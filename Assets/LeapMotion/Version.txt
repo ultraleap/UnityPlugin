@@ -1,0 +1,3 @@
+Leap Motion Unity Asset Version: 3.0.0
+Leap Motion Version at Release Time: 2.3.1+31549
+Oculus Rift SDK/Runtime Version at Release Time: 0.7.0
