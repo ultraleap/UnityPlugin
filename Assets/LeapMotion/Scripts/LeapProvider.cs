@@ -18,8 +18,6 @@ namespace Leap {
     private SmoothedFloat smoothedFixedUpdateOffset_ = new SmoothedFloat();
     /** The maximum offset calculated per frame */
     public float PerFrameFixedUpdateOffset;
-    /** Conversion factor for millimeters to meters. */
-    protected const float MM_TO_M = 1e-3f;
     /** Conversion factor for nanoseconds to seconds. */
     protected const float NS_TO_S = 1e-6f;
     /** Conversion factor for seconds to nanoseconds. */
@@ -121,19 +119,11 @@ namespace Leap {
       }
       return new LeapDeviceInfo(LeapDeviceType.Invalid);
     }
-    private Matrix GetLeapMatrix() {
-      Transform t = this.transform;
-      Vector xbasis = new Vector(t.right.x, t.right.y, t.right.z) * t.localScale.x * MM_TO_M;
-      Vector ybasis = new Vector(t.up.x, t.up.y, t.up.z) * t.localScale.y * MM_TO_M;
-      Vector zbasis = new Vector(t.forward.x, t.forward.y, t.forward.z) * -t.localScale.z * MM_TO_M;
-      Vector trans = new Vector(t.position.x, t.position.y, t.position.z);
-      return new Matrix(xbasis, ybasis, zbasis, trans);
-    }
 
     // Update is called once per frame
     void Update() {
 
-      leapMat = GetLeapMatrix();
+      leapMat = UnityMatrixExtension.GetLeapMatrix(this.transform);
       CurrentFrame = leap_controller_.GetTransformedFrame(leapMat, 0);
 
       //perFrameFixedUpdateOffset_ contains the maximum offset of this Update cycle
@@ -155,7 +145,7 @@ namespace Leap {
       Frame closestFrame = leap_controller_.Frame();
       for (int searchHistoryIndex = 0; searchHistoryIndex < 60; searchHistoryIndex++) {
 
-        leapMat = GetLeapMatrix();
+        leapMat = UnityMatrixExtension.GetLeapMatrix(this.transform);
         Frame historyFrame = leap_controller_.GetTransformedFrame(leapMat, searchHistoryIndex);
 
         //If we reach an invalid frame, terminate the search

@@ -72,6 +72,8 @@ namespace Leap {
     public static readonly Vector LEAP_FORWARD = new Vector(0, 0, -1);
     /** The origin point in the Leap coordinate system.*/
     public static readonly Vector LEAP_ORIGIN = new Vector(0, 0, 0);
+    /** Conversion factor for millimeters to meters. */
+    public static readonly float MM_TO_M = 1e-3f;
     
     /**
      * Converts a Leap Matrix object representing a rotation to a 
@@ -97,6 +99,16 @@ namespace Leap {
      */
     public static Vector3 Translation(this Matrix matrix, bool mirror = false) {
       return matrix.TransformPoint(LEAP_ORIGIN).ToUnityScaled();
+    }
+    /**
+     * 
+     */
+    public static Matrix GetLeapMatrix(Transform t) {
+      Vector xbasis = new Vector(t.right.x, t.right.y, t.right.z) * t.lossyScale.x * MM_TO_M;
+      Vector ybasis = new Vector(t.up.x, t.up.y, t.up.z) * t.lossyScale.y * MM_TO_M;
+      Vector zbasis = new Vector(t.forward.x, t.forward.y, t.forward.z) * -t.lossyScale.z * MM_TO_M;
+      Vector trans = new Vector(t.position.x, t.position.y, t.position.z);
+      return new Matrix(xbasis, ybasis, zbasis, trans);
     }
   }
 }
