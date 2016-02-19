@@ -26,10 +26,18 @@ namespace Leap {
     // Use this for initialization
     void Start() {
       ModelPool = new List<IHandModel>();
-      ModelPool.Add(LeftGraphicsModel);
-      ModelPool.Add(RightGraphicsModel);
-      ModelPool.Add(LeftPhysicsModel);
-      ModelPool.Add(RightPhysicsModel);
+      if (LeftGraphicsModel) {
+        ModelPool.Add(LeftGraphicsModel);
+      }
+      if (RightGraphicsModel) {
+        ModelPool.Add(RightGraphicsModel);
+      }
+      if (LeftPhysicsModel) {
+        ModelPool.Add(LeftPhysicsModel); 
+      }
+      if (RightPhysicsModel) {
+        ModelPool.Add(RightPhysicsModel); 
+      }
       controller_ = GetComponent<LeapHandController>();
     }
 
@@ -57,7 +65,7 @@ namespace Leap {
       }
       return handRep;
     }
-    //Validate the that IHandModel is an instance of a prefab from the scene vs. a prefab from the project
+    //Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project
 #if UNITY_EDITOR
     void OnValidate(){
       if (LeftGraphicsModel != null) {
