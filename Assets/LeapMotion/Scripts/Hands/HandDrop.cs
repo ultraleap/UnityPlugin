@@ -5,7 +5,6 @@ namespace Leap {
   public class HandDrop : HandTransitionBehavior {
     private Vector3 startingPalmPosition;
     private Quaternion startingOrientation;
-    private Vector3 startingScale;
     private Transform palm;
 
     // Use this for initialization
@@ -13,7 +12,6 @@ namespace Leap {
       palm = GetComponent<HandModel>().palm;
       startingPalmPosition = palm.localPosition;
       startingOrientation = palm.localRotation;
-      startingScale = transform.localScale;
     }
 
     public override void HandFinish() {
