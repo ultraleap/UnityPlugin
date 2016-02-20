@@ -15,35 +15,28 @@ namespace Leap {
   public class HandPool :
     HandFactory
   {
-    //public IHandModel LeftGraphicsModel;
-    //public IHandModel RightGraphicsModel;
-    //public IHandModel LeftPhysicsModel;
-    //public IHandModel RightPhysicsModel;
-    [SerializeField]
     public List<IHandModel> ModelCollection;
     public List<IHandModel> ModelPool;
     public LeapHandController controller_ { get; set; }
 
     // Use this for initialization
     void Start() {
-      ModelPool = new List<IHandModel>();
       for (int i = 0; i < ModelCollection.Count; i++) {
-        if (ModelCollection[i] != null) {
-          ModelPool.Add(ModelCollection[i]);
+        if (ModelCollection[i]) {
+          ModelCollection[i].gameObject.SetActive(false);
         }
       }
-      //if (LeftGraphicsModel) {
-      //  ModelPool.Add(LeftGraphicsModel);
-      //}
-      //if (RightGraphicsModel) {
-      //  ModelPool.Add(RightGraphicsModel);
-      //}
-      //if (LeftPhysicsModel) {
-      //  ModelPool.Add(LeftPhysicsModel); 
-      //}
-      //if (RightPhysicsModel) {
-      //  ModelPool.Add(RightPhysicsModel); 
-      //}
+        ModelPool = new List<IHandModel>();
+      for (int i = 0; i < ModelCollection.Count; i++) {
+        if (ModelCollection[i] != null) {
+          if ((PrefabUtility.GetPrefabType(ModelCollection[i]) == PrefabType.Prefab)) {
+            ModelPool.Add(Instantiate(ModelCollection[i]));
+          }
+          else {
+             ModelPool.Add(ModelCollection[i]);
+          }
+        }
+      }
       controller_ = GetComponent<LeapHandController>();
     }
 
@@ -71,27 +64,11 @@ namespace Leap {
       }
       return handRep;
     }
-    //Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project
-#if UNITY_EDITOR
-    //void OnValidate(){
-    //  if (LeftGraphicsModel != null) {
-    //    ValidateIHandModelPrefab(LeftGraphicsModel);
-    //  }
-    //  if (RightGraphicsModel != null) {
-    //    ValidateIHandModelPrefab(RightGraphicsModel);
-    //  }
-    //  if (LeftPhysicsModel != null) {
-    //    ValidateIHandModelPrefab(LeftPhysicsModel);
-    //  }
-    //  if (RightPhysicsModel != null) {
-    //    ValidateIHandModelPrefab(RightPhysicsModel);
-    //  }
-    //}
-    //void ValidateIHandModelPrefab(IHandModel iHandModel) {
-    //  if (PrefabUtility.GetPrefabType(iHandModel) == PrefabType.Prefab) {
-    //    EditorUtility.DisplayDialog("Warning", "This slot needs to have an instance of a prefab from your scene. Make your hand prefab a child of the LeapHanadContrller in your scene,  then drag here", "OK");
-    //  }
-    //}
-#endif 
+    void ValidateIHandModelPrefab(IHandModel iHandModel) {
+      if (PrefabUtility.GetPrefabType(iHandModel) == PrefabType.Prefab) {
+        EditorUtility.DisplayDialog("Warning", "This slot needs to have an instance of a prefab from your scene. Make your hand prefab a child of the LeapHanadContrller in your scene,  then drag here", "OK");
+      }
+    }
+
   }
 }
