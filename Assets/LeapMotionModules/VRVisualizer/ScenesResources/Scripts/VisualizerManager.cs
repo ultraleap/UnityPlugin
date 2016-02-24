@@ -14,6 +14,8 @@ public class VisualizerManager : MonoBehaviour {
   public GameObject m_VRVisualizer = null;
   public UnityEngine.UI.Text m_modeText;
   public UnityEngine.UI.Text m_warningText;
+  public UnityEngine.UI.Text m_trackingText;
+  public KeyCode keyToToggleHMD = KeyCode.V;
 
   private Controller m_controller = null;
   private bool m_leapConnected = false;
@@ -40,12 +42,13 @@ public class VisualizerManager : MonoBehaviour {
       m_VRVisualizer.gameObject.SetActive(false);
       m_PCVisualizer.gameObject.SetActive(true);
       m_modeText.text = "Desktop Mode";
-      m_warningText.text = "Orion is built for virtual reality and performs best when head-mounted";
+      m_warningText.text = "No head-mounted display detected. Orion performs best in a head-mounted display";
     }
   }
 
   void Start()
   {
+    m_trackingText.text = "";
     FindController();
     if (m_controller != null)
       m_leapConnected = m_controller.IsConnected;
@@ -53,18 +56,41 @@ public class VisualizerManager : MonoBehaviour {
 
   void Update()
   {
-    if (m_leapConnected)
-      return;
-
     if (m_controller == null)
     {
       FindController();
-    } else
+      return;
+    }
+
+    if (m_leapConnected == false && m_controller.IsConnected)
     {
-      if (m_controller.IsConnected)
+      // HACK (wyu): LeapProvider should listen to events and update itself when Leap devices are connected/disconnected instead of having to reload the scene to reinitialize variables
+      SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+    m_leapConnected = m_controller.IsConnected;
+    if (!m_leapConnected)
+    {
+      m_trackingText.text = "";
+      return;
+    }
+
+    m_trackingText.text = "Tracking Mode: ";
+    m_trackingText.text += (m_controller.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD)) ? "Head-Mounted" : "Desktop";
+
+    // In Desktop Mode
+    if (m_PCVisualizer.activeInHierarchy)
+    {
+      if (m_controller.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD))
       {
-        // HACK (wyu): LeapProvider should listen to events and update itself when Leap devices are connected/disconnected instead of having to reload the scene to reinitialize variables
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        m_trackingText.text += " (Press '" + keyToToggleHMD + "' to switch to desktop mode)";
+        if (Input.GetKeyDown(keyToToggleHMD))
+          m_controller.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      }
+      else
+      {
+        m_trackingText.text += " (Press '" + keyToToggleHMD + "' to switch to head-mounted mode)";
+        if (Input.GetKeyDown(keyToToggleHMD))
+          m_controller.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
       }
     }
   }
