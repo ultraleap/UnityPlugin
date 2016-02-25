@@ -11,53 +11,67 @@ using Leap;
 
 namespace LeapInternal
 {
-    //TODO test thread safety
-    public class DistortionDictionary : Dictionary<UInt64, DistortionData>{
+  //TODO test thread safety
+  public class DistortionDictionary : Dictionary<UInt64, DistortionData>
+  {
 
-        private UInt64 _currentMatrix = 0;
-        private bool _distortionChange = false;
-        private object locker = new object();
+    private UInt64 _currentMatrix = 0;
+    private bool _distortionChange = false;
+    private object locker = new object();
 
-        public UInt64 CurrentMatrix{
-            get{
-                lock(locker){
-                    return _currentMatrix;
-                }
-            }
-            set {
-                lock(locker){
-                    _currentMatrix = value;
-                }
-            }
+    public UInt64 CurrentMatrix
+    {
+      get
+      {
+        lock (locker)
+        {
+          return _currentMatrix;
         }
-        public bool DistortionChange{
-            get{
-                lock(locker){
-                    return _distortionChange;
-                }
-            }
-            set {
-                lock(locker){
-                    _distortionChange = value;
-                }
-            }
-
+      }
+      set
+      {
+        lock (locker)
+        {
+          _currentMatrix = value;
         }
-
-        public DistortionData GetMatrix(UInt64 version){
-            lock(locker){
-                DistortionData matrix;
-                this.TryGetValue(version, out matrix);
-                return matrix;
-            }
+      }
+    }
+    public bool DistortionChange
+    {
+      get
+      {
+        lock (locker)
+        {
+          return _distortionChange;
         }
-
-        public bool VersionExists(UInt64 version){
-            lock(locker){
-                return this.ContainsKey(version);
-            }
+      }
+      set
+      {
+        lock (locker)
+        {
+          _distortionChange = value;
         }
+      }
 
     }
-}
 
+    public DistortionData GetMatrix(UInt64 version)
+    {
+      lock (locker)
+      {
+        DistortionData matrix;
+        this.TryGetValue(version, out matrix);
+        return matrix;
+      }
+    }
+
+    public bool VersionExists(UInt64 version)
+    {
+      lock (locker)
+      {
+        return this.ContainsKey(version);
+      }
+    }
+
+  }
+}
