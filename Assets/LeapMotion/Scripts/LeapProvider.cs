@@ -149,7 +149,8 @@ namespace Leap {
         Frame historyFrame = leap_controller_.GetTransformedFrame(leapMat, searchHistoryIndex);
 
         //If we reach an invalid frame, terminate the search
-        if (!historyFrame.IsValid) {
+        if (historyFrame.Id < 0) {
+          Debug.Log("historyFrame.Id is less than 0");
           break;
         }
 

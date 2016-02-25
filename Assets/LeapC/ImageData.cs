@@ -44,8 +44,8 @@ namespace LeapInternal
 
         public void CompleteImageData(eLeapImageType type,
                                       eLeapImageFormat format,
-                                      UInt32 bpp, 
-                                      UInt32 width, 
+                                      UInt32 bpp,
+                                      UInt32 width,
                                       UInt32 height,
                                       Int64 timestamp,
                                       Int64 frame_id,
@@ -103,30 +103,5 @@ namespace LeapInternal
                 }
             }
         }
-
-//        public ImageData Copy(){
-//            ImageData copy = new ImageData();
-//            copy.pixelBuffer = new byte[pixelBuffer.Length];
-//            copy.index = this.index;
-//            copy.type = this.type; 
-//            copy.format = this.format;
-//            copy.bpp = this.bpp;
-//            copy.width = this.width;
-//            copy.height = this.height;
-//            copy.timestamp = this.timestamp;
-//            copy.frame_id = this.frame_id;
-//            copy.RayOffsetX = this.RayOffsetX;
-//            copy.RayOffsetY = this.RayOffsetY;
-//            copy.RayScaleX = this.RayScaleX;
-//            copy.RayScaleY = this.RayScaleY;
-//            copy.DistortionData = this.DistortionData;
-//            copy.DistortionMatrixKey = this.DistortionMatrixKey;
-//            copy.isComplete = this.isComplete;
-//
-//            return copy;
-//        }
     }
-
-
-
 }
