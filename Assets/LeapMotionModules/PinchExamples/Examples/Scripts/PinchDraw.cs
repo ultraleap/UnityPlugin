@@ -16,16 +16,16 @@ public class PinchDraw : MonoBehaviour {
   private Color _drawColor = Color.white;
 
   [SerializeField]
-  private float _smoothingDelay = 0.05f;
+  private float _smoothingDelay = 0.01f;
 
   [SerializeField]
-  private float _drawRadius = 0.01f;
+  private float _drawRadius = 0.002f;
 
   [SerializeField]
   private int _drawResolution = 8;
 
   [SerializeField]
-  private float _minSegmentLength = 0.02f;
+  private float _minSegmentLength = 0.005f;
 
   private DrawState[] _drawStates;
 
@@ -49,7 +49,7 @@ public class PinchDraw : MonoBehaviour {
 
   void OnValidate() {
     _drawRadius = Mathf.Max(0, _drawRadius);
-    _drawResolution = Mathf.Max(3, _drawResolution);
+    _drawResolution = Mathf.Clamp(_drawResolution, 3, 24);
     _minSegmentLength = Mathf.Max(0, _minSegmentLength);
   }
 

@@ -7,18 +7,16 @@ using Leap;
 /// be used to detect pinch gestures that the hand makes.
 /// </summary>
 public class LeapPinchDetector : MonoBehaviour {
-  protected const float MM_TO_CM = 0.1f;
+  protected const float MM_TO_M = 0.001f;
 
   [SerializeField]
   protected IHandModel _handModel;
 
-  [Tooltip("Measured in Centimeters")]
   [SerializeField]
-  protected float _activatePinchDist = 3;
+  protected float _activatePinchDist = 0.03f;
 
-  [Tooltip("Measured in Centimeters")]
   [SerializeField]
-  protected float _deactivatePinchDist = 5;
+  protected float _deactivatePinchDist = 0.05f;
 
   protected bool _isPinching = false;
   protected bool _didChange = false;
@@ -135,7 +133,7 @@ public class LeapPinchDetector : MonoBehaviour {
       return;
     }
 
-    float pinchDistCM = hand.PinchDistance * MM_TO_CM;
+    float pinchDistance = hand.PinchDistance * MM_TO_M;
     transform.rotation = hand.Basis.Rotation();
 
     var fingers = hand.Fingers;
@@ -150,12 +148,12 @@ public class LeapPinchDetector : MonoBehaviour {
     transform.position /= 2.0f;
 
     if (_isPinching) {
-      if (pinchDistCM > _deactivatePinchDist) {
+      if (pinchDistance > _deactivatePinchDist) {
         changePinchState(false);
         return;
       }
     } else {
-      if (pinchDistCM < _activatePinchDist) {
+      if (pinchDistance < _activatePinchDist) {
         changePinchState(true);
       }
     }
