@@ -29,6 +29,24 @@ public class PinchDraw : MonoBehaviour {
 
   private DrawState[] _drawStates;
 
+  public Color DrawColor {
+    get {
+      return _drawColor;
+    }
+    set {
+      _drawColor = value;
+    }
+  }
+
+  public float DrawRadius {
+    get {
+      return _drawRadius;
+    }
+    set {
+      _drawRadius = value;
+    }
+  }
+
   void OnValidate() {
     _drawRadius = Mathf.Max(0, _drawRadius);
     _drawResolution = Mathf.Max(3, _drawResolution);
