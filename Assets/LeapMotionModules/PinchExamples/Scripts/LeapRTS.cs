@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Use this component on a Game Object to allow it to be manipulated by a pinch gesture.  The component
+/// allows rotation, translation, and scale of the object (RTS).
+/// </summary>
 [ExecuteAfter(typeof(LeapPinchDetector))]
 public class LeapRTS : MonoBehaviour {
 
@@ -10,10 +14,10 @@ public class LeapRTS : MonoBehaviour {
   }
 
   [SerializeField]
-  private LeapPinchDetector _leftPinch;
+  private LeapPinchDetector _pinchDetectorA;
 
   [SerializeField]
-  private LeapPinchDetector _rightPinch;
+  private LeapPinchDetector _pinchDetectorB;
 
   [SerializeField]
   private RotationMethod _oneHandedRotationMethod;
@@ -36,6 +40,11 @@ public class LeapRTS : MonoBehaviour {
   private float _defaultNearClip;
 
   void Awake() {
+    if (_pinchDetectorA == null || _pinchDetectorB == null) {
+      Debug.LogWarning("Both Pinch Detectors of the LeapRTS component must be assigned. This component has been disabled.");
+      enabled = false;
+    }
+
     GameObject pinchControl = new GameObject("RTS Anchor");
     _anchor = pinchControl.transform;
     _anchor.transform.parent = transform.parent;
@@ -48,19 +57,19 @@ public class LeapRTS : MonoBehaviour {
     }
 
     bool didUpdate = false;
-    didUpdate |= _leftPinch.DidChangeFromLastFrame;
-    didUpdate |= _rightPinch.DidChangeFromLastFrame;
+    didUpdate |= _pinchDetectorA.DidChangeFromLastFrame;
+    didUpdate |= _pinchDetectorB.DidChangeFromLastFrame;
 
     if (didUpdate) {
       transform.SetParent(null, true);
     }
 
-    if (_leftPinch.IsPinching && _rightPinch.IsPinching) {
+    if (_pinchDetectorA.IsPinching && _pinchDetectorB.IsPinching) {
       transformDoubleAnchor();
-    } else if (_leftPinch.IsPinching) {
-      transformSingleAnchor(_leftPinch);
-    } else if (_rightPinch.IsPinching) {
-      transformSingleAnchor(_rightPinch);
+    } else if (_pinchDetectorA.IsPinching) {
+      transformSingleAnchor(_pinchDetectorA);
+    } else if (_pinchDetectorB.IsPinching) {
+      transformSingleAnchor(_pinchDetectorB);
     }
 
     if (didUpdate) {
@@ -102,25 +111,25 @@ public class LeapRTS : MonoBehaviour {
   }
 
   private void transformDoubleAnchor() {
-    _anchor.position = (_leftPinch.Position + _rightPinch.Position) / 2.0f;
+    _anchor.position = (_pinchDetectorA.Position + _pinchDetectorB.Position) / 2.0f;
 
     switch (_twoHandedRotationMethod) {
       case RotationMethod.None:
         break;
       case RotationMethod.Single:
-        Vector3 p = _leftPinch.Position;
+        Vector3 p = _pinchDetectorA.Position;
         p.y = _anchor.position.y;
         _anchor.LookAt(p);
         break;
       case RotationMethod.Full:
-        Quaternion pp = Quaternion.Lerp(_leftPinch.Rotation, _rightPinch.Rotation, 0.5f);
+        Quaternion pp = Quaternion.Lerp(_pinchDetectorA.Rotation, _pinchDetectorB.Rotation, 0.5f);
         Vector3 u = pp * Vector3.up;
-        _anchor.LookAt(_leftPinch.Position, u);
+        _anchor.LookAt(_pinchDetectorA.Position, u);
         break;
     }
 
     if (_allowScale) {
-      _anchor.localScale = Vector3.one * Vector3.Distance(_leftPinch.Position, _rightPinch.Position);
+      _anchor.localScale = Vector3.one * Vector3.Distance(_pinchDetectorA.Position, _pinchDetectorB.Position);
     }
   }
 

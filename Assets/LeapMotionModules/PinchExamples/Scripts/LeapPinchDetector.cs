@@ -1,14 +1,16 @@
 ﻿using UnityEngine;
+using System;
 using Leap;
 
+/// <summary>
+/// A basic utility class to aid in creating pinch based actions.  Once linked with an IHandModel, it can
+/// be used to detect pinch gestures that the hand makes.
+/// </summary>
 public class LeapPinchDetector : MonoBehaviour {
   protected const float MM_TO_CM = 0.1f;
 
   [SerializeField]
-  protected LeapProvider _leapProvider;
-
-  [SerializeField]
-  protected Chirality _handedness;
+  protected IHandModel _handModel;
 
   [Tooltip("Measured in Centimeters")]
   [SerializeField]
@@ -28,8 +30,8 @@ public class LeapPinchDetector : MonoBehaviour {
   protected Quaternion _pinchRotation;
 
   void OnValidate() {
-    if (_handedness == Chirality.Either) {
-      _handedness = Chirality.Left;
+    if (_handModel == null) {
+      _handModel = GetComponentInParent<IHandModel>();
     }
 
     _activatePinchDist = Mathf.Max(0, _activatePinchDist);
@@ -38,6 +40,13 @@ public class LeapPinchDetector : MonoBehaviour {
     //Activate distance cannot be greater than deactivate distance
     if (_activatePinchDist > _deactivatePinchDist) {
       _deactivatePinchDist = _activatePinchDist;
+    }
+  }
+
+  void Awake() {
+    if (_handModel == null) {
+      Debug.LogWarning("The HandModel field of LeapPinchDetector was unassigned and the detector has been disabled.");
+      enabled = false;
     }
   }
 
@@ -119,14 +128,7 @@ public class LeapPinchDetector : MonoBehaviour {
   protected virtual void Update() {
     _didChange = false;
 
-    Hand hand = null;
-    Frame currFrame = _leapProvider.CurrentFrame;
-    for (int i = 0; i < currFrame.Hands.Count; i++) {
-      if (currFrame.Hands[i].IsLeft == (_handedness == Chirality.Left)) {
-        hand = currFrame.Hands[i];
-        break;
-      }
-    }
+    Hand hand = _handModel.GetLeapHand();
 
     if (hand == null) {
       changePinchState(false);
@@ -134,6 +136,7 @@ public class LeapPinchDetector : MonoBehaviour {
     }
 
     float pinchDistCM = hand.PinchDistance * MM_TO_CM;
+    Debug.Log(pinchDistCM);
     transform.rotation = hand.Basis.Rotation();
 
     var fingers = hand.Fingers;
