@@ -298,11 +298,11 @@ public class LeapImageRetriever : MonoBehaviour {
 
   void OnEnable() {
     provider.GetLeapController().DistortionChange += onDistortionChange;
-        provider.GetLeapController().Connect += delegate {
-            provider.GetLeapController().Config.Get("images_enabled", (Int32 enabled) => {
-                this.ImagesEnabled = enabled == 0 ? false : true;
-            });
-        };
+    provider.GetLeapController().Connect += delegate {
+      provider.GetLeapController().Config.Get("images_enabled", (Int32 enabled) => {
+        this.ImagesEnabled = enabled == 0 ? false : true;
+      });
+    };
   }
 
   void OnDisable() {
