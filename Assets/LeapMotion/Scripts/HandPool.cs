@@ -29,7 +29,7 @@ namespace Leap {
         ModelPool = new List<IHandModel>();
       for (int i = 0; i < ModelCollection.Count; i++) {
         if (ModelCollection[i] != null) {
-          if ((PrefabUtility.GetPrefabType(ModelCollection[i]) == PrefabType.Prefab)) {
+          if (ModelCollection[i].gameObject.activeSelf == false) {
             ModelPool.Add(Instantiate(ModelCollection[i]));
           }
           else {
