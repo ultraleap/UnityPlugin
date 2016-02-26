@@ -136,7 +136,6 @@ public class LeapPinchDetector : MonoBehaviour {
     }
 
     float pinchDistCM = hand.PinchDistance * MM_TO_CM;
-    Debug.Log(pinchDistCM);
     transform.rotation = hand.Basis.Rotation();
 
     var fingers = hand.Fingers;
