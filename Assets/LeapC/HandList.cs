@@ -22,7 +22,7 @@ namespace Leap
    * @since 1.0
    */
     
-    public class HandList : List<Hand>
+    public class HandList : List<IHand>
     {
         public HandList():base(){}
         public HandList(int initialCapacity):base(initialCapacity){}
@@ -39,7 +39,7 @@ namespace Leap
      */
         public HandList HandType (bool leftHand)
         {
-            return (HandList) this.FindAll (delegate (Hand hand) {
+            return (HandList) this.FindAll (delegate (IHand hand) {
                 return hand.IsLeft == leftHand;
             });
         }
@@ -69,12 +69,16 @@ namespace Leap
      * @returns The leftmost hand, or invalid if list is empty.
      * @since 1.0
      */
-        public Hand Leftmost {
+        public IHand Leftmost {
             get {
-                Hand mostest = new Hand();
+                if (this.Count == 0)
+                    return Hand.Invalid;
+
+                IHand mostest = null;
                 float position = float.MaxValue;
-                foreach(Hand hand in this){
-                    if(hand.PalmPosition.x < position){
+
+                foreach(IHand hand in this){
+                    if(hand.PalmPosition.x <= position){
                         mostest = hand;
                         position = hand.PalmPosition.x;
                     }
@@ -92,12 +96,16 @@ namespace Leap
      * @returns The rightmost hand, or invalid if list is empty.
      * @since 1.0
      */
-        public Hand Rightmost {
+        public IHand Rightmost {
             get {
-                Hand mostest = new Hand();
+                if (this.Count == 0)
+                    return Hand.Invalid;
+
+                IHand mostest = null;
                 float position = float.MinValue;
-                foreach(Hand hand in this){
-                    if(hand.PalmPosition.x > position){
+
+                foreach(IHand hand in this){
+                    if(hand.PalmPosition.x >= position){
                         mostest = hand;
                         position = hand.PalmPosition.x;
                     }
@@ -115,12 +123,17 @@ namespace Leap
      * @returns The frontmost hand, or invalid if list is empty.
      * @since 1.0
      */
-        public Hand Frontmost {
+        public IHand Frontmost {
             get {
-                Hand mostest = new Hand();
+                if (this.Count == 0)
+                    return Hand.Invalid;
+
+                IHand mostest = null;
                 float position = float.MaxValue;
-                foreach(Hand hand in this){
-                    if(hand.PalmPosition.z < position){
+
+                foreach(IHand hand in this)
+                {
+                    if(hand.PalmPosition.z <= position){
                         mostest = hand;
                         position = hand.PalmPosition.z;
                     }

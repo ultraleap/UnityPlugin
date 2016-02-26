@@ -1,15 +1,21 @@
-﻿using UnityEngine;
+﻿// #define CHECK_TRANSFORMED_IMPL
+
+using UnityEngine;
 using System.Collections;
 using LeapInternal;
 using Leap;
 
-namespace Leap {
-  public class LeapProvider :
-    MonoBehaviour {
-    public Frame CurrentFrame { get; private set; }
+namespace Leap 
+{
+  public class LeapProvider : MonoBehaviour 
+  {
+    public IFrame CurrentFrame { get { return _currentFrame; } }
     public Image CurrentImage { get; private set; }
     private Transform providerSpace;
     private Matrix leapMat;
+
+    private TransformedFrame _currentFrame;
+    private TransformedFrame _currentFixedFrame;
 
     protected Controller leap_controller_;
 
@@ -46,8 +52,9 @@ namespace Leap {
     // Use this for initialization
     void Start() {
       //set empty frame
-      CurrentFrame = new Frame();
-
+        Matrix identity = Matrix.Identity;
+        _currentFrame = new TransformedFrame(ref identity, new Frame());
+        _currentFixedFrame = new TransformedFrame(ref identity, new Frame());
     }
 
     void HandleControllerConnect(object sender, LeapEventArgs args) {
@@ -134,11 +141,26 @@ namespace Leap {
     void Update() {
 
       leapMat = GetLeapMatrix();
-      CurrentFrame = leap_controller_.GetTransformedFrame(leapMat, 0);
+
+#if CHECK_TRANSFORMED_IMPL
+      IFrame frame = leap_controller_.Frame(); // Fetch this only once, otherwise may change between calls
+      IFrame previousFrame = leap_controller_.Frame(1); // May actually be Frame(2), but it's ok
+      
+      _currentFrame.Set(ref leapMat, frame);
+
+      Asserter.CompareAllValues(
+          frame.TransformedCopy(ref leapMat), 
+          previousFrame.TransformedCopy(ref leapMat), 
+          _currentFrame, // == frame.TransformedShallowCopy(ref leapMat)
+          previousFrame.TransformedShallowCopy(ref leapMat));
+#else
+      _currentFrame.Set(ref leapMat, leap_controller_.Frame());
+#endif
 
       //perFrameFixedUpdateOffset_ contains the maximum offset of this Update cycle
       smoothedFixedUpdateOffset_.Update(PerFrameFixedUpdateOffset, Time.deltaTime);
-      float now = leap_controller_.Now();
+      
+      //float now = leap_controller_.Now();
       //Debug.Log("leap_controller_.Now():" + leap_controller_.Now() + " - CurrentFrame.Timestamp:" + CurrentFrame.Timestamp + " = " + (leap_controller_.Now() - CurrentFrame.Timestamp));
       //Debug.Log("provider.Update().CurrentFrame.Id: " + CurrentFrame.Id);
     }
@@ -146,17 +168,17 @@ namespace Leap {
     void FixedUpdate() {
       //which frame to deliver
     }
-    public virtual Frame GetFixedFrame() {
+
+    public virtual IFrame GetFixedFrame() {
 
       //Aproximate the correct timestamp given the current fixed time
       float correctedTimestamp = (Time.fixedTime + smoothedFixedUpdateOffset_.value) * S_TO_NS;
 
       //Search the leap history for a frame with a timestamp closest to the corrected timestamp
-      Frame closestFrame = leap_controller_.Frame();
+      IFrame closestFrame = leap_controller_.Frame();
       for (int searchHistoryIndex = 0; searchHistoryIndex < 60; searchHistoryIndex++) {
 
-        leapMat = GetLeapMatrix();
-        Frame historyFrame = leap_controller_.GetTransformedFrame(leapMat, searchHistoryIndex);
+        IFrame historyFrame = leap_controller_.Frame(searchHistoryIndex);//GetTransformedFrame(leapMat, searchHistoryIndex);
 
         //If we reach an invalid frame, terminate the search
         if (!historyFrame.IsValid) {
@@ -170,7 +192,10 @@ namespace Leap {
           break;
         }
       }
-      return closestFrame;
+
+      leapMat = GetLeapMatrix();
+      _currentFixedFrame.Set(ref leapMat, closestFrame);
+      return _currentFixedFrame;
     }
     void OnDestroy() {
       //DestroyAllHands();

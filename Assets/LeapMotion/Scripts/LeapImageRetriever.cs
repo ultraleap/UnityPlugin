@@ -89,6 +89,10 @@ public class LeapImageRetriever : MonoBehaviour {
       TextureFormat format = getTextureFormat(image);
 
       if (_combinedTexture != null) {
+				if ((_combinedTexture.height == combinedHeight) &&
+				    (_combinedTexture.width == combinedWidth))
+					return;
+
         DestroyImmediate(_combinedTexture);
       }
 
@@ -353,7 +357,7 @@ public class LeapImageRetriever : MonoBehaviour {
       _lastTime = _startTime;
     }
     _requestedImages++;
-    Frame imageFrame = provider.CurrentFrame;
+    IFrame imageFrame = provider.CurrentFrame;
     Controller controller = provider.GetLeapController();
 
     _requestedImage = controller.RequestImages(imageFrame.Id, Image.ImageType.DEFAULT);
