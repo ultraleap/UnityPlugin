@@ -6,6 +6,7 @@
 using UnityEngine;
 using UnityEngine.Serialization;
 using System;
+using System.Collections;
 using Leap;
 
 // To use the LeapImageRetriever you must be on version 2.1+
@@ -43,7 +44,7 @@ public class LeapImageRetriever : MonoBehaviour {
   protected Image _requestedImage = new Image();
   [SerializeField]
   protected long ImageTimeout = 9000; //microseconds
-  protected bool ImagesEnabled = false;
+  protected bool ImagesEnabled = true;
 
   public EyeTextureData TextureData {
     get {
@@ -101,7 +102,6 @@ public class LeapImageRetriever : MonoBehaviour {
 
     public void UpdateTexture(Image image) {
       Array.Copy(image.Data, 0, _intermediateArray, 0, _intermediateArray.Length);
-      //	  Array.Copy(right.Data, 0, _intermediateArray, _intermediateArray.Length / 2, _intermediateArray.Length / 2);
       _combinedTexture.LoadRawTextureData(_intermediateArray);
       _combinedTexture.Apply();
     }
@@ -298,11 +298,6 @@ public class LeapImageRetriever : MonoBehaviour {
 
   void OnEnable() {
     provider.GetLeapController().DistortionChange += onDistortionChange;
-    provider.GetLeapController().Connect += (object sender, ConnectionEventArgs e) => {
-            provider.GetLeapController().Config.Get<Int32>("images_mode", delegate (Int32 enabled){
-            this.ImagesEnabled = enabled == 0 ? false : true;
-        });
-    };
   }
 
   void OnDisable() {
@@ -340,7 +335,16 @@ public class LeapImageRetriever : MonoBehaviour {
         Frame imageFrame = provider.CurrentFrame;
         Controller controller = provider.GetLeapController();
         _requestedImage = controller.RequestImages(imageFrame.Id, Image.ImageType.DEFAULT);
-    }
+        } else {
+            StartCoroutine(CheckImageMode());
+        }
+  }
+  
+  private IEnumerator CheckImageMode(){
+    yield return new WaitForSeconds(1);
+    provider.GetLeapController().Config.Get<Int32>("images_mode", delegate (Int32 enabled){
+      this.ImagesEnabled = enabled == 0 ? false : true;
+    });
   }
 
   public void ApplyGammaCorrectionValues() {
