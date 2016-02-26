@@ -33,7 +33,7 @@ namespace Leap
    * @since 2.0
    */
 
-    public class Bone
+    public class Bone : IBone
     {
         Vector _prevJoint;
         Vector _nextJoint;
@@ -84,10 +84,18 @@ namespace Leap
             _isValid = true;
         }
 
-        public Bone TransformedCopy(Matrix trs){
+        public IBone TransformedShallowCopy(ref Matrix trs)
+        {
+            return new TransformedBone(ref trs, this);
+        }
+
+        public IBone TransformedCopy(ref Matrix trs)
+        {
             float dScale = trs.zBasis.Magnitude;
             float hScale = trs.xBasis.Magnitude;
-            return new Bone(trs.TransformPoint(_prevJoint),
+
+            return new Bone(
+                trs.TransformPoint(_prevJoint),
                 trs.TransformPoint(_nextJoint),
                 trs.TransformPoint(_center),
                 trs.TransformDirection(_direction).Normalized,
@@ -293,9 +301,11 @@ namespace Leap
      * @returns The invalid Bone instance.
      * @since 2.0
      */
-        public static Bone Invalid {
+        private static IBone invalidBone = new InvalidBone();
+
+        public static IBone Invalid {
             get {
-                return new Bone();
+                return invalidBone;
             } 
         }
 

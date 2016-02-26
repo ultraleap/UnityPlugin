@@ -32,13 +32,15 @@ namespace Leap
    * @since 1.0
    */
 
-    public class Finger
+    public class Finger : IFinger
     {
-        Bone[] _bones = new Bone[4];
+        IBone[] _bones = new IBone[4];
         FingerType _type = FingerType.TYPE_UNKNOWN;
          int _frameId;
-         int _id = 0;
          int _handID = 0;
+         int _fingerId = 0;
+         int _id = 0;
+         
          Vector _tipPosition;
          Vector _tipVelocity;
          Vector _direction;
@@ -72,10 +74,10 @@ namespace Leap
                            float length,
                            bool isExtended,
                            Finger.FingerType type,
-                           Bone metacarpal,
-                           Bone proximal,
-                           Bone intermediate,
-                           Bone distal)
+                           IBone metacarpal,
+                           IBone proximal,
+                           IBone intermediate,
+                           IBone distal)
         {
             _type = type;
             _bones [0] = metacarpal;
@@ -83,8 +85,9 @@ namespace Leap
             _bones [2] = intermediate;
             _bones [3] = distal;
             _frameId = frameId;
-            _id = (handId * 10) + fingerId;
+            _fingerId = fingerId;
             _handID = handId;
+            _id = (handId * 10) + fingerId;
             _tipPosition = tipPosition;
             _tipVelocity = tipVelocity;
             _direction = direction;
@@ -96,12 +99,18 @@ namespace Leap
             _timeVisible = timeVisible;
         }
 
-        public Finger TransformedCopy(Matrix trs){
+        public IFinger TransformedShallowCopy(ref Matrix trs)
+        {
+            return new TransformedFinger(ref trs, this);
+        }
+
+        public IFinger TransformedCopy(ref Matrix trs) {
+
             float dScale = trs.zBasis.Magnitude;
             float hScale = trs.xBasis.Magnitude;
             return new Finger(_frameId,
                               _handID,
-                              _id,
+                              _fingerId,
                               _timeVisible,
                               trs.TransformPoint(_tipPosition),
                               trs.TransformPoint(_tipVelocity),
@@ -111,10 +120,10 @@ namespace Leap
                               _length * dScale,
                               _isExtended,
                               _type,
-                              _bones[0].TransformedCopy(trs),
-                              _bones[1].TransformedCopy(trs),
-                              _bones[2].TransformedCopy(trs),
-                              _bones[3].TransformedCopy(trs));
+                              _bones[0].TransformedCopy(ref trs),
+                              _bones[1].TransformedCopy(ref trs),
+                              _bones[2].TransformedCopy(ref trs),
+                              _bones[3].TransformedCopy(ref trs));
         }
 
 
@@ -128,7 +137,7 @@ namespace Leap
      * @returns The Bone that has the specified bone type.
      * @since 2.0
      */
-        public Bone Bone (Bone.BoneType boneIx)
+        public IBone Bone (Bone.BoneType boneIx)
         {
             return _bones[(int)boneIx];
         }
@@ -185,6 +194,13 @@ namespace Leap
             } 
         }
 
+        public int FrameId
+        {
+            get
+            {
+                return _frameId;
+            }
+        }
         /**
      * The Hand associated with a finger.
      *
@@ -356,9 +372,11 @@ namespace Leap
      * @returns The invalid Finger instance.
      * @since 1.0
      */
-        public static Finger Invalid {
+        static private IFinger invalidFinger = new InvalidFinger();
+
+        public static IFinger Invalid {
             get {
-                return new Finger ();
+                return invalidFinger;
             } 
         }
             

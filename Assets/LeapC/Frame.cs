@@ -27,7 +27,7 @@ namespace Leap
    * @since 1.0
    */
 
-    public class Frame
+    public class Frame : IFrame
     {
         FingerList _fingers;
         HandList _hands;
@@ -50,7 +50,12 @@ namespace Leap
             InteractionBox = interactionBox;
         }
 
-        public Frame TransformedCopy (Matrix trs)
+        public IFrame TransformedShallowCopy (ref Matrix trs)
+        {
+            return new TransformedFrame(ref trs, this);
+        }
+
+        public IFrame TransformedCopy (ref Matrix trs)
         {
             Frame transformedFrame = new Frame (_id, 
                                          _timestamp, 
@@ -59,11 +64,12 @@ namespace Leap
             //TODO should InteractionBox be transformed, too?
 
             for (int h = 0; h < this.Hands.Count; h++)
-                transformedFrame.AddHand (this.Hands [h].TransformedCopy (trs));
+                transformedFrame.AddHand (this.Hands [h].TransformedCopy (ref trs));
+
             return transformedFrame;
         }
 
-        public void AddHand (Hand hand)
+        public void AddHand (IHand hand)
         {
             if (_hands == null)
                 _hands = new HandList (3);
@@ -165,9 +171,9 @@ namespace Leap
      * otherwise, an invalid Hand object is returned.
      * @since 1.0
      */
-        public Hand Hand (int id)
+        public IHand Hand (int id)
         {
-            return this.Hands.Find (delegate(Hand item) {
+            return this.Hands.Find (delegate(IHand item) {
                 return item.Id == id;
             });
         }
@@ -192,9 +198,9 @@ namespace Leap
      * otherwise, an invalid Finger object is returned.
      * @since 1.0
      */
-        public Finger Finger (int id)
+        public IFinger Finger (int id)
         {
-            return this.Fingers.Find (delegate(Finger item) {
+            return this.Fingers.Find (delegate(IFinger item) {
                 return item.Id == id;
             });
         }
@@ -220,7 +226,7 @@ namespace Leap
      * in the sinceFrame parameter.
      * @since 1.0
      */
-        public Vector Translation (Frame sinceFrame)
+        public Vector Translation(IFrame sinceFrame)
         {
             return Vector.Zero;
         }
@@ -240,7 +246,7 @@ namespace Leap
      * is intended to be a translating motion.
      * @since 1.0
      */
-        public float TranslationProbability (Frame sinceFrame)
+        public float TranslationProbability(IFrame sinceFrame)
         {
             return 0;
         }
@@ -265,7 +271,7 @@ namespace Leap
      * and that specified in the sinceFrame parameter.
      * @since 1.0
      */
-        public Vector RotationAxis (Frame sinceFrame)
+        public Vector RotationAxis(IFrame sinceFrame)
         {
             return Vector.YAxis;
         }
@@ -292,7 +298,7 @@ namespace Leap
      * sinceFrame parameter.
      * @since 1.0
      */
-        public float RotationAngle (Frame sinceFrame)
+        public float RotationAngle(IFrame sinceFrame)
         {
             return 0;
         }
@@ -320,7 +326,7 @@ namespace Leap
      * parameter around the given axis.
      * @since 1.0
      */
-        public float RotationAngle (Frame sinceFrame, Vector axis)
+        public float RotationAngle(IFrame sinceFrame, Vector axis)
         {
             return 0;
         }
@@ -343,7 +349,7 @@ namespace Leap
      * sinceFrame parameter.
      * @since 1.0
      */
-        public Matrix RotationMatrix (Frame sinceFrame)
+        public Matrix RotationMatrix(IFrame sinceFrame)
         {
             return Matrix.Identity;
         }
@@ -363,7 +369,7 @@ namespace Leap
      * is intended to be a rotating motion.
      * @since 1.0
      */
-        public float RotationProbability (Frame sinceFrame)
+        public float RotationProbability(IFrame sinceFrame)
         {
             return 0;
         }
@@ -391,7 +397,7 @@ namespace Leap
      * sinceFrame parameter.
      * @since 1.0
      */
-        public float ScaleFactor (Frame sinceFrame)
+        public float ScaleFactor(IFrame sinceFrame)
         {
             return 1.0f;
         }
@@ -411,7 +417,7 @@ namespace Leap
      * is intended to be a scaling motion.
      * @since 1.0
      */
-        public float ScaleProbability (Frame sinceFrame)
+        public float ScaleProbability(IFrame sinceFrame)
         {
             return 0;
         }
@@ -425,7 +431,7 @@ namespace Leap
      * the exact same frame of tracking data and both Frame objects are valid.
      * @since 1.0
      */
-        public bool Equals (Frame other)
+        public bool Equals(IFrame other)
         {
             return this.IsValid && other.IsValid && (this.Id == other.Id) && (this.Timestamp == other.Timestamp);
         }
@@ -624,9 +630,11 @@ namespace Leap
      * @returns The invalid Frame instance.
      * @since 1.0
      */
-        public static Frame Invalid {
+        private static IFrame invalidFrame = new InvalidFrame();
+
+        public static IFrame Invalid {
             get {
-                return new Frame ();
+                return invalidFrame;
             } 
         }
 

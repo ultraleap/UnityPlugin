@@ -83,7 +83,7 @@ namespace Leap {
     }
     /** Updates the graphics HandRepresentations. */
     void Update() {
-      Frame frame = Provider.CurrentFrame;
+      IFrame frame = Provider.CurrentFrame;
       if (frame.Id != prev_graphics_id_ && graphicsEnabled) {
         UpdateHandRepresentations(graphicsReps, ModelType.Graphics);
         prev_graphics_id_ = frame.Id;
@@ -98,7 +98,12 @@ namespace Leap {
     * created and added to the dictionary. 
     */
     void UpdateHandRepresentations(Dictionary<int, HandRepresentation> all_hand_reps, ModelType modelType) {
-      foreach (Leap.Hand curHand in Provider.CurrentFrame.Hands) {
+      // foreach (Leap.IHand curHand in Provider.CurrentFrame.Hands) {
+      // Avoid iterator allocation
+      IFrame frame = Provider.CurrentFrame;
+      for(int i = 0; i < frame.Hands.Count; i++)
+      {
+        IHand curHand = frame.Hands[i];
         HandRepresentation rep;
         if (!all_hand_reps.TryGetValue(curHand.Id, out rep)) {
           rep = Factory.MakeHandRepresentation(curHand, modelType);
@@ -142,7 +147,7 @@ namespace Leap {
       var latestFrame = Provider.CurrentFrame;
       Provider.PerFrameFixedUpdateOffset = latestFrame.Timestamp * NS_TO_S - Time.fixedTime;
 
-      Frame frame = Provider.GetFixedFrame();
+      IFrame frame = Provider.GetFixedFrame();
 
       if (frame.Id != prev_physics_id_ && physicsEnabled) {
         UpdateHandRepresentations(physicsReps, ModelType.Physics);

@@ -36,7 +36,7 @@ public class CapsuleHand : IHandModel {
   private List<Transform> _sphereBTransforms;
 
   private Transform armFrontLeft, armFrontRight, armBackLeft, armBackRight;
-  private Hand hand_;
+    private IHand hand_;
 
   public override ModelType HandModelType {
     get {
@@ -51,11 +51,13 @@ public class CapsuleHand : IHandModel {
     }
   }
 
-  public override Hand GetLeapHand() {
+    public override IHand GetLeapHand()
+    {
     return hand_;
   }
 
-  public override void SetLeapHand(Hand hand) {
+    public override void SetLeapHand(IHand hand)
+    {
     hand_ = hand;
   }
 
@@ -104,9 +106,11 @@ public class CapsuleHand : IHandModel {
   private void updateSpheres() {
     //Update all spheres
     FingerList fingers = hand_.Fingers;
-    for (int i = 0; i < fingers.Count; i++) {
-      Finger finger = fingers[i];
-      for (int j = 0; j < 4; j++) {
+        for (int i = 0; i < fingers.Count; i++)
+        {
+            IFinger finger = fingers[i];
+            for (int j = 0; j < 4; j++)
+            {
         int key = getFingerJointIndex((int)finger.Type, j);
         Transform sphere = _jointSpheres[key];
         sphere.position = finger.JointPosition((Finger.FingerJoint)j).ToUnityScaled();
@@ -140,37 +144,51 @@ public class CapsuleHand : IHandModel {
     armBackLeft.position = elbow - right;
   }
 
-  private void updateCapsules() {
-    for (int i = 0; i < _capsuleTransforms.Count; i++) {
+    private void updateCapsules()
+    {
+        Vector3 scale;
+        scale.x = scale.z = CYLINDER_RADIUS * 2;
+
+        float lossyScaleXFactor = 0.5f / transform.lossyScale.x;
+
+        for (int i = 0; i < _capsuleTransforms.Count; i++)
+        {
       Transform capsule = _capsuleTransforms[i];
-      Transform sphereA = _sphereATransforms[i];
-      Transform sphereB = _sphereBTransforms[i];
+            Vector3 sphereA = _sphereATransforms[i].position;
+            Vector3 sphereB = _sphereBTransforms[i].position;
 
-      Vector3 delta = sphereA.position - sphereB.position;
+            Vector3 delta = sphereA - sphereB;
+            float deltaMag = delta.magnitude;
 
-      Vector3 scale = capsule.localScale;
-      scale.x = CYLINDER_RADIUS * 2;
-      scale.y = delta.magnitude * 0.5f / transform.lossyScale.x;
-      scale.z = CYLINDER_RADIUS * 2;
+            capsule.position = (sphereA + sphereB) / 2.0f;
 
-      capsule.localScale = scale;
+            scale.y = deltaMag * lossyScaleXFactor;
 
-      capsule.position = (sphereA.position + sphereB.position) / 2;
+            capsule.localScale = scale;
 
-      if (delta.sqrMagnitude <= Mathf.Epsilon) {
+            if (deltaMag <= Mathf.Epsilon)
+            {
         //Two spheres are at the same location, no rotation will be found
         continue;
       }
 
+            /*/
       Vector3 perp;
-      if (Vector3.Angle(delta, Vector3.up) > 170 || Vector3.Angle(delta, Vector3.up) < 10) {
+            float angleToUp = Vector3.Angle(delta, Vector3.up);
+            
+            if (angleToUp > 170 || angleToUp < 10)
+            {
         perp = Vector3.Cross(delta, Vector3.right);
       }
-      else {
+            else
+            {
         perp = Vector3.Cross(delta, Vector3.up);
       }
 
       capsule.rotation = Quaternion.LookRotation(perp, delta);
+            /*/
+            capsule.rotation = Quaternion.FromToRotation(Vector3.up, delta);
+            /**/
     }
   }
 
@@ -185,9 +203,11 @@ public class CapsuleHand : IHandModel {
   private void createSpheres() {
     //Create spheres for finger joints
     FingerList fingers = hand_.Fingers;
-    for (int i = 0; i < fingers.Count; i++) {
-      Finger finger = fingers[i];
-      for (int j = 0; j < 4; j++) {
+        for (int i = 0; i < fingers.Count; i++)
+        {
+            IFinger finger = fingers[i];
+            for (int j = 0; j < 4; j++)
+            {
         int key = getFingerJointIndex((int)finger.Type, j);
         _jointSpheres[key] = createSphere("Joint", SPHERE_RADIUS);
       }

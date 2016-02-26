@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
    *
    */
 
-public class Arm : Bone {
+public class Arm : Bone, IArm {
 
    /**
     * Constructs an invalid Arm object.
@@ -46,13 +46,19 @@ public class Arm : Bone {
                             type,
                             basis){}
 
-        public new Arm TransformedCopy(Matrix trs){
+        public new IArm TransformedShallowCopy(ref Matrix trs)
+        {
+            return new TransformedArm(ref trs, this);
+        }
+
+        public new IArm TransformedCopy(ref Matrix trs)
+        {
             float dScale = trs.zBasis.Magnitude;
             float hScale = trs.xBasis.Magnitude;
             return new Arm(trs.TransformPoint(PrevJoint),
                 trs.TransformPoint(NextJoint),
                 trs.TransformPoint(Center),
-                trs.TransformDirection(Direction),
+                trs.TransformDirection(Direction).Normalized,
                 Length * dScale,
                 Width * hScale,
                 Type,
@@ -69,8 +75,8 @@ public class Arm : Bone {
     * exact same physical arm in the same frame and both Arm objects are valid.
     * @since 2.0.3
     */
-  public bool Equals(Arm other) {
-    return base.Equals(other as Bone);
+  public bool Equals(IArm other) {
+    return base.Equals(other as IBone);
   }
 
    /**
@@ -138,9 +144,11 @@ public class Arm : Bone {
      * @returns The invalid Arm instance.
      * @since 2.0.3
      */  
-      new  public static Arm Invalid {
+        private static IArm invalidArm = new InvalidArm();
+
+      new  public static IArm Invalid {
     get {
-      return new Arm();
+        return invalidArm;
     } 
   }
 

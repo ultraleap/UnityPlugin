@@ -23,7 +23,7 @@ public class MinimalHand : IHandModel {
   [SerializeField]
   private Material _jointMat;
 
-  private Hand _hand;
+  private IHand _hand;
   private Transform _palm;
   private Transform[] _joints;
 
@@ -39,11 +39,11 @@ public class MinimalHand : IHandModel {
     }
   }
 
-  public override void SetLeapHand(Hand hand) {
+  public override void SetLeapHand(IHand hand) {
     _hand = hand;
   }
 
-  public override Hand GetLeapHand() {
+  public override IHand GetLeapHand() {
     return _hand;
   }
 
@@ -60,7 +60,7 @@ public class MinimalHand : IHandModel {
     var list = _hand.Fingers;
     int index = 0;
     for (int i = 0; i < 5; i++) {
-      Finger finger = list[i];
+      IFinger finger = list[i];
       for (int j = 0; j < 4; j++) {
         _joints[index++].position = finger.JointPosition((Finger.FingerJoint)j).ToVector3();
       }

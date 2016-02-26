@@ -31,7 +31,7 @@ namespace Leap
    * @since 1.0
    */
 
-    public class Hand {
+    public class Hand : IHand {
       int _frameId;
         int _id = 0;
         float _confidence = 0;
@@ -45,7 +45,7 @@ namespace Leap
         bool _isLeft = false;
         bool _isRight = false;
         float _timeVisible = 0;
-        Arm _arm;
+        IArm _arm;
         FingerList _fingers;
         Vector _palmPosition;
         Vector _stabilizedPalmPosition;
@@ -81,6 +81,7 @@ namespace Leap
              _basis = Matrix.Identity;
              _needToCalculateBasis = false;
              _sphereCenter = Vector.Zero;
+             _arm = new Arm();
         }
 
         public Hand(int frameID,
@@ -93,7 +94,7 @@ namespace Leap
                     float palmWidth,
                     bool isLeft,
                     float timeVisible,
-                    Arm arm,
+                    IArm arm,
                     FingerList fingers,
                     Vector palmPosition,
                     Vector stabilizedPalmPosition,
@@ -123,10 +124,16 @@ namespace Leap
             _wristPosition = wristPosition;
         }
 
-        public Hand TransformedCopy(Matrix trs){
+        public IHand TransformedShallowCopy(ref Matrix trs)
+        {
+            return new TransformedHand(ref trs, this);
+        }
+
+        public IHand TransformedCopy(ref Matrix trs)
+        {
             FingerList transformedFingers = new FingerList(5);
             for(int f = 0; f < this.Fingers.Count; f++)
-                transformedFingers.Add(Fingers[f].TransformedCopy(trs));
+                transformedFingers.Add(Fingers[f].TransformedCopy(ref trs));
 
             float hScale = trs.xBasis.Magnitude;
             return new Hand(_frameId,
@@ -139,7 +146,7 @@ namespace Leap
                 _palmWidth * hScale,
                 _isLeft,
                 _timeVisible,
-                _arm.TransformedCopy(trs),
+                _arm.TransformedCopy(ref trs),
                 transformedFingers,
                 trs.TransformPoint(_palmPosition),
                 trs.TransformPoint(_stabilizedPalmPosition),
@@ -170,9 +177,9 @@ namespace Leap
      * hand in this frame; otherwise, an invalid Finger object is returned.
      * @since 1.0
      */
-        public Finger Finger (int id)
+        public IFinger Finger (int id)
         {
-            return this.Fingers.Find (delegate(Finger item) {
+            return this.Fingers.Find (delegate(IFinger item) {
                 return item.Id == id;
             });
         }
@@ -198,9 +205,9 @@ namespace Leap
      * sinceFrame parameter.
      * @since 1.0
      */
-        public Vector Translation (Frame sinceFrame)
+        public Vector Translation (IFrame sinceFrame)
         {
-            Hand sinceHand = sinceFrame.Hand(this.Id);
+            IHand sinceHand = sinceFrame.Hand(this.Id);
 
             if(!sinceHand.IsValid)
                 return Vector.Zero; 
@@ -224,7 +231,7 @@ namespace Leap
      * is intended to be a translating motion.
      * @since 1.0
      */
-        public float TranslationProbability (Frame sinceFrame)
+        public float TranslationProbability(IFrame sinceFrame)
         {
             //TODO probabilities based on comparison of percentage of "likely" max change (scale:.5, trans, 100mm, rotation 45 degrees) -- time normalize?
             return 0; //not implemented
@@ -249,7 +256,7 @@ namespace Leap
      * frame and that specified in the sinceFrame parameter.
      * @since 1.0
      */
-        public Vector RotationAxis (Frame sinceFrame)
+        public Vector RotationAxis(IFrame sinceFrame)
         {
             return Vector.YAxis; //not implemented
         }
@@ -275,7 +282,7 @@ namespace Leap
      * specified in the sinceFrame parameter.
      * @since 1.0
      */
-        public float RotationAngle (Frame sinceFrame)
+        public float RotationAngle(IFrame sinceFrame)
         {
             return 0; //not implemented
         }
@@ -302,7 +309,7 @@ namespace Leap
      * sinceFrame parameter around the specified axis.
      * @since 1.0
      */
-        public float RotationAngle (Frame sinceFrame, Vector axis)
+        public float RotationAngle(IFrame sinceFrame, Vector axis)
         {
             return 0; //this.RotationMatrix(sinceFrame); //not implemented
         }
@@ -324,9 +331,9 @@ namespace Leap
      * in the sinceFrame parameter.
      * @since 1.0
      */
-        public Matrix RotationMatrix (Frame sinceFrame)
+        public Matrix RotationMatrix(IFrame sinceFrame)
         {
-            Hand sinceHand = sinceFrame.Hand(this.Id);
+            IHand sinceHand = sinceFrame.Hand(this.Id);
             
             if(!sinceHand.IsValid)
                 return Matrix.Identity; 
@@ -350,7 +357,7 @@ namespace Leap
      * is intended to be a rotating motion.
      * @since 1.0
      */
-        public float RotationProbability (Frame sinceFrame)
+        public float RotationProbability(IFrame sinceFrame)
         {
             return 0; //not implemented
         }
@@ -379,9 +386,9 @@ namespace Leap
      * specified in the sinceFrame parameter.
      * @since 1.0
      */
-        public float ScaleFactor (Frame sinceFrame)
+        public float ScaleFactor(IFrame sinceFrame)
         {
-            Hand sinceHand = sinceFrame.Hand(this.Id);
+            IHand sinceHand = sinceFrame.Hand(this.Id);
             
             if(!sinceHand.IsValid)
                 return 1.0f; 
@@ -419,7 +426,7 @@ namespace Leap
      * is intended to be a scaling motion.
      * @since 1.0
      */
-        public float ScaleProbability (Frame sinceFrame)
+        public float ScaleProbability(IFrame sinceFrame)
         {
             return 0; //not implemented
         }
@@ -434,12 +441,12 @@ namespace Leap
      * exact same physical hand in the same frame and both Hand objects are valid.
      * @since 1.0
      */
-        public bool Equals (Hand other)
+        public bool Equals (IHand other)
         {
           return this.IsValid &&
               other.IsValid &&
               (this.Id == other.Id) &&
-              (this._frameId == other._frameId);
+              (this.FrameId == other.FrameId);
         }
 
         /**
@@ -477,7 +484,7 @@ namespace Leap
             } 
         }
 
-        public long FrameId {
+        public int FrameId {
           get {
             return _frameId;
           }
@@ -855,7 +862,7 @@ namespace Leap
      * @returns The Arm object for this hand.
      * @since 2.0.3
      */
-        public Arm Arm {
+        public IArm Arm {
             get {
                 return _arm;
             } 
@@ -873,9 +880,11 @@ namespace Leap
      * @returns The invalid Hand instance.
      * @since 1.0
      */
-        public static Hand Invalid {
+        private static IHand invalidHand = new InvalidHand();
+
+        public static IHand Invalid {
             get {
-                return new Hand ();
+                return invalidHand;
             } 
         }
 

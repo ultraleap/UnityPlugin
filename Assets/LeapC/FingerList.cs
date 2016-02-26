@@ -22,7 +22,7 @@ namespace Leap
    * @since 1.0
    */
 
-    public class FingerList : List<Finger>
+    public class FingerList : List<IFinger>
     {
         public FingerList():base(){}
         public FingerList(int initialCapacity):base(initialCapacity){}
@@ -38,7 +38,7 @@ namespace Leap
      */
         public FingerList Extended ()
         {
-            return (FingerList) this.FindAll (delegate (Finger finger) {
+            return (FingerList) this.FindAll (delegate (IFinger finger) {
                 return finger.IsExtended;
             });
         }
@@ -55,7 +55,7 @@ namespace Leap
      */
         public FingerList FingerType (Finger.FingerType type)
         {
-            return (FingerList) this.FindAll (delegate (Finger finger) {
+            return (FingerList) this.FindAll (delegate (IFinger finger) {
                 return finger.Type == type;
             });
         }
@@ -85,12 +85,18 @@ namespace Leap
      * @returns The leftmost finger, or invalid if list is empty.
      * @since 1.0
      */
-        public Finger Leftmost {
+        public IFinger Leftmost {
             get {
-                Finger mostest = new Finger();
+                if (this.Count == 0)
+                    return Finger.Invalid;
+
+                IFinger mostest = null; // TODO: mostest = this[0] and proceed from there
                 float position = float.MaxValue;
-                foreach(Finger finger in this){
-                    if(finger.TipPosition.x < position){
+
+                foreach(IFinger finger in this)
+                {
+                    if(finger.TipPosition.x <= position)
+                    {
                         mostest = finger;
                         position = finger.TipPosition.x;
                     }
@@ -108,12 +114,18 @@ namespace Leap
      * @returns The rightmost finger, or invalid if list is empty.
      * @since 1.0
      */
-        public Finger Rightmost {
+        public IFinger Rightmost {
             get {
-                Finger mostest = new Finger();
+                if (this.Count == 0)
+                    return Finger.Invalid;
+
+                IFinger mostest = null;
                 float position = float.MaxValue;
-                foreach(Finger finger in this){
-                    if(finger.TipPosition.x > position){
+
+                foreach(IFinger finger in this)
+                {
+                    if(finger.TipPosition.x >= position)
+                    {
                         mostest = finger;
                         position = finger.TipPosition.x;
                     }
@@ -131,11 +143,16 @@ namespace Leap
      * @returns The frontmost finger, or invalid if list is empty.
      * @since 1.0
      */
-        public Finger Frontmost {
+        public IFinger Frontmost {
             get {
-                Finger mostest = new Finger();
+                if (this.Count == 0)
+                    return Finger.Invalid;
+
+                IFinger mostest = null;
                 float position = float.MaxValue;
-                foreach(Finger finger in this){
+
+                foreach(IFinger finger in this)
+                {
                     if(finger.TipPosition.z < position){
                         mostest = finger;
                         position = finger.TipPosition.z;

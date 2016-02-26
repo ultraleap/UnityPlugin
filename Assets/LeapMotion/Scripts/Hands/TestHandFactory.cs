@@ -15,7 +15,8 @@ using System.Runtime.InteropServices;
             return testFrame;
         }
 
-        public static Hand MakeTestHand(int frameId, int handId, bool isLeft){
+        public static IHand MakeTestHand(int frameId, int handId, bool isLeft)
+        {
             FingerList fingers = new FingerList(5);
             fingers.Add(MakeThumb (frameId, handId));
             fingers.Add(MakeIndexFinger (frameId, handId));
@@ -51,7 +52,7 @@ using System.Runtime.InteropServices;
                 return testHand;
             } else {
                 Matrix leftToRight = new Matrix(Vector.Right, Vector.Up, Vector.Forward);
-                return testHand.TransformedCopy(leftToRight);
+                return testHand.TransformedCopy(ref leftToRight);
             }
         }
          static Finger MakeThumb(int frameId, int handId){
