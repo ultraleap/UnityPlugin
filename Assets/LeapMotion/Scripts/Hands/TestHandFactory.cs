@@ -146,7 +146,7 @@ using System.Runtime.InteropServices;
             return new Bone(
                 proximalPosition,
                 proximalPosition + direction * length,
-                Vector.Lerp(proximalPosition, proximalPosition + direction * length, 2),
+                Vector.Lerp(proximalPosition, proximalPosition + direction * length, .5f),
                 direction,
                 length,
                 width,
