@@ -54,6 +54,12 @@ namespace Leap.PinchUtility.Examples {
       _minSegmentLength = Mathf.Max(0, _minSegmentLength);
     }
 
+    void Awake() {
+      if (_pinchDetectors.Length == 0) {
+        Debug.LogWarning("No pinch detectors were specified!  PinchDraw can not draw any lines without PinchDetectors.");
+      }
+    }
+
     void Start() {
       _drawStates = new DrawState[_pinchDetectors.Length];
       for (int i = 0; i < _pinchDetectors.Length; i++) {

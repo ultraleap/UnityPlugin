@@ -16,7 +16,7 @@ namespace Leap.PinchUtility {
     protected float _activatePinchDist = 0.03f;
 
     [SerializeField]
-    protected float _deactivatePinchDist = 0.05f;
+    protected float _deactivatePinchDist = 0.04f;
 
     protected bool _isPinching = false;
     protected bool _didChange = false;
@@ -128,7 +128,7 @@ namespace Leap.PinchUtility {
 
       Hand hand = _handModel.GetLeapHand();
 
-      if (hand == null) {
+      if (hand == null || !_handModel.IsTracked) {
         changePinchState(false);
         return;
       }
