@@ -17,7 +17,7 @@ namespace Leap {
   {
 
     [SerializeField]
-    public List<IHandModel> ModelCollection;
+    private List<IHandModel> ModelCollection;
     public List<IHandModel> ModelPool;
     public LeapHandController controller_ { get; set; }
 
