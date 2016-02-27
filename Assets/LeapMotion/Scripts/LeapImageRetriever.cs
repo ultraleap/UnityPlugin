@@ -305,7 +305,7 @@ public class LeapImageRetriever : MonoBehaviour {
             this.ImagesEnabled = enabled == 0 ? false : true;
         });
     };
-    StartCoroutine(CheckImageMode(2));
+    StartCoroutine(CheckImageMode());
   }
 
   void OnDisable() {
