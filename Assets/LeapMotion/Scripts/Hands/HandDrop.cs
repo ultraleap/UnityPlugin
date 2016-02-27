@@ -8,16 +8,17 @@ namespace Leap {
     private Transform palm;
 
     // Use this for initialization
-    void Awake() {
+    protected override void Awake() {
+      base.Awake();
       palm = GetComponent<HandModel>().palm;
       startingPalmPosition = palm.localPosition;
       startingOrientation = palm.localRotation;
     }
 
-    public override void HandFinish() {
+    protected override void HandFinish() {
       StartCoroutine(LerpToStart());
     }
-    public override void Reset() {
+    protected override void HandReset() {
       StopAllCoroutines();
     }
 
