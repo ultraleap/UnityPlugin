@@ -20,7 +20,8 @@ public class LeapImageRetriever : MonoBehaviour {
   public const int IMAGE_WARNING_WAIT = 10;
   public const int LEFT_IMAGE_INDEX = 0;
   public const int RIGHT_IMAGE_INDEX = 1;
-  
+  public const float IMAGE_SETTING_POLL_RATE = 2.0f;
+
   private static LeapImageRetriever _instance = null;
   public static LeapImageRetriever Instance {
     get {
@@ -334,8 +335,7 @@ public class LeapImageRetriever : MonoBehaviour {
         }
         _eyeTextureData.UpdateTextures(_requestedImage, _requestedImage);
       } else if(!checkingImageState){
-        StartCoroutine(CheckImageMode(2));
-        checkingImageState = true;
+        StartCoroutine(CheckImageMode());
       }
     }
   }
@@ -346,13 +346,13 @@ public class LeapImageRetriever : MonoBehaviour {
         Controller controller = provider.GetLeapController();
         _requestedImage = controller.RequestImages(imageFrame.Id, Image.ImageType.DEFAULT);
     } else if(!checkingImageState){
-       StartCoroutine(CheckImageMode(2));
-       checkingImageState = true;
+       StartCoroutine(CheckImageMode());
     }
   }
   
-  private IEnumerator CheckImageMode(int delay){
-    yield return new WaitForSeconds(delay);
+  private IEnumerator CheckImageMode(){
+    checkingImageState = true;
+    yield return new WaitForSeconds(IMAGE_SETTING_POLL_RATE);
     provider.GetLeapController().Config.Get<Int32>("images_mode", delegate (Int32 enabled){
       this.ImagesEnabled = enabled == 0 ? false : true;
       checkingImageState = false;
