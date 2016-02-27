@@ -27,7 +27,7 @@ namespace Leap.PinchUtility {
     protected Vector3 _pinchPos;
     protected Quaternion _pinchRotation;
 
-    void OnValidate() {
+    protected virtual void OnValidate() {
       if (_handModel == null) {
         _handModel = GetComponentInParent<IHandModel>();
       }
@@ -41,7 +41,7 @@ namespace Leap.PinchUtility {
       }
     }
 
-    void Awake() {
+    protected virtual void Awake() {
       if (_handModel == null) {
         Debug.LogWarning("The HandModel field of LeapPinchDetector was unassigned and the detector has been disabled.");
         enabled = false;
