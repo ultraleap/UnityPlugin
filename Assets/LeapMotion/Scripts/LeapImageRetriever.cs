@@ -45,6 +45,7 @@ public class LeapImageRetriever : MonoBehaviour {
   [SerializeField]
   protected long ImageTimeout = 9000; //microseconds
   protected bool ImagesEnabled = true;
+  private bool checkingImageState = false;
 
   public EyeTextureData TextureData {
     get {
@@ -299,10 +300,11 @@ public class LeapImageRetriever : MonoBehaviour {
   void OnEnable() {
     provider.GetLeapController().DistortionChange += onDistortionChange;
     provider.GetLeapController().Connect += delegate {
-      provider.GetLeapController().Config.Get("images_enabled", (Int32 enabled) => {
-        this.ImagesEnabled = enabled == 0 ? false : true;
-      });
+        provider.GetLeapController().Config.Get("images_mode", (Int32 enabled) => {
+            this.ImagesEnabled = enabled == 0 ? false : true;
+        });
     };
+    StartCoroutine(CheckImageMode(2));
   }
 
   void OnDisable() {
@@ -331,6 +333,9 @@ public class LeapImageRetriever : MonoBehaviour {
           _eyeTextureData.Reconstruct(_requestedImage, _requestedImage);
         }
         _eyeTextureData.UpdateTextures(_requestedImage, _requestedImage);
+      } else if(!checkingImageState){
+        StartCoroutine(CheckImageMode(2));
+        checkingImageState = true;
       }
     }
   }
@@ -340,15 +345,17 @@ public class LeapImageRetriever : MonoBehaviour {
         Frame imageFrame = provider.CurrentFrame;
         Controller controller = provider.GetLeapController();
         _requestedImage = controller.RequestImages(imageFrame.Id, Image.ImageType.DEFAULT);
-        } else {
-            StartCoroutine(CheckImageMode());
-        }
+    } else if(!checkingImageState){
+       StartCoroutine(CheckImageMode(2));
+       checkingImageState = true;
+    }
   }
   
-  private IEnumerator CheckImageMode(){
-    yield return new WaitForSeconds(1);
+  private IEnumerator CheckImageMode(int delay){
+    yield return new WaitForSeconds(delay);
     provider.GetLeapController().Config.Get<Int32>("images_mode", delegate (Int32 enabled){
       this.ImagesEnabled = enabled == 0 ? false : true;
+      checkingImageState = false;
     });
   }
 
