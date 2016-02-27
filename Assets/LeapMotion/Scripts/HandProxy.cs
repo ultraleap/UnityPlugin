@@ -6,7 +6,7 @@ namespace Leap {
     HandRepresentation
   {
     HandPool parent;
-    HandTransitionBehavior handFinishBehavior;
+    public IHandModel handModel;
 
   
     public HandProxy(HandPool parent, IHandModel handModel, Leap.Hand hand) :
@@ -22,18 +22,11 @@ namespace Leap {
       } else {
         handModel.SetLeapHand(hand);
       }
-
-
-      handFinishBehavior = handModel.GetComponent<HandTransitionBehavior>();
-      if (handFinishBehavior) {
-        handFinishBehavior.Reset();
-      }
+      handModel.BeginHand();
     }
     /** To be called if the HandRepresentation no longer has a Leap Hand. */
     public override void Finish() {
-      if (handFinishBehavior) {
-        handFinishBehavior.HandFinish();
-      }
+      handModel.FinishHand();
       parent.ModelPool.Add(handModel);
       handModel = null;
     }

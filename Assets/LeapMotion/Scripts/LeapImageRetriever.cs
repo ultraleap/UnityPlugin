@@ -37,7 +37,7 @@ public class LeapImageRetriever : MonoBehaviour {
   [FormerlySerializedAs("gammaCorrection")]
   private float _gammaCorrection = 1.0f;
 
-  private int _missedImages = 0;
+  //private int _missedImages = 0;
   private EyeTextureData _eyeTextureData = new EyeTextureData();
 
   //Image that we have requested from the service.  Are requested in Update and retrieved in OnPreRender
