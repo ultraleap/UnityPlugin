@@ -27,17 +27,16 @@ namespace LeapInternal
                            (long)trackingMsg.info.timestamp,
                            trackingMsg.framerate,
                            new InteractionBox(trackingMsg.interaction_box_center.ToLeapVector(),
-                               trackingMsg.interaction_box_size.ToLeapVector()));
+                               trackingMsg.interaction_box_size.ToLeapVector()),
+                           new List<Hand>((int)trackingMsg.nHands)
+            );
 
       int pHandArrayOffset = 0;
-
-      List<Hand> hands = new List<Hand>((int)trackingMsg.nHands);
-      newFrame.Hands = hands;
       for (int h = 0; h < trackingMsg.nHands; h++)
       {
         LEAP_HAND hand = LeapC.PtrToStruct<LEAP_HAND>(new IntPtr(trackingMsg.pHands.ToInt64() + pHandArrayOffset));
         pHandArrayOffset += handStructSize;
-        hands.Add(makeHand(ref hand, newFrame));
+        newFrame.Hands.Add(makeHand(ref hand, newFrame));
       }
       return newFrame;
     }

@@ -31,7 +31,6 @@ namespace Leap
     IEquatable<Frame>
   {
     TrackedQuad _trackedQuad = new TrackedQuad();
-    List<Hand> _hands;
     /**
      * Constructs a Frame object.
      *
@@ -47,6 +46,7 @@ namespace Leap
      * @since 1.0
      */
     public Frame() {
+      Hands = new List<Hand> ();
       InteractionBox = new InteractionBox(
         new Vector(0, 200, 0),
         new Vector(200, 200, 200)
@@ -62,13 +62,14 @@ namespace Leap
      * @param interactionBox The InteractionBox object for this frame.
      * @since 3.0
      */
-    public Frame(long id, long timestamp, float fps, InteractionBox interactionBox) :
+    public Frame(long id, long timestamp, float fps, InteractionBox interactionBox, List<Hand> hands) :
       this()
     {
       Id = id;
       Timestamp = timestamp;
       CurrentFramesPerSecond = fps;
       InteractionBox = interactionBox;
+      Hands = hands;
     }
 
     /**
@@ -85,9 +86,9 @@ namespace Leap
         Id,
         Timestamp,
         CurrentFramesPerSecond,
-        new InteractionBox(InteractionBox.Center, InteractionBox.Size)
+        new InteractionBox(InteractionBox.Center, InteractionBox.Size),
+        new List<Hand>(this.Hands.Count)
       );
-      transformedFrame.Hands = new List<Hand>(this.Hands.Count);
       for (int h = 0; h < this.Hands.Count; h++)
         transformedFrame.Hands.Add(this.Hands[h].TransformedCopy(trs));
       return transformedFrame;
@@ -249,17 +250,7 @@ namespace Leap
      * @returns The List<Hand> containing all Hand objects detected in this frame.
      * @since 1.0
      */
-    public List<Hand> Hands { 
-      get{
-        if(_hands == null)
-          _hands = new List<Hand>(3);
-
-        return _hands;
-      } 
-      set{
-        _hands = value;
-      }
-    }
+    public List<Hand> Hands { get; set; }
 
     /**
      * The current InteractionBox for the frame. See the InteractionBox class

@@ -125,7 +125,6 @@ namespace Leap {
 
       leapMat = UnityMatrixExtension.GetLeapMatrix(this.transform);
       CurrentFrame = leap_controller_.GetTransformedFrame(leapMat, 0);
-
       //perFrameFixedUpdateOffset_ contains the maximum offset of this Update cycle
       smoothedFixedUpdateOffset_.Update(PerFrameFixedUpdateOffset, Time.deltaTime);
       //float now = leap_controller_.Now();
