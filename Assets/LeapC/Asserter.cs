@@ -6,32 +6,10 @@ namespace Leap
 {
     public class Asserter
     {
-        public static void CompareAllValues(IFrame reference, IFrame previousFrame, IFrame value, IFrame previousValueFrame)
+        public static void CompareAllValues(IFrame reference, IFrame value)
         {
-            // Assert.AreEqual(value.IsValid, reference.IsValid);
-
-            //if (value.IsValid == false)
-            //    return;
-
             Assert.AreEqual(value.Id, reference.Id);
             Assert.AreEqual(reference.CurrentFramesPerSecond, value.CurrentFramesPerSecond);
-
-            //Assert.AreEqual(reference.RotationAngle(previousFrame), value.RotationAngle(previousValueFrame));
-            //Assert.AreEqual(reference.RotationAngle(previousFrame, Vector.Forward), value.RotationAngle(previousValueFrame, Vector.Forward));
-            //Assert.AreEqual(reference.RotationAngle(previousFrame, Vector.Backward), value.RotationAngle(previousValueFrame, Vector.Backward));
-            //Assert.AreEqual(reference.RotationAngle(previousFrame, Vector.Left), value.RotationAngle(previousValueFrame, Vector.Left));
-            //Assert.AreEqual(reference.RotationAngle(previousFrame, Vector.Right), value.RotationAngle(previousValueFrame, Vector.Right));
-            //Assert.AreEqual(reference.RotationAngle(previousFrame, Vector.Up), value.RotationAngle(previousValueFrame, Vector.Up));
-            //Assert.AreEqual(reference.RotationAngle(previousFrame, Vector.Down), value.RotationAngle(previousValueFrame, Vector.Down));
-
-            //Assert.AreEqual(reference.RotationAxis(previousFrame), value.RotationAxis(previousValueFrame));
-            //Assert.AreEqual(reference.RotationMatrix(previousFrame), value.RotationMatrix(previousValueFrame));
-            //Assert.AreEqual(reference.RotationProbability(previousFrame), value.RotationProbability(previousValueFrame));
-            //Assert.AreEqual(reference.ScaleFactor(previousFrame), value.ScaleFactor(previousValueFrame));
-            //Assert.AreEqual(reference.ScaleProbability(previousFrame), value.ScaleProbability(previousValueFrame));
-
-            //Assert.AreEqual(reference.Translation(previousFrame), value.Translation(previousValueFrame));
-            //Assert.AreEqual(reference.TranslationProbability(previousFrame), value.TranslationProbability(previousValueFrame));
 
             Assert.AreEqual(reference.Timestamp, value.Timestamp);
 
@@ -39,31 +17,18 @@ namespace Leap
 
             for (int i = 0; i < reference.Hands.Count; i++)
             {
-                CompareAllValues(reference.Hands[i], previousFrame, value.Hands[i], previousValueFrame);
+                CompareAllValues(reference.Hands[i], value.Hands[i]);
             }
         }
 
-        public static void CompareAllValues(IHand value, IFrame previousFrame, IHand reference, IFrame previousValueFrame)
+        public static void CompareAllValues(IHand value, IHand reference)
         {
-            // Assert.AreEqual(value.IsValid, reference.IsValid);
-
-            //if (value.IsValid == false)
-            //    return;
-
             CompareAllValues(value.Arm, reference.Arm);
-
-            // The original Basis calculation should generate a left-handed
-            // basis for the left hand, and a right-handed base for the
-            // right hand, but there's a bug in it.
-            //Debug.Log("IsLeft? " + value.IsLeft);
-            //Assert.AreEqual(value.Basis, reference.Basis);
 
             Assert.AreEqual(value.Confidence, reference.Confidence);
             Assert.AreEqual(value.Direction, reference.Direction);
 
-            // Assert.AreEqual(value.FrameId, reference.FrameId);
             Assert.AreEqual(value.GrabAngle, reference.GrabAngle);
-
             Assert.AreEqual(value.GrabStrength, reference.GrabStrength);
 
             Assert.AreEqual(value.Id, reference.Id);
@@ -77,25 +42,10 @@ namespace Leap
 
             Assert.AreEqual(value.PinchDistance, reference.PinchDistance);
             Assert.AreEqual(value.PinchStrength, reference.PinchStrength);
-
-            //Assert.AreEqual(value.RotationAngle(previousFrame), reference.RotationAngle(previousValueFrame));
-            //Assert.AreEqual(value.RotationAxis(previousFrame), reference.RotationAxis(previousValueFrame));
-            //Assert.AreEqual(value.RotationMatrix(previousFrame), reference.RotationMatrix(previousValueFrame));
-            //Assert.AreEqual(value.RotationProbability(previousFrame), reference.RotationProbability(previousValueFrame));
-
-            //Assert.AreEqual(value.ScaleFactor(previousFrame), reference.ScaleFactor(previousValueFrame));
-            //Assert.AreEqual(value.ScaleProbability(previousFrame), reference.ScaleProbability(previousValueFrame));
-
-            // There are known issues calculating the SphereCenter: it doesn't
-            // scale the minimum and maximum sphere radii. Will be removed next update anyway
-            // Assert.AreEqual(value.SphereCenter ,  reference.SphereCenter);
-            // Assert.AreEqual(value.SphereRadius ,  reference.SphereRadius);
-
+            
             Assert.AreEqual(value.StabilizedPalmPosition, reference.StabilizedPalmPosition);
             Assert.AreEqual(value.TimeVisible, reference.TimeVisible);
 
-            //Assert.AreEqual(value.Translation(previousFrame), reference.Translation(previousValueFrame));
-            //Assert.AreEqual(value.TranslationProbability(previousFrame), reference.TranslationProbability(previousValueFrame));
             Assert.AreEqual(value.WristPosition, reference.WristPosition);
 
             for (int i = 0; i < reference.Fingers.Count; i++)
@@ -109,7 +59,6 @@ namespace Leap
         public static void CompareAllValues(IFinger value, IFinger reference)
         {
             Assert.AreEqual(value.Id, reference.Id);
-            // Assert.AreEqual(value.FrameId, reference.FrameId);
             Assert.AreEqual(value.HandId, reference.HandId);
             Assert.AreEqual(value.TimeVisible, reference.TimeVisible);
 
@@ -140,6 +89,7 @@ namespace Leap
 
         public static void CompareAllValues(IArm value, IArm reference)
         {
+            // These asserts fail once when a hand is detected. Bug somewhere else?
             Assert.AreEqual(value.ElbowPosition, reference.ElbowPosition);
             Assert.AreEqual(value.WristPosition, reference.WristPosition);
 

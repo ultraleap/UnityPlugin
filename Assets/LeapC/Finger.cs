@@ -82,6 +82,7 @@ namespace Leap
       _bones[2] = intermediate;
       _bones[3] = distal;
       Id = (handId * 10) + fingerId;
+      FingerId = fingerId;
       HandId = handId;
       TipPosition = tipPosition;
       TipVelocity = tipVelocity;
@@ -117,7 +118,7 @@ namespace Leap
       float dScale = trs.zBasis.Magnitude;
       float hScale = trs.xBasis.Magnitude;
       return new Finger(HandId,
-                        Id,
+                        FingerId,
                         TimeVisible,
                         trs.TransformPoint(TipPosition),
                         trs.TransformPoint(TipVelocity),
@@ -206,6 +207,11 @@ namespace Leap
      * @since 1.0
      */
     public int HandId { get; private set; }
+
+    /**
+     * The Id of this finger. 
+     */
+    private int FingerId { get; set; }
 
     /**
      * The tip position in millimeters from the Leap Motion origin.

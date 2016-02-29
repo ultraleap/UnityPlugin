@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿#define CHECK_TRANSFORMED_IMPL
+
+using UnityEngine;
 using System.Collections;
 using LeapInternal;
 using Leap;
@@ -130,15 +132,13 @@ namespace Leap {
 
 #if CHECK_TRANSFORMED_IMPL
       IFrame frame = leap_controller_.Frame(); // Fetch this only once, otherwise may change between calls
-      IFrame previousFrame = leap_controller_.Frame(1); // May actually be Frame(2), but it's ok
       
       _currentFrame.Set(ref leapMat, frame);
 
       Asserter.CompareAllValues(
-          frame.TransformedCopy(ref leapMat), 
-          previousFrame.TransformedCopy(ref leapMat), 
-          _currentFrame, // == frame.TransformedShallowCopy(ref leapMat)
-          previousFrame.TransformedShallowCopy(ref leapMat));
+          frame.TransformedCopy(ref leapMat),
+          _currentFrame
+          );
 #else
       _currentFrame.Set(ref leapMat, leap_controller_.Frame());
 #endif
