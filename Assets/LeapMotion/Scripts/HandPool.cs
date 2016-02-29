@@ -32,7 +32,7 @@ namespace Leap {
       controller_ = GetComponent<LeapHandController>();
     }
 
-    public override HandRepresentation MakeHandRepresentation(Leap.Hand hand, ModelType modelType) {
+    public override HandRepresentation MakeHandRepresentation(Leap.IHand hand, ModelType modelType) {
       HandRepresentation handRep = null;
       for (int i = 0; i < ModelPool.Count; i++) {
         IHandModel model = ModelPool[i];

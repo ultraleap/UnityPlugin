@@ -54,7 +54,7 @@ public abstract class HandModel : IHandModel {
   
   // Leap references
   /** The Leap Hand object this hand model represents. */
-  protected Hand hand_;
+  protected IHand hand_;
   /** The parent HandController object for this hand. */
   //protected HandController controller_;
   protected LeapHandController controller_;
@@ -214,7 +214,7 @@ public abstract class HandModel : IHandModel {
   * Leap Hand object are relative to the Leap Motion coordinate system,
   * which uses a right-handed axes and units of millimeters.
   */
-  public override Hand GetLeapHand() {
+  public override IHand GetLeapHand() {
     return hand_;
   }
 
@@ -223,7 +223,7 @@ public abstract class HandModel : IHandModel {
   * Note that the Leap Hand objects are recreated every frame. The parent 
   * HandController calls this method to set or update the underlying hand.
   */
-  public override void SetLeapHand(Hand hand) {
+  public override void SetLeapHand(IHand hand) {
     hand_ = hand;
     for (int i = 0; i < fingers.Length; ++i) {
       if (fingers[i] != null) {

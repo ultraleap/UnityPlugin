@@ -9,7 +9,7 @@ namespace Leap {
     public IHandModel handModel;
 
   
-    public HandProxy(HandPool parent, IHandModel handModel, Leap.Hand hand) :
+    public HandProxy(HandPool parent, IHandModel handModel, Leap.IHand hand) :
       base(hand.Id)
     {
       this.parent = parent;
@@ -31,7 +31,7 @@ namespace Leap {
       handModel = null;
     }
 
-    public override void UpdateRepresentation(Leap.Hand hand, ModelType modelType){
+    public override void UpdateRepresentation(Leap.IHand hand, ModelType modelType){
       handModel.SetLeapHand(hand);
       handModel.UpdateHand();
     }

@@ -31,7 +31,7 @@ namespace LeapInternal
 
       int pHandArrayOffset = 0;
 
-      List<Hand> hands = new List<Hand>((int)trackingMsg.nHands);
+      List<IHand> hands = new List<IHand>((int)trackingMsg.nHands);
       newFrame.Hands = hands;
       for (int h = 0; h < trackingMsg.nHands; h++)
       {
@@ -76,7 +76,7 @@ namespace LeapInternal
         hand.type == eLeapHandType.eLeapHandType_Left,
         hand.visible_time,
         newArm,
-        new List<Finger>(5),
+        new List<IFinger>(5),
         new Vector(palm.position.x, palm.position.y, palm.position.z),
         new Vector(palm.stabilized_position.x, palm.stabilized_position.y, palm.stabilized_position.z),
         new Vector(palm.velocity.x, palm.velocity.y, palm.velocity.z),
@@ -108,7 +108,7 @@ namespace LeapInternal
       Bone proximal = makeBone(ref digit.proximal, Bone.BoneType.TYPE_PROXIMAL);
       Bone intermediate = makeBone(ref digit.intermediate, Bone.BoneType.TYPE_INTERMEDIATE);
       Bone distal = makeBone(ref digit.distal, Bone.BoneType.TYPE_DISTAL);
-      return new Finger((int)owner.Id,
+      return new Finger(
           (int)hand.id,
           (int)digit.finger_id,
           hand.visible_time,

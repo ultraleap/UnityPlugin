@@ -14,7 +14,7 @@ namespace Leap
    * The Arm class represents the forearm.
    *
    */
-  public class Arm : Bone
+  public class Arm : Bone, IArm
   {
     /**
      * Constructs a default Arm object.
@@ -56,6 +56,19 @@ namespace Leap
                         basis)
     { }
 
+
+    /**
+    * Creates a copy of this arm, transformed by the specified transform
+    * on demand.
+    *
+    * @param trs A Matrix containing the desired translation, rotation, and scale
+    * of the copied arm.
+    */
+    public new IArm TransformedShallowCopy(ref Matrix trs)
+    {
+        return new TransformedArm(ref trs, this);
+    }
+
     /**
      * Creates a copy of this arm, transformed by the specified transform.
      *
@@ -63,14 +76,14 @@ namespace Leap
      * of the copied arm.
      * @since 3.0
      */
-    public new Arm TransformedCopy(Matrix trs)
+    public new IArm TransformedCopy(ref Matrix trs)
     {
       float dScale = trs.zBasis.Magnitude;
       float hScale = trs.xBasis.Magnitude;
       return new Arm(trs.TransformPoint(PrevJoint),
           trs.TransformPoint(NextJoint),
           trs.TransformPoint(Center),
-          trs.TransformDirection(Direction),
+          trs.TransformDirection(Direction).Normalized,
           Length * dScale,
           Width * hScale,
           trs * Basis);
@@ -86,9 +99,9 @@ namespace Leap
      * exact same physical arm in the same frame and both Arm objects are valid.
      * @since 2.0.3
      */
-    public bool Equals(Arm other)
+    public bool Equals(IArm other)
     {
-      return base.Equals(other as Bone);
+      return base.Equals(other as IBone);
     }
 
     /**

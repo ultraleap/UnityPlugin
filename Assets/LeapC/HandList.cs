@@ -22,7 +22,7 @@ namespace Leap
    * @since 1.0
    */
     
-    public class HandList : List<Hand>
+    public class HandList : List<IHand>
     {
         public HandList():base(){}
         public HandList(int initialCapacity):base(initialCapacity){}
@@ -39,7 +39,7 @@ namespace Leap
      */
         public HandList HandType (bool leftHand)
         {
-            return (HandList) this.FindAll (delegate (Hand hand) {
+            return (HandList) this.FindAll (delegate (IHand hand) {
                 return hand.IsLeft == leftHand;
             });
         }
