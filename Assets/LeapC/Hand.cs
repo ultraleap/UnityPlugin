@@ -27,10 +27,9 @@ namespace Leap
    * objects can be the result of asking for a Hand object using an ID from an
    * earlier frame when no Hand objects with that ID exist in the current frame.
    * A Hand object created from the Hand constructor is also invalid.
-   * Test for validity with the Hand::isValid() function.
    * @since 1.0
    */
-  public class Hand
+  public class Hand : IHand
   {
     private Matrix _basis = Matrix.Identity;
     private bool _needToCalculateBasis = true;
@@ -53,7 +52,7 @@ namespace Leap
       PalmNormal = Vector.Zero;
       Direction = Vector.Zero;
       WristPosition = Vector.Zero;
-      Fingers = new List<Finger>();
+      Fingers = new List<IFinger>();
     }
 
 
@@ -67,8 +66,8 @@ namespace Leap
                 float palmWidth,
                 bool isLeft,
                 float timeVisible,
-                Arm arm,
-                List<Finger> fingers,
+                IArm arm,
+                List<IFinger> fingers,
                 Vector palmPosition,
                 Vector stabilizedPalmPosition,
                 Vector palmVelocity,
@@ -96,11 +95,33 @@ namespace Leap
       WristPosition = wristPosition;
     }
 
-    public Hand TransformedCopy(Matrix trs)
+   /**
+    * Creates a shallow copy of this Hand, transforming all finges, and bones by 
+    * the specified transform on demand.
+    *
+    * @param trs A Matrix containing the desired translation, rotation, and scale
+    * of the copied Hand.
+    * @returns a new Hand object with the transform applied.
+    */
+    public IHand TransformedShallowCopy(ref Matrix trs)
     {
-      List<Finger> transformedFingers = new List<Finger>(5);
+        return new TransformedHand(ref trs, this);
+    }
+
+   /**
+    * Creates a copy of this Hand, transforming all fingers, and bones by the specified transform.
+    *
+    * @param trs A Matrix containing the desired translation, rotation, and scale
+    * of the copied Frame.
+    * @returns a new Hand object with the transform applied.
+    * @since 3.0
+    */
+    public IHand TransformedCopy(ref Matrix trs)
+    {
+      List<IFinger> transformedFingers = new List<IFinger>(5);
+
       for (int f = 0; f < this.Fingers.Count; f++)
-        transformedFingers.Add(Fingers[f].TransformedCopy(trs));
+        transformedFingers.Add(Fingers[f].TransformedCopy(ref trs));
 
       float hScale = trs.xBasis.Magnitude;
       return new Hand(
@@ -114,7 +135,7 @@ namespace Leap
         PalmWidth * hScale,
         IsLeft,
         TimeVisible,
-        Arm.TransformedCopy(trs),
+        Arm.TransformedCopy(ref trs),
         transformedFingers,
         trs.TransformPoint(PalmPosition),
         trs.TransformPoint(StabilizedPalmPosition),
@@ -145,9 +166,9 @@ namespace Leap
      * hand in this frame; otherwise, an invalid Finger object is returned.
      * @since 1.0
      */
-    public Finger Finger(int id)
+    public IFinger Finger(int id)
     {
-      return this.Fingers.Find(delegate (Finger item)
+      return this.Fingers.Find(delegate (IFinger item)
       {
         return item.Id == id;
       });
@@ -162,7 +183,7 @@ namespace Leap
      * exact same physical hand in the same frame and both Hand objects are valid.
      * @since 1.0
      */
-    public bool Equals(Hand other)
+    public bool Equals(IHand other)
     {
       return Id == other.Id && FrameId == other.FrameId;
     }
@@ -212,7 +233,7 @@ namespace Leap
      * @returns The List<Finger> containing all Finger objects attached to this hand.
      * @since 1.0
      */
-    public List<Finger> Fingers { get; private set; }
+    public List<IFinger> Fingers { get; private set; }
 
 
     /**
@@ -450,6 +471,6 @@ namespace Leap
      * @returns The Arm object for this hand.
      * @since 2.0.3
      */
-    public Arm Arm { get; private set; }
+    public IArm Arm { get; private set; }
   }
 }

@@ -9,6 +9,6 @@ namespace Leap {
     /// <param name="hand">The hand for which a repersentation is to be generaetd</param>
     /// <returns>A hand representation for the given hand</returns>
     
-    public abstract HandRepresentation MakeHandRepresentation(Leap.Hand hand, ModelType modelType);
+    public abstract HandRepresentation MakeHandRepresentation(Leap.IHand hand, ModelType modelType);
   }
 }

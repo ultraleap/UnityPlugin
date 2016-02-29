@@ -38,9 +38,9 @@ public abstract class FingerModel : MonoBehaviour {
   
   // Leap references
   /** The Leap Hand object. */
-  protected Hand hand_;
+  protected IHand hand_;
   /** The Leap Finger object. */
-  protected Finger finger_;
+  protected IFinger finger_;
   /** An added offset vector. */
   protected Vector3 offset_ = Vector3.zero;
   /** Whether this finger is mirrored. */
@@ -64,7 +64,7 @@ public abstract class FingerModel : MonoBehaviour {
   * parent HandModel object calls this function to set or update the underlying
   * finger. The tracking data in the Leap objects are used to update the FingerModel.
   */ 
-  public void SetLeapHand(Hand hand) {
+  public void SetLeapHand(IHand hand) {
     hand_ = hand;
     if (hand_ != null)
       finger_ = hand.Fingers[(int)fingerType];
@@ -89,9 +89,9 @@ public abstract class FingerModel : MonoBehaviour {
   }
 
   /** The Leap Hand object. */
-  public Hand GetLeapHand() { return hand_; }
+  public IHand GetLeapHand() { return hand_; }
   /** The Leap Finger object. */
-  public Finger GetLeapFinger() { return finger_; }
+  public IFinger GetLeapFinger() { return finger_; }
 
   /** 
   * Implement this function to initialize this finger after it is created.
@@ -153,7 +153,7 @@ public abstract class FingerModel : MonoBehaviour {
   /** Returns the center of the given bone on the finger */
   public Vector3 GetBoneCenter(int bone_type) {
     if (finger_ != null) {
-      Bone bone = finger_.Bone ((Bone.BoneType)(bone_type));
+      IBone bone = finger_.Bone ((Bone.BoneType)(bone_type));
       return bone.Center.ToUnityScaled();
 
     }
