@@ -1,4 +1,4 @@
-﻿#define CHECK_TRANSFORMED_IMPL
+﻿// #define CHECK_TRANSFORMED_IMPL
 
 using UnityEngine;
 using System.Collections;
@@ -129,18 +129,14 @@ namespace Leap {
     void Update() {
 
       leapMat = UnityMatrixExtension.GetLeapMatrix(this.transform);
-
-#if CHECK_TRANSFORMED_IMPL
-      IFrame frame = leap_controller_.Frame(); // Fetch this only once, otherwise may change between calls
-      
+      IFrame frame = leap_controller_.Frame();
       _currentFrame.Set(ref leapMat, frame);
 
+#if CHECK_TRANSFORMED_IMPL
       Asserter.CompareAllValues(
           frame.TransformedCopy(ref leapMat),
           _currentFrame
           );
-#else
-      _currentFrame.Set(ref leapMat, leap_controller_.Frame());
 #endif
 
       //perFrameFixedUpdateOffset_ contains the maximum offset of this Update cycle
