@@ -98,20 +98,28 @@ namespace Leap {
     * created and added to the dictionary. 
     */
     void UpdateHandRepresentations(Dictionary<int, HandRepresentation> all_hand_reps, ModelType modelType) {
-      foreach (Leap.IHand curHand in Provider.CurrentFrame.Hands) {
-        HandRepresentation rep;
-        if (!all_hand_reps.TryGetValue(curHand.Id, out rep)) {
-          rep = Factory.MakeHandRepresentation(curHand, modelType);
-          if (rep != null) {
-            all_hand_reps.Add(curHand.Id, rep);
-          }
+      List<IHand> hands = Provider.CurrentFrame.Hands;
+
+      for (int i = 0; i < hands.Count; i++)
+        {
+            IHand curHand = hands[i];  
+
+            HandRepresentation rep;
+            if (!all_hand_reps.TryGetValue(curHand.Id, out rep))
+            {
+                rep = Factory.MakeHandRepresentation(curHand, modelType);
+                if (rep != null)
+                {
+                    all_hand_reps.Add(curHand.Id, rep);
+                }
+            }
+            if (rep != null)
+            {
+                rep.IsMarked = true;
+                rep.UpdateRepresentation(curHand, modelType);
+                rep.LastUpdatedTime = (int)Provider.CurrentFrame.Timestamp;
+            }
         }
-        if (rep != null) {
-          rep.IsMarked = true;
-          rep.UpdateRepresentation(curHand, modelType);
-          rep.LastUpdatedTime = (int)Provider.CurrentFrame.Timestamp;
-        }
-      }
 
       //Mark-and-sweep to finish unused HandRepresentations
       HandRepresentation toBeDeleted = null;
