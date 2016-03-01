@@ -342,7 +342,7 @@ public class LeapImageRetriever : MonoBehaviour {
   
   void Update() {
     if(ImagesEnabled){
-        Frame imageFrame = provider.CurrentFrame;
+        IFrame imageFrame = provider.CurrentFrame;
         Controller controller = provider.GetLeapController();
         _requestedImage = controller.RequestImages(imageFrame.Id, Image.ImageType.DEFAULT);
     } else if(!checkingImageState){

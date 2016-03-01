@@ -28,10 +28,12 @@ namespace Leap
    * @since 1.0
    */
   public class Frame:
-    IEquatable<Frame>
+    IEquatable<IFrame>, IFrame
   {
     TrackedQuad _trackedQuad = new TrackedQuad();
-    /**
+    List<IHand> _hands;
+
+        /**
      * Constructs a Frame object.
      *
      * Frame instances created with this constructor are invalid.
@@ -72,6 +74,19 @@ namespace Leap
       Hands = hands;
     }
 
+  /**
+   * Creates a shallow copy of this Frame, transforming all hands, fingers, and bones by 
+   * the specified transform on demand.
+   *
+   * @param trs A Matrix containing the desired translation, rotation, and scale
+   * of the copied Frame.
+   * @returns a new Frame object with the transform applied.
+   */
+    public IFrame TransformedShallowCopy(ref Matrix trs)
+    {
+        return new TransformedFrame(ref trs, this);
+    }
+
     /**
      * Creates a copy of this Frame, transforming all hands, fingers, and bones by the specified transform.
      *
@@ -80,7 +95,7 @@ namespace Leap
      * @returns a new Frame object with the transform applied.
      * @since 3.0
      */
-    public Frame TransformedCopy(Matrix trs)
+    public IFrame TransformedCopy(ref Matrix trs)
     {
       Frame transformedFrame = new Frame(
         Id,
@@ -89,8 +104,11 @@ namespace Leap
         new InteractionBox(InteractionBox.Center, InteractionBox.Size),
         new List<Hand>(this.Hands.Count)
       );
+      transformedFrame.Hands = new List<IHand>(this.Hands.Count);
+
       for (int h = 0; h < this.Hands.Count; h++)
-        transformedFrame.Hands.Add(this.Hands[h].TransformedCopy(trs));
+        transformedFrame.Hands.Add(this.Hands[h].TransformedCopy(ref trs));
+
       return transformedFrame;
     }
 
@@ -162,9 +180,9 @@ namespace Leap
      * otherwise, an invalid Hand object is returned.
      * @since 1.0
      */
-    public Hand Hand(int id)
+    public IHand Hand(int id)
     {
-      return this.Hands.Find(delegate (Hand item)
+      return this.Hands.Find(delegate (IHand item)
       {
         return item.Id == id;
       });
@@ -179,7 +197,7 @@ namespace Leap
      * the exact same frame of tracking data and both Frame objects are valid.
      * @since 1.0
      */
-    public bool Equals(Frame other)
+    public bool Equals(IFrame other)
     {
       return this.Id == other.Id && this.Timestamp == other.Timestamp;
     }
@@ -250,7 +268,17 @@ namespace Leap
      * @returns The List<Hand> containing all Hand objects detected in this frame.
      * @since 1.0
      */
-    public List<Hand> Hands { get; set; }
+    public List<IHand> Hands { 
+      get{
+        if(_hands == null)
+          _hands = new List<IHand>(3);
+
+        return _hands;
+      } 
+      set{
+        _hands = value;
+      }
+    }
 
     /**
      * The current InteractionBox for the frame. See the InteractionBox class

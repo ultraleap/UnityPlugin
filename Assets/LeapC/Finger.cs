@@ -24,10 +24,9 @@ namespace Leap
    * will be discontinuous unless they have a corresponding ID exchange.
    * @since 1.0
    */
-  public class Finger
+  public class Finger : IFinger
   {
-    Bone[] _bones = new Bone[4];
-    long _frameId = -1;
+    IBone[] _bones = new IBone[4];
 
     /**
      * Constructs a Finger object.
@@ -61,8 +60,7 @@ namespace Leap
      * @param distal The end bone.
      * @since 3.0
      */
-    public Finger(long frameId,
-                  int handId,
+    public Finger(int handId,
                   int fingerId,
                   float timeVisible,
                   Vector tipPosition,
@@ -73,18 +71,18 @@ namespace Leap
                   float length,
                   bool isExtended,
                   Finger.FingerType type,
-                  Bone metacarpal,
-                  Bone proximal,
-                  Bone intermediate,
-                  Bone distal)
+                  IBone metacarpal,
+                  IBone proximal,
+                  IBone intermediate,
+                  IBone distal)
     {
       Type = type;
       _bones[0] = metacarpal;
       _bones[1] = proximal;
       _bones[2] = intermediate;
       _bones[3] = distal;
-      _frameId = frameId;
       Id = (handId * 10) + fingerId;
+      FingerId = fingerId;
       HandId = handId;
       TipPosition = tipPosition;
       TipVelocity = tipVelocity;
@@ -96,6 +94,18 @@ namespace Leap
       TimeVisible = timeVisible;
     }
 
+  /**
+   * Creates a copy of this finger, transformed by the specified transform
+   * on demand.
+   *
+   * @param trs A Matrix containing the desired translation, rotation, and scale
+   * of the copied finger.
+   */
+    public IFinger TransformedShallowCopy(ref Matrix trs)
+    {
+        return new TransformedFinger(ref trs, this);
+    }
+
     /**
      * Creates a copy of this finger, transformed by the specified transform.
      *
@@ -103,13 +113,12 @@ namespace Leap
      * of the copied finger.
      * @since 3.0
      */
-    public Finger TransformedCopy(Matrix trs)
+    public IFinger TransformedCopy(ref Matrix trs)
     {
       float dScale = trs.zBasis.Magnitude;
       float hScale = trs.xBasis.Magnitude;
-      return new Finger(_frameId,
-                        HandId,
-                        Id,
+      return new Finger(HandId,
+                        FingerId,
                         TimeVisible,
                         trs.TransformPoint(TipPosition),
                         trs.TransformPoint(TipVelocity),
@@ -119,10 +128,10 @@ namespace Leap
                         Length * dScale,
                         IsExtended,
                         Type,
-                        _bones[0].TransformedCopy(trs),
-                        _bones[1].TransformedCopy(trs),
-                        _bones[2].TransformedCopy(trs),
-                        _bones[3].TransformedCopy(trs));
+                        _bones[0].TransformedCopy(ref trs),
+                        _bones[1].TransformedCopy(ref trs),
+                        _bones[2].TransformedCopy(ref trs),
+                        _bones[3].TransformedCopy(ref trs));
     }
 
 
@@ -136,7 +145,7 @@ namespace Leap
      * @returns The Bone that has the specified bone type.
      * @since 2.0
      */
-    public Bone Bone(Bone.BoneType boneIx)
+    public IBone Bone(Bone.BoneType boneIx)
     {
       return _bones[(int)boneIx];
     }
@@ -198,6 +207,11 @@ namespace Leap
      * @since 1.0
      */
     public int HandId { get; private set; }
+
+    /**
+     * The Id of this finger. 
+     */
+    private int FingerId { get; set; }
 
     /**
      * The tip position in millimeters from the Leap Motion origin.
