@@ -37,20 +37,22 @@ public abstract class IHandModel : MonoBehaviour {
     }
     isTracked = false;
   }
-  public abstract Hand GetLeapHand(); 
-  public abstract void SetLeapHand(Hand hand);
+  public abstract IHand GetLeapHand(); 
+  public abstract void SetLeapHand(IHand hand);
 #if UNITY_EDITOR
   void Awake() {
     if (!EditorApplication.isPlaying) {
       //Debug.Log("IHandModel.Awake()");
-      SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(transform)));
+      Matrix leapMatrix = UnityMatrixExtension.GetLeapMatrix(transform);
+      SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(ref leapMatrix));
       InitHand();
     }
   }
   void Update() {
     if (!EditorApplication.isPlaying) {
       //Debug.Log("IHandModel.Update()");
-      SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(transform)));
+      Matrix leapMatrix = UnityMatrixExtension.GetLeapMatrix(transform);
+      SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(ref leapMatrix));
       UpdateHand();
     }
   }

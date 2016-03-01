@@ -26,7 +26,7 @@ namespace Leap
    * zero length bone at that location.
    * @since 2.0
    */
-  public class Bone
+  public class Bone : IBone
   {
     /**
      * Constructs a default Bone object.
@@ -76,6 +76,17 @@ namespace Leap
       Type = type;
     }
 
+  /**
+   * Creates a shallow copy of this bone, transformed by the specified 
+   * transform on demand.
+   *
+   * @param trs A Matrix containing the desired translation, rotation, and scale
+   * of the copied bone.
+   */
+    public IBone TransformedShallowCopy(ref Matrix trs) {
+            return new TransformedBone(ref trs, this);
+    }
+
     /**
      * Creates a copy of this bone, transformed by the specified transform.
      *
@@ -83,7 +94,7 @@ namespace Leap
      * of the copied bone.
      * @since 3.0
      */
-    public Bone TransformedCopy(Matrix trs)
+    public IBone TransformedCopy(ref Matrix trs)
     {
       float dScale = trs.zBasis.Magnitude;
       float hScale = trs.xBasis.Magnitude;
@@ -104,7 +115,7 @@ namespace Leap
      * exact same physical bone in the same frame and both Bone objects are valid.
      * @since 2.0
      */
-    public bool Equals(Bone other)
+    public bool Equals(IBone other)
     {
       return Center == other.Center && Direction == other.Direction && Length == other.Length;
     }
