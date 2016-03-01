@@ -6,8 +6,8 @@ using System;
 
 public class CapsuleHand : IHandModel {
 
-  private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4 + (int)Finger.FingerJoint.JOINT_MCP;
-  private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4 + (int)Finger.FingerJoint.JOINT_MCP;
+  private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4 ;
+  private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4 ;
 
   private const float SPHERE_RADIUS = 0.008f;
   private const float CYLINDER_RADIUS = 0.006f;
@@ -36,7 +36,7 @@ public class CapsuleHand : IHandModel {
   private List<Transform> _sphereBTransforms;
 
   private Transform armFrontLeft, armFrontRight, armBackLeft, armBackRight;
-  private Hand hand_;
+    private IHand hand_;
 
   public override ModelType HandModelType {
     get {
@@ -51,11 +51,13 @@ public class CapsuleHand : IHandModel {
     }
   }
 
-  public override Hand GetLeapHand() {
+    public override IHand GetLeapHand()
+    {
     return hand_;
   }
 
-  public override void SetLeapHand(Hand hand) {
+    public override void SetLeapHand(IHand hand)
+    {
     hand_ = hand;
   }
 
@@ -103,13 +105,13 @@ public class CapsuleHand : IHandModel {
 
   private void updateSpheres() {
     //Update all spheres
-    FingerList fingers = hand_.Fingers;
+    List<IFinger> fingers = hand_.Fingers;
     for (int i = 0; i < fingers.Count; i++) {
-      Finger finger = fingers[i];
+      IFinger finger = fingers[i];
       for (int j = 0; j < 4; j++) {
         int key = getFingerJointIndex((int)finger.Type, j);
         Transform sphere = _jointSpheres[key];
-        sphere.position = finger.JointPosition((Finger.FingerJoint)j).ToUnityScaled();
+        sphere.position = finger.Bone((Bone.BoneType)j).NextJoint.ToUnityScaled();
 
       }
     }
@@ -184,9 +186,9 @@ public class CapsuleHand : IHandModel {
 
   private void createSpheres() {
     //Create spheres for finger joints
-    FingerList fingers = hand_.Fingers;
+    List<IFinger> fingers = hand_.Fingers;
     for (int i = 0; i < fingers.Count; i++) {
-      Finger finger = fingers[i];
+      IFinger finger = fingers[i];
       for (int j = 0; j < 4; j++) {
         int key = getFingerJointIndex((int)finger.Type, j);
         _jointSpheres[key] = createSphere("Joint", SPHERE_RADIUS);

@@ -8,19 +8,15 @@
 
 namespace Leap
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-    using System.Threading;
-    using System.Runtime.InteropServices;
+  using System;
+  using System.Collections.Generic;
+  using System.Text;
+  using System.Threading;
+  using System.Runtime.InteropServices;
 
-    using LeapInternal;
+  using LeapInternal;
 
-    using System.IO;
-
-    //debugging
-
-    /**
+  /**
    * The Controller class is your main interface to the Leap Motion Controller.
    *
    * Create an instance of this Controller class to access frames of tracking
@@ -30,156 +26,273 @@ namespace Leap
    * previous frames. A controller stores up to 60 frames in its frame history.
    *
    * Polling is an appropriate strategy for applications which already have an
-   * intrinsic update loop, such as a game. You can also add an instance of a
-   * subclass of Leap::Listener to the controller to handle events as they occur.
-   * The Controller dispatches events to the listener upon initialization and exiting,
-   * on connection changes, when the application gains and loses the OS input focus,
-   * and when a new frame of tracking data is available.
-   * When these events occur, the controller object invokes the appropriate
-   * callback function defined in your subclass of Listener.
+   * intrinsic update loop, such as a game. You can also subscribe to the FrameReady
+   * event to get tracking frames through an event delegate.
    *
-   * To access frames of tracking data as they become available:
+   * If the current thread implements a SynchronizationContext that contains a message
+   * loop, events are posted to that threads message loop. Otherwise, events are called
+   * on an independent thread and applications must perform any needed synchronization
+   * or marshalling of data between threads. Note that Unity3D does not create an
+   * appropriate SynchronizationContext object. Typically, event handlers cannot access
+   * any Unity objects.
    *
-   * 1. Implement a subclass of the Listener class and override the
-   *    Listener::onFrame() function.
-   * 2. In your Listener::onFrame() function, call the Controller::frame()
-   *    function to access the newest frame of tracking data.
-   * 3. To start receiving frames, create a Controller object and add an instance
-   *    of the Listener subclass to the Controller::addListener() function.
-   *
-   * When an instance of a Listener subclass is added to a Controller object,
-   * it calls the Listener::onInit() function when the listener is ready for use.
-   * When a connection is established between the controller and the Leap Motion software,
-   * the controller calls the Listener::onConnect() function. At this point, your
-   * application will start receiving frames of data. The controller calls the
-   * Listener::onFrame() function each time a new frame is available. If the
-   * controller loses its connection with the Leap Motion software or device for any
-   * reason, it calls the Listener::onDisconnect() function. If the listener is
-   * removed from the controller or the controller is destroyed, it calls the
-   * Listener::onExit() function. At that point, unless the listener is added to
-   * another controller again, it will no longer receive frames of tracking data.
-   *
-   * The Controller object is multithreaded and calls the Listener functions on
-   * its own thread, not on an application thread.
    * @since 1.0
    */
+  public class Controller:
+    IController
+  {
+    Connection _connection;
+    bool _disposed = false;
+    Config _config;
 
-    public class Controller : IController
-    {
-        Connection _connection;
-        bool _disposed = false;
-        Config _config;
-
-        public SynchronizationContext EventContext{ get; set; }
-
-        public event EventHandler<LeapEventArgs> Init;
-        public event EventHandler<ConnectionEventArgs> Connect;
-        public event EventHandler<ConnectionLostEventArgs> Disconnect;
-        public event EventHandler<LeapEventArgs> Exit;
-        public event EventHandler<FrameEventArgs> FrameReady;
-        public event EventHandler<LeapEventArgs> FocusGained;
-        public event EventHandler<LeapEventArgs> FocusLost;
-        public event EventHandler<LeapEventArgs> ServiceConnect;
-        public event EventHandler<LeapEventArgs> ServiceDisconnect;
-        public event EventHandler<DeviceEventArgs> Device;
-        public event EventHandler<DeviceEventArgs> DeviceLost;
-        public event EventHandler<ImageEventArgs> ImageReady;
-        public event EventHandler<ImageRequestFailedEventArgs> ImageRequestFailed;
-        public event EventHandler<LeapEventArgs> ServiceChange;
-        public event EventHandler<DeviceFailureEventArgs> DeviceFailure;
-        public event EventHandler<LogEventArgs> LogMessage;
-        public event EventHandler<PolicyEventArgs> PolicyChange;
-        public event EventHandler<ConfigChangeEventArgs> ConfigChange;
-        public event EventHandler<DistortionEventArgs> DistortionChange;
-        public event EventHandler<TrackedQuadEventArgs> TrackedQuadReady;
-
-        //TODO revisit dispose code
-        public void Dispose ()
-        { 
-            Dispose (true);
-            GC.SuppressFinalize (this);
-        }
-        
-        // Protected implementation of Dispose pattern.
-        protected virtual void Dispose (bool disposing)
-        {
-            if (_disposed)
-                return; 
-            
-            if (disposing) {
-                // Free any other managed objects here.
-            }
-            
-            // Free any unmanaged objects here.
-            //
-            _disposed = true;
-        }
-
-        /**
-     * Constructs a Controller object.
+    /**
+     * The SynchronizationContext used for dispatching events.
      *
-     * When creating a Controller object, you may optionally pass in a
-     * reference to an instance of a subclass of Leap::Listener. Alternatively,
-     * you may add a listener using the Controller::addListener() function.
-     *
-     * @since 1.0
+     * By default the synchronization context of the thread creating the controller
+     * instance is used. You can change the context if desired.
      */
-        public Controller () : this (0)
-        {
-        }
+    public SynchronizationContext EventContext { get; set; }
+    /**
+     * Dispatched when the connection to the service is established.
+     * @since 3.0
+     */
+    public event EventHandler<ConnectionEventArgs> Connect;
+    /**
+     * Dispatched if the connection to the service is lost.
+     * @since 3.0
+     */
+    public event EventHandler<ConnectionLostEventArgs> Disconnect;
+    /**
+     * Dispatched when a tracking frame is ready.
+     * @since 3.0
+     */
+    public event EventHandler<FrameEventArgs> FrameReady;
+    /**
+    * Dispatched when a Leap Motion device is connected.
+    * @since 3.0
+    */
+    public event EventHandler<DeviceEventArgs> Device;
+    /**
+    * Dispatched when when a Leap Motion device is disconnected.
+    * @since 3.0
+    */
+    public event EventHandler<DeviceEventArgs> DeviceLost;
+    /**
+    * Dispatched when an image is ready. Call Controller.RequestImage()
+    * to request that an image be sent to your application.
+    * @since 3.0
+    */
+    public event EventHandler<ImageEventArgs> ImageReady;
+    /**
+    * Dispatched when a requested image cannot be sent.
+    * @since 3.0
+    */
+    public event EventHandler<ImageRequestFailedEventArgs> ImageRequestFailed;
+    /**
+    * Dispatched when a Leap device fails to initialize.
+    * @since 3.0
+    */
+    public event EventHandler<DeviceFailureEventArgs> DeviceFailure;
+    /**
+    * Dispatched when the system generates a loggable event.
+    * @since 3.0
+    */
+    public event EventHandler<LogEventArgs> LogMessage;
+    /**
+    * Dispatched when a policy changes.
+    * @since 3.0
+    */
+    public event EventHandler<PolicyEventArgs> PolicyChange;
+    /**
+    * Dispatched when a configuration seting changes.
+    * @since 3.0
+    */
+    public event EventHandler<ConfigChangeEventArgs> ConfigChange;
+    /**
+    * Dispatched when the image distortion map changes.
+    * The distortion map can change when the Leap device switches orientation,
+    * or a new device becomes active.
+    * @since 3.0
+    */
+    public event EventHandler<DistortionEventArgs> DistortionChange;
+    /**
+    * Dispatched when a new tracked quad object is available.
+    * @since 3.0
+    */
+    public event EventHandler<TrackedQuadEventArgs> TrackedQuadReady;
 
-        public Controller (int connectionKey)
-        {
-            EventContext = SynchronizationContext.Current;
-            _connection = Connection.GetConnection (connectionKey);
+    //TODO revisit dispose code
+    public void Dispose()
+    {
+      Dispose(true);
+      GC.SuppressFinalize(this);
+    }
 
-            _connection.LeapInit += OnInit;
-            _connection.LeapConnection += OnConnect;
-            _connection.LeapConnectionLost += OnDisconnect;
-            _connection.LeapFrame += OnFrame;
-            _connection.LeapImageReady += OnImages;
-            _connection.LeapImageRequestFailed += OnFailedImageRequest;
-            _connection.LeapPolicyChange += OnPolicyChange;
-            _connection.LeapLogEvent += OnLogEvent;
-            _connection.LeapTrackedQuad += OnTrackedQuad;
-            _connection.LeapConfigChange += OnConfigChange;
-            _connection.LeapDevice += OnDevice;
-            _connection.LeapDeviceLost += OnDeviceLost;
-            _connection.LeapDeviceFailure += OnDeviceFailure;
-            _connection.LeapDistortionChange += OnDistortionChange;
+    // Protected implementation of Dispose pattern.
+    protected virtual void Dispose(bool disposing)
+    {
+      if (_disposed)
+        return;
 
-            _connection.Start ();
-        }
+      if (disposing)
+      {
+        // Free any other managed objects here.
+      }
 
-        public void StartConnection ()
-        {
-            _connection.Start ();
-        }
+      // Free any unmanaged objects here.
+      //
+      _disposed = true;
+    }
 
-        public void StopConnection ()
-        {
-            _connection.Stop ();
-        }
+    /**
+    * Constructs a Controller object.
+    *
+    * The default constructor uses a connection key of 0.
+    *
+    * @since 1.0
+    */
+    public Controller() : this(0)
+    {
+    }
 
-        public Image RequestImages(Int64 frameId, Image.ImageType type){
-            return _connection.RequestImages(frameId, type);
-        }
-        public Image RequestImages(Int64 frameId, Image.ImageType type, byte[] imageBuffer){
-            return _connection.RequestImages(frameId, type, imageBuffer);
-        }
+    /**
+     * Constructs a Controller object using the specified connection key.
+     *
+     * All controller instances using the same key will use the same connection
+     * to the serivce. In general, an application should not use more than one connection
+     * for all its controllers.
+     *
+     * @param connectionKey An identifier specifying the connection to use. If a
+     * connection with the specified key already exists, that connection is used.
+     * Otherwise, a new connection is created.
+     */
+    public Controller(int connectionKey)
+    {
+      EventContext = SynchronizationContext.Current;
+      _connection = Connection.GetConnection(connectionKey);
 
-        /**
+      _connection.LeapConnection += OnConnect;
+      _connection.LeapConnectionLost += OnDisconnect;
+      _connection.LeapFrame += OnFrame;
+      _connection.LeapImageReady += OnImages;
+      _connection.LeapImageRequestFailed += OnFailedImageRequest;
+      _connection.LeapPolicyChange += OnPolicyChange;
+      _connection.LeapLogEvent += OnLogEvent;
+      _connection.LeapTrackedQuad += OnTrackedQuad;
+      _connection.LeapConfigChange += OnConfigChange;
+      _connection.LeapDevice += OnDevice;
+      _connection.LeapDeviceLost += OnDeviceLost;
+      _connection.LeapDeviceFailure += OnDeviceFailure;
+      _connection.LeapDistortionChange += OnDistortionChange;
+
+      _connection.Start();
+    }
+
+    /**
+     * Starts the connection.
+     *
+     * A connection starts automatically when created, but you can
+     * use this function to restart the connection after stopping it.
+     *
+     * @since 3.0
+     */
+    public void StartConnection()
+    {
+      _connection.Start();
+    }
+
+    /**
+     * Stops the connection.
+     *
+     * No more frames or other events are received from a stopped connection. You can
+     * restart with StartConnection().
+     *
+     * @since 3.0
+     */
+    public void StopConnection()
+    {
+      _connection.Stop();
+    }
+
+    /**
+     * Requests an image pair from the service.
+     *
+     * Image data is stacked in a single byte array, with the left camera image first, followed by the right camera image.
+     * Two types of image are supported. ImageType.TYPE_DEFAULT is the normal, IR format image.
+     * ImageType.RAW is the unmodified, raw sensor pixels. The format of this image type depends on the device. For
+     * the publically available Leap Motion devices, the raw image type is also IR and is identical to the default image type
+     * except when in robust mode. In robust mode, the default image type is processed to subtract the unilluminated background;
+     * the raw image is not.
+     *
+     * Images are not sent automatically. You must request each image. This function returns an Image
+     * object. However, that object does not contain image data until its IsComplete property
+     * becomes true.
+     *
+     * Image requests will fail if the request is made after the image has been disposed by the service. The service only
+     * keeps images for a few frames, so applications that use images must make the image request as soon as possible
+     * after a tracking frame is received.
+     *
+     * The controller dispatches an ImageReady event when a requested image is recevied from the service
+     * and is ready for use. The controller dispatches an ImageRequestFailed event if the request does not succeed.
+     *
+     * Image requests can fail for the following reasons:
+     *
+     * * The requested image is no longer available.
+     * * The frame id does not match an actual tracking frame.
+     * * Images are disabled by the client's configuration settings.
+     * * The buffer supplied for the image was too small.
+     * * An internal service error occurs.
+     *
+     * In addition, if the returned image is invalid, then the request call itself failed. Typically this
+     * will occur when the connection itself is not running. Such errors are reported in a LogEvent event.
+     *
+     * @param frameId The Id value of the tracking frame.
+     * @param type The type of image desired. A member of the Image.ImageType enumeration.
+     * @returns An incomplete Image object that will contain the image data when the request is fulfilled.
+     * If the request call itself fails, an invalid image is returned.
+     * @since 3.0
+     */
+    public Image RequestImages(Int64 frameId, Image.ImageType type)
+    {
+      return _connection.RequestImages(frameId, type);
+    }
+
+    /**
+     * Requests an image from the service. The pixels of the image are written to the specified byte array.
+     *
+     * If the specified byte array is too small, an ImageRequestFailed event is dispatched. The arguments of this event
+     * include the required buffer size. For the publically available Leap device, the buffer size must be:
+     * width * height * bytes-per-pixel * #cameras, i.e: 640 * 240 * 1 * 2 = 307,200 bytes.
+     *
+     * The Image object returned by this function contains a reference to the supplied buffer. When the service sets
+     * the IsComplete property to true when the buffer is filled in. An ImageReady event is also dispatched.
+     *
+     * @param frameId The Id value of the tracking frame.
+     * @param type The type of image desired. A member of the Image.ImageType enumeration.
+     * @param imageBuffer A byte array large enough to hold the requested image pair.
+     * @returns An incomplete Image object that will contain the image data when the request is fulfilled.
+     * If the request call itself fails, an invalid image is returned.
+     * @since 3.0
+     */
+    public Image RequestImages(Int64 frameId, Image.ImageType type, byte[] imageBuffer)
+    {
+      return _connection.RequestImages(frameId, type, imageBuffer);
+    }
+
+    /**
      * Reports whether your application has a connection to the Leap Motion
      * daemon/service. Can be true even if the Leap Motion hardware is not available.
      * @since 1.2
      */
-        public bool IsServiceConnected {
-            get {
-                return _connection.IsServiceConnected;
-            }
-        }
+    public bool IsServiceConnected
+    {
+      get
+      {
+        return _connection.IsServiceConnected;
+      }
+    }
 
-        /**
+    /**
      * Requests setting a policy.
      *
      * A request to change a policy is subject to user approval and a policy
@@ -196,12 +309,12 @@ namespace Leap
      * @param policy A PolicyFlag value indicating the policy to request.
      * @since 2.1.6
      */
-        public void SetPolicy (Controller.PolicyFlag policy)
-        {
-            _connection.SetPolicy (policy);
-        }
+    public void SetPolicy(Controller.PolicyFlag policy)
+    {
+      _connection.SetPolicy(policy);
+    }
 
-        /**
+    /**
      * Requests clearing a policy.
      *
      * Policy changes are completed asynchronously and, because they are subject
@@ -214,12 +327,12 @@ namespace Leap
      * @param flags A PolicyFlag value indicating the policy to request.
      * @since 2.1.6
      */
-        public void ClearPolicy (Controller.PolicyFlag policy)
-        {
-            _connection.ClearPolicy (policy);
-        }
+    public void ClearPolicy(Controller.PolicyFlag policy)
+    {
+      _connection.ClearPolicy(policy);
+    }
 
-        /**
+    /**
      * Gets the active setting for a specific policy.
      *
      * Keep in mind that setting a policy flag is asynchronous, so changes are
@@ -237,13 +350,12 @@ namespace Leap
      * @returns A boolean indicating whether the specified policy has been set.
      * @since 2.1.6
      */
-        public bool IsPolicySet (Controller.PolicyFlag policy)
-        {
-            return _connection.IsPolicySet (policy);
-        }
+    public bool IsPolicySet(Controller.PolicyFlag policy)
+    {
+      return _connection.IsPolicySet(policy);
+    }
 
-
-        /**
+    /**
      * Returns a frame of tracking data from the Leap Motion software. Use the optional
      * history parameter to specify which frame to retrieve. Call frame() or
      * frame(0) to access the most recent frame; call frame(1) to access the
@@ -256,7 +368,7 @@ namespace Leap
      * Leap Motion frame rate:
      *
      * \include Controller_Listener_onFrame.txt
-     * 
+     *
      * @param history The age of the frame to return, counting backwards from
      * the most recent frame (0) into the past and up to the maximum age (59).
      * @returns The specified frame; or, if no history parameter is specified,
@@ -264,12 +376,12 @@ namespace Leap
      * position, an invalid Frame is returned.
      * @since 1.0
      */
-        public Frame Frame (int history)
-        {
-            return _connection.Frames.Get (history);
-        }
+    public Frame Frame(int history)
+    {
+      return _connection.Frames.Get(history);
+    }
 
-        /**
+    /**
      * Returns a frame of tracking data from the Leap Motion software. Use the optional
      * history parameter to specify which frame to retrieve. Call frame() or
      * frame(0) to access the most recent frame; call frame(1) to access the
@@ -282,7 +394,7 @@ namespace Leap
      * Leap Motion frame rate:
      *
      * \include Controller_Listener_onFrame.txt
-     * 
+     *
      * @param history The age of the frame to return, counting backwards from
      * the most recent frame (0) into the past and up to the maximum age (59).
      * @returns The specified frame; or, if no history parameter is specified,
@@ -290,70 +402,36 @@ namespace Leap
      * position, an invalid Frame is returned.
      * @since 1.0
      */
-        public Frame Frame ()
-        {
-            return Frame (0);
-        }
+    public Frame Frame()
+    {
+      return Frame(0);
+    }
 
-        /**
-         * Returns the frame object with all hands transformed by the specified
-         * transform matrix.
-         * @param trs a Matrix containing translation, rotation, and scale.
-         * @param history The age of the frame to return, counting backwards from
-         * the most recent frame (0) into the past and up to the maximum age (59).
-         */
-        public Frame GetTransformedFrame (Matrix trs, int history = 0)
-        {
-            return Frame (history).TransformedCopy (trs);
-        }
+    /**
+     * Returns the frame object with all hands transformed by the specified
+     * transform matrix.
+     * @param trs a Matrix containing translation, rotation, and scale.
+     * @param history The age of the frame to return, counting backwards from
+     * the most recent frame (0) into the past and up to the maximum age (59).
+     */
+    public IFrame GetTransformedFrame(ref Matrix trs, int history = 0)
+    {
+      return Frame(history).TransformedCopy(ref trs);
+    }
 
-
-        /**
+    /**
      * Returns a timestamp value as close as possible to the current time.
      * Values are in microseconds, as with all the other timestamp values.
      *
      * @since 2.2.7
      *
      */
-        public long Now ()
-        {
-            return LeapC.GetNow ();
-        }
+    public long Now()
+    {
+      return LeapC.GetNow();
+    }
 
-        /**
-     * Pauses or resumes the Leap Motion service.
-     *
-     * When the service is paused no applications receive tracking data and the
-     * service itself uses minimal CPU time.
-     *
-     * Before changing the state of the service, you must set the
-     * POLICY_ALLOW_PAUSE_RESUME using the Controller::setPolicy() function.
-     * Policies must be set every time the application is run.
-     *
-     * \include Controller_setPaused.txt
-     *
-     * @param pause Set true to pause the service; false to resume.
-     * @since 2.4.0
-     */
-//        public void SetPaused (bool pause)
-//        {
-//            _connection.SetPaused (pause);
-//        }
-
-        /**
-     * Reports whether the Leap Motion service is currently paused.
-     *
-     * \include Controller_isPaused.txt
-     *
-     * @returns True, if the service is paused; false, otherwise.
-     * @since 2.4.0
-     */
-//        public bool IsPaused ()
-//        {
-//            return _connection.IsPaused;
-//        }
-
-        /**
+    /**
      * Reports whether this Controller is connected to the Leap Motion service and
      * the Leap Motion hardware is plugged in.
      *
@@ -370,35 +448,15 @@ namespace Leap
      * @returns True, if connected; false otherwise.
      * @since 1.0
      */
-        public bool IsConnected {
-            get {
-                return IsServiceConnected && Devices.Count > 0;
-            } 
-        }
+    public bool IsConnected
+    {
+      get
+      {
+        return IsServiceConnected && Devices.Count > 0;
+      }
+    }
 
-        //TODO how is LeapC going to handle focus?
-        /**
-     * Reports whether this application is the focused, foreground application.
-     *
-     * By default, your application only receives tracking information from
-     * the Leap Motion controller when it has the operating system input focus.
-     * To receive tracking data when your application is in the background,
-     * the background frames policy flag must be set.
-     *
-     * \include Controller_hasFocus.txt
-     *
-     * @returns True, if application has focus; false otherwise.
-     *
-     * @see Controller::setPolicyFlags()
-     * @since 1.0
-     */
-        public bool HasFocus {
-            get {
-                return false;
-            } 
-        }
-
-        /**
+    /**
      * Returns a Config object, which you can use to query the Leap Motion system for
      * configuration information.
      *
@@ -406,52 +464,18 @@ namespace Leap
      *
      * @returns The Controller's Config object.
      * @since 1.0
-     */  
-        public Config Config {
-            get {
-                if (_config == null)
-                    _config = new Config (this._connection.ConnectionKey);
-                return _config;
-            } 
-        }
-
-        /**
-     * The most recent set of images from the Leap Motion cameras.
-     *
-     * \include Controller_images.txt
-     *
-     * Depending on timing and the current processing frame rate, the images
-     * obtained with this function can be newer than images obtained from
-     * the current frame of tracking data.
-     *
-     * @return An ImageList object containing the most recent camera images.
-     * @since 2.2.1
      */
-//        public ImageList Images {
-//            get {
-//                if (_images == null)
-//                    _images = new ImageList ();
-//
-//                _connection.GetLatestImages (ref _images);
-//                return _images;
-//            } 
-//        }
+    public Config Config
+    {
+      get
+      {
+        if (_config == null)
+          _config = new Config(this._connection.ConnectionKey);
+        return _config;
+      }
+    }
 
-        public enum ImageRequestResult{
-            UNKNOWN = 0,
-            SUCCESS,
-            REQUEST_TOO_LATE,
-            INSUFFICIENT_BUFFER,
-            REQUEST_FAILED,
-        }
-        //Images on demand
-//        public Image RequestDefaultImages(Int64 frameId, IntPtr buffer, out int bufferSize){
-//            return _connection.RequestImages(frameId, buffer, out bufferSize, Image.ImageType.DEFAULT);
-//        }
-//        public ImageRequestResult RequestRawImages(Int64 frameId, IntPtr buffer, out int bufferSize){
-//            return _connection.RequestImages(frameId, buffer, out bufferSize, Image.ImageType.RAW);
-//        }
-        /**
+    /**
      * The list of currently attached and recognized Leap Motion controller devices.
      *
      * The Device objects in the list describe information such as the range and
@@ -466,28 +490,30 @@ namespace Leap
      * @returns The list of Leap Motion controllers.
      * @since 1.0
      */
-        public DeviceList Devices {
-            get {
-                return _connection.Devices;
-            } 
-        }
+    public DeviceList Devices
+    {
+      get
+      {
+        return _connection.Devices;
+      }
+    }
 
-        /**
-    * A list of any Leap Motion hardware devices that are physically connected to
-    * the client computer, but are not functioning correctly. The list contains
-    * FailedDevice objects containing the pnpID and the reason for failure. No
-    * other device information is available.
-    *
-    * \include Controller_failedDevices.txt
-    *
-    * @since 2.4.0
-    */
-        public FailedDeviceList FailedDevices ()
-        {
-            return _connection.FailedDevices;
-        }
+    /**
+     * A list of any Leap Motion hardware devices that are physically connected to
+     * the client computer, but are not functioning correctly. The list contains
+     * FailedDevice objects containing the pnpID and the reason for failure. No
+     * other device information is available.
+     *
+     * \include Controller_failedDevices.txt
+     *
+     * @since 3.0
+     */
+    public FailedDeviceList FailedDevices()
+    {
+      return _connection.FailedDevices;
+    }
 
-        /**
+    /**
      * Note: This class is an experimental API for internal use only. It may be
      * removed without warning.
      *
@@ -497,185 +523,132 @@ namespace Leap
      * If no quad is being tracked, then an invalid TrackedQuad is returned.
      * @since 2.2.6
      **/
-        public TrackedQuad TrackedQuad {
-            get {
+    public TrackedQuad TrackedQuad
+    {
+      get
+      {
 
-                return _connection.GetLatestQuad ();
-            } 
-        }
-
-        /**
-       * The supported controller policies.
-       *
-       * The supported policy flags are:
-       *
-       * **POLICY_BACKGROUND_FRAMES** -- requests that your application receives frames
-       *   when it is not the foreground application for user input.
-       *
-       *   The background frames policy determines whether an application
-       *   receives frames of tracking data while in the background. By
-       *   default, the Leap Motion  software only sends tracking data to the foreground application.
-       *   Only applications that need this ability should request the background
-       *   frames policy. The "Allow Background Apps" checkbox must be enabled in the
-       *   Leap Motion Control Panel or this policy will be denied.
-       *
-       * **POLICY_IMAGES** -- request that your application receives images from the
-       *   device cameras. The "Allow Images" checkbox must be enabled in the
-       *   Leap Motion Control Panel or this policy will be denied.
-       *
-       *   The images policy determines whether an application receives image data from
-       *   the Leap Motion sensors which each frame of data. By default, this data is
-       *   not sent. Only applications that use the image data should request this policy.
-       *
-       *
-       * **POLICY_OPTIMIZE_HMD** -- request that the tracking be optimized for head-mounted
-       *   tracking.
-       *
-       *   The optimize HMD policy improves tracking in situations where the Leap
-       *   Motion hardware is attached to a head-mounted display. This policy is
-       *   not granted for devices that cannot be mounted to an HMD, such as
-       *   Leap Motion controllers embedded in a laptop or keyboard.
-       *
-       * Some policies can be denied if the user has disabled the feature on
-       * their Leap Motion control panel.
-       *
-       * @since 1.0
-       */
-        public enum PolicyFlag
-        {
-            /**
-         * The default policy.
-         * @since 1.0
-         */
-            POLICY_DEFAULT = 0,
-            /**
-         * Receive background frames.
-         * @since 1.0
-         */
-            POLICY_BACKGROUND_FRAMES = (1 << 0),
-            /**
-         * Receive raw images from sensor cameras.
-         * @since 2.1.0
-         */
-            POLICY_IMAGES = (1 << 1),
-            /**
-         * Optimize the tracking for head-mounted device.
-         * @since 2.1.2
-         */
-            POLICY_OPTIMIZE_HMD = (1 << 2),
-            /**
-        * Allow pausing and unpausing of the Leap Motion service.
-        * @since 2.4.0
-        */
-            POLICY_ALLOW_PAUSE_RESUME = (1 << 3),
-            POLICY_RAW_IMAGES = (1 << 6),
-        }
-
-
-        //Controller events
-        protected virtual void OnInit (object sender, LeapEventArgs eventArgs)
-        {
-            object senderObj = new object ();
-            Init.DispatchOnContext<LeapEventArgs> (senderObj, EventContext, eventArgs);
-        }
-
-        protected virtual void OnConnect (object sender, ConnectionEventArgs eventArgs)
-        {
-            Connect.DispatchOnContext<ConnectionEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnDisconnect (object sender, ConnectionLostEventArgs eventArgs)
-        {
-            Disconnect.DispatchOnContext<ConnectionLostEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnExit (object sender, LeapEventArgs eventArgs)
-        {
-            Exit.DispatchOnContext<LeapEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnFocusGained (object sender, LeapEventArgs eventArgs)
-        {
-            FocusGained.DispatchOnContext<LeapEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnFocusLost (object sender, LeapEventArgs eventArgs)
-        {
-            FocusLost.DispatchOnContext<LeapEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnServiceConnect (object sender, LeapEventArgs eventArgs)
-        {
-            ServiceConnect.DispatchOnContext<LeapEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnServiceDisconnect (object sender, LeapEventArgs eventArgs)
-        {
-            ServiceDisconnect.DispatchOnContext<LeapEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnDevice (object sender, DeviceEventArgs eventArgs)
-        {
-            Device.DispatchOnContext<DeviceEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnDeviceLost (object sender, DeviceEventArgs eventArgs)
-        {
-            DeviceLost.DispatchOnContext<DeviceEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnServiceChange (object sender, LeapEventArgs eventArgs)
-        {
-            ServiceChange.DispatchOnContext<LeapEventArgs> (this, EventContext, eventArgs);
-        }
-
-        //Rebroadcasted events from connection
-        protected virtual void OnFrame (object sender, FrameEventArgs eventArgs)
-        {
-            FrameReady.DispatchOnContext<FrameEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnImages (object sender, ImageEventArgs eventArgs)
-        {
-            ImageReady.DispatchOnContext<ImageEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnFailedImageRequest (object sender, ImageRequestFailedEventArgs eventArgs)
-        {
-            ImageRequestFailed.DispatchOnContext<ImageRequestFailedEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnDistortionChange (object sender, DistortionEventArgs eventArgs)
-        {
-            DistortionChange.DispatchOnContext<DistortionEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnTrackedQuad (object sender, TrackedQuadEventArgs eventArgs)
-        {
-            TrackedQuadReady.DispatchOnContext<TrackedQuadEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnLogEvent (object sender, LogEventArgs eventArgs)
-        {
-            LogMessage.DispatchOnContext<LogEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnPolicyChange (object sender, PolicyEventArgs eventArgs)
-        {
-            PolicyChange.DispatchOnContext<PolicyEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnConfigChange (object sender, ConfigChangeEventArgs eventArgs)
-        {
-            ConfigChange.DispatchOnContext<ConfigChangeEventArgs> (this, EventContext, eventArgs);
-        }
-
-        protected virtual void OnDeviceFailure (object sender, DeviceFailureEventArgs eventArgs)
-        {
-            DeviceFailure.DispatchOnContext<DeviceFailureEventArgs> (this, EventContext, eventArgs);
-        }
-
-
+        return _connection.GetLatestQuad();
+      }
     }
 
+    /**
+     * The supported controller policies.
+     *
+     * The supported policy flags are:
+     *
+     * **POLICY_BACKGROUND_FRAMES** -- requests that your application receives frames
+     *   when it is not the foreground application for user input.
+     *
+     *   The background frames policy determines whether an application
+     *   receives frames of tracking data while in the background. By
+     *   default, the Leap Motion  software only sends tracking data to the foreground application.
+     *   Only applications that need this ability should request the background
+     *   frames policy. The "Allow Background Apps" checkbox must be enabled in the
+     *   Leap Motion Control Panel or this policy will be denied.
+     *
+     * **POLICY_OPTIMIZE_HMD** -- request that the tracking be optimized for head-mounted
+     *   tracking.
+     *
+     *   The optimize HMD policy improves tracking in situations where the Leap
+     *   Motion hardware is attached to a head-mounted display. This policy is
+     *   not granted for devices that cannot be mounted to an HMD, such as
+     *   Leap Motion controllers embedded in a laptop or keyboard.
+     *
+     * Some policies can be denied if the user has disabled the feature on
+     * their Leap Motion control panel.
+     *
+     * @since 1.0
+     */
+    public enum PolicyFlag
+    {
+      /**
+       * The default policy.
+       * @since 1.0
+       */
+      POLICY_DEFAULT = 0,
+      /**
+       * Receive background frames.
+       * @since 1.0
+       */
+      POLICY_BACKGROUND_FRAMES = (1 << 0),
+      /**
+       * Optimize the tracking for head-mounted device.
+       * @since 2.1.2
+       */
+      POLICY_OPTIMIZE_HMD = (1 << 2),
+      /**
+      * Allow pausing and unpausing of the Leap Motion service.
+      * @since 3.0
+      */
+      POLICY_ALLOW_PAUSE_RESUME = (1 << 3),
+    }
+
+
+    protected virtual void OnConnect(object sender, ConnectionEventArgs eventArgs)
+    {
+      Connect.DispatchOnContext<ConnectionEventArgs>(this, EventContext, eventArgs);
+    }
+
+    protected virtual void OnDisconnect(object sender, ConnectionLostEventArgs eventArgs)
+    {
+      Disconnect.DispatchOnContext<ConnectionLostEventArgs>(this, EventContext, eventArgs);
+    }
+
+    protected virtual void OnDevice(object sender, DeviceEventArgs eventArgs)
+    {
+      Device.DispatchOnContext<DeviceEventArgs>(this, EventContext, eventArgs);
+    }
+
+    protected virtual void OnDeviceLost(object sender, DeviceEventArgs eventArgs)
+    {
+      DeviceLost.DispatchOnContext<DeviceEventArgs>(this, EventContext, eventArgs);
+    }
+
+    //Rebroadcasted events from connection
+    protected virtual void OnFrame(object sender, FrameEventArgs eventArgs)
+    {
+      FrameReady.DispatchOnContext<FrameEventArgs>(this, EventContext, eventArgs);
+    }
+
+    protected virtual void OnImages(object sender, ImageEventArgs eventArgs)
+    {
+      ImageReady.DispatchOnContext<ImageEventArgs>(this, EventContext, eventArgs);
+    }
+
+    protected virtual void OnFailedImageRequest(object sender, ImageRequestFailedEventArgs eventArgs)
+    {
+      ImageRequestFailed.DispatchOnContext<ImageRequestFailedEventArgs>(this, EventContext, eventArgs);
+    }
+
+    protected virtual void OnDistortionChange(object sender, DistortionEventArgs eventArgs)
+    {
+      DistortionChange.DispatchOnContext<DistortionEventArgs>(this, EventContext, eventArgs);
+    }
+
+    protected virtual void OnTrackedQuad(object sender, TrackedQuadEventArgs eventArgs)
+    {
+      TrackedQuadReady.DispatchOnContext<TrackedQuadEventArgs>(this, EventContext, eventArgs);
+    }
+
+    protected virtual void OnLogEvent(object sender, LogEventArgs eventArgs)
+    {
+      LogMessage.DispatchOnContext<LogEventArgs>(this, EventContext, eventArgs);
+    }
+
+    protected virtual void OnPolicyChange(object sender, PolicyEventArgs eventArgs)
+    {
+      PolicyChange.DispatchOnContext<PolicyEventArgs>(this, EventContext, eventArgs);
+    }
+
+    protected virtual void OnConfigChange(object sender, ConfigChangeEventArgs eventArgs)
+    {
+      ConfigChange.DispatchOnContext<ConfigChangeEventArgs>(this, EventContext, eventArgs);
+    }
+
+    protected virtual void OnDeviceFailure(object sender, DeviceFailureEventArgs eventArgs)
+    {
+      DeviceFailure.DispatchOnContext<DeviceFailureEventArgs>(this, EventContext, eventArgs);
+    }
+  }
 }

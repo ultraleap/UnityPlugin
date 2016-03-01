@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using Leap;
 #if UNITY_EDITOR
@@ -11,48 +12,51 @@ public enum ModelType { Graphics, Physics };
 
 [ExecuteInEditMode]
 public abstract class IHandModel : MonoBehaviour {
+  public event Action OnBegin;
+  public event Action OnFinish;
+  private bool isTracked = false;
+  public bool IsTracked {
+    get { return isTracked; }
+  }
   public abstract Chirality Handedness { get; }
   public abstract ModelType HandModelType { get; }
   public virtual void InitHand(){
     //Debug.Log("IHandModel.InitHand()");
   }
+
+  public virtual void BeginHand() {
+    if (OnBegin != null) {
+      OnBegin();
+    }
+    isTracked = true;
+  }
   public abstract void UpdateHand();
-  public abstract Hand GetLeapHand(); 
-  public abstract void SetLeapHand(Hand hand);
-  private bool isLeft;
+  public virtual void FinishHand() {
+    if (OnFinish != null) {
+      OnFinish();
+    }
+    isTracked = false;
+  }
+  public abstract IHand GetLeapHand(); 
+  public abstract void SetLeapHand(IHand hand);
 #if UNITY_EDITOR
   void Awake() {
     if (!EditorApplication.isPlaying) {
       //Debug.Log("IHandModel.Awake()");
-      if (Handedness == Chirality.Left) {
-        isLeft = true;
-      }
-      SetLeapHand(TestHandFactory.MakeTestHand(0, 0, isLeft).TransformedCopy(GetLeapMatrix()));
+      Matrix leapMatrix = UnityMatrixExtension.GetLeapMatrix(transform);
+      SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(ref leapMatrix));
       InitHand();
     }
   }
   void Update() {
     if (!EditorApplication.isPlaying) {
-      if (Handedness == Chirality.Left) {
-        isLeft = true;
-      }
       //Debug.Log("IHandModel.Update()");
-      SetLeapHand(TestHandFactory.MakeTestHand(0, 0, isLeft).TransformedCopy(GetLeapMatrix()));
+      Matrix leapMatrix = UnityMatrixExtension.GetLeapMatrix(transform);
+      SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(ref leapMatrix));
       UpdateHand();
     }
   }
 #endif
-  //Todo move this to a utility.  Needs to be same as Provider
-  /** Conversion factor for millimeters to meters. */
-  protected const float MM_TO_M = 1e-3f;
-  private Matrix GetLeapMatrix() {
-    Transform t = this.transform.transform;
-    Vector xbasis = new Vector(t.right.x, t.right.y, t.right.z) * t.lossyScale.x * MM_TO_M;
-    Vector ybasis = new Vector(t.up.x, t.up.y, t.up.z) * t.lossyScale.y * MM_TO_M;
-    Vector zbasis = new Vector(t.forward.x, t.forward.y, t.forward.z) * -t.lossyScale.z * MM_TO_M;
-    Vector trans = new Vector(t.position.x, t.position.y, t.position.z);
-    return new Matrix(xbasis, ybasis, zbasis, trans);
-  }
 }
 
 

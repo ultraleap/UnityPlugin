@@ -7,11 +7,11 @@
 \******************************************************************************/
 namespace Leap
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Runtime.InteropServices;
+  using System;
+  using System.Collections.Generic;
+  using System.Runtime.InteropServices;
 
-    /**
+  /**
    * The Hand class reports the physical characteristics of a detected hand.
    *
    * Hand tracking data includes a palm position and velocity; vectors for
@@ -27,40 +27,14 @@ namespace Leap
    * objects can be the result of asking for a Hand object using an ID from an
    * earlier frame when no Hand objects with that ID exist in the current frame.
    * A Hand object created from the Hand constructor is also invalid.
-   * Test for validity with the Hand::isValid() function.
    * @since 1.0
    */
+  public class Hand : IHand
+  {
+    private Matrix _basis = Matrix.Identity;
+    private bool _needToCalculateBasis = true;
 
-    public class Hand {
-      int _frameId;
-        int _id = 0;
-        float _confidence = 0;
-        float _grabStrength = 0;
-        float _grabAngle = 0;
-        float _pinchStrength = 0;
-        float _pinchDistance = 0;
-        float _palmWidth = 0;
-        float _sphereRadius = 0;
-        bool _isValid = false;
-        bool _isLeft = false;
-        bool _isRight = false;
-        float _timeVisible = 0;
-        Arm _arm;
-        FingerList _fingers;
-        Vector _palmPosition;
-        Vector _stabilizedPalmPosition;
-        Vector _palmVelocity;
-        Vector _palmNormal;
-        Vector _direction;
-        Vector _wristPosition;
-        Matrix _basis;
-        bool _needToCalculateBasis = true;
-        Vector _sphereCenter;
-
-        float _minSphereRadius = 42; //mm
-        float _maxSphereradius = 160; //mm
-
-        /**
+    /**
      * Constructs a Hand object.
      *
      * An uninitialized hand is considered invalid.
@@ -70,87 +44,109 @@ namespace Leap
      *
      * @since 1.0
      */
-        public Hand ()
-        {
-             _palmPosition = Vector.Zero;
-             _stabilizedPalmPosition = Vector.Zero;
-             _palmVelocity = Vector.Zero;
-             _palmNormal = Vector.Zero;
-             _direction = Vector.Zero;
-             _wristPosition = Vector.Zero;
-             _basis = Matrix.Identity;
-             _needToCalculateBasis = false;
-             _sphereCenter = Vector.Zero;
-        }
+    public Hand()
+    {
+      PalmPosition = Vector.Zero;
+      StabilizedPalmPosition = Vector.Zero;
+      PalmVelocity = Vector.Zero;
+      PalmNormal = Vector.Zero;
+      Direction = Vector.Zero;
+      WristPosition = Vector.Zero;
+      Fingers = new List<IFinger>();
+    }
 
-        public Hand(int frameID,
-                    int id,
-                    float confidence,
-                    float grabStrength,
-                    float grabAngle,
-                    float pinchStrength,
-                    float pinchDistance,
-                    float palmWidth,
-                    bool isLeft,
-                    float timeVisible,
-                    Arm arm,
-                    FingerList fingers,
-                    Vector palmPosition,
-                    Vector stabilizedPalmPosition,
-                    Vector palmVelocity,
-                    Vector palmNormal,
-                    Vector direction,
-                    Vector wristPosition)
-        {
-            _frameId = frameID;
-            _id = id;
-            _confidence = confidence;
-            _grabStrength = grabStrength;
-            _grabAngle = grabAngle;
-            _pinchStrength = pinchStrength;
-            _pinchDistance = pinchDistance;
-            _palmWidth = palmWidth;
-            _isLeft = isLeft;
-            _isRight = !isLeft;
-            _timeVisible = timeVisible;
-            _arm = arm;
-            _fingers = fingers;
-            _palmPosition = palmPosition;
-            _stabilizedPalmPosition = stabilizedPalmPosition;
-            _palmVelocity = palmVelocity;
-            _palmNormal = palmNormal;
-            _direction = direction;
-            _wristPosition = wristPosition;
-        }
 
-        public Hand TransformedCopy(Matrix trs){
-            FingerList transformedFingers = new FingerList(5);
-            for(int f = 0; f < this.Fingers.Count; f++)
-                transformedFingers.Add(Fingers[f].TransformedCopy(trs));
+    public Hand(long frameID,
+                int id,
+                float confidence,
+                float grabStrength,
+                float grabAngle,
+                float pinchStrength,
+                float pinchDistance,
+                float palmWidth,
+                bool isLeft,
+                float timeVisible,
+                IArm arm,
+                List<IFinger> fingers,
+                Vector palmPosition,
+                Vector stabilizedPalmPosition,
+                Vector palmVelocity,
+                Vector palmNormal,
+                Vector direction,
+                Vector wristPosition)
+    {
+      FrameId = frameID;
+      Id = id;
+      Confidence = confidence;
+      GrabStrength = grabStrength;
+      GrabAngle = grabAngle;
+      PinchStrength = pinchStrength;
+      PinchDistance = pinchDistance;
+      PalmWidth = palmWidth;
+      IsLeft = isLeft;
+      TimeVisible = timeVisible;
+      Arm = arm;
+      Fingers = fingers;
+      PalmPosition = palmPosition;
+      StabilizedPalmPosition = stabilizedPalmPosition;
+      PalmVelocity = palmVelocity;
+      PalmNormal = palmNormal;
+      Direction = direction;
+      WristPosition = wristPosition;
+    }
 
-            float hScale = trs.xBasis.Magnitude;
-            return new Hand(_frameId,
-                _id,
-                _confidence,
-                _grabStrength,
-                _grabAngle,
-                _pinchStrength,
-                _pinchDistance,
-                _palmWidth * hScale,
-                _isLeft,
-                _timeVisible,
-                _arm.TransformedCopy(trs),
-                transformedFingers,
-                trs.TransformPoint(_palmPosition),
-                trs.TransformPoint(_stabilizedPalmPosition),
-                trs.TransformPoint(_palmVelocity),
-                trs.TransformDirection(_palmNormal).Normalized,
-                trs.TransformDirection(_direction).Normalized,
-                trs.TransformPoint(_wristPosition)
-            );
-        }
+   /**
+    * Creates a shallow copy of this Hand, transforming all finges, and bones by 
+    * the specified transform on demand.
+    *
+    * @param trs A Matrix containing the desired translation, rotation, and scale
+    * of the copied Hand.
+    * @returns a new Hand object with the transform applied.
+    */
+    public IHand TransformedShallowCopy(ref Matrix trs)
+    {
+        return new TransformedHand(ref trs, this);
+    }
 
-        /**
+   /**
+    * Creates a copy of this Hand, transforming all fingers, and bones by the specified transform.
+    *
+    * @param trs A Matrix containing the desired translation, rotation, and scale
+    * of the copied Frame.
+    * @returns a new Hand object with the transform applied.
+    * @since 3.0
+    */
+    public IHand TransformedCopy(ref Matrix trs)
+    {
+      List<IFinger> transformedFingers = new List<IFinger>(5);
+
+      for (int f = 0; f < this.Fingers.Count; f++)
+        transformedFingers.Add(Fingers[f].TransformedCopy(ref trs));
+
+      float hScale = trs.xBasis.Magnitude;
+      return new Hand(
+        FrameId,
+        Id,
+        Confidence,
+        GrabStrength,
+        GrabAngle,
+        PinchStrength,
+        PinchDistance,
+        PalmWidth * hScale,
+        IsLeft,
+        TimeVisible,
+        Arm.TransformedCopy(ref trs),
+        transformedFingers,
+        trs.TransformPoint(PalmPosition),
+        trs.TransformPoint(StabilizedPalmPosition),
+        trs.TransformPoint(PalmVelocity),
+        trs.TransformDirection(PalmNormal).Normalized,
+        trs.TransformDirection(Direction).Normalized,
+        trs.TransformPoint(WristPosition)
+      );
+    }
+
+    /**
      * The Finger object with the specified ID attached to this hand.
      *
      * Use the Hand::finger() function to retrieve a Finger object attached to
@@ -170,262 +166,15 @@ namespace Leap
      * hand in this frame; otherwise, an invalid Finger object is returned.
      * @since 1.0
      */
-        public Finger Finger (int id)
-        {
-            return this.Fingers.Find (delegate(Finger item) {
-                return item.Id == id;
-            });
-        }
+    public IFinger Finger(int id)
+    {
+      return this.Fingers.Find(delegate (IFinger item)
+      {
+        return item.Id == id;
+      });
+    }
 
-        /**
-
-        /**
-     * The change of position of this hand between the current frame and
-     * the specified frame.
-     *
-     * The returned translation vector provides the magnitude and direction of
-     * the movement in millimeters.
-     *
-     * \include Hand_translation.txt
-     *
-     * If a corresponding Hand object is not found in sinceFrame, or if either
-     * this frame or sinceFrame are invalid Frame objects, then this method
-     * returns a zero vector.
-     *
-     * @param sinceFrame The starting frame for computing the translation.
-     * @returns A Vector representing the heuristically determined change in
-     * hand position between the current frame and that specified in the
-     * sinceFrame parameter.
-     * @since 1.0
-     */
-        public Vector Translation (Frame sinceFrame)
-        {
-            Hand sinceHand = sinceFrame.Hand(this.Id);
-
-            if(!sinceHand.IsValid)
-                return Vector.Zero; 
-
-            return this.PalmPosition - sinceHand.PalmPosition;
-        }
-
-        /**
-     * The estimated probability that the hand motion between the current
-     * frame and the specified frame is intended to be a translating motion.
-     *
-     * \include Hand_translationProbability.txt
-     *
-     * If a corresponding Hand object is not found in sinceFrame, or if either
-     * this frame or sinceFrame are invalid Frame objects, then this method
-     * returns zero.
-     *
-     * @param sinceFrame The starting frame for computing the translation.
-     * @returns A value between 0 and 1 representing the estimated probability
-     * that the hand motion between the current frame and the specified frame
-     * is intended to be a translating motion.
-     * @since 1.0
-     */
-        public float TranslationProbability (Frame sinceFrame)
-        {
-            //TODO probabilities based on comparison of percentage of "likely" max change (scale:.5, trans, 100mm, rotation 45 degrees) -- time normalize?
-            return 0; //not implemented
-        }
-
-        /**
-     * The axis of rotation derived from the change in orientation of this
-     * hand, and any associated fingers, between the current frame
-     * and the specified frame.
-     *
-     * \include Hand_rotationAxis.txt
-     *
-     * The returned direction vector is normalized.
-     *
-     * If a corresponding Hand object is not found in sinceFrame, or if either
-     * this frame or sinceFrame are invalid Frame objects, then this method
-     * returns a zero vector.
-     *
-     * @param sinceFrame The starting frame for computing the relative rotation.
-     * @returns A normalized direction Vector representing the heuristically
-     * determined axis of rotational change of the hand between the current
-     * frame and that specified in the sinceFrame parameter.
-     * @since 1.0
-     */
-        public Vector RotationAxis (Frame sinceFrame)
-        {
-            return Vector.YAxis; //not implemented
-        }
-
-        /**
-     * The angle of rotation around the rotation axis derived from the change
-     * in orientation of this hand, and any associated fingers,
-     * between the current frame and the specified frame.
-     *
-     * \include Hand_rotationAngle.txt
-     *
-     * The returned angle is expressed in radians measured clockwise around the
-     * rotation axis (using the right-hand rule) between the start and end frames.
-     * The value is always between 0 and pi radians (0 and 180 degrees).
-     *
-     * If a corresponding Hand object is not found in sinceFrame, or if either
-     * this frame or sinceFrame are invalid Frame objects, then the angle of
-     * rotation is zero.
-     *
-     * @param sinceFrame The starting frame for computing the relative rotation.
-     * @returns A positive value representing the heuristically determined
-     * rotational change of the hand between the current frame and that
-     * specified in the sinceFrame parameter.
-     * @since 1.0
-     */
-        public float RotationAngle (Frame sinceFrame)
-        {
-            return 0; //not implemented
-        }
-
-        /**
-     * The angle of rotation around the specified axis derived from the change
-     * in orientation of this hand, and any associated fingers,
-     * between the current frame and the specified frame.
-     *
-     * \include Hand_rotationAngle_axis.txt
-     *
-     * The returned angle is expressed in radians measured clockwise around the
-     * rotation axis (using the right-hand rule) between the start and end frames.
-     * The value is always between -pi and pi radians (-180 and 180 degrees).
-     *
-     * If a corresponding Hand object is not found in sinceFrame, or if either
-     * this frame or sinceFrame are invalid Frame objects, then the angle of
-     * rotation is zero.
-     *
-     * @param sinceFrame The starting frame for computing the relative rotation.
-     * @param axis The axis to measure rotation around.
-     * @returns A value representing the heuristically determined rotational
-     * change of the hand between the current frame and that specified in the
-     * sinceFrame parameter around the specified axis.
-     * @since 1.0
-     */
-        public float RotationAngle (Frame sinceFrame, Vector axis)
-        {
-            return 0; //this.RotationMatrix(sinceFrame); //not implemented
-        }
-
-        /**
-     * The transform matrix expressing the rotation derived from the change
-     * in orientation of this hand, and any associated fingers,
-     * between the current frame and the specified frame.
-     *
-     * \include Hand_rotationMatrix.txt
-     *
-     * If a corresponding Hand object is not found in sinceFrame, or if either
-     * this frame or sinceFrame are invalid Frame objects, then this method
-     * returns an identity matrix.
-     *
-     * @param sinceFrame The starting frame for computing the relative rotation.
-     * @returns A transformation Matrix representing the heuristically determined
-     * rotational change of the hand between the current frame and that specified
-     * in the sinceFrame parameter.
-     * @since 1.0
-     */
-        public Matrix RotationMatrix (Frame sinceFrame)
-        {
-            Hand sinceHand = sinceFrame.Hand(this.Id);
-            
-            if(!sinceHand.IsValid)
-                return Matrix.Identity; 
-
-            return this.Basis * sinceHand.Basis.RigidInverse();
-        }
-
-        /**
-     * The estimated probability that the hand motion between the current
-     * frame and the specified frame is intended to be a rotating motion.
-     *
-     * \include Hand_rotationProbability.txt
-     *
-     * If a corresponding Hand object is not found in sinceFrame, or if either
-     * this frame or sinceFrame are invalid Frame objects, then this method
-     * returns zero.
-     *
-     * @param sinceFrame The starting frame for computing the relative rotation.
-     * @returns A value between 0 and 1 representing the estimated probability
-     * that the hand motion between the current frame and the specified frame
-     * is intended to be a rotating motion.
-     * @since 1.0
-     */
-        public float RotationProbability (Frame sinceFrame)
-        {
-            return 0; //not implemented
-        }
-
-        /**
-     * The scale factor derived from this hand's motion between the current frame
-     * and the specified frame.
-     *
-     * The scale factor is always positive. A value of 1.0 indicates no
-     * scaling took place. Values between 0.0 and 1.0 indicate contraction
-     * and values greater than 1.0 indicate expansion.
-     *
-     * \include Hand_scaleFactor.txt
-     *
-     * The Leap Motion software derives scaling from the relative inward or outward motion of
-     * a hand and its associated fingers (independent of translation
-     * and rotation).
-     *
-     * If a corresponding Hand object is not found in sinceFrame, or if either
-     * this frame or sinceFrame are invalid Frame objects, then this method
-     * returns 1.0.
-     *
-     * @param sinceFrame The starting frame for computing the relative scaling.
-     * @returns A positive value representing the heuristically determined
-     * scaling change ratio of the hand between the current frame and that
-     * specified in the sinceFrame parameter.
-     * @since 1.0
-     */
-        public float ScaleFactor (Frame sinceFrame)
-        {
-            Hand sinceHand = sinceFrame.Hand(this.Id);
-            
-            if(!sinceHand.IsValid)
-                return 1.0f; 
-
-            float thisFactor = 1 - Math.Max(this.PinchStrength, this.GrabStrength);
-            float sinceFactor = 1 - Math.Max(sinceHand.PinchStrength, sinceHand.GrabStrength);
-
-            if (thisFactor < Leap.Constants.EPSILON && sinceFactor < Leap.Constants.EPSILON)
-                return 1.0f;
-
-            //Contraction
-            if(thisFactor > sinceFactor && thisFactor > Leap.Constants.EPSILON)
-                return (thisFactor - sinceFactor)/thisFactor;
-
-            //Expansion
-            if(sinceFactor > thisFactor && sinceFactor > Leap.Constants.EPSILON)
-                return (sinceFactor - thisFactor)/sinceFactor;
-
-            return 1.0f;
-        }
-
-        /**
-     * The estimated probability that the hand motion between the current
-     * frame and the specified frame is intended to be a scaling motion.
-     *
-     * \include Hand_scaleProbability.txt
-     *
-     * If a corresponding Hand object is not found in sinceFrame, or if either
-     * this frame or sinceFrame are invalid Frame objects, then this method
-     * returns zero.
-     *
-     * @param sinceFrame The starting frame for computing the relative scaling.
-     * @returns A value between 0 and 1 representing the estimated probability
-     * that the hand motion between the current frame and the specified frame
-     * is intended to be a scaling motion.
-     * @since 1.0
-     */
-        public float ScaleProbability (Frame sinceFrame)
-        {
-            return 0; //not implemented
-        }
-
-     
-        /**
+    /**
      * Compare Hand object equality.
      *
      * \include Hand_operator_equals.txt
@@ -434,29 +183,29 @@ namespace Leap
      * exact same physical hand in the same frame and both Hand objects are valid.
      * @since 1.0
      */
-        public bool Equals (Hand other)
-        {
-          return this.IsValid &&
-              other.IsValid &&
-              (this.Id == other.Id) &&
-              (this._frameId == other._frameId);
-        }
+    public bool Equals(IHand other)
+    {
+      return Id == other.Id && FrameId == other.FrameId;
+    }
 
-        /**
+    /**
      * A string containing a brief, human readable description of the Hand object.
      *
      * @returns A description of the Hand as a string.
      * @since 1.0
      */
-        public override string ToString ()
-        {
-            if(this.IsValid)
-                return "Hand " + this.Id + (this.IsLeft ? " left." : " right.");
+    public override string ToString()
+    {
+      return string.Format(
+        "Hand {0} {1}.",
+        this.Id,
+        this.IsLeft ? "left" : "right"
+      );
+    }
 
-            return "Invalid hand";
-        }
+    public long FrameId { get; private set; }
 
-/**
+    /**
      * A unique ID assigned to this Hand object, whose value remains the same
      * across consecutive frames while the tracked hand remains visible. If
      * tracking is lost (for example, when a hand is occluded by another hand
@@ -471,19 +220,9 @@ namespace Leap
      * @returns The ID of this hand.
      * @since 1.0
      */
-        public int Id {
-            get {
-                return _id;
-            } 
-        }
+    public int Id { get; private set; }
 
-        public long FrameId {
-          get {
-            return _frameId;
-          }
-        }
-
-        /**
+    /**
      * The list of Finger objects detected in this frame that are attached to
      * this hand, given in order from thumb to pinky.  The list cannot be empty.
      *
@@ -491,22 +230,13 @@ namespace Leap
      *
      * \include Hand_Get_Fingers.txt
      *
-     * @returns The FingerList containing all Finger objects attached to this hand.
+     * @returns The List<Finger> containing all Finger objects attached to this hand.
      * @since 1.0
      */
-        public FingerList Fingers {
-                    get {
-                if(_fingers == null)
-                    _fingers = new FingerList(5);
-                return _fingers;
-//                return (FingerList)this.Frame.Fingers.FindAll (delegate(Finger item) {
-//                            return item.HandId == this.Id;
-//                    });
-            }
-        }
+    public List<IFinger> Fingers { get; private set; }
 
 
-/**
+    /**
      * The center position of the palm in millimeters from the Leap Motion Controller origin.
      *
      * \include Hand_palmPosition.txt
@@ -514,13 +244,9 @@ namespace Leap
      * @returns The Vector representing the coordinates of the palm position.
      * @since 1.0
      */
-        public Vector PalmPosition {
-            get {
-                return _palmPosition;
-            } 
-        }
+    public Vector PalmPosition { get; private set; }
 
-/**
+    /**
      * The rate of change of the palm position in millimeters/second.
      *
      * \include Hand_palmVelocity.txt
@@ -528,13 +254,9 @@ namespace Leap
      * @returns The Vector representing the coordinates of the palm velocity.
      * @since 1.0
      */
-        public Vector PalmVelocity {
-            get {
-                return _palmVelocity;
-            } 
-        }
+    public Vector PalmVelocity { get; private set; }
 
-/**
+    /**
      * The normal vector to the palm. If your hand is flat, this vector will
      * point downward, or "out" of the front surface of your palm.
      *
@@ -551,13 +273,9 @@ namespace Leap
      * @returns The Vector normal to the plane formed by the palm.
      * @since 1.0
      */
-        public Vector PalmNormal {
-            get {
-                return _palmNormal;
-            } 
-        }
+    public Vector PalmNormal { get; private set; }
 
-/**
+    /**
      * The direction from the palm position toward the fingers.
      *
      * The direction is expressed as a unit vector pointing in the same
@@ -571,13 +289,9 @@ namespace Leap
      * @returns The Vector pointing from the palm position toward the fingers.
      * @since 1.0
      */
-        public Vector Direction {
-            get {
-                return _direction;
-            } 
-        }
+    public Vector Direction { get; private set; }
 
-/**
+    /**
      * The orientation of the hand as a basis matrix.
      *
      * The basis is defined as follows:
@@ -596,78 +310,24 @@ namespace Leap
      * @returns The basis of the hand as a matrix.
      * @since 2.0
      */
-        public Matrix Basis {
-            get {
-                if(_needToCalculateBasis){
-                    //TODO verify this calculation for both hands
-                    _basis.zBasis = -Direction;
-                    _basis.yBasis = -PalmNormal;
-                    _basis.xBasis = _basis.zBasis.Cross(_basis.yBasis);
-                    _basis.xBasis = _basis.xBasis.Normalized;
-                    _needToCalculateBasis = false;
-                }
-                return _basis;
-            } 
+    public Matrix Basis
+    {
+      get
+      {
+        if (_needToCalculateBasis)
+        {
+          //TODO verify this calculation for both hands
+          _basis.zBasis = -Direction;
+          _basis.yBasis = -PalmNormal;
+          _basis.xBasis = _basis.zBasis.Cross(_basis.yBasis);
+          _basis.xBasis = _basis.xBasis.Normalized;
+          _needToCalculateBasis = false;
         }
+        return _basis;
+      }
+    }
 
-/**
-     * Reports whether this is a valid Hand object.
-     *
-     * \include Hand_isValid.txt
-     *
-     * @returns True, if this Hand object contains valid tracking data.
-     * @since 1.0
-     */
-        public bool IsValid {
-            get {
-                return _isValid;
-            } 
-        }
-
-/**
-     * The center of a sphere fit to the curvature of this hand.
-     *
-     * \include Hand_sphereCenter.txt
-     *
-     * This sphere is placed roughly as if the hand were holding a ball.
-     *
-     * \image html images/Leap_Hand_Ball.png
-     *
-     * @returns The Vector representing the center position of the sphere.
-     * @since 1.0
-     */
-        public Vector SphereCenter {
-            get {
-                calculateSphere();
-                return _sphereCenter;
-            } 
-        }
-
-/**
-     * The radius of a sphere fit to the curvature of this hand.
-     *
-     * This sphere is placed roughly as if the hand were holding a ball. Thus the
-     * size of the sphere decreases as the fingers are curled into a fist.
-     *
-     * \include Hand_sphereRadius.txt
-     *
-     * @returns The radius of the sphere in millimeters.
-     * @since 1.0
-     */
-        public float SphereRadius {
-            get {
-                calculateSphere();
-                return _sphereRadius;
-            } 
-        }
-
-        private void calculateSphere(){
-            float curvatureProxy = (float)Math.Max (GrabStrength, PinchStrength);
-            _sphereRadius = _minSphereRadius + (_maxSphereradius - _minSphereRadius) * curvatureProxy;
-            _sphereCenter = PalmPosition + PalmNormal * _sphereRadius * 2;
-        }
-
-/**
+    /**
      * The strength of a grab hand pose.
      *
      * The strength is zero for an open hand, and blends to 1.0 when a grabbing hand
@@ -679,13 +339,9 @@ namespace Leap
      * of the pose.
      * @since 2.0
      */
-        public float GrabStrength {
-            get {
-                return _grabStrength;
-            } 
-        }
+    public float GrabStrength { get; private set; }
 
-        /**
+    /**
      * The angle between the fingers and the hand of a grab hand pose.
      *
      * The angle is computed by looking at the angle between the direction of the
@@ -697,13 +353,9 @@ namespace Leap
      * @returns The angle of a grab hand pose between 0 and pi radians (0 and 180 degrees).
      * @since 3.0
      */
-        public float GrabAngle {
-            get {
-                return _grabAngle;
-            } 
-        }
+    public float GrabAngle { get; private set; }
 
-     /**
+    /**
      * The holding strength of a pinch hand pose.
      *
      * The strength is zero for an open hand, and blends to 1.0 when a pinching
@@ -716,13 +368,9 @@ namespace Leap
      * of the pinch pose.
      * @since 2.0
      */
-        public float PinchStrength {
-            get {
-                return _pinchStrength;
-            } 
-        }
+    public float PinchStrength { get; private set; }
 
-        /**
+    /**
      * The distance between the thumb and index finger of a pinch hand pose.
      *
      * The distance is computed by looking at the shortest distance between
@@ -735,11 +383,7 @@ namespace Leap
      * pose in millimeters.
      * @since 3.0
      */
-    public float PinchDistance {
-        get {
-            return _pinchDistance;
-        } 
-    }
+    public float PinchDistance { get; private set; }
 
     /**
      * The estimated width of the palm when the hand is in a flat position.
@@ -749,13 +393,9 @@ namespace Leap
      * @returns The width of the palm in millimeters
      * @since 2.0
      */
-        public float PalmWidth {
-            get {
-                return _palmWidth;
-            } 
-        }
+    public float PalmWidth { get; private set; }
 
-/**
+    /**
      * The stabilized palm position of this Hand.
      *
      * Smoothing and stabilization is performed in order to make
@@ -769,25 +409,17 @@ namespace Leap
      * with some additional smoothing and stabilization applied.
      * @since 1.0
      */
-        public Vector StabilizedPalmPosition {
-            get {
-                return _stabilizedPalmPosition;
-            } 
-        }
+    public Vector StabilizedPalmPosition { get; private set; }
 
-/**
+    /**
      * The position of the wrist of this hand.
      *
      * @returns A vector containing the coordinates of the wrist position in millimeters.
      * @since 2.0.3
      */
-        public Vector WristPosition {
-            get {
-                return _wristPosition;
-            } 
-        }
+    public Vector WristPosition { get; private set; }
 
-/**
+    /**
      * The duration of time this Hand has been visible to the Leap Motion Controller.
      *
      * \include Hand_timeVisible.txt
@@ -795,13 +427,9 @@ namespace Leap
      * @returns The duration (in seconds) that this Hand has been tracked.
      * @since 1.0
      */
-        public float TimeVisible {
-            get {
-                return _timeVisible;
-            } 
-        }
+    public float TimeVisible { get; private set; }
 
-/**
+    /**
      * How confident we are with a given hand pose.
      *
      * The confidence level ranges between 0.0 and 1.0 inclusive.
@@ -810,13 +438,9 @@ namespace Leap
      *
      * @since 2.0
      */
-        public float Confidence {
-            get {
-                return _confidence;
-            } 
-        }
+    public float Confidence { get; private set; }
 
-/**
+    /**
      * Identifies whether this Hand is a left hand.
      *
      * \include Hand_isLeft.txt
@@ -824,13 +448,9 @@ namespace Leap
      * @returns True if the hand is identified as a left hand.
      * @since 2.0
      */
-        public bool IsLeft {
-            get {
-                return _isLeft;
-            } 
-        }
+    public bool IsLeft { get; private set; }
 
-/**
+    /**
      * Identifies whether this Hand is a right hand.
      *
      * \include Hand_isRight.txt
@@ -838,13 +458,9 @@ namespace Leap
      * @returns True if the hand is identified as a right hand.
      * @since 2.0
      */
-        public bool IsRight {
-            get {
-                return _isRight;
-            } 
-        }
+    public bool IsRight { get { return !IsLeft; } }
 
-/**
+    /**
      * The arm to which this hand is attached.
      *
      * If the arm is not completely in view, Arm attributes are estimated based on
@@ -855,30 +471,6 @@ namespace Leap
      * @returns The Arm object for this hand.
      * @since 2.0.3
      */
-        public Arm Arm {
-            get {
-                return _arm;
-            } 
-        }
-
-/**
-     * Returns an invalid Hand object.
-     *
-     * \include Hand_invalid.txt
-     *
-     * You can use the instance returned by this function in comparisons testing
-     * whether a given Hand instance is valid or invalid. (You can also use the
-     * Hand::isValid() function.)
-     *
-     * @returns The invalid Hand instance.
-     * @since 1.0
-     */
-        public static Hand Invalid {
-            get {
-                return new Hand ();
-            } 
-        }
-
-    }
-
+    public IArm Arm { get; private set; }
+  }
 }

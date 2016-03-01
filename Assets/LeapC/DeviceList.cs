@@ -6,11 +6,12 @@
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
 
-namespace Leap {
+namespace Leap
+{
 
-using System;
-using System.Runtime.InteropServices;
-using System.Collections.Generic;
+  using System;
+  using System.Runtime.InteropServices;
+  using System.Collections.Generic;
 
   /**
    * The DeviceList class represents a list of Device objects.
@@ -18,48 +19,53 @@ using System.Collections.Generic;
    * Get a DeviceList object by calling Controller::devices().
    * @since 1.0
    */
-
-public class DeviceList : List<Device> {
-
-  ~DeviceList() {
-  }
-
-
+  public class DeviceList:
+    List<Device>
+  {
     /**
      * Constructs an empty list of devices.
      * @since 1.0
      */
-  public DeviceList() {
-  }
+    public DeviceList() {}
 
-        public Device FindDeviceByHandle(IntPtr deviceHandle){
-            for( int d = 0; d < this.Count; d++){
-                if(this[d].UsesHandle(deviceHandle))
-                    return this[d];
-            }
-            return null;
-        }
+    public Device FindDeviceByHandle(IntPtr deviceHandle)
+    {
+      for (int d = 0; d < this.Count; d++)
+      {
+        if (this[d].Handle == deviceHandle)
+          return this[d];
+      }
+      return null;
+    }
 
-        public Device ActiveDevice{
-            get{
-                if(Count == 1)
-                    return this[0];
+    public Device ActiveDevice
+    {
+      get
+      {
+        if (Count == 1)
+          return this[0];
 
-                for( int d = 0; d < this.Count; d++){
-                    if(this[d].IsStreaming)
-                        return this[d];
-                }
-                return new Device();
-            }
+        for (int d = 0; d < this.Count; d++)
+        {
+          if (this[d].IsStreaming)
+            return this[d];
         }
-        public void AddOrUpdate(Device device){
-            Device existingDevice = FindDeviceByHandle(device.Handle);
-            if(existingDevice != null){
-                existingDevice.Update(device);
-            } else {
-                this.Add(device);
-            }
-        }
+        return new Device();
+      }
+    }
+
+    public void AddOrUpdate(Device device)
+    {
+      Device existingDevice = FindDeviceByHandle(device.Handle);
+      if (existingDevice != null)
+      {
+        existingDevice.Update(device);
+      }
+      else {
+        this.Add(device);
+      }
+    }
+
     /**
      * Reports whether the list is empty.
      *
@@ -67,13 +73,10 @@ public class DeviceList : List<Device> {
      *
      * @returns True, if the list has no members.
      * @since 1.0
-     */  
-     public bool IsEmpty {
-        get {
-          return this.Count == 0;
-        } 
-     }
-
+     */
+    public bool IsEmpty
+    {
+      get { return this.Count == 0; }
+    }
   }
-
 }

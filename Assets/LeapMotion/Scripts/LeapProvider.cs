@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿// #define CHECK_TRANSFORMED_IMPL
+
+using UnityEngine;
 using System.Collections;
 using LeapInternal;
 using Leap;
@@ -6,10 +8,13 @@ using Leap;
 namespace Leap {
   public class LeapProvider :
     MonoBehaviour {
-    public Frame CurrentFrame { get; private set; }
+    public IFrame CurrentFrame { get { return _currentFrame; } }
     public Image CurrentImage { get; private set; }
     private Transform providerSpace;
     private Matrix leapMat;
+
+    private TransformedFrame _currentFrame;
+    private TransformedFrame _currentFixedFrame;
 
     protected Controller leap_controller_;
 
@@ -18,8 +23,6 @@ namespace Leap {
     private SmoothedFloat smoothedFixedUpdateOffset_ = new SmoothedFloat();
     /** The maximum offset calculated per frame */
     public float PerFrameFixedUpdateOffset;
-    /** Conversion factor for millimeters to meters. */
-    protected const float MM_TO_M = 1e-3f;
     /** Conversion factor for nanoseconds to seconds. */
     protected const float NS_TO_S = 1e-6f;
     /** Conversion factor for seconds to nanoseconds. */
@@ -46,8 +49,8 @@ namespace Leap {
     // Use this for initialization
     void Start() {
       //set empty frame
-      CurrentFrame = new Frame();
-
+        _currentFrame = new TransformedFrame();
+        _currentFixedFrame = new TransformedFrame();
     }
 
     void HandleControllerConnect(object sender, LeapEventArgs args) {
@@ -121,24 +124,24 @@ namespace Leap {
       }
       return new LeapDeviceInfo(LeapDeviceType.Invalid);
     }
-    private Matrix GetLeapMatrix() {
-      Transform t = this.transform;
-      Vector xbasis = new Vector(t.right.x, t.right.y, t.right.z) * t.localScale.x * MM_TO_M;
-      Vector ybasis = new Vector(t.up.x, t.up.y, t.up.z) * t.localScale.y * MM_TO_M;
-      Vector zbasis = new Vector(t.forward.x, t.forward.y, t.forward.z) * -t.localScale.z * MM_TO_M;
-      Vector trans = new Vector(t.position.x, t.position.y, t.position.z);
-      return new Matrix(xbasis, ybasis, zbasis, trans);
-    }
 
     // Update is called once per frame
     void Update() {
 
-      leapMat = GetLeapMatrix();
-      CurrentFrame = leap_controller_.GetTransformedFrame(leapMat, 0);
+      leapMat = UnityMatrixExtension.GetLeapMatrix(this.transform);
+      IFrame frame = leap_controller_.Frame();
+      _currentFrame.Set(ref leapMat, frame);
+
+#if CHECK_TRANSFORMED_IMPL
+      Asserter.CompareAllValues(
+          frame.TransformedCopy(ref leapMat),
+          _currentFrame
+          );
+#endif
 
       //perFrameFixedUpdateOffset_ contains the maximum offset of this Update cycle
       smoothedFixedUpdateOffset_.Update(PerFrameFixedUpdateOffset, Time.deltaTime);
-      float now = leap_controller_.Now();
+      //float now = leap_controller_.Now();
       //Debug.Log("leap_controller_.Now():" + leap_controller_.Now() + " - CurrentFrame.Timestamp:" + CurrentFrame.Timestamp + " = " + (leap_controller_.Now() - CurrentFrame.Timestamp));
       //Debug.Log("provider.Update().CurrentFrame.Id: " + CurrentFrame.Id);
     }
@@ -146,20 +149,20 @@ namespace Leap {
     void FixedUpdate() {
       //which frame to deliver
     }
-    public virtual Frame GetFixedFrame() {
+    public virtual IFrame GetFixedFrame() {
 
       //Aproximate the correct timestamp given the current fixed time
       float correctedTimestamp = (Time.fixedTime + smoothedFixedUpdateOffset_.value) * S_TO_NS;
 
       //Search the leap history for a frame with a timestamp closest to the corrected timestamp
-      Frame closestFrame = leap_controller_.Frame();
+      IFrame closestFrame = leap_controller_.Frame();
       for (int searchHistoryIndex = 0; searchHistoryIndex < 60; searchHistoryIndex++) {
 
-        leapMat = GetLeapMatrix();
-        Frame historyFrame = leap_controller_.GetTransformedFrame(leapMat, searchHistoryIndex);
+        IFrame historyFrame = leap_controller_.Frame(searchHistoryIndex);//GetTransformedFrame(leapMat, searchHistoryIndex);
 
         //If we reach an invalid frame, terminate the search
-        if (!historyFrame.IsValid) {
+        if (historyFrame.Id < 0) {
+          Debug.Log("historyFrame.Id is less than 0");
           break;
         }
 
@@ -170,7 +173,10 @@ namespace Leap {
           break;
         }
       }
-      return closestFrame;
+
+      leapMat = UnityMatrixExtension.GetLeapMatrix(this.transform);
+      _currentFixedFrame.Set(ref leapMat, closestFrame);
+      return _currentFixedFrame;
     }
     void OnDestroy() {
       //DestroyAllHands();
