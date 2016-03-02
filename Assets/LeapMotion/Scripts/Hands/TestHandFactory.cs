@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
     public class TestHandFactory {
 
         public static Frame MakeTestFrame(int frameId, bool leftHandIncluded, bool rightHandIncluded){
-            Frame testFrame = new Frame(frameId, 0, 120.0f, new InteractionBox());
+            Frame testFrame = new Frame(frameId, 0, 120.0f, new InteractionBox(), new List<Hand>());
             if(leftHandIncluded)
                 testFrame.Hands.Add(MakeTestHand(frameId, 10, true));
             if(rightHandIncluded)
@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
         }
 
         public static Hand MakeTestHand(int frameId, int handId, bool isLeft){
-            List<Finger> fingers = new FingerList(5);
+            List<Finger> fingers = new List<Finger>(5);
             fingers.Add(MakeThumb (frameId, handId));
             fingers.Add(MakeIndexFinger (frameId, handId));
             fingers.Add(MakeMiddleFinger (frameId, handId));

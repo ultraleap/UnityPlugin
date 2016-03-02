@@ -15,8 +15,8 @@ namespace LeapInternal
 
   public enum eLeapConnectionStatus : uint
   {
-    eLeapConnectionStatus_Connected = 0, //!< // A connection has been established
-    eLeapConnectionStatus_NotConnected, //!< The connection has not been completed. Call OpenConnection.
+    eLeapConnectionStatus_NotConnected = 0, //!< // A connection has been established
+    eLeapConnectionStatus_Connected, //!< The connection has not been completed. Call OpenConnection.
     eLeapConnectionStatus_HandshakeIncomplete, //!< The connection handshake has not completed
     eLeapConnectionStatus_NotRunning = 0xE7030004 //!< A connection could not be established because the server does not appear to be running
   };
@@ -299,7 +299,7 @@ namespace LeapInternal
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_FRAME_HEADER
   {
-    IntPtr reserved;
+    public IntPtr reserved;
     public Int64 frame_id;
     public Int64 timestamp;
   }
@@ -668,20 +668,6 @@ namespace LeapInternal
         Marshal.FreeHGlobal(configValue);
       }
       return callResult;
-    }
-
-    //Utility function
-    public static T PtrToStruct<T>(IntPtr ptr) where T : struct
-    {
-      try
-      {
-        return (T)Marshal.PtrToStructure(ptr, typeof(T));
-      }
-      catch (Exception e)
-      {
-        Logger.Log("Problem converting structure " + typeof(T).ToString() + " from ptr " + ptr.ToString() + " : " + e.Message);
-        return new T();
-      }
     }
 
 
