@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System;
-using System.Collections.Generic;
 using Leap;
 using LeapInternal;
 using InteractionEngine.Internal;
@@ -11,7 +9,7 @@ namespace InteractionEngine {
     [SerializeField]
     private LeapProvider _leapProvider;
 
-    private HashSet<InteractionObject> _objects = new HashSet<InteractionObject>();
+    private OneToOneMap<InteractionObject, InteractionShape> _objects = new OneToOneMap<InteractionObject, InteractionShape>();
     private LEAP_IE_SCENE _scene;
 
     public LEAP_IE_SCENE Scene {
@@ -20,21 +18,25 @@ namespace InteractionEngine {
       }
     }
 
-    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE RegisterShapeDescription(IntPtr descPtr) {
-      var handle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
-      InteractionC.LeapIEAddShapeDescription(ref _scene, descPtr, ref handle);
-      return handle;
+    public void RegisterInteractionObject(InteractionObject obj) {
+      InteractionShape shape = new InteractionShape();
+      _objects[obj] = shape;
+
+      if (enabled) {
+        registerWithInteractionC(obj, shape);
+      }
     }
 
-    public void UnregisterShapeDescription(ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle) {
-      InteractionC.LeapIERemoveShapeDescription(ref _scene, ref handle);
-    }
+    private void registerWithInteractionC(InteractionObject obj, InteractionShape shape) {
+      var shapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
 
-    public LEAP_IE_SHAPE_INSTANCE_HANDLE RegisterInteractionObject(InteractionObject interactionObject) {
-      _objects.Add(interactionObject);
+      InteractionC.LeapIEAddShapeDescription(ref _scene,
+                                             obj.ShapeDescription,
+                                             ref shapeHandle);
 
-      var shapeHandle = interactionObject.ShapeDescriptionHandle;
-      var shapeTransform = interactionObject.IeTransform;
+      shape.ShapeHandle = shapeHandle;
+      var shapeTransform = obj.IeTransform;
+
       var instanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
 
       InteractionC.LeapIECreateShape(ref _scene,
@@ -42,15 +44,47 @@ namespace InteractionEngine {
                                      ref shapeTransform,
                                      ref instanceHandle);
 
-      return instanceHandle;
+      shape.InstanceHandle = instanceHandle;
     }
 
-    public void UnregisterInteractionObject(InteractionObject interactionObject) {
-      _objects.Remove(interactionObject);
+    public void UnregisterInteractionObject(InteractionObject obj) {
+      InteractionShape shape = _objects[obj];
 
-      var handle = interactionObject.InstanceHandle;
+      if (enabled) {
+        unregisterWithInteractionC(obj, shape);
+      }
+
+      _objects.Remove(obj);
+    }
+
+    private void unregisterWithInteractionC(InteractionObject obj, InteractionShape shape) {
+      var shapeHandle = shape.ShapeHandle;
+      InteractionC.LeapIERemoveShapeDescription(ref _scene,
+                                                ref shapeHandle);
+
+      var instanceHandle = shape.InstanceHandle;
       InteractionC.LeapIEDestroyShape(ref _scene,
-                                      ref handle);
+                                      ref instanceHandle);
+
+      shape.InstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
+      shape.ShapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
+    }
+
+
+    void OnEnable() {
+      InteractionC.LeapIECreateScene(ref _scene);
+
+      foreach (var pair in _objects) {
+        registerWithInteractionC(pair.Key, pair.Value);
+      }
+    }
+
+    void OnDisable() {
+      foreach (var pair in _objects) {
+        unregisterWithInteractionC(pair.Key, pair.Value);
+      }
+
+      InteractionC.LeapIEDestroyScene(ref _scene);
     }
 
     void FixedUpdate() {
@@ -60,13 +94,16 @@ namespace InteractionEngine {
 
       simulateIe();
 
-      handleIeEvents();
+      setObjectClassifications();
     }
 
     private void updateIeRepresentations() {
-      foreach (var obj in _objects) {
+      foreach (var pair in _objects) {
+        var obj = pair.Key;
+        var shape = pair.Value;
+
         var instanceTransform = obj.IeTransform;
-        var instanceHandle = obj.InstanceHandle;
+        var instanceHandle = shape.InstanceHandle;
 
         InteractionC.LeapIEUpdateShape(ref _scene,
                                        ref instanceTransform,
@@ -87,62 +124,25 @@ namespace InteractionEngine {
       InteractionC.LeapIEAdvance(ref _scene, ref _controllerTransform);
     }
 
-    private void handleIeEvents() {
-      object ie_event;
-      while (true) {
-        //LeapIEPollEvent(ref ie_event);
+    private void setObjectClassifications() {
+      foreach (var pair in _objects) {
+        var obj = pair.Key;
+        var shape = pair.Value;
 
-        switch (/*ie_event.type*/0) {
-          //eLeapIEEventType_None
-          case 0:
-            return;
-          //eLeapIEEventType_ObjectGrabStart
-          case 1:
-            handleEvent_grabStart();
-            break;
-          //eLeapIEEventType_ObjectGrabStop
-          case 2:
-            handleEvent_grabStop();
-            break;
-          //eLeapIEEventType_ObjectGrabMove
-          case 3:
-            handleEvent_grabMove();
-            break;
-          //eLeapIEEventType_ObjectGrabResume
-          case 4:
-            handleEvent_grabResume();
-            break;
-          //eLeapIEEventType_ObjectGrabSuspend
-          case 5:
-            handleEvent_grabSuspend();
-            break;
-        }
+        var instanceHandle = shape.InstanceHandle;
+        var classification = new LEAP_IE_SHAPE_CLASSIFICATION();
+
+        InteractionC.LeapIEGetClassification(ref _scene,
+                                             ref instanceHandle,
+                                             ref classification);
+
+        obj.SetClassification(classification.classification);
       }
     }
 
-    private void handleEvent_grabStart(/*LEAP_IE_EVENT_OBJECT_GRAB_START grabStartEvent*/) {
-      InteractionObject interactionObject = _objectIdMap[/*grabStartEvent.object.id*/0];
-      interactionObject.HandleGrabStart(/*grabStartEvent*/null);
-    }
-
-    private void handleEvent_grabStop(/*LEAP_IE_EVENT_OBJECT_GRAB_STOP grabStopEvent*/) {
-      InteractionObject interactionObject = _objectIdMap[/*grabStopEvent.object.id*/0];
-      interactionObject.HandleGrabStop(/*grabStopEvent*/null);
-    }
-
-    private void handleEvent_grabMove(/*LEAP_IE_EVENT_OBJECT_GRAB_MOVE grabMoveEvent*/) {
-      InteractionObject interactionObject = _objectIdMap[/*grabMoveEvent.object.id*/0];
-      interactionObject.HandleGrabMove(/*grabMoveEvent*/null);
-    }
-
-    private void handleEvent_grabResume(/*LEAP_IE_EVENT_OBJECT_GRAB_RESUME grabResumeEvent*/) {
-      InteractionObject interactionObject = _objectIdMap[/*grabResumeEvent.object.id*/0];
-      interactionObject.HandleGrabResume(/*grabResumeEvent*/null);
-    }
-
-    private void handleEvent_grabSuspend(/*LEAP_IE_EVENT_OBJECT_GRAB_SUSPEND grabSuspendtEvent*/) {
-      InteractionObject interactionObject = _objectIdMap[/*grabSuspendEvent.object.id*/0];
-      interactionObject.HandleGrabSuspend(/*grabSuspendEvent*/null);
+    private class InteractionShape {
+      public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeHandle;
+      public LEAP_IE_SHAPE_INSTANCE_HANDLE InstanceHandle;
     }
   }
 }
