@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System;
+using System.Runtime.InteropServices;
+using InteractionEngine.Internal;
 
 namespace InteractionEngine {
 
@@ -16,6 +18,11 @@ namespace InteractionEngine {
     public event Action OnGrabStop;
     public event Action OnGrabSuspend;
     public event Action OnGrabResume;
+
+
+    private LEAP_IE_TRANSFORM _ieTransform;
+    private LEAP_IE_SHAPE_DESCRIPTION _ieShapeDescription;
+    private LEAP_IE_SHAPE_INSTANCE_HANDLE _ieInstanceHandle;
 
     public uint Id {
       get {
