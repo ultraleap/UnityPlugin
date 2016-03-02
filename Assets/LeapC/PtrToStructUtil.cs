@@ -23,12 +23,6 @@ namespace LeapInternal {
       }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="ptr"></param>
-    /// <param name="arrayIndex"></param>
-    /// <returns></returns>
     public static T ArrayElementToStruct(IntPtr ptr, int arrayIndex) {
       return PtrToStruct(new IntPtr(ptr.ToInt64() + _sizeofT * arrayIndex));
     }
