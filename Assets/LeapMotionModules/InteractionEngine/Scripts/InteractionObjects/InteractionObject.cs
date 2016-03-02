@@ -1,17 +1,15 @@
 ﻿using UnityEngine;
 using System;
-using System.Runtime.InteropServices;
+using LeapInternal;
 using InteractionEngine.Internal;
 
 namespace InteractionEngine {
 
   public abstract class InteractionObject : MonoBehaviour {
-    private static uint _nextId = 1;
+    private static uint _nextHandle = 1;
 
     [SerializeField]
     private InteractionController _controller;
-
-    private uint _id;
 
     public event Action OnGrabStart;
     public event Action OnGrabMove;
@@ -19,19 +17,35 @@ namespace InteractionEngine {
     public event Action OnGrabSuspend;
     public event Action OnGrabResume;
 
-
-    private LEAP_IE_TRANSFORM _ieTransform;
-    private LEAP_IE_SHAPE_DESCRIPTION _ieShapeDescription;
     private LEAP_IE_SHAPE_INSTANCE_HANDLE _ieInstanceHandle;
+    private object _ieShapeDescription;
 
-    public uint Id {
+    public LEAP_IE_SHAPE_INSTANCE_HANDLE Handle {
       get {
-        return _id;
+        return _ieInstanceHandle;
       }
     }
 
-    public object GetRepresentation() {
-      return null;
+    public object ShapeDescription {
+      get {
+        LEAP_IE_SPHERE_DESCRIPTION sphereDescription = new LEAP_IE_SPHERE_DESCRIPTION();
+        sphereDescription.shape.type = eLeapIEShapeType.eLeapIERS_ShapeSphere;
+        sphereDescription.radius = 0.1f;
+        return sphereDescription;
+      }
+    }
+
+    public LEAP_IE_TRANSFORM IeTransform {
+      get {
+        LEAP_IE_TRANSFORM ieTransform = new LEAP_IE_TRANSFORM();
+        ieTransform.position = new LEAP_VECTOR(transform.position);
+        ieTransform.rotation = new LEAP_QUATERNION(transform.rotation);
+        return ieTransform;
+      }
+      set {
+        transform.position = value.position.ToUnityVector();
+        transform.rotation = value.rotation.ToUnityRotation();
+      }
     }
 
     public virtual void HandleGrabStart(/*LEAP_IE_EVENT_OBJECT_GRAB_START grabStartEvent*/ object eventObj) {
@@ -65,8 +79,8 @@ namespace InteractionEngine {
     }
 
     protected virtual void Awake() {
-      _id = _nextId;
-      _nextId++;
+      _ieInstanceHandle.handle = _nextHandle;
+      _nextHandle++;
     }
 
     protected virtual void OnValidate() {

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Leap;
+using InteractionEngine.Internal;
 
 namespace InteractionEngine {
 
@@ -7,12 +8,14 @@ namespace InteractionEngine {
     [SerializeField]
     private LeapProvider _leapProvider;
 
-    private OneToOneMap<InteractionObject, uint> _objectIdMap = new OneToOneMap<InteractionObject, uint>();
+    private LEAP_IT_SCENE _scene;
+
+    private OneToOneMap<InteractionObject, LEAP_IE_SHAPE_INSTANCE_HANDLE> _objectIdMap = new OneToOneMap<InteractionObject, LEAP_IE_SHAPE_INSTANCE_HANDLE>();
 
     public void RegisterInteractionObject(InteractionObject interactionObject) {
-      _objectIdMap.Add(interactionObject, interactionObject.Id);
+      _objectIdMap.Add(interactionObject, interactionObject.Handle);
 
-      object representation = interactionObject.GetRepresentation();
+      InteractionC.LeapIEAddShapeDescription(0, interactionObject.ShapeDescription, interactionObject.Handle);
       //LeapIEAddInteractionObject(representation);
     }
 
