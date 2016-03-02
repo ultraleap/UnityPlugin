@@ -7,7 +7,7 @@ namespace LeapInternal {
   /**
    * A helper class to marshal from unmanaged memory into structs without creating garbage.
    */
-  public class StructUtil<T> where T : struct {
+  public class StructMarshal<T> where T : struct {
     [StructLayout(LayoutKind.Sequential)]
     private class StructContainer {
       public T value;
