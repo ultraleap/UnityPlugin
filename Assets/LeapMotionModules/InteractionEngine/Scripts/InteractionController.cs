@@ -12,12 +12,6 @@ namespace InteractionEngine {
     private OneToOneMap<InteractionObject, InteractionShape> _objects = new OneToOneMap<InteractionObject, InteractionShape>();
     private LEAP_IE_SCENE _scene;
 
-    public LEAP_IE_SCENE Scene {
-      get {
-        return _scene;
-      }
-    }
-
     public void RegisterInteractionObject(InteractionObject obj) {
       InteractionShape shape = new InteractionShape();
       _objects[obj] = shape;
@@ -27,25 +21,7 @@ namespace InteractionEngine {
       }
     }
 
-    private void registerWithInteractionC(InteractionObject obj, InteractionShape shape) {
-      var shapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
-
-      InteractionC.LeapIEAddShapeDescription(ref _scene,
-                                             obj.ShapeDescription,
-                                             ref shapeHandle);
-
-      shape.ShapeHandle = shapeHandle;
-      var shapeTransform = obj.IeTransform;
-
-      var instanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
-
-      InteractionC.LeapIECreateShape(ref _scene,
-                                     ref shapeHandle,
-                                     ref shapeTransform,
-                                     ref instanceHandle);
-
-      shape.InstanceHandle = instanceHandle;
-    }
+    
 
     public void UnregisterInteractionObject(InteractionObject obj) {
       InteractionShape shape = _objects[obj];
@@ -56,20 +32,6 @@ namespace InteractionEngine {
 
       _objects.Remove(obj);
     }
-
-    private void unregisterWithInteractionC(InteractionObject obj, InteractionShape shape) {
-      var shapeHandle = shape.ShapeHandle;
-      InteractionC.LeapIERemoveShapeDescription(ref _scene,
-                                                ref shapeHandle);
-
-      var instanceHandle = shape.InstanceHandle;
-      InteractionC.LeapIEDestroyShape(ref _scene,
-                                      ref instanceHandle);
-
-      shape.InstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
-      shape.ShapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
-    }
-
 
     void OnEnable() {
       InteractionC.LeapIECreateScene(ref _scene);
@@ -138,6 +100,39 @@ namespace InteractionEngine {
 
         obj.SetClassification(classification.classification);
       }
+    }
+
+    private void registerWithInteractionC(InteractionObject obj, InteractionShape shape) {
+      var shapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
+
+      InteractionC.LeapIEAddShapeDescription(ref _scene,
+                                             obj.ShapeDescription,
+                                             ref shapeHandle);
+
+      shape.ShapeHandle = shapeHandle;
+      var shapeTransform = obj.IeTransform;
+
+      var instanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
+
+      InteractionC.LeapIECreateShape(ref _scene,
+                                     ref shapeHandle,
+                                     ref shapeTransform,
+                                     ref instanceHandle);
+
+      shape.InstanceHandle = instanceHandle;
+    }
+
+    private void unregisterWithInteractionC(InteractionObject obj, InteractionShape shape) {
+      var shapeHandle = shape.ShapeHandle;
+      InteractionC.LeapIERemoveShapeDescription(ref _scene,
+                                                ref shapeHandle);
+
+      var instanceHandle = shape.InstanceHandle;
+      InteractionC.LeapIEDestroyShape(ref _scene,
+                                      ref instanceHandle);
+
+      shape.InstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
+      shape.ShapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
     }
 
     private class InteractionShape {
