@@ -109,30 +109,30 @@ public class CapsuleHand : IHandModel {
       for (int j = 0; j < 4; j++) {
         int key = getFingerJointIndex((int)finger.Type, j);
         Transform sphere = _jointSpheres[key];
-        sphere.position = finger.Bone((Bone.BoneType)j).NextJoint.ToUnityScaled();
+        sphere.position = finger.Bone((Bone.BoneType)j).NextJoint.ToVector3();
 
       }
     }
 
-    palmPositionSphere.position = hand_.PalmPosition.ToUnity();
+    palmPositionSphere.position = hand_.PalmPosition.ToVector3();
 
-    Vector3 wristPos = hand_.PalmPosition.ToUnity();
+    Vector3 wristPos = hand_.PalmPosition.ToVector3();
     wristPositionSphere.position = wristPos;
 
     Transform thumbBase = _jointSpheres[THUMB_BASE_INDEX];
 
-    Vector3 thumbBaseToPalm = thumbBase.position - hand_.PalmPosition.ToUnity();
-    mockThumbJointSphere.position = hand_.PalmPosition.ToUnity() + Vector3.Reflect(thumbBaseToPalm, hand_.Basis.xBasis.ToUnity().normalized);
+    Vector3 thumbBaseToPalm = thumbBase.position - hand_.PalmPosition.ToVector3();
+    mockThumbJointSphere.position = hand_.PalmPosition.ToVector3() + Vector3.Reflect(thumbBaseToPalm, hand_.Basis.xBasis.ToVector3().normalized);
   }
 
   private void updateArm() {
     var arm = hand_.Arm;
-    Vector3 right = arm.Basis.xBasis.ToUnity().normalized * arm.Width * 0.7f * 0.5f;
-    Vector3 wrist = arm.WristPosition.ToUnityScaled();
-    Vector3 elbow = arm.ElbowPosition.ToUnityScaled();
+    Vector3 right = arm.Basis.xBasis.ToVector3().normalized * arm.Width * 0.7f * 0.5f;
+    Vector3 wrist = arm.WristPosition.ToVector3();
+    Vector3 elbow = arm.ElbowPosition.ToVector3();
 
     float armLength = Vector3.Distance(wrist, elbow);
-    wrist -= arm.Direction.ToUnity() * armLength * 0.05f;
+    wrist -= arm.Direction.ToVector3() * armLength * 0.05f;
 
     armFrontRight.position = wrist + right;
     armFrontLeft.position = wrist - right;
