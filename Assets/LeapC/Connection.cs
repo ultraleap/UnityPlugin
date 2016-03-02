@@ -164,53 +164,53 @@ namespace LeapInternal
               switch (_msg.type)
               {
                 case eLeapEventType.eLeapEventType_Connection:
-                  LEAP_CONNECTION_EVENT connection_evt = LeapC.PtrToStruct<LEAP_CONNECTION_EVENT>(_msg.eventStructPtr);
+                  LEAP_CONNECTION_EVENT connection_evt = StructUtil<LEAP_CONNECTION_EVENT>.PtrToStruct(_msg.eventStructPtr);
                   handleConnection(ref connection_evt);
                   break;
                 case eLeapEventType.eLeapEventType_ConnectionLost:
-                  LEAP_CONNECTION_LOST_EVENT connection_lost_evt = LeapC.PtrToStruct<LEAP_CONNECTION_LOST_EVENT>(_msg.eventStructPtr);
+                  LEAP_CONNECTION_LOST_EVENT connection_lost_evt = StructUtil<LEAP_CONNECTION_LOST_EVENT>.PtrToStruct(_msg.eventStructPtr);
                   handleConnectionLost(ref connection_lost_evt);
                   break;
                 case eLeapEventType.eLeapEventType_Device:
-                  LEAP_DEVICE_EVENT device_evt = LeapC.PtrToStruct<LEAP_DEVICE_EVENT>(_msg.eventStructPtr);
+                  LEAP_DEVICE_EVENT device_evt = StructUtil<LEAP_DEVICE_EVENT>.PtrToStruct(_msg.eventStructPtr);
                   handleDevice(ref device_evt);
                   break;
                 case eLeapEventType.eLeapEventType_DeviceLost:
-                  LEAP_DEVICE_EVENT device_lost_evt = LeapC.PtrToStruct<LEAP_DEVICE_EVENT>(_msg.eventStructPtr);
+                  LEAP_DEVICE_EVENT device_lost_evt = StructUtil<LEAP_DEVICE_EVENT>.PtrToStruct(_msg.eventStructPtr);
                   handleLostDevice(ref device_lost_evt);
                   break;
                 case eLeapEventType.eLeapEventType_DeviceFailure:
-                  LEAP_DEVICE_FAILURE_EVENT device_failure_evt = LeapC.PtrToStruct<LEAP_DEVICE_FAILURE_EVENT>(_msg.eventStructPtr);
+                  LEAP_DEVICE_FAILURE_EVENT device_failure_evt = StructUtil<LEAP_DEVICE_FAILURE_EVENT>.PtrToStruct(_msg.eventStructPtr);
                   handleFailedDevice(ref device_failure_evt);
                   break;
                 case eLeapEventType.eLeapEventType_Tracking:
-                  LEAP_TRACKING_EVENT tracking_evt = LeapC.PtrToStruct<LEAP_TRACKING_EVENT>(_msg.eventStructPtr);
+                  LEAP_TRACKING_EVENT tracking_evt = StructUtil<LEAP_TRACKING_EVENT>.PtrToStruct(_msg.eventStructPtr);
                   handleTrackingMessage(ref tracking_evt);
                   break;
                 case eLeapEventType.eLeapEventType_ImageComplete:
                   completeCount++;
-                  LEAP_IMAGE_COMPLETE_EVENT image_complete_evt = LeapC.PtrToStruct<LEAP_IMAGE_COMPLETE_EVENT>(_msg.eventStructPtr);
+                  LEAP_IMAGE_COMPLETE_EVENT image_complete_evt = StructUtil<LEAP_IMAGE_COMPLETE_EVENT>.PtrToStruct(_msg.eventStructPtr);
                   handleImageCompletion(ref image_complete_evt);
                   break;
                 case eLeapEventType.eLeapEventType_ImageRequestError:
                   failedCount++;
-                  LEAP_IMAGE_FRAME_REQUEST_ERROR_EVENT failed_image_evt = LeapC.PtrToStruct<LEAP_IMAGE_FRAME_REQUEST_ERROR_EVENT>(_msg.eventStructPtr);
+                  LEAP_IMAGE_FRAME_REQUEST_ERROR_EVENT failed_image_evt = StructUtil<LEAP_IMAGE_FRAME_REQUEST_ERROR_EVENT>.PtrToStruct(_msg.eventStructPtr);
                   handleFailedImageRequest(ref failed_image_evt);
                   break;
                 case eLeapEventType.eLeapEventType_TrackedQuad:
-                  LEAP_TRACKED_QUAD_EVENT quad_evt = LeapC.PtrToStruct<LEAP_TRACKED_QUAD_EVENT>(_msg.eventStructPtr);
+                  LEAP_TRACKED_QUAD_EVENT quad_evt = StructUtil<LEAP_TRACKED_QUAD_EVENT>.PtrToStruct(_msg.eventStructPtr);
                   handleQuadMessage(ref quad_evt);
                   break;
                 case eLeapEventType.eLeapEventType_LogEvent:
-                  LEAP_LOG_EVENT log_evt = LeapC.PtrToStruct<LEAP_LOG_EVENT>(_msg.eventStructPtr);
+                  LEAP_LOG_EVENT log_evt = StructUtil<LEAP_LOG_EVENT>.PtrToStruct(_msg.eventStructPtr);
                   reportLogMessage(ref log_evt);
                   break;
                 case eLeapEventType.eLeapEventType_PolicyChange:
-                  LEAP_POLICY_EVENT policy_evt = LeapC.PtrToStruct<LEAP_POLICY_EVENT>(_msg.eventStructPtr);
+                  LEAP_POLICY_EVENT policy_evt = StructUtil<LEAP_POLICY_EVENT>.PtrToStruct(_msg.eventStructPtr);
                   handlePolicyChange(ref policy_evt);
                   break;
                 case eLeapEventType.eLeapEventType_ConfigChange:
-                  LEAP_CONFIG_CHANGE_EVENT config_change_evt = LeapC.PtrToStruct<LEAP_CONFIG_CHANGE_EVENT>(_msg.eventStructPtr);
+                  LEAP_CONFIG_CHANGE_EVENT config_change_evt = StructUtil<LEAP_CONFIG_CHANGE_EVENT>.PtrToStruct(_msg.eventStructPtr);
                   handleConfigChange(ref config_change_evt);
                   break;
                 case eLeapEventType.eLeapEventType_ConfigResponse:
@@ -320,7 +320,7 @@ namespace LeapInternal
     private object lockPendingImageList = new object();
     private void handleImageCompletion(ref LEAP_IMAGE_COMPLETE_EVENT imageMsg)
     {
-      LEAP_IMAGE_PROPERTIES props = LeapC.PtrToStruct<LEAP_IMAGE_PROPERTIES>(imageMsg.properties);
+      LEAP_IMAGE_PROPERTIES props = StructUtil<LEAP_IMAGE_PROPERTIES>.PtrToStruct(imageMsg.properties);
       ImageReference pendingImage = null;
       lock (lockPendingImageList)
       {
@@ -337,7 +337,7 @@ namespace LeapInternal
           _currentDistortionData.Height = LeapC.DistortionSize; //fixed value for now
           if (_currentDistortionData.Data == null || _currentDistortionData.Data.Length != (2 * _currentDistortionData.Width * _currentDistortionData.Height * 2))
             _currentDistortionData.Data = new float[(int)(2 * _currentDistortionData.Width * _currentDistortionData.Height * 2)]; //2 float values per map point
-          LEAP_DISTORTION_MATRIX matrix = LeapC.PtrToStruct<LEAP_DISTORTION_MATRIX>(imageMsg.distortionMatrix);
+          LEAP_DISTORTION_MATRIX matrix = StructUtil<LEAP_DISTORTION_MATRIX>.PtrToStruct(imageMsg.distortionMatrix);
           Array.Copy(matrix.matrix_data, _currentDistortionData.Data, matrix.matrix_data.Length);
           this.LeapDistortionChange.Dispatch<DistortionEventArgs>(this, new DistortionEventArgs(_currentDistortionData));
         }
@@ -541,7 +541,7 @@ namespace LeapInternal
 
     private void handleConfigResponse(ref LEAP_CONNECTION_MESSAGE configMsg)
     {
-      LEAP_CONFIG_RESPONSE_EVENT config_response_evt = LeapC.PtrToStruct<LEAP_CONFIG_RESPONSE_EVENT>(configMsg.eventStructPtr);
+      LEAP_CONFIG_RESPONSE_EVENT config_response_evt = StructUtil<LEAP_CONFIG_RESPONSE_EVENT>.PtrToStruct(configMsg.eventStructPtr);
       string config_key = "";
       _configRequests.TryGetValue(config_response_evt.requestId, out config_key);
       if (config_key != null)
@@ -575,7 +575,7 @@ namespace LeapInternal
       }
       else {
         LEAP_CONFIG_RESPONSE_EVENT_WITH_REF_TYPE config_ref_value =
-             LeapC.PtrToStruct<LEAP_CONFIG_RESPONSE_EVENT_WITH_REF_TYPE>(configMsg.eventStructPtr);
+             StructUtil<LEAP_CONFIG_RESPONSE_EVENT_WITH_REF_TYPE>.PtrToStruct(configMsg.eventStructPtr);
         dataType = Config.ValueType.TYPE_STRING;
         value = config_ref_value.value.stringValue;
       }

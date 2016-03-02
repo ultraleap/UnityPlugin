@@ -30,12 +30,10 @@ namespace LeapInternal
                                trackingMsg.interaction_box_size.ToLeapVector()),
                            new List<Hand>((int)trackingMsg.nHands)
             );
-
-      int pHandArrayOffset = 0;
+      
       for (int h = 0; h < trackingMsg.nHands; h++)
       {
-        LEAP_HAND hand = LeapC.PtrToStruct<LEAP_HAND>(new IntPtr(trackingMsg.pHands.ToInt64() + pHandArrayOffset));
-        pHandArrayOffset += handStructSize;
+        LEAP_HAND hand = StructUtil<LEAP_HAND>.ArrayElementToStruct(trackingMsg.pHands, h);
         newFrame.Hands.Add(makeHand(ref hand, newFrame));
       }
       return newFrame;
@@ -59,9 +57,9 @@ namespace LeapInternal
 
     public Hand makeHand(ref LEAP_HAND hand, Frame owningFrame)
     {
-      LEAP_BONE arm = LeapC.PtrToStruct<LEAP_BONE>(hand.arm);
+      LEAP_BONE arm = StructUtil<LEAP_BONE>.PtrToStruct(hand.arm);
       Arm newArm = makeArm(ref arm);
-      LEAP_PALM palm = LeapC.PtrToStruct<LEAP_PALM>(hand.palm);
+      LEAP_PALM palm = StructUtil<LEAP_PALM>.PtrToStruct(hand.palm);
 
       Hand newHand = new Hand(
         (int)owningFrame.Id,
@@ -83,19 +81,19 @@ namespace LeapInternal
         new Vector(palm.direction.x, palm.direction.y, palm.direction.z),
         newArm.NextJoint //wrist position
       );
-      LEAP_DIGIT thumbDigit = LeapC.PtrToStruct<LEAP_DIGIT>(hand.thumb);
+      LEAP_DIGIT thumbDigit = StructUtil<LEAP_DIGIT>.PtrToStruct(hand.thumb);
       newHand.Fingers.Insert(0, makeFinger(owningFrame, ref hand, ref thumbDigit, Finger.FingerType.TYPE_THUMB));
 
-      LEAP_DIGIT indexDigit = LeapC.PtrToStruct<LEAP_DIGIT>(hand.index);
+      LEAP_DIGIT indexDigit = StructUtil<LEAP_DIGIT>.PtrToStruct(hand.index);
       newHand.Fingers.Insert(1, makeFinger(owningFrame, ref hand, ref indexDigit, Finger.FingerType.TYPE_INDEX));
 
-      LEAP_DIGIT middleDigit = LeapC.PtrToStruct<LEAP_DIGIT>(hand.middle);
+      LEAP_DIGIT middleDigit = StructUtil<LEAP_DIGIT>.PtrToStruct(hand.middle);
       newHand.Fingers.Insert(2, makeFinger(owningFrame, ref hand, ref middleDigit, Finger.FingerType.TYPE_MIDDLE));
 
-      LEAP_DIGIT ringDigit = LeapC.PtrToStruct<LEAP_DIGIT>(hand.ring);
+      LEAP_DIGIT ringDigit = StructUtil<LEAP_DIGIT>.PtrToStruct(hand.ring);
       newHand.Fingers.Insert(3, makeFinger(owningFrame, ref hand, ref ringDigit, Finger.FingerType.TYPE_RING));
 
-      LEAP_DIGIT pinkyDigit = LeapC.PtrToStruct<LEAP_DIGIT>(hand.pinky);
+      LEAP_DIGIT pinkyDigit = StructUtil<LEAP_DIGIT>.PtrToStruct(hand.pinky);
       newHand.Fingers.Insert(4, makeFinger(owningFrame, ref hand, ref pinkyDigit, Finger.FingerType.TYPE_PINKY));
 
       return newHand;

@@ -604,6 +604,7 @@ namespace LeapInternal
       valueStruct.boolValue = value ? 1 : 0;
       return LeapC.SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
     }
+
     public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, Int32 value, out UInt32 requestId)
     {
       LEAP_VARIANT_VALUE_TYPE valueStruct = new LEAP_VARIANT_VALUE_TYPE();
@@ -611,6 +612,7 @@ namespace LeapInternal
       valueStruct.intValue = value;
       return LeapC.SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
     }
+
     public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, float value, out UInt32 requestId)
     {
       LEAP_VARIANT_VALUE_TYPE valueStruct = new LEAP_VARIANT_VALUE_TYPE();
@@ -618,6 +620,7 @@ namespace LeapInternal
       valueStruct.floatValue = value;
       return LeapC.SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
     }
+
     public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, string value, out UInt32 requestId)
     {
       LEAP_VARIANT_REF_TYPE valueStruct;
@@ -625,51 +628,20 @@ namespace LeapInternal
       valueStruct.stringValue = value;
       return LeapC.SaveConfigWithRefType(hConnection, key, valueStruct, out requestId);
     }
+
     private static eLeapRS SaveConfigWithValueType(IntPtr hConnection, string key, LEAP_VARIANT_VALUE_TYPE valueStruct, out UInt32 requestId)
     {
-      IntPtr configValue = Marshal.AllocHGlobal(Marshal.SizeOf(valueStruct));
-      eLeapRS callResult = eLeapRS.eLeapRS_UnknownError;
-      try
-      {
-        Marshal.StructureToPtr(valueStruct, configValue, false);
-        callResult = SaveConfigValue(hConnection, key, configValue, out requestId);
-      }
-      finally
-      {
-        Marshal.FreeHGlobal(configValue);
-      }
-      return callResult;
+      IntPtr configValue = StructUtil<LEAP_VARIANT_VALUE_TYPE>.TempPointer;
+      Marshal.StructureToPtr(valueStruct, configValue, false);
+      return SaveConfigValue(hConnection, key, configValue, out requestId);
     }
+
     private static eLeapRS SaveConfigWithRefType(IntPtr hConnection, string key, LEAP_VARIANT_REF_TYPE valueStruct, out UInt32 requestId)
     {
-      IntPtr configValue = Marshal.AllocHGlobal(Marshal.SizeOf(valueStruct));
-      eLeapRS callResult = eLeapRS.eLeapRS_UnknownError;
-      try
-      {
-        Marshal.StructureToPtr(valueStruct, configValue, false);
-        callResult = SaveConfigValue(hConnection, key, configValue, out requestId);
-      }
-      finally
-      {
-        Marshal.FreeHGlobal(configValue);
-      }
-      return callResult;
+      IntPtr configValue = StructUtil<LEAP_VARIANT_REF_TYPE>.TempPointer;
+      Marshal.StructureToPtr(valueStruct, configValue, false);
+      return SaveConfigValue(hConnection, key, configValue, out requestId);
     }
-
-    //Utility function
-    public static T PtrToStruct<T>(IntPtr ptr) where T : struct
-    {
-      try
-      {
-        return (T)Marshal.PtrToStructure(ptr, typeof(T));
-      }
-      catch (Exception e)
-      {
-        Logger.Log("Problem converting structure " + typeof(T).ToString() + " from ptr " + ptr.ToString() + " : " + e.Message);
-        return new T();
-      }
-    }
-
 
   }//end LeapC
 } //end LeapInternal namespace
