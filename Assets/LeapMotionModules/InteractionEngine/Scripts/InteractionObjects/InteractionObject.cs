@@ -26,6 +26,10 @@ namespace InteractionEngine {
       }
     }
 
+    protected virtual void Awake() { }
+
+    protected virtual void Start() { }
+
     protected virtual void OnEnable() {
       _controller.RegisterInteractionObject(this);
     }
@@ -33,5 +37,7 @@ namespace InteractionEngine {
     protected virtual void OnDisable() {
       _controller.UnregisterInteractionObject(this);
     }
+
+    protected virtual void Update() { }
   }
 }
