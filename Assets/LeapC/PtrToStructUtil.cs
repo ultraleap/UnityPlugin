@@ -11,19 +11,7 @@ namespace LeapInternal {
     }
 
     private static StructContainer _container = new StructContainer();
-    private static int _sizeofT;
-    private static IntPtr _tempPointerHandle;
-
-    static StructUtil() {
-      _sizeofT = Marshal.SizeOf(typeof(T));
-      _tempPointerHandle = Marshal.AllocHGlobal(_sizeofT);
-    }
-
-    public static IntPtr TempPointer {
-      get {
-        return _tempPointerHandle;
-      }
-    }
+    private static int _sizeofT = Marshal.SizeOf(typeof(T));
 
     public static T PtrToStruct(IntPtr ptr) {
       try {
@@ -35,8 +23,14 @@ namespace LeapInternal {
       }
     }
 
-    public static T ArrayElementToStruct(IntPtr ptr, int arrayOffset) {
-      return PtrToStruct(new IntPtr(ptr.ToInt64() + _sizeofT * arrayOffset));
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="ptr"></param>
+    /// <param name="arrayIndex"></param>
+    /// <returns></returns>
+    public static T ArrayElementToStruct(IntPtr ptr, int arrayIndex) {
+      return PtrToStruct(new IntPtr(ptr.ToInt64() + _sizeofT * arrayIndex));
     }
 
   }
