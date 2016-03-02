@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
+using System;
+using System.Collections.Generic;
 using Leap;
+using LeapInternal;
 using InteractionEngine.Internal;
 
 namespace InteractionEngine {
@@ -8,22 +11,46 @@ namespace InteractionEngine {
     [SerializeField]
     private LeapProvider _leapProvider;
 
-    private LEAP_IT_SCENE _scene;
+    private HashSet<InteractionObject> _objects = new HashSet<InteractionObject>();
+    private LEAP_IE_SCENE _scene;
 
-    private OneToOneMap<InteractionObject, LEAP_IE_SHAPE_INSTANCE_HANDLE> _objectIdMap = new OneToOneMap<InteractionObject, LEAP_IE_SHAPE_INSTANCE_HANDLE>();
+    public LEAP_IE_SCENE Scene {
+      get {
+        return _scene;
+      }
+    }
 
-    public void RegisterInteractionObject(InteractionObject interactionObject) {
-      _objectIdMap.Add(interactionObject, interactionObject.Handle);
+    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE RegisterShapeDescription(IntPtr descPtr) {
+      var handle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
+      InteractionC.LeapIEAddShapeDescription(ref _scene, descPtr, ref handle);
+      return handle;
+    }
 
-      InteractionC.LeapIEAddShapeDescription(0, interactionObject.ShapeDescription, interactionObject.Handle);
-      //LeapIEAddInteractionObject(representation);
+    public void UnregisterShapeDescription(ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle) {
+      InteractionC.LeapIERemoveShapeDescription(ref _scene, ref handle);
+    }
+
+    public LEAP_IE_SHAPE_INSTANCE_HANDLE RegisterInteractionObject(InteractionObject interactionObject) {
+      _objects.Add(interactionObject);
+
+      var shapeHandle = interactionObject.ShapeDescriptionHandle;
+      var shapeTransform = interactionObject.IeTransform;
+      var instanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
+
+      InteractionC.LeapIECreateShape(ref _scene,
+                                     ref shapeHandle,
+                                     ref shapeTransform,
+                                     ref instanceHandle);
+
+      return instanceHandle;
     }
 
     public void UnregisterInteractionObject(InteractionObject interactionObject) {
-      _objectIdMap.Remove(interactionObject);
+      _objects.Remove(interactionObject);
 
-      object representation = interactionObject.GetRepresentation();
-      //LeapIERemoveInteractionObject(representation);
+      var handle = interactionObject.InstanceHandle;
+      InteractionC.LeapIEDestroyShape(ref _scene,
+                                      ref handle);
     }
 
     void FixedUpdate() {
@@ -37,19 +64,27 @@ namespace InteractionEngine {
     }
 
     private void updateIeRepresentations() {
-      foreach (var interactionObjects in _objectIdMap.Keys) {
-        object representation = interactionObjects.GetRepresentation();
-        //LeapIEUpdateInteractionObject(representation);
+      foreach (var obj in _objects) {
+        var instanceTransform = obj.IeTransform;
+        var instanceHandle = obj.InstanceHandle;
+
+        InteractionC.LeapIEUpdateShape(ref _scene,
+                                       ref instanceTransform,
+                                       ref instanceHandle);
       }
     }
 
     private void updateIeTracking() {
-      Frame frame = _leapProvider.GetFixedFrame();
-      //LeapIEUpdateLeapTracking(frame);
+      //TODO: Marshal hand array into InteractionC
     }
 
     private void simulateIe() {
-      //LeapIESimulate(Time.fixedDeltaTime, UnityMatrixExtension.GetLeapMatrix(_leapProvider.transform));
+      var _controllerTransform = new LEAP_IE_TRANSFORM();
+      _controllerTransform.position = new LEAP_VECTOR(_leapProvider.transform.position);
+      _controllerTransform.rotation = new LEAP_QUATERNION(_leapProvider.transform.rotation);
+      _controllerTransform.wallTime = Time.fixedTime;
+
+      InteractionC.LeapIEAdvance(ref _scene, ref _controllerTransform);
     }
 
     private void handleIeEvents() {

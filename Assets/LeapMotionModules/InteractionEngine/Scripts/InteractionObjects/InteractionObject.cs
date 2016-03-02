@@ -17,21 +17,25 @@ namespace InteractionEngine {
     public event Action OnGrabSuspend;
     public event Action OnGrabResume;
 
-    private LEAP_IE_SHAPE_INSTANCE_HANDLE _ieInstanceHandle;
+    private LEAP_IE_SHAPE_INSTANCE_HANDLE _instanceHandle;
+    private LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeDescriptionHandle;
     private object _ieShapeDescription;
 
-    public LEAP_IE_SHAPE_INSTANCE_HANDLE Handle {
+    public LEAP_IE_SHAPE_INSTANCE_HANDLE InstanceHandle {
       get {
-        return _ieInstanceHandle;
+        return _instanceHandle;
+      }
+    }
+
+    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
+      get {
+        return _shapeDescriptionHandle;
       }
     }
 
     public object ShapeDescription {
       get {
-        LEAP_IE_SPHERE_DESCRIPTION sphereDescription = new LEAP_IE_SPHERE_DESCRIPTION();
-        sphereDescription.shape.type = eLeapIEShapeType.eLeapIERS_ShapeSphere;
-        sphereDescription.radius = 0.1f;
-        return sphereDescription;
+        return _ieShapeDescription;
       }
     }
 
@@ -40,6 +44,7 @@ namespace InteractionEngine {
         LEAP_IE_TRANSFORM ieTransform = new LEAP_IE_TRANSFORM();
         ieTransform.position = new LEAP_VECTOR(transform.position);
         ieTransform.rotation = new LEAP_QUATERNION(transform.rotation);
+        ieTransform.wallTime = Time.fixedTime;
         return ieTransform;
       }
       set {
@@ -79,7 +84,11 @@ namespace InteractionEngine {
     }
 
     protected virtual void Awake() {
-      _ieInstanceHandle.handle = _nextHandle;
+      LEAP_IE_SPHERE_DESCRIPTION desc = new LEAP_IE_SPHERE_DESCRIPTION();
+      desc.shape.type = eLeapIEShapeType.eLeapIERS_ShapeSphere;
+      desc.radius = GetComponent<SphereCollider>().radius;
+      _ieShapeDescription = desc;
+
       _nextHandle++;
     }
 

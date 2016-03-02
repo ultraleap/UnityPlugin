@@ -13,8 +13,25 @@ namespace LeapInternal {
       public T value;
     }
 
-    private static StructContainer _container = new StructContainer();
-    private static int _sizeofT = Marshal.SizeOf(typeof(T));
+    private static StructContainer _container;
+    private static int _sizeofT;
+
+    private static GCHandle _tempHandle;
+    private static IntPtr _tempPtr;
+
+    static StructMarshal() {
+      _container = new StructContainer();
+      _sizeofT = Marshal.SizeOf(typeof(T));
+
+      _tempHandle = GCHandle.Alloc(_container, GCHandleType.Pinned);
+      _tempPtr = _tempHandle.AddrOfPinnedObject();
+    }
+
+    public static IntPtr StructToTempPtr(T t) {
+      _container.value = t;
+      Marshal.StructureToPtr(_container, _tempPtr, false);
+      return _tempPtr;
+    }
 
     /**
      * Converts an IntPtr to a struct of type T.  Does not allocate any
