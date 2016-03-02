@@ -75,10 +75,6 @@ public class LeapVRCameraControl : MonoBehaviour {
     if (!_hasDispatchedValidCameraParams) {
       CameraParams cameraParams = new CameraParams(_cachedCamera);
 
-      //Image retriever applies the values on it's own, but it might have applied them too early
-      //We force a re-apply now that the cameras have correct projection matrices
-      LeapImageRetriever.Instance.ApplyCameraProjectionValues();
-
       if(OnValidCameraParams != null) {
         OnValidCameraParams(cameraParams);
       }
