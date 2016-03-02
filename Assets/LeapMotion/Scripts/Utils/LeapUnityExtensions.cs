@@ -91,16 +91,6 @@ namespace Leap {
     }
 
     /**
-     * Converts a Leap Matrix object representing a translation to a 
-     * Unity Vector3 object.
-     * 
-     * @param matrix The Leap.Matrix to convert.
-     * @param mirror If true, the operation is reflected along the z axis.
-     */
-    public static Vector3 Translation(this Matrix matrix, bool mirror = false) {
-      return matrix.TransformPoint(LEAP_ORIGIN).ToVector3();
-    }
-    /**
      * 
      */
     public static Matrix GetLeapMatrix(Transform t) {
