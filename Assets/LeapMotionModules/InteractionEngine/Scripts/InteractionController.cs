@@ -16,16 +16,16 @@ namespace InteractionEngine {
       InteractionShape shape = new InteractionShape();
       _objects[obj] = shape;
 
+      //Don't register right away if we are not enabled, registration will be done in OnEnable
       if (enabled) {
         registerWithInteractionC(obj, shape);
       }
     }
 
-    
-
     public void UnregisterInteractionObject(InteractionObject obj) {
       InteractionShape shape = _objects[obj];
 
+      //Don't unregister if we are not enabled, everything already got unregistered in OnDisable
       if (enabled) {
         unregisterWithInteractionC(obj, shape);
       }
