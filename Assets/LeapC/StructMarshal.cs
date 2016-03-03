@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace LeapInternal {
@@ -16,21 +17,20 @@ namespace LeapInternal {
     private static StructContainer _container;
     private static int _sizeofT;
 
-    private static GCHandle _tempHandle;
-    private static IntPtr _tempPtr;
-
     static StructMarshal() {
       _container = new StructContainer();
       _sizeofT = Marshal.SizeOf(typeof(T));
-
-      _tempHandle = GCHandle.Alloc(_container, GCHandleType.Pinned);
-      _tempPtr = _tempHandle.AddrOfPinnedObject();
     }
 
-    public static IntPtr StructToTempPtr(T t) {
+    public static int Size {
+      get {
+        return _sizeofT;
+      }
+    }
+
+    public static void CopyIntoArray(IntPtr arrayPtr, T t, int index) {
       _container.value = t;
-      Marshal.StructureToPtr(_container, _tempPtr, false);
-      return _tempPtr;
+      Marshal.StructureToPtr(_container, new IntPtr(arrayPtr.ToInt64() + _sizeofT * index), false);
     }
 
     /**
@@ -47,6 +47,15 @@ namespace LeapInternal {
       }
     }
 
+
+
+
+    private static Stack<IntPtr> _tempPtrPool = new Stack<IntPtr>();
+    private static List<IntPtr> _allocatedPtrs = new List<IntPtr>();
+
+    private static IntPtr _tempArray;
+    private static int _tempArrayCount;
+
     /**
      * Converts a single element in an array pointed to by ptr to a struct
      * of type T.  This method does not and cannot do any bounds checking!
@@ -54,6 +63,41 @@ namespace LeapInternal {
      */
     public static T ArrayElementToStruct(IntPtr ptr, int arrayIndex) {
       return PtrToStruct(new IntPtr(ptr.ToInt64() + _sizeofT * arrayIndex));
+    }
+
+    public IntPtr GetTempArray(int count) {
+      if (count > _tempArrayCount) {
+        if (_tempArrayCount != 0) {
+          Marshal.FreeHGlobal(_tempArray);
+        }
+
+        _tempArray = Marshal.AllocHGlobal(_sizeofT * count);
+        _tempArrayCount = count;
+      }
+
+      return _tempArray;
+    }
+
+    public IntPtr AllocNewTemp(T t) {
+      IntPtr ptr;
+      if (_tempPtrPool.Count != 0) {
+        ptr = _tempPtrPool.Pop();
+      } else {
+        ptr = Marshal.AllocHGlobal(_sizeofT);
+      }
+
+      _container.value = t;
+      Marshal.StructureToPtr(_container, ptr, false);
+
+      _allocatedPtrs.Add(ptr);
+      return ptr;
+    }
+
+    public void ReleaseAllTemp() {
+      for (int i = 0; i < _allocatedPtrs.Count; i++) {
+        _tempPtrPool.Push(_allocatedPtrs[i]);
+      }
+      _allocatedPtrs.Clear();
     }
   }
 }

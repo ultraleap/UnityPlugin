@@ -107,49 +107,49 @@ namespace InteractionEngine.Internal {
   }
 
   public class InteractionC {
-    public const string DLL_NAME = "InteractionC";
+    public const string DLL_NAME = "LeapInteractionEngine";
 
     [DllImport(DLL_NAME, EntryPoint = "LeapIECreateScene")]
-    public static extern eLeapIERS LeapIECreateScene(ref LEAP_IE_SCENE scene);
+    public static extern eLeapIERS CreateScene(ref LEAP_IE_SCENE scene);
 
     [DllImport(DLL_NAME, EntryPoint = "LeapIEDestroyScene")]
-    public static extern eLeapIERS LeapIEDestroyScene(ref LEAP_IE_SCENE scene);
+    public static extern eLeapIERS DestroyScene(ref LEAP_IE_SCENE scene);
 
-    [DllImport(DLL_NAME, EntryPoint = "LeapIESetHands")]
-    public static extern eLeapIERS LeapIESetHands(ref LEAP_IE_SCENE scene,
-                                                  UInt32 nHands,
-                                                  IntPtr pHands /*LEAP_HAND*/);
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateHands")]
+    public static extern eLeapIERS UpdateHands(ref LEAP_IE_SCENE scene,
+                                               UInt32 nHands,
+                                               IntPtr pHands /*LEAP_HAND*/);
 
     [DllImport(DLL_NAME, EntryPoint = "LeapIEAddShapeDescription")]
-    public static extern eLeapIERS LeapIEAddShapeDescription(ref LEAP_IE_SCENE scene,
-                                                             IntPtr pDescription,
-                                                             ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
+    public static extern eLeapIERS AddShapeDescription(ref LEAP_IE_SCENE scene,
+                                                       IntPtr pDescription,
+                                                       ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
 
     [DllImport(DLL_NAME, EntryPoint = "LeapIERemoveShapeDescription")]
-    public static extern eLeapIERS LeapIERemoveShapeDescription(ref LEAP_IE_SCENE scene,
+    public static extern eLeapIERS RemoveShapeDescription(ref LEAP_IE_SCENE scene,
                                                                 ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
 
     [DllImport(DLL_NAME, EntryPoint = "LeapIECreateShape")]
-    public static extern eLeapIERS LeapIECreateShape(ref LEAP_IE_SCENE scene,
+    public static extern eLeapIERS CreateShape(ref LEAP_IE_SCENE scene,
                                                      ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle,
                                                      ref LEAP_IE_TRANSFORM transform,
                                                      ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
 
     [DllImport(DLL_NAME, EntryPoint = "LeapIEDestroyShape")]
-    public static extern eLeapIERS LeapIEDestroyShape(ref LEAP_IE_SCENE scene,
+    public static extern eLeapIERS DestroyShape(ref LEAP_IE_SCENE scene,
                                                       ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
 
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateShape")]
-    public static extern eLeapIERS LeapIEUpdateShape(ref LEAP_IE_SCENE scene,
+    public static extern eLeapIERS UpdateShape(ref LEAP_IE_SCENE scene,
                                                      ref LEAP_IE_TRANSFORM transform,
                                                      ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
 
-    [DllImport(DLL_NAME, EntryPoint = "LeapIEAdvance")]
-    public static extern eLeapIERS LeapIEAdvance(ref LEAP_IE_SCENE scene,
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateController")]
+    public static extern eLeapIERS UpdateController(ref LEAP_IE_SCENE scene,
                                                  ref LEAP_IE_TRANSFORM controllerTransform);
 
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetClassification")]
-    public static extern eLeapIERS LeapIEGetClassification(ref LEAP_IE_SCENE scene,
+    public static extern eLeapIERS GetClassification(ref LEAP_IE_SCENE scene,
                                                            ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
                                                            ref LEAP_IE_SHAPE_CLASSIFICATION classification);
   }

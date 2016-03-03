@@ -34,7 +34,7 @@ namespace InteractionEngine {
     }
 
     void OnEnable() {
-      InteractionC.LeapIECreateScene(ref _scene);
+      InteractionC.CreateScene(ref _scene);
 
       foreach (var pair in _objects) {
         registerWithInteractionC(pair.Key, pair.Value);
@@ -46,7 +46,7 @@ namespace InteractionEngine {
         unregisterWithInteractionC(pair.Key, pair.Value);
       }
 
-      InteractionC.LeapIEDestroyScene(ref _scene);
+      InteractionC.DestroyScene(ref _scene);
     }
 
     void FixedUpdate() {
@@ -67,14 +67,17 @@ namespace InteractionEngine {
         var instanceTransform = obj.IeTransform;
         var instanceHandle = shape.InstanceHandle;
 
-        InteractionC.LeapIEUpdateShape(ref _scene,
+        InteractionC.UpdateShape(ref _scene,
                                        ref instanceTransform,
                                        ref instanceHandle);
       }
     }
 
     private void updateIeTracking() {
-      //TODO: Marshal hand array into InteractionC
+      Frame frame = _leapProvider.CurrentFrame;
+      InteractionC.UpdateHands(ref _scene,
+                               (uint)frame.Hands.Count,
+                               frame.TempHandData);
     }
 
     private void simulateIe() {
@@ -83,7 +86,7 @@ namespace InteractionEngine {
       _controllerTransform.rotation = new LEAP_QUATERNION(_leapProvider.transform.rotation);
       _controllerTransform.wallTime = Time.fixedTime;
 
-      InteractionC.LeapIEAdvance(ref _scene, ref _controllerTransform);
+      InteractionC.UpdateController(ref _scene, ref _controllerTransform);
     }
 
     private void setObjectClassifications() {
@@ -94,7 +97,7 @@ namespace InteractionEngine {
         var instanceHandle = shape.InstanceHandle;
         var classification = new LEAP_IE_SHAPE_CLASSIFICATION();
 
-        InteractionC.LeapIEGetClassification(ref _scene,
+        InteractionC.GetClassification(ref _scene,
                                              ref instanceHandle,
                                              ref classification);
 
@@ -105,7 +108,7 @@ namespace InteractionEngine {
     private void registerWithInteractionC(InteractionObject obj, InteractionShape shape) {
       var shapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
 
-      InteractionC.LeapIEAddShapeDescription(ref _scene,
+      InteractionC.AddShapeDescription(ref _scene,
                                              obj.ShapeDescription,
                                              ref shapeHandle);
 
@@ -114,7 +117,7 @@ namespace InteractionEngine {
 
       var instanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
 
-      InteractionC.LeapIECreateShape(ref _scene,
+      InteractionC.CreateShape(ref _scene,
                                      ref shapeHandle,
                                      ref shapeTransform,
                                      ref instanceHandle);
@@ -124,11 +127,11 @@ namespace InteractionEngine {
 
     private void unregisterWithInteractionC(InteractionObject obj, InteractionShape shape) {
       var shapeHandle = shape.ShapeHandle;
-      InteractionC.LeapIERemoveShapeDescription(ref _scene,
+      InteractionC.RemoveShapeDescription(ref _scene,
                                                 ref shapeHandle);
 
       var instanceHandle = shape.InstanceHandle;
-      InteractionC.LeapIEDestroyShape(ref _scene,
+      InteractionC.DestroyShape(ref _scene,
                                       ref instanceHandle);
 
       shape.InstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();

@@ -5,11 +5,11 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap
-{
+namespace Leap {
   using System;
   using System.Collections.Generic;
   using System.Runtime.InteropServices;
+  using LeapInternal;
 
   /**
    * The Hand class reports the physical characteristics of a detected hand.
@@ -30,8 +30,7 @@ namespace Leap
    * Test for validity with the Hand::isValid() function.
    * @since 1.0
    */
-  public class Hand
-  {
+  public class Hand {
     private Matrix _basis = Matrix.Identity;
     private bool _needToCalculateBasis = true;
 
@@ -45,8 +44,7 @@ namespace Leap
      *
      * @since 1.0
      */
-    public Hand()
-    {
+    public Hand() {
       PalmPosition = Vector.Zero;
       StabilizedPalmPosition = Vector.Zero;
       PalmVelocity = Vector.Zero;
@@ -74,8 +72,7 @@ namespace Leap
                 Vector palmVelocity,
                 Vector palmNormal,
                 Vector direction,
-                Vector wristPosition)
-    {
+                Vector wristPosition) {
       FrameId = frameID;
       Id = id;
       Confidence = confidence;
@@ -96,8 +93,7 @@ namespace Leap
       WristPosition = wristPosition;
     }
 
-    public Hand TransformedCopy(Matrix trs)
-    {
+    public Hand TransformedCopy(Matrix trs) {
       List<Finger> transformedFingers = new List<Finger>(5);
       for (int f = 0; f < this.Fingers.Count; f++)
         transformedFingers.Add(Fingers[f].TransformedCopy(trs));
@@ -145,10 +141,8 @@ namespace Leap
      * hand in this frame; otherwise, an invalid Finger object is returned.
      * @since 1.0
      */
-    public Finger Finger(int id)
-    {
-      return this.Fingers.Find(delegate (Finger item)
-      {
+    public Finger Finger(int id) {
+      return this.Fingers.Find(delegate (Finger item) {
         return item.Id == id;
       });
     }
@@ -162,8 +156,7 @@ namespace Leap
      * exact same physical hand in the same frame and both Hand objects are valid.
      * @since 1.0
      */
-    public bool Equals(Hand other)
-    {
+    public bool Equals(Hand other) {
       return Id == other.Id && FrameId == other.FrameId;
     }
 
@@ -173,8 +166,7 @@ namespace Leap
      * @returns A description of the Hand as a string.
      * @since 1.0
      */
-    public override string ToString()
-    {
+    public override string ToString() {
       return string.Format(
         "Hand {0} {1}.",
         this.Id,
@@ -289,12 +281,9 @@ namespace Leap
      * @returns The basis of the hand as a matrix.
      * @since 2.0
      */
-    public Matrix Basis
-    {
-      get
-      {
-        if (_needToCalculateBasis)
-        {
+    public Matrix Basis {
+      get {
+        if (_needToCalculateBasis) {
           //TODO verify this calculation for both hands
           _basis.zBasis = -Direction;
           _basis.yBasis = -PalmNormal;
@@ -451,5 +440,64 @@ namespace Leap
      * @since 2.0.3
      */
     public Arm Arm { get; private set; }
+
+    /* Returns a temporary LEAP_HAND which matches the data contained within this Hand object.
+     * This LEAP_HAND is a temporary object which becomes invalid upon the next call to 
+     * the TempRawHand property of this Hand instance.
+     */
+    private StructMarshal<LEAP_PALM> _palmMarshal = new StructMarshal<LEAP_PALM>();
+    private StructMarshal<LEAP_BONE> _boneMarshal = new StructMarshal<LEAP_BONE>();
+    private StructMarshal<LEAP_DIGIT> _digitMarshal = new StructMarshal<LEAP_DIGIT>();
+    public LEAP_HAND TempRawHand {
+      get {
+        LEAP_HAND leapHand = new LEAP_HAND();
+        leapHand.id = (uint)Id;
+        leapHand.type = IsLeft ? eLeapHandType.eLeapHandType_Left : eLeapHandType.eLeapHandType_Right;
+        leapHand.confidence = Confidence;
+        leapHand.visible_time = (uint)(TimeVisible * 1000);
+
+        LEAP_PALM palm = new LEAP_PALM();
+        palm.position = new LEAP_VECTOR(PalmPosition);
+        palm.stabilized_position = new LEAP_VECTOR(StabilizedPalmPosition);
+        palm.velocity = new LEAP_VECTOR(PalmVelocity);
+        palm.normal = new LEAP_VECTOR(PalmNormal);
+        palm.width = PalmWidth;
+        palm.direction = new LEAP_VECTOR(Direction);
+
+        _palmMarshal.ReleaseAllTemp();
+        leapHand.palm = _palmMarshal.AllocNewTemp(palm);
+
+        _boneMarshal.ReleaseAllTemp();
+        leapHand.arm = _boneMarshal.AllocNewTemp(Arm.RawBone);
+
+        _digitMarshal.ReleaseAllTemp();
+        for (int i = 0; i < Fingers.Count; i++) {
+          Finger finger = Fingers[i];
+          switch (finger.Type) {
+            case Leap.Finger.FingerType.TYPE_THUMB:
+              leapHand.thumb = _digitMarshal.AllocNewTemp(finger.RawDigit);
+              break;
+            case Leap.Finger.FingerType.TYPE_INDEX:
+              leapHand.index = _digitMarshal.AllocNewTemp(finger.RawDigit);
+              break;
+            case Leap.Finger.FingerType.TYPE_MIDDLE:
+              leapHand.middle = _digitMarshal.AllocNewTemp(finger.RawDigit);
+              break;
+            case Leap.Finger.FingerType.TYPE_RING:
+              leapHand.ring = _digitMarshal.AllocNewTemp(finger.RawDigit);
+              break;
+            case Leap.Finger.FingerType.TYPE_PINKY:
+              leapHand.pinky = _digitMarshal.AllocNewTemp(finger.RawDigit);
+              break;
+            default:
+              throw new Exception("Unexpected Finger Type " + finger.Type);
+          }
+        }
+
+        return leapHand;
+      }
+    }
+
+
   }
 }

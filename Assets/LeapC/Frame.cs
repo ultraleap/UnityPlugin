@@ -7,11 +7,11 @@
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
 
-namespace Leap
-{
+namespace Leap {
   using System;
   using System.Collections.Generic;
   using System.Runtime.InteropServices;
+  using LeapInternal;
 
   /**
    * The Frame class represents a set of hand and finger tracking data detected
@@ -27,9 +27,8 @@ namespace Leap
    * Implement a Listener subclass to receive a callback event when a new Frame is available.
    * @since 1.0
    */
-  public class Frame:
-    IEquatable<Frame>
-  {
+  public class Frame :
+    IEquatable<Frame> {
     TrackedQuad _trackedQuad = new TrackedQuad();
     /**
      * Constructs a Frame object.
@@ -46,7 +45,7 @@ namespace Leap
      * @since 1.0
      */
     public Frame() {
-      Hands = new List<Hand> ();
+      Hands = new List<Hand>();
       InteractionBox = new InteractionBox(
         new Vector(0, 200, 0),
         new Vector(200, 200, 200)
@@ -63,8 +62,7 @@ namespace Leap
      * @since 3.0
      */
     public Frame(long id, long timestamp, float fps, InteractionBox interactionBox, List<Hand> hands) :
-      this()
-    {
+      this() {
       Id = id;
       Timestamp = timestamp;
       CurrentFramesPerSecond = fps;
@@ -80,8 +78,7 @@ namespace Leap
      * @returns a new Frame object with the transform applied.
      * @since 3.0
      */
-    public Frame TransformedCopy(Matrix trs)
-    {
+    public Frame TransformedCopy(Matrix trs) {
       Frame transformedFrame = new Frame(
         Id,
         Timestamp,
@@ -101,10 +98,8 @@ namespace Leap
      *
      * @since 2.1.0
      */
-    public byte[] Serialize
-    {
-      get
-      {
+    public byte[] Serialize {
+      get {
         byte[] ptr = new byte[1];
         ptr[1] = 0;
         return ptr;
@@ -137,8 +132,7 @@ namespace Leap
      * @param arg A byte array containing the bytes of a serialized frame.
      * @since 2.1.0
      */
-    public void Deserialize(byte[] arg)
-    {
+    public void Deserialize(byte[] arg) {
 
     }
 
@@ -162,10 +156,8 @@ namespace Leap
      * otherwise, an invalid Hand object is returned.
      * @since 1.0
      */
-    public Hand Hand(int id)
-    {
-      return this.Hands.Find(delegate (Hand item)
-      {
+    public Hand Hand(int id) {
+      return this.Hands.Find(delegate (Hand item) {
         return item.Id == id;
       });
     }
@@ -179,8 +171,7 @@ namespace Leap
      * the exact same frame of tracking data and both Frame objects are valid.
      * @since 1.0
      */
-    public bool Equals(Frame other)
-    {
+    public bool Equals(Frame other) {
       return this.Id == other.Id && this.Timestamp == other.Timestamp;
     }
 
@@ -190,8 +181,7 @@ namespace Leap
      * @returns A description of the Frame as a string.
      * @since 1.0
      */
-    public override string ToString()
-    {
+    public override string ToString() {
       return "Frame id: " + this.Id + " timestamp: " + this.Timestamp;
     }
 
@@ -263,8 +253,7 @@ namespace Leap
      */
     public InteractionBox InteractionBox { get; private set; }
 
-    public int SerializeLength
-    {
+    public int SerializeLength {
       get { return 0; }
     }
 
@@ -278,18 +267,32 @@ namespace Leap
      * If no quad is being tracked, then an invalid TrackedQuad is returned.
      * @since 2.2.6
      **/
-    public TrackedQuad TrackedQuad
-    {
-      get
-      {
+    public TrackedQuad TrackedQuad {
+      get {
         if (_trackedQuad == null)
           _trackedQuad = new TrackedQuad();
 
         return _trackedQuad;
       }
-      set
-      {
+      set {
         _trackedQuad = value;
+      }
+    }
+
+    /**
+     * Returns an IntPtr pointing to an array of LEAP_HAND objects that represent the
+     * hands contained in this frame.  This is a temporary IntPtr which becomes invalid
+     * upon the next call to the TempHandData property for this Frame instance.
+     */
+    private StructMarshal<LEAP_HAND> _handMarshal = new StructMarshal<LEAP_HAND>();
+    public IntPtr TempHandData {
+      get {
+        IntPtr tempArray = _handMarshal.GetTempArray(Hands.Count);
+        for (int i = 0; i < Hands.Count; i++) {
+          StructMarshal<LEAP_HAND>.CopyIntoArray(tempArray, Hands[i].TempRawHand, i);
+        }
+
+        return tempArray;
       }
     }
   }

@@ -31,11 +31,15 @@ namespace InteractionEngine {
     protected virtual void Start() { }
 
     protected virtual void OnEnable() {
-      _controller.RegisterInteractionObject(this);
+      if (_controller != null) {
+        _controller.RegisterInteractionObject(this);
+      }
     }
 
     protected virtual void OnDisable() {
-      _controller.UnregisterInteractionObject(this);
+      if (_controller != null) {
+        _controller.UnregisterInteractionObject(this);
+      }
     }
 
     protected virtual void Update() { }

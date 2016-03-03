@@ -5,10 +5,10 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap
-{
+namespace Leap {
   using System;
   using System.Runtime.InteropServices;
+  using LeapInternal;
 
   /**
    * The Finger class represents a tracked finger.
@@ -24,8 +24,7 @@ namespace Leap
    * will be discontinuous unless they have a corresponding ID exchange.
    * @since 1.0
    */
-  public class Finger
-  {
+  public class Finger {
     Bone[] _bones = new Bone[4];
     long _frameId = -1;
 
@@ -34,7 +33,7 @@ namespace Leap
      *
      * @since 1.0
      */
-    public Finger() {}
+    public Finger() { }
 
     /**
      * Constructs a finger.
@@ -76,8 +75,7 @@ namespace Leap
                   Bone metacarpal,
                   Bone proximal,
                   Bone intermediate,
-                  Bone distal)
-    {
+                  Bone distal) {
       Type = type;
       _bones[0] = metacarpal;
       _bones[1] = proximal;
@@ -103,8 +101,7 @@ namespace Leap
      * of the copied finger.
      * @since 3.0
      */
-    public Finger TransformedCopy(Matrix trs)
-    {
+    public Finger TransformedCopy(Matrix trs) {
       float dScale = trs.zBasis.Magnitude;
       float hScale = trs.xBasis.Magnitude;
       return new Finger(_frameId,
@@ -136,8 +133,7 @@ namespace Leap
      * @returns The Bone that has the specified bone type.
      * @since 2.0
      */
-    public Bone Bone(Bone.BoneType boneIx)
-    {
+    public Bone Bone(Bone.BoneType boneIx) {
       return _bones[(int)boneIx];
     }
 
@@ -149,8 +145,7 @@ namespace Leap
      * @returns A description of the Finger object as a string.
      * @since 1.0
      */
-    public override string ToString()
-    {
+    public override string ToString() {
       return Enum.GetName(typeof(FingerType), Type) + " id:" + Id;
     }
 
@@ -302,8 +297,23 @@ namespace Leap
      * Finger object.
      * @since 2.0
      */
-    public enum FingerType
-    {
+
+    public LEAP_DIGIT RawDigit {
+      get {
+        LEAP_DIGIT digit = new LEAP_DIGIT();
+        digit.finger_id = Id;
+        digit.metacarpal = Bone(Leap.Bone.BoneType.TYPE_METACARPAL).RawBone;
+        digit.proximal = Bone(Leap.Bone.BoneType.TYPE_PROXIMAL).RawBone;
+        digit.intermediate = Bone(Leap.Bone.BoneType.TYPE_INTERMEDIATE).RawBone;
+        digit.distal = Bone(Leap.Bone.BoneType.TYPE_DISTAL).RawBone;
+        digit.tip_velocity = new LEAP_VECTOR(TipVelocity);
+        digit.stabilized_tip_position = new LEAP_VECTOR(StabilizedTipPosition);
+        digit.is_extended = IsExtended ? 1 : 0;
+        return digit;
+      }
+    }
+
+    public enum FingerType {
       TYPE_THUMB = 0,
       TYPE_INDEX = 1,
       TYPE_MIDDLE = 2,
