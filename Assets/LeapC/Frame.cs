@@ -284,10 +284,13 @@ namespace Leap {
      * hands contained in this frame.  This is a temporary IntPtr which becomes invalid
      * upon the next call to the TempHandData property for this Frame instance.
      */
-    private StructMarshal<LEAP_HAND> _handMarshal = new StructMarshal<LEAP_HAND>();
     public IntPtr TempHandData {
       get {
-        IntPtr tempArray = _handMarshal.GetTempArray(Hands.Count);
+        StructMarshal<LEAP_PALM>.ReleaseAllTemp();
+        StructMarshal<LEAP_BONE>.ReleaseAllTemp();
+        StructMarshal<LEAP_DIGIT>.ReleaseAllTemp();
+
+        IntPtr tempArray = StructMarshal<LEAP_HAND>.GetTempArray(Hands.Count);
         for (int i = 0; i < Hands.Count; i++) {
           StructMarshal<LEAP_HAND>.CopyIntoArray(tempArray, Hands[i].TempRawHand, i);
         }

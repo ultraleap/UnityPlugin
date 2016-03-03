@@ -8,7 +8,7 @@ namespace LeapInternal {
   /**
    * A helper class to marshal from unmanaged memory into structs without creating garbage.
    */
-  public class StructMarshal<T> where T : struct {
+  public static class StructMarshal<T> where T : struct {
     [StructLayout(LayoutKind.Sequential)]
     private class StructContainer {
       public T value;
@@ -65,7 +65,7 @@ namespace LeapInternal {
       return PtrToStruct(new IntPtr(ptr.ToInt64() + _sizeofT * arrayIndex));
     }
 
-    public IntPtr GetTempArray(int count) {
+    public static IntPtr GetTempArray(int count) {
       if (count > _tempArrayCount) {
         if (_tempArrayCount != 0) {
           Marshal.FreeHGlobal(_tempArray);
@@ -78,7 +78,7 @@ namespace LeapInternal {
       return _tempArray;
     }
 
-    public IntPtr AllocNewTemp(T t) {
+    public static IntPtr AllocNewTemp(T t) {
       IntPtr ptr;
       if (_tempPtrPool.Count != 0) {
         ptr = _tempPtrPool.Pop();
@@ -93,7 +93,7 @@ namespace LeapInternal {
       return ptr;
     }
 
-    public void ReleaseAllTemp() {
+    public static void ReleaseAllTemp() {
       for (int i = 0; i < _allocatedPtrs.Count; i++) {
         _tempPtrPool.Push(_allocatedPtrs[i]);
       }

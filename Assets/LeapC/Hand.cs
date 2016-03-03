@@ -445,9 +445,6 @@ namespace Leap {
      * This LEAP_HAND is a temporary object which becomes invalid upon the next call to 
      * the TempRawHand property of this Hand instance.
      */
-    private StructMarshal<LEAP_PALM> _palmMarshal = new StructMarshal<LEAP_PALM>();
-    private StructMarshal<LEAP_BONE> _boneMarshal = new StructMarshal<LEAP_BONE>();
-    private StructMarshal<LEAP_DIGIT> _digitMarshal = new StructMarshal<LEAP_DIGIT>();
     public LEAP_HAND TempRawHand {
       get {
         LEAP_HAND leapHand = new LEAP_HAND();
@@ -463,31 +460,27 @@ namespace Leap {
         palm.normal = new LEAP_VECTOR(PalmNormal);
         palm.width = PalmWidth;
         palm.direction = new LEAP_VECTOR(Direction);
-
-        _palmMarshal.ReleaseAllTemp();
-        leapHand.palm = _palmMarshal.AllocNewTemp(palm);
-
-        _boneMarshal.ReleaseAllTemp();
-        leapHand.arm = _boneMarshal.AllocNewTemp(Arm.RawBone);
-
-        _digitMarshal.ReleaseAllTemp();
+        
+        leapHand.palm = StructMarshal<LEAP_PALM>.AllocNewTemp(palm);
+        leapHand.arm = StructMarshal<LEAP_BONE>.AllocNewTemp(Arm.RawBone);
+        
         for (int i = 0; i < Fingers.Count; i++) {
           Finger finger = Fingers[i];
           switch (finger.Type) {
             case Leap.Finger.FingerType.TYPE_THUMB:
-              leapHand.thumb = _digitMarshal.AllocNewTemp(finger.RawDigit);
+              leapHand.thumb = StructMarshal<LEAP_DIGIT>.AllocNewTemp(finger.RawDigit);
               break;
             case Leap.Finger.FingerType.TYPE_INDEX:
-              leapHand.index = _digitMarshal.AllocNewTemp(finger.RawDigit);
+              leapHand.index = StructMarshal<LEAP_DIGIT>.AllocNewTemp(finger.RawDigit);
               break;
             case Leap.Finger.FingerType.TYPE_MIDDLE:
-              leapHand.middle = _digitMarshal.AllocNewTemp(finger.RawDigit);
+              leapHand.middle = StructMarshal<LEAP_DIGIT>.AllocNewTemp(finger.RawDigit);
               break;
             case Leap.Finger.FingerType.TYPE_RING:
-              leapHand.ring = _digitMarshal.AllocNewTemp(finger.RawDigit);
+              leapHand.ring = StructMarshal<LEAP_DIGIT>.AllocNewTemp(finger.RawDigit);
               break;
             case Leap.Finger.FingerType.TYPE_PINKY:
-              leapHand.pinky = _digitMarshal.AllocNewTemp(finger.RawDigit);
+              leapHand.pinky = StructMarshal<LEAP_DIGIT>.AllocNewTemp(finger.RawDigit);
               break;
             default:
               throw new Exception("Unexpected Finger Type " + finger.Type);
