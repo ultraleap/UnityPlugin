@@ -22,16 +22,15 @@ namespace InteractionEngine {
         transform.rotation = value.rotation.ToUnityRotation();
       }
     }
-
-    private StructMarshal<LEAP_IE_SPHERE_DESCRIPTION> _sphereMarshal = new StructMarshal<LEAP_IE_SPHERE_DESCRIPTION>();
+    
     public override IntPtr ShapeDescription {
       get {
         LEAP_IE_SPHERE_DESCRIPTION sphereDesc = new LEAP_IE_SPHERE_DESCRIPTION();
         sphereDesc.shape.type = eLeapIEShapeType.eLeapIERS_ShapeSphere;
         sphereDesc.radius = _sphereCollider.radius;
 
-        _sphereMarshal.ReleaseAllTemp();
-        IntPtr ptr = _sphereMarshal.AllocNewTemp(sphereDesc);
+        StructMarshal<LEAP_IE_SPHERE_DESCRIPTION>.ReleaseAllTemp();
+        IntPtr ptr = StructMarshal<LEAP_IE_SPHERE_DESCRIPTION>.AllocNewTemp(sphereDesc);
         return ptr;
       }
     }
