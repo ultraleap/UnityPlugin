@@ -22,15 +22,6 @@ public class LeapImageRetriever : MonoBehaviour {
   public const int RIGHT_IMAGE_INDEX = 1;
   public const float IMAGE_SETTING_POLL_RATE = 2.0f;
 
-  private static LeapImageRetriever _instance = null;
-  public static LeapImageRetriever Instance {
-    get {
-      if (_instance == null) {
-        Debug.LogError("Could not find an instance of LeapImageRetriever in the scene!  Make sure one exists and is enabled!");
-      }
-      return _instance;
-    }
-  }
 
   [SerializeField]
   LeapProvider provider;
@@ -277,24 +268,19 @@ public class LeapImageRetriever : MonoBehaviour {
   }
 #endif
 
-  void Awake() {
-    if (_instance != null && _instance != this) {
-      Debug.LogError("Can only have one instance of LeapImageRetriever in the scene!  This one has been destroyed!");
-      DestroyImmediate(this);
-      return;
-    }
-
-    _instance = this;
-  }
-
   void Start() {
     if (provider == null) {
       Debug.LogWarning("Cannot use LeapImageRetriever if there is no LeapProvider!");
       enabled = false;
       return;
     }
-
+    LeapVRCameraControl.OnValidCameraParams += HandleOnValidCameraParams;
     ApplyGammaCorrectionValues();
+    ApplyCameraProjectionValues();
+
+  }
+
+  void HandleOnValidCameraParams(LeapVRCameraControl.CameraParams camParams) {
     ApplyCameraProjectionValues();
   }
 
@@ -310,16 +296,6 @@ public class LeapImageRetriever : MonoBehaviour {
 
   void OnDisable() {
     provider.GetLeapController().DistortionChange -= onDistortionChange;
-
-    if (_instance == this) {
-      _instance = null;
-    }
-  }
-
-  void OnDestroy() {
-    if (_instance == this) {
-      _instance = null;
-    }
   }
 
   void OnPreRender() {

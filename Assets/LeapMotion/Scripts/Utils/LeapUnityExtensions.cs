@@ -20,7 +20,7 @@ namespace Leap {
     /** Scale factor from Leap units (millimeters) to Unity units (meters). */
     public const float INPUT_SCALE = 0.001f;
     /** Constant used when converting from right-handed to left-handed axes.*/
-    public static readonly Vector3 Z_FLIP = new Vector3(1, 1, 1);
+    public static readonly Vector3 Z_FLIP = new Vector3(1, 1, -1);
 
     /** 
      * Converts a direction vector from Leap to Unity. (Does not scale.) 
@@ -90,16 +90,6 @@ namespace Leap {
       return Quaternion.LookRotation(forward, up);
     }
 
-    /**
-     * Converts a Leap Matrix object representing a translation to a 
-     * Unity Vector3 object.
-     * 
-     * @param matrix The Leap.Matrix to convert.
-     * @param mirror If true, the operation is reflected along the z axis.
-     */
-    public static Vector3 Translation(this Matrix matrix, bool mirror = false) {
-      return matrix.TransformPoint(LEAP_ORIGIN).ToUnityScaled();
-    }
     /**
      * 
      */

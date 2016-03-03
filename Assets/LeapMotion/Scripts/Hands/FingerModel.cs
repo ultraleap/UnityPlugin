@@ -118,7 +118,7 @@ public abstract class FingerModel : MonoBehaviour {
   /** Returns the location of the tip of the finger */
   public Vector3 GetTipPosition() {
     if (finger_ != null) {
-      Vector3 local_tip = finger_.Bone ((Bone.BoneType.TYPE_DISTAL)).NextJoint.ToUnityScaled ();
+      Vector3 local_tip = finger_.Bone ((Bone.BoneType.TYPE_DISTAL)).NextJoint.ToVector3();
       return local_tip;
 
     }
@@ -134,7 +134,7 @@ public abstract class FingerModel : MonoBehaviour {
       return GetTipPosition ();
     }
     if (finger_ != null) {
-      Vector3 local_position = finger_.Bone ((Bone.BoneType)(joint)).PrevJoint.ToUnityScaled ();
+      Vector3 local_position = finger_.Bone((Bone.BoneType)(joint)).PrevJoint.ToVector3();
       return local_position;
 
     }
@@ -154,7 +154,7 @@ public abstract class FingerModel : MonoBehaviour {
   public Vector3 GetBoneCenter(int bone_type) {
     if (finger_ != null) {
       Bone bone = finger_.Bone ((Bone.BoneType)(bone_type));
-      return bone.Center.ToUnityScaled();
+      return bone.Center.ToVector3();
 
     }
     if (bones [bone_type]) {
