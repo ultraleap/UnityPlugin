@@ -656,20 +656,6 @@ namespace LeapInternal
       return callResult;
     }
 
-    //Utility function
-    public static T PtrToStruct<T>(IntPtr ptr) where T : struct
-    {
-      try
-      {
-        return (T)Marshal.PtrToStructure(ptr, typeof(T));
-      }
-      catch (Exception e)
-      {
-        Logger.Log("Problem converting structure " + typeof(T).ToString() + " from ptr " + ptr.ToString() + " : " + e.Message);
-        return new T();
-      }
-    }
-
 
   }//end LeapC
 } //end LeapInternal namespace
