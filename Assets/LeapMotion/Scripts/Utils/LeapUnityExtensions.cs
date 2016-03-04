@@ -79,14 +79,14 @@ namespace Leap {
      * Converts a Leap Matrix object representing a rotation to a 
      * Unity Quaternion.
      * 
+     * In previous version prior 4.0.0 this function performed a conversion to Unity's left-handed coordinate system, and now does not.
+     * 
      * @param matrix The Leap.Matrix to convert.
      * @param mirror If true, the operation is reflected along the z axis.
      */
     public static Quaternion Rotation(this Matrix matrix) {
-      //Vector3 up = matrix.TransformDirection(LEAP_UP).ToUnity(mirror);
-      //Vector3 forward = matrix.TransformDirection(LEAP_FORWARD).ToUnity(mirror);
-      Vector3 up = matrix.yBasis.ToUnity();
-      Vector3 forward = -matrix.zBasis.ToUnity();
+      Vector3 up = matrix.yBasis.ToVector3();
+      Vector3 forward = -matrix.zBasis.ToVector3();
       return Quaternion.LookRotation(forward, up);
     }
 

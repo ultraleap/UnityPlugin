@@ -63,9 +63,7 @@ namespace Leap
 
         public bool IsComplete{
             get{
-              if (imageData != null)
                 return imageData.isComplete;
-              return false;
             }
         }
 
