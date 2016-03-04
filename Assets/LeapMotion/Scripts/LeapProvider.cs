@@ -136,7 +136,6 @@ namespace Leap {
       //which frame to deliver
     }
     public virtual Frame GetFixedFrame() {
-      int fixedFrameIndex = 0;
       //Aproximate the correct timestamp given the current fixed time
       float correctedTimestamp = (Time.fixedTime + smoothedFixedUpdateOffset_.value) * S_TO_NS;
 
