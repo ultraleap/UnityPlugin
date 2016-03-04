@@ -10,16 +10,18 @@ namespace LeapInternal
     using System;
     using Leap;
 
-    public class ImageReference
+    public class ImageFuture
     {
         public Image imageObject{get; set;}
         public ImageData imageData{get; set;}
         public long Timestamp{get; set;}
+        public LEAP_IMAGE_FRAME_REQUEST_TOKEN Token;
 
-        public ImageReference(Image image, ImageData data, long timestamp){
+        public ImageFuture(Image image, ImageData data, long timestamp, LEAP_IMAGE_FRAME_REQUEST_TOKEN token){
             this.imageObject = image;
             this.imageData = data;
             this.Timestamp = timestamp;
+            this.Token = token;
         }
     }
 }

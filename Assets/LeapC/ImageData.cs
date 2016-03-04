@@ -82,6 +82,7 @@ namespace LeapInternal
             this.index = 0;
             this.isComplete = false;
         }
+
         public IntPtr getPinnedHandle(){
             if(pixelBuffer == null)
                 return IntPtr.Zero;
