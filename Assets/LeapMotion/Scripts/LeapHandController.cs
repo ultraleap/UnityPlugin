@@ -70,17 +70,7 @@ namespace Leap {
       Provider = GetComponent<LeapProvider>();
       Factory = GetComponent<HandFactory>();
     }
-    /**
-    * Turns off collisions between the specified GameObject and all hands.
-    * Subject to the limitations of Unity Physics.IgnoreCollisions(). 
-    * See http://docs.unity3d.com/ScriptReference/Physics.IgnoreCollision.html.
-    */
-    public void IgnoreCollisionsWithHands(GameObject to_ignore, bool ignore = true) {
-      foreach (HandRepresentation rep in physicsReps.Values) {
-        //Todo move this to HandModel
-        //Leap.Utils.IgnoreCollisions(rep.handModel.gameObject, to_ignore, ignore);
-      }
-    }
+
     /** Updates the graphics HandRepresentations. */
     void Update() {
       Frame frame = Provider.CurrentFrame;
