@@ -26,7 +26,7 @@ namespace InteractionEngine {
     public override IntPtr ShapeDescription {
       get {
         LEAP_IE_SPHERE_DESCRIPTION sphereDesc = new LEAP_IE_SPHERE_DESCRIPTION();
-        sphereDesc.shape.type = eLeapIEShapeType.eLeapIERS_ShapeSphere;
+        sphereDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Sphere;
         sphereDesc.radius = _sphereCollider.radius;
 
         StructMarshal<LEAP_IE_SPHERE_DESCRIPTION>.ReleaseAllTemp();
