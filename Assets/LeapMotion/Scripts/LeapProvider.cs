@@ -145,7 +145,6 @@ namespace Leap {
       //which frame to deliver
     }
     public virtual Frame GetFixedFrame() {
-
       //Aproximate the correct timestamp given the current fixed time
       float correctedTimestamp = (Time.fixedTime + smoothedFixedUpdateOffset_.value) * S_TO_NS;
 
@@ -153,8 +152,7 @@ namespace Leap {
       Frame closestFrame = leap_controller_.Frame();
       for (int searchHistoryIndex = 0; searchHistoryIndex < 60; searchHistoryIndex++) {
 
-        leapMat = UnityMatrixExtension.GetLeapMatrix(this.transform);
-        Frame historyFrame = leap_controller_.GetTransformedFrame(leapMat, searchHistoryIndex);
+        Frame historyFrame = leap_controller_.Frame(searchHistoryIndex);
 
         //If we reach an invalid frame, terminate the search
         if (historyFrame.Id < 0) {
@@ -169,7 +167,8 @@ namespace Leap {
           break;
         }
       }
-      return closestFrame;
+      leapMat = UnityMatrixExtension.GetLeapMatrix(this.transform);
+      return closestFrame.TransformedCopy(leapMat);
     }
     void OnDestroy() {
       //DestroyAllHands();
