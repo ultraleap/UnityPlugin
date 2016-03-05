@@ -18,14 +18,14 @@ namespace InteractionEngine {
     private OneToOneMap<InteractionObject, InteractionShape> _objects = new OneToOneMap<InteractionObject, InteractionShape>();
     private LEAP_IE_SCENE _scene;
 
-    public eLeapIEDebugVisualisationFlags DebugVisualizationFlags {
+    public eLeapIEDebugFlags DebugVisualizationFlags {
       get {
-        eLeapIEDebugVisualisationFlags flags = eLeapIEDebugVisualisationFlags.eLeapIEDebugVisualisationFlags_None;
+        eLeapIEDebugFlags flags = eLeapIEDebugFlags.eLeapIEDebugVisualisationFlags_None;
         if (_showDebugLines) {
-          flags |= eLeapIEDebugVisualisationFlags.eLeapIEDebugVisualisationFlags_LinesInternal;
+          flags |= eLeapIEDebugFlags.eLeapIEDebugVisualisationFlags_LinesInternal;
         }
         if (_showDebugBounds) {
-          flags |= eLeapIEDebugVisualisationFlags.eLeapIEDebugVisualisationFlags_Bounds;
+          flags |= eLeapIEDebugFlags.eLeapIEDebugVisualisationFlags_Bounds;
         }
         return flags;
       }

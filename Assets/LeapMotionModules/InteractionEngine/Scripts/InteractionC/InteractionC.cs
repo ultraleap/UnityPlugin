@@ -27,11 +27,12 @@ namespace InteractionEngine.Internal {
     eLeapIEClassification_ForceTo32Bits = 0x10000000
   }
 
-  public enum eLeapIEDebugVisualisationFlags {
-    eLeapIEDebugVisualisationFlags_None,
-    eLeapIEDebugVisualisationFlags_LinesInternal = 0x01,
-    eLeapIEDebugVisualisationFlags_Bounds = 0x02,
-    eLeapIEDebugVisualisationFlags_ForceTo32Bits = 0x10000000
+  public enum eLeapIEDebugFlags {
+    eLeapIEDebugFlags_None,
+    eLeapIEDebugFlags_LinesInternal = 0x01,
+    eLeapIEDebugFlags_RecordToFile = 0x02,
+    eLeapIEDebugFlags_RecordToAnalytics = 0x03,
+    eLeapIEDebugFlags_ForceTo32Bits = 0x10000000
   };
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -193,6 +194,29 @@ namespace InteractionEngine.Internal {
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateController")]
     public static extern eLeapIERS UpdateController(ref LEAP_IE_SCENE scene,
                                                     ref LEAP_IE_TRANSFORM controllerTransform);
+
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEAnnotate")]
+    public static extern eLeapIERS Annotate(ref LEAP_IE_SCENE scene,
+                                            ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
+                                            UInt32 type,
+                                            UInt32 bytes,
+                                            IntPtr data);
+
+    public static eLeapIERS Annotate(ref LEAP_IE_SCENE scene,
+                                     ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
+                                     UInt32 type) {
+      return Annotate(ref scene, ref instance, type, 0, new IntPtr(0));
+    }
+
+    public static eLeapIERS Annotate<T>(ref LEAP_IE_SCENE scene,
+                                       ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
+                                       UInt32 type,
+                                       T t) where T : struct {
+      IntPtr tmpPtr = StructMarshal<T>.AllocNewTemp(t);
+      var ret = Annotate(ref scene, ref instance, type, (UInt32)StructMarshal<T>.Size, tmpPtr);
+      StructMarshal<T>.ReleaseAllTemp();
+      return ret;
+    }
 
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetClassification")]
     public static extern eLeapIERS GetClassification(ref LEAP_IE_SCENE scene,
