@@ -2,6 +2,10 @@
 using System.Collections;
 using LeapInternal;
 using Leap;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 
 namespace Leap {
   public class LeapProvider :
@@ -122,7 +126,12 @@ namespace Leap {
 
     // Update is called once per frame
     void Update() {
-
+#if UNITY_EDITOR
+      if (EditorApplication.isCompiling) {
+        EditorApplication.isPlaying = false;
+        Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
+      }
+#endif
       leapMat = UnityMatrixExtension.GetLeapMatrix(this.transform);
       CurrentFrame = leap_controller_.GetTransformedFrame(leapMat, 0);
       //perFrameFixedUpdateOffset_ contains the maximum offset of this Update cycle

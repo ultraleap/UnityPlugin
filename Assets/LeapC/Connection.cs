@@ -208,12 +208,10 @@ namespace LeapInternal
               handleTrackingMessage(ref tracking_evt);
               break;
             case eLeapEventType.eLeapEventType_ImageComplete:
-              completeCount++;
               LEAP_IMAGE_COMPLETE_EVENT image_complete_evt = StructMarshal<LEAP_IMAGE_COMPLETE_EVENT>.PtrToStruct(_msg.eventStructPtr);
               handleImageCompletion(ref image_complete_evt);
               break;
             case eLeapEventType.eLeapEventType_ImageRequestError:
-              failedCount++;
               LEAP_IMAGE_FRAME_REQUEST_ERROR_EVENT failed_image_evt = StructMarshal<LEAP_IMAGE_FRAME_REQUEST_ERROR_EVENT>.PtrToStruct(_msg.eventStructPtr);
               handleFailedImageRequest(ref failed_image_evt);
               break;
@@ -259,9 +257,7 @@ namespace LeapInternal
       this.LeapFrame.Dispatch<FrameEventArgs>(this, new FrameEventArgs(newFrame));
     }
 
-    int requestCount = 0;
-    int completeCount = 0;
-    int failedCount = 0;
+
     public Image RequestImages(Int64 frameId, Image.ImageType imageType)
     {
       ImageData imageData;
@@ -827,3 +823,4 @@ namespace LeapInternal
     }
   }
 }
+
