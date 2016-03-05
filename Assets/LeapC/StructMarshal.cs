@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace LeapInternal {
@@ -16,8 +16,7 @@ namespace LeapInternal {
     private static int _sizeofT = Marshal.SizeOf(typeof(T));
 
     /**
-     * Converts an IntPtr to a struct of type T.  Does not allocate any
-     * garbage unlike Marshal.PtrToStruct(IntPtr, Type).
+     * Converts an IntPtr to a struct of type T.
      */
     public static T PtrToStruct(IntPtr ptr) {
       try {

@@ -581,6 +581,7 @@ namespace LeapInternal
 
     [DllImport("LeapC", EntryPoint = "LeapRequestImages")]
     public static extern eLeapRS RequestImages(IntPtr hConnection, ref LEAP_IMAGE_FRAME_DESCRIPTION description, out LEAP_IMAGE_FRAME_REQUEST_TOKEN pToken);
+
     [DllImport("LeapC", EntryPoint = "LeapCancelImageFrameRequest")]
     public static extern eLeapRS CancelImageFrameRequest(IntPtr hConnection, LEAP_IMAGE_FRAME_REQUEST_TOKEN token);
 
