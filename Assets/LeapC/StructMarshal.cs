@@ -33,8 +33,7 @@ namespace LeapInternal {
     }
 
     /**
-     * Converts an IntPtr to a struct of type T.  Does not allocate any
-     * garbage unlike Marshal.PtrToStruct(IntPtr, Type).
+     * Converts an IntPtr to a struct of type T.
      */
     public static T PtrToStruct(IntPtr ptr) {
       try {
@@ -45,9 +44,6 @@ namespace LeapInternal {
         return new T();
       }
     }
-
-
-
 
     private static Stack<IntPtr> _tempPtrPool = new Stack<IntPtr>();
     private static List<IntPtr> _allocatedPtrs = new List<IntPtr>();
