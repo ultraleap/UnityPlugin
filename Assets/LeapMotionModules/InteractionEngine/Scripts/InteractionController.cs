@@ -9,8 +9,27 @@ namespace InteractionEngine {
     [SerializeField]
     private LeapProvider _leapProvider;
 
+    [SerializeField]
+    private bool _showDebugLines = true;
+
+    [SerializeField]
+    private bool _showDebugBounds = true;
+
     private OneToOneMap<InteractionObject, InteractionShape> _objects = new OneToOneMap<InteractionObject, InteractionShape>();
     private LEAP_IE_SCENE _scene;
+
+    public eLeapIEDebugVisualisationFlags DebugVisualizationFlags {
+      get {
+        eLeapIEDebugVisualisationFlags flags = eLeapIEDebugVisualisationFlags.eLeapIEDebugVisualisationFlags_None;
+        if (_showDebugLines) {
+          flags |= eLeapIEDebugVisualisationFlags.eLeapIEDebugVisualisationFlags_LinesInternal;
+        }
+        if (_showDebugBounds) {
+          flags |= eLeapIEDebugVisualisationFlags.eLeapIEDebugVisualisationFlags_Bounds;
+        }
+        return flags;
+      }
+    }
 
     public void RegisterInteractionObject(InteractionObject obj) {
       InteractionShape shape = new InteractionShape();
@@ -33,8 +52,15 @@ namespace InteractionEngine {
       _objects.Remove(obj);
     }
 
+    void OnValidate() {
+      if (Application.isPlaying && isActiveAndEnabled) {
+        applyDebugSettings();
+      }
+    }
+
     void OnEnable() {
       InteractionC.CreateScene(ref _scene);
+      applyDebugSettings();
 
       foreach (var pair in _objects) {
         registerWithInteractionC(pair.Key, pair.Value);
@@ -57,6 +83,14 @@ namespace InteractionEngine {
       simulateIe();
 
       setObjectClassifications();
+
+      if (_showDebugLines || _showDebugBounds) {
+        InteractionC.DrawDebugLines(ref _scene);
+      }
+    }
+
+    private void applyDebugSettings() {
+      InteractionC.EnableDebugVisualization(ref _scene, (uint)DebugVisualizationFlags);
     }
 
     private void updateIeRepresentations() {
