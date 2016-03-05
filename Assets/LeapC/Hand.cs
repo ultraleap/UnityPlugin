@@ -5,11 +5,11 @@
 * https://developer.leapmotion.com/sdk_agreement, or another agreement         *
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
-namespace Leap {
+namespace Leap
+{
   using System;
   using System.Collections.Generic;
   using System.Runtime.InteropServices;
-  using LeapInternal;
 
   /**
    * The Hand class reports the physical characteristics of a detected hand.
@@ -30,7 +30,8 @@ namespace Leap {
    * Test for validity with the Hand::isValid() function.
    * @since 1.0
    */
-  public class Hand {
+  public class Hand
+  {
     private Matrix _basis = Matrix.Identity;
     private bool _needToCalculateBasis = true;
 
@@ -44,7 +45,8 @@ namespace Leap {
      *
      * @since 1.0
      */
-    public Hand() {
+    public Hand()
+    {
       PalmPosition = Vector.Zero;
       StabilizedPalmPosition = Vector.Zero;
       PalmVelocity = Vector.Zero;
@@ -72,7 +74,8 @@ namespace Leap {
                 Vector palmVelocity,
                 Vector palmNormal,
                 Vector direction,
-                Vector wristPosition) {
+                Vector wristPosition)
+    {
       FrameId = frameID;
       Id = id;
       Confidence = confidence;
@@ -93,7 +96,8 @@ namespace Leap {
       WristPosition = wristPosition;
     }
 
-    public Hand TransformedCopy(Matrix trs) {
+    public Hand TransformedCopy(Matrix trs)
+    {
       List<Finger> transformedFingers = new List<Finger>(5);
       for (int f = 0; f < this.Fingers.Count; f++)
         transformedFingers.Add(Fingers[f].TransformedCopy(trs));
@@ -141,8 +145,10 @@ namespace Leap {
      * hand in this frame; otherwise, an invalid Finger object is returned.
      * @since 1.0
      */
-    public Finger Finger(int id) {
-      return this.Fingers.Find(delegate (Finger item) {
+    public Finger Finger(int id)
+    {
+      return this.Fingers.Find(delegate (Finger item)
+      {
         return item.Id == id;
       });
     }
@@ -156,7 +162,8 @@ namespace Leap {
      * exact same physical hand in the same frame and both Hand objects are valid.
      * @since 1.0
      */
-    public bool Equals(Hand other) {
+    public bool Equals(Hand other)
+    {
       return Id == other.Id && FrameId == other.FrameId;
     }
 
@@ -166,7 +173,8 @@ namespace Leap {
      * @returns A description of the Hand as a string.
      * @since 1.0
      */
-    public override string ToString() {
+    public override string ToString()
+    {
       return string.Format(
         "Hand {0} {1}.",
         this.Id,
@@ -281,9 +289,12 @@ namespace Leap {
      * @returns The basis of the hand as a matrix.
      * @since 2.0
      */
-    public Matrix Basis {
-      get {
-        if (_needToCalculateBasis) {
+    public Matrix Basis
+    {
+      get
+      {
+        if (_needToCalculateBasis)
+        {
           //TODO verify this calculation for both hands
           _basis.zBasis = -Direction;
           _basis.yBasis = -PalmNormal;
@@ -440,6 +451,5 @@ namespace Leap {
      * @since 2.0.3
      */
     public Arm Arm { get; private set; }
-
   }
 }
