@@ -225,18 +225,6 @@ namespace Leap {
      */
     public Matrix Basis { get; private set; }
 
-    public LEAP_BONE RawBone {
-      get {
-        LEAP_BONE leapBone = new LEAP_BONE();
-        leapBone.prev_joint = new LEAP_VECTOR(PrevJoint);
-        leapBone.next_joint = new LEAP_VECTOR(NextJoint);
-        leapBone.width = Width;
-        leapBone.basis = new LEAP_MATRIX(Basis);
-        return leapBone;
-      }
-    }
-
-
     /**
      * Enumerates the names of the bones.
      *

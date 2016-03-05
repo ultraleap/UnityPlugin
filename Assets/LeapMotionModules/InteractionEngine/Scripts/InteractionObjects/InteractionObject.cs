@@ -9,7 +9,7 @@ namespace InteractionEngine {
     [SerializeField]
     private InteractionController _controller;
 
-    public abstract IntPtr ShapeDescription {
+    public abstract IntPtr ShapeDescriptionPtr {
       get;
     }
 

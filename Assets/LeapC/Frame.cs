@@ -278,25 +278,5 @@ namespace Leap {
         _trackedQuad = value;
       }
     }
-
-    /**
-     * Returns an IntPtr pointing to an array of LEAP_HAND objects that represent the
-     * hands contained in this frame.  This is a temporary IntPtr which becomes invalid
-     * upon the next call to the TempHandData property for this Frame instance.
-     */
-    public IntPtr TempHandData {
-      get {
-        StructMarshal<LEAP_PALM>.ReleaseAllTemp();
-        StructMarshal<LEAP_BONE>.ReleaseAllTemp();
-        StructMarshal<LEAP_DIGIT>.ReleaseAllTemp();
-
-        IntPtr tempArray = StructMarshal<LEAP_HAND>.GetTempArray(Hands.Count);
-        for (int i = 0; i < Hands.Count; i++) {
-          StructMarshal<LEAP_HAND>.CopyIntoArray(tempArray, Hands[i].TempRawHand, i);
-        }
-
-        return tempArray;
-      }
-    }
   }
 }

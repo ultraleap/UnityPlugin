@@ -298,21 +298,6 @@ namespace Leap {
      * @since 2.0
      */
 
-    public LEAP_DIGIT RawDigit {
-      get {
-        LEAP_DIGIT digit = new LEAP_DIGIT();
-        digit.finger_id = Id;
-        digit.metacarpal = Bone(Leap.Bone.BoneType.TYPE_METACARPAL).RawBone;
-        digit.proximal = Bone(Leap.Bone.BoneType.TYPE_PROXIMAL).RawBone;
-        digit.intermediate = Bone(Leap.Bone.BoneType.TYPE_INTERMEDIATE).RawBone;
-        digit.distal = Bone(Leap.Bone.BoneType.TYPE_DISTAL).RawBone;
-        digit.tip_velocity = new LEAP_VECTOR(TipVelocity);
-        digit.stabilized_tip_position = new LEAP_VECTOR(StabilizedTipPosition);
-        digit.is_extended = IsExtended ? 1 : 0;
-        return digit;
-      }
-    }
-
     public enum FingerType {
       TYPE_THUMB = 0,
       TYPE_INDEX = 1,

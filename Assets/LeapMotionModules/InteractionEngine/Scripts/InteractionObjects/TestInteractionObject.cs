@@ -23,15 +23,13 @@ namespace InteractionEngine {
       }
     }
     
-    public override IntPtr ShapeDescription {
+    public override IntPtr ShapeDescriptionPtr {
       get {
         LEAP_IE_SPHERE_DESCRIPTION sphereDesc = new LEAP_IE_SPHERE_DESCRIPTION();
         sphereDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Sphere;
         sphereDesc.radius = _sphereCollider.radius;
-
-        StructMarshal<LEAP_IE_SPHERE_DESCRIPTION>.ReleaseAllTemp();
-        IntPtr ptr = StructMarshal<LEAP_IE_SPHERE_DESCRIPTION>.AllocNewTemp(sphereDesc);
-        return ptr;
+        
+        return StructAllocator.AllocateStruct(sphereDesc);
       }
     }
 

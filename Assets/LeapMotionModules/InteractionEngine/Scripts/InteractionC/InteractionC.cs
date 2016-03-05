@@ -165,7 +165,14 @@ namespace InteractionEngine.Internal {
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateHands")]
     public static extern eLeapIERS UpdateHands(ref LEAP_IE_SCENE scene,
                                                UInt32 nHands,
-                                               IntPtr pHands /*LEAP_HAND*/);
+                                               IntPtr pHands);
+
+    public static eLeapIERS UpdateHands(ref LEAP_IE_SCENE scene,
+                                        Leap.Frame frame) {
+      StructAllocator.BeginAllocationBlock();
+      IntPtr handArray = HandArrayBuilder.CreateHandArray(frame);
+      return UpdateHands(ref scene, (uint)frame.Hands.Count, handArray);
+    }
 
     [DllImport(DLL_NAME, EntryPoint = "LeapIEAddShapeDescription")]
     public static extern eLeapIERS AddShapeDescription(ref LEAP_IE_SCENE scene,
@@ -212,9 +219,9 @@ namespace InteractionEngine.Internal {
                                        ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
                                        UInt32 type,
                                        T t) where T : struct {
-      IntPtr tmpPtr = StructMarshal<T>.AllocNewTemp(t);
+      StructAllocator.BeginAllocationBlock();
+      IntPtr tmpPtr = StructAllocator.AllocateStruct(t);
       var ret = Annotate(ref scene, ref instance, type, (UInt32)StructMarshal<T>.Size, tmpPtr);
-      StructMarshal<T>.ReleaseAllTemp();
       return ret;
     }
 

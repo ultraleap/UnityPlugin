@@ -27,6 +27,10 @@ namespace LeapInternal {
       }
     }
 
+    public static void CopyIntoDestination(IntPtr dstPtr, T t) {
+      CopyIntoArray(dstPtr, t, 0);
+    }
+
     public static void CopyIntoArray(IntPtr arrayPtr, T t, int index) {
       _container.value = t;
       Marshal.StructureToPtr(_container, new IntPtr(arrayPtr.ToInt64() + _sizeofT * index), false);
@@ -45,12 +49,6 @@ namespace LeapInternal {
       }
     }
 
-    private static Stack<IntPtr> _tempPtrPool = new Stack<IntPtr>();
-    private static List<IntPtr> _allocatedPtrs = new List<IntPtr>();
-
-    private static IntPtr _tempArray;
-    private static int _tempArrayCount;
-
     /**
      * Converts a single element in an array pointed to by ptr to a struct
      * of type T.  This method does not and cannot do any bounds checking!
@@ -58,41 +56,6 @@ namespace LeapInternal {
      */
     public static T ArrayElementToStruct(IntPtr ptr, int arrayIndex) {
       return PtrToStruct(new IntPtr(ptr.ToInt64() + _sizeofT * arrayIndex));
-    }
-
-    public static IntPtr GetTempArray(int count) {
-      if (count > _tempArrayCount) {
-        if (_tempArrayCount != 0) {
-          Marshal.FreeHGlobal(_tempArray);
-        }
-
-        _tempArray = Marshal.AllocHGlobal(_sizeofT * count);
-        _tempArrayCount = count;
-      }
-
-      return _tempArray;
-    }
-
-    public static IntPtr AllocNewTemp(T t) {
-      IntPtr ptr;
-      if (_tempPtrPool.Count != 0) {
-        ptr = _tempPtrPool.Pop();
-      } else {
-        ptr = Marshal.AllocHGlobal(_sizeofT);
-      }
-
-      _container.value = t;
-      Marshal.StructureToPtr(_container, ptr, false);
-
-      _allocatedPtrs.Add(ptr);
-      return ptr;
-    }
-
-    public static void ReleaseAllTemp() {
-      for (int i = 0; i < _allocatedPtrs.Count; i++) {
-        _tempPtrPool.Push(_allocatedPtrs[i]);
-      }
-      _allocatedPtrs.Clear();
     }
   }
 }

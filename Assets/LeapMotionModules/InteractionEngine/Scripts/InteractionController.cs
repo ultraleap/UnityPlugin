@@ -102,10 +102,8 @@ namespace InteractionEngine {
     }
 
     private void updateIeTracking() {
-      Frame frame = _leapProvider.CurrentFrame;
       InteractionC.UpdateHands(ref _scene,
-                               (uint)frame.Hands.Count,
-                               frame.TempHandData);
+                               _leapProvider.CurrentFrame);
     }
 
     private void simulateIe() {
@@ -136,9 +134,10 @@ namespace InteractionEngine {
     private void registerWithInteractionC(InteractionObject obj, InteractionShape shape) {
       var shapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
 
+      StructAllocator.BeginAllocationBlock();
       InteractionC.AddShapeDescription(ref _scene,
-                                             obj.ShapeDescription,
-                                             ref shapeHandle);
+                                       obj.ShapeDescriptionPtr,
+                                       ref shapeHandle);
 
       shape.ShapeHandle = shapeHandle;
       var shapeTransform = obj.IeTransform;
@@ -146,9 +145,9 @@ namespace InteractionEngine {
       var instanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
 
       InteractionC.CreateShape(ref _scene,
-                                     ref shapeHandle,
-                                     ref shapeTransform,
-                                     ref instanceHandle);
+                               ref shapeHandle,
+                               ref shapeTransform,
+                               ref instanceHandle);
 
       shape.InstanceHandle = instanceHandle;
     }
@@ -156,11 +155,11 @@ namespace InteractionEngine {
     private void unregisterWithInteractionC(InteractionObject obj, InteractionShape shape) {
       var shapeHandle = shape.ShapeHandle;
       InteractionC.RemoveShapeDescription(ref _scene,
-                                                ref shapeHandle);
+                                          ref shapeHandle);
 
       var instanceHandle = shape.InstanceHandle;
       InteractionC.DestroyShape(ref _scene,
-                                      ref instanceHandle);
+                                ref instanceHandle);
 
       shape.InstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
       shape.ShapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();

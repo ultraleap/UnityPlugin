@@ -441,56 +441,5 @@ namespace Leap {
      */
     public Arm Arm { get; private set; }
 
-    /* Returns a temporary LEAP_HAND which matches the data contained within this Hand object.
-     * This LEAP_HAND is a temporary object which becomes invalid upon the next call to 
-     * the TempRawHand property of this Hand instance.
-     */
-    public LEAP_HAND TempRawHand {
-      get {
-        LEAP_HAND leapHand = new LEAP_HAND();
-        leapHand.id = (uint)Id;
-        leapHand.type = IsLeft ? eLeapHandType.eLeapHandType_Left : eLeapHandType.eLeapHandType_Right;
-        leapHand.confidence = Confidence;
-        leapHand.visible_time = (uint)(TimeVisible * 1000);
-
-        LEAP_PALM palm = new LEAP_PALM();
-        palm.position = new LEAP_VECTOR(PalmPosition);
-        palm.stabilized_position = new LEAP_VECTOR(StabilizedPalmPosition);
-        palm.velocity = new LEAP_VECTOR(PalmVelocity);
-        palm.normal = new LEAP_VECTOR(PalmNormal);
-        palm.width = PalmWidth;
-        palm.direction = new LEAP_VECTOR(Direction);
-        
-        leapHand.palm = StructMarshal<LEAP_PALM>.AllocNewTemp(palm);
-        leapHand.arm = StructMarshal<LEAP_BONE>.AllocNewTemp(Arm.RawBone);
-        
-        for (int i = 0; i < Fingers.Count; i++) {
-          Finger finger = Fingers[i];
-          switch (finger.Type) {
-            case Leap.Finger.FingerType.TYPE_THUMB:
-              leapHand.thumb = StructMarshal<LEAP_DIGIT>.AllocNewTemp(finger.RawDigit);
-              break;
-            case Leap.Finger.FingerType.TYPE_INDEX:
-              leapHand.index = StructMarshal<LEAP_DIGIT>.AllocNewTemp(finger.RawDigit);
-              break;
-            case Leap.Finger.FingerType.TYPE_MIDDLE:
-              leapHand.middle = StructMarshal<LEAP_DIGIT>.AllocNewTemp(finger.RawDigit);
-              break;
-            case Leap.Finger.FingerType.TYPE_RING:
-              leapHand.ring = StructMarshal<LEAP_DIGIT>.AllocNewTemp(finger.RawDigit);
-              break;
-            case Leap.Finger.FingerType.TYPE_PINKY:
-              leapHand.pinky = StructMarshal<LEAP_DIGIT>.AllocNewTemp(finger.RawDigit);
-              break;
-            default:
-              throw new Exception("Unexpected Finger Type " + finger.Type);
-          }
-        }
-
-        return leapHand;
-      }
-    }
-
-
   }
 }
