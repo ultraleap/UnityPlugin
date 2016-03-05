@@ -12,20 +12,14 @@ namespace InteractionEngine {
     [SerializeField]
     private bool _showDebugLines = true;
 
-    [SerializeField]
-    private bool _showDebugBounds = true;
-
     private OneToOneMap<InteractionObject, InteractionShape> _objects = new OneToOneMap<InteractionObject, InteractionShape>();
     private LEAP_IE_SCENE _scene;
 
     public eLeapIEDebugFlags DebugVisualizationFlags {
       get {
-        eLeapIEDebugFlags flags = eLeapIEDebugFlags.eLeapIEDebugVisualisationFlags_None;
+        eLeapIEDebugFlags flags = eLeapIEDebugFlags.eLeapIEDebugFlags_None;
         if (_showDebugLines) {
-          flags |= eLeapIEDebugFlags.eLeapIEDebugVisualisationFlags_LinesInternal;
-        }
-        if (_showDebugBounds) {
-          flags |= eLeapIEDebugFlags.eLeapIEDebugVisualisationFlags_Bounds;
+          flags |= eLeapIEDebugFlags.eLeapIEDebugFlags_LinesInternal;
         }
         return flags;
       }
@@ -84,7 +78,7 @@ namespace InteractionEngine {
 
       setObjectClassifications();
 
-      if (_showDebugLines || _showDebugBounds) {
+      if (_showDebugLines) {
         InteractionC.DrawDebugLines(ref _scene);
       }
     }
