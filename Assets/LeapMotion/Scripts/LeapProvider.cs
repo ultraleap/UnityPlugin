@@ -143,7 +143,6 @@ namespace Leap {
       Frame closestFrame = leap_controller_.Frame();
       for (int searchHistoryIndex = 0; searchHistoryIndex < 60; searchHistoryIndex++) {
 
-        leapMat = UnityMatrixExtension.GetLeapMatrix(this.transform);
         Frame historyFrame = leap_controller_.Frame(searchHistoryIndex);
 
         //If we reach an invalid frame, terminate the search
@@ -159,6 +158,7 @@ namespace Leap {
           break;
         }
       }
+      leapMat = UnityMatrixExtension.GetLeapMatrix(this.transform);
       return closestFrame.TransformedCopy(leapMat);
     }
     void OnDestroy() {
