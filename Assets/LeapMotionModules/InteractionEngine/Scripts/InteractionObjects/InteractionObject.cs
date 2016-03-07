@@ -20,6 +20,10 @@ namespace InteractionEngine {
 
     public abstract void SetClassification(eLeapIEClassification classification);
 
+    protected virtual void Reset() {
+      _controller = FindObjectOfType<InteractionController>();
+    }
+
     protected virtual void OnValidate() {
       if (_controller == null) {
         _controller = FindObjectOfType<InteractionController>();
