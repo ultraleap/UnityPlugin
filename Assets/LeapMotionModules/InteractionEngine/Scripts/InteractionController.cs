@@ -121,33 +121,33 @@ namespace InteractionEngine {
         var shape = pair.Value;
 
         var instanceHandle = shape.InstanceHandle;
-        var classification = new LEAP_IE_SHAPE_CLASSIFICATION();
+        LEAP_IE_SHAPE_CLASSIFICATION classification;
 
         InteractionC.GetClassification(ref _scene,
-                                             ref instanceHandle,
-                                             ref classification);
+                                       ref instanceHandle,
+                                       out classification);
 
         obj.SetClassification(classification.classification);
       }
     }
 
     private void registerWithInteractionC(InteractionObject obj, InteractionShape shape) {
-      var shapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
+      LEAP_IE_SHAPE_DESCRIPTION_HANDLE shapeHandle;
 
       StructAllocator.BeginAllocationBlock();
       InteractionC.AddShapeDescription(ref _scene,
-                                       obj.ShapeDescriptionPtr,
-                                       ref shapeHandle);
+                                           obj.ShapeDescriptionPtr,
+                                       out shapeHandle);
 
       shape.ShapeHandle = shapeHandle;
       var shapeTransform = obj.IeTransform;
 
-      var instanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
+      LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle;
 
       InteractionC.CreateShape(ref _scene,
                                ref shapeHandle,
                                ref shapeTransform,
-                               ref instanceHandle);
+                               out instanceHandle);
 
       shape.InstanceHandle = instanceHandle;
     }
