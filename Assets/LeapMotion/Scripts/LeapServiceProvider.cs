@@ -1,27 +1,11 @@
 ﻿using UnityEngine;
-using System.Collections;
-using LeapInternal;
-using Leap;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-
+using System;
 
 namespace Leap {
-  public class LeapProvider :
-    MonoBehaviour {
-    public Frame CurrentFrame { get; private set; }
-    public Image CurrentImage { get; private set; }
-    private Transform providerSpace;
-    private Matrix leapMat;
-
-    protected Controller leap_controller_;
-
-    /** The smoothed offset between the FixedUpdate timeline and the Leap timeline.  
-   * Used to provide temporally correct frames within FixedUpdate */
-    private SmoothedFloat smoothedFixedUpdateOffset_ = new SmoothedFloat();
-    /** The maximum offset calculated per frame */
-    public float PerFrameFixedUpdateOffset;
+  public class LeapServiceProvider : LeapProvider {
     /** Conversion factor for nanoseconds to seconds. */
     protected const float NS_TO_S = 1e-6f;
     /** Conversion factor for seconds to nanoseconds. */
@@ -29,47 +13,49 @@ namespace Leap {
     /** How much smoothing to use when calculating the FixedUpdate offset. */
     protected const float FIXED_UPDATE_OFFSET_SMOOTHING_DELAY = 0.1f;
 
-    /** Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false. */
-    public bool isHeadMounted = false;
+    [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
+    [SerializeField]
+    protected bool _isHeadMounted = false;
 
-    public bool overrideDeviceType = false;
+    [SerializeField]
+    protected bool overrideDeviceType = false;
 
-    /** If overrideDeviceType is enabled, the hand controller will return a device of this type. */
-    public LeapDeviceType overrideDeviceTypeWith = LeapDeviceType.Peripheral;
+    [Tooltip("If overrideDeviceType is enabled, the hand controller will return a device of this type.")]
+    [SerializeField]
+    protected LeapDeviceType _overrideDeviceTypeWith = LeapDeviceType.Peripheral;
 
-    void Awake() {
-      leap_controller_ = new Controller();
-      if (leap_controller_.IsConnected) {
-        InitializeFlags();
+    protected Controller leap_controller_;
+
+    protected Frame _currentFrame;
+    protected Image _currentImage;
+    protected int _currentUpdateCount = -1;
+
+    protected Frame _currentFixedFrame;
+    protected float _currentFixedTime = -1;
+    protected float _perFrameFixedUpdateOffset;
+    /* The smoothed offset between the FixedUpdate timeline and the Leap timeline.  
+     * Used to provide temporally correct frames within FixedUpdate */
+    protected SmoothedFloat _smoothedFixedUpdateOffset = new SmoothedFloat();
+
+    public override Frame CurrentFrame {
+      get {
+        ensureCurrentFrameAndImageUpToDate();
+        return _currentFrame;
       }
-      leap_controller_.Device += HandleControllerConnect;
     }
 
-    // Use this for initialization
-    void Start() {
-      //set empty frame
-      CurrentFrame = new Frame();
-
+    public override Image CurrentImage {
+      get {
+        ensureCurrentFrameAndImageUpToDate();
+        return _currentImage;
+      }
     }
 
-    void HandleControllerConnect(object sender, LeapEventArgs args) {
-      InitializeFlags();
-    }
-
-    protected void OnDisable() {
-      leap_controller_.Device -= HandleControllerConnect;
-    }
-
-    /** 
-* Initializes the Leap Motion policy flags.
-* The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
-*/
-    void InitializeFlags() {
-      //Optimize for top-down tracking if on head mounted display.
-      if (isHeadMounted)
-        leap_controller_.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-      else
-        leap_controller_.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+    public override Frame CurrentFixedFrame {
+      get {
+        ensureCurrentFixedFrameUpToDate();
+        return _currentFixedFrame;
+      }
     }
 
     /** Returns the Leap Controller instance. */
@@ -78,10 +64,12 @@ namespace Leap {
       //Do a null check to deal with hot reloading
       if (leap_controller_ == null) {
         leap_controller_ = new Controller();
+        initializeFlags();
       }
 #endif
       return leap_controller_;
     }
+
     /** True, if the Leap Motion hardware is plugged in and this application is connected to the Leap Motion service. */
     public bool IsConnected() {
       return GetLeapController().IsConnected;
@@ -90,7 +78,7 @@ namespace Leap {
     /** Returns information describing the device hardware. */
     public LeapDeviceInfo GetDeviceInfo() {
       if (overrideDeviceType) {
-        return new LeapDeviceInfo(overrideDeviceTypeWith);
+        return new LeapDeviceInfo(_overrideDeviceTypeWith);
       }
 
       DeviceList devices = GetLeapController().Devices;
@@ -124,67 +112,116 @@ namespace Leap {
       return new LeapDeviceInfo(LeapDeviceType.Invalid);
     }
 
-    // Update is called once per frame
-    void Update() {
+    protected virtual void Awake() {
+      leap_controller_ = new Controller();
+      if (leap_controller_.IsConnected) {
+        initializeFlags();
+      }
+      leap_controller_.Device += onHandControllerConnect;
+
+      _smoothedFixedUpdateOffset.delay = FIXED_UPDATE_OFFSET_SMOOTHING_DELAY;
+    }
+
+    protected virtual void Start() {
+      _currentFrame = new Frame();
+      _currentFixedFrame = new Frame();
+    }
+
+    protected virtual void Update() {
 #if UNITY_EDITOR
       if (EditorApplication.isCompiling) {
         EditorApplication.isPlaying = false;
         Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
       }
 #endif
-      leapMat = UnityMatrixExtension.GetLeapMatrix(this.transform);
-      CurrentFrame = leap_controller_.GetTransformedFrame(leapMat, 0);
-      //perFrameFixedUpdateOffset_ contains the maximum offset of this Update cycle
-      smoothedFixedUpdateOffset_.Update(PerFrameFixedUpdateOffset, Time.deltaTime);
-      //float now = leap_controller_.Now();
-      //Debug.Log("leap_controller_.Now():" + leap_controller_.Now() + " - CurrentFrame.Timestamp:" + CurrentFrame.Timestamp + " = " + (leap_controller_.Now() - CurrentFrame.Timestamp));
-      //Debug.Log("provider.Update().CurrentFrame.Id: " + CurrentFrame.Id);
+
+      _smoothedFixedUpdateOffset.Update(_perFrameFixedUpdateOffset, Time.deltaTime);
     }
 
-    void FixedUpdate() {
-      //which frame to deliver
+    protected virtual void FixedUpdate() {
+      _perFrameFixedUpdateOffset = leap_controller_.Frame().Timestamp * NS_TO_S - Time.fixedTime;
     }
-    public virtual Frame GetFixedFrame() {
-      //Aproximate the correct timestamp given the current fixed time
-      float correctedTimestamp = (Time.fixedTime + smoothedFixedUpdateOffset_.value) * S_TO_NS;
 
-      //Search the leap history for a frame with a timestamp closest to the corrected timestamp
-      Frame closestFrame = leap_controller_.Frame();
-      for (int searchHistoryIndex = 0; searchHistoryIndex < 60; searchHistoryIndex++) {
-
-        Frame historyFrame = leap_controller_.Frame(searchHistoryIndex);
-
-        //If we reach an invalid frame, terminate the search
-        if (historyFrame.Id < 0) {
-          Debug.Log("historyFrame.Id is less than 0");
-          break;
-        }
-
-        if (Mathf.Abs(historyFrame.Timestamp - correctedTimestamp) < Mathf.Abs(closestFrame.Timestamp - correctedTimestamp)) {
-          closestFrame = historyFrame;
-        } else {
-          //Since frames are always reported in order, we can terminate the search once we stop finding a closer frame
-          break;
-        }
-      }
-      leapMat = UnityMatrixExtension.GetLeapMatrix(this.transform);
-      return closestFrame.TransformedCopy(leapMat);
+    protected void OnDisable() {
+      leap_controller_.Device -= onHandControllerConnect;
     }
-    void OnDestroy() {
-      //DestroyAllHands();
+
+    protected virtual void OnDestroy() {
       leap_controller_.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
       leap_controller_.StopConnection();
     }
-    void OnApplicationPause(bool isPaused) {
-      //Debug.Log("Pause " + isPaused);
+
+    protected virtual void OnApplicationPause(bool isPaused) {
       if (isPaused)
         leap_controller_.StopConnection();
       else
         leap_controller_.StartConnection();
     }
 
-    void OnApplicationQuit() {
+    protected virtual void OnApplicationQuit() {
       leap_controller_.StopConnection();
     }
+
+    /*
+     * Initializes the Leap Motion policy flags.
+     * The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
+     */
+    protected void initializeFlags() {
+      //Optimize for top-down tracking if on head mounted display.
+      if (_isHeadMounted) {
+        leap_controller_.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      } else {
+        leap_controller_.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+      }
+    }
+
+    protected void onHandControllerConnect(object sender, LeapEventArgs args) {
+      initializeFlags();
+    }
+
+    protected void ensureCurrentFrameAndImageUpToDate() {
+      if (Time.frameCount == _currentUpdateCount) {
+        return;
+      }
+      _currentUpdateCount = Time.frameCount;
+
+      var leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
+      _currentFrame = leap_controller_.GetTransformedFrame(leapMat, 0);
+    }
+
+    protected void ensureCurrentFixedFrameUpToDate() {
+      if (Time.fixedTime == _currentFixedTime) {
+        return;
+      }
+      _currentFixedTime = Time.fixedTime;
+
+      //Aproximate the correct timestamp given the current fixed time
+      long correctedTimestamp = (long)((Time.fixedTime + _smoothedFixedUpdateOffset.value) * S_TO_NS);
+
+      //Search the leap history for a frame with a timestamp closest to the corrected timestamp
+      Frame closestFrame = leap_controller_.Frame();
+      for (int searchHistoryIndex = 1; searchHistoryIndex < 60; searchHistoryIndex++) {
+        Frame historyFrame = leap_controller_.Frame(searchHistoryIndex);
+
+        //If we reach an invalid frame, terminate the search
+        if (historyFrame.Id < 0) {
+          Debug.LogWarning("historyFrame.Id was less than 0!");
+          break;
+        }
+
+        //If the history frame is closer, replace closestFrame with the historyFrame
+        if (Math.Abs(historyFrame.Timestamp - correctedTimestamp) < Math.Abs(closestFrame.Timestamp - correctedTimestamp)) {
+          closestFrame = historyFrame;
+        } else {
+          //Since frames are always reported in order, we can terminate the search once we stop finding a closer frame
+          break;
+        }
+      }
+
+      var leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
+      _currentFixedFrame = closestFrame.TransformedCopy(leapMat);
+    }
+
+
   }
 }

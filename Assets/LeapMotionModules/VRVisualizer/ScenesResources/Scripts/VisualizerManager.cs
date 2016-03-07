@@ -22,7 +22,7 @@ public class VisualizerManager : MonoBehaviour {
 
   private void FindController()
   {
-    LeapProvider provider = GameObject.FindObjectOfType<LeapProvider>() as LeapProvider;
+    LeapServiceProvider provider = FindObjectOfType<LeapServiceProvider>();
     if (provider != null)
       m_controller = provider.GetLeapController();
   }
