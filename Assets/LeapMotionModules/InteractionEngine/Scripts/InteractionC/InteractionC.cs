@@ -167,11 +167,11 @@ namespace InteractionEngine.Internal {
     /*** Update Hands ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateHands")]
     public static extern eLeapIERS UpdateHands(ref LEAP_IE_SCENE scene,
-                                               UInt32 nHands,
-                                               IntPtr pHands);
-    
+                                                   UInt32 nHands,
+                                                   IntPtr pHands);
+
     public static eLeapIERS UpdateHands(ref LEAP_IE_SCENE scene,
-                                        Leap.Frame frame) {
+                                            Leap.Frame frame) {
       StructAllocator.BeginAllocationBlock();
       IntPtr handArray = HandArrayBuilder.CreateHandArray(frame);
       return UpdateHands(ref scene, (uint)frame.Hands.Count, handArray);
@@ -180,31 +180,31 @@ namespace InteractionEngine.Internal {
     /*** Add Shape Description ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEAddShapeDescription")]
     public static extern eLeapIERS AddShapeDescription(ref LEAP_IE_SCENE scene,
-                                                       IntPtr pDescription,
-                                                       ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
+                                                           IntPtr pDescription,
+                                                       out LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
 
     /*** Remove Shape Description ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIERemoveShapeDescription")]
     public static extern eLeapIERS RemoveShapeDescription(ref LEAP_IE_SCENE scene,
-                                                                ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
+                                                          ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
 
     /*** Create Shape ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIECreateShape")]
     public static extern eLeapIERS CreateShape(ref LEAP_IE_SCENE scene,
-                                                     ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle,
-                                                     ref LEAP_IE_TRANSFORM transform,
-                                                     ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
+                                               ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle,
+                                               ref LEAP_IE_TRANSFORM transform,
+                                               out LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
 
     /*** Destroy Shape ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEDestroyShape")]
     public static extern eLeapIERS DestroyShape(ref LEAP_IE_SCENE scene,
-                                                      ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
+                                                ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
 
     /*** Update Shape ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateShape")]
     public static extern eLeapIERS UpdateShape(ref LEAP_IE_SCENE scene,
-                                                     ref LEAP_IE_TRANSFORM transform,
-                                                     ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
+                                               ref LEAP_IE_TRANSFORM transform,
+                                               ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
 
     /*** Update Controller ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateController")]
@@ -215,22 +215,22 @@ namespace InteractionEngine.Internal {
     [DllImport(DLL_NAME, EntryPoint = "LeapIEAnnotate")]
     public static extern eLeapIERS Annotate(ref LEAP_IE_SCENE scene,
                                             ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
-                                            UInt32 type,
-                                            UInt32 bytes,
-                                            IntPtr data);
+                                                UInt32 type,
+                                                UInt32 bytes,
+                                                IntPtr data);
 
     public static eLeapIERS Annotate(ref LEAP_IE_SCENE scene,
                                      ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
-                                     UInt32 type) {
-      return Annotate(ref scene, ref instance, type, 0, new IntPtr(0));
+                                         UInt32 type) {
+      return Annotate(ref scene, ref instance, type, 0, IntPtr.Zero);
     }
 
     public static eLeapIERS Annotate<T>(ref LEAP_IE_SCENE scene,
-                                       ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
-                                       UInt32 type,
-                                       T t) where T : struct {
+                                        ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
+                                            UInt32 type,
+                                            T data) where T : struct {
       StructAllocator.BeginAllocationBlock();
-      IntPtr tmpPtr = StructAllocator.AllocateStruct(t);
+      IntPtr tmpPtr = StructAllocator.AllocateStruct(data);
       var ret = Annotate(ref scene, ref instance, type, (UInt32)StructMarshal<T>.Size, tmpPtr);
       return ret;
     }
@@ -238,24 +238,24 @@ namespace InteractionEngine.Internal {
     /*** Get Classification ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetClassification")]
     public static extern eLeapIERS GetClassification(ref LEAP_IE_SCENE scene,
-                                                           ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
-                                                           ref LEAP_IE_SHAPE_CLASSIFICATION classification);
+                                                     ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
+                                                     out LEAP_IE_SHAPE_CLASSIFICATION classification);
 
     /*** Enable Debug Visualization ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEEnableDebugVisualization")]
     public static extern eLeapIERS EnableDebugVisualization(ref LEAP_IE_SCENE scene,
-                                                            UInt32 flags);
+                                                                UInt32 flags);
 
     /*** Get Debug Lines ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetDebugLines")]
     public static extern eLeapIERS GetDebugLines(ref LEAP_IE_SCENE scene,
-                                                 ref UInt32 nLines,
-                                                 ref IntPtr ppLineBuffer);
+                                                 out UInt32 nLines,
+                                                 out IntPtr ppLineBuffer);
 
     public static void DrawDebugLines(ref LEAP_IE_SCENE scene) {
-      UInt32 lines = 0;
-      IntPtr arrayPtr = new IntPtr(0);
-      GetDebugLines(ref scene, ref lines, ref arrayPtr);
+      UInt32 lines;
+      IntPtr arrayPtr;
+      GetDebugLines(ref scene, out lines, out arrayPtr);
 
       for (int i = 0; i < lines; i++) {
         IntPtr linePtr = StructMarshal<IntPtr>.ArrayElementToStruct(arrayPtr, i);
