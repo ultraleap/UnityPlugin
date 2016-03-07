@@ -17,6 +17,7 @@ public static class StructAllocator {
   public static IntPtr AllocateStruct<T>(T t) where T : struct {
     IntPtr ptr = Marshal.AllocHGlobal(StructMarshal<T>.Size);
     StructMarshal<T>.CopyIntoDestination(ptr, t);
+    _allocated.Add(ptr);
     return ptr;
   }
 
