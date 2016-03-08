@@ -244,7 +244,7 @@ public class LeapVRTemporalWarping : MonoBehaviour {
       _history.RemoveAt(0);
     }
   }
-
+  
   private void updateTemporalWarping() {
     if (_trackingAnchor == null) {
       return;
@@ -254,7 +254,9 @@ public class LeapVRTemporalWarping : MonoBehaviour {
     Quaternion currCenterRot = _trackingAnchor.rotation * InputTracking.GetLocalRotation(VRNode.CenterEye);
 
     //Get the transform at the time when the latest image was captured
-    long rewindTime = provider.CurrentFrame.Timestamp;
+    //HACK: Currently timestamps are not accurate enough, just use the current timestamp plus the adjustment (60Ms seems to work well)
+    long rewindTime = provider.GetLeapController().Now() - warpingAdjustment * 1000;
+    //long rewindTime = provider.CurrentFrame.Timestamp - warpingAdjustment * 1000;
 
     TransformData past = transformAtTime(rewindTime);
     Vector3 pastCenterPos = _trackingAnchor.TransformPoint(past.localPosition);
