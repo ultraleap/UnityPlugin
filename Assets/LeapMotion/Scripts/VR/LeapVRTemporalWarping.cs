@@ -69,7 +69,7 @@ public class LeapVRTemporalWarping : MonoBehaviour {
 
   [Tooltip("Controls when this script synchronizes the time warp of images.  Use LowLatency for AR, and SyncWithHands for VR.")]
   [SerializeField]
-  private SyncMode syncMode = SyncMode.LOW_LATENCY;
+  private SyncMode syncMode = SyncMode.SYNC_WITH_HANDS;
 
   // Manual Time Alignment
   [Tooltip("Allow manual adjustment of the rewind time.")]
@@ -78,7 +78,7 @@ public class LeapVRTemporalWarping : MonoBehaviour {
 
   [Tooltip("Timestamps and other uncertanties can lead to sub-optimal alignment, this value can be tuned to get desired alignment.")]
   [SerializeField]
-  private int warpingAdjustment = 20; //Milliseconds
+  private int warpingAdjustment = 60; //Milliseconds
 
   [SerializeField]
   private KeyCode unlockHold = KeyCode.RightShift;
