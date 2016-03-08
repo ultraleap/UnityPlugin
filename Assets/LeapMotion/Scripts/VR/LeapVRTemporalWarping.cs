@@ -69,7 +69,7 @@ public class LeapVRTemporalWarping : MonoBehaviour {
 
   [Tooltip("Controls when this script synchronizes the time warp of images.  Use LowLatency for AR, and SyncWithHands for VR.")]
   [SerializeField]
-  private SyncMode syncMode = SyncMode.LOW_LATENCY;
+  private SyncMode syncMode = SyncMode.SYNC_WITH_HANDS;
 
   // Manual Time Alignment
   [Tooltip("Allow manual adjustment of the rewind time.")]
@@ -78,7 +78,7 @@ public class LeapVRTemporalWarping : MonoBehaviour {
 
   [Tooltip("Timestamps and other uncertanties can lead to sub-optimal alignment, this value can be tuned to get desired alignment.")]
   [SerializeField]
-  private int warpingAdjustment = 20; //Milliseconds
+  private int warpingAdjustment = 60; //Milliseconds
 
   [SerializeField]
   private KeyCode unlockHold = KeyCode.RightShift;
@@ -244,7 +244,7 @@ public class LeapVRTemporalWarping : MonoBehaviour {
       _history.RemoveAt(0);
     }
   }
-
+  
   private void updateTemporalWarping() {
     if (_trackingAnchor == null) {
       return;
@@ -254,7 +254,9 @@ public class LeapVRTemporalWarping : MonoBehaviour {
     Quaternion currCenterRot = _trackingAnchor.rotation * InputTracking.GetLocalRotation(VRNode.CenterEye);
 
     //Get the transform at the time when the latest image was captured
-    long rewindTime = provider.CurrentFrame.Timestamp;
+    //HACK: Currently timestamps are not accurate enough, just use the current timestamp plus the adjustment (60Ms seems to work well)
+    long rewindTime = provider.GetLeapController().Now() - warpingAdjustment * 1000;
+    //long rewindTime = provider.CurrentFrame.Timestamp - warpingAdjustment * 1000;
 
     TransformData past = transformAtTime(rewindTime);
     Vector3 pastCenterPos = _trackingAnchor.TransformPoint(past.localPosition);
