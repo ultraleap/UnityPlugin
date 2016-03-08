@@ -63,8 +63,7 @@ namespace Leap {
 #if UNITY_EDITOR
       //Do a null check to deal with hot reloading
       if (leap_controller_ == null) {
-        leap_controller_ = new Controller();
-        initializeFlags();
+        createController();
       }
 #endif
       return leap_controller_;
@@ -113,12 +112,6 @@ namespace Leap {
     }
 
     protected virtual void Awake() {
-      leap_controller_ = new Controller();
-      if (leap_controller_.IsConnected) {
-        initializeFlags();
-      }
-      leap_controller_.Device += onHandControllerConnect;
-
       _smoothedFixedUpdateOffset.delay = FIXED_UPDATE_OFFSET_SMOOTHING_DELAY;
     }
 
@@ -139,27 +132,23 @@ namespace Leap {
     }
 
     protected virtual void FixedUpdate() {
-      _perFrameFixedUpdateOffset = leap_controller_.Frame().Timestamp * NS_TO_S - Time.fixedTime;
-    }
-
-    protected void OnDisable() {
-      leap_controller_.Device -= onHandControllerConnect;
+      _perFrameFixedUpdateOffset = GetLeapController().Frame().Timestamp * NS_TO_S - Time.fixedTime;
     }
 
     protected virtual void OnDestroy() {
-      leap_controller_.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
-      leap_controller_.StopConnection();
+      destroyController();
     }
 
     protected virtual void OnApplicationPause(bool isPaused) {
-      if (isPaused)
+      if (isPaused) {
         leap_controller_.StopConnection();
-      else
+      } else {
         leap_controller_.StartConnection();
+      }
     }
 
     protected virtual void OnApplicationQuit() {
-      leap_controller_.StopConnection();
+      destroyController();
     }
 
     /*
@@ -175,10 +164,34 @@ namespace Leap {
       }
     }
 
-    protected void onHandControllerConnect(object sender, LeapEventArgs args) {
-      initializeFlags();
+    protected void createController() {
+      if (leap_controller_ != null) {
+        destroyController();
+      }
+
+      leap_controller_ = new Controller();
+      if (leap_controller_.IsConnected) {
+        initializeFlags();
+      }
+      leap_controller_.Device += onHandControllerConnect;
     }
 
+    protected void destroyController() {
+      if (leap_controller_ != null) {
+        leap_controller_.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+        leap_controller_.StopConnection();
+        leap_controller_ = null;
+      }
+    }
+
+    protected void onHandControllerConnect(object sender, LeapEventArgs args) {
+      initializeFlags();
+      leap_controller_.Device -= onHandControllerConnect;
+    }
+
+    /* Calling this method updates _currentFrame and _currentImage if and only if this
+     * is the first time the method has been called for this Update cycle.
+     */
     protected void ensureCurrentFrameAndImageUpToDate() {
       if (Time.frameCount == _currentUpdateCount) {
         return;
@@ -186,9 +199,12 @@ namespace Leap {
       _currentUpdateCount = Time.frameCount;
 
       var leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
-      _currentFrame = leap_controller_.GetTransformedFrame(leapMat, 0);
+      _currentFrame = GetLeapController().GetTransformedFrame(leapMat, 0);
     }
 
+    /* Calling this method updates _currentFixedFrame if and only if this is the first time
+     * the method has been called for this FixedUpdate cycle.
+     */
     protected void ensureCurrentFixedFrameUpToDate() {
       if (Time.fixedTime == _currentFixedTime) {
         return;
@@ -199,9 +215,9 @@ namespace Leap {
       long correctedTimestamp = (long)((Time.fixedTime + _smoothedFixedUpdateOffset.value) * S_TO_NS);
 
       //Search the leap history for a frame with a timestamp closest to the corrected timestamp
-      Frame closestFrame = leap_controller_.Frame();
+      Frame closestFrame = GetLeapController().Frame();
       for (int searchHistoryIndex = 1; searchHistoryIndex < 60; searchHistoryIndex++) {
-        Frame historyFrame = leap_controller_.Frame(searchHistoryIndex);
+        Frame historyFrame = GetLeapController().Frame(searchHistoryIndex);
 
         //If we reach an invalid frame, terminate the search
         if (historyFrame.Id < 0) {
@@ -221,7 +237,5 @@ namespace Leap {
       var leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
       _currentFixedFrame = closestFrame.TransformedCopy(leapMat);
     }
-
-
   }
 }
