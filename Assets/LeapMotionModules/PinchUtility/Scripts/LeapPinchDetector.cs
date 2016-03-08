@@ -18,6 +18,8 @@ namespace Leap.PinchUtility {
     [SerializeField]
     protected float _deactivatePinchDist = 0.04f;
 
+    protected int _lastUpdateFrame = -1;
+
     protected bool _isPinching = false;
     protected bool _didChange = false;
 
@@ -48,11 +50,19 @@ namespace Leap.PinchUtility {
       }
     }
 
+    protected virtual void Update() {
+      //We ensure the data is up to date at all times because
+      //there are some values (like LastPinchTime) that cannot 
+      //be updated on demand
+      ensurePinchInfoUpToDate();
+    }
+
     /// <summary>
     /// Returns whether or not the dectector is currently detecting a pinch.
     /// </summary>
     public bool IsPinching {
       get {
+        ensurePinchInfoUpToDate();
         return _isPinching;
       }
     }
@@ -63,6 +73,7 @@ namespace Leap.PinchUtility {
     /// </summary>
     public bool DidChangeFromLastFrame {
       get {
+        ensurePinchInfoUpToDate();
         return _didChange;
       }
     }
@@ -72,6 +83,7 @@ namespace Leap.PinchUtility {
     /// </summary>
     public bool DidStartPinch {
       get {
+        ensurePinchInfoUpToDate();
         return DidChangeFromLastFrame && IsPinching;
       }
     }
@@ -81,6 +93,7 @@ namespace Leap.PinchUtility {
     /// </summary>
     public bool DidEndPinch {
       get {
+        ensurePinchInfoUpToDate();
         return DidChangeFromLastFrame && !IsPinching;
       }
     }
@@ -90,6 +103,7 @@ namespace Leap.PinchUtility {
     /// </summary>
     public float LastPinchTime {
       get {
+        ensurePinchInfoUpToDate();
         return _lastPinchTime;
       }
     }
@@ -99,6 +113,7 @@ namespace Leap.PinchUtility {
     /// </summary>
     public float LastUnpinchTime {
       get {
+        ensurePinchInfoUpToDate();
         return _lastUnpinchTime;
       }
     }
@@ -109,6 +124,7 @@ namespace Leap.PinchUtility {
     /// </summary>
     public Vector3 Position {
       get {
+        ensurePinchInfoUpToDate();
         return _pinchPos;
       }
     }
@@ -119,11 +135,17 @@ namespace Leap.PinchUtility {
     /// </summary>
     public Quaternion Rotation {
       get {
+        ensurePinchInfoUpToDate();
         return _pinchRotation;
       }
     }
 
-    protected virtual void Update() {
+    protected virtual void ensurePinchInfoUpToDate() {
+      if (Time.frameCount == _lastUpdateFrame) {
+        return;
+      }
+      _lastUpdateFrame = Time.frameCount;
+
       _didChange = false;
 
       Hand hand = _handModel.GetLeapHand();
