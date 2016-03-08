@@ -43,10 +43,10 @@ public class LeapVRTemporalWarping : MonoBehaviour {
       };
     }
   }
+
   [SerializeField]
-  LeapHandController leapHandController;
-  [SerializeField]
-  LeapProvider provider;
+  LeapServiceProvider provider;
+
   // Spatial recalibration
   [Tooltip("Key to recenter the VR tracking space.")]
   [SerializeField]
@@ -181,12 +181,6 @@ public class LeapVRTemporalWarping : MonoBehaviour {
   }
 
   protected void Start() {
-    if (leapHandController == null) {
-      Debug.LogWarning("Camera alignment requires an active LeapHandController -> enabled = false");
-      enabled = false;
-      return;
-    }
-
     //Get a callback right as rendering begins for this frame so we can update the history and warping.
     LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
 

@@ -11,7 +11,6 @@ using Leap;
 
 // To use the LeapImageRetriever you must be on version 2.1+
 // and enable "Allow Images" in the Leap Motion settings.
-[ExecuteAfter(typeof(LeapProvider))]
 [RequireComponent(typeof(Camera))]
 public class LeapImageRetriever : MonoBehaviour {
   public const string GLOBAL_COLOR_SPACE_GAMMA_NAME = "_LeapGlobalColorSpaceGamma";
@@ -22,20 +21,21 @@ public class LeapImageRetriever : MonoBehaviour {
   public const int RIGHT_IMAGE_INDEX = 1;
   public const float IMAGE_SETTING_POLL_RATE = 2.0f;
 
-
   [SerializeField]
-  LeapProvider provider;
+  LeapServiceProvider _provider;
 
   [SerializeField]
   [FormerlySerializedAs("gammaCorrection")]
   private float _gammaCorrection = 1.0f;
 
+  [SerializeField]
+  protected long ImageTimeout = 9000; //microseconds
+
   private EyeTextureData _eyeTextureData = new EyeTextureData();
 
   //Image that we have requested from the service.  Are requested in Update and retrieved in OnPreRender
   protected Image _requestedImage = new Image();
-  [SerializeField]
-  protected long ImageTimeout = 9000; //microseconds
+  
   protected bool ImagesEnabled = true;
   private bool checkingImageState = false;
 
@@ -269,7 +269,7 @@ public class LeapImageRetriever : MonoBehaviour {
 #endif
 
   void Start() {
-    if (provider == null) {
+    if (_provider == null) {
       Debug.LogWarning("Cannot use LeapImageRetriever if there is no LeapProvider!");
       enabled = false;
       return;
@@ -285,9 +285,9 @@ public class LeapImageRetriever : MonoBehaviour {
   }
 
   void OnEnable() {
-    provider.GetLeapController().DistortionChange += onDistortionChange;
-    provider.GetLeapController().Connect += delegate {
-        provider.GetLeapController().Config.Get("images_mode", (Int32 enabled) => {
+    _provider.GetLeapController().DistortionChange += onDistortionChange;
+    _provider.GetLeapController().Connect += delegate {
+        _provider.GetLeapController().Config.Get("images_mode", (Int32 enabled) => {
             this.ImagesEnabled = enabled == 0 ? false : true;
         });
     };
@@ -295,12 +295,12 @@ public class LeapImageRetriever : MonoBehaviour {
   }
 
   void OnDisable() {
-    provider.GetLeapController().DistortionChange -= onDistortionChange;
+    _provider.GetLeapController().DistortionChange -= onDistortionChange;
   }
 
   void OnPreRender() {
     if(ImagesEnabled){
-      Controller controller = provider.GetLeapController();
+      Controller controller = _provider.GetLeapController();
       long start = controller.Now();
       while (!_requestedImage.IsComplete) {
         if (controller.Now() - start > ImageTimeout) break;
@@ -318,8 +318,8 @@ public class LeapImageRetriever : MonoBehaviour {
   
   void Update() {
     if(ImagesEnabled){
-        Frame imageFrame = provider.CurrentFrame;
-        Controller controller = provider.GetLeapController();
+        Frame imageFrame = _provider.CurrentFrame;
+        Controller controller = _provider.GetLeapController();
         _requestedImage = controller.RequestImages(imageFrame.Id, Image.ImageType.DEFAULT);
     } else if(!checkingImageState){
        StartCoroutine(CheckImageMode());
@@ -329,7 +329,7 @@ public class LeapImageRetriever : MonoBehaviour {
   private IEnumerator CheckImageMode(){
     checkingImageState = true;
     yield return new WaitForSeconds(IMAGE_SETTING_POLL_RATE);
-    provider.GetLeapController().Config.Get<Int32>("images_mode", delegate (Int32 enabled){
+    _provider.GetLeapController().Config.Get<Int32>("images_mode", delegate (Int32 enabled){
       this.ImagesEnabled = enabled == 0 ? false : true;
       checkingImageState = false;
     });
