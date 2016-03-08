@@ -225,12 +225,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   provider: {fileID: 1587970163}
   recenter: 114
-  tweenImageWarping: 1
+  tweenImageWarping: 0
   tweenRotationalWarping: 1
   tweenPositionalWarping: 0
-  syncMode: 1
+  syncMode: 0
   allowManualTimeAlignment: 0
-  warpingAdjustment: 20
+  warpingAdjustment: 60
   unlockHold: 0
   moreRewind: 276
   lessRewind: 275
