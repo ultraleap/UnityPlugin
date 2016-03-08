@@ -140,10 +140,12 @@ namespace Leap {
     }
 
     protected virtual void OnApplicationPause(bool isPaused) {
-      if (isPaused) {
-        leap_controller_.StopConnection();
-      } else {
-        leap_controller_.StartConnection();
+      if (leap_controller_ != null) {
+        if (isPaused) {
+          leap_controller_.StopConnection();
+        } else {
+          leap_controller_.StartConnection();
+        }
       }
     }
 
@@ -178,7 +180,9 @@ namespace Leap {
 
     protected void destroyController() {
       if (leap_controller_ != null) {
-        leap_controller_.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+        if (leap_controller_.IsConnected) {
+          leap_controller_.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+        }
         leap_controller_.StopConnection();
         leap_controller_ = null;
       }
