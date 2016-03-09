@@ -72,7 +72,7 @@ namespace Leap {
     protected virtual void Update() {
       Frame frame = Provider.CurrentFrame;
       if (frame.Id != prev_graphics_id_ && graphicsEnabled) {
-        UpdateHandRepresentations(graphicsReps, ModelType.Graphics);
+        UpdateHandRepresentations(graphicsReps, ModelType.Graphics, frame);
         prev_graphics_id_ = frame.Id;
 
       }
@@ -83,7 +83,7 @@ namespace Leap {
       Frame fixedFrame = Provider.CurrentFixedFrame;
 
       if (fixedFrame.Id != prev_physics_id_ && physicsEnabled) {
-        UpdateHandRepresentations(physicsReps, ModelType.Physics);
+        UpdateHandRepresentations(physicsReps, ModelType.Physics, fixedFrame);
         prev_physics_id_ = fixedFrame.Id;
       }
     }
@@ -95,8 +95,8 @@ namespace Leap {
     * Leap Hand objects are present in the Leap HandRepresentation Dictionary, new HandRepresentations are 
     * created and added to the dictionary. 
     */
-    void UpdateHandRepresentations(Dictionary<int, HandRepresentation> all_hand_reps, ModelType modelType) {
-      foreach (Leap.Hand curHand in Provider.CurrentFrame.Hands) {
+    void UpdateHandRepresentations(Dictionary<int, HandRepresentation> all_hand_reps, ModelType modelType, Frame frame) {
+      foreach (Leap.Hand curHand in frame.Hands) {
         HandRepresentation rep;
         if (!all_hand_reps.TryGetValue(curHand.Id, out rep)) {
           rep = Factory.MakeHandRepresentation(curHand, modelType);
@@ -107,7 +107,7 @@ namespace Leap {
         if (rep != null) {
           rep.IsMarked = true;
           rep.UpdateRepresentation(curHand, modelType);
-          rep.LastUpdatedTime = (int)Provider.CurrentFrame.Timestamp;
+          rep.LastUpdatedTime = (int)frame.Timestamp;
         }
       }
 
