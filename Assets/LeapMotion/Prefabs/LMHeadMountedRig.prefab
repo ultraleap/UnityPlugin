@@ -85,14 +85,14 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &411750
 Transform:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 117698}
-  m_LocalRotation: {x: -0.00000011520229, y: -0.70710695, z: -0.7071066, w: 0.00000011520235}
+  m_LocalRotation: {x: 0.000000115202326, y: -0.7071067, z: -0.7071068, w: -0.00000011520231}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -235,10 +235,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 025cc0fa7b46aa541aba29d28d35ac09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PerFrameFixedUpdateOffset: 0
-  isHeadMounted: 1
-  overrideDeviceType: 0
-  overrideDeviceTypeWith: 1
+  _isHeadMounted: 0
+  overrideDeviceType: 1
+  _overrideDeviceTypeWith: 1
 --- !u!114 &11407670
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -264,7 +263,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelCollection: []
+  ModelCollection:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   ModelPool: []
 --- !u!114 &11415308
 MonoBehaviour:
@@ -289,7 +292,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e21f7214440054f59a5d2da168b3e2dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leapHandController: {fileID: 11415308}
   provider: {fileID: 11402294}
   recenter: 114
   tweenImageWarping: 1
@@ -297,7 +299,7 @@ MonoBehaviour:
   tweenPositionalWarping: 0
   syncMode: 1
   allowManualTimeAlignment: 0
-  warpingAdjustment: 20
+  warpingAdjustment: 60
   unlockHold: 0
   moreRewind: 276
   lessRewind: 275
@@ -319,12 +321,12 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 101514}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fd815635398474cbbba564563a209f82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  provider: {fileID: 11402294}
+  _provider: {fileID: 11402294}
   _gammaCorrection: 1
   ImageTimeout: 9000
 --- !u!1001 &100100000

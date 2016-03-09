@@ -5,7 +5,3 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/LeapMotion/Scenes/Leap_Hands_Demo_Desktop.unity
-  - enabled: 1
-    path: Assets/LeapMotionModules/Android/Leap_Hands_Demo_HMD.unity

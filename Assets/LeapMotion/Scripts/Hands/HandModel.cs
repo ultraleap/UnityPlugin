@@ -108,7 +108,7 @@ public abstract class HandModel : IHandModel {
   */
   public Vector3 GetPalmDirection() {
     if (hand_ != null) {
-      return hand_.Direction.ToUnity();
+      return hand_.Direction.ToVector3();
     }
     if (palm) {
       return palm.forward;
@@ -121,7 +121,7 @@ public abstract class HandModel : IHandModel {
   */
   public Vector3 GetPalmNormal() {
     if (hand_ != null) {
-      return hand_.PalmNormal.ToUnity();
+      return hand_.PalmNormal.ToVector3();
     }
     if (palm) {
       return -palm.up;
@@ -134,7 +134,7 @@ public abstract class HandModel : IHandModel {
   */
   public Vector3 GetArmDirection() {
     if (hand_ != null) {
-      return hand_.Arm.Direction.ToUnity();
+      return hand_.Arm.Direction.ToVector3();
     }
     if (forearm) {
       return forearm.forward;
