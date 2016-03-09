@@ -19,6 +19,42 @@ namespace Leap {
     // Leap coordinates are in mm and Unity is in meters. So scale by 1000.
     /** Scale factor from Leap units (millimeters) to Unity units (meters). */
     public const float INPUT_SCALE = 0.001f;
+    /** Constant used when converting from right-handed to left-handed axes.*/
+    public static readonly Vector3 Z_FLIP = new Vector3(1, 1, -1);
+
+    /** 
+     * Converts a direction vector from Leap to Unity. (Does not scale.) 
+     * 
+     * Changes from the Leap Motion right-hand coordinate convention to the
+     * Unity left-handed convention by negating the z-coordinate.
+     *
+     * @param mirror If true, the vector is reflected along the z axis.
+     * @param leap_vector the Leap.Vector object to convert.
+     */
+    public static Vector3 ToUnity(this Vector leap_vector) {
+      return FlipZ(ToVector3(leap_vector));
+    }
+
+    /** 
+     * Converts a point from Leap to Unity. (Scales.)
+     * 
+     * Changes from the Leap Motion right-hand coordinate convention to the
+     * Unity left-handed convention by negating the z-coordinate. Also scales
+     * from Leap Motion millimeter units to Unity meter units by multiplying
+     * the vector by .001.
+     *
+     * @param mirror If true, the vector is reflected along the z axis.
+     * @param leap_vector the Leap.Vector object to convert. 
+     */
+    public static Vector3 ToUnityScaled(this Vector leap_vector) {      
+      //return INPUT_SCALE * FlipZ(ToVector3(leap_vector));
+      return FlipZ(ToVector3(leap_vector));
+
+    }
+
+    private static Vector3 FlipZ(Vector3 vector) {
+      return Vector3.Scale(vector, Z_FLIP);
+    }
 
     public static Vector3 ToVector3(this Vector vector) {
       return new Vector3(vector.x, vector.y, vector.z);
