@@ -9,6 +9,10 @@ namespace InteractionEngine {
     [SerializeField]
     protected InteractionController _controller;
 
+    private bool _hasRegisteredShapeDescription = false;
+
+    private bool _isRegisteredWithController = false;
+
     protected LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeHandle;
 
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeHandle {
@@ -24,38 +28,57 @@ namespace InteractionEngine {
 
     public abstract void SetClassification(eLeapIEClassification classification);
 
-    protected abstract IntPtr allocateShapeDescription();
-
-    protected virtual void Reset() {
-      _controller = FindObjectOfType<InteractionController>();
-    }
-
-    protected virtual void OnValidate() {
-      if (_controller == null) {
-        _controller = FindObjectOfType<InteractionController>();
+    public bool IsInteractionEnabled {
+      get {
+        return _isRegisteredWithController;
+      }
+      set {
+        if (value) {
+          EnableInteraction();
+        } else {
+          DisableInteraction();
+        }
       }
     }
 
-    protected virtual void Awake() {
-      //Must be in Awake so it happens before OnEnable
-      IntPtr shapeDesc = allocateShapeDescription();
-      _shapeHandle = _controller.RegisterShapeDescription(shapeDesc);
-    }
-
-    protected virtual void Start() { }
-
-    protected virtual void OnEnable() {
-      if (_controller != null) {
-        _controller.RegisterInteractionObject(this);
+    public bool HasRegisteredShapeDescription {
+      get {
+        return _hasRegisteredShapeDescription;
       }
     }
 
-    protected virtual void OnDisable() {
-      if (_controller != null) {
-        _controller.UnregisterInteractionObject(this);
+    public void EnableInteraction() {
+      if (_isRegisteredWithController) {
+        return;
       }
+
+      if (!_hasRegisteredShapeDescription) {
+        throw new InvalidOperationException("Cannot enable interaction before a shape definition has been registered.");
+      }
+
+      _controller.RegisterInteractionObject(this);
+      _isRegisteredWithController = true;
     }
 
-    protected virtual void Update() { }
+    public void DisableInteraction() {
+      if (!_isRegisteredWithController) {
+        return;
+      }
+
+      _controller.UnregisterInteractionObject(this);
+      _isRegisteredWithController = false;
+    }
+
+    protected void RegisterShapeDescription(IntPtr shapePtr) {
+      if (_hasRegisteredShapeDescription) {
+        if (_isRegisteredWithController) {
+          throw new InvalidOperationException("Cannot change the shape description while the object is registered with the controller.");
+        }
+        _controller.UnregisterShapeDescription(ref _shapeHandle);
+      }
+
+      _controller.RegisterShapeDescription(shapePtr);
+      _hasRegisteredShapeDescription = true;
+    }
   }
 }

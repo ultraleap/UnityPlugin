@@ -32,7 +32,7 @@ namespace InteractionEngine {
       return shapeHandle;
     }
 
-    public void UnregisterShapeDescription(LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle) {
+    public void UnregisterShapeDescription(ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle) {
       InteractionC.RemoveShapeDescription(ref _scene, ref handle);
     }
 
@@ -153,6 +153,7 @@ namespace InteractionEngine {
                                ref shapeTransform,
                                out instanceHandle);
 
+	  shape.ShapeHandle = shapeHandle;						   
       shape.InstanceHandle = instanceHandle;
     }
 

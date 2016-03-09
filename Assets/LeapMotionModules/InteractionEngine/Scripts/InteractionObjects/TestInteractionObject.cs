@@ -6,7 +6,6 @@ using System;
 namespace InteractionEngine {
 
   public class TestInteractionObject : InteractionObject {
-
     private SphereCollider _sphereCollider;
     private Renderer _renderer;
 
@@ -23,14 +22,6 @@ namespace InteractionEngine {
       }
     }
 
-    protected override IntPtr allocateShapeDescription() {
-      LEAP_IE_SPHERE_DESCRIPTION sphereDesc = new LEAP_IE_SPHERE_DESCRIPTION();
-      sphereDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Sphere;
-      sphereDesc.radius = _sphereCollider.radius;
-
-      return StructAllocator.AllocateStruct(sphereDesc);
-    }
-
     public override void SetClassification(eLeapIEClassification classification) {
       switch (classification) {
         case eLeapIEClassification.eLeapIEClassification_None:
@@ -45,11 +36,24 @@ namespace InteractionEngine {
       }
     }
 
-    protected override void Awake() {
-      base.Awake();
-
+    void OnEnable() {
       _sphereCollider = GetComponent<SphereCollider>();
       _renderer = GetComponent<Renderer>();
+
+      if (!HasRegisteredShapeDescription) {
+        LEAP_IE_SPHERE_DESCRIPTION sphereDesc = new LEAP_IE_SPHERE_DESCRIPTION();
+        sphereDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Sphere;
+        sphereDesc.radius = _sphereCollider.radius;
+
+        IntPtr shapePtr = StructAllocator.AllocateStruct(sphereDesc);
+        RegisterShapeDescription(shapePtr);
+      }
+
+      EnableInteraction();
+    }
+
+    void OnDisable() {
+      DisableInteraction();
     }
   }
 }
