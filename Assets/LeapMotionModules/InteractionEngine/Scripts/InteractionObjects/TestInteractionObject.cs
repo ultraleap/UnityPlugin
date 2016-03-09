@@ -22,15 +22,13 @@ namespace InteractionEngine {
         transform.rotation = value.rotation.ToUnityRotation();
       }
     }
-    
-    public override IntPtr ShapeDescriptionPtr {
-      get {
-        LEAP_IE_SPHERE_DESCRIPTION sphereDesc = new LEAP_IE_SPHERE_DESCRIPTION();
-        sphereDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Sphere;
-        sphereDesc.radius = _sphereCollider.radius;
-        
-        return StructAllocator.AllocateStruct(sphereDesc);
-      }
+
+    protected override IntPtr allocateShapeDescription() {
+      LEAP_IE_SPHERE_DESCRIPTION sphereDesc = new LEAP_IE_SPHERE_DESCRIPTION();
+      sphereDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Sphere;
+      sphereDesc.radius = _sphereCollider.radius;
+
+      return StructAllocator.AllocateStruct(sphereDesc);
     }
 
     public override void SetClassification(eLeapIEClassification classification) {
@@ -53,6 +51,5 @@ namespace InteractionEngine {
       _sphereCollider = GetComponent<SphereCollider>();
       _renderer = GetComponent<Renderer>();
     }
-
   }
 }

@@ -7,10 +7,14 @@ namespace InteractionEngine {
 
   public abstract class InteractionObject : MonoBehaviour {
     [SerializeField]
-    private InteractionController _controller;
+    protected InteractionController _controller;
 
-    public abstract IntPtr ShapeDescriptionPtr {
-      get;
+    protected LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeHandle;
+
+    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeHandle {
+      get {
+        return _shapeHandle;
+      }
     }
 
     public abstract LEAP_IE_TRANSFORM IeTransform {
@@ -19,6 +23,8 @@ namespace InteractionEngine {
     }
 
     public abstract void SetClassification(eLeapIEClassification classification);
+
+    protected abstract IntPtr allocateShapeDescription();
 
     protected virtual void Reset() {
       _controller = FindObjectOfType<InteractionController>();
@@ -30,7 +36,11 @@ namespace InteractionEngine {
       }
     }
 
-    protected virtual void Awake() { }
+    protected virtual void Awake() {
+      //Must be in Awake so it happens before OnEnable
+      IntPtr shapeDesc = allocateShapeDescription();
+      _shapeHandle = _controller.RegisterShapeDescription(shapeDesc);
+    }
 
     protected virtual void Start() { }
 

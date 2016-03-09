@@ -172,9 +172,10 @@ namespace InteractionEngine.Internal {
 
     public static eLeapIERS UpdateHands(ref LEAP_IE_SCENE scene,
                                             Leap.Frame frame) {
-      StructAllocator.BeginAllocationBlock();
       IntPtr handArray = HandArrayBuilder.CreateHandArray(frame);
-      return UpdateHands(ref scene, (uint)frame.Hands.Count, handArray);
+      eLeapIERS rs = UpdateHands(ref scene, (uint)frame.Hands.Count, handArray);
+      StructAllocator.CleanupAllocations();
+      return rs;
     }
 
     /*** Add Shape Description ***/
@@ -229,10 +230,10 @@ namespace InteractionEngine.Internal {
                                         ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
                                             UInt32 type,
                                             T data) where T : struct {
-      StructAllocator.BeginAllocationBlock();
       IntPtr tmpPtr = StructAllocator.AllocateStruct(data);
-      var ret = Annotate(ref scene, ref instance, type, (UInt32)StructMarshal<T>.Size, tmpPtr);
-      return ret;
+      var rs = Annotate(ref scene, ref instance, type, (UInt32)StructMarshal<T>.Size, tmpPtr);
+      StructAllocator.CleanupAllocations();
+      return rs;
     }
 
     /*** Get Classification ***/

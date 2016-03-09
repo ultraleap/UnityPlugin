@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using Leap;
 using LeapInternal;
 using InteractionEngine.Internal;
@@ -23,6 +24,16 @@ namespace InteractionEngine {
         }
         return flags;
       }
+    }
+
+    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE RegisterShapeDescription(IntPtr shapePtr) {
+      LEAP_IE_SHAPE_DESCRIPTION_HANDLE shapeHandle;
+      InteractionC.AddShapeDescription(ref _scene, shapePtr, out shapeHandle);
+      return shapeHandle;
+    }
+
+    public void UnregisterShapeDescription(LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle) {
+      InteractionC.RemoveShapeDescription(ref _scene, ref handle);
     }
 
     public void RegisterInteractionObject(InteractionObject obj) {
@@ -132,14 +143,7 @@ namespace InteractionEngine {
     }
 
     private void registerWithInteractionC(InteractionObject obj, InteractionShape shape) {
-      LEAP_IE_SHAPE_DESCRIPTION_HANDLE shapeHandle;
-
-      StructAllocator.BeginAllocationBlock();
-      InteractionC.AddShapeDescription(ref _scene,
-                                           obj.ShapeDescriptionPtr,
-                                       out shapeHandle);
-
-      shape.ShapeHandle = shapeHandle;
+      var shapeHandle = obj.ShapeHandle;
       var shapeTransform = obj.IeTransform;
 
       LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle;

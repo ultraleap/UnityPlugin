@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 public static class StructAllocator {
   private static List<IntPtr> _allocated = new List<IntPtr>();
 
-  public static void BeginAllocationBlock() {
+  public static void CleanupAllocations() {
     for (int i = 0; i < _allocated.Count; i++) {
       Marshal.FreeHGlobal(_allocated[i]);
     }
