@@ -7,10 +7,11 @@
 using UnityEngine;
 using System.Collections;
 
-public class StretchToScreen : MonoBehaviour {
-
-  void Awake() {
-    GetComponent<GUITexture>().pixelInset = new Rect(0.0f, 0.0f, Screen.width, Screen.height);
+namespace Leap.Unity{
+  public class StretchToScreen : MonoBehaviour {
+  
+    void Awake() {
+      GetComponent<GUITexture>().pixelInset = new Rect(0.0f, 0.0f, Screen.width, Screen.height);
+    }
   }
 }
-

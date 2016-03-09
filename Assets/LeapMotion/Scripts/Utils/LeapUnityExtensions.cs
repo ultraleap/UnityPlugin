@@ -8,7 +8,7 @@ using UnityEngine;
 using System.Collections;
 using Leap;
 
-namespace Leap {
+namespace Leap.Unity {
 
   /** 
    * Extends the Leap Motion Vector class to converting points and directions from the

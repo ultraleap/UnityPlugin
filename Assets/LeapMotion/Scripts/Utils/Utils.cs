@@ -8,7 +8,7 @@ using UnityEngine;
 using System.Collections;
 using Leap;
 
-namespace Leap {
+namespace Leap.Unity {
 
   public static class Utils {
 

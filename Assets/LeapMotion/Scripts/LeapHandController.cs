@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Leap;
 
-namespace Leap {
+namespace Leap.Unity {
   
   public class LeapHandController : MonoBehaviour {
     /** The scale factors for hand movement. Set greater than 1 to give the hands a greater range of motion. */
