@@ -70,7 +70,7 @@ public abstract class HandModel : IHandModel {
 
     Vector3 additional_movement = controller_.handMovementScale - Vector3.one;
 
-    Vector3 scaled_wrist_position = Vector3.Scale(additional_movement, hand_.WristPosition.ToUnityScaled());
+    Vector3 scaled_wrist_position = Vector3.Scale(additional_movement, hand_.WristPosition.ToVector3());
 
     return controller_.transform.TransformPoint(scaled_wrist_position) -
            controller_.transform.position;
@@ -148,7 +148,7 @@ public abstract class HandModel : IHandModel {
   public Vector3 GetArmCenter() {
     if (hand_ != null) {
       Vector leap_center = 0.5f * (hand_.Arm.WristPosition + hand_.Arm.ElbowPosition);
-      return leap_center.ToUnityScaled();
+      return leap_center.ToVector3();
     }
     if (forearm) {
       return forearm.position;
@@ -171,7 +171,7 @@ public abstract class HandModel : IHandModel {
   */
   public Vector3 GetElbowPosition() {
     if (hand_ != null) {
-      Vector3 local_position = hand_.Arm.ElbowPosition.ToUnityScaled ();
+      Vector3 local_position = hand_.Arm.ElbowPosition.ToVector3();
       return local_position;
     }
     if (elbowJoint) {
@@ -185,7 +185,7 @@ public abstract class HandModel : IHandModel {
   */
   public Vector3 GetWristPosition() {
     if (hand_ != null) {
-      Vector3 local_position = hand_.Arm.WristPosition.ToUnityScaled ();
+      Vector3 local_position = hand_.Arm.WristPosition.ToVector3();
       return local_position;
     }
     if (wristJoint) {
@@ -259,7 +259,6 @@ public abstract class HandModel : IHandModel {
   * by the Leap Motion device.
   */
   public override void InitHand() {
-    Debug.Log("HandModel.InitHand() +++++++++++++++++++++++++++++++++++++++++++");
     for (int f = 0; f < fingers.Length; ++f) {
       if (fingers[f] != null) {
         fingers[f].fingerType = (Finger.FingerType)f;

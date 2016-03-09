@@ -62,7 +62,7 @@ public class MinimalHand : IHandModel {
     for (int i = 0; i < 5; i++) {
       Finger finger = list[i];
       for (int j = 0; j < 4; j++) {
-        _joints[index++].position = finger.JointPosition((Finger.FingerJoint)j).ToVector3();
+        _joints[index++].position = finger.Bone((Bone.BoneType)j).NextJoint.ToVector3();
       }
     }
 

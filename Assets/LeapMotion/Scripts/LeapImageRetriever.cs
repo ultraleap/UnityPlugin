@@ -6,11 +6,11 @@
 using UnityEngine;
 using UnityEngine.Serialization;
 using System;
+using System.Collections;
 using Leap;
 
 // To use the LeapImageRetriever you must be on version 2.1+
 // and enable "Allow Images" in the Leap Motion settings.
-[ExecuteAfter(typeof(LeapProvider))]
 [RequireComponent(typeof(Camera))]
 public class LeapImageRetriever : MonoBehaviour {
   public const string GLOBAL_COLOR_SPACE_GAMMA_NAME = "_LeapGlobalColorSpaceGamma";
@@ -19,36 +19,25 @@ public class LeapImageRetriever : MonoBehaviour {
   public const int IMAGE_WARNING_WAIT = 10;
   public const int LEFT_IMAGE_INDEX = 0;
   public const int RIGHT_IMAGE_INDEX = 1;
-
-  private static LeapImageRetriever _instance = null;
-  public static LeapImageRetriever Instance {
-    get {
-      if (_instance == null) {
-        Debug.LogError("Could not find an instance of LeapImageRetriever in the scene!  Make sure one exists and is enabled!");
-      }
-      return _instance;
-    }
-  }
+  public const float IMAGE_SETTING_POLL_RATE = 2.0f;
 
   [SerializeField]
-  LeapProvider provider;
+  LeapServiceProvider _provider;
 
   [SerializeField]
   [FormerlySerializedAs("gammaCorrection")]
   private float _gammaCorrection = 1.0f;
 
-  private int _missedImages = 0;
+  [SerializeField]
+  protected long ImageTimeout = 9000; //microseconds
+
   private EyeTextureData _eyeTextureData = new EyeTextureData();
 
   //Image that we have requested from the service.  Are requested in Update and retrieved in OnPreRender
   protected Image _requestedImage = new Image();
-
-  //Debug vars for image retrieval
-  protected int _requestedImages = 0;
-  protected int _lateImages = 0;
-  protected int _superLateImages = 0;
-  protected float _startTime = 0;
-  protected float _lastTime = 0;
+  
+  protected bool ImagesEnabled = true;
+  private bool checkingImageState = false;
 
   public EyeTextureData TextureData {
     get {
@@ -106,7 +95,6 @@ public class LeapImageRetriever : MonoBehaviour {
 
     public void UpdateTexture(Image image) {
       Array.Copy(image.Data, 0, _intermediateArray, 0, _intermediateArray.Length);
-      //	  Array.Copy(right.Data, 0, _intermediateArray, _intermediateArray.Length / 2, _intermediateArray.Length / 2);
       _combinedTexture.LoadRawTextureData(_intermediateArray);
       _combinedTexture.Apply();
     }
@@ -165,9 +153,6 @@ public class LeapImageRetriever : MonoBehaviour {
       _combinedTexture.hideFlags = HideFlags.DontSave;
 
       addDistortionData(image, colorArray, 0);
-      //      addDistortionData(rightImage, colorArray, colorArray.Length / 2);
-
-
 
       _combinedTexture.SetPixels32(colorArray);
       _combinedTexture.Apply();
@@ -283,80 +268,71 @@ public class LeapImageRetriever : MonoBehaviour {
   }
 #endif
 
-  void Awake() {
-    if (_instance != null && _instance != this) {
-      Debug.LogError("Can only have one instance of LeapImageRetriever in the scene!  This one has been destroyed!");
-      DestroyImmediate(this);
-      return;
-    }
-
-    _instance = this;
-  }
-
   void Start() {
-    if (provider == null) {
+    if (_provider == null) {
       Debug.LogWarning("Cannot use LeapImageRetriever if there is no LeapProvider!");
       enabled = false;
       return;
     }
-
+    LeapVRCameraControl.OnValidCameraParams += HandleOnValidCameraParams;
     ApplyGammaCorrectionValues();
+    ApplyCameraProjectionValues();
+
+  }
+
+  void HandleOnValidCameraParams(LeapVRCameraControl.CameraParams camParams) {
     ApplyCameraProjectionValues();
   }
 
   void OnEnable() {
-    provider.GetLeapController().DistortionChange += onDistortionChange;
+    _provider.GetLeapController().DistortionChange += onDistortionChange;
+    _provider.GetLeapController().Connect += delegate {
+        _provider.GetLeapController().Config.Get("images_mode", (Int32 enabled) => {
+            this.ImagesEnabled = enabled == 0 ? false : true;
+        });
+    };
+    StartCoroutine(CheckImageMode());
   }
 
   void OnDisable() {
-    provider.GetLeapController().DistortionChange -= onDistortionChange;
-
-    if (_instance == this) {
-      _instance = null;
-    }
+    _provider.GetLeapController().DistortionChange -= onDistortionChange;
   }
 
-  void OnDestroy() {
-    if (_instance == this) {
-      _instance = null;
-    }
-  }
-
-  
   void OnPreRender() {
-    Controller controller = provider.GetLeapController();
-    long start = controller.Now();
-    if (!_requestedImage.IsComplete) _lateImages++;
-    while (!_requestedImage.IsComplete) {
-      if (controller.Now() - start > 9000) break;
-    }
-    if (_requestedImage.IsComplete) {
-      //Debug.Log("controller_.Now():" + controller.Now() + " - CurrentFrame.Timestamp:" + image.Timestamp + " = " + (controller.Now() - image.Timestamp));
-      //Debug.Log("LeapImageRetriever.OnPreRender image.SequenceId: " + image.SequenceId);
-      if (_eyeTextureData.CheckStale(_requestedImage, _requestedImage)) {
-        _eyeTextureData.Reconstruct(_requestedImage, _requestedImage);
+    if(ImagesEnabled){
+      Controller controller = _provider.GetLeapController();
+      long start = controller.Now();
+      while (!_requestedImage.IsComplete) {
+        if (controller.Now() - start > ImageTimeout) break;
       }
-      _eyeTextureData.UpdateTextures(_requestedImage, _requestedImage);
-    } else {
-      //            Debug.Log("Shucks");
-      _superLateImages++;
+      if (_requestedImage.IsComplete) {
+        if (_eyeTextureData.CheckStale(_requestedImage, _requestedImage)) {
+          _eyeTextureData.Reconstruct(_requestedImage, _requestedImage);
+        }
+        _eyeTextureData.UpdateTextures(_requestedImage, _requestedImage);
+      } else if(!checkingImageState){
+        StartCoroutine(CheckImageMode());
+      }
     }
   }
   
   void Update() {
-    _startTime = Time.time;
-    if (_startTime - _lastTime > 1) {
-      //Debug.Log("Late images per second: " + (lateImages - superLateImages) + " lost images " + superLateImages + " out of " + requestedImages);
-      _lateImages = 0;
-      _superLateImages = 0;
-      _requestedImages = 0;
-      _lastTime = _startTime;
+    if(ImagesEnabled){
+        Frame imageFrame = _provider.CurrentFrame;
+        Controller controller = _provider.GetLeapController();
+        _requestedImage = controller.RequestImages(imageFrame.Id, Image.ImageType.DEFAULT);
+    } else if(!checkingImageState){
+       StartCoroutine(CheckImageMode());
     }
-    _requestedImages++;
-    Frame imageFrame = provider.CurrentFrame;
-    Controller controller = provider.GetLeapController();
-
-    _requestedImage = controller.RequestImages(imageFrame.Id, Image.ImageType.DEFAULT);
+  }
+  
+  private IEnumerator CheckImageMode(){
+    checkingImageState = true;
+    yield return new WaitForSeconds(IMAGE_SETTING_POLL_RATE);
+    _provider.GetLeapController().Config.Get<Int32>("images_mode", delegate (Int32 enabled){
+      this.ImagesEnabled = enabled == 0 ? false : true;
+      checkingImageState = false;
+    });
   }
 
   public void ApplyGammaCorrectionValues() {

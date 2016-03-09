@@ -2,21 +2,22 @@ namespace Leap {
 
 using System;
 using System.Runtime.InteropServices;
+  using System.Collections.Generic;
 
 
     public class TestHandFactory {
 
         public static Frame MakeTestFrame(int frameId, bool leftHandIncluded, bool rightHandIncluded){
-            Frame testFrame = new Frame(frameId, 0, 120.0f, new InteractionBox());
+            Frame testFrame = new Frame(frameId, 0, 120.0f, new InteractionBox(), new List<Hand>());
             if(leftHandIncluded)
-                testFrame.AddHand(MakeTestHand(frameId, 10, true));
+                testFrame.Hands.Add(MakeTestHand(frameId, 10, true));
             if(rightHandIncluded)
-                testFrame.AddHand(MakeTestHand(frameId, 20, false));
+              testFrame.Hands.Add(MakeTestHand(frameId, 20, false));
             return testFrame;
         }
 
         public static Hand MakeTestHand(int frameId, int handId, bool isLeft){
-            FingerList fingers = new FingerList(5);
+            List<Finger> fingers = new List<Finger>(5);
             fingers.Add(MakeThumb (frameId, handId));
             fingers.Add(MakeIndexFinger (frameId, handId));
             fingers.Add(MakeMiddleFinger (frameId, handId));
@@ -26,7 +27,7 @@ using System.Runtime.InteropServices;
             Vector armWrist = new Vector(-7.05809944059f, 4.0f, 50.0f);
             Vector elbow = armWrist + 250f * Vector.Backward;
             Matrix armBasis = new Matrix(Vector.Right, Vector.Down, Vector.Forward);
-            Arm arm = new Arm(elbow,armWrist,(elbow + armWrist)/2, Vector.Forward, 250f, 41f, Bone.BoneType.TYPE_DISTAL, armBasis);
+            Arm arm = new Arm(elbow,armWrist,(elbow + armWrist)/2, Vector.Forward, 250f, 41f, armBasis);
             Hand testHand = new Hand(frameId,
             handId,
             1.0f,
@@ -145,7 +146,7 @@ using System.Runtime.InteropServices;
             return new Bone(
                 proximalPosition,
                 proximalPosition + direction * length,
-                Vector.Lerp(proximalPosition, proximalPosition + direction * length, 2),
+                Vector.Lerp(proximalPosition, proximalPosition + direction * length, .5f),
                 direction,
                 length,
                 width,

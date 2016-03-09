@@ -7,10 +7,10 @@
 \******************************************************************************/
 namespace Leap
 {
-    using System;
-    using System.Runtime.InteropServices;
+  using System;
+  using System.Runtime.InteropServices;
 
-    /**
+  /**
    * The InteractionBox class represents a box-shaped region completely
    * within the field of view of the Leap Motion controller.
    *
@@ -27,30 +27,27 @@ namespace Leap
    * Get an InteractionBox object from a Frame object.
    * @since 1.0
    */
-
-    public class InteractionBox
+  public class InteractionBox
+  {
+    public InteractionBox()
     {
+      Size = Vector.Zero;
+      Center = Vector.Zero;
+    }
 
+    /**
+     * Create an interaction box with a specxific size and center position.
+     *
+     * @param center The midpoint of the box.
+     * @param size The dimensions of the box along each axis.
+     */
+    public InteractionBox(Vector center, Vector size)
+    {
+      Size = size;
+      Center = center;
+    }
 
-        public InteractionBox ()
-        {
-            Size = Vector.Zero;
-            Center = Vector.Zero;
-        }
-
-        /** 
-         * Create an interaction box with a specxific size and center position.
-         * 
-         * @param center The midpoint of the box.
-         * @param size The dimensions of the box along each axis.
-         */
-        public InteractionBox (Vector center, Vector size)
-        {
-            Size = size;
-            Center = center;
-        }
-
-        /**
+    /**
      * Normalizes the coordinates of a point using the interaction box.
      *
      * \include InteractionBox_normalizePoint.txt
@@ -65,23 +62,25 @@ namespace Leap
      * @returns The normalized position.
      * @since 1.0
      */
-        public Vector NormalizePoint (Vector position, bool clamp = true)
-        {
-            if (!this.IsValid) {
-                return Vector.Zero;
-            }
-            float x = (position.x - Center.x + Size.x / 2.0f) / Size.x;
-            float y = (position.y - Center.y + Size.y / 2.0f) / Size.y;
-            float z = (position.z - Center.z + Size.z / 2.0f) / Size.z;
-            if (clamp) {
-                x = Math.Min (1.0f, Math.Max (0.0f, x));
-                y = Math.Min (1.0f, Math.Max (0.0f, y));
-                z = Math.Min (1.0f, Math.Max (0.0f, z));
-            }
-            return new Vector (x, y, z);
-        }
+    public Vector NormalizePoint(Vector position, bool clamp = true)
+    {
+      if (!this.IsValid)
+      {
+        return Vector.Zero;
+      }
+      float x = (position.x - Center.x + Size.x / 2.0f) / Size.x;
+      float y = (position.y - Center.y + Size.y / 2.0f) / Size.y;
+      float z = (position.z - Center.z + Size.z / 2.0f) / Size.z;
+      if (clamp)
+      {
+        x = Math.Min(1.0f, Math.Max(0.0f, x));
+        y = Math.Min(1.0f, Math.Max(0.0f, y));
+        z = Math.Min(1.0f, Math.Max(0.0f, z));
+      }
+      return new Vector(x, y, z);
+    }
 
-        /**
+    /**
      * Converts a position defined by normalized InteractionBox coordinates into device
      * coordinates in millimeters.
      *
@@ -93,41 +92,42 @@ namespace Leap
      * @returns The corresponding denormalized position in device coordinates.
      * @since 1.0
      */
-        public Vector DenormalizePoint (Vector normalizedPosition)
-        {
-            if (!IsValid) {
-                return Vector.Zero;
-            }
-            float x = normalizedPosition.x * Size.x + (Center.x - Size.x / 2.0f);
-            float y = normalizedPosition.y * Size.y + (Center.y - Size.y / 2.0f);
-            float z = normalizedPosition.z * Size.z + (Center.z - Size.z / 2.0f);
-            return new Vector (x, y, z);
-        }
+    public Vector DenormalizePoint(Vector normalizedPosition)
+    {
+      if (!IsValid)
+      {
+        return Vector.Zero;
+      }
+      float x = normalizedPosition.x * Size.x + (Center.x - Size.x / 2.0f);
+      float y = normalizedPosition.y * Size.y + (Center.y - Size.y / 2.0f);
+      float z = normalizedPosition.z * Size.z + (Center.z - Size.z / 2.0f);
+      return new Vector(x, y, z);
+    }
 
-     /**
+    /**
      * Compare InteractionBox object equality.
      *
      * \include InteractionBox_operator_equals.txt
      *
-     * Two InteractionBox objects are equal if and only if both InteractionBox objects 
+     * Two InteractionBox objects are equal if and only if both InteractionBox objects
      * are the same size, in the same position and both InteractionBoxes are valid.
      * @since 1.0
      */
-        public bool Equals (InteractionBox other)
-        {
-            return this.IsValid && other.IsValid && (this.Center == other.Center) && (this.Size == other.Size);
-        }
+    public bool Equals(InteractionBox other)
+    {
+      return this.IsValid && other.IsValid && (this.Center == other.Center) && (this.Size == other.Size);
+    }
 
-        /**
+    /**
      * A string containing a brief, human readable description of the InteractionBox object.
      *
      * @returns A description of the InteractionBox as a string.
      * @since 1.0
      */
-        public override string ToString ()
-        {
-            return "InteractionBox Center: " + Center + ", Size: " + Size;
-        }
+    public override string ToString()
+    {
+      return "InteractionBox Center: " + Center + ", Size: " + Size;
+    }
 
     /**
      * The center of the InteractionBox in device coordinates (millimeters). This point
@@ -137,13 +137,13 @@ namespace Leap
      *
      * @returns The InteractionBox center in device coordinates.
      * @since 1.0
-     */ 
-        public Vector Center{ get; set; }
+     */
+    public Vector Center { get; set; }
 
-        /** 
-         * The dimensions of the interaction box along each axis.
-         */
-        public Vector Size{ get; set; }
+    /**
+     * The dimensions of the interaction box along each axis.
+     */
+    public Vector Size { get; set; }
 
     /**
      * The width of the InteractionBox in millimeters, measured along the x-axis.
@@ -152,12 +152,11 @@ namespace Leap
      *
      * @returns The InteractionBox width in millimeters.
      * @since 1.0
-     */  
-        public float Width {
-            get {
-                return this.Size.x;
-            } 
-        }
+     */
+    public float Width
+    {
+      get { return Size.x; }
+    }
 
     /**
      * The height of the InteractionBox in millimeters, measured along the y-axis.
@@ -166,12 +165,11 @@ namespace Leap
      *
      * @returns The InteractionBox height in millimeters.
      * @since 1.0
-     */  
-        public float Height {
-            get {
-                return this.Size.y;
-            } 
-        }
+     */
+    public float Height
+    {
+      get { return Size.y; }
+    }
 
     /**
      * The depth of the InteractionBox in millimeters, measured along the z-axis.
@@ -180,12 +178,11 @@ namespace Leap
      *
      * @returns The InteractionBox depth in millimeters.
      * @since 1.0
-     */  
-        public float Depth {
-            get {
-                return this.Size.z;
-            } 
-        }
+     */
+    public float Depth
+    {
+      get { return Size.z; }
+    }
 
     /**
      * Reports whether this is a valid InteractionBox object.
@@ -194,34 +191,16 @@ namespace Leap
      *
      * @returns True, if this InteractionBox object contains valid data.
      * @since 1.0
-     */  
-        public bool IsValid {
-            get {
-                return Size != Vector.Zero 
-                    && !float.IsNaN (Size.x) 
-                    && !float.IsNaN (Size.y) 
-                    && !float.IsNaN (Size.z);
-            } 
-        }
-
-    /**
-     * Returns an invalid InteractionBox object.
-     *
-     * You can use the instance returned by this function in comparisons testing
-     * whether a given InteractionBox instance is valid or invalid. (You can also use the
-     * InteractionBox::isValid() function.)
-     *
-     * \include InteractionBox_invalid.txt
-     *
-     * @returns The invalid InteractionBox instance.
-     * @since 1.0
-     */  
-        public static InteractionBox Invalid {
-            get {
-                return new InteractionBox ();
-            } 
-        }
-
+     */
+    public bool IsValid
+    {
+      get
+      {
+        return Size != Vector.Zero
+            && !float.IsNaN(Size.x)
+            && !float.IsNaN(Size.y)
+            && !float.IsNaN(Size.z);
+      }
     }
-
+  }
 }

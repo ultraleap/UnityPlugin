@@ -5,21 +5,20 @@ namespace Leap {
   public class HandDrop : HandTransitionBehavior {
     private Vector3 startingPalmPosition;
     private Quaternion startingOrientation;
-    private Vector3 startingScale;
     private Transform palm;
 
     // Use this for initialization
-    void Awake() {
+    protected override void Awake() {
+      base.Awake();
       palm = GetComponent<HandModel>().palm;
       startingPalmPosition = palm.localPosition;
       startingOrientation = palm.localRotation;
-      startingScale = transform.localScale;
     }
 
-    public override void HandFinish() {
+    protected override void HandFinish() {
       StartCoroutine(LerpToStart());
     }
-    public override void Reset() {
+    protected override void HandReset() {
       StopAllCoroutines();
     }
 

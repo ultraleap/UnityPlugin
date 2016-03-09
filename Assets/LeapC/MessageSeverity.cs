@@ -6,25 +6,19 @@
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
 
-namespace Leap {
-
+namespace Leap
+{
   /**
    * Reports whether the message is for
    * a severe failure, a recoverable warning, or a status change.
-   * @since 2.4.0
+   * @since 3.0
    */
-public enum MessageSeverity {
-  MESSAGE_UNKNOWN = 0,
-  MESSAGE_CRITICAL = 1,
-  MESSAGE_WARNING = 2,
-/** A verbose, informational message 
-*/
-  MESSAGE_INFORMATION = 3
-}
-  /**
-   * Reports whether the message is for
-   * a severe failure, a recoverable warning, or a status change.
-   * @since 2.4.0
-   */
-
+  public enum MessageSeverity
+  {
+    MESSAGE_UNKNOWN = 0,
+    MESSAGE_CRITICAL = 1,
+    MESSAGE_WARNING = 2,
+    /** A verbose, informational message */
+    MESSAGE_INFORMATION = 3
+  }
 }
