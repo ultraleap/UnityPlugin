@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Leap {
+namespace Leap.Unity {
   public abstract class HandTransitionBehavior : MonoBehaviour {
 
     protected abstract void HandReset();

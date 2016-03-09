@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Leap;
 
-namespace Leap {
+namespace Leap.Unity {
   public class HandProxy:
     HandRepresentation
   {
     HandPool parent;
     public IHandModel handModel;
 
-  
-    public HandProxy(HandPool parent, IHandModel handModel, Leap.Hand hand) :
+    public HandProxy(HandPool parent, IHandModel handModel, Hand hand) :
       base(hand.Id)
     {
       this.parent = parent;
@@ -31,7 +31,7 @@ namespace Leap {
       handModel = null;
     }
 
-    public override void UpdateRepresentation(Leap.Hand hand, ModelType modelType){
+    public override void UpdateRepresentation(Hand hand, ModelType modelType){
       handModel.SetLeapHand(hand);
       handModel.UpdateHand();
     }

@@ -4,14 +4,15 @@ using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using Leap;
 
-/** 
- * HandPool holds a pool of IHandModels and makes HandRepresentations 
- * when given a Leap Hand and a model type or graphics or physics.
- * When a HandRepresentation is created, an IHandModel is removed from the pool.
- * When a HandRepresentation is finished, its IHandModel is returned to the pool.
- */
-namespace Leap {
+namespace Leap.Unity {
+  /** 
+   * HandPool holds a pool of IHandModels and makes HandRepresentations 
+   * when given a Leap Hand and a model type or graphics or physics.
+   * When a HandRepresentation is created, an IHandModel is removed from the pool.
+   * When a HandRepresentation is finished, its IHandModel is returned to the pool.
+   */
   public class HandPool :
     HandFactory
   {
@@ -32,7 +33,7 @@ namespace Leap {
       controller_ = GetComponent<LeapHandController>();
     }
 
-    public override HandRepresentation MakeHandRepresentation(Leap.Hand hand, ModelType modelType) {
+    public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
       HandRepresentation handRep = null;
       for (int i = 0; i < ModelPool.Count; i++) {
         IHandModel model = ModelPool[i];

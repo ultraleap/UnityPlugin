@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Leap.PinchUtility {
+namespace Leap.Unity.PinchUtility {
 
   /// <summary>
   /// Use this component on a Game Object to allow it to be manipulated by a pinch gesture.  The component

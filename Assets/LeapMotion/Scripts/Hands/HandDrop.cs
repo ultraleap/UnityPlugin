@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Leap {
+namespace Leap.Unity {
   public class HandDrop : HandTransitionBehavior {
     private Vector3 startingPalmPosition;
     private Quaternion startingOrientation;
