@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Leap.PinchUtility {
+namespace Leap.Unity.PinchUtility {
 
   /// <summary>
   /// A basic utility class to aid in creating pinch based actions.  Once linked with an IHandModel, it can

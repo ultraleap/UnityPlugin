@@ -3,8 +3,9 @@
 using UnityEditor;
 #endif
 using System;
+using Leap;
 
-namespace Leap {
+namespace Leap.Unity {
   public class LeapServiceProvider : LeapProvider {
     /** Conversion factor for nanoseconds to seconds. */
     protected const float NS_TO_S = 1e-6f;

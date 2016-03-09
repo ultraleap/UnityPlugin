@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace Leap.PinchUtility.Examples {
+namespace Leap.Unity.PinchUtility.Examples {
 
   [ExecuteInEditMode]
   public class MengerSponge : MonoBehaviour {

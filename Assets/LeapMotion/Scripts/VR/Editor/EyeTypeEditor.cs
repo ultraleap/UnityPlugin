@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.Collections;
+using Leap.Unity;
 
 [CustomPropertyDrawer(typeof(EyeType))]
 public class EyeTypeEditor : PropertyDrawer {
