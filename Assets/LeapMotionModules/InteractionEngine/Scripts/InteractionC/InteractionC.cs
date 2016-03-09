@@ -220,22 +220,6 @@ namespace InteractionEngine.Internal {
                                                 UInt32 bytes,
                                                 IntPtr data);
 
-    public static eLeapIERS Annotate(ref LEAP_IE_SCENE scene,
-                                     ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
-                                         UInt32 type) {
-      return Annotate(ref scene, ref instance, type, 0, IntPtr.Zero);
-    }
-
-    public static eLeapIERS Annotate<T>(ref LEAP_IE_SCENE scene,
-                                        ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
-                                            UInt32 type,
-                                            T data) where T : struct {
-      IntPtr tmpPtr = StructAllocator.AllocateStruct(data);
-      var rs = Annotate(ref scene, ref instance, type, (UInt32)StructMarshal<T>.Size, tmpPtr);
-      StructAllocator.CleanupAllocations();
-      return rs;
-    }
-
     /*** Get Classification ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetClassification")]
     public static extern eLeapIERS GetClassification(ref LEAP_IE_SCENE scene,

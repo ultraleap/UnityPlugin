@@ -36,6 +36,24 @@ namespace InteractionEngine {
       InteractionC.RemoveShapeDescription(ref _scene, ref handle);
     }
 
+    public void Annotate(InteractionObject obj, uint type, uint bytes, IntPtr data) {
+      if (!_objects.Contains(obj)) {
+        throw new InvalidOperationException("Cannot annotate an object that has not been registered with the controller.");
+      }
+
+      var handle = _objects[obj].InstanceHandle;
+      InteractionC.Annotate(ref _scene, ref handle, type, bytes, data);
+    }
+
+    public void Annotate<T>(InteractionObject obj, uint type, T t) where T : struct {
+      try {
+        IntPtr structDataPtr = StructAllocator.AllocateStruct<T>(t);
+        Annotate(obj, type, (uint)StructMarshal<T>.Size, structDataPtr);
+      } finally {
+        StructAllocator.CleanupAllocations();
+      }
+    }
+
     public void RegisterInteractionObject(InteractionObject obj) {
       InteractionShape shape = new InteractionShape();
       _objects[obj] = shape;
@@ -153,7 +171,7 @@ namespace InteractionEngine {
                                ref shapeTransform,
                                out instanceHandle);
 
-	  shape.ShapeHandle = shapeHandle;						   
+      shape.ShapeHandle = shapeHandle;
       shape.InstanceHandle = instanceHandle;
     }
 
