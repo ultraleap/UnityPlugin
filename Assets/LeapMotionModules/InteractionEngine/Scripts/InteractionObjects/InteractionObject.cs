@@ -80,5 +80,13 @@ namespace InteractionEngine {
       _controller.RegisterShapeDescription(shapePtr);
       _hasRegisteredShapeDescription = true;
     }
+
+    protected void Annotate(uint type, uint bytes, IntPtr data) {
+      _controller.Annotate(this, type, bytes, data);
+    }
+
+    protected void Annotate<T>(uint type, T t) where T : struct {
+      _controller.Annotate(this, type, t);
+    }
   }
 }
