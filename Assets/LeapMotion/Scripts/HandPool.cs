@@ -4,36 +4,36 @@ using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using Leap;
 
-/** 
- * HandPool holds a pool of IHandModels and makes HandRepresentations 
- * when given a Leap Hand and a model type or graphics or physics.
- * When a HandRepresentation is created, an IHandModel is removed from the pool.
- * When a HandRepresentation is finished, its IHandModel is returned to the pool.
- */
-namespace Leap {
+namespace Leap.Unity {
+  /** 
+   * HandPool holds a pool of IHandModels and makes HandRepresentations 
+   * when given a Leap Hand and a model type or graphics or physics.
+   * When a HandRepresentation is created, an IHandModel is removed from the pool.
+   * When a HandRepresentation is finished, its IHandModel is returned to the pool.
+   */
   public class HandPool :
     HandFactory
-
   {
-    public IHandModel LeftGraphicsModel;
-    public IHandModel RightGraphicsModel;
-    public IHandModel LeftPhysicsModel;
-    public IHandModel RightPhysicsModel;
+
+    [SerializeField]
+    private List<IHandModel> ModelCollection;
     public List<IHandModel> ModelPool;
     public LeapHandController controller_ { get; set; }
 
     // Use this for initialization
     void Start() {
       ModelPool = new List<IHandModel>();
-      ModelPool.Add(LeftGraphicsModel);
-      ModelPool.Add(RightGraphicsModel);
-      ModelPool.Add(LeftPhysicsModel);
-      ModelPool.Add(RightPhysicsModel);
+      for (int i = 0; i < ModelCollection.Count; i++) {
+        if (ModelCollection[i] != null) {
+          ModelPool.Add(ModelCollection[i]);
+        }
+      }
       controller_ = GetComponent<LeapHandController>();
     }
 
-    public override HandRepresentation MakeHandRepresentation(Leap.Hand hand, ModelType modelType) {
+    public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
       HandRepresentation handRep = null;
       for (int i = 0; i < ModelPool.Count; i++) {
         IHandModel model = ModelPool[i];
@@ -57,20 +57,13 @@ namespace Leap {
       }
       return handRep;
     }
-    //Validate the that IHandModel is an instance of a prefab from the scene vs. a prefab from the project
+    //Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project
 #if UNITY_EDITOR
-    void OnValidate(){
-      if (LeftGraphicsModel != null) {
-        ValidateIHandModelPrefab(LeftGraphicsModel);
-      }
-      if (RightGraphicsModel != null) {
-        ValidateIHandModelPrefab(RightGraphicsModel);
-      }
-      if (LeftPhysicsModel != null) {
-        ValidateIHandModelPrefab(LeftPhysicsModel);
-      }
-      if (RightPhysicsModel != null) {
-        ValidateIHandModelPrefab(RightPhysicsModel);
+    void OnValidate() {
+      for (int i = 0; i < ModelCollection.Count; i++) {
+        if (ModelCollection[i] != null) {
+          ValidateIHandModelPrefab(ModelCollection[i]);
+        }
       }
     }
     void ValidateIHandModelPrefab(IHandModel iHandModel) {

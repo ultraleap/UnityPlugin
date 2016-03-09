@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.Collections;
 using System.Collections.Generic;
+using Leap.Unity;
 
 [CustomEditor(typeof(LeapVRTemporalWarping))]
 public class LeapTemporalWarpingEditor : Editor {

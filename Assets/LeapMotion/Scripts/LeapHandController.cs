@@ -3,9 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Leap;
 
-namespace Leap {
-
-  [ExecuteAfter(typeof(LeapProvider))]
+namespace Leap.Unity {
+  
   public class LeapHandController : MonoBehaviour {
     /** The scale factors for hand movement. Set greater than 1 to give the hands a greater range of motion. */
     public Vector3 handMovementScale = Vector3.one;
@@ -57,32 +56,20 @@ namespace Leap {
     private long prev_physics_id_ = 0;
 
     /** Draws the Leap Motion gizmo when in the Unity editor. */
-    /*
     void OnDrawGizmos() {
       // Draws the little Leap Motion Controller in the Editor view.
       Gizmos.matrix = Matrix4x4.Scale(GIZMO_SCALE * Vector3.one);
       Gizmos.DrawIcon(transform.position, "leap_motion.png");
     }
-    */
 
     // Use this for initialization
-    void Start() {
+    protected virtual void Start() {
       Provider = GetComponent<LeapProvider>();
       Factory = GetComponent<HandFactory>();
     }
-    /**
-    * Turns off collisions between the specified GameObject and all hands.
-    * Subject to the limitations of Unity Physics.IgnoreCollisions(). 
-    * See http://docs.unity3d.com/ScriptReference/Physics.IgnoreCollision.html.
-    */
-    public void IgnoreCollisionsWithHands(GameObject to_ignore, bool ignore = true) {
-      foreach (HandRepresentation rep in physicsReps.Values) {
-        //Todo move this to HandModel
-        //Leap.Utils.IgnoreCollisions(rep.handModel.gameObject, to_ignore, ignore);
-      }
-    }
+
     /** Updates the graphics HandRepresentations. */
-    void Update() {
+    protected virtual void Update() {
       Frame frame = Provider.CurrentFrame;
       if (frame.Id != prev_graphics_id_ && graphicsEnabled) {
         UpdateHandRepresentations(graphicsReps, ModelType.Graphics);
@@ -90,6 +77,17 @@ namespace Leap {
 
       }
     }
+
+    /* Updates the physics HandRepresentations. */
+    protected virtual void FixedUpdate() {
+      Frame fixedFrame = Provider.CurrentFixedFrame;
+
+      if (fixedFrame.Id != prev_physics_id_ && physicsEnabled) {
+        UpdateHandRepresentations(physicsReps, ModelType.Physics);
+        prev_physics_id_ = fixedFrame.Id;
+      }
+    }
+
     /** 
     * Updates HandRepresentations based in the specified HandRepresentation Dictionary.
     * Active HandRepresentation instances are updated if the hand they represent is still
@@ -132,21 +130,6 @@ namespace Leap {
       if (toBeDeleted != null) {
         all_hand_reps.Remove(toBeDeleted.HandID);
         toBeDeleted.Finish();
-      }
-    }
-    /** Updates the physics HandRepresentations. */
-    protected virtual void FixedUpdate() {
-
-      //All FixedUpdates of a frame happen before Update, so only the last of these calculations is passed
-      //into Update for smoothing.
-      var latestFrame = Provider.CurrentFrame;
-      Provider.PerFrameFixedUpdateOffset = latestFrame.Timestamp * NS_TO_S - Time.fixedTime;
-
-      Frame frame = Provider.GetFixedFrame();
-
-      if (frame.Id != prev_physics_id_ && physicsEnabled) {
-        UpdateHandRepresentations(physicsReps, ModelType.Physics);
-        prev_physics_id_ = frame.Id;
       }
     }
   }
