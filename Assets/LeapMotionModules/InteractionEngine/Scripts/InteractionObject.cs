@@ -23,23 +23,32 @@ namespace InteractionEngine {
     #endregion
 
     #region PUBLIC METHODS
+    public InteractionController Controller {
+      get {
+        return _controller;
+      }
+      set {
+        _controller = value;
+      }
+    }
+
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeHandle {
       get {
         return _shapeHandle;
       }
     }
-    
+
     public abstract LEAP_IE_TRANSFORM IeTransform {
       get;
       set;
     }
-    
+
     public virtual void SetClassification(eLeapIEClassification classification) {
       if (OnClassification != null) {
         OnClassification(classification);
       }
     }
-    
+
     public bool IsInteractionEnabled {
       get {
         return _isRegisteredWithController;
