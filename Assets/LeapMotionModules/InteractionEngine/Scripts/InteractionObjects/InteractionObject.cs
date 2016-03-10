@@ -6,15 +6,20 @@ using InteractionEngine.Internal;
 namespace InteractionEngine {
 
   public abstract class InteractionObject : MonoBehaviour {
+
+    #region SERIALIZED FIELDS
     [SerializeField]
     protected InteractionController _controller;
+    #endregion
 
+    #region INTERNAL FIELDS
     private bool _hasRegisteredShapeDescription = false;
-
     private bool _isRegisteredWithController = false;
 
     protected LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeHandle;
+    #endregion
 
+    #region PUBLIC METHODS
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeHandle {
       get {
         return _shapeHandle;
@@ -69,6 +74,16 @@ namespace InteractionEngine {
       _isRegisteredWithController = false;
     }
 
+    public void Annotate(uint type, uint bytes, IntPtr data) {
+      _controller.Annotate(this, type, bytes, data);
+    }
+
+    public void Annotate<T>(uint type, T t) where T : struct {
+      _controller.Annotate(this, type, t);
+    }
+    #endregion
+
+    #region PROTECTED METHODS
     protected void RegisterShapeDescription(IntPtr shapePtr) {
       if (_hasRegisteredShapeDescription) {
         if (_isRegisteredWithController) {
@@ -77,16 +92,9 @@ namespace InteractionEngine {
         _controller.UnregisterShapeDescription(ref _shapeHandle);
       }
 
-      _controller.RegisterShapeDescription(shapePtr);
+      _shapeHandle = _controller.RegisterShapeDescription(shapePtr);
       _hasRegisteredShapeDescription = true;
     }
-
-    protected void Annotate(uint type, uint bytes, IntPtr data) {
-      _controller.Annotate(this, type, bytes, data);
-    }
-
-    protected void Annotate<T>(uint type, T t) where T : struct {
-      _controller.Annotate(this, type, t);
-    }
+    #endregion
   }
 }

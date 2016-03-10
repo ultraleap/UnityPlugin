@@ -7,15 +7,21 @@ using InteractionEngine.Internal;
 namespace InteractionEngine {
 
   public class InteractionController : MonoBehaviour {
+
+    #region SERIALIZED FIELDS
     [SerializeField]
     private LeapProvider _leapProvider;
 
     [SerializeField]
     private bool _showDebugLines = true;
+    #endregion
 
+    #region INTERNAL FIELDS
     private OneToOneMap<InteractionObject, InteractionShape> _objects = new OneToOneMap<InteractionObject, InteractionShape>();
     private LEAP_IE_SCENE _scene;
+    #endregion
 
+    #region PUBLIC METHODS
     public eLeapIEDebugFlags DebugFlags {
       get {
         eLeapIEDebugFlags flags = eLeapIEDebugFlags.eLeapIEDebugFlags_None;
@@ -74,7 +80,9 @@ namespace InteractionEngine {
 
       _objects.Remove(obj);
     }
+    #endregion
 
+    #region UNITY CALLBACKS
     void OnValidate() {
       if (Application.isPlaying && isActiveAndEnabled) {
         applyDebugSettings();
@@ -111,7 +119,9 @@ namespace InteractionEngine {
         InteractionC.DrawDebugLines(ref _scene);
       }
     }
+    #endregion
 
+    #region INTERNAL METHODS
     private void applyDebugSettings() {
       InteractionC.EnableDebugFlags(ref _scene, (uint)DebugFlags);
     }
@@ -187,10 +197,13 @@ namespace InteractionEngine {
       shape.InstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
       shape.ShapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
     }
+    #endregion
 
+    #region INTERNAL CLASSES
     private class InteractionShape {
       public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeHandle;
       public LEAP_IE_SHAPE_INSTANCE_HANDLE InstanceHandle;
     }
+    #endregion
   }
 }
