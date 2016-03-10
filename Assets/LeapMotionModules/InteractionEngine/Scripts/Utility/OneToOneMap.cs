@@ -14,6 +14,11 @@ namespace InteractionEngine {
       }
     }
 
+    public void Clear() {
+      _aToB.Clear();
+      _bToA.Clear();
+    }
+
     public void Add(A a, B b) {
       if (_aToB.ContainsKey(a)) {
         throw new InvalidOperationException("Cannot add " + getPairString(a, b) + " to map because it conflicts with " +

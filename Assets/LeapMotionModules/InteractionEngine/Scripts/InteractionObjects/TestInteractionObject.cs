@@ -23,6 +23,7 @@ namespace InteractionEngine {
     }
 
     public override void SetClassification(eLeapIEClassification classification) {
+      base.SetClassification(classification);
       switch (classification) {
         case eLeapIEClassification.eLeapIEClassification_None:
           _renderer.material.color = Color.white;

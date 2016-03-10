@@ -11,6 +11,10 @@ namespace InteractionEngine {
     protected InteractionController _controller;
     #endregion
 
+    #region PUBLIC EVENTS
+    public event Action<eLeapIEClassification> OnClassification;
+    #endregion
+
     #region INTERNAL FIELDS
     private bool _hasRegisteredShapeDescription = false;
     private bool _isRegisteredWithController = false;
@@ -24,14 +28,18 @@ namespace InteractionEngine {
         return _shapeHandle;
       }
     }
-
+    
     public abstract LEAP_IE_TRANSFORM IeTransform {
       get;
       set;
     }
-
-    public abstract void SetClassification(eLeapIEClassification classification);
-
+    
+    public virtual void SetClassification(eLeapIEClassification classification) {
+      if (OnClassification != null) {
+        OnClassification(classification);
+      }
+    }
+    
     public bool IsInteractionEnabled {
       get {
         return _isRegisteredWithController;
