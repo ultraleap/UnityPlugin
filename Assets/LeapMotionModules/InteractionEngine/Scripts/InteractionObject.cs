@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System;
-using LeapInternal;
 using InteractionEngine.Internal;
 
 namespace InteractionEngine {
