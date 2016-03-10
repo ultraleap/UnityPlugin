@@ -159,12 +159,12 @@ namespace Leap.Unity{
   
     /** Returns the measured length of the forearm in meters.*/
     public float GetArmLength() {
-      return (hand_.Arm.WristPosition - hand_.Arm.ElbowPosition).Magnitude * UnityVectorExtension.INPUT_SCALE;
+      return (hand_.Arm.WristPosition - hand_.Arm.ElbowPosition).Magnitude;
     }
     
     /** Returns the measured width of the forearm in meters.*/
     public float GetArmWidth() {
-      return hand_.Arm.Width * UnityVectorExtension.INPUT_SCALE;
+      return hand_.Arm.Width;
     }
   
     /** Calculates the position of the elbow in global coordinates.
