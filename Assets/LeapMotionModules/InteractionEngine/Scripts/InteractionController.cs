@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System;
-using Leap;
+using Leap.Unity;
 using LeapInternal;
 using InteractionEngine.Internal;
 
@@ -16,7 +16,7 @@ namespace InteractionEngine {
     private OneToOneMap<InteractionObject, InteractionShape> _objects = new OneToOneMap<InteractionObject, InteractionShape>();
     private LEAP_IE_SCENE _scene;
 
-    public eLeapIEDebugFlags DebugVisualizationFlags {
+    public eLeapIEDebugFlags DebugFlags {
       get {
         eLeapIEDebugFlags flags = eLeapIEDebugFlags.eLeapIEDebugFlags_None;
         if (_showDebugLines) {
@@ -113,7 +113,7 @@ namespace InteractionEngine {
     }
 
     private void applyDebugSettings() {
-      InteractionC.EnableDebugVisualization(ref _scene, (uint)DebugVisualizationFlags);
+      InteractionC.EnableDebugFlags(ref _scene, (uint)DebugFlags);
     }
 
     private void updateIeRepresentations() {
