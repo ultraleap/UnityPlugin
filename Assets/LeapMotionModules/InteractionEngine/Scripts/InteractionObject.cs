@@ -91,7 +91,7 @@ namespace InteractionEngine {
     #endregion
 
     #region PROTECTED METHODS
-    protected void RegisterShapeDescription(IntPtr shapePtr) {
+    protected void RegisterShapeDescription<T>(T shape) where T : struct {
       if (_hasRegisteredShapeDescription) {
         if (_isRegisteredWithController) {
           throw new InvalidOperationException("Cannot change the shape description while the object is registered with the controller.");
@@ -99,7 +99,8 @@ namespace InteractionEngine {
         _controller.UnregisterShapeDescription(ref _shapeHandle);
       }
 
-      _shapeHandle = _controller.RegisterShapeDescription(shapePtr);
+      IntPtr ptr = StructAllocator.AllocateStruct(shape);
+      _shapeHandle = _controller.RegisterShapeDescription(ptr);
       _hasRegisteredShapeDescription = true;
     }
     #endregion

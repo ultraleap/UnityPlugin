@@ -45,9 +45,7 @@ namespace InteractionEngine {
         LEAP_IE_SPHERE_DESCRIPTION sphereDesc = new LEAP_IE_SPHERE_DESCRIPTION();
         sphereDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Sphere;
         sphereDesc.radius = _sphereCollider.radius;
-
-        IntPtr shapePtr = StructAllocator.AllocateStruct(sphereDesc);
-        RegisterShapeDescription(shapePtr);
+        RegisterShapeDescription(sphereDesc);
       }
 
       EnableInteraction();
