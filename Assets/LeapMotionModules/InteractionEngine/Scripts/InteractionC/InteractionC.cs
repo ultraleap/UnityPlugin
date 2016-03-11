@@ -43,15 +43,15 @@ namespace InteractionEngine.CApi {
     public float y;
     public float z;
 
-    public LEAP_QUATERNION(UnityEngine.Quaternion unity) {
+    public LEAP_QUATERNION(Quaternion unity) {
       w = unity.w;
       x = unity.x;
       y = unity.y;
       z = unity.z;
     }
 
-    public UnityEngine.Quaternion ToUnityRotation() {
-      return new UnityEngine.Quaternion(x, y, z, w);
+    public Quaternion ToUnityRotation() {
+      return new Quaternion(x, y, z, w);
     }
   }
 
@@ -62,15 +62,15 @@ namespace InteractionEngine.CApi {
     float b;
     float a;
 
-    public LEAP_COLOR(UnityEngine.Color color) {
+    public LEAP_COLOR(Color color) {
       r = color.r;
       g = color.g;
       b = color.b;
       a = color.a;
     }
 
-    public UnityEngine.Color ToUnityColor() {
-      return new UnityEngine.Color(r, g, b, a);
+    public Color ToUnityColor() {
+      return new Color(r, g, b, a);
     }
   }
 
