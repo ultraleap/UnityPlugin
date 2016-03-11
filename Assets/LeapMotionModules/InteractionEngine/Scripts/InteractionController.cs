@@ -181,13 +181,13 @@ namespace InteractionEngine {
     }
 
     protected virtual void unregisterWithInteractionC(InteractionObject obj, InteractionShape shape) {
-      var shapeHandle = shape.ShapeHandle;
-      InteractionC.RemoveShapeDescription(ref _scene,
-                                          ref shapeHandle);
-
       var instanceHandle = shape.InstanceHandle;
       InteractionC.DestroyShape(ref _scene,
                                 ref instanceHandle);
+
+      var shapeHandle = shape.ShapeHandle;
+      InteractionC.RemoveShapeDescription(ref _scene,
+                                          ref shapeHandle);
 
       shape.InstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
       shape.ShapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
