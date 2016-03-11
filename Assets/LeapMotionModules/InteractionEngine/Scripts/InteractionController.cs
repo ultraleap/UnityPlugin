@@ -10,15 +10,15 @@ namespace InteractionEngine {
 
     #region SERIALIZED FIELDS
     [SerializeField]
-    private LeapProvider _leapProvider;
+    protected LeapProvider _leapProvider;
 
     [SerializeField]
-    private bool _showDebugLines = true;
+    protected bool _showDebugLines = true;
     #endregion
 
     #region INTERNAL FIELDS
-    private OneToOneMap<InteractionObject, InteractionShape> _objects = new OneToOneMap<InteractionObject, InteractionShape>();
-    private LEAP_IE_SCENE _scene;
+    protected OneToOneMap<InteractionObject, InteractionShape> _objects = new OneToOneMap<InteractionObject, InteractionShape>();
+    protected LEAP_IE_SCENE _scene;
     #endregion
 
     #region PUBLIC METHODS
@@ -65,13 +65,13 @@ namespace InteractionEngine {
     #endregion
 
     #region UNITY CALLBACKS
-    void OnValidate() {
+    protected virtual void OnValidate() {
       if (Application.isPlaying && isActiveAndEnabled) {
         applyDebugSettings();
       }
     }
 
-    void OnEnable() {
+    protected virtual void OnEnable() {
       InteractionC.CreateScene(ref _scene);
       applyDebugSettings();
 
@@ -80,7 +80,7 @@ namespace InteractionEngine {
       }
     }
 
-    void OnDisable() {
+    protected virtual void OnDisable() {
       foreach (var pair in _objects) {
         unregisterWithInteractionC(pair.Key, pair.Value);
       }
@@ -88,7 +88,7 @@ namespace InteractionEngine {
       InteractionC.DestroyScene(ref _scene);
     }
 
-    void FixedUpdate() {
+    protected virtual void FixedUpdate() {
       updateIeRepresentations();
 
       updateIeTracking();
@@ -104,11 +104,11 @@ namespace InteractionEngine {
     #endregion
 
     #region INTERNAL METHODS
-    private void applyDebugSettings() {
+    protected virtual void applyDebugSettings() {
       InteractionC.EnableDebugFlags(ref _scene, (uint)DebugFlags);
     }
 
-    private void updateIeRepresentations() {
+    protected virtual void updateIeRepresentations() {
       foreach (var pair in _objects) {
         var obj = pair.Key;
         var shape = pair.Value;
@@ -122,12 +122,12 @@ namespace InteractionEngine {
       }
     }
 
-    private void updateIeTracking() {
+    protected virtual void updateIeTracking() {
       InteractionC.UpdateHands(ref _scene,
                                _leapProvider.CurrentFrame);
     }
 
-    private void simulateIe() {
+    protected virtual void simulateIe() {
       var _controllerTransform = new LEAP_IE_TRANSFORM();
       _controllerTransform.position = new LEAP_VECTOR(_leapProvider.transform.position);
       _controllerTransform.rotation = new LEAP_QUATERNION(_leapProvider.transform.rotation);
@@ -136,7 +136,7 @@ namespace InteractionEngine {
       InteractionC.UpdateController(ref _scene, ref _controllerTransform);
     }
 
-    private void setObjectClassifications() {
+    protected virtual void setObjectClassifications() {
       foreach (var pair in _objects) {
         var obj = pair.Key;
         var shape = pair.Value;
@@ -152,7 +152,7 @@ namespace InteractionEngine {
       }
     }
 
-    private void registerWithInteractionC(InteractionObject obj, InteractionShape shape) {
+    protected virtual void registerWithInteractionC(InteractionObject obj, InteractionShape shape) {
       var shapeHandle = obj.ShapeHandle;
       var shapeTransform = obj.IeTransform;
 
@@ -167,7 +167,7 @@ namespace InteractionEngine {
       shape.InstanceHandle = instanceHandle;
     }
 
-    private void unregisterWithInteractionC(InteractionObject obj, InteractionShape shape) {
+    protected virtual void unregisterWithInteractionC(InteractionObject obj, InteractionShape shape) {
       var shapeHandle = shape.ShapeHandle;
       InteractionC.RemoveShapeDescription(ref _scene,
                                           ref shapeHandle);
@@ -182,7 +182,7 @@ namespace InteractionEngine {
     #endregion
 
     #region INTERNAL CLASSES
-    private class InteractionShape {
+    protected class InteractionShape {
       public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeHandle;
       public LEAP_IE_SHAPE_INSTANCE_HANDLE InstanceHandle;
     }
