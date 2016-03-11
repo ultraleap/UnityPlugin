@@ -167,13 +167,7 @@ namespace InteractionEngine {
     }
 
     protected void AutoGenerateShapeDescription() {
-      Collider[] colliders = GetComponentsInChildren<Collider>();
-      for (int i = 0; i < colliders.Length; i++) {
-        Collider collider = colliders[i];
-        if (collider is SphereCollider) {
-
-        }
-      }
+      RegisterShapeDescription(new LEAP_IE_COMPOUND_DESCRIPTION(gameObject));
     }
 
     #endregion
