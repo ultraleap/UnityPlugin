@@ -3,7 +3,7 @@ using System;
 using Leap;
 using LeapInternal;
 
-namespace InteractionEngine.Internal {
+namespace InteractionEngine.CApi {
 
   public static class HandArrayBuilder {
 

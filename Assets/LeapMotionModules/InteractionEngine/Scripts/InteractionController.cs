@@ -2,7 +2,7 @@
 using System;
 using Leap.Unity;
 using LeapInternal;
-using InteractionEngine.Internal;
+using InteractionEngine.CApi;
 
 namespace InteractionEngine {
 

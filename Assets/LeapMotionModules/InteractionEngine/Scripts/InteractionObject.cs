@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System;
-using InteractionEngine.Internal;
+using InteractionEngine.CApi;
 
 namespace InteractionEngine {
 

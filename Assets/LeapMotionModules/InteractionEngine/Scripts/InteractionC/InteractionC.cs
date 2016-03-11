@@ -3,7 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 using LeapInternal;
 
-namespace InteractionEngine.Internal {
+namespace InteractionEngine.CApi {
 
   public enum eLeapIERS : uint {
     eLeapIERS_Success,
