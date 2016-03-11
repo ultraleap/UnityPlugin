@@ -134,8 +134,10 @@ namespace InteractionEngine {
     }
 
     protected virtual void updateIeTracking(Frame frame) {
-      InteractionC.UpdateHands(ref _scene,
-                                   frame);
+      int handCount = frame.Hands.Count;
+      IntPtr ptr = HandArrayBuilder.CreateHandArray(frame);
+      InteractionC.UpdateHands(ref _scene, (uint)handCount, ptr);
+      StructAllocator.CleanupAllocations();
     }
 
     protected virtual void simulateIe() {

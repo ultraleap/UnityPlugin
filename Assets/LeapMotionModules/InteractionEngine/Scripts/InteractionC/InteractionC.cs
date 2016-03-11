@@ -426,13 +426,6 @@ namespace InteractionEngine.CApi {
       Logger.HandleReturnStatus(rs);
     }
 
-    public static void UpdateHands(ref LEAP_IE_SCENE scene,
-                                       Leap.Frame frame) {
-      IntPtr handArray = HandArrayBuilder.CreateHandArray(frame);
-      UpdateHands(ref scene, (uint)frame.Hands.Count, handArray);
-      StructAllocator.CleanupAllocations();
-    }
-
     /*** Update Controller ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateController")]
     private static extern eLeapIERS LeapIEUpdateController(ref LEAP_IE_SCENE scene,
