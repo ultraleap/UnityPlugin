@@ -9,10 +9,15 @@ namespace InteractionEngine.CApi {
 
   public enum eLeapIERS : uint {
     eLeapIERS_Success,
+    eLeapIERS_InvalidHandle,
     eLeapIERS_InvalidArgument,
     eLeapIERS_ReferencesRemain,
     eLeapIERS_NotEnabled,
-    eLeapIERS_UnknownError = 0x10000000
+    eLeapIERS_UnknownError,
+    eLeapIERS_BadData,
+    eLeapIERS_StoppedOnNonDeterministic,
+    eLeapIERS_StoppedOnUnexpectedFailure,
+    eLeapIERS_UnexpectedEOF
   }
 
   public enum eLeapIEShapeType : uint {
@@ -290,6 +295,9 @@ namespace InteractionEngine.CApi {
         case eLeapIERS.eLeapIERS_Success:
           Log("Success", LogLevel.Verbose);
           break;
+        case eLeapIERS.eLeapIERS_InvalidHandle:
+          Log("Invalid Handle", LogLevel.Error);
+          break;
         case eLeapIERS.eLeapIERS_InvalidArgument:
           Log("Invalid Argument", LogLevel.Error);
           break;
@@ -301,6 +309,18 @@ namespace InteractionEngine.CApi {
           break;
         case eLeapIERS.eLeapIERS_UnknownError:
           Log("Unknown Error", LogLevel.Error);
+          break;
+        case eLeapIERS.eLeapIERS_BadData:
+          Log("Bad Data", LogLevel.Error);
+          break;
+        case eLeapIERS.eLeapIERS_StoppedOnNonDeterministic:
+          Log("Stopped On Non Deterministic", LogLevel.Error);
+          break;
+        case eLeapIERS.eLeapIERS_StoppedOnUnexpectedFailure:
+          Log("Stopped on Unexpected Failure", LogLevel.Error);
+          break;
+        case eLeapIERS.eLeapIERS_UnexpectedEOF:
+          Log("Unexpected End Of File", LogLevel.Error);
           break;
         default:
           throw new ArgumentException("Unexpected return status " + rs);
