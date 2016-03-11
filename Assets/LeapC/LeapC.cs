@@ -372,7 +372,6 @@ namespace LeapInternal
       return new UnityEngine.Vector3(x, y, z);
     }
 
-
     public LEAP_VECTOR(Leap.Vector leap)
     {
       x = leap.x;
