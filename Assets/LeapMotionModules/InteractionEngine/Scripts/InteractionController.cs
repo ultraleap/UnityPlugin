@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using Leap;
 using Leap.Unity;
 using LeapInternal;
 using InteractionEngine.CApi;
@@ -11,6 +12,10 @@ namespace InteractionEngine {
     #region SERIALIZED FIELDS
     [SerializeField]
     protected LeapProvider _leapProvider;
+
+    [Tooltip("If disabled, objects will still be able to be registers and unregistered, but the simulation will not progress.")]
+    [SerializeField]
+    protected bool _enableSimulation = true;
 
     [SerializeField]
     protected bool _showDebugLines = true;
@@ -89,13 +94,9 @@ namespace InteractionEngine {
     }
 
     protected virtual void FixedUpdate() {
-      updateIeRepresentations();
-
-      updateIeTracking();
-
-      simulateIe();
-
-      setObjectClassifications();
+      if (_enableSimulation) {
+        simulateFrame(_leapProvider.CurrentFrame);
+      }
 
       if (_showDebugLines) {
         InteractionC.DrawDebugLines(ref _scene);
@@ -104,6 +105,16 @@ namespace InteractionEngine {
     #endregion
 
     #region INTERNAL METHODS
+    protected virtual void simulateFrame(Frame frame) {
+      updateIeRepresentations();
+
+      updateIeTracking(frame);
+
+      simulateIe();
+
+      setObjectClassifications();
+    }
+
     protected virtual void applyDebugSettings() {
       InteractionC.EnableDebugFlags(ref _scene, (uint)DebugFlags);
     }
@@ -122,9 +133,9 @@ namespace InteractionEngine {
       }
     }
 
-    protected virtual void updateIeTracking() {
+    protected virtual void updateIeTracking(Frame frame) {
       InteractionC.UpdateHands(ref _scene,
-                               _leapProvider.CurrentFrame);
+                                   frame);
     }
 
     protected virtual void simulateIe() {
