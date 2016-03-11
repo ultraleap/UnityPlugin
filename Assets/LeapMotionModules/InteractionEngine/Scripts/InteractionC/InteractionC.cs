@@ -329,14 +329,6 @@ namespace InteractionEngine.Internal {
     public static extern eLeapIERS UpdateController(ref LEAP_IE_SCENE scene,
                                                     ref LEAP_IE_TRANSFORM controllerTransform);
 
-    /*** Annotate ***/
-    [DllImport(DLL_NAME, EntryPoint = "LeapIEAnnotate")]
-    public static extern eLeapIERS Annotate(ref LEAP_IE_SCENE scene,
-                                            ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
-                                                UInt32 type,
-                                                UInt32 bytes,
-                                                IntPtr data);
-
     /*** Get Classification ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetClassification")]
     public static extern eLeapIERS GetClassification(ref LEAP_IE_SCENE scene,

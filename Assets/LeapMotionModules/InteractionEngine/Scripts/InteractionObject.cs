@@ -135,14 +135,6 @@ namespace InteractionEngine {
       _controller.UnregisterInteractionObject(this);
       _isRegisteredWithController = false;
     }
-
-    public void Annotate(uint type, uint bytes, IntPtr data) {
-      _controller.Annotate(this, type, bytes, data);
-    }
-
-    public void Annotate<T>(uint type, T t) where T : struct {
-      _controller.Annotate(this, type, t);
-    }
     #endregion
 
     #region PROTECTED METHODS
