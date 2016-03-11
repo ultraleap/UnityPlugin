@@ -168,7 +168,8 @@ namespace Leap.Unity {
         leap_controller_.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
       }
     }
-
+    /** Create an instance of a Controller, initialize its policy flags
+     * and subscribe to connection event */
     protected void createController() {
       if (leap_controller_ != null) {
         destroyController();
@@ -181,6 +182,8 @@ namespace Leap.Unity {
       leap_controller_.Device += onHandControllerConnect;
     }
 
+    /** Calling this method stop the connection for the existing instance of a Controller, 
+     * clears old policy flags and resets to null */
     protected void destroyController() {
       if (leap_controller_ != null) {
         if (leap_controller_.IsConnected) {
@@ -240,7 +243,6 @@ namespace Leap.Unity {
           break;
         }
       }
-
       var leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
       _currentFixedFrame = closestFrame.TransformedCopy(leapMat);
     }

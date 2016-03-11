@@ -5,7 +5,7 @@ using Leap;
 
 namespace Leap.Unity {
   /**
-   * */
+   * LeapHandController uses a Factory to create and updata HandRepresentations based on Frame's received from a Provider  */
   public class LeapHandController : MonoBehaviour {
     /** The scale factors for hand movement. Set greater than 1 to give the hands a greater range of motion. */
     public Vector3 handMovementScale = Vector3.one;
