@@ -27,4 +27,13 @@ public static class StructAllocator {
     return ptr;
   }
 
+  public static IntPtr AllocateArray<T>(T[] data) where T : struct {
+    IntPtr ptr = Marshal.AllocHGlobal(StructMarshal<T>.Size * data.Length);
+    _allocated.Add(ptr);
+    for (int i = 0; i < data.Length; i++) {
+      StructMarshal<T>.CopyIntoArray(ptr, data[i], i);
+    }
+    return ptr;
+  }
+
 }
