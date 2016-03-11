@@ -3,6 +3,12 @@ using System.Collections;
 using Leap;
 
 namespace Leap.Unity {
+  /**
+   * HandProxy is a concrete example of HandRepresentation
+   * @param parent The HandPool which creates HandRepresentations
+   * @param handModel the IHandModel to be paired with Leap Hand data.
+   * @param hand The Leap Hand data to paired with an IHandModel
+   */ 
   public class HandProxy:
     HandRepresentation
   {
@@ -31,6 +37,7 @@ namespace Leap.Unity {
       handModel = null;
     }
 
+    /** Calls Updates in IHandModels that are part of this HandRepresentation */
     public override void UpdateRepresentation(Hand hand, ModelType modelType){
       handModel.SetLeapHand(hand);
       handModel.UpdateHand();

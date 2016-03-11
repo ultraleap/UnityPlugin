@@ -6,6 +6,7 @@ using System;
 using Leap;
 
 namespace Leap.Unity {
+  /**LeapServiceProvider creates a Controller and supplies Leap Hands and images */
   public class LeapServiceProvider : LeapProvider {
     /** Conversion factor for nanoseconds to seconds. */
     protected const float NS_TO_S = 1e-6f;
@@ -62,7 +63,7 @@ namespace Leap.Unity {
     /** Returns the Leap Controller instance. */
     public Controller GetLeapController() {
 #if UNITY_EDITOR
-      //Do a null check to deal with hot reloading
+      //Null check to deal with hot reloading
       if (leap_controller_ == null) {
         createController();
       }
@@ -231,7 +232,7 @@ namespace Leap.Unity {
           break;
         }
 
-        //If the history frame is closer, replace closestFrame with the historyFrame
+        /** If the history frame is closer, replace closestFrame with the historyFrame */
         if (Math.Abs(historyFrame.Timestamp - correctedTimestamp) < Math.Abs(closestFrame.Timestamp - correctedTimestamp)) {
           closestFrame = historyFrame;
         } else {

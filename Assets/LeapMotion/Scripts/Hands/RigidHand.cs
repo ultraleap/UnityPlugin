@@ -9,7 +9,7 @@ using System.Collections;
 using Leap;
 
 namespace Leap.Unity {
-  // The model for our rigid hand made out of various polyhedra.
+  /** A physics model for our rigid hand made out of various Unity Collider. */
   public class RigidHand : SkeletalHand {
     public override ModelType HandModelType {
       get {

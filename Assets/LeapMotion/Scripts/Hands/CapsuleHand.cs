@@ -5,6 +5,7 @@ using Leap;
 using System;
 
 namespace Leap.Unity{
+  /** A basic Leap hand model constructed dynamically vs. using pre-existing geometry*/
   public class CapsuleHand : IHandModel {
   
     private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4 ;
