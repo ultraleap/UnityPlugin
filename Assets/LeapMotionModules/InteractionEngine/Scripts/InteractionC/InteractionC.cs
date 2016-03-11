@@ -273,78 +273,174 @@ namespace InteractionEngine.CApi {
   public class InteractionC {
     public const string DLL_NAME = "LeapInteractionEngine";
 
+    public static void HandleReturnStatus(eLeapIERS) {
+
+    }
+
+    public static void Log(string message) {
+
+    }
+
     /*** Create Scene ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIECreateScene")]
-    public static extern eLeapIERS CreateScene(ref LEAP_IE_SCENE scene);
+    private static extern eLeapIERS LeapIECreateScene(ref LEAP_IE_SCENE scene);
+
+    public static void CreateScene(ref LEAP_IE_SCENE scene) {
+      Log("Create Scene");
+      var rs = LeapIECreateScene(ref scene);
+      HandleReturnStatus(rs);
+    }
 
     /*** Destroy Scene ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEDestroyScene")]
-    public static extern eLeapIERS DestroyScene(ref LEAP_IE_SCENE scene);
+    private static extern eLeapIERS LeapIEDestroyScene(ref LEAP_IE_SCENE scene);
+
+    public static void DestroyScene(ref LEAP_IE_SCENE scene) {
+      Log("Destroy Scene");
+      var rs = LeapIEDestroyScene(ref scene);
+      HandleReturnStatus(rs);
+    }
 
     /*** Add Shape Description ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEAddShapeDescription")]
-    public static extern eLeapIERS AddShapeDescription(ref LEAP_IE_SCENE scene,
-                                                           IntPtr pDescription,
-                                                       out LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
+    private static extern eLeapIERS LeapIEAddShapeDescription(ref LEAP_IE_SCENE scene,
+                                                                  IntPtr pDescription,
+                                                              out LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
+
+    public static void AddShapeDescription(ref LEAP_IE_SCENE scene,
+                                               IntPtr pDescription,
+                                           out LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle) {
+      Log("Add Shape Description");
+      var rs = LeapIEAddShapeDescription(ref scene, pDescription, out handle);
+      HandleReturnStatus(rs);
+    }
 
     /*** Remove Shape Description ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIERemoveShapeDescription")]
-    public static extern eLeapIERS RemoveShapeDescription(ref LEAP_IE_SCENE scene,
-                                                          ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
+    private static extern eLeapIERS LeapIERemoveShapeDescription(ref LEAP_IE_SCENE scene,
+                                                                 ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
+
+    public static void RemoveShapeDescription(ref LEAP_IE_SCENE scene,
+                                              ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle) {
+      Log("Remove Shape Description");
+      var rs = LeapIERemoveShapeDescription(ref scene, ref handle);
+      HandleReturnStatus(rs);
+    }
 
     /*** Create Shape ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIECreateShape")]
-    public static extern eLeapIERS CreateShape(ref LEAP_IE_SCENE scene,
-                                               ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle,
-                                               ref LEAP_IE_TRANSFORM transform,
-                                               out LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
+    private static extern eLeapIERS LeapIECreateShape(ref LEAP_IE_SCENE scene,
+                                                      ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle,
+                                                      ref LEAP_IE_TRANSFORM transform,
+                                                      out LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
+
+    public static void CreateShape(ref LEAP_IE_SCENE scene,
+                                   ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle,
+                                   ref LEAP_IE_TRANSFORM transform,
+                                   out LEAP_IE_SHAPE_INSTANCE_HANDLE instance) {
+      Log("Create Shape");
+      var rs = LeapIECreateShape(ref scene, ref handle, ref transform, out instance);
+      HandleReturnStatus(rs);
+    }
 
     /*** Destroy Shape ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEDestroyShape")]
-    public static extern eLeapIERS DestroyShape(ref LEAP_IE_SCENE scene,
-                                                ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
+    private static extern eLeapIERS LeapIEDestroyShape(ref LEAP_IE_SCENE scene,
+                                                       ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
+
+    public static void DestroyShape(ref LEAP_IE_SCENE scene,
+                                    ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance) {
+      Log("Destroy Shape");
+      var rs = LeapIEDestroyShape(ref scene, ref instance);
+      HandleReturnStatus(rs);
+    }
 
     /*** Update Shape ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateShape")]
-    public static extern eLeapIERS UpdateShape(ref LEAP_IE_SCENE scene,
-                                               ref LEAP_IE_TRANSFORM transform,
-                                               ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
+    private static extern eLeapIERS LeapIEUpdateShape(ref LEAP_IE_SCENE scene,
+                                                      ref LEAP_IE_TRANSFORM transform,
+                                                      ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
+
+    public static void UpdateShape(ref LEAP_IE_SCENE scene,
+                                   ref LEAP_IE_TRANSFORM transform,
+                                   ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance) {
+      Log("Update Shape");
+      var rs = LeapIEUpdateShape(ref scene, ref transform, ref instance);
+      HandleReturnStatus(rs);
+    }
 
     /*** Update Hands ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateHands")]
-    public static extern eLeapIERS UpdateHands(ref LEAP_IE_SCENE scene,
-                                                   UInt32 nHands,
-                                                   IntPtr pHands);
+    private static extern eLeapIERS LeapIEUpdateHands(ref LEAP_IE_SCENE scene,
+                                                          UInt32 nHands,
+                                                          IntPtr pHands);
 
-    public static eLeapIERS UpdateHands(ref LEAP_IE_SCENE scene,
-                                            Leap.Frame frame) {
+    public static void UpdateHands(ref LEAP_IE_SCENE scene,
+                                       UInt32 nHands,
+                                       IntPtr pHands) {
+      Log("Update Hands");
+      var rs = LeapIEUpdateHands(ref scene, nHands, pHands);
+      HandleReturnStatus(rs);
+    }
+
+    public static void UpdateHands(ref LEAP_IE_SCENE scene,
+                                       Leap.Frame frame) {
       IntPtr handArray = HandArrayBuilder.CreateHandArray(frame);
-      eLeapIERS rs = UpdateHands(ref scene, (uint)frame.Hands.Count, handArray);
+      UpdateHands(ref scene, (uint)frame.Hands.Count, handArray);
       StructAllocator.CleanupAllocations();
-      return rs;
     }
 
     /*** Update Controller ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateController")]
-    public static extern eLeapIERS UpdateController(ref LEAP_IE_SCENE scene,
-                                                    ref LEAP_IE_TRANSFORM controllerTransform);
+    private static extern eLeapIERS LeapIEUpdateController(ref LEAP_IE_SCENE scene,
+                                                           ref LEAP_IE_TRANSFORM controllerTransform);
+
+    public static void UpdateController(ref LEAP_IE_SCENE scene,
+                                        ref LEAP_IE_TRANSFORM controllerTransform) {
+      Log("Update Controller");
+      var rs = LeapIEUpdateController(ref scene, ref controllerTransform);
+      HandleReturnStatus(rs);
+    }
 
     /*** Get Classification ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetClassification")]
-    public static extern eLeapIERS GetClassification(ref LEAP_IE_SCENE scene,
-                                                     ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
-                                                     out LEAP_IE_SHAPE_CLASSIFICATION classification);
+    private static extern eLeapIERS LeapIEGetClassification(ref LEAP_IE_SCENE scene,
+                                                            ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
+                                                            out LEAP_IE_SHAPE_CLASSIFICATION classification);
+
+    public static void GetClassification(ref LEAP_IE_SCENE scene,
+                                         ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
+                                         out LEAP_IE_SHAPE_CLASSIFICATION classification) {
+      Log("Get Classification");
+      var rs = LeapIEGetClassification(ref scene, ref instance, out classification);
+      HandleReturnStatus(rs);
+    }
 
     /*** Enable Debug Visualization ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEEnableDebugFlags")]
-    public static extern eLeapIERS EnableDebugFlags(ref LEAP_IE_SCENE scene,
-                                                        UInt32 flags);
+    private static extern eLeapIERS LeapIEEnableDebugFlags(ref LEAP_IE_SCENE scene,
+                                                               UInt32 flags);
+
+    public static void EnableDebugFlags(ref LEAP_IE_SCENE scene,
+                                            UInt32 flags) {
+      Log("Enable Debug Flags");
+      var rs = LeapIEEnableDebugFlags(ref scene, flags);
+      HandleReturnStatus(rs);
+    }
 
     /*** Get Debug Lines ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetDebugLines")]
-    public static extern eLeapIERS GetDebugLines(ref LEAP_IE_SCENE scene,
-                                                 out UInt32 nLines,
-                                                 out IntPtr ppLineBuffer);
+    private static extern eLeapIERS LeapIEGetDebugLines(ref LEAP_IE_SCENE scene,
+                                                        out UInt32 nLines,
+                                                        out IntPtr ppLineBuffer);
+
+    public static void GetDebugLines(ref LEAP_IE_SCENE scene,
+                                     out UInt32 nLines,
+                                     out IntPtr ppLineBuffer) {
+      Log("Get Debug Lines");
+      var rs = LeapIEGetDebugLines(ref scene, out nLines, out ppLineBuffer);
+      HandleReturnStatus(rs);
+    }
 
     public static void DrawDebugLines(ref LEAP_IE_SCENE scene) {
       UInt32 lines;
