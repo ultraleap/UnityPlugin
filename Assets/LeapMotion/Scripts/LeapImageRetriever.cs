@@ -12,6 +12,8 @@ using Leap;
 namespace Leap.Unity{
   // To use the LeapImageRetriever you must be on version 2.1+
   // and enable "Allow Images" in the Leap Motion settings.
+
+  /** LeapImageRetriever acquires images from a LeapServiceProvider and uploads them to gpu for use by shaders */ 
   [RequireComponent(typeof(Camera))]
   public class LeapImageRetriever : MonoBehaviour {
     public const string GLOBAL_COLOR_SPACE_GAMMA_NAME = "_LeapGlobalColorSpaceGamma";

@@ -2,6 +2,7 @@
 using System.Collections;
 
 namespace Leap.Unity {
+  /**A Component to be attached to an IHandModel to handle starting and ending of tracking */
   public abstract class HandTransitionBehavior : MonoBehaviour {
 
     protected abstract void HandReset();

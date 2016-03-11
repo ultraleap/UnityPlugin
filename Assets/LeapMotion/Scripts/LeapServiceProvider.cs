@@ -6,6 +6,7 @@ using System;
 using Leap;
 
 namespace Leap.Unity {
+  /**LeapServiceProvider creates a Controller and supplies Leap Hands and images */
   public class LeapServiceProvider : LeapProvider {
     /** Conversion factor for nanoseconds to seconds. */
     protected const float NS_TO_S = 1e-6f;
@@ -62,7 +63,7 @@ namespace Leap.Unity {
     /** Returns the Leap Controller instance. */
     public Controller GetLeapController() {
 #if UNITY_EDITOR
-      //Do a null check to deal with hot reloading
+      //Null check to deal with hot reloading
       if (leap_controller_ == null) {
         createController();
       }
@@ -167,7 +168,8 @@ namespace Leap.Unity {
         leap_controller_.ClearPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
       }
     }
-
+    /** Create an instance of a Controller, initialize its policy flags
+     * and subscribe to connection event */
     protected void createController() {
       if (leap_controller_ != null) {
         destroyController();
@@ -180,6 +182,8 @@ namespace Leap.Unity {
       leap_controller_.Device += onHandControllerConnect;
     }
 
+    /** Calling this method stop the connection for the existing instance of a Controller, 
+     * clears old policy flags and resets to null */
     protected void destroyController() {
       if (leap_controller_ != null) {
         if (leap_controller_.IsConnected) {
@@ -231,7 +235,7 @@ namespace Leap.Unity {
           break;
         }
 
-        //If the history frame is closer, replace closestFrame with the historyFrame
+        /** If the history frame is closer, replace closestFrame with the historyFrame */
         if (Math.Abs(historyFrame.Timestamp - correctedTimestamp) < Math.Abs(closestFrame.Timestamp - correctedTimestamp)) {
           closestFrame = historyFrame;
         } else {
@@ -239,7 +243,6 @@ namespace Leap.Unity {
           break;
         }
       }
-
       var leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
       _currentFixedFrame = closestFrame.TransformedCopy(leapMat);
     }

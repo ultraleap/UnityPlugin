@@ -55,7 +55,8 @@ namespace Leap.Unity {
     }
 
     /**
-     * 
+     * Provides the translation matrix to convert Leap transform data to the Unity space of a specific Unity Transform.
+     * @param t The Unity Transform to which the Leap transformation data is translated
      */
     public static Matrix GetLeapMatrix(Transform t) {
       Vector xbasis = new Vector(t.right.x, t.right.y, t.right.z) * t.lossyScale.x * MM_TO_M;
