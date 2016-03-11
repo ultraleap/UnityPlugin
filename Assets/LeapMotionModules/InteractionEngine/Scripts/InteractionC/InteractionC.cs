@@ -272,19 +272,18 @@ namespace InteractionEngine.CApi {
     }
   }
 
+  public enum LogLevel {
+    Verbose,
+    AllCalls,
+    CreateDestroy,
+    Info,
+    Warning,
+    Error
+  }
+
   public class InteractionC {
-
     public const string DLL_NAME = "LeapInteractionEngine";
-    public const LogLevel logLevel = LogLevel.Info;
-
-    public enum LogLevel {
-      Verbose,
-      AllCalls,
-      CreateDestroy,
-      Info,
-      Warning,
-      Error
-    }
+    public static LogLevel logLevel = LogLevel.Info;
 
     [Conditional("ENABLE_LOGGING")]
     public static void HandleReturnStatus(eLeapIERS rs) {
