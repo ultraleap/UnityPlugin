@@ -25,14 +25,11 @@ namespace InteractionEngine {
     public override void SetClassification(eLeapIEClassification classification) {
       base.SetClassification(classification);
       switch (classification) {
-        case eLeapIEClassification.eLeapIEClassification_None:
+        case eLeapIEClassification.eLeapIEClassification_Physics:
           _renderer.material.color = Color.white;
           break;
-        case eLeapIEClassification.eLeapIEClassification_Grab:
+        case eLeapIEClassification.eLeapIEClassification_Grasp:
           _renderer.material.color = Color.green;
-          break;
-        case eLeapIEClassification.eLeapIEClassification_Push:
-          _renderer.material.color = Color.blue;
           break;
       }
     }

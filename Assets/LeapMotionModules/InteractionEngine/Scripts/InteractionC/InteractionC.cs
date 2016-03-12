@@ -33,9 +33,8 @@ namespace InteractionEngine.CApi {
   }
 
   public enum eLeapIEClassification : uint {
-    eLeapIEClassification_None,
-    eLeapIEClassification_Push,
-    eLeapIEClassification_Grab,
+    eLeapIEClassification_Physics,
+    eLeapIEClassification_Grasp,
     eLeapIEClassification_ForceTo32Bits = 0x10000000
   }
 
