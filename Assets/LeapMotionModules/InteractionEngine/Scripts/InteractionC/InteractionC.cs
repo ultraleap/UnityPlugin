@@ -37,9 +37,7 @@ namespace InteractionEngine.CApi {
 
   public enum eLeapIEDebugFlags {
     eLeapIEDebugFlags_None,
-    eLeapIEDebugFlags_LinesInternal = 0x01,
-    eLeapIEDebugFlags_RecordToFile = 0x02,
-    eLeapIEDebugFlags_RecordToAnalytics = 0x03,
+    eLeapIEDebugFlags_Lines = 0x01,
     eLeapIEDebugFlags_ForceTo32Bits = 0x10000000
   };
 

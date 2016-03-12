@@ -31,7 +31,7 @@ namespace InteractionEngine {
       get {
         eLeapIEDebugFlags flags = eLeapIEDebugFlags.eLeapIEDebugFlags_None;
         if (_showDebugLines) {
-          flags |= eLeapIEDebugFlags.eLeapIEDebugFlags_LinesInternal;
+          flags |= eLeapIEDebugFlags.eLeapIEDebugFlags_Lines;
         }
         return flags;
       }
