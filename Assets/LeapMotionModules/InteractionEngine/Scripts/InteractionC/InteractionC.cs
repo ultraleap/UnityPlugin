@@ -15,9 +15,13 @@ namespace InteractionEngine.CApi {
     eLeapIERS_NotEnabled,
     eLeapIERS_UnknownError,
     eLeapIERS_BadData,
+
     eLeapIERS_StoppedOnNonDeterministic,
     eLeapIERS_StoppedOnUnexpectedFailure,
-    eLeapIERS_UnexpectedEOF
+    eLeapIERS_StoppedOnFull,
+    eLeapIERS_UnexpectedEOF,
+
+    eLeapIERS_ForceTo32Bits = 0x10000000
   }
 
   public enum eLeapIEShapeType : uint {
@@ -312,10 +316,13 @@ namespace InteractionEngine.CApi {
           Log("Bad Data", LogLevel.Error);
           break;
         case eLeapIERS.eLeapIERS_StoppedOnNonDeterministic:
-          Log("Stopped On Non Deterministic", LogLevel.Error);
+          Log("Stopped on Non Deterministic", LogLevel.Error);
           break;
         case eLeapIERS.eLeapIERS_StoppedOnUnexpectedFailure:
           Log("Stopped on Unexpected Failure", LogLevel.Error);
+          break;
+        case eLeapIERS.eLeapIERS_StoppedOnFull:
+          Log("Stopped on Full", LogLevel.Error);
           break;
         case eLeapIERS.eLeapIERS_UnexpectedEOF:
           Log("Unexpected End Of File", LogLevel.Error);
