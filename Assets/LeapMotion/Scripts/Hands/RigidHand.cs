@@ -47,7 +47,7 @@ namespace Leap.Unity {
         if (capsule != null) {
           // Initialization
           capsule.direction = 2;
-          forearm.localScale = new Vector3 (1f, 1f, 1f);
+          forearm.localScale = new Vector3(1f/transform.lossyScale.x, 1f/transform.lossyScale.y, 1f/transform.lossyScale.z);
           
           // Update
           capsule.radius = GetArmWidth () / 2f;
