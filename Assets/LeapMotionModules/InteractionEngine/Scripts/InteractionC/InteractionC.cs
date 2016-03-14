@@ -368,6 +368,10 @@ namespace InteractionEngine.CApi {
       Logger.HandleReturnStatus(rs);
     }
 
+    /*** Get Last Error ***/
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastError")]
+    public static extern eLeapIERS GetLastError(ref LEAP_IE_SCENE scene);
+
     /*** Add Shape Description ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEAddShapeDescription")]
     private static extern eLeapIERS LeapIEAddShapeDescription(ref LEAP_IE_SCENE scene,
