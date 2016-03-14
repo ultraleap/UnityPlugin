@@ -9,7 +9,7 @@ using System.Collections;
 using Leap;
 
 namespace Leap.Unity{
-  // The finger model for our rigid hand made out of various cubes.
+  /** A physics finger model for our rigid hand made out of various cube Unity Colliders. */
   public class RigidFinger : SkeletalFinger {
   
     public float filtering = 0.5f;

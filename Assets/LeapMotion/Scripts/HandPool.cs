@@ -9,7 +9,7 @@ using Leap;
 namespace Leap.Unity {
   /** 
    * HandPool holds a pool of IHandModels and makes HandRepresentations 
-   * when given a Leap Hand and a model type or graphics or physics.
+   * when given a Leap Hand and a model type of graphics or physics.
    * When a HandRepresentation is created, an IHandModel is removed from the pool.
    * When a HandRepresentation is finished, its IHandModel is returned to the pool.
    */
@@ -22,7 +22,7 @@ namespace Leap.Unity {
     public List<IHandModel> ModelPool;
     public LeapHandController controller_ { get; set; }
 
-    // Use this for initialization
+    /** Popuates the ModelPool with the contents of the ModelCollection */
     void Start() {
       ModelPool = new List<IHandModel>();
       for (int i = 0; i < ModelCollection.Count; i++) {
@@ -32,7 +32,11 @@ namespace Leap.Unity {
       }
       controller_ = GetComponent<LeapHandController>();
     }
-
+    /**
+     * MakeHandRepresentation receives a Hand and combines that with an IHandModel to create a HandRepresentation
+     * @param hand The Leap Hand data to be drive an IHandModel
+     * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
+     */
     public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
       HandRepresentation handRep = null;
       for (int i = 0; i < ModelPool.Count; i++) {
@@ -57,8 +61,8 @@ namespace Leap.Unity {
       }
       return handRep;
     }
-    //Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project
 #if UNITY_EDITOR
+    /**In the Unity Editor, Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project. */
     void OnValidate() {
       for (int i = 0; i < ModelCollection.Count; i++) {
         if (ModelCollection[i] != null) {

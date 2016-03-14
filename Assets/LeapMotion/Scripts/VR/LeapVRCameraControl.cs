@@ -3,6 +3,7 @@ using UnityEngine.Rendering;
 using System;
 
 namespace Leap.Unity{
+  /**Provides a variety of VR related camera utilities, for example controlling IPD and camera distance */
   [RequireComponent(typeof(Camera))]
   [ExecuteInEditMode]
   public class LeapVRCameraControl : MonoBehaviour {

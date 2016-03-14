@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 
 namespace Leap.Unity{
+  /** Provides a hard coded Leap Frame with default left and right Hand poses. */
   public class TestHandFactory {
 
       public static Frame MakeTestFrame(int frameId, bool leftHandIncluded, bool rightHandIncluded){

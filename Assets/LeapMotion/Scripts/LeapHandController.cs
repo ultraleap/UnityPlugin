@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using Leap;
 
 namespace Leap.Unity {
-  
+  /**
+   * LeapHandController uses a Factory to create and updata HandRepresentations based on Frame's received from a Provider  */
   public class LeapHandController : MonoBehaviour {
     /** The scale factors for hand movement. Set greater than 1 to give the hands a greater range of motion. */
     public Vector3 handMovementScale = Vector3.one;
@@ -57,12 +58,10 @@ namespace Leap.Unity {
 
     /** Draws the Leap Motion gizmo when in the Unity editor. */
     void OnDrawGizmos() {
-      // Draws the little Leap Motion Controller in the Editor view.
       Gizmos.matrix = Matrix4x4.Scale(GIZMO_SCALE * Vector3.one);
       Gizmos.DrawIcon(transform.position, "leap_motion.png");
     }
 
-    // Use this for initialization
     protected virtual void Start() {
       Provider = GetComponent<LeapProvider>();
       Factory = GetComponent<HandFactory>();
@@ -78,7 +77,7 @@ namespace Leap.Unity {
       }
     }
 
-    /* Updates the physics HandRepresentations. */
+    /** Updates the physics HandRepresentations. */
     protected virtual void FixedUpdate() {
       Frame fixedFrame = Provider.CurrentFixedFrame;
 
@@ -94,6 +93,9 @@ namespace Leap.Unity {
     * present in the Provider's CurrentFrame; otherwise, the HandRepresentation is removed. If new
     * Leap Hand objects are present in the Leap HandRepresentation Dictionary, new HandRepresentations are 
     * created and added to the dictionary. 
+    * @param all_hand_reps = A dictionary of Leap Hand ID's with a paired HandRepresentation
+    * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
+    * @param frame The Leap Frame containing Leap Hand data for each currently tracked hand
     */
     void UpdateHandRepresentations(Dictionary<int, HandRepresentation> all_hand_reps, ModelType modelType, Frame frame) {
       foreach (Leap.Hand curHand in frame.Hands) {
@@ -111,7 +113,7 @@ namespace Leap.Unity {
         }
       }
 
-      //Mark-and-sweep to finish unused HandRepresentations
+      /** Mark-and-sweep to finish unused HandRepresentations */
       HandRepresentation toBeDeleted = null;
       foreach (KeyValuePair<int, HandRepresentation> r in all_hand_reps) {
         if (r.Value != null) {
@@ -119,14 +121,14 @@ namespace Leap.Unity {
             r.Value.IsMarked = false;
           }
           else {
-            //Initialize toBeDeleted with a value to be deleted
+            /** Initialize toBeDeleted with a value to be deleted */
             //Debug.Log("Finishing");
             toBeDeleted = r.Value;
           }
         }
       }
-      //Inform the representation that we will no longer be giving it any hand updates
-      //because the corresponding hand has gone away
+      /**Inform the representation that we will no longer be giving it any hand updates 
+       * because the corresponding hand has gone away */
       if (toBeDeleted != null) {
         all_hand_reps.Remove(toBeDeleted.HandID);
         toBeDeleted.Finish();
