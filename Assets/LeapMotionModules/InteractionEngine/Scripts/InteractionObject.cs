@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 using InteractionEngine.CApi;
 
 namespace InteractionEngine {
@@ -18,6 +19,8 @@ namespace InteractionEngine {
     #region INTERNAL FIELDS
     private bool _hasRegisteredShapeDescription = false;
     private bool _isRegisteredWithController = false;
+
+    private HashSet<int> _graspingIds = new HashSet<int>();
 
     protected LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeHandle;
     #endregion
@@ -62,12 +65,40 @@ namespace InteractionEngine {
     }
 
     /// <summary>
-    /// Called by the controller when the classification for this object changes.
+    /// 
     /// </summary>
-    /// <param name="classification"></param>
-    public virtual void SetClassification(eLeapIEClassification classification) {
-      if (OnClassification != null) {
-        OnClassification(classification);
+    /// <param name="handId"></param>
+    public virtual void BeginHandGrasp(int handId) {
+      if (_graspingIds.Contains(handId)) {
+        throw new InvalidOperationException("Cannot BeginGrasp with hand id " + handId +
+                                            " because a hand of that id is already grasping this object.");
+      }
+
+      _graspingIds.Add(handId);
+      if (_graspingIds.Count == 1) {
+        OnFirstGrasp(handId);
+      }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="handId"></param>
+    public virtual void EndHandGrasp(int handId) {
+      if (_graspingIds.Count == 0) {
+        throw new InvalidOperationException("Cannot EndGrasp with hand id " + handId +
+                                            " because there are no hands current grasping this object.");
+      }
+
+      if (!_graspingIds.Contains(handId)) {
+        throw new InvalidOperationException("Cannot EndGrasp with hand id " + handId +
+                                            " because a hand of that id not already grasping this object.");
+      }
+
+      _graspingIds.Remove(handId);
+
+      if (_graspingIds.Count == 0) {
+        OnLastRelease(handId);
       }
     }
 
@@ -138,6 +169,10 @@ namespace InteractionEngine {
     #endregion
 
     #region PROTECTED METHODS
+
+    protected virtual void OnFirstGrasp(int firstHandId) { }
+    protected virtual void OnLastRelease(int lastHandId) { }
+
     /// <summary>
     /// Call this method to register a custom shape definiton with the controller.  A second shape description cannot
     /// be registered once a first description has already been registered.
