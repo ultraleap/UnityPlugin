@@ -67,6 +67,12 @@ namespace InteractionEngine {
       }
     }
 
+    public IEnumerable<int> GraspingHands {
+      get {
+        return _graspingIds;
+      }
+    }
+
     /// <summary>
     /// Gets the internal handle to the description of the shape of this object.
     /// </summary>
