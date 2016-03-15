@@ -13,7 +13,10 @@ namespace InteractionEngine {
     #endregion
 
     #region PUBLIC EVENTS
-    public event Action<eLeapIEClassification> OnClassification;
+    public event Action<int> OnGrasp;
+    public event Action<int> OnRelease;
+    public event Action<int> OnFirstGrasp;
+    public event Action<int> OnLastRelease;
     #endregion
 
     #region INTERNAL FIELDS
@@ -47,6 +50,24 @@ namespace InteractionEngine {
     }
 
     /// <summary>
+    /// Returns true if there is at least one hand grasping this object.
+    /// </summary>
+    public bool IsBeingGrasped {
+      get {
+        return _graspingIds.Count > 0;
+      }
+    }
+
+    /// <summary>
+    /// Returns the number of hands that are currently grasping this object.
+    /// </summary>
+    public int GraspingHandCount {
+      get {
+        return _graspingIds.Count;
+      }
+    }
+
+    /// <summary>
     /// Gets the internal handle to the description of the shape of this object.
     /// </summary>
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeHandle {
@@ -75,8 +96,14 @@ namespace InteractionEngine {
       }
 
       _graspingIds.Add(handId);
+
+      if (OnGrasp != null) {
+        OnGrasp(handId);
+      }
       if (_graspingIds.Count == 1) {
-        OnFirstGrasp(handId);
+        if (OnFirstGrasp != null) {
+          OnFirstGrasp(handId);
+        }
       }
     }
 
@@ -169,9 +196,6 @@ namespace InteractionEngine {
     #endregion
 
     #region PROTECTED METHODS
-
-    protected virtual void OnFirstGrasp(int firstHandId) { }
-    protected virtual void OnLastRelease(int lastHandId) { }
 
     /// <summary>
     /// Call this method to register a custom shape definiton with the controller.  A second shape description cannot
