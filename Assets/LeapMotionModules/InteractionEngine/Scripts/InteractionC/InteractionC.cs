@@ -13,6 +13,7 @@ namespace InteractionEngine.CApi {
     eLeapIERS_InvalidArgument,
     eLeapIERS_ReferencesRemain,
     eLeapIERS_NotEnabled,
+    eLeapIERS_NeverUpdated,
     eLeapIERS_UnknownError,
     eLeapIERS_BadData,
 
@@ -20,6 +21,7 @@ namespace InteractionEngine.CApi {
     eLeapIERS_StoppedOnUnexpectedFailure,
     eLeapIERS_StoppedOnFull,
     eLeapIERS_UnexpectedEOF,
+    eLeapIERS_Paused,
 
     eLeapIERS_ForceTo32Bits = 0x10000000
   }
@@ -35,6 +37,7 @@ namespace InteractionEngine.CApi {
   public enum eLeapIEClassification : uint {
     eLeapIEClassification_Physics,
     eLeapIEClassification_Grasp,
+    eLeapIEClassification_MAX,
     eLeapIEClassification_ForceTo32Bits = 0x10000000
   }
 
@@ -257,7 +260,7 @@ namespace InteractionEngine.CApi {
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_IE_SHAPE_CLASSIFICATION {
+  public struct LEAP_IE_HAND_CLASSIFICATION {
     public eLeapIEClassification classification;
   }
 
@@ -308,6 +311,9 @@ namespace InteractionEngine.CApi {
         case eLeapIERS.eLeapIERS_NotEnabled:
           Log("Not Enabled", LogLevel.Error);
           break;
+        case eLeapIERS.eLeapIERS_NeverUpdated:
+          Log("Never Updated", LogLevel.Error);
+          break;
         case eLeapIERS.eLeapIERS_UnknownError:
           Log("Unknown Error", LogLevel.Error);
           break;
@@ -325,6 +331,9 @@ namespace InteractionEngine.CApi {
           break;
         case eLeapIERS.eLeapIERS_UnexpectedEOF:
           Log("Unexpected End Of File", LogLevel.Error);
+          break;
+        case eLeapIERS.eLeapIERS_Paused:
+          Log("Paused", LogLevel.Verbose);
           break;
         default:
           throw new ArgumentException("Unexpected return status " + rs);
@@ -477,14 +486,16 @@ namespace InteractionEngine.CApi {
     /*** Get Classification ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetClassification")]
     private static extern eLeapIERS LeapIEGetClassification(ref LEAP_IE_SCENE scene,
-                                                            ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
-                                                            out LEAP_IE_SHAPE_CLASSIFICATION classification);
+                                                                UInt32 handId,
+                                                            out LEAP_IE_HAND_CLASSIFICATION classification,
+                                                            out LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
 
     public static eLeapIERS GetClassification(ref LEAP_IE_SCENE scene,
-                                              ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance,
-                                              out LEAP_IE_SHAPE_CLASSIFICATION classification) {
+                                                  UInt32 handId,
+                                              out LEAP_IE_HAND_CLASSIFICATION classification,
+                                              out LEAP_IE_SHAPE_INSTANCE_HANDLE instance) {
       Logger.Log("Get Classification", LogLevel.AllCalls);
-      var rs = LeapIEGetClassification(ref scene, ref instance, out classification);
+      var rs = LeapIEGetClassification(ref scene, handId, out classification, out instance);
       Logger.HandleReturnStatus(rs);
       return rs;
     }
