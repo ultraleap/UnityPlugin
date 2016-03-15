@@ -31,7 +31,7 @@ namespace Leap.Unity{
           {
             // Initialization
             capsule.direction = 2;
-            bones[i].localScale = new Vector3(1f, 1f, 1f);
+            bones[i].localScale = new Vector3(1f/transform.lossyScale.x, 1f/transform.lossyScale.y, 1f/transform.lossyScale.z);
   
             // Update
             capsule.radius = GetBoneWidth(i) / 2f;
