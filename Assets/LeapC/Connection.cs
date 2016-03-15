@@ -168,6 +168,9 @@ namespace LeapInternal
         LeapInit.Dispatch<LeapEventArgs>(this, new LeapEventArgs(LeapEvent.EVENT_INIT));
         while (true)
         {
+          // Play nice with other threads
+          Thread.Sleep(0);
+
           LEAP_CONNECTION_MESSAGE _msg = new LEAP_CONNECTION_MESSAGE();
           lock(_connLocker) {
             if (_leapConnection == IntPtr.Zero)
