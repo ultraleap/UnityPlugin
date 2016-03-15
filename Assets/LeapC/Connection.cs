@@ -427,7 +427,7 @@ namespace LeapInternal
     {
       //TODO update connection on CONNECTION_LOST_EVENT
       this.LeapConnectionLost.Dispatch<ConnectionLostEventArgs>(this, new ConnectionLostEventArgs()); //TODO Meaningful ConnectionLost event args
-      this.Stop();
+      this.Cleanup();
     }
 
     private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg)
