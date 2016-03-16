@@ -195,13 +195,13 @@ namespace InteractionEngine {
       public LEAP_IE_SHAPE_INSTANCE_HANDLE InstanceHandle;
 
       public void UpdateIERepresentation(ref LEAP_IE_SCENE scene) {
-        LEAP_IE_TRANSFORM t = InteractionObject.IeTransform;
+        LEAP_IE_TRANSFORM t = InteractionObject.GetIETransform();
         InteractionC.UpdateShape(ref scene, ref t, ref InstanceHandle);
       }
 
       public void CreateIEShape(ref LEAP_IE_SCENE scene) {
         ShapeHandle = InteractionObject.GetShapeDescription();
-        LEAP_IE_TRANSFORM t = InteractionObject.IeTransform;
+        LEAP_IE_TRANSFORM t = InteractionObject.GetIETransform();
         InteractionC.CreateShape(ref scene, ref ShapeHandle, ref t, out InstanceHandle);
       }
 

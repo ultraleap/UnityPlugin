@@ -13,10 +13,10 @@ namespace InteractionEngine {
     #endregion
 
     #region PUBLIC EVENTS
-    public event Action<int> OnGrasp;
-    public event Action<int> OnRelease;
-    public event Action<int> OnFirstGrasp;
-    public event Action<int> OnLastRelease;
+    public event Action<int> OnGraspEvent;
+    public event Action<int> OnReleaseEvent;
+    public event Action<int> OnFirstGraspEvent;
+    public event Action<int> OnLastReleaseEvent;
     #endregion
 
     #region INTERNAL FIELDS
@@ -76,14 +76,8 @@ namespace InteractionEngine {
       }
     }
 
-
-    /// <summary>
-    /// Gets or Sets the position of this object using the internal transform struct.
-    /// </summary>
-    public abstract LEAP_IE_TRANSFORM IeTransform {
-      get;
-      set;
-    }
+    public abstract LEAP_IE_TRANSFORM GetIETransform();
+    public abstract LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetShapeDescription();
 
     public bool IsBeingGraspedByHand(int handId) {
       return _graspingIds.Contains(handId);
@@ -101,13 +95,11 @@ namespace InteractionEngine {
 
       _graspingIds.Add(handId);
 
-      if (OnGrasp != null) {
-        OnGrasp(handId);
+      if (OnGraspEvent != null) {
+        OnGraspEvent(handId);
       }
       if (_graspingIds.Count == 1) {
-        if (OnFirstGrasp != null) {
-          OnFirstGrasp(handId);
-        }
+        OnFirstGrasp(handId);
       }
     }
 
@@ -199,8 +191,18 @@ namespace InteractionEngine {
     }
     #endregion
 
-    #region ABSTRACT METHODS
-    public abstract LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetShapeDescription();
+    #region PROTECTED METHODS
+    protected virtual void OnFirstGrasp(int handId) {
+      if (OnFirstGraspEvent != null) {
+        OnFirstGraspEvent(handId);
+      }
+    }
+
+    protected virtual void OnLastRelease(int handId) {
+      if (OnLastReleaseEvent != null) {
+        OnLastReleaseEvent(handId);
+      }
+    }
     #endregion
   }
 }
