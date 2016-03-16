@@ -34,7 +34,7 @@ namespace Leap.Unity {
 
     protected Frame _currentFixedFrame;
     protected float _currentFixedTime = -1;
-    protected float _perFrameFixedUpdateOffset;
+    protected float _perFrameFixedUpdateOffset = -1;
     /* The smoothed offset between the FixedUpdate timeline and the Leap timeline.  
      * Used to provide temporally correct frames within FixedUpdate */
     protected SmoothedFloat _smoothedFixedUpdateOffset = new SmoothedFloat();
@@ -119,8 +119,6 @@ namespace Leap.Unity {
 
     protected virtual void Start() {
       createController();
-      _currentFrame = new Frame();
-      _currentFixedFrame = new Frame();
     }
 
     protected virtual void Update() {
@@ -131,7 +129,10 @@ namespace Leap.Unity {
       }
 #endif
 
-      _smoothedFixedUpdateOffset.Update(_perFrameFixedUpdateOffset, Time.deltaTime);
+      if (_perFrameFixedUpdateOffset > 0) {
+        _smoothedFixedUpdateOffset.Update(_perFrameFixedUpdateOffset, Time.deltaTime);
+        _perFrameFixedUpdateOffset = -1;
+      }
     }
 
     protected virtual void FixedUpdate() {
@@ -172,6 +173,7 @@ namespace Leap.Unity {
      * and subscribe to connection event */
     protected void createController() {
       if (leap_controller_ != null) {
+        Debug.Log("Did destroy?");
         destroyController();
       }
 
