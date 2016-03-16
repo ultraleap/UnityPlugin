@@ -25,6 +25,7 @@ namespace InteractionEngine {
     #region INTERNAL FIELDS
     protected Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, RegisteredObject> _instanceToRegistry;
     protected Dictionary<InteractionObject, RegisteredObject> _objToRegistry;
+    protected ShapeDescriptionPool _shapeDescriptionPool;
 
     protected List<InteractionObject> _graspedObjects;
     protected LEAP_IE_SCENE _scene;
@@ -60,16 +61,16 @@ namespace InteractionEngine {
 
       //Don't create right away if we are not enabled, creation will be done in OnEnable
       if (enabled) {
-        createIEShape(obj, registeredObj);
+        createIEShape(registeredObj);
       }
     }
 
     public void UnregisterInteractionObject(InteractionObject obj) {
-      RegisteredObject shape = _objToRegistry[obj];
+      RegisteredObject registeredObj = _objToRegistry[obj];
 
       //Don't destroy if we are not enabled, everything already got destroyed in OnDisable
       if (enabled) {
-        destroyIEShape(obj, shape);
+        destroyIEShape(registeredObj);
       }
 
       _objToRegistry.Remove(obj);
@@ -91,18 +92,21 @@ namespace InteractionEngine {
 
     protected virtual void OnEnable() {
       InteractionC.CreateScene(ref _scene);
+      _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
       applyDebugSettings();
 
-      foreach (var pair in _objects) {
-        registerWithInteractionC(pair.Key, pair.Value);
+      foreach (var registeredObj in _objToRegistry.Values) {
+        createIEShape(registeredObj);
       }
     }
 
     protected virtual void OnDisable() {
-      foreach (var pair in _objects) {
-        unregisterWithInteractionC(pair.Key, pair.Value);
+      foreach (var registeredObj in _instanceToRegistry.Values) {
+        destroyIEShape(registeredObj);
       }
 
+      _shapeDescriptionPool.RemoveAllShapes();
+      _shapeDescriptionPool = null;
       InteractionC.DestroyScene(ref _scene);
     }
 
@@ -133,16 +137,14 @@ namespace InteractionEngine {
     }
 
     protected virtual void updateIeRepresentations() {
-      foreach (var pair in _objects) {
-        var obj = pair.Key;
-        var shape = pair.Value;
-
+      foreach (var registeredObj in _instanceToRegistry.Values) {
+        var obj = registeredObj.InteractionObject;
         var instanceTransform = obj.IeTransform;
-        var instanceHandle = shape.InstanceHandle;
+        var instanceHandle = registeredObj.InstanceHandle;
 
         InteractionC.UpdateShape(ref _scene,
-                                       ref instanceTransform,
-                                       ref instanceHandle);
+                                 ref instanceTransform,
+                                 ref instanceHandle);
       }
     }
 
@@ -183,25 +185,6 @@ namespace InteractionEngine {
             }
           }
         }
-
-
-
-
-      }
-
-
-      foreach (var pair in _objects) {
-        var obj = pair.Key;
-        var shape = pair.Value;
-
-        var instanceHandle = shape.InstanceHandle;
-        LEAP_IE_SHAPE_CLASSIFICATION classification;
-
-        InteractionC.GetClassification(ref _scene,
-                                       ref instanceHandle,
-                                       out classification);
-
-        obj.SetClassification(classification.classification);
       }
     }
 
