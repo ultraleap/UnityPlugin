@@ -178,7 +178,7 @@ namespace LeapInternal
 
           if (result != eLeapRS.eLeapRS_Success) {
             reportAbnormalResults("LeapC PollConnection call was ", result);
-			// Yield to other thread
+            // Yield to other thread
             Thread.Sleep(0);
             continue;
           }
