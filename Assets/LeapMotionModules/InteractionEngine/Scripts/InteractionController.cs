@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 using Leap;
 using Leap.Unity;
 using LeapInternal;
@@ -22,7 +23,10 @@ namespace InteractionEngine {
     #endregion
 
     #region INTERNAL FIELDS
-    protected OneToOneMap<InteractionObject, InteractionShape> _objects = new OneToOneMap<InteractionObject, InteractionShape>();
+    protected Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, RegisteredObject> _instanceToRegistry;
+    protected Dictionary<InteractionObject, RegisteredObject> _objToRegistry;
+
+    protected List<InteractionObject> _graspedObjects;
     protected LEAP_IE_SCENE _scene;
     #endregion
 
@@ -47,25 +51,28 @@ namespace InteractionEngine {
       InteractionC.RemoveShapeDescription(ref _scene, ref handle);
     }
 
-    public void RegisterInteractionObject(InteractionObject obj) {
-      InteractionShape shape = new InteractionShape();
-      _objects[obj] = shape;
+    public void RegisterInteractionObject(InteractionObject obj, LEAP_IE_SHAPE_DESCRIPTION_HANDLE shapeHandle) {
+      RegisteredObject registeredObj = new RegisteredObject();
+      registeredObj.InteractionObject = obj;
+      registeredObj.ShapeHandle = shapeHandle;
 
-      //Don't register right away if we are not enabled, registration will be done in OnEnable
+      _objToRegistry[obj] = registeredObj;
+
+      //Don't create right away if we are not enabled, creation will be done in OnEnable
       if (enabled) {
-        registerWithInteractionC(obj, shape);
+        createIEShape(obj, registeredObj);
       }
     }
 
     public void UnregisterInteractionObject(InteractionObject obj) {
-      InteractionShape shape = _objects[obj];
+      RegisteredObject shape = _objToRegistry[obj];
 
-      //Don't unregister if we are not enabled, everything already got unregistered in OnDisable
+      //Don't destroy if we are not enabled, everything already got destroyed in OnDisable
       if (enabled) {
-        unregisterWithInteractionC(obj, shape);
+        destroyIEShape(obj, shape);
       }
 
-      _objects.Remove(obj);
+      _objToRegistry.Remove(obj);
     }
     #endregion
 
@@ -74,6 +81,12 @@ namespace InteractionEngine {
       if (Application.isPlaying && isActiveAndEnabled) {
         applyDebugSettings();
       }
+    }
+
+    protected virtual void Awake() {
+      _instanceToRegistry = new Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, RegisteredObject>();
+      _objToRegistry = new Dictionary<InteractionObject, RegisteredObject>();
+      _graspedObjects = new List<InteractionObject>();
     }
 
     protected virtual void OnEnable() {
@@ -150,6 +163,33 @@ namespace InteractionEngine {
     }
 
     protected virtual void setObjectClassifications() {
+      Frame currFrame = _leapProvider.CurrentFrame;
+      for (int i = 0; i < currFrame.Hands.Count; i++) {
+        Hand hand = currFrame.Hands[i];
+
+        LEAP_IE_HAND_CLASSIFICATION classification;
+        LEAP_IE_SHAPE_INSTANCE_HANDLE instance;
+        InteractionC.GetClassification(ref _scene,
+                                       (uint)hand.Id,
+                                       out classification,
+                                       out instance);
+
+        //Ungrasp objects that were grasped before
+        for (int j = _graspedObjects.Count - 1; j >= 0; j--) {
+          if (_graspedObjects[j].IsBeingGraspedByHand(hand.Id)) {
+            if (classification.classification == eLeapIEClassification.eLeapIEClassification_Physics) {
+              _graspedObjects[j].EndHandGrasp(hand.Id);
+              _graspedObjects.RemoveAt(j);
+            }
+          }
+        }
+
+
+
+
+      }
+
+
       foreach (var pair in _objects) {
         var obj = pair.Key;
         var shape = pair.Value;
@@ -165,9 +205,9 @@ namespace InteractionEngine {
       }
     }
 
-    protected virtual void registerWithInteractionC(InteractionObject obj, InteractionShape shape) {
-      var shapeHandle = obj.ShapeHandle;
-      var shapeTransform = obj.IeTransform;
+    protected virtual void createIEShape(RegisteredObject registeredObj) {
+      var shapeHandle = registeredObj.ShapeHandle;
+      var shapeTransform = registeredObj.InteractionObject.IeTransform;
 
       LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle;
 
@@ -176,26 +216,28 @@ namespace InteractionEngine {
                                ref shapeTransform,
                                out instanceHandle);
 
-      shape.ShapeHandle = shapeHandle;
-      shape.InstanceHandle = instanceHandle;
+      registeredObj.InstanceHandle = instanceHandle;
+
+      _instanceToRegistry[instanceHandle] = registeredObj;
     }
 
-    protected virtual void unregisterWithInteractionC(InteractionObject obj, InteractionShape shape) {
-      var instanceHandle = shape.InstanceHandle;
+    protected virtual void destroyIEShape(RegisteredObject registeredObj) {
+      var instanceHandle = registeredObj.InstanceHandle;
       InteractionC.DestroyShape(ref _scene,
                                 ref instanceHandle);
 
-      var shapeHandle = shape.ShapeHandle;
+      var shapeHandle = registeredObj.ShapeHandle;
       InteractionC.RemoveShapeDescription(ref _scene,
                                           ref shapeHandle);
 
-      shape.InstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
-      shape.ShapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
+      registeredObj.InstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
+      registeredObj.ShapeHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
     }
     #endregion
 
     #region INTERNAL CLASSES
-    protected class InteractionShape {
+    protected class RegisteredObject {
+      public InteractionObject InteractionObject;
       public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeHandle;
       public LEAP_IE_SHAPE_INSTANCE_HANDLE InstanceHandle;
     }

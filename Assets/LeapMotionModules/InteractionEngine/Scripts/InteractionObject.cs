@@ -23,7 +23,7 @@ namespace InteractionEngine {
     private bool _hasRegisteredShapeDescription = false;
     private bool _isRegisteredWithController = false;
 
-    private HashSet<int> _graspingIds = new HashSet<int>();
+    private List<int> _graspingIds = new List<int>();
 
     protected LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeHandle;
     #endregion
@@ -67,18 +67,12 @@ namespace InteractionEngine {
       }
     }
 
+    /// <summary>
+    /// Returns the ids of the hands currently grasping this object.
+    /// </summary>
     public IEnumerable<int> GraspingHands {
       get {
         return _graspingIds;
-      }
-    }
-
-    /// <summary>
-    /// Gets the internal handle to the description of the shape of this object.
-    /// </summary>
-    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeHandle {
-      get {
-        return _shapeHandle;
       }
     }
 
@@ -89,6 +83,10 @@ namespace InteractionEngine {
     public abstract LEAP_IE_TRANSFORM IeTransform {
       get;
       set;
+    }
+
+    public bool IsBeingGraspedByHand(int handId) {
+      return _graspingIds.Contains(handId);
     }
 
     /// <summary>
@@ -179,7 +177,7 @@ namespace InteractionEngine {
         throw new InvalidOperationException("Cannot enable interaction before a shape definition has been registered.");
       }
 
-      _controller.RegisterInteractionObject(this);
+      _controller.RegisterInteractionObject(this, GetShapeDescription());
       _isRegisteredWithController = true;
     }
 
@@ -202,31 +200,7 @@ namespace InteractionEngine {
     #endregion
 
     #region PROTECTED METHODS
-
-    /// <summary>
-    /// Call this method to register a custom shape definiton with the controller.  A second shape description cannot
-    /// be registered once a first description has already been registered.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="shape"></param>
-    protected void RegisterShapeDescription<T>(T shape) where T : struct {
-      if (_controller == null) {
-        throw new InvalidOperationException("Cannot register a shape description before setting the controller.");
-      }
-
-      if (_hasRegisteredShapeDescription) {
-        throw new InvalidOperationException("Cannot change the shape description once it has been registered with a controller.");
-      }
-
-      IntPtr ptr = StructAllocator.AllocateStruct(shape);
-      _shapeHandle = _controller.RegisterShapeDescription(ptr);
-      _hasRegisteredShapeDescription = true;
-    }
-
-    protected void AutoGenerateShapeDescription() {
-      RegisterShapeDescription(new LEAP_IE_COMPOUND_DESCRIPTION(gameObject));
-    }
-
+    protected abstract LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetShapeDescription();
     #endregion
   }
 }
