@@ -20,7 +20,6 @@ namespace InteractionEngine {
     #endregion
 
     #region INTERNAL FIELDS
-    private bool _hasRegisteredShapeDescription = false;
     private bool _isRegisteredWithController = false;
 
     private List<int> _graspingIds = new List<int>();
@@ -30,8 +29,7 @@ namespace InteractionEngine {
 
     #region PUBLIC METHODS
     /// <summary>
-    /// Gets or sets the controller this object belongs to.  If this object already has interaction enabled, changing the 
-    /// controller will disable interaction and require the shape to be redefined. 
+    /// Gets or sets the controller this object belongs to.  
     /// </summary>
     public InteractionController Controller {
       get {
@@ -41,10 +39,11 @@ namespace InteractionEngine {
         if (_controller != value) {
           if (IsInteractionEnabled) {
             DisableInteraction();
+            _controller = value;
+            EnableInteraction();
+          } else {
+            _controller = value;
           }
-
-          _hasRegisteredShapeDescription = false;
-          _controller = value;
         }
       }
     }
@@ -143,16 +142,6 @@ namespace InteractionEngine {
     }
 
     /// <summary>
-    /// Gets whether or not this object has registered it's shape with it's controller.  This can and must
-    /// be true before interaction is enabled.
-    /// </summary>
-    public bool HasRegisteredShapeDescription {
-      get {
-        return _hasRegisteredShapeDescription;
-      }
-    }
-
-    /// <summary>
     /// Calling this method registers this object with the controller.  A shape definition must be registered
     /// with the controller before interaction can be enabled.
     /// </summary>
@@ -163,10 +152,6 @@ namespace InteractionEngine {
 
       if (_isRegisteredWithController) {
         return;
-      }
-
-      if (!_hasRegisteredShapeDescription) {
-        throw new InvalidOperationException("Cannot enable interaction before a shape definition has been registered.");
       }
 
       _controller.RegisterInteractionObject(this);
