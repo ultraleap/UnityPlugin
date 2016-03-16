@@ -177,7 +177,7 @@ namespace InteractionEngine {
         throw new InvalidOperationException("Cannot enable interaction before a shape definition has been registered.");
       }
 
-      _controller.RegisterInteractionObject(this, GetShapeDescription());
+      _controller.RegisterInteractionObject(this);
       _isRegisteredWithController = true;
     }
 
@@ -199,8 +199,8 @@ namespace InteractionEngine {
     }
     #endregion
 
-    #region PROTECTED METHODS
-    protected abstract LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetShapeDescription();
+    #region ABSTRACT METHODS
+    public abstract LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetShapeDescription();
     #endregion
   }
 }
