@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using LeapInternal;
 using InteractionEngine.CApi;
 
 namespace InteractionEngine {
@@ -75,15 +76,34 @@ namespace InteractionEngine {
       }
     }
 
-    public abstract LEAP_IE_TRANSFORM GetIETransform();
+    /// <summary>
+    /// Returns the internal transform representation of this object.
+    /// </summary>
+    /// <returns></returns>
+    public virtual LEAP_IE_TRANSFORM GetIETransform() {
+      LEAP_IE_TRANSFORM ieTransform = new LEAP_IE_TRANSFORM();
+      ieTransform.position = new LEAP_VECTOR(transform.position);
+      ieTransform.rotation = new LEAP_QUATERNION(transform.rotation);
+      return ieTransform;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public abstract LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetShapeDescription();
 
+    /// <summary>
+    /// Returns whether or not a hand with the given ID is currently grasping this object.
+    /// </summary>
+    /// <param name="handId"></param>
+    /// <returns></returns>
     public bool IsBeingGraspedByHand(int handId) {
       return _graspingIds.Contains(handId);
     }
 
     /// <summary>
-    /// 
+    /// Called by InteractionController when a Hand begins grasping this object.
     /// </summary>
     /// <param name="handId"></param>
     public virtual void BeginHandGrasp(int handId) {
@@ -103,7 +123,7 @@ namespace InteractionEngine {
     }
 
     /// <summary>
-    /// 
+    /// Called by InteractionController when a Hand stops grasping this object.
     /// </summary>
     /// <param name="handId"></param>
     public virtual void EndHandGrasp(int handId) {
@@ -173,6 +193,12 @@ namespace InteractionEngine {
 
       _controller.UnregisterInteractionObject(this);
       _isRegisteredWithController = false;
+
+      //InteractionController does not dispatch EndHandGrasp events during unregistration
+      //We dispatch them ourselves!
+      for (int i = _graspingIds.Count - 1; i >= 0; i--) {
+        EndHandGrasp(_graspingIds[i]);
+      }
     }
     #endregion
 

@@ -14,10 +14,11 @@ namespace InteractionEngine {
     [SerializeField]
     protected LeapProvider _leapProvider;
 
-    [Tooltip("If disabled, objects will still be able to be registers and unregistered, but the simulation will not progress.")]
+    [Tooltip("If disabled the simulation will not progress, but will still maintain it's state.")]
     [SerializeField]
     protected bool _enableSimulation = true;
 
+    [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
     [SerializeField]
     protected bool _showDebugLines = true;
     #endregion
@@ -27,11 +28,13 @@ namespace InteractionEngine {
     protected Dictionary<InteractionObject, RegisteredObject> _objToRegistry;
     protected ShapeDescriptionPool _shapeDescriptionPool;
 
-    protected List<InteractionObject> _graspedObjects;
     protected LEAP_IE_SCENE _scene;
     #endregion
 
     #region PUBLIC METHODS
+    /// <summary>
+    /// Gets the current debug flags for this Controller.
+    /// </summary>
     public eLeapIEDebugFlags DebugFlags {
       get {
         eLeapIEDebugFlags flags = eLeapIEDebugFlags.eLeapIEDebugFlags_None;
@@ -42,12 +45,25 @@ namespace InteractionEngine {
       }
     }
 
+    /// <summary>
+    /// Returns a ShapeDescriptionPool that can be used to allocate shape descriptions
+    /// for this controller.  Using the pool can be more efficient since identical shapes
+    /// can be automatically combined to save memory.  Shape descriptions aquired from this
+    /// pool will be destroyed when this controller is disabled.
+    /// </summary>
     public ShapeDescriptionPool ShapePool {
       get {
         return _shapeDescriptionPool;
       }
     }
 
+    /// <summary>
+    /// Registers an InteractionObject with this Controller, which automatically adds the objects
+    /// representation into the internal interaction scene.  If the controller is disabled, 
+    /// the registration will still succeed and the object will be added to the internal scene
+    /// when the controller is next enabled.
+    /// </summary>
+    /// <param name="obj"></param>
     public void RegisterInteractionObject(InteractionObject obj) {
       RegisteredObject registeredObj = new RegisteredObject();
       registeredObj.InteractionObject = obj;
@@ -60,6 +76,11 @@ namespace InteractionEngine {
       }
     }
 
+    /// <summary>
+    /// Unregisters an InteractionObject from this Controller.  This removes it from the internal
+    /// scene and prevents any further interaction.
+    /// </summary>
+    /// <param name="obj"></param>
     public void UnregisterInteractionObject(InteractionObject obj) {
       RegisteredObject registeredObj = _objToRegistry[obj];
 
@@ -73,8 +94,15 @@ namespace InteractionEngine {
     #endregion
 
     #region UNITY CALLBACKS
+    protected virtual void Reset() {
+      if (_leapProvider == null) {
+        _leapProvider = FindObjectOfType<LeapProvider>();
+      }
+    }
+
     protected virtual void OnValidate() {
       if (Application.isPlaying && isActiveAndEnabled) {
+        //Allow the debug lines to be toggled while the scene is playing
         applyDebugSettings();
       }
     }
@@ -82,7 +110,6 @@ namespace InteractionEngine {
     protected virtual void Awake() {
       _instanceToRegistry = new Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, RegisteredObject>();
       _objToRegistry = new Dictionary<InteractionObject, RegisteredObject>();
-      _graspedObjects = new List<InteractionObject>();
     }
 
     protected virtual void OnEnable() {
@@ -165,14 +192,21 @@ namespace InteractionEngine {
                                        out classification,
                                        out instance);
 
-        //Ungrasp objects that were grasped before
-        for (int j = _graspedObjects.Count - 1; j >= 0; j--) {
-          if (_graspedObjects[j].IsBeingGraspedByHand(hand.Id)) {
-            if (classification.classification == eLeapIEClassification.eLeapIEClassification_Physics) {
-              _graspedObjects[j].EndHandGrasp(hand.Id);
-              _graspedObjects.RemoveAt(j);
+        switch (classification.classification) {
+          case eLeapIEClassification.eLeapIEClassification_Grasp:
+            {
+              var iObj = _instanceToRegistry[instance].InteractionObject;
+              iObj.BeginHandGrasp(hand.Id);
+              break;
             }
-          }
+          case eLeapIEClassification.eLeapIEClassification_Physics:
+            {
+              var iObj = _instanceToRegistry[instance].InteractionObject;
+              iObj.EndHandGrasp(hand.Id);
+              break;
+            }
+          default:
+            throw new InvalidOperationException("Unexpected classification " + classification.classification);
         }
       }
     }
