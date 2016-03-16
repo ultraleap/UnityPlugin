@@ -31,6 +31,7 @@ namespace InteractionEngine {
     }
 
     void Awake() {
+      _renderer = GetComponent<Renderer>();
       _sphereCollider = GetComponent<SphereCollider>();
     }
 
