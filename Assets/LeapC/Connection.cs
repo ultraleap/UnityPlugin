@@ -175,7 +175,7 @@ namespace LeapInternal
           lock(_connLocker) {
             if (_leapConnection == IntPtr.Zero)
               break;
-            uint timeout = 1000;
+            uint timeout = 100;
             result = LeapC.PollConnection(_leapConnection, timeout, ref _msg);
           }
 
