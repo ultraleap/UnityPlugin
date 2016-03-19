@@ -43,23 +43,17 @@ namespace Leap.Unity {
       for (int i = 0; i < ModelPool.Count; i++) {
         IHandModel model = ModelPool[i];
         bool isCorrectHandedness;
-        if (model.Handedness == Chirality.Either) {
+        Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
+        isCorrectHandedness = model.Handedness == handChirality;
+        if (!EnforceHandedness || model.Handedness == Chirality.Either) {
           isCorrectHandedness = true;
-        }
-        else {
-          Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
-          isCorrectHandedness = model.Handedness == handChirality;
         }
         bool isCorrectModelType;
         isCorrectModelType = model.HandModelType == modelType;
-
-        if (isCorrectModelType) {
-          if (EnforceHandedness && !isCorrectHandedness) {
+        if (isCorrectModelType && isCorrectHandedness) {
+            ModelPool.RemoveAt(i);
+            handRep = new HandProxy(this, model, hand);
             break;
-          }
-          ModelPool.RemoveAt(i);
-          handRep = new HandProxy(this, model, hand);
-          break;
         }
       }
       return handRep;
