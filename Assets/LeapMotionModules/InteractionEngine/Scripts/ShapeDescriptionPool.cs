@@ -24,6 +24,9 @@ namespace InteractionEngine {
       _allHandles = new List<LEAP_IE_SHAPE_DESCRIPTION_HANDLE>();
     }
 
+    /// <summary>
+    /// Removes and destroys all descriptions from the internal scene.
+    /// </summary>
     public void RemoveAllShapes() {
       for (int i = 0; i < _allHandles.Count; i++) {
         LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle = _allHandles[i];
@@ -91,7 +94,8 @@ namespace InteractionEngine {
     }
 
     /// <summary>
-    /// Gets a handle to a convex mesh description of the provided mesh
+    /// Gets a handle to a convex mesh description of the provided mesh.  Any changes
+    /// to the mesh will not be reflected in the description once it is generated.
     /// </summary>
     /// <param name="mesh"></param>
     /// <returns></returns>
@@ -111,17 +115,23 @@ namespace InteractionEngine {
 
     /// <summary>
     /// Returns a handle to a description that represents the structure of the colliders
-    /// attatched to the gameObject passed in.
+    /// attatched to the gameObject passed in.  Changes to the following properties will not
+    /// have any affect on the description once it is generated:
+    ///   scale of parent object
+    ///   position of child objects
+    ///   rotation of child objects
+    ///   scale of child objects
+    ///   collider properties
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
     private List<Collider> _tempColliderList = new List<Collider>();
-    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetAuto(GameObject obj) {
-      if (!isUniformScale(obj.transform)) {
-        throw new InvalidOperationException("The GameObject " + obj + " did not have a uniform scale!");
+    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetAuto(GameObject parentObject) {
+      if (!isUniformScale(parentObject.transform)) {
+        throw new InvalidOperationException("The GameObject " + parentObject + " did not have a uniform scale!");
       }
 
-      obj.GetComponentsInChildren(_tempColliderList);
+      parentObject.GetComponentsInChildren(_tempColliderList);
 
       LEAP_IE_COMPOUND_DESCRIPTION compoundDesc = new LEAP_IE_COMPOUND_DESCRIPTION();
       compoundDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Compound;
@@ -188,8 +198,8 @@ namespace InteractionEngine {
         }
 
         LEAP_IE_TRANSFORM ieTransform = new LEAP_IE_TRANSFORM();
-        ieTransform.position = new LEAP_VECTOR(obj.transform.InverseTransformPoint(globalPos) * obj.transform.lossyScale.x);
-        ieTransform.rotation = new LEAP_QUATERNION(Quaternion.Inverse(obj.transform.rotation) * globalRot);
+        ieTransform.position = new LEAP_VECTOR(parentObject.transform.InverseTransformPoint(globalPos) * parentObject.transform.lossyScale.x);
+        ieTransform.rotation = new LEAP_QUATERNION(Quaternion.Inverse(parentObject.transform.rotation) * globalRot);
 
         StructMarshal<IntPtr>.CopyIntoArray(compoundDesc.pShapes, shapePtr, i);
         StructMarshal<LEAP_IE_TRANSFORM>.CopyIntoArray(compoundDesc.pTransforms, ieTransform, i);
