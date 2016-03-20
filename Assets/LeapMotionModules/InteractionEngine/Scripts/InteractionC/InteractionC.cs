@@ -20,31 +20,27 @@ namespace InteractionEngine.CApi {
     eLeapIERS_StoppedOnNonDeterministic,
     eLeapIERS_StoppedOnUnexpectedFailure,
     eLeapIERS_StoppedOnFull,
+    eLeapIERS_StoppedFileError,
     eLeapIERS_UnexpectedEOF,
-    eLeapIERS_Paused,
-
-    eLeapIERS_ForceTo32Bits = 0x10000000
+    eLeapIERS_Paused
   }
 
   public enum eLeapIEShapeType : uint {
     eLeapIEShape_Sphere,
     eLeapIEShape_OBB,
     eLeapIEShape_Convex,
-    eLeapIEShape_Compound,
-    eLeapIEShape_ForceTo32Bits = 0x10000000
+    eLeapIEShape_Compound
   }
 
   public enum eLeapIEClassification : uint {
     eLeapIEClassification_Physics,
     eLeapIEClassification_Grasp,
-    eLeapIEClassification_MAX,
-    eLeapIEClassification_ForceTo32Bits = 0x10000000
+    eLeapIEClassification_MAX
   }
 
-  public enum eLeapIEDebugFlags {
+  public enum eLeapIEDebugFlags : uint {
     eLeapIEDebugFlags_None,
-    eLeapIEDebugFlags_Lines = 0x01,
-    eLeapIEDebugFlags_ForceTo32Bits = 0x10000000
+    eLeapIEDebugFlags_Lines = 0x01
   };
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -211,6 +207,9 @@ namespace InteractionEngine.CApi {
           break;
         case eLeapIERS.eLeapIERS_StoppedOnFull:
           Log("Stopped on Full", LogLevel.Error);
+          break;
+        case eLeapIERS.eLeapIERS_StoppedFileError:
+          Log("Stopped on File Error", LogLevel.Error);
           break;
         case eLeapIERS.eLeapIERS_UnexpectedEOF:
           Log("Unexpected End Of File", LogLevel.Error);
