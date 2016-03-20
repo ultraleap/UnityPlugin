@@ -44,11 +44,7 @@ namespace InteractionEngine {
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetSphere(float radius) {
       LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle;
       if (!_sphereDescMap.TryGetValue(radius, out handle)) {
-        LEAP_IE_SPHERE_DESCRIPTION sphereDesc = new LEAP_IE_SPHERE_DESCRIPTION();
-        sphereDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Sphere;
-        sphereDesc.radius = radius;
-
-        IntPtr spherePtr = StructAllocator.AllocateStruct(sphereDesc);
+        IntPtr spherePtr = allocateSphere(radius);
         InteractionC.AddShapeDescription(ref _scene, spherePtr, out handle);
         StructAllocator.CleanupAllocations();
 
@@ -67,11 +63,7 @@ namespace InteractionEngine {
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetOBB(Vector3 extents) {
       LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle;
       if (!_obbDescMap.TryGetValue(extents, out handle)) {
-        LEAP_IE_OBB_DESCRIPTION obbDesc = new LEAP_IE_OBB_DESCRIPTION();
-        obbDesc.shape.type = eLeapIEShapeType.eLeapIEShape_OBB;
-        obbDesc.extents = new LeapInternal.LEAP_VECTOR(extents);
-
-        IntPtr obbPtr = StructAllocator.AllocateStruct(obbDesc);
+        IntPtr obbPtr = allocateObb(extents);
         InteractionC.AddShapeDescription(ref _scene, obbPtr, out handle);
         StructAllocator.CleanupAllocations();
 
@@ -83,6 +75,22 @@ namespace InteractionEngine {
     }
 
     /// <summary>
+    /// Gets a handle to a convex mesh description that describes the given capsule.
+    /// </summary>
+    /// <param name="p0"></param>
+    /// <param name="p1"></param>
+    /// <param name="radius"></param>
+    /// <returns></returns>
+    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetCapsule(Vector3 p0, Vector3 p1, float radius) {
+      LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle;
+      IntPtr capsulePtr = allocateCapsule(p0, p1, radius);
+      InteractionC.AddShapeDescription(ref _scene, capsulePtr, out handle);
+      StructAllocator.CleanupAllocations();
+      _allHandles.Add(handle);
+      return handle;
+    }
+
+    /// <summary>
     /// Gets a handle to a convex mesh description of the provided mesh
     /// </summary>
     /// <param name="mesh"></param>
@@ -90,17 +98,7 @@ namespace InteractionEngine {
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetConvexPolyhedron(Mesh mesh) {
       LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle;
       if (!_meshDescMap.TryGetValue(mesh, out handle)) {
-        LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION meshDesc = new LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION();
-        meshDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Convex;
-        meshDesc.radius = 0.0f;
-        meshDesc.nVerticies = (uint)mesh.vertexCount;
-        meshDesc.pVertices = StructAllocator.AllocateArray<LEAP_VECTOR>(mesh.vertexCount);
-        for (int i = 0; i < mesh.vertexCount; i++) {
-          LEAP_VECTOR v = new LEAP_VECTOR(mesh.vertices[i]);
-          StructMarshal<LEAP_VECTOR>.CopyIntoArray(meshDesc.pVertices, v, i);
-        }
-
-        IntPtr meshPtr = StructAllocator.AllocateStruct(meshDesc);
+        IntPtr meshPtr = allocateConvex(mesh, 1.0f);
         InteractionC.AddShapeDescription(ref _scene, meshPtr, out handle);
         StructAllocator.CleanupAllocations();
 
@@ -117,8 +115,147 @@ namespace InteractionEngine {
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
+    private List<Collider> _tempColliderList = new List<Collider>();
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetAuto(GameObject obj) {
-      throw new NotImplementedException();
+      if (!isUniformScale(obj.transform)) {
+        throw new InvalidOperationException("The GameObject " + obj + " did not have a uniform scale!");
+      }
+
+      obj.GetComponentsInChildren(_tempColliderList);
+
+      LEAP_IE_COMPOUND_DESCRIPTION compoundDesc = new LEAP_IE_COMPOUND_DESCRIPTION();
+      compoundDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Compound;
+      compoundDesc.nShapes = (uint)_tempColliderList.Count;
+      compoundDesc.pShapes = StructAllocator.AllocateArray<LEAP_IE_TRANSFORM>(_tempColliderList.Count);
+      compoundDesc.pTransforms = StructAllocator.AllocateArray<IntPtr>(_tempColliderList.Count);
+
+      for (int i = 0; i < _tempColliderList.Count; i++) {
+        Collider collider = _tempColliderList[i];
+
+        if (!isUniformScale(collider.transform)) {
+          throw new InvalidOperationException("Collider " + collider + " did not have a uniform scale!");
+        }
+
+        float globalScale = collider.transform.lossyScale.x;
+        Vector3 globalPos;
+        Quaternion globalRot;
+
+        IntPtr shapePtr;
+
+        if (collider is SphereCollider) {
+          SphereCollider sphereCollider = collider as SphereCollider;
+          globalPos = collider.transform.position + collider.transform.TransformPoint(sphereCollider.center);
+          globalRot = collider.transform.rotation;
+
+          shapePtr = allocateSphere(sphereCollider.radius * globalScale);
+        } else if (collider is BoxCollider) {
+          BoxCollider boxCollider = collider as BoxCollider;
+          globalPos = collider.transform.position + collider.transform.TransformPoint(boxCollider.center);
+          globalRot = collider.transform.rotation;
+
+          shapePtr = allocateObb(boxCollider.size * globalScale * 0.5f);
+        } else if (collider is CapsuleCollider) {
+          CapsuleCollider capsuleCollider = collider as CapsuleCollider;
+          globalPos = collider.transform.position + collider.transform.TransformPoint(capsuleCollider.center);
+          globalRot = collider.transform.rotation;
+
+          Vector3 axis;
+          switch (capsuleCollider.direction) {
+            case 0:
+              axis = Vector3.right;
+              break;
+            case 1:
+              axis = Vector3.up;
+              break;
+            case 2:
+              axis = Vector3.forward;
+              break;
+            default:
+              throw new InvalidOperationException("Unexpected direction " + capsuleCollider.direction);
+          }
+
+          Vector3 p0 = axis * globalScale * (capsuleCollider.height - capsuleCollider.radius * 0.5f);
+          Vector3 p1 = -axis * globalScale * (capsuleCollider.height - capsuleCollider.radius * 0.5f);
+          shapePtr = allocateCapsule(p0, p1, capsuleCollider.radius * globalScale);
+        } else if (collider is MeshCollider) {
+          MeshCollider meshCollider = collider as MeshCollider;
+          globalPos = collider.transform.position;
+          globalRot = collider.transform.rotation;
+
+          shapePtr = allocateConvex(meshCollider.sharedMesh, globalScale);
+        } else {
+          throw new InvalidOperationException("Unexpected collider type " + collider.GetType());
+        }
+
+        LEAP_IE_TRANSFORM ieTransform = new LEAP_IE_TRANSFORM();
+        ieTransform.position = new LEAP_VECTOR(obj.transform.InverseTransformPoint(globalPos) * obj.transform.lossyScale.x);
+        ieTransform.rotation = new LEAP_QUATERNION(Quaternion.Inverse(obj.transform.rotation) * globalRot);
+
+        StructMarshal<IntPtr>.CopyIntoArray(compoundDesc.pShapes, shapePtr, i);
+        StructMarshal<LEAP_IE_TRANSFORM>.CopyIntoArray(compoundDesc.pTransforms, ieTransform, i);
+      }
+
+      LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle;
+      IntPtr compoundPtr = StructAllocator.AllocateStruct(compoundDesc);
+
+      InteractionC.AddShapeDescription(ref _scene, compoundPtr, out handle);
+      StructAllocator.CleanupAllocations();
+
+      _tempColliderList.Clear();
+      _allHandles.Add(handle);
+
+      return handle;
+    }
+
+    private bool isUniformScale(Transform transform) {
+      Vector3 lossyScale = transform.lossyScale;
+      return lossyScale.x == lossyScale.y && lossyScale.x == lossyScale.z;
+    }
+
+    private IntPtr allocateSphere(float radius) {
+      LEAP_IE_SPHERE_DESCRIPTION sphereDesc = new LEAP_IE_SPHERE_DESCRIPTION();
+      sphereDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Sphere;
+      sphereDesc.radius = radius;
+
+      IntPtr spherePtr = StructAllocator.AllocateStruct(sphereDesc);
+      return spherePtr;
+    }
+
+    private IntPtr allocateObb(Vector3 extents) {
+      LEAP_IE_OBB_DESCRIPTION obbDesc = new LEAP_IE_OBB_DESCRIPTION();
+      obbDesc.shape.type = eLeapIEShapeType.eLeapIEShape_OBB;
+      obbDesc.extents = new LeapInternal.LEAP_VECTOR(extents);
+
+      IntPtr obbPtr = StructAllocator.AllocateStruct(obbDesc);
+      return obbPtr;
+    }
+
+    private IntPtr allocateCapsule(Vector3 p0, Vector3 p1, float radius) {
+      LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION meshDesc = new LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION();
+      meshDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Convex;
+      meshDesc.radius = radius;
+      meshDesc.nVerticies = 2;
+      meshDesc.pVertices = StructAllocator.AllocateArray<LEAP_VECTOR>(2);
+      StructMarshal<LEAP_VECTOR>.CopyIntoArray(meshDesc.pVertices, new LEAP_VECTOR(p0), 0);
+      StructMarshal<LEAP_VECTOR>.CopyIntoArray(meshDesc.pVertices, new LEAP_VECTOR(p1), 1);
+
+      IntPtr capsulePtr = StructAllocator.AllocateStruct(meshDesc);
+      return capsulePtr;
+    }
+
+    private IntPtr allocateConvex(Mesh mesh, float scale) {
+      LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION meshDesc = new LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION();
+      meshDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Convex;
+      meshDesc.radius = 0.0f;
+      meshDesc.nVerticies = (uint)mesh.vertexCount;
+      meshDesc.pVertices = StructAllocator.AllocateArray<LEAP_VECTOR>(mesh.vertexCount);
+      for (int i = 0; i < mesh.vertexCount; i++) {
+        LEAP_VECTOR v = new LEAP_VECTOR(mesh.vertices[i] * scale);
+        StructMarshal<LEAP_VECTOR>.CopyIntoArray(meshDesc.pVertices, v, i);
+      }
+
+      IntPtr meshPtr = StructAllocator.AllocateStruct(meshDesc);
+      return meshPtr;
     }
 
   }
