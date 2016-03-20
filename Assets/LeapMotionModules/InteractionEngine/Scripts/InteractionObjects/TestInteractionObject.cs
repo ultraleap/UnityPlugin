@@ -8,7 +8,7 @@ namespace InteractionEngine {
     private Renderer _renderer;
 
     public override LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetShapeDescription() {
-      return _controller.ShapePool.GetSphere(_sphereCollider.radius);
+      return _controller.ShapePool.GetSphere(_sphereCollider.radius * transform.lossyScale.x);
     }
 
     protected override void OnFirstGrasp(int handId) {
