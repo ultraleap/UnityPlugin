@@ -11,13 +11,13 @@ namespace InteractionEngine {
       return _controller.ShapePool.GetSphere(_sphereCollider.radius * transform.lossyScale.x);
     }
 
-    protected override void OnFirstGrasp(int handId) {
-      base.OnFirstGrasp(handId);
+    protected override void OnGraspEnterFirst(int handId) {
+      base.OnGraspEnterFirst(handId);
       _renderer.material.color = Color.green;
     }
 
-    protected override void OnLastRelease(int handId) {
-      base.OnLastRelease(handId);
+    protected override void OnGraspExitLast(int handId) {
+      base.OnGraspExitLast(handId);
       _renderer.material.color = Color.white;
     }
 

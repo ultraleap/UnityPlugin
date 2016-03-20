@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using Leap;
 using LeapInternal;
 using InteractionEngine.CApi;
 
@@ -14,10 +15,12 @@ namespace InteractionEngine {
     #endregion
 
     #region PUBLIC EVENTS
-    public event Action<int> OnGraspEvent;
-    public event Action<int> OnReleaseEvent;
-    public event Action<int> OnFirstGraspEvent;
-    public event Action<int> OnLastReleaseEvent;
+    public event Action<int> OnGraspEnterEvent;
+    public event Action<int[]> OnGraspStayEvent;
+    public event Action<int> OnGraspExitEvent;
+
+    public event Action<int> OnGraspEnterFirstEvent;
+    public event Action<int> OnGraspExitLastEvent;
     #endregion
 
     #region INTERNAL FIELDS
@@ -106,7 +109,7 @@ namespace InteractionEngine {
     /// Called by InteractionController when a Hand begins grasping this object.
     /// </summary>
     /// <param name="handId"></param>
-    public virtual void BeginHandGrasp(int handId) {
+    public virtual void OnGraspEnter(int handId) {
       if (_graspingIds.Contains(handId)) {
         throw new InvalidOperationException("Cannot BeginGrasp with hand id " + handId +
                                             " because a hand of that id is already grasping this object.");
@@ -114,19 +117,23 @@ namespace InteractionEngine {
 
       _graspingIds.Add(handId);
 
-      if (OnGraspEvent != null) {
-        OnGraspEvent(handId);
+      if (OnGraspEnterEvent != null) {
+        OnGraspEnterEvent(handId);
       }
       if (_graspingIds.Count == 1) {
-        OnFirstGrasp(handId);
+        OnGraspEnterFirst(handId);
       }
+    }
+
+    public virtual void OnGraspStay(Hand[] graspingHands) {
+
     }
 
     /// <summary>
     /// Called by InteractionController when a Hand stops grasping this object.
     /// </summary>
     /// <param name="handId"></param>
-    public virtual void EndHandGrasp(int handId) {
+    public virtual void OnGraspExit(int handId) {
       if (_graspingIds.Count == 0) {
         throw new InvalidOperationException("Cannot EndGrasp with hand id " + handId +
                                             " because there are no hands current grasping this object.");
@@ -140,7 +147,7 @@ namespace InteractionEngine {
       _graspingIds.Remove(handId);
 
       if (_graspingIds.Count == 0) {
-        OnLastRelease(handId);
+        OnGraspExitLast(handId);
       }
     }
 
@@ -197,21 +204,21 @@ namespace InteractionEngine {
       //InteractionController does not dispatch EndHandGrasp events during unregistration
       //We dispatch them ourselves!
       for (int i = _graspingIds.Count - 1; i >= 0; i--) {
-        EndHandGrasp(_graspingIds[i]);
+        OnGraspExit(_graspingIds[i]);
       }
     }
     #endregion
 
     #region PROTECTED METHODS
-    protected virtual void OnFirstGrasp(int handId) {
-      if (OnFirstGraspEvent != null) {
-        OnFirstGraspEvent(handId);
+    protected virtual void OnGraspEnterFirst(int handId) {
+      if (OnGraspEnterFirstEvent != null) {
+        OnGraspEnterFirstEvent(handId);
       }
     }
 
-    protected virtual void OnLastRelease(int handId) {
-      if (OnLastReleaseEvent != null) {
-        OnLastReleaseEvent(handId);
+    protected virtual void OnGraspExitLast(int handId) {
+      if (OnGraspExitLastEvent != null) {
+        OnGraspExitLastEvent(handId);
       }
     }
     #endregion

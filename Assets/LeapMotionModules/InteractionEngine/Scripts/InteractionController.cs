@@ -196,13 +196,13 @@ namespace InteractionEngine {
           case eLeapIEClassification.eLeapIEClassification_Grasp:
             {
               var iObj = _instanceToRegistry[instance].InteractionObject;
-              iObj.BeginHandGrasp(hand.Id);
+              iObj.OnGraspEnter(hand.Id);
               break;
             }
           case eLeapIEClassification.eLeapIEClassification_Physics:
             {
               var iObj = _instanceToRegistry[instance].InteractionObject;
-              iObj.EndHandGrasp(hand.Id);
+              iObj.OnGraspExit(hand.Id);
               break;
             }
           default:
