@@ -26,6 +26,8 @@ namespace InteractionEngine {
     #region INTERNAL FIELDS
     protected Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, RegisteredObject> _instanceToRegistry;
     protected Dictionary<InteractionObject, RegisteredObject> _objToRegistry;
+    protected List<InteractionObject> _graspedObjects;
+
     protected ShapeDescriptionPool _shapeDescriptionPool;
 
     protected LEAP_IE_SCENE _scene;
@@ -55,6 +57,45 @@ namespace InteractionEngine {
       get {
         return _shapeDescriptionPool;
       }
+    }
+
+    /// <summary>
+    /// Returns true if any InteractionObject is currently being grasped by at least one Hand.
+    /// </summary>
+    public bool IsAnyObjectGrasped {
+      get {
+        return _graspedObjects.Count != 0;
+      }
+    }
+
+    /// <summary>
+    /// Returns a collection of InteractionObjects that are currently being grasped by
+    /// at least one hand.
+    /// </summary>
+    public IEnumerable<InteractionObject> GraspedObjects {
+      get {
+        return _graspedObjects;
+      }
+    }
+
+    /// <summary>
+    /// Tries to find an InteractionObject that is currently being grasped by a Hand with
+    /// the given ID.
+    /// </summary>
+    /// <param name="handId"></param>
+    /// <param name="graspedObject"></param>
+    /// <returns></returns>
+    public bool TryGetGraspedObject(int handId, out InteractionObject graspedObject) {
+      for (int i = 0; i < _graspedObjects.Count; i++) {
+        var iObj = _graspedObjects[i];
+        if (iObj.IsBeingGraspedByHand(handId)) {
+          graspedObject = iObj;
+          return true;
+        }
+      }
+
+      graspedObject = null;
+      return false;
     }
 
     /// <summary>
@@ -110,6 +151,7 @@ namespace InteractionEngine {
     protected virtual void Awake() {
       _instanceToRegistry = new Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, RegisteredObject>();
       _objToRegistry = new Dictionary<InteractionObject, RegisteredObject>();
+      _graspedObjects = new List<InteractionObject>();
     }
 
     protected virtual void OnEnable() {
@@ -196,18 +238,25 @@ namespace InteractionEngine {
           case eLeapIEClassification.eLeapIEClassification_Grasp:
             {
               var iObj = _instanceToRegistry[instance].InteractionObject;
+              _graspedObjects.Add(iObj);
               iObj.OnGraspEnter(hand.Id);
               break;
             }
           case eLeapIEClassification.eLeapIEClassification_Physics:
             {
               var iObj = _instanceToRegistry[instance].InteractionObject;
+              _graspedObjects.Remove(iObj);
               iObj.OnGraspExit(hand.Id);
               break;
             }
           default:
             throw new InvalidOperationException("Unexpected classification " + classification.classification);
         }
+      }
+
+      for (int i = 0; i < _graspedObjects.Count; i++) {
+        var iObj = _graspedObjects[i];
+        iObj.OnGraspStay();
       }
     }
 

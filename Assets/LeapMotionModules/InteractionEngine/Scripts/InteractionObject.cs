@@ -16,7 +16,7 @@ namespace InteractionEngine {
 
     #region PUBLIC EVENTS
     public event Action<int> OnGraspEnterEvent;
-    public event Action<int[]> OnGraspStayEvent;
+    public event Action OnGraspStayEvent;
     public event Action<int> OnGraspExitEvent;
 
     public event Action<int> OnGraspEnterFirstEvent;
@@ -125,8 +125,13 @@ namespace InteractionEngine {
       }
     }
 
-    public virtual void OnGraspStay(Hand[] graspingHands) {
-
+    /// <summary>
+    /// Called by InteractionController every frame that a Hand continues to grasp this object.
+    /// </summary>
+    public virtual void OnGraspStay() {
+      if (OnGraspStayEvent != null) {
+        OnGraspStayEvent();
+      }
     }
 
     /// <summary>
