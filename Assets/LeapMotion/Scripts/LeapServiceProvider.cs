@@ -66,6 +66,7 @@ namespace Leap.Unity {
       //Null check to deal with hot reloading
       if (leap_controller_ == null) {
         createController();
+        Debug.Log("GetLeapController() calling createController()");
       }
 #endif
       return leap_controller_;
@@ -128,7 +129,6 @@ namespace Leap.Unity {
         Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
       }
 #endif
-
       if (_perFrameFixedUpdateOffset > 0) {
         _smoothedFixedUpdateOffset.Update(_perFrameFixedUpdateOffset, Time.deltaTime);
         _perFrameFixedUpdateOffset = -1;
@@ -136,7 +136,11 @@ namespace Leap.Unity {
     }
 
     protected virtual void FixedUpdate() {
-      _perFrameFixedUpdateOffset = GetLeapController().Frame().Timestamp * NS_TO_S - Time.fixedTime;
+      _perFrameFixedUpdateOffset = 
+        Mathf.Max(
+          _perFrameFixedUpdateOffset,
+          GetLeapController().Frame().Timestamp * NS_TO_S - Time.fixedTime
+        );
     }
 
     protected virtual void OnDestroy() {
@@ -196,6 +200,7 @@ namespace Leap.Unity {
       }
     }
 
+
     protected void onHandControllerConnect(object sender, LeapEventArgs args) {
       initializeFlags();
       leap_controller_.Device -= onHandControllerConnect;
@@ -215,7 +220,7 @@ namespace Leap.Unity {
     }
 
     /* Calling this method updates _currentFixedFrame if and only if this is the first time
-     * the method has been called for this FixedUpdate cycle.
+     * the method has been called for this FixedUpdate burst.
      */
     protected void ensureCurrentFixedFrameUpToDate() {
       if (Time.fixedTime == _currentFixedTime) {
@@ -225,12 +230,15 @@ namespace Leap.Unity {
 
       //Aproximate the correct timestamp given the current fixed time
       long correctedTimestamp = (long)((Time.fixedTime + _smoothedFixedUpdateOffset.value) * S_TO_NS);
-
+  
       //Search the leap history for a frame with a timestamp closest to the corrected timestamp
       Frame closestFrame = GetLeapController().Frame();
+      if ((correctedTimestamp < closestFrame.Timestamp)) {
+        _smoothedFixedUpdateOffset.reset = true;
+      }
+
       for (int searchHistoryIndex = 1; searchHistoryIndex < 60; searchHistoryIndex++) {
         Frame historyFrame = GetLeapController().Frame(searchHistoryIndex);
-
         //If we reach an invalid frame, terminate the search
         if (historyFrame.Id < 0) {
           Debug.LogWarning("historyFrame.Id was less than 0!");
