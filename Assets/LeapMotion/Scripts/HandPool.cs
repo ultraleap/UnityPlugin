@@ -14,13 +14,14 @@ namespace Leap.Unity {
    * When a HandRepresentation is finished, its IHandModel is returned to the pool.
    */
   public class HandPool :
-    HandFactory
-  {
+    HandFactory {
 
     [SerializeField]
     private List<IHandModel> ModelCollection;
     public List<IHandModel> ModelPool;
     public LeapHandController controller_ { get; set; }
+    public bool EnforceHandedness = false;
+
 
     /** Popuates the ModelPool with the contents of the ModelCollection */
     void Start() {
@@ -41,22 +42,18 @@ namespace Leap.Unity {
       HandRepresentation handRep = null;
       for (int i = 0; i < ModelPool.Count; i++) {
         IHandModel model = ModelPool[i];
-
         bool isCorrectHandedness;
-        if(model.Handedness == Chirality.Either) {
+        Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
+        isCorrectHandedness = model.Handedness == handChirality;
+        if (!EnforceHandedness || model.Handedness == Chirality.Either) {
           isCorrectHandedness = true;
-        } else {
-          Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
-          isCorrectHandedness = model.Handedness == handChirality;
         }
-
         bool isCorrectModelType;
         isCorrectModelType = model.HandModelType == modelType;
-
-        if(isCorrectHandedness && isCorrectModelType) {
-          ModelPool.RemoveAt(i);
-          handRep = new HandProxy(this, model, hand);
-          break;
+        if (isCorrectModelType && isCorrectHandedness) {
+            ModelPool.RemoveAt(i);
+            handRep = new HandProxy(this, model, hand);
+            break;
         }
       }
       return handRep;
@@ -75,6 +72,6 @@ namespace Leap.Unity {
         EditorUtility.DisplayDialog("Warning", "This slot needs to have an instance of a prefab from your scene. Make your hand prefab a child of the LeapHanadContrller in your scene,  then drag here", "OK");
       }
     }
-#endif 
+#endif
   }
 }
