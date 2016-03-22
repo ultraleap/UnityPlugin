@@ -276,24 +276,6 @@ MonoBehaviour:
   unlockHold: 0
   moreRewind: 276
   lessRewind: 275
---- !u!1 &836627196 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 188576, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
-  m_PrefabInternal: {fileID: 1759863750}
---- !u!114 &836627198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 836627196}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95ff52b4a0dd041479b65a44882d9e6f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _handModel: {fileID: 1759863751}
-  _activatePinchDist: 0.03
-  _deactivatePinchDist: 0.04
 --- !u!1 &1023543769
 GameObject:
   m_ObjectHideFlags: 0
@@ -1228,6 +1210,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 1686091045}
+  - 114: {fileID: 1686091046}
   m_Layer: 0
   m_Name: PinchDetector_L
   m_TagString: Untagged
@@ -1247,6 +1230,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1095659623}
   m_RootOrder: 0
+--- !u!114 &1686091046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1686091044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 95ff52b4a0dd041479b65a44882d9e6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _handModel: {fileID: 1759863751}
+  _activatePinchDist: 0.03
+  _deactivatePinchDist: 0.04
 --- !u!1 &1714544383
 GameObject:
   m_ObjectHideFlags: 0
@@ -1275,7 +1272,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pinchDetectors:
-  - {fileID: 836627198}
+  - {fileID: 1686091046}
   - {fileID: 188161270}
   _material: {fileID: 2100000, guid: 272a1441cfc719942b392dc8d7c5c7d8, type: 2}
   _drawColor: {r: 0, g: 0.04827571, b: 1, a: 1}
