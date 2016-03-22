@@ -44,6 +44,9 @@ namespace Leap.Unity.PinchUtility {
     }
 
     protected virtual void Awake() {
+      if (GetComponent<IHandModel>() != null) {
+        Debug.LogWarning("LeapPinchDetector should not be attached to the IHandModel's transform and should be attached to its own transform.");
+      }
       if (_handModel == null) {
         Debug.LogWarning("The HandModel field of LeapPinchDetector was unassigned and the detector has been disabled.");
         enabled = false;
@@ -157,6 +160,7 @@ namespace Leap.Unity.PinchUtility {
 
       float pinchDistance = hand.PinchDistance * MM_TO_M;
       transform.rotation = hand.Basis.Rotation();
+      transform.position = hand.PalmPosition.ToVector3();
 
       var fingers = hand.Fingers;
       transform.position = Vector3.zero;
