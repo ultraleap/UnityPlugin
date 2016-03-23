@@ -53,8 +53,6 @@ namespace Leap.Unity {
         }
       }
     }
-    private long prev_graphics_id_ = 0;
-    private long prev_physics_id_ = 0;
 
     /** Draws the Leap Motion gizmo when in the Unity editor. */
     void OnDrawGizmos() {
@@ -70,10 +68,9 @@ namespace Leap.Unity {
     /** Updates the graphics HandRepresentations. */
     protected virtual void Update() {
       Frame frame = Provider.CurrentFrame;
-      if (frame.Id != prev_graphics_id_ && graphicsEnabled) {
-        UpdateHandRepresentations(graphicsReps, ModelType.Graphics, frame);
-        prev_graphics_id_ = frame.Id;
 
+      if (graphicsEnabled) {
+        UpdateHandRepresentations(graphicsReps, ModelType.Graphics, frame);
       }
     }
 
@@ -81,9 +78,8 @@ namespace Leap.Unity {
     protected virtual void FixedUpdate() {
       Frame fixedFrame = Provider.CurrentFixedFrame;
 
-      if (fixedFrame.Id != prev_physics_id_ && physicsEnabled) {
+      if (physicsEnabled) {
         UpdateHandRepresentations(physicsReps, ModelType.Physics, fixedFrame);
-        prev_physics_id_ = fixedFrame.Id;
       }
     }
 
