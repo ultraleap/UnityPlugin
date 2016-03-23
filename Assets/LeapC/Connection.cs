@@ -106,11 +106,17 @@ namespace LeapInternal
 
       if (disposing)
       {
-        Stop();
-        LeapC.DestroyConnection(_leapConnection);
       }
 
+      Stop();
+      LeapC.DestroyConnection(_leapConnection);
+
       _disposed = true;
+    }
+
+    ~Connection()
+    {
+      Dispose(false);
     }
 
     private Connection(int connectionKey)
