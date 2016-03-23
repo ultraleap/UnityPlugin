@@ -158,7 +158,6 @@ namespace LeapInternal
                                       */
     eLeapEventType_ImageRequestError, //!< A requested image could not be acquired
     eLeapEventType_ImageComplete, //!<  An image transfer is complete
-    eLeapEventType_TrackedQuad, //!< A new tracked quad has been received
     eLeapEventType_LogEvent, //!< A diagnostic event has occured
 
     /**
@@ -456,19 +455,6 @@ namespace LeapInternal
   {
     public LEAP_VECTOR position;
     public float radius;
-  }
-
-  [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_TRACKED_QUAD_EVENT
-  {
-    public LEAP_FRAME_HEADER info;
-    public float width;
-    public float height;
-    public Int32 resolutionX;
-    public Int32 resolutionY;
-    public Int32 visible;
-    public LEAP_VECTOR position;
-    public LEAP_MATRIX orientation;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]

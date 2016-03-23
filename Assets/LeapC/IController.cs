@@ -20,7 +20,6 @@ namespace Leap
     bool IsConnected { get; }
     Config Config { get; }
     DeviceList Devices { get; }
-    TrackedQuad TrackedQuad { get; }
 
     event EventHandler<ConnectionEventArgs> Connect;
     event EventHandler<ConnectionLostEventArgs> Disconnect;
@@ -35,7 +34,6 @@ namespace Leap
     event EventHandler<PolicyEventArgs> PolicyChange;
     event EventHandler<ConfigChangeEventArgs> ConfigChange;
     event EventHandler<DistortionEventArgs> DistortionChange;
-    event EventHandler<TrackedQuadEventArgs> TrackedQuadReady;
   }
 }
 
