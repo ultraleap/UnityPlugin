@@ -51,7 +51,7 @@ namespace Leap.Unity{
               return testHand;
           } else {
               Matrix leftToRight = new Matrix(Vector.Right, Vector.Up, Vector.Forward);
-              return testHand.TransformedCopy(leftToRight);
+              return testHand.TransformedCopy(leftToRight, leftToRight);
           }
       }
        static Finger MakeThumb(int frameId, int handId){
@@ -100,7 +100,7 @@ namespace Leap.Unity{
       }
 
 
-       static Finger MakeFinger(Finger.FingerType name, Vector position, Vector forward, Vector up, float[] jointLengths, 
+       static Finger MakeFinger(Finger.FingerType name, Vector position, Vector forward, Vector up, float[] jointLengths,
           int frameId, int handId, int fingerId){
           Bone[] bones = new Bone[5];
           float proximalDistance = -jointLengths[0];

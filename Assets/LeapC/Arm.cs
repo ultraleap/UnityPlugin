@@ -63,7 +63,7 @@ namespace Leap
      * of the copied arm.
      * @since 3.0
      */
-    public new Arm TransformedCopy(Matrix trs)
+    public new Arm TransformedCopy(Matrix trs, Matrix rot)
     {
       float dScale = trs.zBasis.Magnitude;
       float hScale = trs.xBasis.Magnitude;
@@ -73,7 +73,7 @@ namespace Leap
           trs.TransformDirection(Direction),
           Length * dScale,
           Width * hScale,
-          trs * Basis);
+          rot * Basis);
     }
 
     /**
