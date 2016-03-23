@@ -29,7 +29,6 @@ namespace Leap
     EVENT_IMAGE,             //!< A requested image is available
     EVENT_IMAGE_REQUEST_FAILED, //!< A requested image could not be provided
     EVENT_DISTORTION_CHANGE, //!< The distortion matrix used for image correction has changed
-    EVENT_TRACKED_QUAD,      //!< A new tracked quad has been received
     EVENT_LOG_EVENT,         //!< A diagnostic event has occured
     EVENT_INIT,
   };
@@ -159,22 +158,6 @@ namespace Leap
 
     public UInt64 currentPolicies { get; set; }
     public UInt64 oldPolicies { get; set; }
-  }
-
-  /**
-   * Dispatched when a tracked quad is ready.
-   *
-   * Provides the quad as an argument.
-   * @since 3.0
-   */
-  public class TrackedQuadEventArgs : LeapEventArgs
-  {
-    public TrackedQuadEventArgs(TrackedQuad quad) : base(LeapEvent.EVENT_TRACKED_QUAD)
-    {
-      trackedQuad = quad;
-    }
-
-    public TrackedQuad trackedQuad { get; set; }
   }
 
   /**

@@ -39,22 +39,6 @@ namespace LeapInternal
       return newFrame;
     }
 
-    public TrackedQuad makeQuad(ref LEAP_TRACKED_QUAD_EVENT quadMsg)
-    {
-      TrackedQuad quad = new TrackedQuad(
-        quadMsg.width,
-        quadMsg.height,
-        quadMsg.resolutionX,
-        quadMsg.resolutionY,
-        quadMsg.visible != 0,
-        quadMsg.position.ToLeapVector(),
-        quadMsg.orientation.ToLeapMatrix(),
-        quadMsg.info.frame_id
-      );
-      return quad;
-    }
-
-
     public Hand makeHand(ref LEAP_HAND hand, Frame owningFrame)
     {
       LEAP_BONE arm = StructMarshal<LEAP_BONE>.PtrToStruct(hand.arm);

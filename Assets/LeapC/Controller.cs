@@ -53,10 +53,39 @@ namespace Leap
      */
     public SynchronizationContext EventContext { get; set; }
     /**
+    * Dispatched when the connection is initialized (but not necessarily connected).
+    *
+    * Can be dispatched more than once, if connection is restarted.
+    * @since 3.0
+    */
+    public event EventHandler<LeapEventArgs> Init
+    {
+      add
+      {
+        if(_hasInitialized)
+          value(this, new LeapEventArgs(LeapEvent.EVENT_INIT));
+        _init += value;
+      }
+      remove{ _init -= value; }
+    }
+    private bool _hasInitialized = false;
+    private EventHandler<LeapEventArgs> _init;
+    /**
      * Dispatched when the connection to the service is established.
      * @since 3.0
      */
-    public event EventHandler<ConnectionEventArgs> Connect;
+    public event EventHandler<ConnectionEventArgs> Connect   
+    {
+      add
+      {
+        if(_hasConnected)
+          value(this, new ConnectionEventArgs());
+        _connect += value;
+      }
+      remove{ _connect -= value; }
+    }
+    private bool _hasConnected = false;
+    private EventHandler<ConnectionEventArgs> _connect;
     /**
      * Dispatched if the connection to the service is lost.
      * @since 3.0
@@ -115,11 +144,6 @@ namespace Leap
     * @since 3.0
     */
     public event EventHandler<DistortionEventArgs> DistortionChange;
-    /**
-    * Dispatched when a new tracked quad object is available.
-    * @since 3.0
-    */
-    public event EventHandler<TrackedQuadEventArgs> TrackedQuadReady;
 
     //TODO revisit dispose code
     public void Dispose()
@@ -171,6 +195,7 @@ namespace Leap
       EventContext = SynchronizationContext.Current;
       _connection = Connection.GetConnection(connectionKey);
 
+      _connection.LeapInit += OnInit;
       _connection.LeapConnection += OnConnect;
       _connection.LeapConnectionLost += OnDisconnect;
       _connection.LeapFrame += OnFrame;
@@ -178,7 +203,6 @@ namespace Leap
       _connection.LeapImageRequestFailed += OnFailedImageRequest;
       _connection.LeapPolicyChange += OnPolicyChange;
       _connection.LeapLogEvent += OnLogEvent;
-      _connection.LeapTrackedQuad += OnTrackedQuad;
       _connection.LeapConfigChange += OnConfigChange;
       _connection.LeapDevice += OnDevice;
       _connection.LeapDeviceLost += OnDeviceLost;
@@ -514,25 +538,6 @@ namespace Leap
     }
 
     /**
-     * Note: This class is an experimental API for internal use only. It may be
-     * removed without warning.
-     *
-     * Returns information about the currently detected quad in the scene.
-     *
-     * \include Controller_trackedQuad.txt
-     * If no quad is being tracked, then an invalid TrackedQuad is returned.
-     * @since 2.2.6
-     **/
-    public TrackedQuad TrackedQuad
-    {
-      get
-      {
-
-        return _connection.GetLatestQuad();
-      }
-    }
-
-    /**
      * The supported controller policies.
      *
      * The supported policy flags are:
@@ -584,14 +589,22 @@ namespace Leap
       POLICY_ALLOW_PAUSE_RESUME = (1 << 3),
     }
 
+    protected virtual void OnInit(object sender, LeapEventArgs eventArgs)
+    {
+      _hasInitialized = true;
+      _init.DispatchOnContext<LeapEventArgs>(this, EventContext, eventArgs);
+    }
 
     protected virtual void OnConnect(object sender, ConnectionEventArgs eventArgs)
     {
-      Connect.DispatchOnContext<ConnectionEventArgs>(this, EventContext, eventArgs);
+      _hasConnected = true;
+      _connect.DispatchOnContext<ConnectionEventArgs>(this, EventContext, eventArgs);
     }
 
     protected virtual void OnDisconnect(object sender, ConnectionLostEventArgs eventArgs)
     {
+      _hasInitialized = false;
+      _hasConnected = false;
       Disconnect.DispatchOnContext<ConnectionLostEventArgs>(this, EventContext, eventArgs);
     }
 
@@ -624,11 +637,6 @@ namespace Leap
     protected virtual void OnDistortionChange(object sender, DistortionEventArgs eventArgs)
     {
       DistortionChange.DispatchOnContext<DistortionEventArgs>(this, EventContext, eventArgs);
-    }
-
-    protected virtual void OnTrackedQuad(object sender, TrackedQuadEventArgs eventArgs)
-    {
-      TrackedQuadReady.DispatchOnContext<TrackedQuadEventArgs>(this, EventContext, eventArgs);
     }
 
     protected virtual void OnLogEvent(object sender, LogEventArgs eventArgs)
