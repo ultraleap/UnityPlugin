@@ -30,7 +30,7 @@ namespace LeapInternal
                                trackingMsg.interaction_box_size.ToLeapVector()),
                            new List<Hand>((int)trackingMsg.nHands)
             );
-      
+
       for (int h = 0; h < trackingMsg.nHands; h++)
       {
         LEAP_HAND hand = StructMarshal<LEAP_HAND>.ArrayElementToStruct(trackingMsg.pHands, h);
@@ -39,27 +39,9 @@ namespace LeapInternal
       return newFrame;
     }
 
-    public TrackedQuad makeQuad(ref LEAP_TRACKED_QUAD_EVENT quadMsg)
-    {
-      TrackedQuad quad = new TrackedQuad(
-        quadMsg.width,
-        quadMsg.height,
-        quadMsg.resolutionX,
-        quadMsg.resolutionY,
-        quadMsg.visible != 0,
-        quadMsg.position.ToLeapVector(),
-        quadMsg.orientation.ToLeapMatrix(),
-        quadMsg.info.frame_id
-      );
-      return quad;
-    }
-
-
     public Hand makeHand(ref LEAP_HAND hand, Frame owningFrame)
     {
-      LEAP_BONE arm = StructMarshal<LEAP_BONE>.PtrToStruct(hand.arm);
-      Arm newArm = makeArm(ref arm);
-      LEAP_PALM palm = StructMarshal<LEAP_PALM>.PtrToStruct(hand.palm);
+      Arm newArm = makeArm(ref hand.arm);
 
       Hand newHand = new Hand(
         (int)owningFrame.Id,
@@ -69,32 +51,23 @@ namespace LeapInternal
         hand.grab_angle,
         hand.pinch_strength,
         hand.pinch_distance,
-        palm.width,
+        hand.palm.width,
         hand.type == eLeapHandType.eLeapHandType_Left,
         hand.visible_time,
         newArm,
         new List<Finger>(5),
-        new Vector(palm.position.x, palm.position.y, palm.position.z),
-        new Vector(palm.stabilized_position.x, palm.stabilized_position.y, palm.stabilized_position.z),
-        new Vector(palm.velocity.x, palm.velocity.y, palm.velocity.z),
-        new Vector(palm.normal.x, palm.normal.y, palm.normal.z),
-        new Vector(palm.direction.x, palm.direction.y, palm.direction.z),
+        new Vector(hand.palm.position.x, hand.palm.position.y, hand.palm.position.z),
+        new Vector(hand.palm.stabilized_position.x, hand.palm.stabilized_position.y, hand.palm.stabilized_position.z),
+        new Vector(hand.palm.velocity.x, hand.palm.velocity.y, hand.palm.velocity.z),
+        new Vector(hand.palm.normal.x, hand.palm.normal.y, hand.palm.normal.z),
+        new Vector(hand.palm.direction.x, hand.palm.direction.y, hand.palm.direction.z),
         newArm.NextJoint //wrist position
       );
-      LEAP_DIGIT thumbDigit = StructMarshal<LEAP_DIGIT>.PtrToStruct(hand.thumb);
-      newHand.Fingers.Insert(0, makeFinger(owningFrame, ref hand, ref thumbDigit, Finger.FingerType.TYPE_THUMB));
-
-      LEAP_DIGIT indexDigit = StructMarshal<LEAP_DIGIT>.PtrToStruct(hand.index);
-      newHand.Fingers.Insert(1, makeFinger(owningFrame, ref hand, ref indexDigit, Finger.FingerType.TYPE_INDEX));
-
-      LEAP_DIGIT middleDigit = StructMarshal<LEAP_DIGIT>.PtrToStruct(hand.middle);
-      newHand.Fingers.Insert(2, makeFinger(owningFrame, ref hand, ref middleDigit, Finger.FingerType.TYPE_MIDDLE));
-
-      LEAP_DIGIT ringDigit = StructMarshal<LEAP_DIGIT>.PtrToStruct(hand.ring);
-      newHand.Fingers.Insert(3, makeFinger(owningFrame, ref hand, ref ringDigit, Finger.FingerType.TYPE_RING));
-
-      LEAP_DIGIT pinkyDigit = StructMarshal<LEAP_DIGIT>.PtrToStruct(hand.pinky);
-      newHand.Fingers.Insert(4, makeFinger(owningFrame, ref hand, ref pinkyDigit, Finger.FingerType.TYPE_PINKY));
+      newHand.Fingers.Insert(0, makeFinger(owningFrame, ref hand, ref hand.thumb, Finger.FingerType.TYPE_THUMB));
+      newHand.Fingers.Insert(1, makeFinger(owningFrame, ref hand, ref hand.index, Finger.FingerType.TYPE_INDEX));
+      newHand.Fingers.Insert(2, makeFinger(owningFrame, ref hand, ref hand.middle, Finger.FingerType.TYPE_MIDDLE));
+      newHand.Fingers.Insert(3, makeFinger(owningFrame, ref hand, ref hand.ring, Finger.FingerType.TYPE_RING));
+      newHand.Fingers.Insert(4, makeFinger(owningFrame, ref hand, ref hand.pinky, Finger.FingerType.TYPE_PINKY));
 
       return newHand;
     }

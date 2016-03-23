@@ -53,10 +53,39 @@ namespace Leap
      */
     public SynchronizationContext EventContext { get; set; }
     /**
+    * Dispatched when the connection is initialized (but not necessarily connected).
+    *
+    * Can be dispatched more than once, if connection is restarted.
+    * @since 3.0
+    */
+    public event EventHandler<LeapEventArgs> Init
+    {
+      add
+      {
+        if(_hasInitialized)
+          value(this, new LeapEventArgs(LeapEvent.EVENT_INIT));
+        _init += value;
+      }
+      remove{ _init -= value; }
+    }
+    private bool _hasInitialized = false;
+    private EventHandler<LeapEventArgs> _init;
+    /**
      * Dispatched when the connection to the service is established.
      * @since 3.0
      */
-    public event EventHandler<ConnectionEventArgs> Connect;
+    public event EventHandler<ConnectionEventArgs> Connect   
+    {
+      add
+      {
+        if(_hasConnected)
+          value(this, new ConnectionEventArgs());
+        _connect += value;
+      }
+      remove{ _connect -= value; }
+    }
+    private bool _hasConnected = false;
+    private EventHandler<ConnectionEventArgs> _connect;
     /**
      * Dispatched if the connection to the service is lost.
      * @since 3.0
@@ -115,11 +144,6 @@ namespace Leap
     * @since 3.0
     */
     public event EventHandler<DistortionEventArgs> DistortionChange;
-    /**
-    * Dispatched when a new tracked quad object is available.
-    * @since 3.0
-    */
-    public event EventHandler<TrackedQuadEventArgs> TrackedQuadReady;
 
     //TODO revisit dispose code
     public void Dispose()
@@ -160,17 +184,19 @@ namespace Leap
      *
      * All controller instances using the same key will use the same connection
      * to the serivce. In general, an application should not use more than one connection
-     * for all its controllers.
+     * for all its controllers. Each connection keeps its own cache of frames and images.
      *
      * @param connectionKey An identifier specifying the connection to use. If a
      * connection with the specified key already exists, that connection is used.
      * Otherwise, a new connection is created.
+     * @since 3.0
      */
     public Controller(int connectionKey)
     {
       EventContext = SynchronizationContext.Current;
       _connection = Connection.GetConnection(connectionKey);
 
+      _connection.LeapInit += OnInit;
       _connection.LeapConnection += OnConnect;
       _connection.LeapConnectionLost += OnDisconnect;
       _connection.LeapFrame += OnFrame;
@@ -178,7 +204,6 @@ namespace Leap
       _connection.LeapImageRequestFailed += OnFailedImageRequest;
       _connection.LeapPolicyChange += OnPolicyChange;
       _connection.LeapLogEvent += OnLogEvent;
-      _connection.LeapTrackedQuad += OnTrackedQuad;
       _connection.LeapConfigChange += OnConfigChange;
       _connection.LeapDevice += OnDevice;
       _connection.LeapDeviceLost += OnDeviceLost;
@@ -356,18 +381,20 @@ namespace Leap
     }
 
     /**
+     * @if UNITY
+     * In most cases you should get Frame objects using the LeapProvider::CurrentFrame
+     * properties. The data in Frame objects taken directly from a Leap.Controller instance
+     * is still in the Leap Motion frame of reference and will not match the hands
+     * displayed in a Unity scene.
+     * @endif
+     *
      * Returns a frame of tracking data from the Leap Motion software. Use the optional
      * history parameter to specify which frame to retrieve. Call frame() or
      * frame(0) to access the most recent frame; call frame(1) to access the
      * previous frame, and so on. If you use a history value greater than the
-     * number of stored frames, then the controller returns an invalid frame.
+     * number of stored frames, then the controller returns an empty frame.
      *
      * \include Controller_Frame_1.txt
-     *
-     * You can call this function in your Listener implementation to get frames at the
-     * Leap Motion frame rate:
-     *
-     * \include Controller_Listener_onFrame.txt
      *
      * @param history The age of the frame to return, counting backwards from
      * the most recent frame (0) into the past and up to the maximum age (59).
@@ -382,24 +409,8 @@ namespace Leap
     }
 
     /**
-     * Returns a frame of tracking data from the Leap Motion software. Use the optional
-     * history parameter to specify which frame to retrieve. Call frame() or
-     * frame(0) to access the most recent frame; call frame(1) to access the
-     * previous frame, and so on. If you use a history value greater than the
-     * number of stored frames, then the controller returns an invalid frame.
+     * Returns the most recent frame of tracking data.
      *
-     * \include Controller_Frame_1.txt
-     *
-     * You can call this function in your Listener implementation to get frames at the
-     * Leap Motion frame rate:
-     *
-     * \include Controller_Listener_onFrame.txt
-     *
-     * @param history The age of the frame to return, counting backwards from
-     * the most recent frame (0) into the past and up to the maximum age (59).
-     * @returns The specified frame; or, if no history parameter is specified,
-     * the newest frame. If a frame is not available at the specified history
-     * position, an invalid Frame is returned.
      * @since 1.0
      */
     public Frame Frame()
@@ -417,6 +428,41 @@ namespace Leap
     public Frame GetTransformedFrame(Matrix trs, int history = 0)
     {
       return Frame(history).TransformedCopy(trs);
+    }
+
+    /**
+    * Returns the timestamps of the frames captured closest to the specified
+    * time.
+    *
+    * The time should be expressed in microseconds based on the Leap Motion clock.
+    * You can get a system time 
+    * @param time A time expressed in microseconds.
+    */
+    public TimeBracket GetNearestFrameTimes(Int64 time){
+      TimeBracket nearestFrameTimes;
+      _connection.GetNearestFrameTimes(time, 
+                                       out nearestFrameTimes.before, 
+                                       out nearestFrameTimes.after);
+      return nearestFrameTimes;
+    }
+
+    /**
+    * Returns the Frame at the specified time, interpolating the data between existing frames, if necessary.
+    * 
+    * 
+    */
+    public Frame GetInterpolatedFrame(Int64 time){
+      return _connection.GetInterpolatedFrame(time);
+    }
+
+    /**
+    * Returns the Frame at the specified time, interpolating the data between existing frames, if necessary,
+    * and transforms the data using the specified transform matrix.
+    * 
+    * 
+    */
+    public Frame GetTransformedInterpolatedFrame(Matrix trs, Int64 time){
+      return _connection.GetInterpolatedFrame(time).TransformedCopy(trs);
     }
 
     /**
@@ -459,8 +505,6 @@ namespace Leap
     /**
      * Returns a Config object, which you can use to query the Leap Motion system for
      * configuration information.
-     *
-     * \include Controller_config.txt
      *
      * @returns The Controller's Config object.
      * @since 1.0
@@ -511,25 +555,6 @@ namespace Leap
     public FailedDeviceList FailedDevices()
     {
       return _connection.FailedDevices;
-    }
-
-    /**
-     * Note: This class is an experimental API for internal use only. It may be
-     * removed without warning.
-     *
-     * Returns information about the currently detected quad in the scene.
-     *
-     * \include Controller_trackedQuad.txt
-     * If no quad is being tracked, then an invalid TrackedQuad is returned.
-     * @since 2.2.6
-     **/
-    public TrackedQuad TrackedQuad
-    {
-      get
-      {
-
-        return _connection.GetLatestQuad();
-      }
     }
 
     /**
@@ -584,14 +609,22 @@ namespace Leap
       POLICY_ALLOW_PAUSE_RESUME = (1 << 3),
     }
 
+    protected virtual void OnInit(object sender, LeapEventArgs eventArgs)
+    {
+      _hasInitialized = true;
+      _init.DispatchOnContext<LeapEventArgs>(this, EventContext, eventArgs);
+    }
 
     protected virtual void OnConnect(object sender, ConnectionEventArgs eventArgs)
     {
-      Connect.DispatchOnContext<ConnectionEventArgs>(this, EventContext, eventArgs);
+      _hasConnected = true;
+      _connect.DispatchOnContext<ConnectionEventArgs>(this, EventContext, eventArgs);
     }
 
     protected virtual void OnDisconnect(object sender, ConnectionLostEventArgs eventArgs)
     {
+      _hasInitialized = false;
+      _hasConnected = false;
       Disconnect.DispatchOnContext<ConnectionLostEventArgs>(this, EventContext, eventArgs);
     }
 
@@ -624,11 +657,6 @@ namespace Leap
     protected virtual void OnDistortionChange(object sender, DistortionEventArgs eventArgs)
     {
       DistortionChange.DispatchOnContext<DistortionEventArgs>(this, EventContext, eventArgs);
-    }
-
-    protected virtual void OnTrackedQuad(object sender, TrackedQuadEventArgs eventArgs)
-    {
-      TrackedQuadReady.DispatchOnContext<TrackedQuadEventArgs>(this, EventContext, eventArgs);
     }
 
     protected virtual void OnLogEvent(object sender, LogEventArgs eventArgs)

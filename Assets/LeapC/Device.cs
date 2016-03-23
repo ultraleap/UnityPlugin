@@ -33,7 +33,6 @@ namespace Leap
     /**
      * Constructs a default Device object.
      *
-     * An uninitialized device is considered invalid.
      * Get valid Device objects from a DeviceList object obtained using the
      * Controller::devices() method.
      *
@@ -62,6 +61,7 @@ namespace Leap
       SerialNumber = serialNumber;
     }
 
+    /* For internal use. */
     public void Update(
         float horizontalViewAngle,
         float verticalViewAngle,
@@ -80,6 +80,7 @@ namespace Leap
       SerialNumber = serialNumber;
     }
 
+    /* For internal use. */
     public void Update(Device updatedDevice)
     {
       HorizontalViewAngle = updatedDevice.HorizontalViewAngle;
@@ -91,6 +92,7 @@ namespace Leap
       SerialNumber = updatedDevice.SerialNumber;
     }
 
+    /* For internal use. */
     public IntPtr Handle { get; private set; }
 
     public bool SetPaused(bool pause)
@@ -244,6 +246,8 @@ namespace Leap
     /**
      * The software has detected a possible smudge on the translucent cover
      * over the Leap Motion cameras.
+     * 
+     * Not implemented yet.
      *
      * \include Device_isSmudged.txt
      *
@@ -261,6 +265,8 @@ namespace Leap
      * The software has detected excessive IR illumination, which may interfere
      * with tracking. If robust mode is enabled, the system will enter robust mode when
      * isLightingBad() is true.
+     *
+     * Not implemented yet.
      *
      * \include Device_isLightingBad.txt
      *
