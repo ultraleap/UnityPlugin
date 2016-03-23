@@ -41,10 +41,8 @@ namespace LeapInternal
     private PendingImages _pendingImageRequestList = new PendingImages();
     private ObjectPool<ImageData> _imageDataCache;
     private ObjectPool<ImageData> _imageRawDataCache;
-    private CircularObjectBuffer<TrackedQuad> _quads;
     private int _frameBufferLength = 60;
     private int _imageBufferLength = 20 * 4;
-    private int _quadBufferLength = 60;
     private ulong _standardImageBufferSize = 640 * 240 * 2; //width * heigth * 2
     private ulong _standardRawBufferSize = 640 * 240 * 2 * 8; //width * heigth * 2 images * 8 bpp
     private DistortionData _currentDistortionData = new DistortionData();
@@ -56,14 +54,29 @@ namespace LeapInternal
     //Policy and enabled features
     private UInt64 _requestedPolicies = 0;
     private UInt64 _activePolicies = 0;
-    private bool _trackedQuadsAreEnabled = false;
 
     //Config change status
     private Dictionary<uint, string> _configRequests = new Dictionary<uint, string>();
 
     //Connection events
-    public EventHandler<LeapEventArgs> LeapInit;
-    public EventHandler<ConnectionEventArgs> LeapConnection;
+    private EventHandler<LeapEventArgs> _leapInit;
+    public event EventHandler <LeapEventArgs> LeapInit{
+      add{
+        _leapInit += value;
+        if(_leapConnection != IntPtr.Zero)
+          value(this, new LeapEventArgs(LeapEvent.EVENT_INIT));
+      }
+      remove{_leapInit -= value;}
+    }
+    private EventHandler<ConnectionEventArgs> _leapConnectionEvent;
+    public event EventHandler<ConnectionEventArgs> LeapConnection{
+      add{
+        _leapConnectionEvent += value;
+        if(IsServiceConnected)
+          value(this, new ConnectionEventArgs());
+        }
+      remove{_leapConnectionEvent -= value;}
+    }
     public EventHandler<ConnectionLostEventArgs> LeapConnectionLost;
     public EventHandler<DeviceEventArgs> LeapDevice;
     public EventHandler<DeviceEventArgs> LeapDeviceLost;
@@ -72,7 +85,6 @@ namespace LeapInternal
     public EventHandler<FrameEventArgs> LeapFrame;
     public EventHandler<ImageEventArgs> LeapImageReady;
     public EventHandler<ImageRequestFailedEventArgs> LeapImageRequestFailed;
-    public EventHandler<TrackedQuadEventArgs> LeapTrackedQuad;
     public EventHandler<LogEventArgs> LeapLogEvent;
     public EventHandler<SetConfigResponseEventArgs> LeapConfigResponse;
     public EventHandler<ConfigChangeEventArgs> LeapConfigChange;
@@ -106,7 +118,6 @@ namespace LeapInternal
       _leapConnection = IntPtr.Zero;
 
       Frames = new CircularObjectBuffer<Frame>(_frameBufferLength);
-      _quads = new CircularObjectBuffer<TrackedQuad>(_quadBufferLength);
       _imageDataCache = new ObjectPool<ImageData>(_imageBufferLength, false);
       _imageRawDataCache = new ObjectPool<ImageData>(_imageBufferLength, false);
     }
@@ -165,7 +176,7 @@ namespace LeapInternal
       try
       {
         eLeapRS result;
-        LeapInit.Dispatch<LeapEventArgs>(this, new LeapEventArgs(LeapEvent.EVENT_INIT));
+        _leapInit.Dispatch<LeapEventArgs>(this, new LeapEventArgs(LeapEvent.EVENT_INIT));
         while (true)
         {
           LEAP_CONNECTION_MESSAGE _msg = new LEAP_CONNECTION_MESSAGE();
@@ -178,8 +189,6 @@ namespace LeapInternal
 
           if (result != eLeapRS.eLeapRS_Success) {
             reportAbnormalResults("LeapC PollConnection call was ", result);
-            // Yield to other thread
-            Thread.Sleep(0);
             continue;
           }
 
@@ -217,10 +226,6 @@ namespace LeapInternal
               LEAP_IMAGE_FRAME_REQUEST_ERROR_EVENT failed_image_evt = StructMarshal<LEAP_IMAGE_FRAME_REQUEST_ERROR_EVENT>.PtrToStruct(_msg.eventStructPtr);
               handleFailedImageRequest(ref failed_image_evt);
               break;
-            case eLeapEventType.eLeapEventType_TrackedQuad:
-              LEAP_TRACKED_QUAD_EVENT quad_evt = StructMarshal<LEAP_TRACKED_QUAD_EVENT>.PtrToStruct(_msg.eventStructPtr);
-              handleQuadMessage(ref quad_evt);
-              break;
             case eLeapEventType.eLeapEventType_LogEvent:
               LEAP_LOG_EVENT log_evt = StructMarshal<LEAP_LOG_EVENT>.PtrToStruct(_msg.eventStructPtr);
               reportLogMessage(ref log_evt);
@@ -253,12 +258,39 @@ namespace LeapInternal
     private void handleTrackingMessage(ref LEAP_TRACKING_EVENT trackingMsg)
     {
       Frame newFrame = frameFactory.makeFrame(ref trackingMsg);
-      if (_trackedQuadsAreEnabled)
-        newFrame.TrackedQuad = this.findTrackQuadForFrame(newFrame.Id);
       Frames.Put(newFrame);
       this.LeapFrame.Dispatch<FrameEventArgs>(this, new FrameEventArgs(newFrame));
     }
 
+    public void GetNearestFrameTimes(Int64 time, out Int64 before, out Int64 after){
+      eLeapRS result = LeapC.GetNearestFrames(_leapConnection, time, out before, out after);
+      reportAbnormalResults ("LeapC get nearest frame timestamp call was ", result);
+    }
+
+    public UInt64 GetInterpolatedFrameSize(Int64 time){
+      if(_leapConnection == IntPtr.Zero)
+        return 0;
+      UInt64 size = 0;
+      eLeapRS result = LeapC.GetFrameSize(_leapConnection, time, out size);
+      reportAbnormalResults ("LeapC get interpolated frame call was ", result);
+      return size;
+    }
+
+    public Frame GetInterpolatedFrame(Int64 time){
+      if(_leapConnection == IntPtr.Zero)
+        return null;
+      UInt64 size = GetInterpolatedFrameSize(time);
+      IntPtr trackingBuffer = Marshal.AllocHGlobal((Int32)size);
+      eLeapRS result = LeapC.InterpolateFrame(_leapConnection, time, trackingBuffer, size);
+      reportAbnormalResults ("LeapC get interpolated frame call was ", result);
+      Frame frame = null;
+      if(result == eLeapRS.eLeapRS_Success){
+        LEAP_TRACKING_EVENT tracking_evt = StructMarshal<LEAP_TRACKING_EVENT>.PtrToStruct(trackingBuffer);
+        frame = frameFactory.makeFrame(ref tracking_evt);
+      }
+      Marshal.FreeHGlobal(trackingBuffer);
+      return frame;
+    }
 
     public Image RequestImages(Int64 frameId, Image.ImageType imageType)
     {
@@ -411,25 +443,15 @@ namespace LeapInternal
       _pendingImageRequestList.purgeOld(_leapConnection);
     }
 
-    private void handleQuadMessage(ref LEAP_TRACKED_QUAD_EVENT quad_evt)
-    {
-      TrackedQuad quad = frameFactory.makeQuad(ref quad_evt);
-      _quads.Put(quad);
-
-      this.LeapTrackedQuad.Dispatch<TrackedQuadEventArgs>(this, new TrackedQuadEventArgs(quad));
-    }
-
     private void handleConnection(ref LEAP_CONNECTION_EVENT connectionMsg)
     {
-      //TODO update connection on CONNECTION_EVENT
-      this.LeapConnection.Dispatch<ConnectionEventArgs>(this, new ConnectionEventArgs()); //TODO Meaningful Connection event args
+      this._leapConnectionEvent.Dispatch<ConnectionEventArgs>(this, new ConnectionEventArgs());
     }
 
     private void handleConnectionLost(ref LEAP_CONNECTION_LOST_EVENT connectionMsg)
     {
-      //TODO update connection on CONNECTION_LOST_EVENT
-      this.LeapConnectionLost.Dispatch<ConnectionLostEventArgs>(this, new ConnectionLostEventArgs()); //TODO Meaningful ConnectionLost event args
-      this.Cleanup();
+      this.LeapConnectionLost.Dispatch<ConnectionLostEventArgs>(this, new ConnectionLostEventArgs());
+      this.Stop();
     }
 
     private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg)
@@ -748,25 +770,6 @@ namespace LeapInternal
       }
     }
 
-    private TrackedQuad findTrackQuadForFrame(long frameId)
-    {
-      TrackedQuad quad = null;
-      for (int q = 0; q < _quads.Count; q++)
-      {
-        quad = _quads.Get(q);
-        if (quad.Id == frameId)
-          return quad;
-        if (quad.Id < frameId)
-          break;
-      }
-      return quad; //null
-    }
-
-    public TrackedQuad GetLatestQuad()
-    {
-      return _quads.Get(0);
-    }
-
     /**
      * The list of currently attached and recognized Leap Motion controller devices.
      *
@@ -825,4 +828,3 @@ namespace LeapInternal
     }
   }
 }
-
