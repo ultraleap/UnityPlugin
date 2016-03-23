@@ -26,6 +26,13 @@ namespace Leap.Unity {
     [SerializeField]
     protected LeapDeviceType _overrideDeviceTypeWith = LeapDeviceType.Peripheral;
 
+    [SerializeField]
+    protected bool _useInterpolation = true;
+
+    [Tooltip("How much delay should be added to interpolation.  A non-zero amount is needed to prevent extrapolation artifacts.")]
+    [SerializeField]
+    protected long _interpolationDelay = 15;
+
     protected Controller leap_controller_;
 
     protected Frame _currentFrame;
@@ -34,8 +41,6 @@ namespace Leap.Unity {
 
     protected Frame _currentFixedFrame;
     protected float _currentFixedTime = -1;
-
-    protected float _initialFrameOffset = 30f;
 
     private ClockCorrelator clockCorrelator;
 
@@ -131,17 +136,23 @@ namespace Leap.Unity {
       Int64 unityTime = (Int64)(Time.time * 1e6);
       clockCorrelator.UpdateRebaseEstimate(unityTime);
 
-      Int64 unityOffsetTime = (Int64)(unityTime - _initialFrameOffset);
-      Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
-      Matrix leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
-      Frame interpolatedFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
-      if (interpolatedFrame != null) {
-        _currentFrame =  interpolatedFrame.TransformedCopy(leapMat);
+      Frame serviceFrame;
+      if (_useInterpolation) {
+        Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
+        Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
+        serviceFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
+      } else {
+        serviceFrame = leap_controller_.Frame();
       }
-      
+
+      if (serviceFrame != null) {
+        Matrix leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
+        _currentFrame = serviceFrame.TransformedCopy(leapMat);
+      }
     }
 
     protected virtual void FixedUpdate() {
+      //TODO: Find suitable interpolation strategy for FixedUpdate
       _currentFixedFrame = leap_controller_.Frame();
     }
 
