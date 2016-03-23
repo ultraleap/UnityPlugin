@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using Leap;
 
-namespace Leap {
-
-  [ExecuteAfter(typeof(LeapProvider))]
+namespace Leap.Unity {
+  /**
+   * LeapHandController uses a Factory to create and updata HandRepresentations based on Frame's received from a Provider  */
   public class LeapHandController : MonoBehaviour {
     /** The scale factors for hand movement. Set greater than 1 to give the hands a greater range of motion. */
     public Vector3 handMovementScale = Vector3.one;
@@ -57,48 +57,48 @@ namespace Leap {
     private long prev_physics_id_ = 0;
 
     /** Draws the Leap Motion gizmo when in the Unity editor. */
-    /*
     void OnDrawGizmos() {
-      // Draws the little Leap Motion Controller in the Editor view.
       Gizmos.matrix = Matrix4x4.Scale(GIZMO_SCALE * Vector3.one);
       Gizmos.DrawIcon(transform.position, "leap_motion.png");
     }
-    */
 
-    // Use this for initialization
-    void Start() {
+    protected virtual void Start() {
       Provider = GetComponent<LeapProvider>();
       Factory = GetComponent<HandFactory>();
     }
-    /**
-    * Turns off collisions between the specified GameObject and all hands.
-    * Subject to the limitations of Unity Physics.IgnoreCollisions(). 
-    * See http://docs.unity3d.com/ScriptReference/Physics.IgnoreCollision.html.
-    */
-    public void IgnoreCollisionsWithHands(GameObject to_ignore, bool ignore = true) {
-      foreach (HandRepresentation rep in physicsReps.Values) {
-        //Todo move this to HandModel
-        //Leap.Utils.IgnoreCollisions(rep.handModel.gameObject, to_ignore, ignore);
-      }
-    }
+
     /** Updates the graphics HandRepresentations. */
-    void Update() {
+    protected virtual void Update() {
       Frame frame = Provider.CurrentFrame;
       if (frame.Id != prev_graphics_id_ && graphicsEnabled) {
-        UpdateHandRepresentations(graphicsReps, ModelType.Graphics);
+        UpdateHandRepresentations(graphicsReps, ModelType.Graphics, frame);
         prev_graphics_id_ = frame.Id;
 
       }
     }
+
+    /** Updates the physics HandRepresentations. */
+    protected virtual void FixedUpdate() {
+      Frame fixedFrame = Provider.CurrentFixedFrame;
+
+      if (fixedFrame.Id != prev_physics_id_ && physicsEnabled) {
+        UpdateHandRepresentations(physicsReps, ModelType.Physics, fixedFrame);
+        prev_physics_id_ = fixedFrame.Id;
+      }
+    }
+
     /** 
     * Updates HandRepresentations based in the specified HandRepresentation Dictionary.
     * Active HandRepresentation instances are updated if the hand they represent is still
     * present in the Provider's CurrentFrame; otherwise, the HandRepresentation is removed. If new
     * Leap Hand objects are present in the Leap HandRepresentation Dictionary, new HandRepresentations are 
     * created and added to the dictionary. 
+    * @param all_hand_reps = A dictionary of Leap Hand ID's with a paired HandRepresentation
+    * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
+    * @param frame The Leap Frame containing Leap Hand data for each currently tracked hand
     */
-    void UpdateHandRepresentations(Dictionary<int, HandRepresentation> all_hand_reps, ModelType modelType) {
-      foreach (Leap.Hand curHand in Provider.CurrentFrame.Hands) {
+    void UpdateHandRepresentations(Dictionary<int, HandRepresentation> all_hand_reps, ModelType modelType, Frame frame) {
+      foreach (Leap.Hand curHand in frame.Hands) {
         HandRepresentation rep;
         if (!all_hand_reps.TryGetValue(curHand.Id, out rep)) {
           rep = Factory.MakeHandRepresentation(curHand, modelType);
@@ -109,11 +109,11 @@ namespace Leap {
         if (rep != null) {
           rep.IsMarked = true;
           rep.UpdateRepresentation(curHand, modelType);
-          rep.LastUpdatedTime = (int)Provider.CurrentFrame.Timestamp;
+          rep.LastUpdatedTime = (int)frame.Timestamp;
         }
       }
 
-      //Mark-and-sweep to finish unused HandRepresentations
+      /** Mark-and-sweep to finish unused HandRepresentations */
       HandRepresentation toBeDeleted = null;
       foreach (KeyValuePair<int, HandRepresentation> r in all_hand_reps) {
         if (r.Value != null) {
@@ -121,32 +121,17 @@ namespace Leap {
             r.Value.IsMarked = false;
           }
           else {
-            //Initialize toBeDeleted with a value to be deleted
+            /** Initialize toBeDeleted with a value to be deleted */
             //Debug.Log("Finishing");
             toBeDeleted = r.Value;
           }
         }
       }
-      //Inform the representation that we will no longer be giving it any hand updates
-      //because the corresponding hand has gone away
+      /**Inform the representation that we will no longer be giving it any hand updates 
+       * because the corresponding hand has gone away */
       if (toBeDeleted != null) {
         all_hand_reps.Remove(toBeDeleted.HandID);
         toBeDeleted.Finish();
-      }
-    }
-    /** Updates the physics HandRepresentations. */
-    protected virtual void FixedUpdate() {
-
-      //All FixedUpdates of a frame happen before Update, so only the last of these calculations is passed
-      //into Update for smoothing.
-      var latestFrame = Provider.CurrentFrame;
-      Provider.PerFrameFixedUpdateOffset = latestFrame.Timestamp * NS_TO_S - Time.fixedTime;
-
-      Frame frame = Provider.GetFixedFrame();
-
-      if (frame.Id != prev_physics_id_ && physicsEnabled) {
-        UpdateHandRepresentations(physicsReps, ModelType.Physics);
-        prev_physics_id_ = frame.Id;
       }
     }
   }

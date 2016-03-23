@@ -366,11 +366,24 @@ namespace LeapInternal
     {
       return new Leap.Vector(x, y, z);
     }
+
+    public UnityEngine.Vector3 ToUnityVector() 
+    {
+      return new UnityEngine.Vector3(x, y, z);
+    }
+
     public LEAP_VECTOR(Leap.Vector leap)
     {
       x = leap.x;
       y = leap.y;
       z = leap.z;
+    }
+
+    public LEAP_VECTOR(UnityEngine.Vector3 unity) 
+    {
+      x = unity.x;
+      y = unity.y;
+      z = unity.z;
     }
   }
 
@@ -581,6 +594,7 @@ namespace LeapInternal
 
     [DllImport("LeapC", EntryPoint = "LeapRequestImages")]
     public static extern eLeapRS RequestImages(IntPtr hConnection, ref LEAP_IMAGE_FRAME_DESCRIPTION description, out LEAP_IMAGE_FRAME_REQUEST_TOKEN pToken);
+
     [DllImport("LeapC", EntryPoint = "LeapCancelImageFrameRequest")]
     public static extern eLeapRS CancelImageFrameRequest(IntPtr hConnection, LEAP_IMAGE_FRAME_REQUEST_TOKEN token);
 
@@ -654,20 +668,6 @@ namespace LeapInternal
         Marshal.FreeHGlobal(configValue);
       }
       return callResult;
-    }
-
-    //Utility function
-    public static T PtrToStruct<T>(IntPtr ptr) where T : struct
-    {
-      try
-      {
-        return (T)Marshal.PtrToStructure(ptr, typeof(T));
-      }
-      catch (Exception e)
-      {
-        Logger.Log("Problem converting structure " + typeof(T).ToString() + " from ptr " + ptr.ToString() + " : " + e.Message);
-        return new T();
-      }
     }
 
 

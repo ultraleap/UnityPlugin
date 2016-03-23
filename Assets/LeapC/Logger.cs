@@ -20,7 +20,7 @@ namespace LeapInternal
     {
 #if DEBUG
 #if UNITY_EDITOR
-                    UnityEngine.Debug.Log(message);
+                    //UnityEngine.Debug.Log(message);
 #else
                     Console.WriteLine(message);
 #endif

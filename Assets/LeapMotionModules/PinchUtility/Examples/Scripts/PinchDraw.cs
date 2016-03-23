@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace Leap.PinchUtility.Examples {
+namespace Leap.Unity.PinchUtility.Examples {
 
-  [ExecuteAfter(typeof(LeapPinchDetector))]   //Execute after LeapPinchDetector so we give it a chance to update before we do
   public class PinchDraw : MonoBehaviour {
 
     [Tooltip("Each pinch detector can draw one line at a time.")]

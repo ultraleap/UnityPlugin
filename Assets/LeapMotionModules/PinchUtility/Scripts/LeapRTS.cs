@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
 
-namespace Leap.PinchUtility {
+namespace Leap.Unity.PinchUtility {
 
   /// <summary>
   /// Use this component on a Game Object to allow it to be manipulated by a pinch gesture.  The component
   /// allows rotation, translation, and scale of the object (RTS).
   /// </summary>
-  [ExecuteAfter(typeof(LeapPinchDetector))]
   public class LeapRTS : MonoBehaviour {
 
     public enum RotationMethod {
