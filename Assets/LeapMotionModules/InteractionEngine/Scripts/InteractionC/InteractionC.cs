@@ -123,7 +123,7 @@ namespace InteractionEngine.CApi {
     public LEAP_IE_SHAPE_DESCRIPTION shape;
     public UInt32 nShapes;
     public IntPtr pShapes; //LEAP_IE_SHAPE_DESCRIPTION**
-    public IntPtr pTransforms; //LEAP_IE_TRANSFORM* 
+    public IntPtr pTransforms; //LEAP_IE_TRANSFORM*
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -135,7 +135,7 @@ namespace InteractionEngine.CApi {
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_SHAPE_INSTANCE_HANDLE {
     public UInt32 handle;
-    public IntPtr pDEBUG; // LeapIEShapeInstanceData* 
+    public IntPtr pDEBUG; // LeapIEShapeInstanceData*
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -415,9 +415,9 @@ namespace InteractionEngine.CApi {
       IntPtr arrayPtr;
       GetDebugLines(ref scene, out lines, out arrayPtr);
 
-      for (int i = 0; i < lines; i++) {
-        IntPtr linePtr = StructMarshal<IntPtr>.ArrayElementToStruct(arrayPtr, i);
-        LEAP_IE_DEBUG_LINE line = StructMarshal<LEAP_IE_DEBUG_LINE>.PtrToStruct(linePtr);
+      for (int i = 0; i < lines; i++)
+      {
+        LEAP_IE_DEBUG_LINE line = StructMarshal<LEAP_IE_DEBUG_LINE>.ArrayElementToStruct(arrayPtr, i);
         line.Draw();
       }
     }
