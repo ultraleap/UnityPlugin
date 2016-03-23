@@ -80,7 +80,7 @@ namespace Leap
      * @returns a new Frame object with the transform applied.
      * @since 3.0
      */
-    public Frame TransformedCopy(Matrix trs)
+    public Frame TransformedCopy(Matrix trs, Matrix rot)
     {
       Frame transformedFrame = new Frame(
         Id,
@@ -90,7 +90,7 @@ namespace Leap
         new List<Hand>(this.Hands.Count)
       );
       for (int h = 0; h < this.Hands.Count; h++)
-        transformedFrame.Hands.Add(this.Hands[h].TransformedCopy(trs));
+        transformedFrame.Hands.Add(this.Hands[h].TransformedCopy(trs, rot));
       return transformedFrame;
     }
 

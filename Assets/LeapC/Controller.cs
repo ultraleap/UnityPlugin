@@ -414,9 +414,9 @@ namespace Leap
      * @param history The age of the frame to return, counting backwards from
      * the most recent frame (0) into the past and up to the maximum age (59).
      */
-    public Frame GetTransformedFrame(Matrix trs, int history = 0)
+    public Frame GetTransformedFrame(Matrix trs, Matrix rot, int history = 0)
     {
-      return Frame(history).TransformedCopy(trs);
+      return Frame(history).TransformedCopy(trs, rot);
     }
 
     /**

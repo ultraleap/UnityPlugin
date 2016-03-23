@@ -129,13 +129,11 @@ namespace InteractionEngine.CApi {
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_SHAPE_DESCRIPTION_HANDLE {
     public UInt32 handle;
-    public IntPtr pDEBUG; // LeapIEShapeDescriptionData*
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_SHAPE_INSTANCE_HANDLE {
     public UInt32 handle;
-    public IntPtr pDEBUG; // LeapIEShapeInstanceData*
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]

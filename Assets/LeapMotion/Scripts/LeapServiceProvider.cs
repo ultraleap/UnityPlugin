@@ -35,7 +35,7 @@ namespace Leap.Unity {
     protected Frame _currentFixedFrame;
     protected float _currentFixedTime = -1;
     protected float _perFrameFixedUpdateOffset = -1;
-    /* The smoothed offset between the FixedUpdate timeline and the Leap timeline.  
+    /* The smoothed offset between the FixedUpdate timeline and the Leap timeline.
      * Used to provide temporally correct frames within FixedUpdate */
     protected SmoothedFloat _smoothedFixedUpdateOffset = new SmoothedFloat();
 
@@ -184,7 +184,7 @@ namespace Leap.Unity {
       leap_controller_.Device += onHandControllerConnect;
     }
 
-    /** Calling this method stop the connection for the existing instance of a Controller, 
+    /** Calling this method stop the connection for the existing instance of a Controller,
      * clears old policy flags and resets to null */
     protected void destroyController() {
       if (leap_controller_ != null) {
@@ -210,8 +210,9 @@ namespace Leap.Unity {
       }
       _currentUpdateCount = Time.frameCount;
 
-      var leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
-      _currentFrame = GetLeapController().GetTransformedFrame(leapMat, 0);
+      var leapTransform = UnityMatrixExtension.GetLeapTransform(transform);
+      var leapRotation = UnityMatrixExtension.GetLeapRotation(transform);
+      _currentFrame = GetLeapController().GetTransformedFrame(leapTransform, leapRotation, 0);
     }
 
     /* Calling this method updates _currentFixedFrame if and only if this is the first time
@@ -245,8 +246,9 @@ namespace Leap.Unity {
           break;
         }
       }
-      var leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
-      _currentFixedFrame = closestFrame.TransformedCopy(leapMat);
+      var leapTransform = UnityMatrixExtension.GetLeapTransform(transform);
+      var leapRotation = UnityMatrixExtension.GetLeapRotation(transform);
+      _currentFixedFrame = closestFrame.TransformedCopy(leapTransform, leapRotation);
     }
   }
 }

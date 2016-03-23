@@ -103,7 +103,7 @@ namespace Leap
      * of the copied finger.
      * @since 3.0
      */
-    public Finger TransformedCopy(Matrix trs)
+    public Finger TransformedCopy(Matrix trs, Matrix rot)
     {
       float dScale = trs.zBasis.Magnitude;
       float hScale = trs.xBasis.Magnitude;
@@ -119,10 +119,10 @@ namespace Leap
                         Length * dScale,
                         IsExtended,
                         Type,
-                        _bones[0].TransformedCopy(trs),
-                        _bones[1].TransformedCopy(trs),
-                        _bones[2].TransformedCopy(trs),
-                        _bones[3].TransformedCopy(trs));
+                        _bones[0].TransformedCopy(trs, rot),
+                        _bones[1].TransformedCopy(trs, rot),
+                        _bones[2].TransformedCopy(trs, rot),
+                        _bones[3].TransformedCopy(trs, rot));
     }
 
 

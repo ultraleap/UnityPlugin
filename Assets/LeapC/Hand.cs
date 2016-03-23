@@ -96,11 +96,11 @@ namespace Leap
       WristPosition = wristPosition;
     }
 
-    public Hand TransformedCopy(Matrix trs)
+    public Hand TransformedCopy(Matrix trs, Matrix rot)
     {
       List<Finger> transformedFingers = new List<Finger>(5);
       for (int f = 0; f < this.Fingers.Count; f++)
-        transformedFingers.Add(Fingers[f].TransformedCopy(trs));
+        transformedFingers.Add(Fingers[f].TransformedCopy(trs, rot));
 
       float hScale = trs.xBasis.Magnitude;
       return new Hand(
@@ -114,13 +114,13 @@ namespace Leap
         PalmWidth * hScale,
         IsLeft,
         TimeVisible,
-        Arm.TransformedCopy(trs),
+        Arm.TransformedCopy(trs, rot),
         transformedFingers,
         trs.TransformPoint(PalmPosition),
         trs.TransformPoint(StabilizedPalmPosition),
-        trs.TransformPoint(PalmVelocity),
-        trs.TransformDirection(PalmNormal).Normalized,
-        trs.TransformDirection(Direction).Normalized,
+        trs.TransformDirection(PalmVelocity),
+        rot.TransformDirection(PalmNormal),
+        rot.TransformDirection(Direction),
         trs.TransformPoint(WristPosition)
       );
     }

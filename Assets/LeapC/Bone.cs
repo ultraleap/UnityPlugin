@@ -83,7 +83,7 @@ namespace Leap
      * of the copied bone.
      * @since 3.0
      */
-    public Bone TransformedCopy(Matrix trs)
+    public Bone TransformedCopy(Matrix trs, Matrix rot)
     {
       float dScale = trs.zBasis.Magnitude;
       float hScale = trs.xBasis.Magnitude;
@@ -94,7 +94,7 @@ namespace Leap
           Length * dScale,
           Width * hScale,
           Type,
-          trs * Basis);
+          rot * Basis);
     }
 
     /**

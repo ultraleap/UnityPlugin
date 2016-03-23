@@ -10,7 +10,7 @@ using Leap;
 
 namespace Leap.Unity {
 
-  /** 
+  /**
    * Unity extentions for Leap Vector class.
    */
   public static class UnityVectorExtension {
@@ -38,13 +38,13 @@ namespace Leap.Unity {
     public static readonly Vector LEAP_ORIGIN = new Vector(0, 0, 0);
     /** Conversion factor for millimeters to meters. */
     public static readonly float MM_TO_M = 1e-3f;
-    
+
     /**
-     * Converts a Leap Matrix object representing a rotation to a 
+     * Converts a Leap Matrix object representing a rotation to a
      * Unity Quaternion.
-     * 
+     *
      * In previous version prior 4.0.0 this function performed a conversion to Unity's left-handed coordinate system, and now does not.
-     * 
+     *
      * @param matrix The Leap.Matrix to convert.
      * @param mirror If true, the operation is reflected along the z axis.
      */
@@ -55,15 +55,29 @@ namespace Leap.Unity {
     }
 
     /**
-     * Provides the translation matrix to convert Leap transform data to the Unity space of a specific Unity Transform.
-     * @param t The Unity Transform to which the Leap transformation data is translated
+     * Provides the transform matrix to convert Leap to Unity space.
+     * @param t The Unity Transform to which the Leap data is to be transformed
      */
-    public static Matrix GetLeapMatrix(Transform t) {
+    public static Matrix GetLeapTransform(Transform t) {
       Vector xbasis = new Vector(t.right.x, t.right.y, t.right.z) * t.lossyScale.x * MM_TO_M;
       Vector ybasis = new Vector(t.up.x, t.up.y, t.up.z) * t.lossyScale.y * MM_TO_M;
       Vector zbasis = new Vector(t.forward.x, t.forward.y, t.forward.z) * -t.lossyScale.z * MM_TO_M;
       Vector trans = new Vector(t.position.x, t.position.y, t.position.z);
       return new Matrix(xbasis, ybasis, zbasis, trans);
     }
+
+
+    /**
+     * Provides the rotation matrix to convert Leap orientations into Unity space.
+     * @param t The Unity Transform to which the Leap data is to be rotated
+     */
+    public static Matrix GetLeapRotation(Transform t)
+    {
+      Vector xbasis = new Vector(t.right.x, t.right.y, t.right.z);
+      Vector ybasis = new Vector(t.up.x, t.up.y, t.up.z);
+      Vector zbasis = new Vector(-t.forward.x, -t.forward.y, -t.forward.z);
+      return new Matrix(xbasis, ybasis, zbasis);
+    }
+
   }
 }

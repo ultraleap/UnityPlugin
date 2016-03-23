@@ -30,7 +30,7 @@ namespace LeapInternal
                                trackingMsg.interaction_box_size.ToLeapVector()),
                            new List<Hand>((int)trackingMsg.nHands)
             );
-      
+
       for (int h = 0; h < trackingMsg.nHands; h++)
       {
         LEAP_HAND hand = StructMarshal<LEAP_HAND>.ArrayElementToStruct(trackingMsg.pHands, h);
