@@ -69,7 +69,7 @@ namespace Leap.Unity {
     protected virtual void Update() {
       Frame frame = Provider.CurrentFrame;
 
-      if (graphicsEnabled) {
+      if (frame != null && graphicsEnabled) {
         UpdateHandRepresentations(graphicsReps, ModelType.Graphics, frame);
       }
     }
@@ -78,7 +78,7 @@ namespace Leap.Unity {
     protected virtual void FixedUpdate() {
       Frame fixedFrame = Provider.CurrentFixedFrame;
 
-      if (physicsEnabled) {
+      if (fixedFrame != null && physicsEnabled) {
         UpdateHandRepresentations(physicsReps, ModelType.Physics, fixedFrame);
       }
     }

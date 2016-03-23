@@ -125,6 +125,8 @@ namespace Leap.Unity {
 
     protected virtual void Start() {
       createController();
+      _currentFrame = new Frame();
+      _currentFixedFrame = new Frame();
     }
 
     protected virtual void Update() {
