@@ -28,6 +28,7 @@ namespace Leap
      */
     public DeviceList() {}
 
+    /* For internal use. */
     public Device FindDeviceByHandle(IntPtr deviceHandle)
     {
       for (int d = 0; d < this.Count; d++)
@@ -38,6 +39,11 @@ namespace Leap
       return null;
     }
 
+    /**
+    * The device that is currently streaming tracking data.
+    * If no streaming devices are found, returns a default object.
+    * @since 3.0
+    */
     public Device ActiveDevice
     {
       get
@@ -54,6 +60,7 @@ namespace Leap
       }
     }
 
+    /* For internal use. */
     public void AddOrUpdate(Device device)
     {
       Device existingDevice = FindDeviceByHandle(device.Handle);
