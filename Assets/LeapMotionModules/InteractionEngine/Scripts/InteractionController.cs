@@ -100,7 +100,7 @@ namespace InteractionEngine {
 
     /// <summary>
     /// Registers an InteractionObject with this Controller, which automatically adds the objects
-    /// representation into the internal interaction scene.  If the controller is disabled, 
+    /// representation into the internal interaction scene.  If the controller is disabled,
     /// the registration will still succeed and the object will be added to the internal scene
     /// when the controller is next enabled.
     /// </summary>
@@ -233,6 +233,9 @@ namespace InteractionEngine {
                                        (uint)hand.Id,
                                        out classification,
                                        out instance);
+
+        if (instance.handle == 0)
+          continue;
 
         switch (classification.classification) {
           case eLeapIEClassification.eLeapIEClassification_Grasp:
