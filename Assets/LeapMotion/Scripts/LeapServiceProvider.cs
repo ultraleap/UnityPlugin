@@ -19,13 +19,15 @@ namespace Leap.Unity {
     [SerializeField]
     protected bool _isHeadMounted = false;
 
+    [Header("Device Type")]
     [SerializeField]
-    protected bool overrideDeviceType = false;
+    protected bool _overrideDeviceType = false;
 
     [Tooltip("If overrideDeviceType is enabled, the hand controller will return a device of this type.")]
     [SerializeField]
     protected LeapDeviceType _overrideDeviceTypeWith = LeapDeviceType.Peripheral;
 
+    [Header("Interpolation")]
     [SerializeField]
     protected bool _useInterpolation = true;
 
@@ -81,7 +83,7 @@ namespace Leap.Unity {
 
     /** Returns information describing the device hardware. */
     public LeapDeviceInfo GetDeviceInfo() {
-      if (overrideDeviceType) {
+      if (_overrideDeviceType) {
         return new LeapDeviceInfo(_overrideDeviceTypeWith);
       }
 
