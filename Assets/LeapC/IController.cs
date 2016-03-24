@@ -13,14 +13,19 @@ namespace Leap
     IDisposable
   {
     Frame Frame(int history = 0);
+    Frame GetTransformedFrame(Matrix trs, int history = 0);
+    TimeBracket GetNearestFrameTimes(Int64 time);
+    Frame GetInterpolatedFrame(Int64 time);
+
     void SetPolicy(Controller.PolicyFlag policy);
     void ClearPolicy(Controller.PolicyFlag policy);
     bool IsPolicySet(Controller.PolicyFlag policy);
+
     long Now();
+
     bool IsConnected { get; }
     Config Config { get; }
     DeviceList Devices { get; }
-    TrackedQuad TrackedQuad { get; }
 
     event EventHandler<ConnectionEventArgs> Connect;
     event EventHandler<ConnectionLostEventArgs> Disconnect;
@@ -35,7 +40,6 @@ namespace Leap
     event EventHandler<PolicyEventArgs> PolicyChange;
     event EventHandler<ConfigChangeEventArgs> ConfigChange;
     event EventHandler<DistortionEventArgs> DistortionChange;
-    event EventHandler<TrackedQuadEventArgs> TrackedQuadReady;
   }
 }
 

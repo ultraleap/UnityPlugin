@@ -38,6 +38,9 @@ namespace Leap.Unity {
     /* The smoothed offset between the FixedUpdate timeline and the Leap timeline.  
      * Used to provide temporally correct frames within FixedUpdate */
     protected SmoothedFloat _smoothedFixedUpdateOffset = new SmoothedFloat();
+    protected float _initialFrameOffset = 0f;
+
+    private ClockCorrelator clockCorrelator;
 
     public override Frame CurrentFrame {
       get {
@@ -115,7 +118,9 @@ namespace Leap.Unity {
     }
 
     protected virtual void Awake() {
+      clockCorrelator = new ClockCorrelator();
       _smoothedFixedUpdateOffset.delay = FIXED_UPDATE_OFFSET_SMOOTHING_DELAY;
+
     }
 
     protected virtual void Start() {
@@ -129,6 +134,13 @@ namespace Leap.Unity {
         Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
       }
 #endif
+      
+      Int64 unityTime = (Int64)(Time.time);
+      clockCorrelator.UpdateRebaseEstimate(unityTime);
+
+      Int64 unityFrameTime = (Int64)(CurrentFrame.Timestamp - _initialFrameOffset);
+      Int64 LeapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityFrameTime);
+ 
       if (_perFrameFixedUpdateOffset > 0) {
         _smoothedFixedUpdateOffset.Update(_perFrameFixedUpdateOffset, Time.deltaTime);
         _perFrameFixedUpdateOffset = -1;

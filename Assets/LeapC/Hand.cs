@@ -57,6 +57,33 @@ namespace Leap
     }
 
 
+     /**
+     * Constructs a hand.
+     *
+     * Generally, you should not create your own Hand objects. Such objects will not
+     * have valid tracking data. Get valid Hand objects from a frame
+     * received from the service.
+     *
+     * @param frameID Id of the frame this hand belongs to
+     * @param id The hand identifier
+     * @param confidence The estimate of data fitness
+     * @param grabStrength The grab posture rating of the hand
+     * @param grabAngle The average angle of the fingers to the hand
+     * @param pinchStrength The pinch posture rating of the hand
+     * @param pinchDistance The distance in millimeters between the thumb and index finger tips when pinching
+     * @param palmWidth the width of the hand
+     * @param isLeft True, if this is a left hand
+     * @param timeVisible The amount of time this hand has been visible
+     * @param arm The arm object for this hand
+     * @param fingers The list of fingers for this hand
+     * @param palmPosition The position of the palm
+     * @param stabilizedPalmPosition The time-filtered position of the palm
+     * @param palmVelocity The velocity vector of the hand
+     * @param Vector palmNormal The normal vector to the palm
+     * @param direction The direction of the hand
+     * @param wristPosition The position of the wrist
+     * @since 3.0
+     */
     public Hand(long frameID,
                 int id,
                 float confidence,
@@ -96,6 +123,9 @@ namespace Leap
       WristPosition = wristPosition;
     }
 
+    /**
+     * Returns a copy of this Hand object transformed by the specifid transform matrix.
+      */
     public Hand TransformedCopy(Matrix trs)
     {
       List<Finger> transformedFingers = new List<Finger>(5);

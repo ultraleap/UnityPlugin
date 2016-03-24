@@ -30,7 +30,6 @@ namespace Leap
   public class Frame:
     IEquatable<Frame>
   {
-    TrackedQuad _trackedQuad = new TrackedQuad();
     /**
      * Constructs a Frame object.
      *
@@ -266,31 +265,6 @@ namespace Leap
     public int SerializeLength
     {
       get { return 0; }
-    }
-
-    /**
-     * Note: This class is an experimental API for internal use only. It may be
-     * removed without warning.
-     *
-     * Returns information about the currently detected quad in the scene.
-     *
-     * \include Frame_trackedQuad.txt
-     * If no quad is being tracked, then an invalid TrackedQuad is returned.
-     * @since 2.2.6
-     **/
-    public TrackedQuad TrackedQuad
-    {
-      get
-      {
-        if (_trackedQuad == null)
-          _trackedQuad = new TrackedQuad();
-
-        return _trackedQuad;
-      }
-      set
-      {
-        _trackedQuad = value;
-      }
     }
   }
 }
