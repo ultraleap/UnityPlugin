@@ -33,13 +33,17 @@ namespace Leap.Unity {
       }
       controller_ = GetComponent<LeapHandController>();
     }
+    void Update() {
+    }
     /**
      * MakeHandRepresentation receives a Hand and combines that with an IHandModel to create a HandRepresentation
      * @param hand The Leap Hand data to be drive an IHandModel
      * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
      */
     public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
+      Debug.Log("HandPool.MakeHandRepresentation() - - - - - - - - - - - - - -");
       HandRepresentation handRep = null;
+      List<IHandModel> models = new List<IHandModel>();
       for (int i = 0; i < ModelPool.Count; i++) {
         IHandModel model = ModelPool[i];
         bool isCorrectHandedness;
@@ -52,9 +56,13 @@ namespace Leap.Unity {
         isCorrectModelType = model.HandModelType == modelType;
         if (isCorrectModelType && isCorrectHandedness) {
             ModelPool.RemoveAt(i);
-            handRep = new HandProxy(this, model, hand);
-            break;
+            --i;
+            models.Add(model);
+            //break;
         }
+      }
+      if (models != null) {
+        handRep = new HandProxy(this, models, hand);
       }
       return handRep;
     }
