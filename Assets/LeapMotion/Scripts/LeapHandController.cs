@@ -79,14 +79,11 @@ namespace Leap.Unity {
         prev_graphics_id_ = frame.Id;
 
       }
-			Debug.LogWarning("Update");
-
       float interp = Time.deltaTime / (0.5f + Time.deltaTime);
       float currentFPS = 1.0f / Time.deltaTime;
       fps = Mathf.Lerp (fps, currentFPS, interp);
 	  
       if (frameRateText != null) {
-				Debug.LogWarning("Update inside");
         frameRateText.text = "Data FPS:" + frame.CurrentFramesPerSecond.ToString ("f2") +
         System.Environment.NewLine + "Render FPS:" + Mathf.RoundToInt (fps).ToString ("f2");
       }
