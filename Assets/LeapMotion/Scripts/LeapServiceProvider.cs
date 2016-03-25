@@ -88,7 +88,6 @@ namespace Leap.Unity {
       //Null check to deal with hot reloading
       if (leap_controller_ == null) {
         createController();
-        Debug.Log("GetLeapController() calling createController()");
       }
 #endif
       return leap_controller_;
@@ -213,7 +212,6 @@ namespace Leap.Unity {
      * and subscribe to connection event */
     protected void createController() {
       if (leap_controller_ != null) {
-        Debug.Log("Did destroy?");
         destroyController();
       }
 
