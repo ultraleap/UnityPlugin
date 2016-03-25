@@ -17,18 +17,32 @@ namespace Leap.Unity {
     HandFactory {
 
     [SerializeField]
-    private List<IHandModel> ModelCollection;
+    private List<ModelPair> ModelCollection;
     public List<IHandModel> ModelPool;
     public LeapHandController controller_ { get; set; }
     public bool EnforceHandedness = false;
-
+    
+    [System.Serializable]
+    public class ModelPair {
+      public IHandModel LeftModel;
+      public IHandModel RightModel;
+      public ModelPair(IHandModel leftModel, IHandModel rightModel) {
+        this.LeftModel = leftModel;
+        this.RightModel = rightModel;
+      }
+    }
 
     /** Popuates the ModelPool with the contents of the ModelCollection */
     void Start() {
       ModelPool = new List<IHandModel>();
       for (int i = 0; i < ModelCollection.Count; i++) {
         if (ModelCollection[i] != null) {
-          ModelPool.Add(ModelCollection[i]);
+          if (ModelCollection[i].LeftModel) {
+            ModelPool.Add(ModelCollection[i].LeftModel);
+          }
+          if(ModelCollection[i].RightModel){
+            ModelPool.Add(ModelCollection[i].RightModel);
+          }
         }
       }
       controller_ = GetComponent<LeapHandController>();
@@ -41,7 +55,6 @@ namespace Leap.Unity {
      * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
      */
     public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
-      Debug.Log("HandPool.MakeHandRepresentation() - - - - - - - - - - - - - -");
       HandRepresentation handRep = null;
       List<IHandModel> models = new List<IHandModel>();
       for (int i = 0; i < ModelPool.Count; i++) {
@@ -71,7 +84,12 @@ namespace Leap.Unity {
     void OnValidate() {
       for (int i = 0; i < ModelCollection.Count; i++) {
         if (ModelCollection[i] != null) {
-          ValidateIHandModelPrefab(ModelCollection[i]);
+          if (ModelCollection[i].LeftModel) {
+            ValidateIHandModelPrefab(ModelCollection[i].LeftModel);
+          }
+          if (ModelCollection[i].RightModel) {
+            ValidateIHandModelPrefab(ModelCollection[i].RightModel);
+          }
         }
       }
     }
