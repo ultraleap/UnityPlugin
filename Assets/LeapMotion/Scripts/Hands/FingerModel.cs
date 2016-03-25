@@ -28,7 +28,6 @@ namespace Leap.Unity{
     /** The number of joints in a finger. */
     public const int NUM_JOINTS = 3;
   
-    [HideInInspector]
     public Finger.FingerType fingerType = Finger.FingerType.TYPE_INDEX;
   
     // Unity references

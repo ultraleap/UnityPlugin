@@ -51,12 +51,22 @@ namespace Leap.Unity{
     * Draws lines from elbow to wrist, wrist to palm, and normal to the palm.
     */
     protected void DrawDebugLines() {
-      HandModel hand = GetComponent<HandModel>();
-      Debug.DrawLine(hand.GetElbowPosition(), hand.GetWristPosition(), Color.red);
-      Debug.DrawLine(hand.GetWristPosition(), hand.GetPalmPosition(), Color.white);
-      Debug.DrawLine(hand.GetPalmPosition(),
-                     hand.GetPalmPosition() + hand.GetPalmNormal(), Color.black);
-      Debug.Log(Vector3.Dot(hand.GetPalmDirection(), hand.GetPalmNormal()));
+      HandModel handModel = GetComponent<HandModel>();
+      Hand hand = handModel.GetLeapHand();
+      Debug.DrawLine(hand.Arm.ElbowPosition.ToVector3(), hand.Arm.WristPosition.ToVector3(), Color.red); //Arm
+      Debug.DrawLine(hand.WristPosition.ToVector3(), hand.PalmPosition.ToVector3(), Color.white); //Wrist to palm line
+      Debug.DrawLine(hand.PalmPosition.ToVector3(), (hand.PalmPosition + hand.PalmNormal * hand.PalmWidth/2).ToVector3(), Color.black); //Hand Normal
+
+      DrawBasis(hand.PalmPosition, hand.Basis, hand.PalmWidth/4 ); //Hand basis
+      DrawBasis(hand.Arm.Basis.origin, hand.Arm.Basis, 10); //Arm basis
     }
+
+    public static void DrawBasis(Vector position, Matrix basis, float scale){
+      Vector3 origin = position.ToVector3();
+      Debug.DrawLine(origin, origin + basis.xBasis.ToVector3() * scale, Color.red);
+      Debug.DrawLine(origin, origin + basis.yBasis.ToVector3() * scale, Color.green);
+      Debug.DrawLine(origin, origin + basis.zBasis.ToVector3() * scale, Color.blue);
+    }
+
   }
 }
