@@ -64,6 +64,24 @@ namespace Leap.Unity {
       }
     }
 
+    public bool UseInterpolation {
+      get {
+        return _useInterpolation;
+      }
+      set {
+        _useInterpolation = value;
+      }
+    }
+
+    public long InterpolationDelay {
+      get {
+        return _interpolationDelay;
+      }
+      set {
+        _interpolationDelay = value;
+      }
+    }
+
     /** Returns the Leap Controller instance. */
     public Controller GetLeapController() {
 #if UNITY_EDITOR
@@ -136,7 +154,7 @@ namespace Leap.Unity {
         Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
       }
 #endif
-      
+
       Int64 unityTime = (Int64)(Time.time * 1e6);
       clockCorrelator.UpdateRebaseEstimate(unityTime);
 
@@ -157,7 +175,8 @@ namespace Leap.Unity {
 
     protected virtual void FixedUpdate() {
       //TODO: Find suitable interpolation strategy for FixedUpdate
-      _currentFixedFrame = leap_controller_.Frame();
+      Matrix leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
+      _currentFixedFrame = leap_controller_.Frame().TransformedCopy(leapMat);
     }
 
     protected virtual void OnDestroy() {
@@ -216,7 +235,6 @@ namespace Leap.Unity {
         leap_controller_ = null;
       }
     }
-
 
     protected void onHandControllerConnect(object sender, LeapEventArgs args) {
       initializeFlags();
