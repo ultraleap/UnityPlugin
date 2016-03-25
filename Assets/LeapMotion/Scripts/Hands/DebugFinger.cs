@@ -15,7 +15,7 @@ namespace Leap.Unity{
   public class DebugFinger : FingerModel {
   
     /** The colors used for each bone. */
-    protected Color[] colors = {Color.yellow, Color.green, Color.cyan, Color.blue};
+    protected Color[] colors = {Color.gray, Color.yellow, Color.cyan, Color.magenta};
   
     /** Updates the finger and calls the line drawing function. */
     public override void UpdateFinger() {
@@ -26,8 +26,13 @@ namespace Leap.Unity{
     * Draws a line from joint to joint.
     */
     protected void DrawDebugLines() {
-      for (int i = 0; i < NUM_BONES; ++i)
-        Debug.DrawLine(GetJointPosition(i), GetJointPosition(i + 1), colors[i]);
+      Finger finger = this.GetLeapFinger();
+
+      for (int i = 0; i < 4; ++i){
+        Bone bone = finger.Bone((Bone.BoneType)i);
+        Debug.DrawLine(bone.PrevJoint.ToVector3(), bone.PrevJoint.ToVector3() + bone.Direction.ToVector3() * bone.Length, colors[i]);
+        DebugHand.DrawBasis(bone.PrevJoint, bone.Basis, 10);
+      }
     }
   }
 }
