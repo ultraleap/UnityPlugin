@@ -37,10 +37,12 @@ namespace Leap.Unity {
     }
     /** To be called if the HandRepresentation no longer has a Leap Hand. */
     public override void Finish() {
-      for (int i = 0; i < handModels.Count; i++) {
-        handModels[i].FinishHand();
-        parent.ModelPool.Add(handModels[i]);
-        handModels[i] = null;
+      if (handModels != null) {
+        for (int i = 0; i < handModels.Count; i++) {
+          handModels[i].FinishHand();
+          parent.ModelPool.Add(handModels[i]);
+          handModels[i] = null;
+        }
       }
     }
 
