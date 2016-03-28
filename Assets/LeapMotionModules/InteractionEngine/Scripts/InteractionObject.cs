@@ -138,6 +138,14 @@ namespace InteractionEngine {
     }
 
     /// <summary>
+    /// Called by InteractionController when this object is pushed.  The arguments are the proposed
+    /// velocities to be applied to the object. 
+    /// </summary>
+    /// <param name="linearVelocity"></param>
+    /// <param name="angularVelocity"></param>
+    public virtual void OnPush(Vector3 linearVelocity, Vector3 angularVelocity) { }
+
+    /// <summary>
     /// Called by InteractionController when a Hand begins grasping this object.
     /// </summary>
     /// <param name="handId"></param>
