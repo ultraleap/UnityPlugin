@@ -31,26 +31,26 @@ namespace InteractionEngine.CApi {
       palm.width = hand.PalmWidth;
       palm.direction = new LEAP_VECTOR(hand.Direction);
 
-      leapHand.palm = StructAllocator.AllocateStruct(palm);
-      leapHand.arm = StructAllocator.AllocateStruct(CreateBone(hand.Arm));
+      leapHand.palm = palm;
+      leapHand.arm = CreateBone(hand.Arm);
 
       for (int i = 0; i < hand.Fingers.Count; i++) {
         Finger finger = hand.Fingers[i];
         switch (finger.Type) {
           case Finger.FingerType.TYPE_THUMB:
-            leapHand.thumb = StructAllocator.AllocateStruct(CreateDigit(finger));
+            leapHand.thumb = CreateDigit(finger);
             break;
           case Finger.FingerType.TYPE_INDEX:
-            leapHand.index = StructAllocator.AllocateStruct(CreateDigit(finger));
+            leapHand.index = CreateDigit(finger);
             break;
           case Finger.FingerType.TYPE_MIDDLE:
-            leapHand.middle = StructAllocator.AllocateStruct(CreateDigit(finger));
+            leapHand.middle = CreateDigit(finger);
             break;
           case Finger.FingerType.TYPE_RING:
-            leapHand.ring = StructAllocator.AllocateStruct(CreateDigit(finger));
+            leapHand.ring = CreateDigit(finger);
             break;
           case Finger.FingerType.TYPE_PINKY:
-            leapHand.pinky = StructAllocator.AllocateStruct(CreateDigit(finger));
+            leapHand.pinky = CreateDigit(finger);
             break;
           default:
             throw new Exception("Unexpected Finger Type " + finger.Type);
