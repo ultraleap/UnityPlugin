@@ -16,22 +16,42 @@ namespace Leap.Unity{
    * not in the Game view. Use debug hands when you aren't using visible hands in a scene
    * so that you can see where the hands are in the scene view.
    * */
-  public class DebugHand : HandModel {
+  public class DebugHand : IHandModel {
+    private Hand hand_;
+
+    [SerializeField]
+    private bool visualizeBasis = true;
+    public bool VisualizeBasis { get{ return visualizeBasis; } set{ visualizeBasis = value;} }
+
+    /** The colors used for each bone. */
+    protected Color[] colors = {Color.gray, Color.yellow, Color.cyan, Color.magenta};
+
     public override ModelType HandModelType {
       get {
         return ModelType.Graphics;
       }
+    }
+
+    [SerializeField]
+    private Chirality handedness;
+    public override Chirality Handedness {
+      get {
+        return handedness;
+      }
+    }
+  
+    public override Hand GetLeapHand() {
+      return hand_;
+    }
+  
+    public override void SetLeapHand(Hand hand) {
+      hand_ = hand;
     }
   
     /**
     * Initializes the hand and calls the line drawing function.
     */
     public override void InitHand() {
-      for (int f = 0; f < fingers.Length; ++f) {
-        if (fingers[f] != null)
-          fingers[f].InitFinger();
-      }
-  
       DrawDebugLines();
     }
   
@@ -39,11 +59,6 @@ namespace Leap.Unity{
     * Updates the hand and calls the line drawing function.
     */
     public override void UpdateHand() {
-      for (int f = 0; f < fingers.Length; ++f) {
-        if (fingers[f] != null)
-          fingers[f].UpdateFinger();
-      }
-  
       DrawDebugLines();
     }
   
@@ -52,16 +67,28 @@ namespace Leap.Unity{
     */
     protected void DrawDebugLines() {
       HandModel handModel = GetComponent<HandModel>();
-      Hand hand = handModel.GetLeapHand();
+      Hand hand = GetLeapHand();
       Debug.DrawLine(hand.Arm.ElbowPosition.ToVector3(), hand.Arm.WristPosition.ToVector3(), Color.red); //Arm
       Debug.DrawLine(hand.WristPosition.ToVector3(), hand.PalmPosition.ToVector3(), Color.white); //Wrist to palm line
       Debug.DrawLine(hand.PalmPosition.ToVector3(), (hand.PalmPosition + hand.PalmNormal * hand.PalmWidth/2).ToVector3(), Color.black); //Hand Normal
 
-      DrawBasis(hand.PalmPosition, hand.Basis, hand.PalmWidth/4 ); //Hand basis
-      DrawBasis(hand.Arm.Basis.origin, hand.Arm.Basis, 10); //Arm basis
+      if(VisualizeBasis){
+        DrawBasis(hand.PalmPosition, hand.Basis, hand.PalmWidth/4 ); //Hand basis
+        DrawBasis(hand.Arm.Basis.origin, hand.Arm.Basis, 10); //Arm basis
+      }
+
+      for(int f = 0; f < 5; f ++){ //Fingers
+        Finger finger = hand.Fingers[f];
+        for (int i = 0; i < 4; ++i){
+          Bone bone = finger.Bone((Bone.BoneType)i);
+          Debug.DrawLine(bone.PrevJoint.ToVector3(), bone.PrevJoint.ToVector3() + bone.Direction.ToVector3() * bone.Length, colors[i]);
+          if(VisualizeBasis)
+            DrawBasis(bone.PrevJoint, bone.Basis, 10);
+        }
+      }
     }
 
-    public static void DrawBasis(Vector position, Matrix basis, float scale){
+    public void DrawBasis(Vector position, Matrix basis, float scale){
       Vector3 origin = position.ToVector3();
       Debug.DrawLine(origin, origin + basis.xBasis.ToVector3() * scale, Color.red);
       Debug.DrawLine(origin, origin + basis.yBasis.ToVector3() * scale, Color.green);
