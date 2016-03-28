@@ -107,7 +107,7 @@ namespace InteractionEngine {
     /// <param name="obj"></param>
     public void RegisterInteractionObject(InteractionObject obj) {
       RegisteredObject registeredObj = new RegisteredObject();
-      registeredObj.InteractionObject = obj;
+      registeredObj.interactionObject = obj;
 
       _objToRegistry[obj] = registeredObj;
 
@@ -234,19 +234,24 @@ namespace InteractionEngine {
                                        out classification,
                                        out instance);
 
+        RegisteredObject registeredObj = _instanceToRegistry[instance];
+
         switch (classification.classification) {
           case eLeapIEClassification.eLeapIEClassification_Grasp:
             {
-              var iObj = _instanceToRegistry[instance].InteractionObject;
-              _graspedObjects.Add(iObj);
-              iObj.OnGraspEnter(hand.Id);
+              registeredObj.AddHoldingHand(hand);
+              if (!_graspedObjects.Contains(registeredObj.interactionObject)) {
+                _graspedObjects.Add(registeredObj.interactionObject);
+                registeredObj.interactionObject.OnHandGrasp(hand);
+              }
               break;
             }
           case eLeapIEClassification.eLeapIEClassification_Physics:
             {
-              var iObj = _instanceToRegistry[instance].InteractionObject;
-              _graspedObjects.Remove(iObj);
-              iObj.OnGraspExit(hand.Id);
+              if (_graspedObjects.Contains(registeredObj.interactionObject)) {
+                _graspedObjects.Remove(registeredObj.interactionObject);
+                registeredObj.interactionObject.OnHandRelease(hand);
+              }
               break;
             }
           default:
@@ -256,40 +261,52 @@ namespace InteractionEngine {
 
       for (int i = 0; i < _graspedObjects.Count; i++) {
         var iObj = _graspedObjects[i];
-        iObj.OnGraspStay();
+        var registeredObj = _objToRegistry[iObj];
+        registeredObj.DispatchHoldingCallback();
       }
     }
 
     protected virtual void createIEShape(RegisteredObject registeredObj) {
       registeredObj.CreateIEShape(ref _scene);
-      _instanceToRegistry[registeredObj.InstanceHandle] = registeredObj;
+      _instanceToRegistry[registeredObj.instanceHandle] = registeredObj;
     }
 
     protected virtual void destroyIEShape(RegisteredObject registeredObj) {
-      _instanceToRegistry.Remove(registeredObj.InstanceHandle);
+      _instanceToRegistry.Remove(registeredObj.instanceHandle);
       registeredObj.DestroyIEShape(ref _scene);
     }
     #endregion
 
     #region INTERNAL CLASSES
     protected class RegisteredObject {
-      public InteractionObject InteractionObject;
-      public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeHandle;
-      public LEAP_IE_SHAPE_INSTANCE_HANDLE InstanceHandle;
+      public InteractionObject interactionObject;
+      public LEAP_IE_SHAPE_DESCRIPTION_HANDLE shapeHandle;
+      public LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle;
+
+      private List<Hand> _holdingHandList = new List<Hand>();
 
       public void UpdateIERepresentation(ref LEAP_IE_SCENE scene) {
-        LEAP_IE_TRANSFORM t = InteractionObject.GetIETransform();
-        InteractionC.UpdateShape(ref scene, ref t, ref InstanceHandle);
+        LEAP_IE_TRANSFORM t = interactionObject.GetIETransform();
+        InteractionC.UpdateShape(ref scene, ref t, ref instanceHandle);
       }
 
       public void CreateIEShape(ref LEAP_IE_SCENE scene) {
-        ShapeHandle = InteractionObject.GetShapeDescription();
-        LEAP_IE_TRANSFORM t = InteractionObject.GetIETransform();
-        InteractionC.CreateShape(ref scene, ref ShapeHandle, ref t, out InstanceHandle);
+        shapeHandle = interactionObject.GetShapeDescription();
+        LEAP_IE_TRANSFORM t = interactionObject.GetIETransform();
+        InteractionC.CreateShape(ref scene, ref shapeHandle, ref t, out instanceHandle);
       }
 
       public void DestroyIEShape(ref LEAP_IE_SCENE scene) {
-        InteractionC.DestroyShape(ref scene, ref InstanceHandle);
+        InteractionC.DestroyShape(ref scene, ref instanceHandle);
+      }
+
+      public void AddHoldingHand(Hand hand) {
+        _holdingHandList.Add(hand);
+      }
+
+      public void DispatchHoldingCallback() {
+        interactionObject.OnHandsHold(_holdingHandList);
+        _holdingHandList.Clear();
       }
     }
     #endregion
