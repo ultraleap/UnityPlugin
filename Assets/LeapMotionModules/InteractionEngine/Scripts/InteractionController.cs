@@ -21,6 +21,12 @@ namespace InteractionEngine {
     [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
     [SerializeField]
     protected bool _showDebugLines = true;
+
+    [Tooltip("The amount of time a Hand can remain untracked while also still grasping an object.")]
+    [SerializeField]
+    protected float _untrackedTimeout = 0.5f;
+
+
     #endregion
 
     #region INTERNAL FIELDS
@@ -263,7 +269,34 @@ namespace InteractionEngine {
         var iObj = _graspedObjects[i];
         var registeredObj = _objToRegistry[iObj];
         registeredObj.DispatchHoldingCallback();
+
+        foreach (int id in iObj.TrackedGraspingHands) {
+          bool isHandTracked = false;
+          for (int j = 0; j < currFrame.Hands.Count; j++) {
+            if (currFrame.Hands[j].Id == id) {
+              isHandTracked = true;
+              break;
+            }
+          }
+
+          if (!isHandTracked) {
+            iObj.OnHandLostTracking(null);
+          }
+        }
+
+
+
+
+
       }
+
+
+
+
+
+
+
+
     }
 
     protected virtual void createIEShape(RegisteredObject registeredObj) {

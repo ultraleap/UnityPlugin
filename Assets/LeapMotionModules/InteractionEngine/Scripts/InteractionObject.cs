@@ -90,10 +90,21 @@ namespace InteractionEngine {
       }
     }
 
+    public IEnumerable<int> TrackedGraspingHands {
+      get {
+        for (int i = 0; i < _graspingIds.Count; i++) {
+          int id = _graspingIds[i];
+          if (!_untrackedIds.Contains(id)) {
+            yield return id;
+          }
+        }
+      }
+    }
+
     /// <summary>
     /// Returns the ids of the hands that are considered grasping but are untracked.
     /// </summary>
-    public IEnumerable<int> UntrackedHands {
+    public IEnumerable<int> UntrackedGraspingHands {
       get {
         return _untrackedIds;
       }
