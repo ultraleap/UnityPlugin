@@ -233,9 +233,9 @@ namespace InteractionEngine {
     /// too long.  The hand is no longer considered to be grasping the object.
     /// </summary>
     /// <param name="oldId"></param>
-    public virtual void OnHandTimeout(int oldId) {
-      _untrackedIds.Remove(oldId);
-      _graspingIds.Remove(oldId);
+    public virtual void OnHandTimeout(Hand oldHand) {
+      _untrackedIds.Remove(oldHand.Id);
+      _graspingIds.Remove(oldHand.Id);
     }
 
     /// <summary>

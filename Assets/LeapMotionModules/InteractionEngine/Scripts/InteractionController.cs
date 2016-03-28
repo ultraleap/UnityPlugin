@@ -26,17 +26,20 @@ namespace InteractionEngine {
     [SerializeField]
     protected float _untrackedTimeout = 0.5f;
 
-
     #endregion
 
     #region INTERNAL FIELDS
     protected Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, RegisteredObject> _instanceToRegistry;
     protected Dictionary<InteractionObject, RegisteredObject> _objToRegistry;
+
+    protected Dictionary<int, InteractionHand> _handIdToIeHand;
     protected List<InteractionObject> _graspedObjects;
 
     protected ShapeDescriptionPool _shapeDescriptionPool;
 
     protected LEAP_IE_SCENE _scene;
+
+    private List<int> _handIdsToRemove;
     #endregion
 
     #region PUBLIC METHODS
@@ -158,6 +161,8 @@ namespace InteractionEngine {
       _instanceToRegistry = new Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, RegisteredObject>();
       _objToRegistry = new Dictionary<InteractionObject, RegisteredObject>();
       _graspedObjects = new List<InteractionObject>();
+      _handIdToIeHand = new Dictionary<int, InteractionHand>();
+      _handIdsToRemove = new List<int>();
     }
 
     protected virtual void OnEnable() {
@@ -199,7 +204,7 @@ namespace InteractionEngine {
 
       simulateIe();
 
-      setObjectClassifications();
+      updateIeObjStateChange();
     }
 
     protected virtual void applyDebugSettings() {
@@ -228,10 +233,12 @@ namespace InteractionEngine {
       InteractionC.UpdateController(ref _scene, ref _controllerTransform);
     }
 
-    protected virtual void setObjectClassifications() {
-      Frame currFrame = _leapProvider.CurrentFrame;
-      for (int i = 0; i < currFrame.Hands.Count; i++) {
-        Hand hand = currFrame.Hands[i];
+    protected virtual void updateIeObjStateChange() {
+      var hands = _leapProvider.CurrentFrame.Hands;
+
+      //First loop through all the hands and get their classifications from the IE
+      for (int i = 0; i < hands.Count; i++) {
+        Hand hand = hands[i];
 
         LEAP_IE_HAND_CLASSIFICATION classification;
         LEAP_IE_SHAPE_INSTANCE_HANDLE instance;
@@ -242,21 +249,54 @@ namespace InteractionEngine {
 
         RegisteredObject registeredObj = _instanceToRegistry[instance];
 
+        //Get the InteractionHand associated with this hand id
+        InteractionHand ieHand;
+        if (!_handIdToIeHand.TryGetValue(hand.Id, out ieHand)) {
+
+          //First we see if there is an untracked ieHand that can be re-connected using this one
+          InteractionHand untrackedIeHand = null;
+          foreach (var pair in _handIdToIeHand) {
+            //If the old ieHand is untracked, and the handedness matches, we re-connect it
+            if (pair.Value.isUntracked && pair.Value.hand.IsLeft == hand.IsLeft) {
+              untrackedIeHand = pair.Value;
+              break;
+            }
+          }
+          
+          if (untrackedIeHand != null) {
+            //If we found an untrackedIeHand, use it!
+            ieHand = untrackedIeHand;
+            //Remove the old id from the mapping
+            _handIdToIeHand.Remove(untrackedIeHand.hand.Id);
+            //This also dispatched InteractionObject.OnHandRegainedTracking()
+            ieHand.RegainTracking(hand);
+          } else {
+            //Otherwise just create a new one
+            ieHand = new InteractionHand(hand);
+          }
+
+          //In both cases, associate the id with the new ieHand
+          _handIdToIeHand[hand.Id] = ieHand;
+        }
+
+        ieHand.UpdateHand(hand);
+
         switch (classification.classification) {
           case eLeapIEClassification.eLeapIEClassification_Grasp:
             {
               registeredObj.AddHoldingHand(hand);
-              if (!_graspedObjects.Contains(registeredObj.interactionObject)) {
+
+              if (ieHand.graspedObject == null) {
                 _graspedObjects.Add(registeredObj.interactionObject);
-                registeredObj.interactionObject.OnHandGrasp(hand);
+                ieHand.GraspObject(registeredObj.interactionObject);
               }
               break;
             }
           case eLeapIEClassification.eLeapIEClassification_Physics:
             {
-              if (_graspedObjects.Contains(registeredObj.interactionObject)) {
+              if (ieHand.graspedObject != null) {
                 _graspedObjects.Remove(registeredObj.interactionObject);
-                registeredObj.interactionObject.OnHandRelease(hand);
+                ieHand.ReleaseObject();
               }
               break;
             }
@@ -265,38 +305,49 @@ namespace InteractionEngine {
         }
       }
 
+      //Loop through all ieHands to check for timeouts and loss of tracking
+      foreach (var pair in _handIdToIeHand) {
+        var id = pair.Key;
+        var ieHand = pair.Value;
+
+        float handAge = Time.time - ieHand.lastTimeUpdated;
+        //Check to see if the hand is at least 1 frame old
+        //We assume it has become untracked if this is the case
+        if (handAge > 0) {
+          //If the hand isn't grasping anything, just remove it
+          if (ieHand.graspedObject == null) {
+            _handIdsToRemove.Add(id);
+            continue;
+          }
+
+          //If is isn't already marked as untracked, mark it as untracked
+          if (!ieHand.isUntracked) {
+            //This also dispatches InteractionObject.OnHandLostTracking()
+            ieHand.MarkUntracked();
+          }
+
+          //If the age is longer than the timeout, we also remove it from the list
+          if (handAge > _untrackedTimeout) {
+            _handIdsToRemove.Add(id);
+            //This also dispatched InteractionObject.OnHandTimeout()
+            ieHand.MarkTimeout();
+            continue;
+          }
+        }
+      }
+
+      //Loop through the stale ids and remove them from the map
+      for (int i = 0; i < _handIdsToRemove.Count; i++) {
+        _handIdToIeHand.Remove(_handIdsToRemove[i]);
+      }
+      _handIdsToRemove.Clear();
+
+      //Loop through the currently grasped objects to dispatch their OnHandsHold callback
       for (int i = 0; i < _graspedObjects.Count; i++) {
         var iObj = _graspedObjects[i];
         var registeredObj = _objToRegistry[iObj];
         registeredObj.DispatchHoldingCallback();
-
-        foreach (int id in iObj.TrackedGraspingHands) {
-          bool isHandTracked = false;
-          for (int j = 0; j < currFrame.Hands.Count; j++) {
-            if (currFrame.Hands[j].Id == id) {
-              isHandTracked = true;
-              break;
-            }
-          }
-
-          if (!isHandTracked) {
-            iObj.OnHandLostTracking(null);
-          }
-        }
-
-
-
-
-
       }
-
-
-
-
-
-
-
-
     }
 
     protected virtual void createIEShape(RegisteredObject registeredObj) {
@@ -311,6 +362,54 @@ namespace InteractionEngine {
     #endregion
 
     #region INTERNAL CLASSES
+    protected class InteractionHand {
+      public Hand hand { get; protected set; }
+      public float lastTimeUpdated { get; protected set; }
+      public InteractionObject graspedObject { get; protected set; }
+      public bool isUntracked { get; protected set; }
+
+      public InteractionHand(Hand hand) {
+        this.hand = hand;
+        lastTimeUpdated = Time.time;
+        graspedObject = null;
+      }
+
+      public void UpdateHand(Hand hand) {
+        this.hand = hand;
+        lastTimeUpdated = Time.time;
+      }
+
+      public void GraspObject(InteractionObject obj) {
+        graspedObject = obj;
+        graspedObject.OnHandGrasp(hand);
+      }
+
+      public void ReleaseObject() {
+        graspedObject.OnHandRelease(hand);
+        graspedObject = null;
+      }
+
+      public void MarkUntracked() {
+        isUntracked = true;
+        graspedObject.OnHandLostTracking(hand);
+      }
+
+      public void MarkTimeout() {
+        graspedObject.OnHandTimeout(hand);
+        graspedObject = null;
+        isUntracked = true;
+        hand = null;
+      }
+
+      public void RegainTracking(Hand newHand) {
+        int oldId = hand.Id;
+        UpdateHand(newHand);
+
+        isUntracked = false;
+        graspedObject.OnHandRegainedTracking(newHand, oldId);
+      }
+    }
+
     protected class RegisteredObject {
       public InteractionObject interactionObject;
       public LEAP_IE_SHAPE_DESCRIPTION_HANDLE shapeHandle;
