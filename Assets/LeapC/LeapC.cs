@@ -158,7 +158,6 @@ namespace LeapInternal
                                       */
     eLeapEventType_ImageRequestError, //!< A requested image could not be acquired
     eLeapEventType_ImageComplete, //!<  An image transfer is complete
-    eLeapEventType_TrackedQuad, //!< A new tracked quad has been received
     eLeapEventType_LogEvent, //!< A diagnostic event has occured
 
     /**
@@ -190,9 +189,10 @@ namespace LeapInternal
   };
 
 
-  //Note:
+  //Note the following LeapC structs are just IntPtrs in C#:
   // LEAP_CONNECTION is an IntPtr
   // LEAP_DEVICE is an IntPtr
+  // LEAP_CLOCK_REBASER is an IntPtr
 
   [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
   public struct LEAP_CONNECTION_CONFIG
@@ -454,13 +454,13 @@ namespace LeapInternal
     public float grab_angle;
     public float pinch_strength;
     public float grab_strength;
-    public IntPtr palm; //LEAP_PALM*
-    public IntPtr thumb; //LEAP_DIGIT*
-    public IntPtr index; //LEAP_DIGIT*
-    public IntPtr middle; //LEAP_DIGIT*
-    public IntPtr ring; //LEAP_DIGIT*
-    public IntPtr pinky; //LEAP_DIGIT*
-    public IntPtr arm; //LEAP_BONE*
+    public LEAP_PALM palm;
+    public LEAP_DIGIT thumb;
+    public LEAP_DIGIT index;
+    public LEAP_DIGIT middle;
+    public LEAP_DIGIT ring;
+    public LEAP_DIGIT pinky;
+    public LEAP_BONE arm;
   }
 
 
@@ -469,19 +469,6 @@ namespace LeapInternal
   {
     public LEAP_VECTOR position;
     public float radius;
-  }
-
-  [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_TRACKED_QUAD_EVENT
-  {
-    public LEAP_FRAME_HEADER info;
-    public float width;
-    public float height;
-    public Int32 resolutionX;
-    public Int32 resolutionY;
-    public Int32 visible;
-    public LEAP_VECTOR position;
-    public LEAP_MATRIX orientation;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
@@ -548,6 +535,21 @@ namespace LeapInternal
     [DllImport("LeapC", EntryPoint = "LeapGetNow")]
     public static extern long GetNow();
 
+    [DllImport("LeapC", EntryPoint = "LeapCreateClockRebaser")]
+    public static extern eLeapRS CreateClockRebaser(out IntPtr phClockRebaser);
+
+    [DllImport("LeapC", EntryPoint = "LeapDestroyClockRebaser")]
+    public static extern eLeapRS DestroyClockRebaser(IntPtr hClockRebaser);
+
+    [DllImport("LeapC", EntryPoint = "LeapUpdateLatency")]
+    public static extern eLeapRS UpdateLatency(IntPtr hClockRebaser, Int64 userClock, Int64 leapClock);
+
+    [DllImport("LeapC", EntryPoint = "LeapUpdateRebase")]
+    public static extern eLeapRS UpdateRebase(IntPtr hClockRebaser, Int64 userClock, Int64 leapClock);
+
+    [DllImport("LeapC", EntryPoint = "LeapRebaseClock")]
+    public static extern eLeapRS RebaseClock(IntPtr hClockRebaser, Int64 userClock, out Int64 leapClock);
+
     [DllImport("LeapC", EntryPoint = "LeapCreateConnection")]
     public static extern eLeapRS CreateConnection(ref LEAP_CONNECTION_CONFIG pConfig, out IntPtr pConnection);
 
@@ -591,6 +593,14 @@ namespace LeapInternal
     [DllImport("LeapC", EntryPoint = "LeapPollConnection")]
     public static extern eLeapRS PollConnection(IntPtr hConnection, UInt32 timeout, ref LEAP_CONNECTION_MESSAGE msg);
 
+    [DllImport("LeapC", EntryPoint = "LeapGetNearestFrames")]
+    public static extern eLeapRS GetNearestFrames(IntPtr hConnection, Int64 timestamp, out Int64 lb, out Int64 ub);
+
+    [DllImport("LeapC", EntryPoint = "LeapGetFrameSize")]
+    public static extern eLeapRS GetFrameSize(IntPtr hConnection, Int64 timestamp, out UInt64 pncbEvent);
+
+    [DllImport("LeapC", EntryPoint = "LeapInterpolateFrame")]
+    public static extern eLeapRS InterpolateFrame(IntPtr hConnection, Int64 timestamp, IntPtr pEvent, UInt64 ncbEvent);
 
     [DllImport("LeapC", EntryPoint = "LeapRequestImages")]
     public static extern eLeapRS RequestImages(IntPtr hConnection, ref LEAP_IMAGE_FRAME_DESCRIPTION description, out LEAP_IMAGE_FRAME_REQUEST_TOKEN pToken);

@@ -3,17 +3,20 @@ using System.Collections;
 using Leap;
 
 namespace Leap.Unity{
-  /**Simple implementation of HandTransitionBehavior the turn IHandModel GameObjects on and off   */
   public class HandEnableDisable : HandTransitionBehavior {
+    protected override void Awake() {
+      base.Awake();
+      gameObject.SetActive(false);
+    }
 
-    /** Called when a HandRepresentation's Leap Hand ends tracking */
-    protected override void HandReset() {
+  	protected override void HandReset() {
   		gameObject.SetActive(true);
   	}
   
-  	/** Called when a HandRepresentation's Leap Hand ends tracking */
+  	// Use this for initialization
   	protected override void HandFinish () {
   		gameObject.SetActive(false);
   	}
+  	
   }
 }

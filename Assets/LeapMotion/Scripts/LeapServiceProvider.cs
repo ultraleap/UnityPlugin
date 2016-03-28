@@ -19,12 +19,22 @@ namespace Leap.Unity {
     [SerializeField]
     protected bool _isHeadMounted = false;
 
+    [Header("Device Type")]
     [SerializeField]
-    protected bool overrideDeviceType = false;
+    protected bool _overrideDeviceType = false;
 
     [Tooltip("If overrideDeviceType is enabled, the hand controller will return a device of this type.")]
     [SerializeField]
     protected LeapDeviceType _overrideDeviceTypeWith = LeapDeviceType.Peripheral;
+
+    [Header("Interpolation")]
+    [Tooltip("Interpolate frames to deliver a potentially smoother experience.  Currently experimental.")]
+    [SerializeField]
+    protected bool _useInterpolation = false;
+
+    [Tooltip("How much delay should be added to interpolation.  A non-zero amount is needed to prevent extrapolation artifacts.")]
+    [SerializeField]
+    protected long _interpolationDelay = 15;
 
     protected Controller leap_controller_;
 
@@ -34,29 +44,42 @@ namespace Leap.Unity {
 
     protected Frame _currentFixedFrame;
     protected float _currentFixedTime = -1;
-    protected float _perFrameFixedUpdateOffset = -1;
-    /* The smoothed offset between the FixedUpdate timeline and the Leap timeline.  
-     * Used to provide temporally correct frames within FixedUpdate */
-    protected SmoothedFloat _smoothedFixedUpdateOffset = new SmoothedFloat();
+
+    private ClockCorrelator clockCorrelator;
 
     public override Frame CurrentFrame {
       get {
-        ensureCurrentFrameAndImageUpToDate();
         return _currentFrame;
       }
     }
 
     public override Image CurrentImage {
       get {
-        ensureCurrentFrameAndImageUpToDate();
         return _currentImage;
       }
     }
 
     public override Frame CurrentFixedFrame {
       get {
-        ensureCurrentFixedFrameUpToDate();
         return _currentFixedFrame;
+      }
+    }
+
+    public bool UseInterpolation {
+      get {
+        return _useInterpolation;
+      }
+      set {
+        _useInterpolation = value;
+      }
+    }
+
+    public long InterpolationDelay {
+      get {
+        return _interpolationDelay;
+      }
+      set {
+        _interpolationDelay = value;
       }
     }
 
@@ -78,7 +101,7 @@ namespace Leap.Unity {
 
     /** Returns information describing the device hardware. */
     public LeapDeviceInfo GetDeviceInfo() {
-      if (overrideDeviceType) {
+      if (_overrideDeviceType) {
         return new LeapDeviceInfo(_overrideDeviceTypeWith);
       }
 
@@ -114,11 +137,14 @@ namespace Leap.Unity {
     }
 
     protected virtual void Awake() {
-      _smoothedFixedUpdateOffset.delay = FIXED_UPDATE_OFFSET_SMOOTHING_DELAY;
+      clockCorrelator = new ClockCorrelator();
+
     }
 
     protected virtual void Start() {
       createController();
+      _currentFrame = new Frame();
+      _currentFixedFrame = new Frame();
     }
 
     protected virtual void Update() {
@@ -129,14 +155,28 @@ namespace Leap.Unity {
       }
 #endif
 
-      if (_perFrameFixedUpdateOffset > 0) {
-        _smoothedFixedUpdateOffset.Update(_perFrameFixedUpdateOffset, Time.deltaTime);
-        _perFrameFixedUpdateOffset = -1;
+      Int64 unityTime = (Int64)(Time.time * 1e6);
+      clockCorrelator.UpdateRebaseEstimate(unityTime);
+
+      Frame serviceFrame;
+      if (_useInterpolation) {
+        Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
+        Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
+        serviceFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
+      } else {
+        serviceFrame = leap_controller_.Frame();
+      }
+
+      if (serviceFrame != null) {
+        Matrix leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
+        _currentFrame = serviceFrame.TransformedCopy(leapMat);
       }
     }
 
     protected virtual void FixedUpdate() {
-      _perFrameFixedUpdateOffset = GetLeapController().Frame().Timestamp * NS_TO_S - Time.fixedTime;
+      //TODO: Find suitable interpolation strategy for FixedUpdate
+      Matrix leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
+      _currentFixedFrame = leap_controller_.Frame().TransformedCopy(leapMat);
     }
 
     protected virtual void OnDestroy() {
@@ -173,7 +213,6 @@ namespace Leap.Unity {
      * and subscribe to connection event */
     protected void createController() {
       if (leap_controller_ != null) {
-        Debug.Log("Did destroy?");
         destroyController();
       }
 
@@ -201,52 +240,5 @@ namespace Leap.Unity {
       leap_controller_.Device -= onHandControllerConnect;
     }
 
-    /* Calling this method updates _currentFrame and _currentImage if and only if this
-     * is the first time the method has been called for this Update cycle.
-     */
-    protected void ensureCurrentFrameAndImageUpToDate() {
-      if (Time.frameCount == _currentUpdateCount) {
-        return;
-      }
-      _currentUpdateCount = Time.frameCount;
-
-      var leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
-      _currentFrame = GetLeapController().GetTransformedFrame(leapMat, 0);
-    }
-
-    /* Calling this method updates _currentFixedFrame if and only if this is the first time
-     * the method has been called for this FixedUpdate cycle.
-     */
-    protected void ensureCurrentFixedFrameUpToDate() {
-      if (Time.fixedTime == _currentFixedTime) {
-        return;
-      }
-      _currentFixedTime = Time.fixedTime;
-
-      //Aproximate the correct timestamp given the current fixed time
-      long correctedTimestamp = (long)((Time.fixedTime + _smoothedFixedUpdateOffset.value) * S_TO_NS);
-
-      //Search the leap history for a frame with a timestamp closest to the corrected timestamp
-      Frame closestFrame = GetLeapController().Frame();
-      for (int searchHistoryIndex = 1; searchHistoryIndex < 60; searchHistoryIndex++) {
-        Frame historyFrame = GetLeapController().Frame(searchHistoryIndex);
-
-        //If we reach an invalid frame, terminate the search
-        if (historyFrame.Id < 0) {
-          Debug.LogWarning("historyFrame.Id was less than 0!");
-          break;
-        }
-
-        /** If the history frame is closer, replace closestFrame with the historyFrame */
-        if (Math.Abs(historyFrame.Timestamp - correctedTimestamp) < Math.Abs(closestFrame.Timestamp - correctedTimestamp)) {
-          closestFrame = historyFrame;
-        } else {
-          //Since frames are always reported in order, we can terminate the search once we stop finding a closer frame
-          break;
-        }
-      }
-      var leapMat = UnityMatrixExtension.GetLeapMatrix(transform);
-      _currentFixedFrame = closestFrame.TransformedCopy(leapMat);
-    }
   }
 }
