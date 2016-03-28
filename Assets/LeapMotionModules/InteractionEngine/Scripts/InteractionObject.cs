@@ -15,18 +15,23 @@ namespace InteractionEngine {
     #endregion
 
     #region PUBLIC EVENTS
-    public event Action<int> OnGraspEnterEvent;
-    public event Action OnGraspStayEvent;
-    public event Action<int> OnGraspExitEvent;
+    public event Action<Hand> OnHandGraspEvent;
+    public event Action<List<Hand>> OnHandsHoldEvent;
+    public event Action<Hand> OnHandReleaseEvent;
 
-    public event Action<int> OnGraspEnterFirstEvent;
-    public event Action<int> OnGraspExitLastEvent;
+    public event Action<Hand> OnHandLostTrackingEvent;
+    public event Action<Hand, int> OnHandRegainedTrackingEvent;
+    public event Action<int> OnHandTimeoutEvent;
+
+    public event Action OnGraspBeginEvent;
+    public event Action OnGraspEndEvent;
     #endregion
 
     #region INTERNAL FIELDS
     private bool _isRegisteredWithController = false;
 
     private List<int> _graspingIds = new List<int>();
+    private List<int> _untrackedIds = new List<int>();
 
     protected LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeHandle;
     #endregion
@@ -70,6 +75,12 @@ namespace InteractionEngine {
       }
     }
 
+    public int UntrackedHandCount {
+      get {
+        return _untrackedIds.Count;
+      }
+    }
+
     /// <summary>
     /// Returns the ids of the hands currently grasping this object.
     /// </summary>
@@ -78,6 +89,16 @@ namespace InteractionEngine {
         return _graspingIds;
       }
     }
+
+    /// <summary>
+    /// Returns the ids of the hands that are considered grasping but are untracked.
+    /// </summary>
+    public IEnumerable<int> UntrackedHands {
+      get {
+        return _untrackedIds;
+      }
+    }
+
 
     /// <summary>
     /// Returns the internal transform representation of this object.
@@ -109,28 +130,27 @@ namespace InteractionEngine {
     /// Called by InteractionController when a Hand begins grasping this object.
     /// </summary>
     /// <param name="handId"></param>
-    public virtual void OnGraspEnter(int handId) {
-      if (_graspingIds.Contains(handId)) {
-        throw new InvalidOperationException("Cannot BeginGrasp with hand id " + handId +
-                                            " because a hand of that id is already grasping this object.");
+    public virtual void OnHandGrasp(Hand hand) {
+      if (_graspingIds.Contains(hand.Id)) {
+        throw new HandAlreadyGraspingException("OnHandGrasp", hand.Id);
       }
 
-      _graspingIds.Add(handId);
+      _graspingIds.Add(hand.Id);
 
-      if (OnGraspEnterEvent != null) {
-        OnGraspEnterEvent(handId);
+      if (OnHandGraspEvent != null) {
+        OnHandGraspEvent(hand);
       }
       if (_graspingIds.Count == 1) {
-        OnGraspEnterFirst(handId);
+        OnGraspBegin();
       }
     }
 
     /// <summary>
     /// Called by InteractionController every frame that a Hand continues to grasp this object.
     /// </summary>
-    public virtual void OnGraspStay() {
-      if (OnGraspStayEvent != null) {
-        OnGraspStayEvent();
+    public virtual void OnHandsHold(List<Hand> hands) {
+      if (OnHandsHoldEvent != null) {
+        OnHandsHoldEvent(hands);
       }
     }
 
@@ -138,22 +158,73 @@ namespace InteractionEngine {
     /// Called by InteractionController when a Hand stops grasping this object.
     /// </summary>
     /// <param name="handId"></param>
-    public virtual void OnGraspExit(int handId) {
+    public virtual void OnHandRelease(Hand hand) {
       if (_graspingIds.Count == 0) {
-        throw new InvalidOperationException("Cannot EndGrasp with hand id " + handId +
-                                            " because there are no hands current grasping this object.");
+        throw new NoGraspingHandsException("OnHandRelease", hand.Id);
       }
 
-      if (!_graspingIds.Contains(handId)) {
-        throw new InvalidOperationException("Cannot EndGrasp with hand id " + handId +
-                                            " because a hand of that id not already grasping this object.");
+      if (!_graspingIds.Contains(hand.Id)) {
+        throw new HandNotGraspingException("OnHandRelease", hand.Id);
       }
 
-      _graspingIds.Remove(handId);
+      _graspingIds.Remove(hand.Id);
 
       if (_graspingIds.Count == 0) {
-        OnGraspExitLast(handId);
+        OnGraspEnd();
       }
+    }
+
+    /// <summary>
+    /// Called by InteractionController when a Hand that was grasping becomes untracked.  The Hand
+    /// is not yet considered ungrasped, and OnGraspRegainedTracking might be called in the future
+    /// if the Hand becomes tracked again.
+    /// </summary>
+    /// <param name="oldHand"></param>
+    public virtual void OnHandLostTracking(Hand oldHand) {
+      if (_graspingIds.Count == 0) {
+        throw new NoGraspingHandsException("OnHandLostTracking", oldHand.Id);
+      }
+
+      if (!_graspingIds.Contains(oldHand.Id)) {
+        throw new HandNotGraspingException("OnHandLostTracking", oldHand.Id);
+      }
+
+      if (_untrackedIds.Contains(oldHand.Id)) {
+        throw new HandAlreadyUntrackedException("OnHandLostTracking", oldHand.Id);
+      }
+
+      _untrackedIds.Add(oldHand.Id);
+    }
+
+    /// <summary>
+    /// Called by InteractionController when a grasping Hand that had previously been untracked has
+    /// regained tracking.  The new hand is provided, as well as the id of the previously tracked
+    /// hand.
+    /// </summary>
+    /// <param name="newHand"></param>
+    /// <param name="oldId"></param>
+    public virtual void OnHandRegainedTracking(Hand newHand, int oldId) {
+      if (!_graspingIds.Contains(oldId)) {
+        throw new HandNotGraspingException("OnHandRegainedTracking", oldId);
+      }
+
+      if (_graspingIds.Contains(newHand.Id)) {
+        throw new HandAlreadyGraspingException("OnHandRegainedTracking", newHand.Id);
+      }
+
+      _untrackedIds.Remove(oldId);
+      _graspingIds.Remove(oldId);
+      _graspingIds.Add(newHand.Id);
+    }
+
+    /// <summary>
+    /// Called by InteractionController when a untracked grasping Hand has remained ungrasped for
+    /// too long.  The hand is no longer considered to be grasping the object.
+    /// </summary>
+    /// <param name="oldId"></param>
+    public virtual void OnHandTimeout(int oldId) {
+      _untrackedIds.Remove(oldId);
+      _graspingIds.Remove(oldId);
     }
 
     /// <summary>
@@ -205,25 +276,19 @@ namespace InteractionEngine {
 
       _controller.UnregisterInteractionObject(this);
       _isRegisteredWithController = false;
-
-      //InteractionController does not dispatch EndHandGrasp events during unregistration
-      //We dispatch them ourselves!
-      for (int i = _graspingIds.Count - 1; i >= 0; i--) {
-        OnGraspExit(_graspingIds[i]);
-      }
     }
     #endregion
 
     #region PROTECTED METHODS
-    protected virtual void OnGraspEnterFirst(int handId) {
-      if (OnGraspEnterFirstEvent != null) {
-        OnGraspEnterFirstEvent(handId);
+    protected virtual void OnGraspBegin() {
+      if (OnGraspBeginEvent != null) {
+        OnGraspBeginEvent();
       }
     }
 
-    protected virtual void OnGraspExitLast(int handId) {
-      if (OnGraspExitLastEvent != null) {
-        OnGraspExitLastEvent(handId);
+    protected virtual void OnGraspEnd() {
+      if (OnGraspEndEvent != null) {
+        OnGraspEndEvent();
       }
     }
     #endregion
