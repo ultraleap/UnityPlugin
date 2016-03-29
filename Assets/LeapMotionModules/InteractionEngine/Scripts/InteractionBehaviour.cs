@@ -10,7 +10,7 @@ namespace Leap.Unity.Interaction {
 
     #region SERIALIZED FIELDS
     [SerializeField]
-    protected InteractionController _controller;
+    protected InteractionManager _controller;
     #endregion
 
     #region PUBLIC EVENTS
@@ -41,7 +41,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Gets or sets the controller this object belongs to.  
     /// </summary>
-    public InteractionController Controller {
+    public InteractionManager Controller {
       get {
         return _controller;
       }

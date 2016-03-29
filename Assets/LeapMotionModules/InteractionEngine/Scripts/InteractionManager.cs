@@ -7,7 +7,7 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
-  public class InteractionController : MonoBehaviour {
+  public class InteractionManager : MonoBehaviour {
 
     #region SERIALIZED FIELDS
     [SerializeField]
