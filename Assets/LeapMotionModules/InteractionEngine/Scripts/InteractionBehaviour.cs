@@ -10,7 +10,7 @@ namespace Leap.Unity.Interaction {
 
     #region SERIALIZED FIELDS
     [SerializeField]
-    protected InteractionManager _controller;
+    protected InteractionManager _manager;
     #endregion
 
     #region PUBLIC EVENTS
@@ -41,18 +41,18 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Gets or sets the controller this object belongs to.  
     /// </summary>
-    public InteractionManager Controller {
+    public InteractionManager Manager {
       get {
-        return _controller;
+        return _manager;
       }
       set {
-        if (_controller != value) {
+        if (_manager != value) {
           if (IsInteractionEnabled) {
             DisableInteraction();
-            _controller = value;
+            _manager = value;
             EnableInteraction();
           } else {
-            _controller = value;
+            _manager = value;
           }
         }
       }
@@ -318,11 +318,11 @@ namespace Leap.Unity.Interaction {
         return;
       }
 
-      if (_controller == null) {
+      if (_manager == null) {
         throw new NoControllerSpecifiedException();
       }
 
-      _controller.RegisterInteractionBehaviour(this);
+      _manager.RegisterInteractionBehaviour(this);
       _isRegisteredWithController = true;
     }
 
@@ -334,18 +334,18 @@ namespace Leap.Unity.Interaction {
         return;
       }
 
-      if (_controller == null) {
+      if (_manager == null) {
         throw new NoControllerSpecifiedException();
       }
 
-      _controller.UnregisterInteractionBehaviour(this);
+      _manager.UnregisterInteractionBehaviour(this);
       _isRegisteredWithController = false;
     }
     #endregion
 
     #region PROTECTED METHODS
     protected virtual LEAP_IE_SHAPE_DESCRIPTION_HANDLE GenerateShapeDescriptionHandle() {
-      return _controller.ShapePool.GetAuto(gameObject);
+      return _manager.ShapePool.GetAuto(gameObject);
     }
 
     protected virtual void OnGraspBegin() {
