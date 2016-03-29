@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System;
 using System.Collections.Generic;
 using LeapInternal;
@@ -162,6 +163,8 @@ namespace Leap.Unity.Interaction {
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
       applyDebugSettings();
 
+      Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "There should not be any instances before the creation step.");
+
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         createInteractionShape(_registeredBehaviours[i]);
       }
@@ -179,6 +182,8 @@ namespace Leap.Unity.Interaction {
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         destroyInteractionShape(_registeredBehaviours[i]);
       }
+
+      Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "All instances should have been destroyed.");
 
       _shapeDescriptionPool.RemoveAllShapes();
       _shapeDescriptionPool = null;
