@@ -14,10 +14,6 @@ namespace InteractionEngine {
     [SerializeField]
     protected LeapProvider _leapProvider;
 
-    [Tooltip("If disabled the simulation will not progress, but will still maintain it's state.")]
-    [SerializeField]
-    protected bool _enableSimulation = true;
-
     [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
     [SerializeField]
     protected bool _showDebugLines = true;
@@ -39,6 +35,7 @@ namespace InteractionEngine {
 
     protected LEAP_IE_SCENE _scene;
 
+    //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
     private List<int> _handIdsToRemove;
     #endregion
 
@@ -186,9 +183,7 @@ namespace InteractionEngine {
     }
 
     protected virtual void FixedUpdate() {
-      if (_enableSimulation) {
-        simulateFrame(_leapProvider.CurrentFrame);
-      }
+      simulateFrame(_leapProvider.CurrentFrame);
 
       if (_showDebugLines) {
         InteractionC.DrawDebugLines(ref _scene);
