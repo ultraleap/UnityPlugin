@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
-using Leap;
-using Leap.Unity;
 using LeapInternal;
-using InteractionEngine.CApi;
+using Leap.Unity.Interaction.CApi;
 
-namespace InteractionEngine {
+namespace Leap.Unity.Interaction {
 
   public class InteractionController : MonoBehaviour {
 
@@ -26,10 +24,10 @@ namespace InteractionEngine {
 
     #region INTERNAL FIELDS
     protected Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, RegisteredObject> _instanceToRegistry;
-    protected Dictionary<InteractionObject, RegisteredObject> _objToRegistry;
+    protected Dictionary<InteractionBehaviour, RegisteredObject> _objToRegistry;
 
-    protected Dictionary<int, InteractionHand> _handIdToIeHand;
-    protected List<InteractionObject> _graspedObjects;
+    protected Dictionary<int, InteractionHand> _idToInteractionHand;
+    protected List<InteractionBehaviour> _graspedObjects;
 
     protected ShapeDescriptionPool _shapeDescriptionPool;
 
@@ -78,7 +76,7 @@ namespace InteractionEngine {
     /// Returns a collection of InteractionObjects that are currently being grasped by
     /// at least one hand.
     /// </summary>
-    public IEnumerable<InteractionObject> GraspedObjects {
+    public IEnumerable<InteractionBehaviour> GraspedObjects {
       get {
         return _graspedObjects;
       }
@@ -91,7 +89,7 @@ namespace InteractionEngine {
     /// <param name="handId"></param>
     /// <param name="graspedObject"></param>
     /// <returns></returns>
-    public bool TryGetGraspedObject(int handId, out InteractionObject graspedObject) {
+    public bool TryGetGraspedObject(int handId, out InteractionBehaviour graspedObject) {
       for (int i = 0; i < _graspedObjects.Count; i++) {
         var iObj = _graspedObjects[i];
         if (iObj.IsBeingGraspedByHand(handId)) {
@@ -111,7 +109,7 @@ namespace InteractionEngine {
     /// when the controller is next enabled.
     /// </summary>
     /// <param name="obj"></param>
-    public void RegisterInteractionObject(InteractionObject obj) {
+    public void RegisterInteractionObject(InteractionBehaviour obj) {
       RegisteredObject registeredObj = new RegisteredObject();
       registeredObj.interactionObject = obj;
 
@@ -119,7 +117,7 @@ namespace InteractionEngine {
 
       //Don't create right away if we are not enabled, creation will be done in OnEnable
       if (enabled) {
-        createIEShape(registeredObj);
+        createInteractionShape(registeredObj);
       }
     }
 
@@ -128,12 +126,12 @@ namespace InteractionEngine {
     /// scene and prevents any further interaction.
     /// </summary>
     /// <param name="obj"></param>
-    public void UnregisterInteractionObject(InteractionObject obj) {
+    public void UnregisterInteractionObject(InteractionBehaviour obj) {
       RegisteredObject registeredObj = _objToRegistry[obj];
 
       //Don't destroy if we are not enabled, everything already got destroyed in OnDisable
       if (enabled) {
-        destroyIEShape(registeredObj);
+        destroyInteractionShape(registeredObj);
       }
 
       _objToRegistry.Remove(obj);
@@ -156,9 +154,9 @@ namespace InteractionEngine {
 
     protected virtual void Awake() {
       _instanceToRegistry = new Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, RegisteredObject>();
-      _objToRegistry = new Dictionary<InteractionObject, RegisteredObject>();
-      _graspedObjects = new List<InteractionObject>();
-      _handIdToIeHand = new Dictionary<int, InteractionHand>();
+      _objToRegistry = new Dictionary<InteractionBehaviour, RegisteredObject>();
+      _graspedObjects = new List<InteractionBehaviour>();
+      _idToInteractionHand = new Dictionary<int, InteractionHand>();
       _handIdsToRemove = new List<int>();
     }
 
@@ -168,13 +166,13 @@ namespace InteractionEngine {
       applyDebugSettings();
 
       foreach (var registeredObj in _objToRegistry.Values) {
-        createIEShape(registeredObj);
+        createInteractionShape(registeredObj);
       }
     }
 
     protected virtual void OnDisable() {
       foreach (var registeredObj in _instanceToRegistry.Values) {
-        destroyIEShape(registeredObj);
+        destroyInteractionShape(registeredObj);
       }
 
       _shapeDescriptionPool.RemoveAllShapes();
@@ -193,33 +191,33 @@ namespace InteractionEngine {
 
     #region INTERNAL METHODS
     protected virtual void simulateFrame(Frame frame) {
-      updateIeRepresentations();
+      updateInteractionRepresentations();
 
-      updateIeTracking(frame);
+      updateTracking(frame);
 
-      simulateIe();
+      simulateInteraction();
 
-      updateIeObjStateChange();
+      updateInteractionStateChanges();
     }
 
     protected virtual void applyDebugSettings() {
       InteractionC.EnableDebugFlags(ref _scene, (uint)DebugFlags);
     }
 
-    protected virtual void updateIeRepresentations() {
+    protected virtual void updateInteractionRepresentations() {
       foreach (var registeredObj in _instanceToRegistry.Values) {
-        registeredObj.UpdateIERepresentation(ref _scene);
+        registeredObj.UpdateInteractionRepresentation(ref _scene);
       }
     }
 
-    protected virtual void updateIeTracking(Frame frame) {
+    protected virtual void updateTracking(Frame frame) {
       int handCount = frame.Hands.Count;
       IntPtr ptr = HandArrayBuilder.CreateHandArray(frame);
       InteractionC.UpdateHands(ref _scene, (uint)handCount, ptr);
       StructAllocator.CleanupAllocations();
     }
 
-    protected virtual void simulateIe() {
+    protected virtual void simulateInteraction() {
       var _controllerTransform = new LEAP_IE_TRANSFORM();
       _controllerTransform.position = new LEAP_VECTOR(_leapProvider.transform.position);
       _controllerTransform.rotation = new LEAP_QUATERNION(_leapProvider.transform.rotation);
@@ -228,10 +226,10 @@ namespace InteractionEngine {
       InteractionC.UpdateController(ref _scene, ref _controllerTransform);
     }
 
-    protected virtual void updateIeObjStateChange() {
+    protected virtual void updateInteractionStateChanges() {
       var hands = _leapProvider.CurrentFrame.Hands;
 
-      //First loop through all the hands and get their classifications from the IE
+      //First loop through all the hands and get their classifications from the engine
       for (int i = 0; i < hands.Count; i++) {
         Hand hand = hands[i];
 
@@ -245,53 +243,53 @@ namespace InteractionEngine {
         RegisteredObject registeredObj = _instanceToRegistry[instance];
 
         //Get the InteractionHand associated with this hand id
-        InteractionHand ieHand;
-        if (!_handIdToIeHand.TryGetValue(hand.Id, out ieHand)) {
+        InteractionHand interactionHand;
+        if (!_idToInteractionHand.TryGetValue(hand.Id, out interactionHand)) {
 
-          //First we see if there is an untracked ieHand that can be re-connected using this one
-          InteractionHand untrackedIeHand = null;
-          foreach (var pair in _handIdToIeHand) {
+          //First we see if there is an untracked interactionHand that can be re-connected using this one
+          InteractionHand untrackedInteractionHand = null;
+          foreach (var pair in _idToInteractionHand) {
             //If the old ieHand is untracked, and the handedness matches, we re-connect it
             if (pair.Value.isUntracked && pair.Value.hand.IsLeft == hand.IsLeft) {
-              untrackedIeHand = pair.Value;
+              untrackedInteractionHand = pair.Value;
               break;
             }
           }
           
-          if (untrackedIeHand != null) {
+          if (untrackedInteractionHand != null) {
             //If we found an untrackedIeHand, use it!
-            ieHand = untrackedIeHand;
+            interactionHand = untrackedInteractionHand;
             //Remove the old id from the mapping
-            _handIdToIeHand.Remove(untrackedIeHand.hand.Id);
+            _idToInteractionHand.Remove(untrackedInteractionHand.hand.Id);
             //This also dispatched InteractionObject.OnHandRegainedTracking()
-            ieHand.RegainTracking(hand);
+            interactionHand.RegainTracking(hand);
           } else {
             //Otherwise just create a new one
-            ieHand = new InteractionHand(hand);
+            interactionHand = new InteractionHand(hand);
           }
 
           //In both cases, associate the id with the new ieHand
-          _handIdToIeHand[hand.Id] = ieHand;
+          _idToInteractionHand[hand.Id] = interactionHand;
         }
 
-        ieHand.UpdateHand(hand);
+        interactionHand.UpdateHand(hand);
 
         switch (classification.classification) {
           case eLeapIEClassification.eLeapIEClassification_Grasp:
             {
               registeredObj.AddHoldingHand(hand);
 
-              if (ieHand.graspedObject == null) {
+              if (interactionHand.graspedObject == null) {
                 _graspedObjects.Add(registeredObj.interactionObject);
-                ieHand.GraspObject(registeredObj.interactionObject);
+                interactionHand.GraspObject(registeredObj.interactionObject);
               }
               break;
             }
           case eLeapIEClassification.eLeapIEClassification_Physics:
             {
-              if (ieHand.graspedObject != null) {
+              if (interactionHand.graspedObject != null) {
                 _graspedObjects.Remove(registeredObj.interactionObject);
-                ieHand.ReleaseObject();
+                interactionHand.ReleaseObject();
               }
               break;
             }
@@ -301,7 +299,7 @@ namespace InteractionEngine {
       }
 
       //Loop through all ieHands to check for timeouts and loss of tracking
-      foreach (var pair in _handIdToIeHand) {
+      foreach (var pair in _idToInteractionHand) {
         var id = pair.Key;
         var ieHand = pair.Value;
 
@@ -333,7 +331,7 @@ namespace InteractionEngine {
 
       //Loop through the stale ids and remove them from the map
       for (int i = 0; i < _handIdsToRemove.Count; i++) {
-        _handIdToIeHand.Remove(_handIdsToRemove[i]);
+        _idToInteractionHand.Remove(_handIdsToRemove[i]);
       }
       _handIdsToRemove.Clear();
 
@@ -345,14 +343,14 @@ namespace InteractionEngine {
       }
     }
 
-    protected virtual void createIEShape(RegisteredObject registeredObj) {
-      registeredObj.CreateIEShape(ref _scene);
+    protected virtual void createInteractionShape(RegisteredObject registeredObj) {
+      registeredObj.CreateInteractionShape(ref _scene);
       _instanceToRegistry[registeredObj.instanceHandle] = registeredObj;
     }
 
-    protected virtual void destroyIEShape(RegisteredObject registeredObj) {
+    protected virtual void destroyInteractionShape(RegisteredObject registeredObj) {
       _instanceToRegistry.Remove(registeredObj.instanceHandle);
-      registeredObj.DestroyIEShape(ref _scene);
+      registeredObj.DestroyInteractionShape(ref _scene);
     }
     #endregion
 
@@ -361,7 +359,7 @@ namespace InteractionEngine {
     protected class InteractionHand {
       public Hand hand { get; protected set; }
       public float lastTimeUpdated { get; protected set; }
-      public InteractionObject graspedObject { get; protected set; }
+      public InteractionBehaviour graspedObject { get; protected set; }
       public bool isUntracked { get; protected set; }
 
       public InteractionHand(Hand hand) {
@@ -375,7 +373,7 @@ namespace InteractionEngine {
         lastTimeUpdated = Time.time;
       }
 
-      public void GraspObject(InteractionObject obj) {
+      public void GraspObject(InteractionBehaviour obj) {
         graspedObject = obj;
         graspedObject.OnHandGrasp(hand);
       }
@@ -408,24 +406,24 @@ namespace InteractionEngine {
 
     //A persistant structure for storing useful data about an object as it is interacted with
     protected class RegisteredObject {
-      public InteractionObject interactionObject;
+      public InteractionBehaviour interactionObject;
       public LEAP_IE_SHAPE_DESCRIPTION_HANDLE shapeHandle;
       public LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle;
 
       private List<Hand> _holdingHandList = new List<Hand>();
 
-      public void UpdateIERepresentation(ref LEAP_IE_SCENE scene) {
+      public void UpdateInteractionRepresentation(ref LEAP_IE_SCENE scene) {
         LEAP_IE_TRANSFORM t = interactionObject.GetIETransform();
         InteractionC.UpdateShape(ref scene, ref t, ref instanceHandle);
       }
 
-      public void CreateIEShape(ref LEAP_IE_SCENE scene) {
+      public void CreateInteractionShape(ref LEAP_IE_SCENE scene) {
         shapeHandle = interactionObject.GetShapeDescription();
         LEAP_IE_TRANSFORM t = interactionObject.GetIETransform();
         InteractionC.CreateShape(ref scene, ref shapeHandle, ref t, out instanceHandle);
       }
 
-      public void DestroyIEShape(ref LEAP_IE_SCENE scene) {
+      public void DestroyInteractionShape(ref LEAP_IE_SCENE scene) {
         InteractionC.DestroyShape(ref scene, ref instanceHandle);
       }
 

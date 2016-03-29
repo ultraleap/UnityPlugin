@@ -1,13 +1,12 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
-using Leap;
 using LeapInternal;
-using InteractionEngine.CApi;
+using Leap.Unity.Interaction.CApi;
 
-namespace InteractionEngine {
+namespace Leap.Unity.Interaction {
 
-  public abstract class InteractionObject : MonoBehaviour {
+  public abstract class InteractionBehaviour : MonoBehaviour {
 
     #region SERIALIZED FIELDS
     [SerializeField]

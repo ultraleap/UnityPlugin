@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
-using InteractionEngine.CApi;
+using Leap.Unity.Interaction.CApi;
 
-namespace InteractionEngine {
+namespace Leap.Unity.Interaction {
 
-  public class TestInteractionObject : InteractionObject {
+  public class TestInteractionObject : InteractionBehaviour {
     private SphereCollider _sphereCollider;
     private Renderer _renderer;
 

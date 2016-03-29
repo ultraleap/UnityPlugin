@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using LeapInternal;
 
-namespace InteractionEngine.CApi {
+namespace Leap.Unity.Interaction.CApi {
 
   public enum eLeapIERS : uint {
     eLeapIERS_Success,

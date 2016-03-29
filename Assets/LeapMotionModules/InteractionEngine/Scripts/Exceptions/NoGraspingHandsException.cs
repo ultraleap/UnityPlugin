@@ -1,7 +1,6 @@
 ﻿using System;
-using Leap;
 
-namespace InteractionEngine {
+namespace Leap.Unity.Interaction {
 
   public class NoGraspingHandsException : Exception {
     public NoGraspingHandsException(string methodName, int handId) :

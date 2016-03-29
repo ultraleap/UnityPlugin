@@ -1,7 +1,6 @@
 ﻿using System;
-using Leap;
 
-namespace InteractionEngine {
+namespace Leap.Unity.Interaction {
 
   public class HandAlreadyUntrackedException : Exception {
     public HandAlreadyUntrackedException(string methodName, int handId) :

@@ -1,9 +1,7 @@
-﻿using UnityEngine;
-using System;
-using Leap;
+﻿using System;
 using LeapInternal;
 
-namespace InteractionEngine.CApi {
+namespace Leap.Unity.Interaction.CApi {
 
   public static class HandArrayBuilder {
 
