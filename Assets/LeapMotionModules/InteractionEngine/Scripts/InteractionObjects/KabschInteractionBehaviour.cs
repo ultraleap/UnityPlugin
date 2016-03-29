@@ -1,7 +1,6 @@
-﻿using LeapInternal;
-using Leap.Unity.Interaction.CApi;
+﻿using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine;
+using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
