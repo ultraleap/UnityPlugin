@@ -5,9 +5,14 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
+  [RequireComponent(typeof(Rigidbody))]
   public class KabschInteractionBehaviour : InteractionBehaviour {
     public const int NUM_FINGERS = 5;
     public const int NUM_JOINTS = 4;
+
+    [Tooltip("Renderers to turn off when the object is grasped by untracked hands.")]
+    [SerializeField]
+    protected Renderer[] _renderers;
 
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
 
@@ -78,40 +83,59 @@ namespace Leap.Unity.Interaction {
 
       KabschC.Solve(ref _kabsch);
 
-
+      //TODO: apply solve
     }
 
     public override void OnHandRelease(Hand hand) {
       base.OnHandRelease(hand);
 
-      var collection = _handIdToPoints[hand.Id];
-      _handIdToPoints.Remove(hand.Id);
-      HandPointCollection.Return(collection);
+      removeHandPointCollection(hand.Id);
     }
 
     public override void OnHandLostTracking(Hand oldHand) {
       base.OnHandLostTracking(oldHand);
+
+      updateRendererStatus();
     }
 
     public override void OnHandRegainedTracking(Hand newHand, int oldId) {
       base.OnHandRegainedTracking(newHand, oldId);
+
+      updateRendererStatus();
+
+      //Associate the collection with the new id
+      var collection = _handIdToPoints[oldId];
+      _handIdToPoints.Remove(oldId);
+      _handIdToPoints[newHand.Id] = collection;
     }
 
     public override void OnHandTimeout(Hand oldHand) {
       base.OnHandTimeout(oldHand);
+
+      updateRendererStatus();
+      removeHandPointCollection(oldHand.Id);
     }
 
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
+
+      _rigidbody.isKinematic = true;
     }
 
     protected override void OnGraspEnd() {
       base.OnGraspEnd();
+
+      _rigidbody.isKinematic = false;
     }
 
     #endregion
 
     #region UNITY CALLBACKS
+
+    protected virtual void Reset() {
+      _renderers = GetComponentsInChildren<Renderer>();
+    }
+
     protected virtual void Awake() {
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
       KabschC.Construct(ref _kabsch);
@@ -134,12 +158,32 @@ namespace Leap.Unity.Interaction {
     }
     #endregion
 
+    protected void removeHandPointCollection(int handId) {
+      var collection = _handIdToPoints[handId];
+      _handIdToPoints.Remove(handId);
+      HandPointCollection.Return(collection);
+    }
+
+    protected void updateRendererStatus() {
+      //Renderers are visible if there are no grasping hands
+      //or if there is at least one tracked grasping hand
+      int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;
+      bool shouldBeVisible = GraspingHandCount == 0 || trackedGraspingHandCount > 0;
+
+      for (int i = 0; i < _renderers.Length; i++) {
+        Renderer renderer = _renderers[i];
+        if (renderer != null) {
+          renderer.enabled = shouldBeVisible;
+        }
+      }
+    }
+
     #region CLASSES
     protected class HandPointCollection {
       private static Stack<HandPointCollection> _handPointCollectionPool = new Stack<HandPointCollection>();
 
-      protected Rigidbody _rigidbody;
-      protected Vector3[] _localPositions;
+      private Rigidbody _rigidbody;
+      private Vector3[] _localPositions;
 
       private Matrix4x4 _transformMatrix;
       private Matrix4x4 _inverseTransformMatrix;
