@@ -29,10 +29,12 @@ namespace Leap.Unity.Interaction {
     #region INTERNAL FIELDS
     private bool _isRegisteredWithController = false;
 
+    private bool _hasGeneratedShapeDescriptionHandle = false;
+    private LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeDescriptionHandle;
+    private LEAP_IE_SHAPE_INSTANCE_HANDLE _shapeInstanceHandle;
+
     private List<int> _graspingIds = new List<int>();
     private List<int> _untrackedIds = new List<int>();
-
-    protected LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeHandle;
     #endregion
 
     #region PUBLIC METHODS
@@ -70,6 +72,31 @@ namespace Leap.Unity.Interaction {
         } else {
           DisableInteraction();
         }
+      }
+    }
+
+    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
+      get {
+        if (!_hasGeneratedShapeDescriptionHandle) {
+          _shapeDescriptionHandle = GenerateShapeDescriptionHandle();
+          _hasGeneratedShapeDescriptionHandle = true;
+        }
+        return _shapeDescriptionHandle;
+      }
+    }
+
+    public LEAP_IE_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
+      get {
+        return _shapeInstanceHandle;
+      }
+    }
+
+    public LEAP_IE_TRANSFORM InteractionTransform {
+      get {
+        LEAP_IE_TRANSFORM interactionTransform = new LEAP_IE_TRANSFORM();
+        interactionTransform.position = new LEAP_VECTOR(transform.position);
+        interactionTransform.rotation = new LEAP_QUATERNION(transform.rotation);
+        return interactionTransform;
       }
     }
 
@@ -126,24 +153,6 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-
-    /// <summary>
-    /// Returns the internal transform representation of this object.
-    /// </summary>
-    /// <returns></returns>
-    public virtual LEAP_IE_TRANSFORM GetIETransform() {
-      LEAP_IE_TRANSFORM ieTransform = new LEAP_IE_TRANSFORM();
-      ieTransform.position = new LEAP_VECTOR(transform.position);
-      ieTransform.rotation = new LEAP_QUATERNION(transform.rotation);
-      return ieTransform;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public abstract LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetShapeDescription();
-
     /// <summary>
     /// Returns whether or not a hand with the given ID is currently grasping this object.
     /// </summary>
@@ -151,6 +160,25 @@ namespace Leap.Unity.Interaction {
     /// <returns></returns>
     public bool IsBeingGraspedByHand(int handId) {
       return _graspingIds.Contains(handId);
+    }
+
+    /// <summary>
+    /// Called by InteractionController when the interaction shape associated with this InteractionBehaviour
+    /// is created and added to the interaction scene.
+    /// </summary>
+    /// <param name="instanceHandle"></param>
+    public virtual void OnInteractionShapeCreated(LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle) {
+      _shapeInstanceHandle = instanceHandle;
+    }
+
+    /// <summary>
+    /// Called by InteractionController when the interaction shape associated with this InteractionBehaviour
+    /// is destroyed and removed from the interaction scene.
+    /// </summary>
+    public virtual void OnInteractionShapeDestroyed() {
+      _shapeInstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
+      _shapeDescriptionHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
+      _hasGeneratedShapeDescriptionHandle = false;
     }
 
     /// <summary>
@@ -275,7 +303,7 @@ namespace Leap.Unity.Interaction {
         return;
       }
 
-      _controller.RegisterInteractionObject(this);
+      _controller.RegisterInteractionBehaviour(this);
       _isRegisteredWithController = true;
     }
 
@@ -292,12 +320,16 @@ namespace Leap.Unity.Interaction {
         throw new InvalidOperationException("Cannot disable interaction until a controller has been set");
       }
 
-      _controller.UnregisterInteractionObject(this);
+      _controller.UnregisterInteractionBehaviour(this);
       _isRegisteredWithController = false;
     }
     #endregion
 
     #region PROTECTED METHODS
+    protected virtual LEAP_IE_SHAPE_DESCRIPTION_HANDLE GenerateShapeDescriptionHandle() {
+      return _controller.ShapePool.GetAuto(gameObject);
+    }
+
     protected virtual void OnGraspBegin() {
       if (OnGraspBeginEvent != null) {
         OnGraspBeginEvent();
