@@ -41,7 +41,7 @@ namespace Leap.Unity.Interaction {
 
     #region PUBLIC METHODS
     /// <summary>
-    /// Gets the current debug flags for this Controller.
+    /// Gets the current debug flags for this manager.
     /// </summary>
     public eLeapIEDebugFlags DebugFlags {
       get {
@@ -55,9 +55,9 @@ namespace Leap.Unity.Interaction {
 
     /// <summary>
     /// Returns a ShapeDescriptionPool that can be used to allocate shape descriptions
-    /// for this controller.  Using the pool can be more efficient since identical shapes
+    /// for this manager.  Using the pool can be more efficient since identical shapes
     /// can be automatically combined to save memory.  Shape descriptions aquired from this
-    /// pool will be destroyed when this controller is disabled.
+    /// pool will be destroyed when this manager is disabled.
     /// </summary>
     public ShapeDescriptionPool ShapePool {
       get {
@@ -105,10 +105,10 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Registers an InteractionObject with this Controller, which automatically adds the objects
-    /// representation into the internal interaction scene.  If the controller is disabled, 
+    /// Registers an InteractionObject with this manager, which automatically adds the objects
+    /// representation into the internal interaction scene.  If the manager is disabled, 
     /// the registration will still succeed and the object will be added to the internal scene
-    /// when the controller is next enabled.
+    /// when the manager is next enabled.
     /// </summary>
     /// <param name="interactionBehaviour"></param>
     public void RegisterInteractionBehaviour(InteractionBehaviour interactionBehaviour) {
@@ -121,7 +121,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Unregisters an InteractionObject from this Controller.  This removes it from the internal
+    /// Unregisters an InteractionObject from this manager.  This removes it from the internal
     /// scene and prevents any further interaction.
     /// </summary>
     /// <param name="interactionBehaviour"></param>
