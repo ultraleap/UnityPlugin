@@ -81,7 +81,7 @@ namespace Leap.Unity.Interaction {
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
       get {
         if (_isRegisteredWithController) {
-          throw new NotRegisteredWithControllerException();
+          throw new NotRegisteredWithManagerException();
         }
 
         if (!_hasShapeDescriptionBeenCreated) {
@@ -95,7 +95,7 @@ namespace Leap.Unity.Interaction {
     public LEAP_IE_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
       get {
         if (_isRegisteredWithController) {
-          throw new NotRegisteredWithControllerException();
+          throw new NotRegisteredWithManagerException();
         }
 
         return _shapeInstanceHandle;

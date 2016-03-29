@@ -2,9 +2,9 @@
 
 namespace Leap.Unity.Interaction {
 
-  public class NotRegisteredWithControllerException : Exception {
-    public NotRegisteredWithControllerException() :
-      base("The object has not been registered with the InteractionController. " +
+  public class NotRegisteredWithManagerException : Exception {
+    public NotRegisteredWithManagerException() :
+      base("The object has not been registered with the InteractionManager. " +
            "Try calling EnableInteraction first.") { }
   }
 
