@@ -27,7 +27,7 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL FIELDS
-    private bool _isRegisteredWithController = false;
+    private bool _isRegisteredWithManager = false;
 
     private bool _hasShapeDescriptionBeenCreated = false;
     private LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeDescriptionHandle;
@@ -39,7 +39,7 @@ namespace Leap.Unity.Interaction {
 
     #region PUBLIC METHODS
     /// <summary>
-    /// Gets or sets the controller this object belongs to.  
+    /// Gets or sets the manager this object belongs to.  
     /// </summary>
     public InteractionManager Manager {
       get {
@@ -64,7 +64,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public bool IsInteractionEnabled {
       get {
-        return _isRegisteredWithController;
+        return _isRegisteredWithManager;
       }
       set {
         if (value) {
@@ -80,7 +80,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
       get {
-        if (_isRegisteredWithController) {
+        if (_isRegisteredWithManager) {
           throw new NotRegisteredWithManagerException();
         }
 
@@ -94,7 +94,7 @@ namespace Leap.Unity.Interaction {
 
     public LEAP_IE_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
       get {
-        if (_isRegisteredWithController) {
+        if (_isRegisteredWithManager) {
           throw new NotRegisteredWithManagerException();
         }
 
@@ -182,7 +182,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Called by InteractionController when the interaction shape associated with this InteractionBehaviour
+    /// Called by InteractionManager when the interaction shape associated with this InteractionBehaviour
     /// is created and added to the interaction scene.
     /// </summary>
     /// <param name="instanceHandle"></param>
@@ -191,7 +191,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Called by InteractionController when the interaction shape associated with this InteractionBehaviour
+    /// Called by InteractionManager when the interaction shape associated with this InteractionBehaviour
     /// is destroyed and removed from the interaction scene.
     /// </summary>
     public virtual void OnInteractionShapeDestroyed() {
@@ -201,7 +201,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Called by InteractionController when this object is pushed.  The arguments are the proposed
+    /// Called by InteractionManager when this object is pushed.  The arguments are the proposed
     /// linear and angular velocities to be applied to the object. 
     /// </summary>
     /// <param name="linearVelocity"></param>
@@ -209,7 +209,7 @@ namespace Leap.Unity.Interaction {
     public virtual void OnPush(Vector3 linearVelocity, Vector3 angularVelocity) { }
 
     /// <summary>
-    /// Called by InteractionController when a Hand begins grasping this object.
+    /// Called by InteractionManager when a Hand begins grasping this object.
     /// </summary>
     /// <param name="handId"></param>
     public virtual void OnHandGrasp(Hand hand) {
@@ -228,7 +228,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Called by InteractionController every frame that a Hand continues to grasp this object.
+    /// Called by InteractionManager every frame that a Hand continues to grasp this object.
     /// </summary>
     public virtual void OnHandsHold(List<Hand> hands) {
       if (OnHandsHoldEvent != null) {
@@ -237,7 +237,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Called by InteractionController when a Hand stops grasping this object.
+    /// Called by InteractionManager when a Hand stops grasping this object.
     /// </summary>
     /// <param name="handId"></param>
     public virtual void OnHandRelease(Hand hand) {
@@ -257,7 +257,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Called by InteractionController when a Hand that was grasping becomes untracked.  The Hand
+    /// Called by InteractionManager when a Hand that was grasping becomes untracked.  The Hand
     /// is not yet considered ungrasped, and OnGraspRegainedTracking might be called in the future
     /// if the Hand becomes tracked again.
     /// </summary>
@@ -279,7 +279,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Called by InteractionController when a grasping Hand that had previously been untracked has
+    /// Called by InteractionManager when a grasping Hand that had previously been untracked has
     /// regained tracking.  The new hand is provided, as well as the id of the previously tracked
     /// hand.
     /// </summary>
@@ -300,7 +300,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Called by InteractionController when a untracked grasping Hand has remained ungrasped for
+    /// Called by InteractionManager when a untracked grasping Hand has remained ungrasped for
     /// too long.  The hand is no longer considered to be grasping the object.
     /// </summary>
     /// <param name="oldId"></param>
@@ -310,11 +310,11 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Calling this method registers this object with the controller.  A shape definition must be registered
-    /// with the controller before interaction can be enabled.
+    /// Calling this method registers this object with the manager.  A shape definition must be registered
+    /// with the manager before interaction can be enabled.
     /// </summary>
     public void EnableInteraction() {
-      if (_isRegisteredWithController) {
+      if (_isRegisteredWithManager) {
         return;
       }
 
@@ -323,14 +323,14 @@ namespace Leap.Unity.Interaction {
       }
 
       _manager.RegisterInteractionBehaviour(this);
-      _isRegisteredWithController = true;
+      _isRegisteredWithManager = true;
     }
 
     /// <summary>
-    /// Calling this method will unregister this object from the controller.
+    /// Calling this method will unregister this object from the manager.
     /// </summary>
     public void DisableInteraction() {
-      if (!_isRegisteredWithController) {
+      if (!_isRegisteredWithManager) {
         return;
       }
 
@@ -339,7 +339,7 @@ namespace Leap.Unity.Interaction {
       }
 
       _manager.UnregisterInteractionBehaviour(this);
-      _isRegisteredWithController = false;
+      _isRegisteredWithManager = false;
     }
     #endregion
 
