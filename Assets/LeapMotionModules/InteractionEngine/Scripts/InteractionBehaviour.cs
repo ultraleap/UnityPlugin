@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System;
 using System.Collections.Generic;
 using LeapInternal;
@@ -214,9 +215,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     /// <param name="handId"></param>
     public virtual void OnHandGrasp(Hand hand) {
-      if (_graspingIds.Contains(hand.Id)) {
-        throw new HandAlreadyGraspingException(hand.Id);
-      }
+      Assert.IsFalse(_graspingIds.Contains(hand.Id), HandAlreadyGraspingMessage(hand.Id));
 
       _graspingIds.Add(hand.Id);
 
@@ -242,13 +241,8 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     /// <param name="handId"></param>
     public virtual void OnHandRelease(Hand hand) {
-      if (_graspingIds.Count == 0) {
-        throw new NoGraspingHandsException(hand.Id);
-      }
-
-      if (!_graspingIds.Contains(hand.Id)) {
-        throw new HandNotGraspingException(hand.Id);
-      }
+      Assert.AreNotEqual(_graspingIds.Count, 0, NoGraspingHandsMessage());
+      Assert.IsTrue(_graspingIds.Contains(hand.Id), HandNotGraspingMessage(hand.Id));
 
       _graspingIds.Remove(hand.Id);
 
@@ -264,17 +258,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     /// <param name="oldHand"></param>
     public virtual void OnHandLostTracking(Hand oldHand) {
-      if (_graspingIds.Count == 0) {
-        throw new NoGraspingHandsException(oldHand.Id);
-      }
-
-      if (!_graspingIds.Contains(oldHand.Id)) {
-        throw new HandNotGraspingException(oldHand.Id);
-      }
-
-      if (_untrackedIds.Contains(oldHand.Id)) {
-        throw new HandAlreadyUntrackedException(oldHand.Id);
-      }
+      Assert.AreNotEqual(_graspingIds.Count, 0, NoGraspingHandsMessage());
+      Assert.IsTrue(_graspingIds.Contains(oldHand.Id), HandNotGraspingMessage(oldHand.Id));
+      Assert.IsFalse(_untrackedIds.Contains(oldHand.Id), HandAlreadyUntrackedMessage(oldHand.Id));
 
       _untrackedIds.Add(oldHand.Id);
     }
@@ -287,13 +273,8 @@ namespace Leap.Unity.Interaction {
     /// <param name="newHand"></param>
     /// <param name="oldId"></param>
     public virtual void OnHandRegainedTracking(Hand newHand, int oldId) {
-      if (!_graspingIds.Contains(oldId)) {
-        throw new HandNotGraspingException(oldId);
-      }
-
-      if (_graspingIds.Contains(newHand.Id)) {
-        throw new HandAlreadyGraspingException(newHand.Id);
-      }
+      Assert.IsTrue(_graspingIds.Contains(oldId), HandNotGraspingMessage(oldId));
+      Assert.IsFalse(_graspingIds.Contains(newHand.Id), HandAlreadyGraspingMessage(newHand.Id));
 
       _untrackedIds.Remove(oldId);
       _graspingIds.Remove(oldId);
@@ -359,6 +340,24 @@ namespace Leap.Unity.Interaction {
       if (OnGraspEndEvent != null) {
         OnGraspEndEvent();
       }
+    }
+    #endregion
+
+    #region ASSERTION MESSAGES
+    private static string NoGraspingHandsMessage() {
+      return "There are no hands currently grasping this InteractionBehaviour.";
+    }
+
+    private static string HandAlreadyGraspingMessage(int id) {
+      return "There is already a hand of id " + id + " grapsping this InteractionBehaviour.";
+    }
+
+    private static string HandAlreadyUntrackedMessage(int id) {
+      return "There is already an untracked hand of id " + id + " grasping this InteractionBehaviour.";
+    }
+
+    private static string HandNotGraspingMessage(int id) {
+      return "There is not a hand with id " + id + " currently grasping this InteractionBehaviour.";
     }
     #endregion
   }
