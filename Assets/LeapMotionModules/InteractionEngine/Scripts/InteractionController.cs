@@ -12,14 +12,13 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected LeapProvider _leapProvider;
 
-    [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
-    [SerializeField]
-    protected bool _showDebugLines = true;
-
     [Tooltip("The amount of time a Hand can remain untracked while also still grasping an object.")]
     [SerializeField]
     protected float _untrackedTimeout = 0.5f;
 
+    [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
+    [SerializeField]
+    protected bool _showDebugLines = true;
     #endregion
 
     #region INTERNAL FIELDS

@@ -129,6 +129,10 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Returns the number of hands that are currently grasping this object but
+    /// are not currently being tracked.
+    /// </summary>
     public int UntrackedHandCount {
       get {
         return _untrackedIds.Count;
