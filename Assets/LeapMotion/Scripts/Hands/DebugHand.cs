@@ -74,7 +74,7 @@ namespace Leap.Unity{
 
       if(VisualizeBasis){
         DrawBasis(hand.PalmPosition, hand.Basis, hand.PalmWidth/4 ); //Hand basis
-        DrawBasis(hand.Arm.Basis.origin, hand.Arm.Basis, 10); //Arm basis
+        DrawBasis(hand.Arm.ElbowPosition, hand.Arm.Basis, 10); //Arm basis
       }
 
       for(int f = 0; f < 5; f ++){ //Fingers
