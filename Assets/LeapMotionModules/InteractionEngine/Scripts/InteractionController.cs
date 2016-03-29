@@ -362,6 +362,7 @@ namespace InteractionEngine {
     #endregion
 
     #region INTERNAL CLASSES
+    //A persistant structure for storing useful data about a hand as it interacts with objects
     protected class InteractionHand {
       public Hand hand { get; protected set; }
       public float lastTimeUpdated { get; protected set; }
@@ -410,6 +411,7 @@ namespace InteractionEngine {
       }
     }
 
+    //A persistant structure for storing useful data about an object as it is interacted with
     protected class RegisteredObject {
       public InteractionObject interactionObject;
       public LEAP_IE_SHAPE_DESCRIPTION_HANDLE shapeHandle;
