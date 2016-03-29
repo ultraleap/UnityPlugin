@@ -96,7 +96,7 @@ namespace Leap.Unity.Interaction.CApi {
     private static extern eLeapIERS LeapIEKabschSolve(ref LEAP_IE_KABSCH kabsch);
 
     public static eLeapIERS Solve(ref LEAP_IE_KABSCH kabsch) {
-      Logger.Log("Solve", LogLevel.Info);
+      Logger.Log("Solve", LogLevel.AllCalls);
       var rs = LeapIEKabschSolve(ref kabsch);
       Logger.HandleReturnStatus(rs);
       return rs;
@@ -109,7 +109,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static eLeapIERS SolveWithPivot(ref LEAP_IE_KABSCH kabsch,
                                            ref LEAP_VECTOR pivot) {
-      Logger.Log("SolveWithPivot", LogLevel.Info);
+      Logger.Log("SolveWithPivot", LogLevel.AllCalls);
       var rs = LeapIEKabschSolveWithPivot(ref kabsch, ref pivot);
       Logger.HandleReturnStatus(rs);
       return rs;
@@ -122,7 +122,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static eLeapIERS SolveWithPlanar(ref LEAP_IE_KABSCH kabsch,
                                             ref LEAP_VECTOR planeNormal) {
-      Logger.Log("SolveWithPlanar", LogLevel.Info);
+      Logger.Log("SolveWithPlanar", LogLevel.AllCalls);
       var rs = LeapIEKabschSolveWithPlanar(ref kabsch, ref planeNormal);
       Logger.HandleReturnStatus(rs);
       return rs;
@@ -135,7 +135,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static eLeapIERS GetRotation(ref LEAP_IE_KABSCH kabsch,
                                         out LEAP_QUATERNION rotation) {
-      Logger.Log("GetRotation", LogLevel.Info);
+      Logger.Log("GetRotation", LogLevel.AllCalls);
       var rs = LeapIEKabschGetRotation(ref kabsch, out rotation);
       Logger.HandleReturnStatus(rs);
       return rs;
@@ -148,7 +148,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static eLeapIERS GetTranslation(ref LEAP_IE_KABSCH kabsch,
                                         out LEAP_VECTOR translation) {
-      Logger.Log("GetTranslation", LogLevel.Info);
+      Logger.Log("GetTranslation", LogLevel.AllCalls);
       var rs = LeapIEKabschGetTranslation(ref kabsch, out translation);
       Logger.HandleReturnStatus(rs);
       return rs;
@@ -161,7 +161,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static eLeapIERS GetTranslationWithScale(ref LEAP_IE_KABSCH kabsch,
                                                     out LEAP_VECTOR translation) {
-      Logger.Log("GetTranslationWithScale", LogLevel.Info);
+      Logger.Log("GetTranslationWithScale", LogLevel.AllCalls);
       var rs = LeapIEKabschGetTranslationWithScale(ref kabsch, out translation);
       Logger.HandleReturnStatus(rs);
       return rs;
@@ -174,7 +174,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static eLeapIERS GetScale(ref LEAP_IE_KABSCH kabsch,
                                      out LEAP_VECTOR translation) {
-      Logger.Log("GetScale", LogLevel.Info);
+      Logger.Log("GetScale", LogLevel.AllCalls);
       var rs = LeapIEKabschGetScale(ref kabsch, out translation);
       Logger.HandleReturnStatus(rs);
       return rs;
