@@ -168,6 +168,13 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void OnDisable() {
+      foreach (var interactionHand in _idToInteractionHand.Values) {
+        if (interactionHand.graspedObject != null) {
+          interactionHand.ReleaseObject();
+        }
+      }
+      _idToInteractionHand.Clear();
+
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         destroyInteractionShape(_registeredBehaviours[i]);
       }
