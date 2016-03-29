@@ -6,6 +6,7 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
+  [DisallowMultipleComponent]
   public abstract class InteractionBehaviour : MonoBehaviour {
 
     #region SERIALIZED FIELDS
