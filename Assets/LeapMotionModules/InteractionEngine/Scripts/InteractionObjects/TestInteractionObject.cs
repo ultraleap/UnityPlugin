@@ -4,12 +4,7 @@ using Leap.Unity.Interaction.CApi;
 namespace Leap.Unity.Interaction {
 
   public class TestInteractionObject : InteractionBehaviour {
-    private SphereCollider _sphereCollider;
     private Renderer _renderer;
-
-    public override LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetShapeDescription() {
-      return _controller.ShapePool.GetSphere(_sphereCollider.radius * transform.lossyScale.x);
-    }
 
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
@@ -23,7 +18,6 @@ namespace Leap.Unity.Interaction {
 
     void Awake() {
       _renderer = GetComponent<Renderer>();
-      _sphereCollider = GetComponent<SphereCollider>();
     }
 
     void OnEnable() {

@@ -3,9 +3,8 @@
 namespace Leap.Unity.Interaction {
 
   public class HandNotGraspingException : Exception {
-    public HandNotGraspingException(string methodName, int handId) :
-      base("Cannot call " + methodName + " because there is not a hand with id " +
-            "currently grasping this InteractionObject.") { }
+    public HandNotGraspingException(int handId) :
+      base("There is not a hand with id " + handId + " currently grasping this InteractionObject.") { }
   }
 
 }

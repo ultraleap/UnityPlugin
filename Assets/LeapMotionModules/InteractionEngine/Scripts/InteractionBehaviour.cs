@@ -29,7 +29,7 @@ namespace Leap.Unity.Interaction {
     #region INTERNAL FIELDS
     private bool _isRegisteredWithController = false;
 
-    private bool _hasGeneratedShapeDescriptionHandle = false;
+    private bool _hasShapeDescriptionBeenCreated = false;
     private LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeDescriptionHandle;
     private LEAP_IE_SHAPE_INSTANCE_HANDLE _shapeInstanceHandle;
 
@@ -75,11 +75,18 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Gets the shape description handle 
+    /// </summary>
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
       get {
-        if (!_hasGeneratedShapeDescriptionHandle) {
+        if (_isRegisteredWithController) {
+          throw new NotRegisteredWithControllerException();
+        }
+
+        if (!_hasShapeDescriptionBeenCreated) {
           _shapeDescriptionHandle = GenerateShapeDescriptionHandle();
-          _hasGeneratedShapeDescriptionHandle = true;
+          _hasShapeDescriptionBeenCreated = true;
         }
         return _shapeDescriptionHandle;
       }
@@ -87,6 +94,10 @@ namespace Leap.Unity.Interaction {
 
     public LEAP_IE_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
       get {
+        if (_isRegisteredWithController) {
+          throw new NotRegisteredWithControllerException();
+        }
+
         return _shapeInstanceHandle;
       }
     }
@@ -133,6 +144,10 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Returns the ids of the hands currently grasping this object, but only
+    /// returns ids of hands that are also currently being tracked.
+    /// </summary>
     public IEnumerable<int> TrackedGraspingHands {
       get {
         for (int i = 0; i < _graspingIds.Count; i++) {
@@ -178,12 +193,12 @@ namespace Leap.Unity.Interaction {
     public virtual void OnInteractionShapeDestroyed() {
       _shapeInstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
       _shapeDescriptionHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
-      _hasGeneratedShapeDescriptionHandle = false;
+      _hasShapeDescriptionBeenCreated = false;
     }
 
     /// <summary>
     /// Called by InteractionController when this object is pushed.  The arguments are the proposed
-    /// velocities to be applied to the object. 
+    /// linear and angular velocities to be applied to the object. 
     /// </summary>
     /// <param name="linearVelocity"></param>
     /// <param name="angularVelocity"></param>
@@ -195,7 +210,7 @@ namespace Leap.Unity.Interaction {
     /// <param name="handId"></param>
     public virtual void OnHandGrasp(Hand hand) {
       if (_graspingIds.Contains(hand.Id)) {
-        throw new HandAlreadyGraspingException("OnHandGrasp", hand.Id);
+        throw new HandAlreadyGraspingException(hand.Id);
       }
 
       _graspingIds.Add(hand.Id);
@@ -223,11 +238,11 @@ namespace Leap.Unity.Interaction {
     /// <param name="handId"></param>
     public virtual void OnHandRelease(Hand hand) {
       if (_graspingIds.Count == 0) {
-        throw new NoGraspingHandsException("OnHandRelease", hand.Id);
+        throw new NoGraspingHandsException(hand.Id);
       }
 
       if (!_graspingIds.Contains(hand.Id)) {
-        throw new HandNotGraspingException("OnHandRelease", hand.Id);
+        throw new HandNotGraspingException(hand.Id);
       }
 
       _graspingIds.Remove(hand.Id);
@@ -245,15 +260,15 @@ namespace Leap.Unity.Interaction {
     /// <param name="oldHand"></param>
     public virtual void OnHandLostTracking(Hand oldHand) {
       if (_graspingIds.Count == 0) {
-        throw new NoGraspingHandsException("OnHandLostTracking", oldHand.Id);
+        throw new NoGraspingHandsException(oldHand.Id);
       }
 
       if (!_graspingIds.Contains(oldHand.Id)) {
-        throw new HandNotGraspingException("OnHandLostTracking", oldHand.Id);
+        throw new HandNotGraspingException(oldHand.Id);
       }
 
       if (_untrackedIds.Contains(oldHand.Id)) {
-        throw new HandAlreadyUntrackedException("OnHandLostTracking", oldHand.Id);
+        throw new HandAlreadyUntrackedException(oldHand.Id);
       }
 
       _untrackedIds.Add(oldHand.Id);
@@ -268,11 +283,11 @@ namespace Leap.Unity.Interaction {
     /// <param name="oldId"></param>
     public virtual void OnHandRegainedTracking(Hand newHand, int oldId) {
       if (!_graspingIds.Contains(oldId)) {
-        throw new HandNotGraspingException("OnHandRegainedTracking", oldId);
+        throw new HandNotGraspingException(oldId);
       }
 
       if (_graspingIds.Contains(newHand.Id)) {
-        throw new HandAlreadyGraspingException("OnHandRegainedTracking", newHand.Id);
+        throw new HandAlreadyGraspingException(newHand.Id);
       }
 
       _untrackedIds.Remove(oldId);
@@ -295,12 +310,12 @@ namespace Leap.Unity.Interaction {
     /// with the controller before interaction can be enabled.
     /// </summary>
     public void EnableInteraction() {
-      if (_controller == null) {
-        throw new InvalidOperationException("Cannot enable interaction until a controller has been set");
-      }
-
       if (_isRegisteredWithController) {
         return;
+      }
+
+      if (_controller == null) {
+        throw new NoControllerSpecifiedException();
       }
 
       _controller.RegisterInteractionBehaviour(this);
@@ -308,8 +323,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Calling this method will unregister this object from the controller.  The shape definition remains 
-    /// registered and does not need to be re-registered if interaction is enabled again.  
+    /// Calling this method will unregister this object from the controller.
     /// </summary>
     public void DisableInteraction() {
       if (!_isRegisteredWithController) {
@@ -317,7 +331,7 @@ namespace Leap.Unity.Interaction {
       }
 
       if (_controller == null) {
-        throw new InvalidOperationException("Cannot disable interaction until a controller has been set");
+        throw new NoControllerSpecifiedException();
       }
 
       _controller.UnregisterInteractionBehaviour(this);

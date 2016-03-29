@@ -155,6 +155,7 @@ namespace Leap.Unity.Interaction {
       _graspedBehaviours = new List<InteractionBehaviour>();
       _idToInteractionHand = new Dictionary<int, InteractionHand>();
       _handIdsToRemove = new List<int>();
+      _holdingHands = new List<Hand>();
     }
 
     protected virtual void OnEnable() {
