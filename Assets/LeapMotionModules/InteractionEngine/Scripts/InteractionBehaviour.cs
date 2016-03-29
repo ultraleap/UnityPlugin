@@ -319,7 +319,7 @@ namespace Leap.Unity.Interaction {
       }
 
       if (_manager == null) {
-        throw new NoControllerSpecifiedException();
+        throw new NoManagerSpecifiedException();
       }
 
       _manager.RegisterInteractionBehaviour(this);
@@ -335,7 +335,7 @@ namespace Leap.Unity.Interaction {
       }
 
       if (_manager == null) {
-        throw new NoControllerSpecifiedException();
+        throw new NoManagerSpecifiedException();
       }
 
       _manager.UnregisterInteractionBehaviour(this);
