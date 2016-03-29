@@ -174,6 +174,7 @@ namespace Leap.Unity.Interaction {
         }
       }
       _idToInteractionHand.Clear();
+      _graspedBehaviours.Clear();
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         destroyInteractionShape(_registeredBehaviours[i]);
