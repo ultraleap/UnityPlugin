@@ -58,6 +58,23 @@ namespace InteractionEngine {
     }
 
     /// <summary>
+    /// Gets or Sets whether or not interaction is enabled for this object.  Setting is 
+    /// equivilent to calling EnableInteraction() or DisableInteraction()
+    /// </summary>
+    public bool IsInteractionEnabled {
+      get {
+        return _isRegisteredWithController;
+      }
+      set {
+        if (value) {
+          EnableInteraction();
+        } else {
+          DisableInteraction();
+        }
+      }
+    }
+
+    /// <summary>
     /// Returns true if there is at least one hand grasping this object.
     /// </summary>
     public bool IsBeingGrasped {
@@ -244,23 +261,6 @@ namespace InteractionEngine {
     public virtual void OnHandTimeout(Hand oldHand) {
       _untrackedIds.Remove(oldHand.Id);
       _graspingIds.Remove(oldHand.Id);
-    }
-
-    /// <summary>
-    /// Gets or Sets whether or not interaction is enabled for this object.  Setting is 
-    /// equivilent to calling EnableInteraction() or DisableInteraction()
-    /// </summary>
-    public bool IsInteractionEnabled {
-      get {
-        return _isRegisteredWithController;
-      }
-      set {
-        if (value) {
-          EnableInteraction();
-        } else {
-          DisableInteraction();
-        }
-      }
     }
 
     /// <summary>
