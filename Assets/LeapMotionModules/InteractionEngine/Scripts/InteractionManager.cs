@@ -253,7 +253,7 @@ namespace Leap.Unity.Interaction {
                                        out classification,
                                        out instance);
 
-        InteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[instance];
+        
 
         //Get the InteractionHand associated with this hand id
         InteractionHand interactionHand;
@@ -290,6 +290,7 @@ namespace Leap.Unity.Interaction {
         switch (classification.classification) {
           case eLeapIEClassification.eLeapIEClassification_Grasp:
             {
+              InteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[instance];
               if (interactionHand.graspedObject == null) {
                 _graspedBehaviours.Add(interactionBehaviour);
                 interactionHand.GraspObject(interactionBehaviour);
@@ -299,7 +300,7 @@ namespace Leap.Unity.Interaction {
           case eLeapIEClassification.eLeapIEClassification_Physics:
             {
               if (interactionHand.graspedObject != null) {
-                _graspedBehaviours.Remove(interactionBehaviour);
+                _graspedBehaviours.Remove(interactionHand.graspedObject);
                 interactionHand.ReleaseObject();
               }
               break;

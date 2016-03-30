@@ -127,15 +127,31 @@ namespace Leap.Unity.Interaction.CApi {
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_IE_SHAPE_DESCRIPTION_HANDLE {
+  public struct LEAP_IE_SHAPE_DESCRIPTION_HANDLE : IEquatable<LEAP_IE_SHAPE_DESCRIPTION_HANDLE> {
     public UInt32 handle;
     public IntPtr pDEBUG; // LeapIEShapeDescriptionData*
+
+    public bool Equals(LEAP_IE_SHAPE_DESCRIPTION_HANDLE other) {
+      return handle == other.handle;
+    }
+
+    public override int GetHashCode() {
+      return (int)handle;
+    }
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_IE_SHAPE_INSTANCE_HANDLE {
+  public struct LEAP_IE_SHAPE_INSTANCE_HANDLE : IEquatable<LEAP_IE_SHAPE_INSTANCE_HANDLE> {
     public UInt32 handle;
     public IntPtr pDEBUG; // LeapIEShapeInstanceData*
+
+    public bool Equals(LEAP_IE_SHAPE_INSTANCE_HANDLE other) {
+      return handle == other.handle;
+    }
+
+    public override int GetHashCode() {
+      return (int)handle;
+    }
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -415,8 +431,7 @@ namespace Leap.Unity.Interaction.CApi {
       IntPtr arrayPtr;
       GetDebugLines(ref scene, out lines, out arrayPtr);
 
-      for (int i = 0; i < lines; i++)
-      {
+      for (int i = 0; i < lines; i++) {
         LEAP_IE_DEBUG_LINE line = StructMarshal<LEAP_IE_DEBUG_LINE>.ArrayElementToStruct(arrayPtr, i);
         line.Draw();
       }
