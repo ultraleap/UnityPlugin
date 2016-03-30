@@ -340,6 +340,35 @@ namespace Leap.Unity.Interaction {
     protected virtual void OnGraspEnd() { }
     #endregion
 
+    #region UNITY MESSAGES
+    protected virtual void OnValidate() {
+#if UNITY_EDITOR
+      if (GetComponentInParent<InteractionBehaviour>() != null) {
+        Debug.LogError("InteractionBehaviour cannot be a child of another InteractionBehaviour!");
+        UnityEditor.Selection.activeGameObject = gameObject;
+      }
+#endif
+    }
+
+    protected virtual void Reset() {
+      if (_manager == null) {
+        //If manager is null, first check out parents for one, then search the whole scene
+        _manager = GetComponentInParent<InteractionManager>();
+        if (_manager == null) {
+          _manager = FindObjectOfType<InteractionManager>();
+        }
+      }
+    }
+
+    protected virtual void OnEnable() {
+      EnableInteraction();
+    }
+
+    protected virtual void OnDisable() {
+      DisableInteraction();
+    }
+    #endregion
+
     #region ASSERTION MESSAGES
     private static string NoGraspingHandsMessage() {
       return "There are no hands currently grasping this InteractionBehaviour.";
