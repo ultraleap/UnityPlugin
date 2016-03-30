@@ -295,6 +295,11 @@ namespace Leap.Unity.Interaction {
     public virtual void OnHandTimeout(Hand oldHand) {
       _untrackedIds.Remove(oldHand.Id);
       _graspingIds.Remove(oldHand.Id);
+
+      //OnGraspEnd is dispatched in OnHandTimeout in addition to OnHandRelease
+      if (_graspingIds.Count == 0) {
+        OnGraspEnd();
+      }
     }
 
     /// <summary>
