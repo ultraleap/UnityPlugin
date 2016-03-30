@@ -15,19 +15,6 @@ namespace Leap.Unity.Interaction {
     protected InteractionManager _manager;
     #endregion
 
-    #region PUBLIC EVENTS
-    public event Action<Hand> OnHandGraspEvent;
-    public event Action<List<Hand>> OnHandsHoldEvent;
-    public event Action<Hand> OnHandReleaseEvent;
-
-    public event Action<Hand> OnHandLostTrackingEvent;
-    public event Action<Hand, int> OnHandRegainedTrackingEvent;
-    public event Action<int> OnHandTimeoutEvent;
-
-    public event Action OnGraspBeginEvent;
-    public event Action OnGraspEndEvent;
-    #endregion
-
     #region INTERNAL FIELDS
     private bool _isRegisteredWithManager = false;
 
@@ -225,9 +212,6 @@ namespace Leap.Unity.Interaction {
 
       _graspingIds.Add(hand.Id);
 
-      if (OnHandGraspEvent != null) {
-        OnHandGraspEvent(hand);
-      }
       if (_graspingIds.Count == 1) {
         OnGraspBegin();
       }
@@ -236,11 +220,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called by InteractionManager every frame that a Hand continues to grasp this object.
     /// </summary>
-    public virtual void OnHandsHold(List<Hand> hands) {
-      if (OnHandsHoldEvent != null) {
-        OnHandsHoldEvent(hands);
-      }
-    }
+    public virtual void OnHandsHold(List<Hand> hands) { }
 
     /// <summary>
     /// Called by InteractionManager when a Hand stops grasping this object.
@@ -351,21 +331,13 @@ namespace Leap.Unity.Interaction {
     /// Called when the the object transitions from being grasped by no hands to being
     /// grasped by at least one hand.  
     /// </summary>
-    protected virtual void OnGraspBegin() {
-      if (OnGraspBeginEvent != null) {
-        OnGraspBeginEvent();
-      }
-    }
+    protected virtual void OnGraspBegin() { }
 
     /// <summary>
     /// Called when the object transitions from being grasped by at least one hand
     /// to being grasped by no hands.
     /// </summary>
-    protected virtual void OnGraspEnd() {
-      if (OnGraspEndEvent != null) {
-        OnGraspEndEvent();
-      }
-    }
+    protected virtual void OnGraspEnd() { }
     #endregion
 
     #region ASSERTION MESSAGES
