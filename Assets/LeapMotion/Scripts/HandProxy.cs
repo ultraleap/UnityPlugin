@@ -40,7 +40,7 @@ namespace Leap.Unity {
       if (handModels != null) {
         for (int i = 0; i < handModels.Count; i++) {
           handModels[i].FinishHand();
-          parent.ModelPool.Add(handModels[i]);
+          parent.ReturnToPool(handModels[i]);
           handModels[i] = null;
         }
       }
