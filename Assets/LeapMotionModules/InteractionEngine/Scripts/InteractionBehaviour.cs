@@ -69,7 +69,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
       get {
-        if (_isRegisteredWithManager) {
+        if (!_isRegisteredWithManager) {
           throw new NotRegisteredWithManagerException();
         }
 
@@ -86,7 +86,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public LEAP_IE_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
       get {
-        if (_isRegisteredWithManager) {
+        if (!_isRegisteredWithManager) {
           throw new NotRegisteredWithManagerException();
         }
 
@@ -287,7 +287,7 @@ namespace Leap.Unity.Interaction {
     /// with the manager before interaction can be enabled.
     /// </summary>
     public void EnableInteraction() {
-      if (_isRegisteredWithManager) {
+      if (!_isRegisteredWithManager) {
         return;
       }
 
