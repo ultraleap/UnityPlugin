@@ -128,16 +128,55 @@ namespace Leap.Unity.Interaction {
     private List<Collider> _tempColliderList = new List<Collider>();
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetAuto(GameObject parentObject) {
       if (!isUniformScale(parentObject.transform)) {
-        throw new InvalidOperationException("The GameObject " + parentObject + " did not have a uniform scale!");
+        throw new InvalidOperationException("The GameObject " + parentObject + " did not have a uniform scale.");
       }
 
       parentObject.GetComponentsInChildren(_tempColliderList);
 
+      if (_tempColliderList.Count == 0) {
+        throw new InvalidOperationException("The GameObject " + parentObject + " did not have any colliders.");
+      }
+
+      //Optimization for a single collider
+      if (_tempColliderList.Count == 1) {
+        Collider collider = _tempColliderList[0];
+
+        if (collider.gameObject != parentObject) {
+          throw new NotImplementedException("Child colliders are currently not supported.");
+        }
+
+        float scale = parentObject.transform.lossyScale.x;
+
+        if (collider is SphereCollider) {
+          SphereCollider sphereCollider = collider as SphereCollider;
+
+          if (sphereCollider.center != Vector3.zero) {
+            throw new NotImplementedException("Colliders with non-zero centers are currently not supported.");
+          }
+
+          return GetSphere(sphereCollider.radius * scale);
+        } else if (collider is BoxCollider) {
+          BoxCollider boxCollider = collider as BoxCollider;
+
+          if (boxCollider.center != Vector3.zero) {
+            throw new NotImplementedException("Colliders with non-zero centers are currently not supported.");
+          }
+
+          return GetOBB(boxCollider.size * 0.5f * scale);
+        }
+
+        throw new NotImplementedException("The collider type " + collider.GetType() + " is currently not supported.");
+      }
+
+      if (_tempColliderList.Count > 1) {
+        throw new NotImplementedException("Using more than one collider for GetAuto() is currently not supported.");
+      }
+
       LEAP_IE_COMPOUND_DESCRIPTION compoundDesc = new LEAP_IE_COMPOUND_DESCRIPTION();
       compoundDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Compound;
       compoundDesc.nShapes = (uint)_tempColliderList.Count;
-      compoundDesc.pShapes = StructAllocator.AllocateArray<LEAP_IE_TRANSFORM>(_tempColliderList.Count);
-      compoundDesc.pTransforms = StructAllocator.AllocateArray<IntPtr>(_tempColliderList.Count);
+      compoundDesc.pShapes = StructAllocator.AllocateArray<IntPtr>(_tempColliderList.Count);
+      compoundDesc.pTransforms = new LEAP_IE_TRANSFORM[_tempColliderList.Count];
 
       for (int i = 0; i < _tempColliderList.Count; i++) {
         Collider collider = _tempColliderList[i];
@@ -202,7 +241,7 @@ namespace Leap.Unity.Interaction {
         ieTransform.rotation = new LEAP_QUATERNION(Quaternion.Inverse(parentObject.transform.rotation) * globalRot);
 
         StructMarshal<IntPtr>.CopyIntoArray(compoundDesc.pShapes, shapePtr, i);
-        StructMarshal<LEAP_IE_TRANSFORM>.CopyIntoArray(compoundDesc.pTransforms, ieTransform, i);
+        compoundDesc.pTransforms[i] = ieTransform;
       }
 
       LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle;
@@ -245,9 +284,9 @@ namespace Leap.Unity.Interaction {
       meshDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Convex;
       meshDesc.radius = radius;
       meshDesc.nVerticies = 2;
-      meshDesc.pVertices = StructAllocator.AllocateArray<LEAP_VECTOR>(2);
-      StructMarshal<LEAP_VECTOR>.CopyIntoArray(meshDesc.pVertices, new LEAP_VECTOR(p0), 0);
-      StructMarshal<LEAP_VECTOR>.CopyIntoArray(meshDesc.pVertices, new LEAP_VECTOR(p1), 1);
+      meshDesc.pVertices = new LEAP_VECTOR[2];
+      meshDesc.pVertices[0] = new LEAP_VECTOR(p0);
+      meshDesc.pVertices[1] = new LEAP_VECTOR(p1);
 
       IntPtr capsulePtr = StructAllocator.AllocateStruct(meshDesc);
       return capsulePtr;
@@ -258,10 +297,10 @@ namespace Leap.Unity.Interaction {
       meshDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Convex;
       meshDesc.radius = 0.0f;
       meshDesc.nVerticies = (uint)mesh.vertexCount;
-      meshDesc.pVertices = StructAllocator.AllocateArray<LEAP_VECTOR>(mesh.vertexCount);
+      meshDesc.pVertices = new LEAP_VECTOR[mesh.vertexCount];
       for (int i = 0; i < mesh.vertexCount; i++) {
         LEAP_VECTOR v = new LEAP_VECTOR(mesh.vertices[i] * scale);
-        StructMarshal<LEAP_VECTOR>.CopyIntoArray(meshDesc.pVertices, v, i);
+        meshDesc.pVertices[i] = v;
       }
 
       IntPtr meshPtr = StructAllocator.AllocateStruct(meshDesc);

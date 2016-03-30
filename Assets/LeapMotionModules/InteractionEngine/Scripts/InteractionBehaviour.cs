@@ -287,7 +287,7 @@ namespace Leap.Unity.Interaction {
     /// with the manager before interaction can be enabled.
     /// </summary>
     public void EnableInteraction() {
-      if (!_isRegisteredWithManager) {
+      if (_isRegisteredWithManager) {
         return;
       }
 
