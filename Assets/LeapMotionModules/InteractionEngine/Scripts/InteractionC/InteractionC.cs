@@ -114,7 +114,7 @@ namespace Leap.Unity.Interaction.CApi {
   public struct LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION {
     public LEAP_IE_SHAPE_DESCRIPTION shape;
     public UInt32 nVerticies;
-    public IntPtr pVertices; //LEAP_VECTOR*
+    public LEAP_VECTOR[] pVertices;
     public float radius;
   }
 
@@ -123,7 +123,7 @@ namespace Leap.Unity.Interaction.CApi {
     public LEAP_IE_SHAPE_DESCRIPTION shape;
     public UInt32 nShapes;
     public IntPtr pShapes; //LEAP_IE_SHAPE_DESCRIPTION**
-    public IntPtr pTransforms; //LEAP_IE_TRANSFORM*
+    public LEAP_IE_TRANSFORM[] pTransforms;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
