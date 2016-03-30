@@ -20,6 +20,7 @@ namespace Leap.Unity {
     *
     * Does not convert to the Unity left-handed coordinate system or scale
     * the coordinates from millimeters to meters.
+    * @returns The Unity Vector3 object with the same coordinate values as the Leap.Vector.
     */
     public static Vector3 ToVector3(this Vector vector) {
       return new Vector3(vector.x, vector.y, vector.z);
@@ -45,8 +46,7 @@ namespace Leap.Unity {
      * 
      * In previous version prior 4.0.0 this function performed a conversion to Unity's left-handed coordinate system, and now does not.
      * 
-     * @param matrix The Leap.Matrix to convert.
-     * @param mirror If true, the operation is reflected along the z axis.
+     * @returns A Unity Quaternion representing the rotation.
      */
     public static Quaternion Rotation(this Matrix matrix) {
       Vector3 up = matrix.yBasis.ToVector3();
@@ -55,10 +55,17 @@ namespace Leap.Unity {
     }
 
     /**
-     * Provides the translation matrix to convert Leap transform data to the Unity space of a specific Unity Transform.
-     * @param t The Unity Transform to which the Leap transformation data is translated
+     * Extracts a transform matrix containing translation, rotation, and scale from a Unity Transform object and 
+     * returns a Leap Motion Matrix object.
+     * Use this matrix to transform Leap Motion tracking data to the Unity world relative to the
+     * specified transform.
+     *
+     * In addition to applying the translation, rotation, and scale from the Transform object, the returned 
+     * transformation changes the coordinate system from right- to left-handed and converts units from millimeters to meters
+     * by scaling.
+     * @returns A Leap.Matrix object representing the specified transform from Leap Motion into Unity space.
      */
-    public static Matrix GetLeapMatrix(Transform t) {
+    public static Matrix GetLeapMatrix(this Transform t) {
       Vector xbasis = new Vector(t.right.x, t.right.y, t.right.z) * t.lossyScale.x * MM_TO_M;
       Vector ybasis = new Vector(t.up.x, t.up.y, t.up.z) * t.lossyScale.y * MM_TO_M;
       Vector zbasis = new Vector(t.forward.x, t.forward.y, t.forward.z) * -t.lossyScale.z * MM_TO_M;
