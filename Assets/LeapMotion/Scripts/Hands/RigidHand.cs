@@ -7,6 +7,9 @@
 using UnityEngine;
 using System.Collections;
 using Leap;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Leap.Unity {
   /** A physics model for our rigid hand made out of various Unity Collider. */
@@ -63,6 +66,19 @@ namespace Leap.Unity {
           forearm.rotation = GetArmRotation();
         }
       }
+
+        #if UNITY_EDITOR
+        if (!EditorApplication.isPlaying) {
+          if (palm != null) {
+            palm.position = GetPalmCenter();
+            palm.rotation = GetPalmRotation();
+          }
+          if (forearm != null) {
+            forearm.position = GetArmCenter();
+            forearm.rotation = GetArmRotation();
+          }
+        }
+        #endif
     }
   }
 }

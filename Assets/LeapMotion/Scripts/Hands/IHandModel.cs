@@ -22,7 +22,6 @@ namespace Leap.Unity{
     public abstract Chirality Handedness { get; }
     public abstract ModelType HandModelType { get; }
     public virtual void InitHand(){
-      //Debug.Log("IHandModel.InitHand()");
     }
   
     public virtual void BeginHand() {
@@ -43,15 +42,14 @@ namespace Leap.Unity{
   #if UNITY_EDITOR
     void Awake() {
       if (!EditorApplication.isPlaying) {
-        //Debug.Log("IHandModel.Awake()");
-        SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(transform)));
+        SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(transform.GetLeapMatrix()));
         InitHand();
       }
     }
     void Update() {
       if (!EditorApplication.isPlaying) {
-        //Debug.Log("IHandModel.Update()");
-        SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(transform)));
+
+        SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(transform.GetLeapMatrix()));
         UpdateHand();
       }
     }
