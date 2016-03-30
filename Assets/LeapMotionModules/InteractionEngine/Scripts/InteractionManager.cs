@@ -115,7 +115,7 @@ namespace Leap.Unity.Interaction {
       _registeredBehaviours.Add(interactionBehaviour);
 
       //Don't create right away if we are not enabled, creation will be done in OnEnable
-      if (enabled) {
+      if (isActiveAndEnabled) {
         createInteractionShape(interactionBehaviour);
       }
     }
@@ -129,7 +129,7 @@ namespace Leap.Unity.Interaction {
       _registeredBehaviours.Remove(interactionBehaviour);
 
       //Don't destroy if we are not enabled, everything already got destroyed in OnDisable
-      if (enabled) {
+      if (isActiveAndEnabled) {
         destroyInteractionShape(interactionBehaviour);
       }
     }
