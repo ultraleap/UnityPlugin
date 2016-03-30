@@ -56,21 +56,12 @@ namespace Leap.Unity{
     // Leap references
     /** The Leap Hand object this hand model represents. */
     protected Hand hand_;
-    /** The parent HandController object for this hand. */
-    protected LeapHandController controller_;
   
     /** Calculates the position of the palm in global coordinates.
     * @returns A Vector3 containing the Unity coordinates of the palm position.
     */
     public Vector3 GetPalmPosition() {
-      //if (hand_ != null) {
-        return hand_.PalmPosition.ToVector3();
-  
-      //}
-      //if (palm) {
-      //  return palm.position;
-      //}
-      //return Vector3.zero;
+      return hand_.PalmPosition.ToVector3();
     }
   
     /** Calculates the rotation of the hand in global coordinates.
