@@ -366,8 +366,8 @@ namespace Leap.Unity.Interaction {
     }
 
     private void checkForParentBehaviour() {
-      if (GetComponentInParent<InteractionBehaviour>() != null) {
-        Debug.LogError("InteractionBehaviour cannot be a child of another InteractionBehaviour!");
+      if (GetComponentsInParent<InteractionBehaviour>().Length > 1) {
+        Debug.LogError("InteractionBehaviour cannot be a child OR sibling of another InteractionBehaviour!");
 #if UNITY_EDITOR
         UnityEditor.Selection.activeGameObject = gameObject;
 #endif
