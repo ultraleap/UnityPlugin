@@ -295,8 +295,8 @@ namespace Leap.Unity.Interaction {
         throw new NoManagerSpecifiedException();
       }
 
-      _manager.RegisterInteractionBehaviour(this);
       _isRegisteredWithManager = true;
+      _manager.RegisterInteractionBehaviour(this);
     }
 
     /// <summary>
