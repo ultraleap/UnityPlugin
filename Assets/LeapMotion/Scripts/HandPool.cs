@@ -79,7 +79,7 @@ namespace Leap.Unity {
             group.modelList.RemoveAt(i);
             --i;
             models.Add(model);
-            //break;
+            break;
           }
         }
       }
