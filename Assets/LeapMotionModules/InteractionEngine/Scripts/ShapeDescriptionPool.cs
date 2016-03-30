@@ -128,10 +128,49 @@ namespace Leap.Unity.Interaction {
     private List<Collider> _tempColliderList = new List<Collider>();
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetAuto(GameObject parentObject) {
       if (!isUniformScale(parentObject.transform)) {
-        throw new InvalidOperationException("The GameObject " + parentObject + " did not have a uniform scale!");
+        throw new InvalidOperationException("The GameObject " + parentObject + " did not have a uniform scale.");
       }
 
       parentObject.GetComponentsInChildren(_tempColliderList);
+
+      if (_tempColliderList.Count == 0) {
+        throw new InvalidOperationException("The GameObject " + parentObject + " did not have any colliders.");
+      }
+
+      //Optimization for a single collider
+      if (_tempColliderList.Count == 1) {
+        Collider collider = _tempColliderList[0];
+
+        if (collider.gameObject != parentObject) {
+          throw new NotImplementedException("Child colliders are currently not supported.");
+        }
+
+        float scale = parentObject.transform.lossyScale.x;
+
+        if (collider is SphereCollider) {
+          SphereCollider sphereCollider = collider as SphereCollider;
+
+          if (sphereCollider.center != Vector3.zero) {
+            throw new NotImplementedException("Colliders with non-zero centers are currently not supported.");
+          }
+
+          return GetSphere(sphereCollider.radius * scale);
+        } else if (collider is BoxCollider) {
+          BoxCollider boxCollider = collider as BoxCollider;
+
+          if (boxCollider.center != Vector3.zero) {
+            throw new NotImplementedException("Colliders with non-zero centers are currently not supported.");
+          }
+
+          return GetOBB(boxCollider.size * 0.5f * scale);
+        }
+
+        throw new NotImplementedException("The collider type " + collider.GetType() + " is currently not supported.");
+      }
+
+      if (_tempColliderList.Count > 1) {
+        throw new NotImplementedException("Using more than one collider for GetAuto() is currently not supported.");
+      }
 
       LEAP_IE_COMPOUND_DESCRIPTION compoundDesc = new LEAP_IE_COMPOUND_DESCRIPTION();
       compoundDesc.shape.type = eLeapIEShapeType.eLeapIEShape_Compound;
