@@ -82,11 +82,9 @@ namespace Leap.Unity{
         Vector3 local_tip = finger_.Bone ((Bone.BoneType.TYPE_DISTAL)).NextJoint.ToVector3();
         return local_tip;
       }
-
       if (bones [NUM_BONES - 1] && joints [NUM_JOINTS - 2]) {
         return 2f*bones [NUM_BONES - 1].position - joints [NUM_JOINTS - 2].position;
       }
-
       return Vector3.zero;
     }
   
@@ -95,16 +93,13 @@ namespace Leap.Unity{
       if (joint >= NUM_BONES) {
         return GetTipPosition ();
       }
-
       if (finger_ != null) {
         Vector3 local_position = finger_.Bone((Bone.BoneType)(joint)).PrevJoint.ToVector3();
         return local_position;
       }
-
       if (joints [joint]) {
         return joints[joint].position;
       }
-
       return Vector3.zero;
     }
   
@@ -120,11 +115,9 @@ namespace Leap.Unity{
         Bone bone = finger_.Bone ((Bone.BoneType)(bone_type));
         return bone.Center.ToVector3();
       }
-
       if (bones [bone_type]) {
         return bones[bone_type].position;
       }
-
       return Vector3.zero;
     }
   
@@ -134,11 +127,9 @@ namespace Leap.Unity{
         Vector3 direction = GetJointPosition (bone_type + 1) - GetJointPosition (bone_type);
         return direction.normalized;
       }
-
       if (bones[bone_type]) {
         return bones[bone_type].forward;
       }
-
       return Vector3.forward;
     }
   
@@ -148,11 +139,9 @@ namespace Leap.Unity{
         Quaternion local_rotation = finger_.Bone ((Bone.BoneType)(bone_type)).Basis.Rotation ();
         return local_rotation;
       }
-
       if (bones[bone_type]) {
         return bones[bone_type].rotation;
       }
-
       return Quaternion.identity;
     }
     
