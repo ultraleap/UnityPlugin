@@ -57,25 +57,7 @@ namespace Leap.Unity{
     /** The Leap Hand object this hand model represents. */
     protected Hand hand_;
     /** The parent HandController object for this hand. */
-    //protected HandController controller_;
     protected LeapHandController controller_;
-  
-    /** 
-    * Calculates the offset between the wrist position and the controller based
-    * on the HandController.handMovementScale property and the Leap hand wrist position.
-    */
-    //TODO: Remove this
-    public Vector3 GetHandOffset() {
-      if (controller_ == null || hand_ == null)
-        return Vector3.zero;
-  
-      Vector3 additional_movement = controller_.handMovementScale - Vector3.one;
-  
-      Vector3 scaled_wrist_position = Vector3.Scale(additional_movement, hand_.WristPosition.ToVector3());
-  
-      return controller_.transform.TransformPoint(scaled_wrist_position) -
-             controller_.transform.position;
-    }
   
     /** Calculates the position of the palm in global coordinates.
     * @returns A Vector3 containing the Unity coordinates of the palm position.
@@ -229,28 +211,7 @@ namespace Leap.Unity{
       for (int i = 0; i < fingers.Length; ++i) {
         if (fingers[i] != null) {
           fingers[i].SetLeapHand(hand_);
-          fingers[i].SetOffset(GetHandOffset());
         }
-      }
-    }
-  
-  
-  
-  
-    //Todo Kill these
-    /** The parent HandController object of this hand.*/
-    //public HandController GetController() {
-    public LeapHandController GetController() {
-      return controller_;
-    }
-   
-    /** Sets the parent HandController object. */
-    public void SetController(LeapHandController controller) {
-      controller_ = controller;
-      Debug.Log("SetController:" + controller_);
-      for (int i = 0; i < fingers.Length; ++i) {
-        if (fingers[i] != null)
-          fingers[i].SetController(controller_);
       }
     }
   

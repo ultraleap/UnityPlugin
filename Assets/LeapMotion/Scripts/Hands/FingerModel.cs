@@ -41,23 +41,6 @@ namespace Leap.Unity{
     protected Hand hand_;
     /** The Leap Finger object. */
     protected Finger finger_;
-    /** An added offset vector. */
-    protected Vector3 offset_ = Vector3.zero;
-    /** Whether this finger is mirrored. */
-    protected bool mirror_z_axis_ = false;
-  
-    /** The parent HandController instance. */
-    protected LeapHandController controller_;
-  
-    /** Assigns the HandController parent for this FingerModel object. */
-    public void SetController(LeapHandController controller) {
-      controller_ = controller;
-    }
-  
-    /** The parent HandController instance. */
-    public LeapHandController GetController() {
-      return controller_;
-    }
   
     /** Sets the Leap Hand and Leap Finger for this finger.
     * Note that Leap Hand and Finger objects are recreated every frame. The
@@ -68,24 +51,6 @@ namespace Leap.Unity{
       hand_ = hand;
       if (hand_ != null)
         finger_ = hand.Fingers[(int)fingerType];
-    }
-  
-    /** Sets an offset vector to displace the finger from its normally calculated
-    * position relative to the HandController. Typically, this offset is used to
-    * give the virtual hands a larger range of motion then they would have based on their 
-    * scaled size in the Unity scene.
-    */
-    public void SetOffset(Vector3 offset) {
-      offset_ = offset;
-    }
-  
-    /** 
-    * Sets the mirror z-axis flag for this Finger Model.
-    * Mirroring the z axis reverses the hand so that they face the opposite direction -- as if in a mirror.
-    * @param mirror Set true, the default value to mirror; false for normal rendering. 
-    */
-    public void MirrorZAxis(bool mirror = true) {
-      mirror_z_axis_ = mirror;
     }
   
     /** The Leap Hand object. */
@@ -109,11 +74,6 @@ namespace Leap.Unity{
     * models.
     */
     public abstract void UpdateFinger();
-  
-    /** Returns any additional movement the finger needs because of non-relative palm movement.*/
-    public Vector3 GetOffset() {
-      return offset_;
-    }
   
     /** Returns the location of the tip of the finger */
     public Vector3 GetTipPosition() {
