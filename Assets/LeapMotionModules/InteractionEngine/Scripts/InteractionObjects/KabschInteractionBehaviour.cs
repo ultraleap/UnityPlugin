@@ -180,6 +180,8 @@ namespace Leap.Unity.Interaction {
 
     #region CLASSES
     protected class HandPointCollection {
+      //Without a pool, you might end up with 2 instances per object
+      //With a pool, likely there will only ever be 2 instances!
       private static Stack<HandPointCollection> _handPointCollectionPool = new Stack<HandPointCollection>();
 
       private Rigidbody _rigidbody;
