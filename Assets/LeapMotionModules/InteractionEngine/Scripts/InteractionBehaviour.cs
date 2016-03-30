@@ -78,7 +78,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Gets the shape description handle 
+    /// Gets the handle to the internal shape description.
     /// </summary>
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
       get {
@@ -94,6 +94,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Gets the handle to the internal shape instance.
+    /// </summary>
     public LEAP_IE_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
       get {
         if (_isRegisteredWithManager) {
@@ -104,6 +107,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Gets the internal representation of the transform of the object.
+    /// </summary>
     public LEAP_IE_TRANSFORM InteractionTransform {
       get {
         LEAP_IE_TRANSFORM interactionTransform = new LEAP_IE_TRANSFORM();
@@ -326,16 +332,30 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region PROTECTED METHODS
+    /// <summary>
+    /// This method is called to generate the internal description of the interaction shape.
+    /// The default implementation uses the GetAuto() method of the ShapeDescriptionPool class, which 
+    /// accounts for all colliders on this gameObject and its children.
+    /// </summary>
+    /// <returns></returns>
     protected virtual LEAP_IE_SHAPE_DESCRIPTION_HANDLE GenerateShapeDescriptionHandle() {
       return _manager.ShapePool.GetAuto(gameObject);
     }
 
+    /// <summary>
+    /// Called when the the object transitions from being grasped by no hands to being
+    /// grasped by at least one hand.  
+    /// </summary>
     protected virtual void OnGraspBegin() {
       if (OnGraspBeginEvent != null) {
         OnGraspBeginEvent();
       }
     }
 
+    /// <summary>
+    /// Called when the object transitions from being grasped by at least one hand
+    /// to being grasped by no hands.
+    /// </summary>
     protected virtual void OnGraspEnd() {
       if (OnGraspEndEvent != null) {
         OnGraspEndEvent();
