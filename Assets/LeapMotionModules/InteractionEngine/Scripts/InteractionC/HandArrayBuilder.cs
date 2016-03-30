@@ -1,9 +1,7 @@
-﻿using UnityEngine;
-using System;
-using Leap;
+﻿using System;
 using LeapInternal;
 
-namespace InteractionEngine.CApi {
+namespace Leap.Unity.Interaction.CApi {
 
   public static class HandArrayBuilder {
 
@@ -63,10 +61,10 @@ namespace InteractionEngine.CApi {
     public static LEAP_DIGIT CreateDigit(Finger finger) {
       LEAP_DIGIT digit = new LEAP_DIGIT();
       digit.finger_id = finger.Id;
-      digit.metacarpal = CreateBone(finger.Bone(Leap.Bone.BoneType.TYPE_METACARPAL));
-      digit.proximal = CreateBone(finger.Bone(Leap.Bone.BoneType.TYPE_PROXIMAL));
-      digit.intermediate = CreateBone(finger.Bone(Leap.Bone.BoneType.TYPE_INTERMEDIATE));
-      digit.distal = CreateBone(finger.Bone(Leap.Bone.BoneType.TYPE_DISTAL));
+      digit.metacarpal = CreateBone(finger.Bone(Bone.BoneType.TYPE_METACARPAL));
+      digit.proximal = CreateBone(finger.Bone(Bone.BoneType.TYPE_PROXIMAL));
+      digit.intermediate = CreateBone(finger.Bone(Bone.BoneType.TYPE_INTERMEDIATE));
+      digit.distal = CreateBone(finger.Bone(Bone.BoneType.TYPE_DISTAL));
       digit.tip_velocity = new LEAP_VECTOR(finger.TipVelocity);
       digit.stabilized_tip_position = new LEAP_VECTOR(finger.StabilizedTipPosition);
       digit.is_extended = finger.IsExtended ? 1 : 0;
