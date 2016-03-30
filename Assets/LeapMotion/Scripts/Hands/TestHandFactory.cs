@@ -52,14 +52,15 @@ using System.Runtime.InteropServices;
                 Vector.Forward,
                 new Vector(-4.36385750984f, 6.5f, 31.0111342526f)
             );
+
+            //Sets the default position of the hands in the editor
+            Matrix defaultTransform = new Matrix(Vector.Up, 180 * Leap.Constants.DEG_TO_RAD);
             if(isLeft){
-                return testHand;
+              defaultTransform *= new Matrix(Vector.Left, Vector.Up, Vector.Forward, new Vector(90f, 360f, 240f));
             } else {
-                Matrix leftToRight = Matrix.Identity;
-                leftToRight.xBasis = new Vector(-1, 0, 0); 
-                Hand rightHand = testHand.TransformedCopy(leftToRight);
-              return rightHand;
+              defaultTransform *= new Matrix(Vector.Right, Vector.Up, Vector.Forward, new Vector(-90f, 360f, 240f));
             }
+            return testHand.TransformedCopy(defaultTransform);
         }
          static Finger MakeThumb(int frameId, int handId, bool isLeft){
             //Thumb
