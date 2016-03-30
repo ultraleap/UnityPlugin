@@ -342,12 +342,7 @@ namespace Leap.Unity.Interaction {
 
     #region UNITY MESSAGES
     protected virtual void OnValidate() {
-#if UNITY_EDITOR
-      if (GetComponentInParent<InteractionBehaviour>() != null) {
-        Debug.LogError("InteractionBehaviour cannot be a child of another InteractionBehaviour!");
-        UnityEditor.Selection.activeGameObject = gameObject;
-      }
-#endif
+      checkForParentBehaviour();
     }
 
     protected virtual void Reset() {
@@ -358,6 +353,8 @@ namespace Leap.Unity.Interaction {
           _manager = FindObjectOfType<InteractionManager>();
         }
       }
+
+      checkForParentBehaviour();
     }
 
     protected virtual void OnEnable() {
@@ -367,6 +364,16 @@ namespace Leap.Unity.Interaction {
     protected virtual void OnDisable() {
       DisableInteraction();
     }
+
+    private void checkForParentBehaviour() {
+      if (GetComponentInParent<InteractionBehaviour>() != null) {
+        Debug.LogError("InteractionBehaviour cannot be a child of another InteractionBehaviour!");
+#if UNITY_EDITOR
+        UnityEditor.Selection.activeGameObject = gameObject;
+#endif
+      }
+    }
+
     #endregion
 
     #region ASSERTION MESSAGES
