@@ -199,14 +199,6 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Called by InteractionManager when this object is pushed.  The arguments are the proposed
-    /// linear and angular velocities to be applied to the object.
-    /// </summary>
-    /// <param name="linearVelocity"></param>
-    /// <param name="angularVelocity"></param>
-    public virtual void OnPush(Vector3 linearVelocity, Vector3 angularVelocity) { }
-
-    /// <summary>
     /// Called by InteractionManager when a Hand begins grasping this object.
     /// </summary>
     /// <param name="handId"></param>
@@ -290,6 +282,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public virtual void OnVelocityChanged(UnityEngine.Vector3 linearVelocity, UnityEngine.Vector3 angularVelocity)
     {
+      if (!_rigidbody)
+        return;
+
       if(_rigidbody.useGravity)
         throw new InvalidOperationException("Cannot modify velocity of object correctly because it has a force applied (gravity.)");
 
