@@ -22,13 +22,16 @@ namespace Leap.Unity.Interaction {
     private LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeDescriptionHandle;
     private LEAP_IE_SHAPE_INSTANCE_HANDLE _shapeInstanceHandle;
 
+    protected Rigidbody _rigidbody;
+    bool _rigidbodyHadUseGravity = false;
+
     private List<int> _graspingIds = new List<int>();
     private List<int> _untrackedIds = new List<int>();
     #endregion
 
     #region PUBLIC METHODS
     /// <summary>
-    /// Gets or sets the manager this object belongs to.  
+    /// Gets or sets the manager this object belongs to.
     /// </summary>
     public InteractionManager Manager {
       get {
@@ -48,7 +51,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Gets or Sets whether or not interaction is enabled for this object.  Setting is 
+    /// Gets or Sets whether or not interaction is enabled for this object.  Setting is
     /// equivilent to calling EnableInteraction() or DisableInteraction()
     /// </summary>
     public bool IsInteractionEnabled {
@@ -197,7 +200,7 @@ namespace Leap.Unity.Interaction {
 
     /// <summary>
     /// Called by InteractionManager when this object is pushed.  The arguments are the proposed
-    /// linear and angular velocities to be applied to the object. 
+    /// linear and angular velocities to be applied to the object.
     /// </summary>
     /// <param name="linearVelocity"></param>
     /// <param name="angularVelocity"></param>
@@ -268,7 +271,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Called by InteractionManager when a untracked grasping Hand has remained ungrasped for
+    /// Called by InteractionManager when an untracked grasping Hand has remained ungrasped for
     /// too long.  The hand is no longer considered to be grasping the object.
     /// </summary>
     /// <param name="oldId"></param>
@@ -280,6 +283,21 @@ namespace Leap.Unity.Interaction {
       if (_graspingIds.Count == 0) {
         OnGraspEnd();
       }
+    }
+
+    /// <summary>
+    /// Called by InteractionController when the velocity of an object is changed.
+    /// </summary>
+    public virtual void OnVelocityChanged(UnityEngine.Vector3 linearVelocity, UnityEngine.Vector3 angularVelocity)
+    {
+      if(_rigidbody.useGravity)
+        throw new InvalidOperationException("Cannot modify velocity of object correctly because it has a force applied (gravity.)");
+
+      // Clear applied forces.  They were not accounted for when the velocities were calculated.
+      _rigidbody.Sleep();
+
+      _rigidbody.velocity = linearVelocity;
+      _rigidbody.angularVelocity = angularVelocity;
     }
 
     /// <summary>
@@ -297,6 +315,13 @@ namespace Leap.Unity.Interaction {
 
       _isRegisteredWithManager = true;
       _manager.RegisterInteractionBehaviour(this);
+
+      _rigidbody = GetComponent<Rigidbody>();
+      if (_rigidbody)
+      {
+        _rigidbodyHadUseGravity = _rigidbody.useGravity;
+        _rigidbody.useGravity = false;
+      }
     }
 
     /// <summary>
@@ -313,13 +338,19 @@ namespace Leap.Unity.Interaction {
 
       _manager.UnregisterInteractionBehaviour(this);
       _isRegisteredWithManager = false;
+
+      if (_rigidbody)
+      {
+        _rigidbody.useGravity = _rigidbodyHadUseGravity;
+        _rigidbody = null;
+      }
     }
     #endregion
 
     #region PROTECTED METHODS
     /// <summary>
     /// This method is called to generate the internal description of the interaction shape.
-    /// The default implementation uses the GetAuto() method of the ShapeDescriptionPool class, which 
+    /// The default implementation uses the GetAuto() method of the ShapeDescriptionPool class, which
     /// accounts for all colliders on this gameObject and its children.
     /// </summary>
     /// <returns></returns>
@@ -329,7 +360,7 @@ namespace Leap.Unity.Interaction {
 
     /// <summary>
     /// Called when the the object transitions from being grasped by no hands to being
-    /// grasped by at least one hand.  
+    /// grasped by at least one hand.
     /// </summary>
     protected virtual void OnGraspBegin() { }
 
