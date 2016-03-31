@@ -70,8 +70,6 @@ namespace Leap.Unity {
       bool isFirst = true;
 
       while (iterator.NextVisible(isFirst)) {
-        isFirst = false;
-
         string conditionalPropertyName;
         if (_conditionalProperties.TryGetValue(iterator.name, out conditionalPropertyName)) {
           SerializedProperty conditionalProperty = serializedObject.FindProperty(conditionalPropertyName);
@@ -92,8 +90,12 @@ namespace Leap.Unity {
         if (_specifiedDrawers.TryGetValue(iterator.name, out customDrawer)) {
           customDrawer(iterator);
         } else {
-          EditorGUILayout.PropertyField(iterator, true);
+          using (new EditorGUI.DisabledGroupScope(isFirst)) {
+            EditorGUILayout.PropertyField(iterator, true);
+          }
         }
+
+        isFirst = false;
       }
 
       serializedObject.ApplyModifiedProperties();
