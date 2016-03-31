@@ -19,6 +19,8 @@ namespace Leap.Unity {
     private LeapHandController controller;
 
     protected override void OnEnable() {
+      base.OnEnable();
+
       controller = target as LeapHandController;
     }
 
