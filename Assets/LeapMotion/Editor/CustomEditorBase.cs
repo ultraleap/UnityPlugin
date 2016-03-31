@@ -8,9 +8,11 @@ public class CustomEditorBase : Editor {
   protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedDecorators;
   protected Dictionary<string, string> _conditionalProperties;
 
-  /**
-   * Specify a callback to be used to draw a specific named property.  Should be called in OnEnable
-   */
+  /// <summary>
+  /// Specify a callback to be used to draw a specific named property.  Should be called in OnEnable.
+  /// </summary>
+  /// <param name="propertyName"></param>
+  /// <param name="propertyDrawer"></param>
   protected void specifyCustomDrawer(string propertyName, Action<SerializedProperty> propertyDrawer) {
     if (serializedObject.FindProperty(propertyName) != null) {
       _specifiedDrawers[propertyName] = propertyDrawer;
@@ -19,6 +21,11 @@ public class CustomEditorBase : Editor {
     }
   }
 
+  /// <summary>
+  /// Specify a callback to be used to draw a decorator for a specific named property.  Should be called in OnEnable.
+  /// </summary>
+  /// <param name="propertyName"></param>
+  /// <param name="decoratorDrawer"></param>
   protected void specifyCustomDecorator(string propertyName, Action<SerializedProperty> decoratorDrawer) {
     if (serializedObject.FindProperty(propertyName) != null) {
 
@@ -34,6 +41,12 @@ public class CustomEditorBase : Editor {
     }
   }
 
+  /// <summary>
+  /// Specify a list of properties that should only be displayed if the conditional property has a value of true.
+  /// Should be called in OnEnable.
+  /// </summary>
+  /// <param name="conditionalName"></param>
+  /// <param name="dependantProperties"></param>
   protected void specifyConditionalDrawing(string conditionalName, params string[] dependantProperties) {
     for (int i = 0; i < dependantProperties.Length; i++) {
       _conditionalProperties[dependantProperties[i]] = conditionalName;
