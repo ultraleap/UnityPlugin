@@ -165,7 +165,6 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region UNITY CALLBACKS
-
     protected override void Reset() {
       base.Reset();
       _renderers = GetComponentsInChildren<Renderer>();
@@ -176,12 +175,7 @@ namespace Leap.Unity.Interaction {
     }
     #endregion
 
-    protected void removeHandPointCollection(int handId) {
-      var collection = _handIdToPoints[handId];
-      _handIdToPoints.Remove(handId);
-      HandPointCollection.Return(collection);
-    }
-
+    #region INTERNAL
     protected void updateRendererStatus() {
       //Renderers are visible if there are no grasping hands
       //or if there is at least one tracked grasping hand
@@ -196,7 +190,11 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    #region INTERNAL
+    protected void removeHandPointCollection(int handId) {
+      var collection = _handIdToPoints[handId];
+      _handIdToPoints.Remove(handId);
+      HandPointCollection.Return(collection);
+    }
 
     protected void getSolvedTransform(List<Hand> hands, out Vector3 translation, out Quaternion rotation) {
       KabschC.Reset(ref _kabsch);
