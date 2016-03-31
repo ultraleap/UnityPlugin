@@ -129,7 +129,6 @@ namespace Leap.Unity.Interaction.CApi {
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_SHAPE_DESCRIPTION_HANDLE : IEquatable<LEAP_IE_SHAPE_DESCRIPTION_HANDLE> {
     public UInt32 handle;
-    public IntPtr pDEBUG; // LeapIEShapeDescriptionData*
 
     public bool Equals(LEAP_IE_SHAPE_DESCRIPTION_HANDLE other) {
       return handle == other.handle;
@@ -143,7 +142,6 @@ namespace Leap.Unity.Interaction.CApi {
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_SHAPE_INSTANCE_HANDLE : IEquatable<LEAP_IE_SHAPE_INSTANCE_HANDLE> {
     public UInt32 handle;
-    public IntPtr pDEBUG; // LeapIEShapeInstanceData*
 
     public bool Equals(LEAP_IE_SHAPE_INSTANCE_HANDLE other) {
       return handle == other.handle;
@@ -174,6 +172,14 @@ namespace Leap.Unity.Interaction.CApi {
                                  duration,
                                  depthTest != 0);
     }
+  }
+
+  [StructLayout(LayoutKind.Sequential, Pack = 1)]
+  public struct LEAP_IE_VELOCITY
+  {
+    public LEAP_IE_SHAPE_INSTANCE_HANDLE handle;
+    public LEAP_VECTOR linearVelocity;
+    public LEAP_VECTOR angularVelocity;
   }
 
   public enum LogLevel {
@@ -395,6 +401,34 @@ namespace Leap.Unity.Interaction.CApi {
       Logger.Log("Get Classification", LogLevel.AllCalls);
       var rs = LeapIEGetClassification(ref scene, handId, out classification, out instance);
       Logger.HandleReturnStatus(rs);
+      return rs;
+    }
+
+    /*** Get Velocities ***/
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetVelocities")]
+    private static extern eLeapIERS LeapIEGetVelocities(ref LEAP_IE_SCENE scene,
+                                                        out UInt32 nVelocities,
+                                                        out IntPtr ppVelocitiesBuffer);
+
+    public static eLeapIERS GetVelocities(ref LEAP_IE_SCENE scene, out LEAP_IE_VELOCITY[] velocities)
+    {
+      Logger.Log("Get Velocities", LogLevel.AllCalls);
+
+      UInt32 nVelocities;
+      IntPtr ppVelocitiesBuffer;
+      var rs = LeapIEGetVelocities(ref scene, out nVelocities, out ppVelocitiesBuffer);
+      Logger.HandleReturnStatus(rs);
+      if (rs != eLeapIERS.eLeapIERS_Success || nVelocities == 0)
+      {
+        velocities = null;
+        return rs;
+      }
+
+      velocities = new LEAP_IE_VELOCITY[nVelocities];
+      for (int i = 0; i < nVelocities; i++)
+      {
+        velocities[i] = StructMarshal<LEAP_IE_VELOCITY>.ArrayElementToStruct(ppVelocitiesBuffer, i);
+      }
       return rs;
     }
 

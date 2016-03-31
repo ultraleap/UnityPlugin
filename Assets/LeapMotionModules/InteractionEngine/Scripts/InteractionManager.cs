@@ -20,6 +20,10 @@ namespace Leap.Unity.Interaction {
     [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
     [SerializeField]
     protected bool _showDebugLines = true;
+
+    [Tooltip("Allow the Interaction plugin to modify object velocities when pushing.")]
+    [SerializeField]
+    protected bool _modifyVelocities = true;
     #endregion
 
     #region INTERNAL FIELDS
@@ -106,7 +110,7 @@ namespace Leap.Unity.Interaction {
 
     /// <summary>
     /// Registers an InteractionObject with this manager, which automatically adds the objects
-    /// representation into the internal interaction scene.  If the manager is disabled, 
+    /// representation into the internal interaction scene.  If the manager is disabled,
     /// the registration will still succeed and the object will be added to the internal scene
     /// when the manager is next enabled.
     /// </summary>
@@ -208,6 +212,10 @@ namespace Leap.Unity.Interaction {
       simulateInteraction();
 
       updateInteractionStateChanges();
+
+      // TODO: Pass a debug flag to disable calculating velocities.
+      if(_modifyVelocities)
+        setObjectVelocities();
     }
 
     protected virtual void applyDebugSettings() {
@@ -253,7 +261,7 @@ namespace Leap.Unity.Interaction {
                                        out classification,
                                        out instance);
 
-        
+
 
         //Get the InteractionHand associated with this hand id
         InteractionHand interactionHand;
@@ -359,6 +367,21 @@ namespace Leap.Unity.Interaction {
 
         interactionBehaviour.OnHandsHold(_holdingHands);
         _holdingHands.Clear();
+      }
+    }
+
+    protected virtual void setObjectVelocities()
+    {
+      LEAP_IE_VELOCITY[] velocities;
+      InteractionC.GetVelocities(ref _scene, out velocities);
+
+      if (velocities == null)
+        return;
+
+      for (int i = 0; i < velocities.Length; ++i)
+      {
+        LEAP_IE_VELOCITY vel = velocities[i];
+        _instanceHandleToBehaviour[vel.handle].OnVelocityChanged(vel.linearVelocity.ToUnityVector(), vel.angularVelocity.ToUnityVector());
       }
     }
 
