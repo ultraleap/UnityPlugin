@@ -22,9 +22,6 @@ namespace Leap.Unity.Interaction {
     private LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeDescriptionHandle;
     private LEAP_IE_SHAPE_INSTANCE_HANDLE _shapeInstanceHandle;
 
-    protected Rigidbody _rigidbody;
-    bool _rigidbodyHadUseGravity = false;
-
     private List<int> _graspingIds = new List<int>();
     private List<int> _untrackedIds = new List<int>();
     #endregion
@@ -100,13 +97,8 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Gets the internal representation of the transform of the object.
     /// </summary>
-    public LEAP_IE_TRANSFORM InteractionTransform {
-      get {
-        LEAP_IE_TRANSFORM interactionTransform = new LEAP_IE_TRANSFORM();
-        interactionTransform.position = new LEAP_VECTOR(transform.position);
-        interactionTransform.rotation = new LEAP_QUATERNION(transform.rotation);
-        return interactionTransform;
-      }
+    public abstract LEAP_IE_TRANSFORM InteractionTransform {
+      get;
     }
 
     /// <summary>
@@ -280,26 +272,13 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called by InteractionController when the velocity of an object is changed.
     /// </summary>
-    public virtual void OnVelocityChanged(UnityEngine.Vector3 linearVelocity, UnityEngine.Vector3 angularVelocity)
-    {
-      if (!_rigidbody)
-        return;
-
-      if(_rigidbody.useGravity)
-        throw new InvalidOperationException("Cannot modify velocity of object correctly because it has a force applied (gravity.)");
-
-      // Clear applied forces.  They were not accounted for when the velocities were calculated.
-      _rigidbody.Sleep();
-
-      _rigidbody.velocity = linearVelocity;
-      _rigidbody.angularVelocity = angularVelocity;
-    }
+    public virtual void OnVelocityChanged(Vector3 linearVelocity, Vector3 angularVelocity) { }
 
     /// <summary>
     /// Calling this method registers this object with the manager.  A shape definition must be registered
     /// with the manager before interaction can be enabled.
     /// </summary>
-    public void EnableInteraction() {
+    public virtual void EnableInteraction() {
       if (_isRegisteredWithManager) {
         return;
       }
@@ -310,19 +289,12 @@ namespace Leap.Unity.Interaction {
 
       _isRegisteredWithManager = true;
       _manager.RegisterInteractionBehaviour(this);
-
-      _rigidbody = GetComponent<Rigidbody>();
-      if (_rigidbody)
-      {
-        _rigidbodyHadUseGravity = _rigidbody.useGravity;
-        _rigidbody.useGravity = false;
-      }
     }
 
     /// <summary>
     /// Calling this method will unregister this object from the manager.
     /// </summary>
-    public void DisableInteraction() {
+    public virtual void DisableInteraction() {
       if (!_isRegisteredWithManager) {
         return;
       }
@@ -333,12 +305,6 @@ namespace Leap.Unity.Interaction {
 
       _manager.UnregisterInteractionBehaviour(this);
       _isRegisteredWithManager = false;
-
-      if (_rigidbody)
-      {
-        _rigidbody.useGravity = _rigidbodyHadUseGravity;
-        _rigidbody = null;
-      }
     }
     #endregion
 

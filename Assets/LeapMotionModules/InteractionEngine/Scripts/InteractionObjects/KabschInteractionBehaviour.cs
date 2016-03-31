@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using LeapInternal;
 using Leap.Unity.Interaction.CApi;
+using System;
 
 namespace Leap.Unity.Interaction {
 
@@ -17,9 +18,47 @@ namespace Leap.Unity.Interaction {
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
 
     protected Rigidbody _rigidbody;
+    private bool _shouldNextSolveBeTeleport = false;
+    private bool _rigidbodyHadUseGravity = false;
+
     protected LEAP_IE_KABSCH _kabsch;
 
     #region INTERACTION CALLBACKS
+
+    public override LEAP_IE_TRANSFORM InteractionTransform {
+      get {
+        LEAP_IE_TRANSFORM interactionTransform = new LEAP_IE_TRANSFORM();
+        if (_rigidbody != null) {
+          interactionTransform.position = new LEAP_VECTOR(_rigidbody.position);
+          interactionTransform.rotation = new LEAP_QUATERNION(_rigidbody.rotation);
+        } else {
+          interactionTransform.position = new LEAP_VECTOR(transform.position);
+          interactionTransform.rotation = new LEAP_QUATERNION(transform.rotation);
+        }
+        return interactionTransform;
+      }
+    }
+
+    public override void EnableInteraction() {
+      base.EnableInteraction();
+
+      _rigidbody = GetComponent<Rigidbody>();
+      if (_rigidbody != null) {
+        _rigidbodyHadUseGravity = _rigidbody.useGravity;
+        _rigidbody.useGravity = false;
+      }
+
+      KabschC.Construct(ref _kabsch);
+    }
+
+    public override void DisableInteraction() {
+      base.DisableInteraction();
+
+      _rigidbody.useGravity = _rigidbodyHadUseGravity;
+      _rigidbody = null;
+
+      KabschC.Destruct(ref _kabsch);
+    }
 
     public override void OnVelocityChanged(Vector3 linearVelocity, Vector3 angularVelocity) {
       base.OnVelocityChanged(linearVelocity, angularVelocity);
@@ -56,7 +95,112 @@ namespace Leap.Unity.Interaction {
     public override void OnHandsHold(List<Hand> hands) {
       base.OnHandsHold(hands);
 
+      Vector3 translation;
+      Quaternion rotation;
+      getSolvedTransform(hands, out translation, out rotation);
+
+      if (_rigidbody != null) {
+        if (_shouldNextSolveBeTeleport) {
+          _rigidbody.position = translation;
+          _rigidbody.rotation = rotation;
+        } else {
+          _rigidbody.MovePosition(translation);
+          _rigidbody.MoveRotation(rotation);
+        }
+      } else {
+        transform.position = translation;
+        transform.rotation = rotation;
+      }
+
+      _shouldNextSolveBeTeleport = false;
+    }
+
+    public override void OnHandRelease(Hand hand) {
+      base.OnHandRelease(hand);
+
+      removeHandPointCollection(hand.Id);
+    }
+
+    public override void OnHandLostTracking(Hand oldHand) {
+      base.OnHandLostTracking(oldHand);
+
+      updateRendererStatus();
+    }
+
+    public override void OnHandRegainedTracking(Hand newHand, int oldId) {
+      base.OnHandRegainedTracking(newHand, oldId);
+
+      updateRendererStatus();
+
+      //Associate the collection with the new id
+      var collection = _handIdToPoints[oldId];
+      _handIdToPoints.Remove(oldId);
+      _handIdToPoints[newHand.Id] = collection;
+
+      _shouldNextSolveBeTeleport = true;
+    }
+
+    public override void OnHandTimeout(Hand oldHand) {
+      base.OnHandTimeout(oldHand);
+
+      updateRendererStatus();
+      removeHandPointCollection(oldHand.Id);
+    }
+
+    protected override void OnGraspBegin() {
+      base.OnGraspBegin();
+
+      if (_rigidbody != null) {
+        _rigidbody.isKinematic = true;
+      }
+    }
+
+    protected override void OnGraspEnd() {
+      base.OnGraspEnd();
+
+      if (_rigidbody != null) {
+        _rigidbody.isKinematic = false;
+      }
+    }
+    #endregion
+
+    #region UNITY CALLBACKS
+
+    protected override void Reset() {
+      base.Reset();
+      _renderers = GetComponentsInChildren<Renderer>();
+    }
+
+    protected virtual void Awake() {
+      _handIdToPoints = new Dictionary<int, HandPointCollection>();
+    }
+    #endregion
+
+    protected void removeHandPointCollection(int handId) {
+      var collection = _handIdToPoints[handId];
+      _handIdToPoints.Remove(handId);
+      HandPointCollection.Return(collection);
+    }
+
+    protected void updateRendererStatus() {
+      //Renderers are visible if there are no grasping hands
+      //or if there is at least one tracked grasping hand
+      int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;
+      bool shouldBeVisible = GraspingHandCount == 0 || trackedGraspingHandCount > 0;
+
+      for (int i = 0; i < _renderers.Length; i++) {
+        Renderer renderer = _renderers[i];
+        if (renderer != null) {
+          renderer.enabled = shouldBeVisible;
+        }
+      }
+    }
+
+    #region INTERNAL
+
+    protected void getSolvedTransform(List<Hand> hands, out Vector3 translation, out Quaternion rotation) {
       KabschC.Reset(ref _kabsch);
+
       for (int h = 0; h < hands.Count; h++) {
         Hand hand = hands[h];
 
@@ -84,102 +228,15 @@ namespace Leap.Unity.Interaction {
 
       KabschC.Solve(ref _kabsch);
 
-      //TODO: apply solve
+      LEAP_VECTOR leapTranslation;
+      LEAP_QUATERNION leapRotation;
+      KabschC.GetTranslation(ref _kabsch, out leapTranslation);
+      KabschC.GetRotation(ref _kabsch, out leapRotation);
+
+      translation = leapTranslation.ToUnityVector();
+      rotation = leapRotation.ToUnityRotation();
     }
 
-    public override void OnHandRelease(Hand hand) {
-      base.OnHandRelease(hand);
-
-      removeHandPointCollection(hand.Id);
-    }
-
-    public override void OnHandLostTracking(Hand oldHand) {
-      base.OnHandLostTracking(oldHand);
-
-      updateRendererStatus();
-    }
-
-    public override void OnHandRegainedTracking(Hand newHand, int oldId) {
-      base.OnHandRegainedTracking(newHand, oldId);
-
-      updateRendererStatus();
-
-      //Associate the collection with the new id
-      var collection = _handIdToPoints[oldId];
-      _handIdToPoints.Remove(oldId);
-      _handIdToPoints[newHand.Id] = collection;
-    }
-
-    public override void OnHandTimeout(Hand oldHand) {
-      base.OnHandTimeout(oldHand);
-
-      updateRendererStatus();
-      removeHandPointCollection(oldHand.Id);
-    }
-
-    protected override void OnGraspBegin() {
-      base.OnGraspBegin();
-
-      _rigidbody.isKinematic = true;
-    }
-
-    protected override void OnGraspEnd() {
-      base.OnGraspEnd();
-
-      _rigidbody.isKinematic = false;
-    }
-
-    #endregion
-
-    #region UNITY CALLBACKS
-
-    protected virtual void Reset() {
-      _renderers = GetComponentsInChildren<Renderer>();
-    }
-
-    protected virtual void Awake() {
-      _handIdToPoints = new Dictionary<int, HandPointCollection>();
-      KabschC.Construct(ref _kabsch);
-    }
-
-    protected virtual void OnEnable() {
-      EnableInteraction();
-    }
-
-    protected virtual void Start() {
-      _rigidbody = GetComponent<Rigidbody>();
-    }
-
-    protected virtual void OnDisable() {
-      DisableInteraction();
-    }
-
-    protected virtual void OnDestroy() {
-      KabschC.Destruct(ref _kabsch);
-    }
-    #endregion
-
-    protected void removeHandPointCollection(int handId) {
-      var collection = _handIdToPoints[handId];
-      _handIdToPoints.Remove(handId);
-      HandPointCollection.Return(collection);
-    }
-
-    protected void updateRendererStatus() {
-      //Renderers are visible if there are no grasping hands
-      //or if there is at least one tracked grasping hand
-      int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;
-      bool shouldBeVisible = GraspingHandCount == 0 || trackedGraspingHandCount > 0;
-
-      for (int i = 0; i < _renderers.Length; i++) {
-        Renderer renderer = _renderers[i];
-        if (renderer != null) {
-          renderer.enabled = shouldBeVisible;
-        }
-      }
-    }
-
-    #region CLASSES
     protected class HandPointCollection {
       //Without a pool, you might end up with 2 instances per object
       //With a pool, likely there will only ever be 2 instances!
@@ -236,8 +293,5 @@ namespace Leap.Unity.Interaction {
       }
     }
     #endregion
-
-
   }
-
 }
