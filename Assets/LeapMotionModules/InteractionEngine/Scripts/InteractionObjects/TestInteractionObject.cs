@@ -3,7 +3,7 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
-  public class TestInteractionObject : InteractionBehaviour {
+  public class TestInteractionObject : InteractionBehaviourBase {
     private Renderer _renderer;
 
     protected override void OnGraspBegin() {

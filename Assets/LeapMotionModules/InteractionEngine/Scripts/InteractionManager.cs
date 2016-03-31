@@ -27,11 +27,11 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL FIELDS
-    protected List<InteractionBehaviour> _registeredBehaviours;
-    protected Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, InteractionBehaviour> _instanceHandleToBehaviour;
+    protected List<InteractionBehaviourBase> _registeredBehaviours;
+    protected Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, InteractionBehaviourBase> _instanceHandleToBehaviour;
 
     protected Dictionary<int, InteractionHand> _idToInteractionHand;
-    protected List<InteractionBehaviour> _graspedBehaviours;
+    protected List<InteractionBehaviourBase> _graspedBehaviours;
 
     protected ShapeDescriptionPool _shapeDescriptionPool;
 
@@ -82,7 +82,7 @@ namespace Leap.Unity.Interaction {
     /// Returns a collection of InteractionObjects that are currently being grasped by
     /// at least one hand.
     /// </summary>
-    public IEnumerable<InteractionBehaviour> GraspedObjects {
+    public IEnumerable<InteractionBehaviourBase> GraspedObjects {
       get {
         return _graspedBehaviours;
       }
@@ -95,7 +95,7 @@ namespace Leap.Unity.Interaction {
     /// <param name="handId"></param>
     /// <param name="graspedObject"></param>
     /// <returns></returns>
-    public bool TryGetGraspedObject(int handId, out InteractionBehaviour graspedObject) {
+    public bool TryGetGraspedObject(int handId, out InteractionBehaviourBase graspedObject) {
       for (int i = 0; i < _graspedBehaviours.Count; i++) {
         var iObj = _graspedBehaviours[i];
         if (iObj.IsBeingGraspedByHand(handId)) {
@@ -115,7 +115,7 @@ namespace Leap.Unity.Interaction {
     /// when the manager is next enabled.
     /// </summary>
     /// <param name="interactionBehaviour"></param>
-    public void RegisterInteractionBehaviour(InteractionBehaviour interactionBehaviour) {
+    public void RegisterInteractionBehaviour(InteractionBehaviourBase interactionBehaviour) {
       _registeredBehaviours.Add(interactionBehaviour);
 
       //Don't create right away if we are not enabled, creation will be done in OnEnable
@@ -129,7 +129,7 @@ namespace Leap.Unity.Interaction {
     /// scene and prevents any further interaction.
     /// </summary>
     /// <param name="interactionBehaviour"></param>
-    public void UnregisterInteractionBehaviour(InteractionBehaviour interactionBehaviour) {
+    public void UnregisterInteractionBehaviour(InteractionBehaviourBase interactionBehaviour) {
       _registeredBehaviours.Remove(interactionBehaviour);
 
       //Don't destroy if we are not enabled, everything already got destroyed in OnDisable
@@ -154,9 +154,9 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void Awake() {
-      _registeredBehaviours = new List<InteractionBehaviour>();
-      _instanceHandleToBehaviour = new Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, InteractionBehaviour>();
-      _graspedBehaviours = new List<InteractionBehaviour>();
+      _registeredBehaviours = new List<InteractionBehaviourBase>();
+      _instanceHandleToBehaviour = new Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, InteractionBehaviourBase>();
+      _graspedBehaviours = new List<InteractionBehaviourBase>();
       _idToInteractionHand = new Dictionary<int, InteractionHand>();
       _handIdsToRemove = new List<int>();
       _holdingHands = new List<Hand>();
@@ -224,7 +224,7 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void updateInteractionRepresentations() {
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
-        InteractionBehaviour interactionBehaviour = _registeredBehaviours[i];
+        InteractionBehaviourBase interactionBehaviour = _registeredBehaviours[i];
         LEAP_IE_SHAPE_INSTANCE_HANDLE shapeInstanceHandle = interactionBehaviour.ShapeInstanceHandle;
         LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
         InteractionC.UpdateShape(ref _scene, ref interactionTransform, ref shapeInstanceHandle);
@@ -298,7 +298,7 @@ namespace Leap.Unity.Interaction {
         switch (classification.classification) {
           case eLeapIEClassification.eLeapIEClassification_Grasp:
             {
-              InteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[instance];
+              InteractionBehaviourBase interactionBehaviour = _instanceHandleToBehaviour[instance];
               if (interactionHand.graspedObject == null) {
                 _graspedBehaviours.Add(interactionBehaviour);
                 interactionHand.GraspObject(interactionBehaviour);
@@ -385,7 +385,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void createInteractionShape(InteractionBehaviour interactionBehaviour) {
+    protected virtual void createInteractionShape(InteractionBehaviourBase interactionBehaviour) {
       LEAP_IE_SHAPE_DESCRIPTION_HANDLE descriptionHandle = interactionBehaviour.ShapeDescriptionHandle;
       LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
       LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
@@ -397,7 +397,7 @@ namespace Leap.Unity.Interaction {
       interactionBehaviour.OnInteractionShapeCreated(instanceHandle);
     }
 
-    protected virtual void destroyInteractionShape(InteractionBehaviour interactionBehaviour) {
+    protected virtual void destroyInteractionShape(InteractionBehaviourBase interactionBehaviour) {
       LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle = interactionBehaviour.ShapeInstanceHandle;
 
       _instanceHandleToBehaviour.Remove(instanceHandle);
@@ -413,7 +413,7 @@ namespace Leap.Unity.Interaction {
     protected class InteractionHand {
       public Hand hand { get; protected set; }
       public float lastTimeUpdated { get; protected set; }
-      public InteractionBehaviour graspedObject { get; protected set; }
+      public InteractionBehaviourBase graspedObject { get; protected set; }
       public bool isUntracked { get; protected set; }
 
       public InteractionHand(Hand hand) {
@@ -427,7 +427,7 @@ namespace Leap.Unity.Interaction {
         lastTimeUpdated = Time.time;
       }
 
-      public void GraspObject(InteractionBehaviour obj) {
+      public void GraspObject(InteractionBehaviourBase obj) {
         graspedObject = obj;
         graspedObject.OnHandGrasp(hand);
       }

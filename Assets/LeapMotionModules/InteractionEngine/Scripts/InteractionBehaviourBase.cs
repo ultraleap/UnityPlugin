@@ -8,7 +8,7 @@ using Leap.Unity.Interaction.CApi;
 namespace Leap.Unity.Interaction {
 
   [DisallowMultipleComponent]
-  public abstract class InteractionBehaviour : MonoBehaviour {
+  public abstract class InteractionBehaviourBase : MonoBehaviour {
 
     #region SERIALIZED FIELDS
     [SerializeField]
@@ -392,7 +392,7 @@ namespace Leap.Unity.Interaction {
     }
 
     private void checkForParentBehaviour() {
-      if (GetComponentsInParent<InteractionBehaviour>().Length > 1) {
+      if (GetComponentsInParent<InteractionBehaviourBase>().Length > 1) {
         Debug.LogError("InteractionBehaviour cannot be a child OR sibling of another InteractionBehaviour!");
 #if UNITY_EDITOR
         UnityEditor.Selection.activeGameObject = gameObject;

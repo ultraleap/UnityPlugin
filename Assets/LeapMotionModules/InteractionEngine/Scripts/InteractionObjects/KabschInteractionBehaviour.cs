@@ -6,7 +6,7 @@ using Leap.Unity.Interaction.CApi;
 namespace Leap.Unity.Interaction {
 
   [RequireComponent(typeof(Rigidbody))]
-  public class KabschInteractionBehaviour : InteractionBehaviour {
+  public class KabschInteractionBehaviour : InteractionBehaviourBase {
     public const int NUM_FINGERS = 5;
     public const int NUM_JOINTS = 4;
 
@@ -20,8 +20,9 @@ namespace Leap.Unity.Interaction {
     protected LEAP_IE_KABSCH _kabsch;
 
     #region INTERACTION CALLBACKS
-    public override void OnPush(Vector3 linearVelocity, Vector3 angularVelocity) {
-      base.OnPush(linearVelocity, angularVelocity);
+
+    public override void OnVelocityChanged(Vector3 linearVelocity, Vector3 angularVelocity) {
+      base.OnVelocityChanged(linearVelocity, angularVelocity);
 
       if (_rigidbody != null) {
         _rigidbody.velocity = linearVelocity;
