@@ -114,7 +114,7 @@ namespace Leap.Unity.Interaction.CApi {
   public struct LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION {
     public LEAP_IE_SHAPE_DESCRIPTION shape;
     public UInt32 nVerticies;
-    public IntPtr pVertices; //LEAP_VECTOR*
+    public LEAP_VECTOR[] pVertices;
     public float radius;
   }
 
@@ -123,19 +123,33 @@ namespace Leap.Unity.Interaction.CApi {
     public LEAP_IE_SHAPE_DESCRIPTION shape;
     public UInt32 nShapes;
     public IntPtr pShapes; //LEAP_IE_SHAPE_DESCRIPTION**
-    public IntPtr pTransforms; //LEAP_IE_TRANSFORM*
+    public LEAP_IE_TRANSFORM[] pTransforms;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_IE_SHAPE_DESCRIPTION_HANDLE {
+  public struct LEAP_IE_SHAPE_DESCRIPTION_HANDLE : IEquatable<LEAP_IE_SHAPE_DESCRIPTION_HANDLE> {
     public UInt32 handle;
-    public IntPtr pDEBUG; // LeapIEShapeDescriptionData*
+
+    public bool Equals(LEAP_IE_SHAPE_DESCRIPTION_HANDLE other) {
+      return handle == other.handle;
+    }
+
+    public override int GetHashCode() {
+      return (int)handle;
+    }
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_IE_SHAPE_INSTANCE_HANDLE {
+  public struct LEAP_IE_SHAPE_INSTANCE_HANDLE : IEquatable<LEAP_IE_SHAPE_INSTANCE_HANDLE> {
     public UInt32 handle;
-    public IntPtr pDEBUG; // LeapIEShapeInstanceData*
+
+    public bool Equals(LEAP_IE_SHAPE_INSTANCE_HANDLE other) {
+      return handle == other.handle;
+    }
+
+    public override int GetHashCode() {
+      return (int)handle;
+    }
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -158,6 +172,14 @@ namespace Leap.Unity.Interaction.CApi {
                                  duration,
                                  depthTest != 0);
     }
+  }
+
+  [StructLayout(LayoutKind.Sequential, Pack = 1)]
+  public struct LEAP_IE_VELOCITY
+  {
+    public LEAP_IE_SHAPE_INSTANCE_HANDLE handle;
+    public LEAP_VECTOR linearVelocity;
+    public LEAP_VECTOR angularVelocity;
   }
 
   public enum LogLevel {
@@ -382,6 +404,34 @@ namespace Leap.Unity.Interaction.CApi {
       return rs;
     }
 
+    /*** Get Velocities ***/
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetVelocities")]
+    private static extern eLeapIERS LeapIEGetVelocities(ref LEAP_IE_SCENE scene,
+                                                        out UInt32 nVelocities,
+                                                        out IntPtr ppVelocitiesBuffer);
+
+    public static eLeapIERS GetVelocities(ref LEAP_IE_SCENE scene, out LEAP_IE_VELOCITY[] velocities)
+    {
+      Logger.Log("Get Velocities", LogLevel.AllCalls);
+
+      UInt32 nVelocities;
+      IntPtr ppVelocitiesBuffer;
+      var rs = LeapIEGetVelocities(ref scene, out nVelocities, out ppVelocitiesBuffer);
+      Logger.HandleReturnStatus(rs);
+      if (rs != eLeapIERS.eLeapIERS_Success || nVelocities == 0)
+      {
+        velocities = null;
+        return rs;
+      }
+
+      velocities = new LEAP_IE_VELOCITY[nVelocities];
+      for (int i = 0; i < nVelocities; i++)
+      {
+        velocities[i] = StructMarshal<LEAP_IE_VELOCITY>.ArrayElementToStruct(ppVelocitiesBuffer, i);
+      }
+      return rs;
+    }
+
     /*** Enable Debug Visualization ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEEnableDebugFlags")]
     private static extern eLeapIERS LeapIEEnableDebugFlags(ref LEAP_IE_SCENE scene,
@@ -415,8 +465,7 @@ namespace Leap.Unity.Interaction.CApi {
       IntPtr arrayPtr;
       GetDebugLines(ref scene, out lines, out arrayPtr);
 
-      for (int i = 0; i < lines; i++)
-      {
+      for (int i = 0; i < lines; i++) {
         LEAP_IE_DEBUG_LINE line = StructMarshal<LEAP_IE_DEBUG_LINE>.ArrayElementToStruct(arrayPtr, i);
         line.Draw();
       }

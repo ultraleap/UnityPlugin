@@ -20,6 +20,10 @@ namespace Leap.Unity.Interaction {
     [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
     [SerializeField]
     protected bool _showDebugLines = true;
+
+    [Tooltip("Allow the Interaction plugin to modify object velocities when pushing.")]
+    [SerializeField]
+    protected bool _modifyVelocities = true;
     #endregion
 
     #region INTERNAL FIELDS
@@ -106,7 +110,7 @@ namespace Leap.Unity.Interaction {
 
     /// <summary>
     /// Registers an InteractionObject with this manager, which automatically adds the objects
-    /// representation into the internal interaction scene.  If the manager is disabled, 
+    /// representation into the internal interaction scene.  If the manager is disabled,
     /// the registration will still succeed and the object will be added to the internal scene
     /// when the manager is next enabled.
     /// </summary>
@@ -115,7 +119,7 @@ namespace Leap.Unity.Interaction {
       _registeredBehaviours.Add(interactionBehaviour);
 
       //Don't create right away if we are not enabled, creation will be done in OnEnable
-      if (enabled) {
+      if (isActiveAndEnabled) {
         createInteractionShape(interactionBehaviour);
       }
     }
@@ -129,7 +133,7 @@ namespace Leap.Unity.Interaction {
       _registeredBehaviours.Remove(interactionBehaviour);
 
       //Don't destroy if we are not enabled, everything already got destroyed in OnDisable
-      if (enabled) {
+      if (isActiveAndEnabled) {
         destroyInteractionShape(interactionBehaviour);
       }
     }
@@ -208,6 +212,10 @@ namespace Leap.Unity.Interaction {
       simulateInteraction();
 
       updateInteractionStateChanges();
+
+      // TODO: Pass a debug flag to disable calculating velocities.
+      if(_modifyVelocities)
+        setObjectVelocities();
     }
 
     protected virtual void applyDebugSettings() {
@@ -253,7 +261,7 @@ namespace Leap.Unity.Interaction {
                                        out classification,
                                        out instance);
 
-        InteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[instance];
+
 
         //Get the InteractionHand associated with this hand id
         InteractionHand interactionHand;
@@ -290,6 +298,7 @@ namespace Leap.Unity.Interaction {
         switch (classification.classification) {
           case eLeapIEClassification.eLeapIEClassification_Grasp:
             {
+              InteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[instance];
               if (interactionHand.graspedObject == null) {
                 _graspedBehaviours.Add(interactionBehaviour);
                 interactionHand.GraspObject(interactionBehaviour);
@@ -299,7 +308,7 @@ namespace Leap.Unity.Interaction {
           case eLeapIEClassification.eLeapIEClassification_Physics:
             {
               if (interactionHand.graspedObject != null) {
-                _graspedBehaviours.Remove(interactionBehaviour);
+                _graspedBehaviours.Remove(interactionHand.graspedObject);
                 interactionHand.ReleaseObject();
               }
               break;
@@ -358,6 +367,21 @@ namespace Leap.Unity.Interaction {
 
         interactionBehaviour.OnHandsHold(_holdingHands);
         _holdingHands.Clear();
+      }
+    }
+
+    protected virtual void setObjectVelocities()
+    {
+      LEAP_IE_VELOCITY[] velocities;
+      InteractionC.GetVelocities(ref _scene, out velocities);
+
+      if (velocities == null)
+        return;
+
+      for (int i = 0; i < velocities.Length; ++i)
+      {
+        LEAP_IE_VELOCITY vel = velocities[i];
+        _instanceHandleToBehaviour[vel.handle].OnVelocityChanged(vel.linearVelocity.ToUnityVector(), vel.angularVelocity.ToUnityVector());
       }
     }
 

@@ -15,19 +15,6 @@ namespace Leap.Unity.Interaction {
     protected InteractionManager _manager;
     #endregion
 
-    #region PUBLIC EVENTS
-    public event Action<Hand> OnHandGraspEvent;
-    public event Action<List<Hand>> OnHandsHoldEvent;
-    public event Action<Hand> OnHandReleaseEvent;
-
-    public event Action<Hand> OnHandLostTrackingEvent;
-    public event Action<Hand, int> OnHandRegainedTrackingEvent;
-    public event Action<int> OnHandTimeoutEvent;
-
-    public event Action OnGraspBeginEvent;
-    public event Action OnGraspEndEvent;
-    #endregion
-
     #region INTERNAL FIELDS
     private bool _isRegisteredWithManager = false;
 
@@ -35,13 +22,16 @@ namespace Leap.Unity.Interaction {
     private LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeDescriptionHandle;
     private LEAP_IE_SHAPE_INSTANCE_HANDLE _shapeInstanceHandle;
 
+    protected Rigidbody _rigidbody;
+    bool _rigidbodyHadUseGravity = false;
+
     private List<int> _graspingIds = new List<int>();
     private List<int> _untrackedIds = new List<int>();
     #endregion
 
     #region PUBLIC METHODS
     /// <summary>
-    /// Gets or sets the manager this object belongs to.  
+    /// Gets or sets the manager this object belongs to.
     /// </summary>
     public InteractionManager Manager {
       get {
@@ -61,7 +51,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Gets or Sets whether or not interaction is enabled for this object.  Setting is 
+    /// Gets or Sets whether or not interaction is enabled for this object.  Setting is
     /// equivilent to calling EnableInteraction() or DisableInteraction()
     /// </summary>
     public bool IsInteractionEnabled {
@@ -78,11 +68,11 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Gets the shape description handle 
+    /// Gets the handle to the internal shape description.
     /// </summary>
     public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
       get {
-        if (_isRegisteredWithManager) {
+        if (!_isRegisteredWithManager) {
           throw new NotRegisteredWithManagerException();
         }
 
@@ -94,9 +84,12 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Gets the handle to the internal shape instance.
+    /// </summary>
     public LEAP_IE_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
       get {
-        if (_isRegisteredWithManager) {
+        if (!_isRegisteredWithManager) {
           throw new NotRegisteredWithManagerException();
         }
 
@@ -104,6 +97,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Gets the internal representation of the transform of the object.
+    /// </summary>
     public LEAP_IE_TRANSFORM InteractionTransform {
       get {
         LEAP_IE_TRANSFORM interactionTransform = new LEAP_IE_TRANSFORM();
@@ -203,14 +199,6 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Called by InteractionManager when this object is pushed.  The arguments are the proposed
-    /// linear and angular velocities to be applied to the object. 
-    /// </summary>
-    /// <param name="linearVelocity"></param>
-    /// <param name="angularVelocity"></param>
-    public virtual void OnPush(Vector3 linearVelocity, Vector3 angularVelocity) { }
-
-    /// <summary>
     /// Called by InteractionManager when a Hand begins grasping this object.
     /// </summary>
     /// <param name="handId"></param>
@@ -219,9 +207,6 @@ namespace Leap.Unity.Interaction {
 
       _graspingIds.Add(hand.Id);
 
-      if (OnHandGraspEvent != null) {
-        OnHandGraspEvent(hand);
-      }
       if (_graspingIds.Count == 1) {
         OnGraspBegin();
       }
@@ -230,11 +215,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called by InteractionManager every frame that a Hand continues to grasp this object.
     /// </summary>
-    public virtual void OnHandsHold(List<Hand> hands) {
-      if (OnHandsHoldEvent != null) {
-        OnHandsHoldEvent(hands);
-      }
-    }
+    public virtual void OnHandsHold(List<Hand> hands) { }
 
     /// <summary>
     /// Called by InteractionManager when a Hand stops grasping this object.
@@ -282,13 +263,36 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Called by InteractionManager when a untracked grasping Hand has remained ungrasped for
+    /// Called by InteractionManager when an untracked grasping Hand has remained ungrasped for
     /// too long.  The hand is no longer considered to be grasping the object.
     /// </summary>
     /// <param name="oldId"></param>
     public virtual void OnHandTimeout(Hand oldHand) {
       _untrackedIds.Remove(oldHand.Id);
       _graspingIds.Remove(oldHand.Id);
+
+      //OnGraspEnd is dispatched in OnHandTimeout in addition to OnHandRelease
+      if (_graspingIds.Count == 0) {
+        OnGraspEnd();
+      }
+    }
+
+    /// <summary>
+    /// Called by InteractionController when the velocity of an object is changed.
+    /// </summary>
+    public virtual void OnVelocityChanged(UnityEngine.Vector3 linearVelocity, UnityEngine.Vector3 angularVelocity)
+    {
+      if (!_rigidbody)
+        return;
+
+      if(_rigidbody.useGravity)
+        throw new InvalidOperationException("Cannot modify velocity of object correctly because it has a force applied (gravity.)");
+
+      // Clear applied forces.  They were not accounted for when the velocities were calculated.
+      _rigidbody.Sleep();
+
+      _rigidbody.velocity = linearVelocity;
+      _rigidbody.angularVelocity = angularVelocity;
     }
 
     /// <summary>
@@ -304,8 +308,15 @@ namespace Leap.Unity.Interaction {
         throw new NoManagerSpecifiedException();
       }
 
-      _manager.RegisterInteractionBehaviour(this);
       _isRegisteredWithManager = true;
+      _manager.RegisterInteractionBehaviour(this);
+
+      _rigidbody = GetComponent<Rigidbody>();
+      if (_rigidbody)
+      {
+        _rigidbodyHadUseGravity = _rigidbody.useGravity;
+        _rigidbody.useGravity = false;
+      }
     }
 
     /// <summary>
@@ -322,25 +333,73 @@ namespace Leap.Unity.Interaction {
 
       _manager.UnregisterInteractionBehaviour(this);
       _isRegisteredWithManager = false;
+
+      if (_rigidbody)
+      {
+        _rigidbody.useGravity = _rigidbodyHadUseGravity;
+        _rigidbody = null;
+      }
     }
     #endregion
 
     #region PROTECTED METHODS
+    /// <summary>
+    /// This method is called to generate the internal description of the interaction shape.
+    /// The default implementation uses the GetAuto() method of the ShapeDescriptionPool class, which
+    /// accounts for all colliders on this gameObject and its children.
+    /// </summary>
+    /// <returns></returns>
     protected virtual LEAP_IE_SHAPE_DESCRIPTION_HANDLE GenerateShapeDescriptionHandle() {
       return _manager.ShapePool.GetAuto(gameObject);
     }
 
-    protected virtual void OnGraspBegin() {
-      if (OnGraspBeginEvent != null) {
-        OnGraspBeginEvent();
+    /// <summary>
+    /// Called when the the object transitions from being grasped by no hands to being
+    /// grasped by at least one hand.
+    /// </summary>
+    protected virtual void OnGraspBegin() { }
+
+    /// <summary>
+    /// Called when the object transitions from being grasped by at least one hand
+    /// to being grasped by no hands.
+    /// </summary>
+    protected virtual void OnGraspEnd() { }
+    #endregion
+
+    #region UNITY MESSAGES
+    protected virtual void OnValidate() {
+      checkForParentBehaviour();
+    }
+
+    protected virtual void Reset() {
+      if (_manager == null) {
+        //If manager is null, first check out parents for one, then search the whole scene
+        _manager = GetComponentInParent<InteractionManager>();
+        if (_manager == null) {
+          _manager = FindObjectOfType<InteractionManager>();
+        }
+      }
+
+      checkForParentBehaviour();
+    }
+
+    protected virtual void OnEnable() {
+      EnableInteraction();
+    }
+
+    protected virtual void OnDisable() {
+      DisableInteraction();
+    }
+
+    private void checkForParentBehaviour() {
+      if (GetComponentsInParent<InteractionBehaviour>().Length > 1) {
+        Debug.LogError("InteractionBehaviour cannot be a child OR sibling of another InteractionBehaviour!");
+#if UNITY_EDITOR
+        UnityEditor.Selection.activeGameObject = gameObject;
+#endif
       }
     }
 
-    protected virtual void OnGraspEnd() {
-      if (OnGraspEndEvent != null) {
-        OnGraspEndEvent();
-      }
-    }
     #endregion
 
     #region ASSERTION MESSAGES

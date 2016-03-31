@@ -19,13 +19,5 @@ namespace Leap.Unity.Interaction {
     void Awake() {
       _renderer = GetComponent<Renderer>();
     }
-
-    void OnEnable() {
-      EnableInteraction();
-    }
-
-    void OnDisable() {
-      DisableInteraction();
-    }
   }
 }

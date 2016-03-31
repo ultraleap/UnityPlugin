@@ -367,7 +367,7 @@ namespace LeapInternal
       return new Leap.Vector(x, y, z);
     }
 
-    public UnityEngine.Vector3 ToUnityVector() 
+    public UnityEngine.Vector3 ToUnityVector()
     {
       return new UnityEngine.Vector3(x, y, z);
     }
@@ -379,7 +379,7 @@ namespace LeapInternal
       z = leap.z;
     }
 
-    public LEAP_VECTOR(UnityEngine.Vector3 unity) 
+    public LEAP_VECTOR(UnityEngine.Vector3 unity)
     {
       x = unity.x;
       y = unity.y;
@@ -403,9 +403,9 @@ namespace LeapInternal
 
     public LEAP_MATRIX(Leap.Matrix leap)
     {
-      x_basis = new LEAP_VECTOR(leap.xBasis);
-      y_basis = new LEAP_VECTOR(leap.yBasis);
-      z_basis = new LEAP_VECTOR(leap.zBasis);
+      x_basis = new LEAP_VECTOR(leap.xBasis.Normalized);
+      y_basis = new LEAP_VECTOR(leap.yBasis.Normalized);
+      z_basis = new LEAP_VECTOR(leap.zBasis.Normalized);
     }
   }
 
