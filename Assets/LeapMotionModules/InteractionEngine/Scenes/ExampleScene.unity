@@ -1357,10 +1357,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 990557404}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82ca9b30da67d394893c209ebb5d0ade, type: 3}
+  m_Script: {fileID: 11500000, guid: ffce1885e536aaf4696254f3d6911922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 1473219677}
+  _toggledRenderers:
+  - {fileID: 990557409}
 --- !u!54 &990557407
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1541,10 +1543,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1282123898}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82ca9b30da67d394893c209ebb5d0ade, type: 3}
+  m_Script: {fileID: 11500000, guid: ffce1885e536aaf4696254f3d6911922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 1473219677}
+  _toggledRenderers:
+  - {fileID: 1282123903}
 --- !u!54 &1282123901
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1720,10 +1724,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1367191952}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82ca9b30da67d394893c209ebb5d0ade, type: 3}
+  m_Script: {fileID: 11500000, guid: ffce1885e536aaf4696254f3d6911922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 1473219677}
+  _toggledRenderers:
+  - {fileID: 1367191957}
 --- !u!54 &1367191955
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1813,8 +1819,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _leapProvider: {fileID: 972296616}
   _untrackedTimeout: 0.5
-  _showDebugLines: 1
   _modifyVelocities: 1
+  _showDebugLines: 1
 --- !u!4 &1473219678
 Transform:
   m_ObjectHideFlags: 0
@@ -1844,8 +1850,8 @@ GameObject:
   - 33: {fileID: 1700929376}
   - 23: {fileID: 1700929375}
   - 135: {fileID: 1700929374}
-  - 114: {fileID: 1700929373}
   - 54: {fileID: 1700929378}
+  - 114: {fileID: 1700929373}
   m_Layer: 8
   m_Name: InteractionSphere
   m_TagString: Untagged
@@ -1861,10 +1867,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1700929372}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82ca9b30da67d394893c209ebb5d0ade, type: 3}
+  m_Script: {fileID: 11500000, guid: ffce1885e536aaf4696254f3d6911922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 1473219677}
+  _toggledRenderers:
+  - {fileID: 1700929375}
 --- !u!135 &1700929374
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1948,8 +1956,8 @@ GameObject:
   - 33: {fileID: 1721542084}
   - 23: {fileID: 1721542083}
   - 135: {fileID: 1721542082}
-  - 114: {fileID: 1721542080}
   - 54: {fileID: 1721542085}
+  - 114: {fileID: 1721542080}
   m_Layer: 8
   m_Name: InteractionSphere
   m_TagString: Untagged
@@ -1965,10 +1973,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1721542079}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82ca9b30da67d394893c209ebb5d0ade, type: 3}
+  m_Script: {fileID: 11500000, guid: ffce1885e536aaf4696254f3d6911922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 1473219677}
+  _toggledRenderers:
+  - {fileID: 1721542083}
 --- !u!4 &1721542081
 Transform:
   m_ObjectHideFlags: 0
@@ -2052,8 +2062,8 @@ GameObject:
   - 33: {fileID: 1759218971}
   - 23: {fileID: 1759218970}
   - 135: {fileID: 1759218969}
-  - 114: {fileID: 1759218968}
   - 54: {fileID: 1759218973}
+  - 114: {fileID: 1759218968}
   m_Layer: 8
   m_Name: InteractionSphere
   m_TagString: Untagged
@@ -2069,10 +2079,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1759218967}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82ca9b30da67d394893c209ebb5d0ade, type: 3}
+  m_Script: {fileID: 11500000, guid: ffce1885e536aaf4696254f3d6911922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 1473219677}
+  _toggledRenderers:
+  - {fileID: 1759218970}
 --- !u!135 &1759218969
 SphereCollider:
   m_ObjectHideFlags: 0

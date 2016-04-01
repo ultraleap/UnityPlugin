@@ -13,7 +13,7 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("Renderers to turn off when the object is grasped by untracked hands.")]
     [SerializeField]
-    protected Renderer[] _renderers;
+    protected Renderer[] _toggledRenderers;
 
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
 
@@ -185,7 +185,7 @@ namespace Leap.Unity.Interaction {
     #region UNITY CALLBACKS
     protected override void Reset() {
       base.Reset();
-      _renderers = GetComponentsInChildren<Renderer>();
+      _toggledRenderers = GetComponentsInChildren<Renderer>();
     }
 
     protected virtual void Awake() {
@@ -200,8 +200,8 @@ namespace Leap.Unity.Interaction {
       int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;
       bool shouldBeVisible = GraspingHandCount == 0 || trackedGraspingHandCount > 0;
 
-      for (int i = 0; i < _renderers.Length; i++) {
-        Renderer renderer = _renderers[i];
+      for (int i = 0; i < _toggledRenderers.Length; i++) {
+        Renderer renderer = _toggledRenderers[i];
         if (renderer != null) {
           renderer.enabled = shouldBeVisible;
         }
