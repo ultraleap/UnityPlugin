@@ -1,10 +1,20 @@
 ﻿using UnityEngine;
 using Leap.Unity.Interaction.CApi;
+using LeapInternal;
 
 namespace Leap.Unity.Interaction {
 
-  public class TestInteractionObject : InteractionBehaviour {
+  public class TestInteractionObject : InteractionBehaviourBase {
     private Renderer _renderer;
+
+    public override LEAP_IE_TRANSFORM InteractionTransform {
+      get {
+        LEAP_IE_TRANSFORM interactionTransform = new LEAP_IE_TRANSFORM();
+        interactionTransform.position = new LEAP_VECTOR(transform.position);
+        interactionTransform.rotation = new LEAP_QUATERNION(transform.rotation);
+        return interactionTransform;
+      }
+    }
 
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
