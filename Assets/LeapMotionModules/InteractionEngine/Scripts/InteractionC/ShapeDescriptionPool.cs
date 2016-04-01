@@ -2,9 +2,8 @@
 using System;
 using System.Collections.Generic;
 using LeapInternal;
-using Leap.Unity.Interaction.CApi;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity.Interaction.CApi {
 
   public class ShapeDescriptionPool {
 
