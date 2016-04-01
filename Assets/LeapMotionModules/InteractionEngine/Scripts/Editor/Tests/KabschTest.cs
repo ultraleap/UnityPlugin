@@ -4,7 +4,7 @@ using NUnit.Framework;
 using LeapInternal;
 using Leap.Unity.Interaction.CApi;
 
-namespace Leap.Unity.Interaction.Test {
+namespace Leap.Unity.Interaction.Tests {
 
   public class KabschTest {
     LEAP_IE_KABSCH _kabsch;
@@ -39,8 +39,7 @@ namespace Leap.Unity.Interaction.Test {
       Assert.That(desiredTranslation.y, Is.EqualTo(solvedTranslation.y).Within(0.001f), "Y");
       Assert.That(desiredTranslation.z, Is.EqualTo(solvedTranslation.z).Within(0.001f), "Z");
 
-      Debug.Log(desiredRotation + " : " + solvedRotation);
-      Assert.That(Quaternion.Angle(desiredRotation, solvedRotation), Is.EqualTo(0.0f).Within(0.001f), "A");
+      Assert.That(Quaternion.Angle(desiredRotation, solvedRotation), Is.EqualTo(0.0f).Within(1), "A");
     }
     
     private void solveWithTRS(Vector3 translation, 
@@ -52,7 +51,7 @@ namespace Leap.Unity.Interaction.Test {
       v0[1] = new Vector3(0, 1, 0);
       v0[2] = new Vector3(0, 0, 1);
 
-      var v1 = v0.Select(v => v + translation).ToArray();
+      var v1 = v0.Select(v => rotation * v + translation).ToArray();
 
       for (int i = 0; i < 3; i++) {
         var l0 = new LEAP_VECTOR(v0[i]);
