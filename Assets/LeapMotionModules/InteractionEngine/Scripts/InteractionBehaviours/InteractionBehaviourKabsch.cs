@@ -9,7 +9,7 @@ namespace Leap.Unity.Interaction {
   [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviourKabsch : InteractionBehaviourBase {
     public const int NUM_FINGERS = 5;
-    public const int NUM_JOINTS = 4;
+    public const int NUM_BONES = 4;
 
     [Tooltip("Renderers to turn off when the object is grasped by untracked hands.")]
     [SerializeField]
@@ -82,12 +82,12 @@ namespace Leap.Unity.Interaction {
         Finger finger = hand.Fingers[f];
         Finger.FingerType fingerType = finger.Type;
 
-        for (int j = 0; j < NUM_JOINTS; j++) {
+        for (int j = 0; j < NUM_BONES; j++) {
           Bone.BoneType boneType = (Bone.BoneType)j;
           Bone bone = finger.Bone(boneType);
 
-          Vector3 jointPos = bone.NextJoint.ToVector3();
-          Vector3 closestOnSurface = jointPos; //TODO: how to get closest on surface?
+          Vector3 bonePos = bone.NextJoint.ToVector3();
+          Vector3 closestOnSurface = bonePos; //TODO: how to get closest on surface?
 
           newCollection.SetGlobalPosition(closestOnSurface, fingerType, boneType);
         }
@@ -235,16 +235,16 @@ namespace Leap.Unity.Interaction {
           Finger finger = hand.Fingers[f];
           Finger.FingerType fingerType = finger.Type;
 
-          for (int j = 0; j < NUM_JOINTS; j++) {
+          for (int j = 0; j < NUM_BONES; j++) {
             Bone.BoneType boneType = (Bone.BoneType)j;
             Bone bone = finger.Bone(boneType);
 
             Vector3 objectPos = collection.GetGlobalPosition(fingerType, boneType);
-            Vector3 jointPos = bone.NextJoint.ToVector3();
+            Vector3 bonePos = bone.NextJoint.ToVector3();
 
-            //Do the solve such that the objects positions are matched to the new joint positions
+            //Do the solve such that the objects positions are matched to the new bone positions
             LEAP_VECTOR point1 = new LEAP_VECTOR(objectPos);
-            LEAP_VECTOR point2 = new LEAP_VECTOR(jointPos);
+            LEAP_VECTOR point2 = new LEAP_VECTOR(bonePos);
 
             KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
           }
@@ -291,7 +291,7 @@ namespace Leap.Unity.Interaction {
       }
 
       private HandPointCollection() {
-        _localPositions = new Vector3[NUM_FINGERS * NUM_JOINTS];
+        _localPositions = new Vector3[NUM_FINGERS * NUM_BONES];
       }
 
       private void init(InteractionBehaviourKabsch interactionBehaviour) {
@@ -320,7 +320,7 @@ namespace Leap.Unity.Interaction {
       }
 
       private int getIndex(Finger.FingerType fingerType, Bone.BoneType boneType) {
-        return (int)fingerType * 5 + (int)boneType;
+        return (int)fingerType * 4 + (int)boneType;
       }
     }
     #endregion
