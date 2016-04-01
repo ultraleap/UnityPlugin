@@ -151,6 +151,11 @@ namespace Leap.Unity.Interaction {
         //Allow the debug lines to be toggled while the scene is playing
         applyDebugSettings();
       }
+
+      //Timeout must be positive
+      if (_untrackedTimeout < 0) {
+        _untrackedTimeout = 0;
+      }
     }
 
     protected virtual void Awake() {
