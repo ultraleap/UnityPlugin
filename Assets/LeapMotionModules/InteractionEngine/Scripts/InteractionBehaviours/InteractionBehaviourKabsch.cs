@@ -194,7 +194,7 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL
-    protected void updateRendererStatus() {
+    protected virtual void updateRendererStatus() {
       //Renderers are visible if there are no grasping hands
       //or if there is at least one tracked grasping hand
       int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;

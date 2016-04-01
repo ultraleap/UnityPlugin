@@ -17,13 +17,13 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _untrackedTimeout = 0.5f;
 
-    [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
-    [SerializeField]
-    protected bool _showDebugLines = true;
-
     [Tooltip("Allow the Interaction plugin to modify object velocities when pushing.")]
     [SerializeField]
     protected bool _modifyVelocities = true;
+
+    [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
+    [SerializeField]
+    protected bool _showDebugLines = true;
     #endregion
 
     #region INTERNAL FIELDS
@@ -214,8 +214,9 @@ namespace Leap.Unity.Interaction {
       updateInteractionStateChanges();
 
       // TODO: Pass a debug flag to disable calculating velocities.
-      if(_modifyVelocities)
+      if (_modifyVelocities) {
         setObjectVelocities();
+      }
     }
 
     protected virtual void applyDebugSettings() {
@@ -370,16 +371,15 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void setObjectVelocities()
-    {
+    protected virtual void setObjectVelocities() {
       LEAP_IE_VELOCITY[] velocities;
       InteractionC.GetVelocities(ref _scene, out velocities);
 
-      if (velocities == null)
+      if (velocities == null) {
         return;
+      }
 
-      for (int i = 0; i < velocities.Length; ++i)
-      {
+      for (int i = 0; i < velocities.Length; ++i) {
         LEAP_IE_VELOCITY vel = velocities[i];
         _instanceHandleToBehaviour[vel.handle].OnVelocityChanged(vel.linearVelocity.ToUnityVector(), vel.angularVelocity.ToUnityVector());
       }
