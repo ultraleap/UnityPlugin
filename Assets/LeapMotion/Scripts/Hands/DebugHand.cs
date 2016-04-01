@@ -11,7 +11,7 @@ using Leap;
 namespace Leap.Unity{
   /**
    * A HandModel that draws lines for the bones in the hand and its fingers.
-   * 
+   *
    * The debugs lines are only drawn in the Editor Scene view (when a hand is tracked) and
    * not in the Game view. Use debug hands when you aren't using visible hands in a scene
    * so that you can see where the hands are in the scene view.
@@ -39,29 +39,29 @@ namespace Leap.Unity{
         return handedness;
       }
     }
-  
+
     public override Hand GetLeapHand() {
       return hand_;
     }
-  
+
     public override void SetLeapHand(Hand hand) {
       hand_ = hand;
     }
-  
+
     /**
     * Initializes the hand and calls the line drawing function.
     */
     public override void InitHand() {
       DrawDebugLines();
     }
-  
+
     /**
     * Updates the hand and calls the line drawing function.
     */
     public override void UpdateHand() {
       DrawDebugLines();
     }
-  
+
     /**
     * Draws lines from elbow to wrist, wrist to palm, and normal to the palm.
     */
@@ -88,7 +88,7 @@ namespace Leap.Unity{
       }
     }
 
-    public void DrawBasis(Vector position, Matrix basis, float scale){
+    public void DrawBasis(Vector position, LeapTransform basis, float scale){
       Vector3 origin = position.ToVector3();
       Debug.DrawLine(origin, origin + basis.xBasis.ToVector3() * scale, Color.red);
       Debug.DrawLine(origin, origin + basis.yBasis.ToVector3() * scale, Color.green);

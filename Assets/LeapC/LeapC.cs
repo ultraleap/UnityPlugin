@@ -388,24 +388,27 @@ namespace LeapInternal
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_MATRIX
+  public struct LEAP_QUATERNION
   {
-    public LEAP_VECTOR x_basis;
-    public LEAP_VECTOR y_basis;
-    public LEAP_VECTOR z_basis;
+    public float w;
+    public float x;
+    public float y;
+    public float z;
 
-    public Leap.Matrix ToLeapMatrix()
+    public LEAP_QUATERNION(Leap.LeapQuaternion q)
     {
-      return new Leap.Matrix(x_basis.ToLeapVector(),
-                             y_basis.ToLeapVector(),
-                             z_basis.ToLeapVector());
+      w = q.w;
+      x = q.x;
+      y = q.y;
+      z = q.z;
     }
 
-    public LEAP_MATRIX(Leap.Matrix leap)
+    public LEAP_QUATERNION(UnityEngine.Quaternion unity)
     {
-      x_basis = new LEAP_VECTOR(leap.xBasis.Normalized);
-      y_basis = new LEAP_VECTOR(leap.yBasis.Normalized);
-      z_basis = new LEAP_VECTOR(leap.zBasis.Normalized);
+      w = unity.w;
+      x = unity.x;
+      y = unity.y;
+      z = unity.z;
     }
   }
 
@@ -415,7 +418,7 @@ namespace LeapInternal
     public LEAP_VECTOR prev_joint;
     public LEAP_VECTOR next_joint;
     public float width;
-    public LEAP_MATRIX basis;
+    public LEAP_QUATERNION rotation;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]

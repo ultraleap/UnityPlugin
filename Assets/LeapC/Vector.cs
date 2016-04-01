@@ -520,6 +520,11 @@ namespace Leap
     public static readonly Vector Zero = new Vector(0, 0, 0);
 
     /**
+     * The ones vector: (1, 1, 1)
+     */
+    public static readonly Vector Ones = new Vector(1, 1, 1);
+
+    /**
      * The x-axis unit vector: (1, 0, 0)
      *
      * \include Vector_XAxis.txt

@@ -32,7 +32,7 @@ namespace Leap
    */
   public class Hand
   {
-    private Matrix _basis = Matrix.Identity;
+    private LeapTransform _basis = LeapTransform.Identity;
     private bool _needToCalculateBasis = true;
 
     /**
@@ -126,13 +126,12 @@ namespace Leap
     /**
      * Returns a copy of this Hand object transformed by the specifid transform matrix.
       */
-    public Hand TransformedCopy(Matrix trs)
+    public Hand TransformedCopy(LeapTransform trs)
     {
       List<Finger> transformedFingers = new List<Finger>(5);
       for (int f = 0; f < this.Fingers.Count; f++)
         transformedFingers.Add(Fingers[f].TransformedCopy(trs));
 
-      float hScale = trs.xBasis.Magnitude;
       return new Hand(
         FrameId,
         Id,
@@ -141,7 +140,7 @@ namespace Leap
         GrabAngle,
         PinchStrength,
         PinchDistance,
-        PalmWidth * hScale,
+        PalmWidth * trs.scale.x,
         IsLeft,
         TimeVisible,
         Arm.TransformedCopy(trs),
@@ -300,7 +299,7 @@ namespace Leap
      */
     public Vector Direction { get; private set; }
 
-    /**
+     /**
      * The orientation of the hand as a basis matrix.
      *
      * The basis is defined as follows:
@@ -319,7 +318,7 @@ namespace Leap
      * @returns The basis of the hand as a matrix.
      * @since 2.0
      */
-    public Matrix Basis
+    public LeapTransform Basis
     {
       get
       {

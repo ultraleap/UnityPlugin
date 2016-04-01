@@ -3,10 +3,11 @@ namespace Leap {
 using System;
 using System.Runtime.InteropServices;
   using System.Collections.Generic;
+  using Leap.Unity;
 
 
     public class TestHandFactory {
-    
+
         public static Frame MakeTestFrame(int frameId, bool leftHandIncluded, bool rightHandIncluded){
             Frame testFrame = new Frame(frameId, 0, 120.0f, new InteractionBox(), new List<Hand>());
             if(leftHandIncluded)
@@ -26,13 +27,8 @@ using System.Runtime.InteropServices;
 
             Vector armWrist = new Vector(-7.05809944059f, 4.0f, 50.0f);
             Vector elbow = armWrist + 250f * Vector.Backward;
-            Matrix armBasis;
-            if(isLeft)
-                  armBasis = new Matrix(Vector.Right, Vector.Up, Vector.Forward, elbow);
-            else
-                  armBasis = new Matrix(Vector.Left, Vector.Up, Vector.Forward, elbow);
 
-            Arm arm = new Arm(elbow, armWrist,(elbow + armWrist)/2, Vector.Forward, 250f, 41f, armBasis);
+            Arm arm = new Arm(elbow, armWrist,(elbow + armWrist)/2, Vector.Forward, 250f, 41f, LeapQuaternion.Identity);
             Hand testHand = new Hand(frameId,
             handId,
             1.0f,
@@ -55,8 +51,9 @@ using System.Runtime.InteropServices;
             if(isLeft){
                 return testHand;
             } else {
-                Matrix leftToRight = Matrix.Identity;
-                leftToRight.xBasis = new Vector(-1, 0, 0); 
+                // This will not change the bones rotatations.
+                LeapTransform leftToRight = LeapTransform.Identity;
+                leftToRight.xBasis = new Vector(-1, 0, 0);
                 Hand rightHand = testHand.TransformedCopy(leftToRight);
               return rightHand;
             }
@@ -107,7 +104,7 @@ using System.Runtime.InteropServices;
         }
 
 
-         static Finger MakeFinger(Finger.FingerType name, Vector position, Vector forward, Vector up, float[] jointLengths, 
+         static Finger MakeFinger(Finger.FingerType name, Vector position, Vector forward, Vector up, float[] jointLengths,
             int frameId, int handId, int fingerId, bool isLeft){
             Bone[] bones = new Bone[5];
             float proximalDistance = -jointLengths[0];
@@ -145,14 +142,14 @@ using System.Runtime.InteropServices;
         }
 
          static Bone MakeBone(Bone.BoneType name, Vector proximalPosition, float length, float width, Vector direction, Vector up, bool isLeft){
-            Matrix basis = new Matrix();
-            basis.zBasis = -direction;
-            basis.yBasis = up;
-            basis.xBasis = direction.Cross(up).Normalized;
+           UnityEngine.Quaternion q = UnityEngine.Quaternion.LookRotation(direction.ToVector3(), up.ToVector3());
+
+           LeapTransform basis = new LeapTransform(proximalPosition, q.ToQuaternion());
+
             if(!isLeft)
               basis.xBasis = -basis.xBasis;
-            basis.origin = proximalPosition;
-            return new Bone(
+
+           return new Bone(
                 proximalPosition,
                 proximalPosition + direction * length,
                 Vector.Lerp(proximalPosition, proximalPosition + direction * length, .5f),
@@ -160,7 +157,7 @@ using System.Runtime.InteropServices;
                 length,
                 width,
                 name,
-                basis);
+                LeapQuaternion.Identity);
         }
     }
 }

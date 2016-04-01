@@ -55,7 +55,7 @@ namespace Leap.Unity.PinchUtility {
 
     protected virtual void Update() {
       //We ensure the data is up to date at all times because
-      //there are some values (like LastPinchTime) that cannot 
+      //there are some values (like LastPinchTime) that cannot
       //be updated on demand
       ensurePinchInfoUpToDate();
     }
@@ -159,7 +159,7 @@ namespace Leap.Unity.PinchUtility {
       }
 
       float pinchDistance = hand.PinchDistance * MM_TO_M;
-      transform.rotation = hand.Basis.Rotation();
+      transform.rotation = hand.Basis.quaternion.ToQuaternion();
 
       var fingers = hand.Fingers;
       transform.position = Vector3.zero;

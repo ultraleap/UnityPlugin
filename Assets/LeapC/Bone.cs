@@ -37,7 +37,7 @@ namespace Leap
     {
       PrevJoint = Vector.Zero;
       NextJoint = Vector.Zero;
-      Basis = Matrix.Identity;
+      Rotation = LeapQuaternion.Identity;
       Center = Vector.Zero;
       Direction = Vector.Zero;
       Type = BoneType.TYPE_INVALID;
@@ -63,14 +63,14 @@ namespace Leap
                 float length,
                 float width,
                 Bone.BoneType type,
-                Matrix basis
+                LeapQuaternion rotation
                 )
     {
       PrevJoint = prevJoint;
       NextJoint = nextJoint;
       Center = center;
       Direction = direction;
-      Basis = basis;
+      Rotation = rotation;
       Length = length;
       Width = width;
       Type = type;
@@ -79,22 +79,20 @@ namespace Leap
     /**
      * Creates a copy of this bone, transformed by the specified transform.
      *
-     * @param trs A Matrix containing the desired translation, rotation, and scale
+     * @param trs A LeapTransform containing the desired translation, rotation, and scale
      * of the copied bone.
      * @since 3.0
      */
-    public Bone TransformedCopy(Matrix trs)
+    public Bone TransformedCopy(LeapTransform trs)
     {
-      float dScale = trs.zBasis.Magnitude;
-      float hScale = trs.xBasis.Magnitude;
       return new Bone(trs.TransformPoint(PrevJoint),
           trs.TransformPoint(NextJoint),
           trs.TransformPoint(Center),
           trs.TransformDirection(Direction).Normalized,
-          Length * dScale,
-          Width * hScale,
+          Length * trs.scale.z,
+          Width * trs.scale.x,
           Type,
-          trs * Basis);
+          trs.TransformQuaternion(Rotation));
     }
 
     /**
@@ -197,7 +195,16 @@ namespace Leap
     public Bone.BoneType Type { get; private set; }
 
     /**
+     * The orientation of this Bone as a Quaternion.
+     *
+     * @returns The Quaternion.
+     * @since 2.0
+     */
+    public LeapQuaternion Rotation { get; private set; }
+
+    /**
      * The orthonormal basis vectors for this Bone as a Matrix.
+     * The orientation of this Bone as a Quaternion.
      *
      * Basis vectors specify the orientation of a bone.
      *
@@ -227,9 +234,10 @@ namespace Leap
      * \include Bone_basis.txt
      *
      * @returns The basis of the bone as a matrix.
+     * @returns The Quaternion.
      * @since 2.0
      */
-    public Matrix Basis { get; private set; }
+    public LeapTransform Basis { get { return new LeapTransform(PrevJoint, Rotation); } }
 
     /**
      * Enumerates the names of the bones.
