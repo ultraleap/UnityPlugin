@@ -231,11 +231,12 @@ namespace Leap.Unity.Interaction {
             Bone.BoneType boneType = (Bone.BoneType)j;
             Bone bone = finger.Bone(boneType);
 
+            Vector3 objectPos = collection.GetGlobalPosition(fingerType, boneType);
             Vector3 jointPos = bone.NextJoint.ToVector3();
-            Vector3 coresponding = collection.GetGlobalPosition(fingerType, boneType);
 
-            LEAP_VECTOR point1 = new LEAP_VECTOR(jointPos);
-            LEAP_VECTOR point2 = new LEAP_VECTOR(coresponding);
+            //Do the solve such that the objects positions are matched to the new joint positions
+            LEAP_VECTOR point1 = new LEAP_VECTOR(objectPos);
+            LEAP_VECTOR point2 = new LEAP_VECTOR(jointPos);
 
             KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
           }
