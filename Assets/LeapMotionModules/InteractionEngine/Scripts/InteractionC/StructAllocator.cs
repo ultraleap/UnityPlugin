@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using LeapInternal;
+﻿using LeapInternal;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
