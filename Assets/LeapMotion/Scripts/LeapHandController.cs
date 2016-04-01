@@ -5,27 +5,16 @@ using Leap;
 
 namespace Leap.Unity {
   /**
-   * LeapHandController uses a Factory to create and updata HandRepresentations based on Frame's received from a Provider  */
+   * LeapHandController uses a Factory to create and update HandRepresentations based on Frame's received from a Provider  */
   public class LeapHandController : MonoBehaviour {
-    /** The scale factors for hand movement. Set greater than 1 to give the hands a greater range of motion. */
-    public Vector3 handMovementScale = Vector3.one;
+    protected LeapProvider provider;
+    protected HandFactory factory;
 
-    public LeapProvider Provider { get; set; }
-    public HandFactory Factory { get; set; }
-
-    public Dictionary<int, HandRepresentation> graphicsReps = new Dictionary<int, HandRepresentation>();
-    public Dictionary<int, HandRepresentation> physicsReps = new Dictionary<int, HandRepresentation>();
+    protected Dictionary<int, HandRepresentation> graphicsReps = new Dictionary<int, HandRepresentation>();
+    protected Dictionary<int, HandRepresentation> physicsReps = new Dictionary<int, HandRepresentation>();
 
     // Reference distance from thumb base to pinky base in mm.
     protected const float GIZMO_SCALE = 5.0f;
-    /** Conversion factor for millimeters to meters. */
-    protected const float MM_TO_M = 1e-3f;
-    /** Conversion factor for nanoseconds to seconds. */
-    protected const float NS_TO_S = 1e-6f;
-    /** Conversion factor for seconds to nanoseconds. */
-    protected const float S_TO_NS = 1e6f;
-    /** How much smoothing to use when calculating the FixedUpdate offset. */
-    protected const float FIXED_UPDATE_OFFSET_SMOOTHING_DELAY = 0.1f;
 
     protected bool graphicsEnabled = true;
     protected bool physicsEnabled = true;
@@ -36,9 +25,6 @@ namespace Leap.Unity {
       }
       set {
         graphicsEnabled = value;
-        if (!graphicsEnabled) {
-          //DestroyGraphicsHands();
-        }
       }
     }
 
@@ -48,9 +34,6 @@ namespace Leap.Unity {
       }
       set {
         physicsEnabled = value;
-        if (!physicsEnabled) {
-          //DestroyPhysicsHands();
-        }
       }
     }
 
@@ -61,13 +44,13 @@ namespace Leap.Unity {
     }
 
     protected virtual void Start() {
-      Provider = GetComponent<LeapProvider>();
-      Factory = GetComponent<HandFactory>();
+      provider = requireComponent<LeapProvider>();
+      factory = requireComponent<HandFactory>();
     }
 
     /** Updates the graphics HandRepresentations. */
     protected virtual void Update() {
-      Frame frame = Provider.CurrentFrame;
+      Frame frame = provider.CurrentFrame;
 
       if (frame != null && graphicsEnabled) {
         UpdateHandRepresentations(graphicsReps, ModelType.Graphics, frame);
@@ -76,7 +59,7 @@ namespace Leap.Unity {
 
     /** Updates the physics HandRepresentations. */
     protected virtual void FixedUpdate() {
-      Frame fixedFrame = Provider.CurrentFixedFrame;
+      Frame fixedFrame = provider.CurrentFixedFrame;
 
       if (fixedFrame != null && physicsEnabled) {
         UpdateHandRepresentations(physicsReps, ModelType.Physics, fixedFrame);
@@ -97,7 +80,7 @@ namespace Leap.Unity {
       foreach (Leap.Hand curHand in frame.Hands) {
         HandRepresentation rep;
         if (!all_hand_reps.TryGetValue(curHand.Id, out rep)) {
-          rep = Factory.MakeHandRepresentation(curHand, modelType);
+          rep = factory.MakeHandRepresentation(curHand, modelType);
           if (rep != null) {
             all_hand_reps.Add(curHand.Id, rep);
           }
@@ -115,8 +98,7 @@ namespace Leap.Unity {
         if (r.Value != null) {
           if (r.Value.IsMarked) {
             r.Value.IsMarked = false;
-          }
-          else {
+          } else {
             /** Initialize toBeDeleted with a value to be deleted */
             //Debug.Log("Finishing");
             toBeDeleted = r.Value;
@@ -129,6 +111,16 @@ namespace Leap.Unity {
         all_hand_reps.Remove(toBeDeleted.HandID);
         toBeDeleted.Finish();
       }
+    }
+
+    private T requireComponent<T>() where T : Component {
+      T component = GetComponent<T>();
+      if (component == null) {
+        string componentName = typeof(T).Name;
+        Debug.LogError("LeapHandController could not find a " + componentName + " and has been disabled.  Make sure there is a " + componentName + " on the same gameObject.");
+        enabled = false;
+      }
+      return component;
     }
   }
 }
