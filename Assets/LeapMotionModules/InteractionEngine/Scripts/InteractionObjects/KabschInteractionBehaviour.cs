@@ -54,8 +54,10 @@ namespace Leap.Unity.Interaction {
     public override void DisableInteraction() {
       base.DisableInteraction();
 
-      _rigidbody.useGravity = _rigidbodyHadUseGravity;
-      _rigidbody = null;
+      if (_rigidbody != null) {
+        _rigidbody.useGravity = _rigidbodyHadUseGravity;
+        _rigidbody = null;
+      }
 
       KabschC.Destruct(ref _kabsch);
     }
