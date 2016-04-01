@@ -4,8 +4,7 @@ using LeapInternal;
 
 namespace Leap.Unity.Interaction {
 
-  public class TestInteractionObject : InteractionBehaviourBase {
-    private Renderer _renderer;
+  public class InteractionBehaviourDebug : InteractionBehaviourBase {
 
     public override LEAP_IE_TRANSFORM InteractionTransform {
       get {
@@ -16,18 +15,21 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected override void OnGraspBegin() {
-      base.OnGraspBegin();
-      _renderer.material.color = Color.green;
+    public void OnDrawGizmos() {
+      Bounds bounds = new Bounds(transform.position, Vector3.zero);
+      foreach (Collider c in GetComponentsInChildren<Collider>()) {
+        bounds.Encapsulate(c.bounds.min);
+        bounds.Encapsulate(c.bounds.max);
+      }
+
+      if (IsBeingGrasped) {
+        Gizmos.color = Color.green;
+        Gizmos.DrawCube(bounds.center, bounds.size);
+      } else {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(bounds.center, bounds.size);
+      }
     }
 
-    protected override void OnGraspEnd() {
-      base.OnGraspEnd();
-      _renderer.material.color = Color.white;
-    }
-
-    void Awake() {
-      _renderer = GetComponent<Renderer>();
-    }
   }
 }
