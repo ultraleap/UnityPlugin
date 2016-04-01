@@ -7,7 +7,7 @@ using System;
 namespace Leap.Unity.Interaction {
 
   [RequireComponent(typeof(Rigidbody))]
-  public class KabschInteractionBehaviour : InteractionBehaviourBase {
+  public class InteractionBehaviourKabsch : InteractionBehaviourBase {
     public const int NUM_FINGERS = 5;
     public const int NUM_JOINTS = 4;
 
