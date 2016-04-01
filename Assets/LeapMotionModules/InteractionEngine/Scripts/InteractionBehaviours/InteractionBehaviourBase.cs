@@ -339,7 +339,7 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void Reset() {
       if (_manager == null) {
-        //If manager is null, first check out parents for one, then search the whole scene
+        //If manager is null, first check our parents for one, then search the whole scene
         _manager = GetComponentInParent<InteractionManager>();
         if (_manager == null) {
           _manager = FindObjectOfType<InteractionManager>();
