@@ -66,7 +66,6 @@ namespace Leap.Unity{
     * Draws lines from elbow to wrist, wrist to palm, and normal to the palm.
     */
     protected void DrawDebugLines() {
-      HandModel handModel = GetComponent<HandModel>();
       Hand hand = GetLeapHand();
       Debug.DrawLine(hand.Arm.ElbowPosition.ToVector3(), hand.Arm.WristPosition.ToVector3(), Color.red); //Arm
       Debug.DrawLine(hand.WristPosition.ToVector3(), hand.PalmPosition.ToVector3(), Color.white); //Wrist to palm line
