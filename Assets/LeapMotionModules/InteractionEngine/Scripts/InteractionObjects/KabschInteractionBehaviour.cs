@@ -95,24 +95,40 @@ namespace Leap.Unity.Interaction {
     public override void OnHandsHold(List<Hand> hands) {
       base.OnHandsHold(hands);
 
-      Vector3 translation;
-      Quaternion rotation;
-      getSolvedTransform(hands, out translation, out rotation);
-
+      //Get old transform
+      Vector3 oldPosition;
+      Quaternion oldRotation;
       if (_rigidbody != null) {
-        if (_shouldNextSolveBeTeleport) {
-          _rigidbody.position = translation;
-          _rigidbody.rotation = rotation;
-        } else {
-          _rigidbody.MovePosition(translation);
-          _rigidbody.MoveRotation(rotation);
-        }
+        oldPosition = _rigidbody.position;
+        oldRotation = _rigidbody.rotation;
       } else {
-        transform.position = translation;
-        transform.rotation = rotation;
+        oldPosition = transform.position;
+        oldRotation = transform.rotation;
       }
 
-      _shouldNextSolveBeTeleport = false;
+      //Get solved transform deltas
+      Vector3 solvedTranslation;
+      Quaternion solvedRotation;
+      getSolvedTransform(hands, out solvedTranslation, out solvedRotation);
+
+      //Calculate new transform using delta
+      Vector3 newPosition = oldPosition + solvedTranslation;
+      Quaternion newRotation = oldRotation * solvedRotation;
+
+      //Apply new transform to object
+      if (_rigidbody != null) {
+        if (_shouldNextSolveBeTeleport) {
+          _rigidbody.position = newPosition;
+          _rigidbody.rotation = newRotation;
+        } else {
+          _rigidbody.MovePosition(newPosition);
+          _rigidbody.MoveRotation(newRotation);
+        }
+        _shouldNextSolveBeTeleport = false;
+      } else {
+        transform.position = newPosition;
+        transform.rotation = newRotation;
+      }
     }
 
     public override void OnHandRelease(Hand hand) {
