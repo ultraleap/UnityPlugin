@@ -6,7 +6,6 @@ using LeapInternal;
 namespace Leap.Unity.Interaction.CApi {
 
   public class ShapeDescriptionPool {
-
     private LEAP_IE_SCENE _scene;
 
     private Dictionary<float, LEAP_IE_SHAPE_DESCRIPTION_HANDLE> _sphereDescMap;
