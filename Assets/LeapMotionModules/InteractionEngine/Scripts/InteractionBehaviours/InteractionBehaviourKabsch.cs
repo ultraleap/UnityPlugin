@@ -290,10 +290,11 @@ namespace Leap.Unity.Interaction {
         _handPointCollectionPool.Push(handPointCollection);
       }
 
-      private HandPointCollection() { }
+      private HandPointCollection() {
+        _localPositions = new Vector3[NUM_FINGERS * NUM_JOINTS];
+      }
 
       private void init(InteractionBehaviourKabsch interactionBehaviour) {
-        _localPositions = new Vector3[NUM_FINGERS * NUM_JOINTS];
         _interactionBehaviour = interactionBehaviour;
       }
 
