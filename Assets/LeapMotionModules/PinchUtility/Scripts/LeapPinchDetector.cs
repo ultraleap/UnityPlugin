@@ -159,7 +159,7 @@ namespace Leap.Unity.PinchUtility {
       }
 
       float pinchDistance = hand.PinchDistance * MM_TO_M;
-      transform.rotation = hand.Basis.quaternion.ToQuaternion();
+      transform.rotation = hand.Basis.CalculateRotation();
 
       var fingers = hand.Fingers;
       transform.position = Vector3.zero;

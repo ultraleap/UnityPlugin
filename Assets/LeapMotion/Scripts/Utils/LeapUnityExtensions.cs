@@ -27,6 +27,18 @@ namespace Leap.Unity {
     }
 
     /**
+    * Converts a Leap Vector object to a UnityEngine Vector4 object.
+    *
+    * Does not convert to the Unity left-handed coordinate system or scale
+    * the coordinates from millimeters to meters.
+    * @returns The Unity Vector4 object with the same coordinate values as the Leap.Vector.
+    */
+    public static Vector4 ToVector4(this Vector vector)
+    {
+      return new Vector4(vector.x, vector.y, vector.z, 0.0f);
+    }
+
+    /**
     * Converts a UnityEngine Vector3 object to a Leap Vector object.
     *
     * Does not convert to the Unity left-handed coordinate system or scale
@@ -59,7 +71,7 @@ namespace Leap.Unity {
     *
     * @returns The LeapQuaternion object with the same values as the UnityEngine.Quaternion.
     */
-    public static LeapQuaternion ToQuaternion(this Quaternion q)
+    public static LeapQuaternion ToLeapQuaternion(this Quaternion q)
     {
       return new LeapQuaternion(q.x, q.y, q.z, q.w);
     }
@@ -78,6 +90,20 @@ namespace Leap.Unity {
     /** Conversion factor for millimeters to meters. */
     public static readonly float MM_TO_M = 1e-3f;
 
+   /**
+     * Converts a Leap Matrix object representing a rotation to a
+     * Unity Quaternion.
+     *
+     * In previous version prior 4.0.0 this function performed a conversion to Unity's left-handed coordinate system, and now does not.
+     *
+     * @returns A Unity Quaternion representing the rotation.
+     */
+    public static Quaternion CalculateRotation(this LeapTransform matrix) {
+      Vector3 up = matrix.yBasis.ToVector3();
+      Vector3 forward = -matrix.zBasis.ToVector3();
+      return Quaternion.LookRotation(forward, up);
+    }
+
     /**
      * Extracts a transform matrix containing translation, rotation, and scale from a Unity Transform object and
      * returns a Leap Motion LeapTransform object.
@@ -91,7 +117,7 @@ namespace Leap.Unity {
      */
     public static LeapTransform GetLeapMatrix(this Transform t) {
       Vector scale = new Vector(t.lossyScale.x * MM_TO_M, t.lossyScale.y * MM_TO_M, t.lossyScale.z * MM_TO_M);
-      return new LeapTransform(t.position.ToVector(), t.rotation.ToQuaternion(), scale);
+      return new LeapTransform(t.position.ToVector(), t.rotation.ToLeapQuaternion(), scale);
     }
   }
 }

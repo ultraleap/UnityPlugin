@@ -53,7 +53,7 @@ using System.Runtime.InteropServices;
             } else {
                 // This will not change the bones rotatations.
                 LeapTransform leftToRight = LeapTransform.Identity;
-                leftToRight.xBasis = new Vector(-1, 0, 0);
+                leftToRight.FlipX();
                 Hand rightHand = testHand.TransformedCopy(leftToRight);
               return rightHand;
             }
@@ -144,7 +144,7 @@ using System.Runtime.InteropServices;
          static Bone MakeBone(Bone.BoneType name, Vector proximalPosition, float length, float width, Vector direction, Vector up, bool isLeft){
            UnityEngine.Quaternion q = UnityEngine.Quaternion.LookRotation(direction.ToVector3(), up.ToVector3());
 
-           LeapTransform basis = new LeapTransform(proximalPosition, q.ToQuaternion());
+           LeapTransform basis = new LeapTransform(proximalPosition, q.ToLeapQuaternion());
 
             if(!isLeft)
               basis.xBasis = -basis.xBasis;

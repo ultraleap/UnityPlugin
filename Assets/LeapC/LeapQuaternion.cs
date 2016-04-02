@@ -20,9 +20,6 @@ namespace Leap
   {
     /**
      * Creates a new LeapQuaternion with the specified component values.
-     *
-     * \include Vector_Constructor_1.txt
-     * @since 1.0
      */
     public LeapQuaternion(float x, float y, float z, float w) :
       this()
@@ -35,9 +32,6 @@ namespace Leap
 
     /**
      * Copies the specified LeapQuaternion.
-     *
-     * \include Vector_Constructor_2.txt
-     * @since 1.0
      */
     public LeapQuaternion(LeapQuaternion quaternion) :
       this()
@@ -50,9 +44,6 @@ namespace Leap
 
     /**
      * Copies the specified LEAP_QUATERNION.
-     *
-     * \include Vector_Constructor_2.txt
-     * @since 1.0
      */
     public LeapQuaternion(LeapInternal.LEAP_QUATERNION quaternion) :
       this()
@@ -65,7 +56,6 @@ namespace Leap
 
     /**
      * Returns a string containing this quaternion in a human readable format: (x, y, z).
-     * @since 1.0
      */
     public override string ToString()
     {
@@ -74,9 +64,6 @@ namespace Leap
 
     /**
      * Compare LeapQuaternion equality component-wise.
-     *
-     * \include Vector_Equals.txt
-     * @since 1.0
      */
     public bool Equals(LeapQuaternion v)
     {
@@ -90,9 +77,6 @@ namespace Leap
     /**
      * Returns true if all of the quaternion's components are finite.  If any
      * component is NaN or infinite, then this returns false.
-     *
-     * \include Vector_IsValid.txt
-     * @since 1.0
      */
     public bool IsValid()
     {
@@ -101,38 +85,27 @@ namespace Leap
 
     /**
      * The x component.
-     * @since 1.0
      */
     public float x;
 
     /**
      * The y component.
-     * @since 1.0
      */
     public float y;
 
     /**
      * The z component.
-     * @since 1.0
      */
     public float z;
 
     /**
      * The w component.
-     * @since 1.0
      */
     public float w;
 
     /**
      * The magnitude, or length, of this quaternion.
-     *
-     * The magnitude is the L2 norm, or Euclidean distance between the origin and
-     * the point represented by the (x, y, z) components of this LeapQuaternion object.
-     *
-     * \include Vector_Magnitude.txt
-     *
      * @returns The length of this quaternion.
-     * @since 1.0
      */
     public float Magnitude
     {
@@ -142,10 +115,7 @@ namespace Leap
     /**
      * The square of the magnitude, or length, of this quaternion.
      *
-     * \include Vector_Magnitude_Squared.txt
-     *
      * @returns The square of the length of this quaternion.
-     * @since 1.0
      */
     public float MagnitudeSquared
     {
@@ -155,12 +125,7 @@ namespace Leap
     /**
      * A normalized copy of this quaternion.
      *
-     * A normalized quaternion has the same direction as the original quaternion,
-     * but with a length of one.
-     *
-     * @returns A LeapQuaternion object with a length of one, with the same rotation
-     * direction as this LeapQuaternion object.
-     * @since 1.0
+     * @returns A LeapQuaternion object with a length of one.
      */
     public LeapQuaternion Normalized
     {
@@ -176,6 +141,12 @@ namespace Leap
       }
     }
 
+    /**
+     * Concatenates the rotation described by this quaternion with the one provided
+     * and returns the result.
+     *
+     * @returns A LeapQuaternion containging the product.
+     */
     public LeapQuaternion Multiply(LeapQuaternion rhs)
     {
       return new LeapQuaternion(

@@ -96,7 +96,9 @@ namespace Leap.Unity{
     */
     public Quaternion GetPalmRotation() {
       if (hand_ != null) {
-        return hand_.Basis.quaternion.ToQuaternion();
+        // The hand Basis vectors are calculated explicitly.  This requires using Basis.CalculateRotation()
+        // instead of Basis.quaternion.
+        return hand_.Basis.CalculateRotation();
       }
       if (palm) {
         return palm.rotation;
@@ -233,9 +235,6 @@ namespace Leap.Unity{
         }
       }
     }
-
-
-
 
     //Todo Kill these
     /** The parent HandController object of this hand.*/

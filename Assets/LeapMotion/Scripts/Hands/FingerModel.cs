@@ -44,8 +44,6 @@ namespace Leap.Unity{
     protected Finger finger_;
     /** An added offset vector. */
     protected Vector3 offset_ = Vector3.zero;
-    /** Whether this finger is mirrored. */
-    protected bool mirror_z_axis_ = false;
 
     /** The parent HandController instance. */
     protected LeapHandController controller_;
@@ -78,15 +76,6 @@ namespace Leap.Unity{
     */
     public void SetOffset(Vector3 offset) {
       offset_ = offset;
-    }
-
-    /**
-    * Sets the mirror z-axis flag for this Finger Model.
-    * Mirroring the z axis reverses the hand so that they face the opposite direction -- as if in a mirror.
-    * @param mirror Set true, the default value to mirror; false for normal rendering.
-    */
-    public void MirrorZAxis(bool mirror = true) {
-      mirror_z_axis_ = mirror;
     }
 
     /** The Leap Hand object. */
