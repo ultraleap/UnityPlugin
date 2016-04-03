@@ -37,23 +37,23 @@ namespace Leap
       Vector result = _xBasisScaled * point.x + _yBasisScaled * point.y + _zBasisScaled * point.z + translation;
 
 #if DEBUG_CHECK_AGAINST_UNITY
-      Vector3 t = _dbgFull.MultiplyPoint(result.ToVector3());
-      UnityEngine.Assertions.Assert.AreApproximatelyEqual(t.x, result.x);
-      UnityEngine.Assertions.Assert.AreApproximatelyEqual(t.y, result.y);
-      UnityEngine.Assertions.Assert.AreApproximatelyEqual(t.z, result.z);
+      Vector3 t = _dbgFull.MultiplyPoint(point.ToVector3());
+      approximatelyEqual(t.x, result.x);
+      approximatelyEqual(t.y, result.y);
+      approximatelyEqual(t.z, result.z);
 #endif
       return result;
     }
 
     public Vector TransformDirection(Vector direction)
     {
-      Vector result = _xBasis * direction.x + yBasis * direction.y + zBasis * direction.z;
+      Vector result = _xBasis * direction.x + _yBasis * direction.y + _zBasis * direction.z;
 
 #if DEBUG_CHECK_AGAINST_UNITY
-      Vector3 t = _dbgRot.MultiplyPoint(result.ToVector3());
-      UnityEngine.Assertions.Assert.AreApproximatelyEqual(t.x, result.x);
-      UnityEngine.Assertions.Assert.AreApproximatelyEqual(t.y, result.y);
-      UnityEngine.Assertions.Assert.AreApproximatelyEqual(t.z, result.z);
+      Vector3 t = _dbgRot.MultiplyPoint(direction.ToVector3());
+      approximatelyEqual(t.x, result.x);
+      approximatelyEqual(t.y, result.y);
+      approximatelyEqual(t.z, result.z);
 #endif
       return result;
     }
@@ -68,10 +68,10 @@ namespace Leap
 
 #if DEBUG_CHECK_AGAINST_UNITY
       Quaternion dbg = _quaternion.ToQuaternion() * rhs.ToQuaternion();
-      UnityEngine.Assertions.Assert.AreApproximatelyEqual(t.x, dbg.x);
-      UnityEngine.Assertions.Assert.AreApproximatelyEqual(t.y, dbg.y);
-      UnityEngine.Assertions.Assert.AreApproximatelyEqual(t.z, dbg.z);
-      UnityEngine.Assertions.Assert.AreApproximatelyEqual(t.z, dbg.w);
+      approximatelyEqual(t.x, dbg.x);
+      approximatelyEqual(t.y, dbg.y);
+      approximatelyEqual(t.z, dbg.z);
+      approximatelyEqual(t.w, dbg.w);
 #endif
 
       if (_flipX) {
@@ -94,8 +94,8 @@ namespace Leap
       _translation.x = -_translation.x;
 
 #if DEBUG_CHECK_AGAINST_UNITY
-      _dbgRot.SetColumn(2, -_dbgRot.GetColumn(2));
-      _dbgFull.SetColumn(2, -_dbgFull.GetColumn(2));
+      _dbgRot.SetColumn(0, -_dbgRot.GetColumn(0));
+      _dbgFull.SetColumn(0, -_dbgFull.GetColumn(0));
       Vector4 t = _dbgFull.GetColumn(3);
       t.z = -t.z;
       _dbgFull.SetColumn(3, t);
@@ -196,12 +196,16 @@ namespace Leap
 		    float xx = value.x * xs,  xy = value.x * ys,  xz = value.x * zs;
 		    float yy = value.y * ys,  yz = value.y * zs,  zz = value.z * zs;
 
-        this.xBasis = new Vector(1.0f - (yy + zz), xy - wz,          xz + wy);
-        this.yBasis = new Vector(xy + wz,          1.0f - (xx + zz), yz - wx);
-        this.zBasis = new Vector(xz - wy,          yz + wx,          1.0f - (xx + yy));
+        _xBasis = new Vector(1.0f - (yy + zz), xy + wz, xz - wy);
+        _yBasis = new Vector(xy - wz, 1.0f - (xx + zz), yz + wx);
+        _zBasis = new Vector(xz + wy, yz - wx, 1.0f - (xx + yy));
 
-      _quaternionDirty = false;
-      _flipX = false;
+        _xBasisScaled = _xBasis * scale.x;
+        _yBasisScaled = _yBasis * scale.y;
+        _zBasisScaled = _zBasis * scale.z;
+
+        _quaternionDirty = false;
+        _flipX = false;
 
 #if DEBUG_CHECK_AGAINST_UNITY
         _dbgFull.SetTRS(_translation.ToVector3(), _quaternion.ToQuaternion(), _scale.ToVector3());
@@ -216,18 +220,35 @@ namespace Leap
 #if DEBUG_CHECK_AGAINST_UNITY
     void validateBasis()
     {
+			UnityEngine.Assertions.Assert.raiseExceptions = true;
+			Debug.DebugBreak ();
+
+
       for (int i = 0; i < 3; ++i)
       {
-        UnityEngine.Assertions.Assert.AreApproximatelyEqual(_xBasis.ToVector4()[i], _dbgRot.GetColumn(0)[i]);
-        UnityEngine.Assertions.Assert.AreApproximatelyEqual(_yBasis.ToVector4()[i], _dbgRot.GetColumn(1)[i]);
-        UnityEngine.Assertions.Assert.AreApproximatelyEqual(_zBasis.ToVector4()[i], _dbgRot.GetColumn(2)[i]);
+        approximatelyEqual(_xBasis.ToVector4()[i], _dbgRot.GetColumn(0)[i]);
+        approximatelyEqual(_yBasis.ToVector4()[i], _dbgRot.GetColumn(1)[i]);
+        approximatelyEqual(_zBasis.ToVector4()[i], _dbgRot.GetColumn(2)[i]);
 
-        UnityEngine.Assertions.Assert.AreApproximatelyEqual(_xBasisScaled.ToVector4()[i], _dbgFull.GetColumn(0)[i]);
-        UnityEngine.Assertions.Assert.AreApproximatelyEqual(_yBasisScaled.ToVector4()[i], _dbgFull.GetColumn(1)[i]);
-        UnityEngine.Assertions.Assert.AreApproximatelyEqual(_zBasisScaled.ToVector4()[i], _dbgFull.GetColumn(2)[i]);
+        approximatelyEqual(_xBasis.ToVector4().SqrMagnitude(), 1.0f);
+        approximatelyEqual(_yBasis.ToVector4().SqrMagnitude(), 1.0f);
+        approximatelyEqual(_zBasis.ToVector4().SqrMagnitude(), 1.0f);
+
+        approximatelyEqual(_xBasisScaled.ToVector4()[i], _dbgFull.GetColumn(0)[i]);
+        approximatelyEqual(_yBasisScaled.ToVector4()[i], _dbgFull.GetColumn(1)[i]);
+        approximatelyEqual(_zBasisScaled.ToVector4()[i], _dbgFull.GetColumn(2)[i]);
       }
-#endif
     }
+
+    void approximatelyEqual(float a, float b)
+    {
+      float absdiff = Math.Abs(a - b);
+      if (absdiff > 0.0001)
+      {
+        Debug.Log("approximatelyEqual: Somewhere to put a breakpoint.");
+      }
+    }
+#endif
 
     private Vector _translation;
     private Vector _scale;

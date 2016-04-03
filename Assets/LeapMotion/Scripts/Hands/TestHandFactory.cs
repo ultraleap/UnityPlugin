@@ -28,6 +28,7 @@ using System.Runtime.InteropServices;
             Vector armWrist = new Vector(-7.05809944059f, 4.0f, 50.0f);
             Vector elbow = armWrist + 250f * Vector.Backward;
 
+            // Adrian: The previous "armBasis" used "elbow" as a translation component.
             Arm arm = new Arm(elbow, armWrist,(elbow + armWrist)/2, Vector.Forward, 250f, 41f, LeapQuaternion.Identity);
             Hand testHand = new Hand(frameId,
             handId,
@@ -51,7 +52,6 @@ using System.Runtime.InteropServices;
             if(isLeft){
                 return testHand;
             } else {
-                // This will not change the bones rotatations.
                 LeapTransform leftToRight = LeapTransform.Identity;
                 leftToRight.FlipX();
                 Hand rightHand = testHand.TransformedCopy(leftToRight);
@@ -142,12 +142,8 @@ using System.Runtime.InteropServices;
         }
 
          static Bone MakeBone(Bone.BoneType name, Vector proximalPosition, float length, float width, Vector direction, Vector up, bool isLeft){
-           UnityEngine.Quaternion q = UnityEngine.Quaternion.LookRotation(direction.ToVector3(), up.ToVector3());
 
-           LeapTransform basis = new LeapTransform(proximalPosition, q.ToLeapQuaternion());
-
-            if(!isLeft)
-              basis.xBasis = -basis.xBasis;
+           LeapQuaternion rotation = UnityEngine.Quaternion.LookRotation(direction.ToVector3(), up.ToVector3()).ToLeapQuaternion();
 
            return new Bone(
                 proximalPosition,
@@ -157,7 +153,7 @@ using System.Runtime.InteropServices;
                 length,
                 width,
                 name,
-                LeapQuaternion.Identity);
+                rotation);
         }
     }
 }

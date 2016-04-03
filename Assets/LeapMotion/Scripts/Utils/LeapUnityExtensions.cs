@@ -90,17 +90,17 @@ namespace Leap.Unity {
     /** Conversion factor for millimeters to meters. */
     public static readonly float MM_TO_M = 1e-3f;
 
-   /**
-     * Converts a Leap Matrix object representing a rotation to a
-     * Unity Quaternion.
-     *
-     * In previous version prior 4.0.0 this function performed a conversion to Unity's left-handed coordinate system, and now does not.
-     *
-     * @returns A Unity Quaternion representing the rotation.
-     */
-    public static Quaternion CalculateRotation(this LeapTransform matrix) {
-      Vector3 up = matrix.yBasis.ToVector3();
-      Vector3 forward = -matrix.zBasis.ToVector3();
+    /**
+      * Converts a LeapTransform representing a rotation to a Unity Quaternion without
+      * depending on the LeapTransform having a valid Quaternion.
+      *
+      * In previous version prior 4.0.0 this function performed a conversion to Unity's left-handed coordinate system, and now does not.
+      *
+      * @returns A Unity Quaternion representing the rotation.
+      */
+    public static Quaternion CalculateRotation(this LeapTransform trs) {
+      Vector3 up = trs.yBasis.ToVector3();
+      Vector3 forward = -trs.zBasis.ToVector3();
       return Quaternion.LookRotation(forward, up);
     }
 
