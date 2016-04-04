@@ -185,6 +185,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     /// <param name="instanceHandle"></param>
     public virtual void OnInteractionShapeCreated(LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle) {
+      throw new Exception("is it bad?");
       _shapeInstanceHandle = instanceHandle;
     }
 
@@ -280,12 +281,11 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called by InteractionController when the velocity of an object is changed.
     /// </summary>
-    public virtual void OnVelocityChanged(UnityEngine.Vector3 linearVelocity, UnityEngine.Vector3 angularVelocity)
-    {
+    public virtual void OnVelocityChanged(UnityEngine.Vector3 linearVelocity, UnityEngine.Vector3 angularVelocity) {
       if (!_rigidbody)
         return;
 
-      if(_rigidbody.useGravity)
+      if (_rigidbody.useGravity)
         throw new InvalidOperationException("Cannot modify velocity of object correctly because it has a force applied (gravity.)");
 
       // Clear applied forces.  They were not accounted for when the velocities were calculated.
@@ -293,6 +293,25 @@ namespace Leap.Unity.Interaction {
 
       _rigidbody.velocity = linearVelocity;
       _rigidbody.angularVelocity = angularVelocity;
+    }
+
+    public virtual void OnRegister() {
+      _isRegisteredWithManager = true;
+
+      _rigidbody = GetComponent<Rigidbody>();
+      if (_rigidbody) {
+        _rigidbodyHadUseGravity = _rigidbody.useGravity;
+        _rigidbody.useGravity = false;
+      }
+    }
+
+    public virtual void OnUnregister() {
+      _isRegisteredWithManager = false;
+
+      if (_rigidbody) {
+        _rigidbody.useGravity = _rigidbodyHadUseGravity;
+        _rigidbody = null;
+      }
     }
 
     /// <summary>
@@ -307,16 +326,8 @@ namespace Leap.Unity.Interaction {
       if (_manager == null) {
         throw new NoManagerSpecifiedException();
       }
-
-      _isRegisteredWithManager = true;
+      
       _manager.RegisterInteractionBehaviour(this);
-
-      _rigidbody = GetComponent<Rigidbody>();
-      if (_rigidbody)
-      {
-        _rigidbodyHadUseGravity = _rigidbody.useGravity;
-        _rigidbody.useGravity = false;
-      }
     }
 
     /// <summary>
@@ -332,13 +343,6 @@ namespace Leap.Unity.Interaction {
       }
 
       _manager.UnregisterInteractionBehaviour(this);
-      _isRegisteredWithManager = false;
-
-      if (_rigidbody)
-      {
-        _rigidbody.useGravity = _rigidbodyHadUseGravity;
-        _rigidbody = null;
-      }
     }
     #endregion
 

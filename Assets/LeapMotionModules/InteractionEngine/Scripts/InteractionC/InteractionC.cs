@@ -244,6 +244,29 @@ namespace Leap.Unity.Interaction.CApi {
       }
     }
 
+    public static bool IsError(eLeapIERS rs) {
+        switch (rs) {
+        case eLeapIERS.eLeapIERS_Success:
+        case eLeapIERS.eLeapIERS_Paused:
+          return false;
+        case eLeapIERS.eLeapIERS_InvalidHandle:
+        case eLeapIERS.eLeapIERS_InvalidArgument:
+        case eLeapIERS.eLeapIERS_ReferencesRemain:
+        case eLeapIERS.eLeapIERS_NotEnabled:
+        case eLeapIERS.eLeapIERS_NeverUpdated:
+        case eLeapIERS.eLeapIERS_UnknownError:
+        case eLeapIERS.eLeapIERS_BadData:
+        case eLeapIERS.eLeapIERS_StoppedOnNonDeterministic:
+        case eLeapIERS.eLeapIERS_StoppedOnUnexpectedFailure:
+        case eLeapIERS.eLeapIERS_StoppedOnFull:
+        case eLeapIERS.eLeapIERS_StoppedFileError:
+        case eLeapIERS.eLeapIERS_UnexpectedEOF:
+          return true;
+        default:
+          throw new ArgumentException("Unexpected return status " + rs);
+      }
+    }
+
     [Conditional("ENABLE_LOGGING")]
     public static void Log(string message, LogLevel level) {
       if (level >= logLevel) {
