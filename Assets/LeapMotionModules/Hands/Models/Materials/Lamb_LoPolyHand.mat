@@ -38,13 +38,6 @@ Material:
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _MetallicGlossMap
-        second:
-          m_Texture: {fileID: 0}
-          m_Scale: {x: 1, y: 1}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
           name: _ParallaxMap
         second:
           m_Texture: {fileID: 0}
@@ -78,6 +71,13 @@ Material:
           m_Texture: {fileID: 0}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _MetallicGlossMap
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
     m_Floats:
       data:
         first:
@@ -93,24 +93,20 @@ Material:
         second: 0.5
       data:
         first:
+          name: _Parallax
+        second: 0.02
+      data:
+        first:
           name: _ZWrite
         second: 1
       data:
         first:
           name: _Glossiness
-        second: 0.5
-      data:
-        first:
-          name: _Metallic
-        second: 0
+        second: 0.108
       data:
         first:
           name: _BumpScale
         second: 1
-      data:
-        first:
-          name: _Parallax
-        second: 0.02
       data:
         first:
           name: _OcclusionStrength
@@ -126,6 +122,10 @@ Material:
       data:
         first:
           name: _Mode
+        second: 0
+      data:
+        first:
+          name: _Metallic
         second: 0
     m_Colors:
       data:
