@@ -390,25 +390,25 @@ namespace LeapInternal
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_QUATERNION
   {
-    public float w;
     public float x;
     public float y;
     public float z;
+    public float w;
 
     public LEAP_QUATERNION(Leap.LeapQuaternion q)
     {
-      w = q.w;
       x = q.x;
       y = q.y;
       z = q.z;
+      w = q.w;
     }
 
     public LEAP_QUATERNION(UnityEngine.Quaternion unity)
     {
-      w = unity.w;
       x = unity.x;
       y = unity.y;
       z = unity.z;
+      w = unity.w;
     }
   }
 

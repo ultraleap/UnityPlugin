@@ -6,7 +6,7 @@
 * between Leap Motion and you, your company or other organization.             *
 \******************************************************************************/
 
-#define DEBUG_CHECK_AGAINST_UNITY
+//#define DEBUG_CHECK_AGAINST_UNITY
 #if DEBUG_CHECK_AGAINST_UNITY
 using Leap.Unity;
 using UnityEngine;
@@ -38,9 +38,9 @@ namespace Leap
 
 #if DEBUG_CHECK_AGAINST_UNITY
       Vector3 t = _dbgFull.MultiplyPoint(point.ToVector3());
-      approximatelyEqual(t.x, result.x);
-      approximatelyEqual(t.y, result.y);
-      approximatelyEqual(t.z, result.z);
+      approximatelyEqual(t.x, result.x, 0.1f);
+      approximatelyEqual(t.y, result.y, 0.1f);
+      approximatelyEqual(t.z, result.z, 0.1f);
 #endif
       return result;
     }
@@ -67,6 +67,10 @@ namespace Leap
       LeapQuaternion t = _quaternion.Multiply(rhs);
 
 #if DEBUG_CHECK_AGAINST_UNITY
+      approximatelyEqual(rhs.Magnitude, 1);
+      approximatelyEqual(_quaternion.Magnitude, 1);
+      approximatelyEqual(t.Magnitude, 1);
+
       Quaternion dbg = _quaternion.ToQuaternion() * rhs.ToQuaternion();
       approximatelyEqual(t.x, dbg.x);
       approximatelyEqual(t.y, dbg.y);
@@ -208,6 +212,8 @@ namespace Leap
         _flipX = false;
 
 #if DEBUG_CHECK_AGAINST_UNITY
+        approximatelyEqual(_quaternion.Magnitude, 1);
+
         _dbgFull.SetTRS(_translation.ToVector3(), _quaternion.ToQuaternion(), _scale.ToVector3());
         _dbgRot.SetTRS(Vector3.zero, _quaternion.ToQuaternion(), Vector3.one);
         validateBasis();
@@ -220,10 +226,6 @@ namespace Leap
 #if DEBUG_CHECK_AGAINST_UNITY
     void validateBasis()
     {
-			UnityEngine.Assertions.Assert.raiseExceptions = true;
-			Debug.DebugBreak ();
-
-
       for (int i = 0; i < 3; ++i)
       {
         approximatelyEqual(_xBasis.ToVector4()[i], _dbgRot.GetColumn(0)[i]);
@@ -240,10 +242,10 @@ namespace Leap
       }
     }
 
-    void approximatelyEqual(float a, float b)
+    void approximatelyEqual(float a, float b, float tol=0.0001f)
     {
       float absdiff = Math.Abs(a - b);
-      if (absdiff > 0.0001)
+     	if (absdiff > tol)
       {
         Debug.Log("approximatelyEqual: Somewhere to put a breakpoint.");
       }
