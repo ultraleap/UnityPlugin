@@ -41,25 +41,31 @@ namespace Leap.Unity.Interaction {
 
     public override void EnableInteraction() {
       base.EnableInteraction();
+      KabschC.Construct(ref _kabsch);
+    }
+
+    public override void DisableInteraction() {
+      base.DisableInteraction();
+      KabschC.Destruct(ref _kabsch);
+    }
+
+    public override void OnRegister() {
+      base.OnRegister();
 
       _rigidbody = GetComponent<Rigidbody>();
       if (_rigidbody != null) {
         _rigidbodyHadUseGravity = _rigidbody.useGravity;
         _rigidbody.useGravity = false;
       }
-
-      KabschC.Construct(ref _kabsch);
     }
 
-    public override void DisableInteraction() {
-      base.DisableInteraction();
+    public override void OnUnregister() {
+      base.OnUnregister();
 
       if (_rigidbody != null) {
         _rigidbody.useGravity = _rigidbodyHadUseGravity;
         _rigidbody = null;
       }
-
-      KabschC.Destruct(ref _kabsch);
     }
 
     public override void OnVelocityChanged(Vector3 linearVelocity, Vector3 angularVelocity) {
