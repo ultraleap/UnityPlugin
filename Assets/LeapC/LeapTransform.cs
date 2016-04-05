@@ -58,6 +58,12 @@ namespace Leap
       return result;
     }
 
+    public Vector TransformVelocity(Vector velocity)
+    {
+      Vector result = _xBasisScaled * velocity.x + _yBasisScaled * velocity.y + _zBasisScaled * velocity.z;
+      return result;
+    }
+
     // This is only usable when the basis vectors have not been modified directly.
     public LeapQuaternion TransformQuaternion(LeapQuaternion rhs)
     {

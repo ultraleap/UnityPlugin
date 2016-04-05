@@ -147,7 +147,7 @@ namespace Leap
         transformedFingers,
         trs.TransformPoint(PalmPosition),
         trs.TransformPoint(StabilizedPalmPosition),
-        trs.TransformPoint(PalmVelocity),
+        trs.TransformVelocity(PalmVelocity),
         trs.TransformDirection(PalmNormal).Normalized,
         trs.TransformDirection(Direction).Normalized,
         trs.TransformPoint(WristPosition)
