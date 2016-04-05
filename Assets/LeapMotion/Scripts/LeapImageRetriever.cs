@@ -39,7 +39,7 @@ namespace Leap.Unity{
     //Image that we have requested from the service.  Are requested in Update and retrieved in OnPreRender
     protected Image _requestedImage = new Image();
     
-    protected bool ImagesEnabled = true;
+    protected bool imagesEnabled = true;
     private bool checkingImageState = false;
   
     public EyeTextureData TextureData {
@@ -278,9 +278,9 @@ namespace Leap.Unity{
         return;
       }
       LeapVRCameraControl.OnValidCameraParams += HandleOnValidCameraParams;
+
       ApplyGammaCorrectionValues();
       ApplyCameraProjectionValues();
-  
     }
   
     void HandleOnValidCameraParams(LeapVRCameraControl.CameraParams camParams) {
@@ -291,10 +291,10 @@ namespace Leap.Unity{
       _provider.GetLeapController().DistortionChange += onDistortionChange;
       _provider.GetLeapController().Connect += delegate {
           _provider.GetLeapController().Config.Get("images_mode", (Int32 enabled) => {
-              this.ImagesEnabled = enabled == 0 ? false : true;
+              this.imagesEnabled = enabled == 0 ? false : true;
           });
       };
-      StartCoroutine(CheckImageMode());
+      StartCoroutine(checkImageMode());
     }
   
     void OnDisable() {
@@ -302,7 +302,7 @@ namespace Leap.Unity{
     }
   
     void OnPreRender() {
-      if(ImagesEnabled){
+      if(imagesEnabled){
         Controller controller = _provider.GetLeapController();
         long start = controller.Now();
         while (!_requestedImage.IsComplete) {
@@ -314,26 +314,26 @@ namespace Leap.Unity{
           }
           _eyeTextureData.UpdateTextures(_requestedImage, _requestedImage);
         } else if(!checkingImageState){
-          StartCoroutine(CheckImageMode());
+          StartCoroutine(checkImageMode());
         }
       }
     }
     
     void Update() {
-      if(ImagesEnabled){
+      if(imagesEnabled){
           Frame imageFrame = _provider.CurrentFrame;
           Controller controller = _provider.GetLeapController();
           _requestedImage = controller.RequestImages(imageFrame.Id, Image.ImageType.DEFAULT);
       } else if(!checkingImageState){
-         StartCoroutine(CheckImageMode());
+         StartCoroutine(checkImageMode());
       }
     }
     
-    private IEnumerator CheckImageMode(){
+    private IEnumerator checkImageMode(){
       checkingImageState = true;
       yield return new WaitForSeconds(IMAGE_SETTING_POLL_RATE);
       _provider.GetLeapController().Config.Get<Int32>("images_mode", delegate (Int32 enabled){
-        this.ImagesEnabled = enabled == 0 ? false : true;
+        this.imagesEnabled = enabled == 0 ? false : true;
         checkingImageState = false;
       });
     }

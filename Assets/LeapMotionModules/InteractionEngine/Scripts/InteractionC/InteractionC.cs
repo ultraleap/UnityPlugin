@@ -1,7 +1,5 @@
-﻿#define ENABLE_LOGGING
-using UnityEngine;
+﻿using UnityEngine;
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using LeapInternal;
 
@@ -175,87 +173,10 @@ namespace Leap.Unity.Interaction.CApi {
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_IE_VELOCITY
-  {
+  public struct LEAP_IE_VELOCITY {
     public LEAP_IE_SHAPE_INSTANCE_HANDLE handle;
     public LEAP_VECTOR linearVelocity;
     public LEAP_VECTOR angularVelocity;
-  }
-
-  public enum LogLevel {
-    Verbose,
-    AllCalls,
-    CreateDestroy,
-    Info,
-    Warning,
-    Error
-  }
-
-  public static class Logger {
-    public static LogLevel logLevel = LogLevel.Info;
-
-    [Conditional("ENABLE_LOGGING")]
-    public static void HandleReturnStatus(eLeapIERS rs) {
-      switch (rs) {
-        case eLeapIERS.eLeapIERS_Success:
-          Log("Success", LogLevel.Verbose);
-          break;
-        case eLeapIERS.eLeapIERS_InvalidHandle:
-          Log("Invalid Handle", LogLevel.Error);
-          break;
-        case eLeapIERS.eLeapIERS_InvalidArgument:
-          Log("Invalid Argument", LogLevel.Error);
-          break;
-        case eLeapIERS.eLeapIERS_ReferencesRemain:
-          Log("References Remain", LogLevel.Error);
-          break;
-        case eLeapIERS.eLeapIERS_NotEnabled:
-          Log("Not Enabled", LogLevel.Error);
-          break;
-        case eLeapIERS.eLeapIERS_NeverUpdated:
-          Log("Never Updated", LogLevel.Error);
-          break;
-        case eLeapIERS.eLeapIERS_UnknownError:
-          Log("Unknown Error", LogLevel.Error);
-          break;
-        case eLeapIERS.eLeapIERS_BadData:
-          Log("Bad Data", LogLevel.Error);
-          break;
-        case eLeapIERS.eLeapIERS_StoppedOnNonDeterministic:
-          Log("Stopped on Non Deterministic", LogLevel.Error);
-          break;
-        case eLeapIERS.eLeapIERS_StoppedOnUnexpectedFailure:
-          Log("Stopped on Unexpected Failure", LogLevel.Error);
-          break;
-        case eLeapIERS.eLeapIERS_StoppedOnFull:
-          Log("Stopped on Full", LogLevel.Error);
-          break;
-        case eLeapIERS.eLeapIERS_StoppedFileError:
-          Log("Stopped on File Error", LogLevel.Error);
-          break;
-        case eLeapIERS.eLeapIERS_UnexpectedEOF:
-          Log("Unexpected End Of File", LogLevel.Error);
-          break;
-        case eLeapIERS.eLeapIERS_Paused:
-          Log("Paused", LogLevel.Verbose);
-          break;
-        default:
-          throw new ArgumentException("Unexpected return status " + rs);
-      }
-    }
-
-    [Conditional("ENABLE_LOGGING")]
-    public static void Log(string message, LogLevel level) {
-      if (level >= logLevel) {
-        if (level == LogLevel.Error) {
-          UnityEngine.Debug.LogError(message);
-        } else if (level == LogLevel.Warning) {
-          UnityEngine.Debug.LogWarning(message);
-        } else {
-          UnityEngine.Debug.Log(message);
-        }
-      }
-    }
   }
 
   public class InteractionC {
@@ -410,23 +331,21 @@ namespace Leap.Unity.Interaction.CApi {
                                                         out UInt32 nVelocities,
                                                         out IntPtr ppVelocitiesBuffer);
 
-    public static eLeapIERS GetVelocities(ref LEAP_IE_SCENE scene, out LEAP_IE_VELOCITY[] velocities)
-    {
+    public static eLeapIERS GetVelocities(ref LEAP_IE_SCENE scene, out LEAP_IE_VELOCITY[] velocities) {
       Logger.Log("Get Velocities", LogLevel.AllCalls);
 
       UInt32 nVelocities;
       IntPtr ppVelocitiesBuffer;
       var rs = LeapIEGetVelocities(ref scene, out nVelocities, out ppVelocitiesBuffer);
       Logger.HandleReturnStatus(rs);
-      if (rs != eLeapIERS.eLeapIERS_Success || nVelocities == 0)
-      {
+
+      if (rs != eLeapIERS.eLeapIERS_Success || nVelocities == 0) {
         velocities = null;
         return rs;
       }
 
       velocities = new LEAP_IE_VELOCITY[nVelocities];
-      for (int i = 0; i < nVelocities; i++)
-      {
+      for (int i = 0; i < nVelocities; i++) {
         velocities[i] = StructMarshal<LEAP_IE_VELOCITY>.ArrayElementToStruct(ppVelocitiesBuffer, i);
       }
       return rs;
