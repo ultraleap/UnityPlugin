@@ -70,10 +70,12 @@ namespace Leap.Unity.Interaction {
     public override void OnVelocityChanged(Vector3 linearVelocity, Vector3 angularVelocity) {
       base.OnVelocityChanged(linearVelocity, angularVelocity);
 
+      /*
       if (_rigidbody != null) {
         _rigidbody.velocity = linearVelocity;
         _rigidbody.angularVelocity = angularVelocity;
       }
+      */
     }
 
     public override void OnHandGrasp(Hand hand) {
@@ -114,7 +116,7 @@ namespace Leap.Unity.Interaction {
 
       //Calculate new transform using delta
       Vector3 newPosition = oldPosition + solvedTranslation;
-      Quaternion newRotation = oldRotation * solvedRotation;
+      Quaternion newRotation = oldRotation;
 
       //Apply new transform to object
       setInteractionTransform(newPosition, newRotation, _shouldNextSolveBeTeleport);
@@ -246,6 +248,8 @@ namespace Leap.Unity.Interaction {
 
             Vector3 objectPos = collection.GetGlobalPosition(fingerType, boneType);
             Vector3 bonePos = bone.NextJoint.ToVector3();
+
+            Debug.DrawLine(objectPos, bonePos, Color.blue);
 
             //Do the solve such that the objects positions are matched to the new bone positions
             LEAP_VECTOR point1 = new LEAP_VECTOR(objectPos);

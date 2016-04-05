@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using LeapInternal;
 using Leap.Unity.Interaction.CApi;
@@ -41,6 +42,8 @@ namespace Leap.Unity.Interaction {
 
     private bool _hasSceneBeenCreated = false;
     protected LEAP_IE_SCENE _scene;
+
+    private bool _toggleClassification = false;
 
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
     private List<int> _handIdsToRemove;
@@ -134,7 +137,7 @@ namespace Leap.Unity.Interaction {
         throw new InvalidOperationException("Interaction Behaviour " + interactionBehaviour + " cannot be registered because " +
                                             "it is already registered with this manager.");
       }
-      
+
       _registeredBehaviours.Add(interactionBehaviour);
 
       try {
@@ -160,7 +163,7 @@ namespace Leap.Unity.Interaction {
         throw new InvalidOperationException("Interaction Behaviour " + interactionBehaviour + " cannot be unregistered because " +
                                             "it is not currently registered with this manager.");
       }
-      
+
       _registeredBehaviours.Remove(interactionBehaviour);
 
       if (_graspedBehaviours.Remove(interactionBehaviour)) {
@@ -295,6 +298,10 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void LateUpdate() {
+      if (Input.GetKeyDown(KeyCode.Space)) {
+        _toggleClassification = !_toggleClassification;
+      }
+
       unregisterMisbehavingBehaviours();
     }
     #endregion
@@ -363,7 +370,11 @@ namespace Leap.Unity.Interaction {
                                        out classification,
                                        out instance);
 
-
+        if (_toggleClassification) {
+          classification = new LEAP_IE_HAND_CLASSIFICATION();
+          classification.classification = eLeapIEClassification.eLeapIEClassification_Grasp;
+          instance = _instanceHandleToBehaviour.Keys.First();
+        }
 
         //Get the InteractionHand associated with this hand id
         InteractionHand interactionHand;
