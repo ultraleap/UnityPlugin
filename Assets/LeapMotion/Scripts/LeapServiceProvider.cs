@@ -168,14 +168,14 @@ namespace Leap.Unity {
       }
 
       if (serviceFrame != null) {
-        Matrix leapMat = transform.GetLeapMatrix();
+        LeapTransform leapMat = transform.GetLeapMatrix();
         _currentFrame = serviceFrame.TransformedCopy(leapMat);
       }
     }
 
     protected virtual void FixedUpdate() {
       //TODO: Find suitable interpolation strategy for FixedUpdate
-      Matrix leapMat = transform.GetLeapMatrix();
+      LeapTransform leapMat = transform.GetLeapMatrix();
       _currentFixedFrame = leap_controller_.Frame().TransformedCopy(leapMat);
     }
 

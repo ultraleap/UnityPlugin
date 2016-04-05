@@ -45,7 +45,7 @@ namespace Leap
                 Vector direction,
                 float length,
                 float width,
-                Matrix basis
+                LeapQuaternion rotation
               ) : base(elbow,
                         wrist,
                         center,
@@ -53,27 +53,25 @@ namespace Leap
                         length,
                         width,
                         BoneType.TYPE_METACARPAL, //ignored for arms
-                        basis)
+                        rotation)
     { }
 
     /**
      * Creates a copy of this arm, transformed by the specified transform.
      *
-     * @param trs A Matrix containing the desired translation, rotation, and scale
+     * @param trs A LeapTransform containing the desired translation, rotation, and scale
      * of the copied arm.
      * @since 3.0
      */
-    public new Arm TransformedCopy(Matrix trs)
+    public new Arm TransformedCopy(LeapTransform trs)
     {
-      float dScale = trs.zBasis.Magnitude;
-      float hScale = trs.xBasis.Magnitude;
       return new Arm(trs.TransformPoint(PrevJoint),
           trs.TransformPoint(NextJoint),
           trs.TransformPoint(Center),
           trs.TransformDirection(Direction),
-          Length * dScale,
-          Width * hScale,
-          trs * Basis);
+          Length * trs.scale.z,
+          Width * trs.scale.x,
+          trs.TransformQuaternion(Rotation));
     }
 
     /**
