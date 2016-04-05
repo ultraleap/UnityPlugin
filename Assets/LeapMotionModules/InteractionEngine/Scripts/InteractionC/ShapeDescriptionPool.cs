@@ -255,8 +255,14 @@ namespace Leap.Unity.Interaction.CApi {
     }
 
     private bool isUniformScale(Transform transform) {
-      Vector3 lossyScale = transform.lossyScale;
-      return lossyScale.x == lossyScale.y && lossyScale.x == lossyScale.z;
+      while (transform != null) {
+        Vector3 localScale = transform.localScale;
+        if (!Mathf.Approximately(localScale.x, localScale.y) || !Mathf.Approximately(localScale.x, localScale.z)) {
+          return false;
+        }
+        transform = transform.parent;
+      }
+      return true;
     }
 
     private IntPtr allocateSphere(float radius) {

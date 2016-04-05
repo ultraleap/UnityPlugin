@@ -20,6 +20,8 @@ namespace Leap.Unity.Interaction {
 
     private bool _hasShapeDescriptionBeenCreated = false;
     private LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeDescriptionHandle;
+
+    private bool _hasShapeInstanceHandle = false;
     private LEAP_IE_SHAPE_INSTANCE_HANDLE _shapeInstanceHandle;
 
     private List<int> _graspingIds = new List<int>();
@@ -86,8 +88,8 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public LEAP_IE_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
       get {
-        if (!_isRegisteredWithManager) {
-          throw new NotRegisteredWithManagerException();
+        if (!_hasShapeInstanceHandle) {
+          throw new InvalidOperationException("Cannot get ShapeInstanceHandle because it has not been assigned.");
         }
 
         return _shapeInstanceHandle;
@@ -178,6 +180,7 @@ namespace Leap.Unity.Interaction {
     /// <param name="instanceHandle"></param>
     public virtual void OnInteractionShapeCreated(LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle) {
       _shapeInstanceHandle = instanceHandle;
+      _hasShapeInstanceHandle = true;
     }
 
     /// <summary>
@@ -188,6 +191,7 @@ namespace Leap.Unity.Interaction {
       _shapeInstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
       _shapeDescriptionHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
       _hasShapeDescriptionBeenCreated = false;
+      _hasShapeInstanceHandle = false;
     }
 
     /// <summary>
@@ -274,6 +278,14 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public virtual void OnVelocityChanged(Vector3 linearVelocity, Vector3 angularVelocity) { }
 
+    public virtual void OnRegister() {
+      _isRegisteredWithManager = true;
+    }
+
+    public virtual void OnUnregister() {
+      _isRegisteredWithManager = false;
+    }
+
     /// <summary>
     /// Calling this method registers this object with the manager.  A shape definition must be registered
     /// with the manager before interaction can be enabled.
@@ -287,7 +299,6 @@ namespace Leap.Unity.Interaction {
         throw new NoManagerSpecifiedException();
       }
 
-      _isRegisteredWithManager = true;
       _manager.RegisterInteractionBehaviour(this);
     }
 
@@ -304,7 +315,6 @@ namespace Leap.Unity.Interaction {
       }
 
       _manager.UnregisterInteractionBehaviour(this);
-      _isRegisteredWithManager = false;
     }
     #endregion
 
