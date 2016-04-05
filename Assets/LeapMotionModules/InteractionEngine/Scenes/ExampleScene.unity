@@ -1650,7 +1650,7 @@ GameObject:
   - 135: {fileID: 1700929374}
   - 54: {fileID: 1700929378}
   - 114: {fileID: 1700929373}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: InteractionSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1757,7 +1757,7 @@ GameObject:
   - 135: {fileID: 1721542082}
   - 54: {fileID: 1721542085}
   - 114: {fileID: 1721542080}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: InteractionSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1864,7 +1864,7 @@ GameObject:
   - 135: {fileID: 1759218969}
   - 54: {fileID: 1759218973}
   - 114: {fileID: 1759218968}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: InteractionSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
