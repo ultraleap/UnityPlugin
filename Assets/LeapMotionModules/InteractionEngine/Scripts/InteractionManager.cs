@@ -505,7 +505,7 @@ namespace Leap.Unity.Interaction {
       for (int i = 0; i < velocities.Length; ++i) {
         LEAP_IE_VELOCITY vel = velocities[i];
         InteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[vel.handle];
-
+        
         try {
           interactionBehaviour.OnVelocityChanged(vel.linearVelocity.ToUnityVector(), vel.angularVelocity.ToUnityVector());
         } catch (Exception e) {
