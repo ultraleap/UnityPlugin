@@ -117,7 +117,9 @@ namespace Leap.Unity {
      */
     public static LeapTransform GetLeapMatrix(this Transform t) {
       Vector scale = new Vector(t.lossyScale.x * MM_TO_M, t.lossyScale.y * MM_TO_M, t.lossyScale.z * MM_TO_M);
-      return new LeapTransform(t.position.ToVector(), t.rotation.ToLeapQuaternion(), scale);
+      LeapTransform transform = new LeapTransform(t.position.ToVector(), t.rotation.ToLeapQuaternion(), scale);
+      transform.FlipZ(); // Unity is left handed.
+      return transform;
     }
   }
 }

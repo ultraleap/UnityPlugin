@@ -64,42 +64,54 @@ namespace Leap
       if (_quaternionDirty)
         throw new InvalidOperationException("Calling TransformQuaternion after Basis vectors have been modified.");
 
-      LeapQuaternion t = _quaternion.Multiply(rhs);
-
-#if DEBUG_CHECK_AGAINST_UNITY
-      approximatelyEqual(rhs.Magnitude, 1);
-      approximatelyEqual(_quaternion.Magnitude, 1);
-      approximatelyEqual(t.Magnitude, 1);
-
-      Quaternion dbg = _quaternion.ToQuaternion() * rhs.ToQuaternion();
-      approximatelyEqual(t.x, dbg.x);
-      approximatelyEqual(t.y, dbg.y);
-      approximatelyEqual(t.z, dbg.z);
-      approximatelyEqual(t.w, dbg.w);
-#endif
-
-      if (_flipX) {
-        // Mirror the axis of rotation accross the x axis.  This has to be done after concatenation
-        // as there is no way to prepend a mirror transform using quaternions.
-        t.y = -t.y;
-        t.z = -t.z;
+      if (_flip)
+      {
+        // Mirror the axis of rotation accross the flip axis.
+        rhs.x *= _flipAxes.x;
+        rhs.y *= _flipAxes.y;
+        rhs.z *= _flipAxes.z;
       }
 
+      LeapQuaternion t = _quaternion.Multiply(rhs);
       return t;
     }
 
     // Mirror points and rotations accross the x axis.
     public void FlipX()
     {
-      _flipX = !_flipX;
-
       _xBasis = -_xBasis;
       _xBasisScaled = -_xBasisScaled;
       _translation.x = -_translation.x;
 
+      _flip = true;
+      _flipAxes.y = -_flipAxes.y;
+      _flipAxes.z = -_flipAxes.z;
+
 #if DEBUG_CHECK_AGAINST_UNITY
       _dbgRot.SetColumn(0, -_dbgRot.GetColumn(0));
       _dbgFull.SetColumn(0, -_dbgFull.GetColumn(0));
+      Vector4 t = _dbgFull.GetColumn(3);
+      t.x = -t.x;
+      _dbgFull.SetColumn(3, t);
+
+      validateBasis();
+#endif
+    }
+
+    // Mirror points and rotations accross the z axis.
+    public void FlipZ()
+    {
+      _zBasis = -_zBasis;
+      _zBasisScaled = -_zBasisScaled;
+      _translation.z = -_translation.z;
+
+      _flip = true;
+      _flipAxes.x = -_flipAxes.x;
+      _flipAxes.y = -_flipAxes.y;
+
+#if DEBUG_CHECK_AGAINST_UNITY
+      _dbgRot.SetColumn(2, -_dbgRot.GetColumn(2));
+      _dbgFull.SetColumn(2, -_dbgFull.GetColumn(2));
       Vector4 t = _dbgFull.GetColumn(3);
       t.z = -t.z;
       _dbgFull.SetColumn(3, t);
@@ -209,7 +221,8 @@ namespace Leap
         _zBasisScaled = _zBasis * scale.z;
 
         _quaternionDirty = false;
-        _flipX = false;
+        _flip = false;
+        _flipAxes = new Vector(1.0f, 1.0f, 1.0f);
 
 #if DEBUG_CHECK_AGAINST_UNITY
         approximatelyEqual(_quaternion.Magnitude, 1);
@@ -256,7 +269,8 @@ namespace Leap
     private Vector _scale;
     private LeapQuaternion _quaternion;
     private bool _quaternionDirty;
-    private bool _flipX;
+    private bool _flip;
+    private Vector _flipAxes;
     private Vector _xBasis;
     private Vector _yBasis;
     private Vector _zBasis;
