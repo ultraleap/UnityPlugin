@@ -182,17 +182,28 @@ namespace Leap.Unity{
     }
   
     protected void Start() {
-      //Get a callback right as rendering begins for this frame so we can update the history and warping.
-      LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
-  
-      deviceInfo = provider.GetDeviceInfo();
+
+      Controller controller = provider.GetLeapController();
+      controller.Device += OnDevice;
+    }
+    
+    protected void OnDevice(object sender, DeviceEventArgs args) {
+       deviceInfo = provider.GetDeviceInfo();
       if (deviceInfo.type == LeapDeviceType.Invalid) {
         Debug.LogWarning("Invalid Leap Device -> enabled = false");
         enabled = false;
         return;
       }
+      //Get a callback right as rendering begins for this frame so we can update the history and warping.
+      LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
+   }
+
+    protected void OnEnable()
+    {
+      if (deviceInfo.type != LeapDeviceType.Invalid)
+        LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
     }
-  
+
     protected void OnDisable()
     {
       LeapVRCameraControl.OnValidCameraParams -= onValidCameraParams;
