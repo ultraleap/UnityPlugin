@@ -258,7 +258,7 @@ namespace Leap.Unity.Interaction {
 
     private bool isUniformScale(Transform transform) {
       Vector3 lossyScale = transform.lossyScale;
-      return lossyScale.x == lossyScale.y && lossyScale.x == lossyScale.z;
+      return Mathf.Approximately(lossyScale.x, lossyScale.y) && Mathf.Approximately(lossyScale.x, lossyScale.z);
     }
 
     private IntPtr allocateSphere(float radius) {

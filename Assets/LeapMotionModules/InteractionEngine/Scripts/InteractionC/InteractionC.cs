@@ -44,25 +44,6 @@ namespace Leap.Unity.Interaction.CApi {
   };
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_QUATERNION {
-    public float w;
-    public float x;
-    public float y;
-    public float z;
-
-    public LEAP_QUATERNION(Quaternion unity) {
-      w = unity.w;
-      x = unity.x;
-      y = unity.y;
-      z = unity.z;
-    }
-
-    public Quaternion ToUnityRotation() {
-      return new Quaternion(x, y, z, w);
-    }
-  }
-
-  [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_COLOR {
     float r;
     float g;

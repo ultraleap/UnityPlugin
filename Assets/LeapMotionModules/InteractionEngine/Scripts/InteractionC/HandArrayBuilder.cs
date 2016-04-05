@@ -76,7 +76,7 @@ namespace Leap.Unity.Interaction.CApi {
       leapBone.prev_joint = new LEAP_VECTOR(bone.PrevJoint);
       leapBone.next_joint = new LEAP_VECTOR(bone.NextJoint);
       leapBone.width = bone.Width;
-      leapBone.basis = new LEAP_MATRIX(bone.Basis);
+      leapBone.rotation = new LEAP_QUATERNION(bone.Rotation);
       return leapBone;
     }
   }
