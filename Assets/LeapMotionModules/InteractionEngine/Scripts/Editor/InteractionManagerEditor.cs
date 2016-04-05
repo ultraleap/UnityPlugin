@@ -4,7 +4,7 @@ using UnityEditor;
 
 namespace Leap.Unity.Interaction {
 
-  [CustomEditor(typeof(InteractionManager))]
+  [CustomEditor(typeof(InteractionManager), true)]
   public class InteractionManagerEditor : Editor {
 
     public override void OnInspectorGUI() {
