@@ -264,7 +264,7 @@ namespace Leap.Unity.Interaction {
       KabschC.GetRotation(ref _kabsch, out leapRotation);
 
       translation = leapTranslation.ToUnityVector();
-      rotation = leapRotation.ToUnityRotation();
+      rotation = new Quaternion(leapRotation.x, leapRotation.y, leapRotation.z, leapRotation.w);
     }
 
     protected class HandPointCollection {
