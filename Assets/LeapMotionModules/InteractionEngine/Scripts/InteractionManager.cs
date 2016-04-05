@@ -83,7 +83,16 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Returns a collection of InteractionObjects that are currently being grasped by
+    /// Returns a collection of InteractionBehaviours that are currently registered with this manager.
+    /// </summary>
+    public IEnumerable<InteractionBehaviour> RegisteredObjects {
+      get {
+        return _registeredBehaviours;
+      }
+    }
+
+    /// <summary>
+    /// Returns a collection of InteractionBehaviours that are currently being grasped by
     /// at least one hand.
     /// </summary>
     public IEnumerable<InteractionBehaviour> GraspedObjects {
