@@ -4,8 +4,7 @@ using LeapInternal;
 using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
-
-  [RequireComponent(typeof(Rigidbody))]
+  
   public class InteractionBehaviourKabsch : InteractionBehaviourBase {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
@@ -110,11 +109,11 @@ namespace Leap.Unity.Interaction {
       //Get solved transform deltas
       Vector3 solvedTranslation;
       Quaternion solvedRotation;
-      getSolvedTransform(hands, out solvedTranslation, out solvedRotation);
+      getSolvedTransform(hands, oldPosition, out solvedTranslation, out solvedRotation);
 
       //Calculate new transform using delta
       Vector3 newPosition = oldPosition + solvedTranslation;
-      Quaternion newRotation = oldRotation * solvedRotation;
+      Quaternion newRotation = solvedRotation * oldRotation;
 
       //Apply new transform to object
       setInteractionTransform(newPosition, newRotation, _shouldNextSolveBeTeleport);
@@ -227,7 +226,7 @@ namespace Leap.Unity.Interaction {
       HandPointCollection.Return(collection);
     }
 
-    protected void getSolvedTransform(List<Hand> hands, out Vector3 translation, out Quaternion rotation) {
+    protected void getSolvedTransform(List<Hand> hands, Vector3 oldPosition, out Vector3 translation, out Quaternion rotation) {
       KabschC.Reset(ref _kabsch);
 
       for (int h = 0; h < hands.Count; h++) {
@@ -248,8 +247,8 @@ namespace Leap.Unity.Interaction {
             Vector3 bonePos = bone.NextJoint.ToVector3();
 
             //Do the solve such that the objects positions are matched to the new bone positions
-            LEAP_VECTOR point1 = new LEAP_VECTOR(objectPos);
-            LEAP_VECTOR point2 = new LEAP_VECTOR(bonePos);
+            LEAP_VECTOR point1 = new LEAP_VECTOR(objectPos - oldPosition);
+            LEAP_VECTOR point2 = new LEAP_VECTOR(bonePos - oldPosition);
 
             KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
           }
