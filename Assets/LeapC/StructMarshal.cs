@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace LeapInternal {
@@ -6,14 +7,34 @@ namespace LeapInternal {
   /**
    * A helper class to marshal from unmanaged memory into structs without creating garbage.
    */
-  public class StructMarshal<T> where T : struct {
+  public static class StructMarshal<T> where T : struct {
     [StructLayout(LayoutKind.Sequential)]
     private class StructContainer {
       public T value;
     }
 
-    private static StructContainer _container = new StructContainer();
-    private static int _sizeofT = Marshal.SizeOf(typeof(T));
+    private static StructContainer _container;
+    private static int _sizeofT;
+
+    static StructMarshal() {
+      _container = new StructContainer();
+      _sizeofT = Marshal.SizeOf(typeof(T));
+    }
+
+    public static int Size {
+      get {
+        return _sizeofT;
+      }
+    }
+
+    public static void CopyIntoDestination(IntPtr dstPtr, T t) {
+      CopyIntoArray(dstPtr, t, 0);
+    }
+
+    public static void CopyIntoArray(IntPtr arrayPtr, T t, int index) {
+      _container.value = t;
+      Marshal.StructureToPtr(_container, new IntPtr(arrayPtr.ToInt64() + _sizeofT * index), false);
+    }
 
     /**
      * Converts an IntPtr to a struct of type T.
