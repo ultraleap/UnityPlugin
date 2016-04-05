@@ -1,7 +1,5 @@
-﻿#define ENABLE_LOGGING
-using UnityEngine;
+﻿using UnityEngine;
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using LeapInternal;
 
@@ -340,6 +338,9 @@ namespace Leap.Unity.Interaction.CApi {
       IntPtr ppVelocitiesBuffer;
       var rs = LeapIEGetVelocities(ref scene, out nVelocities, out ppVelocitiesBuffer);
       Logger.HandleReturnStatus(rs);
+
+
+      UnityEngine.Debug.Log(nVelocities + " : " + rs);
       if (rs != eLeapIERS.eLeapIERS_Success || nVelocities == 0) {
         velocities = null;
         return rs;

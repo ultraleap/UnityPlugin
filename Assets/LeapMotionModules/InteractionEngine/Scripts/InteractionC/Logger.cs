@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define ENABLE_LOGGING
+using System;
 using System.Diagnostics;
 
 namespace Leap.Unity.Interaction.CApi {
@@ -20,7 +21,7 @@ namespace Leap.Unity.Interaction.CApi {
       string message;
       LogLevel logLevel;
       rs.GetInfo(out message, out logLevel);
-
+      
       if (logLevel == LogLevel.Error) {
         throw new Exception(message);
       }

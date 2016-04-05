@@ -39,6 +39,7 @@ namespace Leap.Unity.Interaction {
 
     protected ShapeDescriptionPool _shapeDescriptionPool;
 
+    private bool _hasSceneBeenCreated = false;
     protected LEAP_IE_SCENE _scene;
 
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
@@ -144,7 +145,7 @@ namespace Leap.Unity.Interaction {
       }
 
       //Don't create right away if we are not enabled, creation will be done in OnEnable
-      if (isActiveAndEnabled) {
+      if (_hasSceneBeenCreated) {
         createInteractionShape(interactionBehaviour);
       }
     }
@@ -178,7 +179,7 @@ namespace Leap.Unity.Interaction {
       }
 
       //Don't destroy if we are not enabled, everything already got destroyed in OnDisable
-      if (isActiveAndEnabled) {
+      if (_hasSceneBeenCreated) {
         try {
           destroyInteractionShape(interactionBehaviour);
         } catch (Exception e) {
@@ -199,7 +200,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void OnValidate() {
-      if (Application.isPlaying && isActiveAndEnabled) {
+      if (Application.isPlaying && _hasSceneBeenCreated) {
         //Allow the debug lines to be toggled while the scene is playing
         applyDebugSettings();
       }
@@ -216,9 +217,18 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void OnEnable() {
-      InteractionC.CreateScene(ref _scene);
+      Assert.IsFalse(_hasSceneBeenCreated, "Scene should not have been created yet");
+
+      try {
+        InteractionC.CreateScene(ref _scene);
+        _hasSceneBeenCreated = true;
+        applyDebugSettings();
+      } catch (Exception e) {
+        enabled = false;
+        throw e;
+      }
+
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
-      applyDebugSettings();
 
       Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "There should not be any instances before the creation step.");
 
@@ -261,9 +271,14 @@ namespace Leap.Unity.Interaction {
 
       Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "All instances should have been destroyed.");
 
-      _shapeDescriptionPool.RemoveAllShapes();
-      _shapeDescriptionPool = null;
-      InteractionC.DestroyScene(ref _scene);
+      if (_shapeDescriptionPool != null) {
+        _shapeDescriptionPool.RemoveAllShapes();
+        _shapeDescriptionPool = null;
+      }
+
+      if (_hasSceneBeenCreated) {
+        InteractionC.DestroyScene(ref _scene);
+      }
     }
 
     protected virtual void FixedUpdate() {
@@ -505,7 +520,7 @@ namespace Leap.Unity.Interaction {
       for (int i = 0; i < velocities.Length; ++i) {
         LEAP_IE_VELOCITY vel = velocities[i];
         InteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[vel.handle];
-        
+
         try {
           interactionBehaviour.OnVelocityChanged(vel.linearVelocity.ToUnityVector(), vel.angularVelocity.ToUnityVector());
         } catch (Exception e) {
