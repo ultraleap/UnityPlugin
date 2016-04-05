@@ -53,7 +53,7 @@ using System.Runtime.InteropServices;
                 return testHand;
             } else {
                 LeapTransform leftToRight = LeapTransform.Identity;
-                leftToRight.FlipX();
+                leftToRight.MirrorX();
                 Hand rightHand = testHand.TransformedCopy(leftToRight);
               return rightHand;
             }

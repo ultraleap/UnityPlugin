@@ -54,6 +54,8 @@ namespace Leap
       approximatelyEqual(t.x, result.x);
       approximatelyEqual(t.y, result.y);
       approximatelyEqual(t.z, result.z);
+
+      approximatelyNORMAL(t.magnitude, 1.0f);
 #endif
       return result;
     }
@@ -82,12 +84,11 @@ namespace Leap
       return t;
     }
 
-    // Mirror points and rotations accross the x axis.
-    public void FlipX()
+    // Additionally mirror transformed data accross the X axis.  Note translation applied is unchanged.
+    public void MirrorX()
     {
       _xBasis = -_xBasis;
       _xBasisScaled = -_xBasisScaled;
-      _translation.x = -_translation.x;
 
       _flip = true;
       _flipAxes.y = -_flipAxes.y;
@@ -96,20 +97,16 @@ namespace Leap
 #if DEBUG_CHECK_AGAINST_UNITY
       _dbgRot.SetColumn(0, -_dbgRot.GetColumn(0));
       _dbgFull.SetColumn(0, -_dbgFull.GetColumn(0));
-      Vector4 t = _dbgFull.GetColumn(3);
-      t.x = -t.x;
-      _dbgFull.SetColumn(3, t);
 
       validateBasis();
 #endif
     }
 
-    // Mirror points and rotations accross the z axis.
-    public void FlipZ()
+    // Additionally mirror transformed data accross the X axis.  Note translation applied is unchanged.
+    public void MirrorZ()
     {
       _zBasis = -_zBasis;
       _zBasisScaled = -_zBasisScaled;
-      _translation.z = -_translation.z;
 
       _flip = true;
       _flipAxes.x = -_flipAxes.x;
@@ -118,9 +115,6 @@ namespace Leap
 #if DEBUG_CHECK_AGAINST_UNITY
       _dbgRot.SetColumn(2, -_dbgRot.GetColumn(2));
       _dbgFull.SetColumn(2, -_dbgFull.GetColumn(2));
-      Vector4 t = _dbgFull.GetColumn(3);
-      t.z = -t.z;
-      _dbgFull.SetColumn(3, t);
 
       validateBasis();
 #endif
@@ -266,9 +260,19 @@ namespace Leap
       float absdiff = Math.Abs(a - b);
      	if (absdiff > tol)
       {
-        Debug.Log("approximatelyEqual: Somewhere to put a breakpoint.");
+        Debug.Log("approximatelyEqual: Somewhere to put a breakpoint: " + a + " " + b);
       }
     }
+
+    void approximatelyNORMAL(float a, float b, float tol = 0.0001f)
+    {
+      float absdiff = Math.Abs(a - b);
+      if (absdiff > tol)
+      {
+        Debug.Log("approximatelyEqual: Somewhere to put a breakpoint: " + a + " " + b);
+      }
+    }
+
 #endif
 
     private Vector _translation;

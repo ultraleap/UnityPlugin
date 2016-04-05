@@ -148,8 +148,8 @@ namespace Leap
         trs.TransformPoint(PalmPosition),
         trs.TransformPoint(StabilizedPalmPosition),
         trs.TransformVelocity(PalmVelocity),
-        trs.TransformDirection(PalmNormal).Normalized,
-        trs.TransformDirection(Direction).Normalized,
+        trs.TransformDirection(PalmNormal),
+        trs.TransformDirection(Direction),
         trs.TransformPoint(WristPosition)
       );
     }

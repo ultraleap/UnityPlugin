@@ -111,7 +111,7 @@ namespace Leap
                         TimeVisible,
                         trs.TransformPoint(TipPosition),
                         trs.TransformVelocity(TipVelocity),
-                        trs.TransformDirection(Direction).Normalized,
+                        trs.TransformDirection(Direction),
                         trs.TransformPoint(StabilizedTipPosition),
                         Width * trs.scale.x,
                         Length * trs.scale.z,
