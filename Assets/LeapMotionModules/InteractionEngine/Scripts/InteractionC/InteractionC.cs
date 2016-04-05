@@ -175,8 +175,7 @@ namespace Leap.Unity.Interaction.CApi {
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_IE_VELOCITY
-  {
+  public struct LEAP_IE_VELOCITY {
     public LEAP_IE_SHAPE_INSTANCE_HANDLE handle;
     public LEAP_VECTOR linearVelocity;
     public LEAP_VECTOR angularVelocity;
@@ -334,23 +333,20 @@ namespace Leap.Unity.Interaction.CApi {
                                                         out UInt32 nVelocities,
                                                         out IntPtr ppVelocitiesBuffer);
 
-    public static eLeapIERS GetVelocities(ref LEAP_IE_SCENE scene, out LEAP_IE_VELOCITY[] velocities)
-    {
+    public static eLeapIERS GetVelocities(ref LEAP_IE_SCENE scene, out LEAP_IE_VELOCITY[] velocities) {
       Logger.Log("Get Velocities", LogLevel.AllCalls);
 
       UInt32 nVelocities;
       IntPtr ppVelocitiesBuffer;
       var rs = LeapIEGetVelocities(ref scene, out nVelocities, out ppVelocitiesBuffer);
       Logger.HandleReturnStatus(rs);
-      if (rs != eLeapIERS.eLeapIERS_Success || nVelocities == 0)
-      {
+      if (rs != eLeapIERS.eLeapIERS_Success || nVelocities == 0) {
         velocities = null;
         return rs;
       }
 
       velocities = new LEAP_IE_VELOCITY[nVelocities];
-      for (int i = 0; i < nVelocities; i++)
-      {
+      for (int i = 0; i < nVelocities; i++) {
         velocities[i] = StructMarshal<LEAP_IE_VELOCITY>.ArrayElementToStruct(ppVelocitiesBuffer, i);
       }
       return rs;
