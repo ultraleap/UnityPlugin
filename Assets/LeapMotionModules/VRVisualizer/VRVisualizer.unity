@@ -1038,7 +1038,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Data Frame Rate
+  m_Text: Leap Data Frame Rate
 --- !u!222 &383344160
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1679,7 +1679,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Render Time
+  m_Text: Render Frame Rate
 --- !u!222 &713154455
 CanvasRenderer:
   m_ObjectHideFlags: 0
