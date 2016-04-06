@@ -80,7 +80,7 @@ namespace Leap
      */
     public bool IsValid()
     {
-      return float.IsNaN(x) && float.IsNaN(y) && float.IsNaN(z) && float.IsNaN(w);
+      return float.IsNaN(x) || float.IsNaN(y) || float.IsNaN(z) || float.IsNaN(w);
     }
 
     /**
