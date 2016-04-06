@@ -13,7 +13,6 @@ namespace Leap.Unity.VRVisualizer{
   public class VisualizerManager : MonoBehaviour {
     public GameObject m_PCVisualizer = null;
     public GameObject m_VRVisualizer = null;
-    public UnityEngine.UI.Text m_modeText;
     public UnityEngine.UI.Text m_warningText;
     public UnityEngine.UI.Text m_trackingText;
     public KeyCode keyToToggleHMD = KeyCode.V;
@@ -35,14 +34,12 @@ namespace Leap.Unity.VRVisualizer{
       {
         m_PCVisualizer.gameObject.SetActive(false);
         m_VRVisualizer.gameObject.SetActive(true);
-        m_modeText.text = "VR Mode";
         m_warningText.text = "Please put on your head-mounted display";
       }
       else
       {
         m_VRVisualizer.gameObject.SetActive(false);
         m_PCVisualizer.gameObject.SetActive(true);
-        m_modeText.text = "Desktop Mode";
         m_warningText.text = "No head-mounted display detected. Orion performs best in a head-mounted display";
       }
     }
