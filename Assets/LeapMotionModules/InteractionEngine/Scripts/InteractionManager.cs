@@ -163,7 +163,10 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void OnEnable() {
-      InteractionC.CreateScene(ref _scene);
+      LEAP_IE_CREATE_SCENE_INFO sceneInfo = new LEAP_IE_CREATE_SCENE_INFO();
+      sceneInfo.sceneFlags = 0;
+      string dataPath = UnityEngine.Application.dataPath + "/LeapMotionModules/InteractionEngine/Plugins";
+      InteractionC.CreateScene(ref _scene, ref sceneInfo, dataPath);
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
       applyDebugSettings();
 
@@ -227,7 +230,9 @@ namespace Leap.Unity.Interaction {
         InteractionBehaviour interactionBehaviour = _registeredBehaviours[i];
         LEAP_IE_SHAPE_INSTANCE_HANDLE shapeInstanceHandle = interactionBehaviour.ShapeInstanceHandle;
         LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
-        InteractionC.UpdateShape(ref _scene, ref interactionTransform, ref shapeInstanceHandle);
+        LEAP_IE_UPDATE_SHAPE_INFO updateInfo = new LEAP_IE_UPDATE_SHAPE_INFO();
+        updateInfo.updateFlags = 0;
+        InteractionC.UpdateShape(ref _scene, ref interactionTransform, ref updateInfo, ref shapeInstanceHandle);
       }
     }
 
@@ -389,8 +394,9 @@ namespace Leap.Unity.Interaction {
       LEAP_IE_SHAPE_DESCRIPTION_HANDLE descriptionHandle = interactionBehaviour.ShapeDescriptionHandle;
       LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
       LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
-
-      InteractionC.CreateShape(ref _scene, ref descriptionHandle, ref interactionTransform, out instanceHandle);
+      LEAP_IE_CREATE_SHAPE_INFO createInfo = new LEAP_IE_CREATE_SHAPE_INFO();
+      createInfo.shapeFlags = (uint)eLeapIEShapeFlags.eLeapIEShapeFlags_HasRigidBody;
+      InteractionC.CreateShape(ref _scene, ref descriptionHandle, ref interactionTransform, ref createInfo, out instanceHandle);
 
       _instanceHandleToBehaviour[instanceHandle] = interactionBehaviour;
 
