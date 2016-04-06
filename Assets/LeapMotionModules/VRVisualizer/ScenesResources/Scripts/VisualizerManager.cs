@@ -15,11 +15,16 @@ namespace Leap.Unity.VRVisualizer{
     public GameObject m_VRVisualizer = null;
     public UnityEngine.UI.Text m_warningText;
     public UnityEngine.UI.Text m_trackingText;
+    public UnityEngine.UI.Text m_frameRateText;
+    public UnityEngine.UI.Text m_dataFrameRateText;
+
     public KeyCode keyToToggleHMD = KeyCode.V;
   
     private Controller m_controller = null;
     private bool m_leapConnected = false;
-  
+    private float m_deltaTime = 0.0f;
+    private int m_framrateUpdateCount = 0;
+    private int m_framerateUpdateInterval = 30;
     private void FindController()
     {
       LeapServiceProvider provider = FindObjectOfType<LeapServiceProvider>();
@@ -74,7 +79,8 @@ namespace Leap.Unity.VRVisualizer{
   
       m_trackingText.text = "Tracking Mode: ";
       m_trackingText.text += (m_controller.IsPolicySet(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD)) ? "Head-Mounted" : "Desktop";
-  
+
+
       // In Desktop Mode
       if (m_PCVisualizer.activeInHierarchy)
       {
@@ -91,6 +97,21 @@ namespace Leap.Unity.VRVisualizer{
             m_controller.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
         }
       }
+      //update render frame display
+      m_deltaTime += (Time.deltaTime - m_deltaTime) * 0.1f;
+      if (m_framrateUpdateCount > m_framerateUpdateInterval) {
+        updateRenderFrameRate();
+        m_framrateUpdateCount = 0;
+      }
+      m_framrateUpdateCount++;
+    }
+
+    private void updateRenderFrameRate() {
+      float msec = m_deltaTime * 1000.0f;
+      float fps = 1.0f / m_deltaTime;
+      string text = string.Format("{0:0.0} ms ({1:0.} fps)", msec, fps);
+      m_frameRateText.text = "Render Time: " + text;
+      m_dataFrameRateText.text = "Data Framerate: " + m_controller.Frame().CurrentFramesPerSecond;
     }
   }
 }
