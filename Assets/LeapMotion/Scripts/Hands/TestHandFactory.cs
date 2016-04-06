@@ -143,7 +143,7 @@ using System.Runtime.InteropServices;
 
          static Bone MakeBone(Bone.BoneType name, Vector proximalPosition, float length, float width, Vector direction, Vector up, bool isLeft){
 
-           LeapQuaternion rotation = UnityEngine.Quaternion.LookRotation(direction.ToVector3(), up.ToVector3()).ToLeapQuaternion();
+           LeapQuaternion rotation = UnityEngine.Quaternion.LookRotation(-direction.ToVector3(), up.ToVector3()).ToLeapQuaternion();
 
            return new Bone(
                 proximalPosition,
