@@ -30,8 +30,8 @@ namespace Leap.Unity.Interaction {
         getInteractionTransform(out interactionPosition, out interactionRotation);
 
         LEAP_IE_TRANSFORM interactionTransform = new LEAP_IE_TRANSFORM();
-        interactionTransform.position = new LEAP_VECTOR(interactionPosition);
-        interactionTransform.rotation = new LEAP_QUATERNION(interactionRotation);
+        interactionTransform.position = interactionPosition.ToCVector();
+        interactionTransform.rotation = interactionRotation.ToCQuaternion();
 
         return interactionTransform;
       }
@@ -247,8 +247,8 @@ namespace Leap.Unity.Interaction {
             Vector3 bonePos = bone.NextJoint.ToVector3();
 
             //Do the solve such that the objects positions are matched to the new bone positions
-            LEAP_VECTOR point1 = new LEAP_VECTOR(objectPos - oldPosition);
-            LEAP_VECTOR point2 = new LEAP_VECTOR(bonePos - oldPosition);
+            LEAP_VECTOR point1 = (objectPos - oldPosition).ToCVector();
+            LEAP_VECTOR point2 = (bonePos - oldPosition).ToCVector();
 
             KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
           }
@@ -262,8 +262,8 @@ namespace Leap.Unity.Interaction {
       KabschC.GetTranslation(ref _kabsch, out leapTranslation);
       KabschC.GetRotation(ref _kabsch, out leapRotation);
 
-      translation = leapTranslation.ToUnityVector();
-      rotation = new Quaternion(leapRotation.x, leapRotation.y, leapRotation.z, leapRotation.w);
+      translation = leapTranslation.ToVector3();
+      rotation = leapRotation.ToQuaternion();
     }
 
     protected class HandPointCollection {

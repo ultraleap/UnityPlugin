@@ -342,8 +342,8 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void simulateInteraction() {
       var _controllerTransform = new LEAP_IE_TRANSFORM();
-      _controllerTransform.position = new LEAP_VECTOR(_leapProvider.transform.position);
-      _controllerTransform.rotation = new LEAP_QUATERNION(_leapProvider.transform.rotation);
+      _controllerTransform.position = _leapProvider.transform.position.ToCVector();
+      _controllerTransform.rotation = _leapProvider.transform.rotation.ToCQuaternion();
       _controllerTransform.wallTime = Time.fixedTime;
 
       InteractionC.UpdateController(ref _scene, ref _controllerTransform);
@@ -527,7 +527,7 @@ namespace Leap.Unity.Interaction {
         InteractionBehaviourBase interactionBehaviour = _instanceHandleToBehaviour[vel.handle];
 
         try {
-          interactionBehaviour.OnVelocityChanged(vel.linearVelocity.ToUnityVector(), vel.angularVelocity.ToUnityVector());
+          interactionBehaviour.OnVelocityChanged(vel.linearVelocity.ToVector3(), vel.angularVelocity.ToVector3());
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);

@@ -367,23 +367,11 @@ namespace LeapInternal
       return new Leap.Vector(x, y, z);
     }
 
-    public UnityEngine.Vector3 ToUnityVector()
-    {
-      return new UnityEngine.Vector3(x, y, z);
-    }
-
     public LEAP_VECTOR(Leap.Vector leap)
     {
       x = leap.x;
       y = leap.y;
       z = leap.z;
-    }
-
-    public LEAP_VECTOR(UnityEngine.Vector3 unity)
-    {
-      x = unity.x;
-      y = unity.y;
-      z = unity.z;
     }
   }
 
@@ -401,14 +389,6 @@ namespace LeapInternal
       y = q.y;
       z = q.z;
       w = q.w;
-    }
-
-    public LEAP_QUATERNION(UnityEngine.Quaternion unity)
-    {
-      x = unity.x;
-      y = unity.y;
-      z = unity.z;
-      w = unity.w;
     }
   }
 
