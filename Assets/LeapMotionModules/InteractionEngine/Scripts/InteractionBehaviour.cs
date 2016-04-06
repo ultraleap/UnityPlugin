@@ -20,6 +20,8 @@ namespace Leap.Unity.Interaction {
 
     private bool _hasShapeDescriptionBeenCreated = false;
     private LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeDescriptionHandle;
+
+    private bool _hasShapeInstanceHandle = false;
     private LEAP_IE_SHAPE_INSTANCE_HANDLE _shapeInstanceHandle;
 
     protected Rigidbody _rigidbody;
@@ -89,8 +91,8 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public LEAP_IE_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
       get {
-        if (!_isRegisteredWithManager) {
-          throw new NotRegisteredWithManagerException();
+        if (!_hasShapeInstanceHandle) {
+          throw new InvalidOperationException("Cannot get ShapeInstanceHandle because it has not been assigned.");
         }
 
         return _shapeInstanceHandle;
@@ -186,6 +188,7 @@ namespace Leap.Unity.Interaction {
     /// <param name="instanceHandle"></param>
     public virtual void OnInteractionShapeCreated(LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle) {
       _shapeInstanceHandle = instanceHandle;
+      _hasShapeInstanceHandle = true;
     }
 
     /// <summary>
@@ -196,6 +199,7 @@ namespace Leap.Unity.Interaction {
       _shapeInstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
       _shapeDescriptionHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
       _hasShapeDescriptionBeenCreated = false;
+      _hasShapeInstanceHandle = false;
     }
 
     /// <summary>
@@ -280,19 +284,39 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called by InteractionController when the velocity of an object is changed.
     /// </summary>
-    public virtual void OnVelocityChanged(UnityEngine.Vector3 linearVelocity, UnityEngine.Vector3 angularVelocity)
-    {
-      if (!_rigidbody)
+    public virtual void OnVelocityChanged(UnityEngine.Vector3 linearVelocity, UnityEngine.Vector3 angularVelocity) {
+      if (!_rigidbody) {
         return;
+      }
 
-      if(_rigidbody.useGravity)
+      if (_rigidbody.useGravity) {
         throw new InvalidOperationException("Cannot modify velocity of object correctly because it has a force applied (gravity.)");
+      }
 
       // Clear applied forces.  They were not accounted for when the velocities were calculated.
       _rigidbody.Sleep();
 
       _rigidbody.velocity = linearVelocity;
       _rigidbody.angularVelocity = angularVelocity;
+    }
+
+    public virtual void OnRegister() {
+      _isRegisteredWithManager = true;
+
+      _rigidbody = GetComponent<Rigidbody>();
+      if (_rigidbody) {
+        _rigidbodyHadUseGravity = _rigidbody.useGravity;
+        _rigidbody.useGravity = false;
+      }
+    }
+
+    public virtual void OnUnregister() {
+      _isRegisteredWithManager = false;
+
+      if (_rigidbody) {
+        _rigidbody.useGravity = _rigidbodyHadUseGravity;
+        _rigidbody = null;
+      }
     }
 
     /// <summary>
@@ -308,15 +332,7 @@ namespace Leap.Unity.Interaction {
         throw new NoManagerSpecifiedException();
       }
 
-      _isRegisteredWithManager = true;
       _manager.RegisterInteractionBehaviour(this);
-
-      _rigidbody = GetComponent<Rigidbody>();
-      if (_rigidbody)
-      {
-        _rigidbodyHadUseGravity = _rigidbody.useGravity;
-        _rigidbody.useGravity = false;
-      }
     }
 
     /// <summary>
@@ -332,13 +348,6 @@ namespace Leap.Unity.Interaction {
       }
 
       _manager.UnregisterInteractionBehaviour(this);
-      _isRegisteredWithManager = false;
-
-      if (_rigidbody)
-      {
-        _rigidbody.useGravity = _rigidbodyHadUseGravity;
-        _rigidbody = null;
-      }
     }
     #endregion
 

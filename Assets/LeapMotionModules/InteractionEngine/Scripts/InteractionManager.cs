@@ -28,6 +28,10 @@ namespace Leap.Unity.Interaction {
 
     #region INTERNAL FIELDS
     protected List<InteractionBehaviour> _registeredBehaviours;
+    protected HashSet<InteractionBehaviour> _misbehavingBehaviours;
+
+    //Maps the Interaction instance handle to the behaviour
+    //A mapping only exists if a shape instance has been created
     protected Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, InteractionBehaviour> _instanceHandleToBehaviour;
 
     protected Dictionary<int, InteractionHand> _idToInteractionHand;
@@ -35,6 +39,7 @@ namespace Leap.Unity.Interaction {
 
     protected ShapeDescriptionPool _shapeDescriptionPool;
 
+    private bool _hasSceneBeenCreated = false;
     protected LEAP_IE_SCENE _scene;
 
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
@@ -79,7 +84,16 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Returns a collection of InteractionObjects that are currently being grasped by
+    /// Returns a collection of InteractionBehaviours that are currently registered with this manager.
+    /// </summary>
+    public IEnumerable<InteractionBehaviour> RegisteredObjects {
+      get {
+        return _registeredBehaviours;
+      }
+    }
+
+    /// <summary>
+    /// Returns a collection of InteractionBehaviours that are currently being grasped by
     /// at least one hand.
     /// </summary>
     public IEnumerable<InteractionBehaviour> GraspedObjects {
@@ -116,10 +130,22 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     /// <param name="interactionBehaviour"></param>
     public void RegisterInteractionBehaviour(InteractionBehaviour interactionBehaviour) {
+      if (_registeredBehaviours.Contains(interactionBehaviour)) {
+        throw new InvalidOperationException("Interaction Behaviour " + interactionBehaviour + " cannot be registered because " +
+                                            "it is already registered with this manager.");
+      }
+
       _registeredBehaviours.Add(interactionBehaviour);
 
+      try {
+        interactionBehaviour.OnRegister();
+      } catch (Exception e) {
+        _misbehavingBehaviours.Add(interactionBehaviour);
+        throw e;
+      }
+
       //Don't create right away if we are not enabled, creation will be done in OnEnable
-      if (isActiveAndEnabled) {
+      if (_hasSceneBeenCreated) {
         createInteractionShape(interactionBehaviour);
       }
     }
@@ -130,12 +156,39 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     /// <param name="interactionBehaviour"></param>
     public void UnregisterInteractionBehaviour(InteractionBehaviour interactionBehaviour) {
+      if (!_registeredBehaviours.Contains(interactionBehaviour)) {
+        throw new InvalidOperationException("Interaction Behaviour " + interactionBehaviour + " cannot be unregistered because " +
+                                            "it is not currently registered with this manager.");
+      }
+
       _registeredBehaviours.Remove(interactionBehaviour);
 
-      //Don't destroy if we are not enabled, everything already got destroyed in OnDisable
-      if (isActiveAndEnabled) {
-        destroyInteractionShape(interactionBehaviour);
+      if (_graspedBehaviours.Remove(interactionBehaviour)) {
+        foreach (var interactionHand in _idToInteractionHand.Values) {
+          if (interactionHand.graspedObject == interactionBehaviour) {
+            try {
+              interactionHand.ReleaseObject();
+            } catch (Exception e) {
+              //Only log to console
+              //We want to continue so we can destroy the shape and dispatch OnUnregister
+              Debug.LogException(e);
+            }
+            break;
+          }
+        }
       }
+
+      //Don't destroy if we are not enabled, everything already got destroyed in OnDisable
+      if (_hasSceneBeenCreated) {
+        try {
+          destroyInteractionShape(interactionBehaviour);
+        } catch (Exception e) {
+          //Like above, only log to console so we can dispatch OnUnregister
+          Debug.LogException(e);
+        }
+      }
+
+      interactionBehaviour.OnUnregister();
     }
     #endregion
 
@@ -147,7 +200,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void OnValidate() {
-      if (Application.isPlaying && isActiveAndEnabled) {
+      if (Application.isPlaying && _hasSceneBeenCreated) {
         //Allow the debug lines to be toggled while the scene is playing
         applyDebugSettings();
       }
@@ -155,6 +208,7 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void Awake() {
       _registeredBehaviours = new List<InteractionBehaviour>();
+      _misbehavingBehaviours = new HashSet<InteractionBehaviour>();
       _instanceHandleToBehaviour = new Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, InteractionBehaviour>();
       _graspedBehaviours = new List<InteractionBehaviour>();
       _idToInteractionHand = new Dictionary<int, InteractionHand>();
@@ -163,35 +217,68 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void OnEnable() {
-      InteractionC.CreateScene(ref _scene);
+      Assert.IsFalse(_hasSceneBeenCreated, "Scene should not have been created yet");
+
+      try {
+        InteractionC.CreateScene(ref _scene);
+        _hasSceneBeenCreated = true;
+        applyDebugSettings();
+      } catch (Exception e) {
+        enabled = false;
+        throw e;
+      }
+
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
-      applyDebugSettings();
 
       Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "There should not be any instances before the creation step.");
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
-        createInteractionShape(_registeredBehaviours[i]);
+        InteractionBehaviour interactionBehaviour = _registeredBehaviours[i];
+        try {
+          createInteractionShape(interactionBehaviour);
+        } catch (Exception e) {
+          _misbehavingBehaviours.Add(interactionBehaviour);
+          Debug.LogException(e);
+        }
       }
     }
 
     protected virtual void OnDisable() {
       foreach (var interactionHand in _idToInteractionHand.Values) {
-        if (interactionHand.graspedObject != null) {
-          interactionHand.ReleaseObject();
+        InteractionBehaviour graspedBehaviour = interactionHand.graspedObject;
+        if (graspedBehaviour != null) {
+          try {
+            interactionHand.ReleaseObject();
+          } catch (Exception e) {
+            _misbehavingBehaviours.Add(graspedBehaviour);
+            Debug.LogException(e);
+          }
         }
       }
+
+      unregisterMisbehavingBehaviours();
+
       _idToInteractionHand.Clear();
       _graspedBehaviours.Clear();
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
-        destroyInteractionShape(_registeredBehaviours[i]);
+        try {
+          destroyInteractionShape(_registeredBehaviours[i]);
+        } catch (Exception e) {
+          Debug.LogException(e);
+        }
       }
 
       Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "All instances should have been destroyed.");
 
-      _shapeDescriptionPool.RemoveAllShapes();
-      _shapeDescriptionPool = null;
-      InteractionC.DestroyScene(ref _scene);
+      if (_shapeDescriptionPool != null) {
+        _shapeDescriptionPool.RemoveAllShapes();
+        _shapeDescriptionPool = null;
+      }
+
+      if (_hasSceneBeenCreated) {
+        InteractionC.DestroyScene(ref _scene);
+      }
     }
 
     protected virtual void FixedUpdate() {
@@ -200,6 +287,10 @@ namespace Leap.Unity.Interaction {
       if (_showDebugLines) {
         InteractionC.DrawDebugLines(ref _scene);
       }
+    }
+
+    protected virtual void LateUpdate() {
+      unregisterMisbehavingBehaviours();
     }
     #endregion
 
@@ -214,8 +305,9 @@ namespace Leap.Unity.Interaction {
       updateInteractionStateChanges();
 
       // TODO: Pass a debug flag to disable calculating velocities.
-      if(_modifyVelocities)
+      if (_modifyVelocities) {
         setObjectVelocities();
+      }
     }
 
     protected virtual void applyDebugSettings() {
@@ -225,9 +317,14 @@ namespace Leap.Unity.Interaction {
     protected virtual void updateInteractionRepresentations() {
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         InteractionBehaviour interactionBehaviour = _registeredBehaviours[i];
-        LEAP_IE_SHAPE_INSTANCE_HANDLE shapeInstanceHandle = interactionBehaviour.ShapeInstanceHandle;
-        LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
-        InteractionC.UpdateShape(ref _scene, ref interactionTransform, ref shapeInstanceHandle);
+        try {
+          LEAP_IE_SHAPE_INSTANCE_HANDLE shapeInstanceHandle = interactionBehaviour.ShapeInstanceHandle;
+          LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
+          InteractionC.UpdateShape(ref _scene, ref interactionTransform, ref shapeInstanceHandle);
+        } catch (Exception e) {
+          _misbehavingBehaviours.Add(interactionBehaviour);
+          Debug.LogException(e);
+        }
       }
     }
 
@@ -282,8 +379,16 @@ namespace Leap.Unity.Interaction {
             interactionHand = untrackedInteractionHand;
             //Remove the old id from the mapping
             _idToInteractionHand.Remove(untrackedInteractionHand.hand.Id);
-            //This also dispatched InteractionObject.OnHandRegainedTracking()
-            interactionHand.RegainTracking(hand);
+
+            try {
+              //This also dispatched InteractionObject.OnHandRegainedTracking()
+              interactionHand.RegainTracking(hand);
+            } catch (Exception e) {
+              _misbehavingBehaviours.Add(interactionHand.graspedObject);
+              Debug.LogException(e);
+              continue;
+            }
+
           } else {
             //Otherwise just create a new one
             interactionHand = new InteractionHand(hand);
@@ -301,7 +406,15 @@ namespace Leap.Unity.Interaction {
               InteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[instance];
               if (interactionHand.graspedObject == null) {
                 _graspedBehaviours.Add(interactionBehaviour);
-                interactionHand.GraspObject(interactionBehaviour);
+
+                try {
+                  interactionHand.GraspObject(interactionBehaviour);
+                } catch (Exception e) {
+                  _misbehavingBehaviours.Add(interactionBehaviour);
+                  Debug.LogException(e);
+                  continue;
+                }
+
               }
               break;
             }
@@ -309,7 +422,15 @@ namespace Leap.Unity.Interaction {
             {
               if (interactionHand.graspedObject != null) {
                 _graspedBehaviours.Remove(interactionHand.graspedObject);
-                interactionHand.ReleaseObject();
+
+                try {
+                  interactionHand.ReleaseObject();
+                } catch (Exception e) {
+                  _misbehavingBehaviours.Add(interactionHand.graspedObject);
+                  Debug.LogException(e);
+                  continue;
+                }
+
               }
               break;
             }
@@ -335,15 +456,27 @@ namespace Leap.Unity.Interaction {
 
           //If is isn't already marked as untracked, mark it as untracked
           if (!ieHand.isUntracked) {
-            //This also dispatches InteractionObject.OnHandLostTracking()
-            ieHand.MarkUntracked();
+            try {
+              //This also dispatches InteractionObject.OnHandLostTracking()
+              ieHand.MarkUntracked();
+            } catch (Exception e) {
+              _misbehavingBehaviours.Add(ieHand.graspedObject);
+              Debug.LogException(e);
+            }
           }
 
           //If the age is longer than the timeout, we also remove it from the list
           if (handAge > _untrackedTimeout) {
             _handIdsToRemove.Add(id);
-            //This also dispatched InteractionObject.OnHandTimeout()
-            ieHand.MarkTimeout();
+
+            try {
+              //This also dispatched InteractionObject.OnHandTimeout()
+              ieHand.MarkTimeout();
+            } catch (Exception e) {
+              _misbehavingBehaviours.Add(ieHand.graspedObject);
+              Debug.LogException(e);
+            }
+
             continue;
           }
         }
@@ -365,23 +498,35 @@ namespace Leap.Unity.Interaction {
           }
         }
 
-        interactionBehaviour.OnHandsHold(_holdingHands);
+        try {
+          interactionBehaviour.OnHandsHold(_holdingHands);
+        } catch (Exception e) {
+          _misbehavingBehaviours.Add(interactionBehaviour);
+          Debug.LogException(e);
+        }
+
         _holdingHands.Clear();
       }
     }
 
-    protected virtual void setObjectVelocities()
-    {
+    protected virtual void setObjectVelocities() {
       LEAP_IE_VELOCITY[] velocities;
       InteractionC.GetVelocities(ref _scene, out velocities);
 
-      if (velocities == null)
+      if (velocities == null) {
         return;
+      }
 
-      for (int i = 0; i < velocities.Length; ++i)
-      {
+      for (int i = 0; i < velocities.Length; ++i) {
         LEAP_IE_VELOCITY vel = velocities[i];
-        _instanceHandleToBehaviour[vel.handle].OnVelocityChanged(vel.linearVelocity.ToVector3(), vel.angularVelocity.ToVector3());
+        InteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[vel.handle];
+
+        try {
+          interactionBehaviour.OnVelocityChanged(vel.linearVelocity.ToVector3(), vel.angularVelocity.ToVector3());
+        } catch (Exception e) {
+          _misbehavingBehaviours.Add(interactionBehaviour);
+          Debug.LogException(e);
+        }
       }
     }
 
@@ -408,7 +553,23 @@ namespace Leap.Unity.Interaction {
     }
     #endregion
 
-    #region INTERNAL CLASSES
+    #region INTERNAL
+
+    private void unregisterMisbehavingBehaviours() {
+      if (_misbehavingBehaviours.Count > 0) {
+        foreach (var interactionBehaviour in _misbehavingBehaviours) {
+          if (interactionBehaviour != null) {
+            try {
+              UnregisterInteractionBehaviour(interactionBehaviour);
+            } catch (Exception e) {
+              Debug.LogException(e);
+            }
+          }
+        }
+        _misbehavingBehaviours.Clear();
+      }
+    }
+
     //A persistant structure for storing useful data about a hand as it interacts with objects
     protected class InteractionHand {
       public Hand hand { get; protected set; }
