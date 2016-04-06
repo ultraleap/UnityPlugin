@@ -237,8 +237,8 @@ namespace Leap.Unity.Interaction {
         }
 
         LEAP_IE_TRANSFORM ieTransform = new LEAP_IE_TRANSFORM();
-        ieTransform.position = new LEAP_VECTOR(parentObject.transform.InverseTransformPoint(globalPos) * parentObject.transform.lossyScale.x);
-        ieTransform.rotation = new LEAP_QUATERNION(Quaternion.Inverse(parentObject.transform.rotation) * globalRot);
+        ieTransform.position = (parentObject.transform.InverseTransformPoint(globalPos) * parentObject.transform.lossyScale.x).ToCVector();
+        ieTransform.rotation = (Quaternion.Inverse(parentObject.transform.rotation) * globalRot).ToCQuaternion();
 
         StructMarshal<IntPtr>.CopyIntoArray(compoundDesc.pShapes, shapePtr, i);
         compoundDesc.pTransforms[i] = ieTransform;
@@ -279,7 +279,7 @@ namespace Leap.Unity.Interaction {
     private IntPtr allocateObb(Vector3 extents) {
       LEAP_IE_OBB_DESCRIPTION obbDesc = new LEAP_IE_OBB_DESCRIPTION();
       obbDesc.shape.type = eLeapIEShapeType.eLeapIEShape_OBB;
-      obbDesc.extents = new LeapInternal.LEAP_VECTOR(extents);
+      obbDesc.extents = extents.ToCVector();
 
       IntPtr obbPtr = StructAllocator.AllocateStruct(obbDesc);
       return obbPtr;
@@ -291,8 +291,8 @@ namespace Leap.Unity.Interaction {
       meshDesc.radius = radius;
       meshDesc.nVerticies = 2;
       meshDesc.pVertices = new LEAP_VECTOR[2];
-      meshDesc.pVertices[0] = new LEAP_VECTOR(p0);
-      meshDesc.pVertices[1] = new LEAP_VECTOR(p1);
+      meshDesc.pVertices[0] = p0.ToCVector();
+      meshDesc.pVertices[1] = p1.ToCVector();
 
       IntPtr capsulePtr = StructAllocator.AllocateStruct(meshDesc);
       return capsulePtr;
@@ -305,7 +305,7 @@ namespace Leap.Unity.Interaction {
       meshDesc.nVerticies = (uint)mesh.vertexCount;
       meshDesc.pVertices = new LEAP_VECTOR[mesh.vertexCount];
       for (int i = 0; i < mesh.vertexCount; i++) {
-        LEAP_VECTOR v = new LEAP_VECTOR(mesh.vertices[i] * scale);
+        LEAP_VECTOR v = (mesh.vertices[i] * scale).ToCVector();
         meshDesc.pVertices[i] = v;
       }
 
