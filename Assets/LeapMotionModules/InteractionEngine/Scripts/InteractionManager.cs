@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
 using System;
+using System.IO;
 using System.Collections.Generic;
-using LeapInternal;
 using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
   public class InteractionManager : MonoBehaviour {
+    private const string STREAMING_DATA_SUBFOLDER = "InteractionEngine";
 
     #region SERIALIZED FIELDS
     [SerializeField]
@@ -225,14 +226,18 @@ namespace Leap.Unity.Interaction {
       Assert.IsFalse(_hasSceneBeenCreated, "Scene should not have been created yet");
 
       try {
-        InteractionC.CreateScene(ref _scene);
+        LEAP_IE_CREATE_SCENE_INFO sceneInfo = new LEAP_IE_CREATE_SCENE_INFO();
+        sceneInfo.sceneFlags = 0;
+        string dataPath = Path.Combine(Application.streamingAssetsPath, STREAMING_DATA_SUBFOLDER);
+        InteractionC.CreateScene(ref _scene, ref sceneInfo, dataPath);
+
         _hasSceneBeenCreated = true;
         applyDebugSettings();
       } catch (Exception e) {
         enabled = false;
         throw e;
       }
-
+      
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
 
       Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "There should not be any instances before the creation step.");
@@ -325,7 +330,9 @@ namespace Leap.Unity.Interaction {
         try {
           LEAP_IE_SHAPE_INSTANCE_HANDLE shapeInstanceHandle = interactionBehaviour.ShapeInstanceHandle;
           LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
-          InteractionC.UpdateShape(ref _scene, ref interactionTransform, ref shapeInstanceHandle);
+          LEAP_IE_UPDATE_SHAPE_INFO updateInfo = new LEAP_IE_UPDATE_SHAPE_INFO();
+          updateInfo.updateFlags = 0;
+          InteractionC.UpdateShape(ref _scene, ref interactionTransform, ref updateInfo, ref shapeInstanceHandle);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
@@ -539,8 +546,9 @@ namespace Leap.Unity.Interaction {
       LEAP_IE_SHAPE_DESCRIPTION_HANDLE descriptionHandle = interactionBehaviour.ShapeDescriptionHandle;
       LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
       LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
-
-      InteractionC.CreateShape(ref _scene, ref descriptionHandle, ref interactionTransform, out instanceHandle);
+      LEAP_IE_CREATE_SHAPE_INFO createInfo = new LEAP_IE_CREATE_SHAPE_INFO();
+      createInfo.shapeFlags = (uint)eLeapIEShapeFlags.eLeapIEShapeFlags_HasRigidBody;
+      InteractionC.CreateShape(ref _scene, ref descriptionHandle, ref interactionTransform, ref createInfo, out instanceHandle);
 
       _instanceHandleToBehaviour[instanceHandle] = interactionBehaviour;
 
