@@ -147,8 +147,8 @@ namespace Leap.Unity.Interaction.CApi {
     int depthTest;
 
     public void Draw() {
-      UnityEngine.Debug.DrawLine(start.ToUnityVector(),
-                                 end.ToUnityVector(),
+      UnityEngine.Debug.DrawLine(start.ToVector3(),
+                                 end.ToVector3(),
                                  color.ToUnityColor(),
                                  duration,
                                  depthTest != 0);

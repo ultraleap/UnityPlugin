@@ -240,8 +240,8 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void simulateInteraction() {
       var _controllerTransform = new LEAP_IE_TRANSFORM();
-      _controllerTransform.position = new LEAP_VECTOR(_leapProvider.transform.position);
-      _controllerTransform.rotation = new LEAP_QUATERNION(_leapProvider.transform.rotation);
+      _controllerTransform.position = _leapProvider.transform.position.ToCVector();
+      _controllerTransform.rotation = _leapProvider.transform.rotation.ToCQuaternion();
       _controllerTransform.wallTime = Time.fixedTime;
 
       InteractionC.UpdateController(ref _scene, ref _controllerTransform);
@@ -381,7 +381,7 @@ namespace Leap.Unity.Interaction {
       for (int i = 0; i < velocities.Length; ++i)
       {
         LEAP_IE_VELOCITY vel = velocities[i];
-        _instanceHandleToBehaviour[vel.handle].OnVelocityChanged(vel.linearVelocity.ToUnityVector(), vel.angularVelocity.ToUnityVector());
+        _instanceHandleToBehaviour[vel.handle].OnVelocityChanged(vel.linearVelocity.ToVector3(), vel.angularVelocity.ToVector3());
       }
     }
 
