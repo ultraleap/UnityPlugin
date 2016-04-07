@@ -390,7 +390,7 @@ namespace Leap.Unity.Interaction {
           INTERACTION_SHAPE_INSTANCE_HANDLE shapeInstanceHandle = interactionBehaviour.ShapeInstanceHandle;
           INTERACTION_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
           INTERACTION_UPDATE_SHAPE_INFO updateInfo = interactionBehaviour.OnInteractionShapeUpdate();
-          InteractionC.UpdateShape(ref _scene, ref interactionTransform, ref updateInfo, ref shapeInstanceHandle);
+          InteractionC.UpdateShapeInstance(ref _scene, ref interactionTransform, ref updateInfo, ref shapeInstanceHandle);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
@@ -604,7 +604,7 @@ namespace Leap.Unity.Interaction {
       INTERACTION_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
       INTERACTION_CREATE_SHAPE_INFO createInfo = new INTERACTION_CREATE_SHAPE_INFO();
       createInfo.shapeFlags = ShapeInfoFlags.HasRigidBody | ShapeInfoFlags.GravityEnabled;
-      InteractionC.CreateShape(ref _scene, ref descriptionHandle, ref interactionTransform, ref createInfo, out instanceHandle);
+      InteractionC.CreateShapeInstance(ref _scene, ref descriptionHandle, ref interactionTransform, ref createInfo, out instanceHandle);
 
       _instanceHandleToBehaviour[instanceHandle] = interactionBehaviour;
 
@@ -616,7 +616,7 @@ namespace Leap.Unity.Interaction {
 
       _instanceHandleToBehaviour.Remove(instanceHandle);
 
-      InteractionC.DestroyShape(ref _scene, ref instanceHandle);
+      InteractionC.DestroyShapeInstance(ref _scene, ref instanceHandle);
 
       interactionBehaviour.OnInteractionShapeDestroyed();
     }

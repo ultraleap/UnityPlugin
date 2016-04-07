@@ -289,50 +289,50 @@ namespace Leap.Unity.Interaction.CApi {
     }
 
     /*** Create Shape ***/
-    [DllImport(DLL_NAME, EntryPoint = "LeapIECreateShape")]
-    private static extern ReturnStatus LeapIECreateShape(ref INTERACTION_SCENE scene,
-                                                         ref INTERACTION_SHAPE_DESCRIPTION_HANDLE handle,
-                                                         ref INTERACTION_TRANSFORM transform,
-                                                         ref INTERACTION_CREATE_SHAPE_INFO shapeInfo,
-                                                         out INTERACTION_SHAPE_INSTANCE_HANDLE instance);
+    [DllImport(DLL_NAME, EntryPoint = "LeapIECreateShapeInstance")]
+    private static extern ReturnStatus LeapIECreateShapeInstance(ref INTERACTION_SCENE scene,
+                                                                 ref INTERACTION_SHAPE_DESCRIPTION_HANDLE handle,
+                                                                 ref INTERACTION_TRANSFORM transform,
+                                                                 ref INTERACTION_CREATE_SHAPE_INFO shapeInfo,
+                                                                 out INTERACTION_SHAPE_INSTANCE_HANDLE instance);
 
-    public static ReturnStatus CreateShape(ref INTERACTION_SCENE scene,
-                                           ref INTERACTION_SHAPE_DESCRIPTION_HANDLE handle,
-                                           ref INTERACTION_TRANSFORM transform,
-                                           ref INTERACTION_CREATE_SHAPE_INFO shapeInfo,
-                                           out INTERACTION_SHAPE_INSTANCE_HANDLE instance) {
-      Logger.Log("Create Shape", LogLevel.CreateDestroy);
-      var rs = LeapIECreateShape(ref scene, ref handle, ref transform, ref shapeInfo, out instance);
+    public static ReturnStatus CreateShapeInstance(ref INTERACTION_SCENE scene,
+                                                   ref INTERACTION_SHAPE_DESCRIPTION_HANDLE handle,
+                                                   ref INTERACTION_TRANSFORM transform,
+                                                   ref INTERACTION_CREATE_SHAPE_INFO shapeInfo,
+                                                   out INTERACTION_SHAPE_INSTANCE_HANDLE instance) {
+      Logger.Log("Create Shap eInstance", LogLevel.CreateDestroy);
+      var rs = CreateShapeInstance(ref scene, ref handle, ref transform, ref shapeInfo, out instance);
       Logger.HandleReturnStatus(rs);
       return rs;
     }
 
-    /*** Destroy Shape ***/
-    [DllImport(DLL_NAME, EntryPoint = "LeapIEDestroyShape")]
-    private static extern ReturnStatus LeapIEDestroyShape(ref INTERACTION_SCENE scene,
+    /*** Destroy Shape Instance ***/
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEDestroyShapeInstance")]
+    private static extern ReturnStatus LeapIEDestroyShapeInstance(ref INTERACTION_SCENE scene,
                                                           ref INTERACTION_SHAPE_INSTANCE_HANDLE instance);
 
-    public static ReturnStatus DestroyShape(ref INTERACTION_SCENE scene,
+    public static ReturnStatus DestroyShapeInstance(ref INTERACTION_SCENE scene,
                                             ref INTERACTION_SHAPE_INSTANCE_HANDLE instance) {
-      Logger.Log("Destroy Shape", LogLevel.CreateDestroy);
-      var rs = LeapIEDestroyShape(ref scene, ref instance);
+      Logger.Log("Destroy Shape Instance", LogLevel.CreateDestroy);
+      var rs = LeapIEDestroyShapeInstance(ref scene, ref instance);
       Logger.HandleReturnStatus(rs);
       return rs;
     }
 
-    /*** Update Shape ***/
-    [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateShape")]
-    private static extern ReturnStatus LeapIEUpdateShape(ref INTERACTION_SCENE scene,
-                                                         ref INTERACTION_TRANSFORM transform,
-                                                         ref INTERACTION_UPDATE_SHAPE_INFO updateInfo,
-                                                         ref INTERACTION_SHAPE_INSTANCE_HANDLE instance);
+    /*** Update Shape Instance ***/
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateShapeInstance")]
+    private static extern ReturnStatus LeapIEUpdateShapeInstance(ref INTERACTION_SCENE scene,
+                                                                 ref INTERACTION_TRANSFORM transform,
+                                                                 ref INTERACTION_UPDATE_SHAPE_INFO updateInfo,
+                                                                 ref INTERACTION_SHAPE_INSTANCE_HANDLE instance);
 
-    public static ReturnStatus UpdateShape(ref INTERACTION_SCENE scene,
-                                           ref INTERACTION_TRANSFORM transform,
-                                           ref INTERACTION_UPDATE_SHAPE_INFO updateInfo,
-                                           ref INTERACTION_SHAPE_INSTANCE_HANDLE instance) {
-      Logger.Log("Update Shape", LogLevel.AllCalls);
-      var rs = LeapIEUpdateShape(ref scene, ref transform, ref updateInfo, ref instance);
+    public static ReturnStatus UpdateShapeInstance(ref INTERACTION_SCENE scene,
+                                                   ref INTERACTION_TRANSFORM transform,
+                                                   ref INTERACTION_UPDATE_SHAPE_INFO updateInfo,
+                                                   ref INTERACTION_SHAPE_INSTANCE_HANDLE instance) {
+      Logger.Log("Update Shape Instance", LogLevel.AllCalls);
+      var rs = LeapIEUpdateShapeInstance(ref scene, ref transform, ref updateInfo, ref instance);
       Logger.HandleReturnStatus(rs);
       return rs;
     }
