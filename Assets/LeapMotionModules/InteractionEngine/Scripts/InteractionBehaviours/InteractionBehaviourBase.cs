@@ -34,6 +34,7 @@ namespace Leap.Unity.Interaction {
     private List<int> _untrackedIds = new List<int>();
 
     private bool _didRecieveVelocityUpdate = false;
+    protected bool _notifiedOfTeleport = false;
     private Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     private Vector3 _accumulatedAngularAcceleration = Vector3.zero;
     #endregion
@@ -214,6 +215,10 @@ namespace Leap.Unity.Interaction {
       return _graspingIds.Contains(handId);
     }
 
+    public virtual void NotifyTeleported() {
+      _notifiedOfTeleport = true;
+    }
+
     public virtual void AddLinearAcceleration(Vector3 linearAcceleration) {
       _accumulatedLinearAcceleration += linearAcceleration;
     }
@@ -265,8 +270,8 @@ namespace Leap.Unity.Interaction {
     /// <returns></returns>
     public virtual INTERACTION_UPDATE_SHAPE_INFO OnInteractionShapeUpdate() {
       INTERACTION_UPDATE_SHAPE_INFO info = new INTERACTION_UPDATE_SHAPE_INFO();
-      
-      info.updateFlags = UpdateInfoFlags.ApplyAcceleration;
+
+      info.updateFlags = _notifiedOfTeleport ? UpdateInfoFlags.ResetVelocity : UpdateInfoFlags.ApplyAcceleration;
       info.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
       info.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
 
@@ -393,6 +398,7 @@ namespace Leap.Unity.Interaction {
         }
       }
       _didRecieveVelocityUpdate = false;
+      _notifiedOfTeleport = false;
     }
     #endregion
 

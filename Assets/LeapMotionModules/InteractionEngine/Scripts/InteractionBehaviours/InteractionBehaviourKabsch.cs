@@ -15,8 +15,6 @@ namespace Leap.Unity.Interaction {
 
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
 
-    private bool _shouldNextSolveBeTeleport = false;
-
     protected LEAP_IE_KABSCH _kabsch;
 
     #region INTERACTION CALLBACKS
@@ -80,10 +78,9 @@ namespace Leap.Unity.Interaction {
       Quaternion newRotation = solvedRotation * oldRotation;
 
       //Apply new transform to object
-      if (_shouldNextSolveBeTeleport) {
+      if (_notifiedOfTeleport) {
         _rigidbody.position = newPosition;
         _rigidbody.rotation = newRotation;
-        _shouldNextSolveBeTeleport = false;
       } else {
         _rigidbody.MovePosition(newPosition);
         _rigidbody.MoveRotation(newRotation);
@@ -112,7 +109,7 @@ namespace Leap.Unity.Interaction {
       _handIdToPoints.Remove(oldId);
       _handIdToPoints[newHand.Id] = collection;
 
-      _shouldNextSolveBeTeleport = true;
+      NotifyTeleported();
     }
 
     public override void OnHandTimeout(Hand oldHand) {
