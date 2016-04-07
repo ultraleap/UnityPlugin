@@ -207,9 +207,13 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Create Scene ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIECreateScene", CallingConvention = CallingConvention.Cdecl)]
-    private static extern eLeapIERS LeapIECreateScene(ref LEAP_IE_SCENE scene, ref LEAP_IE_CREATE_SCENE_INFO sceneInfo, string dataPath);
+    private static extern eLeapIERS LeapIECreateScene(ref LEAP_IE_SCENE scene, 
+                                                      ref LEAP_IE_CREATE_SCENE_INFO sceneInfo, 
+                                                          string dataPath);
 
-    public static void CreateScene(ref LEAP_IE_SCENE scene, ref LEAP_IE_CREATE_SCENE_INFO sceneInfo, string dataPath) {
+    public static void CreateScene(ref LEAP_IE_SCENE scene, 
+                                   ref LEAP_IE_CREATE_SCENE_INFO sceneInfo, 
+                                       string dataPath) {
       Logger.Log("Create Scene", LogLevel.Info);
       var rs = LeapIECreateScene(ref scene, ref sceneInfo, dataPath);
       Logger.HandleReturnStatus(rs);
