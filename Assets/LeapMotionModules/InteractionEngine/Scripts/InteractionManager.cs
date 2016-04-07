@@ -34,6 +34,12 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL FIELDS
+    protected LEAP_IE_SCENE _scene;
+    private bool _hasSceneBeenCreated = false;
+    private Coroutine _simulationCoroutine = null;
+
+    protected ShapeDescriptionPool _shapeDescriptionPool;
+
     protected List<InteractionBehaviourBase> _registeredBehaviours;
     protected HashSet<InteractionBehaviourBase> _misbehavingBehaviours;
 
@@ -44,19 +50,13 @@ namespace Leap.Unity.Interaction {
     protected Dictionary<int, InteractionHand> _idToInteractionHand;
     protected List<InteractionBehaviourBase> _graspedBehaviours;
 
-    protected ShapeDescriptionPool _shapeDescriptionPool;
-
-    private bool _hasSceneBeenCreated = false;
-    private Coroutine _simulationCoroutine = null;
-    protected LEAP_IE_SCENE _scene;
-
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
     private List<int> _handIdsToRemove;
     //A temp list that is recycled.  Used as the argument to OnHandsHold.
     private List<Hand> _holdingHands;
-
+    //A temp list that is recycled.  Used to recieve results from InteractionC.
     private List<LEAP_IE_SHAPE_INSTANCE_RESULTS> _resultList;
-
+    //A temp list that is recycled.  Used to recieve debug logs from InteractionC.
     private List<string> _debugOutput;
     #endregion
 
