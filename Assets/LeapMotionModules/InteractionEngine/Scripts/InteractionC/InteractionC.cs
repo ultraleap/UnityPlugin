@@ -302,7 +302,7 @@ namespace Leap.Unity.Interaction.CApi {
                                                    ref INTERACTION_CREATE_SHAPE_INFO shapeInfo,
                                                    out INTERACTION_SHAPE_INSTANCE_HANDLE instance) {
       Logger.Log("Create Shap eInstance", LogLevel.CreateDestroy);
-      var rs = CreateShapeInstance(ref scene, ref handle, ref transform, ref shapeInfo, out instance);
+      var rs = LeapIECreateShapeInstance(ref scene, ref handle, ref transform, ref shapeInfo, out instance);
       Logger.HandleReturnStatus(rs);
       return rs;
     }
