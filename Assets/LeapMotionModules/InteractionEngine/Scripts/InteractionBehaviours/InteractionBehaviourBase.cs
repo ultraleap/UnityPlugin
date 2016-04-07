@@ -374,8 +374,14 @@ namespace Leap.Unity.Interaction {
       _rigidbody.angularVelocity = angularVelocity;
     }
 
+    /// <summary>
+    /// Called by InteractionManager before any solving is performed.
+    /// </summary>
     public virtual void OnPreSolve() { }
 
+    /// <summary>
+    /// Called by InteractionManager after all solving is performed.
+    /// </summary>
     public virtual void OnPostSolve() {
       if (!_didRecieveVelocityUpdate) {
         _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
