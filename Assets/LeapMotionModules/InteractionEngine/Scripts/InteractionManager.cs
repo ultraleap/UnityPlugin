@@ -9,11 +9,12 @@ using Leap.Unity.Interaction.CApi;
 namespace Leap.Unity.Interaction {
 
   public class InteractionManager : MonoBehaviour {
-    private const string STREAMING_DATA_SUBFOLDER = "InteractionEngine";
-
     #region SERIALIZED FIELDS
     [SerializeField]
     protected LeapProvider _leapProvider;
+
+    [SerializeField]
+    protected string _dataSubfolder = "InteractionEngine";
 
     [Tooltip("The amount of time a Hand can remain untracked while also still grasping an object.")]
     [SerializeField]
@@ -245,7 +246,7 @@ namespace Leap.Unity.Interaction {
         LEAP_IE_SCENE_INFO sceneInfo = new LEAP_IE_SCENE_INFO();
         sceneInfo.sceneFlags = eLeapIESceneFlags.eLeapIESceneFlags_HasGravity;
         sceneInfo.gravity = Physics.gravity.ToCVector();
-        string dataPath = Path.Combine(Application.streamingAssetsPath, STREAMING_DATA_SUBFOLDER);
+        string dataPath = Path.Combine(Application.streamingAssetsPath, _dataSubfolder);
         InteractionC.CreateScene(ref _scene, ref sceneInfo, dataPath);
 
         _hasSceneBeenCreated = true;
