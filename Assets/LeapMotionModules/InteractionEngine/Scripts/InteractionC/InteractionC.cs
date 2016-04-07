@@ -191,26 +191,26 @@ namespace Leap.Unity.Interaction.CApi {
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_SHAPE_INSTANCE_RESULTS {
-    LEAP_IE_SHAPE_INSTANCE_HANDLE handle; 
-    ShapeInstanceResultFlags resultFlags;
-    LEAP_VECTOR linearVelocity;   
-    LEAP_VECTOR angularVelocity;
+    public LEAP_IE_SHAPE_INSTANCE_HANDLE handle;
+    public ShapeInstanceResultFlags resultFlags;
+    public LEAP_VECTOR linearVelocity;
+    public LEAP_VECTOR angularVelocity;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_DEBUG_LINE {
-    LEAP_VECTOR start;
-    LEAP_VECTOR end;
-    LEAP_COLOR color;
-    float duration;
-    int depthTest;
+    public LEAP_VECTOR start;
+    public LEAP_VECTOR end;
+    public LEAP_COLOR color;
+    public float duration;
+    public int depthTest;
 
     public void Draw() {
-      UnityEngine.Debug.DrawLine(start.ToVector3(),
-                                 end.ToVector3(),
-                                 color.ToUnityColor(),
-                                 duration,
-                                 depthTest != 0);
+      Debug.DrawLine(start.ToVector3(),
+                     end.ToVector3(),
+                     color.ToUnityColor(),
+                     duration,
+                     depthTest != 0);
     }
   }
 

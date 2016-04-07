@@ -422,11 +422,9 @@ namespace Leap.Unity.Interaction {
         Hand hand = hands[i];
 
         LEAP_IE_HAND_RESULT handResult;
-        LEAP_IE_SHAPE_INSTANCE_HANDLE instance;
         InteractionC.GetHandResult(ref _scene,
                                        (uint)hand.Id,
-                                   out handResult,
-                                   out instance);
+                                   out handResult);
 
         //Get the InteractionHand associated with this hand id
         InteractionHand interactionHand;
@@ -471,7 +469,7 @@ namespace Leap.Unity.Interaction {
         switch (handResult.classification) {
           case ManipulatorMode.eLeapIEClassification_Grasp:
             {
-              InteractionBehaviourBase interactionBehaviour = _instanceHandleToBehaviour[instance];
+              InteractionBehaviourBase interactionBehaviour = _instanceHandleToBehaviour[handResult.instanceHandle];
               if (interactionHand.graspedObject == null) {
                 _graspedBehaviours.Add(interactionBehaviour);
 
@@ -637,7 +635,7 @@ namespace Leap.Unity.Interaction {
     private LEAP_IE_SCENE_INFO getSceneInfo() {
       LEAP_IE_SCENE_INFO info = new LEAP_IE_SCENE_INFO();
       info.gravity = Physics.gravity.ToCVector();
-      info.sceneFlags = SceneFlags.eLeapIESceneFlags_HasGravity;
+      info.sceneFlags = SceneInfoFlags.eLeapIESceneFlags_HasGravity;
       return info;
     }
 
