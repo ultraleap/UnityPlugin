@@ -240,7 +240,8 @@ namespace Leap.Unity.Interaction {
 
       try {
         LEAP_IE_CREATE_SCENE_INFO sceneInfo = new LEAP_IE_CREATE_SCENE_INFO();
-        sceneInfo.sceneFlags = 0;
+        sceneInfo.sceneFlags = eLeapIESceneFlags.eLeapIESceneFlags_HasGravity;
+        sceneInfo.gravity = Physics.gravity.ToCVector();
         string dataPath = Path.Combine(Application.streamingAssetsPath, STREAMING_DATA_SUBFOLDER);
         InteractionC.CreateScene(ref _scene, ref sceneInfo, dataPath);
 
@@ -366,7 +367,7 @@ namespace Leap.Unity.Interaction {
           LEAP_IE_SHAPE_INSTANCE_HANDLE shapeInstanceHandle = interactionBehaviour.ShapeInstanceHandle;
           LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
           LEAP_IE_UPDATE_SHAPE_INFO updateInfo = new LEAP_IE_UPDATE_SHAPE_INFO();
-          updateInfo.updateFlags = 0;
+          updateInfo.updateFlags = eLeapIEUpdateFlags.eLeapIEUpdateFlags_None;
           InteractionC.UpdateShape(ref _scene, ref interactionTransform, ref updateInfo, ref shapeInstanceHandle);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
@@ -582,7 +583,7 @@ namespace Leap.Unity.Interaction {
       LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
       LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
       LEAP_IE_CREATE_SHAPE_INFO createInfo = new LEAP_IE_CREATE_SHAPE_INFO();
-      createInfo.shapeFlags = (uint)eLeapIEShapeFlags.eLeapIEShapeFlags_HasRigidBody;
+      createInfo.shapeFlags = eLeapIEShapeFlags.eLeapIEShapeFlags_HasRigidBody | eLeapIEShapeFlags.eLeapIEShapeFlags_GravityEnabled;
       InteractionC.CreateShape(ref _scene, ref descriptionHandle, ref interactionTransform, ref createInfo, out instanceHandle);
 
       _instanceHandleToBehaviour[instanceHandle] = interactionBehaviour;

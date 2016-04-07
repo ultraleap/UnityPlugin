@@ -31,18 +31,18 @@ namespace Leap.Unity.Interaction.CApi {
     eLeapIEShape_Compound
   }
 
-  enum eLeapIESceneFlags : uint {
+  public enum eLeapIESceneFlags : uint {
     eLeapIESceneFlags_None = 0x00,
     eLeapIESceneFlags_HasGravity = 0x01
   };
 
-  enum eLeapIEShapeFlags : uint {
+  public enum eLeapIEShapeFlags : uint {
     eLeapIEShapeFlags_None = 0x00,
     eLeapIEShapeFlags_HasRigidBody = 0x01,
     eLeapIEShapeFlags_GravityEnabled = 0x02
   };
 
-  enum eLeapIEUpdateFlags : uint {
+  public enum eLeapIEUpdateFlags : uint {
     eLeapIEUpdateFlags_None = 0x00,
     eLeapIEUpdateFlags_ResetVelocity = 0x01, // E.g. teleported.
     eLeapIEUpdateFlags_ApplyAcceleration = 0x02
@@ -154,21 +154,21 @@ namespace Leap.Unity.Interaction.CApi {
   // All properties require eLeapIESceneFlags to enable
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_CREATE_SCENE_INFO {
-    public uint sceneFlags;
+    public eLeapIESceneFlags sceneFlags;
     public LEAP_VECTOR gravity;
   }
 
   // All properties require eLeapIEShapeFlags to enable
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_CREATE_SHAPE_INFO {
-    public uint shapeFlags;
+    public eLeapIEShapeFlags shapeFlags;
     public LEAP_VECTOR gravity;
   }
 
   // All properties require eLeapIEUpdateFlags to enable
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_UPDATE_SHAPE_INFO {
-    public uint updateFlags;
+    public eLeapIEUpdateFlags updateFlags;
     public LEAP_VECTOR linearAcceleration;
     public LEAP_VECTOR angularAcceleration;
   }
