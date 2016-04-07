@@ -7,67 +7,67 @@ using LeapInternal;
 namespace Leap.Unity.Interaction.CApi {
 
   public enum ReturnStatus : uint {
-    eLeapIERS_Success,
-    eLeapIERS_InvalidHandle,
-    eLeapIERS_InvalidArgument,
-    eLeapIERS_ReferencesRemain,
-    eLeapIERS_NotEnabled,
-    eLeapIERS_NeverUpdated,
-    eLeapIERS_UnknownError,
-    eLeapIERS_BadData,
+    Success,
+    InvalidHandle,
+    InvalidArgument,
+    ReferencesRemain,
+    NotEnabled,
+    NeverUpdated,
+    UnknownError,
+    BadData,
 
-    eLeapIERS_StoppedOnNonDeterministic,
-    eLeapIERS_StoppedOnUnexpectedFailure,
-    eLeapIERS_StoppedOnFull,
-    eLeapIERS_StoppedFileError,
-    eLeapIERS_UnexpectedEOF,
-    eLeapIERS_Paused
+    StoppedOnNonDeterministic,
+    StoppedOnUnexpectedFailure,
+    StoppedOnFull,
+    StoppedFileError,
+    UnexpectedEOF,
+    Paused
   }
 
   public enum ShapeType : uint {
-    eLeapIEShape_Sphere,
-    eLeapIEShape_OBB,
-    eLeapIEShape_Convex,
-    eLeapIEShape_Compound
+    Sphere,
+    OBB,
+    Convex,
+    Compound
   }
 
   public enum SceneInfoFlags : uint {
-    eLeapIESceneFlags_None = 0x00,
-    eLeapIESceneFlags_HasGravity = 0x01
+    None = 0x00,
+    HasGravity = 0x01
   };
 
   public enum ShapeInfoFlags : uint {
-    eLeapIEShapeFlags_None = 0x00,
-    eLeapIEShapeFlags_HasRigidBody = 0x01,
-    eLeapIEShapeFlags_GravityEnabled = 0x02
+    None = 0x00,
+    HasRigidBody = 0x01,
+    GravityEnabled = 0x02
   };
 
   public enum UpdateInfoFlags : uint {
-    eLeapIEUpdateFlags_None = 0x00,
-    eLeapIEUpdateFlags_ResetVelocity = 0x01, // E.g. teleported.
-    eLeapIEUpdateFlags_ApplyAcceleration = 0x02
+    None = 0x00,
+    ResetVelocity = 0x01, // E.g. teleported.
+    ApplyAcceleration = 0x02
   };
 
   public enum HandResultFlags : uint {
-    eLeapIEHandResultFlags_ManipulatorMode = 0x01, // currently required
+    ManipulatorMode = 0x01, // currently required
   }
 
   public enum ManipulatorMode : uint {
-    eLeapIEClassification_Physics,
-    eLeapIEClassification_Grasp,
-    eLeapIEManipulatorMode_NoInteraction,
+    Physics,
+    Grasp,
+    NoInteraction,
   }
 
   public enum ShapeInstanceResultFlags : uint {
-    eLeapIEShapeInstanceResultFlags_None = 0x00,
-    eLeapIEShapeInstanceResultFlags_Velocities = 0x01,
+    None = 0x00,
+    Velocities = 0x01,
   }
 
   public enum DebugFlags : uint {
-    eLeapIEDebugFlags_None = 0x00,
-    eLeapIEDebugFlags_Lines = 0x01,
-    eLeapIEDebugFlags_Logging = 0x02,
-    eLeapIEListenerFlags_Strings = 0x04
+    None = 0x00,
+    Lines = 0x01,
+    Logging = 0x02,
+    Strings = 0x04
   };
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -412,7 +412,7 @@ namespace Leap.Unity.Interaction.CApi {
                                              out papResultsBuffer);
 
       results.Clear();
-      if (rs == ReturnStatus.eLeapIERS_Success) {
+      if (rs == ReturnStatus.Success) {
         for (int i = 0; i < nResults; i++) {
           IntPtr resultPtr = StructMarshal<IntPtr>.ArrayElementToStruct(papResultsBuffer, i);
           var result = StructMarshal<LEAP_IE_SHAPE_INSTANCE_RESULTS>.PtrToStruct(resultPtr);
@@ -478,7 +478,7 @@ namespace Leap.Unity.Interaction.CApi {
       var rs = LeapIEGetDebugStrings(ref scene, out nStrings, out pppStrings);
 
       strings.Clear();
-      if (rs == ReturnStatus.eLeapIERS_Success) {
+      if (rs == ReturnStatus.Success) {
         for (int i = 0; i < nStrings; i++) {
           IntPtr charPtr = StructMarshal<IntPtr>.ArrayElementToStruct(pppStrings, i);
           string str = Marshal.PtrToStringAnsi(charPtr);

@@ -31,59 +31,59 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static void GetInfo(this ReturnStatus rs, out string message, out LogLevel logLevel) {
       switch (rs) {
-        case ReturnStatus.eLeapIERS_Success:
+        case ReturnStatus.Success:
           message = "Success";
           logLevel = LogLevel.Verbose;
           return;
-        case ReturnStatus.eLeapIERS_InvalidHandle:
+        case ReturnStatus.InvalidHandle:
           message = "Invalid Handle";
           logLevel = LogLevel.Error;
           return;
-        case ReturnStatus.eLeapIERS_InvalidArgument:
+        case ReturnStatus.InvalidArgument:
           message = "Invalid Argument";
           logLevel = LogLevel.Error;
           return;
-        case ReturnStatus.eLeapIERS_ReferencesRemain:
+        case ReturnStatus.ReferencesRemain:
           message = "References Remain";
           logLevel = LogLevel.Error;
           return;
-        case ReturnStatus.eLeapIERS_NotEnabled:
+        case ReturnStatus.NotEnabled:
           message = "Not Enabled";
           logLevel = LogLevel.Error;
           return;
-        case ReturnStatus.eLeapIERS_NeverUpdated:
+        case ReturnStatus.NeverUpdated:
           message = "Never Updated";
           logLevel = LogLevel.Error;
           return;
-        case ReturnStatus.eLeapIERS_UnknownError:
+        case ReturnStatus.UnknownError:
           message = "Unknown Error";
           logLevel = LogLevel.Error;
           return;
-        case ReturnStatus.eLeapIERS_BadData:
+        case ReturnStatus.BadData:
           message = "Bad Data";
           logLevel = LogLevel.Error;
           return;
-        case ReturnStatus.eLeapIERS_StoppedOnNonDeterministic:
+        case ReturnStatus.StoppedOnNonDeterministic:
           message = "Stopped on Non Deterministic";
           logLevel = LogLevel.Error;
           return;
-        case ReturnStatus.eLeapIERS_StoppedOnUnexpectedFailure:
+        case ReturnStatus.StoppedOnUnexpectedFailure:
           message = "Stopped on Unexpected Failure";
           logLevel = LogLevel.Error;
           return;
-        case ReturnStatus.eLeapIERS_StoppedOnFull:
+        case ReturnStatus.StoppedOnFull:
           message = "Stopped on Full";
           logLevel = LogLevel.Error;
           return;
-        case ReturnStatus.eLeapIERS_StoppedFileError:
+        case ReturnStatus.StoppedFileError:
           message = "Stopped on File Error";
           logLevel = LogLevel.Error;
           return;
-        case ReturnStatus.eLeapIERS_UnexpectedEOF:
+        case ReturnStatus.UnexpectedEOF:
           message = "Unexpected End Of File";
           logLevel = LogLevel.Error;
           return;
-        case ReturnStatus.eLeapIERS_Paused:
+        case ReturnStatus.Paused:
           message = "Paused";
           logLevel = LogLevel.Verbose;
           return;

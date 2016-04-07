@@ -171,7 +171,7 @@ namespace Leap.Unity.Interaction.CApi {
       }
 
       LEAP_IE_COMPOUND_DESCRIPTION compoundDesc = new LEAP_IE_COMPOUND_DESCRIPTION();
-      compoundDesc.shape.type = ShapeType.eLeapIEShape_Compound;
+      compoundDesc.shape.type = ShapeType.Compound;
       compoundDesc.nShapes = (uint)_tempColliderList.Count;
       compoundDesc.pShapes = StructAllocator.AllocateArray<IntPtr>(_tempColliderList.Count);
       compoundDesc.pTransforms = new LEAP_IE_TRANSFORM[_tempColliderList.Count];
@@ -267,7 +267,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     private IntPtr allocateSphere(float radius) {
       LEAP_IE_SPHERE_DESCRIPTION sphereDesc = new LEAP_IE_SPHERE_DESCRIPTION();
-      sphereDesc.shape.type = ShapeType.eLeapIEShape_Sphere;
+      sphereDesc.shape.type = ShapeType.Sphere;
       sphereDesc.radius = radius;
 
       IntPtr spherePtr = StructAllocator.AllocateStruct(sphereDesc);
@@ -276,7 +276,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     private IntPtr allocateObb(Vector3 extents) {
       LEAP_IE_OBB_DESCRIPTION obbDesc = new LEAP_IE_OBB_DESCRIPTION();
-      obbDesc.shape.type = ShapeType.eLeapIEShape_OBB;
+      obbDesc.shape.type = ShapeType.OBB;
       obbDesc.extents = extents.ToCVector();
 
       IntPtr obbPtr = StructAllocator.AllocateStruct(obbDesc);
@@ -285,7 +285,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     private IntPtr allocateCapsule(Vector3 p0, Vector3 p1, float radius) {
       LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION meshDesc = new LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION();
-      meshDesc.shape.type = ShapeType.eLeapIEShape_Convex;
+      meshDesc.shape.type = ShapeType.Convex;
       meshDesc.radius = radius;
       meshDesc.nVerticies = 2;
       meshDesc.pVertices = new LEAP_VECTOR[2];
@@ -298,7 +298,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     private IntPtr allocateConvex(Mesh mesh, float scale) {
       LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION meshDesc = new LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION();
-      meshDesc.shape.type = ShapeType.eLeapIEShape_Convex;
+      meshDesc.shape.type = ShapeType.Convex;
       meshDesc.radius = 0.0f;
       meshDesc.nVerticies = (uint)mesh.vertexCount;
       meshDesc.pVertices = new LEAP_VECTOR[mesh.vertexCount];

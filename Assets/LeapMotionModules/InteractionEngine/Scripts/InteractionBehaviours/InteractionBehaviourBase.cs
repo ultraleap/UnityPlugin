@@ -266,7 +266,7 @@ namespace Leap.Unity.Interaction {
     public virtual LEAP_IE_UPDATE_SHAPE_INFO OnInteractionShapeUpdate() {
       LEAP_IE_UPDATE_SHAPE_INFO info = new LEAP_IE_UPDATE_SHAPE_INFO();
       
-      info.updateFlags = UpdateInfoFlags.eLeapIEUpdateFlags_ApplyAcceleration;
+      info.updateFlags = UpdateInfoFlags.ApplyAcceleration;
       info.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
       info.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
 
