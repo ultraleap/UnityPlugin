@@ -455,6 +455,13 @@ namespace Leap.Unity.Interaction {
               continue;
             }
 
+            //Override the existing classification to force the hand to grab the old object
+            handResult = new INTERACTION_HAND_RESULT();
+            handResult.classification = ManipulatorMode.Grasp;
+            handResult.handFlags = HandResultFlags.ManipulatorMode;
+            handResult.instanceHandle = interactionHand.graspedObject.ShapeInstanceHandle;
+            InteractionC.OverrideHandResult(ref _scene, (uint)hand.Id, ref handResult);
+
           } else {
             //Otherwise just create a new one
             interactionHand = new InteractionHand(hand);
