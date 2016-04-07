@@ -34,7 +34,7 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL FIELDS
-    protected LEAP_IE_SCENE _scene;
+    protected INTERACTION_SCENE _scene;
     private bool _hasSceneBeenCreated = false;
     private Coroutine _simulationCoroutine = null;
 
@@ -45,7 +45,7 @@ namespace Leap.Unity.Interaction {
 
     //Maps the Interaction instance handle to the behaviour
     //A mapping only exists if a shape instance has been created
-    protected Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, InteractionBehaviourBase> _instanceHandleToBehaviour;
+    protected Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, InteractionBehaviourBase> _instanceHandleToBehaviour;
 
     protected Dictionary<int, InteractionHand> _idToInteractionHand;
     protected List<InteractionBehaviourBase> _graspedBehaviours;
@@ -55,7 +55,7 @@ namespace Leap.Unity.Interaction {
     //A temp list that is recycled.  Used as the argument to OnHandsHold.
     private List<Hand> _holdingHands;
     //A temp list that is recycled.  Used to recieve results from InteractionC.
-    private List<LEAP_IE_SHAPE_INSTANCE_RESULTS> _resultList;
+    private List<INTERACTION_SHAPE_INSTANCE_RESULTS> _resultList;
     //A temp list that is recycled.  Used to recieve debug logs from InteractionC.
     private List<string> _debugOutput;
     #endregion
@@ -235,12 +235,12 @@ namespace Leap.Unity.Interaction {
     protected virtual void Awake() {
       _registeredBehaviours = new List<InteractionBehaviourBase>();
       _misbehavingBehaviours = new HashSet<InteractionBehaviourBase>();
-      _instanceHandleToBehaviour = new Dictionary<LEAP_IE_SHAPE_INSTANCE_HANDLE, InteractionBehaviourBase>();
+      _instanceHandleToBehaviour = new Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, InteractionBehaviourBase>();
       _graspedBehaviours = new List<InteractionBehaviourBase>();
       _idToInteractionHand = new Dictionary<int, InteractionHand>();
       _handIdsToRemove = new List<int>();
       _holdingHands = new List<Hand>();
-      _resultList = new List<LEAP_IE_SHAPE_INSTANCE_RESULTS>();
+      _resultList = new List<INTERACTION_SHAPE_INSTANCE_RESULTS>();
       _debugOutput = new List<string>();
     }
 
@@ -248,7 +248,7 @@ namespace Leap.Unity.Interaction {
       Assert.IsFalse(_hasSceneBeenCreated, "Scene should not have been created yet");
 
       try {
-        LEAP_IE_SCENE_INFO sceneInfo = getSceneInfo();
+        INTERACTION_SCENE_INFO sceneInfo = getSceneInfo();
         string dataPath = Path.Combine(Application.streamingAssetsPath, _dataSubfolder);
         InteractionC.CreateScene(ref _scene, ref sceneInfo, dataPath);
 
@@ -387,9 +387,9 @@ namespace Leap.Unity.Interaction {
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         InteractionBehaviourBase interactionBehaviour = _registeredBehaviours[i];
         try {
-          LEAP_IE_SHAPE_INSTANCE_HANDLE shapeInstanceHandle = interactionBehaviour.ShapeInstanceHandle;
-          LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
-          LEAP_IE_UPDATE_SHAPE_INFO updateInfo = interactionBehaviour.OnInteractionShapeUpdate();
+          INTERACTION_SHAPE_INSTANCE_HANDLE shapeInstanceHandle = interactionBehaviour.ShapeInstanceHandle;
+          INTERACTION_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
+          INTERACTION_UPDATE_SHAPE_INFO updateInfo = interactionBehaviour.OnInteractionShapeUpdate();
           InteractionC.UpdateShape(ref _scene, ref interactionTransform, ref updateInfo, ref shapeInstanceHandle);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
@@ -406,7 +406,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void simulateInteraction() {
-      var _controllerTransform = new LEAP_IE_TRANSFORM();
+      var _controllerTransform = new INTERACTION_TRANSFORM();
       _controllerTransform.position = _leapProvider.transform.position.ToCVector();
       _controllerTransform.rotation = _leapProvider.transform.rotation.ToCQuaternion();
       _controllerTransform.wallTime = Time.fixedTime;
@@ -421,7 +421,7 @@ namespace Leap.Unity.Interaction {
       for (int i = 0; i < hands.Count; i++) {
         Hand hand = hands[i];
 
-        LEAP_IE_HAND_RESULT handResult;
+        INTERACTION_HAND_RESULT handResult;
         InteractionC.GetHandResult(ref _scene,
                                        (uint)hand.Id,
                                    out handResult);
@@ -579,7 +579,7 @@ namespace Leap.Unity.Interaction {
       InteractionC.GetVelocities(ref _scene, _resultList);
 
       for (int i = 0; i < _resultList.Count; ++i) {
-        LEAP_IE_SHAPE_INSTANCE_RESULTS result = _resultList[i];
+        INTERACTION_SHAPE_INSTANCE_RESULTS result = _resultList[i];
         InteractionBehaviourBase interactionBehaviour = _instanceHandleToBehaviour[result.handle];
 
         try {
@@ -592,10 +592,10 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void createInteractionShape(InteractionBehaviourBase interactionBehaviour) {
-      LEAP_IE_SHAPE_DESCRIPTION_HANDLE descriptionHandle = interactionBehaviour.ShapeDescriptionHandle;
-      LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
-      LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
-      LEAP_IE_CREATE_SHAPE_INFO createInfo = new LEAP_IE_CREATE_SHAPE_INFO();
+      INTERACTION_SHAPE_DESCRIPTION_HANDLE descriptionHandle = interactionBehaviour.ShapeDescriptionHandle;
+      INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
+      INTERACTION_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
+      INTERACTION_CREATE_SHAPE_INFO createInfo = new INTERACTION_CREATE_SHAPE_INFO();
       createInfo.shapeFlags = ShapeInfoFlags.HasRigidBody | ShapeInfoFlags.GravityEnabled;
       InteractionC.CreateShape(ref _scene, ref descriptionHandle, ref interactionTransform, ref createInfo, out instanceHandle);
 
@@ -605,7 +605,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void destroyInteractionShape(InteractionBehaviourBase interactionBehaviour) {
-      LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle = interactionBehaviour.ShapeInstanceHandle;
+      INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle = interactionBehaviour.ShapeInstanceHandle;
 
       _instanceHandleToBehaviour.Remove(instanceHandle);
 
@@ -632,8 +632,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private LEAP_IE_SCENE_INFO getSceneInfo() {
-      LEAP_IE_SCENE_INFO info = new LEAP_IE_SCENE_INFO();
+    private INTERACTION_SCENE_INFO getSceneInfo() {
+      INTERACTION_SCENE_INFO info = new INTERACTION_SCENE_INFO();
       info.gravity = Physics.gravity.ToCVector();
       info.sceneFlags = SceneInfoFlags.HasGravity;
       return info;

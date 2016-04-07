@@ -7,9 +7,9 @@ namespace Leap.Unity.Interaction {
 
   public class InteractionBehaviourDebug : InteractionBehaviourBase {
 
-    public override LEAP_IE_TRANSFORM InteractionTransform {
+    public override INTERACTION_TRANSFORM InteractionTransform {
       get {
-        LEAP_IE_TRANSFORM interactionTransform = new LEAP_IE_TRANSFORM();
+        INTERACTION_TRANSFORM interactionTransform = new INTERACTION_TRANSFORM();
         interactionTransform.position = transform.position.ToCVector();
         interactionTransform.rotation = transform.rotation.ToCQuaternion();
         return interactionTransform;

@@ -6,20 +6,20 @@ using LeapInternal;
 namespace Leap.Unity.Interaction.CApi {
 
   public class ShapeDescriptionPool {
-    private LEAP_IE_SCENE _scene;
+    private INTERACTION_SCENE _scene;
 
-    private Dictionary<float, LEAP_IE_SHAPE_DESCRIPTION_HANDLE> _sphereDescMap;
-    private Dictionary<Vector3, LEAP_IE_SHAPE_DESCRIPTION_HANDLE> _obbDescMap;
-    private Dictionary<Mesh, LEAP_IE_SHAPE_DESCRIPTION_HANDLE> _meshDescMap;
-    private List<LEAP_IE_SHAPE_DESCRIPTION_HANDLE> _allHandles;
+    private Dictionary<float, INTERACTION_SHAPE_DESCRIPTION_HANDLE> _sphereDescMap;
+    private Dictionary<Vector3, INTERACTION_SHAPE_DESCRIPTION_HANDLE> _obbDescMap;
+    private Dictionary<Mesh, INTERACTION_SHAPE_DESCRIPTION_HANDLE> _meshDescMap;
+    private List<INTERACTION_SHAPE_DESCRIPTION_HANDLE> _allHandles;
 
-    public ShapeDescriptionPool(LEAP_IE_SCENE scene) {
+    public ShapeDescriptionPool(INTERACTION_SCENE scene) {
       _scene = scene;
 
-      _sphereDescMap = new Dictionary<float, LEAP_IE_SHAPE_DESCRIPTION_HANDLE>();
-      _obbDescMap = new Dictionary<Vector3, LEAP_IE_SHAPE_DESCRIPTION_HANDLE>();
-      _meshDescMap = new Dictionary<Mesh, LEAP_IE_SHAPE_DESCRIPTION_HANDLE>();
-      _allHandles = new List<LEAP_IE_SHAPE_DESCRIPTION_HANDLE>();
+      _sphereDescMap = new Dictionary<float, INTERACTION_SHAPE_DESCRIPTION_HANDLE>();
+      _obbDescMap = new Dictionary<Vector3, INTERACTION_SHAPE_DESCRIPTION_HANDLE>();
+      _meshDescMap = new Dictionary<Mesh, INTERACTION_SHAPE_DESCRIPTION_HANDLE>();
+      _allHandles = new List<INTERACTION_SHAPE_DESCRIPTION_HANDLE>();
     }
 
     /// <summary>
@@ -27,7 +27,7 @@ namespace Leap.Unity.Interaction.CApi {
     /// </summary>
     public void RemoveAllShapes() {
       for (int i = 0; i < _allHandles.Count; i++) {
-        LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle = _allHandles[i];
+        INTERACTION_SHAPE_DESCRIPTION_HANDLE handle = _allHandles[i];
         InteractionC.RemoveShapeDescription(ref _scene, ref handle);
       }
 
@@ -42,8 +42,8 @@ namespace Leap.Unity.Interaction.CApi {
     /// </summary>
     /// <param name="radius"></param>
     /// <returns></returns>
-    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetSphere(float radius) {
-      LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle;
+    public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetSphere(float radius) {
+      INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
       if (!_sphereDescMap.TryGetValue(radius, out handle)) {
         IntPtr spherePtr = allocateSphere(radius);
         InteractionC.AddShapeDescription(ref _scene, spherePtr, out handle);
@@ -61,8 +61,8 @@ namespace Leap.Unity.Interaction.CApi {
     /// </summary>
     /// <param name="extents"></param>
     /// <returns></returns>
-    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetOBB(Vector3 extents) {
-      LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle;
+    public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetOBB(Vector3 extents) {
+      INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
       if (!_obbDescMap.TryGetValue(extents, out handle)) {
         IntPtr obbPtr = allocateObb(extents);
         InteractionC.AddShapeDescription(ref _scene, obbPtr, out handle);
@@ -82,8 +82,8 @@ namespace Leap.Unity.Interaction.CApi {
     /// <param name="p1"></param>
     /// <param name="radius"></param>
     /// <returns></returns>
-    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetCapsule(Vector3 p0, Vector3 p1, float radius) {
-      LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle;
+    public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetCapsule(Vector3 p0, Vector3 p1, float radius) {
+      INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
       IntPtr capsulePtr = allocateCapsule(p0, p1, radius);
       InteractionC.AddShapeDescription(ref _scene, capsulePtr, out handle);
       StructAllocator.CleanupAllocations();
@@ -97,8 +97,8 @@ namespace Leap.Unity.Interaction.CApi {
     /// </summary>
     /// <param name="mesh"></param>
     /// <returns></returns>
-    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetConvexPolyhedron(Mesh mesh) {
-      LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle;
+    public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetConvexPolyhedron(Mesh mesh) {
+      INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
       if (!_meshDescMap.TryGetValue(mesh, out handle)) {
         IntPtr meshPtr = allocateConvex(mesh, 1.0f);
         InteractionC.AddShapeDescription(ref _scene, meshPtr, out handle);
@@ -124,7 +124,7 @@ namespace Leap.Unity.Interaction.CApi {
     /// <param name="obj"></param>
     /// <returns></returns>
     private List<Collider> _tempColliderList = new List<Collider>();
-    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE GetAuto(GameObject parentObject) {
+    public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetAuto(GameObject parentObject) {
       if (!isUniformScale(parentObject.transform)) {
         throw new InvalidOperationException("The GameObject " + parentObject + " did not have a uniform scale.");
       }
@@ -170,11 +170,11 @@ namespace Leap.Unity.Interaction.CApi {
         throw new NotImplementedException("Using more than one collider for GetAuto() is currently not supported.");
       }
 
-      LEAP_IE_COMPOUND_DESCRIPTION compoundDesc = new LEAP_IE_COMPOUND_DESCRIPTION();
+      INTERACTION_COMPOUND_DESCRIPTION compoundDesc = new INTERACTION_COMPOUND_DESCRIPTION();
       compoundDesc.shape.type = ShapeType.Compound;
       compoundDesc.nShapes = (uint)_tempColliderList.Count;
       compoundDesc.pShapes = StructAllocator.AllocateArray<IntPtr>(_tempColliderList.Count);
-      compoundDesc.pTransforms = new LEAP_IE_TRANSFORM[_tempColliderList.Count];
+      compoundDesc.pTransforms = new INTERACTION_TRANSFORM[_tempColliderList.Count];
 
       for (int i = 0; i < _tempColliderList.Count; i++) {
         Collider collider = _tempColliderList[i];
@@ -234,7 +234,7 @@ namespace Leap.Unity.Interaction.CApi {
           throw new InvalidOperationException("Unexpected collider type " + collider.GetType());
         }
 
-        LEAP_IE_TRANSFORM ieTransform = new LEAP_IE_TRANSFORM();
+        INTERACTION_TRANSFORM ieTransform = new INTERACTION_TRANSFORM();
         ieTransform.position = (parentObject.transform.InverseTransformPoint(globalPos) * parentObject.transform.lossyScale.x).ToCVector();
         ieTransform.rotation = (Quaternion.Inverse(parentObject.transform.rotation) * globalRot).ToCQuaternion();
 
@@ -242,7 +242,7 @@ namespace Leap.Unity.Interaction.CApi {
         compoundDesc.pTransforms[i] = ieTransform;
       }
 
-      LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle;
+      INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
       IntPtr compoundPtr = StructAllocator.AllocateStruct(compoundDesc);
 
       InteractionC.AddShapeDescription(ref _scene, compoundPtr, out handle);
@@ -266,7 +266,7 @@ namespace Leap.Unity.Interaction.CApi {
     }
 
     private IntPtr allocateSphere(float radius) {
-      LEAP_IE_SPHERE_DESCRIPTION sphereDesc = new LEAP_IE_SPHERE_DESCRIPTION();
+      INTERACTION_SPHERE_DESCRIPTION sphereDesc = new INTERACTION_SPHERE_DESCRIPTION();
       sphereDesc.shape.type = ShapeType.Sphere;
       sphereDesc.radius = radius;
 
@@ -275,7 +275,7 @@ namespace Leap.Unity.Interaction.CApi {
     }
 
     private IntPtr allocateObb(Vector3 extents) {
-      LEAP_IE_OBB_DESCRIPTION obbDesc = new LEAP_IE_OBB_DESCRIPTION();
+      INTERACTION_OBB_DESCRIPTION obbDesc = new INTERACTION_OBB_DESCRIPTION();
       obbDesc.shape.type = ShapeType.OBB;
       obbDesc.extents = extents.ToCVector();
 
@@ -284,7 +284,7 @@ namespace Leap.Unity.Interaction.CApi {
     }
 
     private IntPtr allocateCapsule(Vector3 p0, Vector3 p1, float radius) {
-      LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION meshDesc = new LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION();
+      INTERACTION_CONVEX_POLYHEDRON_DESCRIPTION meshDesc = new INTERACTION_CONVEX_POLYHEDRON_DESCRIPTION();
       meshDesc.shape.type = ShapeType.Convex;
       meshDesc.radius = radius;
       meshDesc.nVerticies = 2;
@@ -297,7 +297,7 @@ namespace Leap.Unity.Interaction.CApi {
     }
 
     private IntPtr allocateConvex(Mesh mesh, float scale) {
-      LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION meshDesc = new LEAP_IE_CONVEX_POLYHEDRON_DESCRIPTION();
+      INTERACTION_CONVEX_POLYHEDRON_DESCRIPTION meshDesc = new INTERACTION_CONVEX_POLYHEDRON_DESCRIPTION();
       meshDesc.shape.type = ShapeType.Convex;
       meshDesc.radius = 0.0f;
       meshDesc.nVerticies = (uint)mesh.vertexCount;

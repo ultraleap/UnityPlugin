@@ -22,10 +22,10 @@ namespace Leap.Unity.Interaction {
     private bool _isRegisteredWithManager = false;
 
     private bool _hasShapeDescriptionBeenCreated = false;
-    private LEAP_IE_SHAPE_DESCRIPTION_HANDLE _shapeDescriptionHandle;
+    private INTERACTION_SHAPE_DESCRIPTION_HANDLE _shapeDescriptionHandle;
 
     private bool _hasShapeInstanceHandle = false;
-    private LEAP_IE_SHAPE_INSTANCE_HANDLE _shapeInstanceHandle;
+    private INTERACTION_SHAPE_INSTANCE_HANDLE _shapeInstanceHandle;
 
     protected Rigidbody _rigidbody;
     private bool _rigidbodyUsesGravity;
@@ -110,7 +110,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Gets the handle to the internal shape description.
     /// </summary>
-    public LEAP_IE_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
+    public INTERACTION_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
       get {
         if (!_isRegisteredWithManager) {
           throw new NotRegisteredWithManagerException();
@@ -127,7 +127,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Gets the handle to the internal shape instance.
     /// </summary>
-    public LEAP_IE_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
+    public INTERACTION_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
       get {
         if (!_hasShapeInstanceHandle) {
           throw new InvalidOperationException("Cannot get ShapeInstanceHandle because it has not been assigned.");
@@ -140,7 +140,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Gets the internal representation of the transform of the object.
     /// </summary>
-    public abstract LEAP_IE_TRANSFORM InteractionTransform {
+    public abstract INTERACTION_TRANSFORM InteractionTransform {
       get;
     }
 
@@ -253,7 +253,7 @@ namespace Leap.Unity.Interaction {
     /// is created and added to the interaction scene.
     /// </summary>
     /// <param name="instanceHandle"></param>
-    public virtual void OnInteractionShapeCreated(LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle) {
+    public virtual void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
       _shapeInstanceHandle = instanceHandle;
       _hasShapeInstanceHandle = true;
     }
@@ -263,8 +263,8 @@ namespace Leap.Unity.Interaction {
     /// of the shape instance.  
     /// </summary>
     /// <returns></returns>
-    public virtual LEAP_IE_UPDATE_SHAPE_INFO OnInteractionShapeUpdate() {
-      LEAP_IE_UPDATE_SHAPE_INFO info = new LEAP_IE_UPDATE_SHAPE_INFO();
+    public virtual INTERACTION_UPDATE_SHAPE_INFO OnInteractionShapeUpdate() {
+      INTERACTION_UPDATE_SHAPE_INFO info = new INTERACTION_UPDATE_SHAPE_INFO();
       
       info.updateFlags = UpdateInfoFlags.ApplyAcceleration;
       info.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
@@ -281,8 +281,8 @@ namespace Leap.Unity.Interaction {
     /// is destroyed and removed from the interaction scene.
     /// </summary>
     public virtual void OnInteractionShapeDestroyed() {
-      _shapeInstanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
-      _shapeDescriptionHandle = new LEAP_IE_SHAPE_DESCRIPTION_HANDLE();
+      _shapeInstanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
+      _shapeDescriptionHandle = new INTERACTION_SHAPE_DESCRIPTION_HANDLE();
       _hasShapeDescriptionBeenCreated = false;
       _hasShapeInstanceHandle = false;
     }
@@ -369,7 +369,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called by InteractionManager when the velocity of an object is changed.
     /// </summary>
-    public virtual void OnRecieveSimulationResults(LEAP_IE_SHAPE_INSTANCE_RESULTS results) {
+    public virtual void OnRecieveSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
       _didRecieveVelocityUpdate = true;
       _rigidbody.Sleep();
       _rigidbody.velocity = results.linearVelocity.ToVector3();
@@ -403,7 +403,7 @@ namespace Leap.Unity.Interaction {
     /// accounts for all colliders on this gameObject and its children.
     /// </summary>
     /// <returns></returns>
-    protected virtual LEAP_IE_SHAPE_DESCRIPTION_HANDLE GenerateShapeDescriptionHandle() {
+    protected virtual INTERACTION_SHAPE_DESCRIPTION_HANDLE GenerateShapeDescriptionHandle() {
       return _manager.ShapePool.GetAuto(gameObject);
     }
 

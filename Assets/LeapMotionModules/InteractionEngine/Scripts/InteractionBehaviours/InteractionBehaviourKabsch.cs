@@ -21,9 +21,9 @@ namespace Leap.Unity.Interaction {
 
     #region INTERACTION CALLBACKS
 
-    public override LEAP_IE_TRANSFORM InteractionTransform {
+    public override INTERACTION_TRANSFORM InteractionTransform {
       get {
-        LEAP_IE_TRANSFORM interactionTransform = new LEAP_IE_TRANSFORM();
+        INTERACTION_TRANSFORM interactionTransform = new INTERACTION_TRANSFORM();
         interactionTransform.position = _rigidbody.position.ToCVector();
         interactionTransform.rotation = _rigidbody.rotation.ToCQuaternion();
         return interactionTransform;
