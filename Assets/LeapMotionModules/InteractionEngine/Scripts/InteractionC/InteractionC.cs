@@ -220,6 +220,17 @@ namespace Leap.Unity.Interaction.CApi {
       return rs;
     }
 
+    /*** Destroy Scene ***/
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEDestroyScene")]
+    private static extern eLeapIERS LeapIEDestroyScene(ref LEAP_IE_SCENE scene);
+
+    public static eLeapIERS DestroyScene(ref LEAP_IE_SCENE scene) {
+      Logger.Log("Destroy Scene", LogLevel.Info);
+      var rs = LeapIEDestroyScene(ref scene);
+      Logger.HandleReturnStatus(rs);
+      return rs;
+    }
+
     /*** Update Scene Info ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateSceneInfo", CallingConvention = CallingConvention.Cdecl)]
     private static extern eLeapIERS LeapIEUpdateSceneInfo(ref LEAP_IE_SCENE scene,
@@ -229,17 +240,6 @@ namespace Leap.Unity.Interaction.CApi {
                                             ref LEAP_IE_SCENE_INFO sceneInfo) {
       Logger.Log("Update Scene Info", LogLevel.Info);
       var rs = UpdateSceneInfo(ref scene, ref sceneInfo);
-      Logger.HandleReturnStatus(rs);
-      return rs;
-    }
-
-    /*** Destroy Scene ***/
-    [DllImport(DLL_NAME, EntryPoint = "LeapIEDestroyScene")]
-    private static extern eLeapIERS LeapIEDestroyScene(ref LEAP_IE_SCENE scene);
-
-    public static eLeapIERS DestroyScene(ref LEAP_IE_SCENE scene) {
-      Logger.Log("Destroy Scene", LogLevel.Info);
-      var rs = LeapIEDestroyScene(ref scene);
       Logger.HandleReturnStatus(rs);
       return rs;
     }
