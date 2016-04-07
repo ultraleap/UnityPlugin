@@ -370,6 +370,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public virtual void OnReceiveVelocityUpdate(Vector3 linearVelocity, Vector3 angularVelocity) {
       _didRecieveVelocityUpdate = true;
+      _rigidbody.Sleep();
       _rigidbody.velocity = linearVelocity;
       _rigidbody.angularVelocity = angularVelocity;
     }
