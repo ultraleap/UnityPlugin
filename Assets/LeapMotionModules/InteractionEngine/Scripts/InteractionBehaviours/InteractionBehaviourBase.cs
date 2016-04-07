@@ -368,11 +368,11 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called by InteractionManager when the velocity of an object is changed.
     /// </summary>
-    public virtual void OnReceiveVelocityUpdate(Vector3 linearVelocity, Vector3 angularVelocity) {
+    public virtual void OnRecieveSimulationResults(LEAP_IE_SHAPE_INSTANCE_RESULTS results) {
       _didRecieveVelocityUpdate = true;
       _rigidbody.Sleep();
-      _rigidbody.velocity = linearVelocity;
-      _rigidbody.angularVelocity = angularVelocity;
+      _rigidbody.velocity = results.linearVelocity.ToVector3();
+      _rigidbody.angularVelocity = results.angularVelocity.ToVector3(); ;
     }
 
     /// <summary>

@@ -54,6 +54,8 @@ namespace Leap.Unity.Interaction {
     //A temp list that is recycled.  Used as the argument to OnHandsHold.
     private List<Hand> _holdingHands;
 
+    private List<LEAP_IE_SHAPE_INSTANCE_RESULTS> _resultList;
+
     private List<string> _debugOutput;
     #endregion
 
@@ -232,6 +234,7 @@ namespace Leap.Unity.Interaction {
       _idToInteractionHand = new Dictionary<int, InteractionHand>();
       _handIdsToRemove = new List<int>();
       _holdingHands = new List<Hand>();
+      _resultList = new List<LEAP_IE_SHAPE_INSTANCE_RESULTS>();
       _debugOutput = new List<string>();
     }
 
@@ -414,14 +417,12 @@ namespace Leap.Unity.Interaction {
       for (int i = 0; i < hands.Count; i++) {
         Hand hand = hands[i];
 
-        LEAP_IE_HAND_RESULT classification;
+        LEAP_IE_HAND_RESULT handResult;
         LEAP_IE_SHAPE_INSTANCE_HANDLE instance;
         InteractionC.GetHandResult(ref _scene,
                                        (uint)hand.Id,
-                                       out classification,
-                                       out instance);
-
-
+                                   out handResult,
+                                   out instance);
 
         //Get the InteractionHand associated with this hand id
         InteractionHand interactionHand;
@@ -463,7 +464,7 @@ namespace Leap.Unity.Interaction {
 
         interactionHand.UpdateHand(hand);
 
-        switch (classification.classification) {
+        switch (handResult.classification) {
           case eLeapIEClassification.eLeapIEClassification_Grasp:
             {
               InteractionBehaviourBase interactionBehaviour = _instanceHandleToBehaviour[instance];
@@ -498,7 +499,7 @@ namespace Leap.Unity.Interaction {
               break;
             }
           default:
-            throw new InvalidOperationException("Unexpected classification " + classification.classification);
+            throw new InvalidOperationException("Unexpected classification " + handResult.classification);
         }
       }
 
@@ -573,19 +574,14 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void setObjectVelocities() {
-      LEAP_IE_SHAPE_INSTANCE_RESULTS[] velocities;
-      InteractionC.GetVelocities(ref _scene, out velocities);
+      InteractionC.GetVelocities(ref _scene, _resultList);
 
-      if (velocities == null) {
-        return;
-      }
-
-      for (int i = 0; i < velocities.Length; ++i) {
-        LEAP_IE_SHAPE_INSTANCE_RESULTS vel = velocities[i];
-        InteractionBehaviourBase interactionBehaviour = _instanceHandleToBehaviour[vel.handle];
+      for (int i = 0; i < _resultList.Count; ++i) {
+        LEAP_IE_SHAPE_INSTANCE_RESULTS result = _resultList[i];
+        InteractionBehaviourBase interactionBehaviour = _instanceHandleToBehaviour[result.handle];
 
         try {
-          interactionBehaviour.OnReceiveVelocityUpdate(vel.linearVelocity.ToVector3(), vel.angularVelocity.ToVector3());
+          interactionBehaviour.OnRecieveSimulationResults(result);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
