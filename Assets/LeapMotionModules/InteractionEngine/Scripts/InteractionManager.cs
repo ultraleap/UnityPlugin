@@ -239,7 +239,7 @@ namespace Leap.Unity.Interaction {
       Assert.IsFalse(_hasSceneBeenCreated, "Scene should not have been created yet");
 
       try {
-        LEAP_IE_CREATE_SCENE_INFO sceneInfo = new LEAP_IE_CREATE_SCENE_INFO();
+        LEAP_IE_SCENE_INFO sceneInfo = new LEAP_IE_SCENE_INFO();
         sceneInfo.sceneFlags = eLeapIESceneFlags.eLeapIESceneFlags_HasGravity;
         sceneInfo.gravity = Physics.gravity.ToCVector();
         string dataPath = Path.Combine(Application.streamingAssetsPath, STREAMING_DATA_SUBFOLDER);
@@ -414,9 +414,9 @@ namespace Leap.Unity.Interaction {
       for (int i = 0; i < hands.Count; i++) {
         Hand hand = hands[i];
 
-        LEAP_IE_HAND_CLASSIFICATION classification;
+        LEAP_IE_HAND_RESULT classification;
         LEAP_IE_SHAPE_INSTANCE_HANDLE instance;
-        InteractionC.GetClassification(ref _scene,
+        InteractionC.GetHandResult(ref _scene,
                                        (uint)hand.Id,
                                        out classification,
                                        out instance);
@@ -573,7 +573,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void setObjectVelocities() {
-      LEAP_IE_VELOCITY[] velocities;
+      LEAP_IE_SHAPE_INSTANCE_RESULTS[] velocities;
       InteractionC.GetVelocities(ref _scene, out velocities);
 
       if (velocities == null) {
@@ -581,7 +581,7 @@ namespace Leap.Unity.Interaction {
       }
 
       for (int i = 0; i < velocities.Length; ++i) {
-        LEAP_IE_VELOCITY vel = velocities[i];
+        LEAP_IE_SHAPE_INSTANCE_RESULTS vel = velocities[i];
         InteractionBehaviourBase interactionBehaviour = _instanceHandleToBehaviour[vel.handle];
 
         try {

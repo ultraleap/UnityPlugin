@@ -153,7 +153,7 @@ namespace Leap.Unity.Interaction.CApi {
 
   // All properties require eLeapIESceneFlags to enable
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_IE_CREATE_SCENE_INFO {
+  public struct LEAP_IE_SCENE_INFO {
     public eLeapIESceneFlags sceneFlags;
     public LEAP_VECTOR gravity;
   }
@@ -174,7 +174,7 @@ namespace Leap.Unity.Interaction.CApi {
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_IE_HAND_CLASSIFICATION {
+  public struct LEAP_IE_HAND_RESULT {
     public eLeapIEClassification classification;
   }
 
@@ -196,7 +196,7 @@ namespace Leap.Unity.Interaction.CApi {
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_IE_VELOCITY {
+  public struct LEAP_IE_SHAPE_INSTANCE_RESULTS {
     public LEAP_IE_SHAPE_INSTANCE_HANDLE handle;
     public LEAP_VECTOR linearVelocity;
     public LEAP_VECTOR angularVelocity;
@@ -207,16 +207,30 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Create Scene ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIECreateScene", CallingConvention = CallingConvention.Cdecl)]
-    private static extern eLeapIERS LeapIECreateScene(ref LEAP_IE_SCENE scene, 
-                                                      ref LEAP_IE_CREATE_SCENE_INFO sceneInfo, 
+    private static extern eLeapIERS LeapIECreateScene(ref LEAP_IE_SCENE scene,
+                                                      ref LEAP_IE_SCENE_INFO sceneInfo,
                                                           string dataPath);
 
-    public static void CreateScene(ref LEAP_IE_SCENE scene, 
-                                   ref LEAP_IE_CREATE_SCENE_INFO sceneInfo, 
-                                       string dataPath) {
+    public static eLeapIERS CreateScene(ref LEAP_IE_SCENE scene,
+                                        ref LEAP_IE_SCENE_INFO sceneInfo,
+                                            string dataPath) {
       Logger.Log("Create Scene", LogLevel.Info);
       var rs = LeapIECreateScene(ref scene, ref sceneInfo, dataPath);
       Logger.HandleReturnStatus(rs);
+      return rs;
+    }
+
+    /*** Update Scene Info ***/
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateSceneInfo", CallingConvention = CallingConvention.Cdecl)]
+    private static extern eLeapIERS LeapIEUpdateSceneInfo(ref LEAP_IE_SCENE scene,
+                                                          ref LEAP_IE_SCENE_INFO sceneInfo);
+
+    public static eLeapIERS UpdateSceneInfo(ref LEAP_IE_SCENE scene,
+                                            ref LEAP_IE_SCENE_INFO sceneInfo) {
+      Logger.Log("Update Scene Info", LogLevel.Info);
+      var rs = UpdateSceneInfo(ref scene, ref sceneInfo);
+      Logger.HandleReturnStatus(rs);
+      return rs;
     }
 
     /*** Destroy Scene ***/
@@ -340,45 +354,60 @@ namespace Leap.Unity.Interaction.CApi {
     }
 
     /*** Get Classification ***/
-    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetClassification")]
-    private static extern eLeapIERS LeapIEGetClassification(ref LEAP_IE_SCENE scene,
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetHandResult")]
+    private static extern eLeapIERS LeapIEGetHandResult(ref LEAP_IE_SCENE scene,
                                                                 UInt32 handId,
-                                                            out LEAP_IE_HAND_CLASSIFICATION classification,
+                                                            out LEAP_IE_HAND_RESULT handResult,
                                                             out LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
 
-    public static eLeapIERS GetClassification(ref LEAP_IE_SCENE scene,
-                                                  UInt32 handId,
-                                              out LEAP_IE_HAND_CLASSIFICATION classification,
-                                              out LEAP_IE_SHAPE_INSTANCE_HANDLE instance) {
-      Logger.Log("Get Classification", LogLevel.AllCalls);
-      var rs = LeapIEGetClassification(ref scene, handId, out classification, out instance);
+    public static eLeapIERS GetHandResult(ref LEAP_IE_SCENE scene,
+                                              UInt32 handId,
+                                          out LEAP_IE_HAND_RESULT handResult,
+                                          out LEAP_IE_SHAPE_INSTANCE_HANDLE instance) {
+      Logger.Log("Get Hand Result", LogLevel.AllCalls);
+      var rs = LeapIEGetHandResult(ref scene, handId, out handResult, out instance);
+      Logger.HandleReturnStatus(rs);
+      return rs;
+    }
+
+    /*** Override Hand Result ***/
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEOverrideHandResult")]
+    private static extern eLeapIERS LeapIEOverrideHandResult(ref LEAP_IE_SCENE scene,
+                                                                UInt32 handId,
+                                                             ref LEAP_IE_HAND_RESULT handResult);
+
+    public static eLeapIERS OverrideHandResult(ref LEAP_IE_SCENE scene,
+                                                   UInt32 handId,
+                                               ref LEAP_IE_HAND_RESULT handResult) {
+      Logger.Log("Override Hand Result", LogLevel.AllCalls);
+      var rs = LeapIEOverrideHandResult(ref scene, handId, ref handResult);
       Logger.HandleReturnStatus(rs);
       return rs;
     }
 
     /*** Get Velocities ***/
-    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetVelocities")]
-    private static extern eLeapIERS LeapIEGetVelocities(ref LEAP_IE_SCENE scene,
-                                                        out UInt32 nVelocities,
-                                                        out IntPtr ppVelocitiesBuffer);
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetShapeInstanceResults")]
+    private static extern eLeapIERS LeapIEGetShapeInstanceResults(ref LEAP_IE_SCENE scene,
+                                                                  out UInt32 nResults,
+                                                                  out IntPtr papResultsBuffer);
 
-    public static eLeapIERS GetVelocities(ref LEAP_IE_SCENE scene, out LEAP_IE_VELOCITY[] velocities) {
+    public static eLeapIERS GetVelocities(ref LEAP_IE_SCENE scene, List<LEAP_IE_SHAPE_INSTANCE_RESULTS> results) {
       Logger.Log("Get Velocities", LogLevel.AllCalls);
 
-      UInt32 nVelocities;
-      IntPtr ppVelocitiesBuffer;
-      var rs = LeapIEGetVelocities(ref scene, out nVelocities, out ppVelocitiesBuffer);
+      UInt32 nResults;
+      IntPtr papResultsBuffer;
+      var rs = LeapIEGetShapeInstanceResults(ref scene, out nResults, out papResultsBuffer);
+
+      results.Clear();
+      if (rs == eLeapIERS.eLeapIERS_Success) {
+        for (int i = 0; i < nResults; i++) {
+          IntPtr resultPtr = StructMarshal<IntPtr>.ArrayElementToStruct(papResultsBuffer, i);
+          var result = StructMarshal<LEAP_IE_SHAPE_INSTANCE_RESULTS>.PtrToStruct(resultPtr);
+          results.Add(result);
+        }
+      }
+
       Logger.HandleReturnStatus(rs);
-
-      if (rs != eLeapIERS.eLeapIERS_Success || nVelocities == 0) {
-        velocities = null;
-        return rs;
-      }
-
-      velocities = new LEAP_IE_VELOCITY[nVelocities];
-      for (int i = 0; i < nVelocities; i++) {
-        velocities[i] = StructMarshal<LEAP_IE_VELOCITY>.ArrayElementToStruct(ppVelocitiesBuffer, i);
-      }
       return rs;
     }
 
@@ -436,10 +465,12 @@ namespace Leap.Unity.Interaction.CApi {
       var rs = LeapIEGetDebugStrings(ref scene, out nStrings, out pppStrings);
 
       strings.Clear();
-      for (int i = 0; i < nStrings; i++) {
-        IntPtr charPtr = StructMarshal<IntPtr>.ArrayElementToStruct(pppStrings, i);
-        string str = Marshal.PtrToStringAnsi(charPtr);
-        strings.Add(str);
+      if (rs == eLeapIERS.eLeapIERS_Success) {
+        for (int i = 0; i < nStrings; i++) {
+          IntPtr charPtr = StructMarshal<IntPtr>.ArrayElementToStruct(pppStrings, i);
+          string str = Marshal.PtrToStringAnsi(charPtr);
+          strings.Add(str);
+        }
       }
 
       Logger.HandleReturnStatus(rs);
