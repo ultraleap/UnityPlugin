@@ -350,6 +350,10 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void simulateFrame(Frame frame) {
+      for (int i = 0; i < _registeredBehaviours.Count; i++) {
+        _registeredBehaviours[i].OnPreSolve();
+      }
+
       updateInteractionRepresentations();
 
       updateTracking(frame);
@@ -361,6 +365,10 @@ namespace Leap.Unity.Interaction {
       // TODO: Pass a debug flag to disable calculating velocities.
       if (_modifyVelocities) {
         setObjectVelocities();
+      }
+
+      for (int i = 0; i < _registeredBehaviours.Count; i++) {
+        _registeredBehaviours[i].OnPostSolve();
       }
     }
 

@@ -33,6 +33,7 @@ namespace Leap.Unity.Interaction {
     private List<int> _graspingIds = new List<int>();
     private List<int> _untrackedIds = new List<int>();
 
+    private bool _didRecieveVelocityUpdate = false;
     private Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     private Vector3 _accumulatedAngularAcceleration = Vector3.zero;
     #endregion
@@ -266,7 +267,7 @@ namespace Leap.Unity.Interaction {
       LEAP_IE_UPDATE_SHAPE_INFO info = new LEAP_IE_UPDATE_SHAPE_INFO();
 
       //TODO: Actually apply acceleration
-      info.updateFlags = eLeapIEUpdateFlags.eLeapIEUpdateFlags_None;
+      info.updateFlags = eLeapIEUpdateFlags.eLeapIEUpdateFlags_ApplyAcceleration;
       info.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
       info.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
       _accumulatedLinearAcceleration = Vector3.zero;
@@ -368,14 +369,22 @@ namespace Leap.Unity.Interaction {
     /// Called by InteractionManager when the velocity of an object is changed.
     /// </summary>
     public virtual void OnReceiveVelocityUpdate(Vector3 linearVelocity, Vector3 angularVelocity) {
+      _didRecieveVelocityUpdate = true;
       _rigidbody.velocity = linearVelocity;
       _rigidbody.angularVelocity = angularVelocity;
     }
 
-    public virtual void OnReciveNoVelocityUpdate() {
-      _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
-      _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
-      _rigidbody.AddForce(Physics.gravity, ForceMode.Acceleration);
+    public virtual void OnPreSolve() { }
+
+    public virtual void OnPostSolve() {
+      if (!_didRecieveVelocityUpdate) {
+        _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
+        _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
+        if (_rigidbodyUsesGravity) {
+          _rigidbody.AddForce(Physics.gravity, ForceMode.Acceleration);
+        }
+      }
+      _didRecieveVelocityUpdate = false;
     }
     #endregion
 
