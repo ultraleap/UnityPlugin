@@ -331,13 +331,20 @@ namespace Leap.Unity.Interaction {
       while (true) {
         yield return fixedUpdate;
 
-        simulateFrame(_leapProvider.CurrentFrame);
+        try {
+          simulateFrame(_leapProvider.CurrentFrame);
 
-        if (_showDebugLines) {
-          InteractionC.DrawDebugLines(ref _scene);
+          if (_showDebugLines) {
+            InteractionC.DrawDebugLines(ref _scene);
+          }
+
+          if (_showDebugOutput) {
+            InteractionC.GetDebugStrings(ref _scene, _debugOutput);
+          }
+        } catch (Exception e) {
+          //Catch the error so that the loop doesn't terminate
+          Debug.LogException(e);
         }
-
-        InteractionC.GetDebugStrings(ref _scene, _debugOutput);
       }
     }
 
