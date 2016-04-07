@@ -641,6 +641,8 @@ namespace Leap.Unity.Interaction {
       public void RegainTracking(Hand newHand) {
         int oldId = hand.Id;
         UpdateHand(newHand);
+        
+        //TODO: Need to force engine to update the grabbed state!
 
         isUntracked = false;
         graspedObject.OnHandRegainedTracking(newHand, oldId);
