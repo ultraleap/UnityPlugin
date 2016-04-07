@@ -476,6 +476,5 @@ namespace Leap.Unity.Interaction.CApi {
       Logger.HandleReturnStatus(rs);
       return rs;
     }
-
   }
 }
