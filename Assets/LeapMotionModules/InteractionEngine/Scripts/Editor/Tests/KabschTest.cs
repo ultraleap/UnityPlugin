@@ -54,8 +54,8 @@ namespace Leap.Unity.Interaction.Tests {
       var v1 = v0.Select(v => rotation * v + translation).ToArray();
 
       for (int i = 0; i < 3; i++) {
-        var l0 = new LEAP_VECTOR(v0[i]);
-        var l1 = new LEAP_VECTOR(v1[i]);
+        var l0 = (v0[i]).ToCVector();
+        var l1 = (v1[i]).ToCVector();
         KabschC.AddPoint(ref _kabsch, ref l0, ref l1, 1.0f);
       }
 
@@ -67,8 +67,8 @@ namespace Leap.Unity.Interaction.Tests {
       KabschC.GetTranslation(ref _kabsch, out leapTranslation);
       KabschC.GetRotation(ref _kabsch, out leapRotation);
 
-      solvedTranslation = leapTranslation.ToUnityVector();
-      solvedRotation = leapRotation.ToUnityRotation();
+      solvedTranslation = leapTranslation.ToVector3();
+      solvedRotation = leapRotation.ToQuaternion();
     }
   }
 }
