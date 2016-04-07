@@ -64,15 +64,15 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Gets the current debug flags for this manager.
     /// </summary>
-    public eLeapIEDebugFlags DebugFlags {
+    public DebugFlags DebugFlags {
       get {
-        eLeapIEDebugFlags flags = eLeapIEDebugFlags.eLeapIEDebugFlags_None;
+        DebugFlags flags = DebugFlags.eLeapIEDebugFlags_None;
         if (_showDebugLines) {
-          flags |= eLeapIEDebugFlags.eLeapIEDebugFlags_Lines;
+          flags |= DebugFlags.eLeapIEDebugFlags_Lines;
         }
         if (_showDebugOutput) {
-          flags |= eLeapIEDebugFlags.eLeapIEListenerFlags_Strings;
-          flags |= eLeapIEDebugFlags.eLeapIEDebugFlags_Logging;
+          flags |= DebugFlags.eLeapIEListenerFlags_Strings;
+          flags |= DebugFlags.eLeapIEDebugFlags_Logging;
         }
         return flags;
       }
@@ -469,7 +469,7 @@ namespace Leap.Unity.Interaction {
         interactionHand.UpdateHand(hand);
 
         switch (handResult.classification) {
-          case eLeapIEClassification.eLeapIEClassification_Grasp:
+          case ManipulatorMode.eLeapIEClassification_Grasp:
             {
               InteractionBehaviourBase interactionBehaviour = _instanceHandleToBehaviour[instance];
               if (interactionHand.graspedObject == null) {
@@ -486,7 +486,7 @@ namespace Leap.Unity.Interaction {
               }
               break;
             }
-          case eLeapIEClassification.eLeapIEClassification_Physics:
+          case ManipulatorMode.eLeapIEClassification_Physics:
             {
               if (interactionHand.graspedObject != null) {
                 _graspedBehaviours.Remove(interactionHand.graspedObject);
@@ -598,7 +598,7 @@ namespace Leap.Unity.Interaction {
       LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle = new LEAP_IE_SHAPE_INSTANCE_HANDLE();
       LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
       LEAP_IE_CREATE_SHAPE_INFO createInfo = new LEAP_IE_CREATE_SHAPE_INFO();
-      createInfo.shapeFlags = eLeapIEShapeFlags.eLeapIEShapeFlags_HasRigidBody | eLeapIEShapeFlags.eLeapIEShapeFlags_GravityEnabled;
+      createInfo.shapeFlags = ShapeInfoFlags.eLeapIEShapeFlags_HasRigidBody | ShapeInfoFlags.eLeapIEShapeFlags_GravityEnabled;
       InteractionC.CreateShape(ref _scene, ref descriptionHandle, ref interactionTransform, ref createInfo, out instanceHandle);
 
       _instanceHandleToBehaviour[instanceHandle] = interactionBehaviour;
@@ -637,7 +637,7 @@ namespace Leap.Unity.Interaction {
     private LEAP_IE_SCENE_INFO getSceneInfo() {
       LEAP_IE_SCENE_INFO info = new LEAP_IE_SCENE_INFO();
       info.gravity = Physics.gravity.ToCVector();
-      info.sceneFlags = eLeapIESceneFlags.eLeapIESceneFlags_HasGravity;
+      info.sceneFlags = SceneFlags.eLeapIESceneFlags_HasGravity;
       return info;
     }
 

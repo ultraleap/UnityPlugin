@@ -6,7 +6,7 @@ using LeapInternal;
 
 namespace Leap.Unity.Interaction.CApi {
 
-  public enum eLeapIERS : uint {
+  public enum ReturnStatus : uint {
     eLeapIERS_Success,
     eLeapIERS_InvalidHandle,
     eLeapIERS_InvalidArgument,
@@ -24,41 +24,50 @@ namespace Leap.Unity.Interaction.CApi {
     eLeapIERS_Paused
   }
 
-  public enum eLeapIEShapeType : uint {
+  public enum ShapeType : uint {
     eLeapIEShape_Sphere,
     eLeapIEShape_OBB,
     eLeapIEShape_Convex,
     eLeapIEShape_Compound
   }
 
-  public enum eLeapIESceneFlags : uint {
+  public enum SceneInfoFlags : uint {
     eLeapIESceneFlags_None = 0x00,
     eLeapIESceneFlags_HasGravity = 0x01
   };
 
-  public enum eLeapIEShapeFlags : uint {
+  public enum ShapeInfoFlags : uint {
     eLeapIEShapeFlags_None = 0x00,
     eLeapIEShapeFlags_HasRigidBody = 0x01,
     eLeapIEShapeFlags_GravityEnabled = 0x02
   };
 
-  public enum eLeapIEUpdateFlags : uint {
+  public enum UpdateInfoFlags : uint {
     eLeapIEUpdateFlags_None = 0x00,
     eLeapIEUpdateFlags_ResetVelocity = 0x01, // E.g. teleported.
     eLeapIEUpdateFlags_ApplyAcceleration = 0x02
   };
 
-  public enum eLeapIEClassification : uint {
-    eLeapIEClassification_Physics,
-    eLeapIEClassification_Grasp,
-    eLeapIEClassification_MAX
+  public enum HandResultFlags : uint {
+    eLeapIEHandResultFlags_ManipulatorMode = 0x01, // currently required
   }
 
-  public enum eLeapIEDebugFlags : uint {
+  public enum ManipulatorMode : uint {
+    eLeapIEClassification_Physics,
+    eLeapIEClassification_Grasp,
+    eLeapIEManipulatorMode_NoInteraction,
+  }
+
+  public enum ShapeInstanceResultFlags : uint {
+    eLeapIEShapeInstanceResultFlags_None = 0x00,
+    eLeapIEShapeInstanceResultFlags_Velocities = 0x01,
+  }
+
+  public enum DebugFlags : uint {
     eLeapIEDebugFlags_None = 0x00,
     eLeapIEDebugFlags_Lines = 0x01,
     eLeapIEDebugFlags_Logging = 0x02,
-    eLeapIEListenerFlags_Strings = 0x04,
+    eLeapIEListenerFlags_Strings = 0x04
   };
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -82,7 +91,7 @@ namespace Leap.Unity.Interaction.CApi {
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_SCENE {
-    public IntPtr pData; //LeapIESceneData*
+    public IntPtr pScene;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -94,7 +103,7 @@ namespace Leap.Unity.Interaction.CApi {
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_SHAPE_DESCRIPTION {
-    public eLeapIEShapeType type;
+    public ShapeType type;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -154,28 +163,38 @@ namespace Leap.Unity.Interaction.CApi {
   // All properties require eLeapIESceneFlags to enable
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_SCENE_INFO {
-    public eLeapIESceneFlags sceneFlags;
+    public SceneInfoFlags sceneFlags;
     public LEAP_VECTOR gravity;
   }
 
   // All properties require eLeapIEShapeFlags to enable
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_CREATE_SHAPE_INFO {
-    public eLeapIEShapeFlags shapeFlags;
+    public ShapeInfoFlags shapeFlags;
     public LEAP_VECTOR gravity;
   }
 
   // All properties require eLeapIEUpdateFlags to enable
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_UPDATE_SHAPE_INFO {
-    public eLeapIEUpdateFlags updateFlags;
+    public UpdateInfoFlags updateFlags;
     public LEAP_VECTOR linearAcceleration;
     public LEAP_VECTOR angularAcceleration;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_HAND_RESULT {
-    public eLeapIEClassification classification;
+    public HandResultFlags handFlags;
+    public ManipulatorMode classification;
+    public LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle;
+  }
+
+  [StructLayout(LayoutKind.Sequential, Pack = 1)]
+  public struct LEAP_IE_SHAPE_INSTANCE_RESULTS {
+    LEAP_IE_SHAPE_INSTANCE_HANDLE handle; 
+    ShapeInstanceResultFlags resultFlags;
+    LEAP_VECTOR linearVelocity;   
+    LEAP_VECTOR angularVelocity;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -195,25 +214,18 @@ namespace Leap.Unity.Interaction.CApi {
     }
   }
 
-  [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_IE_SHAPE_INSTANCE_RESULTS {
-    public LEAP_IE_SHAPE_INSTANCE_HANDLE handle;
-    public LEAP_VECTOR linearVelocity;
-    public LEAP_VECTOR angularVelocity;
-  }
-
   public class InteractionC {
     public const string DLL_NAME = "LeapInteractionEngine";
 
     /*** Create Scene ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIECreateScene", CallingConvention = CallingConvention.Cdecl)]
-    private static extern eLeapIERS LeapIECreateScene(ref LEAP_IE_SCENE scene,
-                                                      ref LEAP_IE_SCENE_INFO sceneInfo,
-                                                          string dataPath);
+    private static extern ReturnStatus LeapIECreateScene(ref LEAP_IE_SCENE scene,
+                                                         ref LEAP_IE_SCENE_INFO sceneInfo,
+                                                             string dataPath);
 
-    public static eLeapIERS CreateScene(ref LEAP_IE_SCENE scene,
-                                        ref LEAP_IE_SCENE_INFO sceneInfo,
-                                            string dataPath) {
+    public static ReturnStatus CreateScene(ref LEAP_IE_SCENE scene,
+                                           ref LEAP_IE_SCENE_INFO sceneInfo,
+                                               string dataPath) {
       Logger.Log("Create Scene", LogLevel.Info);
       var rs = LeapIECreateScene(ref scene, ref sceneInfo, dataPath);
       Logger.HandleReturnStatus(rs);
@@ -222,9 +234,9 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Destroy Scene ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEDestroyScene")]
-    private static extern eLeapIERS LeapIEDestroyScene(ref LEAP_IE_SCENE scene);
+    private static extern ReturnStatus LeapIEDestroyScene(ref LEAP_IE_SCENE scene);
 
-    public static eLeapIERS DestroyScene(ref LEAP_IE_SCENE scene) {
+    public static ReturnStatus DestroyScene(ref LEAP_IE_SCENE scene) {
       Logger.Log("Destroy Scene", LogLevel.Info);
       var rs = LeapIEDestroyScene(ref scene);
       Logger.HandleReturnStatus(rs);
@@ -233,11 +245,11 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Update Scene Info ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateSceneInfo", CallingConvention = CallingConvention.Cdecl)]
-    private static extern eLeapIERS LeapIEUpdateSceneInfo(ref LEAP_IE_SCENE scene,
-                                                          ref LEAP_IE_SCENE_INFO sceneInfo);
+    private static extern ReturnStatus LeapIEUpdateSceneInfo(ref LEAP_IE_SCENE scene,
+                                                             ref LEAP_IE_SCENE_INFO sceneInfo);
 
-    public static eLeapIERS UpdateSceneInfo(ref LEAP_IE_SCENE scene,
-                                            ref LEAP_IE_SCENE_INFO sceneInfo) {
+    public static ReturnStatus UpdateSceneInfo(ref LEAP_IE_SCENE scene,
+                                               ref LEAP_IE_SCENE_INFO sceneInfo) {
       Logger.Log("Update Scene Info", LogLevel.Info);
       var rs = UpdateSceneInfo(ref scene, ref sceneInfo);
       Logger.HandleReturnStatus(rs);
@@ -246,17 +258,17 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Get Last Error ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastError")]
-    public static extern eLeapIERS GetLastError(ref LEAP_IE_SCENE scene);
+    public static extern ReturnStatus GetLastError(ref LEAP_IE_SCENE scene);
 
     /*** Add Shape Description ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEAddShapeDescription")]
-    private static extern eLeapIERS LeapIEAddShapeDescription(ref LEAP_IE_SCENE scene,
-                                                                  IntPtr pDescription,
-                                                              out LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
+    private static extern ReturnStatus LeapIEAddShapeDescription(ref LEAP_IE_SCENE scene,
+                                                                     IntPtr pDescription,
+                                                                 out LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
 
-    public static eLeapIERS AddShapeDescription(ref LEAP_IE_SCENE scene,
-                                                    IntPtr pDescription,
-                                                out LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle) {
+    public static ReturnStatus AddShapeDescription(ref LEAP_IE_SCENE scene,
+                                                       IntPtr pDescription,
+                                                   out LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle) {
       Logger.Log("Add Shape Description", LogLevel.CreateDestroy);
       var rs = LeapIEAddShapeDescription(ref scene, pDescription, out handle);
       Logger.HandleReturnStatus(rs);
@@ -265,11 +277,11 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Remove Shape Description ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIERemoveShapeDescription")]
-    private static extern eLeapIERS LeapIERemoveShapeDescription(ref LEAP_IE_SCENE scene,
-                                                                 ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
+    private static extern ReturnStatus LeapIERemoveShapeDescription(ref LEAP_IE_SCENE scene,
+                                                                    ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle);
 
-    public static eLeapIERS RemoveShapeDescription(ref LEAP_IE_SCENE scene,
-                                                   ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle) {
+    public static ReturnStatus RemoveShapeDescription(ref LEAP_IE_SCENE scene,
+                                                      ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle) {
       Logger.Log("Remove Shape Description", LogLevel.CreateDestroy);
       var rs = LeapIERemoveShapeDescription(ref scene, ref handle);
       Logger.HandleReturnStatus(rs);
@@ -278,17 +290,17 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Create Shape ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIECreateShape")]
-    private static extern eLeapIERS LeapIECreateShape(ref LEAP_IE_SCENE scene,
-                                                      ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle,
-                                                      ref LEAP_IE_TRANSFORM transform,
-                                                      ref LEAP_IE_CREATE_SHAPE_INFO shapeInfo,
-                                                      out LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
+    private static extern ReturnStatus LeapIECreateShape(ref LEAP_IE_SCENE scene,
+                                                         ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle,
+                                                         ref LEAP_IE_TRANSFORM transform,
+                                                         ref LEAP_IE_CREATE_SHAPE_INFO shapeInfo,
+                                                         out LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
 
-    public static eLeapIERS CreateShape(ref LEAP_IE_SCENE scene,
-                                        ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle,
-                                        ref LEAP_IE_TRANSFORM transform,
-                                        ref LEAP_IE_CREATE_SHAPE_INFO shapeInfo,
-                                        out LEAP_IE_SHAPE_INSTANCE_HANDLE instance) {
+    public static ReturnStatus CreateShape(ref LEAP_IE_SCENE scene,
+                                           ref LEAP_IE_SHAPE_DESCRIPTION_HANDLE handle,
+                                           ref LEAP_IE_TRANSFORM transform,
+                                           ref LEAP_IE_CREATE_SHAPE_INFO shapeInfo,
+                                           out LEAP_IE_SHAPE_INSTANCE_HANDLE instance) {
       Logger.Log("Create Shape", LogLevel.CreateDestroy);
       var rs = LeapIECreateShape(ref scene, ref handle, ref transform, ref shapeInfo, out instance);
       Logger.HandleReturnStatus(rs);
@@ -297,11 +309,11 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Destroy Shape ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEDestroyShape")]
-    private static extern eLeapIERS LeapIEDestroyShape(ref LEAP_IE_SCENE scene,
-                                                       ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
+    private static extern ReturnStatus LeapIEDestroyShape(ref LEAP_IE_SCENE scene,
+                                                          ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
 
-    public static eLeapIERS DestroyShape(ref LEAP_IE_SCENE scene,
-                                         ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance) {
+    public static ReturnStatus DestroyShape(ref LEAP_IE_SCENE scene,
+                                            ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance) {
       Logger.Log("Destroy Shape", LogLevel.CreateDestroy);
       var rs = LeapIEDestroyShape(ref scene, ref instance);
       Logger.HandleReturnStatus(rs);
@@ -310,15 +322,15 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Update Shape ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateShape")]
-    private static extern eLeapIERS LeapIEUpdateShape(ref LEAP_IE_SCENE scene,
-                                                      ref LEAP_IE_TRANSFORM transform,
-                                                      ref LEAP_IE_UPDATE_SHAPE_INFO updateInfo,
-                                                      ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
+    private static extern ReturnStatus LeapIEUpdateShape(ref LEAP_IE_SCENE scene,
+                                                         ref LEAP_IE_TRANSFORM transform,
+                                                         ref LEAP_IE_UPDATE_SHAPE_INFO updateInfo,
+                                                         ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
 
-    public static eLeapIERS UpdateShape(ref LEAP_IE_SCENE scene,
-                                        ref LEAP_IE_TRANSFORM transform,
-                                        ref LEAP_IE_UPDATE_SHAPE_INFO updateInfo,
-                                        ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance) {
+    public static ReturnStatus UpdateShape(ref LEAP_IE_SCENE scene,
+                                           ref LEAP_IE_TRANSFORM transform,
+                                           ref LEAP_IE_UPDATE_SHAPE_INFO updateInfo,
+                                           ref LEAP_IE_SHAPE_INSTANCE_HANDLE instance) {
       Logger.Log("Update Shape", LogLevel.AllCalls);
       var rs = LeapIEUpdateShape(ref scene, ref transform, ref updateInfo, ref instance);
       Logger.HandleReturnStatus(rs);
@@ -327,13 +339,13 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Update Hands ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateHands")]
-    private static extern eLeapIERS LeapIEUpdateHands(ref LEAP_IE_SCENE scene,
-                                                          UInt32 nHands,
-                                                          IntPtr pHands);
+    private static extern ReturnStatus LeapIEUpdateHands(ref LEAP_IE_SCENE scene,
+                                                             UInt32 nHands,
+                                                             IntPtr pHands);
 
-    public static eLeapIERS UpdateHands(ref LEAP_IE_SCENE scene,
-                                            UInt32 nHands,
-                                            IntPtr pHands) {
+    public static ReturnStatus UpdateHands(ref LEAP_IE_SCENE scene,
+                                               UInt32 nHands,
+                                               IntPtr pHands) {
       Logger.Log("Update Hands", LogLevel.AllCalls);
       var rs = LeapIEUpdateHands(ref scene, nHands, pHands);
       Logger.HandleReturnStatus(rs);
@@ -342,11 +354,11 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Update Controller ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEUpdateController")]
-    private static extern eLeapIERS LeapIEUpdateController(ref LEAP_IE_SCENE scene,
-                                                           ref LEAP_IE_TRANSFORM controllerTransform);
+    private static extern ReturnStatus LeapIEUpdateController(ref LEAP_IE_SCENE scene,
+                                                              ref LEAP_IE_TRANSFORM controllerTransform);
 
-    public static eLeapIERS UpdateController(ref LEAP_IE_SCENE scene,
-                                             ref LEAP_IE_TRANSFORM controllerTransform) {
+    public static ReturnStatus UpdateController(ref LEAP_IE_SCENE scene,
+                                                ref LEAP_IE_TRANSFORM controllerTransform) {
       Logger.Log("Update Controller", LogLevel.AllCalls);
       var rs = LeapIEUpdateController(ref scene, ref controllerTransform);
       Logger.HandleReturnStatus(rs);
@@ -355,30 +367,28 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Get Classification ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetHandResult")]
-    private static extern eLeapIERS LeapIEGetHandResult(ref LEAP_IE_SCENE scene,
-                                                                UInt32 handId,
-                                                            out LEAP_IE_HAND_RESULT handResult,
-                                                            out LEAP_IE_SHAPE_INSTANCE_HANDLE instance);
+    private static extern ReturnStatus LeapIEGetHandResult(ref LEAP_IE_SCENE scene,
+                                                               UInt32 handId,
+                                                           out LEAP_IE_HAND_RESULT handResult);
 
-    public static eLeapIERS GetHandResult(ref LEAP_IE_SCENE scene,
-                                              UInt32 handId,
-                                          out LEAP_IE_HAND_RESULT handResult,
-                                          out LEAP_IE_SHAPE_INSTANCE_HANDLE instance) {
+    public static ReturnStatus GetHandResult(ref LEAP_IE_SCENE scene,
+                                                 UInt32 handId,
+                                             out LEAP_IE_HAND_RESULT handResult) {
       Logger.Log("Get Hand Result", LogLevel.AllCalls);
-      var rs = LeapIEGetHandResult(ref scene, handId, out handResult, out instance);
+      var rs = LeapIEGetHandResult(ref scene, handId, out handResult);
       Logger.HandleReturnStatus(rs);
       return rs;
     }
 
     /*** Override Hand Result ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEOverrideHandResult")]
-    private static extern eLeapIERS LeapIEOverrideHandResult(ref LEAP_IE_SCENE scene,
-                                                                UInt32 handId,
-                                                             ref LEAP_IE_HAND_RESULT handResult);
+    private static extern ReturnStatus LeapIEOverrideHandResult(ref LEAP_IE_SCENE scene,
+                                                                   UInt32 handId,
+                                                                ref LEAP_IE_HAND_RESULT handResult);
 
-    public static eLeapIERS OverrideHandResult(ref LEAP_IE_SCENE scene,
-                                                   UInt32 handId,
-                                               ref LEAP_IE_HAND_RESULT handResult) {
+    public static ReturnStatus OverrideHandResult(ref LEAP_IE_SCENE scene,
+                                                      UInt32 handId,
+                                                  ref LEAP_IE_HAND_RESULT handResult) {
       Logger.Log("Override Hand Result", LogLevel.AllCalls);
       var rs = LeapIEOverrideHandResult(ref scene, handId, ref handResult);
       Logger.HandleReturnStatus(rs);
@@ -387,19 +397,22 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Get Velocities ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetShapeInstanceResults")]
-    private static extern eLeapIERS LeapIEGetShapeInstanceResults(ref LEAP_IE_SCENE scene,
-                                                                  out UInt32 nResults,
-                                                                  out IntPtr papResultsBuffer);
+    private static extern ReturnStatus LeapIEGetShapeInstanceResults(ref LEAP_IE_SCENE scene,
+                                                                     out UInt32 nResults,
+                                                                     out IntPtr papResultsBuffer);
 
-    public static eLeapIERS GetVelocities(ref LEAP_IE_SCENE scene, List<LEAP_IE_SHAPE_INSTANCE_RESULTS> results) {
+    public static ReturnStatus GetVelocities(ref LEAP_IE_SCENE scene, 
+                                                 List<LEAP_IE_SHAPE_INSTANCE_RESULTS> results) {
       Logger.Log("Get Velocities", LogLevel.AllCalls);
 
       UInt32 nResults;
       IntPtr papResultsBuffer;
-      var rs = LeapIEGetShapeInstanceResults(ref scene, out nResults, out papResultsBuffer);
+      var rs = LeapIEGetShapeInstanceResults(ref scene, 
+                                             out nResults, 
+                                             out papResultsBuffer);
 
       results.Clear();
-      if (rs == eLeapIERS.eLeapIERS_Success) {
+      if (rs == ReturnStatus.eLeapIERS_Success) {
         for (int i = 0; i < nResults; i++) {
           IntPtr resultPtr = StructMarshal<IntPtr>.ArrayElementToStruct(papResultsBuffer, i);
           var result = StructMarshal<LEAP_IE_SHAPE_INSTANCE_RESULTS>.PtrToStruct(resultPtr);
@@ -413,11 +426,11 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Enable Debug Visualization ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEEnableDebugFlags")]
-    private static extern eLeapIERS LeapIEEnableDebugFlags(ref LEAP_IE_SCENE scene,
-                                                               UInt32 flags);
+    private static extern ReturnStatus LeapIEEnableDebugFlags(ref LEAP_IE_SCENE scene,
+                                                                  UInt32 flags);
 
-    public static eLeapIERS EnableDebugFlags(ref LEAP_IE_SCENE scene,
-                                                 UInt32 flags) {
+    public static ReturnStatus EnableDebugFlags(ref LEAP_IE_SCENE scene,
+                                                    UInt32 flags) {
       Logger.Log("Enable Debug Flags", LogLevel.Info);
       var rs = LeapIEEnableDebugFlags(ref scene, flags);
       Logger.HandleReturnStatus(rs);
@@ -426,13 +439,13 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Get Debug Lines ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetDebugLines")]
-    private static extern eLeapIERS LeapIEGetDebugLines(ref LEAP_IE_SCENE scene,
-                                                        out UInt32 nLines,
-                                                        out IntPtr ppLineBuffer);
+    private static extern ReturnStatus LeapIEGetDebugLines(ref LEAP_IE_SCENE scene,
+                                                           out UInt32 nLines,
+                                                           out IntPtr ppLineBuffer);
 
-    public static eLeapIERS GetDebugLines(ref LEAP_IE_SCENE scene,
-                                          out UInt32 nLines,
-                                          out IntPtr ppLineBuffer) {
+    public static ReturnStatus GetDebugLines(ref LEAP_IE_SCENE scene,
+                                             out UInt32 nLines,
+                                             out IntPtr ppLineBuffer) {
       Logger.Log("Get Debug Lines", LogLevel.AllCalls);
       var rs = LeapIEGetDebugLines(ref scene, out nLines, out ppLineBuffer);
       Logger.HandleReturnStatus(rs);
@@ -452,12 +465,12 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Get Debug Strings ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetDebugStrings")]
-    private static extern eLeapIERS LeapIEGetDebugStrings(ref LEAP_IE_SCENE scene,
-                                                        out UInt32 nStrings,
-                                                        out IntPtr pppStrings);
+    private static extern ReturnStatus LeapIEGetDebugStrings(ref LEAP_IE_SCENE scene,
+                                                           out UInt32 nStrings,
+                                                           out IntPtr pppStrings);
 
-    public static eLeapIERS GetDebugStrings(ref LEAP_IE_SCENE scene,
-                                                List<string> strings) {
+    public static ReturnStatus GetDebugStrings(ref LEAP_IE_SCENE scene,
+                                                   List<string> strings) {
       Logger.Log("Get Debug Strings", LogLevel.AllCalls);
 
       UInt32 nStrings;
@@ -465,7 +478,7 @@ namespace Leap.Unity.Interaction.CApi {
       var rs = LeapIEGetDebugStrings(ref scene, out nStrings, out pppStrings);
 
       strings.Clear();
-      if (rs == eLeapIERS.eLeapIERS_Success) {
+      if (rs == ReturnStatus.eLeapIERS_Success) {
         for (int i = 0; i < nStrings; i++) {
           IntPtr charPtr = StructMarshal<IntPtr>.ArrayElementToStruct(pppStrings, i);
           string str = Marshal.PtrToStringAnsi(charPtr);

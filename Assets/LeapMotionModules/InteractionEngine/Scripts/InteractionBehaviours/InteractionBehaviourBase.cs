@@ -267,7 +267,6 @@ namespace Leap.Unity.Interaction {
       LEAP_IE_UPDATE_SHAPE_INFO info = new LEAP_IE_UPDATE_SHAPE_INFO();
 
       //TODO: Actually apply acceleration
-      info.updateFlags = eLeapIEUpdateFlags.eLeapIEUpdateFlags_ApplyAcceleration;
       info.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
       info.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
       _accumulatedLinearAcceleration = Vector3.zero;

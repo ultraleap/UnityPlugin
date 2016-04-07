@@ -17,7 +17,7 @@ namespace Leap.Unity.Interaction.CApi {
     public static LogLevel logLevel = LogLevel.Info;
 
     [Conditional("ENABLE_LOGGING")]
-    public static void HandleReturnStatus(eLeapIERS rs) {
+    public static void HandleReturnStatus(ReturnStatus rs) {
       string message;
       LogLevel logLevel;
       rs.GetInfo(out message, out logLevel);
@@ -29,61 +29,61 @@ namespace Leap.Unity.Interaction.CApi {
       Log(message, logLevel);
     }
 
-    public static void GetInfo(this eLeapIERS rs, out string message, out LogLevel logLevel) {
+    public static void GetInfo(this ReturnStatus rs, out string message, out LogLevel logLevel) {
       switch (rs) {
-        case eLeapIERS.eLeapIERS_Success:
+        case ReturnStatus.eLeapIERS_Success:
           message = "Success";
           logLevel = LogLevel.Verbose;
           return;
-        case eLeapIERS.eLeapIERS_InvalidHandle:
+        case ReturnStatus.eLeapIERS_InvalidHandle:
           message = "Invalid Handle";
           logLevel = LogLevel.Error;
           return;
-        case eLeapIERS.eLeapIERS_InvalidArgument:
+        case ReturnStatus.eLeapIERS_InvalidArgument:
           message = "Invalid Argument";
           logLevel = LogLevel.Error;
           return;
-        case eLeapIERS.eLeapIERS_ReferencesRemain:
+        case ReturnStatus.eLeapIERS_ReferencesRemain:
           message = "References Remain";
           logLevel = LogLevel.Error;
           return;
-        case eLeapIERS.eLeapIERS_NotEnabled:
+        case ReturnStatus.eLeapIERS_NotEnabled:
           message = "Not Enabled";
           logLevel = LogLevel.Error;
           return;
-        case eLeapIERS.eLeapIERS_NeverUpdated:
+        case ReturnStatus.eLeapIERS_NeverUpdated:
           message = "Never Updated";
           logLevel = LogLevel.Error;
           return;
-        case eLeapIERS.eLeapIERS_UnknownError:
+        case ReturnStatus.eLeapIERS_UnknownError:
           message = "Unknown Error";
           logLevel = LogLevel.Error;
           return;
-        case eLeapIERS.eLeapIERS_BadData:
+        case ReturnStatus.eLeapIERS_BadData:
           message = "Bad Data";
           logLevel = LogLevel.Error;
           return;
-        case eLeapIERS.eLeapIERS_StoppedOnNonDeterministic:
+        case ReturnStatus.eLeapIERS_StoppedOnNonDeterministic:
           message = "Stopped on Non Deterministic";
           logLevel = LogLevel.Error;
           return;
-        case eLeapIERS.eLeapIERS_StoppedOnUnexpectedFailure:
+        case ReturnStatus.eLeapIERS_StoppedOnUnexpectedFailure:
           message = "Stopped on Unexpected Failure";
           logLevel = LogLevel.Error;
           return;
-        case eLeapIERS.eLeapIERS_StoppedOnFull:
+        case ReturnStatus.eLeapIERS_StoppedOnFull:
           message = "Stopped on Full";
           logLevel = LogLevel.Error;
           return;
-        case eLeapIERS.eLeapIERS_StoppedFileError:
+        case ReturnStatus.eLeapIERS_StoppedFileError:
           message = "Stopped on File Error";
           logLevel = LogLevel.Error;
           return;
-        case eLeapIERS.eLeapIERS_UnexpectedEOF:
+        case ReturnStatus.eLeapIERS_UnexpectedEOF:
           message = "Unexpected End Of File";
           logLevel = LogLevel.Error;
           return;
-        case eLeapIERS.eLeapIERS_Paused:
+        case ReturnStatus.eLeapIERS_Paused:
           message = "Paused";
           logLevel = LogLevel.Verbose;
           return;
