@@ -23,32 +23,27 @@ namespace Leap.Unity.Interaction {
 
     public override LEAP_IE_TRANSFORM InteractionTransform {
       get {
-        Vector3 interactionPosition;
-        Quaternion interactionRotation;
-        getInteractionTransform(out interactionPosition, out interactionRotation);
-
         LEAP_IE_TRANSFORM interactionTransform = new LEAP_IE_TRANSFORM();
-        interactionTransform.position = interactionPosition.ToCVector();
-        interactionTransform.rotation = interactionRotation.ToCQuaternion();
-
+        interactionTransform.position = _rigidbody.position.ToCVector();
+        interactionTransform.rotation = _rigidbody.rotation.ToCQuaternion();
         return interactionTransform;
       }
     }
 
-    public override void EnableInteraction() {
-      base.EnableInteraction();
+    public override void OnRegister() {
+      base.OnRegister();
       KabschC.Construct(ref _kabsch);
     }
 
-    public override void DisableInteraction() {
-      base.DisableInteraction();
+    protected override void OnDisable() {
+      base.OnDisable();
       KabschC.Destruct(ref _kabsch);
     }
 
     public override void OnHandGrasp(Hand hand) {
       base.OnHandGrasp(hand);
 
-      var newCollection = HandPointCollection.Create(this);
+      var newCollection = HandPointCollection.Create(_rigidbody);
       _handIdToPoints[hand.Id] = newCollection;
       newCollection.UpdateTransform();
 
@@ -72,9 +67,8 @@ namespace Leap.Unity.Interaction {
       base.OnHandsHold(hands);
 
       //Get old transform
-      Vector3 oldPosition;
-      Quaternion oldRotation;
-      getInteractionTransform(out oldPosition, out oldRotation);
+      Vector3 oldPosition = _rigidbody.position;
+      Quaternion oldRotation = _rigidbody.rotation;
 
       //Get solved transform deltas
       Vector3 solvedTranslation;
@@ -86,8 +80,14 @@ namespace Leap.Unity.Interaction {
       Quaternion newRotation = solvedRotation * oldRotation;
 
       //Apply new transform to object
-      setInteractionTransform(newPosition, newRotation, _shouldNextSolveBeTeleport);
-      _shouldNextSolveBeTeleport = false;
+      if (_shouldNextSolveBeTeleport) {
+        _rigidbody.position = newPosition;
+        _rigidbody.rotation = newRotation;
+        _shouldNextSolveBeTeleport = false;
+      } else {
+        _rigidbody.MovePosition(newPosition);
+        _rigidbody.MoveRotation(newRotation);
+      }
     }
 
     public override void OnHandRelease(Hand hand) {
@@ -125,13 +125,17 @@ namespace Leap.Unity.Interaction {
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
 
-      _rigidbody.isKinematic = true;
+      if (_rigidbody != null) {
+        _rigidbody.isKinematic = true;
+      }
     }
 
     protected override void OnGraspEnd() {
       base.OnGraspEnd();
 
-      _rigidbody.isKinematic = false;
+      if (_rigidbody != null) {
+        _rigidbody.isKinematic = false;
+      }
     }
     #endregion
 
@@ -147,31 +151,6 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL
-    protected void getInteractionTransform(out Vector3 position, out Quaternion rotation) {
-      if (_rigidbody != null) {
-        position = _rigidbody.position;
-        rotation = _rigidbody.rotation;
-      } else {
-        position = transform.position;
-        rotation = transform.rotation;
-      }
-    }
-
-    protected void setInteractionTransform(Vector3 position, Quaternion rotation, bool teleportRigidbody) {
-      if (_rigidbody != null) {
-        if (teleportRigidbody) {
-          _rigidbody.position = position;
-          _rigidbody.rotation = rotation;
-        } else {
-          _rigidbody.MovePosition(position);
-          _rigidbody.MoveRotation(rotation);
-        }
-      } else {
-        transform.position = position;
-        transform.rotation = rotation;
-      }
-    }
-
     protected virtual void updateRendererStatus() {
       //Renderers are visible if there are no grasping hands
       //or if there is at least one tracked grasping hand
@@ -237,13 +216,13 @@ namespace Leap.Unity.Interaction {
       //With a pool, likely there will only ever be 2 instances!
       private static Stack<HandPointCollection> _handPointCollectionPool = new Stack<HandPointCollection>();
 
-      private InteractionBehaviourKabsch _interactionBehaviour;
+      private Rigidbody _rigidbody;
       private Vector3[] _localPositions;
 
       private Matrix4x4 _transformMatrix;
       private Matrix4x4 _inverseTransformMatrix;
 
-      public static HandPointCollection Create(InteractionBehaviourKabsch interactionBehaviour) {
+      public static HandPointCollection Create(Rigidbody rigidbody) {
         HandPointCollection collection;
         if (_handPointCollectionPool.Count != 0) {
           collection = _handPointCollectionPool.Pop();
@@ -251,7 +230,7 @@ namespace Leap.Unity.Interaction {
           collection = new HandPointCollection();
         }
 
-        collection.init(interactionBehaviour);
+        collection.init(rigidbody);
         return collection;
       }
 
@@ -264,18 +243,17 @@ namespace Leap.Unity.Interaction {
         _localPositions = new Vector3[NUM_FINGERS * NUM_BONES];
       }
 
-      private void init(InteractionBehaviourKabsch interactionBehaviour) {
-        _interactionBehaviour = interactionBehaviour;
+      private void init(Rigidbody rigidbody) {
+        _rigidbody = rigidbody;
       }
 
       private void reset() {
-        _interactionBehaviour = null;
+        _rigidbody = null;
       }
 
       public void UpdateTransform() {
-        Vector3 interactionPosition;
-        Quaternion interactionRotation;
-        _interactionBehaviour.getInteractionTransform(out interactionPosition, out interactionRotation);
+        Vector3 interactionPosition = _rigidbody.position;
+        Quaternion interactionRotation = _rigidbody.rotation;
 
         _transformMatrix = Matrix4x4.TRS(interactionPosition, interactionRotation, Vector3.one);
         _inverseTransformMatrix = Matrix4x4.Inverse(_transformMatrix);
