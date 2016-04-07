@@ -28,7 +28,6 @@ namespace Leap.Unity{
     /** The number of joints in a finger. */
     public const int NUM_JOINTS = 3;
   
-    [HideInInspector]
     public Finger.FingerType fingerType = Finger.FingerType.TYPE_INDEX;
   
     // Unity references
@@ -42,23 +41,6 @@ namespace Leap.Unity{
     protected Hand hand_;
     /** The Leap Finger object. */
     protected Finger finger_;
-    /** An added offset vector. */
-    protected Vector3 offset_ = Vector3.zero;
-    /** Whether this finger is mirrored. */
-    protected bool mirror_z_axis_ = false;
-  
-    /** The parent HandController instance. */
-    protected LeapHandController controller_;
-  
-    /** Assigns the HandController parent for this FingerModel object. */
-    public void SetController(LeapHandController controller) {
-      controller_ = controller;
-    }
-  
-    /** The parent HandController instance. */
-    public LeapHandController GetController() {
-      return controller_;
-    }
   
     /** Sets the Leap Hand and Leap Finger for this finger.
     * Note that Leap Hand and Finger objects are recreated every frame. The
@@ -67,26 +49,9 @@ namespace Leap.Unity{
     */ 
     public void SetLeapHand(Hand hand) {
       hand_ = hand;
-      if (hand_ != null)
+      if (hand_ != null) {
         finger_ = hand.Fingers[(int)fingerType];
-    }
-  
-    /** Sets an offset vector to displace the finger from its normally calculated
-    * position relative to the HandController. Typically, this offset is used to
-    * give the virtual hands a larger range of motion then they would have based on their 
-    * scaled size in the Unity scene.
-    */
-    public void SetOffset(Vector3 offset) {
-      offset_ = offset;
-    }
-  
-    /** 
-    * Sets the mirror z-axis flag for this Finger Model.
-    * Mirroring the z axis reverses the hand so that they face the opposite direction -- as if in a mirror.
-    * @param mirror Set true, the default value to mirror; false for normal rendering. 
-    */
-    public void MirrorZAxis(bool mirror = true) {
-      mirror_z_axis_ = mirror;
+      }
     }
   
     /** The Leap Hand object. */
@@ -111,17 +76,11 @@ namespace Leap.Unity{
     */
     public abstract void UpdateFinger();
   
-    /** Returns any additional movement the finger needs because of non-relative palm movement.*/
-    public Vector3 GetOffset() {
-      return offset_;
-    }
-  
     /** Returns the location of the tip of the finger */
     public Vector3 GetTipPosition() {
       if (finger_ != null) {
         Vector3 local_tip = finger_.Bone ((Bone.BoneType.TYPE_DISTAL)).NextJoint.ToVector3();
         return local_tip;
-  
       }
       if (bones [NUM_BONES - 1] && joints [NUM_JOINTS - 2]) {
         return 2f*bones [NUM_BONES - 1].position - joints [NUM_JOINTS - 2].position;
@@ -137,7 +96,6 @@ namespace Leap.Unity{
       if (finger_ != null) {
         Vector3 local_position = finger_.Bone((Bone.BoneType)(joint)).PrevJoint.ToVector3();
         return local_position;
-  
       }
       if (joints [joint]) {
         return joints[joint].position;
@@ -156,7 +114,6 @@ namespace Leap.Unity{
       if (finger_ != null) {
         Bone bone = finger_.Bone ((Bone.BoneType)(bone_type));
         return bone.Center.ToVector3();
-  
       }
       if (bones [bone_type]) {
         return bones[bone_type].position;
@@ -181,7 +138,6 @@ namespace Leap.Unity{
       if (finger_ != null) {
         Quaternion local_rotation = finger_.Bone ((Bone.BoneType)(bone_type)).Basis.Rotation ();
         return local_rotation;
-  
       }
       if (bones[bone_type]) {
         return bones[bone_type].rotation;
@@ -191,16 +147,12 @@ namespace Leap.Unity{
     
     /** Returns the length of the finger bone.*/
     public float GetBoneLength(int bone_type) {
-      //return finger_.Bone ((Bone.BoneType)(bone_type)).Length * UnityVectorExtension.INPUT_SCALE;
       return finger_.Bone((Bone.BoneType)(bone_type)).Length;
-  
     }
     
     /** Returns the width of the finger bone.*/
     public float GetBoneWidth(int bone_type) {
-      //return finger_.Bone((Bone.BoneType)(bone_type)).Width * UnityVectorExtension.INPUT_SCALE;
       return finger_.Bone((Bone.BoneType)(bone_type)).Width;
-  
     }
     
     /**

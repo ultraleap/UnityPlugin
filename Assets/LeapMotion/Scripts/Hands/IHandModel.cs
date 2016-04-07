@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections;
-using Leap;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -22,7 +20,6 @@ namespace Leap.Unity{
     public abstract Chirality Handedness { get; }
     public abstract ModelType HandModelType { get; }
     public virtual void InitHand(){
-      //Debug.Log("IHandModel.InitHand()");
     }
   
     public virtual void BeginHand() {
@@ -40,17 +37,17 @@ namespace Leap.Unity{
     }
     public abstract Hand GetLeapHand(); 
     public abstract void SetLeapHand(Hand hand);
+
   #if UNITY_EDITOR
     void Awake() {
       if (!EditorApplication.isPlaying) {
-        //Debug.Log("IHandModel.Awake()");
         SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(transform)));
         InitHand();
       }
     }
+
     void Update() {
       if (!EditorApplication.isPlaying) {
-        //Debug.Log("IHandModel.Update()");
         SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(transform)));
         UpdateHand();
       }
