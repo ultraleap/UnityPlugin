@@ -9,8 +9,8 @@ namespace Leap.Unity.Interaction {
     public override LEAP_IE_TRANSFORM InteractionTransform {
       get {
         LEAP_IE_TRANSFORM interactionTransform = new LEAP_IE_TRANSFORM();
-        interactionTransform.position = new LEAP_VECTOR(transform.position);
-        interactionTransform.rotation = new LEAP_QUATERNION(transform.rotation);
+        interactionTransform.position = transform.position.ToCVector();
+        interactionTransform.rotation = transform.rotation.ToCQuaternion();
         return interactionTransform;
       }
     }

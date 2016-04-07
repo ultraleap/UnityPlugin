@@ -5,7 +5,6 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
-  [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviourKabsch : InteractionBehaviourBase {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
@@ -31,8 +30,8 @@ namespace Leap.Unity.Interaction {
         getInteractionTransform(out interactionPosition, out interactionRotation);
 
         LEAP_IE_TRANSFORM interactionTransform = new LEAP_IE_TRANSFORM();
-        interactionTransform.position = new LEAP_VECTOR(interactionPosition);
-        interactionTransform.rotation = new LEAP_QUATERNION(interactionRotation);
+        interactionTransform.position = interactionPosition.ToCVector();
+        interactionTransform.rotation = interactionRotation.ToCQuaternion();
 
         return interactionTransform;
       }
@@ -70,12 +69,10 @@ namespace Leap.Unity.Interaction {
     public override void OnVelocityChanged(Vector3 linearVelocity, Vector3 angularVelocity) {
       base.OnVelocityChanged(linearVelocity, angularVelocity);
 
-      /*
       if (_rigidbody != null) {
         _rigidbody.velocity = linearVelocity;
         _rigidbody.angularVelocity = angularVelocity;
       }
-      */
     }
 
     public override void OnHandGrasp(Hand hand) {
@@ -112,11 +109,11 @@ namespace Leap.Unity.Interaction {
       //Get solved transform deltas
       Vector3 solvedTranslation;
       Quaternion solvedRotation;
-      getSolvedTransform(hands, out solvedTranslation, out solvedRotation);
+      getSolvedTransform(hands, oldPosition, out solvedTranslation, out solvedRotation);
 
       //Calculate new transform using delta
       Vector3 newPosition = oldPosition + solvedTranslation;
-      Quaternion newRotation = oldRotation;
+      Quaternion newRotation = solvedRotation * oldRotation;
 
       //Apply new transform to object
       setInteractionTransform(newPosition, newRotation, _shouldNextSolveBeTeleport);
@@ -229,7 +226,7 @@ namespace Leap.Unity.Interaction {
       HandPointCollection.Return(collection);
     }
 
-    protected void getSolvedTransform(List<Hand> hands, out Vector3 translation, out Quaternion rotation) {
+    protected void getSolvedTransform(List<Hand> hands, Vector3 oldPosition, out Vector3 translation, out Quaternion rotation) {
       KabschC.Reset(ref _kabsch);
 
       for (int h = 0; h < hands.Count; h++) {
@@ -249,11 +246,9 @@ namespace Leap.Unity.Interaction {
             Vector3 objectPos = collection.GetGlobalPosition(fingerType, boneType);
             Vector3 bonePos = bone.NextJoint.ToVector3();
 
-            Debug.DrawLine(objectPos, bonePos, Color.blue);
-
             //Do the solve such that the objects positions are matched to the new bone positions
-            LEAP_VECTOR point1 = new LEAP_VECTOR(objectPos);
-            LEAP_VECTOR point2 = new LEAP_VECTOR(bonePos);
+            LEAP_VECTOR point1 = (objectPos - oldPosition).ToCVector();
+            LEAP_VECTOR point2 = (bonePos - oldPosition).ToCVector();
 
             KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
           }
@@ -267,8 +262,8 @@ namespace Leap.Unity.Interaction {
       KabschC.GetTranslation(ref _kabsch, out leapTranslation);
       KabschC.GetRotation(ref _kabsch, out leapRotation);
 
-      translation = leapTranslation.ToUnityVector();
-      rotation = new Quaternion(leapRotation.x, leapRotation.y, leapRotation.z, leapRotation.w);
+      translation = leapTranslation.ToVector3();
+      rotation = leapRotation.ToQuaternion();
     }
 
     protected class HandPointCollection {
