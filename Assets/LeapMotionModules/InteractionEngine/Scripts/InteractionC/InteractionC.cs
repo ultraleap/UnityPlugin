@@ -79,6 +79,12 @@ namespace Leap.Unity.Interaction.CApi {
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
+  public struct LEAP_STRING {
+    public UInt32 string_length;
+    public IntPtr characters; //char*
+  }
+
+  [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct LEAP_IE_SCENE {
     public IntPtr pData; //LeapIESceneData*
   }
@@ -416,6 +422,21 @@ namespace Leap.Unity.Interaction.CApi {
         LEAP_IE_DEBUG_LINE line = StructMarshal<LEAP_IE_DEBUG_LINE>.ArrayElementToStruct(arrayPtr, i);
         line.Draw();
       }
+    }
+
+    /*** Get Debug Strings ***/
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetDebugStrings")]
+    private static extern eLeapIERS LeapIEGetDebugStrings(ref LEAP_IE_SCENE scene,
+                                                        out UInt32 nStrings,
+                                                        out IntPtr ppStrings);
+
+    public static eLeapIERS GetDebugStrings(ref LEAP_IE_SCENE scene,
+                                            out UInt32 nStrings,
+                                            out IntPtr ppStrings) {
+      Logger.Log("Get Debug Strings", LogLevel.AllCalls);
+      var rs = LeapIEGetDebugLines(ref scene, out nStrings, out ppStrings);
+      Logger.HandleReturnStatus(rs);
+      return rs;
     }
 
   }

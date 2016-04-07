@@ -22,9 +22,13 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _modifyVelocities = true;
 
+    [Header("Debug")]
     [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
     [SerializeField]
     protected bool _showDebugLines = true;
+
+    [SerializeField]
+    protected bool _showDebugOutput = true;
     #endregion
 
     #region INTERNAL FIELDS
@@ -47,6 +51,8 @@ namespace Leap.Unity.Interaction {
     private List<int> _handIdsToRemove;
     //A temp list that is recycled.  Used as the argument to OnHandsHold.
     private List<Hand> _holdingHands;
+
+    private List<string> _debugOutput;
     #endregion
 
     #region PUBLIC METHODS
@@ -135,7 +141,7 @@ namespace Leap.Unity.Interaction {
         throw new InvalidOperationException("Interaction Behaviour " + interactionBehaviour + " cannot be registered because " +
                                             "it is already registered with this manager.");
       }
-      
+
       _registeredBehaviours.Add(interactionBehaviour);
 
       try {
@@ -161,7 +167,7 @@ namespace Leap.Unity.Interaction {
         throw new InvalidOperationException("Interaction Behaviour " + interactionBehaviour + " cannot be unregistered because " +
                                             "it is not currently registered with this manager.");
       }
-      
+
       _registeredBehaviours.Remove(interactionBehaviour);
 
       if (_graspedBehaviours.Remove(interactionBehaviour)) {
@@ -220,6 +226,7 @@ namespace Leap.Unity.Interaction {
       _idToInteractionHand = new Dictionary<int, InteractionHand>();
       _handIdsToRemove = new List<int>();
       _holdingHands = new List<Hand>();
+      _debugOutput = new List<string>();
     }
 
     protected virtual void OnEnable() {
@@ -237,7 +244,7 @@ namespace Leap.Unity.Interaction {
         enabled = false;
         throw e;
       }
-      
+
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
 
       Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "There should not be any instances before the creation step.");
@@ -301,6 +308,14 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void LateUpdate() {
       unregisterMisbehavingBehaviours();
+    }
+
+    protected virtual void OnGUI() {
+      if (_showDebugOutput) {
+        for (int i = 0; i < _debugOutput.Count; i++) {
+          GUILayout.Label(_debugOutput[i]);
+        }
+      }
     }
     #endregion
 
