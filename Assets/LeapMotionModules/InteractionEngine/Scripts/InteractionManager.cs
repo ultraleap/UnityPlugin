@@ -304,6 +304,7 @@ namespace Leap.Unity.Interaction {
 
       if (_hasSceneBeenCreated) {
         InteractionC.DestroyScene(ref _scene);
+        _hasSceneBeenCreated = false;
       }
 
       if (_simulationCoroutine != null) {
