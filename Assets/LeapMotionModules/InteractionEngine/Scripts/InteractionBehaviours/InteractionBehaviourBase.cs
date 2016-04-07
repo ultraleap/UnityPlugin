@@ -2,7 +2,6 @@
 using UnityEngine.Assertions;
 using System;
 using System.Collections.Generic;
-using LeapInternal;
 using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
@@ -26,6 +25,9 @@ namespace Leap.Unity.Interaction {
 
     private List<int> _graspingIds = new List<int>();
     private List<int> _untrackedIds = new List<int>();
+
+    private Vector3 _accumulatedLinearAcceleration = Vector3.zero;
+    private Vector3 _accumulatedAngularAcceleration = Vector3.zero;
     #endregion
 
     #region PUBLIC METHODS
@@ -64,6 +66,37 @@ namespace Leap.Unity.Interaction {
           DisableInteraction();
         }
       }
+    }
+
+    /// <summary>
+    /// Calling this method registers this object with the manager.  A shape definition must be registered
+    /// with the manager before interaction can be enabled.
+    /// </summary>
+    public virtual void EnableInteraction() {
+      if (_isRegisteredWithManager) {
+        return;
+      }
+
+      if (_manager == null) {
+        throw new NoManagerSpecifiedException();
+      }
+
+      _manager.RegisterInteractionBehaviour(this);
+    }
+
+    /// <summary>
+    /// Calling this method will unregister this object from the manager.
+    /// </summary>
+    public virtual void DisableInteraction() {
+      if (!_isRegisteredWithManager) {
+        return;
+      }
+
+      if (_manager == null) {
+        throw new NoManagerSpecifiedException();
+      }
+
+      _manager.UnregisterInteractionBehaviour(this);
     }
 
     /// <summary>
@@ -173,6 +206,30 @@ namespace Leap.Unity.Interaction {
       return _graspingIds.Contains(handId);
     }
 
+    public virtual void AddLinearAcceleration(Vector3 linearAcceleration) {
+      _accumulatedLinearAcceleration += linearAcceleration;
+    }
+
+    public virtual void AddAngularAcceleration(Vector3 angularAcceleration) {
+      _accumulatedAngularAcceleration += angularAcceleration;
+    }
+    #endregion
+
+    #region MANAGER CALLBACKS
+    /// <summary>
+    /// Called by InteractionManager when the behaviour is successfully registered with the manager.
+    /// </summary>
+    public virtual void OnRegister() {
+      _isRegisteredWithManager = true;
+    }
+
+    /// <summary>
+    /// Called by InteractionManager when the behaviour has been unregistered from the manager.
+    /// </summary>
+    public virtual void OnUnregister() {
+      _isRegisteredWithManager = false;
+    }
+
     /// <summary>
     /// Called by InteractionManager when the interaction shape associated with this InteractionBehaviour
     /// is created and added to the interaction scene.
@@ -181,6 +238,21 @@ namespace Leap.Unity.Interaction {
     public virtual void OnInteractionShapeCreated(LEAP_IE_SHAPE_INSTANCE_HANDLE instanceHandle) {
       _shapeInstanceHandle = instanceHandle;
       _hasShapeInstanceHandle = true;
+    }
+
+    /// <summary>
+    /// Called by InteractionManager to get the information used to update the internal representation
+    /// of the shape instance.  
+    /// </summary>
+    /// <returns></returns>
+    public virtual LEAP_IE_UPDATE_SHAPE_INFO OnInteractionShapeUpdate() {
+      LEAP_IE_UPDATE_SHAPE_INFO info = new LEAP_IE_UPDATE_SHAPE_INFO();
+      info.updateFlags = eLeapIEUpdateFlags.eLeapIEUpdateFlags_ApplyAcceleration;
+      info.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
+      info.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
+      _accumulatedLinearAcceleration = Vector3.zero;
+      _accumulatedAngularAcceleration = Vector3.zero;
+      return info;
     }
 
     /// <summary>
@@ -274,48 +346,9 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Called by InteractionController when the velocity of an object is changed.
+    /// Called by InteractionManager when the velocity of an object is changed.
     /// </summary>
     public virtual void OnVelocityChanged(Vector3 linearVelocity, Vector3 angularVelocity) { }
-
-    public virtual void OnRegister() {
-      _isRegisteredWithManager = true;
-    }
-
-    public virtual void OnUnregister() {
-      _isRegisteredWithManager = false;
-    }
-
-    /// <summary>
-    /// Calling this method registers this object with the manager.  A shape definition must be registered
-    /// with the manager before interaction can be enabled.
-    /// </summary>
-    public virtual void EnableInteraction() {
-      if (_isRegisteredWithManager) {
-        return;
-      }
-
-      if (_manager == null) {
-        throw new NoManagerSpecifiedException();
-      }
-
-      _manager.RegisterInteractionBehaviour(this);
-    }
-
-    /// <summary>
-    /// Calling this method will unregister this object from the manager.
-    /// </summary>
-    public virtual void DisableInteraction() {
-      if (!_isRegisteredWithManager) {
-        return;
-      }
-
-      if (_manager == null) {
-        throw new NoManagerSpecifiedException();
-      }
-
-      _manager.UnregisterInteractionBehaviour(this);
-    }
     #endregion
 
     #region PROTECTED METHODS

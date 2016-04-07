@@ -374,8 +374,7 @@ namespace Leap.Unity.Interaction {
         try {
           LEAP_IE_SHAPE_INSTANCE_HANDLE shapeInstanceHandle = interactionBehaviour.ShapeInstanceHandle;
           LEAP_IE_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
-          LEAP_IE_UPDATE_SHAPE_INFO updateInfo = new LEAP_IE_UPDATE_SHAPE_INFO();
-          updateInfo.updateFlags = eLeapIEUpdateFlags.eLeapIEUpdateFlags_None;
+          LEAP_IE_UPDATE_SHAPE_INFO updateInfo = interactionBehaviour.OnInteractionShapeUpdate();
           InteractionC.UpdateShape(ref _scene, ref interactionTransform, ref updateInfo, ref shapeInstanceHandle);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
