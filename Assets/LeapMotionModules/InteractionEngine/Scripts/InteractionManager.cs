@@ -2,6 +2,7 @@
 using UnityEngine.Assertions;
 using System;
 using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using Leap.Unity.Interaction.CApi;
 
@@ -45,6 +46,7 @@ namespace Leap.Unity.Interaction {
     protected ShapeDescriptionPool _shapeDescriptionPool;
 
     private bool _hasSceneBeenCreated = false;
+    private Coroutine _simulationCoroutine = null;
     protected LEAP_IE_SCENE _scene;
 
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
@@ -262,6 +264,8 @@ namespace Leap.Unity.Interaction {
           Debug.LogException(e);
         }
       }
+
+      _simulationCoroutine = StartCoroutine(simulationLoop());
     }
 
     protected virtual void OnDisable() {
@@ -300,16 +304,11 @@ namespace Leap.Unity.Interaction {
       if (_hasSceneBeenCreated) {
         InteractionC.DestroyScene(ref _scene);
       }
-    }
 
-    protected virtual void FixedUpdate() {
-      simulateFrame(_leapProvider.CurrentFrame);
-
-      if (_showDebugLines) {
-        InteractionC.DrawDebugLines(ref _scene);
+      if (_simulationCoroutine != null) {
+        StopCoroutine(_simulationCoroutine);
+        _simulationCoroutine = null;
       }
-
-      InteractionC.GetDebugStrings(ref _scene, _debugOutput);
     }
 
     protected virtual void LateUpdate() {
@@ -326,6 +325,21 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL METHODS
+    private IEnumerator simulationLoop() {
+      WaitForFixedUpdate fixedUpdate = new WaitForFixedUpdate();
+      while (true) {
+        yield return fixedUpdate;
+
+        simulateFrame(_leapProvider.CurrentFrame);
+
+        if (_showDebugLines) {
+          InteractionC.DrawDebugLines(ref _scene);
+        }
+
+        InteractionC.GetDebugStrings(ref _scene, _debugOutput);
+      }
+    }
+
     protected virtual void simulateFrame(Frame frame) {
       updateInteractionRepresentations();
 
