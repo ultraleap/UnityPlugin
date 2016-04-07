@@ -15,9 +15,7 @@ namespace Leap.Unity.Interaction {
 
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
 
-    protected Rigidbody _rigidbody;
     private bool _shouldNextSolveBeTeleport = false;
-    private bool _rigidbodyHadUseGravity = false;
 
     protected LEAP_IE_KABSCH _kabsch;
 
@@ -45,34 +43,6 @@ namespace Leap.Unity.Interaction {
     public override void DisableInteraction() {
       base.DisableInteraction();
       KabschC.Destruct(ref _kabsch);
-    }
-
-    public override void OnRegister() {
-      base.OnRegister();
-
-      _rigidbody = GetComponent<Rigidbody>();
-      if (_rigidbody != null) {
-        _rigidbodyHadUseGravity = _rigidbody.useGravity;
-        _rigidbody.useGravity = false;
-      }
-    }
-
-    public override void OnUnregister() {
-      base.OnUnregister();
-
-      if (_rigidbody != null) {
-        _rigidbody.useGravity = _rigidbodyHadUseGravity;
-        _rigidbody = null;
-      }
-    }
-
-    public override void OnVelocityChanged(Vector3 linearVelocity, Vector3 angularVelocity) {
-      base.OnVelocityChanged(linearVelocity, angularVelocity);
-
-      if (_rigidbody != null) {
-        _rigidbody.velocity = linearVelocity;
-        _rigidbody.angularVelocity = angularVelocity;
-      }
     }
 
     public override void OnHandGrasp(Hand hand) {
@@ -155,17 +125,13 @@ namespace Leap.Unity.Interaction {
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
 
-      if (_rigidbody != null) {
-        _rigidbody.isKinematic = true;
-      }
+      _rigidbody.isKinematic = true;
     }
 
     protected override void OnGraspEnd() {
       base.OnGraspEnd();
 
-      if (_rigidbody != null) {
-        _rigidbody.isKinematic = false;
-      }
+      _rigidbody.isKinematic = false;
     }
     #endregion
 

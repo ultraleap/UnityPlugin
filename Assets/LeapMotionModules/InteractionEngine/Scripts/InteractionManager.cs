@@ -577,7 +577,7 @@ namespace Leap.Unity.Interaction {
         InteractionBehaviourBase interactionBehaviour = _instanceHandleToBehaviour[vel.handle];
 
         try {
-          interactionBehaviour.OnVelocityChanged(vel.linearVelocity.ToVector3(), vel.angularVelocity.ToVector3());
+          interactionBehaviour.OnReceiveVelocityUpdate(vel.linearVelocity.ToVector3(), vel.angularVelocity.ToVector3());
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);

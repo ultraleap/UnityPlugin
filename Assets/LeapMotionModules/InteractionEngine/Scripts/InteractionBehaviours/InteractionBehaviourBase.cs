@@ -6,12 +6,16 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
+  [RequireComponent(typeof(Rigidbody))]
   [DisallowMultipleComponent]
   public abstract class InteractionBehaviourBase : MonoBehaviour {
 
     #region SERIALIZED FIELDS
     [SerializeField]
     protected InteractionManager _manager;
+
+    [SerializeField]
+    protected bool _recieveVelocityUpdates = true;
     #endregion
 
     #region INTERNAL FIELDS
@@ -22,6 +26,9 @@ namespace Leap.Unity.Interaction {
 
     private bool _hasShapeInstanceHandle = false;
     private LEAP_IE_SHAPE_INSTANCE_HANDLE _shapeInstanceHandle;
+
+    protected Rigidbody _rigidbody;
+    private bool _rigidbodyUsesGravity;
 
     private List<int> _graspingIds = new List<int>();
     private List<int> _untrackedIds = new List<int>();
@@ -221,6 +228,14 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public virtual void OnRegister() {
       _isRegisteredWithManager = true;
+
+      _rigidbody = GetComponent<Rigidbody>();
+      if (_rigidbody == null) {
+        throw new InvalidOperationException("InteractionBehaviour must have a Rigidbody component.");
+      }
+
+      _rigidbodyUsesGravity = _rigidbody.useGravity;
+      _rigidbody.useGravity = false;
     }
 
     /// <summary>
@@ -228,6 +243,8 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public virtual void OnUnregister() {
       _isRegisteredWithManager = false;
+
+      _rigidbody.useGravity = _rigidbodyUsesGravity;
     }
 
     /// <summary>
@@ -249,7 +266,7 @@ namespace Leap.Unity.Interaction {
       LEAP_IE_UPDATE_SHAPE_INFO info = new LEAP_IE_UPDATE_SHAPE_INFO();
 
       //TODO: Actually apply acceleration
-      info.updateFlags = eLeapIEUpdateFlags.eLeapIEUpdateFlags_None;  
+      info.updateFlags = eLeapIEUpdateFlags.eLeapIEUpdateFlags_None;
       info.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
       info.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
       _accumulatedLinearAcceleration = Vector3.zero;
@@ -350,7 +367,16 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called by InteractionManager when the velocity of an object is changed.
     /// </summary>
-    public virtual void OnVelocityChanged(Vector3 linearVelocity, Vector3 angularVelocity) { }
+    public virtual void OnReceiveVelocityUpdate(Vector3 linearVelocity, Vector3 angularVelocity) {
+      _rigidbody.velocity = linearVelocity;
+      _rigidbody.angularVelocity = angularVelocity;
+    }
+
+    public virtual void OnReciveNoVelocityUpdate() {
+      _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
+      _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
+      _rigidbody.AddForce(Physics.gravity, ForceMode.Acceleration);
+    }
     #endregion
 
     #region PROTECTED METHODS
