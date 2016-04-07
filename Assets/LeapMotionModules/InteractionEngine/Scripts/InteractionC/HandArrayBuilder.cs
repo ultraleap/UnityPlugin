@@ -23,7 +23,6 @@ namespace Leap.Unity.Interaction.CApi {
 
       LEAP_PALM palm = new LEAP_PALM();
       palm.position = new LEAP_VECTOR(hand.PalmPosition);
-      palm.stabilized_position = new LEAP_VECTOR(hand.StabilizedPalmPosition);
       palm.velocity = new LEAP_VECTOR(hand.PalmVelocity);
       palm.normal = new LEAP_VECTOR(hand.PalmNormal);
       palm.width = hand.PalmWidth;
