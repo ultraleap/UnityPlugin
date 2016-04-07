@@ -118,6 +118,11 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public void UpdateSceneInfo() {
+      var info = getSceneInfo();
+      InteractionC.UpdateSceneInfo(ref _scene, ref info);
+    }
+
     /// <summary>
     /// Tries to find an InteractionObject that is currently being grasped by a Hand with
     /// the given ID.
@@ -243,9 +248,7 @@ namespace Leap.Unity.Interaction {
       Assert.IsFalse(_hasSceneBeenCreated, "Scene should not have been created yet");
 
       try {
-        LEAP_IE_SCENE_INFO sceneInfo = new LEAP_IE_SCENE_INFO();
-        sceneInfo.sceneFlags = eLeapIESceneFlags.eLeapIESceneFlags_HasGravity;
-        sceneInfo.gravity = Physics.gravity.ToCVector();
+        LEAP_IE_SCENE_INFO sceneInfo = getSceneInfo();
         string dataPath = Path.Combine(Application.streamingAssetsPath, _dataSubfolder);
         InteractionC.CreateScene(ref _scene, ref sceneInfo, dataPath);
 
@@ -629,6 +632,13 @@ namespace Leap.Unity.Interaction {
         }
         _misbehavingBehaviours.Clear();
       }
+    }
+
+    private LEAP_IE_SCENE_INFO getSceneInfo() {
+      LEAP_IE_SCENE_INFO info = new LEAP_IE_SCENE_INFO();
+      info.gravity = Physics.gravity.ToCVector();
+      info.sceneFlags = eLeapIESceneFlags.eLeapIESceneFlags_HasGravity;
+      return info;
     }
 
     //A persistant structure for storing useful data about a hand as it interacts with objects
