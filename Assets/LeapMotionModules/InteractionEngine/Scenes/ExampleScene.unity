@@ -1131,7 +1131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _leapProvider: {fileID: 972296616}
   _untrackedTimeout: 0.5
-  _modifyVelocities: 0
+  _modifyVelocities: 1
   _showDebugLines: 1
   _showDebugOutput: 1
 --- !u!4 &1473219678

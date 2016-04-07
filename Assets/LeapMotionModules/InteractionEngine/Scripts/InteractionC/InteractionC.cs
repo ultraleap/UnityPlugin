@@ -57,7 +57,8 @@ namespace Leap.Unity.Interaction.CApi {
   public enum eLeapIEDebugFlags : uint {
     eLeapIEDebugFlags_None = 0x00,
     eLeapIEDebugFlags_Lines = 0x01,
-    eLeapIEDebugFlags_Logging = 0x02
+    eLeapIEDebugFlags_Logging = 0x02,
+    eLeapIEListenerFlags_Strings = 0x04,
   };
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -425,10 +426,10 @@ namespace Leap.Unity.Interaction.CApi {
     public static eLeapIERS GetDebugStrings(ref LEAP_IE_SCENE scene,
                                                 List<string> strings) {
       Logger.Log("Get Debug Strings", LogLevel.AllCalls);
-      
+
       UInt32 nStrings;
       IntPtr pppStrings;
-      var rs = LeapIEGetDebugLines(ref scene, out nStrings, out pppStrings);
+      var rs = LeapIEGetDebugStrings(ref scene, out nStrings, out pppStrings);
 
       strings.Clear();
       for (int i = 0; i < nStrings; i++) {
