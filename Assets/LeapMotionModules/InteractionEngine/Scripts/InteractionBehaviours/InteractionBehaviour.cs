@@ -6,6 +6,7 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
+  [SelectionBase]
   [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviour : InteractionBehaviourBase {
     public const int NUM_FINGERS = 5;
