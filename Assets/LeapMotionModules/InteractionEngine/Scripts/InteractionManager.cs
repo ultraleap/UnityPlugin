@@ -620,9 +620,6 @@ namespace Leap.Unity.Interaction {
 
       interactionBehaviour.OnInteractionShapeDestroyed();
     }
-    #endregion
-
-    #region INTERNAL
 
     private void unregisterMisbehavingBehaviours() {
       if (_misbehavingBehaviours.Count > 0) {
