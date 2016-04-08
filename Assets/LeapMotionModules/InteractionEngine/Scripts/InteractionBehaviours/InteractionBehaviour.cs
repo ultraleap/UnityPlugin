@@ -27,7 +27,7 @@ namespace Leap.Unity.Interaction {
     protected bool _useGravity;
     protected bool _recievedVelocityUpdate = false;
     protected bool _notifiedOfTeleport = false;
-    
+
     protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
 
@@ -115,11 +115,13 @@ namespace Leap.Unity.Interaction {
 
 #if UNITY_EDITOR
       Collider[] colliders = GetComponentsInChildren<Collider>();
-      _debugBounds = colliders[0].bounds;
-      for (int i = 1; i < colliders.Length; i++) {
-        _debugBounds.Encapsulate(colliders[i].bounds);
+      if (colliders.Length > 0) {
+        _debugBounds = colliders[0].bounds;
+        for (int i = 1; i < colliders.Length; i++) {
+          _debugBounds.Encapsulate(colliders[i].bounds);
+        }
+        _debugBounds.center = transform.InverseTransformPoint(_debugBounds.center);
       }
-      _debugBounds.center = transform.InverseTransformPoint(_debugBounds.center);
 #endif
     }
 
