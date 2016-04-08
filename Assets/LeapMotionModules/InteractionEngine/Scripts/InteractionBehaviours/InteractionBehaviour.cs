@@ -21,13 +21,13 @@ namespace Leap.Unity.Interaction {
     protected bool _pushingEnabled = true;
 
     protected Renderer[] _renderers;
-
     protected Rigidbody _rigidbody;
-    protected bool _recievedVelocityUpdate = false;
-    protected bool _notifiedOfTeleport = false;
 
     protected bool _isKinematic;
     protected bool _useGravity;
+    protected bool _recievedVelocityUpdate = false;
+    protected bool _notifiedOfTeleport = false;
+    
     protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
 
@@ -83,7 +83,7 @@ namespace Leap.Unity.Interaction {
         _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
         _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
         if (_useGravity) {
-          _rigidbody.AddForce(Physics.gravity);
+          _rigidbody.AddForce(Physics.gravity, ForceMode.Acceleration);
         }
       }
 
