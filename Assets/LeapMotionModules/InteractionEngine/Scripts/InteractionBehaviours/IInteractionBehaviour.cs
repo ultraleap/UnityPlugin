@@ -132,7 +132,9 @@ namespace Leap.Unity.Interaction {
     void OnHandGrasp(Hand hand);
 
     /// <summary>
-    /// Called by InteractionManager every frame that a Hand continues to grasp this object.
+    /// Called by InteractionManager every frame that a Hand continues to grasp this object.  This callback
+    /// is invoked both in FixedUpdate, and also in LateUpdate.  This gives all objects a chance to both update
+    /// their physical representation as well as their graphical, for decreased latency and increase fidelity.
     /// </summary>
     void OnHandsHold(List<Hand> hands);
 
