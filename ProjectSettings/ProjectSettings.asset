@@ -10,7 +10,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: LeapMotion
-  productName: OrionGearVR
+  productName: PinchMoveCardboard
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_ShowUnitySplashScreen: 0
@@ -89,13 +89,13 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleIdentifier: com.leapmotion.oriongearvr
+  bundleIdentifier: com.leapmotion.pinchmovecardboard
   bundleVersion: 1.0
   preloadedAssets: []
   metroEnableIndependentInputSource: 0
   metroEnableLowLatencyPresentationAPI: 0
   xboxOneDisableKinectGpuReservation: 0
-  virtualRealitySupported: 1
+  virtualRealitySupported: 0
   productGUID: 7095a052d2dfd6642a958de988530851
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 19
