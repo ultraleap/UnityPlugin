@@ -215,14 +215,26 @@ namespace Leap.Unity.Interaction {
       return _graspingIds.Contains(handId);
     }
 
+    /// <summary>
+    /// Should be called if the object is ever teleported.  If this method is not called, it will always be
+    /// assumed that the object moved smoothly from it's previous position, potentially causing large forces.
+    /// </summary>
     public virtual void NotifyTeleported() {
       _notifiedOfTeleport = true;
     }
 
+    /// <summary>
+    /// Add linear acceleration to the center of mass of the object.  Use this instead of Rigidbody.AddForce().
+    /// </summary>
+    /// <param name="linearAcceleration"></param>
     public virtual void AddLinearAcceleration(Vector3 linearAcceleration) {
       _accumulatedLinearAcceleration += linearAcceleration;
     }
 
+    /// <summary>
+    /// Add angular acceleration to the center of mass of the object.  Use this instead of Rigidbody.AddTorque().
+    /// </summary>
+    /// <param name="angularAcceleration"></param>
     public virtual void AddAngularAcceleration(Vector3 angularAcceleration) {
       _accumulatedAngularAcceleration += angularAcceleration;
     }
