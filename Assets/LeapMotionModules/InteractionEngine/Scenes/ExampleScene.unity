@@ -1121,7 +1121,7 @@ MonoBehaviour:
   _dataSubfolder: InteractionEngine
   _untrackedTimeout: 0.5
   _modifyVelocities: 1
-  _showDebugLines: 1
+  _showDebugLines: 0
   _showDebugOutput: 1
 --- !u!4 &1473219678
 Transform:

@@ -97,6 +97,15 @@ namespace Leap.Unity.Interaction {
     public override void OnInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
       createInfo = new INTERACTION_CREATE_SHAPE_INFO();
       createInfo.gravity = Physics.gravity.ToCVector();
+      createInfo.shapeFlags = ShapeInfoFlags.None;
+
+      if (!_isKinematic) {
+        createInfo.shapeFlags |= ShapeInfoFlags.HasRigidBody;
+      }
+
+      if (_useGravity) {
+        createInfo.shapeFlags |= ShapeInfoFlags.GravityEnabled;
+      }
 
       createTransform = getRigidbodyTransform();
     }
