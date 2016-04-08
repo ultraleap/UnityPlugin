@@ -371,7 +371,7 @@ namespace Leap.Unity.Interaction {
 
       // TODO: Pass a debug flag to disable calculating velocities.
       if (_modifyVelocities) {
-        setObjectVelocities();
+        dispatchSimulationResults();
       }
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
@@ -582,7 +582,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void setObjectVelocities() {
+    protected virtual void dispatchSimulationResults() {
       InteractionC.GetVelocities(ref _scene, _resultList);
 
       for (int i = 0; i < _resultList.Count; ++i) {
