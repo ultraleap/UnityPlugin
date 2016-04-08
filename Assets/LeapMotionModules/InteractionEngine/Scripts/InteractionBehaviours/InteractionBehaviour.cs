@@ -11,11 +11,14 @@ namespace Leap.Unity.Interaction {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 
-    [SerializeField]
-    protected bool _pushingEnabled = true;
-
+    [Tooltip("A transform that acts as the parent of all renderers for this object.  By seperating out the graphical " +
+             "representation from the physical, interaction fidelity can be improved and latency reduced.")]
     [SerializeField]
     protected Transform _graphicalAnchor;
+
+    [Tooltip("Should a hand be able to impart pushing forces to this object.")]
+    [SerializeField]
+    protected bool _pushingEnabled = true;
 
     protected Renderer[] _renderers;
 
@@ -30,6 +33,8 @@ namespace Leap.Unity.Interaction {
 
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
     protected LEAP_IE_KABSCH _kabsch;
+
+    protected Bounds _debugBounds;
 
     #region PUBLIC METHODS
     public void AddLinearAcceleration(Vector3 acceleration) {
@@ -92,6 +97,21 @@ namespace Leap.Unity.Interaction {
     public override void OnInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
       createInfo = new INTERACTION_CREATE_SHAPE_INFO();
       createInfo.gravity = Physics.gravity.ToCVector();
+
+      createTransform = getRigidbodyTransform();
+    }
+
+    public override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
+      base.OnInteractionShapeCreated(instanceHandle);
+
+#if UNITY_EDITOR
+      Collider[] colliders = GetComponentsInChildren<Collider>();
+      _debugBounds = colliders[0].bounds;
+      for (int i = 1; i < colliders.Length; i++) {
+        _debugBounds.Encapsulate(colliders[i].bounds);
+      }
+      _debugBounds.center = transform.InverseTransformPoint(_debugBounds.center);
+#endif
     }
 
     public override void OnInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTrasnform) {
@@ -100,10 +120,7 @@ namespace Leap.Unity.Interaction {
       updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
       updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
 
-      interactionTrasnform = new INTERACTION_TRANSFORM();
-      interactionTrasnform.position = _rigidbody.position.ToCVector();
-      interactionTrasnform.rotation = _rigidbody.rotation.ToCQuaternion();
-      interactionTrasnform.wallTime = Time.fixedTime;
+      interactionTrasnform = getRigidbodyTransform();
     }
 
     public override void OnRecieveSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
@@ -222,9 +239,27 @@ namespace Leap.Unity.Interaction {
     protected virtual void Awake() {
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
     }
+
+    protected virtual void OnDrawGizmos() {
+      Matrix4x4 gizmosMatrix = Gizmos.matrix;
+
+      Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
+      Gizmos.color = IsBeingGrasped ? Color.green : Color.blue;
+      Gizmos.DrawWireCube(_debugBounds.center, _debugBounds.size);
+
+      Gizmos.matrix = gizmosMatrix;
+    }
     #endregion
 
     #region INTERNAL
+    protected INTERACTION_TRANSFORM getRigidbodyTransform() {
+      INTERACTION_TRANSFORM interactionTransform = new INTERACTION_TRANSFORM();
+      interactionTransform.position = _rigidbody.position.ToCVector();
+      interactionTransform.rotation = _rigidbody.rotation.ToCQuaternion();
+      interactionTransform.wallTime = Time.fixedTime;
+      return interactionTransform;
+    }
+
     protected virtual void updateRendererStatus() {
       //Renderers are visible if there are no grasping hands
       //or if there is at least one tracked grasping hand
