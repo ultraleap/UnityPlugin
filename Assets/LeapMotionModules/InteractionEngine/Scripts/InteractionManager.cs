@@ -619,8 +619,6 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-
-
     protected virtual void createInteractionShape(InteractionBehaviourBase interactionBehaviour) {
       INTERACTION_SHAPE_DESCRIPTION_HANDLE descriptionHandle = interactionBehaviour.ShapeDescriptionHandle;
       INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
