@@ -728,7 +728,7 @@ MonoBehaviour:
   _isHeadMounted: 1
   _overrideDeviceType: 1
   _overrideDeviceTypeWith: 1
-  _useInterpolation: 0
+  _useInterpolation: 1
   _interpolationDelay: 15
 --- !u!114 &972296617
 MonoBehaviour:
@@ -1040,6 +1040,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 1473219677}
+  _recieveVelocityUpdates: 1
   _toggledRenderers:
   - {fileID: 1390993041}
 --- !u!54 &1390993039
@@ -1130,6 +1131,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _leapProvider: {fileID: 972296616}
+  _dataSubfolder: InteractionEngine
   _untrackedTimeout: 0.5
   _modifyVelocities: 1
   _showDebugLines: 1
@@ -1182,6 +1184,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 1473219677}
+  _recieveVelocityUpdates: 1
 --- !u!135 &1700929374
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1272,6 +1275,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 1473219677}
+  _recieveVelocityUpdates: 1
   _toggledRenderers:
   - {fileID: 1721542083}
 --- !u!4 &1721542081
@@ -1381,6 +1385,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 1473219677}
+  _recieveVelocityUpdates: 1
 --- !u!135 &1759218969
 SphereCollider:
   m_ObjectHideFlags: 0
