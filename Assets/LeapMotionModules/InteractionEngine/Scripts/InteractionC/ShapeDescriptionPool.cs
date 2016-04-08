@@ -140,6 +140,7 @@ namespace Leap.Unity.Interaction.CApi {
         Collider collider = _tempColliderList[0];
 
         if (collider.gameObject != parentObject) {
+          //TODO: break out of single collider optimization in this case
           throw new NotImplementedException("Child colliders are currently not supported.");
         }
 
@@ -149,6 +150,7 @@ namespace Leap.Unity.Interaction.CApi {
           SphereCollider sphereCollider = collider as SphereCollider;
 
           if (sphereCollider.center != Vector3.zero) {
+            //TODO: break out of single collider optimization in this case
             throw new NotImplementedException("Colliders with non-zero centers are currently not supported.");
           }
 
@@ -157,6 +159,7 @@ namespace Leap.Unity.Interaction.CApi {
           BoxCollider boxCollider = collider as BoxCollider;
 
           if (boxCollider.center != Vector3.zero) {
+            //TODO: break out of single collider optimization in this case
             throw new NotImplementedException("Colliders with non-zero centers are currently not supported.");
           }
 
