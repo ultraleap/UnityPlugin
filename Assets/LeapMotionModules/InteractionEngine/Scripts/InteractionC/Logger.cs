@@ -14,7 +14,7 @@ namespace Leap.Unity.Interaction.CApi {
   }
 
   public static class Logger {
-    public static LogLevel logLevel = LogLevel.Info;
+    public static LogLevel logLevel = LogLevel.Warning;
 
     [Conditional("ENABLE_LOGGING")]
     public static void HandleReturnStatus(ReturnStatus rs) {
