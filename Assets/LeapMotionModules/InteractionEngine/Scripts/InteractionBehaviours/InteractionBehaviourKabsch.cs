@@ -1,41 +1,120 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections.Generic;
 using LeapInternal;
 using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
+  [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviourKabsch : InteractionBehaviourBase {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 
-    [Tooltip("Renderers to turn off when the object is grasped by untracked hands.")]
     [SerializeField]
-    protected Renderer[] _toggledRenderers;
+    protected bool _pushingEnabled = true;
+
+    [SerializeField]
+    protected Transform _graphicalAnchor;
+
+    protected Renderer[] _renderers;
+
+    protected Rigidbody _rigidbody;
+    protected bool _recievedVelocityUpdate = false;
+    protected bool _notifiedOfTeleport = false;
+
+    protected bool _isKinematic;
+    protected bool _useGravity;
+    protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
+    protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
 
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
-
     protected LEAP_IE_KABSCH _kabsch;
+
+    #region PUBLIC METHODS
+    public void AddLinearAcceleration(Vector3 acceleration) {
+      _accumulatedLinearAcceleration += acceleration;
+    }
+
+    public void AddAngularAcceleration(Vector3 acceleration) {
+      _accumulatedAngularAcceleration += acceleration;
+    }
+
+    public void NotifyTeleported() {
+      _notifiedOfTeleport = true;
+    }
+    #endregion
 
     #region INTERACTION CALLBACKS
 
-    public override INTERACTION_TRANSFORM InteractionTransform {
-      get {
-        INTERACTION_TRANSFORM interactionTransform = new INTERACTION_TRANSFORM();
-        interactionTransform.position = _rigidbody.position.ToCVector();
-        interactionTransform.rotation = _rigidbody.rotation.ToCQuaternion();
-        return interactionTransform;
-      }
-    }
-
     public override void OnRegister() {
       base.OnRegister();
+
+      _rigidbody = GetComponent<Rigidbody>();
+      if (_rigidbody == null) {
+        throw new InvalidOperationException("InteractionBehaviour must have a Rigidbody component attached to it.");
+      }
+
+      _isKinematic = _rigidbody.isKinematic;
+      _useGravity = _rigidbody.useGravity;
+
+      //Gravity is always manually applied
+      _rigidbody.useGravity = false;
+
       KabschC.Construct(ref _kabsch);
     }
 
-    protected override void OnDisable() {
-      base.OnDisable();
+    public override void OnUnregister() {
+      base.OnUnregister();
+
+      _rigidbody.useGravity = _useGravity;
       KabschC.Destruct(ref _kabsch);
+    }
+
+    public override void OnPostSolve() {
+      base.OnPreSolve();
+
+      if (!_recievedVelocityUpdate) {
+        _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
+        _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
+        if (_useGravity) {
+          _rigidbody.AddForce(Physics.gravity);
+        }
+      }
+
+      _accumulatedLinearAcceleration = Vector3.zero;
+      _accumulatedAngularAcceleration = Vector3.zero;
+
+      _notifiedOfTeleport = false;
+      _recievedVelocityUpdate = false;
+    }
+
+    public override void OnInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
+      createInfo = new INTERACTION_CREATE_SHAPE_INFO();
+      createInfo.gravity = Physics.gravity.ToCVector();
+    }
+
+    public override void OnInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTrasnform) {
+      updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
+      updateInfo.updateFlags = _notifiedOfTeleport ? UpdateInfoFlags.ResetVelocity : UpdateInfoFlags.ApplyAcceleration;
+      updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
+      updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
+
+      interactionTrasnform = new INTERACTION_TRANSFORM();
+      interactionTrasnform.position = _rigidbody.position.ToCVector();
+      interactionTrasnform.rotation = _rigidbody.rotation.ToCQuaternion();
+      interactionTrasnform.wallTime = Time.fixedTime;
+    }
+
+    public override void OnRecieveSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
+      base.OnRecieveSimulationResults(results);
+
+      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
+        _rigidbody.Sleep();
+        _rigidbody.velocity = results.linearVelocity.ToVector3();
+        _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
+        _recievedVelocityUpdate = true;
+      }
     }
 
     public override void OnHandGrasp(Hand hand) {
@@ -85,6 +164,9 @@ namespace Leap.Unity.Interaction {
         _rigidbody.MovePosition(newPosition);
         _rigidbody.MoveRotation(newRotation);
       }
+
+      _graphicalAnchor.position = newPosition;
+      _graphicalAnchor.rotation = newRotation;
     }
 
     public override void OnHandRelease(Hand hand) {
@@ -122,7 +204,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
 
-      if (_rigidbody != null) {
+      if (!_isKinematic) {
         _rigidbody.isKinematic = true;
       }
     }
@@ -130,18 +212,13 @@ namespace Leap.Unity.Interaction {
     protected override void OnGraspEnd() {
       base.OnGraspEnd();
 
-      if (_rigidbody != null) {
+      if (!_isKinematic) {
         _rigidbody.isKinematic = false;
       }
     }
     #endregion
 
     #region UNITY CALLBACKS
-    protected override void Reset() {
-      base.Reset();
-      _toggledRenderers = GetComponentsInChildren<Renderer>();
-    }
-
     protected virtual void Awake() {
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
     }
@@ -154,12 +231,7 @@ namespace Leap.Unity.Interaction {
       int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;
       bool shouldBeVisible = GraspingHandCount == 0 || trackedGraspingHandCount > 0;
 
-      for (int i = 0; i < _toggledRenderers.Length; i++) {
-        Renderer renderer = _toggledRenderers[i];
-        if (renderer != null) {
-          renderer.enabled = shouldBeVisible;
-        }
-      }
+      _graphicalAnchor.gameObject.SetActive(shouldBeVisible);
     }
 
     protected void removeHandPointCollection(int handId) {

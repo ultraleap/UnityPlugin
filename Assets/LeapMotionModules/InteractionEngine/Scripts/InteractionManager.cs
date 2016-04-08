@@ -321,6 +321,8 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void LateUpdate() {
+      dispatchOnHandsHolding(_leapProvider.CurrentFrame);
+
       unregisterMisbehavingBehaviours();
     }
 
@@ -361,13 +363,15 @@ namespace Leap.Unity.Interaction {
         _registeredBehaviours[i].OnPreSolve();
       }
 
+      dispatchOnHandsHolding(frame);
+
       updateInteractionRepresentations();
 
       updateTracking(frame);
 
       simulateInteraction();
 
-      updateInteractionStateChanges();
+      updateInteractionStateChanges(frame);
 
       // TODO: Pass a debug flag to disable calculating velocities.
       if (_modifyVelocities) {
@@ -388,13 +392,40 @@ namespace Leap.Unity.Interaction {
         InteractionBehaviourBase interactionBehaviour = _registeredBehaviours[i];
         try {
           INTERACTION_SHAPE_INSTANCE_HANDLE shapeInstanceHandle = interactionBehaviour.ShapeInstanceHandle;
-          INTERACTION_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
-          INTERACTION_UPDATE_SHAPE_INFO updateInfo = interactionBehaviour.OnInteractionShapeUpdate();
-          InteractionC.UpdateShapeInstance(ref _scene, ref interactionTransform, ref updateInfo, ref shapeInstanceHandle);
+
+          INTERACTION_UPDATE_SHAPE_INFO updateInfo;
+          INTERACTION_TRANSFORM updateTransform;
+          interactionBehaviour.OnInteractionShapeUpdate(out updateInfo, out updateTransform);
+
+          InteractionC.UpdateShapeInstance(ref _scene, ref updateTransform, ref updateInfo, ref shapeInstanceHandle);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
         }
+      }
+    }
+
+    protected virtual void dispatchOnHandsHolding(Frame frame) {
+      var hands = frame.Hands;
+
+      //Loop through the currently grasped objects to dispatch their OnHandsHold callback
+      for (int i = 0; i < _graspedBehaviours.Count; i++) {
+        var interactionBehaviour = _graspedBehaviours[i];
+
+        for (int j = 0; j < hands.Count; j++) {
+          if (interactionBehaviour.IsBeingGraspedByHand(hands[j].Id)) {
+            _holdingHands.Add(hands[j]);
+          }
+        }
+
+        try {
+          interactionBehaviour.OnHandsHold(_holdingHands);
+        } catch (Exception e) {
+          _misbehavingBehaviours.Add(interactionBehaviour);
+          Debug.LogException(e);
+        }
+
+        _holdingHands.Clear();
       }
     }
 
@@ -414,8 +445,13 @@ namespace Leap.Unity.Interaction {
       InteractionC.UpdateController(ref _scene, ref _controllerTransform);
     }
 
-    protected virtual void updateInteractionStateChanges() {
-      var hands = _leapProvider.CurrentFrame.Hands;
+    private bool toggle = false;
+    protected virtual void updateInteractionStateChanges(Frame frame) {
+      var hands = frame.Hands;
+
+      if (Input.GetKeyDown(KeyCode.Space)) {
+        toggle = !toggle;
+      }
 
       //First loop through all the hands and get their classifications from the engine
       for (int i = 0; i < hands.Count; i++) {
@@ -425,6 +461,11 @@ namespace Leap.Unity.Interaction {
         InteractionC.GetHandResult(ref _scene,
                                        (uint)hand.Id,
                                    out handResult);
+
+        if (toggle) {
+          handResult.classification = ManipulatorMode.Grasp;
+          handResult.instanceHandle = _registeredBehaviours[0].ShapeInstanceHandle;
+        }
 
         //Get the InteractionHand associated with this hand id
         InteractionHand interactionHand;
@@ -560,26 +601,6 @@ namespace Leap.Unity.Interaction {
         _idToInteractionHand.Remove(_handIdsToRemove[i]);
       }
       _handIdsToRemove.Clear();
-
-      //Loop through the currently grasped objects to dispatch their OnHandsHold callback
-      for (int i = 0; i < _graspedBehaviours.Count; i++) {
-        var interactionBehaviour = _graspedBehaviours[i];
-
-        for (int j = 0; j < hands.Count; j++) {
-          if (interactionBehaviour.IsBeingGraspedByHand(hands[j].Id)) {
-            _holdingHands.Add(hands[j]);
-          }
-        }
-
-        try {
-          interactionBehaviour.OnHandsHold(_holdingHands);
-        } catch (Exception e) {
-          _misbehavingBehaviours.Add(interactionBehaviour);
-          Debug.LogException(e);
-        }
-
-        _holdingHands.Clear();
-      }
     }
 
     protected virtual void dispatchSimulationResults() {
@@ -598,13 +619,17 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+
+
     protected virtual void createInteractionShape(InteractionBehaviourBase interactionBehaviour) {
       INTERACTION_SHAPE_DESCRIPTION_HANDLE descriptionHandle = interactionBehaviour.ShapeDescriptionHandle;
       INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
-      INTERACTION_TRANSFORM interactionTransform = interactionBehaviour.InteractionTransform;
-      INTERACTION_CREATE_SHAPE_INFO createInfo = new INTERACTION_CREATE_SHAPE_INFO();
-      createInfo.shapeFlags = ShapeInfoFlags.HasRigidBody | ShapeInfoFlags.GravityEnabled;
-      InteractionC.CreateShapeInstance(ref _scene, ref descriptionHandle, ref interactionTransform, ref createInfo, out instanceHandle);
+
+      INTERACTION_CREATE_SHAPE_INFO createInfo;
+      INTERACTION_TRANSFORM createTransform;
+      interactionBehaviour.OnInteractionShapeCreationInfo(out createInfo, out createTransform);
+
+      InteractionC.CreateShapeInstance(ref _scene, ref descriptionHandle, ref createTransform, ref createInfo, out instanceHandle);
 
       _instanceHandleToBehaviour[instanceHandle] = interactionBehaviour;
 

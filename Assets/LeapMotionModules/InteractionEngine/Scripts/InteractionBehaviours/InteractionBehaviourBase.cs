@@ -6,16 +6,12 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
-  [RequireComponent(typeof(Rigidbody))]
   [DisallowMultipleComponent]
-  public abstract class InteractionBehaviourBase : MonoBehaviour {
+  public abstract class InteractionBehaviourBase : MonoBehaviour, IInteractionBehaviour {
 
     #region SERIALIZED FIELDS
     [SerializeField]
     protected InteractionManager _manager;
-
-    [SerializeField]
-    protected bool _recieveVelocityUpdates = true;
     #endregion
 
     #region INTERNAL FIELDS
@@ -27,22 +23,12 @@ namespace Leap.Unity.Interaction {
     private bool _hasShapeInstanceHandle = false;
     private INTERACTION_SHAPE_INSTANCE_HANDLE _shapeInstanceHandle;
 
-    protected Rigidbody _rigidbody;
-    private bool _rigidbodyUsesGravity;
-
     private List<int> _graspingIds = new List<int>();
     private List<int> _untrackedIds = new List<int>();
-
-    private bool _didRecieveVelocityUpdate = false;
-    protected bool _notifiedOfTeleport = false;
-    private Vector3 _accumulatedLinearAcceleration = Vector3.zero;
-    private Vector3 _accumulatedAngularAcceleration = Vector3.zero;
     #endregion
 
     #region PUBLIC METHODS
-    /// <summary>
-    /// Gets or sets the manager this object belongs to.
-    /// </summary>
+
     public InteractionManager Manager {
       get {
         return _manager;
@@ -60,10 +46,6 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    /// <summary>
-    /// Gets or Sets whether or not interaction is enabled for this object.  Setting is
-    /// equivilent to calling EnableInteraction() or DisableInteraction()
-    /// </summary>
     public bool IsInteractionEnabled {
       get {
         return _isRegisteredWithManager;
@@ -77,10 +59,6 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    /// <summary>
-    /// Calling this method registers this object with the manager.  A shape definition must be registered
-    /// with the manager before interaction can be enabled.
-    /// </summary>
     public virtual void EnableInteraction() {
       if (_isRegisteredWithManager) {
         return;
@@ -93,9 +71,6 @@ namespace Leap.Unity.Interaction {
       _manager.RegisterInteractionBehaviour(this);
     }
 
-    /// <summary>
-    /// Calling this method will unregister this object from the manager.
-    /// </summary>
     public virtual void DisableInteraction() {
       if (!_isRegisteredWithManager) {
         return;
@@ -108,9 +83,6 @@ namespace Leap.Unity.Interaction {
       _manager.UnregisterInteractionBehaviour(this);
     }
 
-    /// <summary>
-    /// Gets the handle to the internal shape description.
-    /// </summary>
     public INTERACTION_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
       get {
         if (!_isRegisteredWithManager) {
@@ -125,9 +97,6 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    /// <summary>
-    /// Gets the handle to the internal shape instance.
-    /// </summary>
     public INTERACTION_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
       get {
         if (!_hasShapeInstanceHandle) {
@@ -138,54 +107,30 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    /// <summary>
-    /// Gets the internal representation of the transform of the object.
-    /// </summary>
-    public abstract INTERACTION_TRANSFORM InteractionTransform {
-      get;
-    }
-
-    /// <summary>
-    /// Returns true if there is at least one hand grasping this object.
-    /// </summary>
     public bool IsBeingGrasped {
       get {
         return _graspingIds.Count > 0;
       }
     }
 
-    /// <summary>
-    /// Returns the number of hands that are currently grasping this object.
-    /// </summary>
     public int GraspingHandCount {
       get {
         return _graspingIds.Count;
       }
     }
 
-    /// <summary>
-    /// Returns the number of hands that are currently grasping this object but
-    /// are not currently being tracked.
-    /// </summary>
     public int UntrackedHandCount {
       get {
         return _untrackedIds.Count;
       }
     }
 
-    /// <summary>
-    /// Returns the ids of the hands currently grasping this object.
-    /// </summary>
     public IEnumerable<int> GraspingHands {
       get {
         return _graspingIds;
       }
     }
 
-    /// <summary>
-    /// Returns the ids of the hands currently grasping this object, but only
-    /// returns ids of hands that are also currently being tracked.
-    /// </summary>
     public IEnumerable<int> TrackedGraspingHands {
       get {
         for (int i = 0; i < _graspingIds.Count; i++) {
@@ -197,106 +142,40 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    /// <summary>
-    /// Returns the ids of the hands that are considered grasping but are untracked.
-    /// </summary>
     public IEnumerable<int> UntrackedGraspingHands {
       get {
         return _untrackedIds;
       }
     }
 
-    /// <summary>
-    /// Returns whether or not a hand with the given ID is currently grasping this object.
-    /// </summary>
-    /// <param name="handId"></param>
-    /// <returns></returns>
     public bool IsBeingGraspedByHand(int handId) {
       return _graspingIds.Contains(handId);
-    }
-
-    /// <summary>
-    /// Should be called if the object is ever teleported.  If this method is not called, it will always be
-    /// assumed that the object moved smoothly from it's previous position, potentially causing large forces.
-    /// </summary>
-    public virtual void NotifyTeleported() {
-      _notifiedOfTeleport = true;
-    }
-
-    /// <summary>
-    /// Add linear acceleration to the center of mass of the object.  Use this instead of Rigidbody.AddForce().
-    /// </summary>
-    /// <param name="linearAcceleration"></param>
-    public virtual void AddLinearAcceleration(Vector3 linearAcceleration) {
-      _accumulatedLinearAcceleration += linearAcceleration;
-    }
-
-    /// <summary>
-    /// Add angular acceleration to the center of mass of the object.  Use this instead of Rigidbody.AddTorque().
-    /// </summary>
-    /// <param name="angularAcceleration"></param>
-    public virtual void AddAngularAcceleration(Vector3 angularAcceleration) {
-      _accumulatedAngularAcceleration += angularAcceleration;
     }
     #endregion
 
     #region MANAGER CALLBACKS
-    /// <summary>
-    /// Called by InteractionManager when the behaviour is successfully registered with the manager.
-    /// </summary>
+
     public virtual void OnRegister() {
       _isRegisteredWithManager = true;
-
-      _rigidbody = GetComponent<Rigidbody>();
-      if (_rigidbody == null) {
-        throw new InvalidOperationException("InteractionBehaviour must have a Rigidbody component.");
-      }
-
-      _rigidbodyUsesGravity = _rigidbody.useGravity;
-      _rigidbody.useGravity = false;
     }
 
-    /// <summary>
-    /// Called by InteractionManager when the behaviour has been unregistered from the manager.
-    /// </summary>
     public virtual void OnUnregister() {
       _isRegisteredWithManager = false;
-
-      _rigidbody.useGravity = _rigidbodyUsesGravity;
     }
 
-    /// <summary>
-    /// Called by InteractionManager when the interaction shape associated with this InteractionBehaviour
-    /// is created and added to the interaction scene.
-    /// </summary>
-    /// <param name="instanceHandle"></param>
+    public virtual void OnPreSolve() { }
+
+    public virtual void OnPostSolve() { }
+
+    public abstract void OnInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform);
+
     public virtual void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
       _shapeInstanceHandle = instanceHandle;
       _hasShapeInstanceHandle = true;
     }
 
-    /// <summary>
-    /// Called by InteractionManager to get the information used to update the internal representation
-    /// of the shape instance.  
-    /// </summary>
-    /// <returns></returns>
-    public virtual INTERACTION_UPDATE_SHAPE_INFO OnInteractionShapeUpdate() {
-      INTERACTION_UPDATE_SHAPE_INFO info = new INTERACTION_UPDATE_SHAPE_INFO();
+    public abstract void OnInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTrasnform);
 
-      info.updateFlags = _notifiedOfTeleport ? UpdateInfoFlags.ResetVelocity : UpdateInfoFlags.ApplyAcceleration;
-      info.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
-      info.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
-
-      _accumulatedLinearAcceleration = Vector3.zero;
-      _accumulatedAngularAcceleration = Vector3.zero;
-
-      return info;
-    }
-
-    /// <summary>
-    /// Called by InteractionManager when the interaction shape associated with this InteractionBehaviour
-    /// is destroyed and removed from the interaction scene.
-    /// </summary>
     public virtual void OnInteractionShapeDestroyed() {
       _shapeInstanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
       _shapeDescriptionHandle = new INTERACTION_SHAPE_DESCRIPTION_HANDLE();
@@ -304,10 +183,6 @@ namespace Leap.Unity.Interaction {
       _hasShapeInstanceHandle = false;
     }
 
-    /// <summary>
-    /// Called by InteractionManager when a Hand begins grasping this object.
-    /// </summary>
-    /// <param name="handId"></param>
     public virtual void OnHandGrasp(Hand hand) {
       Assert.IsFalse(_graspingIds.Contains(hand.Id), HandAlreadyGraspingMessage(hand.Id));
 
@@ -318,15 +193,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    /// <summary>
-    /// Called by InteractionManager every frame that a Hand continues to grasp this object.
-    /// </summary>
     public virtual void OnHandsHold(List<Hand> hands) { }
 
-    /// <summary>
-    /// Called by InteractionManager when a Hand stops grasping this object.
-    /// </summary>
-    /// <param name="handId"></param>
     public virtual void OnHandRelease(Hand hand) {
       Assert.AreNotEqual(_graspingIds.Count, 0, NoGraspingHandsMessage());
       Assert.IsTrue(_graspingIds.Contains(hand.Id), HandNotGraspingMessage(hand.Id));
@@ -338,12 +206,6 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    /// <summary>
-    /// Called by InteractionManager when a Hand that was grasping becomes untracked.  The Hand
-    /// is not yet considered ungrasped, and OnGraspRegainedTracking might be called in the future
-    /// if the Hand becomes tracked again.
-    /// </summary>
-    /// <param name="oldHand"></param>
     public virtual void OnHandLostTracking(Hand oldHand) {
       Assert.AreNotEqual(_graspingIds.Count, 0, NoGraspingHandsMessage());
       Assert.IsTrue(_graspingIds.Contains(oldHand.Id), HandNotGraspingMessage(oldHand.Id));
@@ -352,13 +214,6 @@ namespace Leap.Unity.Interaction {
       _untrackedIds.Add(oldHand.Id);
     }
 
-    /// <summary>
-    /// Called by InteractionManager when a grasping Hand that had previously been untracked has
-    /// regained tracking.  The new hand is provided, as well as the id of the previously tracked
-    /// hand.
-    /// </summary>
-    /// <param name="newHand"></param>
-    /// <param name="oldId"></param>
     public virtual void OnHandRegainedTracking(Hand newHand, int oldId) {
       Assert.IsTrue(_graspingIds.Contains(oldId), HandNotGraspingMessage(oldId));
       Assert.IsFalse(_graspingIds.Contains(newHand.Id), HandAlreadyGraspingMessage(newHand.Id));
@@ -368,11 +223,6 @@ namespace Leap.Unity.Interaction {
       _graspingIds.Add(newHand.Id);
     }
 
-    /// <summary>
-    /// Called by InteractionManager when an untracked grasping Hand has remained ungrasped for
-    /// too long.  The hand is no longer considered to be grasping the object.
-    /// </summary>
-    /// <param name="oldId"></param>
     public virtual void OnHandTimeout(Hand oldHand) {
       _untrackedIds.Remove(oldHand.Id);
       _graspingIds.Remove(oldHand.Id);
@@ -383,35 +233,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    /// <summary>
-    /// Called by InteractionManager when the velocity of an object is changed.
-    /// </summary>
-    public virtual void OnRecieveSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
-      _didRecieveVelocityUpdate = true;
-      _rigidbody.Sleep();
-      _rigidbody.velocity = results.linearVelocity.ToVector3();
-      _rigidbody.angularVelocity = results.angularVelocity.ToVector3(); ;
-    }
-
-    /// <summary>
-    /// Called by InteractionManager before any solving is performed.
-    /// </summary>
-    public virtual void OnPreSolve() { }
-
-    /// <summary>
-    /// Called by InteractionManager after all solving is performed.
-    /// </summary>
-    public virtual void OnPostSolve() {
-      if (!_didRecieveVelocityUpdate) {
-        _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
-        _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
-        if (_rigidbodyUsesGravity) {
-          _rigidbody.AddForce(Physics.gravity, ForceMode.Acceleration);
-        }
-      }
-      _didRecieveVelocityUpdate = false;
-      _notifiedOfTeleport = false;
-    }
+    public virtual void OnRecieveSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) { }
     #endregion
 
     #region PROTECTED METHODS
@@ -471,7 +293,6 @@ namespace Leap.Unity.Interaction {
 #endif
       }
     }
-
     #endregion
 
     #region ASSERTION MESSAGES
