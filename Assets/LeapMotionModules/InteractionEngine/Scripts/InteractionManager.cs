@@ -22,7 +22,7 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("Allow the Interaction plugin to modify object velocities when pushing.")]
     [SerializeField]
-    protected bool _modifyVelocities = true;
+    protected bool _enablePushing = true;
 
     [Header("Debug")]
     [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
@@ -374,7 +374,7 @@ namespace Leap.Unity.Interaction {
       updateInteractionStateChanges(frame);
 
       // TODO: Pass a debug flag to disable calculating velocities.
-      if (_modifyVelocities) {
+      if (_enablePushing) {
         dispatchSimulationResults();
       }
 
