@@ -40,24 +40,24 @@ namespace Leap.Unity.Interaction {
 
     protected ShapeDescriptionPool _shapeDescriptionPool;
 
-    protected List<IInteractionBehaviour> _registeredBehaviours;
-    protected HashSet<IInteractionBehaviour> _misbehavingBehaviours;
+    protected List<IInteractionBehaviour> _registeredBehaviours = new List<IInteractionBehaviour>();
+    protected HashSet<IInteractionBehaviour> _misbehavingBehaviours = new HashSet<IInteractionBehaviour>();
 
     //Maps the Interaction instance handle to the behaviour
     //A mapping only exists if a shape instance has been created
-    protected Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, IInteractionBehaviour> _instanceHandleToBehaviour;
+    protected Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, IInteractionBehaviour> _instanceHandleToBehaviour = new Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, IInteractionBehaviour>();
 
-    protected Dictionary<int, InteractionHand> _idToInteractionHand;
-    protected List<IInteractionBehaviour> _graspedBehaviours;
+    protected Dictionary<int, InteractionHand> _idToInteractionHand = new Dictionary<int, InteractionHand>();
+    protected List<IInteractionBehaviour> _graspedBehaviours = new List<IInteractionBehaviour>();
 
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
-    private List<int> _handIdsToRemove;
+    private List<int> _handIdsToRemove = new List<int>();
     //A temp list that is recycled.  Used as the argument to OnHandsHold.
-    private List<Hand> _holdingHands;
+    private List<Hand> _holdingHands = new List<Hand>();
     //A temp list that is recycled.  Used to recieve results from InteractionC.
-    private List<INTERACTION_SHAPE_INSTANCE_RESULTS> _resultList;
+    private List<INTERACTION_SHAPE_INSTANCE_RESULTS> _resultList = new List<INTERACTION_SHAPE_INSTANCE_RESULTS>();
     //A temp list that is recycled.  Used to recieve debug logs from InteractionC.
-    private List<string> _debugOutput;
+    private List<string> _debugOutput = new List<string>();
     #endregion
 
     #region PUBLIC METHODS
@@ -232,17 +232,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void Awake() {
-      _registeredBehaviours = new List<IInteractionBehaviour>();
-      _misbehavingBehaviours = new HashSet<IInteractionBehaviour>();
-      _instanceHandleToBehaviour = new Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, IInteractionBehaviour>();
-      _graspedBehaviours = new List<IInteractionBehaviour>();
-      _idToInteractionHand = new Dictionary<int, InteractionHand>();
-      _handIdsToRemove = new List<int>();
-      _holdingHands = new List<Hand>();
-      _resultList = new List<INTERACTION_SHAPE_INSTANCE_RESULTS>();
-      _debugOutput = new List<string>();
-    }
+    protected virtual void Awake() { }
 
     protected virtual void OnEnable() {
       Assert.IsFalse(_hasSceneBeenCreated, "Scene should not have been created yet");
