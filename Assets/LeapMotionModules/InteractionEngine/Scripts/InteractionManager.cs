@@ -64,7 +64,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Gets the current debug flags for this manager.
     /// </summary>
-    public DebugFlags DebugFlags {
+    public virtual DebugFlags DebugFlags {
       get {
         DebugFlags flags = DebugFlags.None;
         if (_showDebugLines) {
@@ -238,16 +238,13 @@ namespace Leap.Unity.Interaction {
       Assert.IsFalse(_hasSceneBeenCreated, "Scene should not have been created yet");
 
       try {
-        INTERACTION_SCENE_INFO sceneInfo = getSceneInfo();
-        string dataPath = Path.Combine(Application.streamingAssetsPath, _dataSubfolder);
-        InteractionC.CreateScene(ref _scene, ref sceneInfo, dataPath);
-
-        _hasSceneBeenCreated = true;
-        applyDebugSettings();
+        createScene();
       } catch (Exception e) {
         enabled = false;
         throw e;
       }
+
+      applyDebugSettings();
 
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
 
@@ -300,8 +297,7 @@ namespace Leap.Unity.Interaction {
       }
 
       if (_hasSceneBeenCreated) {
-        InteractionC.DestroyScene(ref _scene);
-        _hasSceneBeenCreated = false;
+        destroyScene();
       }
 
       if (_simulationCoroutine != null) {
@@ -647,6 +643,19 @@ namespace Leap.Unity.Interaction {
         }
         _misbehavingBehaviours.Clear();
       }
+    }
+
+    protected virtual void createScene() {
+      INTERACTION_SCENE_INFO sceneInfo = getSceneInfo();
+      string dataPath = Path.Combine(Application.streamingAssetsPath, _dataSubfolder);
+      InteractionC.CreateScene(ref _scene, ref sceneInfo, dataPath);
+
+      _hasSceneBeenCreated = true;
+    }
+
+    protected virtual void destroyScene() {
+      InteractionC.DestroyScene(ref _scene);
+      _hasSceneBeenCreated = false;
     }
 
     private INTERACTION_SCENE_INFO getSceneInfo() {
