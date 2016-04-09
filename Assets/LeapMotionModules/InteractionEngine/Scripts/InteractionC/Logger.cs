@@ -24,13 +24,13 @@ namespace Leap.Unity.Interaction.CApi {
 
       LogLevel maxLevel = (LogLevel)Math.Max((int)level, (int)methodLevel);
 
-      if (maxLevel == LogLevel.Error) {
-        throw new Exception(message);
-      }
-
       if (maxLevel >= logLevel) {
         string totalMessage = methodName + " returned " + message;
-
+  
+        if (maxLevel == LogLevel.Error) {
+          throw new Exception(totalMessage);
+        }
+  
         if (maxLevel == LogLevel.Error) {
           UnityEngine.Debug.LogError(totalMessage);
         } else if (maxLevel == LogLevel.Warning) {
