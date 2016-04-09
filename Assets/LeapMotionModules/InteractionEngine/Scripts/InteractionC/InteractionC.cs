@@ -7,21 +7,21 @@ using LeapInternal;
 namespace Leap.Unity.Interaction.CApi {
 
   public enum ReturnStatus : uint {
-    Success,
-    InvalidHandle,
-    InvalidArgument,
-    ReferencesRemain,
-    NotEnabled,
-    NeverUpdated,
-    UnknownError,
-    BadData,
+    Success = 0,
+    InvalidHandle = 1,
+    InvalidArgument = 2,
+    ReferencesRemain = 3,
+    NotEnabled = 4,
+    NeverUpdated = 5,
+    UnknownError = 6,
+    BadData = 7,
 
-    StoppedOnNonDeterministic,
-    StoppedOnUnexpectedFailure,
-    StoppedOnFull,
-    StoppedFileError,
-    UnexpectedEOF,
-    Paused
+    StoppedOnNonDeterministic = 100,
+    StoppedOnUnexpectedFailure = 101,
+    StoppedOnFull = 102,
+    StoppedFileError = 103,
+    UnexpectedEOF = 104,
+    Paused = 105
   }
 
   public enum ShapeType : uint {
