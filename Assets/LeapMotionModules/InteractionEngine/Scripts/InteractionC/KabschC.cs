@@ -17,9 +17,8 @@ namespace Leap.Unity.Interaction.CApi {
     private static extern ReturnStatus LeapIEKabschConstruct(ref LEAP_IE_KABSCH kabsch);
 
     public static ReturnStatus Construct(ref LEAP_IE_KABSCH kabsch) {
-      Logger.Log("Construct", LogLevel.CreateDestroy);
       var rs = LeapIEKabschConstruct(ref kabsch);
-      Logger.HandleReturnStatus(rs);
+      Logger.HandleReturnStatus("Construct", LogLevel.CreateDestroy, rs);
       return rs;
     }
 
@@ -28,9 +27,8 @@ namespace Leap.Unity.Interaction.CApi {
     private static extern ReturnStatus LeapIEKabschDestruct(ref LEAP_IE_KABSCH kabsch);
 
     public static ReturnStatus Destruct(ref LEAP_IE_KABSCH kabsch) {
-      Logger.Log("Destruct", LogLevel.CreateDestroy);
       var rs = LeapIEKabschDestruct(ref kabsch);
-      Logger.HandleReturnStatus(rs);
+      Logger.HandleReturnStatus("Destruct", LogLevel.CreateDestroy, rs);
       return rs;
     }
 
@@ -39,9 +37,8 @@ namespace Leap.Unity.Interaction.CApi {
     private static extern ReturnStatus LeapIEKabschReset(ref LEAP_IE_KABSCH kabsch);
 
     public static ReturnStatus Reset(ref LEAP_IE_KABSCH kabsch) {
-      Logger.Log("Reset", LogLevel.AllCalls);
       var rs = LeapIEKabschReset(ref kabsch);
-      Logger.HandleReturnStatus(rs);
+      Logger.HandleReturnStatus("Reset", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -50,9 +47,8 @@ namespace Leap.Unity.Interaction.CApi {
     private static extern ReturnStatus LeapIEKabschNormalize(ref LEAP_IE_KABSCH kabsch);
 
     public static ReturnStatus Normalize(ref LEAP_IE_KABSCH kabsch) {
-      Logger.Log("Normalize", LogLevel.AllCalls);
       var rs = LeapIEKabschNormalize(ref kabsch);
-      Logger.HandleReturnStatus(rs);
+      Logger.HandleReturnStatus("Normalize", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -67,9 +63,8 @@ namespace Leap.Unity.Interaction.CApi {
                                      ref LEAP_VECTOR point1,
                                      ref LEAP_VECTOR point2,
                                          float weight) {
-      Logger.Log("AddPoint", LogLevel.AllCalls);
       var rs = LeapIEKabschAddPoint(ref kabsch, ref point1, ref point2, weight);
-      Logger.HandleReturnStatus(rs);
+      Logger.HandleReturnStatus("AddPoint", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -84,9 +79,8 @@ namespace Leap.Unity.Interaction.CApi {
                                       ref LEAP_VECTOR normal1,
                                       ref LEAP_VECTOR normal2,
                                           float weight) {
-      Logger.Log("AddNormal", LogLevel.AllCalls);
       var rs = LeapIEKabschAddNormal(ref kabsch, ref normal1, ref normal2, weight);
-      Logger.HandleReturnStatus(rs);
+      Logger.HandleReturnStatus("AddNormal", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -95,9 +89,8 @@ namespace Leap.Unity.Interaction.CApi {
     private static extern ReturnStatus LeapIEKabschSolve(ref LEAP_IE_KABSCH kabsch);
 
     public static ReturnStatus Solve(ref LEAP_IE_KABSCH kabsch) {
-      Logger.Log("Solve", LogLevel.AllCalls);
       var rs = LeapIEKabschSolve(ref kabsch);
-      Logger.HandleReturnStatus(rs);
+      Logger.HandleReturnStatus("Solve", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -108,9 +101,8 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static ReturnStatus SolveWithPivot(ref LEAP_IE_KABSCH kabsch,
                                            ref LEAP_VECTOR pivot) {
-      Logger.Log("SolveWithPivot", LogLevel.AllCalls);
       var rs = LeapIEKabschSolveWithPivot(ref kabsch, ref pivot);
-      Logger.HandleReturnStatus(rs);
+      Logger.HandleReturnStatus("SolveWithPivot", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -121,9 +113,8 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static ReturnStatus SolveWithPlanar(ref LEAP_IE_KABSCH kabsch,
                                             ref LEAP_VECTOR planeNormal) {
-      Logger.Log("SolveWithPlanar", LogLevel.AllCalls);
       var rs = LeapIEKabschSolveWithPlanar(ref kabsch, ref planeNormal);
-      Logger.HandleReturnStatus(rs);
+      Logger.HandleReturnStatus("SolveWithPlanar", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -134,9 +125,8 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static ReturnStatus GetRotation(ref LEAP_IE_KABSCH kabsch,
                                         out LEAP_QUATERNION rotation) {
-      Logger.Log("GetRotation", LogLevel.AllCalls);
       var rs = LeapIEKabschGetRotation(ref kabsch, out rotation);
-      Logger.HandleReturnStatus(rs);
+      Logger.HandleReturnStatus("GetRotation", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -147,9 +137,8 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static ReturnStatus GetTranslation(ref LEAP_IE_KABSCH kabsch,
                                         out LEAP_VECTOR translation) {
-      Logger.Log("GetTranslation", LogLevel.AllCalls);
       var rs = LeapIEKabschGetTranslation(ref kabsch, out translation);
-      Logger.HandleReturnStatus(rs);
+      Logger.HandleReturnStatus("GetTranslation", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -160,9 +149,8 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static ReturnStatus GetTranslationWithScale(ref LEAP_IE_KABSCH kabsch,
                                                     out LEAP_VECTOR translation) {
-      Logger.Log("GetTranslationWithScale", LogLevel.AllCalls);
       var rs = LeapIEKabschGetTranslationWithScale(ref kabsch, out translation);
-      Logger.HandleReturnStatus(rs);
+      Logger.HandleReturnStatus("GetTranslationWithScale", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -173,9 +161,8 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static ReturnStatus GetScale(ref LEAP_IE_KABSCH kabsch,
                                      out LEAP_VECTOR translation) {
-      Logger.Log("GetScale", LogLevel.AllCalls);
       var rs = LeapIEKabschGetScale(ref kabsch, out translation);
-      Logger.HandleReturnStatus(rs);
+      Logger.HandleReturnStatus("GetScale", LogLevel.AllCalls, rs);
       return rs;
     }
 

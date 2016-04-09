@@ -17,16 +17,41 @@ namespace Leap.Unity.Interaction.CApi {
     public static LogLevel logLevel = LogLevel.Warning;
 
     [Conditional("ENABLE_LOGGING")]
-    public static void HandleReturnStatus(ReturnStatus rs) {
+    public static void HandleReturnStatus(string methodName, LogLevel methodLevel, ReturnStatus rs) {
       string message;
-      LogLevel logLevel;
-      rs.GetInfo(out message, out logLevel);
-      
-      if (logLevel == LogLevel.Error) {
+      LogLevel level;
+      rs.GetInfo(out message, out level);
+
+      LogLevel maxLevel = (LogLevel)Math.Max((int)level, (int)methodLevel);
+
+      if (maxLevel == LogLevel.Error) {
         throw new Exception(message);
       }
 
-      Log(message, logLevel);
+      if (maxLevel >= logLevel) {
+        string totalMessage = methodName + " returned " + message;
+
+        if (maxLevel == LogLevel.Error) {
+          UnityEngine.Debug.LogError(totalMessage);
+        } else if (maxLevel == LogLevel.Warning) {
+          UnityEngine.Debug.LogWarning(totalMessage);
+        } else {
+          UnityEngine.Debug.Log(totalMessage);
+        }
+      }
+    }
+
+    [Conditional("ENABLE_LOGGING")]
+    public static void Log(string message, LogLevel level) {
+      if (level >= logLevel) {
+        if (level == LogLevel.Error) {
+          UnityEngine.Debug.LogError(message);
+        } else if (level == LogLevel.Warning) {
+          UnityEngine.Debug.LogWarning(message);
+        } else {
+          UnityEngine.Debug.Log(message);
+        }
+      }
     }
 
     public static void GetInfo(this ReturnStatus rs, out string message, out LogLevel logLevel) {
@@ -89,19 +114,6 @@ namespace Leap.Unity.Interaction.CApi {
           return;
         default:
           throw new ArgumentException("Unexpected return status " + rs);
-      }
-    }
-
-    [Conditional("ENABLE_LOGGING")]
-    public static void Log(string message, LogLevel level) {
-      if (level >= logLevel) {
-        if (level == LogLevel.Error) {
-          UnityEngine.Debug.LogError(message);
-        } else if (level == LogLevel.Warning) {
-          UnityEngine.Debug.LogWarning(message);
-        } else {
-          UnityEngine.Debug.Log(message);
-        }
       }
     }
   }
