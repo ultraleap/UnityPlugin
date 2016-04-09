@@ -40,15 +40,15 @@ namespace Leap.Unity.Interaction {
 
     protected ShapeDescriptionPool _shapeDescriptionPool;
 
-    protected List<InteractionBehaviourBase> _registeredBehaviours;
-    protected HashSet<InteractionBehaviourBase> _misbehavingBehaviours;
+    protected List<IInteractionBehaviour> _registeredBehaviours;
+    protected HashSet<IInteractionBehaviour> _misbehavingBehaviours;
 
     //Maps the Interaction instance handle to the behaviour
     //A mapping only exists if a shape instance has been created
-    protected Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, InteractionBehaviourBase> _instanceHandleToBehaviour;
+    protected Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, IInteractionBehaviour> _instanceHandleToBehaviour;
 
     protected Dictionary<int, InteractionHand> _idToInteractionHand;
-    protected List<InteractionBehaviourBase> _graspedBehaviours;
+    protected List<IInteractionBehaviour> _graspedBehaviours;
 
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
     private List<int> _handIdsToRemove;
@@ -102,7 +102,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Returns a collection of InteractionBehaviours that are currently registered with this manager.
     /// </summary>
-    public IEnumerable<InteractionBehaviourBase> RegisteredObjects {
+    public IEnumerable<IInteractionBehaviour> RegisteredObjects {
       get {
         return _registeredBehaviours;
       }
@@ -112,7 +112,7 @@ namespace Leap.Unity.Interaction {
     /// Returns a collection of InteractionBehaviours that are currently being grasped by
     /// at least one hand.
     /// </summary>
-    public IEnumerable<InteractionBehaviourBase> GraspedObjects {
+    public IEnumerable<IInteractionBehaviour> GraspedObjects {
       get {
         return _graspedBehaviours;
       }
@@ -130,7 +130,7 @@ namespace Leap.Unity.Interaction {
     /// <param name="handId"></param>
     /// <param name="graspedObject"></param>
     /// <returns></returns>
-    public bool TryGetGraspedObject(int handId, out InteractionBehaviourBase graspedObject) {
+    public bool TryGetGraspedObject(int handId, out IInteractionBehaviour graspedObject) {
       for (int i = 0; i < _graspedBehaviours.Count; i++) {
         var iObj = _graspedBehaviours[i];
         if (iObj.IsBeingGraspedByHand(handId)) {
@@ -150,7 +150,7 @@ namespace Leap.Unity.Interaction {
     /// when the manager is next enabled.
     /// </summary>
     /// <param name="interactionBehaviour"></param>
-    public void RegisterInteractionBehaviour(InteractionBehaviourBase interactionBehaviour) {
+    public void RegisterInteractionBehaviour(IInteractionBehaviour interactionBehaviour) {
       if (_registeredBehaviours.Contains(interactionBehaviour)) {
         throw new InvalidOperationException("Interaction Behaviour " + interactionBehaviour + " cannot be registered because " +
                                             "it is already registered with this manager.");
@@ -176,7 +176,7 @@ namespace Leap.Unity.Interaction {
     /// scene and prevents any further interaction.
     /// </summary>
     /// <param name="interactionBehaviour"></param>
-    public void UnregisterInteractionBehaviour(InteractionBehaviourBase interactionBehaviour) {
+    public void UnregisterInteractionBehaviour(IInteractionBehaviour interactionBehaviour) {
       if (!_registeredBehaviours.Contains(interactionBehaviour)) {
         throw new InvalidOperationException("Interaction Behaviour " + interactionBehaviour + " cannot be unregistered because " +
                                             "it is not currently registered with this manager.");
@@ -233,10 +233,10 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void Awake() {
-      _registeredBehaviours = new List<InteractionBehaviourBase>();
-      _misbehavingBehaviours = new HashSet<InteractionBehaviourBase>();
-      _instanceHandleToBehaviour = new Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, InteractionBehaviourBase>();
-      _graspedBehaviours = new List<InteractionBehaviourBase>();
+      _registeredBehaviours = new List<IInteractionBehaviour>();
+      _misbehavingBehaviours = new HashSet<IInteractionBehaviour>();
+      _instanceHandleToBehaviour = new Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, IInteractionBehaviour>();
+      _graspedBehaviours = new List<IInteractionBehaviour>();
       _idToInteractionHand = new Dictionary<int, InteractionHand>();
       _handIdsToRemove = new List<int>();
       _holdingHands = new List<Hand>();
@@ -264,7 +264,7 @@ namespace Leap.Unity.Interaction {
       Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "There should not be any instances before the creation step.");
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
-        InteractionBehaviourBase interactionBehaviour = _registeredBehaviours[i];
+        IInteractionBehaviour interactionBehaviour = _registeredBehaviours[i];
         try {
           createInteractionShape(interactionBehaviour);
         } catch (Exception e) {
@@ -278,7 +278,7 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void OnDisable() {
       foreach (var interactionHand in _idToInteractionHand.Values) {
-        InteractionBehaviourBase graspedBehaviour = interactionHand.graspedObject;
+        IInteractionBehaviour graspedBehaviour = interactionHand.graspedObject;
         if (graspedBehaviour != null) {
           try {
             interactionHand.ReleaseObject();
@@ -389,7 +389,7 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void updateInteractionRepresentations() {
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
-        InteractionBehaviourBase interactionBehaviour = _registeredBehaviours[i];
+        IInteractionBehaviour interactionBehaviour = _registeredBehaviours[i];
         try {
           INTERACTION_SHAPE_INSTANCE_HANDLE shapeInstanceHandle = interactionBehaviour.ShapeInstanceHandle;
 
@@ -517,7 +517,7 @@ namespace Leap.Unity.Interaction {
         switch (handResult.classification) {
           case ManipulatorMode.Grasp:
             {
-              InteractionBehaviourBase interactionBehaviour = _instanceHandleToBehaviour[handResult.instanceHandle];
+              IInteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[handResult.instanceHandle];
               if (interactionHand.graspedObject == null) {
                 _graspedBehaviours.Add(interactionBehaviour);
 
@@ -608,7 +608,7 @@ namespace Leap.Unity.Interaction {
 
       for (int i = 0; i < _resultList.Count; ++i) {
         INTERACTION_SHAPE_INSTANCE_RESULTS result = _resultList[i];
-        InteractionBehaviourBase interactionBehaviour = _instanceHandleToBehaviour[result.handle];
+        IInteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[result.handle];
 
         try {
           interactionBehaviour.OnRecieveSimulationResults(result);
@@ -619,7 +619,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void createInteractionShape(InteractionBehaviourBase interactionBehaviour) {
+    protected virtual void createInteractionShape(IInteractionBehaviour interactionBehaviour) {
       INTERACTION_SHAPE_DESCRIPTION_HANDLE descriptionHandle = interactionBehaviour.ShapeDescriptionHandle;
       INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
 
@@ -634,7 +634,7 @@ namespace Leap.Unity.Interaction {
       interactionBehaviour.OnInteractionShapeCreated(instanceHandle);
     }
 
-    protected virtual void destroyInteractionShape(InteractionBehaviourBase interactionBehaviour) {
+    protected virtual void destroyInteractionShape(IInteractionBehaviour interactionBehaviour) {
       INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle = interactionBehaviour.ShapeInstanceHandle;
 
       _instanceHandleToBehaviour.Remove(instanceHandle);
@@ -670,7 +670,7 @@ namespace Leap.Unity.Interaction {
     protected class InteractionHand {
       public Hand hand { get; protected set; }
       public float lastTimeUpdated { get; protected set; }
-      public InteractionBehaviourBase graspedObject { get; protected set; }
+      public IInteractionBehaviour graspedObject { get; protected set; }
       public bool isUntracked { get; protected set; }
 
       public InteractionHand(Hand hand) {
@@ -684,7 +684,7 @@ namespace Leap.Unity.Interaction {
         lastTimeUpdated = Time.time;
       }
 
-      public void GraspObject(InteractionBehaviourBase obj) {
+      public void GraspObject(IInteractionBehaviour obj) {
         graspedObject = obj;
         graspedObject.OnHandGrasp(hand);
       }
