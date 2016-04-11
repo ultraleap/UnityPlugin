@@ -85,6 +85,7 @@ namespace Leap
                float.IsNaN(z) || float.IsInfinity(z) ||
                float.IsNaN(w) || float.IsInfinity(w));
     }
+
     /**
      * The x component.
      */
