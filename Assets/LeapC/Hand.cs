@@ -325,9 +325,9 @@ namespace Leap
         if (_needToCalculateBasis)
         {
           //TODO verify this calculation for both hands
-          _basis.zBasis = Direction;
+          _basis.zBasis = -Direction;
           _basis.yBasis = -PalmNormal;
-          _basis.xBasis = _basis.yBasis.Cross(_basis.zBasis);
+          _basis.xBasis = _basis.zBasis.Cross(_basis.yBasis);
           _basis.xBasis = _basis.xBasis.Normalized;
           _needToCalculateBasis = false;
         }
