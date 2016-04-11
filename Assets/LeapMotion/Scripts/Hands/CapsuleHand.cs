@@ -254,6 +254,7 @@ namespace Leap.Unity{
       sphere.GetComponent<Renderer>().sharedMaterial = jointMat;
 
       sphere.name = name;
+      sphere.layer = gameObject.layer;
       sphere.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
 
       if (isPartOfArm) {
@@ -267,6 +268,7 @@ namespace Leap.Unity{
       GameObject capsule = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
       DestroyImmediate(capsule.GetComponent<Collider>());
       capsule.name = name;
+      capsule.layer = gameObject.layer;
       capsule.transform.parent = transform;
       capsule.transform.localScale = Vector3.one * CYLINDER_RADIUS * 2;
       capsule.GetComponent<Renderer>().sharedMaterial = _material;
