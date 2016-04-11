@@ -326,7 +326,9 @@ namespace Leap
      */
     public bool IsValid()
     {
-      return float.IsNaN(x) && float.IsNaN(y) && float.IsNaN(z);
+      return !(float.IsNaN(x) || float.IsInfinity(x) ||
+               float.IsNaN(y) || float.IsInfinity(y) ||
+               float.IsNaN(z) || float.IsInfinity(z));
     }
 
     /**
@@ -518,6 +520,11 @@ namespace Leap
      * @since 1.0
      */
     public static readonly Vector Zero = new Vector(0, 0, 0);
+
+    /**
+     * The ones vector: (1, 1, 1)
+     */
+    public static readonly Vector Ones = new Vector(1, 1, 1);
 
     /**
      * The x-axis unit vector: (1, 0, 0)
