@@ -270,7 +270,7 @@ namespace Leap.Unity{
       }
     }
   #endif
-  
+
     void Start() {
       if (_provider == null) {
         Debug.LogWarning("Cannot use LeapImageRetriever if there is no LeapProvider!");
@@ -282,25 +282,24 @@ namespace Leap.Unity{
       ApplyGammaCorrectionValues();
       ApplyCameraProjectionValues();
     }
-  
+
     void HandleOnValidCameraParams(LeapVRCameraControl.CameraParams camParams) {
       ApplyCameraProjectionValues();
     }
   
     void OnEnable() {
-      _provider.GetLeapController().DistortionChange += onDistortionChange;
-      _provider.GetLeapController().Connect += delegate {
-          _provider.GetLeapController().Config.Get("images_mode", (Int32 enabled) => {
-              this.imagesEnabled = enabled == 0 ? false : true;
-          });
-      };
-      StartCoroutine(checkImageMode());
+      StartCoroutine(waitForController());
     }
-  
+
     void OnDisable() {
       _provider.GetLeapController().DistortionChange -= onDistortionChange;
+      LeapVRCameraControl.OnValidCameraParams -= HandleOnValidCameraParams;
     }
-  
+    void OnDestroy() {
+      _provider.GetLeapController().DistortionChange -= onDistortionChange;
+      LeapVRCameraControl.OnValidCameraParams -= HandleOnValidCameraParams;
+    }
+
     void OnPreRender() {
       if(imagesEnabled){
         Controller controller = _provider.GetLeapController();
@@ -318,7 +317,7 @@ namespace Leap.Unity{
         }
       }
     }
-    
+
     void Update() {
       if(imagesEnabled){
           Frame imageFrame = _provider.CurrentFrame;
@@ -329,6 +328,23 @@ namespace Leap.Unity{
       }
     }
     
+    private IEnumerator waitForController(){
+      Controller controller = _provider.GetLeapController();
+      if(controller == null){
+        yield return null;
+      }
+        controller.DistortionChange += onDistortionChange;
+        controller.Connect += delegate {
+          _provider.GetLeapController().Config.Get("images_mode", (Int32 enabled) => {
+                this.imagesEnabled = enabled == 0 ? false : true;
+            });
+        };
+       if(!checkingImageState){
+         StartCoroutine(checkImageMode());
+      }
+      yield break;
+    }
+
     private IEnumerator checkImageMode(){
       checkingImageState = true;
       yield return new WaitForSeconds(IMAGE_SETTING_POLL_RATE);
