@@ -301,6 +301,11 @@ namespace Leap.Unity{
       _provider.GetLeapController().DistortionChange -= onDistortionChange;
     }
   
+    void OnDestroy() {
+      _provider.GetLeapController().DistortionChange -= onDistortionChange;
+      LeapVRCameraControl.OnValidCameraParams -= HandleOnValidCameraParams;
+    }
+
     void OnPreRender() {
       if(imagesEnabled){
         Controller controller = _provider.GetLeapController();
