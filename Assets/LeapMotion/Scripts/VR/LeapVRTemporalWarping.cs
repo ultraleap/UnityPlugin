@@ -198,7 +198,6 @@ namespace Leap.Unity{
 
     protected void OnDevice(object sender, DeviceEventArgs args) {
       deviceInfo = provider.GetDeviceInfo();
-      Debug.Log("Device gotten: " + deviceInfo.type);
       if (deviceInfo.type == LeapDeviceType.Invalid) {
         Debug.LogWarning("Invalid Leap Device -> enabled = false");
         enabled = false;
