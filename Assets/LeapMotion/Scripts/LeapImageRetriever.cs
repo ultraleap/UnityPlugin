@@ -331,7 +331,7 @@ namespace Leap.Unity{
     private IEnumerator waitForController(){
       Controller controller = _provider.GetLeapController();
       if(controller == null){
-        yield return true;
+        yield return null;
       }
         controller.DistortionChange += onDistortionChange;
         controller.Connect += delegate {
@@ -339,8 +339,10 @@ namespace Leap.Unity{
                 this.imagesEnabled = enabled == 0 ? false : true;
             });
         };
-      StartCoroutine(checkImageMode());
-      yield return false;
+       if(!checkingImageState){
+         StartCoroutine(checkImageMode());
+      }
+      yield break;
     }
 
     private IEnumerator checkImageMode(){
