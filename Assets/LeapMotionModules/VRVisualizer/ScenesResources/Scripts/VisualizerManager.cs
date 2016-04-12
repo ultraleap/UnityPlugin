@@ -22,9 +22,11 @@ namespace Leap.Unity.VRVisualizer{
   
     private Controller m_controller = null;
     private bool m_leapConnected = false;
-    private float m_deltaTime = 0.0f;
+
+    private SmoothedFloat m_deltaTime;
     private int m_framrateUpdateCount = 0;
     private int m_framerateUpdateInterval = 30;
+
     private void FindController()
     {
       LeapServiceProvider provider = FindObjectOfType<LeapServiceProvider>();
@@ -47,6 +49,9 @@ namespace Leap.Unity.VRVisualizer{
         m_PCVisualizer.gameObject.SetActive(true);
         m_warningText.text = "No head-mounted display detected. Orion performs best in a head-mounted display";
       }
+
+      m_deltaTime = new SmoothedFloat();
+      m_deltaTime.delay = 0.1f;
     }
   
     void Start()
@@ -98,7 +103,7 @@ namespace Leap.Unity.VRVisualizer{
         }
       }
       //update render frame display
-      m_deltaTime += (Time.deltaTime - m_deltaTime) * 0.1f;
+      m_deltaTime.Update(Time.deltaTime, Time.deltaTime);
       if (m_framrateUpdateCount > m_framerateUpdateInterval) {
         updateRenderFrameRate();
         m_framrateUpdateCount = 0;
@@ -107,8 +112,8 @@ namespace Leap.Unity.VRVisualizer{
     }
 
     private void updateRenderFrameRate() {
-      float msec = m_deltaTime * 1000.0f;
-      float fps = 1.0f / m_deltaTime;
+      float msec = m_deltaTime.value * 1000.0f;
+      float fps = 1.0f / m_deltaTime.value;
       string text = string.Format("{0:0.0} ms ({1:0.} fps)", msec, fps);
       m_frameRateText.text = "Render Time: " + text;
       m_dataFrameRateText.text = "Data Framerate: " + m_controller.Frame().CurrentFramesPerSecond;
