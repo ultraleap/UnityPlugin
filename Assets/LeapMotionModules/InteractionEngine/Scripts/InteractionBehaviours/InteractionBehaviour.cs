@@ -126,13 +126,16 @@ namespace Leap.Unity.Interaction {
 #endif
     }
 
-    public override void OnInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTrasnform) {
+    public override void OnInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
       updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
-      updateInfo.updateFlags = _notifiedOfTeleport ? UpdateInfoFlags.ResetVelocity : UpdateInfoFlags.ApplyAcceleration;
+      updateInfo.updateFlags = _notifiedOfTeleport ? UpdateInfoFlags.ResetVelocity : UpdateInfoFlags.None;
+      updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration | UpdateInfoFlags.ExplicitVelocity;
       updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
       updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
+      updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
+      updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
 
-      interactionTrasnform = getRigidbodyTransform();
+      interactionTransform = getRigidbodyTransform();
     }
 
     public override void OnRecieveSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
