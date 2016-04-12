@@ -45,7 +45,8 @@ namespace Leap.Unity.Interaction.CApi {
   public enum UpdateInfoFlags : uint {
     None = 0x00,
     ResetVelocity = 0x01, // E.g. teleported.
-    ApplyAcceleration = 0x02
+    ApplyAcceleration = 0x02,
+    ExplicitVelocity = 0x04
   };
 
   public enum HandResultFlags : uint {
@@ -180,6 +181,8 @@ namespace Leap.Unity.Interaction.CApi {
     public UpdateInfoFlags updateFlags;
     public LEAP_VECTOR linearAcceleration;
     public LEAP_VECTOR angularAcceleration;
+    public LEAP_VECTOR linearVelocity;
+    public LEAP_VECTOR angularVelocity;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -389,12 +392,12 @@ namespace Leap.Unity.Interaction.CApi {
                                                                      out UInt32 nResults,
                                                                      out IntPtr papResultsBuffer);
 
-    public static ReturnStatus GetVelocities(ref INTERACTION_SCENE scene, 
+    public static ReturnStatus GetVelocities(ref INTERACTION_SCENE scene,
                                                  List<INTERACTION_SHAPE_INSTANCE_RESULTS> results) {
       UInt32 nResults;
       IntPtr papResultsBuffer;
-      var rs = LeapIEGetShapeInstanceResults(ref scene, 
-                                             out nResults, 
+      var rs = LeapIEGetShapeInstanceResults(ref scene,
+                                             out nResults,
                                              out papResultsBuffer);
 
       results.Clear();

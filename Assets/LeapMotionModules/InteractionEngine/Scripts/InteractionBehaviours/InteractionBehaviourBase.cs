@@ -174,7 +174,7 @@ namespace Leap.Unity.Interaction {
       _hasShapeInstanceHandle = true;
     }
 
-    public abstract void OnInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTrasnform);
+    public abstract void OnInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform);
 
     public virtual void OnInteractionShapeDestroyed() {
       _shapeInstanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
