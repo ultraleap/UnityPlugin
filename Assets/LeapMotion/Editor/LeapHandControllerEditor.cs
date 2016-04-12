@@ -11,15 +11,16 @@ using Leap;
 
 namespace Leap.Unity {
   [CustomEditor(typeof(LeapHandController))]
-  public class LeapHandControllerEditor : Editor {
-
+  public class LeapHandControllerEditor : CustomEditorBase {
     private const float BOX_RADIUS = 0.45f;
     private const float BOX_WIDTH = 0.965f;
     private const float BOX_DEPTH = 0.6671f;
 
     private LeapHandController controller;
 
-    void OnEnable() {
+    protected override void OnEnable() {
+      base.OnEnable();
+
       controller = target as LeapHandController;
     }
 
@@ -74,27 +75,5 @@ namespace Leap.Unity {
                           controller.transform.TransformDirection(faceA),
                           angle, controller.transform.lossyScale.x * BOX_RADIUS);
     }
-
-    public override void OnInspectorGUI() {
-      serializedObject.Update();
-      SerializedProperty properties = serializedObject.GetIterator();
-
-      EditorGUI.BeginChangeCheck();
-
-      bool useEnterChildren = true;
-      while (properties.NextVisible(useEnterChildren)) {
-        useEnterChildren = false;
-
-        switch (properties.name) {
-          default:
-            EditorGUILayout.PropertyField(properties);
-            break;
-        }
-      }
-
-      if (EditorGUI.EndChangeCheck()) {
-        serializedObject.ApplyModifiedProperties();
-      }
-    }
-  } 
+  }
 }

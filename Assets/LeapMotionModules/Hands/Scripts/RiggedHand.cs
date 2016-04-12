@@ -33,8 +33,9 @@ namespace Leap.Unity {
         palm.rotation = GetPalmRotation() * Reorientation();
       }
 
-      if (forearm != null)
+      if (forearm != null) {
         forearm.rotation = GetArmRotation() * Reorientation();
+      }
 
       for (int i = 0; i < fingers.Length; ++i) {
         if (fingers[i] != null) {
