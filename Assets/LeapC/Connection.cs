@@ -428,7 +428,6 @@ namespace LeapInternal
     private void handleConnectionLost(ref LEAP_CONNECTION_LOST_EVENT connectionMsg)
     {
       this.LeapConnectionLost.Dispatch<ConnectionLostEventArgs>(this, new ConnectionLostEventArgs());
-      _isRunning = false;
     }
 
     private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg)
@@ -548,7 +547,7 @@ namespace LeapInternal
             dataType = Config.ValueType.TYPE_INT32;
             value = config_response_evt.value.intValue;
             break;
-          case eLeapValueType.eleapValueType_Float:
+          case eLeapValueType.eLeapValueType_Float:
             dataType = Config.ValueType.TYPE_FLOAT;
             value = config_response_evt.value.floatValue;
             break;

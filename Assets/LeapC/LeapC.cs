@@ -112,7 +112,7 @@ namespace LeapInternal
     eLeapValueType_Unknown,
     eLeapValueType_Boolean,
     eLeapValueType_Int32,
-    eleapValueType_Float,
+    eLeapValueType_Float,
     eLeapValueType_String
   };
 
@@ -524,9 +524,6 @@ namespace LeapInternal
     [DllImport("LeapC", EntryPoint = "LeapDestroyClockRebaser")]
     public static extern eLeapRS DestroyClockRebaser(IntPtr hClockRebaser);
 
-    [DllImport("LeapC", EntryPoint = "LeapUpdateLatency")]
-    public static extern eLeapRS UpdateLatency(IntPtr hClockRebaser, Int64 userClock, Int64 leapClock);
-
     [DllImport("LeapC", EntryPoint = "LeapUpdateRebase")]
     public static extern eLeapRS UpdateRebase(IntPtr hClockRebaser, Int64 userClock, Int64 leapClock);
 
@@ -621,7 +618,7 @@ namespace LeapInternal
     public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, float value, out UInt32 requestId)
     {
       LEAP_VARIANT_VALUE_TYPE valueStruct = new LEAP_VARIANT_VALUE_TYPE();
-      valueStruct.type = eLeapValueType.eleapValueType_Float;
+      valueStruct.type = eLeapValueType.eLeapValueType_Float;
       valueStruct.floatValue = value;
       return LeapC.SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
     }

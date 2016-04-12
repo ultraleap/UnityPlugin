@@ -73,7 +73,7 @@ namespace Leap.Unity{
 
       if(VisualizeBasis){
         DrawBasis(hand.PalmPosition, hand.Basis, hand.PalmWidth/4 ); //Hand basis
-        DrawBasis(hand.Arm.ElbowPosition, hand.Arm.Basis, 10); //Arm basis
+        DrawBasis(hand.Arm.ElbowPosition, hand.Arm.Basis, .01f); //Arm basis
       }
 
       for(int f = 0; f < 5; f ++){ //Fingers
@@ -82,7 +82,7 @@ namespace Leap.Unity{
           Bone bone = finger.Bone((Bone.BoneType)i);
           Debug.DrawLine(bone.PrevJoint.ToVector3(), bone.PrevJoint.ToVector3() + bone.Direction.ToVector3() * bone.Length, colors[i]);
           if(VisualizeBasis)
-            DrawBasis(bone.PrevJoint, bone.Basis, 10);
+            DrawBasis(bone.PrevJoint, bone.Basis, .01f);
         }
       }
     }

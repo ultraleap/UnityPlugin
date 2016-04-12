@@ -49,14 +49,14 @@ using System.Runtime.InteropServices;
                 Vector.Forward,
                 new Vector(-4.36385750984f, 6.5f, 31.0111342526f)
             );
+            LeapTransform restPosition = LeapTransform.Identity;
             if(isLeft){
-                return testHand;
+                restPosition.translation = new Vector(-80f, 120f, 0f);
             } else {
-                LeapTransform leftToRight = LeapTransform.Identity;
-                leftToRight.MirrorX();
-                Hand rightHand = testHand.TransformedCopy(leftToRight);
-              return rightHand;
+                restPosition.translation = new Vector(80f, 120f, 0f);
+                restPosition.MirrorX();
             }
+            return testHand.TransformedCopy(restPosition);
         }
          static Finger MakeThumb(int frameId, int handId, bool isLeft){
             //Thumb
@@ -143,7 +143,7 @@ using System.Runtime.InteropServices;
 
          static Bone MakeBone(Bone.BoneType name, Vector proximalPosition, float length, float width, Vector direction, Vector up, bool isLeft){
 
-           LeapQuaternion rotation = UnityEngine.Quaternion.LookRotation(direction.ToVector3(), up.ToVector3()).ToLeapQuaternion();
+           LeapQuaternion rotation = UnityEngine.Quaternion.LookRotation(-direction.ToVector3(), up.ToVector3()).ToLeapQuaternion();
 
            return new Bone(
                 proximalPosition,
