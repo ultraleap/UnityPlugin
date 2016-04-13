@@ -292,11 +292,18 @@ namespace Leap.Unity{
     }
 
     void OnDisable() {
-      _provider.GetLeapController().DistortionChange -= onDistortionChange;
+      Controller controller = _provider.GetLeapController();
+      if (controller != null) {
+        controller.DistortionChange -= onDistortionChange;
+      }
       LeapVRCameraControl.OnValidCameraParams -= HandleOnValidCameraParams;
     }
+
     void OnDestroy() {
-        _provider.GetLeapController().DistortionChange -= onDistortionChange;
+      Controller controller = _provider.GetLeapController();
+      if (controller != null) {
+        controller.DistortionChange -= onDistortionChange;
+      }
       LeapVRCameraControl.OnValidCameraParams -= HandleOnValidCameraParams;
     }
 

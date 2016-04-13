@@ -274,7 +274,7 @@ namespace Leap.Unity{
     }
     
     private void updateTemporalWarping() {
-      if (_trackingAnchor == null) {
+      if (_trackingAnchor == null || provider.GetLeapController() == null) {
         return;
       }
   
