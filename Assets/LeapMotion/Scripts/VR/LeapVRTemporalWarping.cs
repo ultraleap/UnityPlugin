@@ -218,7 +218,11 @@ namespace Leap.Unity{
     protected void OnDisable() {
       LeapVRCameraControl.OnValidCameraParams -= onValidCameraParams;
     }
-  
+
+    protected void OnDestroy() {
+        LeapVRCameraControl.OnValidCameraParams -= onValidCameraParams;
+    }
+
     protected void Update() {
       if (Input.GetKeyDown(recenter)) {
         InputTracking.Recenter();
@@ -244,8 +248,10 @@ namespace Leap.Unity{
     private void onValidCameraParams(LeapVRCameraControl.CameraParams cameraParams) {
       _projectionMatrix = cameraParams.ProjectionMatrix;
       _trackingAnchor = cameraParams.TrackingAnchor;
-  
-      updateHistory();
+
+      if (provider != null) { 
+        updateHistory(); 
+      }
   
       if (syncMode == SyncMode.LOW_LATENCY) {
         updateTemporalWarping();

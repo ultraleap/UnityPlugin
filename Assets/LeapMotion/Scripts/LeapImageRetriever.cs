@@ -140,26 +140,26 @@ namespace Leap.Unity{
       public bool CheckStale() {
         return _combinedTexture == null;
       }
-  
-      public void Reconstruct(Image image, string shaderName) {
+
+      public void Reconstruct(Image image, string shaderName)
+      {
         int combinedWidth = image.DistortionWidth / 2;
         int combinedHeight = image.DistortionHeight * 2;
-  
+
         if (_combinedTexture != null) {
           DestroyImmediate(_combinedTexture);
         }
-  
+
         Color32[] colorArray = new Color32[combinedWidth * combinedHeight];
         _combinedTexture = new Texture2D(combinedWidth, combinedHeight, TextureFormat.RGBA32, false, true);
         _combinedTexture.filterMode = FilterMode.Bilinear;
         _combinedTexture.wrapMode = TextureWrapMode.Clamp;
         _combinedTexture.hideFlags = HideFlags.DontSave;
-  
+
         addDistortionData(image, colorArray, 0);
-  
+
         _combinedTexture.SetPixels32(colorArray);
         _combinedTexture.Apply();
-  
         Shader.SetGlobalTexture(shaderName, _combinedTexture);
       }
   
@@ -296,7 +296,7 @@ namespace Leap.Unity{
       LeapVRCameraControl.OnValidCameraParams -= HandleOnValidCameraParams;
     }
     void OnDestroy() {
-      _provider.GetLeapController().DistortionChange -= onDistortionChange;
+        _provider.GetLeapController().DistortionChange -= onDistortionChange;
       LeapVRCameraControl.OnValidCameraParams -= HandleOnValidCameraParams;
     }
 
@@ -329,20 +329,23 @@ namespace Leap.Unity{
     }
     
     private IEnumerator waitForController(){
-      Controller controller = _provider.GetLeapController();
-      if(controller == null){
+      while (_provider == null) {
         yield return null;
       }
-        controller.DistortionChange += onDistortionChange;
-        controller.Connect += delegate {
-          _provider.GetLeapController().Config.Get("images_mode", (Int32 enabled) => {
-                this.imagesEnabled = enabled == 0 ? false : true;
-            });
-        };
-       if(!checkingImageState){
-         StartCoroutine(checkImageMode());
+      Controller controller = null;
+      while (controller == null) {
+          controller = _provider.GetLeapController();
+          yield return null;
       }
-      yield break;
+      controller.DistortionChange += onDistortionChange;
+      controller.Connect += delegate {
+        _provider.GetLeapController().Config.Get("images_mode", (Int32 enabled) => {
+          this.imagesEnabled = enabled == 0 ? false : true;
+        });
+      };
+      if (!checkingImageState) {
+        StartCoroutine(checkImageMode());
+      }
     }
 
     private IEnumerator checkImageMode(){
