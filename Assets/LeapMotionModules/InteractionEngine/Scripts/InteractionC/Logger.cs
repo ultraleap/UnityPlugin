@@ -17,7 +17,17 @@ namespace Leap.Unity.Interaction.CApi {
     public static LogLevel logLevel = LogLevel.Warning;
 
     [Conditional("ENABLE_LOGGING")]
+    public static void HandleReturnStatus(INTERACTION_SCENE scene, string methodName, LogLevel methodLevel, ReturnStatus rs) {
+      string extraText = InteractionC.GetLastErrorString(ref scene);
+      handleReturnStatusInternal(methodName, methodLevel, rs, extraText);
+    }
+
+    [Conditional("ENABLE_LOGGING")]
     public static void HandleReturnStatus(string methodName, LogLevel methodLevel, ReturnStatus rs) {
+      handleReturnStatusInternal(methodName, methodLevel, rs, null);
+    }
+
+    public static void handleReturnStatusInternal(string methodName, LogLevel methodLevel, ReturnStatus rs, string extraErrorText) {
       string message;
       LogLevel level;
       rs.GetInfo(out message, out level);
@@ -26,14 +36,17 @@ namespace Leap.Unity.Interaction.CApi {
 
       if (maxLevel >= logLevel) {
         string totalMessage = methodName + " returned " + message;
-  
+
         if (maxLevel == LogLevel.Error) {
+          if (!string.IsNullOrEmpty(extraErrorText)) {
+            totalMessage += "\n";
+            totalMessage += extraErrorText;
+          }
+
           throw new Exception(totalMessage);
         }
-  
-        if (maxLevel == LogLevel.Error) {
-          UnityEngine.Debug.LogError(totalMessage);
-        } else if (maxLevel == LogLevel.Warning) {
+
+        if (maxLevel == LogLevel.Warning) {
           UnityEngine.Debug.LogWarning(totalMessage);
         } else {
           UnityEngine.Debug.Log(totalMessage);

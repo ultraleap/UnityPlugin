@@ -230,7 +230,7 @@ namespace Leap.Unity.Interaction.CApi {
                                            ref INTERACTION_SCENE_INFO sceneInfo,
                                                string dataPath) {
       var rs = LeapIECreateScene(ref scene, ref sceneInfo, dataPath);
-      Logger.HandleReturnStatus("Create Scene", LogLevel.Info, rs);
+      Logger.HandleReturnStatus(scene, "Create Scene", LogLevel.Info, rs);
       return rs;
     }
 
@@ -240,7 +240,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static ReturnStatus DestroyScene(ref INTERACTION_SCENE scene) {
       var rs = LeapIEDestroyScene(ref scene);
-      Logger.HandleReturnStatus("Destroy Scene", LogLevel.Info, rs);
+      Logger.HandleReturnStatus(scene, "Destroy Scene", LogLevel.Info, rs);
       return rs;
     }
 
@@ -252,13 +252,17 @@ namespace Leap.Unity.Interaction.CApi {
     public static ReturnStatus UpdateSceneInfo(ref INTERACTION_SCENE scene,
                                                ref INTERACTION_SCENE_INFO sceneInfo) {
       var rs = UpdateSceneInfo(ref scene, ref sceneInfo);
-      Logger.HandleReturnStatus("Update Scene Info", LogLevel.Info, rs);
+      Logger.HandleReturnStatus(scene, "Update Scene Info", LogLevel.Info, rs);
       return rs;
     }
 
     /*** Get Last Error ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastError")]
     public static extern ReturnStatus GetLastError(ref INTERACTION_SCENE scene);
+
+    /*** Get Last String ***/
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastError")]
+    public static extern string GetLastErrorString(ref INTERACTION_SCENE scene);
 
     /*** Add Shape Description ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEAddShapeDescription")]
@@ -270,7 +274,7 @@ namespace Leap.Unity.Interaction.CApi {
                                                        IntPtr pDescription,
                                                    out INTERACTION_SHAPE_DESCRIPTION_HANDLE handle) {
       var rs = LeapIEAddShapeDescription(ref scene, pDescription, out handle);
-      Logger.HandleReturnStatus("Add Shape Description", LogLevel.CreateDestroy, rs);
+      Logger.HandleReturnStatus(scene, "Add Shape Description", LogLevel.CreateDestroy, rs);
       return rs;
     }
 
@@ -282,7 +286,7 @@ namespace Leap.Unity.Interaction.CApi {
     public static ReturnStatus RemoveShapeDescription(ref INTERACTION_SCENE scene,
                                                       ref INTERACTION_SHAPE_DESCRIPTION_HANDLE handle) {
       var rs = LeapIERemoveShapeDescription(ref scene, ref handle);
-      Logger.HandleReturnStatus("Remove Shape Description", LogLevel.CreateDestroy, rs);
+      Logger.HandleReturnStatus(scene, "Remove Shape Description", LogLevel.CreateDestroy, rs);
       return rs;
     }
 
@@ -300,7 +304,7 @@ namespace Leap.Unity.Interaction.CApi {
                                                    ref INTERACTION_CREATE_SHAPE_INFO shapeInfo,
                                                    out INTERACTION_SHAPE_INSTANCE_HANDLE instance) {
       var rs = LeapIECreateShapeInstance(ref scene, ref handle, ref transform, ref shapeInfo, out instance);
-      Logger.HandleReturnStatus("Create Shap eInstance", LogLevel.CreateDestroy, rs);
+      Logger.HandleReturnStatus(scene, "Create Shap eInstance", LogLevel.CreateDestroy, rs);
       return rs;
     }
 
@@ -312,7 +316,7 @@ namespace Leap.Unity.Interaction.CApi {
     public static ReturnStatus DestroyShapeInstance(ref INTERACTION_SCENE scene,
                                             ref INTERACTION_SHAPE_INSTANCE_HANDLE instance) {
       var rs = LeapIEDestroyShapeInstance(ref scene, ref instance);
-      Logger.HandleReturnStatus("Destroy Shape Instance", LogLevel.CreateDestroy, rs);
+      Logger.HandleReturnStatus(scene, "Destroy Shape Instance", LogLevel.CreateDestroy, rs);
       return rs;
     }
 
@@ -328,7 +332,7 @@ namespace Leap.Unity.Interaction.CApi {
                                                    ref INTERACTION_UPDATE_SHAPE_INFO updateInfo,
                                                    ref INTERACTION_SHAPE_INSTANCE_HANDLE instance) {
       var rs = LeapIEUpdateShapeInstance(ref scene, ref transform, ref updateInfo, ref instance);
-      Logger.HandleReturnStatus("Update Shape Instance", LogLevel.AllCalls, rs);
+      Logger.HandleReturnStatus(scene, "Update Shape Instance", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -342,7 +346,7 @@ namespace Leap.Unity.Interaction.CApi {
                                                UInt32 nHands,
                                                IntPtr pHands) {
       var rs = LeapIEUpdateHands(ref scene, nHands, pHands);
-      Logger.HandleReturnStatus("Update Hands", LogLevel.AllCalls, rs);
+      Logger.HandleReturnStatus(scene, "Update Hands", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -354,7 +358,7 @@ namespace Leap.Unity.Interaction.CApi {
     public static ReturnStatus UpdateController(ref INTERACTION_SCENE scene,
                                                 ref INTERACTION_TRANSFORM controllerTransform) {
       var rs = LeapIEUpdateController(ref scene, ref controllerTransform);
-      Logger.HandleReturnStatus("Update Controller", LogLevel.AllCalls, rs);
+      Logger.HandleReturnStatus(scene, "Update Controller", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -368,7 +372,7 @@ namespace Leap.Unity.Interaction.CApi {
                                                  UInt32 handId,
                                              out INTERACTION_HAND_RESULT handResult) {
       var rs = LeapIEGetHandResult(ref scene, handId, out handResult);
-      Logger.HandleReturnStatus("Get Hand Result", LogLevel.AllCalls, rs);
+      Logger.HandleReturnStatus(scene, "Get Hand Result", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -382,7 +386,7 @@ namespace Leap.Unity.Interaction.CApi {
                                                       UInt32 handId,
                                                   ref INTERACTION_HAND_RESULT handResult) {
       var rs = LeapIEOverrideHandResult(ref scene, handId, ref handResult);
-      Logger.HandleReturnStatus("Override Hand Result", LogLevel.AllCalls, rs);
+      Logger.HandleReturnStatus(scene, "Override Hand Result", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -409,7 +413,7 @@ namespace Leap.Unity.Interaction.CApi {
         }
       }
 
-      Logger.HandleReturnStatus("Get Velocities", LogLevel.AllCalls, rs);
+      Logger.HandleReturnStatus(scene, "Get Velocities", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -421,7 +425,7 @@ namespace Leap.Unity.Interaction.CApi {
     public static ReturnStatus EnableDebugFlags(ref INTERACTION_SCENE scene,
                                                     UInt32 flags) {
       var rs = LeapIEEnableDebugFlags(ref scene, flags);
-      Logger.HandleReturnStatus("Enable Debug Flags", LogLevel.Info, rs);
+      Logger.HandleReturnStatus(scene, "Enable Debug Flags", LogLevel.Info, rs);
       return rs;
     }
 
@@ -435,7 +439,7 @@ namespace Leap.Unity.Interaction.CApi {
                                              out UInt32 nLines,
                                              out IntPtr ppLineBuffer) {
       var rs = LeapIEGetDebugLines(ref scene, out nLines, out ppLineBuffer);
-      Logger.HandleReturnStatus("Get Debug Lines", LogLevel.AllCalls, rs);
+      Logger.HandleReturnStatus(scene, "Get Debug Lines", LogLevel.AllCalls, rs);
       return rs;
     }
 
@@ -471,7 +475,7 @@ namespace Leap.Unity.Interaction.CApi {
         }
       }
 
-      Logger.HandleReturnStatus("Get Debug Strings", LogLevel.AllCalls, rs);
+      Logger.HandleReturnStatus(scene, "Get Debug Strings", LogLevel.AllCalls, rs);
       return rs;
     }
   }
