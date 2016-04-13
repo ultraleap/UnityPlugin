@@ -1759,6 +1759,7 @@ Transform:
   m_LocalRotation: {x: 0.40821794, y: -0.23456973, z: 0.109381676, w: 0.87542605}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -1769,6 +1770,10 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: ModelCollection.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 492502, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1804,11 +1809,11 @@ Prefab:
     - target: {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
       propertyPath: ModelCollection.Array.data[0]
       value: 
-      objectReference: {fileID: 1545945338}
+      objectReference: {fileID: 0}
     - target: {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
       propertyPath: ModelCollection.Array.data[1]
       value: 
-      objectReference: {fileID: 1061438465}
+      objectReference: {fileID: 0}
     - target: {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
       propertyPath: ModelCollection.Array.data[2]
       value: 
@@ -1819,6 +1824,26 @@ Prefab:
       objectReference: {fileID: 1167543056}
     - target: {fileID: 11402294, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
       propertyPath: _isHeadMounted
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: ModelCollection.Array.data[0].LeftModel
+      value: 
+      objectReference: {fileID: 1545945338}
+    - target: {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: ModelCollection.Array.data[0].RightModel
+      value: 
+      objectReference: {fileID: 1061438465}
+    - target: {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: ModelCollection.Array.data[1].LeftModel
+      value: 
+      objectReference: {fileID: 1414805578}
+    - target: {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: ModelCollection.Array.data[1].RightModel
+      value: 
+      objectReference: {fileID: 1167543056}
+    - target: {fileID: 11402294, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: _overrideDeviceType
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

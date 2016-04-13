@@ -155,7 +155,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 215a4d49fc705b74a9d3c5cbfa2c9601, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handMovementScale: {x: 1, y: 1, z: 1}
 --- !u!1001 &118028245
 Prefab:
   m_ObjectHideFlags: 0
@@ -1048,15 +1047,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13649788, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
-      value: 0.29099995
+      value: 0.291
       objectReference: {fileID: 0}
     - target: {fileID: 13620250, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
-      value: 0.034329996
+      value: 0.03433
       objectReference: {fileID: 0}
     - target: {fileID: 13659560, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
-      value: 0.054219995
+      value: 0.05422
       objectReference: {fileID: 0}
     - target: {fileID: 13631504, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
@@ -1068,7 +1067,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13668516, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
-      value: 0.052629992
+      value: 0.05263
       objectReference: {fileID: 0}
     - target: {fileID: 13686906, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
@@ -1076,39 +1075,39 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13666838, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
-      value: 0.047779992
+      value: 0.047779996
       objectReference: {fileID: 0}
     - target: {fileID: 13660160, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
-      value: 0.04936999
+      value: 0.04937
       objectReference: {fileID: 0}
     - target: {fileID: 13652564, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
-      value: 0.039569996
+      value: 0.03957
       objectReference: {fileID: 0}
     - target: {fileID: 13663724, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
-      value: 0.04074
+      value: 0.040740002
       objectReference: {fileID: 0}
     - target: {fileID: 13664198, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
-      value: 0.026109997
+      value: 0.02611
       objectReference: {fileID: 0}
     - target: {fileID: 13636776, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
-      value: 0.029669996
+      value: 0.02967
       objectReference: {fileID: 0}
     - target: {fileID: 13626790, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
-      value: 0.033649996
+      value: 0.03365
       objectReference: {fileID: 0}
     - target: {fileID: 13662386, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
-      value: 0.025299996
+      value: 0.0253
       objectReference: {fileID: 0}
     - target: {fileID: 13639576, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_Height
-      value: 0.030379996
+      value: 0.03038
       objectReference: {fileID: 0}
     - target: {fileID: 441686, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
       propertyPath: m_LocalPosition.z
@@ -1753,7 +1752,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13653358, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Height
-      value: 0.29099995
+      value: 0.291
       objectReference: {fileID: 0}
     - target: {fileID: 13611584, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Radius
@@ -1761,7 +1760,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13611584, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Height
-      value: 0.034329996
+      value: 0.03433
       objectReference: {fileID: 0}
     - target: {fileID: 13665176, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Radius
@@ -1769,7 +1768,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13665176, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Height
-      value: 0.054219995
+      value: 0.05422
       objectReference: {fileID: 0}
     - target: {fileID: 13618002, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Radius
@@ -1793,7 +1792,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13609178, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Height
-      value: 0.033649996
+      value: 0.03365
       objectReference: {fileID: 0}
     - target: {fileID: 13621156, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Radius
@@ -1801,7 +1800,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13621156, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Height
-      value: 0.029669996
+      value: 0.02967
       objectReference: {fileID: 0}
     - target: {fileID: 13642902, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Radius
@@ -1809,7 +1808,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13642902, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Height
-      value: 0.052629992
+      value: 0.05263
       objectReference: {fileID: 0}
     - target: {fileID: 13695480, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Radius
@@ -1825,7 +1824,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13643808, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Height
-      value: 0.047779992
+      value: 0.047779996
       objectReference: {fileID: 0}
     - target: {fileID: 13640252, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Radius
@@ -1833,7 +1832,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13640252, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Height
-      value: 0.04936999
+      value: 0.04937
       objectReference: {fileID: 0}
     - target: {fileID: 13661254, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Radius
@@ -1841,7 +1840,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13661254, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Height
-      value: 0.030379996
+      value: 0.03038
       objectReference: {fileID: 0}
     - target: {fileID: 13604654, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Radius
@@ -1849,7 +1848,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13604654, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Height
-      value: 0.025299996
+      value: 0.0253
       objectReference: {fileID: 0}
     - target: {fileID: 13638526, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Radius
@@ -1857,7 +1856,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13638526, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Height
-      value: 0.039569996
+      value: 0.03957
       objectReference: {fileID: 0}
     - target: {fileID: 13630498, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Radius
@@ -1865,7 +1864,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13630498, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Height
-      value: 0.04074
+      value: 0.040740002
       objectReference: {fileID: 0}
     - target: {fileID: 13600456, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Radius
@@ -1873,7 +1872,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 13600456, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_Height
-      value: 0.026109997
+      value: 0.02611
       objectReference: {fileID: 0}
     - target: {fileID: 452704, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_LocalRotation.x
