@@ -140,26 +140,26 @@ namespace Leap.Unity{
       public bool CheckStale() {
         return _combinedTexture == null;
       }
-
-      public void Reconstruct(Image image, string shaderName)
-      {
+  
+      public void Reconstruct(Image image, string shaderName) {
         int combinedWidth = image.DistortionWidth / 2;
         int combinedHeight = image.DistortionHeight * 2;
-
+  
         if (_combinedTexture != null) {
           DestroyImmediate(_combinedTexture);
         }
-
+  
         Color32[] colorArray = new Color32[combinedWidth * combinedHeight];
         _combinedTexture = new Texture2D(combinedWidth, combinedHeight, TextureFormat.RGBA32, false, true);
         _combinedTexture.filterMode = FilterMode.Bilinear;
         _combinedTexture.wrapMode = TextureWrapMode.Clamp;
         _combinedTexture.hideFlags = HideFlags.DontSave;
-
+  
         addDistortionData(image, colorArray, 0);
-
+  
         _combinedTexture.SetPixels32(colorArray);
         _combinedTexture.Apply();
+  
         Shader.SetGlobalTexture(shaderName, _combinedTexture);
       }
   
@@ -292,18 +292,11 @@ namespace Leap.Unity{
     }
 
     void OnDisable() {
-      Controller controller = _provider.GetLeapController();
-      if (controller != null) {
-        controller.DistortionChange -= onDistortionChange;
-      }
+      _provider.GetLeapController().DistortionChange -= onDistortionChange;
       LeapVRCameraControl.OnValidCameraParams -= HandleOnValidCameraParams;
     }
-
     void OnDestroy() {
-      Controller controller = _provider.GetLeapController();
-      if (controller != null) {
-        controller.DistortionChange -= onDistortionChange;
-      }
+      _provider.GetLeapController().DistortionChange -= onDistortionChange;
       LeapVRCameraControl.OnValidCameraParams -= HandleOnValidCameraParams;
     }
 
@@ -327,22 +320,18 @@ namespace Leap.Unity{
 
     void Update() {
       if(imagesEnabled){
-          Frame imageFrame = _provider.CurrentFrame;
-          Controller controller = _provider.GetLeapController();
-          _requestedImage = controller.RequestImages(imageFrame.Id, Image.ImageType.DEFAULT);
+        Frame imageFrame = _provider.CurrentFrame;
+        Controller controller = _provider.GetLeapController();
+        _requestedImage = controller.RequestImages(imageFrame.Id, Image.ImageType.DEFAULT);
       } else if(!checkingImageState){
          StartCoroutine(checkImageMode());
       }
     }
     
     private IEnumerator waitForController(){
-      while (_provider == null) {
+      Controller controller = _provider.GetLeapController();
+      if(controller == null){
         yield return null;
-      }
-      Controller controller = null;
-      while (controller == null) {
-          controller = _provider.GetLeapController();
-          yield return null;
       }
       controller.DistortionChange += onDistortionChange;
       controller.Connect += delegate {
@@ -350,9 +339,10 @@ namespace Leap.Unity{
           this.imagesEnabled = enabled == 0 ? false : true;
         });
       };
-      if (!checkingImageState) {
+      if(!checkingImageState){
         StartCoroutine(checkImageMode());
       }
+      yield break;
     }
 
     private IEnumerator checkImageMode(){
