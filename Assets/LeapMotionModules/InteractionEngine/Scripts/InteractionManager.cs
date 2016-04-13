@@ -430,28 +430,16 @@ namespace Leap.Unity.Interaction {
 
       InteractionC.UpdateController(ref _scene, ref _controllerTransform);
     }
-
-    private bool toggle = false;
+    
     protected virtual void updateInteractionStateChanges(Frame frame) {
       var hands = frame.Hands;
-
-      if (Input.GetKeyDown(KeyCode.Space)) {
-        toggle = !toggle;
-      }
 
       //First loop through all the hands and get their classifications from the engine
       for (int i = 0; i < hands.Count; i++) {
         Hand hand = hands[i];
 
-        INTERACTION_HAND_RESULT handResult;
-        InteractionC.GetHandResult(ref _scene,
-                                       (uint)hand.Id,
-                                   out handResult);
-
-        if (toggle) {
-          handResult.classification = ManipulatorMode.Grasp;
-          handResult.instanceHandle = _registeredBehaviours[0].ShapeInstanceHandle;
-        }
+        bool hasHandResult = false;
+        INTERACTION_HAND_RESULT handResult = new INTERACTION_HAND_RESULT();
 
         //Get the InteractionHand associated with this hand id
         InteractionHand interactionHand;
@@ -483,12 +471,13 @@ namespace Leap.Unity.Interaction {
             }
 
             //Override the existing classification to force the hand to grab the old object
+            hasHandResult = true;
             handResult = new INTERACTION_HAND_RESULT();
             handResult.classification = ManipulatorMode.Grasp;
             handResult.handFlags = HandResultFlags.ManipulatorMode;
             handResult.instanceHandle = interactionHand.graspedObject.ShapeInstanceHandle;
-            InteractionC.OverrideHandResult(ref _scene, (uint)hand.Id, ref handResult);
 
+            InteractionC.OverrideHandResult(ref _scene, (uint)hand.Id, ref handResult);
           } else {
             //Otherwise just create a new one
             interactionHand = new InteractionHand(hand);
@@ -496,6 +485,11 @@ namespace Leap.Unity.Interaction {
 
           //In both cases, associate the id with the new ieHand
           _idToInteractionHand[hand.Id] = interactionHand;
+        }
+
+        if (!hasHandResult) {
+          handResult = getHandResults(interactionHand);
+          hasHandResult = true;
         }
 
         interactionHand.UpdateHand(hand);
@@ -587,6 +581,14 @@ namespace Leap.Unity.Interaction {
         _idToInteractionHand.Remove(_handIdsToRemove[i]);
       }
       _handIdsToRemove.Clear();
+    }
+
+    protected virtual INTERACTION_HAND_RESULT getHandResults(InteractionHand hand) {
+      INTERACTION_HAND_RESULT handResult;
+      InteractionC.GetHandResult(ref _scene,
+                                     (uint)hand.hand.Id,
+                                 out handResult);
+      return handResult;
     }
 
     protected virtual void dispatchSimulationResults() {
