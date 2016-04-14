@@ -19,8 +19,9 @@ namespace Leap.Unity.Interaction.CApi {
 
     [Conditional("ENABLE_LOGGING")]
     public static void HandleReturnStatus(INTERACTION_SCENE scene, string methodName, LogLevel methodLevel, ReturnStatus rs) {
-      IntPtr textPtr = InteractionC.GetLastErrorString(ref scene);
-      handleReturnStatusInternal(methodName, methodLevel, rs, textPtr);
+      IntPtr messagePtr;
+      InteractionC.GetLastError(ref scene, out messagePtr);
+      handleReturnStatusInternal(methodName, methodLevel, rs, messagePtr);
     }
 
     [Conditional("ENABLE_LOGGING")]

@@ -258,11 +258,23 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Get Last Error ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastError")]
-    public static extern ReturnStatus GetLastError(ref INTERACTION_SCENE scene);
+    private static extern ReturnStatus GetLastError(ref INTERACTION_SCENE scene);
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastErrorString")]
+    private static extern IntPtr GetLastErrorString();
 
-    /*** Get Last Error String ***/
-    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastErrorString", CharSet = CharSet.Ansi)]
-    public static extern IntPtr GetLastErrorString(ref INTERACTION_SCENE scene);
+    public static ReturnStatus GetLastError(ref INTERACTION_SCENE scene, 
+                                            out string message) {
+      ReturnStatus rs = GetLastError(ref scene);
+      message = Marshal.PtrToStringAnsi(GetLastErrorString());
+      return rs;
+    }
+
+    public static ReturnStatus GetLastError(ref INTERACTION_SCENE scene,
+                                            out IntPtr messagePtr) {
+      ReturnStatus rs = GetLastError(ref scene);
+      messagePtr = GetLastErrorString();
+      return rs;
+    }
 
     /*** Add Shape Description ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEAddShapeDescription")]
