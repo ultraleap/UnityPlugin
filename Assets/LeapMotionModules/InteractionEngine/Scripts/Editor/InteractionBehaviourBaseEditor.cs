@@ -55,7 +55,7 @@ namespace Leap.Unity.Interaction {
         EditorGUILayout.Space();
         InteractionBehaviourBase behaviour = target as InteractionBehaviourBase;
 
-        if (!behaviour.IsInteractionEnabled) {
+        if (!behaviour.IsRegisteredWithManager) {
           EditorGUILayout.LabelField("Interaction Disabled", EditorStyles.boldLabel);
         } else {
           EditorGUILayout.LabelField("Interaction Info", EditorStyles.boldLabel);

@@ -7,7 +7,7 @@ using Leap.Unity.Interaction.CApi;
 namespace Leap.Unity.Interaction {
 
   [DisallowMultipleComponent]
-  public abstract class InteractionBehaviourBase : MonoBehaviour, IInteractionBehaviour {
+  public abstract class InteractionBehaviourBase : IInteractionBehaviour {
 
     #region SERIALIZED FIELDS
     [SerializeField]
@@ -29,16 +29,16 @@ namespace Leap.Unity.Interaction {
 
     #region PUBLIC METHODS
 
-    public InteractionManager Manager {
+    public override InteractionManager Manager {
       get {
         return _manager;
       }
       set {
         if (_manager != value) {
-          if (IsInteractionEnabled) {
-            DisableInteraction();
+          if (_isRegisteredWithManager) {
+            enabled = false;
             _manager = value;
-            EnableInteraction();
+            enabled = true;
           } else {
             _manager = value;
           }
@@ -46,44 +46,13 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public bool IsInteractionEnabled {
+    public override bool IsRegisteredWithManager {
       get {
         return _isRegisteredWithManager;
       }
-      set {
-        if (value) {
-          EnableInteraction();
-        } else {
-          DisableInteraction();
-        }
-      }
     }
 
-    public virtual void EnableInteraction() {
-      if (_isRegisteredWithManager) {
-        return;
-      }
-
-      if (_manager == null) {
-        throw new NoManagerSpecifiedException();
-      }
-
-      _manager.RegisterInteractionBehaviour(this);
-    }
-
-    public virtual void DisableInteraction() {
-      if (!_isRegisteredWithManager) {
-        return;
-      }
-
-      if (_manager == null) {
-        throw new NoManagerSpecifiedException();
-      }
-
-      _manager.UnregisterInteractionBehaviour(this);
-    }
-
-    public INTERACTION_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
+    public override INTERACTION_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
       get {
         if (!_isRegisteredWithManager) {
           throw new NotRegisteredWithManagerException();
@@ -97,7 +66,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public INTERACTION_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
+    public override INTERACTION_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
       get {
         if (!_hasShapeInstanceHandle) {
           throw new InvalidOperationException("Cannot get ShapeInstanceHandle because it has not been assigned.");
@@ -107,31 +76,31 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public bool IsBeingGrasped {
+    public override bool IsBeingGrasped {
       get {
         return _graspingIds.Count > 0;
       }
     }
 
-    public int GraspingHandCount {
+    public override int GraspingHandCount {
       get {
         return _graspingIds.Count;
       }
     }
 
-    public int UntrackedHandCount {
+    public override int UntrackedHandCount {
       get {
         return _untrackedIds.Count;
       }
     }
 
-    public IEnumerable<int> GraspingHands {
+    public override IEnumerable<int> GraspingHands {
       get {
         return _graspingIds;
       }
     }
 
-    public IEnumerable<int> TrackedGraspingHands {
+    public override IEnumerable<int> TrackedGraspingHands {
       get {
         for (int i = 0; i < _graspingIds.Count; i++) {
           int id = _graspingIds[i];
@@ -142,48 +111,44 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public IEnumerable<int> UntrackedGraspingHands {
+    public override IEnumerable<int> UntrackedGraspingHands {
       get {
         return _untrackedIds;
       }
     }
 
-    public bool IsBeingGraspedByHand(int handId) {
+    public override bool IsBeingGraspedByHand(int handId) {
       return _graspingIds.Contains(handId);
     }
     #endregion
 
     #region MANAGER CALLBACKS
 
-    public virtual void OnRegister() {
+    public override void OnRegister() {
       _isRegisteredWithManager = true;
     }
 
-    public virtual void OnUnregister() {
+    public override void OnUnregister() {
       _isRegisteredWithManager = false;
     }
 
-    public virtual void OnPreSolve() { }
+    public override void OnPreSolve() { }
 
-    public virtual void OnPostSolve() { }
+    public override void OnPostSolve() { }
 
-    public abstract void OnInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform);
-
-    public virtual void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
+    public override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
       _shapeInstanceHandle = instanceHandle;
       _hasShapeInstanceHandle = true;
     }
 
-    public abstract void OnInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform);
-
-    public virtual void OnInteractionShapeDestroyed() {
+    public override void OnInteractionShapeDestroyed() {
       _shapeInstanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
       _shapeDescriptionHandle = new INTERACTION_SHAPE_DESCRIPTION_HANDLE();
       _hasShapeDescriptionBeenCreated = false;
       _hasShapeInstanceHandle = false;
     }
 
-    public virtual void OnHandGrasp(Hand hand) {
+    public override void OnHandGrasp(Hand hand) {
       Assert.IsFalse(_graspingIds.Contains(hand.Id), HandAlreadyGraspingMessage(hand.Id));
 
       _graspingIds.Add(hand.Id);
@@ -193,9 +158,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public virtual void OnHandsHold(List<Hand> hands) { }
+    public override void OnHandsHold(List<Hand> hands) { }
 
-    public virtual void OnHandRelease(Hand hand) {
+    public override void OnHandRelease(Hand hand) {
       Assert.AreNotEqual(_graspingIds.Count, 0, NoGraspingHandsMessage());
       Assert.IsTrue(_graspingIds.Contains(hand.Id), HandNotGraspingMessage(hand.Id));
 
@@ -206,7 +171,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public virtual void OnHandLostTracking(Hand oldHand) {
+    public override void OnHandLostTracking(Hand oldHand) {
       Assert.AreNotEqual(_graspingIds.Count, 0, NoGraspingHandsMessage());
       Assert.IsTrue(_graspingIds.Contains(oldHand.Id), HandNotGraspingMessage(oldHand.Id));
       Assert.IsFalse(_untrackedIds.Contains(oldHand.Id), HandAlreadyUntrackedMessage(oldHand.Id));
@@ -214,7 +179,7 @@ namespace Leap.Unity.Interaction {
       _untrackedIds.Add(oldHand.Id);
     }
 
-    public virtual void OnHandRegainedTracking(Hand newHand, int oldId) {
+    public override void OnHandRegainedTracking(Hand newHand, int oldId) {
       Assert.IsTrue(_graspingIds.Contains(oldId), HandNotGraspingMessage(oldId));
       Assert.IsFalse(_graspingIds.Contains(newHand.Id), HandAlreadyGraspingMessage(newHand.Id));
 
@@ -223,7 +188,7 @@ namespace Leap.Unity.Interaction {
       _graspingIds.Add(newHand.Id);
     }
 
-    public virtual void OnHandTimeout(Hand oldHand) {
+    public override void OnHandTimeout(Hand oldHand) {
       _untrackedIds.Remove(oldHand.Id);
       _graspingIds.Remove(oldHand.Id);
 
@@ -233,7 +198,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public virtual void OnRecieveSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) { }
+    public override void OnRecieveSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) { }
     #endregion
 
     #region PROTECTED METHODS
@@ -272,11 +237,27 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void OnEnable() {
-      EnableInteraction();
+      if (_manager == null) {
+        enabled = false;
+      }
+
+      if (_isRegisteredWithManager) {
+        return;
+      }
+
+      _manager.RegisterInteractionBehaviour(this);
     }
 
     protected virtual void OnDisable() {
-      DisableInteraction();
+      if (_manager == null) {
+        return;
+      }
+
+      if (!_isRegisteredWithManager) {
+        return;
+      }
+
+      _manager.UnregisterInteractionBehaviour(this);
     }
     #endregion
 

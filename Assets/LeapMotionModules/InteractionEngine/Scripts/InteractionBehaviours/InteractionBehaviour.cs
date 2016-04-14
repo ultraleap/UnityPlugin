@@ -38,6 +38,31 @@ namespace Leap.Unity.Interaction {
     protected Bounds _debugBounds;
 
     #region PUBLIC METHODS
+
+    public bool IsKinematic {
+      get {
+        return _isKinematic;
+      }
+      set {
+        _isKinematic = value;
+        if (!IsRegisteredWithManager) {
+          _rigidbody.isKinematic = value;
+        }
+      }
+    }
+
+    public bool UseGravity {
+      get {
+        return _useGravity;
+      }
+      set {
+        _useGravity = value;
+        if (!IsRegisteredWithManager) {
+          _rigidbody.useGravity = _useGravity;
+        }
+      }
+    }
+
     public void AddLinearAcceleration(Vector3 acceleration) {
       _accumulatedLinearAcceleration += acceleration;
     }
@@ -73,6 +98,7 @@ namespace Leap.Unity.Interaction {
     public override void OnUnregister() {
       base.OnUnregister();
 
+      _rigidbody.isKinematic = _isKinematic;
       _rigidbody.useGravity = _useGravity;
       KabschC.Destruct(ref _kabsch);
     }
@@ -256,13 +282,15 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void OnDrawGizmos() {
-      Matrix4x4 gizmosMatrix = Gizmos.matrix;
+      if (IsRegisteredWithManager) {
+        Matrix4x4 gizmosMatrix = Gizmos.matrix;
 
-      Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
-      Gizmos.color = IsBeingGrasped ? Color.green : Color.blue;
-      Gizmos.DrawWireCube(_debugBounds.center, _debugBounds.size);
+        Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
+        Gizmos.color = IsBeingGrasped ? Color.green : Color.blue;
+        Gizmos.DrawWireCube(_debugBounds.center, _debugBounds.size);
 
-      Gizmos.matrix = gizmosMatrix;
+        Gizmos.matrix = gizmosMatrix;
+      }
     }
     #endregion
 
