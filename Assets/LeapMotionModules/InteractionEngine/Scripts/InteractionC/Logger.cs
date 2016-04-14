@@ -1,5 +1,6 @@
 ﻿#define ENABLE_LOGGING
 using System;
+using System.Runtime.InteropServices;
 using System.Diagnostics;
 
 namespace Leap.Unity.Interaction.CApi {
@@ -18,16 +19,16 @@ namespace Leap.Unity.Interaction.CApi {
 
     [Conditional("ENABLE_LOGGING")]
     public static void HandleReturnStatus(INTERACTION_SCENE scene, string methodName, LogLevel methodLevel, ReturnStatus rs) {
-      string extraText = InteractionC.GetLastErrorString(ref scene);
-      handleReturnStatusInternal(methodName, methodLevel, rs, extraText);
+      IntPtr textPtr = InteractionC.GetLastErrorString(ref scene);
+      handleReturnStatusInternal(methodName, methodLevel, rs, textPtr);
     }
 
     [Conditional("ENABLE_LOGGING")]
     public static void HandleReturnStatus(string methodName, LogLevel methodLevel, ReturnStatus rs) {
-      handleReturnStatusInternal(methodName, methodLevel, rs, null);
+      handleReturnStatusInternal(methodName, methodLevel, rs, IntPtr.Zero);
     }
 
-    public static void handleReturnStatusInternal(string methodName, LogLevel methodLevel, ReturnStatus rs, string extraErrorText) {
+    public static void handleReturnStatusInternal(string methodName, LogLevel methodLevel, ReturnStatus rs, IntPtr textPtr) {
       string message;
       LogLevel level;
       rs.GetInfo(out message, out level);
@@ -38,9 +39,9 @@ namespace Leap.Unity.Interaction.CApi {
         string totalMessage = methodName + " returned " + message;
 
         if (maxLevel == LogLevel.Error) {
-          if (!string.IsNullOrEmpty(extraErrorText)) {
+          if (textPtr != IntPtr.Zero) {
             totalMessage += "\n";
-            totalMessage += extraErrorText;
+            totalMessage += Marshal.PtrToStringAnsi(textPtr);
           }
 
           throw new Exception(totalMessage);
