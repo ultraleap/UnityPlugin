@@ -11,22 +11,25 @@ public class LeapInputModule : BaseInputModule {
     public LeapProvider LeapDataProvider;
     public int NumberOfHands = 2;
     public float ProjectiveToTactileTransitionDistance = 0.06f;
-
-    //[HideInInspector]
-    public bool GuiHit;
-    [HideInInspector]
-    public bool ButtonUsed;
-
+    public float PinchingThreshold = 0.7f;
+    public bool OverrideScrollViewClicks = false;
     public bool DrawDebug = false;
-
-    private PointerEventData[] PointEvents;
-    private Camera EventCamera;
 
     [Header(" [Pointer setup]")]
     public Sprite PointerSprite;
     public Material PointerMaterial;
     public float NormalPointerScale = 0.00025f; //In world space
     private RectTransform[] Pointers;
+    public Color NormalColor = Color.white;
+    public Color HoveringColor = Color.green;
+    public Color TriggeringColor = Color.gray;
+    public Color TriggerMissedColor = Color.gray;
+
+
+
+    private PointerEventData[] PointEvents;
+    private Camera EventCamera;
+    private bool ButtonUsed;
 
     private GameObject[] CurrentPoint;
     private GameObject[] CurrentPressed;
@@ -35,7 +38,6 @@ public class LeapInputModule : BaseInputModule {
     private Queue<Vector3> DebugSphereQueue;
     Canvas[] canvases;
 
-    public float PinchingThreshold = 0.7f;
     private bool[] TriggeringInteraction;
     private Quaternion CurrentRotation;
     private Vector2[] PrevScreenPosition;
@@ -51,7 +53,6 @@ public class LeapInputModule : BaseInputModule {
         TouchingCanvas,
         OffCanvas
     };
-
 
 
     // Use this for initialization
@@ -113,12 +114,10 @@ public class LeapInputModule : BaseInputModule {
         CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.01f);
     }
 
-    // Process is called by UI system to process events
+    //Process is called by UI system to process events
     public override void Process() {
-        //InitializeControllers();
         //DebugSphereQueue.Enqueue(InputTracking.GetLocalPosition(VRNode.CenterEye));
 
-        GuiHit = false;
         ButtonUsed = false;
 
         //Send update events if there is a selected object - this is important for InputField to receive keyboard events
@@ -184,16 +183,16 @@ public class LeapInputModule : BaseInputModule {
                         GameObject newPressed = ExecuteEvents.ExecuteHierarchy(CurrentPressed[whichHand], PointEvents[whichHand], ExecuteEvents.pointerDownHandler);
 
                         if (newPressed == null) {
-                            // some UI elements might only have click handler and not pointer down handler
+                            //Some UI elements might only have click handler and not pointer down handler
                             newPressed = ExecuteEvents.ExecuteHierarchy(CurrentPressed[whichHand], PointEvents[whichHand], ExecuteEvents.pointerClickHandler);
                             if (newPressed != null) {
                                 CurrentPressed[whichHand] = newPressed;
                             }
                         } else {
                             CurrentPressed[whichHand] = newPressed;
-                            // we want to do click on button down at same time, unlike regular mouse processing
-                            // which does click when mouse goes up over same object it went down on
-                            // reason to do this is head tracking might be jittery and this makes it easier to click buttons
+                            //We want to do "click on button down" at same time, unlike regular mouse processing
+                            //Which does click when mouse goes up over same object it went down on
+                            //The reason to do this is head tracking might be jittery and this makes it easier to click buttons
                             ExecuteEvents.Execute(newPressed, PointEvents[whichHand], ExecuteEvents.pointerClickHandler);
                         }
 
@@ -238,16 +237,19 @@ public class LeapInputModule : BaseInputModule {
             switch (pointerState[whichHand]) {
                 case pointerStates.OnCanvas:
                     lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 1f), 0.2f);
-                    lerpPointerColor(whichHand, Color.white, 0.2f);
+                    lerpPointerColor(whichHand, NormalColor, 0.2f);
                     break;
                 case pointerStates.OnElement:
-                    lerpPointerColor(whichHand, Color.green, 0.2f);
+                    lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 1f), 0.2f);
+                    lerpPointerColor(whichHand, HoveringColor, 0.2f);
                     break;
                 case pointerStates.PinchingToCanvas:
-                    lerpPointerColor(whichHand, new Color(0.8f, 0.8f, 0.8f, 1f), 0.2f);
+                    lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 1f), 0.2f);
+                    lerpPointerColor(whichHand, TriggerMissedColor, 0.2f);
                     break;
                 case pointerStates.PinchingToElement:
-                    lerpPointerColor(whichHand, new Color(0.5f, 0.5f, 0.5f, 1f), 0.2f);
+                    lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 1f), 0.2f);
+                    lerpPointerColor(whichHand, TriggeringColor, 0.2f);
                     break;
                 case pointerStates.NearCanvas:
                     lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 0f), 0.1f);
@@ -270,6 +272,8 @@ public class LeapInputModule : BaseInputModule {
             PointEvents[whichHand].Reset();
         }
 
+        PointEvents[whichHand].button = PointerEventData.InputButton.Left;
+
         //Set Camera Origin
         EventCamera.transform.position = Origin;
         if (DrawDebug)
@@ -287,22 +291,47 @@ public class LeapInputModule : BaseInputModule {
         }
 
         //Set its raycast direction and delta
-        PointEvents[whichHand].position = Vector2.Lerp(PrevScreenPosition[whichHand], EventCamera.WorldToScreenPoint(IndexFingerPosition),0.5f);//new Vector2(Screen.width / 2, Screen.height / 2);
-        PointEvents[whichHand].delta = (PointEvents[whichHand].position - PrevScreenPosition[whichHand])*-10f;
+        PointEvents[whichHand].position = Vector2.Lerp(PrevScreenPosition[whichHand], EventCamera.WorldToScreenPoint(IndexFingerPosition), 1.0f);//new Vector2(Screen.width / 2, Screen.height / 2);
+        PointEvents[whichHand].delta = (PointEvents[whichHand].position - PrevScreenPosition[whichHand]) * -10f;
         PrevScreenPosition[whichHand] = PointEvents[whichHand].position;
         PointEvents[whichHand].scrollDelta = Vector2.zero;
 
         //Perform the raycast and see if we hit anything
         base.eventSystem.RaycastAll(PointEvents[whichHand], m_RaycastResultCache);
-        PointEvents[whichHand].pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
+
+        //HACKY CODE TO GET IT TO WORK ON SCROLLRECTS - WHY DOESN'T FINDFIRSTRAYCAST DO THIS
+        if (OverrideScrollViewClicks) {
+            PointEvents[whichHand].pointerCurrentRaycast = new RaycastResult();
+            foreach (RaycastResult hit in m_RaycastResultCache) {
+                if (hit.gameObject.GetComponent<Scrollbar>() != null) {
+                    PointEvents[whichHand].pointerCurrentRaycast = hit;
+                } else if (PointEvents[whichHand].pointerCurrentRaycast.gameObject == null && hit.gameObject.GetComponent<ScrollRect>() != null) {
+                    PointEvents[whichHand].pointerCurrentRaycast = hit;
+                }
+            }
+            if (PointEvents[whichHand].pointerCurrentRaycast.gameObject == null) {
+                PointEvents[whichHand].pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
+            }
+        }else {
+            PointEvents[whichHand].pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
+        }
+
+        //Check what we're hitting and set the PointerState to match
         if ((PointEvents[whichHand].pointerCurrentRaycast.gameObject != null)) {
             if (checkIfClickable(PointEvents[whichHand].pointerCurrentRaycast.gameObject)) {
-                GuiHit = true; //gets set to false at the beginning of the process event
-                if (!isTriggeringInteraction(whichHand)&&(pointerState[whichHand] != pointerStates.NearCanvas && pointerState[whichHand] != pointerStates.TouchingCanvas)) {
-                    pointerState[whichHand] = pointerStates.OnElement;
+                if (pointerState[whichHand] != pointerStates.NearCanvas && pointerState[whichHand] != pointerStates.TouchingCanvas) {
+                    if (isTriggeringInteraction(whichHand)) {
+                        pointerState[whichHand] = pointerStates.PinchingToElement;
+                    }else {
+                        pointerState[whichHand] = pointerStates.OnElement;
+                    }
                 }
             }else if (pointerState[whichHand] != pointerStates.NearCanvas && pointerState[whichHand] != pointerStates.TouchingCanvas) {
-                pointerState[whichHand] = pointerStates.OnCanvas;
+                if (isTriggeringInteraction(whichHand)) {
+                    pointerState[whichHand] = pointerStates.PinchingToCanvas;
+                } else {
+                    pointerState[whichHand] = pointerStates.OnCanvas;
+                }
             }
         }else {
             pointerState[whichHand] = pointerStates.OffCanvas;
@@ -329,7 +358,8 @@ public class LeapInputModule : BaseInputModule {
                 Vector3 globalLookPos;
                 if (RectTransformUtility.ScreenPointToWorldPointInRectangle(draggingPlane, pointData.position, pointData.enterEventCamera, out globalLookPos)) {
                     Pointers[index].position = globalLookPos;
-                    Pointers[index].rotation = draggingPlane.rotation;
+                    float cursorAngle = Mathf.Rad2Deg*(Mathf.Atan2(pointData.delta.x, pointData.delta.y));
+                    Pointers[index].rotation = draggingPlane.rotation * Quaternion.Euler(0f,0f, -cursorAngle);
 
                     // scale cursor based on distance to camera
                     float lookPointDistance = 1f;
@@ -344,7 +374,7 @@ public class LeapInputModule : BaseInputModule {
                         Pointerscale = NormalPointerScale;
                     }
 
-                    Pointers[index].localScale = Vector3.one * Pointerscale;
+                    Pointers[index].localScale = Pointerscale * new Vector3(1f, 1f + pointData.delta.magnitude*0.5f, 1f);
                 }
             }
         } else {
@@ -356,16 +386,7 @@ public class LeapInputModule : BaseInputModule {
         if (distanceOfIndexTipToPointer(whichHand) < ProjectiveToTactileTransitionDistance) {
             return distanceOfIndexTipToPointer(whichHand) < 0.01f;
         }else {
-            if(LeapDataProvider.CurrentFrame.Hands[whichHand].PinchStrength > PinchingThreshold) {
-                if (GuiHit) {
-                    pointerState[whichHand] = pointerStates.PinchingToElement;
-                } else {
-                    pointerState[whichHand] = pointerStates.PinchingToCanvas;
-                }
-                
-                return true;
-            }
-            return false;
+            return LeapDataProvider.CurrentFrame.Hands[whichHand].PinchStrength > PinchingThreshold;
         }
     }
 
