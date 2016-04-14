@@ -5,27 +5,22 @@ using System.Collections.Generic;
 
 namespace Leap.Unity{
   [CustomEditor(typeof(LeapImageRetriever))]
-  public class LeapImageRetrieverEditor : Editor {
+  public class LeapImageRetrieverEditor : CustomEditorBase {
 
     private GUIContent _brightTextureGUIContent;
     private GUIContent _rawTextureGUIContent;
     private GUIContent _distortionTextureGUIContent;
 
-    void OnEnable() {
+    protected override void OnEnable() {
+      base.OnEnable();
+
       _brightTextureGUIContent = new GUIContent("Bright Texture");
       _rawTextureGUIContent = new GUIContent("Raw Texture");
       _distortionTextureGUIContent = new GUIContent("Distortion Texture");
     }
 
     public override void OnInspectorGUI() {
-      serializedObject.Update();
-      SerializedProperty properties = serializedObject.GetIterator();
-
-      bool useEnterChildren = true;
-      while (properties.NextVisible(useEnterChildren) == true) {
-        useEnterChildren = false;
-        EditorGUILayout.PropertyField(properties, true);
-      }
+      base.OnInspectorGUI();
 
       if (Application.isPlaying) {
         LeapImageRetriever retriever = target as LeapImageRetriever;
@@ -38,8 +33,6 @@ namespace Leap.Unity{
         EditorGUILayout.ObjectField(_distortionTextureGUIContent, data.Distortion.CombinedTexture, dataType, true);
         EditorGUI.EndDisabledGroup();
       }
-
-      serializedObject.ApplyModifiedProperties();
     }
   }
 }
