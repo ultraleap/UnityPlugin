@@ -330,7 +330,7 @@ namespace Leap.Unity{
     
     private IEnumerator waitForController(){
       Controller controller = _provider.GetLeapController();
-      if(controller == null){
+      while(controller == null){
         yield return null;
       }
       controller.DistortionChange += onDistortionChange;
