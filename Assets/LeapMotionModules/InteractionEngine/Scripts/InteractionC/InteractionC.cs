@@ -240,7 +240,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static ReturnStatus DestroyScene(ref INTERACTION_SCENE scene) {
       var rs = LeapIEDestroyScene(ref scene);
-      Logger.HandleReturnStatus(scene, "Destroy Scene", LogLevel.Info, rs);
+      Logger.HandleReturnStatus("Destroy Scene", LogLevel.Info, rs);
       return rs;
     }
 
@@ -260,9 +260,9 @@ namespace Leap.Unity.Interaction.CApi {
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastError")]
     public static extern ReturnStatus GetLastError(ref INTERACTION_SCENE scene);
 
-    /*** Get Last String ***/
-    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastError")]
-    public static extern string GetLastErrorString(ref INTERACTION_SCENE scene);
+    /*** Get Last Error String ***/
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastErrorString", CharSet = CharSet.Ansi)]
+    public static extern IntPtr GetLastErrorString(ref INTERACTION_SCENE scene);
 
     /*** Add Shape Description ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEAddShapeDescription")]
