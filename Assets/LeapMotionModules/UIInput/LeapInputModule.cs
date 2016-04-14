@@ -12,10 +12,10 @@ public class LeapInputModule : BaseInputModule {
     public int NumberOfHands = 2;
     public float ProjectiveToTactileTransitionDistance = 0.06f;
 
-    [HideInInspector]
+    //[HideInInspector]
     public bool GuiHit;
     [HideInInspector]
-    public  bool ButtonUsed;
+    public bool ButtonUsed;
 
     public bool DrawDebug = false;
 
@@ -40,7 +40,19 @@ public class LeapInputModule : BaseInputModule {
     private Quaternion CurrentRotation;
     private Vector2[] PrevScreenPosition;
 
-    private bool projectingFromIndexTip = false;
+    private pointerStates[] pointerState;
+
+    enum pointerStates : int {
+        OnCanvas,
+        OnElement,
+        PinchingToCanvas,
+        PinchingToElement,
+        NearCanvas,
+        TouchingCanvas,
+        OffCanvas
+    };
+
+
 
     // Use this for initialization
     protected override void Start() {
@@ -71,7 +83,7 @@ public class LeapInputModule : BaseInputModule {
 
             UnityEngine.UI.Image image = pointer.AddComponent<UnityEngine.UI.Image>();
             image.sprite = PointerSprite;
-            image.material = PointerMaterial;
+            image.material = Instantiate(PointerMaterial);
             image.raycastTarget = false;
 
             if (PointerSprite == null)
@@ -86,6 +98,8 @@ public class LeapInputModule : BaseInputModule {
 
         TriggeringInteraction = new bool[NumberOfHands];
         PrevScreenPosition = new Vector2[NumberOfHands];
+        pointerState = new pointerStates[NumberOfHands];
+
         CurrentRotation = InputTracking.GetLocalRotation(VRNode.Head);
 
         PointEvents = new PointerEventData[NumberOfHands];
@@ -119,6 +133,7 @@ public class LeapInputModule : BaseInputModule {
                 continue;
             }
 
+            //Calculate Shoulders
             Vector3 ProjectionOrigin = Vector3.zero;
             switch (LeapDataProvider.CurrentFrame.Hands[whichHand].IsRight) {
                 case true:
@@ -134,19 +149,17 @@ public class LeapInputModule : BaseInputModule {
             if (DrawDebug)
                 Debug.DrawRay(ProjectionOrigin, CurrentRotation * Vector3.forward * 5f);
 
-            Color oldColor = Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color;
-            if (distanceOfIndexTipToCursor(whichHand) < ProjectiveToTactileTransitionDistance +0.05f) {
-                Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = new Color(1f, 1f, 1f, Mathf.Lerp(oldColor.a, 0f, 0.1f));
-                if (distanceOfIndexTipToCursor(whichHand) < ProjectiveToTactileTransitionDistance) {
-                    projectingFromIndexTip = true;
+            if (distanceOfIndexTipToPointer(whichHand) < ProjectiveToTactileTransitionDistance +0.05f) {
+                pointerState[whichHand] = pointerStates.NearCanvas;
+                if (distanceOfIndexTipToPointer(whichHand) < ProjectiveToTactileTransitionDistance) {
+                    pointerState[whichHand] = pointerStates.TouchingCanvas;
                 }
-            } else {
-                Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = new Color(1f, 1f, 1f, Mathf.Lerp(oldColor.a, 1f, 0.1f));
-                projectingFromIndexTip = false;
+            }else if(pointerState[whichHand] != pointerStates.OffCanvas) {
+                pointerState[whichHand] = pointerStates.OnCanvas;
             }
 
             //Raycast from shoulder through index finger to the UI
-            GetLookPointerEventData(whichHand, ProjectionOrigin, CurrentRotation * Vector3.forward);// (IndexBasePosition - ProjectionOrigin).normalized);
+            GetLookPointerEventData(whichHand, ProjectionOrigin, CurrentRotation * Vector3.forward);
 
             if (PointEvents[whichHand].pointerCurrentRaycast.gameObject != null) {
                 CurrentPoint[whichHand] = PointEvents[whichHand].pointerCurrentRaycast.gameObject;
@@ -222,6 +235,30 @@ public class LeapInputModule : BaseInputModule {
                     ExecuteEvents.Execute(CurrentDragging[whichHand], PointEvents[whichHand], ExecuteEvents.dragHandler);
                 }
             }
+            switch (pointerState[whichHand]) {
+                case pointerStates.OnCanvas:
+                    lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 1f), 0.2f);
+                    lerpPointerColor(whichHand, Color.white, 0.2f);
+                    break;
+                case pointerStates.OnElement:
+                    lerpPointerColor(whichHand, Color.green, 0.2f);
+                    break;
+                case pointerStates.PinchingToCanvas:
+                    lerpPointerColor(whichHand, new Color(0.8f, 0.8f, 0.8f, 1f), 0.2f);
+                    break;
+                case pointerStates.PinchingToElement:
+                    lerpPointerColor(whichHand, new Color(0.5f, 0.5f, 0.5f, 1f), 0.2f);
+                    break;
+                case pointerStates.NearCanvas:
+                    lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 0f), 0.1f);
+                    break;
+                case pointerStates.TouchingCanvas:
+                    lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 0f), 0.2f);
+                    break;
+                case pointerStates.OffCanvas:
+                    lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 0f), 0.2f);
+                    break;
+            }
         }
     }
 
@@ -243,7 +280,7 @@ public class LeapInputModule : BaseInputModule {
 
         //Get Base of Index Finger Position
         Vector3 IndexFingerPosition;
-        if (projectingFromIndexTip) {
+        if (pointerState[whichHand] == pointerStates.NearCanvas || pointerState[whichHand] == pointerStates.TouchingCanvas) {
             IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].StabilizedTipPosition.ToVector3();
         } else {
             IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
@@ -258,11 +295,28 @@ public class LeapInputModule : BaseInputModule {
         //Perform the raycast and see if we hit anything
         base.eventSystem.RaycastAll(PointEvents[whichHand], m_RaycastResultCache);
         PointEvents[whichHand].pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
-        if (PointEvents[whichHand].pointerCurrentRaycast.gameObject != null) {
-            GuiHit = true; //gets set to false at the beginning of the process event
+        if ((PointEvents[whichHand].pointerCurrentRaycast.gameObject != null)) {
+            if (checkIfClickable(PointEvents[whichHand].pointerCurrentRaycast.gameObject)) {
+                GuiHit = true; //gets set to false at the beginning of the process event
+                if (!isTriggeringInteraction(whichHand)&&(pointerState[whichHand] != pointerStates.NearCanvas && pointerState[whichHand] != pointerStates.TouchingCanvas)) {
+                    pointerState[whichHand] = pointerStates.OnElement;
+                }
+            }else if (pointerState[whichHand] != pointerStates.NearCanvas && pointerState[whichHand] != pointerStates.TouchingCanvas) {
+                pointerState[whichHand] = pointerStates.OnCanvas;
+            }
+        }else {
+            pointerState[whichHand] = pointerStates.OffCanvas;
         }
 
         m_RaycastResultCache.Clear();
+    }
+
+    private bool checkIfClickable(GameObject gameObject) {
+        return checkIfHasInteractionComponent(gameObject);
+    }
+
+    private bool checkIfHasInteractionComponent(GameObject gameObject) {
+        return !gameObject.GetComponent<Canvas>();
     }
 
     // update the cursor location and whether it is enabled
@@ -299,21 +353,37 @@ public class LeapInputModule : BaseInputModule {
     }
 
     public bool isTriggeringInteraction(int whichHand) {
-        if (distanceOfIndexTipToCursor(whichHand) < ProjectiveToTactileTransitionDistance) {
-            return distanceOfIndexTipToCursor(whichHand) < 0.01f;
+        if (distanceOfIndexTipToPointer(whichHand) < ProjectiveToTactileTransitionDistance) {
+            return distanceOfIndexTipToPointer(whichHand) < 0.01f;
         }else {
-            return LeapDataProvider.CurrentFrame.Hands[whichHand].PinchStrength > PinchingThreshold;
+            if(LeapDataProvider.CurrentFrame.Hands[whichHand].PinchStrength > PinchingThreshold) {
+                if (GuiHit) {
+                    pointerState[whichHand] = pointerStates.PinchingToElement;
+                } else {
+                    pointerState[whichHand] = pointerStates.PinchingToCanvas;
+                }
+                
+                return true;
+            }
+            return false;
         }
     }
 
-    public float distanceOfIndexTipToCursor(int whichHand) {
+    public float distanceOfIndexTipToPointer(int whichHand) {
         //Get Base of Index Finger Position
         Vector3 IndexTipPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].StabilizedTipPosition.ToVector3();
         return -Pointers[whichHand].InverseTransformPoint(IndexTipPosition).z*Pointers[whichHand].localScale.z;
     }
 
-    public Vector3 getRectProjectiveOrigin(RectTransform Rect) {
-        return Rect.localToWorldMatrix.MultiplyPoint3x4(Vector3.zero);
+    public void lerpPointerColor(int whichHand, Color color, float lerpalpha) {
+        Color oldColor = Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color;
+        if (color.r == 0f && color.g == 0f && color.b == 0f) {
+            Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = Color.Lerp(oldColor, new Color(oldColor.r, oldColor.g, oldColor.b, color.a), lerpalpha);
+        } else if (color.a == 1f) {
+            Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = Color.Lerp(oldColor, new Color(color.r, color.g, color.b, oldColor.a), lerpalpha);
+        } else {
+            Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = Color.Lerp(oldColor, color, lerpalpha);
+        }
     }
 
     // clear the current selection
