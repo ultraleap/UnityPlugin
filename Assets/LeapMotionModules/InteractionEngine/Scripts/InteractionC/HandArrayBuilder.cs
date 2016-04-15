@@ -1,16 +1,28 @@
 ﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 using LeapInternal;
 
 namespace Leap.Unity.Interaction.CApi {
 
   public static class HandArrayBuilder {
+    private static HashSet<int> _ids = new HashSet<int>();
 
     public static IntPtr CreateHandArray(Frame frame) {
+      _ids.Clear();
+
       var hands = frame.Hands;
       IntPtr handArray = StructAllocator.AllocateArray<LEAP_HAND>(hands.Count);
       for (int i = 0; i < hands.Count; i++) {
+        if (_ids.Contains(hands[i].Id)) {
+          Debug.LogWarning("Found multiple hands with the same id");
+          continue;
+        }
+        
         StructMarshal<LEAP_HAND>.CopyIntoArray(handArray, CreateHand(hands[i]), i);
+        _ids.Add(hands[i].Id);
       }
+
       return handArray;
     }
 
