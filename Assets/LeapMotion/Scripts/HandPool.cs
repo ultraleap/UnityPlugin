@@ -18,7 +18,8 @@ namespace Leap.Unity {
 
     [SerializeField]
     private List<ModelPair> ModelCollection;
-    public List<ModelGroup> ModelPool;
+    [SerializeField]
+    private List<ModelGroup> ModelPool;
     public LeapHandController controller_ { get; set; }
     public bool EnforceHandedness = false;
     
