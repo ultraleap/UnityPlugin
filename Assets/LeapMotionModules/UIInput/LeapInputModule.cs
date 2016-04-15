@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
-using System.Collections;
 using System.Collections.Generic;
 using Leap;
 using Leap.Unity;
@@ -22,14 +23,22 @@ public class LeapInputModule : BaseInputModule {
     private RectTransform[] Pointers;
     public Color NormalColor = Color.white;
     public Color HoveringColor = Color.green;
+    public AudioClip HoverSound;
     public Color TriggeringColor = Color.gray;
+    public AudioClip TriggerSound;
     public Color TriggerMissedColor = Color.gray;
+    public AudioClip MissedSound;
 
+    // Event delegates triggered on click.
+    public UnityEvent onClickDown;
+    public UnityEvent onClickUp;
+    public UnityEvent onHover;
+    public UnityEvent whileClickHeld;
 
+    private AudioSource PointerSounds;
 
     private PointerEventData[] PointEvents;
     private Camera EventCamera;
-    private bool ButtonUsed;
 
     private GameObject[] CurrentPoint;
     private GameObject[] CurrentPressed;
@@ -93,6 +102,11 @@ public class LeapInputModule : BaseInputModule {
             Pointers[index] = pointer.GetComponent<RectTransform>();
         }
 
+        PointerSounds = this.gameObject.AddComponent<AudioSource>();
+        //for (int index = 0; index < PointerSounds.Length; index++) {
+        //    PointerSounds[index] = new AudioSource();
+        //}
+
         CurrentPoint = new GameObject[NumberOfHands];
         CurrentPressed = new GameObject[NumberOfHands];
         CurrentDragging = new GameObject[NumberOfHands];
@@ -117,8 +131,6 @@ public class LeapInputModule : BaseInputModule {
     //Process is called by UI system to process events
     public override void Process() {
         //DebugSphereQueue.Enqueue(InputTracking.GetLocalPosition(VRNode.CenterEye));
-
-        ButtonUsed = false;
 
         //Send update events if there is a selected object - this is important for InputField to receive keyboard events
         SendUpdateEventToSelectedObject();
@@ -153,8 +165,6 @@ public class LeapInputModule : BaseInputModule {
                 if (distanceOfIndexTipToPointer(whichHand) < ProjectiveToTactileTransitionDistance) {
                     pointerState[whichHand] = pointerStates.TouchingCanvas;
                 }
-            }else if(pointerState[whichHand] != pointerStates.OffCanvas) {
-                pointerState[whichHand] = pointerStates.OnCanvas;
             }
 
             //Raycast from shoulder through index finger to the UI
@@ -200,7 +210,6 @@ public class LeapInputModule : BaseInputModule {
                             PointEvents[whichHand].pointerPress = newPressed;
                             CurrentPressed[whichHand] = newPressed;
                             Select(CurrentPressed[whichHand]);
-                            ButtonUsed = true;
                         }
 
                         ExecuteEvents.Execute(CurrentPressed[whichHand], PointEvents[whichHand], ExecuteEvents.beginDragHandler);
@@ -299,7 +308,9 @@ public class LeapInputModule : BaseInputModule {
         //Perform the raycast and see if we hit anything
         base.eventSystem.RaycastAll(PointEvents[whichHand], m_RaycastResultCache);
 
-        //HACKY CODE TO GET IT TO WORK ON SCROLLRECTS - WHY DOESN'T FINDFIRSTRAYCAST DO THIS
+        //HACKY CODE TO GET IT TO WORK ON SCROLLRECTS
+        //WHY DOESN'T FINDFIRSTRAYCAST DO THIS; WHY DOES IT WORK WITH MOUSE POINTERS
+        //SO MANY UNANSWERED QUESTIONS
         if (OverrideScrollViewClicks) {
             PointEvents[whichHand].pointerCurrentRaycast = new RaycastResult();
             foreach (RaycastResult hit in m_RaycastResultCache) {
@@ -317,6 +328,7 @@ public class LeapInputModule : BaseInputModule {
         }
 
         //Check what we're hitting and set the PointerState to match
+        pointerStates OldState = pointerState[whichHand]; //Store old state for sound transitionary purposes
         if ((PointEvents[whichHand].pointerCurrentRaycast.gameObject != null)) {
             if (checkIfClickable(PointEvents[whichHand].pointerCurrentRaycast.gameObject)) {
                 if (pointerState[whichHand] != pointerStates.NearCanvas && pointerState[whichHand] != pointerStates.TouchingCanvas) {
@@ -336,8 +348,32 @@ public class LeapInputModule : BaseInputModule {
         }else {
             pointerState[whichHand] = pointerStates.OffCanvas;
         }
-
         m_RaycastResultCache.Clear();
+
+
+        if (OldState == pointerStates.OnCanvas) {
+            if (pointerState[whichHand] == pointerStates.OnElement) {
+                PointerSounds.PlayOneShot(HoverSound);
+                onHover.Invoke();
+            } else if (pointerState[whichHand] == pointerStates.PinchingToCanvas) {
+                PointerSounds.PlayOneShot(MissedSound);
+            }
+        }
+        if (OldState == pointerStates.OnElement) {
+            if (pointerState[whichHand] == pointerStates.OnCanvas) {
+                PointerSounds.PlayOneShot(HoverSound);
+            } else if (pointerState[whichHand] == pointerStates.PinchingToElement) {
+                PointerSounds.PlayOneShot(TriggerSound);
+                onClickDown.Invoke();
+            }//ALSO PLAY HOVER SOUND IF ON DIFFERENT UI ELEMENT THAN LAST FRAME
+        }
+        if (OldState == pointerStates.PinchingToElement) {
+            if (pointerState[whichHand] == pointerStates.PinchingToCanvas) {
+                //PointerSounds.PlayOneShot(HoverSound);
+            } else if (pointerState[whichHand] == pointerStates.OnElement || pointerState[whichHand] == pointerStates.OnCanvas) {
+                onClickUp.Invoke();
+            }
+        }
     }
 
     private bool checkIfClickable(GameObject gameObject) {
