@@ -58,7 +58,7 @@ namespace Leap.Unity {
         }
       }
 
-      public bool CheckStale (Image image) {
+      public bool CheckStale(Image image) {
         if (_combinedTexture == null || _intermediateArray == null) {
           return true;
         }
@@ -74,7 +74,7 @@ namespace Leap.Unity {
         return false;
       }
 
-      public void Reconstruct (Image image, string globalShaderName, string pixelSizeName) {
+      public void Reconstruct(Image image, string globalShaderName, string pixelSizeName) {
         int combinedWidth = image.Width;
         int combinedHeight = image.Height * 2;
 
@@ -96,13 +96,13 @@ namespace Leap.Unity {
         Shader.SetGlobalVector(pixelSizeName, new Vector2(1.0f / image.Width, 1.0f / image.Height));
       }
 
-      public void UpdateTexture (Image image) {
+      public void UpdateTexture(Image image) {
         Array.Copy(image.Data, 0, _intermediateArray, 0, _intermediateArray.Length);
         _combinedTexture.LoadRawTextureData(_intermediateArray);
         _combinedTexture.Apply();
       }
 
-      private TextureFormat getTextureFormat (Image image) {
+      private TextureFormat getTextureFormat(Image image) {
         switch (image.Format) {
           case Image.FormatType.INFRARED:
             return TextureFormat.Alpha8;
@@ -114,7 +114,7 @@ namespace Leap.Unity {
         }
       }
 
-      private int bytesPerPixel (TextureFormat format) {
+      private int bytesPerPixel(TextureFormat format) {
         switch (format) {
           case TextureFormat.Alpha8:
             return 1;
@@ -137,11 +137,11 @@ namespace Leap.Unity {
         }
       }
 
-      public bool CheckStale () {
+      public bool CheckStale() {
         return _combinedTexture == null;
       }
 
-      public void Reconstruct (Image image, string shaderName) {
+      public void Reconstruct(Image image, string shaderName) {
         int combinedWidth = image.DistortionWidth / 2;
         int combinedHeight = image.DistortionHeight * 2;
 
@@ -163,7 +163,7 @@ namespace Leap.Unity {
         Shader.SetGlobalTexture(shaderName, _combinedTexture);
       }
 
-      private void addDistortionData (Image image, Color32[] colors, int startIndex) {
+      private void addDistortionData(Image image, Color32[] colors, int startIndex) {
         float[] distortionData = image.Distortion;
 
         for (int i = 0; i < distortionData.Length; i += 2) {
@@ -174,7 +174,7 @@ namespace Leap.Unity {
         }
       }
 
-      private void encodeFloat (float value, out byte byte0, out byte byte1) {
+      private void encodeFloat(float value, out byte byte0, out byte byte1) {
         // The distortion range is -0.6 to +1.7. Normalize to range [0..1).
         value = (value + 0.6f) / 2.3f;
         float enc_0 = value;
@@ -204,7 +204,7 @@ namespace Leap.Unity {
       public readonly LeapDistortionData Distortion;
       private bool _isStale = false;
 
-      public static void ResetGlobalShaderValues () {
+      public static void ResetGlobalShaderValues() {
         Texture2D empty = new Texture2D(1, 1, TextureFormat.ARGB32, false, false);
         empty.name = "EmptyTexture";
         empty.hideFlags = HideFlags.DontSave;
@@ -215,24 +215,24 @@ namespace Leap.Unity {
         Shader.SetGlobalTexture(GLOBAL_DISTORTION_TEXTURE_NAME, empty);
       }
 
-      public EyeTextureData () {
+      public EyeTextureData() {
         BrightTexture = new LeapTextureData();
         RawTexture = new LeapTextureData();
         Distortion = new LeapDistortionData();
       }
 
-      public bool CheckStale (Image bright, Image raw) {
+      public bool CheckStale(Image bright, Image raw) {
         return BrightTexture.CheckStale(bright) ||
                RawTexture.CheckStale(raw) ||
                Distortion.CheckStale() ||
                _isStale;
       }
 
-      public void MarkStale () {
+      public void MarkStale() {
         _isStale = true;
       }
 
-      public void Reconstruct (Image bright, Image raw) {
+      public void Reconstruct(Image bright, Image raw) {
         BrightTexture.Reconstruct(bright, GLOBAL_BRIGHT_TEXTURE_NAME, GLOBAL_BRIGHT_PIXEL_SIZE_NAME);
         RawTexture.Reconstruct(raw, GLOBAL_RAW_TEXTURE_NAME, GLOBAL_RAW_PIXEL_SIZE_NAME);
 
@@ -255,14 +255,14 @@ namespace Leap.Unity {
         _isStale = false;
       }
 
-      public void UpdateTextures (Image bright, Image raw) {
+      public void UpdateTextures(Image bright, Image raw) {
         BrightTexture.UpdateTexture(bright);
         RawTexture.UpdateTexture(raw);
       }
     }
 
 #if UNITY_EDITOR
-    void OnValidate () {
+    void OnValidate() {
       if (Application.isPlaying) {
         ApplyGammaCorrectionValues();
       } else {
@@ -271,50 +271,49 @@ namespace Leap.Unity {
     }
 #endif
 
-    void Start () {
+    void Start() {
       if (_provider == null) {
         Debug.LogWarning("Cannot use LeapImageRetriever if there is no LeapProvider!");
         enabled = false;
         return;
       }
-      LeapVRCameraControl.OnValidCameraParams += HandleOnValidCameraParams;
 
       ApplyGammaCorrectionValues();
-      ApplyCameraProjectionValues();
+      ApplyCameraProjectionValues(GetComponent<Camera>());
     }
 
-    void HandleOnValidCameraParams (LeapVRCameraControl.CameraParams camParams) {
-      ApplyCameraProjectionValues();
-    }
-
-    void OnEnable () {
+    void OnEnable() {
       Controller controller = _provider.GetLeapController();
       if (controller != null) {
         onController(controller);
       } else {
         StartCoroutine(waitForController());
       }
+
+      LeapVRCameraControl.OnLeftPreRender += ApplyCameraProjectionValues;
+      LeapVRCameraControl.OnRightPreRender += ApplyCameraProjectionValues;
     }
 
-    void OnDisable () {
+    void OnDisable() {
       StopAllCoroutines();
       Controller controller = _provider.GetLeapController();
       if (controller != null) {
         _provider.GetLeapController().DistortionChange -= onDistortionChange;
       }
-      LeapVRCameraControl.OnValidCameraParams -= HandleOnValidCameraParams;
+
+      LeapVRCameraControl.OnLeftPreRender -= ApplyCameraProjectionValues;
+      LeapVRCameraControl.OnRightPreRender -= ApplyCameraProjectionValues;
     }
 
-    void OnDestroy () {
+    void OnDestroy() {
       StopAllCoroutines();
       Controller controller = _provider.GetLeapController();
       if (controller != null) {
         _provider.GetLeapController().DistortionChange -= onDistortionChange;
       }
-      LeapVRCameraControl.OnValidCameraParams -= HandleOnValidCameraParams;
     }
 
-    void OnPreRender () {
+    void OnPreRender() {
       if (imagesEnabled) {
         Controller controller = _provider.GetLeapController();
         long start = controller.Now();
@@ -332,7 +331,7 @@ namespace Leap.Unity {
       }
     }
 
-    void Update () {
+    void Update() {
       if (imagesEnabled) {
         Frame imageFrame = _provider.CurrentFrame;
         Controller controller = _provider.GetLeapController();
@@ -342,7 +341,7 @@ namespace Leap.Unity {
       }
     }
 
-    private IEnumerator waitForController () {
+    private IEnumerator waitForController() {
       Controller controller = null;
       do {
         controller = _provider.GetLeapController();
@@ -351,16 +350,16 @@ namespace Leap.Unity {
       onController(controller);
     }
 
-    private IEnumerator checkImageMode () {
+    private IEnumerator checkImageMode() {
       checkingImageState = true;
       yield return new WaitForSeconds(IMAGE_SETTING_POLL_RATE);
-      _provider.GetLeapController().Config.Get<Int32>("images_mode", delegate(Int32 enabled) {
+      _provider.GetLeapController().Config.Get<Int32>("images_mode", delegate (Int32 enabled) {
         this.imagesEnabled = enabled == 0 ? false : true;
         checkingImageState = false;
       });
     }
 
-    private void onController (Controller controller) {
+    private void onController(Controller controller) {
       controller.DistortionChange += onDistortionChange;
       controller.Connect += delegate {
         _provider.GetLeapController().Config.Get("images_mode", (Int32 enabled) => {
@@ -372,7 +371,7 @@ namespace Leap.Unity {
       }
     }
 
-    public void ApplyGammaCorrectionValues () {
+    public void ApplyGammaCorrectionValues() {
       float gamma = 1f;
       if (QualitySettings.activeColorSpace != ColorSpace.Linear) {
         gamma = -Mathf.Log10(Mathf.GammaToLinearSpace(0.1f));
@@ -381,19 +380,18 @@ namespace Leap.Unity {
       Shader.SetGlobalFloat(GLOBAL_GAMMA_CORRECTION_EXPONENT_NAME, 1.0f / _gammaCorrection);
     }
 
-    public void ApplyCameraProjectionValues () {
-      Camera c = GetComponent<Camera>();
+    public void ApplyCameraProjectionValues(Camera camera) {
       //These parameters are used during undistortion of the images to ensure they
       //line up properly with the scene
       Vector4 projection = new Vector4();
-      projection.x = c.projectionMatrix[0, 2];
+      projection.x = camera.projectionMatrix[0, 2];
       projection.y = 0f;
-      projection.z = c.projectionMatrix[0, 0];
-      projection.w = c.projectionMatrix[1, 1];
+      projection.z = camera.projectionMatrix[0, 0];
+      projection.w = camera.projectionMatrix[1, 1];
       Shader.SetGlobalVector(GLOBAL_CAMERA_PROJECTION_NAME, projection);
     }
 
-    void onDistortionChange (object sender, LeapEventArgs args) {
+    void onDistortionChange(object sender, LeapEventArgs args) {
       _eyeTextureData.MarkStale();
     }
   }
