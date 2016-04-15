@@ -75,7 +75,7 @@ namespace Leap.Unity {
           isCorrectModelType = model.HandModelType == modelType;
           if (isCorrectModelType && isCorrectHandedness) {
             group.modelList.RemoveAt(i);
-            --i;
+            //--i;
             models.Add(model);
             break;
           }
