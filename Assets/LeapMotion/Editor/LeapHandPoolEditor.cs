@@ -5,15 +5,20 @@ using System.Collections;
 namespace Leap.Unity {
   [CustomEditor(typeof(HandPool))]
   public class LeapHandPoolEditor : CustomEditorBase {
-    public override void OnInspectorGUI() {
-      serializedObject.Update();
-      show(serializedObject.FindProperty("ModelCollection"));
-      EditorGUILayout.PropertyField(serializedObject.FindProperty("EnforceHandedness"));
-      if (Application.isPlaying) {
-        EditorGUILayout.PropertyField(serializedObject.FindProperty("ModelPool"), true);
-      }
-      serializedObject.ApplyModifiedProperties();
+
+    protected override void OnEnable() {
+      base.OnEnable();
+
+      specifyCustomDrawer("ModelCollection", show);
+      specifyCustomDrawer("ModelPool", showModelPool);
     }
+
+    private void showModelPool(SerializedProperty modelPool) {
+      if (Application.isPlaying) {
+        EditorGUILayout.PropertyField(modelPool, true);
+      }
+    }
+
     private void show(SerializedProperty list) {
       EditorGUILayout.PropertyField(list);
       EditorGUI.indentLevel += 1;
@@ -27,7 +32,8 @@ namespace Leap.Unity {
         }
       }
       EditorGUI.indentLevel -= 1;
-
     }
+
+
   }
 }
