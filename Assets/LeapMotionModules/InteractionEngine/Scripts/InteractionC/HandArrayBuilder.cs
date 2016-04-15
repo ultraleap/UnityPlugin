@@ -20,6 +20,10 @@ namespace Leap.Unity.Interaction.CApi {
       leapHand.type = hand.IsLeft ? eLeapHandType.eLeapHandType_Left : eLeapHandType.eLeapHandType_Right;
       leapHand.confidence = hand.Confidence;
       leapHand.visible_time = (uint)(hand.TimeVisible * 1000);
+      leapHand.grab_angle = hand.GrabAngle;
+      leapHand.grab_strength = hand.GrabStrength;
+      leapHand.pinch_distance = hand.PinchDistance;
+      leapHand.pinch_strength = hand.PinchStrength;
 
       LEAP_PALM palm = new LEAP_PALM();
       palm.position = new LEAP_VECTOR(hand.PalmPosition);
@@ -66,7 +70,7 @@ namespace Leap.Unity.Interaction.CApi {
       digit.intermediate = CreateBone(finger.Bone(Bone.BoneType.TYPE_INTERMEDIATE));
       digit.distal = CreateBone(finger.Bone(Bone.BoneType.TYPE_DISTAL));
       digit.tip_velocity = new LEAP_VECTOR(finger.TipVelocity);
-      digit.stabilized_tip_position = new LEAP_VECTOR(finger.StabilizedTipPosition);
+      digit.stabilized_tip_position = UnityEngine.Vector3.zero.ToCVector(); //HACK: stabilized position is sometimes NaN, ignore it
       digit.is_extended = finger.IsExtended ? 1 : 0;
       return digit;
     }
