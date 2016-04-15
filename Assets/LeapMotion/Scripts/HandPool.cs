@@ -20,7 +20,6 @@ namespace Leap.Unity {
     private List<ModelPair> ModelCollection;
     [SerializeField]
     private List<ModelGroup> ModelPool;
-    public LeapHandController controller_ { get; set; }
     public bool EnforceHandedness = false;
     
     [System.Serializable]
@@ -53,10 +52,8 @@ namespace Leap.Unity {
         modelGroupMapping.Add(pair.RightModel, newModelGroup);
         ModelPool.Add(newModelGroup);
       }
-      controller_ = GetComponent<LeapHandController>();
     }
-    void Update() {
-    }
+ 
     /**
      * MakeHandRepresentation receives a Hand and combines that with an IHandModel to create a HandRepresentation
      * @param hand The Leap Hand data to be drive an IHandModel
@@ -84,9 +81,7 @@ namespace Leap.Unity {
           }
         }
       }
-      if (models != null) {
-        handRep = new HandProxy(this, models, hand);
-      }
+      handRep = new HandProxy(this, models, hand);
       return handRep;
     }
 
