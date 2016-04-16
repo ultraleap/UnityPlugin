@@ -93,13 +93,13 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 104011635}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: GraphicalAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &104011635
 Transform:
   m_ObjectHideFlags: 0
@@ -181,7 +181,7 @@ GameObject:
   - 65: {fileID: 143627046}
   - 54: {fileID: 143627045}
   - 114: {fileID: 143627044}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: InteractionCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -378,7 +378,7 @@ GameObject:
   - 4: {fileID: 315211906}
   - 33: {fileID: 315211908}
   - 23: {fileID: 315211907}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -508,7 +508,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &432594273
 Transform:
   m_ObjectHideFlags: 0
@@ -537,7 +537,7 @@ GameObject:
   - 33: {fileID: 493052516}
   - 65: {fileID: 493052515}
   - 23: {fileID: 493052514}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -675,7 +675,7 @@ GameObject:
   - 4: {fileID: 654654237}
   - 33: {fileID: 654654239}
   - 23: {fileID: 654654238}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -742,7 +742,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &668376984
 Transform:
   m_ObjectHideFlags: 0
@@ -771,7 +771,7 @@ GameObject:
   - 33: {fileID: 671288000}
   - 65: {fileID: 671287999}
   - 23: {fileID: 671287998}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -954,7 +954,7 @@ GameObject:
   - 33: {fileID: 784447002}
   - 65: {fileID: 784447001}
   - 23: {fileID: 784447000}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1194,13 +1194,13 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 869198656}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: GraphicalAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &869198656
 Transform:
   m_ObjectHideFlags: 0
@@ -1302,13 +1302,13 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 997335263}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: GraphicalAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &997335263
 Transform:
   m_ObjectHideFlags: 0
@@ -1668,7 +1668,7 @@ GameObject:
   - 33: {fileID: 1345401779}
   - 65: {fileID: 1345401778}
   - 23: {fileID: 1345401777}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1744,7 +1744,7 @@ GameObject:
   - 65: {fileID: 1359167688}
   - 54: {fileID: 1359167687}
   - 114: {fileID: 1359167686}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: InteractionCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1837,7 +1837,7 @@ MonoBehaviour:
   _dataSubfolder: InteractionEngine
   _untrackedTimeout: 0.5
   _enablePushing: 1
-  _showDebugLines: 0
+  _showDebugLines: 1
   _showDebugOutput: 1
 --- !u!4 &1473219678
 Transform:
@@ -1870,7 +1870,7 @@ GameObject:
   - 65: {fileID: 1493679625}
   - 54: {fileID: 1493679624}
   - 114: {fileID: 1493679623}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: InteractionCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2142,7 +2142,7 @@ GameObject:
   - 65: {fileID: 1781426151}
   - 54: {fileID: 1781426150}
   - 114: {fileID: 1781426149}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: InteractionCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2214,7 +2214,7 @@ GameObject:
   - 4: {fileID: 1801015273}
   - 33: {fileID: 1801015275}
   - 23: {fileID: 1801015274}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2281,7 +2281,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1819474273
 Transform:
   m_ObjectHideFlags: 0
@@ -2365,7 +2365,7 @@ GameObject:
   - 4: {fileID: 1898784430}
   - 33: {fileID: 1898784432}
   - 23: {fileID: 1898784431}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2426,13 +2426,13 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 1935213665}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: GraphicalAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1935213665
 Transform:
   m_ObjectHideFlags: 0
@@ -2531,7 +2531,7 @@ GameObject:
   - 33: {fileID: 2021251538}
   - 65: {fileID: 2021251537}
   - 23: {fileID: 2021251536}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
