@@ -198,8 +198,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override void NotifyHandsHold(List<Hand> hands) {
-      base.NotifyHandsHold(hands);
+    public override void NotifyHandsHoldPhysics(List<Hand> hands) {
+      base.NotifyHandsHoldPhysics(hands);
 
       //Get old transform
       Vector3 oldPosition = _rigidbody.position;
@@ -227,20 +227,20 @@ namespace Leap.Unity.Interaction {
       _graphicalAnchor.rotation = newRotation;
     }
 
-    public override void OnHandRelease(Hand hand) {
-      base.OnHandRelease(hand);
+    public override void NotifyHandReleased(Hand hand) {
+      base.NotifyHandReleased(hand);
 
       removeHandPointCollection(hand.Id);
     }
 
-    public override void OnHandLostTracking(Hand oldHand) {
-      base.OnHandLostTracking(oldHand);
+    public override void NotifyHandLostTracking(Hand oldHand) {
+      base.NotifyHandLostTracking(oldHand);
 
       updateRendererStatus();
     }
 
-    public override void OnHandRegainedTracking(Hand newHand, int oldId) {
-      base.OnHandRegainedTracking(newHand, oldId);
+    public override void NotifyHandRegainedTracking(Hand newHand, int oldId) {
+      base.NotifyHandRegainedTracking(newHand, oldId);
 
       updateRendererStatus();
 
@@ -252,8 +252,8 @@ namespace Leap.Unity.Interaction {
       NotifyTeleported();
     }
 
-    public override void OnHandTimeout(Hand oldHand) {
-      base.OnHandTimeout(oldHand);
+    public override void NotifyHandTimeout(Hand oldHand) {
+      base.NotifyHandTimeout(oldHand);
 
       updateRendererStatus();
       removeHandPointCollection(oldHand.Id);

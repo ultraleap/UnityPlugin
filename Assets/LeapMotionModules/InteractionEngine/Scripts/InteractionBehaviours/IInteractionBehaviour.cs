@@ -121,35 +121,40 @@ namespace Leap.Unity.Interaction {
 
     /// <summary>
     /// Called by InteractionManager every frame that a Hand continues to grasp this object.  This callback
-    /// is invoked both in FixedUpdate, and also in LateUpdate.  This gives all objects a chance to both update
-    /// their physical representation as well as their graphical, for decreased latency and increase fidelity.
+    /// is invoked both in FixedUpdate.
     /// </summary>
-    public abstract void NotifyHandsHold(List<Hand> hands);
+    public abstract void NotifyHandsHoldPhysics(List<Hand> hands);
+
+    /// <summary>
+    /// Called by InteractionManager every frame that a Hand continues to grasp this object.  This callback
+    /// is invoked both in LateUpdate.
+    /// </summary>
+    public abstract void NotifyHandsHoldGraphics(List<Hand> hands);
 
     /// <summary>
     /// Called by InteractionManager when a Hand stops grasping this object.
     /// </summary>
-    public abstract void OnHandRelease(Hand hand);
+    public abstract void NotifyHandReleased(Hand hand);
 
     /// <summary>
     /// Called by InteractionManager when a Hand that was grasping becomes untracked.  The Hand
     /// is not yet considered ungrasped, and OnHandRegainedTracking might be called in the future
     /// if the Hand becomes tracked again.
     /// </summary>
-    public abstract void OnHandLostTracking(Hand oldHand);
+    public abstract void NotifyHandLostTracking(Hand oldHand);
 
     /// <summary>
     /// Called by InteractionManager when a grasping Hand that had previously been untracked has
     /// regained tracking.  The new hand is provided, as well as the id of the previously tracked
     /// hand.
     /// </summary>
-    public abstract void OnHandRegainedTracking(Hand newHand, int oldId);
+    public abstract void NotifyHandRegainedTracking(Hand newHand, int oldId);
 
     /// <summary>
     /// Called by InteractionManager when an untracked grasping Hand has remained ungrasped for
     /// too long.  The hand is no longer considered to be grasping the object.
     /// </summary>
-    public abstract void OnHandTimeout(Hand oldHand);
+    public abstract void NotifyHandTimeout(Hand oldHand);
 
   }
 }

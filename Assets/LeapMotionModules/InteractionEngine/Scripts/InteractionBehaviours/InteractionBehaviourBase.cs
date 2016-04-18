@@ -158,9 +158,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override void NotifyHandsHold(List<Hand> hands) { }
+    public override void NotifyHandsHoldPhysics(List<Hand> hands) { }
 
-    public override void OnHandRelease(Hand hand) {
+    public override void NotifyHandReleased(Hand hand) {
       Assert.AreNotEqual(_graspingIds.Count, 0, NoGraspingHandsMessage());
       Assert.IsTrue(_graspingIds.Contains(hand.Id), HandNotGraspingMessage(hand.Id));
 
@@ -171,7 +171,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override void OnHandLostTracking(Hand oldHand) {
+    public override void NotifyHandLostTracking(Hand oldHand) {
       Assert.AreNotEqual(_graspingIds.Count, 0, NoGraspingHandsMessage());
       Assert.IsTrue(_graspingIds.Contains(oldHand.Id), HandNotGraspingMessage(oldHand.Id));
       Assert.IsFalse(_untrackedIds.Contains(oldHand.Id), HandAlreadyUntrackedMessage(oldHand.Id));
@@ -179,7 +179,7 @@ namespace Leap.Unity.Interaction {
       _untrackedIds.Add(oldHand.Id);
     }
 
-    public override void OnHandRegainedTracking(Hand newHand, int oldId) {
+    public override void NotifyHandRegainedTracking(Hand newHand, int oldId) {
       Assert.IsTrue(_graspingIds.Contains(oldId), HandNotGraspingMessage(oldId));
       Assert.IsFalse(_graspingIds.Contains(newHand.Id), HandAlreadyGraspingMessage(newHand.Id));
 
@@ -188,7 +188,7 @@ namespace Leap.Unity.Interaction {
       _graspingIds.Add(newHand.Id);
     }
 
-    public override void OnHandTimeout(Hand oldHand) {
+    public override void NotifyHandTimeout(Hand oldHand) {
       _untrackedIds.Remove(oldHand.Id);
       _graspingIds.Remove(oldHand.Id);
 

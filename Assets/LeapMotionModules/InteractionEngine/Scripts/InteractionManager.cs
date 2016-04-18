@@ -405,7 +405,7 @@ namespace Leap.Unity.Interaction {
         }
 
         try {
-          interactionBehaviour.NotifyHandsHold(_holdingHands);
+          interactionBehaviour.NotifyHandsHoldPhysics(_holdingHands);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
@@ -691,17 +691,17 @@ namespace Leap.Unity.Interaction {
       }
 
       public void ReleaseObject() {
-        graspedObject.OnHandRelease(hand);
+        graspedObject.NotifyHandReleased(hand);
         graspedObject = null;
       }
 
       public void MarkUntracked() {
         isUntracked = true;
-        graspedObject.OnHandLostTracking(hand);
+        graspedObject.NotifyHandLostTracking(hand);
       }
 
       public void MarkTimeout() {
-        graspedObject.OnHandTimeout(hand);
+        graspedObject.NotifyHandTimeout(hand);
         graspedObject = null;
         isUntracked = true;
         hand = null;
@@ -714,7 +714,7 @@ namespace Leap.Unity.Interaction {
         //TODO: Need to force engine to update the grabbed state!
 
         isUntracked = false;
-        graspedObject.OnHandRegainedTracking(newHand, oldId);
+        graspedObject.NotifyHandRegainedTracking(newHand, oldId);
       }
     }
     #endregion
