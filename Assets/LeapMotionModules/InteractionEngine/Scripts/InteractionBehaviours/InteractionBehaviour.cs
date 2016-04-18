@@ -78,8 +78,8 @@ namespace Leap.Unity.Interaction {
 
     #region INTERACTION CALLBACKS
 
-    public override void NotifyRegistered() {
-      base.NotifyRegistered();
+    protected override void OnRegistered() {
+      base.OnRegistered();
 
       _rigidbody = GetComponent<Rigidbody>();
       if (_rigidbody == null) {
@@ -95,16 +95,16 @@ namespace Leap.Unity.Interaction {
       KabschC.Construct(ref _kabsch);
     }
 
-    public override void NotifyUnregistered() {
-      base.NotifyUnregistered();
+    protected override void OnUnregistered() {
+      base.OnUnregistered();
 
       _rigidbody.isKinematic = _isKinematic;
       _rigidbody.useGravity = _useGravity;
       KabschC.Destruct(ref _kabsch);
     }
 
-    public override void NotifyPostSolve() {
-      base.NotifyPreSolve();
+    protected override void OnPostSolve() {
+      base.OnPostSolve();
 
       if (!_recievedVelocityUpdate) {
         _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
@@ -137,8 +137,8 @@ namespace Leap.Unity.Interaction {
       createTransform = getRigidbodyTransform();
     }
 
-    public override void NotifyInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
-      base.NotifyInteractionShapeCreated(instanceHandle);
+    protected override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
+      base.OnInteractionShapeCreated(instanceHandle);
 
 #if UNITY_EDITOR
       Collider[] colliders = GetComponentsInChildren<Collider>();
@@ -152,7 +152,7 @@ namespace Leap.Unity.Interaction {
 #endif
     }
 
-    public override void NotifyInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
+    public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
       updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
       updateInfo.updateFlags = _notifiedOfTeleport ? UpdateInfoFlags.ResetVelocity : UpdateInfoFlags.None;
       updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration | UpdateInfoFlags.ExplicitVelocity;
@@ -164,8 +164,8 @@ namespace Leap.Unity.Interaction {
       interactionTransform = getRigidbodyTransform();
     }
 
-    public override void NotifyRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
-      base.NotifyRecievedSimulationResults(results);
+    protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
+      base.OnRecievedSimulationResults(results);
 
       if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
         _rigidbody.Sleep();
@@ -175,8 +175,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override void NotifyHandGrasped(Hand hand) {
-      base.NotifyHandGrasped(hand);
+    protected override void OnHandGrasped(Hand hand) {
+      base.OnHandGrasped(hand);
 
       var newCollection = HandPointCollection.Create(_rigidbody);
       _handIdToPoints[hand.Id] = newCollection;
@@ -191,28 +191,20 @@ namespace Leap.Unity.Interaction {
           Bone bone = finger.Bone(boneType);
 
           Vector3 bonePos = bone.NextJoint.ToVector3();
-          Vector3 closestOnSurface = bonePos; //TODO: how to get closest on surface?
+          Vector3 closestOnSurface = bonePos;
 
           newCollection.SetGlobalPosition(closestOnSurface, fingerType, boneType);
         }
       }
     }
 
-    public override void NotifyHandsHoldPhysics(List<Hand> hands) {
-      base.NotifyHandsHoldPhysics(hands);
+    protected override void OnHandsHoldPhysics(List<Hand> hands) {
+      base.OnHandsHoldPhysics(hands);
 
-      //Get old transform
-      Vector3 oldPosition = _rigidbody.position;
-      Quaternion oldRotation = _rigidbody.rotation;
-
-      //Get solved transform deltas
-      Vector3 solvedTranslation;
-      Quaternion solvedRotation;
-      getSolvedTransform(hands, oldPosition, out solvedTranslation, out solvedRotation);
-
-      //Calculate new transform using delta
-      Vector3 newPosition = oldPosition + solvedTranslation;
-      Quaternion newRotation = solvedRotation * oldRotation;
+      //Get new transform
+      Vector3 newPosition;
+      Quaternion newRotation;
+      getSolvedTransform(hands, out newPosition, out newRotation);
 
       //Apply new transform to object
       if (_notifiedOfTeleport) {
@@ -222,25 +214,35 @@ namespace Leap.Unity.Interaction {
         _rigidbody.MovePosition(newPosition);
         _rigidbody.MoveRotation(newRotation);
       }
+    }
+
+    protected override void OnHandsHoldGraphics(List<Hand> hands) {
+      base.OnHandsHoldGraphics(hands);
+
+      //Get new transform
+      Vector3 newPosition;
+      Quaternion newRotation;
+      getSolvedTransform(hands, out newPosition, out newRotation);
 
       _graphicalAnchor.position = newPosition;
       _graphicalAnchor.rotation = newRotation;
     }
 
-    public override void NotifyHandReleased(Hand hand) {
-      base.NotifyHandReleased(hand);
+
+    protected override void OnHandReleased(Hand hand) {
+      base.OnHandReleased(hand);
 
       removeHandPointCollection(hand.Id);
     }
 
-    public override void NotifyHandLostTracking(Hand oldHand) {
-      base.NotifyHandLostTracking(oldHand);
+    protected override void OnHandLostTracking(Hand oldHand) {
+      base.OnHandLostTracking(oldHand);
 
       updateRendererStatus();
     }
 
-    public override void NotifyHandRegainedTracking(Hand newHand, int oldId) {
-      base.NotifyHandRegainedTracking(newHand, oldId);
+    protected override void OnHandRegainedTracking(Hand newHand, int oldId) {
+      base.OnHandRegainedTracking(newHand, oldId);
 
       updateRendererStatus();
 
@@ -252,8 +254,8 @@ namespace Leap.Unity.Interaction {
       NotifyTeleported();
     }
 
-    public override void NotifyHandTimeout(Hand oldHand) {
-      base.NotifyHandTimeout(oldHand);
+    protected override void OnHandTimeout(Hand oldHand) {
+      base.OnHandTimeout(oldHand);
 
       updateRendererStatus();
       removeHandPointCollection(oldHand.Id);
@@ -318,7 +320,7 @@ namespace Leap.Unity.Interaction {
       HandPointCollection.Return(collection);
     }
 
-    protected void getSolvedTransform(List<Hand> hands, Vector3 oldPosition, out Vector3 translation, out Quaternion rotation) {
+    protected void getSolvedTransform(List<Hand> hands, out Vector3 newPosition, out Quaternion newRotation) {
       KabschC.Reset(ref _kabsch);
 
       for (int h = 0; h < hands.Count; h++) {
@@ -339,8 +341,8 @@ namespace Leap.Unity.Interaction {
             Vector3 bonePos = bone.NextJoint.ToVector3();
 
             //Do the solve such that the objects positions are matched to the new bone positions
-            LEAP_VECTOR point1 = (objectPos - oldPosition).ToCVector();
-            LEAP_VECTOR point2 = (bonePos - oldPosition).ToCVector();
+            LEAP_VECTOR point1 = (objectPos - _rigidbody.position).ToCVector();
+            LEAP_VECTOR point2 = (bonePos - _rigidbody.position).ToCVector();
 
             KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
           }
@@ -354,8 +356,12 @@ namespace Leap.Unity.Interaction {
       KabschC.GetTranslation(ref _kabsch, out leapTranslation);
       KabschC.GetRotation(ref _kabsch, out leapRotation);
 
-      translation = leapTranslation.ToVector3();
-      rotation = leapRotation.ToQuaternion();
+      Vector3 solvedTranslation = leapTranslation.ToVector3();
+      Quaternion solvedRotation = leapRotation.ToQuaternion();
+
+      //Calculate new transform using delta
+      newPosition = _rigidbody.position + solvedTranslation;
+      newRotation = solvedRotation * _rigidbody.rotation; ;
     }
 
     protected class HandPointCollection {

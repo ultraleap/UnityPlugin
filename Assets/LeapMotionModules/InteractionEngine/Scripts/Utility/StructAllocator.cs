@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace Leap.Unity.Interaction.CApi {
+namespace Leap.Unity.Interaction {
 
   public static class StructAllocator {
     [ThreadStatic]

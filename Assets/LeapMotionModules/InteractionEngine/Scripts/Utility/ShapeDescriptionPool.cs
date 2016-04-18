@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using LeapInternal;
+using Leap.Unity.Interaction.CApi;
 
-namespace Leap.Unity.Interaction.CApi {
+namespace Leap.Unity.Interaction {
 
   public class ShapeDescriptionPool {
     private INTERACTION_SCENE _scene;

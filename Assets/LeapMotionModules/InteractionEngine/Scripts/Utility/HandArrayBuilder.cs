@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LeapInternal;
 
-namespace Leap.Unity.Interaction.CApi {
+namespace Leap.Unity.Interaction {
 
   public static class HandArrayBuilder {
     private static HashSet<int> _ids = new HashSet<int>();

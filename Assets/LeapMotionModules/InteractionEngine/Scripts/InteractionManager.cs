@@ -307,7 +307,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void LateUpdate() {
-      dispatchOnHandsHolding(_leapProvider.CurrentFrame);
+      dispatchOnHandsHolding(_leapProvider.CurrentFrame, isPhysics: false);
 
       unregisterMisbehavingBehaviours();
     }
@@ -349,7 +349,7 @@ namespace Leap.Unity.Interaction {
         _registeredBehaviours[i].NotifyPreSolve();
       }
 
-      dispatchOnHandsHolding(frame);
+      dispatchOnHandsHolding(frame, isPhysics: true);
 
       updateInteractionRepresentations();
 
@@ -381,7 +381,7 @@ namespace Leap.Unity.Interaction {
 
           INTERACTION_UPDATE_SHAPE_INFO updateInfo;
           INTERACTION_TRANSFORM updateTransform;
-          interactionBehaviour.NotifyInteractionShapeUpdate(out updateInfo, out updateTransform);
+          interactionBehaviour.GetInteractionShapeUpdateInfo(out updateInfo, out updateTransform);
 
           InteractionC.UpdateShapeInstance(ref _scene, ref updateTransform, ref updateInfo, ref shapeInstanceHandle);
         } catch (Exception e) {
@@ -391,10 +391,11 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void dispatchOnHandsHolding(Frame frame) {
+    protected virtual void dispatchOnHandsHolding(Frame frame, bool isPhysics) {
       var hands = frame.Hands;
 
       //Loop through the currently grasped objects to dispatch their OnHandsHold callback
+      //TODO: Reverse this, it's terrible
       for (int i = 0; i < _graspedBehaviours.Count; i++) {
         var interactionBehaviour = _graspedBehaviours[i];
 
@@ -405,7 +406,11 @@ namespace Leap.Unity.Interaction {
         }
 
         try {
-          interactionBehaviour.NotifyHandsHoldPhysics(_holdingHands);
+          if (isPhysics) {
+            interactionBehaviour.NotifyHandsHoldPhysics(_holdingHands);
+          } else {
+            interactionBehaviour.NotifyHandsHoldGraphics(_holdingHands);
+          }
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
@@ -430,7 +435,7 @@ namespace Leap.Unity.Interaction {
 
       InteractionC.UpdateController(ref _scene, ref _controllerTransform);
     }
-    
+
     protected virtual void updateInteractionStateChanges(Frame frame) {
       var hands = frame.Hands;
 

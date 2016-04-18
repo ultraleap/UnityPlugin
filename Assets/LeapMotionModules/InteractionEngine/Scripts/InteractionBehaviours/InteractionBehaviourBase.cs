@@ -25,6 +25,8 @@ namespace Leap.Unity.Interaction {
 
     private List<int> _graspingIds = new List<int>();
     private List<int> _untrackedIds = new List<int>();
+
+    private BaseCallGuard _baseCallGuard = new BaseCallGuard();
     #endregion
 
     #region PUBLIC METHODS
@@ -124,73 +126,127 @@ namespace Leap.Unity.Interaction {
 
     #region MANAGER CALLBACKS
 
-    public override void NotifyRegistered() {
+    public override sealed void NotifyRegistered() {
       _isRegisteredWithManager = true;
+
+      _baseCallGuard.Begin();
+      OnRegistered();
+      _baseCallGuard.AssertBaseCalled();
     }
 
-    public override void NotifyUnregistered() {
+    public override sealed void NotifyUnregistered() {
       _isRegisteredWithManager = false;
+
+      _baseCallGuard.Begin();
+      OnUnregistered();
+      _baseCallGuard.AssertBaseCalled();
     }
 
-    public override void NotifyPreSolve() { }
+    public override sealed void NotifyPreSolve() {
+      _baseCallGuard.Begin();
+      OnPreSolve();
+      _baseCallGuard.AssertBaseCalled();
+    }
 
-    public override void NotifyPostSolve() { }
+    public override sealed void NotifyPostSolve() {
+      _baseCallGuard.Begin();
+      OnPostSolve();
+      _baseCallGuard.AssertBaseCalled();
+    }
 
-    public override void NotifyInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
+    public override sealed void NotifyInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
       _shapeInstanceHandle = instanceHandle;
       _hasShapeInstanceHandle = true;
+
+      _baseCallGuard.Begin();
+      OnInteractionShapeCreated(instanceHandle);
+      _baseCallGuard.AssertBaseCalled();
     }
 
-    public override void NotifyInteractionShapeDestroyed() {
+    public override sealed void NotifyInteractionShapeDestroyed() {
       _shapeInstanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
       _shapeDescriptionHandle = new INTERACTION_SHAPE_DESCRIPTION_HANDLE();
       _hasShapeDescriptionBeenCreated = false;
       _hasShapeInstanceHandle = false;
+
+      _baseCallGuard.Begin();
+      OnInteractionShapeDestroyed();
+      _baseCallGuard.AssertBaseCalled();
     }
 
-    public override void NotifyHandGrasped(Hand hand) {
+    public override sealed void NotifyHandGrasped(Hand hand) {
       Assert.IsFalse(_graspingIds.Contains(hand.Id), HandAlreadyGraspingMessage(hand.Id));
 
       _graspingIds.Add(hand.Id);
+
+      _baseCallGuard.Begin();
+      OnHandGrasped(hand);
+      _baseCallGuard.AssertBaseCalled();
 
       if (_graspingIds.Count == 1) {
         OnGraspBegin();
       }
     }
 
-    public override void NotifyHandsHoldPhysics(List<Hand> hands) { }
+    public override sealed void NotifyHandsHoldPhysics(List<Hand> hands) {
+      _baseCallGuard.Begin();
+      OnHandsHoldPhysics(hands);
+      _baseCallGuard.AssertBaseCalled();
+    }
 
-    public override void NotifyHandReleased(Hand hand) {
+    public override sealed void NotifyHandsHoldGraphics(List<Hand> hands) {
+      _baseCallGuard.Begin();
+      OnHandsHoldGraphics(hands);
+      _baseCallGuard.AssertBaseCalled();
+    }
+
+    public override sealed void NotifyHandReleased(Hand hand) {
       Assert.AreNotEqual(_graspingIds.Count, 0, NoGraspingHandsMessage());
       Assert.IsTrue(_graspingIds.Contains(hand.Id), HandNotGraspingMessage(hand.Id));
 
       _graspingIds.Remove(hand.Id);
+
+      _baseCallGuard.Begin();
+      OnHandReleased(hand);
+      _baseCallGuard.AssertBaseCalled();
 
       if (_graspingIds.Count == 0) {
         OnGraspEnd();
       }
     }
 
-    public override void NotifyHandLostTracking(Hand oldHand) {
+    public override sealed void NotifyHandLostTracking(Hand oldHand) {
       Assert.AreNotEqual(_graspingIds.Count, 0, NoGraspingHandsMessage());
       Assert.IsTrue(_graspingIds.Contains(oldHand.Id), HandNotGraspingMessage(oldHand.Id));
       Assert.IsFalse(_untrackedIds.Contains(oldHand.Id), HandAlreadyUntrackedMessage(oldHand.Id));
 
       _untrackedIds.Add(oldHand.Id);
+
+      _baseCallGuard.Begin();
+      OnHandLostTracking(oldHand);
+      _baseCallGuard.AssertBaseCalled();
     }
 
-    public override void NotifyHandRegainedTracking(Hand newHand, int oldId) {
+    public override sealed void NotifyHandRegainedTracking(Hand newHand, int oldId) {
       Assert.IsTrue(_graspingIds.Contains(oldId), HandNotGraspingMessage(oldId));
       Assert.IsFalse(_graspingIds.Contains(newHand.Id), HandAlreadyGraspingMessage(newHand.Id));
 
       _untrackedIds.Remove(oldId);
       _graspingIds.Remove(oldId);
       _graspingIds.Add(newHand.Id);
+
+      _baseCallGuard.Begin();
+      OnHandRegainedTracking(newHand, oldId);
+      _baseCallGuard.AssertBaseCalled();
     }
 
-    public override void NotifyHandTimeout(Hand oldHand) {
+    public override sealed void NotifyHandTimeout(Hand oldHand) {
       _untrackedIds.Remove(oldHand.Id);
       _graspingIds.Remove(oldHand.Id);
+
+      _baseCallGuard.Begin();
+      OnHandTimeout(oldHand);
+      _baseCallGuard.AssertBaseCalled();
 
       //OnGraspEnd is dispatched in OnHandTimeout in addition to OnHandRelease
       if (_graspingIds.Count == 0) {
@@ -198,10 +254,39 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override void NotifyRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) { }
+    public override sealed void NotifyRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) { }
     #endregion
 
     #region PROTECTED METHODS
+
+    protected virtual void OnRegistered() { }
+
+    protected virtual void OnUnregistered() { }
+
+    protected virtual void OnPreSolve() { }
+
+    protected virtual void OnPostSolve() { }
+
+    protected virtual void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) { }
+
+    protected virtual void OnInteractionShapeDestroyed() { }
+
+    protected virtual void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) { }
+
+    protected virtual void OnHandGrasped(Hand hand) { }
+
+    protected virtual void OnHandsHoldPhysics(List<Hand> hands) { }
+
+    protected virtual void OnHandsHoldGraphics(List<Hand> hands) { }
+
+    protected virtual void OnHandReleased(Hand hand) { }
+
+    protected virtual void OnHandLostTracking(Hand oldHand) { }
+
+    protected virtual void OnHandRegainedTracking(Hand newHand, int oldId) { }
+
+    protected virtual void OnHandTimeout(Hand oldHand) { }
+
     /// <summary>
     /// This method is called to generate the internal description of the interaction shape.
     /// The default implementation uses the GetAuto() method of the ShapeDescriptionPool class, which

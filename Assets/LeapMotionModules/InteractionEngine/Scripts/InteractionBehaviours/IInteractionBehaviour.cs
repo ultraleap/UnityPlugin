@@ -101,7 +101,7 @@ namespace Leap.Unity.Interaction {
     /// Called by InteractionManager when the interaction shape associated with this InteractionBehaviour
     /// is about to be updated.
     /// </summary>
-    public abstract void NotifyInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform);
+    public abstract void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform);
 
     /// <summary>
     /// Called by InteractionManager when the interaction shape associated with this InteractionBehaviour
