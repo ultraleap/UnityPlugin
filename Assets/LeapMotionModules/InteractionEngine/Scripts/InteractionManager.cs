@@ -395,13 +395,13 @@ namespace Leap.Unity.Interaction {
       var hands = frame.Hands;
 
       //Loop through the currently grasped objects to dispatch their OnHandsHold callback
-      //TODO: Reverse this, it's terrible
       for (int i = 0; i < _graspedBehaviours.Count; i++) {
         var interactionBehaviour = _graspedBehaviours[i];
 
         for (int j = 0; j < hands.Count; j++) {
-          if (interactionBehaviour.IsBeingGraspedByHand(hands[j].Id)) {
-            _holdingHands.Add(hands[j]);
+          var hand = hands[j];
+          if (_idToInteractionHand[hand.Id].graspedObject == interactionBehaviour) {
+            _holdingHands.Add(hand);
           }
         }
 
