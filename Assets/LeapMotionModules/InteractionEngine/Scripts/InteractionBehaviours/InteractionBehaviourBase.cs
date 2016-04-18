@@ -129,7 +129,7 @@ namespace Leap.Unity.Interaction {
     public override sealed void NotifyRegistered() {
       _isRegisteredWithManager = true;
 
-      _baseCallGuard.Begin();
+      _baseCallGuard.Begin("OnRegistered");
       OnRegistered();
       _baseCallGuard.AssertBaseCalled();
     }
@@ -137,19 +137,19 @@ namespace Leap.Unity.Interaction {
     public override sealed void NotifyUnregistered() {
       _isRegisteredWithManager = false;
 
-      _baseCallGuard.Begin();
+      _baseCallGuard.Begin("OnUnregistered");
       OnUnregistered();
       _baseCallGuard.AssertBaseCalled();
     }
 
     public override sealed void NotifyPreSolve() {
-      _baseCallGuard.Begin();
+      _baseCallGuard.Begin("OnPreSolve");
       OnPreSolve();
       _baseCallGuard.AssertBaseCalled();
     }
 
     public override sealed void NotifyPostSolve() {
-      _baseCallGuard.Begin();
+      _baseCallGuard.Begin("OnPostSolve");
       OnPostSolve();
       _baseCallGuard.AssertBaseCalled();
     }
@@ -158,7 +158,7 @@ namespace Leap.Unity.Interaction {
       _shapeInstanceHandle = instanceHandle;
       _hasShapeInstanceHandle = true;
 
-      _baseCallGuard.Begin();
+      _baseCallGuard.Begin("OnInteractionShapeCreated");
       OnInteractionShapeCreated(instanceHandle);
       _baseCallGuard.AssertBaseCalled();
     }
@@ -169,7 +169,7 @@ namespace Leap.Unity.Interaction {
       _hasShapeDescriptionBeenCreated = false;
       _hasShapeInstanceHandle = false;
 
-      _baseCallGuard.Begin();
+      _baseCallGuard.Begin("OnInteractionShapeDestroyed");
       OnInteractionShapeDestroyed();
       _baseCallGuard.AssertBaseCalled();
     }
@@ -179,25 +179,25 @@ namespace Leap.Unity.Interaction {
 
       _graspingIds.Add(hand.Id);
 
-      _baseCallGuard.Begin();
+      _baseCallGuard.Begin("OnHandGrasped");
       OnHandGrasped(hand);
       _baseCallGuard.AssertBaseCalled();
 
       if (_graspingIds.Count == 1) {
-        _baseCallGuard.Begin();
+        _baseCallGuard.Begin("OnGraspBegin");
         OnGraspBegin();
         _baseCallGuard.AssertBaseCalled();
       }
     }
 
     public override sealed void NotifyHandsHoldPhysics(List<Hand> hands) {
-      _baseCallGuard.Begin();
+      _baseCallGuard.Begin("OnHandsHoldPhysics");
       OnHandsHoldPhysics(hands);
       _baseCallGuard.AssertBaseCalled();
     }
 
     public override sealed void NotifyHandsHoldGraphics(List<Hand> hands) {
-      _baseCallGuard.Begin();
+      _baseCallGuard.Begin("OnHandsHoldGraphics");
       OnHandsHoldGraphics(hands);
       _baseCallGuard.AssertBaseCalled();
     }
@@ -208,12 +208,12 @@ namespace Leap.Unity.Interaction {
 
       _graspingIds.Remove(hand.Id);
 
-      _baseCallGuard.Begin();
+      _baseCallGuard.Begin("OnHandReleased");
       OnHandReleased(hand);
       _baseCallGuard.AssertBaseCalled();
 
       if (_graspingIds.Count == 0) {
-        _baseCallGuard.Begin();
+        _baseCallGuard.Begin("OnGraspEnd");
         OnGraspEnd();
         _baseCallGuard.AssertBaseCalled();
       }
@@ -226,7 +226,7 @@ namespace Leap.Unity.Interaction {
 
       _untrackedIds.Add(oldHand.Id);
 
-      _baseCallGuard.Begin();
+      _baseCallGuard.Begin("OnHandLostTracking");
       OnHandLostTracking(oldHand);
       _baseCallGuard.AssertBaseCalled();
     }
@@ -239,7 +239,7 @@ namespace Leap.Unity.Interaction {
       _graspingIds.Remove(oldId);
       _graspingIds.Add(newHand.Id);
 
-      _baseCallGuard.Begin();
+      _baseCallGuard.Begin("OnHandRegainedTracking");
       OnHandRegainedTracking(newHand, oldId);
       _baseCallGuard.AssertBaseCalled();
     }
@@ -248,13 +248,13 @@ namespace Leap.Unity.Interaction {
       _untrackedIds.Remove(oldHand.Id);
       _graspingIds.Remove(oldHand.Id);
 
-      _baseCallGuard.Begin();
+      _baseCallGuard.Begin("OnHandTimeout");
       OnHandTimeout(oldHand);
       _baseCallGuard.AssertBaseCalled();
 
       //OnGraspEnd is dispatched in OnHandTimeout in addition to OnHandRelease
       if (_graspingIds.Count == 0) {
-        _baseCallGuard.Begin();
+        _baseCallGuard.Begin("OnGraspEnd");
         OnGraspEnd();
         _baseCallGuard.AssertBaseCalled();
       }
@@ -279,28 +279,28 @@ namespace Leap.Unity.Interaction {
     /// Called when the behaviour is successfully registered with the manager.
     /// </summary>
     protected virtual void OnRegistered() {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnRegistered");
     }
 
     /// <summary>
     /// Called when the behaviour is unregistered with the manager.
     /// </summary>
     protected virtual void OnUnregistered() {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnUnregistered");
     }
 
     /// <summary>
     /// Called before any solving is performed.
     /// </summary>
     protected virtual void OnPreSolve() {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnPreSolve");
     }
 
     /// <summary>
     /// Called after all solving is performed.
     /// </summary>
     protected virtual void OnPostSolve() {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnPostSolve");
     }
 
     /// <summary>
@@ -308,7 +308,7 @@ namespace Leap.Unity.Interaction {
     /// is created and added to the interaction scene.
     /// </summary>
     protected virtual void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnInteractionShapeCreated");
     }
 
     /// <summary>
@@ -316,42 +316,42 @@ namespace Leap.Unity.Interaction {
     /// is destroyed and removed from the interaction scene.
     /// </summary>
     protected virtual void OnInteractionShapeDestroyed() {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnInteractionShapeDestroyed");
     }
 
     /// <summary>
     /// Called when simulation results are available for this object.
     /// </summary>
     protected virtual void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnRecievedSimulationResults");
     }
 
     /// <summary>
     /// Called when a Hand begins grasping this object.
     /// </summary>
     protected virtual void OnHandGrasped(Hand hand) {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnHandGrasped");
     }
 
     /// <summary>
     /// Called every FixedUpdate that a Hand continues to grasp this object.
     /// </summary>
     protected virtual void OnHandsHoldPhysics(List<Hand> hands) {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnHandsHoldPhysics");
     }
 
     /// <summary>
     /// Called every LateUpdate that a Hand continues to grasp this object.
     /// </summary>
     protected virtual void OnHandsHoldGraphics(List<Hand> hands) {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnHandsHoldGraphics");
     }
 
     /// <summary>
     /// Called when a Hand stops grasping this object.
     /// </summary>
     protected virtual void OnHandReleased(Hand hand) {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnHandReleased");
     }
 
     /// <summary>
@@ -360,7 +360,7 @@ namespace Leap.Unity.Interaction {
     /// if the Hand becomes tracked again.
     /// </summary>
     protected virtual void OnHandLostTracking(Hand oldHand) {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnHandLostTracking");
     }
 
     /// <summary>
@@ -369,7 +369,7 @@ namespace Leap.Unity.Interaction {
     /// hand.
     /// </summary>
     protected virtual void OnHandRegainedTracking(Hand newHand, int oldId) {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnHandRegainedTracking");
     }
 
     /// <summary>
@@ -377,7 +377,7 @@ namespace Leap.Unity.Interaction {
     /// too long.  The hand is no longer considered to be grasping the object.
     /// </summary>
     protected virtual void OnHandTimeout(Hand oldHand) {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnHandTimeout");
     }
 
     /// <summary>
@@ -385,7 +385,7 @@ namespace Leap.Unity.Interaction {
     /// grasped by at least one hand.
     /// </summary>
     protected virtual void OnGraspBegin() {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnGraspBegin");
     }
 
     /// <summary>
@@ -393,7 +393,7 @@ namespace Leap.Unity.Interaction {
     /// to being grasped by no hands.
     /// </summary>
     protected virtual void OnGraspEnd() {
-      _baseCallGuard.NotifyBaseCalled();
+      _baseCallGuard.NotifyBaseCalled("OnGraspEnd");
     }
     #endregion
 
