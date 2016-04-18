@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -24,17 +25,27 @@ namespace Leap.Unity {
     
     [System.Serializable]
     public class ModelPair {
+      public string PairName = "PairName";
+      public bool IsEnabled = true;
       public IHandModel LeftModel;
       public IHandModel RightModel;
-      public ModelPair(IHandModel leftModel, IHandModel rightModel) {
+
+      public ModelPair() {}
+
+      public ModelPair(string pairName, bool IsEnabled, IHandModel leftModel, IHandModel rightModel) {
+        this.PairName = pairName;
         this.LeftModel = leftModel;
         this.RightModel = rightModel;
       }
     }
     [System.Serializable]
     public class ModelGroup {
+      public string GroupName;
+      public bool IsEnabled;
       public List<IHandModel> modelList;
-      public ModelGroup(List<IHandModel> modelList) {
+      public ModelGroup(string groupName, bool isEnabled, List<IHandModel> modelList) {
+        this.GroupName = groupName;
+        this.IsEnabled = isEnabled;
         this.modelList = modelList;
       }
     }
@@ -45,7 +56,7 @@ namespace Leap.Unity {
     void Start() {
       ModelPool = new List<ModelGroup>();
       foreach (ModelPair pair in ModelCollection) {
-        ModelGroup newModelGroup = new ModelGroup(new List<IHandModel>());
+        ModelGroup newModelGroup = new ModelGroup(pair.PairName, pair.IsEnabled, new List<IHandModel>());
         newModelGroup.modelList.Add(pair.LeftModel);
         modelGroupMapping.Add(pair.LeftModel, newModelGroup);
         newModelGroup.modelList.Add(pair.RightModel);
@@ -90,6 +101,20 @@ namespace Leap.Unity {
       modelGroup.modelList.Add(model);
     }
 
+    public void EnableDisablePair(string groupName, bool isEnabled) {
+      for (int i = 0; i < modelGroupMapping.Count; i++) {
+        ModelGroup group = modelGroupMapping.ElementAt(i).Value;
+        if (group.GroupName == groupName) {
+          IHandModel model = modelGroupMapping.ElementAt(i).Key;
+          model.transform.gameObject.SetActive(isEnabled);
+          model.IsEnabled = false;
+        }
+      }
+      //IHandModel model = modelGroupMapping.Where(z => z.Value.GroupName == groupName).FirstOrDefault().Key;
+      //Debug.Log("model = " + model);
+      //model.transform.gameObject.SetActive(isEnabled);
+    }
+
 #if UNITY_EDITOR
     /**In the Unity Editor, Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project. */
     void OnValidate() {
@@ -110,5 +135,13 @@ namespace Leap.Unity {
       }
     }
 #endif
+    void Update() {
+      if (Input.GetKeyUp(KeyCode.O)) {
+        EnableDisablePair("Poly_Hands", false);
+      }
+      if (Input.GetKeyUp(KeyCode.P)) {
+        EnableDisablePair("Poly_Hands", true);
+      }
+    }
   }
 }
