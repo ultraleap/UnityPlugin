@@ -11,8 +11,8 @@ using UnityEngine.VR;
 public class LeapInputModule : BaseInputModule {
     public LeapProvider LeapDataProvider;
     public int NumberOfHands = 2;
-    public float ProjectiveToTactileTransitionDistance = 0.06f;
-    public float PinchingThreshold = 0.7f;
+    public float ProjectiveToTactileTransitionDistance = 0.12f;
+    public float PinchingThreshold = 0.8f;
     public bool OverrideScrollViewClicks = false;
     public bool DrawDebug = false;
 
@@ -35,6 +35,8 @@ public class LeapInputModule : BaseInputModule {
     public UnityEvent onHover;
     public UnityEvent whileClickHeld;
 
+    private pointerStates[] pointerState;
+    private pointerStates[] OldState;
     private AudioSource PointerSounds;
 
     private PointerEventData[] PointEvents;
@@ -47,11 +49,11 @@ public class LeapInputModule : BaseInputModule {
     private Queue<Vector3> DebugSphereQueue;
     Canvas[] canvases;
 
-    private bool[] TriggeringInteraction;
+    private bool[] OldTriggeringInteraction;
     private Quaternion CurrentRotation;
     private Vector2[] PrevScreenPosition;
 
-    private pointerStates[] pointerState;
+
 
     enum pointerStates : int {
         OnCanvas,
@@ -60,6 +62,7 @@ public class LeapInputModule : BaseInputModule {
         PinchingToElement,
         NearCanvas,
         TouchingCanvas,
+        TouchingElement,
         OffCanvas
     };
 
@@ -111,9 +114,10 @@ public class LeapInputModule : BaseInputModule {
         CurrentPressed = new GameObject[NumberOfHands];
         CurrentDragging = new GameObject[NumberOfHands];
 
-        TriggeringInteraction = new bool[NumberOfHands];
+        OldTriggeringInteraction = new bool[NumberOfHands];
         PrevScreenPosition = new Vector2[NumberOfHands];
         pointerState = new pointerStates[NumberOfHands];
+        OldState = new pointerStates[NumberOfHands];
 
         CurrentRotation = InputTracking.GetLocalRotation(VRNode.Head);
 
@@ -160,12 +164,6 @@ public class LeapInputModule : BaseInputModule {
             if (DrawDebug)
                 Debug.DrawRay(ProjectionOrigin, CurrentRotation * Vector3.forward * 5f);
 
-            if (distanceOfIndexTipToPointer(whichHand) < ProjectiveToTactileTransitionDistance +0.05f) {
-                pointerState[whichHand] = pointerStates.NearCanvas;
-                if (distanceOfIndexTipToPointer(whichHand) < ProjectiveToTactileTransitionDistance) {
-                    pointerState[whichHand] = pointerStates.TouchingCanvas;
-                }
-            }
 
             //Raycast from shoulder through index finger to the UI
             GetLookPointerEventData(whichHand, ProjectionOrigin, CurrentRotation * Vector3.forward);
@@ -179,9 +177,9 @@ public class LeapInputModule : BaseInputModule {
                 //Update cursor
                 UpdatePointer(whichHand, PointEvents[whichHand]);
 
-                if (!TriggeringInteraction[whichHand] && isTriggeringInteraction(whichHand)) {
+                if (!OldTriggeringInteraction[whichHand] && isTriggeringInteraction(whichHand)) {
                     ClearSelection();
-                    TriggeringInteraction[whichHand] = true;
+                    OldTriggeringInteraction[whichHand] = true;
 
                     PointEvents[whichHand].pressPosition = PointEvents[whichHand].position;
                     PointEvents[whichHand].pointerPressRaycast = PointEvents[whichHand].pointerCurrentRaycast;
@@ -218,8 +216,8 @@ public class LeapInputModule : BaseInputModule {
                     }
                 }
 
-                if (TriggeringInteraction[whichHand] && !isTriggeringInteraction(whichHand)) {
-                    TriggeringInteraction[whichHand] = false;
+                if (OldTriggeringInteraction[whichHand] && !isTriggeringInteraction(whichHand)) {
+                    OldTriggeringInteraction[whichHand] = false;
 
                     if (CurrentDragging[whichHand]) {
                         ExecuteEvents.Execute(CurrentDragging[whichHand], PointEvents[whichHand], ExecuteEvents.endDragHandler);
@@ -261,7 +259,10 @@ public class LeapInputModule : BaseInputModule {
                     lerpPointerColor(whichHand, TriggeringColor, 0.2f);
                     break;
                 case pointerStates.NearCanvas:
-                    lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 0f), 0.1f);
+                    lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 0f), 1f);
+                    break;
+                case pointerStates.TouchingElement:
+                    lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 0f), 0.2f);
                     break;
                 case pointerStates.TouchingCanvas:
                     lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 0f), 0.2f);
@@ -283,21 +284,23 @@ public class LeapInputModule : BaseInputModule {
 
         PointEvents[whichHand].button = PointerEventData.InputButton.Left;
 
-        //Set Camera Origin
-        EventCamera.transform.position = Origin;
+        //Get Base of Index Finger Position and set EventCamera Origin
+        Vector3 IndexFingerPosition;
+        if (pointerState[whichHand] == pointerStates.NearCanvas || pointerState[whichHand] == pointerStates.TouchingCanvas || pointerState[whichHand] == pointerStates.TouchingElement)
+        {
+            EventCamera.transform.position = InputTracking.GetLocalPosition(VRNode.Head);
+            IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].StabilizedTipPosition.ToVector3();
+        } else {
+            EventCamera.transform.position = Origin;
+            IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
+        }
+
+        //Draw Camera Origin
         if (DrawDebug)
-            DebugSphereQueue.Enqueue(Origin);
+            DebugSphereQueue.Enqueue(EventCamera.transform.position);
 
         //Set Camera Forward
         EventCamera.transform.forward = Direction;
-
-        //Get Base of Index Finger Position
-        Vector3 IndexFingerPosition;
-        if (pointerState[whichHand] == pointerStates.NearCanvas || pointerState[whichHand] == pointerStates.TouchingCanvas) {
-            IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].StabilizedTipPosition.ToVector3();
-        } else {
-            IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
-        }
 
         //Set its raycast direction and delta
         PointEvents[whichHand].position = Vector2.Lerp(PrevScreenPosition[whichHand], EventCamera.WorldToScreenPoint(IndexFingerPosition), 1.0f);//new Vector2(Screen.width / 2, Screen.height / 2);
@@ -328,30 +331,40 @@ public class LeapInputModule : BaseInputModule {
         }
 
         //Check what we're hitting and set the PointerState to match
-        pointerStates OldState = pointerState[whichHand]; //Store old state for sound transitionary purposes
+        OldState[whichHand] = pointerState[whichHand]; //Store old state for sound transitionary purposes
         if ((PointEvents[whichHand].pointerCurrentRaycast.gameObject != null)) {
-            if (checkIfClickable(PointEvents[whichHand].pointerCurrentRaycast.gameObject)) {
-                if (pointerState[whichHand] != pointerStates.NearCanvas && pointerState[whichHand] != pointerStates.TouchingCanvas) {
-                    if (isTriggeringInteraction(whichHand)) {
-                        pointerState[whichHand] = pointerStates.PinchingToElement;
-                    }else {
-                        pointerState[whichHand] = pointerStates.OnElement;
+            if (distanceOfIndexTipToPointer(whichHand) > ProjectiveToTactileTransitionDistance){
+                    if (checkIfClickable(PointEvents[whichHand].pointerCurrentRaycast.gameObject)){
+                        if (isTriggeringInteraction(whichHand)){
+                            pointerState[whichHand] = pointerStates.PinchingToElement;
+                        }else{
+                            pointerState[whichHand] = pointerStates.OnElement;
+                        }
+                    }else{
+                        if (isTriggeringInteraction(whichHand)){
+                            pointerState[whichHand] = pointerStates.PinchingToCanvas;
+                        }else{
+                            pointerState[whichHand] = pointerStates.OnCanvas;
+                        }
                     }
+            }else if (isTriggeringInteraction(whichHand)) {
+                if (checkIfClickable(PointEvents[whichHand].pointerCurrentRaycast.gameObject)){
+                    pointerState[whichHand] = pointerStates.TouchingElement;
+                }else{
+                    pointerState[whichHand] = pointerStates.TouchingCanvas;
                 }
-            }else if (pointerState[whichHand] != pointerStates.NearCanvas && pointerState[whichHand] != pointerStates.TouchingCanvas) {
-                if (isTriggeringInteraction(whichHand)) {
-                    pointerState[whichHand] = pointerStates.PinchingToCanvas;
-                } else {
-                    pointerState[whichHand] = pointerStates.OnCanvas;
-                }
+            }else {
+                pointerState[whichHand] = pointerStates.NearCanvas;
             }
-        }else {
+        }else{
             pointerState[whichHand] = pointerStates.OffCanvas;
         }
+
         m_RaycastResultCache.Clear();
 
-
-        if (OldState == pointerStates.OnCanvas) {
+        //Transition Behaviors (sound and event triggers (color is in "Process" since it is lerped over multiple frames))
+        if (OldState[whichHand] == pointerStates.OnCanvas)
+        {
             if (pointerState[whichHand] == pointerStates.OnElement) {
                 PointerSounds.PlayOneShot(HoverSound);
                 onHover.Invoke();
@@ -359,7 +372,8 @@ public class LeapInputModule : BaseInputModule {
                 PointerSounds.PlayOneShot(MissedSound);
             }
         }
-        if (OldState == pointerStates.OnElement) {
+        else if (OldState[whichHand] == pointerStates.OnElement)
+        {
             if (pointerState[whichHand] == pointerStates.OnCanvas) {
                 PointerSounds.PlayOneShot(HoverSound);
             } else if (pointerState[whichHand] == pointerStates.PinchingToElement) {
@@ -367,10 +381,27 @@ public class LeapInputModule : BaseInputModule {
                 onClickDown.Invoke();
             }//ALSO PLAY HOVER SOUND IF ON DIFFERENT UI ELEMENT THAN LAST FRAME
         }
-        if (OldState == pointerStates.PinchingToElement) {
+        else if (OldState[whichHand] == pointerStates.PinchingToElement)
+        {
             if (pointerState[whichHand] == pointerStates.PinchingToCanvas) {
                 //PointerSounds.PlayOneShot(HoverSound);
             } else if (pointerState[whichHand] == pointerStates.OnElement || pointerState[whichHand] == pointerStates.OnCanvas) {
+                onClickUp.Invoke();
+            }
+        }
+        else if (OldState[whichHand] == pointerStates.NearCanvas)
+        {
+            if (pointerState[whichHand] == pointerStates.TouchingElement){
+                PointerSounds.PlayOneShot(TriggerSound);
+                onClickDown.Invoke();
+            }
+            if (pointerState[whichHand] == pointerStates.TouchingCanvas){
+                PointerSounds.PlayOneShot(MissedSound);
+            }
+        }
+        else if (OldState[whichHand] == pointerStates.TouchingElement)
+        {
+            if (pointerState[whichHand] == pointerStates.NearCanvas){
                 onClickUp.Invoke();
             }
         }
@@ -410,7 +441,8 @@ public class LeapInputModule : BaseInputModule {
                         Pointerscale = NormalPointerScale;
                     }
 
-                    Pointers[index].localScale = Pointerscale * new Vector3(1f, 1f + pointData.delta.magnitude*0.5f, 1f);
+                    //Commented out Velocity Stretching because it looks funny when I change the
+                    Pointers[index].localScale = Pointerscale * new Vector3(1f, 1f/* + pointData.delta.magnitude*0.5f*/, 1f);
                 }
             }
         } else {
@@ -419,10 +451,11 @@ public class LeapInputModule : BaseInputModule {
     }
 
     public bool isTriggeringInteraction(int whichHand) {
-        if (distanceOfIndexTipToPointer(whichHand) < ProjectiveToTactileTransitionDistance) {
-            return distanceOfIndexTipToPointer(whichHand) < 0.01f;
+        if (pointerState[whichHand] == pointerStates.NearCanvas || pointerState[whichHand] == pointerStates.TouchingCanvas || pointerState[whichHand] == pointerStates.TouchingElement){
+            return (distanceOfIndexTipToPointer(whichHand) < 0.03f);
         }else {
-            return LeapDataProvider.CurrentFrame.Hands[whichHand].PinchStrength > PinchingThreshold;
+            Debug.Log(LeapDataProvider.CurrentFrame.Hands[whichHand].PinchDistance);
+            return LeapDataProvider.CurrentFrame.Hands[whichHand].PinchDistance < 30f;
         }
     }
 

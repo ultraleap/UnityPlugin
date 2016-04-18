@@ -13,10 +13,6 @@ namespace UnityEngine.UI {
         public class DialEvent : UnityEvent<float> { }
 
         [SerializeField]
-        private RectTransform m_FillRect;
-        public RectTransform fillRect { get { return m_FillRect; } set { if (SetPropertyUtility.SetClass(ref m_FillRect, value)) { UpdateCachedReferences(); UpdateVisuals(); } } }
-
-        [SerializeField]
         private RectTransform m_HandleRect;
         public RectTransform handleRect { get { return m_HandleRect; } set { if (SetPropertyUtility.SetClass(ref m_HandleRect, value)) { UpdateCachedReferences(); UpdateVisuals(); } } }
 
@@ -35,6 +31,13 @@ namespace UnityEngine.UI {
         public bool wholeNumbers { get { return m_WholeNumbers; } set { if (SetPropertyUtility.SetStruct(ref m_WholeNumbers, value)) { Set(m_Value); UpdateVisuals(); } } }
 
         [SerializeField]
+        private float m_ValuePerRotation = 10f;
+        public float valuePerRotation { get { return m_ValuePerRotation; } set { if (SetPropertyUtility.SetStruct(ref m_ValuePerRotation, value)) { Set(m_ValuePerRotation); UpdateVisuals(); } } }
+
+        private float wholeRotationValue = 0f;
+        private float prevNormalizedValue = 0f;
+
+        [SerializeField]
         protected float m_Value;
         public virtual float value
         {
@@ -50,19 +53,7 @@ namespace UnityEngine.UI {
             }
         }
 
-        public float normalizedValue
-        {
-            get
-            {
-                if (Mathf.Approximately(minValue, maxValue))
-                    return 0;
-                return Mathf.InverseLerp(minValue, maxValue, value);
-            }
-            set
-            {
-                this.value = Mathf.Lerp(minValue, maxValue, value);
-            }
-        }
+        private float normalizedValue;
 
         [Space]
 
@@ -72,10 +63,6 @@ namespace UnityEngine.UI {
         public DialEvent onValueChanged { get { return m_OnValueChanged; } set { m_OnValueChanged = value; } }
 
         // Private fields
-
-        private Image m_FillImage;
-        private Transform m_FillTransform;
-        private RectTransform m_FillContainerRect;
         private Transform m_HandleTransform;
         private RectTransform m_HandleContainerRect;
 
@@ -92,7 +79,7 @@ namespace UnityEngine.UI {
 #if UNITY_EDITOR
         protected override void OnValidate() {
             base.OnValidate();
-
+            wholeRotationValue = value - (value % valuePerRotation);
             if (wholeNumbers) {
                 m_MinValue = Mathf.Round(m_MinValue);
                 m_MaxValue = Mathf.Round(m_MaxValue);
@@ -126,6 +113,8 @@ namespace UnityEngine.UI {
 
         protected override void OnEnable() {
             base.OnEnable();
+            normalizedValue = (value % valuePerRotation);
+            wholeRotationValue = value - (value % valuePerRotation);
             UpdateCachedReferences();
             Set(m_Value, false);
             // Update rects since they need to be initialized correctly.
@@ -142,12 +131,8 @@ namespace UnityEngine.UI {
             // We also need to ensure the value stays within min/max.
             m_Value = ClampValue(m_Value);
             float oldNormalizedValue = normalizedValue;
-            if (m_FillContainerRect != null) {
-                if (m_FillImage != null && m_FillImage.type == Image.Type.Filled)
-                    oldNormalizedValue = m_FillImage.fillAmount;
-                else
-                    oldNormalizedValue = (reverseValue ? 1f : 0f);
-            } else if (m_HandleContainerRect != null)
+
+            if (m_HandleContainerRect != null)
                 oldNormalizedValue = (reverseValue ? 1f : 0f);
 
             UpdateVisuals();
@@ -157,15 +142,6 @@ namespace UnityEngine.UI {
         }
 
         void UpdateCachedReferences() {
-            if (m_FillRect) {
-                m_FillTransform = m_FillRect.transform;
-                m_FillImage = m_FillRect.GetComponent<Image>();
-                if (m_FillTransform.parent != null)
-                    m_FillContainerRect = m_FillTransform.parent.GetComponent<RectTransform>();
-            } else {
-                m_FillContainerRect = null;
-                m_FillImage = null;
-            }
 
             if (m_HandleRect) {
                 m_HandleTransform = m_HandleRect.transform;
@@ -223,49 +199,56 @@ namespace UnityEngine.UI {
 #endif
 
             m_Tracker.Clear();
-            m_HandleRect.localRotation = Quaternion.Euler(new Vector3(m_HandleRect.localRotation.x, m_HandleRect.localRotation.y, (-normalizedValue * 360f) % 360f));
 
-            /*
-            if (m_FillContainerRect != null) {
-                m_Tracker.Add(this, m_FillRect, DrivenTransformProperties.Anchors);
-                float anchorMin = 0f;
-                float anchorMax = 1f;
+            m_HandleRect.localRotation = Quaternion.Euler(new Vector3(m_HandleRect.localRotation.x, m_HandleRect.localRotation.y, (((-normalizedValue) * 360f)+180f) % 360f));
 
-                if (m_FillImage != null && m_FillImage.type == Image.Type.Filled) {
-                    m_FillImage.fillAmount = normalizedValue;
-                } else {
-                    if (reverseValue)
-                        anchorMin = 1 - normalizedValue;
-                    else
-                        anchorMax = normalizedValue;
-                }
-
-                m_FillRect.anchorMin = new Vector2(anchorMin, 1f);
-                m_FillRect.anchorMax = new Vector2(anchorMax, 1f);
-            }
-
-            if (m_HandleContainerRect != null) {
-                m_Tracker.Add(this, m_HandleRect, DrivenTransformProperties.Anchors);
-                Vector2 anchorMin = Vector2.zero;
-                Vector2 anchorMax = Vector2.one;
-                anchorMin[0] = anchorMax[0] = (reverseValue ? (1 - normalizedValue) : normalizedValue);
-                m_HandleRect.anchorMin = anchorMin;
-                m_HandleRect.anchorMax = anchorMax;
-            }
-            */
         }
 
         // Update the slider's position based on the mouse.
         void UpdateDrag(PointerEventData eventData, Camera cam) {
-            RectTransform clickRect = m_HandleRect ?? m_HandleContainerRect ?? m_FillContainerRect;
+            RectTransform clickRect = m_HandleContainerRect;
             if (clickRect != null && clickRect.rect.size[0] > 0) {
                 Vector2 localCursor;
                 if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(clickRect, eventData.position, cam, out localCursor))
                     return;
                 //localCursor -= clickRect.rect.position;
 
-                float val = Mathf.Clamp01(Mathf.Rad2Deg*(Mathf.Atan2(localCursor.x,localCursor.y)-m_Offset + ((float)Math.PI)) / 360f);
-                normalizedValue = (reverseValue ? 1f - val : val);
+                float val = Mathf.Clamp01(Mathf.Rad2Deg*(Mathf.Atan2(localCursor.x,localCursor.y)-m_Offset + (Mathf.PI)) / 360f);
+                val = (reverseValue ? 1f - val : val);
+                prevNormalizedValue = normalizedValue;
+
+                //Loop Around
+                if (prevNormalizedValue > 0.8f && val < 0.2f)
+                {
+                    wholeRotationValue += valuePerRotation;
+                }
+                if (prevNormalizedValue < 0.2f && val > 0.8f)
+                {
+                    wholeRotationValue -= valuePerRotation;
+                }
+
+                //Apply Max/Min Constraint
+                float testval = wholeRotationValue + (val * valuePerRotation);
+                if (testval > maxValue-0.01f)
+                {
+                    normalizedValue = ((maxValue - wholeRotationValue) / valuePerRotation);
+                }
+                else if (testval < minValue+0.01f)
+                {
+                    normalizedValue = ((minValue - wholeRotationValue) / valuePerRotation);
+                }
+                else
+                {
+                    normalizedValue = val;
+                }
+
+
+                //Set the main Value
+                Set(wholeRotationValue + (normalizedValue * valuePerRotation));
+
+                //Show the world
+                UpdateVisuals();
+
             }
         }
 
@@ -283,7 +266,7 @@ namespace UnityEngine.UI {
             if (m_HandleContainerRect != null && RectTransformUtility.RectangleContainsScreenPoint(m_HandleRect, eventData.position, eventData.enterEventCamera)) {
                 Vector2 localMousePos;
                 if (RectTransformUtility.ScreenPointToLocalPointInRectangle(m_HandleRect, eventData.position, eventData.pressEventCamera, out localMousePos)) {
-                    m_Offset = Mathf.Rad2Deg*(Mathf.Atan2(localMousePos.x, localMousePos.y) + ((float)Math.PI))/360f;
+                    m_Offset = 0f;// Mathf.Rad2Deg * (Mathf.Atan2(localMousePos.x, localMousePos.y) + (Mathf.PI)) / 360f;
                 }
             }
         }
