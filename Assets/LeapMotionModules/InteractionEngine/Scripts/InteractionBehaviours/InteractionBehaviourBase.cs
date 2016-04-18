@@ -261,7 +261,11 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override sealed void NotifyRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) { }
+    public override sealed void NotifyRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
+      _baseCallGuard.Begin("OnRecievedSimulationResults");
+      OnRecievedSimulationResults(results);
+      _baseCallGuard.AssertBaseCalled();
+    }
     #endregion
 
     #region PROTECTED METHODS
