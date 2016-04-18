@@ -18,8 +18,9 @@ namespace Leap.Unity.Interaction.CApi {
           Debug.LogWarning("Found multiple hands with the same id");
           continue;
         }
-        
-        StructMarshal<LEAP_HAND>.CopyIntoArray(handArray, CreateHand(hands[i]), i);
+
+        LEAP_HAND hand = CreateHand(hands[i]);
+        StructMarshal<LEAP_HAND>.CopyIntoArray(handArray, ref hand, i);
         _ids.Add(hands[i].Id);
       }
 

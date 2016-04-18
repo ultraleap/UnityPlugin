@@ -241,12 +241,12 @@ namespace Leap.Unity.Interaction.CApi {
         ieTransform.position = (parentObject.transform.InverseTransformPoint(globalPos) * parentObject.transform.lossyScale.x).ToCVector();
         ieTransform.rotation = (Quaternion.Inverse(parentObject.transform.rotation) * globalRot).ToCQuaternion();
 
-        StructMarshal<IntPtr>.CopyIntoArray(compoundDesc.pShapes, shapePtr, i);
+        StructMarshal<IntPtr>.CopyIntoArray(compoundDesc.pShapes, ref shapePtr, i);
         compoundDesc.pTransforms[i] = ieTransform;
       }
 
       INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
-      IntPtr compoundPtr = StructAllocator.AllocateStruct(compoundDesc);
+      IntPtr compoundPtr = StructAllocator.AllocateStruct(ref compoundDesc);
 
       InteractionC.AddShapeDescription(ref _scene, compoundPtr, out handle);
       StructAllocator.CleanupAllocations();
@@ -273,7 +273,7 @@ namespace Leap.Unity.Interaction.CApi {
       sphereDesc.shape.type = ShapeType.Sphere;
       sphereDesc.radius = radius;
 
-      IntPtr spherePtr = StructAllocator.AllocateStruct(sphereDesc);
+      IntPtr spherePtr = StructAllocator.AllocateStruct(ref sphereDesc);
       return spherePtr;
     }
 
@@ -282,7 +282,7 @@ namespace Leap.Unity.Interaction.CApi {
       obbDesc.shape.type = ShapeType.OBB;
       obbDesc.extents = extents.ToCVector();
 
-      IntPtr obbPtr = StructAllocator.AllocateStruct(obbDesc);
+      IntPtr obbPtr = StructAllocator.AllocateStruct(ref obbDesc);
       return obbPtr;
     }
 
@@ -295,7 +295,7 @@ namespace Leap.Unity.Interaction.CApi {
       meshDesc.pVertices[0] = p0.ToCVector();
       meshDesc.pVertices[1] = p1.ToCVector();
 
-      IntPtr capsulePtr = StructAllocator.AllocateStruct(meshDesc);
+      IntPtr capsulePtr = StructAllocator.AllocateStruct(ref meshDesc);
       return capsulePtr;
     }
 
@@ -310,7 +310,7 @@ namespace Leap.Unity.Interaction.CApi {
         meshDesc.pVertices[i] = v;
       }
 
-      IntPtr meshPtr = StructAllocator.AllocateStruct(meshDesc);
+      IntPtr meshPtr = StructAllocator.AllocateStruct(ref meshDesc);
       return meshPtr;
     }
 
