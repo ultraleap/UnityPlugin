@@ -136,6 +136,7 @@ namespace Leap.Unity.Interaction {
 
     public override sealed void NotifyUnregistered() {
       _isRegisteredWithManager = false;
+      enabled = false;
 
       _baseCallGuard.Begin("OnUnregistered");
       OnUnregistered();
