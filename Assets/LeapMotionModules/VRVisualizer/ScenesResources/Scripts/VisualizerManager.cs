@@ -33,33 +33,38 @@ namespace Leap.Unity.VRVisualizer{
       if (provider != null)
         m_controller = provider.GetLeapController();
     }
-  
-    void Awake()
-    {
-      Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, false);
-      if (VRDevice.isPresent)
-      {
+
+    private void goVR() {
         m_PCVisualizer.gameObject.SetActive(false);
         m_VRVisualizer.gameObject.SetActive(true);
-        m_warningText.text = "Please put on your head-mounted display";
-      }
-      else
-      {
+        m_warningText.text = "Please put on your head-mounted display";      
+    }
+
+    private void goDesktop() {
         m_VRVisualizer.gameObject.SetActive(false);
         m_PCVisualizer.gameObject.SetActive(true);
-        m_warningText.text = "No head-mounted display detected. Orion performs best in a head-mounted display";
-      }
-
-      m_deltaTime = new SmoothedFloat();
-      m_deltaTime.delay = 0.1f;
+        m_warningText.text = "No head-mounted display detected. Orion performs best in a head-mounted display";      
     }
-  
+
     void Start()
     {
       m_trackingText.text = "";
       FindController();
       if (m_controller != null)
         m_leapConnected = m_controller.IsConnected;
+
+      Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, false);
+      if (VRDevice.isPresent)
+      {
+        goVR();    
+      }
+      else
+      {
+        goDesktop();
+      }
+
+      m_deltaTime = new SmoothedFloat();
+      m_deltaTime.delay = 0.1f;
     }
   
     void Update()
@@ -70,11 +75,6 @@ namespace Leap.Unity.VRVisualizer{
         return;
       }
   
-      if (m_leapConnected == false && m_controller.IsConnected)
-      {
-        // HACK (wyu): LeapProvider should listen to events and update itself when Leap devices are connected/disconnected instead of having to reload the scene to reinitialize variables
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-      }
       m_leapConnected = m_controller.IsConnected;
       if (!m_leapConnected)
       {
@@ -98,11 +98,13 @@ namespace Leap.Unity.VRVisualizer{
         else
         {
           m_trackingText.text += " (Press '" + keyToToggleHMD + "' to switch to head-mounted mode)";
-          if (Input.GetKeyDown(keyToToggleHMD))
-            m_controller.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+          if (Input.GetKeyDown(keyToToggleHMD)) {
+              m_controller.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
+          }
         }
-      }
-      //update render frame display
+      } 
+
+        //update render frame display
       m_deltaTime.Update(Time.deltaTime, Time.deltaTime);
       if (m_framrateUpdateCount > m_framerateUpdateInterval) {
         updateRenderFrameRate();

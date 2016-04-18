@@ -954,10 +954,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ModelCollection:
-  - {fileID: 931920751}
-  - {fileID: 1542358432}
-  - {fileID: 824246799}
-  - {fileID: 162318176}
+  - LeftModel: {fileID: 931920751}
+    RightModel: {fileID: 1542358432}
+  - LeftModel: {fileID: 824246799}
+    RightModel: {fileID: 162318176}
   ModelPool: []
   EnforceHandedness: 0
 --- !u!114 &228550821
@@ -4143,10 +4143,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ModelCollection:
-  - {fileID: 1545945338}
-  - {fileID: 1061438465}
-  - {fileID: 1414805578}
-  - {fileID: 1167543056}
+  - LeftModel: {fileID: 1545945338}
+    RightModel: {fileID: 1061438465}
+  - LeftModel: {fileID: 1414805578}
+    RightModel: {fileID: 1167543056}
   ModelPool: []
   EnforceHandedness: 0
 --- !u!114 &1476913615
