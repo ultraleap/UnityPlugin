@@ -124,31 +124,31 @@ namespace Leap.Unity.Interaction {
 
     #region MANAGER CALLBACKS
 
-    public override void OnRegister() {
+    public override void NotifyRegistered() {
       _isRegisteredWithManager = true;
     }
 
-    public override void OnUnregister() {
+    public override void NotifyUnregistered() {
       _isRegisteredWithManager = false;
     }
 
-    public override void OnPreSolve() { }
+    public override void NotifyPreSolve() { }
 
-    public override void OnPostSolve() { }
+    public override void NotifyPostSolve() { }
 
-    public override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
+    public override void NotifyInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
       _shapeInstanceHandle = instanceHandle;
       _hasShapeInstanceHandle = true;
     }
 
-    public override void OnInteractionShapeDestroyed() {
+    public override void NotifyInteractionShapeDestroyed() {
       _shapeInstanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
       _shapeDescriptionHandle = new INTERACTION_SHAPE_DESCRIPTION_HANDLE();
       _hasShapeDescriptionBeenCreated = false;
       _hasShapeInstanceHandle = false;
     }
 
-    public override void OnHandGrasp(Hand hand) {
+    public override void NotifyHandGrasped(Hand hand) {
       Assert.IsFalse(_graspingIds.Contains(hand.Id), HandAlreadyGraspingMessage(hand.Id));
 
       _graspingIds.Add(hand.Id);
@@ -158,7 +158,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override void OnHandsHold(List<Hand> hands) { }
+    public override void NotifyHandsHold(List<Hand> hands) { }
 
     public override void OnHandRelease(Hand hand) {
       Assert.AreNotEqual(_graspingIds.Count, 0, NoGraspingHandsMessage());
@@ -198,7 +198,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override void OnRecieveSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) { }
+    public override void NotifyRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) { }
     #endregion
 
     #region PROTECTED METHODS

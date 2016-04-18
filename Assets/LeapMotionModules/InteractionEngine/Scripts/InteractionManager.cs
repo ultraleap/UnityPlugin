@@ -159,7 +159,7 @@ namespace Leap.Unity.Interaction {
       _registeredBehaviours.Add(interactionBehaviour);
 
       try {
-        interactionBehaviour.OnRegister();
+        interactionBehaviour.NotifyRegistered();
       } catch (Exception e) {
         _misbehavingBehaviours.Add(interactionBehaviour);
         throw e;
@@ -209,7 +209,7 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      interactionBehaviour.OnUnregister();
+      interactionBehaviour.NotifyUnregistered();
     }
     #endregion
 
@@ -346,7 +346,7 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void simulateFrame(Frame frame) {
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
-        _registeredBehaviours[i].OnPreSolve();
+        _registeredBehaviours[i].NotifyPreSolve();
       }
 
       dispatchOnHandsHolding(frame);
@@ -365,7 +365,7 @@ namespace Leap.Unity.Interaction {
       }
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
-        _registeredBehaviours[i].OnPostSolve();
+        _registeredBehaviours[i].NotifyPostSolve();
       }
     }
 
@@ -381,7 +381,7 @@ namespace Leap.Unity.Interaction {
 
           INTERACTION_UPDATE_SHAPE_INFO updateInfo;
           INTERACTION_TRANSFORM updateTransform;
-          interactionBehaviour.OnInteractionShapeUpdate(out updateInfo, out updateTransform);
+          interactionBehaviour.NotifyInteractionShapeUpdate(out updateInfo, out updateTransform);
 
           InteractionC.UpdateShapeInstance(ref _scene, ref updateTransform, ref updateInfo, ref shapeInstanceHandle);
         } catch (Exception e) {
@@ -405,7 +405,7 @@ namespace Leap.Unity.Interaction {
         }
 
         try {
-          interactionBehaviour.OnHandsHold(_holdingHands);
+          interactionBehaviour.NotifyHandsHold(_holdingHands);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
@@ -599,7 +599,7 @@ namespace Leap.Unity.Interaction {
         IInteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[result.handle];
 
         try {
-          interactionBehaviour.OnRecieveSimulationResults(result);
+          interactionBehaviour.NotifyRecievedSimulationResults(result);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
@@ -613,13 +613,13 @@ namespace Leap.Unity.Interaction {
 
       INTERACTION_CREATE_SHAPE_INFO createInfo;
       INTERACTION_TRANSFORM createTransform;
-      interactionBehaviour.OnInteractionShapeCreationInfo(out createInfo, out createTransform);
+      interactionBehaviour.GetInteractionShapeCreationInfo(out createInfo, out createTransform);
 
       InteractionC.CreateShapeInstance(ref _scene, ref descriptionHandle, ref createTransform, ref createInfo, out instanceHandle);
 
       _instanceHandleToBehaviour[instanceHandle] = interactionBehaviour;
 
-      interactionBehaviour.OnInteractionShapeCreated(instanceHandle);
+      interactionBehaviour.NotifyInteractionShapeCreated(instanceHandle);
     }
 
     protected virtual void destroyInteractionShape(IInteractionBehaviour interactionBehaviour) {
@@ -629,7 +629,7 @@ namespace Leap.Unity.Interaction {
 
       InteractionC.DestroyShapeInstance(ref _scene, ref instanceHandle);
 
-      interactionBehaviour.OnInteractionShapeDestroyed();
+      interactionBehaviour.NotifyInteractionShapeDestroyed();
     }
 
     private void unregisterMisbehavingBehaviours() {
@@ -687,7 +687,7 @@ namespace Leap.Unity.Interaction {
 
       public void GraspObject(IInteractionBehaviour obj) {
         graspedObject = obj;
-        graspedObject.OnHandGrasp(hand);
+        graspedObject.NotifyHandGrasped(hand);
       }
 
       public void ReleaseObject() {

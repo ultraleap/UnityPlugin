@@ -78,8 +78,8 @@ namespace Leap.Unity.Interaction {
 
     #region INTERACTION CALLBACKS
 
-    public override void OnRegister() {
-      base.OnRegister();
+    public override void NotifyRegistered() {
+      base.NotifyRegistered();
 
       _rigidbody = GetComponent<Rigidbody>();
       if (_rigidbody == null) {
@@ -95,16 +95,16 @@ namespace Leap.Unity.Interaction {
       KabschC.Construct(ref _kabsch);
     }
 
-    public override void OnUnregister() {
-      base.OnUnregister();
+    public override void NotifyUnregistered() {
+      base.NotifyUnregistered();
 
       _rigidbody.isKinematic = _isKinematic;
       _rigidbody.useGravity = _useGravity;
       KabschC.Destruct(ref _kabsch);
     }
 
-    public override void OnPostSolve() {
-      base.OnPreSolve();
+    public override void NotifyPostSolve() {
+      base.NotifyPreSolve();
 
       if (!_recievedVelocityUpdate) {
         _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
@@ -121,7 +121,7 @@ namespace Leap.Unity.Interaction {
       _recievedVelocityUpdate = false;
     }
 
-    public override void OnInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
+    public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
       createInfo = new INTERACTION_CREATE_SHAPE_INFO();
       createInfo.gravity = Physics.gravity.ToCVector();
       createInfo.shapeFlags = ShapeInfoFlags.None;
@@ -137,8 +137,8 @@ namespace Leap.Unity.Interaction {
       createTransform = getRigidbodyTransform();
     }
 
-    public override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
-      base.OnInteractionShapeCreated(instanceHandle);
+    public override void NotifyInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
+      base.NotifyInteractionShapeCreated(instanceHandle);
 
 #if UNITY_EDITOR
       Collider[] colliders = GetComponentsInChildren<Collider>();
@@ -152,7 +152,7 @@ namespace Leap.Unity.Interaction {
 #endif
     }
 
-    public override void OnInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
+    public override void NotifyInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
       updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
       updateInfo.updateFlags = _notifiedOfTeleport ? UpdateInfoFlags.ResetVelocity : UpdateInfoFlags.None;
       updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration | UpdateInfoFlags.ExplicitVelocity;
@@ -164,8 +164,8 @@ namespace Leap.Unity.Interaction {
       interactionTransform = getRigidbodyTransform();
     }
 
-    public override void OnRecieveSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
-      base.OnRecieveSimulationResults(results);
+    public override void NotifyRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
+      base.NotifyRecievedSimulationResults(results);
 
       if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
         _rigidbody.Sleep();
@@ -175,8 +175,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override void OnHandGrasp(Hand hand) {
-      base.OnHandGrasp(hand);
+    public override void NotifyHandGrasped(Hand hand) {
+      base.NotifyHandGrasped(hand);
 
       var newCollection = HandPointCollection.Create(_rigidbody);
       _handIdToPoints[hand.Id] = newCollection;
@@ -198,8 +198,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override void OnHandsHold(List<Hand> hands) {
-      base.OnHandsHold(hands);
+    public override void NotifyHandsHold(List<Hand> hands) {
+      base.NotifyHandsHold(hands);
 
       //Get old transform
       Vector3 oldPosition = _rigidbody.position;
