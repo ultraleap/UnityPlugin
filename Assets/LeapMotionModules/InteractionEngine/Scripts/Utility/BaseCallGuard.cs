@@ -4,8 +4,8 @@ using System.Diagnostics;
 namespace Leap.Unity.Interaction {
 
   public class BaseNotCalledException : Exception {
-    public BaseNotCalledException(object method) :
-      base("Base implementation for " + method + " was not called.") { }
+    public BaseNotCalledException() :
+      base("Base implementation was not called.") { }
   }
 
   public class BaseCallGuard {
@@ -18,8 +18,8 @@ namespace Leap.Unity.Interaction {
 
     [Conditional("UNITY_ASSERTIONS")]
     public void AssertBaseCalled() {
-      if (!_waitingForBaseCall) {
-        var notCalledException = new BaseNotCalledException(_waitingForBaseCall);
+      if (_waitingForBaseCall) {
+        var notCalledException = new BaseNotCalledException();
         _waitingForBaseCall = false;
         throw notCalledException;
       }

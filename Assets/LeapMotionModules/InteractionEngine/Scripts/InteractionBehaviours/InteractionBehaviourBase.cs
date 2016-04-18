@@ -184,7 +184,9 @@ namespace Leap.Unity.Interaction {
       _baseCallGuard.AssertBaseCalled();
 
       if (_graspingIds.Count == 1) {
+        _baseCallGuard.Begin();
         OnGraspBegin();
+        _baseCallGuard.AssertBaseCalled();
       }
     }
 
@@ -211,7 +213,9 @@ namespace Leap.Unity.Interaction {
       _baseCallGuard.AssertBaseCalled();
 
       if (_graspingIds.Count == 0) {
+        _baseCallGuard.Begin();
         OnGraspEnd();
+        _baseCallGuard.AssertBaseCalled();
       }
     }
 
@@ -250,7 +254,9 @@ namespace Leap.Unity.Interaction {
 
       //OnGraspEnd is dispatched in OnHandTimeout in addition to OnHandRelease
       if (_graspingIds.Count == 0) {
+        _baseCallGuard.Begin();
         OnGraspEnd();
+        _baseCallGuard.AssertBaseCalled();
       }
     }
 
@@ -258,34 +264,6 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region PROTECTED METHODS
-
-    protected virtual void OnRegistered() { }
-
-    protected virtual void OnUnregistered() { }
-
-    protected virtual void OnPreSolve() { }
-
-    protected virtual void OnPostSolve() { }
-
-    protected virtual void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) { }
-
-    protected virtual void OnInteractionShapeDestroyed() { }
-
-    protected virtual void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) { }
-
-    protected virtual void OnHandGrasped(Hand hand) { }
-
-    protected virtual void OnHandsHoldPhysics(List<Hand> hands) { }
-
-    protected virtual void OnHandsHoldGraphics(List<Hand> hands) { }
-
-    protected virtual void OnHandReleased(Hand hand) { }
-
-    protected virtual void OnHandLostTracking(Hand oldHand) { }
-
-    protected virtual void OnHandRegainedTracking(Hand newHand, int oldId) { }
-
-    protected virtual void OnHandTimeout(Hand oldHand) { }
 
     /// <summary>
     /// This method is called to generate the internal description of the interaction shape.
@@ -298,16 +276,125 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Called when the behaviour is successfully registered with the manager.
+    /// </summary>
+    protected virtual void OnRegistered() {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
+    /// Called when the behaviour is unregistered with the manager.
+    /// </summary>
+    protected virtual void OnUnregistered() {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
+    /// Called before any solving is performed.
+    /// </summary>
+    protected virtual void OnPreSolve() {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
+    /// Called after all solving is performed.
+    /// </summary>
+    protected virtual void OnPostSolve() {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
+    /// Called when the interaction shape associated with this InteractionBehaviour
+    /// is created and added to the interaction scene.
+    /// </summary>
+    protected virtual void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
+    /// Called when the interaction shape associated with this InteractionBehaviour
+    /// is destroyed and removed from the interaction scene.
+    /// </summary>
+    protected virtual void OnInteractionShapeDestroyed() {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
+    /// Called when simulation results are available for this object.
+    /// </summary>
+    protected virtual void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
+    /// Called when a Hand begins grasping this object.
+    /// </summary>
+    protected virtual void OnHandGrasped(Hand hand) {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
+    /// Called every FixedUpdate that a Hand continues to grasp this object.
+    /// </summary>
+    protected virtual void OnHandsHoldPhysics(List<Hand> hands) {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
+    /// Called every LateUpdate that a Hand continues to grasp this object.
+    /// </summary>
+    protected virtual void OnHandsHoldGraphics(List<Hand> hands) {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
+    /// Called when a Hand stops grasping this object.
+    /// </summary>
+    protected virtual void OnHandReleased(Hand hand) {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
+    /// Called when a Hand that was grasping becomes untracked.  The Hand
+    /// is not yet considered ungrasped, and OnHandRegainedTracking might be called in the future
+    /// if the Hand becomes tracked again.
+    /// </summary>
+    protected virtual void OnHandLostTracking(Hand oldHand) {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
+    /// Called when a grasping Hand that had previously been untracked has
+    /// regained tracking.  The new hand is provided, as well as the id of the previously tracked
+    /// hand.
+    /// </summary>
+    protected virtual void OnHandRegainedTracking(Hand newHand, int oldId) {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
+    /// Called when an untracked grasping Hand has remained ungrasped for
+    /// too long.  The hand is no longer considered to be grasping the object.
+    /// </summary>
+    protected virtual void OnHandTimeout(Hand oldHand) {
+      _baseCallGuard.NotifyBaseCalled();
+    }
+
+    /// <summary>
     /// Called when the the object transitions from being grasped by no hands to being
     /// grasped by at least one hand.
     /// </summary>
-    protected virtual void OnGraspBegin() { }
+    protected virtual void OnGraspBegin() {
+      _baseCallGuard.NotifyBaseCalled();
+    }
 
     /// <summary>
     /// Called when the object transitions from being grasped by at least one hand
     /// to being grasped by no hands.
     /// </summary>
-    protected virtual void OnGraspEnd() { }
+    protected virtual void OnGraspEnd() {
+      _baseCallGuard.NotifyBaseCalled();
+    }
     #endregion
 
     #region UNITY MESSAGES

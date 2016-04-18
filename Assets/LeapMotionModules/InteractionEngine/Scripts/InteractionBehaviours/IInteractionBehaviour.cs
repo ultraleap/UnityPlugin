@@ -109,7 +109,7 @@ namespace Leap.Unity.Interaction {
     public abstract void NotifyInteractionShapeDestroyed();
 
     /// <summary>
-    /// Called by InteractionManager when the velocity of an object is changed.
+    /// Called by InteractionManager when simulation results are available for this object.
     /// </summary>
     public abstract void NotifyRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results);
 
