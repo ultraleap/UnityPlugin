@@ -175,7 +175,7 @@ namespace Leap.Unity.Interaction {
         canDestroy &= cleanupEmptyObjects(childList[i].gameObject, graphicalAnchor);
       }
 
-      //Can only destroy if there are no components except transform//
+      //Can only destroy if there are no components except transform
       canDestroy &= anchor.GetComponents<Component>().Length == 1;
 
       canDestroy &= anchor != graphicalAnchor;
