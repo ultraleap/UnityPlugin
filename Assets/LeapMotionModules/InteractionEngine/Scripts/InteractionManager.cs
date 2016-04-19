@@ -27,6 +27,9 @@ namespace Leap.Unity.Interaction {
     [Header("Debug")]
     [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
     [SerializeField]
+    protected bool _enableSimulation = true;
+
+    [SerializeField]
     protected bool _showDebugLines = true;
 
     [SerializeField]
@@ -328,7 +331,9 @@ namespace Leap.Unity.Interaction {
         yield return fixedUpdate;
 
         try {
-          simulateFrame();
+          if (_enableSimulation) {
+            simulateFrame(_leapProvider.CurrentFixedFrame);
+          }
 
           if (_showDebugLines) {
             InteractionC.DrawDebugLines(ref _scene);
@@ -344,9 +349,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void simulateFrame() {
-      Frame frame = _leapProvider.CurrentFrame;
-
+    protected virtual void simulateFrame(Frame frame) {
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         _registeredBehaviours[i].NotifyPreSolve();
       }
