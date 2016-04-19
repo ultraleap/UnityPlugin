@@ -57,7 +57,7 @@ namespace Leap.Unity.Interaction {
     public override INTERACTION_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
       get {
         if (!_isRegisteredWithManager) {
-          throw new NotRegisteredWithManagerException();
+          throw new InvalidOperationException("Cannot get Shape Description Handle because the Interaction Object has not yet been registered with an Interaction Manager.");
         }
 
         if (!_hasShapeDescriptionBeenCreated) {
@@ -424,7 +424,8 @@ namespace Leap.Unity.Interaction {
 
       if (_manager == null) {
         enabled = false;
-        throw new NoManagerSpecifiedException();
+        Debug.LogError("Could not enable Interaction Behaviour because no Interaction Manager was specified.");
+        return;
       }
 
       _manager.RegisterInteractionBehaviour(this);

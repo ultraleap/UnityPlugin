@@ -238,6 +238,12 @@ namespace Leap.Unity.Interaction {
     protected virtual void Awake() { }
 
     protected virtual void OnEnable() {
+      if (_leapProvider == null) {
+        enabled = false;
+        Debug.LogError("Could not enable Interaction Manager because no Leap Provider was specified.");
+        return;
+      }
+
       Assert.IsFalse(_hasSceneBeenCreated, "Scene should not have been created yet");
 
       try {
