@@ -19,7 +19,7 @@ namespace Leap.Unity.Interaction {
     protected Transform _graphicalAnchor;
 
     [SerializeField]
-    protected float _graphicalReturnTime = 0.15f;
+    protected float _graphicalReturnTime = 0.25f;
 
     [Tooltip("Should a hand be able to impart pushing forces to this object.")]
     [SerializeField]
