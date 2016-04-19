@@ -18,6 +18,7 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected Transform _graphicalAnchor;
 
+    [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
     [SerializeField]
     protected float _graphicalReturnTime = 0.25f;
 
@@ -225,15 +226,16 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandsHoldGraphics(List<Hand> hands) {
       base.OnHandsHoldGraphics(hands);
 
-      //Get new transform
-      Vector3 newPosition;
-      Quaternion newRotation;
-      getSolvedTransform(hands, out newPosition, out newRotation);
+      if (_graphicalAnchor != null) {
+        //Get new transform
+        Vector3 newPosition;
+        Quaternion newRotation;
+        getSolvedTransform(hands, out newPosition, out newRotation);
 
-      _graphicalAnchor.position = newPosition;
-      _graphicalAnchor.rotation = newRotation;
+        _graphicalAnchor.position = newPosition;
+        _graphicalAnchor.rotation = newRotation;
+      }
     }
-
 
     protected override void OnHandReleased(Hand hand) {
       base.OnHandReleased(hand);
@@ -282,7 +284,9 @@ namespace Leap.Unity.Interaction {
     protected override void OnGraspEnd() {
       base.OnGraspEnd();
 
-      _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
+      if (_graphicalAnchor != null) {
+        _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
+      }
 
       if (!_isKinematic) {
         _rigidbody.isKinematic = false;
@@ -291,6 +295,14 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region UNITY CALLBACKS
+    protected virtual void OnValidate() {
+      if (_graphicalAnchor != null) {
+        _graphicalAnchor.transform.localPosition = Vector3.zero;
+        _graphicalAnchor.transform.localRotation = Quaternion.identity;
+        _graphicalAnchor.transform.localScale = Vector3.one;
+      }
+    }
+
     protected virtual void Awake() {
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
     }
@@ -344,7 +356,9 @@ namespace Leap.Unity.Interaction {
       int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;
       bool shouldBeVisible = GraspingHandCount == 0 || trackedGraspingHandCount > 0;
 
-      _graphicalAnchor.gameObject.SetActive(shouldBeVisible);
+      if (_graphicalAnchor != null) {
+        _graphicalAnchor.gameObject.SetActive(shouldBeVisible);
+      }
     }
 
     protected void removeHandPointCollection(int handId) {
