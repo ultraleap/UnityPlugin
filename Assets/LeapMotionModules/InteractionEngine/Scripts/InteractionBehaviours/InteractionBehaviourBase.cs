@@ -423,6 +423,7 @@ namespace Leap.Unity.Interaction {
       }
 
       if (_manager == null) {
+        enabled = false;
         throw new NoManagerSpecifiedException();
       }
 
