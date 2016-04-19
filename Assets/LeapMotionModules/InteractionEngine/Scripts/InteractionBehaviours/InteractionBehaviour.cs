@@ -295,14 +295,6 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region UNITY CALLBACKS
-    protected virtual void OnValidate() {
-      if (_graphicalAnchor != null) {
-        _graphicalAnchor.transform.localPosition = Vector3.zero;
-        _graphicalAnchor.transform.localRotation = Quaternion.identity;
-        _graphicalAnchor.transform.localScale = Vector3.one;
-      }
-    }
-
     protected virtual void Awake() {
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
     }
