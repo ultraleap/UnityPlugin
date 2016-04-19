@@ -16,9 +16,25 @@ namespace Leap.Unity.PinchUtility {
 
     [SerializeField]
     private LeapPinchDetector _pinchDetectorA;
+    public LeapPinchDetector PinchDetectorA {
+      get {
+        return _pinchDetectorA;
+      }
+      set {
+        _pinchDetectorA = value;
+      }
+    }
 
     [SerializeField]
     private LeapPinchDetector _pinchDetectorB;
+    public LeapPinchDetector PinchDetectorB {
+      get {
+        return _pinchDetectorB;
+      }
+      set {
+        _pinchDetectorB = value;
+      }
+    }
 
     [SerializeField]
     private RotationMethod _oneHandedRotationMethod;
@@ -40,7 +56,7 @@ namespace Leap.Unity.PinchUtility {
 
     private float _defaultNearClip;
 
-    void Awake() {
+    void Start() {
       if (_pinchDetectorA == null || _pinchDetectorB == null) {
         Debug.LogWarning("Both Pinch Detectors of the LeapRTS component must be assigned. This component has been disabled.");
         enabled = false;

@@ -13,8 +13,7 @@ namespace Leap
     IDisposable
   {
     Frame Frame(int history = 0);
-    Frame GetTransformedFrame(Matrix trs, int history = 0);
-    TimeBracket GetNearestFrameTimes(Int64 time);
+    Frame GetTransformedFrame(LeapTransform trs, int history = 0);
     Frame GetInterpolatedFrame(Int64 time);
 
     void SetPolicy(Controller.PolicyFlag policy);
