@@ -70,6 +70,44 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public Transform GraphicalAnchor {
+      get {
+        return _graphicalAnchor;
+      }
+      set {
+        if (_graphicalLerpCoroutine != null) {
+          StopCoroutine(_graphicalLerpCoroutine);
+          _graphicalLerpCoroutine = null;
+        }
+
+        if (_graphicalAnchor != null) {
+          _graphicalAnchor.gameObject.SetActive(true);
+        }
+
+        _graphicalAnchor = value;
+
+        updateRendererStatus();
+      }
+    }
+
+    public float GraphicalReturnTime {
+      get {
+        return _graphicalReturnTime;
+      }
+      set {
+        _graphicalReturnTime = value;
+      }
+    }
+
+    public bool PushingEnabled {
+      get {
+        return _pushingEnabled;
+      }
+      set {
+        _pushingEnabled = value;
+      }
+    }
+
     public void AddLinearAcceleration(Vector3 acceleration) {
       _accumulatedLinearAcceleration += acceleration;
     }
@@ -161,8 +199,10 @@ namespace Leap.Unity.Interaction {
 
     public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
       updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
-      updateInfo.updateFlags = _notifiedOfTeleport ? UpdateInfoFlags.ResetVelocity : UpdateInfoFlags.None;
-      updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration | UpdateInfoFlags.ExplicitVelocity;
+      updateInfo.updateFlags = UpdateInfoFlags.ExplicitVelocity;
+      updateInfo.updateFlags |= _notifiedOfTeleport ? UpdateInfoFlags.ResetVelocity : UpdateInfoFlags.None;
+      updateInfo.updateFlags |= _pushingEnabled ? UpdateInfoFlags.ApplyAcceleration : UpdateInfoFlags.None;
+      
       updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
       updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
       updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
