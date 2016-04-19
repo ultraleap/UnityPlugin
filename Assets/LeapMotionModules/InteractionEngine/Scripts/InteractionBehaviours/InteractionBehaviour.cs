@@ -201,7 +201,7 @@ namespace Leap.Unity.Interaction {
       updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
       updateInfo.updateFlags = UpdateInfoFlags.ExplicitVelocity;
       updateInfo.updateFlags |= _notifiedOfTeleport ? UpdateInfoFlags.ResetVelocity : UpdateInfoFlags.None;
-      updateInfo.updateFlags |= _pushingEnabled ? UpdateInfoFlags.ApplyAcceleration : UpdateInfoFlags.None;
+      updateInfo.updateFlags |= _pushingEnabled && !_isKinematic ? UpdateInfoFlags.ApplyAcceleration : UpdateInfoFlags.None;
       
       updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
       updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
