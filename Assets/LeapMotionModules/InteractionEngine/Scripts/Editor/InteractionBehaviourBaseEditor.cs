@@ -33,10 +33,24 @@ namespace Leap.Unity.Interaction {
       }
 
       if (rigidbody == null) {
-        EditorGUILayout.HelpBox("This component requires a Rigidbody", MessageType.Error);
+        using (new GUILayout.HorizontalScope()) {
+          EditorGUILayout.HelpBox("This component requires a Rigidbody", MessageType.Error);
+          if (GUILayout.Button("Auto-Fix")) {
+            rigidbody = _interactionBehaviour.gameObject.AddComponent<Rigidbody>();
+            rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+            rigidbody.useGravity = true;
+            rigidbody.isKinematic = false;
+          }
+        }
       } else {
-        if (rigidbody.interpolation == RigidbodyInterpolation.None) {
-          EditorGUILayout.HelpBox("It is recommended to use interpolation on Rigidbodies to improve interaction fidelity.", MessageType.Warning);
+        if (rigidbody.interpolation != RigidbodyInterpolation.Interpolate) {
+          using (new GUILayout.HorizontalScope()) {
+            EditorGUILayout.HelpBox("It is recommended to use interpolation on Rigidbodies to improve interaction fidelity.", MessageType.Warning);
+            if (GUILayout.Button("Auto-Fix")) {
+              rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+              EditorUtility.SetDirty(rigidbody);
+            }
+          }
         }
 
         if (rigidbody.isKinematic) {
@@ -60,7 +74,7 @@ namespace Leap.Unity.Interaction {
 
       if (Application.isPlaying && _interactionBehaviour != null) {
         EditorGUILayout.Space();
-        
+
         if (!_interactionBehaviour.IsRegisteredWithManager) {
           EditorGUILayout.LabelField("Interaction Disabled", EditorStyles.boldLabel);
         } else {
