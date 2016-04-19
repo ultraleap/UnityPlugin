@@ -229,11 +229,11 @@ namespace UnityEngine.UI {
 
                 //Apply Max/Min Constraint
                 float testval = wholeRotationValue + (val * valuePerRotation);
-                if (testval > maxValue-0.01f)
+                if (testval > maxValue)
                 {
                     normalizedValue = ((maxValue - wholeRotationValue) / valuePerRotation);
                 }
-                else if (testval < minValue+0.01f)
+                else if (testval < minValue)
                 {
                     normalizedValue = ((minValue - wholeRotationValue) / valuePerRotation);
                 }

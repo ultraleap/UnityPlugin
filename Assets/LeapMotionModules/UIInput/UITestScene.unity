@@ -2066,7 +2066,7 @@ MonoBehaviour:
   ProjectiveToTactileTransitionDistance: 0.15
   PinchingThreshold: 0.8
   OverrideScrollViewClicks: 0
-  DrawDebug: 1
+  DrawDebug: 0
   PointerSprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   PointerMaterial: {fileID: 10754, guid: 0000000000000000e000000000000000, type: 0}
   NormalPointerScale: 0.00025
