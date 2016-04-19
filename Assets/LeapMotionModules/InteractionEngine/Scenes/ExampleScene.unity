@@ -1840,8 +1840,9 @@ MonoBehaviour:
   _dataSubfolder: InteractionEngine
   _untrackedTimeout: 0.5
   _enablePushing: 0
+  _enableSimulation: 1
   _showDebugLines: 0
-  _showDebugOutput: 1
+  _showDebugOutput: 0
 --- !u!4 &1473219678
 Transform:
   m_ObjectHideFlags: 0
