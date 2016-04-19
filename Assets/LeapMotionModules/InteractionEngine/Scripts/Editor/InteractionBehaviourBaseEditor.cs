@@ -3,6 +3,7 @@ using UnityEditor;
 
 namespace Leap.Unity.Interaction {
 
+  [CanEditMultipleObjects]
   [CustomEditor(typeof(InteractionBehaviourBase), true)]
   public class InteractionBehaviourBaseEditor : CustomEditorBase {
     protected InteractionBehaviour _interactionBehaviour;
@@ -10,12 +11,20 @@ namespace Leap.Unity.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
 
-      _interactionBehaviour = target as InteractionBehaviour;
+      if (targets.Length == 1) {
+        _interactionBehaviour = target as InteractionBehaviour;
+      } else {
+        _interactionBehaviour = null;
+      }
 
       specifyCustomDecorator("_manager", kinematicDecorator);
     }
 
     private void kinematicDecorator(SerializedProperty prop) {
+      if (_interactionBehaviour == null) {
+        return;
+      }
+
       Rigidbody rigidbody = _interactionBehaviour.GetComponent<Rigidbody>();
 
       if (_interactionBehaviour.GetComponentsInParent<InteractionBehaviourBase>().Length > 1 ||
@@ -46,22 +55,19 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    
-
     public override void OnInspectorGUI() {
       base.OnInspectorGUI();
 
-      if (Application.isPlaying) {
+      if (Application.isPlaying && _interactionBehaviour != null) {
         EditorGUILayout.Space();
-        InteractionBehaviourBase behaviour = target as InteractionBehaviourBase;
-
-        if (!behaviour.IsRegisteredWithManager) {
+        
+        if (!_interactionBehaviour.IsRegisteredWithManager) {
           EditorGUILayout.LabelField("Interaction Disabled", EditorStyles.boldLabel);
         } else {
           EditorGUILayout.LabelField("Interaction Info", EditorStyles.boldLabel);
           using (new EditorGUI.DisabledGroupScope(true)) {
-            EditorGUILayout.IntField("Grasping Hand Count", behaviour.GraspingHandCount);
-            EditorGUILayout.IntField("Untracked Hand Count", behaviour.UntrackedHandCount);
+            EditorGUILayout.IntField("Grasping Hand Count", _interactionBehaviour.GraspingHandCount);
+            EditorGUILayout.IntField("Untracked Hand Count", _interactionBehaviour.UntrackedHandCount);
           }
         }
       }

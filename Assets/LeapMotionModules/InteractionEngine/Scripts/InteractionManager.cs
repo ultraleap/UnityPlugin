@@ -400,8 +400,11 @@ namespace Leap.Unity.Interaction {
 
         for (int j = 0; j < hands.Count; j++) {
           var hand = hands[j];
-          if (_idToInteractionHand[hand.Id].graspedObject == interactionBehaviour) {
-            _holdingHands.Add(hand);
+          InteractionHand interactionHand;
+          if (_idToInteractionHand.TryGetValue(hand.Id, out interactionHand)) {
+            if (interactionHand.graspedObject == interactionBehaviour) {
+              _holdingHands.Add(hand);
+            }
           }
         }
 

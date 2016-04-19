@@ -3,6 +3,7 @@ using UnityEditor;
 
 namespace Leap.Unity.Interaction {
 
+  [CanEditMultipleObjects]
   [CustomEditor(typeof(InteractionBehaviour), true)]
   public class InteractionBehaviourEditor : InteractionBehaviourBaseEditor {
 
@@ -20,9 +21,18 @@ namespace Leap.Unity.Interaction {
     }
 
     private void pushingDrawer(SerializedProperty prop) {
-      Rigidbody rigidbody = _interactionBehaviour.GetComponent<Rigidbody>();
+      bool shouldShow = false;
 
-      if (!rigidbody.isKinematic) {
+      if (_interactionBehaviour == null) {
+        shouldShow = true;
+      } else {
+        Rigidbody rigidbody = _interactionBehaviour.GetComponent<Rigidbody>();
+        if (!rigidbody.isKinematic) {
+          shouldShow = true;
+        }
+      }
+
+      if (shouldShow) {
         EditorGUILayout.PropertyField(prop);
       }
     }

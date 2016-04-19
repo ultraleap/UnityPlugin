@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using LeapInternal;
 using Leap.Unity.Interaction.CApi;
@@ -16,6 +17,9 @@ namespace Leap.Unity.Interaction {
              "representation from the physical, interaction fidelity can be improved and latency reduced.")]
     [SerializeField]
     protected Transform _graphicalAnchor;
+
+    [SerializeField]
+    protected float _graphicalReturnTime = 0.15f;
 
     [Tooltip("Should a hand be able to impart pushing forces to this object.")]
     [SerializeField]
@@ -35,7 +39,9 @@ namespace Leap.Unity.Interaction {
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
     protected LEAP_IE_KABSCH _kabsch;
 
-    protected Bounds _debugBounds;
+    private Coroutine _graphicalLerpCoroutine = null;
+
+    private Bounds _debugBounds;
 
     #region PUBLIC METHODS
 
@@ -264,6 +270,10 @@ namespace Leap.Unity.Interaction {
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
 
+      if (_graphicalLerpCoroutine != null) {
+        StopCoroutine(_graphicalLerpCoroutine);
+      }
+
       if (!_isKinematic) {
         _rigidbody.isKinematic = true;
       }
@@ -271,6 +281,8 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnGraspEnd() {
       base.OnGraspEnd();
+
+      _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
 
       if (!_isKinematic) {
         _rigidbody.isKinematic = false;
@@ -281,6 +293,27 @@ namespace Leap.Unity.Interaction {
     #region UNITY CALLBACKS
     protected virtual void Awake() {
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
+    }
+
+    protected IEnumerator lerpGraphicalToOrigin() {
+      Vector3 startOffset = _graphicalAnchor.position - transform.position;
+      Quaternion startRot = _graphicalAnchor.localRotation;
+      float startTime = Time.time;
+      while (true) {
+        yield return null;
+
+        float t = Mathf.InverseLerp(startTime, startTime + _graphicalReturnTime, Time.time);
+        float percent = t * t * (3 - 2 * t);
+
+        _graphicalAnchor.position = transform.position + Vector3.Lerp(startOffset, Vector3.zero, percent);
+        _graphicalAnchor.localRotation = Quaternion.Slerp(startRot, Quaternion.identity, percent);
+
+        if (percent >= 1.0f) {
+          break;
+        }
+      }
+
+      _graphicalLerpCoroutine = null;
     }
 
     protected virtual void OnDrawGizmos() {
