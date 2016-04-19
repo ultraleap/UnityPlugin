@@ -14,7 +14,6 @@ namespace Leap
   {
     Frame Frame(int history = 0);
     Frame GetTransformedFrame(LeapTransform trs, int history = 0);
-    TimeBracket GetNearestFrameTimes(Int64 time);
     Frame GetInterpolatedFrame(Int64 time);
 
     void SetPolicy(Controller.PolicyFlag policy);

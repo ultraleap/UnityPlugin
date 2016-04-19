@@ -431,22 +431,6 @@ namespace Leap
     }
 
     /**
-    * Returns the timestamps of the frames captured closest to the specified
-    * time.
-    *
-    * The time should be expressed in microseconds based on the Leap Motion clock.
-    * You can get a system time 
-    * @param time A time expressed in microseconds.
-    */
-    public TimeBracket GetNearestFrameTimes(Int64 time){
-      TimeBracket nearestFrameTimes;
-      _connection.GetNearestFrameTimes(time, 
-                                       out nearestFrameTimes.before, 
-                                       out nearestFrameTimes.after);
-      return nearestFrameTimes;
-    }
-
-    /**
     * Returns the Frame at the specified time, interpolating the data between existing frames, if necessary.
     * 
     * 
