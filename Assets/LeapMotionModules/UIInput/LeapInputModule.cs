@@ -59,16 +59,20 @@ public class LeapInputModule : BaseInputModule
     public float NormalPointerScale = 0.00025f; //In world space
     private RectTransform[] Pointers;
     [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
+    [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color NormalColor = Color.white;
     [Tooltip("The color of the pointer when it is hovering over any other UI element.")]
+    [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color HoveringColor = Color.green;
     [Tooltip("The sound that is played when the pointer transitions from canvas to element.")]
     public AudioClip HoverSound;
     [Tooltip("The color of the pointer when it is triggering a UI element.")]
+    [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color TriggeringColor = Color.gray;
     [Tooltip("The sound that is played when the pointer triggers a UI element.")]
     public AudioClip TriggerSound;
     [Tooltip("The color of the pointer when it is triggering blank canvas.")]
+    [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color TriggerMissedColor = Color.gray;
     [Tooltip("The sound that is played when the pointer triggers blank canvas.")]
     public AudioClip MissedSound;
@@ -617,7 +621,7 @@ public class LeapInputModule : BaseInputModule
         }
         else
         {
-            return LeapDataProvider.CurrentFrame.Hands[whichHand].PinchDistance < 20f;
+            return LeapDataProvider.CurrentFrame.Hands[whichHand].PinchDistance < PinchingThreshold;
         }
     }
 
@@ -690,9 +694,7 @@ public class LeapInputModule : BaseInputModule
             return false;
 
         BaseEventData data = GetBaseEventData();
-
         ExecuteEvents.Execute(base.eventSystem.currentSelectedGameObject, data, ExecuteEvents.updateSelectedHandler);
-
         return data.used;
     }
 
