@@ -88,6 +88,9 @@ namespace Leap.Unity {
             group.modelList.RemoveAt(i);
             //--i;
             models.Add(model);
+            if (group.IsEnabled == false) {
+              model.IsEnabled = false;
+            }
             break;
           }
         }
@@ -106,8 +109,12 @@ namespace Leap.Unity {
         ModelGroup group = modelGroupMapping.ElementAt(i).Value;
         if (group.GroupName == groupName) {
           IHandModel model = modelGroupMapping.ElementAt(i).Key;
-          model.transform.gameObject.SetActive(isEnabled);
-          model.IsEnabled = false;
+          if (model.IsTracked) {
+            model.InitHand();
+            model.transform.gameObject.SetActive(isEnabled);
+          }
+          model.IsEnabled = isEnabled;
+          group.IsEnabled = isEnabled;
         }
       }
       //IHandModel model = modelGroupMapping.Where(z => z.Value.GroupName == groupName).FirstOrDefault().Key;
@@ -137,6 +144,7 @@ namespace Leap.Unity {
 #endif
     void Update() {
       if (Input.GetKeyUp(KeyCode.O)) {
+        Debug.Log("hello");
         EnableDisablePair("Poly_Hands", false);
       }
       if (Input.GetKeyUp(KeyCode.P)) {
