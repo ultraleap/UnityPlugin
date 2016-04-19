@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
+using System;
 using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction {
@@ -46,32 +47,47 @@ namespace Leap.Unity.Interaction {
 
     private void autoGenerateGraphicalAnchor(SerializedProperty prop) {
       //Create graphical anchor
-      GameObject graphicalAnchor = new GameObject("Graphical Anchor");
-      graphicalAnchor.transform.SetParent(_interactionBehaviour.transform);
-      graphicalAnchor.transform.localPosition = Vector3.zero;
-      graphicalAnchor.transform.localRotation = Quaternion.identity;
-      graphicalAnchor.transform.localScale = Vector3.one;
-      graphicalAnchor.transform.SetSiblingIndex(0);
-      Undo.RegisterCreatedObjectUndo(graphicalAnchor, "Created Graphical Anchor");
+      GameObject graphicalAnchor = null;
 
-      prop.objectReferenceValue = graphicalAnchor;
+      //Increment group to ensure that our operations are self contained within a single Undo group.
+      Undo.IncrementCurrentGroup();
 
-      Dictionary<Object, Object> oldToNew = new Dictionary<Object, Object>();
+      try {
+        graphicalAnchor = new GameObject("Graphical Anchor");
+        graphicalAnchor.transform.SetParent(_interactionBehaviour.transform);
+        graphicalAnchor.transform.localPosition = Vector3.zero;
+        graphicalAnchor.transform.localRotation = Quaternion.identity;
+        graphicalAnchor.transform.localScale = Vector3.one;
+        graphicalAnchor.transform.SetSiblingIndex(0);
+        Undo.RegisterCreatedObjectUndo(graphicalAnchor, "Created Graphical Anchor");
 
-      //Deep copy the object to a new object
-      deepCopyGraphicalComponents(_interactionBehaviour.gameObject, graphicalAnchor, graphicalAnchor, oldToNew);
+        prop.objectReferenceValue = graphicalAnchor;
 
-      //Point references from old components to the new ones
-      repairReferences(_interactionBehaviour.gameObject, oldToNew);
+        var oldToNew = new Dictionary<UnityEngine.Object, UnityEngine.Object>();
 
-      //Destroy all old components
-      destroyOldComponents(oldToNew);
+        //Deep copy the object to a new object
+        deepCopyGraphicalComponents(_interactionBehaviour.gameObject, graphicalAnchor, graphicalAnchor, oldToNew);
 
-      //Cleanup empty objects 
-      cleanupEmptyObjects(_interactionBehaviour.gameObject, graphicalAnchor);
+        //Point references from old components to the new ones
+        repairReferences(_interactionBehaviour.gameObject, oldToNew);
+
+        //Destroy all old components
+        destroyOldComponents(oldToNew);
+
+        //Cleanup empty objects 
+        cleanupEmptyObjects(_interactionBehaviour.gameObject, graphicalAnchor);
+      } catch (Exception e) {
+        //If any exceptions are encountered, Undo back to initial state
+        Undo.PerformUndo();
+        Debug.LogError("Could not perform automatic graphical anchor creation!");
+        Debug.LogException(e);
+      }
     }
 
-    private void deepCopyGraphicalComponents(GameObject obj, GameObject anchor, GameObject graphicalAnchor, Dictionary<Object, Object> oldToNew) {
+    private void deepCopyGraphicalComponents(GameObject obj,
+                                             GameObject anchor,
+                                             GameObject graphicalAnchor,
+                                             Dictionary<UnityEngine.Object, UnityEngine.Object> oldToNew) {
       if (obj == graphicalAnchor) {
         return;
       }
@@ -95,7 +111,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private void repairReferences(GameObject parentObject, Dictionary<Object, Object> oldToNew) {
+    private void repairReferences(GameObject parentObject, Dictionary<UnityEngine.Object, UnityEngine.Object> oldToNew) {
       Component[] components = parentObject.GetComponentsInChildren<Component>(true);
       for (int i = 0; i < components.Length; i++) {
 
@@ -105,8 +121,8 @@ namespace Leap.Unity.Interaction {
 
         while (iterator.Next(true)) {
           if (iterator.propertyType == SerializedPropertyType.ObjectReference) {
-            Object oldReference = iterator.objectReferenceValue;
-            Object newReference;
+            UnityEngine.Object oldReference = iterator.objectReferenceValue;
+            UnityEngine.Object newReference;
             if (oldReference != null && oldToNew.TryGetValue(oldReference, out newReference)) {
               iterator.objectReferenceValue = newReference;
               didChange = true;
@@ -120,7 +136,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private void destroyOldComponents(Dictionary<Object, Object> oldToNew) {
+    private void destroyOldComponents(Dictionary<UnityEngine.Object, UnityEngine.Object> oldToNew) {
       foreach (var toDestroy in oldToNew.Keys) {
         Undo.DestroyObjectImmediate(toDestroy);
       }
@@ -166,11 +182,15 @@ namespace Leap.Unity.Interaction {
     }
 
     private Component transferComponent(Component src, GameObject dst) {
-      ComponentUtility.CopyComponent(src);
-      Component newComponent = dst.AddComponent(src.GetType());
-      ComponentUtility.PasteComponentValues(newComponent);
+      if (!ComponentUtility.CopyComponent(src)) {
+        throw new Exception("Could not copy component " + src);
+      }
 
-      Undo.RegisterCreatedObjectUndo(newComponent, "Created Graphical Component");
+      Component newComponent = Undo.AddComponent(dst, src.GetType());
+
+      if (!ComponentUtility.PasteComponentValues(newComponent)) {
+        throw new Exception("Could not paste component values onto " + newComponent);
+      }
 
       return newComponent;
     }
