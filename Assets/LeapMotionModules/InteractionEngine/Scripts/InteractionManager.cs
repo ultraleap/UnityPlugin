@@ -310,9 +310,11 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void LateUpdate() {
-      dispatchOnHandsHolding(_leapProvider.CurrentFrame, isPhysics: false);
+      if (_enableSimulation) {
+        dispatchOnHandsHolding(_leapProvider.CurrentFrame, isPhysics: false);
 
-      unregisterMisbehavingBehaviours();
+        unregisterMisbehavingBehaviours();
+      }
     }
 
     protected virtual void OnGUI() {
