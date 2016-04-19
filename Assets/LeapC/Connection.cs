@@ -251,11 +251,6 @@ namespace LeapInternal
       this.LeapFrame.Dispatch<FrameEventArgs>(this, new FrameEventArgs(newFrame));
     }
 
-    public void GetNearestFrameTimes(Int64 time, out Int64 before, out Int64 after){
-      eLeapRS result = LeapC.GetNearestFrames(_leapConnection, time, out before, out after);
-      reportAbnormalResults ("LeapC get nearest frame timestamp call was ", result);
-    }
-
     public UInt64 GetInterpolatedFrameSize(Int64 time){
       UInt64 size = 0;
       eLeapRS result = LeapC.GetFrameSize(_leapConnection, time, out size);

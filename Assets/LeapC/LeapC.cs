@@ -573,9 +573,6 @@ namespace LeapInternal
     [DllImport("LeapC", EntryPoint = "LeapPollConnection")]
     public static extern eLeapRS PollConnection(IntPtr hConnection, UInt32 timeout, ref LEAP_CONNECTION_MESSAGE msg);
 
-    [DllImport("LeapC", EntryPoint = "LeapGetNearestFrames")]
-    public static extern eLeapRS GetNearestFrames(IntPtr hConnection, Int64 timestamp, out Int64 lb, out Int64 ub);
-
     [DllImport("LeapC", EntryPoint = "LeapGetFrameSize")]
     public static extern eLeapRS GetFrameSize(IntPtr hConnection, Int64 timestamp, out UInt64 pncbEvent);
 
