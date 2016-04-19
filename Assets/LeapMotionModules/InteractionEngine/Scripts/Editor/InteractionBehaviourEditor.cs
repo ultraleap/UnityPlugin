@@ -112,7 +112,12 @@ namespace Leap.Unity.Interaction {
       newObj.transform.parent = anchor.transform;
       newObj.transform.position = obj.transform.position;
       newObj.transform.rotation = obj.transform.rotation;
-      newObj.transform.localScale = obj.transform.localScale;
+
+      if (anchor == graphicalAnchor) {
+        newObj.transform.localScale = Vector3.one;
+      } else {
+        newObj.transform.localScale = obj.transform.localScale;
+      }
 
       Undo.RegisterCreatedObjectUndo(newObj, "Created Graphical Object");
 
