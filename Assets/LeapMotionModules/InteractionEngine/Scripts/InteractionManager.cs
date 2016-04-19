@@ -328,7 +328,7 @@ namespace Leap.Unity.Interaction {
         yield return fixedUpdate;
 
         try {
-          simulateFrame(_leapProvider.CurrentFrame);
+          simulateFrame();
 
           if (_showDebugLines) {
             InteractionC.DrawDebugLines(ref _scene);
@@ -344,7 +344,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void simulateFrame(Frame frame) {
+    protected virtual void simulateFrame() {
+      Frame frame = _leapProvider.CurrentFrame;
+
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         _registeredBehaviours[i].NotifyPreSolve();
       }
