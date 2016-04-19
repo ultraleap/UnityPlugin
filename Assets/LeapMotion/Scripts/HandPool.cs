@@ -16,19 +16,18 @@ namespace Leap.Unity {
    */
   public class HandPool :
     HandFactory {
-
+    public bool EnforceHandedness = false;
     [SerializeField]
     private List<ModelPair> ModelCollection;
     [SerializeField]
     private List<ModelGroup> ModelPool;
-    public bool EnforceHandedness = false;
     
     [System.Serializable]
     public class ModelPair {
       public string PairName = "PairName";
-      public bool IsEnabled = true;
       public IHandModel LeftModel;
       public IHandModel RightModel;
+      public bool IsEnabled = true;
 
       public ModelPair() {}
 
@@ -41,8 +40,8 @@ namespace Leap.Unity {
     [System.Serializable]
     public class ModelGroup {
       public string GroupName;
-      public bool IsEnabled;
       public List<IHandModel> modelList;
+      public bool IsEnabled;
       public ModelGroup(string groupName, bool isEnabled, List<IHandModel> modelList) {
         this.GroupName = groupName;
         this.IsEnabled = isEnabled;
@@ -86,7 +85,6 @@ namespace Leap.Unity {
           isCorrectModelType = model.HandModelType == modelType;
           if (isCorrectModelType && isCorrectHandedness) {
             group.modelList.RemoveAt(i);
-            //--i;
             models.Add(model);
             if (group.IsEnabled == false) {
               model.IsEnabled = false;
@@ -117,9 +115,6 @@ namespace Leap.Unity {
           group.IsEnabled = isEnabled;
         }
       }
-      //IHandModel model = modelGroupMapping.Where(z => z.Value.GroupName == groupName).FirstOrDefault().Key;
-      //Debug.Log("model = " + model);
-      //model.transform.gameObject.SetActive(isEnabled);
     }
 
 #if UNITY_EDITOR
@@ -142,14 +137,5 @@ namespace Leap.Unity {
       }
     }
 #endif
-    void Update() {
-      if (Input.GetKeyUp(KeyCode.O)) {
-        Debug.Log("hello");
-        EnableDisablePair("Poly_Hands", false);
-      }
-      if (Input.GetKeyUp(KeyCode.P)) {
-        EnableDisablePair("Poly_Hands", true);
-      }
-    }
   }
 }
