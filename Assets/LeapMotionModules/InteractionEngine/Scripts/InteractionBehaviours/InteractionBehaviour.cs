@@ -199,10 +199,16 @@ namespace Leap.Unity.Interaction {
 
     public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
       updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
+
       updateInfo.updateFlags = UpdateInfoFlags.ExplicitVelocity;
-      updateInfo.updateFlags |= _notifiedOfTeleport ? UpdateInfoFlags.ResetVelocity : UpdateInfoFlags.None;
-      updateInfo.updateFlags |= _pushingEnabled && !_isKinematic ? UpdateInfoFlags.ApplyAcceleration : UpdateInfoFlags.None;
-      
+      if (_notifiedOfTeleport) {
+        updateInfo.updateFlags |= UpdateInfoFlags.ResetVelocity;
+      }
+
+      if (_pushingEnabled && !_isKinematic && !IsBeingGrasped) {
+        updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration;
+      }
+
       updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
       updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
       updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
