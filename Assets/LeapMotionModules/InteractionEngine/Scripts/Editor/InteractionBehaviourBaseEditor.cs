@@ -17,7 +17,9 @@ namespace Leap.Unity.Interaction {
         _interactionBehaviour = null;
       }
 
-      specifyCustomDecorator("_manager", kinematicDecorator);
+      if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab) {
+        specifyCustomDecorator("_manager", kinematicDecorator);
+      }
     }
 
     private void kinematicDecorator(SerializedProperty prop) {

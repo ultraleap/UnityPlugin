@@ -13,8 +13,10 @@ namespace Leap.Unity.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
 
-      specifyCustomDecorator("_graphicalAnchor", graphicalAnchor);
-      specifyCustomDrawer("_pushingEnabled", pushingDrawer);
+      if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab) {
+        specifyCustomDecorator("_graphicalAnchor", graphicalAnchor);
+        specifyCustomDrawer("_pushingEnabled", pushingDrawer);
+      }
     }
 
     private void graphicalAnchor(SerializedProperty prop) {
