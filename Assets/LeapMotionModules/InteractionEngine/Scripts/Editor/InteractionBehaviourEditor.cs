@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using UnityEditorInternal;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction {
 
@@ -16,7 +18,12 @@ namespace Leap.Unity.Interaction {
 
     private void graphicalAnchor(SerializedProperty prop) {
       if (prop.objectReferenceValue == null) {
-        EditorGUILayout.HelpBox("It is recommended to use the graphical anchor to improve interaction fidelity.", MessageType.Warning);
+        using (new GUILayout.HorizontalScope()) {
+          EditorGUILayout.HelpBox("It is recommended to use the graphical anchor to improve interaction fidelity.", MessageType.Warning);
+          if (GUILayout.Button("Auto-Fix")) {
+            autoGenerateGraphicalAnchor(prop);
+          }
+        }
       }
     }
 
@@ -35,6 +42,137 @@ namespace Leap.Unity.Interaction {
       if (shouldShow) {
         EditorGUILayout.PropertyField(prop);
       }
+    }
+
+    private void autoGenerateGraphicalAnchor(SerializedProperty prop) {
+      //Create graphical anchor
+      GameObject graphicalAnchor = new GameObject("Graphical Anchor");
+      graphicalAnchor.transform.SetParent(_interactionBehaviour.transform);
+      graphicalAnchor.transform.localPosition = Vector3.zero;
+      graphicalAnchor.transform.localRotation = Quaternion.identity;
+      graphicalAnchor.transform.localScale = Vector3.one;
+      graphicalAnchor.transform.SetSiblingIndex(0);
+      Undo.RegisterCreatedObjectUndo(graphicalAnchor, "Created Graphical Anchor");
+
+      prop.objectReferenceValue = graphicalAnchor;
+
+      Dictionary<Object, Object> oldToNew = new Dictionary<Object, Object>();
+
+      //Deep copy the object to a new object
+      deepCopyGraphicalComponents(_interactionBehaviour.gameObject, graphicalAnchor, graphicalAnchor, oldToNew);
+
+      //Point references from old components to the new ones
+      repairReferences(_interactionBehaviour.gameObject, oldToNew);
+
+      //Destroy all old components
+      destroyOldComponents(oldToNew);
+
+      //Cleanup empty objects 
+      cleanupEmptyObjects(_interactionBehaviour.gameObject, graphicalAnchor);
+    }
+
+    private void deepCopyGraphicalComponents(GameObject obj, GameObject anchor, GameObject graphicalAnchor, Dictionary<Object, Object> oldToNew) {
+      if (obj == graphicalAnchor) {
+        return;
+      }
+
+      GameObject newObj = new GameObject(obj.name);
+      newObj.transform.parent = anchor.transform;
+      newObj.transform.position = obj.transform.position;
+      newObj.transform.rotation = obj.transform.rotation;
+      newObj.transform.localScale = obj.transform.localScale;
+
+      Undo.RegisterCreatedObjectUndo(newObj, "Created Graphical Object");
+
+      var toCopy = getComponentsToCopy(obj);
+      foreach (var oldComponent in toCopy) {
+        Component newComponent = transferComponent(oldComponent, newObj);
+        oldToNew[oldComponent] = newComponent;
+      }
+
+      foreach (Transform child in obj.transform) {
+        deepCopyGraphicalComponents(child.gameObject, newObj, graphicalAnchor, oldToNew);
+      }
+    }
+
+    private void repairReferences(GameObject parentObject, Dictionary<Object, Object> oldToNew) {
+      Component[] components = parentObject.GetComponentsInChildren<Component>(true);
+      for (int i = 0; i < components.Length; i++) {
+
+        SerializedObject oldSerializedObject = new SerializedObject(components[i]);
+        SerializedProperty iterator = oldSerializedObject.GetIterator();
+        bool didChange = false;
+
+        while (iterator.Next(true)) {
+          if (iterator.propertyType == SerializedPropertyType.ObjectReference) {
+            Object oldReference = iterator.objectReferenceValue;
+            Object newReference;
+            if (oldReference != null && oldToNew.TryGetValue(oldReference, out newReference)) {
+              iterator.objectReferenceValue = newReference;
+              didChange = true;
+            }
+          }
+        }
+
+        if (didChange) {
+          oldSerializedObject.ApplyModifiedProperties();
+        }
+      }
+    }
+
+    private void destroyOldComponents(Dictionary<Object, Object> oldToNew) {
+      foreach (var toDestroy in oldToNew.Keys) {
+        Undo.DestroyObjectImmediate(toDestroy);
+      }
+    }
+
+    private bool cleanupEmptyObjects(GameObject anchor, GameObject graphicalAnchor) {
+      List<Transform> childList = new List<Transform>();
+      foreach (Transform child in anchor.transform) {
+        childList.Add(child);
+      }
+
+      bool canDestroy = true;
+
+      for (int i = 0; i < childList.Count; i++) {
+        canDestroy &= cleanupEmptyObjects(childList[i].gameObject, graphicalAnchor);
+      }
+
+      //Can only destroy if there are no components except transform//
+      canDestroy &= anchor.GetComponents<Component>().Length == 1;
+
+      canDestroy &= anchor != graphicalAnchor;
+
+      if (canDestroy) {
+        Undo.DestroyObjectImmediate(anchor);
+      }
+
+      return canDestroy;
+    }
+
+    private IEnumerable<Component> getComponentsToCopy(GameObject gameObject) {
+      Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>(true);
+      for (int i = 0; i < renderers.Length; i++) {
+        Component component = renderers[i];
+        if (component.gameObject == gameObject) {
+          yield return component;
+        }
+      }
+
+      MeshFilter[] meshFilters = gameObject.GetComponents<MeshFilter>();
+      for (int i = 0; i < meshFilters.Length; i++) {
+        yield return meshFilters[i];
+      }
+    }
+
+    private Component transferComponent(Component src, GameObject dst) {
+      ComponentUtility.CopyComponent(src);
+      Component newComponent = dst.AddComponent(src.GetType());
+      ComponentUtility.PasteComponentValues(newComponent);
+
+      Undo.RegisterCreatedObjectUndo(newComponent, "Created Graphical Component");
+
+      return newComponent;
     }
   }
 }
