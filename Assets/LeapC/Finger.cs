@@ -107,7 +107,7 @@ namespace Leap
     {
       return new Finger(_frameId,
                         HandId,
-                        Id,
+                        Id % 10, //remove hand portion of finger Id
                         TimeVisible,
                         trs.TransformPoint(TipPosition),
                         trs.TransformVelocity(TipVelocity),
