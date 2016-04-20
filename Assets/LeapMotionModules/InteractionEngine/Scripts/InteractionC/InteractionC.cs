@@ -39,14 +39,13 @@ namespace Leap.Unity.Interaction.CApi {
   public enum ShapeInfoFlags : uint {
     None = 0x00,
     HasRigidBody = 0x01,
-    GravityEnabled = 0x02
   };
 
   public enum UpdateInfoFlags : uint {
     None = 0x00,
-    ResetVelocity = 0x01, // E.g. teleported.
     ApplyAcceleration = 0x02,
-    ExplicitVelocity = 0x04
+    VelocityEnabled = 0x04,
+    GravityEnabled = 0x08
   };
 
   public enum HandResultFlags : uint {
@@ -262,7 +261,7 @@ namespace Leap.Unity.Interaction.CApi {
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastErrorString")]
     private static extern IntPtr GetLastErrorString();
 
-    public static ReturnStatus GetLastError(ref INTERACTION_SCENE scene, 
+    public static ReturnStatus GetLastError(ref INTERACTION_SCENE scene,
                                             out string message) {
       ReturnStatus rs = GetLastError(ref scene);
       message = Marshal.PtrToStringAnsi(GetLastErrorString());

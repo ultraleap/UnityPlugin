@@ -104,7 +104,7 @@ namespace Leap.Unity.Interaction {
     }
 
     public override void OnPostSolve() {
-      base.OnPreSolve();
+      base.OnPostSolve();
 
       if (!_recievedVelocityUpdate) {
         _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
@@ -130,10 +130,6 @@ namespace Leap.Unity.Interaction {
         createInfo.shapeFlags |= ShapeInfoFlags.HasRigidBody;
       }
 
-      if (_useGravity) {
-        createInfo.shapeFlags |= ShapeInfoFlags.GravityEnabled;
-      }
-
       createTransform = getRigidbodyTransform();
     }
 
@@ -154,12 +150,18 @@ namespace Leap.Unity.Interaction {
 
     public override void OnInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
       updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
-      updateInfo.updateFlags = _notifiedOfTeleport ? UpdateInfoFlags.ResetVelocity : UpdateInfoFlags.None;
-      updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration | UpdateInfoFlags.ExplicitVelocity;
+
+      // Always use these flags for now.
+      updateInfo.updateFlags = UpdateInfoFlags.ApplyAcceleration | UpdateInfoFlags.VelocityEnabled;
       updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
       updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
       updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
       updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
+
+      if (_useGravity)
+      {
+        updateInfo.updateFlags |= UpdateInfoFlags.GravityEnabled;
+      }
 
       interactionTransform = getRigidbodyTransform();
     }
