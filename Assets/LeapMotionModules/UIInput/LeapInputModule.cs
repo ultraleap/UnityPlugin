@@ -127,6 +127,18 @@ public class LeapInputModule : BaseInputModule
     {
         base.Start();
 
+        if (LeapDataProvider == null)
+        {
+            LeapDataProvider = FindObjectOfType<LeapProvider>();
+            if (LeapDataProvider == null || !LeapDataProvider.isActiveAndEnabled)
+            {
+                Debug.LogError("Cannot use LeapImageRetriever if there is no LeapProvider!");
+                enabled = false;
+                return;
+            }
+        }
+
+
         //Camera from which rays into the UI will be cast.
         EventCamera = new GameObject("UI Selection Camera").AddComponent<Camera>();
         EventCamera.clearFlags = CameraClearFlags.Nothing;
@@ -297,11 +309,12 @@ public class LeapInputModule : BaseInputModule
                         }
                         else
                         {
+                            CurrentPressed[whichHand] = newPressed;
                             //We want to do "click on button down" at same time, unlike regular mouse processing
                             //Which does click when mouse goes up over same object it went down on
                             //This improves the user's ability to select small menu items
                             ExecuteEvents.Execute(newPressed, PointEvents[whichHand], ExecuteEvents.pointerClickHandler);
-                            CurrentPressed[whichHand] = newPressed;
+
                         }
 
                         if (newPressed != null)
@@ -407,6 +420,15 @@ public class LeapInputModule : BaseInputModule
         //Perform the Raycast and sort all the things we hit by distance...
         base.eventSystem.RaycastAll(PointEvents[whichHand], m_RaycastResultCache);
         m_RaycastResultCache = m_RaycastResultCache.OrderBy(o => o.distance).ToList();
+
+        //If the Canvas and an Element are Z-Fighting, remove the Canvas from the runnings
+        if (m_RaycastResultCache.Count > 1)
+        {
+            if (m_RaycastResultCache[0].gameObject.GetComponent<Canvas>())
+            {
+                m_RaycastResultCache.RemoveAt(0);
+            }
+        }
 
         //Optional hack that subverts ScrollRect hierarchies; to avoid this, disable "RaycastTarget" on the Viewport and Content panes
         if (OverrideScrollViewClicks)
