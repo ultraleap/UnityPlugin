@@ -12,11 +12,11 @@ namespace LeapInternal {
       public T value;
     }
 
+    [ThreadStatic]
     private static StructContainer _container;
     private static int _sizeofT;
 
     static StructMarshal() {
-      _container = new StructContainer();
       _sizeofT = Marshal.SizeOf(typeof(T));
     }
 
@@ -35,8 +35,8 @@ namespace LeapInternal {
      * unsafe operation that assumes there is enough space allocated at the pointer
      * to accommodate the struct.
      */
-    public static void CopyIntoDestination(IntPtr dstPtr, T t) {
-      CopyIntoArray(dstPtr, t, 0);
+    public static void CopyIntoDestination(IntPtr dstPtr, ref T t) {
+      CopyIntoArray(dstPtr, ref t, 0);
     }
 
     /**
@@ -44,7 +44,11 @@ namespace LeapInternal {
      * offset index specified by indexx.  This is an unsafe operation that assumes
      * there is enough space allocated in the array to accommodate the struct.
      */
-    public static void CopyIntoArray(IntPtr arrayPtr, T t, int index) {
+    public static void CopyIntoArray(IntPtr arrayPtr, ref T t, int index) {
+      if (_container == null) {
+        _container = new StructContainer();
+      }
+
       _container.value = t;
       Marshal.StructureToPtr(_container, new IntPtr(arrayPtr.ToInt64() + _sizeofT * index), false);
     }
@@ -52,13 +56,17 @@ namespace LeapInternal {
     /**
      * Converts an IntPtr to a struct of type T.
      */
-    public static T PtrToStruct(IntPtr ptr) {
+    public static void PtrToStruct(IntPtr ptr, out T t) {
+      if (_container == null) {
+        _container = new StructContainer();
+      }
+
       try {
         Marshal.PtrToStructure(ptr, _container);
-        return _container.value;
+        t = _container.value;
       } catch (Exception e) {
         Logger.Log("Problem converting structure " + typeof(T) + " from ptr " + ptr + " : " + e.Message);
-        return new T();
+        t = default(T);
       }
     }
 
@@ -67,8 +75,8 @@ namespace LeapInternal {
      * of type T.  This method does not and cannot do any bounds checking!
      * This method does not create any garbage.
      */
-    public static T ArrayElementToStruct(IntPtr ptr, int arrayIndex) {
-      return PtrToStruct(new IntPtr(ptr.ToInt64() + _sizeofT * arrayIndex));
+    public static void ArrayElementToStruct(IntPtr ptr, int arrayIndex, out T t) {
+      PtrToStruct(new IntPtr(ptr.ToInt64() + _sizeofT * arrayIndex), out t);
     }
   }
 }
