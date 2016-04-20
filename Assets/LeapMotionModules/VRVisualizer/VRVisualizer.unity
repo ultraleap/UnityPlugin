@@ -958,13 +958,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelCollection:
-  - LeftModel: {fileID: 931920751}
-    RightModel: {fileID: 1542358432}
-  - LeftModel: {fileID: 824246799}
-    RightModel: {fileID: 162318176}
-  ModelPool: []
   EnforceHandedness: 0
+  ModelCollection:
+  - PairName: Graphics_Hands
+    LeftModel: {fileID: 931920751}
+    RightModel: {fileID: 1542358432}
+    IsEnabled: 1
+  - PairName: Physics_Hands
+    LeftModel: {fileID: 824246799}
+    RightModel: {fileID: 162318176}
+    IsEnabled: 1
+  ModelPool: []
 --- !u!114 &228550821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4595,7 +4599,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 025cc0fa7b46aa541aba29d28d35ac09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isHeadMounted: 0
+  _isHeadMounted: 1
   _overrideDeviceType: 1
   _overrideDeviceTypeWith: 1
   _useInterpolation: 0
@@ -4612,13 +4616,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelCollection:
-  - LeftModel: {fileID: 1545945338}
-    RightModel: {fileID: 1061438465}
-  - LeftModel: {fileID: 1414805578}
-    RightModel: {fileID: 1167543056}
-  ModelPool: []
   EnforceHandedness: 0
+  ModelCollection:
+  - PairName: Graphics_Hands
+    LeftModel: {fileID: 1545945338}
+    RightModel: {fileID: 1061438465}
+    IsEnabled: 1
+  - PairName: Physics_Hands
+    LeftModel: {fileID: 1414805578}
+    RightModel: {fileID: 1167543056}
+    IsEnabled: 1
+  ModelPool: []
 --- !u!114 &1476913615
 MonoBehaviour:
   m_ObjectHideFlags: 0
