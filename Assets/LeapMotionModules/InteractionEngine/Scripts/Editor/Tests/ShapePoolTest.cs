@@ -6,22 +6,15 @@ using Leap.Unity.Interaction.CApi;
 namespace Leap.Unity.Interaction.Tests {
 
   [TestFixture(Category = "ShapeDescriptionPool")]
-  public abstract class ShapePoolTestBase {
+  public abstract class ShapePoolTestBase : InteractionCTestBase {
     private const string DATA_FOLDER = "InteractionEngine";
-
-    protected INTERACTION_SCENE _scene;
+    
     protected ShapeDescriptionPool _pool;
     protected Mesh _mesh;
 
     [SetUp]
-    public virtual void Setup() {
-      INTERACTION_SCENE_INFO sceneInfo = new INTERACTION_SCENE_INFO();
-      sceneInfo.gravity = Vector3.zero.ToCVector();
-      sceneInfo.sceneFlags = SceneInfoFlags.None;
-
-      string path = Path.Combine(Application.streamingAssetsPath, DATA_FOLDER);
-
-      InteractionC.CreateScene(ref _scene, ref sceneInfo, path);
+    public override void Setup() {
+      base.Setup();
 
       _pool = new ShapeDescriptionPool(_scene);
 
@@ -31,13 +24,13 @@ namespace Leap.Unity.Interaction.Tests {
     }
 
     [TearDown]
-    public virtual void Teardown() {
+    public override void Teardown() {
       _pool.RemoveAllShapes();
       _pool = null;
 
       Object.DestroyImmediate(_mesh);
 
-      InteractionC.DestroyScene(ref _scene);
+      base.Teardown();
     }
   }
   
