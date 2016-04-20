@@ -251,11 +251,6 @@ namespace LeapInternal
       this.LeapFrame.Dispatch<FrameEventArgs>(this, new FrameEventArgs(newFrame));
     }
 
-    public void GetNearestFrameTimes(Int64 time, out Int64 before, out Int64 after){
-      eLeapRS result = LeapC.GetNearestFrames(_leapConnection, time, out before, out after);
-      reportAbnormalResults ("LeapC get nearest frame timestamp call was ", result);
-    }
-
     public UInt64 GetInterpolatedFrameSize(Int64 time){
       UInt64 size = 0;
       eLeapRS result = LeapC.GetFrameSize(_leapConnection, time, out size);
@@ -428,7 +423,6 @@ namespace LeapInternal
     private void handleConnectionLost(ref LEAP_CONNECTION_LOST_EVENT connectionMsg)
     {
       this.LeapConnectionLost.Dispatch<ConnectionLostEventArgs>(this, new ConnectionLostEventArgs());
-      _isRunning = false;
     }
 
     private void handleDevice(ref LEAP_DEVICE_EVENT deviceMsg)
@@ -548,7 +542,7 @@ namespace LeapInternal
             dataType = Config.ValueType.TYPE_INT32;
             value = config_response_evt.value.intValue;
             break;
-          case eLeapValueType.eleapValueType_Float:
+          case eLeapValueType.eLeapValueType_Float:
             dataType = Config.ValueType.TYPE_FLOAT;
             value = config_response_evt.value.floatValue;
             break;

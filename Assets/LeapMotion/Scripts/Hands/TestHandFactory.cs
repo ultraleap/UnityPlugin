@@ -3,10 +3,11 @@ namespace Leap {
 using System;
 using System.Runtime.InteropServices;
   using System.Collections.Generic;
+  using Leap.Unity;
 
 
     public class TestHandFactory {
-    
+
         public static Frame MakeTestFrame(int frameId, bool leftHandIncluded, bool rightHandIncluded){
             Frame testFrame = new Frame(frameId, 0, 120.0f, new InteractionBox(), new List<Hand>());
             if(leftHandIncluded)
@@ -26,13 +27,9 @@ using System.Runtime.InteropServices;
 
             Vector armWrist = new Vector(-7.05809944059f, 4.0f, 50.0f);
             Vector elbow = armWrist + 250f * Vector.Backward;
-            Matrix armBasis;
-            if(isLeft)
-                  armBasis = new Matrix(Vector.Right, Vector.Up, Vector.Forward, elbow);
-            else
-                  armBasis = new Matrix(Vector.Left, Vector.Up, Vector.Forward, elbow);
 
-            Arm arm = new Arm(elbow, armWrist,(elbow + armWrist)/2, Vector.Forward, 250f, 41f, armBasis);
+            // Adrian: The previous "armBasis" used "elbow" as a translation component.
+            Arm arm = new Arm(elbow, armWrist,(elbow + armWrist)/2, Vector.Forward, 250f, 41f, LeapQuaternion.Identity);
             Hand testHand = new Hand(frameId,
             handId,
             1.0f,
@@ -52,19 +49,19 @@ using System.Runtime.InteropServices;
                 Vector.Forward,
                 new Vector(-4.36385750984f, 6.5f, 31.0111342526f)
             );
+            LeapTransform restPosition = LeapTransform.Identity;
             if(isLeft){
-                return testHand;
+                restPosition.translation = new Vector(-80f, 120f, 0f);
             } else {
-                Matrix leftToRight = Matrix.Identity;
-                leftToRight.xBasis = new Vector(-1, 0, 0); 
-                Hand rightHand = testHand.TransformedCopy(leftToRight);
-              return rightHand;
+                restPosition.translation = new Vector(80f, 120f, 0f);
+                restPosition.MirrorX();
             }
+            return testHand.TransformedCopy(restPosition);
         }
          static Finger MakeThumb(int frameId, int handId, bool isLeft){
             //Thumb
             Vector position = new Vector(19.3382610281f, -6.0f, 53.168484654f);
-            Vector forward = new Vector(0.436329113772f, 0.0f, -0.899787143982f);
+            Vector forward = new Vector(0.636329113772f, -0.5f, -0.899787143982f);
             Vector up = new Vector(0.804793943718f, 0.447213915513f, 0.390264553767f);
             float[] jointLengths = {0.0f, 46.22f, 31.57f, 21.67f};
             return MakeFinger (Finger.FingerType.TYPE_THUMB, position, forward, up, jointLengths, frameId, handId, handId + 0, isLeft);
@@ -107,7 +104,7 @@ using System.Runtime.InteropServices;
         }
 
 
-         static Finger MakeFinger(Finger.FingerType name, Vector position, Vector forward, Vector up, float[] jointLengths, 
+         static Finger MakeFinger(Finger.FingerType name, Vector position, Vector forward, Vector up, float[] jointLengths,
             int frameId, int handId, int fingerId, bool isLeft){
             Bone[] bones = new Bone[5];
             float proximalDistance = -jointLengths[0];
@@ -145,14 +142,10 @@ using System.Runtime.InteropServices;
         }
 
          static Bone MakeBone(Bone.BoneType name, Vector proximalPosition, float length, float width, Vector direction, Vector up, bool isLeft){
-            Matrix basis = new Matrix();
-            basis.zBasis = -direction;
-            basis.yBasis = up;
-            basis.xBasis = direction.Cross(up).Normalized;
-            if(!isLeft)
-              basis.xBasis = -basis.xBasis;
-            basis.origin = proximalPosition;
-            return new Bone(
+
+           LeapQuaternion rotation = UnityEngine.Quaternion.LookRotation(-direction.ToVector3(), up.ToVector3()).ToLeapQuaternion();
+
+           return new Bone(
                 proximalPosition,
                 proximalPosition + direction * length,
                 Vector.Lerp(proximalPosition, proximalPosition + direction * length, .5f),
@@ -160,7 +153,7 @@ using System.Runtime.InteropServices;
                 length,
                 width,
                 name,
-                basis);
+                rotation);
         }
     }
 }

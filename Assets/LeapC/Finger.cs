@@ -99,24 +99,22 @@ namespace Leap
     /**
      * Creates a copy of this finger, transformed by the specified transform.
      *
-     * @param trs A Matrix containing the desired translation, rotation, and scale
+     * @param trs A LeapTransform containing the desired translation, rotation, and scale
      * of the copied finger.
      * @since 3.0
      */
-    public Finger TransformedCopy(Matrix trs)
+    public Finger TransformedCopy(LeapTransform trs)
     {
-      float dScale = trs.zBasis.Magnitude;
-      float hScale = trs.xBasis.Magnitude;
       return new Finger(_frameId,
                         HandId,
-                        Id,
+                        Id % 10, //remove hand portion of finger Id
                         TimeVisible,
                         trs.TransformPoint(TipPosition),
-                        trs.TransformPoint(TipVelocity),
-                        trs.TransformDirection(Direction).Normalized,
+                        trs.TransformVelocity(TipVelocity),
+                        trs.TransformDirection(Direction),
                         trs.TransformPoint(StabilizedTipPosition),
-                        Width * hScale,
-                        Length * dScale,
+                        Width * trs.scale.x,
+                        Length * trs.scale.z,
                         IsExtended,
                         Type,
                         _bones[0].TransformedCopy(trs),

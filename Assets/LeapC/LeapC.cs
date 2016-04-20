@@ -112,7 +112,7 @@ namespace LeapInternal
     eLeapValueType_Unknown,
     eLeapValueType_Boolean,
     eLeapValueType_Int32,
-    eleapValueType_Float,
+    eLeapValueType_Float,
     eLeapValueType_String
   };
 
@@ -366,6 +366,7 @@ namespace LeapInternal
     {
       return new Leap.Vector(x, y, z);
     }
+
     public LEAP_VECTOR(Leap.Vector leap)
     {
       x = leap.x;
@@ -375,24 +376,19 @@ namespace LeapInternal
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
-  public struct LEAP_MATRIX
+  public struct LEAP_QUATERNION
   {
-    public LEAP_VECTOR x_basis;
-    public LEAP_VECTOR y_basis;
-    public LEAP_VECTOR z_basis;
+    public float x;
+    public float y;
+    public float z;
+    public float w;
 
-    public Leap.Matrix ToLeapMatrix()
+    public LEAP_QUATERNION(Leap.LeapQuaternion q)
     {
-      return new Leap.Matrix(x_basis.ToLeapVector(),
-                             y_basis.ToLeapVector(),
-                             z_basis.ToLeapVector());
-    }
-
-    public LEAP_MATRIX(Leap.Matrix leap)
-    {
-      x_basis = new LEAP_VECTOR(leap.xBasis);
-      y_basis = new LEAP_VECTOR(leap.yBasis);
-      z_basis = new LEAP_VECTOR(leap.zBasis);
+      x = q.x;
+      y = q.y;
+      z = q.z;
+      w = q.w;
     }
   }
 
@@ -402,7 +398,7 @@ namespace LeapInternal
     public LEAP_VECTOR prev_joint;
     public LEAP_VECTOR next_joint;
     public float width;
-    public LEAP_MATRIX basis;
+    public LEAP_QUATERNION rotation;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -528,9 +524,6 @@ namespace LeapInternal
     [DllImport("LeapC", EntryPoint = "LeapDestroyClockRebaser")]
     public static extern eLeapRS DestroyClockRebaser(IntPtr hClockRebaser);
 
-    [DllImport("LeapC", EntryPoint = "LeapUpdateLatency")]
-    public static extern eLeapRS UpdateLatency(IntPtr hClockRebaser, Int64 userClock, Int64 leapClock);
-
     [DllImport("LeapC", EntryPoint = "LeapUpdateRebase")]
     public static extern eLeapRS UpdateRebase(IntPtr hClockRebaser, Int64 userClock, Int64 leapClock);
 
@@ -580,9 +573,6 @@ namespace LeapInternal
     [DllImport("LeapC", EntryPoint = "LeapPollConnection")]
     public static extern eLeapRS PollConnection(IntPtr hConnection, UInt32 timeout, ref LEAP_CONNECTION_MESSAGE msg);
 
-    [DllImport("LeapC", EntryPoint = "LeapGetNearestFrames")]
-    public static extern eLeapRS GetNearestFrames(IntPtr hConnection, Int64 timestamp, out Int64 lb, out Int64 ub);
-
     [DllImport("LeapC", EntryPoint = "LeapGetFrameSize")]
     public static extern eLeapRS GetFrameSize(IntPtr hConnection, Int64 timestamp, out UInt64 pncbEvent);
 
@@ -625,7 +615,7 @@ namespace LeapInternal
     public static eLeapRS SaveConfigValue(IntPtr hConnection, string key, float value, out UInt32 requestId)
     {
       LEAP_VARIANT_VALUE_TYPE valueStruct = new LEAP_VARIANT_VALUE_TYPE();
-      valueStruct.type = eLeapValueType.eleapValueType_Float;
+      valueStruct.type = eLeapValueType.eLeapValueType_Float;
       valueStruct.floatValue = value;
       return LeapC.SaveConfigWithValueType(hConnection, key, valueStruct, out requestId);
     }

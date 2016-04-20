@@ -168,14 +168,14 @@ namespace Leap.Unity {
       }
 
       if (serviceFrame != null) {
-        Matrix leapMat = transform.GetLeapMatrix();
+        LeapTransform leapMat = transform.GetLeapMatrix();
         _currentFrame = serviceFrame.TransformedCopy(leapMat);
       }
     }
 
     protected virtual void FixedUpdate() {
       //TODO: Find suitable interpolation strategy for FixedUpdate
-      Matrix leapMat = transform.GetLeapMatrix();
+      LeapTransform leapMat = transform.GetLeapMatrix();
       _currentFixedFrame = leap_controller_.Frame().TransformedCopy(leapMat);
     }
 
@@ -202,6 +202,9 @@ namespace Leap.Unity {
      * The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
      */
     protected void initializeFlags() {
+      if (leap_controller_ == null) {
+        return;
+      }
       //Optimize for top-down tracking if on head mounted display.
       if (_isHeadMounted) {
         leap_controller_.SetPolicy(Controller.PolicyFlag.POLICY_OPTIMIZE_HMD);
@@ -217,10 +220,12 @@ namespace Leap.Unity {
       }
 
       leap_controller_ = new Controller();
-      if (leap_controller_.IsConnected) {
-        initializeFlags();
+      if (leap_controller_.IsConnected)
+      {
+          initializeFlags();
+      } else {
+        leap_controller_.Device += onHandControllerConnect;
       }
-      leap_controller_.Device += onHandControllerConnect;
     }
 
     /** Calling this method stop the connection for the existing instance of a Controller, 

@@ -74,12 +74,12 @@ namespace Leap
     /**
      * Creates a copy of this Frame, transforming all hands, fingers, and bones by the specified transform.
      *
-     * @param trs A Matrix containing the desired translation, rotation, and scale
+     * @param trs A LeapTransform containing the desired translation, rotation, and scale
      * of the copied Frame.
      * @returns a new Frame object with the transform applied.
      * @since 3.0
      */
-    public Frame TransformedCopy(Matrix trs)
+    public Frame TransformedCopy(LeapTransform trs)
     {
       Frame transformedFrame = new Frame(
         Id,
