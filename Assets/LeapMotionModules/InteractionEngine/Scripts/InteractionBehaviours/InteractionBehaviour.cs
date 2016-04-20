@@ -52,7 +52,11 @@ namespace Leap.Unity.Interaction {
       }
       set {
         _isKinematic = value;
-        if (!IsRegisteredWithManager) {
+        if (HasShapeInstance) {
+          if (!IsBeingGrasped) {
+            _rigidbody.isKinematic = value;
+          }
+        } else {
           _rigidbody.isKinematic = value;
         }
       }
@@ -64,7 +68,7 @@ namespace Leap.Unity.Interaction {
       }
       set {
         _useGravity = value;
-        if (!IsRegisteredWithManager) {
+        if (!HasShapeInstance) {
           _rigidbody.useGravity = _useGravity;
         }
       }
@@ -131,20 +135,14 @@ namespace Leap.Unity.Interaction {
         throw new InvalidOperationException("InteractionBehaviour must have a Rigidbody component attached to it.");
       }
 
-      _isKinematic = _rigidbody.isKinematic;
-      _useGravity = _rigidbody.useGravity;
-
-      //Gravity is always manually applied
-      _rigidbody.useGravity = false;
-
       KabschC.Construct(ref _kabsch);
     }
 
     protected override void OnUnregistered() {
       base.OnUnregistered();
 
-      _rigidbody.isKinematic = _isKinematic;
-      _rigidbody.useGravity = _useGravity;
+      _rigidbody = null;
+
       KabschC.Destruct(ref _kabsch);
     }
 
@@ -185,6 +183,12 @@ namespace Leap.Unity.Interaction {
     protected override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
       base.OnInteractionShapeCreated(instanceHandle);
 
+      _isKinematic = _rigidbody.isKinematic;
+      _useGravity = _rigidbody.useGravity;
+
+      //Gravity is always manually applied
+      _rigidbody.useGravity = false;
+
 #if UNITY_EDITOR
       Collider[] colliders = GetComponentsInChildren<Collider>();
       if (colliders.Length > 0) {
@@ -195,6 +199,13 @@ namespace Leap.Unity.Interaction {
         _debugBounds.center = transform.InverseTransformPoint(_debugBounds.center);
       }
 #endif
+    }
+
+    protected override void OnInteractionShapeDestroyed() {
+      base.OnInteractionShapeDestroyed();
+
+      _rigidbody.isKinematic = _isKinematic;
+      _rigidbody.useGravity = _useGravity;
     }
 
     public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {

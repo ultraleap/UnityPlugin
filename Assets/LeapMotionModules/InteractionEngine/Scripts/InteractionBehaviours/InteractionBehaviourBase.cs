@@ -54,6 +54,12 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public bool HasShapeInstance {
+      get {
+        return _hasShapeInstanceHandle;
+      }
+    }
+
     public override INTERACTION_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
       get {
         if (!_isRegisteredWithManager) {
