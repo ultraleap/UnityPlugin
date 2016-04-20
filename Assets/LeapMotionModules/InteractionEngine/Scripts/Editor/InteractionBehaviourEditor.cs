@@ -29,17 +29,19 @@ namespace Leap.Unity.Interaction {
           }
         }
       } else {
-        Transform graphicalAnchor = objectValue as Transform;
-        bool isIncorrect = false;
-        isIncorrect |= graphicalAnchor.transform.localPosition != Vector3.zero;
-        isIncorrect |= graphicalAnchor.transform.localRotation != Quaternion.identity;
-        if (isIncorrect) {
-          using (new GUILayout.HorizontalScope()) {
-            EditorGUILayout.HelpBox("Graphical anchor should have no position or rotation offset.", MessageType.Warning);
-            if (GUILayout.Button("Auto-Fix")) {
-              graphicalAnchor.localPosition = Vector3.zero;
-              graphicalAnchor.localRotation = Quaternion.identity;
-              prop.objectReferenceValue = graphicalAnchor;
+        if (!Application.isPlaying) {
+          Transform graphicalAnchor = objectValue as Transform;
+          bool isIncorrect = false;
+          isIncorrect |= graphicalAnchor.transform.localPosition != Vector3.zero;
+          isIncorrect |= graphicalAnchor.transform.localRotation != Quaternion.identity;
+          if (isIncorrect) {
+            using (new GUILayout.HorizontalScope()) {
+              EditorGUILayout.HelpBox("Graphical anchor should have no position or rotation offset.", MessageType.Warning);
+              if (GUILayout.Button("Auto-Fix")) {
+                graphicalAnchor.localPosition = Vector3.zero;
+                graphicalAnchor.localRotation = Quaternion.identity;
+                prop.objectReferenceValue = graphicalAnchor;
+              }
             }
           }
         }
