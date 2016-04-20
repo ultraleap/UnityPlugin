@@ -1,19 +1,53 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace LeapInternal {
 
   /**
-   * A helper class to marshal from unmanaged memory into structs without creating garbage.
+   * A helper class to marshal between unmanaged memory and structs without creating garbage.
    */
-  public class StructMarshal<T> where T : struct {
+  public static class StructMarshal<T> where T : struct {
     [StructLayout(LayoutKind.Sequential)]
     private class StructContainer {
       public T value;
     }
 
-    private static StructContainer _container = new StructContainer();
-    private static int _sizeofT = Marshal.SizeOf(typeof(T));
+    private static StructContainer _container;
+    private static int _sizeofT;
+
+    static StructMarshal() {
+      _container = new StructContainer();
+      _sizeofT = Marshal.SizeOf(typeof(T));
+    }
+
+    /**
+     * Returns the size in bytes of the struct of type T.  This call is equivalent to
+     * Marshal.Sizeof(typeof(T)) but caches the result for ease of access.
+     */
+    public static int Size {
+      get {
+        return _sizeofT;
+      }
+    }
+
+    /** 
+     * Copies a struct of type T into the memory pointed to by dstPtr.  This is an 
+     * unsafe operation that assumes there is enough space allocated at the pointer
+     * to accommodate the struct.
+     */
+    public static void CopyIntoDestination(IntPtr dstPtr, T t) {
+      CopyIntoArray(dstPtr, t, 0);
+    }
+
+    /**
+     * Copies a struct of type T into the array pointed to by arrayPtr at the 
+     * offset index specified by indexx.  This is an unsafe operation that assumes
+     * there is enough space allocated in the array to accommodate the struct.
+     */
+    public static void CopyIntoArray(IntPtr arrayPtr, T t, int index) {
+      _container.value = t;
+      Marshal.StructureToPtr(_container, new IntPtr(arrayPtr.ToInt64() + _sizeofT * index), false);
+    }
 
     /**
      * Converts an IntPtr to a struct of type T.

@@ -421,29 +421,13 @@ namespace Leap
     /**
      * Returns the frame object with all hands transformed by the specified
      * transform matrix.
-     * @param trs a Matrix containing translation, rotation, and scale.
+     * @param trs a LeapTransform containing translation, rotation, and scale.
      * @param history The age of the frame to return, counting backwards from
      * the most recent frame (0) into the past and up to the maximum age (59).
      */
-    public Frame GetTransformedFrame(Matrix trs, int history = 0)
+    public Frame GetTransformedFrame(LeapTransform trs, int history = 0)
     {
       return Frame(history).TransformedCopy(trs);
-    }
-
-    /**
-    * Returns the timestamps of the frames captured closest to the specified
-    * time.
-    *
-    * The time should be expressed in microseconds based on the Leap Motion clock.
-    * You can get a system time 
-    * @param time A time expressed in microseconds.
-    */
-    public TimeBracket GetNearestFrameTimes(Int64 time){
-      TimeBracket nearestFrameTimes;
-      _connection.GetNearestFrameTimes(time, 
-                                       out nearestFrameTimes.before, 
-                                       out nearestFrameTimes.after);
-      return nearestFrameTimes;
     }
 
     /**
@@ -461,7 +445,7 @@ namespace Leap
     * 
     * 
     */
-    public Frame GetTransformedInterpolatedFrame(Matrix trs, Int64 time){
+    public Frame GetTransformedInterpolatedFrame(LeapTransform trs, Int64 time){
       return _connection.GetInterpolatedFrame(time).TransformedCopy(trs);
     }
 
