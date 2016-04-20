@@ -408,8 +408,8 @@ namespace Leap.Unity.Interaction.CApi {
                                                                      out UInt32 nResults,
                                                                      out IntPtr papResultsBuffer);
 
-    public static ReturnStatus GetVelocities(ref INTERACTION_SCENE scene,
-                                                 List<INTERACTION_SHAPE_INSTANCE_RESULTS> results) {
+    public static ReturnStatus GetShapeInstanceResults(ref INTERACTION_SCENE scene,
+                                                           List<INTERACTION_SHAPE_INSTANCE_RESULTS> results) {
       UInt32 nResults;
       IntPtr papResultsBuffer;
       var rs = LeapIEGetShapeInstanceResults(ref scene,

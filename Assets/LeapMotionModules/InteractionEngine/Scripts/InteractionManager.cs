@@ -618,7 +618,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void dispatchSimulationResults() {
-      InteractionC.GetVelocities(ref _scene, _resultList);
+      InteractionC.GetShapeInstanceResults(ref _scene, _resultList);
 
       for (int i = 0; i < _resultList.Count; ++i) {
         INTERACTION_SHAPE_INSTANCE_RESULTS result = _resultList[i];
