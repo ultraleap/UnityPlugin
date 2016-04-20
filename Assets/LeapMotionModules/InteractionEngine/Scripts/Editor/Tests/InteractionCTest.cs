@@ -141,8 +141,4 @@ namespace Leap.Unity.Interaction.Tests {
       InteractionC.UpdateShapeInstance(ref _scene, ref transform, ref info, ref _shapeInstanceHandle);
     }
   }
-
-
-
-
 }
