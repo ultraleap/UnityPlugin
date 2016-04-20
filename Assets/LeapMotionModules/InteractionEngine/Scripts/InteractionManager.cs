@@ -518,19 +518,24 @@ namespace Leap.Unity.Interaction {
         switch (handResult.classification) {
           case ManipulatorMode.Grasp:
             {
-              IInteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[handResult.instanceHandle];
-              if (interactionHand.graspedObject == null) {
-                _graspedBehaviours.Add(interactionBehaviour);
+              IInteractionBehaviour interactionBehaviour;
+              if (_instanceHandleToBehaviour.TryGetValue(handResult.instanceHandle, out interactionBehaviour)) {
+                if (interactionHand.graspedObject == null) {
+                  _graspedBehaviours.Add(interactionBehaviour);
 
-                try {
-                  interactionHand.GraspObject(interactionBehaviour);
-                } catch (Exception e) {
-                  _misbehavingBehaviours.Add(interactionBehaviour);
-                  Debug.LogException(e);
-                  continue;
+                  try {
+                    interactionHand.GraspObject(interactionBehaviour);
+                  } catch (Exception e) {
+                    _misbehavingBehaviours.Add(interactionBehaviour);
+                    Debug.LogException(e);
+                    continue;
+                  }
+
                 }
-
+              } else {
+                Debug.LogError("Recieved a hand result with an unkown handle " + handResult.instanceHandle.handle);
               }
+
               break;
             }
           case ManipulatorMode.Physics:
@@ -647,7 +652,7 @@ namespace Leap.Unity.Interaction {
       INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle = interactionBehaviour.ShapeInstanceHandle;
 
       _instanceHandleToBehaviour.Remove(instanceHandle);
-
+      
       InteractionC.DestroyShapeInstance(ref _scene, ref instanceHandle);
 
       interactionBehaviour.NotifyInteractionShapeDestroyed();
