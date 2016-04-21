@@ -295,8 +295,7 @@ namespace Leap.Unity.Interaction {
       updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
       updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
 
-      if (_useGravity)
-      {
+      if (_useGravity) {
         updateInfo.updateFlags |= UpdateInfoFlags.GravityEnabled;
       }
 
