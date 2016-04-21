@@ -6,11 +6,11 @@ using Leap.Unity;
 public class PinchActivator : Activator {
   private IHandModel handModel = null;
 
-  [Range (0.0f, 1.0f)]
-  public float PinchOn = .7f;
-  [Range (0.0f, 1.0f)]
-  public float PinchOff = .5f;
-
+  [Range (0.0f, 70.0f)]
+  public float PinchOn = 10.0f;
+  [Range (0.0f, 70.0f)]
+  public float PinchOff = 20.0f;
+  public float CurrentValue = 99f;
   void Start () {
     handModel = gameObject.GetComponentInParent<IHandModel>();
   }
@@ -29,9 +29,10 @@ public class PinchActivator : Activator {
       if(handModel != null){
         hand = handModel.GetLeapHand();
         if(hand != null){
-          if(hand.PinchStrength >= PinchOn){
+          CurrentValue = hand.PinchDistance;
+          if(hand.PinchDistance <= PinchOn){
             Activate();
-          } else if ( hand.PinchStrength <= PinchOff){
+          } else if ( hand.PinchDistance >= PinchOff){
             Deactivate();
           }
         }

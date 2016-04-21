@@ -52,22 +52,27 @@ public class ExtendedFingerActivator : Activator {
       case 0:
         if(Thumb == PointingState.Either) return true;
         if(Thumb == PointingState.Extended && finger.IsExtended) return true;
+        if(Thumb == PointingState.NotExtended && !finger.IsExtended) return true;
         return false;
       case 1:
         if(Index == PointingState.Either) return true;
         if(Index == PointingState.Extended && finger.IsExtended) return true;
+        if (Index == PointingState.NotExtended && !finger.IsExtended) return true;
         return false;
       case 2:
         if(Middle == PointingState.Either) return true;
         if(Middle == PointingState.Extended && finger.IsExtended) return true;
+        if (Middle == PointingState.NotExtended && !finger.IsExtended) return true;
         return false;
       case 3:
         if(Ring == PointingState.Either) return true;
         if(Ring == PointingState.Extended && finger.IsExtended) return true;
+        if (Ring == PointingState.NotExtended && !finger.IsExtended) return true;
         return false;
       case 4:
         if(Pinky == PointingState.Either) return true;
         if(Pinky == PointingState.Extended && finger.IsExtended) return true;
+        if (Pinky == PointingState.NotExtended && !finger.IsExtended) return true;
         return false;
       default:
         return false;
