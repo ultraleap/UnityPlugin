@@ -1265,8 +1265,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ModelCollection:
-  - {fileID: 125884215}
-  - {fileID: 1884541115}
+  - LeftModel: {fileID: 125884215}
+    RightModel: {fileID: 1884541115}
   ModelPool: []
   EnforceHandedness: 0
 --- !u!114 &972296618
