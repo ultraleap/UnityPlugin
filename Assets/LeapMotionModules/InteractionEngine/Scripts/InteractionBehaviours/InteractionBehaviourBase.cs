@@ -20,6 +20,8 @@ namespace Leap.Unity.Interaction {
   /// This behaviour has the following requirements:
   ///    - This behaviour cannot be a sibling or a child of any other InteractionBehaviourBase.
   ///    - Certain callbacks have been left unimplemented and must be implemented by an extending class.
+  ///    - Only a single collider is supported currently.  The collider must be either a BoxCollider or SphereCollider,
+  ///      and must not be on a child transform.  The collider must also have a center value of zero.
   /// </summary>
   [DisallowMultipleComponent]
   public abstract class InteractionBehaviourBase : IInteractionBehaviour {
