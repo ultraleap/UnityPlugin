@@ -1839,7 +1839,7 @@ MonoBehaviour:
   _leapProvider: {fileID: 972296616}
   _dataSubfolder: InteractionEngine
   _untrackedTimeout: 0.5
-  _enablePushing: 0
+  _enablePushing: 1
   _enableSimulation: 1
   _showDebugLines: 0
   _showDebugOutput: 0
