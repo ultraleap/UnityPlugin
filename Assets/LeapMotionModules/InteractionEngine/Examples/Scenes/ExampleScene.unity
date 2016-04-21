@@ -907,7 +907,7 @@ MonoBehaviour:
   _isHeadMounted: 1
   _overrideDeviceType: 0
   _overrideDeviceTypeWith: 1
-  _useInterpolation: 0
+  _useInterpolation: 1
   _interpolationDelay: 15
 --- !u!114 &972296617
 MonoBehaviour:
