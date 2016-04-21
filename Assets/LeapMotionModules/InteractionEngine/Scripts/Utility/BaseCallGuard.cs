@@ -3,9 +3,12 @@ using System.Diagnostics;
 
 namespace Leap.Unity.Interaction {
 
-  public class BeginNotCalled : Exception {
-    public BeginNotCalled(string methodName) :
-      base("BaseCallGuard.Begin was not called for " + methodName + ".") { }
+  public class BeginNotCalledException : Exception {
+    public BeginNotCalledException(string methodName) :
+      base("Begin was not called for " + methodName + ".") { }
+
+    public BeginNotCalledException() :
+      base("Begin was not called before calling AssertBaseCalled.") { }
   }
 
   public class BaseNotCalledException : Exception {
@@ -20,14 +23,21 @@ namespace Leap.Unity.Interaction {
 
   public class BaseCallGuard {
     private string _pendingMethodKey = null;
+    private bool _wasBeginCalled = false;
 
     [Conditional("UNITY_ASSERTIONS")]
     public void Begin(string methodKey) {
       _pendingMethodKey = methodKey;
+      _wasBeginCalled = true;
     }
 
     [Conditional("UNITY_ASSERTIONS")]
     public void AssertBaseCalled() {
+      if (!_wasBeginCalled) {
+        throw new BeginNotCalledException();
+      }
+      _wasBeginCalled = false;
+
       if (_pendingMethodKey != null) {
         var notCalledException = new BaseNotCalledException(_pendingMethodKey);
         _pendingMethodKey = null;
@@ -38,7 +48,7 @@ namespace Leap.Unity.Interaction {
     [Conditional("UNITY_ASSERTIONS")]
     public void NotifyBaseCalled(string methodKey) {
       if (_pendingMethodKey == null) {
-        throw new BeginNotCalled(methodKey);
+        throw new BeginNotCalledException(methodKey);
       }
 
       if (_pendingMethodKey != methodKey) {
