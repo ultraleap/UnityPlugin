@@ -429,11 +429,8 @@ namespace Leap.Unity.Interaction {
       simulateInteraction();
 
       updateInteractionStateChanges(frame);
-
-      // TODO: Pass a debug flag to disable calculating velocities.
-      if (_enableContact) {
-        dispatchSimulationResults();
-      }
+      
+      dispatchSimulationResults();
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         _registeredBehaviours[i].NotifyPostSolve();
@@ -683,7 +680,9 @@ namespace Leap.Unity.Interaction {
         IInteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[result.handle];
 
         try {
-          interactionBehaviour.NotifyRecievedSimulationResults(result);
+          if (result.resultFlags != ShapeInstanceResultFlags.None) {
+            interactionBehaviour.NotifyRecievedSimulationResults(result);
+          }
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
