@@ -26,6 +26,7 @@ public class HandAttachments : IHandModel {
   public Transform Middle;
   public Transform Ring;
   public Transform Pinky;
+  public Transform PinchPoint;
 
   private Hand _hand;
 
@@ -79,6 +80,19 @@ public class HandAttachments : IHandModel {
     if(Pinky != null) {
       Pinky.position = _hand.Fingers[4].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToVector3();
       Pinky.rotation = _hand.Fingers[4].Bone(Bone.BoneType.TYPE_DISTAL).Rotation.ToQuaternion();
+    }
+    if(PinchPoint != null){
+      Vector thumbTip = _hand.Fingers[0].TipPosition;
+      Vector indexTip = _hand.Fingers[1].TipPosition;
+      Vector pinchPoint = Vector.Lerp(thumbTip, indexTip, 0.5f);
+      PinchPoint.position = pinchPoint.ToVector3();
+//      Vector forward = pinchPoint - _hand.Fingers[1].Bone(Bone.BoneType.TYPE_PROXIMAL).PrevJoint;
+//      Vector up = _hand.Fingers[1].Bone(Bone.BoneType.TYPE_PROXIMAL).Direction.Cross(_hand.Fingers[0].Bone(Bone.BoneType.TYPE_PROXIMAL).Direction);
+//      PinchPoint.rotation = Quaternion.LookRotation(forward.ToVector3(), up.ToVector3());
+      //Or
+      //PinchPoint.rotation = _hand.Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).Rotation.ToQuaternion();
+      //Or
+      PinchPoint.rotation = _hand.Rotation.ToQuaternion();
     }
   }
 }
