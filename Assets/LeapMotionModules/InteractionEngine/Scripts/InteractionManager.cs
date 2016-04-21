@@ -617,7 +617,7 @@ namespace Leap.Unity.Interaction {
         var id = pair.Key;
         var ieHand = pair.Value;
 
-        float handAge = Time.time - ieHand.lastTimeUpdated;
+        float handAge = Time.unscaledTime - ieHand.lastTimeUpdated;
         //Check to see if the hand is at least 1 frame old
         //We assume it has become untracked if this is the case
         if (handAge > 0) {
@@ -767,13 +767,13 @@ namespace Leap.Unity.Interaction {
 
       public InteractionHand(Hand hand) {
         this.hand = hand;
-        lastTimeUpdated = Time.time;
+        lastTimeUpdated = Time.unscaledTime;
         graspedObject = null;
       }
 
       public void UpdateHand(Hand hand) {
         this.hand = hand;
-        lastTimeUpdated = Time.time;
+        lastTimeUpdated = Time.unscaledTime;
       }
 
       public void GraspObject(IInteractionBehaviour obj) {
