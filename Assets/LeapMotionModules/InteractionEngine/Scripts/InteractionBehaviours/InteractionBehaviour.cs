@@ -45,7 +45,7 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("Should a hand be able to impart pushing forces to this object.")]
     [SerializeField]
-    protected bool _pushingEnabled = true;
+    protected bool _enableContact = true;
 
     protected Renderer[] _renderers;
     protected Rigidbody _rigidbody;
@@ -150,10 +150,10 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public bool PushingEnabled {
       get {
-        return _pushingEnabled;
+        return _enableContact;
       }
       set {
-        _pushingEnabled = value;
+        _enableContact = value;
       }
     }
 
@@ -286,7 +286,7 @@ namespace Leap.Unity.Interaction {
         updateInfo.updateFlags |= UpdateInfoFlags.VelocityEnabled;
       }
 
-      if (_pushingEnabled && !_isKinematic && !IsBeingGrasped) {
+      if (_enableContact && !_isKinematic && !IsBeingGrasped) {
         updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration;
       }
 
