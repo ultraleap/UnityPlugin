@@ -251,7 +251,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static ReturnStatus UpdateSceneInfo(ref INTERACTION_SCENE scene,
                                                ref INTERACTION_SCENE_INFO sceneInfo) {
-      var rs = UpdateSceneInfo(ref scene, ref sceneInfo);
+      var rs = LeapIEUpdateSceneInfo(ref scene, ref sceneInfo);
       Logger.HandleReturnStatus(scene, "Update Scene Info", LogLevel.Info, rs);
       return rs;
     }
