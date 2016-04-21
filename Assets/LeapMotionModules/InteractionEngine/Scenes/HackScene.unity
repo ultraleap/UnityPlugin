@@ -93,7 +93,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 104011635}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: GraphicalAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -160,12 +160,6 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
   m_IsPrefabParent: 0
---- !u!114 &125884215 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78,
-    type: 2}
-  m_PrefabInternal: {fileID: 125884214}
-  m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
 --- !u!4 &125884216 stripped
 Transform:
   m_PrefabParentObject: {fileID: 464466, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
@@ -318,7 +312,7 @@ GameObject:
   - 4: {fileID: 654654237}
   - 33: {fileID: 654654239}
   - 23: {fileID: 654654238}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -709,8 +703,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ModelCollection:
-  - {fileID: 125884215}
-  - {fileID: 1884541115}
+  - LeftModel: {fileID: 0}
+    RightModel: {fileID: 0}
+  - LeftModel: {fileID: 0}
+    RightModel: {fileID: 0}
   ModelPool: []
   EnforceHandedness: 0
 --- !u!114 &972296618
@@ -928,7 +924,9 @@ MonoBehaviour:
   _leapProvider: {fileID: 972296616}
   _dataSubfolder: InteractionEngine
   _untrackedTimeout: 0.5
-  _enablePushing: 1
+  _enableContact: 1
+  _enableGrasping: 1
+  _enableSimulation: 1
   _showDebugLines: 1
   _showDebugOutput: 1
 --- !u!4 &1473219678
@@ -957,7 +955,7 @@ GameObject:
   - 65: {fileID: 1493679625}
   - 54: {fileID: 1493679624}
   - 114: {fileID: 1493679623}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: InteractionCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -991,7 +989,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 1935213665}
-  _pushingEnabled: 1
+  _graphicalReturnTime: 0.25
+  _enableContact: 1
 --- !u!54 &1493679624
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1030,7 +1029,7 @@ GameObject:
   - 65: {fileID: 1781426151}
   - 54: {fileID: 1781426150}
   - 114: {fileID: 1781426149}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: InteractionCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1064,7 +1063,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 104011635}
-  _pushingEnabled: 1
+  _graphicalReturnTime: 0.25
+  _enableContact: 1
 --- !u!54 &1781426150
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1102,7 +1102,7 @@ GameObject:
   - 4: {fileID: 1801015273}
   - 33: {fileID: 1801015275}
   - 23: {fileID: 1801015274}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1201,12 +1201,6 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
   m_IsPrefabParent: 0
---- !u!114 &1884541115 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3,
-    type: 2}
-  m_PrefabInternal: {fileID: 1884541114}
-  m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
 --- !u!4 &1884541116 stripped
 Transform:
   m_PrefabParentObject: {fileID: 464466, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
@@ -1219,7 +1213,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 1935213665}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: GraphicalAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
