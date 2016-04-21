@@ -649,8 +649,6 @@ namespace Leap.Unity.Interaction {
               _misbehavingBehaviours.Add(ieHand.graspedObject);
               Debug.LogException(e);
             }
-
-            continue;
           }
         }
       }
