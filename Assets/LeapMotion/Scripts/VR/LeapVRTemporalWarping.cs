@@ -182,8 +182,18 @@ namespace Leap.Unity{
     }
   
     protected void Start() {
-      Controller controller = provider.GetLeapController();
-      controller.Device += OnDevice;
+      if(provider.IsConnected()){
+        deviceInfo = provider.GetDeviceInfo();
+        LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
+        if (deviceInfo.type == LeapDeviceType.Invalid) {
+          Debug.LogWarning("Invalid Leap Device -> enabled = false");
+          enabled = false;
+          return;
+        }
+      } else {
+        Controller controller = provider.GetLeapController();
+        controller.Device += OnDevice;
+      }
     }
 
     protected void OnDevice(object sender, DeviceEventArgs args) {
@@ -208,7 +218,11 @@ namespace Leap.Unity{
     protected void OnDisable() {
       LeapVRCameraControl.OnValidCameraParams -= onValidCameraParams;
     }
-  
+
+    protected void OnDestroy() {
+        LeapVRCameraControl.OnValidCameraParams -= onValidCameraParams;
+    }
+
     protected void Update() {
       if (Input.GetKeyDown(recenter)) {
         InputTracking.Recenter();
@@ -234,8 +248,10 @@ namespace Leap.Unity{
     private void onValidCameraParams(LeapVRCameraControl.CameraParams cameraParams) {
       _projectionMatrix = cameraParams.ProjectionMatrix;
       _trackingAnchor = cameraParams.TrackingAnchor;
-  
-      updateHistory();
+
+      if (provider != null) { 
+        updateHistory(); 
+      }
   
       if (syncMode == SyncMode.LOW_LATENCY) {
         updateTemporalWarping();
@@ -258,7 +274,7 @@ namespace Leap.Unity{
     }
     
     private void updateTemporalWarping() {
-      if (_trackingAnchor == null) {
+      if (_trackingAnchor == null || provider.GetLeapController() == null) {
         return;
       }
   

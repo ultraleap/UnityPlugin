@@ -6,6 +6,7 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction.Tests {
 
+  [TestFixture(Category = "KabschC")]
   public class KabschTest {
     LEAP_IE_KABSCH _kabsch;
 

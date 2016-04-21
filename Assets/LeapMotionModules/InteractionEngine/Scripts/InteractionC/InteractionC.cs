@@ -253,7 +253,7 @@ namespace Leap.Unity.Interaction.CApi {
 
     public static ReturnStatus UpdateSceneInfo(ref INTERACTION_SCENE scene,
                                                ref INTERACTION_SCENE_INFO sceneInfo) {
-      var rs = UpdateSceneInfo(ref scene, ref sceneInfo);
+      var rs = LeapIEUpdateSceneInfo(ref scene, ref sceneInfo);
       Logger.HandleReturnStatus(scene, "Update Scene Info", LogLevel.Info, rs);
       return rs;
     }
@@ -410,8 +410,8 @@ namespace Leap.Unity.Interaction.CApi {
                                                                      out UInt32 nResults,
                                                                      out IntPtr papResultsBuffer);
 
-    public static ReturnStatus GetVelocities(ref INTERACTION_SCENE scene,
-                                                 List<INTERACTION_SHAPE_INSTANCE_RESULTS> results) {
+    public static ReturnStatus GetShapeInstanceResults(ref INTERACTION_SCENE scene,
+                                                           List<INTERACTION_SHAPE_INSTANCE_RESULTS> results) {
       UInt32 nResults;
       IntPtr papResultsBuffer;
       var rs = LeapIEGetShapeInstanceResults(ref scene,
@@ -421,8 +421,10 @@ namespace Leap.Unity.Interaction.CApi {
       results.Clear();
       if (rs == ReturnStatus.Success) {
         for (int i = 0; i < nResults; i++) {
-          IntPtr resultPtr = StructMarshal<IntPtr>.ArrayElementToStruct(papResultsBuffer, i);
-          var result = StructMarshal<INTERACTION_SHAPE_INSTANCE_RESULTS>.PtrToStruct(resultPtr);
+          IntPtr resultPtr;
+          StructMarshal<IntPtr>.ArrayElementToStruct(papResultsBuffer, i, out resultPtr);
+          INTERACTION_SHAPE_INSTANCE_RESULTS result;
+          StructMarshal<INTERACTION_SHAPE_INSTANCE_RESULTS>.PtrToStruct(resultPtr, out result);
           results.Add(result);
         }
       }
@@ -463,7 +465,8 @@ namespace Leap.Unity.Interaction.CApi {
       GetDebugLines(ref scene, out lines, out arrayPtr);
 
       for (int i = 0; i < lines; i++) {
-        INTERACTION_DEBUG_LINE line = StructMarshal<INTERACTION_DEBUG_LINE>.ArrayElementToStruct(arrayPtr, i);
+        INTERACTION_DEBUG_LINE line;
+        StructMarshal<INTERACTION_DEBUG_LINE>.ArrayElementToStruct(arrayPtr, i, out line);
         line.Draw();
       }
     }
@@ -483,7 +486,8 @@ namespace Leap.Unity.Interaction.CApi {
       strings.Clear();
       if (rs == ReturnStatus.Success) {
         for (int i = 0; i < nStrings; i++) {
-          IntPtr charPtr = StructMarshal<IntPtr>.ArrayElementToStruct(pppStrings, i);
+          IntPtr charPtr;
+          StructMarshal<IntPtr>.ArrayElementToStruct(pppStrings, i, out charPtr);
           string str = Marshal.PtrToStringAnsi(charPtr);
           strings.Add(str);
         }

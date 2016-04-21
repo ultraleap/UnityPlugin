@@ -3,6 +3,7 @@ using UnityEditor;
 
 namespace Leap.Unity.Interaction {
 
+  [CanEditMultipleObjects]
   [CustomEditor(typeof(InteractionBehaviourBase), true)]
   public class InteractionBehaviourBaseEditor : CustomEditorBase {
     protected InteractionBehaviour _interactionBehaviour;
@@ -10,12 +11,22 @@ namespace Leap.Unity.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
 
-      _interactionBehaviour = target as InteractionBehaviour;
+      if (targets.Length == 1) {
+        _interactionBehaviour = target as InteractionBehaviour;
+      } else {
+        _interactionBehaviour = null;
+      }
 
-      specifyCustomDecorator("_manager", kinematicDecorator);
+      if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab) {
+        specifyCustomDecorator("_manager", kinematicDecorator);
+      }
     }
 
     private void kinematicDecorator(SerializedProperty prop) {
+      if (_interactionBehaviour == null) {
+        return;
+      }
+
       Rigidbody rigidbody = _interactionBehaviour.GetComponent<Rigidbody>();
 
       if (_interactionBehaviour.GetComponentsInParent<InteractionBehaviourBase>().Length > 1 ||
@@ -24,10 +35,24 @@ namespace Leap.Unity.Interaction {
       }
 
       if (rigidbody == null) {
-        EditorGUILayout.HelpBox("This component requires a Rigidbody", MessageType.Error);
+        using (new GUILayout.HorizontalScope()) {
+          EditorGUILayout.HelpBox("This component requires a Rigidbody", MessageType.Error);
+          if (GUILayout.Button("Auto-Fix")) {
+            rigidbody = _interactionBehaviour.gameObject.AddComponent<Rigidbody>();
+            rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+            rigidbody.useGravity = true;
+            rigidbody.isKinematic = false;
+          }
+        }
       } else {
-        if (rigidbody.interpolation == RigidbodyInterpolation.None) {
-          EditorGUILayout.HelpBox("It is recommended to use interpolation on Rigidbodies to improve interaction fidelity.", MessageType.Warning);
+        if (rigidbody.interpolation != RigidbodyInterpolation.Interpolate) {
+          using (new GUILayout.HorizontalScope()) {
+            EditorGUILayout.HelpBox("It is recommended to use interpolation on Rigidbodies to improve interaction fidelity.", MessageType.Warning);
+            if (GUILayout.Button("Auto-Fix")) {
+              rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+              EditorUtility.SetDirty(rigidbody);
+            }
+          }
         }
 
         if (rigidbody.isKinematic) {
@@ -46,22 +71,19 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    
-
     public override void OnInspectorGUI() {
       base.OnInspectorGUI();
 
-      if (Application.isPlaying) {
+      if (Application.isPlaying && _interactionBehaviour != null) {
         EditorGUILayout.Space();
-        InteractionBehaviourBase behaviour = target as InteractionBehaviourBase;
 
-        if (!behaviour.IsRegisteredWithManager) {
+        if (!_interactionBehaviour.IsRegisteredWithManager) {
           EditorGUILayout.LabelField("Interaction Disabled", EditorStyles.boldLabel);
         } else {
           EditorGUILayout.LabelField("Interaction Info", EditorStyles.boldLabel);
           using (new EditorGUI.DisabledGroupScope(true)) {
-            EditorGUILayout.IntField("Grasping Hand Count", behaviour.GraspingHandCount);
-            EditorGUILayout.IntField("Untracked Hand Count", behaviour.UntrackedHandCount);
+            EditorGUILayout.IntField("Grasping Hand Count", _interactionBehaviour.GraspingHandCount);
+            EditorGUILayout.IntField("Untracked Hand Count", _interactionBehaviour.UntrackedHandCount);
           }
         }
       }

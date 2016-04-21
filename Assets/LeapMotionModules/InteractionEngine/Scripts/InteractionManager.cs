@@ -33,6 +33,9 @@ namespace Leap.Unity.Interaction {
     [Header("Debug")]
     [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
     [SerializeField]
+    protected bool _enableSimulation = true;
+
+    [SerializeField]
     protected bool _showDebugLines = true;
 
     [SerializeField]
@@ -165,7 +168,7 @@ namespace Leap.Unity.Interaction {
       _registeredBehaviours.Add(interactionBehaviour);
 
       try {
-        interactionBehaviour.OnRegister();
+        interactionBehaviour.NotifyRegistered();
       } catch (Exception e) {
         _misbehavingBehaviours.Add(interactionBehaviour);
         throw e;
@@ -215,7 +218,7 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      interactionBehaviour.OnUnregister();
+      interactionBehaviour.NotifyUnregistered();
     }
     #endregion
 
@@ -241,6 +244,12 @@ namespace Leap.Unity.Interaction {
     protected virtual void Awake() { }
 
     protected virtual void OnEnable() {
+      if (_leapProvider == null) {
+        enabled = false;
+        Debug.LogError("Could not enable Interaction Manager because no Leap Provider was specified.");
+        return;
+      }
+
       Assert.IsFalse(_hasSceneBeenCreated, "Scene should not have been created yet");
 
       try {
@@ -313,9 +322,11 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void LateUpdate() {
-      dispatchOnHandsHolding(_leapProvider.CurrentFrame);
+      if (_enableSimulation) {
+        dispatchOnHandsHolding(_leapProvider.CurrentFrame, isPhysics: false);
 
-      unregisterMisbehavingBehaviours();
+        unregisterMisbehavingBehaviours();
+      }
     }
 
     protected virtual void OnGUI() {
@@ -334,7 +345,9 @@ namespace Leap.Unity.Interaction {
         yield return fixedUpdate;
 
         try {
-          simulateFrame(_leapProvider.CurrentFrame);
+          if (_enableSimulation) {
+            simulateFrame(_leapProvider.CurrentFixedFrame);
+          }
 
           if (_showDebugLines) {
             InteractionC.DrawDebugLines(ref _scene);
@@ -352,10 +365,10 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void simulateFrame(Frame frame) {
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
-        _registeredBehaviours[i].OnPreSolve();
+        _registeredBehaviours[i].NotifyPreSolve();
       }
 
-      dispatchOnHandsHolding(frame);
+      dispatchOnHandsHolding(frame, isPhysics: true);
 
       updateInteractionRepresentations();
 
@@ -371,7 +384,7 @@ namespace Leap.Unity.Interaction {
       }
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
-        _registeredBehaviours[i].OnPostSolve();
+        _registeredBehaviours[i].NotifyPostSolve();
       }
     }
 
@@ -387,7 +400,7 @@ namespace Leap.Unity.Interaction {
 
           INTERACTION_UPDATE_SHAPE_INFO updateInfo;
           INTERACTION_TRANSFORM updateTransform;
-          interactionBehaviour.OnInteractionShapeUpdate(out updateInfo, out updateTransform);
+          interactionBehaviour.GetInteractionShapeUpdateInfo(out updateInfo, out updateTransform);
 
           InteractionC.UpdateShapeInstance(ref _scene, ref updateTransform, ref updateInfo, ref shapeInstanceHandle);
         } catch (Exception e) {
@@ -397,7 +410,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void dispatchOnHandsHolding(Frame frame) {
+    protected virtual void dispatchOnHandsHolding(Frame frame, bool isPhysics) {
       var hands = frame.Hands;
 
       //Loop through the currently grasped objects to dispatch their OnHandsHold callback
@@ -405,13 +418,21 @@ namespace Leap.Unity.Interaction {
         var interactionBehaviour = _graspedBehaviours[i];
 
         for (int j = 0; j < hands.Count; j++) {
-          if (interactionBehaviour.IsBeingGraspedByHand(hands[j].Id)) {
-            _holdingHands.Add(hands[j]);
+          var hand = hands[j];
+          InteractionHand interactionHand;
+          if (_idToInteractionHand.TryGetValue(hand.Id, out interactionHand)) {
+            if (interactionHand.graspedObject == interactionBehaviour) {
+              _holdingHands.Add(hand);
+            }
           }
         }
 
         try {
-          interactionBehaviour.OnHandsHold(_holdingHands);
+          if (isPhysics) {
+            interactionBehaviour.NotifyHandsHoldPhysics(_holdingHands);
+          } else {
+            interactionBehaviour.NotifyHandsHoldGraphics(_holdingHands);
+          }
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
@@ -503,19 +524,24 @@ namespace Leap.Unity.Interaction {
         switch (handResult.classification) {
           case ManipulatorMode.Grasp:
             {
-              IInteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[handResult.instanceHandle];
-              if (interactionHand.graspedObject == null) {
-                _graspedBehaviours.Add(interactionBehaviour);
+              IInteractionBehaviour interactionBehaviour;
+              if (_instanceHandleToBehaviour.TryGetValue(handResult.instanceHandle, out interactionBehaviour)) {
+                if (interactionHand.graspedObject == null) {
+                  _graspedBehaviours.Add(interactionBehaviour);
 
-                try {
-                  interactionHand.GraspObject(interactionBehaviour);
-                } catch (Exception e) {
-                  _misbehavingBehaviours.Add(interactionBehaviour);
-                  Debug.LogException(e);
-                  continue;
+                  try {
+                    interactionHand.GraspObject(interactionBehaviour);
+                  } catch (Exception e) {
+                    _misbehavingBehaviours.Add(interactionBehaviour);
+                    Debug.LogException(e);
+                    continue;
+                  }
+
                 }
-
+              } else {
+                Debug.LogError("Recieved a hand result with an unkown handle " + handResult.instanceHandle.handle);
               }
+
               break;
             }
           case ManipulatorMode.Physics:
@@ -598,14 +624,14 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void dispatchSimulationResults() {
-      InteractionC.GetVelocities(ref _scene, _resultList);
+      InteractionC.GetShapeInstanceResults(ref _scene, _resultList);
 
       for (int i = 0; i < _resultList.Count; ++i) {
         INTERACTION_SHAPE_INSTANCE_RESULTS result = _resultList[i];
         IInteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[result.handle];
 
         try {
-          interactionBehaviour.OnRecieveSimulationResults(result);
+          interactionBehaviour.NotifyRecievedSimulationResults(result);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
@@ -619,23 +645,23 @@ namespace Leap.Unity.Interaction {
 
       INTERACTION_CREATE_SHAPE_INFO createInfo;
       INTERACTION_TRANSFORM createTransform;
-      interactionBehaviour.OnInteractionShapeCreationInfo(out createInfo, out createTransform);
+      interactionBehaviour.GetInteractionShapeCreationInfo(out createInfo, out createTransform);
 
       InteractionC.CreateShapeInstance(ref _scene, ref descriptionHandle, ref createTransform, ref createInfo, out instanceHandle);
 
       _instanceHandleToBehaviour[instanceHandle] = interactionBehaviour;
 
-      interactionBehaviour.OnInteractionShapeCreated(instanceHandle);
+      interactionBehaviour.NotifyInteractionShapeCreated(instanceHandle);
     }
 
     protected virtual void destroyInteractionShape(IInteractionBehaviour interactionBehaviour) {
       INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle = interactionBehaviour.ShapeInstanceHandle;
 
       _instanceHandleToBehaviour.Remove(instanceHandle);
-
+      
       InteractionC.DestroyShapeInstance(ref _scene, ref instanceHandle);
 
-      interactionBehaviour.OnInteractionShapeDestroyed();
+      interactionBehaviour.NotifyInteractionShapeDestroyed();
     }
 
     private void unregisterMisbehavingBehaviours() {
@@ -693,21 +719,21 @@ namespace Leap.Unity.Interaction {
 
       public void GraspObject(IInteractionBehaviour obj) {
         graspedObject = obj;
-        graspedObject.OnHandGrasp(hand);
+        graspedObject.NotifyHandGrasped(hand);
       }
 
       public void ReleaseObject() {
-        graspedObject.OnHandRelease(hand);
+        graspedObject.NotifyHandReleased(hand);
         graspedObject = null;
       }
 
       public void MarkUntracked() {
         isUntracked = true;
-        graspedObject.OnHandLostTracking(hand);
+        graspedObject.NotifyHandLostTracking(hand);
       }
 
       public void MarkTimeout() {
-        graspedObject.OnHandTimeout(hand);
+        graspedObject.NotifyHandTimeout(hand);
         graspedObject = null;
         isUntracked = true;
         hand = null;
@@ -720,7 +746,7 @@ namespace Leap.Unity.Interaction {
         //TODO: Need to force engine to update the grabbed state!
 
         isUntracked = false;
-        graspedObject.OnHandRegainedTracking(newHand, oldId);
+        graspedObject.NotifyHandRegainedTracking(newHand, oldId);
       }
     }
     #endregion

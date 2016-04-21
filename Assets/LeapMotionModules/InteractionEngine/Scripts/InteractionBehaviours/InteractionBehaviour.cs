@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using LeapInternal;
 using Leap.Unity.Interaction.CApi;
@@ -16,6 +17,10 @@ namespace Leap.Unity.Interaction {
              "representation from the physical, interaction fidelity can be improved and latency reduced.")]
     [SerializeField]
     protected Transform _graphicalAnchor;
+
+    [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
+    [SerializeField]
+    protected float _graphicalReturnTime = 0.25f;
 
     [Tooltip("Should a hand be able to impart pushing forces to this object.")]
     [SerializeField]
@@ -35,31 +40,83 @@ namespace Leap.Unity.Interaction {
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
     protected LEAP_IE_KABSCH _kabsch;
 
-    protected Bounds _debugBounds;
+    private Coroutine _graphicalLerpCoroutine = null;
+
+    private Bounds _debugBounds;
 
     #region PUBLIC METHODS
 
+    /// <summary>
+    /// Sets or Gets whether or not this InteractionBehaviour is Kinematic or not.  Always use this instead
+    /// of Rigidbody.IsKinematic because InteractionBehaviour overrides the kinematic status of the Rigidbody.
+    /// </summary>
     public bool IsKinematic {
       get {
         return _isKinematic;
       }
       set {
         _isKinematic = value;
-        if (!IsRegisteredWithManager) {
+        if (HasShapeInstance) {
+          if (!IsBeingGrasped) {
+            _rigidbody.isKinematic = value;
+          }
+        } else {
           _rigidbody.isKinematic = value;
         }
       }
     }
 
+    /// <summary>
+    /// Sets or Gets whether or not this InteractionBehaviour uses Gravity or not.  Always use this instead
+    /// of Rigidbody.UseGravity because InteractionBehaviour overrides the gravity status of the Rigidbody.
+    /// </summary>
     public bool UseGravity {
       get {
         return _useGravity;
       }
       set {
         _useGravity = value;
-        if (!IsRegisteredWithManager) {
+        if (!HasShapeInstance) {
           _rigidbody.useGravity = _useGravity;
         }
+      }
+    }
+
+    public Transform GraphicalAnchor {
+      get {
+        return _graphicalAnchor;
+      }
+      set {
+        if (_graphicalLerpCoroutine != null) {
+          StopCoroutine(_graphicalLerpCoroutine);
+          _graphicalLerpCoroutine = null;
+        }
+
+        if (_graphicalAnchor != null) {
+          _graphicalAnchor.gameObject.SetActive(true);
+        }
+
+        _graphicalAnchor = value;
+
+        updateRendererStatus();
+      }
+    }
+
+    public float GraphicalReturnTime {
+      get {
+        return _graphicalReturnTime;
+      }
+      set {
+        _graphicalReturnTime = value;
+      }
+    }
+
+    public bool PushingEnabled {
+      get {
+        return _pushingEnabled;
+      }
+      set {
+        _pushingEnabled = value;
       }
     }
 
@@ -78,39 +135,43 @@ namespace Leap.Unity.Interaction {
 
     #region INTERACTION CALLBACKS
 
-    public override void OnRegister() {
-      base.OnRegister();
+    protected override void OnRegistered() {
+      base.OnRegistered();
 
       _rigidbody = GetComponent<Rigidbody>();
       if (_rigidbody == null) {
         throw new InvalidOperationException("InteractionBehaviour must have a Rigidbody component attached to it.");
       }
 
-      _isKinematic = _rigidbody.isKinematic;
-      _useGravity = _rigidbody.useGravity;
-
-      //Gravity is always manually applied
-      _rigidbody.useGravity = false;
-
       KabschC.Construct(ref _kabsch);
     }
 
-    public override void OnUnregister() {
-      base.OnUnregister();
+    protected override void OnUnregistered() {
+      base.OnUnregistered();
 
-      _rigidbody.isKinematic = _isKinematic;
-      _rigidbody.useGravity = _useGravity;
+      _rigidbody = null;
+
       KabschC.Destruct(ref _kabsch);
     }
 
-    public override void OnPostSolve() {
+    protected override void OnPostSolve() {
       base.OnPostSolve();
 
-      if (!_recievedVelocityUpdate) {
-        _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
-        _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
-        if (_useGravity) {
-          _rigidbody.AddForce(Physics.gravity, ForceMode.Acceleration);
+      if (_recievedVelocityUpdate) {
+        if (_rigidbody.useGravity) {
+          _rigidbody.useGravity = false;
+        }
+      } else {
+        if (_rigidbody.useGravity != _useGravity) {
+          _rigidbody.useGravity = _useGravity;
+        }
+
+        if (_accumulatedLinearAcceleration != Vector3.zero) {
+          _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
+        }
+
+        if (_accumulatedAngularAcceleration != Vector3.zero) {
+          _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
         }
       }
 
@@ -121,7 +182,7 @@ namespace Leap.Unity.Interaction {
       _recievedVelocityUpdate = false;
     }
 
-    public override void OnInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
+    public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
       createInfo = new INTERACTION_CREATE_SHAPE_INFO();
       createInfo.gravity = Physics.gravity.ToCVector();
       createInfo.shapeFlags = ShapeInfoFlags.None;
@@ -133,8 +194,14 @@ namespace Leap.Unity.Interaction {
       createTransform = getRigidbodyTransform();
     }
 
-    public override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
+    protected override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
       base.OnInteractionShapeCreated(instanceHandle);
+
+      _isKinematic = _rigidbody.isKinematic;
+      _useGravity = _rigidbody.useGravity;
+
+      //Gravity is always manually applied
+      _rigidbody.useGravity = false;
 
 #if UNITY_EDITOR
       Collider[] colliders = GetComponentsInChildren<Collider>();
@@ -148,11 +215,25 @@ namespace Leap.Unity.Interaction {
 #endif
     }
 
-    public override void OnInteractionShapeUpdate(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
+    protected override void OnInteractionShapeDestroyed() {
+      base.OnInteractionShapeDestroyed();
+
+      _rigidbody.isKinematic = _isKinematic;
+      _rigidbody.useGravity = _useGravity;
+    }
+
+    public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
       updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
 
-      // Always use these flags for now.
-      updateInfo.updateFlags = UpdateInfoFlags.ApplyAcceleration | UpdateInfoFlags.VelocityEnabled;
+      updateInfo.updateFlags = UpdateInfoFlags.None;
+      if (!_notifiedOfTeleport) {
+        updateInfo.updateFlags |= UpdateInfoFlags.VelocityEnabled;
+      }
+
+      if (_pushingEnabled && !_isKinematic && !IsBeingGrasped) {
+        updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration;
+      }
+
       updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
       updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
       updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
@@ -166,8 +247,8 @@ namespace Leap.Unity.Interaction {
       interactionTransform = getRigidbodyTransform();
     }
 
-    public override void OnRecieveSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
-      base.OnRecieveSimulationResults(results);
+    protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
+      base.OnRecievedSimulationResults(results);
 
       if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
         _rigidbody.Sleep();
@@ -177,8 +258,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override void OnHandGrasp(Hand hand) {
-      base.OnHandGrasp(hand);
+    protected override void OnHandGrasped(Hand hand) {
+      base.OnHandGrasped(hand);
 
       var newCollection = HandPointCollection.Create(_rigidbody);
       _handIdToPoints[hand.Id] = newCollection;
@@ -193,28 +274,20 @@ namespace Leap.Unity.Interaction {
           Bone bone = finger.Bone(boneType);
 
           Vector3 bonePos = bone.NextJoint.ToVector3();
-          Vector3 closestOnSurface = bonePos; //TODO: how to get closest on surface?
+          Vector3 closestOnSurface = bonePos;
 
           newCollection.SetGlobalPosition(closestOnSurface, fingerType, boneType);
         }
       }
     }
 
-    public override void OnHandsHold(List<Hand> hands) {
-      base.OnHandsHold(hands);
+    protected override void OnHandsHoldPhysics(List<Hand> hands) {
+      base.OnHandsHoldPhysics(hands);
 
-      //Get old transform
-      Vector3 oldPosition = _rigidbody.position;
-      Quaternion oldRotation = _rigidbody.rotation;
-
-      //Get solved transform deltas
-      Vector3 solvedTranslation;
-      Quaternion solvedRotation;
-      getSolvedTransform(hands, oldPosition, out solvedTranslation, out solvedRotation);
-
-      //Calculate new transform using delta
-      Vector3 newPosition = oldPosition + solvedTranslation;
-      Quaternion newRotation = solvedRotation * oldRotation;
+      //Get new transform
+      Vector3 newPosition;
+      Quaternion newRotation;
+      getSolvedTransform(hands, out newPosition, out newRotation);
 
       //Apply new transform to object
       if (_notifiedOfTeleport) {
@@ -224,24 +297,35 @@ namespace Leap.Unity.Interaction {
         _rigidbody.MovePosition(newPosition);
         _rigidbody.MoveRotation(newRotation);
       }
-
-      _graphicalAnchor.position = newPosition;
-      _graphicalAnchor.rotation = newRotation;
     }
 
-    public override void OnHandRelease(Hand hand) {
-      base.OnHandRelease(hand);
+    protected override void OnHandsHoldGraphics(List<Hand> hands) {
+      base.OnHandsHoldGraphics(hands);
+
+      if (_graphicalAnchor != null) {
+        //Get new transform
+        Vector3 newPosition;
+        Quaternion newRotation;
+        getSolvedTransform(hands, out newPosition, out newRotation);
+
+        _graphicalAnchor.position = newPosition;
+        _graphicalAnchor.rotation = newRotation;
+      }
+    }
+
+    protected override void OnHandReleased(Hand hand) {
+      base.OnHandReleased(hand);
 
       removeHandPointCollection(hand.Id);
     }
 
-    public override void OnHandLostTracking(Hand oldHand) {
+    protected override void OnHandLostTracking(Hand oldHand) {
       base.OnHandLostTracking(oldHand);
 
       updateRendererStatus();
     }
 
-    public override void OnHandRegainedTracking(Hand newHand, int oldId) {
+    protected override void OnHandRegainedTracking(Hand newHand, int oldId) {
       base.OnHandRegainedTracking(newHand, oldId);
 
       updateRendererStatus();
@@ -254,7 +338,7 @@ namespace Leap.Unity.Interaction {
       NotifyTeleported();
     }
 
-    public override void OnHandTimeout(Hand oldHand) {
+    protected override void OnHandTimeout(Hand oldHand) {
       base.OnHandTimeout(oldHand);
 
       updateRendererStatus();
@@ -264,6 +348,10 @@ namespace Leap.Unity.Interaction {
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
 
+      if (_graphicalLerpCoroutine != null) {
+        StopCoroutine(_graphicalLerpCoroutine);
+      }
+
       if (!_isKinematic) {
         _rigidbody.isKinematic = true;
       }
@@ -271,6 +359,10 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnGraspEnd() {
       base.OnGraspEnd();
+
+      if (_graphicalAnchor != null) {
+        _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
+      }
 
       if (!_isKinematic) {
         _rigidbody.isKinematic = false;
@@ -281,6 +373,27 @@ namespace Leap.Unity.Interaction {
     #region UNITY CALLBACKS
     protected virtual void Awake() {
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
+    }
+
+    protected IEnumerator lerpGraphicalToOrigin() {
+      Vector3 startOffset = _graphicalAnchor.position - transform.position;
+      Quaternion startRot = _graphicalAnchor.localRotation;
+      float startTime = Time.time;
+      while (true) {
+        yield return null;
+
+        float t = Mathf.InverseLerp(startTime, startTime + _graphicalReturnTime, Time.time);
+        float percent = t * t * (3 - 2 * t);
+
+        _graphicalAnchor.position = transform.position + Vector3.Lerp(startOffset, Vector3.zero, percent);
+        _graphicalAnchor.localRotation = Quaternion.Slerp(startRot, Quaternion.identity, percent);
+
+        if (percent >= 1.0f) {
+          break;
+        }
+      }
+
+      _graphicalLerpCoroutine = null;
     }
 
     protected virtual void OnDrawGizmos() {
@@ -311,7 +424,9 @@ namespace Leap.Unity.Interaction {
       int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;
       bool shouldBeVisible = GraspingHandCount == 0 || trackedGraspingHandCount > 0;
 
-      _graphicalAnchor.gameObject.SetActive(shouldBeVisible);
+      if (_graphicalAnchor != null) {
+        _graphicalAnchor.gameObject.SetActive(shouldBeVisible);
+      }
     }
 
     protected void removeHandPointCollection(int handId) {
@@ -320,7 +435,7 @@ namespace Leap.Unity.Interaction {
       HandPointCollection.Return(collection);
     }
 
-    protected void getSolvedTransform(List<Hand> hands, Vector3 oldPosition, out Vector3 translation, out Quaternion rotation) {
+    protected void getSolvedTransform(List<Hand> hands, out Vector3 newPosition, out Quaternion newRotation) {
       KabschC.Reset(ref _kabsch);
 
       for (int h = 0; h < hands.Count; h++) {
@@ -341,8 +456,8 @@ namespace Leap.Unity.Interaction {
             Vector3 bonePos = bone.NextJoint.ToVector3();
 
             //Do the solve such that the objects positions are matched to the new bone positions
-            LEAP_VECTOR point1 = (objectPos - oldPosition).ToCVector();
-            LEAP_VECTOR point2 = (bonePos - oldPosition).ToCVector();
+            LEAP_VECTOR point1 = (objectPos - _rigidbody.position).ToCVector();
+            LEAP_VECTOR point2 = (bonePos - _rigidbody.position).ToCVector();
 
             KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
           }
@@ -356,8 +471,12 @@ namespace Leap.Unity.Interaction {
       KabschC.GetTranslation(ref _kabsch, out leapTranslation);
       KabschC.GetRotation(ref _kabsch, out leapRotation);
 
-      translation = leapTranslation.ToVector3();
-      rotation = leapRotation.ToQuaternion();
+      Vector3 solvedTranslation = leapTranslation.ToVector3();
+      Quaternion solvedRotation = leapRotation.ToQuaternion();
+
+      //Calculate new transform using delta
+      newPosition = _rigidbody.position + solvedTranslation;
+      newRotation = solvedRotation * _rigidbody.rotation; ;
     }
 
     protected class HandPointCollection {
