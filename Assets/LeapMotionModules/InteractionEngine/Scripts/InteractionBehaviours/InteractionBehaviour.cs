@@ -64,6 +64,7 @@ namespace Leap.Unity.Interaction {
     private Coroutine _graphicalLerpCoroutine = null;
 
     private Bounds _debugBounds;
+    private bool _showDebugRecievedVelocity = false;
 
     #region PUBLIC METHODS
 
@@ -312,6 +313,10 @@ namespace Leap.Unity.Interaction {
         _rigidbody.velocity = results.linearVelocity.ToVector3();
         _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
         _recievedVelocityUpdate = true;
+
+#if UNITY_EDITOR
+        _showDebugRecievedVelocity = true;
+#endif
       }
     }
 
@@ -465,7 +470,18 @@ namespace Leap.Unity.Interaction {
         Matrix4x4 gizmosMatrix = Gizmos.matrix;
 
         Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
-        Gizmos.color = IsBeingGrasped ? Color.green : Color.blue;
+
+        if (_rigidbody.IsSleeping()) {
+          Gizmos.color = Color.gray;
+        } else if (IsBeingGrasped) {
+          Gizmos.color = Color.green;
+        } else if (_showDebugRecievedVelocity) {
+          Gizmos.color = Color.yellow;
+          _showDebugRecievedVelocity = false;
+        } else {
+          Gizmos.color = Color.blue;
+        }
+
         Gizmos.DrawWireCube(_debugBounds.center, _debugBounds.size);
 
         Gizmos.matrix = gizmosMatrix;
