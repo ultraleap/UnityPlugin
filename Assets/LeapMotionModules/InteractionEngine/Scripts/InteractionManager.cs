@@ -391,6 +391,7 @@ namespace Leap.Unity.Interaction {
 
     #region INTERNAL METHODS
     private IEnumerator simulationLoop() {
+      //We use a coroutine so that our logic happens after all FixedUpdate calls
       WaitForFixedUpdate fixedUpdate = new WaitForFixedUpdate();
       while (true) {
         yield return fixedUpdate;
