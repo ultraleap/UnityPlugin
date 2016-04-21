@@ -463,6 +463,19 @@ namespace Leap.Unity.Interaction {
       _graphicalLerpCoroutine = null;
     }
 
+#if UNITY_EDITOR
+    private void OnCollisionEnter(Collision collision) {
+      GameObject otherObj = collision.collider.gameObject;
+      if (otherObj.GetComponentInParent<IHandModel>() != null) {
+        UnityEditor.EditorUtility.DisplayDialog("Collision Detected!",
+                                                "A collision between an InteractionBehaviour and a Hand was detected!  " +
+                                                "For interaction to work properly please disable collision between interaction.",
+                                                "Ok");
+        Debug.Break();
+      }
+    }
+#endif
+
     protected virtual void OnDrawGizmos() {
       if (IsRegisteredWithManager) {
         Matrix4x4 gizmosMatrix = Gizmos.matrix;
