@@ -35,7 +35,7 @@ namespace Leap.Unity.Interaction.CApi {
   public enum SceneInfoFlags : uint {
     None                  = 0x00,
     HasGravity            = 0x01,
-    PhysicsEnabled        = 0x02,
+    ContactEnabled        = 0x02,
     GraspEnabled          = 0x04
   };
 
@@ -56,7 +56,7 @@ namespace Leap.Unity.Interaction.CApi {
   }
 
   public enum ManipulatorMode : uint {
-    Physics,
+    Contact,
     Grasp,
     NoInteraction,
   }

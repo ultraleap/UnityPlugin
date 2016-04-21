@@ -594,7 +594,7 @@ namespace Leap.Unity.Interaction {
 
               break;
             }
-          case ManipulatorMode.Physics:
+          case ManipulatorMode.Contact:
             {
               if (interactionHand.graspedObject != null) {
                 _graspedBehaviours.Remove(interactionHand.graspedObject);
@@ -749,7 +749,7 @@ namespace Leap.Unity.Interaction {
       info.sceneFlags = SceneInfoFlags.HasGravity;
 
       if (_enableContact) {
-        info.sceneFlags |= SceneInfoFlags.PhysicsEnabled;
+        info.sceneFlags |= SceneInfoFlags.ContactEnabled;
       }
 
       if (_enableGrasping) {
