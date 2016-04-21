@@ -13,7 +13,7 @@ public class CameraFacer : MonoBehaviour {
     float eulerX = ConstrainX ? transform.rotation.eulerAngles.x : lookRotation.eulerAngles.x;
     float eulerY = ConstrainY ? transform.rotation.eulerAngles.y : lookRotation.eulerAngles.y;
     float eulerZ = ConstrainZ ? transform.rotation.eulerAngles.z : lookRotation.eulerAngles.z;
-    transform.rotation = Quaternion.Euler(eulerX, eulerY, eulerZ);
-//    transform.localRotation = Quaternion.Euler(eulerX, eulerY, eulerZ);
+    //transform.rotation = Quaternion.Euler(eulerX, eulerY, eulerZ);
+    transform.localRotation = Quaternion.Euler(eulerX, eulerY, eulerZ);
 	}
 }
