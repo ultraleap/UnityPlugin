@@ -100,12 +100,12 @@ namespace Leap.Unity.Interaction.Tests {
       sphere.radius = 1.0f;
 
       IntPtr spherePtr = StructAllocator.AllocateStruct(ref sphere);
-      
+
       InteractionC.AddShapeDescription(ref _scene, spherePtr, out _shapeDescriptionHandle);
 
       INTERACTION_CREATE_SHAPE_INFO info = new INTERACTION_CREATE_SHAPE_INFO();
       info.gravity = Vector3.zero.ToCVector();
-      info.shapeFlags = ShapeInfoFlags.GravityEnabled | ShapeInfoFlags.HasRigidBody;
+      info.shapeFlags = ShapeInfoFlags.HasRigidBody;
 
       INTERACTION_TRANSFORM transform = new INTERACTION_TRANSFORM();
       transform.position = Vector3.zero.ToCVector();
