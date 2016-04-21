@@ -160,6 +160,12 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
   m_IsPrefabParent: 0
+--- !u!114 &125884215 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78,
+    type: 2}
+  m_PrefabInternal: {fileID: 125884214}
+  m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
 --- !u!4 &125884216 stripped
 Transform:
   m_PrefabParentObject: {fileID: 464466, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
@@ -1062,7 +1068,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _eyeType:
     _orderType: 3
-  _overrideEyePosition: 1
+  _overrideEyePosition: 0
 --- !u!114 &796518404
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1075,7 +1081,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4499ae867a57a90449cb9069c466ade0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _depthTextureMode: 1
+  _depthTextureMode: 0
 --- !u!20 &796518405
 Camera:
   m_ObjectHideFlags: 0
@@ -1241,7 +1247,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 025cc0fa7b46aa541aba29d28d35ac09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isHeadMounted: 0
+  _isHeadMounted: 1
   _overrideDeviceType: 0
   _overrideDeviceTypeWith: 1
   _useInterpolation: 0
@@ -1258,7 +1264,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelCollection: []
+  ModelCollection:
+  - LeftModel: {fileID: 125884215}
+    RightModel: {fileID: 1884541115}
   ModelPool: []
   EnforceHandedness: 0
 --- !u!114 &972296618
@@ -2345,6 +2353,12 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
   m_IsPrefabParent: 0
+--- !u!114 &1884541115 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3,
+    type: 2}
+  m_PrefabInternal: {fileID: 1884541114}
+  m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
 --- !u!4 &1884541116 stripped
 Transform:
   m_PrefabParentObject: {fileID: 464466, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
