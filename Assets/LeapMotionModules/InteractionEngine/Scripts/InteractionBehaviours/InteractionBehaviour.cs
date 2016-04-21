@@ -45,7 +45,7 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("Should a hand be able to impart pushing forces to this object.")]
     [SerializeField]
-    protected bool _pushingEnabled = true;
+    protected bool _enableContact = true;
 
     protected Renderer[] _renderers;
     protected Rigidbody _rigidbody;
@@ -150,10 +150,10 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public bool PushingEnabled {
       get {
-        return _pushingEnabled;
+        return _enableContact;
       }
       set {
-        _pushingEnabled = value;
+        _enableContact = value;
       }
     }
 
@@ -248,10 +248,6 @@ namespace Leap.Unity.Interaction {
         createInfo.shapeFlags |= ShapeInfoFlags.HasRigidBody;
       }
 
-      if (_useGravity) {
-        createInfo.shapeFlags |= ShapeInfoFlags.GravityEnabled;
-      }
-
       createTransform = getRigidbodyTransform();
     }
 
@@ -285,14 +281,12 @@ namespace Leap.Unity.Interaction {
     public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
       updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
 
-      //Always use explicit velocity for now
-      updateInfo.updateFlags = UpdateInfoFlags.ExplicitVelocity;
-
-      if (_notifiedOfTeleport) {
-        updateInfo.updateFlags |= UpdateInfoFlags.ResetVelocity;
+      updateInfo.updateFlags = UpdateInfoFlags.None;
+      if (!_notifiedOfTeleport) {
+        updateInfo.updateFlags |= UpdateInfoFlags.VelocityEnabled;
       }
 
-      if (_pushingEnabled && !_isKinematic && !IsBeingGrasped) {
+      if (_enableContact && !_isKinematic && !IsBeingGrasped) {
         updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration;
       }
 
@@ -300,6 +294,10 @@ namespace Leap.Unity.Interaction {
       updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
       updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
       updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
+
+      if (_useGravity) {
+        updateInfo.updateFlags |= UpdateInfoFlags.GravityEnabled;
+      }
 
       interactionTransform = getRigidbodyTransform();
     }
@@ -464,6 +462,19 @@ namespace Leap.Unity.Interaction {
       //Null out coroutine reference when finished
       _graphicalLerpCoroutine = null;
     }
+
+#if UNITY_EDITOR
+    private void OnCollisionEnter(Collision collision) {
+      GameObject otherObj = collision.collider.gameObject;
+      if (otherObj.GetComponentInParent<IHandModel>() != null) {
+        UnityEditor.EditorUtility.DisplayDialog("Collision Detected!",
+                                                "A collision between an InteractionBehaviour and a Hand was detected!  " +
+                                                "For interaction to work properly please disable collision between interaction.",
+                                                "Ok");
+        Debug.Break();
+      }
+    }
+#endif
 
     protected virtual void OnDrawGizmos() {
       if (IsRegisteredWithManager) {

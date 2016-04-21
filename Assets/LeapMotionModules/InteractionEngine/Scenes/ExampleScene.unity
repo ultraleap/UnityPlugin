@@ -216,7 +216,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 869198656}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!54 &143627045
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -538,7 +538,7 @@ GameObject:
   - 33: {fileID: 493052516}
   - 65: {fileID: 493052515}
   - 23: {fileID: 493052514}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -772,7 +772,7 @@ GameObject:
   - 33: {fileID: 671288000}
   - 65: {fileID: 671287999}
   - 23: {fileID: 671287998}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -917,7 +917,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 432594273}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!54 &718397159
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -956,7 +956,7 @@ GameObject:
   - 33: {fileID: 784447002}
   - 65: {fileID: 784447001}
   - 23: {fileID: 784447000}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1017,7 +1017,7 @@ Transform:
   m_LocalRotation: {x: -0.09229592, y: 0.7010567, z: 0.092295736, w: 0.7010581}
   m_LocalPosition: {x: -1.415769, y: 3.550533, z: -1.5674014}
   m_LocalScale: {x: 4, y: 0.20000002, z: 2}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -15, y: 89.9999, z: 0}
   m_Children: []
   m_Father: {fileID: 682435271}
   m_RootOrder: 2
@@ -1248,9 +1248,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isHeadMounted: 1
-  _overrideDeviceType: 1
+  _overrideDeviceType: 0
   _overrideDeviceTypeWith: 1
-  _useInterpolation: 1
+  _useInterpolation: 0
   _interpolationDelay: 15
 --- !u!114 &972296617
 MonoBehaviour:
@@ -1587,13 +1587,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   provider: {fileID: 972296616}
   recenter: 114
-  tweenImageWarping: 1
+  tweenImageWarping: 0
   tweenRotationalWarping: 1
   tweenPositionalWarping: 0
-  syncMode: 1
+  syncMode: 0
   allowManualTimeAlignment: 0
-  warpingAdjustment: 20
-  unlockHold: 0
+  warpingAdjustment: 60
+  unlockHold: 303
   moreRewind: 276
   lessRewind: 275
 --- !u!1 &1203671703
@@ -1670,7 +1670,7 @@ GameObject:
   - 33: {fileID: 1345401779}
   - 65: {fileID: 1345401778}
   - 23: {fileID: 1345401777}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1781,7 +1781,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 997335263}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!54 &1359167687
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1839,10 +1839,11 @@ MonoBehaviour:
   _leapProvider: {fileID: 972296616}
   _dataSubfolder: InteractionEngine
   _untrackedTimeout: 0.5
-  _enablePushing: 1
+  _enableContact: 1
+  _enableGrasping: 1
   _enableSimulation: 1
-  _showDebugLines: 0
-  _showDebugOutput: 0
+  _showDebugLines: 1
+  _showDebugOutput: 1
 --- !u!4 &1473219678
 Transform:
   m_ObjectHideFlags: 0
@@ -1909,7 +1910,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 1935213665}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!54 &1493679624
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2095,7 +2096,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 668376984}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!4 &1721542081
 Transform:
   m_ObjectHideFlags: 0
@@ -2183,7 +2184,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 104011635}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!54 &1781426150
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2500,7 +2501,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 1819474273}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!54 &1995768976
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2539,7 +2540,7 @@ GameObject:
   - 33: {fileID: 2021251538}
   - 65: {fileID: 2021251537}
   - 23: {fileID: 2021251536}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Platform
   m_TagString: Untagged
   m_Icon: {fileID: 0}

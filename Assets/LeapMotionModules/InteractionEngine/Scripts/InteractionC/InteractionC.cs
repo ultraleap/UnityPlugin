@@ -15,6 +15,7 @@ namespace Leap.Unity.Interaction.CApi {
     NeverUpdated = 5,
     UnknownError = 6,
     BadData = 7,
+    MissingFile = 8,
 
     StoppedOnNonDeterministic = 100,
     StoppedOnUnexpectedFailure = 101,
@@ -32,21 +33,22 @@ namespace Leap.Unity.Interaction.CApi {
   }
 
   public enum SceneInfoFlags : uint {
-    None = 0x00,
-    HasGravity = 0x01
+    None                  = 0x00,
+    HasGravity            = 0x01,
+    ContactEnabled        = 0x02,
+    GraspEnabled          = 0x04
   };
 
   public enum ShapeInfoFlags : uint {
     None = 0x00,
     HasRigidBody = 0x01,
-    GravityEnabled = 0x02
   };
 
   public enum UpdateInfoFlags : uint {
     None = 0x00,
-    ResetVelocity = 0x01, // E.g. teleported.
-    ApplyAcceleration = 0x02,
-    ExplicitVelocity = 0x04
+    ApplyAcceleration = 0x01,
+    VelocityEnabled = 0x02,
+    GravityEnabled = 0x04
   };
 
   public enum HandResultFlags : uint {
@@ -54,7 +56,7 @@ namespace Leap.Unity.Interaction.CApi {
   }
 
   public enum ManipulatorMode : uint {
-    Physics,
+    Contact,
     Grasp,
     NoInteraction,
   }
@@ -262,7 +264,7 @@ namespace Leap.Unity.Interaction.CApi {
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastErrorString")]
     private static extern IntPtr GetLastErrorString();
 
-    public static ReturnStatus GetLastError(ref INTERACTION_SCENE scene, 
+    public static ReturnStatus GetLastError(ref INTERACTION_SCENE scene,
                                             out string message) {
       ReturnStatus rs = GetLastError(ref scene);
       message = Marshal.PtrToStringAnsi(GetLastErrorString());

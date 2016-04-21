@@ -44,7 +44,11 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("Allow the Interaction Engine to modify object velocities when pushing.")]
     [SerializeField]
-    protected bool _enablePushing = true;
+    protected bool _enableContact = true;
+
+    [Tooltip("Allow the Interaction plugin to modify object positions by grasping.")]
+    [SerializeField]
+    protected bool _enableGrasping = true;
 
     [Header("Debug")]
     [Tooltip("Allows simulation to be disabled without destroying the scene in any way.")]
@@ -142,6 +146,32 @@ namespace Leap.Unity.Interaction {
     public IEnumerable<IInteractionBehaviour> GraspedObjects {
       get {
         return _graspedBehaviours;
+      }
+    }
+
+    /// <summary>
+    /// Sets or Gets whether or not the Interaction Engine can modify object velocities when pushing.
+    /// </summary>
+    public bool EnableContact {
+      get {
+        return _enableContact;
+      }
+      set {
+        _enableContact = value;
+        UpdateSceneInfo();
+      }
+    }
+
+    /// <summary>
+    /// Sets or Gets whether or not the Interaction plugin to modify object positions by grasping.
+    /// </summary>
+    public bool EnableGrasping {
+      get {
+        return _enableGrasping;
+      }
+      set {
+        _enableGrasping = value;
+        UpdateSceneInfo();
       }
     }
 
@@ -251,6 +281,8 @@ namespace Leap.Unity.Interaction {
       if (Application.isPlaying && _hasSceneBeenCreated) {
         //Allow the debug lines to be toggled while the scene is playing
         applyDebugSettings();
+        //Allow scene info to be updated while the scene is playing
+        UpdateSceneInfo();
       }
 
       //Timeout must be positive
@@ -397,7 +429,7 @@ namespace Leap.Unity.Interaction {
       updateInteractionStateChanges(frame);
 
       // TODO: Pass a debug flag to disable calculating velocities.
-      if (_enablePushing) {
+      if (_enableContact) {
         dispatchSimulationResults();
       }
 
@@ -562,7 +594,7 @@ namespace Leap.Unity.Interaction {
 
               break;
             }
-          case ManipulatorMode.Physics:
+          case ManipulatorMode.Contact:
             {
               if (interactionHand.graspedObject != null) {
                 _graspedBehaviours.Remove(interactionHand.graspedObject);
@@ -676,7 +708,7 @@ namespace Leap.Unity.Interaction {
       INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle = interactionBehaviour.ShapeInstanceHandle;
 
       _instanceHandleToBehaviour.Remove(instanceHandle);
-      
+
       InteractionC.DestroyShapeInstance(ref _scene, ref instanceHandle);
 
       interactionBehaviour.NotifyInteractionShapeDestroyed();
@@ -713,7 +745,17 @@ namespace Leap.Unity.Interaction {
     private INTERACTION_SCENE_INFO getSceneInfo() {
       INTERACTION_SCENE_INFO info = new INTERACTION_SCENE_INFO();
       info.gravity = Physics.gravity.ToCVector();
+
       info.sceneFlags = SceneInfoFlags.HasGravity;
+
+      if (_enableContact) {
+        info.sceneFlags |= SceneInfoFlags.ContactEnabled;
+      }
+
+      if (_enableGrasping) {
+        info.sceneFlags |= SceneInfoFlags.GraspEnabled;
+      }
+
       return info;
     }
 

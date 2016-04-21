@@ -15,7 +15,7 @@ namespace Leap.Unity.Interaction {
 
       if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab) {
         specifyCustomDecorator("_graphicalAnchor", graphicalAnchor);
-        specifyCustomDrawer("_pushingEnabled", pushingDrawer);
+        specifyCustomDrawer("_enableContact", contactDrawer);
       }
     }
 
@@ -48,7 +48,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private void pushingDrawer(SerializedProperty prop) {
+    private void contactDrawer(SerializedProperty prop) {
       bool shouldShow = false;
 
       if (_interactionBehaviour == null) {
