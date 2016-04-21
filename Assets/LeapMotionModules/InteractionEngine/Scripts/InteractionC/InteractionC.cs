@@ -15,6 +15,7 @@ namespace Leap.Unity.Interaction.CApi {
     NeverUpdated = 5,
     UnknownError = 6,
     BadData = 7,
+    MissingFile = 8,
 
     StoppedOnNonDeterministic = 100,
     StoppedOnUnexpectedFailure = 101,
@@ -32,8 +33,10 @@ namespace Leap.Unity.Interaction.CApi {
   }
 
   public enum SceneInfoFlags : uint {
-    None = 0x00,
-    HasGravity = 0x01
+    None                  = 0x00,
+    HasGravity            = 0x01,
+    PhysicsEnabled        = 0x02,
+    GraspEnabled          = 0x04
   };
 
   public enum ShapeInfoFlags : uint {

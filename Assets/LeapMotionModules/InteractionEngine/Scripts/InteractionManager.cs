@@ -430,7 +430,7 @@ namespace Leap.Unity.Interaction {
 
       InteractionC.UpdateController(ref _scene, ref _controllerTransform);
     }
-    
+
     protected virtual void updateInteractionStateChanges(Frame frame) {
       var hands = frame.Hands;
 
@@ -663,7 +663,7 @@ namespace Leap.Unity.Interaction {
     private INTERACTION_SCENE_INFO getSceneInfo() {
       INTERACTION_SCENE_INFO info = new INTERACTION_SCENE_INFO();
       info.gravity = Physics.gravity.ToCVector();
-      info.sceneFlags = SceneInfoFlags.HasGravity;
+      info.sceneFlags = SceneInfoFlags.HasGravity | SceneInfoFlags.PhysicsEnabled | SceneInfoFlags.GraspEnabled;
       return info;
     }
 

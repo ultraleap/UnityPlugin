@@ -103,6 +103,10 @@ namespace Leap.Unity.Interaction.CApi {
           message = "Bad Data";
           logLevel = LogLevel.Error;
           return;
+        case ReturnStatus.MissingFile:
+          message = "MissingFile";
+          logLevel = LogLevel.Error;
+          return;
         case ReturnStatus.StoppedOnNonDeterministic:
           message = "Stopped on Non Deterministic";
           logLevel = LogLevel.Error;
@@ -127,6 +131,7 @@ namespace Leap.Unity.Interaction.CApi {
           message = "Paused";
           logLevel = LogLevel.Verbose;
           return;
+
         default:
           throw new ArgumentException("Unexpected return status " + rs);
       }
