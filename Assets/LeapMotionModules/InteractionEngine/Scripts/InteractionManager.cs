@@ -759,6 +759,7 @@ namespace Leap.Unity.Interaction {
     }
 
     //A persistant structure for storing useful data about a hand as it interacts with objects
+    //TODO: Investigate pooling?
     protected class InteractionHand {
       public Hand hand { get; protected set; }
       public float lastTimeUpdated { get; protected set; }
