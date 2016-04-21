@@ -28,7 +28,7 @@ namespace Leap.Unity.Interaction.Tests {
       _pool.RemoveAllShapes();
       _pool = null;
 
-      Object.DestroyImmediate(_mesh);
+      Object.DestroyImmediate(_mesh); 
 
       base.Teardown();
     }

@@ -16,7 +16,7 @@ namespace Leap.Unity.Interaction {
 
     #region INTERNAL FIELDS
     private bool _isRegisteredWithManager = false;
-
+ 
     private bool _hasShapeDescriptionBeenCreated = false;
     private INTERACTION_SHAPE_DESCRIPTION_HANDLE _shapeDescriptionHandle;
 
