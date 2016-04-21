@@ -15,8 +15,10 @@ namespace Leap.Unity{
     private const float CYLINDER_RADIUS = 0.006f;
     private const float PALM_RADIUS = 0.015f;
 
-    private static int _colorIndex = 0;
-    private static Color[] _colorList = { Color.blue, Color.green, Color.magenta, Color.cyan, Color.red, Color.yellow };
+    private static int _leftColorIndex = 0;
+    private static int _rightColorIndex = 0;
+    private static Color[] _leftColorList = { Color.blue, Color.magenta };
+    private static Color[] _rightColorList = { Color.red, Color.yellow };
 
     [SerializeField]
     private bool _showArm = true;
@@ -72,8 +74,14 @@ namespace Leap.Unity{
       if (_material != null) {
         jointMat = new Material(_material);
         jointMat.hideFlags = HideFlags.DontSaveInEditor;
-        jointMat.color = _colorList[_colorIndex];
-        _colorIndex = (_colorIndex + 1) % _colorList.Length;
+
+        if (hand_.IsLeft) {
+          jointMat.color = _leftColorList[_leftColorIndex];
+          _leftColorIndex = (_leftColorIndex + 1) % _leftColorList.Length;
+        } else {
+          jointMat.color = _rightColorList[_rightColorIndex];
+          _rightColorIndex = (_rightColorIndex + 1) % _rightColorList.Length;
+        }
       }
 
       _jointSpheres = new Transform[4 * 5];
