@@ -590,7 +590,6 @@ namespace Leap.Unity.Interaction {
               } else {
                 Debug.LogError("Recieved a hand result with an unkown handle " + handResult.instanceHandle.handle);
               }
-
               break;
             }
           case ManipulatorMode.Contact:
@@ -605,7 +604,6 @@ namespace Leap.Unity.Interaction {
                   Debug.LogException(e);
                   continue;
                 }
-
               }
               break;
             }
