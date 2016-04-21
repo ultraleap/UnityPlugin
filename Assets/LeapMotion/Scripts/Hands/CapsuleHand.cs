@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using Leap;
 using System;
 
-namespace Leap.Unity{
+namespace Leap.Unity {
   /** A basic Leap hand model constructed dynamically vs. using pre-existing geometry*/
   public class CapsuleHand : IHandModel {
 
-    private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4 ;
-    private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4 ;
+    private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4;
+    private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4;
 
     private const float SPHERE_RADIUS = 0.008f;
     private const float CYLINDER_RADIUS = 0.006f;
@@ -17,8 +17,8 @@ namespace Leap.Unity{
 
     private static int _leftColorIndex = 0;
     private static int _rightColorIndex = 0;
-    private static Color[] _leftColorList = { Color.blue, Color.magenta };
-    private static Color[] _rightColorList = { Color.red, Color.yellow };
+    private static Color[] _leftColorList = { new Color(0.0f, 0.0f, 1.0f), new Color(0.2f, 0.0f, 0.4f), new Color(0.0f, 0.2f, 0.2f) };
+    private static Color[] _rightColorList = { new Color(1.0f, 0.0f, 0.0f), new Color(1.0f, 1.0f, 0.0f), new Color(1.0f, 0.5f, 0.0f) };
 
     [SerializeField]
     private bool _showArm = true;
@@ -74,14 +74,6 @@ namespace Leap.Unity{
       if (_material != null) {
         jointMat = new Material(_material);
         jointMat.hideFlags = HideFlags.DontSaveInEditor;
-
-        if (hand_.IsLeft) {
-          jointMat.color = _leftColorList[_leftColorIndex];
-          _leftColorIndex = (_leftColorIndex + 1) % _leftColorList.Length;
-        } else {
-          jointMat.color = _rightColorList[_rightColorIndex];
-          _rightColorIndex = (_rightColorIndex + 1) % _rightColorList.Length;
-        }
       }
 
       _jointSpheres = new Transform[4 * 5];
@@ -94,6 +86,18 @@ namespace Leap.Unity{
       createCapsules();
 
       updateArmVisibility();
+    }
+
+    public override void BeginHand() {
+      base.BeginHand();
+
+      if (hand_.IsLeft) {
+        jointMat.color = _leftColorList[_leftColorIndex];
+        _leftColorIndex = (_leftColorIndex + 1) % _leftColorList.Length;
+      } else {
+        jointMat.color = _rightColorList[_rightColorIndex];
+        _rightColorIndex = (_rightColorIndex + 1) % _rightColorList.Length;
+      }
     }
 
     public override void UpdateHand() {
@@ -175,8 +179,7 @@ namespace Leap.Unity{
         Vector3 perp;
         if (Vector3.Angle(delta, Vector3.up) > 170 || Vector3.Angle(delta, Vector3.up) < 10) {
           perp = Vector3.Cross(delta, Vector3.right);
-        }
-        else {
+        } else {
           perp = Vector3.Cross(delta, Vector3.up);
         }
 
