@@ -7,6 +7,27 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
+  /// <summary>
+  /// InteractionBehaviour is the default implementation of IInteractionBehaviour. It has the following features:
+  ///    - Extends from InteractionBehaviourBase to take advantage of it's bookkeeping and callbacks.
+  ///    - Supports kinematic movement as well as physical movement.
+  ///    - When non-kinematic, supports pushing.
+  ///    - Has the concept of a graphical anchor to reduce apparent latency between a hand moving and the object responding.
+  ///      This can result in the graphical representation diverging slightly from the physical representation.
+  ///    - Utilizes the Kabsch algorithm to determine how the object should rest in the hand when grabbed.
+  ///      This allows more fidelity than simple rigid atatchment to the hand, as well as more intuitive multi-hand
+  ///      interaction.
+  /// 
+  /// This default implementation has the following requirements:
+  ///    - A Rigidbody is required 
+  ///    - Kinematic movement must still be simulated via Rigidbody kinematic movement, as opposed to rigid movement of the Transform.
+  ///    - This behaviour cannot be a child of another InteractionBehaviour.
+  ///    - Any non-continuous movement must be noted using the NotifyTeleported() method.
+  ///    - Any forces or torques must be applied using the AddLinearAcceleration and AddAngularAcceleration methods instead of
+  ///      the Rigidbody AddForce or AddTorque methods.
+  ///    - Any update of the kinematic or gravity status of the object must be done through setting the IsKinematic or UseGravity
+  ///      properties of this behaviour instead of the properties on the Rigidbody component.
+  /// </summary>
   [SelectionBase]
   [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviour : InteractionBehaviourBase {

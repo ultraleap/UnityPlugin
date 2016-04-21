@@ -8,11 +8,33 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
+  /// <summary>
+  /// InteractionManager is the core behaviour that manages the IInteractionBehaviours in the scene.
+  /// This class allows IInteractionBehaviours to register with it and provides all of the callbacks
+  /// needed for operation.  This class also takes care of all bookkeeping to keep track of the objects,
+  /// hands, and the internal state of the interaction plugin.
+  /// 
+  /// InteractionManager has the following features:
+  ///    - Allows instances of IInteractionBehaviour to register or unregister with it.
+  ///    - Registered instances stay registered even if this behaviour is disabled.
+  ///    - Dispatches events to the interaction plugin and uses the returned data to drive the registered
+  ///      behaviours.  Takes care of all bookkeeping needed to maintain the internal state.
+  ///    - Supports the concept of 'suspension', where an untracked hand is still allowed to be considered
+  ///      grasping an object.  This is to allow an object to not fall when a hand becomes untracked for
+  ///      a small amount of time.  This helps with actions such as throwing.
+  ///    - Multiple instances of InteractionManager are ALLOWED!  This allows you to have different simulation
+  ///      settings and control for different groups of objects.
+  /// 
+  /// InteractionManager has the following requirements:
+  ///    - The DataSubfolder property must point to a valid subfolder in the StreamingAssets data folder.
+  ///      The subfolder must contain a valid ldat file names IE.  
+  /// </summary>
   public class InteractionManager : MonoBehaviour {
     #region SERIALIZED FIELDS
     [SerializeField]
     protected LeapProvider _leapProvider;
 
+    [Tooltip("The streaming asset subolder of the data folder for the engine.")]
     [SerializeField]
     protected string _dataSubfolder = "InteractionEngine";
 
@@ -20,20 +42,22 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _untrackedTimeout = 0.5f;
 
-    [Tooltip("Allow the Interaction plugin to modify object velocities when pushing.")]
+    [Tooltip("Allow the Interaction Engine to modify object velocities when pushing.")]
     [SerializeField]
     protected bool _enablePushing = true;
 
     [Header("Debug")]
-    [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
+    [Tooltip("Allows simulation to be disabled without destroying the scene in any way.")]
     [SerializeField]
     protected bool _enableSimulation = true;
 
+    [Tooltip("Shows the debug visualization coming from the internal Interaction plugin.")]
     [SerializeField]
-    protected bool _showDebugLines = true;
+    protected bool _showDebugLines = false;
 
+    [Tooltip("Shows the debug messages coming from the internal Interaction plugin.")]
     [SerializeField]
-    protected bool _showDebugOutput = true;
+    protected bool _showDebugOutput = false;
     #endregion
 
     #region INTERNAL FIELDS

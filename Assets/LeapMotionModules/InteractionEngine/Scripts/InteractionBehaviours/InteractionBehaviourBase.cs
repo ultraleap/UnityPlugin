@@ -6,6 +6,21 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
+  /// <summary>
+  /// InteractionBehaviourBase is a utility class that implements the IInteractionBehaviour interface.  This class
+  /// aims to provide the minimum set of behaviours that can be generalized to most interaction objects, and no more.
+  /// The aim is to provide a class that takes care of the 'bookkeeping' needed to properly interface with the 
+  /// InteractionManager component, so that implementing different types of InteractionBehaviours becomes easier.
+  /// 
+  /// This behaviour has the following features:
+  ///    - Takes care of most of the bookkeeping needed to interface with the InteractionManager
+  ///    - Contains protected callbacks for use of an implementing class.  Certain callbacks like OnGraspBegin and
+  ///      OnGraspEnd provide utility functionality that is not provided by InteractionManager.
+  /// 
+  /// This behaviour has the following requirements:
+  ///    - This behaviour cannot be a sibling or a child of any other InteractionBehaviourBase.
+  ///    - Certain callbacks have been left unimplemented and must be implemented by an extending class.
+  /// </summary>
   [DisallowMultipleComponent]
   public abstract class InteractionBehaviourBase : IInteractionBehaviour {
 
