@@ -46,6 +46,10 @@ namespace Leap.Unity.Interaction {
 
     #region PUBLIC METHODS
 
+    /// <summary>
+    /// Sets or Gets whether or not this InteractionBehaviour is Kinematic or not.  Always use this instead
+    /// of Rigidbody.IsKinematic because InteractionBehaviour overrides the kinematic status of the Rigidbody.
+    /// </summary>
     public bool IsKinematic {
       get {
         return _isKinematic;
@@ -62,6 +66,10 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Sets or Gets whether or not this InteractionBehaviour uses Gravity or not.  Always use this instead
+    /// of Rigidbody.UseGravity because InteractionBehaviour overrides the gravity status of the Rigidbody.
+    /// </summary>
     public bool UseGravity {
       get {
         return _useGravity;
@@ -149,11 +157,21 @@ namespace Leap.Unity.Interaction {
     protected override void OnPostSolve() {
       base.OnPostSolve();
 
-      if (!_recievedVelocityUpdate) {
-        _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
-        _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
-        if (_useGravity) {
-          _rigidbody.AddForce(Physics.gravity, ForceMode.Acceleration);
+      if (_recievedVelocityUpdate) {
+        if (_rigidbody.useGravity) {
+          _rigidbody.useGravity = false;
+        }
+      } else {
+        if (_rigidbody.useGravity != _useGravity) {
+          _rigidbody.useGravity = _useGravity;
+        }
+
+        if (_accumulatedLinearAcceleration != Vector3.zero) {
+          _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
+        }
+
+        if (_accumulatedAngularAcceleration != Vector3.zero) {
+          _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
         }
       }
 
