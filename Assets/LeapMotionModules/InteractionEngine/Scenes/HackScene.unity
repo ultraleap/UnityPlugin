@@ -160,6 +160,12 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
   m_IsPrefabParent: 0
+--- !u!114 &125884215 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78,
+    type: 2}
+  m_PrefabInternal: {fileID: 125884214}
+  m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
 --- !u!4 &125884216 stripped
 Transform:
   m_PrefabParentObject: {fileID: 464466, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
@@ -686,7 +692,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isHeadMounted: 1
-  _overrideDeviceType: 1
+  _overrideDeviceType: 0
   _overrideDeviceTypeWith: 1
   _useInterpolation: 1
   _interpolationDelay: 15
@@ -703,10 +709,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ModelCollection:
-  - LeftModel: {fileID: 0}
-    RightModel: {fileID: 0}
-  - LeftModel: {fileID: 0}
-    RightModel: {fileID: 0}
+  - LeftModel: {fileID: 125884215}
+    RightModel: {fileID: 1884541115}
   ModelPool: []
   EnforceHandedness: 0
 --- !u!114 &972296618
@@ -809,7 +813,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   provider: {fileID: 972296616}
   recenter: 114
-  tweenImageWarping: 1
+  tweenImageWarping: 0
   tweenRotationalWarping: 1
   tweenPositionalWarping: 0
   syncMode: 1
@@ -1201,6 +1205,12 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
   m_IsPrefabParent: 0
+--- !u!114 &1884541115 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3,
+    type: 2}
+  m_PrefabInternal: {fileID: 1884541114}
+  m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
 --- !u!4 &1884541116 stripped
 Transform:
   m_PrefabParentObject: {fileID: 464466, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
