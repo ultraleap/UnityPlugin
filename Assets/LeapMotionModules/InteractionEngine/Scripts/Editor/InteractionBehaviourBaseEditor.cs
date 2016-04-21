@@ -7,22 +7,27 @@ namespace Leap.Unity.Interaction {
   [CustomEditor(typeof(InteractionBehaviourBase), true)]
   public class InteractionBehaviourBaseEditor : CustomEditorBase {
     protected InteractionBehaviour _interactionBehaviour;
+    protected InteractionManager _manager;
 
     protected override void OnEnable() {
       base.OnEnable();
 
       if (targets.Length == 1) {
         _interactionBehaviour = target as InteractionBehaviour;
+        _manager = _interactionBehaviour.GetComponentInParent<InteractionManager>();
+        if (_manager == null) {
+          _manager = FindObjectOfType<InteractionManager>();
+        }
       } else {
         _interactionBehaviour = null;
       }
 
       if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab) {
-        specifyCustomDecorator("_manager", kinematicDecorator);
+        specifyCustomDecorator("_manager", managerDectorator);
       }
     }
 
-    private void kinematicDecorator(SerializedProperty prop) {
+    private void managerDectorator(SerializedProperty prop) {
       if (_interactionBehaviour == null) {
         return;
       }
@@ -45,16 +50,6 @@ namespace Leap.Unity.Interaction {
           }
         }
       } else {
-        if (rigidbody.interpolation != RigidbodyInterpolation.Interpolate) {
-          using (new GUILayout.HorizontalScope()) {
-            EditorGUILayout.HelpBox("It is recommended to use interpolation on Rigidbodies to improve interaction fidelity.", MessageType.Warning);
-            if (GUILayout.Button("Auto-Fix")) {
-              rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-              EditorUtility.SetDirty(rigidbody);
-            }
-          }
-        }
-
         if (rigidbody.isKinematic) {
           if (rigidbody.useGravity) {
             EditorGUILayout.HelpBox("Rigidbody is set as Kinematic but has gravity enabled.", MessageType.Warning);
@@ -66,6 +61,27 @@ namespace Leap.Unity.Interaction {
             EditorGUILayout.HelpBox("Will be simulated with gravity.", MessageType.Info);
           } else {
             EditorGUILayout.HelpBox("Will be simulated without gravity.", MessageType.Info);
+          }
+        }
+
+        if (rigidbody.interpolation != RigidbodyInterpolation.Interpolate) {
+          using (new GUILayout.HorizontalScope()) {
+            EditorGUILayout.HelpBox("It is recommended to use interpolation on Rigidbodies to improve interaction fidelity.", MessageType.Warning);
+            if (GUILayout.Button("Auto-Fix")) {
+              rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+              EditorUtility.SetDirty(rigidbody);
+            }
+          }
+        }
+      }
+
+      if (prop.objectReferenceValue == null) {
+        using (new EditorGUILayout.HorizontalScope()) {
+          EditorGUILayout.HelpBox("Interaction Behaviour must be linked to an Interaction Manager", MessageType.Error);
+          if (_manager != null) {
+            if (GUILayout.Button("Auto-Fix")) {
+              prop.objectReferenceValue = _manager;
+            }
           }
         }
       }
