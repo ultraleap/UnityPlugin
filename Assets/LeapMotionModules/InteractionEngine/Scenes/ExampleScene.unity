@@ -93,7 +93,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 104011635}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: GraphicalAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -175,7 +175,7 @@ GameObject:
   - 65: {fileID: 143627046}
   - 54: {fileID: 143627045}
   - 114: {fileID: 143627044}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: InteractionCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -210,7 +210,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 869198656}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!54 &143627045
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -373,7 +373,7 @@ GameObject:
   - 4: {fileID: 315211906}
   - 33: {fileID: 315211908}
   - 23: {fileID: 315211907}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -670,7 +670,7 @@ GameObject:
   - 4: {fileID: 654654237}
   - 33: {fileID: 654654239}
   - 23: {fileID: 654654238}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -911,7 +911,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 432594273}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!54 &718397159
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1011,7 +1011,7 @@ Transform:
   m_LocalRotation: {x: -0.09229592, y: 0.7010567, z: 0.092295736, w: 0.7010581}
   m_LocalPosition: {x: -1.415769, y: 3.550533, z: -1.5674014}
   m_LocalScale: {x: 4, y: 0.20000002, z: 2}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -15, y: 89.9999, z: 0}
   m_Children: []
   m_Father: {fileID: 682435271}
   m_RootOrder: 2
@@ -1190,7 +1190,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 869198656}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: GraphicalAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1296,7 +1296,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 997335263}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: GraphicalAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1738,7 +1738,7 @@ GameObject:
   - 65: {fileID: 1359167688}
   - 54: {fileID: 1359167687}
   - 114: {fileID: 1359167686}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: InteractionCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1773,7 +1773,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 997335263}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!54 &1359167687
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1832,6 +1832,7 @@ MonoBehaviour:
   _dataSubfolder: InteractionEngine
   _untrackedTimeout: 0.5
   _enableContact: 1
+  _enableGrasping: 1
   _enableSimulation: 1
   _showDebugLines: 1
   _showDebugOutput: 1
@@ -1866,7 +1867,7 @@ GameObject:
   - 65: {fileID: 1493679625}
   - 54: {fileID: 1493679624}
   - 114: {fileID: 1493679623}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: InteractionCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1901,7 +1902,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 1935213665}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!54 &1493679624
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2087,7 +2088,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 668376984}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!4 &1721542081
 Transform:
   m_ObjectHideFlags: 0
@@ -2140,7 +2141,7 @@ GameObject:
   - 65: {fileID: 1781426151}
   - 54: {fileID: 1781426150}
   - 114: {fileID: 1781426149}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: InteractionCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2175,7 +2176,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 104011635}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!54 &1781426150
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2213,7 +2214,7 @@ GameObject:
   - 4: {fileID: 1801015273}
   - 33: {fileID: 1801015275}
   - 23: {fileID: 1801015274}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2358,7 +2359,7 @@ GameObject:
   - 4: {fileID: 1898784430}
   - 33: {fileID: 1898784432}
   - 23: {fileID: 1898784431}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2419,7 +2420,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 1935213665}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: GraphicalAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2486,7 +2487,7 @@ MonoBehaviour:
   _manager: {fileID: 1473219677}
   _graphicalAnchor: {fileID: 1819474273}
   _graphicalReturnTime: 0.25
-  _pushingEnabled: 1
+  _enableContact: 1
 --- !u!54 &1995768976
 Rigidbody:
   m_ObjectHideFlags: 0
