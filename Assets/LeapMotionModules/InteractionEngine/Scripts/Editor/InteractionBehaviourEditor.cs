@@ -69,6 +69,15 @@ namespace Leap.Unity.Interaction {
       //Create graphical anchor
       GameObject graphicalAnchor = null;
 
+      //First just check to see if there is a child named GraphicalAnchor, it might have been unlinked.
+      Transform[] children = _interactionBehaviour.GetComponentsInChildren<Transform>();
+      for (int i = 0; i < children.Length; i++) {
+        if (children[i] != _interactionBehaviour.transform && children[i].gameObject.name == "GraphicalAnchor") {
+          prop.objectReferenceValue = children[i];
+          return;
+        }
+      }
+
       //Increment group to ensure that our operations are self contained within a single Undo group.
       Undo.IncrementCurrentGroup();
 

@@ -7,6 +7,27 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
+  /// <summary>
+  /// InteractionBehaviour is the default implementation of IInteractionBehaviour. It has the following features:
+  ///    - Extends from InteractionBehaviourBase to take advantage of it's bookkeeping and callbacks.
+  ///    - Supports kinematic movement as well as physical movement.
+  ///    - When non-kinematic, supports pushing.
+  ///    - Has the concept of a graphical anchor to reduce apparent latency between a hand moving and the object responding.
+  ///      This can result in the graphical representation diverging slightly from the physical representation.
+  ///    - Utilizes the Kabsch algorithm to determine how the object should rest in the hand when grabbed.
+  ///      This allows more fidelity than simple rigid atatchment to the hand, as well as more intuitive multi-hand
+  ///      interaction.
+  /// 
+  /// This default implementation has the following requirements:
+  ///    - A Rigidbody is required 
+  ///    - Kinematic movement must still be simulated via Rigidbody kinematic movement, as opposed to rigid movement of the Transform.
+  ///    - This behaviour cannot be a child of another InteractionBehaviour.
+  ///    - Any non-continuous movement must be noted using the NotifyTeleported() method.
+  ///    - Any forces or torques must be applied using the AddLinearAcceleration and AddAngularAcceleration methods instead of
+  ///      the Rigidbody AddForce or AddTorque methods.
+  ///    - Any update of the kinematic or gravity status of the object must be done through setting the IsKinematic or UseGravity
+  ///      properties of this behaviour instead of the properties on the Rigidbody component.
+  /// </summary>
   [SelectionBase]
   [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviour : InteractionBehaviourBase {
@@ -43,6 +64,7 @@ namespace Leap.Unity.Interaction {
     private Coroutine _graphicalLerpCoroutine = null;
 
     private Bounds _debugBounds;
+    private bool _showDebugRecievedVelocity = false;
 
     #region PUBLIC METHODS
 
@@ -82,11 +104,18 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Sets or Gets the transform used as the graphical anchor of this InteractionBehaviour.
+    /// </summary>
     public Transform GraphicalAnchor {
       get {
         return _graphicalAnchor;
       }
       set {
+        if (!value.IsChildOf(transform) || value == transform) {
+          throw new ArgumentException("Cannot have a graphical anchor that is not a child of the InteractionBehaviour");
+        }
+
         if (_graphicalLerpCoroutine != null) {
           StopCoroutine(_graphicalLerpCoroutine);
           _graphicalLerpCoroutine = null;
@@ -102,6 +131,10 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Sets or Gets the amount of time the graphical anchor takes to return to it's neutral offset after
+    /// a release has occured.
+    /// </summary>
     public float GraphicalReturnTime {
       get {
         return _graphicalReturnTime;
@@ -111,6 +144,10 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Sets or Gets whether or not pushing is enabled for this object.  Pushing will only be used if this is set to True
+    /// AND if pushing is enabled for the InteractionManager that this behaviour is registered with.
+    /// </summary>
     public bool PushingEnabled {
       get {
         return _pushingEnabled;
@@ -120,14 +157,25 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Adds a linear acceleration to the center of mass of this object.  Use this instead of Rigidbody.AddForce()
+    /// </summary>
     public void AddLinearAcceleration(Vector3 acceleration) {
       _accumulatedLinearAcceleration += acceleration;
     }
 
+    /// <summary>
+    /// Adds an angular acceleration to the center of mass of this object.  Use this instead of Rigidbody.AddTorque()
+    /// </summary>
+    /// <param name="acceleration"></param>
     public void AddAngularAcceleration(Vector3 acceleration) {
       _accumulatedAngularAcceleration += acceleration;
     }
 
+    /// <summary>
+    /// This method should always be called if the object is teleported to a new location instead of moving there.  If
+    /// this method is not called, it can cause the simulation to become unstable.
+    /// </summary>
     public void NotifyTeleported() {
       _notifiedOfTeleport = true;
     }
@@ -140,9 +188,12 @@ namespace Leap.Unity.Interaction {
 
       _rigidbody = GetComponent<Rigidbody>();
       if (_rigidbody == null) {
+        //Should only happen if the user has done some trickery since there is a RequireComponent attribute
         throw new InvalidOperationException("InteractionBehaviour must have a Rigidbody component attached to it.");
       }
 
+      //Technically we only need one instance in the entire scene, but easier for each object to have it's own instance for now.
+      //TODO: Investigate allowing this to be a singleton?
       KabschC.Construct(ref _kabsch);
     }
 
@@ -158,14 +209,19 @@ namespace Leap.Unity.Interaction {
       base.OnPostSolve();
 
       if (_recievedVelocityUpdate) {
+        //If we recieved a velocity update, gravity must always be disabled because the 
+        //velocity update accounts for gravity.
         if (_rigidbody.useGravity) {
           _rigidbody.useGravity = false;
         }
       } else {
+        //If we did not recieve a velocity update, we set the rigidbody's gravity status
+        //to match whatever the user has set.
         if (_rigidbody.useGravity != _useGravity) {
           _rigidbody.useGravity = _useGravity;
         }
 
+        //Only apply if non-zero to prevent waking up the body
         if (_accumulatedLinearAcceleration != Vector3.zero) {
           _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
         }
@@ -175,9 +231,9 @@ namespace Leap.Unity.Interaction {
         }
       }
 
+      //Reset so we can accumulate for the next frame
       _accumulatedLinearAcceleration = Vector3.zero;
       _accumulatedAngularAcceleration = Vector3.zero;
-
       _notifiedOfTeleport = false;
       _recievedVelocityUpdate = false;
     }
@@ -188,6 +244,7 @@ namespace Leap.Unity.Interaction {
       createInfo.shapeFlags = ShapeInfoFlags.None;
 
       if (!_isKinematic) {
+        //Kinematic objects do not need velocity simulation
         createInfo.shapeFlags |= ShapeInfoFlags.HasRigidBody;
       }
 
@@ -197,11 +254,9 @@ namespace Leap.Unity.Interaction {
     protected override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
       base.OnInteractionShapeCreated(instanceHandle);
 
+      //Copy over existing settings for defaults
       _isKinematic = _rigidbody.isKinematic;
       _useGravity = _rigidbody.useGravity;
-
-      //Gravity is always manually applied
-      _rigidbody.useGravity = false;
 
 #if UNITY_EDITOR
       Collider[] colliders = GetComponentsInChildren<Collider>();
@@ -218,6 +273,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnInteractionShapeDestroyed() {
       base.OnInteractionShapeDestroyed();
 
+      //When the shape is destroyed, revert rigidbody status to user settings
       _rigidbody.isKinematic = _isKinematic;
       _rigidbody.useGravity = _useGravity;
     }
@@ -251,10 +307,15 @@ namespace Leap.Unity.Interaction {
       base.OnRecievedSimulationResults(results);
 
       if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
+        //Use Sleep() to clear any forces that might have been applied by the user.
         _rigidbody.Sleep();
         _rigidbody.velocity = results.linearVelocity.ToVector3();
         _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
         _recievedVelocityUpdate = true;
+
+#if UNITY_EDITOR
+        _showDebugRecievedVelocity = true;
+#endif
       }
     }
 
@@ -263,6 +324,7 @@ namespace Leap.Unity.Interaction {
 
       var newCollection = HandPointCollection.Create(_rigidbody);
       _handIdToPoints[hand.Id] = newCollection;
+
       newCollection.UpdateTransform();
 
       for (int f = 0; f < NUM_FINGERS; f++) {
@@ -274,9 +336,9 @@ namespace Leap.Unity.Interaction {
           Bone bone = finger.Bone(boneType);
 
           Vector3 bonePos = bone.NextJoint.ToVector3();
-          Vector3 closestOnSurface = bonePos;
 
-          newCollection.SetGlobalPosition(closestOnSurface, fingerType, boneType);
+          //Global position of the point is just the position of the joint itself
+          newCollection.SetGlobalPosition(bonePos, fingerType, boneType);
         }
       }
     }
@@ -303,7 +365,6 @@ namespace Leap.Unity.Interaction {
       base.OnHandsHoldGraphics(hands);
 
       if (_graphicalAnchor != null) {
-        //Get new transform
         Vector3 newPosition;
         Quaternion newRotation;
         getSolvedTransform(hands, out newPosition, out newRotation);
@@ -348,25 +409,26 @@ namespace Leap.Unity.Interaction {
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
 
+      //Stop an existing lerp coroutine if it exists to prevent conflict
       if (_graphicalLerpCoroutine != null) {
         StopCoroutine(_graphicalLerpCoroutine);
       }
 
-      if (!_isKinematic) {
-        _rigidbody.isKinematic = true;
-      }
+      //A grasp always causes the object to become kinematic
+      _rigidbody.isKinematic = true;
     }
 
     protected override void OnGraspEnd() {
       base.OnGraspEnd();
 
+      //If there is a graphical anchor, we are going to lerp it back to match the 
+      //position and rotation of the rigidbody, since it might have diverged.
       if (_graphicalAnchor != null) {
         _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
       }
 
-      if (!_isKinematic) {
-        _rigidbody.isKinematic = false;
-      }
+      //Revert the kinematic status of the Rigidbody to the user setting once the grasp is finished.
+      _rigidbody.isKinematic = _isKinematic;
     }
     #endregion
 
@@ -376,16 +438,21 @@ namespace Leap.Unity.Interaction {
     }
 
     protected IEnumerator lerpGraphicalToOrigin() {
-      Vector3 startOffset = _graphicalAnchor.position - transform.position;
+      //We lerp position in world space instead of local space
+      //This helps remove wobbles when the object is rotating
+      Vector3 globalPosOffset = _graphicalAnchor.position - transform.position;
       Quaternion startRot = _graphicalAnchor.localRotation;
       float startTime = Time.time;
+
       while (true) {
         yield return null;
 
+        //Using sigmoid to help hide the lerp
         float t = Mathf.InverseLerp(startTime, startTime + _graphicalReturnTime, Time.time);
         float percent = t * t * (3 - 2 * t);
 
-        _graphicalAnchor.position = transform.position + Vector3.Lerp(startOffset, Vector3.zero, percent);
+        //Lerp based on transform.position instead of rigidbody.position to reduce stutter
+        _graphicalAnchor.position = transform.position + Vector3.Lerp(globalPosOffset, Vector3.zero, percent);
         _graphicalAnchor.localRotation = Quaternion.Slerp(startRot, Quaternion.identity, percent);
 
         if (percent >= 1.0f) {
@@ -393,6 +460,7 @@ namespace Leap.Unity.Interaction {
         }
       }
 
+      //Null out coroutine reference when finished
       _graphicalLerpCoroutine = null;
     }
 
@@ -401,7 +469,18 @@ namespace Leap.Unity.Interaction {
         Matrix4x4 gizmosMatrix = Gizmos.matrix;
 
         Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
-        Gizmos.color = IsBeingGrasped ? Color.green : Color.blue;
+
+        if (_rigidbody.IsSleeping()) {
+          Gizmos.color = Color.gray;
+        } else if (IsBeingGrasped) {
+          Gizmos.color = Color.green;
+        } else if (_showDebugRecievedVelocity) {
+          Gizmos.color = Color.yellow;
+          _showDebugRecievedVelocity = false;
+        } else {
+          Gizmos.color = Color.blue;
+        }
+
         Gizmos.DrawWireCube(_debugBounds.center, _debugBounds.size);
 
         Gizmos.matrix = gizmosMatrix;
@@ -432,6 +511,8 @@ namespace Leap.Unity.Interaction {
     protected void removeHandPointCollection(int handId) {
       var collection = _handIdToPoints[handId];
       _handIdToPoints.Remove(handId);
+
+      //Return the collection to the pool so it can be re-used
       HandPointCollection.Return(collection);
     }
 
@@ -488,6 +569,8 @@ namespace Leap.Unity.Interaction {
       private Vector3[] _localPositions;
 
       private Matrix4x4 _transformMatrix;
+
+      private bool _hasInverse = false;
       private Matrix4x4 _inverseTransformMatrix;
 
       public static HandPointCollection Create(Rigidbody rigidbody) {
@@ -517,17 +600,23 @@ namespace Leap.Unity.Interaction {
 
       private void reset() {
         _rigidbody = null;
+        _hasInverse = false;
       }
 
       public void UpdateTransform() {
         Vector3 interactionPosition = _rigidbody.position;
         Quaternion interactionRotation = _rigidbody.rotation;
 
+        _hasInverse = false;
         _transformMatrix = Matrix4x4.TRS(interactionPosition, interactionRotation, Vector3.one);
-        _inverseTransformMatrix = Matrix4x4.Inverse(_transformMatrix);
       }
 
       public void SetGlobalPosition(Vector3 globalPosition, Finger.FingerType fingerType, Bone.BoneType boneType) {
+        if (!_hasInverse) {
+          _inverseTransformMatrix = _transformMatrix.inverse;
+          _hasInverse = true;
+        }
+
         _localPositions[getIndex(fingerType, boneType)] = _inverseTransformMatrix.MultiplyPoint3x4(globalPosition);
       }
 
