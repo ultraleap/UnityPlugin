@@ -16,34 +16,38 @@ namespace Leap.Unity {
     HandPool parent;
     public List<IHandModel> handModels;
 
-    public HandProxy(HandPool parent, List<IHandModel> handModels, Hand hand) :
+    public HandProxy(HandPool parent, Hand hand) :
       base(hand.Id)
     {
-      for (int i = 0; i < handModels.Count; i++) {
-
-        this.parent = parent;
-        this.handModels = handModels;
-
-        // Check to see if the hand model has been initialized yet
-        if (handModels[i].GetLeapHand() == null) {
-          handModels[i].SetLeapHand(hand);
-          handModels[i].InitHand();
-        }
-        else {
-          handModels[i].SetLeapHand(hand);
-        }
-        handModels[i].BeginHand();
-      }
+      this.parent = parent;
     }
+
     /** To be called if the HandRepresentation no longer has a Leap Hand. */
     public override void Finish() {
       if (handModels != null) {
         for (int i = 0; i < handModels.Count; i++) {
           handModels[i].FinishHand();
+          Debug.Log("HandProxy.Finish(): " + parent);
           parent.ReturnToPool(handModels[i]);
           handModels[i] = null;
         }
       }
+    }
+
+    public override void AddRemoveModel(Hand hand, IHandModel model) {
+      Debug.Log("Adding:" + model);
+      if (handModels == null) {
+        handModels = new List<IHandModel>();
+      }
+      handModels.Add(model);
+      if (model.GetLeapHand() == null) {
+        model.SetLeapHand(hand);
+        model.InitHand();
+      }
+      else {
+        model.SetLeapHand(hand);
+      }
+      model.BeginHand();
     }
 
     /** Calls Updates in IHandModels that are part of this HandRepresentation */

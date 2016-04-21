@@ -28,5 +28,6 @@ namespace Leap.Unity {
     * Called when a hand representation is no longer needed
     */
     public abstract void Finish();
+    public abstract void AddRemoveModel(Hand hand, IHandModel model);
   }
 }

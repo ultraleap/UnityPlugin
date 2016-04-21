@@ -10,7 +10,7 @@ namespace Leap.Unity{
     }
 
   	protected override void HandReset() {
-        gameObject.SetActive(iHandModel.IsEnabled);
+      gameObject.SetActive(true);
   	}
   
   	protected override void HandFinish () {
