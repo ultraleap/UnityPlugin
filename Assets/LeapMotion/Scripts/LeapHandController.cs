@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using Leap;
@@ -12,6 +13,8 @@ namespace Leap.Unity {
 
     protected Dictionary<int, HandRepresentation> graphicsReps = new Dictionary<int, HandRepresentation>();
     protected Dictionary<int, HandRepresentation> physicsReps = new Dictionary<int, HandRepresentation>();
+	public Text frameRateText;
+	private float fps;
 
     // Reference distance from thumb base to pinky base in mm.
     protected const float GIZMO_SCALE = 5.0f;
@@ -54,6 +57,13 @@ namespace Leap.Unity {
 
       if (frame != null && graphicsEnabled) {
         UpdateHandRepresentations(graphicsReps, ModelType.Graphics, frame);
+      }
+      float interp = Time.deltaTime / (0.5f + Time.deltaTime);
+      float currentFPS = 1.0f / Time.deltaTime;
+      fps = Mathf.Lerp (fps, currentFPS, interp);
+      if (frameRateText != null) {
+        frameRateText.text = "Data FPS:" + frame.CurrentFramesPerSecond.ToString ("f2") +
+        System.Environment.NewLine + "Render FPS:" + Mathf.RoundToInt (fps).ToString ("f2");
       }
     }
 
