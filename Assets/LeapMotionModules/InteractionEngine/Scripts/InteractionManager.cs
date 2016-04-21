@@ -306,12 +306,11 @@ namespace Leap.Unity.Interaction {
 
       try {
         createScene();
+        applyDebugSettings();
       } catch (Exception e) {
         enabled = false;
         throw e;
       }
-
-      applyDebugSettings();
 
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
 
