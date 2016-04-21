@@ -209,6 +209,14 @@ namespace Leap.Unity.Interaction {
       KabschC.Destruct(ref _kabsch);
     }
 
+#if UNITY_EDITOR
+    protected override void OnPreSolve() {
+      base.OnPreSolve();
+
+      _showDebugRecievedVelocity = false;
+    }
+#endif
+
     protected override void OnPostSolve() {
       base.OnPostSolve();
 
@@ -492,7 +500,6 @@ namespace Leap.Unity.Interaction {
           Gizmos.color = Color.green;
         } else if (_showDebugRecievedVelocity) {
           Gizmos.color = Color.yellow;
-          _showDebugRecievedVelocity = false;
         } else {
           Gizmos.color = Color.blue;
         }
