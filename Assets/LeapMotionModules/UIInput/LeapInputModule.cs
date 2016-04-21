@@ -35,14 +35,20 @@ using Leap;
 
 public class LeapInputModule : BaseInputModule
 {
+    public static LeapInputModule Instance;
+
     [Header(" [Interaction Setup]")]
     [Tooltip("The current Leap Data Provider for the scene.")]
     public LeapProvider LeapDataProvider;
+    [Tooltip("An optional alternate detector for pinching on the left hand.")]
+    public Leap.Unity.PinchUtility.LeapPinchDetector LeftHandDetector;
+    [Tooltip("An optional alternate detector for pinching on the right hand.")]
+    public Leap.Unity.PinchUtility.LeapPinchDetector RightHandDetector;
     [Tooltip("How many hands and pointers the Input Module should allocate for.")]
     public int NumberOfHands = 2;
     [Tooltip("The distance from a UI element that interaction switches from Projective-Pointer based to Touch based.")]
     public float ProjectiveToTactileTransitionDistance = 0.12f;
-    [Tooltip("The distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.")]
+    [Tooltip("When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.")]
     public float PinchingThreshold = 20f;
     [Tooltip("If the ScrollView still doesn't work even after disabling RaycastTarget on the intermediate layers.")]
     public bool OverrideScrollViewClicks = false;
@@ -78,14 +84,18 @@ public class LeapInputModule : BaseInputModule
     public AudioClip MissedSound;
 
     // Event delegates triggered by Input
+    [System.Serializable]
+
+    public class PositionEvent : UnityEvent<Vector3> {}
+
     [Tooltip("The event that is triggered upon clicking on a non-canvas UI element.")]
-    public UnityEvent onClickDown;
+    public PositionEvent onClickDown;
     [Tooltip("The event that is triggered upon lifting up from a non-canvas UI element (Not 1:1 with onClickDown!)")]
-    public UnityEvent onClickUp;
+    public PositionEvent onClickUp;
     [Tooltip("The event that is triggered upon hovering over a non-canvas UI element.")]
-    public UnityEvent onHover;
+    public PositionEvent onHover;
     [Tooltip("The event that is triggered while holding down a non-canvas UI element.")]
-    public UnityEvent whileClickHeld;
+    public PositionEvent whileClickHeld;
 
     //Event related data
     private Camera EventCamera;
@@ -101,9 +111,11 @@ public class LeapInputModule : BaseInputModule
     private pointerStates[] PrevState;
     private Vector2[] PrevScreenPosition;
     private bool[] PrevTriggeringInteraction;
+    private bool PrevTouchingMode;
 
     //Misc. Objects
-    Canvas[] canvases;
+    private Canvas[] canvases;
+    public List<ILeapWidget> LeapWidgets;
     private Quaternion CurrentRotation;
     private AudioSource SoundPlayer;
 
@@ -126,6 +138,8 @@ public class LeapInputModule : BaseInputModule
     protected override void Start()
     {
         base.Start();
+
+        Instance = this;
 
         if (LeapDataProvider == null)
         {
@@ -192,6 +206,7 @@ public class LeapInputModule : BaseInputModule
         PrevTriggeringInteraction = new bool[NumberOfHands];
         PrevScreenPosition = new Vector2[NumberOfHands];
         PrevState = new pointerStates[NumberOfHands];
+        LeapWidgets = new List<ILeapWidget>();
 
         //Used for calculating the origin of the Projective Interactions
         CurrentRotation = InputTracking.GetLocalRotation(VRNode.Head);
@@ -265,6 +280,17 @@ public class LeapInputModule : BaseInputModule
 
             //Trigger events that come from changing pointer state
             ProcessStateEvents(whichHand);
+
+            //Tell Leap Buttons how far away the finger is
+            if(PointEvents[whichHand].pointerCurrentRaycast.gameObject !=  null){
+                Selectable comp = PointEvents[whichHand].pointerCurrentRaycast.gameObject.GetComponent<Selectable>();
+                if (comp != null && comp.GetType().GetInterface("ILeapWidget") != null)
+                {
+                    ((ILeapWidget)comp).HoverDistance(distanceOfIndexTipToPointer(whichHand));
+                }
+            }
+
+
 
             //If we hit something with our Raycast, let's see if we should interact with it
             if (PointEvents[whichHand].pointerCurrentRaycast.gameObject != null && pointerState[whichHand] != pointerStates.OffCanvas)
@@ -368,6 +394,26 @@ public class LeapInputModule : BaseInputModule
             }
 
             updatePointerColor(whichHand);
+        }
+
+        //Make the special Leap Widget Buttons PopUp and Flatten when Appropriate
+        if (PrevTouchingMode != getTouchingMode())
+        {
+            PrevTouchingMode = getTouchingMode();
+            if (PrevTouchingMode)
+            {
+                foreach (ILeapWidget widget in LeapWidgets)
+                {
+                    widget.Expand();
+                }
+            }
+            else
+            {
+                foreach (ILeapWidget widget in LeapWidgets)
+                {
+                    widget.Retract();
+                }
+            }
         }
     }
 
@@ -530,7 +576,7 @@ public class LeapInputModule : BaseInputModule
             {
                 //When you begin to hover on an element
                 SoundPlayer.PlayOneShot(HoverSound);
-                onHover.Invoke();
+                onHover.Invoke(Pointers[whichHand].transform.position);
             }
             else if (pointerState[whichHand] == pointerStates.PinchingToCanvas)
             {
@@ -549,7 +595,7 @@ public class LeapInputModule : BaseInputModule
             {
                 //When you click on an element
                 SoundPlayer.PlayOneShot(TriggerSound);
-                onClickDown.Invoke();
+                onClickDown.Invoke(Pointers[whichHand].transform.position);
             }//ALSO PLAY HOVER SOUND IF ON DIFFERENT UI ELEMENT THAN LAST FRAME
         }
         else if (PrevState[whichHand] == pointerStates.PinchingToElement)
@@ -562,7 +608,7 @@ public class LeapInputModule : BaseInputModule
             else if (pointerState[whichHand] == pointerStates.OnElement || pointerState[whichHand] == pointerStates.OnCanvas)
             {
                 //When you let go of an element
-                onClickUp.Invoke();
+                onClickUp.Invoke(Pointers[whichHand].transform.position);
             }
         }
         else if (PrevState[whichHand] == pointerStates.NearCanvas)
@@ -571,7 +617,7 @@ public class LeapInputModule : BaseInputModule
             {
                 //When you physically touch an element
                 SoundPlayer.PlayOneShot(TriggerSound);
-                onClickDown.Invoke();
+                onClickDown.Invoke(Pointers[whichHand].transform.position);
             }
             if (pointerState[whichHand] == pointerStates.TouchingCanvas)
             {
@@ -584,7 +630,7 @@ public class LeapInputModule : BaseInputModule
             if (pointerState[whichHand] == pointerStates.NearCanvas)
             {
                 //When you physically pull out of an element
-                onClickUp.Invoke();
+                onClickUp.Invoke(Pointers[whichHand].transform.position);
             }
         }
     }
@@ -639,10 +685,18 @@ public class LeapInputModule : BaseInputModule
     {
         if (pointerState[whichHand] == pointerStates.NearCanvas || pointerState[whichHand] == pointerStates.TouchingCanvas || pointerState[whichHand] == pointerStates.TouchingElement)
         {
-            return (distanceOfIndexTipToPointer(whichHand) < 0.03f);
+            return (distanceOfIndexTipToPointer(whichHand) < 0f);
         }
         else
         {
+            if (LeapDataProvider.CurrentFrame.Hands[whichHand].IsRight && RightHandDetector != null)
+            {
+                return RightHandDetector.IsPinching;
+            }
+            else if (!LeapDataProvider.CurrentFrame.Hands[whichHand].IsRight && LeftHandDetector != null)
+            {
+                return LeftHandDetector.IsPinching;
+            }
             return LeapDataProvider.CurrentFrame.Hands[whichHand].PinchDistance < PinchingThreshold;
         }
     }
@@ -653,6 +707,19 @@ public class LeapInputModule : BaseInputModule
         //Get Base of Index Finger Position
         Vector3 IndexTipPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].StabilizedTipPosition.ToVector3();
         return -Pointers[whichHand].InverseTransformPoint(IndexTipPosition).z * Pointers[whichHand].localScale.z;
+    }
+
+    public bool getTouchingMode()
+    {
+        bool mode = false;
+        foreach (pointerStates state in pointerState)
+        {
+            if (state == pointerStates.NearCanvas || state == pointerStates.TouchingCanvas || state == pointerStates.TouchingElement)
+            {
+                mode = true;
+            }
+        }
+        return mode;
     }
 
     //Where the color that the Pointer will lerp to is chosen

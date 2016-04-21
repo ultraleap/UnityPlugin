@@ -10,8 +10,10 @@ public class Exploder : MonoBehaviour {
         particles.Stop();
 	}
 
-	public void Explode (Transform button) {
-        transform.position = button.position + new Vector3(0f,0f,-0.1f);
+	public void Explode (Vector3 button) {
+        transform.position = button;
+        transform.rotation = Quaternion.LookRotation(Camera.main.transform.position - transform.position);
+        transform.position += transform.forward * 0.05f;
         particles.Play();
     }
 }
