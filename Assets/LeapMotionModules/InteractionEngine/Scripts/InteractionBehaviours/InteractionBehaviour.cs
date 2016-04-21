@@ -8,7 +8,11 @@ using Leap.Unity.Interaction.CApi;
 namespace Leap.Unity.Interaction {
 
   /// <summary>
-  /// InteractionBehaviour is the default implementation of IInteractionBehaviour. It has the following features:
+  /// InteractionBehaviour is the default implementation of IInteractionBehaviour.
+  /// </summary>
+  /// 
+  /// <remarks>
+  /// It has the following features:
   ///    - Extends from InteractionBehaviourBase to take advantage of it's bookkeeping and callbacks.
   ///    - Supports kinematic movement as well as physical movement.
   ///    - When non-kinematic, supports pushing.
@@ -27,7 +31,7 @@ namespace Leap.Unity.Interaction {
   ///      the Rigidbody AddForce or AddTorque methods.
   ///    - Any update of the kinematic or gravity status of the object must be done through setting the IsKinematic or UseGravity
   ///      properties of this behaviour instead of the properties on the Rigidbody component.
-  /// </summary>
+  /// </remarks>
   [SelectionBase]
   [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviour : InteractionBehaviourBase {

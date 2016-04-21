@@ -13,7 +13,9 @@ namespace Leap.Unity.Interaction {
   /// This class allows IInteractionBehaviours to register with it and provides all of the callbacks
   /// needed for operation.  This class also takes care of all bookkeeping to keep track of the objects,
   /// hands, and the internal state of the interaction plugin.
+  /// </summary>
   /// 
+  /// <remarks>
   /// InteractionManager has the following features:
   ///    - Allows instances of IInteractionBehaviour to register or unregister with it.
   ///    - Registered instances stay registered even if this behaviour is disabled.
@@ -28,7 +30,7 @@ namespace Leap.Unity.Interaction {
   /// InteractionManager has the following requirements:
   ///    - The DataSubfolder property must point to a valid subfolder in the StreamingAssets data folder.
   ///      The subfolder must contain a valid ldat file names IE.  
-  /// </summary>
+  /// </remarks>
   public class InteractionManager : MonoBehaviour {
     #region SERIALIZED FIELDS
     [SerializeField]
