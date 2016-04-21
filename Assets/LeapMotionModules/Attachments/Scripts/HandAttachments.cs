@@ -22,11 +22,11 @@ public class HandAttachments : IHandModel {
   public Transform Palm;
   public Transform Arm;
   public Transform Thumb;
+  public Transform PinchPoint;
   public Transform Index;
   public Transform Middle;
   public Transform Ring;
   public Transform Pinky;
-  public Transform PinchPoint;
 
   private Hand _hand;
 
