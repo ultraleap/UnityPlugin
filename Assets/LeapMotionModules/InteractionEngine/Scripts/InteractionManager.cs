@@ -20,9 +20,15 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _untrackedTimeout = 0.5f;
 
-    [Tooltip("Allow the Interaction plugin to modify object velocities when pushing.")]
+    // TODO: eLeapIESceneInfoFlags_PhysicsEnabled
+    [Tooltip("Allow the Interaction plugin to modify object velocities when in contact.")]
     [SerializeField]
-    protected bool _enablePushing = true;
+    protected bool _enableContact = true;
+
+    // TODO: eLeapIESceneInfoFlags_GraspEnabled
+//    [Tooltip("Allow the Interaction plugin to modify object positions by grasping.")]
+//    [SerializeField]
+//    protected bool _enableGrasping = true;
 
     [Header("Debug")]
     [Tooltip("Shows the debug output coming from the internal Interaction plugin.")]
@@ -360,7 +366,7 @@ namespace Leap.Unity.Interaction {
       updateInteractionStateChanges(frame);
 
       // TODO: Pass a debug flag to disable calculating velocities.
-      if (_enablePushing) {
+      if (_enableContact) {
         dispatchSimulationResults();
       }
 
