@@ -33,7 +33,8 @@ namespace LeapInternal
 
       for (int h = 0; h < trackingMsg.nHands; h++)
       {
-        LEAP_HAND hand = StructMarshal<LEAP_HAND>.ArrayElementToStruct(trackingMsg.pHands, h);
+        LEAP_HAND hand;
+        StructMarshal<LEAP_HAND>.ArrayElementToStruct(trackingMsg.pHands, h, out hand);
         newFrame.Hands.Add(makeHand(ref hand, newFrame));
       }
       return newFrame;
