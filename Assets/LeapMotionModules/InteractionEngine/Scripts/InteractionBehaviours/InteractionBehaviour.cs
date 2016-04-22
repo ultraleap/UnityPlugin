@@ -51,6 +51,22 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _enableContact = true;
 
+    [Tooltip("Should advanved throwing settings be enabled.")]
+    [SerializeField]
+    protected bool _advancedThrowing = false;
+
+    [Tooltip("A curve used to calculate a multiplier of the throwing velocity.  Maps original velocity to new velocity.")]
+    [SerializeField]
+    protected AnimationCurve _throwingVelocityCurve;
+
+    [Tooltip("Measured in Meters per Second.  If the object is thrown faster than this speed, contact is disabled for a period of time.")]
+    [SerializeField]
+    protected float _contactDisbleSpeed = 1.0f;
+
+    [Tooltip("How much time after contact is disabled after a throw before it is re-enabled.")]
+    [SerializeField]
+    protected float _contactEnableDelay = 0.25f;
+
     protected Renderer[] _renderers;
     protected Rigidbody _rigidbody;
 
