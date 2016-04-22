@@ -13,7 +13,12 @@ namespace Leap.Unity.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
 
-      if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab) {
+      specifyConditionalDrawing("_advancedThrowing", "_throwingVelocityCurve",
+                                                     "_contactDisableSpeed",
+                                                     "_contactEnableDelay");
+
+      if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab &&
+          _interactionBehaviour != null) {
         specifyCustomDecorator("_graphicalAnchor", graphicalAnchor);
         specifyCustomDrawer("_enableContact", contactDrawer);
       }

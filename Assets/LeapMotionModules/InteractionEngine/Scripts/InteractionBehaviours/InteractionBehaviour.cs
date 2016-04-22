@@ -8,7 +8,11 @@ using Leap.Unity.Interaction.CApi;
 namespace Leap.Unity.Interaction {
 
   /// <summary>
-  /// InteractionBehaviour is the default implementation of IInteractionBehaviour. It has the following features:
+  /// InteractionBehaviour is the default implementation of IInteractionBehaviour.
+  /// </summary>
+  /// 
+  /// <remarks>
+  /// It has the following features:
   ///    - Extends from InteractionBehaviourBase to take advantage of it's bookkeeping and callbacks.
   ///    - Supports kinematic movement as well as physical movement.
   ///    - When non-kinematic, supports pushing.
@@ -27,7 +31,7 @@ namespace Leap.Unity.Interaction {
   ///      the Rigidbody AddForce or AddTorque methods.
   ///    - Any update of the kinematic or gravity status of the object must be done through setting the IsKinematic or UseGravity
   ///      properties of this behaviour instead of the properties on the Rigidbody component.
-  /// </summary>
+  /// </remarks>
   [SelectionBase]
   [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviour : InteractionBehaviourBase {
@@ -46,6 +50,23 @@ namespace Leap.Unity.Interaction {
     [Tooltip("Should a hand be able to impart pushing forces to this object.")]
     [SerializeField]
     protected bool _enableContact = true;
+
+    [Space]
+    [Tooltip("Should advanved throwing settings be enabled.")]
+    [SerializeField]
+    protected bool _advancedThrowing = false;
+
+    [Tooltip("A curve used to calculate a multiplier of the throwing velocity.  Maps original velocity to multiplier.")]
+    [SerializeField]
+    protected AnimationCurve _throwingVelocityCurve;
+
+    [Tooltip("Measured in Meters per Second.  If the object is thrown faster than this speed, contact is disabled for a period of time.")]
+    [SerializeField]
+    protected float _contactDisableSpeed = 0.4f;
+
+    [Tooltip("How much time after contact is disabled after a throw before it is re-enabled.")]
+    [SerializeField]
+    protected float _contactEnableDelay = 0.1f;
 
     protected Renderer[] _renderers;
     protected Rigidbody _rigidbody;
@@ -205,6 +226,14 @@ namespace Leap.Unity.Interaction {
       KabschC.Destruct(ref _kabsch);
     }
 
+#if UNITY_EDITOR
+    protected override void OnPreSolve() {
+      base.OnPreSolve();
+
+      _showDebugRecievedVelocity = false;
+    }
+#endif
+
     protected override void OnPostSolve() {
       base.OnPostSolve();
 
@@ -305,7 +334,8 @@ namespace Leap.Unity.Interaction {
     protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
       base.OnRecievedSimulationResults(results);
 
-      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
+      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 &&
+          _enableContact) {
         //Use Sleep() to clear any forces that might have been applied by the user.
         _rigidbody.Sleep();
         _rigidbody.velocity = results.linearVelocity.ToVector3();
@@ -428,12 +458,36 @@ namespace Leap.Unity.Interaction {
 
       //Revert the kinematic status of the Rigidbody to the user setting once the grasp is finished.
       _rigidbody.isKinematic = _isKinematic;
+
+      if (_advancedThrowing) {
+        float speed = _rigidbody.velocity.magnitude;
+        float multiplier = _throwingVelocityCurve.Evaluate(speed);
+        _rigidbody.velocity *= multiplier;
+
+        if (_enableContact && speed >= _contactDisableSpeed) {
+          _enableContact = false;
+          StartCoroutine(enableContactAfterDelay());
+        }
+      }
     }
     #endregion
 
     #region UNITY CALLBACKS
+    protected override void Reset() {
+      base.Reset();
+
+      _throwingVelocityCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
+                                                  new Keyframe(1.0f, 1.0f, 0.0f, 0.0f),
+                                                  new Keyframe(2.0f, 1.5f, 0.0f, 0.0f));
+    }
+
     protected virtual void Awake() {
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
+    }
+
+    protected IEnumerator enableContactAfterDelay() {
+      yield return new WaitForSeconds(_contactEnableDelay);
+      _enableContact = true;
     }
 
     protected IEnumerator lerpGraphicalToOrigin() {
@@ -488,7 +542,6 @@ namespace Leap.Unity.Interaction {
           Gizmos.color = Color.green;
         } else if (_showDebugRecievedVelocity) {
           Gizmos.color = Color.yellow;
-          _showDebugRecievedVelocity = false;
         } else {
           Gizmos.color = Color.blue;
         }

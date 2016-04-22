@@ -43,7 +43,7 @@ namespace Leap.Unity.Interaction.CApi {
     None = 0x00,
     HasRigidBody = 0x01,
   };
-
+  
   public enum UpdateInfoFlags : uint {
     None = 0x00,
     ApplyAcceleration = 0x01,

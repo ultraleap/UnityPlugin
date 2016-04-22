@@ -13,7 +13,9 @@ namespace Leap.Unity.Interaction {
   /// This class allows IInteractionBehaviours to register with it and provides all of the callbacks
   /// needed for operation.  This class also takes care of all bookkeeping to keep track of the objects,
   /// hands, and the internal state of the interaction plugin.
+  /// </summary>
   /// 
+  /// <remarks>
   /// InteractionManager has the following features:
   ///    - Allows instances of IInteractionBehaviour to register or unregister with it.
   ///    - Registered instances stay registered even if this behaviour is disabled.
@@ -28,7 +30,7 @@ namespace Leap.Unity.Interaction {
   /// InteractionManager has the following requirements:
   ///    - The DataSubfolder property must point to a valid subfolder in the StreamingAssets data folder.
   ///      The subfolder must contain a valid ldat file names IE.  
-  /// </summary>
+  /// </remarks>
   public class InteractionManager : MonoBehaviour {
     #region SERIALIZED FIELDS
     [SerializeField]
@@ -304,12 +306,11 @@ namespace Leap.Unity.Interaction {
 
       try {
         createScene();
+        applyDebugSettings();
       } catch (Exception e) {
         enabled = false;
         throw e;
       }
-
-      applyDebugSettings();
 
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
 
@@ -390,6 +391,7 @@ namespace Leap.Unity.Interaction {
 
     #region INTERNAL METHODS
     private IEnumerator simulationLoop() {
+      //We use a coroutine so that our logic happens after all FixedUpdate calls
       WaitForFixedUpdate fixedUpdate = new WaitForFixedUpdate();
       while (true) {
         yield return fixedUpdate;
@@ -427,11 +429,8 @@ namespace Leap.Unity.Interaction {
       simulateInteraction();
 
       updateInteractionStateChanges(frame);
-
-      // TODO: Pass a debug flag to disable calculating velocities.
-      if (_enableContact) {
-        dispatchSimulationResults();
-      }
+      
+      dispatchSimulationResults();
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         _registeredBehaviours[i].NotifyPostSolve();
@@ -591,7 +590,6 @@ namespace Leap.Unity.Interaction {
               } else {
                 Debug.LogError("Recieved a hand result with an unkown handle " + handResult.instanceHandle.handle);
               }
-
               break;
             }
           case ManipulatorMode.Contact:
@@ -606,7 +604,6 @@ namespace Leap.Unity.Interaction {
                   Debug.LogException(e);
                   continue;
                 }
-
               }
               break;
             }
@@ -620,7 +617,7 @@ namespace Leap.Unity.Interaction {
         var id = pair.Key;
         var ieHand = pair.Value;
 
-        float handAge = Time.time - ieHand.lastTimeUpdated;
+        float handAge = Time.unscaledTime - ieHand.lastTimeUpdated;
         //Check to see if the hand is at least 1 frame old
         //We assume it has become untracked if this is the case
         if (handAge > 0) {
@@ -652,8 +649,6 @@ namespace Leap.Unity.Interaction {
               _misbehavingBehaviours.Add(ieHand.graspedObject);
               Debug.LogException(e);
             }
-
-            continue;
           }
         }
       }
@@ -681,7 +676,9 @@ namespace Leap.Unity.Interaction {
         IInteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[result.handle];
 
         try {
-          interactionBehaviour.NotifyRecievedSimulationResults(result);
+          if (result.resultFlags != ShapeInstanceResultFlags.None) {
+            interactionBehaviour.NotifyRecievedSimulationResults(result);
+          }
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
@@ -760,6 +757,7 @@ namespace Leap.Unity.Interaction {
     }
 
     //A persistant structure for storing useful data about a hand as it interacts with objects
+    //TODO: Investigate pooling?
     protected class InteractionHand {
       public Hand hand { get; protected set; }
       public float lastTimeUpdated { get; protected set; }
@@ -768,13 +766,13 @@ namespace Leap.Unity.Interaction {
 
       public InteractionHand(Hand hand) {
         this.hand = hand;
-        lastTimeUpdated = Time.time;
+        lastTimeUpdated = Time.unscaledTime;
         graspedObject = null;
       }
 
       public void UpdateHand(Hand hand) {
         this.hand = hand;
-        lastTimeUpdated = Time.time;
+        lastTimeUpdated = Time.unscaledTime;
       }
 
       public void GraspObject(IInteractionBehaviour obj) {

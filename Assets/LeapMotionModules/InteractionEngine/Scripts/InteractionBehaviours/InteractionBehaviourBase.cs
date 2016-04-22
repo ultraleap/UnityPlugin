@@ -11,7 +11,9 @@ namespace Leap.Unity.Interaction {
   /// aims to provide the minimum set of behaviours that can be generalized to most interaction objects, and no more.
   /// The aim is to provide a class that takes care of the 'bookkeeping' needed to properly interface with the 
   /// InteractionManager component, so that implementing different types of InteractionBehaviours becomes easier.
+  /// </summary>
   /// 
+  /// <remarks>
   /// This behaviour has the following features:
   ///    - Takes care of most of the bookkeeping needed to interface with the InteractionManager
   ///    - Contains protected callbacks for use of an implementing class.  Certain callbacks like OnGraspBegin and
@@ -22,7 +24,7 @@ namespace Leap.Unity.Interaction {
   ///    - Certain callbacks have been left unimplemented and must be implemented by an extending class.
   ///    - Only a single collider is supported currently.  The collider must be either a BoxCollider or SphereCollider,
   ///      and must not be on a child transform.  The collider must also have a center value of zero.
-  /// </summary>
+  /// </remarks>
   [DisallowMultipleComponent]
   public abstract class InteractionBehaviourBase : IInteractionBehaviour {
 
