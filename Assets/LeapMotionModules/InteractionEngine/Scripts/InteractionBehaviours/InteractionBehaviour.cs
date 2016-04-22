@@ -51,17 +51,18 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _enableContact = true;
 
+    [Space]
     [Tooltip("Should advanved throwing settings be enabled.")]
     [SerializeField]
     protected bool _advancedThrowing = false;
 
-    [Tooltip("A curve used to calculate a multiplier of the throwing velocity.  Maps original velocity to new velocity.")]
+    [Tooltip("A curve used to calculate a multiplier of the throwing velocity.  Maps original velocity to multiplier.")]
     [SerializeField]
     protected AnimationCurve _throwingVelocityCurve;
 
     [Tooltip("Measured in Meters per Second.  If the object is thrown faster than this speed, contact is disabled for a period of time.")]
     [SerializeField]
-    protected float _contactDisbleSpeed = 1.0f;
+    protected float _contactDisableSpeed = 1.0f;
 
     [Tooltip("How much time after contact is disabled after a throw before it is re-enabled.")]
     [SerializeField]
@@ -456,12 +457,36 @@ namespace Leap.Unity.Interaction {
 
       //Revert the kinematic status of the Rigidbody to the user setting once the grasp is finished.
       _rigidbody.isKinematic = _isKinematic;
+
+      if (_advancedThrowing) {
+        float speed = _rigidbody.velocity.magnitude;
+        float multiplier = _throwingVelocityCurve.Evaluate(speed);
+        _rigidbody.velocity *= multiplier;
+
+        if (_enableContact) {
+          _enableContact = false;
+          StartCoroutine(enableContactAfterDelay());
+        }
+      }
     }
     #endregion
 
     #region UNITY CALLBACKS
+    protected override void Reset() {
+      base.Reset();
+
+      _throwingVelocityCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
+                                                  new Keyframe(1.0f, 1.0f, 0.0f, 0.0f),
+                                                  new Keyframe(2.0f, 1.5f, 0.0f, 0.0f));
+    }
+
     protected virtual void Awake() {
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
+    }
+
+    protected IEnumerator enableContactAfterDelay() {
+      yield return new WaitForSeconds(_contactEnableDelay);
+      _enableContact = true;
     }
 
     protected IEnumerator lerpGraphicalToOrigin() {
