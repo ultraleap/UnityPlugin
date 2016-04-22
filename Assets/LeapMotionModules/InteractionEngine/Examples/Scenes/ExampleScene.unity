@@ -665,6 +665,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 682435271}
+  - 114: {fileID: 682435272}
   m_Layer: 0
   m_Name: Scene
   m_TagString: Untagged
@@ -695,6 +696,26 @@ Transform:
   - {fileID: 2047243206}
   m_Father: {fileID: 0}
   m_RootOrder: 2
+--- !u!114 &682435272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 682435270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2d53554227124ca485c87bdfa387665, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetRenderRate: 0
+  targetRenderRateStep: 1
+  fixedPhysicsRate: 100
+  fixedPhysicsRateStep: 1
+  unlockRender: 0
+  unlockPhysics: 0
+  decrease: 0
+  increase: 0
+  resetRate: 0
 --- !u!1 &784446999
 GameObject:
   m_ObjectHideFlags: 0
