@@ -17,7 +17,8 @@ namespace Leap.Unity.Interaction {
                                                      "_contactDisableSpeed",
                                                      "_contactEnableDelay");
 
-      if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab) {
+      if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab &&
+          _interactionBehaviour != null) {
         specifyCustomDecorator("_graphicalAnchor", graphicalAnchor);
         specifyCustomDrawer("_enableContact", contactDrawer);
       }

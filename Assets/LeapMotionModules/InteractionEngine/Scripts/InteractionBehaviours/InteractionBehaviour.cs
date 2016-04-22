@@ -62,11 +62,11 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("Measured in Meters per Second.  If the object is thrown faster than this speed, contact is disabled for a period of time.")]
     [SerializeField]
-    protected float _contactDisableSpeed = 1.0f;
+    protected float _contactDisableSpeed = 0.4f;
 
     [Tooltip("How much time after contact is disabled after a throw before it is re-enabled.")]
     [SerializeField]
-    protected float _contactEnableDelay = 0.25f;
+    protected float _contactEnableDelay = 0.1f;
 
     protected Renderer[] _renderers;
     protected Rigidbody _rigidbody;
@@ -334,7 +334,8 @@ namespace Leap.Unity.Interaction {
     protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
       base.OnRecievedSimulationResults(results);
 
-      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
+      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 &&
+          _enableContact) {
         //Use Sleep() to clear any forces that might have been applied by the user.
         _rigidbody.Sleep();
         _rigidbody.velocity = results.linearVelocity.ToVector3();
@@ -463,7 +464,7 @@ namespace Leap.Unity.Interaction {
         float multiplier = _throwingVelocityCurve.Evaluate(speed);
         _rigidbody.velocity *= multiplier;
 
-        if (_enableContact) {
+        if (_enableContact && speed >= _contactDisableSpeed) {
           _enableContact = false;
           StartCoroutine(enableContactAfterDelay());
         }

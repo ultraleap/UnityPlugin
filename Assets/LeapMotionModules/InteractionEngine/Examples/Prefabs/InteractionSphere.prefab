@@ -147,7 +147,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 134782}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0.383}
+  m_LocalPosition: {x: -0.162, y: -0.15886116, z: 0.503}
   m_LocalScale: {x: 0.15661615, y: 0.15661615, z: 0.15661615}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
@@ -346,6 +346,30 @@ MonoBehaviour:
   _graphicalAnchor: {fileID: 492210}
   _graphicalReturnTime: 0.25
   _enableContact: 1
+  _advancedThrowing: 1
+  _throwingVelocityCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 2
+      value: 1.5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _contactDisableSpeed: 0.4
+  _contactEnableDelay: 0.1
 --- !u!135 &13536856
 SphereCollider:
   m_ObjectHideFlags: 1
