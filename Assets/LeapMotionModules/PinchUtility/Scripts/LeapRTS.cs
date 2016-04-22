@@ -45,6 +45,9 @@ namespace Leap.Unity.PinchUtility {
     [SerializeField]
     private bool _allowScale = true;
 
+    [SerializeField]
+    private float _pinchRadius = 0.08f;
+
     [Header("GUI Options")]
     [SerializeField]
     private KeyCode _toggleGuiState = KeyCode.None;
@@ -55,6 +58,9 @@ namespace Leap.Unity.PinchUtility {
     private Transform _anchor;
 
     private float _defaultNearClip;
+
+    private bool isPinchingA = false;
+    private bool isPinchingB = false;
 
     void Start() {
       if (_pinchDetectorA == null || _pinchDetectorB == null) {
@@ -74,18 +80,32 @@ namespace Leap.Unity.PinchUtility {
       }
 
       bool didUpdate = false;
-      didUpdate |= _pinchDetectorA.DidChangeFromLastFrame;
-      didUpdate |= _pinchDetectorB.DidChangeFromLastFrame;
+
+      if (_pinchDetectorA.IsPinching != isPinchingA && Vector3.Distance(_pinchDetectorA.gameObject.transform.position, transform.position) < _pinchRadius * transform.lossyScale.x)
+      {
+          didUpdate = true;
+          isPinchingA = _pinchDetectorA.IsPinching;
+      }
+      if (_pinchDetectorB.IsPinching != isPinchingB && Vector3.Distance(_pinchDetectorB.gameObject.transform.position, transform.position) < _pinchRadius * transform.lossyScale.x)
+      {
+          didUpdate = true;
+          isPinchingB = _pinchDetectorB.IsPinching;
+      }
 
       if (didUpdate) {
         transform.SetParent(null, true);
       }
 
-      if (_pinchDetectorA.IsPinching && _pinchDetectorB.IsPinching) {
+      if ((isPinchingA && Vector3.Distance(_pinchDetectorA.gameObject.transform.position, transform.position) < _pinchRadius * transform.lossyScale.x) && (isPinchingB && Vector3.Distance(_pinchDetectorB.gameObject.transform.position, transform.position) < _pinchRadius * transform.lossyScale.x))
+      {
         transformDoubleAnchor();
-      } else if (_pinchDetectorA.IsPinching) {
+      }
+      else if (isPinchingA && Vector3.Distance(_pinchDetectorA.gameObject.transform.position, transform.position) < _pinchRadius * transform.lossyScale.x)
+      {
         transformSingleAnchor(_pinchDetectorA);
-      } else if (_pinchDetectorB.IsPinching) {
+      }
+      else if (isPinchingB && Vector3.Distance(_pinchDetectorB.gameObject.transform.position, transform.position) < _pinchRadius * transform.lossyScale.x)
+      {
         transformSingleAnchor(_pinchDetectorB);
       }
 

@@ -63,7 +63,6 @@ public class LeapInputModule : BaseInputModule
     public Material PointerMaterial;
     [Tooltip("The size of the pointer in world coordinates.")]
     public float NormalPointerScale = 0.00025f; //In world space
-    private RectTransform[] Pointers;
     [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color NormalColor = Color.white;
@@ -101,6 +100,8 @@ public class LeapInputModule : BaseInputModule
     private Camera EventCamera;
     private PointerEventData[] PointEvents;
     private pointerStates[] pointerState;
+    private RectTransform[] Pointers;
+    private LineRenderer[] PointerLines;
 
     //Objects selected by pointer
     private GameObject[] CurrentPoint;
@@ -170,6 +171,7 @@ public class LeapInputModule : BaseInputModule
 
         //Initialize the Pointers for Projective Interaction
         Pointers = new RectTransform[NumberOfHands];
+        PointerLines = new LineRenderer[NumberOfHands];
         for (int index = 0; index < Pointers.Length; index++)
         {
             //Create the Canvas to render the Pointer on
@@ -187,6 +189,12 @@ public class LeapInputModule : BaseInputModule
             image.sprite = PointerSprite;
             image.material = Instantiate(PointerMaterial); //Make sure to instantiate the material so each pointer can be modified independently
             image.raycastTarget = false;
+
+            PointerLines[index] = pointer.AddComponent<LineRenderer>();
+            PointerLines[index].material = Instantiate(PointerMaterial);
+            PointerLines[index].material.color = new Color(0f, 0f, 0f, 0f);
+            PointerLines[index].SetVertexCount(2);
+            PointerLines[index].SetWidth(0.001f, 0.001f);
 
             if (PointerSprite == null)
                 Debug.LogError("Set PointerSprite on " + this.gameObject.name + " to the sprite you want to use as your pointer.", this.gameObject);
@@ -222,7 +230,7 @@ public class LeapInputModule : BaseInputModule
     void Update()
     {
         Quaternion HeadYaw = Quaternion.Euler(0f, InputTracking.GetLocalRotation(VRNode.Head).eulerAngles.y, 0f);
-        CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.01f);
+        CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.1f);
     }
 
     //Process is called by UI system to process events
@@ -277,6 +285,9 @@ public class LeapInputModule : BaseInputModule
                 UpdatePointer(whichHand, PointEvents[whichHand]);
                 ProcessState(whichHand, TipRaycast);
             }
+
+            PointerLines[whichHand].SetPosition(0, EventCamera.transform.position);
+            PointerLines[whichHand].SetPosition(1, Pointers[whichHand].transform.position);
 
             //Trigger events that come from changing pointer state
             ProcessStateEvents(whichHand);
@@ -447,6 +458,7 @@ public class LeapInputModule : BaseInputModule
         else //Raycast through knuckle of Index Finger
         {
             EventCamera.transform.position = Origin;
+            //IndexFingerPosition = Vector3.Lerp(LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].TipPosition.ToVector3(), LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[0].TipPosition.ToVector3(), 0.7f);
             IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
         }
 
@@ -683,22 +695,22 @@ public class LeapInputModule : BaseInputModule
     //A boolean that returns when a "click" is being triggered
     public bool isTriggeringInteraction(int whichHand)
     {
-        if (pointerState[whichHand] == pointerStates.NearCanvas || pointerState[whichHand] == pointerStates.TouchingCanvas || pointerState[whichHand] == pointerStates.TouchingElement)
+
+        if (LeapDataProvider.CurrentFrame.Hands[whichHand].IsRight && RightHandDetector != null && RightHandDetector.IsPinching)
+        {
+            return true;
+        }
+        else if (!LeapDataProvider.CurrentFrame.Hands[whichHand].IsRight && LeftHandDetector != null && LeftHandDetector.IsPinching)
+        {
+            return true;
+        }
+
+        if ((pointerState[whichHand] == pointerStates.NearCanvas || pointerState[whichHand] == pointerStates.TouchingCanvas || pointerState[whichHand] == pointerStates.TouchingElement))
         {
             return (distanceOfIndexTipToPointer(whichHand) < 0f);
         }
-        else
-        {
-            if (LeapDataProvider.CurrentFrame.Hands[whichHand].IsRight && RightHandDetector != null)
-            {
-                return RightHandDetector.IsPinching;
-            }
-            else if (!LeapDataProvider.CurrentFrame.Hands[whichHand].IsRight && LeftHandDetector != null)
-            {
-                return LeftHandDetector.IsPinching;
-            }
-            return LeapDataProvider.CurrentFrame.Hands[whichHand].PinchDistance < PinchingThreshold;
-        }
+
+        return false;
     }
 
     //The z position of the index finger tip to the Pointer
