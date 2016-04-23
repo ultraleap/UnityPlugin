@@ -119,6 +119,7 @@ public class LeapInputModule : BaseInputModule
     public List<ILeapWidget> LeapWidgets;
     private Quaternion CurrentRotation;
     private AudioSource SoundPlayer;
+    private Frame curFrame;
 
     //Queue of Spheres to Debug Draw
     private Queue<Vector3> DebugSphereQueue;
@@ -236,6 +237,8 @@ public class LeapInputModule : BaseInputModule
     //Process is called by UI system to process events
     public override void Process()
     {
+        curFrame = LeapDataProvider.CurrentFrame.TransformedCopy(LeapTransform.Identity);
+
         //Send update events if there is a selected object
         //This is important for InputField to receive keyboard events
         SendUpdateEventToSelectedObject();
@@ -244,7 +247,7 @@ public class LeapInputModule : BaseInputModule
         for (int whichHand = 0; whichHand < NumberOfHands; whichHand++)
         {
             //Move on if this hand isn't visible in the frame
-            if (LeapDataProvider.CurrentFrame.Hands.Count - 1 < whichHand)
+            if (curFrame.Hands.Count - 1 < whichHand)
             {
                 if (Pointers[whichHand].gameObject.activeInHierarchy == true)
                 {
@@ -255,7 +258,7 @@ public class LeapInputModule : BaseInputModule
 
             //Calculate Shoulder Positions (for Projection)
             Vector3 ProjectionOrigin = Vector3.zero;
-            switch (LeapDataProvider.CurrentFrame.Hands[whichHand].IsRight)
+            switch (curFrame.Hands[whichHand].IsRight)
             {
                 case true:
                     ProjectionOrigin = InputTracking.GetLocalPosition(VRNode.Head) + CurrentRotation * new Vector3(0.15f, -0.2f, 0f);
@@ -453,13 +456,14 @@ public class LeapInputModule : BaseInputModule
         {
             TipRaycast = true;
             EventCamera.transform.position = InputTracking.GetLocalPosition(VRNode.Head);
-            IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].StabilizedTipPosition.ToVector3();
+            IndexFingerPosition = curFrame.Hands[whichHand].Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).Center.ToVector3();//StabilizedTipPosition.ToVector3();
+           // IndexFingerPosition = curFrame.Hands[whichHand].Fingers[1].StabilizedTipPosition.ToVector3();
         }
         else //Raycast through knuckle of Index Finger
         {
             EventCamera.transform.position = Origin;
             //IndexFingerPosition = Vector3.Lerp(LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].TipPosition.ToVector3(), LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[0].TipPosition.ToVector3(), 0.7f);
-            IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
+            IndexFingerPosition = curFrame.Hands[whichHand].Fingers[1].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
         }
 
         //Draw Camera Origin
@@ -696,11 +700,11 @@ public class LeapInputModule : BaseInputModule
     public bool isTriggeringInteraction(int whichHand)
     {
 
-        if (LeapDataProvider.CurrentFrame.Hands[whichHand].IsRight && RightHandDetector != null && RightHandDetector.IsPinching)
+        if (curFrame.Hands[whichHand].IsRight && RightHandDetector != null && RightHandDetector.IsPinching)
         {
             return true;
         }
-        else if (!LeapDataProvider.CurrentFrame.Hands[whichHand].IsRight && LeftHandDetector != null && LeftHandDetector.IsPinching)
+        else if (!curFrame.Hands[whichHand].IsRight && LeftHandDetector != null && LeftHandDetector.IsPinching)
         {
             return true;
         }
@@ -710,14 +714,18 @@ public class LeapInputModule : BaseInputModule
             return (distanceOfIndexTipToPointer(whichHand) < 0f);
         }
 
-        return false;
+
+        return curFrame.Hands[whichHand].PinchDistance < PinchingThreshold;
+
+        //return false;
     }
 
     //The z position of the index finger tip to the Pointer
     public float distanceOfIndexTipToPointer(int whichHand)
     {
         //Get Base of Index Finger Position
-        Vector3 IndexTipPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].StabilizedTipPosition.ToVector3();
+        Vector3 IndexTipPosition = curFrame.Hands[whichHand].Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToVector3();
+        //Debug.Log(-Pointers[whichHand].InverseTransformPoint(IndexTipPosition).z * Pointers[whichHand].localScale.z);
         return -Pointers[whichHand].InverseTransformPoint(IndexTipPosition).z * Pointers[whichHand].localScale.z;
     }
 
