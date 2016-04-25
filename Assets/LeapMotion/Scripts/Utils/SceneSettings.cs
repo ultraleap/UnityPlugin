@@ -17,10 +17,10 @@ namespace Leap.Unity {
     public class ToggleVector3 : ToggleValue<Vector3> { }
 
     [SerializeField]
-    private ToggleFloat _shadowDistance;
+    private ToggleFloat _shadowDistance = new ToggleFloat();
 
     [SerializeField]
-    private ToggleVector3 _gravity;
+    private ToggleVector3 _gravity = new ToggleVector3();
 
     void Reset() {
       _shadowDistance.Value = QualitySettings.shadowDistance;
