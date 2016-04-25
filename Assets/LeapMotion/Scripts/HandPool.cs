@@ -127,8 +127,10 @@ namespace Leap.Unity {
           group = ModelPool[i];
           for (int m = 0; m < group.modelsCheckedOut.Count; m++) {
             IHandModel model = group.modelsCheckedOut[m];
-            HandProxy handProxy = ModelToHandProxyMapping[model];
-            handProxy.RemoveModel(model);
+            HandProxy handProxy;
+            if (ModelToHandProxyMapping.TryGetValue(model, out handProxy)) {
+              handProxy.RemoveModel(model);
+            }
           }
           group.modelsCheckedOut = new List<IHandModel>();
           group.IsEnabled = false;
