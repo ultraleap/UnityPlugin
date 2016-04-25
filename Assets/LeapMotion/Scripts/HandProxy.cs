@@ -16,10 +16,13 @@ namespace Leap.Unity {
     HandPool parent;
     public List<IHandModel> handModels;
 
-    public HandProxy(HandPool parent, Hand hand) :
-      base(hand.Id)
+    public HandProxy(HandPool parent, Hand hand, Chirality repChirality, ModelType repType) :
+      base(hand.Id, hand, repChirality, repType)
     {
       this.parent = parent;
+      this.RepChirality = repChirality;
+      this.RepType = repType;
+      this.MostRecentHand = hand;
     }
 
     /** To be called if the HandRepresentation no longer has a Leap Hand. */
@@ -32,33 +35,48 @@ namespace Leap.Unity {
           handModels[i] = null;
         }
       }
+      parent.ActiveHandReps.Remove(this);
     }
 
-    public override void AddRemoveModel(Hand hand, IHandModel model) {
+    public override void AddModel(IHandModel model) {
       Debug.Log("Adding:" + model);
       if (handModels == null) {
         handModels = new List<IHandModel>();
       }
       handModels.Add(model);
       if (model.GetLeapHand() == null) {
-        model.SetLeapHand(hand);
+        model.SetLeapHand(MostRecentHand);
         model.InitHand();
+        model.UpdateHand();
       }
       else {
-        model.SetLeapHand(hand);
+        model.SetLeapHand(MostRecentHand);
       }
       model.BeginHand();
+      parent.ModelToHandProxyMapping.Add(model, this);
+    }
+
+    public override void RemoveModel(IHandModel model) {
+      Debug.Log("RemoveModel");
+      if (handModels != null) {
+        model.FinishHand();
+        handModels.Remove(model);
+        parent.ReturnToPool(model);
+      }
     }
 
     /** Calls Updates in IHandModels that are part of this HandRepresentation */
-    public override void UpdateRepresentation(Hand hand, ModelType modelType)
+    public override void UpdateRepresentation(Hand hand)
     {
+      base.UpdateRepresentation(hand);
       if (handModels != null) {
         for (int i = 0; i < handModels.Count; i++) {
           handModels[i].SetLeapHand(hand);
           handModels[i].UpdateHand();
         }
       }
+
+      //this runs if handModels is null ?
     }
   }
 }

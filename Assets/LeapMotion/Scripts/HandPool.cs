@@ -21,7 +21,11 @@ namespace Leap.Unity {
     private List<ModelPair> ModelCollection;
     [SerializeField]
     public List<ModelGroup> ModelPool;
-    
+    public List<HandRepresentation> ActiveHandReps = new List<HandRepresentation>();
+
+    private Dictionary<IHandModel, ModelGroup> modelGroupMapping = new Dictionary<IHandModel, ModelGroup>();
+    public Dictionary<IHandModel, HandProxy> ModelToHandProxyMapping = new Dictionary<IHandModel, HandProxy>();
+
     [System.Serializable]
     public class ModelPair {
       public string PairName = "PairName";
@@ -41,6 +45,7 @@ namespace Leap.Unity {
     public class ModelGroup {
       public string GroupName;
       public List<IHandModel> modelList;
+      public List<IHandModel> modelsCheckedOut;
       public bool IsEnabled;
       public IHandModel TryGetModel(Chirality chirality, ModelType modelType) {
         for (int i = 0; i < modelList.Count; i++) {
@@ -56,10 +61,10 @@ namespace Leap.Unity {
         this.GroupName = groupName;
         this.IsEnabled = isEnabled;
         this.modelList = modelList;
+        this.modelsCheckedOut = new List<IHandModel>();
       }
     }
 
-    private Dictionary<IHandModel, ModelGroup> modelGroupMapping = new  Dictionary<IHandModel, ModelGroup>();
 
     /** Popuates the ModelPool with the contents of the ModelCollection */
     void Start() {
@@ -79,66 +84,67 @@ namespace Leap.Unity {
      * @param hand The Leap Hand data to be drive an IHandModel
      * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
      */
-    //public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
-    //  HandRepresentation handRep = null;
-    //  List<IHandModel> models = new List<IHandModel>();
-    //  foreach (ModelGroup group in ModelPool) {
-    //    for (int i = 0; i < group.modelList.Count; i++) {
-    //      IHandModel model = group.modelList[i];
-    //      bool isCorrectHandedness;
-    //      Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
-    //      isCorrectHandedness = model.Handedness == handChirality;
-    //      if (!EnforceHandedness || model.Handedness == Chirality.Either) {
-    //        isCorrectHandedness = true;
-    //      }
-    //      bool isCorrectModelType;
-    //      isCorrectModelType = model.HandModelType == modelType;
-    //      if (isCorrectModelType && isCorrectHandedness) {
-    //        group.modelList.RemoveAt(i);
-    //        models.Add(model);
-    //        if (group.IsEnabled == false) {
-    //          //model.IsEnabled = false;
-    //        }
-    //        break;
-    //      }
-    //    }
-    //  }
-    //  handRep = new HandProxy(this, models, hand);
-    //  return handRep;
-    //}
+
     public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
       //HandRepresentation handRep = null;
       List<IHandModel> models = new List<IHandModel>();
-      HandRepresentation handRep = new HandProxy(this, hand);
+      Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
+      HandRepresentation handRep = new HandProxy(this, hand, handChirality, modelType);
       for (int i = 0; i < ModelPool.Count; i++) {
         ModelGroup group = ModelPool[i];
-        //tryget
-        Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
-        IHandModel model = group.TryGetModel(handChirality, modelType);
-        if (model != null) {
-          handRep.AddRemoveModel(hand, model);
+        if (group.IsEnabled) {
+          IHandModel model = group.TryGetModel(handChirality, modelType);
+          if (model != null) {
+            handRep.AddModel(model);
+            group.modelsCheckedOut.Add(model);
+          }
         }
       }
+      ActiveHandReps.Add(handRep);
       return handRep;
     }
-
-    public void ReturnToPool(IHandModel model){
-      ModelGroup modelGroup = modelGroupMapping[model];
-      modelGroup.modelList.Add(model);
-    }
-
-    public void EnableDisablePair(string groupName, bool isEnabled) {
-      for (int i = 0; i < modelGroupMapping.Count; i++) {
-        ModelGroup group = modelGroupMapping.ElementAt(i).Value;
-        if (group.GroupName == groupName) {
-          IHandModel model = modelGroupMapping.ElementAt(i).Key;
-          if (model.IsTracked) {
-            model.InitHand();
-            model.BeginHand();
+    public void EnableGroup(string groupName) {
+      for (int i = 0; i < ModelPool.Count; i++) {
+        if (ModelPool[i].GroupName == groupName) {
+          ModelGroup group = ModelPool[i];
+          for (int hp = 0; hp < ActiveHandReps.Count; hp++ ) {
+            HandRepresentation handRep = ActiveHandReps[hp];
+            IHandModel model = group.TryGetModel(handRep.RepChirality, handRep.RepType);
+            if (model != null) {
+              handRep.AddModel(model);
+              group.modelsCheckedOut.Add(model);
+            }
           }
-          group.IsEnabled = isEnabled;
+          group.IsEnabled = true;
         }
       }
+    }
+    public void DisableGroup( string groupName) {
+      for (int i = 0; i < ModelPool.Count; i++) {
+        ModelGroup group = null;
+        if (ModelPool[i].GroupName == groupName) {
+          group = ModelPool[i];
+          Debug.Log("group.modelsCheckedOut.Count: " + group.modelsCheckedOut.Count);
+          for (int m = 0; m < group.modelsCheckedOut.Count; m++) {
+            Debug.Log("modelsCheckedOut: " + m);
+            IHandModel model = group.modelsCheckedOut[m];
+            HandProxy handProxy = ModelToHandProxyMapping[model];
+            handProxy.RemoveModel(model);
+            //group.modelsCheckedOut.Remove(model);
+          }
+        }
+        if (group != null) {
+          group.modelsCheckedOut = new List<IHandModel>();
+          group.IsEnabled = false;
+        }
+      }
+    }
+    public void ReturnToPool(IHandModel model) {
+      ModelGroup modelGroup = modelGroupMapping[model];
+      modelGroup.modelList.Add(model);
+      //modelGroup.modelsCheckedOut.Remove(model);
+      ModelToHandProxyMapping.Remove(model);
+      //add check to see if representation of chirality and type exists
     }
 
 #if UNITY_EDITOR
@@ -162,12 +168,39 @@ namespace Leap.Unity {
     }
 #endif
     void Update() {
-      if (Input.GetKeyUp(KeyCode.O)) {
-        EnableDisablePair("Poly_Hands", false);
+      if (Input.GetKeyUp(KeyCode.Space)) {
+        DisableGroup("Poly_Hands");
       }
       if (Input.GetKeyUp(KeyCode.P)) {
-        EnableDisablePair("Poly_Hands", true);
+        EnableGroup("Poly_Hands");
       }
     }
   }
 }
+//public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
+//  HandRepresentation handRep = null;
+//  List<IHandModel> models = new List<IHandModel>();
+//  foreach (ModelGroup group in ModelPool) {
+//    for (int i = 0; i < group.modelList.Count; i++) {
+//      IHandModel model = group.modelList[i];
+//      bool isCorrectHandedness;
+//      Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
+//      isCorrectHandedness = model.Handedness == handChirality;
+//      if (!EnforceHandedness || model.Handedness == Chirality.Either) {
+//        isCorrectHandedness = true;
+//      }
+//      bool isCorrectModelType;
+//      isCorrectModelType = model.HandModelType == modelType;
+//      if (isCorrectModelType && isCorrectHandedness) {
+//        group.modelList.RemoveAt(i);
+//        models.Add(model);
+//        if (group.IsEnabled == false) {
+//          //model.IsEnabled = false;
+//        }
+//        break;
+//      }
+//    }
+//  }
+//  handRep = new HandProxy(this, models, hand);
+//  return handRep;
+//}
