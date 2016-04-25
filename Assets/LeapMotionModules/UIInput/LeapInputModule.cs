@@ -35,7 +35,6 @@ using Leap;
 
 public class LeapInputModule : BaseInputModule
 {
-    public static LeapInputModule Instance;
 
     [Header(" [Interaction Setup]")]
     [Tooltip("The current Leap Data Provider for the scene.")]
@@ -116,7 +115,6 @@ public class LeapInputModule : BaseInputModule
 
     //Misc. Objects
     private Canvas[] canvases;
-    public List<ILeapWidget> LeapWidgets;
     private Quaternion CurrentRotation;
     private AudioSource SoundPlayer;
     private Frame curFrame;
@@ -141,8 +139,6 @@ public class LeapInputModule : BaseInputModule
     {
         base.Start();
 
-        Instance = this;
-
         if (LeapDataProvider == null)
         {
             LeapDataProvider = FindObjectOfType<LeapProvider>();
@@ -153,7 +149,6 @@ public class LeapInputModule : BaseInputModule
                 return;
             }
         }
-
 
         //Camera from which rays into the UI will be cast.
         EventCamera = new GameObject("UI Selection Camera").AddComponent<Camera>();
@@ -215,7 +210,6 @@ public class LeapInputModule : BaseInputModule
         PrevTriggeringInteraction = new bool[NumberOfHands];
         PrevScreenPosition = new Vector2[NumberOfHands];
         PrevState = new pointerStates[NumberOfHands];
-        LeapWidgets = new List<ILeapWidget>();
 
         //Used for calculating the origin of the Projective Interactions
         CurrentRotation = InputTracking.GetLocalRotation(VRNode.Head);
@@ -297,14 +291,12 @@ public class LeapInputModule : BaseInputModule
 
             //Tell Leap Buttons how far away the finger is
             if(PointEvents[whichHand].pointerCurrentRaycast.gameObject !=  null){
-                Selectable comp = PointEvents[whichHand].pointerCurrentRaycast.gameObject.GetComponent<Selectable>();
-                if (comp != null && comp.GetType().GetInterface("ILeapWidget") != null)
+                ILeapWidget comp = PointEvents[whichHand].pointerCurrentRaycast.gameObject.GetComponent<ILeapWidget>();
+                if (comp != null)
                 {
                     ((ILeapWidget)comp).HoverDistance(distanceOfIndexTipToPointer(whichHand));
                 }
             }
-
-
 
             //If we hit something with our Raycast, let's see if we should interact with it
             if (PointEvents[whichHand].pointerCurrentRaycast.gameObject != null && pointerState[whichHand] != pointerStates.OffCanvas)
@@ -410,22 +402,22 @@ public class LeapInputModule : BaseInputModule
             updatePointerColor(whichHand);
         }
 
-        //Make the special Leap Widget Buttons PopUp and Flatten when Appropriate
+        //Make the special Leap Widget Buttons Pop Up and Flatten when Appropriate
         if (PrevTouchingMode != getTouchingMode())
         {
             PrevTouchingMode = getTouchingMode();
             if (PrevTouchingMode)
             {
-                foreach (ILeapWidget widget in LeapWidgets)
+                foreach (Canvas canvas in canvases)
                 {
-                    widget.Expand();
+                    canvas.BroadcastMessage("Expand", SendMessageOptions.DontRequireReceiver);
                 }
             }
             else
             {
-                foreach (ILeapWidget widget in LeapWidgets)
+                foreach (Canvas canvas in canvases)
                 {
-                    widget.Retract();
+                    canvas.BroadcastMessage("Retract", SendMessageOptions.DontRequireReceiver);
                 }
             }
         }

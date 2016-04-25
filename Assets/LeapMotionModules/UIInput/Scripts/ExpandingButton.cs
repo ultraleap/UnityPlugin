@@ -30,7 +30,6 @@ namespace UnityEngine.UI {
         //CURRENT Floating Distances
         private float LayerOneFloatingDistance = 0f;
         private float LayerTwoFloatingDistance = 0f;
-        private float currentDistance = 100f;
 
         //How far the finger is from the base of the button
         private float HoveringDistance = 0f;
@@ -38,43 +37,26 @@ namespace UnityEngine.UI {
         //Whether or not the button is currently in float mode
         private bool floating = false;
 
-        //Whether or not this button has added itself to the list of LeapWidgets in the LeapInputModule
-        private bool AddedMyself = false;
-
         private float LastTimeHovered = 0f;
-
-        // Use this for initialization
-        void OnEnable()
-        {
-            LayerOne.transform.localPosition = new Vector3(LayerOne.transform.localPosition.x, LayerOne.transform.localPosition.y, 0f);
-            LayerTwo.transform.localPosition = new Vector3(LayerTwo.transform.localPosition.x, LayerTwo.transform.localPosition.y, 0f);
-        }
 
         // Update is called once per frame
         void Update()
         {
-            //Have to add this button in Update because the LeapWidgets list gets initialized in LeapInputModule's Start
-            if (!AddedMyself && LeapInputModule.Instance != null )
-            {
-                LeapInputModule.Instance.LeapWidgets.Add(this);
-                AddedMyself = true;
-            }
-
             if (Time.time > LastTimeHovered + 0.1f)
             {
-                currentDistance = 100f;
+                HoveringDistance = 100f;
             }
 
             if (floating)
             {
-                if (currentDistance < LayerOneFloatDistance)
+                if (HoveringDistance < LayerOneFloatDistance)
                 {
-                    LayerTwoFloatingDistance = currentDistance;
-                    LayerOneFloatingDistance = currentDistance;
+                    LayerTwoFloatingDistance = HoveringDistance;
+                    LayerOneFloatingDistance = HoveringDistance;
                 }
-                else if (currentDistance < LayerTwoFloatDistance)
+                else if (HoveringDistance < LayerTwoFloatDistance)
                 {
-                    LayerTwoFloatingDistance = currentDistance;
+                    LayerTwoFloatingDistance = HoveringDistance;
                     LayerOneFloatingDistance = LayerOneFloatDistance;
                 }
                 else
@@ -104,7 +86,7 @@ namespace UnityEngine.UI {
 
         public void HoverDistance(float distance)
         {
-            currentDistance = distance - 0.01f;
+            HoveringDistance = distance - 0.01f;
 
             LastTimeHovered = Time.time;
         }
