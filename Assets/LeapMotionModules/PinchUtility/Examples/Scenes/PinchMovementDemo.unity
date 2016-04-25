@@ -1337,6 +1337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 215a4d49fc705b74a9d3c5cbfa2c9601, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  frameRateText: {fileID: 0}
 --- !u!114 &1587970163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1459,7 +1460,7 @@ Prefab:
     - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
       propertyPath: _sphereMesh
       value: 
-      objectReference: {fileID: 4300000, guid: 274b6b0a59f428643a4debadb91a1dec, type: 3}
+      objectReference: {fileID: 4300000, guid: f124e8fd6551f44debb96875e8b8c07f, type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
   m_IsPrefabParent: 0
@@ -1581,7 +1582,7 @@ Prefab:
     - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
       propertyPath: _sphereMesh
       value: 
-      objectReference: {fileID: 4300000, guid: 274b6b0a59f428643a4debadb91a1dec, type: 3}
+      objectReference: {fileID: 4300000, guid: f124e8fd6551f44debb96875e8b8c07f, type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
   m_IsPrefabParent: 0
