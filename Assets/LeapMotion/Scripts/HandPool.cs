@@ -100,6 +100,7 @@ namespace Leap.Unity {
           }
         }
       }
+      //Return null if modelList is empty
       ActiveHandReps.Add(handRep);
       return handRep;
     }
@@ -124,16 +125,11 @@ namespace Leap.Unity {
         ModelGroup group = null;
         if (ModelPool[i].GroupName == groupName) {
           group = ModelPool[i];
-          Debug.Log("group.modelsCheckedOut.Count: " + group.modelsCheckedOut.Count);
           for (int m = 0; m < group.modelsCheckedOut.Count; m++) {
-            Debug.Log("modelsCheckedOut: " + m);
             IHandModel model = group.modelsCheckedOut[m];
             HandProxy handProxy = ModelToHandProxyMapping[model];
             handProxy.RemoveModel(model);
-            //group.modelsCheckedOut.Remove(model);
           }
-        }
-        if (group != null) {
           group.modelsCheckedOut = new List<IHandModel>();
           group.IsEnabled = false;
         }
@@ -142,7 +138,6 @@ namespace Leap.Unity {
     public void ReturnToPool(IHandModel model) {
       ModelGroup modelGroup = modelGroupMapping[model];
       modelGroup.modelList.Add(model);
-      //modelGroup.modelsCheckedOut.Remove(model);
       ModelToHandProxyMapping.Remove(model);
       //add check to see if representation of chirality and type exists
     }
@@ -168,7 +163,7 @@ namespace Leap.Unity {
     }
 #endif
     void Update() {
-      if (Input.GetKeyUp(KeyCode.Space)) {
+      if (Input.GetKeyUp(KeyCode.O)) {
         DisableGroup("Poly_Hands");
       }
       if (Input.GetKeyUp(KeyCode.P)) {
