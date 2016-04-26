@@ -278,7 +278,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &480729187
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1275,6 +1275,18 @@ Prefab:
     - target: {fileID: 419024, guid: 6102d840e97904c85a540c3e696a11cd, type: 2}
       propertyPath: m_LocalPosition.z
       value: -0.0000000071525594
+      objectReference: {fileID: 0}
+    - target: {fileID: 457252, guid: 6102d840e97904c85a540c3e696a11cd, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: -0.016
+      objectReference: {fileID: 0}
+    - target: {fileID: 457252, guid: 6102d840e97904c85a540c3e696a11cd, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 457252, guid: 6102d840e97904c85a540c3e696a11cd, type: 2}
+      propertyPath: m_LocalScale.z
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6102d840e97904c85a540c3e696a11cd, type: 2}
@@ -2653,6 +2665,18 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 191.5719
       objectReference: {fileID: 0}
+    - target: {fileID: 457252, guid: 6102d840e97904c85a540c3e696a11cd, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: -0.016
+      objectReference: {fileID: 0}
+    - target: {fileID: 457252, guid: 6102d840e97904c85a540c3e696a11cd, type: 2}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 457252, guid: 6102d840e97904c85a540c3e696a11cd, type: 2}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6102d840e97904c85a540c3e696a11cd, type: 2}
   m_IsPrefabParent: 0
@@ -2674,6 +2698,12 @@ Transform:
 GameObject:
   m_PrefabParentObject: {fileID: 124460, guid: 6102d840e97904c85a540c3e696a11cd, type: 2}
   m_PrefabInternal: {fileID: 2048966681}
+--- !u!114 &2048966686 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 11494352, guid: 6102d840e97904c85a540c3e696a11cd,
+    type: 2}
+  m_PrefabInternal: {fileID: 2048966681}
+  m_Script: {fileID: 11500000, guid: 151c8c2f008764de9a6626d477f47115, type: 3}
 --- !u!114 &2048966687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2690,9 +2720,9 @@ MonoBehaviour:
   OnActivate:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 480729186}
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 2048966686}
+        m_MethodName: Activate
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2706,9 +2736,9 @@ MonoBehaviour:
   OnDeactivate:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 480729186}
-        m_MethodName: SetActive
-        m_Mode: 6
+      - m_Target: {fileID: 2048966686}
+        m_MethodName: Deactivate
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine

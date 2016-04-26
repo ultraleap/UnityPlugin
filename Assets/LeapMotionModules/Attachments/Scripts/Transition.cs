@@ -34,7 +34,7 @@ public class Transition : MonoBehaviour {
 #if UNITY_EDITOR
   void Update() {
     if (!EditorApplication.isPlaying) {
-      updateTransition(Simulate);
+      updateTransition(1 - Simulate);
     }
   }
 #endif
