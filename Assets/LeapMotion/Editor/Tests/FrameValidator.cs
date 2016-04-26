@@ -90,9 +90,25 @@ namespace Leap.Unity.Tests {
                                       [ValueSource(typeof(FrameValidator), "_bones")] Bone.BoneType boneType) {
       foreach (Hand hand in _frame.Hands) {
         Bone bone = getBone(hand, fingerType, boneType);
-        
+
         Vector jointAverage = (bone.NextJoint + bone.PrevJoint) * 0.5f;
         assertVectorsEqual(jointAverage, bone.Center);
+      }
+    }
+
+    [Test]
+    public void DirectionMatchesJoints([ValueSource(typeof(FrameValidator), "_fingers")] Finger.FingerType fingerType,
+                                       [ValueSource(typeof(FrameValidator), "_bones")] Bone.BoneType boneType) {
+      foreach (Hand hand in _frame.Hands) {
+        Bone bone = getBone(hand, fingerType, boneType);
+
+        //If the joints are at the same position this test is meaningless
+        if (bone.NextJoint.DistanceTo(bone.PrevJoint) < TOLERANCE) {
+          continue;
+        }
+
+        Vector jointDirection = (bone.NextJoint - bone.PrevJoint).Normalized;
+        assertVectorsEqual(jointDirection, bone.Direction);
       }
     }
 
