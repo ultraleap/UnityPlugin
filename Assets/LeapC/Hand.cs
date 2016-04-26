@@ -32,9 +32,6 @@ namespace Leap
    */
   public class Hand
   {
-    private LeapTransform _basis = LeapTransform.Identity;
-    private bool _needToCalculateBasis = true;
-
     /**
      * Constructs a Hand object.
      *
@@ -300,40 +297,19 @@ namespace Leap
     public Vector Direction { get; private set; }
 
      /**
-     * The orientation of the hand as a basis matrix.
-     *
-     * The basis is defined as follows:
-     *
-     * **xAxis** Positive in the direction of the pinky
-     *
-     * **yAxis** Positive above the hand
-     *
-     * **zAxis** Positive in the direction of the wrist
-     *
-     * Note: Since the left hand is a mirror of the right hand, the
-     * basis matrix will be left-handed for left hands.
-     *
-     * \include Hand_basis.txt
-     *
-     * @returns The basis of the hand as a matrix.
-     * @since 2.0
+     * The transform of the hand.
+     * 
+     * Note, in version prior to 3.1, the Basis was a Matrix object.
+     * @since 3.1
      */
-    public LeapTransform Basis
-    {
-      get
-      {
-        if (_needToCalculateBasis)
-        {
-          //TODO verify this calculation for both hands
-          _basis.zBasis = -Direction;
-          _basis.yBasis = -PalmNormal;
-          _basis.xBasis = _basis.zBasis.Cross(_basis.yBasis);
-          _basis.xBasis = _basis.xBasis.Normalized;
-          _needToCalculateBasis = false;
-        }
-        return _basis;
-      }
-    }
+    public LeapTransform Basis { get { return new LeapTransform(PalmPosition, Rotation); } }
+
+    /**
+    * The rotation of the hand as a quaternion.
+    *
+    * @since 3.1
+    */
+    public LeapQuaternion Rotation { get { return Fingers[2].Bone((Bone.BoneType)0).Rotation; } } //proxy for hand rotation
 
     /**
      * The strength of a grab hand pose.
