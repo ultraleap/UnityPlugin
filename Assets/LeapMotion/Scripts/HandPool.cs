@@ -100,7 +100,6 @@ namespace Leap.Unity {
           }
         }
       }
-      //Return null if modelList is empty
       ActiveHandReps.Add(handRep);
       return handRep;
     }
@@ -141,7 +140,7 @@ namespace Leap.Unity {
       ModelGroup modelGroup = modelGroupMapping[model];
       modelGroup.modelList.Add(model);
       ModelToHandProxyMapping.Remove(model);
-      //add check to see if representation of chirality and type exists
+      //Todo: add check to see if representation of chirality and type exists
     }
 
 #if UNITY_EDITOR
@@ -174,30 +173,4 @@ namespace Leap.Unity {
     }
   }
 }
-//public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
-//  HandRepresentation handRep = null;
-//  List<IHandModel> models = new List<IHandModel>();
-//  foreach (ModelGroup group in ModelPool) {
-//    for (int i = 0; i < group.modelList.Count; i++) {
-//      IHandModel model = group.modelList[i];
-//      bool isCorrectHandedness;
-//      Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
-//      isCorrectHandedness = model.Handedness == handChirality;
-//      if (!EnforceHandedness || model.Handedness == Chirality.Either) {
-//        isCorrectHandedness = true;
-//      }
-//      bool isCorrectModelType;
-//      isCorrectModelType = model.HandModelType == modelType;
-//      if (isCorrectModelType && isCorrectHandedness) {
-//        group.modelList.RemoveAt(i);
-//        models.Add(model);
-//        if (group.IsEnabled == false) {
-//          //model.IsEnabled = false;
-//        }
-//        break;
-//      }
-//    }
-//  }
-//  handRep = new HandProxy(this, models, hand);
-//  return handRep;
-//}
+

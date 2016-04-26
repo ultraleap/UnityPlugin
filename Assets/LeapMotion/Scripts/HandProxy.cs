@@ -30,7 +30,6 @@ namespace Leap.Unity {
       if (handModels != null) {
         for (int i = 0; i < handModels.Count; i++) {
           handModels[i].FinishHand();
-          Debug.Log("HandProxy.Finish(): " + parent);
           parent.ReturnToPool(handModels[i]);
           handModels[i] = null;
         }
@@ -39,7 +38,6 @@ namespace Leap.Unity {
     }
 
     public override void AddModel(IHandModel model) {
-      Debug.Log("Adding:" + model);
       if (handModels == null) {
         handModels = new List<IHandModel>();
       }
@@ -57,7 +55,6 @@ namespace Leap.Unity {
     }
 
     public override void RemoveModel(IHandModel model) {
-      Debug.Log("RemoveModel");
       if (handModels != null) {
         model.FinishHand();
         handModels.Remove(model);
@@ -75,8 +72,6 @@ namespace Leap.Unity {
           handModels[i].UpdateHand();
         }
       }
-
-      //this runs if handModels is null ?
     }
   }
 }
