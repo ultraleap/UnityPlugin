@@ -16,11 +16,12 @@ namespace Leap.Unity {
    */
   public class HandPool :
     HandFactory {
-    public bool EnforceHandedness = false;
+    [SerializeField]
+    private bool EnforceHandedness = false;
     [SerializeField]
     private List<ModelPair> ModelCollection;
     [SerializeField]
-    public List<ModelGroup> ModelPool;
+    private List<ModelGroup> ModelPool;
     public List<HandRepresentation> ActiveHandReps = new List<HandRepresentation>();
 
     private Dictionary<IHandModel, ModelGroup> modelGroupMapping = new Dictionary<IHandModel, ModelGroup>();
