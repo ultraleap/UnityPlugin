@@ -31,7 +31,7 @@ public class Cursor3D : MonoBehaviour {
 
     //Can only handle one pinch per frame
     //Two colliders don't return two uniquely identifiable OnTriggerEnter's
-    private SphereCollider collider;
+    private SphereCollider radialcollider;
     private int justPinched = 0;
 
 	// Use this for initialization
@@ -48,10 +48,10 @@ public class Cursor3D : MonoBehaviour {
         }
 
         Cursors = new GameObject[2];
-        collider = this.gameObject.AddComponent<SphereCollider>();
-        collider.radius = CollisionSphereDiameter / 2f;
-        collider.enabled = false;
-        collider.isTrigger = true;
+        radialcollider = this.gameObject.AddComponent<SphereCollider>();
+        radialcollider.radius = CollisionSphereDiameter / 2f;
+        radialcollider.enabled = false;
+        radialcollider.isTrigger = true;
 
         for (int i = 0; i < Cursors.Length; i++)
         {
@@ -74,7 +74,7 @@ public class Cursor3D : MonoBehaviour {
         Quaternion HeadYaw = Quaternion.Euler(0f, InputTracking.GetLocalRotation(VRNode.Head).eulerAngles.y, 0f);
         CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.1f);
 
-        collider.enabled = false;
+        radialcollider.enabled = false;
 
         for (int whichHand = 0; whichHand < curFrame.Hands.Count; whichHand++)
         {
@@ -105,9 +105,9 @@ public class Cursor3D : MonoBehaviour {
                     prevPinching[whichHand] = true;
                     Cursors[whichHand].GetComponent<MeshRenderer>().material.color = Color.green;
 
-                    collider.center = transform.InverseTransformPoint(Cursors[whichHand].transform.position);
+                    radialcollider.center = transform.InverseTransformPoint(Cursors[whichHand].transform.position);
                     justPinched = whichHand;
-                    collider.enabled = true;
+                    radialcollider.enabled = true;
                 }
             }else{
                 if (prevPinching[whichHand])

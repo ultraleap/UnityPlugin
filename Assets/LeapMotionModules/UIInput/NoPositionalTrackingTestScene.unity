@@ -822,6 +822,46 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 1.0000001
       objectReference: {fileID: 0}
+    - target: {fileID: 428776, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0.07399496
+      objectReference: {fileID: 0}
+    - target: {fileID: 428776, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: -0.99437046
+      objectReference: {fileID: 0}
+    - target: {fileID: 428776, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: -0.075277835
+      objectReference: {fileID: 0}
+    - target: {fileID: 428776, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 0.00924224
+      objectReference: {fileID: 0}
+    - target: {fileID: 428776, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: -0.08000001
+      objectReference: {fileID: 0}
+    - target: {fileID: 428776, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0.11999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 428776, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: -0.015000004
+      objectReference: {fileID: 0}
+    - target: {fileID: 428776, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -8.5308
+      objectReference: {fileID: 0}
+    - target: {fileID: 428776, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -178.2894
+      objectReference: {fileID: 0}
+    - target: {fileID: 428776, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -8.6391
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 23f2cce114628a448bfeaae171b4c0c0, type: 2}
   m_IsPrefabParent: 0
@@ -1327,27 +1367,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Layers:
   - LayerTransform: {fileID: 2032947206}
-    MaxFloatDistance: 0.02
+    MaxFloatDistance: 0.01
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   - LayerTransform: {fileID: 1622479602}
-    MaxFloatDistance: 0.04
+    MaxFloatDistance: 0.02
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   - LayerTransform: {fileID: 1304534475}
-    MaxFloatDistance: 0.06
+    MaxFloatDistance: 0.03
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   - LayerTransform: {fileID: 1444482303}
-    MaxFloatDistance: 0.08
+    MaxFloatDistance: 0.04
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   - LayerTransform: {fileID: 888520381}
-    MaxFloatDistance: 0.1
+    MaxFloatDistance: 0.05
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   - LayerTransform: {fileID: 301223347}
-    MaxFloatDistance: 0.12
+    MaxFloatDistance: 0.06
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   ExpandSpeed: 0.05
@@ -2047,11 +2087,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Layers:
   - LayerTransform: {fileID: 1566600391}
-    MaxFloatDistance: 0.05
+    MaxFloatDistance: 0.02
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   - LayerTransform: {fileID: 1735971374}
-    MaxFloatDistance: 0.1
+    MaxFloatDistance: 0.04
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   ExpandSpeed: 0.1
@@ -4345,7 +4385,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 968877814}
   m_LocalRotation: {x: 0.12258729, y: -0.8665033, z: 0.25051022, w: 0.4139917}
-  m_LocalPosition: {x: 0, y: 0, z: -0.28900003}
+  m_LocalPosition: {x: 0, y: 0, z: -0.249}
   m_LocalScale: {x: 0.0010000003, y: 0.001, z: 0.0010000004}
   m_LocalEulerAnglesHint: {x: 32.3871, y: -129.0246, z: -0.341}
   m_Children:
@@ -4354,7 +4394,7 @@ RectTransform:
   m_RootOrder: 3
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.3299322, y: -0.25000668}
+  m_AnchoredPosition: {x: -0.346, y: -0.25000668}
   m_SizeDelta: {x: 458, y: 447.424}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &968877816
@@ -5211,6 +5251,46 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 1.0000001
       objectReference: {fileID: 0}
+    - target: {fileID: 480912, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: -0.07399494
+      objectReference: {fileID: 0}
+    - target: {fileID: 480912, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: -0.99437046
+      objectReference: {fileID: 0}
+    - target: {fileID: 480912, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: -0.075277776
+      objectReference: {fileID: 0}
+    - target: {fileID: 480912, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: -0.00924224
+      objectReference: {fileID: 0}
+    - target: {fileID: 480912, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0.08000001
+      objectReference: {fileID: 0}
+    - target: {fileID: 480912, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0.11999998
+      objectReference: {fileID: 0}
+    - target: {fileID: 480912, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: -0.015000004
+      objectReference: {fileID: 0}
+    - target: {fileID: 480912, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -8.5308
+      objectReference: {fileID: 0}
+    - target: {fileID: 480912, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 178.2894
+      objectReference: {fileID: 0}
+    - target: {fileID: 480912, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 8.6391
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
   m_IsPrefabParent: 0
@@ -5293,7 +5373,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1062194879}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.033, y: 0, z: 0.102}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
@@ -8436,7 +8516,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1676285221}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b5e28570e3b26f4fa9606c9f3294d7d, type: 3}
   m_Name: 
@@ -8449,7 +8529,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1676285221}
   m_LocalRotation: {x: 0, y: 0.5735765, z: 0, w: 0.819152}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.131, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 70, z: 0}
   m_Children:
@@ -9179,27 +9259,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Layers:
   - LayerTransform: {fileID: 1689572089}
-    MaxFloatDistance: 0.02
+    MaxFloatDistance: 0.01
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   - LayerTransform: {fileID: 307190751}
-    MaxFloatDistance: 0.04
+    MaxFloatDistance: 0.02
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   - LayerTransform: {fileID: 1807667811}
-    MaxFloatDistance: 0.06
+    MaxFloatDistance: 0.03
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   - LayerTransform: {fileID: 1572479808}
-    MaxFloatDistance: 0.08
+    MaxFloatDistance: 0.04
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   - LayerTransform: {fileID: 544919274}
-    MaxFloatDistance: 0.1
+    MaxFloatDistance: 0.05
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   - LayerTransform: {fileID: 673850456}
-    MaxFloatDistance: 0.1
+    MaxFloatDistance: 0.06
     MinFloatDistance: 0
     CurrentFloatingDistance: 0
   ExpandSpeed: 0.05
