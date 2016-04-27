@@ -60,7 +60,6 @@ namespace Leap.Unity {
       if (handModels != null) {
         model.FinishHand();
         handModels.Remove(model);
-        parent.ReturnToPool(model);
       }
     }
 
