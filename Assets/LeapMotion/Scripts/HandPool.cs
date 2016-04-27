@@ -87,7 +87,6 @@ namespace Leap.Unity {
 
     public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
       //HandRepresentation handRep = null;
-      List<IHandModel> models = new List<IHandModel>();
       Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
       HandRepresentation handRep = new HandProxy(this, hand, handChirality, modelType);
       for (int i = 0; i < ModelPool.Count; i++) {
