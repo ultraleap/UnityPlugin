@@ -5,7 +5,7 @@ namespace Leap.Unity.Tests {
 
   public abstract class FrameValidator {
     protected const float TOLERANCE = 0.0001f;
-    private static Finger.FingerType[] _fingers = {
+    protected static Finger.FingerType[] _fingers = {
       Finger.FingerType.TYPE_INDEX,
       Finger.FingerType.TYPE_MIDDLE,
       Finger.FingerType.TYPE_PINKY,
@@ -13,7 +13,7 @@ namespace Leap.Unity.Tests {
       Finger.FingerType.TYPE_THUMB
     };
 
-    private static Bone.BoneType[] _bones = {
+    protected static Bone.BoneType[] _bones = {
       Bone.BoneType.TYPE_DISTAL,
       Bone.BoneType.TYPE_INTERMEDIATE,
       Bone.BoneType.TYPE_METACARPAL,
