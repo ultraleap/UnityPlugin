@@ -2108,7 +2108,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1284852055
 Transform:
   m_ObjectHideFlags: 0
@@ -2677,6 +2677,10 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 11453478, guid: 6102d840e97904c85a540c3e696a11cd, type: 2}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6102d840e97904c85a540c3e696a11cd, type: 2}
   m_IsPrefabParent: 0
@@ -2710,7 +2714,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2048966685}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 299c90464d86841bb9c3f0bd6f79da8a, type: 3}
   m_Name: 
@@ -2749,6 +2753,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  Provider: {fileID: 0}
   Proximity: 0.1
   VelocityThreshold: 0.1
   PalmAngleLimit: 90
@@ -2783,3 +2788,17 @@ MonoBehaviour:
   Proximity: 0.1
   VelocityThreshold: 0.1
   PalmAngleLimit: 75
+--- !u!114 &2048966689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2048966685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d014de507b9c94113858cb8d7bd028c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Menu: {fileID: 1284852054}
+  Zed: {x: 0, y: 0, z: 0}
+  IsActive: 0

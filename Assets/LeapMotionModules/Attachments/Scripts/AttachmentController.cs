@@ -2,7 +2,7 @@
 using UnityEngine.Events;
 using System.Collections;
 
-public class AttachmentPoint : MonoBehaviour {
+public class AttachmentController : MonoBehaviour {
   
   public bool IsActive = false;
   public Transition InTransition;
