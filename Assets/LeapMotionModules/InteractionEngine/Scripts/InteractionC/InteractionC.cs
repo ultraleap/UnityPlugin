@@ -232,7 +232,7 @@ namespace Leap.Unity.Interaction.CApi {
                                            ref INTERACTION_SCENE_INFO sceneInfo,
                                                string dataPath) {
       var rs = LeapIECreateScene(ref scene, ref sceneInfo, dataPath);
-      Logger.HandleReturnStatus(scene, "Create Scene", LogLevel.Info, rs);
+      Logger.HandleReturnStatus("Create Scene", LogLevel.Info, rs);
       return rs;
     }
 
@@ -260,16 +260,9 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Get Last Error ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastError")]
-    private static extern ReturnStatus GetLastError(ref INTERACTION_SCENE scene);
+    public static extern ReturnStatus GetLastError(ref INTERACTION_SCENE scene);
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastErrorString")]
-    private static extern IntPtr GetLastErrorString();
-
-    public static ReturnStatus GetLastError(ref INTERACTION_SCENE scene,
-                                            out string message) {
-      ReturnStatus rs = GetLastError(ref scene);
-      message = Marshal.PtrToStringAnsi(GetLastErrorString());
-      return rs;
-    }
+    public static extern IntPtr GetLastErrorString();
 
     public static ReturnStatus GetLastError(ref INTERACTION_SCENE scene,
                                             out IntPtr messagePtr) {
