@@ -53,7 +53,6 @@ namespace Leap.Unity {
         model.BeginHand();
 
       }
-      parent.ModelToHandProxyMapping.Add(model, this);
     }
 
     public override void RemoveModel(IHandModel model) {

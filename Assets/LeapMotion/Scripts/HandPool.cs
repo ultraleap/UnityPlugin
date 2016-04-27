@@ -16,7 +16,8 @@ namespace Leap.Unity {
    */
   public class HandPool :
     HandFactory {
- 
+    [SerializeField]
+    private bool EnforceHandedness;
     [SerializeField]
     private List<ModelPair> ModelCollection;
     [SerializeField]
@@ -24,7 +25,7 @@ namespace Leap.Unity {
     public List<HandRepresentation> ActiveHandReps = new List<HandRepresentation>();
 
     private Dictionary<IHandModel, ModelGroup> modelGroupMapping = new Dictionary<IHandModel, ModelGroup>();
-    public Dictionary<IHandModel, HandProxy> ModelToHandProxyMapping = new Dictionary<IHandModel, HandProxy>();
+    private Dictionary<IHandModel, HandRepresentation> modelToHandRepMapping = new Dictionary<IHandModel, HandRepresentation>();
 
     [System.Serializable]
     public class ModelPair {
@@ -63,7 +64,7 @@ namespace Leap.Unity {
       public void ReturnToGroup(IHandModel model) {
         modelsCheckedOut.Remove(model);
         modelList.Add(model);
-        this._handPool.ModelToHandProxyMapping.Remove(model);
+        this._handPool.modelToHandRepMapping.Remove(model);
       }
       public ModelGroup(string groupName, bool isEnabled, List<IHandModel> modelList, HandPool handPool) {
         this.GroupName = groupName;
@@ -94,7 +95,6 @@ namespace Leap.Unity {
      */
 
     public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
-      //HandRepresentation handRep = null;
       Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
       HandRepresentation handRep = new HandProxy(this, hand, handChirality, modelType);
       for (int i = 0; i < ModelPool.Count; i++) {
@@ -103,6 +103,7 @@ namespace Leap.Unity {
           IHandModel model = group.TryGetModel(handChirality, modelType);
           if (model != null) {
             handRep.AddModel(model);
+            modelToHandRepMapping.Add(model, handRep);
           }
         }
       }
@@ -118,6 +119,7 @@ namespace Leap.Unity {
             IHandModel model = group.TryGetModel(handRep.RepChirality, handRep.RepType);
             if (model != null) {
               handRep.AddModel(model);
+              modelToHandRepMapping.Add(model, handRep);
             }
           }
           group.IsEnabled = true;
@@ -131,9 +133,9 @@ namespace Leap.Unity {
           group = ModelPool[i];
           for (int m = 0; m < group.modelsCheckedOut.Count; m++) {
             IHandModel model = group.modelsCheckedOut[m];
-            HandProxy handProxy;
-            if (ModelToHandProxyMapping.TryGetValue(model, out handProxy)) {
-              handProxy.RemoveModel(model);
+            HandRepresentation handRep;
+            if (modelToHandRepMapping.TryGetValue(model, out handRep)) {
+              handRep.RemoveModel(model);
               group.ReturnToGroup(model);
               m--;
             }
