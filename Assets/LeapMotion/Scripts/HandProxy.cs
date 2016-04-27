@@ -45,12 +45,14 @@ namespace Leap.Unity {
       if (model.GetLeapHand() == null) {
         model.SetLeapHand(MostRecentHand);
         model.InitHand();
+        model.BeginHand();
         model.UpdateHand();
       }
       else {
         model.SetLeapHand(MostRecentHand);
+        model.BeginHand();
+
       }
-      model.BeginHand();
       parent.ModelToHandProxyMapping.Add(model, this);
     }
 
