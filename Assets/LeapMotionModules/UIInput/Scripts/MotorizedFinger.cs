@@ -22,8 +22,6 @@ namespace Leap.Unity
 
         void Start()
         {
-
-
             for (int i = 0; i < bones.Length; ++i)
             {
                 if (bones[i] != null)
@@ -31,6 +29,11 @@ namespace Leap.Unity
                     bones[i].transform.parent = null;
                 }
             }
+        }
+
+        void OnValidate()
+        {
+            hinges = new HingeJoint[3];
         }
 
         void InitializeFingerJoints()
@@ -125,7 +128,6 @@ namespace Leap.Unity
         }
 
         void OnEnable(){
-            hinges = new HingeJoint[3];
             dirty = true;
             RemoveFingerJoints();
         }
@@ -181,15 +183,19 @@ namespace Leap.Unity
                     }
                     else
                     {
-                        float offset = (Quaternion.Inverse((Quaternion.Inverse(GetBoneRotation(i)) * bones[i].rotation))).eulerAngles.x;
-                        if (offset > 180)
+                        if (hinges[i - 1] != null)
                         {
-                           offset -= 360f;
+                            float offset = (Quaternion.Inverse((Quaternion.Inverse(GetBoneRotation(i)) * bones[i].rotation))).eulerAngles.x;
+                            if (offset > 180)
+                            {
+                                offset -= 360f;
+                            }
+                            JointMotor mmotor = new JointMotor();
+                            mmotor.force = 100f;
+                            mmotor.targetVelocity = offset * -100f;
+                            mmotor.freeSpin = true;
+                            hinges[i - 1].motor = mmotor;
                         }
-                        JointMotor mmotor = new JointMotor();
-                        mmotor.force = 10f;
-                        mmotor.targetVelocity = offset * -100f;
-                        hinges[i-1].motor = mmotor;
                     }
                 }
             }

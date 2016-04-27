@@ -64,6 +64,9 @@ namespace Leap.Unity
                     }
                 }
             }
+            Rigidbody palmBody = palm.GetComponent<Rigidbody>();
+            palmBody.velocity = Vector3.zero;
+            palmBody.angularVelocity = Vector3.zero;
         }
 
         public override void UpdateHand()
@@ -75,6 +78,8 @@ namespace Leap.Unity
                 {
                     palmBody.MovePosition(GetPalmCenter());
                     palmBody.MoveRotation(GetPalmRotation());
+                    palmBody.velocity *= 0.95f;
+                    palmBody.angularVelocity *= 0.95f;
                     palm.position = GetPalmCenter();
                     palm.rotation = GetPalmRotation();
                 }
