@@ -138,8 +138,7 @@ namespace Leap.Unity {
               m--;
             }
           }
-          //Todo replace with assert that list is empty
-          //group.modelsCheckedOut = new List<IHandModel>();
+          Debug.Assert(group.modelsCheckedOut.Count == 0, group.GroupName + "'s modelsCheckedOut List has not been cleared");
           group.IsEnabled = false;
         }
       }
