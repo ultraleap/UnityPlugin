@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -157,7 +158,7 @@ namespace Leap.Unity {
               m--;
             }
           }
-          Debug.Assert(group.modelsCheckedOut.Count == 0, group.GroupName + "'s modelsCheckedOut List has not been cleared");
+          Assert.AreEqual(0, group.modelsCheckedOut.Count, group.GroupName + "'s modelsCheckedOut List has not been cleared");
           group.IsEnabled = false;
         }
       }
