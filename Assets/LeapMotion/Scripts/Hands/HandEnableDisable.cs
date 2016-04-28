@@ -13,7 +13,6 @@ namespace Leap.Unity{
   		gameObject.SetActive(true);
   	}
   
-  	// Use this for initialization
   	protected override void HandFinish () {
   		gameObject.SetActive(false);
   	}

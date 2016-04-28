@@ -39,34 +39,6 @@ namespace Leap
     }
 
     /**
-    * Updates the estimate of latency between the simulation of time
-    * and the Leap Motion device time.
-    *
-    * Call this function when a simulation time step occurs. Uses the Leap clock time at the
-    * moment this function is called.
-    *
-    * @param applicationClock The time in milliseconds when this simulation frame occured.
-    * @since 3.x.z
-    */
-    public void UpdateLatencyEstimate(Int64 applicationClock){
-      LeapC.UpdateLatency(_rebaserHandle, applicationClock, LeapC.GetNow());
-    }
-
-    /**
-    * Updates the estimate of latency between the simulation of time
-    * and the Leap Motion device time.
-    *
-    * Call this function when a simulation time step occurs.
-    *
-    * @param applicationClock The time in milliseconds when this simulation frame occured.
-    * @param leapClock the time in milliseconds obtained by calling Controller.Now().
-    * @since 3.x.z
-    */
-    public void UpdateLatencyEstimate(Int64 applicationClock, Int64 leapClock){
-      LeapC.UpdateLatency(_rebaserHandle, applicationClock, leapClock);
-    }
-
-    /**
     * Updates the estimate of latency between render time
     * and the Leap Motion device time.
     *
@@ -97,8 +69,7 @@ namespace Leap
     /**
     * Returns the Leap Motion device time corresponding to an external time.
     *
-    * For this function to return meaningful results, the UpdateLatency() function must be
-    * called at each physics simulation step and the UpdateRebaseEstimate() function must be
+    * For this function to return meaningful results, the UpdateRebaseEstimate() function must be
     * called for each graphics frame rendered.
     *
     * @param externalClockTime The time in milliseconds.
