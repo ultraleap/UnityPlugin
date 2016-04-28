@@ -13,10 +13,11 @@ namespace Leap.Unity
     /** A physics model for our rigid hand made out of various Unity Collider. */
     public class PuppetHand : SkeletalHand
     {
-        public float PalmSpringStrength = 50000f;
-        public float PalmSpringDistanceOfMaxForce = 0.02f;
-        public float FingerMotorForce = 100000f;
+        public float PalmSpringStrength = 10000f;
+        public float PalmSpringDistanceOfMaxForce = 0.03f;
+        public float FingerMotorForce = 1000f;
         public float FingerMotorSpeed = 50f;
+        public bool DetachHand = false;
 
         //Holder Parent of all of the Rigidbodies this hand is made of
         GameObject RigidbodyParent;
@@ -49,7 +50,7 @@ namespace Leap.Unity
 
                 for (int f = 0; f < fingers.Length; ++f) {
                     if (fingers[f] != null) {
-                        ((MotorizedFinger)fingers[f]).setParentofDigits(RigidbodyParent.transform, FingerMotorForce, FingerMotorSpeed);
+                        ((MotorizedFinger)fingers[f]).setParentofDigits(RigidbodyParent.transform, FingerMotorForce, FingerMotorSpeed, GetComponent<Rigidbody>().useGravity);
 
                         Physics.IgnoreCollision(fingers[f].bones[1].GetComponent<Collider>(), palm.GetComponent<Collider>());
                         Physics.IgnoreCollision(fingers[f].bones[2].GetComponent<Collider>(), palm.GetComponent<Collider>());
@@ -91,6 +92,7 @@ namespace Leap.Unity
                 Rigidbody palmBody = palm.GetComponent<Rigidbody>();
                 palmBody.velocity = Vector3.zero;
                 palmBody.angularVelocity = Vector3.zero;
+                palmBody.useGravity = GetComponent<Rigidbody>().useGravity;
             }
         }
 
@@ -117,61 +119,69 @@ namespace Leap.Unity
                     Rigidbody palmBody = palm.GetComponent<Rigidbody>();
                     if (palmBody)
                     {
-                        if (!gameObject.GetComponent<SpringJoint>())
-                        {
-                            spring1 = gameObject.AddComponent<SpringJoint>();
-                            spring1.anchor = new Vector3(0.03f, 0f, 0.03f);
-                            spring1.autoConfigureConnectedAnchor = false;
-                            spring1.damper = 100f;
-                            spring1.maxDistance = 0f;
-                            spring1.tolerance = 0f;
-                            spring1.connectedBody = palmBody;
-                            spring1.connectedAnchor = new Vector3(0.03f, 0f, 0.03f);
-                            spring1.transform.position = GetPalmCenter();
+                        if (!palmBody.isKinematic) {
+                            if (!gameObject.GetComponent<SpringJoint>()) {
+                                if (!DetachHand) {
+                                    spring1 = gameObject.AddComponent<SpringJoint>();
+                                    spring1.anchor = new Vector3(0.03f, 0f, 0.03f);
+                                    spring1.autoConfigureConnectedAnchor = false;
+                                    spring1.damper = 0f;
+                                    spring1.maxDistance = 0f;
+                                    spring1.tolerance = 0f;
+                                    spring1.connectedBody = palmBody;
+                                    spring1.connectedAnchor = new Vector3(0.03f, 0f, 0.03f);
+                                    spring1.transform.position = GetPalmCenter();
 
-                            spring2 = gameObject.AddComponent<SpringJoint>();
-                            spring2.anchor = new Vector3(-0.03f, 0f, 0.03f);
-                            spring2.autoConfigureConnectedAnchor = false;
-                            spring2.damper = 100f;
-                            spring2.maxDistance = 0f;
-                            spring2.tolerance = 0f;
-                            spring2.connectedBody = palmBody;
-                            spring2.connectedAnchor = new Vector3(-0.03f, 0f, 0.03f);
-                            spring2.transform.position = GetPalmCenter();
+                                    spring2 = gameObject.AddComponent<SpringJoint>();
+                                    spring2.anchor = new Vector3(-0.03f, 0f, 0.03f);
+                                    spring2.autoConfigureConnectedAnchor = false;
+                                    spring2.damper = 0f;
+                                    spring2.maxDistance = 0f;
+                                    spring2.tolerance = 0f;
+                                    spring2.connectedBody = palmBody;
+                                    spring2.connectedAnchor = new Vector3(-0.03f, 0f, 0.03f);
+                                    spring2.transform.position = GetPalmCenter();
 
-                            spring3 = gameObject.AddComponent<SpringJoint>();
-                            spring3.anchor = new Vector3(-0.03f, 0f, -0.03f);
-                            spring3.autoConfigureConnectedAnchor = false;
-                            spring3.damper = 100f;
-                            spring3.maxDistance = 0f;
-                            spring3.tolerance = 0f;
-                            spring3.connectedBody = palmBody;
-                            spring3.connectedAnchor = new Vector3(-0.03f, 0f, -0.03f);
-                            spring3.transform.position = GetPalmCenter();
+                                    spring3 = gameObject.AddComponent<SpringJoint>();
+                                    spring3.anchor = new Vector3(-0.03f, 0f, -0.03f);
+                                    spring3.autoConfigureConnectedAnchor = false;
+                                    spring3.damper = 0f;
+                                    spring3.maxDistance = 0f;
+                                    spring3.tolerance = 0f;
+                                    spring3.connectedBody = palmBody;
+                                    spring3.connectedAnchor = new Vector3(-0.03f, 0f, -0.03f);
+                                    spring3.transform.position = GetPalmCenter();
 
-                            spring4 = gameObject.AddComponent<SpringJoint>();
-                            spring4.anchor = new Vector3(0.03f, 0f, -0.03f);
-                            spring4.autoConfigureConnectedAnchor = false;
-                            spring4.damper = 100f;
-                            spring4.maxDistance = 0f;
-                            spring4.tolerance = 0f;
-                            spring4.connectedBody = palmBody;
-                            spring4.connectedAnchor = new Vector3(0.03f, 0f, -0.03f);
-                            spring4.transform.position = GetPalmCenter();
-                        }
-                        else
-                        {
-                            transform.position = GetPalmCenter();
-                            transform.rotation = GetPalmRotation();
+                                    spring4 = gameObject.AddComponent<SpringJoint>();
+                                    spring4.anchor = new Vector3(0.03f, 0f, -0.03f);
+                                    spring4.autoConfigureConnectedAnchor = false;
+                                    spring4.damper = 0f;
+                                    spring4.maxDistance = 0f;
+                                    spring4.tolerance = 0f;
+                                    spring4.connectedBody = palmBody;
+                                    spring4.connectedAnchor = new Vector3(0.03f, 0f, -0.03f);
+                                    spring4.transform.position = GetPalmCenter();
+                                }
+                            } else {
+                                //transform.position = GetPalmCenter();
+                                //transform.rotation = GetPalmRotation();
+                                GetComponent<Rigidbody>().MovePosition(GetPalmCenter());
+                                GetComponent<Rigidbody>().MoveRotation(GetPalmRotation());
 
-                            float dist = Vector3.Distance(transform.TransformPoint(spring1.anchor), palm.TransformPoint(spring1.connectedAnchor));
-                            spring1.spring = (dist > PalmSpringDistanceOfMaxForce) ? (PalmSpringStrength * PalmSpringDistanceOfMaxForce) / dist : PalmSpringStrength;
-                            dist = Vector3.Distance(transform.TransformPoint(spring2.anchor), palm.TransformPoint(spring2.connectedAnchor));
-                            spring2.spring = (dist > PalmSpringDistanceOfMaxForce) ? (PalmSpringStrength * PalmSpringDistanceOfMaxForce) / dist : PalmSpringStrength;
-                            dist = Vector3.Distance(transform.TransformPoint(spring3.anchor), palm.TransformPoint(spring3.connectedAnchor));
-                            spring3.spring = (dist > PalmSpringDistanceOfMaxForce) ? (PalmSpringStrength * PalmSpringDistanceOfMaxForce) / dist : PalmSpringStrength;
-                            dist = Vector3.Distance(transform.TransformPoint(spring4.anchor), palm.TransformPoint(spring4.connectedAnchor));
-                            spring4.spring = (dist > PalmSpringDistanceOfMaxForce) ? (PalmSpringStrength * PalmSpringDistanceOfMaxForce) / dist : PalmSpringStrength;
+                                palmBody.velocity = Vector3.zero;
+
+                                float dist = Vector3.Distance(transform.TransformPoint(spring1.anchor), palm.TransformPoint(spring1.connectedAnchor));
+                                spring1.spring = (dist > PalmSpringDistanceOfMaxForce) ? (PalmSpringStrength * PalmSpringDistanceOfMaxForce) / dist : PalmSpringStrength;
+                                dist = Vector3.Distance(transform.TransformPoint(spring2.anchor), palm.TransformPoint(spring2.connectedAnchor));
+                                spring2.spring = (dist > PalmSpringDistanceOfMaxForce) ? (PalmSpringStrength * PalmSpringDistanceOfMaxForce) / dist : PalmSpringStrength;
+                                dist = Vector3.Distance(transform.TransformPoint(spring3.anchor), palm.TransformPoint(spring3.connectedAnchor));
+                                spring3.spring = (dist > PalmSpringDistanceOfMaxForce) ? (PalmSpringStrength * PalmSpringDistanceOfMaxForce) / dist : PalmSpringStrength;
+                                dist = Vector3.Distance(transform.TransformPoint(spring4.anchor), palm.TransformPoint(spring4.connectedAnchor));
+                                spring4.spring = (dist > PalmSpringDistanceOfMaxForce) ? (PalmSpringStrength * PalmSpringDistanceOfMaxForce) / dist : PalmSpringStrength;
+                            }
+                        } else {
+                            palmBody.MovePosition(GetPalmCenter());
+                            palmBody.MoveRotation(GetPalmRotation());
                         }
                     }
                     else

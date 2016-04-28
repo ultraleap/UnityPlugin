@@ -41,7 +41,7 @@ namespace Leap.Unity
                         Hinge.hideFlags = HideFlags.DontSave | HideFlags.DontSaveInEditor;
 
                         Hinge.useMotor = true;
-                        Hinge.useLimits = true;
+                        Hinge.useLimits = false;
                         JointLimits limit = new JointLimits();
                         limit.min = -80f;
                         limit.max = 5f;
@@ -63,7 +63,7 @@ namespace Leap.Unity
                         Hinge.hideFlags = HideFlags.DontSave | HideFlags.DontSaveInEditor;
 
                         Hinge.useMotor = true;
-                        Hinge.useLimits = true;
+                        Hinge.useLimits = false;
                         JointLimits limit = new JointLimits();
                         limit.min = -70f;
                         limit.max = 15f;
@@ -113,7 +113,7 @@ namespace Leap.Unity
             PalmRot = rot;
         }
 
-        public void setParentofDigits(Transform parent, float strength, float speed)
+        public void setParentofDigits(Transform parent, float strength, float speed, bool gravity)
         {
             FingerStrength = strength;
             FingerSpeed = speed;
@@ -121,6 +121,7 @@ namespace Leap.Unity
             for (int i = 0; i < bones.Length; ++i) {
                 if (bones[i] != null) {
                     bones[i].transform.parent = parent.transform;
+                    bones[i].GetComponent<Rigidbody>().useGravity = gravity;
                 }
             }
         }
@@ -137,8 +138,8 @@ namespace Leap.Unity
                         bones[i].localScale = new Vector3(1f / transform.lossyScale.x, 1f / transform.lossyScale.y, 1f / transform.lossyScale.z);
 
                         // Update
-                        capsule.radius = GetBoneWidth(i) / 2f;
-                        capsule.height = GetBoneLength(i) + GetBoneWidth(i);
+                        capsule.radius = (GetBoneWidth(i) / 2f)*transform.lossyScale.x;
+                        capsule.height = (GetBoneLength(i) + GetBoneWidth(i)) * transform.lossyScale.x;
                     }
 
                     Rigidbody boneBody = bones[i].GetComponent<Rigidbody>();
