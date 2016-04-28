@@ -87,7 +87,7 @@ namespace Leap.Unity {
         }
         if (rep != null) {
           rep.IsMarked = true;
-          rep.UpdateRepresentation(curHand, modelType);
+          rep.UpdateRepresentation(curHand);
           rep.LastUpdatedTime = (int)frame.Timestamp;
         }
       }
