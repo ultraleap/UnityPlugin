@@ -47,7 +47,7 @@ namespace Leap.Unity {
 
     public override ModelType HandModelType {
       get {
-        return ModelType.Graphics;
+        return ModelType.Physics;
       }
     }
 

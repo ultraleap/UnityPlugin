@@ -52,6 +52,7 @@ namespace Leap.Unity
                     if (fingers[f] != null) {
                         ((MotorizedFinger)fingers[f]).setParentofDigits(RigidbodyParent.transform, FingerMotorForce, FingerMotorSpeed, GetComponent<Rigidbody>().useGravity);
 
+                        Physics.IgnoreCollision(fingers[f].bones[1].GetComponent<Collider>(), forearm.GetComponent<Collider>());
                         Physics.IgnoreCollision(fingers[f].bones[1].GetComponent<Collider>(), palm.GetComponent<Collider>());
                         Physics.IgnoreCollision(fingers[f].bones[2].GetComponent<Collider>(), palm.GetComponent<Collider>());
 

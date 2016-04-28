@@ -22,6 +22,10 @@ namespace Leap.Unity
         private Quaternion PalmRot;
         private float FingerStrength = 0f;
         private float FingerSpeed = 0f;
+        private ConfigurableJoint rootJoint;
+        private Quaternion origJointRotation;
+        private Quaternion origPalmRotation;
+        private Quaternion origPalmToJointRotation;
 
         void InitializeFingerJoints()
         {
@@ -29,25 +33,37 @@ namespace Leap.Unity
             for (int i = 1; i < bones.Length - 1; ++i) {
                 if (bones[i] != null) {
                     if (i == 1) {
-                        HingeJoint Hinge = Palm.gameObject.AddComponent<HingeJoint>();
-                        Hinge.enablePreprocessing = true;
-                        Hinge.autoConfigureConnectedAnchor = false;
-                        Hinge.connectedBody = bones[i].GetComponent<Rigidbody>();
-                        Hinge.anchor = Palm.transform.InverseTransformPoint(bones[i].TransformPoint(new Vector3(0f, 0f, (bones[i].GetComponent<CapsuleCollider>().radius) - (bones[i].GetComponent<CapsuleCollider>().height / 2f))));
-                        Hinge.connectedAnchor = new Vector3(0f, 0f, (bones[i].GetComponent<CapsuleCollider>().radius) - (bones[i].GetComponent<CapsuleCollider>().height / 2f));
-                        Hinge.axis = Palm.transform.InverseTransformDirection(bones[i].transform.right);
-                        Hinge.enableCollision = false;
 
-                        Hinge.hideFlags = HideFlags.DontSave | HideFlags.DontSaveInEditor;
+                        rootJoint = Palm.gameObject.AddComponent<ConfigurableJoint>();
+                        rootJoint.configuredInWorldSpace = false;
+                        rootJoint.connectedBody = bones[i].GetComponent<Rigidbody>();
+                        origJointRotation = new Quaternion(bones[i].rotation.x, bones[i].rotation.y, bones[i].rotation.z, bones[i].rotation.w);
+                        origPalmRotation = new Quaternion(Palm.rotation.x, Palm.rotation.y, Palm.rotation.z, Palm.rotation.w);
+                        origPalmToJointRotation = Quaternion.Inverse(origPalmRotation) * origJointRotation;
 
-                        Hinge.useMotor = true;
-                        Hinge.useLimits = false;
-                        JointLimits limit = new JointLimits();
-                        limit.min = -80f;
-                        limit.max = 5f;
-                        Hinge.limits = limit;
+                        rootJoint.rotationDriveMode = RotationDriveMode.Slerp;
 
-                        hinges[0] = Hinge;
+                        rootJoint.enablePreprocessing = true;
+                        rootJoint.autoConfigureConnectedAnchor = false;
+                        rootJoint.anchor = Palm.transform.InverseTransformPoint(bones[i].TransformPoint(new Vector3(0f, 0f, (bones[i].GetComponent<CapsuleCollider>().radius) - (bones[i].GetComponent<CapsuleCollider>().height / 2f))));
+                        rootJoint.connectedAnchor = new Vector3(0f, 0f, (bones[i].GetComponent<CapsuleCollider>().radius) - (bones[i].GetComponent<CapsuleCollider>().height / 2f));
+                        //rootJoint.axis = Palm.transform.InverseTransformDirection(bones[i].transform.right);
+                        //rootJoint.secondaryAxis = Palm.transform.InverseTransformDirection(bones[i].transform.forward);
+                        rootJoint.enableCollision = false;
+
+                        rootJoint.hideFlags = HideFlags.DontSave | HideFlags.DontSaveInEditor;
+
+                        rootJoint.xMotion = ConfigurableJointMotion.Locked;
+                        rootJoint.yMotion = ConfigurableJointMotion.Locked;
+                        rootJoint.zMotion = ConfigurableJointMotion.Locked;
+                        //rootJoint.angularYMotion = ConfigurableJointMotion.Locked;
+                        //rootJoint.angularZMotion = ConfigurableJointMotion.Locked;
+
+                        JointDrive motorMovement = new JointDrive();
+                        motorMovement.maximumForce = 500000f;
+                        motorMovement.positionSpring = 500000f;
+
+                        rootJoint.slerpDrive = motorMovement;
                     }
 
                     if (i + 1 < bones.Length) {
@@ -63,7 +79,7 @@ namespace Leap.Unity
                         Hinge.hideFlags = HideFlags.DontSave | HideFlags.DontSaveInEditor;
 
                         Hinge.useMotor = true;
-                        Hinge.useLimits = false;
+                        Hinge.useLimits = true;
                         JointLimits limit = new JointLimits();
                         limit.min = -70f;
                         limit.max = 15f;
@@ -77,8 +93,8 @@ namespace Leap.Unity
 
         void RemoveFingerJoints()
         {
-            HingeJoint[] palmhingelist = Palm.gameObject.GetComponents<HingeJoint>();
-            foreach (HingeJoint hinge in palmhingelist) {
+            ConfigurableJoint[] palmhingelist = Palm.gameObject.GetComponents<ConfigurableJoint>();
+            foreach (ConfigurableJoint hinge in palmhingelist) {
                 Destroy(hinge);
             }
 
@@ -157,19 +173,31 @@ namespace Leap.Unity
                             bones[i].rotation = GetBoneRotation(i);
                         }
                     } else {
-
-                        if (hinges != null && hinges[i - 1] != null) {
-                            Quaternion localRealFinger = (Quaternion.Inverse(PalmRot) * GetBoneRotation(i));
-                            Quaternion localPhysicsFinger = (Quaternion.Inverse(Palm.transform.rotation) * bones[i].rotation);
+                        if (i == 1) {
+                            Quaternion localRealFinger = (Quaternion.Euler(180f, 180f, 180f) * (Quaternion.Inverse(PalmRot * origPalmToJointRotation) * GetBoneRotation(i)));
+                            if (rootJoint) {
+                                if (fingerType == Finger.FingerType.TYPE_THUMB && hand_.IsRight) {
+                                    localRealFinger = Quaternion.Euler(localRealFinger.eulerAngles.y, localRealFinger.eulerAngles.x, localRealFinger.eulerAngles.z);
+                                } else if (fingerType == Finger.FingerType.TYPE_THUMB && hand_.IsLeft) {
+                                    localRealFinger = Quaternion.Euler(localRealFinger.eulerAngles.y * -1f, localRealFinger.eulerAngles.x * -1f, localRealFinger.eulerAngles.z);
+                                } else {
+                                    localRealFinger = Quaternion.Euler(localRealFinger.eulerAngles.x * -1f, localRealFinger.eulerAngles.y, 0f);
+                                }
+                                rootJoint.targetRotation = localRealFinger;
+                            }
+                        }
+                        if (hinges != null && hinges[i - 1] != null && hinges[i - 1].GetType().Equals(typeof(HingeJoint))) {
+                            Quaternion localRealFinger = (Quaternion.Inverse(GetBoneRotation(i-1)) * GetBoneRotation(i));
+                            Quaternion localPhysicsFinger = (Quaternion.Inverse(bones[i-1].rotation) * bones[i].rotation);
                             float offset = (Quaternion.Inverse((Quaternion.Inverse(localRealFinger) * localPhysicsFinger))).eulerAngles.x;
                             if (offset > 180) {
                                 offset -= 360f;
                             }
                             JointMotor mmotor = new JointMotor();
-                            mmotor.force = 10000f;// FingerStrength;
+                            mmotor.force = 50000f;// FingerStrength;
                             mmotor.targetVelocity = offset * -50f;// FingerSpeed;
                             mmotor.freeSpin = false;
-                            hinges[i - 1].motor = mmotor;
+                            ((HingeJoint)hinges[i - 1]).motor = mmotor;
                         }
                     }
                 }
