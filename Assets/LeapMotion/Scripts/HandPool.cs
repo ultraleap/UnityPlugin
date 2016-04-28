@@ -51,13 +51,24 @@ namespace Leap.Unity {
       public List<IHandModel> modelList;
       public List<IHandModel> modelsCheckedOut;
       public bool IsEnabled;
-      public IHandModel TryGetModel(Chirality chirality, ModelType modelType, List<IHandModel> modelListToCheck) {
-        for (int i = 0; i < modelListToCheck.Count; i++) {
-          if (modelListToCheck[i].Handedness == chirality && modelListToCheck[i].HandModelType == modelType) {
-            IHandModel model = modelListToCheck[i];
-            modelListToCheck.RemoveAt(i);
+      public IHandModel TryGetModel(Chirality chirality, ModelType modelType) {
+        for (int i = 0; i < modelList.Count; i++) {
+          if (modelList[i].Handedness == chirality && modelList[i].HandModelType == modelType) {
+            IHandModel model = modelList[i];
+            modelList.RemoveAt(i);
             modelsCheckedOut.Add(model);
             return model;
+          }
+        }
+        //Todo: if spawning enabled
+        for (int i = 0; i < modelsCheckedOut.Count; i++) {
+          if (modelsCheckedOut[i].Handedness == chirality && modelsCheckedOut[i].HandModelType == modelType) {
+            IHandModel modelToSpawn = modelsCheckedOut[i];
+            GameObject spawnedGO = GameObject.Instantiate(modelToSpawn.gameObject);
+            IHandModel spawnedModel = spawnedGO.GetComponent<IHandModel>();
+            _handPool.modelGroupMapping.Add(spawnedModel, this);
+            modelsCheckedOut.Add(spawnedModel);
+            return spawnedModel;
           }
         }
         return null;
@@ -104,23 +115,10 @@ namespace Leap.Unity {
       for (int i = 0; i < ModelPool.Count; i++) {
         ModelGroup group = ModelPool[i];
         if (group.IsEnabled) {
-          IHandModel model = group.TryGetModel(handChirality, modelType, group.modelList);
+          IHandModel model = group.TryGetModel(handChirality, modelType);
           if (model != null) {
             handRep.AddModel(model);
             modelToHandRepMapping.Add(model, handRep);
-          }
-          else {
-            //if spawning enabled
-            //find an iHandModel to spawn
-            IHandModel modelToSpawn = group.TryGetModel(handChirality, modelType, group.modelsCheckedOut);
-            if (modelToSpawn != null) {
-              //spawn it
-              GameObject spawnedGO = GameObject.Instantiate(modelToSpawn.gameObject);
-              IHandModel spawnedModel = spawnedGO.GetComponent<IHandModel>();
-              handRep.AddModel(spawnedModel);
-              modelToHandRepMapping.Add(spawnedModel, handRep);
-              modelGroupMapping.Add(spawnedModel, group);
-            }
           }
         }
 
@@ -134,7 +132,7 @@ namespace Leap.Unity {
           ModelGroup group = ModelPool[i];
           for (int hp = 0; hp < ActiveHandReps.Count; hp++ ) {
             HandRepresentation handRep = ActiveHandReps[hp];
-            IHandModel model = group.TryGetModel(handRep.RepChirality, handRep.RepType, group.modelList);
+            IHandModel model = group.TryGetModel(handRep.RepChirality, handRep.RepType);
             if (model != null) {
               handRep.AddModel(model);
               modelToHandRepMapping.Add(model, handRep);
@@ -168,10 +166,6 @@ namespace Leap.Unity {
       if(modelGroupMapping.TryGetValue(model, out modelGroup)){
         modelGroup.ReturnToGroup(model);
       }
-      else {
-        //figure out which group
-      }
-      //Todo: add check to see if representation of chirality and type exists
     }
 
 #if UNITY_EDITOR
