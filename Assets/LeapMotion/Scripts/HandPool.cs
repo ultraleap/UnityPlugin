@@ -60,6 +60,16 @@ namespace Leap.Unity {
             return model;
           }
         }
+        //Todo: if spawning enabled
+        for (int i = 0; i < modelsCheckedOut.Count; i++) {
+          if (modelsCheckedOut[i].Handedness == chirality && modelsCheckedOut[i].HandModelType == modelType) {
+            IHandModel modelToSpawn = modelsCheckedOut[i];
+            IHandModel spawnedModel = GameObject.Instantiate(modelToSpawn);
+            _handPool.modelGroupMapping.Add(spawnedModel, this);
+            modelsCheckedOut.Add(spawnedModel);
+            return spawnedModel;
+          }
+        }
         return null;
       }
       public void ReturnToGroup(IHandModel model) {
@@ -96,7 +106,10 @@ namespace Leap.Unity {
      */
 
     public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
-      Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
+      Chirality handChirality = Chirality.Either;
+      if (EnforceHandedness) {
+        handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
+      }
       HandRepresentation handRep = new HandProxy(this, hand, handChirality, modelType);
       for (int i = 0; i < ModelPool.Count; i++) {
         ModelGroup group = ModelPool[i];
@@ -107,6 +120,7 @@ namespace Leap.Unity {
             modelToHandRepMapping.Add(model, handRep);
           }
         }
+
       }
       ActiveHandReps.Add(handRep);
       return handRep;
@@ -147,9 +161,10 @@ namespace Leap.Unity {
       }
     }
     public void ReturnToPool(IHandModel model) {
-      ModelGroup modelGroup = modelGroupMapping[model];
+      ModelGroup modelGroup;
+      bool groupFound = modelGroupMapping.TryGetValue(model, out modelGroup);
       modelGroup.ReturnToGroup(model);
-      //Todo: add check to see if representation of chirality and type exists
+      Assert.IsTrue(groupFound);
     }
 
 #if UNITY_EDITOR
@@ -178,6 +193,12 @@ namespace Leap.Unity {
       }
       if (Input.GetKeyUp(KeyCode.P)) {
         EnableGroup("Poly_Hands");
+      }
+      if (Input.GetKeyUp(KeyCode.U)) {
+        DisableGroup("Graphics_Hands");
+      }
+      if (Input.GetKeyUp(KeyCode.I)) {
+        EnableGroup("Graphics_Hands");
       }
     }
   }
