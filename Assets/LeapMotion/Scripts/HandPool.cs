@@ -49,7 +49,6 @@ namespace Leap.Unity {
     [System.Serializable]
     public class ModelGroup {
       private HandPool _handPool;
-      public ModelGroup(HandPool handPool) { _handPool = handPool; }
       public string GroupName;
       public List<IHandModel> modelList;
       public List<IHandModel> modelsCheckedOut;
