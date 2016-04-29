@@ -17,6 +17,8 @@ namespace Leap.Unity
         public Rigidbody Palm;
 
         private bool dirty = false;
+        private bool useConstraints = false;
+
         private HingeJoint[] hinges;
         private Vector3 PalmPos;
         private Quaternion PalmRot;
@@ -30,62 +32,64 @@ namespace Leap.Unity
         void InitializeFingerJoints()
         {
             hinges = new HingeJoint[3];
-            for (int i = 1; i < bones.Length - 1; ++i) {
-                if (bones[i] != null) {
-                    if (i == 1) {
+            if (useConstraints) {
+                for (int i = 1; i < bones.Length - 1; ++i) {
+                    if (bones[i] != null) {
+                        if (i == 1) {
+                            rootJoint = Palm.gameObject.AddComponent<ConfigurableJoint>();
+                            rootJoint.configuredInWorldSpace = false;
+                            rootJoint.connectedBody = bones[i].GetComponent<Rigidbody>();
+                            origJointRotation = new Quaternion(bones[i].rotation.x, bones[i].rotation.y, bones[i].rotation.z, bones[i].rotation.w);
+                            origPalmRotation = new Quaternion(Palm.rotation.x, Palm.rotation.y, Palm.rotation.z, Palm.rotation.w);
+                            origPalmToJointRotation = Quaternion.Inverse(origPalmRotation) * origJointRotation;
 
-                        rootJoint = Palm.gameObject.AddComponent<ConfigurableJoint>();
-                        rootJoint.configuredInWorldSpace = false;
-                        rootJoint.connectedBody = bones[i].GetComponent<Rigidbody>();
-                        origJointRotation = new Quaternion(bones[i].rotation.x, bones[i].rotation.y, bones[i].rotation.z, bones[i].rotation.w);
-                        origPalmRotation = new Quaternion(Palm.rotation.x, Palm.rotation.y, Palm.rotation.z, Palm.rotation.w);
-                        origPalmToJointRotation = Quaternion.Inverse(origPalmRotation) * origJointRotation;
+                            rootJoint.rotationDriveMode = RotationDriveMode.Slerp;
 
-                        rootJoint.rotationDriveMode = RotationDriveMode.Slerp;
+                            rootJoint.enablePreprocessing = true;
+                            rootJoint.autoConfigureConnectedAnchor = false;
+                            rootJoint.anchor = Palm.transform.InverseTransformPoint(bones[i].TransformPoint(new Vector3(0f, 0f, (bones[i].GetComponent<CapsuleCollider>().radius) - (bones[i].GetComponent<CapsuleCollider>().height / 2f))));
+                            rootJoint.connectedAnchor = new Vector3(0f, 0f, (bones[i].GetComponent<CapsuleCollider>().radius) - (bones[i].GetComponent<CapsuleCollider>().height / 2f));
+                            //rootJoint.axis = Palm.transform.InverseTransformDirection(bones[i].transform.right);
+                            //rootJoint.secondaryAxis = Palm.transform.InverseTransformDirection(bones[i].transform.forward);
+                            rootJoint.enableCollision = false;
 
-                        rootJoint.enablePreprocessing = true;
-                        rootJoint.autoConfigureConnectedAnchor = false;
-                        rootJoint.anchor = Palm.transform.InverseTransformPoint(bones[i].TransformPoint(new Vector3(0f, 0f, (bones[i].GetComponent<CapsuleCollider>().radius) - (bones[i].GetComponent<CapsuleCollider>().height / 2f))));
-                        rootJoint.connectedAnchor = new Vector3(0f, 0f, (bones[i].GetComponent<CapsuleCollider>().radius) - (bones[i].GetComponent<CapsuleCollider>().height / 2f));
-                        //rootJoint.axis = Palm.transform.InverseTransformDirection(bones[i].transform.right);
-                        //rootJoint.secondaryAxis = Palm.transform.InverseTransformDirection(bones[i].transform.forward);
-                        rootJoint.enableCollision = false;
+                            rootJoint.hideFlags = HideFlags.DontSave | HideFlags.DontSaveInEditor;
 
-                        rootJoint.hideFlags = HideFlags.DontSave | HideFlags.DontSaveInEditor;
+                            rootJoint.xMotion = ConfigurableJointMotion.Locked;
+                            rootJoint.yMotion = ConfigurableJointMotion.Locked;
+                            rootJoint.zMotion = ConfigurableJointMotion.Locked;
+                            //rootJoint.angularYMotion = ConfigurableJointMotion.Locked;
+                            //rootJoint.angularZMotion = ConfigurableJointMotion.Locked;
 
-                        rootJoint.xMotion = ConfigurableJointMotion.Locked;
-                        rootJoint.yMotion = ConfigurableJointMotion.Locked;
-                        rootJoint.zMotion = ConfigurableJointMotion.Locked;
-                        //rootJoint.angularYMotion = ConfigurableJointMotion.Locked;
-                        //rootJoint.angularZMotion = ConfigurableJointMotion.Locked;
+                            JointDrive motorMovement = new JointDrive();
+                            motorMovement.maximumForce = 500000f;
+                            motorMovement.positionSpring = 500000f;
 
-                        JointDrive motorMovement = new JointDrive();
-                        motorMovement.maximumForce = 500000f;
-                        motorMovement.positionSpring = 500000f;
+                            rootJoint.slerpDrive = motorMovement;
+                        }
 
-                        rootJoint.slerpDrive = motorMovement;
-                    }
+                        if (i + 1 < bones.Length) {
+                            HingeJoint Hinge = bones[i].gameObject.AddComponent<HingeJoint>();
+                            Hinge.enablePreprocessing = true;
+                            Hinge.autoConfigureConnectedAnchor = false;
+                            Hinge.connectedBody = bones[i + 1].gameObject.GetComponent<Rigidbody>();
+                            Hinge.anchor = bones[i].InverseTransformPoint(bones[i + 1].TransformPoint(new Vector3(0f, 0f, (bones[i + 1].GetComponent<CapsuleCollider>().radius) - (bones[i + 1].GetComponent<CapsuleCollider>().height / 2f))));
+                            Hinge.connectedAnchor = new Vector3(0f, 0f, (bones[i + 1].GetComponent<CapsuleCollider>().radius) - (bones[i + 1].GetComponent<CapsuleCollider>().height / 2f));
+                            Hinge.axis = bones[i].InverseTransformDirection(bones[i + 1].transform.right);
+                            Hinge.enableCollision = false;
 
-                    if (i + 1 < bones.Length) {
-                        HingeJoint Hinge = bones[i].gameObject.AddComponent<HingeJoint>();
-                        Hinge.enablePreprocessing = true;
-                        Hinge.autoConfigureConnectedAnchor = false;
-                        Hinge.connectedBody = bones[i + 1].gameObject.GetComponent<Rigidbody>();
-                        Hinge.anchor = bones[i].InverseTransformPoint(bones[i + 1].TransformPoint(new Vector3(0f, 0f, (bones[i + 1].GetComponent<CapsuleCollider>().radius) - (bones[i + 1].GetComponent<CapsuleCollider>().height / 2f))));
-                        Hinge.connectedAnchor = new Vector3(0f, 0f, (bones[i + 1].GetComponent<CapsuleCollider>().radius) - (bones[i + 1].GetComponent<CapsuleCollider>().height / 2f));
-                        Hinge.axis = bones[i].InverseTransformDirection(bones[i + 1].transform.right);
-                        Hinge.enableCollision = false;
+                            Hinge.hideFlags = HideFlags.DontSave | HideFlags.DontSaveInEditor;
 
-                        Hinge.hideFlags = HideFlags.DontSave | HideFlags.DontSaveInEditor;
+                            Hinge.useMotor = true;
+                            Hinge.useLimits = true;
+                            JointLimits limit = new JointLimits();
+                            limit.min = -70f;
+                            limit.max = 15f;
+                            Hinge.limits = limit;
 
-                        Hinge.useMotor = true;
-                        Hinge.useLimits = true;
-                        JointLimits limit = new JointLimits();
-                        limit.min = -70f;
-                        limit.max = 15f;
-                        Hinge.limits = limit;
+                            hinges[i] = Hinge;
+                        }
 
-                        hinges[i] = Hinge;
                     }
                 }
             }
@@ -129,15 +133,17 @@ namespace Leap.Unity
             PalmRot = rot;
         }
 
-        public void setParentofDigits(Transform parent, float strength, float speed, bool gravity)
+        public void setParentofDigits(Transform parent, float strength, float speed, bool gravity, bool constraints, float mass)
         {
             FingerStrength = strength;
             FingerSpeed = speed;
+            useConstraints = constraints;
 
             for (int i = 0; i < bones.Length; ++i) {
                 if (bones[i] != null) {
                     bones[i].transform.parent = parent.transform;
                     bones[i].GetComponent<Rigidbody>().useGravity = gravity;
+                    bones[i].GetComponent<Rigidbody>().mass = mass;
                 }
             }
         }
@@ -173,31 +179,48 @@ namespace Leap.Unity
                             bones[i].rotation = GetBoneRotation(i);
                         }
                     } else {
-                        if (i == 1) {
-                            Quaternion localRealFinger = (Quaternion.Euler(180f, 180f, 180f) * (Quaternion.Inverse(PalmRot * origPalmToJointRotation) * GetBoneRotation(i)));
-                            if (rootJoint) {
-                                if (fingerType == Finger.FingerType.TYPE_THUMB && hand_.IsRight) {
-                                    localRealFinger = Quaternion.Euler(localRealFinger.eulerAngles.y, localRealFinger.eulerAngles.x, localRealFinger.eulerAngles.z);
-                                } else if (fingerType == Finger.FingerType.TYPE_THUMB && hand_.IsLeft) {
-                                    localRealFinger = Quaternion.Euler(localRealFinger.eulerAngles.y * -1f, localRealFinger.eulerAngles.x * -1f, localRealFinger.eulerAngles.z);
-                                } else {
-                                    localRealFinger = Quaternion.Euler(localRealFinger.eulerAngles.x * -1f, localRealFinger.eulerAngles.y, 0f);
+                        if (useConstraints) {
+                            if (i == 1) {
+                                Quaternion localRealFinger = (Quaternion.Euler(180f, 180f, 180f) * (Quaternion.Inverse(PalmRot * origPalmToJointRotation) * GetBoneRotation(i)));
+                                if (rootJoint) {
+                                    if (fingerType == Finger.FingerType.TYPE_THUMB && hand_.IsRight) {
+                                        localRealFinger = Quaternion.Euler(localRealFinger.eulerAngles.y, localRealFinger.eulerAngles.x, localRealFinger.eulerAngles.z);
+                                    } else if (fingerType == Finger.FingerType.TYPE_THUMB && hand_.IsLeft) {
+                                        localRealFinger = Quaternion.Euler(localRealFinger.eulerAngles.y * -1f, localRealFinger.eulerAngles.x * -1f, localRealFinger.eulerAngles.z);
+                                    } else {
+                                        localRealFinger = Quaternion.Euler(localRealFinger.eulerAngles.x * -1f, localRealFinger.eulerAngles.y, 0f);
+                                    }
+                                    rootJoint.targetRotation = localRealFinger;
                                 }
-                                rootJoint.targetRotation = localRealFinger;
                             }
-                        }
-                        if (hinges != null && hinges[i - 1] != null && hinges[i - 1].GetType().Equals(typeof(HingeJoint))) {
-                            Quaternion localRealFinger = (Quaternion.Inverse(GetBoneRotation(i-1)) * GetBoneRotation(i));
-                            Quaternion localPhysicsFinger = (Quaternion.Inverse(bones[i-1].rotation) * bones[i].rotation);
-                            float offset = (Quaternion.Inverse((Quaternion.Inverse(localRealFinger) * localPhysicsFinger))).eulerAngles.x;
-                            if (offset > 180) {
-                                offset -= 360f;
+                            if (hinges != null && hinges[i - 1] != null && hinges[i - 1].GetType().Equals(typeof(HingeJoint))) {
+                                Quaternion localRealFinger = (Quaternion.Inverse(GetBoneRotation(i - 1)) * GetBoneRotation(i));
+                                Quaternion localPhysicsFinger = (Quaternion.Inverse(bones[i - 1].rotation) * bones[i].rotation);
+                                float offset = (Quaternion.Inverse((Quaternion.Inverse(localRealFinger) * localPhysicsFinger))).eulerAngles.x;
+                                if (offset > 180) {
+                                    offset -= 360f;
+                                }
+                                JointMotor mmotor = new JointMotor();
+                                mmotor.force = 50000f;// FingerStrength;
+                                mmotor.targetVelocity = offset * -50f;// FingerSpeed;
+                                mmotor.freeSpin = false;
+                                ((HingeJoint)hinges[i - 1]).motor = mmotor;
                             }
-                            JointMotor mmotor = new JointMotor();
-                            mmotor.force = 50000f;// FingerStrength;
-                            mmotor.targetVelocity = offset * -50f;// FingerSpeed;
-                            mmotor.freeSpin = false;
-                            ((HingeJoint)hinges[i - 1]).motor = mmotor;
+
+
+                        } else {
+                            boneBody.velocity = ((GetBoneCenter(i) - bones[i].position) / Time.fixedDeltaTime);
+
+                            Quaternion boneRot = GetBoneRotation(i);
+                            float dot = Quaternion.Dot(boneBody.rotation, boneRot);
+                            if (dot > 0f) { boneRot = new Quaternion(-boneRot.x, -boneRot.y, -boneRot.z, -boneRot.w); }
+                            Vector3 axis; float angle;
+                            Quaternion localQuat = boneBody.rotation * Quaternion.Inverse(boneRot);
+                            localQuat.ToAngleAxis(out angle, out axis);
+                            axis *= angle;
+                            if ((axis / Time.fixedDeltaTime).x != Mathf.Infinity && (axis / Time.fixedDeltaTime).x != Mathf.NegativeInfinity) {
+                                boneBody.angularVelocity = (axis / Time.fixedDeltaTime);
+                            }
                         }
                     }
                 }
