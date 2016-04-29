@@ -32,8 +32,13 @@ namespace Leap.Unity {
     public class ModelPair {
       public string PairName = "PairName";
       public IHandModel LeftModel;
+      [HideInInspector]
+      public bool IsLeftToBeSpawned;
       public IHandModel RightModel;
+      [HideInInspector]
+      public bool IsRightToBeSpawned;
       public bool IsEnabled = true;
+      public bool CanDuplicate;
 
       public ModelPair() {}
 
@@ -91,10 +96,30 @@ namespace Leap.Unity {
       ModelPool = new List<ModelGroup>();
       foreach (ModelPair pair in ModelCollection) {
         ModelGroup newModelGroup = new ModelGroup(pair.PairName, pair.IsEnabled, new List<IHandModel>(), this);
-        newModelGroup.modelList.Add(pair.LeftModel);
-        modelGroupMapping.Add(pair.LeftModel, newModelGroup);
-        newModelGroup.modelList.Add(pair.RightModel);
-        modelGroupMapping.Add(pair.RightModel, newModelGroup);
+        IHandModel leftModel;
+        IHandModel rightModel;
+        if (pair.IsLeftToBeSpawned) {
+          IHandModel modelToSpawn = pair.LeftModel;
+          GameObject spawnedGO = GameObject.Instantiate(modelToSpawn.gameObject);
+          leftModel = spawnedGO.GetComponent<IHandModel>();
+        }
+        else {
+          leftModel = pair.LeftModel;
+        }
+        newModelGroup.modelList.Add(leftModel);
+        modelGroupMapping.Add(leftModel, newModelGroup);
+
+        if (pair.IsRightToBeSpawned) {
+          IHandModel modelToSpawn = pair.RightModel;
+          GameObject spawnedGO = GameObject.Instantiate(modelToSpawn.gameObject);
+          rightModel = spawnedGO.GetComponent<IHandModel>();
+        }
+        else {
+          rightModel = pair.RightModel;
+        }
+        newModelGroup.modelList.Add(rightModel);
+        modelGroupMapping.Add(rightModel, newModelGroup);
+
         ModelPool.Add(newModelGroup);
       }
     }
@@ -173,10 +198,21 @@ namespace Leap.Unity {
       for (int i = 0; i < ModelCollection.Count; i++) {
         if (ModelCollection[i] != null) {
           if (ModelCollection[i].LeftModel) {
-            ValidateIHandModelPrefab(ModelCollection[i].LeftModel);
+            if (PrefabUtility.GetPrefabType(ModelCollection[i].LeftModel) == PrefabType.Prefab) {
+              ModelCollection[i].IsLeftToBeSpawned = true;
+            }
+            else {
+              ModelCollection[i].IsLeftToBeSpawned = false;
+            }
           }
           if (ModelCollection[i].RightModel) {
-            ValidateIHandModelPrefab(ModelCollection[i].RightModel);
+            if (PrefabUtility.GetPrefabType(ModelCollection[i].RightModel) == PrefabType.Prefab) {
+              ModelCollection[i].IsRightToBeSpawned = true;
+            }
+            else {
+              ModelCollection[i].IsRightToBeSpawned = false;
+
+            }
           }
         }
       }
