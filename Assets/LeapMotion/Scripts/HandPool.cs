@@ -38,7 +38,7 @@ namespace Leap.Unity {
       public bool IsEnabled = true;
       public bool CanDuplicate;
 
-      public ModelPair() {}
+      public ModelPair() { }
 
       public ModelPair(string pairName, bool IsEnabled, IHandModel leftModel, IHandModel rightModel) {
         this.PairName = pairName;
@@ -66,8 +66,9 @@ namespace Leap.Unity {
 
       public IHandModel TryGetModel(Chirality chirality, ModelType modelType) {
         for (int i = 0; i < modelList.Count; i++) {
-          if (modelList[i].Handedness == chirality && modelList[i].HandModelType == modelType
-            || modelList[i].Handedness == Chirality.Either && modelList[i].HandModelType == modelType) {
+          if (modelList[i].HandModelType == modelType 
+            && modelList[i].Handedness == chirality 
+            || modelList[i].Handedness == Chirality.Either) {
             IHandModel model = modelList[i];
             modelList.RemoveAt(i);
             modelsCheckedOut.Add(model);
@@ -76,8 +77,9 @@ namespace Leap.Unity {
         }
         if (CanDuplicate) {
           for (int i = 0; i < modelsCheckedOut.Count; i++) {
-            if (modelsCheckedOut[i].Handedness == chirality && modelsCheckedOut[i].HandModelType == modelType
-              || modelsCheckedOut[i].Handedness == Chirality.Either && modelsCheckedOut[i].HandModelType == modelType) {
+            if (modelsCheckedOut[i].HandModelType == modelType 
+              && modelsCheckedOut[i].Handedness == chirality 
+              || modelsCheckedOut[i].Handedness == Chirality.Either) {
               IHandModel modelToSpawn = modelsCheckedOut[i];
               IHandModel spawnedModel = GameObject.Instantiate(modelToSpawn);
               _handPool.modelGroupMapping.Add(spawnedModel, this);
@@ -127,7 +129,7 @@ namespace Leap.Unity {
         ModelPool.Add(newModelGroup);
       }
     }
- 
+
     /**
      * MakeHandRepresentation receives a Hand and combines that with an IHandModel to create a HandRepresentation
      * @param hand The Leap Hand data to be drive an IHandModel
@@ -155,7 +157,7 @@ namespace Leap.Unity {
       for (int i = 0; i < ModelPool.Count; i++) {
         if (ModelPool[i].GroupName == groupName) {
           ModelGroup group = ModelPool[i];
-          for (int hp = 0; hp < activeHandReps.Count; hp++ ) {
+          for (int hp = 0; hp < activeHandReps.Count; hp++) {
             HandRepresentation handRep = activeHandReps[hp];
             IHandModel model = group.TryGetModel(handRep.RepChirality, handRep.RepType);
             if (model != null) {
@@ -167,7 +169,7 @@ namespace Leap.Unity {
         }
       }
     }
-    public void DisableGroup( string groupName) {
+    public void DisableGroup(string groupName) {
       for (int i = 0; i < ModelPool.Count; i++) {
         ModelGroup group = null;
         if (ModelPool[i].GroupName == groupName) {
