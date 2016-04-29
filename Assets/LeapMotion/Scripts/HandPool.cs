@@ -56,6 +56,7 @@ namespace Leap.Unity {
       public List<IHandModel> modelList;
       public List<IHandModel> modelsCheckedOut;
       public bool IsEnabled;
+      public bool CanDuplicate;
       public IHandModel TryGetModel(Chirality chirality, ModelType modelType) {
         for (int i = 0; i < modelList.Count; i++) {
           if (modelList[i].Handedness == chirality && modelList[i].HandModelType == modelType) {
@@ -66,13 +67,15 @@ namespace Leap.Unity {
           }
         }
         //Todo: if spawning enabled
-        for (int i = 0; i < modelsCheckedOut.Count; i++) {
-          if (modelsCheckedOut[i].Handedness == chirality && modelsCheckedOut[i].HandModelType == modelType) {
-            IHandModel modelToSpawn = modelsCheckedOut[i];
-            IHandModel spawnedModel = GameObject.Instantiate(modelToSpawn);
-            _handPool.modelGroupMapping.Add(spawnedModel, this);
-            modelsCheckedOut.Add(spawnedModel);
-            return spawnedModel;
+        if (CanDuplicate) {
+          for (int i = 0; i < modelsCheckedOut.Count; i++) {
+            if (modelsCheckedOut[i].Handedness == chirality && modelsCheckedOut[i].HandModelType == modelType) {
+              IHandModel modelToSpawn = modelsCheckedOut[i];
+              IHandModel spawnedModel = GameObject.Instantiate(modelToSpawn);
+              _handPool.modelGroupMapping.Add(spawnedModel, this);
+              modelsCheckedOut.Add(spawnedModel);
+              return spawnedModel;
+            }
           }
         }
         return null;
@@ -82,9 +85,10 @@ namespace Leap.Unity {
         modelList.Add(model);
         this._handPool.modelToHandRepMapping.Remove(model);
       }
-      public ModelGroup(string groupName, bool isEnabled, List<IHandModel> modelList, HandPool handPool) {
+      public ModelGroup(string groupName, bool isEnabled, bool canDuplicate, List<IHandModel> modelList, HandPool handPool) {
         this.GroupName = groupName;
         this.IsEnabled = isEnabled;
+        this.CanDuplicate = canDuplicate;
         this.modelList = modelList;
         this.modelsCheckedOut = new List<IHandModel>();
         this._handPool = handPool;
@@ -95,7 +99,7 @@ namespace Leap.Unity {
     void Start() {
       ModelPool = new List<ModelGroup>();
       foreach (ModelPair pair in ModelCollection) {
-        ModelGroup newModelGroup = new ModelGroup(pair.PairName, pair.IsEnabled, new List<IHandModel>(), this);
+        ModelGroup newModelGroup = new ModelGroup(pair.PairName, pair.IsEnabled, pair.CanDuplicate, new List<IHandModel>(), this);
         IHandModel leftModel;
         IHandModel rightModel;
         if (pair.IsLeftToBeSpawned) {
