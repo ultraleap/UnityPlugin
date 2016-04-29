@@ -18,8 +18,6 @@ namespace Leap.Unity {
   public class HandPool :
     HandFactory {
     [SerializeField]
-    private bool EnforceHandedness;
-    [SerializeField]
     private List<ModelPair> ModelCollection;
     [SerializeField]
     private List<ModelGroup> ModelPool;
@@ -69,7 +67,8 @@ namespace Leap.Unity {
 
       public IHandModel TryGetModel(Chirality chirality, ModelType modelType) {
         for (int i = 0; i < modelList.Count; i++) {
-          if (modelList[i].Handedness == chirality && modelList[i].HandModelType == modelType) {
+          if (modelList[i].Handedness == chirality && modelList[i].HandModelType == modelType
+            || modelList[i].Handedness == Chirality.Either && modelList[i].HandModelType == modelType) {
             IHandModel model = modelList[i];
             modelList.RemoveAt(i);
             modelsCheckedOut.Add(model);
@@ -78,7 +77,8 @@ namespace Leap.Unity {
         }
         if (CanDuplicate) {
           for (int i = 0; i < modelsCheckedOut.Count; i++) {
-            if (modelsCheckedOut[i].Handedness == chirality && modelsCheckedOut[i].HandModelType == modelType) {
+            if (modelsCheckedOut[i].Handedness == chirality && modelsCheckedOut[i].HandModelType == modelType
+              || modelsCheckedOut[i].Handedness == Chirality.Either && modelsCheckedOut[i].HandModelType == modelType) {
               IHandModel modelToSpawn = modelsCheckedOut[i];
               IHandModel spawnedModel = GameObject.Instantiate(modelToSpawn);
               _handPool.modelGroupMapping.Add(spawnedModel, this);
@@ -136,10 +136,7 @@ namespace Leap.Unity {
      */
 
     public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
-      Chirality handChirality = Chirality.Either;
-      if (EnforceHandedness) {
-        handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
-      }
+      Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
       HandRepresentation handRep = new HandProxy(this, hand, handChirality, modelType);
       for (int i = 0; i < ModelPool.Count; i++) {
         ModelGroup group = ModelPool[i];
