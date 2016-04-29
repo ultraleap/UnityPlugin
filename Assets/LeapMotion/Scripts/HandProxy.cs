@@ -34,7 +34,7 @@ namespace Leap.Unity {
           handModels[i] = null;
         }
       }
-      parent.ActiveHandReps.Remove(this);
+      parent.RemoveHandRepresentation(this);
     }
 
     public override void AddModel(IHandModel model) {

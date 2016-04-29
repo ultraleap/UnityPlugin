@@ -21,7 +21,7 @@ namespace Leap.Unity {
     private List<ModelPair> ModelCollection;
     [SerializeField]
     private List<ModelGroup> ModelPool;
-    public List<HandRepresentation> ActiveHandReps = new List<HandRepresentation>();
+    private List<HandRepresentation> activeHandReps = new List<HandRepresentation>();
 
     private Dictionary<IHandModel, ModelGroup> modelGroupMapping = new Dictionary<IHandModel, ModelGroup>();
     private Dictionary<IHandModel, HandRepresentation> modelToHandRepMapping = new Dictionary<IHandModel, HandRepresentation>();
@@ -148,15 +148,15 @@ namespace Leap.Unity {
         }
 
       }
-      ActiveHandReps.Add(handRep);
+      activeHandReps.Add(handRep);
       return handRep;
     }
     public void EnableGroup(string groupName) {
       for (int i = 0; i < ModelPool.Count; i++) {
         if (ModelPool[i].GroupName == groupName) {
           ModelGroup group = ModelPool[i];
-          for (int hp = 0; hp < ActiveHandReps.Count; hp++ ) {
-            HandRepresentation handRep = ActiveHandReps[hp];
+          for (int hp = 0; hp < activeHandReps.Count; hp++ ) {
+            HandRepresentation handRep = activeHandReps[hp];
             IHandModel model = group.TryGetModel(handRep.RepChirality, handRep.RepType);
             if (model != null) {
               handRep.AddModel(model);
@@ -191,6 +191,9 @@ namespace Leap.Unity {
       bool groupFound = modelGroupMapping.TryGetValue(model, out modelGroup);
       modelGroup.ReturnToGroup(model);
       Assert.IsTrue(groupFound);
+    }
+    public void RemoveHandRepresentation(HandRepresentation handRep) {
+      activeHandReps.Remove(handRep);
     }
 
 #if UNITY_EDITOR
