@@ -204,20 +204,10 @@ namespace Leap.Unity {
       for (int i = 0; i < ModelCollection.Count; i++) {
         if (ModelCollection[i] != null) {
           if (ModelCollection[i].LeftModel) {
-            if (PrefabUtility.GetPrefabType(ModelCollection[i].LeftModel) == PrefabType.Prefab) {
-              ModelCollection[i].IsLeftToBeSpawned = true;
-            }
-            else {
-              ModelCollection[i].IsLeftToBeSpawned = false;
-            }
+            ModelCollection[i].IsLeftToBeSpawned = PrefabUtility.GetPrefabType(ModelCollection[i].LeftModel) == PrefabType.Prefab;
           }
           if (ModelCollection[i].RightModel) {
-            if (PrefabUtility.GetPrefabType(ModelCollection[i].RightModel) == PrefabType.Prefab) {
-              ModelCollection[i].IsRightToBeSpawned = true;
-            }
-            else {
-              ModelCollection[i].IsRightToBeSpawned = false;
-            }
+            ModelCollection[i].IsRightToBeSpawned = PrefabUtility.GetPrefabType(ModelCollection[i].RightModel) == PrefabType.Prefab;
           }
         }
       }
