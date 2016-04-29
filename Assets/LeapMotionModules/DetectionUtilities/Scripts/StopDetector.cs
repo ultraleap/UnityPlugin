@@ -13,10 +13,10 @@ namespace Leap.Unity.DetectionUtilities {
     private Vector3 _directionAtExceed = Vector3.zero;
     private bool _capturedPosition = false;
 
-//    public float Proximity = 0.1f; //meters
     public float VelocityThreshold = 0.1f; //meters/s
-    public float MinimumVelocityThreshold = 0.05f; //meters/s
+    public float StopVelocityThreshold = 0.05f; //meters/s
     public float MinimumDistance = .20f; //meters
+    public bool CheckDirection = true;
     public Directions MovementDirection = Directions.Forward;
     public Vector3 CustomDirection = Vector3.forward;
     public float AngleTolerance = 45f; //degrees
@@ -82,16 +82,16 @@ namespace Leap.Unity.DetectionUtilities {
               //for debugging
               computedAngle = Vector3.Angle(_directionAtExceed, selectedDirection());
               distance = Vector3.Distance(_positionAtExceed, thisHand.PalmPosition.ToVector3());
-              angleCheck= Vector3.Angle(_directionAtExceed, selectedDirection()) < AngleTolerance;
-              minSpeedCheck = thisHand.PalmVelocity.MagnitudeSquared < MinimumVelocityThreshold;
+              angleCheck= !CheckDirection || Vector3.Angle(_directionAtExceed, selectedDirection()) < AngleTolerance;
+              minSpeedCheck = thisHand.PalmVelocity.MagnitudeSquared < StopVelocityThreshold;
               minDistanceCheck = Vector3.Distance(_positionAtExceed, thisHand.PalmPosition.ToVector3()) > MinimumDistance;
               #endif
 
               //decide if clapped
               stopped = _velocityThresholdExceeded && //went fast enough
-                        thisHand.PalmVelocity.MagnitudeSquared < MinimumVelocityThreshold && //Then slowed down
+                        thisHand.PalmVelocity.MagnitudeSquared < StopVelocityThreshold && //Then slowed down
                         Vector3.Distance(_positionAtExceed, thisHand.PalmPosition.ToVector3()) > MinimumDistance && //went far enough
-                        Vector3.Angle(_directionAtExceed, selectedDirection()) < AngleTolerance; //right direction
+                        !CheckDirection || Vector3.Angle(_directionAtExceed, selectedDirection()) < AngleTolerance; //right direction
               if(stopped & !IsActive){
                 Activate();
               } else if(stopped & IsActive){
