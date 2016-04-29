@@ -8,32 +8,21 @@ namespace Leap.Unity {
 
     protected override void OnEnable() {
       base.OnEnable();
-
-      specifyCustomDrawer("ModelCollection", show);
+      specifyCustomDrawer("ModelCollection", showModelCollection);
       specifyCustomDrawer("ModelPool", showModelPool);
+    }
+
+    private void showModelCollection(SerializedProperty list) {
+      EditorGUILayout.PropertyField(list,true);
     }
 
     private void showModelPool(SerializedProperty modelPool) {
       if (Application.isPlaying) {
-        EditorGUILayout.PropertyField(modelPool, true);
-      }
-    }
-
-    private void show(SerializedProperty list) {
-      EditorGUILayout.PropertyField(list);
-      EditorGUI.indentLevel += 1;
-      if (list.isExpanded) {
-        EditorGUILayout.PropertyField(list.FindPropertyRelative("Array.size"));
-        for (int i = 0; i < list.arraySize; i++) {
-          EditorGUI.indentLevel += 2;
-          EditorGUILayout.PropertyField(list.GetArrayElementAtIndex(i), new GUIContent("Model Pair: " + i), true);
-          EditorGUI.indentLevel -= 2;
-          EditorGUILayout.Space();
+        using (new EditorGUI.DisabledGroupScope(true)) {
+          EditorGUILayout.PropertyField(modelPool, true);
         }
       }
-      EditorGUI.indentLevel -= 1;
     }
-
 
   }
 }
