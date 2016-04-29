@@ -64,8 +64,7 @@ namespace Leap.Unity {
         for (int i = 0; i < modelsCheckedOut.Count; i++) {
           if (modelsCheckedOut[i].Handedness == chirality && modelsCheckedOut[i].HandModelType == modelType) {
             IHandModel modelToSpawn = modelsCheckedOut[i];
-            GameObject spawnedGO = GameObject.Instantiate(modelToSpawn.gameObject);
-            IHandModel spawnedModel = spawnedGO.GetComponent<IHandModel>();
+            IHandModel spawnedModel = GameObject.Instantiate(modelToSpawn);
             _handPool.modelGroupMapping.Add(spawnedModel, this);
             modelsCheckedOut.Add(spawnedModel);
             return spawnedModel;
@@ -163,9 +162,9 @@ namespace Leap.Unity {
     }
     public void ReturnToPool(IHandModel model) {
       ModelGroup modelGroup;
-      if(modelGroupMapping.TryGetValue(model, out modelGroup)){
-        modelGroup.ReturnToGroup(model);
-      }
+      bool groupFound = modelGroupMapping.TryGetValue(model, out modelGroup);
+      modelGroup.ReturnToGroup(model);
+      Assert.IsTrue(groupFound);
     }
 
 #if UNITY_EDITOR
