@@ -73,6 +73,9 @@ namespace Leap.Unity {
     }
 
     void OnValidate() {
+      //Resolution must be at least 3!
+      _cylinderResolution = Mathf.Max(3, _cylinderResolution);
+
       //Update visibility on validate so that the user can toggle in real-time
       if (_armRenderers != null) {
         updateArmVisibility();
