@@ -261,7 +261,7 @@ namespace Leap.Unity {
     private Transform createSphere(string name, float radius, bool isPartOfArm = false) {
       GameObject sphere = new GameObject(name);
       sphere.AddComponent<MeshFilter>().mesh = _sphereMesh;
-      sphere.AddComponent<MeshRenderer>().sharedMaterial = _material;
+      sphere.AddComponent<MeshRenderer>().sharedMaterial = jointMat;
       sphere.transform.parent = transform;
       sphere.transform.localScale = Vector3.one * radius * 2;
 
