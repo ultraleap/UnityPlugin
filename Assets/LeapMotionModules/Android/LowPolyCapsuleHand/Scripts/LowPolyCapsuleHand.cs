@@ -12,9 +12,6 @@ namespace Leap.Unity {
     private const float CYLINDER_RADIUS = 0.006f;
     private const float PALM_RADIUS = 0.015f;
 
-    private static int _colorIndex = 0;
-    private static Color[] _colorList = { Color.blue, Color.green, Color.magenta, Color.cyan, Color.red, Color.yellow };
-
     [SerializeField]
     private bool _showArm = true;
 
@@ -71,16 +68,7 @@ namespace Leap.Unity {
       }
     }
 
-    public override void InitHand() {
-      /*
-      if (_material != null) {
-        jointMat = new Material(_material);
-        jointMat.hideFlags = HideFlags.DontSaveInEditor;
-        jointMat.color = _colorList[_colorIndex];
-        _colorIndex = (_colorIndex + 1) % _colorList.Length;
-      }
-      */
-
+	public override void InitHand() {
       _jointSpheres = new Transform[4 * 5];
       _armRenderers = new List<Renderer>();
       _capsuleTransforms = new List<Transform>();
@@ -309,33 +297,7 @@ namespace Leap.Unity {
         tris.Add((triStart + 1) % triCap);
       }
 
-      /*
-      int pv0 = verts.Count;
-      verts.Add(p0);
-      colors.Add(Color.white);
-      int pv1 = verts.Count;
-      verts.Add(p1);
-      colors.Add(Color.white);
-
-      for (int i = 0; i < _cylinderResolution; i++) {
-        int a0 = i * 2;
-        int a1 = 2 * ((i + 1) % _cylinderResolution);
-
-        int b0 = a0 + 1;
-        int b1 = a1 + 1;
-
-        //tris.Add(pv0);
-        //tris.Add(a1);
-        //tris.Add(a0);
-
-        tris.Add(pv1);
-        tris.Add(b0);
-        tris.Add(b1);
-      }
-      */
-
       mesh.SetVertices(verts);
-      //mesh.SetColors(colors);
       mesh.SetIndices(tris.ToArray(), MeshTopology.Triangles, 0);
       mesh.RecalculateBounds();
       mesh.RecalculateNormals();
