@@ -45,7 +45,7 @@ namespace Leap.Unity {
     private Transform wristPositionSphere;
 
     private List<Renderer> _armRenderers;
-    private List<Transform> _capsuleTransforms;
+    private List<Transform> _cylinderTransforms;
     private List<Transform> _sphereATransforms;
     private List<Transform> _sphereBTransforms;
 
@@ -87,12 +87,12 @@ namespace Leap.Unity {
 
       _jointSpheres = new Transform[4 * 5];
       _armRenderers = new List<Renderer>();
-      _capsuleTransforms = new List<Transform>();
+      _cylinderTransforms = new List<Transform>();
       _sphereATransforms = new List<Transform>();
       _sphereBTransforms = new List<Transform>();
 
       createSpheres();
-      createCapsules();
+      createCylinders();
 
       updateArmVisibility();
     }
@@ -118,7 +118,7 @@ namespace Leap.Unity {
         updateArm();
       }
 
-      //The capsule transforms are deterimined by the spheres they are connected to
+      //The cylinder transforms are deterimined by the spheres they are connected to
       updateCylinders();
     }
 
@@ -163,26 +163,26 @@ namespace Leap.Unity {
     }
 
     private void updateCylinders() {
-      for (int i = 0; i < _capsuleTransforms.Count; i++) {
-        Transform capsule = _capsuleTransforms[i];
+      for (int i = 0; i < _cylinderTransforms.Count; i++) {
+        Transform cylinder = _cylinderTransforms[i];
         Transform sphereA = _sphereATransforms[i];
         Transform sphereB = _sphereBTransforms[i];
 
         Vector3 delta = sphereA.position - sphereB.position;
 
         if (!_hasGeneratedMeshes) {
-          MeshFilter filter = capsule.GetComponent<MeshFilter>();
+          MeshFilter filter = cylinder.GetComponent<MeshFilter>();
           filter.sharedMesh = generateCylinderMesh(delta.magnitude / transform.lossyScale.x);
         }
 
-        capsule.position = sphereA.position;
+        cylinder.position = sphereA.position;
 
         if (delta.sqrMagnitude <= Mathf.Epsilon) {
           //Two spheres are at the same location, no rotation will be found
           continue;
         }
 
-        capsule.LookAt(sphereB);
+        cylinder.LookAt(sphereB);
       }
 
       _hasGeneratedMeshes = true;
@@ -217,8 +217,8 @@ namespace Leap.Unity {
       armBackRight = createSphere("ArmBackRight", SPHERE_RADIUS, true);
     }
 
-    private void createCapsules() {
-      //Create capsules between finger joints
+    private void createCylinders() {
+      //Create cylinders between finger joints
       for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 3; j++) {
           int keyA = getFingerJointIndex(i, j);
@@ -231,7 +231,7 @@ namespace Leap.Unity {
         }
       }
 
-      //Create capsule between finger knuckles
+      //Create cylinders between finger knuckles
       for (int i = 0; i < 4; i++) {
         int keyA = getFingerJointIndex(i, 0);
         int keyB = getFingerJointIndex(i + 1, 0);
@@ -281,7 +281,7 @@ namespace Leap.Unity {
       cylinder.AddComponent<MeshRenderer>().sharedMaterial = _material;
       cylinder.transform.parent = transform;
 
-      _capsuleTransforms.Add(cylinder.transform);
+      _cylinderTransforms.Add(cylinder.transform);
       _sphereATransforms.Add(jointA);
       _sphereBTransforms.Add(jointB);
 
