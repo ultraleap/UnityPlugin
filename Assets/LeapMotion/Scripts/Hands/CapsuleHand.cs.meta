@@ -1,10 +1,12 @@
 fileFormatVersion: 2
 guid: a04122797dd84ca43a07055f12d91e0f
-timeCreated: 1454112234
+timeCreated: 1461984273
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - _material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - _sphereMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

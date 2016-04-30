@@ -21,11 +21,21 @@ namespace Leap.Unity {
     private static Color[] _rightColorList = { new Color(1.0f, 0.0f, 0.0f), new Color(1.0f, 1.0f, 0.0f), new Color(1.0f, 0.5f, 0.0f) };
 
     [SerializeField]
+    private Chirality handedness;
+
+    [SerializeField]
     private bool _showArm = true;
 
     [SerializeField]
     private Material _material;
 
+    [SerializeField]
+    private Mesh _sphereMesh;
+
+    [SerializeField]
+    private int _cylinderResolution = 8;
+
+    private bool _hasGeneratedMeshes = false;
     private Material jointMat;
 
     private Transform[] _jointSpheres;
@@ -47,8 +57,7 @@ namespace Leap.Unity {
         return ModelType.Graphics;
       }
     }
-    [SerializeField]
-    private Chirality handedness;
+
     public override Chirality Handedness {
       get {
         return handedness;
@@ -110,7 +119,7 @@ namespace Leap.Unity {
       }
 
       //The capsule transforms are deterimined by the spheres they are connected to
-      updateCapsules();
+      updateCylinders();
     }
 
     //Transform updating methods
@@ -124,7 +133,6 @@ namespace Leap.Unity {
           int key = getFingerJointIndex((int)finger.Type, j);
           Transform sphere = _jointSpheres[key];
           sphere.position = finger.Bone((Bone.BoneType)j).NextJoint.ToVector3();
-
         }
       }
 
@@ -154,7 +162,7 @@ namespace Leap.Unity {
       armBackLeft.position = elbow - right;
     }
 
-    private void updateCapsules() {
+    private void updateCylinders() {
       for (int i = 0; i < _capsuleTransforms.Count; i++) {
         Transform capsule = _capsuleTransforms[i];
         Transform sphereA = _sphereATransforms[i];
@@ -162,29 +170,22 @@ namespace Leap.Unity {
 
         Vector3 delta = sphereA.position - sphereB.position;
 
-        Vector3 scale = capsule.localScale;
-        scale.x = CYLINDER_RADIUS * 2;
-        scale.y = delta.magnitude * 0.5f / transform.lossyScale.x;
-        scale.z = CYLINDER_RADIUS * 2;
+        if (!_hasGeneratedMeshes) {
+          MeshFilter filter = capsule.GetComponent<MeshFilter>();
+          filter.sharedMesh = generateCylinderMesh(delta.magnitude / transform.lossyScale.x);
+        }
 
-        capsule.localScale = scale;
-
-        capsule.position = (sphereA.position + sphereB.position) / 2;
+        capsule.position = sphereA.position;
 
         if (delta.sqrMagnitude <= Mathf.Epsilon) {
           //Two spheres are at the same location, no rotation will be found
           continue;
         }
 
-        Vector3 perp;
-        if (Vector3.Angle(delta, Vector3.up) > 170 || Vector3.Angle(delta, Vector3.up) < 10) {
-          perp = Vector3.Cross(delta, Vector3.right);
-        } else {
-          perp = Vector3.Cross(delta, Vector3.up);
-        }
-
-        capsule.rotation = Quaternion.LookRotation(perp, delta);
+        capsule.LookAt(sphereB);
       }
+
+      _hasGeneratedMeshes = true;
     }
 
     private void updateArmVisibility() {
@@ -226,7 +227,7 @@ namespace Leap.Unity {
           Transform sphereA = _jointSpheres[keyA];
           Transform sphereB = _jointSpheres[keyB];
 
-          createCapsule("Finger Joint", sphereA, sphereB);
+          createCylinder("Finger Joint", sphereA, sphereB);
         }
       }
 
@@ -238,19 +239,19 @@ namespace Leap.Unity {
         Transform sphereA = _jointSpheres[keyA];
         Transform sphereB = _jointSpheres[keyB];
 
-        createCapsule("Hand Joints", sphereA, sphereB);
+        createCylinder("Hand Joints", sphereA, sphereB);
       }
 
       //Create the rest of the hand
       Transform thumbBase = _jointSpheres[THUMB_BASE_INDEX];
       Transform pinkyBase = _jointSpheres[PINKY_BASE_INDEX];
-      createCapsule("Hand Bottom", thumbBase, mockThumbJointSphere);
-      createCapsule("Hand Side", pinkyBase, mockThumbJointSphere);
+      createCylinder("Hand Bottom", thumbBase, mockThumbJointSphere);
+      createCylinder("Hand Side", pinkyBase, mockThumbJointSphere);
 
-      createCapsule("ArmFront", armFrontLeft, armFrontRight, true);
-      createCapsule("ArmBack", armBackLeft, armBackRight, true);
-      createCapsule("ArmLeft", armFrontLeft, armBackLeft, true);
-      createCapsule("ArmRight", armFrontRight, armBackRight, true);
+      createCylinder("ArmFront", armFrontLeft, armFrontRight, true);
+      createCylinder("ArmBack", armBackLeft, armBackRight, true);
+      createCylinder("ArmLeft", armFrontLeft, armBackLeft, true);
+      createCylinder("ArmRight", armFrontRight, armBackRight, true);
     }
 
     private int getFingerJointIndex(int fingerIndex, int jointIndex) {
@@ -258,15 +259,14 @@ namespace Leap.Unity {
     }
 
     private Transform createSphere(string name, float radius, bool isPartOfArm = false) {
-      GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-      DestroyImmediate(sphere.GetComponent<Collider>());
+      GameObject sphere = new GameObject(name);
+      sphere.AddComponent<MeshFilter>().mesh = _sphereMesh;
+      sphere.AddComponent<MeshRenderer>().sharedMaterial = _material;
       sphere.transform.parent = transform;
       sphere.transform.localScale = Vector3.one * radius * 2;
-      sphere.GetComponent<Renderer>().sharedMaterial = jointMat;
 
-      sphere.name = name;
-      sphere.layer = gameObject.layer;
       sphere.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+      sphere.layer = gameObject.layer;
 
       if (isPartOfArm) {
         _armRenderers.Add(sphere.GetComponent<Renderer>());
@@ -275,24 +275,68 @@ namespace Leap.Unity {
       return sphere.transform;
     }
 
-    private void createCapsule(string name, Transform jointA, Transform jointB, bool isPartOfArm = false) {
-      GameObject capsule = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-      DestroyImmediate(capsule.GetComponent<Collider>());
-      capsule.name = name;
-      capsule.layer = gameObject.layer;
-      capsule.transform.parent = transform;
-      capsule.transform.localScale = Vector3.one * CYLINDER_RADIUS * 2;
-      capsule.GetComponent<Renderer>().sharedMaterial = _material;
+    private void createCylinder(string name, Transform jointA, Transform jointB, bool isPartOfArm = false) {
+      GameObject cylinder = new GameObject(name);
+      cylinder.AddComponent<MeshFilter>();
+      cylinder.AddComponent<MeshRenderer>().sharedMaterial = _material;
+      cylinder.transform.parent = transform;
 
-      _capsuleTransforms.Add(capsule.transform);
+      _capsuleTransforms.Add(cylinder.transform);
       _sphereATransforms.Add(jointA);
       _sphereBTransforms.Add(jointB);
 
-      capsule.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+      cylinder.gameObject.layer = gameObject.layer;
+      cylinder.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
 
       if (isPartOfArm) {
-        _armRenderers.Add(capsule.GetComponent<Renderer>());
+        _armRenderers.Add(cylinder.GetComponent<Renderer>());
       }
+    }
+
+    private Mesh generateCylinderMesh(float length) {
+      Mesh mesh = new Mesh();
+      mesh.name = "GeneratedCylinder";
+      mesh.hideFlags = HideFlags.DontSave;
+
+      List<Vector3> verts = new List<Vector3>();
+      List<Color> colors = new List<Color>();
+      List<int> tris = new List<int>();
+
+      Vector3 p0 = Vector3.zero;
+      Vector3 p1 = Vector3.forward * length;
+      for (int i = 0; i < _cylinderResolution; i++) {
+        float angle = (Mathf.PI * 2.0f * i) / _cylinderResolution;
+        float dx = CYLINDER_RADIUS * Mathf.Cos(angle);
+        float dy = CYLINDER_RADIUS * Mathf.Sin(angle);
+
+        Vector3 spoke = new Vector3(dx, dy, 0);
+
+        verts.Add(p0 + spoke);
+        verts.Add(p1 + spoke);
+
+        colors.Add(Color.white);
+        colors.Add(Color.white);
+
+        int triStart = verts.Count;
+        int triCap = _cylinderResolution * 2;
+
+        tris.Add((triStart + 0) % triCap);
+        tris.Add((triStart + 2) % triCap);
+        tris.Add((triStart + 1) % triCap);
+
+        tris.Add((triStart + 2) % triCap);
+        tris.Add((triStart + 3) % triCap);
+        tris.Add((triStart + 1) % triCap);
+      }
+
+      mesh.SetVertices(verts);
+      mesh.SetIndices(tris.ToArray(), MeshTopology.Triangles, 0);
+      mesh.RecalculateBounds();
+      mesh.RecalculateNormals();
+      mesh.Optimize();
+      mesh.UploadMeshData(true);
+
+      return mesh;
     }
   }
 }
