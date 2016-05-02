@@ -1875,6 +1875,18 @@ Prefab:
       propertyPath: ModelCollection.Array.data[1].RightModel
       value: 
       objectReference: {fileID: 1167543056}
+    - target: {fileID: 11402294, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: _overrideDeviceType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11429104, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: allowManualTimeAlignment
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11429104, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: warpingAdjustment
+      value: 20
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
     - {fileID: 8146722, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
@@ -1895,14 +1907,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnforceHandedness: 0
-  ModelCollection:
-  - PairName: Graphics_Hands
+  ModelPool:
+  - _handPool: {fileID: 0}
+    GroupName: Graphics_Hands
     LeftModel: {fileID: 1545945338}
+    IsLeftToBeSpawned: 0
     RightModel: {fileID: 1061438465}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
     IsEnabled: 1
-  - PairName: Physics_Hands
+    CanDuplicate: 1
+  - _handPool: {fileID: 0}
+    GroupName: Physics_Hands
     LeftModel: {fileID: 1414805578}
+    IsLeftToBeSpawned: 0
     RightModel: {fileID: 1167543056}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
     IsEnabled: 1
-  ModelPool: []
+    CanDuplicate: 1

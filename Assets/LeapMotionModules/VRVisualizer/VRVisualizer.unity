@@ -958,17 +958,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnforceHandedness: 0
-  ModelCollection:
-  - PairName: Graphics_Hands
+  ModelPool:
+  - _handPool: {fileID: 0}
+    GroupName: Graphics_Hands
     LeftModel: {fileID: 931920751}
+    IsLeftToBeSpawned: 0
     RightModel: {fileID: 1542358432}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
     IsEnabled: 1
-  - PairName: Physics_Hands
+    CanDuplicate: 1
+  - _handPool: {fileID: 0}
+    GroupName: Physics_Hands
     LeftModel: {fileID: 824246799}
+    IsLeftToBeSpawned: 0
     RightModel: {fileID: 162318176}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
     IsEnabled: 1
-  ModelPool: []
+    CanDuplicate: 1
 --- !u!114 &228550821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4579,7 +4589,7 @@ GameObject:
   - 4: {fileID: 1576743646}
   - 114: {fileID: 1476913615}
   - 114: {fileID: 1476913613}
-  - 114: {fileID: 1476913614}
+  - 114: {fileID: 1476913616}
   m_Layer: 0
   m_Name: LeapHandController
   m_TagString: Untagged
@@ -4604,29 +4614,6 @@ MonoBehaviour:
   _overrideDeviceTypeWith: 1
   _useInterpolation: 0
   _interpolationDelay: 15
---- !u!114 &1476913614
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1476913612}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  EnforceHandedness: 0
-  ModelCollection:
-  - PairName: Graphics_Hands
-    LeftModel: {fileID: 1545945338}
-    RightModel: {fileID: 1061438465}
-    IsEnabled: 1
-  - PairName: Physics_Hands
-    LeftModel: {fileID: 1414805578}
-    RightModel: {fileID: 1167543056}
-    IsEnabled: 1
-  ModelPool: []
 --- !u!114 &1476913615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4639,6 +4626,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 215a4d49fc705b74a9d3c5cbfa2c9601, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1476913616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1476913612}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ModelPool:
+  - _handPool: {fileID: 0}
+    GroupName: Graphics_Hands
+    LeftModel: {fileID: 1545945338}
+    IsLeftToBeSpawned: 0
+    RightModel: {fileID: 1061438465}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 1
+  - _handPool: {fileID: 0}
+    GroupName: Physics_Hands
+    LeftModel: {fileID: 1414805578}
+    IsLeftToBeSpawned: 0
+    RightModel: {fileID: 1167543056}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 1
 --- !u!1 &1488726490
 GameObject:
   m_ObjectHideFlags: 0

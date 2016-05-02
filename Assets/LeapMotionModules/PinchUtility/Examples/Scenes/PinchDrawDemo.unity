@@ -1161,17 +1161,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EnforceHandedness: 0
-  ModelCollection:
-  - PairName: Graphics_Hands
+  ModelPool:
+  - _handPool: {fileID: 0}
+    GroupName: Graphics_Hands
     LeftModel: {fileID: 1759863751}
+    IsLeftToBeSpawned: 0
     RightModel: {fileID: 1781939140}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
     IsEnabled: 1
-  - PairName: Physics_Hands
+    CanDuplicate: 1
+  - _handPool: {fileID: 0}
+    GroupName: Physics_Hands
     LeftModel: {fileID: 1798992564}
+    IsLeftToBeSpawned: 0
     RightModel: {fileID: 1391235876}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
     IsEnabled: 1
-  ModelPool: []
+    CanDuplicate: 1
 --- !u!114 &1419902426
 MonoBehaviour:
   m_ObjectHideFlags: 0
