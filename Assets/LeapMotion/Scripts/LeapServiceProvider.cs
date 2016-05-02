@@ -172,8 +172,7 @@ namespace Leap.Unity {
 
     protected virtual void FixedUpdate() {
       //TODO: Find suitable interpolation strategy for FixedUpdate
-      LeapTransform leapMat = transform.GetLeapMatrix();
-      _untransformedFixedFrame = leap_controller_.Frame().TransformedCopy(leapMat);
+      _untransformedFixedFrame = leap_controller_.Frame();
     }
 
     protected virtual void OnDestroy() {
