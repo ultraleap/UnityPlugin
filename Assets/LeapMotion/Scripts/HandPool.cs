@@ -93,6 +93,7 @@ namespace Leap.Unity {
           IHandModel modelToSpawn = collectionGroup.LeftModel;
           GameObject spawnedGO = GameObject.Instantiate(modelToSpawn.gameObject);
           leftModel = spawnedGO.GetComponent<IHandModel>();
+          leftModel.transform.parent = transform;
         }
         else {
           leftModel = collectionGroup.LeftModel;
@@ -104,6 +105,7 @@ namespace Leap.Unity {
           IHandModel modelToSpawn = collectionGroup.RightModel;
           GameObject spawnedGO = GameObject.Instantiate(modelToSpawn.gameObject);
           rightModel = spawnedGO.GetComponent<IHandModel>();
+          rightModel.transform.parent = transform;
         }
         else {
           rightModel = collectionGroup.RightModel;
