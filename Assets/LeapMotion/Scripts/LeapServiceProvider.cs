@@ -38,18 +38,21 @@ namespace Leap.Unity {
 
     protected Controller leap_controller_;
 
-    protected Frame _currentFrame;
+    protected Frame _untransformedUpdateFrame;
+    protected Frame _transformedUpdateFrame;
     protected Image _currentImage;
     protected int _currentUpdateCount = -1;
 
-    protected Frame _currentFixedFrame;
+    protected Frame _untransformedFixedFrame;
+    protected Frame _transformedFixedFrame;
     protected float _currentFixedTime = -1;
 
     private ClockCorrelator clockCorrelator;
 
     public override Frame CurrentFrame {
       get {
-        return _currentFrame;
+        updateIfTransformMoved(_untransformedUpdateFrame, ref _transformedUpdateFrame);
+        return _transformedUpdateFrame;
       }
     }
 
@@ -61,7 +64,8 @@ namespace Leap.Unity {
 
     public override Frame CurrentFixedFrame {
       get {
-        return _currentFixedFrame;
+        updateIfTransformMoved(_untransformedFixedFrame, ref _transformedFixedFrame);
+        return _transformedFixedFrame;
       }
     }
 
@@ -138,13 +142,12 @@ namespace Leap.Unity {
 
     protected virtual void Awake() {
       clockCorrelator = new ClockCorrelator();
-
     }
 
     protected virtual void Start() {
       createController();
-      _currentFrame = new Frame();
-      _currentFixedFrame = new Frame();
+      _untransformedUpdateFrame = new Frame();
+      _untransformedFixedFrame = new Frame();
     }
 
     protected virtual void Update() {
@@ -158,25 +161,18 @@ namespace Leap.Unity {
       Int64 unityTime = (Int64)(Time.time * 1e6);
       clockCorrelator.UpdateRebaseEstimate(unityTime);
 
-      Frame serviceFrame;
       if (_useInterpolation) {
         Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
         Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
-        serviceFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
+        _untransformedUpdateFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
       } else {
-        serviceFrame = leap_controller_.Frame();
-      }
-
-      if (serviceFrame != null) {
-        LeapTransform leapMat = transform.GetLeapMatrix();
-        _currentFrame = serviceFrame.TransformedCopy(leapMat);
+        _untransformedUpdateFrame = leap_controller_.Frame();
       }
     }
 
     protected virtual void FixedUpdate() {
       //TODO: Find suitable interpolation strategy for FixedUpdate
-      LeapTransform leapMat = transform.GetLeapMatrix();
-      _currentFixedFrame = leap_controller_.Frame().TransformedCopy(leapMat);
+      _untransformedFixedFrame = leap_controller_.Frame();
     }
 
     protected virtual void OnDestroy() {
@@ -220,9 +216,8 @@ namespace Leap.Unity {
       }
 
       leap_controller_ = new Controller();
-      if (leap_controller_.IsConnected)
-      {
-          initializeFlags();
+      if (leap_controller_.IsConnected) {
+        initializeFlags();
       } else {
         leap_controller_.Device += onHandControllerConnect;
       }
@@ -245,5 +240,16 @@ namespace Leap.Unity {
       leap_controller_.Device -= onHandControllerConnect;
     }
 
+    protected void updateIfTransformMoved(Frame source, ref Frame toUpdate) {
+      if (transform.hasChanged) {
+        _transformedFixedFrame = null;
+        _transformedUpdateFrame = null;
+        transform.hasChanged = false;
+      }
+
+      if (toUpdate == null) {
+        toUpdate = source.TransformedCopy(transform.GetLeapMatrix());
+      }
+    }
   }
 }
