@@ -1875,6 +1875,18 @@ Prefab:
       propertyPath: ModelCollection.Array.data[1].RightModel
       value: 
       objectReference: {fileID: 1167543056}
+    - target: {fileID: 11402294, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: _overrideDeviceType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11429104, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: allowManualTimeAlignment
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11429104, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: warpingAdjustment
+      value: 20
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
     - {fileID: 8146722, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
