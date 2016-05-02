@@ -36,8 +36,9 @@ namespace Leap.Unity {
       public IHandModel RightModel;
       [HideInInspector]
       public bool IsRightToBeSpawned;
-
+      [HideInInspector]
       public List<IHandModel> modelList;
+      [HideInInspector]
       public List<IHandModel> modelsCheckedOut;
       public bool IsEnabled;
       public bool CanDuplicate;
