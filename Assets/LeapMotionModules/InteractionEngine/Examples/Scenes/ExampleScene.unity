@@ -996,11 +996,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelCollection:
-  - LeftModel: {fileID: 125884215}
+  ModelPool:
+  - _handPool: {fileID: 0}
+    GroupName: GraphicalHands
+    LeftModel: {fileID: 125884215}
+    IsLeftToBeSpawned: 0
     RightModel: {fileID: 1884541115}
-  ModelPool: []
-  EnforceHandedness: 0
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 1
 --- !u!114 &972296618
 MonoBehaviour:
   m_ObjectHideFlags: 0
