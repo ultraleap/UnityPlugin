@@ -140,5 +140,15 @@ namespace Leap.Unity.Interaction.Tests {
 
       InteractionC.UpdateShapeInstance(ref _scene, ref transform, ref info, ref _shapeInstanceHandle);
     }
+
+    [Test]
+    public void EnableContactThenUpdate() {
+      INTERACTION_SCENE_INFO info = new INTERACTION_SCENE_INFO();
+      info.sceneFlags = SceneInfoFlags.ContactEnabled;
+
+      InteractionC.UpdateSceneInfo(ref _scene, ref info);
+
+      UpdateInstance();
+    }
   }
 }
