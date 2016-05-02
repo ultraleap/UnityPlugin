@@ -61,6 +61,7 @@ namespace Leap.Unity {
               || modelsCheckedOut[i].Handedness == Chirality.Either) {
               IHandModel modelToSpawn = modelsCheckedOut[i];
               IHandModel spawnedModel = GameObject.Instantiate(modelToSpawn);
+              spawnedModel.transform.parent = _handPool.transform;
               _handPool.modelGroupMapping.Add(spawnedModel, this);
               modelsCheckedOut.Add(spawnedModel);
               return spawnedModel;
