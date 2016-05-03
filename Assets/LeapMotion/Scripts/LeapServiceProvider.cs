@@ -168,11 +168,16 @@ namespace Leap.Unity {
       } else {
         _untransformedUpdateFrame = leap_controller_.Frame();
       }
+
+      //Null out transformed frame because it is now stale
+      //It will be recalculated if it is needed
+      _transformedUpdateFrame = null;
     }
 
     protected virtual void FixedUpdate() {
       //TODO: Find suitable interpolation strategy for FixedUpdate
       _untransformedFixedFrame = leap_controller_.Frame();
+      _transformedFixedFrame = null;
     }
 
     protected virtual void OnDestroy() {
