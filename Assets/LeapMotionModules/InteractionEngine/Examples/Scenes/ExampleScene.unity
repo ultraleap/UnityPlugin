@@ -287,6 +287,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -84.580894
       objectReference: {fileID: 0}
+    - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
   m_IsPrefabParent: 0
@@ -365,6 +369,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -76.6187
       objectReference: {fileID: 0}
+    - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
   m_IsPrefabParent: 0
@@ -442,6 +450,10 @@ Prefab:
     - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 5.4893
+      objectReference: {fileID: 0}
+    - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -625,6 +637,10 @@ Prefab:
     - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_LocalScale.z
       value: 0.07534971
+      objectReference: {fileID: 0}
+    - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1178,7 +1194,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1251467164}
   - 114: {fileID: 1251467163}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BrushHand_L
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1197,6 +1213,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handedness: 0
+  _perBoneMass: 1
+  _collisionDetection: 2
+  _material: {fileID: 13400000, guid: 7cb9646d25ecc1a4f8d790618b63c821, type: 2}
 --- !u!4 &1251467164
 Transform:
   m_ObjectHideFlags: 0
@@ -1393,7 +1412,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1491160529}
   - 114: {fileID: 1491160530}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BrushHand_R
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1425,6 +1444,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   handedness: 1
+  _perBoneMass: 1
+  _collisionDetection: 2
+  _material: {fileID: 13400000, guid: 7cb9646d25ecc1a4f8d790618b63c821, type: 2}
 --- !u!1001 &1552365339
 Prefab:
   m_ObjectHideFlags: 0
@@ -1495,6 +1517,10 @@ Prefab:
     - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -45.8289
+      objectReference: {fileID: 0}
+    - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -1603,6 +1629,10 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 0.062000003
       objectReference: {fileID: 0}
+    - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
   m_IsPrefabParent: 0
@@ -1680,6 +1710,10 @@ Prefab:
     - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_LocalScale.z
       value: 0.078
+      objectReference: {fileID: 0}
+    - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1759,6 +1793,10 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 0.06290098
       objectReference: {fileID: 0}
+    - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
   m_IsPrefabParent: 0
@@ -1812,6 +1850,10 @@ Prefab:
     - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_Name
       value: InteractionCube (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
