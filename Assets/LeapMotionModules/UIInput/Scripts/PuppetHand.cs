@@ -6,6 +6,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Leap;
 
 namespace Leap.Unity
@@ -21,6 +22,9 @@ namespace Leap.Unity
         public bool DetachHand = false;
         public bool DisableSprings = true;
         public bool DisableMotors = true;
+        public bool hybridConstraints = true;
+
+        private List<Collider> kinematicColliders;
 
 
         //Holder Parent of all of the Rigidbodies this hand is made of
@@ -51,14 +55,30 @@ namespace Leap.Unity
                 RigidbodyParent.name = gameObject.name + "'s Physics Parent";
                 palm.parent = RigidbodyParent.transform;
 
+                kinematicColliders = new List<Collider>();
+                Collider[] bodies = FindObjectsOfType<Collider>();
+                foreach (Collider colliderr in bodies) {
+                    if ((colliderr.attachedRigidbody == null || colliderr.attachedRigidbody.isKinematic) && !colliderr.isTrigger) {
+                        kinematicColliders.Add(colliderr);
+
+                        Physics.IgnoreCollision(palm.GetComponent<Collider>(), colliderr);
+                        Physics.IgnoreCollision(forearm.GetComponent<Collider>(), colliderr);
+                    }
+                }
 
                 for (int f = 0; f < fingers.Length; ++f) {
                     if (fingers[f] != null) {
                         //General Finger Options
-                        ((MotorizedFinger)fingers[f]).setParentofDigits(RigidbodyParent.transform, FingerMotorForce, FingerMotorSpeed, GetComponent<Rigidbody>().useGravity, !DisableMotors, FingerMass);
+                        ((MotorizedFinger)fingers[f]).setParentofDigits(RigidbodyParent.transform, FingerMotorForce, FingerMotorSpeed, GetComponent<Rigidbody>().useGravity, !DisableMotors, FingerMass, hybridConstraints);
 
                         DisableFingerCollisions();
                     }
+                }
+
+                if (DisableSprings && !hybridConstraints) {
+                    palm.GetComponent<Rigidbody>().freezeRotation = true;
+                } else {
+                    palm.GetComponent<Rigidbody>().freezeRotation = false;
                 }
             }
         }
@@ -68,10 +88,22 @@ namespace Leap.Unity
             for (int f = 0; f < fingers.Length; ++f) {
                 if (fingers[f] != null) {
                     Physics.IgnoreCollision(fingers[f].bones[1].GetComponent<Collider>(), forearm.GetComponent<Collider>());
-                    Physics.IgnoreCollision(fingers[f].bones[1].GetComponent<Collider>(), palm.GetComponent<Collider>());
-                    Physics.IgnoreCollision(fingers[f].bones[2].GetComponent<Collider>(), palm.GetComponent<Collider>());
-                    Physics.IgnoreCollision(fingers[f].bones[3].GetComponent<Collider>(), palm.GetComponent<Collider>());
 
+                    for (int i = 1; i < fingers[f].bones.Length; i++) {
+                        foreach (Collider colliderr in kinematicColliders) {
+                            Physics.IgnoreCollision(palm.GetComponent<Collider>(), colliderr);
+                            Physics.IgnoreCollision(fingers[f].bones[i].GetComponent<Collider>(), colliderr);
+                        }
+                        Physics.IgnoreCollision(fingers[f].bones[i].GetComponent<Collider>(), palm.GetComponent<Collider>());
+                        for (int of = 0; of < fingers.Length; ++of) {
+                            if (fingers[of] != null) {
+                                for (int j = 1; j < fingers[of].bones.Length; j++) {
+                                    Physics.IgnoreCollision(fingers[f].bones[i].GetComponent<Collider>(), fingers[of].bones[j].GetComponent<Collider>());
+                                }
+                            }
+                        }
+                    }
+                        /*
                     Physics.IgnoreCollision(fingers[f].bones[1].GetComponent<Collider>(), fingers[f].bones[2].GetComponent<Collider>());
                     Physics.IgnoreCollision(fingers[f].bones[1].GetComponent<Collider>(), fingers[f].bones[3].GetComponent<Collider>());
                     Physics.IgnoreCollision(fingers[f].bones[2].GetComponent<Collider>(), fingers[f].bones[1].GetComponent<Collider>());
@@ -86,6 +118,7 @@ namespace Leap.Unity
                         Physics.IgnoreCollision(fingers[f].bones[2].GetComponent<Collider>(), fingers[f + 1].bones[3].GetComponent<Collider>());
                         Physics.IgnoreCollision(fingers[f].bones[1].GetComponent<Collider>(), fingers[f + 1].bones[3].GetComponent<Collider>());
                     }
+                         * */
                 }
             }
         }
@@ -176,9 +209,10 @@ namespace Leap.Unity
                                         spring4.connectedAnchor = new Vector3(0.03f, 0f, -0.03f);
                                         spring4.transform.position = GetPalmCenter();
                                     } else {
+                                        Vector3 deltaVel = ((transform.position - palmBody.position) / Time.fixedDeltaTime);
+                                        palmBody.velocity = deltaVel.magnitude > 2f ? (deltaVel / deltaVel.magnitude) * 2f : deltaVel;
 
-                                        palmBody.velocity = ((transform.position - palmBody.position) / Time.fixedDeltaTime);
-
+                                        /*
                                         Quaternion palmRot = transform.rotation;
                                         float dot = Quaternion.Dot(palmBody.rotation, palmRot);
                                         if (dot > 0f) { palmRot = new Quaternion(-palmRot.x, -palmRot.y, -palmRot.z, -palmRot.w); }
@@ -189,11 +223,14 @@ namespace Leap.Unity
                                         if ((axis / Time.fixedDeltaTime).x != Mathf.Infinity && (axis / Time.fixedDeltaTime).x != Mathf.NegativeInfinity) {
                                             palmBody.angularVelocity = (axis / Time.fixedDeltaTime);
                                         }
+                                         * */
+
+                                        palmBody.MoveRotation(GetPalmRotation());
                                     }
                                 }
                             } else {
-                                transform.position = GetPalmCenter();
-                                transform.rotation = GetPalmRotation();
+                               // transform.position = GetPalmCenter();
+                                //transform.rotation = GetPalmRotation();
                                 GetComponent<Rigidbody>().MovePosition(GetPalmCenter());
                                 GetComponent<Rigidbody>().MoveRotation(GetPalmRotation());
 

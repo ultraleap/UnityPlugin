@@ -18,6 +18,14 @@ namespace Leap.Unity
 
         private bool dirty = false;
         private bool useConstraints = false;
+        private bool useConstraintsOnCollission = false;
+
+        private bool colliding = false;
+
+        private bool usingConstraints = false;
+
+        private float timeOfCollision = 0f;
+        private float resetPeriod = 2f;
 
         private HingeJoint[] hinges;
         private Vector3 PalmPos;
@@ -32,7 +40,6 @@ namespace Leap.Unity
         void InitializeFingerJoints()
         {
             hinges = new HingeJoint[3];
-            if (useConstraints) {
                 for (int i = 1; i < bones.Length - 1; ++i) {
                     if (bones[i] != null) {
                         if (i == 1) {
@@ -62,8 +69,8 @@ namespace Leap.Unity
                             //rootJoint.angularZMotion = ConfigurableJointMotion.Locked;
 
                             JointDrive motorMovement = new JointDrive();
-                            motorMovement.maximumForce = 500000f;
-                            motorMovement.positionSpring = 500000f;
+                            motorMovement.maximumForce = 5000000f;
+                            motorMovement.positionSpring = 5000000f;
 
                             rootJoint.slerpDrive = motorMovement;
                         }
@@ -91,17 +98,12 @@ namespace Leap.Unity
                         }
 
                     }
-                }
             }
         }
 
         void RemoveFingerJoints()
         {
-            ConfigurableJoint[] palmhingelist = Palm.gameObject.GetComponents<ConfigurableJoint>();
-            foreach (ConfigurableJoint hinge in palmhingelist) {
-                Destroy(hinge);
-            }
-
+            Destroy(rootJoint);
             for (int i = 0; i < bones.Length; ++i) {
                 if (bones[i] != null) {
                     HingeJoint[] hingelist = bones[i].gameObject.GetComponents<HingeJoint>();
@@ -111,20 +113,58 @@ namespace Leap.Unity
 
                     bones[i].GetComponent<Rigidbody>().velocity = Vector3.zero;
                     bones[i].GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-                    bones[i].gameObject.SetActive(false);
+
+                    if (!useConstraintsOnCollission) {
+                        bones[i].gameObject.SetActive(false);
+                    }
                 }
             }
+        }
+
+        void checkColliding()
+        {
+           bool tempColliding = false;
+           if (bones[bones.Length-1] != null) {
+                if (bones[bones.Length-1].GetComponent<CollissionChecker>().isColliding) {
+                    tempColliding = true;
+                }
+           }
+
+           if (tempColliding != colliding) {
+               if (useConstraintsOnCollission) {
+                   if (tempColliding) {
+                       dirty = true;
+                       usingConstraints = true;
+                   } else {
+                       RemoveFingerJoints();
+                       usingConstraints = false;
+                   }
+               }
+               colliding = tempColliding;
+           }
         }
 
         void OnEnable()
         {
             //dirty ensures that the fingers get updated in "Update" before the Joints are applied
             dirty = true;
+            if (useConstraints) {
+                //usingConstraints = true;
+            }
         }
 
         void OnDisable()
         {
             RemoveFingerJoints();
+            ConfigurableJoint[] palmhingelist = Palm.gameObject.GetComponents<ConfigurableJoint>();
+            foreach (ConfigurableJoint hinge in palmhingelist) {
+                Destroy(hinge);
+            }
+            for (int i = 0; i < bones.Length; ++i) {
+                if (bones[i] != null) {
+                    bones[i].gameObject.SetActive(false);
+                }
+            }
         }
 
         public void setPalmTransform(Vector3 pos, Quaternion rot)
@@ -133,23 +173,43 @@ namespace Leap.Unity
             PalmRot = rot;
         }
 
-        public void setParentofDigits(Transform parent, float strength, float speed, bool gravity, bool constraints, float mass)
+        public void setParentofDigits(Transform parent, float strength, float speed, bool gravity, bool constraints, float mass, bool hybridConstraints)
         {
             FingerStrength = strength;
             FingerSpeed = speed;
             useConstraints = constraints;
+            useConstraintsOnCollission = hybridConstraints;
+            //Palm.GetComponent<Rigidbody>().maxAngularVelocity = Mathf.Infinity;
 
             for (int i = 0; i < bones.Length; ++i) {
                 if (bones[i] != null) {
                     bones[i].transform.parent = parent.transform;
                     bones[i].GetComponent<Rigidbody>().useGravity = gravity;
                     bones[i].GetComponent<Rigidbody>().mass = mass;
+                    bones[i].GetComponent<Rigidbody>().maxAngularVelocity = Mathf.Infinity;
+                    if (i == bones.Length - 1) {
+                        bones[i].gameObject.AddComponent<CollissionChecker>();
+                    }
+
+                    if (!constraints && !useConstraintsOnCollission) {
+                        bones[i].GetComponent<Rigidbody>().freezeRotation = true;
+                    } else {
+                        bones[i].GetComponent<Rigidbody>().freezeRotation = false;
+                    }
                 }
             }
         }
 
         public override void UpdateFinger()
         {
+            bool oldColliding = colliding;
+            //See whether we should enable motor joints this frame
+            checkColliding();
+
+            if (colliding && !oldColliding) {
+                timeOfCollision = Time.fixedTime;
+            }
+
             for (int i = 0; i < bones.Length; ++i) {
                 if (bones[i] != null) {
                     // Set bone dimensions.
@@ -166,7 +226,8 @@ namespace Leap.Unity
 
                     Rigidbody boneBody = bones[i].GetComponent<Rigidbody>();
 
-                    if (!bones[i].gameObject.activeSelf) {
+                    //Initialize Hand!
+                    if (dirty) {
                         bones[i].gameObject.SetActive(true);
                         if (boneBody) {
                             boneBody.velocity = Vector3.zero;
@@ -179,7 +240,8 @@ namespace Leap.Unity
                             bones[i].rotation = GetBoneRotation(i);
                         }
                     } else {
-                        if (useConstraints) {
+                        //Move Joint Motors!
+                        if (usingConstraints || useConstraints) {
                             if (i == 1) {
                                 Quaternion localRealFinger = (Quaternion.Euler(180f, 180f, 180f) * (Quaternion.Inverse(PalmRot * origPalmToJointRotation) * GetBoneRotation(i)));
                                 if (rootJoint) {
@@ -207,10 +269,11 @@ namespace Leap.Unity
                                 ((HingeJoint)hinges[i - 1]).motor = mmotor;
                             }
 
-
+                        //Set Velocity!
                         } else {
-                            boneBody.velocity = ((GetBoneCenter(i) - bones[i].position) / Time.fixedDeltaTime);
-
+                            Vector3 deltaVel = ((GetBoneCenter(i) - bones[i].position) / Time.fixedDeltaTime);
+                            boneBody.velocity = deltaVel.magnitude > 2f ? (deltaVel / deltaVel.magnitude) * 2f : deltaVel;
+                            /*
                             Quaternion boneRot = GetBoneRotation(i);
                             float dot = Quaternion.Dot(boneBody.rotation, boneRot);
                             if (dot > 0f) { boneRot = new Quaternion(-boneRot.x, -boneRot.y, -boneRot.z, -boneRot.w); }
@@ -218,19 +281,30 @@ namespace Leap.Unity
                             Quaternion localQuat = boneBody.rotation * Quaternion.Inverse(boneRot);
                             localQuat.ToAngleAxis(out angle, out axis);
                             axis *= angle;
-                            if ((axis / Time.fixedDeltaTime).x != Mathf.Infinity && (axis / Time.fixedDeltaTime).x != Mathf.NegativeInfinity) {
+                            if ((axis / Time.fixedDeltaTime).x != Mathf.Infinity && (axis / Time.fixedDeltaTime).x != Mathf.NegativeInfinity && float.IsNaN((axis / Time.fixedDeltaTime).x)) {
                                 boneBody.angularVelocity = (axis / Time.fixedDeltaTime);
+                            }
+                            */
+                            boneBody.MoveRotation(GetBoneRotation(i));
+
+                            if (Time.fixedTime - timeOfCollision > resetPeriod && colliding) {
+                                boneBody.MovePosition(GetBoneCenter(i));
                             }
                         }
                     }
                 }
+            }
+            if (Time.fixedTime - timeOfCollision > resetPeriod && colliding) {
+                timeOfCollision = Time.fixedTime;
             }
 
             if (dirty) {
                 dirty = false;
                 Palm.transform.position = PalmPos;
                 Palm.transform.rotation = PalmRot;
-                InitializeFingerJoints();
+                if (usingConstraints || useConstraints) {
+                    InitializeFingerJoints();
+                }
             }
         }
     }
