@@ -45,6 +45,9 @@ namespace Leap.Unity.DetectionUtilities {
             } else {
               Deactivate();
             }
+          } else if(IsActive) {
+            Debug.Log("No hand");
+            Deactivate();
           }
         }
         yield return new WaitForSeconds(Period);

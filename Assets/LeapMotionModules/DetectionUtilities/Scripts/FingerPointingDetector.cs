@@ -45,6 +45,8 @@ namespace Leap.Unity.DetectionUtilities {
               Deactivate();
             }
           }
+        } else if (IsActive) {
+          Deactivate();
         }
         yield return new WaitForSeconds(Period);
       }
