@@ -64,7 +64,7 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _maxVelocity = 1;
 
-    [Tooltip("How strong the attraction is from the hand to the object when being held.  At strength 1 the object " + 
+    [Tooltip("How strong the attraction is from the hand to the object when being held.  At strength 1 the object " +
              "will try to move 100% of the way to the hand every frame.")]
     [Range(0, 1)]
     [SerializeField]
@@ -405,25 +405,66 @@ namespace Leap.Unity.Interaction {
       getSolvedTransform(hands, out newPosition, out newRotation);
 
       //Apply new transform to object
-      if (_notifiedOfTeleport) {
-        _rigidbody.position = newPosition;
-        _rigidbody.rotation = newRotation;
-      } else {
-        _rigidbody.MovePosition(newPosition);
-        _rigidbody.MoveRotation(newRotation);
+      switch (_graspMethod) {
+        case GraspMethod.Kinematic:
+          if (_notifiedOfTeleport) {
+            _rigidbody.position = newPosition;
+            _rigidbody.rotation = newRotation;
+          } else {
+            _rigidbody.MovePosition(newPosition);
+            _rigidbody.MoveRotation(newRotation);
+          }
+          break;
+        case GraspMethod.Velocity:
+          if (_notifiedOfTeleport) {
+            _rigidbody.position = newPosition;
+            _rigidbody.rotation = newRotation;
+          } else {
+            Vector3 deltaPos = newPosition - _rigidbody.position;
+            Quaternion deltaRot = Quaternion.Inverse(_rigidbody.rotation) * newRotation;
+
+            Vector3 deltaAxis;
+            float deltaAngle;
+            deltaRot.ToAngleAxis(out deltaAngle, out deltaAxis);
+
+            Vector3 targetVelocity = deltaPos / Time.fixedDeltaTime;
+            Vector3 targetAngularVelocity = deltaAxis * deltaAngle * Mathf.Deg2Rad / Time.fixedDeltaTime;
+
+            float targetSpeed = targetVelocity.magnitude;
+            float actualSpeed = Mathf.Min(_maxVelocity, targetSpeed);
+            float targetPercent = actualSpeed / targetSpeed;
+
+            targetVelocity *= targetPercent;
+            targetAngularVelocity *= targetPercent;
+
+            _rigidbody.velocity = Vector3.Lerp()
+
+            //TODO: set velocity
+          }
+          break;
+        default:
+          throw new InvalidOperationException("Unexpected grasp method");
       }
     }
 
     protected override void OnHandsHoldGraphics(List<Hand> hands) {
       base.OnHandsHoldGraphics(hands);
 
-      if (_graphicalAnchor != null) {
-        Vector3 newPosition;
-        Quaternion newRotation;
-        getSolvedTransform(hands, out newPosition, out newRotation);
+      switch (_graspMethod) {
+        case GraspMethod.Kinematic:
+          if (_graphicalAnchor != null) {
+            Vector3 newPosition;
+            Quaternion newRotation;
+            getSolvedTransform(hands, out newPosition, out newRotation);
 
-        _graphicalAnchor.position = newPosition;
-        _graphicalAnchor.rotation = newRotation;
+            _graphicalAnchor.position = newPosition;
+            _graphicalAnchor.rotation = newRotation;
+          }
+          break;
+        case GraspMethod.Velocity:
+          break;
+        default:
+          throw new InvalidOperationException("Unexpected grasp method");
       }
     }
 
@@ -467,21 +508,37 @@ namespace Leap.Unity.Interaction {
         StopCoroutine(_graphicalLerpCoroutine);
       }
 
-      //A grasp always causes the object to become kinematic
-      _rigidbody.isKinematic = true;
+      switch (_graspMethod) {
+        case GraspMethod.Kinematic:
+          //A grasp always causes the object to become kinematic
+          _rigidbody.isKinematic = true;
+          break;
+        case GraspMethod.Velocity:
+          break;
+        default:
+          throw new InvalidOperationException("Unexpected grasp method");
+      }
     }
 
     protected override void OnGraspEnd() {
       base.OnGraspEnd();
 
-      //If there is a graphical anchor, we are going to lerp it back to match the 
-      //position and rotation of the rigidbody, since it might have diverged.
-      if (_graphicalAnchor != null) {
-        _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
-      }
+      switch (_graspMethod) {
+        case GraspMethod.Kinematic:
+          //If there is a graphical anchor, we are going to lerp it back to match the 
+          //position and rotation of the rigidbody, since it might have diverged.
+          if (_graphicalAnchor != null) {
+            _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
+          }
 
-      //Revert the kinematic status of the Rigidbody to the user setting once the grasp is finished.
-      _rigidbody.isKinematic = _isKinematic;
+          //Revert the kinematic status of the Rigidbody to the user setting once the grasp is finished.
+          _rigidbody.isKinematic = _isKinematic;
+          break;
+        case GraspMethod.Velocity:
+          break;
+        default:
+          throw new InvalidCastException("Unexpected grasp method");
+      }
 
       if (_advancedThrowing) {
         float speed = _rigidbody.velocity.magnitude;
