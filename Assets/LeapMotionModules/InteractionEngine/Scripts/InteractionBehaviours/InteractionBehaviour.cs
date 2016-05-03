@@ -38,6 +38,15 @@ namespace Leap.Unity.Interaction {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 
+    public enum GraspMethod {
+      Velocity,
+      Kinematic
+    }
+
+    [Header("Grasp Settings")]
+    [SerializeField]
+    protected GraspMethod _graspMethod = GraspMethod.Velocity;
+
     [Tooltip("A transform that acts as the parent of all renderers for this object.  By seperating out the graphical " +
              "representation from the physical, interaction fidelity can be improved and latency reduced.")]
     [SerializeField]
@@ -47,6 +56,21 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _graphicalReturnTime = 0.25f;
 
+    [Tooltip("How far the object can get from the hand before it is released.")]
+    [SerializeField]
+    protected float _releaseDistance = 0.15f;
+
+    [Tooltip("How fast the object can move to try to get to the hand.")]
+    [SerializeField]
+    protected float _maxVelocity = 1;
+
+    [Tooltip("How strong the attraction is from the hand to the object when being held.  At strength 1 the object " + 
+             "will try to move 100% of the way to the hand every frame.")]
+    [Range(0, 1)]
+    [SerializeField]
+    protected float _followStrength = 1.0f;
+
+    [Header("Contact Settings")]
     [Tooltip("Should a hand be able to impart pushing forces to this object.")]
     [SerializeField]
     protected bool _enableContact = true;
