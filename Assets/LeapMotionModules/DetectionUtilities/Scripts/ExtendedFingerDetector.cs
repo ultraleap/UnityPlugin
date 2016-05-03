@@ -5,7 +5,7 @@ using Leap.Unity;
 
 namespace Leap.Unity.DetectionUtilities {
 
-  public class ExtendedFingerDetector : Detector {
+  public class ExtendedFingerDetector : BinaryDetector {
     public IHandModel handModel = null;
   
     public PointingState Thumb = PointingState.Either;

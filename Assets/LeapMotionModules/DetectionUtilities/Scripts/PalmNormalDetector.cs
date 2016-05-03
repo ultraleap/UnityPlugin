@@ -5,7 +5,7 @@ using Leap.Unity;
 
 namespace Leap.Unity.DetectionUtilities {
 
-  public class PalmNormalDetector : Detector {
+  public class PalmNormalDetector : BinaryDetector {
   
     public float OnAngle = 45; // degrees
     public float OffAngle = 65;

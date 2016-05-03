@@ -5,7 +5,7 @@ using Leap.Unity;
 
 namespace Leap.Unity.DetectionUtilities {
 
-  public class FingerPointingDetector : Detector {
+  public class FingerPointingDetector : BinaryDetector {
     public IHandModel handModel = null;
   
     public Finger.FingerType FingerName = Finger.FingerType.TYPE_INDEX;

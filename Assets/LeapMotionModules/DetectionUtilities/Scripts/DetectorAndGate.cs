@@ -9,11 +9,11 @@ namespace Leap.Unity.DetectionUtilities {
     public UnityEvent OnActivate;
     public UnityEvent OnDeactivate;
   
-    private Detector[] _detectors;
+    private BinaryDetector[] _detectors;
   
     void Start(){
-      _detectors = GetComponents<Detector>();
-      foreach(Detector activator in _detectors){
+      _detectors = GetComponents<BinaryDetector>();
+      foreach(BinaryDetector activator in _detectors){
         activator.OnActivate.AddListener(CheckDetectors);
         activator.OnDeactivate.AddListener(CheckDetectors);
       }
@@ -22,7 +22,7 @@ namespace Leap.Unity.DetectionUtilities {
     void CheckDetectors(){
       bool state = true;
       for(int a = 0; a < _detectors.Length; a++){
-        state = _detectors[a].CombineBooleans(state); 
+        state &= _detectors[a].IsActive; 
       }
       if(state && !IsActive){
         Activate();

@@ -5,14 +5,16 @@ using Leap.Unity;
 
 namespace Leap.Unity.DetectionUtilities {
 
-  public class HandClapToggleDetector : Detector {
+  public class HandClapToggleDetector : BinaryDetector {
     public LeapProvider Provider = null;
     private bool velocityThresholdExceeded = false;
-  
+    private bool _didClap = false;
+
     public float Proximity = 0.1f; //meters
     public float VelocityThreshold = 0.1f; //meters/s
     public float PalmAngleLimit = 75; //degrees
-  
+    public float Quiescence = .05f; //seconds between claps
+
     #if UNITY_EDITOR
     //For debugging --set Inspector to debug mode
     private float currentAngle = 0;
@@ -70,6 +72,10 @@ namespace Leap.Unity.DetectionUtilities {
       Hand thatHand;
       bool clapped = false;
       while(true){
+        if(_didClap){
+          _didClap = false;
+          yield return new WaitForSeconds(Quiescence);
+        }
         if(Provider){
           Frame frame = Provider.CurrentFrame;
           if(frame != null && frame.Hands.Count >= 2){
@@ -83,8 +89,10 @@ namespace Leap.Unity.DetectionUtilities {
     
               if(clapped & !IsActive){
                 Activate();
+                _didClap = true;
               } else if(clapped & IsActive){
                 Deactivate();
+                _didClap = true;
               }
             }
           }

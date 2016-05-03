@@ -11,7 +11,7 @@ namespace Leap.Unity.DetectionUtilities {
     private bool _velocityThresholdExceeded = false;
     private Vector3 _positionAtExceed = Vector3.zero;
     private Vector3 _directionAtExceed = Vector3.zero;
-    private bool _capturedPosition = false;
+    private bool _didStop = false;
 
     public float VelocityThreshold = 0.1f; //meters/s
     public float StopVelocityThreshold = 0.05f; //meters/s
@@ -20,6 +20,8 @@ namespace Leap.Unity.DetectionUtilities {
     public Directions MovementDirection = Directions.Forward;
     public Vector3 CustomDirection = Vector3.forward;
     public float AngleTolerance = 45f; //degrees
+    public float Quiescence = .01f; //seconds
+
     #if UNITY_EDITOR
     //For debugging --set Inspector to debug mode
     private float currentVelocity = 0;
@@ -48,13 +50,10 @@ namespace Leap.Unity.DetectionUtilities {
           currentVelocity = thisHand.PalmVelocity.MagnitudeSquared;
           #endif
   
-          if(thisHand.PalmVelocity.MagnitudeSquared > VelocityThreshold){
+          if(thisHand.PalmVelocity.MagnitudeSquared > VelocityThreshold && !_velocityThresholdExceeded){
             _velocityThresholdExceeded = true;
             _directionAtExceed = thisHand.PalmVelocity.Normalized.ToVector3();
-            if(!_capturedPosition){
               _positionAtExceed = thisHand.PalmPosition.ToVector3();
-              _capturedPosition = true;
-            }
           }
         }
       }
@@ -66,13 +65,18 @@ namespace Leap.Unity.DetectionUtilities {
   
     void OnDisable () {
       StopCoroutine(stopWatcher());
-      IsActive = false;
     }
   
     IEnumerator stopWatcher() {
       Hand thisHand;
       bool stopped = false;
       while(true){
+        if(_didStop){
+          _didStop = false;
+          _velocityThresholdExceeded = false;
+          Debug.Log("Quiescence");
+          yield return new WaitForSeconds(Quiescence);
+        }
         if(Provider){
           Frame frame = Provider.CurrentFrame;
           if(frame != null && frame.Hands.Count >= 1){
@@ -91,17 +95,16 @@ namespace Leap.Unity.DetectionUtilities {
               stopped = _velocityThresholdExceeded && //went fast enough
                         thisHand.PalmVelocity.MagnitudeSquared < StopVelocityThreshold && //Then slowed down
                         Vector3.Distance(_positionAtExceed, thisHand.PalmPosition.ToVector3()) > MinimumDistance && //went far enough
-                        !CheckDirection || Vector3.Angle(_directionAtExceed, selectedDirection()) < AngleTolerance; //right direction
-              if(stopped & !IsActive){
-                Activate();
-              } else if(stopped & IsActive){
-                Deactivate();
+                        (!CheckDirection || Vector3.Angle(_directionAtExceed, selectedDirection()) < AngleTolerance); //right direction
+              if(stopped){
+                stopped = false;
+                _didStop = true;
+                OnDetection.Invoke();
               }
             }
           }
         }
         _velocityThresholdExceeded = false;
-        _capturedPosition = false;
         yield return new WaitForSeconds(Period);
       }
     }
