@@ -64,7 +64,9 @@ namespace Leap.Unity.DetectionUtilities {
           ActiveZone = currentZone;
         }
         if(ActiveZone == TargetZone){
-          
+          Activate();
+        } else if(IsActive){
+          Deactivate();
         }
         yield return new WaitForSeconds(Period);
       }
