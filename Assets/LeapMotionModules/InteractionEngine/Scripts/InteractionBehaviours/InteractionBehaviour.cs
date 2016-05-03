@@ -10,7 +10,7 @@ namespace Leap.Unity.Interaction {
   /// <summary>
   /// InteractionBehaviour is the default implementation of IInteractionBehaviour.
   /// </summary>
-  /// 
+  ///
   /// <remarks>
   /// It has the following features:
   ///    - Extends from InteractionBehaviourBase to take advantage of it's bookkeeping and callbacks.
@@ -21,9 +21,9 @@ namespace Leap.Unity.Interaction {
   ///    - Utilizes the Kabsch algorithm to determine how the object should rest in the hand when grabbed.
   ///      This allows more fidelity than simple rigid atatchment to the hand, as well as more intuitive multi-hand
   ///      interaction.
-  /// 
+  ///
   /// This default implementation has the following requirements:
-  ///    - A Rigidbody is required 
+  ///    - A Rigidbody is required
   ///    - Kinematic movement must still be simulated via Rigidbody kinematic movement, as opposed to rigid movement of the Transform.
   ///    - This behaviour cannot be a child of another InteractionBehaviour.
   ///    - Any non-continuous movement must be noted using the NotifyTeleported() method.
@@ -238,7 +238,7 @@ namespace Leap.Unity.Interaction {
       base.OnPostSolve();
 
       if (_recievedVelocityUpdate) {
-        //If we recieved a velocity update, gravity must always be disabled because the 
+        //If we recieved a velocity update, gravity must always be disabled because the
         //velocity update accounts for gravity.
         if (_rigidbody.useGravity) {
           _rigidbody.useGravity = false;
@@ -450,7 +450,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnGraspEnd() {
       base.OnGraspEnd();
 
-      //If there is a graphical anchor, we are going to lerp it back to match the 
+      //If there is a graphical anchor, we are going to lerp it back to match the
       //position and rotation of the rigidbody, since it might have diverged.
       if (_graphicalAnchor != null) {
         _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
@@ -520,9 +520,11 @@ namespace Leap.Unity.Interaction {
 #if UNITY_EDITOR
     private void OnCollisionEnter(Collision collision) {
       GameObject otherObj = collision.collider.gameObject;
-      if (otherObj.GetComponentInParent<IHandModel>() != null) {
+      if ( otherObj.GetComponentInParent<IHandModel>() != null
+        && otherObj.GetComponentInParent<InteractionBrushHand>() == null)
+      {
         UnityEditor.EditorUtility.DisplayDialog("Collision Detected!",
-                                                "A collision between an InteractionBehaviour and a Hand was detected!  " +
+                                                "A collision between an InteractionBehavior and a Hand was detected!  " +
                                                 "For interaction to work properly please disable collision between interaction.",
                                                 "Ok");
         Debug.Break();
