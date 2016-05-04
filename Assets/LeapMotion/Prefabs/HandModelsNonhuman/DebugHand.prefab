@@ -41,7 +41,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   visualizeBasis: 1
-  handedness: 0
+  handedness: 2
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
