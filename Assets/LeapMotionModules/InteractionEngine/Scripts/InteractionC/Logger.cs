@@ -26,7 +26,8 @@ namespace Leap.Unity.Interaction.CApi {
 
     [Conditional("ENABLE_LOGGING")]
     public static void HandleReturnStatus(string methodName, LogLevel methodLevel, ReturnStatus rs) {
-      handleReturnStatusInternal(methodName, methodLevel, rs, IntPtr.Zero);
+      IntPtr messagePtr = InteractionC.GetLastErrorString();
+      handleReturnStatusInternal(methodName, methodLevel, rs, messagePtr);
     }
 
     public static void handleReturnStatusInternal(string methodName, LogLevel methodLevel, ReturnStatus rs, IntPtr textPtr) {

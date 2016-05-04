@@ -100,6 +100,9 @@ namespace Leap.Unity.Interaction {
     protected bool _recievedVelocityUpdate = false;
     protected bool _notifiedOfTeleport = false;
 
+    protected Vector3 _solvedPosition;
+    protected Quaternion _solvedRotation;
+
     protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
 
@@ -404,6 +407,9 @@ namespace Leap.Unity.Interaction {
       Quaternion newRotation;
       getSolvedTransform(hands, out newPosition, out newRotation);
 
+      _solvedPosition = newPosition;
+      _solvedRotation = newRotation;
+
       //Apply new transform to object
       switch (_graspMethod) {
         case GraspMethod.Kinematic:
@@ -636,8 +642,8 @@ namespace Leap.Unity.Interaction {
     #region INTERNAL
     protected INTERACTION_TRANSFORM getRigidbodyTransform() {
       INTERACTION_TRANSFORM interactionTransform = new INTERACTION_TRANSFORM();
-      interactionTransform.position = _rigidbody.position.ToCVector();
-      interactionTransform.rotation = _rigidbody.rotation.ToCQuaternion();
+      interactionTransform.position = _solvedPosition.ToCVector();
+      interactionTransform.rotation = _solvedRotation.ToCQuaternion();
       interactionTransform.wallTime = Time.fixedTime;
       return interactionTransform;
     }
