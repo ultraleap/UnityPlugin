@@ -17,6 +17,7 @@ namespace Leap.Unity
     private const int N_ACTIVE_BONES = 3;
 
     private Rigidbody[] _capsuleBodies;
+    private Vector3[] _lastPositions;
     private Hand hand_;
 
     public override ModelType HandModelType
@@ -41,11 +42,17 @@ namespace Leap.Unity
     private PhysicMaterial _material = null;
 
 
+    // DELETE ME
+    private int _hack = 0;
+
+
     public override Hand GetLeapHand() { return hand_; }
     public override void SetLeapHand(Hand hand) { hand_ = hand; }
 
-    public override void InitHand()
+    public override void BeginHand()
     {
+      base.BeginHand();
+
 #if UNITY_EDITOR
       if (!EditorApplication.isPlaying)
         return;
@@ -62,6 +69,7 @@ namespace Leap.Unity
 #endif
 
       _capsuleBodies = new Rigidbody[N_FINGERS * N_ACTIVE_BONES];
+      _lastPositions = new Vector3[N_FINGERS * N_ACTIVE_BONES];
 
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++)
       {
@@ -83,8 +91,8 @@ namespace Leap.Unity
 
           CapsuleCollider capsule = capsuleGameObject.GetComponent<CapsuleCollider>();
           capsule.direction = 2;
-          capsule.radius = bone.Width * 0.55f;
-          capsule.height = bone.Length + (capsule.radius * 2.0f);
+          capsule.radius = bone.Width*0.5f;
+          capsule.height = bone.Length + bone.Width;
           capsule.material = _material;
 
           Rigidbody body = capsuleGameObject.GetComponent<Rigidbody>();
@@ -92,11 +100,12 @@ namespace Leap.Unity
           body.position = bone.Center.ToVector3();
           body.rotation = bone.Rotation.ToQuaternion();
           body.freezeRotation = true;
-          body.constraints = RigidbodyConstraints.FreezeRotation; // again for fun.
           body.useGravity = false;
 
           body.mass = _perBoneMass;
           body.collisionDetectionMode = _collisionDetection;
+
+          _lastPositions[boneArrayIndex] = bone.Center.ToVector3();
         }
       }
     }
@@ -108,6 +117,15 @@ namespace Leap.Unity
         return;
 #endif
 
+      // DELETE ME
+      bool xx = false;
+      if (++_hack > 100)
+      {
+        _hack = 0;
+        xx = true;
+      }
+
+
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++)
       {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++)
@@ -117,10 +135,46 @@ namespace Leap.Unity
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
           Rigidbody body = _capsuleBodies[boneArrayIndex];
 
-          body.velocity = (bone.Center.ToVector3() - body.position) / Time.fixedDeltaTime;
-          body.MoveRotation(bone.Rotation.ToQuaternion()); // body.rotation has less friction
+          if(body.gameObject.activeSelf) {
+            // Compare against intended target, not new tracking position.
+            Vector3 error = _lastPositions[boneArrayIndex] - body.position;
+            if (error.magnitude > (bone.Width * 1.7f)) {
+              body.gameObject.SetActive(false);
+            }
+
+            Vector3 delta = bone.Center.ToVector3() - body.position;
+            body.velocity = delta / Time.fixedDeltaTime;
+            body.rotation = bone.Rotation.ToQuaternion();
+          }
+          else
+            if (xx)
+          {
+
+//            bool isClear = Physics.CheckCapsule(bone.PrevJoint.ToVector3(), bone.NextJoint.ToVector3(), bone.Width * 0.5f, _layerMask);
+//            if (isClear)
+            {
+              body.gameObject.SetActive(true);
+              body.position = bone.Center.ToVector3();
+              body.rotation = bone.Rotation.ToQuaternion();
+              body.velocity = Vector3.zero;
+            }
+          }
+
+          _lastPositions[boneArrayIndex] = bone.Center.ToVector3();
         }
       }
+    }
+
+    public override void FinishHand()
+    {
+      for(int i=_capsuleBodies.Length; i-- != 0; )
+      {
+        _capsuleBodies[i].transform.parent = null;
+        GameObject.Destroy(_capsuleBodies[i].gameObject);
+      }
+      _capsuleBodies = null;
+
+      base.FinishHand();
     }
   }
 }
