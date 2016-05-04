@@ -50,7 +50,8 @@ namespace Leap.Unity
       if (!EditorApplication.isPlaying)
         return;
 
-      if (_material != null && (_material.bounciness != 0.0f || _material.bounceCombine != PhysicMaterialCombine.Minimum))
+      // We also require a material for friction to be able to work.
+      if (_material == null || _material.bounciness != 0.0f || _material.bounceCombine != PhysicMaterialCombine.Minimum)
       {
         UnityEditor.EditorUtility.DisplayDialog("Collision Error!",
                                                 "An InteractionBrushHand must have a material with 0 bounciness "
@@ -82,15 +83,16 @@ namespace Leap.Unity
 
           CapsuleCollider capsule = capsuleGameObject.GetComponent<CapsuleCollider>();
           capsule.direction = 2;
-          capsule.radius = bone.Width / 2.0f;
-          capsule.height = bone.Length + bone.Width;
+          capsule.radius = bone.Width * 0.55f;
+          capsule.height = bone.Length + (capsule.radius * 2.0f);
           capsule.material = _material;
 
           Rigidbody body = capsuleGameObject.GetComponent<Rigidbody>();
           _capsuleBodies[boneArrayIndex] = body;
           body.position = bone.Center.ToVector3();
           body.rotation = bone.Rotation.ToQuaternion();
-          body.constraints = RigidbodyConstraints.FreezeRotation;
+          body.freezeRotation = true;
+          body.constraints = RigidbodyConstraints.FreezeRotation; // again for fun.
           body.useGravity = false;
 
           body.mass = _perBoneMass;
@@ -116,7 +118,7 @@ namespace Leap.Unity
           Rigidbody body = _capsuleBodies[boneArrayIndex];
 
           body.velocity = (bone.Center.ToVector3() - body.position) / Time.fixedDeltaTime;
-          body.rotation = bone.Rotation.ToQuaternion();
+          body.MoveRotation(bone.Rotation.ToQuaternion()); // body.rotation has less friction
         }
       }
     }

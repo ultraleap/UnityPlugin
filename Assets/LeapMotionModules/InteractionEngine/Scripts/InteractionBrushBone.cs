@@ -5,12 +5,14 @@ using Leap.Unity.Interaction;
 using UnityEditor;
 #endif
 
+// This is a debug script for the editor.  Should not be instanced in game.
 namespace Leap.Unity
 {
   public class InteractionBrushBone : MonoBehaviour
   {
 #if UNITY_EDITOR
-    private void OnCollisionEnter(Collision collision) {
+    private void OnCollisionEnter(Collision collision)
+    {
       GameObject otherObj = collision.collider.gameObject;
       if (otherObj.GetComponentInParent<InteractionBehaviourBase>() == null)
       {
@@ -23,7 +25,17 @@ namespace Leap.Unity
                                                 "Ok");
         Debug.Break();
       }
+
+      PhysicMaterial material = otherObj.GetComponentInParent<Collider>().material;
+      if (material == null)
+      {
+        UnityEditor.EditorUtility.DisplayDialog("Collision Error!",
+                                                "For interaction to work properly please provide a material for all objects touching an InteractionBrushHand."
+                                                + "Name:" + otherObj.gameObject.name,
+                                                "Ok");
+        Debug.Break();
+      }
     }
-#endif
   }
+#endif
 }
