@@ -437,9 +437,8 @@ namespace Leap.Unity.Interaction {
             targetVelocity *= targetPercent;
             targetAngularVelocity *= targetPercent;
 
-            _rigidbody.velocity = Vector3.Lerp()
-
-            //TODO: set velocity
+            _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, _followStrength);
+            _rigidbody.angularVelocity = Vector3.Lerp(_rigidbody.angularVelocity, targetAngularVelocity, _followStrength);
           }
           break;
         default:
