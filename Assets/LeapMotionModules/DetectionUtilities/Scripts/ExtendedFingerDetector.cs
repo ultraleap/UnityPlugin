@@ -35,19 +35,17 @@ namespace Leap.Unity.DetectionUtilities {
         if(handModel != null){
           hand = handModel.GetLeapHand();
           if(hand != null){
+            Debug.Log("is tracked " + handModel.IsTracked);
             fingerState = matchFingerState(hand.Fingers[0], 0)
               && matchFingerState(hand.Fingers[1], 1)
               && matchFingerState(hand.Fingers[2], 2)
               && matchFingerState(hand.Fingers[3], 3)
               && matchFingerState(hand.Fingers[4], 4);
-            if(fingerState){
+            if(handModel.IsTracked && fingerState){
               Activate();
             } else {
               Deactivate();
             }
-          } else if(IsActive) {
-            Debug.Log("No hand");
-            Deactivate();
           }
         }
         yield return new WaitForSeconds(Period);

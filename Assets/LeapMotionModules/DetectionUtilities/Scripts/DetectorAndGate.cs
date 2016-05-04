@@ -40,6 +40,9 @@ namespace Leap.Unity.DetectionUtilities {
       IsActive = false;
       OnDeactivate.Invoke();
     }
-  
+
+    void OnDisable () {
+      Deactivate();
+    }
   }
 }

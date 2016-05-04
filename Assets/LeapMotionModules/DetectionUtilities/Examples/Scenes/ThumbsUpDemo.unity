@@ -288,7 +288,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   RedBallPrefab: {fileID: 154294, guid: caa1d1192d90347d99ee08d1eb6a5ee8, type: 2}
   GreenBallPrefab: {fileID: 103980, guid: d4cf7d0273cf246898d2c5400866efa4, type: 2}
-  delayInterval: 0.05
+  delayInterval: 0.25
 --- !u!4 &470260116
 Transform:
   m_ObjectHideFlags: 0
@@ -1426,7 +1426,7 @@ Transform:
   m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5000001, w: 0.49999994}
   m_LocalPosition: {x: 0.33952364, y: 0.24528933, z: 0.5347653}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: -90, z: 0}
   m_Children: []
   m_Father: {fileID: 1192633917}
   m_RootOrder: 2
@@ -1541,7 +1541,7 @@ Transform:
   m_LocalRotation: {x: -0.00000011518241, y: 0.70722896, z: -0.7069846, w: -0.00000011522223}
   m_LocalPosition: {x: -0.08447635, y: 0.24628933, z: 0.8907653}
   m_LocalScale: {x: 0.1, y: 0.10000001, z: 0.099999994}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 89.980194, y: -180, z: 0}
   m_Children: []
   m_Father: {fileID: 1192633917}
   m_RootOrder: 1

@@ -4,21 +4,25 @@ using System.Collections;
 public class SpawnBalls : MonoBehaviour {
   public GameObject RedBallPrefab;
   public GameObject GreenBallPrefab;
-  public float delayInterval = .05f; // seconds
+  public float delayInterval = .15f; // seconds
+  public int BallLimit = 200;
 
   public void StartRedBalls(){
     StartCoroutine(addRedBallsWithDelay());
   }
 
   public void StopRedBalls(){
-     StartCoroutine(addRedBallsWithDelay());
+    StopAllCoroutines();
+     StopCoroutine(addRedBallsWithDelay());
   }
 
   IEnumerator addRedBallsWithDelay(){
-    GameObject go = GameObject.Instantiate(RedBallPrefab);
-    go.transform.parent = transform;
-
-    yield return  new WaitForSeconds(delayInterval);
+    while (true) {
+      if (transform.childCount > BallLimit) removeBalls(BallLimit / 10);
+      GameObject go = GameObject.Instantiate(RedBallPrefab);
+      go.transform.parent = transform;
+      yield return new WaitForSeconds(delayInterval);
+    }
   }
 
   public void StartGreenBalls(){
@@ -26,12 +30,22 @@ public class SpawnBalls : MonoBehaviour {
   }
 
   public void StopGreenBalls(){
-     StartCoroutine(addGreenBallsWithDelay());
+    StopCoroutine(addGreenBallsWithDelay());
   }
 
   IEnumerator addGreenBallsWithDelay(){
-    GameObject go = GameObject.Instantiate(GreenBallPrefab);
-    go.transform.parent = transform;
-    yield return  new WaitForSeconds(delayInterval);
+    while (true) {
+      if (transform.childCount > BallLimit) removeBalls(BallLimit / 10);
+      GameObject go = GameObject.Instantiate(GreenBallPrefab);
+      go.transform.parent = transform;
+      yield return new WaitForSeconds(delayInterval);
+    }
+  }
+
+  private void removeBalls (int count) {
+    if (count > transform.childCount) count = transform.childCount;
+    for (int b = 0; b < count; b++) {
+      Destroy(transform.GetChild(b).gameObject);
+    }
   }
 }

@@ -39,14 +39,12 @@ namespace Leap.Unity.DetectionUtilities {
           if(hand != null){
             fingerDirection = hand.Fingers[selectedFinger].Direction.ToVector3();
             float angleTo = Vector3.Angle(fingerDirection, targetDirection);
-            if(angleTo <= OnAngle){
+            if(handModel.IsTracked && angleTo <= OnAngle){
               Activate();
-            } else if(angleTo >= OffAngle) {
+            } else if (!handModel.IsTracked || angleTo >= OffAngle) {
               Deactivate();
             }
           }
-        } else if (IsActive) {
-          Deactivate();
         }
         yield return new WaitForSeconds(Period);
       }

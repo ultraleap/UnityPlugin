@@ -13,14 +13,18 @@ namespace Leap.Unity.DetectionUtilities {
     public UnityEvent OnDeactivate;
   
     public virtual void Activate(){
+      if (!IsActive) {
+        OnActivate.Invoke();
+      }
       IsActive = true;
-      OnActivate.Invoke();
       OnDetection.Invoke();
     }
   
     public virtual void Deactivate(){
+      if (IsActive) {
+        OnDeactivate.Invoke();
+      }
       IsActive = false;
-      OnDeactivate.Invoke();
       OnDetection.Invoke();
     }
   }
