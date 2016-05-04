@@ -26,6 +26,7 @@ namespace Leap.Unity.DetectionUtilities {
   
     void OnDisable () {
       StopCoroutine(extendedFingerWatcher());
+      Deactivate();
     }
   
     IEnumerator extendedFingerWatcher() {
@@ -35,7 +36,6 @@ namespace Leap.Unity.DetectionUtilities {
         if(handModel != null && handModel.IsTracked){
           hand = handModel.GetLeapHand();
           if(hand != null){
-            Debug.Log("is tracked " + handModel.IsTracked);
             fingerState = matchFingerState(hand.Fingers[0], 0)
               && matchFingerState(hand.Fingers[1], 1)
               && matchFingerState(hand.Fingers[2], 2)
@@ -43,7 +43,7 @@ namespace Leap.Unity.DetectionUtilities {
               && matchFingerState(hand.Fingers[4], 4);
             if(handModel.IsTracked && fingerState){
               Activate();
-            } else {
+            } else if(!handModel.IsTracked || !fingerState) {
               Deactivate();
             }
           }

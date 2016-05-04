@@ -8,11 +8,12 @@ public class SpawnBalls : MonoBehaviour {
   public int BallLimit = 200;
 
   public void StartRedBalls(){
+    StopCoroutine(addRedBallsWithDelay());
     StartCoroutine(addRedBallsWithDelay());
   }
 
   public void StopRedBalls(){
-    StopAllCoroutines();
+    //StopAllCoroutines();
      StopCoroutine(addRedBallsWithDelay());
   }
 
@@ -26,6 +27,7 @@ public class SpawnBalls : MonoBehaviour {
   }
 
   public void StartGreenBalls(){
+    StopCoroutine(addGreenBallsWithDelay()); 
     StartCoroutine(addGreenBallsWithDelay());
   }
 

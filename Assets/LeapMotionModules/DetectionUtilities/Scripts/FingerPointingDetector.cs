@@ -26,6 +26,7 @@ namespace Leap.Unity.DetectionUtilities {
   
     void OnDisable () {
       StopCoroutine(fingerPointingWatcher());
+      Deactivate();
     }
   
     IEnumerator fingerPointingWatcher() {

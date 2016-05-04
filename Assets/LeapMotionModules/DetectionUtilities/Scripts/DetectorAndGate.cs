@@ -18,12 +18,16 @@ namespace Leap.Unity.DetectionUtilities {
         activator.OnDeactivate.AddListener(CheckDetectors);
       }
     }
-  
+
+    int iteration = 0;
     void CheckDetectors(){
+      if (_detectors.Length < 1)
+        return;
       bool state = true;
       for(int a = 0; a < _detectors.Length; a++){
-        state &= _detectors[a].IsActive; 
+        state = state && _detectors[a].IsActive;
       }
+
       if(state && !IsActive){
         Activate();
       } else if(!state && IsActive){

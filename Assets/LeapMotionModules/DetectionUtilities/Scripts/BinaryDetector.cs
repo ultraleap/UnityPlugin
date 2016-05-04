@@ -14,6 +14,7 @@ namespace Leap.Unity.DetectionUtilities {
   
     public virtual void Activate(){
       if (!IsActive) {
+        IsActive = true;
         OnActivate.Invoke();
       }
       IsActive = true;
@@ -22,6 +23,7 @@ namespace Leap.Unity.DetectionUtilities {
   
     public virtual void Deactivate(){
       if (IsActive) {
+        IsActive = false;
         OnDeactivate.Invoke();
       }
       IsActive = false;
