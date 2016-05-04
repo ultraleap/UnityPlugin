@@ -255,49 +255,13 @@ Prefab:
       propertyPath: m_RootOrder
       value: 8
       objectReference: {fileID: 0}
-    - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_Name
-      value: InteractionSphere (4)
-      objectReference: {fileID: 0}
     - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: _manager
       value: 
       objectReference: {fileID: 1473219677}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalScale.x
-      value: 0.0666886
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalScale.y
-      value: 0.06668858
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalScale.z
-      value: 0.06668858
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -63.2842
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -61.217598
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -84.580894
-      objectReference: {fileID: 0}
-    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: _maxVelocity
-      value: 100
-      objectReference: {fileID: 0}
     - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: _graspMethod
-      value: 1
+      propertyPath: m_Name
+      value: InteractionSphere (4)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -345,49 +309,13 @@ Prefab:
       propertyPath: m_RootOrder
       value: 7
       objectReference: {fileID: 0}
-    - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_Name
-      value: InteractionSphere (3)
-      objectReference: {fileID: 0}
     - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: _manager
       value: 
       objectReference: {fileID: 1473219677}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalScale.x
-      value: 0.08963039
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalScale.y
-      value: 0.08963039
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalScale.z
-      value: 0.08963039
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -60.2635
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 73.0418
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -76.6187
-      objectReference: {fileID: 0}
-    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: _maxVelocity
-      value: 100
-      objectReference: {fileID: 0}
     - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: _graspMethod
-      value: 1
+      propertyPath: m_Name
+      value: InteractionSphere (3)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -442,42 +370,6 @@ Prefab:
     - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_Name
       value: InteractionSphere (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalScale.x
-      value: 0.12456127
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalScale.y
-      value: 0.12456126
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalScale.z
-      value: 0.12456126
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -55.4413
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 7.6496997
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 5.4893
-      objectReference: {fileID: 0}
-    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: _maxVelocity
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: _graspMethod
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -630,49 +522,13 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_Name
-      value: InteractionCube (2)
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 16.8823
-      objectReference: {fileID: 0}
     - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: _manager
       value: 
       objectReference: {fileID: 1473219677}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _contactEnableDelay
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _contactDisableSpeed
-      value: 0.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalScale.x
-      value: 0.07534971
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalScale.y
-      value: 0.07534971
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalScale.z
-      value: 0.07534971
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _maxVelocity
-      value: 100
-      objectReference: {fileID: 0}
     - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _graspMethod
-      value: 1
+      propertyPath: m_Name
+      value: InteractionCube (2)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1418,49 +1274,13 @@ Prefab:
       propertyPath: m_RootOrder
       value: 6
       objectReference: {fileID: 0}
-    - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_Name
-      value: InteractionSphere (2)
-      objectReference: {fileID: 0}
     - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: _manager
       value: 
       objectReference: {fileID: 1473219677}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalScale.x
-      value: 0.08451322
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalScale.y
-      value: 0.08451322
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalScale.z
-      value: 0.08451322
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -54.3285
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -89.1821
-      objectReference: {fileID: 0}
-    - target: {fileID: 459940, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -45.8289
-      objectReference: {fileID: 0}
-    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: _maxVelocity
-      value: 100
-      objectReference: {fileID: 0}
     - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: _graspMethod
-      value: 1
+      propertyPath: m_Name
+      value: InteractionSphere (2)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -1537,49 +1357,13 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_Name
-      value: InteractionCube (3)
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -15
-      objectReference: {fileID: 0}
     - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: _manager
       value: 
       objectReference: {fileID: 1473219677}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _contactEnableDelay
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _contactDisableSpeed
-      value: 0.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalScale.x
-      value: 0.062000003
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalScale.y
-      value: 0.062000003
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalScale.z
-      value: 0.062000003
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _maxVelocity
-      value: 100
-      objectReference: {fileID: 0}
     - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _graspMethod
-      value: 1
+      propertyPath: m_Name
+      value: InteractionCube (3)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1627,49 +1411,13 @@ Prefab:
       propertyPath: m_RootOrder
       value: 4
       objectReference: {fileID: 0}
-    - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_Name
-      value: InteractionCube (5)
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -12.8616
-      objectReference: {fileID: 0}
     - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: _manager
       value: 
       objectReference: {fileID: 1473219677}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _contactEnableDelay
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _contactDisableSpeed
-      value: 0.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalScale.x
-      value: 0.078
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalScale.y
-      value: 0.078
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalScale.z
-      value: 0.078
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _maxVelocity
-      value: 100
-      objectReference: {fileID: 0}
     - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _graspMethod
-      value: 1
+      propertyPath: m_Name
+      value: InteractionCube (5)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1717,49 +1465,13 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_Name
-      value: InteractionCube (4)
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: -39.0265
-      objectReference: {fileID: 0}
     - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: _manager
       value: 
       objectReference: {fileID: 1473219677}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _contactEnableDelay
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _contactDisableSpeed
-      value: 0.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalScale.x
-      value: 0.06290098
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalScale.y
-      value: 0.06290098
-      objectReference: {fileID: 0}
-    - target: {fileID: 446808, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_LocalScale.z
-      value: 0.06290098
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _maxVelocity
-      value: 100
-      objectReference: {fileID: 0}
     - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _graspMethod
-      value: 1
+      propertyPath: m_Name
+      value: InteractionCube (4)
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1814,18 +1526,6 @@ Prefab:
     - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_Name
       value: InteractionCube (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _maxVelocity
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: _graspMethod
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}

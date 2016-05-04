@@ -56,10 +56,10 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 119026}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.376, y: -0.195, z: 0.514}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0, y: -0.11200241, z: 0, w: 0.99370795}
+  m_LocalPosition: {x: 0.2685, y: -0.195, z: 0.4864}
+  m_LocalScale: {x: 0.078, y: 0.078, z: 0.078}
+  m_LocalEulerAnglesHint: {x: 0, y: -12.8616, z: 0}
   m_Children:
   - {fileID: 462596}
   m_Father: {fileID: 0}
@@ -163,8 +163,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
+  _graspMethod: 0
   _graphicalAnchor: {fileID: 462596}
   _graphicalReturnTime: 0.25
+  _releaseDistance: 0.15
+  _maxVelocity: 100
+  _followStrength: 1
   _enableContact: 1
   _advancedThrowing: 1
   _throwingVelocityCurve:

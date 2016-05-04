@@ -239,6 +239,7 @@ namespace Leap.Unity.Interaction {
         //Should only happen if the user has done some trickery since there is a RequireComponent attribute
         throw new InvalidOperationException("InteractionBehaviour must have a Rigidbody component attached to it.");
       }
+      _rigidbody.maxAngularVelocity = float.PositiveInfinity;
 
       //Technically we only need one instance in the entire scene, but easier for each object to have it's own instance for now.
       //TODO: Investigate allowing this to be a singleton?
@@ -312,6 +313,9 @@ namespace Leap.Unity.Interaction {
       //Copy over existing settings for defaults
       _isKinematic = _rigidbody.isKinematic;
       _useGravity = _rigidbody.useGravity;
+
+      _solvedPosition = _rigidbody.position;
+      _solvedRotation = _rigidbody.rotation;
 
 #if UNITY_EDITOR
       Collider[] colliders = GetComponentsInChildren<Collider>();
@@ -426,7 +430,7 @@ namespace Leap.Unity.Interaction {
             _rigidbody.rotation = newRotation;
           } else {
             Vector3 deltaPos = newPosition - _rigidbody.position;
-            Quaternion deltaRot = Quaternion.Inverse(_rigidbody.rotation) * newRotation;
+            Quaternion deltaRot = newRotation * Quaternion.Inverse(_rigidbody.rotation);
 
             Vector3 deltaAxis;
             float deltaAngle;
@@ -641,8 +645,15 @@ namespace Leap.Unity.Interaction {
     #region INTERNAL
     protected INTERACTION_TRANSFORM getRigidbodyTransform() {
       INTERACTION_TRANSFORM interactionTransform = new INTERACTION_TRANSFORM();
-      interactionTransform.position = _solvedPosition.ToCVector();
-      interactionTransform.rotation = _solvedRotation.ToCQuaternion();
+
+      if (IsBeingGrasped) {
+        interactionTransform.position = _solvedPosition.ToCVector();
+        interactionTransform.rotation = _solvedRotation.ToCQuaternion();
+      } else {
+        interactionTransform.position = _rigidbody.position.ToCVector();
+        interactionTransform.rotation = _rigidbody.rotation.ToCQuaternion();
+      }
+
       interactionTransform.wallTime = Time.fixedTime;
       return interactionTransform;
     }
