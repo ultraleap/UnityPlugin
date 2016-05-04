@@ -62,6 +62,9 @@ public class Detector : MonoBehaviour {
       for(float q = step; q <= height; q += step){
         DrawCircle(origin + direction * q, direction, Mathf.Tan(angle * Constants.DEG_TO_RAD) * q, color, quality * 8, duration, depthTest);
       }
+      float hypo = height/Mathf.Cos(angle/2);
+      Vector3 edge = Vector3.Slerp(direction, -direction, Mathf.Cos(angle/2)) * hypo;
+      Debug.DrawLine(origin, edge);
     }
 
     #endif
