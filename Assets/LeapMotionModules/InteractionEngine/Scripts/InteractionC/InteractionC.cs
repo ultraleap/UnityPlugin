@@ -56,9 +56,9 @@ namespace Leap.Unity.Interaction.CApi {
   }
 
   public enum ManipulatorMode : uint {
-    Contact,
-    Grasp,
-    NoInteraction,
+    Contact = 0x00,
+    Grasp = 0x01,
+    NoInteraction = 0x02,
   }
 
   public enum ShapeInstanceResultFlags : uint {
@@ -174,7 +174,6 @@ namespace Leap.Unity.Interaction.CApi {
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct INTERACTION_CREATE_SHAPE_INFO {
     public ShapeInfoFlags shapeFlags;
-    public LEAP_VECTOR gravity;
   }
 
   // All properties require eLeapIEUpdateFlags to enable

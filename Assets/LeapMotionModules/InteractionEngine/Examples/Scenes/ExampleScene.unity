@@ -293,7 +293,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: _graspMethod
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -379,7 +383,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: _graspMethod
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -465,7 +473,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: _graspMethod
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -656,7 +668,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: _graspMethod
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1440,7 +1456,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: _graspMethod
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -1555,7 +1575,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: _graspMethod
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1641,7 +1665,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: _graspMethod
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1727,7 +1755,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: _graspMethod
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1789,7 +1821,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: _graspMethod
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}

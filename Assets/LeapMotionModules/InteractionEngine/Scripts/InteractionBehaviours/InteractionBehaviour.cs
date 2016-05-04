@@ -296,7 +296,6 @@ namespace Leap.Unity.Interaction {
 
     public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
       createInfo = new INTERACTION_CREATE_SHAPE_INFO();
-      createInfo.gravity = Physics.gravity.ToCVector();
       createInfo.shapeFlags = ShapeInfoFlags.None;
 
       if (!_isKinematic) {
