@@ -365,6 +365,7 @@ namespace Leap.Unity.Interaction {
       base.OnRecievedSimulationResults(results);
 
       if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 &&
+          !IsBeingGrasped &&
           _enableContact) {
         //Use Sleep() to clear any forces that might have been applied by the user.
         _rigidbody.Sleep();
