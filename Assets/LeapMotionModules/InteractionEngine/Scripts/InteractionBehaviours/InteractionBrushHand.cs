@@ -19,6 +19,7 @@ namespace Leap.Unity
     private Rigidbody[] _capsuleBodies;
     private Vector3[] _lastPositions;
     private Hand hand_;
+    private bool _hasWarned = false;
 
     public override ModelType HandModelType
     {
@@ -40,11 +41,6 @@ namespace Leap.Unity
 
     [SerializeField]
     private PhysicMaterial _material = null;
-
-
-    // DELETE ME
-    private int _hack = 0;
-
 
     public override Hand GetLeapHand() { return hand_; }
     public override void SetLeapHand(Hand hand) { hand_ = hand; }
@@ -117,15 +113,6 @@ namespace Leap.Unity
         return;
 #endif
 
-      // DELETE ME
-      bool xx = false;
-      if (++_hack > 100)
-      {
-        _hack = 0;
-        xx = true;
-      }
-
-
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++)
       {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++)
@@ -135,32 +122,24 @@ namespace Leap.Unity
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
           Rigidbody body = _capsuleBodies[boneArrayIndex];
 
-          if(body.gameObject.activeSelf) {
+#if UNITY_EDITOR
+          // During normal operation the brushes should not be pushed away from the tracked hand.
+          // In unusual situations (e.g. swatting an object really quickly) this may fire.
+          if (!_hasWarned)
+          {
             // Compare against intended target, not new tracking position.
             Vector3 error = _lastPositions[boneArrayIndex] - body.position;
-            if (error.magnitude > (bone.Width * 1.7f)) {
-              body.gameObject.SetActive(false);
-            }
-
-            Vector3 delta = bone.Center.ToVector3() - body.position;
-            body.velocity = delta / Time.fixedDeltaTime;
-            body.rotation = bone.Rotation.ToQuaternion();
-          }
-          else
-            if (xx)
-          {
-
-//            bool isClear = Physics.CheckCapsule(bone.PrevJoint.ToVector3(), bone.NextJoint.ToVector3(), bone.Width * 0.5f, _layerMask);
-//            if (isClear)
-            {
-              body.gameObject.SetActive(true);
-              body.position = bone.Center.ToVector3();
-              body.rotation = bone.Rotation.ToQuaternion();
-              body.velocity = Vector3.zero;
+            if (error.magnitude > bone.Width) {
+              Debug.LogWarning("InteractionBrushHand is falling behind tracked hand: " + gameObject.name);
+              _hasWarned = true;
             }
           }
-
           _lastPositions[boneArrayIndex] = bone.Center.ToVector3();
+#endif
+
+          Vector3 delta = bone.Center.ToVector3() - body.position;
+          body.velocity = delta / Time.fixedDeltaTime;
+          body.rotation = bone.Rotation.ToQuaternion();
         }
       }
     }
@@ -173,6 +152,7 @@ namespace Leap.Unity
         GameObject.Destroy(_capsuleBodies[i].gameObject);
       }
       _capsuleBodies = null;
+      _lastPositions = null;
 
       base.FinishHand();
     }

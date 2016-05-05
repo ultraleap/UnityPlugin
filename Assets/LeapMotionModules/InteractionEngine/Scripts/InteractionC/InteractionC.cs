@@ -43,12 +43,13 @@ namespace Leap.Unity.Interaction.CApi {
     None = 0x00,
     HasRigidBody = 0x01,
   };
-  
+
   public enum UpdateInfoFlags : uint {
     None = 0x00,
     ApplyAcceleration = 0x01,
     VelocityEnabled = 0x02,
-    GravityEnabled = 0x04
+    GravityEnabled = 0x04,
+    ReportNoResult = 0x08
   };
 
   public enum HandResultFlags : uint {
@@ -64,6 +65,7 @@ namespace Leap.Unity.Interaction.CApi {
   public enum ShapeInstanceResultFlags : uint {
     None = 0x00,
     Velocities = 0x01,
+    MaxHand = 0x02
   }
 
   public enum DebugFlags : uint {
@@ -200,6 +202,8 @@ namespace Leap.Unity.Interaction.CApi {
     public ShapeInstanceResultFlags resultFlags;
     public LEAP_VECTOR linearVelocity;
     public LEAP_VECTOR angularVelocity;
+    public float maxHandDepth;
+    public float maxHandVelocity;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]

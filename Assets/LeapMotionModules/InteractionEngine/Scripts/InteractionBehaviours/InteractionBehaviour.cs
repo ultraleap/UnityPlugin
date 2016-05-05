@@ -75,6 +75,7 @@ namespace Leap.Unity.Interaction {
     protected bool _useGravity;
     protected bool _recievedVelocityUpdate = false;
     protected bool _notifiedOfTeleport = false;
+    protected bool _ignoringBrushes = false;
 
     protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
@@ -315,6 +316,11 @@ namespace Leap.Unity.Interaction {
         updateInfo.updateFlags |= UpdateInfoFlags.VelocityEnabled;
       }
 
+      // Request notification of when hands are no longer touching (or influencing.)
+      if (_ignoringBrushes) {
+        updateInfo.updateFlags |= UpdateInfoFlags.ReportNoResult;
+      }
+
       if (_enableContact && !_isKinematic && !IsBeingGrasped) {
         updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration;
       }
@@ -334,8 +340,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
       base.OnRecievedSimulationResults(results);
 
-      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 &&
-          _enableContact) {
+      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 && _enableContact) {
         //Use Sleep() to clear any forces that might have been applied by the user.
         _rigidbody.Sleep();
         _rigidbody.velocity = results.linearVelocity.ToVector3();
@@ -345,6 +350,19 @@ namespace Leap.Unity.Interaction {
 #if UNITY_EDITOR
         _showDebugRecievedVelocity = true;
 #endif
+      }
+
+      if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
+        _ignoringBrushes = true;
+
+        // HACK FIXME TODO BBQ.  This will be rewired.
+        gameObject.layer = 10; // InteractionExampleObjectNoClipBrush
+      }
+      else {
+        _ignoringBrushes = false;
+
+        // HACK FIXME TODO BBQ.  This will be rewired.
+        gameObject.layer = 9; // InteractionExampleObjectCollidesBrush
       }
     }
 
