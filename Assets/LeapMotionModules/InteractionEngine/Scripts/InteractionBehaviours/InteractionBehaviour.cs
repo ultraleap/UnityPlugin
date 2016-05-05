@@ -380,6 +380,8 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandGrasped(Hand hand) {
       base.OnHandGrasped(hand);
 
+      updateState();
+
       var newCollection = HandPointCollection.Create(_rigidbody);
       _handIdToPoints[hand.Id] = newCollection;
 
@@ -487,9 +489,6 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnHandLostTracking(Hand oldHand) {
       base.OnHandLostTracking(oldHand);
-
-      //Always set to be kinematic when tracking is lost
-      _rigidbody.isKinematic = true;
 
       updateState();
     }
