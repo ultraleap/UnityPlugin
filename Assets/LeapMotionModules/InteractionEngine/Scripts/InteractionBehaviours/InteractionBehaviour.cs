@@ -249,9 +249,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnUnregistered() {
       base.OnUnregistered();
 
-      _rigidbody.useGravity = _useGravity;
-      _rigidbody.isKinematic = _isKinematic;
-      _rigidbody = null;
+      resetState();
 
       KabschC.Destruct(ref _kabsch);
     }
@@ -333,9 +331,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnInteractionShapeDestroyed() {
       base.OnInteractionShapeDestroyed();
 
-      //When the shape is destroyed, revert rigidbody status to user settings
-      _rigidbody.isKinematic = _isKinematic;
-      _rigidbody.useGravity = _useGravity;
+      resetState();
     }
 
     public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
@@ -639,6 +635,7 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL
+
     protected INTERACTION_TRANSFORM getRigidbodyTransform() {
       INTERACTION_TRANSFORM interactionTransform = new INTERACTION_TRANSFORM();
 
@@ -652,6 +649,14 @@ namespace Leap.Unity.Interaction {
 
       interactionTransform.wallTime = Time.fixedTime;
       return interactionTransform;
+    }
+
+    protected void resetState() {
+      _rigidbody.useGravity = _useGravity;
+      _rigidbody.isKinematic = _isKinematic;
+      _graphicalAnchor.localPosition = Vector3.one;
+      _graphicalAnchor.localRotation = Quaternion.identity;
+      _graphicalAnchor.gameObject.SetActive(true);
     }
 
     protected virtual void updateState() {
