@@ -249,6 +249,8 @@ namespace Leap.Unity.Interaction {
     protected override void OnUnregistered() {
       base.OnUnregistered();
 
+      _rigidbody.useGravity = _useGravity;
+      _rigidbody.isKinematic = _isKinematic;
       _rigidbody = null;
 
       KabschC.Destruct(ref _kabsch);
@@ -291,7 +293,6 @@ namespace Leap.Unity.Interaction {
       //Reset so we can accumulate for the next frame
       _accumulatedLinearAcceleration = Vector3.zero;
       _accumulatedAngularAcceleration = Vector3.zero;
-      _notifiedOfTeleport = false;
       _recievedVelocityUpdate = false;
     }
 
@@ -340,10 +341,7 @@ namespace Leap.Unity.Interaction {
     public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
       updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
 
-      updateInfo.updateFlags = UpdateInfoFlags.None;
-      if (!_notifiedOfTeleport) {
-        updateInfo.updateFlags |= UpdateInfoFlags.VelocityEnabled;
-      }
+      updateInfo.updateFlags = UpdateInfoFlags.VelocityEnabled;
 
       if (_enableContact && !_isKinematic && !IsBeingGrasped) {
         updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration;
@@ -454,6 +452,8 @@ namespace Leap.Unity.Interaction {
         default:
           throw new InvalidOperationException("Unexpected grasp method");
       }
+
+      _notifiedOfTeleport = false;
     }
 
     protected override void OnHandsHoldGraphics(List<Hand> hands) {
