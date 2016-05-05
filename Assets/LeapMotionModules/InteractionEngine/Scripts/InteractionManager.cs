@@ -14,7 +14,7 @@ namespace Leap.Unity.Interaction {
   /// needed for operation.  This class also takes care of all bookkeeping to keep track of the objects,
   /// hands, and the internal state of the interaction plugin.
   /// </summary>
-  /// 
+  ///
   /// <remarks>
   /// InteractionManager has the following features:
   ///    - Allows instances of IInteractionBehaviour to register or unregister with it.
@@ -26,10 +26,10 @@ namespace Leap.Unity.Interaction {
   ///      a small amount of time.  This helps with actions such as throwing.
   ///    - Multiple instances of InteractionManager are ALLOWED!  This allows you to have different simulation
   ///      settings and control for different groups of objects.
-  /// 
+  ///
   /// InteractionManager has the following requirements:
   ///    - The DataSubfolder property must point to a valid subfolder in the StreamingAssets data folder.
-  ///      The subfolder must contain a valid ldat file names IE.  
+  ///      The subfolder must contain a valid ldat file names IE.
   /// </remarks>
   public class InteractionManager : MonoBehaviour {
     #region SERIALIZED FIELDS
@@ -67,6 +67,7 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL FIELDS
+    private static UInt32 _expectedVersion = 1;
     protected INTERACTION_SCENE _scene;
     private bool _hasSceneBeenCreated = false;
     private Coroutine _simulationCoroutine = null;
@@ -429,7 +430,7 @@ namespace Leap.Unity.Interaction {
       simulateInteraction();
 
       updateInteractionStateChanges(frame);
-      
+
       dispatchSimulationResults();
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
@@ -727,6 +728,15 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void createScene() {
+      UInt32 version = InteractionC.GetVersion();
+      if (InteractionC.GetVersion() != _expectedVersion) {
+        _scene.pScene = (IntPtr)0;
+        UnityEditor.EditorUtility.DisplayDialog("Version Error!",
+                                                "Leap Interaction dll version expected: " + _expectedVersion + " got version: " + version,
+                                                "Ok");
+        throw new Exception("Leap Interaction version wrong");
+      }
+
       INTERACTION_SCENE_INFO sceneInfo = getSceneInfo();
       string dataPath = Path.Combine(Application.streamingAssetsPath, _dataSubfolder);
       InteractionC.CreateScene(ref _scene, ref sceneInfo, dataPath);

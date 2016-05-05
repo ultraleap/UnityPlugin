@@ -68,6 +68,11 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _contactEnableDelay = 0.1f;
 
+    [Tooltip("Depth before brushes are disabled.")]
+    [SerializeField]
+    protected float _brushDisableDistance = 0.015f;
+
+
     protected Renderer[] _renderers;
     protected Rigidbody _rigidbody;
 
@@ -319,6 +324,8 @@ namespace Leap.Unity.Interaction {
       // Request notification of when hands are no longer touching (or influencing.)
       if (_ignoringBrushes) {
         updateInfo.updateFlags |= UpdateInfoFlags.ReportNoResult;
+
+        Debug.DrawLine(gameObject.transform.position, gameObject.transform.position + new Vector3(0.5f, 0.6f, 0.7f), new Color(0, 1, 0));
       }
 
       if (_enableContact && !_isKinematic && !IsBeingGrasped) {
@@ -341,25 +348,29 @@ namespace Leap.Unity.Interaction {
       base.OnRecievedSimulationResults(results);
 
       if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 && _enableContact) {
-        //Use Sleep() to clear any forces that might have been applied by the user.
-        _rigidbody.Sleep();
         _rigidbody.velocity = results.linearVelocity.ToVector3();
         _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
         _recievedVelocityUpdate = true;
-
-#if UNITY_EDITOR
-        _showDebugRecievedVelocity = true;
-#endif
       }
+#if UNITY_EDITOR
+      _showDebugRecievedVelocity = _recievedVelocityUpdate;
+#endif
 
       if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
-        _ignoringBrushes = true;
+        if (results.maxHandDepth > _brushDisableDistance) {
+          _ignoringBrushes = true;
 
-        // HACK FIXME TODO BBQ.  This will be rewired.
-        gameObject.layer = 10; // InteractionExampleObjectNoClipBrush
+          // HACK FIXME TODO BBQ.  This will be rewired.
+          gameObject.layer = 10; // InteractionExampleObjectNoClipBrush
+
+
+//          Debug.DrawLine(gameObject.transform.position, gameObject.transform.position + new Vector3(1,1,1), new Color(1, 1, 1) );
+        }
       }
       else {
         _ignoringBrushes = false;
+
+        Debug.DrawLine(gameObject.transform.position, gameObject.transform.position + new Vector3(1, 1, 1), new Color(1, 0, 0));
 
         // HACK FIXME TODO BBQ.  This will be rewired.
         gameObject.layer = 9; // InteractionExampleObjectCollidesBrush
@@ -561,6 +572,8 @@ namespace Leap.Unity.Interaction {
 
         if (_rigidbody.IsSleeping()) {
           Gizmos.color = Color.gray;
+        } else if (_ignoringBrushes) {
+          Gizmos.color = Color.red;
         } else if (IsBeingGrasped) {
           Gizmos.color = Color.green;
         } else if (_showDebugRecievedVelocity) {

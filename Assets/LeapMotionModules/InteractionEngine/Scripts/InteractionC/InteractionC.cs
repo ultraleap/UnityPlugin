@@ -203,7 +203,7 @@ namespace Leap.Unity.Interaction.CApi {
     public LEAP_VECTOR linearVelocity;
     public LEAP_VECTOR angularVelocity;
     public float maxHandDepth;
-    public float maxHandVelocity;
+    public LEAP_VECTOR maxHandVelocity;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -225,6 +225,12 @@ namespace Leap.Unity.Interaction.CApi {
 
   public class InteractionC {
     public const string DLL_NAME = "LeapInteractionEngine";
+
+    /*** Get DLL Version ***/
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetVersion")]
+    private static extern UInt32 LeapIEGetVersion();
+
+    public static UInt32 GetVersion() { return LeapIEGetVersion(); }
 
     /*** Create Scene ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIECreateScene", CallingConvention = CallingConvention.Cdecl)]

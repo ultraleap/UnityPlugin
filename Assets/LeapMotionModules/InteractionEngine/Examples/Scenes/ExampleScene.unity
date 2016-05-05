@@ -298,7 +298,11 @@ Prefab:
         type: 2}
     - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: _brushDisableDistance
+      value: 0.015
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -389,7 +393,11 @@ Prefab:
         type: 2}
     - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: _brushDisableDistance
+      value: 0.015
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -480,7 +488,11 @@ Prefab:
         type: 2}
     - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: _brushDisableDistance
+      value: 0.015
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -676,7 +688,11 @@ Prefab:
         type: 2}
     - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: _brushDisableDistance
+      value: 0.015
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1404,7 +1420,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1473219676}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 99abcac5e6e214041876299e0504c871, type: 3}
   m_Name: 
@@ -1412,8 +1428,8 @@ MonoBehaviour:
   _leapProvider: {fileID: 972296616}
   _dataSubfolder: InteractionEngine
   _untrackedTimeout: 0.5
-  _enableContact: 0
-  _enableGrasping: 0
+  _enableContact: 1
+  _enableGrasping: 1
   _enableSimulation: 1
   _showDebugLines: 0
   _showDebugOutput: 0
@@ -1565,7 +1581,11 @@ Prefab:
         type: 2}
     - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: _brushDisableDistance
+      value: 0.015
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -1685,7 +1705,11 @@ Prefab:
         type: 2}
     - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: _brushDisableDistance
+      value: 0.015
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1776,7 +1800,11 @@ Prefab:
         type: 2}
     - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: _brushDisableDistance
+      value: 0.015
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1867,7 +1895,11 @@ Prefab:
         type: 2}
     - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: _brushDisableDistance
+      value: 0.015
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1934,7 +1966,11 @@ Prefab:
         type: 2}
     - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: _brushDisableDistance
+      value: 0.015
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
