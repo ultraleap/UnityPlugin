@@ -656,9 +656,12 @@ namespace Leap.Unity.Interaction {
     protected void resetState() {
       _rigidbody.useGravity = _useGravity;
       _rigidbody.isKinematic = _isKinematic;
-      _graphicalAnchor.localPosition = Vector3.zero;
-      _graphicalAnchor.localRotation = Quaternion.identity;
-      _graphicalAnchor.gameObject.SetActive(true);
+
+      if (_graphicalAnchor != null) {
+        _graphicalAnchor.localPosition = Vector3.zero;
+        _graphicalAnchor.localRotation = Quaternion.identity;
+        _graphicalAnchor.gameObject.SetActive(true);
+      }
     }
 
     protected virtual void updateState() {
