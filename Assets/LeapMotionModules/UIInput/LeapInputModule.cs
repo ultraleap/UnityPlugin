@@ -37,10 +37,10 @@ public class LeapInputModule : BaseInputModule
     [Tooltip("The material to be instantiated for your pointers during projective interaction.")]
     public Material PointerMaterial;
     [Tooltip("The size of the pointer in world coordinates.")]
-    public float NormalPointerScale = 0.00025f; //In world space
+    public AnimationCurve PointerScale;
     [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
-    public Color Color = Color.white;
+    public Color StandardColor = Color.white;
     [Tooltip("The color of the pointer when it is hovering over any other UI element.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color HoveringColor = Color.green;
@@ -77,7 +77,7 @@ public class LeapInputModule : BaseInputModule
     private Camera EventCamera;
     private PointerEventData[] PointEvents;
     private pointerStates[] pointerState;
-    private RectTransform[] Pointers;
+    private Transform[] Pointers;
     private LineRenderer[] PointerLines;
 
     //Object the pointer is hovering over
@@ -144,25 +144,18 @@ public class LeapInputModule : BaseInputModule
         }
 
         //Initialize the Pointers for Projective Interaction
-        Pointers = new RectTransform[NumberOfHands];
+        Pointers = new Transform[NumberOfHands];
         PointerLines = new LineRenderer[NumberOfHands];
         for (int index = 0; index < Pointers.Length; index++)
         {
             //Create the Canvas to render the Pointer on
             GameObject pointer = new GameObject("Pointer " + index);
-            Canvas canvas = pointer.AddComponent<Canvas>();
-            pointer.AddComponent<CanvasRenderer>();
-            pointer.AddComponent<CanvasScaler>();
-
-            //Set the canvas to be worldspace like everything else
-            canvas.renderMode = RenderMode.WorldSpace;
-            canvas.sortingOrder = 1000;
+            SpriteRenderer renderer = pointer.AddComponent<SpriteRenderer>();
+            renderer.sortingOrder = 1000;
 
             //Add your sprite to the Canvas
-            UnityEngine.UI.Image image = pointer.AddComponent<UnityEngine.UI.Image>();
-            image.sprite = PointerSprite;
-            image.material = Instantiate(PointerMaterial); //Make sure to instantiate the material so each pointer can be modified independently
-            image.raycastTarget = false;
+            renderer.sprite = PointerSprite;
+            renderer.material = Instantiate(PointerMaterial); //Make sure to instantiate the material so each pointer can be modified independently
 
             if (DrawDebug) {
                 PointerLines[index] = pointer.AddComponent<LineRenderer>();
@@ -175,7 +168,7 @@ public class LeapInputModule : BaseInputModule
             if (PointerSprite == null)
                 Debug.LogError("Set PointerSprite on " + this.gameObject.name + " to the sprite you want to use as your pointer.", this.gameObject);
 
-            Pointers[index] = pointer.GetComponent<RectTransform>();
+            Pointers[index] = pointer.GetComponent<Transform>();
         }
 
         //Initialize our Sound Player
@@ -263,8 +256,12 @@ public class LeapInputModule : BaseInputModule
                 ProcessState(whichHand, TipRaycast);
             }
 
-            PointerLines[whichHand].SetPosition(0, EventCamera.transform.position);
-            PointerLines[whichHand].SetPosition(1, Pointers[whichHand].transform.position);
+            PrevScreenPosition[whichHand] = PointEvents[whichHand].position;
+
+            if (DrawDebug) {
+                PointerLines[whichHand].SetPosition(0, EventCamera.transform.position);
+                PointerLines[whichHand].SetPosition(1, Pointers[whichHand].position);
+            }
 
             //Trigger events that come from changing pointer state
             ProcessStateEvents(whichHand);
@@ -448,7 +445,6 @@ public class LeapInputModule : BaseInputModule
         //Set the Raycast Direction and Delta
         PointEvents[whichHand].position = Vector2.Lerp(PrevScreenPosition[whichHand], EventCamera.WorldToScreenPoint(IndexFingerPosition), 1.0f);//new Vector2(Screen.width / 2, Screen.height / 2);
         PointEvents[whichHand].delta = (PointEvents[whichHand].position - PrevScreenPosition[whichHand]) * -10f;
-        PrevScreenPosition[whichHand] = PointEvents[whichHand].position;
         PointEvents[whichHand].scrollDelta = Vector2.zero;
 
         //Perform the Raycast and sort all the things we hit by distance...
@@ -624,47 +620,35 @@ public class LeapInputModule : BaseInputModule
     }
 
     //Update the cursor location and whether or not it is enabled
-    private void UpdatePointer(int index, PointerEventData pointData)
+    private void UpdatePointer(int whichHand, PointerEventData pointData)
     {
-        if (PointEvents[index].pointerCurrentRaycast.gameObject != null)
+        if (currentOverGo[whichHand] != null)
         {
-            Pointers[index].gameObject.SetActive(true);
-            if (PointEvents[index].pointerCurrentRaycast.gameObject != null)
+            Pointers[whichHand].gameObject.SetActive(true);
+            if (PointEvents[whichHand].pointerCurrentRaycast.gameObject != null)
             {
-                RectTransform draggingPlane = PointEvents[index].pointerCurrentRaycast.gameObject.GetComponent<RectTransform>();
+                RectTransform draggingPlane = PointEvents[whichHand].pointerCurrentRaycast.gameObject.GetComponent<RectTransform>();
                 Vector3 globalLookPos;
                 if (RectTransformUtility.ScreenPointToWorldPointInRectangle(draggingPlane, pointData.position, pointData.enterEventCamera, out globalLookPos))
                 {
-                    Pointers[index].position = globalLookPos;// -transform.forward * 0.01f; //Amount the pointer floats above the Canvas
+                    Pointers[whichHand].position = globalLookPos;// -transform.forward * 0.01f; //Amount the pointer floats above the Canvas
 
                     float pointerAngle = Mathf.Rad2Deg * (Mathf.Atan2(pointData.delta.x, pointData.delta.y));
-                    Pointers[index].rotation = draggingPlane.rotation * Quaternion.Euler(0f, 0f, -pointerAngle);
+                    Pointers[whichHand].rotation = draggingPlane.rotation * Quaternion.Euler(0f, 0f, -pointerAngle);
 
                     // scale cursor based on distance to camera
                     float lookPointDistance = 1f;
-                    if (Camera.main != null)
+                    if (Camera.current != null)
                     {
-                        lookPointDistance = (Pointers[index].position - Camera.main.transform.position).magnitude;
-                    }
-                    else
-                    {
-                        Debug.LogError("Tag a camera with 'Main Camera'");
+                        lookPointDistance = (Pointers[whichHand].position - Camera.current.transform.position).magnitude;
                     }
 
-                    float Pointerscale = lookPointDistance * NormalPointerScale;
-                    if (Pointerscale < NormalPointerScale)
-                    {
-                        Pointerscale = NormalPointerScale;
-                    }
+                    float Pointerscale = PointerScale.Evaluate(lookPointDistance);
 
                     //Commented out Velocity Stretching because it looks funny when I change the projection origin
-                    Pointers[index].localScale = Pointerscale * new Vector3(1f, 1f/* + pointData.delta.magnitude*0.5f*/, 1f);
+                    Pointers[whichHand].localScale = Pointerscale * new Vector3(1f, 1f + pointData.delta.magnitude*1f, 1f);
                 }
             }
-        }
-        else
-        {
-            Pointers[index].gameObject.SetActive(false);
         }
     }
 
@@ -721,7 +705,7 @@ public class LeapInputModule : BaseInputModule
         {
             case pointerStates.OnCanvas:
                 lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 1f), 0.2f);
-                lerpPointerColor(whichHand, Color, 0.2f);
+                lerpPointerColor(whichHand, StandardColor, 0.2f);
                 break;
             case pointerStates.OnElement:
                 lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 1f), 0.2f);
@@ -745,7 +729,7 @@ public class LeapInputModule : BaseInputModule
                 lerpPointerColor(whichHand, new Color(0.0f, 0.01f, 0.0f, 0f), 0.2f);
                 break;
             case pointerStates.OffCanvas:
-                lerpPointerColor(whichHand, new Color(0.0f, 0.0f, 0.0f, 0f), 0.2f);
+                lerpPointerColor(whichHand, new Color(0.0f, 0.0f, 0.0f, 0f), 1f);
                 break;
         }
     }
@@ -754,21 +738,22 @@ public class LeapInputModule : BaseInputModule
     //If RGB are 0f or Alpha is 1f, then it will ignore those components and only lerp the remaining components
     public void lerpPointerColor(int whichHand, Color color, float lerpalpha)
     {
-        Color oldColor = Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color;
+        SpriteRenderer PointerSprite = Pointers[whichHand].GetComponent<SpriteRenderer>();
+        Color oldColor = PointerSprite.color;
         if (color.r == 0f && color.g == 0f && color.b == 0f)
         {
-            //Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = Color.Lerp(oldColor, new Color(oldColor.r, oldColor.g, oldColor.b, color.a), lerpalpha);
-            Pointers[whichHand].GetComponent<Renderer>().material.color = Color.Lerp(oldColor, new Color(oldColor.r, oldColor.g, oldColor.b, color.a), lerpalpha);
+            PointerSprite.material.color = Color.Lerp(oldColor, new Color(oldColor.r, oldColor.g, oldColor.b, color.a), lerpalpha);
+            PointerSprite.color = Color.Lerp(oldColor, new Color(oldColor.r, oldColor.g, oldColor.b, color.a), lerpalpha);
         }
         else if (color.a == 1f)
         {
-            //Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = Color.Lerp(oldColor, new Color(color.r, color.g, color.b, oldColor.a), lerpalpha);
-            Pointers[whichHand].GetComponent<Renderer>().material.color = Color.Lerp(oldColor, new Color(color.r, color.g, color.b, oldColor.a), lerpalpha);
+            PointerSprite.material.color = Color.Lerp(oldColor, new Color(color.r, color.g, color.b, oldColor.a), lerpalpha);
+            PointerSprite.color = Color.Lerp(oldColor, new Color(color.r, color.g, color.b, oldColor.a), lerpalpha);
         }
         else
         {
-            //Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = Color.Lerp(oldColor, color, lerpalpha);
-            Pointers[whichHand].GetComponent<Renderer>().material.color = Color.Lerp(oldColor, color, lerpalpha);
+            PointerSprite.material.color = Color.Lerp(oldColor, color, lerpalpha);
+            PointerSprite.color = Color.Lerp(oldColor, color, lerpalpha);
         }
     }
 

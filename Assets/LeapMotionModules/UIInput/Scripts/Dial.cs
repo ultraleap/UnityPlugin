@@ -36,6 +36,7 @@ namespace UnityEngine.UI {
 
         private float wholeRotationValue = 0f;
         private float prevNormalizedValue = 0f;
+        private bool endHit = false;
 
         [SerializeField]
         protected float m_Value;
@@ -61,6 +62,10 @@ namespace UnityEngine.UI {
         [SerializeField]
         private DialEvent m_OnValueChanged = new DialEvent();
         public DialEvent onValueChanged { get { return m_OnValueChanged; } set { m_OnValueChanged = value; } }
+
+        [SerializeField]
+        private DialEvent m_EndHit = new DialEvent();
+        public DialEvent onEndHit { get { return m_EndHit; } set { m_EndHit = value; } }
 
         // Private fields
         private Transform m_HandleTransform;
@@ -228,23 +233,26 @@ namespace UnityEngine.UI {
                 }
 
                 //Apply Max/Min Constraint
-                float testval = wholeRotationValue + (val * valuePerRotation);
-                if (testval > maxValue)
-                {
+                float testval = (wholeRotationValue + (val * valuePerRotation));
+                if (testval > maxValue) {
                     normalizedValue = ((maxValue - wholeRotationValue) / valuePerRotation);
-                }
-                else if (testval < minValue)
-                {
+                    if (!endHit) {
+                        m_EndHit.Invoke(m_Value);
+                        endHit = true;
+                    }
+                } else if (testval < minValue) {
                     normalizedValue = ((minValue - wholeRotationValue) / valuePerRotation);
-                }
-                else
-                {
+                    if (!endHit) {
+                        m_EndHit.Invoke(m_Value);
+                        endHit = true;
+                    }
+                } else {
+                    endHit = false;
                     normalizedValue = val;
                 }
 
-
                 //Set the main Value
-                Set(wholeRotationValue + (normalizedValue * valuePerRotation));
+                Set((wholeRotationValue + (normalizedValue * valuePerRotation)));
 
                 //Show the world
                 UpdateVisuals();
