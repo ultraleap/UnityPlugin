@@ -3,43 +3,32 @@ using System.Collections;
 
 public class CollissionChecker : MonoBehaviour {
     public bool isColliding = false;
+    public float collisionMass;
     int numberOfCollisions = 0;
     float lastcollision = 0f;
 
-    void OnCollisionEnter(Collision collision)
+    void Start()
     {
-        numberOfCollisions++;
-
-        if (numberOfCollisions > 0) {
-            isColliding = true;
-        }
-        lastcollision = Time.fixedTime;
+        collisionMass = GetComponent<Rigidbody>().mass;
     }
 
     void OnCollisionStay(Collision collisionInfo)
     {
         foreach (ContactPoint contact in collisionInfo.contacts) {
-            if (collisionInfo.impulse.magnitude <= 0f) {
-               // Debug.DrawRay(contact.point, contact.normal * 0.05f, Color.white);
-            } else {
-                Debug.DrawRay(contact.point, contact.normal * 0.05f, Color.red);
+            if (collisionInfo.impulse.magnitude > 0f) {
+                if (collisionInfo.collider.attachedRigidbody != null) {
+                    collisionMass = collisionInfo.collider.attachedRigidbody.mass;
+                }
+                lastcollision = Time.fixedTime;
+                isColliding = true;
+                Debug.DrawRay(contact.point, contact.normal * collisionInfo.impulse.magnitude/100f, Color.white);
             }
-        }
-        lastcollision = Time.fixedTime;
-    }
-
-    void OnCollisionExit(Collision collision)
-    {
-        numberOfCollisions--;
-
-        if (numberOfCollisions == 0) {
-            isColliding = false;
         }
     }
 
     void FixedUpdate()
     {
-        if (Time.fixedTime - lastcollision > Time.fixedDeltaTime*2f) {
+        if (Time.fixedTime - lastcollision > Time.fixedDeltaTime*3f) {
             isColliding = false;
             numberOfCollisions = 0;
         }

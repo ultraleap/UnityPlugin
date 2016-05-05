@@ -25,7 +25,7 @@ namespace Leap.Unity
         private bool usingConstraints = false;
 
         private float timeOfCollision = 0f;
-        private float resetPeriod = 2f;
+        private float resetPeriod = 1.5f;
 
         private HingeJoint[] hinges;
         private Vector3 PalmPos;
@@ -124,9 +124,12 @@ namespace Leap.Unity
         void checkColliding()
         {
            bool tempColliding = false;
+           float tempMass = 0f;
            if (bones[bones.Length-1] != null) {
-                if (bones[bones.Length-1].GetComponent<CollissionChecker>().isColliding) {
+               CollissionChecker checker = bones[bones.Length - 1].GetComponent<CollissionChecker>();
+               if (checker.isColliding) {
                     tempColliding = true;
+                    tempMass = checker.collisionMass > tempMass ? checker.collisionMass : tempMass;
                 }
            }
 
@@ -140,6 +143,13 @@ namespace Leap.Unity
                        usingConstraints = false;
                    }
                }
+               if (bones[1].GetComponent<Rigidbody>().mass != tempMass && tempColliding) {
+                   foreach (Transform bone in bones) {
+                       if (bone != null) {
+                           bone.GetComponent<Rigidbody>().mass = tempMass / 3f;
+                       }
+                   }
+               }
                colliding = tempColliding;
            }
         }
@@ -148,9 +158,6 @@ namespace Leap.Unity
         {
             //dirty ensures that the fingers get updated in "Update" before the Joints are applied
             dirty = true;
-            if (useConstraints) {
-                //usingConstraints = true;
-            }
         }
 
         void OnDisable()
@@ -181,15 +188,13 @@ namespace Leap.Unity
             useConstraintsOnCollission = hybridConstraints;
             //Palm.GetComponent<Rigidbody>().maxAngularVelocity = Mathf.Infinity;
 
-            for (int i = 0; i < bones.Length; ++i) {
+            for (int i = 1; i < bones.Length; ++i) {
                 if (bones[i] != null) {
                     bones[i].transform.parent = parent.transform;
                     bones[i].GetComponent<Rigidbody>().useGravity = gravity;
                     bones[i].GetComponent<Rigidbody>().mass = mass;
                     bones[i].GetComponent<Rigidbody>().maxAngularVelocity = Mathf.Infinity;
-                    if (i == bones.Length - 1) {
-                        bones[i].gameObject.AddComponent<CollissionChecker>();
-                    }
+                    bones[i].gameObject.AddComponent<CollissionChecker>();
 
                     if (!constraints && !useConstraintsOnCollission) {
                         bones[i].GetComponent<Rigidbody>().freezeRotation = true;
@@ -256,6 +261,10 @@ namespace Leap.Unity
                                 }
                             }
                             if (hinges != null && hinges[i - 1] != null && hinges[i - 1].GetType().Equals(typeof(HingeJoint))) {
+                                if (timeOfCollision == Time.fixedTime) {
+                                    boneBody.velocity = Vector3.zero;
+                                }
+
                                 Quaternion localRealFinger = (Quaternion.Inverse(GetBoneRotation(i - 1)) * GetBoneRotation(i));
                                 Quaternion localPhysicsFinger = (Quaternion.Inverse(bones[i - 1].rotation) * bones[i].rotation);
                                 float offset = (Quaternion.Inverse((Quaternion.Inverse(localRealFinger) * localPhysicsFinger))).eulerAngles.x;
@@ -269,10 +278,33 @@ namespace Leap.Unity
                                 ((HingeJoint)hinges[i - 1]).motor = mmotor;
                             }
 
+                            Vector3 transformedBonePos = GetBoneCenter(i);
+                            //Vector3 transformedBonePos = bones[i - 1].TransformPoint(Quaternion.Inverse(GetBoneRotation(i - 1)) * (GetBoneCenter(i) - GetBoneCenter(i - 1)));
+                            //Vector3 deltaToPrevBone = bones[i].position - bones[i-1].position;
+
+                            Vector3 deltaVel = ((transformedBonePos - bones[i].position) / Time.fixedDeltaTime);
+                            deltaVel = Vector3.Lerp(boneBody.velocity, deltaVel, 1f);
+                            boneBody.velocity = deltaVel.magnitude > 2f ? (deltaVel / deltaVel.magnitude) * 2f : deltaVel;
                         //Set Velocity!
                         } else {
-                            Vector3 deltaVel = ((GetBoneCenter(i) - bones[i].position) / Time.fixedDeltaTime);
-                            boneBody.velocity = deltaVel.magnitude > 2f ? (deltaVel / deltaVel.magnitude) * 2f : deltaVel;
+
+                                Vector3 deltaVel = ((GetBoneCenter(i) - bones[i].position) / Time.fixedDeltaTime);
+                                //deltaVel = Vector3.Lerp(boneBody.velocity, deltaVel, 1f);
+                                boneBody.velocity = deltaVel.magnitude > 2f ? (deltaVel / deltaVel.magnitude) * 2f : deltaVel;
+                            /*
+                            if (i > 1) {
+                                Vector3 transformedBonePos = bones[i - 1].TransformPoint(Quaternion.Inverse(GetBoneRotation(i - 1)) * (GetBoneCenter(i) - GetBoneCenter(i - 1)));
+                                Vector3 deltaVel = ((transformedBonePos - bones[i].position) / Time.fixedDeltaTime);
+                                //Vector3 deltaVel = ((GetBoneCenter(i) - bones[i].position) / Time.fixedDeltaTime);
+                                boneBody.velocity = deltaVel.magnitude > 3f ? (deltaVel / deltaVel.magnitude) * 3f : deltaVel;
+                            } else {
+                                Vector3 transformedBonePos = Palm.transform.TransformPoint(Quaternion.Inverse(PalmRot) * (GetBoneCenter(i) - PalmPos));
+                                Vector3 deltaVel = ((transformedBonePos - bones[i].position) / Time.fixedDeltaTime);
+                                //Vector3 deltaVel = ((GetBoneCenter(i) - bones[i].position) / Time.fixedDeltaTime);
+                                boneBody.velocity = deltaVel.magnitude > 3f ? (deltaVel / deltaVel.magnitude) * 3f : deltaVel;
+                            }
+                            */
+
                             /*
                             Quaternion boneRot = GetBoneRotation(i);
                             float dot = Quaternion.Dot(boneBody.rotation, boneRot);

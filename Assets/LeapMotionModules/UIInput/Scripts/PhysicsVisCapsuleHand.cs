@@ -47,7 +47,7 @@ namespace Leap.Unity {
 
     public override ModelType HandModelType {
       get {
-        return ModelType.Physics;
+        return ModelType.Graphics;
       }
     }
 
@@ -171,7 +171,6 @@ namespace Leap.Unity {
 
     //Vector3 thumbBaseToPalm = thumbBase.position - wristPos;
     //mockThumbJointSphere.position = wristPos + Vector3.Reflect(thumbBaseToPalm, HandToVisualize.palm.right);
-    Debug.DrawLine(mockThumbJointSphere.position, mockThumbJointSphere.position + Vector3.up);
   }
 
   private void updateArm() {
