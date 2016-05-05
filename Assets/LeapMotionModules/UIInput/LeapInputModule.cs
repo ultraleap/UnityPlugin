@@ -1,28 +1,4 @@
-﻿//The MIT License (MIT)
-
-//Copyright (c) 2015 VREAL INC.
-//Copyright (c) 2015 LEAP MOTION INC.
-
-//Permission is hereby granted, free of charge, to any person obtaining a copy
-//of this software and associated documentation files (the "Software"), to deal
-//in the Software without restriction, including without limitation the rights
-//to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//copies of the Software, and to permit persons to whom the Software is
-//furnished to do so, subject to the following conditions:
-
-//The above copyright notice and this permission notice shall be included in all
-//copies or substantial portions of the Software.
-
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//SOFTWARE.
-
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.VR;
 using UnityEngine.Events;
@@ -35,8 +11,8 @@ using Leap;
 
 public class LeapInputModule : BaseInputModule
 {
-
-    [Header(" [Interaction Setup]")]
+    //General Interaction Parameters
+    [Header(" Interaction Setup")]
     [Tooltip("The current Leap Data Provider for the scene.")]
     public LeapProvider LeapDataProvider;
     [Tooltip("An optional alternate detector for pinching on the left hand.")]
@@ -55,7 +31,7 @@ public class LeapInputModule : BaseInputModule
     public bool DrawDebug = false;
 
     //Customizable Pointer Parameters
-    [Header(" [Pointer setup]")]
+    [Header(" Pointer setup")]
     [Tooltip("The sprite used to represent your pointers during projective interaction.")]
     public Sprite PointerSprite;
     [Tooltip("The material to be instantiated for your pointers during projective interaction.")]
@@ -64,7 +40,7 @@ public class LeapInputModule : BaseInputModule
     public float NormalPointerScale = 0.00025f; //In world space
     [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
-    public Color NormalColor = Color.white;
+    public Color Color = Color.white;
     [Tooltip("The color of the pointer when it is hovering over any other UI element.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color HoveringColor = Color.green;
@@ -81,11 +57,13 @@ public class LeapInputModule : BaseInputModule
     [Tooltip("The sound that is played when the pointer triggers blank canvas.")]
     public AudioClip MissedSound;
 
+
+
     // Event delegates triggered by Input
     [System.Serializable]
-
     public class PositionEvent : UnityEvent<Vector3> {}
 
+    [Header(" Event Setup")]
     [Tooltip("The event that is triggered upon clicking on a non-canvas UI element.")]
     public PositionEvent onClickDown;
     [Tooltip("The event that is triggered upon lifting up from a non-canvas UI element (Not 1:1 with onClickDown!)")]
@@ -102,10 +80,8 @@ public class LeapInputModule : BaseInputModule
     private RectTransform[] Pointers;
     private LineRenderer[] PointerLines;
 
-    //Objects selected by pointer
-    private GameObject[] CurrentPoint;
-    private GameObject[] CurrentPressed;
-    private GameObject[] CurrentDragging;
+    //Object the pointer is hovering over
+    private GameObject[] currentOverGo;
 
     //Values from the previous frame
     private pointerStates[] PrevState;
@@ -118,6 +94,8 @@ public class LeapInputModule : BaseInputModule
     private Quaternion CurrentRotation;
     private AudioSource SoundPlayer;
     private Frame curFrame;
+    private GameObject[] currentGo;
+    private GameObject[] currentGoing;
 
     //Queue of Spheres to Debug Draw
     private Queue<Vector3> DebugSphereQueue;
@@ -158,7 +136,7 @@ public class LeapInputModule : BaseInputModule
         EventCamera.fieldOfView = 179f;
         EventCamera.transform.SetParent(this.transform);
 
-        //Setting the event camera of all currently existent Canvases to our Event Camera
+        //Set the event camera of all currently existent Canvases to our Event Camera
         canvases = GameObject.FindObjectsOfType<Canvas>();
         foreach (Canvas canvas in canvases)
         {
@@ -186,11 +164,13 @@ public class LeapInputModule : BaseInputModule
             image.material = Instantiate(PointerMaterial); //Make sure to instantiate the material so each pointer can be modified independently
             image.raycastTarget = false;
 
-            PointerLines[index] = pointer.AddComponent<LineRenderer>();
-            PointerLines[index].material = Instantiate(PointerMaterial);
-            PointerLines[index].material.color = new Color(0f, 0f, 0f, 0f);
-            PointerLines[index].SetVertexCount(2);
-            PointerLines[index].SetWidth(0.001f, 0.001f);
+            if (DrawDebug) {
+                PointerLines[index] = pointer.AddComponent<LineRenderer>();
+                PointerLines[index].material = Instantiate(PointerMaterial);
+                PointerLines[index].material.color = new Color(0f, 0f, 0f, 0f);
+                PointerLines[index].SetVertexCount(2);
+                PointerLines[index].SetWidth(0.001f, 0.001f);
+            }
 
             if (PointerSprite == null)
                 Debug.LogError("Set PointerSprite on " + this.gameObject.name + " to the sprite you want to use as your pointer.", this.gameObject);
@@ -204,9 +184,9 @@ public class LeapInputModule : BaseInputModule
         //Initialize the arrays that store persistent objects per pointer
         PointEvents = new PointerEventData[NumberOfHands];
         pointerState = new pointerStates[NumberOfHands];
-        CurrentPoint = new GameObject[NumberOfHands];
-        CurrentPressed = new GameObject[NumberOfHands];
-        CurrentDragging = new GameObject[NumberOfHands];
+        currentOverGo = new GameObject[NumberOfHands];
+        currentGo = new GameObject[NumberOfHands];
+        currentGoing = new GameObject[NumberOfHands];
         PrevTriggeringInteraction = new bool[NumberOfHands];
         PrevScreenPosition = new Vector2[NumberOfHands];
         PrevState = new pointerStates[NumberOfHands];
@@ -301,10 +281,10 @@ public class LeapInputModule : BaseInputModule
             //If we hit something with our Raycast, let's see if we should interact with it
             if (PointEvents[whichHand].pointerCurrentRaycast.gameObject != null && pointerState[whichHand] != pointerStates.OffCanvas)
             {
-                CurrentPoint[whichHand] = PointEvents[whichHand].pointerCurrentRaycast.gameObject;
+                currentOverGo[whichHand] = PointEvents[whichHand].pointerCurrentRaycast.gameObject;
 
                 //Trigger Enter or Exit Events on the UI Element (like highlighting)
-                base.HandlePointerExitAndEnter(PointEvents[whichHand], CurrentPoint[whichHand]);
+                base.HandlePointerExitAndEnter(PointEvents[whichHand], currentOverGo[whichHand]);
 
                 //If we weren't triggering an interaction last frame, but we are now...
                 if (!PrevTriggeringInteraction[whichHand] && isTriggeringInteraction(whichHand))
@@ -323,25 +303,25 @@ public class LeapInputModule : BaseInputModule
                     PointEvents[whichHand].pointerPress = null; //Clear this for setting later
 
                     //If we hit something good, let's trigger it!
-                    if (CurrentPoint[whichHand] != null)
+                    if (currentOverGo[whichHand] != null)
                     {
-                        CurrentPressed[whichHand] = CurrentPoint[whichHand];
+                        currentGo[whichHand] = currentOverGo[whichHand];
 
                         //See if this object, or one of its parents, has a pointerDownHandler
-                        GameObject newPressed = ExecuteEvents.ExecuteHierarchy(CurrentPressed[whichHand], PointEvents[whichHand], ExecuteEvents.pointerDownHandler);
+                        GameObject newPressed = ExecuteEvents.ExecuteHierarchy(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.pointerDownHandler);
 
                         //If not, see if one has a pointerClickHandler!
                         if (newPressed == null)
                         {
-                            newPressed = ExecuteEvents.ExecuteHierarchy(CurrentPressed[whichHand], PointEvents[whichHand], ExecuteEvents.pointerClickHandler);
+                            newPressed = ExecuteEvents.ExecuteHierarchy(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.pointerClickHandler);
                             if (newPressed != null)
                             {
-                                CurrentPressed[whichHand] = newPressed;
+                                currentGo[whichHand] = newPressed;
                             }
                         }
                         else
                         {
-                            CurrentPressed[whichHand] = newPressed;
+                            currentGo[whichHand] = newPressed;
                             //We want to do "click on button down" at same time, unlike regular mouse processing
                             //Which does click when mouse goes up over same object it went down on
                             //This improves the user's ability to select small menu items
@@ -352,18 +332,18 @@ public class LeapInputModule : BaseInputModule
                         if (newPressed != null)
                         {
                             PointEvents[whichHand].pointerPress = newPressed;
-                            CurrentPressed[whichHand] = newPressed;
+                            currentGo[whichHand] = newPressed;
 
                             //Select the currently pressed object
-                            if (ExecuteEvents.GetEventHandler<ISelectHandler>(CurrentPressed[whichHand]))
+                            if (ExecuteEvents.GetEventHandler<ISelectHandler>(currentGo[whichHand]))
                             {
-                                base.eventSystem.SetSelectedGameObject(CurrentPressed[whichHand]);
+                                base.eventSystem.SetSelectedGameObject(currentGo[whichHand]);
                             }
                         }
 
-                        ExecuteEvents.Execute(CurrentPressed[whichHand], PointEvents[whichHand], ExecuteEvents.beginDragHandler);
-                        PointEvents[whichHand].pointerDrag = CurrentPressed[whichHand];
-                        CurrentDragging[whichHand] = CurrentPressed[whichHand];
+                        ExecuteEvents.Execute(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.beginDragHandler);
+                        PointEvents[whichHand].pointerDrag = currentGo[whichHand];
+                        currentGoing[whichHand] = currentGo[whichHand];
                     }
                 }
 
@@ -372,30 +352,30 @@ public class LeapInputModule : BaseInputModule
                 {
                     PrevTriggeringInteraction[whichHand] = false;
 
-                    if (CurrentDragging[whichHand])
+                    if (currentGoing[whichHand])
                     {
-                        ExecuteEvents.Execute(CurrentDragging[whichHand], PointEvents[whichHand], ExecuteEvents.endDragHandler);
-                        if (CurrentPoint[whichHand] != null)
+                        ExecuteEvents.Execute(currentGoing[whichHand], PointEvents[whichHand], ExecuteEvents.endDragHandler);
+                        if (currentOverGo[whichHand] != null)
                         {
-                            ExecuteEvents.ExecuteHierarchy(CurrentPoint[whichHand], PointEvents[whichHand], ExecuteEvents.dropHandler);
+                            ExecuteEvents.ExecuteHierarchy(currentOverGo[whichHand], PointEvents[whichHand], ExecuteEvents.dropHandler);
                         }
                         PointEvents[whichHand].pointerDrag = null;
                         PointEvents[whichHand].dragging = false;
-                        CurrentDragging[whichHand] = null;
+                        currentGoing[whichHand] = null;
                     }
-                    if (CurrentPressed[whichHand])
+                    if (currentGo[whichHand])
                     {
-                        ExecuteEvents.Execute(CurrentPressed[whichHand], PointEvents[whichHand], ExecuteEvents.pointerUpHandler);
+                        ExecuteEvents.Execute(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.pointerUpHandler);
                         PointEvents[whichHand].rawPointerPress = null;
                         PointEvents[whichHand].pointerPress = null;
-                        CurrentPressed[whichHand] = null;
+                        currentGo[whichHand] = null;
                     }
                 }
 
                 //And for everything else, there is dragging.
-                if (CurrentDragging[whichHand] != null)
+                if (currentGoing[whichHand] != null)
                 {
-                    ExecuteEvents.Execute(CurrentDragging[whichHand], PointEvents[whichHand], ExecuteEvents.dragHandler);
+                    ExecuteEvents.Execute(currentGoing[whichHand], PointEvents[whichHand], ExecuteEvents.dragHandler);
                 }
             }
 
@@ -741,7 +721,7 @@ public class LeapInputModule : BaseInputModule
         {
             case pointerStates.OnCanvas:
                 lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 1f), 0.2f);
-                lerpPointerColor(whichHand, NormalColor, 0.2f);
+                lerpPointerColor(whichHand, Color, 0.2f);
                 break;
             case pointerStates.OnElement:
                 lerpPointerColor(whichHand, new Color(0f, 0f, 0f, 1f), 0.2f);
@@ -777,15 +757,18 @@ public class LeapInputModule : BaseInputModule
         Color oldColor = Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color;
         if (color.r == 0f && color.g == 0f && color.b == 0f)
         {
-            Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = Color.Lerp(oldColor, new Color(oldColor.r, oldColor.g, oldColor.b, color.a), lerpalpha);
+            //Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = Color.Lerp(oldColor, new Color(oldColor.r, oldColor.g, oldColor.b, color.a), lerpalpha);
+            Pointers[whichHand].GetComponent<Renderer>().material.color = Color.Lerp(oldColor, new Color(oldColor.r, oldColor.g, oldColor.b, color.a), lerpalpha);
         }
         else if (color.a == 1f)
         {
-            Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = Color.Lerp(oldColor, new Color(color.r, color.g, color.b, oldColor.a), lerpalpha);
+            //Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = Color.Lerp(oldColor, new Color(color.r, color.g, color.b, oldColor.a), lerpalpha);
+            Pointers[whichHand].GetComponent<Renderer>().material.color = Color.Lerp(oldColor, new Color(color.r, color.g, color.b, oldColor.a), lerpalpha);
         }
         else
         {
-            Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = Color.Lerp(oldColor, color, lerpalpha);
+            //Pointers[whichHand].GetComponent<UnityEngine.UI.Image>().material.color = Color.Lerp(oldColor, color, lerpalpha);
+            Pointers[whichHand].GetComponent<Renderer>().material.color = Color.Lerp(oldColor, color, lerpalpha);
         }
     }
 
