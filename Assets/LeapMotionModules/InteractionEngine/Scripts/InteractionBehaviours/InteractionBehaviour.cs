@@ -486,11 +486,27 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandLostTracking(Hand oldHand) {
       base.OnHandLostTracking(oldHand);
 
+      //Always set to be kinematic when tracking is lost
+      _rigidbody.isKinematic = true;
+
       updateRendererStatus();
     }
 
     protected override void OnHandRegainedTracking(Hand newHand, int oldId) {
       base.OnHandRegainedTracking(newHand, oldId);
+
+      if (UntrackedHandCount == 0) {
+        switch (_graspMethod) {
+          case GraspMethod.Kinematic:
+            _rigidbody.isKinematic = true;
+            break;
+          case GraspMethod.Velocity:
+            _rigidbody.isKinematic = _isKinematic;
+            break;
+          default:
+            throw new InvalidOperationException("Unexpected grasp method");
+        }
+      }
 
       updateRendererStatus();
 
