@@ -175,7 +175,7 @@ namespace Leap.Unity.Interaction {
 
         _graphicalAnchor = value;
 
-        updateRendererStatus();
+        updateState();
       }
     }
 
@@ -480,6 +480,8 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandReleased(Hand hand) {
       base.OnHandReleased(hand);
 
+      updateState();
+
       removeHandPointCollection(hand.Id);
     }
 
@@ -489,26 +491,13 @@ namespace Leap.Unity.Interaction {
       //Always set to be kinematic when tracking is lost
       _rigidbody.isKinematic = true;
 
-      updateRendererStatus();
+      updateState();
     }
 
     protected override void OnHandRegainedTracking(Hand newHand, int oldId) {
       base.OnHandRegainedTracking(newHand, oldId);
 
-      if (UntrackedHandCount == 0) {
-        switch (_graspMethod) {
-          case GraspMethod.Kinematic:
-            _rigidbody.isKinematic = true;
-            break;
-          case GraspMethod.Velocity:
-            _rigidbody.isKinematic = _isKinematic;
-            break;
-          default:
-            throw new InvalidOperationException("Unexpected grasp method");
-        }
-      }
-
-      updateRendererStatus();
+      updateState();
 
       //Associate the collection with the new id
       var collection = _handIdToPoints[oldId];
@@ -521,32 +510,26 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandTimeout(Hand oldHand) {
       base.OnHandTimeout(oldHand);
 
-      updateRendererStatus();
+      updateState();
+
       removeHandPointCollection(oldHand.Id);
     }
 
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
 
+      updateState();
+
       //Stop an existing lerp coroutine if it exists to prevent conflict
       if (_graphicalLerpCoroutine != null) {
         StopCoroutine(_graphicalLerpCoroutine);
-      }
-
-      switch (_graspMethod) {
-        case GraspMethod.Kinematic:
-          //A grasp always causes the object to become kinematic
-          _rigidbody.isKinematic = true;
-          break;
-        case GraspMethod.Velocity:
-          break;
-        default:
-          throw new InvalidOperationException("Unexpected grasp method");
       }
     }
 
     protected override void OnGraspEnd() {
       base.OnGraspEnd();
+
+      updateState();
 
       switch (_graspMethod) {
         case GraspMethod.Kinematic:
@@ -555,9 +538,6 @@ namespace Leap.Unity.Interaction {
           if (_graphicalAnchor != null) {
             _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
           }
-
-          //Revert the kinematic status of the Rigidbody to the user setting once the grasp is finished.
-          _rigidbody.isKinematic = _isKinematic;
           break;
         case GraspMethod.Velocity:
           break;
@@ -675,7 +655,7 @@ namespace Leap.Unity.Interaction {
       return interactionTransform;
     }
 
-    protected virtual void updateRendererStatus() {
+    protected virtual void updateState() {
       //Renderers are visible if there are no grasping hands
       //or if there is at least one tracked grasping hand
       int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;
@@ -683,6 +663,26 @@ namespace Leap.Unity.Interaction {
 
       if (_graphicalAnchor != null) {
         _graphicalAnchor.gameObject.SetActive(shouldBeVisible);
+      }
+
+      //Update kinematic status of body
+      if (IsBeingGrasped) {
+        switch (_graspMethod) {
+          case GraspMethod.Kinematic:
+            _rigidbody.isKinematic = true;
+            break;
+          case GraspMethod.Velocity:
+            if (UntrackedHandCount > 0) {
+              _rigidbody.isKinematic = true;
+            } else {
+              _rigidbody.isKinematic = false;
+            }
+            break;
+          default:
+            throw new InvalidOperationException("Unexpected grasp method");
+        }
+      } else {
+        _rigidbody.isKinematic = _isKinematic;
       }
     }
 
