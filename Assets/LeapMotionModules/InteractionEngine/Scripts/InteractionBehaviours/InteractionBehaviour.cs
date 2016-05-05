@@ -436,12 +436,14 @@ namespace Leap.Unity.Interaction {
             Vector3 targetVelocity = deltaPos / Time.fixedDeltaTime;
             Vector3 targetAngularVelocity = deltaAxis * deltaAngle * Mathf.Deg2Rad / Time.fixedDeltaTime;
 
-            float targetSpeed = targetVelocity.magnitude;
-            float actualSpeed = Mathf.Min(_maxVelocity, targetSpeed);
-            float targetPercent = actualSpeed / targetSpeed;
+            if (targetVelocity.sqrMagnitude > float.Epsilon) {
+              float targetSpeed = targetVelocity.magnitude;
+              float actualSpeed = Mathf.Min(_maxVelocity, targetSpeed);
+              float targetPercent = actualSpeed / targetSpeed;
 
-            targetVelocity *= targetPercent;
-            targetAngularVelocity *= targetPercent;
+              targetVelocity *= targetPercent;
+              targetAngularVelocity *= targetPercent;
+            }
 
             _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, _followStrength);
             _rigidbody.angularVelocity = Vector3.Lerp(_rigidbody.angularVelocity, targetAngularVelocity, _followStrength);
@@ -654,7 +656,7 @@ namespace Leap.Unity.Interaction {
     protected void resetState() {
       _rigidbody.useGravity = _useGravity;
       _rigidbody.isKinematic = _isKinematic;
-      _graphicalAnchor.localPosition = Vector3.one;
+      _graphicalAnchor.localPosition = Vector3.zero;
       _graphicalAnchor.localRotation = Quaternion.identity;
       _graphicalAnchor.gameObject.SetActive(true);
     }
