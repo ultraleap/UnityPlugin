@@ -1378,7 +1378,7 @@ MonoBehaviour:
   _deviceOffsets:
   - deviceName: Oculus
     heightOffset: -0.1
-  - deviceName: Vive
+  - deviceName: OpenVR
     heightOffset: 1
 --- !u!1001 &1759863750
 Prefab:

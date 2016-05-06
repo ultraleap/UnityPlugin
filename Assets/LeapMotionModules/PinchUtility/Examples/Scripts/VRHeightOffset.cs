@@ -20,14 +20,18 @@ public class VRHeightOffset : MonoBehaviour {
 
   void Reset() {
     _deviceOffsets = new DeviceHeightPair[2];
-    _deviceOffsets[0] = new DeviceHeightPair("Oculus", -0.1f);
-    _deviceOffsets[1] = new DeviceHeightPair("Vive", 1.0f);
+    _deviceOffsets[0] = new DeviceHeightPair("oculus", -0.1f);
+    _deviceOffsets[1] = new DeviceHeightPair("OpenVR", 1.0f);
   }
 
   void Start() {
     if (VRDevice.isPresent && VRSettings.enabled && _deviceOffsets != null) {
+#if UNITY_5_4_OR_NEWER
       string deviceName = VRSettings.loadedDeviceName;
-      var deviceHeightPair = _deviceOffsets.FirstOrDefault(d => d.deviceName == deviceName);
+#else
+      string deviceName = VRDevice.family;
+#endif
+      var deviceHeightPair = _deviceOffsets.FirstOrDefault(d => deviceName.ToLower().Contains(d.deviceName.ToLower()));
       if (deviceHeightPair != null) {
         transform.Translate(Vector3.up * deviceHeightPair.heightOffset);
       }
