@@ -36,6 +36,7 @@ namespace Leap.Unity {
     [SerializeField]
     protected long _interpolationDelay = 15;
 
+    protected float _fixedToTimeOffset = 0;
     protected Controller leap_controller_;
 
     protected Frame _untransformedUpdateFrame;
@@ -155,8 +156,11 @@ namespace Leap.Unity {
       if (EditorApplication.isCompiling) {
         EditorApplication.isPlaying = false;
         Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
+        return;
       }
 #endif
+
+      _fixedToTimeOffset = Time.time - Time.fixedTime;
 
       Int64 unityTime = (Int64)(Time.time * 1e6);
       clockCorrelator.UpdateRebaseEstimate(unityTime);
@@ -175,8 +179,15 @@ namespace Leap.Unity {
     }
 
     protected virtual void FixedUpdate() {
-      //TODO: Find suitable interpolation strategy for FixedUpdate
-      _untransformedFixedFrame = leap_controller_.Frame();
+      if (_useInterpolation) {
+        Int64 unityTime = (Int64)((Time.fixedTime + _fixedToTimeOffset) * 1e6);
+        Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
+        Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
+        _untransformedFixedFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
+      } else {
+        _untransformedFixedFrame = leap_controller_.Frame();
+      }
+
       _transformedFixedFrame = null;
     }
 
