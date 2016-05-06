@@ -38,13 +38,13 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("How fast the object can move to try to get to the hand.")]
     [SerializeField]
-    protected float _maxVelocity = 1;
+    protected float _maxVelocity = 3;
 
     [Tooltip("How strong the attraction is from the hand to the object when being held.  At strength 1 the object " +
              "will try to move 100% of the way to the hand every frame.")]
     [Range(0, 1)]
     [SerializeField]
-    protected float _followStrength = 1.0f;
+    protected float _followStrength = 0.6f;
 
 
 

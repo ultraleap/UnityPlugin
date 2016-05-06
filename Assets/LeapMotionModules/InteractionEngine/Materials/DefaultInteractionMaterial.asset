@@ -36,5 +36,5 @@ MonoBehaviour:
   _graspMethod: 0
   _graphicalReturnTime: 0.25
   _releaseDistance: 0.15
-  _maxVelocity: 1
-  _followStrength: 1
+  _maxVelocity: 3
+  _followStrength: 0.6
