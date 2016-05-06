@@ -44,5 +44,16 @@ namespace Leap.Unity {
         }
       }
     }
+    private void findFingerModels() {
+      FingerModel[] fingerModelList = GetComponentsInChildren<FingerModel>();
+      for (int i = 0; i < 5; i++ ) {
+        fingers[i] = fingerModelList[i];
+      }
+    }
+    void Update() {
+      if(Input.GetKeyUp(KeyCode.A)){
+        findFingerModels();
+      }
+    }
   } 
 }

@@ -35,9 +35,28 @@ namespace Leap.Unity {
         if (bones[i] != null) {
           bones[i].rotation = GetBoneRotation(i) * Reorientation();
           if (deformPosition) {
-            bones[i].position = GetBoneCenter(i);
+            bones[i].position = GetJointPosition(i);
           }
         }
+      }
+    }
+    private void findBoneTransforms() {
+      if (fingerType == Finger.FingerType.TYPE_THUMB) {
+        bones[1] = transform;
+        bones[2] = transform.GetChild(0).transform;
+        bones[3] = transform.GetChild(0).transform.GetChild(0).transform;
+      }
+      else {
+        bones[0] = transform;
+        bones[1] = transform.GetChild(0).transform;
+        bones[2] = transform.GetChild(0).transform.GetChild(0).transform;
+        bones[3] = transform.GetChild(0).transform.GetChild(0).transform.GetChild(0).transform;
+
+      }
+    }
+    void Update() {
+      if (Input.GetKeyUp(KeyCode.B)) {
+        findBoneTransforms();
       }
     }
   } 
