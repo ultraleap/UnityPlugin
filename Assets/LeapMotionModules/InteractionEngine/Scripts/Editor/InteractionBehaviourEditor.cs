@@ -13,20 +13,6 @@ namespace Leap.Unity.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
 
-      specifyConditionalDrawing("_advancedThrowing", "_throwingVelocityCurve",
-                                                     "_contactDisableSpeed",
-                                                     "_contactEnableDelay");
-
-      SerializedProperty graspMethod = serializedObject.FindProperty("_graspMethod");
-      specifyConditionalDrawing(() => graspMethod.intValue == (int)InteractionBehaviour.GraspMethod.Kinematic,
-                                "_graphicalAnchor",
-                                "_graphicalReturnTime");
-
-      specifyConditionalDrawing(() => graspMethod.intValue == (int)InteractionBehaviour.GraspMethod.Velocity,
-                                "_releaseDistance",
-                                "_maxVelocity",
-                                "_followStrength");
-
       if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab &&
           _interactionBehaviour != null) {
         specifyCustomDecorator("_graphicalAnchor", graphicalAnchor);

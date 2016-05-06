@@ -38,59 +38,14 @@ namespace Leap.Unity.Interaction {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 
-    public enum GraspMethod {
-      Velocity,
-      Kinematic
-    }
-
     [Header("Grasp Settings")]
     [SerializeField]
-    protected GraspMethod _graspMethod = GraspMethod.Velocity;
+    protected InteractionMaterial _material;
 
     [Tooltip("A transform that acts as the parent of all renderers for this object.  By seperating out the graphical " +
              "representation from the physical, interaction fidelity can be improved and latency reduced.")]
     [SerializeField]
     protected Transform _graphicalAnchor;
-
-    [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
-    [SerializeField]
-    protected float _graphicalReturnTime = 0.25f;
-
-    [Tooltip("How far the object can get from the hand before it is released.")]
-    [SerializeField]
-    protected float _releaseDistance = 0.15f;
-
-    [Tooltip("How fast the object can move to try to get to the hand.")]
-    [SerializeField]
-    protected float _maxVelocity = 1;
-
-    [Tooltip("How strong the attraction is from the hand to the object when being held.  At strength 1 the object " +
-             "will try to move 100% of the way to the hand every frame.")]
-    [Range(0, 1)]
-    [SerializeField]
-    protected float _followStrength = 1.0f;
-
-    [Header("Contact Settings")]
-    [Tooltip("Should a hand be able to impart pushing forces to this object.")]
-    [SerializeField]
-    protected bool _enableContact = true;
-
-    [Space]
-    [Tooltip("Should advanved throwing settings be enabled.")]
-    [SerializeField]
-    protected bool _advancedThrowing = false;
-
-    [Tooltip("A curve used to calculate a multiplier of the throwing velocity.  Maps original velocity to multiplier.")]
-    [SerializeField]
-    protected AnimationCurve _throwingVelocityCurve;
-
-    [Tooltip("Measured in Meters per Second.  If the object is thrown faster than this speed, contact is disabled for a period of time.")]
-    [SerializeField]
-    protected float _contactDisableSpeed = 0.4f;
-
-    [Tooltip("How much time after contact is disabled after a throw before it is re-enabled.")]
-    [SerializeField]
-    protected float _contactEnableDelay = 0.1f;
 
     protected Renderer[] _renderers;
     protected Rigidbody _rigidbody;
@@ -176,32 +131,6 @@ namespace Leap.Unity.Interaction {
         _graphicalAnchor = value;
 
         updateState();
-      }
-    }
-
-    /// <summary>
-    /// Sets or Gets the amount of time the graphical anchor takes to return to it's neutral offset after
-    /// a release has occured.
-    /// </summary>
-    public float GraphicalReturnTime {
-      get {
-        return _graphicalReturnTime;
-      }
-      set {
-        _graphicalReturnTime = value;
-      }
-    }
-
-    /// <summary>
-    /// Sets or Gets whether or not pushing is enabled for this object.  Pushing will only be used if this is set to True
-    /// AND if pushing is enabled for the InteractionManager that this behaviour is registered with.
-    /// </summary>
-    public bool PushingEnabled {
-      get {
-        return _enableContact;
-      }
-      set {
-        _enableContact = value;
       }
     }
 
@@ -339,7 +268,7 @@ namespace Leap.Unity.Interaction {
 
       updateInfo.updateFlags = UpdateInfoFlags.VelocityEnabled;
 
-      if (_enableContact && !_isKinematic && !IsBeingGrasped) {
+      if (_material.EnableContact && !_isKinematic && !IsBeingGrasped) {
         updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration;
       }
 
@@ -360,7 +289,7 @@ namespace Leap.Unity.Interaction {
 
       if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 &&
           !IsBeingGrasped &&
-          _enableContact) {
+          _material.EnableContact) {
         //Use Sleep() to clear any forces that might have been applied by the user.
         _rigidbody.Sleep();
         _rigidbody.velocity = results.linearVelocity.ToVector3();
@@ -411,8 +340,8 @@ namespace Leap.Unity.Interaction {
       _solvedRotation = newRotation;
 
       //Apply new transform to object
-      switch (_graspMethod) {
-        case GraspMethod.Kinematic:
+      switch (_material.GraspMethod) {
+        case InteractionMaterial.GraspMethodEnum.Kinematic:
           if (_notifiedOfTeleport) {
             _rigidbody.position = newPosition;
             _rigidbody.rotation = newRotation;
@@ -421,7 +350,7 @@ namespace Leap.Unity.Interaction {
             _rigidbody.MoveRotation(newRotation);
           }
           break;
-        case GraspMethod.Velocity:
+        case InteractionMaterial.GraspMethodEnum.Velocity:
           if (_notifiedOfTeleport) {
             _rigidbody.position = newPosition;
             _rigidbody.rotation = newRotation;
@@ -438,15 +367,15 @@ namespace Leap.Unity.Interaction {
 
             if (targetVelocity.sqrMagnitude > float.Epsilon) {
               float targetSpeed = targetVelocity.magnitude;
-              float actualSpeed = Mathf.Min(_maxVelocity, targetSpeed);
+              float actualSpeed = Mathf.Min(_material.MaxVelocity, targetSpeed);
               float targetPercent = actualSpeed / targetSpeed;
 
               targetVelocity *= targetPercent;
               targetAngularVelocity *= targetPercent;
             }
 
-            _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, _followStrength);
-            _rigidbody.angularVelocity = Vector3.Lerp(_rigidbody.angularVelocity, targetAngularVelocity, _followStrength);
+            _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, _material.FollowStrength);
+            _rigidbody.angularVelocity = Vector3.Lerp(_rigidbody.angularVelocity, targetAngularVelocity, _material.FollowStrength);
           }
           break;
         default:
@@ -459,8 +388,8 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandsHoldGraphics(List<Hand> hands) {
       base.OnHandsHoldGraphics(hands);
 
-      switch (_graspMethod) {
-        case GraspMethod.Kinematic:
+      switch (_material.GraspMethod) {
+        case InteractionMaterial.GraspMethodEnum.Kinematic:
           if (_graphicalAnchor != null) {
             Vector3 newPosition;
             Quaternion newRotation;
@@ -470,7 +399,7 @@ namespace Leap.Unity.Interaction {
             _graphicalAnchor.rotation = newRotation;
           }
           break;
-        case GraspMethod.Velocity:
+        case InteractionMaterial.GraspMethodEnum.Velocity:
           break;
         default:
           throw new InvalidOperationException("Unexpected grasp method");
@@ -528,49 +457,29 @@ namespace Leap.Unity.Interaction {
 
       updateState();
 
-      switch (_graspMethod) {
-        case GraspMethod.Kinematic:
+      switch (_material.GraspMethod) {
+        case InteractionMaterial.GraspMethodEnum.Kinematic:
           //If there is a graphical anchor, we are going to lerp it back to match the 
           //position and rotation of the rigidbody, since it might have diverged.
           if (_graphicalAnchor != null) {
             _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
           }
           break;
-        case GraspMethod.Velocity:
+        case InteractionMaterial.GraspMethodEnum.Velocity:
           break;
         default:
           throw new InvalidCastException("Unexpected grasp method");
       }
-
-      if (_advancedThrowing) {
-        float speed = _rigidbody.velocity.magnitude;
-        float multiplier = _throwingVelocityCurve.Evaluate(speed);
-        _rigidbody.velocity *= multiplier;
-
-        if (_enableContact && speed >= _contactDisableSpeed) {
-          _enableContact = false;
-          StartCoroutine(enableContactAfterDelay());
-        }
-      }
+      
+      float speed = _rigidbody.velocity.magnitude;
+      float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed);
+      _rigidbody.velocity *= multiplier;
     }
     #endregion
 
     #region UNITY CALLBACKS
-    protected override void Reset() {
-      base.Reset();
-
-      _throwingVelocityCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
-                                                  new Keyframe(1.0f, 1.0f, 0.0f, 0.0f),
-                                                  new Keyframe(2.0f, 1.5f, 0.0f, 0.0f));
-    }
-
     protected virtual void Awake() {
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
-    }
-
-    protected IEnumerator enableContactAfterDelay() {
-      yield return new WaitForSeconds(_contactEnableDelay);
-      _enableContact = true;
     }
 
     protected IEnumerator lerpGraphicalToOrigin() {
@@ -584,7 +493,7 @@ namespace Leap.Unity.Interaction {
         yield return null;
 
         //Using sigmoid to help hide the lerp
-        float t = Mathf.InverseLerp(startTime, startTime + _graphicalReturnTime, Time.time);
+        float t = Mathf.InverseLerp(startTime, startTime + _material.GraphicalReturnTime, Time.time);
         float percent = t * t * (3 - 2 * t);
 
         //Lerp based on transform.position instead of rigidbody.position to reduce stutter
@@ -676,11 +585,11 @@ namespace Leap.Unity.Interaction {
 
       //Update kinematic status of body
       if (IsBeingGrasped) {
-        switch (_graspMethod) {
-          case GraspMethod.Kinematic:
+        switch (_material.GraspMethod) {
+          case InteractionMaterial.GraspMethodEnum.Kinematic:
             _rigidbody.isKinematic = true;
             break;
-          case GraspMethod.Velocity:
+          case InteractionMaterial.GraspMethodEnum.Velocity:
             if (UntrackedHandCount > 0) {
               _rigidbody.isKinematic = true;
             } else {
