@@ -11,13 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 183146e09617b2e41a21d0ecf5e56fcb, type: 3}
   m_Name: InteractionMaterial
   m_EditorClassIdentifier: 
-  _graspMethod: 0
-  _graphicalReturnTime: 0.25
-  _releaseDistance: 0.15
-  _maxVelocity: 1
-  _followStrength: 1
   _enableContact: 1
-  _advancedThrowing: 0
   _throwingVelocityCurve:
     serializedVersion: 2
     m_Curve:
@@ -39,3 +33,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _graspMethod: 0
+  _graphicalReturnTime: 0.25
+  _releaseDistance: 0.15
+  _maxVelocity: 1
+  _followStrength: 1
