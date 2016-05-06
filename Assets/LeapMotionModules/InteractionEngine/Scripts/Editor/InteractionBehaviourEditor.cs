@@ -16,7 +16,6 @@ namespace Leap.Unity.Interaction {
       if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab &&
           _interactionBehaviour != null) {
         specifyCustomDecorator("_graphicalAnchor", graphicalAnchor);
-        specifyCustomDrawer("_enableContact", contactDrawer);
       }
     }
 
@@ -46,23 +45,6 @@ namespace Leap.Unity.Interaction {
             }
           }
         }
-      }
-    }
-
-    private void contactDrawer(SerializedProperty prop) {
-      bool shouldShow = false;
-
-      if (_interactionBehaviour == null) {
-        shouldShow = true;
-      } else {
-        Rigidbody rigidbody = _interactionBehaviour.GetComponent<Rigidbody>();
-        if (!rigidbody.isKinematic) {
-          shouldShow = true;
-        }
-      }
-
-      if (shouldShow) {
-        EditorGUILayout.PropertyField(prop);
       }
     }
 

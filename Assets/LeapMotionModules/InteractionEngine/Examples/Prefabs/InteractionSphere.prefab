@@ -146,10 +146,10 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 134782}
-  m_LocalRotation: {x: -0.04232016, y: -0.6244836, z: -0.6906378, w: 0.36228275}
-  m_LocalPosition: {x: 0.407, y: -0.14865571, z: 0.529}
-  m_LocalScale: {x: 0.0666886, y: 0.06668858, z: 0.06668858}
-  m_LocalEulerAnglesHint: {x: -63.2842, y: -61.217598, z: -84.580894}
+  m_LocalRotation: {x: -0.05626984, y: -0.7019055, z: -0.5419113, w: 0.45879686}
+  m_LocalPosition: {x: 0.074, y: -0.182, z: 0.517}
+  m_LocalScale: {x: 0.08451322, y: 0.08451322, z: 0.08451322}
+  m_LocalEulerAnglesHint: {x: -54.3285, y: -89.1821, z: -45.8289}
   m_Children:
   - {fileID: 492210}
   m_Father: {fileID: 0}
@@ -343,44 +343,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
-  _graspMethod: 0
+  _material: {fileID: 11400000, guid: a1a145592530d754f93841b3e0a6b0a1, type: 2}
   _graphicalAnchor: {fileID: 492210}
-  _graphicalReturnTime: 0.25
-  _releaseDistance: 0.15
-  _maxVelocity: 100
-  _followStrength: 1
-  _enableContact: 1
-  _advancedThrowing: 1
-  _throwingVelocityCurve:
-    serializedVersion: 2
-    m_Curve:
-    - time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    - time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    - time: 2
-      value: 1.5
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _contactDisableSpeed: 0.4
-  _contactEnableDelay: 0.1
 --- !u!135 &13536856
 SphereCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 134782}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 90525c5b573a282479c894c2354cde4a, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2

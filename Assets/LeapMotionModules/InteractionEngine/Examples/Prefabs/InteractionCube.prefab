@@ -163,37 +163,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
-  _graspMethod: 0
+  _material: {fileID: 11400000, guid: a1a145592530d754f93841b3e0a6b0a1, type: 2}
   _graphicalAnchor: {fileID: 462596}
-  _graphicalReturnTime: 0.25
-  _releaseDistance: 0.15
-  _maxVelocity: 3
-  _followStrength: 0.5
-  _enableContact: 1
-  _advancedThrowing: 1
-  _throwingVelocityCurve:
-    serializedVersion: 2
-    m_Curve:
-    - time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    - time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    - time: 2
-      value: 1.5
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _contactDisableSpeed: 0.4
-  _contactEnableDelay: 0.1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

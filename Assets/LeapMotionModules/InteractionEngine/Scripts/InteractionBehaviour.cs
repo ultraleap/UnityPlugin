@@ -37,8 +37,7 @@ namespace Leap.Unity.Interaction {
   public class InteractionBehaviour : InteractionBehaviourBase {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
-
-    [Header("Grasp Settings")]
+    
     [SerializeField]
     protected InteractionMaterial _material;
 
