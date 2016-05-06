@@ -677,9 +677,8 @@ namespace Leap.Unity.Interaction {
         IInteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[result.handle];
 
         try {
-          if (result.resultFlags != ShapeInstanceResultFlags.None) {
-            interactionBehaviour.NotifyRecievedSimulationResults(result);
-          }
+          // ShapeInstanceResultFlags.None may be returned if requested when hands are not touching.
+          interactionBehaviour.NotifyRecievedSimulationResults(result);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);

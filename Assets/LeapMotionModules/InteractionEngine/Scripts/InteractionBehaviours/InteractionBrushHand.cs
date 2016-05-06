@@ -18,7 +18,8 @@ namespace Leap.Unity
 
     private Rigidbody[] _capsuleBodies;
     private Vector3[] _lastPositions;
-    private Hand hand_;
+    private Hand _hand;
+    private GameObject _handParent;
     private bool _hasWarned = false;
 
     public override ModelType HandModelType
@@ -42,8 +43,8 @@ namespace Leap.Unity
     [SerializeField]
     private PhysicMaterial _material = null;
 
-    public override Hand GetLeapHand() { return hand_; }
-    public override void SetLeapHand(Hand hand) { hand_ = hand; }
+    public override Hand GetLeapHand() { return _hand; }
+    public override void SetLeapHand(Hand hand) { _hand = hand; }
 
     public override void BeginHand()
     {
@@ -64,6 +65,9 @@ namespace Leap.Unity
       }
 #endif
 
+      _handParent = new GameObject(gameObject.name);
+      _handParent.transform.parent = null; // Prevent hand from moving when you turn your head.
+
       _capsuleBodies = new Rigidbody[N_FINGERS * N_ACTIVE_BONES];
       _lastPositions = new Vector3[N_FINGERS * N_ACTIVE_BONES];
 
@@ -71,7 +75,7 @@ namespace Leap.Unity
       {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++)
         {
-          Bone bone = hand_.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
+          Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
 
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
           GameObject capsuleGameObject = new GameObject(gameObject.name, typeof(Rigidbody), typeof(CapsuleCollider));
@@ -82,7 +86,7 @@ namespace Leap.Unity
 #endif
 
           Transform capsuleTransform = capsuleGameObject.GetComponent<Transform>();
-          capsuleTransform.parent = transform;
+          capsuleTransform.parent = _handParent.transform;
           capsuleTransform.localScale = new Vector3(1f / transform.lossyScale.x, 1f / transform.lossyScale.y, 1f / transform.lossyScale.z);
 
           CapsuleCollider capsule = capsuleGameObject.GetComponent<CapsuleCollider>();
@@ -117,7 +121,7 @@ namespace Leap.Unity
       {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++)
         {
-          Bone bone = hand_.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
+          Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
 
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
           Rigidbody body = _capsuleBodies[boneArrayIndex];
@@ -151,6 +155,8 @@ namespace Leap.Unity
         _capsuleBodies[i].transform.parent = null;
         GameObject.Destroy(_capsuleBodies[i].gameObject);
       }
+
+      GameObject.Destroy(_handParent);
       _capsuleBodies = null;
       _lastPositions = null;
 

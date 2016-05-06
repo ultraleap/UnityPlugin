@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using LeapInternal;
+using UnityEngine;
+using UnityEngine.Assertions;
 using Leap.Unity.Interaction.CApi;
+using LeapInternal;
 
 namespace Leap.Unity.Interaction {
 
@@ -70,7 +72,7 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("Depth before brushes are disabled.")]
     [SerializeField]
-    protected float _brushDisableDistance = 0.015f;
+    protected float _brushDisableDistance = 0.017f;
 
 
     protected Renderer[] _renderers;
@@ -324,8 +326,6 @@ namespace Leap.Unity.Interaction {
       // Request notification of when hands are no longer touching (or influencing.)
       if (_ignoringBrushes) {
         updateInfo.updateFlags |= UpdateInfoFlags.ReportNoResult;
-
-        Debug.DrawLine(gameObject.transform.position, gameObject.transform.position + new Vector3(0.5f, 0.6f, 0.7f), new Color(0, 1, 0));
       }
 
       if (_enableContact && !_isKinematic && !IsBeingGrasped) {
@@ -357,20 +357,16 @@ namespace Leap.Unity.Interaction {
 #endif
 
       if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
-        if (results.maxHandDepth > _brushDisableDistance) {
+        if (!_ignoringBrushes && results.maxHandDepth > _brushDisableDistance)
+        {
           _ignoringBrushes = true;
 
           // HACK FIXME TODO BBQ.  This will be rewired.
           gameObject.layer = 10; // InteractionExampleObjectNoClipBrush
-
-
-//          Debug.DrawLine(gameObject.transform.position, gameObject.transform.position + new Vector3(1,1,1), new Color(1, 1, 1) );
         }
       }
-      else {
+      else if(_ignoringBrushes) {
         _ignoringBrushes = false;
-
-        Debug.DrawLine(gameObject.transform.position, gameObject.transform.position + new Vector3(1, 1, 1), new Color(1, 0, 0));
 
         // HACK FIXME TODO BBQ.  This will be rewired.
         gameObject.layer = 9; // InteractionExampleObjectCollidesBrush
