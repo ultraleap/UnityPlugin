@@ -727,6 +727,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void createScene() {
+#if UNITY_EDITOR
       UInt32 version = InteractionC.GetVersion();
       if (InteractionC.GetVersion() != _expectedVersion) {
         _scene.pScene = (IntPtr)0;
@@ -735,6 +736,7 @@ namespace Leap.Unity.Interaction {
                                                 "Ok");
         throw new Exception("Leap Interaction version wrong");
       }
+#endif // UNITY_EDITOR
 
       INTERACTION_SCENE_INFO sceneInfo = getSceneInfo();
       string dataPath = Path.Combine(Application.streamingAssetsPath, _dataSubfolder);
