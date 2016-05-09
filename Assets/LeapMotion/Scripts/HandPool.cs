@@ -18,56 +18,54 @@ namespace Leap.Unity {
   public class HandPool :
     HandFactory {
     [SerializeField]
-    private bool EnforceHandedness;
-    [SerializeField]
-    private List<ModelPair> ModelCollection;
-    [SerializeField]
     private List<ModelGroup> ModelPool;
-    public List<HandRepresentation> ActiveHandReps = new List<HandRepresentation>();
+    private List<HandRepresentation> activeHandReps = new List<HandRepresentation>();
 
     private Dictionary<IHandModel, ModelGroup> modelGroupMapping = new Dictionary<IHandModel, ModelGroup>();
     private Dictionary<IHandModel, HandRepresentation> modelToHandRepMapping = new Dictionary<IHandModel, HandRepresentation>();
 
     [System.Serializable]
-    public class ModelPair {
-      public string PairName = "PairName";
-      public IHandModel LeftModel;
-      public IHandModel RightModel;
-      public bool IsEnabled = true;
-
-      public ModelPair() {}
-
-      public ModelPair(string pairName, bool IsEnabled, IHandModel leftModel, IHandModel rightModel) {
-        this.PairName = pairName;
-        this.LeftModel = leftModel;
-        this.RightModel = rightModel;
-      }
-    }
-    [System.Serializable]
     public class ModelGroup {
-      private HandPool _handPool;
-      public ModelGroup(HandPool handPool) { _handPool = handPool; }
+      [HideInInspector]
+      public HandPool _handPool;
       public string GroupName;
+
+      public IHandModel LeftModel;
+      [HideInInspector]
+      public bool IsLeftToBeSpawned;
+      public IHandModel RightModel;
+      [HideInInspector]
+      public bool IsRightToBeSpawned;
+      [HideInInspector]
       public List<IHandModel> modelList;
+      [HideInInspector]
       public List<IHandModel> modelsCheckedOut;
       public bool IsEnabled;
+      public bool CanDuplicate;
+
       public IHandModel TryGetModel(Chirality chirality, ModelType modelType) {
         for (int i = 0; i < modelList.Count; i++) {
-          if (modelList[i].Handedness == chirality && modelList[i].HandModelType == modelType) {
+          if (modelList[i].HandModelType == modelType
+            && modelList[i].Handedness == chirality
+            || modelList[i].Handedness == Chirality.Either) {
             IHandModel model = modelList[i];
             modelList.RemoveAt(i);
             modelsCheckedOut.Add(model);
             return model;
           }
         }
-        //Todo: if spawning enabled
-        for (int i = 0; i < modelsCheckedOut.Count; i++) {
-          if (modelsCheckedOut[i].Handedness == chirality && modelsCheckedOut[i].HandModelType == modelType) {
-            IHandModel modelToSpawn = modelsCheckedOut[i];
-            IHandModel spawnedModel = GameObject.Instantiate(modelToSpawn);
-            _handPool.modelGroupMapping.Add(spawnedModel, this);
-            modelsCheckedOut.Add(spawnedModel);
-            return spawnedModel;
+        if (CanDuplicate) {
+          for (int i = 0; i < modelsCheckedOut.Count; i++) {
+            if (modelsCheckedOut[i].HandModelType == modelType
+              && modelsCheckedOut[i].Handedness == chirality
+              || modelsCheckedOut[i].Handedness == Chirality.Either) {
+              IHandModel modelToSpawn = modelsCheckedOut[i];
+              IHandModel spawnedModel = GameObject.Instantiate(modelToSpawn);
+              spawnedModel.transform.parent = _handPool.transform;
+              _handPool.modelGroupMapping.Add(spawnedModel, this);
+              modelsCheckedOut.Add(spawnedModel);
+              return spawnedModel;
+            }
           }
         }
         return null;
@@ -77,28 +75,48 @@ namespace Leap.Unity {
         modelList.Add(model);
         this._handPool.modelToHandRepMapping.Remove(model);
       }
-      public ModelGroup(string groupName, bool isEnabled, List<IHandModel> modelList, HandPool handPool) {
-        this.GroupName = groupName;
-        this.IsEnabled = isEnabled;
-        this.modelList = modelList;
-        this.modelsCheckedOut = new List<IHandModel>();
-        this._handPool = handPool;
+    }
+    public void ReturnToPool(IHandModel model) {
+      ModelGroup modelGroup;
+      bool groupFound = modelGroupMapping.TryGetValue(model, out modelGroup);
+      modelGroup.ReturnToGroup(model);
+      Assert.IsTrue(groupFound);
+    }
+    public void RemoveHandRepresentation(HandRepresentation handRep) {
+      activeHandReps.Remove(handRep);
+    }
+    /** Popuates the ModelPool with the contents of the ModelCollection */
+    void Start() {
+      foreach (ModelGroup collectionGroup in ModelPool) {
+        collectionGroup._handPool = this;
+        IHandModel leftModel;
+        IHandModel rightModel;
+        if (collectionGroup.IsLeftToBeSpawned) {
+          IHandModel modelToSpawn = collectionGroup.LeftModel;
+          GameObject spawnedGO = GameObject.Instantiate(modelToSpawn.gameObject);
+          leftModel = spawnedGO.GetComponent<IHandModel>();
+          leftModel.transform.parent = transform;
+        }
+        else {
+          leftModel = collectionGroup.LeftModel;
+        }
+        collectionGroup.modelList.Add(leftModel);
+        modelGroupMapping.Add(leftModel, collectionGroup);
+
+        if (collectionGroup.IsRightToBeSpawned) {
+          IHandModel modelToSpawn = collectionGroup.RightModel;
+          GameObject spawnedGO = GameObject.Instantiate(modelToSpawn.gameObject);
+          rightModel = spawnedGO.GetComponent<IHandModel>();
+          rightModel.transform.parent = transform;
+        }
+        else {
+          rightModel = collectionGroup.RightModel;
+        }
+        collectionGroup.modelList.Add(rightModel);
+        modelGroupMapping.Add(rightModel, collectionGroup);
       }
     }
 
-    /** Popuates the ModelPool with the contents of the ModelCollection */
-    void Start() {
-      ModelPool = new List<ModelGroup>();
-      foreach (ModelPair pair in ModelCollection) {
-        ModelGroup newModelGroup = new ModelGroup(pair.PairName, pair.IsEnabled, new List<IHandModel>(), this);
-        newModelGroup.modelList.Add(pair.LeftModel);
-        modelGroupMapping.Add(pair.LeftModel, newModelGroup);
-        newModelGroup.modelList.Add(pair.RightModel);
-        modelGroupMapping.Add(pair.RightModel, newModelGroup);
-        ModelPool.Add(newModelGroup);
-      }
-    }
- 
     /**
      * MakeHandRepresentation receives a Hand and combines that with an IHandModel to create a HandRepresentation
      * @param hand The Leap Hand data to be drive an IHandModel
@@ -106,10 +124,7 @@ namespace Leap.Unity {
      */
 
     public override HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
-      Chirality handChirality = Chirality.Either;
-      if (EnforceHandedness) {
-        handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
-      }
+      Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
       HandRepresentation handRep = new HandProxy(this, hand, handChirality, modelType);
       for (int i = 0; i < ModelPool.Count; i++) {
         ModelGroup group = ModelPool[i];
@@ -120,17 +135,16 @@ namespace Leap.Unity {
             modelToHandRepMapping.Add(model, handRep);
           }
         }
-
       }
-      ActiveHandReps.Add(handRep);
+      activeHandReps.Add(handRep);
       return handRep;
     }
     public void EnableGroup(string groupName) {
       for (int i = 0; i < ModelPool.Count; i++) {
         if (ModelPool[i].GroupName == groupName) {
           ModelGroup group = ModelPool[i];
-          for (int hp = 0; hp < ActiveHandReps.Count; hp++ ) {
-            HandRepresentation handRep = ActiveHandReps[hp];
+          for (int hp = 0; hp < activeHandReps.Count; hp++) {
+            HandRepresentation handRep = activeHandReps[hp];
             IHandModel model = group.TryGetModel(handRep.RepChirality, handRep.RepType);
             if (model != null) {
               handRep.AddModel(model);
@@ -141,7 +155,7 @@ namespace Leap.Unity {
         }
       }
     }
-    public void DisableGroup( string groupName) {
+    public void DisableGroup(string groupName) {
       for (int i = 0; i < ModelPool.Count; i++) {
         ModelGroup group = null;
         if (ModelPool[i].GroupName == groupName) {
@@ -160,47 +174,24 @@ namespace Leap.Unity {
         }
       }
     }
-    public void ReturnToPool(IHandModel model) {
-      ModelGroup modelGroup;
-      bool groupFound = modelGroupMapping.TryGetValue(model, out modelGroup);
-      modelGroup.ReturnToGroup(model);
-      Assert.IsTrue(groupFound);
-    }
+
 
 #if UNITY_EDITOR
     /**In the Unity Editor, Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project. */
     void OnValidate() {
-      for (int i = 0; i < ModelCollection.Count; i++) {
-        if (ModelCollection[i] != null) {
-          if (ModelCollection[i].LeftModel) {
-            ValidateIHandModelPrefab(ModelCollection[i].LeftModel);
+      for (int i = 0; i < ModelPool.Count; i++) {
+        if (ModelPool[i] != null) {
+          if (ModelPool[i].LeftModel) {
+            ModelPool[i].IsLeftToBeSpawned = PrefabUtility.GetPrefabType(ModelPool[i].LeftModel) == PrefabType.Prefab;
           }
-          if (ModelCollection[i].RightModel) {
-            ValidateIHandModelPrefab(ModelCollection[i].RightModel);
+          if (ModelPool[i].RightModel) {
+            ModelPool[i].IsRightToBeSpawned = PrefabUtility.GetPrefabType(ModelPool[i].RightModel) == PrefabType.Prefab;
           }
         }
       }
     }
-    void ValidateIHandModelPrefab(IHandModel iHandModel) {
-      if (PrefabUtility.GetPrefabType(iHandModel) == PrefabType.Prefab) {
-        EditorUtility.DisplayDialog("Warning", "This slot needs to have an instance of a prefab from your scene. Make your hand prefab a child of the LeapHanadContrller in your scene,  then drag here", "OK");
-      }
-    }
+
 #endif
-    void Update() {
-      if (Input.GetKeyUp(KeyCode.O)) {
-        DisableGroup("Poly_Hands");
-      }
-      if (Input.GetKeyUp(KeyCode.P)) {
-        EnableGroup("Poly_Hands");
-      }
-      if (Input.GetKeyUp(KeyCode.U)) {
-        DisableGroup("Graphics_Hands");
-      }
-      if (Input.GetKeyUp(KeyCode.I)) {
-        EnableGroup("Graphics_Hands");
-      }
-    }
   }
 }
 
