@@ -213,11 +213,6 @@ namespace Leap.Unity {
       if (_headTransform == null) {
         _headTransform = transform.parent;
       }
-      if (_trackingAnchor == null) {
-        if (_headTransform != null) {
-          _trackingAnchor = _headTransform.parent;
-        }
-      }
     }
 
     protected void Start() {
