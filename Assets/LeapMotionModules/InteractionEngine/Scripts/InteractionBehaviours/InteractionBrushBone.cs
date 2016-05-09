@@ -9,6 +9,33 @@ namespace Leap.Unity
 {
   public class InteractionBrushBone : MonoBehaviour
   {
+    private int _collisionCounter = 0;
+    private float _collisionMassTotal = 0.0f;
+
+    // Should be called by hand every fixed update.
+    public float getAverageContactingMass()
+    {
+      if (_collisionCounter == 0)
+        return 0.0f;
+
+      float result = _collisionMassTotal / (float)_collisionCounter;
+      _collisionCounter = 0;
+      _collisionMassTotal = 0.0f;
+      return result;
+    }
+
+    void OnCollisionStay(Collision collisionInfo)
+    {
+      // Doing this every frame prevents issues when the mass of other objects changes.
+
+      Rigidbody otherRigidbody = collisionInfo.collider.attachedRigidbody;
+      if(otherRigidbody) {
+        ++_collisionCounter;
+        _collisionMassTotal += otherRigidbody.mass;
+      }
+    }
+
+#if UNITY_EDITOR
     private string ThisLabel()
     {
       return gameObject.name + " <layer " + LayerMask.LayerToName(gameObject.layer) + ">";
@@ -53,6 +80,7 @@ namespace Leap.Unity
             }
       */
     }
+#endif
   }
 }
 

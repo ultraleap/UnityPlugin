@@ -15,11 +15,16 @@ namespace Leap.Unity
   {
     private const int N_FINGERS = 5;
     private const int N_ACTIVE_BONES = 3;
+    private const int FRAMES_DELAY = 3;
 
     private Rigidbody[] _capsuleBodies;
+    private InteractionBrushBone[] _capsuleBones;
     private Vector3[] _lastPositions;
+
     private Hand _hand;
     private GameObject _handParent;
+    private int _frameTimer = 0;
+
     private bool _hasWarned = false;
 
     public override ModelType HandModelType
@@ -35,7 +40,14 @@ namespace Leap.Unity
     }
 
     [SerializeField]
-    private float _perBoneMass = 1.0f;
+    private float _perBoneMass = 0.2f; // Default to a "low" value.
+
+    [SerializeField]
+    private bool _enableDynamicMass = true;
+
+    [SerializeField]
+    private float _dynamicMassMultiplier = 0.2f; // The brushes are very powerful
+
 
     [SerializeField]
     private CollisionDetectionMode _collisionDetection = CollisionDetectionMode.ContinuousDynamic;
@@ -64,11 +76,17 @@ namespace Leap.Unity
         Debug.Break();
       }
 #endif
+      _frameTimer = 0;
+    }
 
+
+    private void ConstructHand()
+    {
       _handParent = new GameObject(gameObject.name);
       _handParent.transform.parent = null; // Prevent hand from moving when you turn your head.
 
       _capsuleBodies = new Rigidbody[N_FINGERS * N_ACTIVE_BONES];
+      _capsuleBones = new InteractionBrushBone[N_FINGERS * N_ACTIVE_BONES];
       _lastPositions = new Vector3[N_FINGERS * N_ACTIVE_BONES];
 
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++)
@@ -78,12 +96,8 @@ namespace Leap.Unity
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
 
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
-          GameObject capsuleGameObject = new GameObject(gameObject.name, typeof(Rigidbody), typeof(CapsuleCollider));
+          GameObject capsuleGameObject = new GameObject(gameObject.name, typeof(Rigidbody), typeof(CapsuleCollider), typeof(InteractionBrushBone));
           capsuleGameObject.layer = gameObject.layer;
-#if UNITY_EDITOR
-          // This is a debug facility that warns developers of issues.
-          capsuleGameObject.AddComponent<InteractionBrushBone>();
-#endif
 
           Transform capsuleTransform = capsuleGameObject.GetComponent<Transform>();
           capsuleTransform.parent = _handParent.transform;
@@ -96,15 +110,15 @@ namespace Leap.Unity
           capsule.material = _material;
 
           Rigidbody body = capsuleGameObject.GetComponent<Rigidbody>();
-          _capsuleBodies[boneArrayIndex] = body;
           body.position = bone.Center.ToVector3();
           body.rotation = bone.Rotation.ToQuaternion();
           body.freezeRotation = true;
           body.useGravity = false;
-
           body.mass = _perBoneMass;
           body.collisionDetectionMode = _collisionDetection;
 
+          _capsuleBodies[boneArrayIndex] = body;
+          _capsuleBones[boneArrayIndex] = capsuleGameObject.GetComponent<InteractionBrushBone>();
           _lastPositions[boneArrayIndex] = bone.Center.ToVector3();
         }
       }
@@ -116,6 +130,13 @@ namespace Leap.Unity
       if (!EditorApplication.isPlaying)
         return;
 #endif
+
+      if (_frameTimer <= FRAMES_DELAY) {
+        if (_frameTimer++ < FRAMES_DELAY) {
+          return;
+        }
+        ConstructHand();
+      }
 
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++)
       {
@@ -129,8 +150,7 @@ namespace Leap.Unity
 #if UNITY_EDITOR
           // During normal operation the brushes should not be pushed away from the tracked hand.
           // In unusual situations (e.g. swatting an object really quickly) this may fire.
-          if (!_hasWarned)
-          {
+          if (!_hasWarned) {
             // Compare against intended target, not new tracking position.
             Vector3 error = _lastPositions[boneArrayIndex] - body.position;
             if (error.magnitude > bone.Width) {
@@ -144,20 +164,38 @@ namespace Leap.Unity
           Vector3 delta = bone.Center.ToVector3() - body.position;
           body.velocity = delta / Time.fixedDeltaTime;
           body.rotation = bone.Rotation.ToQuaternion();
+
+          // Update mass
+          if (_enableDynamicMass) {
+            InteractionBrushBone brushBone = _capsuleBones[boneArrayIndex];
+            float contactingMass = brushBone.getAverageContactingMass();
+            if (contactingMass == 0) {
+              body.mass = _perBoneMass;
+            }
+            else {
+              body.mass = _dynamicMassMultiplier * contactingMass;
+            }
+          }
+          else {
+            body.mass = _perBoneMass; // !_enableDynamicMass
+          }
         }
       }
     }
 
     public override void FinishHand()
     {
-      for(int i=_capsuleBodies.Length; i-- != 0; )
-      {
+      if (_capsuleBodies == null)
+        return; // Frame counter never expired.
+
+      for(int i=_capsuleBodies.Length; i-- != 0; ) {
         _capsuleBodies[i].transform.parent = null;
         GameObject.Destroy(_capsuleBodies[i].gameObject);
       }
 
       GameObject.Destroy(_handParent);
       _capsuleBodies = null;
+      _capsuleBones = null;
       _lastPositions = null;
 
       base.FinishHand();

@@ -72,7 +72,7 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("Depth before brushes are disabled.")]
     [SerializeField]
-    protected float _brushDisableDistance = 0.017f;
+    protected float _brushDisableDistance = 0.013f;
 
 
     protected Renderer[] _renderers;
