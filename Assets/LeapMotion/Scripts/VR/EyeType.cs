@@ -1,41 +1,42 @@
 ﻿using UnityEngine;
+using UnityEngine.VR;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using System;
 
-namespace Leap.Unity{
+namespace Leap.Unity {
   [System.Serializable]
   public class EyeType {
     private const string TARGET_EYE_PROPERTY_NAME = "m_TargetEye";
     private const int TARGET_EYE_LEFT_INDEX = 1;
     private const int TARGET_EYE_RIGHT_INDEX = 2;
     private const int TARGET_EYE_CENTER_INDEX = 3;
-  
-    public enum OrderType{
+
+    public enum OrderType {
       LEFT = TARGET_EYE_LEFT_INDEX,
       RIGHT = TARGET_EYE_RIGHT_INDEX,
       CENTER = TARGET_EYE_CENTER_INDEX
     }
-  
+
     [SerializeField]
     private OrderType _orderType = OrderType.LEFT;
-  
+
     private bool _isOnFirst = false;
     private bool _hasBegun = false;
-  
+
     public OrderType Type {
       get {
         return _orderType;
       }
     }
-  
+
     public bool IsLeftEye {
       get {
         if (!_hasBegun) {
           throw new Exception("Cannot call IsLeftEye or IsRightEye before BeginCamera has been called!");
         }
-  
+
         switch (_orderType) {
           case OrderType.LEFT: return true;
           case OrderType.RIGHT: return false;
@@ -44,28 +45,33 @@ namespace Leap.Unity{
         }
       }
     }
-  
+
     public bool IsRightEye {
       get {
         return !IsLeftEye;
       }
     }
-  
+
     public EyeType(OrderType type) {
       _orderType = type;
     }
-  
-  #if UNITY_EDITOR
+
+#if UNITY_EDITOR
     public void UpdateOrderGivenComponent(Component component) {
       if (Application.isPlaying) {
         return;
       }
-  
+
+      //Allow the user to specify themselves if VR is disabled
+      if (!VRSettings.enabled || !PlayerSettings.virtualRealitySupported) {
+        return;
+      }
+
       Camera camera = component.GetComponent<Camera>();
       if (camera == null) {
         camera = component.gameObject.AddComponent<Camera>();
       }
-  
+
       SerializedObject obj = new SerializedObject(camera);
       SerializedProperty targetEyeProp = obj.FindProperty(TARGET_EYE_PROPERTY_NAME);
       OrderType newOrder = (OrderType)targetEyeProp.intValue;
@@ -74,8 +80,8 @@ namespace Leap.Unity{
         EditorUtility.SetDirty(component);
       }
     }
-  #endif
-  
+#endif
+
     public void BeginCamera() {
       if (!_hasBegun) {
         _isOnFirst = true;
@@ -84,7 +90,7 @@ namespace Leap.Unity{
         _isOnFirst = !_isOnFirst;
       }
     }
-  
+
     public void Reset() {
       _hasBegun = false;
     }
