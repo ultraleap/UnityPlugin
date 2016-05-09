@@ -12,6 +12,7 @@ namespace Leap.Unity.DetectionUtilities {
     private Vector3 _positionAtExceed = Vector3.zero;
     private Vector3 _directionAtExceed = Vector3.zero;
     private bool _didStop = false;
+    private Vector3 stopPosition = Vector3.zero;
 
     public float VelocityThreshold = 0.1f; //meters/s
     public float StopVelocityThreshold = 0.05f; //meters/s
@@ -99,6 +100,7 @@ namespace Leap.Unity.DetectionUtilities {
               if(stopped){
                 stopped = false;
                 _didStop = true;
+                stopPosition = transform.position;
                 OnDetection.Invoke();
               }
             }
@@ -129,6 +131,11 @@ namespace Leap.Unity.DetectionUtilities {
           return Camera.main.transform.forward;
       }
     }
-
+    #if UNITY_EDITOR
+    void OnDrawGizmos () {
+          Gizmos.color = Color.white;
+          Gizmos.DrawWireSphere(stopPosition, .05f);
+    }
+    #endif
   }
 }
