@@ -36,14 +36,15 @@ namespace Leap.Unity.Interaction.CApi {
     None                  = 0x00,
     HasGravity            = 0x01,
     ContactEnabled        = 0x02,
-    GraspEnabled          = 0x04
+    GraspEnabled          = 0x04,
+    SphericalInside       = 0x08
   };
 
   public enum ShapeInfoFlags : uint {
     None = 0x00,
     HasRigidBody = 0x01,
   };
-  
+
   public enum UpdateInfoFlags : uint {
     None = 0x00,
     ApplyAcceleration = 0x01,
@@ -168,6 +169,7 @@ namespace Leap.Unity.Interaction.CApi {
   public struct INTERACTION_SCENE_INFO {
     public SceneInfoFlags sceneFlags;
     public LEAP_VECTOR gravity;
+    public float depthUntilSphericalInside;
   }
 
   // All properties require eLeapIEShapeFlags to enable
