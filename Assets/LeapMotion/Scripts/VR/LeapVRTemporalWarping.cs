@@ -263,7 +263,7 @@ namespace Leap.Unity {
     }
 
     protected void Update() {
-      if (Input.GetKeyDown(recenter)) {
+      if (Input.GetKeyDown(recenter) && VRSettings.enabled && VRDevice.isPresent) {
         InputTracking.Recenter();
       }
 
