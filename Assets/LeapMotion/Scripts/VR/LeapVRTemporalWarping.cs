@@ -45,7 +45,15 @@ namespace Leap.Unity {
     }
 
     [SerializeField]
-    LeapServiceProvider provider;
+    private LeapServiceProvider provider;
+
+    [Tooltip("The transform that represents the head object.")]
+    [SerializeField]
+    private Transform _headTransform;
+
+    [Tooltip("The transform that is the anchor that tracking movement is relative to.  Can be null if head motion is in world space.")]
+    [SerializeField]
+    private Transform _trackingAnchor;
 
     // Spatial recalibration
     [Tooltip("Key to recenter the VR tracking space.")]
@@ -133,7 +141,6 @@ namespace Leap.Unity {
 
     private LeapDeviceInfo deviceInfo;
 
-    private Transform _trackingAnchor;
     private Matrix4x4 _projectionMatrix;
     private List<TransformData> _history = new List<TransformData>();
 
@@ -141,7 +148,7 @@ namespace Leap.Unity {
     /// Provides the position of a Leap Anchor at a given Leap Time.  Cannot extrapolate.
     /// </summary>
     public bool TryGetWarpedTransform(WarpedAnchor anchor, out Vector3 rewoundPosition, out Quaternion rewoundRotation, long leapTime) {
-      if (_trackingAnchor == null) {
+      if (_headTransform == null) {
         rewoundPosition = Vector3.one;
         rewoundRotation = Quaternion.identity;
         return false;
@@ -150,8 +157,13 @@ namespace Leap.Unity {
       TransformData past = transformAtTime(leapTime);
 
       // Rewind position and rotation
-      rewoundRotation = _trackingAnchor.rotation * past.localRotation;
-      rewoundPosition = _trackingAnchor.TransformPoint(past.localPosition) + rewoundRotation * Vector3.forward * deviceInfo.focalPlaneOffset;
+      if (_trackingAnchor == null) {
+        rewoundRotation = past.localRotation;
+        rewoundPosition = past.localPosition + rewoundRotation * Vector3.forward * deviceInfo.focalPlaneOffset;
+      } else {
+        rewoundRotation = _trackingAnchor.rotation * past.localRotation;
+        rewoundPosition = _trackingAnchor.TransformPoint(past.localPosition) + rewoundRotation * Vector3.forward * deviceInfo.focalPlaneOffset;
+      }
 
       switch (anchor) {
         case WarpedAnchor.CENTER:
@@ -178,6 +190,34 @@ namespace Leap.Unity {
       rewoundPosition = Vector3.zero;
       rewoundRotation = Quaternion.identity;
       return false;
+    }
+
+    public void ManualyUpdateTemporalWarping() {
+      if (_trackingAnchor == null) {
+        updateHistory(_headTransform.position, _headTransform.rotation);
+        updateTemporalWarping(_headTransform.position, _headTransform.rotation);
+      } else {
+        updateHistory(_trackingAnchor.InverseTransformPoint(_headTransform.position),
+                      Quaternion.Inverse(_trackingAnchor.rotation) * _headTransform.rotation);
+      }
+    }
+
+    protected void Reset() {
+      _headTransform = transform.parent;
+      if (_headTransform != null) {
+        _trackingAnchor = _headTransform.parent;
+      }
+    }
+
+    protected void OnValidate() {
+      if (_headTransform == null) {
+        _headTransform = transform.parent;
+      }
+      if (_trackingAnchor == null) {
+        if (_headTransform != null) {
+          _trackingAnchor = _headTransform.parent;
+        }
+      }
     }
 
     protected void Start() {
@@ -241,28 +281,34 @@ namespace Leap.Unity {
     }
 
     protected void LateUpdate() {
-      updateTemporalWarping();
+      if (VRSettings.enabled) {
+        updateTemporalWarping(InputTracking.GetLocalPosition(VRNode.CenterEye),
+                              InputTracking.GetLocalRotation(VRNode.CenterEye));
+      }
     }
 
     private void onValidCameraParams(LeapVRCameraControl.CameraParams cameraParams) {
       _projectionMatrix = cameraParams.ProjectionMatrix;
-      _trackingAnchor = cameraParams.TrackingAnchor;
 
-      if (provider != null) {
-        updateHistory();
-      }
+      if (VRSettings.enabled) {
+        if (provider != null) {
+          updateHistory(InputTracking.GetLocalPosition(VRNode.CenterEye),
+                        InputTracking.GetLocalRotation(VRNode.CenterEye));
+        }
 
-      if (syncMode == SyncMode.LOW_LATENCY) {
-        updateTemporalWarping();
+        if (syncMode == SyncMode.LOW_LATENCY) {
+          updateTemporalWarping(InputTracking.GetLocalPosition(VRNode.CenterEye),
+                                InputTracking.GetLocalRotation(VRNode.CenterEye));
+        }
       }
     }
 
-    private void updateHistory() {
+    private void updateHistory(Vector3 currLocalPosition, Quaternion currLocalRotation) {
       long leapNow = provider.GetLeapController().Now();
       _history.Add(new TransformData() {
         leapTime = leapNow,
-        localPosition = InputTracking.GetLocalPosition(VRNode.CenterEye),
-        localRotation = InputTracking.GetLocalRotation(VRNode.CenterEye)
+        localPosition = currLocalPosition,
+        localRotation = currLocalRotation
       });
 
       // Reduce history length
@@ -272,13 +318,13 @@ namespace Leap.Unity {
       }
     }
 
-    private void updateTemporalWarping() {
+    private void updateTemporalWarping(Vector3 currLocalPosition, Quaternion currLocalRotation) {
       if (_trackingAnchor == null || provider.GetLeapController() == null) {
         return;
       }
 
-      Vector3 currCenterPos = _trackingAnchor.TransformPoint(InputTracking.GetLocalPosition(VRNode.CenterEye));
-      Quaternion currCenterRot = _trackingAnchor.rotation * InputTracking.GetLocalRotation(VRNode.CenterEye);
+      Vector3 currCenterPos = _trackingAnchor.TransformPoint(currLocalPosition);
+      Quaternion currCenterRot = _trackingAnchor.rotation * currLocalRotation;
 
       //Get the transform at the time when the latest image was captured
       //HACK: Currently timestamps are not accurate enough, just use the current timestamp plus the adjustment (60Ms seems to work well)
