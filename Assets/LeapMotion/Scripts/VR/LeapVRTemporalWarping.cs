@@ -202,6 +202,7 @@ namespace Leap.Unity {
       }
     }
 
+#if UNITY_EDITOR
     protected void Reset() {
       _headTransform = transform.parent;
       if (_headTransform != null) {
@@ -213,7 +214,12 @@ namespace Leap.Unity {
       if (_headTransform == null) {
         _headTransform = transform.parent;
       }
+
+      if (_headTransform != null && UnityEditor.PlayerSettings.virtualRealitySupported) {
+        _trackingAnchor = _headTransform.parent;
+      }
     }
+#endif
 
     protected void Start() {
       if (provider.IsConnected()) {
