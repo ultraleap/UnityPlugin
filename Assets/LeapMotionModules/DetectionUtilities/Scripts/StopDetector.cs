@@ -72,12 +72,12 @@ namespace Leap.Unity.DetectionUtilities {
       Hand thisHand;
       bool stopped = false;
       while(true){
-        if(_didStop){
-          _didStop = false;
-          _velocityThresholdExceeded = false;
-          Debug.Log("Quiescence");
-          yield return new WaitForSeconds(Quiescence);
-        }
+//        if(_didStop){
+//          _didStop = false;
+//          _velocityThresholdExceeded = false;
+//          Debug.Log("Quiescence");
+//          yield return new WaitForSeconds(Quiescence);
+//        }
         if(Provider){
           Frame frame = Provider.CurrentFrame;
           if(frame != null && frame.Hands.Count >= 1){
@@ -90,6 +90,12 @@ namespace Leap.Unity.DetectionUtilities {
               angleCheck= !CheckDirection || Vector3.Angle(_directionAtExceed, selectedDirection()) < AngleTolerance;
               minSpeedCheck = thisHand.PalmVelocity.MagnitudeSquared < StopVelocityThreshold;
               minDistanceCheck = Vector3.Distance(_positionAtExceed, thisHand.PalmPosition.ToVector3()) > MinimumDistance;
+              if(_velocityThresholdExceeded){
+                Debug.DrawLine(_positionAtExceed, thisHand.PalmPosition.ToVector3(), Color.white, Period * 2);
+                Debug.DrawRay(_positionAtExceed, _directionAtExceed, Color.blue, Period * 2);
+                Debug.DrawLine(_positionAtExceed, (thisHand.PalmPosition.ToVector3() - _positionAtExceed).normalized * MinimumDistance, Color.red, Period * 2);
+              }
+              Debug.DrawRay(thisHand.PalmPosition.ToVector3(), selectedDirection(), Color.green, Period);
               #endif
 
               //decide if clapped
