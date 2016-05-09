@@ -580,7 +580,9 @@ namespace Leap.Unity.Interaction {
               IInteractionBehaviour interactionBehaviour;
               if (_instanceHandleToBehaviour.TryGetValue(handResult.instanceHandle, out interactionBehaviour)) {
                 if (interactionHand.graspedObject == null) {
-                  _graspedBehaviours.Add(interactionBehaviour);
+                  if (!interactionBehaviour.IsBeingGrasped) {
+                    _graspedBehaviours.Add(interactionBehaviour);
+                  }
 
                   try {
                     interactionHand.GraspObject(interactionBehaviour);
@@ -599,7 +601,9 @@ namespace Leap.Unity.Interaction {
           case ManipulatorMode.Contact:
             {
               if (interactionHand.graspedObject != null) {
-                _graspedBehaviours.Remove(interactionHand.graspedObject);
+                if (interactionHand.graspedObject.GraspingHandCount == 1) {
+                  _graspedBehaviours.Remove(interactionHand.graspedObject);
+                }
 
                 try {
                   interactionHand.ReleaseObject();
@@ -647,6 +651,10 @@ namespace Leap.Unity.Interaction {
             _handIdsToRemove.Add(id);
 
             try {
+              if (ieHand.graspedObject.GraspingHandCount == 1) {
+                _graspedBehaviours.Remove(ieHand.graspedObject);
+              }
+
               //This also dispatched InteractionObject.OnHandTimeout()
               ieHand.MarkTimeout();
             } catch (Exception e) {
