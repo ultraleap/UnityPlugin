@@ -192,6 +192,10 @@ namespace Leap.Unity {
       return false;
     }
 
+    /// <summary>
+    /// Use this method when not using Unity default VR integration.  This method should be called directly after
+    /// the head transform has been updated using your input tracking solution.
+    /// </summary>
     public void ManualyUpdateTemporalWarping() {
       if (_trackingAnchor == null) {
         updateHistory(_headTransform.position, _headTransform.rotation);
