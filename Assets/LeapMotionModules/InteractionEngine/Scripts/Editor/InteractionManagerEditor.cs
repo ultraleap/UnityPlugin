@@ -115,8 +115,13 @@ namespace Leap.Unity.Interaction {
     private void doSingleLayerGUI(SerializedProperty property) {
       int index = _layerValues.IndexOf(property.intValue);
       if (index < 0) {
-        property.intValue = EditorGUILayout.IntField(property.displayName, property.intValue);
-        return;
+        if (Application.isPlaying) {
+          property.intValue = EditorGUILayout.IntField(property.displayName, property.intValue);
+          return;
+        } else {
+          property.intValue = 0;
+          index = 0;
+        }
       }
 
       index = EditorGUILayout.Popup(property.displayName, index, _layerNames);
