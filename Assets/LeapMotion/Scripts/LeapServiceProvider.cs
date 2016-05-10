@@ -3,6 +3,7 @@
 using UnityEditor;
 #endif
 using System;
+using System.Collections;
 using Leap;
 
 namespace Leap.Unity {
@@ -18,6 +19,9 @@ namespace Leap.Unity {
     [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
     [SerializeField]
     protected bool _isHeadMounted = false;
+
+    [SerializeField]
+    protected LeapVRTemporalWarping _temporalWarping;
 
     [Header("Device Type")]
     [SerializeField]
@@ -35,8 +39,7 @@ namespace Leap.Unity {
     [Tooltip("How much delay should be added to interpolation.  A non-zero amount is needed to prevent extrapolation artifacts.")]
     [SerializeField]
     protected long _interpolationDelay = 15;
-
-    protected float _fixedToTimeOffset = 0;
+    
     protected Controller leap_controller_;
 
     protected Frame _untransformedUpdateFrame;
@@ -149,6 +152,16 @@ namespace Leap.Unity {
       createController();
       _untransformedUpdateFrame = new Frame();
       _untransformedFixedFrame = new Frame();
+      StartCoroutine(waitCoroutine());
+    }
+
+    protected IEnumerator waitCoroutine() {
+      WaitForEndOfFrame endWaiter = new WaitForEndOfFrame();
+      while (true) {
+        yield return endWaiter;
+        Int64 unityTime = (Int64)(Time.time * 1e6);
+        clockCorrelator.UpdateRebaseEstimate(unityTime);
+      }
     }
 
     protected virtual void Update() {
@@ -160,15 +173,11 @@ namespace Leap.Unity {
       }
 #endif
 
-      _fixedToTimeOffset = Time.time - Time.fixedTime;
-
-      Int64 unityTime = (Int64)(Time.time * 1e6);
-      clockCorrelator.UpdateRebaseEstimate(unityTime);
-
       if (_useInterpolation) {
+        Int64 unityTime = (Int64)(Time.time * 1e6);
         Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
         Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
-        _untransformedUpdateFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
+        _untransformedUpdateFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime) ?? _untransformedUpdateFrame;
       } else {
         _untransformedUpdateFrame = leap_controller_.Frame();
       }
@@ -177,13 +186,14 @@ namespace Leap.Unity {
       //It will be recalculated if it is needed
       _transformedUpdateFrame = null;
     }
-
+    
     protected virtual void FixedUpdate() {
       if (_useInterpolation) {
-        Int64 unityTime = (Int64)((Time.fixedTime + _fixedToTimeOffset) * 1e6);
+        Int64 unityTime = (Int64)(Time.fixedTime * 1e6);
         Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
         Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
-        _untransformedFixedFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
+
+        _untransformedFixedFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime) ?? _untransformedFixedFrame;
       } else {
         _untransformedFixedFrame = leap_controller_.Frame();
       }
@@ -255,7 +265,7 @@ namespace Leap.Unity {
       initializeFlags();
       leap_controller_.Device -= onHandControllerConnect;
     }
-
+    
     protected void updateIfTransformMoved(Frame source, ref Frame toUpdate) {
       if (transform.hasChanged) {
         _transformedFixedFrame = null;
@@ -264,7 +274,18 @@ namespace Leap.Unity {
       }
 
       if (toUpdate == null) {
-        toUpdate = source.TransformedCopy(transform.GetLeapMatrix());
+        Vector3 warpedPosition;
+        Quaternion warpedRotation;
+        _temporalWarping.TryGetWarpedTransform(LeapVRTemporalWarping.WarpedAnchor.CENTER, out warpedPosition, out warpedRotation, source.Timestamp);
+
+        warpedRotation = warpedRotation * transform.localRotation;
+
+        Vector scale = new Vector(transform.lossyScale.x * 1e-3f, transform.lossyScale.y * 1e-3f, transform.lossyScale.z * 1e-3f);
+
+        LeapTransform leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), scale);
+        leapTransform.MirrorZ();
+
+        toUpdate = source.TransformedCopy(leapTransform);
       }
     }
   }
