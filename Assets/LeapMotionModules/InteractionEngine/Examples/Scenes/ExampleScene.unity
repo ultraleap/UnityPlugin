@@ -1280,6 +1280,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8db2ca3caad750429c7c1db202bbf5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 1473219677}
   handedness: 0
   _perBoneMass: 0.2
   _collisionDetection: 2
@@ -1520,6 +1521,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8db2ca3caad750429c7c1db202bbf5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 1473219677}
   handedness: 1
   _perBoneMass: 0.2
   _collisionDetection: 2
