@@ -116,9 +116,12 @@ namespace Leap.Unity.Interaction {
       int index = _layerValues.IndexOf(property.intValue);
       if (index < 0) {
         if (Application.isPlaying) {
+          //If application is playing we dont want to change the layers on the fly
+          //Instead, just display them as an int value
           property.intValue = EditorGUILayout.IntField(property.displayName, property.intValue);
           return;
         } else {
+          //If the application is not running, reset the layer to the default layer
           property.intValue = 0;
           index = 0;
         }
