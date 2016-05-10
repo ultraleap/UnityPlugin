@@ -425,7 +425,7 @@ public class LeapInputModule : BaseInputModule
         {
             TipRaycast = true;
             EventCamera.transform.position = InputTracking.GetLocalPosition(VRNode.Head);
-            IndexFingerPosition = curFrame.Hands[whichHand].Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).Center.ToVector3();//StabilizedTipPosition.ToVector3();
+            IndexFingerPosition = curFrame.Hands[whichHand].Fingers[1].TipPosition.ToVector3();//StabilizedTipPosition.ToVector3();
            // IndexFingerPosition = curFrame.Hands[whichHand].Fingers[1].StabilizedTipPosition.ToVector3();
         }
         else //Raycast through knuckle of Index Finger
@@ -646,7 +646,7 @@ public class LeapInputModule : BaseInputModule
                     float Pointerscale = PointerScale.Evaluate(lookPointDistance);
 
                     //Commented out Velocity Stretching because it looks funny when I change the projection origin
-                    Pointers[whichHand].localScale = Pointerscale * new Vector3(1f, 1f + pointData.delta.magnitude*1f, 1f);
+                    Pointers[whichHand].localScale = Pointerscale * new Vector3(1f, 1f /*+ pointData.delta.magnitude*1f*/, 1f);
                 }
             }
         }
@@ -720,13 +720,16 @@ public class LeapInputModule : BaseInputModule
                 lerpPointerColor(whichHand, TriggeringColor, 0.2f);
                 break;
             case pointerStates.NearCanvas:
-                lerpPointerColor(whichHand, new Color(0.0f, 0.0f, 0.0f, 0f), 1f);
+                lerpPointerColor(whichHand, new Color(0.0f, 0.0f, 0.0f, 0.5f), 0.3f);
+                lerpPointerColor(whichHand, StandardColor, 0.2f);
                 break;
             case pointerStates.TouchingElement:
-                lerpPointerColor(whichHand, new Color(0.0f, 0.0f, 0.0f, 0f), 0.2f);
+                lerpPointerColor(whichHand, new Color(0.0f, 0.0f, 0.0f, 1f), 0.2f);
+                lerpPointerColor(whichHand, HoveringColor, 0.2f);
                 break;
             case pointerStates.TouchingCanvas:
-                lerpPointerColor(whichHand, new Color(0.0f, 0.01f, 0.0f, 0f), 0.2f);
+                lerpPointerColor(whichHand, new Color(0.0f, 0.01f, 0.0f, 1f), 0.2f);
+                lerpPointerColor(whichHand, TriggerMissedColor, 0.2f);
                 break;
             case pointerStates.OffCanvas:
                 lerpPointerColor(whichHand, new Color(0.0f, 0.0f, 0.0f, 0f), 1f);
