@@ -103,9 +103,6 @@ namespace Leap.Unity.DetectionUtilities {
             depth = 2 * yZone * _range/zones.y * _vTan;
             zZone = Mathf.Ceil((position.z - HandController.transform.position.z + depth/2) * zones.z/depth);
             currentZone = new Vector3(xZone, yZone, zZone);
-//            #if UNITY_EDITOR
-//            drawZone(xZone, yZone, zZone, Color.blue, width, depth, (int)zones.z, (int)zones.y);
-//            #endif
           }
           inZone = currentZone;
           if(currentZone != ActiveZone){
