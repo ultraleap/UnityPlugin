@@ -52,6 +52,10 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _enableGrasping = true;
 
+    [Tooltip("Depth before collision response becomes as if holding a sphere.")]
+    [SerializeField]
+    protected float _depthUntilSphericalInside = 0.023f;
+
     [Header("Debug")]
     [Tooltip("Allows simulation to be disabled without destroying the scene in any way.")]
     [SerializeField]
@@ -577,7 +581,9 @@ namespace Leap.Unity.Interaction {
               IInteractionBehaviour interactionBehaviour;
               if (_instanceHandleToBehaviour.TryGetValue(handResult.instanceHandle, out interactionBehaviour)) {
                 if (interactionHand.graspedObject == null) {
-                  _graspedBehaviours.Add(interactionBehaviour);
+                  if (!interactionBehaviour.IsBeingGrasped) {
+                    _graspedBehaviours.Add(interactionBehaviour);
+                  }
 
                   try {
                     interactionHand.GraspObject(interactionBehaviour);
@@ -596,7 +602,9 @@ namespace Leap.Unity.Interaction {
           case ManipulatorMode.Contact:
             {
               if (interactionHand.graspedObject != null) {
-                _graspedBehaviours.Remove(interactionHand.graspedObject);
+                if (interactionHand.graspedObject.GraspingHandCount == 1) {
+                  _graspedBehaviours.Remove(interactionHand.graspedObject);
+                }
 
                 try {
                   interactionHand.ReleaseObject();
@@ -644,6 +652,10 @@ namespace Leap.Unity.Interaction {
             _handIdsToRemove.Add(id);
 
             try {
+              if (ieHand.graspedObject.GraspingHandCount == 1) {
+                _graspedBehaviours.Remove(ieHand.graspedObject);
+              }
+
               //This also dispatched InteractionObject.OnHandTimeout()
               ieHand.MarkTimeout();
             } catch (Exception e) {
@@ -754,7 +766,8 @@ namespace Leap.Unity.Interaction {
       INTERACTION_SCENE_INFO info = new INTERACTION_SCENE_INFO();
       info.gravity = Physics.gravity.ToCVector();
 
-      info.sceneFlags = SceneInfoFlags.HasGravity;
+      info.sceneFlags = SceneInfoFlags.HasGravity | SceneInfoFlags.SphericalInside;
+      info.depthUntilSphericalInside = _depthUntilSphericalInside;
 
       if (_enableContact) {
         info.sceneFlags |= SceneInfoFlags.ContactEnabled;
