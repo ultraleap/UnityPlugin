@@ -1841,7 +1841,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 492502, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
       propertyPath: m_RootOrder
-      value: 5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
       propertyPath: ModelCollection.Array.data[0]
@@ -1875,6 +1875,56 @@ Prefab:
       propertyPath: ModelCollection.Array.data[1].RightModel
       value: 
       objectReference: {fileID: 1167543056}
-    m_RemovedComponents: []
+    - target: {fileID: 11402294, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: _overrideDeviceType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11429104, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: allowManualTimeAlignment
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11429104, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: warpingAdjustment
+      value: 20
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+    - {fileID: 8146722, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &2044067703 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 117698, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+  m_PrefabInternal: {fileID: 2044067702}
+--- !u!114 &2044067704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2044067703}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ModelPool:
+  - _handPool: {fileID: 0}
+    GroupName: Graphics_Hands
+    LeftModel: {fileID: 1545945338}
+    IsLeftToBeSpawned: 0
+    RightModel: {fileID: 1061438465}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 1
+  - _handPool: {fileID: 0}
+    GroupName: Physics_Hands
+    LeftModel: {fileID: 1414805578}
+    IsLeftToBeSpawned: 0
+    RightModel: {fileID: 1167543056}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 1

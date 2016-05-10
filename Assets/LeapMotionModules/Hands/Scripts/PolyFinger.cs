@@ -47,15 +47,7 @@ namespace Leap.Unity{
     public override void UpdateFinger() {
       UpdateMesh();
       UpdateCapMesh();
-    }
 
-    void OnDestroy() {
-      Destroy(mesh_);
-      Destroy(cap_mesh_);
-      Destroy(GetComponent<MeshFilter>().mesh);
-    }
-
-    void Update() {
       if (vertices_ == null)
         return;
 
@@ -73,8 +65,18 @@ namespace Leap.Unity{
       combine[0].mesh = mesh_;
       combine[1].mesh = cap_mesh_;
 
-      GetComponent<MeshFilter>().mesh.CombineMeshes(combine, true, false);
-      GetComponent<MeshFilter>().mesh.RecalculateBounds();
+      GetComponent<MeshFilter>().sharedMesh.CombineMeshes(combine, true, false);
+      GetComponent<MeshFilter>().sharedMesh.RecalculateBounds();
+    }
+
+    void OnDestroy() {
+      Destroy(mesh_);
+      Destroy(cap_mesh_);
+      Destroy(GetComponent<MeshFilter>().mesh);
+    }
+
+    void Update() {
+
     }
 
     protected Quaternion GetJointRotation(int joint) {
