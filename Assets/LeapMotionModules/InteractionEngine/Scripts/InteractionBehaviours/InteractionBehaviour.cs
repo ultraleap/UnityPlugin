@@ -385,15 +385,13 @@ namespace Leap.Unity.Interaction {
 #endif
 
       if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
-        if (!_ignoringBrushes && results.maxHandDepth > _brushDisableDistance)
-        {
+        if (!_ignoringBrushes && results.maxHandDepth > _brushDisableDistance) {
           _ignoringBrushes = true;
 
           // HACK FIXME TODO BBQ.  This will be rewired.
           gameObject.layer = 10; // InteractionExampleObjectNoClipBrush
         }
-      }
-      else if(_ignoringBrushes) {
+      } else if (_ignoringBrushes) {
         _ignoringBrushes = false;
 
         // HACK FIXME TODO BBQ.  This will be rewired.
@@ -631,9 +629,8 @@ namespace Leap.Unity.Interaction {
 #if UNITY_EDITOR
     private void OnCollisionEnter(Collision collision) {
       GameObject otherObj = collision.collider.gameObject;
-      if ( otherObj.GetComponentInParent<IHandModel>() != null
-        && otherObj.GetComponentInParent<InteractionBrushHand>() == null)
-      {
+      if (otherObj.GetComponentInParent<IHandModel>() != null
+        && otherObj.GetComponentInParent<InteractionBrushHand>() == null) {
         string thisLabel = gameObject.name + " <layer " + LayerMask.LayerToName(gameObject.layer) + ">";
         string otherLabel = otherObj.name + " <layer " + LayerMask.LayerToName(otherObj.layer) + ">";
 
