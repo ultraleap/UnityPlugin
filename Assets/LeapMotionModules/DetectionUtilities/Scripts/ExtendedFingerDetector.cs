@@ -85,6 +85,23 @@ namespace Leap.Unity.DetectionUtilities {
           return false;
       }
     }
+
+    #if UNITY_EDITOR
+    void OnDrawGizmos () {
+      if (ShowGizmos && handModel != null) {
+        Hand hand = handModel.GetLeapHand();
+        for (int f = 0; f < 5; f++) {
+          Finger finger = hand.Fingers[f];
+          if (matchFingerState(finger, f)) {
+            Gizmos.color = Color.green;
+          } else {
+            Gizmos.color = Color.red;
+          }
+          Gizmos.DrawWireSphere(finger.TipPosition.ToVector3(), finger.Width);
+        }
+      }
+    }
+    #endif
   }
   
   public enum PointingState{Extended, NotExtended, Either}

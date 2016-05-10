@@ -139,8 +139,10 @@ namespace Leap.Unity.DetectionUtilities {
     }
     #if UNITY_EDITOR
     void OnDrawGizmos () {
-          Gizmos.color = Color.white;
-          Gizmos.DrawWireSphere(stopPosition, .05f);
+      if (ShowGizmos) {
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(stopPosition, .05f);
+      }
     }
     #endif
   }

@@ -19,7 +19,6 @@ namespace Leap.Unity.DetectionUtilities {
       }
     }
 
-    int iteration = 0;
     void CheckDetectors(){
       if (_detectors.Length < 1)
         return;

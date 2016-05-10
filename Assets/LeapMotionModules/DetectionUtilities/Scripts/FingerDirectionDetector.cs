@@ -5,12 +5,13 @@ using Leap.Unity;
 
 namespace Leap.Unity.DetectionUtilities {
 
-  public class FingerPointingDetector : BinaryDetector {
+  public class FingerDirectionDetector : BinaryDetector {
     public IHandModel handModel = null;
   
     public Finger.FingerType FingerName = Finger.FingerType.TYPE_INDEX;
-    public Directions PointingDirection = Directions.Forward;
-    public Vector3 CustomDirection = Vector3.forward;
+    public Vector3 PointingDirection = Vector3.forward;
+    public PointingType PointingType = PointingType.RelativeToHorizon;
+    public Transform TargetObject = null;
     public float OnAngle = 45f; //degrees
     public float OffAngle = 65f; //degrees
   
@@ -32,12 +33,13 @@ namespace Leap.Unity.DetectionUtilities {
     IEnumerator fingerPointingWatcher() {
       Hand hand;
       Vector3 fingerDirection;
-      Vector3 targetDirection = selectedDirection();
+      Vector3 targetDirection;
       int selectedFinger = selectedFingerOrdinal();
       while(true){
         if(handModel != null){
           hand = handModel.GetLeapHand();
           if(hand != null){
+            targetDirection = selectedDirection(hand.Fingers[selectedFinger].TipPosition.ToVector3());
             fingerDirection = hand.Fingers[selectedFinger].Direction.ToVector3();
             float angleTo = Vector3.Angle(fingerDirection, targetDirection);
             if(handModel.IsTracked && angleTo <= OnAngle){
@@ -51,24 +53,21 @@ namespace Leap.Unity.DetectionUtilities {
       }
     }
   
-    private Vector3 selectedDirection(){
-      switch(PointingDirection){
-        case Directions.Backward:
-          return -Camera.main.transform.forward;
-        case Directions.Down:
-          return -Camera.main.transform.up;
-        case Directions.Forward:
-          return Camera.main.transform.forward;
-        case Directions.Left:
-          return -Camera.main.transform.right;
-        case Directions.Right:
-          return Camera.main.transform.right;
-        case Directions.Up:
-          return Camera.main.transform.up;
-        case Directions.CustomVector:
-          return CustomDirection;
+    private Vector3 selectedDirection(Vector3 tipPosition){
+      switch(PointingType){
+        case PointingType.RelativeToHorizon:
+          Quaternion cameraRot = Camera.main.transform.rotation;
+          float cameraYaw = cameraRot.eulerAngles.y;
+          Quaternion rotator = Quaternion.AngleAxis(cameraYaw, Vector3.up);
+          return rotator * PointingDirection;
+        case PointingType.RelativeToCamera:
+          return Camera.main.transform.TransformDirection(PointingDirection);
+        case PointingType.RelativeToWorld:
+          return PointingDirection;
+        case PointingType.AtTarget:
+          return TargetObject.position - tipPosition;
         default:
-          return Camera.main.transform.forward;
+          return PointingDirection;
       }
     }
   
@@ -88,6 +87,23 @@ namespace Leap.Unity.DetectionUtilities {
           return 1;
       }
     }
+
+  #if UNITY_EDITOR
+    void OnDrawGizmos () {
+      if (ShowGizmos && handModel != null) {
+        Color innerColor;
+        if (IsActive) {
+          innerColor = Color.green;
+        } else {
+          innerColor = Color.blue;
+        }
+        Finger finger = handModel.GetLeapHand().Fingers[selectedFingerOrdinal()];
+        DrawCone(finger.TipPosition.ToVector3(), finger.Direction.ToVector3(), OnAngle, finger.Length, innerColor);
+        DrawCone(finger.TipPosition.ToVector3(), finger.Direction.ToVector3(), OffAngle, finger.Length, Color.red);
+        Debug.DrawRay(finger.TipPosition.ToVector3(), selectedDirection(finger.TipPosition.ToVector3()), Color.grey);
+      }
+    }
+  #endif
   }
   
 }

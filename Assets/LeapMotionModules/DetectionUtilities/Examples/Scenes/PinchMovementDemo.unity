@@ -155,9 +155,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 390684572}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95ff52b4a0dd041479b65a44882d9e6f, type: 3}
+  m_Script: {fileID: 11500000, guid: e309ac4138f124f9f8ad312a14a8e9ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Period: 0.1
+  OnDetection:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  ShowGizmos: 1
+  IsActive: 0
+  OnActivate:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
   _handModel: {fileID: 1759863751}
   _activatePinchDist: 0.03
   _deactivatePinchDist: 0.05
@@ -264,9 +282,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 525701292}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95ff52b4a0dd041479b65a44882d9e6f, type: 3}
+  m_Script: {fileID: 11500000, guid: e309ac4138f124f9f8ad312a14a8e9ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Period: 0.1
+  OnDetection:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  ShowGizmos: 1
+  IsActive: 0
+  OnActivate:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
   _handModel: {fileID: 1781939140}
   _activatePinchDist: 0.03
   _deactivatePinchDist: 0.05
@@ -1320,15 +1356,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1714544383}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aebd27fca271bde429fc692c3045f2d8, type: 3}
+  m_Script: {fileID: 11500000, guid: 16a1f1e7fe03f4967aedc21b646b884a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _pinchDetectorA: {fileID: 390684574}
   _pinchDetectorB: {fileID: 525701294}
-  _oneHandedRotationMethod: 0
-  _twoHandedRotationMethod: 1
+  _oneHandedRotationMethod: 2
+  _twoHandedRotationMethod: 2
   _allowScale: 1
-  _toggleGuiState: 103
+  _toggleGuiState: 0
   _showGUI: 1
 --- !u!4 &1714544385
 Transform:
@@ -1339,7 +1375,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0.3826829, z: 0, w: 0.9238798}
   m_LocalPosition: {x: 0, y: -0.1, z: 0.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 44.999897, z: 0}
   m_Children:
   - {fileID: 1020142584}
   m_Father: {fileID: 0}

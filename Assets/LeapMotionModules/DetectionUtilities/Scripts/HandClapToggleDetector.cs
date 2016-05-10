@@ -42,8 +42,10 @@ namespace Leap.Unity.DetectionUtilities {
   
           #if UNITY_EDITOR
           //for debugging
-          Debug.DrawRay(thisHand.PalmPosition.ToVector3(), velocityDirection.ToVector3());
-          Debug.DrawRay(thatHand.PalmPosition.ToVector3(), otherhandDirection.ToVector3());
+          if (ShowGizmos) {
+            Debug.DrawRay(thisHand.PalmPosition.ToVector3(), velocityDirection.ToVector3());
+            Debug.DrawRay(thatHand.PalmPosition.ToVector3(), otherhandDirection.ToVector3());
+          }
           currentAngle = thisHand.PalmNormal.AngleTo(thatHand.PalmNormal) * Constants.RAD_TO_DEG;
           currentDistance = thisHand.PalmPosition.DistanceTo(thatHand.PalmPosition);
           currentVelocity = thisHand.PalmVelocity.MagnitudeSquared + thatHand.PalmVelocity.MagnitudeSquared;

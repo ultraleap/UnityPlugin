@@ -7,41 +7,52 @@ public class SpawnBalls : MonoBehaviour {
   public float delayInterval = .15f; // seconds
   public int BallLimit = 200;
 
+  private IEnumerator _redballCoroutine;
+  private IEnumerator _greenballCoroutine;
+
+  void Awake () {
+    _redballCoroutine = addRedBallsWithDelay();
+    _greenballCoroutine = addGreenBallsWithDelay();
+  }
+
   public void StartRedBalls(){
-    StopCoroutine(addRedBallsWithDelay());
-    StartCoroutine(addRedBallsWithDelay());
+    StopCoroutine(_redballCoroutine);
+    StartCoroutine(_redballCoroutine);
   }
 
   public void StopRedBalls(){
-    //StopAllCoroutines();
-     StopCoroutine(addRedBallsWithDelay());
+    StopCoroutine(_redballCoroutine);
   }
 
   IEnumerator addRedBallsWithDelay(){
     while (true) {
-      if (transform.childCount > BallLimit) removeBalls(BallLimit / 10);
-      GameObject go = GameObject.Instantiate(RedBallPrefab);
-      go.transform.parent = transform;
+      addBall(RedBallPrefab);
       yield return new WaitForSeconds(delayInterval);
     }
   }
 
   public void StartGreenBalls(){
-    StopCoroutine(addGreenBallsWithDelay()); 
-    StartCoroutine(addGreenBallsWithDelay());
+    StopCoroutine(_greenballCoroutine);
+    StartCoroutine(_greenballCoroutine);
   }
 
   public void StopGreenBalls(){
-    StopCoroutine(addGreenBallsWithDelay());
+    StopCoroutine(_greenballCoroutine);
   }
 
   IEnumerator addGreenBallsWithDelay(){
     while (true) {
-      if (transform.childCount > BallLimit) removeBalls(BallLimit / 10);
-      GameObject go = GameObject.Instantiate(GreenBallPrefab);
-      go.transform.parent = transform;
+      addBall(GreenBallPrefab);
       yield return new WaitForSeconds(delayInterval);
     }
+  }
+
+  private void addBall (GameObject prefab) {
+    if (transform.childCount > BallLimit) removeBalls(BallLimit / 10);
+    GameObject go = GameObject.Instantiate(prefab);
+    go.transform.parent = transform;
+    Rigidbody rb = go.GetComponent<Rigidbody>();
+    rb.AddForce(Random.value, Random.value, Random.value);
   }
 
   private void removeBalls (int count) {

@@ -127,63 +127,64 @@ namespace Leap.Unity.DetectionUtilities {
     #if UNITY_EDITOR
     GameObject go;
     void OnDrawGizmos(){
-      Debug.Log("Draw Gizmos");
-      if(go == null) go = new GameObject();
-      Color gridColor = Color.gray;
-      float tx, ty, tz, tw = 0, ts = 0;
-      float ax, ay, az, aw = 0, ah = 0;
-      int layers = 1;
-      int stacks = 1;
-      if(HandController != null){
-        go.transform.localPosition = HandController.transform.localPosition;
-        go.transform.localRotation = HandController.transform.localRotation;
-        go.transform.localScale = HandController.transform.localScale;
-        if(ZAligned){
-          layers = (int)zones.z;
-          stacks = (int)zones.y;
-          tx = TargetZone.x;
-          ty = TargetZone.y;
-          tz = TargetZone.z;
-          ax = ActiveZone.x;
-          ay = ActiveZone.y;
-          az = ActiveZone.z;
-        } else {
-          layers = (int)zones.y;
-          stacks = (int)zones.z;
-          go.transform.Rotate(Vector3.right, -90);
-          tx = TargetZone.x;
-          ty = zones.z - TargetZone.z + 1; //mirror across axis
-          tz = TargetZone.y;
-          ax = ActiveZone.x;
-          ay = zones.z - ActiveZone.z + 1; //mirror across axis
-          az = ActiveZone.y;
-        }
-        for(int l = 1; l <= layers; l++){
-          float width  = 2 * l * _range/layers * _vTan;
-          float height = 2 * l * _range/layers * _hTan;
-          for(int c = 1; c <= zones.x; c++){
-            for(int s = 1; s <= stacks; s++){
-              if(tx == c && ty == s && tz == l){ //is target zone
-                tw = width;
-                ts = height;
-              } else if (ax == c && ay == s && az == l){ // is active zone
-                aw = width;
-                ah = height;
-              } else {
-                drawZone(c, s, l, gridColor,width, height, stacks, layers);
+      if (ShowGizmos) {
+        if (go == null) go = new GameObject();
+        Color gridColor = Color.gray;
+        float tx, ty, tz, tw = 0, ts = 0;
+        float ax, ay, az, aw = 0, ah = 0;
+        int layers = 1;
+        int stacks = 1;
+        if (HandController != null) {
+          go.transform.localPosition = HandController.transform.localPosition;
+          go.transform.localRotation = HandController.transform.localRotation;
+          go.transform.localScale = HandController.transform.localScale;
+          if (ZAligned) {
+            layers = (int)zones.z;
+            stacks = (int)zones.y;
+            tx = TargetZone.x;
+            ty = TargetZone.y;
+            tz = TargetZone.z;
+            ax = ActiveZone.x;
+            ay = ActiveZone.y;
+            az = ActiveZone.z;
+          } else {
+            layers = (int)zones.y;
+            stacks = (int)zones.z;
+            go.transform.Rotate(Vector3.right, -90);
+            tx = TargetZone.x;
+            ty = zones.z - TargetZone.z + 1; //mirror across axis
+            tz = TargetZone.y;
+            ax = ActiveZone.x;
+            ay = zones.z - ActiveZone.z + 1; //mirror across axis
+            az = ActiveZone.y;
+          }
+          for (int l = 1; l <= layers; l++) {
+            float width = 2 * l * _range / layers * _vTan;
+            float height = 2 * l * _range / layers * _hTan;
+            for (int c = 1; c <= zones.x; c++) {
+              for (int s = 1; s <= stacks; s++) {
+                if (tx == c && ty == s && tz == l) { //is target zone
+                  tw = width;
+                  ts = height;
+                } else if (ax == c && ay == s && az == l) { // is active zone
+                  aw = width;
+                  ah = height;
+                } else {
+                  drawZone(c, s, l, gridColor, width, height, stacks, layers);
+                }
               }
             }
           }
+          //Draw Target Zone last
+          Color targetColor;
+          if (IsActive) {
+            targetColor = Color.green;
+          } else {
+            targetColor = Color.red;
+            drawZone(ax, ay, az, Color.blue, aw, ah, stacks, layers);
+          }
+          drawZone(tx, ty, tz, targetColor, tw, ts, stacks, layers);
         }
-        //Draw Target Zone last
-        Color targetColor;
-        if(IsActive){
-          targetColor = Color.green;
-        } else {
-          targetColor = Color.red;
-          drawZone(ax, ay, az, Color.blue, aw, ah, stacks, layers);
-        }
-        drawZone(tx, ty, tz, targetColor, tw, ts, stacks, layers);
       }
     }
 

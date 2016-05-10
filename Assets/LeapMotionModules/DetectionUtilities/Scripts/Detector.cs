@@ -6,6 +6,7 @@ namespace Leap.Unity.DetectionUtilities{
 public class Detector : MonoBehaviour {
     public float Period = .1f; //seconds
     public UnityEvent OnDetection;
+    public bool ShowGizmos = true;
 
     #if UNITY_EDITOR
     /* Visual debugging utilities */
@@ -62,9 +63,6 @@ public class Detector : MonoBehaviour {
       for(float q = step; q <= height; q += step){
         DrawCircle(origin + direction * q, direction, Mathf.Tan(angle * Constants.DEG_TO_RAD) * q, color, quality * 8, duration, depthTest);
       }
-      float hypo = height/Mathf.Cos(angle/2);
-      Vector3 edge = Vector3.Slerp(direction, -direction, Mathf.Cos(angle/2)) * hypo;
-      Debug.DrawLine(origin, edge);
     }
 
     #endif
@@ -72,4 +70,5 @@ public class Detector : MonoBehaviour {
   }
 
   public enum Directions { Up, Down, Right, Left, Forward, Backward, CustomVector }
+  public enum PointingType { RelativeToCamera, RelativeToHorizon, RelativeToWorld, AtTarget}
 }
