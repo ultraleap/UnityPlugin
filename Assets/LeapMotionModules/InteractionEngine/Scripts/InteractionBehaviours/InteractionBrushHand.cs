@@ -171,13 +171,10 @@ namespace Leap.Unity {
     }
 
     public override void FinishHand() {
-      if (_capsuleBodies == null)
+      if (_capsuleBodies == null) {
         return; // Frame counter never expired.
-
-      for (int i = _capsuleBodies.Length; i-- != 0;) {
-        _capsuleBodies[i].transform.parent = null;
-        GameObject.Destroy(_capsuleBodies[i].gameObject);
       }
+
       GameObject.Destroy(_handParent);
       _capsuleBodies = null;
       _capsuleBones = null;
