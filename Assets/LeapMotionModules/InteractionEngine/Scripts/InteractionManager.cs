@@ -196,6 +196,42 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Gets the layer that interaction objects should be on by default.
+    /// </summary>
+    public int InteractionLayer {
+      get {
+        return _interactionLayer;
+      }
+      set {
+        _interactionLayer = value;
+      }
+    }
+
+    /// <summary>
+    /// Gets the layer that interaction objects should be on when they become grasped.
+    /// </summary>
+    public int InteractionNoClipLayer {
+      get {
+        return _interactionNoClipLayer;
+      }
+      set {
+        _interactionNoClipLayer = value;
+      }
+    }
+
+    /// <summary>
+    /// Gets the layer that interaction brushes should be on.
+    /// </summary>
+    public int InteractionBrushLayer {
+      get {
+        return _brushHandLayer;
+      }
+      set {
+        _brushHandLayer = value;
+      }
+    }
+
     public void UpdateSceneInfo() {
       var info = getSceneInfo();
       InteractionC.UpdateSceneInfo(ref _scene, ref info);
@@ -310,9 +346,17 @@ namespace Leap.Unity.Interaction {
       if (_untrackedTimeout < 0) {
         _untrackedTimeout = 0;
       }
+
+      if (_autoGenerateLayers) {
+        autoGenerateLayers();
+      }
     }
 
-    protected virtual void Awake() { }
+    protected virtual void Awake() {
+      if (_autoGenerateLayers) {
+        autoGenerateLayers();
+      }
+    }
 
     protected virtual void OnEnable() {
       if (_leapProvider == null) {
@@ -409,6 +453,33 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL METHODS
+    protected void autoGenerateLayers() {
+      _brushHandLayer = -1;
+      _interactionNoClipLayer = -1;
+      for (int i = 8; i < 32; i++) {
+        string layerName = LayerMask.LayerToName(i);
+        if (string.IsNullOrEmpty(layerName)) {
+          if (_brushHandLayer == -1) {
+            _brushHandLayer = i;
+          } else {
+            _interactionNoClipLayer = i;
+            break;
+          }
+        }
+      }
+
+      if (_brushHandLayer == -1 || _interactionNoClipLayer == -1) {
+        if (Application.isPlaying) {
+          enabled = false;
+        }
+        Debug.LogError("InteractionManager Could not find enough free layers for auto-setup, manual setup required.");
+        _autoGenerateLayers = false;
+        return;
+      }
+    }
+
+    
+
     private IEnumerator simulationLoop() {
       //We use a coroutine so that our logic happens after all FixedUpdate calls
       WaitForFixedUpdate fixedUpdate = new WaitForFixedUpdate();

@@ -40,6 +40,8 @@ namespace Leap.Unity.Interaction {
       specifyCustomDrawer("_brushHandLayer", doSingleLayerGUI);
       specifyCustomDrawer("_interactionNoClipLayer", doSingleLayerGUI);
 
+      specifyCustomDecorator("_brushHandLayer", collisionLayerHelper);
+
       _interactionBehaviours = FindObjectsOfType<IInteractionBehaviour>();
       for (int i = 0; i < _interactionBehaviours.Length; i++) {
         if (_interactionBehaviours[i].Manager == null) {
@@ -47,6 +49,32 @@ namespace Leap.Unity.Interaction {
           break;
         }
       }
+    }
+
+    private void collisionLayerHelper(SerializedProperty prop) {
+      InteractionManager manager = target as InteractionManager;
+      if(manager.)
+    }
+
+    private void autoSetupCollisionLayers(InteractionManager manager) {
+      for (int i = 0; i < 32; i++) {
+        //Copy ignore settings from interaction layer to the noclip layer
+        bool shouldIgnore = Physics.GetIgnoreLayerCollision(manager.InteractionLayer, i);
+        Physics.IgnoreLayerCollision(_interactionNoClipLayer, i, shouldIgnore);
+
+        //Set brush layer to collide with nothing
+        Physics.IgnoreLayerCollision(_brushHandLayer, i, true);
+      }
+
+      //After copy and set we specify the interactions between the brush and interaction objects
+      Physics.IgnoreLayerCollision(_brushHandLayer, _interactionLayer, false);
+      Physics.IgnoreLayerCollision(_brushHandLayer, _interactionNoClipLayer, true);
+    }
+
+    private bool areCollisionLayersSetupProperly() {
+      bool isInteractionIgnored = Physics.GetIgnoreLayerCollision(_brushHandLayer, _interactionLayer);
+      bool isNoClipIgnored = Physics.GetIgnoreLayerCollision(_brushHandLayer, _interactionNoClipLayer);
+      return !isInteractionIgnored && isNoClipIgnored;
     }
 
     private void providerDectorator(SerializedProperty prop) {
