@@ -355,6 +355,7 @@ namespace Leap.Unity.Interaction {
     protected virtual void Awake() {
       if (_autoGenerateLayers) {
         autoGenerateLayers();
+        autoSetupCollisionLayers();
       }
     }
 
@@ -478,7 +479,20 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    
+    private void autoSetupCollisionLayers() {
+      for (int i = 0; i < 32; i++) {
+        //Copy ignore settings from interaction layer to the noclip layer
+        bool shouldIgnore = Physics.GetIgnoreLayerCollision(_interactionLayer, i);
+        Physics.IgnoreLayerCollision(_interactionNoClipLayer, i, shouldIgnore);
+
+        //Set brush layer to collide with nothing
+        Physics.IgnoreLayerCollision(_brushHandLayer, i, true);
+      }
+
+      //After copy and set we specify the interactions between the brush and interaction objects
+      Physics.IgnoreLayerCollision(_brushHandLayer, _interactionLayer, false);
+      Physics.IgnoreLayerCollision(_brushHandLayer, _interactionNoClipLayer, true);
+    }
 
     private IEnumerator simulationLoop() {
       //We use a coroutine so that our logic happens after all FixedUpdate calls

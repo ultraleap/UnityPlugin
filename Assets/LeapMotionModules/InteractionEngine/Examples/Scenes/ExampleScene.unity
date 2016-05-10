@@ -1447,11 +1447,11 @@ MonoBehaviour:
   _interactionLayer: 0
   _brushHandLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 11
   _interactionNoClipLayer:
     serializedVersion: 2
-    m_Bits: 0
-  _untrackedTimeout: 0.5
+    m_Bits: 12
+  _untrackedTimeout: 0
   _enableContact: 1
   _enableGrasping: 1
   _depthUntilSphericalInside: 0.023

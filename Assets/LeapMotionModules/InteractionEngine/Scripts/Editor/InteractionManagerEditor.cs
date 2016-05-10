@@ -40,7 +40,7 @@ namespace Leap.Unity.Interaction {
       specifyCustomDrawer("_brushHandLayer", doSingleLayerGUI);
       specifyCustomDrawer("_interactionNoClipLayer", doSingleLayerGUI);
 
-      specifyCustomDecorator("_brushHandLayer", collisionLayerHelper);
+      specifyCustomDecorator("_interactionLayer", collisionLayerHelper);
 
       _interactionBehaviours = FindObjectsOfType<IInteractionBehaviour>();
       for (int i = 0; i < _interactionBehaviours.Length; i++) {
@@ -53,28 +53,46 @@ namespace Leap.Unity.Interaction {
 
     private void collisionLayerHelper(SerializedProperty prop) {
       InteractionManager manager = target as InteractionManager;
-      if(manager.)
-    }
 
-    private void autoSetupCollisionLayers(InteractionManager manager) {
-      for (int i = 0; i < 32; i++) {
-        //Copy ignore settings from interaction layer to the noclip layer
-        bool shouldIgnore = Physics.GetIgnoreLayerCollision(manager.InteractionLayer, i);
-        Physics.IgnoreLayerCollision(_interactionNoClipLayer, i, shouldIgnore);
-
-        //Set brush layer to collide with nothing
-        Physics.IgnoreLayerCollision(_brushHandLayer, i, true);
+      bool hasError = false;
+      if (manager.InteractionBrushLayer == manager.InteractionLayer) {
+        EditorGUILayout.HelpBox("Brush Layer cannot be the same as Interaction Layer", MessageType.Error);
+        hasError = true;
       }
 
-      //After copy and set we specify the interactions between the brush and interaction objects
-      Physics.IgnoreLayerCollision(_brushHandLayer, _interactionLayer, false);
-      Physics.IgnoreLayerCollision(_brushHandLayer, _interactionNoClipLayer, true);
-    }
+      if (manager.InteractionBrushLayer == manager.InteractionNoClipLayer) {
+        EditorGUILayout.HelpBox("Brush Layer cannot be the same as No-Clip Layer", MessageType.Error);
+        hasError = true;
+      }
 
-    private bool areCollisionLayersSetupProperly() {
-      bool isInteractionIgnored = Physics.GetIgnoreLayerCollision(_brushHandLayer, _interactionLayer);
-      bool isNoClipIgnored = Physics.GetIgnoreLayerCollision(_brushHandLayer, _interactionNoClipLayer);
-      return !isInteractionIgnored && isNoClipIgnored;
+      if (manager.InteractionLayer == manager.InteractionNoClipLayer) {
+        EditorGUILayout.HelpBox("Interaction Layer cannot be the same as No-Clip Layer", MessageType.Error);
+        hasError = true;
+      }
+
+      if (hasError) {
+        return;
+      }
+
+      if (!serializedObject.FindProperty("_autoGenerateLayers").boolValue) {
+        if (Physics.GetIgnoreLayerCollision(manager.InteractionBrushLayer, manager.InteractionLayer)) {
+          using (new GUILayout.HorizontalScope()) {
+            EditorGUILayout.HelpBox("Brush Layer should collide with Interaction Layer", MessageType.Warning);
+            if (GUILayout.Button("Auto-fix")) {
+              Physics.IgnoreLayerCollision(manager.InteractionBrushLayer, manager.InteractionLayer, false);
+            }
+          }
+        }
+
+        if (!Physics.GetIgnoreLayerCollision(manager.InteractionBrushLayer, manager.InteractionNoClipLayer)) {
+          using (new GUILayout.HorizontalScope()) {
+            EditorGUILayout.HelpBox("Brush Layer should not collide with No-Clip Layer", MessageType.Warning);
+            if (GUILayout.Button("Auto-fix")) {
+              Physics.IgnoreLayerCollision(manager.InteractionBrushLayer, manager.InteractionNoClipLayer, true);
+            }
+          }
+        }
+      }
     }
 
     private void providerDectorator(SerializedProperty prop) {
@@ -97,8 +115,8 @@ namespace Leap.Unity.Interaction {
     private void doSingleLayerGUI(SerializedProperty property) {
       int index = _layerValues.IndexOf(property.intValue);
       if (index < 0) {
-        property.intValue = 0;
-        index = 0;
+        property.intValue = EditorGUILayout.IntField(property.displayName, property.intValue);
+        return;
       }
 
       index = EditorGUILayout.Popup(property.displayName, index, _layerNames);
