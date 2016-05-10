@@ -46,15 +46,16 @@ namespace Leap.Unity {
       base.BeginHand();
 
 #if UNITY_EDITOR
-      if (!EditorApplication.isPlaying)
+      if (!EditorApplication.isPlaying) {
         return;
+      }
 
       // We also require a material for friction to be able to work.
       if (_material == null || _material.bounciness != 0.0f || _material.bounceCombine != PhysicMaterialCombine.Minimum) {
-        UnityEditor.EditorUtility.DisplayDialog("Collision Error!",
-                                                "An InteractionBrushHand must have a material with 0 bounciness "
-                                                + "and a bounceCombine of Minimum.  Name:" + gameObject.name,
-                                                "Ok");
+        EditorUtility.DisplayDialog("Collision Error!",
+                                    "An InteractionBrushHand must have a material with 0 bounciness "
+                                    + "and a bounceCombine of Minimum.  Name:" + gameObject.name,
+                                    "Ok");
         Debug.Break();
       }
 #endif
@@ -77,8 +78,8 @@ namespace Leap.Unity {
           capsuleGameObject.AddComponent<InteractionBrushBone>();
 #endif
 
-          Transform capsuleTransform = capsuleGameObject.GetComponent<Transform>();
-          capsuleTransform.parent = _handParent.transform;
+          Transform capsuleTransform = capsuleGameObject.transform;
+          capsuleTransform.SetParent(_handParent.transform, false);
           capsuleTransform.localScale = new Vector3(1f / transform.lossyScale.x, 1f / transform.lossyScale.y, 1f / transform.lossyScale.z);
 
           CapsuleCollider capsule = capsuleGameObject.GetComponent<CapsuleCollider>();
@@ -131,17 +132,12 @@ namespace Leap.Unity {
 
           Vector3 delta = bone.Center.ToVector3() - body.position;
           body.velocity = delta / Time.fixedDeltaTime;
-          body.rotation = bone.Rotation.ToQuaternion();
+          body.MoveRotation(bone.Rotation.ToQuaternion());
         }
       }
     }
 
     public override void FinishHand() {
-      for (int i = _capsuleBodies.Length; i-- != 0;) {
-        _capsuleBodies[i].transform.parent = null;
-        GameObject.Destroy(_capsuleBodies[i].gameObject);
-      }
-
       GameObject.Destroy(_handParent);
       _capsuleBodies = null;
       _lastPositions = null;
