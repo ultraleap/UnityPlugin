@@ -20,7 +20,5 @@ namespace Leap.Unity.Interaction {
                                 "_maxVelocity",
                                 "_followStrength");
     }
-
-
   }
 }
