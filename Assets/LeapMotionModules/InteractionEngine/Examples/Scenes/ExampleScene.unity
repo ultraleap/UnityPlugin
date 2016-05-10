@@ -1066,7 +1066,7 @@ MonoBehaviour:
   _isHeadMounted: 1
   _overrideDeviceType: 0
   _overrideDeviceTypeWith: 1
-  _useInterpolation: 1
+  _useInterpolation: 0
   _interpolationDelay: 15
 --- !u!114 &972296617
 MonoBehaviour:
@@ -1284,7 +1284,6 @@ MonoBehaviour:
   _perBoneMass: 0.2
   _collisionDetection: 2
   _material: {fileID: 13400000, guid: 7cb9646d25ecc1a4f8d790618b63c821, type: 2}
-  _maxVelocity: 600
 --- !u!4 &1251467164
 Transform:
   m_ObjectHideFlags: 0
@@ -1444,9 +1443,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _leapProvider: {fileID: 972296616}
   _dataSubfolder: InteractionEngine
+  _autoGenerateLayers: 1
+  _interactionLayer: 0
+  _brushHandLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  _interactionNoClipLayer:
+    serializedVersion: 2
+    m_Bits: 0
   _untrackedTimeout: 0.5
   _enableContact: 1
   _enableGrasping: 1
+  _depthUntilSphericalInside: 0.023
   _enableSimulation: 1
   _showDebugLines: 0
   _showDebugOutput: 0
@@ -1516,7 +1524,6 @@ MonoBehaviour:
   _perBoneMass: 0.2
   _collisionDetection: 2
   _material: {fileID: 13400000, guid: 7cb9646d25ecc1a4f8d790618b63c821, type: 2}
-  _maxVelocity: 600
 --- !u!1001 &1552365339
 Prefab:
   m_ObjectHideFlags: 0

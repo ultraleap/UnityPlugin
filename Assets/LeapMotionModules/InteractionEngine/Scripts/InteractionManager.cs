@@ -40,6 +40,20 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected string _dataSubfolder = "InteractionEngine";
 
+    [Header("Layer Settings")]
+    [SerializeField]
+    protected bool _autoGenerateLayers = true;
+
+    [SerializeField]
+    protected int _interactionLayer = 0;
+
+    [SerializeField]
+    protected LayerMask _brushHandLayer = 0;
+
+    [SerializeField]
+    protected LayerMask _interactionNoClipLayer = 0;
+
+    [Header("Interaction Settings")]
     [Tooltip("The amount of time a Hand can remain untracked while also still grasping an object.")]
     [SerializeField]
     protected float _untrackedTimeout = 0.5f;
