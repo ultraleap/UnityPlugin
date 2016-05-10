@@ -71,6 +71,7 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL FIELDS
+    private static UInt32 _expectedVersion = 1;
     protected INTERACTION_SCENE _scene;
     private bool _hasSceneBeenCreated = false;
     private Coroutine _simulationCoroutine = null;
@@ -688,9 +689,8 @@ namespace Leap.Unity.Interaction {
         IInteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[result.handle];
 
         try {
-          if (result.resultFlags != ShapeInstanceResultFlags.None) {
-            interactionBehaviour.NotifyRecievedSimulationResults(result);
-          }
+          // ShapeInstanceResultFlags.None may be returned if requested when hands are not touching.
+          interactionBehaviour.NotifyRecievedSimulationResults(result);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
@@ -739,6 +739,17 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void createScene() {
+#if UNITY_EDITOR
+      UInt32 version = InteractionC.GetVersion();
+      if (InteractionC.GetVersion() != _expectedVersion) {
+        _scene.pScene = (IntPtr)0;
+        UnityEditor.EditorUtility.DisplayDialog("Version Error!",
+                                                "Leap Interaction dll version expected: " + _expectedVersion + " got version: " + version,
+                                                "Ok");
+        throw new Exception("Leap Interaction version wrong");
+      }
+#endif // UNITY_EDITOR
+
       INTERACTION_SCENE_INFO sceneInfo = getSceneInfo();
       string dataPath = Path.Combine(Application.streamingAssetsPath, _dataSubfolder);
       InteractionC.CreateScene(ref _scene, ref sceneInfo, dataPath);

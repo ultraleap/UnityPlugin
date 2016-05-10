@@ -1,16 +1,18 @@
-﻿using UnityEngine;
+﻿
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using LeapInternal;
+using UnityEngine;
+using UnityEngine.Assertions;
 using Leap.Unity.Interaction.CApi;
+using LeapInternal;
 
 namespace Leap.Unity.Interaction {
 
   /// <summary>
   /// InteractionBehaviour is the default implementation of IInteractionBehaviour.
   /// </summary>
-  /// 
+  ///
   /// <remarks>
   /// It has the following features:
   ///    - Extends from InteractionBehaviourBase to take advantage of it's bookkeeping and callbacks.
@@ -21,9 +23,9 @@ namespace Leap.Unity.Interaction {
   ///    - Utilizes the Kabsch algorithm to determine how the object should rest in the hand when grabbed.
   ///      This allows more fidelity than simple rigid atatchment to the hand, as well as more intuitive multi-hand
   ///      interaction.
-  /// 
+  ///
   /// This default implementation has the following requirements:
-  ///    - A Rigidbody is required 
+  ///    - A Rigidbody is required
   ///    - Kinematic movement must still be simulated via Rigidbody kinematic movement, as opposed to rigid movement of the Transform.
   ///    - This behaviour cannot be a child of another InteractionBehaviour.
   ///    - Any non-continuous movement must be noted using the NotifyTeleported() method.
@@ -92,6 +94,11 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _contactEnableDelay = 0.1f;
 
+    [Tooltip("Depth before brushes are disabled.")]
+    [SerializeField]
+    protected float _brushDisableDistance = 0.017f;
+
+
     protected Renderer[] _renderers;
     protected Rigidbody _rigidbody;
 
@@ -99,6 +106,7 @@ namespace Leap.Unity.Interaction {
     protected bool _useGravity;
     protected bool _recievedVelocityUpdate = false;
     protected bool _notifiedOfTeleport = false;
+    protected bool _ignoringBrushes = false;
 
     protected Vector3 _solvedPosition;
     protected Quaternion _solvedRotation;
@@ -266,7 +274,7 @@ namespace Leap.Unity.Interaction {
       base.OnPostSolve();
 
       if (_recievedVelocityUpdate) {
-        //If we recieved a velocity update, gravity must always be disabled because the 
+        //If we recieved a velocity update, gravity must always be disabled because the
         //velocity update accounts for gravity.
         if (_rigidbody.useGravity) {
           _rigidbody.useGravity = false;
@@ -339,6 +347,11 @@ namespace Leap.Unity.Interaction {
 
       updateInfo.updateFlags = UpdateInfoFlags.VelocityEnabled;
 
+      // Request notification of when hands are no longer touching (or influencing.)
+      if (_ignoringBrushes) {
+        updateInfo.updateFlags |= UpdateInfoFlags.ReportNoResult;
+      }
+
       if (_enableContact && !_isKinematic && !IsBeingGrasped) {
         updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration;
       }
@@ -366,10 +379,23 @@ namespace Leap.Unity.Interaction {
         _rigidbody.velocity = results.linearVelocity.ToVector3();
         _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
         _recievedVelocityUpdate = true;
-
+      }
 #if UNITY_EDITOR
-        _showDebugRecievedVelocity = true;
+      _showDebugRecievedVelocity = _recievedVelocityUpdate;
 #endif
+
+      if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
+        if (!_ignoringBrushes && results.maxHandDepth > _brushDisableDistance) {
+          _ignoringBrushes = true;
+
+          // HACK FIXME TODO BBQ.  This will be rewired.
+          gameObject.layer = 10; // InteractionExampleObjectNoClipBrush
+        }
+      } else if (_ignoringBrushes) {
+        _ignoringBrushes = false;
+
+        // HACK FIXME TODO BBQ.  This will be rewired.
+        gameObject.layer = 9; // InteractionExampleObjectCollidesBrush
       }
     }
 
@@ -603,10 +629,14 @@ namespace Leap.Unity.Interaction {
 #if UNITY_EDITOR
     private void OnCollisionEnter(Collision collision) {
       GameObject otherObj = collision.collider.gameObject;
-      if (otherObj.GetComponentInParent<IHandModel>() != null) {
-        UnityEditor.EditorUtility.DisplayDialog("Collision Detected!",
-                                                "A collision between an InteractionBehaviour and a Hand was detected!  " +
-                                                "For interaction to work properly please disable collision between interaction.",
+      if (otherObj.GetComponentInParent<IHandModel>() != null
+        && otherObj.GetComponentInParent<InteractionBrushHand>() == null) {
+        string thisLabel = gameObject.name + " <layer " + LayerMask.LayerToName(gameObject.layer) + ">";
+        string otherLabel = otherObj.name + " <layer " + LayerMask.LayerToName(otherObj.layer) + ">";
+
+        UnityEditor.EditorUtility.DisplayDialog("Collision Error!",
+                                                "For interaction to work properly please prevent collision between IHandModel "
+                                                + "and InteractionBehavior. " + thisLabel + ", " + otherLabel,
                                                 "Ok");
         Debug.Break();
       }
@@ -621,6 +651,8 @@ namespace Leap.Unity.Interaction {
 
         if (_rigidbody.IsSleeping()) {
           Gizmos.color = Color.gray;
+        } else if (_ignoringBrushes) {
+          Gizmos.color = Color.red;
         } else if (IsBeingGrasped) {
           Gizmos.color = Color.green;
         } else if (_showDebugRecievedVelocity) {

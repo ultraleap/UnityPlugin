@@ -49,7 +49,8 @@ namespace Leap.Unity.Interaction.CApi {
     None = 0x00,
     ApplyAcceleration = 0x01,
     VelocityEnabled = 0x02,
-    GravityEnabled = 0x04
+    GravityEnabled = 0x04,
+    ReportNoResult = 0x08
   };
 
   public enum HandResultFlags : uint {
@@ -65,6 +66,7 @@ namespace Leap.Unity.Interaction.CApi {
   public enum ShapeInstanceResultFlags : uint {
     None = 0x00,
     Velocities = 0x01,
+    MaxHand = 0x02
   }
 
   public enum DebugFlags : uint {
@@ -201,6 +203,8 @@ namespace Leap.Unity.Interaction.CApi {
     public ShapeInstanceResultFlags resultFlags;
     public LEAP_VECTOR linearVelocity;
     public LEAP_VECTOR angularVelocity;
+    public float maxHandDepth;
+    public LEAP_VECTOR maxHandVelocity;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -222,6 +226,12 @@ namespace Leap.Unity.Interaction.CApi {
 
   public class InteractionC {
     public const string DLL_NAME = "LeapInteractionEngine";
+
+    /*** Get DLL Version ***/
+    [DllImport(DLL_NAME, EntryPoint = "LeapIEGetVersion")]
+    private static extern UInt32 LeapIEGetVersion();
+
+    public static UInt32 GetVersion() { return LeapIEGetVersion(); }
 
     /*** Create Scene ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIECreateScene", CallingConvention = CallingConvention.Cdecl)]
