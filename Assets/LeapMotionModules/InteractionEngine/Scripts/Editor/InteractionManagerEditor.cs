@@ -33,6 +33,7 @@ namespace Leap.Unity.Interaction {
 
       SerializedProperty autoGenerateLayerProperty = serializedObject.FindProperty("_autoGenerateLayers");
       specifyConditionalDrawing(() => !autoGenerateLayerProperty.boolValue,
+                                "_interactionLayer",
                                 "_brushHandLayer",
                                 "_interactionNoClipLayer");
 

@@ -48,10 +48,10 @@ namespace Leap.Unity.Interaction {
     protected int _interactionLayer = 0;
 
     [SerializeField]
-    protected LayerMask _brushHandLayer = 0;
+    protected int _brushHandLayer = 0;
 
     [SerializeField]
-    protected LayerMask _interactionNoClipLayer = 0;
+    protected int _interactionNoClipLayer = 0;
 
     [Header("Interaction Settings")]
     [Tooltip("The amount of time a Hand can remain untracked while also still grasping an object.")]
@@ -455,12 +455,15 @@ namespace Leap.Unity.Interaction {
 
     #region INTERNAL METHODS
     protected void autoGenerateLayers() {
+      _interactionLayer = -1;
       _brushHandLayer = -1;
       _interactionNoClipLayer = -1;
       for (int i = 8; i < 32; i++) {
         string layerName = LayerMask.LayerToName(i);
         if (string.IsNullOrEmpty(layerName)) {
-          if (_brushHandLayer == -1) {
+          if (_interactionLayer == -1) {
+            _interactionLayer = i;
+          } else if (_brushHandLayer == -1) {
             _brushHandLayer = i;
           } else {
             _interactionNoClipLayer = i;
@@ -469,7 +472,7 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      if (_brushHandLayer == -1 || _interactionNoClipLayer == -1) {
+      if (_interactionLayer == -1 || _brushHandLayer == -1 || _interactionNoClipLayer == -1) {
         if (Application.isPlaying) {
           enabled = false;
         }
