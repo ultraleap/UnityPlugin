@@ -53,24 +53,19 @@ namespace Leap.Unity.Interaction {
 
     private void collisionLayerHelper(SerializedProperty prop) {
       InteractionManager manager = target as InteractionManager;
-
-      bool hasError = false;
+      
       if (manager.InteractionBrushLayer == manager.InteractionLayer) {
         EditorGUILayout.HelpBox("Brush Layer cannot be the same as Interaction Layer", MessageType.Error);
-        hasError = true;
+        return;
       }
 
       if (manager.InteractionBrushLayer == manager.InteractionNoClipLayer) {
         EditorGUILayout.HelpBox("Brush Layer cannot be the same as No-Clip Layer", MessageType.Error);
-        hasError = true;
+        return;
       }
 
       if (manager.InteractionLayer == manager.InteractionNoClipLayer) {
         EditorGUILayout.HelpBox("Interaction Layer cannot be the same as No-Clip Layer", MessageType.Error);
-        hasError = true;
-      }
-
-      if (hasError) {
         return;
       }
 

@@ -98,8 +98,8 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _brushDisableDistance = 0.017f;
 
-
     protected Renderer[] _renderers;
+    protected Transform[] _childrenArray;
     protected Rigidbody _rigidbody;
 
     protected bool _isKinematic;
@@ -249,6 +249,8 @@ namespace Leap.Unity.Interaction {
       }
       _rigidbody.maxAngularVelocity = float.PositiveInfinity;
 
+      _childrenArray = GetComponentsInChildren<Transform>(true);
+
       //Technically we only need one instance in the entire scene, but easier for each object to have it's own instance for now.
       //TODO: Investigate allowing this to be a singleton?
       KabschC.Construct(ref _kabsch);
@@ -388,14 +390,18 @@ namespace Leap.Unity.Interaction {
         if (!_ignoringBrushes && results.maxHandDepth > _brushDisableDistance) {
           _ignoringBrushes = true;
 
-          // HACK FIXME TODO BBQ.  This will be rewired.
-          gameObject.layer = 10; // InteractionExampleObjectNoClipBrush
+          int layer = _manager.InteractionNoClipLayer;
+          for (int i = 0; i < _childrenArray.Length; i++) {
+            _childrenArray[i].gameObject.layer = layer;
+          }
         }
       } else if (_ignoringBrushes) {
         _ignoringBrushes = false;
 
-        // HACK FIXME TODO BBQ.  This will be rewired.
-        gameObject.layer = 9; // InteractionExampleObjectCollidesBrush
+        int layer = _manager.InteractionLayer;
+        for (int i = 0; i < _childrenArray.Length; i++) {
+          _childrenArray[i].gameObject.layer = layer;
+        }
       }
     }
 
