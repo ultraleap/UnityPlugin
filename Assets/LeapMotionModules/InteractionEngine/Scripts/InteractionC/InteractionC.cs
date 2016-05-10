@@ -36,7 +36,8 @@ namespace Leap.Unity.Interaction.CApi {
     None                  = 0x00,
     HasGravity            = 0x01,
     ContactEnabled        = 0x02,
-    GraspEnabled          = 0x04
+    GraspEnabled          = 0x04,
+    SphericalInside       = 0x08
   };
 
   public enum ShapeInfoFlags : uint {
@@ -57,9 +58,9 @@ namespace Leap.Unity.Interaction.CApi {
   }
 
   public enum ManipulatorMode : uint {
-    Contact,
-    Grasp,
-    NoInteraction,
+    Contact = 0x00,
+    Grasp = 0x01,
+    NoInteraction = 0x02,
   }
 
   public enum ShapeInstanceResultFlags : uint {
@@ -170,13 +171,13 @@ namespace Leap.Unity.Interaction.CApi {
   public struct INTERACTION_SCENE_INFO {
     public SceneInfoFlags sceneFlags;
     public LEAP_VECTOR gravity;
+    public float depthUntilSphericalInside;
   }
 
   // All properties require eLeapIEShapeFlags to enable
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
   public struct INTERACTION_CREATE_SHAPE_INFO {
     public ShapeInfoFlags shapeFlags;
-    public LEAP_VECTOR gravity;
   }
 
   // All properties require eLeapIEUpdateFlags to enable
@@ -242,7 +243,7 @@ namespace Leap.Unity.Interaction.CApi {
                                            ref INTERACTION_SCENE_INFO sceneInfo,
                                                string dataPath) {
       var rs = LeapIECreateScene(ref scene, ref sceneInfo, dataPath);
-      Logger.HandleReturnStatus(scene, "Create Scene", LogLevel.Info, rs);
+      Logger.HandleReturnStatus("Create Scene", LogLevel.Info, rs);
       return rs;
     }
 
@@ -270,16 +271,9 @@ namespace Leap.Unity.Interaction.CApi {
 
     /*** Get Last Error ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastError")]
-    private static extern ReturnStatus GetLastError(ref INTERACTION_SCENE scene);
+    public static extern ReturnStatus GetLastError(ref INTERACTION_SCENE scene);
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetLastErrorString")]
-    private static extern IntPtr GetLastErrorString();
-
-    public static ReturnStatus GetLastError(ref INTERACTION_SCENE scene,
-                                            out string message) {
-      ReturnStatus rs = GetLastError(ref scene);
-      message = Marshal.PtrToStringAnsi(GetLastErrorString());
-      return rs;
-    }
+    public static extern IntPtr GetLastErrorString();
 
     public static ReturnStatus GetLastError(ref INTERACTION_SCENE scene,
                                             out IntPtr messagePtr) {

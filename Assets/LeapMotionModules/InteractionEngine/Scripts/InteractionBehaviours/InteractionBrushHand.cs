@@ -8,11 +8,9 @@ using System;
 using UnityEditor;
 #endif
 
-namespace Leap.Unity
-{
+namespace Leap.Unity {
   /** Collision brushes */
-  public class InteractionBrushHand : IHandModel
-  {
+  public class InteractionBrushHand : IHandModel {
     private const int N_FINGERS = 5;
     private const int N_ACTIVE_BONES = 3;
     private const int FRAMES_DELAY = 3;
@@ -27,15 +25,13 @@ namespace Leap.Unity
 
     private bool _hasWarned = false;
 
-    public override ModelType HandModelType
-    {
+    public override ModelType HandModelType {
       get { return ModelType.Physics; }
     }
 
     [SerializeField]
     private Chirality handedness;
-    public override Chirality Handedness
-    {
+    public override Chirality Handedness {
       get { return handedness; }
     }
 
@@ -58,21 +54,20 @@ namespace Leap.Unity
     public override Hand GetLeapHand() { return _hand; }
     public override void SetLeapHand(Hand hand) { _hand = hand; }
 
-    public override void BeginHand()
-    {
+    public override void BeginHand() {
       base.BeginHand();
 
 #if UNITY_EDITOR
-      if (!EditorApplication.isPlaying)
+      if (!EditorApplication.isPlaying) {
         return;
+      }
 
       // We also require a material for friction to be able to work.
-      if (_material == null || _material.bounciness != 0.0f || _material.bounceCombine != PhysicMaterialCombine.Minimum)
-      {
-        UnityEditor.EditorUtility.DisplayDialog("Collision Error!",
-                                                "An InteractionBrushHand must have a material with 0 bounciness "
-                                                + "and a bounceCombine of Minimum.  Name:" + gameObject.name,
-                                                "Ok");
+      if (_material == null || _material.bounciness != 0.0f || _material.bounceCombine != PhysicMaterialCombine.Minimum) {
+        EditorUtility.DisplayDialog("Collision Error!",
+                                    "An InteractionBrushHand must have a material with 0 bounciness "
+                                    + "and a bounceCombine of Minimum.  Name:" + gameObject.name,
+                                    "Ok");
         Debug.Break();
       }
 #endif
@@ -80,8 +75,7 @@ namespace Leap.Unity
     }
 
 
-    private void ConstructHand()
-    {
+    private void ConstructHand() {
       _handParent = new GameObject(gameObject.name);
       _handParent.transform.parent = null; // Prevent hand from moving when you turn your head.
 
@@ -89,23 +83,21 @@ namespace Leap.Unity
       _capsuleBones = new InteractionBrushBone[N_FINGERS * N_ACTIVE_BONES];
       _lastPositions = new Vector3[N_FINGERS * N_ACTIVE_BONES];
 
-      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++)
-      {
-        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++)
-        {
+      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
+        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
 
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
           GameObject capsuleGameObject = new GameObject(gameObject.name, typeof(Rigidbody), typeof(CapsuleCollider), typeof(InteractionBrushBone));
           capsuleGameObject.layer = gameObject.layer;
 
-          Transform capsuleTransform = capsuleGameObject.GetComponent<Transform>();
-          capsuleTransform.parent = _handParent.transform;
+          Transform capsuleTransform = capsuleGameObject.transform;
+          capsuleTransform.SetParent(_handParent.transform, false);
           capsuleTransform.localScale = new Vector3(1f / transform.lossyScale.x, 1f / transform.lossyScale.y, 1f / transform.lossyScale.z);
 
           CapsuleCollider capsule = capsuleGameObject.GetComponent<CapsuleCollider>();
           capsule.direction = 2;
-          capsule.radius = bone.Width*0.5f;
+          capsule.radius = bone.Width * 0.5f;
           capsule.height = bone.Length + bone.Width;
           capsule.material = _material;
 
@@ -124,8 +116,7 @@ namespace Leap.Unity
       }
     }
 
-    public override void UpdateHand()
-    {
+    public override void UpdateHand() {
 #if UNITY_EDITOR
       if (!EditorApplication.isPlaying)
         return;
@@ -138,10 +129,8 @@ namespace Leap.Unity
         ConstructHand();
       }
 
-      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++)
-      {
-        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++)
-        {
+      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
+        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
 
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
@@ -171,28 +160,24 @@ namespace Leap.Unity
             float contactingMass = brushBone.getAverageContactingMass();
             if (contactingMass == 0) {
               body.mass = _perBoneMass;
-            }
-            else {
+            } else {
               body.mass = _dynamicMassMultiplier * contactingMass;
             }
-          }
-          else {
+          } else {
             body.mass = _perBoneMass; // !_enableDynamicMass
           }
         }
       }
     }
 
-    public override void FinishHand()
-    {
+    public override void FinishHand() {
       if (_capsuleBodies == null)
         return; // Frame counter never expired.
 
-      for(int i=_capsuleBodies.Length; i-- != 0; ) {
+      for (int i = _capsuleBodies.Length; i-- != 0;) {
         _capsuleBodies[i].transform.parent = null;
         GameObject.Destroy(_capsuleBodies[i].gameObject);
       }
-
       GameObject.Destroy(_handParent);
       _capsuleBodies = null;
       _capsuleBones = null;

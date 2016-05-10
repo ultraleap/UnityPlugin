@@ -5,16 +5,13 @@ using Leap.Unity.Interaction;
 using UnityEditor;
 
 // This is a debug script for the editor.  Should not be instanced in game.
-namespace Leap.Unity
-{
-  public class InteractionBrushBone : MonoBehaviour
-  {
+namespace Leap.Unity {
+  public class InteractionBrushBone : MonoBehaviour {
     private int _collisionCounter = 0;
     private float _collisionMassTotal = 0.0f;
 
     // Should be called by hand every fixed update.
-    public float getAverageContactingMass()
-    {
+    public float getAverageContactingMass() {
       if (_collisionCounter == 0)
         return 0.0f;
 
@@ -24,37 +21,33 @@ namespace Leap.Unity
       return result;
     }
 
-    void OnCollisionStay(Collision collisionInfo)
-    {
+    void OnCollisionStay(Collision collisionInfo) {
       // Doing this every frame prevents issues when the mass of other objects changes.
 
       Rigidbody otherRigidbody = collisionInfo.collider.attachedRigidbody;
-      if(otherRigidbody) {
+      if (otherRigidbody) {
         ++_collisionCounter;
         _collisionMassTotal += otherRigidbody.mass;
       }
     }
 
 #if UNITY_EDITOR
-    private string ThisLabel()
-    {
+    private string ThisLabel() {
       return gameObject.name + " <layer " + LayerMask.LayerToName(gameObject.layer) + ">";
     }
 
-    private string ThatLabel(Collision collision)
-    {
+    private string ThatLabel(Collision collision) {
       GameObject otherObj = collision.collider.gameObject;
       return otherObj.name + " <layer " + LayerMask.LayerToName(otherObj.layer) + ">";
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
+    private void OnCollisionEnter(Collision collision) {
       GameObject otherObj = collision.collider.gameObject;
       if (otherObj.GetComponentInParent<InteractionBehaviourBase>() == null) {
-        UnityEditor.EditorUtility.DisplayDialog("Collision Error!",
-                                                "For interaction to work properly please prevent collision between an InteractionBrushHand "
-                                                + "and non-interaction objects. " + ThisLabel() + ", " + ThatLabel(collision),
-                                                "Ok");
+        EditorUtility.DisplayDialog("Collision Error!",
+                                    "For interaction to work properly please prevent collision between an InteractionBrushHand "
+                                    + "and non-interaction objects. " + ThisLabel() + ", " + ThatLabel(collision),
+                                    "Ok");
         Debug.Break();
       }
 

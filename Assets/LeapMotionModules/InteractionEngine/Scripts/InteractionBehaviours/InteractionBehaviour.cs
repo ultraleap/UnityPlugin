@@ -40,6 +40,15 @@ namespace Leap.Unity.Interaction {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 
+    public enum GraspMethod {
+      Velocity,
+      Kinematic
+    }
+
+    [Header("Grasp Settings")]
+    [SerializeField]
+    protected GraspMethod _graspMethod = GraspMethod.Velocity;
+
     [Tooltip("A transform that acts as the parent of all renderers for this object.  By seperating out the graphical " +
              "representation from the physical, interaction fidelity can be improved and latency reduced.")]
     [SerializeField]
@@ -49,6 +58,21 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _graphicalReturnTime = 0.25f;
 
+    [Tooltip("How far the object can get from the hand before it is released.")]
+    [SerializeField]
+    protected float _releaseDistance = 0.15f;
+
+    [Tooltip("How fast the object can move to try to get to the hand.")]
+    [SerializeField]
+    protected float _maxVelocity = 1;
+
+    [Tooltip("How strong the attraction is from the hand to the object when being held.  At strength 1 the object " +
+             "will try to move 100% of the way to the hand every frame.")]
+    [Range(0, 1)]
+    [SerializeField]
+    protected float _followStrength = 1.0f;
+
+    [Header("Contact Settings")]
     [Tooltip("Should a hand be able to impart pushing forces to this object.")]
     [SerializeField]
     protected bool _enableContact = true;
@@ -83,6 +107,9 @@ namespace Leap.Unity.Interaction {
     protected bool _recievedVelocityUpdate = false;
     protected bool _notifiedOfTeleport = false;
     protected bool _ignoringBrushes = false;
+
+    protected Vector3 _solvedPosition;
+    protected Quaternion _solvedRotation;
 
     protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
@@ -156,7 +183,7 @@ namespace Leap.Unity.Interaction {
 
         _graphicalAnchor = value;
 
-        updateRendererStatus();
+        updateState();
       }
     }
 
@@ -220,6 +247,7 @@ namespace Leap.Unity.Interaction {
         //Should only happen if the user has done some trickery since there is a RequireComponent attribute
         throw new InvalidOperationException("InteractionBehaviour must have a Rigidbody component attached to it.");
       }
+      _rigidbody.maxAngularVelocity = float.PositiveInfinity;
 
       //Technically we only need one instance in the entire scene, but easier for each object to have it's own instance for now.
       //TODO: Investigate allowing this to be a singleton?
@@ -229,7 +257,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnUnregistered() {
       base.OnUnregistered();
 
-      _rigidbody = null;
+      resetState();
 
       KabschC.Destruct(ref _kabsch);
     }
@@ -271,13 +299,11 @@ namespace Leap.Unity.Interaction {
       //Reset so we can accumulate for the next frame
       _accumulatedLinearAcceleration = Vector3.zero;
       _accumulatedAngularAcceleration = Vector3.zero;
-      _notifiedOfTeleport = false;
       _recievedVelocityUpdate = false;
     }
 
     public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
       createInfo = new INTERACTION_CREATE_SHAPE_INFO();
-      createInfo.gravity = Physics.gravity.ToCVector();
       createInfo.shapeFlags = ShapeInfoFlags.None;
 
       if (!_isKinematic) {
@@ -295,6 +321,9 @@ namespace Leap.Unity.Interaction {
       _isKinematic = _rigidbody.isKinematic;
       _useGravity = _rigidbody.useGravity;
 
+      _solvedPosition = _rigidbody.position;
+      _solvedRotation = _rigidbody.rotation;
+
 #if UNITY_EDITOR
       Collider[] colliders = GetComponentsInChildren<Collider>();
       if (colliders.Length > 0) {
@@ -310,18 +339,13 @@ namespace Leap.Unity.Interaction {
     protected override void OnInteractionShapeDestroyed() {
       base.OnInteractionShapeDestroyed();
 
-      //When the shape is destroyed, revert rigidbody status to user settings
-      _rigidbody.isKinematic = _isKinematic;
-      _rigidbody.useGravity = _useGravity;
+      resetState();
     }
 
     public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
       updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
 
-      updateInfo.updateFlags = UpdateInfoFlags.None;
-      if (!_notifiedOfTeleport) {
-        updateInfo.updateFlags |= UpdateInfoFlags.VelocityEnabled;
-      }
+      updateInfo.updateFlags = UpdateInfoFlags.VelocityEnabled;
 
       // Request notification of when hands are no longer touching (or influencing.)
       if (_ignoringBrushes) {
@@ -347,7 +371,11 @@ namespace Leap.Unity.Interaction {
     protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
       base.OnRecievedSimulationResults(results);
 
-      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 && _enableContact) {
+      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 &&
+          !IsBeingGrasped &&
+          _enableContact) {
+        //Use Sleep() to clear any forces that might have been applied by the user.
+        _rigidbody.Sleep();
         _rigidbody.velocity = results.linearVelocity.ToVector3();
         _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
         _recievedVelocityUpdate = true;
@@ -357,15 +385,13 @@ namespace Leap.Unity.Interaction {
 #endif
 
       if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
-        if (!_ignoringBrushes && results.maxHandDepth > _brushDisableDistance)
-        {
+        if (!_ignoringBrushes && results.maxHandDepth > _brushDisableDistance) {
           _ignoringBrushes = true;
 
           // HACK FIXME TODO BBQ.  This will be rewired.
           gameObject.layer = 10; // InteractionExampleObjectNoClipBrush
         }
-      }
-      else if(_ignoringBrushes) {
+      } else if (_ignoringBrushes) {
         _ignoringBrushes = false;
 
         // HACK FIXME TODO BBQ.  This will be rewired.
@@ -375,6 +401,8 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnHandGrasped(Hand hand) {
       base.OnHandGrasped(hand);
+
+      updateState();
 
       var newCollection = HandPointCollection.Create(_rigidbody);
       _handIdToPoints[hand.Id] = newCollection;
@@ -405,31 +433,80 @@ namespace Leap.Unity.Interaction {
       Quaternion newRotation;
       getSolvedTransform(hands, out newPosition, out newRotation);
 
+      _solvedPosition = newPosition;
+      _solvedRotation = newRotation;
+
       //Apply new transform to object
-      if (_notifiedOfTeleport) {
-        _rigidbody.position = newPosition;
-        _rigidbody.rotation = newRotation;
-      } else {
-        _rigidbody.MovePosition(newPosition);
-        _rigidbody.MoveRotation(newRotation);
+      switch (_graspMethod) {
+        case GraspMethod.Kinematic:
+          if (_notifiedOfTeleport) {
+            _rigidbody.position = newPosition;
+            _rigidbody.rotation = newRotation;
+          } else {
+            _rigidbody.MovePosition(newPosition);
+            _rigidbody.MoveRotation(newRotation);
+          }
+          break;
+        case GraspMethod.Velocity:
+          if (_notifiedOfTeleport) {
+            _rigidbody.position = newPosition;
+            _rigidbody.rotation = newRotation;
+          } else {
+            Vector3 deltaPos = newPosition - _rigidbody.position;
+            Quaternion deltaRot = newRotation * Quaternion.Inverse(_rigidbody.rotation);
+
+            Vector3 deltaAxis;
+            float deltaAngle;
+            deltaRot.ToAngleAxis(out deltaAngle, out deltaAxis);
+
+            Vector3 targetVelocity = deltaPos / Time.fixedDeltaTime;
+            Vector3 targetAngularVelocity = deltaAxis * deltaAngle * Mathf.Deg2Rad / Time.fixedDeltaTime;
+
+            if (targetVelocity.sqrMagnitude > float.Epsilon) {
+              float targetSpeed = targetVelocity.magnitude;
+              float actualSpeed = Mathf.Min(_maxVelocity, targetSpeed);
+              float targetPercent = actualSpeed / targetSpeed;
+
+              targetVelocity *= targetPercent;
+              targetAngularVelocity *= targetPercent;
+            }
+
+            _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, _followStrength);
+            _rigidbody.angularVelocity = Vector3.Lerp(_rigidbody.angularVelocity, targetAngularVelocity, _followStrength);
+          }
+          break;
+        default:
+          throw new InvalidOperationException("Unexpected grasp method");
       }
+
+      _notifiedOfTeleport = false;
     }
 
     protected override void OnHandsHoldGraphics(List<Hand> hands) {
       base.OnHandsHoldGraphics(hands);
 
-      if (_graphicalAnchor != null) {
-        Vector3 newPosition;
-        Quaternion newRotation;
-        getSolvedTransform(hands, out newPosition, out newRotation);
+      switch (_graspMethod) {
+        case GraspMethod.Kinematic:
+          if (_graphicalAnchor != null) {
+            Vector3 newPosition;
+            Quaternion newRotation;
+            getSolvedTransform(hands, out newPosition, out newRotation);
 
-        _graphicalAnchor.position = newPosition;
-        _graphicalAnchor.rotation = newRotation;
+            _graphicalAnchor.position = newPosition;
+            _graphicalAnchor.rotation = newRotation;
+          }
+          break;
+        case GraspMethod.Velocity:
+          break;
+        default:
+          throw new InvalidOperationException("Unexpected grasp method");
       }
     }
 
     protected override void OnHandReleased(Hand hand) {
       base.OnHandReleased(hand);
+
+      updateState();
 
       removeHandPointCollection(hand.Id);
     }
@@ -437,13 +514,13 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandLostTracking(Hand oldHand) {
       base.OnHandLostTracking(oldHand);
 
-      updateRendererStatus();
+      updateState();
     }
 
     protected override void OnHandRegainedTracking(Hand newHand, int oldId) {
       base.OnHandRegainedTracking(newHand, oldId);
 
-      updateRendererStatus();
+      updateState();
 
       //Associate the collection with the new id
       var collection = _handIdToPoints[oldId];
@@ -456,33 +533,40 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandTimeout(Hand oldHand) {
       base.OnHandTimeout(oldHand);
 
-      updateRendererStatus();
+      updateState();
+
       removeHandPointCollection(oldHand.Id);
     }
 
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
 
+      updateState();
+
       //Stop an existing lerp coroutine if it exists to prevent conflict
       if (_graphicalLerpCoroutine != null) {
         StopCoroutine(_graphicalLerpCoroutine);
       }
-
-      //A grasp always causes the object to become kinematic
-      _rigidbody.isKinematic = true;
     }
 
     protected override void OnGraspEnd() {
       base.OnGraspEnd();
 
-      //If there is a graphical anchor, we are going to lerp it back to match the
-      //position and rotation of the rigidbody, since it might have diverged.
-      if (_graphicalAnchor != null) {
-        _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
-      }
+      updateState();
 
-      //Revert the kinematic status of the Rigidbody to the user setting once the grasp is finished.
-      _rigidbody.isKinematic = _isKinematic;
+      switch (_graspMethod) {
+        case GraspMethod.Kinematic:
+          //If there is a graphical anchor, we are going to lerp it back to match the 
+          //position and rotation of the rigidbody, since it might have diverged.
+          if (_graphicalAnchor != null) {
+            _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
+          }
+          break;
+        case GraspMethod.Velocity:
+          break;
+        default:
+          throw new InvalidCastException("Unexpected grasp method");
+      }
 
       if (_advancedThrowing) {
         float speed = _rigidbody.velocity.magnitude;
@@ -545,9 +629,8 @@ namespace Leap.Unity.Interaction {
 #if UNITY_EDITOR
     private void OnCollisionEnter(Collision collision) {
       GameObject otherObj = collision.collider.gameObject;
-      if ( otherObj.GetComponentInParent<IHandModel>() != null
-        && otherObj.GetComponentInParent<InteractionBrushHand>() == null)
-      {
+      if (otherObj.GetComponentInParent<IHandModel>() != null
+        && otherObj.GetComponentInParent<InteractionBrushHand>() == null) {
         string thisLabel = gameObject.name + " <layer " + LayerMask.LayerToName(gameObject.layer) + ">";
         string otherLabel = otherObj.name + " <layer " + LayerMask.LayerToName(otherObj.layer) + ">";
 
@@ -586,15 +669,34 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL
+
     protected INTERACTION_TRANSFORM getRigidbodyTransform() {
       INTERACTION_TRANSFORM interactionTransform = new INTERACTION_TRANSFORM();
-      interactionTransform.position = _rigidbody.position.ToCVector();
-      interactionTransform.rotation = _rigidbody.rotation.ToCQuaternion();
+
+      if (IsBeingGrasped) {
+        interactionTransform.position = _solvedPosition.ToCVector();
+        interactionTransform.rotation = _solvedRotation.ToCQuaternion();
+      } else {
+        interactionTransform.position = _rigidbody.position.ToCVector();
+        interactionTransform.rotation = _rigidbody.rotation.ToCQuaternion();
+      }
+
       interactionTransform.wallTime = Time.fixedTime;
       return interactionTransform;
     }
 
-    protected virtual void updateRendererStatus() {
+    protected void resetState() {
+      _rigidbody.useGravity = _useGravity;
+      _rigidbody.isKinematic = _isKinematic;
+
+      if (_graphicalAnchor != null) {
+        _graphicalAnchor.localPosition = Vector3.zero;
+        _graphicalAnchor.localRotation = Quaternion.identity;
+        _graphicalAnchor.gameObject.SetActive(true);
+      }
+    }
+
+    protected virtual void updateState() {
       //Renderers are visible if there are no grasping hands
       //or if there is at least one tracked grasping hand
       int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;
@@ -602,6 +704,26 @@ namespace Leap.Unity.Interaction {
 
       if (_graphicalAnchor != null) {
         _graphicalAnchor.gameObject.SetActive(shouldBeVisible);
+      }
+
+      //Update kinematic status of body
+      if (IsBeingGrasped) {
+        switch (_graspMethod) {
+          case GraspMethod.Kinematic:
+            _rigidbody.isKinematic = true;
+            break;
+          case GraspMethod.Velocity:
+            if (UntrackedHandCount > 0) {
+              _rigidbody.isKinematic = true;
+            } else {
+              _rigidbody.isKinematic = false;
+            }
+            break;
+          default:
+            throw new InvalidOperationException("Unexpected grasp method");
+        }
+      } else {
+        _rigidbody.isKinematic = _isKinematic;
       }
     }
 
