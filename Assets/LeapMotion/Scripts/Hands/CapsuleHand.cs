@@ -33,7 +33,7 @@ namespace Leap.Unity {
     private Mesh _sphereMesh;
 
     [SerializeField]
-    private int _cylinderResolution = 16;
+    private int _cylinderResolution = 12;
 
     private bool _hasGeneratedMeshes = false;
     private Material jointMat;
