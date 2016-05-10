@@ -5,15 +5,16 @@ using Leap;
 using Leap.Unity;
 namespace Leap.Unity.DetectionUtilities{
 
-  //A zone detector that surounds the leap Motion Detector in concentric rings
+  //Detects when the parent Gameobject is in proximity of one of a list of target objects.
   public class ProximityDetector : BinaryDetector {
     public ProximityEvent OnProximity;
     public GameObject[] TargetObjects;
-    public float OnDistance = .05f; //meters
-    public float OffDistance = .075f; //meters
+    public float OnDistance = .01f; //meters
+    public float OffDistance = .015f; //meters
 
     private IEnumerator proximityWatcherCoroutine;
-    private GameObject currentObj = null;
+    private GameObject _currentObj = null;
+    public GameObject CurrentObject { get { return _currentObj; } }
 
     void Awake(){
       proximityWatcherCoroutine = proximityWatcher();
@@ -30,24 +31,22 @@ namespace Leap.Unity.DetectionUtilities{
 
     IEnumerator proximityWatcher(){
       bool proximityState = false;
-      float onSquared, offSquared;
-      Vector3 closest;
-      Collider targetCollider;
+      float onSquared, offSquared; //Use squared distamces to avoid taking square roots
       while(true){
         onSquared = OnDistance * OnDistance;
         offSquared = OffDistance * OffDistance;
-        if(currentObj != null){
-          if(distanceSquared(currentObj) > offSquared){
-            currentObj = null;
+        if(_currentObj != null){
+          if(distanceSquared(_currentObj) > offSquared){
+            _currentObj = null;
             proximityState = false;
           }
         } else {
           for(int obj = 0; obj < TargetObjects.Length; obj++){
             GameObject target = TargetObjects[obj];
             if(distanceSquared(target) < onSquared){
-              currentObj = target;
+              _currentObj = target;
               proximityState = true;
-              OnProximity.Invoke(currentObj);
+              OnProximity.Invoke(_currentObj);
               break; // pick first match
             }
           }
