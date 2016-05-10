@@ -1086,6 +1086,10 @@ Prefab:
       propertyPath: warpingAdjustment
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 11402294, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
+      propertyPath: _temporalWarping
+      value: 
+      objectReference: {fileID: 2044067706}
     m_RemovedComponents:
     - {fileID: 11408046, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
     - {fileID: 8146722, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
@@ -1131,3 +1135,9 @@ MonoBehaviour:
 Transform:
   m_PrefabParentObject: {fileID: 492502, guid: 18d6bf9063dcb1842be63f411fd9fc26, type: 2}
   m_PrefabInternal: {fileID: 2044067702}
+--- !u!114 &2044067706 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 11429104, guid: 18d6bf9063dcb1842be63f411fd9fc26,
+    type: 2}
+  m_PrefabInternal: {fileID: 2044067702}
+  m_Script: {fileID: 11500000, guid: e21f7214440054f59a5d2da168b3e2dd, type: 3}

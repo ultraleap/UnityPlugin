@@ -39,7 +39,7 @@ namespace Leap.Unity {
     [Tooltip("How much delay should be added to interpolation.  A non-zero amount is needed to prevent extrapolation artifacts.")]
     [SerializeField]
     protected long _interpolationDelay = 15;
-    
+
     protected Controller leap_controller_;
 
     protected SmoothedFloat _fixedOffset = new SmoothedFloat();
@@ -191,7 +191,7 @@ namespace Leap.Unity {
       //It will be recalculated if it is needed
       _transformedUpdateFrame = null;
     }
-    
+
     protected virtual void FixedUpdate() {
       if (_useInterpolation) {
         Int64 unityTime = (Int64)((Time.fixedTime + _fixedOffset.value) * 1e6);
@@ -270,7 +270,7 @@ namespace Leap.Unity {
       initializeFlags();
       leap_controller_.Device -= onHandControllerConnect;
     }
-    
+
     protected void updateIfTransformMoved(Frame source, ref Frame toUpdate) {
       if (transform.hasChanged) {
         _transformedFixedFrame = null;
@@ -279,16 +279,21 @@ namespace Leap.Unity {
       }
 
       if (toUpdate == null) {
-        Vector3 warpedPosition;
-        Quaternion warpedRotation;
-        _temporalWarping.TryGetWarpedTransform(LeapVRTemporalWarping.WarpedAnchor.CENTER, out warpedPosition, out warpedRotation, source.Timestamp);
+        LeapTransform leapTransform;
+        if (_temporalWarping != null) {
+          Vector3 warpedPosition;
+          Quaternion warpedRotation;
+          _temporalWarping.TryGetWarpedTransform(LeapVRTemporalWarping.WarpedAnchor.CENTER, out warpedPosition, out warpedRotation, source.Timestamp);
 
-        warpedRotation = warpedRotation * transform.localRotation;
+          warpedRotation = warpedRotation * transform.localRotation;
 
-        Vector scale = new Vector(transform.lossyScale.x * 1e-3f, transform.lossyScale.y * 1e-3f, transform.lossyScale.z * 1e-3f);
+          Vector scale = new Vector(transform.lossyScale.x * 1e-3f, transform.lossyScale.y * 1e-3f, transform.lossyScale.z * 1e-3f);
 
-        LeapTransform leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), scale);
-        leapTransform.MirrorZ();
+          leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), scale);
+          leapTransform.MirrorZ();
+        } else {
+          leapTransform = transform.GetLeapMatrix();
+        }
 
         toUpdate = source.TransformedCopy(leapTransform);
       }
