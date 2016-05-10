@@ -42,6 +42,8 @@ namespace Leap.Unity {
     
     protected Controller leap_controller_;
 
+    protected SmoothedFloat _fixedOffset = new SmoothedFloat();
+
     protected Frame _untransformedUpdateFrame;
     protected Frame _transformedUpdateFrame;
     protected Image _currentImage;
@@ -146,6 +148,7 @@ namespace Leap.Unity {
 
     protected virtual void Awake() {
       clockCorrelator = new ClockCorrelator();
+      _fixedOffset.delay = 0.4f;
     }
 
     protected virtual void Start() {
@@ -173,6 +176,8 @@ namespace Leap.Unity {
       }
 #endif
 
+      _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
+
       if (_useInterpolation) {
         Int64 unityTime = (Int64)(Time.time * 1e6);
         Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
@@ -189,7 +194,7 @@ namespace Leap.Unity {
     
     protected virtual void FixedUpdate() {
       if (_useInterpolation) {
-        Int64 unityTime = (Int64)(Time.fixedTime * 1e6);
+        Int64 unityTime = (Int64)((Time.fixedTime + _fixedOffset.value) * 1e6);
         Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
         Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
 
