@@ -18,6 +18,10 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _enableContact = true;
 
+    [Tooltip("Depth before brushes are disabled.")]
+    [SerializeField]
+    protected float _brushDisableDistance = 0.017f;
+
     [Tooltip("A curve used to calculate a multiplier of the throwing velocity.  Maps original velocity to multiplier.")]
     [SerializeField]
     protected AnimationCurve _throwingVelocityCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
@@ -45,8 +49,6 @@ namespace Leap.Unity.Interaction {
     [Range(0, 1)]
     [SerializeField]
     protected float _followStrength = 0.6f;
-
-
 
     public bool EnableContact {
       get {
@@ -81,6 +83,12 @@ namespace Leap.Unity.Interaction {
     public float FollowStrength {
       get {
         return _followStrength;
+      }
+    }
+
+    public float BrushDisableDistance {
+      get {
+        return _brushDisableDistance;
       }
     }
 

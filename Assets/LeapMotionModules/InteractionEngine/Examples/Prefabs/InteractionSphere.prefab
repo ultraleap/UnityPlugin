@@ -28,7 +28,7 @@ GameObject:
   - 135: {fileID: 13536856}
   - 54: {fileID: 5429032}
   - 114: {fileID: 11455500}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: InteractionSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -146,10 +146,10 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 134782}
-  m_LocalRotation: {x: -0.05626984, y: -0.7019055, z: -0.5419113, w: 0.45879686}
-  m_LocalPosition: {x: 0.074, y: -0.182, z: 0.517}
-  m_LocalScale: {x: 0.08451322, y: 0.08451322, z: 0.08451322}
-  m_LocalEulerAnglesHint: {x: -54.3285, y: -89.1821, z: -45.8289}
+  m_LocalRotation: {x: -0.4607647, y: 0.08120725, z: 0.07328804, w: 0.8807555}
+  m_LocalPosition: {x: -0.162, y: -0.15886116, z: 0.503}
+  m_LocalScale: {x: 0.12456127, y: 0.12456126, z: 0.12456126}
+  m_LocalEulerAnglesHint: {x: -55.4413, y: 7.6496997, z: 5.4893}
   m_Children:
   - {fileID: 492210}
   m_Father: {fileID: 0}
@@ -330,7 +330,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &11455500
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -343,15 +343,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
-  _material: {fileID: 11400000, guid: a1a145592530d754f93841b3e0a6b0a1, type: 2}
   _graphicalAnchor: {fileID: 492210}
+  _material: {fileID: 11400000, guid: a1a145592530d754f93841b3e0a6b0a1, type: 2}
 --- !u!135 &13536856
 SphereCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 134782}
-  m_Material: {fileID: 13400000, guid: 90525c5b573a282479c894c2354cde4a, type: 2}
+  m_Material: {fileID: 13400000, guid: 37b1f9135ed80e5438922256002328c6, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
