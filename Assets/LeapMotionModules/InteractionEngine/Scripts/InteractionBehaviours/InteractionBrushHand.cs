@@ -8,11 +8,9 @@ using System;
 using UnityEditor;
 #endif
 
-namespace Leap.Unity
-{
+namespace Leap.Unity {
   /** Collision brushes */
-  public class InteractionBrushHand : IHandModel
-  {
+  public class InteractionBrushHand : IHandModel {
     private const int N_FINGERS = 5;
     private const int N_ACTIVE_BONES = 3;
 
@@ -22,15 +20,13 @@ namespace Leap.Unity
     private GameObject _handParent;
     private bool _hasWarned = false;
 
-    public override ModelType HandModelType
-    {
+    public override ModelType HandModelType {
       get { return ModelType.Physics; }
     }
 
     [SerializeField]
     private Chirality handedness;
-    public override Chirality Handedness
-    {
+    public override Chirality Handedness {
       get { return handedness; }
     }
 
@@ -46,8 +42,7 @@ namespace Leap.Unity
     public override Hand GetLeapHand() { return _hand; }
     public override void SetLeapHand(Hand hand) { _hand = hand; }
 
-    public override void BeginHand()
-    {
+    public override void BeginHand() {
       base.BeginHand();
 
 #if UNITY_EDITOR
@@ -55,8 +50,7 @@ namespace Leap.Unity
         return;
 
       // We also require a material for friction to be able to work.
-      if (_material == null || _material.bounciness != 0.0f || _material.bounceCombine != PhysicMaterialCombine.Minimum)
-      {
+      if (_material == null || _material.bounciness != 0.0f || _material.bounceCombine != PhysicMaterialCombine.Minimum) {
         UnityEditor.EditorUtility.DisplayDialog("Collision Error!",
                                                 "An InteractionBrushHand must have a material with 0 bounciness "
                                                 + "and a bounceCombine of Minimum.  Name:" + gameObject.name,
@@ -71,10 +65,8 @@ namespace Leap.Unity
       _capsuleBodies = new Rigidbody[N_FINGERS * N_ACTIVE_BONES];
       _lastPositions = new Vector3[N_FINGERS * N_ACTIVE_BONES];
 
-      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++)
-      {
-        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++)
-        {
+      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
+        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
 
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
@@ -91,7 +83,7 @@ namespace Leap.Unity
 
           CapsuleCollider capsule = capsuleGameObject.GetComponent<CapsuleCollider>();
           capsule.direction = 2;
-          capsule.radius = bone.Width*0.5f;
+          capsule.radius = bone.Width * 0.5f;
           capsule.height = bone.Length + bone.Width;
           capsule.material = _material;
 
@@ -110,17 +102,14 @@ namespace Leap.Unity
       }
     }
 
-    public override void UpdateHand()
-    {
+    public override void UpdateHand() {
 #if UNITY_EDITOR
       if (!EditorApplication.isPlaying)
         return;
 #endif
 
-      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++)
-      {
-        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++)
-        {
+      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
+        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
 
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
@@ -129,8 +118,7 @@ namespace Leap.Unity
 #if UNITY_EDITOR
           // During normal operation the brushes should not be pushed away from the tracked hand.
           // In unusual situations (e.g. swatting an object really quickly) this may fire.
-          if (!_hasWarned)
-          {
+          if (!_hasWarned) {
             // Compare against intended target, not new tracking position.
             Vector3 error = _lastPositions[boneArrayIndex] - body.position;
             if (error.magnitude > bone.Width) {
@@ -148,10 +136,8 @@ namespace Leap.Unity
       }
     }
 
-    public override void FinishHand()
-    {
-      for(int i=_capsuleBodies.Length; i-- != 0; )
-      {
+    public override void FinishHand() {
+      for (int i = _capsuleBodies.Length; i-- != 0;) {
         _capsuleBodies[i].transform.parent = null;
         GameObject.Destroy(_capsuleBodies[i].gameObject);
       }
