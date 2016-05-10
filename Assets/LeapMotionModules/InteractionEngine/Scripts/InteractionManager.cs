@@ -14,7 +14,7 @@ namespace Leap.Unity.Interaction {
   /// needed for operation.  This class also takes care of all bookkeeping to keep track of the objects,
   /// hands, and the internal state of the interaction plugin.
   /// </summary>
-  /// 
+  ///
   /// <remarks>
   /// InteractionManager has the following features:
   ///    - Allows instances of IInteractionBehaviour to register or unregister with it.
@@ -26,10 +26,10 @@ namespace Leap.Unity.Interaction {
   ///      a small amount of time.  This helps with actions such as throwing.
   ///    - Multiple instances of InteractionManager are ALLOWED!  This allows you to have different simulation
   ///      settings and control for different groups of objects.
-  /// 
+  ///
   /// InteractionManager has the following requirements:
   ///    - The DataSubfolder property must point to a valid subfolder in the StreamingAssets data folder.
-  ///      The subfolder must contain a valid ldat file names IE.  
+  ///      The subfolder must contain a valid ldat file names IE.
   /// </remarks>
   public class InteractionManager : MonoBehaviour {
     #region SERIALIZED FIELDS
@@ -52,6 +52,10 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _enableGrasping = true;
 
+    [Tooltip("Depth before collision response becomes as if holding a sphere.")]
+    [SerializeField]
+    protected float _depthUntilSphericalInside = 0.023f;
+
     [Header("Debug")]
     [Tooltip("Allows simulation to be disabled without destroying the scene in any way.")]
     [SerializeField]
@@ -67,6 +71,7 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL FIELDS
+    private static UInt32 _expectedVersion = 1;
     protected INTERACTION_SCENE _scene;
     private bool _hasSceneBeenCreated = false;
     private Coroutine _simulationCoroutine = null;
@@ -684,9 +689,8 @@ namespace Leap.Unity.Interaction {
         IInteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[result.handle];
 
         try {
-          if (result.resultFlags != ShapeInstanceResultFlags.None) {
-            interactionBehaviour.NotifyRecievedSimulationResults(result);
-          }
+          // ShapeInstanceResultFlags.None may be returned if requested when hands are not touching.
+          interactionBehaviour.NotifyRecievedSimulationResults(result);
         } catch (Exception e) {
           _misbehavingBehaviours.Add(interactionBehaviour);
           Debug.LogException(e);
@@ -735,6 +739,17 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void createScene() {
+#if UNITY_EDITOR
+      UInt32 version = InteractionC.GetVersion();
+      if (InteractionC.GetVersion() != _expectedVersion) {
+        _scene.pScene = (IntPtr)0;
+        UnityEditor.EditorUtility.DisplayDialog("Version Error!",
+                                                "Leap Interaction dll version expected: " + _expectedVersion + " got version: " + version,
+                                                "Ok");
+        throw new Exception("Leap Interaction version wrong");
+      }
+#endif // UNITY_EDITOR
+
       INTERACTION_SCENE_INFO sceneInfo = getSceneInfo();
       string dataPath = Path.Combine(Application.streamingAssetsPath, _dataSubfolder);
       InteractionC.CreateScene(ref _scene, ref sceneInfo, dataPath);
@@ -751,7 +766,8 @@ namespace Leap.Unity.Interaction {
       INTERACTION_SCENE_INFO info = new INTERACTION_SCENE_INFO();
       info.gravity = Physics.gravity.ToCVector();
 
-      info.sceneFlags = SceneInfoFlags.HasGravity;
+      info.sceneFlags = SceneInfoFlags.HasGravity | SceneInfoFlags.SphericalInside;
+      info.depthUntilSphericalInside = _depthUntilSphericalInside;
 
       if (_enableContact) {
         info.sceneFlags |= SceneInfoFlags.ContactEnabled;
