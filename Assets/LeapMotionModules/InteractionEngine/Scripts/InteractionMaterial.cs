@@ -95,7 +95,7 @@ namespace Leap.Unity.Interaction {
 #if UNITY_EDITOR
     private const string DEFAULT_ASSET_NAME = "InteractionMaterial.asset";
 
-    [MenuItem("Assets/Create/Interaction Material", priority = 90)]
+    [MenuItem("Assets/Create/Interaction Material", priority = 510)]
     private static void createNewBuildSetup() {
       string path = "Assets";
 
