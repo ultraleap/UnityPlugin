@@ -61,6 +61,16 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _graphicalReturnTime = 0.25f;
 
+    [Header("Layer Settings")]
+    [SerializeField]
+    protected bool _useCustomLayers = false;
+
+    [SerializeField]
+    protected SingleLayer _interactionLayer = 0;
+
+    [SerializeField]
+    protected SingleLayer _interactionNoClipLayer = 0;
+
     public bool EnableContact {
       get {
         return _enableContact;

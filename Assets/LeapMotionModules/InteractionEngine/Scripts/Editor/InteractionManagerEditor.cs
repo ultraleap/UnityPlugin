@@ -10,24 +10,10 @@ namespace Leap.Unity.Interaction {
 
     private IInteractionBehaviour[] _interactionBehaviours;
 
-    private string[] _layerNames;
-    private List<int> _layerValues;
-
     private bool _anyBehavioursUnregistered;
 
     protected override void OnEnable() {
       base.OnEnable();
-
-      Dictionary<int, string> valueToLayer = new Dictionary<int, string>();
-      for (int i = 0; i < 32; i++) {
-        string layerName = LayerMask.LayerToName(i);
-        if (!string.IsNullOrEmpty(layerName)) {
-          valueToLayer[i] = layerName;
-        }
-      }
-
-      _layerValues = valueToLayer.Keys.ToList();
-      _layerNames = valueToLayer.Values.ToArray();
 
       specifyCustomDecorator("_leapProvider", providerDectorator);
 
@@ -38,11 +24,6 @@ namespace Leap.Unity.Interaction {
                                 "_interactionLayer",
                                 "_brushHandLayer",
                                 "_interactionNoClipLayer");
-
-      specifyCustomDrawer("_teplateLayer", doSingleLayerGUI);
-      specifyCustomDrawer("_interactionLayer", doSingleLayerGUI);
-      specifyCustomDrawer("_brushHandLayer", doSingleLayerGUI);
-      specifyCustomDrawer("_interactionNoClipLayer", doSingleLayerGUI);
 
       specifyCustomDecorator("_interactionLayer", collisionLayerHelper);
 
@@ -109,25 +90,6 @@ namespace Leap.Unity.Interaction {
         }
         GUILayout.Space(EditorGUIUtility.singleLineHeight);
       }
-    }
-
-    private void doSingleLayerGUI(SerializedProperty property) {
-      int index = _layerValues.IndexOf(property.intValue);
-      if (index < 0) {
-        if (Application.isPlaying) {
-          //If application is playing we dont want to change the layers on the fly
-          //Instead, just display them as an int value
-          property.intValue = EditorGUILayout.IntField(property.displayName, property.intValue);
-          return;
-        } else {
-          //If the application is not running, reset the layer to the default layer
-          property.intValue = 0;
-          index = 0;
-        }
-      }
-
-      index = EditorGUILayout.Popup(property.displayName, index, _layerNames);
-      property.intValue = _layerValues[index];
     }
 
     public override void OnInspectorGUI() {

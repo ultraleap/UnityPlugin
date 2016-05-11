@@ -63,16 +63,16 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("Layer to use for auto-generation.  The generated interaction layers will have the same collision settings as this layer.")]
     [SerializeField]
-    protected int _teplateLayer = 0;
+    protected SingleLayer _teplateLayer = 0;
 
     [SerializeField]
-    protected int _interactionLayer = 0;
+    protected SingleLayer _interactionLayer = 0;
 
     [SerializeField]
-    protected int _brushHandLayer = 0;
+    protected SingleLayer _brushHandLayer = 0;
 
     [SerializeField]
-    protected int _interactionNoClipLayer = 0;
+    protected SingleLayer _interactionNoClipLayer = 0;
 
     [Header("Debug")]
     [Tooltip("Allows simulation to be disabled without destroying the scene in any way.")]

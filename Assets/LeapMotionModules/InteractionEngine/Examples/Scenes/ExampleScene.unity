@@ -2098,10 +2098,14 @@ MonoBehaviour:
   _untrackedTimeout: 0.5
   _depthUntilSphericalInside: 0.023
   _autoGenerateLayers: 1
-  _teplateLayer: 0
-  _interactionLayer: 8
-  _brushHandLayer: 9
-  _interactionNoClipLayer: 10
+  _teplateLayer:
+    layer: 0
+  _interactionLayer:
+    layer: 8
+  _brushHandLayer:
+    layer: 9
+  _interactionNoClipLayer:
+    layer: 10
   _enableSimulation: 1
   _showDebugLines: 0
   _showDebugOutput: 0
