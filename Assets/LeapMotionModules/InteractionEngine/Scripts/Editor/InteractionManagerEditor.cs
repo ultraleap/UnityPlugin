@@ -32,11 +32,14 @@ namespace Leap.Unity.Interaction {
       specifyCustomDecorator("_leapProvider", providerDectorator);
 
       SerializedProperty autoGenerateLayerProperty = serializedObject.FindProperty("_autoGenerateLayers");
+      specifyConditionalDrawing(() => autoGenerateLayerProperty.boolValue,
+                                "_teplateLayer");
       specifyConditionalDrawing(() => !autoGenerateLayerProperty.boolValue,
                                 "_interactionLayer",
                                 "_brushHandLayer",
                                 "_interactionNoClipLayer");
 
+      specifyCustomDrawer("_teplateLayer", doSingleLayerGUI);
       specifyCustomDrawer("_interactionLayer", doSingleLayerGUI);
       specifyCustomDrawer("_brushHandLayer", doSingleLayerGUI);
       specifyCustomDrawer("_interactionNoClipLayer", doSingleLayerGUI);
