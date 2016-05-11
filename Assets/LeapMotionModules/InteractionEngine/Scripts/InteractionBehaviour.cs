@@ -320,7 +320,13 @@ namespace Leap.Unity.Interaction {
         if (!_ignoringBrushes && results.maxHandDepth > _material.BrushDisableDistance) {
           _ignoringBrushes = true;
 
-          int layer = _manager.InteractionNoClipLayer;
+          int layer;
+          if (_material.UseCustomLayers) {
+            layer = _material.InteractionNoClipLayer;
+          } else {
+            layer = _material.InteractionNoClipLayer;
+          }
+
           for (int i = 0; i < _childrenArray.Length; i++) {
             _childrenArray[i].gameObject.layer = layer;
           }
@@ -328,7 +334,13 @@ namespace Leap.Unity.Interaction {
       } else if (_ignoringBrushes) {
         _ignoringBrushes = false;
 
-        int layer = _manager.InteractionLayer;
+        int layer;
+        if (_material.UseCustomLayers) {
+          layer = _material.InteractionLayer;
+        } else {
+          layer = _material.InteractionLayer;
+        }
+
         for (int i = 0; i < _childrenArray.Length; i++) {
           _childrenArray[i].gameObject.layer = layer;
         }

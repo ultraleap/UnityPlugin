@@ -63,7 +63,7 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("Layer to use for auto-generation.  The generated interaction layers will have the same collision settings as this layer.")]
     [SerializeField]
-    protected SingleLayer _teplateLayer = 0;
+    protected SingleLayer _templateLayer = 0;
 
     [SerializeField]
     protected SingleLayer _interactionLayer = 0;
@@ -532,8 +532,10 @@ namespace Leap.Unity.Interaction {
 
     private void autoSetupCollisionLayers() {
       for (int i = 0; i < 32; i++) {
-        //Copy ignore settings from interaction layer to the noclip layer
-        bool shouldIgnore = Physics.GetIgnoreLayerCollision(_interactionLayer, i);
+        //Copy ignore settings from template layer
+        bool shouldIgnore = Physics.GetIgnoreLayerCollision(_templateLayer, i);
+
+        Physics.IgnoreLayerCollision(_interactionLayer, i, shouldIgnore);
         Physics.IgnoreLayerCollision(_interactionNoClipLayer, i, shouldIgnore);
 
         //Set brush layer to collide with nothing
@@ -542,7 +544,6 @@ namespace Leap.Unity.Interaction {
 
       //After copy and set we specify the interactions between the brush and interaction objects
       Physics.IgnoreLayerCollision(_brushHandLayer, _interactionLayer, false);
-      Physics.IgnoreLayerCollision(_brushHandLayer, _interactionNoClipLayer, true);
     }
 
     protected virtual void simulateFrame(Frame frame) {

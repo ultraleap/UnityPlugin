@@ -137,6 +137,24 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public bool UseCustomLayers {
+      get {
+        return _useCustomLayers;
+      }
+    }
+
+    public int InteractionLayer {
+      get {
+        return _interactionLayer;
+      }
+    }
+
+    public int InteractionNoClipLayer {
+      get {
+        return _interactionNoClipLayer;
+      }
+    }
+
 #if UNITY_EDITOR
     private const string DEFAULT_ASSET_NAME = "InteractionMaterial.asset";
 
