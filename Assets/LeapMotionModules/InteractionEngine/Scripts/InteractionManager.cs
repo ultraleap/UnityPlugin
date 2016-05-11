@@ -181,6 +181,10 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Force an update of the internal scene info.  This should be called if settings have been changed like
+    /// gravity.
+    /// </summary>
     public void UpdateSceneInfo() {
       var info = getSceneInfo();
       InteractionC.UpdateSceneInfo(ref _scene, ref info);
@@ -190,9 +194,6 @@ namespace Leap.Unity.Interaction {
     /// Tries to find an InteractionObject that is currently being grasped by a Hand with
     /// the given ID.
     /// </summary>
-    /// <param name="handId"></param>
-    /// <param name="graspedObject"></param>
-    /// <returns></returns>
     public bool TryGetGraspedObject(int handId, out IInteractionBehaviour graspedObject) {
       for (int i = 0; i < _graspedBehaviours.Count; i++) {
         var iObj = _graspedBehaviours[i];
@@ -207,12 +208,29 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Forces the given object to be released by any hands currently holding it.  Will return true
+    /// only if there was at least one hand holding the object.
+    /// </summary>
+    public bool ReleaseObject(IInteractionBehaviour graspedObject) {
+      if (!_graspedBehaviours.Remove(graspedObject)) {
+        return false;
+      }
+
+      foreach (var interactionHand in _idToInteractionHand.Values) {
+        if (interactionHand.graspedObject == graspedObject) {
+          interactionHand.ReleaseObject();
+        }
+      }
+
+      return true;
+    }
+
+    /// <summary>
     /// Registers an InteractionObject with this manager, which automatically adds the objects
     /// representation into the internal interaction scene.  If the manager is disabled,
     /// the registration will still succeed and the object will be added to the internal scene
     /// when the manager is next enabled.
     /// </summary>
-    /// <param name="interactionBehaviour"></param>
     public void RegisterInteractionBehaviour(IInteractionBehaviour interactionBehaviour) {
       if (_registeredBehaviours.Contains(interactionBehaviour)) {
         throw new InvalidOperationException("Interaction Behaviour " + interactionBehaviour + " cannot be registered because " +
@@ -238,7 +256,6 @@ namespace Leap.Unity.Interaction {
     /// Unregisters an InteractionObject from this manager.  This removes it from the internal
     /// scene and prevents any further interaction.
     /// </summary>
-    /// <param name="interactionBehaviour"></param>
     public void UnregisterInteractionBehaviour(IInteractionBehaviour interactionBehaviour) {
       if (!_registeredBehaviours.Contains(interactionBehaviour)) {
         throw new InvalidOperationException("Interaction Behaviour " + interactionBehaviour + " cannot be unregistered because " +
