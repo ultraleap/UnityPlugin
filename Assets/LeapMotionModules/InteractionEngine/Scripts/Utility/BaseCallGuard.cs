@@ -24,18 +24,21 @@ namespace Leap.Unity.Interaction {
 
   public class BaseCallGuard {
     private Stack<string> _pendingKeys = new Stack<string>();
-    private string _justPopped = null;
+    private Stack<string> _pendingCalls = new Stack<string>();
 
     [Conditional("UNITY_ASSERTIONS")]
     public void Begin(string methodKey) {
       _pendingKeys.Push(methodKey);
-      _justPopped = null;
     }
 
     [Conditional("UNITY_ASSERTIONS")]
     public void AssertBaseCalled() {
-      if (_justPopped == null) {
-        new BaseNotCalledException(_pendingKeys.Pop());
+      if (_pendingKeys.Count == 0) {
+        throw new BeginNotCalledException();
+      }
+
+      if (_pendingKeys.Count > _pendingCalls.Count) {
+        throw new BaseNotCalledException(_pendingKeys.Peek());
       }
     }
 
@@ -45,9 +48,11 @@ namespace Leap.Unity.Interaction {
         throw new BeginNotCalledException(methodKey);
       }
 
-      _justPopped = _pendingKeys.Pop();
-      if (_justPopped != methodKey) {
-        var wrongBaseException = new WrongBaseCalledException(methodKey, _justPopped);
+      _pendingCalls.Push(methodKey);
+
+      var pendingKey = _pendingKeys.Peek();
+      if (pendingKey != methodKey) {
+        var wrongBaseException = new WrongBaseCalledException(methodKey, pendingKey);
         throw wrongBaseException;
       }
     }
