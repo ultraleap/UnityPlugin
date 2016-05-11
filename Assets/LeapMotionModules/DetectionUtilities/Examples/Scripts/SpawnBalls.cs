@@ -2,47 +2,23 @@
 using System.Collections;
 
 public class SpawnBalls : MonoBehaviour {
-  public GameObject RedBallPrefab;
-  public GameObject GreenBallPrefab;
-  public GameObject BlueBallPrefab;
+  public GameObject BallPrefab;
   public float delayInterval = .15f; // seconds
   public int BallLimit = 200;
 
-  private IEnumerator _redballCoroutine;
-  private IEnumerator _greenballCoroutine;
-  private IEnumerator _blueballCoroutine;
+  private IEnumerator _spawnCoroutine;
 
   void Awake () {
-    _redballCoroutine = AddBallWithDelay(RedBallPrefab);
-    _greenballCoroutine = AddBallWithDelay(GreenBallPrefab);
-    _blueballCoroutine = AddBallWithDelay(BlueBallPrefab);
+    _spawnCoroutine = AddBallWithDelay(BallPrefab);
   }
 
-  public void StartRedBalls(){
-    StopCoroutine(_redballCoroutine);
-    StartCoroutine(_redballCoroutine);
+  public void StartBalls(){
+    StopCoroutine(_spawnCoroutine);
+    StartCoroutine(_spawnCoroutine);
   }
 
-  public void StopRedBalls(){
-    StopCoroutine(_redballCoroutine);
-  }
-
-  public void StartGreenBalls(){
-    StopCoroutine(_greenballCoroutine);
-    StartCoroutine(_greenballCoroutine);
-  }
-
-  public void StopGreenBalls(){
-    StopCoroutine(_greenballCoroutine);
-  }
-
-  public void StartBlueBalls () {
-    StopCoroutine(_blueballCoroutine);
-    StartCoroutine(_blueballCoroutine);
-  }
-
-  public void StopBlueBalls () {
-    StopCoroutine(_blueballCoroutine);
+  public void StopBalls(){
+    StopCoroutine(_spawnCoroutine);
   }
 
   private IEnumerator AddBallWithDelay (GameObject prefab) {
@@ -56,8 +32,9 @@ public class SpawnBalls : MonoBehaviour {
     if (transform.childCount > BallLimit) removeBalls(BallLimit / 10);
     GameObject go = GameObject.Instantiate(prefab);
     go.transform.parent = transform;
+    go.transform.localPosition = Vector3.zero;
     Rigidbody rb = go.GetComponent<Rigidbody>();
-    rb.AddForce(Random.value * 3, Random.value * 3, Random.value * 3, ForceMode.Impulse);
+    rb.AddForce(Random.value * 3, -Random.value * 13, Random.value * 3, ForceMode.Impulse);
   }
 
   private void removeBalls (int count) {
