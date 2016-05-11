@@ -28,18 +28,6 @@ namespace Leap.Unity.Interaction {
                                                                          new Keyframe(1.0f, 1.0f, 0.0f, 0.0f),
                                                                          new Keyframe(2.0f, 1.5f, 0.0f, 0.0f));
 
-    [Header("Warp Settings")]
-    [SerializeField]
-    protected bool _warpingEnabled = true;
-
-    [SerializeField]
-    protected AnimationCurve _warpCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
-                                                             new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
-
-    [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
-    [SerializeField]
-    protected float _graphicalReturnTime = 0.25f;
-
     [Header("Grasp Settings")]
     [SerializeField]
     protected GraspMethodEnum _graspMethod = GraspMethodEnum.Velocity;
@@ -61,6 +49,18 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _followStrength = 0.6f;
 
+    [Header("Warp Settings")]
+    [SerializeField]
+    protected bool _warpingEnabled = true;
+
+    [SerializeField]
+    protected AnimationCurve _warpCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
+                                                             new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
+
+    [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
+    [SerializeField]
+    protected float _graphicalReturnTime = 0.25f;
+
     public bool EnableContact {
       get {
         return _enableContact;
@@ -76,24 +76,6 @@ namespace Leap.Unity.Interaction {
     public AnimationCurve ThrowingVelocityCurve {
       get {
         return _throwingVelocityCurve;
-      }
-    }
-
-    public bool WarpingEnabled {
-      get {
-        return _warpingEnabled;
-      }
-    }
-
-    public AnimationCurve WarpCurve {
-      get {
-        return _warpCurve;
-      }
-    }
-
-    public float GraphicalReturnTime {
-      get {
-        return _graphicalReturnTime;
       }
     }
 
@@ -127,7 +109,23 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public bool WarpingEnabled {
+      get {
+        return _warpingEnabled;
+      }
+    }
 
+    public AnimationCurve WarpCurve {
+      get {
+        return _warpCurve;
+      }
+    }
+
+    public float GraphicalReturnTime {
+      get {
+        return _graphicalReturnTime;
+      }
+    }
 
 #if UNITY_EDITOR
     private const string DEFAULT_ASSET_NAME = "InteractionMaterial.asset";
