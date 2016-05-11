@@ -41,10 +41,6 @@ namespace Leap.Unity.Interaction {
     protected string _dataSubfolder = "InteractionEngine";
 
     [Header("Interaction Settings")]
-    [Tooltip("The amount of time a Hand can remain untracked while also still grasping an object.")]
-    [SerializeField]
-    protected float _untrackedTimeout = 0.5f;
-
     [Tooltip("Allow the Interaction Engine to modify object velocities when pushing.")]
     [SerializeField]
     protected bool _enableContact = true;
@@ -52,6 +48,10 @@ namespace Leap.Unity.Interaction {
     [Tooltip("Allow the Interaction plugin to modify object positions by grasping.")]
     [SerializeField]
     protected bool _enableGrasping = true;
+
+    [Tooltip("The amount of time a Hand can remain untracked while also still grasping an object.")]
+    [SerializeField]
+    protected float _untrackedTimeout = 0.5f;
 
     [Tooltip("Depth before collision response becomes as if holding a sphere.")]
     [SerializeField]
