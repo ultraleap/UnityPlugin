@@ -154,8 +154,8 @@ namespace Leap.Unity {
         return false;
       }
 
-      TransformData past = transformAtTime(leapTime);
-
+      TransformData past = transformAtTime(leapTime - warpingAdjustment * 1000);
+      
       // Rewind position and rotation
       if (_trackingAnchor == null) {
         rewoundRotation = past.localRotation;
@@ -331,10 +331,8 @@ namespace Leap.Unity {
       Vector3 currCenterPos = _trackingAnchor.TransformPoint(currLocalPosition);
       Quaternion currCenterRot = _trackingAnchor.rotation * currLocalRotation;
 
-      //Get the transform at the time when the latest image was captured
-      //HACK: Currently timestamps are not accurate enough, just use the current timestamp plus the adjustment (60Ms seems to work well)
-      long rewindTime = provider.GetLeapController().Now() - warpingAdjustment * 1000;
-      //long rewindTime = provider.CurrentFrame.Timestamp - warpingAdjustment * 1000;
+      //Get the transform at the time when the latest frame was captured
+      long rewindTime = provider.CurrentFrame.Timestamp - warpingAdjustment * 1000;
 
       TransformData past = transformAtTime(rewindTime);
       Vector3 pastCenterPos = _trackingAnchor.TransformPoint(past.localPosition);
