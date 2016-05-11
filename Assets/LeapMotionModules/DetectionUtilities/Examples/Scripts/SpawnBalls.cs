@@ -4,7 +4,7 @@ using System.Collections;
 public class SpawnBalls : MonoBehaviour {
   public GameObject BallPrefab;
   public float delayInterval = .15f; // seconds
-  public int BallLimit = 200;
+  public int BallLimit = 100;
 
   private IEnumerator _spawnCoroutine;
 
@@ -13,12 +13,11 @@ public class SpawnBalls : MonoBehaviour {
   }
 
   public void StartBalls(){
-    StopCoroutine(_spawnCoroutine);
     StartCoroutine(_spawnCoroutine);
   }
 
   public void StopBalls(){
-    StopCoroutine(_spawnCoroutine);
+    StopAllCoroutines();
   }
 
   private IEnumerator AddBallWithDelay (GameObject prefab) {
