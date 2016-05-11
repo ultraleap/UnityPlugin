@@ -7,8 +7,9 @@ namespace Leap.Unity {
 
     protected abstract void HandReset();
     protected abstract void HandFinish();
+    protected IHandModel iHandModel;
     protected virtual void Awake(){
-      IHandModel iHandModel = GetComponent<IHandModel>();
+      iHandModel = GetComponent<IHandModel>();
       if (iHandModel == null) {
         Debug.LogWarning("HandTransitionBehavior components require an IHandModel component attached to the same GameObject");
         return;
