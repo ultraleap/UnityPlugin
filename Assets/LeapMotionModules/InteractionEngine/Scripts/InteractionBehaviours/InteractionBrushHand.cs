@@ -17,7 +17,6 @@ namespace Leap.Unity {
     private Rigidbody[] _capsuleBodies;
     private Hand _hand;
     private GameObject _handParent;
-    private bool _hasWarned = false;
 
     public override ModelType HandModelType {
       get { return ModelType.Physics; }

@@ -10,6 +10,10 @@ namespace Leap.Unity.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
 
+      specifyConditionalDrawing("_warpingEnabled", 
+                                "_warpCurve",
+                                "_graphicalReturnTime");
+
       SerializedProperty graspMethod = serializedObject.FindProperty("_graspMethod");
       specifyConditionalDrawing(() => graspMethod.intValue == (int)InteractionMaterial.GraspMethodEnum.Velocity,
                                 "_releaseDistance",

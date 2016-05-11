@@ -219,6 +219,12 @@ namespace Leap.Unity.Interaction {
         }
       }
 
+      if (IsBeingGrasped) {
+        if (Vector3.Distance(_solvedPosition, _rigidbody.position) > _material.ReleaseDistance) {
+          _manager.ReleaseObject(this);
+        }
+      }
+
       //Reset so we can accumulate for the next frame
       _accumulatedLinearAcceleration = Vector3.zero;
       _accumulatedAngularAcceleration = Vector3.zero;
@@ -408,7 +414,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandsHoldGraphics(List<Hand> hands) {
       base.OnHandsHoldGraphics(hands);
 
-      if (_graphicalAnchor != null) {
+      if (_graphicalAnchor != null && _material.WarpingEnabled) {
         Vector3 deltaPosition = Quaternion.Inverse(_solvedRotation) * (_rigidbody.position - _solvedPosition);
         Quaternion deltaRotation = Quaternion.Inverse(_solvedRotation) * _rigidbody.rotation;
 
@@ -543,12 +549,12 @@ namespace Leap.Unity.Interaction {
 
         if (_rigidbody.IsSleeping()) {
           Gizmos.color = Color.gray;
-        } else if (_ignoringBrushes) {
-          Gizmos.color = Color.red;
         } else if (IsBeingGrasped) {
           Gizmos.color = Color.green;
         } else if (_showDebugRecievedVelocity) {
           Gizmos.color = Color.yellow;
+        } else if (_ignoringBrushes) {
+          Gizmos.color = Color.red;
         } else {
           Gizmos.color = Color.blue;
         }
@@ -600,6 +606,7 @@ namespace Leap.Unity.Interaction {
 
       //Update kinematic status of body
       if (IsBeingGrasped) {
+        _rigidbody.useGravity = false;
         switch (_material.GraspMethod) {
           case InteractionMaterial.GraspMethodEnum.Kinematic:
             _rigidbody.isKinematic = true;
@@ -615,6 +622,7 @@ namespace Leap.Unity.Interaction {
             throw new InvalidOperationException("Unexpected grasp method");
         }
       } else {
+        _rigidbody.useGravity = _useGravity;
         _rigidbody.isKinematic = _isKinematic;
       }
     }
