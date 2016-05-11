@@ -40,6 +40,9 @@ namespace Leap.Unity.Interaction {
       if (_pendingKeys.Count > _pendingCalls.Count) {
         throw new BaseNotCalledException(_pendingKeys.Peek());
       }
+
+      _pendingKeys.Pop();
+      _pendingCalls.Pop();
     }
 
     [Conditional("UNITY_ASSERTIONS")]
