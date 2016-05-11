@@ -5,10 +5,10 @@ using UnityEditor;
 #endif
 
 /** IHandModel defines abstract methods as a template for building Leap hand models*/
-namespace Leap.Unity{
+namespace Leap.Unity {
   public enum Chirality { Left, Right, Either };
   public enum ModelType { Graphics, Physics };
-  
+
   [ExecuteInEditMode]
   public abstract class IHandModel : MonoBehaviour {
     public event Action OnBegin;
@@ -20,9 +20,9 @@ namespace Leap.Unity{
 
     public abstract Chirality Handedness { get; }
     public abstract ModelType HandModelType { get; }
-    public virtual void InitHand(){
+    public virtual void InitHand() {
     }
-  
+
     public virtual void BeginHand() {
       if (OnBegin != null) {
         OnBegin();
@@ -36,23 +36,24 @@ namespace Leap.Unity{
       }
       isTracked = false;
     }
-    public abstract Hand GetLeapHand(); 
+    public abstract Hand GetLeapHand();
     public abstract void SetLeapHand(Hand hand);
 
-  #if UNITY_EDITOR
-    void Awake() {
-      if (!EditorApplication.isPlaying) {
-        SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(transform)));
-        InitHand();
-      }
-    }
-
+#if UNITY_EDITOR
     void Update() {
       if (!EditorApplication.isPlaying) {
-        SetLeapHand(TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(transform)));
-        UpdateHand();
+        Hand hand = TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(transform));
+        if (GetLeapHand() == null) {
+          SetLeapHand(hand);
+          InitHand();
+          BeginHand();
+          UpdateHand();
+        } else {
+          SetLeapHand(hand);
+          UpdateHand();
+        }
       }
     }
-  #endif
+#endif
   }
 }

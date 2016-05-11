@@ -13,24 +13,9 @@ namespace Leap.Unity.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
 
-      specifyConditionalDrawing("_advancedThrowing", "_throwingVelocityCurve",
-                                                     "_contactDisableSpeed",
-                                                     "_contactEnableDelay");
-
-      SerializedProperty graspMethod = serializedObject.FindProperty("_graspMethod");
-      specifyConditionalDrawing(() => graspMethod.intValue == (int)InteractionBehaviour.GraspMethod.Kinematic,
-                                "_graphicalAnchor",
-                                "_graphicalReturnTime");
-
-      specifyConditionalDrawing(() => graspMethod.intValue == (int)InteractionBehaviour.GraspMethod.Velocity,
-                                "_releaseDistance",
-                                "_maxVelocity",
-                                "_followStrength");
-
       if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab &&
           _interactionBehaviour != null) {
         specifyCustomDecorator("_graphicalAnchor", graphicalAnchor);
-        specifyCustomDrawer("_enableContact", contactDrawer);
       }
     }
 
@@ -60,23 +45,6 @@ namespace Leap.Unity.Interaction {
             }
           }
         }
-      }
-    }
-
-    private void contactDrawer(SerializedProperty prop) {
-      bool shouldShow = false;
-
-      if (_interactionBehaviour == null) {
-        shouldShow = true;
-      } else {
-        Rigidbody rigidbody = _interactionBehaviour.GetComponent<Rigidbody>();
-        if (!rigidbody.isKinematic) {
-          shouldShow = true;
-        }
-      }
-
-      if (shouldShow) {
-        EditorGUILayout.PropertyField(prop);
       }
     }
 
