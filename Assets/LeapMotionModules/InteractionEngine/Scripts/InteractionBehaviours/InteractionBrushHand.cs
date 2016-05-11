@@ -15,7 +15,6 @@ namespace Leap.Unity.Interaction {
     private const int N_ACTIVE_BONES = 3;
 
     private Rigidbody[] _capsuleBodies;
-    private Vector3[] _lastPositions;
     private Hand _hand;
     private GameObject _handParent;
     private bool _hasWarned = false;
@@ -75,7 +74,6 @@ namespace Leap.Unity.Interaction {
       _handParent.transform.parent = null; // Prevent hand from moving when you turn your head.
 
       _capsuleBodies = new Rigidbody[N_FINGERS * N_ACTIVE_BONES];
-      _lastPositions = new Vector3[N_FINGERS * N_ACTIVE_BONES];
 
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
@@ -108,8 +106,6 @@ namespace Leap.Unity.Interaction {
 
           body.mass = _perBoneMass;
           body.collisionDetectionMode = _collisionDetection;
-
-          _lastPositions[boneArrayIndex] = bone.Center.ToVector3();
         }
       }
     }
@@ -127,20 +123,6 @@ namespace Leap.Unity.Interaction {
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
           Rigidbody body = _capsuleBodies[boneArrayIndex];
 
-#if UNITY_EDITOR
-          // During normal operation the brushes should not be pushed away from the tracked hand.
-          // In unusual situations (e.g. swatting an object really quickly) this may fire.
-          if (!_hasWarned) {
-            // Compare against intended target, not new tracking position.
-            Vector3 error = _lastPositions[boneArrayIndex] - body.position;
-            if (error.magnitude > bone.Width) {
-              Debug.LogWarning("InteractionBrushHand is falling behind tracked hand: " + gameObject.name);
-              _hasWarned = true;
-            }
-          }
-          _lastPositions[boneArrayIndex] = bone.Center.ToVector3();
-#endif
-
           Vector3 delta = bone.Center.ToVector3() - body.position;
           body.velocity = delta / Time.fixedDeltaTime;
           body.MoveRotation(bone.Rotation.ToQuaternion());
@@ -151,7 +133,6 @@ namespace Leap.Unity.Interaction {
     public override void FinishHand() {
       GameObject.Destroy(_handParent);
       _capsuleBodies = null;
-      _lastPositions = null;
 
       base.FinishHand();
     }

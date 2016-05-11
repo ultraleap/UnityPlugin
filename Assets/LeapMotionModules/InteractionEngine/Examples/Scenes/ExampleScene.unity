@@ -306,7 +306,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!135 &335842743
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -959,7 +959,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetRenderRate: 0
   targetRenderRateStep: 1
-  fixedPhysicsRate: 50
+  fixedPhysicsRate: 100
   fixedPhysicsRateStep: 1
   unlockRender: 0
   unlockPhysics: 0
