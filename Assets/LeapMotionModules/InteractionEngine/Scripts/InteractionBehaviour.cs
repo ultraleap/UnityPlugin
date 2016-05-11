@@ -408,21 +408,16 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandsHoldGraphics(List<Hand> hands) {
       base.OnHandsHoldGraphics(hands);
 
-      switch (_material.GraspMethod) {
-        case InteractionMaterial.GraspMethodEnum.Kinematic:
-          if (_graphicalAnchor != null) {
-            Vector3 newPosition;
-            Quaternion newRotation;
-            getSolvedTransform(hands, out newPosition, out newRotation);
+      if (_graphicalAnchor != null) {
+        Vector3 deltaPosition = Quaternion.Inverse(_solvedRotation) * (_rigidbody.position - _solvedPosition);
+        Quaternion deltaRotation = Quaternion.Inverse(_solvedRotation) * _rigidbody.rotation;
 
-            _graphicalAnchor.position = newPosition;
-            _graphicalAnchor.rotation = newRotation;
-          }
-          break;
-        case InteractionMaterial.GraspMethodEnum.Velocity:
-          break;
-        default:
-          throw new InvalidOperationException("Unexpected grasp method");
+        Vector3 newPosition;
+        Quaternion newRotation;
+        getSolvedTransform(hands, out newPosition, out newRotation);
+
+        _graphicalAnchor.position = newPosition + newRotation * deltaPosition;
+        _graphicalAnchor.rotation = newRotation * deltaRotation;
       }
     }
 
@@ -477,20 +472,10 @@ namespace Leap.Unity.Interaction {
 
       updateState();
 
-      switch (_material.GraspMethod) {
-        case InteractionMaterial.GraspMethodEnum.Kinematic:
-          //If there is a graphical anchor, we are going to lerp it back to match the 
-          //position and rotation of the rigidbody, since it might have diverged.
-          if (_graphicalAnchor != null) {
-            _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
-          }
-          break;
-        case InteractionMaterial.GraspMethodEnum.Velocity:
-          break;
-        default:
-          throw new InvalidCastException("Unexpected grasp method");
+      if (_graphicalAnchor != null) {
+        _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
       }
-      
+
       float speed = _rigidbody.velocity.magnitude;
       float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed);
       _rigidbody.velocity *= multiplier;
