@@ -32,13 +32,8 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected GraspMethodEnum _graspMethod = GraspMethodEnum.Velocity;
 
-    [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
     [SerializeField]
-    protected float _graphicalReturnTime = 0.25f;
-
-    [SerializeField]
-    protected AnimationCurve _warpCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
-                                                             new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
+    protected bool _suspensionEnabled = true;
 
     [Tooltip("How far the object can get from the hand before it is released.")]
     [SerializeField]
@@ -54,9 +49,27 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _followStrength = 0.6f;
 
+    [Header("Warp Settings")]
+    [SerializeField]
+    protected bool _warpingEnabled = true;
+
+    [SerializeField]
+    protected AnimationCurve _warpCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
+                                                             new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
+
+    [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
+    [SerializeField]
+    protected float _graphicalReturnTime = 0.25f;
+
     public bool EnableContact {
       get {
         return _enableContact;
+      }
+    }
+
+    public float BrushDisableDistance {
+      get {
+        return _brushDisableDistance;
       }
     }
 
@@ -72,15 +85,15 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public float GraphicalReturnTime {
+    public bool SuspensionEnabled {
       get {
-        return _graphicalReturnTime;
+        return _suspensionEnabled;
       }
     }
 
-    public AnimationCurve WarpCurve {
+    public float ReleaseDistance {
       get {
-        return _warpCurve;
+        return _releaseDistance;
       }
     }
 
@@ -96,9 +109,21 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public float BrushDisableDistance {
+    public bool WarpingEnabled {
       get {
-        return _brushDisableDistance;
+        return _warpingEnabled;
+      }
+    }
+
+    public AnimationCurve WarpCurve {
+      get {
+        return _warpCurve;
+      }
+    }
+
+    public float GraphicalReturnTime {
+      get {
+        return _graphicalReturnTime;
       }
     }
 

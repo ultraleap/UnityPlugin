@@ -9,7 +9,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 183146e09617b2e41a21d0ecf5e56fcb, type: 3}
-  m_Name: DefaultInteractionMaterial
+  m_Name: Nunchuck
   m_EditorClassIdentifier: 
   _enableContact: 1
   _brushDisableDistance: 0.017
@@ -34,8 +34,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _graspMethod: 0
-  _graphicalReturnTime: 0.25
+  _warpingEnabled: 1
   _warpCurve:
     serializedVersion: 2
     m_Curve:
@@ -44,14 +43,16 @@ MonoBehaviour:
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - time: 0.020000001
-      value: 0.02
+    - time: 0.02
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 0
+    m_RotationOrder: 4
+  _graphicalReturnTime: 0.25
+  _graspMethod: 1
   _releaseDistance: 0.15
   _maxVelocity: 3
-  _followStrength: 1
+  _followStrength: 0.6

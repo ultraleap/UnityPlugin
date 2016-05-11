@@ -230,7 +230,10 @@ namespace Leap.Unity.Interaction {
         _brushHandLayer = value;
       }
     }
-
+    
+    /// Force an update of the internal scene info.  This should be called if settings have been changed like
+    /// gravity.
+    /// </summary>
     public void UpdateSceneInfo() {
       var info = getSceneInfo();
       InteractionC.UpdateSceneInfo(ref _scene, ref info);
@@ -240,9 +243,6 @@ namespace Leap.Unity.Interaction {
     /// Tries to find an InteractionObject that is currently being grasped by a Hand with
     /// the given ID.
     /// </summary>
-    /// <param name="handId"></param>
-    /// <param name="graspedObject"></param>
-    /// <returns></returns>
     public bool TryGetGraspedObject(int handId, out IInteractionBehaviour graspedObject) {
       for (int i = 0; i < _graspedBehaviours.Count; i++) {
         var iObj = _graspedBehaviours[i];
@@ -257,12 +257,51 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Forces the given object to be released by any hands currently holding it.  Will return true
+    /// only if there was at least one hand holding the object.
+    /// </summary>
+    public bool ReleaseObject(IInteractionBehaviour graspedObject) {
+      if (!_graspedBehaviours.Remove(graspedObject)) {
+        return false;
+      }
+
+      foreach (var interactionHand in _idToInteractionHand.Values) {
+        if (interactionHand.graspedObject == graspedObject) {
+          interactionHand.ReleaseObject();
+        }
+      }
+
+      return true;
+    }
+
+    /// <summary>
+    /// Forces a hand with the given id to release an object if it is holding it.  Will return true
+    /// only if a hand with the given id releases an object it was holding.
+    /// </summary>
+    public bool ReleaseHand(int handId) {
+      InteractionHand interactionHand;
+      if (!_idToInteractionHand.TryGetValue(handId, out interactionHand)) {
+        return false;
+      }
+
+      if (interactionHand.graspedObject == null) {
+        return false;
+      }
+
+      if (interactionHand.graspedObject.GraspingHandCount == 1) {
+        _graspedBehaviours.Remove(interactionHand.graspedObject);
+      }
+      
+      interactionHand.ReleaseObject();
+      return true;
+    }
+
+    /// <summary>
     /// Registers an InteractionObject with this manager, which automatically adds the objects
     /// representation into the internal interaction scene.  If the manager is disabled,
     /// the registration will still succeed and the object will be added to the internal scene
     /// when the manager is next enabled.
     /// </summary>
-    /// <param name="interactionBehaviour"></param>
     public void RegisterInteractionBehaviour(IInteractionBehaviour interactionBehaviour) {
       if (_registeredBehaviours.Contains(interactionBehaviour)) {
         throw new InvalidOperationException("Interaction Behaviour " + interactionBehaviour + " cannot be registered because " +
@@ -288,7 +327,6 @@ namespace Leap.Unity.Interaction {
     /// Unregisters an InteractionObject from this manager.  This removes it from the internal
     /// scene and prevents any further interaction.
     /// </summary>
-    /// <param name="interactionBehaviour"></param>
     public void UnregisterInteractionBehaviour(IInteractionBehaviour interactionBehaviour) {
       if (!_registeredBehaviours.Contains(interactionBehaviour)) {
         throw new InvalidOperationException("Interaction Behaviour " + interactionBehaviour + " cannot be unregistered because " +
@@ -516,9 +554,14 @@ namespace Leap.Unity.Interaction {
 
       simulateInteraction();
 
-      updateInteractionStateChanges(frame);
+      bool didAnyHandGrasp;
+      updateInteractionStateChanges(frame, out didAnyHandGrasp);
 
       dispatchSimulationResults();
+
+      if (didAnyHandGrasp) {
+        dispatchOnHandsHolding(frame, isPhysics: true);
+      }
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         _registeredBehaviours[i].NotifyPostSolve();
@@ -595,7 +638,8 @@ namespace Leap.Unity.Interaction {
       InteractionC.UpdateController(ref _scene, ref _controllerTransform);
     }
 
-    protected virtual void updateInteractionStateChanges(Frame frame) {
+    protected virtual void updateInteractionStateChanges(Frame frame, out bool didAnyHandBeginGrasp) {
+      didAnyHandBeginGrasp = false;
       var hands = frame.Hands;
 
       //First loop through all the hands and get their classifications from the engine
@@ -664,6 +708,8 @@ namespace Leap.Unity.Interaction {
               IInteractionBehaviour interactionBehaviour;
               if (_instanceHandleToBehaviour.TryGetValue(handResult.instanceHandle, out interactionBehaviour)) {
                 if (interactionHand.graspedObject == null) {
+                  didAnyHandBeginGrasp = true;
+
                   if (!interactionBehaviour.IsBeingGrasped) {
                     _graspedBehaviours.Add(interactionBehaviour);
                   }
@@ -675,7 +721,6 @@ namespace Leap.Unity.Interaction {
                     Debug.LogException(e);
                     continue;
                   }
-
                 }
               } else {
                 Debug.LogError("Recieved a hand result with an unkown handle " + handResult.instanceHandle.handle);

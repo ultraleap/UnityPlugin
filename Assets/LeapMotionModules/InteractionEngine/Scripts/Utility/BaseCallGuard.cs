@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction {
 
@@ -22,42 +23,41 @@ namespace Leap.Unity.Interaction {
   }
 
   public class BaseCallGuard {
-    private string _pendingMethodKey = null;
-    private bool _wasBeginCalled = false;
+    private Stack<string> _pendingKeys = new Stack<string>();
+    private Stack<string> _pendingCalls = new Stack<string>();
 
     [Conditional("UNITY_ASSERTIONS")]
     public void Begin(string methodKey) {
-      _pendingMethodKey = methodKey;
-      _wasBeginCalled = true;
+      _pendingKeys.Push(methodKey);
     }
 
     [Conditional("UNITY_ASSERTIONS")]
     public void AssertBaseCalled() {
-      if (!_wasBeginCalled) {
+      if (_pendingKeys.Count == 0) {
         throw new BeginNotCalledException();
       }
-      _wasBeginCalled = false;
 
-      if (_pendingMethodKey != null) {
-        var notCalledException = new BaseNotCalledException(_pendingMethodKey);
-        _pendingMethodKey = null;
-        throw notCalledException;
+      if (_pendingKeys.Count > _pendingCalls.Count) {
+        throw new BaseNotCalledException(_pendingKeys.Peek());
       }
+
+      _pendingKeys.Pop();
+      _pendingCalls.Pop();
     }
 
     [Conditional("UNITY_ASSERTIONS")]
     public void NotifyBaseCalled(string methodKey) {
-      if (_pendingMethodKey == null) {
+      if (_pendingKeys.Count == 0) {
         throw new BeginNotCalledException(methodKey);
       }
 
-      if (_pendingMethodKey != methodKey) {
-        var wrongBaseException = new WrongBaseCalledException(methodKey, _pendingMethodKey);
-        _pendingMethodKey = null;
+      _pendingCalls.Push(methodKey);
+
+      var pendingKey = _pendingKeys.Peek();
+      if (pendingKey != methodKey) {
+        var wrongBaseException = new WrongBaseCalledException(methodKey, pendingKey);
         throw wrongBaseException;
       }
-
-      _pendingMethodKey = null;
     }
   }
 }
