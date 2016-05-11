@@ -226,6 +226,28 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Forces a hand with the given id to release an object if it is holding it.  Will return true
+    /// only if a hand with the given id releases an object it was holding.
+    /// </summary>
+    public bool ReleaseHand(int handId) {
+      InteractionHand interactionHand;
+      if (!_idToInteractionHand.TryGetValue(handId, out interactionHand)) {
+        return false;
+      }
+
+      if (interactionHand.graspedObject == null) {
+        return false;
+      }
+
+      if (interactionHand.graspedObject.GraspingHandCount == 1) {
+        _graspedBehaviours.Remove(interactionHand.graspedObject);
+      }
+      
+      interactionHand.ReleaseObject();
+      return true;
+    }
+
+    /// <summary>
     /// Registers an InteractionObject with this manager, which automatically adds the objects
     /// representation into the internal interaction scene.  If the manager is disabled,
     /// the registration will still succeed and the object will be added to the internal scene

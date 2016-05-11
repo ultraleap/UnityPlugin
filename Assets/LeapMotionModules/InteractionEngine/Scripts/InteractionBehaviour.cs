@@ -219,6 +219,12 @@ namespace Leap.Unity.Interaction {
         }
       }
 
+      if (IsBeingGrasped) {
+        if (Vector3.Distance(_solvedPosition, _rigidbody.position) > _material.ReleaseDistance) {
+          _manager.ReleaseObject(this);
+        }
+      }
+
       //Reset so we can accumulate for the next frame
       _accumulatedLinearAcceleration = Vector3.zero;
       _accumulatedAngularAcceleration = Vector3.zero;
@@ -543,12 +549,12 @@ namespace Leap.Unity.Interaction {
 
         if (_rigidbody.IsSleeping()) {
           Gizmos.color = Color.gray;
-        } else if (_ignoringBrushes) {
-          Gizmos.color = Color.red;
         } else if (IsBeingGrasped) {
           Gizmos.color = Color.green;
         } else if (_showDebugRecievedVelocity) {
           Gizmos.color = Color.yellow;
+        } else if (_ignoringBrushes) {
+          Gizmos.color = Color.red;
         } else {
           Gizmos.color = Color.blue;
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction {
 
@@ -22,42 +23,33 @@ namespace Leap.Unity.Interaction {
   }
 
   public class BaseCallGuard {
-    private string _pendingMethodKey = null;
-    private bool _wasBeginCalled = false;
+    private Stack<string> _pendingKeys = new Stack<string>();
+    private string _justPopped = null;
 
     [Conditional("UNITY_ASSERTIONS")]
     public void Begin(string methodKey) {
-      _pendingMethodKey = methodKey;
-      _wasBeginCalled = true;
+      _pendingKeys.Push(methodKey);
+      _justPopped = null;
     }
 
     [Conditional("UNITY_ASSERTIONS")]
     public void AssertBaseCalled() {
-      if (!_wasBeginCalled) {
-        throw new BeginNotCalledException();
-      }
-      _wasBeginCalled = false;
-
-      if (_pendingMethodKey != null) {
-        var notCalledException = new BaseNotCalledException(_pendingMethodKey);
-        _pendingMethodKey = null;
-        throw notCalledException;
+      if (_justPopped == null) {
+        new BaseNotCalledException(_pendingKeys.Pop());
       }
     }
 
     [Conditional("UNITY_ASSERTIONS")]
     public void NotifyBaseCalled(string methodKey) {
-      if (_pendingMethodKey == null) {
+      if (_pendingKeys.Count == 0) {
         throw new BeginNotCalledException(methodKey);
       }
 
-      if (_pendingMethodKey != methodKey) {
-        var wrongBaseException = new WrongBaseCalledException(methodKey, _pendingMethodKey);
-        _pendingMethodKey = null;
+      _justPopped = _pendingKeys.Pop();
+      if (_justPopped != methodKey) {
+        var wrongBaseException = new WrongBaseCalledException(methodKey, _justPopped);
         throw wrongBaseException;
       }
-
-      _pendingMethodKey = null;
     }
   }
 }
