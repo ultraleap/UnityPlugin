@@ -287,9 +287,7 @@ namespace Leap.Unity {
 
           warpedRotation = warpedRotation * transform.localRotation;
 
-          Vector scale = new Vector(transform.lossyScale.x * 1e-3f, transform.lossyScale.y * 1e-3f, transform.lossyScale.z * 1e-3f);
-
-          leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), scale);
+          leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), transform.lossyScale.ToVector() * 1e-3f);
           leapTransform.MirrorZ();
         } else {
           leapTransform = transform.GetLeapMatrix();
