@@ -54,4 +54,4 @@ MonoBehaviour:
     m_RotationOrder: 0
   _releaseDistance: 0.15
   _maxVelocity: 3
-  _followStrength: 0.6
+  _followStrength: 1

@@ -205,10 +205,10 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 313214632}
-  m_LocalRotation: {x: 0.59540296, y: 0.29102877, z: 0.5996574, w: 0.44856277}
+  m_LocalRotation: {x: 0.43769792, y: -0.32756114, z: 0.59360814, w: 0.5905537}
   m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 10.6679, y: 82.892395, z: 115.83099}
+  m_LocalEulerAnglesHint: {x: 64.9386, y: 18.2648, z: 101.9766}
   m_Children: []
   m_Father: {fileID: 682435271}
   m_RootOrder: 0
@@ -222,15 +222,15 @@ Light:
   serializedVersion: 6
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.3
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_Strength: 1
-    m_Bias: 0.05
+    m_Bias: 0
     m_NormalBias: 0.4
     m_NearPlane: 0.2
   m_Cookie: {fileID: 0}
@@ -914,6 +914,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 682435271}
   - 114: {fileID: 682435272}
+  - 114: {fileID: 682435273}
   m_Layer: 0
   m_Name: Scene
   m_TagString: Untagged
@@ -965,6 +966,23 @@ MonoBehaviour:
   decrease: 0
   increase: 0
   resetRate: 0
+--- !u!114 &682435273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 682435270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 430cf29676d3e214d98657ef55500c0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _shadowDistance:
+    Override: 1
+    Value: 5
+  _gravity:
+    Override: 1
+    Value: {x: 0, y: -5, z: 0}
 --- !u!1 &784446999
 GameObject:
   m_ObjectHideFlags: 0
