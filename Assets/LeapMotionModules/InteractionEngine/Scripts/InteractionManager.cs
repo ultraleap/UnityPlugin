@@ -74,7 +74,6 @@ namespace Leap.Unity.Interaction {
     private static UInt32 _expectedVersion = 1;
     protected INTERACTION_SCENE _scene;
     private bool _hasSceneBeenCreated = false;
-    private Coroutine _simulationCoroutine = null;
 
     protected ShapeDescriptionPool _shapeDescriptionPool;
 
@@ -330,8 +329,6 @@ namespace Leap.Unity.Interaction {
           Debug.LogException(e);
         }
       }
-
-      _simulationCoroutine = StartCoroutine(simulationLoop());
     }
 
     protected virtual void OnDisable() {
@@ -370,10 +367,19 @@ namespace Leap.Unity.Interaction {
       if (_hasSceneBeenCreated) {
         destroyScene();
       }
+    }
 
-      if (_simulationCoroutine != null) {
-        StopCoroutine(_simulationCoroutine);
-        _simulationCoroutine = null;
+    protected virtual void FixedUpdate() {
+      if (_enableSimulation) {
+        simulateFrame(_leapProvider.CurrentFixedFrame);
+      }
+
+      if (_showDebugLines) {
+        InteractionC.DrawDebugLines(ref _scene);
+      }
+
+      if (_showDebugOutput) {
+        InteractionC.GetDebugStrings(ref _scene, _debugOutput);
       }
     }
 
@@ -395,30 +401,6 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL METHODS
-    private IEnumerator simulationLoop() {
-      //We use a coroutine so that our logic happens after all FixedUpdate calls
-      WaitForFixedUpdate fixedUpdate = new WaitForFixedUpdate();
-      while (true) {
-        yield return fixedUpdate;
-
-        try {
-          if (_enableSimulation) {
-            simulateFrame(_leapProvider.CurrentFixedFrame);
-          }
-
-          if (_showDebugLines) {
-            InteractionC.DrawDebugLines(ref _scene);
-          }
-
-          if (_showDebugOutput) {
-            InteractionC.GetDebugStrings(ref _scene, _debugOutput);
-          }
-        } catch (Exception e) {
-          //Catch the error so that the loop doesn't terminate
-          Debug.LogException(e);
-        }
-      }
-    }
 
     protected virtual void simulateFrame(Frame frame) {
       for (int i = 0; i < _registeredBehaviours.Count; i++) {

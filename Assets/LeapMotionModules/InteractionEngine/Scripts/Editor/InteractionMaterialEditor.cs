@@ -11,10 +11,6 @@ namespace Leap.Unity.Interaction {
       base.OnEnable();
 
       SerializedProperty graspMethod = serializedObject.FindProperty("_graspMethod");
-      specifyConditionalDrawing(() => graspMethod.intValue == (int)InteractionMaterial.GraspMethodEnum.Kinematic,
-                                "_graphicalAnchor",
-                                "_graphicalReturnTime");
-
       specifyConditionalDrawing(() => graspMethod.intValue == (int)InteractionMaterial.GraspMethodEnum.Velocity,
                                 "_releaseDistance",
                                 "_maxVelocity",

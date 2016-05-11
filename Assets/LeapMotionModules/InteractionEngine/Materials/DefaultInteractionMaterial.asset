@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Name: DefaultInteractionMaterial
   m_EditorClassIdentifier: 
   _enableContact: 1
+  _brushDisableDistance: 0.017
   _throwingVelocityCurve:
     serializedVersion: 2
     m_Curve:
@@ -35,6 +36,22 @@ MonoBehaviour:
     m_RotationOrder: 4
   _graspMethod: 0
   _graphicalReturnTime: 0.25
+  _warpCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 0.020000001
+      value: 0.02
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
   _releaseDistance: 0.15
   _maxVelocity: 3
-  _followStrength: 0.6
+  _followStrength: 1
