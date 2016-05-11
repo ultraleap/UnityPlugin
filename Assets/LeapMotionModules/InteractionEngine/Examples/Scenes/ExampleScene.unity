@@ -167,9 +167,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  handedness: 0
   _showArm: 1
   _material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
-  handedness: 0
+  _sphereMesh: {fileID: 0}
+  _cylinderResolution: 12
 --- !u!4 &125884216
 Transform:
   m_ObjectHideFlags: 0
@@ -1374,6 +1376,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   provider: {fileID: 972296616}
+  _headTransform: {fileID: 796518401}
+  _trackingAnchor: {fileID: 1081703725}
   recenter: 114
   tweenImageWarping: 0
   tweenRotationalWarping: 1
@@ -2668,9 +2672,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  handedness: 1
   _showArm: 1
   _material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
-  handedness: 1
+  _sphereMesh: {fileID: 0}
+  _cylinderResolution: 12
 --- !u!4 &1884541116
 Transform:
   m_ObjectHideFlags: 0

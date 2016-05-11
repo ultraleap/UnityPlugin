@@ -606,6 +606,7 @@ namespace Leap.Unity.Interaction {
 
       //Update kinematic status of body
       if (IsBeingGrasped) {
+        _rigidbody.useGravity = false;
         switch (_material.GraspMethod) {
           case InteractionMaterial.GraspMethodEnum.Kinematic:
             _rigidbody.isKinematic = true;
@@ -621,6 +622,7 @@ namespace Leap.Unity.Interaction {
             throw new InvalidOperationException("Unexpected grasp method");
         }
       } else {
+        _rigidbody.useGravity = _useGravity;
         _rigidbody.isKinematic = _isKinematic;
       }
     }
