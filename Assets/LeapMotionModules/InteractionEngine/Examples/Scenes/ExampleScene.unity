@@ -448,6 +448,10 @@ Prefab:
       value: 
       objectReference: {fileID: 11400000, guid: a1a145592530d754f93841b3e0a6b0a1,
         type: 2}
+    - target: {fileID: 5429032, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
   m_IsPrefabParent: 0
@@ -552,6 +556,10 @@ Prefab:
       value: 
       objectReference: {fileID: 11400000, guid: a1a145592530d754f93841b3e0a6b0a1,
         type: 2}
+    - target: {fileID: 5429032, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
   m_IsPrefabParent: 0
@@ -605,6 +613,10 @@ Prefab:
     - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_Name
       value: InteractionSphere (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5429032, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: m_Interpolate
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
@@ -806,6 +818,10 @@ Prefab:
       propertyPath: _brushDisableDistance
       value: 0.017
       objectReference: {fileID: 0}
+    - target: {fileID: 5484986, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
   m_IsPrefabParent: 0
@@ -942,7 +958,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetRenderRate: 0
   targetRenderRateStep: 1
-  fixedPhysicsRate: 100
+  fixedPhysicsRate: 50
   fixedPhysicsRateStep: 1
   unlockRender: 0
   unlockPhysics: 0
@@ -1189,6 +1205,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isHeadMounted: 1
+  _temporalWarping: {fileID: 1094789975}
   _overrideDeviceType: 0
   _overrideDeviceTypeWith: 1
   _useInterpolation: 1
@@ -2041,6 +2058,10 @@ Prefab:
       value: 
       objectReference: {fileID: 11400000, guid: a1a145592530d754f93841b3e0a6b0a1,
         type: 2}
+    - target: {fileID: 5429032, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
   m_IsPrefabParent: 0
@@ -2195,6 +2216,10 @@ Prefab:
       propertyPath: _brushDisableDistance
       value: 0.017
       objectReference: {fileID: 0}
+    - target: {fileID: 5484986, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
   m_IsPrefabParent: 0
@@ -2289,6 +2314,10 @@ Prefab:
     - target: {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: _brushDisableDistance
       value: 0.017
+      objectReference: {fileID: 0}
+    - target: {fileID: 5484986, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_Interpolate
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -2385,6 +2414,10 @@ Prefab:
       propertyPath: _brushDisableDistance
       value: 0.017
       objectReference: {fileID: 0}
+    - target: {fileID: 5484986, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_Interpolate
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
   m_IsPrefabParent: 0
@@ -2438,6 +2471,10 @@ Prefab:
     - target: {fileID: 119026, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_Name
       value: InteractionCube (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5484986, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_Interpolate
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}

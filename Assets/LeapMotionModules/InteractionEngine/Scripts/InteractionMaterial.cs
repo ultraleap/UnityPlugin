@@ -36,6 +36,10 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _graphicalReturnTime = 0.25f;
 
+    [SerializeField]
+    protected AnimationCurve _warpCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
+                                                             new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
+
     [Tooltip("How far the object can get from the hand before it is released.")]
     [SerializeField]
     protected float _releaseDistance = 0.15f;
@@ -71,6 +75,12 @@ namespace Leap.Unity.Interaction {
     public float GraphicalReturnTime {
       get {
         return _graphicalReturnTime;
+      }
+    }
+
+    public AnimationCurve WarpCurve {
+      get {
+        return _warpCurve;
       }
     }
 

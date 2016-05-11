@@ -418,6 +418,10 @@ namespace Leap.Unity.Interaction {
 
         _graphicalAnchor.position = newPosition + newRotation * deltaPosition;
         _graphicalAnchor.rotation = newRotation * deltaRotation;
+
+        float warpAmount = _material.WarpCurve.Evaluate(deltaPosition.magnitude);
+        _graphicalAnchor.localPosition *= warpAmount;
+        _graphicalAnchor.localRotation = Quaternion.Slerp(Quaternion.identity, _graphicalAnchor.localRotation, warpAmount);
       }
     }
 
