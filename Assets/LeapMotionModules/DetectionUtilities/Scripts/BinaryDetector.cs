@@ -18,7 +18,6 @@ namespace Leap.Unity.DetectionUtilities {
         OnActivate.Invoke();
       }
       IsActive = true;
-      OnDetection.Invoke();
     }
   
     public virtual void Deactivate(){
@@ -27,7 +26,6 @@ namespace Leap.Unity.DetectionUtilities {
         OnDeactivate.Invoke();
       }
       IsActive = false;
-      OnDetection.Invoke();
     }
   }
 }

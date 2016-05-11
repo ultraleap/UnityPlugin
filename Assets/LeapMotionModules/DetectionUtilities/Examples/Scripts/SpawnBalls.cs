@@ -4,15 +4,18 @@ using System.Collections;
 public class SpawnBalls : MonoBehaviour {
   public GameObject RedBallPrefab;
   public GameObject GreenBallPrefab;
+  public GameObject BlueBallPrefab;
   public float delayInterval = .15f; // seconds
   public int BallLimit = 200;
 
   private IEnumerator _redballCoroutine;
   private IEnumerator _greenballCoroutine;
+  private IEnumerator _blueballCoroutine;
 
   void Awake () {
-    _redballCoroutine = addRedBallsWithDelay();
-    _greenballCoroutine = addGreenBallsWithDelay();
+    _redballCoroutine = AddBallWithDelay(RedBallPrefab);
+    _greenballCoroutine = AddBallWithDelay(GreenBallPrefab);
+    _blueballCoroutine = AddBallWithDelay(BlueBallPrefab);
   }
 
   public void StartRedBalls(){
@@ -24,13 +27,6 @@ public class SpawnBalls : MonoBehaviour {
     StopCoroutine(_redballCoroutine);
   }
 
-  IEnumerator addRedBallsWithDelay(){
-    while (true) {
-      addBall(RedBallPrefab);
-      yield return new WaitForSeconds(delayInterval);
-    }
-  }
-
   public void StartGreenBalls(){
     StopCoroutine(_greenballCoroutine);
     StartCoroutine(_greenballCoroutine);
@@ -40,9 +36,18 @@ public class SpawnBalls : MonoBehaviour {
     StopCoroutine(_greenballCoroutine);
   }
 
-  IEnumerator addGreenBallsWithDelay(){
+  public void StartBlueBalls () {
+    StopCoroutine(_blueballCoroutine);
+    StartCoroutine(_blueballCoroutine);
+  }
+
+  public void StopBlueBalls () {
+    StopCoroutine(_blueballCoroutine);
+  }
+
+  private IEnumerator AddBallWithDelay (GameObject prefab) {
     while (true) {
-      addBall(GreenBallPrefab);
+      addBall(prefab);
       yield return new WaitForSeconds(delayInterval);
     }
   }
@@ -52,7 +57,7 @@ public class SpawnBalls : MonoBehaviour {
     GameObject go = GameObject.Instantiate(prefab);
     go.transform.parent = transform;
     Rigidbody rb = go.GetComponent<Rigidbody>();
-    rb.AddForce(Random.value, Random.value, Random.value);
+    rb.AddForce(Random.value * 3, Random.value * 3, Random.value * 3, ForceMode.Impulse);
   }
 
   private void removeBalls (int count) {

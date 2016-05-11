@@ -107,7 +107,6 @@ namespace Leap.Unity.DetectionUtilities {
                 stopped = false;
                 _didStop = true;
                 stopPosition = transform.position;
-                OnDetection.Invoke();
               }
             }
           }
