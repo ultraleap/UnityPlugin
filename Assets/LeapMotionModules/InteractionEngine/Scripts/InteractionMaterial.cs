@@ -28,17 +28,21 @@ namespace Leap.Unity.Interaction {
                                                                          new Keyframe(1.0f, 1.0f, 0.0f, 0.0f),
                                                                          new Keyframe(2.0f, 1.5f, 0.0f, 0.0f));
 
-    [Header("Grasp Settings")]
+    [Header("Warp Settings")]
     [SerializeField]
-    protected GraspMethodEnum _graspMethod = GraspMethodEnum.Velocity;
+    protected bool _warpingEnabled = true;
+
+    [SerializeField]
+    protected AnimationCurve _warpCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
+                                                             new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
 
     [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
     [SerializeField]
     protected float _graphicalReturnTime = 0.25f;
 
+    [Header("Grasp Settings")]
     [SerializeField]
-    protected AnimationCurve _warpCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
-                                                             new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
+    protected GraspMethodEnum _graspMethod = GraspMethodEnum.Velocity;
 
     [Tooltip("How far the object can get from the hand before it is released.")]
     [SerializeField]
@@ -66,9 +70,15 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public GraspMethodEnum GraspMethod {
+    public bool WarpingEnabled {
       get {
-        return _graspMethod;
+        return _warpingEnabled;
+      }
+    }
+
+    public AnimationCurve WarpCurve {
+      get {
+        return _warpCurve;
       }
     }
 
@@ -78,9 +88,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public AnimationCurve WarpCurve {
+    public GraspMethodEnum GraspMethod {
       get {
-        return _warpCurve;
+        return _graspMethod;
       }
     }
 

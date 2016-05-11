@@ -415,9 +415,14 @@ namespace Leap.Unity.Interaction {
 
       simulateInteraction();
 
-      updateInteractionStateChanges(frame);
+      bool didAnyHandGrasp;
+      updateInteractionStateChanges(frame, out didAnyHandGrasp);
 
       dispatchSimulationResults();
+
+      if (didAnyHandGrasp) {
+        dispatchOnHandsHolding(frame, isPhysics: true);
+      }
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         _registeredBehaviours[i].NotifyPostSolve();
@@ -494,7 +499,8 @@ namespace Leap.Unity.Interaction {
       InteractionC.UpdateController(ref _scene, ref _controllerTransform);
     }
 
-    protected virtual void updateInteractionStateChanges(Frame frame) {
+    protected virtual void updateInteractionStateChanges(Frame frame, out bool didAnyHandBeginGrasp) {
+      didAnyHandBeginGrasp = false;
       var hands = frame.Hands;
 
       //First loop through all the hands and get their classifications from the engine
@@ -563,6 +569,8 @@ namespace Leap.Unity.Interaction {
               IInteractionBehaviour interactionBehaviour;
               if (_instanceHandleToBehaviour.TryGetValue(handResult.instanceHandle, out interactionBehaviour)) {
                 if (interactionHand.graspedObject == null) {
+                  didAnyHandBeginGrasp = true;
+
                   if (!interactionBehaviour.IsBeingGrasped) {
                     _graspedBehaviours.Add(interactionBehaviour);
                   }
@@ -574,7 +582,6 @@ namespace Leap.Unity.Interaction {
                     Debug.LogException(e);
                     continue;
                   }
-
                 }
               } else {
                 Debug.LogError("Recieved a hand result with an unkown handle " + handResult.instanceHandle.handle);

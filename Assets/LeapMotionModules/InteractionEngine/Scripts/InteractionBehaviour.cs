@@ -408,7 +408,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandsHoldGraphics(List<Hand> hands) {
       base.OnHandsHoldGraphics(hands);
 
-      if (_graphicalAnchor != null) {
+      if (_graphicalAnchor != null && _material.WarpingEnabled) {
         Vector3 deltaPosition = Quaternion.Inverse(_solvedRotation) * (_rigidbody.position - _solvedPosition);
         Quaternion deltaRotation = Quaternion.Inverse(_solvedRotation) * _rigidbody.rotation;
 
