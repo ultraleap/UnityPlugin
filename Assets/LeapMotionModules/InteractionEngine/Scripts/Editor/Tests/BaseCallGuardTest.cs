@@ -38,6 +38,22 @@ namespace Leap.Unity.Interaction.Tests {
     }
 
     [Test]
+    public void Recursive2() {
+      _guard.Begin(KEY_A);
+      _guard.NotifyBaseCalled(KEY_A);
+      _guard.Begin(KEY_B);
+      _guard.NotifyBaseCalled(KEY_B);
+      _guard.Begin(KEY_A);
+      _guard.NotifyBaseCalled(KEY_A);
+      _guard.Begin(KEY_B);
+      _guard.NotifyBaseCalled(KEY_B);
+      _guard.AssertBaseCalled();
+      _guard.AssertBaseCalled();
+      _guard.AssertBaseCalled();
+      _guard.AssertBaseCalled();
+    }
+
+    [Test]
     [ExpectedException(typeof(BaseNotCalledException))]
     public void Recursive_BaseNotCalled1() {
       _guard.Begin(KEY_A);
