@@ -44,6 +44,9 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected GraspMethodEnum _graspMethod = GraspMethodEnum.Velocity;
 
+    [SerializeField]
+    protected bool _suspensionEnabled = true;
+
     [Tooltip("How far the object can get from the hand before it is released.")]
     [SerializeField]
     protected float _releaseDistance = 0.15f;
@@ -61,6 +64,12 @@ namespace Leap.Unity.Interaction {
     public bool EnableContact {
       get {
         return _enableContact;
+      }
+    }
+
+    public float BrushDisableDistance {
+      get {
+        return _brushDisableDistance;
       }
     }
 
@@ -94,6 +103,18 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public bool SuspensionEnabled {
+      get {
+        return _suspensionEnabled;
+      }
+    }
+
+    public float ReleaseDistance {
+      get {
+        return _releaseDistance;
+      }
+    }
+
     public float MaxVelocity {
       get {
         return _maxVelocity;
@@ -106,11 +127,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public float BrushDisableDistance {
-      get {
-        return _brushDisableDistance;
-      }
-    }
+
 
 #if UNITY_EDITOR
     private const string DEFAULT_ASSET_NAME = "InteractionMaterial.asset";

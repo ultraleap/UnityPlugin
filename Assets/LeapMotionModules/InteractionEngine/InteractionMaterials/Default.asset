@@ -51,8 +51,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  _graspMethod: 0
   _graphicalReturnTime: 0.25
+  _graspMethod: 0
+  _suspensionEnabled: 1
   _releaseDistance: 0.15
   _maxVelocity: 6
   _followStrength: 1
