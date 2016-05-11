@@ -40,23 +40,6 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected string _dataSubfolder = "InteractionEngine";
 
-    [Header("Layer Settings")]
-    [SerializeField]
-    protected bool _autoGenerateLayers = true;
-
-    [Tooltip("Layer to use for auto-generation.  The generated interaction layers will have the same collision settings as this layer.")]
-    [SerializeField]
-    protected int _teplateLayer = 0;
-
-    [SerializeField]
-    protected int _interactionLayer = 0;
-
-    [SerializeField]
-    protected int _brushHandLayer = 0;
-
-    [SerializeField]
-    protected int _interactionNoClipLayer = 0;
-
     [Header("Interaction Settings")]
     [Tooltip("The amount of time a Hand can remain untracked while also still grasping an object.")]
     [SerializeField]
@@ -73,6 +56,23 @@ namespace Leap.Unity.Interaction {
     [Tooltip("Depth before collision response becomes as if holding a sphere.")]
     [SerializeField]
     protected float _depthUntilSphericalInside = 0.023f;
+
+    [Header("Layer Settings")]
+    [SerializeField]
+    protected bool _autoGenerateLayers = true;
+
+    [Tooltip("Layer to use for auto-generation.  The generated interaction layers will have the same collision settings as this layer.")]
+    [SerializeField]
+    protected int _teplateLayer = 0;
+
+    [SerializeField]
+    protected int _interactionLayer = 0;
+
+    [SerializeField]
+    protected int _brushHandLayer = 0;
+
+    [SerializeField]
+    protected int _interactionNoClipLayer = 0;
 
     [Header("Debug")]
     [Tooltip("Allows simulation to be disabled without destroying the scene in any way.")]
