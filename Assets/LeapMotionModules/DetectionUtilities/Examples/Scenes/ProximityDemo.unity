@@ -119,15 +119,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelCollection:
-  - LeftModel: {fileID: 1545945338}
+  ModelPool:
+  - _handPool: {fileID: 0}
+    GroupName: Graphics
+    LeftModel: {fileID: 1545945338}
+    IsLeftToBeSpawned: 0
     RightModel: {fileID: 1061438465}
-  - LeftModel: {fileID: 1414805578}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 1
+  - _handPool: {fileID: 0}
+    GroupName: Physics
+    LeftModel: {fileID: 1414805578}
+    IsLeftToBeSpawned: 0
     RightModel: {fileID: 1167543056}
-  - LeftModel: {fileID: 375805477}
-    RightModel: {fileID: 540169376}
-  ModelPool: []
-  EnforceHandedness: 1
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 1
+  - _handPool: {fileID: 0}
+    GroupName: Attachments
+    LeftModel: {fileID: 540169376}
+    IsLeftToBeSpawned: 0
+    RightModel: {fileID: 375805477}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 1
 --- !u!114 &72891527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -665,10 +687,10 @@ Transform:
   m_PrefabParentObject: {fileID: 408564, guid: 82561f9c9b90ae14b9df601f141c4963, type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 418859236}
-  m_LocalRotation: {x: -0.35755515, y: -0.019904805, z: -0.7650837, w: 0.5351683}
-  m_LocalPosition: {x: 0.002627564, y: 0.17572998, z: 0.036324322}
+  m_LocalRotation: {x: -0.35755518, y: -0.019904805, z: -0.7650837, w: 0.5351683}
+  m_LocalPosition: {x: -0.008364244, y: 0.16709308, z: 0.020781614}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -24.4037, y: 35.2679, z: -117.919495}
   m_Children: []
   m_Father: {fileID: 375805476}
   m_RootOrder: 2
@@ -732,11 +754,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Period: 0.1
-  OnDetection:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
   ShowGizmos: 1
   IsActive: 0
   OnActivate:
@@ -784,11 +801,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Period: 0.1
-  OnDetection:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
   ShowGizmos: 1
   IsActive: 0
   OnActivate:
@@ -4071,11 +4083,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Period: 0.1
-  OnDetection:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
   ShowGizmos: 1
   IsActive: 0
   OnActivate:
@@ -4163,11 +4170,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Period: 0.1
-  OnDetection:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
   ShowGizmos: 1
   IsActive: 0
   OnActivate:
@@ -4316,11 +4318,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Period: 0.1
-  OnDetection:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
   ShowGizmos: 1
   IsActive: 0
   OnActivate:
@@ -4402,11 +4399,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Period: 0.1
-  OnDetection:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
   ShowGizmos: 1
   IsActive: 0
   OnActivate:
@@ -4490,10 +4482,10 @@ Transform:
   m_PrefabParentObject: {fileID: 408564, guid: 82561f9c9b90ae14b9df601f141c4963, type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1123946201}
-  m_LocalRotation: {x: -0.35755515, y: -0.019904805, z: -0.7650837, w: 0.5351683}
-  m_LocalPosition: {x: 0.002627564, y: 0.17572998, z: 0.036324322}
+  m_LocalRotation: {x: -0.35755518, y: -0.019904805, z: -0.7650837, w: 0.5351683}
+  m_LocalPosition: {x: -0.008364244, y: 0.16709308, z: 0.020781614}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -24.4037, y: 35.2679, z: -117.919495}
   m_Children: []
   m_Father: {fileID: 540169375}
   m_RootOrder: 2
@@ -5802,11 +5794,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Period: 0.1
-  OnDetection:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
   ShowGizmos: 1
   IsActive: 0
   OnActivate:
@@ -5835,11 +5822,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Period: 0.1
-  OnDetection:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
   ShowGizmos: 1
   IsActive: 0
   OnActivate:

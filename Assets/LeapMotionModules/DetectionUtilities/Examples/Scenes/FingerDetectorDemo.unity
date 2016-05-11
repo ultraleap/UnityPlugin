@@ -119,13 +119,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelCollection:
-  - LeftModel: {fileID: 1545945338}
+  ModelPool:
+  - _handPool: {fileID: 0}
+    GroupName: Graphics_hands
+    LeftModel: {fileID: 1545945338}
+    IsLeftToBeSpawned: 0
     RightModel: {fileID: 1061438465}
-  - LeftModel: {fileID: 1414805578}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 1
+  - _handPool: {fileID: 0}
+    GroupName: Physics_hands
+    LeftModel: {fileID: 1414805578}
+    IsLeftToBeSpawned: 0
     RightModel: {fileID: 1167543056}
-  ModelPool: []
-  EnforceHandedness: 1
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 1
 --- !u!114 &72891527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1649,7 +1663,7 @@ MonoBehaviour:
       PublicKeyToken=null
   handModel: {fileID: 0}
   Thumb: 0
-  Index: 2
+  Index: 1
   Middle: 1
   Ring: 1
   Pinky: 1
@@ -1961,7 +1975,7 @@ MonoBehaviour:
       PublicKeyToken=null
   handModel: {fileID: 0}
   Thumb: 0
-  Index: 2
+  Index: 1
   Middle: 1
   Ring: 1
   Pinky: 1
@@ -3057,7 +3071,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.00081848353, y: 0.0011}
+  m_AnchoredPosition: {x: -0.00081848353, y: 0}
   m_SizeDelta: {x: 481.9, y: 180.53}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1268138431
