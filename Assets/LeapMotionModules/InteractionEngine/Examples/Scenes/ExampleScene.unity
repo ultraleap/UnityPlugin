@@ -1835,6 +1835,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8db2ca3caad750429c7c1db202bbf5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 1473219677}
   handedness: 0
   _perBoneMass: 0.2
   _collisionDetection: 2
@@ -2061,6 +2062,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _leapProvider: {fileID: 972296616}
   _dataSubfolder: InteractionEngine
+  _autoGenerateLayers: 1
+  _interactionLayer: 8
+  _brushHandLayer: 9
+  _interactionNoClipLayer: 10
   _untrackedTimeout: 0.5
   _enableContact: 1
   _enableGrasping: 1
@@ -2134,6 +2139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8db2ca3caad750429c7c1db202bbf5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 1473219677}
   handedness: 1
   _perBoneMass: 0.2
   _collisionDetection: 2
