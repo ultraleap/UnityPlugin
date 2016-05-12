@@ -117,14 +117,12 @@ namespace Leap.Unity {
     }
 
     public struct CameraParams {
-      public readonly Transform TrackingAnchor;
       public readonly Transform CenterEyeTransform;
       public readonly Matrix4x4 ProjectionMatrix;
       public readonly int Width;
       public readonly int Height;
 
       public CameraParams(Camera camera) {
-        TrackingAnchor = camera.transform.parent;
         CenterEyeTransform = camera.transform;
         ProjectionMatrix = camera.projectionMatrix;
 

@@ -106,6 +106,10 @@ using System.Runtime.InteropServices;
 
          static Finger MakeFinger(Finger.FingerType name, Vector position, Vector forward, Vector up, float[] jointLengths,
             int frameId, int handId, int fingerId, bool isLeft){
+
+            forward = forward.Normalized;
+            up = up.Normalized;
+
             Bone[] bones = new Bone[5];
             float proximalDistance = -jointLengths[0];
             Bone metacarpal = MakeBone (Bone.BoneType.TYPE_METACARPAL, position + forward * proximalDistance, jointLengths[0], 8f, forward, up, isLeft);
