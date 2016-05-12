@@ -174,6 +174,7 @@ namespace Leap.Unity.Interaction {
       _rigidbody.maxAngularVelocity = float.PositiveInfinity;
 
       _childrenArray = GetComponentsInChildren<Transform>(true);
+      updateLayer();
 
       //Technically we only need one instance in the entire scene, but easier for each object to have it's own instance for now.
       //TODO: Investigate allowing this to be a singleton?
@@ -319,31 +320,11 @@ namespace Leap.Unity.Interaction {
       if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
         if (!_ignoringBrushes && results.maxHandDepth > _material.BrushDisableDistance) {
           _ignoringBrushes = true;
-
-          int layer;
-          if (_material.UseCustomLayers) {
-            layer = _material.InteractionNoClipLayer;
-          } else {
-            layer = _material.InteractionNoClipLayer;
-          }
-
-          for (int i = 0; i < _childrenArray.Length; i++) {
-            _childrenArray[i].gameObject.layer = layer;
-          }
+          updateLayer();
         }
       } else if (_ignoringBrushes) {
         _ignoringBrushes = false;
-
-        int layer;
-        if (_material.UseCustomLayers) {
-          layer = _material.InteractionLayer;
-        } else {
-          layer = _material.InteractionLayer;
-        }
-
-        for (int i = 0; i < _childrenArray.Length; i++) {
-          _childrenArray[i].gameObject.layer = layer;
-        }
+        updateLayer();
       }
     }
 
@@ -595,6 +576,27 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL
+
+    protected void updateLayer() {
+      int layer;
+      if (IsBeingGrasped) {
+        if (_material.UseCustomLayers) {
+          layer = _material.InteractionNoClipLayer;
+        } else {
+          layer = _manager.InteractionNoClipLayer;
+        }
+      } else {
+        if (_material.UseCustomLayers) {
+          layer = _material.InteractionLayer;
+        } else {
+          layer = _manager.InteractionLayer;
+        }
+      }
+
+      for (int i = 0; i < _childrenArray.Length; i++) {
+        _childrenArray[i].gameObject.layer = layer;
+      }
+    }
 
     protected INTERACTION_TRANSFORM getRigidbodyTransform() {
       INTERACTION_TRANSFORM interactionTransform = new INTERACTION_TRANSFORM();
