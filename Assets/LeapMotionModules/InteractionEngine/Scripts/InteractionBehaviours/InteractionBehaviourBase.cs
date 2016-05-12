@@ -245,7 +245,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override sealed void NotifyHandLostTracking(Hand oldHand) {
+    public override sealed void NotifyHandLostTracking(Hand oldHand, out bool allowSuspension) {
       Assert.AreNotEqual(_graspingIds.Count, 0, NoGraspingHandsMessage());
       Assert.IsTrue(_graspingIds.Contains(oldHand.Id), HandNotGraspingMessage(oldHand.Id));
       Assert.IsFalse(_untrackedIds.Contains(oldHand.Id), HandAlreadyUntrackedMessage(oldHand.Id));
@@ -253,7 +253,7 @@ namespace Leap.Unity.Interaction {
       _untrackedIds.Add(oldHand.Id);
 
       _baseCallGuard.Begin("OnHandLostTracking");
-      OnHandLostTracking(oldHand);
+      OnHandLostTracking(oldHand, out allowSuspension);
       _baseCallGuard.AssertBaseCalled();
     }
 
@@ -389,7 +389,8 @@ namespace Leap.Unity.Interaction {
     /// is not yet considered ungrasped, and OnHandRegainedTracking might be called in the future
     /// if the Hand becomes tracked again.
     /// </summary>
-    protected virtual void OnHandLostTracking(Hand oldHand) {
+    protected virtual void OnHandLostTracking(Hand oldHand, out bool allowSuspension) {
+      allowSuspension = false;
       _baseCallGuard.NotifyBaseCalled("OnHandLostTracking");
     }
 

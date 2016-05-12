@@ -35,7 +35,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _graspMethod: 0
-  _suspensionEnabled: 1
+  _suspensionEnabled: 0
   _releaseDistance: 0.15
   _maxVelocity: 3
   _followStrength: 0.6

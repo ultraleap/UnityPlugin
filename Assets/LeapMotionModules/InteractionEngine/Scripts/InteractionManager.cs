@@ -295,7 +295,7 @@ namespace Leap.Unity.Interaction {
       if (interactionHand.graspedObject.GraspingHandCount == 1) {
         _graspedBehaviours.Remove(interactionHand.graspedObject);
       }
-      
+
       interactionHand.ReleaseObject();
       return true;
     }
@@ -773,7 +773,14 @@ namespace Leap.Unity.Interaction {
           if (!ieHand.isUntracked) {
             try {
               //This also dispatches InteractionObject.OnHandLostTracking()
-              ieHand.MarkUntracked();
+              bool didSuspend;
+              ieHand.MarkUntracked(out didSuspend);
+
+              if (!didSuspend) {
+                //set to max value to force the hand to time-out
+                handAge = float.MaxValue;
+              }
+
             } catch (Exception e) {
               _misbehavingBehaviours.Add(ieHand.graspedObject);
               Debug.LogException(e);
@@ -940,11 +947,12 @@ namespace Leap.Unity.Interaction {
       public void ReleaseObject() {
         graspedObject.NotifyHandReleased(hand);
         graspedObject = null;
+        isUntracked = false;
       }
 
-      public void MarkUntracked() {
+      public void MarkUntracked(out bool didSuspend) {
         isUntracked = true;
-        graspedObject.NotifyHandLostTracking(hand);
+        graspedObject.NotifyHandLostTracking(hand, out didSuspend);
       }
 
       public void MarkTimeout() {
