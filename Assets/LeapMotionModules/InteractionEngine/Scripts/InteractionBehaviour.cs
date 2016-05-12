@@ -54,6 +54,8 @@ namespace Leap.Unity.Interaction {
 
     protected bool _isKinematic;
     protected bool _useGravity;
+    protected float _drag;
+    protected float _angularDrag;
     protected bool _recievedVelocityUpdate = false;
     protected bool _notifiedOfTeleport = false;
     protected bool _ignoringBrushes = false;
@@ -253,6 +255,8 @@ namespace Leap.Unity.Interaction {
       //Copy over existing settings for defaults
       _isKinematic = _rigidbody.isKinematic;
       _useGravity = _rigidbody.useGravity;
+      _drag = _rigidbody.drag;
+      _angularDrag = _rigidbody.angularDrag;
 
       _solvedPosition = _rigidbody.position;
       _solvedRotation = _rigidbody.rotation;
@@ -637,6 +641,9 @@ namespace Leap.Unity.Interaction {
       //Update kinematic status of body
       if (IsBeingGrasped) {
         _rigidbody.useGravity = false;
+        _rigidbody.drag = 0;
+        _rigidbody.angularDrag = 0;
+
         switch (_material.GraspMethod) {
           case InteractionMaterial.GraspMethodEnum.Kinematic:
             _rigidbody.isKinematic = true;
@@ -654,6 +661,8 @@ namespace Leap.Unity.Interaction {
       } else {
         _rigidbody.useGravity = _useGravity;
         _rigidbody.isKinematic = _isKinematic;
+        _rigidbody.drag = _drag;
+        _rigidbody.angularDrag = _angularDrag;
       }
     }
 
