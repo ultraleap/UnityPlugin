@@ -34,6 +34,11 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _graspMethod: 1
+  _suspensionEnabled: 0
+  _releaseDistance: 0.15
+  _maxVelocity: 3
+  _followStrength: 0.6
   _warpingEnabled: 1
   _warpCurve:
     serializedVersion: 2
@@ -52,7 +57,3 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _graphicalReturnTime: 0.25
-  _graspMethod: 1
-  _releaseDistance: 0.15
-  _maxVelocity: 3
-  _followStrength: 0.6

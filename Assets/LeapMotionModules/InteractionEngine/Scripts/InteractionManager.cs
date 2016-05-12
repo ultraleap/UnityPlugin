@@ -672,11 +672,8 @@ namespace Leap.Unity.Interaction {
               ieHand.MarkUntracked(out didSuspend);
 
               if (!didSuspend) {
-                if (ieHand.graspedObject.GraspingHandCount == 1) {
-                  _graspedBehaviours.Remove(ieHand.graspedObject);
-                }
-
-                ieHand.ReleaseObject();
+                //set to max value to force the hand to time-out
+                handAge = float.MaxValue;
               }
 
             } catch (Exception e) {
