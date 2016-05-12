@@ -234,7 +234,7 @@ namespace Leap.Unity.Interaction {
         _brushHandLayer = value;
       }
     }
-    
+
     /// Force an update of the internal scene info.  This should be called if settings have been changed like
     /// gravity.
     /// </summary>
