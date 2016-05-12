@@ -40,10 +40,7 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected string _dataSubfolder = "InteractionEngine";
 
-    [Tooltip("The amount of time a Hand can remain untracked while also still grasping an object.")]
-    [SerializeField]
-    protected float _untrackedTimeout = 0.5f;
-
+    [Header("Interaction Settings")]
     [Tooltip("Allow the Interaction Engine to modify object velocities when pushing.")]
     [SerializeField]
     protected bool _enableContact = true;
@@ -52,9 +49,30 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _enableGrasping = true;
 
+    [Tooltip("The amount of time a Hand can remain untracked while also still grasping an object.")]
+    [SerializeField]
+    protected float _untrackedTimeout = 0.5f;
+
     [Tooltip("Depth before collision response becomes as if holding a sphere.")]
     [SerializeField]
     protected float _depthUntilSphericalInside = 0.023f;
+
+    [Header("Layer Settings")]
+    [SerializeField]
+    protected bool _autoGenerateLayers = false;
+
+    [Tooltip("Layer to use for auto-generation.  The generated interaction layers will have the same collision settings as this layer.")]
+    [SerializeField]
+    protected SingleLayer _templateLayer = 0;
+
+    [SerializeField]
+    protected SingleLayer _interactionLayer = 0;
+
+    [SerializeField]
+    protected SingleLayer _brushHandLayer = 0;
+
+    [SerializeField]
+    protected SingleLayer _interactionNoClipLayer = 0;
 
     [Header("Debug")]
     [Tooltip("Allows simulation to be disabled without destroying the scene in any way.")]
@@ -182,6 +200,41 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Gets the layer that interaction objects should be on by default.
+    /// </summary>
+    public int InteractionLayer {
+      get {
+        return _interactionLayer;
+      }
+      set {
+        _interactionLayer = value;
+      }
+    }
+
+    /// <summary>
+    /// Gets the layer that interaction objects should be on when they become grasped.
+    /// </summary>
+    public int InteractionNoClipLayer {
+      get {
+        return _interactionNoClipLayer;
+      }
+      set {
+        _interactionNoClipLayer = value;
+      }
+    }
+
+    /// <summary>
+    /// Gets the layer that interaction brushes should be on.
+    /// </summary>
+    public int InteractionBrushLayer {
+      get {
+        return _brushHandLayer;
+      }
+      set {
+        _brushHandLayer = value;
+      }
+    }
+
     /// Force an update of the internal scene info.  This should be called if settings have been changed like
     /// gravity.
     /// </summary>
@@ -242,7 +295,7 @@ namespace Leap.Unity.Interaction {
       if (interactionHand.graspedObject.GraspingHandCount == 1) {
         _graspedBehaviours.Remove(interactionHand.graspedObject);
       }
-      
+
       interactionHand.ReleaseObject();
       return true;
     }
@@ -334,9 +387,18 @@ namespace Leap.Unity.Interaction {
       if (_untrackedTimeout < 0) {
         _untrackedTimeout = 0;
       }
+
+      if (_autoGenerateLayers) {
+        autoGenerateLayers();
+      }
     }
 
-    protected virtual void Awake() { }
+    protected virtual void Awake() {
+      if (_autoGenerateLayers) {
+        autoGenerateLayers();
+        autoSetupCollisionLayers();
+      }
+    }
 
     protected virtual void OnEnable() {
       if (_leapProvider == null) {
@@ -440,6 +502,49 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL METHODS
+    protected void autoGenerateLayers() {
+      _interactionLayer = -1;
+      _brushHandLayer = -1;
+      _interactionNoClipLayer = -1;
+      for (int i = 8; i < 32; i++) {
+        string layerName = LayerMask.LayerToName(i);
+        if (string.IsNullOrEmpty(layerName)) {
+          if (_interactionLayer == -1) {
+            _interactionLayer = i;
+          } else if (_brushHandLayer == -1) {
+            _brushHandLayer = i;
+          } else {
+            _interactionNoClipLayer = i;
+            break;
+          }
+        }
+      }
+
+      if (_interactionLayer == -1 || _brushHandLayer == -1 || _interactionNoClipLayer == -1) {
+        if (Application.isPlaying) {
+          enabled = false;
+        }
+        Debug.LogError("InteractionManager Could not find enough free layers for auto-setup, manual setup required.");
+        _autoGenerateLayers = false;
+        return;
+      }
+    }
+
+    private void autoSetupCollisionLayers() {
+      for (int i = 0; i < 32; i++) {
+        //Copy ignore settings from template layer
+        bool shouldIgnore = Physics.GetIgnoreLayerCollision(_templateLayer, i);
+
+        Physics.IgnoreLayerCollision(_interactionLayer, i, shouldIgnore);
+        Physics.IgnoreLayerCollision(_interactionNoClipLayer, i, shouldIgnore);
+
+        //Set brush layer to collide with nothing
+        Physics.IgnoreLayerCollision(_brushHandLayer, i, true);
+      }
+
+      //After copy and set we specify the interactions between the brush and interaction objects
+      Physics.IgnoreLayerCollision(_brushHandLayer, _interactionLayer, false);
+    }
 
     protected virtual void simulateFrame(Frame frame) {
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
@@ -668,7 +773,14 @@ namespace Leap.Unity.Interaction {
           if (!ieHand.isUntracked) {
             try {
               //This also dispatches InteractionObject.OnHandLostTracking()
-              ieHand.MarkUntracked();
+              bool didSuspend;
+              ieHand.MarkUntracked(out didSuspend);
+
+              if (!didSuspend) {
+                //set to max value to force the hand to time-out
+                handAge = float.MaxValue;
+              }
+
             } catch (Exception e) {
               _misbehavingBehaviours.Add(ieHand.graspedObject);
               Debug.LogException(e);
@@ -835,11 +947,12 @@ namespace Leap.Unity.Interaction {
       public void ReleaseObject() {
         graspedObject.NotifyHandReleased(hand);
         graspedObject = null;
+        isUntracked = false;
       }
 
-      public void MarkUntracked() {
+      public void MarkUntracked(out bool didSuspend) {
         isUntracked = true;
-        graspedObject.NotifyHandLostTracking(hand);
+        graspedObject.NotifyHandLostTracking(hand, out didSuspend);
       }
 
       public void MarkTimeout() {

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
 using UnityEditor;
 
 namespace Leap.Unity.Interaction {
@@ -8,6 +9,7 @@ namespace Leap.Unity.Interaction {
   public class InteractionManagerEditor : CustomEditorBase {
 
     private IInteractionBehaviour[] _interactionBehaviours;
+
     private bool _anyBehavioursUnregistered;
 
     protected override void OnEnable() {
@@ -15,11 +17,60 @@ namespace Leap.Unity.Interaction {
 
       specifyCustomDecorator("_leapProvider", providerDectorator);
 
+      SerializedProperty autoGenerateLayerProperty = serializedObject.FindProperty("_autoGenerateLayers");
+      specifyConditionalDrawing(() => autoGenerateLayerProperty.boolValue,
+                                "_templateLayer");
+      specifyConditionalDrawing(() => !autoGenerateLayerProperty.boolValue,
+                                "_interactionLayer",
+                                "_brushHandLayer",
+                                "_interactionNoClipLayer");
+
+      specifyCustomDecorator("_interactionLayer", collisionLayerHelper);
+
       _interactionBehaviours = FindObjectsOfType<IInteractionBehaviour>();
       for (int i = 0; i < _interactionBehaviours.Length; i++) {
         if (_interactionBehaviours[i].Manager == null) {
           _anyBehavioursUnregistered = true;
           break;
+        }
+      }
+    }
+
+    private void collisionLayerHelper(SerializedProperty prop) {
+      InteractionManager manager = target as InteractionManager;
+      
+      if (manager.InteractionBrushLayer == manager.InteractionLayer) {
+        EditorGUILayout.HelpBox("Brush Layer cannot be the same as Interaction Layer", MessageType.Error);
+        return;
+      }
+
+      if (manager.InteractionBrushLayer == manager.InteractionNoClipLayer) {
+        EditorGUILayout.HelpBox("Brush Layer cannot be the same as No-Clip Layer", MessageType.Error);
+        return;
+      }
+
+      if (manager.InteractionLayer == manager.InteractionNoClipLayer) {
+        EditorGUILayout.HelpBox("Interaction Layer cannot be the same as No-Clip Layer", MessageType.Error);
+        return;
+      }
+
+      if (!serializedObject.FindProperty("_autoGenerateLayers").boolValue) {
+        if (Physics.GetIgnoreLayerCollision(manager.InteractionBrushLayer, manager.InteractionLayer)) {
+          using (new GUILayout.HorizontalScope()) {
+            EditorGUILayout.HelpBox("Brush Layer should collide with Interaction Layer", MessageType.Warning);
+            if (GUILayout.Button("Auto-fix")) {
+              Physics.IgnoreLayerCollision(manager.InteractionBrushLayer, manager.InteractionLayer, false);
+            }
+          }
+        }
+
+        if (!Physics.GetIgnoreLayerCollision(manager.InteractionBrushLayer, manager.InteractionNoClipLayer)) {
+          using (new GUILayout.HorizontalScope()) {
+            EditorGUILayout.HelpBox("Brush Layer should not collide with No-Clip Layer", MessageType.Warning);
+            if (GUILayout.Button("Auto-fix")) {
+              Physics.IgnoreLayerCollision(manager.InteractionBrushLayer, manager.InteractionNoClipLayer, true);
+            }
+          }
         }
       }
     }

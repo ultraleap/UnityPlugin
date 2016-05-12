@@ -8,7 +8,7 @@ using System;
 using UnityEditor;
 #endif
 
-namespace Leap.Unity {
+namespace Leap.Unity.Interaction {
   /** Collision brushes */
   public class InteractionBrushHand : IHandModel {
     private const int N_FINGERS = 5;
@@ -21,6 +21,9 @@ namespace Leap.Unity {
     public override ModelType HandModelType {
       get { return ModelType.Physics; }
     }
+
+    [SerializeField]
+    private InteractionManager _manager;
 
     [SerializeField]
     private Chirality handedness;
@@ -39,6 +42,14 @@ namespace Leap.Unity {
 
     public override Hand GetLeapHand() { return _hand; }
     public override void SetLeapHand(Hand hand) { _hand = hand; }
+
+    public override void InitHand() {
+      base.InitHand();
+
+      if (Application.isPlaying) {
+        gameObject.layer = _manager.InteractionBrushLayer;
+      }
+    }
 
     public override void BeginHand() {
       base.BeginHand();

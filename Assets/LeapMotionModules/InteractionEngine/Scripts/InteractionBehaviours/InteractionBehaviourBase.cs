@@ -33,6 +33,13 @@ namespace Leap.Unity.Interaction {
     protected InteractionManager _manager;
     #endregion
 
+    #region EVENTS
+    public event Action<Hand> OnHandGraspedEvent;
+    public event Action<Hand> OnHandReleasedEvent;
+    public event Action OnGraspBeginEvent;
+    public event Action OnGraspEndEvent;
+    #endregion
+
     #region INTERNAL FIELDS
     private bool _isRegisteredWithManager = false;
 
@@ -245,7 +252,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override sealed void NotifyHandLostTracking(Hand oldHand) {
+    public override sealed void NotifyHandLostTracking(Hand oldHand, out bool allowSuspension) {
       Assert.AreNotEqual(_graspingIds.Count, 0, NoGraspingHandsMessage());
       Assert.IsTrue(_graspingIds.Contains(oldHand.Id), HandNotGraspingMessage(oldHand.Id));
       Assert.IsFalse(_untrackedIds.Contains(oldHand.Id), HandAlreadyUntrackedMessage(oldHand.Id));
@@ -253,7 +260,7 @@ namespace Leap.Unity.Interaction {
       _untrackedIds.Add(oldHand.Id);
 
       _baseCallGuard.Begin("OnHandLostTracking");
-      OnHandLostTracking(oldHand);
+      OnHandLostTracking(oldHand, out allowSuspension);
       _baseCallGuard.AssertBaseCalled();
     }
 
@@ -361,6 +368,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     protected virtual void OnHandGrasped(Hand hand) {
       _baseCallGuard.NotifyBaseCalled("OnHandGrasped");
+      if (OnHandGraspedEvent != null) {
+        OnHandGraspedEvent(hand);
+      }
     }
 
     /// <summary>
@@ -382,6 +392,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     protected virtual void OnHandReleased(Hand hand) {
       _baseCallGuard.NotifyBaseCalled("OnHandReleased");
+      if (OnHandReleasedEvent != null) {
+        OnHandReleasedEvent(hand);
+      }
     }
 
     /// <summary>
@@ -389,7 +402,8 @@ namespace Leap.Unity.Interaction {
     /// is not yet considered ungrasped, and OnHandRegainedTracking might be called in the future
     /// if the Hand becomes tracked again.
     /// </summary>
-    protected virtual void OnHandLostTracking(Hand oldHand) {
+    protected virtual void OnHandLostTracking(Hand oldHand, out bool allowSuspension) {
+      allowSuspension = false;
       _baseCallGuard.NotifyBaseCalled("OnHandLostTracking");
     }
 
@@ -416,6 +430,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     protected virtual void OnGraspBegin() {
       _baseCallGuard.NotifyBaseCalled("OnGraspBegin");
+      if (OnGraspBeginEvent != null) {
+        OnGraspBeginEvent();
+      }
     }
 
     /// <summary>
@@ -424,6 +441,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     protected virtual void OnGraspEnd() {
       _baseCallGuard.NotifyBaseCalled("OnGraspEnd");
+      if (OnGraspEndEvent != null) {
+        OnGraspEndEvent();
+      }
     }
     #endregion
 

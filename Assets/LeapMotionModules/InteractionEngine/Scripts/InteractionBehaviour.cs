@@ -49,10 +49,13 @@ namespace Leap.Unity.Interaction {
     protected InteractionMaterial _material;
 
     protected Renderer[] _renderers;
+    protected Transform[] _childrenArray;
     protected Rigidbody _rigidbody;
 
     protected bool _isKinematic;
     protected bool _useGravity;
+    protected float _drag;
+    protected float _angularDrag;
     protected bool _recievedVelocityUpdate = false;
     protected bool _notifiedOfTeleport = false;
     protected bool _ignoringBrushes = false;
@@ -172,6 +175,9 @@ namespace Leap.Unity.Interaction {
       }
       _rigidbody.maxAngularVelocity = float.PositiveInfinity;
 
+      _childrenArray = GetComponentsInChildren<Transform>(true);
+      updateLayer();
+
       //Technically we only need one instance in the entire scene, but easier for each object to have it's own instance for now.
       //TODO: Investigate allowing this to be a singleton?
       KabschC.Construct(ref _kabsch);
@@ -249,6 +255,8 @@ namespace Leap.Unity.Interaction {
       //Copy over existing settings for defaults
       _isKinematic = _rigidbody.isKinematic;
       _useGravity = _rigidbody.useGravity;
+      _drag = _rigidbody.drag;
+      _angularDrag = _rigidbody.angularDrag;
 
       _solvedPosition = _rigidbody.position;
       _solvedRotation = _rigidbody.rotation;
@@ -316,15 +324,11 @@ namespace Leap.Unity.Interaction {
       if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
         if (!_ignoringBrushes && results.maxHandDepth > _material.BrushDisableDistance) {
           _ignoringBrushes = true;
-
-          // HACK FIXME TODO BBQ.  This will be rewired.
-          gameObject.layer = 10; // InteractionExampleObjectNoClipBrush
+          updateLayer();
         }
       } else if (_ignoringBrushes) {
         _ignoringBrushes = false;
-
-        // HACK FIXME TODO BBQ.  This will be rewired.
-        gameObject.layer = 9; // InteractionExampleObjectCollidesBrush
+        updateLayer();
       }
     }
 
@@ -439,8 +443,10 @@ namespace Leap.Unity.Interaction {
       removeHandPointCollection(hand.Id);
     }
 
-    protected override void OnHandLostTracking(Hand oldHand) {
-      base.OnHandLostTracking(oldHand);
+    protected override void OnHandLostTracking(Hand oldHand, out bool allowSuspension) {
+      base.OnHandLostTracking(oldHand, out allowSuspension);
+
+      allowSuspension = _material.SuspensionEnabled;
 
       updateState();
     }
@@ -495,6 +501,13 @@ namespace Leap.Unity.Interaction {
     #region UNITY CALLBACKS
     protected virtual void Awake() {
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
+
+      Vector3 scale = transform.lossyScale;
+      if (!Mathf.Approximately(scale.x, scale.y) || !Mathf.Approximately(scale.x, scale.z)) {
+        enabled = false;
+        Debug.LogError("Interaction Behaviour cannot have a non-uniform scale!");
+        return;
+      }
     }
 
     protected IEnumerator lerpGraphicalToOrigin() {
@@ -568,6 +581,27 @@ namespace Leap.Unity.Interaction {
 
     #region INTERNAL
 
+    protected void updateLayer() {
+      int layer;
+      if (IsBeingGrasped) {
+        if (_material.UseCustomLayers) {
+          layer = _material.InteractionNoClipLayer;
+        } else {
+          layer = _manager.InteractionNoClipLayer;
+        }
+      } else {
+        if (_material.UseCustomLayers) {
+          layer = _material.InteractionLayer;
+        } else {
+          layer = _manager.InteractionLayer;
+        }
+      }
+
+      for (int i = 0; i < _childrenArray.Length; i++) {
+        _childrenArray[i].gameObject.layer = layer;
+      }
+    }
+
     protected INTERACTION_TRANSFORM getRigidbodyTransform() {
       INTERACTION_TRANSFORM interactionTransform = new INTERACTION_TRANSFORM();
 
@@ -607,6 +641,9 @@ namespace Leap.Unity.Interaction {
       //Update kinematic status of body
       if (IsBeingGrasped) {
         _rigidbody.useGravity = false;
+        _rigidbody.drag = 0;
+        _rigidbody.angularDrag = 0;
+
         switch (_material.GraspMethod) {
           case InteractionMaterial.GraspMethodEnum.Kinematic:
             _rigidbody.isKinematic = true;
@@ -624,6 +661,8 @@ namespace Leap.Unity.Interaction {
       } else {
         _rigidbody.useGravity = _useGravity;
         _rigidbody.isKinematic = _isKinematic;
+        _rigidbody.drag = _drag;
+        _rigidbody.angularDrag = _angularDrag;
       }
     }
 

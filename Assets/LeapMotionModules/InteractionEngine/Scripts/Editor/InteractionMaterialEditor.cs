@@ -19,6 +19,10 @@ namespace Leap.Unity.Interaction {
                                 "_releaseDistance",
                                 "_maxVelocity",
                                 "_followStrength");
+
+      specifyConditionalDrawing("_useCustomLayers", 
+                                "_interactionLayer", 
+                                "_interactionNoClipLayer");
     }
   }
 }
