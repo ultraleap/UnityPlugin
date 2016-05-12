@@ -350,39 +350,69 @@ MonoBehaviour:
   - LayerTransform: {fileID: 22414710}
     MaxFloatDistance: 0
     MinFloatDistance: 0
+    Shadow: {fileID: 0}
+    ShadowOnAboveLayer: 0
     TriggerLayerEvent: 1
+    MaxShadowOpacity: 0
     CurrentFloatingDistance: 0
     touchingFinger: 0
+    distanceToAboveLayer: 0
+    maxDistanceToAboveLayer: 0
   - LayerTransform: {fileID: 22479986}
     MaxFloatDistance: 0.01
     MinFloatDistance: 0
+    Shadow: {fileID: 0}
+    ShadowOnAboveLayer: 0
     TriggerLayerEvent: 1
+    MaxShadowOpacity: 0
     CurrentFloatingDistance: 0
     touchingFinger: 0
+    distanceToAboveLayer: 0
+    maxDistanceToAboveLayer: 0
   - LayerTransform: {fileID: 22455726}
     MaxFloatDistance: 0.02
     MinFloatDistance: 0
+    Shadow: {fileID: 0}
+    ShadowOnAboveLayer: 0
     TriggerLayerEvent: 1
+    MaxShadowOpacity: 0
     CurrentFloatingDistance: 0
     touchingFinger: 0
+    distanceToAboveLayer: 0
+    maxDistanceToAboveLayer: 0
   - LayerTransform: {fileID: 22491658}
     MaxFloatDistance: 0.03
     MinFloatDistance: 0
+    Shadow: {fileID: 0}
+    ShadowOnAboveLayer: 0
     TriggerLayerEvent: 1
+    MaxShadowOpacity: 0
     CurrentFloatingDistance: 0
     touchingFinger: 0
+    distanceToAboveLayer: 0
+    maxDistanceToAboveLayer: 0
   - LayerTransform: {fileID: 22409774}
     MaxFloatDistance: 0.04
     MinFloatDistance: 0
+    Shadow: {fileID: 0}
+    ShadowOnAboveLayer: 0
     TriggerLayerEvent: 1
+    MaxShadowOpacity: 0
     CurrentFloatingDistance: 0
     touchingFinger: 0
+    distanceToAboveLayer: 0
+    maxDistanceToAboveLayer: 0
   - LayerTransform: {fileID: 22440094}
     MaxFloatDistance: 0.05
     MinFloatDistance: 0
+    Shadow: {fileID: 0}
+    ShadowOnAboveLayer: 0
     TriggerLayerEvent: 0
+    MaxShadowOpacity: 0
     CurrentFloatingDistance: 0
     touchingFinger: 0
+    distanceToAboveLayer: 0
+    maxDistanceToAboveLayer: 0
   ExpandSpeed: 0.05
   ContractSpeed: 0.05
   PushPaddingDistance: 0.01

@@ -423,15 +423,25 @@ MonoBehaviour:
   - LayerTransform: {fileID: 22488214}
     MaxFloatDistance: 0.01
     MinFloatDistance: 0
+    Shadow: {fileID: 0}
+    ShadowOnAboveLayer: 0
     TriggerLayerEvent: 0
+    MaxShadowOpacity: 0
     CurrentFloatingDistance: 0
     touchingFinger: 0
+    distanceToAboveLayer: 0
+    maxDistanceToAboveLayer: 0
   - LayerTransform: {fileID: 22434280}
     MaxFloatDistance: 0.02
     MinFloatDistance: 0
+    Shadow: {fileID: 0}
+    ShadowOnAboveLayer: 0
     TriggerLayerEvent: 0
+    MaxShadowOpacity: 0
     CurrentFloatingDistance: 0
     touchingFinger: 0
+    distanceToAboveLayer: 0
+    maxDistanceToAboveLayer: 0
   ExpandSpeed: 0.1
   ContractSpeed: 0.1
   PushPaddingDistance: 0.01
