@@ -33,6 +33,13 @@ namespace Leap.Unity.Interaction {
     protected InteractionManager _manager;
     #endregion
 
+    #region EVENTS
+    public event Action<Hand> OnHandGraspedEvent;
+    public event Action<Hand> OnHandReleasedEvent;
+    public event Action OnGraspBeginEvent;
+    public event Action OnGraspEndEvent;
+    #endregion
+
     #region INTERNAL FIELDS
     private bool _isRegisteredWithManager = false;
 
@@ -361,6 +368,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     protected virtual void OnHandGrasped(Hand hand) {
       _baseCallGuard.NotifyBaseCalled("OnHandGrasped");
+      if (OnHandGraspedEvent != null) {
+        OnHandGraspedEvent(hand);
+      }
     }
 
     /// <summary>
@@ -382,6 +392,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     protected virtual void OnHandReleased(Hand hand) {
       _baseCallGuard.NotifyBaseCalled("OnHandReleased");
+      if (OnHandReleasedEvent != null) {
+        OnHandReleasedEvent(hand);
+      }
     }
 
     /// <summary>
@@ -417,6 +430,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     protected virtual void OnGraspBegin() {
       _baseCallGuard.NotifyBaseCalled("OnGraspBegin");
+      if (OnGraspBeginEvent != null) {
+        OnGraspBeginEvent();
+      }
     }
 
     /// <summary>
@@ -425,6 +441,9 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     protected virtual void OnGraspEnd() {
       _baseCallGuard.NotifyBaseCalled("OnGraspEnd");
+      if (OnGraspEndEvent != null) {
+        OnGraspEndEvent();
+      }
     }
     #endregion
 
