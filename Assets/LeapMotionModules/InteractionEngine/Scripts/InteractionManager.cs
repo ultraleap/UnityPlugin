@@ -59,7 +59,7 @@ namespace Leap.Unity.Interaction {
 
     [Header("Layer Settings")]
     [SerializeField]
-    protected bool _autoGenerateLayers = true;
+    protected bool _autoGenerateLayers = false;
 
     [Tooltip("Layer to use for auto-generation.  The generated interaction layers will have the same collision settings as this layer.")]
     [SerializeField]
