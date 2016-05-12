@@ -2098,7 +2098,7 @@ MonoBehaviour:
   _untrackedTimeout: 0.5
   _depthUntilSphericalInside: 0.023
   _autoGenerateLayers: 1
-  _teplateLayer:
+  _templateLayer:
     layer: 0
   _interactionLayer:
     layer: 8

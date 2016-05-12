@@ -58,5 +58,7 @@ MonoBehaviour:
     m_RotationOrder: 0
   _graphicalReturnTime: 0.25
   _useCustomLayers: 0
-  _interactionLayer: 0
-  _interactionNoClipLayer: 0
+  _interactionLayer:
+    layer: 0
+  _interactionNoClipLayer:
+    layer: 0
