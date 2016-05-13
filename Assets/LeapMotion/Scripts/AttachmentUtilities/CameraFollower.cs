@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Leap.Unity.Attachments{
+namespace Leap.Unity{
 
   public class CameraFollower : MonoBehaviour {
   

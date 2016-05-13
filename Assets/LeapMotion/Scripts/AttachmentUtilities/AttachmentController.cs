@@ -2,7 +2,7 @@
 using UnityEngine.Events;
 using System.Collections;
 
-namespace Leap.Unity.Attachments {
+namespace Leap.Unity {
 
   /**
    * Controls activation and deactivation of child game objects, optionally using a transition.

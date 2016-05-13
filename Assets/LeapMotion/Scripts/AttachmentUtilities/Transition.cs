@@ -5,7 +5,7 @@ using UnityEditor;
 #endif
 using System.Collections;
 
-namespace Leap.Unity.Attachments{
+namespace Leap.Unity{
   
   [ExecuteInEditMode]
   public class Transition : MonoBehaviour {
