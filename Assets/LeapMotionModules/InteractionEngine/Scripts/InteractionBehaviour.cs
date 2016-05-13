@@ -261,6 +261,8 @@ namespace Leap.Unity.Interaction {
       _solvedPosition = _rigidbody.position;
       _solvedRotation = _rigidbody.rotation;
 
+      updateLayer();
+
 #if UNITY_EDITOR
       Collider[] colliders = GetComponentsInChildren<Collider>();
       if (colliders.Length > 0) {
@@ -586,7 +588,7 @@ namespace Leap.Unity.Interaction {
 
     protected void updateLayer() {
       int layer;
-      if (_ignoringBrushes) {
+      if (_ignoringBrushes || !_manager.ContactEnabled || !_material.ContactEnabled) {
         if (_material.UseCustomLayers) {
           layer = _material.InteractionNoClipLayer;
         } else {
