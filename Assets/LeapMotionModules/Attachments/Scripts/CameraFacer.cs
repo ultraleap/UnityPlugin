@@ -10,7 +10,7 @@ public class CameraFacer : MonoBehaviour {
   public bool FreezeY = false;
   public bool FreezeZ = false;
 
-  [Range(-360, 360)]
+  [Range(-760, 760)]
   public float InputAngle = 180;
   [Range(-360, 360)]
   public float TargetAngle = 180;
@@ -39,49 +39,56 @@ public class CameraFacer : MonoBehaviour {
     if(FreezeX){
       angleX = startingEulers.x;
     } else {
-      angleX = clampAngle(transform.localEulerAngles.x, startingEulers.x, startingEulers.x - MinTilt.x, startingEulers.x + MaxTilt.x);
+      angleX = clampAngle(transform.localEulerAngles.x, startingEulers.x - MinTilt.x, startingEulers.x + MaxTilt.x);
       //angleX = transform.localEulerAngles.x;
     }
     if(FreezeY){
       angleY = startingEulers.y;
     } else {
       //angleY = transform.localEulerAngles.y;
-      angleY = clampAngle(transform.localEulerAngles.y, startingEulers.y, startingEulers.y - MinTilt.y, startingEulers.y + MaxTilt.y);
+      angleY = clampAngle(transform.localEulerAngles.y, startingEulers.y - MinTilt.y, startingEulers.y + MaxTilt.y);
     }
     if(FreezeZ){
       angleZ = startingEulers.z;
     } else {
       //angleZ = transform.localEulerAngles.z;
-      angleZ = clampAngle(transform.localEulerAngles.z, startingEulers.z, startingEulers.z - MinTilt.z, startingEulers.z + MaxTilt.z);
+      angleZ = clampAngle(transform.localEulerAngles.z, startingEulers.z - MinTilt.z, startingEulers.z + MaxTilt.z);
     }
     transform.localEulerAngles = new Vector3(angleX, angleY, angleZ);
     TestAngleCode();
     Debug.Log("Eulers: " + FreezeX + " " + FreezeY + " " + FreezeZ + " " + startingEulers + " " + targetEulers + " " + transform.localEulerAngles);
   }
 
-  float clampAngle (float angle, float targetAngle, float min, float max) {
-    if (angle >= min) {
+  float clampAngle (float angle, float min, float max) {
+    if(min >= 0){
       angle = Mathf.Clamp(angle, min, max);
+    }else {
+      float delta = -min;
+      angle = Mathf.Clamp(angle + delta, min + delta, max + delta);
+      angle -= delta;
     }
-    angle = angle % 360;
-    if (angle < min) {
-      angle = Mathf.Clamp(angle, 0, max % 360);
-    }
-    return angle;
+    return normalizeAngle(angle);
   }
 
   void TestAngleCode(){
     Vector3 target = new Vector3(Mathf.Cos(TargetAngle * Mathf.Deg2Rad), 0, Mathf.Sin(TargetAngle * Mathf.Deg2Rad));
     Vector3 min = new Vector3(Mathf.Cos((TargetAngle - Min) * Mathf.Deg2Rad), 0, Mathf.Sin((TargetAngle - Min) * Mathf.Deg2Rad));
     Vector3 max = new Vector3(Mathf.Cos((TargetAngle + Max) * Mathf.Deg2Rad), 0, Mathf.Sin((TargetAngle + Max) * Mathf.Deg2Rad));
-    float testAngle = ClampAngle(InputAngle, TargetAngle - Min, TargetAngle + Max);
+    float testAngle = clampAngle(InputAngle, TargetAngle - Min, TargetAngle + Max);
     Vector3 test = new Vector3(Mathf.Cos(testAngle * Mathf.Deg2Rad), 0, Mathf.Sin(testAngle * Mathf.Deg2Rad));
     Debug.DrawLine(Vector3.zero, target, Color.blue);
     Debug.DrawLine(Vector3.zero, min, Color.yellow);
     Debug.DrawLine(Vector3.zero, max, Color.red);
     Debug.DrawLine(Vector3.zero, test, Color.green);
   }
-  //float normalizeAngle (float angle) {
+  float normalizeAngle (float angle) {
+     float normalizedDeg = angle % 360;
 
-  //}
+     if (normalizedDeg <= -180)
+         normalizedDeg += 360;
+     else if (normalizedDeg > 180)
+         normalizedDeg -= 360;
+
+     return normalizedDeg;
+ }
 }
