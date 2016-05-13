@@ -1,21 +1,8 @@
 fileFormatVersion: 2
 guid: a04122797dd84ca43a07055f12d91e0f
-<<<<<<< HEAD
-timeCreated: 1459888984
-=======
-timeCreated: 1461985891
->>>>>>> refs/remotes/origin/develop
-licenseType: Pro
 MonoImporter:
   serializedVersion: 2
-  defaultReferences:
-<<<<<<< HEAD
-  - _material: {fileID: 2100000, guid: b564f2cea19fc4b43bb31667ac372fa1, type: 2}
-  - _sphereMesh: {fileID: 4300000, guid: 274b6b0a59f428643a4debadb91a1dec, type: 3}
-=======
-  - _material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
-  - _sphereMesh: {fileID: 4300002, guid: 2f496b1b1bec86743b418551f859020c, type: 3}
->>>>>>> refs/remotes/origin/develop
+  defaultReferences: []
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

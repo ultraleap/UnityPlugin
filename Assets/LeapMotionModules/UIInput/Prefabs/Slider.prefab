@@ -398,6 +398,7 @@ MonoBehaviour:
   ExpandSpeed: 0.1
   ContractSpeed: 0.1
   PushPaddingDistance: 0.01
+  RetractWhenOutsideofTouchingDistance: 0
   LayerCollapseStateChange:
     m_PersistentCalls:
       m_Calls: []
@@ -659,7 +660,7 @@ RectTransform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100398}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0.0000018626}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
@@ -670,8 +671,8 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 169.95}
-  m_SizeDelta: {x: 409.5, y: 60}
+  m_AnchoredPosition: {x: 0, y: -60}
+  m_SizeDelta: {x: 400, y: 60}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &22479692
 RectTransform:

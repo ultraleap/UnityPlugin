@@ -36,7 +36,7 @@ public class LeapInputModule : BaseInputModule
     public Sprite PointerSprite;
     [Tooltip("The material to be instantiated for your pointers during projective interaction.")]
     public Material PointerMaterial;
-    [Tooltip("The size of the pointer in world coordinates.")]
+    [Tooltip("The size of the pointer in world coordinates with respect to distance.")]
     public AnimationCurve PointerScale;
     [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
@@ -267,7 +267,11 @@ public class LeapInputModule : BaseInputModule
             if (PointEvents[whichHand].pointerCurrentRaycast.gameObject != null) {
                 ILeapWidget comp = PointEvents[whichHand].pointerCurrentRaycast.gameObject.GetComponent<ILeapWidget>();
                 if (comp != null) {
-                    ((ILeapWidget)comp).HoverDistance(distanceOfIndexTipToPointer(whichHand));
+                    if (!isTriggeringInteraction(whichHand)) {
+                        ((ILeapWidget)comp).HoverDistance(distanceOfIndexTipToPointer(whichHand));
+                    } else {
+                        ((ILeapWidget)comp).HoverDistance(-10f);
+                    }
                 }
             }
 

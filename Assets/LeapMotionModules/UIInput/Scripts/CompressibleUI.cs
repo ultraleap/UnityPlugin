@@ -38,6 +38,8 @@ public class CompressibleUI : MonoBehaviour, ILeapWidget
     [SerializeField]
     public float PushPaddingDistance = 0.01f;
     [SerializeField]
+    public bool RetractWhenOutsideofTouchingDistance = false;
+    [SerializeField]
     public UnityEvent LayerCollapseStateChange;
 
     //How quickly the button layers are Lerping
@@ -71,6 +73,9 @@ public class CompressibleUI : MonoBehaviour, ILeapWidget
             {
                 Debug.LogWarning("Ensure that the layers that you have allotted have UI Elements in them!");
             }
+        }
+        if (!RetractWhenOutsideofTouchingDistance) {
+            Expand();
         }
     }
 
@@ -177,8 +182,10 @@ public class CompressibleUI : MonoBehaviour, ILeapWidget
 
     public void Retract()
     {
-        currentlyFloating = false;
-        curLerpSpeed = ContractSpeed;
+        if (RetractWhenOutsideofTouchingDistance) {
+            currentlyFloating = false;
+            curLerpSpeed = ContractSpeed;
+        }
     }
 
     public void DivideLayerHeightsOnToggle(Toggle toggle)
