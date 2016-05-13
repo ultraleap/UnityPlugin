@@ -2,14 +2,48 @@
 using UnityEngine.Events;
 using System.Collections;
 
-namespace Leap.Unity.Attachments{
+namespace Leap.Unity.Attachments {
 
+  /**
+   * Controls activation and deactivation of child game objects, optionally using a transition.
+   * 
+   * Call Activate() to enable all child objects. If an InTransition is specified, it is applied
+   * after enabling the children.
+   * 
+   * Call Deactivate() to disable all child objects. If an OutTransition is specified, it is applied
+   * before the children are deactivated.
+   * 
+   * You can override ChangeChildState() for more sophisticated behavior.
+   * 
+   * Use with Detectors and a DetectorAndGate to turn on and off hand attachments based
+   * on hand pose or other factors for which a detector class exists.
+   * 
+   * @since 4.1.1
+   */
   public class AttachmentController : MonoBehaviour {
-    
+
+    /**
+     * Reports whether this attachment is in an activated state or not.
+     *  @since 4.1.1
+     */
+    [HideInInspector]
     public bool IsActive = false;
+    /**
+     * A Transition played when the attachment is activated.
+     *  @since 4.1.1
+     */
     public Transition InTransition;
+    /**
+     * A Transition played when the attachment is deactivated.
+     *  @since 4.1.1
+     */
     public Transition OutTransition;
-  
+
+    /**
+     * Activates the attachment's child object.
+     * Plays the InTransition, if one is specified.
+     *  @since 4.1.1
+     */
     public virtual void Activate(){
       IsActive = true;
       ChangeChildState();
@@ -18,8 +52,13 @@ namespace Leap.Unity.Attachments{
         InTransition.TransitionIn();
       }
     }
-  
-    public virtual void Deactivate(){
+
+    /**
+     * Deactivates the attachment's child object.
+     * Plays the OutTransition, if one is specified.
+     *  @since 4.1.1
+     */
+    public virtual void Deactivate () {
       IsActive = false;
       if(OutTransition != null){
         OutTransition.OnComplete.AddListener(ChangeChildState);
@@ -28,8 +67,12 @@ namespace Leap.Unity.Attachments{
         ChangeChildState();
       }
     }
-  
-    public virtual void ChangeChildState(){
+
+    /**
+     * Toggles child state.
+     *  @since 4.1.1
+     */
+    protected virtual void ChangeChildState(){
       if(InTransition != null){
         InTransition.OnComplete.RemoveListener(ChangeChildState);
       }

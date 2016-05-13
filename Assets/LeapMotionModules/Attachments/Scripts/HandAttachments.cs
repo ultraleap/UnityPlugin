@@ -18,16 +18,28 @@ namespace Leap.Unity.Attachments{
   * etc. under the attachment point.
   *
   * Attachment points are updated during the Unity Update loop.
+  * 
+  * Use with AttachmentControllers and Detectors to activate and deactivate attachments in response to 
+  * hand poses.
+  *  @since 4.1.1
   */
   public class HandAttachments : IHandModel {
   
+    /** The palm of the hand. */
     public Transform Palm;
+    /** The center of the arm. */
     public Transform Arm;
+    /** The tip of the thumb. */
     public Transform Thumb;
+    /** The point midway between the thumb and index finger tips.*/
     public Transform PinchPoint;
+    /** The tip of the index finger. */
     public Transform Index;
+    /** The tip of the middle finger. */
     public Transform Middle;
+    /** The tip of the ring finger. */
     public Transform Ring;
+    /** The tip of the pinky finger. */
     public Transform Pinky;
   
     private Hand _hand;
@@ -40,6 +52,11 @@ namespace Leap.Unity.Attachments{
   
     [SerializeField]
     private Chirality _handedness;
+
+    /** 
+     * Restrict this set of attachments to one hand or another. Set to
+     * Either if the attachment object can be used for both hands.
+     */
     public override Chirality Handedness {
       get {
         return _handedness;
@@ -54,6 +71,7 @@ namespace Leap.Unity.Attachments{
       return _hand;
     }
   
+    /** Updates the position and rotation for each non-null attachment transform. */
     public override void UpdateHand () {
       if(Palm != null) {
         Palm.position = _hand.PalmPosition.ToVector3();
@@ -88,12 +106,6 @@ namespace Leap.Unity.Attachments{
         Vector indexTip = _hand.Fingers[1].TipPosition;
         Vector pinchPoint = Vector.Lerp(thumbTip, indexTip, 0.5f);
         PinchPoint.position = pinchPoint.ToVector3();
-  //      Vector forward = pinchPoint - _hand.Fingers[1].Bone(Bone.BoneType.TYPE_PROXIMAL).PrevJoint;
-  //      Vector up = _hand.Fingers[1].Bone(Bone.BoneType.TYPE_PROXIMAL).Direction.Cross(_hand.Fingers[0].Bone(Bone.BoneType.TYPE_PROXIMAL).Direction);
-  //      PinchPoint.rotation = Quaternion.LookRotation(forward.ToVector3(), up.ToVector3());
-        //Or
-        //PinchPoint.rotation = _hand.Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).Rotation.ToQuaternion();
-        //Or
         PinchPoint.rotation = _hand.Rotation.ToQuaternion();
       }
     }

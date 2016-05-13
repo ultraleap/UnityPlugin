@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace Leap.Unity.Attachments{
 
-  public class CameraFacer : MonoBehaviour {
+  public class CameraFollower : MonoBehaviour {
   
     public Vector3 objectForward = Vector3.forward;
     public AnimationCurve Ease = AnimationCurve.EaseInOut(0, 0, 1, 1);
