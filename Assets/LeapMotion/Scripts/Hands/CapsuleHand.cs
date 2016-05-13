@@ -34,10 +34,8 @@ namespace Leap.Unity {
 
     [SerializeField]
     private int _cylinderResolution = 12;
-
-    [NonSerialized]
+    
     private bool _hasGeneratedMeshes = false;
-
     private Material jointMat;
 
     [SerializeField, HideInInspector]
@@ -145,12 +143,6 @@ namespace Leap.Unity {
             DestroyImmediate(component.gameObject);
           }
         }
-      }
-    }
-
-    private void cleanupObject(Component component) {
-      if (component != null) {
-        DestroyImmediate(component);
       }
     }
 
