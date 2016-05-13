@@ -77,7 +77,7 @@ namespace Leap.Unity.Interaction {
     [Header("Debug")]
     [Tooltip("Allows simulation to be disabled without destroying the scene in any way.")]
     [SerializeField]
-    protected bool _enableSimulation = true;
+    protected bool _pauseSimulation = false;
 
     [Tooltip("Shows the debug visualization coming from the internal Interaction plugin.")]
     [SerializeField]
@@ -489,7 +489,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void FixedUpdate() {
-      if (_enableSimulation) {
+      if (!_pauseSimulation) {
         simulateFrame(_leapProvider.CurrentFixedFrame);
       }
 
@@ -503,11 +503,13 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void LateUpdate() {
-      if (_enableSimulation) {
-        dispatchOnHandsHolding(_leapProvider.CurrentFrame, isPhysics: false);
-
-        unregisterMisbehavingBehaviours();
+      if (_pauseSimulation) {
+        return;
       }
+
+      dispatchOnHandsHolding(_leapProvider.CurrentFrame, isPhysics: false);
+
+      unregisterMisbehavingBehaviours();
     }
 
     protected virtual void OnGUI() {
