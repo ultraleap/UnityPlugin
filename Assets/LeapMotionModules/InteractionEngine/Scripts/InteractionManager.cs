@@ -708,7 +708,9 @@ namespace Leap.Unity.Interaction {
             handResult.handFlags = HandResultFlags.ManipulatorMode;
             handResult.instanceHandle = interactionHand.graspedObject.ShapeInstanceHandle;
 
-            InteractionC.OverrideHandResult(ref _scene, (uint)hand.Id, ref handResult);
+            if (_enableContact) {
+              InteractionC.OverrideHandResult(ref _scene, (uint)hand.Id, ref handResult);
+            }
           } else {
             //Otherwise just create a new one
             interactionHand = new InteractionHand(hand);
