@@ -326,12 +326,12 @@ namespace Leap.Unity.Interaction {
       if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
         if (!_ignoringBrushes && results.maxHandDepth > _material.BrushDisableDistance) {
           _ignoringBrushes = true;
-          updateLayer();
         }
       } else if (_ignoringBrushes) {
         _ignoringBrushes = false;
-        updateLayer();
       }
+
+      updateLayer();
     }
 
     protected override void OnHandGrasped(Hand hand) {
@@ -602,8 +602,10 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      for (int i = 0; i < _childrenArray.Length; i++) {
-        _childrenArray[i].gameObject.layer = layer;
+      if (gameObject.layer != layer) {
+        for (int i = 0; i < _childrenArray.Length; i++) {
+          _childrenArray[i].gameObject.layer = layer;
+        }
       }
     }
 
