@@ -158,14 +158,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e309ac4138f124f9f8ad312a14a8e9ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Period: 0.1
-  OnDetection:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  ShowGizmos: 1
   IsActive: 0
+  Period: 0.1
+  ShowGizmos: 1
   OnActivate:
     m_PersistentCalls:
       m_Calls: []
@@ -285,14 +280,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e309ac4138f124f9f8ad312a14a8e9ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Period: 0.1
-  OnDetection:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  ShowGizmos: 1
   IsActive: 0
+  Period: 0.1
+  ShowGizmos: 1
   OnActivate:
     m_PersistentCalls:
       m_Calls: []
@@ -1279,13 +1269,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelCollection:
-  - LeftModel: {fileID: 1759863751}
+  ModelPool:
+  - _handPool: {fileID: 0}
+    GroupName: gfx
+    LeftModel: {fileID: 1759863751}
+    IsLeftToBeSpawned: 0
     RightModel: {fileID: 1781939140}
-  - LeftModel: {fileID: 1798992564}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 0
+  - _handPool: {fileID: 0}
+    GroupName: phys
+    LeftModel: {fileID: 1798992564}
+    IsLeftToBeSpawned: 0
     RightModel: {fileID: 1391235876}
-  ModelPool: []
-  EnforceHandedness: 0
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 0
 --- !u!114 &1419902426
 MonoBehaviour:
   m_ObjectHideFlags: 0
