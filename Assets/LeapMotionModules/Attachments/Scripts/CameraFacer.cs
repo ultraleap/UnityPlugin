@@ -11,6 +11,15 @@ public class CameraFacer : MonoBehaviour {
   public bool FreezeY = false;
   public bool FreezeZ = false;
 
+  [Range(-360, 360)]
+  public float InputAngle = 180;
+  [Range(-360, 360)]
+  public float TargetAngle = 180;
+  [Range(0, 360)]
+  public float Min = 20;
+  [Range(0, 360)]
+  public float Max = 20;
+
   private Quaternion offset;
   private Quaternion originalLocalRotation;
 
@@ -45,6 +54,7 @@ public class CameraFacer : MonoBehaviour {
       angleZ = ClampAngle(transform.localEulerAngles.z, startEulers.z - MinTilt.z, startEulers.z + MaxTilt.z);
     }
     transform.localEulerAngles = new Vector3(angleX, angleY, angleZ);
+    TestAngleCode();
   }
 
   /* Attribution: aldonaletto http://answers.unity.com/questions/141775/limit-local-rotation.html */
@@ -57,5 +67,17 @@ public class CameraFacer : MonoBehaviour {
     angle = Mathf.Clamp(angle, min, max);
     if (angle<0) angle += 360;  // if angle negative, convert to 0..360
     return angle;
+  }
+
+  void TestAngleCode(){
+    Vector3 target = new Vector3(Mathf.Cos(TargetAngle * Mathf.Deg2Rad), 0, Mathf.Sin(TargetAngle * Mathf.Deg2Rad));
+    Vector3 min = new Vector3(Mathf.Cos((TargetAngle - Min) * Mathf.Deg2Rad), 0, Mathf.Sin((TargetAngle - Min) * Mathf.Deg2Rad));
+    Vector3 max = new Vector3(Mathf.Cos((TargetAngle + Max) * Mathf.Deg2Rad), 0, Mathf.Sin((TargetAngle + Max) * Mathf.Deg2Rad));
+    float testAngle = ClampAngle(InputAngle, TargetAngle - Min, TargetAngle + Max);
+    Vector3 test = new Vector3(Mathf.Cos(testAngle * Mathf.Deg2Rad), 0, Mathf.Sin(testAngle * Mathf.Deg2Rad));
+    Debug.DrawLine(Vector3.zero, target, Color.blue);
+    Debug.DrawLine(Vector3.zero, min, Color.yellow);
+    Debug.DrawLine(Vector3.zero, max, Color.red);
+    Debug.DrawLine(Vector3.zero, test, Color.green);
   }
 }
