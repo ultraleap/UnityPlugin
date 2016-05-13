@@ -79,6 +79,7 @@ public class LeapInputModule : BaseInputModule
     private pointerStates[] pointerState;
     private Transform[] Pointers;
     private LineRenderer[] PointerLines;
+    private float ActivationTime = 0.1f;
 
     //Object the pointer is hovering over
     private GameObject[] currentOverGo;
@@ -88,6 +89,7 @@ public class LeapInputModule : BaseInputModule
     private Vector2[] PrevScreenPosition;
     private bool[] PrevTriggeringInteraction;
     private bool PrevTouchingMode;
+    private float[] timeEnteredCanvas;
 
     //Misc. Objects
     private Canvas[] canvases;
@@ -179,6 +181,7 @@ public class LeapInputModule : BaseInputModule
         PrevTriggeringInteraction = new bool[NumberOfHands];
         PrevScreenPosition = new Vector2[NumberOfHands];
         PrevState = new pointerStates[NumberOfHands];
+        timeEnteredCanvas = new float[NumberOfHands];
 
         //Used for calculating the origin of the Projective Interactions
         if (Camera.main != null) {
@@ -286,52 +289,54 @@ public class LeapInputModule : BaseInputModule
                 if (!PrevTriggeringInteraction[whichHand] && isTriggeringInteraction(whichHand)) {
                     PrevTriggeringInteraction[whichHand] = true;
 
-                    //Deselect all objects
-                    if (base.eventSystem.currentSelectedGameObject) {
-                        base.eventSystem.SetSelectedGameObject(null);
-                    }
+                    if ((Time.time - timeEnteredCanvas[whichHand] > ActivationTime)) {
+                        //Deselect all objects
+                        if (base.eventSystem.currentSelectedGameObject) {
+                            base.eventSystem.SetSelectedGameObject(null);
+                        }
 
-                    //Record pointer telemetry
-                    PointEvents[whichHand].pressPosition = PointEvents[whichHand].position;
-                    PointEvents[whichHand].pointerPressRaycast = PointEvents[whichHand].pointerCurrentRaycast;
-                    PointEvents[whichHand].pointerPress = null; //Clear this for setting later
+                        //Record pointer telemetry
+                        PointEvents[whichHand].pressPosition = PointEvents[whichHand].position;
+                        PointEvents[whichHand].pointerPressRaycast = PointEvents[whichHand].pointerCurrentRaycast;
+                        PointEvents[whichHand].pointerPress = null; //Clear this for setting later
 
-                    //If we hit something good, let's trigger it!
-                    if (currentOverGo[whichHand] != null) {
-                        currentGo[whichHand] = currentOverGo[whichHand];
+                        //If we hit something good, let's trigger it!
+                        if (currentOverGo[whichHand] != null) {
+                            currentGo[whichHand] = currentOverGo[whichHand];
 
-                        //See if this object, or one of its parents, has a pointerDownHandler
-                        GameObject newPressed = ExecuteEvents.ExecuteHierarchy(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.pointerDownHandler);
+                            //See if this object, or one of its parents, has a pointerDownHandler
+                            GameObject newPressed = ExecuteEvents.ExecuteHierarchy(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.pointerDownHandler);
 
-                        //If not, see if one has a pointerClickHandler!
-                        if (newPressed == null) {
-                            newPressed = ExecuteEvents.ExecuteHierarchy(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.pointerClickHandler);
-                            if (newPressed != null) {
+                            //If not, see if one has a pointerClickHandler!
+                            if (newPressed == null) {
+                                newPressed = ExecuteEvents.ExecuteHierarchy(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.pointerClickHandler);
+                                if (newPressed != null) {
+                                    currentGo[whichHand] = newPressed;
+                                }
+                            } else {
                                 currentGo[whichHand] = newPressed;
+                                //We want to do "click on button down" at same time, unlike regular mouse processing
+                                //Which does click when mouse goes up over same object it went down on
+                                //This improves the user's ability to select small menu items
+                                ExecuteEvents.Execute(newPressed, PointEvents[whichHand], ExecuteEvents.pointerClickHandler);
+
                             }
-                        } else {
-                            currentGo[whichHand] = newPressed;
-                            //We want to do "click on button down" at same time, unlike regular mouse processing
-                            //Which does click when mouse goes up over same object it went down on
-                            //This improves the user's ability to select small menu items
-                            ExecuteEvents.Execute(newPressed, PointEvents[whichHand], ExecuteEvents.pointerClickHandler);
 
-                        }
+                            if (newPressed != null) {
+                                PointEvents[whichHand].pointerPress = newPressed;
+                                currentGo[whichHand] = newPressed;
 
-                        if (newPressed != null) {
-                            PointEvents[whichHand].pointerPress = newPressed;
-                            currentGo[whichHand] = newPressed;
-
-                            //Select the currently pressed object
-                            if (ExecuteEvents.GetEventHandler<ISelectHandler>(currentGo[whichHand])) {
-                                base.eventSystem.SetSelectedGameObject(currentGo[whichHand]);
+                                //Select the currently pressed object
+                                if (ExecuteEvents.GetEventHandler<ISelectHandler>(currentGo[whichHand])) {
+                                    base.eventSystem.SetSelectedGameObject(currentGo[whichHand]);
+                                }
                             }
-                        }
 
-                        ExecuteEvents.Execute(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.beginDragHandler);
-                        PointEvents[whichHand].pointerDrag = currentGo[whichHand];
-                        PointEvents[whichHand].dragging = true;
-                        currentGoing[whichHand] = currentGo[whichHand];
+                            ExecuteEvents.Execute(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.beginDragHandler);
+                            PointEvents[whichHand].pointerDrag = currentGo[whichHand];
+                            PointEvents[whichHand].dragging = true;
+                            currentGoing[whichHand] = currentGo[whichHand];
+                        }
                     }
                 }
 
@@ -548,6 +553,11 @@ public class LeapInputModule : BaseInputModule
             if (pointerState[whichHand] == pointerStates.NearCanvas) {
                 //When you physically pull out of an element
                 onClickUp.Invoke(Pointers[whichHand].transform.position);
+            }
+        } else if (PrevState[whichHand] == pointerStates.OffCanvas) {
+            if (pointerState[whichHand] != pointerStates.OffCanvas) {
+                //Record the time the hand entered an interactable state
+                timeEnteredCanvas[whichHand] = Time.time;
             }
         }
     }

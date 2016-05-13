@@ -162,9 +162,10 @@ public class CompressibleUI : MonoBehaviour, ILeapWidget
                     Layers[i].Shadow.color = new Color(Layers[i].Shadow.color.r, Layers[i].Shadow.color.g, Layers[i].Shadow.color.b, Layers[i].CurrentFloatingDistance.Remap(Layers[i].MinFloatDistance, Layers[i].MaxFloatDistance, 0f, Layers[i].MaxShadowOpacity));
                 }
             }
-
-            Vector3 LocalPosition = transform.InverseTransformPoint(Layers[i].LayerTransform.position);
-            Layers[i].LayerTransform.position = transform.TransformPoint(new Vector3(LocalPosition.x, LocalPosition.y, -Layers[i].CurrentFloatingDistance / transform.lossyScale.z));
+            if (Layers[i].LayerTransform != null) {
+                Vector3 LocalPosition = transform.InverseTransformPoint(Layers[i].LayerTransform.position);
+                Layers[i].LayerTransform.position = transform.TransformPoint(new Vector3(LocalPosition.x, LocalPosition.y, -Layers[i].CurrentFloatingDistance / transform.lossyScale.z));
+            }
         }
     }
 
