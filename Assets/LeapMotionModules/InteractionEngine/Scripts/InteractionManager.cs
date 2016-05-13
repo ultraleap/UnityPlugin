@@ -301,6 +301,24 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Forces a hand to grasp the given interaction behaviour.  The grasp will only be terminated when 
+    /// the hand either times out or the user calls ReleaseHand.
+    /// </summary>
+    /// <param name="hand"></param>
+    public void GraspWithHand(Hand hand, IInteractionBehaviour interactionBehaviour) {
+      if (!_registeredBehaviours.Contains(interactionBehaviour)) {
+        throw new InvalidOperationException("Cannot grasp " + interactionBehaviour + " because it is not registered with this manager.");
+      }
+
+      if (!interactionBehaviour.IsBeingGrasped) {
+        _graspedBehaviours.Add(interactionBehaviour);
+      }
+
+      InteractionHand interactionHand = _idToInteractionHand[hand.Id];
+      interactionHand.GraspObject(interactionBehaviour, isUserGrasp: true);
+    }
+
+    /// <summary>
     /// Registers an InteractionObject with this manager, which automatically adds the objects
     /// representation into the internal interaction scene.  If the manager is disabled,
     /// the registration will still succeed and the object will be added to the internal scene
@@ -707,50 +725,52 @@ namespace Leap.Unity.Interaction {
 
         interactionHand.UpdateHand(hand);
 
-        switch (handResult.classification) {
-          case ManipulatorMode.Grasp:
-            {
-              IInteractionBehaviour interactionBehaviour;
-              if (_instanceHandleToBehaviour.TryGetValue(handResult.instanceHandle, out interactionBehaviour)) {
-                if (interactionHand.graspedObject == null) {
-                  didAnyHandBeginGrasp = true;
+        if (!interactionHand.isUserGrasp) {
+          switch (handResult.classification) {
+            case ManipulatorMode.Grasp:
+              {
+                IInteractionBehaviour interactionBehaviour;
+                if (_instanceHandleToBehaviour.TryGetValue(handResult.instanceHandle, out interactionBehaviour)) {
+                  if (interactionHand.graspedObject == null) {
+                    didAnyHandBeginGrasp = true;
 
-                  if (!interactionBehaviour.IsBeingGrasped) {
-                    _graspedBehaviours.Add(interactionBehaviour);
+                    if (!interactionBehaviour.IsBeingGrasped) {
+                      _graspedBehaviours.Add(interactionBehaviour);
+                    }
+
+                    try {
+                      interactionHand.GraspObject(interactionBehaviour, isUserGrasp: false);
+                    } catch (Exception e) {
+                      _misbehavingBehaviours.Add(interactionBehaviour);
+                      Debug.LogException(e);
+                      continue;
+                    }
+                  }
+                } else {
+                  Debug.LogError("Recieved a hand result with an unkown handle " + handResult.instanceHandle.handle);
+                }
+                break;
+              }
+            case ManipulatorMode.Contact:
+              {
+                if (interactionHand.graspedObject != null) {
+                  if (interactionHand.graspedObject.GraspingHandCount == 1) {
+                    _graspedBehaviours.Remove(interactionHand.graspedObject);
                   }
 
                   try {
-                    interactionHand.GraspObject(interactionBehaviour);
+                    interactionHand.ReleaseObject();
                   } catch (Exception e) {
-                    _misbehavingBehaviours.Add(interactionBehaviour);
+                    _misbehavingBehaviours.Add(interactionHand.graspedObject);
                     Debug.LogException(e);
                     continue;
                   }
                 }
-              } else {
-                Debug.LogError("Recieved a hand result with an unkown handle " + handResult.instanceHandle.handle);
+                break;
               }
-              break;
-            }
-          case ManipulatorMode.Contact:
-            {
-              if (interactionHand.graspedObject != null) {
-                if (interactionHand.graspedObject.GraspingHandCount == 1) {
-                  _graspedBehaviours.Remove(interactionHand.graspedObject);
-                }
-
-                try {
-                  interactionHand.ReleaseObject();
-                } catch (Exception e) {
-                  _misbehavingBehaviours.Add(interactionHand.graspedObject);
-                  Debug.LogException(e);
-                  continue;
-                }
-              }
-              break;
-            }
-          default:
-            throw new InvalidOperationException("Unexpected classification " + handResult.classification);
+            default:
+              throw new InvalidOperationException("Unexpected classification " + handResult.classification);
+          }
         }
       }
 
@@ -927,6 +947,7 @@ namespace Leap.Unity.Interaction {
       public float lastTimeUpdated { get; protected set; }
       public IInteractionBehaviour graspedObject { get; protected set; }
       public bool isUntracked { get; protected set; }
+      public bool isUserGrasp { get; protected set; }
 
       public InteractionHand(Hand hand) {
         this.hand = hand;
@@ -939,7 +960,8 @@ namespace Leap.Unity.Interaction {
         lastTimeUpdated = Time.unscaledTime;
       }
 
-      public void GraspObject(IInteractionBehaviour obj) {
+      public void GraspObject(IInteractionBehaviour obj, bool isUserGrasp) {
+        this.isUserGrasp = isUserGrasp;
         graspedObject = obj;
         graspedObject.NotifyHandGrasped(hand);
       }
@@ -948,6 +970,7 @@ namespace Leap.Unity.Interaction {
         graspedObject.NotifyHandReleased(hand);
         graspedObject = null;
         isUntracked = false;
+        isUserGrasp = false;
       }
 
       public void MarkUntracked(out bool didSuspend) {
@@ -959,6 +982,7 @@ namespace Leap.Unity.Interaction {
         graspedObject.NotifyHandTimeout(hand);
         graspedObject = null;
         isUntracked = true;
+        isUserGrasp = false;
         hand = null;
       }
 
