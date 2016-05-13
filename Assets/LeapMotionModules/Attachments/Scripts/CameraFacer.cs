@@ -4,7 +4,6 @@ using System.Collections;
 public class CameraFacer : MonoBehaviour {
 
   public Vector3 objectForward = Vector3.forward;
-  public Transform RotationParent;
   public Vector3 MaxTilt = Vector3.one * 15;//degrees
   public Vector3 MinTilt = Vector3.one * 15;//degrees
   public bool FreezeX = false;
@@ -12,12 +11,11 @@ public class CameraFacer : MonoBehaviour {
   public bool FreezeZ = false;
 
   private Quaternion offset;
-  private Quaternion originalLocalRotation;
+  private Quaternion startingLocalRotation;
 
   void Awake(){
-    transform.rotation = Quaternion.LookRotation(objectForward);
-    offset = transform.rotation;
-    originalLocalRotation = transform.localRotation;
+    offset = Quaternion.Inverse(Quaternion.LookRotation(objectForward));
+    startingLocalRotation = transform.localRotation;
   }
 
   void Update () {
@@ -25,37 +23,44 @@ public class CameraFacer : MonoBehaviour {
     Vector3 objectDirection = transform.TransformDirection(objectForward);
     Quaternion towardCamera = Quaternion.LookRotation(cameraDirection);
     towardCamera *= offset;
-    transform.rotation = Quaternion.Slerp(towardCamera, Quaternion.LookRotation(objectDirection), Time.deltaTime / 5);
-    Vector3 startEulers = originalLocalRotation.eulerAngles;
-
+    transform.rotation =Quaternion.Slerp(towardCamera, towardCamera, Time.deltaTime);
+    Vector3 startingEulers = startingLocalRotation.eulerAngles;
+    Vector3 targetEulers = transform.localEulerAngles;
     float angleX, angleY, angleZ;
     if(FreezeX){
-      angleX = startEulers.x;
+      angleX = startingEulers.x;
     } else {
-      angleX = ClampAngle(transform.localEulerAngles.x, startEulers.x - MinTilt.x, startEulers.x + MaxTilt.x);
+      angleX = clampAngle(transform.localEulerAngles.x, startingEulers.x, startingEulers.x - MinTilt.x, startingEulers.x + MaxTilt.x);
+      //angleX = transform.localEulerAngles.x;
     }
     if(FreezeY){
-      angleY = startEulers.y;
+      angleY = startingEulers.y;
     } else {
-      angleY = ClampAngle(transform.localEulerAngles.y, startEulers.y - MinTilt.y, startEulers.y + MaxTilt.y);
+      //angleY = transform.localEulerAngles.y;
+      angleY = clampAngle(transform.localEulerAngles.y, startingEulers.y, startingEulers.y - MinTilt.y, startingEulers.y + MaxTilt.y);
     }
     if(FreezeZ){
-      angleZ = startEulers.z;
+      angleZ = startingEulers.z;
     } else {
-      angleZ = ClampAngle(transform.localEulerAngles.z, startEulers.z - MinTilt.z, startEulers.z + MaxTilt.z);
+      //angleZ = transform.localEulerAngles.z;
+      angleZ = clampAngle(transform.localEulerAngles.z, startingEulers.z, startingEulers.z - MinTilt.z, startingEulers.z + MaxTilt.z);
     }
     transform.localEulerAngles = new Vector3(angleX, angleY, angleZ);
+    Debug.Log("Eulers: " + FreezeX + " " + FreezeY + " " + FreezeZ + " " + startingEulers + " " + targetEulers + " " + transform.localEulerAngles);
   }
 
-  /* Attribution: aldonaletto http://answers.unity.com/questions/141775/limit-local-rotation.html */
-  float ClampAngle(float angle, float min, float max) {
-    if (angle < 90 || angle > 270){       // if angle in the critic region...
-        if (angle > 180) angle -= 360;  // convert all angles to -180..+180
-        if (max > 180) max -= 360;
-        if (min > 180) min -= 360;
-    }    
-    angle = Mathf.Clamp(angle, min, max);
-    if (angle<0) angle += 360;  // if angle negative, convert to 0..360
+  float clampAngle (float angle, float targetAngle, float min, float max) {
+    if (angle >= min) {
+      angle = Mathf.Clamp(angle, min, max);
+    }
+    angle = angle % 360;
+    if (angle < min) {
+      angle = Mathf.Clamp(angle, 0, max % 360);
+    }
     return angle;
   }
+
+  //float normalizeAngle (float angle) {
+
+  //}
 }

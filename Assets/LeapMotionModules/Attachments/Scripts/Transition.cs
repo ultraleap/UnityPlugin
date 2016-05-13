@@ -23,7 +23,7 @@ public class Transition : MonoBehaviour {
   public AnimationCurve XScale;
   public AnimationCurve YScale;
   public AnimationCurve ZScale;
-  [Range (.001f, 2.0f)]
+  [Range(.001f, 2.0f)]
   public float Duration = 0.5f; //seconds
   [Range (0, 1)]
   public float Simulate = 0.0f; //0..1
@@ -40,13 +40,17 @@ public class Transition : MonoBehaviour {
 #endif
 
   public void TransitionIn(){
-    StopAllCoroutines();
-    StartCoroutine(transitionIn());
+    if (isActiveAndEnabled) {
+      StopAllCoroutines();
+      StartCoroutine(transitionIn());
+    }
   }
 
   public void TransitionOut(){
-    StopAllCoroutines();
-    StartCoroutine(transitionOut());
+    if (isActiveAndEnabled) {
+      StopAllCoroutines();
+      StartCoroutine(transitionOut());
+    }
   }
 
   IEnumerator transitionIn(){
