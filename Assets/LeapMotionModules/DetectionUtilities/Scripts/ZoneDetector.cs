@@ -6,7 +6,7 @@ using Leap.Unity;
 namespace Leap.Unity.DetectionUtilities {
 
   /** Detects when the hand has entered a rectangular zone. */
-  public class ZoneDetector : BinaryDetector {
+  public class ZoneDetector : Detector {
     public IHandModel HandModel = null;
     public LeapHandController HandController = null;
     public Vector3 zones = Vector3.one;

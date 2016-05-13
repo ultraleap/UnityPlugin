@@ -5,7 +5,7 @@ using Leap.Unity;
 
 namespace Leap.Unity.DetectionUtilities {
 
-  public class HandClapToggleDetector : BinaryDetector {
+  public class HandClapToggleDetector : Detector {
     public LeapProvider Provider = null;
     private bool velocityThresholdExceeded = false;
     private bool _didClap = false;

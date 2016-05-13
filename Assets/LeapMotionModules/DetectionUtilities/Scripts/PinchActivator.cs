@@ -5,7 +5,7 @@ using Leap.Unity;
 
 namespace Leap.Unity.DetectionUtilities {
 
-  public class PinchActivator : BinaryDetector {
+  public class PinchActivator : Detector {
     public IHandModel handModel = null;
   
     [Range (0.0f, 70.0f)]

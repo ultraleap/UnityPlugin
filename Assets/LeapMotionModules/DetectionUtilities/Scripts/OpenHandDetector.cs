@@ -5,7 +5,7 @@ using Leap.Unity;
 
 namespace Leap.Unity.DetectionUtilities {
 
-  public class OpenHandDetector : BinaryDetector {
+  public class OpenHandDetector : Detector {
     public IHandModel handModel = null;
   
     public int OnCount = 5;

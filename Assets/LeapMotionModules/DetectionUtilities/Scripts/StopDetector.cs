@@ -145,4 +145,7 @@ namespace Leap.Unity.DetectionUtilities {
     }
     #endif
   }
+
+  public enum Directions { Up, Down, Right, Left, Forward, Backward, CustomVector }
+
 }
