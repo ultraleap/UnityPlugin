@@ -583,7 +583,7 @@ namespace Leap.Unity.Interaction {
 
     protected void updateLayer() {
       int layer;
-      if (IsBeingGrasped) {
+      if (_ignoringBrushes) {
         if (_material.UseCustomLayers) {
           layer = _material.InteractionNoClipLayer;
         } else {
