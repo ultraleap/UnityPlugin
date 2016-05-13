@@ -16,19 +16,16 @@ namespace Leap.Unity.Interaction {
     [Header("Contact Settings")]
     [Tooltip("Should a hand be able to impart pushing forces to this object.")]
     [SerializeField]
-    protected bool _enableContact = true;
+    protected bool _contactEnabled = true;
 
     [Tooltip("Depth before brushes are disabled.")]
     [SerializeField]
     protected float _brushDisableDistance = 0.017f;
 
-    [Tooltip("A curve used to calculate a multiplier of the throwing velocity.  Maps original velocity to multiplier.")]
-    [SerializeField]
-    protected AnimationCurve _throwingVelocityCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
-                                                                         new Keyframe(1.0f, 1.0f, 0.0f, 0.0f),
-                                                                         new Keyframe(2.0f, 1.5f, 0.0f, 0.0f));
-
     [Header("Grasp Settings")]
+    [SerializeField]
+    protected bool _graspingEnabled = true;
+
     [SerializeField]
     protected GraspMethodEnum _graspMethod = GraspMethodEnum.Velocity;
 
@@ -48,6 +45,12 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                                       new Keyframe(0.02f, 0.2f, 0.0f, 0.0f));
+
+    [Tooltip("A curve used to calculate a multiplier of the throwing velocity.  Maps original velocity to multiplier.")]
+    [SerializeField]
+    protected AnimationCurve _throwingVelocityCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
+                                                                         new Keyframe(1.0f, 1.0f, 0.0f, 0.0f),
+                                                                         new Keyframe(2.0f, 1.5f, 0.0f, 0.0f));
 
     [Header("Warp Settings")]
     [SerializeField]
@@ -71,9 +74,9 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected SingleLayer _interactionNoClipLayer = 0;
 
-    public bool EnableContact {
+    public bool ContactEnabled {
       get {
-        return _enableContact;
+        return _contactEnabled;
       }
     }
 
@@ -83,9 +86,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public AnimationCurve ThrowingVelocityCurve {
+    public bool GraspingEnabled {
       get {
-        return _throwingVelocityCurve;
+        return _graspingEnabled;
       }
     }
 
@@ -116,6 +119,12 @@ namespace Leap.Unity.Interaction {
     public AnimationCurve StrengthByDistance {
       get {
         return _strengthByDistance;
+      }
+    }
+
+    public AnimationCurve ThrowingVelocityCurve {
+      get {
+        return _throwingVelocityCurve;
       }
     }
 

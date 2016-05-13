@@ -43,11 +43,11 @@ namespace Leap.Unity.Interaction {
     [Header("Interaction Settings")]
     [Tooltip("Allow the Interaction Engine to modify object velocities when pushing.")]
     [SerializeField]
-    protected bool _enableContact = true;
+    protected bool _contactEnabled = true;
 
     [Tooltip("Allow the Interaction plugin to modify object positions by grasping.")]
     [SerializeField]
-    protected bool _enableGrasping = true;
+    protected bool _graspingEnabled = true;
 
     [Tooltip("The amount of time a Hand can remain untracked while also still grasping an object.")]
     [SerializeField]
@@ -176,12 +176,12 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Sets or Gets whether or not the Interaction Engine can modify object velocities when pushing.
     /// </summary>
-    public bool EnableContact {
+    public bool ContactEnabled {
       get {
-        return _enableContact;
+        return _contactEnabled;
       }
       set {
-        _enableContact = value;
+        _contactEnabled = value;
         UpdateSceneInfo();
       }
     }
@@ -189,12 +189,12 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Sets or Gets whether or not the Interaction plugin to modify object positions by grasping.
     /// </summary>
-    public bool EnableGrasping {
+    public bool GraspingEnabled {
       get {
-        return _enableGrasping;
+        return _graspingEnabled;
       }
       set {
-        _enableGrasping = value;
+        _graspingEnabled = value;
         UpdateSceneInfo();
       }
     }
@@ -710,7 +710,7 @@ namespace Leap.Unity.Interaction {
             handResult.handFlags = HandResultFlags.ManipulatorMode;
             handResult.instanceHandle = interactionHand.graspedObject.ShapeInstanceHandle;
 
-            if (_enableContact) {
+            if (_contactEnabled) {
               InteractionC.OverrideHandResult(ref _scene, (uint)hand.Id, ref handResult);
             }
           } else {
@@ -838,7 +838,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual INTERACTION_HAND_RESULT getHandResults(InteractionHand hand) {
-      if (!_enableGrasping) {
+      if (!_graspingEnabled) {
         INTERACTION_HAND_RESULT result = new INTERACTION_HAND_RESULT();
         result.classification = ManipulatorMode.Contact;
         result.handFlags = HandResultFlags.ManipulatorMode;
@@ -942,11 +942,11 @@ namespace Leap.Unity.Interaction {
       info.sceneFlags = SceneInfoFlags.HasGravity | SceneInfoFlags.SphericalInside;
       info.depthUntilSphericalInside = _depthUntilSphericalInside;
 
-      if (_enableContact) {
+      if (_contactEnabled) {
         info.sceneFlags |= SceneInfoFlags.ContactEnabled;
       }
 
-      if (_enableGrasping) {
+      if (_graspingEnabled) {
         info.sceneFlags |= SceneInfoFlags.GraspEnabled;
       }
 

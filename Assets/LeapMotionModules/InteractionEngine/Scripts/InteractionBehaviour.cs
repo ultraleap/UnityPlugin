@@ -289,7 +289,7 @@ namespace Leap.Unity.Interaction {
         updateInfo.updateFlags |= UpdateInfoFlags.ReportNoResult;
       }
 
-      if (_material.EnableContact && !_isKinematic && !IsBeingGrasped) {
+      if (_material.ContactEnabled && !_isKinematic && !IsBeingGrasped) {
         updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration;
       }
 
@@ -310,7 +310,7 @@ namespace Leap.Unity.Interaction {
 
       if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 &&
           !IsBeingGrasped &&
-          _material.EnableContact) {
+          _material.ContactEnabled) {
         //Use Sleep() to clear any forces that might have been applied by the user.
         _rigidbody.Sleep();
         _rigidbody.velocity = results.linearVelocity.ToVector3();
