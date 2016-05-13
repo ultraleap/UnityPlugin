@@ -834,6 +834,15 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual INTERACTION_HAND_RESULT getHandResults(InteractionHand hand) {
+      if (!_enableGrasping) {
+        INTERACTION_HAND_RESULT result = new INTERACTION_HAND_RESULT();
+        result.classification = ManipulatorMode.Contact;
+        result.handFlags = HandResultFlags.ManipulatorMode;
+        result.instanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
+        return result;
+      }
+
+
       INTERACTION_HAND_RESULT handResult;
       InteractionC.GetHandResult(ref _scene,
                                      (uint)hand.hand.Id,
