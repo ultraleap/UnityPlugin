@@ -34,7 +34,7 @@ namespace Leap.Unity {
 
     [SerializeField]
     private int _cylinderResolution = 12;
-    
+
     private bool _hasGeneratedMeshes = false;
     private Material jointMat;
 
@@ -44,9 +44,9 @@ namespace Leap.Unity {
     private Transform[] _jointSpheres;
     private Transform mockThumbJointSphere;
     private Transform palmPositionSphere;
-    
+
     private Transform wristPositionSphere;
-    
+
     private List<Renderer> _armRenderers;
     private List<Transform> _cylinderTransforms;
     private List<Transform> _sphereATransforms;
@@ -90,9 +90,18 @@ namespace Leap.Unity {
         jointMat = new Material(_material);
         jointMat.hideFlags = HideFlags.DontSaveInEditor;
       }
-      
-      cleanupArray(_serializedTransforms);
-      _serializedTransforms = new List<Transform>();
+
+      if (_serializedTransforms != null) {
+        for (int i = 0; i < _serializedTransforms.Count; i++) {
+          var obj = _serializedTransforms[i];
+          if (obj != null) {
+            DestroyImmediate(obj.gameObject);
+          }
+        }
+        _serializedTransforms.Clear();
+      } else {
+        _serializedTransforms = new List<Transform>();
+      }
 
       _jointSpheres = new Transform[4 * 5];
       _armRenderers = new List<Renderer>();
@@ -134,17 +143,6 @@ namespace Leap.Unity {
     }
 
     //Transform updating methods
-
-    private void cleanupArray(IEnumerable objs) {
-      if (objs != null) {
-        foreach (var obj in objs) {
-          var component = obj as Component;
-          if (component != null) {
-            DestroyImmediate(component.gameObject);
-          }
-        }
-      }
-    }
 
     private void updateSpheres() {
       //Update all spheres
