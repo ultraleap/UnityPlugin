@@ -3,6 +3,7 @@
 using UnityEditor;
 #endif
 using System;
+using System.Collections;
 using Leap;
 
 namespace Leap.Unity {
@@ -18,6 +19,9 @@ namespace Leap.Unity {
     [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
     [SerializeField]
     protected bool _isHeadMounted = false;
+
+    [SerializeField]
+    protected LeapVRTemporalWarping _temporalWarping;
 
     [Header("Device Type")]
     [SerializeField]
@@ -37,6 +41,8 @@ namespace Leap.Unity {
     protected long _interpolationDelay = 15;
 
     protected Controller leap_controller_;
+
+    protected SmoothedFloat _fixedOffset = new SmoothedFloat();
 
     protected Frame _untransformedUpdateFrame;
     protected Frame _transformedUpdateFrame;
@@ -142,12 +148,23 @@ namespace Leap.Unity {
 
     protected virtual void Awake() {
       clockCorrelator = new ClockCorrelator();
+      _fixedOffset.delay = 0.4f;
     }
 
     protected virtual void Start() {
       createController();
       _untransformedUpdateFrame = new Frame();
       _untransformedFixedFrame = new Frame();
+      StartCoroutine(waitCoroutine());
+    }
+
+    protected IEnumerator waitCoroutine() {
+      WaitForEndOfFrame endWaiter = new WaitForEndOfFrame();
+      while (true) {
+        yield return endWaiter;
+        Int64 unityTime = (Int64)(Time.time * 1e6);
+        clockCorrelator.UpdateRebaseEstimate(unityTime);
+      }
     }
 
     protected virtual void Update() {
@@ -155,16 +172,17 @@ namespace Leap.Unity {
       if (EditorApplication.isCompiling) {
         EditorApplication.isPlaying = false;
         Debug.LogWarning("Unity hot reloading not currently supported. Stopping Editor Playback.");
+        return;
       }
 #endif
 
-      Int64 unityTime = (Int64)(Time.time * 1e6);
-      clockCorrelator.UpdateRebaseEstimate(unityTime);
+      _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
       if (_useInterpolation) {
+        Int64 unityTime = (Int64)(Time.time * 1e6);
         Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
         Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
-        _untransformedUpdateFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
+        _untransformedUpdateFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime) ?? _untransformedUpdateFrame;
       } else {
         _untransformedUpdateFrame = leap_controller_.Frame();
       }
@@ -175,8 +193,16 @@ namespace Leap.Unity {
     }
 
     protected virtual void FixedUpdate() {
-      //TODO: Find suitable interpolation strategy for FixedUpdate
-      _untransformedFixedFrame = leap_controller_.Frame();
+      if (_useInterpolation) {
+        Int64 unityTime = (Int64)((Time.fixedTime + _fixedOffset.value) * 1e6);
+        Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
+        Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
+
+        _untransformedFixedFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime) ?? _untransformedFixedFrame;
+      } else {
+        _untransformedFixedFrame = leap_controller_.Frame();
+      }
+
       _transformedFixedFrame = null;
     }
 
@@ -253,7 +279,21 @@ namespace Leap.Unity {
       }
 
       if (toUpdate == null) {
-        toUpdate = source.TransformedCopy(transform.GetLeapMatrix());
+        LeapTransform leapTransform;
+        if (_temporalWarping != null) {
+          Vector3 warpedPosition;
+          Quaternion warpedRotation;
+          _temporalWarping.TryGetWarpedTransform(LeapVRTemporalWarping.WarpedAnchor.CENTER, out warpedPosition, out warpedRotation, source.Timestamp);
+
+          warpedRotation = warpedRotation * transform.localRotation;
+
+          leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), transform.lossyScale.ToVector() * 1e-3f);
+          leapTransform.MirrorZ();
+        } else {
+          leapTransform = transform.GetLeapMatrix();
+        }
+
+        toUpdate = source.TransformedCopy(leapTransform);
       }
     }
   }
