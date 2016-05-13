@@ -45,9 +45,9 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("How strong the attraction is from the hand to the object when being held.  At strength 1 the object " +
              "will try to move 100% of the way to the hand every frame.")]
-    [Range(0, 1)]
     [SerializeField]
-    protected float _followStrength = 0.6f;
+    protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
+                                                                      new Keyframe(0.02f, 0.2f, 0.0f, 0.0f));
 
     [Header("Warp Settings")]
     [SerializeField]
@@ -113,9 +113,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public float FollowStrength {
+    public AnimationCurve StrengthByDistance {
       get {
-        return _followStrength;
+        return _strengthByDistance;
       }
     }
 

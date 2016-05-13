@@ -38,7 +38,22 @@ MonoBehaviour:
   _suspensionEnabled: 1
   _releaseDistance: 0.15
   _maxVelocity: 6
-  _followStrength: 1
+  _strengthByDistance:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 0.020000001
+      value: 0.29999998
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
   _warpingEnabled: 1
   _warpCurve:
     serializedVersion: 2

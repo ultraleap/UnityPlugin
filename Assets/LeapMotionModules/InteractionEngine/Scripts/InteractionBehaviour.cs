@@ -361,6 +361,8 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandsHoldPhysics(List<Hand> hands) {
       base.OnHandsHoldPhysics(hands);
 
+      float distanceToSolved = Vector3.Distance(_rigidbody.position, _solvedPosition);
+
       //Get new transform
       Vector3 newPosition;
       Quaternion newRotation;
@@ -404,8 +406,9 @@ namespace Leap.Unity.Interaction {
               targetAngularVelocity *= targetPercent;
             }
 
-            _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, _material.FollowStrength);
-            _rigidbody.angularVelocity = Vector3.Lerp(_rigidbody.angularVelocity, targetAngularVelocity, _material.FollowStrength);
+            float followStrength = _material.StrengthByDistance.Evaluate(distanceToSolved);
+            _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, followStrength);
+            _rigidbody.angularVelocity = Vector3.Lerp(_rigidbody.angularVelocity, targetAngularVelocity, followStrength);
           }
           break;
         default:
