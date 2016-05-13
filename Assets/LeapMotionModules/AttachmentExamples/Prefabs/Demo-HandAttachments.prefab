@@ -300,6 +300,7 @@ Transform:
   m_LocalRotation: {x: -0.06845518, y: -0.06767924, z: -0.9898138, w: 0.10489064}
   m_LocalPosition: {x: 0.107676715, y: 0.12850805, z: 0.1000364}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 404706}
   m_RootOrder: 6
@@ -312,6 +313,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 419024}
   - {fileID: 450242}
@@ -332,6 +334,7 @@ Transform:
   m_LocalRotation: {x: 0.35755515, y: -0.019904839, z: -0.76508355, w: -0.5351684}
   m_LocalPosition: {x: -0.0026275488, y: 0.17572999, z: 0.036324322}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 479788}
   - {fileID: 499672}
@@ -346,6 +349,7 @@ Transform:
   m_LocalRotation: {x: 0.009242233, y: -0.07527787, z: -0.99437046, w: 0.07399488}
   m_LocalPosition: {x: 0.058740232, y: 0.121999994, z: -0.015009575}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 415846}
   m_Father: {fileID: 404706}
@@ -359,6 +363,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.02, y: 0.02, z: 0.02}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 411680}
   m_RootOrder: 0
@@ -371,6 +376,7 @@ Transform:
   m_LocalRotation: {x: 0.009242233, y: -0.07527787, z: -0.99437046, w: 0.07399488}
   m_LocalPosition: {x: 0.08000001, y: 0.11999998, z: -0.0000000071525577}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 457252}
   m_Father: {fileID: 404706}
@@ -384,6 +390,7 @@ Transform:
   m_LocalRotation: {x: 0.009242233, y: -0.07527787, z: -0.99437046, w: 0.07399488}
   m_LocalPosition: {x: 0.07460278, y: 0.12910734, z: 0.11059556}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 404706}
   m_RootOrder: 5
@@ -396,6 +403,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.0003, y: 0.0017, z: -0.0003}
   m_LocalScale: {x: 0.05, y: 0.001, z: 0.049999997}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 457252}
   m_RootOrder: 0
@@ -408,6 +416,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 499672}
   m_RootOrder: 0
@@ -420,6 +429,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 1.683232e-14, z: -1, w: -0.000000043711374}
   m_LocalPosition: {x: 0.08705811, y: 0.11599998, z: -0.17499998}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 404706}
   m_RootOrder: 1
@@ -432,6 +442,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0, z: 0}
   m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 433514}
   m_Father: {fileID: 419024}
@@ -445,6 +456,7 @@ Transform:
   m_LocalRotation: {x: 0.08401715, y: -0.07411182, z: -0.9936847, w: -0.0062662777}
   m_LocalPosition: {x: 0.043870587, y: 0.12956758, z: 0.0991718}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 404706}
   m_RootOrder: 4
@@ -457,6 +469,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 479788}
   m_RootOrder: 0
@@ -469,6 +482,7 @@ Transform:
   m_LocalRotation: {x: -0.13843814, y: -0.029145654, z: -0.9739429, w: 0.17725909}
   m_LocalPosition: {x: 0.13266324, y: 0.12707189, z: 0.07386435}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 494426}
   m_Father: {fileID: 404706}
@@ -482,6 +496,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 474106}
   m_Father: {fileID: 411486}
@@ -495,6 +510,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0.0135}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 474522}
   m_RootOrder: 0
@@ -507,6 +523,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 446560}
   m_Father: {fileID: 411486}
@@ -647,8 +664,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e98e641d160144e87a3d33fcdb893a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Period: 0.1
   IsActive: 0
+  Period: 0.1
+  ShowGizmos: 1
   OnActivate:
     m_PersistentCalls:
       m_Calls:
@@ -681,6 +699,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  handModel: {fileID: 0}
   Thumb: 2
   Index: 2
   Middle: 2
@@ -755,6 +774,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  _detectors: []
 --- !u!114 &11429630
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -766,8 +786,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c057ae8396c1146c98a146b81dcc5870, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Period: 0.1
   IsActive: 0
+  Period: 0.1
+  ShowGizmos: 1
   OnActivate:
     m_PersistentCalls:
       m_Calls: []
@@ -778,8 +799,12 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  PointingDirection: {x: 0, y: 0, z: 1}
+  PointingType: 1
+  TargetObject: {fileID: 0}
   OnAngle: 45
   OffAngle: 65
+  handModel: {fileID: 0}
 --- !u!114 &11438072
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -805,8 +830,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b77174815b904166ad047382f534c36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Period: 0.1
   IsActive: 0
+  Period: 0.1
+  ShowGizmos: 1
   OnActivate:
     m_PersistentCalls:
       m_Calls: []
@@ -817,8 +843,11 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  handModel: {fileID: 0}
   FingerName: 0
-  PointingDirection: 1
+  PointingDirection: {x: 0, y: 0, z: 1}
+  PointingType: 1
+  TargetObject: {fileID: 0}
   OnAngle: 65
   OffAngle: 80
 --- !u!114 &11443360
@@ -857,9 +886,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e56de3d13fd1342818f451e1415b1913, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConstrainX: 0
-  ConstrainY: 0
-  ConstrainZ: 0
+  objectForward: {x: 0, y: 0, z: 1}
+  Ease:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  Speed: 10
+  FreezeX: 0
+  FreezeY: 0
+  FreezeZ: 0
 --- !u!114 &11456706
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -904,6 +951,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  _detectors: []
 --- !u!114 &11461876
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1059,8 +1107,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e98e641d160144e87a3d33fcdb893a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Period: 0.1
   IsActive: 0
+  Period: 0.1
+  ShowGizmos: 1
   OnActivate:
     m_PersistentCalls:
       m_Calls: []
@@ -1071,6 +1120,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  handModel: {fileID: 0}
   Thumb: 0
   Index: 1
   Middle: 1
@@ -1120,6 +1170,7 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  _detectors: []
 --- !u!114 &11479994
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1145,8 +1196,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e98e641d160144e87a3d33fcdb893a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Period: 0.1
   IsActive: 0
+  Period: 0.1
+  ShowGizmos: 1
   OnActivate:
     m_PersistentCalls:
       m_Calls: []
@@ -1157,6 +1209,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  handModel: {fileID: 0}
   Thumb: 0
   Index: 1
   Middle: 1
@@ -1173,8 +1226,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b77174815b904166ad047382f534c36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Period: 0.1
   IsActive: 0
+  Period: 0.1
+  ShowGizmos: 1
   OnActivate:
     m_PersistentCalls:
       m_Calls: []
@@ -1185,8 +1239,11 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+  handModel: {fileID: 0}
   FingerName: 0
-  PointingDirection: 0
+  PointingDirection: {x: 0, y: 0, z: 1}
+  PointingType: 1
+  TargetObject: {fileID: 0}
   OnAngle: 30
   OffAngle: 45
 --- !u!114 &11482752
