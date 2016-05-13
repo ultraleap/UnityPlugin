@@ -8,7 +8,7 @@ namespace Leap.Unity {
   public class CustomEditorBase : Editor {
     protected Dictionary<string, Action<SerializedProperty>> _specifiedDrawers;
     protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedDecorators;
-    protected Dictionary<string, string> _conditionalProperties;
+    protected Dictionary<string, List<Func<bool>>> _conditionalProperties;
 
     /// <summary>
     /// Specify a callback to be used to draw a specific named property.  Should be called in OnEnable.
@@ -50,15 +50,26 @@ namespace Leap.Unity {
     /// <param name="conditionalName"></param>
     /// <param name="dependantProperties"></param>
     protected void specifyConditionalDrawing(string conditionalName, params string[] dependantProperties) {
+      SerializedProperty conditionalProp = serializedObject.FindProperty(conditionalName);
+      specifyConditionalDrawing(() => conditionalProp.boolValue, dependantProperties);
+    }
+
+    protected void specifyConditionalDrawing(Func<bool> conditional, params string[] dependantProperties) {
       for (int i = 0; i < dependantProperties.Length; i++) {
-        _conditionalProperties[dependantProperties[i]] = conditionalName;
+        List<Func<bool>> list;
+        string dependant = dependantProperties[i];
+        if (!_conditionalProperties.TryGetValue(dependant, out list)) {
+          list = new List<Func<bool>>();
+          _conditionalProperties[dependant] = list;
+        }
+        list.Add(conditional);
       }
     }
 
     protected virtual void OnEnable() {
       _specifiedDrawers = new Dictionary<string, Action<SerializedProperty>>();
       _specifiedDecorators = new Dictionary<string, List<Action<SerializedProperty>>>();
-      _conditionalProperties = new Dictionary<string, string>();
+      _conditionalProperties = new Dictionary<string, List<Func<bool>>>();
     }
 
     /* 
@@ -70,10 +81,13 @@ namespace Leap.Unity {
       bool isFirst = true;
 
       while (iterator.NextVisible(isFirst)) {
-        string conditionalPropertyName;
-        if (_conditionalProperties.TryGetValue(iterator.name, out conditionalPropertyName)) {
-          SerializedProperty conditionalProperty = serializedObject.FindProperty(conditionalPropertyName);
-          if (!conditionalProperty.boolValue) {
+        List<Func<bool>> conditionalList;
+        if (_conditionalProperties.TryGetValue(iterator.name, out conditionalList)) {
+          bool allTrue = true;
+          for (int i = 0; i < conditionalList.Count; i++) {
+            allTrue &= conditionalList[i]();
+          }
+          if (!allTrue) {
             continue;
           }
         }
