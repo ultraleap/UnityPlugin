@@ -35,15 +35,20 @@ namespace Leap.Unity {
     [SerializeField]
     private int _cylinderResolution = 12;
 
+    [NonSerialized]
     private bool _hasGeneratedMeshes = false;
+
     private Material jointMat;
+
+    [SerializeField, HideInInspector]
+    private List<Transform> _serializedTransforms;
 
     private Transform[] _jointSpheres;
     private Transform mockThumbJointSphere;
     private Transform palmPositionSphere;
-
+    
     private Transform wristPositionSphere;
-
+    
     private List<Renderer> _armRenderers;
     private List<Transform> _cylinderTransforms;
     private List<Transform> _sphereATransforms;
@@ -87,6 +92,9 @@ namespace Leap.Unity {
         jointMat = new Material(_material);
         jointMat.hideFlags = HideFlags.DontSaveInEditor;
       }
+      
+      cleanupArray(_serializedTransforms);
+      _serializedTransforms = new List<Transform>();
 
       _jointSpheres = new Transform[4 * 5];
       _armRenderers = new List<Renderer>();
@@ -98,6 +106,8 @@ namespace Leap.Unity {
       createCylinders();
 
       updateArmVisibility();
+
+      _hasGeneratedMeshes = false;
     }
 
     public override void BeginHand() {
@@ -126,6 +136,23 @@ namespace Leap.Unity {
     }
 
     //Transform updating methods
+
+    private void cleanupArray(IEnumerable objs) {
+      if (objs != null) {
+        foreach (var obj in objs) {
+          var component = obj as Component;
+          if (component != null) {
+            DestroyImmediate(component.gameObject);
+          }
+        }
+      }
+    }
+
+    private void cleanupObject(Component component) {
+      if (component != null) {
+        DestroyImmediate(component);
+      }
+    }
 
     private void updateSpheres() {
       //Update all spheres
@@ -263,6 +290,8 @@ namespace Leap.Unity {
 
     private Transform createSphere(string name, float radius, bool isPartOfArm = false) {
       GameObject sphere = new GameObject(name);
+      _serializedTransforms.Add(sphere.transform);
+
       sphere.AddComponent<MeshFilter>().mesh = _sphereMesh;
       sphere.AddComponent<MeshRenderer>().sharedMaterial = jointMat;
       sphere.transform.parent = transform;
@@ -280,6 +309,8 @@ namespace Leap.Unity {
 
     private void createCylinder(string name, Transform jointA, Transform jointB, bool isPartOfArm = false) {
       GameObject cylinder = new GameObject(name);
+      _serializedTransforms.Add(cylinder.transform);
+
       cylinder.AddComponent<MeshFilter>();
       cylinder.AddComponent<MeshRenderer>().sharedMaterial = _material;
       cylinder.transform.parent = transform;
