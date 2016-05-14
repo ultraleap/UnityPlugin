@@ -245,7 +245,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -512,6 +512,14 @@ Prefab:
     - target: {fileID: 22497848, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
       propertyPath: m_LocalScale.z
       value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
@@ -1212,6 +1220,14 @@ Prefab:
       propertyPath: m_Name
       value: Button Left
       objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
   m_IsPrefabParent: 0
@@ -1398,6 +1414,14 @@ Prefab:
     - target: {fileID: 22400918, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
@@ -1753,6 +1777,14 @@ Prefab:
     - target: {fileID: 11458476, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
       propertyPath: RetractWhenOutsideofTouchingDistance
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
@@ -2435,6 +2467,14 @@ Prefab:
       propertyPath: m_Colors.m_FadeDuration
       value: 0.05
       objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
   m_IsPrefabParent: 0
@@ -2548,6 +2588,14 @@ Prefab:
     - target: {fileID: 22497848, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
       propertyPath: m_LocalScale.z
       value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
@@ -3379,6 +3427,14 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 1.5
       objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
   m_IsPrefabParent: 0
@@ -3672,6 +3728,14 @@ Prefab:
     - target: {fileID: 121642, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
       propertyPath: m_Name
       value: Toggle Right
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
@@ -4209,7 +4273,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -4449,6 +4513,14 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
   m_IsPrefabParent: 0
@@ -4538,7 +4610,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -4699,6 +4771,11 @@ CanvasRenderer:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 655292230}
+--- !u!82 &659269785 stripped
+AudioSource:
+  m_PrefabParentObject: {fileID: 8263894, guid: e21d28e01f4eabc4cb46ce3a10831671,
+    type: 2}
+  m_PrefabInternal: {fileID: 1922065244}
 --- !u!1 &663555262
 GameObject:
   m_ObjectHideFlags: 0
@@ -4858,7 +4935,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -5189,7 +5266,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -5457,6 +5534,14 @@ Prefab:
       propertyPath: m_Name
       value: Button Right
       objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
   m_IsPrefabParent: 0
@@ -5567,6 +5652,14 @@ Prefab:
       propertyPath: m_Name
       value: Button Left
       objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
   m_IsPrefabParent: 0
@@ -5656,7 +5749,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -5975,6 +6068,14 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
   m_IsPrefabParent: 0
@@ -6288,6 +6389,14 @@ Prefab:
       propertyPath: RetractWhenOutsideofTouchingDistance
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
   m_IsPrefabParent: 0
@@ -6524,7 +6633,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -7073,6 +7182,14 @@ Prefab:
       propertyPath: RetractWhenOutsideofTouchingDistance
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
   m_IsPrefabParent: 0
@@ -7254,6 +7371,14 @@ Prefab:
     - target: {fileID: 22431716, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
       propertyPath: m_SizeDelta.x
       value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 8263894, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8263894, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
@@ -7509,7 +7634,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -7756,7 +7881,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -8938,7 +9063,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -9253,6 +9378,14 @@ Prefab:
     - target: {fileID: 121642, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
       propertyPath: m_Name
       value: Toggle Left
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
@@ -9629,6 +9762,14 @@ Prefab:
     - target: {fileID: 11490466, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
       propertyPath: RetractWhenOutsideofTouchingDistance
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
@@ -10055,6 +10196,14 @@ Prefab:
     - target: {fileID: 121642, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
       propertyPath: m_Name
       value: Toggle Left
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
@@ -10741,6 +10890,14 @@ Prefab:
       propertyPath: m_Name
       value: Toggle Right
       objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
   m_IsPrefabParent: 0
@@ -11045,6 +11202,14 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
   m_IsPrefabParent: 0
@@ -11134,7 +11299,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -11454,7 +11619,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -12054,7 +12219,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -12418,7 +12583,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -12761,6 +12926,14 @@ Prefab:
     - target: {fileID: 22400918, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
@@ -13835,7 +14008,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -14291,6 +14464,14 @@ Prefab:
       propertyPath: RetractWhenOutsideofTouchingDistance
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
   m_IsPrefabParent: 0
@@ -14385,7 +14566,7 @@ AudioSource:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -14648,6 +14829,14 @@ Prefab:
     - target: {fileID: 22431716, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
       propertyPath: m_SizeDelta.x
       value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 8263894, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8263894, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
@@ -15182,6 +15371,14 @@ Prefab:
       propertyPath: RetractWhenOutsideofTouchingDistance
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
   m_IsPrefabParent: 0
@@ -15522,8 +15719,12 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 600214003}
     m_Modifications:
-    - target: {fileID: 11420128, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
-      propertyPath: LayerCollapseStateChange.m_PersistentCalls.m_Calls.Array.size
+    - target: {fileID: 11420752, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: m_Delegates.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11420752, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: m_Delegates.Array.data[1].callback.m_PersistentCalls.m_Calls.Array.size
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22476068, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
@@ -15598,6 +15799,10 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 11417408, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: m_OnValueChanged.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 22479692, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
       propertyPath: m_AnchorMax.x
       value: 0.652
@@ -15618,17 +15823,34 @@ Prefab:
       propertyPath: m_AnchorMax.y
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 11420128, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
-      propertyPath: LayerCollapseStateChange.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+    - target: {fileID: 11420752, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: m_Delegates.Array.data[1].eventID
+      value: 14
+      objectReference: {fileID: 0}
+    - target: {fileID: 11420752, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: m_Delegates.Array.data[1].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 659269785}
+    - target: {fileID: 11420752, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: m_Delegates.Array.data[1].callback.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Play
+      objectReference: {fileID: 0}
+    - target: {fileID: 11420752, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: m_Delegates.Array.data[1].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 11420128, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
-      propertyPath: LayerCollapseStateChange.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+    - target: {fileID: 11420752, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: m_Delegates.Array.data[1].callback.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 11420752, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: m_Delegates.Array.data[1].callback.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 11420128, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
-      propertyPath: RetractWhenOutsideofTouchingDistance
-      value: 0
+    - target: {fileID: 11420752, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: m_Delegates.Array.data[1].callback.m_TypeName
+      value: UnityEngine.EventSystems.EventTrigger+TriggerEvent, UnityEngine.UI, Version=1.0.0.0,
+        Culture=neutral, PublicKeyToken=null
       objectReference: {fileID: 0}
     - target: {fileID: 11487644, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
       propertyPath: m_Enabled
@@ -15923,6 +16145,14 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11487644, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
       propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8263894, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8263894, guid: e21d28e01f4eabc4cb46ce3a10831671, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -16221,6 +16451,14 @@ Prefab:
     - target: {fileID: 108926, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
       propertyPath: m_Name
       value: Button Right
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218832, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2216e2fdeac77a4ab814e44bb7ba878, type: 2}
@@ -17168,6 +17406,14 @@ Prefab:
     - target: {fileID: 22497848, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
       propertyPath: m_LocalScale.z
       value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: m_PlayOnAwake
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8218894, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 695bb09df764aba4ebec17e115aba572, type: 2}
