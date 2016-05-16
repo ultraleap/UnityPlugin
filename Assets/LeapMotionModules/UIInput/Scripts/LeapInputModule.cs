@@ -37,7 +37,7 @@ namespace Leap.Unity.InputModule {
     [Tooltip("The material to be instantiated for your pointers during projective interaction.")]
     public Material PointerMaterial;
     [Tooltip("The size of the pointer in world coordinates with respect to distance.")]
-    public AnimationCurve PointerScale;
+    public AnimationCurve PointerScale = AnimationCurve.Linear(0f,0.1f,6f,1f);
     [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color StandardColor = Color.white;
@@ -46,6 +46,8 @@ namespace Leap.Unity.InputModule {
     public Color HoveringColor = Color.green;
     [Tooltip("The sound that is played when the pointer transitions from canvas to element.")]
     public AudioClip HoverSound;
+    [Tooltip("Trigger a Hover Event when switching between UI elements.")]
+    public bool TriggerHoverOnElementSwitch = false;
     [Tooltip("The color of the pointer when it is triggering a UI element.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color TriggeringColor = Color.gray;
@@ -89,6 +91,7 @@ namespace Leap.Unity.InputModule {
     private Vector2[] PrevScreenPosition;
     private bool[] PrevTriggeringInteraction;
     private bool PrevTouchingMode;
+    private GameObject[] prevOverGo;
     private float[] timeEnteredCanvas;
 
     //Misc. Objects
@@ -174,6 +177,7 @@ namespace Leap.Unity.InputModule {
       PointEvents = new PointerEventData[NumberOfHands];
       pointerState = new pointerStates[NumberOfHands];
       currentOverGo = new GameObject[NumberOfHands];
+      prevOverGo = new GameObject[NumberOfHands];
       currentGo = new GameObject[NumberOfHands];
       currentGoing = new GameObject[NumberOfHands];
       PrevTriggeringInteraction = new bool[NumberOfHands];
@@ -276,6 +280,7 @@ namespace Leap.Unity.InputModule {
 
         //If we hit something with our Raycast, let's see if we should interact with it
         if (PointEvents[whichHand].pointerCurrentRaycast.gameObject != null && pointerState[whichHand] != pointerStates.OffCanvas) {
+          prevOverGo[whichHand] = currentOverGo[whichHand];
           currentOverGo[whichHand] = PointEvents[whichHand].pointerCurrentRaycast.gameObject;
 
           //Trigger Enter or Exit Events on the UI Element (like highlighting)
@@ -506,11 +511,23 @@ namespace Leap.Unity.InputModule {
     //Discrete 1-Frame Transition Behaviors like Sounds and Events
     //(color changing is in a different function since it is lerped over multiple frames)
     private void ProcessStateEvents(int whichHand) {
+      if (TriggerHoverOnElementSwitch) {
+        if ((PrevState[whichHand] != pointerStates.OffCanvas) && (pointerState[whichHand] != pointerStates.OffCanvas)) {
+          if (currentOverGo[whichHand] != prevOverGo[whichHand]) {
+            //When you begin to hover on an element
+            SoundPlayer.PlayOneShot(HoverSound);
+            onHover.Invoke(Pointers[whichHand].transform.position);
+          }
+        }
+      }
+
       if (PrevState[whichHand] == pointerStates.OnCanvas) {
         if (pointerState[whichHand] == pointerStates.OnElement) {
-          //When you begin to hover on an element
-          SoundPlayer.PlayOneShot(HoverSound);
-          onHover.Invoke(Pointers[whichHand].transform.position);
+          //When you go from hovering on the Canvas to hovering on an element
+          if (!TriggerHoverOnElementSwitch) {
+            SoundPlayer.PlayOneShot(HoverSound);
+            onHover.Invoke(Pointers[whichHand].transform.position);
+          }
         } else if (pointerState[whichHand] == pointerStates.PinchingToCanvas) {
           //When you try to interact with the Canvas
           SoundPlayer.PlayOneShot(MissedSound);
