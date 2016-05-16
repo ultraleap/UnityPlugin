@@ -5,31 +5,46 @@ using Leap;
 namespace Leap.Unity {
 
   public class FingerDirectionDetector : Detector {
-    public IHandModel handModel = null;
-  
+    [Tooltip("The interval in seconds at which to check this detector's conditions.")]
+    public float Period = .1f; //seconds
+    [Tooltip("The hand model to watch. Set automatically if detector is on a hand.")]
+    public IHandModel handModel = null;  
     public Finger.FingerType FingerName = Finger.FingerType.TYPE_INDEX;
+    [Tooltip("The target direction.")]
     public Vector3 PointingDirection = Vector3.forward;
+    [Tooltip("How to treat the target direction.")]
     public PointingType PointingType = PointingType.RelativeToHorizon;
+    [Tooltip("A target object(optional). Use PointingType.AtTarget")]
     public Transform TargetObject = null;
-    public float OnAngle = 45f; //degrees
-    public float OffAngle = 65f; //degrees
-  
-    void Start () {
+    [Tooltip("The angle in degrees from the target direction at which to turn on.")]
+    [Range(0, 360)]
+    public float OnAngle = 15f; //degrees
+    [Tooltip("The angle in degrees from the target direction at which to turn off.")]
+    [Range(0, 360)]
+    public float OffAngle = 25f; //degrees
+
+    private void OnValidate(){
+      if( OffAngle < OnAngle){
+        OffAngle = OnAngle;
+      }
+    }
+
+    private void Start () {
       if(handModel == null){
         handModel = gameObject.GetComponentInParent<IHandModel>();
       }
     }
 
-    void OnEnable () {
+    private void OnEnable () {
       StartCoroutine(fingerPointingWatcher());
     }
   
-    void OnDisable () {
+    private void OnDisable () {
       StopCoroutine(fingerPointingWatcher());
       Deactivate();
     }
-  
-    IEnumerator fingerPointingWatcher() {
+
+    private IEnumerator fingerPointingWatcher() {
       Hand hand;
       Vector3 fingerDirection;
       Vector3 targetDirection;
@@ -51,7 +66,7 @@ namespace Leap.Unity {
         yield return new WaitForSeconds(Period);
       }
     }
-  
+
     private Vector3 selectedDirection(Vector3 tipPosition){
       switch(PointingType){
         case PointingType.RelativeToHorizon:
@@ -69,7 +84,7 @@ namespace Leap.Unity {
           return PointingDirection;
       }
     }
-  
+
     private int selectedFingerOrdinal(){
       switch(FingerName){
         case Finger.FingerType.TYPE_INDEX:
@@ -88,7 +103,7 @@ namespace Leap.Unity {
     }
 
   #if UNITY_EDITOR
-    void OnDrawGizmos () {
+    private void OnDrawGizmos () {
       if (ShowGizmos && handModel != null) {
         Color innerColor;
         if (IsActive) {
@@ -104,5 +119,4 @@ namespace Leap.Unity {
     }
   #endif
   }
-  
 }

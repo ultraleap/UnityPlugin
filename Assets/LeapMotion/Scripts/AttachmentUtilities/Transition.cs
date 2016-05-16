@@ -27,20 +27,25 @@ namespace Leap.Unity{
     public AnimationCurve ZScale;
     [Range(.001f, 2.0f)]
     public float Duration = 0.5f; //seconds
+    [Range (-1, 1)]
+    public float Simulate = 0.0f;
     [Range (0, 1)]
-    public float Simulate = 0.0f; //0..1
-    public float Speed = 1.0f;
-    public float progress = 0;
+    public float Progress = 1.0f; //Start with full transition influence
   
     public UnityEvent OnComplete;
+
   #if UNITY_EDITOR
     void Update() {
       if (!EditorApplication.isPlaying) {
-        updateTransition(1 - Simulate);
+        updateTransition(Mathf.Abs(Progress));
       }
     }
   #endif
   
+    private void Awake(){
+      updateTransition(1.0f);
+    }
+
     public void TransitionIn(){
       if (isActiveAndEnabled) {
         StopAllCoroutines();
@@ -58,26 +63,27 @@ namespace Leap.Unity{
     IEnumerator transitionIn(){
       float start = Time.time;
       do {
-        progress = (Time.time - start)/Duration;
-        updateTransition(progress);
+        Progress = Progress - (Time.time - start)/Duration;
+        updateTransition(Progress);
         yield return null;
-      } while(progress <= 1);
-      progress = 1;
+      } while(Progress >= 0);
+      Progress = 0;
       OnComplete.Invoke();
     }
   
     IEnumerator transitionOut(){
       float start = Time.time;
       do {
-        progress = progress - (Time.time - start)/Duration;
-        updateTransition(progress);
+        Progress = (Time.time - start)/Duration;
+        updateTransition(Progress);
         yield return null;
-      } while(progress >= 0);
-      progress = 0;
+      } while(Progress <= 1);
+      Progress = 1;
       OnComplete.Invoke();
     }
   
     void updateTransition(float interpolationPoint){
+      interpolationPoint = 1 - interpolationPoint; //invert so 0 is finished position on anim curve (i.e. no transition influence)
       if(AnimatePosition){
         Vector3 localPosition = transform.localPosition;
         localPosition.x = XPosition.Evaluate(interpolationPoint) * RelativeOnPosition.x;

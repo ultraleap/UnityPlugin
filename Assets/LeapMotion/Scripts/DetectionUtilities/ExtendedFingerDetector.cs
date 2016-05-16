@@ -5,6 +5,9 @@ using Leap;
 namespace Leap.Unity {
 
   public class ExtendedFingerDetector : Detector {
+    [Tooltip("The interval in seconds at which to check this detector's conditions.")]
+    public float Period = .1f; //seconds
+
     public IHandModel handModel = null;
   
     public PointingState Thumb = PointingState.Either;

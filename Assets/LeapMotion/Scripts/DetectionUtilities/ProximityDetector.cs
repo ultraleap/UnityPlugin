@@ -7,6 +7,8 @@ namespace Leap.Unity{
 
   //Detects when the parent Gameobject is in proximity of one of a list of target objects.
   public class ProximityDetector : Detector {
+    [Tooltip("The interval in seconds at which to check this detector's conditions.")]
+    public float Period = .1f; //seconds
     public ProximityEvent OnProximity;
     public GameObject[] TargetObjects;
     public float OnDistance = .01f; //meters

@@ -26,7 +26,6 @@ namespace Leap.Unity {
      * Reports whether this attachment is in an activated state or not.
      *  @since 4.1.1
      */
-    [HideInInspector]
     public bool IsActive = false;
     /**
      * A Transition played when the attachment is activated.
@@ -44,10 +43,10 @@ namespace Leap.Unity {
      * Plays the InTransition, if one is specified.
      *  @since 4.1.1
      */
-    public virtual void Activate(){
+    public virtual void Activate(bool doTransition = true){
       IsActive = true;
       ChangeChildState();
-      if(InTransition != null){
+      if(InTransition != null && doTransition){
         InTransition.OnComplete.AddListener(ChangeChildState);
         InTransition.TransitionIn();
       }
@@ -58,9 +57,9 @@ namespace Leap.Unity {
      * Plays the OutTransition, if one is specified.
      *  @since 4.1.1
      */
-    public virtual void Deactivate () {
+    public virtual void Deactivate(bool doTransition = true) {
       IsActive = false;
-      if(OutTransition != null){
+      if(OutTransition != null && doTransition){
         OutTransition.OnComplete.AddListener(ChangeChildState);
         OutTransition.TransitionOut();
       } else {
@@ -85,6 +84,10 @@ namespace Leap.Unity {
           children[g].gameObject.SetActive(IsActive);
         }
       }
+    }
+
+    private void OnDisable(){
+      Deactivate(false);
     }
   }
 }
