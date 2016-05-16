@@ -46,10 +46,17 @@ namespace Leap.Unity {
         }
       }
     }
+    [ContextMenu("Setup Rigged Hand")]
+    public void SetupRiggedHand() {
+      findFingerModels();
+    }
+
     private void findFingerModels() {
-      FingerModel[] fingerModelList = GetComponentsInChildren<FingerModel>();
+      RiggedFinger[] fingerModelList = GetComponentsInChildren<RiggedFinger>();
       for (int i = 0; i < 5; i++ ) {
-        fingers[i] = fingerModelList[i];
+        int fingersIndex = fingerModelList[i].fingerType.indexOf();
+        fingers[fingersIndex] = fingerModelList[i];
+        fingerModelList[i].SetupRiggedFinger();
       }
     }
 

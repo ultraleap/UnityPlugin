@@ -40,6 +40,10 @@ namespace Leap.Unity {
         }
       }
     }
+    public void SetupRiggedFinger () {
+      findBoneTransforms();
+    }
+
     private void findBoneTransforms() {
       if (fingerType == Finger.FingerType.TYPE_THUMB) {
         bones[1] = transform;
@@ -52,11 +56,6 @@ namespace Leap.Unity {
         bones[2] = transform.GetChild(0).transform.GetChild(0).transform;
         bones[3] = transform.GetChild(0).transform.GetChild(0).transform.GetChild(0).transform;
 
-      }
-    }
-    void Update() {
-      if (Input.GetKeyUp(KeyCode.B)) {
-        findBoneTransforms();
       }
     }
   } 
