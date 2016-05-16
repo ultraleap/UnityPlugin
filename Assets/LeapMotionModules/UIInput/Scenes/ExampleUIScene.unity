@@ -3510,8 +3510,8 @@ MonoBehaviour:
   tweenRotationalWarping: 1
   tweenPositionalWarping: 0
   syncMode: 1
-  allowManualTimeAlignment: 0
-  warpingAdjustment: 60
+  allowManualTimeAlignment: 1
+  warpingAdjustment: 30
   unlockHold: 0
   moreRewind: 276
   lessRewind: 275
