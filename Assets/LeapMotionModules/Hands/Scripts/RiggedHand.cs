@@ -26,10 +26,12 @@ namespace Leap.Unity {
     public Quaternion Reorientation() {
       return Quaternion.Inverse(Quaternion.LookRotation(modelFingerPointing, -modelPalmFacing));
     }
+    
 
     public override void UpdateHand() {
       if (palm != null) {
-        palm.position = GetPalmPosition();
+        palm.position = GetWristPosition();
+        wristJoint.position = GetWristPosition();
         palm.rotation = GetPalmRotation() * Reorientation();
       }
 
@@ -50,10 +52,6 @@ namespace Leap.Unity {
         fingers[i] = fingerModelList[i];
       }
     }
-    void Update() {
-      if(Input.GetKeyUp(KeyCode.A)){
-        findFingerModels();
-      }
-    }
+
   } 
 }
