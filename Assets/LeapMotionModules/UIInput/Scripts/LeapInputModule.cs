@@ -20,7 +20,14 @@ namespace Leap.Unity.InputModule {
     [Tooltip("An optional alternate detector for pinching on the right hand.")]
     public Leap.Unity.PinchUtility.LeapPinchDetector RightHandDetector;
     [Tooltip("How many hands and pointers the Input Module should allocate for.")]
-    public int NumberOfHands = 2;
+    int NumberOfHands = 2;
+    public enum InteractionCapability : int {
+      Hybrid,
+      Tactile,
+      Projective
+    };
+    [Tooltip("The interaction mode that the Input Module will use.")]
+    public InteractionCapability InteractionMode = InteractionCapability.Hybrid;
     [Tooltip("The distance from a UI element that interaction switches from Projective-Pointer based to Touch based.")]
     public float ProjectiveToTactileTransitionDistance = 0.12f;
     [Tooltip("When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.")]
@@ -28,7 +35,7 @@ namespace Leap.Unity.InputModule {
     [Tooltip("If the ScrollView still doesn't work even after disabling RaycastTarget on the intermediate layers.")]
     public bool OverrideScrollViewClicks = false;
     [Tooltip("Draw the raycast for projective interaction.")]
-    public bool DrawDebug = false;
+    bool DrawDebug = false;
 
     //Customizable Pointer Parameters
     [Header(" Pointer setup")]
@@ -333,7 +340,7 @@ namespace Leap.Unity.InputModule {
                   }
                 }
 
-                ExecuteEvents.Execute(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.beginDragHandler);
+                ExecuteEvents.ExecuteHierarchy(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.beginDragHandler);
                 PointEvents[whichHand].pointerDrag = currentGo[whichHand];
                 PointEvents[whichHand].dragging = true;
                 currentGoing[whichHand] = currentGo[whichHand];
@@ -613,7 +620,7 @@ namespace Leap.Unity.InputModule {
         return (distanceOfIndexTipToPointer(whichHand) < 0f);
       }
 
-
+      //Disabling Pinching during touch interactions; maybe still desirable?
       //return curFrame.Hands[whichHand].PinchDistance < PinchingThreshold;
 
       return false;
