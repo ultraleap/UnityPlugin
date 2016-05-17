@@ -53,7 +53,7 @@ namespace Leap.Unity {
     public void SetupRiggedHand() {
       modelPalmFacing = calculateModelPalmFacing();
       modelFingerPointing = calculateModelFingerPointing();
-      //findFingerModels();
+      findFingerModels();
     }
 
     private void findFingerModels() {
@@ -87,7 +87,7 @@ namespace Leap.Unity {
       return zeroed;
     }
     private Vector3 calculateModelFingerPointing() {
-      Vector3 distance = transform.InverseTransformPoint(palm.position) - transform.InverseTransformPoint(palm.transform.GetChild(2).transform.GetChild(0).transform.position);
+      Vector3 distance =  palm.transform.InverseTransformPoint(palm.transform.GetChild(2).transform.GetChild(0).transform.position) - palm.localPosition;
       float max = Mathf.Max(Mathf.Abs(distance.x), Mathf.Abs(distance.y), Mathf.Abs(distance.z));
       var zeroed = new Vector3();
       if (Mathf.Abs(distance.x) == max) {
