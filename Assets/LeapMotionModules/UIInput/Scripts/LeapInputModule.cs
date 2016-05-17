@@ -21,24 +21,9 @@ namespace Leap.Unity.InputModule {
     public Leap.Unity.PinchUtility.LeapPinchDetector RightHandDetector;
     [Tooltip("How many hands and pointers the Input Module should allocate for.")]
     const int NumberOfHands = 2;
-    public enum InteractionCapability : int {
-      Hybrid,
-      Tactile,
-      Projective
-    };
-    [Tooltip("The interaction mode that the Input Module will use.")]
-    public InteractionCapability InteractionMode = InteractionCapability.Hybrid;
-    [Tooltip("The distance from a UI element that interaction switches from Projective-Pointer based to Touch based.")]
-    public float ProjectiveToTactileTransitionDistance = 0.12f;
-    [Tooltip("When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.")]
-    public float PinchingThreshold = 20f;
-    [Tooltip("If the ScrollView still doesn't work even after disabling RaycastTarget on the intermediate layers.")]
-    public bool OverrideScrollViewClicks = false;
-    [Tooltip("Draw the raycast for projective interaction.")]
-    bool DrawDebug = false;
 
     //Customizable Pointer Parameters
-    [Header(" Pointer setup")]
+    [Header(" Pointer Setup")]
     [Tooltip("The sprite used to represent your pointers during projective interaction.")]
     public Sprite PointerSprite;
     [Tooltip("The material to be instantiated for your pointers during projective interaction.")]
@@ -51,14 +36,28 @@ namespace Leap.Unity.InputModule {
     [Tooltip("The color of the pointer when it is hovering over any other UI element.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color HoveringColor = Color.green;
-    [Tooltip("Trigger a Hover Event when switching between UI elements.")]
-    public bool TriggerHoverOnElementSwitch = false;
     [Tooltip("The color of the pointer when it is triggering a UI element.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color TriggeringColor = Color.gray;
     [Tooltip("The color of the pointer when it is triggering blank canvas.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color TriggerMissedColor = Color.gray;
+
+    //Customizable Pointer Parameters
+    [Header(" Advanced Options")]
+    [Tooltip("Whether or not to show Advanced Options in the Inspector.")]
+    public bool ShowAdvancedOptions = false;
+    public enum InteractionCapability : int {
+      Hybrid,
+      Tactile,
+      Projective
+    };
+    [Tooltip("The interaction mode that the Input Module will use.")]
+    public InteractionCapability InteractionMode = InteractionCapability.Hybrid;
+    [Tooltip("The distance from a UI element that interaction switches from Projective-Pointer based to Touch based.")]
+    public float ProjectiveToTactileTransitionDistance = 0.12f;
+    [Tooltip("When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.")]
+    public float PinchingThreshold = 20f;
 
     [Tooltip("The sound that is played when the pointer transitions from canvas to element.")]
     public AudioClip BeginHoverSound;
@@ -75,8 +74,6 @@ namespace Leap.Unity.InputModule {
     [Tooltip("The sound that is played while the pointer is dragging an object.")]
     public AudioClip DragLoopSound;
 
-
-
     // Event delegates triggered by Input
     [System.Serializable]
     public class PositionEvent : UnityEvent<Vector3> { }
@@ -90,6 +87,17 @@ namespace Leap.Unity.InputModule {
     public PositionEvent onHover;
     [Tooltip("The event that is triggered while holding down a non-canvas UI element.")]
     public PositionEvent whileClickHeld;
+
+    [Tooltip("Whether or not to show unsupported Experimental Options in the Inspector.")]
+    public bool ShowExperimentalOptions = false;
+    [Tooltip("Trigger a Hover Event when switching between UI elements.")]
+    public bool TriggerHoverOnElementSwitch = false;
+    [Tooltip("If the ScrollView still doesn't work even after disabling RaycastTarget on the intermediate layers.")]
+    public bool OverrideScrollViewClicks = false;
+    [Tooltip("Draw the raycast for projective interaction.")]
+    public bool DrawDebug = false;
+    [Tooltip("Retract compressible widgets when not using Tactile Interaction.")]
+    public bool RetractUI = false;
 
     //Event related data
     private Camera EventCamera;
@@ -301,8 +309,6 @@ namespace Leap.Unity.InputModule {
             if (comp != null) {
               if (!isTriggeringInteraction(whichHand)) {
                 ((ILeapWidget)comp).HoverDistance(distanceOfIndexTipToPointer(whichHand));
-              } else {
-                ((ILeapWidget)comp).HoverDistance(-10f);
               }
             }
           }
@@ -401,7 +407,7 @@ namespace Leap.Unity.InputModule {
         }
 
         //Make the special Leap Widget Buttons Pop Up and Flatten when Appropriate
-        if (PrevTouchingMode != getTouchingMode()) {
+        if (PrevTouchingMode != getTouchingMode() && RetractUI) {
           PrevTouchingMode = getTouchingMode();
           if (PrevTouchingMode) {
             foreach (Canvas canvas in canvases) {

@@ -32,7 +32,7 @@ namespace Leap.Unity.InputModule {
     public float ExpandSpeed = 0.1f;
     public float ContractSpeed = 0.1f;
     public float PushPaddingDistance = 0.01f;
-    public bool RetractWhenOutsideofTouchingDistance = false;
+    //public bool RetractWhenOutsideofTouchingDistance = false;
 
     public UnityEvent LayerCollapseStateChange;
 
@@ -62,9 +62,9 @@ namespace Leap.Unity.InputModule {
           Debug.LogWarning("Ensure that the layers that you have allotted have UI Elements in them!");
         }
       }
-      if (!RetractWhenOutsideofTouchingDistance) {
+      //if (!RetractWhenOutsideofTouchingDistance) {
         Expand();
-      }
+      //}
     }
 
     void OnApplicationQuit() {
@@ -164,10 +164,10 @@ namespace Leap.Unity.InputModule {
     }
 
     public void Retract() {
-      if (RetractWhenOutsideofTouchingDistance) {
+      //if (RetractWhenOutsideofTouchingDistance) {
         currentlyFloating = false;
         curLerpSpeed = ContractSpeed;
-      }
+      //}
     }
 
     public void DivideLayerHeightsOnToggle(Toggle toggle) {

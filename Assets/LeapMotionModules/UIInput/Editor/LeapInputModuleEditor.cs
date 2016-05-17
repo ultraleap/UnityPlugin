@@ -11,12 +11,45 @@ namespace Leap.Unity.InputModule {
       LeapInputModule module = target as LeapInputModule;
 
       specifyConditionalDrawing(() => ProjectiveAllowed(module.InteractionMode),
-                               "ProjectiveToTactileTransitionDistance",
                                "PinchingThreshold");
+
+      specifyConditionalDrawing(() => isTrue(module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid),
+                               "ProjectiveToTactileTransitionDistance");
+
+      specifyConditionalDrawing(() => isTrue(module.ShowAdvancedOptions),
+                         "InteractionMode",
+                         "OverrideScrollViewClicks",
+                         "DrawDebug",
+                         "TriggerHoverOnElementSwitch",
+                         "BeginHoverSound",
+                         "EndHoverSound",
+                         "BeginTriggerSound",
+                         "EndTriggerSound",
+                         "BeginMissedSound",
+                         "EndMissedSound",
+                         "DragLoopSound",
+                         "onClickDown",
+                         "onClickUp",
+                         "onHover",
+                         "whileClickHeld",
+                         "ProjectiveToTactileTransitionDistance",
+                         "PinchingThreshold",
+                         "RetractUI",
+                         "ShowExperimentalOptions");
+
+      specifyConditionalDrawing(() => isTrue(module.ShowExperimentalOptions),
+                   "OverrideScrollViewClicks",
+                   "DrawDebug",
+                   "TriggerHoverOnElementSwitch",
+                   "RetractUI");
     }
 
     bool ProjectiveAllowed(LeapInputModule.InteractionCapability mode) {
       return mode != LeapInputModule.InteractionCapability.Tactile;
+    }
+
+    bool isTrue(bool truth) {
+      return truth;
     }
   }
 }
