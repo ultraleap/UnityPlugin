@@ -31,7 +31,10 @@ namespace Leap.Unity {
     public override void UpdateHand() {
       if (palm != null) {
         palm.position = GetWristPosition();
-        wristJoint.position = GetWristPosition();
+        if (wristJoint) {
+          wristJoint.position = GetWristPosition();
+        }
+        else palm.position = GetWristPosition();
         palm.rotation = GetPalmRotation() * Reorientation();
       }
 
@@ -57,6 +60,7 @@ namespace Leap.Unity {
         int fingersIndex = fingerModelList[i].fingerType.indexOf();
         fingers[fingersIndex] = fingerModelList[i];
         fingerModelList[i].SetupRiggedFinger();
+        fingerModelList[i].modelPalmFacing = modelPalmFacing;
       }
     }
 
