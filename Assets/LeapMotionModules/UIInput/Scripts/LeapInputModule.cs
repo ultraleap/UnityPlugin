@@ -20,7 +20,7 @@ namespace Leap.Unity.InputModule {
     [Tooltip("An optional alternate detector for pinching on the right hand.")]
     public Leap.Unity.PinchUtility.LeapPinchDetector RightHandDetector;
     [Tooltip("How many hands and pointers the Input Module should allocate for.")]
-    int NumberOfHands = 2;
+    const int NumberOfHands = 2;
     public enum InteractionCapability : int {
       Hybrid,
       Tactile,
