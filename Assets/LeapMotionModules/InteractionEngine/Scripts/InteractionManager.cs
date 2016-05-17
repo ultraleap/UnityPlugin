@@ -49,10 +49,6 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _graspingEnabled = true;
 
-    [Tooltip("The amount of time a Hand can remain untracked while also still grasping an object.")]
-    [SerializeField]
-    protected float _untrackedTimeout = 0.5f;
-
     [Tooltip("Depth before collision response becomes as if holding a sphere.")]
     [SerializeField]
     protected float _depthUntilSphericalInside = 0.023f;
@@ -157,7 +153,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Returns a collection of InteractionBehaviours that are currently registered with this manager.
     /// </summary>
-    public IEnumerable<IInteractionBehaviour> RegisteredObjects {
+    public ReadonlyList<IInteractionBehaviour> RegisteredObjects {
       get {
         return _registeredBehaviours;
       }
@@ -167,35 +163,27 @@ namespace Leap.Unity.Interaction {
     /// Returns a collection of InteractionBehaviours that are currently being grasped by
     /// at least one hand.
     /// </summary>
-    public IEnumerable<IInteractionBehaviour> GraspedObjects {
+    public ReadonlyList<IInteractionBehaviour> GraspedObjects {
       get {
         return _graspedBehaviours;
       }
     }
 
     /// <summary>
-    /// Sets or Gets whether or not the Interaction Engine can modify object velocities when pushing.
+    /// Gets whether or not the Interaction Engine can modify object velocities when pushing.
     /// </summary>
     public bool ContactEnabled {
       get {
         return _contactEnabled;
       }
-      set {
-        _contactEnabled = value;
-        UpdateSceneInfo();
-      }
     }
 
     /// <summary>
-    /// Sets or Gets whether or not the Interaction plugin to modify object positions by grasping.
+    /// Gets whether or not the Interaction plugin to modify object positions by grasping.
     /// </summary>
     public bool GraspingEnabled {
       get {
         return _graspingEnabled;
-      }
-      set {
-        _graspingEnabled = value;
-        UpdateSceneInfo();
       }
     }
 
@@ -401,12 +389,7 @@ namespace Leap.Unity.Interaction {
         UpdateSceneInfo();
       }
 
-      //Timeout must be positive
-      if (_untrackedTimeout < 0) {
-        _untrackedTimeout = 0;
-      }
-
-      if (_autoGenerateLayers) {
+      if (!Application.isPlaying && _autoGenerateLayers) {
         autoGenerateLayers();
       }
     }
@@ -797,14 +780,7 @@ namespace Leap.Unity.Interaction {
           if (!ieHand.isUntracked) {
             try {
               //This also dispatches InteractionObject.OnHandLostTracking()
-              bool didSuspend;
-              ieHand.MarkUntracked(out didSuspend);
-
-              if (!didSuspend) {
-                //set to max value to force the hand to time-out
-                handAge = float.MaxValue;
-              }
-
+              ieHand.MarkUntracked();
             } catch (Exception e) {
               _misbehavingBehaviours.Add(ieHand.graspedObject);
               Debug.LogException(e);
@@ -812,7 +788,7 @@ namespace Leap.Unity.Interaction {
           }
 
           //If the age is longer than the timeout, we also remove it from the list
-          if (handAge > _untrackedTimeout) {
+          if (handAge >= ieHand.maxSuspensionTime) {
             _handIdsToRemove.Add(id);
 
             try {
@@ -958,6 +934,7 @@ namespace Leap.Unity.Interaction {
     protected class InteractionHand {
       public Hand hand { get; protected set; }
       public float lastTimeUpdated { get; protected set; }
+      public float maxSuspensionTime { get; protected set; }
       public IInteractionBehaviour graspedObject { get; protected set; }
       public bool isUntracked { get; protected set; }
       public bool isUserGrasp { get; protected set; }
@@ -986,9 +963,11 @@ namespace Leap.Unity.Interaction {
         isUserGrasp = false;
       }
 
-      public void MarkUntracked(out bool didSuspend) {
+      public void MarkUntracked() {
         isUntracked = true;
-        graspedObject.NotifyHandLostTracking(hand, out didSuspend);
+        float outTime;
+        graspedObject.NotifyHandLostTracking(hand, out outTime);
+        maxSuspensionTime = outTime;
       }
 
       public void MarkTimeout() {

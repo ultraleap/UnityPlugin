@@ -17,12 +17,19 @@ namespace Leap.Unity.Interaction {
       specifyConditionalDrawing("_contactEnabled",
                                 "_brushDisableDistance");
 
+      specifyConditionalDrawing("_suspensionEnabled",
+                                "_maxSuspensionTime",
+                                "_hideObjectOnSuspend");
+
       specifyConditionalDrawing("_graspingEnabled",
                                 "_graspMethod",
-                                "_suspensionEnabled",
                                 "_releaseDistance",
                                 "_maxVelocity",
                                 "_strengthByDistance",
+                                "_throwingVelocityCurve",
+                                "_suspensionEnabled",
+                                "_maxSuspensionTime",
+                                "_hideObjectOnSuspend",
                                 "_warpingEnabled",
                                 "_warpCurve",
                                 "_graphicalReturnTime");
@@ -31,7 +38,7 @@ namespace Leap.Unity.Interaction {
       specifyConditionalDrawing(() => graspMethod.intValue == (int)InteractionMaterial.GraspMethodEnum.Velocity,
                                 "_releaseDistance",
                                 "_maxVelocity",
-                                "_followStrength");
+                                "_strengthByDistance");
 
       specifyConditionalDrawing("_useCustomLayers", 
                                 "_interactionLayer", 
