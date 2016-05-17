@@ -25,7 +25,7 @@ namespace Leap.Unity {
     public void AddAllDetectors(){
       Detector[] detectors = GetComponents<Detector>();
       for(int g = 0; g < detectors.Length; g++){
-        if ( detectors[g].GetInstanceID() != this.GetInstanceID()) {
+        if ( detectors[g].GetInstanceID() != this.GetInstanceID() && detectors[g].enabled) {
           AddDetector(detectors[g]);
         }
       }

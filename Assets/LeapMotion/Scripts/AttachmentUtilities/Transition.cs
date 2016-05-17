@@ -37,7 +37,7 @@ namespace Leap.Unity{
   #if UNITY_EDITOR
     void Update() {
       if (!EditorApplication.isPlaying) {
-        updateTransition(Mathf.Abs(Progress));
+        updateTransition(Progress);
       }
     }
   #endif
@@ -83,7 +83,7 @@ namespace Leap.Unity{
     }
   
     void updateTransition(float interpolationPoint){
-      interpolationPoint = 1 - interpolationPoint; //invert so 0 is finished position on anim curve (i.e. no transition influence)
+      //interpolationPoint = 1 - interpolationPoint; //invert so 0 is finished position on anim curve (i.e. no transition influence)
       if(AnimatePosition){
         Vector3 localPosition = transform.localPosition;
         localPosition.x = XPosition.Evaluate(interpolationPoint) * RelativeOnPosition.x;
@@ -97,11 +97,17 @@ namespace Leap.Unity{
                                                          transform.localRotation.z + ZRotation.Evaluate(interpolationPoint) * RelativeOnRotation.z);
         transform.localRotation = transitionRotation;
       }
-      if(AnimateScale){
+      if (AnimateRotation && false) {
+        Quaternion transitionRotation = Quaternion.Euler(XRotation.Evaluate(interpolationPoint) * RelativeOnRotation.x,
+                                                         YRotation.Evaluate(interpolationPoint) * RelativeOnRotation.y,
+                                                         ZRotation.Evaluate(interpolationPoint) * RelativeOnRotation.z);
+        transform.localRotation = transitionRotation;
+      }
+      if (AnimateScale) {
         Vector3 localScale = transform.localScale;
-        localScale.x = XScale.Evaluate(interpolationPoint) * RelativeOnScale.x;
-        localScale.y = YScale.Evaluate(interpolationPoint) * RelativeOnScale.y;
-        localScale.z = ZScale.Evaluate(interpolationPoint) * RelativeOnScale.z;
+        localScale.x = XScale.Evaluate(1 - interpolationPoint) * RelativeOnScale.x;
+        localScale.y = YScale.Evaluate(1 - interpolationPoint) * RelativeOnScale.y;
+        localScale.z = ZScale.Evaluate(1 - interpolationPoint) * RelativeOnScale.z;
         transform.localScale = localScale;
       }
     }

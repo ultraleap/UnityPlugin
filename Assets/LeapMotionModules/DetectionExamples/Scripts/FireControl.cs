@@ -8,7 +8,7 @@ public class FireControl : MonoBehaviour {
     CurrentTarget = target;
   }
 
-  public void ActivateChildren () {
+  public void LightFire () {
     if (CurrentTarget != null) {
       for (int c = 0; c < CurrentTarget.transform.childCount; c++) {
         CurrentTarget.transform.GetChild(c).gameObject.SetActive(true);
@@ -16,7 +16,7 @@ public class FireControl : MonoBehaviour {
     }
   }
 
-  public void DeactivateChildren () {
+  public void PutOutFire () {
     if (CurrentTarget != null) {
       for (int c = 0; c < CurrentTarget.transform.childCount; c++) {
         CurrentTarget.transform.GetChild(c).gameObject.SetActive(false);
@@ -24,7 +24,7 @@ public class FireControl : MonoBehaviour {
     }
   }
   
-  public void ToggleChildren () {
+  public void ToggleFire () {
     if (CurrentTarget != null) {
       for (int c = 0; c < CurrentTarget.transform.childCount; c++) {
         CurrentTarget.transform.GetChild(c).gameObject.SetActive(!CurrentTarget.transform.GetChild(c).gameObject.activeInHierarchy);
