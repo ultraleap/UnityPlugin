@@ -122,13 +122,13 @@ namespace Leap.Unity.Interaction {
     /// Called by InteractionManager every frame that a Hand continues to grasp this object.  This callback
     /// is invoked both in FixedUpdate.
     /// </summary>
-    public abstract void NotifyHandsHoldPhysics(List<Hand> hands);
+    public abstract void NotifyHandsHoldPhysics(ReadonlyList<Hand> hands);
 
     /// <summary>
     /// Called by InteractionManager every frame that a Hand continues to grasp this object.  This callback
     /// is invoked both in LateUpdate.
     /// </summary>
-    public abstract void NotifyHandsHoldGraphics(List<Hand> hands);
+    public abstract void NotifyHandsHoldGraphics(ReadonlyList<Hand> hands);
 
     /// <summary>
     /// Called by InteractionManager when a Hand stops grasping this object.

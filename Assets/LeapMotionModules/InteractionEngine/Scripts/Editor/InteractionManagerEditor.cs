@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Linq;
-using System.Collections.Generic;
 using UnityEditor;
 
 namespace Leap.Unity.Interaction {
@@ -101,8 +99,8 @@ namespace Leap.Unity.Interaction {
 
         EditorGUILayout.LabelField("Info", EditorStyles.boldLabel);
         using (new EditorGUI.DisabledGroupScope(true)) {
-          EditorGUILayout.IntField("Registered Count", manager.RegisteredObjects.Count());
-          EditorGUILayout.IntField("Grasped Count", manager.GraspedObjects.Count());
+          EditorGUILayout.IntField("Registered Count", manager.RegisteredObjects.Count);
+          EditorGUILayout.IntField("Grasped Count", manager.GraspedObjects.Count);
         }
       }
     }

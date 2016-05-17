@@ -360,7 +360,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected override void OnHandsHoldPhysics(List<Hand> hands) {
+    protected override void OnHandsHoldPhysics(ReadonlyList<Hand> hands) {
       base.OnHandsHoldPhysics(hands);
 
       float distanceToSolved = Vector3.Distance(_rigidbody.position, _solvedPosition);
@@ -420,7 +420,7 @@ namespace Leap.Unity.Interaction {
       _notifiedOfTeleport = false;
     }
 
-    protected override void OnHandsHoldGraphics(List<Hand> hands) {
+    protected override void OnHandsHoldGraphics(ReadonlyList<Hand> hands) {
       base.OnHandsHoldGraphics(hands);
 
       if (_graphicalAnchor != null && _material.WarpingEnabled) {
@@ -681,7 +681,7 @@ namespace Leap.Unity.Interaction {
       HandPointCollection.Return(collection);
     }
 
-    protected void getSolvedTransform(List<Hand> hands, out Vector3 newPosition, out Quaternion newRotation) {
+    protected void getSolvedTransform(ReadonlyList<Hand> hands, out Vector3 newPosition, out Quaternion newRotation) {
       KabschC.Reset(ref _kabsch);
 
       for (int h = 0; h < hands.Count; h++) {

@@ -223,13 +223,13 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override sealed void NotifyHandsHoldPhysics(List<Hand> hands) {
+    public override sealed void NotifyHandsHoldPhysics(ReadonlyList<Hand> hands) {
       _baseCallGuard.Begin("OnHandsHoldPhysics");
       OnHandsHoldPhysics(hands);
       _baseCallGuard.AssertBaseCalled();
     }
 
-    public override sealed void NotifyHandsHoldGraphics(List<Hand> hands) {
+    public override sealed void NotifyHandsHoldGraphics(ReadonlyList<Hand> hands) {
       _baseCallGuard.Begin("OnHandsHoldGraphics");
       OnHandsHoldGraphics(hands);
       _baseCallGuard.AssertBaseCalled();
@@ -376,14 +376,14 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called every FixedUpdate that a Hand continues to grasp this object.
     /// </summary>
-    protected virtual void OnHandsHoldPhysics(List<Hand> hands) {
+    protected virtual void OnHandsHoldPhysics(ReadonlyList<Hand> hands) {
       _baseCallGuard.NotifyBaseCalled("OnHandsHoldPhysics");
     }
 
     /// <summary>
     /// Called every LateUpdate that a Hand continues to grasp this object.
     /// </summary>
-    protected virtual void OnHandsHoldGraphics(List<Hand> hands) {
+    protected virtual void OnHandsHoldGraphics(ReadonlyList<Hand> hands) {
       _baseCallGuard.NotifyBaseCalled("OnHandsHoldGraphics");
     }
 
