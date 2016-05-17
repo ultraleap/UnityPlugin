@@ -15,7 +15,6 @@ MonoBehaviour:
   _brushDisableDistance: 0.017
   _graspingEnabled: 1
   _graspMethod: 0
-  _suspensionEnabled: 1
   _releaseDistance: 0.15
   _maxVelocity: 6
   _strengthByDistance:
@@ -55,6 +54,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _suspensionEnabled: 1
+  _maxSuspensionTime: 1
+  _hideObjectOnSuspend: 1
   _warpingEnabled: 1
   _warpCurve:
     serializedVersion: 2

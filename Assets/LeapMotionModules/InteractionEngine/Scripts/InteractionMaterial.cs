@@ -29,11 +29,7 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected GraspMethodEnum _graspMethod = GraspMethodEnum.Velocity;
 
-    [SerializeField]
-    protected bool _suspensionEnabled = true;
 
-    [SerializeField]
-    protected float _maxSuspensionTime = 1;
 
     [Tooltip("How far the object can get from the hand before it is released.")]
     [SerializeField]
@@ -54,6 +50,16 @@ namespace Leap.Unity.Interaction {
     protected AnimationCurve _throwingVelocityCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                                          new Keyframe(1.0f, 1.0f, 0.0f, 0.0f),
                                                                          new Keyframe(2.0f, 1.5f, 0.0f, 0.0f));
+
+    [Header("Suspension Settings")]
+    [SerializeField]
+    protected bool _suspensionEnabled = true;
+
+    [SerializeField]
+    protected float _maxSuspensionTime = 1;
+
+    [SerializeField]
+    protected bool _hideObjectOnSuspend = true;
 
     [Header("Warp Settings")]
     [SerializeField]
@@ -76,6 +82,14 @@ namespace Leap.Unity.Interaction {
 
     [SerializeField]
     protected SingleLayer _interactionNoClipLayer = 0;
+
+    protected virtual void OnValidate() {
+      _brushDisableDistance = Mathf.Max(0, _brushDisableDistance);
+      _releaseDistance = Mathf.Max(0, _releaseDistance);
+      _maxVelocity = Mathf.Max(0, _maxVelocity);
+      _maxSuspensionTime = Mathf.Max(0, _maxSuspensionTime);
+      _graphicalReturnTime = Mathf.Max(0, _graphicalReturnTime);
+    }
 
     public bool ContactEnabled {
       get {
@@ -101,18 +115,6 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public bool SuspensionEnabled {
-      get {
-        return _suspensionEnabled;
-      }
-    }
-
-    public float MaxSuspensionTime {
-      get {
-        return _maxSuspensionTime;
-      }
-    }
-
     public float ReleaseDistance {
       get {
         return _releaseDistance;
@@ -134,6 +136,24 @@ namespace Leap.Unity.Interaction {
     public AnimationCurve ThrowingVelocityCurve {
       get {
         return _throwingVelocityCurve;
+      }
+    }
+
+    public bool SuspensionEnabled {
+      get {
+        return _suspensionEnabled;
+      }
+    }
+
+    public float MaxSuspensionTime {
+      get {
+        return _maxSuspensionTime;
+      }
+    }
+
+    public bool HideObjectOnSuspend {
+      get {
+        return _hideObjectOnSuspend;
       }
     }
 
