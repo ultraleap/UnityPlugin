@@ -51,20 +51,29 @@ namespace Leap.Unity.InputModule {
     [Tooltip("The color of the pointer when it is hovering over any other UI element.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color HoveringColor = Color.green;
-    [Tooltip("The sound that is played when the pointer transitions from canvas to element.")]
-    public AudioClip HoverSound;
     [Tooltip("Trigger a Hover Event when switching between UI elements.")]
     public bool TriggerHoverOnElementSwitch = false;
     [Tooltip("The color of the pointer when it is triggering a UI element.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color TriggeringColor = Color.gray;
-    [Tooltip("The sound that is played when the pointer triggers a UI element.")]
-    public AudioClip TriggerSound;
     [Tooltip("The color of the pointer when it is triggering blank canvas.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color TriggerMissedColor = Color.gray;
+
+    [Tooltip("The sound that is played when the pointer transitions from canvas to element.")]
+    public AudioClip BeginHoverSound;
+    [Tooltip("The sound that is played when the pointer transitions from canvas to element.")]
+    public AudioClip EndHoverSound;
+    [Tooltip("The sound that is played when the pointer triggers a UI element.")]
+    public AudioClip BeginTriggerSound;
+    [Tooltip("The sound that is played when the pointer triggers a UI element.")]
+    public AudioClip EndTriggerSound;
     [Tooltip("The sound that is played when the pointer triggers blank canvas.")]
-    public AudioClip MissedSound;
+    public AudioClip BeginMissedSound;
+    [Tooltip("The sound that is played when the pointer triggers blank canvas.")]
+    public AudioClip EndMissedSound;
+    [Tooltip("The sound that is played while the pointer is dragging an object.")]
+    public AudioClip DragLoopSound;
 
 
 
@@ -508,7 +517,7 @@ namespace Leap.Unity.InputModule {
             pointerState[whichHand] = pointerStates.NearCanvas;
           }
         } else if (!forceTipRaycast) {
-          if (!PointEvents[whichHand].pointerCurrentRaycast.gameObject.GetComponent<Canvas>() || PointEvents[whichHand].dragging) {
+          if (!PointEvents[whichHand].pointerCurrentRaycast.gameObject.GetComponent<Canvas>()){// || PointEvents[whichHand].dragging) {
             if (isTriggeringInteraction(whichHand)) {
               pointerState[whichHand] = pointerStates.PinchingToElement;
             } else {
@@ -536,53 +545,66 @@ namespace Leap.Unity.InputModule {
         if ((PrevState[whichHand] != pointerStates.OffCanvas) && (pointerState[whichHand] != pointerStates.OffCanvas)) {
           if (currentOverGo[whichHand] != prevOverGo[whichHand]) {
             //When you begin to hover on an element
-            SoundPlayer.PlayOneShot(HoverSound);
+            SoundPlayer.PlayOneShot(BeginHoverSound);
             onHover.Invoke(Pointers[whichHand].transform.position);
           }
         }
       }
 
+      //Warning: Horrible State Machine ahead...
       if (PrevState[whichHand] == pointerStates.OnCanvas) {
         if (pointerState[whichHand] == pointerStates.OnElement) {
           //When you go from hovering on the Canvas to hovering on an element
           if (!TriggerHoverOnElementSwitch) {
-            SoundPlayer.PlayOneShot(HoverSound);
+            SoundPlayer.PlayOneShot(BeginHoverSound);
             onHover.Invoke(Pointers[whichHand].transform.position);
           }
         } else if (pointerState[whichHand] == pointerStates.PinchingToCanvas) {
           //When you try to interact with the Canvas
-          SoundPlayer.PlayOneShot(MissedSound);
+          SoundPlayer.PlayOneShot(BeginMissedSound);
+        }
+      } else if (PrevState[whichHand] == pointerStates.PinchingToCanvas) {
+        if (pointerState[whichHand] == pointerStates.OnCanvas) {
+          //When you unpinch off of Blank Canvas
+          SoundPlayer.PlayOneShot(EndMissedSound);
         }
       } else if (PrevState[whichHand] == pointerStates.OnElement) {
         if (pointerState[whichHand] == pointerStates.OnCanvas) {
           //When you begin to hover over the Canvas after hovering over an element
-          SoundPlayer.PlayOneShot(HoverSound);
+          SoundPlayer.PlayOneShot(EndHoverSound);
         } else if (pointerState[whichHand] == pointerStates.PinchingToElement) {
           //When you click on an element
-          SoundPlayer.PlayOneShot(TriggerSound);
+          SoundPlayer.PlayOneShot(BeginTriggerSound);
           onClickDown.Invoke(Pointers[whichHand].transform.position);
-        }//ALSO PLAY HOVER SOUND IF ON DIFFERENT UI ELEMENT THAN LAST FRAME
+        }
       } else if (PrevState[whichHand] == pointerStates.PinchingToElement) {
         if (pointerState[whichHand] == pointerStates.PinchingToCanvas) {
           //When you slide off of an element while holding it
           //SoundPlayer.PlayOneShot(HoverSound);
         } else if (pointerState[whichHand] == pointerStates.OnElement || pointerState[whichHand] == pointerStates.OnCanvas) {
           //When you let go of an element
+          SoundPlayer.PlayOneShot(EndTriggerSound);
           onClickUp.Invoke(Pointers[whichHand].transform.position);
         }
       } else if (PrevState[whichHand] == pointerStates.NearCanvas) {
         if (pointerState[whichHand] == pointerStates.TouchingElement) {
           //When you physically touch an element
-          SoundPlayer.PlayOneShot(TriggerSound);
+          SoundPlayer.PlayOneShot(BeginTriggerSound);
           onClickDown.Invoke(Pointers[whichHand].transform.position);
         }
         if (pointerState[whichHand] == pointerStates.TouchingCanvas) {
           //When you physically touch Blank Canvas
-          SoundPlayer.PlayOneShot(MissedSound);
+          SoundPlayer.PlayOneShot(BeginMissedSound);
+        }
+      } else if (PrevState[whichHand] == pointerStates.TouchingCanvas) {
+        if (pointerState[whichHand] == pointerStates.NearCanvas) {
+          //When you physically lift off of Blank Canvas
+          SoundPlayer.PlayOneShot(EndMissedSound);
         }
       } else if (PrevState[whichHand] == pointerStates.TouchingElement) {
         if (pointerState[whichHand] == pointerStates.NearCanvas) {
           //When you physically pull out of an element
+          SoundPlayer.PlayOneShot(EndTriggerSound);
           onClickUp.Invoke(Pointers[whichHand].transform.position);
         }
       } else if (PrevState[whichHand] == pointerStates.OffCanvas) {
