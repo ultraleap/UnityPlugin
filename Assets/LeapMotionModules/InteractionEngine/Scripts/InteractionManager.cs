@@ -389,7 +389,7 @@ namespace Leap.Unity.Interaction {
         UpdateSceneInfo();
       }
 
-      if (_autoGenerateLayers) {
+      if (!Application.isPlaying && _autoGenerateLayers) {
         autoGenerateLayers();
       }
     }
