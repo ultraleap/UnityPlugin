@@ -55,7 +55,7 @@ namespace Leap.Unity.InputModule {
     [Tooltip("The interaction mode that the Input Module will use.")]
     public InteractionCapability InteractionMode = InteractionCapability.Hybrid;
     [Tooltip("The distance from a UI element that interaction switches from Projective-Pointer based to Touch based.")]
-    public float ProjectiveToTactileTransitionDistance = 0.12f;
+    public float ProjectiveToTactileTransitionDistance = 0.4f;
     [Tooltip("When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.")]
     public float PinchingThreshold = 20f;
 
