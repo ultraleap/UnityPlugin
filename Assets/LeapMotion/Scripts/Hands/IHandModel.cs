@@ -39,9 +39,13 @@ namespace Leap.Unity {
     public abstract Hand GetLeapHand();
     public abstract void SetLeapHand(Hand hand);
 
+    public virtual bool SupportsEditorPersistence() {
+      return false;
+    }
+
 #if UNITY_EDITOR
     void Update() {
-      if (!EditorApplication.isPlaying) {
+      if (!EditorApplication.isPlaying && SupportsEditorPersistence()) {
         Hand hand = TestHandFactory.MakeTestHand(0, 0, Handedness == Chirality.Left).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(transform));
         if (GetLeapHand() == null) {
           SetLeapHand(hand);
