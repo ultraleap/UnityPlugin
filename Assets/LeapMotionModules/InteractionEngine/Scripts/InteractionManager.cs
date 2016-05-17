@@ -170,28 +170,20 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Sets or Gets whether or not the Interaction Engine can modify object velocities when pushing.
+    /// Gets whether or not the Interaction Engine can modify object velocities when pushing.
     /// </summary>
     public bool ContactEnabled {
       get {
         return _contactEnabled;
       }
-      set {
-        _contactEnabled = value;
-        UpdateSceneInfo();
-      }
     }
 
     /// <summary>
-    /// Sets or Gets whether or not the Interaction plugin to modify object positions by grasping.
+    /// Gets whether or not the Interaction plugin to modify object positions by grasping.
     /// </summary>
     public bool GraspingEnabled {
       get {
         return _graspingEnabled;
-      }
-      set {
-        _graspingEnabled = value;
-        UpdateSceneInfo();
       }
     }
 
