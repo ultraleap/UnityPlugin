@@ -150,6 +150,13 @@ namespace Leap.Unity.InputModule {
         canvas.worldCamera = EventCamera;
       }
 
+      //Set Projective/Tactile Modes
+      if (InteractionMode == InteractionCapability.Projective) {
+        ProjectiveToTactileTransitionDistance = -100f;
+      } else if (InteractionMode == InteractionCapability.Tactile) {
+        ProjectiveToTactileTransitionDistance = 100f;
+      }
+
       //Initialize the Pointers for Projective Interaction
       Pointers = new Transform[NumberOfHands];
       PointerLines = new LineRenderer[NumberOfHands];
@@ -251,14 +258,20 @@ namespace Leap.Unity.InputModule {
         }
 
         //Raycast from shoulder through tip of the index finger to the UI
-        bool TipRaycast = GetLookPointerEventData(whichHand, ProjectionOrigin, CurrentRotation * Vector3.forward, true);
-        PrevState[whichHand] = pointerState[whichHand]; //Store old state for sound transitionary purposes
-        UpdatePointer(whichHand, PointEvents[whichHand]);
-        ProcessState(whichHand, TipRaycast);
+        bool TipRaycast = false;
+        if (InteractionMode != InteractionCapability.Projective) {
+          TipRaycast = GetLookPointerEventData(whichHand, ProjectionOrigin, CurrentRotation * Vector3.forward, true);
+          PrevState[whichHand] = pointerState[whichHand]; //Store old state for sound transitionary purposes
+          UpdatePointer(whichHand, PointEvents[whichHand]);
+          ProcessState(whichHand, TipRaycast);
+        }
 
         //If didn't hit anything near the fingertip, try doing it again, but through the knuckle this time
-        if (pointerState[whichHand] == pointerStates.OffCanvas) {
+        if (((pointerState[whichHand] == pointerStates.OffCanvas) && (InteractionMode != InteractionCapability.Tactile)) || (InteractionMode == InteractionCapability.Projective)) {
           TipRaycast = GetLookPointerEventData(whichHand, ProjectionOrigin, CurrentRotation * Vector3.forward, false);
+          if ((InteractionMode == InteractionCapability.Projective)) {
+            PrevState[whichHand] = pointerState[whichHand]; //Store old state for sound transitionary purposes
+          }
           UpdatePointer(whichHand, PointEvents[whichHand]);
           ProcessState(whichHand, TipRaycast);
         }
@@ -272,122 +285,123 @@ namespace Leap.Unity.InputModule {
 
         //Trigger events that come from changing pointer state
         ProcessStateEvents(whichHand);
-
-        //Tell Leap Buttons how far away the finger is
-        if (PointEvents[whichHand].pointerCurrentRaycast.gameObject != null) {
-          ILeapWidget comp = PointEvents[whichHand].pointerCurrentRaycast.gameObject.GetComponent<ILeapWidget>();
-          if (comp != null) {
-            if (!isTriggeringInteraction(whichHand)) {
-              ((ILeapWidget)comp).HoverDistance(distanceOfIndexTipToPointer(whichHand));
-            } else {
-              ((ILeapWidget)comp).HoverDistance(-10f);
+        if ((PointEvents[whichHand] != null)) {
+          //Tell Leap Buttons how far away the finger is
+          if ((PointEvents[whichHand].pointerCurrentRaycast.gameObject != null)) {
+            ILeapWidget comp = PointEvents[whichHand].pointerCurrentRaycast.gameObject.GetComponent<ILeapWidget>();
+            if (comp != null) {
+              if (!isTriggeringInteraction(whichHand)) {
+                ((ILeapWidget)comp).HoverDistance(distanceOfIndexTipToPointer(whichHand));
+              } else {
+                ((ILeapWidget)comp).HoverDistance(-10f);
+              }
             }
           }
-        }
 
-        //If we hit something with our Raycast, let's see if we should interact with it
-        if (PointEvents[whichHand].pointerCurrentRaycast.gameObject != null && pointerState[whichHand] != pointerStates.OffCanvas) {
-          prevOverGo[whichHand] = currentOverGo[whichHand];
-          currentOverGo[whichHand] = PointEvents[whichHand].pointerCurrentRaycast.gameObject;
+          //If we hit something with our Raycast, let's see if we should interact with it
+          if (PointEvents[whichHand].pointerCurrentRaycast.gameObject != null && pointerState[whichHand] != pointerStates.OffCanvas) {
+            prevOverGo[whichHand] = currentOverGo[whichHand];
+            currentOverGo[whichHand] = PointEvents[whichHand].pointerCurrentRaycast.gameObject;
 
-          //Trigger Enter or Exit Events on the UI Element (like highlighting)
-          base.HandlePointerExitAndEnter(PointEvents[whichHand], currentOverGo[whichHand]);
+            //Trigger Enter or Exit Events on the UI Element (like highlighting)
+            base.HandlePointerExitAndEnter(PointEvents[whichHand], currentOverGo[whichHand]);
 
-          //If we weren't triggering an interaction last frame, but we are now...
-          if (!PrevTriggeringInteraction[whichHand] && isTriggeringInteraction(whichHand)) {
-            PrevTriggeringInteraction[whichHand] = true;
+            //If we weren't triggering an interaction last frame, but we are now...
+            if (!PrevTriggeringInteraction[whichHand] && isTriggeringInteraction(whichHand)) {
+              PrevTriggeringInteraction[whichHand] = true;
 
-            if ((Time.time - timeEnteredCanvas[whichHand] > ActivationTime)) {
-              //Deselect all objects
-              if (base.eventSystem.currentSelectedGameObject) {
-                base.eventSystem.SetSelectedGameObject(null);
-              }
+              if ((Time.time - timeEnteredCanvas[whichHand] > ActivationTime)) {
+                //Deselect all objects
+                if (base.eventSystem.currentSelectedGameObject) {
+                  base.eventSystem.SetSelectedGameObject(null);
+                }
 
-              //Record pointer telemetry
-              PointEvents[whichHand].pressPosition = PointEvents[whichHand].position;
-              PointEvents[whichHand].pointerPressRaycast = PointEvents[whichHand].pointerCurrentRaycast;
-              PointEvents[whichHand].pointerPress = null; //Clear this for setting later
+                //Record pointer telemetry
+                PointEvents[whichHand].pressPosition = PointEvents[whichHand].position;
+                PointEvents[whichHand].pointerPressRaycast = PointEvents[whichHand].pointerCurrentRaycast;
+                PointEvents[whichHand].pointerPress = null; //Clear this for setting later
 
-              //If we hit something good, let's trigger it!
-              if (currentOverGo[whichHand] != null) {
-                currentGo[whichHand] = currentOverGo[whichHand];
+                //If we hit something good, let's trigger it!
+                if (currentOverGo[whichHand] != null) {
+                  currentGo[whichHand] = currentOverGo[whichHand];
 
-                //See if this object, or one of its parents, has a pointerDownHandler
-                GameObject newPressed = ExecuteEvents.ExecuteHierarchy(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.pointerDownHandler);
+                  //See if this object, or one of its parents, has a pointerDownHandler
+                  GameObject newPressed = ExecuteEvents.ExecuteHierarchy(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.pointerDownHandler);
 
-                //If not, see if one has a pointerClickHandler!
-                if (newPressed == null) {
-                  newPressed = ExecuteEvents.ExecuteHierarchy(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.pointerClickHandler);
-                  if (newPressed != null) {
+                  //If not, see if one has a pointerClickHandler!
+                  if (newPressed == null) {
+                    newPressed = ExecuteEvents.ExecuteHierarchy(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.pointerClickHandler);
+                    if (newPressed != null) {
+                      currentGo[whichHand] = newPressed;
+                    }
+                  } else {
                     currentGo[whichHand] = newPressed;
+                    //We want to do "click on button down" at same time, unlike regular mouse processing
+                    //Which does click when mouse goes up over same object it went down on
+                    //This improves the user's ability to select small menu items
+                    ExecuteEvents.Execute(newPressed, PointEvents[whichHand], ExecuteEvents.pointerClickHandler);
+
                   }
-                } else {
-                  currentGo[whichHand] = newPressed;
-                  //We want to do "click on button down" at same time, unlike regular mouse processing
-                  //Which does click when mouse goes up over same object it went down on
-                  //This improves the user's ability to select small menu items
-                  ExecuteEvents.Execute(newPressed, PointEvents[whichHand], ExecuteEvents.pointerClickHandler);
 
-                }
+                  if (newPressed != null) {
+                    PointEvents[whichHand].pointerPress = newPressed;
+                    currentGo[whichHand] = newPressed;
 
-                if (newPressed != null) {
-                  PointEvents[whichHand].pointerPress = newPressed;
-                  currentGo[whichHand] = newPressed;
-
-                  //Select the currently pressed object
-                  if (ExecuteEvents.GetEventHandler<ISelectHandler>(currentGo[whichHand])) {
-                    base.eventSystem.SetSelectedGameObject(currentGo[whichHand]);
+                    //Select the currently pressed object
+                    if (ExecuteEvents.GetEventHandler<ISelectHandler>(currentGo[whichHand])) {
+                      base.eventSystem.SetSelectedGameObject(currentGo[whichHand]);
+                    }
                   }
-                }
 
-                ExecuteEvents.ExecuteHierarchy(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.beginDragHandler);
-                PointEvents[whichHand].pointerDrag = currentGo[whichHand];
-                PointEvents[whichHand].dragging = true;
-                currentGoing[whichHand] = currentGo[whichHand];
+                  ExecuteEvents.ExecuteHierarchy(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.beginDragHandler);
+                  PointEvents[whichHand].pointerDrag = currentGo[whichHand];
+                  PointEvents[whichHand].dragging = true;
+                  currentGoing[whichHand] = currentGo[whichHand];
+                }
               }
             }
-          }
 
-          //If we WERE interacting last frame, but are not this frame...
-          if (PrevTriggeringInteraction[whichHand] && !isTriggeringInteraction(whichHand)) {
-            PrevTriggeringInteraction[whichHand] = false;
+            //If we WERE interacting last frame, but are not this frame...
+            if (PrevTriggeringInteraction[whichHand] && !isTriggeringInteraction(whichHand)) {
+              PrevTriggeringInteraction[whichHand] = false;
 
-            if (currentGoing[whichHand]) {
-              ExecuteEvents.Execute(currentGoing[whichHand], PointEvents[whichHand], ExecuteEvents.endDragHandler);
-              if (currentOverGo[whichHand] != null) {
-                ExecuteEvents.ExecuteHierarchy(currentOverGo[whichHand], PointEvents[whichHand], ExecuteEvents.dropHandler);
+              if (currentGoing[whichHand]) {
+                ExecuteEvents.Execute(currentGoing[whichHand], PointEvents[whichHand], ExecuteEvents.endDragHandler);
+                if (currentOverGo[whichHand] != null) {
+                  ExecuteEvents.ExecuteHierarchy(currentOverGo[whichHand], PointEvents[whichHand], ExecuteEvents.dropHandler);
+                }
+                PointEvents[whichHand].pointerDrag = null;
+                PointEvents[whichHand].dragging = false;
+                currentGoing[whichHand] = null;
               }
-              PointEvents[whichHand].pointerDrag = null;
-              PointEvents[whichHand].dragging = false;
-              currentGoing[whichHand] = null;
+              if (currentGo[whichHand]) {
+                ExecuteEvents.Execute(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.pointerUpHandler);
+                PointEvents[whichHand].rawPointerPress = null;
+                PointEvents[whichHand].pointerPress = null;
+                currentGo[whichHand] = null;
+              }
             }
-            if (currentGo[whichHand]) {
-              ExecuteEvents.Execute(currentGo[whichHand], PointEvents[whichHand], ExecuteEvents.pointerUpHandler);
-              PointEvents[whichHand].rawPointerPress = null;
-              PointEvents[whichHand].pointerPress = null;
-              currentGo[whichHand] = null;
+
+            //And for everything else, there is dragging.
+            if (currentGoing[whichHand] != null) {
+              ExecuteEvents.Execute(currentGoing[whichHand], PointEvents[whichHand], ExecuteEvents.dragHandler);
             }
           }
 
-          //And for everything else, there is dragging.
-          if (currentGoing[whichHand] != null) {
-            ExecuteEvents.Execute(currentGoing[whichHand], PointEvents[whichHand], ExecuteEvents.dragHandler);
-          }
+          updatePointerColor(whichHand);
         }
 
-        updatePointerColor(whichHand);
-      }
-
-      //Make the special Leap Widget Buttons Pop Up and Flatten when Appropriate
-      if (PrevTouchingMode != getTouchingMode()) {
-        PrevTouchingMode = getTouchingMode();
-        if (PrevTouchingMode) {
-          foreach (Canvas canvas in canvases) {
-            canvas.BroadcastMessage("Expand", SendMessageOptions.DontRequireReceiver);
-          }
-        } else {
-          foreach (Canvas canvas in canvases) {
-            canvas.BroadcastMessage("Retract", SendMessageOptions.DontRequireReceiver);
+        //Make the special Leap Widget Buttons Pop Up and Flatten when Appropriate
+        if (PrevTouchingMode != getTouchingMode()) {
+          PrevTouchingMode = getTouchingMode();
+          if (PrevTouchingMode) {
+            foreach (Canvas canvas in canvases) {
+              canvas.BroadcastMessage("Expand", SendMessageOptions.DontRequireReceiver);
+            }
+          } else {
+            foreach (Canvas canvas in canvases) {
+              canvas.BroadcastMessage("Retract", SendMessageOptions.DontRequireReceiver);
+            }
           }
         }
       }
@@ -610,14 +624,18 @@ namespace Leap.Unity.InputModule {
     //A boolean that returns when a "click" is being triggered
     public bool isTriggeringInteraction(int whichHand) {
 
-      if ((curFrame.Hands[whichHand].IsRight) && (RightHandDetector != null && RightHandDetector.IsPinching) || (RightHandDetector == null && curFrame.Hands[whichHand].PinchDistance < PinchingThreshold)) {
-        return true;
-      } else if ((curFrame.Hands[whichHand].IsLeft) && (LeftHandDetector != null && LeftHandDetector.IsPinching) || (LeftHandDetector == null && curFrame.Hands[whichHand].PinchDistance < PinchingThreshold)) {
-        return true;
+      if (InteractionMode != InteractionCapability.Tactile) {
+        if ((curFrame.Hands[whichHand].IsRight) && (RightHandDetector != null && RightHandDetector.IsPinching) || (RightHandDetector == null && curFrame.Hands[whichHand].PinchDistance < PinchingThreshold)) {
+          return true;
+        } else if ((curFrame.Hands[whichHand].IsLeft) && (LeftHandDetector != null && LeftHandDetector.IsPinching) || (LeftHandDetector == null && curFrame.Hands[whichHand].PinchDistance < PinchingThreshold)) {
+          return true;
+        }
       }
 
-      if ((pointerState[whichHand] == pointerStates.NearCanvas || pointerState[whichHand] == pointerStates.TouchingCanvas || pointerState[whichHand] == pointerStates.TouchingElement)) {
-        return (distanceOfIndexTipToPointer(whichHand) < 0f);
+      if (InteractionMode != InteractionCapability.Projective) {
+        if ((pointerState[whichHand] == pointerStates.NearCanvas || pointerState[whichHand] == pointerStates.TouchingCanvas || pointerState[whichHand] == pointerStates.TouchingElement)) {
+          return (distanceOfIndexTipToPointer(whichHand) < 0f);
+        }
       }
 
       //Disabling Pinching during touch interactions; maybe still desirable?
