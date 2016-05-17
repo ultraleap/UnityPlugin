@@ -448,10 +448,10 @@ namespace Leap.Unity.Interaction {
       removeHandPointCollection(hand.Id);
     }
 
-    protected override void OnHandLostTracking(Hand oldHand, out bool allowSuspension) {
-      base.OnHandLostTracking(oldHand, out allowSuspension);
+    protected override void OnHandLostTracking(Hand oldHand, out float maxSuspensionTime) {
+      base.OnHandLostTracking(oldHand, out maxSuspensionTime);
 
-      allowSuspension = _material.SuspensionEnabled;
+      maxSuspensionTime = _material.SuspensionEnabled ? _material.MaxSuspensionTime : 0;
 
       updateState();
     }

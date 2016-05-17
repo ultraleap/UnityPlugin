@@ -32,6 +32,9 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _suspensionEnabled = true;
 
+    [SerializeField]
+    protected float _maxSuspensionTime = 1;
+
     [Tooltip("How far the object can get from the hand before it is released.")]
     [SerializeField]
     protected float _releaseDistance = 0.15f;
@@ -101,6 +104,12 @@ namespace Leap.Unity.Interaction {
     public bool SuspensionEnabled {
       get {
         return _suspensionEnabled;
+      }
+    }
+
+    public float MaxSuspensionTime {
+      get {
+        return _maxSuspensionTime;
       }
     }
 

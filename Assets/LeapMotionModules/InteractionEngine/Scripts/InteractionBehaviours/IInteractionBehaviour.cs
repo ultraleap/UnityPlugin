@@ -140,7 +140,7 @@ namespace Leap.Unity.Interaction {
     /// is not yet considered ungrasped, and OnHandRegainedTracking might be called in the future
     /// if the Hand becomes tracked again.
     /// </summary>
-    public abstract void NotifyHandLostTracking(Hand oldHand, out bool allowSuspension);
+    public abstract void NotifyHandLostTracking(Hand oldHand, out float maxSuspensionTime);
 
     /// <summary>
     /// Called by InteractionManager when a grasping Hand that had previously been untracked has
