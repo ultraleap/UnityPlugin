@@ -5,6 +5,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using Leap.Unity.Interaction.CApi;
+using System.Runtime.InteropServices;
 
 namespace Leap.Unity.Interaction {
 
@@ -36,9 +37,9 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected LeapProvider _leapProvider;
 
-    [Tooltip("The streaming asset subolder of the data folder for the engine.")]
+    [Tooltip("The streaming asset subpath of the ldat engine.")]
     [SerializeField]
-    protected string _dataSubfolder = "InteractionEngine";
+    protected string _ldatPath = "InteractionEngine/IE.ldat";
 
     [Header("Interaction Settings")]
     [Tooltip("Allow the Interaction Engine to modify object velocities when pushing.")]
@@ -89,9 +90,9 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL FIELDS
-    private static UInt32 _expectedVersion = 1;
     protected INTERACTION_SCENE _scene;
     private bool _hasSceneBeenCreated = false;
+    private bool _enableGraspingLast = false;
 
     protected ShapeDescriptionPool _shapeDescriptionPool;
 
@@ -200,6 +201,19 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Depth before collision response becomes as if holding a sphere..
+    /// </summary>
+    public float DepthUntilSphericalInside {
+      get {
+        return _depthUntilSphericalInside;
+      }
+      set {
+        _depthUntilSphericalInside = value;
+        UpdateSceneInfo();
+      }
+    }
+
+    /// <summary>
     /// Gets the layer that interaction objects should be on by default.
     /// </summary>
     public int InteractionLayer {
@@ -235,12 +249,61 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    /// Force an update of the internal scene info.  This should be called if settings have been changed like
-    /// gravity.
+    /// Force an update of the internal scene info.  This should be called if gravity has changed.
     /// </summary>
     public void UpdateSceneInfo() {
-      var info = getSceneInfo();
-      InteractionC.UpdateSceneInfo(ref _scene, ref info);
+      if (!_hasSceneBeenCreated) {
+        return; // UpdateSceneInfo is a side effect of a lot of changes.
+      }
+
+      INTERACTION_SCENE_INFO info = new INTERACTION_SCENE_INFO();
+      info.sceneFlags = SceneInfoFlags.None;
+
+      if (Physics.gravity.sqrMagnitude != 0.0f) {
+        info.sceneFlags |= SceneInfoFlags.HasGravity;
+        info.gravity = Physics.gravity.ToCVector();
+      }
+
+      if (_depthUntilSphericalInside > 0.0f) {
+        info.sceneFlags |= SceneInfoFlags.SphericalInside;
+        info.depthUntilSphericalInside = _depthUntilSphericalInside;
+      }
+
+      if (_enableContact) {
+        info.sceneFlags |= SceneInfoFlags.ContactEnabled;
+      }
+
+      // _enableGraspingLast gaurds against expensive file IO.  Only provide the ldat
+      // data when grasping is being enabled.
+      GCHandle ldatPinnedBytes;
+      if (_enableGrasping) {
+        info.sceneFlags |= SceneInfoFlags.GraspEnabled;
+      }
+      if (_enableGrasping && !_enableGraspingLast) {
+        string ldatFullPath = getStreamingAssetsPath() + "/" + _ldatPath;
+        WWW ldat = new WWW(ldatFullPath);
+        while (!ldat.isDone) {
+          System.Threading.Thread.Sleep(1);
+        }
+
+        if (!string.IsNullOrEmpty(ldat.error)) {
+          throw new Exception(ldat.error + ": " + ldatFullPath);
+        }
+
+        byte[] ldatBytes = ldat.bytes;
+        ldatPinnedBytes = GCHandle.Alloc(ldatBytes, GCHandleType.Pinned);
+        info.ldatData = ldatPinnedBytes.AddrOfPinnedObject();
+        info.ldatSize = (uint)ldatBytes.Length;
+        Marshal.Copy(ldatBytes, 0, info.ldatData, ldatBytes.Length);
+
+        InteractionC.UpdateSceneInfo(ref _scene, ref info);
+
+        ldatPinnedBytes.Free();
+      }
+      else {
+        InteractionC.UpdateSceneInfo(ref _scene, ref info);
+      }
+      _enableGraspingLast = _enableGrasping;
     }
 
     /// <summary>
@@ -502,6 +565,15 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL METHODS
+
+    private string getStreamingAssetsPath() {
+#if UNITY_STANDALONE_WIN || UNITY_WSA || UNITY_EDITOR_WIN
+      return "file:///" + Application.streamingAssetsPath;
+#else
+      return Application.streamingAssetsPath;
+#endif
+    }
+
     protected void autoGenerateLayers() {
       _interactionLayer = -1;
       _brushHandLayer = -1;
@@ -879,45 +951,26 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void createScene() {
+      _scene.pScene = (IntPtr)0;
+
+      UInt32 libraryVersion = InteractionC.GetLibraryVersion();
+      UInt32 expectedVersion = InteractionC.GetExpectedVersion();
+      if (libraryVersion != expectedVersion) {
 #if UNITY_EDITOR
-      UInt32 version = InteractionC.GetVersion();
-      if (InteractionC.GetVersion() != _expectedVersion) {
-        _scene.pScene = (IntPtr)0;
-        UnityEditor.EditorUtility.DisplayDialog("Version Error!",
-                                                "Leap Interaction dll version expected: " + _expectedVersion + " got version: " + version,
-                                                "Ok");
-        throw new Exception("Leap Interaction version wrong");
-      }
+        UnityEditor.EditorUtility.DisplayDialog("Version Error!", "Leap Interaction library version expected: " + expectedVersion + " got version: " + libraryVersion, "Ok");
 #endif // UNITY_EDITOR
+        throw new Exception("Leap Interaction library version wrong");
+      }
 
-      INTERACTION_SCENE_INFO sceneInfo = getSceneInfo();
-      string dataPath = Path.Combine(Application.streamingAssetsPath, _dataSubfolder);
-      InteractionC.CreateScene(ref _scene, ref sceneInfo, dataPath);
-
+      InteractionC.CreateScene(ref _scene);
       _hasSceneBeenCreated = true;
+
+      UpdateSceneInfo();
     }
 
     protected virtual void destroyScene() {
       InteractionC.DestroyScene(ref _scene);
       _hasSceneBeenCreated = false;
-    }
-
-    private INTERACTION_SCENE_INFO getSceneInfo() {
-      INTERACTION_SCENE_INFO info = new INTERACTION_SCENE_INFO();
-      info.gravity = Physics.gravity.ToCVector();
-
-      info.sceneFlags = SceneInfoFlags.HasGravity | SceneInfoFlags.SphericalInside;
-      info.depthUntilSphericalInside = _depthUntilSphericalInside;
-
-      if (_enableContact) {
-        info.sceneFlags |= SceneInfoFlags.ContactEnabled;
-      }
-
-      if (_enableGrasping) {
-        info.sceneFlags |= SceneInfoFlags.GraspEnabled;
-      }
-
-      return info;
     }
 
     //A persistant structure for storing useful data about a hand as it interacts with objects

@@ -15,13 +15,12 @@ namespace Leap.Unity.Interaction.Tests {
 
     [SetUp]
     public virtual void Setup() {
+      InteractionC.CreateScene(ref _scene);
+
       INTERACTION_SCENE_INFO sceneInfo = new INTERACTION_SCENE_INFO();
-      sceneInfo.gravity = Vector3.zero.ToCVector();
-      sceneInfo.sceneFlags = SceneInfoFlags.None;
+      sceneInfo.sceneFlags = SceneInfoFlags.ContactEnabled;
 
-      string path = Path.Combine(Application.streamingAssetsPath, DATA_FOLDER);
-
-      InteractionC.CreateScene(ref _scene, ref sceneInfo, path);
+      InteractionC.UpdateSceneInfo(ref _scene, ref sceneInfo);
     }
 
     [TearDown]
