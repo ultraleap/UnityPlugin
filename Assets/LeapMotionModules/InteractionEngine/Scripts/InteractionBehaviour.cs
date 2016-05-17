@@ -639,7 +639,7 @@ namespace Leap.Unity.Interaction {
       //Renderers are visible if there are no grasping hands
       //or if there is at least one tracked grasping hand
       int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;
-      bool shouldBeVisible = GraspingHandCount == 0 || trackedGraspingHandCount > 0;
+      bool shouldBeVisible = GraspingHandCount == 0 || trackedGraspingHandCount > 0 || !_material.HideObjectOnSuspend;
 
       if (_graphicalAnchor != null) {
         _graphicalAnchor.gameObject.SetActive(shouldBeVisible);
