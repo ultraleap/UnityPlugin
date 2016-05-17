@@ -6,7 +6,7 @@ namespace Leap.Unity {
   /// A basic utility class to aid in creating pinch based actions.  Once linked with an IHandModel, it can
   /// be used to detect pinch gestures that the hand makes.
   /// </summary>
-  public class LeapPinchDetector : Detector {
+  public class PinchDetector : Detector {
     protected const float MM_TO_M = 0.001f;
 
     [SerializeField]

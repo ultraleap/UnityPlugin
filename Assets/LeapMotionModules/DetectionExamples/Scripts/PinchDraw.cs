@@ -7,7 +7,7 @@ namespace Leap.Unity.DetectionUtilities.Examples {
 
     [Tooltip("Each pinch detector can draw one line at a time.")]
     [SerializeField]
-    private LeapPinchDetector[] _pinchDetectors;
+    private PinchDetector[] _pinchDetectors;
 
     [SerializeField]
     private Material _material;

@@ -15,8 +15,8 @@ namespace Leap.Unity {
     }
 
     [SerializeField]
-    private LeapPinchDetector _pinchDetectorA;
-    public LeapPinchDetector PinchDetectorA {
+    private PinchDetector _pinchDetectorA;
+    public PinchDetector PinchDetectorA {
       get {
         return _pinchDetectorA;
       }
@@ -26,8 +26,8 @@ namespace Leap.Unity {
     }
 
     [SerializeField]
-    private LeapPinchDetector _pinchDetectorB;
-    public LeapPinchDetector PinchDetectorB {
+    private PinchDetector _pinchDetectorB;
+    public PinchDetector PinchDetectorB {
       get {
         return _pinchDetectorB;
       }
@@ -153,7 +153,7 @@ namespace Leap.Unity {
       }
     }
 
-    private void transformSingleAnchor(LeapPinchDetector singlePinch) {
+    private void transformSingleAnchor(PinchDetector singlePinch) {
       _anchor.position = singlePinch.Position;
 
       switch (_oneHandedRotationMethod) {
