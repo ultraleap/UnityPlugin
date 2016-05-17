@@ -13,6 +13,13 @@ namespace Leap.Unity.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
 
+      specifyCustomDrawer("_dataSubfolder", disableWhenRunning);
+      specifyCustomDrawer("_contactEnabled", disableWhenRunning);
+      specifyCustomDrawer("_graspingEnabled", disableWhenRunning);
+      specifyCustomDrawer("_depthUntilSphericalInside", disableWhenRunning);
+      specifyCustomDrawer("_autoGenerateLayers", disableWhenRunning);
+      specifyCustomDrawer("_templateLayer", disableWhenRunning);
+
       specifyCustomDecorator("_leapProvider", providerDectorator);
 
       SerializedProperty autoGenerateLayerProperty = serializedObject.FindProperty("_autoGenerateLayers");
@@ -34,9 +41,15 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    private void disableWhenRunning(SerializedProperty property) {
+      EditorGUI.BeginDisabledGroup(EditorApplication.isPlaying);
+      EditorGUILayout.PropertyField(property);
+      EditorGUI.EndDisabledGroup();
+    }
+
     private void collisionLayerHelper(SerializedProperty prop) {
       InteractionManager manager = target as InteractionManager;
-      
+
       if (manager.InteractionBrushLayer == manager.InteractionLayer) {
         EditorGUILayout.HelpBox("Brush Layer cannot be the same as Interaction Layer", MessageType.Error);
         return;
