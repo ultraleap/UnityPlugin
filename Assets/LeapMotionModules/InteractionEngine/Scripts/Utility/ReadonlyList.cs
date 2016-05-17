@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 public struct ReadonlyList<T> {
-  private List<T> _list;
+  private readonly List<T> _list;
 
   public ReadonlyList(List<T> list) {
     _list = list;
