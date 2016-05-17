@@ -5,18 +5,61 @@ using Leap;
 
 namespace Leap.Unity{
 
-  //Detects when the parent Gameobject is in proximity of one of a list of target objects.
+  /**
+   * Detects when the parent GameObject is within the specified distance
+   * of one of the target objects.
+   * @since 4.1.2
+   */
   public class ProximityDetector : Detector {
+    /**
+     * The interval at which to check palm direction.
+     * @since 4.1.2
+     */
     [Tooltip("The interval in seconds at which to check this detector's conditions.")]
     public float Period = .1f; //seconds
+    /**
+     * Dispatched when the proximity check succeeds.
+     * The ProximityEvent object provides a reference to the proximate GameObject. 
+     * @since 4.1.2
+     */
+    [Tooltip("Dispatched when close enough to a target.")]
     public ProximityEvent OnProximity;
+
+    /**
+     * The list of objects which can activate the detector by proximity.
+     * @since 4.1.2
+     */
+    [Tooltip("The list of target objects.")]
     public GameObject[] TargetObjects;
+
+    /**
+     * The distance in meters between this game object and the target game object that
+     * will pass the proximity check.
+     * @since 4.1.2
+     */
+    [Tooltip("The target distance in meters to activate the detector.")]
     public float OnDistance = .01f; //meters
+
+    /**
+     * The distance in meters between this game object and the target game object that
+     * will turn off the detector. 
+     * @since 4.1.2
+     */
+    [Tooltip("The distance in meters at which to deactivate the detector.")]
     public float OffDistance = .015f; //meters
+
+    /**
+     * The object that is close to the activated detector.
+     * 
+     * If more than one target object is within the required distance, it is
+     * undefined which object will be current. Set to null when no targets
+     * are close enough.
+     * @since 4.1.2
+     */
+    public GameObject CurrentObject { get { return _currentObj; } }
 
     private IEnumerator proximityWatcherCoroutine;
     private GameObject _currentObj = null;
-    public GameObject CurrentObject { get { return _currentObj; } }
 
     void Awake(){
       proximityWatcherCoroutine = proximityWatcher();
@@ -33,7 +76,7 @@ namespace Leap.Unity{
 
     IEnumerator proximityWatcher(){
       bool proximityState = false;
-      float onSquared, offSquared; //Use squared distamces to avoid taking square roots
+      float onSquared, offSquared; //Use squared distances to avoid taking square roots
       while(true){
         onSquared = OnDistance * OnDistance;
         offSquared = OffDistance * OffDistance;
@@ -87,6 +130,12 @@ namespace Leap.Unity{
     #endif
   }
 
+  /**
+   * An event class that is dispatched by a ProximityDetector when the detector's
+   * game object comes close enough to a game object in its target list.
+   * The event parameters provide the proximate game object.
+   * @since 4.1.2
+   */
   [System.Serializable]
   public class ProximityEvent : UnityEvent <GameObject> {}
 }

@@ -4,24 +4,57 @@ using System.Collections.Generic;
 
 namespace Leap.Unity {
 
+  /**
+   * The DetectorLogicGate detector observes other detectors and activates when
+   * these other detectors match the specified logic.
+   * 
+   * A DetectorLogicGate can be configured as an AND gate or an OR gate. You can also
+   * negate the output (creating a NAND or NOR gate).
+   * 
+   * Since a DetectorLogicGate is a Detector, it can observe other DetectorLogicGate instances.
+   * However, before constructing complex logic chains, you should consider whether it is better 
+   * to put such logic into a normal script.
+   * 
+   * @since 4.1.2
+   */
   public class DetectorLogicGate : Detector {
     public List<Detector> Detectors;
     public bool AddAllDetectorsOnAwake = true;
     public LogicType GateType = LogicType.AndGate;
     public bool Negate = false;
 
+    /**
+     * Adds the specified detector to the list of observed detectors.
+     * 
+     * The same detector cannot be added more than once.
+     * @param Detector the detector to watch.
+     * @since 4.1.2
+     */
     public void AddDetector(Detector detector){
       if(!Detectors.Contains(detector)){
         Detectors.Add(detector);
       }
     }
 
+    /**
+     * Removes the specified detector from the list of observed detectors;
+     * 
+     * @param Detector the detector to remove.
+     * @since 4.1.2
+     */
     public void RemoveDetector(Detector detector){
       detector.OnActivate.RemoveListener(CheckDetectors);
       detector.OnDeactivate.RemoveListener(CheckDetectors);
       Detectors.Remove(detector);
     }
 
+    /**
+     * Adds all the other detectors on the same GameObject to the list of observed detectors.
+     * 
+     * Note: If you have more than one DetectorLogicGate instance on a game object, make sure that
+     * both objects don't observe each other.
+     * @since 4.1.2
+     */
     public void AddAllDetectors(){
       Detector[] detectors = GetComponents<Detector>();
       for(int g = 0; g < detectors.Length; g++){
@@ -51,6 +84,10 @@ namespace Leap.Unity {
       Deactivate();
     }
 
+    /**
+     * Checks all the observed detectors, combines them with the specified type of logic
+     * and calls the Activate() or Deactivate() function as appropriate.
+     */
     protected void CheckDetectors(){
       if (Detectors.Count < 1)
         return;
@@ -75,5 +112,6 @@ namespace Leap.Unity {
     }
   }
 
+  /** The type of logic used to combine the watched detectors. */
   public enum LogicType{ AndGate, OrGate }
 }
