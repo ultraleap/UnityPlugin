@@ -38,7 +38,7 @@ namespace Leap.Unity.Interaction {
       specifyConditionalDrawing(() => graspMethod.intValue == (int)InteractionMaterial.GraspMethodEnum.Velocity,
                                 "_releaseDistance",
                                 "_maxVelocity",
-                                "_followStrength");
+                                "_strengthByDistance");
 
       specifyConditionalDrawing("_useCustomLayers", 
                                 "_interactionLayer", 
