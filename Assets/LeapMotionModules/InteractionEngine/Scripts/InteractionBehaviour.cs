@@ -261,6 +261,8 @@ namespace Leap.Unity.Interaction {
       _solvedPosition = _rigidbody.position;
       _solvedRotation = _rigidbody.rotation;
 
+      updateLayer();
+
 #if UNITY_EDITOR
       Collider[] colliders = GetComponentsInChildren<Collider>();
       if (colliders.Length > 0) {
@@ -289,7 +291,7 @@ namespace Leap.Unity.Interaction {
         updateInfo.updateFlags |= UpdateInfoFlags.ReportNoResult;
       }
 
-      if (_material.EnableContact && !_isKinematic && !IsBeingGrasped) {
+      if (_material.ContactEnabled && !_isKinematic && !IsBeingGrasped) {
         updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration;
       }
 
@@ -310,7 +312,7 @@ namespace Leap.Unity.Interaction {
 
       if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 &&
           !IsBeingGrasped &&
-          _material.EnableContact) {
+          _material.ContactEnabled) {
         //Use Sleep() to clear any forces that might have been applied by the user.
         _rigidbody.Sleep();
         _rigidbody.velocity = results.linearVelocity.ToVector3();
@@ -324,12 +326,12 @@ namespace Leap.Unity.Interaction {
       if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
         if (!_ignoringBrushes && results.maxHandDepth > _material.BrushDisableDistance) {
           _ignoringBrushes = true;
-          updateLayer();
         }
       } else if (_ignoringBrushes) {
         _ignoringBrushes = false;
-        updateLayer();
       }
+
+      updateLayer();
     }
 
     protected override void OnHandGrasped(Hand hand) {
@@ -360,6 +362,8 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnHandsHoldPhysics(List<Hand> hands) {
       base.OnHandsHoldPhysics(hands);
+
+      float distanceToSolved = Vector3.Distance(_rigidbody.position, _solvedPosition);
 
       //Get new transform
       Vector3 newPosition;
@@ -404,8 +408,9 @@ namespace Leap.Unity.Interaction {
               targetAngularVelocity *= targetPercent;
             }
 
-            _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, _material.FollowStrength);
-            _rigidbody.angularVelocity = Vector3.Lerp(_rigidbody.angularVelocity, targetAngularVelocity, _material.FollowStrength);
+            float followStrength = _material.StrengthByDistance.Evaluate(distanceToSolved);
+            _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, followStrength);
+            _rigidbody.angularVelocity = Vector3.Lerp(_rigidbody.angularVelocity, targetAngularVelocity, followStrength);
           }
           break;
         default:
@@ -583,7 +588,7 @@ namespace Leap.Unity.Interaction {
 
     protected void updateLayer() {
       int layer;
-      if (_ignoringBrushes) {
+      if (_ignoringBrushes || !_manager.ContactEnabled || !_material.ContactEnabled) {
         if (_material.UseCustomLayers) {
           layer = _material.InteractionNoClipLayer;
         } else {
@@ -597,8 +602,10 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      for (int i = 0; i < _childrenArray.Length; i++) {
-        _childrenArray[i].gameObject.layer = layer;
+      if (gameObject.layer != layer) {
+        for (int i = 0; i < _childrenArray.Length; i++) {
+          _childrenArray[i].gameObject.layer = layer;
+        }
       }
     }
 

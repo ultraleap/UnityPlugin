@@ -11,8 +11,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 183146e09617b2e41a21d0ecf5e56fcb, type: 3}
   m_Name: Default
   m_EditorClassIdentifier: 
-  _enableContact: 1
+  _contactEnabled: 1
   _brushDisableDistance: 0.017
+  _graspingEnabled: 1
+  _graspMethod: 0
+  _suspensionEnabled: 1
+  _releaseDistance: 0.15
+  _maxVelocity: 6
+  _strengthByDistance:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 0.020000001
+      value: 0.29999998
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
   _throwingVelocityCurve:
     serializedVersion: 2
     m_Curve:
@@ -34,11 +55,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _graspMethod: 0
-  _suspensionEnabled: 1
-  _releaseDistance: 0.15
-  _maxVelocity: 6
-  _followStrength: 1
   _warpingEnabled: 1
   _warpCurve:
     serializedVersion: 2
@@ -49,7 +65,7 @@ MonoBehaviour:
       outSlope: 0
       tangentMode: 0
     - time: 0.020000001
-      value: 0.02
+      value: 0.19999999
       inSlope: 0
       outSlope: 0
       tangentMode: 0
