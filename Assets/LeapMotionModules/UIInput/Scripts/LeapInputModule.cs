@@ -54,10 +54,14 @@ namespace Leap.Unity.InputModule {
     };
     [Tooltip("The interaction mode that the Input Module will use.")]
     public InteractionCapability InteractionMode = InteractionCapability.Hybrid;
-    [Tooltip("The distance from a UI element that interaction switches from Projective-Pointer based to Touch based.")]
-    public float ProjectiveToTactileTransitionDistance = 0.12f;
+    [Tooltip("The distance from the base of a UI element that interaction switches from Projective-Pointer based to Touch based.")]
+    public float ProjectiveToTactileTransitionDistance = 0.4f;
+    [Tooltip("The distance from the base of a UI element that tactile interaction is triggered.")]
+    public float TactilePadding = 0.005f;
     [Tooltip("When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.")]
     public float PinchingThreshold = 20f;
+    [Tooltip("Render the pointer onto the enviroment.")]
+    public bool EnvironmentPointer = false;
 
     [Tooltip("The sound that is played when the pointer transitions from canvas to element.")]
     public AudioClip BeginHoverSound;
@@ -293,6 +297,16 @@ namespace Leap.Unity.InputModule {
           ProcessState(whichHand, TipRaycast);
         }
 
+        if ((EnvironmentPointer)&&(pointerState[whichHand] == pointerStates.OffCanvas)) {
+          Vector3 IndexMetacarpal = curFrame.Hands[whichHand].Fingers[1].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
+          RaycastHit EnvironmentSpot;
+          Physics.Raycast(ProjectionOrigin, (IndexMetacarpal - ProjectionOrigin).normalized, out EnvironmentSpot);
+          Pointers[whichHand].position = EnvironmentSpot.point + (EnvironmentSpot.normal*0.01f);
+          Pointers[whichHand].rotation = Quaternion.LookRotation(EnvironmentSpot.normal);
+          evaluatePointerSize(whichHand);
+        }
+
+
         PrevScreenPosition[whichHand] = PointEvents[whichHand].position;
 
         if (DrawDebug) {
@@ -480,10 +494,8 @@ namespace Leap.Unity.InputModule {
       m_RaycastResultCache = m_RaycastResultCache.OrderBy(o => o.distance).ToList();
 
       //If the Canvas and an Element are Z-Fighting, remove the Canvas from the runnings
-      if (m_RaycastResultCache.Count > 1) {
-        if (m_RaycastResultCache[0].gameObject.GetComponent<Canvas>()) {
-          m_RaycastResultCache.RemoveAt(0);
-        }
+      if ((m_RaycastResultCache.Count > 1) && (m_RaycastResultCache[0].gameObject.GetComponent<Canvas>()) && (Mathf.Abs(m_RaycastResultCache[0].distance - m_RaycastResultCache[1].distance))<0.1f) {
+         m_RaycastResultCache.RemoveAt(0);
       }
 
       //Optional hack that subverts ScrollRect hierarchies; to avoid this, disable "RaycastTarget" on the Viewport and Content panes
@@ -621,7 +633,7 @@ namespace Leap.Unity.InputModule {
       }
     }
 
-    //Update the cursor location and whether or not it is enabled
+    //Update the pointer location and whether or not it is enabled
     private void UpdatePointer(int whichHand, PointerEventData pointData) {
       if (currentOverGo[whichHand] != null) {
         Pointers[whichHand].gameObject.SetActive(true);
@@ -633,36 +645,40 @@ namespace Leap.Unity.InputModule {
 
             float pointerAngle = Mathf.Rad2Deg * (Mathf.Atan2(pointData.delta.x, pointData.delta.y));
             Pointers[whichHand].rotation = draggingPlane.rotation * Quaternion.Euler(0f, 0f, -pointerAngle);
-
-            // scale cursor based on distance to camera
-            float lookPointDistance = 1f;
-            if (Camera.main != null) {
-              lookPointDistance = (Pointers[whichHand].position - Camera.main.transform.position).magnitude;
-            }
-
-            float Pointerscale = PointerScale.Evaluate(lookPointDistance);
-
-            //Commented out Velocity Stretching because it looks funny when I change the projection origin
-            Pointers[whichHand].localScale = Pointerscale * new Vector3(1f, 1f /*+ pointData.delta.magnitude*1f*/, 1f);
+            evaluatePointerSize(whichHand);
           }
         }
       }
     }
 
+
+    void evaluatePointerSize(int whichHand) {
+      //Use the Scale AnimCurve to Evaluate the Size of the Pointer
+      float PointDistance = 1f;
+      if (Camera.main != null) {
+        PointDistance = (Pointers[whichHand].position - Camera.main.transform.position).magnitude;
+      }
+
+      float Pointerscale = PointerScale.Evaluate(PointDistance);
+
+      //Commented out Velocity Stretching because it looks funny when I change the projection origin
+      Pointers[whichHand].localScale = Pointerscale * new Vector3(1f, 1f /*+ pointData.delta.magnitude*1f*/, 1f);
+    }
+
     //A boolean that returns when a "click" is being triggered
     public bool isTriggeringInteraction(int whichHand) {
+
+      if (InteractionMode != InteractionCapability.Projective) {
+        if ((pointerState[whichHand] == pointerStates.NearCanvas || pointerState[whichHand] == pointerStates.TouchingCanvas || pointerState[whichHand] == pointerStates.TouchingElement)) {
+          return (distanceOfIndexTipToPointer(whichHand) < 0f);
+        }
+      }
 
       if (InteractionMode != InteractionCapability.Tactile) {
         if ((curFrame.Hands[whichHand].IsRight) && (RightHandDetector != null && RightHandDetector.IsPinching) || (RightHandDetector == null && curFrame.Hands[whichHand].PinchDistance < PinchingThreshold)) {
           return true;
         } else if ((curFrame.Hands[whichHand].IsLeft) && (LeftHandDetector != null && LeftHandDetector.IsPinching) || (LeftHandDetector == null && curFrame.Hands[whichHand].PinchDistance < PinchingThreshold)) {
           return true;
-        }
-      }
-
-      if (InteractionMode != InteractionCapability.Projective) {
-        if ((pointerState[whichHand] == pointerStates.NearCanvas || pointerState[whichHand] == pointerStates.TouchingCanvas || pointerState[whichHand] == pointerStates.TouchingElement)) {
-          return (distanceOfIndexTipToPointer(whichHand) < 0f);
         }
       }
 
@@ -676,8 +692,7 @@ namespace Leap.Unity.InputModule {
     public float distanceOfIndexTipToPointer(int whichHand) {
       //Get Base of Index Finger Position
       Vector3 IndexTipPosition = curFrame.Hands[whichHand].Fingers[1].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToVector3();
-      //Debug.Log(-Pointers[whichHand].InverseTransformPoint(IndexTipPosition).z * Pointers[whichHand].localScale.z);
-      return -Pointers[whichHand].InverseTransformPoint(IndexTipPosition).z * Pointers[whichHand].localScale.z;
+      return (-Pointers[whichHand].InverseTransformPoint(IndexTipPosition).z * Pointers[whichHand].localScale.z) - TactilePadding;
     }
 
     public bool getTouchingMode() {
@@ -722,12 +737,17 @@ namespace Leap.Unity.InputModule {
           lerpPointerColor(whichHand, TriggerMissedColor, 0.2f);
           break;
         case pointerStates.OffCanvas:
-          lerpPointerColor(whichHand, new Color(0.0f, 0.0f, 0.0f, 0f), 1f);
+          lerpPointerColor(whichHand, TriggerMissedColor, 0.2f);
+          if (EnvironmentPointer) {
+            lerpPointerColor(whichHand, new Color(0.0f, 0.0f, 0.0f, 0.5f), 1f);
+          } else {
+            lerpPointerColor(whichHand, new Color(0.0f, 0.0f, 0.0f, 0.0f), 1f);
+          }
           break;
       }
     }
 
-    //Where the lerping of the cursor's color takes place
+    //Where the lerping of the pointer's color takes place
     //If RGB are 0f or Alpha is 1f, then it will ignore those components and only lerp the remaining components
     public void lerpPointerColor(int whichHand, Color color, float lerpalpha) {
       SpriteRenderer PointerSprite = Pointers[whichHand].GetComponent<SpriteRenderer>();
