@@ -99,18 +99,15 @@ namespace Leap.Unity.Interaction {
     /// <param name="mesh"></param>
     /// <returns></returns>
     public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetConvexPolyhedron(MeshCollider meshCollider) {
-      INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
-
       if (meshCollider.sharedMesh == null) { throw new NotImplementedException("MeshCollider missing sharedMesh."); }
-      if (meshCollider.convex == false)    { throw new NotImplementedException("MeshCollider must be convex."); }
 
-      Mesh mesh = meshCollider.sharedMesh;
-      if (!_meshDescMap.TryGetValue(mesh, out handle)) {
-        IntPtr meshPtr = allocateConvex(mesh, 1.0f);
+      INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
+      if (!_meshDescMap.TryGetValue(meshCollider.sharedMesh, out handle)) {
+        IntPtr meshPtr = allocateConvex(meshCollider, 1.0f);
         InteractionC.AddShapeDescription(ref _scene, meshPtr, out handle);
         StructAllocator.CleanupAllocations();
 
-        _meshDescMap[mesh] = handle;
+        _meshDescMap[meshCollider.sharedMesh] = handle;
         _allHandles.Add(handle);
       }
 
@@ -167,39 +164,22 @@ namespace Leap.Unity.Interaction {
         Quaternion globalRot;
 
         IntPtr shapePtr;
-
         if (collider is SphereCollider) {
           SphereCollider sphereCollider = collider as SphereCollider;
           globalPos = collider.transform.position + collider.transform.TransformPoint(sphereCollider.center);
           globalRot = collider.transform.rotation;
-
           shapePtr = allocateSphere(sphereCollider.radius * globalScale);
         } else if (collider is BoxCollider) {
           BoxCollider boxCollider = collider as BoxCollider;
           globalPos = collider.transform.position + collider.transform.TransformPoint(boxCollider.center);
           globalRot = collider.transform.rotation;
-
           shapePtr = allocateObb(boxCollider.size * globalScale * 0.5f);
         } else if (collider is CapsuleCollider) {
           CapsuleCollider capsuleCollider = collider as CapsuleCollider;
           globalPos = collider.transform.position + collider.transform.TransformPoint(capsuleCollider.center);
           globalRot = collider.transform.rotation;
 
-          Vector3 axis;
-          switch (capsuleCollider.direction) {
-            case 0:
-              axis = Vector3.right;
-              break;
-            case 1:
-              axis = Vector3.up;
-              break;
-            case 2:
-              axis = Vector3.forward;
-              break;
-            default:
-              throw new InvalidOperationException("Unexpected capsule direction " + capsuleCollider.direction);
-          }
-
+          Vector3 axis = new Vector3((capsuleCollider.direction==0)?1:0, (capsuleCollider.direction==1)?1:0, (capsuleCollider.direction==2)?1:0);
           Vector3 p0 = axis * globalScale * (capsuleCollider.height - capsuleCollider.radius * 0.5f);
           Vector3 p1 = -axis * globalScale * (capsuleCollider.height - capsuleCollider.radius * 0.5f);
           shapePtr = allocateCapsule(p0, p1, capsuleCollider.radius * globalScale);
@@ -207,8 +187,7 @@ namespace Leap.Unity.Interaction {
           MeshCollider meshCollider = collider as MeshCollider;
           globalPos = collider.transform.position;
           globalRot = collider.transform.rotation;
-
-          shapePtr = allocateConvex(meshCollider.sharedMesh, globalScale);
+          shapePtr = allocateConvex(meshCollider, globalScale);
         } else {
           throw new InvalidOperationException("Unsupported collider type " + collider.GetType());
         }
@@ -309,7 +288,13 @@ namespace Leap.Unity.Interaction {
       return capsulePtr;
     }
 
-    private IntPtr allocateConvex(Mesh mesh, float scale) {
+    private IntPtr allocateConvex(MeshCollider meshCollider, float scale) {
+
+      if (meshCollider.sharedMesh == null) { throw new NotImplementedException("MeshCollider missing sharedMesh."); }
+      if (meshCollider.convex == false)    { throw new NotImplementedException("MeshCollider must be convex."); }
+
+      Mesh mesh = meshCollider.sharedMesh;
+
       INTERACTION_CONVEX_POLYHEDRON_DESCRIPTION meshDesc = new INTERACTION_CONVEX_POLYHEDRON_DESCRIPTION();
       meshDesc.shape.type = ShapeType.Convex;
       meshDesc.radius = 0.0f;
