@@ -26,9 +26,9 @@ namespace Leap.Unity {
 
     [System.Serializable]
     public class ModelGroup {
+      public string GroupName;
       [HideInInspector]
       public HandPool _handPool;
-      public string GroupName;
 
       public IHandModel LeftModel;
       [HideInInspector]
