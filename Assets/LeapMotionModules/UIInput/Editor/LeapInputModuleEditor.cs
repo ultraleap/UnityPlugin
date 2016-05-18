@@ -10,8 +10,12 @@ namespace Leap.Unity.InputModule {
       base.OnEnable();
       LeapInputModule module = target as LeapInputModule;
 
-      specifyConditionalDrawing(() => ProjectiveAllowed(module.InteractionMode),
-                               "PinchingThreshold");
+      specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || module.InteractionMode == LeapInputModule.InteractionCapability.Projective,
+                               "PinchingThreshold",
+                               "EnvironmentPointer");
+
+      specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || module.InteractionMode == LeapInputModule.InteractionCapability.Tactile,
+                               "TactilePadding");
 
       specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid,
                                "ProjectiveToTactileTransitionDistance");
@@ -35,6 +39,8 @@ namespace Leap.Unity.InputModule {
                          "ProjectiveToTactileTransitionDistance",
                          "PinchingThreshold",
                          "RetractUI",
+                         "TactilePadding",
+                         "EnvironmentPointer",
                          "ShowExperimentalOptions");
 
       specifyConditionalDrawing(() => module.ShowExperimentalOptions,
