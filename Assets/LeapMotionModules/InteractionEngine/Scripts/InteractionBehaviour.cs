@@ -149,7 +149,6 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Adds an angular acceleration to the center of mass of this object.  Use this instead of Rigidbody.AddTorque()
     /// </summary>
-    /// <param name="acceleration"></param>
     public void AddAngularAcceleration(Vector3 acceleration) {
       _accumulatedAngularAcceleration += acceleration;
     }

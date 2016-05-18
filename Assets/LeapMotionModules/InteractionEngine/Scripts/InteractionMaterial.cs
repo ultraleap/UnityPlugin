@@ -23,13 +23,14 @@ namespace Leap.Unity.Interaction {
     protected float _brushDisableDistance = 0.017f;
 
     [Header("Grasp Settings")]
+    [Tooltip("Should a hand be able to grasp objects using this material.")]
     [SerializeField]
     protected bool _graspingEnabled = true;
 
+    [Tooltip("What method should be used to move the object when it is grasped.")]
     [SerializeField]
     protected GraspMethodEnum _graspMethod = GraspMethodEnum.Velocity;
-
-
+    
 
     [Tooltip("How far the object can get from the hand before it is released.")]
     [SerializeField]
@@ -52,19 +53,25 @@ namespace Leap.Unity.Interaction {
                                                                          new Keyframe(2.0f, 1.5f, 0.0f, 0.0f));
 
     [Header("Suspension Settings")]
+    [Tooltip("Can objects using this material be suspended when a grasping hand becomes untracked.")]
     [SerializeField]
     protected bool _suspensionEnabled = true;
 
+    [Tooltip("How long can objects using this material be suspended.  If a hand remains untracked for mor than this time then " +
+             "the object will end suspension.")]
     [SerializeField]
     protected float _maxSuspensionTime = 1;
 
+    [Tooltip("Whether or not objects using this material have their graphical anchor disabled when they become suspended.")]
     [SerializeField]
     protected bool _hideObjectOnSuspend = true;
 
     [Header("Warp Settings")]
+    [Tooltip("Can objects using this material warp the graphical anchor through time to reduce percieved latency.")]
     [SerializeField]
     protected bool _warpingEnabled = true;
 
+    [Tooltip("The amount of warping to perform based on the distance between the actual position and the graphical position.")]
     [SerializeField]
     protected AnimationCurve _warpCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                              new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
@@ -74,6 +81,7 @@ namespace Leap.Unity.Interaction {
     protected float _graphicalReturnTime = 0.25f;
 
     [Header("Layer Settings")]
+    [Tooltip("Should objects using this material use custom layers instead of the ones provided by the Interaction Manager.")]
     [SerializeField]
     protected bool _useCustomLayers = false;
 
