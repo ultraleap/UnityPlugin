@@ -661,8 +661,19 @@ namespace Leap.Unity.InputModule {
 
       float Pointerscale = PointerScale.Evaluate(PointDistance);
 
+      float pinchScale = 1f;
+      if (whichHand == 0 && RightHandDetector != null) {
+        float pdist = curFrame.Hands[whichHand].PinchDistance / 1000f;
+        Debug.Log(pdist);
+        if (RightHandDetector.IsPinching) {
+          pinchScale = Mathf.Clamp(pdist.Remap(RightHandDetector._deactivatePinchDist, 1f, RightHandDetector._activatePinchDist, 2.5f), 1f, 2.5f);
+        } else {
+          pinchScale = Mathf.Clamp(pdist.Remap(RightHandDetector._deactivatePinchDist, 0.75f, RightHandDetector._activatePinchDist, 1f), 0.75f, 1f);
+        }
+      }
+
       //Commented out Velocity Stretching because it looks funny when I change the projection origin
-      Pointers[whichHand].localScale = Pointerscale * new Vector3(1f, 1f /*+ pointData.delta.magnitude*1f*/, 1f);
+      Pointers[whichHand].localScale = Pointerscale * pinchScale * new Vector3(1f, 1f /*+ pointData.delta.magnitude*1f*/, 1f);
     }
 
     //A boolean that returns when a "click" is being triggered
@@ -781,4 +792,11 @@ namespace Leap.Unity.InputModule {
       }
     }
   }
+  /*
+  public static class ExtensionMethods {
+    public static float Remap(this float value, float from1, float to1, float from2, float to2) {
+      return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+    }
+  }
+  */
 }
