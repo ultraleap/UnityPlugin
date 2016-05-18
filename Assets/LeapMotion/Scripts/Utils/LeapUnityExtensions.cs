@@ -6,7 +6,7 @@
 
 using UnityEngine;
 using System.Collections;
-using Leap;
+using LeapInternal;
 
 namespace Leap.Unity {
 
@@ -26,6 +26,10 @@ namespace Leap.Unity {
       return new Vector3(vector.x, vector.y, vector.z);
     }
 
+    public static Vector3 ToVector3(this LEAP_VECTOR vector) {
+      return new Vector3(vector.x, vector.y, vector.z);
+    }
+
     /**
     * Converts a Leap Vector object to a UnityEngine Vector4 object.
     *
@@ -33,8 +37,7 @@ namespace Leap.Unity {
     * the coordinates from millimeters to meters.
     * @returns The Unity Vector4 object with the same coordinate values as the Leap.Vector.
     */
-    public static Vector4 ToVector4(this Vector vector)
-    {
+    public static Vector4 ToVector4(this Vector vector) {
       return new Vector4(vector.x, vector.y, vector.z, 0.0f);
     }
 
@@ -45,24 +48,33 @@ namespace Leap.Unity {
     * the coordinates from millimeters to meters.
     * @returns The Leap Vector object with the same coordinate values as the UnityEngine.Vector.
     */
-    public static Vector ToVector(this Vector3 vector)
-    {
+    public static Vector ToVector(this Vector3 vector) {
       return new Vector(vector.x, vector.y, vector.z);
+    }
+
+    public static LEAP_VECTOR ToCVector(this Vector3 vector) {
+      LEAP_VECTOR cVector = new LEAP_VECTOR();
+      cVector.x = vector.x;
+      cVector.y = vector.y;
+      cVector.z = vector.z;
+      return cVector;
     }
   }
 
   /**
    * Unity extentions for Leap Quaternion class.
    */
-  public static class UnityQuaternionExtension
-  {
+  public static class UnityQuaternionExtension {
     /**
     * Converts a LeapQuaternion object to a UnityEngine.Quaternion object.
     *
     * @returns The UnityEngine Quaternion object with the same values as the LeapQuaternion.
     */
-    public static Quaternion ToQuaternion(this LeapQuaternion q)
-    {
+    public static Quaternion ToQuaternion(this LeapQuaternion q) {
+      return new Quaternion(q.x, q.y, q.z, q.w);
+    }
+
+    public static Quaternion ToQuaternion(this LEAP_QUATERNION q) {
       return new Quaternion(q.x, q.y, q.z, q.w);
     }
 
@@ -71,9 +83,17 @@ namespace Leap.Unity {
     *
     * @returns The LeapQuaternion object with the same values as the UnityEngine.Quaternion.
     */
-    public static LeapQuaternion ToLeapQuaternion(this Quaternion q)
-    {
+    public static LeapQuaternion ToLeapQuaternion(this Quaternion q) {
       return new LeapQuaternion(q.x, q.y, q.z, q.w);
+    }
+
+    public static LEAP_QUATERNION ToCQuaternion(this Quaternion q) {
+      LEAP_QUATERNION cQuaternion = new LEAP_QUATERNION();
+      cQuaternion.x = q.x;
+      cQuaternion.y = q.y;
+      cQuaternion.z = q.z;
+      cQuaternion.w = q.w;
+      return cQuaternion;
     }
   }
 
