@@ -23,11 +23,11 @@ namespace Leap.Unity.Interaction {
     protected float _brushDisableDistance = 0.017f;
 
     [Header("Grasp Settings")]
-    [Header("Should a hand be able to grasp objects using this material.")]
+    [Tooltip("Should a hand be able to grasp objects using this material.")]
     [SerializeField]
     protected bool _graspingEnabled = true;
 
-    [Header("What method should be used to move the object when it is grasped.")]
+    [Tooltip("What method should be used to move the object when it is grasped.")]
     [SerializeField]
     protected GraspMethodEnum _graspMethod = GraspMethodEnum.Velocity;
     
