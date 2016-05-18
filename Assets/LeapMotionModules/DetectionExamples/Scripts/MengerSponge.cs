@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace Leap.Unity.DetectionUtilites.Examples {
+namespace Leap.Unity.DetectionExamples {
 
   [ExecuteInEditMode]
   public class MengerSponge : MonoBehaviour {
