@@ -16,6 +16,9 @@ namespace Leap.Unity {
         return ModelType.Graphics;
       }
     }
+    public override bool SupportsEditorPersistence() {
+      return true;
+    }
     public Vector3 modelFingerPointing = new Vector3(0, 0, 0);//Vector3.forward;
     public Vector3 modelPalmFacing = new Vector3(0, 0, 0);// -Vector3.up;
 
