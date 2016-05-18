@@ -74,11 +74,13 @@ namespace Leap.Unity {
 
       Vector3 side1 = b - a;
       Vector3 side2 = c - a;
-      Vector3 perpendicular = Vector3.Cross(side1, side2);
-      Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
+      Vector3 perpendicular;
+
       if (Handedness == Chirality.Left) {
-        calculatedPalmFacing = calculatedPalmFacing * -1f;
+        perpendicular = Vector3.Cross(side2, side1);
       }
+      else perpendicular = Vector3.Cross(side1, side2);
+      Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
       return calculatedPalmFacing;
     }
     private Vector3 calculateModelFingerPointing() {
