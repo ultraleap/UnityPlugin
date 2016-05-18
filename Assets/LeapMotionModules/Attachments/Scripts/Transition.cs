@@ -83,7 +83,6 @@ namespace Leap.Unity{
     }
   
     void updateTransition(float interpolationPoint){
-      //interpolationPoint = 1 - interpolationPoint; //invert so 0 is finished position on anim curve (i.e. no transition influence)
       if(AnimatePosition){
         Vector3 localPosition = transform.localPosition;
         localPosition.x = XPosition.Evaluate(interpolationPoint) * RelativeOnPosition.x;
@@ -95,12 +94,6 @@ namespace Leap.Unity{
         Quaternion transitionRotation = Quaternion.Euler(transform.localRotation.x + XRotation.Evaluate(interpolationPoint) * RelativeOnRotation.x,
                                                          transform.localRotation.y + YRotation.Evaluate(interpolationPoint) * RelativeOnRotation.y,
                                                          transform.localRotation.z + ZRotation.Evaluate(interpolationPoint) * RelativeOnRotation.z);
-        transform.localRotation = transitionRotation;
-      }
-      if (AnimateRotation && false) {
-        Quaternion transitionRotation = Quaternion.Euler(XRotation.Evaluate(interpolationPoint) * RelativeOnRotation.x,
-                                                         YRotation.Evaluate(interpolationPoint) * RelativeOnRotation.y,
-                                                         ZRotation.Evaluate(interpolationPoint) * RelativeOnRotation.z);
         transform.localRotation = transitionRotation;
       }
       if (AnimateScale) {

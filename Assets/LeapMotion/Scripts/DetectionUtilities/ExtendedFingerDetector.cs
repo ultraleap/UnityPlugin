@@ -43,19 +43,22 @@ namespace Leap.Unity {
     public PointingState Ring = PointingState.Either;
     /** The required pinky finger state. */
     public PointingState Pinky = PointingState.Either;
-  
-    void Start () {
+
+    private IEnumerator watcherCoroutine;
+
+    void Awake () {
+      watcherCoroutine = extendedFingerWatcher();
       if(HandModel == null){
         HandModel = gameObject.GetComponentInParent<IHandModel>();
       }
     }
   
     void OnEnable () {
-      StartCoroutine(extendedFingerWatcher());
+      StartCoroutine(watcherCoroutine);
     }
   
     void OnDisable () {
-      StopCoroutine(extendedFingerWatcher());
+      StopCoroutine(watcherCoroutine);
       Deactivate();
     }
   
@@ -83,37 +86,31 @@ namespace Leap.Unity {
         yield return new WaitForSeconds(Period);
       }
     }
-  
-    private bool matchFingerState(Finger finger, int ordinal){
-      switch(ordinal){
+
+    private bool matchFingerState (Finger finger, int ordinal) {
+      PointingState requiredState;
+      switch (ordinal) {
         case 0:
-          if(Thumb == PointingState.Either) return true;
-          if(Thumb == PointingState.Extended && finger.IsExtended) return true;
-          if(Thumb == PointingState.NotExtended && !finger.IsExtended) return true;
-          return false;
+          requiredState = Thumb;
+          break;
         case 1:
-          if(Index == PointingState.Either) return true;
-          if(Index == PointingState.Extended && finger.IsExtended) return true;
-          if (Index == PointingState.NotExtended && !finger.IsExtended) return true;
-          return false;
+          requiredState = Index;
+          break;
         case 2:
-          if(Middle == PointingState.Either) return true;
-          if(Middle == PointingState.Extended && finger.IsExtended) return true;
-          if (Middle == PointingState.NotExtended && !finger.IsExtended) return true;
-          return false;
+          requiredState = Middle;
+          break;
         case 3:
-          if(Ring == PointingState.Either) return true;
-          if(Ring == PointingState.Extended && finger.IsExtended) return true;
-          if (Ring == PointingState.NotExtended && !finger.IsExtended) return true;
-          return false;
+          requiredState = Ring;
+          break;
         case 4:
-          if(Pinky == PointingState.Either) return true;
-          if(Pinky == PointingState.Extended && finger.IsExtended) return true;
-          if (Pinky == PointingState.NotExtended && !finger.IsExtended) return true;
-          return false;
+          requiredState = Pinky;
+          break;
         default:
           return false;
       }
+      return (requiredState == PointingState.Either) ||
+             (requiredState == PointingState.Extended && finger.IsExtended) ||
+             (requiredState == PointingState.NotExtended && !finger.IsExtended);
     }
 
     #if UNITY_EDITOR

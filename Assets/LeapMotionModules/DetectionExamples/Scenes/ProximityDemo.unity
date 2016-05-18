@@ -651,7 +651,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Detectors: []
-  AddAllDetectorsOnAwake: 1
+  AddAllSiblingDetectorsOnAwake: 1
   GateType: 0
   Negate: 0
 --- !u!1 &433605379
@@ -3896,7 +3896,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  handModel: {fileID: 0}
+  HandModel: {fileID: 0}
   Thumb: 0
   Index: 0
   Middle: 1
@@ -3919,7 +3919,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 268212998}
-        m_MethodName: ActivateChildren
+        m_MethodName: LightFire
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3948,7 +3948,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Detectors: []
-  AddAllDetectorsOnAwake: 1
+  AddAllSiblingDetectorsOnAwake: 1
   GateType: 0
   Negate: 0
 --- !u!114 &995332418
@@ -4179,7 +4179,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Detectors: []
-  AddAllDetectorsOnAwake: 1
+  AddAllSiblingDetectorsOnAwake: 1
   GateType: 0
   Negate: 0
 --- !u!114 &1060014947
@@ -4228,7 +4228,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  handModel: {fileID: 0}
+  HandModel: {fileID: 0}
   Thumb: 0
   Index: 0
   Middle: 1
@@ -5581,7 +5581,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Detectors: []
-  AddAllDetectorsOnAwake: 1
+  AddAllSiblingDetectorsOnAwake: 1
   GateType: 0
   Negate: 0
 --- !u!114 &1232644031

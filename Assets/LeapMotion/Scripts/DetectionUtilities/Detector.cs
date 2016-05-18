@@ -25,7 +25,7 @@ namespace Leap.Unity {
     /** The current detector state. 
      * @since 4.1.2 
      */
-    public bool IsActive{ get{ return _isActive;} private set { _isActive = value;}}
+    public bool IsActive{ get{ return _isActive;}}
     private bool _isActive = false;
     /** Whether to draw the detector's Gizmos for debugging. (Not every detector provides gizmos.)
      * @since 4.1.2 
@@ -50,10 +50,9 @@ namespace Leap.Unity {
     */
     public virtual void Activate(){
       if (!IsActive) {
-        IsActive = true;
+        _isActive = true;
         OnActivate.Invoke();
       }
-      IsActive = true;
     }
 
     /**
@@ -63,23 +62,9 @@ namespace Leap.Unity {
     */
     public virtual void Deactivate(){
       if (IsActive) {
-        IsActive = false;
+        _isActive = false;
         OnDeactivate.Invoke();
       }
-      IsActive = false;
     }
   }
-
-  /** 
-  * Settings for handling pointing conditions
-  * - RelativeToCamera -- the target direction is defined relative to the camera's forward vector.
-  * - RelativeToHorizon -- the target direction is defined relative to the camera's forward vector, 
-  *                        except that it does not change with pitch.
-  * - RelativeToWorld -- the target direction is defined as a global direction that does not change with camera movement.
-  * - AtTarget -- a target object is used to determine the pointing direction.
-  * 
-  * @since 4.1.2
-  */
-  public enum PointingType { RelativeToCamera, RelativeToHorizon, RelativeToWorld, AtTarget }
-
 }

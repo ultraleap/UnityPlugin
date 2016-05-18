@@ -1830,10 +1830,10 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  handModel: {fileID: 0}
+  HandModel: {fileID: 0}
   FingerName: 0
   PointingDirection: {x: 0, y: 1, z: 0}
-  PointingType: 1
+  PointingType: 2
   TargetObject: {fileID: 0}
   OnAngle: 25
   OffAngle: 35
@@ -1860,7 +1860,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  handModel: {fileID: 0}
+  HandModel: {fileID: 0}
   Thumb: 0
   Index: 1
   Middle: 1
@@ -1913,7 +1913,7 @@ MonoBehaviour:
   Detectors:
   - {fileID: 687963584}
   - {fileID: 687963583}
-  AddAllDetectorsOnAwake: 0
+  AddAllSiblingDetectorsOnAwake: 0
   GateType: 0
   Negate: 0
 --- !u!114 &687963586
@@ -1973,7 +1973,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  handModel: {fileID: 0}
+  HandModel: {fileID: 0}
   FingerName: 1
   PointingDirection: {x: 0, y: 0, z: 1}
   PointingType: 3
@@ -2244,7 +2244,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  handModel: {fileID: 0}
+  HandModel: {fileID: 0}
   Thumb: 0
   Index: 1
   Middle: 1
@@ -2273,10 +2273,10 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  handModel: {fileID: 0}
+  HandModel: {fileID: 0}
   FingerName: 0
   PointingDirection: {x: 0, y: 1, z: 0}
-  PointingType: 1
+  PointingType: 2
   TargetObject: {fileID: 0}
   OnAngle: 25
   OffAngle: 35
@@ -2327,7 +2327,7 @@ MonoBehaviour:
   Detectors:
   - {fileID: 1101896908}
   - {fileID: 1101896909}
-  AddAllDetectorsOnAwake: 0
+  AddAllSiblingDetectorsOnAwake: 0
   GateType: 0
   Negate: 0
 --- !u!114 &1101896911
@@ -2387,7 +2387,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  handModel: {fileID: 0}
+  HandModel: {fileID: 0}
   FingerName: 1
   PointingDirection: {x: 0, y: 0, z: 1}
   PointingType: 3

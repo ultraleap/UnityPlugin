@@ -38,7 +38,6 @@ namespace Leap.Unity {
                            float duration = 0, 
                            bool depthTest = true) {
       Vector3 planeA = Vector3.Slerp(normal, -normal, 0.5f);
-      Vector3 planeB = Vector3.Cross(normal, planeA).normalized;
       DrawArc(360, center, planeA, normal, radius, color, quality, duration, depthTest);
     }
 

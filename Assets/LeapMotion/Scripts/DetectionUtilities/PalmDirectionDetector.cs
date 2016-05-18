@@ -85,24 +85,27 @@ namespace Leap.Unity {
     [Range(0, 360)]
     public float OffAngle = 65; //degrees
 
+    private IEnumerator watcherCoroutine;
+
     private void OnValidate(){
       if( OffAngle < OnAngle){
         OffAngle = OnAngle;
       }
     }
 
-    private void Start () {
+    private void Awake () {
+      watcherCoroutine = palmWatcher();
       if(HandModel == null){
         HandModel = gameObject.GetComponentInParent<IHandModel>();
       }
     }
 
     private void OnEnable () {
-      StartCoroutine(palmWatcher());
+      StartCoroutine(watcherCoroutine);
     }
 
     private void OnDisable () {
-      StopCoroutine(palmWatcher());
+      StopCoroutine(watcherCoroutine);
     }
 
     private IEnumerator palmWatcher() {
@@ -160,4 +163,16 @@ namespace Leap.Unity {
     }
     #endif
   }
+
+  /** 
+  * Settings for handling pointing conditions
+  * - RelativeToCamera -- the target direction is defined relative to the camera's forward vector.
+  * - RelativeToHorizon -- the target direction is defined relative to the camera's forward vector, 
+  *                        except that it does not change with pitch.
+  * - RelativeToWorld -- the target direction is defined as a global direction that does not change with camera movement.
+  * - AtTarget -- a target object is used to determine the pointing direction.
+  * 
+  * @since 4.1.2
+  */
+  public enum PointingType { RelativeToCamera, RelativeToHorizon, RelativeToWorld, AtTarget }
 }

@@ -18,9 +18,33 @@ namespace Leap.Unity {
    * @since 4.1.2
    */
   public class DetectorLogicGate : Detector {
-    public List<Detector> Detectors;
-    public bool AddAllDetectorsOnAwake = true;
+    [SerializeField]
+    [Tooltip("The list of observed detectors.")]
+    private List<Detector> Detectors;
+    /**
+     * When true, all Detector components of the same game object
+     * are added to the list of watched detectors on Awake. When false,
+     * you must manually add the desired detectors.
+     * 
+     * If you have more than one DetectorLogicGate component on a game object,
+     * do not enable this option on both. 
+     * @since 4.1.2
+     */
+    [Tooltip("Add all detectors on this object automatically.")]
+    public bool AddAllSiblingDetectorsOnAwake = true;
+
+    /**
+     * The type of logic for this gate: AND or OR.
+     * @since 4.1.2
+     */
+    [Tooltip("The type of logic used to combine detector state.")]
     public LogicType GateType = LogicType.AndGate;
+
+    /**
+     * Whether to negate the output of the gate. AND becomes NAND; OR becomes NOR.
+     * @since 4.1.2
+     */
+    [Tooltip("Whether to negate the gate output.")]
     public bool Negate = false;
 
     /**
@@ -33,6 +57,7 @@ namespace Leap.Unity {
     public void AddDetector(Detector detector){
       if(!Detectors.Contains(detector)){
         Detectors.Add(detector);
+        activateDetector(detector);
       }
     }
 
@@ -55,21 +80,21 @@ namespace Leap.Unity {
      * both objects don't observe each other.
      * @since 4.1.2
      */
-    public void AddAllDetectors(){
+    public void AddAllSiblingDetectors(){
       Detector[] detectors = GetComponents<Detector>();
       for(int g = 0; g < detectors.Length; g++){
-        if ( detectors[g].GetInstanceID() != this.GetInstanceID() && detectors[g].enabled) {
+        if ( detectors[g] != this && detectors[g].enabled) {
           AddDetector(detectors[g]);
         }
       }
     }
 
     private void Awake(){
-      if(AddAllDetectorsOnAwake){
-        AddAllDetectors();
+      for (int d = 0; d < Detectors.Count; d++) {
+        activateDetector(Detectors[d]);
       }
-      foreach(Detector detector in Detectors){
-        activateDetector(detector);
+      if (AddAllSiblingDetectorsOnAwake) {
+        AddAllSiblingDetectors();
       }
     }
 
@@ -87,6 +112,7 @@ namespace Leap.Unity {
     /**
      * Checks all the observed detectors, combines them with the specified type of logic
      * and calls the Activate() or Deactivate() function as appropriate.
+     * @since 4.1.2
      */
     protected void CheckDetectors(){
       if (Detectors.Count < 1)

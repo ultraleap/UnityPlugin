@@ -90,24 +90,27 @@ namespace Leap.Unity {
     [Range(0, 360)]
     public float OffAngle = 25f; //degrees
 
+    private IEnumerator watcherCoroutine;
+
     private void OnValidate(){
       if( OffAngle < OnAngle){
         OffAngle = OnAngle;
       }
     }
 
-    private void Start () {
+    private void Awake () {
+      watcherCoroutine = fingerPointingWatcher();
       if(HandModel == null){
         HandModel = gameObject.GetComponentInParent<IHandModel>();
       }
     }
 
     private void OnEnable () {
-      StartCoroutine(fingerPointingWatcher());
+      StartCoroutine(watcherCoroutine);
     }
   
     private void OnDisable () {
-      StopCoroutine(fingerPointingWatcher());
+      StopCoroutine(watcherCoroutine);
       Deactivate();
     }
 
