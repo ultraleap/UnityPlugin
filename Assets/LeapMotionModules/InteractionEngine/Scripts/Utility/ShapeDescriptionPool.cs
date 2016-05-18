@@ -98,8 +98,13 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     /// <param name="mesh"></param>
     /// <returns></returns>
-    public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetConvexPolyhedron(Mesh mesh) {
+    public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetConvexPolyhedron(MeshCollider meshCollider) {
       INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
+
+      if (meshCollider.sharedMesh == null) { throw new NotImplementedException("MeshCollider missing sharedMesh."); }
+      if (meshCollider.convex == false)    { throw new NotImplementedException("MeshCollider must be convex."); }
+
+      Mesh mesh = meshCollider.sharedMesh;
       if (!_meshDescMap.TryGetValue(mesh, out handle)) {
         IntPtr meshPtr = allocateConvex(mesh, 1.0f);
         InteractionC.AddShapeDescription(ref _scene, meshPtr, out handle);
@@ -125,53 +130,23 @@ namespace Leap.Unity.Interaction {
     /// <param name="obj"></param>
     /// <returns></returns>
     private List<Collider> _tempColliderList = new List<Collider>();
-    public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetAuto(GameObject parentObject) {
+    public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetCollision(GameObject parentObject) {
       if (!isUniformScale(parentObject.transform)) {
         throw new InvalidOperationException("The GameObject " + parentObject + " did not have a uniform scale.");
       }
 
-      parentObject.GetComponentsInChildren(_tempColliderList);
-
+      parentObject.GetComponentsInChildren<Collider>(_tempColliderList);
       if (_tempColliderList.Count == 0) {
         throw new InvalidOperationException("The GameObject " + parentObject + " did not have any colliders.");
       }
 
-      //Optimization for a single collider
+      INTERACTION_SHAPE_DESCRIPTION_HANDLE handle = new INTERACTION_SHAPE_DESCRIPTION_HANDLE();
+
+      // Try optimized encodings for a single collider.  Everything else is a compound.
       if (_tempColliderList.Count == 1) {
-        Collider collider = _tempColliderList[0];
-
-        if (collider.gameObject != parentObject) {
-          //TODO: break out of single collider optimization in this case
-          throw new NotImplementedException("Child colliders are currently not supported.");
+        if(GetCollisionSingleInternal(parentObject, ref handle)) {
+          return handle;
         }
-
-        float scale = parentObject.transform.lossyScale.x;
-
-        if (collider is SphereCollider) {
-          SphereCollider sphereCollider = collider as SphereCollider;
-
-          if (sphereCollider.center != Vector3.zero) {
-            //TODO: break out of single collider optimization in this case
-            throw new NotImplementedException("Colliders with non-zero centers are currently not supported.");
-          }
-
-          return GetSphere(sphereCollider.radius * scale);
-        } else if (collider is BoxCollider) {
-          BoxCollider boxCollider = collider as BoxCollider;
-
-          if (boxCollider.center != Vector3.zero) {
-            //TODO: break out of single collider optimization in this case
-            throw new NotImplementedException("Colliders with non-zero centers are currently not supported.");
-          }
-
-          return GetOBB(boxCollider.size * 0.5f * scale);
-        }
-
-        throw new NotImplementedException("The collider type " + collider.GetType() + " is currently not supported.");
-      }
-
-      if (_tempColliderList.Count > 1) {
-        throw new NotImplementedException("Using more than one collider for GetAuto() is currently not supported.");
       }
 
       INTERACTION_COMPOUND_DESCRIPTION compoundDesc = new INTERACTION_COMPOUND_DESCRIPTION();
@@ -222,7 +197,7 @@ namespace Leap.Unity.Interaction {
               axis = Vector3.forward;
               break;
             default:
-              throw new InvalidOperationException("Unexpected direction " + capsuleCollider.direction);
+              throw new InvalidOperationException("Unexpected capsule direction " + capsuleCollider.direction);
           }
 
           Vector3 p0 = axis * globalScale * (capsuleCollider.height - capsuleCollider.radius * 0.5f);
@@ -235,7 +210,7 @@ namespace Leap.Unity.Interaction {
 
           shapePtr = allocateConvex(meshCollider.sharedMesh, globalScale);
         } else {
-          throw new InvalidOperationException("Unexpected collider type " + collider.GetType());
+          throw new InvalidOperationException("Unsupported collider type " + collider.GetType());
         }
 
         INTERACTION_TRANSFORM ieTransform = new INTERACTION_TRANSFORM();
@@ -246,9 +221,7 @@ namespace Leap.Unity.Interaction {
         compoundDesc.pTransforms[i] = ieTransform;
       }
 
-      INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
       IntPtr compoundPtr = StructAllocator.AllocateStruct(ref compoundDesc);
-
       InteractionC.AddShapeDescription(ref _scene, compoundPtr, out handle);
       StructAllocator.CleanupAllocations();
 
@@ -256,6 +229,42 @@ namespace Leap.Unity.Interaction {
       _allHandles.Add(handle);
 
       return handle;
+    }
+
+    private bool GetCollisionSingleInternal(GameObject parentObject, ref INTERACTION_SHAPE_DESCRIPTION_HANDLE shape) {
+      Collider collider = _tempColliderList[0];
+
+      if (collider.gameObject != parentObject) {
+        return false; // Potential optimization
+      }
+
+      float scale = parentObject.transform.lossyScale.x;
+
+      if (collider is SphereCollider) {
+        SphereCollider sphereCollider = collider as SphereCollider;
+
+        if (sphereCollider.center != Vector3.zero) {
+          return false;
+        }
+
+        shape = GetSphere(sphereCollider.radius * scale);
+        return true;
+      } else if (collider is BoxCollider) {
+        BoxCollider boxCollider = collider as BoxCollider;
+
+        if (boxCollider.center != Vector3.zero) {
+          return false;
+        }
+
+        shape = GetOBB(boxCollider.size * 0.5f * scale);
+        return false;
+      } else if (collider is MeshCollider) {
+        MeshCollider meshCollider = collider as MeshCollider;
+        shape = GetConvexPolyhedron(meshCollider);
+        return true;
+      }
+
+      return false; // Compound
     }
 
     private bool isUniformScale(Transform transform) {

@@ -304,12 +304,12 @@ namespace Leap.Unity.Interaction {
 
     /// <summary>
     /// This method is called to generate the internal description of the interaction shape.
-    /// The default implementation uses the GetAuto() method of the ShapeDescriptionPool class, which
+    /// The default implementation uses the GetCollision() method of the ShapeDescriptionPool class, which
     /// accounts for all colliders on this gameObject and its children.
     /// </summary>
     /// <returns></returns>
     protected virtual INTERACTION_SHAPE_DESCRIPTION_HANDLE GenerateShapeDescriptionHandle() {
-      return _manager.ShapePool.GetAuto(gameObject);
+      return _manager.ShapePool.GetCollision(gameObject);
     }
 
     /// <summary>
