@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace Leap.Unity.DetectionUtilities.Examples {
+namespace Leap.Unity.DetectionExamples {
 
   public class PinchDraw : MonoBehaviour {
 

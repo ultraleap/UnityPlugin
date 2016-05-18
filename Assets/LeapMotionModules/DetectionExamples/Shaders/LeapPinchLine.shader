@@ -1,4 +1,4 @@
-﻿Shader "LeapMotion/PinchUtility/PinchLine" {
+﻿Shader "LeapMotion/DetectionExamples/PinchLine" {
   Properties{
     _Color("Tint", Color) = (1,1,1,1)
     _Glossiness("Smoothness", Range(0,1)) = 0.5

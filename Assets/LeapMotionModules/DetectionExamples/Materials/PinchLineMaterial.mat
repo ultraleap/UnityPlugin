@@ -7,7 +7,7 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: PinchLineMaterial
-  m_Shader: {fileID: 4800000, guid: 17d74b3320b7b4b499d58e317d602a88, type: 3}
+  m_Shader: {fileID: 4800000, guid: 868ff1d5b45e9477f89c4941814f93af, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
   m_CustomRenderQueue: 2000
