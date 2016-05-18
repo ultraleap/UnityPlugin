@@ -4,6 +4,11 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
+  /// <summary>
+  /// IInteractionBehaviour is the interface used by InteractionManager to drive interaction objects.
+  /// All interaction objects must extend from this base interface class.  This class is an abstract
+  /// extended MonoBehaviour instead of an interface.
+  /// </summary>
   public abstract class IInteractionBehaviour : MonoBehaviour {
     /// <summary>
     /// Gets or sets the manager this object belongs to.
