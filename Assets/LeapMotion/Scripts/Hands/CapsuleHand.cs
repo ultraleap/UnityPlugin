@@ -67,6 +67,10 @@ namespace Leap.Unity {
       }
     }
 
+    public override bool SupportsEditorPersistence() {
+      return true;
+    }
+
     public override Hand GetLeapHand() {
       return hand_;
     }
