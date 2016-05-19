@@ -40,7 +40,7 @@ namespace Leap.Unity {
       public List<IHandModel> modelList;
       [HideInInspector]
       public List<IHandModel> modelsCheckedOut;
-      public bool IsEnabled;
+      public bool IsEnabled = true;
       public bool CanDuplicate;
 
       public IHandModel TryGetModel(Chirality chirality, ModelType modelType) {
