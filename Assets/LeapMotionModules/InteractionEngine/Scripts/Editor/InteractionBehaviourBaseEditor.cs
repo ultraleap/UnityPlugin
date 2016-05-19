@@ -42,7 +42,7 @@ namespace Leap.Unity.Interaction {
       var colliders = rigidbody.GetComponentsInChildren<Collider>();
       bool isAnyColliderBad = false;
       for (int i = 0; i < colliders.Length; i++) {
-        if (colliders[i].sharedMaterial.bounciness != 0.0f) {
+        if (colliders[i].sharedMaterial != null && colliders[i].sharedMaterial.bounciness != 0.0f) {
           isAnyColliderBad = true;
           break;
         }
