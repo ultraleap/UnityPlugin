@@ -14,6 +14,7 @@ public class CycleHandPairs : MonoBehaviour {
       //handPool.DisableGroup(GroupNames[CurrentGroup]);
       currentGroup = value;
       handPool.EnableGroup(GroupNames[value]);
+      Debug.Log(value);
     }
   }
   private KeyCode[] keyCodes = {
@@ -31,12 +32,15 @@ public class CycleHandPairs : MonoBehaviour {
   // Use this for initialization
   void Start () {
     handPool = GetComponent<HandPool>();
+    disableAllGroups();
+    CurrentGroup = 0;
   }
   
   // Update is called once per frame
-  void LateUpdate () {
+  void FixedUpdate () {
+
     if (Input.GetKeyUp(KeyCode.RightArrow)) {
-      if (CurrentGroup < GroupNames.Length -1) {
+      if (CurrentGroup < GroupNames.Length - 1) {
         CurrentGroup++;
       }
     }
@@ -47,10 +51,12 @@ public class CycleHandPairs : MonoBehaviour {
     }
     for (int i = 0; i < keyCodes.Length; i++) {
       if (Input.GetKeyDown(keyCodes[i])) {
-        //handPool.ToggleGroup(GroupNames[i]);
+        handPool.ToggleGroup(GroupNames[i]);
       }
-
       // check for errors. 
+    }
+    if(Input.GetKeyUp(KeyCode.Alpha0)){
+      disableAllGroups();
     }
   }
 
@@ -59,9 +65,4 @@ public class CycleHandPairs : MonoBehaviour {
       handPool.DisableGroup(GroupNames[i]);
     }
   }
-  //show group name on change
-  //Disable all
-  //arrows disable all
-  //0 disables all
-  //number toggles group
 }
