@@ -14,6 +14,9 @@ namespace Leap.Unity {
 
     public Vector3 GrabCenter { get; private set; }
     public Quaternion GrabRotation { get; private set; }
+    public Vector3 GrabForward = Vector3.forward;
+    public Vector3 GrabNormal = Vector3.up;
+    public float GrabSize;
 
     protected int _lastUpdateFrame = -1;
 
@@ -133,7 +136,7 @@ namespace Leap.Unity {
     }
 
     protected virtual void ensureGrabInfoUpToDate() {
-      if (Time.frameCount == _lastUpdateFrame) {
+      if (Time.frameCount == _lastUpdateFrame || HandModel == null) {
         return;
       }
       _lastUpdateFrame = Time.frameCount;
@@ -153,15 +156,19 @@ namespace Leap.Unity {
 
       var fingers = hand.Fingers;
       GrabCenter = Vector3.zero;
+      GrabSize = 0;
       for (int i = 0; i < fingers.Count; i++) {
         Finger finger = fingers[i];
         GrabCenter += finger.TipPosition.ToVector3();
+        GrabSize += fingers[0].TipPosition.DistanceTo(finger.TipPosition);
       }
       GrabCenter /= 5.0f;
-      Vector3 wristToMiddle = hand.WristPosition.ToVector3() - fingers[2].TipPosition.ToVector3();
+      GrabSize /= 4;
+
+      GrabForward = hand.WristPosition.ToVector3() - fingers[2].TipPosition.ToVector3();
       Vector3 thumbToPinky = fingers[0].TipPosition.ToVector3() - fingers[4].TipPosition.ToVector3();
-      Vector3 graspNormal = Vector3.Cross(wristToMiddle, thumbToPinky).normalized;
-      GrabRotation = Quaternion.LookRotation(wristToMiddle, graspNormal);
+      GrabNormal = Vector3.Cross(GrabForward, thumbToPinky).normalized;
+      GrabRotation = Quaternion.LookRotation(GrabForward, GrabNormal);
 
       if (_isGrabbing) {
         if (grabAngle < DeactivateGrabAngle) {
@@ -199,26 +206,21 @@ namespace Leap.Unity {
     #if UNITY_EDITOR
     void OnDrawGizmos () {
       if (ShowGizmos) {
+        ensureGrabInfoUpToDate();
         Color centerColor;
-        Vector3 centerPosition;
-        Quaternion circleRotation;
+        Vector3 centerPosition = GrabCenter;
+        Quaternion circleRotation = GrabRotation;
         if (IsGrabbing) {
           centerColor = Color.green;
-          centerPosition = Position;
-          circleRotation = Rotation;
         } else {
-          Hand hand = HandModel.GetLeapHand();
-          Finger thumb = hand.Fingers[0];
-          Finger index = hand.Fingers[1];
           centerColor = Color.red;
-          centerPosition = ((thumb.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint + index.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint)/2).ToVector3();
-          circleRotation = hand.Basis.CalculateRotation();
         }
         Vector3 axis;
         float angle;
         circleRotation.ToAngleAxis(out angle, out axis);
-        Utils.DrawCircle(centerPosition, axis, ActivateGrabAngle / 2, centerColor);
-        Utils.DrawCircle(centerPosition, axis, DeactivateGrabAngle / 2, Color.blue);
+        Utils.DrawCircle(centerPosition, axis, GrabSize / 2, centerColor);
+        Debug.DrawLine(centerPosition, centerPosition + GrabForward * GrabSize / 2, Color.grey);
+        Debug.DrawLine(centerPosition, centerPosition + GrabNormal * GrabSize / 2, Color.grey);
       }
     }
     #endif
