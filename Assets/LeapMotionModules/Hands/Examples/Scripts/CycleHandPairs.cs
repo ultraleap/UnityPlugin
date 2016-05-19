@@ -10,7 +10,8 @@ public class CycleHandPairs : MonoBehaviour {
   public int CurrentGroup {
     get { return currentGroup; }
     set {
-      handPool.DisableGroup(GroupNames[CurrentGroup]);
+      disableAllGroups();
+      //handPool.DisableGroup(GroupNames[CurrentGroup]);
       currentGroup = value;
       handPool.EnableGroup(GroupNames[value]);
     }
@@ -33,7 +34,7 @@ public class CycleHandPairs : MonoBehaviour {
   }
   
   // Update is called once per frame
-  void Update () {
+  void LateUpdate () {
     if (Input.GetKeyUp(KeyCode.RightArrow)) {
       if (CurrentGroup < GroupNames.Length -1) {
         CurrentGroup++;
@@ -46,10 +47,16 @@ public class CycleHandPairs : MonoBehaviour {
     }
     for (int i = 0; i < keyCodes.Length; i++) {
       if (Input.GetKeyDown(keyCodes[i])) {
-        handPool.ToggleGroup(GroupNames[i]);
+        //handPool.ToggleGroup(GroupNames[i]);
       }
 
       // check for errors. 
+    }
+  }
+
+  private void disableAllGroups() {
+    for (int i = 0; i < GroupNames.Length; i++) {
+      handPool.DisableGroup(GroupNames[i]);
     }
   }
   //show group name on change
