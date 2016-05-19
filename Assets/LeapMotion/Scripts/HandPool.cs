@@ -26,9 +26,9 @@ namespace Leap.Unity {
 
     [System.Serializable]
     public class ModelGroup {
+      public string GroupName;
       [HideInInspector]
       public HandPool _handPool;
-      public string GroupName;
 
       public IHandModel LeftModel;
       [HideInInspector]
@@ -40,7 +40,7 @@ namespace Leap.Unity {
       public List<IHandModel> modelList;
       [HideInInspector]
       public List<IHandModel> modelsCheckedOut;
-      public bool IsEnabled;
+      public bool IsEnabled = true;
       public bool CanDuplicate;
 
       public IHandModel TryGetModel(Chirality chirality, ModelType modelType) {
