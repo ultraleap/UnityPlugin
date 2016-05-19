@@ -16,9 +16,9 @@ namespace Leap.Unity.InputModule {
     [Tooltip("The current Leap Data Provider for the scene.")]
     public LeapProvider LeapDataProvider;
     [Tooltip("An optional alternate detector for pinching on the left hand.")]
-    public Leap.Unity.PinchUtility.LeapPinchDetector LeftHandDetector;
+    public Leap.Unity.PinchDetector LeftHandDetector;
     [Tooltip("An optional alternate detector for pinching on the right hand.")]
-    public Leap.Unity.PinchUtility.LeapPinchDetector RightHandDetector;
+    public Leap.Unity.PinchDetector RightHandDetector;
     [Tooltip("How many hands and pointers the Input Module should allocate for.")]
     const int NumberOfHands = 2;
 
