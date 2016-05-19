@@ -140,9 +140,10 @@ namespace Leap.Unity {
       return handRep;
     }
     public void EnableGroup(string groupName) {
+      ModelGroup group = null;
       for (int i = 0; i < ModelPool.Count; i++) {
         if (ModelPool[i].GroupName == groupName) {
-          ModelGroup group = ModelPool[i];
+          group = ModelPool[i];
           for (int hp = 0; hp < activeHandReps.Count; hp++) {
             HandRepresentation handRep = activeHandReps[hp];
             IHandModel model = group.TryGetModel(handRep.RepChirality, handRep.RepType);
@@ -154,10 +155,13 @@ namespace Leap.Unity {
           group.IsEnabled = true;
         }
       }
+      if (group == null) {
+        Debug.LogWarning("A group matching that name does not exisit in the modelPool");
+      }
     }
     public void DisableGroup(string groupName) {
+      ModelGroup group = null;
       for (int i = 0; i < ModelPool.Count; i++) {
-        ModelGroup group = null;
         if (ModelPool[i].GroupName == groupName) {
           group = ModelPool[i];
           for (int m = 0; m < group.modelsCheckedOut.Count; m++) {
@@ -172,9 +176,26 @@ namespace Leap.Unity {
           Assert.AreEqual(0, group.modelsCheckedOut.Count, group.GroupName + "'s modelsCheckedOut List has not been cleared");
           group.IsEnabled = false;
         }
+
+      }
+      if (group == null) {
+        Debug.LogWarning("A group matching that name does not exisit in the modelPool");
       }
     }
-
+    public void ToggleGroup(string groupName) {
+      ModelGroup modelGroup =  ModelPool.Find(i => i.GroupName == groupName);
+      if (modelGroup != null) {
+        if (modelGroup.IsEnabled == true) {
+          DisableGroup(groupName);
+          modelGroup.IsEnabled = false;
+        }
+        else {
+          EnableGroup(groupName);
+          modelGroup.IsEnabled = true;
+        }
+      }
+      else Debug.LogWarning("A group matching that name does not exisit in the modelPool");
+    }
 
 #if UNITY_EDITOR
     /**In the Unity Editor, Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project. */
