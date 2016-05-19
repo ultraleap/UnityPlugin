@@ -24,6 +24,13 @@ namespace Leap.Unity {
     private Dictionary<IHandModel, ModelGroup> modelGroupMapping = new Dictionary<IHandModel, ModelGroup>();
     private Dictionary<IHandModel, HandRepresentation> modelToHandRepMapping = new Dictionary<IHandModel, HandRepresentation>();
 
+    /**
+     * ModelGroup contains a left/right pair of IHandModel's 
+     * @param modelList The IHandModels available for use by HandRepresentations
+     * @param modelsCheckedOut The IHandModels currently in use by active HandRepresentations
+     * @param IsEnabled determines whether the ModelGroup is active at app Start(), though ModelGroup's are controlled with the EnableGroup() & DisableGroup methods.
+     * @param CanDuplicate Allows a IHandModels in the ModelGroup to be cloned at runtime if a suitable IHandModel isn't available.
+     */
     [System.Serializable]
     public class ModelGroup {
       public string GroupName;
@@ -42,7 +49,8 @@ namespace Leap.Unity {
       public List<IHandModel> modelsCheckedOut;
       public bool IsEnabled = true;
       public bool CanDuplicate;
-
+      /*Looks for suitable IHandModel is the ModelGroup's modelList, if found, it is added to modelsCheckedOut.
+       * If not, one can be cloned*/
       public IHandModel TryGetModel(Chirality chirality, ModelType modelType) {
         for (int i = 0; i < modelList.Count; i++) {
           if (modelList[i].HandModelType == modelType
@@ -139,6 +147,10 @@ namespace Leap.Unity {
       activeHandReps.Add(handRep);
       return handRep;
     }
+    /**
+    * EnableGroup finds suitable HandRepresentations and adds IHandModels from the ModelGroup, returns them to their ModelGroup and sets the groups IsEnabled to true.
+     * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
+    */
     public void EnableGroup(string groupName) {
       for (int i = 0; i < ModelPool.Count; i++) {
         if (ModelPool[i].GroupName == groupName) {
@@ -155,6 +167,10 @@ namespace Leap.Unity {
         }
       }
     }
+    /**
+     * DisableGroup finds and removes the ModelGroup's IHandModels from their HandRepresentations, returns them to their ModelGroup and sets the groups IsEnabled to false.
+     * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
+     */
     public void DisableGroup(string groupName) {
       for (int i = 0; i < ModelPool.Count; i++) {
         ModelGroup group = null;
