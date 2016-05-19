@@ -3,16 +3,17 @@
 namespace Leap.Unity {
 
   public class GrabDetector : Detector {
-    protected const float MM_TO_M = 0.001f;
 
-    [SerializeField]
-    protected IHandModel _handModel;
+    public IHandModel HandModel;
+    [Range(0, 180)]
+    public float ActivateGrabAngle = 110f; //degrees
+    [Range(0, 180)]
+    public float DeactivateGrabAngle = 90f; //degrees
+    public float CurrentAngle;
+    public float CurrentStrength;
 
-    [SerializeField]
-    protected float _activateGrabAngle = 0.03f;
-
-    [SerializeField]
-    protected float _deactivateGrabAngle = 0.04f;
+    public Vector3 GrabCenter { get; private set; }
+    public Quaternion GrabRotation { get; private set; }
 
     protected int _lastUpdateFrame = -1;
 
@@ -26,26 +27,18 @@ namespace Leap.Unity {
     protected Quaternion _grabRotation;
 
     protected virtual void OnValidate() {
-      if (_handModel == null) {
-        _handModel = GetComponentInParent<IHandModel>();
-      }
+      ActivateGrabAngle = Mathf.Max(0, ActivateGrabAngle);
+      DeactivateGrabAngle = Mathf.Max(0, DeactivateGrabAngle);
 
-      _activateGrabAngle = Mathf.Max(0, _activateGrabAngle);
-      _deactivateGrabAngle = Mathf.Max(0, _deactivateGrabAngle);
-
-      //Activate distance cannot be greater than deactivate distance
-      if (_activateGrabAngle > _deactivateGrabAngle) {
-        _deactivateGrabAngle = _activateGrabAngle;
+      //Activate angle cannot be less than deactivate angle
+      if (DeactivateGrabAngle > ActivateGrabAngle) {
+        DeactivateGrabAngle = ActivateGrabAngle;
       }
     }
 
     protected virtual void Awake() {
-      if (GetComponent<IHandModel>() != null) {
-        Debug.LogWarning("LeapGrabDetector should not be attached to the IHandModel's transform. It should be attached to its own transform.");
-      }
-      if (_handModel == null) {
-        Debug.LogWarning("The HandModel field of LeapGrabDetector was unassigned and the detector has been disabled.");
-        enabled = false;
+      if (HandModel == null) {
+        HandModel = gameObject.GetComponentInParent<IHandModel>();
       }
     }
 
@@ -147,41 +140,43 @@ namespace Leap.Unity {
 
       _didChange = false;
 
-      Hand hand = _handModel.GetLeapHand();
+      Hand hand = HandModel.GetLeapHand();
 
-      if (hand == null || !_handModel.IsTracked) {
+      if (hand == null || !HandModel.IsTracked) {
         changeGrabState(false);
         return;
       }
 
-      float grabAngle = hand.GrabAngle;
-      transform.rotation = hand.Basis.CalculateRotation();
+      float grabAngle = hand.GrabAngle * Constants.RAD_TO_DEG;
+            CurrentAngle = grabAngle;
+            CurrentStrength = hand.GrabStrength;
 
       var fingers = hand.Fingers;
-      transform.position = Vector3.zero;
+      GrabCenter = Vector3.zero;
       for (int i = 0; i < fingers.Count; i++) {
         Finger finger = fingers[i];
-        if (finger.Type == Finger.FingerType.TYPE_INDEX ||
-            finger.Type == Finger.FingerType.TYPE_THUMB) {
-          transform.position += finger.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToVector3();
-        }
+        GrabCenter += finger.TipPosition.ToVector3();
       }
-      transform.position /= 2.0f;
+      GrabCenter /= 5.0f;
+      Vector3 wristToMiddle = hand.WristPosition.ToVector3() - fingers[2].TipPosition.ToVector3();
+      Vector3 thumbToPinky = fingers[0].TipPosition.ToVector3() - fingers[4].TipPosition.ToVector3();
+      Vector3 graspNormal = Vector3.Cross(wristToMiddle, thumbToPinky).normalized;
+      GrabRotation = Quaternion.LookRotation(wristToMiddle, graspNormal);
 
       if (_isGrabbing) {
-        if (grabAngle > _deactivateGrabAngle) {
+        if (grabAngle < DeactivateGrabAngle) {
           changeGrabState(false);
           return;
         }
       } else {
-        if (grabAngle < _activateGrabAngle) {
+        if (grabAngle > ActivateGrabAngle) {
           changeGrabState(true);
         }
       }
 
       if (_isGrabbing) {
-        _grabPos = transform.position;
-        _grabRotation = transform.rotation;
+        _grabPos = GrabCenter;
+        _grabRotation = GrabRotation;
       }
     }
 
@@ -212,7 +207,7 @@ namespace Leap.Unity {
           centerPosition = Position;
           circleRotation = Rotation;
         } else {
-          Hand hand = _handModel.GetLeapHand();
+          Hand hand = HandModel.GetLeapHand();
           Finger thumb = hand.Fingers[0];
           Finger index = hand.Fingers[1];
           centerColor = Color.red;
@@ -222,8 +217,8 @@ namespace Leap.Unity {
         Vector3 axis;
         float angle;
         circleRotation.ToAngleAxis(out angle, out axis);
-        Utils.DrawCircle(centerPosition, axis, _activateGrabAngle / 2, centerColor);
-        Utils.DrawCircle(centerPosition, axis, _deactivateGrabAngle / 2, Color.blue);
+        Utils.DrawCircle(centerPosition, axis, ActivateGrabAngle / 2, centerColor);
+        Utils.DrawCircle(centerPosition, axis, DeactivateGrabAngle / 2, Color.blue);
       }
     }
     #endif
