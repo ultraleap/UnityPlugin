@@ -439,7 +439,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6124de87eead3d43a9f23cd33163506, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  source: {fileID: 0}
+  source: {fileID: 1617220043}
 --- !u!114 &4551098
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1535,8 +1535,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca9148427e7d7584481a72d5ded7f132, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  source: {fileID: 0}
-  content: {fileID: 0}
+  source: {fileID: 128445454}
+  content: {fileID: 1135838176}
   Volume: 1
 --- !u!114 &59641601
 MonoBehaviour:
@@ -5194,6 +5194,10 @@ Prefab:
       propertyPath: RightHandDetector
       value: 
       objectReference: {fileID: 1188448100}
+    - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 2}
+      propertyPath: PointerMaterial
+      value: 
+      objectReference: {fileID: 10754, guid: 0000000000000000e000000000000000, type: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 2}
   m_IsPrefabParent: 0
@@ -7374,10 +7378,10 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 420189611}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.9943705, y: -0.0739949, z: -0.009242237, w: -0.07527788}
+  m_LocalPosition: {x: 0.026117418, y: 0.14833024, z: 0.059976745}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 8.5308, y: 178.2894, z: 171.3609}
   m_Children: []
   m_Father: {fileID: 795012431}
   m_RootOrder: 0
@@ -7389,9 +7393,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 420189611}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95ff52b4a0dd041479b65a44882d9e6f, type: 3}
+  m_Script: {fileID: 11500000, guid: e309ac4138f124f9f8ad312a14a8e9ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowGizmos: 1
+  OnActivate:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  _handModel: {fileID: 1000655849}
+  _activatePinchDist: 0.03
+  _deactivatePinchDist: 0.04
 --- !u!4 &422496982 stripped
 Transform:
   m_PrefabParentObject: {fileID: 464466, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
@@ -8786,14 +8804,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e21f7214440054f59a5d2da168b3e2dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  provider: {fileID: 0}
+  provider: {fileID: 1587970163}
   _headTransform: {fileID: 2098797247}
   _trackingAnchor: {fileID: 193323430}
   recenter: 114
   tweenImageWarping: 0
-  tweenRotationalWarping: 0
-  tweenPositionalWarping: 0
-  syncMode: 0
+  tweenRotationalWarping: 1
+  tweenPositionalWarping: 1
+  syncMode: 1
   allowManualTimeAlignment: 0
   warpingAdjustment: 60
   unlockHold: 303
@@ -8988,7 +9006,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6124de87eead3d43a9f23cd33163506, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  source: {fileID: 0}
+  source: {fileID: 1509676417}
 --- !u!114 &561927602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11436,8 +11454,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c18c90a2199d9c742ae0f95fbd2fa06c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Slider: {fileID: 0}
-  Handle: {fileID: 0}
+  Slider: {fileID: 1467901836}
+  Handle: {fileID: 1543573187}
 --- !u!114 &687445872
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15740,6 +15758,12 @@ CanvasRenderer:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 989531277}
+--- !u!114 &1000655849 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78,
+    type: 2}
+  m_PrefabInternal: {fileID: 98503025}
+  m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
 --- !u!1 &1007161105
 GameObject:
   m_ObjectHideFlags: 0
@@ -18873,10 +18897,10 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1188448098}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.99437046, y: 0.07399498, z: 0.009242243, w: -0.07527788}
+  m_LocalPosition: {x: -0.02611741, y: 0.14833024, z: 0.059976734}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 8.5308, y: -178.2894, z: -171.3609}
   m_Children: []
   m_Father: {fileID: 422496982}
   m_RootOrder: 0
@@ -18888,9 +18912,23 @@ MonoBehaviour:
   m_GameObject: {fileID: 1188448098}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95ff52b4a0dd041479b65a44882d9e6f, type: 3}
+  m_Script: {fileID: 11500000, guid: e309ac4138f124f9f8ad312a14a8e9ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowGizmos: 1
+  OnActivate:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnDeactivate:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  _handModel: {fileID: 1724301390}
+  _activatePinchDist: 0.03
+  _deactivatePinchDist: 0.04
 --- !u!1 &1192978081
 GameObject:
   m_ObjectHideFlags: 0
@@ -20943,8 +20981,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c18c90a2199d9c742ae0f95fbd2fa06c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Slider: {fileID: 0}
-  Handle: {fileID: 0}
+  Slider: {fileID: 520782338}
+  Handle: {fileID: 1617220042}
 --- !u!114 &1359495891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21322,7 +21360,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ModelPool: []
+  ModelPool:
+  - _handPool: {fileID: 0}
+    GroupName: CapsuleHands
+    LeftModel: {fileID: 1000655849}
+    IsLeftToBeSpawned: 0
+    RightModel: {fileID: 1724301390}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 0
 --- !u!114 &1419902426
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24629,7 +24677,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.86666673, g: 0.86666673, b: 0.86666673, a: 1}
   m_RaycastTarget: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -24663,11 +24711,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 025cc0fa7b46aa541aba29d28d35ac09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isHeadMounted: 0
-  _temporalWarping: {fileID: 0}
-  _overrideDeviceType: 0
+  _isHeadMounted: 1
+  _temporalWarping: {fileID: 531819953}
+  _overrideDeviceType: 1
   _overrideDeviceTypeWith: 1
-  _useInterpolation: 0
+  _useInterpolation: 1
   _interpolationDelay: 15
 --- !u!4 &1587970164
 Transform:
@@ -25477,8 +25525,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca9148427e7d7584481a72d5ded7f132, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  source: {fileID: 0}
-  content: {fileID: 0}
+  source: {fileID: 19086904}
+  content: {fileID: 1744694353}
   Volume: 1
 --- !u!1 &1671801159
 GameObject:
@@ -25530,6 +25578,7 @@ GameObject:
   - 114: {fileID: 1672305357}
   - 82: {fileID: 1672305356}
   - 114: {fileID: 1672305355}
+  - 114: {fileID: 1672305360}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -25725,7 +25774,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: c30b6490f98cb3240a6c34e69e75a5d5, type: 3}
+  m_Sprite: {fileID: 21300000, guid: eccec04b76ecffb408e4145c9c3777bd, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -25740,6 +25789,47 @@ CanvasRenderer:
     type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1672305354}
+--- !u!114 &1672305360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1672305354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1392445389, guid: f5f67c52d1564df4a8936ccd202a3bd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 0.86666673, g: 0.86666673, b: 0.86666673, a: 1}
+    m_HighlightedColor: {r: 0.86666673, g: 0.86666673, b: 0.86666673, a: 1}
+    m_PressedColor: {r: 0.6784314, g: 0.6784314, b: 0.6784314, a: 1}
+    m_DisabledColor: {r: 0.86666673, g: 0.86666673, b: 0.86666673, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.05
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1117774659}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!1 &1675685458
 GameObject:
   m_ObjectHideFlags: 0
@@ -26766,7 +26856,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6124de87eead3d43a9f23cd33163506, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  source: {fileID: 0}
+  source: {fileID: 1278954966}
 --- !u!114 &1707800784
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27082,7 +27172,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6124de87eead3d43a9f23cd33163506, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  source: {fileID: 0}
+  source: {fileID: 1543573188}
 --- !u!114 &1708598252
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27363,6 +27453,12 @@ MonoBehaviour:
         m_CallState: 2
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!114 &1724301390 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3,
+    type: 2}
+  m_PrefabInternal: {fileID: 1041615673}
+  m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
 --- !u!1 &1729989368
 GameObject:
   m_ObjectHideFlags: 0
@@ -29778,8 +29874,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c18c90a2199d9c742ae0f95fbd2fa06c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Slider: {fileID: 0}
-  Handle: {fileID: 0}
+  Slider: {fileID: 284631523}
+  Handle: {fileID: 1278954965}
 --- !u!114 &1869115318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31854,8 +31950,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c18c90a2199d9c742ae0f95fbd2fa06c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Slider: {fileID: 0}
-  Handle: {fileID: 0}
+  Slider: {fileID: 570450646}
+  Handle: {fileID: 1509676416}
 --- !u!114 &2070133333
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32205,7 +32301,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _eyeType:
     _orderType: 3
-  _overrideEyePosition: 1
+  _overrideEyePosition: 0
 --- !u!114 &2098797252
 MonoBehaviour:
   m_ObjectHideFlags: 0
