@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Leap.Unity.Interaction.CApi;
 using LeapInternal;
 
