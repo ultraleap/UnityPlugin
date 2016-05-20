@@ -27,8 +27,7 @@ namespace Leap.Unity{
         if (bones[i] != null) {
           // Set bone dimensions.
           CapsuleCollider capsule = bones[i].GetComponent<CapsuleCollider>();
-          if (capsule != null)
-          {
+          if (capsule != null) {
             // Initialization
             capsule.direction = 2;
             bones[i].localScale = new Vector3(1f/transform.lossyScale.x, 1f/transform.lossyScale.y, 1f/transform.lossyScale.z);
