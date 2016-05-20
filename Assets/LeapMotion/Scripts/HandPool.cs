@@ -24,6 +24,13 @@ namespace Leap.Unity {
     private Dictionary<IHandModel, ModelGroup> modelGroupMapping = new Dictionary<IHandModel, ModelGroup>();
     private Dictionary<IHandModel, HandRepresentation> modelToHandRepMapping = new Dictionary<IHandModel, HandRepresentation>();
 
+    /**
+     * ModelGroup contains a left/right pair of IHandModel's 
+     * @param modelList The IHandModels available for use by HandRepresentations
+     * @param modelsCheckedOut The IHandModels currently in use by active HandRepresentations
+     * @param IsEnabled determines whether the ModelGroup is active at app Start(), though ModelGroup's are controlled with the EnableGroup() & DisableGroup methods.
+     * @param CanDuplicate Allows a IHandModels in the ModelGroup to be cloned at runtime if a suitable IHandModel isn't available.
+     */
     [System.Serializable]
     public class ModelGroup {
       public string GroupName;
@@ -42,7 +49,8 @@ namespace Leap.Unity {
       public List<IHandModel> modelsCheckedOut;
       public bool IsEnabled = true;
       public bool CanDuplicate;
-
+      /*Looks for suitable IHandModel is the ModelGroup's modelList, if found, it is added to modelsCheckedOut.
+       * If not, one can be cloned*/
       public IHandModel TryGetModel(Chirality chirality, ModelType modelType) {
         for (int i = 0; i < modelList.Count; i++) {
           if (modelList[i].HandModelType == modelType
@@ -139,10 +147,15 @@ namespace Leap.Unity {
       activeHandReps.Add(handRep);
       return handRep;
     }
+    /**
+    * EnableGroup finds suitable HandRepresentations and adds IHandModels from the ModelGroup, returns them to their ModelGroup and sets the groups IsEnabled to true.
+     * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
+    */
     public void EnableGroup(string groupName) {
+      ModelGroup group = null;
       for (int i = 0; i < ModelPool.Count; i++) {
         if (ModelPool[i].GroupName == groupName) {
-          ModelGroup group = ModelPool[i];
+          group = ModelPool[i];
           for (int hp = 0; hp < activeHandReps.Count; hp++) {
             HandRepresentation handRep = activeHandReps[hp];
             IHandModel model = group.TryGetModel(handRep.RepChirality, handRep.RepType);
@@ -154,10 +167,17 @@ namespace Leap.Unity {
           group.IsEnabled = true;
         }
       }
+      if (group == null) {
+        Debug.LogWarning("A group matching that name does not exisit in the modelPool");
+      }
     }
+    /**
+     * DisableGroup finds and removes the ModelGroup's IHandModels from their HandRepresentations, returns them to their ModelGroup and sets the groups IsEnabled to false.
+     * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
+     */
     public void DisableGroup(string groupName) {
+      ModelGroup group = null;
       for (int i = 0; i < ModelPool.Count; i++) {
-        ModelGroup group = null;
         if (ModelPool[i].GroupName == groupName) {
           group = ModelPool[i];
           for (int m = 0; m < group.modelsCheckedOut.Count; m++) {
@@ -173,8 +193,24 @@ namespace Leap.Unity {
           group.IsEnabled = false;
         }
       }
+      if (group == null) {
+        Debug.LogWarning("A group matching that name does not exisit in the modelPool");
+      }
     }
-
+    public void ToggleGroup(string groupName) {
+      ModelGroup modelGroup = ModelPool.Find(i => i.GroupName == groupName);
+      if (modelGroup != null) {
+        if (modelGroup.IsEnabled == true) {
+          DisableGroup(groupName);
+          modelGroup.IsEnabled = false;
+        }
+        else {
+          EnableGroup(groupName);
+          modelGroup.IsEnabled = true;
+        }
+      }
+      else Debug.LogWarning("A group matching that name does not exisit in the modelPool");
+    }
 
 #if UNITY_EDITOR
     /**In the Unity Editor, Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project. */
