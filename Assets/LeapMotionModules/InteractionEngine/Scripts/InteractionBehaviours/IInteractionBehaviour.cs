@@ -4,6 +4,11 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
+  /// <summary>
+  /// IInteractionBehaviour is the interface used by InteractionManager to drive interaction objects.
+  /// All interaction objects must extend from this base interface class.  This class is an abstract
+  /// extended MonoBehaviour instead of an interface.
+  /// </summary>
   public abstract class IInteractionBehaviour : MonoBehaviour {
     /// <summary>
     /// Gets or sets the manager this object belongs to.
@@ -122,13 +127,13 @@ namespace Leap.Unity.Interaction {
     /// Called by InteractionManager every frame that a Hand continues to grasp this object.  This callback
     /// is invoked both in FixedUpdate.
     /// </summary>
-    public abstract void NotifyHandsHoldPhysics(List<Hand> hands);
+    public abstract void NotifyHandsHoldPhysics(ReadonlyList<Hand> hands);
 
     /// <summary>
     /// Called by InteractionManager every frame that a Hand continues to grasp this object.  This callback
     /// is invoked both in LateUpdate.
     /// </summary>
-    public abstract void NotifyHandsHoldGraphics(List<Hand> hands);
+    public abstract void NotifyHandsHoldGraphics(ReadonlyList<Hand> hands);
 
     /// <summary>
     /// Called by InteractionManager when a Hand stops grasping this object.
@@ -140,7 +145,7 @@ namespace Leap.Unity.Interaction {
     /// is not yet considered ungrasped, and OnHandRegainedTracking might be called in the future
     /// if the Hand becomes tracked again.
     /// </summary>
-    public abstract void NotifyHandLostTracking(Hand oldHand, out bool allowSuspension);
+    public abstract void NotifyHandLostTracking(Hand oldHand, out float maxSuspensionTime);
 
     /// <summary>
     /// Called by InteractionManager when a grasping Hand that had previously been untracked has

@@ -39,6 +39,19 @@ namespace Leap.Unity.Interaction {
         EditorGUILayout.HelpBox("Interaction Behaviour cannot be a child sibling or parent of another Interaction Behaviour.", MessageType.Error);
       }
 
+      var colliders = rigidbody.GetComponentsInChildren<Collider>();
+      bool isAnyColliderBad = false;
+      for (int i = 0; i < colliders.Length; i++) {
+        if (colliders[i].sharedMaterial != null && colliders[i].sharedMaterial.bounciness != 0.0f) {
+          isAnyColliderBad = true;
+          break;
+        }
+      }
+
+      if (isAnyColliderBad) {
+        EditorGUILayout.HelpBox("All physics materials should have a bounciness of 0.", MessageType.Error);
+      }
+
       if (rigidbody == null) {
         using (new GUILayout.HorizontalScope()) {
           EditorGUILayout.HelpBox("This component requires a Rigidbody", MessageType.Error);

@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Leap.Unity.Interaction.CApi;
 using LeapInternal;
 
@@ -149,7 +148,6 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Adds an angular acceleration to the center of mass of this object.  Use this instead of Rigidbody.AddTorque()
     /// </summary>
-    /// <param name="acceleration"></param>
     public void AddAngularAcceleration(Vector3 acceleration) {
       _accumulatedAngularAcceleration += acceleration;
     }
@@ -360,7 +358,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected override void OnHandsHoldPhysics(List<Hand> hands) {
+    protected override void OnHandsHoldPhysics(ReadonlyList<Hand> hands) {
       base.OnHandsHoldPhysics(hands);
 
       float distanceToSolved = Vector3.Distance(_rigidbody.position, _solvedPosition);
@@ -420,7 +418,7 @@ namespace Leap.Unity.Interaction {
       _notifiedOfTeleport = false;
     }
 
-    protected override void OnHandsHoldGraphics(List<Hand> hands) {
+    protected override void OnHandsHoldGraphics(ReadonlyList<Hand> hands) {
       base.OnHandsHoldGraphics(hands);
 
       if (_graphicalAnchor != null && _material.WarpingEnabled) {
@@ -448,10 +446,10 @@ namespace Leap.Unity.Interaction {
       removeHandPointCollection(hand.Id);
     }
 
-    protected override void OnHandLostTracking(Hand oldHand, out bool allowSuspension) {
-      base.OnHandLostTracking(oldHand, out allowSuspension);
+    protected override void OnHandLostTracking(Hand oldHand, out float maxSuspensionTime) {
+      base.OnHandLostTracking(oldHand, out maxSuspensionTime);
 
-      allowSuspension = _material.SuspensionEnabled;
+      maxSuspensionTime = _material.SuspensionEnabled ? _material.MaxSuspensionTime : 0;
 
       updateState();
     }
@@ -639,7 +637,7 @@ namespace Leap.Unity.Interaction {
       //Renderers are visible if there are no grasping hands
       //or if there is at least one tracked grasping hand
       int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;
-      bool shouldBeVisible = GraspingHandCount == 0 || trackedGraspingHandCount > 0;
+      bool shouldBeVisible = GraspingHandCount == 0 || trackedGraspingHandCount > 0 || !_material.HideObjectOnSuspend;
 
       if (_graphicalAnchor != null) {
         _graphicalAnchor.gameObject.SetActive(shouldBeVisible);
@@ -681,7 +679,7 @@ namespace Leap.Unity.Interaction {
       HandPointCollection.Return(collection);
     }
 
-    protected void getSolvedTransform(List<Hand> hands, out Vector3 newPosition, out Quaternion newRotation) {
+    protected void getSolvedTransform(ReadonlyList<Hand> hands, out Vector3 newPosition, out Quaternion newRotation) {
       KabschC.Reset(ref _kabsch);
 
       for (int h = 0; h < hands.Count; h++) {

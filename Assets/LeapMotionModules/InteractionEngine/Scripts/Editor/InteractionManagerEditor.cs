@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Linq;
-using System.Collections.Generic;
 using UnityEditor;
 
 namespace Leap.Unity.Interaction {
@@ -14,6 +12,13 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnEnable() {
       base.OnEnable();
+
+      specifyCustomDrawer("_dataSubfolder", disableWhenRunning);
+      specifyCustomDrawer("_contactEnabled", disableWhenRunning);
+      specifyCustomDrawer("_graspingEnabled", disableWhenRunning);
+      specifyCustomDrawer("_depthUntilSphericalInside", disableWhenRunning);
+      specifyCustomDrawer("_autoGenerateLayers", disableWhenRunning);
+      specifyCustomDrawer("_templateLayer", disableWhenRunning);
 
       specifyCustomDecorator("_leapProvider", providerDectorator);
 
@@ -36,9 +41,15 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    private void disableWhenRunning(SerializedProperty property) {
+      EditorGUI.BeginDisabledGroup(EditorApplication.isPlaying);
+      EditorGUILayout.PropertyField(property);
+      EditorGUI.EndDisabledGroup();
+    }
+
     private void collisionLayerHelper(SerializedProperty prop) {
       InteractionManager manager = target as InteractionManager;
-      
+
       if (manager.InteractionBrushLayer == manager.InteractionLayer) {
         EditorGUILayout.HelpBox("Brush Layer cannot be the same as Interaction Layer", MessageType.Error);
         return;
@@ -101,8 +112,8 @@ namespace Leap.Unity.Interaction {
 
         EditorGUILayout.LabelField("Info", EditorStyles.boldLabel);
         using (new EditorGUI.DisabledGroupScope(true)) {
-          EditorGUILayout.IntField("Registered Count", manager.RegisteredObjects.Count());
-          EditorGUILayout.IntField("Grasped Count", manager.GraspedObjects.Count());
+          EditorGUILayout.IntField("Registered Count", manager.RegisteredObjects.Count);
+          EditorGUILayout.IntField("Grasped Count", manager.GraspedObjects.Count);
         }
       }
     }
