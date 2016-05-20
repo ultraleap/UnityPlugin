@@ -208,20 +208,22 @@ namespace Leap.Unity {
     #if UNITY_EDITOR
     void OnDrawGizmos () {
       if (ShowGizmos) {
-        Color centerColor;
-        Vector3 centerPosition;
-        Quaternion circleRotation;
+        Color centerColor = Color.clear;
+        Vector3 centerPosition = Vector3.zero;
+        Quaternion circleRotation = Quaternion.identity;
         if (IsPinching) {
           centerColor = Color.green;
           centerPosition = Position;
           circleRotation = Rotation;
         } else {
           Hand hand = _handModel.GetLeapHand();
-          Finger thumb = hand.Fingers[0];
-          Finger index = hand.Fingers[1];
-          centerColor = Color.red;
-          centerPosition = ((thumb.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint + index.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint)/2).ToVector3();
-          circleRotation = hand.Basis.CalculateRotation();
+          if (hand != null) {
+            Finger thumb = hand.Fingers[0];
+            Finger index = hand.Fingers[1];
+            centerColor = Color.red;
+            centerPosition = ((thumb.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint + index.Bone(Bone.BoneType.TYPE_DISTAL).NextJoint) / 2).ToVector3();
+            circleRotation = hand.Basis.CalculateRotation();
+          }
         }
         Vector3 axis;
         float angle;
