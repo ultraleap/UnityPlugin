@@ -165,7 +165,7 @@ namespace Leap.Unity {
       GrabCenter /= 5.0f;
       GrabSize /= 4;
 
-      GrabForward = hand.WristPosition.ToVector3() - fingers[2].TipPosition.ToVector3();
+      GrabForward = (hand.WristPosition.ToVector3() - fingers[2].TipPosition.ToVector3()).normalized;
       Vector3 thumbToPinky = fingers[0].TipPosition.ToVector3() - fingers[4].TipPosition.ToVector3();
       GrabNormal = Vector3.Cross(GrabForward, thumbToPinky).normalized;
       GrabRotation = Quaternion.LookRotation(GrabForward, GrabNormal);
@@ -218,9 +218,9 @@ namespace Leap.Unity {
         Vector3 axis;
         float angle;
         circleRotation.ToAngleAxis(out angle, out axis);
-        Utils.DrawCircle(centerPosition, axis, GrabSize / 2, centerColor);
+        Utils.DrawCircle(centerPosition, GrabNormal, GrabSize / 2, centerColor);
         Debug.DrawLine(centerPosition, centerPosition + GrabForward * GrabSize / 2, Color.grey);
-        Debug.DrawLine(centerPosition, centerPosition + GrabNormal * GrabSize / 2, Color.grey);
+        Debug.DrawLine(centerPosition, centerPosition + GrabNormal * GrabSize / 2, Color.white);
       }
     }
     #endif
