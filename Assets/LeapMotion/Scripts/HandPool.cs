@@ -211,14 +211,7 @@ namespace Leap.Unity {
       }
       else Debug.LogWarning("A group matching that name does not exisit in the modelPool");
     }
-    //void Update() {
-    //  if (Input.GetKeyUp(KeyCode.U)) {
-    //    DisableGroup("LoPoly_Rigged");
-    //  }
-    //  if (Input.GetKeyUp(KeyCode.I)) {
-    //    EnableGroup("LoPoly_Rigged");
-    //  }
-    //}
+
 #if UNITY_EDITOR
     /**In the Unity Editor, Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project. */
     void OnValidate() {
