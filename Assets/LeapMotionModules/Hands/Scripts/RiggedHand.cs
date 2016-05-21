@@ -19,6 +19,7 @@ namespace Leap.Unity {
     public override bool SupportsEditorPersistence() {
       return true;
     }
+    public bool DriveFromPalm;
     public Vector3 modelFingerPointing = new Vector3(0, 0, 0);//Vector3.forward;
     public Vector3 modelPalmFacing = new Vector3(0, 0, 0);// -Vector3.up;
 
@@ -36,6 +37,9 @@ namespace Leap.Unity {
         palm.position = GetWristPosition();
         if (wristJoint) {
           wristJoint.position = GetWristPosition();
+        }
+        else if (DriveFromPalm) {
+          palm.position = GetPalmPosition();
         }
         else palm.position = GetWristPosition();
         palm.rotation = GetPalmRotation() * Reorientation();
