@@ -37,21 +37,24 @@ public class CycleHandPairs : MonoBehaviour {
   }
   
   // Update is called once per frame
-  void FixedUpdate () {
+  void Update () {
 
     if (Input.GetKeyUp(KeyCode.RightArrow)) {
       if (CurrentGroup < GroupNames.Length - 1) {
-        CurrentGroup++;
+        //CurrentGroup++;
+        StartCoroutine(WaitToPlus());
       }
     }
     if (Input.GetKeyUp(KeyCode.LeftArrow)) {
       if (CurrentGroup > 0) {
-        CurrentGroup--;
+        //CurrentGroup--;
+        StartCoroutine(WaitToMinus());
       }
     }
     for (int i = 0; i < keyCodes.Length; i++) {
       if (Input.GetKeyDown(keyCodes[i])) {
-        handPool.ToggleGroup(GroupNames[i]);
+        //handPool.ToggleGroup(GroupNames[i]);
+        StartCoroutine(waitToSwitch(i));
       }
       // check for errors. 
     }
@@ -59,10 +62,23 @@ public class CycleHandPairs : MonoBehaviour {
       disableAllGroups();
     }
   }
+  private IEnumerator WaitToPlus () {
+    yield return new WaitForEndOfFrame();
+    CurrentGroup++;
+  }
+  private IEnumerator WaitToMinus() {
+    yield return new WaitForEndOfFrame();
+    CurrentGroup--;
+  }
+  private IEnumerator waitToSwitch(int group) {
+    yield return new WaitForEndOfFrame();
+    handPool.ToggleGroup(GroupNames[group]);
+  }
 
   private void disableAllGroups() {
     for (int i = 0; i < GroupNames.Length; i++) {
       handPool.DisableGroup(GroupNames[i]);
     }
   }
+
 }
