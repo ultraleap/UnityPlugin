@@ -80,8 +80,8 @@ MonoBehaviour:
   HoveringColor: {r: 0, g: 1, b: 1, a: 1}
   TriggeringColor: {r: 0.6397059, g: 0.6397059, b: 0.6397059, a: 1}
   TriggerMissedColor: {r: 0.8897059, g: 0.8897059, b: 0.8897059, a: 1}
-  ShowAdvancedOptions: 1
-  InteractionMode: 1
+  ShowAdvancedOptions: 0
+  InteractionMode: 0
   ProjectiveToTactileTransitionDistance: 0.4
   TactilePadding: 0.005
   PinchingThreshold: 20
@@ -118,6 +118,7 @@ MonoBehaviour:
   OverrideScrollViewClicks: 0
   DrawDebug: 0
   RetractUI: 0
+  perFingerPointer: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

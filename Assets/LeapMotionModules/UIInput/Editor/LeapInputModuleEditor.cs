@@ -41,12 +41,14 @@ namespace Leap.Unity.InputModule {
                          "RetractUI",
                          "TactilePadding",
                          "EnvironmentPointer",
+                         "perFingerPointer",
                          "ShowExperimentalOptions");
 
       specifyConditionalDrawing(() => module.ShowExperimentalOptions,
                    "OverrideScrollViewClicks",
                    "DrawDebug",
                    "TriggerHoverOnElementSwitch",
+                   "perFingerPointer",
                    "RetractUI");
     }
 

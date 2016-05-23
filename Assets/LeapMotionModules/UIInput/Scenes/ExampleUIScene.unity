@@ -20,9 +20,9 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 1.0495679, g: 1.0588975, b: 1.086886, a: 1.5608958}
-  m_AmbientEquatorColor: {r: 0.17794213, g: 0.19511198, b: 0.20759913, a: 1.5608958}
-  m_AmbientGroundColor: {r: 0.073362105, g: 0.067118526, b: 0.054631352, a: 1.5608958}
+  m_AmbientSkyColor: {r: 1.2174988, g: 1.2283211, b: 1.2607877, a: 1.810639}
+  m_AmbientEquatorColor: {r: 0.20641287, g: 0.22632988, b: 0.24081498, a: 1.810639}
+  m_AmbientGroundColor: {r: 0.08510004, g: 0.07785749, b: 0.063372366, a: 1.810639}
   m_AmbientIntensity: 1.16
   m_AmbientMode: 3
   m_SkyboxMaterial: {fileID: 0}
@@ -42,7 +42,7 @@ LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 6
   m_GIWorkflowMode: 1
-  m_LightmapsMode: 0
+  m_LightmapsMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -7505,10 +7505,6 @@ Prefab:
       propertyPath: RightHandDetector
       value: 
       objectReference: {fileID: 1188448100}
-    - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 2}
-      propertyPath: InteractionMode
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 2}
   m_IsPrefabParent: 0
