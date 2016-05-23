@@ -1,23 +1,27 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System.Collections;
-using System.Collections.Generic;
-using Leap.Unity;
+﻿using UnityEditor;
 
-[CustomEditor(typeof(LeapVRTemporalWarping))]
-public class LeapTemporalWarpingEditor : Editor {
+namespace Leap.Unity {
 
-  public override void OnInspectorGUI() {
-    serializedObject.Update();
-    SerializedProperty properties = serializedObject.GetIterator();
+  [CustomEditor(typeof(LeapVRTemporalWarping))]
+  public class LeapTemporalWarpingEditor : CustomEditorBase {
 
-    bool useEnterChildren = true;
-    while (properties.NextVisible(useEnterChildren) == true) {
-      useEnterChildren = false;
-      EditorGUILayout.PropertyField(properties, true);
+    protected override void OnEnable() {
+      base.OnEnable();
+
+      specifyConditionalDrawing("allowManualTimeAlignment",
+                                "warpingAdjustment",
+                                "unlockHold",
+                                "moreRewind",
+                                "lessRewind");
+
+      specifyCustomDecorator("provider", warningDecorator);
     }
-    serializedObject.ApplyModifiedProperties();
+
+    private void warningDecorator(SerializedProperty prop) {
+      if (!PlayerSettings.virtualRealitySupported) {
+        EditorGUILayout.HelpBox("Unity VR Disabled.  ManualyUpdateTemporalWarping must be called right after " +
+                                "the Head transform has been updated.", MessageType.Warning);
+      }
+    }
   }
 }
-
-  

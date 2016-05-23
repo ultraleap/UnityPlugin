@@ -23,7 +23,31 @@ GraphicsSettings:
   m_PreloadedShaders: []
   m_ShaderSettings:
     useScreenSpaceShadows: 1
-  m_BuildTargetShaderSettings: []
+  m_BuildTargetShaderSettings:
+  - m_BuildTarget: WindowsStandaloneSupport
+    m_ShaderSettings:
+      useScreenSpaceShadows: 1
+    m_Automatic: 0
+  - m_BuildTarget: WindowsStandaloneSupport
+    m_ShaderSettings:
+      useScreenSpaceShadows: 1
+    m_Automatic: 0
+  - m_BuildTarget: WindowsStandaloneSupport
+    m_ShaderSettings:
+      useScreenSpaceShadows: 1
+    m_Automatic: 0
+  - m_BuildTarget: PS4Player
+    m_ShaderSettings:
+      useScreenSpaceShadows: 1
+    m_Automatic: 0
+  - m_BuildTarget: PS4Player
+    m_ShaderSettings:
+      useScreenSpaceShadows: 1
+    m_Automatic: 0
+  - m_BuildTarget: PS4Player
+    m_ShaderSettings:
+      useScreenSpaceShadows: 1
+    m_Automatic: 0
   m_LightmapStripping: 0
   m_FogStripping: 0
   m_LightmapKeepPlain: 1
