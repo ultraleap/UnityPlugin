@@ -2524,8 +2524,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _deviceOffsets:
-  - deviceName: oculus
-    heightOffset: 1
+  - DeviceName: oculus
+    HeightOffset: 1
 --- !u!1 &1928180893
 GameObject:
   m_ObjectHideFlags: 0
