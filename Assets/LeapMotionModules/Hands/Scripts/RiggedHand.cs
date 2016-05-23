@@ -74,10 +74,14 @@ namespace Leap.Unity {
         fingerModelList[i].modelPalmFacing = modelPalmFacing;
       }
     }
+    //Currently depends on order of fingers in hierarchy
     private Vector3 calculateModelPalmFacing() {
       Vector3 a = transform.InverseTransformPoint(palm.position);
-      Vector3 b = transform.InverseTransformPoint(palm.transform.GetChild(1).transform.position);
-      Vector3 c = transform.InverseTransformPoint(palm.transform.GetChild(2).transform.position);
+      Vector3 b = transform.InverseTransformPoint(palm.transform.GetChild(2).transform.position);
+      Debug.Log("palm child(1): " + palm.transform.GetChild(2).name);
+      Vector3 c = transform.InverseTransformPoint(palm.transform.GetChild(1).transform.position);
+      Debug.Log("palm child(2): " + palm.transform.GetChild(1).name);
+
 
       Vector3 side1 = b - a;
       Vector3 side2 = c - a;
@@ -91,7 +95,8 @@ namespace Leap.Unity {
       return calculatedPalmFacing;
     }
     private Vector3 calculateModelFingerPointing() {
-      Vector3 distance =  palm.transform.InverseTransformPoint(palm.transform.GetChild(2).transform.GetChild(0).transform.position) - palm.localPosition;
+      Vector3 distance =  transform.InverseTransformPoint(palm.transform.GetChild(2).transform.GetChild(0).transform.position) - transform.InverseTransformPoint(palm.position);
+      Debug.Log("palm child(2) child(0): " + palm.transform.GetChild(2).transform.GetChild(0).name);
       Vector3 calculatedFingerPointing = CalculateZeroedVector(distance);
       return calculatedFingerPointing;
     }
