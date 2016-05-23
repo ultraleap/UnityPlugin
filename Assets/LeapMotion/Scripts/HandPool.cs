@@ -152,6 +152,10 @@ namespace Leap.Unity {
      * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
     */
     public void EnableGroup(string groupName) {
+      StartCoroutine(enableGroup(groupName));
+    }
+    private IEnumerator enableGroup(string groupName) {
+      yield return new WaitForEndOfFrame();
       ModelGroup group = null;
       for (int i = 0; i < ModelPool.Count; i++) {
         if (ModelPool[i].GroupName == groupName) {
@@ -176,6 +180,10 @@ namespace Leap.Unity {
      * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
      */
     public void DisableGroup(string groupName) {
+      StartCoroutine(disableGroup(groupName));
+    }
+    private IEnumerator disableGroup(string groupName) {
+      yield return new WaitForEndOfFrame();
       ModelGroup group = null;
       for (int i = 0; i < ModelPool.Count; i++) {
         if (ModelPool[i].GroupName == groupName) {
@@ -198,6 +206,10 @@ namespace Leap.Unity {
       }
     }
     public void ToggleGroup(string groupName) {
+      StartCoroutine(toggleGroup(groupName));
+    }
+    private IEnumerator toggleGroup(string groupName) {
+      yield return new WaitForEndOfFrame();
       ModelGroup modelGroup = ModelPool.Find(i => i.GroupName == groupName);
       if (modelGroup != null) {
         if (modelGroup.IsEnabled == true) {
