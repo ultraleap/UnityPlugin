@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.VR;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Leap.Unity {
@@ -235,9 +236,18 @@ namespace Leap.Unity {
           return;
         }
       } else {
+        StartCoroutine(waitForConnection());
         Controller controller = provider.GetLeapController();
         controller.Device += OnDevice;
       }
+    }
+
+    private IEnumerator waitForConnection() {
+      while (!provider.IsConnected()) {
+        yield return null;
+      }
+      LeapVRCameraControl.OnValidCameraParams -= onValidCameraParams; //avoid multiple subscription
+      LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
     }
 
     protected void OnDevice(object sender, DeviceEventArgs args) {
