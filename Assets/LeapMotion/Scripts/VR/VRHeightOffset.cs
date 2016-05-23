@@ -19,9 +19,8 @@ public class VRHeightOffset : MonoBehaviour {
   public DeviceHeightPair[] _deviceOffsets;
 
   void Reset() {
-    _deviceOffsets = new DeviceHeightPair[2];
-    _deviceOffsets[0] = new DeviceHeightPair("oculus", -0.1f);
-    _deviceOffsets[1] = new DeviceHeightPair("OpenVR", 1.0f);
+    _deviceOffsets = new DeviceHeightPair[1];
+    _deviceOffsets[0] = new DeviceHeightPair("oculus", 1f);
   }
 
   void Start() {
