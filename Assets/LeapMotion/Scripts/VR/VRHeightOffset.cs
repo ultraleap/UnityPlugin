@@ -7,12 +7,12 @@ public class VRHeightOffset : MonoBehaviour {
 
   [Serializable]
   public class DeviceHeightPair {
-    public string deviceName;
-    public float heightOffset;
+    public string DeviceName;
+    public float HeightOffset;
 
     public DeviceHeightPair(string deviceName, float heightOffset) {
-      this.deviceName = deviceName;
-      this.heightOffset = heightOffset;
+      DeviceName = deviceName;
+      HeightOffset = heightOffset;
     }
   }
 
@@ -30,9 +30,9 @@ public class VRHeightOffset : MonoBehaviour {
 #else
       string deviceName = VRDevice.family;
 #endif
-      var deviceHeightPair = _deviceOffsets.FirstOrDefault(d => deviceName.ToLower().Contains(d.deviceName.ToLower()));
+      var deviceHeightPair = _deviceOffsets.FirstOrDefault(d => deviceName.ToLower().Contains(d.DeviceName.ToLower()));
       if (deviceHeightPair != null) {
-        transform.Translate(Vector3.up * deviceHeightPair.heightOffset);
+        transform.Translate(Vector3.up * deviceHeightPair.HeightOffset);
       }
     }
   }
