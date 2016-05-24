@@ -5,6 +5,7 @@ public class SpawnBalls : MonoBehaviour {
   public GameObject BallPrefab;
   public float delayInterval = .15f; // seconds
   public int BallLimit = 100;
+  public Vector3 BallSize = new Vector3(0.1f, 0.1f, 0.1f);
 
   private IEnumerator _spawnCoroutine;
 
@@ -32,6 +33,7 @@ public class SpawnBalls : MonoBehaviour {
     GameObject go = GameObject.Instantiate(prefab);
     go.transform.parent = transform;
     go.transform.localPosition = Vector3.zero;
+    go.transform.localScale = BallSize;
     Rigidbody rb = go.GetComponent<Rigidbody>();
     rb.AddForce(Random.value * 3, -Random.value * 13, Random.value * 3, ForceMode.Impulse);
   }
