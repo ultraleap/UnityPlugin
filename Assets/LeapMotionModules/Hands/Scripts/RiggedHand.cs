@@ -19,7 +19,8 @@ namespace Leap.Unity {
     public override bool SupportsEditorPersistence() {
       return true;
     }
-    public bool DriveFromPalm;
+    [Tooltip("Hands are typically rigged in 3D packages with the palm transform near the wrist. Uncheck this is your model's palm transform is at the center of the palm similar to Leap's API drives")]
+    public bool ModelPalmAtLeapWrist = true;//this is typical for rigged models
     public bool UseMetaCarpals;
     public Vector3 modelFingerPointing = new Vector3(0, 0, 0);//Vector3.forward;
     public Vector3 modelPalmFacing = new Vector3(0, 0, 0);// -Vector3.up;
@@ -31,18 +32,17 @@ namespace Leap.Unity {
     public Quaternion Reorientation() {
       return Quaternion.Inverse(Quaternion.LookRotation(modelFingerPointing, -modelPalmFacing));
     }
-    
-
     public override void UpdateHand() {
       if (palm != null) {
-        palm.position = GetWristPosition();
-        if (wristJoint) {
-          wristJoint.position = GetWristPosition();
+        if (ModelPalmAtLeapWrist) {
+          palm.position = GetWristPosition();
         }
-        else if (DriveFromPalm) {
+        else {
           palm.position = GetPalmPosition();
+          if (wristJoint) {
+            wristJoint.position = GetWristPosition();
+          }
         }
-        else palm.position = GetWristPosition();
         palm.rotation = GetPalmRotation() * Reorientation();
       }
 
@@ -57,6 +57,7 @@ namespace Leap.Unity {
         }
       }
     }
+
     [ContextMenu("Setup Rigged Hand")]
     public void SetupRiggedHand() {
       modelFingerPointing = new Vector3(0, 0, 0);
@@ -68,7 +69,7 @@ namespace Leap.Unity {
 
     private void findFingerModels() {
       RiggedFinger[] fingerModelList = GetComponentsInChildren<RiggedFinger>();
-      for (int i = 0; i < 5; i++ ) {
+      for (int i = 0; i < 5; i++) {
         int fingersIndex = fingerModelList[i].fingerType.indexOf();
         fingers[fingersIndex] = fingerModelList[i];
         fingerModelList[i].SetupRiggedFinger(UseMetaCarpals);
@@ -96,7 +97,7 @@ namespace Leap.Unity {
       return calculatedPalmFacing;
     }
     private Vector3 calculateModelFingerPointing() {
-      Vector3 distance =  transform.InverseTransformPoint(palm.transform.GetChild(2).transform.GetChild(0).transform.position) - transform.InverseTransformPoint(palm.position);
+      Vector3 distance = transform.InverseTransformPoint(palm.transform.GetChild(2).transform.GetChild(0).transform.position) - transform.InverseTransformPoint(palm.position);
       //Debug.Log("palm child(2) child(0): " + palm.transform.GetChild(2).transform.GetChild(0).name);
       Vector3 calculatedFingerPointing = CalculateZeroedVector(distance);
       return calculatedFingerPointing;
@@ -115,5 +116,5 @@ namespace Leap.Unity {
       }
       return zeroed;
     }
-  } 
+  }
 }
