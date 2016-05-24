@@ -120,8 +120,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ModelPool:
-  - _handPool: {fileID: 0}
-    GroupName: Graphics
+  - GroupName: Graphics
+    _handPool: {fileID: 0}
     LeftModel: {fileID: 1545945338}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 1061438465}
@@ -130,8 +130,8 @@ MonoBehaviour:
     modelsCheckedOut: []
     IsEnabled: 1
     CanDuplicate: 1
-  - _handPool: {fileID: 0}
-    GroupName: Physics
+  - GroupName: Physics
+    _handPool: {fileID: 0}
     LeftModel: {fileID: 1414805578}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 1167543056}
@@ -140,8 +140,8 @@ MonoBehaviour:
     modelsCheckedOut: []
     IsEnabled: 1
     CanDuplicate: 1
-  - _handPool: {fileID: 0}
-    GroupName: Attachments
+  - GroupName: Attachments
+    _handPool: {fileID: 0}
     LeftModel: {fileID: 540169376}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 375805477}
@@ -163,7 +163,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isHeadMounted: 1
-  _temporalWarping: {fileID: 0}
+  _temporalWarping: {fileID: 1928180895}
   _overrideDeviceType: 1
   _overrideDeviceTypeWith: 1
   _useInterpolation: 0
@@ -682,7 +682,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 66e97fbc349a749c6be1f12a1f6283b1, type: 2}
+  - {fileID: 2100000, guid: 0341999f378d6914e84ff554f707467a, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -871,7 +871,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 74051cfc81028d94bba92f8467b43e3c, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -2501,7 +2501,7 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_Materials:
-  - {fileID: 2100000, guid: 75ac83db1cec6459382f15d263a76c5f, type: 2}
+  - {fileID: 2100000, guid: 0a68a1bbdafba7d40b497e757efaf067, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 1
@@ -5443,6 +5443,14 @@ Prefab:
     - target: {fileID: 436198, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
       propertyPath: m_LocalScale.x
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 415952, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 415952, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -360
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c8515ebee271c0649b9db1321f3026a4, type: 2}
