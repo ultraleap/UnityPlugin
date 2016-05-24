@@ -1782,6 +1782,7 @@ MonoBehaviour:
   wristJoint: {fileID: 278269260}
   elbowJoint: {fileID: 0}
   DriveFromPalm: 0
+  UseMetaCarpals: 0
   modelFingerPointing: {x: -1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: -1, z: 0}
 --- !u!114 &278269293
@@ -3032,6 +3033,7 @@ MonoBehaviour:
   wristJoint: {fileID: 509167954}
   elbowJoint: {fileID: 0}
   DriveFromPalm: 0
+  UseMetaCarpals: 0
   modelFingerPointing: {x: 1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: 1, z: 0}
 --- !u!114 &509167962
@@ -3058,6 +3060,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 519947171}
   - 114: {fileID: 519947172}
+  - 114: {fileID: 519947173}
   m_Layer: 0
   m_Name: Pepper_Test_Left
   m_TagString: Untagged
@@ -3104,8 +3107,20 @@ MonoBehaviour:
   wristJoint: {fileID: 0}
   elbowJoint: {fileID: 0}
   DriveFromPalm: 0
+  UseMetaCarpals: 0
   modelFingerPointing: {x: 0, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: 0, z: 0}
+--- !u!114 &519947173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 519947170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcd03e00992e084c8be61565d44b8bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &538511266
 GameObject:
   m_ObjectHideFlags: 0
@@ -4132,7 +4147,7 @@ Transform:
   m_PrefabParentObject: {fileID: 400000, guid: 2fd862f812aa846649cab0657317a4ea, type: 3}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 849937009}
-  m_LocalRotation: {x: -0.60314333, y: 0.5017879, z: 0.14910193, w: 0.6018269}
+  m_LocalRotation: {x: -0.6031434, y: 0.50178796, z: 0.14910194, w: 0.60182697}
   m_LocalPosition: {x: -0.027367866, y: 0.020160303, z: 0.027376166}
   m_LocalScale: {x: 0.9999997, y: 1.0000013, z: 1.0000006}
   m_Children:
@@ -4218,7 +4233,7 @@ Transform:
   m_PrefabParentObject: {fileID: 400006, guid: 2fd862f812aa846649cab0657317a4ea, type: 3}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 908116666}
-  m_LocalRotation: {x: -0.60314333, y: 0.5017879, z: 0.14910197, w: 0.6018269}
+  m_LocalRotation: {x: -0.6031434, y: 0.50178796, z: 0.14910199, w: 0.60182697}
   m_LocalPosition: {x: -0.02736787, y: 0.020160308, z: 0.027376166}
   m_LocalScale: {x: 0.99999976, y: 1.0000014, z: 1.0000006}
   m_Children:
@@ -4314,6 +4329,7 @@ MonoBehaviour:
   wristJoint: {fileID: 2028689132}
   elbowJoint: {fileID: 0}
   DriveFromPalm: 0
+  UseMetaCarpals: 0
   modelFingerPointing: {x: 1, y: 0, z: 0}
   modelPalmFacing: {x: -0, y: 1, z: -0}
 --- !u!114 &957129455
@@ -4413,6 +4429,7 @@ MonoBehaviour:
   wristJoint: {fileID: 319761326}
   elbowJoint: {fileID: 0}
   DriveFromPalm: 0
+  UseMetaCarpals: 0
   modelFingerPointing: {x: -1, y: 0, z: 0}
   modelPalmFacing: {x: -0, y: -1, z: -0}
 --- !u!114 &978374463
@@ -6662,6 +6679,7 @@ MonoBehaviour:
   wristJoint: {fileID: 0}
   elbowJoint: {fileID: 0}
   DriveFromPalm: 0
+  UseMetaCarpals: 1
   modelFingerPointing: {x: 0, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: 0, z: 0}
 --- !u!1 &1540319192 stripped
@@ -6804,6 +6822,17 @@ MonoBehaviour:
   deformPosition: 0
   modelFingerPointing: {x: 0, y: 0, z: 1}
   modelPalmFacing: {x: -0, y: -1, z: -0}
+--- !u!114 &1540319202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1540319190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcd03e00992e084c8be61565d44b8bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1545996621 stripped
 Transform:
   m_PrefabParentObject: {fileID: 400024, guid: bfcd6ebbf65bea2449ce1598de5fed4b, type: 3}
@@ -7434,6 +7463,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1916607822}
   - 114: {fileID: 1916607823}
+  - 114: {fileID: 1916607824}
   m_Layer: 0
   m_Name: Pepper_Test_Right
   m_TagString: Untagged
@@ -7480,8 +7510,20 @@ MonoBehaviour:
   wristJoint: {fileID: 0}
   elbowJoint: {fileID: 0}
   DriveFromPalm: 0
+  UseMetaCarpals: 0
   modelFingerPointing: {x: 0, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: 0, z: 0}
+--- !u!114 &1916607824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1916607821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcd03e00992e084c8be61565d44b8bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1923659098
 GameObject:
   m_ObjectHideFlags: 0
@@ -7758,6 +7800,7 @@ MonoBehaviour:
   wristJoint: {fileID: 0}
   elbowJoint: {fileID: 0}
   DriveFromPalm: 0
+  UseMetaCarpals: 1
   modelFingerPointing: {x: 0, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: 0, z: 0}
 --- !u!1 &1964514317 stripped
@@ -7900,6 +7943,17 @@ MonoBehaviour:
   deformPosition: 0
   modelFingerPointing: {x: 0, y: 0, z: 1}
   modelPalmFacing: {x: -0, y: -1, z: -0}
+--- !u!114 &1964514327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1964514315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bcd03e00992e084c8be61565d44b8bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1966885502
 GameObject:
   m_ObjectHideFlags: 0

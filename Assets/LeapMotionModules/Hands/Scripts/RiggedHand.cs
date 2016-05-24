@@ -20,6 +20,7 @@ namespace Leap.Unity {
       return true;
     }
     public bool DriveFromPalm;
+    public bool UseMetaCarpals;
     public Vector3 modelFingerPointing = new Vector3(0, 0, 0);//Vector3.forward;
     public Vector3 modelPalmFacing = new Vector3(0, 0, 0);// -Vector3.up;
 
@@ -70,7 +71,7 @@ namespace Leap.Unity {
       for (int i = 0; i < 5; i++ ) {
         int fingersIndex = fingerModelList[i].fingerType.indexOf();
         fingers[fingersIndex] = fingerModelList[i];
-        fingerModelList[i].SetupRiggedFinger();
+        fingerModelList[i].SetupRiggedFinger(UseMetaCarpals);
         fingerModelList[i].modelPalmFacing = modelPalmFacing;
       }
     }

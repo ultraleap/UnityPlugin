@@ -40,13 +40,13 @@ namespace Leap.Unity {
         }
       }
     }
-    public void SetupRiggedFinger () {
-      findBoneTransforms();
+    public void SetupRiggedFinger (bool useMetaCarpals) {
+      findBoneTransforms(useMetaCarpals);
       modelFingerPointing = calulateModelFingerPointing();
     }
 
-    private void findBoneTransforms() {
-      if (fingerType == Finger.FingerType.TYPE_THUMB) {
+    private void findBoneTransforms(bool useMetaCarpals) {
+      if (!useMetaCarpals || fingerType == Finger.FingerType.TYPE_THUMB) {
         bones[1] = transform;
         bones[2] = transform.GetChild(0).transform;
         bones[3] = transform.GetChild(0).transform.GetChild(0).transform;
