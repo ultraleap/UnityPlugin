@@ -166,19 +166,20 @@ namespace Leap.Unity.Interaction {
         IntPtr shapePtr;
         if (collider is SphereCollider) {
           SphereCollider sphereCollider = collider as SphereCollider;
-          globalPos = collider.transform.position + collider.transform.TransformPoint(sphereCollider.center);
+          globalPos = collider.transform.TransformPoint(sphereCollider.center);
           globalRot = collider.transform.rotation;
           shapePtr = allocateSphere(sphereCollider.radius * globalScale);
         } else if (collider is BoxCollider) {
           BoxCollider boxCollider = collider as BoxCollider;
-          globalPos = collider.transform.position + collider.transform.TransformPoint(boxCollider.center);
+          globalPos = collider.transform.TransformPoint(boxCollider.center);
           globalRot = collider.transform.rotation;
           shapePtr = allocateObb(boxCollider.size * globalScale * 0.5f);
         } else if (collider is CapsuleCollider) {
           CapsuleCollider capsuleCollider = collider as CapsuleCollider;
-          globalPos = collider.transform.position + collider.transform.TransformPoint(capsuleCollider.center);
+          if((uint)capsuleCollider.direction >= 3u)
+            throw new InvalidOperationException("Unexpected capsule direction " + capsuleCollider.direction);
+          globalPos = collider.transform.TransformPoint(capsuleCollider.center);
           globalRot = collider.transform.rotation;
-
           Vector3 axis = new Vector3((capsuleCollider.direction==0)?1:0, (capsuleCollider.direction==1)?1:0, (capsuleCollider.direction==2)?1:0);
           Vector3 p0 = axis * globalScale * (capsuleCollider.height - capsuleCollider.radius * 0.5f);
           Vector3 p1 = -axis * globalScale * (capsuleCollider.height - capsuleCollider.radius * 0.5f);
@@ -193,6 +194,8 @@ namespace Leap.Unity.Interaction {
         }
 
         INTERACTION_TRANSFORM ieTransform = new INTERACTION_TRANSFORM();
+        // We want to preserve the global (actual) scale.  However InverseTransformPoint
+        // removes the parents scale and so that must be reapplied.
         ieTransform.position = (parentObject.transform.InverseTransformPoint(globalPos) * parentObject.transform.lossyScale.x).ToCVector();
         ieTransform.rotation = (Quaternion.Inverse(parentObject.transform.rotation) * globalRot).ToCQuaternion();
 
