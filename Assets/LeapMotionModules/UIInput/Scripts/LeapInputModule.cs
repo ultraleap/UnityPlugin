@@ -240,6 +240,8 @@ namespace Leap.Unity.InputModule {
 
     //Update the Head Yaw for Calculating "Shoulder Positions"
     void Update() {
+      curFrame = LeapDataProvider.CurrentFrame;
+
       if (Camera.main != null) {
         Quaternion HeadYaw = Quaternion.Euler(0f, Camera.main.transform.rotation.eulerAngles.y, 0f);
         CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.1f);
@@ -248,8 +250,6 @@ namespace Leap.Unity.InputModule {
 
     //Process is called by UI system to process events
     public override void Process() {
-      curFrame = LeapDataProvider.CurrentFrame.TransformedCopy(LeapTransform.Identity);
-
       //Send update events if there is a selected object
       //This is important for InputField to receive keyboard events
       SendUpdateEventToSelectedObject();
