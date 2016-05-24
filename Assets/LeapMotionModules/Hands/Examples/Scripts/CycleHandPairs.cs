@@ -41,38 +41,23 @@ public class CycleHandPairs : MonoBehaviour {
 
     if (Input.GetKeyUp(KeyCode.RightArrow)) {
       if (CurrentGroup < GroupNames.Length - 1) {
-        //CurrentGroup++;
-        StartCoroutine(WaitToPlus());
+        CurrentGroup++;
       }
     }
     if (Input.GetKeyUp(KeyCode.LeftArrow)) {
       if (CurrentGroup > 0) {
-        //CurrentGroup--;
-        StartCoroutine(WaitToMinus());
+        CurrentGroup--;
       }
     }
     for (int i = 0; i < keyCodes.Length; i++) {
       if (Input.GetKeyDown(keyCodes[i])) {
-        //handPool.ToggleGroup(GroupNames[i]);
-        StartCoroutine(waitToSwitch(i));
+        handPool.ToggleGroup(GroupNames[i]);
       }
       // check for errors. 
     }
     if(Input.GetKeyUp(KeyCode.Alpha0)){
       disableAllGroups();
     }
-  }
-  private IEnumerator WaitToPlus () {
-    yield return new WaitForEndOfFrame();
-    CurrentGroup++;
-  }
-  private IEnumerator WaitToMinus() {
-    yield return new WaitForEndOfFrame();
-    CurrentGroup--;
-  }
-  private IEnumerator waitToSwitch(int group) {
-    yield return new WaitForEndOfFrame();
-    handPool.ToggleGroup(GroupNames[group]);
   }
 
   private void disableAllGroups() {
