@@ -257,8 +257,16 @@ namespace Leap.Unity.Interaction {
         return false;
       }
 
+      INTERACTION_HAND_RESULT result = new INTERACTION_HAND_RESULT();
+      result.classification = ManipulatorMode.Contact;
+      result.handFlags = HandResultFlags.ManipulatorMode;
+      result.instanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
+
       foreach (var interactionHand in _idToInteractionHand.Values) {
         if (interactionHand.graspedObject == graspedObject) {
+          if (_graspingEnabled) {
+            InteractionC.OverrideHandResult(ref _scene, (uint)interactionHand.hand.Id, ref result);
+          }
           interactionHand.ReleaseObject();
         }
       }
@@ -693,7 +701,7 @@ namespace Leap.Unity.Interaction {
             handResult.handFlags = HandResultFlags.ManipulatorMode;
             handResult.instanceHandle = interactionHand.graspedObject.ShapeInstanceHandle;
 
-            if (_contactEnabled) {
+            if (_graspingEnabled) {
               InteractionC.OverrideHandResult(ref _scene, (uint)hand.Id, ref handResult);
             }
           } else {
