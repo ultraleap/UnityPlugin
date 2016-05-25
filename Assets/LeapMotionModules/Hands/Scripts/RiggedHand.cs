@@ -43,7 +43,7 @@ namespace Leap.Unity {
             wristJoint.position = GetWristPosition();
           }
         }
-        palm.rotation = GetPalmRotation() * Reorientation();
+        palm.rotation = GetRiggedPalmRotation() * Reorientation();
       }
 
       if (forearm != null) {
@@ -56,6 +56,25 @@ namespace Leap.Unity {
           fingers[i].UpdateFinger();
         }
       }
+    }
+
+    //These versions of GetPalmRotation & CalculateRotation return the opposite vector compared to LeapUnityExtension.CalculateRotation
+    //This will be deprecated once LeapUnityExtension.CalculateRotation is flipped in the next release of LeapMotion Core Assets
+    public Quaternion GetRiggedPalmRotation() {
+      if (hand_ != null) {
+        LeapTransform trs = hand_.Basis;
+        return CalculateRotation(trs);
+      }
+      if (palm) {
+        return palm.rotation;
+      }
+      return Quaternion.identity;
+    }
+
+    private Quaternion CalculateRotation(this LeapTransform trs) {
+      Vector3 up = trs.yBasis.ToVector3();
+      Vector3 forward = trs.zBasis.ToVector3();
+      return Quaternion.LookRotation(forward, up);
     }
 
     [ContextMenu("Setup Rigged Hand")]
