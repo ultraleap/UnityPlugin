@@ -108,7 +108,7 @@ namespace Leap.Unity {
       return calculatedFingerPointing;
     }
 
-    public Vector3 CalculateZeroedVector(Vector3 vectorToZero) {
+    public static Vector3 CalculateZeroedVector(Vector3 vectorToZero) {
       var zeroed = new Vector3();
       float max = Mathf.Max(Mathf.Abs(vectorToZero.x), Mathf.Abs(vectorToZero.y), Mathf.Abs(vectorToZero.z));
       if (Mathf.Abs(vectorToZero.x) == max) {

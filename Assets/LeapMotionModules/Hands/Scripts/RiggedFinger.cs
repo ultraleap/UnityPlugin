@@ -29,6 +29,8 @@ namespace Leap.Unity {
       return Quaternion.Inverse(Quaternion.LookRotation(modelFingerPointing, -modelPalmFacing));
     }
 
+    private RiggedHand riggedHand;
+
     /** Updates the bone rotations. */
     public override void UpdateFinger() {
       for (int i = 0; i < bones.Length; ++i) {
@@ -61,18 +63,7 @@ namespace Leap.Unity {
     }
     private Vector3 calulateModelFingerPointing() {
       Vector3 distance = transform.InverseTransformPoint(transform.position) -  transform.InverseTransformPoint(transform.GetChild(0).transform.position);
-      float max = Mathf.Max(Mathf.Abs(distance.x), Mathf.Abs(distance.y), Mathf.Abs(distance.z));
-
-      var zeroed = new Vector3();
-      if (Mathf.Abs(distance.x) == max) {
-        zeroed = (distance.x < 0) ? new Vector3(1, 0, 0) : new Vector3(-1, 0, 0);
-      }
-      if (Mathf.Abs(distance.y) == max) {
-        zeroed = (distance.y < 0) ? new Vector3(0, 1, 0) : new Vector3(0, -1, 0);
-      }
-      if (Mathf.Abs(distance.z) == max) {
-        zeroed = (distance.y < 0) ? new Vector3(0, 0, 1) : new Vector3(0, 0, -1);
-      }
+      Vector3 zeroed = RiggedHand.CalculateZeroedVector(distance);
       return zeroed;
     }
   } 
