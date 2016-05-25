@@ -20,10 +20,10 @@ namespace Leap.Unity {
       return true;
     }
     [Tooltip("Hands are typically rigged in 3D packages with the palm transform near the wrist. Uncheck this is your model's palm transform is at the center of the palm similar to Leap's API drives")]
-    public bool ModelPalmAtLeapWrist = true;//this is typical for rigged models
+    public bool ModelPalmAtLeapWrist = true;
     public bool UseMetaCarpals;
-    public Vector3 modelFingerPointing = new Vector3(0, 0, 0);//Vector3.forward;
-    public Vector3 modelPalmFacing = new Vector3(0, 0, 0);// -Vector3.up;
+    public Vector3 modelFingerPointing = new Vector3(0, 0, 0);
+    public Vector3 modelPalmFacing = new Vector3(0, 0, 0);
 
     public override void InitHand() {
       UpdateHand();
@@ -62,9 +62,10 @@ namespace Leap.Unity {
     public void SetupRiggedHand() {
       modelFingerPointing = new Vector3(0, 0, 0);
       modelPalmFacing = new Vector3(0, 0, 0);
+      findFingerModels();
       modelPalmFacing = calculateModelPalmFacing();
       modelFingerPointing = calculateModelFingerPointing();
-      findFingerModels();
+      
     }
 
     private void findFingerModels() {
@@ -76,14 +77,11 @@ namespace Leap.Unity {
         fingerModelList[i].modelPalmFacing = modelPalmFacing;
       }
     }
-    //Currently depends on order of fingers in hierarchy
+
     private Vector3 calculateModelPalmFacing() {
       Vector3 a = transform.InverseTransformPoint(palm.position);
-      Vector3 b = transform.InverseTransformPoint(palm.transform.GetChild(2).transform.position);
-      //Debug.Log("palm child(1): " + palm.transform.GetChild(2).name);
-      Vector3 c = transform.InverseTransformPoint(palm.transform.GetChild(1).transform.position);
-      //Debug.Log("palm child(2): " + palm.transform.GetChild(1).name);
-
+      Vector3 b = transform.InverseTransformPoint(fingers[2].transform.position);
+      Vector3 c = transform.InverseTransformPoint(fingers[1].transform.position);
 
       Vector3 side1 = b - a;
       Vector3 side2 = c - a;
@@ -96,12 +94,13 @@ namespace Leap.Unity {
       Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
       return calculatedPalmFacing;
     }
+
     private Vector3 calculateModelFingerPointing() {
-      Vector3 distance = transform.InverseTransformPoint(palm.transform.GetChild(2).transform.GetChild(0).transform.position) - transform.InverseTransformPoint(palm.position);
-      //Debug.Log("palm child(2) child(0): " + palm.transform.GetChild(2).transform.GetChild(0).name);
+      Vector3 distance = transform.InverseTransformPoint(fingers[2].transform.GetChild(0).transform.position) - transform.InverseTransformPoint(palm.position);
       Vector3 calculatedFingerPointing = CalculateZeroedVector(distance);
       return calculatedFingerPointing;
     }
+
     public Vector3 CalculateZeroedVector(Vector3 vectorToZero) {
       var zeroed = new Vector3();
       float max = Mathf.Max(Mathf.Abs(vectorToZero.x), Mathf.Abs(vectorToZero.y), Mathf.Abs(vectorToZero.z));
