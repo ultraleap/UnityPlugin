@@ -2,9 +2,8 @@
 using System.Collections;
 using Leap.Unity;
 
-[RequireComponent(typeof(HandPool))]
 public class CycleHandPairs : MonoBehaviour {
-  private HandPool handPool;
+  public HandPool HandPool;
   public string[] GroupNames;
   private int currentGroup;
   public int CurrentGroup {
@@ -12,7 +11,7 @@ public class CycleHandPairs : MonoBehaviour {
     set {
       disableAllGroups();
       currentGroup = value;
-      handPool.EnableGroup(GroupNames[value]);
+      HandPool.EnableGroup(GroupNames[value]);
     }
   }
   private KeyCode[] keyCodes = {
@@ -29,7 +28,7 @@ public class CycleHandPairs : MonoBehaviour {
 
   // Use this for initialization
   void Start () {
-    handPool = GetComponent<HandPool>();
+    HandPool = GetComponent<HandPool>();
     disableAllGroups();
     CurrentGroup = 0;
   }
@@ -48,7 +47,7 @@ public class CycleHandPairs : MonoBehaviour {
     }
     for (int i = 0; i < keyCodes.Length; i++) {
       if (Input.GetKeyDown(keyCodes[i])) {
-        handPool.ToggleGroup(GroupNames[i]);
+        HandPool.ToggleGroup(GroupNames[i]);
       }
     }
     if(Input.GetKeyUp(KeyCode.Alpha0)){
@@ -58,7 +57,7 @@ public class CycleHandPairs : MonoBehaviour {
 
   private void disableAllGroups() {
     for (int i = 0; i < GroupNames.Length; i++) {
-      handPool.DisableGroup(GroupNames[i]);
+      HandPool.DisableGroup(GroupNames[i]);
     }
   }
 
