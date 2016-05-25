@@ -65,7 +65,7 @@ namespace Leap.Unity {
       findFingerModels();
       modelPalmFacing = calculateModelPalmFacing();
       modelFingerPointing = calculateModelFingerPointing();
-      
+      setFingerPalmFacing();
     }
 
     private void findFingerModels() {
@@ -74,6 +74,13 @@ namespace Leap.Unity {
         int fingersIndex = fingerModelList[i].fingerType.indexOf();
         fingers[fingersIndex] = fingerModelList[i];
         fingerModelList[i].SetupRiggedFinger(UseMetaCarpals);
+      }
+    }
+    private void setFingerPalmFacing() {
+      RiggedFinger[] fingerModelList = GetComponentsInChildren<RiggedFinger>();
+      for (int i = 0; i < 5; i++) {
+        int fingersIndex = fingerModelList[i].fingerType.indexOf();
+        fingers[fingersIndex] = fingerModelList[i];
         fingerModelList[i].modelPalmFacing = modelPalmFacing;
       }
     }
