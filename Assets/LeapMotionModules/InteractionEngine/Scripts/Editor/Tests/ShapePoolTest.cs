@@ -8,9 +8,10 @@ namespace Leap.Unity.Interaction.Tests {
   [TestFixture(Category = "ShapeDescriptionPool")]
   public abstract class ShapePoolTestBase : InteractionCTestBase {
     private const string DATA_FOLDER = "InteractionEngine";
-    
+
     protected ShapeDescriptionPool _pool;
     protected Mesh _mesh;
+    protected MeshCollider _meshCollider;
 
     [SetUp]
     public override void Setup() {
@@ -28,12 +29,12 @@ namespace Leap.Unity.Interaction.Tests {
       _pool.RemoveAllShapes();
       _pool = null;
 
-      Object.DestroyImmediate(_mesh); 
+      Object.DestroyImmediate(_mesh);
 
       base.Teardown();
     }
   }
-  
+
   public class ShapePoolGetShape : ShapePoolTestBase {
     [Test]
     public void CreateSphere() {
@@ -52,10 +53,10 @@ namespace Leap.Unity.Interaction.Tests {
 
     [Test]
     public void CreateMesh() {
-      _pool.GetConvexPolyhedron(_mesh);
+      _pool.GetConvexPolyhedron(_meshCollider);
     }
   }
-  
+
   public class ShapePoolGetAuto : ShapePoolTestBase {
     protected GameObject _obj;
     protected GameObject _child;
@@ -79,25 +80,25 @@ namespace Leap.Unity.Interaction.Tests {
     [Test]
     public void Sphere([Values(true, false)] bool atCenter) {
       addSphere(_obj, atCenter: atCenter);
-      _pool.GetAuto(_obj);
+      _pool.GetCollision(_obj);
     }
 
     [Test]
     public void Box([Values(true, false)] bool atCenter) {
       addBox(_obj, atCenter);
-      _pool.GetAuto(_obj);
+      _pool.GetCollision(_obj);
     }
 
     [Test]
     public void Capsule([Values(0, 1, 2)] int direction) {
       addCapsule(_obj, direction);
-      _pool.GetAuto(_obj);
+      _pool.GetCollision(_obj);
     }
 
     [Test]
     public void Mesh() {
       addMesh(_obj);
-      _pool.GetAuto(_obj);
+      _pool.GetCollision(_obj);
     }
 
     [Test]
@@ -106,13 +107,13 @@ namespace Leap.Unity.Interaction.Tests {
       addBox(_obj, false);
       addCapsule(_obj, 0);
       addMesh(_obj);
-      _pool.GetAuto(_obj);
+      _pool.GetCollision(_obj);
     }
 
     [Test]
     public void WithChild() {
       addSphere(_child, false);
-      _pool.GetAuto(_obj);
+      _pool.GetCollision(_obj);
     }
 
     protected void addSphere(GameObject obj, bool atCenter) {
@@ -136,8 +137,8 @@ namespace Leap.Unity.Interaction.Tests {
     }
 
     protected void addMesh(GameObject obj) {
-      var meshC = obj.AddComponent<MeshCollider>();
-      meshC.sharedMesh = _mesh;
+      _meshCollider = obj.AddComponent<MeshCollider>();
+      _meshCollider.sharedMesh = _mesh;
     }
   }
 }
