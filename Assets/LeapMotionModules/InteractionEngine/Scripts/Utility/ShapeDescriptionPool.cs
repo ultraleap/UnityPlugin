@@ -41,8 +41,6 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Gets a handle to a sphere shape description of the given radius
     /// </summary>
-    /// <param name="radius"></param>
-    /// <returns></returns>
     public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetSphere(float radius) {
       INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
       if (!_sphereDescMap.TryGetValue(radius, out handle)) {
@@ -60,8 +58,6 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Gets a handle to an OBB description of the given extents
     /// </summary>
-    /// <param name="extents"></param>
-    /// <returns></returns>
     public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetOBB(Vector3 extents) {
       INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
       if (!_obbDescMap.TryGetValue(extents, out handle)) {
@@ -79,10 +75,6 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Gets a handle to a convex mesh description that describes the given capsule.
     /// </summary>
-    /// <param name="p0"></param>
-    /// <param name="p1"></param>
-    /// <param name="radius"></param>
-    /// <returns></returns>
     public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetCapsule(Vector3 p0, Vector3 p1, float radius) {
       INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
       IntPtr capsulePtr = allocateCapsule(p0, p1, radius);
@@ -96,8 +88,6 @@ namespace Leap.Unity.Interaction {
     /// Gets a handle to a convex mesh description of the provided mesh.  Any changes
     /// to the mesh will not be reflected in the description once it is generated.
     /// </summary>
-    /// <param name="mesh"></param>
-    /// <returns></returns>
     public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetConvexPolyhedron(MeshCollider meshCollider) {
       if (meshCollider.sharedMesh == null) { throw new NotImplementedException("MeshCollider missing sharedMesh."); }
 
@@ -124,8 +114,6 @@ namespace Leap.Unity.Interaction {
     ///   scale of child objects
     ///   collider properties
     /// </summary>
-    /// <param name="obj"></param>
-    /// <returns></returns>
     private List<Collider> _tempColliderList = new List<Collider>();
     public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetCollision(GameObject parentObject) {
       if (!isUniformScale(parentObject.transform)) {
@@ -141,7 +129,7 @@ namespace Leap.Unity.Interaction {
 
       // Try optimized encodings for a single collider.  Everything else is a compound.
       if (_tempColliderList.Count == 1) {
-        if(GetCollisionSingleInternal(parentObject, ref handle)) {
+        if(getCollisionSingleInternal(parentObject, ref handle)) {
           return handle;
         }
       }
@@ -213,7 +201,7 @@ namespace Leap.Unity.Interaction {
       return handle;
     }
 
-    private bool GetCollisionSingleInternal(GameObject parentObject, ref INTERACTION_SHAPE_DESCRIPTION_HANDLE shape) {
+    private bool getCollisionSingleInternal(GameObject parentObject, ref INTERACTION_SHAPE_DESCRIPTION_HANDLE shape) {
       Collider collider = _tempColliderList[0];
 
       if (collider.gameObject != parentObject) {
