@@ -112,6 +112,7 @@ namespace Leap.Unity.InputModule {
     private PointerEventData[] PointEvents;
     private pointerStates[] pointerState;
     private Transform[] Pointers;
+    private Transform[] InnerPointers;
     private LineRenderer[] PointerLines;
     private float ActivationTime = 0.1f;
 
@@ -187,6 +188,7 @@ namespace Leap.Unity.InputModule {
         NumberOfPointers = 10;
       }
       Pointers = new Transform[NumberOfPointers];
+      InnerPointers = new Transform[NumberOfPointers];
       PointerLines = new LineRenderer[NumberOfPointers];
       for (int index = 0; index < Pointers.Length; index++) {
         //Create the Canvas to render the Pointer on
@@ -210,7 +212,19 @@ namespace Leap.Unity.InputModule {
           Debug.LogError("Set PointerSprite on " + this.gameObject.name + " to the sprite you want to use as your pointer.", this.gameObject);
 
         Pointers[index] = pointer.GetComponent<Transform>();
+
+        //Create the Canvas to render the Pointer on
+        GameObject innerPointer = new GameObject("Pointer " + index);
+        renderer = innerPointer.AddComponent<SpriteRenderer>();
+        renderer.sortingOrder = 1000;
+
+        //Add your sprite to the Canvas
+        renderer.sprite = PointerSprite;
+        renderer.material = Instantiate(PointerMaterial);
+
+        InnerPointers[index] = innerPointer.GetComponent<Transform>();
       }
+
 
       //Initialize our Sound Player
       SoundPlayer = this.gameObject.AddComponent<AudioSource>();
@@ -267,6 +281,7 @@ namespace Leap.Unity.InputModule {
           if (curFrame.Hands.Count - 1 < whichHand){
             if(Pointers[whichPointer].gameObject.activeInHierarchy == true) {
               Pointers[whichPointer].gameObject.SetActive(false);
+              InnerPointers[whichPointer].gameObject.SetActive(false);
             }
             continue;
           }
@@ -277,6 +292,7 @@ namespace Leap.Unity.InputModule {
           if (curFrame.Hands.Count - 1 < whichHand) {
             if (Pointers[whichPointer].gameObject.activeInHierarchy == true) {
               Pointers[whichPointer].gameObject.SetActive(false);
+              InnerPointers[whichPointer].gameObject.SetActive(false);
             }
             continue;
           }
@@ -326,6 +342,8 @@ namespace Leap.Unity.InputModule {
           Physics.Raycast(ProjectionOrigin, (IndexMetacarpal - ProjectionOrigin).normalized, out EnvironmentSpot);
           Pointers[whichPointer].position = EnvironmentSpot.point + (EnvironmentSpot.normal*0.01f);
           Pointers[whichPointer].rotation = Quaternion.LookRotation(EnvironmentSpot.normal);
+          InnerPointers[whichPointer].position = EnvironmentSpot.point + (EnvironmentSpot.normal * 0.01f);
+          InnerPointers[whichPointer].rotation = Quaternion.LookRotation(EnvironmentSpot.normal);
           evaluatePointerSize(whichPointer);
         }
 
@@ -662,14 +680,17 @@ namespace Leap.Unity.InputModule {
     private void UpdatePointer(int whichPointer, PointerEventData pointData) {
       if (currentOverGo[whichPointer] != null) {
         Pointers[whichPointer].gameObject.SetActive(true);
+        InnerPointers[whichPointer].gameObject.SetActive(true);
         if (PointEvents[whichPointer].pointerCurrentRaycast.gameObject != null) {
           RectTransform draggingPlane = PointEvents[whichPointer].pointerCurrentRaycast.gameObject.GetComponent<RectTransform>();
           Vector3 globalLookPos;
           if (RectTransformUtility.ScreenPointToWorldPointInRectangle(draggingPlane, pointData.position, pointData.enterEventCamera, out globalLookPos)) {
             Pointers[whichPointer].position = globalLookPos;// -transform.forward * 0.01f; //Amount the pointer floats above the Canvas
+            InnerPointers[whichPointer].position = globalLookPos;// -transform.forward * 0.01f; //Amount the pointer floats above the Canvas
 
             float pointerAngle = Mathf.Rad2Deg * (Mathf.Atan2(pointData.delta.x, pointData.delta.y));
             Pointers[whichPointer].rotation = draggingPlane.rotation * Quaternion.Euler(0f, 0f, -pointerAngle);
+            InnerPointers[whichPointer].rotation = draggingPlane.rotation * Quaternion.Euler(0f, 0f, -pointerAngle);
             evaluatePointerSize(whichPointer);
           }
         }
@@ -685,6 +706,8 @@ namespace Leap.Unity.InputModule {
       }
 
       float Pointerscale = PointerDistanceScale.Evaluate(PointDistance);
+
+      InnerPointers[whichPointer].localScale = Pointerscale * PointerPinchScale.Evaluate(0f) * Vector3.one;
 
       if (!perFingerPointer && !getTouchingMode(whichPointer)) {
         if (whichPointer == 0) {
@@ -798,6 +821,19 @@ namespace Leap.Unity.InputModule {
       } else {
         PointerSprite.material.color = Color.Lerp(oldColor, color, lerpalpha);
         PointerSprite.color = Color.Lerp(oldColor, color, lerpalpha);
+      }
+
+      SpriteRenderer InnerPointerSprite = InnerPointers[whichPointer].GetComponent<SpriteRenderer>();
+      oldColor = PointerSprite.color;
+      if (color.r == 0f && color.g == 0f && color.b == 0f) {
+        InnerPointerSprite.material.color = Color.Lerp(oldColor, new Color(oldColor.r, oldColor.g, oldColor.b, color.a), lerpalpha);
+        InnerPointerSprite.color = Color.Lerp(oldColor, new Color(oldColor.r, oldColor.g, oldColor.b, color.a), lerpalpha);
+      } else if (color.a == 1f) {
+        InnerPointerSprite.material.color = Color.Lerp(oldColor, new Color(color.r, color.g, color.b, oldColor.a), lerpalpha);
+        InnerPointerSprite.color = Color.Lerp(oldColor, new Color(color.r, color.g, color.b, oldColor.a), lerpalpha);
+      } else {
+        InnerPointerSprite.material.color = Color.Lerp(oldColor, color, lerpalpha);
+        InnerPointerSprite.color = Color.Lerp(oldColor, color, lerpalpha);
       }
     }
 
