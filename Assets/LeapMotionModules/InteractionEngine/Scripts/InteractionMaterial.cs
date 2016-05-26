@@ -30,7 +30,7 @@ namespace Leap.Unity.Interaction {
     [Tooltip("What method should be used to move the object when it is grasped.")]
     [SerializeField]
     protected GraspMethodEnum _graspMethod = GraspMethodEnum.Velocity;
-    
+
 
     [Tooltip("How far the object can get from the hand before it is released.")]
     [SerializeField]
@@ -57,10 +57,10 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _suspensionEnabled = true;
 
-    [Tooltip("How long can objects using this material be suspended.  If a hand remains untracked for mor than this time then " +
+    [Tooltip("How long can objects using this material be suspended.  If a hand remains untracked for more than this time then " +
              "the object will end suspension.")]
     [SerializeField]
-    protected float _maxSuspensionTime = 1;
+    protected float _maxSuspensionTime = 4;
 
     [Tooltip("Whether or not objects using this material have their graphical anchor disabled when they become suspended.")]
     [SerializeField]

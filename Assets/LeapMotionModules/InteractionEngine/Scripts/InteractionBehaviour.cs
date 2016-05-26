@@ -472,6 +472,9 @@ namespace Leap.Unity.Interaction {
 
       updateState();
 
+      _rigidbody.velocity = Vector3.zero;
+      _rigidbody.angularVelocity = Vector3.zero;
+
       removeHandPointCollection(oldHand.Id);
     }
 
@@ -495,10 +498,12 @@ namespace Leap.Unity.Interaction {
         _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
       }
 
-      Vector3 palmVel = lastHand.PalmVelocity.ToVector3();
-      float speed = palmVel.magnitude;
-      float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed);
-      _rigidbody.velocity = palmVel * multiplier;
+      if (lastHand != null) {
+        Vector3 palmVel = lastHand.PalmVelocity.ToVector3();
+        float speed = palmVel.magnitude;
+        float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed);
+        _rigidbody.velocity = palmVel * multiplier;
+      }
     }
     #endregion
 

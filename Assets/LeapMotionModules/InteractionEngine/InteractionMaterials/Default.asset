@@ -50,7 +50,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 0
   _suspensionEnabled: 1
-  _maxSuspensionTime: 1
+  _maxSuspensionTime: 4
   _hideObjectOnSuspend: 1
   _warpingEnabled: 1
   _warpCurve:

@@ -285,10 +285,10 @@ namespace Leap.Unity.Interaction {
       OnHandTimeout(oldHand);
       _baseCallGuard.AssertBaseCalled();
 
-      //OnGraspEnd is dispatched in OnHandTimeout in addition to OnHandRelease
+      // OnGraspEnd is dispatched in OnHandTimeout in addition to OnHandRelease
       if (_graspingIds.Count == 0) {
         _baseCallGuard.Begin("OnGraspEnd");
-        OnGraspEnd(oldHand);
+        OnGraspEnd(null);
         _baseCallGuard.AssertBaseCalled();
       }
     }
