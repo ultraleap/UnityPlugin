@@ -28,8 +28,10 @@ namespace Leap.Unity.InputModule {
     public Sprite PointerSprite;
     [Tooltip("The material to be instantiated for your pointers during projective interaction.")]
     public Material PointerMaterial;
-    [Tooltip("The size of the pointer in world coordinates with respect to distance.")]
-    public AnimationCurve PointerScale = AnimationCurve.Linear(0f,0.1f,6f,1f);
+    [Tooltip("The size of the pointer in world coordinates with respect to the distance between the cursor and the camera.")]
+    public AnimationCurve PointerDistanceScale = AnimationCurve.Linear(0f,0.1f,6f,1f);
+    [Tooltip("The size of the pointer in world coordinates with respect to the distance between the thumb and forefinger.")]
+    public AnimationCurve PointerPinchScale = AnimationCurve.Linear(30f, 0.8f, 70f, 1.1f);
     [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color StandardColor = Color.white;
@@ -683,7 +685,15 @@ namespace Leap.Unity.InputModule {
         PointDistance = (Pointers[whichPointer].position - Camera.main.transform.position).magnitude;
       }
 
-      float Pointerscale = PointerScale.Evaluate(PointDistance);
+      float Pointerscale = PointerDistanceScale.Evaluate(PointDistance);
+
+      if (!perFingerPointer && !getTouchingMode(whichPointer)) {
+        if (whichPointer == 0) {
+          Pointerscale *= PointerPinchScale.Evaluate(curFrame.Hands[0].PinchDistance);
+        } else if (whichPointer == 1) {
+          Pointerscale *= PointerPinchScale.Evaluate(curFrame.Hands[1].PinchDistance);
+        }
+      }
 
       //Commented out Velocity Stretching because it looks funny when I change the projection origin
       Pointers[whichPointer].localScale = Pointerscale * new Vector3(1f, 1f /*+ pointData.delta.magnitude*1f*/, 1f);
@@ -727,6 +737,10 @@ namespace Leap.Unity.InputModule {
         }
       }
       return mode;
+    }
+
+    public bool getTouchingMode(int whichPointer) {
+      return (pointerState[whichPointer] == pointerStates.NearCanvas || pointerState[whichPointer] == pointerStates.TouchingCanvas || pointerState[whichPointer] == pointerStates.TouchingElement);
     }
 
     //Where the color that the Pointer will lerp to is chosen
