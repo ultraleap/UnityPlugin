@@ -875,7 +875,7 @@ MonoBehaviour:
   elbowJoint: {fileID: 0}
   ModelPalmAtLeapWrist: 1
   UseMetaCarpals: 1
-  modelFingerPointing: {x: -1, y: 0, z: 0}
+  modelFingerPointing: {x: 1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: -1, z: 0}
 --- !u!114 &11435496
 MonoBehaviour:
