@@ -28,12 +28,6 @@ namespace Leap.Unity.FramerateGraph {
     [SerializeField]
     private Text _smoothedFrameTimeText;
 
-    [SerializeField]
-    private Text _longMethodNameText;
-
-    [SerializeField]
-    private Text _longMethodTimeText;
-
     [Tooltip("Amount of smoothing to use for the smoothed times.")]
     [SerializeField]
     private float _smoothingDelay = 0.1f;
@@ -44,19 +38,22 @@ namespace Leap.Unity.FramerateGraph {
     [SerializeField]
     private float _spikeSmoothingDelay = 5.0f;
 
-    [Tooltip("How many frames should this profiler visualize.")]
+    [Tooltip("How many frames should this graph visualize.")]
     [SerializeField]
     private int _frameResolution = 128;
 
     [SerializeField]
-    private Renderer _profilerRenderer;
+    private Renderer _graphRenderer;
+
+    [SerializeField]
+    private Shader _graphShader;
 
     private System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
 
     private string[] _cachedStrings;
 
     private int _textureOffset;
-    private Texture2D _profilerTexture;
+    private Texture2D _graphTexture;
     private Renderer _renderer;
 
     private Texture2D _gradientTexture;
@@ -80,84 +77,25 @@ namespace Leap.Unity.FramerateGraph {
     private long _lastSpikeTick = 0;
     private SmoothedFloat _smoothedSpikeRate = new SmoothedFloat();
 
-    private MethodPair[] _methodPairs = new MethodPair[3];
-
-    private long _beginTick = -1;
-    public void BeginMethod() {
-      if (_beginTick != -1) {
-        Debug.LogError("Cannot nest calls to Begin/End Method!");
-        return;
-      }
-
-      _beginTick = _stopwatch.ElapsedTicks;
-    }
-
-    public void EndMethod(string name) {
-      if (_beginTick == -1) {
-        Debug.LogError("Cannot nest calls to Begin/End Method!");
-        return;
-      }
-
-      long elapsedTicks = _stopwatch.ElapsedTicks - _beginTick;
-      long elapsedMilis = elapsedTicks / (System.Diagnostics.Stopwatch.Frequency / 1000);
-
-      if (elapsedMilis > 0) {
-        MethodPair pair = new MethodPair();
-        pair.MethodName = name;
-        pair.ElapsedMilis = elapsedMilis;
-
-        int index = _methodPairs.Length;
-        while (index != 0) {
-          MethodPair nextPair = _methodPairs[index - 1];
-          if (elapsedMilis < nextPair.ElapsedMilis) {
-            break;
-          }
-
-          if (index < _methodPairs.Length) {
-            _methodPairs[index] = nextPair;
-          }
-
-          index--;
-        }
-
-        if (index < _methodPairs.Length) {
-          _methodPairs[index] = pair;
-          string nameText = "";
-          string timeText = "";
-
-          for (int i = 0; i < _methodPairs.Length; i++) {
-            var iPair = _methodPairs[i];
-            if (iPair.ElapsedMilis > 0) {
-              nameText += iPair.MethodName + ": \n";
-              timeText += iPair.ElapsedMilis + "\n";
-            }
-          }
-          _longMethodNameText.text = nameText;
-          _longMethodTimeText.text = timeText;
-        }
-      }
-
-      _beginTick = -1;
-    }
-
     void Awake() {
       _smoothedFrameTime.delay = _smoothingDelay;
       _smoothedRenderTime.delay = _smoothingDelay;
       _smoothedUpdateTime.delay = _smoothingDelay;
       _smoothedSpikeRate.delay = _spikeSmoothingDelay;
 
-      _profilerTexture = new Texture2D(_frameResolution, 1, TextureFormat.ARGB32, false, true);
-      _profilerTexture.filterMode = FilterMode.Point;
-      _profilerTexture.wrapMode = TextureWrapMode.Repeat;
+      _graphTexture = new Texture2D(_frameResolution, 1, TextureFormat.ARGB32, false, true);
+      _graphTexture.filterMode = FilterMode.Point;
+      _graphTexture.wrapMode = TextureWrapMode.Repeat;
 
       Color32[] black = new Color32[_frameResolution];
       for (int i = 0; i < black.Length; i++) {
         black[i] = Color.black;
       }
-      _profilerTexture.SetPixels32(black);
-      _profilerTexture.Apply();
+      _graphTexture.SetPixels32(black);
+      _graphTexture.Apply();
 
-      _profilerRenderer.material.mainTexture = _profilerTexture;
+      _graphRenderer.material = new Material(_graphShader);
+      _graphRenderer.material.mainTexture = _graphTexture;
 
       _gradientTexture = new Texture2D(256, 1, TextureFormat.ARGB32, false, true);
       _gradientTexture.filterMode = FilterMode.Bilinear;
@@ -170,15 +108,12 @@ namespace Leap.Unity.FramerateGraph {
       _gradientTexture.SetPixels32(colors);
       _gradientTexture.Apply();
 
-      _profilerRenderer.material.SetTexture("_Ramp", _gradientTexture);
+      _graphRenderer.material.SetTexture("_Ramp", _gradientTexture);
 
       _cachedStrings = new string[500];
       for (int i = 0; i < 500; i++) {
         _cachedStrings[i] = (i / 10.0f).ToString();
       }
-
-      _longMethodNameText.text = "";
-      _longMethodTimeText.text = "";
     }
 
     void OnEnable() {
@@ -227,11 +162,11 @@ namespace Leap.Unity.FramerateGraph {
         float updatePercent = totalUpdateMilis / _frameTimeCap;
         float framePercent = totalFrameMilis / _frameTimeCap;
 
-        _profilerTexture.SetPixel(_textureOffset, 0, new Color(renderPercent, updatePercent, framePercent));
-        _profilerTexture.Apply();
+        _graphTexture.SetPixel(_textureOffset, 0, new Color(renderPercent, updatePercent, framePercent));
+        _graphTexture.Apply();
 
         _textureOffset = (_textureOffset + 1) % _frameResolution;
-        _profilerRenderer.material.SetFloat("_Offset", _textureOffset / (float)_frameResolution);
+        _graphRenderer.material.SetFloat("_Offset", _textureOffset / (float)_frameResolution);
 
         setSmoothedText(_smoothedFrameTimeText, _smoothedFrameTime, totalFrameMilis);
         setSmoothedText(_smoothedRenderTimeText, _smoothedRenderTime, totalRenderMilis);
