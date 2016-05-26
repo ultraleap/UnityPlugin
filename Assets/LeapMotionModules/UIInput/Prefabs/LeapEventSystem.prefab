@@ -79,12 +79,12 @@ MonoBehaviour:
   PointerPinchScale:
     serializedVersion: 2
     m_Curve:
-    - time: 29.927753
-      value: 0.7980286
+    - time: 29.960255
+      value: 0.6020917
       inSlope: 0.018969504
       outSlope: 0.018969504
       tangentMode: 0
-    - time: 70.05925
+    - time: 70.01795
       value: 1.101783
       inSlope: 0.0040388247
       outSlope: 0.0040388247
@@ -100,8 +100,9 @@ MonoBehaviour:
   InteractionMode: 0
   ProjectiveToTactileTransitionDistance: 0.4
   TactilePadding: 0.005
-  PinchingThreshold: 20
-  EnvironmentPointer: 0
+  PinchingThreshold: 30
+  InnerPointer: 1
+  InnerPointerOpacityScalar: 0.77
   BeginHoverSound: {fileID: 0}
   EndHoverSound: {fileID: 0}
   BeginTriggerSound: {fileID: 0}
@@ -135,6 +136,7 @@ MonoBehaviour:
   DrawDebug: 0
   RetractUI: 0
   perFingerPointer: 0
+  EnvironmentPointer: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

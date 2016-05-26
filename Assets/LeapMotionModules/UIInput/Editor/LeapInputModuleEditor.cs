@@ -21,9 +21,14 @@ namespace Leap.Unity.InputModule {
       specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid,
                                "ProjectiveToTactileTransitionDistance");
 
+      specifyConditionalDrawing(() => module.InnerPointer,
+                         "InnerPointerOpacityScalar");
+
       specifyConditionalDrawing(() => module.ShowAdvancedOptions,
                          "InteractionMode",
                          "OverrideScrollViewClicks",
+                         "InnerPointer",
+                         "InnerPointerOpacityScalar",
                          "DrawDebug",
                          "TriggerHoverOnElementSwitch",
                          "BeginHoverSound",
@@ -50,7 +55,8 @@ namespace Leap.Unity.InputModule {
                    "DrawDebug",
                    "TriggerHoverOnElementSwitch",
                    "perFingerPointer",
-                   "RetractUI");
+                   "RetractUI",
+                   "EnvironmentPointer");
     }
 
     bool ProjectiveAllowed(LeapInputModule.InteractionCapability mode) {

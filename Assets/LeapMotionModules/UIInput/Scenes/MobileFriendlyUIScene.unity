@@ -7362,6 +7362,14 @@ Prefab:
       propertyPath: RightHandDetector
       value: 
       objectReference: {fileID: 1188448100}
+    - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 2}
+      propertyPath: ShowAdvancedOptions
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 2}
+      propertyPath: PinchingThreshold
+      value: 30
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 2}
   m_IsPrefabParent: 0
@@ -10191,8 +10199,8 @@ MonoBehaviour:
   tweenRotationalWarping: 0
   tweenPositionalWarping: 0
   syncMode: 1
-  allowManualTimeAlignment: 0
-  warpingAdjustment: 30
+  allowManualTimeAlignment: 1
+  warpingAdjustment: 0
   unlockHold: 303
   moreRewind: 276
   lessRewind: 275
@@ -28118,7 +28126,7 @@ MonoBehaviour:
   _overrideDeviceType: 1
   _overrideDeviceTypeWith: 1
   _useInterpolation: 1
-  _interpolationDelay: 40
+  _interpolationDelay: 15
 --- !u!4 &1587970164
 Transform:
   m_ObjectHideFlags: 0
