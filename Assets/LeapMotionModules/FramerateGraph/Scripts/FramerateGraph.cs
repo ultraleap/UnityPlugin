@@ -5,11 +5,12 @@ using System.Collections;
 namespace Leap.Unity.FramerateGraph {
 
   public class FramerateGraph : MonoBehaviour {
-    [Tooltip("The ideal framerate your application should be running at.")]
+
+    [Tooltip("The ideal framerate your application should be running at.  The graph will show frame time based on a scale from 0 to IdealFrameTime*2.")]
     [SerializeField]
     private float _idealFramerate = 60;
 
-    [Tooltip("When the frame time is less than idealMaxFrameTime, color will come from this gradient.")]
+    [Tooltip("The color of a vertial slice based on the frame time.")]
     [SerializeField]
     private Gradient _colorGradient;
 
