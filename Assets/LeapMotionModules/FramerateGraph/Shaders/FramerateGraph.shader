@@ -1,4 +1,4 @@
-﻿Shader "HandyMan/RuntimeProfiler" {
+﻿Shader "LeapMotion/FramerateGraph" {
 	Properties {
 		_MainTex ("Time Data", 2D) = "white" {}
     _Ramp    ("Color Ramp",  2D) = "white" {}

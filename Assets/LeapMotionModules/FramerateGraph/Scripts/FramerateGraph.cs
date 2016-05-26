@@ -5,12 +5,9 @@ using System.Collections;
 namespace Leap.Unity.FramerateGraph {
 
   public class FramerateGraph : MonoBehaviour {
-    public static KeyCode _toggleKey = KeyCode.P;
-    public const float DIST_BETWEEN_RENDER_AND_UPDATE = 0.003f;
-
-    [Tooltip("All frame times greater than this value will not result in larger bars.")]
+    [Tooltip("The ideal framerate your application should be running at.")]
     [SerializeField]
-    private float _frameTimeCap = 30.0f;
+    private float _idealFramerate = 60;
 
     [Tooltip("When the frame time is less than idealMaxFrameTime, color will come from this gradient.")]
     [SerializeField]
@@ -32,8 +29,9 @@ namespace Leap.Unity.FramerateGraph {
     [SerializeField]
     private float _smoothingDelay = 0.1f;
 
+    [Tooltip("How many extra frames of delay are considered a spike.  If this value is 2 for example, a frame that takes twice as long as expected is considered a spike.")]
     [SerializeField]
-    private float _spikeThreshold = 17.0f;
+    private float _spikeFrameMultiplier = 2;
 
     [SerializeField]
     private float _spikeSmoothingDelay = 5.0f;
@@ -151,16 +149,17 @@ namespace Leap.Unity.FramerateGraph {
         float totalUpdateMilis = _totalUpdateTick / (float)System.Diagnostics.Stopwatch.Frequency * 1000.0f;
         float totalFrameMilis = _totalFrameTick / (float)System.Diagnostics.Stopwatch.Frequency * 1000.0f;
 
-        bool isSpike = totalFrameMilis > _spikeThreshold;
+        bool isSpike = totalFrameMilis > (1000.0f * _spikeFrameMultiplier / _idealFramerate);
         if (isSpike) {
           _lastSpikeTick = _stopwatch.ElapsedTicks;
         }
         long ticksSinceSpike = (_stopwatch.ElapsedTicks - _lastSpikeTick);
         float secondsSinceSpike = ticksSinceSpike / (float)System.Diagnostics.Stopwatch.Frequency;
 
-        float renderPercent = totalRenderMilis / _frameTimeCap;
-        float updatePercent = totalUpdateMilis / _frameTimeCap;
-        float framePercent = totalFrameMilis / _frameTimeCap;
+        float maxMilisPerFrame = 2000.0f / _idealFramerate;
+        float renderPercent = totalRenderMilis / maxMilisPerFrame;
+        float updatePercent = totalUpdateMilis / maxMilisPerFrame;
+        float framePercent = totalFrameMilis / maxMilisPerFrame;
 
         _graphTexture.SetPixel(_textureOffset, 0, new Color(renderPercent, updatePercent, framePercent));
         _graphTexture.Apply();
