@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Leap;
 
 namespace Leap.Unity {
@@ -13,34 +14,64 @@ namespace Leap.Unity {
     HandRepresentation
   {
     HandPool parent;
-    public IHandModel handModel;
+    public List<IHandModel> handModels;
 
-    public HandProxy(HandPool parent, IHandModel handModel, Hand hand) :
-      base(hand.Id)
+    public HandProxy(HandPool parent, Hand hand, Chirality repChirality, ModelType repType) :
+      base(hand.Id, hand, repChirality, repType)
     {
       this.parent = parent;
-      this.handModel = handModel;
-
-      // Check to see if the hand model has been initialized yet
-      if (handModel.GetLeapHand() == null) {
-        handModel.SetLeapHand(hand);
-        handModel.InitHand();
-      } else {
-        handModel.SetLeapHand(hand);
-      }
-      handModel.BeginHand();
+      this.RepChirality = repChirality;
+      this.RepType = repType;
+      this.MostRecentHand = hand;
     }
+
     /** To be called if the HandRepresentation no longer has a Leap Hand. */
     public override void Finish() {
-      handModel.FinishHand();
-      parent.ModelPool.Add(handModel);
-      handModel = null;
+      if (handModels != null) {
+        for (int i = 0; i < handModels.Count; i++) {
+          handModels[i].FinishHand();
+          parent.ReturnToPool(handModels[i]);
+          handModels[i] = null;
+        }
+      }
+      parent.RemoveHandRepresentation(this);
+    }
+
+    public override void AddModel(IHandModel model) {
+      if (handModels == null) {
+        handModels = new List<IHandModel>();
+      }
+      handModels.Add(model);
+      if (model.GetLeapHand() == null) {
+        model.SetLeapHand(MostRecentHand);
+        model.InitHand();
+        model.BeginHand();
+        model.UpdateHand();
+      }
+      else {
+        model.SetLeapHand(MostRecentHand);
+        model.BeginHand();
+
+      }
+    }
+
+    public override void RemoveModel(IHandModel model) {
+      if (handModels != null) {
+        model.FinishHand();
+        handModels.Remove(model);
+      }
     }
 
     /** Calls Updates in IHandModels that are part of this HandRepresentation */
-    public override void UpdateRepresentation(Hand hand, ModelType modelType){
-      handModel.SetLeapHand(hand);
-      handModel.UpdateHand();
+    public override void UpdateRepresentation(Hand hand)
+    {
+      base.UpdateRepresentation(hand);
+      if (handModels != null) {
+        for (int i = 0; i < handModels.Count; i++) {
+          handModels[i].SetLeapHand(hand);
+          handModels[i].UpdateHand();
+        }
+      }
     }
   }
 }

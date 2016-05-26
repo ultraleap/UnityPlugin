@@ -17,19 +17,23 @@ namespace Leap.Unity {
       }
     }
     public float filtering = 0.5f;
-  
+
+    public override bool SupportsEditorPersistence() {
+      return true;
+    }
+
     public override void InitHand() {
       base.InitHand();
     }
-  
+
     public override void UpdateHand() {
-  
+
       for (int f = 0; f < fingers.Length; ++f) {
         if (fingers[f] != null) {
           fingers[f].UpdateFinger();
         }
       }
-  
+
       if (palm != null) {
         Rigidbody palmBody = palm.GetComponent<Rigidbody>();
         if (palmBody) {
@@ -40,21 +44,21 @@ namespace Leap.Unity {
           palm.rotation = GetPalmRotation();
         }
       }
-      
+
       if (forearm != null) {
         // Set arm dimensions.
-        CapsuleCollider capsule = forearm.GetComponent<CapsuleCollider> ();
+        CapsuleCollider capsule = forearm.GetComponent<CapsuleCollider>();
         if (capsule != null) {
           // Initialization
           capsule.direction = 2;
-          forearm.localScale = new Vector3(1f/transform.lossyScale.x, 1f/transform.lossyScale.y, 1f/transform.lossyScale.z);
-          
+          forearm.localScale = new Vector3(1f / transform.lossyScale.x, 1f / transform.lossyScale.y, 1f / transform.lossyScale.z);
+
           // Update
-          capsule.radius = GetArmWidth () / 2f;
-          capsule.height = GetArmLength () + GetArmWidth ();
+          capsule.radius = GetArmWidth() / 2f;
+          capsule.height = GetArmLength() + GetArmWidth();
         }
-  
-        Rigidbody forearmBody = forearm.GetComponent<Rigidbody> ();
+
+        Rigidbody forearmBody = forearm.GetComponent<Rigidbody>();
         if (forearmBody) {
           forearmBody.MovePosition(GetArmCenter());
           forearmBody.MoveRotation(GetArmRotation());
