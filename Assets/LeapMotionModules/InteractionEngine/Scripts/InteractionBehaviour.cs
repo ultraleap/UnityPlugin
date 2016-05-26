@@ -486,8 +486,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected override void OnGraspEnd() {
-      base.OnGraspEnd();
+    protected override void OnGraspEnd(Hand lastHand) {
+      base.OnGraspEnd(lastHand);
 
       updateState();
 
@@ -495,9 +495,10 @@ namespace Leap.Unity.Interaction {
         _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
       }
 
-      float speed = _rigidbody.velocity.magnitude;
+      Vector3 palmVel = lastHand.PalmVelocity.ToVector3();
+      float speed = palmVel.magnitude;
       float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed);
-      _rigidbody.velocity *= multiplier;
+      _rigidbody.velocity = palmVel * multiplier;
     }
     #endregion
 

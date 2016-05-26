@@ -247,7 +247,7 @@ namespace Leap.Unity.Interaction {
 
       if (_graspingIds.Count == 0) {
         _baseCallGuard.Begin("OnGraspEnd");
-        OnGraspEnd();
+        OnGraspEnd(hand);
         _baseCallGuard.AssertBaseCalled();
       }
     }
@@ -288,7 +288,7 @@ namespace Leap.Unity.Interaction {
       //OnGraspEnd is dispatched in OnHandTimeout in addition to OnHandRelease
       if (_graspingIds.Count == 0) {
         _baseCallGuard.Begin("OnGraspEnd");
-        OnGraspEnd();
+        OnGraspEnd(oldHand);
         _baseCallGuard.AssertBaseCalled();
       }
     }
@@ -439,7 +439,7 @@ namespace Leap.Unity.Interaction {
     /// Called when the object transitions from being grasped by at least one hand
     /// to being grasped by no hands.
     /// </summary>
-    protected virtual void OnGraspEnd() {
+    protected virtual void OnGraspEnd(Hand lastHand) {
       _baseCallGuard.NotifyBaseCalled("OnGraspEnd");
       if (OnGraspEndEvent != null) {
         OnGraspEndEvent();
