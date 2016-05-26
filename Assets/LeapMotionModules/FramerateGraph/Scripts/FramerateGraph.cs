@@ -31,7 +31,7 @@ namespace Leap.Unity.FramerateGraph {
 
     [Tooltip("How many extra frames of delay are considered a spike.  If this value is 2 for example, a frame that takes twice as long as expected is considered a spike.")]
     [SerializeField]
-    private float _spikeFrameMultiplier = 2;
+    private float _spikeFrameMultiplier = 1.5f;
 
     [SerializeField]
     private float _spikeSmoothingDelay = 5.0f;
@@ -175,17 +175,6 @@ namespace Leap.Unity.FramerateGraph {
 
       _totalRenderTick = 0;
       _totalFrameTick = 0;
-    }
-
-    void OnDrawGizmosSelected() {
-      Matrix4x4 savedMatrix = Gizmos.matrix;
-
-      Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, transform.lossyScale);
-
-      Gizmos.color = Color.white;
-      Gizmos.DrawWireCube(Vector3.zero, new Vector3(1, 1, 0));
-
-      Gizmos.matrix = savedMatrix;
     }
 
     private void onPreRender(Camera camera) {

@@ -392,7 +392,7 @@ MonoBehaviour:
   _smoothedSpikeText: {fileID: 11431814}
   _smoothedFrameTimeText: {fileID: 11458122}
   _smoothingDelay: 0.1
-  _spikeFrameMultiplier: 2
+  _spikeFrameMultiplier: 1.5
   _spikeSmoothingDelay: 5
   _frameResolution: 128
   _graphRenderer: {fileID: 2374066}
