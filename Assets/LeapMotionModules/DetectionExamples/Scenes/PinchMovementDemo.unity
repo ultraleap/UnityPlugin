@@ -405,7 +405,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rendererLod: 2
   _subMeshLod: 2
-  _material: {fileID: 2100000, guid: 55b2de73592554eb4987d57cfffeb478, type: 2}
+  _material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   _overrideShadowDistance: 1
 --- !u!1 &1023543769
 GameObject:
