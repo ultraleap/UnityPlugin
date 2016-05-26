@@ -260,10 +260,10 @@ namespace Leap.Unity.InputModule {
       for (int whichPointer = 0; whichPointer < NumberOfPointers; whichPointer++) {
         int whichHand;
         int whichFinger;
-        //Move on if this hand isn't visible in the frame
         if (perFingerPointer) {
           whichHand = whichPointer <= 4 ? 0 : 1;
           whichFinger = whichPointer <= 4 ? whichPointer : whichPointer - 5;
+          //Move on if this hand isn't visible in the frame
           if (curFrame.Hands.Count - 1 < whichHand){
             if(Pointers[whichPointer].gameObject.activeInHierarchy == true) {
               Pointers[whichPointer].gameObject.SetActive(false);
@@ -273,6 +273,7 @@ namespace Leap.Unity.InputModule {
         }else {
           whichHand = whichPointer;
           whichFinger = 1;
+          //Move on if this hand isn't visible in the frame
           if (curFrame.Hands.Count - 1 < whichHand) {
             if (Pointers[whichPointer].gameObject.activeInHierarchy == true) {
               Pointers[whichPointer].gameObject.SetActive(false);
@@ -327,7 +328,6 @@ namespace Leap.Unity.InputModule {
           Pointers[whichPointer].rotation = Quaternion.LookRotation(EnvironmentSpot.normal);
           evaluatePointerSize(whichPointer);
         }
-
 
         PrevScreenPosition[whichPointer] = PointEvents[whichPointer].position;
 
@@ -391,7 +391,6 @@ namespace Leap.Unity.InputModule {
                     //Which does click when mouse goes up over same object it went down on
                     //This improves the user's ability to select small menu items
                     ExecuteEvents.Execute(newPressed, PointEvents[whichPointer], ExecuteEvents.pointerClickHandler);
-
                   }
 
                   if (newPressed != null) {
@@ -475,7 +474,7 @@ namespace Leap.Unity.InputModule {
 
       //If we're in "Touching Mode", Raycast through the fingers
       Vector3 IndexFingerPosition;
-      if (pointerState[whichPointer] == pointerStates.NearCanvas || pointerState[whichPointer] == pointerStates.TouchingCanvas || pointerState[whichPointer] == pointerStates.TouchingElement || forceTipRaycast) {
+      if (getTouchingMode(whichPointer) || forceTipRaycast) {
         TipRaycast = true;
         if (Camera.main != null) {
           EventCamera.transform.position = Camera.main.transform.position;
@@ -695,7 +694,7 @@ namespace Leap.Unity.InputModule {
         }
       }
 
-      //Commented out Velocity Stretching because it looks funny when I change the projection origin
+      //Commented out Velocity Stretching because it looks funny when switching between Tactile and Projective
       Pointers[whichPointer].localScale = Pointerscale * new Vector3(1f, 1f /*+ pointData.delta.magnitude*1f*/, 1f);
     }
 
@@ -703,7 +702,7 @@ namespace Leap.Unity.InputModule {
     public bool isTriggeringInteraction(int whichPointer, int whichHand, int whichFinger) {
 
       if (InteractionMode != InteractionCapability.Projective) {
-        if ((pointerState[whichPointer] == pointerStates.NearCanvas || pointerState[whichPointer] == pointerStates.TouchingCanvas || pointerState[whichPointer] == pointerStates.TouchingElement)) {
+        if (getTouchingMode(whichPointer)) {
           return (distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < 0f);
         }
       }
