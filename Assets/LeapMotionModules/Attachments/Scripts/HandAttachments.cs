@@ -123,14 +123,16 @@ namespace Leap.Unity{
         PinchPoint.rotation = Quaternion.LookRotation(forward.ToVector3(), up.ToVector3());
       }
       if (GrabPoint != null) {
-        Vector3 GrabCenter = _hand.WristPosition.ToVector3();
+        Vector GrabCenter = Vector.Zero;
         for (int i = 0; i < _hand.Fingers.Count; i++) {
-          GrabCenter += _hand.Fingers[i].TipPosition.ToVector3();
+          GrabCenter += _hand.Fingers[i].TipPosition;
         }
-        GrabPoint.position = GrabCenter / 6.0f;
         Vector GrabForward = (_hand.Fingers[2].TipPosition - _hand.WristPosition).Normalized;
         Vector thumbToPinky = _hand.Fingers[0].TipPosition - _hand.Fingers[4].TipPosition;
         Vector GrabNormal = GrabForward.Cross(thumbToPinky).Normalized;
+
+        GrabCenter = GrabCenter / 5.0f;
+        GrabPoint.position = GrabCenter.ToVector3();
         GrabPoint.rotation = Quaternion.LookRotation(GrabForward.ToVector3(), GrabNormal.ToVector3());
       }
     }
