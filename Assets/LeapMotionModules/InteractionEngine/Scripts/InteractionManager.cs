@@ -297,7 +297,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Forces a hand to grasp the given interaction behaviour.  The grasp will only be terminated when 
+    /// Forces a hand to grasp the given interaction behaviour.  The grasp will only be terminated when
     /// the hand either times out or the user calls ReleaseHand.
     /// </summary>
     /// <param name="hand"></param>
@@ -896,16 +896,12 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void createScene() {
-#if UNITY_EDITOR
       UInt32 version = InteractionC.GetVersion();
       if (InteractionC.GetVersion() != _expectedVersion) {
         _scene.pScene = (IntPtr)0;
-        UnityEditor.EditorUtility.DisplayDialog("Version Error!",
-                                                "Leap Interaction dll version expected: " + _expectedVersion + " got version: " + version,
-                                                "Ok");
-        throw new Exception("Leap Interaction version wrong");
+        Debug.Log("Leap Interaction dll version expected: " + _expectedVersion + " got version: " + version);
+        throw new EntryPointNotFoundException("Leap Interaction version wrong");
       }
-#endif // UNITY_EDITOR
 
       INTERACTION_SCENE_INFO sceneInfo = getSceneInfo();
       string dataPath = Path.Combine(Application.streamingAssetsPath, _dataSubfolder);

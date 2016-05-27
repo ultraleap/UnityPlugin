@@ -472,6 +472,9 @@ namespace Leap.Unity.Interaction {
 
       updateState();
 
+      _rigidbody.velocity = Vector3.zero;
+      _rigidbody.angularVelocity = Vector3.zero;
+
       removeHandPointCollection(oldHand.Id);
     }
 
@@ -486,8 +489,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected override void OnGraspEnd() {
-      base.OnGraspEnd();
+    protected override void OnGraspEnd(Hand lastHand) {
+      base.OnGraspEnd(lastHand);
 
       updateState();
 
@@ -495,9 +498,12 @@ namespace Leap.Unity.Interaction {
         _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
       }
 
-      float speed = _rigidbody.velocity.magnitude;
-      float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed);
-      _rigidbody.velocity *= multiplier;
+      if (lastHand != null) {
+        Vector3 palmVel = lastHand.PalmVelocity.ToVector3();
+        float speed = palmVel.magnitude;
+        float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed);
+        _rigidbody.velocity = palmVel * multiplier;
+      }
     }
     #endregion
 
@@ -547,12 +553,7 @@ namespace Leap.Unity.Interaction {
         && otherObj.GetComponentInParent<InteractionBrushHand>() == null) {
         string thisLabel = gameObject.name + " <layer " + LayerMask.LayerToName(gameObject.layer) + ">";
         string otherLabel = otherObj.name + " <layer " + LayerMask.LayerToName(otherObj.layer) + ">";
-
-        UnityEditor.EditorUtility.DisplayDialog("Collision Error!",
-                                                "For interaction to work properly please prevent collision between IHandModel "
-                                                + "and InteractionBehavior. " + thisLabel + ", " + otherLabel,
-                                                "Ok");
-        Debug.Break();
+        Debug.Log("For interaction to work properly please prevent collision between IHandModel and InteractionBehavior. " + thisLabel + ", " + otherLabel);
       }
     }
 #endif
