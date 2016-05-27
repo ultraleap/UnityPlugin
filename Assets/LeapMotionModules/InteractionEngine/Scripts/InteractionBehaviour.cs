@@ -65,14 +65,6 @@ namespace Leap.Unity.Interaction {
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
     protected LEAP_IE_KABSCH _kabsch;
 
-    protected Vector3 _rigidbodyPosition, _prevRigidbodyPosition;
-    protected Quaternion _rigidbodyRotation, _prevRigidbodyRotation;
-    protected bool _hasRigidbodyMoved = false;
-
-    protected float _graphicalWarpAmount = 0;
-    private Vector3 _graphicalPositionOffset;
-    private Quaternion _graphicalRotationOffset;
-
     private Bounds _debugBounds;
     private bool _showDebugRecievedVelocity = false;
 
@@ -396,34 +388,6 @@ namespace Leap.Unity.Interaction {
       _notifiedOfTeleport = false;
     }
 
-    protected override void OnHandsHoldGraphics(ReadonlyList<Hand> hands) {
-      base.OnHandsHoldGraphics(hands);
-
-      if (_material.WarpingEnabled) {
-        Vector3 interpolatedPosition;
-        Quaternion interpolatedRotation;
-        getInterpolatedTransform(out interpolatedPosition, out interpolatedRotation);
-
-        Vector3 deltaPosition = Quaternion.Inverse(_solvedRotation) * (_rigidbodyPosition - _solvedPosition);
-        Quaternion deltaRotation = Quaternion.Inverse(_solvedRotation) * _rigidbodyRotation;
-
-        Vector3 newPosition;
-        Quaternion newRotation;
-        getSolvedTransform(hands, out newPosition, out newRotation);
-
-        Vector3 graphicalPosition = newPosition + newRotation * deltaPosition;
-        Quaternion graphicalRotation = newRotation * deltaRotation;
-
-        _graphicalPositionOffset = graphicalPosition;
-        _graphicalRotationOffset = graphicalRotation;
-
-        _graphicalPositionOffset = Quaternion.Inverse(interpolatedRotation) * (graphicalPosition - interpolatedPosition);
-        _graphicalRotationOffset = Quaternion.Inverse(interpolatedRotation) * graphicalRotation;
-
-        _graphicalWarpAmount = _material.WarpCurve.Evaluate(deltaPosition.magnitude);
-      }
-    }
-
     protected override void OnHandReleased(Hand hand) {
       base.OnHandReleased(hand);
 
@@ -490,35 +454,6 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void FixedUpdate() {
-      if (_hasRigidbodyMoved && _graphicalWarpAmount > 0) {
-        transform.position = _rigidbodyPosition;
-        transform.rotation = _rigidbodyRotation;
-      }
-      _prevRigidbodyPosition = _rigidbody.position;
-      _prevRigidbodyRotation = _rigidbody.rotation;
-      _hasRigidbodyMoved = false;
-    }
-
-    protected virtual void LateUpdate() {
-      updateRigidbodyPosition();
-
-      if (_graphicalWarpAmount > 0) {
-        Vector3 interpolatedPosition;
-        Quaternion interpolatedRotation;
-
-        getInterpolatedTransform(out interpolatedPosition, out interpolatedRotation);
-
-        interpolatedPosition = interpolatedPosition + interpolatedRotation * _graphicalPositionOffset * _graphicalWarpAmount;
-        interpolatedRotation = interpolatedRotation * Quaternion.Slerp(Quaternion.identity, _graphicalRotationOffset, _graphicalWarpAmount);
-
-        transform.position = interpolatedPosition;
-        transform.rotation = interpolatedRotation;
-
-        _graphicalWarpAmount = Mathf.MoveTowards(_graphicalWarpAmount, 0, Time.deltaTime / _material.GraphicalReturnTime);
-      }
-    }
-
 #if UNITY_EDITOR
     private void OnCollisionEnter(Collision collision) {
       GameObject otherObj = collision.collider.gameObject;
@@ -540,7 +475,7 @@ namespace Leap.Unity.Interaction {
       if (IsRegisteredWithManager) {
         Matrix4x4 gizmosMatrix = Gizmos.matrix;
 
-        Gizmos.matrix = Matrix4x4.TRS(_rigidbodyPosition, _rigidbodyRotation, Vector3.one);
+        Gizmos.matrix = Matrix4x4.TRS(_rigidbody.position, _rigidbody.rotation, Vector3.one);
 
         if (_rigidbody.IsSleeping()) {
           Gizmos.color = Color.gray;
@@ -653,22 +588,6 @@ namespace Leap.Unity.Interaction {
 
       //Return the collection to the pool so it can be re-used
       HandPointCollection.Return(collection);
-    }
-
-    protected void updateRigidbodyPosition() {
-      if (!_hasRigidbodyMoved) {
-        _rigidbodyPosition = _rigidbody.position;
-        _rigidbodyRotation = _rigidbody.rotation;
-        _hasRigidbodyMoved = true;
-      }
-    }
-
-    protected void getInterpolatedTransform(out Vector3 position, out Quaternion rotation) {
-      updateRigidbodyPosition();
-
-      float t = (Time.time - Time.fixedTime) / Time.fixedDeltaTime;
-      position = Vector3.Lerp(_prevRigidbodyPosition, _rigidbodyPosition, t);
-      rotation = Quaternion.Slerp(_prevRigidbodyRotation, _rigidbodyRotation, t);
     }
 
     protected void getSolvedTransform(ReadonlyList<Hand> hands, out Vector3 newPosition, out Quaternion newRotation) {
