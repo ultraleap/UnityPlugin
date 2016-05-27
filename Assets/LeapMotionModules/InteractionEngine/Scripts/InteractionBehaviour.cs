@@ -553,12 +553,7 @@ namespace Leap.Unity.Interaction {
         && otherObj.GetComponentInParent<InteractionBrushHand>() == null) {
         string thisLabel = gameObject.name + " <layer " + LayerMask.LayerToName(gameObject.layer) + ">";
         string otherLabel = otherObj.name + " <layer " + LayerMask.LayerToName(otherObj.layer) + ">";
-
-        UnityEditor.EditorUtility.DisplayDialog("Collision Error!",
-                                                "For interaction to work properly please prevent collision between IHandModel "
-                                                + "and InteractionBehavior. " + thisLabel + ", " + otherLabel,
-                                                "Ok");
-        Debug.Break();
+        Debug.Log("For interaction to work properly please prevent collision between IHandModel and InteractionBehavior. " + thisLabel + ", " + otherLabel);
       }
     }
 #endif
