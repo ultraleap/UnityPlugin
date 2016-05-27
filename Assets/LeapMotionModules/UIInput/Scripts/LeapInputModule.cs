@@ -128,9 +128,6 @@ namespace Leap.Unity.InputModule {
     private Vector2[] PrevScreenPosition;
     private bool[] PrevTriggeringInteraction;
     private bool PrevTouchingMode;
-    private bool[] closeEnoughToTouch;
-    private bool[] touchingMode;
-    private float[] timeBegunTransitioning;
     private GameObject[] prevOverGo;
     private float[] timeEnteredCanvas;
 
@@ -249,9 +246,6 @@ namespace Leap.Unity.InputModule {
       PrevScreenPosition = new Vector2[NumberOfPointers];
       PrevState = new pointerStates[NumberOfPointers];
       timeEnteredCanvas = new float[NumberOfPointers];
-      timeBegunTransitioning = new float[NumberOfPointers];
-      closeEnoughToTouch = new bool[NumberOfPointers];
-      touchingMode = new bool[NumberOfPointers];
 
       //Used for calculating the origin of the Projective Interactions
       if (Camera.main != null) {
@@ -333,10 +327,6 @@ namespace Leap.Unity.InputModule {
           Debug.DrawRay(ProjectionOrigin, CurrentRotation * Vector3.forward * 5f);
         }
 
-        if (Time.time - timeBegunTransitioning[whichPointer] > 0.25f) {
-          touchingMode[whichPointer] = closeEnoughToTouch[whichPointer];
-        }
-
         //Raycast from shoulder through tip of the index finger to the UI
         bool TipRaycast = false;
         if (InteractionMode != InteractionCapability.Projective) {
@@ -373,26 +363,6 @@ namespace Leap.Unity.InputModule {
         }
 
         PrevScreenPosition[whichPointer] = PointEvents[whichPointer].position;
-
-        if (InteractionMode == InteractionCapability.Tactile) {
-          closeEnoughToTouch[whichPointer] = true;
-        }else if (InteractionMode == InteractionCapability.Projective) {
-          closeEnoughToTouch[whichPointer] = false;
-        }else if ((pointerState[whichPointer] != pointerStates.OffCanvas) && (PrevState[whichPointer] == pointerStates.OffCanvas)) {
-          //if ((distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance)) {
-          //  closeEnoughToTouch[whichPointer] = true;
-          //  timeBegunTransitioning[whichPointer] = Time.time - 0.25f;
-          //} else if ((distanceOfTipToPointer(whichPointer, whichHand, whichFinger) > ProjectiveToTactileTransitionDistance)) {
-          //  closeEnoughToTouch[whichPointer] = false;
-          //  timeBegunTransitioning[whichPointer] = Time.time - 0.25f;
-          //}
-        } else if ((distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance) && (!closeEnoughToTouch[whichPointer])) {
-          closeEnoughToTouch[whichPointer] = true;
-          timeBegunTransitioning[whichPointer] = Time.time;
-        } else if ((distanceOfTipToPointer(whichPointer, whichHand, whichFinger) > ProjectiveToTactileTransitionDistance) && (closeEnoughToTouch[whichPointer])) {
-          closeEnoughToTouch[whichPointer] = false;
-          timeBegunTransitioning[whichPointer] = Time.time;
-        }
 
         if (DrawDebug) {
           PointerLines[whichPointer].SetPosition(0, EventCamera.transform.position);
@@ -501,7 +471,7 @@ namespace Leap.Unity.InputModule {
             }
           }
 
-          updatePointerColor(whichPointer);
+          updatePointerColor(whichPointer, whichHand, whichFinger);
         }
 
         //Make the special Leap Widget Buttons Pop Up and Flatten when Appropriate
@@ -612,8 +582,7 @@ namespace Leap.Unity.InputModule {
     //Tree to decide the State of the Pointer
     private void ProcessState(int whichPointer, int whichHand, int whichFinger, bool forceTipRaycast) {
       if ((PointEvents[whichPointer].pointerCurrentRaycast.gameObject != null)) {
-        //if (distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance) {
-        if (touchingMode[whichPointer]){
+        if (distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance) {
           if (isTriggeringInteraction(whichPointer, whichHand, whichFinger)) {
             if (!PointEvents[whichPointer].pointerCurrentRaycast.gameObject.GetComponent<Canvas>()) {
               pointerState[whichPointer] = pointerStates.TouchingElement;
@@ -814,8 +783,8 @@ namespace Leap.Unity.InputModule {
     }
 
     //Where the color that the Pointer will lerp to is chosen
-    void updatePointerColor(int whichPointer) {
-      float TransitionAmount = Mathf.Clamp01(Mathf.Abs(((Time.time - timeBegunTransitioning[whichPointer])*4f) - 1f));
+    void updatePointerColor(int whichPointer, int whichHand, int whichFinger) {
+      float TransitionAmount = Mathf.Clamp01(Mathf.Abs((distanceOfTipToPointer(whichPointer, whichHand, whichFinger)-ProjectiveToTactileTransitionDistance))/0.05f);
 
       switch (pointerState[whichPointer]) {
         case pointerStates.OnCanvas:
