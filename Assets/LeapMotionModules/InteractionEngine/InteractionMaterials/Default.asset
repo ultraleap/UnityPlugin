@@ -15,7 +15,7 @@ MonoBehaviour:
   _brushDisableDistance: 0.017
   _graspingEnabled: 1
   _graspMethod: 0
-  _releaseDistance: 0.15
+  _releaseDistance: 60
   _maxVelocity: 6
   _strengthByDistance:
     serializedVersion: 2

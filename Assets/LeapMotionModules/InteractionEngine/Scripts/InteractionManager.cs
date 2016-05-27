@@ -493,7 +493,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void LateUpdate() {
+    protected virtual void Update() {
       if (_pauseSimulation) {
         return;
       }
