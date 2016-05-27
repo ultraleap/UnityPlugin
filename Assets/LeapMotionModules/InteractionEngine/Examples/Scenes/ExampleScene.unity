@@ -1363,8 +1363,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ModelPool:
-  - _handPool: {fileID: 0}
-    GroupName: GraphicalHands
+  - GroupName: GraphicalHands
+    _handPool: {fileID: 0}
     LeftModel: {fileID: 125884215}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 1884541115}
@@ -1373,8 +1373,8 @@ MonoBehaviour:
     modelsCheckedOut: []
     IsEnabled: 1
     CanDuplicate: 1
-  - _handPool: {fileID: 0}
-    GroupName: GraphicalHands
+  - GroupName: GraphicalHands
+    _handPool: {fileID: 0}
     LeftModel: {fileID: 1251467163}
     IsLeftToBeSpawned: 0
     RightModel: {fileID: 1491160530}
@@ -1475,7 +1475,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1081703724}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.182, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 796518401}
