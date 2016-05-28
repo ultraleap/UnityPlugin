@@ -3,7 +3,7 @@ using System;
 
 namespace Leap.Unity.Interaction {
 
-  public class Warper : IDisposable {
+  public class RigidbodyWarper : IDisposable {
     protected enum CallbackState {
       Physical,
       PhysicalNeedsUpdate,
@@ -30,7 +30,7 @@ namespace Leap.Unity.Interaction {
     protected Vector3 _graphicalPosition, _graphicalPositionOffset;
     protected Quaternion _graphicalRotation, _graphicalRotationOffset;
 
-    public Warper(InteractionManager manager, Transform transform, Rigidbody rigidbody, float returnTime) {
+    public RigidbodyWarper(InteractionManager manager, Transform transform, Rigidbody rigidbody, float returnTime) {
       _manager = manager;
       _transform = transform;
       _rigidbody = rigidbody;

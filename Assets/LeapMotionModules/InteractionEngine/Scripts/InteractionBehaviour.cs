@@ -59,7 +59,7 @@ namespace Leap.Unity.Interaction {
     protected Vector3 _solvedPosition;
     protected Quaternion _solvedRotation;
 
-    protected Warper _warper;
+    protected RigidbodyWarper _warper;
 
     protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
@@ -143,7 +143,7 @@ namespace Leap.Unity.Interaction {
       }
       _rigidbody.maxAngularVelocity = float.PositiveInfinity;
 
-      _warper = new Warper(_manager, transform, _rigidbody, _material.GraphicalReturnTime);
+      _warper = new RigidbodyWarper(_manager, transform, _rigidbody, _material.GraphicalReturnTime);
 
       _childrenArray = GetComponentsInChildren<Transform>(true);
       updateLayer();
