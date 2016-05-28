@@ -899,7 +899,7 @@ namespace Leap.Unity.Interaction {
       UInt32 version = InteractionC.GetVersion();
       if (InteractionC.GetVersion() != _expectedVersion) {
         _scene.pScene = (IntPtr)0;
-        Debug.Log("Leap Interaction dll version expected: " + _expectedVersion + " got version: " + version);
+        Debug.LogError("Leap Interaction dll version expected: " + _expectedVersion + " got version: " + version);
         throw new EntryPointNotFoundException("Leap Interaction version wrong");
       }
 

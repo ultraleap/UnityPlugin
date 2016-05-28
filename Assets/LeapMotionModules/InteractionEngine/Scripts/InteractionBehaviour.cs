@@ -510,13 +510,6 @@ namespace Leap.Unity.Interaction {
     #region UNITY CALLBACKS
     protected virtual void Awake() {
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
-
-      Vector3 scale = transform.lossyScale;
-      if (!Mathf.Approximately(scale.x, scale.y) || !Mathf.Approximately(scale.x, scale.z)) {
-        enabled = false;
-        Debug.LogError("Interaction Behaviour cannot have a non-uniform scale!");
-        return;
-      }
     }
 
     protected IEnumerator lerpGraphicalToOrigin() {
@@ -553,7 +546,7 @@ namespace Leap.Unity.Interaction {
         && otherObj.GetComponentInParent<InteractionBrushHand>() == null) {
         string thisLabel = gameObject.name + " <layer " + LayerMask.LayerToName(gameObject.layer) + ">";
         string otherLabel = otherObj.name + " <layer " + LayerMask.LayerToName(otherObj.layer) + ">";
-        Debug.Log("For interaction to work properly please prevent collision between IHandModel and InteractionBehavior. " + thisLabel + ", " + otherLabel);
+        Debug.LogError("For interaction to work properly please prevent collision between IHandModel and InteractionBehavior. " + thisLabel + ", " + otherLabel);
       }
     }
 #endif

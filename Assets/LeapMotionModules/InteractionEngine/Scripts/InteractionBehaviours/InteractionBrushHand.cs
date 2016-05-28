@@ -61,7 +61,7 @@ namespace Leap.Unity.Interaction {
 
       // We also require a material for friction to be able to work.
       if (_material == null || _material.bounciness != 0.0f || _material.bounceCombine != PhysicMaterialCombine.Minimum) {
-        Debug.Log("An InteractionBrushHand must have a material with 0 bounciness and a bounceCombine of Minimum.  Name: " + gameObject.name);
+        Debug.LogError("An InteractionBrushHand must have a material with 0 bounciness and a bounceCombine of Minimum.  Name: " + gameObject.name);
       }
 #endif
 

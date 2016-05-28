@@ -19,7 +19,7 @@ namespace Leap.Unity {
     private void OnCollisionEnter(Collision collision) {
       GameObject otherObj = collision.collider.gameObject;
       if (otherObj.GetComponentInParent<InteractionBehaviourBase>() == null) {
-        Debug.Log("For interaction to work properly please prevent collision between an InteractionBrushHand and non-interaction objects. " + ThisLabel() + ", " + ThatLabel(collision));
+        Debug.LogError("For interaction to work properly please prevent collision between an InteractionBrushHand and non-interaction objects. " + ThisLabel() + ", " + ThatLabel(collision));
       }
     }
   }
