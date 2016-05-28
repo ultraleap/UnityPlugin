@@ -39,15 +39,12 @@ namespace Leap.Unity.Interaction {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 
-    [Tooltip("A transform that acts as the parent of all renderers for this object.  By seperating out the graphical " +
-             "representation from the physical, interaction fidelity can be improved and latency reduced.")]
-    [SerializeField]
-    protected Transform _graphicalAnchor;
-
     [SerializeField]
     protected InteractionMaterial _material;
 
-    protected Renderer[] _renderers;
+    [SerializeField]
+    protected Renderer[] _suspendableRenderers;
+
     protected Transform[] _childrenArray;
     protected Rigidbody _rigidbody;
 
@@ -62,13 +59,13 @@ namespace Leap.Unity.Interaction {
     protected Vector3 _solvedPosition;
     protected Quaternion _solvedRotation;
 
+    protected RigidbodyWarper _warper;
+
     protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
 
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
     protected LEAP_IE_KABSCH _kabsch;
-
-    private Coroutine _graphicalLerpCoroutine = null;
 
     private Bounds _debugBounds;
     private bool _showDebugRecievedVelocity = false;
@@ -112,33 +109,6 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Sets or Gets the transform used as the graphical anchor of this InteractionBehaviour.
-    /// </summary>
-    public Transform GraphicalAnchor {
-      get {
-        return _graphicalAnchor;
-      }
-      set {
-        if (!value.IsChildOf(transform) || value == transform) {
-          throw new ArgumentException("Cannot have a graphical anchor that is not a child of the InteractionBehaviour");
-        }
-
-        if (_graphicalLerpCoroutine != null) {
-          StopCoroutine(_graphicalLerpCoroutine);
-          _graphicalLerpCoroutine = null;
-        }
-
-        if (_graphicalAnchor != null) {
-          _graphicalAnchor.gameObject.SetActive(true);
-        }
-
-        _graphicalAnchor = value;
-
-        updateState();
-      }
-    }
-
-    /// <summary>
     /// Adds a linear acceleration to the center of mass of this object.  Use this instead of Rigidbody.AddForce()
     /// </summary>
     public void AddLinearAcceleration(Vector3 acceleration) {
@@ -173,6 +143,8 @@ namespace Leap.Unity.Interaction {
       }
       _rigidbody.maxAngularVelocity = float.PositiveInfinity;
 
+      _warper = new RigidbodyWarper(_manager, transform, _rigidbody, _material.GraphicalReturnTime);
+
       _childrenArray = GetComponentsInChildren<Transform>(true);
       updateLayer();
 
@@ -183,6 +155,9 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnUnregistered() {
       base.OnUnregistered();
+
+      _warper.Dispose();
+      _warper = null;
 
       resetState();
 
@@ -207,10 +182,12 @@ namespace Leap.Unity.Interaction {
           _rigidbody.useGravity = false;
         }
       } else {
-        //If we did not recieve a velocity update, we set the rigidbody's gravity status
-        //to match whatever the user has set.
-        if (_rigidbody.useGravity != _useGravity) {
-          _rigidbody.useGravity = _useGravity;
+        if (!IsBeingGrasped) {
+          //If we did not recieve a velocity update, we set the rigidbody's gravity status
+          //to match whatever the user has set.
+          if (_rigidbody.useGravity != _useGravity) {
+            _rigidbody.useGravity = _useGravity;
+          }
         }
 
         //Only apply if non-zero to prevent waking up the body
@@ -361,34 +338,29 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandsHoldPhysics(ReadonlyList<Hand> hands) {
       base.OnHandsHoldPhysics(hands);
 
-      float distanceToSolved = Vector3.Distance(_rigidbody.position, _solvedPosition);
+       float distanceToSolved = Vector3.Distance(_warper.RigidbodyPosition, _solvedPosition);
 
       //Get new transform
-      Vector3 newPosition;
-      Quaternion newRotation;
-      getSolvedTransform(hands, out newPosition, out newRotation);
-
-      _solvedPosition = newPosition;
-      _solvedRotation = newRotation;
+      getSolvedTransform(hands, out _solvedPosition, out _solvedRotation);
 
       //Apply new transform to object
       switch (_material.GraspMethod) {
         case InteractionMaterial.GraspMethodEnum.Kinematic:
           if (_notifiedOfTeleport) {
-            _rigidbody.position = newPosition;
-            _rigidbody.rotation = newRotation;
+            _rigidbody.position = _solvedPosition;
+            _rigidbody.rotation = _solvedRotation;
           } else {
-            _rigidbody.MovePosition(newPosition);
-            _rigidbody.MoveRotation(newRotation);
+            _rigidbody.MovePosition(_solvedPosition);
+            _rigidbody.MoveRotation(_solvedRotation);
           }
           break;
         case InteractionMaterial.GraspMethodEnum.Velocity:
           if (_notifiedOfTeleport) {
-            _rigidbody.position = newPosition;
-            _rigidbody.rotation = newRotation;
+            _rigidbody.position = _solvedPosition;
+            _rigidbody.rotation = _solvedRotation;
           } else {
-            Vector3 deltaPos = newPosition - _rigidbody.position;
-            Quaternion deltaRot = newRotation * Quaternion.Inverse(_rigidbody.rotation);
+            Vector3 deltaPos = _solvedPosition - _warper.RigidbodyPosition;
+            Quaternion deltaRot = _solvedRotation * Quaternion.Inverse(_warper.RigidbodyRotation);
 
             Vector3 deltaAxis;
             float deltaAngle;
@@ -421,20 +393,19 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandsHoldGraphics(ReadonlyList<Hand> hands) {
       base.OnHandsHoldGraphics(hands);
 
-      if (_graphicalAnchor != null && _material.WarpingEnabled) {
-        Vector3 deltaPosition = Quaternion.Inverse(_solvedRotation) * (_rigidbody.position - _solvedPosition);
-        Quaternion deltaRotation = Quaternion.Inverse(_solvedRotation) * _rigidbody.rotation;
+      if (_material.WarpingEnabled) {
+        Vector3 deltaPosition = Quaternion.Inverse(_solvedRotation) * (_warper.RigidbodyPosition - _solvedPosition);
+        Quaternion deltaRotation = Quaternion.Inverse(_solvedRotation) * _warper.RigidbodyRotation;
 
         Vector3 newPosition;
         Quaternion newRotation;
         getSolvedTransform(hands, out newPosition, out newRotation);
 
-        _graphicalAnchor.position = newPosition + newRotation * deltaPosition;
-        _graphicalAnchor.rotation = newRotation * deltaRotation;
+        Vector3 graphicalPosition = newPosition + newRotation * deltaPosition;
+        Quaternion graphicalRotation = newRotation * deltaRotation;
 
-        float warpAmount = _material.WarpCurve.Evaluate(deltaPosition.magnitude);
-        _graphicalAnchor.localPosition *= warpAmount;
-        _graphicalAnchor.localRotation = Quaternion.Slerp(Quaternion.identity, _graphicalAnchor.localRotation, warpAmount);
+        _warper.WarpPercent = _material.WarpCurve.Evaluate(deltaPosition.magnitude);
+        _warper.SetGraphicalPosition(graphicalPosition, graphicalRotation);
       }
     }
 
@@ -479,21 +450,12 @@ namespace Leap.Unity.Interaction {
       base.OnGraspBegin();
 
       updateState();
-
-      //Stop an existing lerp coroutine if it exists to prevent conflict
-      if (_graphicalLerpCoroutine != null) {
-        StopCoroutine(_graphicalLerpCoroutine);
-      }
     }
 
     protected override void OnGraspEnd() {
       base.OnGraspEnd();
 
       updateState();
-
-      if (_graphicalAnchor != null) {
-        _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
-      }
 
       float speed = _rigidbody.velocity.magnitude;
       float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed);
@@ -511,33 +473,6 @@ namespace Leap.Unity.Interaction {
         Debug.LogError("Interaction Behaviour cannot have a non-uniform scale!");
         return;
       }
-    }
-
-    protected IEnumerator lerpGraphicalToOrigin() {
-      //We lerp position in world space instead of local space
-      //This helps remove wobbles when the object is rotating
-      Vector3 globalPosOffset = _graphicalAnchor.position - transform.position;
-      Quaternion startRot = _graphicalAnchor.localRotation;
-      float startTime = Time.time;
-
-      while (true) {
-        yield return null;
-
-        //Using sigmoid to help hide the lerp
-        float t = Mathf.InverseLerp(startTime, startTime + _material.GraphicalReturnTime, Time.time);
-        float percent = t * t * (3 - 2 * t);
-
-        //Lerp based on transform.position instead of rigidbody.position to reduce stutter
-        _graphicalAnchor.position = transform.position + Vector3.Lerp(globalPosOffset, Vector3.zero, percent);
-        _graphicalAnchor.localRotation = Quaternion.Slerp(startRot, Quaternion.identity, percent);
-
-        if (percent >= 1.0f) {
-          break;
-        }
-      }
-
-      //Null out coroutine reference when finished
-      _graphicalLerpCoroutine = null;
     }
 
 #if UNITY_EDITOR
@@ -561,7 +496,7 @@ namespace Leap.Unity.Interaction {
       if (IsRegisteredWithManager) {
         Matrix4x4 gizmosMatrix = Gizmos.matrix;
 
-        Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
+        Gizmos.matrix = Matrix4x4.TRS(_warper.RigidbodyPosition, _warper.RigidbodyRotation, Vector3.one);
 
         if (_rigidbody.IsSleeping()) {
           Gizmos.color = Color.gray;
@@ -625,12 +560,6 @@ namespace Leap.Unity.Interaction {
     protected void resetState() {
       _rigidbody.useGravity = _useGravity;
       _rigidbody.isKinematic = _isKinematic;
-
-      if (_graphicalAnchor != null) {
-        _graphicalAnchor.localPosition = Vector3.zero;
-        _graphicalAnchor.localRotation = Quaternion.identity;
-        _graphicalAnchor.gameObject.SetActive(true);
-      }
     }
 
     protected virtual void updateState() {
@@ -639,8 +568,11 @@ namespace Leap.Unity.Interaction {
       int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;
       bool shouldBeVisible = GraspingHandCount == 0 || trackedGraspingHandCount > 0 || !_material.HideObjectOnSuspend;
 
-      if (_graphicalAnchor != null) {
-        _graphicalAnchor.gameObject.SetActive(shouldBeVisible);
+      for (int i = 0; i < _suspendableRenderers.Length; i++) {
+        var renderer = _suspendableRenderers[i];
+        if (renderer != null) {
+          renderer.enabled = shouldBeVisible;
+        }
       }
 
       //Update kinematic status of body
