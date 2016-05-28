@@ -6,14 +6,14 @@ namespace Leap.Unity.Interaction {
   [CanEditMultipleObjects]
   [CustomEditor(typeof(InteractionBehaviourBase), true)]
   public class InteractionBehaviourBaseEditor : CustomEditorBase {
-    protected InteractionBehaviour _interactionBehaviour;
+    protected InteractionBehaviourBase _interactionBehaviour;
     protected InteractionManager _manager;
 
     protected override void OnEnable() {
       base.OnEnable();
 
       if (targets.Length == 1) {
-        _interactionBehaviour = target as InteractionBehaviour;
+        _interactionBehaviour = target as InteractionBehaviourBase;
         _manager = _interactionBehaviour.GetComponentInParent<InteractionManager>();
         if (_manager == null) {
           _manager = FindObjectOfType<InteractionManager>();

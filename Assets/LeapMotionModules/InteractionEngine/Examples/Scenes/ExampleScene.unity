@@ -2560,7 +2560,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetRenderRate: 0
   targetRenderRateStep: 1
-  fixedPhysicsRate: 10
+  fixedPhysicsRate: 100
   fixedPhysicsRateStep: 1
   unlockRender: 0
   unlockPhysics: 0
