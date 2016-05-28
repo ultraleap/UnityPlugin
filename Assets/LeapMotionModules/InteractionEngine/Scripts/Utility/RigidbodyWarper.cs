@@ -49,6 +49,8 @@ namespace Leap.Unity.Interaction {
 
     public Vector3 RigidbodyPosition {
       get {
+        checkDisposed();
+
         if (_subscribed) {
           updateRigidbodyValues();
           return _rigidbodyPosition;
@@ -60,6 +62,8 @@ namespace Leap.Unity.Interaction {
 
     public Quaternion RigidbodyRotation {
       get {
+        checkDisposed();
+
         if (_subscribed) {
           updateRigidbodyValues();
           return _rigidbodyRotation;
