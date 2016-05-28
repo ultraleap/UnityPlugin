@@ -10,7 +10,6 @@ namespace Leap.Unity.Interaction {
       Graphical
     }
 
-
     protected InteractionManager _manager;
     protected Transform _transform;
     protected Rigidbody _rigidbody;
