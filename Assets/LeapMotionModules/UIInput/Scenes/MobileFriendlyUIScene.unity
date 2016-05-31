@@ -3513,7 +3513,7 @@ MonoBehaviour:
   _overrideDeviceType: 1
   _overrideDeviceTypeWith: 1
   _useInterpolation: 1
-  _interpolationDelay: 15
+  _interpolationDelay: 40
 --- !u!4 &1587970164
 Transform:
   m_ObjectHideFlags: 0
