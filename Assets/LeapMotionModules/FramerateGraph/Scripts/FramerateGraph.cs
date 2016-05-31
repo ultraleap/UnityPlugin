@@ -146,21 +146,21 @@ namespace Leap.Unity.FramerateGraph {
 
     void Update() {
       if (_hasCompletedFrame) {
-        float totalRenderMilis = _totalRenderTick / (float)System.Diagnostics.Stopwatch.Frequency * 1000.0f;
-        float totalUpdateMilis = _totalUpdateTick / (float)System.Diagnostics.Stopwatch.Frequency * 1000.0f;
-        float totalFrameMilis = _totalFrameTick / (float)System.Diagnostics.Stopwatch.Frequency * 1000.0f;
+        float totalRenderMillis = _totalRenderTick / (float)System.Diagnostics.Stopwatch.Frequency * 1000.0f;
+        float totalUpdateMillis = _totalUpdateTick / (float)System.Diagnostics.Stopwatch.Frequency * 1000.0f;
+        float totalFrameMillis = _totalFrameTick / (float)System.Diagnostics.Stopwatch.Frequency * 1000.0f;
 
-        bool isSpike = totalFrameMilis > (1000.0f * _spikeFrameMultiplier / _idealFramerate);
+        bool isSpike = totalFrameMillis > (1000.0f * _spikeFrameMultiplier / _idealFramerate);
         if (isSpike) {
           _lastSpikeTick = _stopwatch.ElapsedTicks;
         }
         long ticksSinceSpike = (_stopwatch.ElapsedTicks - _lastSpikeTick);
         float secondsSinceSpike = ticksSinceSpike / (float)System.Diagnostics.Stopwatch.Frequency;
 
-        float maxMilisPerFrame = 2000.0f / _idealFramerate;
-        float renderPercent = totalRenderMilis / maxMilisPerFrame;
-        float updatePercent = totalUpdateMilis / maxMilisPerFrame;
-        float framePercent = totalFrameMilis / maxMilisPerFrame;
+        float maxMillisPerFrame = 2000.0f / _idealFramerate;
+        float renderPercent = totalRenderMillis / maxMillisPerFrame;
+        float updatePercent = totalUpdateMillis / maxMillisPerFrame;
+        float framePercent = totalFrameMillis / maxMillisPerFrame;
 
         _graphTexture.SetPixel(_textureOffset, 0, new Color(renderPercent, updatePercent, framePercent));
         _graphTexture.Apply();
@@ -168,9 +168,9 @@ namespace Leap.Unity.FramerateGraph {
         _textureOffset = (_textureOffset + 1) % _frameResolution;
         _graphRenderer.material.SetFloat("_Offset", _textureOffset / (float)_frameResolution);
 
-        setSmoothedText(_smoothedFrameTimeText, _smoothedFrameTime, totalFrameMilis);
-        setSmoothedText(_smoothedRenderTimeText, _smoothedRenderTime, totalRenderMilis);
-        setSmoothedText(_smoothedUpdateTimeText, _smoothedUpdateTime, totalUpdateMilis);
+        setSmoothedText(_smoothedFrameTimeText, _smoothedFrameTime, totalFrameMillis);
+        setSmoothedText(_smoothedRenderTimeText, _smoothedRenderTime, totalRenderMillis);
+        setSmoothedText(_smoothedUpdateTimeText, _smoothedUpdateTime, totalUpdateMillis);
         setSmoothedText(_smoothedSpikeText, _smoothedSpikeRate, secondsSinceSpike);
       }
 
@@ -221,7 +221,7 @@ namespace Leap.Unity.FramerateGraph {
 
     private struct MethodPair {
       public string MethodName;
-      public long ElapsedMilis;
+      public long ElapsedMillis;
     }
   }
 }
