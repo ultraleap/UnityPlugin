@@ -112,6 +112,9 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region PUBLIC METHODS
+    public Action OnGraphicalUpdate;
+    public Action OnPhysicalUpdate;
+
     /// <summary>
     /// Gets the current debug flags for this manager.
     /// </summary>
@@ -491,6 +494,10 @@ namespace Leap.Unity.Interaction {
       if (_showDebugOutput) {
         InteractionC.GetDebugStrings(ref _scene, _debugOutput);
       }
+
+      if (OnPhysicalUpdate != null) {
+        OnPhysicalUpdate();
+      }
     }
 
     protected virtual void LateUpdate() {
@@ -501,6 +508,10 @@ namespace Leap.Unity.Interaction {
       dispatchOnHandsHolding(_leapProvider.CurrentFrame, isPhysics: false);
 
       unregisterMisbehavingBehaviours();
+
+      if (OnGraphicalUpdate != null) {
+        OnGraphicalUpdate();
+      }
     }
 
     protected virtual void OnGUI() {

@@ -229,6 +229,7 @@ namespace Leap.Unity {
     protected void Start() {
       if (provider.IsConnected()) {
         deviceInfo = provider.GetDeviceInfo();
+        transform.localPosition = transform.forward * deviceInfo.focalPlaneOffset;
         LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
         if (deviceInfo.type == LeapDeviceType.Invalid) {
           Debug.LogWarning("Invalid Leap Device -> enabled = false");
@@ -252,6 +253,8 @@ namespace Leap.Unity {
 
     protected void OnDevice(object sender, DeviceEventArgs args) {
       deviceInfo = provider.GetDeviceInfo();
+      transform.localPosition = transform.forward * deviceInfo.focalPlaneOffset;
+
       if (deviceInfo.type == LeapDeviceType.Invalid) {
         Debug.LogWarning("Invalid Leap Device -> enabled = false");
         enabled = false;

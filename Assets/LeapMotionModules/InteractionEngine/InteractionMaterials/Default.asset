@@ -20,7 +20,7 @@ MonoBehaviour:
   _strengthByDistance:
     serializedVersion: 2
     m_Curve:
-    - time: 0
+    - time: 0.0050000004
       value: 1
       inSlope: 0
       outSlope: 0
@@ -61,7 +61,7 @@ MonoBehaviour:
       inSlope: 0
       outSlope: 0
       tangentMode: 0
-    - time: 0.020000001
+    - time: 0.02
       value: 0.19999999
       inSlope: 0
       outSlope: 0
