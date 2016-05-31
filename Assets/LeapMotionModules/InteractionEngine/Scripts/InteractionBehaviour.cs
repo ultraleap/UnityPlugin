@@ -443,6 +443,9 @@ namespace Leap.Unity.Interaction {
 
       updateState();
 
+      _rigidbody.velocity = Vector3.zero;
+      _rigidbody.angularVelocity = Vector3.zero;
+
       removeHandPointCollection(oldHand.Id);
     }
 
@@ -452,27 +455,23 @@ namespace Leap.Unity.Interaction {
       updateState();
     }
 
-    protected override void OnGraspEnd() {
-      base.OnGraspEnd();
+    protected override void OnGraspEnd(Hand lastHand) {
+      base.OnGraspEnd(lastHand);
 
       updateState();
 
-      float speed = _rigidbody.velocity.magnitude;
-      float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed);
-      _rigidbody.velocity *= multiplier;
+      if (lastHand != null) {
+        Vector3 palmVel = lastHand.PalmVelocity.ToVector3();
+        float speed = palmVel.magnitude;
+        float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed);
+        _rigidbody.velocity = palmVel * multiplier;
+      }
     }
     #endregion
 
     #region UNITY CALLBACKS
     protected virtual void Awake() {
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
-
-      Vector3 scale = transform.lossyScale;
-      if (!Mathf.Approximately(scale.x, scale.y) || !Mathf.Approximately(scale.x, scale.z)) {
-        enabled = false;
-        Debug.LogError("Interaction Behaviour cannot have a non-uniform scale!");
-        return;
-      }
     }
 
 #if UNITY_EDITOR
@@ -482,12 +481,7 @@ namespace Leap.Unity.Interaction {
         && otherObj.GetComponentInParent<InteractionBrushHand>() == null) {
         string thisLabel = gameObject.name + " <layer " + LayerMask.LayerToName(gameObject.layer) + ">";
         string otherLabel = otherObj.name + " <layer " + LayerMask.LayerToName(otherObj.layer) + ">";
-
-        UnityEditor.EditorUtility.DisplayDialog("Collision Error!",
-                                                "For interaction to work properly please prevent collision between IHandModel "
-                                                + "and InteractionBehavior. " + thisLabel + ", " + otherLabel,
-                                                "Ok");
-        Debug.Break();
+        Debug.LogError("For interaction to work properly please prevent collision between IHandModel and InteractionBehavior. " + thisLabel + ", " + otherLabel);
       }
     }
 #endif

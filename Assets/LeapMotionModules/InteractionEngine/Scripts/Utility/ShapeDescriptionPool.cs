@@ -93,13 +93,31 @@ namespace Leap.Unity.Interaction {
 
       INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
       if (!_meshDescMap.TryGetValue(meshCollider.sharedMesh, out handle)) {
-        IntPtr meshPtr = allocateConvex(meshCollider, 1.0f);
+        IntPtr meshPtr = allocateConvex(meshCollider, Matrix4x4.identity);
         InteractionC.AddShapeDescription(ref _scene, meshPtr, out handle);
         StructAllocator.CleanupAllocations();
 
         _meshDescMap[meshCollider.sharedMesh] = handle;
         _allHandles.Add(handle);
       }
+
+      return handle;
+    }
+
+    /// <summary>
+    /// Gets a handle to a convex mesh description of the provided mesh.  Any changes
+    /// to the mesh will not be reflected in the description once it is generated.
+    /// This version always allocates a new handle for the transformed data.
+    /// </summary>
+    public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetConvexPolyhedron(MeshCollider meshCollider, Matrix4x4 transform) {
+      if (meshCollider.sharedMesh == null) { throw new NotImplementedException("MeshCollider missing sharedMesh."); }
+
+      INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
+      IntPtr meshPtr = allocateConvex(meshCollider, transform);
+      InteractionC.AddShapeDescription(ref _scene, meshPtr, out handle);
+      StructAllocator.CleanupAllocations();
+
+      _allHandles.Add(handle);
 
       return handle;
     }
@@ -116,10 +134,6 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     private List<Collider> _tempColliderList = new List<Collider>();
     public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetCollision(GameObject parentObject) {
-      if (!isUniformScale(parentObject.transform)) {
-        throw new InvalidOperationException("The GameObject " + parentObject + " did not have a uniform scale.");
-      }
-
       parentObject.GetComponentsInChildren<Collider>(_tempColliderList);
       if (_tempColliderList.Count == 0) {
         throw new InvalidOperationException("The GameObject " + parentObject + " did not have any colliders.");
@@ -140,54 +154,78 @@ namespace Leap.Unity.Interaction {
       compoundDesc.pShapes = StructAllocator.AllocateArray<IntPtr>(_tempColliderList.Count);
       compoundDesc.pTransforms = new INTERACTION_TRANSFORM[_tempColliderList.Count];
 
+      // The parent's relative pose is a components of the parents transform that
+      // child transforms are considered to be relative two.  In this case scale
+      // and shear are not considered a property of the parents relative pose and
+      // therefore these calcualtions will allow the child to inherit the parents
+      // scale.
+
+      Matrix4x4 parentRelativePose = Matrix4x4.TRS(parentObject.transform.position, parentObject.transform.rotation, Vector3.one);
+      Matrix4x4 inverseParentRelativePose = parentRelativePose.inverse;
+
       for (int i = 0; i < _tempColliderList.Count; i++) {
         Collider collider = _tempColliderList[i];
 
-        if (!isUniformScale(collider.transform)) {
-          throw new InvalidOperationException("Collider " + collider + " did not have a uniform scale!");
-        }
+        // Transform to apply to collision shape.
+        Matrix4x4 localToParentRelative = inverseParentRelativePose * collider.transform.localToWorldMatrix;
 
-        float globalScale = collider.transform.lossyScale.x;
-        Vector3 globalPos;
-        Quaternion globalRot;
+          // Values used to construct INTERACTION_TRANSFORM.
+        Vector3 parentRelativePos = Vector3.zero;
+        Quaternion parentRelativeRot = Quaternion.identity;
 
         IntPtr shapePtr;
-        if (collider is SphereCollider) {
-          SphereCollider sphereCollider = collider as SphereCollider;
-          globalPos = collider.transform.TransformPoint(sphereCollider.center);
-          globalRot = collider.transform.rotation;
-          shapePtr = allocateSphere(sphereCollider.radius * globalScale);
-        } else if (collider is BoxCollider) {
-          BoxCollider boxCollider = collider as BoxCollider;
-          globalPos = collider.transform.TransformPoint(boxCollider.center);
-          globalRot = collider.transform.rotation;
-          shapePtr = allocateObb(boxCollider.size * globalScale * 0.5f);
-        } else if (collider is CapsuleCollider) {
-          CapsuleCollider capsuleCollider = collider as CapsuleCollider;
-          if((uint)capsuleCollider.direction >= 3u)
-            throw new InvalidOperationException("Unexpected capsule direction " + capsuleCollider.direction);
-          globalPos = collider.transform.TransformPoint(capsuleCollider.center);
-          globalRot = collider.transform.rotation;
-          Vector3 axis = new Vector3((capsuleCollider.direction==0)?1:0, (capsuleCollider.direction==1)?1:0, (capsuleCollider.direction==2)?1:0);
-          Vector3 p0 = axis * globalScale * (capsuleCollider.height - capsuleCollider.radius * 0.5f);
-          Vector3 p1 = -axis * globalScale * (capsuleCollider.height - capsuleCollider.radius * 0.5f);
-          shapePtr = allocateCapsule(p0, p1, capsuleCollider.radius * globalScale);
-        } else if (collider is MeshCollider) {
+        if (collider is MeshCollider) {
+          // Mesh always has an identity associated transform that can be baked into the verts.
           MeshCollider meshCollider = collider as MeshCollider;
-          globalPos = collider.transform.position;
-          globalRot = collider.transform.rotation;
-          shapePtr = allocateConvex(meshCollider, globalScale);
+          shapePtr = allocateConvex(meshCollider, localToParentRelative);
         } else {
-          throw new InvalidOperationException("Unsupported collider type " + collider.GetType());
+          //  Rotation and scale are lossy when shear is involved.
+          parentRelativeRot = Quaternion.Inverse(parentObject.transform.rotation) * collider.transform.rotation;
+
+          Vector3 scaleAlongLocalToParentAxes = new Vector3(localToParentRelative.GetColumn(0).magnitude,
+                                                            localToParentRelative.GetColumn(1).magnitude,
+                                                            localToParentRelative.GetColumn(2).magnitude);
+          if (collider is SphereCollider) {
+            SphereCollider sphereCollider = collider as SphereCollider;
+            parentRelativePos = localToParentRelative.MultiplyPoint(sphereCollider.center);
+
+            float aproximateScale = Mathf.Max(scaleAlongLocalToParentAxes.x, Mathf.Max(scaleAlongLocalToParentAxes.y, scaleAlongLocalToParentAxes.z));
+            shapePtr = allocateSphere(sphereCollider.radius * aproximateScale);
+          } else if (collider is BoxCollider) {
+            BoxCollider boxCollider = collider as BoxCollider;
+            parentRelativePos = localToParentRelative.MultiplyPoint(boxCollider.center);
+
+            Vector3 extents = boxCollider.size * 0.5f;
+            extents.Scale(scaleAlongLocalToParentAxes);
+            shapePtr = allocateObb(extents);
+          } else if (collider is CapsuleCollider) {
+            CapsuleCollider capsuleCollider = collider as CapsuleCollider;
+            if((uint)capsuleCollider.direction >= 3u)
+              throw new InvalidOperationException("Unexpected capsule direction " + capsuleCollider.direction);
+
+            parentRelativePos = localToParentRelative.MultiplyPoint(capsuleCollider.center);
+
+            Vector3 primaryAxis = new Vector3((capsuleCollider.direction==0)?1:0, (capsuleCollider.direction==1)?1:0, (capsuleCollider.direction==2)?1:0);
+            float primaryAxisScale = scaleAlongLocalToParentAxes[capsuleCollider.direction];
+            float perpendicularScale = Mathf.Max(scaleAlongLocalToParentAxes[(capsuleCollider.direction + 1)%3], scaleAlongLocalToParentAxes[(capsuleCollider.direction + 2)%3]);
+
+            float scaledHeight = capsuleCollider.height * primaryAxisScale;
+            float scaledRadius = capsuleCollider.radius * perpendicularScale;
+            float interiorExtent = (scaledHeight * 0.5f) - scaledRadius;
+
+            Vector3 p0 = primaryAxis * interiorExtent;
+            shapePtr = allocateCapsule(p0, -p0, scaledRadius);
+          }
+          else {
+            throw new InvalidOperationException("Unsupported collider type " + collider.GetType());
+          }
         }
 
-        INTERACTION_TRANSFORM ieTransform = new INTERACTION_TRANSFORM();
-        // We want to preserve the global (actual) scale.  However InverseTransformPoint
-        // removes the parents scale and so that must be reapplied.
-        ieTransform.position = (parentObject.transform.InverseTransformPoint(globalPos) * parentObject.transform.lossyScale.x).ToCVector();
-        ieTransform.rotation = (Quaternion.Inverse(parentObject.transform.rotation) * globalRot).ToCQuaternion();
-
         StructMarshal<IntPtr>.CopyIntoArray(compoundDesc.pShapes, ref shapePtr, i);
+
+        INTERACTION_TRANSFORM ieTransform = new INTERACTION_TRANSFORM();
+        ieTransform.position = parentRelativePos.ToCVector();
+        ieTransform.rotation = parentRelativeRot.ToCQuaternion();
         compoundDesc.pTransforms[i] = ieTransform;
       }
 
@@ -205,10 +243,10 @@ namespace Leap.Unity.Interaction {
       Collider collider = _tempColliderList[0];
 
       if (collider.gameObject != parentObject) {
-        return false; // Potential optimization
+        return false; // Potential for optimization.  See GetCollision().
       }
 
-      float scale = parentObject.transform.lossyScale.x;
+      Vector3 scale3 = parentObject.transform.lossyScale;
 
       if (collider is SphereCollider) {
         SphereCollider sphereCollider = collider as SphereCollider;
@@ -217,7 +255,8 @@ namespace Leap.Unity.Interaction {
           return false;
         }
 
-        shape = GetSphere(sphereCollider.radius * scale);
+        float aproximateScale = Mathf.Max(scale3.x, Mathf.Max(scale3.y, scale3.z));
+        shape = GetSphere(sphereCollider.radius * aproximateScale);
         return true;
       } else if (collider is BoxCollider) {
         BoxCollider boxCollider = collider as BoxCollider;
@@ -226,26 +265,19 @@ namespace Leap.Unity.Interaction {
           return false;
         }
 
-        shape = GetOBB(boxCollider.size * 0.5f * scale);
-        return false;
+        Vector3 extents = boxCollider.size * 0.5f;
+        extents.Scale(scale3);
+        shape = GetOBB(extents);
+        return true;
       } else if (collider is MeshCollider) {
         MeshCollider meshCollider = collider as MeshCollider;
-        shape = GetConvexPolyhedron(meshCollider);
+
+        // Create a new mesh scaled as needed.  Scale is not dynamic and must be baked in.
+        shape = GetConvexPolyhedron(meshCollider, Matrix4x4.TRS(Vector3.zero, Quaternion.identity, scale3));
         return true;
       }
 
       return false; // Compound
-    }
-
-    private bool isUniformScale(Transform transform) {
-      while (transform != null) {
-        Vector3 localScale = transform.localScale;
-        if (!Mathf.Approximately(localScale.x, localScale.y) || !Mathf.Approximately(localScale.x, localScale.z)) {
-          return false;
-        }
-        transform = transform.parent;
-      }
-      return true;
     }
 
     private IntPtr allocateSphere(float radius) {
@@ -279,7 +311,7 @@ namespace Leap.Unity.Interaction {
       return capsulePtr;
     }
 
-    private IntPtr allocateConvex(MeshCollider meshCollider, float scale) {
+    private IntPtr allocateConvex(MeshCollider meshCollider, Matrix4x4 localToParentRelative) {
 
       if (meshCollider.sharedMesh == null) { throw new NotImplementedException("MeshCollider missing sharedMesh."); }
       if (meshCollider.convex == false)    { throw new NotImplementedException("MeshCollider must be convex."); }
@@ -291,14 +323,14 @@ namespace Leap.Unity.Interaction {
       meshDesc.radius = 0.0f;
       meshDesc.nVerticies = (uint)mesh.vertexCount;
       meshDesc.pVertices = new LEAP_VECTOR[mesh.vertexCount];
+
       for (int i = 0; i < mesh.vertexCount; i++) {
-        LEAP_VECTOR v = (mesh.vertices[i] * scale).ToCVector();
+        LEAP_VECTOR v = localToParentRelative.MultiplyPoint(mesh.vertices[i]).ToCVector();
         meshDesc.pVertices[i] = v;
       }
 
       IntPtr meshPtr = StructAllocator.AllocateStruct(ref meshDesc);
       return meshPtr;
     }
-
   }
 }
