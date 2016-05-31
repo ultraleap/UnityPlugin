@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.VR;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Leap.Unity {
@@ -228,6 +229,7 @@ namespace Leap.Unity {
     protected void Start() {
       if (provider.IsConnected()) {
         deviceInfo = provider.GetDeviceInfo();
+        transform.localPosition = transform.forward * deviceInfo.focalPlaneOffset;
         LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
         if (deviceInfo.type == LeapDeviceType.Invalid) {
           Debug.LogWarning("Invalid Leap Device -> enabled = false");
@@ -235,13 +237,24 @@ namespace Leap.Unity {
           return;
         }
       } else {
+        StartCoroutine(waitForConnection());
         Controller controller = provider.GetLeapController();
         controller.Device += OnDevice;
       }
     }
 
+    private IEnumerator waitForConnection() {
+      while (!provider.IsConnected()) {
+        yield return null;
+      }
+      LeapVRCameraControl.OnValidCameraParams -= onValidCameraParams; //avoid multiple subscription
+      LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
+    }
+
     protected void OnDevice(object sender, DeviceEventArgs args) {
       deviceInfo = provider.GetDeviceInfo();
+      transform.localPosition = transform.forward * deviceInfo.focalPlaneOffset;
+
       if (deviceInfo.type == LeapDeviceType.Invalid) {
         Debug.LogWarning("Invalid Leap Device -> enabled = false");
         enabled = false;
