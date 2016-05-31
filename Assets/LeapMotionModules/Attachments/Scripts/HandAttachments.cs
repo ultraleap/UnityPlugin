@@ -25,22 +25,31 @@ namespace Leap.Unity{
   public class HandAttachments : IHandModel {
   
     /** The palm of the hand. */
+    [Tooltip("The palm of the hand.")]
     public Transform Palm;
-    /** The center of the arm. */
+    /** The center of the forearm. */
+    [Tooltip("The center of the forearm.")]
     public Transform Arm;
     /** The tip of the thumb. */
+    [Tooltip("The tip of the thumb.")]
     public Transform Thumb;
     /** The point midway between the thumb and index finger tips.*/
+    [Tooltip("The pont between the thumb and index finger.")]
     public Transform PinchPoint;
     /** The tip of the index finger. */
+    [Tooltip("The tip of the index finger.")]
     public Transform Index;
     /** The tip of the middle finger. */
+    [Tooltip("The tip of the middle finger.")]
     public Transform Middle;
     /** The tip of the ring finger. */
+    [Tooltip("The tip of the ring finger.")]
     public Transform Ring;
     /** The tip of the pinky finger. */
+    [Tooltip("The tip of the little finger.")]
     public Transform Pinky;
-    /** At the center of the finger tips */
+    /** The point midway between the finger tips. */
+    [Tooltip("The point midway between the finger tips.")]
     public Transform GrabPoint;
 
     private Hand _hand;
@@ -51,6 +60,7 @@ namespace Leap.Unity{
       }
     }
   
+    [Tooltip("Whether to use this for right or left hands")]
     [SerializeField]
     private Chirality _handedness;
 
@@ -102,7 +112,7 @@ namespace Leap.Unity{
         Pinky.position = _hand.Fingers[4].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToVector3();
         Pinky.rotation = _hand.Fingers[4].Bone(Bone.BoneType.TYPE_DISTAL).Rotation.ToQuaternion();
       }
-      if(PinchPoint != null){
+      if (PinchPoint != null) {
         Vector thumbTip = _hand.Fingers[0].TipPosition;
         Vector indexTip = _hand.Fingers[1].TipPosition;
         Vector pinchPoint = Vector.Lerp(thumbTip, indexTip, 0.5f);
@@ -113,14 +123,16 @@ namespace Leap.Unity{
         PinchPoint.rotation = Quaternion.LookRotation(forward.ToVector3(), up.ToVector3());
       }
       if (GrabPoint != null) {
-        Vector3 GrabCenter = _hand.WristPosition.ToVector3();
+        Vector GrabCenter = Vector.Zero;
         for (int i = 0; i < _hand.Fingers.Count; i++) {
-          GrabCenter += _hand.Fingers[i].TipPosition.ToVector3();
+          GrabCenter += _hand.Fingers[i].TipPosition;
         }
-        GrabPoint.position = GrabCenter / 6.0f;
         Vector GrabForward = (_hand.Fingers[2].TipPosition - _hand.WristPosition).Normalized;
         Vector thumbToPinky = _hand.Fingers[0].TipPosition - _hand.Fingers[4].TipPosition;
         Vector GrabNormal = GrabForward.Cross(thumbToPinky).Normalized;
+
+        GrabCenter = GrabCenter / 5.0f;
+        GrabPoint.position = GrabCenter.ToVector3();
         GrabPoint.rotation = Quaternion.LookRotation(GrabForward.ToVector3(), GrabNormal.ToVector3());
       }
     }
