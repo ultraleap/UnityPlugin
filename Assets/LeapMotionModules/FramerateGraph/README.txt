@@ -8,8 +8,8 @@ spent doing rendering for all cameras.
 Right Panel:
 The right panel has three numbers, a top, middle, and bottom.
 The top and bottom numbers correspond with the top and bottom graphs, and represent the average time in
-miliseconds spent on the update cycle or the render cycle respectively.
-The middle number shows the average time in miliseconds spent on the entire frame, rendering and update
+milliseconds spent on the update cycle or the render cycle respectively.
+The middle number shows the average time in milliseconds spent on the entire frame, rendering and update
 indluded.
 
 Top Panel:
