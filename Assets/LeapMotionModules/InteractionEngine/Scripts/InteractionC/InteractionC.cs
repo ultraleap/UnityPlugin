@@ -172,6 +172,7 @@ namespace Leap.Unity.Interaction.CApi {
     public SceneInfoFlags sceneFlags;
     public LEAP_VECTOR gravity;
     public float depthUntilSphericalInside;
+    public float physicsScale;
   }
 
   // All properties require eLeapIEShapeFlags to enable
