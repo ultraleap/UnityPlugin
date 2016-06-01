@@ -40,6 +40,10 @@ namespace Leap.Unity.Interaction {
                                 "_maxVelocity",
                                 "_strengthByDistance");
 
+      SerializedProperty physicMaterialMode = serializedObject.FindProperty("_physicMaterialMode");
+      specifyConditionalDrawing(() => physicMaterialMode.intValue == (int)InteractionMaterial.PhysicMaterialMode.Replace,
+                                "_replacementMaterial");
+
       specifyConditionalDrawing("_useCustomLayers", 
                                 "_interactionLayer", 
                                 "_interactionNoClipLayer");
