@@ -132,10 +132,6 @@ Prefab:
       propertyPath: _debugTextView
       value: 
       objectReference: {fileID: 2071161178}
-    - target: {fileID: 11435054, guid: a2e4c6a003fcd1a43b91889103145982, type: 2}
-      propertyPath: _showDebugOutput
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2e4c6a003fcd1a43b91889103145982, type: 2}
   m_IsPrefabParent: 0
@@ -200,6 +196,11 @@ Prefab:
       propertyPath: m_Interpolate
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 13536856, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: 7134cd34cadef4b0c800194d94a39bf6,
+        type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
   m_IsPrefabParent: 0
