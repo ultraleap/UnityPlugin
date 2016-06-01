@@ -37,7 +37,8 @@ namespace Leap.Unity.Interaction.CApi {
     HasGravity            = 0x01,
     ContactEnabled        = 0x02,
     GraspEnabled          = 0x04,
-    SphericalInside       = 0x08
+    SphericalInside       = 0x08,
+    PhysicsScale          = 0x10
   };
 
   public enum ShapeInfoFlags : uint {
