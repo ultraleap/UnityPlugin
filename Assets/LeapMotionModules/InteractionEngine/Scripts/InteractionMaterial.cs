@@ -59,7 +59,7 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("What to do with the physic materials when a grasp occurs.")]
     [SerializeField]
-    protected PhysicMaterialModeEnum _physicMaterialMode = PhysicMaterialMode.DuplicateExisting;
+    protected PhysicMaterialModeEnum _physicMaterialMode = PhysicMaterialModeEnum.DuplicateExisting;
 
     [Tooltip("The physic material to use when a grasp occurs.  This material will replace existing materials when a grasp occurs.")]
     [SerializeField]

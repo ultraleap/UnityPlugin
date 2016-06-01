@@ -9,7 +9,7 @@ namespace Leap.Unity.Interaction {
     private PhysicMaterial[] _originalMaterials;
     private PhysicMaterial[] _replacementMaterials;
 
-    public PhysicMaterialSwapper(Transform anchor, InteractionMaterial material) {
+    public PhysicMaterialReplacer(Transform anchor, InteractionMaterial material) {
       _colliders = anchor.GetComponentsInChildren<Collider>(true);
       _originalMaterials = _colliders.Select(c => c.sharedMaterial).ToArray();
 
