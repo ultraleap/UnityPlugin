@@ -948,6 +948,12 @@ namespace Leap.Unity.Interaction {
       info.sceneFlags = SceneInfoFlags.HasGravity | SceneInfoFlags.SphericalInside;
       info.depthUntilSphericalInside = _depthUntilSphericalInside;
 
+      if(_leapProvider != null) {
+        info.sceneFlags |= SceneInfoFlags.PhysicsScale;
+        // Objects need to be in the range of 0.05 to 10 units.
+        info.physicsScale = _leapProvider.transform.lossyScale.x * 50.0f;
+      }
+
       if (_contactEnabled) {
         info.sceneFlags |= SceneInfoFlags.ContactEnabled;
       }
