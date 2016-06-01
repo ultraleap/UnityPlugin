@@ -22,11 +22,12 @@ namespace Leap.Unity.Interaction {
             PhysicMaterial newMat;
             if (m == null) {
               newMat = new PhysicMaterial();
+              newMat.name = "Grasping Material";
             } else {
               newMat = Object.Instantiate(m);
+              newMat.name = m.name + " (Grasping Instance)";
             }
             newMat.bounciness = 0;
-            newMat.name = m.name + " (Grasping Instance)";
             return newMat;
           }).ToArray();
           break;
