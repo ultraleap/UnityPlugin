@@ -1449,7 +1449,7 @@ Prefab:
     - target: {fileID: 11435192, guid: b9c7aaf0d314cb847a3b2a20e893f1b6, type: 2}
       propertyPath: _temporalWarping
       value: 
-      objectReference: {fileID: 1011776858}
+      objectReference: {fileID: 0}
     - target: {fileID: 11435192, guid: b9c7aaf0d314cb847a3b2a20e893f1b6, type: 2}
       propertyPath: _isHeadMounted
       value: 1
@@ -1696,7 +1696,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e21f7214440054f59a5d2da168b3e2dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  provider: {fileID: 0}
+  provider: {fileID: 506451037}
   _headTransform: {fileID: 961781291}
   _trackingAnchor: {fileID: 526355614}
   recenter: 114
