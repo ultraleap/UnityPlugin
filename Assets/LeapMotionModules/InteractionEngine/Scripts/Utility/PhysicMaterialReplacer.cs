@@ -9,6 +9,8 @@ namespace Leap.Unity.Interaction {
     private PhysicMaterial[] _originalMaterials;
     private PhysicMaterial[] _replacementMaterials;
 
+    private bool _hasReplaced = false;
+
     public PhysicMaterialReplacer(Transform anchor, InteractionMaterial material) {
       _colliders = anchor.GetComponentsInChildren<Collider>(true);
       _originalMaterials = _colliders.Select(c => c.sharedMaterial).ToArray();
@@ -38,19 +40,29 @@ namespace Leap.Unity.Interaction {
     }
 
     public void ReplaceMaterials() {
+      if (_hasReplaced) {
+        return;
+      }
+
       if (_replacementMaterials != null) {
         for (int i = 0; i < _colliders.Length; i++) {
           _colliders[i].sharedMaterial = _replacementMaterials[i];
         }
       }
+      _hasReplaced = true;
     }
 
     public void RevertMaterials() {
+      if (!_hasReplaced) {
+        return;
+      }
+
       if (_replacementMaterials != null) {
         for (int i = 0; i < _colliders.Length; i++) {
           _colliders[i].sharedMaterial = _originalMaterials[i];
         }
       }
+      _hasReplaced = false;
     }
   }
 }

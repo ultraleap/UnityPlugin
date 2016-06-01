@@ -177,34 +177,36 @@ namespace Leap.Unity.Interaction {
     protected override void OnPostSolve() {
       base.OnPostSolve();
 
-      if (_recievedVelocityUpdate) {
-        //If we recieved a velocity update, gravity must always be disabled because the
-        //velocity update accounts for gravity.
-        if (_rigidbody.useGravity) {
-          _rigidbody.useGravity = false;
+      if (IsBeingGrasped) {
+        if (Vector3.Distance(_solvedPosition, _rigidbody.position) > _material.ReleaseDistance) {
+          _manager.ReleaseObject(this);
         }
       } else {
-        if (!IsBeingGrasped) {
+        if (_recievedVelocityUpdate) {
+          //If we recieved a velocity update, gravity must always be disabled because the
+          //velocity update accounts for gravity.
+          if (_rigidbody.useGravity) {
+            _rigidbody.useGravity = false;
+          }
+
+          _materialReplacer.ReplaceMaterials();
+        } else {
           //If we did not recieve a velocity update, we set the rigidbody's gravity status
           //to match whatever the user has set.
           if (_rigidbody.useGravity != _useGravity) {
             _rigidbody.useGravity = _useGravity;
           }
-        }
 
-        //Only apply if non-zero to prevent waking up the body
-        if (_accumulatedLinearAcceleration != Vector3.zero) {
-          _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
-        }
+          //Only apply if non-zero to prevent waking up the body
+          if (_accumulatedLinearAcceleration != Vector3.zero) {
+            _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
+          }
 
-        if (_accumulatedAngularAcceleration != Vector3.zero) {
-          _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
-        }
-      }
+          if (_accumulatedAngularAcceleration != Vector3.zero) {
+            _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
+          }
 
-      if (IsBeingGrasped) {
-        if (Vector3.Distance(_solvedPosition, _rigidbody.position) > _material.ReleaseDistance) {
-          _manager.ReleaseObject(this);
+          _materialReplacer.RevertMaterials();
         }
       }
 
@@ -262,6 +264,8 @@ namespace Leap.Unity.Interaction {
       updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
 
       updateInfo.updateFlags = UpdateInfoFlags.VelocityEnabled;
+      updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
+      updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
 
       // Request notification of when hands are no longer touching (or influencing.)
       if (_ignoringBrushes) {
@@ -270,12 +274,9 @@ namespace Leap.Unity.Interaction {
 
       if (_material.ContactEnabled && !_isKinematic && !IsBeingGrasped) {
         updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration;
+        updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
+        updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
       }
-
-      updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
-      updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
-      updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
-      updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
 
       if (_useGravity) {
         updateInfo.updateFlags |= UpdateInfoFlags.GravityEnabled;
@@ -296,6 +297,7 @@ namespace Leap.Unity.Interaction {
         _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
         _recievedVelocityUpdate = true;
       }
+
 #if UNITY_EDITOR
       _showDebugRecievedVelocity = _recievedVelocityUpdate;
 #endif
