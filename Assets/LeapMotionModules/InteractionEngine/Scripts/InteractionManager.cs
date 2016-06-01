@@ -53,10 +53,6 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _depthUntilSphericalInside = 0.023f;
 
-    [Tooltip("Objects need to be in the range of 0.05 to 10 units.")]
-    [SerializeField]
-    protected float _physicsScale = 50.0f;
-
     [Header("Layer Settings")]
     [SerializeField]
     protected bool _autoGenerateLayers = false;
@@ -936,7 +932,11 @@ namespace Leap.Unity.Interaction {
 
       info.sceneFlags = SceneInfoFlags.HasGravity | SceneInfoFlags.SphericalInside;
       info.depthUntilSphericalInside = _depthUntilSphericalInside;
-      info.physicsScale = _physicsScale;
+
+      if(_leapProvider != null) {
+
+        info.physicsScale = _leapProvider.transform.lossyScale.x * 50.0f;
+      }
 
       if (_contactEnabled) {
         info.sceneFlags |= SceneInfoFlags.ContactEnabled;
