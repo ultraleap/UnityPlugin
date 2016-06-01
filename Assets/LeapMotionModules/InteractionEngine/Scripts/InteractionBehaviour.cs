@@ -338,7 +338,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandsHoldPhysics(ReadonlyList<Hand> hands) {
       base.OnHandsHoldPhysics(hands);
 
-       float distanceToSolved = Vector3.Distance(_warper.RigidbodyPosition, _solvedPosition);
+      float distanceToSolved = Vector3.Distance(_warper.RigidbodyPosition, _solvedPosition);
 
       //Get new transform
       getSolvedTransform(hands, out _solvedPosition, out _solvedRotation);
@@ -451,6 +451,8 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
+
+      _ignoringBrushes = true;
 
       updateState();
     }
