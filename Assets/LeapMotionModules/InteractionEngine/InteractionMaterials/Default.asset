@@ -49,6 +49,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  _physicMaterialMode: 1
+  _replacementMaterial: {fileID: 0}
   _suspensionEnabled: 1
   _maxSuspensionTime: 4
   _hideObjectOnSuspend: 1

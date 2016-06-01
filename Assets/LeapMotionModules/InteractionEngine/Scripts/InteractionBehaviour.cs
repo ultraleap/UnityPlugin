@@ -59,6 +59,7 @@ namespace Leap.Unity.Interaction {
     protected Vector3 _solvedPosition;
     protected Quaternion _solvedRotation;
 
+    protected PhysicMaterialReplacer _materialReplacer;
     protected RigidbodyWarper _warper;
 
     protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
@@ -143,6 +144,7 @@ namespace Leap.Unity.Interaction {
       }
       _rigidbody.maxAngularVelocity = float.PositiveInfinity;
 
+      _materialReplacer = new PhysicMaterialReplacer(transform, _material);
       _warper = new RigidbodyWarper(_manager, transform, _rigidbody, _material.GraphicalReturnTime);
 
       _childrenArray = GetComponentsInChildren<Transform>(true);
@@ -338,7 +340,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandsHoldPhysics(ReadonlyList<Hand> hands) {
       base.OnHandsHoldPhysics(hands);
 
-       float distanceToSolved = Vector3.Distance(_warper.RigidbodyPosition, _solvedPosition);
+      float distanceToSolved = Vector3.Distance(_warper.RigidbodyPosition, _solvedPosition);
 
       //Get new transform
       getSolvedTransform(hands, out _solvedPosition, out _solvedRotation);
@@ -452,11 +454,17 @@ namespace Leap.Unity.Interaction {
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
 
+      _materialReplacer.ReplaceMaterials();
+
+      _ignoringBrushes = true;
+
       updateState();
     }
 
     protected override void OnGraspEnd(Hand lastHand) {
       base.OnGraspEnd(lastHand);
+
+      _materialReplacer.RevertMaterials();
 
       updateState();
 

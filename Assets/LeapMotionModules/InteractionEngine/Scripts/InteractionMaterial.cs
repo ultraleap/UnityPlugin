@@ -13,6 +13,12 @@ namespace Leap.Unity.Interaction {
       Kinematic
     }
 
+    public enum PhysicMaterialModeEnum {
+      NoAction,
+      DuplicateExisting,
+      Replace
+    }
+
     [Header("Contact Settings")]
     [Tooltip("Should a hand be able to impart pushing forces to this object.")]
     [SerializeField]
@@ -30,7 +36,6 @@ namespace Leap.Unity.Interaction {
     [Tooltip("What method should be used to move the object when it is grasped.")]
     [SerializeField]
     protected GraspMethodEnum _graspMethod = GraspMethodEnum.Velocity;
-
 
     [Tooltip("How far the object can get from the hand before it is released.")]
     [SerializeField]
@@ -51,6 +56,15 @@ namespace Leap.Unity.Interaction {
     protected AnimationCurve _throwingVelocityCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                                          new Keyframe(1.0f, 1.0f, 0.0f, 0.0f),
                                                                          new Keyframe(2.0f, 1.5f, 0.0f, 0.0f));
+
+    [Tooltip("What to do with the physic materials when a grasp occurs.")]
+    [SerializeField]
+    protected PhysicMaterialModeEnum _physicMaterialMode = PhysicMaterialModeEnum.DuplicateExisting;
+
+    [Tooltip("The physic material to use when a grasp occurs.  This material will replace existing materials when a grasp occurs.")]
+    [SerializeField]
+    protected PhysicMaterial _replacementMaterial;
+
 
     [Header("Suspension Settings")]
     [Tooltip("Can objects using this material be suspended when a grasping hand becomes untracked.")]
@@ -144,6 +158,18 @@ namespace Leap.Unity.Interaction {
     public AnimationCurve ThrowingVelocityCurve {
       get {
         return _throwingVelocityCurve;
+      }
+    }
+
+    public PhysicMaterialModeEnum PhysicMaterialMode {
+      get {
+        return _physicMaterialMode;
+      }
+    }
+
+    public PhysicMaterial ReplacementPhysicMaterial {
+      get {
+        return _replacementMaterial;
       }
     }
 

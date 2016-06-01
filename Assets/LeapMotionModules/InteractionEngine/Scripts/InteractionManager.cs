@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Assertions;
 using System;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 using Leap.Unity.Interaction.CApi;
 
@@ -82,6 +82,10 @@ namespace Leap.Unity.Interaction {
     [Tooltip("Shows the debug messages coming from the internal Interaction plugin.")]
     [SerializeField]
     protected bool _showDebugOutput = false;
+
+    [Tooltip("Will display the debug messages if assigned.")]
+    [SerializeField]
+    protected Text _debugTextView;
     #endregion
 
     #region INTERNAL FIELDS
@@ -511,6 +515,17 @@ namespace Leap.Unity.Interaction {
 
       if (OnGraphicalUpdate != null) {
         OnGraphicalUpdate();
+      }
+
+      if (_showDebugOutput && _debugTextView != null) {
+        string text = "";
+        for (int i = 0; i < _debugOutput.Count; i++) {
+          text += _debugOutput[i];
+          if (i != _debugOutput.Count - 1) {
+            text += "\n";
+          }
+        }
+        _debugTextView.text = text;
       }
     }
 
