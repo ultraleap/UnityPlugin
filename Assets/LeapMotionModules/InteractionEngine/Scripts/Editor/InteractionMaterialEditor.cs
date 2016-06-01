@@ -41,7 +41,7 @@ namespace Leap.Unity.Interaction {
                                 "_strengthByDistance");
 
       SerializedProperty physicMaterialMode = serializedObject.FindProperty("_physicMaterialMode");
-      specifyConditionalDrawing(() => physicMaterialMode.intValue == (int)InteractionMaterial.PhysicMaterialMode.Replace,
+      specifyConditionalDrawing(() => physicMaterialMode.intValue == (int)InteractionMaterial.PhysicMaterialModeEnum.Replace,
                                 "_replacementMaterial");
 
       specifyConditionalDrawing("_useCustomLayers", 
