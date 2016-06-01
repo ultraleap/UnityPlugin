@@ -18,7 +18,17 @@ namespace Leap.Unity.Interaction {
           _replacementMaterials = null;
           break;
         case InteractionMaterial.PhysicMaterialModeEnum.DuplicateExisting:
-          _replacementMaterials = _originalMaterials.Select(m => Object.Instantiate(m)).ToArray();
+          _replacementMaterials = _originalMaterials.Select(m => {
+            PhysicMaterial newMat;
+            if (m == null) {
+              newMat = new PhysicMaterial();
+            } else {
+              newMat = Object.Instantiate(m);
+            }
+            newMat.bounciness = 0;
+            newMat.name = m.name + " (Grasping Instance)";
+            return newMat;
+          }).ToArray();
           break;
         case InteractionMaterial.PhysicMaterialModeEnum.Replace:
           _replacementMaterials = _originalMaterials.Select(m => material.ReplacementPhysicMaterial).ToArray();
