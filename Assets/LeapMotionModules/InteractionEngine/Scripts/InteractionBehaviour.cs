@@ -273,7 +273,7 @@ namespace Leap.Unity.Interaction {
       }
 
       if (_material.ContactEnabled && !_isKinematic && !IsBeingGrasped) {
-        updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration;
+        updateInfo.updateFlags |= UpdateInfoFlags.AccelerationEnabled;
         updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
         updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
       }
