@@ -820,7 +820,7 @@ namespace Leap.Unity.InputModule {
           if (EnvironmentPointer) {
             lerpPointerColor(whichPointer, new Color(0.0f, 0.0f, 0.0f, 0.5f*TransitionAmount), 1f);
           } else {
-            lerpPointerColor(whichPointer, new Color(0.0f, 0.0f, 0.0f, 0.5f * TransitionAmount), 1f);
+            lerpPointerColor(whichPointer, new Color(0.0f, 0.0f, 0.0f, 0.001f), 1f);
           }
           break;
       }
