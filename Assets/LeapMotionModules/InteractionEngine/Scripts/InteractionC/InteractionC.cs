@@ -48,7 +48,7 @@ namespace Leap.Unity.Interaction.CApi {
 
   public enum UpdateInfoFlags : uint {
     None = 0x00,
-    ApplyAcceleration = 0x01,
+    AccelerationEnabled = 0x01,
     VelocityEnabled = 0x02,
     GravityEnabled = 0x04,
     ReportNoResult = 0x08

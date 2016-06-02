@@ -13,6 +13,7 @@ namespace Leap.Unity.Interaction {
   public class InteractionBrushHand : IHandModel {
     private const int N_FINGERS = 5;
     private const int N_ACTIVE_BONES = 3;
+    private const float DEAD_ZONE_FRACTION = 0.05f;
 
     private Rigidbody[] _capsuleBodies;
     private Hand _hand;
@@ -111,16 +112,25 @@ namespace Leap.Unity.Interaction {
         return;
 #endif
 
+      float deadzone = DEAD_ZONE_FRACTION * _hand.Fingers[1].Bone((Bone.BoneType)1).Width;
+
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
 
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
           Rigidbody body = _capsuleBodies[boneArrayIndex];
+          body.MoveRotation(bone.Rotation.ToQuaternion());
 
           Vector3 delta = bone.Center.ToVector3() - body.position;
+          float deltaLen = delta.magnitude;
+          if (deltaLen <= deadzone) {
+            body.velocity = Vector3.zero;
+            continue;
+          }
+
+          delta *= (deltaLen - deadzone) / deltaLen;
           body.velocity = delta / Time.fixedDeltaTime;
-          body.MoveRotation(bone.Rotation.ToQuaternion());
         }
       }
     }
