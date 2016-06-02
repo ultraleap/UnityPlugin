@@ -175,7 +175,7 @@ namespace Leap.Unity.InputModule {
       EventCamera.transform.SetParent(this.transform);
 
       //Set the event camera of all currently existent Canvases to our Event Camera
-      canvases = GameObject.FindObjectsOfType<Canvas>();
+      canvases = Resources.FindObjectsOfTypeAll<Canvas>();
       foreach (Canvas canvas in canvases) {
         canvas.worldCamera = EventCamera;
       }
