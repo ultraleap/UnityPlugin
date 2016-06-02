@@ -950,8 +950,7 @@ namespace Leap.Unity.Interaction {
 
       if(_leapProvider != null) {
         info.sceneFlags |= SceneInfoFlags.PhysicsScale;
-        // Objects need to be in the range of 0.05 to 10 units.
-        info.physicsScale = _leapProvider.transform.lossyScale.x * 50.0f;
+        info.physicsScale = _leapProvider.transform.lossyScale.x;
       }
 
       if (_contactEnabled) {
