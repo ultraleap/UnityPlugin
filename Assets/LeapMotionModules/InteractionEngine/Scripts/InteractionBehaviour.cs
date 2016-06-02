@@ -53,6 +53,7 @@ namespace Leap.Unity.Interaction {
     protected float _drag;
     protected float _angularDrag;
     protected bool _recievedVelocityUpdate = false;
+    protected bool _recievedSimulationResults = false;
     protected bool _notifiedOfTeleport = false;
     protected bool _ignoringBrushes = false;
 
@@ -182,6 +183,12 @@ namespace Leap.Unity.Interaction {
           _manager.ReleaseObject(this);
         }
       } else {
+        if (_recievedSimulationResults) {
+          _materialReplacer.ReplaceMaterials();
+        } else {
+          _materialReplacer.RevertMaterials();
+        }
+
         if (_recievedVelocityUpdate) {
           //If we recieved a velocity update, gravity must always be disabled because the
           //velocity update accounts for gravity.
@@ -189,7 +196,7 @@ namespace Leap.Unity.Interaction {
             _rigidbody.useGravity = false;
           }
 
-          _materialReplacer.ReplaceMaterials();
+
         } else {
           //If we did not recieve a velocity update, we set the rigidbody's gravity status
           //to match whatever the user has set.
@@ -205,8 +212,6 @@ namespace Leap.Unity.Interaction {
           if (_accumulatedAngularAcceleration != Vector3.zero) {
             _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
           }
-
-          _materialReplacer.RevertMaterials();
         }
       }
 
@@ -214,6 +219,7 @@ namespace Leap.Unity.Interaction {
       _accumulatedLinearAcceleration = Vector3.zero;
       _accumulatedAngularAcceleration = Vector3.zero;
       _recievedVelocityUpdate = false;
+      _recievedSimulationResults = false;
     }
 
     public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
@@ -287,6 +293,8 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
       base.OnRecievedSimulationResults(results);
+
+      _recievedSimulationResults = true;
 
       if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 &&
           !IsBeingGrasped &&
