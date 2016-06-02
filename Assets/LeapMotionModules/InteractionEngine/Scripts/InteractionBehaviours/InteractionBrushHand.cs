@@ -16,6 +16,7 @@ namespace Leap.Unity.Interaction {
     private const float DEAD_ZONE_FRACTION = 0.05f;
 
     private Rigidbody[] _capsuleBodies;
+    private Vector3[] _lastTarget;
     private Hand _hand;
     private GameObject _handParent;
 
@@ -70,6 +71,7 @@ namespace Leap.Unity.Interaction {
       _handParent.transform.parent = null; // Prevent hand from moving when you turn your head.
 
       _capsuleBodies = new Rigidbody[N_FINGERS * N_ACTIVE_BONES];
+      _lastTarget = new Vector3[N_FINGERS * N_ACTIVE_BONES];
 
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
@@ -102,6 +104,8 @@ namespace Leap.Unity.Interaction {
 
           body.mass = _perBoneMass;
           body.collisionDetectionMode = _collisionDetection;
+
+          _lastTarget[boneArrayIndex] = bone.Center.ToVector3();
         }
       }
     }
@@ -122,6 +126,14 @@ namespace Leap.Unity.Interaction {
           Rigidbody body = _capsuleBodies[boneArrayIndex];
           body.MoveRotation(bone.Rotation.ToQuaternion());
 
+          // Calculate how far off the mark the brushes are.
+          float targetingError = (_lastTarget[boneArrayIndex] - body.position).magnitude / bone.Width;
+          _lastTarget[boneArrayIndex] = bone.Center.ToVector3();
+
+          // Reduce the energy applied by the brushes as they are pushed away.
+          float massScale = Mathf.Clamp(1.0f - (targetingError*2.0f), 0.1f, 1.0f);
+          body.mass = _perBoneMass * massScale;
+
           Vector3 delta = bone.Center.ToVector3() - body.position;
           float deltaLen = delta.magnitude;
           if (deltaLen <= deadzone) {
@@ -138,6 +150,7 @@ namespace Leap.Unity.Interaction {
     public override void FinishHand() {
       GameObject.Destroy(_handParent);
       _capsuleBodies = null;
+      _lastTarget = null;
 
       base.FinishHand();
     }
