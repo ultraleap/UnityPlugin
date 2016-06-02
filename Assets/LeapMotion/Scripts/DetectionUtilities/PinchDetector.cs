@@ -12,9 +12,11 @@ namespace Leap.Unity {
     [SerializeField]
     protected IHandModel _handModel;
 
-    public float _activatePinchDist = 0.03f;
+    [SerializeField]
+    protected float _activatePinchDist = 0.03f;
 
-    public float _deactivatePinchDist = 0.04f;
+    [SerializeField]
+    protected float _deactivatePinchDist = 0.04f;
 
     protected int _lastUpdateFrame = -1;
 
