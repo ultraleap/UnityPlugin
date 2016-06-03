@@ -136,6 +136,12 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public float SimulationScale {
+      get {
+        return _leapProvider.transform.lossyScale.x;
+      }
+    }
+
     /// <summary>
     /// Returns a ShapeDescriptionPool that can be used to allocate shape descriptions
     /// for this manager.  Using the pool can be more efficient since identical shapes
@@ -948,7 +954,7 @@ namespace Leap.Unity.Interaction {
       info.sceneFlags = SceneInfoFlags.HasGravity | SceneInfoFlags.SphericalInside;
       info.depthUntilSphericalInside = _depthUntilSphericalInside;
 
-      if(_leapProvider != null) {
+      if (_leapProvider != null) {
         info.sceneFlags |= SceneInfoFlags.PhysicsScale;
         info.physicsScale = _leapProvider.transform.lossyScale.x;
       }
