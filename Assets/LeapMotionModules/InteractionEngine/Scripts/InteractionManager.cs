@@ -105,6 +105,7 @@ namespace Leap.Unity.Interaction {
     protected Dictionary<int, InteractionHand> _idToInteractionHand = new Dictionary<int, InteractionHand>();
     protected List<IInteractionBehaviour> _graspedBehaviours = new List<IInteractionBehaviour>();
 
+    private float _cachedSimulationScale = 1;
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
     private List<int> _handIdsToRemove = new List<int>();
     //A temp list that is recycled.  Used as the argument to OnHandsHold.
@@ -138,7 +139,7 @@ namespace Leap.Unity.Interaction {
 
     public float SimulationScale {
       get {
-        return _leapProvider.transform.lossyScale.x;
+        return _cachedSimulationScale;
       }
     }
 
@@ -957,6 +958,7 @@ namespace Leap.Unity.Interaction {
       if (_leapProvider != null) {
         info.sceneFlags |= SceneInfoFlags.PhysicsScale;
         info.physicsScale = _leapProvider.transform.lossyScale.x;
+        _cachedSimulationScale = info.physicsScale;
       }
 
       if (_contactEnabled) {

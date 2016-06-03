@@ -179,7 +179,7 @@ namespace Leap.Unity.Interaction {
       base.OnPostSolve();
 
       if (IsBeingGrasped) {
-        if (Vector3.Distance(_solvedPosition, _rigidbody.position) > _material.ReleaseDistance) {
+        if (Vector3.Distance(_solvedPosition, _rigidbody.position) > _material.ReleaseDistance * _manager.SimulationScale) {
           _manager.ReleaseObject(this);
         }
       } else {
@@ -311,7 +311,7 @@ namespace Leap.Unity.Interaction {
 #endif
 
       if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
-        if (!_ignoringBrushes && results.maxHandDepth > _material.BrushDisableDistance) {
+        if (!_ignoringBrushes && results.maxHandDepth > _material.BrushDisableDistance * _manager.SimulationScale) {
           _ignoringBrushes = true;
         }
       } else if (_ignoringBrushes) {
@@ -383,14 +383,14 @@ namespace Leap.Unity.Interaction {
 
             if (targetVelocity.sqrMagnitude > float.Epsilon) {
               float targetSpeed = targetVelocity.magnitude;
-              float actualSpeed = Mathf.Min(_material.MaxVelocity, targetSpeed);
+              float actualSpeed = Mathf.Min(_material.MaxVelocity * _manager.SimulationScale, targetSpeed);
               float targetPercent = actualSpeed / targetSpeed;
 
               targetVelocity *= targetPercent;
               targetAngularVelocity *= targetPercent;
             }
 
-            float followStrength = _material.StrengthByDistance.Evaluate(distanceToSolved);
+            float followStrength = _material.StrengthByDistance.Evaluate(distanceToSolved / _manager.SimulationScale);
             _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, followStrength);
             _rigidbody.angularVelocity = Vector3.Lerp(_rigidbody.angularVelocity, targetAngularVelocity, followStrength);
           }
@@ -416,7 +416,7 @@ namespace Leap.Unity.Interaction {
         Vector3 graphicalPosition = newPosition + newRotation * deltaPosition;
         Quaternion graphicalRotation = newRotation * deltaRotation;
 
-        _warper.WarpPercent = _material.WarpCurve.Evaluate(deltaPosition.magnitude);
+        _warper.WarpPercent = _material.WarpCurve.Evaluate(deltaPosition.magnitude / _manager.SimulationScale);
         _warper.SetGraphicalPosition(graphicalPosition, graphicalRotation);
       }
     }
@@ -481,7 +481,7 @@ namespace Leap.Unity.Interaction {
       if (lastHand != null) {
         Vector3 palmVel = lastHand.PalmVelocity.ToVector3();
         float speed = palmVel.magnitude;
-        float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed);
+        float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed / _manager.SimulationScale);
         _rigidbody.velocity = palmVel * multiplier;
       }
     }
