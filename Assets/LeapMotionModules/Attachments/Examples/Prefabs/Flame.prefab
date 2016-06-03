@@ -27,7 +27,7 @@ GameObject:
   - 198: {fileID: 19823238}
   - 199: {fileID: 19911980}
   m_Layer: 0
-  m_Name: Fire
+  m_Name: Flame
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
