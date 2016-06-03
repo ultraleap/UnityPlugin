@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class FireControl : MonoBehaviour {
+public class FlameControl : MonoBehaviour {
   public GameObject CurrentTarget = null;
 
   public void SetTarget (GameObject target) {
