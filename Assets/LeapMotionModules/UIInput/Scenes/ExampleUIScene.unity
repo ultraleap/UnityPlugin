@@ -7520,6 +7520,14 @@ Prefab:
       propertyPath: RightHandDetector
       value: 
       objectReference: {fileID: 1188448100}
+    - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 2}
+      propertyPath: ShowAdvancedOptions
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 2}
+      propertyPath: InteractionMode
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 2}
   m_IsPrefabParent: 0
