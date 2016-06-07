@@ -94,6 +94,36 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public IGraspSolver GraspSolver {
+      get {
+        return null;
+      }
+    }
+
+    public IPhysicsDriver PhysicsDriver {
+      get {
+        return null;
+      }
+    }
+
+    public ISuspensionHandler SuspensionHandler {
+      get {
+        return null;
+      }
+    }
+
+    public Rigidbody Rigidbody {
+      get {
+        return _rigidbody;
+      }
+    }
+
+    public InteractionMaterial Material {
+      get {
+        return _material;
+      }
+    }
+
     /// <summary>
     /// Sets or Gets whether or not this InteractionBehaviour uses Gravity or not.  Always use this instead
     /// of Rigidbody.UseGravity because InteractionBehaviour overrides the gravity status of the Rigidbody.
