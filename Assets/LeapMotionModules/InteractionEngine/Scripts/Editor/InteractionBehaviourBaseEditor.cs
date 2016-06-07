@@ -34,11 +34,6 @@ namespace Leap.Unity.Interaction {
 
       Rigidbody rigidbody = _interactionBehaviour.GetComponent<Rigidbody>();
 
-      if (_interactionBehaviour.GetComponentsInParent<InteractionBehaviourBase>().Length > 1 ||
-          _interactionBehaviour.GetComponentsInChildren<InteractionBehaviourBase>().Length > 1) {
-        EditorGUILayout.HelpBox("Interaction Behaviour cannot be a child sibling or parent of another Interaction Behaviour.", MessageType.Error);
-      }
-
       if (rigidbody == null) {
         using (new GUILayout.HorizontalScope()) {
           EditorGUILayout.HelpBox("This component requires a Rigidbody", MessageType.Error);

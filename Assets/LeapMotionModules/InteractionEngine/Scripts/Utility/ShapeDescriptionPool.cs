@@ -135,6 +135,20 @@ namespace Leap.Unity.Interaction {
     private List<Collider> _tempColliderList = new List<Collider>();
     public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetCollision(GameObject parentObject) {
       parentObject.GetComponentsInChildren<Collider>(_tempColliderList);
+
+      // Remove Colliders that are children of other IInteractionBehaviour.
+      Transform parentTransform = parentObject.transform;
+      for (int i = _tempColliderList.Count; i-- > 0; ) {
+        Transform it = _tempColliderList[i].transform;
+        while (it != parentTransform) {
+          if (it.GetComponent<IInteractionBehaviour>() != null) {
+            _tempColliderList.RemoveAt(i);
+            break;
+          }
+          it = it.parent;
+        }
+      }
+
       if (_tempColliderList.Count == 0) {
         throw new InvalidOperationException("The GameObject " + parentObject + " did not have any colliders.");
       }
