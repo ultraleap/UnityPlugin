@@ -436,6 +436,9 @@ namespace Leap.Unity.Interaction {
         createScene();
         applyDebugSettings();
       } catch (Exception e) {
+        Debug.LogError("Error creating scene.  This might have been due to trying to build 32bit, which is not currently supported, or by missing dlls.");
+        Application.Quit();
+        Debug.Break();
         enabled = false;
         throw e;
       }
