@@ -7,16 +7,25 @@ using System.Collections;
 public class Cursor3D : MonoBehaviour {
     [Tooltip("The current Leap Data Provider for the scene.")]
     public LeapProvider LeapDataProvider;
+    [Tooltip("The diameter of the visual sphere cursor.")]
     public float RenderSphereDiameter = 0.1f;
+    [Tooltip("The diameter of the collider that checks for pinchable objects.")]
     public float CollisionSphereDiameter = 0.1f;
-    public float ScalingFactor = 6f;
-    public float CursorDampingFactor = 0.8f;
+    [Tooltip("The amount of motion amplification for cursor movement.")]
+    public float MotionScalingFactor = 6f;
+    [Tooltip("The amount that the cursor is lerped to its previous position per frame.")]
+    public float CursorSmoothingFactor = 0.2f;
 
-    public float k_Spring = 500.0f;
-    public float k_Damper = 10.5f;
-    public float k_Drag = 10.0f;
-    public float k_AngularDrag = 5.0f;
-    public float k_Distance = 0f;
+    [Tooltip("The springiness of the spring joint.")]
+    public float Spring = 500.0f;
+    [Tooltip("The dampening of the spring joint.")]
+    public float Damper = 10.5f;
+    [Tooltip("The drag applied to the object while it is being dragged.")]
+    public float Drag = 10.0f;
+    [Tooltip("The angular drag applied to the object while it is being dragged.")]
+    public float AngularDrag = 5.0f;
+    [Tooltip("The amount of dead-zone in the spring joint.")]
+    public float Distance = 0f;
 
     private Quaternion CurrentRotation;
 
@@ -26,13 +35,8 @@ public class Cursor3D : MonoBehaviour {
     private Material _sphereMaterial;
 
     private GameObject[] Cursors;
-    private SpringJoint[] SpringJoints;
+    private SpringJoint[,] SpringJoints;
     private bool[] prevPinching;
-
-    //Can only handle one pinch per frame
-    //Two colliders don't return two uniquely identifiable OnTriggerEnter's
-    private SphereCollider radialcollider;
-    private int justPinched = 0;
 
 	// Use this for initialization
 	void Start () {
@@ -48,22 +52,19 @@ public class Cursor3D : MonoBehaviour {
         }
 
         Cursors = new GameObject[2];
-        radialcollider = this.gameObject.AddComponent<SphereCollider>();
-        radialcollider.radius = CollisionSphereDiameter / 2f;
-        radialcollider.enabled = false;
-        radialcollider.isTrigger = true;
 
         for (int i = 0; i < Cursors.Length; i++)
         {
-            Cursors[i] = new GameObject();
+          Cursors[i] = new GameObject("Cursor " + i);
             Cursors[i].AddComponent<MeshFilter>().mesh = _sphereMesh;
             Cursors[i].AddComponent<MeshRenderer>().sharedMaterial = _sphereMaterial;
+            Cursors[i].AddComponent<Rigidbody>().isKinematic = true;
             Cursors[i].transform.parent = transform;
             Cursors[i].transform.localScale = Vector3.one * RenderSphereDiameter;
         }
 
         prevPinching = new bool[2];
-        SpringJoints = new SpringJoint[2];
+        SpringJoints = new SpringJoint[2,10];
 	}
 
     //Update the Head Yaw for Calculating "Shoulder Positions"
@@ -74,13 +75,17 @@ public class Cursor3D : MonoBehaviour {
         Quaternion HeadYaw = Quaternion.Euler(0f, InputTracking.GetLocalRotation(VRNode.Head).eulerAngles.y, 0f);
         CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.1f);
 
-        radialcollider.enabled = false;
-
-        for (int whichHand = 0; whichHand < curFrame.Hands.Count; whichHand++)
+        for (int whichHand = 0; whichHand < 2; whichHand++)
         {
-            if (whichHand > curFrame.Hands.Count)
-            {
-                continue;
+            if (whichHand > curFrame.Hands.Count - 1){
+              if (Cursors[whichHand].activeInHierarchy) {
+                Cursors[whichHand].SetActive(false);
+              }
+              continue;
+            } else {
+              if (!Cursors[whichHand].activeInHierarchy) {
+                Cursors[whichHand].SetActive(true);
+              }
             }
 
             Vector3 ProjectionOrigin = Vector3.zero;
@@ -96,7 +101,7 @@ public class Cursor3D : MonoBehaviour {
 
             Vector3 Offset = curFrame.Hands[whichHand].Fingers[1].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3() - ProjectionOrigin;
 
-            Cursors[whichHand].transform.position = Vector3.Lerp(Cursors[whichHand].transform.position, ProjectionOrigin + (Offset * ScalingFactor), 1f - CursorDampingFactor);
+            Cursors[whichHand].transform.position = Vector3.Lerp(Cursors[whichHand].transform.position, ProjectionOrigin + (Offset * MotionScalingFactor), CursorSmoothingFactor);
 
             if (curFrame.Hands[whichHand].PinchDistance < 30f)
             {
@@ -105,11 +110,31 @@ public class Cursor3D : MonoBehaviour {
                     prevPinching[whichHand] = true;
                     Cursors[whichHand].GetComponent<MeshRenderer>().material.color = Color.green;
 
-                    radialcollider.center = transform.InverseTransformPoint(Cursors[whichHand].transform.position);
-                    justPinched = whichHand;
-                    radialcollider.enabled = true;
+                    Collider[] Colliders = Physics.OverlapSphere(Cursors[whichHand].transform.position, CollisionSphereDiameter);
+
+                    for(int i = 0; i < Mathf.Min(10,Colliders.Length); i++){
+                      // We need to hit a rigidbody that is not kinematic
+                      if (!Colliders[i].attachedRigidbody || Colliders[i].attachedRigidbody.isKinematic) {
+                        return;
+                      }
+
+                      if (!SpringJoints[whichHand, i]) {
+                        SpringJoints[whichHand, i] = Cursors[whichHand].AddComponent<SpringJoint>();
+                        Cursors[whichHand].GetComponent<Rigidbody>().isKinematic = true;
+                      }
+
+                      SpringJoints[whichHand, i].transform.position = Cursors[whichHand].transform.position;
+                      SpringJoints[whichHand, i].anchor = Vector3.zero;
+
+                      SpringJoints[whichHand, i].spring = Spring;
+                      SpringJoints[whichHand, i].damper = Damper;
+                      SpringJoints[whichHand, i].maxDistance = Distance;
+                      SpringJoints[whichHand, i].connectedBody = Colliders[i].attachedRigidbody;
+
+                      StartCoroutine(DragObject(whichHand, i));
+                    }
                 }
-            }else{
+            }else if (curFrame.Hands[whichHand].PinchDistance > 40f) {
                 if (prevPinching[whichHand])
                 {
                     prevPinching[whichHand] = false;
@@ -121,51 +146,25 @@ public class Cursor3D : MonoBehaviour {
         }
     }
 
-    void OnTriggerEnter(Collider hit)
+    private IEnumerator DragObject(int whichHand, int i)
     {
-        // We need to hit a rigidbody that is not kinematic
-        if (!hit.attachedRigidbody || hit.attachedRigidbody.isKinematic)
-        {
-            return;
-        }
-
-        if (!SpringJoints[justPinched])
-        {
-            var go = new GameObject("Rigidbody dragger");
-            Rigidbody body = go.AddComponent<Rigidbody>();
-            SpringJoints[justPinched] = go.AddComponent<SpringJoint>();
-            body.isKinematic = true;
-        }
-
-        SpringJoints[justPinched].transform.position = Cursors[justPinched].transform.position;
-        SpringJoints[justPinched].anchor = Vector3.zero;
-
-        SpringJoints[justPinched].spring = k_Spring;
-        SpringJoints[justPinched].damper = k_Damper;
-        SpringJoints[justPinched].maxDistance = k_Distance;
-        SpringJoints[justPinched].connectedBody = hit.attachedRigidbody;
-
-        StartCoroutine("DragObject", justPinched);
-    }
-
-    private IEnumerator DragObject(int whichHand)
-    {
-        float oldDrag = SpringJoints[whichHand].connectedBody.drag;
-        float oldAngularDrag = SpringJoints[whichHand].connectedBody.angularDrag;
-        SpringJoints[whichHand].connectedBody.drag = k_Drag;
-        SpringJoints[whichHand].connectedBody.angularDrag = k_AngularDrag;
+        float oldDrag = SpringJoints[whichHand, i].connectedBody.drag;
+        float oldAngularDrag = SpringJoints[whichHand, i].connectedBody.angularDrag;
+        SpringJoints[whichHand, i].connectedBody.drag = Drag;
+        SpringJoints[whichHand, i].connectedBody.angularDrag = AngularDrag;
 
         while (prevPinching[whichHand])
         {
-            SpringJoints[whichHand].transform.position = Cursors[whichHand].transform.position;
+          SpringJoints[whichHand, i].transform.position = Cursors[whichHand].transform.position;
             yield return null;
         }
 
-        if (SpringJoints[whichHand].connectedBody)
+        if (SpringJoints[whichHand, i].connectedBody)
         {
-            SpringJoints[whichHand].connectedBody.drag = oldDrag;
-            SpringJoints[whichHand].connectedBody.angularDrag = oldAngularDrag;
-            SpringJoints[whichHand].connectedBody = null;
+          SpringJoints[whichHand, i].connectedBody.drag = oldDrag;
+          SpringJoints[whichHand, i].connectedBody.angularDrag = oldAngularDrag;
+          SpringJoints[whichHand, i].connectedBody = null;
+          Destroy(SpringJoints[whichHand, i]);
         }
     }
 }

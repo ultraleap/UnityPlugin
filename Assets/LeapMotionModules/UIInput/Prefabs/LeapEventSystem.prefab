@@ -60,19 +60,35 @@ MonoBehaviour:
   RightHandDetector: {fileID: 0}
   PointerSprite: {fileID: 21300000, guid: e4965e539caa5e547abccae409261181, type: 3}
   PointerMaterial: {fileID: 10754, guid: 0000000000000000e000000000000000, type: 0}
-  PointerScale:
+  PointerDistanceScale:
     serializedVersion: 2
     m_Curve:
     - time: 0
-      value: 0.099485725
+      value: 0.1
       inSlope: 0
-      outSlope: 0.1495377
-      tangentMode: 17
-    - time: 5.9900966
-      value: 0.995231
-      inSlope: 0
+      outSlope: 0.15
+      tangentMode: 0
+    - time: 6
+      value: 1
+      inSlope: 0.15
       outSlope: 0
-      tangentMode: 17
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  PointerPinchScale:
+    serializedVersion: 2
+    m_Curve:
+    - time: 29.960255
+      value: 0.6020917
+      inSlope: 0.018969504
+      outSlope: 0.018969504
+      tangentMode: 0
+    - time: 70.01795
+      value: 1.101783
+      inSlope: 0.0040388247
+      outSlope: 0.0040388247
+      tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
@@ -84,8 +100,9 @@ MonoBehaviour:
   InteractionMode: 0
   ProjectiveToTactileTransitionDistance: 0.4
   TactilePadding: 0.005
-  PinchingThreshold: 20
-  EnvironmentPointer: 0
+  PinchingThreshold: 30
+  InnerPointer: 1
+  InnerPointerOpacityScalar: 0.77
   BeginHoverSound: {fileID: 0}
   EndHoverSound: {fileID: 0}
   BeginTriggerSound: {fileID: 0}
@@ -119,6 +136,7 @@ MonoBehaviour:
   DrawDebug: 0
   RetractUI: 0
   perFingerPointer: 0
+  EnvironmentPointer: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
