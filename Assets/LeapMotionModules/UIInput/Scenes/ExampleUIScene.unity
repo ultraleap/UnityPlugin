@@ -20,9 +20,9 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 1.2174988, g: 1.2283211, b: 1.2607877, a: 1.810639}
-  m_AmbientEquatorColor: {r: 0.20641287, g: 0.22632988, b: 0.24081498, a: 1.810639}
-  m_AmbientGroundColor: {r: 0.08510004, g: 0.07785749, b: 0.063372366, a: 1.810639}
+  m_AmbientSkyColor: {r: 1.4122986, g: 1.4248524, b: 1.4625137, a: 2.1003413}
+  m_AmbientEquatorColor: {r: 0.23943892, g: 0.26254267, b: 0.27934536, a: 2.1003413}
+  m_AmbientGroundColor: {r: 0.09871604, g: 0.09031468, b: 0.07351194, a: 2.1003413}
   m_AmbientIntensity: 1.16
   m_AmbientMode: 3
   m_SkyboxMaterial: {fileID: 0}
@@ -16169,7 +16169,7 @@ MonoBehaviour:
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 3
+  m_DynamicPixelsPerUnit: 1
 --- !u!223 &871389356
 Canvas:
   m_ObjectHideFlags: 0
@@ -16663,7 +16663,7 @@ MonoBehaviour:
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 1
+  m_DynamicPixelsPerUnit: 0.1
 --- !u!223 &880958843
 Canvas:
   m_ObjectHideFlags: 0
@@ -18251,7 +18251,7 @@ MonoBehaviour:
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 1
+  m_DynamicPixelsPerUnit: 0.1
 --- !u!223 &976021664
 Canvas:
   m_ObjectHideFlags: 0
@@ -26234,7 +26234,7 @@ RectTransform:
   m_GameObject: {fileID: 1407887157}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.000081954}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalScale: {x: 6, y: 6, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 604850742}
@@ -26266,10 +26266,10 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 12800000, guid: 5b964491dc225bb489190e46b82093ca, type: 3}
-    m_FontSize: 14
+    m_FontSize: 31
     m_FontStyle: 0
-    m_BestFit: 1
-    m_MinSize: 10
+    m_BestFit: 0
+    m_MinSize: 3
     m_MaxSize: 257
     m_Alignment: 4
     m_AlignByGeometry: 0
@@ -29219,7 +29219,7 @@ MonoBehaviour:
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 3
+  m_DynamicPixelsPerUnit: 1
 --- !u!223 &1689193714
 Canvas:
   m_ObjectHideFlags: 0
@@ -31118,7 +31118,7 @@ RectTransform:
   m_GameObject: {fileID: 1789132953}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.0000029803}
-  m_LocalScale: {x: 0.3, y: 0.29999995, z: 0.29999998}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 1213421347}
@@ -31150,9 +31150,9 @@ MonoBehaviour:
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_FontData:
     m_Font: {fileID: 12800000, guid: 5b964491dc225bb489190e46b82093ca, type: 3}
-    m_FontSize: 14
+    m_FontSize: 47
     m_FontStyle: 0
-    m_BestFit: 1
+    m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 257
     m_Alignment: 4
@@ -31938,7 +31938,7 @@ MonoBehaviour:
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
-  m_DynamicPixelsPerUnit: 4
+  m_DynamicPixelsPerUnit: 1
 --- !u!223 &1961689421
 Canvas:
   m_ObjectHideFlags: 0
