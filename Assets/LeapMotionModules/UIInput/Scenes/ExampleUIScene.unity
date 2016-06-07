@@ -20,10 +20,10 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 1.4122986, g: 1.4248524, b: 1.4625137, a: 2.1003413}
+  m_AmbientSkyColor: {r: 0.9656652, g: 0.9742489, b: 1, a: 1}
   m_AmbientEquatorColor: {r: 0.23943892, g: 0.26254267, b: 0.27934536, a: 2.1003413}
   m_AmbientGroundColor: {r: 0.09871604, g: 0.09031468, b: 0.07351194, a: 2.1003413}
-  m_AmbientIntensity: 1.16
+  m_AmbientIntensity: 1
   m_AmbientMode: 3
   m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
@@ -63,7 +63,7 @@ LightmapSettings:
     m_CompAOExponent: 1
     m_LightmapParameters: {fileID: 0}
     m_TextureCompression: 1
-    m_FinalGather: 0
+    m_FinalGather: 1
     m_FinalGatherRayCount: 1024
     m_ReflectionCompression: 2
   m_LightingDataAsset: {fileID: 112000001, guid: 38fcc41463484e949a7212c111cfc600,
