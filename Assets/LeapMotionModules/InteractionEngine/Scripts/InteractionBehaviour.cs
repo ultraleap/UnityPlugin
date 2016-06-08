@@ -325,7 +325,7 @@ namespace Leap.Unity.Interaction {
 
       updateState();
 
-      var newCollection = HandPointCollection.Create(_rigidbody);
+      var newCollection = HandPointCollection.Create(_warper);
       _handIdToPoints[hand.Id] = newCollection;
 
       newCollection.UpdateTransform();
@@ -671,7 +671,7 @@ namespace Leap.Unity.Interaction {
       //With a pool, likely there will only ever be 2 instances!
       private static Stack<HandPointCollection> _handPointCollectionPool = new Stack<HandPointCollection>();
 
-      private Rigidbody _rigidbody;
+      private RigidbodyWarper _warper;
       private Vector3[] _localPositions;
 
       private Matrix4x4 _transformMatrix;
@@ -679,7 +679,7 @@ namespace Leap.Unity.Interaction {
       private bool _hasInverse = false;
       private Matrix4x4 _inverseTransformMatrix;
 
-      public static HandPointCollection Create(Rigidbody rigidbody) {
+      public static HandPointCollection Create(RigidbodyWarper warper) {
         HandPointCollection collection;
         if (_handPointCollectionPool.Count != 0) {
           collection = _handPointCollectionPool.Pop();
@@ -687,7 +687,7 @@ namespace Leap.Unity.Interaction {
           collection = new HandPointCollection();
         }
 
-        collection.init(rigidbody);
+        collection.init(warper);
         return collection;
       }
 
@@ -700,18 +700,18 @@ namespace Leap.Unity.Interaction {
         _localPositions = new Vector3[NUM_FINGERS * NUM_BONES];
       }
 
-      private void init(Rigidbody rigidbody) {
-        _rigidbody = rigidbody;
+      private void init(RigidbodyWarper warper) {
+        _warper = warper;
       }
 
       private void reset() {
-        _rigidbody = null;
+        _warper = null;
         _hasInverse = false;
       }
 
       public void UpdateTransform() {
-        Vector3 interactionPosition = _rigidbody.position;
-        Quaternion interactionRotation = _rigidbody.rotation;
+        Vector3 interactionPosition = _warper.RigidbodyPosition;
+        Quaternion interactionRotation = _warper.RigidbodyRotation;
 
         _hasInverse = false;
         _transformMatrix = Matrix4x4.TRS(interactionPosition, interactionRotation, Vector3.one);
