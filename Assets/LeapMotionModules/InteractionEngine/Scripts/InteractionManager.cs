@@ -497,6 +497,10 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void FixedUpdate() {
+      if (OnPhysicalUpdate != null) {
+        OnPhysicalUpdate();
+      }
+
       if (!_pauseSimulation) {
         simulateFrame(_leapProvider.CurrentFixedFrame);
       }
@@ -507,10 +511,6 @@ namespace Leap.Unity.Interaction {
 
       if (_showDebugOutput) {
         InteractionC.GetDebugStrings(ref _scene, _debugOutput);
-      }
-
-      if (OnPhysicalUpdate != null) {
-        OnPhysicalUpdate();
       }
     }
 
