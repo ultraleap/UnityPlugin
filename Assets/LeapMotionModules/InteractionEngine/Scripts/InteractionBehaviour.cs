@@ -340,26 +340,6 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnHandGrasped(Hand hand) {
       base.OnHandGrasped(hand);
-
-      updateState();
-
-      var newCollection = HandPointCollection.Create(_warper);
-      _handIdToPoints[hand.Id] = newCollection;
-
-      for (int f = 0; f < NUM_FINGERS; f++) {
-        Finger finger = hand.Fingers[f];
-        Finger.FingerType fingerType = finger.Type;
-
-        for (int j = 0; j < NUM_BONES; j++) {
-          Bone.BoneType boneType = (Bone.BoneType)j;
-          Bone bone = finger.Bone(boneType);
-
-          Vector3 bonePos = bone.NextJoint.ToVector3();
-
-          //Global position of the point is just the position of the joint itself
-          newCollection.SetGlobalPosition(bonePos, fingerType, boneType);
-        }
-      }
     }
 
     protected override void OnHandsHoldPhysics(ReadonlyList<Hand> hands) {
