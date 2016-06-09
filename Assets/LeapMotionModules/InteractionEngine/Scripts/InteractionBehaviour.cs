@@ -178,7 +178,7 @@ namespace Leap.Unity.Interaction {
       base.OnPostSolve();
 
       if (IsBeingGrasped) {
-        if (Vector3.Distance(_solvedPosition, _rigidbody.position) > _material.ReleaseDistance * _manager.SimulationScale) {
+        if (Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale) {
           _manager.ReleaseObject(this);
         }
       } else {
@@ -325,10 +325,8 @@ namespace Leap.Unity.Interaction {
 
       updateState();
 
-      var newCollection = HandPointCollection.Create(_rigidbody);
+      var newCollection = HandPointCollection.Create(_warper);
       _handIdToPoints[hand.Id] = newCollection;
-
-      newCollection.UpdateTransform();
 
       for (int f = 0; f < NUM_FINGERS; f++) {
         Finger finger = hand.Fingers[f];
@@ -376,6 +374,11 @@ namespace Leap.Unity.Interaction {
             Vector3 deltaAxis;
             float deltaAngle;
             deltaRot.ToAngleAxis(out deltaAngle, out deltaAxis);
+
+            if (float.IsInfinity(deltaAxis.x)) {
+              deltaAxis = Vector3.zero;
+              deltaAngle = 0;
+            }
 
             Vector3 targetVelocity = deltaPos / Time.fixedDeltaTime;
             Vector3 targetAngularVelocity = deltaAxis * deltaAngle * Mathf.Deg2Rad / Time.fixedDeltaTime;
@@ -560,8 +563,8 @@ namespace Leap.Unity.Interaction {
         interactionTransform.position = _solvedPosition.ToCVector();
         interactionTransform.rotation = _solvedRotation.ToCQuaternion();
       } else {
-        interactionTransform.position = _rigidbody.position.ToCVector();
-        interactionTransform.rotation = _rigidbody.rotation.ToCQuaternion();
+        interactionTransform.position = _warper.RigidbodyPosition.ToCVector();
+        interactionTransform.rotation = _warper.RigidbodyRotation.ToCQuaternion();
       }
 
       interactionTransform.wallTime = Time.fixedTime;
@@ -629,7 +632,6 @@ namespace Leap.Unity.Interaction {
         Hand hand = hands[h];
 
         var collection = _handIdToPoints[hand.Id];
-        collection.UpdateTransform();
 
         for (int f = 0; f < NUM_FINGERS; f++) {
           Finger finger = hand.Fingers[f];
@@ -639,12 +641,12 @@ namespace Leap.Unity.Interaction {
             Bone.BoneType boneType = (Bone.BoneType)j;
             Bone bone = finger.Bone(boneType);
 
-            Vector3 objectPos = collection.GetGlobalPosition(fingerType, boneType);
+            Vector3 localPos = collection.GetLocalPosition(fingerType, boneType);
             Vector3 bonePos = bone.NextJoint.ToVector3();
 
             //Do the solve such that the objects positions are matched to the new bone positions
-            LEAP_VECTOR point1 = (objectPos - _rigidbody.position).ToCVector();
-            LEAP_VECTOR point2 = (bonePos - _rigidbody.position).ToCVector();
+            LEAP_VECTOR point1 = (localPos).ToCVector();
+            LEAP_VECTOR point2 = (bonePos).ToCVector();
 
             KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
           }
@@ -662,24 +664,19 @@ namespace Leap.Unity.Interaction {
       Quaternion solvedRotation = leapRotation.ToQuaternion();
 
       //Calculate new transform using delta
-      newPosition = _rigidbody.position + solvedTranslation;
-      newRotation = solvedRotation * _rigidbody.rotation; ;
+      newPosition = solvedTranslation;
+      newRotation = solvedRotation;
     }
 
     protected class HandPointCollection {
       //Without a pool, you might end up with 2 instances per object
       //With a pool, likely there will only ever be 2 instances!
       private static Stack<HandPointCollection> _handPointCollectionPool = new Stack<HandPointCollection>();
-
-      private Rigidbody _rigidbody;
+      
       private Vector3[] _localPositions;
-
-      private Matrix4x4 _transformMatrix;
-
-      private bool _hasInverse = false;
       private Matrix4x4 _inverseTransformMatrix;
 
-      public static HandPointCollection Create(Rigidbody rigidbody) {
+      public static HandPointCollection Create(RigidbodyWarper warper) {
         HandPointCollection collection;
         if (_handPointCollectionPool.Count != 0) {
           collection = _handPointCollectionPool.Pop();
@@ -687,12 +684,11 @@ namespace Leap.Unity.Interaction {
           collection = new HandPointCollection();
         }
 
-        collection.init(rigidbody);
+        collection.init(warper);
         return collection;
       }
 
       public static void Return(HandPointCollection handPointCollection) {
-        handPointCollection.reset();
         _handPointCollectionPool.Push(handPointCollection);
       }
 
@@ -700,34 +696,18 @@ namespace Leap.Unity.Interaction {
         _localPositions = new Vector3[NUM_FINGERS * NUM_BONES];
       }
 
-      private void init(Rigidbody rigidbody) {
-        _rigidbody = rigidbody;
-      }
-
-      private void reset() {
-        _rigidbody = null;
-        _hasInverse = false;
-      }
-
-      public void UpdateTransform() {
-        Vector3 interactionPosition = _rigidbody.position;
-        Quaternion interactionRotation = _rigidbody.rotation;
-
-        _hasInverse = false;
-        _transformMatrix = Matrix4x4.TRS(interactionPosition, interactionRotation, Vector3.one);
+      private void init(RigidbodyWarper warper) {
+        Vector3 interactionPosition = warper.RigidbodyPosition;
+        Quaternion interactionRotation = warper.RigidbodyRotation;
+        _inverseTransformMatrix = Matrix4x4.TRS(interactionPosition, interactionRotation, Vector3.one).inverse;
       }
 
       public void SetGlobalPosition(Vector3 globalPosition, Finger.FingerType fingerType, Bone.BoneType boneType) {
-        if (!_hasInverse) {
-          _inverseTransformMatrix = _transformMatrix.inverse;
-          _hasInverse = true;
-        }
-
         _localPositions[getIndex(fingerType, boneType)] = _inverseTransformMatrix.MultiplyPoint3x4(globalPosition);
       }
 
-      public Vector3 GetGlobalPosition(Finger.FingerType fingerType, Bone.BoneType boneType) {
-        return _transformMatrix.MultiplyPoint3x4(_localPositions[getIndex(fingerType, boneType)]);
+      public Vector3 GetLocalPosition(Finger.FingerType fingerType, Bone.BoneType boneType) {
+        return _localPositions[getIndex(fingerType, boneType)];
       }
 
       private int getIndex(Finger.FingerType fingerType, Bone.BoneType boneType) {
