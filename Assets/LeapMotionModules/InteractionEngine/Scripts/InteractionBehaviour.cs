@@ -629,7 +629,6 @@ namespace Leap.Unity.Interaction {
         Hand hand = hands[h];
 
         var collection = _handIdToPoints[hand.Id];
-        collection.UpdateTransform();
 
         for (int f = 0; f < NUM_FINGERS; f++) {
           Finger finger = hand.Fingers[f];
@@ -639,12 +638,12 @@ namespace Leap.Unity.Interaction {
             Bone.BoneType boneType = (Bone.BoneType)j;
             Bone bone = finger.Bone(boneType);
 
-            Vector3 objectPos = collection.GetGlobalPosition(fingerType, boneType);
+            Vector3 localPos = collection.GetLocalPosition(fingerType, boneType);
             Vector3 bonePos = bone.NextJoint.ToVector3();
 
             //Do the solve such that the objects positions are matched to the new bone positions
-            LEAP_VECTOR point1 = (objectPos - _warper.RigidbodyPosition).ToCVector();
-            LEAP_VECTOR point2 = (bonePos - _warper.RigidbodyPosition).ToCVector();
+            LEAP_VECTOR point1 = (localPos).ToCVector();
+            LEAP_VECTOR point2 = (bonePos).ToCVector();
 
             KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
           }
@@ -662,8 +661,8 @@ namespace Leap.Unity.Interaction {
       Quaternion solvedRotation = leapRotation.ToQuaternion();
 
       //Calculate new transform using delta
-      newPosition = _warper.RigidbodyPosition + solvedTranslation;
-      newRotation = solvedRotation * _warper.RigidbodyRotation;
+      newPosition = solvedTranslation;
+      newRotation = solvedRotation;
     }
 
     protected class HandPointCollection {
@@ -673,10 +672,6 @@ namespace Leap.Unity.Interaction {
 
       private RigidbodyWarper _warper;
       private Vector3[] _localPositions;
-
-      private Matrix4x4 _transformMatrix;
-
-      private bool _hasInverse = false;
       private Matrix4x4 _inverseTransformMatrix;
 
       public static HandPointCollection Create(RigidbodyWarper warper) {
@@ -706,28 +701,20 @@ namespace Leap.Unity.Interaction {
 
       private void reset() {
         _warper = null;
-        _hasInverse = false;
       }
 
       public void UpdateTransform() {
         Vector3 interactionPosition = _warper.RigidbodyPosition;
         Quaternion interactionRotation = _warper.RigidbodyRotation;
-
-        _hasInverse = false;
-        _transformMatrix = Matrix4x4.TRS(interactionPosition, interactionRotation, Vector3.one);
+        _inverseTransformMatrix = Matrix4x4.TRS(interactionPosition, interactionRotation, Vector3.one).inverse;
       }
 
       public void SetGlobalPosition(Vector3 globalPosition, Finger.FingerType fingerType, Bone.BoneType boneType) {
-        if (!_hasInverse) {
-          _inverseTransformMatrix = _transformMatrix.inverse;
-          _hasInverse = true;
-        }
-
         _localPositions[getIndex(fingerType, boneType)] = _inverseTransformMatrix.MultiplyPoint3x4(globalPosition);
       }
 
-      public Vector3 GetGlobalPosition(Finger.FingerType fingerType, Bone.BoneType boneType) {
-        return _transformMatrix.MultiplyPoint3x4(_localPositions[getIndex(fingerType, boneType)]);
+      public Vector3 GetLocalPosition(Finger.FingerType fingerType, Bone.BoneType boneType) {
+        return _localPositions[getIndex(fingerType, boneType)];
       }
 
       private int getIndex(Finger.FingerType fingerType, Bone.BoneType boneType) {
