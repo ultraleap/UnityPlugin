@@ -75,6 +75,8 @@ namespace Leap.Unity.Interaction {
         }
       }
 
+      performSolve();
+
       LEAP_VECTOR leapTranslation;
       LEAP_QUATERNION leapRotation;
       KabschC.GetTranslation(ref _kabsch, out leapTranslation);
