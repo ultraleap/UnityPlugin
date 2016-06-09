@@ -13,6 +13,10 @@ namespace Leap.Unity.Interaction {
     }
 
     public static T CreateInstance<T>(InteractionBehaviour obj, T template) where T : IControllerBase {
+      if (template == null) {
+        return null;
+      }
+
       T controller = Instantiate(template);
       controller.Init(obj, obj.Manager);
       return controller;

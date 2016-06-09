@@ -42,6 +42,30 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected ILayerController _layerController;
 
+    public IGraspController CreateGraspController(InteractionBehaviour obj) {
+      return IControllerBase.CreateInstance(obj, _graspController);
+    }
+
+    public IHoldingController CreateHoldingController(InteractionBehaviour obj) {
+      return IControllerBase.CreateInstance(obj, _holdingController);
+    }
+
+    public IPhysicsController CreatePhysicsController(InteractionBehaviour obj) {
+      return IControllerBase.CreateInstance(obj, _physicsController);
+    }
+
+    public ISuspensionController CreateSuspensionController(InteractionBehaviour obj) {
+      return IControllerBase.CreateInstance(obj, _suspensionController);
+    }
+
+    public IThrowingController CreateThrowingController(InteractionBehaviour obj) {
+      return IControllerBase.CreateInstance(obj, _throwingController);
+    }
+
+    public ILayerController CreateLayerController(InteractionBehaviour obj) {
+      return IControllerBase.CreateInstance(obj, _layerController);
+    }
+
 #if UNITY_EDITOR
     private const string DEFAULT_ASSET_NAME = "InteractionMaterial.asset";
 
