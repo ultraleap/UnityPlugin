@@ -477,8 +477,20 @@ namespace Leap.Unity.Interaction {
     #region INTERNAL
 
     protected void updateLayer() {
-      int layer = 0;
-      //TODO: layer logic
+      int layer;
+      if (_controllers.LayerController != null) {
+        if (_ignoringBrushes) {
+          layer = _controllers.LayerController.InteractionNoClipLayer;
+        } else {
+          layer = _controllers.LayerController.InteractionLayer;
+        }
+      } else {
+        if (_ignoringBrushes) {
+          layer = _manager.InteractionNoClipLayer;
+        } else {
+          layer = _manager.InteractionLayer;
+        }
+      }
 
       if (gameObject.layer != layer) {
         for (int i = 0; i < _childrenArray.Length; i++) {
