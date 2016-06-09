@@ -205,8 +205,6 @@ namespace Leap.Unity.Interaction {
           if (_rigidbody.useGravity) {
             _rigidbody.useGravity = false;
           }
-
-
         } else {
           //If we did not recieve a velocity update, we set the rigidbody's gravity status
           //to match whatever the user has set.
