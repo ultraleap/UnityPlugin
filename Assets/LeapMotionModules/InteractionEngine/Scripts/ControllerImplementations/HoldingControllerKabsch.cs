@@ -119,7 +119,7 @@ namespace Leap.Unity.Interaction {
       private void init(RigidbodyWarper warper) {
         Vector3 interactionPosition = warper.RigidbodyPosition;
         Quaternion interactionRotation = warper.RigidbodyRotation;
-        _inverseTransformMatrix = Matrix4x4.TRS(interactionPosition, interactionRotation, Vector3.one);
+        _inverseTransformMatrix = Matrix4x4.TRS(interactionPosition, interactionRotation, Vector3.one).inverse;
       }
 
       public void SetGlobalPosition(Vector3 globalPosition, Finger.FingerType fingerType, Bone.BoneType boneType) {
