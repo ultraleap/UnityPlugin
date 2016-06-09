@@ -105,7 +105,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public ISuspensionHandler SuspensionHandler {
+    public ISuspensionController SuspensionHandler {
       get {
         return null;
       }

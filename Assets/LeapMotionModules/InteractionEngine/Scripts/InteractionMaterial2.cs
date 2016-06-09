@@ -15,7 +15,7 @@ namespace Leap.Unity.Interaction {
     protected IPhysicsDriver _physicsDriver;
 
     [SerializeField]
-    protected ISuspensionHandler _suspensionHandler;
+    protected ISuspensionController _suspensionHandler;
 
     [SerializeField]
     protected IThrowingHandler _throwingHandler;

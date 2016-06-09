@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Leap.Unity.Interaction {
 
@@ -14,10 +15,12 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override void OnGrasp() {
+    public override void SetGraspedState() {
       _obj.Rigidbody.isKinematic = true;
     }
 
-    public override void OnUngrasp() { }
+    public override void OnGrasp() { }
+
+    public override void OnUngrasp() { } 
   }
 }

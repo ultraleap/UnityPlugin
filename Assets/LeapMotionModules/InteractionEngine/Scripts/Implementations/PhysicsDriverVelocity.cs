@@ -42,12 +42,14 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public override void OnGrasp() {
+    public override void SetGraspedState() {
       _obj.Rigidbody.isKinematic = false;
       _obj.Rigidbody.useGravity = false;
       _obj.Rigidbody.drag = 0;
       _obj.Rigidbody.angularDrag = 0;
     }
+
+    public override void OnGrasp() { }
 
     public override void OnUngrasp() { }
   }
