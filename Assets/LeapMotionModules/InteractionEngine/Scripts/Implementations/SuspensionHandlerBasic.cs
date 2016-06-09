@@ -9,7 +9,7 @@ namespace Leap.Unity.Interaction {
 
     private Renderer[] _renderers;
 
-    public override void Init(InteractionBehaviour obj) {
+    protected override void Init(InteractionBehaviour obj) {
       base.Init(obj);
 
       _renderers = obj.GetComponentsInChildren<Renderer>();

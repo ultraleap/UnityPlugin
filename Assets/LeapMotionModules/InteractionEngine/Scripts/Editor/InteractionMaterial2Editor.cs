@@ -106,7 +106,6 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-
       serializedObject.ApplyModifiedProperties();
     }
 
