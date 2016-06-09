@@ -11,12 +11,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e240ddf8ae2bd147b6c7d3cd1da1e2a, type: 3}
   m_Name: InteractionMaterial
   m_EditorClassIdentifier: 
-  _graspController: {fileID: 0}
+  _graspController: {fileID: 11426564}
+  _releaseDistance: 0.15
+  _physicMaterialMode: 1
   _holdingController: {fileID: 11404794}
-  _physicsController: {fileID: 11481132}
-  _suspensionController: {fileID: 11488972}
+  _physicsController: {fileID: 11409724}
+  _suspensionController: {fileID: 11462104}
   _throwingController: {fileID: 0}
   _layerController: {fileID: 0}
+  _warpingEnabled: 1
+  _warpCurve:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 0.02
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  _graphicalReturnTime: 0.25
 --- !u!114 &11403502
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -46,6 +66,47 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5f7ab934b62d25438bd10ceb74720d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11409724
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp:Leap.Unity.Interaction:PhysicsDriverVelocity
+  _maxVelocity: 6
+  _strengthByDistance:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &11426564
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8fcfa6ff99ea96429cecce3bc5710f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11462104
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d79f36bc3cfbe724b84442128f47ef8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxSuspensionTime: 4
 --- !u!114 &11481132
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -64,15 +125,3 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &11488972
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d79f36bc3cfbe724b84442128f47ef8f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _maxSuspensionTime: 4

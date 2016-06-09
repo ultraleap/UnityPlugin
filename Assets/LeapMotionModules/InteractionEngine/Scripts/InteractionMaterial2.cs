@@ -18,9 +18,23 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public enum PhysicMaterialModeEnum {
+      NoAction,
+      DuplicateExisting,
+      Replace
+    }
+
     [Controller]
     [SerializeField]
     protected IGraspController _graspController;
+
+    [Tooltip("How far the object can get from the hand before it is released.")]
+    [SerializeField]
+    protected float _releaseDistance = 0.15f;
+
+    [Tooltip("What to do with the physic materials when a grasp occurs.")]
+    [SerializeField]
+    protected PhysicMaterialModeEnum _physicMaterialMode = PhysicMaterialModeEnum.DuplicateExisting;
 
     [Controller]
     [SerializeField]
@@ -41,6 +55,21 @@ namespace Leap.Unity.Interaction {
     [Controller(allowNone: true)]
     [SerializeField]
     protected ILayerController _layerController;
+
+    [Header("Warp Settings")]
+    [Tooltip("Can objects using this material warp the graphical anchor through time to reduce percieved latency.")]
+    [SerializeField]
+    protected bool _warpingEnabled = true;
+
+    [Tooltip("The amount of warping to perform based on the distance between the actual position and the graphical position.")]
+    [SerializeField]
+    protected AnimationCurve _warpCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
+                                                             new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
+
+    [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
+    [SerializeField]
+    protected float _graphicalReturnTime = 0.25f;
+
 
     public IGraspController CreateGraspController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _graspController);
@@ -64,6 +93,48 @@ namespace Leap.Unity.Interaction {
 
     public ILayerController CreateLayerController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _layerController);
+    }
+
+    public bool ContactEnabled {
+      get {
+        return true;
+      }
+    }
+
+    public float BrushDisableDistance {
+      get {
+        return 0.017f;
+      }
+    }
+
+    public float ReleaseDistance {
+      get {
+        return _releaseDistance;
+      }
+    }
+
+    public PhysicMaterialModeEnum PhysicMaterialMode {
+      get {
+        return _physicMaterialMode;
+      }
+    }
+
+    public bool WarpingEnabled {
+      get {
+        return _warpingEnabled;
+      }
+    }
+
+    public AnimationCurve WarpCurve {
+      get {
+        return _warpCurve;
+      }
+    }
+
+    public float GraphicalReturnTime {
+      get {
+        return _graphicalReturnTime;
+      }
     }
 
 #if UNITY_EDITOR

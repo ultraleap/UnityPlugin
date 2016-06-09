@@ -12,11 +12,11 @@ namespace Leap.Unity.Interaction {
 
     public override void DrivePhysics(ReadonlyList<Hand> hands, PhysicsMoveInfo info, Vector3 solvedPosition, Quaternion solvedRotation) {
       if (info.shouldTeleport) {
-        _obj.Rigidbody.position = solvedPosition;
-        _obj.Rigidbody.rotation = solvedRotation;
+        _obj.rigidbody.position = solvedPosition;
+        _obj.rigidbody.rotation = solvedRotation;
       } else {
-        Vector3 deltaPos = solvedPosition - _obj.Rigidbody.position;
-        Quaternion deltaRot = solvedRotation * Quaternion.Inverse(_obj.Rigidbody.rotation);
+        Vector3 deltaPos = solvedPosition - _obj.rigidbody.position;
+        Quaternion deltaRot = solvedRotation * Quaternion.Inverse(_obj.rigidbody.rotation);
 
         Vector3 deltaAxis;
         float deltaAngle;
@@ -35,16 +35,16 @@ namespace Leap.Unity.Interaction {
         }
 
         float followStrength = _strengthByDistance.Evaluate(info.remainingDistanceLastFrame);
-        _obj.Rigidbody.velocity = Vector3.Lerp(_obj.Rigidbody.velocity, targetVelocity, followStrength);
-        _obj.Rigidbody.angularVelocity = Vector3.Lerp(_obj.Rigidbody.angularVelocity, targetAngularVelocity, followStrength);
+        _obj.rigidbody.velocity = Vector3.Lerp(_obj.rigidbody.velocity, targetVelocity, followStrength);
+        _obj.rigidbody.angularVelocity = Vector3.Lerp(_obj.rigidbody.angularVelocity, targetAngularVelocity, followStrength);
       }
     }
 
     public override void SetGraspedState() {
-      _obj.Rigidbody.isKinematic = false;
-      _obj.Rigidbody.useGravity = false;
-      _obj.Rigidbody.drag = 0;
-      _obj.Rigidbody.angularDrag = 0;
+      _obj.rigidbody.isKinematic = false;
+      _obj.rigidbody.useGravity = false;
+      _obj.rigidbody.drag = 0;
+      _obj.rigidbody.angularDrag = 0;
     }
 
     public override void OnGrasp() { }

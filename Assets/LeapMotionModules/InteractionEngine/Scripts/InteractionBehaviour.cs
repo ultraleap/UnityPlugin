@@ -39,15 +39,17 @@ namespace Leap.Unity.Interaction {
     public const int NUM_BONES = 4;
 
     [SerializeField]
-    protected InteractionMaterial _material;
+    protected InteractionMaterial2 _material;
 
     protected Transform[] _childrenArray;
     protected Rigidbody _rigidbody;
 
+    //Rigidbody settings
     protected bool _isKinematic;
     protected bool _useGravity;
     protected float _drag;
     protected float _angularDrag;
+
     protected bool _recievedVelocityUpdate = false;
     protected bool _recievedSimulationResults = false;
     protected bool _notifiedOfTeleport = false;
@@ -56,6 +58,7 @@ namespace Leap.Unity.Interaction {
     protected Vector3 _solvedPosition;
     protected Quaternion _solvedRotation;
 
+    protected ControllerContainer _controllers;
     protected PhysicMaterialReplacer _materialReplacer;
     protected RigidbodyWarper _warper;
 
@@ -87,13 +90,19 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public ControllerContainer controllers {
+      get {
+        return _controllers;
+      }
+    }
+
     public new Rigidbody rigidbody {
       get {
         return _rigidbody;
       }
     }
 
-    public InteractionMaterial material {
+    public InteractionMaterial2 material {
       get {
         return _material;
       }
@@ -142,6 +151,8 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnRegistered() {
       base.OnRegistered();
+
+      _controllers = new ControllerContainer(this, _material);
 
       _rigidbody = GetComponent<Rigidbody>();
       if (_rigidbody == null) {
@@ -381,13 +392,6 @@ namespace Leap.Unity.Interaction {
       base.OnGraspEnd(lastHand);
 
       _materialReplacer.RevertMaterials();
-
-      if (lastHand != null) {
-        Vector3 palmVel = lastHand.PalmVelocity.ToVector3();
-        float speed = palmVel.magnitude;
-        float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed / _manager.SimulationScale);
-        _rigidbody.velocity = palmVel * multiplier;
-      }
     }
     #endregion
 
@@ -432,20 +436,8 @@ namespace Leap.Unity.Interaction {
     #region INTERNAL
 
     protected void updateLayer() {
-      int layer;
-      if (_ignoringBrushes || !_manager.ContactEnabled || !_material.ContactEnabled) {
-        if (_material.UseCustomLayers) {
-          layer = _material.InteractionNoClipLayer;
-        } else {
-          layer = _manager.InteractionNoClipLayer;
-        }
-      } else {
-        if (_material.UseCustomLayers) {
-          layer = _material.InteractionLayer;
-        } else {
-          layer = _manager.InteractionLayer;
-        }
-      }
+      int layer = 0;
+      //TODO: layer logic
 
       if (gameObject.layer != layer) {
         for (int i = 0; i < _childrenArray.Length; i++) {
@@ -473,7 +465,7 @@ namespace Leap.Unity.Interaction {
       _rigidbody.useGravity = _useGravity;
       _rigidbody.isKinematic = _isKinematic;
     }
-    
+
     #endregion
   }
 }

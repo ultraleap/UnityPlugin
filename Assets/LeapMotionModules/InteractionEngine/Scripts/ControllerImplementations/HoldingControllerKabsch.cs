@@ -13,10 +13,10 @@ namespace Leap.Unity.Interaction {
     protected Rigidbody _rigidbody;
     protected LEAP_IE_KABSCH _kabsch;
 
-    protected override void Init(InteractionBehaviour obj, InteractionManager manager) {
-      base.Init(obj, manager);
+    protected override void Init(InteractionBehaviour obj) {
+      base.Init(obj);
 
-      _rigidbody = obj.Rigidbody;
+      _rigidbody = obj.rigidbody;
       KabschC.Construct(ref _kabsch);
     }
 

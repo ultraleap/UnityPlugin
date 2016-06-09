@@ -9,8 +9,8 @@ namespace Leap.Unity.Interaction {
 
     private Renderer[] _renderers;
 
-    protected override void Init(InteractionBehaviour obj, InteractionManager manager) {
-      base.Init(obj, manager);
+    protected override void Init(InteractionBehaviour obj) {
+      base.Init(obj);
 
       _renderers = obj.GetComponentsInChildren<Renderer>();
     }
@@ -26,7 +26,7 @@ namespace Leap.Unity.Interaction {
     }
 
     public override void Suspend() {
-      _obj.Rigidbody.isKinematic = true;
+      _obj.rigidbody.isKinematic = true;
       setRendererState(false);
     }
 
