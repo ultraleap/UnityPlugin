@@ -26,7 +26,6 @@ namespace Leap.Unity.Interaction {
   /// This default implementation has the following requirements:
   ///    - A Rigidbody is required
   ///    - Kinematic movement must still be simulated via Rigidbody kinematic movement, as opposed to rigid movement of the Transform.
-  ///    - This behaviour cannot be a child of another InteractionBehaviour.
   ///    - Any non-continuous movement must be noted using the NotifyTeleported() method.
   ///    - Any forces or torques must be applied using the AddLinearAcceleration and AddAngularAcceleration methods instead of
   ///      the Rigidbody AddForce or AddTorque methods.
