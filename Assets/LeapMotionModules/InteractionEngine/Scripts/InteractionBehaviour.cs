@@ -328,8 +328,6 @@ namespace Leap.Unity.Interaction {
       var newCollection = HandPointCollection.Create(_warper);
       _handIdToPoints[hand.Id] = newCollection;
 
-      newCollection.UpdateTransform();
-
       for (int f = 0; f < NUM_FINGERS; f++) {
         Finger finger = hand.Fingers[f];
         Finger.FingerType fingerType = finger.Type;
@@ -674,8 +672,7 @@ namespace Leap.Unity.Interaction {
       //Without a pool, you might end up with 2 instances per object
       //With a pool, likely there will only ever be 2 instances!
       private static Stack<HandPointCollection> _handPointCollectionPool = new Stack<HandPointCollection>();
-
-      private RigidbodyWarper _warper;
+      
       private Vector3[] _localPositions;
       private Matrix4x4 _inverseTransformMatrix;
 
@@ -692,7 +689,6 @@ namespace Leap.Unity.Interaction {
       }
 
       public static void Return(HandPointCollection handPointCollection) {
-        handPointCollection.reset();
         _handPointCollectionPool.Push(handPointCollection);
       }
 
@@ -701,16 +697,8 @@ namespace Leap.Unity.Interaction {
       }
 
       private void init(RigidbodyWarper warper) {
-        _warper = warper;
-      }
-
-      private void reset() {
-        _warper = null;
-      }
-
-      public void UpdateTransform() {
-        Vector3 interactionPosition = _warper.RigidbodyPosition;
-        Quaternion interactionRotation = _warper.RigidbodyRotation;
+        Vector3 interactionPosition = warper.RigidbodyPosition;
+        Quaternion interactionRotation = warper.RigidbodyRotation;
         _inverseTransformMatrix = Matrix4x4.TRS(interactionPosition, interactionRotation, Vector3.one).inverse;
       }
 
