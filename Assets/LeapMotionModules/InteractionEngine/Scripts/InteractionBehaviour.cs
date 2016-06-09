@@ -389,6 +389,11 @@ namespace Leap.Unity.Interaction {
               targetAngularVelocity *= targetPercent;
             }
 
+            if (float.IsInfinity(targetAngularVelocity.x)) {
+              targetVelocity = Vector3.zero;
+              targetAngularVelocity = Vector3.zero;
+            }
+
             float followStrength = _material.StrengthByDistance.Evaluate(distanceToSolved / _manager.SimulationScale);
             _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, followStrength);
             _rigidbody.angularVelocity = Vector3.Lerp(_rigidbody.angularVelocity, targetAngularVelocity, followStrength);
