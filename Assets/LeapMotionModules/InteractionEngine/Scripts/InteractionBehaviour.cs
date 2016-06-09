@@ -375,6 +375,11 @@ namespace Leap.Unity.Interaction {
             float deltaAngle;
             deltaRot.ToAngleAxis(out deltaAngle, out deltaAxis);
 
+            if (float.IsInfinity(deltaAxis.x)) {
+              deltaAxis = Vector3.zero;
+              deltaAngle = 0;
+            }
+
             Vector3 targetVelocity = deltaPos / Time.fixedDeltaTime;
             Vector3 targetAngularVelocity = deltaAxis * deltaAngle * Mathf.Deg2Rad / Time.fixedDeltaTime;
 
@@ -385,11 +390,6 @@ namespace Leap.Unity.Interaction {
 
               targetVelocity *= targetPercent;
               targetAngularVelocity *= targetPercent;
-            }
-
-            if (float.IsInfinity(targetAngularVelocity.x)) {
-              targetVelocity = Vector3.zero;
-              targetAngularVelocity = Vector3.zero;
             }
 
             float followStrength = _material.StrengthByDistance.Evaluate(distanceToSolved / _manager.SimulationScale);
