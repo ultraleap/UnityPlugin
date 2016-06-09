@@ -5,7 +5,7 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
-  public class GraspSolverKabsch : IGraspSolver {
+  public class GraspSolverKabsch : IHoldingController {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 
@@ -50,7 +50,7 @@ namespace Leap.Unity.Interaction {
       HandPointCollection.Return(collection);
     }
 
-    public override void GetSolvedTransform(ReadonlyList<Hand> hands, out Vector3 newPosition, out Quaternion newRotation) {
+    public override void GetHeldTransform(ReadonlyList<Hand> hands, out Vector3 newPosition, out Quaternion newRotation) {
       KabschC.Reset(ref _kabsch);
 
       for (int h = 0; h < hands.Count; h++) {

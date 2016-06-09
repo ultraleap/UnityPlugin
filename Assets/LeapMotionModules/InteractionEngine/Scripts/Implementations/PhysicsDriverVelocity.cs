@@ -4,7 +4,7 @@ using System;
 
 namespace Leap.Unity.Interaction {
 
-  public class PhysicsDriverVelocity : IPhysicsDriver {
+  public class PhysicsDriverVelocity : IPhysicsController {
 
     [SerializeField]
     protected float _maxVelocity = 6;

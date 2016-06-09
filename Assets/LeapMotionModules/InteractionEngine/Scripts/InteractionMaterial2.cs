@@ -9,16 +9,16 @@ namespace Leap.Unity.Interaction {
   public class InteractionMaterial2 : ScriptableObject {
 
     [SerializeField]
-    protected IGraspSolver _graspSolver;
+    protected IHoldingController _graspSolver;
 
     [SerializeField]
-    protected IPhysicsDriver _physicsDriver;
+    protected IPhysicsController _physicsDriver;
 
     [SerializeField]
     protected ISuspensionController _suspensionHandler;
 
     [SerializeField]
-    protected IThrowingHandler _throwingHandler;
+    protected IThrowingController _throwingHandler;
 
 #if UNITY_EDITOR
     private const string DEFAULT_ASSET_NAME = "InteractionMaterial.asset";

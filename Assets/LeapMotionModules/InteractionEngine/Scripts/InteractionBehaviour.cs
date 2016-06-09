@@ -93,13 +93,13 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public IGraspSolver GraspSolver {
+    public IHoldingController GraspSolver {
       get {
         return null;
       }
     }
 
-    public IPhysicsDriver PhysicsDriver {
+    public IPhysicsController PhysicsDriver {
       get {
         return null;
       }

@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-
+﻿
 namespace Leap.Unity.Interaction {
 
   public abstract class ISuspensionController : IControllerBase {

@@ -2,7 +2,7 @@
 
 namespace Leap.Unity.Interaction {
 
-  public abstract class IThrowingHandler : IControllerBase {
+  public abstract class IThrowingController : IControllerBase {
     public abstract void OnThrow();
   }
 }

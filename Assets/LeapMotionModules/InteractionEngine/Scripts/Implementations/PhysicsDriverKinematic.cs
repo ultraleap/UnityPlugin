@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction {
 
-  public class PhysicsDriverKinematic : IPhysicsDriver {
+  public class PhysicsDriverKinematic : IPhysicsController {
 
     public override void DrivePhysics(ReadonlyList<Hand> hands, PhysicsMoveInfo info, Vector3 solvedPosition, Quaternion solvedRotation) {
       if (info.shouldTeleport) {
