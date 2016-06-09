@@ -14,33 +14,38 @@ namespace Leap.Unity.Interaction {
       public readonly bool AllowNone;
       public readonly Type DefaultType;
 
-      public ControllerAttribute(Type defaultType, bool allowNone) {
-        AllowNone = allowNone;
+      public ControllerAttribute() {
+        AllowNone = true;
+        DefaultType = typeof(void);
+      }
+
+      public ControllerAttribute(Type defaultType) {
+        AllowNone = false;
         DefaultType = defaultType;
       }
     }
 
-    [Controller(typeof(void), allowNone: false)]
+    [Controller(typeof(void))]
     [SerializeField]
     protected IGraspController _graspController;
 
-    [Controller(typeof(void), allowNone: false)]
+    [Controller(typeof(void))]
     [SerializeField]
     protected IHoldingController _holdingController;
 
-    [Controller(typeof(void), allowNone: false)]
+    [Controller(typeof(void))]
     [SerializeField]
     protected IPhysicsController _physicsController;
 
-    [Controller(typeof(void), allowNone: true)]
+    [Controller]
     [SerializeField]
     protected ISuspensionController _suspensionController;
 
-    [Controller(typeof(void), allowNone: true)]
+    [Controller]
     [SerializeField]
     protected IThrowingController _throwingController;
 
-    [Controller(typeof(void), allowNone: true)]
+    [Controller]
     [SerializeField]
     protected ILayerController _layerController;
 

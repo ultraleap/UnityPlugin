@@ -12,7 +12,6 @@ namespace Leap.Unity.Interaction {
 
     private Dictionary<string, TypeData> _propertyToType;
 
-
     void OnEnable() {
       _propertyToType = new Dictionary<string, TypeData>();
 
@@ -28,13 +27,32 @@ namespace Leap.Unity.Interaction {
 
           Type propertyType = fieldInfo.FieldType;
 
+          var attributeObj = fieldInfo.GetCustomAttributes(typeof(InteractionMaterial2.ControllerAttribute), true).FirstOrDefault();
+          if (attributeObj == null) {
+            continue;
+          }
+
           TypeData data = new TypeData();
+
+          data.controllerAttribute = attributeObj as InteractionMaterial2.ControllerAttribute;
+
           data.types = AppDomain.CurrentDomain.GetAssemblies()
                                 .SelectMany(s => s.GetTypes())
                                 .Where(p => p.IsSubclassOf(propertyType))
+                                .OrderBy(t => t.Name)
                                 .ToList();
 
-          data.dropdownNames = new string[] { "None" }.Concat(data.types.Select(t => t.Name)).ToArray();
+          if (data.controllerAttribute.AllowNone) {
+            data.types.Insert(0, typeof(void));
+          }
+
+          data.dropdownNames = data.dropdownNames.Concat(data.types.Select(t => {
+            if (t == typeof(void)) {
+              return "None";
+            } else {
+              return t.Name;
+            }
+          })).ToArray();
 
           _propertyToType[it.name] = data;
         }
@@ -52,7 +70,12 @@ namespace Leap.Unity.Interaction {
 
           int index;
           if (it.objectReferenceValue == null) {
-            index = 0;
+            if (data.controllerAttribute.AllowNone) {
+              index = 0;
+            } else {
+              it.objectReferenceValue = createObjectOfType(data.controllerAttribute.DefaultType);
+              index = data.types.IndexOf(data.controllerAttribute.DefaultType);
+            }
           } else {
             index = data.types.IndexOf(it.objectReferenceValue.GetType()) + 1;
           }
@@ -66,10 +89,7 @@ namespace Leap.Unity.Interaction {
             }
 
             if (newIndex != 0) {
-              var newOne = CreateInstance(data.types[newIndex - 1]);
-              newOne.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
-              AssetDatabase.AddObjectToAsset(newOne, target);
-              it.objectReferenceValue = newOne;
+              it.objectReferenceValue = createObjectOfType(data.types[newIndex - 1]);
             }
           }
 
@@ -89,15 +109,21 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      
+
       serializedObject.ApplyModifiedProperties();
     }
 
+    private ScriptableObject createObjectOfType(Type type) {
+      var newOne = CreateInstance(type);
+      newOne.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+      AssetDatabase.AddObjectToAsset(newOne, target);
+      return newOne;
+    }
+
     private struct TypeData {
+      public InteractionMaterial2.ControllerAttribute controllerAttribute;
       public List<Type> types;
       public string[] dropdownNames;
     }
-
-
   }
 }
