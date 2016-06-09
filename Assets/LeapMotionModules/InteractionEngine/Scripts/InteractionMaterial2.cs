@@ -85,6 +85,10 @@ namespace Leap.Unity.Interaction {
       path = AssetDatabase.GenerateUniqueAssetPath(path);
 
       InteractionMaterial2 material = CreateInstance<InteractionMaterial2>();
+      material._graspController = CreateInstance<GraspControllerDefault>();
+      material._holdingController = CreateInstance<HoldingControllerKabsch>();
+      material._physicsController = CreateInstance<PhysicsControllerKinematic>();
+
       //TODO: set defaults
 
       AssetDatabase.CreateAsset(material, path);
