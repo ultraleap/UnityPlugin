@@ -174,7 +174,7 @@ namespace Leap.Unity.Interaction {
       _warper.Dispose();
       _warper = null;
 
-      resetState();
+      revertRigidbodyState();
     }
 
 #if UNITY_EDITOR
@@ -270,8 +270,6 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnInteractionShapeDestroyed() {
       base.OnInteractionShapeDestroyed();
-
-      resetState();
     }
 
     public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
@@ -331,12 +329,24 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnHandGrasped(Hand hand) {
       base.OnHandGrasped(hand);
+
+      _controllers.HoldingController.AddHand(hand);
     }
 
     protected override void OnHandsHoldPhysics(ReadonlyList<Hand> hands) {
       base.OnHandsHoldPhysics(hands);
 
-      float distanceToSolved = Vector3.Distance(_warper.RigidbodyPosition, _solvedPosition);
+      PhysicsMoveInfo info = new PhysicsMoveInfo();
+      info.remainingDistanceLastFrame = Vector3.Distance(_warper.RigidbodyPosition, _solvedPosition);
+      info.shouldTeleport = _notifiedOfTeleport;
+
+      _controllers.HoldingController.GetHeldTransform(hands, out _solvedPosition, out _solvedRotation);
+
+      _controllers.PhysicsController.DrivePhysics(hands, info, _solvedPosition, _solvedRotation);
+
+      if (_controllers.ThrowingController != null) {
+        _controllers.ThrowingController.OnHold();
+      }
 
       _notifiedOfTeleport = false;
     }
@@ -348,9 +358,9 @@ namespace Leap.Unity.Interaction {
         Vector3 deltaPosition = Quaternion.Inverse(_solvedRotation) * (_warper.RigidbodyPosition - _solvedPosition);
         Quaternion deltaRotation = Quaternion.Inverse(_solvedRotation) * _warper.RigidbodyRotation;
 
-        Vector3 newPosition = Vector3.zero;
-        Quaternion newRotation = Quaternion.identity;
-        //TODO: get solved position using holding controller
+        Vector3 newPosition;
+        Quaternion newRotation;
+        _controllers.HoldingController.GetHeldTransform(hands, out newPosition, out newRotation);
 
         Vector3 graphicalPosition = newPosition + newRotation * deltaPosition;
         Quaternion graphicalRotation = newRotation * deltaRotation;
@@ -362,24 +372,49 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnHandReleased(Hand hand) {
       base.OnHandReleased(hand);
+
+      _controllers.HoldingController.RemoveHand(hand);
     }
 
     protected override void OnHandLostTracking(Hand oldHand, out float maxSuspensionTime) {
       base.OnHandLostTracking(oldHand, out maxSuspensionTime);
+
+      if (_controllers.SuspensionController == null) {
+        maxSuspensionTime = 0;
+      } else {
+        maxSuspensionTime = _controllers.SuspensionController.MaxSuspensionTime;
+        _controllers.SuspensionController.Suspend();
+      }
+
     }
 
     protected override void OnHandRegainedTracking(Hand newHand, int oldId) {
       base.OnHandRegainedTracking(newHand, oldId);
+
+      if (_controllers.SuspensionController != null) {
+        _controllers.SuspensionController.Resume();
+      }
+
+      _controllers.PhysicsController.SetGraspedState();
 
       NotifyTeleported();
     }
 
     protected override void OnHandTimeout(Hand oldHand) {
       base.OnHandTimeout(oldHand);
+
+      if (_controllers.SuspensionController != null) {
+        _controllers.SuspensionController.Timeout();
+      }
+
+      _controllers.HoldingController.RemoveHand(oldHand);
     }
 
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
+
+      _controllers.PhysicsController.OnGraspBegin();
+      _controllers.PhysicsController.SetGraspedState();
 
       _materialReplacer.ReplaceMaterials();
 
@@ -388,6 +423,14 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnGraspEnd(Hand lastHand) {
       base.OnGraspEnd(lastHand);
+
+      _controllers.PhysicsController.OnGraspEnd();
+
+      if (_controllers.ThrowingController != null) {
+        _controllers.ThrowingController.OnThrow();
+      }
+
+      revertRigidbodyState();
 
       _materialReplacer.RevertMaterials();
     }
@@ -444,6 +487,13 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    protected virtual void revertRigidbodyState() {
+      _rigidbody.useGravity = _useGravity;
+      _rigidbody.isKinematic = _isKinematic;
+      _rigidbody.drag = _drag;
+      _rigidbody.angularDrag = _angularDrag;
+    }
+
     protected INTERACTION_TRANSFORM getRigidbodyTransform() {
       INTERACTION_TRANSFORM interactionTransform = new INTERACTION_TRANSFORM();
 
@@ -458,12 +508,6 @@ namespace Leap.Unity.Interaction {
       interactionTransform.wallTime = Time.fixedTime;
       return interactionTransform;
     }
-
-    protected void resetState() {
-      _rigidbody.useGravity = _useGravity;
-      _rigidbody.isKinematic = _isKinematic;
-    }
-
     #endregion
   }
 }

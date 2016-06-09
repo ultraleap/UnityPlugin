@@ -19,8 +19,8 @@ namespace Leap.Unity.Interaction {
       _obj.rigidbody.isKinematic = true;
     }
 
-    public override void OnGrasp() { }
+    public override void OnGraspBegin() { }
 
-    public override void OnUngrasp() { }
+    public override void OnGraspEnd() { }
   }
 }

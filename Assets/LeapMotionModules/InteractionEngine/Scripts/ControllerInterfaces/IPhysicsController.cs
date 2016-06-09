@@ -5,8 +5,8 @@ namespace Leap.Unity.Interaction {
   public abstract class IPhysicsController : IControllerBase {
     public abstract void DrivePhysics(ReadonlyList<Hand> hands, PhysicsMoveInfo info, Vector3 solvedPosition, Quaternion solvedRotation);
     public abstract void SetGraspedState();
-    public abstract void OnGrasp();
-    public abstract void OnUngrasp();
+    public abstract void OnGraspBegin();
+    public abstract void OnGraspEnd();
   }
 
   public struct PhysicsMoveInfo {

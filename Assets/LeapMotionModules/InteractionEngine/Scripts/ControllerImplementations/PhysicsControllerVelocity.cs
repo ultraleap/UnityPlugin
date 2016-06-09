@@ -47,8 +47,8 @@ namespace Leap.Unity.Interaction {
       _obj.rigidbody.angularDrag = 0;
     }
 
-    public override void OnGrasp() { }
+    public override void OnGraspBegin() { }
 
-    public override void OnUngrasp() { }
+    public override void OnGraspEnd() { }
   }
 }
