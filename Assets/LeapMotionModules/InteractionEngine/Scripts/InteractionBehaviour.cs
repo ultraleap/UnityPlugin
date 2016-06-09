@@ -178,7 +178,7 @@ namespace Leap.Unity.Interaction {
       base.OnPostSolve();
 
       if (IsBeingGrasped) {
-        if (Vector3.Distance(_solvedPosition, _rigidbody.position) > _material.ReleaseDistance * _manager.SimulationScale) {
+        if (Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale) {
           _manager.ReleaseObject(this);
         }
       } else {
@@ -560,8 +560,8 @@ namespace Leap.Unity.Interaction {
         interactionTransform.position = _solvedPosition.ToCVector();
         interactionTransform.rotation = _solvedRotation.ToCQuaternion();
       } else {
-        interactionTransform.position = _rigidbody.position.ToCVector();
-        interactionTransform.rotation = _rigidbody.rotation.ToCQuaternion();
+        interactionTransform.position = _warper.RigidbodyPosition.ToCVector();
+        interactionTransform.rotation = _warper.RigidbodyRotation.ToCQuaternion();
       }
 
       interactionTransform.wallTime = Time.fixedTime;
@@ -643,8 +643,8 @@ namespace Leap.Unity.Interaction {
             Vector3 bonePos = bone.NextJoint.ToVector3();
 
             //Do the solve such that the objects positions are matched to the new bone positions
-            LEAP_VECTOR point1 = (objectPos - _rigidbody.position).ToCVector();
-            LEAP_VECTOR point2 = (bonePos - _rigidbody.position).ToCVector();
+            LEAP_VECTOR point1 = (objectPos - _warper.RigidbodyPosition).ToCVector();
+            LEAP_VECTOR point2 = (bonePos - _warper.RigidbodyPosition).ToCVector();
 
             KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
           }
@@ -662,8 +662,8 @@ namespace Leap.Unity.Interaction {
       Quaternion solvedRotation = leapRotation.ToQuaternion();
 
       //Calculate new transform using delta
-      newPosition = _rigidbody.position + solvedTranslation;
-      newRotation = solvedRotation * _rigidbody.rotation; ;
+      newPosition = _warper.RigidbodyPosition + solvedTranslation;
+      newRotation = solvedRotation * _warper.RigidbodyRotation;
     }
 
     protected class HandPointCollection {
