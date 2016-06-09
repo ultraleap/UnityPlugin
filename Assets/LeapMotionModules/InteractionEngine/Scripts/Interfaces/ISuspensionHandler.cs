@@ -2,8 +2,10 @@
 
 namespace Leap.Unity.Interaction {
 
-  public abstract class ISuspensionHandler : IHandlerBase {
-    public abstract void BeginSuspension();
-    public abstract void EndSuspension();
+  public abstract class ISuspensionHandler : IControllerBase {
+    public abstract float GetMaxSuspensionTime();
+    public abstract void Suspend();
+    public abstract void Resume();
+    public abstract void Timeout();
   }
 }
