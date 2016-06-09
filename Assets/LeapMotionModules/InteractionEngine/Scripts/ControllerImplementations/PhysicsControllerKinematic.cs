@@ -21,6 +21,6 @@ namespace Leap.Unity.Interaction {
 
     public override void OnGrasp() { }
 
-    public override void OnUngrasp() { } 
+    public override void OnUngrasp() { }
   }
 }

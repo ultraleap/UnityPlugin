@@ -4,15 +4,22 @@ namespace Leap.Unity.Interaction {
 
   public abstract class IControllerBase : ScriptableObject {
     protected InteractionBehaviour _obj;
+    protected InteractionManager _manager;
 
-    public static T CreateController<T>(InteractionBehaviour obj) where T : IControllerBase {
+    public static T CreateInstance<T>(InteractionBehaviour obj) where T : IControllerBase {
       T controller = CreateInstance<T>();
-      controller.Init(obj);
+      controller.Init(obj, obj.Manager);
       return controller;
     }
 
-    protected virtual void Init(InteractionBehaviour obj) {
-      _obj = obj;
+    public static T CreateInstance<T>(InteractionBehaviour obj, T template) where T : IControllerBase {
+      T controller = Instantiate(template);
+      controller.Init(obj, obj.Manager);
+      return controller;
+    }
+
+    protected virtual void Init(InteractionBehaviour obj, InteractionManager manager) {
+      _manager = obj.Manager;
     }
   }
 }
