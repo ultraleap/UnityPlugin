@@ -877,7 +877,6 @@ namespace Leap.Unity.Interaction {
         return result;
       }
 
-
       INTERACTION_HAND_RESULT handResult;
       InteractionC.GetHandResult(ref _scene,
                                      (uint)hand.hand.Id,

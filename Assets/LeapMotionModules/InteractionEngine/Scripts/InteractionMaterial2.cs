@@ -24,10 +24,6 @@ namespace Leap.Unity.Interaction {
       Replace
     }
 
-    [Controller]
-    [SerializeField]
-    protected IGraspController _graspController;
-
     [Tooltip("How far the object can get from the hand before it is released.")]
     [SerializeField]
     protected float _releaseDistance = 0.15f;
@@ -69,11 +65,6 @@ namespace Leap.Unity.Interaction {
     [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
     [SerializeField]
     protected float _graphicalReturnTime = 0.25f;
-
-
-    public IGraspController CreateGraspController(InteractionBehaviour obj) {
-      return IControllerBase.CreateInstance(obj, _graspController);
-    }
 
     public IHoldingController CreateHoldingController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _holdingController);
@@ -156,7 +147,6 @@ namespace Leap.Unity.Interaction {
       path = AssetDatabase.GenerateUniqueAssetPath(path);
 
       InteractionMaterial2 material = CreateInstance<InteractionMaterial2>();
-      material._graspController = CreateInstance<GraspControllerDefault>();
       material._holdingController = CreateInstance<HoldingControllerKabsch>();
       material._physicsController = CreateInstance<PhysicsControllerKinematic>();
 
