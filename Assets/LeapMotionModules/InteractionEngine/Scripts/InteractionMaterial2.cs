@@ -12,40 +12,33 @@ namespace Leap.Unity.Interaction {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     public class ControllerAttribute : Attribute {
       public readonly bool AllowNone;
-      public readonly Type DefaultType;
 
-      public ControllerAttribute() {
-        AllowNone = true;
-        DefaultType = typeof(void);
-      }
-
-      public ControllerAttribute(Type defaultType) {
-        AllowNone = false;
-        DefaultType = defaultType;
+      public ControllerAttribute(bool allowNone = false) {
+        AllowNone = allowNone;
       }
     }
 
-    [Controller(typeof(void))]
+    [Controller]
     [SerializeField]
     protected IGraspController _graspController;
 
-    [Controller(typeof(void))]
+    [Controller]
     [SerializeField]
     protected IHoldingController _holdingController;
 
-    [Controller(typeof(void))]
+    [Controller]
     [SerializeField]
     protected IPhysicsController _physicsController;
 
-    [Controller]
+    [Controller(allowNone: true)]
     [SerializeField]
     protected ISuspensionController _suspensionController;
 
-    [Controller]
+    [Controller(allowNone: true)]
     [SerializeField]
     protected IThrowingController _throwingController;
 
-    [Controller]
+    [Controller(allowNone: true)]
     [SerializeField]
     protected ILayerController _layerController;
 
@@ -68,6 +61,8 @@ namespace Leap.Unity.Interaction {
       path = AssetDatabase.GenerateUniqueAssetPath(path);
 
       InteractionMaterial2 material = CreateInstance<InteractionMaterial2>();
+      //TODO: set defaults
+
       AssetDatabase.CreateAsset(material, path);
       AssetDatabase.SaveAssets();
 

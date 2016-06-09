@@ -46,13 +46,13 @@ namespace Leap.Unity.Interaction {
             data.types.Insert(0, typeof(void));
           }
 
-          data.dropdownNames = data.dropdownNames.Concat(data.types.Select(t => {
+          data.dropdownNames = data.types.Select(t => {
             if (t == typeof(void)) {
               return "None";
             } else {
               return t.Name;
             }
-          })).ToArray();
+          }).ToArray();
 
           _propertyToType[it.name] = data;
         }
@@ -68,18 +68,14 @@ namespace Leap.Unity.Interaction {
           EditorGUILayout.Space();
           EditorGUILayout.LabelField(it.displayName);
 
-          int index;
+          Type type;
           if (it.objectReferenceValue == null) {
-            if (data.controllerAttribute.AllowNone) {
-              index = 0;
-            } else {
-              it.objectReferenceValue = createObjectOfType(data.controllerAttribute.DefaultType);
-              index = data.types.IndexOf(data.controllerAttribute.DefaultType);
-            }
+            type = typeof(void);
           } else {
-            index = data.types.IndexOf(it.objectReferenceValue.GetType()) + 1;
+            type = it.objectReferenceValue.GetType();
           }
 
+          int index = data.types.IndexOf(type);
           int newIndex = EditorGUILayout.Popup(index, data.dropdownNames);
 
           if (newIndex != index) {
@@ -88,8 +84,9 @@ namespace Leap.Unity.Interaction {
               it.objectReferenceValue = null;
             }
 
-            if (newIndex != 0) {
-              it.objectReferenceValue = createObjectOfType(data.types[newIndex - 1]);
+            Type newType = data.types[newIndex];
+            if (newType != typeof(void)) {
+              it.objectReferenceValue = createObjectOfType(newType);
             }
           }
 
