@@ -118,7 +118,8 @@ namespace Leap.Unity.Interaction {
 
     #region PUBLIC METHODS
     public Action OnGraphicalUpdate;
-    public Action OnPhysicalUpdate;
+    public Action OnPrePhysicalUpdate;
+    public Action OnPostPhysicalUpdate;
 
     /// <summary>
     /// Gets the current debug flags for this manager.
@@ -497,12 +498,16 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void FixedUpdate() {
-      if (OnPhysicalUpdate != null) {
-        OnPhysicalUpdate();
+      if (OnPrePhysicalUpdate != null) {
+        OnPrePhysicalUpdate();
       }
 
       if (!_pauseSimulation) {
         simulateFrame(_leapProvider.CurrentFixedFrame);
+      }
+
+      if (OnPostPhysicalUpdate != null) {
+        OnPostPhysicalUpdate();
       }
 
       if (_showDebugLines) {

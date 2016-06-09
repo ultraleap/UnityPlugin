@@ -113,17 +113,19 @@ namespace Leap.Unity.Interaction {
       _mostRecentCallback = CallbackState.PhysicalNeedsUpdate;
 
       _manager.OnGraphicalUpdate += onGraphicalUpdate;
-      _manager.OnPhysicalUpdate += onPhysicalUpdate;
+      _manager.OnPrePhysicalUpdate += onPrePhysicalUpdate;
+      _manager.OnPostPhysicalUpdate += onPostPhysicalUpdate;
       _subscribed = true;
     }
 
     protected void unsubscribe() {
       _manager.OnGraphicalUpdate -= onGraphicalUpdate;
-      _manager.OnPhysicalUpdate -= onPhysicalUpdate;
+      _manager.OnPrePhysicalUpdate -= onPrePhysicalUpdate;
+      _manager.OnPostPhysicalUpdate -= onPostPhysicalUpdate;
       _subscribed = false;
     }
 
-    protected virtual void onPhysicalUpdate() {
+    protected virtual void onPrePhysicalUpdate() {
       updateRigidbodyValues();
 
       if (_mostRecentCallback == CallbackState.Graphical) {
@@ -131,6 +133,10 @@ namespace Leap.Unity.Interaction {
         _transform.rotation = _savedRotation;
       }
 
+      _mostRecentCallback = CallbackState.Physical;
+    }
+
+    protected virtual void onPostPhysicalUpdate() {
       _mostRecentCallback = CallbackState.PhysicalNeedsUpdate;
     }
 
