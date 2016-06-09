@@ -144,6 +144,12 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public INTERACTION_SCENE Scene {
+      get {
+        return _scene;
+      }
+    }
+
     /// <summary>
     /// Returns a ShapeDescriptionPool that can be used to allocate shape descriptions
     /// for this manager.  Using the pool can be more efficient since identical shapes
