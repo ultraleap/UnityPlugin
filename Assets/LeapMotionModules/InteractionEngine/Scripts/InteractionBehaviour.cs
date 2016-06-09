@@ -71,7 +71,7 @@ namespace Leap.Unity.Interaction {
     /// Sets or Gets whether or not this InteractionBehaviour is Kinematic or not.  Always use this instead
     /// of Rigidbody.IsKinematic because InteractionBehaviour overrides the kinematic status of the Rigidbody.
     /// </summary>
-    public bool IsKinematic {
+    public bool isKinematic {
       get {
         return _isKinematic;
       }
@@ -87,31 +87,13 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public IHoldingController GraspSolver {
-      get {
-        return null;
-      }
-    }
-
-    public IPhysicsController PhysicsDriver {
-      get {
-        return null;
-      }
-    }
-
-    public ISuspensionController SuspensionHandler {
-      get {
-        return null;
-      }
-    }
-
-    public Rigidbody Rigidbody {
+    public new Rigidbody rigidbody {
       get {
         return _rigidbody;
       }
     }
 
-    public InteractionMaterial Material {
+    public InteractionMaterial material {
       get {
         return _material;
       }
@@ -121,7 +103,7 @@ namespace Leap.Unity.Interaction {
     /// Sets or Gets whether or not this InteractionBehaviour uses Gravity or not.  Always use this instead
     /// of Rigidbody.UseGravity because InteractionBehaviour overrides the gravity status of the Rigidbody.
     /// </summary>
-    public bool UseGravity {
+    public bool useGravity {
       get {
         return _useGravity;
       }
