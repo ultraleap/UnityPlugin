@@ -2,23 +2,47 @@
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using System;
 using System.IO;
 
 namespace Leap.Unity.Interaction {
 
   public class InteractionMaterial2 : ScriptableObject {
 
-    [SerializeField]
-    protected IHoldingController _graspSolver;
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+    public class ControllerAttribute : Attribute {
+      public readonly bool AllowNone;
+      public readonly Type DefaultType;
 
-    [SerializeField]
-    protected IPhysicsController _physicsDriver;
+      public ControllerAttribute(Type defaultType, bool allowNone) {
+        AllowNone = allowNone;
+        DefaultType = defaultType;
+      }
+    }
 
+    [Controller(typeof(void), allowNone: false)]
     [SerializeField]
-    protected ISuspensionController _suspensionHandler;
+    protected IGraspController _graspController;
 
+    [Controller(typeof(void), allowNone: false)]
     [SerializeField]
-    protected IThrowingController _throwingHandler;
+    protected IHoldingController _holdingController;
+
+    [Controller(typeof(void), allowNone: false)]
+    [SerializeField]
+    protected IPhysicsController _physicsController;
+
+    [Controller(typeof(void), allowNone: true)]
+    [SerializeField]
+    protected ISuspensionController _suspensionController;
+
+    [Controller(typeof(void), allowNone: true)]
+    [SerializeField]
+    protected IThrowingController _throwingController;
+
+    [Controller(typeof(void), allowNone: true)]
+    [SerializeField]
+    protected ILayerController _layerController;
 
 #if UNITY_EDITOR
     private const string DEFAULT_ASSET_NAME = "InteractionMaterial.asset";
@@ -27,7 +51,7 @@ namespace Leap.Unity.Interaction {
     private static void createNewBuildSetup() {
       string path = "Assets";
 
-      foreach (Object obj in Selection.GetFiltered(typeof(Object), SelectionMode.Assets)) {
+      foreach (UnityEngine.Object obj in Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets)) {
         path = AssetDatabase.GetAssetPath(obj);
         if (!string.IsNullOrEmpty(path) && File.Exists(path)) {
           path = Path.GetDirectoryName(path);
