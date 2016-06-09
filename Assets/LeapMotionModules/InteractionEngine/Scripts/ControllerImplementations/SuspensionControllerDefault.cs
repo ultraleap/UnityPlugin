@@ -3,7 +3,7 @@ using System;
 
 namespace Leap.Unity.Interaction {
 
-  public class SuspensionHandlerBasic : ISuspensionController {
+  public class SuspensionControllerDefault : ISuspensionController {
     [SerializeField]
     private float _maxSuspensionTime = 4;
 
