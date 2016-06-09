@@ -8,7 +8,8 @@ namespace Leap.Unity.Interaction {
     protected float _maxVelocity = 6;
 
     [SerializeField]
-    protected AnimationCurve _strengthByDistance;
+    protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
+                                                                      new Keyframe(0.02f, 0.3f, 0.0f, 0.0f));
 
     public override void DrivePhysics(ReadonlyList<Hand> hands, PhysicsMoveInfo info, Vector3 solvedPosition, Quaternion solvedRotation) {
       if (info.shouldTeleport) {

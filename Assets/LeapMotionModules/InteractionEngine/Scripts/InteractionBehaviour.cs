@@ -102,6 +102,12 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public RigidbodyWarper warper {
+      get {
+        return _warper;
+      }
+    }
+
     public InteractionMaterial2 material {
       get {
         return _material;

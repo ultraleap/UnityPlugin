@@ -2,9 +2,9 @@
 using System;
 
 namespace Leap.Unity.Interaction {
-
+  
   public class ControllerContainer {
-
+    
     private struct DefinableController<T> where T : IControllerBase {
       public T defaultController;
       public T registeredController;

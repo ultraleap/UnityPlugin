@@ -11,7 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e240ddf8ae2bd147b6c7d3cd1da1e2a, type: 3}
   m_Name: InteractionMaterial
   m_EditorClassIdentifier: 
-  _graspController: {fileID: 11426564}
   _releaseDistance: 0.15
   _physicMaterialMode: 1
   _holdingController: {fileID: 11404794}
@@ -80,10 +79,20 @@ MonoBehaviour:
   _maxVelocity: 6
   _strengthByDistance:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - time: 0.0050000004
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 0.020000001
+      value: 0.29999998
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 4
+    m_RotationOrder: 0
 --- !u!114 &11426564
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -95,6 +104,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8fcfa6ff99ea96429cecce3bc5710f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _obj: {fileID: 0}
 --- !u!114 &11462104
 MonoBehaviour:
   m_ObjectHideFlags: 3
