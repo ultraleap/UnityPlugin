@@ -405,7 +405,7 @@ Prefab:
     - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
       propertyPath: _sphereMesh
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 4300002, guid: 2f496b1b1bec86743b418551f859020c, type: 3}
     - target: {fileID: 11407378, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
       propertyPath: _showArm
       value: 0
@@ -1341,8 +1341,8 @@ Prefab:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11484536, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 2}
-      propertyPath: PinchingThreshold
-      value: 30
+      propertyPath: InteractionMode
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8b10486b9212d9f4badcf6c992af0a47, type: 2}
@@ -2306,7 +2306,7 @@ Prefab:
     - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
       propertyPath: _sphereMesh
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 4300002, guid: 2f496b1b1bec86743b418551f859020c, type: 3}
     - target: {fileID: 11407378, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
       propertyPath: _showArm
       value: 0
