@@ -149,17 +149,20 @@ namespace Leap.Unity.Interaction {
       InteractionMaterial2 material = CreateInstance<InteractionMaterial2>();
       AssetDatabase.CreateAsset(material, path);
 
-      material._holdingController = CreateInstance<HoldingControllerKabsch>();
-      material._holdingController.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
-      AssetDatabase.AddObjectToAsset(material._holdingController, material);
-      
-      material._physicsController = CreateInstance<PhysicsControllerVelocity>();
-      material._physicsController.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
-      AssetDatabase.AddObjectToAsset(material._physicsController, material);
-     
+      material._holdingController = createDefaultAsset<HoldingControllerKabsch>(material);
+      material._physicsController = createDefaultAsset<PhysicsControllerVelocity>(material);
+      material._throwingController = createDefaultAsset<ThrowingControllerPalm>(material);
+
       AssetDatabase.SaveAssets();
 
       Selection.activeObject = material;
+    }
+
+    private static T createDefaultAsset<T>(InteractionMaterial2 material) where T : ScriptableObject {
+      T t = CreateInstance<T>();
+      t.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+      AssetDatabase.AddObjectToAsset(t, material);
+      return t;
     }
 #endif
   }

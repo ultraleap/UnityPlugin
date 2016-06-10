@@ -4,7 +4,7 @@ using System;
 
 namespace Leap.Unity.Interaction {
 
-  public class ThrowingControllerPalmBased : IThrowingController {
+  public class ThrowingControllerPalm : IThrowingController {
 
     [SerializeField]
     private AnimationCurve _throwingVelocityCurve;
