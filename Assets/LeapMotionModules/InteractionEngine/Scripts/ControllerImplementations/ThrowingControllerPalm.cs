@@ -7,7 +7,8 @@ namespace Leap.Unity.Interaction {
   public class ThrowingControllerPalm : IThrowingController {
 
     [SerializeField]
-    private AnimationCurve _throwingVelocityCurve;
+    private AnimationCurve _throwingVelocityCurve = new AnimationCurve(new Keyframe(0, 1.5f, 0, 0),
+                                                                       new Keyframe(2, 1.3f, 0, 0));
 
     public override void OnHold(ReadonlyList<Hand> hands) { }
 

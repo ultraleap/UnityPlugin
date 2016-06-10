@@ -151,6 +151,7 @@ namespace Leap.Unity.Interaction {
 
       material._holdingController = createDefaultAsset<HoldingControllerKabsch>(material);
       material._physicsController = createDefaultAsset<PhysicsControllerVelocity>(material);
+      material._suspensionController = createDefaultAsset<SuspensionControllerDefault>(material);
       material._throwingController = createDefaultAsset<ThrowingControllerPalm>(material);
 
       AssetDatabase.SaveAssets();
