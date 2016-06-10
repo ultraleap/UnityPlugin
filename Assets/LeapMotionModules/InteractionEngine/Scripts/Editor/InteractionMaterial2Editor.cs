@@ -93,10 +93,13 @@ namespace Leap.Unity.Interaction {
           if (it.objectReferenceValue != null) {
             SerializedObject sObj = new SerializedObject(it.objectReferenceValue);
             SerializedProperty sIt = sObj.GetIterator();
-
-            sIt.NextVisible(true);
-            while (sIt.NextVisible(false)) {
+            
+            bool isFirst = true;
+            while (sIt.NextVisible(isFirst)) {
+              EditorGUI.BeginDisabledGroup(isFirst);
               EditorGUILayout.PropertyField(sIt);
+              EditorGUI.EndDisabledGroup();
+              isFirst = false;
             }
 
             sObj.ApplyModifiedProperties();
