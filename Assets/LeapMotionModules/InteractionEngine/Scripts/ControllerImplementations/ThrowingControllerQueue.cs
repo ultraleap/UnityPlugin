@@ -13,7 +13,11 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("The delay between the averaging window and the current time.")]
     [SerializeField]
-    private float _windowDelay = 0.05f;
+    private float _windowDelay = 0.02f;
+
+    [SerializeField]
+    private AnimationCurve _velocityScaleCurve = new AnimationCurve(new Keyframe(0, 1, 0, 0),
+                                                                    new Keyframe(3, 1.5f, 0, 0));
 
     private struct VelocitySample {
       public float time;
@@ -87,6 +91,8 @@ namespace Leap.Unity.Interaction {
 
       _obj.rigidbody.velocity = PhysicsUtility.ToLinearVelocity(start.position, end.position, _windowLength);
       _obj.rigidbody.angularVelocity = PhysicsUtility.ToAngularVelocity(start.rotation, end.rotation, _windowLength);
+
+      _obj.rigidbody.velocity *= _velocityScaleCurve.Evaluate(_obj.rigidbody.velocity.magnitude);
     }
   }
 }
