@@ -32,6 +32,19 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected PhysicMaterialModeEnum _physicMaterialMode = PhysicMaterialModeEnum.DuplicateExisting;
 
+    [Tooltip("Can objects using this material warp the graphical anchor through time to reduce percieved latency.")]
+    [SerializeField]
+    protected bool _warpingEnabled = true;
+
+    [Tooltip("The amount of warping to perform based on the distance between the actual position and the graphical position.")]
+    [SerializeField]
+    protected AnimationCurve _warpCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
+                                                             new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
+
+    [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
+    [SerializeField]
+    protected float _graphicalReturnTime = 0.25f;
+
     [Controller]
     [SerializeField]
     protected IHoldingController _holdingController;
@@ -51,20 +64,6 @@ namespace Leap.Unity.Interaction {
     [Controller(allowNone: true)]
     [SerializeField]
     protected ILayerController _layerController;
-
-    [Header("Warp Settings")]
-    [Tooltip("Can objects using this material warp the graphical anchor through time to reduce percieved latency.")]
-    [SerializeField]
-    protected bool _warpingEnabled = true;
-
-    [Tooltip("The amount of warping to perform based on the distance between the actual position and the graphical position.")]
-    [SerializeField]
-    protected AnimationCurve _warpCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
-                                                             new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
-
-    [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
-    [SerializeField]
-    protected float _graphicalReturnTime = 0.25f;
 
     public IHoldingController CreateHoldingController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _holdingController);

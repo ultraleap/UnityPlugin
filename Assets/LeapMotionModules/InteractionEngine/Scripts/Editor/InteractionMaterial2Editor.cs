@@ -8,11 +8,13 @@ using System.Collections.Generic;
 namespace Leap.Unity.Interaction {
 
   [CustomEditor(typeof(InteractionMaterial2))]
-  public class InteractionMaterial2Editor : Editor {
+  public class InteractionMaterial2Editor : CustomEditorBase {
 
     private Dictionary<string, TypeData> _propertyToType;
 
-    void OnEnable() {
+    protected override void OnEnable() {
+      base.OnEnable();
+
       _propertyToType = new Dictionary<string, TypeData>();
 
       Type targetType = typeof(InteractionMaterial2);
@@ -57,59 +59,60 @@ namespace Leap.Unity.Interaction {
           _propertyToType[it.name] = data;
         }
       }
+
+      specifyCustomDrawer("_holdingController", controllerDrawer);
+      specifyCustomDrawer("_physicsController", controllerDrawer);
+      specifyCustomDrawer("_suspensionController", controllerDrawer);
+      specifyCustomDrawer("_throwingController", controllerDrawer);
+      specifyCustomDrawer("_layerController", controllerDrawer);
     }
 
-    public override void OnInspectorGUI() {
-      SerializedProperty it = serializedObject.GetIterator();
+    private void controllerDrawer(SerializedProperty controller) {
+      TypeData data;
+      if (!_propertyToType.TryGetValue(controller.name, out data)) {
+        Debug.LogWarning("Could not find controller data for property " + controller.name);
+        return;
+      }
 
-      while (it.NextVisible(true)) {
-        TypeData data;
-        if (_propertyToType.TryGetValue(it.name, out data)) {
-          EditorGUILayout.Space();
-          EditorGUILayout.LabelField(it.displayName);
+      EditorGUILayout.Space();
+      EditorGUILayout.LabelField(controller.displayName);
 
-          Type type;
-          if (it.objectReferenceValue == null) {
-            type = typeof(void);
-          } else {
-            type = it.objectReferenceValue.GetType();
-          }
+      Type type;
+      if (controller.objectReferenceValue == null) {
+        type = typeof(void);
+      } else {
+        type = controller.objectReferenceValue.GetType();
+      }
 
-          int index = data.types.IndexOf(type);
-          int newIndex = EditorGUILayout.Popup(index, data.dropdownNames);
+      int index = data.types.IndexOf(type);
+      int newIndex = EditorGUILayout.Popup(index, data.dropdownNames);
 
-          if (newIndex != index) {
-            if (it.objectReferenceValue != null) {
-              DestroyImmediate(it.objectReferenceValue, true);
-              it.objectReferenceValue = null;
-            }
+      if (newIndex != index) {
+        if (controller.objectReferenceValue != null) {
+          DestroyImmediate(controller.objectReferenceValue, true);
+          controller.objectReferenceValue = null;
+        }
 
-            Type newType = data.types[newIndex];
-            if (newType != typeof(void)) {
-              it.objectReferenceValue = createObjectOfType(newType);
-            }
-          }
-
-          if (it.objectReferenceValue != null) {
-            SerializedObject sObj = new SerializedObject(it.objectReferenceValue);
-            SerializedProperty sIt = sObj.GetIterator();
-            
-            bool isFirst = true;
-            while (sIt.NextVisible(isFirst)) {
-              EditorGUI.BeginDisabledGroup(isFirst);
-              EditorGUILayout.PropertyField(sIt);
-              EditorGUI.EndDisabledGroup();
-              isFirst = false;
-            }
-
-            sObj.ApplyModifiedProperties();
-          }
-        } else {
-          EditorGUILayout.PropertyField(it);
+        Type newType = data.types[newIndex];
+        if (newType != typeof(void)) {
+          controller.objectReferenceValue = createObjectOfType(newType);
         }
       }
 
-      serializedObject.ApplyModifiedProperties();
+      if (controller.objectReferenceValue != null) {
+        SerializedObject sObj = new SerializedObject(controller.objectReferenceValue);
+        SerializedProperty sIt = sObj.GetIterator();
+
+        bool isFirst = true;
+        while (sIt.NextVisible(isFirst)) {
+          EditorGUI.BeginDisabledGroup(isFirst);
+          EditorGUILayout.PropertyField(sIt);
+          EditorGUI.EndDisabledGroup();
+          isFirst = false;
+        }
+
+        sObj.ApplyModifiedProperties();
+      }
     }
 
     private ScriptableObject createObjectOfType(Type type) {
