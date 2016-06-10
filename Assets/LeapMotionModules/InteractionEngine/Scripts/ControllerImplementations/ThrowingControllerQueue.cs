@@ -13,7 +13,7 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("The delay between the averaging window and the current time.")]
     [SerializeField]
-    private float _windowDelay = 0.1f;
+    private float _windowDelay = 0.05f;
 
     private struct VelocitySample {
       public float time;
@@ -27,7 +27,7 @@ namespace Leap.Unity.Interaction {
       }
 
       public static VelocitySample Interpolate(VelocitySample a, VelocitySample b, float time) {
-        float alpha = Mathf.InverseLerp(a.time, b.time, time);
+        float alpha = Mathf.Clamp01(Mathf.InverseLerp(a.time, b.time, time));
         return new VelocitySample(Vector3.Lerp(a.position, b.position, alpha),
                                   Quaternion.Slerp(a.rotation, b.rotation, alpha),
                                   time);
@@ -59,11 +59,9 @@ namespace Leap.Unity.Interaction {
       //start occurs before end
       VelocitySample start0, start1;
       VelocitySample end0, end1;
+      VelocitySample s0, s1;
 
-      //Have to initialize or else compiler yells at us, we assert below to ensure assignment occurs
-      start0 = start1 = end0 = end1 = new VelocitySample(Vector3.zero, Quaternion.identity, -1);
-
-      VelocitySample s0, s1 = _velocityQueue.Dequeue();
+      s0 = s1 = start0 = start1 = end0 = end1 = _velocityQueue.Dequeue();
 
       while (_velocityQueue.Count != 0) {
         s0 = s1;
@@ -77,14 +75,12 @@ namespace Leap.Unity.Interaction {
         if (s0.time < windowEnd && s1.time >= windowEnd) {
           end0 = s0;
           end1 = s1;
+
+          //We have assigned both start and end and can break out of loop
+          _velocityQueue.Clear();
+          break;
         }
       }
-
-      //Assert to make sure we got assignments to all 4 values
-      Assert.AreNotEqual(start0.time, -1);
-      Assert.AreNotEqual(start1.time, -1);
-      Assert.AreNotEqual(end0.time, -1);
-      Assert.AreNotEqual(end1.time, -1);
 
       VelocitySample start = VelocitySample.Interpolate(start0, start1, windowStart);
       VelocitySample end = VelocitySample.Interpolate(end0, end1, windowEnd);

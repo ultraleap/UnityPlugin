@@ -15,8 +15,8 @@ MonoBehaviour:
   _physicMaterialMode: 1
   _holdingController: {fileID: 11480242}
   _physicsController: {fileID: 11433068}
-  _suspensionController: {fileID: 0}
-  _throwingController: {fileID: 0}
+  _suspensionController: {fileID: 11406562}
+  _throwingController: {fileID: 11483906}
   _layerController: {fileID: 0}
   _warpingEnabled: 1
   _warpCurve:
@@ -36,6 +36,18 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _graphicalReturnTime: 0.25
+--- !u!114 &11406562
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d79f36bc3cfbe724b84442128f47ef8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxSuspensionTime: 4
 --- !u!114 &11433068
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -75,3 +87,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5f7ab934b62d25438bd10ceb74720d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11483906
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0d90d203addfcd4e9401006f44d79b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _windowLength: 0.1
+  _windowDelay: 0.05
