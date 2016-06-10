@@ -93,6 +93,11 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public virtual void Teleport(Vector3 position, Quaternion rotation) {
+      _rigidbody.position = _rigidbodyPosition = _prevRigidbodyPosition = position;
+      _rigidbody.rotation = _rigidbodyRotation = _prevRigidbodyRotation = rotation;
+    }
+
     public virtual void SetGraphicalPosition(Vector3 position, Quaternion rotation) {
       checkDisposed();
 

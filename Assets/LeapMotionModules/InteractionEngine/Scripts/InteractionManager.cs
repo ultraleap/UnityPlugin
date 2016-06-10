@@ -144,6 +144,12 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public INTERACTION_SCENE Scene {
+      get {
+        return _scene;
+      }
+    }
+
     /// <summary>
     /// Returns a ShapeDescriptionPool that can be used to allocate shape descriptions
     /// for this manager.  Using the pool can be more efficient since identical shapes
@@ -595,7 +601,9 @@ namespace Leap.Unity.Interaction {
       }
 
       //After copy and set we specify the interactions between the brush and interaction objects
-      Physics.IgnoreLayerCollision(_brushHandLayer, _interactionLayer, false);
+      if (_contactEnabled) {
+        Physics.IgnoreLayerCollision(_brushHandLayer, _interactionLayer, false);
+      }
     }
 
     protected virtual void simulateFrame(Frame frame) {
@@ -652,31 +660,33 @@ namespace Leap.Unity.Interaction {
 
       //Loop through the currently grasped objects to dispatch their OnHandsHold callback
       for (int i = 0; i < _graspedBehaviours.Count; i++) {
-        var interactionBehaviour = _graspedBehaviours[i];
-
-        for (int j = 0; j < hands.Count; j++) {
-          var hand = hands[j];
-          InteractionHand interactionHand;
-          if (_idToInteractionHand.TryGetValue(hand.Id, out interactionHand)) {
-            if (interactionHand.graspedObject == interactionBehaviour) {
-              _holdingHands.Add(hand);
-            }
-          }
-        }
-
-        try {
-          if (isPhysics) {
-            interactionBehaviour.NotifyHandsHoldPhysics(_holdingHands);
-          } else {
-            interactionBehaviour.NotifyHandsHoldGraphics(_holdingHands);
-          }
-        } catch (Exception e) {
-          _misbehavingBehaviours.Add(interactionBehaviour);
-          Debug.LogException(e);
-        }
-
-        _holdingHands.Clear();
+        dispatchOnHandsHolding(hands, _graspedBehaviours[i], isPhysics);
       }
+    }
+
+    protected virtual void dispatchOnHandsHolding(List<Hand> hands, IInteractionBehaviour interactionBehaviour, bool isPhysics) {
+      for (int j = 0; j < hands.Count; j++) {
+        var hand = hands[j];
+        InteractionHand interactionHand;
+        if (_idToInteractionHand.TryGetValue(hand.Id, out interactionHand)) {
+          if (interactionHand.graspedObject == interactionBehaviour) {
+            _holdingHands.Add(hand);
+          }
+        }
+      }
+
+      try {
+        if (isPhysics) {
+          interactionBehaviour.NotifyHandsHoldPhysics(_holdingHands);
+        } else {
+          interactionBehaviour.NotifyHandsHoldGraphics(_holdingHands);
+        }
+      } catch (Exception e) {
+        _misbehavingBehaviours.Add(interactionBehaviour);
+        Debug.LogException(e);
+      }
+
+      _holdingHands.Clear();
     }
 
     protected virtual void updateTracking(Frame frame) {
@@ -725,10 +735,12 @@ namespace Leap.Unity.Interaction {
             interactionHand = untrackedInteractionHand;
             //Remove the old id from the mapping
             _idToInteractionHand.Remove(untrackedInteractionHand.hand.Id);
+            _idToInteractionHand[hand.Id] = interactionHand;
 
             try {
               //This also dispatched InteractionObject.OnHandRegainedTracking()
               interactionHand.RegainTracking(hand);
+              dispatchOnHandsHolding(hands, interactionHand.graspedObject, isPhysics: true);
             } catch (Exception e) {
               _misbehavingBehaviours.Add(interactionHand.graspedObject);
               Debug.LogException(e);
@@ -748,10 +760,8 @@ namespace Leap.Unity.Interaction {
           } else {
             //Otherwise just create a new one
             interactionHand = new InteractionHand(hand);
+            _idToInteractionHand[hand.Id] = interactionHand;
           }
-
-          //In both cases, associate the id with the new ieHand
-          _idToInteractionHand[hand.Id] = interactionHand;
         }
 
         if (!hasHandResult) {
@@ -870,7 +880,6 @@ namespace Leap.Unity.Interaction {
         result.instanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
         return result;
       }
-
 
       INTERACTION_HAND_RESULT handResult;
       InteractionC.GetHandResult(ref _scene,

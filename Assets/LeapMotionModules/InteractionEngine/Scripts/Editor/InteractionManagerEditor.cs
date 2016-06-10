@@ -15,7 +15,6 @@ namespace Leap.Unity.Interaction {
 
       specifyCustomDrawer("_dataSubfolder", disableWhenRunning);
       specifyCustomDrawer("_contactEnabled", disableWhenRunning);
-      specifyCustomDrawer("_physicsScale", disableWhenRunning); // Requires _contactEnabled and _graspingEnabled to be off to toggle.
       specifyCustomDrawer("_autoGenerateLayers", disableWhenRunning);
       specifyCustomDrawer("_templateLayer", disableWhenRunning);
 
