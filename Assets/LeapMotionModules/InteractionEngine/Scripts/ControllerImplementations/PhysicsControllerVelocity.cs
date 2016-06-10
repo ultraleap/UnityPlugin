@@ -11,6 +11,15 @@ namespace Leap.Unity.Interaction {
     protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                                       new Keyframe(0.02f, 0.3f, 0.0f, 0.0f));
 
+    private float _maxVelocitySqrd;
+
+    protected override void Init(InteractionBehaviour obj) {
+      base.Init(obj);
+
+      _maxVelocitySqrd = _maxVelocity * _obj.Manager.SimulationScale;
+      _maxVelocitySqrd *= _maxVelocitySqrd;
+    }
+
     public override void DrivePhysics(ReadonlyList<Hand> hands, PhysicsMoveInfo info, Vector3 solvedPosition, Quaternion solvedRotation) {
       if (info.shouldTeleport) {
         _obj.warper.Teleport(solvedPosition, solvedRotation);
@@ -18,10 +27,9 @@ namespace Leap.Unity.Interaction {
         Vector3 targetVelocity = PhysicsUtility.ToLinearVelocity(_obj.warper.RigidbodyPosition, solvedPosition, Time.fixedDeltaTime);
         Vector3 targetAngularVelocity = PhysicsUtility.ToAngularVelocity(_obj.warper.RigidbodyRotation, solvedRotation, Time.fixedDeltaTime);
 
-        if (targetVelocity.sqrMagnitude > float.Epsilon) {
-          float targetSpeed = targetVelocity.magnitude;
-          float actualSpeed = Mathf.Min(_maxVelocity * _obj.Manager.SimulationScale, targetSpeed);
-          float targetPercent = actualSpeed / targetSpeed;
+        float targetSpeedSqrd = targetVelocity.sqrMagnitude;
+        if (targetSpeedSqrd > _maxVelocitySqrd) {
+          float targetPercent = (_maxVelocity * _obj.Manager.SimulationScale) / Mathf.Sqrt(targetSpeedSqrd);
 
           targetVelocity *= targetPercent;
           targetAngularVelocity *= targetPercent;
