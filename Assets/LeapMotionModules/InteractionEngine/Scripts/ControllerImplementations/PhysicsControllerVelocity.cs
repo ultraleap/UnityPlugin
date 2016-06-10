@@ -27,6 +27,10 @@ namespace Leap.Unity.Interaction {
           deltaAngle = 0;
         }
 
+        if (deltaAngle > 180) {
+          deltaAngle -= 360.0f;
+        }
+
         Vector3 targetVelocity = deltaPos / Time.fixedDeltaTime;
         Vector3 targetAngularVelocity = deltaAxis * deltaAngle * Mathf.Deg2Rad / Time.fixedDeltaTime;
 
