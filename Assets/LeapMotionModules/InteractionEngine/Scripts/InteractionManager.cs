@@ -658,31 +658,33 @@ namespace Leap.Unity.Interaction {
 
       //Loop through the currently grasped objects to dispatch their OnHandsHold callback
       for (int i = 0; i < _graspedBehaviours.Count; i++) {
-        var interactionBehaviour = _graspedBehaviours[i];
-
-        for (int j = 0; j < hands.Count; j++) {
-          var hand = hands[j];
-          InteractionHand interactionHand;
-          if (_idToInteractionHand.TryGetValue(hand.Id, out interactionHand)) {
-            if (interactionHand.graspedObject == interactionBehaviour) {
-              _holdingHands.Add(hand);
-            }
-          }
-        }
-
-        try {
-          if (isPhysics) {
-            interactionBehaviour.NotifyHandsHoldPhysics(_holdingHands);
-          } else {
-            interactionBehaviour.NotifyHandsHoldGraphics(_holdingHands);
-          }
-        } catch (Exception e) {
-          _misbehavingBehaviours.Add(interactionBehaviour);
-          Debug.LogException(e);
-        }
-
-        _holdingHands.Clear();
+        dispatchOnHandsHolding(hands, _graspedBehaviours[i], isPhysics);
       }
+    }
+
+    protected virtual void dispatchOnHandsHolding(List<Hand> hands, IInteractionBehaviour interactionBehaviour, bool isPhysics) {
+      for (int j = 0; j < hands.Count; j++) {
+        var hand = hands[j];
+        InteractionHand interactionHand;
+        if (_idToInteractionHand.TryGetValue(hand.Id, out interactionHand)) {
+          if (interactionHand.graspedObject == interactionBehaviour) {
+            _holdingHands.Add(hand);
+          }
+        }
+      }
+
+      try {
+        if (isPhysics) {
+          interactionBehaviour.NotifyHandsHoldPhysics(_holdingHands);
+        } else {
+          interactionBehaviour.NotifyHandsHoldGraphics(_holdingHands);
+        }
+      } catch (Exception e) {
+        _misbehavingBehaviours.Add(interactionBehaviour);
+        Debug.LogException(e);
+      }
+
+      _holdingHands.Clear();
     }
 
     protected virtual void updateTracking(Frame frame) {
@@ -735,6 +737,7 @@ namespace Leap.Unity.Interaction {
             try {
               //This also dispatched InteractionObject.OnHandRegainedTracking()
               interactionHand.RegainTracking(hand);
+              dispatchOnHandsHolding(hands, interactionHand.graspedObject, isPhysics: true);
             } catch (Exception e) {
               _misbehavingBehaviours.Add(interactionHand.graspedObject);
               Debug.LogException(e);

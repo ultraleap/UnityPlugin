@@ -13,8 +13,7 @@ namespace Leap.Unity.Interaction {
 
     public override void DrivePhysics(ReadonlyList<Hand> hands, PhysicsMoveInfo info, Vector3 solvedPosition, Quaternion solvedRotation) {
       if (info.shouldTeleport) {
-        _obj.rigidbody.position = solvedPosition;
-        _obj.rigidbody.rotation = solvedRotation;
+        _obj.warper.Teleport(solvedPosition, solvedRotation);
       } else {
         Vector3 deltaPos = solvedPosition - _obj.warper.RigidbodyPosition;
         Quaternion deltaRot = solvedRotation * Quaternion.Inverse(_obj.warper.RigidbodyRotation);
