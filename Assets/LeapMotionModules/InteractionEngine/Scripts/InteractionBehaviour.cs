@@ -187,6 +187,11 @@ namespace Leap.Unity.Interaction {
     protected override void OnPreSolve() {
       base.OnPreSolve();
 
+      if (IsBeingGrasped && UntrackedHandCount == 0 &&
+          Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale) {
+        _manager.ReleaseObject(this);
+      }
+
       _showDebugRecievedVelocity = false;
     }
 #endif
@@ -194,11 +199,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnPostSolve() {
       base.OnPostSolve();
 
-      if (IsBeingGrasped) {
-        if (UntrackedHandCount == 0 && Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale) {
-          _manager.ReleaseObject(this);
-        }
-      } else {
+      if (!IsBeingGrasped) {
         if (_recievedSimulationResults) {
           _materialReplacer.ReplaceMaterials();
         } else {
