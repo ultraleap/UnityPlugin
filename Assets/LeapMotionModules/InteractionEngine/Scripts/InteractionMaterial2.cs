@@ -112,7 +112,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public PhysicMaterial ReplacementMateiral {
+    public PhysicMaterial ReplacementPhysicMaterial {
       get {
         return _replacementMaterial;
       }

@@ -34,8 +34,7 @@ namespace Leap.Unity.Interaction {
           }).ToArray();
           break;
         case InteractionMaterial2.PhysicMaterialModeEnum.Replace:
-          //TODO: what to do here?  custom replacer controller??
-          //_replacementMaterials = _originalMaterials.Select(m => material.ReplacementPhysicMaterial).ToArray();
+          _replacementMaterials = _originalMaterials.Select(m => material.ReplacementPhysicMaterial).ToArray();
           break;
       }
     }
