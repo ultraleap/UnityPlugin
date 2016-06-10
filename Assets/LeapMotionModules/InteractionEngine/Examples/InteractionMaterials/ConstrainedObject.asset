@@ -32,11 +32,39 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _graphicalReturnTime: 0.25
-  _holdingController: {fileID: 11476970}
-  _physicsController: {fileID: 11439394}
+  _holdingPoseController: {fileID: 11490366}
+  _moveToController: {fileID: 11428294}
   _suspensionController: {fileID: 0}
   _throwingController: {fileID: 0}
   _layerController: {fileID: 0}
+--- !u!114 &11428294
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c64ed932563afd24dab8dfc1939a9516, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxVelocity: 6
+  _strengthByDistance:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 0.02
+      value: 0.3
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!114 &11439394
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -66,6 +94,17 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
 --- !u!114 &11476970
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5f7ab934b62d25438bd10ceb74720d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &11490366
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_PrefabParentObject: {fileID: 0}
