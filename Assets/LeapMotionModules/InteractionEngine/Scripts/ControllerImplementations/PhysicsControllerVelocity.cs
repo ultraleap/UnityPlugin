@@ -2,7 +2,7 @@
 
 namespace Leap.Unity.Interaction {
 
-  public class PhysicsControllerVelocity : IPhysicsController {
+  public class PhysicsControllerVelocity : IMoveToController {
 
     [SerializeField]
     protected float _maxVelocity = 6;
@@ -20,7 +20,7 @@ namespace Leap.Unity.Interaction {
       _maxVelocitySqrd *= _maxVelocitySqrd;
     }
 
-    public override void DrivePhysics(ReadonlyList<Hand> hands, PhysicsMoveInfo info, Vector3 solvedPosition, Quaternion solvedRotation) {
+    public override void MoveTo(ReadonlyList<Hand> hands, PhysicsMoveInfo info, Vector3 solvedPosition, Quaternion solvedRotation) {
       if (info.shouldTeleport) {
         _obj.warper.Teleport(solvedPosition, solvedRotation);
       } else {

@@ -349,7 +349,7 @@ namespace Leap.Unity.Interaction {
 
       _controllers.HoldingPoseController.GetHoldingPose(hands, out _solvedPosition, out _solvedRotation);
 
-      _controllers.PhysicsController.DrivePhysics(hands, info, _solvedPosition, _solvedRotation);
+      _controllers.MoveToController.MoveTo(hands, info, _solvedPosition, _solvedRotation);
 
       if (_controllers.ThrowingController != null) {
         _controllers.ThrowingController.OnHold(hands);
@@ -404,7 +404,7 @@ namespace Leap.Unity.Interaction {
 
       _controllers.HoldingPoseController.TransferHandId(oldId, newHand.Id);
 
-      _controllers.PhysicsController.SetGraspedState();
+      _controllers.MoveToController.SetGraspedState();
 
       NotifyTeleported();
     }
@@ -422,8 +422,8 @@ namespace Leap.Unity.Interaction {
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
 
-      _controllers.PhysicsController.OnGraspBegin();
-      _controllers.PhysicsController.SetGraspedState();
+      _controllers.MoveToController.OnGraspBegin();
+      _controllers.MoveToController.SetGraspedState();
 
       _materialReplacer.ReplaceMaterials();
 
@@ -433,7 +433,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnGraspEnd(Hand lastHand) {
       base.OnGraspEnd(lastHand);
 
-      _controllers.PhysicsController.OnGraspEnd();
+      _controllers.MoveToController.OnGraspEnd();
 
       if (_controllers.ThrowingController != null && lastHand != null) {
         _controllers.ThrowingController.OnThrow(lastHand);

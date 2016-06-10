@@ -41,7 +41,7 @@ namespace Leap.Unity.Interaction {
 
     private DefinableController<IHoldingPoseController> _holdingPoseController;
     private DefinableController<ILayerController> _layerController;
-    private DefinableController<IPhysicsController> _physicsController;
+    private DefinableController<IMoveToController> _moveToController;
     private DefinableController<ISuspensionController> _suspensionController;
     private DefinableController<IThrowingController> _throwingController;
 
@@ -50,7 +50,7 @@ namespace Leap.Unity.Interaction {
      
       _holdingPoseController = new DefinableController<IHoldingPoseController>(_material.CreateHoldingPoseController(obj));
       _layerController = new DefinableController<ILayerController>(_material.CreateLayerController(obj));
-      _physicsController = new DefinableController<IPhysicsController>(_material.CreatePhysicsController(obj));
+      _moveToController = new DefinableController<IMoveToController>(_material.CreateMoveToController(obj));
       _suspensionController = new DefinableController<ISuspensionController>(_material.CreateSuspensionController(obj));
       _throwingController = new DefinableController<IThrowingController>(_material.CreateThrowingController(obj));
     }
@@ -83,18 +83,18 @@ namespace Leap.Unity.Interaction {
       _layerController.UnregisterCustomController();
     }
 
-    public IPhysicsController PhysicsController {
+    public IMoveToController MoveToController {
       get {
-        return _physicsController;
+        return _moveToController;
       }
     }
 
-    public void RegisterCustomPhysicsController(IPhysicsController physicsController) {
-      _physicsController.RegisterCustomController(physicsController);
+    public void RegisterCustomMoveToController(IMoveToController moveToController) {
+      _moveToController.RegisterCustomController(moveToController);
     }
 
-    public void UnregisterCustomPhysicsController() {
-      _physicsController.UnregisterCustomController();
+    public void UnregisterCustomMoveToController() {
+      _moveToController.UnregisterCustomController();
     }
 
     public ISuspensionController SuspensionController {
