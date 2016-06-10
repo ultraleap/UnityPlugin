@@ -352,7 +352,7 @@ namespace Leap.Unity.Interaction {
       _controllers.PhysicsController.DrivePhysics(hands, info, _solvedPosition, _solvedRotation);
 
       if (_controllers.ThrowingController != null) {
-        _controllers.ThrowingController.OnHold();
+        _controllers.ThrowingController.OnHold(hands);
       }
 
       _notifiedOfTeleport = false;
@@ -435,8 +435,8 @@ namespace Leap.Unity.Interaction {
 
       _controllers.PhysicsController.OnGraspEnd();
 
-      if (_controllers.ThrowingController != null) {
-        _controllers.ThrowingController.OnThrow();
+      if (_controllers.ThrowingController != null && lastHand != null) {
+        _controllers.ThrowingController.OnThrow(lastHand);
       }
 
       revertRigidbodyState();
