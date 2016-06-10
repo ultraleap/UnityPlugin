@@ -148,7 +148,7 @@ namespace Leap.Unity.Interaction {
 
       InteractionMaterial2 material = CreateInstance<InteractionMaterial2>();
       material._holdingController = CreateInstance<HoldingControllerKabsch>();
-      material._physicsController = CreateInstance<PhysicsControllerKinematic>();
+      material._physicsController = CreateInstance<PhysicsControllerVelocity>();
 
       //TODO: set defaults
 
