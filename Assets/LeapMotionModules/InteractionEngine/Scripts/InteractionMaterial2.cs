@@ -147,12 +147,16 @@ namespace Leap.Unity.Interaction {
       path = AssetDatabase.GenerateUniqueAssetPath(path);
 
       InteractionMaterial2 material = CreateInstance<InteractionMaterial2>();
-      material._holdingController = CreateInstance<HoldingControllerKabsch>();
-      material._physicsController = CreateInstance<PhysicsControllerVelocity>();
-
-      //TODO: set defaults
-
       AssetDatabase.CreateAsset(material, path);
+
+      material._holdingController = CreateInstance<HoldingControllerKabsch>();
+      material._holdingController.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+      AssetDatabase.AddObjectToAsset(material._holdingController, material);
+      
+      material._physicsController = CreateInstance<PhysicsControllerVelocity>();
+      material._physicsController.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+      AssetDatabase.AddObjectToAsset(material._physicsController, material);
+     
       AssetDatabase.SaveAssets();
 
       Selection.activeObject = material;
