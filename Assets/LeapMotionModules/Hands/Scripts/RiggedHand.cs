@@ -211,7 +211,10 @@ namespace Leap.Unity {
         // Recreate the local transform matrix of the bone
         Matrix4x4 localMatrix = mesh.bindposes[i].inverse;
         //UnityEngine.Matrix4x4 localMatrix = savedBindPoses[i].inverse;
-        SetTransformFromMatrix(boneTrans, ref localMatrix);
+        //SetTransformFromMatrix(boneTrans, ref localMatrix);
+
+        boneTrans.position = localMatrix.MultiplyPoint(Vector3.zero);
+        boneTrans.rotation = Quaternion.LookRotation(localMatrix.GetColumn(2), localMatrix.GetColumn(1));
       }
     }
     /// <summary>
@@ -291,7 +294,7 @@ namespace Leap.Unity {
     public static void SetTransformFromMatrix(Transform transform, ref Matrix4x4 matrix) {
       transform.position = ExtractTranslationFromMatrix(ref matrix);
       transform.rotation = ExtractRotationFromMatrix(ref matrix);
-      //transform.localScale = ExtractScaleFromMatrix(ref matrix);
+      transform.localScale = ExtractScaleFromMatrix(ref matrix);
     }
   }
 }
