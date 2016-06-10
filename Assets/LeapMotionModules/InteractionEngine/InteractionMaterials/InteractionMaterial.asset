@@ -13,11 +13,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _releaseDistance: 0.15
   _physicMaterialMode: 1
-  _holdingController: {fileID: 11480242}
-  _physicsController: {fileID: 11433068}
-  _suspensionController: {fileID: 11406562}
-  _throwingController: {fileID: 11471154}
-  _layerController: {fileID: 0}
+  _replacementMaterial: {fileID: 0}
   _warpingEnabled: 1
   _warpCurve:
     serializedVersion: 2
@@ -36,6 +32,11 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _graphicalReturnTime: 0.25
+  _holdingController: {fileID: 11480242}
+  _physicsController: {fileID: 11433068}
+  _suspensionController: {fileID: 11406562}
+  _throwingController: {fileID: 11471154}
+  _layerController: {fileID: 0}
 --- !u!114 &11406562
 MonoBehaviour:
   m_ObjectHideFlags: 3

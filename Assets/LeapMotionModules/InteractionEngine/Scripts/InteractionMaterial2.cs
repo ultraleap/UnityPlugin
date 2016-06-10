@@ -32,6 +32,9 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected PhysicMaterialModeEnum _physicMaterialMode = PhysicMaterialModeEnum.DuplicateExisting;
 
+    [SerializeField]
+    protected PhysicMaterial _replacementMaterial;
+
     [Tooltip("Can objects using this material warp the graphical anchor through time to reduce percieved latency.")]
     [SerializeField]
     protected bool _warpingEnabled = true;
@@ -106,6 +109,12 @@ namespace Leap.Unity.Interaction {
     public PhysicMaterialModeEnum PhysicMaterialMode {
       get {
         return _physicMaterialMode;
+      }
+    }
+
+    public PhysicMaterial ReplacementMateiral {
+      get {
+        return _replacementMaterial;
       }
     }
 

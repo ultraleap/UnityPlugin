@@ -60,6 +60,11 @@ namespace Leap.Unity.Interaction {
         }
       }
 
+      SerializedProperty prop = serializedObject.FindProperty("_physicMaterialMode");
+      specifyConditionalDrawing(() => prop.intValue == (int)InteractionMaterial2.PhysicMaterialModeEnum.Replace, "_replacementMaterial");
+
+      specifyConditionalDrawing("_warpingEnabled", "_warpCurve", "_graphicalReturnTime");
+
       specifyCustomDrawer("_holdingController", controllerDrawer);
       specifyCustomDrawer("_physicsController", controllerDrawer);
       specifyCustomDrawer("_suspensionController", controllerDrawer);
@@ -75,7 +80,7 @@ namespace Leap.Unity.Interaction {
       }
 
       EditorGUILayout.Space();
-      EditorGUILayout.LabelField(controller.displayName);
+      EditorGUILayout.LabelField(controller.displayName, EditorStyles.boldLabel);
 
       Type type;
       if (controller.objectReferenceValue == null) {
