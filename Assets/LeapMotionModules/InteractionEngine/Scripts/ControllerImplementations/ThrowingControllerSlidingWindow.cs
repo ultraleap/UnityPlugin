@@ -5,7 +5,7 @@ using System;
 
 namespace Leap.Unity.Interaction {
 
-  public class ThrowingControllerQueue : IThrowingController {
+  public class ThrowingControllerSlidingWindow : IThrowingController {
 
     [Tooltip("How long the averaging window is in seconds.")]
     [SerializeField]

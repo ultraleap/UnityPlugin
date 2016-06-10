@@ -5,7 +5,7 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
-  public class HoldingControllerKabsch : IHoldingPoseController {
+  public class HoldingPoseControllerKabsch : IHoldingPoseController {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 

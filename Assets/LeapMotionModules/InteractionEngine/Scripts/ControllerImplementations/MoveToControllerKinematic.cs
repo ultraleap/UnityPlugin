@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction {
 
-  public class PhysicsControllerKinematic : IMoveToController {
+  public class MoveToControllerKinematic : IMoveToController {
 
     public override void MoveTo(ReadonlyList<Hand> hands, PhysicsMoveInfo info, Vector3 solvedPosition, Quaternion solvedRotation) {
       if (info.shouldTeleport) {
