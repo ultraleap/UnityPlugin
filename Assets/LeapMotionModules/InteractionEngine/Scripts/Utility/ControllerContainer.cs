@@ -37,7 +37,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private InteractionMaterial2 _material;
+    private InteractionMaterial _material;
 
     private DefinableController<IHoldingController> _holdingController;
     private DefinableController<ILayerController> _layerController;
@@ -45,7 +45,7 @@ namespace Leap.Unity.Interaction {
     private DefinableController<ISuspensionController> _suspensionController;
     private DefinableController<IThrowingController> _throwingController;
 
-    public ControllerContainer(InteractionBehaviour obj, InteractionMaterial2 material) {
+    public ControllerContainer(InteractionBehaviour obj, InteractionMaterial material) {
       _material = material;
      
       _holdingController = new DefinableController<IHoldingController>(_material.CreateHoldingController(obj));

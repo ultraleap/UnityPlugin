@@ -39,7 +39,7 @@ namespace Leap.Unity.Interaction {
     public const int NUM_BONES = 4;
 
     [SerializeField]
-    protected InteractionMaterial2 _material;
+    protected InteractionMaterial _material;
 
     protected Transform[] _childrenArray;
     protected Rigidbody _rigidbody;
@@ -108,7 +108,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public InteractionMaterial2 material {
+    public InteractionMaterial material {
       get {
         return _material;
       }

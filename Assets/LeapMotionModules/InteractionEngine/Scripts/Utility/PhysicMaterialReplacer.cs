@@ -11,15 +11,15 @@ namespace Leap.Unity.Interaction {
 
     private bool _hasReplaced = false;
 
-    public PhysicMaterialReplacer(Transform anchor, InteractionMaterial2 material) {
+    public PhysicMaterialReplacer(Transform anchor, InteractionMaterial material) {
       _colliders = anchor.GetComponentsInChildren<Collider>(true);
       _originalMaterials = _colliders.Select(c => c.sharedMaterial).ToArray();
 
       switch (material.PhysicMaterialMode) {
-        case InteractionMaterial2.PhysicMaterialModeEnum.NoAction:
+        case InteractionMaterial.PhysicMaterialModeEnum.NoAction:
           _replacementMaterials = null;
           break;
-        case InteractionMaterial2.PhysicMaterialModeEnum.DuplicateExisting:
+        case InteractionMaterial.PhysicMaterialModeEnum.DuplicateExisting:
           _replacementMaterials = _originalMaterials.Select(m => {
             PhysicMaterial newMat;
             if (m == null) {
@@ -33,7 +33,7 @@ namespace Leap.Unity.Interaction {
             return newMat;
           }).ToArray();
           break;
-        case InteractionMaterial2.PhysicMaterialModeEnum.Replace:
+        case InteractionMaterial.PhysicMaterialModeEnum.Replace:
           _replacementMaterials = _originalMaterials.Select(m => material.ReplacementPhysicMaterial).ToArray();
           break;
       }

@@ -1,16 +1,21 @@
-﻿#if UNITY_EDITOR
+﻿using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
 #endif
+using System;
 using System.IO;
-using UnityEngine;
 
 namespace Leap.Unity.Interaction {
 
   public class InteractionMaterial : ScriptableObject {
 
-    public enum GraspMethodEnum {
-      Velocity,
-      Kinematic
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+    public class ControllerAttribute : Attribute {
+      public readonly bool AllowNone;
+
+      public ControllerAttribute(bool allowNone = false) {
+        AllowNone = allowNone;
+      }
     }
 
     public enum PhysicMaterialModeEnum {
@@ -19,68 +24,17 @@ namespace Leap.Unity.Interaction {
       Replace
     }
 
-    [Header("Contact Settings")]
-    [Tooltip("Should a hand be able to impart pushing forces to this object.")]
-    [SerializeField]
-    protected bool _contactEnabled = true;
-
-    [Tooltip("Depth before brushes are disabled.")]
-    [SerializeField]
-    protected float _brushDisableDistance = 0.017f;
-
-    [Header("Grasp Settings")]
-    [Tooltip("Should a hand be able to grasp objects using this material.")]
-    [SerializeField]
-    protected bool _graspingEnabled = true;
-
-    [Tooltip("What method should be used to move the object when it is grasped.")]
-    [SerializeField]
-    protected GraspMethodEnum _graspMethod = GraspMethodEnum.Velocity;
-
     [Tooltip("How far the object can get from the hand before it is released.")]
     [SerializeField]
     protected float _releaseDistance = 0.15f;
-
-    [Tooltip("How fast the object can move to try to get to the hand.")]
-    [SerializeField]
-    protected float _maxVelocity = 3;
-
-    [Tooltip("How strong the attraction is from the hand to the object when being held.  At strength 1 the object " +
-             "will try to move 100% of the way to the hand every frame.")]
-    [SerializeField]
-    protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
-                                                                      new Keyframe(0.02f, 0.2f, 0.0f, 0.0f));
-
-    [Tooltip("A curve used to calculate a multiplier of the throwing velocity.  Maps original velocity to multiplier.")]
-    [SerializeField]
-    protected AnimationCurve _throwingVelocityCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
-                                                                         new Keyframe(1.0f, 1.0f, 0.0f, 0.0f),
-                                                                         new Keyframe(2.0f, 1.5f, 0.0f, 0.0f));
 
     [Tooltip("What to do with the physic materials when a grasp occurs.")]
     [SerializeField]
     protected PhysicMaterialModeEnum _physicMaterialMode = PhysicMaterialModeEnum.DuplicateExisting;
 
-    [Tooltip("The physic material to use when a grasp occurs.  This material will replace existing materials when a grasp occurs.")]
     [SerializeField]
     protected PhysicMaterial _replacementMaterial;
 
-
-    [Header("Suspension Settings")]
-    [Tooltip("Can objects using this material be suspended when a grasping hand becomes untracked.")]
-    [SerializeField]
-    protected bool _suspensionEnabled = true;
-
-    [Tooltip("How long can objects using this material be suspended.  If a hand remains untracked for more than this time then " +
-             "the object will end suspension.")]
-    [SerializeField]
-    protected float _maxSuspensionTime = 4;
-
-    [Tooltip("Whether or not objects using this material have their graphical anchor disabled when they become suspended.")]
-    [SerializeField]
-    protected bool _hideObjectOnSuspend = true;
-
-    [Header("Warp Settings")]
     [Tooltip("Can objects using this material warp the graphical anchor through time to reduce percieved latency.")]
     [SerializeField]
     protected bool _warpingEnabled = true;
@@ -94,70 +48,61 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _graphicalReturnTime = 0.25f;
 
-    [Header("Layer Settings")]
-    [Tooltip("Should objects using this material use custom layers instead of the ones provided by the Interaction Manager.")]
+    [Controller]
     [SerializeField]
-    protected bool _useCustomLayers = false;
+    protected IHoldingController _holdingController;
 
+    [Controller]
     [SerializeField]
-    protected SingleLayer _interactionLayer = 0;
+    protected IPhysicsController _physicsController;
 
+    [Controller(allowNone: true)]
     [SerializeField]
-    protected SingleLayer _interactionNoClipLayer = 0;
+    protected ISuspensionController _suspensionController;
 
-    protected virtual void OnValidate() {
-      _brushDisableDistance = Mathf.Max(0, _brushDisableDistance);
-      _releaseDistance = Mathf.Max(0, _releaseDistance);
-      _maxVelocity = Mathf.Max(0, _maxVelocity);
-      _maxSuspensionTime = Mathf.Max(0, _maxSuspensionTime);
-      _graphicalReturnTime = Mathf.Max(0, _graphicalReturnTime);
+    [Controller(allowNone: true)]
+    [SerializeField]
+    protected IThrowingController _throwingController;
+
+    [Controller(allowNone: true)]
+    [SerializeField]
+    protected ILayerController _layerController;
+
+    public IHoldingController CreateHoldingController(InteractionBehaviour obj) {
+      return IControllerBase.CreateInstance(obj, _holdingController);
+    }
+
+    public IPhysicsController CreatePhysicsController(InteractionBehaviour obj) {
+      return IControllerBase.CreateInstance(obj, _physicsController);
+    }
+
+    public ISuspensionController CreateSuspensionController(InteractionBehaviour obj) {
+      return IControllerBase.CreateInstance(obj, _suspensionController);
+    }
+
+    public IThrowingController CreateThrowingController(InteractionBehaviour obj) {
+      return IControllerBase.CreateInstance(obj, _throwingController);
+    }
+
+    public ILayerController CreateLayerController(InteractionBehaviour obj) {
+      return IControllerBase.CreateInstance(obj, _layerController);
     }
 
     public bool ContactEnabled {
       get {
-        return _contactEnabled;
+        return true;
       }
     }
 
     public float BrushDisableDistance {
       get {
-        return _brushDisableDistance;
-      }
-    }
-
-    public bool GraspingEnabled {
-      get {
-        return _graspingEnabled;
-      }
-    }
-
-    public GraspMethodEnum GraspMethod {
-      get {
-        return _graspMethod;
+        return 0.017f;
       }
     }
 
     public float ReleaseDistance {
       get {
         return _releaseDistance;
-      }
-    }
-
-    public float MaxVelocity {
-      get {
-        return _maxVelocity;
-      }
-    }
-
-    public AnimationCurve StrengthByDistance {
-      get {
-        return _strengthByDistance;
-      }
-    }
-
-    public AnimationCurve ThrowingVelocityCurve {
-      get {
-        return _throwingVelocityCurve;
       }
     }
 
@@ -170,24 +115,6 @@ namespace Leap.Unity.Interaction {
     public PhysicMaterial ReplacementPhysicMaterial {
       get {
         return _replacementMaterial;
-      }
-    }
-
-    public bool SuspensionEnabled {
-      get {
-        return _suspensionEnabled;
-      }
-    }
-
-    public float MaxSuspensionTime {
-      get {
-        return _maxSuspensionTime;
-      }
-    }
-
-    public bool HideObjectOnSuspend {
-      get {
-        return _hideObjectOnSuspend;
       }
     }
 
@@ -209,32 +136,14 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public bool UseCustomLayers {
-      get {
-        return _useCustomLayers;
-      }
-    }
-
-    public int InteractionLayer {
-      get {
-        return _interactionLayer;
-      }
-    }
-
-    public int InteractionNoClipLayer {
-      get {
-        return _interactionNoClipLayer;
-      }
-    }
-
 #if UNITY_EDITOR
     private const string DEFAULT_ASSET_NAME = "InteractionMaterial.asset";
 
-    [MenuItem("Assets/Create/Interaction Material", priority = 510)]
+    [MenuItem("Assets/Create/Interaction Material 2", priority = 510)]
     private static void createNewBuildSetup() {
       string path = "Assets";
 
-      foreach (Object obj in Selection.GetFiltered(typeof(Object), SelectionMode.Assets)) {
+      foreach (UnityEngine.Object obj in Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets)) {
         path = AssetDatabase.GetAssetPath(obj);
         if (!string.IsNullOrEmpty(path) && File.Exists(path)) {
           path = Path.GetDirectoryName(path);
@@ -247,9 +156,22 @@ namespace Leap.Unity.Interaction {
 
       InteractionMaterial material = CreateInstance<InteractionMaterial>();
       AssetDatabase.CreateAsset(material, path);
+
+      material._holdingController = createDefaultAsset<HoldingControllerKabsch>(material);
+      material._physicsController = createDefaultAsset<PhysicsControllerVelocity>(material);
+      material._suspensionController = createDefaultAsset<SuspensionControllerDefault>(material);
+      material._throwingController = createDefaultAsset<ThrowingControllerPalm>(material);
+
       AssetDatabase.SaveAssets();
 
       Selection.activeObject = material;
+    }
+
+    private static T createDefaultAsset<T>(InteractionMaterial material) where T : ScriptableObject {
+      T t = CreateInstance<T>();
+      t.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+      AssetDatabase.AddObjectToAsset(t, material);
+      return t;
     }
 #endif
   }
