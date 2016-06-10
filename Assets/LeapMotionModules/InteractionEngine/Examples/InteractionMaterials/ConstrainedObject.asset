@@ -8,37 +8,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 183146e09617b2e41a21d0ecf5e56fcb, type: 3}
+  m_Script: {fileID: 11500000, guid: 9e240ddf8ae2bd147b6c7d3cd1da1e2a, type: 3}
   m_Name: ConstrainedObject
   m_EditorClassIdentifier: 
-  _enableContact: 1
-  _brushDisableDistance: 0.017
-  _throwingVelocityCurve:
-    serializedVersion: 2
-    m_Curve:
-    - time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    - time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    - time: 2
-      value: 1.5
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  _graspMethod: 0
-  _suspensionEnabled: 0
   _releaseDistance: 0.15
-  _maxVelocity: 3
-  _followStrength: 0.6
+  _physicMaterialMode: 1
+  _replacementMaterial: {fileID: 0}
   _warpingEnabled: 0
   _warpCurve:
     serializedVersion: 2
@@ -57,3 +32,47 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _graphicalReturnTime: 0.25
+  _holdingController: {fileID: 11476970}
+  _physicsController: {fileID: 11439394}
+  _suspensionController: {fileID: 0}
+  _throwingController: {fileID: 0}
+  _layerController: {fileID: 0}
+--- !u!114 &11439394
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c64ed932563afd24dab8dfc1939a9516, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _maxVelocity: 6
+  _strengthByDistance:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 0.02
+      value: 0.3
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &11476970
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5f7ab934b62d25438bd10ceb74720d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

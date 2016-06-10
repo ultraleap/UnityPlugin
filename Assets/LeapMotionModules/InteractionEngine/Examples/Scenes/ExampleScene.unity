@@ -1409,7 +1409,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 42874259}
-  _material: {fileID: 11400000, guid: b905ba41378bfd94db6b72bd3e98fac4, type: 2}
+  _material: {fileID: 11400000, guid: cfea75c825aab3844b597c7b7fbb22f3, type: 2}
 --- !u!54 &1102362658
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3459,7 +3459,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 42874259}
-  _material: {fileID: 11400000, guid: b905ba41378bfd94db6b72bd3e98fac4, type: 2}
+  _material: {fileID: 11400000, guid: cfea75c825aab3844b597c7b7fbb22f3, type: 2}
 --- !u!59 &2078455511
 HingeJoint:
   m_ObjectHideFlags: 0
