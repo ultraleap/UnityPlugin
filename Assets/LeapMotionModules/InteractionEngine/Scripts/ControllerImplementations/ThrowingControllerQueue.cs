@@ -9,7 +9,7 @@ namespace Leap.Unity.Interaction {
 
     [Tooltip("How long the averaging window is in seconds.")]
     [SerializeField]
-    private float _windowLength = 0.1f;
+    private float _windowLength = 0.05f;
 
     [Tooltip("The delay between the averaging window and the current time.")]
     [SerializeField]
