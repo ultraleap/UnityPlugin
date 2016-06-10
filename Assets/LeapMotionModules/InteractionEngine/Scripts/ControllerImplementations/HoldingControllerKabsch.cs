@@ -19,6 +19,11 @@ namespace Leap.Unity.Interaction {
       KabschC.Construct(ref _kabsch);
     }
 
+    public override void TransferHandId(int oldId, int newId) {
+      _handIdToPoints[newId] = _handIdToPoints[oldId];
+      _handIdToPoints.Remove(oldId);
+    }
+
     public override void AddHand(Hand hand) {
       var newCollection = HandPointCollection.Create(_obj.warper);
       _handIdToPoints[hand.Id] = newCollection;

@@ -195,7 +195,7 @@ namespace Leap.Unity.Interaction {
       base.OnPostSolve();
 
       if (IsBeingGrasped) {
-        if (Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale) {
+        if (UntrackedHandCount == 0 && Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale) {
           _manager.ReleaseObject(this);
         }
       } else {
@@ -400,6 +400,8 @@ namespace Leap.Unity.Interaction {
       if (_controllers.SuspensionController != null) {
         _controllers.SuspensionController.Resume();
       }
+
+      _controllers.HoldingController.TransferHandId(oldId, newHand.Id);
 
       _controllers.PhysicsController.SetGraspedState();
 
