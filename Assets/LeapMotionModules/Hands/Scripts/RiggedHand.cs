@@ -6,6 +6,7 @@
 
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Leap;
 
 namespace Leap.Unity {
@@ -17,8 +18,25 @@ namespace Leap.Unity {
       }
     }
     public override bool SupportsEditorPersistence() {
-      return true;
+      return SetEditorLeapPose;
     }
+    [SerializeField]
+    private bool setEditorLeapPose = false;
+    
+    public bool SetEditorLeapPose {
+      get { return setEditorLeapPose; }
+      set {
+        setEditorLeapPose = value;
+        Debug.Log("set");
+        if (value == false) {
+          ResetLocalRotations();
+        }
+      }
+    }
+    void OnValidate() {
+      SetEditorLeapPose = setEditorLeapPose;
+    }
+
     [Tooltip("Hands are typically rigged in 3D packages with the palm transform near the wrist. Uncheck this is your model's palm transform is at the center of the palm similar to Leap's API drives")]
     public bool ModelPalmAtLeapWrist = true;
     public bool UseMetaCarpals;
@@ -140,6 +158,48 @@ namespace Leap.Unity {
         zeroed = (vectorToZero.y < 0) ? new Vector3(0, 0, 1) : new Vector3(0, 0, -1);
       }
       return zeroed;
+    }
+    [SerializeField]
+    private List<Quaternion> localRotations = new List<Quaternion>();
+    [SerializeField]
+    private List<Vector3> localPositions = new List<Vector3>();
+
+    [ContextMenu("StoreLocalRotations")]
+    public void StoreLocalRotations() {
+      Debug.Log("StoreLocalRotations()");
+      SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
+      Mesh mesh = skinnedMesh.sharedMesh;
+      for (int i = 0; i < skinnedMesh.bones.Length; i++) {
+        Transform boneTrans = skinnedMesh.bones[i];
+        localRotations.Add(boneTrans.localRotation);
+        localPositions.Add(boneTrans.localPosition);
+      }
+    }
+    [ContextMenu("ResetLocalRotations")]
+    public void ResetLocalRotations() {
+      Debug.Log("ResetLocalRotations()");
+      SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
+      Mesh mesh = skinnedMesh.sharedMesh;
+      for (int i = 0; i < skinnedMesh.bones.Length; i++) {
+        Transform boneTrans = skinnedMesh.bones[i];
+        boneTrans.localRotation = localRotations[i];
+        boneTrans.localPosition = localPositions[i];
+      }
+    }
+    [ContextMenu("ResetToBindPose")]
+    public void ResetToBindPose() {
+      Debug.Log("resetToBindPose()");
+      SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
+      Mesh mesh = skinnedMesh.sharedMesh;
+      for (int i = 0; i < skinnedMesh.bones.Length; i++) {
+        Transform boneTrans = skinnedMesh.bones[i];
+        // Recreate the local transform matrix of the bone
+        Matrix4x4 localMatrix = mesh.bindposes[i].inverse;
+        // Recreate local transform from that matrix
+        boneTrans.localPosition = localMatrix.MultiplyPoint (Vector3.zero);
+        boneTrans.localRotation = Quaternion.LookRotation (localMatrix.GetColumn (2), localMatrix.GetColumn (1));
+        boneTrans.localScale = new Vector3 (localMatrix.GetColumn (0).magnitude, localMatrix.GetColumn (1).magnitude, localMatrix.GetColumn (2).magnitude);
+      }
     }
   }
 }
