@@ -39,7 +39,7 @@ namespace Leap.Unity.Interaction {
 
     private InteractionMaterial _material;
 
-    private DefinableController<IHoldingController> _holdingController;
+    private DefinableController<IHoldingPoseController> _holdingPoseController;
     private DefinableController<ILayerController> _layerController;
     private DefinableController<IPhysicsController> _physicsController;
     private DefinableController<ISuspensionController> _suspensionController;
@@ -48,25 +48,25 @@ namespace Leap.Unity.Interaction {
     public ControllerContainer(InteractionBehaviour obj, InteractionMaterial material) {
       _material = material;
      
-      _holdingController = new DefinableController<IHoldingController>(_material.CreateHoldingController(obj));
+      _holdingPoseController = new DefinableController<IHoldingPoseController>(_material.CreateHoldingPoseController(obj));
       _layerController = new DefinableController<ILayerController>(_material.CreateLayerController(obj));
       _physicsController = new DefinableController<IPhysicsController>(_material.CreatePhysicsController(obj));
       _suspensionController = new DefinableController<ISuspensionController>(_material.CreateSuspensionController(obj));
       _throwingController = new DefinableController<IThrowingController>(_material.CreateThrowingController(obj));
     }
 
-    public IHoldingController HoldingController {
+    public IHoldingPoseController HoldingPoseController {
       get {
-        return _holdingController;
+        return _holdingPoseController;
       }
     }
 
-    public void RegisterCustomHoldingController(IHoldingController holdingController) {
-      _holdingController.RegisterCustomController(holdingController);
+    public void RegisterCustomHoldingPoseController(IHoldingPoseController holdingPoseController) {
+      _holdingPoseController.RegisterCustomController(holdingPoseController);
     }
 
-    public void UnregisterCustomHoldingController() {
-      _holdingController.UnregisterCustomController();
+    public void UnregisterCustomHoldingPoseController() {
+      _holdingPoseController.UnregisterCustomController();
     }
 
     public ILayerController LayerController {

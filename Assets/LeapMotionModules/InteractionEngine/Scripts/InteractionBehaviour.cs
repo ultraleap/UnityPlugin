@@ -337,7 +337,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandGrasped(Hand hand) {
       base.OnHandGrasped(hand);
 
-      _controllers.HoldingController.AddHand(hand);
+      _controllers.HoldingPoseController.AddHand(hand);
     }
 
     protected override void OnHandsHoldPhysics(ReadonlyList<Hand> hands) {
@@ -347,7 +347,7 @@ namespace Leap.Unity.Interaction {
       info.remainingDistanceLastFrame = Vector3.Distance(_warper.RigidbodyPosition, _solvedPosition);
       info.shouldTeleport = _notifiedOfTeleport;
 
-      _controllers.HoldingController.GetHeldTransform(hands, out _solvedPosition, out _solvedRotation);
+      _controllers.HoldingPoseController.GetHoldingPose(hands, out _solvedPosition, out _solvedRotation);
 
       _controllers.PhysicsController.DrivePhysics(hands, info, _solvedPosition, _solvedRotation);
 
@@ -367,7 +367,7 @@ namespace Leap.Unity.Interaction {
 
         Vector3 newPosition;
         Quaternion newRotation;
-        _controllers.HoldingController.GetHeldTransform(hands, out newPosition, out newRotation);
+        _controllers.HoldingPoseController.GetHoldingPose(hands, out newPosition, out newRotation);
 
         Vector3 graphicalPosition = newPosition + newRotation * deltaPosition;
         Quaternion graphicalRotation = newRotation * deltaRotation;
@@ -380,7 +380,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandReleased(Hand hand) {
       base.OnHandReleased(hand);
 
-      _controllers.HoldingController.RemoveHand(hand);
+      _controllers.HoldingPoseController.RemoveHand(hand);
     }
 
     protected override void OnHandLostTracking(Hand oldHand, out float maxSuspensionTime) {
@@ -402,7 +402,7 @@ namespace Leap.Unity.Interaction {
         _controllers.SuspensionController.Resume();
       }
 
-      _controllers.HoldingController.TransferHandId(oldId, newHand.Id);
+      _controllers.HoldingPoseController.TransferHandId(oldId, newHand.Id);
 
       _controllers.PhysicsController.SetGraspedState();
 
@@ -416,7 +416,7 @@ namespace Leap.Unity.Interaction {
         _controllers.SuspensionController.Timeout();
       }
 
-      _controllers.HoldingController.RemoveHand(oldHand);
+      _controllers.HoldingPoseController.RemoveHand(oldHand);
     }
 
     protected override void OnGraspBegin() {

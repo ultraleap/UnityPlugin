@@ -50,7 +50,7 @@ namespace Leap.Unity.Interaction {
 
     [Controller]
     [SerializeField]
-    protected IHoldingController _holdingController;
+    protected IHoldingPoseController _holdingPoseController;
 
     [Controller]
     [SerializeField]
@@ -68,8 +68,8 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected ILayerController _layerController;
 
-    public IHoldingController CreateHoldingController(InteractionBehaviour obj) {
-      return IControllerBase.CreateInstance(obj, _holdingController);
+    public IHoldingPoseController CreateHoldingPoseController(InteractionBehaviour obj) {
+      return IControllerBase.CreateInstance(obj, _holdingPoseController);
     }
 
     public IPhysicsController CreatePhysicsController(InteractionBehaviour obj) {
@@ -157,7 +157,7 @@ namespace Leap.Unity.Interaction {
       InteractionMaterial material = CreateInstance<InteractionMaterial>();
       AssetDatabase.CreateAsset(material, path);
 
-      material._holdingController = createDefaultAsset<HoldingControllerKabsch>(material);
+      material._holdingPoseController = createDefaultAsset<HoldingControllerKabsch>(material);
       material._physicsController = createDefaultAsset<PhysicsControllerVelocity>(material);
       material._suspensionController = createDefaultAsset<SuspensionControllerDefault>(material);
       material._throwingController = createDefaultAsset<ThrowingControllerPalm>(material);
