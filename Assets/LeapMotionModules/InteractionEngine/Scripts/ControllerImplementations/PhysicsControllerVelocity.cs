@@ -15,24 +15,8 @@ namespace Leap.Unity.Interaction {
       if (info.shouldTeleport) {
         _obj.warper.Teleport(solvedPosition, solvedRotation);
       } else {
-        Vector3 deltaPos = solvedPosition - _obj.warper.RigidbodyPosition;
-        Quaternion deltaRot = solvedRotation * Quaternion.Inverse(_obj.warper.RigidbodyRotation);
-
-        Vector3 deltaAxis;
-        float deltaAngle;
-        deltaRot.ToAngleAxis(out deltaAngle, out deltaAxis);
-
-        if (float.IsInfinity(deltaAxis.x)) {
-          deltaAxis = Vector3.zero;
-          deltaAngle = 0;
-        }
-
-        if (deltaAngle > 180) {
-          deltaAngle -= 360.0f;
-        }
-
-        Vector3 targetVelocity = deltaPos / Time.fixedDeltaTime;
-        Vector3 targetAngularVelocity = deltaAxis * deltaAngle * Mathf.Deg2Rad / Time.fixedDeltaTime;
+        Vector3 targetVelocity = PhysicsUtility.ToLinearVelocity(_obj.warper.RigidbodyPosition, solvedPosition, Time.fixedDeltaTime);
+        Vector3 targetAngularVelocity = PhysicsUtility.ToAngularVelocity(_obj.warper.RigidbodyRotation, solvedRotation, Time.fixedDeltaTime);
 
         if (targetVelocity.sqrMagnitude > float.Epsilon) {
           float targetSpeed = targetVelocity.magnitude;
