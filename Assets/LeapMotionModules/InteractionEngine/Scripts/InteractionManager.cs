@@ -733,6 +733,7 @@ namespace Leap.Unity.Interaction {
             interactionHand = untrackedInteractionHand;
             //Remove the old id from the mapping
             _idToInteractionHand.Remove(untrackedInteractionHand.hand.Id);
+            _idToInteractionHand[hand.Id] = interactionHand;
 
             try {
               //This also dispatched InteractionObject.OnHandRegainedTracking()
@@ -757,10 +758,8 @@ namespace Leap.Unity.Interaction {
           } else {
             //Otherwise just create a new one
             interactionHand = new InteractionHand(hand);
+            _idToInteractionHand[hand.Id] = interactionHand;
           }
-
-          //In both cases, associate the id with the new ieHand
-          _idToInteractionHand[hand.Id] = interactionHand;
         }
 
         if (!hasHandResult) {
