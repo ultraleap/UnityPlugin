@@ -21,14 +21,14 @@ namespace Leap.Unity {
       return SetEditorLeapPose;
     }
     [SerializeField]
-    private bool setEditorLeapPose = false;
+    private bool setEditorLeapPose = true;
     
     public bool SetEditorLeapPose {
       get { return setEditorLeapPose; }
       set {
 
         if (value == false) {
-          ResetLocalPosAndRot();
+          //ResetToBindPose();
         }
         setEditorLeapPose = value;
       }
@@ -138,13 +138,21 @@ namespace Leap.Unity {
       }
       else perpendicular = Vector3.Cross(side1, side2);
       Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
-      return calculatedPalmFacing;
+      //return calculatedPalmFacing;
+      if (Handedness == Chirality.Right) {
+        return new Vector3(0, -1, 0);
+      }
+      else return new Vector3(0, 1, 0);
     }
 
     private Vector3 calculateModelFingerPointing() {
       Vector3 distance = transform.InverseTransformPoint(fingers[2].transform.GetChild(0).transform.position) - transform.InverseTransformPoint(palm.position);
       Vector3 calculatedFingerPointing = CalculateZeroedVector(distance);
-      return calculatedFingerPointing;
+      //return calculatedFingerPointing;
+      if (Handedness == Chirality.Right) {
+        return new Vector3(1, 0, 0);
+      }
+      else return new Vector3(-1, 0, 0);
     }
 
     public static Vector3 CalculateZeroedVector(Vector3 vectorToZero) {
@@ -213,7 +221,7 @@ namespace Leap.Unity {
         //UnityEngine.Matrix4x4 localMatrix = savedBindPoses[i].inverse;
         //SetTransformFromMatrix(boneTrans, ref localMatrix);
 
-        boneTrans.position = localMatrix.MultiplyPoint(Vector3.zero);
+        //boneTrans.position = localMatrix.MultiplyPoint(Vector3.zero);
         boneTrans.rotation = Quaternion.LookRotation(localMatrix.GetColumn(2), localMatrix.GetColumn(1));
       }
     }
