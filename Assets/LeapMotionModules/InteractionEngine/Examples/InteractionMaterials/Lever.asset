@@ -33,7 +33,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   _graphicalReturnTime: 0.25
   _holdingPoseController: {fileID: 11419838}
-  _moveToController: {fileID: 11451438}
+  _moveToController: {fileID: 11478976}
   _suspensionController: {fileID: 0}
   _throwingController: {fileID: 0}
   _layerController: {fileID: 0}
@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _solveMethod: 1
---- !u!114 &11451438
+--- !u!114 &11478976
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_PrefabParentObject: {fileID: 0}
