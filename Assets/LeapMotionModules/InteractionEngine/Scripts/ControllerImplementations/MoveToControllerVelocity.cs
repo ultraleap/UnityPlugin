@@ -30,14 +30,17 @@ namespace Leap.Unity.Interaction {
         float targetSpeedSqrd = targetVelocity.sqrMagnitude;
         if (targetSpeedSqrd > _maxVelocitySqrd) {
           float targetPercent = (_maxVelocity * _obj.Manager.SimulationScale) / Mathf.Sqrt(targetSpeedSqrd);
-
           targetVelocity *= targetPercent;
           targetAngularVelocity *= targetPercent;
         }
 
         float followStrength = _strengthByDistance.Evaluate(info.remainingDistanceLastFrame / _obj.Manager.SimulationScale);
-        _obj.rigidbody.velocity = Vector3.Lerp(_obj.rigidbody.velocity, targetVelocity, followStrength);
-        _obj.rigidbody.angularVelocity = Vector3.Lerp(_obj.rigidbody.angularVelocity, targetAngularVelocity, followStrength);
+        Vector3 lerpedVelocity = Vector3.Lerp(_obj.rigidbody.velocity, targetVelocity, followStrength);
+        Vector3 lerpedAngularVelocity = Vector3.Lerp(_obj.rigidbody.angularVelocity, targetAngularVelocity, followStrength);
+
+        Vector3 centerOfMassOffset = _obj.warper.RigidbodyRotation * _obj.rigidbody.centerOfMass;
+        _obj.rigidbody.velocity = lerpedVelocity + Vector3.Cross(lerpedAngularVelocity, centerOfMassOffset);
+        _obj.rigidbody.angularVelocity = lerpedAngularVelocity;
       }
     }
 

@@ -9,6 +9,14 @@ namespace Leap.Unity.Interaction {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 
+    public enum SolveMethod {
+      SixDegreeSolve,
+      PivotAroundOrigin
+    }
+
+    [SerializeField]
+    protected SolveMethod _solveMethod;
+
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
     protected LEAP_IE_KABSCH _kabsch;
 
@@ -55,6 +63,10 @@ namespace Leap.Unity.Interaction {
     public override void GetHoldingPose(ReadonlyList<Hand> hands, out Vector3 newPosition, out Quaternion newRotation) {
       KabschC.Reset(ref _kabsch);
 
+      Vector3 bodyPosition = _obj.warper.RigidbodyPosition;
+      Quaternion bodyRotation = _obj.warper.RigidbodyRotation;
+      Matrix4x4 it = Matrix4x4.TRS(bodyPosition, bodyRotation, Vector3.one);
+
       for (int h = 0; h < hands.Count; h++) {
         Hand hand = hands[h];
 
@@ -72,8 +84,8 @@ namespace Leap.Unity.Interaction {
             Vector3 bonePos = bone.NextJoint.ToVector3();
 
             //Do the solve such that the objects positions are matched to the new bone positions
-            LEAP_VECTOR point1 = localPos.ToCVector();
-            LEAP_VECTOR point2 = bonePos.ToCVector();
+            LEAP_VECTOR point1 = (it.MultiplyPoint3x4(localPos) - bodyPosition).ToCVector();
+            LEAP_VECTOR point2 = (bonePos - bodyPosition).ToCVector();
 
             KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
           }
@@ -87,12 +99,21 @@ namespace Leap.Unity.Interaction {
       KabschC.GetTranslation(ref _kabsch, out leapTranslation);
       KabschC.GetRotation(ref _kabsch, out leapRotation);
 
-      newPosition = leapTranslation.ToVector3();
-      newRotation = leapRotation.ToQuaternion();
+      newPosition = bodyPosition + leapTranslation.ToVector3();
+      newRotation = leapRotation.ToQuaternion() * bodyRotation;
     }
 
     protected void performSolve() {
-      KabschC.Solve(ref _kabsch);
+      switch (_solveMethod) {
+        case SolveMethod.SixDegreeSolve:
+          KabschC.Solve(ref _kabsch);
+          break;
+        case SolveMethod.PivotAroundOrigin:
+          LEAP_VECTOR v = new LEAP_VECTOR();
+          v.x = v.y = v.z = 0;
+          KabschC.SolveWithPivot(ref _kabsch, ref v);
+          break;
+      }
     }
 
     protected class HandPointCollection {
