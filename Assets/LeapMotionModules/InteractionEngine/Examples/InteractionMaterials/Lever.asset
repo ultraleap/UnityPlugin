@@ -9,12 +9,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 183146e09617b2e41a21d0ecf5e56fcb, type: 3}
-  m_Name: Pivot
+  m_Name: Lever
   m_EditorClassIdentifier: 
   _releaseDistance: 0.15
   _physicMaterialMode: 1
   _replacementMaterial: {fileID: 0}
-  _warpingEnabled: 1
+  _warpingEnabled: 0
   _warpCurve:
     serializedVersion: 2
     m_Curve:
@@ -32,12 +32,12 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   _graphicalReturnTime: 0.25
-  _holdingPoseController: {fileID: 11442344}
-  _moveToController: {fileID: 11457276}
-  _suspensionController: {fileID: 11470702}
-  _throwingController: {fileID: 11485056}
+  _holdingPoseController: {fileID: 11419838}
+  _moveToController: {fileID: 11451438}
+  _suspensionController: {fileID: 0}
+  _throwingController: {fileID: 0}
   _layerController: {fileID: 0}
---- !u!114 &11442344
+--- !u!114 &11419838
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_PrefabParentObject: {fileID: 0}
@@ -48,8 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5f7ab934b62d25438bd10ceb74720d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _solveMethod: 0
---- !u!114 &11457276
+  _solveMethod: 1
+--- !u!114 &11451438
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_PrefabParentObject: {fileID: 0}
@@ -71,45 +71,6 @@ MonoBehaviour:
       tangentMode: 0
     - time: 0.02
       value: 0.3
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
---- !u!114 &11470702
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d79f36bc3cfbe724b84442128f47ef8f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _maxSuspensionTime: 4
---- !u!114 &11485056
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69417b19ae8f33b4fb9d65c4a22026e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _throwingVelocityCurve:
-    serializedVersion: 2
-    m_Curve:
-    - time: 0
-      value: 1.5
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-    - time: 2
-      value: 1.3
       inSlope: 0
       outSlope: 0
       tangentMode: 0
