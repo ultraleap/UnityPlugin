@@ -65,6 +65,13 @@ namespace Leap.Unity.Interaction {
 
       specifyConditionalDrawing("_warpingEnabled", "_warpCurve", "_graphicalReturnTime");
 
+      specifyConditionalDrawing("_contactEnabled", "_brushDisableDistance");
+
+      specifyConditionalDrawing("_graspEnabled", "_releaseDistance", 
+                                                 "_warpingEnabled", 
+                                                 "_warpCurve", 
+                                                 "_graphicalReturnTime");
+
       specifyCustomDrawer("_holdingPoseController", controllerDrawer);
       specifyCustomDrawer("_moveToController", controllerDrawer);
       specifyCustomDrawer("_suspensionController", controllerDrawer);

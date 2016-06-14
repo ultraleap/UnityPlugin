@@ -31,14 +31,6 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _brushDisableDistance = 0.017f;
 
-    [Header("Grasp Settings")]
-    [SerializeField]
-    protected bool _graspEnabled = true;
-
-    [Tooltip("How far the object can get from the hand before it is released.")]
-    [SerializeField]
-    protected float _releaseDistance = 0.15f;
-
     [Tooltip("What to do with the physic materials when a grasp occurs.")]
     [SerializeField]
     protected PhysicMaterialModeEnum _physicMaterialMode = PhysicMaterialModeEnum.DuplicateExisting;
@@ -46,6 +38,14 @@ namespace Leap.Unity.Interaction {
     [Tooltip("What material to replace with when a grasp occurs.")]
     [SerializeField]
     protected PhysicMaterial _replacementMaterial;
+
+    [Header("Grasp Settings")]
+    [SerializeField]
+    protected bool _graspEnabled = true;
+
+    [Tooltip("How far the object can get from the hand before it is released.")]
+    [SerializeField]
+    protected float _releaseDistance = 0.15f;
 
     [Tooltip("Can objects using this material warp the graphical anchor through time to reduce percieved latency.")]
     [SerializeField]
