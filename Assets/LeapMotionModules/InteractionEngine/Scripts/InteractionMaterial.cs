@@ -24,6 +24,17 @@ namespace Leap.Unity.Interaction {
       Replace
     }
 
+    [Header("Contact Settings")]
+    [SerializeField]
+    protected bool _contactEnabled = true;
+
+    [SerializeField]
+    protected float _brushDisableDistance = 0.017f;
+
+    [Header("Grasp Settings")]
+    [SerializeField]
+    protected bool _graspEnabled = true;
+
     [Tooltip("How far the object can get from the hand before it is released.")]
     [SerializeField]
     protected float _releaseDistance = 0.15f;
@@ -91,13 +102,19 @@ namespace Leap.Unity.Interaction {
 
     public bool ContactEnabled {
       get {
-        return true;
+        return _contactEnabled;
       }
     }
 
     public float BrushDisableDistance {
       get {
         return 0.017f;
+      }
+    }
+
+    public bool GraspEnabled {
+      get {
+        return _graspEnabled;
       }
     }
 
