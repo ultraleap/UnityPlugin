@@ -40,9 +40,6 @@ namespace Leap.Unity.Interaction {
     protected PhysicMaterial _replacementMaterial;
 
     [Header("Grasp Settings")]
-    [SerializeField]
-    protected bool _graspEnabled = true;
-
     [Tooltip("How far the object can get from the hand before it is released.")]
     [SerializeField]
     protected float _releaseDistance = 0.15f;
@@ -109,12 +106,6 @@ namespace Leap.Unity.Interaction {
     public float BrushDisableDistance {
       get {
         return 0.017f;
-      }
-    }
-
-    public bool GraspEnabled {
-      get {
-        return _graspEnabled;
       }
     }
 
