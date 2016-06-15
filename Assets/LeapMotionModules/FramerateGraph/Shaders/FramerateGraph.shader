@@ -1,7 +1,7 @@
 ﻿Shader "LeapMotion/FramerateGraph" {
 	Properties {
     _GraphTexture ("Time Data",  2D) = "white" {}
-    _Gradient     ("Color Ramp", 2D) = "white" {}
+    _GridTexture  ("Grid Texture", 2D) = "white" {}
     _GradientScale ("Gradient Scale", Float) = 0
 	}
 
@@ -28,13 +28,15 @@
   }
 
   sampler2D _GraphTexture;
-  sampler2D _Gradient;
+  sampler2D _GridTexture;
   float _GradientScale;
 
   float4 frag(frag_in input) : COLOR {
     fixed4 color = tex2D(_GraphTexture, float2(input.uv.x, 0.5));
     float alpha = step(input.uv.y, color.a);
-    return float4(tex2D(_Gradient, color.a * _GradientScale).rgb, alpha);
+    fixed4 grid = tex2D(_GridTexture, float2(input.uv.x, input.uv.y * _GradientScale));
+    alpha = max(alpha, 1 - grid.x);
+    return float4(grid.rgb, alpha);
   }
   ENDCG
 

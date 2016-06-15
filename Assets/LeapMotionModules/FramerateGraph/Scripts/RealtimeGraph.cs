@@ -48,6 +48,9 @@ namespace Leap.Unity.RealtimeGraph {
     protected Renderer _graphRenderer;
 
     [SerializeField]
+    protected LeapServiceProvider _provider;
+
+    [SerializeField]
     protected Text upperValueLabel;
 
     [SerializeField]
@@ -99,7 +102,7 @@ namespace Leap.Unity.RealtimeGraph {
       _gradientTexture.wrapMode = TextureWrapMode.Repeat;
       _gradientTexture.filterMode = FilterMode.Bilinear;
 
-      _graphRenderer.material = new Material(_graphShader);
+      //_graphRenderer.material = new Material(_graphShader);
       _graphRenderer.material.SetTexture("_GraphTexture", _texture);
       _graphRenderer.material.SetTexture("_Gradient", _gradientTexture);
 
@@ -164,6 +167,8 @@ namespace Leap.Unity.RealtimeGraph {
           return 1000.0f / getFrameMs();
         case GraphType.UpdateDelta:
           return getUpdateMs();
+        case GraphType.TrackingLatency:
+          return (_provider.GetLeapController().Now() - _provider.CurrentFrame.Timestamp) / 1000.0f;
         default:
           throw new Exception("asd");
       }
@@ -216,10 +221,13 @@ namespace Leap.Unity.RealtimeGraph {
         _colors[i] = new Color32(percentByte, percentByte, percentByte, percentByte);
       }
 
-      _graphRenderer.material.SetFloat("_GradientScale", max / (_gradientSetting.crossoverPoint * 2) * (_gradientSetting.isHigherBetter ? -1 : 1));
+      _graphRenderer.material.SetFloat("_GradientScale", 50 * max / (_gradientSetting.crossoverPoint * 2) * (_gradientSetting.isHigherBetter ? -1 : 1));
 
       _texture.SetPixels32(_colors);
       _texture.Apply();
+
+      upperValueLabel.text = Mathf.Round(max).ToString();
+      midValueLabel.text = Mathf.Round(max * 0.5f).ToString();
     }
   }
 }
