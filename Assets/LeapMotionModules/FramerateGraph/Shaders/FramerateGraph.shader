@@ -1,8 +1,8 @@
 ﻿Shader "LeapMotion/FramerateGraph" {
 	Properties {
-		_MainTex ("Time Data", 2D) = "white" {}
-    _Ramp    ("Color Ramp",  2D) = "white" {}
-    _Offset  ("Horizontal Offset", Range(0, 1)) = 0
+    _GraphTexture ("Time Data",  2D) = "white" {}
+    _Gradient     ("Color Ramp", 2D) = "white" {}
+    _GradientScale ("Gradient Scale", Float) = 0
 	}
 
   CGINCLUDE
@@ -23,19 +23,18 @@
   frag_in vert(appdata v){
     frag_in o;
     o.position = mul(UNITY_MATRIX_MVP, v.vertex);
-    o.uv = v.uv + fixed2(_Offset, 0);
+    o.uv = v.uv;
     return o;
   }
 
-  sampler2D _MainTex;
-  sampler2D _Ramp;
+  sampler2D _GraphTexture;
+  sampler2D _Gradient;
+  float _GradientScale;
 
   float4 frag(frag_in input) : COLOR {
-    fixed4 color = tex2D(_MainTex, input.uv);
-    
-    fixed alpha = step(color.x, input.uv.y) * step(color.y, 1.0 - input.uv.y);
-
-    return float4(tex2D(_Ramp, color.z).rgb, alpha);
+    fixed4 color = tex2D(_GraphTexture, float2(input.uv.x, 0.5));
+    float alpha = step(input.uv.y, color.a);
+    return float4(tex2D(_Gradient, color.a * _GradientScale).rgb, alpha);
   }
   ENDCG
 
@@ -43,7 +42,7 @@
 		Tags {"Queue"="Transparent"}
 
     Cull Off 
-    Blend OneMinusSrcAlpha SrcAlpha
+    Blend SrcAlpha OneMinusSrcAlpha
 
     Pass {
       CGPROGRAM
