@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System;
-using System.Linq;
 using System.Collections;
 
 namespace Leap.Unity.RealtimeGraph {
@@ -18,12 +17,6 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     [SerializeField]
-    private float _framerateLineSpacing = 60;
-
-    [SerializeField]
-    private float _deltaLineSpacing = 10;
-
-    [SerializeField]
     private GraphType _graphType;
 
     [SerializeField]
@@ -33,28 +26,38 @@ namespace Leap.Unity.RealtimeGraph {
     protected int _updatePeriod = 10;
 
     [SerializeField]
+    private float _framerateLineSpacing = 60;
+
+    [SerializeField]
+    private float _deltaLineSpacing = 10;
+
+    [SerializeField]
     protected float _maxSmoothingDelay = 0.1f;
 
     [SerializeField]
     protected float _valueSmoothingDelay = 1;
-
-    [SerializeField]
-    protected Shader _graphShader;
-
-    [SerializeField]
-    protected Renderer _graphRenderer;
-
+    
+    [Header("References")]
     [SerializeField]
     protected LeapServiceProvider _provider;
 
     [SerializeField]
-    protected Text midValueLabel;
+    protected Renderer _graphRenderer;
 
     [SerializeField]
     protected Text titleLabel;
 
     [SerializeField]
     protected Canvas valueCanvas;
+
+    [SerializeField]
+    protected Text valueLabel;
+
+    public float UpdatePeriodFloat {
+      set {
+        _updatePeriod = Mathf.RoundToInt(Mathf.Lerp(1, 10, value));
+      }
+    }
 
     protected System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
     protected long _preCullTicks, _postRenderTicks;
@@ -154,6 +157,11 @@ namespace Leap.Unity.RealtimeGraph {
       titleLabel.text = Enum.GetName(typeof(GraphType), _graphType);
     }
 
+    public void SwitchGraph(string name) {
+      GraphType newType = (GraphType)Enum.Parse(typeof(GraphType), name);
+      SwitchGraph(newType);
+    }
+
     public void NextGraph() {
       GraphType nextType = (GraphType)(((int)_graphType + 1) % Enum.GetNames(typeof(GraphType)).Length);
       SwitchGraph(nextType);
@@ -237,7 +245,7 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     private float ticksToMs(long ticks) {
-      return (float)(ticks / (double)(System.Diagnostics.Stopwatch.Frequency / 1000.0));
+      return (float)(ticks / (System.Diagnostics.Stopwatch.Frequency / 1000.0));
     }
 
     private void UpdateTexture() {
@@ -254,7 +262,7 @@ namespace Leap.Unity.RealtimeGraph {
       _texture.SetPixels32(_colors);
       _texture.Apply();
 
-      midValueLabel.text = Mathf.Round(_smoothedValue.value).ToString();
+      valueLabel.text = (Mathf.Round(_smoothedValue.value * 10) * 0.1f).ToString();
 
       Vector3 localP = valueCanvas.transform.localPosition;
       localP.y = _smoothedValue.value / max - 0.5f;

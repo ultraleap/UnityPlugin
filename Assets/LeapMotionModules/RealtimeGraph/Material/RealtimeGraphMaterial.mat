@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: GraphNew Material
+  m_Name: RealtimeGraphMaterial
   m_Shader: {fileID: 4800000, guid: b2af0548007d5254487a3e1dda8b7eff, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
@@ -87,14 +87,14 @@ Material:
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _GridTexture
+          name: _LineTexture
         second:
           m_Texture: {fileID: 2800000, guid: 650f94ff90775b94eacf543ee237e10c, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _LineTexture
+          name: _GridTexture
         second:
           m_Texture: {fileID: 2800000, guid: 650f94ff90775b94eacf543ee237e10c, type: 3}
           m_Scale: {x: 1, y: 1}
@@ -150,6 +150,10 @@ Material:
         second: 0
       data:
         first:
+          name: _GraphScale
+        second: 6.63
+      data:
+        first:
           name: _LineA
         second: 5.53
       data:
@@ -160,10 +164,6 @@ Material:
         first:
           name: _GradientScale
         second: 0
-      data:
-        first:
-          name: _GraphScale
-        second: 6.63
     m_Colors:
       data:
         first:

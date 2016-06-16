@@ -1,4 +1,4 @@
-﻿Shader "LeapMotion/FramerateGraph" {
+﻿Shader "LeapMotion/RealtimeGraph" {
 	Properties {
     _GraphTexture ("Time Data",  2D)     = "white" {}
     _LineTexture  ("Line Texture", 2D)   = "white" {}
