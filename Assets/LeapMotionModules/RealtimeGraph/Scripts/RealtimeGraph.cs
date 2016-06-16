@@ -26,6 +26,9 @@ namespace Leap.Unity.RealtimeGraph {
     protected int _updatePeriod = 10;
 
     [SerializeField]
+    protected int _samplesPerFrame = 1;
+
+    [SerializeField]
     private float _framerateLineSpacing = 60;
 
     [SerializeField]
@@ -36,7 +39,7 @@ namespace Leap.Unity.RealtimeGraph {
 
     [SerializeField]
     protected float _valueSmoothingDelay = 1;
-    
+
     [Header("References")]
     [SerializeField]
     protected LeapServiceProvider _provider;
@@ -59,6 +62,12 @@ namespace Leap.Unity.RealtimeGraph {
       }
     }
 
+    public float BatchSizeFloat {
+      set {
+        _samplesPerFrame = Mathf.RoundToInt(Mathf.Lerp(1, 10, value));
+      }
+    }
+
     protected System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
     protected long _preCullTicks, _postRenderTicks;
     protected long _fixedUpdateTicks;
@@ -69,6 +78,10 @@ namespace Leap.Unity.RealtimeGraph {
 
     protected Dequeue<float> _history;
     protected SlidingMax _slidingMax;
+
+    protected int _sampleIndex = 0;
+    protected float _sampleValue = 0;
+    protected int _updateCount = 0;
 
     protected float _lineSpacing;
     protected Texture2D _texture;
@@ -105,16 +118,16 @@ namespace Leap.Unity.RealtimeGraph {
 
       _graphRenderer.material.SetTexture("_GraphTexture", _texture);
 
-      SwitchGraph(_graphType);
-
-      StartCoroutine(endOfFrameWaiter());
-
       _stopwatch.Start();
     }
 
     protected virtual void OnEnable() {
       Camera.onPreCull += onPreCull;
       Camera.onPostRender += onPostRender;
+
+      SwitchGraph(_graphType);
+
+      StartCoroutine(endOfFrameWaiter());
     }
 
     protected virtual void OnDisable() {
@@ -130,6 +143,16 @@ namespace Leap.Unity.RealtimeGraph {
 
       _smoothedValue.Update(value, Time.deltaTime);
 
+      _sampleValue += value;
+      _sampleIndex++;
+      if (_sampleIndex < _samplesPerFrame) {
+        return;
+      }
+
+      value = _sampleValue / _sampleIndex;
+      _sampleIndex = 0;
+      _sampleValue = 0;
+
       _history.PushFront(value);
       while (_history.Count > _historyLength) {
         _history.PopBack();
@@ -138,8 +161,10 @@ namespace Leap.Unity.RealtimeGraph {
       _slidingMax.AddValue(value);
       _smoothedMax.Update(_slidingMax.Max, Time.deltaTime);
 
-      if ((Time.frameCount % _updatePeriod) == 0) {
+      _updateCount++;
+      if (_updateCount >= _updatePeriod) {
         UpdateTexture();
+        _updateCount = 0;
       }
 
       _preCullTicks = -1;

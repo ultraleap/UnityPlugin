@@ -369,7 +369,7 @@ GameObject:
   - 222: {fileID: 22296912}
   - 114: {fileID: 11498460}
   m_Layer: 5
-  m_Name: Text (1)
+  m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1030,6 +1030,7 @@ MonoBehaviour:
   _graphType: 0
   _historyLength: 64
   _updatePeriod: 1
+  _samplesPerFrame: 1
   _framerateLineSpacing: 60
   _deltaLineSpacing: 5
   _maxSmoothingDelay: 0.1
