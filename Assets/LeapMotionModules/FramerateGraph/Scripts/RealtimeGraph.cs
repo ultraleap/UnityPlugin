@@ -14,23 +14,17 @@ namespace Leap.Unity.RealtimeGraph {
       RenderDelta,
       UpdateDelta,
       TrackingFramerate,
-      TrackingDelta,
       TrackingLatency
     }
 
-    [Serializable]
-    public class GradientMaximum {
-      public GraphType graphType;
-      public float crossoverPoint;
-      public float crossoverTolerance;
-      public bool isHigherBetter;
-    }
+    [SerializeField]
+    private float _framerateLineSpacing = 60;
+
+    [SerializeField]
+    private float _deltaLineSpacing = 10;
 
     [SerializeField]
     private GraphType _graphType;
-
-    [SerializeField]
-    private GradientMaximum[] _gradientMaximums;
 
     [SerializeField]
     protected int _historyLength = 128;
@@ -42,6 +36,9 @@ namespace Leap.Unity.RealtimeGraph {
     protected float _maxSmoothingDelay = 0.1f;
 
     [SerializeField]
+    protected float _valueSmoothingDelay = 1;
+
+    [SerializeField]
     protected Shader _graphShader;
 
     [SerializeField]
@@ -51,17 +48,17 @@ namespace Leap.Unity.RealtimeGraph {
     protected LeapServiceProvider _provider;
 
     [SerializeField]
-    protected Text upperValueLabel;
-
-    [SerializeField]
     protected Text midValueLabel;
 
-    [Header("Gradient Settings")]
     [SerializeField]
-    protected int _gradientResolution = 128;
+    protected Text titleLabel;
+
+    [SerializeField]
+    protected Canvas valueCanvas;
 
     protected System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
     protected long _preCullTicks, _postRenderTicks;
+    protected long _fixedUpdateTicks;
     protected long _endOfFrameTicks;
 
     protected long _updateTicks;
@@ -70,10 +67,11 @@ namespace Leap.Unity.RealtimeGraph {
     protected Dequeue<float> _history;
     protected SlidingMax _slidingMax;
 
-    protected GradientMaximum _gradientSetting;
+    protected float _lineSpacing;
     protected Texture2D _texture;
-    protected Texture2D _gradientTexture;
     protected Color32[] _colors;
+
+    protected SmoothedFloat _smoothedValue;
     protected SmoothedFloat _smoothedMax;
 
     protected virtual void OnValidate() {
@@ -81,15 +79,19 @@ namespace Leap.Unity.RealtimeGraph {
       _updatePeriod = Mathf.Max(1, _updatePeriod);
 
       if (_texture != null) {
-        UpdateTexture();
+        SwitchGraph(_graphType);
       }
     }
 
     protected virtual void Awake() {
       _history = new Dequeue<float>();
       _slidingMax = new SlidingMax(_historyLength);
+
       _smoothedMax = new SmoothedFloat();
       _smoothedMax.delay = _maxSmoothingDelay;
+
+      _smoothedValue = new SmoothedFloat();
+      _smoothedValue.delay = _valueSmoothingDelay;
     }
 
     protected virtual void Start() {
@@ -98,44 +100,23 @@ namespace Leap.Unity.RealtimeGraph {
       _texture.wrapMode = TextureWrapMode.Clamp;
       _colors = new Color32[_historyLength];
 
-      _gradientTexture = new Texture2D(_gradientResolution, 1, TextureFormat.ARGB32, false, false);
-      _gradientTexture.wrapMode = TextureWrapMode.Repeat;
-      _gradientTexture.filterMode = FilterMode.Bilinear;
-
-      //_graphRenderer.material = new Material(_graphShader);
       _graphRenderer.material.SetTexture("_GraphTexture", _texture);
-      _graphRenderer.material.SetTexture("_Gradient", _gradientTexture);
 
-      SwitchGraphType(_graphType);
+      SwitchGraph(_graphType);
 
       StartCoroutine(endOfFrameWaiter());
 
       _stopwatch.Start();
     }
 
-    public void SwitchGraphType(GraphType graphType) {
-      _graphType = graphType;
+    protected virtual void OnEnable() {
+      Camera.onPreCull += onPreCull;
+      Camera.onPostRender += onPostRender;
+    }
 
-      _gradientSetting = _gradientMaximums.FirstOrDefault(g => g.graphType == graphType);
-
-      float maxGradient = _gradientSetting.crossoverPoint * 2;
-      float crossoverPercent = _gradientSetting.crossoverTolerance / maxGradient;
-      float startCross = 0.5f - crossoverPercent * 2;
-      float endCross = 0.5f + crossoverPercent * 2;
-
-      for (int i = 0; i < _gradientResolution; i++) {
-        float percent = i / (float)_gradientResolution;
-        Color color;
-        if (percent < startCross) {
-          color = Color.green;
-        } else if (percent < endCross) {
-          color = Color.Lerp(Color.green, Color.yellow, Mathf.InverseLerp(startCross, endCross, percent));
-        } else {
-          color = Color.Lerp(Color.red, Color.red * 0.5f, Mathf.InverseLerp(endCross, 1, percent));
-        }
-        _gradientTexture.SetPixel(i, 0, color);
-      }
-      _gradientTexture.Apply();
+    protected virtual void OnDisable() {
+      Camera.onPreCull -= onPreCull;
+      Camera.onPostRender -= onPostRender;
     }
 
     protected virtual void Update() {
@@ -143,6 +124,8 @@ namespace Leap.Unity.RealtimeGraph {
       if (float.IsInfinity(value) || float.IsNaN(value)) {
         return;
       }
+
+      _smoothedValue.Update(value, Time.deltaTime);
 
       _history.PushFront(value);
       while (_history.Count > _historyLength) {
@@ -155,6 +138,31 @@ namespace Leap.Unity.RealtimeGraph {
       if ((Time.frameCount % _updatePeriod) == 0) {
         UpdateTexture();
       }
+
+      _preCullTicks = -1;
+    }
+
+    protected virtual void FixedUpdate() {
+      if (_fixedUpdateTicks == -1) {
+        _fixedUpdateTicks = _stopwatch.ElapsedTicks;
+      }
+    }
+
+    public void SwitchGraph(GraphType type) {
+      _graphType = type;
+
+      titleLabel.text = Enum.GetName(typeof(GraphType), _graphType);
+    }
+
+    public void NextGraph() {
+      GraphType nextType = (GraphType)(((int)_graphType + 1) % Enum.GetNames(typeof(GraphType)).Length);
+      SwitchGraph(nextType);
+    }
+
+    public void PrevGraph() {
+      int count = Enum.GetNames(typeof(GraphType)).Length;
+      GraphType nextType = (GraphType)(((int)_graphType - 1 + count) % count);
+      SwitchGraph(nextType);
     }
 
     private float getValue() {
@@ -169,8 +177,25 @@ namespace Leap.Unity.RealtimeGraph {
           return getUpdateMs();
         case GraphType.TrackingLatency:
           return (_provider.GetLeapController().Now() - _provider.CurrentFrame.Timestamp) / 1000.0f;
+        case GraphType.TrackingFramerate:
+          return _provider.CurrentFrame.CurrentFramesPerSecond;
         default:
-          throw new Exception("asd");
+          throw new Exception("Unexpected graph type");
+      }
+    }
+
+    private float getGraphSpacing() {
+      switch (_graphType) {
+        case GraphType.FrameDelta:
+        case GraphType.RenderDelta:
+        case GraphType.UpdateDelta:
+        case GraphType.TrackingLatency:
+          return _deltaLineSpacing;
+        case GraphType.Framerate:
+        case GraphType.TrackingFramerate:
+          return _framerateLineSpacing;
+        default:
+          throw new Exception("Unexpected graph type");
       }
     }
 
@@ -181,17 +206,20 @@ namespace Leap.Unity.RealtimeGraph {
         long ticks = _stopwatch.ElapsedTicks;
         _frameTicks = ticks - _endOfFrameTicks;
         _endOfFrameTicks = ticks;
+        _fixedUpdateTicks = -1;
       }
     }
 
-    private void onPreCull() {
-      if (_preCullTicks != -1) {
+    private void onPreCull(Camera camera) {
+      if (_preCullTicks == -1) {
         _preCullTicks = _stopwatch.ElapsedTicks;
-        _updateTicks = _preCullTicks - _endOfFrameTicks;
+        if (_fixedUpdateTicks != -1) {
+          _updateTicks = _preCullTicks - _fixedUpdateTicks;
+        }
       }
     }
 
-    private void onPostRender() {
+    private void onPostRender(Camera camera) {
       _postRenderTicks = _stopwatch.ElapsedTicks;
     }
 
@@ -213,7 +241,7 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     private void UpdateTexture() {
-      float max = _smoothedMax.value;
+      float max = _smoothedMax.value * 1.5f;
 
       for (int i = 0; i < _historyLength; i++) {
         float percent = Mathf.Clamp01(_history[i] / max);
@@ -221,13 +249,16 @@ namespace Leap.Unity.RealtimeGraph {
         _colors[i] = new Color32(percentByte, percentByte, percentByte, percentByte);
       }
 
-      _graphRenderer.material.SetFloat("_GradientScale", 50 * max / (_gradientSetting.crossoverPoint * 2) * (_gradientSetting.isHigherBetter ? -1 : 1));
+      _graphRenderer.material.SetFloat("_GraphScale", max / getGraphSpacing());
 
       _texture.SetPixels32(_colors);
       _texture.Apply();
 
-      upperValueLabel.text = Mathf.Round(max).ToString();
-      midValueLabel.text = Mathf.Round(max * 0.5f).ToString();
+      midValueLabel.text = Mathf.Round(_smoothedValue.value).ToString();
+
+      Vector3 localP = valueCanvas.transform.localPosition;
+      localP.y = _smoothedValue.value / max - 0.5f;
+      valueCanvas.transform.localPosition = localP;
     }
   }
 }

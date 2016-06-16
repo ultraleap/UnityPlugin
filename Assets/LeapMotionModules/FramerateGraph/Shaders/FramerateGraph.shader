@@ -1,8 +1,8 @@
 ﻿Shader "LeapMotion/FramerateGraph" {
 	Properties {
-    _GraphTexture ("Time Data",  2D) = "white" {}
-    _LineA ("Line A", Float) = 0
-    _LineB ("Line B", Float) = 0
+    _GraphTexture ("Time Data",  2D)     = "white" {}
+    _LineTexture  ("Line Texture", 2D)   = "white" {}
+    _GraphScale   ("_GraphScale", Float) = 0
 	}
 
   CGINCLUDE
@@ -28,16 +28,16 @@
   }
 
   sampler2D _GraphTexture;
-  float _LineA, _LineB;
+  sampler2D _LineTexture;
+  float _GraphScale;
 
   float4 frag(frag_in input) : COLOR {
     fixed percent = tex2D(_GraphTexture, float2(input.uv.x, 0.5)).a;
     fixed graphColor = step(input.uv.y, percent);
 
-    fixed distToLine = min(abs(_LineA - input.uv.y), abs(_LineB - input.uv.y));
-    fixed lineColor = smoothstep(0.006, 0.005, distToLine);
+    fixed lineColor = tex2D(_LineTexture, float2(0, input.uv.y * _GraphScale));
 
-    fixed color = (graphColor + 1) * 0.5 - lineColor;
+    fixed color = (graphColor + 1) * 0.5 * lineColor;
 
     //fixed color = lerp(graphColor, 1 - graphColor, lineColor);
     return float4(color, color, color, 1);
