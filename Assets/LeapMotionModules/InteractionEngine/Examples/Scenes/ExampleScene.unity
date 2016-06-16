@@ -203,7 +203,7 @@ Prefab:
     - target: {fileID: 13536856, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_Material
       value: 
-      objectReference: {fileID: 13400000, guid: 7134cd34cadef4b0c800194d94a39bf6,
+      objectReference: {fileID: 13400000, guid: 736ce6a56268a5f4e82243e04df6cf6a,
         type: 2}
     - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_IsActive
