@@ -1,9 +1,9 @@
 ﻿Shader "LeapMotion/RealtimeGraph" {
-	Properties {
+  Properties {
     _GraphTexture ("Time Data",  2D)     = "white" {}
     _LineTexture  ("Line Texture", 2D)   = "white" {}
     _GraphScale   ("_GraphScale", Float) = 0
-	}
+  }
 
   CGINCLUDE
   #include "UNityCG.cginc"
@@ -43,8 +43,8 @@
   }
   ENDCG
 
-	SubShader {
-		Tags {"Queue"="Geometry"}
+  SubShader {
+    Tags {"Queue"="Geometry"}
 
     Cull Off 
     Blend One Zero
@@ -55,7 +55,7 @@
       #pragma fragment frag
       ENDCG
     }
-	} 
+  } 
 
-	FallBack off
+  FallBack off
 }
