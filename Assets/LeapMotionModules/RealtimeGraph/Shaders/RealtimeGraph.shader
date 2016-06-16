@@ -29,7 +29,7 @@
 
   sampler2D _GraphTexture;
   sampler2D _LineTexture;
-  float _GraphScale;
+  half _GraphScale;
 
   float4 frag(frag_in input) : COLOR {
     fixed percent = tex2D(_GraphTexture, input.uv).a;
@@ -37,17 +37,17 @@
 
     fixed lineColor = tex2D(_LineTexture, input.uv * _GraphScale);
 
-    fixed color = (graphColor + 1) * 0.5 * lineColor;
+    fixed color = graphColor * lineColor + lineColor;
 
     return float4(color, color, color, 1);
   }
   ENDCG
 
 	SubShader {
-		Tags {"Queue"="Transparent"}
+		Tags {"Queue"="Geometry"}
 
     Cull Off 
-    Blend SrcAlpha OneMinusSrcAlpha
+    Blend One Zero
 
     Pass {
       CGPROGRAM
