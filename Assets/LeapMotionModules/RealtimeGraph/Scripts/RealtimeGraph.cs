@@ -137,6 +137,8 @@ namespace Leap.Unity.RealtimeGraph {
 
     protected virtual void Update() {
       float value = getValue();
+      _preCullTicks = -1;
+
       if (float.IsInfinity(value) || float.IsNaN(value)) {
         return;
       }
@@ -166,8 +168,6 @@ namespace Leap.Unity.RealtimeGraph {
         UpdateTexture();
         _updateCount = 0;
       }
-
-      _preCullTicks = -1;
     }
 
     protected virtual void FixedUpdate() {
