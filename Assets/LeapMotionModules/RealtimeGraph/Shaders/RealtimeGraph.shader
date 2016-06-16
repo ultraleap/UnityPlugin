@@ -32,14 +32,13 @@
   float _GraphScale;
 
   float4 frag(frag_in input) : COLOR {
-    fixed percent = tex2D(_GraphTexture, float2(input.uv.x, 0.5)).a;
+    fixed percent = tex2D(_GraphTexture, input.uv).a;
     fixed graphColor = step(input.uv.y, percent);
 
-    fixed lineColor = tex2D(_LineTexture, float2(0, input.uv.y * _GraphScale));
+    fixed lineColor = tex2D(_LineTexture, input.uv * _GraphScale);
 
     fixed color = (graphColor + 1) * 0.5 * lineColor;
 
-    //fixed color = lerp(graphColor, 1 - graphColor, lineColor);
     return float4(color, color, color, 1);
   }
   ENDCG
