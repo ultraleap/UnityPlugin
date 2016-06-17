@@ -57,6 +57,9 @@ namespace Leap.Unity.RealtimeGraph {
     [SerializeField]
     protected Text valueLabel;
 
+    [SerializeField]
+    protected GameObject customSamplePrefab;
+
     public float UpdatePeriodFloat {
       set {
         _updatePeriod = Mathf.RoundToInt(Mathf.Lerp(1, 10, value));
@@ -90,6 +93,9 @@ namespace Leap.Unity.RealtimeGraph {
 
     protected SmoothedFloat _smoothedValue;
     protected SmoothedFloat _smoothedMax;
+
+    protected Stack<GameObject> _customSampleLabelPool = new Stack<GameObject>();
+    protected Dequeue<GameObject> _customSampleLabelActive = new Dequeue<GameObject>();
 
     protected Dequeue<List<CustomSample>> _customSampleBuffer;
     protected Dictionary<string, CustomSample> _completedSamples = new Dictionary<string, CustomSample>();
@@ -194,21 +200,28 @@ namespace Leap.Unity.RealtimeGraph {
         return;
       }
 
-      List<CustomSample> expiredSamples;
-      _customSampleBuffer.PopBack(out expiredSamples);
+      List<CustomSample> samplesForFrame;
+      {
+        List<CustomSample> expiredSamples;
+        _customSampleBuffer.PopBack(out expiredSamples);
 
-      for (int i = 0; i < expiredSamples.Count; i++) {
-        CustomSample.Recycle(expiredSamples[i]);
-      }
-      expiredSamples.Clear();
-
-      expiredSamples.AddRange(_completedSamples.Values);
-      for (int i = 0; i < expiredSamples.Count; i++) {
-        expiredSamples[i].totalExclusiveTicks /= _sampleIndex;
-        expiredSamples[i].totalInclusiveTicks /= _sampleIndex;
+        for (int i = 0; i < expiredSamples.Count; i++) {
+          CustomSample.Recycle(expiredSamples[i]);
+        }
+        expiredSamples.Clear();
+        samplesForFrame = expiredSamples;
       }
 
-      _customSampleBuffer.PushFront(expiredSamples);
+      List<CustomSample> newSamples = samplesForFrame;
+      samplesForFrame.AddRange(_completedSamples.Values);
+      for (int i = 0; i < samplesForFrame.Count; i++) {
+        samplesForFrame[i].totalExclusiveTicks /= _sampleIndex;
+        samplesForFrame[i].totalInclusiveTicks /= _sampleIndex;
+      }
+
+      _customSampleBuffer.PushFront(samplesForFrame);
+
+      updateCustomSamplePanel(samplesForFrame);
 
       value = _sampleValue / _sampleIndex;
       _sampleIndex = 0;
@@ -332,6 +345,10 @@ namespace Leap.Unity.RealtimeGraph {
       return (float)(ticks / (System.Diagnostics.Stopwatch.Frequency / 1000.0));
     }
 
+    private string msToString(float ms) {
+      return (Mathf.Round(ms * 10) * 0.1f).ToString();
+    }
+
     private void UpdateTexture() {
       float max = _smoothedMax.value * 1.5f;
 
@@ -346,14 +363,53 @@ namespace Leap.Unity.RealtimeGraph {
       _texture.SetPixels32(_colors);
       _texture.Apply();
 
-      valueLabel.text = (Mathf.Round(_smoothedValue.value * 10) * 0.1f).ToString();
+      valueLabel.text = msToString(_smoothedValue.value);
 
       Vector3 localP = valueCanvas.transform.localPosition;
       localP.y = _smoothedValue.value / max - 0.5f;
       valueCanvas.transform.localPosition = localP;
     }
 
-    protected class CustomSample {
+    private void updateCustomSamplePanel(List<CustomSample> unorderedSamples) {
+      unorderedSamples.Sort();
+
+      //Pool sample objects that are not needed
+      while (_customSampleLabelActive.Count > unorderedSamples.Count) {
+        GameObject activeObj;
+        _customSampleLabelActive.PopBack(out activeObj);
+
+        activeObj.SetActive(false);
+        _customSampleLabelPool.Push(activeObj);
+      }
+
+      //Enable sample objects that are needed
+      while (_customSampleLabelActive.Count < unorderedSamples.Count) {
+        GameObject sampleObj;
+        if (_customSampleLabelPool.Count > 0) {
+          sampleObj = _customSampleLabelPool.Pop();
+          sampleObj.SetActive(true);
+        } else {
+          sampleObj = Instantiate(customSamplePrefab);
+          sampleObj.transform.SetParent(customSamplePrefab.transform.parent);
+          sampleObj.SetActive(true);
+        }
+
+        _customSampleLabelActive.PushFront(sampleObj);
+      }
+
+      //Update sample objects
+      for (int i = 0; i < unorderedSamples.Count; i++) {
+        GameObject sampleObj = _customSampleLabelActive[i];
+        sampleObj.transform.SetSiblingIndex(i);
+
+        Text sampleText = sampleObj.GetComponentInChildren<Text>();
+        sampleText.text = unorderedSamples[i].name + "\n";
+        sampleText.text += "inclusive: " + msToString(ticksToMs(unorderedSamples[i].totalInclusiveTicks)) + " ms\n";
+        sampleText.text += "exclusive: " + msToString(ticksToMs(unorderedSamples[i].totalExclusiveTicks)) + " ms";
+      }
+    }
+
+    protected class CustomSample : IComparable<CustomSample> {
       private static Queue<CustomSample> _pool = new Queue<CustomSample>();
 
       public string name;
@@ -379,6 +435,10 @@ namespace Leap.Unity.RealtimeGraph {
 
       public static void Recycle(CustomSample sample) {
         _pool.Enqueue(sample);
+      }
+
+      public int CompareTo(CustomSample other) {
+        return totalExclusiveTicks.CompareTo(other.totalExclusiveTicks);
       }
     }
   }
