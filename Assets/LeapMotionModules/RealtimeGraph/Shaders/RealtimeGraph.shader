@@ -39,7 +39,7 @@
 
     fixed color = graphColor * lineColor + lineColor;
 
-    return float4(color, color, color, 1);
+    return color;
   }
   ENDCG
 
