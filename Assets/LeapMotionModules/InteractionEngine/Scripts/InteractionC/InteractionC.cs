@@ -51,7 +51,8 @@ namespace Leap.Unity.Interaction.CApi {
     AccelerationEnabled = 0x01,
     VelocityEnabled = 0x02,
     GravityEnabled = 0x04,
-    ReportNoResult = 0x08
+    ReportNoResult = 0x08,
+    NotifiedOfTeleport = 0x10
   };
 
   public enum HandResultFlags : uint {

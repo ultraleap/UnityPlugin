@@ -530,7 +530,7 @@ namespace Leap.Unity.Interaction {
         return;
       }
 
-      dispatchOnHandsHolding(_leapProvider.CurrentFrame, isPhysics: false);
+      dispatchOnHandsHoldingAll(_leapProvider.CurrentFrame, isPhysics: false);
 
       unregisterMisbehavingBehaviours();
 
@@ -611,7 +611,7 @@ namespace Leap.Unity.Interaction {
         _registeredBehaviours[i].NotifyPreSolve();
       }
 
-      dispatchOnHandsHolding(frame, isPhysics: true);
+      dispatchOnHandsHoldingAll(frame, isPhysics: true);
 
       updateInteractionRepresentations();
 
@@ -619,14 +619,9 @@ namespace Leap.Unity.Interaction {
 
       simulateInteraction();
 
-      bool didAnyHandGrasp;
-      updateInteractionStateChanges(frame, out didAnyHandGrasp);
+      updateInteractionStateChanges(frame);
 
       dispatchSimulationResults();
-
-      if (didAnyHandGrasp) {
-        dispatchOnHandsHolding(frame, isPhysics: true);
-      }
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         _registeredBehaviours[i].NotifyPostSolve();
@@ -655,9 +650,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void dispatchOnHandsHolding(Frame frame, bool isPhysics) {
+    protected virtual void dispatchOnHandsHoldingAll(Frame frame, bool isPhysics) {
       var hands = frame.Hands;
-
       //Loop through the currently grasped objects to dispatch their OnHandsHold callback
       for (int i = 0; i < _graspedBehaviours.Count; i++) {
         dispatchOnHandsHolding(hands, _graspedBehaviours[i], isPhysics);
@@ -705,16 +699,16 @@ namespace Leap.Unity.Interaction {
       InteractionC.UpdateController(ref _scene, ref _controllerTransform);
     }
 
-    protected virtual void updateInteractionStateChanges(Frame frame, out bool didAnyHandBeginGrasp) {
-      didAnyHandBeginGrasp = false;
+    protected virtual void updateInteractionStateChanges(Frame frame) {
       var hands = frame.Hands;
+
+      INTERACTION_HAND_RESULT handResult = new INTERACTION_HAND_RESULT();
 
       //First loop through all the hands and get their classifications from the engine
       for (int i = 0; i < hands.Count; i++) {
         Hand hand = hands[i];
 
-        bool hasHandResult = false;
-        INTERACTION_HAND_RESULT handResult = new INTERACTION_HAND_RESULT();
+        bool handResultForced = false;
 
         //Get the InteractionHand associated with this hand id
         InteractionHand interactionHand;
@@ -740,6 +734,8 @@ namespace Leap.Unity.Interaction {
             try {
               //This also dispatched InteractionObject.OnHandRegainedTracking()
               interactionHand.RegainTracking(hand);
+
+              // NotifyHandRegainedTracking() did not throw, continue on to NotifyHandsHoldPhysics().
               dispatchOnHandsHolding(hands, interactionHand.graspedObject, isPhysics: true);
             } catch (Exception e) {
               _misbehavingBehaviours.Add(interactionHand.graspedObject);
@@ -748,8 +744,7 @@ namespace Leap.Unity.Interaction {
             }
 
             //Override the existing classification to force the hand to grab the old object
-            hasHandResult = true;
-            handResult = new INTERACTION_HAND_RESULT();
+            handResultForced = true;
             handResult.classification = ManipulatorMode.Grasp;
             handResult.handFlags = HandResultFlags.ManipulatorMode;
             handResult.instanceHandle = interactionHand.graspedObject.ShapeInstanceHandle;
@@ -764,9 +759,8 @@ namespace Leap.Unity.Interaction {
           }
         }
 
-        if (!hasHandResult) {
+        if (!handResultForced) {
           handResult = getHandResults(interactionHand);
-          hasHandResult = true;
         }
 
         interactionHand.UpdateHand(hand);
@@ -778,14 +772,14 @@ namespace Leap.Unity.Interaction {
                 IInteractionBehaviour interactionBehaviour;
                 if (_instanceHandleToBehaviour.TryGetValue(handResult.instanceHandle, out interactionBehaviour)) {
                   if (interactionHand.graspedObject == null) {
-                    didAnyHandBeginGrasp = true;
-
                     if (!interactionBehaviour.IsBeingGrasped) {
                       _graspedBehaviours.Add(interactionBehaviour);
                     }
 
                     try {
                       interactionHand.GraspObject(interactionBehaviour, isUserGrasp: false);
+
+                      dispatchOnHandsHolding(hands, interactionBehaviour, isPhysics: true);
                     } catch (Exception e) {
                       _misbehavingBehaviours.Add(interactionBehaviour);
                       Debug.LogException(e);
