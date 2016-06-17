@@ -6,8 +6,8 @@ namespace Leap.Unity.RealtimeGraph {
     private T[] _array;
     private int _back, _count;
 
-    public Dequeue() {
-      _array = new T[8];
+    public Dequeue(int capacity = 8) {
+      _array = new T[capacity];
       _back = 0;
       _count = 0;
     }

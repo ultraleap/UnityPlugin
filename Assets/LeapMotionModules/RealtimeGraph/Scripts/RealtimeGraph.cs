@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Leap.Unity.RealtimeGraph {
 
@@ -90,6 +91,42 @@ namespace Leap.Unity.RealtimeGraph {
     protected SmoothedFloat _smoothedValue;
     protected SmoothedFloat _smoothedMax;
 
+    protected Dequeue<List<CustomSample>> _customSampleBuffer;
+    protected Dictionary<string, CustomSample> _completedSamples = new Dictionary<string, CustomSample>();
+    protected Stack<CustomSample> _currentSamples = new Stack<CustomSample>();
+
+    public void BeginCustomSample(string sampleName) {
+      long currTicks = _stopwatch.ElapsedTicks;
+
+      if (_currentSamples.Count != 0) {
+        CustomSample currentSample = _currentSamples.Peek();
+        currentSample.totalExclusiveTicks += currTicks - currentSample.exclusiveStart;
+      }
+
+      CustomSample sample;
+      if (!_completedSamples.TryGetValue(sampleName, out sample)) {
+        sample = CustomSample.Create(sampleName);
+        sample.name = sampleName;
+      }
+
+      sample.exclusiveStart = sample.inclusiveStart = currTicks;
+
+      _currentSamples.Push(sample);
+    }
+
+    public void EndCustomSample() {
+      long currTicks = _stopwatch.ElapsedTicks;
+
+      var sample = _currentSamples.Pop();
+      sample.totalInclusiveTicks = currTicks - sample.inclusiveStart;
+      sample.totalExclusiveTicks += currTicks - sample.exclusiveStart;
+
+      if (_currentSamples.Count != 0) {
+        var nextSample = _currentSamples.Peek();
+        nextSample.exclusiveStart = currTicks;
+      }
+    }
+
     protected virtual void OnValidate() {
       _historyLength = Mathf.Max(1, _historyLength);
       _updatePeriod = Mathf.Max(1, _updatePeriod);
@@ -100,14 +137,20 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     protected virtual void Awake() {
-      _history = new Dequeue<float>();
+      _history = new Dequeue<float>(_historyLength);
       _slidingMax = new SlidingMax(_historyLength);
+      _customSampleBuffer = new Dequeue<List<CustomSample>>(_historyLength);
 
       _smoothedMax = new SmoothedFloat();
       _smoothedMax.delay = _maxSmoothingDelay;
 
       _smoothedValue = new SmoothedFloat();
       _smoothedValue.delay = _valueSmoothingDelay;
+
+      for (int i = 0; i < _historyLength; i++) {
+        _history.PushFront(0);
+        _customSampleBuffer.PushFront(new List<CustomSample>());
+      }
     }
 
     protected virtual void Start() {
@@ -150,6 +193,22 @@ namespace Leap.Unity.RealtimeGraph {
       if (_sampleIndex < _samplesPerFrame) {
         return;
       }
+
+      List<CustomSample> expiredSamples;
+      _customSampleBuffer.PopBack(out expiredSamples);
+
+      for (int i = 0; i < expiredSamples.Count; i++) {
+        CustomSample.Recycle(expiredSamples[i]);
+      }
+      expiredSamples.Clear();
+
+      expiredSamples.AddRange(_completedSamples.Values);
+      for (int i = 0; i < expiredSamples.Count; i++) {
+        expiredSamples[i].totalExclusiveTicks /= _sampleIndex;
+        expiredSamples[i].totalInclusiveTicks /= _sampleIndex;
+      }
+
+      _customSampleBuffer.PushFront(expiredSamples);
 
       value = _sampleValue / _sampleIndex;
       _sampleIndex = 0;
@@ -292,6 +351,35 @@ namespace Leap.Unity.RealtimeGraph {
       Vector3 localP = valueCanvas.transform.localPosition;
       localP.y = _smoothedValue.value / max - 0.5f;
       valueCanvas.transform.localPosition = localP;
+    }
+
+    protected class CustomSample {
+      private static Queue<CustomSample> _pool = new Queue<CustomSample>();
+
+      public string name;
+      public long totalInclusiveTicks;
+      public long totalExclusiveTicks;
+
+      public long inclusiveStart, exclusiveStart;
+
+      private CustomSample() { }
+
+      public static CustomSample Create(string name) {
+        CustomSample sample;
+        if (_pool.Count == 0) {
+          sample = new CustomSample();
+        } else {
+          sample = _pool.Dequeue();
+        }
+
+        //init
+        sample.name = name;
+        return sample;
+      }
+
+      public static void Recycle(CustomSample sample) {
+        _pool.Enqueue(sample);
+      }
     }
   }
 }
