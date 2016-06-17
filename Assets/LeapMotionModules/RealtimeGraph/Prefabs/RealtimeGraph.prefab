@@ -1160,6 +1160,7 @@ MonoBehaviour:
   titleLabel: {fileID: 11425492}
   valueCanvas: {fileID: 22394056}
   valueLabel: {fileID: 11498460}
+  customSamplePrefab: {fileID: 0}
 --- !u!114 &11419876
 MonoBehaviour:
   m_ObjectHideFlags: 1
