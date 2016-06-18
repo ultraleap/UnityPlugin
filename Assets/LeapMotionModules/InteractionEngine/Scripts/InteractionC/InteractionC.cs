@@ -43,7 +43,8 @@ namespace Leap.Unity.Interaction.CApi {
     HasGravity            = 0x01,
     ContactEnabled        = 0x02,
     GraspEnabled          = 0x04,
-    SphericalInside       = 0x08
+    SphericalInside       = 0x08,
+    PhysicsScale          = 0x10
   };
 
   public enum ShapeInfoFlags : uint {
@@ -53,7 +54,7 @@ namespace Leap.Unity.Interaction.CApi {
 
   public enum UpdateInfoFlags : uint {
     None = 0x00,
-    ApplyAcceleration = 0x01,
+    AccelerationEnabled = 0x01,
     VelocityEnabled = 0x02,
     GravityEnabled = 0x04,
     ReportNoResult = 0x08
@@ -178,6 +179,7 @@ namespace Leap.Unity.Interaction.CApi {
     public SceneInfoFlags sceneFlags;
     public LEAP_VECTOR gravity;
     public float depthUntilSphericalInside;
+    public float physicsScale;
     public IntPtr ldatData;
     public UInt32 ldatSize;
   }

@@ -29,16 +29,42 @@ namespace Leap.Unity {
       return Quaternion.Inverse(Quaternion.LookRotation(modelFingerPointing, -modelPalmFacing));
     }
 
+    private RiggedHand riggedHand;
+
     /** Updates the bone rotations. */
     public override void UpdateFinger() {
       for (int i = 0; i < bones.Length; ++i) {
         if (bones[i] != null) {
           bones[i].rotation = GetBoneRotation(i) * Reorientation();
           if (deformPosition) {
-            bones[i].position = GetBoneCenter(i);
+            bones[i].position = GetJointPosition(i);
           }
         }
       }
+    }
+    public void SetupRiggedFinger (bool useMetaCarpals) {
+      findBoneTransforms(useMetaCarpals);
+      modelFingerPointing = calulateModelFingerPointing();
+    }
+
+    private void findBoneTransforms(bool useMetaCarpals) {
+      if (!useMetaCarpals || fingerType == Finger.FingerType.TYPE_THUMB) {
+        bones[1] = transform;
+        bones[2] = transform.GetChild(0).transform;
+        bones[3] = transform.GetChild(0).transform.GetChild(0).transform;
+      }
+      else {
+        bones[0] = transform;
+        bones[1] = transform.GetChild(0).transform;
+        bones[2] = transform.GetChild(0).transform.GetChild(0).transform;
+        bones[3] = transform.GetChild(0).transform.GetChild(0).transform.GetChild(0).transform;
+
+      }
+    }
+    private Vector3 calulateModelFingerPointing() {
+      Vector3 distance = transform.InverseTransformPoint(transform.position) -  transform.InverseTransformPoint(transform.GetChild(0).transform.position);
+      Vector3 zeroed = RiggedHand.CalculateZeroedVector(distance);
+      return zeroed;
     }
   } 
 }

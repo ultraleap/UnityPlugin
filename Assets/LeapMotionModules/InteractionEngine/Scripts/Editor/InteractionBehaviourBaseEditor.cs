@@ -6,14 +6,14 @@ namespace Leap.Unity.Interaction {
   [CanEditMultipleObjects]
   [CustomEditor(typeof(InteractionBehaviourBase), true)]
   public class InteractionBehaviourBaseEditor : CustomEditorBase {
-    protected InteractionBehaviour _interactionBehaviour;
+    protected InteractionBehaviourBase _interactionBehaviour;
     protected InteractionManager _manager;
 
     protected override void OnEnable() {
       base.OnEnable();
 
       if (targets.Length == 1) {
-        _interactionBehaviour = target as InteractionBehaviour;
+        _interactionBehaviour = target as InteractionBehaviourBase;
         _manager = _interactionBehaviour.GetComponentInParent<InteractionManager>();
         if (_manager == null) {
           _manager = FindObjectOfType<InteractionManager>();
@@ -33,11 +33,6 @@ namespace Leap.Unity.Interaction {
       }
 
       Rigidbody rigidbody = _interactionBehaviour.GetComponent<Rigidbody>();
-
-      if (_interactionBehaviour.GetComponentsInParent<InteractionBehaviourBase>().Length > 1 ||
-          _interactionBehaviour.GetComponentsInChildren<InteractionBehaviourBase>().Length > 1) {
-        EditorGUILayout.HelpBox("Interaction Behaviour cannot be a child sibling or parent of another Interaction Behaviour.", MessageType.Error);
-      }
 
       if (rigidbody == null) {
         using (new GUILayout.HorizontalScope()) {

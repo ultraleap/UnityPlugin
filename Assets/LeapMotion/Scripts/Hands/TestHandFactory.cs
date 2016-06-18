@@ -4,6 +4,7 @@ using System;
 using System.Runtime.InteropServices;
   using System.Collections.Generic;
   using Leap.Unity;
+  using UnityEngine;
 
 
     public class TestHandFactory {
@@ -50,14 +51,37 @@ using System.Runtime.InteropServices;
                 new Vector(-4.36385750984f, 6.5f, 31.0111342526f)
             );
             LeapTransform restPosition = LeapTransform.Identity;
+            //restPosition.rotation = RotationFromTo(Vector.Up, Vector.Left).Multiply(RotationFromTo(Vector.Up, Vector.Left));
+            restPosition.rotation = AngleAxis(180 * Constants.DEG_TO_RAD, Vector.Forward);
             if(isLeft){
-                restPosition.translation = new Vector(-80f, 120f, 0f);
-            } else {
                 restPosition.translation = new Vector(80f, 120f, 0f);
+
+            } else {
+                restPosition.translation = new Vector(-80f, 120f, 0f);
                 restPosition.MirrorX();
             }
             return testHand.TransformedCopy(restPosition);
         }
+
+         static LeapQuaternion AngleAxis(float angle, Vector axis){
+           if(!axis.MagnitudeSquared.NearlyEquals(1.0f)){
+             throw new ArgumentException("Axis must be a unit vector.");
+           }
+           float sineHalfAngle = Mathf.Sin(angle/2.0f);
+           LeapQuaternion q = new LeapQuaternion(sineHalfAngle * axis.x,
+                                                 sineHalfAngle * axis.y,
+                                                 sineHalfAngle * axis.z,
+                                                 Mathf.Cos(angle/2.0f));
+           return q.Normalized;
+         }
+
+    static LeapQuaternion RotationBetween(Vector fromDirection, Vector toDirection)
+    {
+      float m = Mathf.Sqrt(2.0f + 2.0f * fromDirection.Dot(toDirection));
+      Vector w = (1.0f / m) * fromDirection.Cross(toDirection);
+      return new LeapQuaternion(w.x, w.y, w.z, 0.5f * m);
+    }
+
          static Finger MakeThumb(int frameId, int handId, bool isLeft){
             //Thumb
             Vector position = new Vector(19.3382610281f, -6.0f, 53.168484654f);

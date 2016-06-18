@@ -67,6 +67,10 @@ namespace Leap.Unity {
       }
     }
 
+    public override bool SupportsEditorPersistence() {
+      return true;
+    }
+
     public override Hand GetLeapHand() {
       return hand_;
     }
@@ -335,8 +339,8 @@ namespace Leap.Unity {
 
         Vector3 spoke = new Vector3(dx, dy, 0);
 
-        verts.Add(p0 + spoke);
-        verts.Add(p1 + spoke);
+        verts.Add((p0 + spoke) * transform.lossyScale.x);
+        verts.Add((p1 + spoke) * transform.lossyScale.x);
 
         colors.Add(Color.white);
         colors.Add(Color.white);

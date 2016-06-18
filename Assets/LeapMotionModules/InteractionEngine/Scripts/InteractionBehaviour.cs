@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Leap.Unity.Interaction.CApi;
 using LeapInternal;
 
@@ -27,7 +26,6 @@ namespace Leap.Unity.Interaction {
   /// This default implementation has the following requirements:
   ///    - A Rigidbody is required
   ///    - Kinematic movement must still be simulated via Rigidbody kinematic movement, as opposed to rigid movement of the Transform.
-  ///    - This behaviour cannot be a child of another InteractionBehaviour.
   ///    - Any non-continuous movement must be noted using the NotifyTeleported() method.
   ///    - Any forces or torques must be applied using the AddLinearAcceleration and AddAngularAcceleration methods instead of
   ///      the Rigidbody AddForce or AddTorque methods.
@@ -40,36 +38,32 @@ namespace Leap.Unity.Interaction {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 
-    [Tooltip("A transform that acts as the parent of all renderers for this object.  By seperating out the graphical " +
-             "representation from the physical, interaction fidelity can be improved and latency reduced.")]
-    [SerializeField]
-    protected Transform _graphicalAnchor;
-
     [SerializeField]
     protected InteractionMaterial _material;
 
-    protected Renderer[] _renderers;
     protected Transform[] _childrenArray;
     protected Rigidbody _rigidbody;
 
+    //Rigidbody settings
     protected bool _isKinematic;
     protected bool _useGravity;
     protected float _drag;
     protected float _angularDrag;
+
     protected bool _recievedVelocityUpdate = false;
+    protected bool _recievedSimulationResults = false;
     protected bool _notifiedOfTeleport = false;
     protected bool _ignoringBrushes = false;
 
     protected Vector3 _solvedPosition;
     protected Quaternion _solvedRotation;
 
+    protected ControllerContainer _controllers;
+    protected PhysicMaterialReplacer _materialReplacer;
+    protected RigidbodyWarper _warper;
+
     protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
-
-    protected Dictionary<int, HandPointCollection> _handIdToPoints;
-    protected LEAP_IE_KABSCH _kabsch;
-
-    private Coroutine _graphicalLerpCoroutine = null;
 
     private Bounds _debugBounds;
     private bool _showDebugRecievedVelocity = false;
@@ -80,7 +74,7 @@ namespace Leap.Unity.Interaction {
     /// Sets or Gets whether or not this InteractionBehaviour is Kinematic or not.  Always use this instead
     /// of Rigidbody.IsKinematic because InteractionBehaviour overrides the kinematic status of the Rigidbody.
     /// </summary>
-    public bool IsKinematic {
+    public bool isKinematic {
       get {
         return _isKinematic;
       }
@@ -96,11 +90,35 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public ControllerContainer controllers {
+      get {
+        return _controllers;
+      }
+    }
+
+    public new Rigidbody rigidbody {
+      get {
+        return _rigidbody;
+      }
+    }
+
+    public RigidbodyWarper warper {
+      get {
+        return _warper;
+      }
+    }
+
+    public InteractionMaterial material {
+      get {
+        return _material;
+      }
+    }
+
     /// <summary>
     /// Sets or Gets whether or not this InteractionBehaviour uses Gravity or not.  Always use this instead
     /// of Rigidbody.UseGravity because InteractionBehaviour overrides the gravity status of the Rigidbody.
     /// </summary>
-    public bool UseGravity {
+    public bool useGravity {
       get {
         return _useGravity;
       }
@@ -109,33 +127,6 @@ namespace Leap.Unity.Interaction {
         if (!HasShapeInstance) {
           _rigidbody.useGravity = _useGravity;
         }
-      }
-    }
-
-    /// <summary>
-    /// Sets or Gets the transform used as the graphical anchor of this InteractionBehaviour.
-    /// </summary>
-    public Transform GraphicalAnchor {
-      get {
-        return _graphicalAnchor;
-      }
-      set {
-        if (!value.IsChildOf(transform) || value == transform) {
-          throw new ArgumentException("Cannot have a graphical anchor that is not a child of the InteractionBehaviour");
-        }
-
-        if (_graphicalLerpCoroutine != null) {
-          StopCoroutine(_graphicalLerpCoroutine);
-          _graphicalLerpCoroutine = null;
-        }
-
-        if (_graphicalAnchor != null) {
-          _graphicalAnchor.gameObject.SetActive(true);
-        }
-
-        _graphicalAnchor = value;
-
-        updateState();
       }
     }
 
@@ -149,7 +140,6 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Adds an angular acceleration to the center of mass of this object.  Use this instead of Rigidbody.AddTorque()
     /// </summary>
-    /// <param name="acceleration"></param>
     public void AddAngularAcceleration(Vector3 acceleration) {
       _accumulatedAngularAcceleration += acceleration;
     }
@@ -168,6 +158,8 @@ namespace Leap.Unity.Interaction {
     protected override void OnRegistered() {
       base.OnRegistered();
 
+      _controllers = new ControllerContainer(this, _material);
+
       _rigidbody = GetComponent<Rigidbody>();
       if (_rigidbody == null) {
         //Should only happen if the user has done some trickery since there is a RequireComponent attribute
@@ -175,25 +167,30 @@ namespace Leap.Unity.Interaction {
       }
       _rigidbody.maxAngularVelocity = float.PositiveInfinity;
 
+      _materialReplacer = new PhysicMaterialReplacer(transform, _material);
+      _warper = new RigidbodyWarper(_manager, transform, _rigidbody, _material.GraphicalReturnTime);
+
       _childrenArray = GetComponentsInChildren<Transform>(true);
       updateLayer();
-
-      //Technically we only need one instance in the entire scene, but easier for each object to have it's own instance for now.
-      //TODO: Investigate allowing this to be a singleton?
-      KabschC.Construct(ref _kabsch);
     }
 
     protected override void OnUnregistered() {
       base.OnUnregistered();
 
-      resetState();
+      _warper.Dispose();
+      _warper = null;
 
-      KabschC.Destruct(ref _kabsch);
+      revertRigidbodyState();
     }
 
 #if UNITY_EDITOR
     protected override void OnPreSolve() {
       base.OnPreSolve();
+
+      if (IsBeingGrasped && UntrackedHandCount == 0 &&
+          Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale) {
+        _manager.ReleaseObject(this);
+      }
 
       _showDebugRecievedVelocity = false;
     }
@@ -202,32 +199,34 @@ namespace Leap.Unity.Interaction {
     protected override void OnPostSolve() {
       base.OnPostSolve();
 
-      if (_recievedVelocityUpdate) {
-        //If we recieved a velocity update, gravity must always be disabled because the
-        //velocity update accounts for gravity.
-        if (_rigidbody.useGravity) {
-          _rigidbody.useGravity = false;
-        }
-      } else {
-        //If we did not recieve a velocity update, we set the rigidbody's gravity status
-        //to match whatever the user has set.
-        if (_rigidbody.useGravity != _useGravity) {
-          _rigidbody.useGravity = _useGravity;
+      if (!IsBeingGrasped) {
+        if (_recievedSimulationResults) {
+          _materialReplacer.ReplaceMaterials();
+        } else {
+          _materialReplacer.RevertMaterials();
         }
 
-        //Only apply if non-zero to prevent waking up the body
-        if (_accumulatedLinearAcceleration != Vector3.zero) {
-          _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
-        }
+        if (_recievedVelocityUpdate) {
+          //If we recieved a velocity update, gravity must always be disabled because the
+          //velocity update accounts for gravity.
+          if (_rigidbody.useGravity) {
+            _rigidbody.useGravity = false;
+          }
+        } else {
+          //If we did not recieve a velocity update, we set the rigidbody's gravity status
+          //to match whatever the user has set.
+          if (_rigidbody.useGravity != _useGravity) {
+            _rigidbody.useGravity = _useGravity;
+          }
 
-        if (_accumulatedAngularAcceleration != Vector3.zero) {
-          _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
-        }
-      }
+          //Only apply if non-zero to prevent waking up the body
+          if (_accumulatedLinearAcceleration != Vector3.zero) {
+            _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
+          }
 
-      if (IsBeingGrasped) {
-        if (Vector3.Distance(_solvedPosition, _rigidbody.position) > _material.ReleaseDistance) {
-          _manager.ReleaseObject(this);
+          if (_accumulatedAngularAcceleration != Vector3.zero) {
+            _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
+          }
         }
       }
 
@@ -235,6 +234,7 @@ namespace Leap.Unity.Interaction {
       _accumulatedLinearAcceleration = Vector3.zero;
       _accumulatedAngularAcceleration = Vector3.zero;
       _recievedVelocityUpdate = false;
+      _recievedSimulationResults = false;
     }
 
     public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
@@ -261,6 +261,8 @@ namespace Leap.Unity.Interaction {
       _solvedPosition = _rigidbody.position;
       _solvedRotation = _rigidbody.rotation;
 
+      updateLayer();
+
 #if UNITY_EDITOR
       Collider[] colliders = GetComponentsInChildren<Collider>();
       if (colliders.Length > 0) {
@@ -275,28 +277,25 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnInteractionShapeDestroyed() {
       base.OnInteractionShapeDestroyed();
-
-      resetState();
     }
 
     public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
       updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
 
       updateInfo.updateFlags = UpdateInfoFlags.VelocityEnabled;
+      updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
+      updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
 
       // Request notification of when hands are no longer touching (or influencing.)
       if (_ignoringBrushes) {
         updateInfo.updateFlags |= UpdateInfoFlags.ReportNoResult;
       }
 
-      if (_material.EnableContact && !_isKinematic && !IsBeingGrasped) {
-        updateInfo.updateFlags |= UpdateInfoFlags.ApplyAcceleration;
+      if (_material.ContactEnabled && !_isKinematic && !IsBeingGrasped) {
+        updateInfo.updateFlags |= UpdateInfoFlags.AccelerationEnabled;
+        updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
+        updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
       }
-
-      updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
-      updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
-      updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
-      updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
 
       if (_useGravity) {
         updateInfo.updateFlags |= UpdateInfoFlags.GravityEnabled;
@@ -308,158 +307,104 @@ namespace Leap.Unity.Interaction {
     protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
       base.OnRecievedSimulationResults(results);
 
+      _recievedSimulationResults = true;
+
       if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 &&
           !IsBeingGrasped &&
-          _material.EnableContact) {
+          _material.ContactEnabled) {
         //Use Sleep() to clear any forces that might have been applied by the user.
         _rigidbody.Sleep();
         _rigidbody.velocity = results.linearVelocity.ToVector3();
         _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
         _recievedVelocityUpdate = true;
       }
+
 #if UNITY_EDITOR
       _showDebugRecievedVelocity = _recievedVelocityUpdate;
 #endif
 
       if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
-        if (!_ignoringBrushes && results.maxHandDepth > _material.BrushDisableDistance) {
+        if (!_ignoringBrushes && results.maxHandDepth > _material.BrushDisableDistance * _manager.SimulationScale) {
           _ignoringBrushes = true;
-          updateLayer();
         }
       } else if (_ignoringBrushes) {
         _ignoringBrushes = false;
-        updateLayer();
       }
+
+      updateLayer();
     }
 
     protected override void OnHandGrasped(Hand hand) {
       base.OnHandGrasped(hand);
 
-      updateState();
-
-      var newCollection = HandPointCollection.Create(_rigidbody);
-      _handIdToPoints[hand.Id] = newCollection;
-
-      newCollection.UpdateTransform();
-
-      for (int f = 0; f < NUM_FINGERS; f++) {
-        Finger finger = hand.Fingers[f];
-        Finger.FingerType fingerType = finger.Type;
-
-        for (int j = 0; j < NUM_BONES; j++) {
-          Bone.BoneType boneType = (Bone.BoneType)j;
-          Bone bone = finger.Bone(boneType);
-
-          Vector3 bonePos = bone.NextJoint.ToVector3();
-
-          //Global position of the point is just the position of the joint itself
-          newCollection.SetGlobalPosition(bonePos, fingerType, boneType);
-        }
-      }
+      _controllers.HoldingPoseController.AddHand(hand);
     }
 
-    protected override void OnHandsHoldPhysics(List<Hand> hands) {
+    protected override void OnHandsHoldPhysics(ReadonlyList<Hand> hands) {
       base.OnHandsHoldPhysics(hands);
 
-      //Get new transform
-      Vector3 newPosition;
-      Quaternion newRotation;
-      getSolvedTransform(hands, out newPosition, out newRotation);
+      PhysicsMoveInfo info = new PhysicsMoveInfo();
+      info.remainingDistanceLastFrame = Vector3.Distance(_warper.RigidbodyPosition, _solvedPosition);
+      info.shouldTeleport = _notifiedOfTeleport;
 
-      _solvedPosition = newPosition;
-      _solvedRotation = newRotation;
+      _controllers.HoldingPoseController.GetHoldingPose(hands, out _solvedPosition, out _solvedRotation);
 
-      //Apply new transform to object
-      switch (_material.GraspMethod) {
-        case InteractionMaterial.GraspMethodEnum.Kinematic:
-          if (_notifiedOfTeleport) {
-            _rigidbody.position = newPosition;
-            _rigidbody.rotation = newRotation;
-          } else {
-            _rigidbody.MovePosition(newPosition);
-            _rigidbody.MoveRotation(newRotation);
-          }
-          break;
-        case InteractionMaterial.GraspMethodEnum.Velocity:
-          if (_notifiedOfTeleport) {
-            _rigidbody.position = newPosition;
-            _rigidbody.rotation = newRotation;
-          } else {
-            Vector3 deltaPos = newPosition - _rigidbody.position;
-            Quaternion deltaRot = newRotation * Quaternion.Inverse(_rigidbody.rotation);
+      _controllers.MoveToController.MoveTo(hands, info, _solvedPosition, _solvedRotation);
 
-            Vector3 deltaAxis;
-            float deltaAngle;
-            deltaRot.ToAngleAxis(out deltaAngle, out deltaAxis);
-
-            Vector3 targetVelocity = deltaPos / Time.fixedDeltaTime;
-            Vector3 targetAngularVelocity = deltaAxis * deltaAngle * Mathf.Deg2Rad / Time.fixedDeltaTime;
-
-            if (targetVelocity.sqrMagnitude > float.Epsilon) {
-              float targetSpeed = targetVelocity.magnitude;
-              float actualSpeed = Mathf.Min(_material.MaxVelocity, targetSpeed);
-              float targetPercent = actualSpeed / targetSpeed;
-
-              targetVelocity *= targetPercent;
-              targetAngularVelocity *= targetPercent;
-            }
-
-            _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, _material.FollowStrength);
-            _rigidbody.angularVelocity = Vector3.Lerp(_rigidbody.angularVelocity, targetAngularVelocity, _material.FollowStrength);
-          }
-          break;
-        default:
-          throw new InvalidOperationException("Unexpected grasp method");
+      if (_controllers.ThrowingController != null) {
+        _controllers.ThrowingController.OnHold(hands);
       }
 
       _notifiedOfTeleport = false;
     }
 
-    protected override void OnHandsHoldGraphics(List<Hand> hands) {
+    protected override void OnHandsHoldGraphics(ReadonlyList<Hand> hands) {
       base.OnHandsHoldGraphics(hands);
 
-      if (_graphicalAnchor != null && _material.WarpingEnabled) {
-        Vector3 deltaPosition = Quaternion.Inverse(_solvedRotation) * (_rigidbody.position - _solvedPosition);
-        Quaternion deltaRotation = Quaternion.Inverse(_solvedRotation) * _rigidbody.rotation;
+      if (_material.WarpingEnabled) {
+        Vector3 deltaPosition = Quaternion.Inverse(_solvedRotation) * (_warper.RigidbodyPosition - _solvedPosition);
+        Quaternion deltaRotation = Quaternion.Inverse(_solvedRotation) * _warper.RigidbodyRotation;
 
         Vector3 newPosition;
         Quaternion newRotation;
-        getSolvedTransform(hands, out newPosition, out newRotation);
+        _controllers.HoldingPoseController.GetHoldingPose(hands, out newPosition, out newRotation);
 
-        _graphicalAnchor.position = newPosition + newRotation * deltaPosition;
-        _graphicalAnchor.rotation = newRotation * deltaRotation;
+        Vector3 graphicalPosition = newPosition + newRotation * deltaPosition;
+        Quaternion graphicalRotation = newRotation * deltaRotation;
 
-        float warpAmount = _material.WarpCurve.Evaluate(deltaPosition.magnitude);
-        _graphicalAnchor.localPosition *= warpAmount;
-        _graphicalAnchor.localRotation = Quaternion.Slerp(Quaternion.identity, _graphicalAnchor.localRotation, warpAmount);
+        _warper.WarpPercent = _material.WarpCurve.Evaluate(deltaPosition.magnitude / _manager.SimulationScale);
+        _warper.SetGraphicalPosition(graphicalPosition, graphicalRotation);
       }
     }
 
     protected override void OnHandReleased(Hand hand) {
       base.OnHandReleased(hand);
 
-      updateState();
-
-      removeHandPointCollection(hand.Id);
+      _controllers.HoldingPoseController.RemoveHand(hand);
     }
 
-    protected override void OnHandLostTracking(Hand oldHand, out bool allowSuspension) {
-      base.OnHandLostTracking(oldHand, out allowSuspension);
+    protected override void OnHandLostTracking(Hand oldHand, out float maxSuspensionTime) {
+      base.OnHandLostTracking(oldHand, out maxSuspensionTime);
 
-      allowSuspension = _material.SuspensionEnabled;
+      if (_controllers.SuspensionController == null) {
+        maxSuspensionTime = 0;
+      } else {
+        maxSuspensionTime = _controllers.SuspensionController.MaxSuspensionTime;
+        _controllers.SuspensionController.Suspend();
+      }
 
-      updateState();
     }
 
     protected override void OnHandRegainedTracking(Hand newHand, int oldId) {
       base.OnHandRegainedTracking(newHand, oldId);
 
-      updateState();
+      if (_controllers.SuspensionController != null) {
+        _controllers.SuspensionController.Resume();
+      }
 
-      //Associate the collection with the new id
-      var collection = _handIdToPoints[oldId];
-      _handIdToPoints.Remove(oldId);
-      _handIdToPoints[newHand.Id] = collection;
+      _controllers.HoldingPoseController.TransferHandId(oldId, newHand.Id);
+
+      _controllers.MoveToController.SetGraspedState();
 
       NotifyTeleported();
     }
@@ -467,76 +412,40 @@ namespace Leap.Unity.Interaction {
     protected override void OnHandTimeout(Hand oldHand) {
       base.OnHandTimeout(oldHand);
 
-      updateState();
+      if (_controllers.SuspensionController != null) {
+        _controllers.SuspensionController.Timeout();
+      }
 
-      removeHandPointCollection(oldHand.Id);
+      _controllers.HoldingPoseController.RemoveHand(oldHand);
     }
 
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
 
-      updateState();
+      _controllers.MoveToController.OnGraspBegin();
+      _controllers.MoveToController.SetGraspedState();
 
-      //Stop an existing lerp coroutine if it exists to prevent conflict
-      if (_graphicalLerpCoroutine != null) {
-        StopCoroutine(_graphicalLerpCoroutine);
-      }
+      _materialReplacer.ReplaceMaterials();
+
+      _ignoringBrushes = true;
     }
 
-    protected override void OnGraspEnd() {
-      base.OnGraspEnd();
+    protected override void OnGraspEnd(Hand lastHand) {
+      base.OnGraspEnd(lastHand);
 
-      updateState();
+      _controllers.MoveToController.OnGraspEnd();
 
-      if (_graphicalAnchor != null) {
-        _graphicalLerpCoroutine = StartCoroutine(lerpGraphicalToOrigin());
+      if (_controllers.ThrowingController != null && lastHand != null) {
+        _controllers.ThrowingController.OnThrow(lastHand);
       }
 
-      float speed = _rigidbody.velocity.magnitude;
-      float multiplier = _material.ThrowingVelocityCurve.Evaluate(speed);
-      _rigidbody.velocity *= multiplier;
+      revertRigidbodyState();
+
+      _materialReplacer.RevertMaterials();
     }
     #endregion
 
     #region UNITY CALLBACKS
-    protected virtual void Awake() {
-      _handIdToPoints = new Dictionary<int, HandPointCollection>();
-
-      Vector3 scale = transform.lossyScale;
-      if (!Mathf.Approximately(scale.x, scale.y) || !Mathf.Approximately(scale.x, scale.z)) {
-        enabled = false;
-        Debug.LogError("Interaction Behaviour cannot have a non-uniform scale!");
-        return;
-      }
-    }
-
-    protected IEnumerator lerpGraphicalToOrigin() {
-      //We lerp position in world space instead of local space
-      //This helps remove wobbles when the object is rotating
-      Vector3 globalPosOffset = _graphicalAnchor.position - transform.position;
-      Quaternion startRot = _graphicalAnchor.localRotation;
-      float startTime = Time.time;
-
-      while (true) {
-        yield return null;
-
-        //Using sigmoid to help hide the lerp
-        float t = Mathf.InverseLerp(startTime, startTime + _material.GraphicalReturnTime, Time.time);
-        float percent = t * t * (3 - 2 * t);
-
-        //Lerp based on transform.position instead of rigidbody.position to reduce stutter
-        _graphicalAnchor.position = transform.position + Vector3.Lerp(globalPosOffset, Vector3.zero, percent);
-        _graphicalAnchor.localRotation = Quaternion.Slerp(startRot, Quaternion.identity, percent);
-
-        if (percent >= 1.0f) {
-          break;
-        }
-      }
-
-      //Null out coroutine reference when finished
-      _graphicalLerpCoroutine = null;
-    }
-
 #if UNITY_EDITOR
     private void OnCollisionEnter(Collision collision) {
       GameObject otherObj = collision.collider.gameObject;
@@ -544,12 +453,7 @@ namespace Leap.Unity.Interaction {
         && otherObj.GetComponentInParent<InteractionBrushHand>() == null) {
         string thisLabel = gameObject.name + " <layer " + LayerMask.LayerToName(gameObject.layer) + ">";
         string otherLabel = otherObj.name + " <layer " + LayerMask.LayerToName(otherObj.layer) + ">";
-
-        UnityEditor.EditorUtility.DisplayDialog("Collision Error!",
-                                                "For interaction to work properly please prevent collision between IHandModel "
-                                                + "and InteractionBehavior. " + thisLabel + ", " + otherLabel,
-                                                "Ok");
-        Debug.Break();
+        Debug.LogError("For interaction to work properly please prevent collision between IHandModel and InteractionBehavior. " + thisLabel + ", " + otherLabel);
       }
     }
 #endif
@@ -558,7 +462,7 @@ namespace Leap.Unity.Interaction {
       if (IsRegisteredWithManager) {
         Matrix4x4 gizmosMatrix = Gizmos.matrix;
 
-        Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
+        Gizmos.matrix = Matrix4x4.TRS(_warper.RigidbodyPosition, _warper.RigidbodyRotation, Vector3.one);
 
         if (_rigidbody.IsSleeping()) {
           Gizmos.color = Color.gray;
@@ -583,23 +487,32 @@ namespace Leap.Unity.Interaction {
 
     protected void updateLayer() {
       int layer;
-      if (_ignoringBrushes) {
-        if (_material.UseCustomLayers) {
-          layer = _material.InteractionNoClipLayer;
+      if (_controllers.LayerController != null) {
+        if (_ignoringBrushes) {
+          layer = _controllers.LayerController.InteractionNoClipLayer;
         } else {
-          layer = _manager.InteractionNoClipLayer;
+          layer = _controllers.LayerController.InteractionLayer;
         }
       } else {
-        if (_material.UseCustomLayers) {
-          layer = _material.InteractionLayer;
+        if (_ignoringBrushes) {
+          layer = _manager.InteractionNoClipLayer;
         } else {
           layer = _manager.InteractionLayer;
         }
       }
 
-      for (int i = 0; i < _childrenArray.Length; i++) {
-        _childrenArray[i].gameObject.layer = layer;
+      if (gameObject.layer != layer) {
+        for (int i = 0; i < _childrenArray.Length; i++) {
+          _childrenArray[i].gameObject.layer = layer;
+        }
       }
+    }
+
+    protected virtual void revertRigidbodyState() {
+      _rigidbody.useGravity = _useGravity;
+      _rigidbody.isKinematic = _isKinematic;
+      _rigidbody.drag = _drag;
+      _rigidbody.angularDrag = _angularDrag;
     }
 
     protected INTERACTION_TRANSFORM getRigidbodyTransform() {
@@ -609,182 +522,12 @@ namespace Leap.Unity.Interaction {
         interactionTransform.position = _solvedPosition.ToCVector();
         interactionTransform.rotation = _solvedRotation.ToCQuaternion();
       } else {
-        interactionTransform.position = _rigidbody.position.ToCVector();
-        interactionTransform.rotation = _rigidbody.rotation.ToCQuaternion();
+        interactionTransform.position = _warper.RigidbodyPosition.ToCVector();
+        interactionTransform.rotation = _warper.RigidbodyRotation.ToCQuaternion();
       }
 
       interactionTransform.wallTime = Time.fixedTime;
       return interactionTransform;
-    }
-
-    protected void resetState() {
-      _rigidbody.useGravity = _useGravity;
-      _rigidbody.isKinematic = _isKinematic;
-
-      if (_graphicalAnchor != null) {
-        _graphicalAnchor.localPosition = Vector3.zero;
-        _graphicalAnchor.localRotation = Quaternion.identity;
-        _graphicalAnchor.gameObject.SetActive(true);
-      }
-    }
-
-    protected virtual void updateState() {
-      //Renderers are visible if there are no grasping hands
-      //or if there is at least one tracked grasping hand
-      int trackedGraspingHandCount = GraspingHandCount - UntrackedHandCount;
-      bool shouldBeVisible = GraspingHandCount == 0 || trackedGraspingHandCount > 0;
-
-      if (_graphicalAnchor != null) {
-        _graphicalAnchor.gameObject.SetActive(shouldBeVisible);
-      }
-
-      //Update kinematic status of body
-      if (IsBeingGrasped) {
-        _rigidbody.useGravity = false;
-        _rigidbody.drag = 0;
-        _rigidbody.angularDrag = 0;
-
-        switch (_material.GraspMethod) {
-          case InteractionMaterial.GraspMethodEnum.Kinematic:
-            _rigidbody.isKinematic = true;
-            break;
-          case InteractionMaterial.GraspMethodEnum.Velocity:
-            if (UntrackedHandCount > 0) {
-              _rigidbody.isKinematic = true;
-            } else {
-              _rigidbody.isKinematic = false;
-            }
-            break;
-          default:
-            throw new InvalidOperationException("Unexpected grasp method");
-        }
-      } else {
-        _rigidbody.useGravity = _useGravity;
-        _rigidbody.isKinematic = _isKinematic;
-        _rigidbody.drag = _drag;
-        _rigidbody.angularDrag = _angularDrag;
-      }
-    }
-
-    protected void removeHandPointCollection(int handId) {
-      var collection = _handIdToPoints[handId];
-      _handIdToPoints.Remove(handId);
-
-      //Return the collection to the pool so it can be re-used
-      HandPointCollection.Return(collection);
-    }
-
-    protected void getSolvedTransform(List<Hand> hands, out Vector3 newPosition, out Quaternion newRotation) {
-      KabschC.Reset(ref _kabsch);
-
-      for (int h = 0; h < hands.Count; h++) {
-        Hand hand = hands[h];
-
-        var collection = _handIdToPoints[hand.Id];
-        collection.UpdateTransform();
-
-        for (int f = 0; f < NUM_FINGERS; f++) {
-          Finger finger = hand.Fingers[f];
-          Finger.FingerType fingerType = finger.Type;
-
-          for (int j = 0; j < NUM_BONES; j++) {
-            Bone.BoneType boneType = (Bone.BoneType)j;
-            Bone bone = finger.Bone(boneType);
-
-            Vector3 objectPos = collection.GetGlobalPosition(fingerType, boneType);
-            Vector3 bonePos = bone.NextJoint.ToVector3();
-
-            //Do the solve such that the objects positions are matched to the new bone positions
-            LEAP_VECTOR point1 = (objectPos - _rigidbody.position).ToCVector();
-            LEAP_VECTOR point2 = (bonePos - _rigidbody.position).ToCVector();
-
-            KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
-          }
-        }
-      }
-
-      KabschC.Solve(ref _kabsch);
-
-      LEAP_VECTOR leapTranslation;
-      LEAP_QUATERNION leapRotation;
-      KabschC.GetTranslation(ref _kabsch, out leapTranslation);
-      KabschC.GetRotation(ref _kabsch, out leapRotation);
-
-      Vector3 solvedTranslation = leapTranslation.ToVector3();
-      Quaternion solvedRotation = leapRotation.ToQuaternion();
-
-      //Calculate new transform using delta
-      newPosition = _rigidbody.position + solvedTranslation;
-      newRotation = solvedRotation * _rigidbody.rotation; ;
-    }
-
-    protected class HandPointCollection {
-      //Without a pool, you might end up with 2 instances per object
-      //With a pool, likely there will only ever be 2 instances!
-      private static Stack<HandPointCollection> _handPointCollectionPool = new Stack<HandPointCollection>();
-
-      private Rigidbody _rigidbody;
-      private Vector3[] _localPositions;
-
-      private Matrix4x4 _transformMatrix;
-
-      private bool _hasInverse = false;
-      private Matrix4x4 _inverseTransformMatrix;
-
-      public static HandPointCollection Create(Rigidbody rigidbody) {
-        HandPointCollection collection;
-        if (_handPointCollectionPool.Count != 0) {
-          collection = _handPointCollectionPool.Pop();
-        } else {
-          collection = new HandPointCollection();
-        }
-
-        collection.init(rigidbody);
-        return collection;
-      }
-
-      public static void Return(HandPointCollection handPointCollection) {
-        handPointCollection.reset();
-        _handPointCollectionPool.Push(handPointCollection);
-      }
-
-      private HandPointCollection() {
-        _localPositions = new Vector3[NUM_FINGERS * NUM_BONES];
-      }
-
-      private void init(Rigidbody rigidbody) {
-        _rigidbody = rigidbody;
-      }
-
-      private void reset() {
-        _rigidbody = null;
-        _hasInverse = false;
-      }
-
-      public void UpdateTransform() {
-        Vector3 interactionPosition = _rigidbody.position;
-        Quaternion interactionRotation = _rigidbody.rotation;
-
-        _hasInverse = false;
-        _transformMatrix = Matrix4x4.TRS(interactionPosition, interactionRotation, Vector3.one);
-      }
-
-      public void SetGlobalPosition(Vector3 globalPosition, Finger.FingerType fingerType, Bone.BoneType boneType) {
-        if (!_hasInverse) {
-          _inverseTransformMatrix = _transformMatrix.inverse;
-          _hasInverse = true;
-        }
-
-        _localPositions[getIndex(fingerType, boneType)] = _inverseTransformMatrix.MultiplyPoint3x4(globalPosition);
-      }
-
-      public Vector3 GetGlobalPosition(Finger.FingerType fingerType, Bone.BoneType boneType) {
-        return _transformMatrix.MultiplyPoint3x4(_localPositions[getIndex(fingerType, boneType)]);
-      }
-
-      private int getIndex(Finger.FingerType fingerType, Bone.BoneType boneType) {
-        return (int)fingerType * 4 + (int)boneType;
-      }
     }
     #endregion
   }

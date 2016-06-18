@@ -13,8 +13,10 @@ namespace Leap.Unity.Interaction {
   public class InteractionBrushHand : IHandModel {
     private const int N_FINGERS = 5;
     private const int N_ACTIVE_BONES = 3;
+    private const float DEAD_ZONE_FRACTION = 0.05f;
 
     private Rigidbody[] _capsuleBodies;
+    private Vector3[] _lastTarget;
     private Hand _hand;
     private GameObject _handParent;
 
@@ -61,11 +63,7 @@ namespace Leap.Unity.Interaction {
 
       // We also require a material for friction to be able to work.
       if (_material == null || _material.bounciness != 0.0f || _material.bounceCombine != PhysicMaterialCombine.Minimum) {
-        EditorUtility.DisplayDialog("Collision Error!",
-                                    "An InteractionBrushHand must have a material with 0 bounciness "
-                                    + "and a bounceCombine of Minimum.  Name:" + gameObject.name,
-                                    "Ok");
-        Debug.Break();
+        Debug.LogError("An InteractionBrushHand must have a material with 0 bounciness and a bounceCombine of Minimum.  Name: " + gameObject.name);
       }
 #endif
 
@@ -73,6 +71,7 @@ namespace Leap.Unity.Interaction {
       _handParent.transform.parent = null; // Prevent hand from moving when you turn your head.
 
       _capsuleBodies = new Rigidbody[N_FINGERS * N_ACTIVE_BONES];
+      _lastTarget = new Vector3[N_FINGERS * N_ACTIVE_BONES];
 
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
@@ -105,6 +104,8 @@ namespace Leap.Unity.Interaction {
 
           body.mass = _perBoneMass;
           body.collisionDetectionMode = _collisionDetection;
+
+          _lastTarget[boneArrayIndex] = bone.Center.ToVector3();
         }
       }
     }
@@ -115,16 +116,33 @@ namespace Leap.Unity.Interaction {
         return;
 #endif
 
+      float deadzone = DEAD_ZONE_FRACTION * _hand.Fingers[1].Bone((Bone.BoneType)1).Width;
+
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
 
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
           Rigidbody body = _capsuleBodies[boneArrayIndex];
+          body.MoveRotation(bone.Rotation.ToQuaternion());
+
+          // Calculate how far off the mark the brushes are.
+          float targetingError = (_lastTarget[boneArrayIndex] - body.position).magnitude / bone.Width;
+          _lastTarget[boneArrayIndex] = bone.Center.ToVector3();
+
+          // Reduce the energy applied by the brushes as they are pushed away.
+          float massScale = Mathf.Clamp(1.0f - (targetingError*2.0f), 0.1f, 1.0f);
+          body.mass = _perBoneMass * massScale;
 
           Vector3 delta = bone.Center.ToVector3() - body.position;
+          float deltaLen = delta.magnitude;
+          if (deltaLen <= deadzone) {
+            body.velocity = Vector3.zero;
+            continue;
+          }
+
+          delta *= (deltaLen - deadzone) / deltaLen;
           body.velocity = delta / Time.fixedDeltaTime;
-          body.MoveRotation(bone.Rotation.ToQuaternion());
         }
       }
     }
@@ -132,6 +150,7 @@ namespace Leap.Unity.Interaction {
     public override void FinishHand() {
       GameObject.Destroy(_handParent);
       _capsuleBodies = null;
+      _lastTarget = null;
 
       base.FinishHand();
     }

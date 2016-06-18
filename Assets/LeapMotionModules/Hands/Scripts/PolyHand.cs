@@ -21,6 +21,9 @@ namespace Leap.Unity {
         return ModelType.Graphics;
       }
     }
+    public override bool SupportsEditorPersistence() {
+      return true;
+    }
     /** Initializes the hand and calls the finger initializers. */
     public override void InitHand() {
       SetPalmOrientation();

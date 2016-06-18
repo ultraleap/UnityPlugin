@@ -5,7 +5,9 @@ using Leap;
 
 namespace Leap.Unity{
   public class MinimalHand : IHandModel {
-  
+    public override bool SupportsEditorPersistence() {
+      return true;
+    }
     [SerializeField]
     private Mesh _palmMesh;
   
