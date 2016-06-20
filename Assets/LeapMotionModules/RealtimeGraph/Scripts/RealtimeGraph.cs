@@ -111,6 +111,8 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     protected virtual void Start() {
+      _provider = _provider ?? FindObjectOfType<LeapServiceProvider>();
+
       _texture = new Texture2D(_historyLength, 1, TextureFormat.Alpha8, false, true);
       _texture.filterMode = FilterMode.Point;
       _texture.wrapMode = TextureWrapMode.Clamp;
