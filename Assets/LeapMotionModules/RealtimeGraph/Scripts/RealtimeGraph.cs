@@ -62,7 +62,7 @@ namespace Leap.Unity.RealtimeGraph {
     protected Text valueLabel;
 
     [SerializeField]
-    protected GameObject customSamplePrefab;
+    protected GameObject customGraphPrefab;
 
     public float UpdatePeriodFloat {
       set {
@@ -127,7 +127,12 @@ namespace Leap.Unity.RealtimeGraph {
 
     public void AddSample(string sampleName, GraphUnits units, float ms) {
       Graph graph = getGraph(sampleName, units);
+      graph.AddSample((long)(ms * System.Diagnostics.Stopwatch.Frequency * 0.001f));
+    }
 
+    public void SwtichGraph(string graphName) {
+      _currentGraph = _graphs[graphName];
+      titleLabel.text = graphName;
     }
 
     protected virtual void OnValidate() {
@@ -179,8 +184,12 @@ namespace Leap.Unity.RealtimeGraph {
 
       _preCullTicks = -1;
 
-      AddSample("Tracking Framerate", GraphUnits.Framerate, _provider.CurrentFrame.CurrentFramesPerSecond);
+      AddSample("Tracking Framerate", GraphUnits.Framerate, 1000.0f / _provider.CurrentFrame.CurrentFramesPerSecond);
+      AddSample("Tracking Latency", GraphUnits.Miliseconds, (_provider.GetLeapController().Now() - _provider.CurrentFrame.Timestamp) / 1000.0f);
 
+      if (_currentGraph == null) {
+        return;
+      }
 
       _sampleIndex++;
       if (_sampleIndex < _samplesPerFrame) {
@@ -204,6 +213,7 @@ namespace Leap.Unity.RealtimeGraph {
           throw new Exception("Unexpected graph mode");
       }
 
+      _smoothedValue.Update(currValue, Time.deltaTime);
       _slidingMax.AddValue(currValue);
 
       _smoothedMax.Update(_slidingMax.Max, Time.deltaTime);
@@ -307,6 +317,21 @@ namespace Leap.Unity.RealtimeGraph {
       if (!_graphs.TryGetValue(name, out graph)) {
         graph = new Graph(name, units, _historyLength);
         _graphs[name] = graph;
+
+        GameObject buttonObj = Instantiate(customGraphPrefab);
+        buttonObj.transform.SetParent(customGraphPrefab.transform.parent, false);
+
+        Text buttonText = buttonObj.GetComponentInChildren<Text>();
+        buttonText.text = name;
+
+        Button button = buttonObj.GetComponentInChildren<Button>();
+        button.onClick.AddListener(() => SwtichGraph(name));
+
+        buttonObj.SetActive(true);
+
+        if (_currentGraph == null && name == _defaultGraph) {
+          SwtichGraph(name);
+        }
       }
       return graph;
     }
