@@ -77,20 +77,11 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     protected System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
-    protected long _preCullTicks, _postRenderTicks;
-    protected long _fixedUpdateTicks;
-    protected long _endOfFrameTicks;
-
-    protected long _updateTicks;
-    protected long _frameTicks;
-
     protected SlidingMax _slidingMax;
 
     protected int _sampleIndex = 0;
-    protected float _sampleValue = 0;
     protected int _updateCount = 0;
 
-    protected float _lineSpacing;
     protected Texture2D _texture;
     protected Color32[] _colors;
 
@@ -128,6 +119,16 @@ namespace Leap.Unity.RealtimeGraph {
       if (_currentGraphStack.Count != 0) {
         _currentGraphStack.Peek().ResumeSample(currTicks);
       }
+    }
+
+    public void AddSample(string sampleName, GraphUnits units, long ticks) {
+      Graph graph;
+      if (!_graphs.TryGetValue(sampleName, out graph)) {
+        graph = new Graph(sampleName, units, _historyLength);
+        _graphs[sampleName] = graph;
+      }
+
+      graph.AddSample(ticks);
     }
 
     protected virtual void OnValidate() {
@@ -172,8 +173,6 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     protected virtual void Update() {
-      _preCullTicks = -1;
-
       _sampleIndex++;
       if (_sampleIndex < _samplesPerFrame) {
         return;
@@ -208,46 +207,19 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     protected virtual void FixedUpdate() {
-      if (_fixedUpdateTicks == -1) {
-        _fixedUpdateTicks = _stopwatch.ElapsedTicks;
-      }
     }
 
     private IEnumerator endOfFrameWaiter() {
       WaitForEndOfFrame waiter = new WaitForEndOfFrame();
       while (true) {
         yield return waiter;
-        long ticks = _stopwatch.ElapsedTicks;
-        _frameTicks = ticks - _endOfFrameTicks;
-        _endOfFrameTicks = ticks;
-        _fixedUpdateTicks = -1;
       }
     }
 
     private void onPreCull(Camera camera) {
-      if (_preCullTicks == -1) {
-        _preCullTicks = _stopwatch.ElapsedTicks;
-        if (_fixedUpdateTicks != -1) {
-          _updateTicks = _preCullTicks - _fixedUpdateTicks;
-        }
-      }
     }
 
     private void onPostRender(Camera camera) {
-      _postRenderTicks = _stopwatch.ElapsedTicks;
-    }
-
-    private float getRenderMs() {
-      long tickDelta = _postRenderTicks - _preCullTicks;
-      return ticksToMs(tickDelta);
-    }
-
-    private float getFrameMs() {
-      return ticksToMs(_frameTicks);
-    }
-
-    private float getUpdateMs() {
-      return ticksToMs(_updateTicks);
     }
 
     protected static float ticksToMs(long ticks) {
@@ -336,6 +308,11 @@ namespace Leap.Unity.RealtimeGraph {
       public void EndSample(long currTicks) {
         accumulatedInclusiveTicks += currTicks - inclusiveStart;
         accumulatedExclusiveTicks += currTicks - exclusiveStart;
+      }
+
+      public void AddSample(long ticks) {
+        accumulatedInclusiveTicks += ticks;
+        accumulatedExclusiveTicks += ticks;
       }
 
       public void RecordSample(int sampleCount) {
