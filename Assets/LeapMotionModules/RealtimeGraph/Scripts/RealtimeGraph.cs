@@ -76,6 +76,12 @@ namespace Leap.Unity.RealtimeGraph {
       }
     }
 
+    public float GraphModeFloat {
+      set {
+        _graphMode = value > 0.5f ? GraphMode.Inclusive : GraphMode.Exclusive;
+      }
+    }
+
     protected System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
     protected SlidingMax _slidingMax;
 
@@ -322,10 +328,10 @@ namespace Leap.Unity.RealtimeGraph {
         buttonObj.transform.SetParent(customGraphPrefab.transform.parent, false);
 
         Text buttonText = buttonObj.GetComponentInChildren<Text>();
-        buttonText.text = name;
+        buttonText.text = name.Replace(' ', '\n');
 
         Button button = buttonObj.GetComponentInChildren<Button>();
-        button.onClick.AddListener(() => SwtichGraph(name));
+        addCallback(button, name);
 
         buttonObj.SetActive(true);
 
@@ -334,6 +340,10 @@ namespace Leap.Unity.RealtimeGraph {
         }
       }
       return graph;
+    }
+
+    protected void addCallback(Button button, string name) {
+      button.onClick.AddListener(() => SwtichGraph(name));
     }
 
     protected class Graph {
