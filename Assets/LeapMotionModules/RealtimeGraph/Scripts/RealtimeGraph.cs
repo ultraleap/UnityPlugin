@@ -13,8 +13,16 @@ namespace Leap.Unity.RealtimeGraph {
       Framerate
     }
 
+    public enum GraphMode {
+      Inclusive,
+      Exclusive
+    }
+
     [SerializeField]
-    private string _defaultGraph = "Framerate";
+    protected string _defaultGraph = "Framerate";
+
+    [SerializeField]
+    protected GraphMode _graphMode = GraphMode.Exclusive;
 
     [SerializeField]
     protected int _historyLength = 128;
@@ -26,10 +34,10 @@ namespace Leap.Unity.RealtimeGraph {
     protected int _samplesPerFrame = 1;
 
     [SerializeField]
-    private float _framerateLineSpacing = 60;
+    protected float _framerateLineSpacing = 60;
 
     [SerializeField]
-    private float _deltaLineSpacing = 10;
+    protected float _deltaLineSpacing = 10;
 
     [SerializeField]
     protected float _maxSmoothingDelay = 0.1f;
@@ -76,7 +84,6 @@ namespace Leap.Unity.RealtimeGraph {
     protected long _updateTicks;
     protected long _frameTicks;
 
-    protected Dequeue<float> _history;
     protected SlidingMax _slidingMax;
 
     protected int _sampleIndex = 0;
@@ -99,16 +106,15 @@ namespace Leap.Unity.RealtimeGraph {
 
       Graph graph;
       if (!_graphs.TryGetValue(sampleName, out graph)) {
-        graph = new Graph(name, units);
+        graph = new Graph(name, units, _historyLength);
         _graphs[name] = graph;
       }
 
       if (_currentGraphStack.Count != 0) {
-        Graph currentGraph = _currentGraphStack.Peek();
-        currentGraph.currentSample.totalExclusiveTicks += currTicks - currentGraph.exclusiveStart;
+        _currentGraphStack.Peek().PauseSample(currTicks);
       }
 
-      graph.exclusiveStart = graph.inclusiveStart = currTicks;
+      graph.BeginSample(currTicks);
 
       _currentGraphStack.Push(graph);
     }
@@ -117,12 +123,10 @@ namespace Leap.Unity.RealtimeGraph {
       long currTicks = _stopwatch.ElapsedTicks;
 
       Graph graph = _currentGraphStack.Pop();
-      graph.currentSample.totalInclusiveTicks = currTicks - graph.inclusiveStart;
-      graph.currentSample.totalExclusiveTicks += currTicks - graph.exclusiveStart;
+      graph.EndSample(currTicks);
 
       if (_currentGraphStack.Count != 0) {
-        Graph nextGraph = _currentGraphStack.Peek();
-        nextGraph.exclusiveStart = currTicks;
+        _currentGraphStack.Peek().ResumeSample(currTicks);
       }
     }
 
@@ -132,7 +136,6 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     protected virtual void Awake() {
-      _history = new Dequeue<float>(_historyLength);
       _slidingMax = new SlidingMax(_historyLength);
       _graphs = new Dictionary<string, Graph>();
 
@@ -141,10 +144,6 @@ namespace Leap.Unity.RealtimeGraph {
 
       _smoothedValue = new SmoothedFloat();
       _smoothedValue.delay = _valueSmoothingDelay;
-
-      for (int i = 0; i < _historyLength; i++) {
-        _history.PushFront(0);
-      }
     }
 
     protected virtual void Start() {
@@ -173,36 +172,32 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     protected virtual void Update() {
-      float value = getValue();
       _preCullTicks = -1;
 
-      if (float.IsInfinity(value) || float.IsNaN(value)) {
-        return;
-      }
-
-      _smoothedValue.Update(value, Time.deltaTime);
-
-      _sampleValue += value;
       _sampleIndex++;
       if (_sampleIndex < _samplesPerFrame) {
         return;
       }
 
       foreach (Graph graph in _graphs.Values) {
-        graph.samples.PushFront(graph.currentSample);
-        graph.currentSample = new Sample();
+        graph.RecordSample(_sampleIndex);
       }
-
-      value = _sampleValue / _sampleIndex;
       _sampleIndex = 0;
-      _sampleValue = 0;
 
-      _history.PushFront(value);
-      while (_history.Count > _historyLength) {
-        _history.PopBack();
+      float currValue;
+      switch (_graphMode) {
+        case GraphMode.Exclusive:
+          currValue = _currentGraph.exclusive.Front;
+          break;
+        case GraphMode.Inclusive:
+          currValue = _currentGraph.inclusive.Front;
+          break;
+        default:
+          throw new Exception("Unexpected graph mode");
       }
 
-      _slidingMax.AddValue(value);
+      _slidingMax.AddValue(currValue);
+
       _smoothedMax.Update(_slidingMax.Max, Time.deltaTime);
 
       _updateCount++;
@@ -255,7 +250,7 @@ namespace Leap.Unity.RealtimeGraph {
       return ticksToMs(_updateTicks);
     }
 
-    private float ticksToMs(long ticks) {
+    protected static float ticksToMs(long ticks) {
       return (float)(ticks / (System.Diagnostics.Stopwatch.Frequency / 1000.0));
     }
 
@@ -264,15 +259,33 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     private float getGraphSpacing() {
-      //TODO
-      return 0;
+      switch (_currentGraph.units) {
+        case GraphUnits.Framerate:
+          return _framerateLineSpacing;
+        case GraphUnits.Miliseconds:
+          return _deltaLineSpacing;
+        default:
+          throw new Exception("Unexpected graph units");
+      }
     }
 
     private void UpdateTexture() {
       float max = _smoothedMax.value * 1.5f;
 
+      Dequeue<float> history;
+      switch (_graphMode) {
+        case GraphMode.Exclusive:
+          history = _currentGraph.exclusive;
+          break;
+        case GraphMode.Inclusive:
+          history = _currentGraph.inclusive;
+          break;
+        default:
+          throw new Exception("Unexpected graph mode");
+      }
+
       for (int i = 0; i < _historyLength; i++) {
-        float percent = Mathf.Clamp01(_history[i] / max);
+        float percent = Mathf.Clamp01(history[i] / max);
         byte percentByte = (byte)(percent * 255.9999f);
         _colors[i] = new Color32(percentByte, percentByte, percentByte, percentByte);
       }
@@ -292,24 +305,62 @@ namespace Leap.Unity.RealtimeGraph {
     protected class Graph {
       public string name;
       public GraphUnits units;
-      public Dequeue<Sample> samples;
+      public Dequeue<float> exclusive;
+      public Dequeue<float> inclusive;
 
-      public Sample currentSample;
-      public long inclusiveStart, exclusiveStart;
+      private int maxHistory;
 
-      public Graph(string name, GraphUnits units) {
+      private long accumulatedInclusiveTicks, accumulatedExclusiveTicks;
+      private long inclusiveStart, exclusiveStart;
+
+      public Graph(string name, GraphUnits units, int maxHistory) {
         this.name = name;
         this.units = units;
-        samples = new Dequeue<Sample>();
+        this.maxHistory = maxHistory;
+        exclusive = new Dequeue<float>();
+        inclusive = new Dequeue<float>();
       }
-    }
 
-    protected struct Sample : IComparable<Sample> {
-      public long totalInclusiveTicks;
-      public long totalExclusiveTicks;
+      public void BeginSample(long currTicks) {
+        inclusiveStart = exclusiveStart = currTicks;
+      }
 
-      public int CompareTo(Sample other) {
-        return totalExclusiveTicks.CompareTo(other.totalExclusiveTicks);
+      public void PauseSample(long currTicks) {
+        accumulatedInclusiveTicks += currTicks - inclusiveStart;
+      }
+
+      public void ResumeSample(long currTicks) {
+        inclusiveStart = currTicks;
+      }
+
+      public void EndSample(long currTicks) {
+        accumulatedInclusiveTicks += currTicks - inclusiveStart;
+        accumulatedExclusiveTicks += currTicks - exclusiveStart;
+      }
+
+      public void RecordSample(int sampleCount) {
+        float inclusiveMs = ticksToMs(accumulatedInclusiveTicks / sampleCount);
+        float exclusiveMs = ticksToMs(accumulatedExclusiveTicks / sampleCount);
+
+        switch (units) {
+          case GraphUnits.Miliseconds:
+            inclusive.PushFront(inclusiveMs);
+            exclusive.PushFront(exclusiveMs);
+            break;
+          case GraphUnits.Framerate:
+            inclusive.PushFront(1000.0f / inclusiveMs);
+            exclusive.PushFront(1000.0f / exclusiveMs);
+            break;
+          default:
+            throw new Exception("Unexpected units type");
+        }
+
+        while (inclusive.Count > maxHistory) {
+          inclusive.PopBack();
+        }
+        while (exclusive.Count > maxHistory) {
+          exclusive.PopBack();
+        }
       }
     }
   }
