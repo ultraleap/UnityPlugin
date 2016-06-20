@@ -8,17 +8,13 @@ namespace Leap.Unity.RealtimeGraph {
 
   public class RealtimeGraph : MonoBehaviour {
 
-    public enum GraphType {
-      Framerate,
-      FrameDelta,
-      RenderDelta,
-      UpdateDelta,
-      TrackingFramerate,
-      TrackingLatency
+    public enum GraphUnits {
+      Miliseconds,
+      Framerate
     }
 
     [SerializeField]
-    private GraphType _graphType;
+    private string _defaultGraph = "Framerate";
 
     [SerializeField]
     protected int _historyLength = 128;
@@ -94,58 +90,51 @@ namespace Leap.Unity.RealtimeGraph {
     protected SmoothedFloat _smoothedValue;
     protected SmoothedFloat _smoothedMax;
 
-    protected Stack<GameObject> _customSampleLabelPool = new Stack<GameObject>();
-    protected Dequeue<GameObject> _customSampleLabelActive = new Dequeue<GameObject>();
+    protected Graph _currentGraph;
+    protected Dictionary<string, Graph> _graphs;
+    protected Stack<Graph> _currentGraphStack = new Stack<Graph>();
 
-    protected Dequeue<List<CustomSample>> _customSampleBuffer;
-    protected Dictionary<string, CustomSample> _completedSamples = new Dictionary<string, CustomSample>();
-    protected Stack<CustomSample> _currentSamples = new Stack<CustomSample>();
-
-    public void BeginCustomSample(string sampleName) {
+    public void BeginSample(string sampleName, GraphUnits units) {
       long currTicks = _stopwatch.ElapsedTicks;
 
-      if (_currentSamples.Count != 0) {
-        CustomSample currentSample = _currentSamples.Peek();
-        currentSample.totalExclusiveTicks += currTicks - currentSample.exclusiveStart;
+      Graph graph;
+      if (!_graphs.TryGetValue(sampleName, out graph)) {
+        graph = new Graph(name, units);
+        _graphs[name] = graph;
       }
 
-      CustomSample sample;
-      if (!_completedSamples.TryGetValue(sampleName, out sample)) {
-        sample = CustomSample.Create(sampleName);
-        sample.name = sampleName;
+      if (_currentGraphStack.Count != 0) {
+        Graph currentGraph = _currentGraphStack.Peek();
+        currentGraph.currentSample.totalExclusiveTicks += currTicks - currentGraph.exclusiveStart;
       }
 
-      sample.exclusiveStart = sample.inclusiveStart = currTicks;
+      graph.exclusiveStart = graph.inclusiveStart = currTicks;
 
-      _currentSamples.Push(sample);
+      _currentGraphStack.Push(graph);
     }
 
-    public void EndCustomSample() {
+    public void EndSample() {
       long currTicks = _stopwatch.ElapsedTicks;
 
-      var sample = _currentSamples.Pop();
-      sample.totalInclusiveTicks = currTicks - sample.inclusiveStart;
-      sample.totalExclusiveTicks += currTicks - sample.exclusiveStart;
+      Graph graph = _currentGraphStack.Pop();
+      graph.currentSample.totalInclusiveTicks = currTicks - graph.inclusiveStart;
+      graph.currentSample.totalExclusiveTicks += currTicks - graph.exclusiveStart;
 
-      if (_currentSamples.Count != 0) {
-        var nextSample = _currentSamples.Peek();
-        nextSample.exclusiveStart = currTicks;
+      if (_currentGraphStack.Count != 0) {
+        Graph nextGraph = _currentGraphStack.Peek();
+        nextGraph.exclusiveStart = currTicks;
       }
     }
 
     protected virtual void OnValidate() {
       _historyLength = Mathf.Max(1, _historyLength);
       _updatePeriod = Mathf.Max(1, _updatePeriod);
-
-      if (_texture != null) {
-        SwitchGraph(_graphType);
-      }
     }
 
     protected virtual void Awake() {
       _history = new Dequeue<float>(_historyLength);
       _slidingMax = new SlidingMax(_historyLength);
-      _customSampleBuffer = new Dequeue<List<CustomSample>>(_historyLength);
+      _graphs = new Dictionary<string, Graph>();
 
       _smoothedMax = new SmoothedFloat();
       _smoothedMax.delay = _maxSmoothingDelay;
@@ -155,7 +144,6 @@ namespace Leap.Unity.RealtimeGraph {
 
       for (int i = 0; i < _historyLength; i++) {
         _history.PushFront(0);
-        _customSampleBuffer.PushFront(new List<CustomSample>());
       }
     }
 
@@ -175,8 +163,6 @@ namespace Leap.Unity.RealtimeGraph {
     protected virtual void OnEnable() {
       Camera.onPreCull += onPreCull;
       Camera.onPostRender += onPostRender;
-
-      SwitchGraph(_graphType);
 
       StartCoroutine(endOfFrameWaiter());
     }
@@ -202,28 +188,10 @@ namespace Leap.Unity.RealtimeGraph {
         return;
       }
 
-      List<CustomSample> samplesForFrame;
-      {
-        List<CustomSample> expiredSamples;
-        _customSampleBuffer.PopBack(out expiredSamples);
-
-        for (int i = 0; i < expiredSamples.Count; i++) {
-          CustomSample.Recycle(expiredSamples[i]);
-        }
-        expiredSamples.Clear();
-        samplesForFrame = expiredSamples;
+      foreach (Graph graph in _graphs.Values) {
+        graph.samples.PushFront(graph.currentSample);
+        graph.currentSample = new Sample();
       }
-
-      List<CustomSample> newSamples = samplesForFrame;
-      samplesForFrame.AddRange(_completedSamples.Values);
-      for (int i = 0; i < samplesForFrame.Count; i++) {
-        samplesForFrame[i].totalExclusiveTicks /= _sampleIndex;
-        samplesForFrame[i].totalInclusiveTicks /= _sampleIndex;
-      }
-
-      _customSampleBuffer.PushFront(samplesForFrame);
-
-      updateCustomSamplePanel(samplesForFrame);
 
       value = _sampleValue / _sampleIndex;
       _sampleIndex = 0;
@@ -247,62 +215,6 @@ namespace Leap.Unity.RealtimeGraph {
     protected virtual void FixedUpdate() {
       if (_fixedUpdateTicks == -1) {
         _fixedUpdateTicks = _stopwatch.ElapsedTicks;
-      }
-    }
-
-    public void SwitchGraph(GraphType type) {
-      _graphType = type;
-
-      titleLabel.text = Enum.GetName(typeof(GraphType), _graphType);
-    }
-
-    public void SwitchGraph(string name) {
-      GraphType newType = (GraphType)Enum.Parse(typeof(GraphType), name);
-      SwitchGraph(newType);
-    }
-
-    public void NextGraph() {
-      GraphType nextType = (GraphType)(((int)_graphType + 1) % Enum.GetNames(typeof(GraphType)).Length);
-      SwitchGraph(nextType);
-    }
-
-    public void PrevGraph() {
-      int count = Enum.GetNames(typeof(GraphType)).Length;
-      GraphType nextType = (GraphType)(((int)_graphType - 1 + count) % count);
-      SwitchGraph(nextType);
-    }
-
-    private float getValue() {
-      switch (_graphType) {
-        case GraphType.RenderDelta:
-          return getRenderMs();
-        case GraphType.FrameDelta:
-          return getFrameMs();
-        case GraphType.Framerate:
-          return 1000.0f / getFrameMs();
-        case GraphType.UpdateDelta:
-          return getUpdateMs();
-        case GraphType.TrackingLatency:
-          return (_provider.GetLeapController().Now() - _provider.CurrentFrame.Timestamp) / 1000.0f;
-        case GraphType.TrackingFramerate:
-          return _provider.CurrentFrame.CurrentFramesPerSecond;
-        default:
-          throw new Exception("Unexpected graph type");
-      }
-    }
-
-    private float getGraphSpacing() {
-      switch (_graphType) {
-        case GraphType.FrameDelta:
-        case GraphType.RenderDelta:
-        case GraphType.UpdateDelta:
-        case GraphType.TrackingLatency:
-          return _deltaLineSpacing;
-        case GraphType.Framerate:
-        case GraphType.TrackingFramerate:
-          return _framerateLineSpacing;
-        default:
-          throw new Exception("Unexpected graph type");
       }
     }
 
@@ -351,6 +263,11 @@ namespace Leap.Unity.RealtimeGraph {
       return (Mathf.Round(ms * 10) * 0.1f).ToString();
     }
 
+    private float getGraphSpacing() {
+      //TODO
+      return 0;
+    }
+
     private void UpdateTexture() {
       float max = _smoothedMax.value * 1.5f;
 
@@ -372,74 +289,26 @@ namespace Leap.Unity.RealtimeGraph {
       valueCanvas.transform.localPosition = localP;
     }
 
-    private void updateCustomSamplePanel(List<CustomSample> unorderedSamples) {
-      unorderedSamples.Sort();
+    protected class Graph {
+      public string name;
+      public GraphUnits units;
+      public Dequeue<Sample> samples;
 
-      //Pool sample objects that are not needed
-      while (_customSampleLabelActive.Count > unorderedSamples.Count) {
-        GameObject activeObj;
-        _customSampleLabelActive.PopBack(out activeObj);
+      public Sample currentSample;
+      public long inclusiveStart, exclusiveStart;
 
-        activeObj.SetActive(false);
-        _customSampleLabelPool.Push(activeObj);
-      }
-
-      //Enable sample objects that are needed
-      while (_customSampleLabelActive.Count < unorderedSamples.Count) {
-        GameObject sampleObj;
-        if (_customSampleLabelPool.Count > 0) {
-          sampleObj = _customSampleLabelPool.Pop();
-          sampleObj.SetActive(true);
-        } else {
-          sampleObj = Instantiate(customSamplePrefab);
-          sampleObj.transform.SetParent(customSamplePrefab.transform.parent);
-          sampleObj.SetActive(true);
-        }
-
-        _customSampleLabelActive.PushFront(sampleObj);
-      }
-
-      //Update sample objects
-      for (int i = 0; i < unorderedSamples.Count; i++) {
-        GameObject sampleObj = _customSampleLabelActive[i];
-        sampleObj.transform.SetSiblingIndex(i);
-
-        Text sampleText = sampleObj.GetComponentInChildren<Text>();
-        sampleText.text = unorderedSamples[i].name + "\n";
-        sampleText.text += "inclusive: " + msToString(ticksToMs(unorderedSamples[i].totalInclusiveTicks)) + " ms\n";
-        sampleText.text += "exclusive: " + msToString(ticksToMs(unorderedSamples[i].totalExclusiveTicks)) + " ms";
+      public Graph(string name, GraphUnits units) {
+        this.name = name;
+        this.units = units;
+        samples = new Dequeue<Sample>();
       }
     }
 
-    protected class CustomSample : IComparable<CustomSample> {
-      private static Queue<CustomSample> _pool = new Queue<CustomSample>();
-
-      public string name;
+    protected struct Sample : IComparable<Sample> {
       public long totalInclusiveTicks;
       public long totalExclusiveTicks;
 
-      public long inclusiveStart, exclusiveStart;
-
-      private CustomSample() { }
-
-      public static CustomSample Create(string name) {
-        CustomSample sample;
-        if (_pool.Count == 0) {
-          sample = new CustomSample();
-        } else {
-          sample = _pool.Dequeue();
-        }
-
-        //init
-        sample.name = name;
-        return sample;
-      }
-
-      public static void Recycle(CustomSample sample) {
-        _pool.Enqueue(sample);
-      }
-
-      public int CompareTo(CustomSample other) {
+      public int CompareTo(Sample other) {
         return totalExclusiveTicks.CompareTo(other.totalExclusiveTicks);
       }
     }
