@@ -28,10 +28,6 @@ namespace Leap.Unity.InputModule {
     public Sprite PointerSprite;
     [Tooltip("The material to be instantiated for your pointers during projective interaction.")]
     public Material PointerMaterial;
-    [Tooltip("The size of the pointer in world coordinates with respect to the distance between the cursor and the camera.")]
-    public AnimationCurve PointerDistanceScale = AnimationCurve.Linear(0f,0.1f,6f,1f);
-    [Tooltip("The size of the pointer in world coordinates with respect to the distance between the thumb and forefinger.")]
-    public AnimationCurve PointerPinchScale = AnimationCurve.Linear(30f, 0.6f, 70f, 1.1f);
     [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
     public Color StandardColor = Color.white;
@@ -49,24 +45,8 @@ namespace Leap.Unity.InputModule {
     [Header(" Advanced Options")]
     [Tooltip("Whether or not to show Advanced Options in the Inspector.")]
     public bool ShowAdvancedOptions = false;
-    public enum InteractionCapability : int {
-      Hybrid,
-      Tactile,
-      Projective
-    };
-    [Tooltip("The interaction mode that the Input Module will be restricted to.")]
-    public InteractionCapability InteractionMode = InteractionCapability.Hybrid;
-    [Tooltip("The distance from the base of a UI element that interaction switches from Projective-Pointer based to Touch based.")]
-    public float ProjectiveToTactileTransitionDistance = 0.4f;
     [Tooltip("The distance from the base of a UI element that tactile interaction is triggered.")]
     public float TactilePadding = 0.005f;
-    [Tooltip("When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.")]
-    public float PinchingThreshold = 30f;
-    [Tooltip("Render a smaller pointer inside of the main pointer.")]
-    public bool InnerPointer = true;
-    [Tooltip("The Opacity of the Inner Pointer relative to the Primary Pointer.")]
-    public float InnerPointerOpacityScalar = 0.77f;
-
     [Tooltip("The sound that is played when the pointer transitions from canvas to element.")]
     public AudioClip BeginHoverSound;
     [Tooltip("The sound that is played when the pointer transitions from canvas to element.")]
@@ -98,6 +78,31 @@ namespace Leap.Unity.InputModule {
 
     [Tooltip("Whether or not to show unsupported Experimental Options in the Inspector.")]
     public bool ShowExperimentalOptions = false;
+    public enum InteractionCapability : int {
+      Hybrid,
+      Tactile,
+      Projective
+    };
+    [Tooltip("The interaction mode that the Input Module will be restricted to.")]
+    public InteractionCapability InteractionMode = InteractionCapability.Tactile;
+    [Tooltip("The distance from the base of a UI element that interaction switches from Projective-Pointer based to Touch based.")]
+    public float ProjectiveToTactileTransitionDistance = 0.4f;
+    [Tooltip("The size of the pointer in world coordinates with respect to the distance between the cursor and the camera.")]
+    public AnimationCurve PointerDistanceScale = AnimationCurve.Linear(0f, 0.1f, 6f, 1f);
+    [Tooltip("The size of the pointer in world coordinates with respect to the distance between the thumb and forefinger.")]
+    public AnimationCurve PointerPinchScale = AnimationCurve.Linear(30f, 0.6f, 70f, 1.1f);
+    [Tooltip("When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.")]
+    public float PinchingThreshold = 30f;
+    [Tooltip("Create a pointer for each finger.")]
+    public bool perFingerPointer = false;
+    [Tooltip("Render the pointer onto the enviroment.")]
+    public bool EnvironmentPointer = false;
+    [Tooltip("The event that is triggered while pinching to a point in the environment.")]
+    public PositionEvent environmentPinch;
+    [Tooltip("Render a smaller pointer inside of the main pointer.")]
+    public bool InnerPointer = true;
+    [Tooltip("The Opacity of the Inner Pointer relative to the Primary Pointer.")]
+    public float InnerPointerOpacityScalar = 0.77f;
     [Tooltip("Trigger a Hover Event when switching between UI elements.")]
     public bool TriggerHoverOnElementSwitch = false;
     [Tooltip("If the ScrollView still doesn't work even after disabling RaycastTarget on the intermediate layers.")]
@@ -106,10 +111,6 @@ namespace Leap.Unity.InputModule {
     public bool DrawDebug = false;
     [Tooltip("Retract compressible widgets when not using Tactile Interaction.")]
     public bool RetractUI = false;
-    [Tooltip("Create a pointer for each finger.")]
-    public bool perFingerPointer = false;
-    [Tooltip("Render the pointer onto the enviroment.")]
-    public bool EnvironmentPointer = false;
 
     //Event related data
     private Camera EventCamera;
@@ -360,6 +361,10 @@ namespace Leap.Unity.InputModule {
             InnerPointers[whichPointer].rotation = Quaternion.LookRotation(EnvironmentSpot.normal);
           }
           evaluatePointerSize(whichPointer);
+
+          if(isTriggeringInteraction(whichPointer, whichHand, whichFinger)){
+            environmentPinch.Invoke(Pointers[whichPointer].position);
+          }
         }
 
         PrevScreenPosition[whichPointer] = PointEvents[whichPointer].position;
@@ -693,6 +698,10 @@ namespace Leap.Unity.InputModule {
 
     //Update the pointer location and whether or not it is enabled
     private void UpdatePointer(int whichPointer, PointerEventData pointData) {
+      if (EnvironmentPointer && pointerState[whichPointer] == pointerStates.OffCanvas) {
+        Pointers[whichPointer].gameObject.SetActive(true);
+        if (InnerPointer) { InnerPointers[whichPointer].gameObject.SetActive(true); }
+      }
       if (currentOverGo[whichPointer] != null) {
         Pointers[whichPointer].gameObject.SetActive(true);
         if (InnerPointer) { InnerPointers[whichPointer].gameObject.SetActive(true);}

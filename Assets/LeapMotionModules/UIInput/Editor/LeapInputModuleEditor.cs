@@ -13,13 +13,15 @@ namespace Leap.Unity.InputModule {
       specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || module.InteractionMode == LeapInputModule.InteractionCapability.Projective,
                                "PinchingThreshold",
                                "EnvironmentPointer",
+                               "environmentPinch",
                                "PointerPinchScale");
 
       specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || module.InteractionMode == LeapInputModule.InteractionCapability.Tactile,
                                "TactilePadding");
 
       specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid,
-                               "ProjectiveToTactileTransitionDistance");
+                               "ProjectiveToTactileTransitionDistance",
+                               "RetractUI");
 
       specifyConditionalDrawing(() => module.InnerPointer,
                          "InnerPointerOpacityScalar");
@@ -48,15 +50,29 @@ namespace Leap.Unity.InputModule {
                          "TactilePadding",
                          "EnvironmentPointer",
                          "perFingerPointer",
-                         "ShowExperimentalOptions");
+                         "ShowExperimentalOptions",
+                         "PointerDistanceScale",
+                         "PointerPinchScale",
+                         "environmentPinch");
 
       specifyConditionalDrawing(() => module.ShowExperimentalOptions,
+                   "InteractionMode",
+                   "PointerDistanceScale",
+                   "PointerPinchScale",
+                   "ProjectiveToTactileTransitionDistance",
+                   "PinchingThreshold",
+                   "InnerPointer",
+                   "InnerPointerOpacityScalar",
                    "OverrideScrollViewClicks",
                    "DrawDebug",
                    "TriggerHoverOnElementSwitch",
                    "perFingerPointer",
                    "RetractUI",
-                   "EnvironmentPointer");
+                   "EnvironmentPointer",
+                   "environmentPinch");
+
+      specifyConditionalDrawing(() => module.EnvironmentPointer,
+             "environmentPinch");
     }
 
     bool ProjectiveAllowed(LeapInputModule.InteractionCapability mode) {
