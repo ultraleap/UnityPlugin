@@ -92,14 +92,13 @@ namespace Leap.Unity.RealtimeGraph {
     protected Dictionary<string, Graph> _graphs;
     protected Stack<Graph> _currentGraphStack = new Stack<Graph>();
 
+    //Custom sample timers
+    protected long _preCullTicks, _renderTicks, _fixedTicks = -1;
+
     public void BeginSample(string sampleName, GraphUnits units) {
       long currTicks = _stopwatch.ElapsedTicks;
 
-      Graph graph;
-      if (!_graphs.TryGetValue(sampleName, out graph)) {
-        graph = new Graph(name, units, _historyLength);
-        _graphs[name] = graph;
-      }
+      Graph graph = getGraph(sampleName, units);
 
       if (_currentGraphStack.Count != 0) {
         _currentGraphStack.Peek().PauseSample(currTicks);
@@ -122,13 +121,13 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     public void AddSample(string sampleName, GraphUnits units, long ticks) {
-      Graph graph;
-      if (!_graphs.TryGetValue(sampleName, out graph)) {
-        graph = new Graph(sampleName, units, _historyLength);
-        _graphs[sampleName] = graph;
-      }
-
+      Graph graph = getGraph(sampleName, units);
       graph.AddSample(ticks);
+    }
+
+    public void AddSample(string sampleName, GraphUnits units, float ms) {
+      Graph graph = getGraph(sampleName, units);
+
     }
 
     protected virtual void OnValidate() {
@@ -173,6 +172,16 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     protected virtual void Update() {
+      if (_fixedTicks != -1) {
+        AddSample("Physics Delta", GraphUnits.Miliseconds, _stopwatch.ElapsedTicks - _fixedTicks);
+        _fixedTicks = -1;
+      }
+
+      _preCullTicks = -1;
+
+      AddSample("Tracking Framerate", GraphUnits.Framerate, _provider.CurrentFrame.CurrentFramesPerSecond);
+
+
       _sampleIndex++;
       if (_sampleIndex < _samplesPerFrame) {
         return;
@@ -207,19 +216,34 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     protected virtual void FixedUpdate() {
+      if (_fixedTicks == -1) {
+        _fixedTicks = _stopwatch.ElapsedTicks;
+      }
     }
 
     private IEnumerator endOfFrameWaiter() {
       WaitForEndOfFrame waiter = new WaitForEndOfFrame();
+      long endOfFrameTicks = _stopwatch.ElapsedTicks;
       while (true) {
         yield return waiter;
+
+        long newTicks = _stopwatch.ElapsedTicks;
+        AddSample("Frame Delta", GraphUnits.Miliseconds, newTicks - endOfFrameTicks);
+        AddSample("Framerate", GraphUnits.Framerate, newTicks - endOfFrameTicks);
+        endOfFrameTicks = newTicks;
+
+        AddSample("Render Delta", GraphUnits.Miliseconds, _renderTicks);
       }
     }
 
     private void onPreCull(Camera camera) {
+      if (_preCullTicks == -1) {
+        _preCullTicks = _stopwatch.ElapsedTicks;
+      }
     }
 
     private void onPostRender(Camera camera) {
+      _renderTicks = _stopwatch.ElapsedTicks - _preCullTicks;
     }
 
     protected static float ticksToMs(long ticks) {
@@ -228,6 +252,10 @@ namespace Leap.Unity.RealtimeGraph {
 
     private string msToString(float ms) {
       return (Mathf.Round(ms * 10) * 0.1f).ToString();
+    }
+
+    private long msToTicks(float ms) {
+      return (long)(ms * System.Diagnostics.Stopwatch.Frequency * 1000);
     }
 
     private float getGraphSpacing() {
@@ -272,6 +300,15 @@ namespace Leap.Unity.RealtimeGraph {
       Vector3 localP = valueCanvas.transform.localPosition;
       localP.y = _smoothedValue.value / max - 0.5f;
       valueCanvas.transform.localPosition = localP;
+    }
+
+    protected Graph getGraph(string name, GraphUnits units) {
+      Graph graph;
+      if (!_graphs.TryGetValue(name, out graph)) {
+        graph = new Graph(name, units, _historyLength);
+        _graphs[name] = graph;
+      }
+      return graph;
     }
 
     protected class Graph {
