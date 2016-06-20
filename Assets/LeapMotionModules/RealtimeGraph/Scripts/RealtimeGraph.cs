@@ -341,6 +341,7 @@ namespace Leap.Unity.RealtimeGraph {
       public void RecordSample(int sampleCount) {
         float inclusiveMs = ticksToMs(accumulatedInclusiveTicks / sampleCount);
         float exclusiveMs = ticksToMs(accumulatedExclusiveTicks / sampleCount);
+        accumulatedInclusiveTicks = accumulatedExclusiveTicks = 0;
 
         switch (units) {
           case GraphUnits.Miliseconds:
