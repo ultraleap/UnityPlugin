@@ -581,7 +581,7 @@ Transform:
   m_LocalRotation: {x: 0.7071068, y: -0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: -1, y: -1, z: -1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 400040}
   m_RootOrder: 0
@@ -1092,7 +1092,7 @@ SkinnedMeshRenderer:
   m_SortingOrder: 0
   serializedVersion: 2
   m_Quality: 4
-  m_UpdateWhenOffscreen: 0
+  m_UpdateWhenOffscreen: 1
   m_Mesh: {fileID: 4300000, guid: 1140de03f648349c6976a0ad6bce907c, type: 3}
   m_Bones:
   - {fileID: 400020}
