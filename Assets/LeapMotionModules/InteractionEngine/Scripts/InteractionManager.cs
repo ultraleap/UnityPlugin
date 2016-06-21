@@ -439,16 +439,8 @@ namespace Leap.Unity.Interaction {
 
       Assert.IsFalse(_hasSceneBeenCreated, "Scene should not have been created yet");
 
-      try {
-        createScene();
-        applyDebugSettings();
-      } catch (Exception e) {
-        Debug.LogError("Error creating scene.  This might have been due to trying to build 32bit, which is not currently supported, or by missing dlls.");
-        Application.Quit();
-        Debug.Break();
-        enabled = false;
-        throw e;
-      }
+      createScene();
+      applyDebugSettings();
 
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
 

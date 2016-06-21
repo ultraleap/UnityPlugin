@@ -110,6 +110,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+
+//        if (!_contactMode && results.maxHandDepth > _material.BrushDisableDistance * _manager.SimulationScale) {
+
     public override void UpdateHand() {
 #if UNITY_EDITOR
       if (!EditorApplication.isPlaying)

@@ -37,9 +37,9 @@ namespace Leap.Unity.Interaction {
   [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviour : InteractionBehaviourBase {
     private enum ContactMode {
-      NORMAL = 0,
-      SOFT = 1,
-      GRASPED = 2,
+      NORMAL = 0,  // Influenced by brushes and not by soft contact.
+      SOFT = 1,    // Influenced by soft contact and not by brushes.  Will not return to NORMAL until no brush or soft contact remains.
+      GRASPED = 2, // Not infuenced by either brushes or soft contact.  Returns to SOFT not NORMAL.
     };
 
     [SerializeField]
@@ -56,8 +56,9 @@ namespace Leap.Unity.Interaction {
 
     // Contact mode state
     protected ContactMode _contactMode = ContactMode.NORMAL;
+    protected int _touchingBrushes = 0;
+
     protected bool _recievedVelocityUpdate = false;
-    protected bool _recievedSimulationResults = false;
     protected bool _notifiedOfTeleport = false;
     protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
@@ -76,7 +77,7 @@ namespace Leap.Unity.Interaction {
 
     public override bool IsBeingGrasped {
       get {
-        Assert.IsTrue((_contactMode == ContactMode.GRASPED) == IsBeingGrasped);
+        Assert.IsTrue((_contactMode == ContactMode.GRASPED) == base.IsBeingGrasped);
         return base.IsBeingGrasped;
       }
     }
@@ -210,21 +211,20 @@ namespace Leap.Unity.Interaction {
     protected override void OnPostSolve() {
       base.OnPostSolve();
 
-      if (!IsBeingGrasped) {
-        if (_recievedSimulationResults) {
+      if (_contactMode != ContactMode.GRASPED) {
+        if (_recievedVelocityUpdate) {
           // Shapes in the contact graph of a hand do not bounce.
           _materialReplacer.ReplaceMaterials();
-        } else {
-          _materialReplacer.RevertMaterials();
-        }
 
-        if (_recievedVelocityUpdate) {
           //If we recieved a velocity update, gravity must always be disabled because the
           //velocity update accounts for gravity.
           if (_rigidbody.useGravity) {
             _rigidbody.useGravity = false;
           }
         } else {
+          // Shapes in the contact graph of a hand do not bounce.
+          _materialReplacer.RevertMaterials();
+
           //If we did not recieve a velocity update, we set the rigidbody's gravity status
           //to match whatever the user has set.
           if (_rigidbody.useGravity != _useGravity) {
@@ -246,7 +246,6 @@ namespace Leap.Unity.Interaction {
       _accumulatedLinearAcceleration = Vector3.zero;
       _accumulatedAngularAcceleration = Vector3.zero;
       _recievedVelocityUpdate = false;
-      _recievedSimulationResults = false;
 
       _notifiedOfTeleport = false;
     }
@@ -254,11 +253,6 @@ namespace Leap.Unity.Interaction {
     public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
       createInfo = new INTERACTION_CREATE_SHAPE_INFO();
       createInfo.shapeFlags = ShapeInfoFlags.None;
-
-      if (!_isKinematic) {
-        //Kinematic objects do not need velocity simulation
-        createInfo.shapeFlags |= ShapeInfoFlags.HasRigidBody;
-      }
 
       createTransform = getRigidbodyTransform();
     }
@@ -300,22 +294,28 @@ namespace Leap.Unity.Interaction {
       updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
       updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
 
-      // Request notification even when hands are no longer influencing.
-      if (_contactMode == ContactMode.SOFT) {
-        updateInfo.updateFlags |= UpdateInfoFlags.ReportNoResult;
-      }
-
       if (_notifiedOfTeleport) {
         updateInfo.updateFlags |= UpdateInfoFlags.NotifiedOfTeleport;
       }
 
-      if (_contactMode != ContactMode.GRASPED && _material.ContactEnabled && !_isKinematic) {
-        updateInfo.updateFlags |= UpdateInfoFlags.AccelerationEnabled;
-        updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
-        updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
+      if(_isKinematic) {
+          updateInfo.updateFlags |= UpdateInfoFlags.Kinematic;
+      } else {
+        // Generates notifications even when hands are no longer influencing
+        if (_contactMode == ContactMode.SOFT) {
+          Assert.IsTrue(_material.ContactEnabled);
+          updateInfo.updateFlags |= UpdateInfoFlags.SoftContact;
+        }
 
-        if (_useGravity) {
-          updateInfo.updateFlags |= UpdateInfoFlags.GravityEnabled;
+        // All forms of acceleration.
+        if (_contactMode != ContactMode.GRASPED) {
+          updateInfo.updateFlags |= UpdateInfoFlags.AccelerationEnabled;
+          updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
+          updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
+
+          if (_useGravity) {
+            updateInfo.updateFlags |= UpdateInfoFlags.GravityEnabled;
+          }
         }
       }
 
@@ -325,18 +325,23 @@ namespace Leap.Unity.Interaction {
     protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
       base.OnRecievedSimulationResults(results);
 
-      Assert.IsTrue(_material.ContactEnabled);
-      _recievedSimulationResults = true;
-
-      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 && !IsBeingGrasped) {
-        _rigidbody.velocity = results.linearVelocity.ToVector3();
-        _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
-        _recievedVelocityUpdate = true;
+      // Velocities can propagate even when not able to contact the hand.
+      if (_contactMode != ContactMode.GRASPED) {
+        if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
+          Assert.IsFalse(_isKinematic);
+          _rigidbody.velocity = results.linearVelocity.ToVector3();
+          _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
+          _recievedVelocityUpdate = true;
+        }
       }
 
 #if UNITY_EDITOR
       _showDebugRecievedVelocity = _recievedVelocityUpdate;
 #endif
+
+      if (_contactMode == ContactMode.SOFT && _touchingBrushes == 0) {
+
+
 
       if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
         if (!_contactMode && results.maxHandDepth > _material.BrushDisableDistance * _manager.SimulationScale) {

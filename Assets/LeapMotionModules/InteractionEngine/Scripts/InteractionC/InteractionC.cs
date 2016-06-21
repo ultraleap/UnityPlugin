@@ -42,8 +42,7 @@ namespace Leap.Unity.Interaction.CApi {
   };
 
   public enum ShapeInfoFlags : uint {
-    None = 0x00,
-    HasRigidBody = 0x01,
+    None = 0x00
   };
 
   public enum UpdateInfoFlags : uint {
@@ -51,8 +50,9 @@ namespace Leap.Unity.Interaction.CApi {
     AccelerationEnabled = 0x01,
     VelocityEnabled = 0x02,
     GravityEnabled = 0x04,
-    ReportNoResult = 0x08,
-    NotifiedOfTeleport = 0x10
+    SoftContact = 0x08,
+    NotifiedOfTeleport = 0x10,
+    Kinematic = 0x20
   };
 
   public enum HandResultFlags : uint {
