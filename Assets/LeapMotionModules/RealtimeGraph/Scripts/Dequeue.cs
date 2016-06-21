@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Leap.Unity.RealtimeGraph {
+namespace Leap.Unity.Graphing {
 
   public class Dequeue<T> {
     private T[] _array;
