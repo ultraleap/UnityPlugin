@@ -195,7 +195,6 @@ namespace Leap.Unity.RealtimeGraph {
       _preCullTicks = -1;
 
       AddSample("Tracking Framerate", GraphUnits.Framerate, 1000.0f / _provider.CurrentFrame.CurrentFramesPerSecond);
-      AddSample("Tracking Latency", GraphUnits.Miliseconds, (_provider.GetLeapController().Now() - _provider.CurrentFrame.Timestamp) / 1000.0f);
 
       if (_currentGraph == null) {
         return;
@@ -258,6 +257,8 @@ namespace Leap.Unity.RealtimeGraph {
         endOfFrameTicks = newTicks;
 
         AddSample("Render Delta", GraphUnits.Miliseconds, _renderTicks);
+
+        AddSample("Tracking Latency", GraphUnits.Miliseconds, (_provider.GetLeapController().Now() - _provider.CurrentFrame.Timestamp) * 0.001f);
       }
     }
 
