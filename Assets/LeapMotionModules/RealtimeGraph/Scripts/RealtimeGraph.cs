@@ -83,7 +83,6 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     protected System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
-    protected SlidingMax _slidingMax;
 
     protected int _sampleIndex = 0;
     protected int _updateCount = 0;
@@ -153,7 +152,6 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     protected virtual void Awake() {
-      _slidingMax = new SlidingMax(_historyLength);
       _graphs = new Dictionary<string, Graph>();
 
       _smoothedMax = new SmoothedFloat();
@@ -217,22 +215,23 @@ namespace Leap.Unity.RealtimeGraph {
       }
       _sampleIndex = 0;
 
-      float currValue;
+      float currValue, currMax;
       switch (_graphMode) {
         case GraphMode.Exclusive:
           currValue = _currentGraph.exclusive.Front;
+          currMax = _currentGraph.exclusiveMax.Max;
           break;
         case GraphMode.Inclusive:
           currValue = _currentGraph.inclusive.Front;
+          currMax = _currentGraph.inclusiveMax.Max;
           break;
         default:
           throw new Exception("Unexpected graph mode");
       }
 
       _smoothedValue.Update(currValue, Time.deltaTime);
-      _slidingMax.AddValue(currValue);
 
-      _smoothedMax.Update(_slidingMax.Max, Time.deltaTime);
+      _smoothedMax.Update(currMax, Time.deltaTime);
 
       _updateCount++;
       if (_updateCount >= _updatePeriod) {
@@ -361,6 +360,7 @@ namespace Leap.Unity.RealtimeGraph {
       public GraphUnits units;
       public Dequeue<float> exclusive;
       public Dequeue<float> inclusive;
+      public SlidingMax exclusiveMax, inclusiveMax;
 
       private int maxHistory;
 
@@ -371,8 +371,10 @@ namespace Leap.Unity.RealtimeGraph {
         this.name = name;
         this.units = units;
         this.maxHistory = maxHistory;
-        exclusive = new Dequeue<float>();
-        inclusive = new Dequeue<float>();
+        exclusive = new Dequeue<float>(maxHistory);
+        inclusive = new Dequeue<float>(maxHistory);
+        exclusiveMax = new SlidingMax(maxHistory);
+        inclusiveMax = new SlidingMax(maxHistory);
       }
 
       public void BeginSample(long currTicks) {
@@ -410,10 +412,14 @@ namespace Leap.Unity.RealtimeGraph {
           case GraphUnits.Miliseconds:
             inclusive.PushFront(inclusiveMs);
             exclusive.PushFront(exclusiveMs);
+            inclusiveMax.AddValue(inclusiveMs);
+            exclusiveMax.AddValue(exclusiveMs);
             break;
           case GraphUnits.Framerate:
             inclusive.PushFront(1000.0f / inclusiveMs);
             exclusive.PushFront(1000.0f / exclusiveMs);
+            inclusiveMax.AddValue(1000.0f / inclusiveMs);
+            exclusiveMax.AddValue(1000.0f / exclusiveMs);
             break;
           default:
             throw new Exception("Unexpected units type");
