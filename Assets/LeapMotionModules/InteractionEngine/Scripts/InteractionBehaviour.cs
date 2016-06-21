@@ -54,7 +54,6 @@ namespace Leap.Unity.Interaction {
     protected float _drag;
     protected float _angularDrag;
 
-    // Contact mode state
     protected ContactMode _contactMode = ContactMode.NORMAL;
     protected int _touchingBrushes = 0;
 
@@ -211,6 +210,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnPostSolve() {
       base.OnPostSolve();
 
+      // Material already replaced in OnGraspBegin
       if (_contactMode != ContactMode.GRASPED) {
         if (_recievedVelocityUpdate) {
           // Shapes in the contact graph of a hand do not bounce.
@@ -326,32 +326,22 @@ namespace Leap.Unity.Interaction {
       base.OnRecievedSimulationResults(results);
 
       // Velocities can propagate even when not able to contact the hand.
-      if (_contactMode != ContactMode.GRASPED) {
-        if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
-          Assert.IsFalse(_isKinematic);
-          _rigidbody.velocity = results.linearVelocity.ToVector3();
-          _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
-          _recievedVelocityUpdate = true;
-        }
+      if (_contactMode != ContactMode.GRASPED && (results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
+        Assert.IsFalse(_isKinematic);
+        _rigidbody.velocity = results.linearVelocity.ToVector3();
+        _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
+        _recievedVelocityUpdate = true;
       }
 
 #if UNITY_EDITOR
       _showDebugRecievedVelocity = _recievedVelocityUpdate;
 #endif
 
-      if (_contactMode == ContactMode.SOFT && _touchingBrushes == 0) {
-
-
-
-      if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
-        if (!_contactMode && results.maxHandDepth > _material.BrushDisableDistance * _manager.SimulationScale) {
-          _contactMode = true;
-        }
-      } else if (_contactMode) {
-        _contactMode = false;
+      if (_contactMode == ContactMode.SOFT && _touchingBrushes == 0
+          && ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) == 0 || results.maxHandDepth >= 0.0f)) {
+        _contactMode = ContactMode.NORMAL;
+        updateLayer();
       }
-
-      updateLayer();
     }
 
     protected override void OnHandGrasped(Hand hand) {
@@ -445,7 +435,8 @@ namespace Leap.Unity.Interaction {
 
       _materialReplacer.ReplaceMaterials();
 
-      _contactMode = true;
+      _contactMode = ContactMode.GRASPED;
+      updateLayer();
     }
 
     protected override void OnGraspEnd(Hand lastHand) {
@@ -460,6 +451,10 @@ namespace Leap.Unity.Interaction {
       revertRigidbodyState();
 
       _materialReplacer.RevertMaterials();
+
+      // Only transition to ContactMode.NORMAL after checking for brushes.
+      _contactMode = ContactMode.SOFT;
+      updateLayer();
     }
     #endregion
 
@@ -486,10 +481,10 @@ namespace Leap.Unity.Interaction {
           Gizmos.color = Color.gray;
         } else if (IsBeingGrasped) {
           Gizmos.color = Color.green;
+        } else if (_showDebugRecievedVelocity && _contactMode == ContactMode.SOFT) {
+          Gizmos.color = Color.red;
         } else if (_showDebugRecievedVelocity) {
           Gizmos.color = Color.yellow;
-        } else if (_contactMode) {
-          Gizmos.color = Color.red;
         } else {
           Gizmos.color = Color.blue;
         }
@@ -506,13 +501,13 @@ namespace Leap.Unity.Interaction {
     protected void updateLayer() {
       int layer;
       if (_controllers.LayerController != null) {
-        if (_contactMode) {
+        if (_contactMode != ContactMode.NORMAL) {
           layer = _controllers.LayerController.InteractionNoClipLayer;
         } else {
           layer = _controllers.LayerController.InteractionLayer;
         }
       } else {
-        if (_contactMode) {
+        if (_contactMode != ContactMode.NORMAL) {
           layer = _manager.InteractionNoClipLayer;
         } else {
           layer = _manager.InteractionLayer;
