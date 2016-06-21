@@ -452,11 +452,22 @@ namespace Leap.Unity.InputModule {
 
                   if (PointEvents[whichPointer].pointerDrag) {
                     IDragHandler Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
-                    if (Dragger != null && !(Dragger is EventTrigger)) { //Hack: EventSystems intercepting Drag Events causing funkiness
-                      ExecuteEvents.Execute(PointEvents[whichPointer].pointerDrag, PointEvents[whichPointer], ExecuteEvents.beginDragHandler);
-                      PointEvents[whichPointer].dragging = true;
-                      currentGoing[whichPointer] = PointEvents[whichPointer].pointerDrag;
-                      DragBeginPosition[whichPointer] = PointEvents[whichPointer].position;
+                    if (Dragger != null) {
+                      if (Dragger is EventTrigger) { //Hack: EventSystems intercepting Drag Events causing funkiness
+                         PointEvents[whichPointer].pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(PointEvents[whichPointer].pointerDrag.transform.parent.gameObject);
+                         Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
+                         if ((Dragger != null)&&!(Dragger is EventTrigger)) {
+                           ExecuteEvents.Execute(PointEvents[whichPointer].pointerDrag, PointEvents[whichPointer], ExecuteEvents.beginDragHandler);
+                           PointEvents[whichPointer].dragging = true;
+                           currentGoing[whichPointer] = PointEvents[whichPointer].pointerDrag;
+                           DragBeginPosition[whichPointer] = PointEvents[whichPointer].position;
+                         }
+                      } else {
+                        ExecuteEvents.Execute(PointEvents[whichPointer].pointerDrag, PointEvents[whichPointer], ExecuteEvents.beginDragHandler);
+                        PointEvents[whichPointer].dragging = true;
+                        currentGoing[whichPointer] = PointEvents[whichPointer].pointerDrag;
+                        DragBeginPosition[whichPointer] = PointEvents[whichPointer].position;
+                      }
                     }
                   }
                 }
@@ -483,7 +494,9 @@ namespace Leap.Unity.InputModule {
 
             if (currentGoing[whichPointer]) {
               ExecuteEvents.Execute(currentGoing[whichPointer], PointEvents[whichPointer], ExecuteEvents.endDragHandler);
-              ExecuteEvents.Execute(currentGoing[whichPointer], PointEvents[whichPointer], ExecuteEvents.pointerUpHandler);
+              if ((currentGo[whichPointer]) && (currentGoing[whichPointer] == currentGo[whichPointer])) {
+                ExecuteEvents.Execute(currentGoing[whichPointer], PointEvents[whichPointer], ExecuteEvents.pointerUpHandler);
+              }
               Debug.Log(currentGoing[whichPointer].name);
               if (currentOverGo[whichPointer] != null) {
                 ExecuteEvents.ExecuteHierarchy(currentOverGo[whichPointer], PointEvents[whichPointer], ExecuteEvents.dropHandler);
