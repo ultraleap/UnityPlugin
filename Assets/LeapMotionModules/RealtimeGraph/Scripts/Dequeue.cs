@@ -38,17 +38,29 @@ namespace Leap.Unity.Graphing {
     }
 
     public void PopFront() {
+      if (_count == 0) {
+        throw new InvalidOperationException("Cannot pop a value because the Dequeue is empty.");
+      }
+
       Front = default(T);
       _count--;
     }
 
     public void PopBack() {
+      if (_count == 0) {
+        throw new InvalidOperationException("Cannot pop a value because the Dequeue is empty.");
+      }
+
       Back = default(T);
       _count--;
       _back = (_back + 1) % _array.Length;
     }
 
     public void PopFront(out T front) {
+      if (_count == 0) {
+        throw new InvalidOperationException("Cannot pop a value because the Dequeue is empty.");
+      }
+
       int frontIndex = getFrontIndex();
       front = _array[frontIndex];
       _array[frontIndex] = default(T);
@@ -56,6 +68,10 @@ namespace Leap.Unity.Graphing {
     }
 
     public void PopBack(out T back) {
+      if (_count == 0) {
+        throw new InvalidOperationException("Cannot pop a value because the Dequeue is empty.");
+      }
+
       back = _array[_back];
       _array[_back] = default(T);
       _count--;
@@ -64,9 +80,17 @@ namespace Leap.Unity.Graphing {
 
     public T Back {
       get {
+        if (_count == 0) {
+          throw new InvalidOperationException("Cannot get the back of the Dequeue because it is empty.");
+        }
+
         return _array[_back];
       }
       set {
+        if (_count == 0) {
+          throw new InvalidOperationException("Cannot set the back of the Dequeue because it is empty.");
+        }
+
         _array[_back] = value;
       }
     }
