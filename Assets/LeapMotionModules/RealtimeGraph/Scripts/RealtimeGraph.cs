@@ -88,6 +88,8 @@ namespace Leap.Unity.RealtimeGraph {
     protected int _sampleIndex = 0;
     protected int _updateCount = 0;
 
+    protected bool _paused = false;
+
     protected Texture2D _texture;
     protected Color32[] _colors;
 
@@ -139,6 +141,10 @@ namespace Leap.Unity.RealtimeGraph {
     public void SwtichGraph(string graphName) {
       _currentGraph = _graphs[graphName];
       titleLabel.text = graphName;
+    }
+
+    public void TogglePaused() {
+      _paused = !_paused;
     }
 
     protected virtual void OnValidate() {
@@ -203,7 +209,11 @@ namespace Leap.Unity.RealtimeGraph {
       }
 
       foreach (Graph graph in _graphs.Values) {
-        graph.RecordSample(_sampleIndex);
+        if (_paused) {
+          graph.ClearSample();
+        } else {
+          graph.RecordSample(_sampleIndex);
+        }
       }
       _sampleIndex = 0;
 
@@ -387,10 +397,14 @@ namespace Leap.Unity.RealtimeGraph {
         accumulatedExclusiveTicks += ticks;
       }
 
+      public void ClearSample() {
+        accumulatedExclusiveTicks = accumulatedInclusiveTicks = 0;
+      }
+
       public void RecordSample(int sampleCount) {
         float inclusiveMs = ticksToMs(accumulatedInclusiveTicks / sampleCount);
         float exclusiveMs = ticksToMs(accumulatedExclusiveTicks / sampleCount);
-        accumulatedInclusiveTicks = accumulatedExclusiveTicks = 0;
+        ClearSample();
 
         switch (units) {
           case GraphUnits.Miliseconds:
