@@ -2,7 +2,6 @@
 using NUnit.Framework;
 
 namespace Leap.Unity.Graphing.Tests {
-
   public class DequeueTest {
 
     private Dequeue<int> _dequeue;
@@ -20,7 +19,7 @@ namespace Leap.Unity.Graphing.Tests {
 
     [Test]
     [ExpectedException(typeof(ArgumentException))]
-    public void Capacity([Values(int.MinValue, -1, 0)] int minCapacity) {
+    public void InvalidCapacity([Values(int.MinValue, -1, 0)] int minCapacity) {
       new Dequeue<int>(minCapacity);
     }
 
@@ -45,6 +44,17 @@ namespace Leap.Unity.Graphing.Tests {
     public void AccessEmptyFront() {
       int value = _dequeue.Back;
       Assert.NotNull(value);  //Just to remove unused value warning
+    }
+
+    [Test]
+    [ExpectedException(typeof(IndexOutOfRangeException))]
+    public void InvalidIndex([Values(int.MinValue, -1, 5, int.MaxValue)] int index) {
+      for (int i = 0; i < 5; i++) {
+        _dequeue.PushFront(0);
+      }
+
+      int value = _dequeue[index];
+      Assert.NotNull(value); //Just to remove unused value warning
     }
 
     [Test]
