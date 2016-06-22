@@ -21,6 +21,6 @@ namespace Leap.Unity {
       * @param hand The HandRepresentation for which to check
       * @returns Whether this HandRepresentation has any models attached to it
       */
-     public abstract bool CheckModelUsage(HandRepresentation hand);
+     public abstract bool CheckModelUsage(HandRepresentation handRep);
   }
 }
