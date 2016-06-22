@@ -23,21 +23,21 @@ namespace Leap.Unity.Graphing {
     }
 
     public void AddValue(float value) {
-      while (_dequeue.Count != 0 && _dequeue.Front.value <= value) {
-        _dequeue.PopFront();
+      while (_dequeue.Count != 0 && _dequeue.Back.value <= value) {
+        _dequeue.PopBack();
       }
 
-      _dequeue.PushFront(new IndexValuePair(_count, value));
+      _dequeue.PushBack(new IndexValuePair(_count, value));
       _count++;
 
-      while (_dequeue.Back.index < (_count - _history)) {
-        _dequeue.PopBack();
+      while (_dequeue.Front.index < (_count - _history)) {
+        _dequeue.PopFront();
       }
     }
 
     public float Max {
       get {
-        return _dequeue.Back.value;
+        return _dequeue.Front.value;
       }
     }
   }
