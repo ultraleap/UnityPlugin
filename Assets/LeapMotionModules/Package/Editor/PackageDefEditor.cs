@@ -127,6 +127,5 @@ namespace Leap.Unity.Packaging {
 
       return relativePath;
     }
-
   }
 }
