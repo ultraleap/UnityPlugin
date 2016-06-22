@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿using System;
 using NUnit.Framework;
 
 namespace Leap.Unity.Graphing.Tests {
@@ -19,10 +19,40 @@ namespace Leap.Unity.Graphing.Tests {
     }
 
     [Test]
+    [ExpectedException(typeof(ArgumentException))]
+    public void Capacity([Values(int.MinValue, -1, 0)] int minCapacity) {
+      new Dequeue<int>(minCapacity);
+    }
+
+    [Test]
+    public void Clear() {
+      _dequeue.PushFront(1);
+      _dequeue.PushBack(1);
+      Assert.That(_dequeue.Count, Is.EqualTo(2));
+      _dequeue.Clear();
+      Assert.That(_dequeue.Count, Is.EqualTo(0));
+    }
+
+    [Test]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void AccessEmptyBack() {
+      int value = _dequeue.Back;
+      Assert.NotNull(value);  //Just to remove unused value warning
+    }
+
+    [Test]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void AccessEmptyFront() {
+      int value = _dequeue.Back;
+      Assert.NotNull(value);  //Just to remove unused value warning
+    }
+
+    [Test]
     public void PushFront() {
       for (int i = 0; i < 100; i++) {
         _dequeue.PushFront(i);
         Assert.That(_dequeue.Front, Is.EqualTo(i));
+        Assert.That(_dequeue.Count, Is.EqualTo(i + 1));
         for (int j = 0; j <= i; j++) {
           Assert.That(j, Is.EqualTo(_dequeue[j]));
         }
@@ -38,23 +68,23 @@ namespace Leap.Unity.Graphing.Tests {
 
     [Test]
     public void PushBack() {
-      Debug.Log(_dequeue.ToDebugString());
-      for (int i = 0; i < 30; i++) {
+      for (int i = 0; i < 100; i++) {
         _dequeue.PushBack(i);
         Assert.That(_dequeue.Back, Is.EqualTo(i));
+        Assert.That(_dequeue.Count, Is.EqualTo(i + 1));
         for (int j = 0; j <= i; j++) {
-          //Debug.Log((i - j) + " : " + _dequeue[j]);
-          //Assert.That(i - j, Is.EqualTo(_dequeue[j]));
+          Assert.That(i - j, Is.EqualTo(_dequeue[j]));
         }
-        Debug.Log(_dequeue.ToDebugString());
       }
 
-      for (int i = 0; i < 30; i++) {
+      for (int i = 0; i < 100; i++) {
         int value;
         Assert.That(_dequeue.Front, Is.EqualTo(i));
         _dequeue.PopFront(out value);
         Assert.That(i, Is.EqualTo(value));
       }
     }
+
+
   }
 }
