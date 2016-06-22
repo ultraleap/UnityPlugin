@@ -28,6 +28,14 @@ namespace Leap.Unity.Packaging {
       EditorPrefs.DeleteKey(getExportFolderKey());
     }
 
+    [ContextMenu("Reset Export Folder For All")]
+    public void ResetAllExportFolders() {
+      var allPackageDefs = Resources.FindObjectsOfTypeAll<PackageDef>();
+      foreach (var package in allPackageDefs) {
+        package.ResetExportFolder();
+      }
+    }
+
     public bool PrompUserToSetExportPath() {
       string chosenFolder = EditorUtility.SaveFilePanel("Select export path for " + _packageName, Application.dataPath, _packageName, "unitypackage");
       if (string.IsNullOrEmpty(chosenFolder)) {

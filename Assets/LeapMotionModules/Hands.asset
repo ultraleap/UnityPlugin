@@ -9,16 +9,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 437f3e9ccf671e241b2a1697e38ddc2b, type: 3}
-  m_Name: packageDef
+  m_Name: Hands
   m_EditorClassIdentifier: 
-  _packageName: 
-  _packageExportFolder: 
+  _packageName: Hands
   _dependantFolders:
-  - Assets\LeapMotion
-  - Assets\LeapMotionModules\DetectionExamples
-  _dependantFiles:
-  - 
-  - 
+  - Assets\LeapMotionModules\Hands
+  _dependantFiles: []
   _dependantPackages:
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 11400000, guid: 887d977c0a4e4a34db60912466ac7f96, type: 2}

@@ -25,22 +25,30 @@ namespace Leap.Unity.Packaging {
     }
 
     private void drawPackageExportFolder(SerializedProperty property) {
-      string folder;
       EditorGUILayout.BeginHorizontal();
 
+      string folder;
       if (_def.TryGetPackageExportFolder(out folder, prompIfNotDefined: false)) {
         EditorGUILayout.TextField("Package Export Folder", folder);
-        if (GUILayout.Button("Change")) {
-          _def.PrompUserToSetExportPath();
-        }
       } else {
         EditorGUILayout.LabelField("Package Export Folder");
-        if (GUILayout.Button("Change")) {
-          _def.PrompUserToSetExportPath();
-        }
+      }
+
+      if (GUILayout.Button("Change")) {
+        _def.PrompUserToSetExportPath();
       }
 
       EditorGUILayout.EndHorizontal();
+
+      EditorGUILayout.BeginHorizontal();
+      if (GUILayout.Button("Build Package")) {
+        _def.BuildPackage(ExportPackageOptions.Recurse | ExportPackageOptions.Interactive);
+      }
+      if (GUILayout.Button("Build All Parent Packages")) {
+        _def.BuildAllParentPackages(ExportPackageOptions.Recurse | ExportPackageOptions.Interactive);
+      }
+      EditorGUILayout.EndHorizontal();
+      GUILayout.Space(EditorGUIUtility.singleLineHeight * 2);
     }
 
     private void drawFolderElement(Rect rect, SerializedProperty property) {
