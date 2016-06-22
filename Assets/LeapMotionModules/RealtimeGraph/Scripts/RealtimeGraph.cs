@@ -2,22 +2,37 @@
 using UnityEngine.UI;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
-namespace Leap.Unity.RealtimeGraph {
+namespace Leap.Unity.Graphing {
 
   public class RealtimeGraph : MonoBehaviour {
 
-    public enum GraphType {
-      Framerate,
-      FrameDelta,
-      RenderDelta,
-      UpdateDelta,
-      TrackingFramerate,
-      TrackingLatency
+    private static RealtimeGraph _cachedInstance = null;
+    public static RealtimeGraph Instance {
+      get {
+        if (_cachedInstance == null) {
+          _cachedInstance = FindObjectOfType<RealtimeGraph>();
+        }
+        return _cachedInstance;
+      }
+    }
+
+    public enum GraphUnits {
+      Miliseconds,
+      Framerate
+    }
+
+    public enum GraphMode {
+      Inclusive,
+      Exclusive
     }
 
     [SerializeField]
-    private GraphType _graphType;
+    protected string _defaultGraph = "Framerate";
+
+    [SerializeField]
+    protected GraphMode _graphMode = GraphMode.Exclusive;
 
     [SerializeField]
     protected int _historyLength = 128;
@@ -29,10 +44,10 @@ namespace Leap.Unity.RealtimeGraph {
     protected int _samplesPerFrame = 1;
 
     [SerializeField]
-    private float _framerateLineSpacing = 60;
+    protected float _framerateLineSpacing = 60;
 
     [SerializeField]
-    private float _deltaLineSpacing = 10;
+    protected float _deltaLineSpacing = 10;
 
     [SerializeField]
     protected float _maxSmoothingDelay = 0.1f;
@@ -56,6 +71,9 @@ namespace Leap.Unity.RealtimeGraph {
     [SerializeField]
     protected Text valueLabel;
 
+    [SerializeField]
+    protected GameObject customGraphPrefab;
+
     public float UpdatePeriodFloat {
       set {
         _updatePeriod = Mathf.RoundToInt(Mathf.Lerp(1, 10, value));
@@ -68,40 +86,83 @@ namespace Leap.Unity.RealtimeGraph {
       }
     }
 
+    public float GraphModeFloat {
+      set {
+        _graphMode = value > 0.5f ? GraphMode.Inclusive : GraphMode.Exclusive;
+      }
+    }
+
     protected System.Diagnostics.Stopwatch _stopwatch = new System.Diagnostics.Stopwatch();
-    protected long _preCullTicks, _postRenderTicks;
-    protected long _fixedUpdateTicks;
-    protected long _endOfFrameTicks;
-
-    protected long _updateTicks;
-    protected long _frameTicks;
-
-    protected Dequeue<float> _history;
-    protected SlidingMax _slidingMax;
 
     protected int _sampleIndex = 0;
-    protected float _sampleValue = 0;
     protected int _updateCount = 0;
 
-    protected float _lineSpacing;
+    protected bool _paused = false;
+
     protected Texture2D _texture;
     protected Color32[] _colors;
 
     protected SmoothedFloat _smoothedValue;
     protected SmoothedFloat _smoothedMax;
 
-    protected virtual void OnValidate() {
-      _historyLength = Mathf.Max(1, _historyLength);
-      _updatePeriod = Mathf.Max(1, _updatePeriod);
+    protected Graph _currentGraph;
+    protected Dictionary<string, Graph> _graphs;
+    protected Stack<Graph> _currentGraphStack = new Stack<Graph>();
 
-      if (_texture != null) {
-        SwitchGraph(_graphType);
+    //Custom sample timers
+    protected long _preCullTicks, _renderTicks, _fixedTicks = -1;
+
+    public void BeginSample(string sampleName, GraphUnits units) {
+      long currTicks = _stopwatch.ElapsedTicks;
+
+      Graph graph = getGraph(sampleName, units);
+
+      if (_currentGraphStack.Count != 0) {
+        _currentGraphStack.Peek().PauseSample(currTicks);
+      }
+
+      graph.BeginSample(currTicks);
+
+      _currentGraphStack.Push(graph);
+    }
+
+    public void EndSample() {
+      long currTicks = _stopwatch.ElapsedTicks;
+
+      Graph graph = _currentGraphStack.Pop();
+      graph.EndSample(currTicks);
+
+      if (_currentGraphStack.Count != 0) {
+        _currentGraphStack.Peek().ResumeSample(currTicks);
       }
     }
 
+    public void AddSample(string sampleName, GraphUnits units, long ticks) {
+      Graph graph = getGraph(sampleName, units);
+      graph.AddSample(ticks);
+    }
+
+    public void AddSample(string sampleName, GraphUnits units, float ms) {
+      Graph graph = getGraph(sampleName, units);
+      graph.AddSample((long)(ms * System.Diagnostics.Stopwatch.Frequency * 0.001f));
+    }
+
+    public void SwtichGraph(string graphName) {
+      _currentGraph = _graphs[graphName];
+      titleLabel.text = graphName;
+    }
+
+    public void TogglePaused() {
+      _paused = !_paused;
+    }
+
+    protected virtual void OnValidate() {
+      _historyLength = Mathf.Max(1, _historyLength);
+      _updatePeriod = Mathf.Max(1, _updatePeriod);
+    }
+
     protected virtual void Awake() {
-      _history = new Dequeue<float>();
-      _slidingMax = new SlidingMax(_historyLength);
+      _graphs = new Dictionary<string, Graph>();
 
       _smoothedMax = new SmoothedFloat();
       _smoothedMax.delay = _maxSmoothingDelay;
@@ -127,8 +188,6 @@ namespace Leap.Unity.RealtimeGraph {
       Camera.onPreCull += onPreCull;
       Camera.onPostRender += onPostRender;
 
-      SwitchGraph(_graphType);
-
       StartCoroutine(endOfFrameWaiter());
     }
 
@@ -138,32 +197,50 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     protected virtual void Update() {
-      float value = getValue();
+      if (_fixedTicks != -1) {
+        AddSample("Physics Delta", GraphUnits.Miliseconds, _stopwatch.ElapsedTicks - _fixedTicks);
+        _fixedTicks = -1;
+      }
+
       _preCullTicks = -1;
 
-      if (float.IsInfinity(value) || float.IsNaN(value)) {
+      AddSample("Tracking Framerate", GraphUnits.Framerate, 1000.0f / _provider.CurrentFrame.CurrentFramesPerSecond);
+
+      if (_currentGraph == null) {
         return;
       }
 
-      _smoothedValue.Update(value, Time.deltaTime);
-
-      _sampleValue += value;
       _sampleIndex++;
       if (_sampleIndex < _samplesPerFrame) {
         return;
       }
 
-      value = _sampleValue / _sampleIndex;
+      foreach (Graph graph in _graphs.Values) {
+        if (_paused) {
+          graph.ClearSample();
+        } else {
+          graph.RecordSample(_sampleIndex);
+        }
+      }
       _sampleIndex = 0;
-      _sampleValue = 0;
 
-      _history.PushFront(value);
-      while (_history.Count > _historyLength) {
-        _history.PopBack();
+      float currValue, currMax;
+      switch (_graphMode) {
+        case GraphMode.Exclusive:
+          currValue = _currentGraph.exclusive.Back;
+          currMax = _currentGraph.exclusiveMax.Max;
+          break;
+        case GraphMode.Inclusive:
+          currValue = _currentGraph.inclusive.Back;
+          currMax = _currentGraph.inclusiveMax.Max;
+          break;
+        default:
+          throw new Exception("Unexpected graph mode");
       }
 
-      _slidingMax.AddValue(value);
-      _smoothedMax.Update(_slidingMax.Max, Time.deltaTime);
+      _smoothedValue.Update(currValue, Time.deltaTime);
+
+      _smoothedMax.Update(currMax, Time.deltaTime);
 
       _updateCount++;
       if (_updateCount >= _updatePeriod) {
@@ -173,113 +250,78 @@ namespace Leap.Unity.RealtimeGraph {
     }
 
     protected virtual void FixedUpdate() {
-      if (_fixedUpdateTicks == -1) {
-        _fixedUpdateTicks = _stopwatch.ElapsedTicks;
-      }
-    }
-
-    public void SwitchGraph(GraphType type) {
-      _graphType = type;
-
-      titleLabel.text = Enum.GetName(typeof(GraphType), _graphType);
-    }
-
-    public void SwitchGraph(string name) {
-      GraphType newType = (GraphType)Enum.Parse(typeof(GraphType), name);
-      SwitchGraph(newType);
-    }
-
-    public void NextGraph() {
-      GraphType nextType = (GraphType)(((int)_graphType + 1) % Enum.GetNames(typeof(GraphType)).Length);
-      SwitchGraph(nextType);
-    }
-
-    public void PrevGraph() {
-      int count = Enum.GetNames(typeof(GraphType)).Length;
-      GraphType nextType = (GraphType)(((int)_graphType - 1 + count) % count);
-      SwitchGraph(nextType);
-    }
-
-    private float getValue() {
-      switch (_graphType) {
-        case GraphType.RenderDelta:
-          return getRenderMs();
-        case GraphType.FrameDelta:
-          return getFrameMs();
-        case GraphType.Framerate:
-          return 1000.0f / getFrameMs();
-        case GraphType.UpdateDelta:
-          return getUpdateMs();
-        case GraphType.TrackingLatency:
-          return (_provider.GetLeapController().Now() - _provider.CurrentFrame.Timestamp) / 1000.0f;
-        case GraphType.TrackingFramerate:
-          return _provider.CurrentFrame.CurrentFramesPerSecond;
-        default:
-          throw new Exception("Unexpected graph type");
-      }
-    }
-
-    private float getGraphSpacing() {
-      switch (_graphType) {
-        case GraphType.FrameDelta:
-        case GraphType.RenderDelta:
-        case GraphType.UpdateDelta:
-        case GraphType.TrackingLatency:
-          return _deltaLineSpacing;
-        case GraphType.Framerate:
-        case GraphType.TrackingFramerate:
-          return _framerateLineSpacing;
-        default:
-          throw new Exception("Unexpected graph type");
+      if (_fixedTicks == -1) {
+        _fixedTicks = _stopwatch.ElapsedTicks;
       }
     }
 
     private IEnumerator endOfFrameWaiter() {
       WaitForEndOfFrame waiter = new WaitForEndOfFrame();
+      long endOfFrameTicks = _stopwatch.ElapsedTicks;
       while (true) {
         yield return waiter;
-        long ticks = _stopwatch.ElapsedTicks;
-        _frameTicks = ticks - _endOfFrameTicks;
-        _endOfFrameTicks = ticks;
-        _fixedUpdateTicks = -1;
+
+        long newTicks = _stopwatch.ElapsedTicks;
+        AddSample("Frame Delta", GraphUnits.Miliseconds, newTicks - endOfFrameTicks);
+        AddSample("Framerate", GraphUnits.Framerate, newTicks - endOfFrameTicks);
+        endOfFrameTicks = newTicks;
+
+        AddSample("Render Delta", GraphUnits.Miliseconds, _renderTicks);
+
+        AddSample("Tracking Latency", GraphUnits.Miliseconds, (_provider.GetLeapController().Now() - _provider.CurrentFrame.Timestamp) * 0.001f);
       }
     }
 
     private void onPreCull(Camera camera) {
       if (_preCullTicks == -1) {
         _preCullTicks = _stopwatch.ElapsedTicks;
-        if (_fixedUpdateTicks != -1) {
-          _updateTicks = _preCullTicks - _fixedUpdateTicks;
-        }
       }
     }
 
     private void onPostRender(Camera camera) {
-      _postRenderTicks = _stopwatch.ElapsedTicks;
+      _renderTicks = _stopwatch.ElapsedTicks - _preCullTicks;
     }
 
-    private float getRenderMs() {
-      long tickDelta = _postRenderTicks - _preCullTicks;
-      return ticksToMs(tickDelta);
-    }
-
-    private float getFrameMs() {
-      return ticksToMs(_frameTicks);
-    }
-
-    private float getUpdateMs() {
-      return ticksToMs(_updateTicks);
-    }
-
-    private float ticksToMs(long ticks) {
+    protected static float ticksToMs(long ticks) {
       return (float)(ticks / (System.Diagnostics.Stopwatch.Frequency / 1000.0));
+    }
+
+    private string msToString(float ms) {
+      return (Mathf.Round(ms * 10) * 0.1f).ToString();
+    }
+
+    private long msToTicks(float ms) {
+      return (long)(ms * System.Diagnostics.Stopwatch.Frequency * 1000);
+    }
+
+    private float getGraphSpacing() {
+      switch (_currentGraph.units) {
+        case GraphUnits.Framerate:
+          return _framerateLineSpacing;
+        case GraphUnits.Miliseconds:
+          return _deltaLineSpacing;
+        default:
+          throw new Exception("Unexpected graph units");
+      }
     }
 
     private void UpdateTexture() {
       float max = _smoothedMax.value * 1.5f;
 
-      for (int i = 0; i < _historyLength; i++) {
-        float percent = Mathf.Clamp01(_history[i] / max);
+      RingBuffer<float> history;
+      switch (_graphMode) {
+        case GraphMode.Exclusive:
+          history = _currentGraph.exclusive;
+          break;
+        case GraphMode.Inclusive:
+          history = _currentGraph.inclusive;
+          break;
+        default:
+          throw new Exception("Unexpected graph mode");
+      }
+
+      for (int i = 0; i < history.Count; i++) {
+        float percent = Mathf.Clamp01(history[i] / max);
         byte percentByte = (byte)(percent * 255.9999f);
         _colors[i] = new Color32(percentByte, percentByte, percentByte, percentByte);
       }
@@ -289,11 +331,118 @@ namespace Leap.Unity.RealtimeGraph {
       _texture.SetPixels32(_colors);
       _texture.Apply();
 
-      valueLabel.text = (Mathf.Round(_smoothedValue.value * 10) * 0.1f).ToString();
+      valueLabel.text = msToString(_smoothedValue.value);
 
       Vector3 localP = valueCanvas.transform.localPosition;
       localP.y = _smoothedValue.value / max - 0.5f;
       valueCanvas.transform.localPosition = localP;
+    }
+
+    protected Graph getGraph(string name, GraphUnits units) {
+      Graph graph;
+      if (!_graphs.TryGetValue(name, out graph)) {
+        graph = new Graph(name, units, _historyLength);
+        _graphs[name] = graph;
+
+        GameObject buttonObj = Instantiate(customGraphPrefab);
+        buttonObj.transform.SetParent(customGraphPrefab.transform.parent, false);
+
+        Text buttonText = buttonObj.GetComponentInChildren<Text>();
+        buttonText.text = name.Replace(' ', '\n');
+
+        Button button = buttonObj.GetComponentInChildren<Button>();
+        addCallback(button, name);
+
+        buttonObj.SetActive(true);
+
+        if (_currentGraph == null && name == _defaultGraph) {
+          SwtichGraph(name);
+        }
+      }
+      return graph;
+    }
+
+    protected void addCallback(Button button, string name) {
+      button.onClick.AddListener(() => SwtichGraph(name));
+    }
+
+    protected class Graph {
+      public string name;
+      public GraphUnits units;
+      public RingBuffer<float> exclusive;
+      public RingBuffer<float> inclusive;
+      public SlidingMax exclusiveMax, inclusiveMax;
+
+      private int maxHistory;
+
+      private long accumulatedInclusiveTicks, accumulatedExclusiveTicks;
+      private long inclusiveStart, exclusiveStart;
+
+      public Graph(string name, GraphUnits units, int maxHistory) {
+        this.name = name;
+        this.units = units;
+        this.maxHistory = maxHistory;
+        exclusive = new RingBuffer<float>(maxHistory);
+        inclusive = new RingBuffer<float>(maxHistory);
+        exclusiveMax = new SlidingMax(maxHistory);
+        inclusiveMax = new SlidingMax(maxHistory);
+      }
+
+      public void BeginSample(long currTicks) {
+        inclusiveStart = exclusiveStart = currTicks;
+      }
+
+      public void PauseSample(long currTicks) {
+        accumulatedInclusiveTicks += currTicks - inclusiveStart;
+      }
+
+      public void ResumeSample(long currTicks) {
+        inclusiveStart = currTicks;
+      }
+
+      public void EndSample(long currTicks) {
+        accumulatedInclusiveTicks += currTicks - inclusiveStart;
+        accumulatedExclusiveTicks += currTicks - exclusiveStart;
+      }
+
+      public void AddSample(long ticks) {
+        accumulatedInclusiveTicks += ticks;
+        accumulatedExclusiveTicks += ticks;
+      }
+
+      public void ClearSample() {
+        accumulatedExclusiveTicks = accumulatedInclusiveTicks = 0;
+      }
+
+      public void RecordSample(int sampleCount) {
+        float inclusiveMs = ticksToMs(accumulatedInclusiveTicks / sampleCount);
+        float exclusiveMs = ticksToMs(accumulatedExclusiveTicks / sampleCount);
+        ClearSample();
+
+        switch (units) {
+          case GraphUnits.Miliseconds:
+            inclusive.PushBack(inclusiveMs);
+            exclusive.PushBack(exclusiveMs);
+            inclusiveMax.AddValue(inclusiveMs);
+            exclusiveMax.AddValue(exclusiveMs);
+            break;
+          case GraphUnits.Framerate:
+            inclusive.PushBack(1000.0f / inclusiveMs);
+            exclusive.PushBack(1000.0f / exclusiveMs);
+            inclusiveMax.AddValue(1000.0f / inclusiveMs);
+            exclusiveMax.AddValue(1000.0f / exclusiveMs);
+            break;
+          default:
+            throw new Exception("Unexpected units type");
+        }
+
+        while (inclusive.Count > maxHistory) {
+          inclusive.PopFront();
+        }
+        while (exclusive.Count > maxHistory) {
+          exclusive.PopFront();
+        }
+      }
     }
   }
 }
