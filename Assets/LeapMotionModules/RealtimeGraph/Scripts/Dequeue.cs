@@ -31,9 +31,11 @@ namespace Leap.Unity.Graphing {
     }
 
     public void Clear() {
-      Array.Clear(_array, 0, _array.Length);
-      _back = 0;
-      _count = 0;
+      if (_count != 0) {
+        Array.Clear(_array, 0, _array.Length);
+        _back = 0;
+        _count = 0;
+      }
     }
 
     public void PushFront(T t) {
@@ -168,9 +170,18 @@ namespace Leap.Unity.Graphing {
     private void expandIfNeeded() {
       if (_count >= _array.Length) {
         T[] newArray = new T[_array.Length * 2];
-        for (int i = 0; i < _count; ++i) {
-          newArray[i] = _array[(_back + i) & _indexMask];
+
+        uint front = getFrontIndex();
+        if (_back <= front) {
+          //values do not wrap around, we can use a simple copy
+          Array.Copy(_array, _back, newArray, 0, _count);
+        } else {
+          //values do wrap around, we need to use 2 copies
+          uint backOffset = (uint)_array.Length - _back;
+          Array.Copy(_array, _back, newArray, 0, backOffset);
+          Array.Copy(_array, 0, newArray, backOffset, _count - backOffset);
         }
+
         _back = 0;
         _array = newArray;
         recalculateIndexMask();
