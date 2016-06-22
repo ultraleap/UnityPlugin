@@ -198,13 +198,13 @@ namespace Leap.Unity.Graphing {
 
     private void checkForValidIndex(uint index) {
       if (index >= _count) {
-        throw new IndexOutOfRangeException("The index " + index + " was out of range for the Dequeue with size " + _count + ".");
+        throw new IndexOutOfRangeException("The index " + index + " was out of range for the RingBuffer with size " + _count + ".");
       }
     }
 
     private void checkForEmpty(string actionName) {
       if (_count == 0) {
-        throw new InvalidOperationException("Cannot " + actionName + " because the Dequeue is empty.");
+        throw new InvalidOperationException("Cannot " + actionName + " because the RingBuffer is empty.");
       }
     }
   }
