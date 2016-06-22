@@ -40,29 +40,29 @@ namespace Leap.Unity.Graphing {
 
     public void PushFront(T t) {
       expandIfNeeded();
-      _count++;
-      Front = t;
+      ++_count;
+      _array[getFrontIndex()] = t;
     }
 
     public void PushBack(T t) {
       expandIfNeeded();
-      _count++;
+      ++_count;
       _back = (_back - 1) & _indexMask;
-      Back = t;
+      _array[_back] = t;
     }
 
     public void PopFront() {
       checkForEmpty("pop front");
 
-      Front = default(T);
+      _array[getFrontIndex()] = default(T);
       --_count;
     }
 
     public void PopBack() {
       checkForEmpty("pop back");
 
-      Back = default(T);
-      _count--;
+      _array[_back] = default(T);
+      --_count;
       _back = (_back + 1) & _indexMask;
     }
 
