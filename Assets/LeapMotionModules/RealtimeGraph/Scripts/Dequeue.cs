@@ -178,6 +178,9 @@ namespace Leap.Unity.Graphing {
     }
 
     private void recalculateIndexMask() {
+      //array length is always power of 2, so length-1 is the bitmask we need
+      //8 = 1000
+      //7 = 0111 = mask for values 0-7
       _indexMask = (uint)_array.Length - 1;
     }
 
