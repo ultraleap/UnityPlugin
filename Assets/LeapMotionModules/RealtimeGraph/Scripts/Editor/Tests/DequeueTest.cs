@@ -4,11 +4,11 @@ using NUnit.Framework;
 namespace Leap.Unity.Graphing.Tests {
   public class DequeueTest {
 
-    private Dequeue<int> _dequeue;
+    private RingBuffer<int> _dequeue;
 
     [SetUp]
     public void Setup() {
-      _dequeue = new Dequeue<int>();
+      _dequeue = new RingBuffer<int>();
     }
 
     [TearDown]
@@ -20,13 +20,13 @@ namespace Leap.Unity.Graphing.Tests {
     [Test]
     [ExpectedException(typeof(ArgumentException))]
     public void InvalidCapacity([Values(int.MinValue, -1, 0)] int minCapacity) {
-      new Dequeue<int>(minCapacity);
+      new RingBuffer<int>(minCapacity);
     }
 
     [Test]
     public void Clear() {
-      _dequeue.PushFront(1);
       _dequeue.PushBack(1);
+      _dequeue.PushFront(1);
       Assert.That(_dequeue.Count, Is.EqualTo(2));
       _dequeue.Clear();
       Assert.That(_dequeue.Count, Is.EqualTo(0));
@@ -35,14 +35,14 @@ namespace Leap.Unity.Graphing.Tests {
     [Test]
     [ExpectedException(typeof(InvalidOperationException))]
     public void AccessEmptyBack() {
-      int value = _dequeue.Back;
+      int value = _dequeue.Front;
       Assert.NotNull(value);  //Just to remove unused value warning
     }
 
     [Test]
     [ExpectedException(typeof(InvalidOperationException))]
     public void AccessEmptyFront() {
-      int value = _dequeue.Back;
+      int value = _dequeue.Front;
       Assert.NotNull(value);  //Just to remove unused value warning
     }
 
@@ -50,7 +50,7 @@ namespace Leap.Unity.Graphing.Tests {
     [ExpectedException(typeof(IndexOutOfRangeException))]
     public void InvalidIndex([Values(int.MinValue, -1, 5, int.MaxValue)] int index) {
       for (int i = 0; i < 5; i++) {
-        _dequeue.PushFront(0);
+        _dequeue.PushBack(0);
       }
 
       int value = _dequeue[index];
@@ -60,8 +60,8 @@ namespace Leap.Unity.Graphing.Tests {
     [Test]
     public void PushFront() {
       for (int i = 0; i < 100; i++) {
-        _dequeue.PushFront(i);
-        Assert.That(_dequeue.Front, Is.EqualTo(i));
+        _dequeue.PushBack(i);
+        Assert.That(_dequeue.Back, Is.EqualTo(i));
         Assert.That(_dequeue.Count, Is.EqualTo(i + 1));
         for (int j = 0; j <= i; j++) {
           Assert.That(j, Is.EqualTo(_dequeue[j]));
@@ -70,8 +70,8 @@ namespace Leap.Unity.Graphing.Tests {
 
       for (int i = 0; i < 100; i++) {
         int value;
-        Assert.That(_dequeue.Back, Is.EqualTo(i));
-        _dequeue.PopBack(out value);
+        Assert.That(_dequeue.Front, Is.EqualTo(i));
+        _dequeue.PopFront(out value);
         Assert.That(i, Is.EqualTo(value));
       }
     }
@@ -79,8 +79,8 @@ namespace Leap.Unity.Graphing.Tests {
     [Test]
     public void PushBack() {
       for (int i = 0; i < 100; i++) {
-        _dequeue.PushBack(i);
-        Assert.That(_dequeue.Back, Is.EqualTo(i));
+        _dequeue.PushFront(i);
+        Assert.That(_dequeue.Front, Is.EqualTo(i));
         Assert.That(_dequeue.Count, Is.EqualTo(i + 1));
         for (int j = 0; j <= i; j++) {
           Assert.That(i - j, Is.EqualTo(_dequeue[j]));
@@ -89,8 +89,8 @@ namespace Leap.Unity.Graphing.Tests {
 
       for (int i = 0; i < 100; i++) {
         int value;
-        Assert.That(_dequeue.Front, Is.EqualTo(i));
-        _dequeue.PopFront(out value);
+        Assert.That(_dequeue.Back, Is.EqualTo(i));
+        _dequeue.PopBack(out value);
         Assert.That(i, Is.EqualTo(value));
       }
     }

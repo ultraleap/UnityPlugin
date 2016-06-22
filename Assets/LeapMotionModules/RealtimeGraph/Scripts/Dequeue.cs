@@ -3,16 +3,17 @@ using UnityEngine;
 
 namespace Leap.Unity.Graphing {
 
-  public class Dequeue<T> {
+  public class RingBuffer<T> {
     private T[] _array;
-    private uint _back, _count;
+    private uint _front, _count;
     private uint _indexMask;
 
-    public Dequeue(int minCapacity = 8) {
+    public RingBuffer(int minCapacity = 8) {
       if (minCapacity <= 0) {
         throw new ArgumentException("Capacity must be positive and nonzero.");
       }
 
+      //Find next highest power of two
       int capacity = Mathf.ClosestPowerOfTwo(minCapacity);
       if (capacity < minCapacity) {
         capacity *= 2;
@@ -20,7 +21,7 @@ namespace Leap.Unity.Graphing {
 
       _array = new T[capacity];
       recalculateIndexMask();
-      _back = 0;
+      _front = 0;
       _count = 0;
     }
 
@@ -33,76 +34,76 @@ namespace Leap.Unity.Graphing {
     public void Clear() {
       if (_count != 0) {
         Array.Clear(_array, 0, _array.Length);
-        _back = 0;
+        _front = 0;
         _count = 0;
       }
     }
 
-    public void PushFront(T t) {
-      expandIfNeeded();
-      ++_count;
-      _array[getFrontIndex()] = t;
-    }
-
     public void PushBack(T t) {
-      expandIfNeeded();
+      doubleCapacityIfFull();
       ++_count;
-      _back = (_back - 1) & _indexMask;
-      _array[_back] = t;
+      _array[getBackIndex()] = t;
     }
 
-    public void PopFront() {
-      checkForEmpty("pop front");
-
-      _array[getFrontIndex()] = default(T);
-      --_count;
+    public void PushFront(T t) {
+      doubleCapacityIfFull();
+      ++_count;
+      _front = (_front - 1) & _indexMask;
+      _array[_front] = t;
     }
 
     public void PopBack() {
-      checkForEmpty("pop back");
-
-      _array[_back] = default(T);
-      --_count;
-      _back = (_back + 1) & _indexMask;
-    }
-
-    public void PopFront(out T front) {
       checkForEmpty("pop front");
 
-      uint frontIndex = getFrontIndex();
-      front = _array[frontIndex];
-      _array[frontIndex] = default(T);
+      _array[getBackIndex()] = default(T);
       --_count;
     }
 
-    public void PopBack(out T back) {
+    public void PopFront() {
       checkForEmpty("pop back");
 
-      back = _array[_back];
-      _array[_back] = default(T);
-      _back = (_back + 1) & _indexMask;
+      _array[_front] = default(T);
+      --_count;
+      _front = (_front + 1) & _indexMask;
+    }
+
+    public void PopBack(out T front) {
+      checkForEmpty("pop front");
+
+      uint backIndex = getBackIndex();
+      front = _array[backIndex];
+      _array[backIndex] = default(T);
       --_count;
     }
 
-    public T Back {
-      get {
-        checkForEmpty("get back");
-        return _array[_back];
-      }
-      set {
-        checkForEmpty("set back");
-        _array[_back] = value;
-      }
+    public void PopFront(out T back) {
+      checkForEmpty("pop back");
+
+      back = _array[_front];
+      _array[_front] = default(T);
+      _front = (_front + 1) & _indexMask;
+      --_count;
     }
 
     public T Front {
       get {
         checkForEmpty("get front");
-        return _array[getFrontIndex()];
+        return _array[_front];
       }
       set {
         checkForEmpty("set front");
-        _array[getFrontIndex()] = value;
+        _array[_front] = value;
+      }
+    }
+
+    public T Back {
+      get {
+        checkForEmpty("get back");
+        return _array[getBackIndex()];
+      }
+      set {
+        checkForEmpty("set back");
+        _array[getBackIndex()] = value;
       }
     }
 
@@ -121,21 +122,21 @@ namespace Leap.Unity.Graphing {
 
     public string ToDebugString() {
       string debug = "[";
-      uint front = (_back + _count - 1) & _indexMask;
+      uint back = getBackIndex();
       for (uint i = 0; i < _array.Length; i++) {
         bool isEmpty;
         if (_count == 0) {
           isEmpty = true;
         } else if (_count == 1) {
-          isEmpty = i != _back;
-        } else if (_back < front) {
-          isEmpty = (i < _back) || (i > front);
+          isEmpty = i != _front;
+        } else if (_front < back) {
+          isEmpty = (i < _front) || (i > back);
         } else {
-          isEmpty = (i < _back) && (i > front);
+          isEmpty = (i < _front) && (i > back);
         }
 
         string element = "";
-        if (i == _back) {
+        if (i == _front) {
           element = "{";
         } else {
           element = " ";
@@ -147,7 +148,7 @@ namespace Leap.Unity.Graphing {
           element += _array[i].ToString();
         }
 
-        if (i == front) {
+        if (i == back) {
           element += "}";
         } else {
           element += " ";
@@ -159,30 +160,30 @@ namespace Leap.Unity.Graphing {
       return debug;
     }
 
-    private uint getFrontIndex() {
-      return (_back + _count - 1) & _indexMask;
+    private uint getBackIndex() {
+      return (_front + _count - 1) & _indexMask;
     }
 
     private uint getIndex(uint index) {
-      return (_back + index) & _indexMask;
+      return (_front + index) & _indexMask;
     }
 
-    private void expandIfNeeded() {
+    private void doubleCapacityIfFull() {
       if (_count >= _array.Length) {
         T[] newArray = new T[_array.Length * 2];
 
-        uint front = getFrontIndex();
-        if (_back <= front) {
+        uint front = getBackIndex();
+        if (_front <= front) {
           //values do not wrap around, we can use a simple copy
-          Array.Copy(_array, _back, newArray, 0, _count);
+          Array.Copy(_array, _front, newArray, 0, _count);
         } else {
           //values do wrap around, we need to use 2 copies
-          uint backOffset = (uint)_array.Length - _back;
-          Array.Copy(_array, _back, newArray, 0, backOffset);
+          uint backOffset = (uint)_array.Length - _front;
+          Array.Copy(_array, _front, newArray, 0, backOffset);
           Array.Copy(_array, 0, newArray, backOffset, _count - backOffset);
         }
 
-        _back = 0;
+        _front = 0;
         _array = newArray;
         recalculateIndexMask();
       }

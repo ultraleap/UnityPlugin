@@ -227,11 +227,11 @@ namespace Leap.Unity.Graphing {
       float currValue, currMax;
       switch (_graphMode) {
         case GraphMode.Exclusive:
-          currValue = _currentGraph.exclusive.Front;
+          currValue = _currentGraph.exclusive.Back;
           currMax = _currentGraph.exclusiveMax.Max;
           break;
         case GraphMode.Inclusive:
-          currValue = _currentGraph.inclusive.Front;
+          currValue = _currentGraph.inclusive.Back;
           currMax = _currentGraph.inclusiveMax.Max;
           break;
         default:
@@ -308,7 +308,7 @@ namespace Leap.Unity.Graphing {
     private void UpdateTexture() {
       float max = _smoothedMax.value * 1.5f;
 
-      Dequeue<float> history;
+      RingBuffer<float> history;
       switch (_graphMode) {
         case GraphMode.Exclusive:
           history = _currentGraph.exclusive;
@@ -369,8 +369,8 @@ namespace Leap.Unity.Graphing {
     protected class Graph {
       public string name;
       public GraphUnits units;
-      public Dequeue<float> exclusive;
-      public Dequeue<float> inclusive;
+      public RingBuffer<float> exclusive;
+      public RingBuffer<float> inclusive;
       public SlidingMax exclusiveMax, inclusiveMax;
 
       private int maxHistory;
@@ -382,8 +382,8 @@ namespace Leap.Unity.Graphing {
         this.name = name;
         this.units = units;
         this.maxHistory = maxHistory;
-        exclusive = new Dequeue<float>(maxHistory);
-        inclusive = new Dequeue<float>(maxHistory);
+        exclusive = new RingBuffer<float>(maxHistory);
+        inclusive = new RingBuffer<float>(maxHistory);
         exclusiveMax = new SlidingMax(maxHistory);
         inclusiveMax = new SlidingMax(maxHistory);
       }
@@ -421,14 +421,14 @@ namespace Leap.Unity.Graphing {
 
         switch (units) {
           case GraphUnits.Miliseconds:
-            inclusive.PushFront(inclusiveMs);
-            exclusive.PushFront(exclusiveMs);
+            inclusive.PushBack(inclusiveMs);
+            exclusive.PushBack(exclusiveMs);
             inclusiveMax.AddValue(inclusiveMs);
             exclusiveMax.AddValue(exclusiveMs);
             break;
           case GraphUnits.Framerate:
-            inclusive.PushFront(1000.0f / inclusiveMs);
-            exclusive.PushFront(1000.0f / exclusiveMs);
+            inclusive.PushBack(1000.0f / inclusiveMs);
+            exclusive.PushBack(1000.0f / exclusiveMs);
             inclusiveMax.AddValue(1000.0f / inclusiveMs);
             exclusiveMax.AddValue(1000.0f / exclusiveMs);
             break;
@@ -437,10 +437,10 @@ namespace Leap.Unity.Graphing {
         }
 
         while (inclusive.Count > maxHistory) {
-          inclusive.PopBack();
+          inclusive.PopFront();
         }
         while (exclusive.Count > maxHistory) {
-          exclusive.PopBack();
+          exclusive.PopFront();
         }
       }
     }
