@@ -15,7 +15,7 @@ namespace Leap.Unity.Graphing {
 
     private int _history;
     private int _count;
-    private RingBuffer<IndexValuePair> _dequeue = new RingBuffer<IndexValuePair>();
+    private RingBuffer<IndexValuePair> _buffer = new RingBuffer<IndexValuePair>();
 
     public SlidingMax(int history) {
       _history = history;
@@ -23,21 +23,21 @@ namespace Leap.Unity.Graphing {
     }
 
     public void AddValue(float value) {
-      while (_dequeue.Count != 0 && _dequeue.Front.value <= value) {
-        _dequeue.PopFront();
+      while (_buffer.Count != 0 && _buffer.Front.value <= value) {
+        _buffer.PopFront();
       }
 
-      _dequeue.PushFront(new IndexValuePair(_count, value));
+      _buffer.PushFront(new IndexValuePair(_count, value));
       _count++;
 
-      while (_dequeue.Back.index < (_count - _history)) {
-        _dequeue.PopBack();
+      while (_buffer.Back.index < (_count - _history)) {
+        _buffer.PopBack();
       }
     }
 
     public float Max {
       get {
-        return _dequeue.Back.value;
+        return _buffer.Back.value;
       }
     }
   }
