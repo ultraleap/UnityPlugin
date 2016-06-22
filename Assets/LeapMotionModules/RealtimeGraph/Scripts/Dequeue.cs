@@ -9,6 +9,10 @@ namespace Leap.Unity.Graphing {
     private uint _indexMask;
 
     public Dequeue(int minCapacity = 8) {
+      if (minCapacity <= 0) {
+        throw new ArgumentException("Capacity must be positive and nonzero.");
+      }
+
       int capacity = Mathf.ClosestPowerOfTwo(minCapacity);
       if (capacity < minCapacity) {
         capacity *= 2;
