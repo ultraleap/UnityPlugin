@@ -53,33 +53,33 @@ namespace Leap.Unity.Graphing {
     }
 
     public void PopBack() {
-      checkForEmpty("pop front");
+      checkForEmpty("pop back");
 
       _array[getBackIndex()] = default(T);
       --_count;
     }
 
     public void PopFront() {
-      checkForEmpty("pop back");
+      checkForEmpty("pop front");
 
       _array[_front] = default(T);
       --_count;
       _front = (_front + 1) & _indexMask;
     }
 
-    public void PopBack(out T front) {
-      checkForEmpty("pop front");
+    public void PopBack(out T back) {
+      checkForEmpty("pop back");
 
       uint backIndex = getBackIndex();
-      front = _array[backIndex];
+      back = _array[backIndex];
       _array[backIndex] = default(T);
       --_count;
     }
 
-    public void PopFront(out T back) {
-      checkForEmpty("pop back");
+    public void PopFront(out T front) {
+      checkForEmpty("pop front");
 
-      back = _array[_front];
+      front = _array[_front];
       _array[_front] = default(T);
       _front = (_front + 1) & _indexMask;
       --_count;
