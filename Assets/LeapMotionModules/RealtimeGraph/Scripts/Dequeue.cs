@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 namespace Leap.Unity.Graphing {
 
@@ -7,8 +8,13 @@ namespace Leap.Unity.Graphing {
     private uint _back, _count;
     private uint _indexMask;
 
-    public Dequeue(int capacityPower = 3) {
-      _array = new T[(int)Math.Pow(2, capacityPower)];
+    public Dequeue(int minCapacity = 8) {
+      int capacity = Mathf.ClosestPowerOfTwo(minCapacity);
+      if (capacity < minCapacity) {
+        capacity *= 2;
+      }
+
+      _array = new T[capacity];
       recalculateIndexMask();
       _back = 0;
       _count = 0;

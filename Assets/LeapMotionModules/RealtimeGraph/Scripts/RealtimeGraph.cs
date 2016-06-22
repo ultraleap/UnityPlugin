@@ -320,7 +320,7 @@ namespace Leap.Unity.Graphing {
           throw new Exception("Unexpected graph mode");
       }
 
-      for (int i = 0; i < _historyLength; i++) {
+      for (int i = 0; i < history.Count; i++) {
         float percent = Mathf.Clamp01(history[i] / max);
         byte percentByte = (byte)(percent * 255.9999f);
         _colors[i] = new Color32(percentByte, percentByte, percentByte, percentByte);
