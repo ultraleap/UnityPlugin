@@ -9,8 +9,8 @@ using UnityEditor;
 using Leap;
 
 namespace Leap.Unity {
-  /** 
-   * HandPool holds a pool of IHandModels and makes HandRepresentations 
+  /**
+   * HandPool holds a pool of IHandModels and makes HandRepresentations
    * when given a Leap Hand and a model type of graphics or physics.
    * When a HandRepresentation is created, an IHandModel is removed from the pool.
    * When a HandRepresentation is finished, its IHandModel is returned to the pool.
@@ -25,7 +25,7 @@ namespace Leap.Unity {
     private Dictionary<IHandModel, HandRepresentation> modelToHandRepMapping = new Dictionary<IHandModel, HandRepresentation>();
 
     /**
-     * ModelGroup contains a left/right pair of IHandModel's 
+     * ModelGroup contains a left/right pair of IHandModel's
      * @param modelList The IHandModels available for use by HandRepresentations
      * @param modelsCheckedOut The IHandModels currently in use by active HandRepresentations
      * @param IsEnabled determines whether the ModelGroup is active at app Start(), though ModelGroup's are controlled with the EnableGroup() & DisableGroup methods.
@@ -125,6 +125,7 @@ namespace Leap.Unity {
       }
     }
 
+
     /**
      * MakeHandRepresentation receives a Hand and combines that with an IHandModel to create a HandRepresentation
      * @param hand The Leap Hand data to be drive an IHandModel
@@ -147,6 +148,49 @@ namespace Leap.Unity {
       activeHandReps.Add(handRep);
       return handRep;
     }
+
+    /** Attempts to draw another model from the Model pool for an existing HandRepresentation
+     * @param handRep The Representation for the hand which doesn't have any models assigned to it
+     * @returns Whether this representation was successfully assigned a model
+     */
+    public override bool AttemptToReassignHandModel(HandRepresentation handRep, ModelType modelType) {
+      bool Assigned = false;
+      for (int i = 0; i < ModelPool.Count; i++) {
+        ModelGroup group = ModelPool[i];
+        if (group.IsEnabled) {
+          IHandModel model = group.TryGetModel(handRep.RepChirality, modelType);
+          if (model != null) {
+            handRep.AddModel(model);
+            modelToHandRepMapping.Add(model, handRep);
+            Assigned = true;
+          }
+        }
+      }
+      return Assigned;
+    }
+
+    /** Check if any models are using this HandRepresentation
+      * @param hand The HandRepresentation to check
+      * @returns Whether this HandRepresentation has any models attached to it
+      */
+    public override bool CheckModelUsage(HandRepresentation handRep) {
+      bool isUsed = false;
+      foreach (ModelGroup group in ModelPool) {
+        if (group.IsEnabled) {
+          for (int m = 0; m < group.modelsCheckedOut.Count; m++) {
+            IHandModel model = group.modelsCheckedOut[m];
+            HandRepresentation handRepToCheck;
+            if (modelToHandRepMapping.TryGetValue(model, out handRepToCheck)) {
+              if (handRep == handRepToCheck) {
+                isUsed = true;
+              }
+            }
+          }
+        }
+      }
+      return isUsed;
+    }
+
     /**
     * EnableGroup finds suitable HandRepresentations and adds IHandModels from the ModelGroup, returns them to their ModelGroup and sets the groups IsEnabled to true.
      * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector

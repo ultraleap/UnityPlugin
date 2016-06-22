@@ -66,12 +66,12 @@ namespace Leap.Unity {
       }
     }
 
-    /** 
+    /**
     * Updates HandRepresentations based in the specified HandRepresentation Dictionary.
     * Active HandRepresentation instances are updated if the hand they represent is still
     * present in the Provider's CurrentFrame; otherwise, the HandRepresentation is removed. If new
-    * Leap Hand objects are present in the Leap HandRepresentation Dictionary, new HandRepresentations are 
-    * created and added to the dictionary. 
+    * Leap Hand objects are present in the Leap HandRepresentation Dictionary, new HandRepresentations are
+    * created and added to the dictionary.
     * @param all_hand_reps = A dictionary of Leap Hand ID's with a paired HandRepresentation
     * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
     * @param frame The Leap Frame containing Leap Hand data for each currently tracked hand
@@ -86,6 +86,11 @@ namespace Leap.Unity {
           }
         }
         if (rep != null) {
+          /** Check for any representations that have no models assigned to them */
+          if (!factory.CheckModelUsage(rep)) {
+            factory.AttemptToReassignHandModel(rep, modelType);
+          }
+
           rep.IsMarked = true;
           rep.UpdateRepresentation(curHand);
           rep.LastUpdatedTime = (int)frame.Timestamp;
@@ -105,7 +110,7 @@ namespace Leap.Unity {
           }
         }
       }
-      /**Inform the representation that we will no longer be giving it any hand updates 
+      /**Inform the representation that we will no longer be giving it any hand updates
        * because the corresponding hand has gone away */
       if (toBeDeleted != null) {
         all_hand_reps.Remove(toBeDeleted.HandID);
