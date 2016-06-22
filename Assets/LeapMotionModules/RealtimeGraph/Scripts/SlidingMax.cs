@@ -1,5 +1,5 @@
 ﻿
-namespace Leap.Unity.RealtimeGraph {
+namespace Leap.Unity.Graphing {
 
   public class SlidingMax {
 
@@ -15,7 +15,7 @@ namespace Leap.Unity.RealtimeGraph {
 
     private int _history;
     private int _count;
-    private Dequeue<IndexValuePair> _dequeue = new Dequeue<IndexValuePair>();
+    private RingBuffer<IndexValuePair> _dequeue = new RingBuffer<IndexValuePair>();
 
     public SlidingMax(int history) {
       _history = history;
