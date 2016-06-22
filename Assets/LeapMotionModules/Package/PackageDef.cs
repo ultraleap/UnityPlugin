@@ -37,7 +37,12 @@ namespace Leap.Unity.Packaging {
     }
 
     public bool PrompUserToSetExportPath() {
-      string chosenFolder = EditorUtility.SaveFilePanel("Select export path for " + _packageName, Application.dataPath, _packageName, "unitypackage");
+      string promptFolder;
+      if (!TryGetPackageExportFolder(out promptFolder, promptIfNotDefined: false)) {
+        promptFolder = Application.dataPath;
+      }
+
+      string chosenFolder = EditorUtility.SaveFilePanel("Select export path for " + _packageName, promptFolder, _packageName, "unitypackage");
       if (string.IsNullOrEmpty(chosenFolder)) {
         return false;
       }
@@ -51,7 +56,7 @@ namespace Leap.Unity.Packaging {
       return EditorPrefs.HasKey(key);
     }
 
-    public bool TryGetPackageExportFolder(out string folder, bool prompIfNotDefined) {
+    public bool TryGetPackageExportFolder(out string folder, bool promptIfNotDefined) {
       string key = getExportFolderKey();
       if (!EditorPrefs.HasKey(key)) {
         folder = null;
@@ -64,7 +69,7 @@ namespace Leap.Unity.Packaging {
 
     public void BuildPackage(ExportPackageOptions options) {
       string exportFolder;
-      if (!TryGetPackageExportFolder(out exportFolder, prompIfNotDefined: true)) {
+      if (!TryGetPackageExportFolder(out exportFolder, promptIfNotDefined: true)) {
         Debug.LogWarning("Did not build package " + _packageName + " because no path was defined.");
         return;
       }

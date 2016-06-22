@@ -28,7 +28,7 @@ namespace Leap.Unity.Packaging {
       EditorGUILayout.BeginHorizontal();
 
       string folder;
-      if (_def.TryGetPackageExportFolder(out folder, prompIfNotDefined: false)) {
+      if (_def.TryGetPackageExportFolder(out folder, promptIfNotDefined: false)) {
         EditorGUILayout.TextField("Package Export Folder", folder);
       } else {
         EditorGUILayout.LabelField("Package Export Folder");
