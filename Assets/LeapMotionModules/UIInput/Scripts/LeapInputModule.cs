@@ -497,7 +497,7 @@ namespace Leap.Unity.InputModule {
               if ((currentGo[whichPointer]) && (currentGoing[whichPointer] == currentGo[whichPointer])) {
                 ExecuteEvents.Execute(currentGoing[whichPointer], PointEvents[whichPointer], ExecuteEvents.pointerUpHandler);
               }
-              Debug.Log(currentGoing[whichPointer].name);
+              //Debug.Log(currentGoing[whichPointer].name);
               if (currentOverGo[whichPointer] != null) {
                 ExecuteEvents.ExecuteHierarchy(currentOverGo[whichPointer], PointEvents[whichPointer], ExecuteEvents.dropHandler);
               }
