@@ -6,6 +6,12 @@ using LeapInternal;
 
 namespace Leap.Unity.Interaction.CApi {
 
+  public enum Version : uint {
+    Current = 0x0102,
+    Major = 0xff00, // Any API breaking changes
+    Minor = 0x00ff
+  }
+
   public enum ReturnStatus : uint {
     Success = 0,
     InvalidHandle = 1,
@@ -175,6 +181,8 @@ namespace Leap.Unity.Interaction.CApi {
     public LEAP_VECTOR gravity;
     public float depthUntilSphericalInside;
     public float physicsScale;
+    public IntPtr ldatData;
+    public UInt32 ldatSize;
   }
 
   // All properties require eLeapIEShapeFlags to enable
@@ -234,18 +242,16 @@ namespace Leap.Unity.Interaction.CApi {
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetVersion")]
     private static extern UInt32 LeapIEGetVersion();
 
-    public static UInt32 GetVersion() { return LeapIEGetVersion(); }
+    public static UInt32 GetLibraryVersion() { return LeapIEGetVersion(); }
+
+    public static UInt32 GetExpectedVersion() { return (UInt32)Version.Current; }
 
     /*** Create Scene ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIECreateScene", CallingConvention = CallingConvention.Cdecl)]
-    private static extern ReturnStatus LeapIECreateScene(ref INTERACTION_SCENE scene,
-                                                         ref INTERACTION_SCENE_INFO sceneInfo,
-                                                             string dataPath);
+    private static extern ReturnStatus LeapIECreateScene(ref INTERACTION_SCENE scene);
 
-    public static ReturnStatus CreateScene(ref INTERACTION_SCENE scene,
-                                           ref INTERACTION_SCENE_INFO sceneInfo,
-                                               string dataPath) {
-      var rs = LeapIECreateScene(ref scene, ref sceneInfo, dataPath);
+    public static ReturnStatus CreateScene(ref INTERACTION_SCENE scene) {
+      var rs = LeapIECreateScene(ref scene);
       Logger.HandleReturnStatus("Create Scene", LogLevel.Info, rs);
       return rs;
     }
