@@ -10,9 +10,10 @@ namespace Leap.Unity.Packaging {
 
   public class PackageDef : ScriptableObject {
     private const string PACKAGE_EXPORT_FOLDER_KEY = "LeapPackageDefExportFolder";
+    private const string DEFAULT_PACKAGE_NAME = "Package.asset";
 
     [SerializeField]
-    protected string _packageName;
+    protected string _packageName = "New Package";
 
     [SerializeField]
     protected string[] _dependantFolders;
@@ -59,8 +60,10 @@ namespace Leap.Unity.Packaging {
     public bool TryGetPackageExportFolder(out string folder, bool promptIfNotDefined) {
       string key = getExportFolderKey();
       if (!EditorPrefs.HasKey(key)) {
-        folder = null;
-        return false;
+        if (!promptIfNotDefined || !PrompUserToSetExportPath()) {
+          folder = null;
+          return false;
+        }
       }
 
       folder = EditorPrefs.GetString(key);
@@ -144,6 +147,29 @@ namespace Leap.Unity.Packaging {
       var instance = CreateInstance<PackageDef>();
       AssetDatabase.CreateAsset(instance, "Assets/packageDef.asset");
       AssetDatabase.SaveAssets();
+    }
+
+    [MenuItem("Assets/Create/Package Definition", priority = 201)]
+    private static void createNewPackageDef() {
+      string path = "Assets";
+
+      foreach (Object obj in Selection.GetFiltered(typeof(Object), SelectionMode.Assets)) {
+        path = AssetDatabase.GetAssetPath(obj);
+        if (!string.IsNullOrEmpty(path) && File.Exists(path)) {
+          path = Path.GetDirectoryName(path);
+          break;
+        }
+      }
+
+      path = Path.Combine(path, DEFAULT_PACKAGE_NAME);
+      path = AssetDatabase.GenerateUniqueAssetPath(path);
+
+      PackageDef package = CreateInstance<PackageDef>();
+      AssetDatabase.CreateAsset(package, path);
+      AssetDatabase.SaveAssets();
+      AssetDatabase.Refresh();
+
+      Selection.activeObject = package;
     }
   }
 }
