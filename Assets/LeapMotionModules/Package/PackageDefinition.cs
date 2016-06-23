@@ -142,7 +142,7 @@ namespace Leap.Unity.Packaging {
     /// Builds this package in addition to all packages that depend on this package in some way.
     /// </summary>
     public void BuildAllParentPackages() {
-      List<PackageDefinition> parentPackages = findParentPackages();
+      List<PackageDefinition> parentPackages = GetParentPackages();
       parentPackages.Add(this);
 
       buildPackages(parentPackages.ToArray());
@@ -165,7 +165,7 @@ namespace Leap.Unity.Packaging {
     /// <summary>
     /// Finds all packages that depend on this package in some way.
     /// </summary>
-    private List<PackageDefinition> findParentPackages() {
+    public List<PackageDefinition> GetParentPackages() {
       List<PackageDefinition> parents = new List<PackageDefinition>();
       var allPackages = Resources.FindObjectsOfTypeAll<PackageDefinition>();
 

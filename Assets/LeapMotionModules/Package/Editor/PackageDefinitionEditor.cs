@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Packaging {
 
@@ -10,17 +11,42 @@ namespace Leap.Unity.Packaging {
   public class PackageDefinitionEditor : CustomEditorBase {
 
     private PackageDefinition _def;
+    private List<PackageDefinition> _parentPackages;
 
     protected override void OnEnable() {
       base.OnEnable();
 
       _def = target as PackageDefinition;
 
+      _parentPackages = _def.GetParentPackages();
+
       createList("_dependantFolders", drawFolderElement);
       createList("_dependantFiles", drawFileElement);
       createList("_dependantPackages", drawPackageElement);
 
       specifyCustomDecorator("_dependantFolders", drawPackageExportFolder);
+    }
+
+    public override void OnInspectorGUI() {
+      base.OnInspectorGUI();
+
+      if (_parentPackages.Count != 0) {
+        GUILayout.Space(EditorGUIUtility.singleLineHeight * 2);
+
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("Packages that depend on this package", EditorStyles.boldLabel);
+        if (GUILayout.Button("Build All")) {
+          _def.BuildAllParentPackages();
+        }
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUI.BeginDisabledGroup(true);
+        foreach (var parentPackage in _parentPackages) {
+          EditorGUILayout.ObjectField(parentPackage, typeof(PackageDefinition), false);
+        }
+        EditorGUI.EndDisabledGroup();
+        
+      }
     }
 
     private void drawPackageExportFolder(SerializedProperty property) {
@@ -39,14 +65,9 @@ namespace Leap.Unity.Packaging {
 
       EditorGUILayout.EndHorizontal();
 
-      EditorGUILayout.BeginHorizontal();
-      if (GUILayout.Button("Build Package")) {
+      if (GUILayout.Button("Build Package", GUILayout.MinHeight(EditorGUIUtility.singleLineHeight * 2))) {
         _def.BuildPackage(interactive: true);
       }
-      if (GUILayout.Button("Build All Parent Packages")) {
-        _def.BuildAllParentPackages();
-      }
-      EditorGUILayout.EndHorizontal();
       GUILayout.Space(EditorGUIUtility.singleLineHeight * 2);
     }
 
