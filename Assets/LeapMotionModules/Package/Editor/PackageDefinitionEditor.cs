@@ -41,10 +41,10 @@ namespace Leap.Unity.Packaging {
 
       EditorGUILayout.BeginHorizontal();
       if (GUILayout.Button("Build Package")) {
-        _def.BuildPackage(ExportPackageOptions.Recurse | ExportPackageOptions.Interactive);
+        _def.BuildPackage();
       }
       if (GUILayout.Button("Build All Parent Packages")) {
-        _def.BuildAllParentPackages(ExportPackageOptions.Recurse | ExportPackageOptions.Interactive);
+        _def.BuildAllParentPackages();
       }
       EditorGUILayout.EndHorizontal();
       GUILayout.Space(EditorGUIUtility.singleLineHeight * 2);

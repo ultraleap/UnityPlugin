@@ -2,6 +2,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
@@ -88,7 +89,7 @@ namespace Leap.Unity.Packaging {
     /// and the dependancies of all dependant packages.  This will NOT include ANY package definition assets
     /// in the exported package.
     /// </summary>
-    public void BuildPackage(ExportPackageOptions options) {
+    public void BuildPackage() {
       string exportFolder;
       if (!TryGetPackageExportFolder(out exportFolder, promptIfNotDefined: true)) {
         Debug.LogWarning("Did not build package " + _packageName + " because no path was defined.");
@@ -128,18 +129,18 @@ namespace Leap.Unity.Packaging {
                                   Where(path => Path.GetExtension(path) != ".meta").
                                   ToArray();
 
-      AssetDatabase.ExportPackage(filteredAssets, exportPath, options);
+      AssetDatabase.ExportPackage(filteredAssets, exportPath, ExportPackageOptions.Interactive | ExportPackageOptions.Recurse);
     }
 
     /// <summary>
     /// Builds this package in addition to all packages that depend on this package in some way.
     /// </summary>
-    public void BuildAllParentPackages(ExportPackageOptions options) {
+    public void BuildAllParentPackages() {
       List<PackageDefinition> parentPackages = findParentPackages();
       parentPackages.Add(this);
 
       foreach (var package in parentPackages) {
-        package.BuildPackage(options);
+        package.BuildPackage();
       }
     }
 
@@ -183,11 +184,24 @@ namespace Leap.Unity.Packaging {
       return PACKAGE_EXPORT_FOLDER_KEY + "_" + AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(this));
     }
 
+    [MenuItem("Assets/Build All Packages")]
+    private static void buildAllPackages() {
+      var packages = Resources.FindObjectsOfTypeAll<PackageDefinition>();
+      foreach (var package in packages) {
+        try {
+          package.BuildPackage();
+        } catch (Exception e) {
+          Debug.LogError("Exception thrown while trying to build package " + package._packageName);
+          Debug.LogException(e);
+        }
+      }
+    }
+
     [MenuItem("Assets/Create/Package Definition", priority = 201)]
     private static void createNewPackageDef() {
       string path = "Assets";
 
-      foreach (Object obj in Selection.GetFiltered(typeof(Object), SelectionMode.Assets)) {
+      foreach (UnityEngine.Object obj in Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Assets)) {
         path = AssetDatabase.GetAssetPath(obj);
         if (!string.IsNullOrEmpty(path) && File.Exists(path)) {
           path = Path.GetDirectoryName(path);
