@@ -55,9 +55,10 @@ namespace Leap.Unity.Interaction {
     protected float _angularDrag;
 
     protected ContactMode _contactMode = ContactMode.NORMAL;
-    protected int _touchingBrushes = 0;
+    protected int _dislocatedBrushCount = 0;
 
     protected bool _recievedVelocityUpdate = false;
+    protected float _minHandDistance = float.MaxValue;
     protected bool _notifiedOfTeleport = false;
     protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
@@ -77,7 +78,7 @@ namespace Leap.Unity.Interaction {
     public override bool IsBeingGrasped {
       get {
         Assert.IsTrue((_contactMode == ContactMode.GRASPED) == base.IsBeingGrasped);
-        return base.IsBeingGrasped;
+        return _contactMode == ContactMode.GRASPED;
       }
     }
 
@@ -92,7 +93,7 @@ namespace Leap.Unity.Interaction {
       set {
         _isKinematic = value;
         if (HasShapeInstance) {
-          if (!IsBeingGrasped) {
+          if (_contactMode != ContactMode.GRASPED) {
             _rigidbody.isKinematic = value;
           }
         } else {
@@ -198,7 +199,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnPreSolve() {
       base.OnPreSolve();
 
-      if (IsBeingGrasped && UntrackedHandCount == 0 &&
+      if (_contactMode == ContactMode.GRASPED && UntrackedHandCount == 0 &&
           Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale) {
         _manager.ReleaseObject(this);
       }
@@ -337,11 +338,9 @@ namespace Leap.Unity.Interaction {
       _showDebugRecievedVelocity = _recievedVelocityUpdate;
 #endif
 
-      if (_contactMode == ContactMode.SOFT && _touchingBrushes == 0
-          && ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) == 0 || results.maxHandDepth >= 0.0f)) {
-        _contactMode = ContactMode.NORMAL;
-        updateLayer();
-      }
+      _minHandDistance = (results.resultFlags & ShapeInstanceResultFlags.MaxHand) == 0 ? float.MaxValue : results.minHandDistance;
+
+      updateContactMode();
     }
 
     protected override void OnHandGrasped(Hand hand) {
@@ -434,9 +433,7 @@ namespace Leap.Unity.Interaction {
       _controllers.MoveToController.SetGraspedState();
 
       _materialReplacer.ReplaceMaterials();
-
-      _contactMode = ContactMode.GRASPED;
-      updateLayer();
+      updateContactMode();
     }
 
     protected override void OnGraspEnd(Hand lastHand) {
@@ -449,16 +446,27 @@ namespace Leap.Unity.Interaction {
       }
 
       revertRigidbodyState();
-
       _materialReplacer.RevertMaterials();
-
-      // Only transition to ContactMode.NORMAL after checking for brushes.
-      _contactMode = ContactMode.SOFT;
-      updateLayer();
+      updateContactMode();
     }
     #endregion
 
     #region UNITY CALLBACKS
+
+    protected override void OnTriggerEnter(Collider other) {
+      if(other.CompareTag("LeapMotion.InteractionBrush")) {
+        ++_dislocatedBrushCount;
+        updateContactMode();
+      }
+    }
+
+    protected override void OnTriggerExit(Collider other) {
+      if(other.CompareTag("LeapMotion.InteractionBrush")) {
+        --_dislocatedBrushCount;
+        updateContactMode();
+      }
+    }
+
 #if UNITY_EDITOR
     private void OnCollisionEnter(Collision collision) {
       GameObject otherObj = collision.collider.gameObject;
@@ -479,7 +487,7 @@ namespace Leap.Unity.Interaction {
 
         if (_rigidbody.IsSleeping()) {
           Gizmos.color = Color.gray;
-        } else if (IsBeingGrasped) {
+        } else if (_contactMode == ContactMode.GRASPED) {
           Gizmos.color = Color.green;
         } else if (_showDebugRecievedVelocity && _contactMode == ContactMode.SOFT) {
           Gizmos.color = Color.red;
@@ -497,6 +505,23 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL
+
+    protected void updateContactMode() {
+      ContactMode desiredContactMode = ContactMode.NORMAL;
+      if(base.IsBeingGrasped) {
+        desiredContactMode = ContactMode.GRASPED;
+      }
+      else if(_dislocatedBrushCount != 0 || (_contactMode == ContactMode.SOFT && _minHandDistance <= 0.0f )) {
+        desiredContactMode = ContactMode.SOFT;
+      }
+
+      if(_contactMode != desiredContactMode) {
+        _contactMode = desiredContactMode;
+        updateLayer();
+      }
+
+      Assert.IsTrue((_contactMode == ContactMode.GRASPED) == base.IsBeingGrasped);
+    }
 
     protected void updateLayer() {
       int layer;

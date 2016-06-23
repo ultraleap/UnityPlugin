@@ -14,9 +14,16 @@ namespace Leap.Unity.Interaction {
     private const int N_FINGERS = 5;
     private const int N_ACTIVE_BONES = 3;
     private const float DEAD_ZONE_FRACTION = 0.05f;
+    private const float DISLOCATION_FRACTION = 1.5f;
 
-    private Rigidbody[] _capsuleBodies;
-    private Vector3[] _lastTarget;
+    private struct BrushState {
+      public Rigidbody capsuleBody;
+      public CapsuleCollider capsuleCollider;
+      public Vector3 lastTarget;
+      public bool isDislocated = false;
+    }
+
+    private BrushState[] _brushState;
     private Hand _hand;
     private GameObject _handParent;
 
@@ -70,8 +77,7 @@ namespace Leap.Unity.Interaction {
       _handParent = new GameObject(gameObject.name);
       _handParent.transform.parent = null; // Prevent hand from moving when you turn your head.
 
-      _capsuleBodies = new Rigidbody[N_FINGERS * N_ACTIVE_BONES];
-      _lastTarget = new Vector3[N_FINGERS * N_ACTIVE_BONES];
+      _brushState = new BrushState[N_FINGERS * N_ACTIVE_BONES];
 
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
@@ -80,6 +86,7 @@ namespace Leap.Unity.Interaction {
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
           GameObject capsuleGameObject = new GameObject(gameObject.name, typeof(Rigidbody), typeof(CapsuleCollider));
           capsuleGameObject.layer = gameObject.layer;
+          capsuleGameObject.tag = "LeapMotion.InteractionBrush";
 #if UNITY_EDITOR
           // This is a debug facility that warns developers of issues.
           capsuleGameObject.AddComponent<InteractionBrushBone>();
@@ -94,9 +101,10 @@ namespace Leap.Unity.Interaction {
           capsule.radius = bone.Width * 0.5f;
           capsule.height = bone.Length + bone.Width;
           capsule.material = _material;
+          _brushState[boneArrayIndex].capsuleCollider = capsule;
 
           Rigidbody body = capsuleGameObject.GetComponent<Rigidbody>();
-          _capsuleBodies[boneArrayIndex] = body;
+          _brushState[boneArrayIndex].capsuleBody = body;
           body.position = bone.Center.ToVector3();
           body.rotation = bone.Rotation.ToQuaternion();
           body.freezeRotation = true;
@@ -105,7 +113,7 @@ namespace Leap.Unity.Interaction {
           body.mass = _perBoneMass;
           body.collisionDetectionMode = _collisionDetection;
 
-          _lastTarget[boneArrayIndex] = bone.Center.ToVector3();
+          _brushState[boneArrayIndex].lastTarget = bone.Center.ToVector3();
         }
       }
     }
@@ -119,32 +127,41 @@ namespace Leap.Unity.Interaction {
         return;
 #endif
 
-      float deadzone = DEAD_ZONE_FRACTION * _hand.Fingers[1].Bone((Bone.BoneType)1).Width;
+      float width = _hand.Fingers[1].Bone((Bone.BoneType)1).Width;
+      float deadzone = DEAD_ZONE_FRACTION * width;
 
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
 
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
-          Rigidbody body = _capsuleBodies[boneArrayIndex];
+          Rigidbody body = _brushState[boneArrayIndex].capsuleBody;
           body.MoveRotation(bone.Rotation.ToQuaternion());
 
           // Calculate how far off the mark the brushes are.
-          float targetingError = (_lastTarget[boneArrayIndex] - body.position).magnitude / bone.Width;
-          _lastTarget[boneArrayIndex] = bone.Center.ToVector3();
+          float targetingError = (_brushState[boneArrayIndex].lastTarget - body.position).magnitude / bone.Width;
+          _brushState[boneArrayIndex].lastTarget = bone.Center.ToVector3();
 
           // Reduce the energy applied by the brushes as they are pushed away.
           float massScale = Mathf.Clamp(1.0f - (targetingError*2.0f), 0.1f, 1.0f);
           body.mass = _perBoneMass * massScale;
 
+          // Switch to triggering when dislocated.
+          bool isDislocated = targetingError >= DISLOCATION_FRACTION;
+          if(isDislocated != _brushState[boneArrayIndex].isDislocated) {
+            _brushState[boneArrayIndex].isDislocated = isDislocated;
+            _brushState[boneArrayIndex].capsuleCollider.isTrigger = isDislocated;
+          }
+
+          // Add a deadzone to avoid vibration.
           Vector3 delta = bone.Center.ToVector3() - body.position;
           float deltaLen = delta.magnitude;
           if (deltaLen <= deadzone) {
             body.velocity = Vector3.zero;
             continue;
           }
-
           delta *= (deltaLen - deadzone) / deltaLen;
+
           body.velocity = delta / Time.fixedDeltaTime;
         }
       }
@@ -152,10 +169,30 @@ namespace Leap.Unity.Interaction {
 
     public override void FinishHand() {
       GameObject.Destroy(_handParent);
-      _capsuleBodies = null;
-      _lastTarget = null;
+      _brushState = null;
 
       base.FinishHand();
     }
+
+#if UNITY_EDITOR
+    public override void OnDrawGizmos(){
+      Matrix4x4 gizmosMatrix = Gizmos.matrix;
+
+      float radius = _hand.Fingers[1].Bone((Bone.BoneType)1).Width;
+
+      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
+        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
+          int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
+          Rigidbody body = _brushState[boneArrayIndex].capsuleBody;
+
+          Gizmos.matrix = body.transform.localToWorldMatrix;
+          Gizmos.color = _brushState[boneArrayIndex].isDislocated ? Color.red : Color.green;
+          Gizmos.DrawWireSphere(body.centerOfMass, radius);
+        }
+      }
+
+      Gizmos.matrix = gizmosMatrix;
+    }
+#endif
   }
 }

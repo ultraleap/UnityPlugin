@@ -214,8 +214,7 @@ namespace Leap.Unity.Interaction.CApi {
     public ShapeInstanceResultFlags resultFlags;
     public LEAP_VECTOR linearVelocity;
     public LEAP_VECTOR angularVelocity;
-    public float maxHandDepth;
-    public LEAP_VECTOR maxHandVelocity;
+    public float minHandDistance;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]
