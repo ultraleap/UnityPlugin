@@ -72,11 +72,8 @@ namespace Leap.Unity.Attributes {
         r.width = EditorGUIUtility.labelWidth + fieldWidth;
 
         if (fullPropertyDrawer != null) {
-          r.height = fullPropertyDrawer.GetPropertyHeight(property);
           fullPropertyDrawer.DrawProperty(r, property, label);
         } else {
-          r.height = EditorGUIUtility.singleLineHeight;
-
           if (rangeAttribute != null) {
             if (property.propertyType == SerializedPropertyType.Integer) {
               property.intValue = EditorGUI.IntSlider(r, label, property.intValue, (int)rangeAttribute.min, (int)rangeAttribute.max);
@@ -93,14 +90,12 @@ namespace Leap.Unity.Attributes {
         r.x += r.width;
       } else {
         r.width = EditorGUIUtility.labelWidth;
-        r.height = EditorGUIUtility.singleLineHeight;
         r = EditorGUI.PrefixLabel(r, label);
 
         drawAdditive<IAfterLabelAdditiveDrawer>(ref r, property);
         drawAdditive<IBeforeFieldAdditiveDrawer>(ref r, property);
 
         r.width = fieldWidth;
-        r.height = EditorGUIUtility.singleLineHeight;
         EditorGUI.PropertyField(r, property, GUIContent.none);
         r.x += r.width;
       }
@@ -123,7 +118,6 @@ namespace Leap.Unity.Attributes {
         if (a is T) {
           T t = a as T;
           r.width = t.GetWidth();
-          r.height = EditorGUIUtility.singleLineHeight;
           t.Draw(r, property);
           r.x += r.width;
         }

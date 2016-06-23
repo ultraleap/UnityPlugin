@@ -19,7 +19,6 @@ namespace Leap.Unity.Attributes {
 
   public interface IFullPropertyDrawer {
 #if UNITY_EDITOR
-    float GetPropertyHeight(SerializedProperty property);
     void DrawProperty(Rect rect, SerializedProperty property, GUIContent label);
 #endif
   }
