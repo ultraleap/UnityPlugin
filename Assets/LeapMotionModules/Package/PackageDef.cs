@@ -87,10 +87,28 @@ namespace Leap.Unity.Packaging {
 
       foreach (var package in totalPackages) {
         assets.UnionWith(package._dependantFiles);
-        assets.UnionWith(package._dependantFolders);
+
+        //package exporter expands directories, we do it manually so that we can filter later
+        //on a file-by-file basis
+        foreach (var folder in package._dependantFolders) {
+          foreach (var subFile in Directory.GetFiles(folder, "*", SearchOption.AllDirectories)) {
+            assets.Add(subFile);
+          }
+        }
       }
 
-      var filteredAssets = assets.Where(path => File.Exists(path) || Directory.Exists(path)).ToArray();
+      //Build a set of paths to package definitions
+      //We want to be able to exclude paths from the export that are paths to package definitions
+      var packagePaths = new HashSet<string>(Resources.FindObjectsOfTypeAll<PackageDef>().Select(package => Path.GetFullPath(AssetDatabase.GetAssetPath(package))));
+
+      //Filter paths to:
+      // - paths that point to existing files
+      // - paths that do not point to package definitions
+      // - paths that do not point to meta files (let the exporter take care of that)
+      var filteredAssets = assets.Where(path => File.Exists(path)).
+                                  Where(path => !packagePaths.Contains(Path.GetFullPath(path))).
+                                  Where(path => Path.GetExtension(path) != ".meta").
+                                  ToArray();
 
       AssetDatabase.ExportPackage(filteredAssets, exportPath, options);
     }
@@ -128,6 +146,7 @@ namespace Leap.Unity.Packaging {
       List<PackageDef> parents = new List<PackageDef>();
       var allPackages = Resources.FindObjectsOfTypeAll<PackageDef>();
 
+      //Just search through all existing package definitions and check their dependancies
       HashSet<PackageDef> packages = new HashSet<PackageDef>();
       foreach (var package in allPackages) {
         package.buildPackageSet(packages);
@@ -141,14 +160,9 @@ namespace Leap.Unity.Packaging {
     }
 
     private string getExportFolderKey() {
+      //Tie the key to the guid of the asset, as it will never change for the duration of the asset's life and will be unique for
+      //a given computer.
       return PACKAGE_EXPORT_FOLDER_KEY + "_" + AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(this));
-    }
-
-    [MenuItem("Menu/MakeOne")]
-    public static void doTheTHing() {
-      var instance = CreateInstance<PackageDef>();
-      AssetDatabase.CreateAsset(instance, "Assets/packageDef.asset");
-      AssetDatabase.SaveAssets();
     }
 
     [MenuItem("Assets/Create/Package Definition", priority = 201)]
