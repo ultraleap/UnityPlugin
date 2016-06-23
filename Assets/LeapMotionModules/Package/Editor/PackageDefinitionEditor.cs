@@ -41,7 +41,7 @@ namespace Leap.Unity.Packaging {
 
       EditorGUILayout.BeginHorizontal();
       if (GUILayout.Button("Build Package")) {
-        _def.BuildPackage();
+        _def.BuildPackage(interactive: true);
       }
       if (GUILayout.Button("Build All Parent Packages")) {
         _def.BuildAllParentPackages();

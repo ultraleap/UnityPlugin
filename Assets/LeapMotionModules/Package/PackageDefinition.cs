@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Leap.Unity.Packaging {
 
@@ -89,10 +90,10 @@ namespace Leap.Unity.Packaging {
     /// and the dependancies of all dependant packages.  This will NOT include ANY package definition assets
     /// in the exported package.
     /// </summary>
-    public void BuildPackage() {
+    public void BuildPackage(bool interactive) {
       string exportFolder;
       if (!TryGetPackageExportFolder(out exportFolder, promptIfNotDefined: true)) {
-        Debug.LogWarning("Did not build package " + _packageName + " because no path was defined.");
+        UnityEngine.Debug.LogWarning("Did not build package " + _packageName + " because no path was defined.");
         return;
       }
 
@@ -129,7 +130,12 @@ namespace Leap.Unity.Packaging {
                                   Where(path => Path.GetExtension(path) != ".meta").
                                   ToArray();
 
-      AssetDatabase.ExportPackage(filteredAssets, exportPath, ExportPackageOptions.Interactive | ExportPackageOptions.Recurse);
+      ExportPackageOptions options = ExportPackageOptions.Recurse;
+      if (interactive) {
+        options |= ExportPackageOptions.Interactive;
+      }
+
+      AssetDatabase.ExportPackage(filteredAssets, exportPath, options);
     }
 
     /// <summary>
@@ -139,9 +145,7 @@ namespace Leap.Unity.Packaging {
       List<PackageDefinition> parentPackages = findParentPackages();
       parentPackages.Add(this);
 
-      foreach (var package in parentPackages) {
-        package.BuildPackage();
-      }
+      buildPackages(parentPackages.ToArray());
     }
 
     private void buildPackageSet(HashSet<PackageDefinition> packages) {
@@ -184,17 +188,36 @@ namespace Leap.Unity.Packaging {
       return PACKAGE_EXPORT_FOLDER_KEY + "_" + AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(this));
     }
 
+    private static void buildPackages(PackageDefinition[] packages) {
+      string validPath = null;
+      try {
+        for (int i = 0; i < packages.Length; i++) {
+          var package = packages[i];
+
+          if (EditorUtility.DisplayCancelableProgressBar("Building Packages", "Building " + package._packageName + "...", i / (float)packages.Length)) {
+            break;
+          }
+          try {
+            package.BuildPackage(interactive: false);
+            package.TryGetPackageExportFolder(out validPath, promptIfNotDefined: false);
+          } catch (Exception e) {
+            UnityEngine.Debug.LogError("Exception thrown while trying to build package " + package._packageName);
+            UnityEngine.Debug.LogException(e);
+          }
+        }
+      } finally {
+        EditorUtility.ClearProgressBar();
+
+        if (validPath != null) {
+          Process.Start(validPath);
+        }
+      }
+    }
+
     [MenuItem("Assets/Build All Packages")]
     private static void buildAllPackages() {
       var packages = Resources.FindObjectsOfTypeAll<PackageDefinition>();
-      foreach (var package in packages) {
-        try {
-          package.BuildPackage();
-        } catch (Exception e) {
-          Debug.LogError("Exception thrown while trying to build package " + package._packageName);
-          Debug.LogException(e);
-        }
-      }
+      buildPackages(packages);
     }
 
     [MenuItem("Assets/Create/Package Definition", priority = 201)]
