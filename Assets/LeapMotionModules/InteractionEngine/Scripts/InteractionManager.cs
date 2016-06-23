@@ -265,28 +265,8 @@ namespace Leap.Unity.Interaction {
         return; // UpdateSceneInfo is a side effect of a lot of changes.
       }
 
-      INTERACTION_SCENE_INFO info = new INTERACTION_SCENE_INFO();
-      info.sceneFlags = SceneInfoFlags.None;
+      INTERACTION_SCENE_INFO info = getSceneInfo();
 
-      if (Physics.gravity.sqrMagnitude != 0.0f) {
-        info.sceneFlags |= SceneInfoFlags.HasGravity;
-        info.gravity = Physics.gravity.ToCVector();
-      }
-
-      if (_depthUntilSphericalInside > 0.0f) {
-        info.sceneFlags |= SceneInfoFlags.SphericalInside;
-        info.depthUntilSphericalInside = _depthUntilSphericalInside;
-      }
-
-      if (_contactEnabled) {
-        info.sceneFlags |= SceneInfoFlags.ContactEnabled;
-      }
-
-      // _enableGraspingLast gaurds against expensive file IO.  Only load the ldat
-      // data when grasping is being enabled.
-      if (_graspingEnabled) {
-        info.sceneFlags |= SceneInfoFlags.GraspEnabled;
-      }
       if (_graspingEnabled && !_enableGraspingLast) {
         using (LdatLoader.LoadLdat(ref info, _ldatPath)) {
           InteractionC.UpdateSceneInfo(ref _scene, ref info);
@@ -1013,6 +993,33 @@ namespace Leap.Unity.Interaction {
     protected virtual void destroyScene() {
       InteractionC.DestroyScene(ref _scene);
       _hasSceneBeenCreated = false;
+    }
+
+    protected virtual INTERACTION_SCENE_INFO getSceneInfo() {
+      INTERACTION_SCENE_INFO info = new INTERACTION_SCENE_INFO();
+      info.sceneFlags = SceneInfoFlags.None;
+
+      if (Physics.gravity.sqrMagnitude != 0.0f) {
+        info.sceneFlags |= SceneInfoFlags.HasGravity;
+        info.gravity = Physics.gravity.ToCVector();
+      }
+
+      if (_depthUntilSphericalInside > 0.0f) {
+        info.sceneFlags |= SceneInfoFlags.SphericalInside;
+        info.depthUntilSphericalInside = _depthUntilSphericalInside;
+      }
+
+      if (_contactEnabled) {
+        info.sceneFlags |= SceneInfoFlags.ContactEnabled;
+      }
+
+      // _enableGraspingLast gaurds against expensive file IO.  Only load the ldat
+      // data when grasping is being enabled.
+      if (_graspingEnabled) {
+        info.sceneFlags |= SceneInfoFlags.GraspEnabled;
+      }
+
+      return info;
     }
 
     //A persistant structure for storing useful data about a hand as it interacts with objects
