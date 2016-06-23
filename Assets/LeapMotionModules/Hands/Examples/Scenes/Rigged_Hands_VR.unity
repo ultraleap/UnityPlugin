@@ -2622,6 +2622,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 4.6889
       objectReference: {fileID: 0}
+    - target: {fileID: 13784922, guid: d3b5577c4bfd7194ab9259b6951d2417, type: 2}
+      propertyPath: m_UpdateWhenOffscreen
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d3b5577c4bfd7194ab9259b6951d2417, type: 2}
   m_IsPrefabParent: 0
@@ -3132,6 +3136,10 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11434078, guid: 1d47ecad742b1e9448626279a13e9df0, type: 2}
       propertyPath: modelFingerPointing.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 13733758, guid: 1d47ecad742b1e9448626279a13e9df0, type: 2}
+      propertyPath: m_UpdateWhenOffscreen
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
