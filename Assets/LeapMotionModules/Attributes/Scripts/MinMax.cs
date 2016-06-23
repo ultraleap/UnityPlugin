@@ -61,10 +61,6 @@ namespace Leap.Unity.Attributes {
 
       EditorGUI.indentLevel = prevIndent;
     }
-
-    public float GetPropertyHeight(SerializedProperty property) {
-      return EditorGUIUtility.singleLineHeight;
-    }
 #endif
   }
 }

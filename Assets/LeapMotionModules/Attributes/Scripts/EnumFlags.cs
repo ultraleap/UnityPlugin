@@ -12,10 +12,6 @@ namespace Leap.Unity.Attributes {
     public void DrawProperty(Rect rect, SerializedProperty property, GUIContent label) {
       property.intValue = EditorGUI.MaskField(rect, label, property.intValue, property.enumNames);
     }
-
-    public float GetPropertyHeight(SerializedProperty property) {
-      return EditorGUIUtility.singleLineHeight;
-    }
 #endif
   }
 }
