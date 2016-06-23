@@ -308,8 +308,7 @@ namespace Leap.Unity.Interaction {
         InteractionC.UpdateSceneInfo(ref _scene, ref info);
 
         ldatPinnedBytes.Free();
-      }
-      else {
+      } else {
         InteractionC.UpdateSceneInfo(ref _scene, ref info);
       }
       _enableGraspingLast = _graspingEnabled;
@@ -965,14 +964,17 @@ namespace Leap.Unity.Interaction {
 
       for (int i = 0; i < _resultList.Count; ++i) {
         INTERACTION_SHAPE_INSTANCE_RESULTS result = _resultList[i];
-        IInteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[result.handle];
 
-        try {
-          // ShapeInstanceResultFlags.None may be returned if requested when hands are not touching.
-          interactionBehaviour.NotifyRecievedSimulationResults(result);
-        } catch (Exception e) {
-          _misbehavingBehaviours.Add(interactionBehaviour);
-          Debug.LogException(e);
+        //Behaviour might have already been unregistered during an earlier callback for this simulation step
+        IInteractionBehaviour interactionBehaviour;
+        if (_instanceHandleToBehaviour.TryGetValue(result.handle, out interactionBehaviour)) {
+          try {
+            // ShapeInstanceResultFlags.None may be returned if requested when hands are not touching.
+            interactionBehaviour.NotifyRecievedSimulationResults(result);
+          } catch (Exception e) {
+            _misbehavingBehaviours.Add(interactionBehaviour);
+            Debug.LogException(e);
+          }
         }
       }
     }
