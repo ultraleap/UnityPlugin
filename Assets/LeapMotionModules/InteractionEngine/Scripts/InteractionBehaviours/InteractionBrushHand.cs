@@ -86,7 +86,6 @@ namespace Leap.Unity.Interaction {
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
           GameObject capsuleGameObject = new GameObject(gameObject.name, typeof(Rigidbody), typeof(CapsuleCollider));
           capsuleGameObject.layer = gameObject.layer;
-          capsuleGameObject.tag = "LeapMotion.InteractionBrush";
 #if UNITY_EDITOR
           // This is a debug facility that warns developers of issues.
           capsuleGameObject.AddComponent<InteractionBrushBone>();

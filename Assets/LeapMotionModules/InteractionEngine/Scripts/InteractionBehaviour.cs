@@ -454,14 +454,14 @@ namespace Leap.Unity.Interaction {
     #region UNITY CALLBACKS
 
     protected override void OnTriggerEnter(Collider other) {
-      if(other.CompareTag("LeapMotion.InteractionBrush")) {
+      if (other.gameObject.layer == _manager.InteractionBrushLayer) {
         ++_dislocatedBrushCount;
         updateContactMode();
       }
     }
 
     protected override void OnTriggerExit(Collider other) {
-      if(other.CompareTag("LeapMotion.InteractionBrush")) {
+      if (other.gameObject.layer == _manager.InteractionBrushLayer) {
         --_dislocatedBrushCount;
         updateContactMode();
       }
