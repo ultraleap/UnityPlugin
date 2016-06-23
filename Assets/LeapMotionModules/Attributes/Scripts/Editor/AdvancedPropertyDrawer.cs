@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Leap.Unity.Attributes {
@@ -15,30 +16,14 @@ namespace Leap.Unity.Attributes {
       }
     }
 
-    private bool useSlider {
-      get {
-        return fieldInfo.GetCustomAttributes(typeof(RangeAttribute), true).Length != 0;
-      }
-    }
-
-    private float sliderLeft {
-      get {
-        return (fieldInfo.GetCustomAttributes(typeof(RangeAttribute), true)[0] as RangeAttribute).min;
-      }
-    }
-
-    private float sliderRight {
-      get {
-        return (fieldInfo.GetCustomAttributes(typeof(RangeAttribute), true)[0] as RangeAttribute).max;
-      }
-    }
-
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
       float defaultLabelWidth = EditorGUIUtility.labelWidth;
       float fieldWidth = position.width - EditorGUIUtility.labelWidth;
 
       bool canUseDefaultDrawer = true;
       bool shouldDisable = false;
+
+      RangeAttribute rangeAttribute = fieldInfo.GetCustomAttributes(typeof(RangeAttribute), true).FirstOrDefault() as RangeAttribute;
 
       IFullPropertyDrawer fullPropertyDrawer = null;
       foreach (var a in attributes) {
@@ -92,11 +77,11 @@ namespace Leap.Unity.Attributes {
         } else {
           r.height = EditorGUIUtility.singleLineHeight;
 
-          if (useSlider) {
+          if (rangeAttribute != null) {
             if (property.propertyType == SerializedPropertyType.Integer) {
-              property.intValue = EditorGUI.IntSlider(r, label, property.intValue, (int)sliderLeft, (int)sliderRight);
+              property.intValue = EditorGUI.IntSlider(r, label, property.intValue, (int)rangeAttribute.min, (int)rangeAttribute.max);
             } else if (property.propertyType == SerializedPropertyType.Float) {
-              property.floatValue = EditorGUI.Slider(r, label, property.floatValue, sliderLeft, sliderRight);
+              property.floatValue = EditorGUI.Slider(r, label, property.floatValue, rangeAttribute.min, rangeAttribute.max);
             } else {
               EditorGUI.PropertyField(r, property, label);
             }
