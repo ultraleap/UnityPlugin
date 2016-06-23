@@ -12,6 +12,7 @@ namespace Leap.Unity.Packaging {
     private const string PACKAGE_EXPORT_FOLDER_KEY = "LeapPackageDefExportFolder";
     private const string DEFAULT_PACKAGE_NAME = "Package.asset";
 
+    [Tooltip("The name of the package.  Used to define the name of the export package file.")]
     [SerializeField]
     protected string _packageName = "New Package";
 
@@ -37,6 +38,10 @@ namespace Leap.Unity.Packaging {
       }
     }
 
+    /// <summary>
+    /// Forces a save prompt for the user to select the export path.  Returns whether or not
+    /// the path was updated.
+    /// </summary>
     public bool PrompUserToSetExportPath() {
       string promptFolder;
       if (!TryGetPackageExportFolder(out promptFolder, promptIfNotDefined: false)) {
@@ -52,11 +57,19 @@ namespace Leap.Unity.Packaging {
       return true;
     }
 
+    /// <summary>
+    /// Returns whether or not the export folder has been defined for this user. 
+    /// </summary>
     public bool HasExportFolderBeenDefined() {
       string key = getExportFolderKey();
       return EditorPrefs.HasKey(key);
     }
 
+    /// <summary>
+    /// Tries to get the package export folder.  This method can be configured to auto-promp
+    /// the user for the export folder if it is not yet defined.  Returns whether or not this
+    /// method returned a valid export folder.
+    /// </summary>
     public bool TryGetPackageExportFolder(out string folder, bool promptIfNotDefined) {
       string key = getExportFolderKey();
       if (!EditorPrefs.HasKey(key)) {
@@ -70,6 +83,11 @@ namespace Leap.Unity.Packaging {
       return true;
     }
 
+    /// <summary>
+    /// Builds the package defined by this definition.  This will include all dependant files, folders,
+    /// and the dependancies of all dependant packages.  This will NOT include ANY package definition assets
+    /// in the exported package.
+    /// </summary>
     public void BuildPackage(ExportPackageOptions options) {
       string exportFolder;
       if (!TryGetPackageExportFolder(out exportFolder, promptIfNotDefined: true)) {
