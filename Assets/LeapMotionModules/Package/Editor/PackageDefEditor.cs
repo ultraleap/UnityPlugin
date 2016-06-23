@@ -3,7 +3,6 @@ using UnityEditor;
 using UnityEditorInternal;
 using System;
 using System.IO;
-using System.Collections;
 
 namespace Leap.Unity.Packaging {
 
