@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.Packaging {
 
-  public class PackageDef : ScriptableObject {
+  public class PackageDefinition : ScriptableObject {
     private const string PACKAGE_EXPORT_FOLDER_KEY = "LeapPackageDefExportFolder";
     private const string DEFAULT_PACKAGE_NAME = "Package.asset";
 
@@ -23,7 +23,7 @@ namespace Leap.Unity.Packaging {
     protected string[] _dependantFiles;
 
     [SerializeField]
-    protected PackageDef[] _dependantPackages;
+    protected PackageDefinition[] _dependantPackages;
 
     [ContextMenu("Reset Export Folder")]
     public void ResetExportFolder() {
@@ -32,7 +32,7 @@ namespace Leap.Unity.Packaging {
 
     [ContextMenu("Reset Export Folder For All")]
     public void ResetAllExportFolders() {
-      var allPackageDefs = Resources.FindObjectsOfTypeAll<PackageDef>();
+      var allPackageDefs = Resources.FindObjectsOfTypeAll<PackageDefinition>();
       foreach (var package in allPackageDefs) {
         package.ResetExportFolder();
       }
@@ -99,7 +99,7 @@ namespace Leap.Unity.Packaging {
 
       HashSet<string> assets = new HashSet<string>();
 
-      HashSet<PackageDef> totalPackages = new HashSet<PackageDef>();
+      HashSet<PackageDefinition> totalPackages = new HashSet<PackageDefinition>();
       totalPackages.Add(this);
       buildPackageSet(totalPackages);
 
@@ -117,7 +117,7 @@ namespace Leap.Unity.Packaging {
 
       //Build a set of paths to package definitions
       //We want to be able to exclude paths from the export that are paths to package definitions
-      var packagePaths = new HashSet<string>(Resources.FindObjectsOfTypeAll<PackageDef>().Select(package => Path.GetFullPath(AssetDatabase.GetAssetPath(package))));
+      var packagePaths = new HashSet<string>(Resources.FindObjectsOfTypeAll<PackageDefinition>().Select(package => Path.GetFullPath(AssetDatabase.GetAssetPath(package))));
 
       //Filter paths to:
       // - paths that point to existing files
@@ -135,7 +135,7 @@ namespace Leap.Unity.Packaging {
     /// Builds this package in addition to all packages that depend on this package in some way.
     /// </summary>
     public void BuildAllParentPackages(ExportPackageOptions options) {
-      List<PackageDef> parentPackages = findParentPackages();
+      List<PackageDefinition> parentPackages = findParentPackages();
       parentPackages.Add(this);
 
       foreach (var package in parentPackages) {
@@ -143,9 +143,9 @@ namespace Leap.Unity.Packaging {
       }
     }
 
-    private void buildPackageSet(HashSet<PackageDef> packages) {
+    private void buildPackageSet(HashSet<PackageDefinition> packages) {
       for (int i = 0; i < _dependantPackages.Length; i++) {
-        PackageDef package = _dependantPackages[i];
+        PackageDefinition package = _dependantPackages[i];
         if (package == null) {
           continue;
         }
@@ -160,12 +160,12 @@ namespace Leap.Unity.Packaging {
     /// <summary>
     /// Finds all packages that depend on this package in some way.
     /// </summary>
-    private List<PackageDef> findParentPackages() {
-      List<PackageDef> parents = new List<PackageDef>();
-      var allPackages = Resources.FindObjectsOfTypeAll<PackageDef>();
+    private List<PackageDefinition> findParentPackages() {
+      List<PackageDefinition> parents = new List<PackageDefinition>();
+      var allPackages = Resources.FindObjectsOfTypeAll<PackageDefinition>();
 
       //Just search through all existing package definitions and check their dependancies
-      HashSet<PackageDef> packages = new HashSet<PackageDef>();
+      HashSet<PackageDefinition> packages = new HashSet<PackageDefinition>();
       foreach (var package in allPackages) {
         package.buildPackageSet(packages);
         if (packages.Contains(this)) {
@@ -198,7 +198,7 @@ namespace Leap.Unity.Packaging {
       path = Path.Combine(path, DEFAULT_PACKAGE_NAME);
       path = AssetDatabase.GenerateUniqueAssetPath(path);
 
-      PackageDef package = CreateInstance<PackageDef>();
+      PackageDefinition package = CreateInstance<PackageDefinition>();
       AssetDatabase.CreateAsset(package, path);
       AssetDatabase.SaveAssets();
       AssetDatabase.Refresh();

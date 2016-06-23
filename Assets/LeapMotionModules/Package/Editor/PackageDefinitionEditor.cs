@@ -6,15 +6,15 @@ using System.IO;
 
 namespace Leap.Unity.Packaging {
 
-  [CustomEditor(typeof(PackageDef))]
-  public class PackageDefEditor : CustomEditorBase {
+  [CustomEditor(typeof(PackageDefinition))]
+  public class PackageDefinitionEditor : CustomEditorBase {
 
-    private PackageDef _def;
+    private PackageDefinition _def;
 
     protected override void OnEnable() {
       base.OnEnable();
 
-      _def = target as PackageDef;
+      _def = target as PackageDefinition;
 
       createList("_dependantFolders", drawFolderElement);
       createList("_dependantFiles", drawFileElement);
