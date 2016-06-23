@@ -43,7 +43,7 @@ namespace Leap.Unity.Packaging {
         promptFolder = Application.dataPath;
       }
 
-      string chosenFolder = EditorUtility.SaveFilePanel("Select export path for " + _packageName, promptFolder, _packageName, "unitypackage");
+      string chosenFolder = EditorUtility.OpenFolderPanel("Select export folder for " + _packageName, promptFolder, "Packages");
       if (string.IsNullOrEmpty(chosenFolder)) {
         return false;
       }
@@ -77,6 +77,8 @@ namespace Leap.Unity.Packaging {
         return;
       }
 
+      string exportPath = Path.Combine(exportFolder, _packageName + ".unitypackage");
+
       HashSet<string> assets = new HashSet<string>();
 
       HashSet<PackageDef> totalPackages = new HashSet<PackageDef>();
@@ -90,7 +92,7 @@ namespace Leap.Unity.Packaging {
 
       var filteredAssets = assets.Where(path => File.Exists(path) || Directory.Exists(path)).ToArray();
 
-      AssetDatabase.ExportPackage(filteredAssets, exportFolder, options);
+      AssetDatabase.ExportPackage(filteredAssets, exportPath, options);
     }
 
     /// <summary>
