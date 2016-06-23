@@ -184,8 +184,8 @@ namespace Leap.Unity.Interaction.CApi {
     public float physicsScale;
     public IntPtr ldatData;
     public UInt32 ldatSize;
-    float graspThreshold;
-    float releaseThreshold;
+    public float graspThreshold;
+    public float releaseThreshold;
   }
 
   // All properties require eLeapIEShapeFlags to enable
