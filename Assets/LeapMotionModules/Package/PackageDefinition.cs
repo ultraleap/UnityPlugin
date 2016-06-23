@@ -141,11 +141,11 @@ namespace Leap.Unity.Packaging {
     /// <summary>
     /// Builds this package in addition to all packages that depend on this package in some way.
     /// </summary>
-    public void BuildAllParentPackages() {
-      List<PackageDefinition> parentPackages = GetParentPackages();
-      parentPackages.Add(this);
+    public void BuildAllChildPackages() {
+      List<PackageDefinition> childPackages = GetChildPackages();
+      childPackages.Add(this);
 
-      buildPackages(parentPackages.ToArray());
+      buildPackages(childPackages.ToArray());
     }
 
     private void buildPackageSet(HashSet<PackageDefinition> packages) {
@@ -165,8 +165,8 @@ namespace Leap.Unity.Packaging {
     /// <summary>
     /// Finds all packages that depend on this package in some way.
     /// </summary>
-    public List<PackageDefinition> GetParentPackages() {
-      List<PackageDefinition> parents = new List<PackageDefinition>();
+    public List<PackageDefinition> GetChildPackages() {
+      List<PackageDefinition> children = new List<PackageDefinition>();
       var allPackages = Resources.FindObjectsOfTypeAll<PackageDefinition>();
 
       //Just search through all existing package definitions and check their dependancies
@@ -174,12 +174,12 @@ namespace Leap.Unity.Packaging {
       foreach (var package in allPackages) {
         package.buildPackageSet(packages);
         if (packages.Contains(this)) {
-          parents.Add(package);
+          children.Add(package);
         }
         packages.Clear();
       }
 
-      return parents;
+      return children;
     }
 
     private string getExportFolderKey() {

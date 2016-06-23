@@ -11,14 +11,14 @@ namespace Leap.Unity.Packaging {
   public class PackageDefinitionEditor : CustomEditorBase {
 
     private PackageDefinition _def;
-    private List<PackageDefinition> _parentPackages;
+    private List<PackageDefinition> _childPackages;
 
     protected override void OnEnable() {
       base.OnEnable();
 
       _def = target as PackageDefinition;
 
-      _parentPackages = _def.GetParentPackages();
+      _childPackages = _def.GetChildPackages();
 
       createList("_dependantFolders", drawFolderElement);
       createList("_dependantFiles", drawFileElement);
@@ -30,19 +30,19 @@ namespace Leap.Unity.Packaging {
     public override void OnInspectorGUI() {
       base.OnInspectorGUI();
 
-      if (_parentPackages.Count != 0) {
+      if (_childPackages.Count != 0) {
         GUILayout.Space(EditorGUIUtility.singleLineHeight * 2);
 
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("Packages that depend on this package", EditorStyles.boldLabel);
         if (GUILayout.Button("Build All")) {
-          _def.BuildAllParentPackages();
+          _def.BuildAllChildPackages();
         }
         EditorGUILayout.EndHorizontal();
 
         EditorGUI.BeginDisabledGroup(true);
-        foreach (var parentPackage in _parentPackages) {
-          EditorGUILayout.ObjectField(parentPackage, typeof(PackageDefinition), false);
+        foreach (var childPackage in _childPackages) {
+          EditorGUILayout.ObjectField(childPackage, typeof(PackageDefinition), false);
         }
         EditorGUI.EndDisabledGroup();
         
