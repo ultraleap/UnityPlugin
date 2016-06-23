@@ -284,30 +284,13 @@ namespace Leap.Unity.Interaction {
 
       // _enableGraspingLast gaurds against expensive file IO.  Only load the ldat
       // data when grasping is being enabled.
-      GCHandle ldatPinnedBytes;
       if (_graspingEnabled) {
         info.sceneFlags |= SceneInfoFlags.GraspEnabled;
       }
       if (_graspingEnabled && !_enableGraspingLast) {
-        string ldatFullPath = getStreamingAssetsPath() + "/" + _ldatPath;
-        WWW ldat = new WWW(ldatFullPath);
-        while (!ldat.isDone) {
-          System.Threading.Thread.Sleep(1);
+        using (LdatLoader.LoadLdat(ref info, _ldatPath)) {
+          InteractionC.UpdateSceneInfo(ref _scene, ref info);
         }
-
-        if (!string.IsNullOrEmpty(ldat.error)) {
-          throw new Exception(ldat.error + ": " + ldatFullPath);
-        }
-
-        byte[] ldatBytes = ldat.bytes;
-        ldatPinnedBytes = GCHandle.Alloc(ldatBytes, GCHandleType.Pinned);
-        info.ldatData = ldatPinnedBytes.AddrOfPinnedObject();
-        info.ldatSize = (uint)ldatBytes.Length;
-        Marshal.Copy(ldatBytes, 0, info.ldatData, ldatBytes.Length);
-
-        InteractionC.UpdateSceneInfo(ref _scene, ref info);
-
-        ldatPinnedBytes.Free();
       } else {
         InteractionC.UpdateSceneInfo(ref _scene, ref info);
       }
@@ -622,14 +605,6 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL METHODS
-
-    private string getStreamingAssetsPath() {
-#if UNITY_STANDALONE_WIN || UNITY_WSA || UNITY_EDITOR_WIN
-      return "file:///" + Application.streamingAssetsPath;
-#else
-      return Application.streamingAssetsPath;
-#endif
-    }
 
     protected void autoGenerateLayers() {
       _interactionLayer = -1;
