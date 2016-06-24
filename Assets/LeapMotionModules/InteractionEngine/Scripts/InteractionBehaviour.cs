@@ -55,7 +55,7 @@ namespace Leap.Unity.Interaction {
     protected float _angularDrag;
 
     protected ContactMode _contactMode = ContactMode.NORMAL;
-    protected int _dislocatedBrushCount = 0;
+    protected int _triggeringBrushCount = 0;
 
     protected bool _recievedVelocityUpdate = false;
     protected float _minHandDistance = float.MaxValue;
@@ -451,21 +451,21 @@ namespace Leap.Unity.Interaction {
     }
     #endregion
 
+    #region BRUSH CALLBACKS
+
+    public override sealed void NotifyBrushTriggerEnter() {
+      ++_triggeringBrushCount;
+      updateContactMode();
+    }
+
+    public override sealed void NotifyBrushTriggerExit() {
+      --_triggeringBrushCount;
+      updateContactMode();
+    }
+
+    #endregion
+
     #region UNITY CALLBACKS
-
-    protected override void OnTriggerEnter(Collider other) {
-      if (other.gameObject.layer == _manager.InteractionBrushLayer) {
-        ++_dislocatedBrushCount;
-        updateContactMode();
-      }
-    }
-
-    protected override void OnTriggerExit(Collider other) {
-      if (other.gameObject.layer == _manager.InteractionBrushLayer) {
-        --_dislocatedBrushCount;
-        updateContactMode();
-      }
-    }
 
 #if UNITY_EDITOR
     private void OnCollisionEnter(Collision collision) {
@@ -511,7 +511,7 @@ namespace Leap.Unity.Interaction {
       if(base.IsBeingGrasped) {
         desiredContactMode = ContactMode.GRASPED;
       }
-      else if(_dislocatedBrushCount != 0 || (_contactMode == ContactMode.SOFT && _minHandDistance <= 0.0f )) {
+      else if(_triggeringBrushCount != 0 || (_contactMode == ContactMode.SOFT && _minHandDistance <= 0.0f )) {
         desiredContactMode = ContactMode.SOFT;
       }
 
