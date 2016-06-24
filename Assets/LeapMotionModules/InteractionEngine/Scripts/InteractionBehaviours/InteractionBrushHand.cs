@@ -78,25 +78,26 @@ namespace Leap.Unity.Interaction {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
-          GameObject capsuleGameObject = new GameObject(gameObject.name, typeof(Rigidbody), typeof(CapsuleCollider), typeof(InteractionBrushBone));
-          capsuleGameObject.layer = gameObject.layer;
 
-          InteractionBrushBone brushBone = capsuleGameObject.GetComponent<InteractionBrushBone>();
+          GameObject brushGameObject = new GameObject(gameObject.name, typeof(Rigidbody), typeof(CapsuleCollider), typeof(InteractionBrushBone));
+          brushGameObject.layer = gameObject.layer;
+
+          InteractionBrushBone brushBone = brushGameObject.GetComponent<InteractionBrushBone>();
           brushBone.brushHand = this;
           brushBone.boneArrayIndex = boneArrayIndex;
 
-          Transform capsuleTransform = capsuleGameObject.transform;
+          Transform capsuleTransform = brushGameObject.transform;
           capsuleTransform.SetParent(_handParent.transform, false);
           capsuleTransform.localScale = new Vector3(1f / transform.lossyScale.x, 1f / transform.lossyScale.y, 1f / transform.lossyScale.z);
 
-          CapsuleCollider capsule = capsuleGameObject.GetComponent<CapsuleCollider>();
+          CapsuleCollider capsule = brushGameObject.GetComponent<CapsuleCollider>();
           capsule.direction = 2;
           capsule.radius = bone.Width * 0.5f;
           capsule.height = bone.Length + bone.Width;
           capsule.material = _material;
           brushBone.capsuleCollider = capsule;
 
-          Rigidbody body = capsuleGameObject.GetComponent<Rigidbody>();
+          Rigidbody body = brushGameObject.GetComponent<Rigidbody>();
           brushBone.capsuleBody = body;
           body.position = bone.Center.ToVector3();
           body.rotation = bone.Rotation.ToQuaternion();
@@ -117,45 +118,31 @@ namespace Leap.Unity.Interaction {
         return;
 #endif
 
-      float width = _hand.Fingers[1].Bone((Bone.BoneType)1).Width;
-      float deadzone = DEAD_ZONE_FRACTION * width;
+      float deadzone = DEAD_ZONE_FRACTION * _hand.Fingers[1].Bone((Bone.BoneType)1).Width;
 
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
           InteractionBrushBone brushBone = _brushBones[boneArrayIndex];
-
           Rigidbody body = brushBone.capsuleBody;
-          body.MoveRotation(bone.Rotation.ToQuaternion());
 
-          // Switch to triggering when dislocated or remain overlapping an InteractionBehaviour
-          bool triggerCriteria = brushBone.triggerCounter != 0;
-          if(triggerCriteria == false) {
+          // Switch to triggering either when dislocated or remain overlapping an InteractionBehaviour
+          bool shouldTrigger = brushBone.triggerCounter != 0;
+          if(shouldTrigger == false) {
             // Calculate how far off the mark the brushes are.
             float targetingError = (brushBone.lastTarget - body.position).magnitude / bone.Width;
             float massScale = Mathf.Clamp(1.0f - (targetingError*2.0f), 0.1f, 1.0f);
             body.mass = _perBoneMass * massScale;
 
             if(targetingError >= DISLOCATION_FRACTION) {
-              triggerCriteria = brushBone.dislocationCounter++ >= DISLOCATION_COUNTER;
+              shouldTrigger = brushBone.dislocationCounter++ >= DISLOCATION_COUNTER;
             }
             else {
               brushBone.dislocationCounter = 0;
             }
           }
-          if(brushBone.capsuleCollider.isTrigger != triggerCriteria) {
-            brushBone.capsuleCollider.isTrigger = triggerCriteria;
-
-            // These should not matter, being done here for correctness.
-            if (triggerCriteria) {
-              body.mass = _perBoneMass;
-              brushBone.dislocationCounter = 0;
-            }
-          }
-
-          // Bones only stop triggering when they are no longer triggering.
-          Assert.IsTrue(brushBone.triggerCounter == 0 || brushBone.capsuleCollider.isTrigger);
+          brushBone.capsuleCollider.isTrigger = shouldTrigger;
 
           // Add a deadzone to avoid vibration.
           Vector3 delta = bone.Center.ToVector3() - body.position;
@@ -168,6 +155,8 @@ namespace Leap.Unity.Interaction {
             body.velocity = delta / Time.fixedDeltaTime;
           }
           brushBone.lastTarget = body.position + body.velocity;
+
+          body.MoveRotation(bone.Rotation.ToQuaternion());
         }
       }
     }
