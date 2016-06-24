@@ -156,7 +156,7 @@ namespace Leap.Unity {
       }
 
       TransformData past = transformAtTime(leapTime - warpingAdjustment * 1000);
-      
+
       // Rewind position and rotation
       if (_trackingAnchor == null) {
         rewoundRotation = past.localRotation;
@@ -361,6 +361,7 @@ namespace Leap.Unity {
       Quaternion referenceRotation = Quaternion.Slerp(currCenterRot, pastCenterRot, tweenImageWarping);
 
       Quaternion quatWarp = Quaternion.Inverse(currCenterRot) * referenceRotation;
+      quatWarp = Quaternion.Euler(quatWarp.eulerAngles.x, quatWarp.eulerAngles.y, -quatWarp.eulerAngles.z);
       Matrix4x4 matWarp = _projectionMatrix * Matrix4x4.TRS(Vector3.zero, quatWarp, Vector3.one) * _projectionMatrix.inverse;
 
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", matWarp);
