@@ -14,7 +14,7 @@ namespace Leap.Unity.Interaction {
     public InteractionBrushHand brushHand = null;
     public int boneArrayIndex = -1;
 
-    protected override void OnTriggerEnter(Collider other) {
+    protected void OnTriggerEnter(Collider other) {
       IInteractionBehaviour ib = other.GetComponentInParent<IInteractionBehaviour>();
       if(ib) {
         ib.NotifyBrushTriggerEnter();
@@ -22,7 +22,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected override void OnTriggerExit(Collider other) {
+    protected void OnTriggerExit(Collider other) {
       IInteractionBehaviour ib = other.GetComponentInParent<IInteractionBehaviour>();
       if(ib) {
         ib.NotifyBrushTriggerExit();

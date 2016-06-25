@@ -36,7 +36,7 @@ namespace Leap.Unity.Interaction {
   [SelectionBase]
   [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviour : InteractionBehaviourBase {
-    private enum ContactMode {
+    protected enum ContactMode {
       NORMAL = 0,  // Influenced by brushes and not by soft contact.
       SOFT = 1,    // Influenced by soft contact and not by brushes.  Will not return to NORMAL until no brush or soft contact remains.
       GRASPED = 2, // Not infuenced by either brushes or soft contact.  Returns to SOFT not NORMAL.
@@ -295,10 +295,6 @@ namespace Leap.Unity.Interaction {
       updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
       updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
 
-      if (_notifiedOfTeleport) {
-        updateInfo.updateFlags |= UpdateInfoFlags.NotifiedOfTeleport;
-      }
-
       if(_isKinematic) {
           updateInfo.updateFlags |= UpdateInfoFlags.Kinematic;
       } else {
@@ -453,12 +449,12 @@ namespace Leap.Unity.Interaction {
 
     #region BRUSH CALLBACKS
 
-    public override sealed void NotifyBrushTriggerEnter() {
+    public override void NotifyBrushTriggerEnter() {
       ++_triggeringBrushCount;
       updateContactMode();
     }
 
-    public override sealed void NotifyBrushTriggerExit() {
+    public override void NotifyBrushTriggerExit() {
       --_triggeringBrushCount;
       updateContactMode();
     }

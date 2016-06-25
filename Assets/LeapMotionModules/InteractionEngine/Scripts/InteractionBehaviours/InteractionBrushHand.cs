@@ -79,12 +79,13 @@ namespace Leap.Unity.Interaction {
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
 
-          GameObject brushGameObject = new GameObject(gameObject.name, typeof(Rigidbody), typeof(CapsuleCollider), typeof(InteractionBrushBone));
+          GameObject brushGameObject = new GameObject(gameObject.name, typeof(CapsuleCollider), typeof(Rigidbody), typeof(InteractionBrushBone));
           brushGameObject.layer = gameObject.layer;
 
           InteractionBrushBone brushBone = brushGameObject.GetComponent<InteractionBrushBone>();
           brushBone.brushHand = this;
           brushBone.boneArrayIndex = boneArrayIndex;
+          _brushBones[boneArrayIndex] = brushBone;
 
           Transform capsuleTransform = brushGameObject.transform;
           capsuleTransform.SetParent(_handParent.transform, false);
@@ -157,6 +158,13 @@ namespace Leap.Unity.Interaction {
           brushBone.lastTarget = body.position + body.velocity;
 
           body.MoveRotation(bone.Rotation.ToQuaternion());
+
+
+/*
+          Vector3 delta = bone.Center.ToVector3() - body.position;
+          body.velocity = delta / Time.fixedDeltaTime;
+          body.MoveRotation(bone.Rotation.ToQuaternion());
+*/
         }
       }
     }
@@ -172,7 +180,9 @@ namespace Leap.Unity.Interaction {
     }
 
 #if UNITY_EDITOR
-    public override void OnDrawGizmos(){
+    public void OnDrawGizmos(){
+      if (_brushBones == null) { return; }
+
       Matrix4x4 gizmosMatrix = Gizmos.matrix;
 
       float radius = _hand.Fingers[1].Bone((Bone.BoneType)1).Width;
@@ -183,7 +193,8 @@ namespace Leap.Unity.Interaction {
           Rigidbody body = _brushBones[boneArrayIndex].capsuleBody;
 
           Gizmos.matrix = body.transform.localToWorldMatrix;
-          Gizmos.color = _brushBones[boneArrayIndex].capsuleCollider.isTrigger ? Color.red : Color.green;
+//          Gizmos.color = _brushBones[boneArrayIndex].capsuleCollider.isTrigger ? Color.red : Color.green;
+          Gizmos.color = (_brushBones[boneArrayIndex].triggerCounter != 0) ? Color.red : Color.green;
           Gizmos.DrawWireSphere(body.centerOfMass, radius);
         }
       }
