@@ -1450,7 +1450,7 @@ Prefab:
     - target: {fileID: 11435192, guid: b9c7aaf0d314cb847a3b2a20e893f1b6, type: 2}
       propertyPath: _temporalWarping
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1011776858}
     - target: {fileID: 11435192, guid: b9c7aaf0d314cb847a3b2a20e893f1b6, type: 2}
       propertyPath: _isHeadMounted
       value: 1
