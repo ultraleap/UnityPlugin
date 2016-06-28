@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction {
@@ -19,6 +20,9 @@ namespace Leap.Unity.Interaction {
       _overlapRadius = overlapRadius;
       _layerMask = layerMask;
     }
+
+    public event Action<IInteractionBehaviour> OnObjectActivate;
+    public event Action<IInteractionBehaviour> OnObjectDeactivate;
 
     public float OverlapRadius {
       get {
@@ -88,6 +92,10 @@ namespace Leap.Unity.Interaction {
           //TODO: validate that a behaviour actually exists (it should unless someone is being mean)
           activeObj.interactionBehaviour = body.GetComponent<IInteractionBehaviour>();
 
+          if (OnObjectActivate != null) {
+            OnObjectActivate(activeObj.interactionBehaviour);
+          }
+
           _activeObjects[body] = activeObj;
         }
 
@@ -100,8 +108,13 @@ namespace Leap.Unity.Interaction {
       _rigidbodyList.Clear();
       foreach (var pair in _activeObjects) {
         if (pair.Value.updateIndex < _updateIndex) {
+          if (OnObjectDeactivate != null) {
+            OnObjectDeactivate(pair.Value.interactionBehaviour);
+          }
+
           //Destroy the component right away
-          Object.DestroyImmediate(pair.Value);
+          UnityEngine.Object.DestroyImmediate(pair.Value);
+
           //Add the key to the list for later removal
           _rigidbodyList.Add(pair.Key);
         }
