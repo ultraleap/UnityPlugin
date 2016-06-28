@@ -14,15 +14,15 @@ namespace Leap.Unity.Interaction {
 
     private List<Rigidbody> _rigidbodyList = new List<Rigidbody>();
     private Collider[] _colliderResults = new Collider[32];
+
     private List<IInteractionBehaviour> _activeBehaviours = new List<IInteractionBehaviour>();
+    private List<IInteractionBehaviour> _activatedBehaviours = new List<IInteractionBehaviour>();
+    private List<IInteractionBehaviour> _deactivatedBehaviours = new List<IInteractionBehaviour>();
 
     public ActiveObjectManager(float overlapRadius, int layerMask) {
       _overlapRadius = overlapRadius;
       _layerMask = layerMask;
     }
-
-    public event Action<IInteractionBehaviour> OnObjectActivate;
-    public event Action<IInteractionBehaviour> OnObjectDeactivate;
 
     public float OverlapRadius {
       get {
@@ -45,6 +45,18 @@ namespace Leap.Unity.Interaction {
     public ReadonlyList<IInteractionBehaviour> ActiveBehaviours {
       get {
         return _activeBehaviours;
+      }
+    }
+
+    public ReadonlyList<IInteractionBehaviour> ActivatedBehaviours {
+      get {
+        return _activatedBehaviours;
+      }
+    }
+
+    public ReadonlyList<IInteractionBehaviour> DeactivatedBehaviours {
+      get {
+        return _deactivatedBehaviours;
       }
     }
 
@@ -83,6 +95,7 @@ namespace Leap.Unity.Interaction {
     }
 
     private void activateMarkedObjects() {
+      _activatedBehaviours.Clear();
       for (int i = 0; i < _rigidbodyList.Count; i++) {
         Rigidbody body = _rigidbodyList[i];
         ActiveObject activeObj;
@@ -92,9 +105,7 @@ namespace Leap.Unity.Interaction {
           //TODO: validate that a behaviour actually exists (it should unless someone is being mean)
           activeObj.interactionBehaviour = body.GetComponent<IInteractionBehaviour>();
 
-          if (OnObjectActivate != null) {
-            OnObjectActivate(activeObj.interactionBehaviour);
-          }
+          _activatedBehaviours.Add(activeObj.interactionBehaviour);
 
           _activeObjects[body] = activeObj;
         }
@@ -106,11 +117,10 @@ namespace Leap.Unity.Interaction {
     private void deactivateStaleObjects() {
       //Find all active objects that have not had their index updated
       _rigidbodyList.Clear();
+      _deactivatedBehaviours.Clear();
       foreach (var pair in _activeObjects) {
         if (pair.Value.updateIndex < _updateIndex) {
-          if (OnObjectDeactivate != null) {
-            OnObjectDeactivate(pair.Value.interactionBehaviour);
-          }
+          _deactivatedBehaviours.Add(pair.Value.interactionBehaviour);
 
           //Destroy the component right away
           UnityEngine.Object.DestroyImmediate(pair.Value);
