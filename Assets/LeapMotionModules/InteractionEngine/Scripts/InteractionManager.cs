@@ -54,6 +54,9 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _depthUntilSphericalInside = 0.023f;
 
+    [SerializeField]
+    protected float _overlapRadius = 0.15f;
+
     [Header("Layer Settings")]
     [SerializeField]
     protected bool _autoGenerateLayers = false;
