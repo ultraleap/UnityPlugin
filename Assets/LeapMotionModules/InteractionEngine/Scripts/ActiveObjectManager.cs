@@ -9,24 +9,24 @@ namespace Leap.Unity.Interaction {
 
     private int _updateIndex = 0;
 
-    private float _primaryRadius = 0;
+    private float _overlapRadius = 0;
     private int _layerMask;
 
     private List<Rigidbody> _rigidbodyList = new List<Rigidbody>();
     private Collider[] _colliderResults = new Collider[32];
     private List<IInteractionBehaviour> _activeBehaviours = new List<IInteractionBehaviour>();
 
-    public ActiveObjectManager(float primaryRadius, int layerMask) {
-      _primaryRadius = primaryRadius;
+    public ActiveObjectManager(float overlapRadius, int layerMask) {
+      _overlapRadius = overlapRadius;
       _layerMask = layerMask;
     }
 
-    public float PrimaryRadius {
+    public float OverlapRadius {
       get {
-        return _primaryRadius;
+        return _overlapRadius;
       }
       set {
-        _primaryRadius = value;
+        _overlapRadius = value;
       }
     }
 
@@ -133,7 +133,7 @@ namespace Leap.Unity.Interaction {
       int count;
       while (true) {
         count = Physics.OverlapSphereNonAlloc(hand.PalmPosition.ToVector3(),
-                                              _primaryRadius,
+                                              _overlapRadius,
                                               _colliderResults,
                                               _layerMask,
                                               QueryTriggerInteraction.Ignore);
