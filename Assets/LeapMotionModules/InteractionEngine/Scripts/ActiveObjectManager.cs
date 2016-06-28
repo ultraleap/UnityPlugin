@@ -4,7 +4,6 @@ using System.Collections.Generic;
 namespace Leap.Unity.Interaction {
 
   public class ActiveObjectManager {
-
     private Dictionary<Rigidbody, ActiveObject> _activeObjects = new Dictionary<Rigidbody, ActiveObject>();
 
     private int _updateIndex = 0;
