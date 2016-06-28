@@ -560,12 +560,6 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1d47ecad742b1e9448626279a13e9df0, type: 2}
   m_IsPrefabParent: 0
---- !u!114 &166841092 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 11434078, guid: 1d47ecad742b1e9448626279a13e9df0,
-    type: 2}
-  m_PrefabInternal: {fileID: 166841091}
-  m_Script: {fileID: 11500000, guid: a77b65c1ae87b436881aa63bc80f4894, type: 3}
 --- !u!4 &166841093 stripped
 Transform:
   m_PrefabParentObject: {fileID: 483382, guid: 1d47ecad742b1e9448626279a13e9df0, type: 2}
@@ -686,6 +680,12 @@ Camera:
   m_PrefabParentObject: {fileID: 2000004, guid: b8b03d395f5734e98af91ccf44f9bf47,
     type: 2}
   m_PrefabInternal: {fileID: 593869531}
+--- !u!114 &1105877803 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114000011868975516, guid: d3b5577c4bfd7194ab9259b6951d2417,
+    type: 2}
+  m_PrefabInternal: {fileID: 1132065356}
+  m_Script: {fileID: 11500000, guid: a77b65c1ae87b436881aa63bc80f4894, type: 3}
 --- !u!1001 &1132065356
 Prefab:
   m_ObjectHideFlags: 0
@@ -980,16 +980,16 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d3b5577c4bfd7194ab9259b6951d2417, type: 2}
   m_IsPrefabParent: 0
---- !u!114 &1132065357 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 11463264, guid: d3b5577c4bfd7194ab9259b6951d2417,
-    type: 2}
-  m_PrefabInternal: {fileID: 1132065356}
-  m_Script: {fileID: 11500000, guid: a77b65c1ae87b436881aa63bc80f4894, type: 3}
 --- !u!4 &1132065358 stripped
 Transform:
   m_PrefabParentObject: {fileID: 475472, guid: d3b5577c4bfd7194ab9259b6951d2417, type: 2}
   m_PrefabInternal: {fileID: 1132065356}
+--- !u!114 &1434801068 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114000013683841834, guid: 1d47ecad742b1e9448626279a13e9df0,
+    type: 2}
+  m_PrefabInternal: {fileID: 166841091}
+  m_Script: {fileID: 11500000, guid: a77b65c1ae87b436881aa63bc80f4894, type: 3}
 --- !u!1 &1602690163
 GameObject:
   m_ObjectHideFlags: 0
@@ -1023,9 +1023,9 @@ MonoBehaviour:
   ModelPool:
   - GroupName: Graphics_Hands
     _handPool: {fileID: 0}
-    LeftModel: {fileID: 1132065357}
+    LeftModel: {fileID: 1105877803}
     IsLeftToBeSpawned: 0
-    RightModel: {fileID: 166841092}
+    RightModel: {fileID: 1434801068}
     IsRightToBeSpawned: 0
     modelList: []
     modelsCheckedOut: []

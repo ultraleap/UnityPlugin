@@ -262,27 +262,19 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
-    - target: {fileID: 483382, guid: 1d47ecad742b1e9448626279a13e9df0, type: 2}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 483382, guid: 1d47ecad742b1e9448626279a13e9df0, type: 2}
-      propertyPath: m_LocalScale.z
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1d47ecad742b1e9448626279a13e9df0, type: 2}
   m_IsPrefabParent: 0
---- !u!114 &120366733 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 11434078, guid: 1d47ecad742b1e9448626279a13e9df0,
-    type: 2}
-  m_PrefabInternal: {fileID: 120366732}
-  m_Script: {fileID: 11500000, guid: a77b65c1ae87b436881aa63bc80f4894, type: 3}
 --- !u!4 &120366734 stripped
 Transform:
   m_PrefabParentObject: {fileID: 483382, guid: 1d47ecad742b1e9448626279a13e9df0, type: 2}
   m_PrefabInternal: {fileID: 120366732}
+--- !u!114 &129000075 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114000011868975516, guid: d3b5577c4bfd7194ab9259b6951d2417,
+    type: 2}
+  m_PrefabInternal: {fileID: 141736374}
+  m_Script: {fileID: 11500000, guid: a77b65c1ae87b436881aa63bc80f4894, type: 3}
 --- !u!1001 &141736374
 Prefab:
   m_ObjectHideFlags: 0
@@ -338,23 +330,9 @@ Prefab:
       propertyPath: m_LocalRotation.w
       value: -0.9824908
       objectReference: {fileID: 0}
-    - target: {fileID: 475472, guid: d3b5577c4bfd7194ab9259b6951d2417, type: 2}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 475472, guid: d3b5577c4bfd7194ab9259b6951d2417, type: 2}
-      propertyPath: m_LocalScale.z
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d3b5577c4bfd7194ab9259b6951d2417, type: 2}
   m_IsPrefabParent: 0
---- !u!114 &141736375 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 11463264, guid: d3b5577c4bfd7194ab9259b6951d2417,
-    type: 2}
-  m_PrefabInternal: {fileID: 141736374}
-  m_Script: {fileID: 11500000, guid: a77b65c1ae87b436881aa63bc80f4894, type: 3}
 --- !u!4 &141736376 stripped
 Transform:
   m_PrefabParentObject: {fileID: 475472, guid: d3b5577c4bfd7194ab9259b6951d2417, type: 2}
@@ -454,9 +432,9 @@ MonoBehaviour:
   ModelPool:
   - GroupName: Graphics_Hands
     _handPool: {fileID: 0}
-    LeftModel: {fileID: 141736375}
+    LeftModel: {fileID: 129000075}
     IsLeftToBeSpawned: 0
-    RightModel: {fileID: 120366733}
+    RightModel: {fileID: 1010847069}
     IsRightToBeSpawned: 0
     modelList: []
     modelsCheckedOut: []
@@ -578,6 +556,12 @@ AudioListener:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 961781290}
   m_Enabled: 1
+--- !u!114 &1010847069 stripped
+MonoBehaviour:
+  m_PrefabParentObject: {fileID: 114000013683841834, guid: 1d47ecad742b1e9448626279a13e9df0,
+    type: 2}
+  m_PrefabInternal: {fileID: 120366732}
+  m_Script: {fileID: 11500000, guid: a77b65c1ae87b436881aa63bc80f4894, type: 3}
 --- !u!1 &1011776856
 GameObject:
   m_ObjectHideFlags: 0

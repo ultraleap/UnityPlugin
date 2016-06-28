@@ -236,8 +236,8 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 475472}
-  - 114: {fileID: 11463264}
   - 114: {fileID: 11445778}
+  - 114: {fileID: 114000011868975516}
   m_Layer: 0
   m_Name: LoPoly_Rigged_Hand_Left
   m_TagString: Untagged
@@ -783,7 +783,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 170858}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0.000000115202326, y: -0.7071067, z: -0.7071068, w: -0.00000011520231}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -901,33 +901,6 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   deformPosition: 0
-  modelFingerPointing: {x: -1, y: 0, z: 0}
-  modelPalmFacing: {x: 0, y: 1, z: 0}
---- !u!114 &11463264
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 170858}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a77b65c1ae87b436881aa63bc80f4894, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  handedness: 0
-  handModelPalmWidth: 0.085
-  fingers:
-  - {fileID: 11476316}
-  - {fileID: 11433822}
-  - {fileID: 11476916}
-  - {fileID: 11460460}
-  - {fileID: 11462638}
-  palm: {fileID: 405330}
-  forearm: {fileID: 0}
-  wristJoint: {fileID: 438826}
-  elbowJoint: {fileID: 0}
-  ModelPalmAtLeapWrist: 1
-  UseMetaCarpals: 1
   modelFingerPointing: {x: -1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: 1, z: 0}
 --- !u!114 &11476316
@@ -1056,3 +1029,30 @@ Prefab:
   m_ParentPrefab: {fileID: 0}
   m_RootGameObject: {fileID: 170858}
   m_IsPrefabParent: 1
+--- !u!114 &114000011868975516
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 170858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a77b65c1ae87b436881aa63bc80f4894, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  handedness: 0
+  handModelPalmWidth: 0.085
+  fingers:
+  - {fileID: 11476316}
+  - {fileID: 11433822}
+  - {fileID: 11476916}
+  - {fileID: 11460460}
+  - {fileID: 11462638}
+  palm: {fileID: 405330}
+  forearm: {fileID: 0}
+  wristJoint: {fileID: 438826}
+  elbowJoint: {fileID: 0}
+  ModelPalmAtLeapWrist: 1
+  UseMetaCarpals: 1
+  modelFingerPointing: {x: -1, y: 0, z: 0}
+  modelPalmFacing: {x: 0, y: 1, z: 0}
