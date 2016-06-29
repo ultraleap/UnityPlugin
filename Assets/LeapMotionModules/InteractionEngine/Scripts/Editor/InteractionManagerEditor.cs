@@ -13,7 +13,7 @@ namespace Leap.Unity.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
 
-      specifyCustomDrawer("_dataSubfolder", disableWhenRunning);
+      specifyCustomDrawer("_ldatPath", disableWhenRunning);
       specifyCustomDrawer("_contactEnabled", disableWhenRunning);
       specifyCustomDrawer("_autoGenerateLayers", disableWhenRunning);
       specifyCustomDrawer("_templateLayer", disableWhenRunning);

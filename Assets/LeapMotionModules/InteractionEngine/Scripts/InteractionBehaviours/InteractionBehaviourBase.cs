@@ -168,7 +168,9 @@ namespace Leap.Unity.Interaction {
 
     public override sealed void NotifyUnregistered() {
       _isRegisteredWithManager = false;
-      enabled = false;
+      if (isActiveAndEnabled) {
+        enabled = false;
+      }
 
       _baseCallGuard.Begin("OnUnregistered");
       OnUnregistered();
@@ -461,15 +463,11 @@ namespace Leap.Unity.Interaction {
     protected virtual void OnEnable() {
       if (_manager == null) {
         enabled = false;
-      }
-
-      if (_isRegisteredWithManager) {
+        Debug.LogError("Could not enable Interaction Behaviour because no Interaction Manager was specified.");
         return;
       }
 
-      if (_manager == null) {
-        enabled = false;
-        Debug.LogError("Could not enable Interaction Behaviour because no Interaction Manager was specified.");
+      if (_isRegisteredWithManager) {
         return;
       }
 

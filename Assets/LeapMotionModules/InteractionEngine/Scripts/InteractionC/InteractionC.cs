@@ -44,7 +44,9 @@ namespace Leap.Unity.Interaction.CApi {
     ContactEnabled        = 0x02,
     GraspEnabled          = 0x04,
     SphericalInside       = 0x08,
-    PhysicsScale          = 0x10
+    PhysicsScale          = 0x10,
+    DebugResults          = 0x20,
+    GraspSettings         = 0x40
   };
 
   public enum ShapeInfoFlags : uint {
@@ -182,6 +184,8 @@ namespace Leap.Unity.Interaction.CApi {
     public float physicsScale;
     public IntPtr ldatData;
     public UInt32 ldatSize;
+    public float graspThreshold;
+    public float releaseThreshold;
   }
 
   // All properties require eLeapIEShapeFlags to enable
@@ -214,6 +218,8 @@ namespace Leap.Unity.Interaction.CApi {
     public LEAP_VECTOR linearVelocity;
     public LEAP_VECTOR angularVelocity;
     public float minHandDistance;
+    public float debugGrab;
+    public float debugRelease;
   }
 
   [StructLayout(LayoutKind.Sequential, Pack = 1)]

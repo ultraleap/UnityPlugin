@@ -268,51 +268,13 @@ namespace Leap.Unity.Interaction {
         return; // UpdateSceneInfo is a side effect of a lot of changes.
       }
 
-      INTERACTION_SCENE_INFO info = new INTERACTION_SCENE_INFO();
-      info.sceneFlags = SceneInfoFlags.None;
+      INTERACTION_SCENE_INFO info = getSceneInfo();
 
-      if (Physics.gravity.sqrMagnitude != 0.0f) {
-        info.sceneFlags |= SceneInfoFlags.HasGravity;
-        info.gravity = Physics.gravity.ToCVector();
-      }
-
-      if (_depthUntilSphericalInside > 0.0f) {
-        info.sceneFlags |= SceneInfoFlags.SphericalInside;
-        info.depthUntilSphericalInside = _depthUntilSphericalInside;
-      }
-
-      if (_contactEnabled) {
-        info.sceneFlags |= SceneInfoFlags.ContactEnabled;
-      }
-
-      // _enableGraspingLast gaurds against expensive file IO.  Only load the ldat
-      // data when grasping is being enabled.
-      GCHandle ldatPinnedBytes;
-      if (_graspingEnabled) {
-        info.sceneFlags |= SceneInfoFlags.GraspEnabled;
-      }
       if (_graspingEnabled && !_enableGraspingLast) {
-        string ldatFullPath = getStreamingAssetsPath() + "/" + _ldatPath;
-        WWW ldat = new WWW(ldatFullPath);
-        while (!ldat.isDone) {
-          System.Threading.Thread.Sleep(1);
+        using (LdatLoader.LoadLdat(ref info, _ldatPath)) {
+          InteractionC.UpdateSceneInfo(ref _scene, ref info);
         }
-
-        if (!string.IsNullOrEmpty(ldat.error)) {
-          throw new Exception(ldat.error + ": " + ldatFullPath);
-        }
-
-        byte[] ldatBytes = ldat.bytes;
-        ldatPinnedBytes = GCHandle.Alloc(ldatBytes, GCHandleType.Pinned);
-        info.ldatData = ldatPinnedBytes.AddrOfPinnedObject();
-        info.ldatSize = (uint)ldatBytes.Length;
-        Marshal.Copy(ldatBytes, 0, info.ldatData, ldatBytes.Length);
-
-        InteractionC.UpdateSceneInfo(ref _scene, ref info);
-
-        ldatPinnedBytes.Free();
-      }
-      else {
+      } else {
         InteractionC.UpdateSceneInfo(ref _scene, ref info);
       }
       _enableGraspingLast = _graspingEnabled;
@@ -618,14 +580,6 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL METHODS
-
-    private string getStreamingAssetsPath() {
-#if UNITY_STANDALONE_WIN || UNITY_WSA || UNITY_EDITOR_WIN
-      return "file:///" + Application.streamingAssetsPath;
-#else
-      return Application.streamingAssetsPath;
-#endif
-    }
 
     protected void autoGenerateLayers() {
       _interactionLayer = -1;
@@ -953,14 +907,17 @@ namespace Leap.Unity.Interaction {
 
       for (int i = 0; i < _resultList.Count; ++i) {
         INTERACTION_SHAPE_INSTANCE_RESULTS result = _resultList[i];
-        IInteractionBehaviour interactionBehaviour = _instanceHandleToBehaviour[result.handle];
 
-        try {
-          // ShapeInstanceResultFlags.None may be returned if requested when hands are not touching.
-          interactionBehaviour.NotifyRecievedSimulationResults(result);
-        } catch (Exception e) {
-          _misbehavingBehaviours.Add(interactionBehaviour);
-          Debug.LogException(e);
+        //Behaviour might have already been unregistered during an earlier callback for this simulation step
+        IInteractionBehaviour interactionBehaviour;
+        if (_instanceHandleToBehaviour.TryGetValue(result.handle, out interactionBehaviour)) {
+          try {
+            // ShapeInstanceResultFlags.None may be returned if requested when hands are not touching.
+            interactionBehaviour.NotifyRecievedSimulationResults(result);
+          } catch (Exception e) {
+            _misbehavingBehaviours.Add(interactionBehaviour);
+            Debug.LogException(e);
+          }
         }
       }
     }
@@ -1024,6 +981,33 @@ namespace Leap.Unity.Interaction {
     protected virtual void destroyScene() {
       InteractionC.DestroyScene(ref _scene);
       _hasSceneBeenCreated = false;
+    }
+
+    protected virtual INTERACTION_SCENE_INFO getSceneInfo() {
+      INTERACTION_SCENE_INFO info = new INTERACTION_SCENE_INFO();
+      info.sceneFlags = SceneInfoFlags.None;
+
+      if (Physics.gravity.sqrMagnitude != 0.0f) {
+        info.sceneFlags |= SceneInfoFlags.HasGravity;
+        info.gravity = Physics.gravity.ToCVector();
+      }
+
+      if (_depthUntilSphericalInside > 0.0f) {
+        info.sceneFlags |= SceneInfoFlags.SphericalInside;
+        info.depthUntilSphericalInside = _depthUntilSphericalInside;
+      }
+
+      if (_contactEnabled) {
+        info.sceneFlags |= SceneInfoFlags.ContactEnabled;
+      }
+
+      // _enableGraspingLast gaurds against expensive file IO.  Only load the ldat
+      // data when grasping is being enabled.
+      if (_graspingEnabled) {
+        info.sceneFlags |= SceneInfoFlags.GraspEnabled;
+      }
+
+      return info;
     }
 
     //A persistant structure for storing useful data about a hand as it interacts with objects
