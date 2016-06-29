@@ -17,7 +17,7 @@ namespace Leap.Unity.Interaction {
     protected void OnTriggerEnter(Collider other) {
       IInteractionBehaviour ib = other.GetComponentInParent<IInteractionBehaviour>();
       if(ib) {
-//        ib.NotifyBrushTriggerEnter();
+        ib.NotifyBrushTriggerEnter();
         ++triggerCounter;
       }
     }
@@ -25,7 +25,7 @@ namespace Leap.Unity.Interaction {
     protected void OnTriggerExit(Collider other) {
       IInteractionBehaviour ib = other.GetComponentInParent<IInteractionBehaviour>();
       if(ib) {
-//        ib.NotifyBrushTriggerExit();
+        ib.NotifyBrushTriggerExit();
         --triggerCounter;
       }
     }

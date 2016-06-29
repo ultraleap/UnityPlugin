@@ -25,8 +25,9 @@ namespace Leap.Unity.Interaction {
                                 "_templateLayer");
       specifyConditionalDrawing(() => !autoGenerateLayerProperty.boolValue,
                                 "_interactionLayer",
-                                "_brushHandLayer",
-                                "_interactionNoClipLayer");
+                                "_interactionNoClipLayer",
+                                "_brushLayer",
+                                "_brushTriggerLayer");
 
       specifyCustomDecorator("_interactionLayer", collisionLayerHelper);
 

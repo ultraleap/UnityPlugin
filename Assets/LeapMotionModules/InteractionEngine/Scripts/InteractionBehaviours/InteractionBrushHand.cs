@@ -128,6 +128,10 @@ namespace Leap.Unity.Interaction {
           InteractionBrushBone brushBone = _brushBones[boneArrayIndex];
           Rigidbody body = brushBone.capsuleBody;
 
+          // This hack works best when we set a fixed rotation for bones.  Otherwise
+          // most friction is lost as the bones roll on contact.
+          body.MoveRotation(bone.Rotation.ToQuaternion());
+
           // Switch to triggering either when dislocated or remain overlapping an InteractionBehaviour
           bool shouldTrigger = brushBone.triggerCounter != 0;
           if(shouldTrigger == false) {
@@ -143,28 +147,23 @@ namespace Leap.Unity.Interaction {
               brushBone.dislocationCounter = 0;
             }
           }
-          brushBone.capsuleCollider.isTrigger = shouldTrigger;
+          if (brushBone.capsuleCollider.isTrigger != shouldTrigger) {
+            brushBone.capsuleCollider.isTrigger = shouldTrigger;
+            brushBone.gameObject.layer = shouldTrigger ? _manager.InteractionBrushTriggerLayer : _manager.InteractionBrushLayer;
+          }
 
           // Add a deadzone to avoid vibration.
           Vector3 delta = bone.Center.ToVector3() - body.position;
           float deltaLen = delta.magnitude;
           if (deltaLen <= deadzone) {
             body.velocity = Vector3.zero;
+            brushBone.lastTarget = body.position;
           }
           else {
             delta *= (deltaLen - deadzone) / deltaLen;
             body.velocity = delta / Time.fixedDeltaTime;
+            brushBone.lastTarget = body.position + delta;
           }
-          brushBone.lastTarget = body.position + body.velocity;
-
-          body.MoveRotation(bone.Rotation.ToQuaternion());
-
-
-/*
-          Vector3 delta = bone.Center.ToVector3() - body.position;
-          body.velocity = delta / Time.fixedDeltaTime;
-          body.MoveRotation(bone.Rotation.ToQuaternion());
-*/
         }
       }
     }
@@ -193,8 +192,8 @@ namespace Leap.Unity.Interaction {
           Rigidbody body = _brushBones[boneArrayIndex].capsuleBody;
 
           Gizmos.matrix = body.transform.localToWorldMatrix;
-//          Gizmos.color = _brushBones[boneArrayIndex].capsuleCollider.isTrigger ? Color.red : Color.green;
-          Gizmos.color = (_brushBones[boneArrayIndex].triggerCounter != 0) ? Color.red : Color.green;
+          Gizmos.color = _brushBones[boneArrayIndex].capsuleCollider.isTrigger ? Color.red : Color.green;
+
           Gizmos.DrawWireSphere(body.centerOfMass, radius);
         }
       }
