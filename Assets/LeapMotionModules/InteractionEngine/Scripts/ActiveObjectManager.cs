@@ -60,6 +60,25 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public void Deactivate(IInteractionBehaviour interactionBehaviour) {
+      Rigidbody rigidbody = interactionBehaviour.GetComponent<Rigidbody>();
+      if (_activeObjects.ContainsKey(rigidbody)) {
+        _activeObjects.Remove(rigidbody);
+        _activeBehaviours.Remove(interactionBehaviour);
+      }
+    }
+
+    public void DeactivateAll() {
+      _deactivatedBehaviours.AddRange(_activeBehaviours);
+      _activeBehaviours.Clear();
+      _activatedBehaviours.Clear();
+      _activeObjects.Clear();
+    }
+
+    public bool IsActive(IInteractionBehaviour interactionBehaviour) {
+      return _activeBehaviours.Contains(interactionBehaviour);
+    }
+
     public void FindActiveObjects(Frame frame) {
       List<Hand> hands = frame.Hands;
 

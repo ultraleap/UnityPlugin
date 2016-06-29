@@ -102,6 +102,8 @@ namespace Leap.Unity.Interaction {
     protected List<IInteractionBehaviour> _registeredBehaviours = new List<IInteractionBehaviour>();
     protected HashSet<IInteractionBehaviour> _misbehavingBehaviours = new HashSet<IInteractionBehaviour>();
 
+    protected ActiveObjectManager _activeManager;
+
     //Maps the Interaction instance handle to the behaviour
     //A mapping only exists if a shape instance has been created
     protected Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, IInteractionBehaviour> _instanceHandleToBehaviour = new Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, IInteractionBehaviour>();
@@ -419,11 +421,13 @@ namespace Leap.Unity.Interaction {
 
       //Don't destroy if we are not enabled, everything already got destroyed in OnDisable
       if (_hasSceneBeenCreated) {
-        try {
-          destroyInteractionShape(interactionBehaviour);
-        } catch (Exception e) {
-          //Like above, only log to console so we can dispatch OnUnregister
-          Debug.LogException(e);
+        if (_activeManager.IsActive(interactionBehaviour)) {
+          try {
+            destroyInteractionShape(interactionBehaviour);
+          } catch (Exception e) {
+            //Like above, only log to console so we can dispatch OnUnregister
+            Debug.LogException(e);
+          }
         }
       }
 
