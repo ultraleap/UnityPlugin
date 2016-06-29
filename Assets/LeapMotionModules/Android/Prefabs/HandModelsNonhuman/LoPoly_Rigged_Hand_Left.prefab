@@ -789,10 +789,10 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 170858}
-  m_LocalRotation: {x: 0.000000115202326, y: -0.7071067, z: -0.7071068, w: -0.00000011520231}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: -89.980194, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 438826}
   - {fileID: 473532}
@@ -847,7 +847,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  deformPosition: 1
+  deformPosition: 0
   modelFingerPointing: {x: -1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: 1, z: 0}
 --- !u!114 &11445778
@@ -882,7 +882,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  deformPosition: 1
+  deformPosition: 0
   modelFingerPointing: {x: -1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: 1, z: 0}
 --- !u!114 &11462638
@@ -906,7 +906,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  deformPosition: 1
+  deformPosition: 0
   modelFingerPointing: {x: -1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: 1, z: 0}
 --- !u!114 &11463264
@@ -957,7 +957,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  deformPosition: 1
+  deformPosition: 0
   modelFingerPointing: {x: -1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: 1, z: 0}
 --- !u!114 &11476916
@@ -981,7 +981,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  deformPosition: 1
+  deformPosition: 0
   modelFingerPointing: {x: -1, y: 0, z: 0}
   modelPalmFacing: {x: 0, y: 1, z: 0}
 --- !u!137 &13784922
@@ -1011,7 +1011,7 @@ SkinnedMeshRenderer:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   serializedVersion: 2
-  m_Quality: 2
+  m_Quality: 4
   m_UpdateWhenOffscreen: 1
   m_Mesh: {fileID: 4300000, guid: bfcd6ebbf65bea2449ce1598de5fed4b, type: 3}
   m_Bones:
