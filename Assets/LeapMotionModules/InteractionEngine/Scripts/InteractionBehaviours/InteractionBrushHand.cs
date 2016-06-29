@@ -83,8 +83,6 @@ namespace Leap.Unity.Interaction {
           brushGameObject.layer = gameObject.layer;
 
           InteractionBrushBone brushBone = brushGameObject.GetComponent<InteractionBrushBone>();
-          brushBone.brushHand = this;
-          brushBone.boneArrayIndex = boneArrayIndex;
           _brushBones[boneArrayIndex] = brushBone;
 
           Transform capsuleTransform = brushGameObject.transform;
@@ -141,6 +139,7 @@ namespace Leap.Unity.Interaction {
             if(targetingError >= DISLOCATION_FRACTION) {
               if(brushBone.dislocationCounter++ >= DISLOCATION_COUNTER) {
                 brushBone.startTriggering();
+                brushBone.dislocationCounter = 0;
               }
             }
             else {

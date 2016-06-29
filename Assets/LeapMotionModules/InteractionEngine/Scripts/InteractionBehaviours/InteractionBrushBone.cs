@@ -5,25 +5,26 @@ using UnityEditor;
 // This is a debug script for the editor.  Should not be instanced in game.
 namespace Leap.Unity.Interaction {
   public class InteractionBrushBone : MonoBehaviour {
-    // Operated by InteractionBrushHand.
+
+    // Used by InteractionBrushHand:
     public Rigidbody capsuleBody;
     public CapsuleCollider capsuleCollider;
     public Vector3 lastTarget;
     public int dislocationCounter = 0;
-    public InteractionBrushHand brushHand = null;
-    public int boneArrayIndex = -1;
 
+    // Once the dislocationCounter expires and the brush becomes dislocated, the brush then
+    // remains dislocated until it stops triggering and then the _dislocatedCounter expires.
     private const int DISLOCATED_BRUSH_COOLDOWN = 3;
-    private int _dislocatedBrushCounter = DISLOCATED_BRUSH_COOLDOWN;
+    private int _dislocatedCounter = DISLOCATED_BRUSH_COOLDOWN;
 
     public void startTriggering() {
       capsuleCollider.isTrigger = true;
-      _dislocatedBrushCounter = 0;
+      _dislocatedCounter = 0;
     }
 
     public bool updateTriggering() {
-      if (_dislocatedBrushCounter < DISLOCATED_BRUSH_COOLDOWN) {
-        if (++_dislocatedBrushCounter == DISLOCATED_BRUSH_COOLDOWN) {
+      if (_dislocatedCounter < DISLOCATED_BRUSH_COOLDOWN) {
+        if (++_dislocatedCounter == DISLOCATED_BRUSH_COOLDOWN) {
           capsuleCollider.isTrigger = false;
           return false;
         }
@@ -35,7 +36,7 @@ namespace Leap.Unity.Interaction {
     private void tryNotify(Collider other) {
       IInteractionBehaviour ib = other.GetComponentInParent<IInteractionBehaviour>();
       if(ib) {
-        _dislocatedBrushCounter = 0;
+        _dislocatedCounter = 0;
         ib.NotifyBrushDislocated();
       }
     }
