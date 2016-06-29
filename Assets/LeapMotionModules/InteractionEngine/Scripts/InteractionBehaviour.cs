@@ -54,8 +54,9 @@ namespace Leap.Unity.Interaction {
     protected float _drag;
     protected float _angularDrag;
 
+    private const int DISLOCATED_BRUSH_COOLDOWN = 3;
+    protected uint _dislocatedBrushCounter = DISLOCATED_BRUSH_COOLDOWN;
     protected ContactMode _contactMode = ContactMode.NORMAL;
-    protected int _triggeringBrushCount = 0;
 
     protected bool _recievedVelocityUpdate = false;
     protected float _minHandDistance = float.MaxValue;
@@ -246,9 +247,10 @@ namespace Leap.Unity.Interaction {
       //Reset so we can accumulate for the next frame
       _accumulatedLinearAcceleration = Vector3.zero;
       _accumulatedAngularAcceleration = Vector3.zero;
-      _recievedVelocityUpdate = false;
 
+      _recievedVelocityUpdate = false;
       _notifiedOfTeleport = false;
+      ++_dislocatedBrushCounter;
     }
 
     public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
@@ -449,13 +451,8 @@ namespace Leap.Unity.Interaction {
 
     #region BRUSH CALLBACKS
 
-    public override void NotifyBrushTriggerEnter() {
-      ++_triggeringBrushCount;
-      updateContactMode();
-    }
-
-    public override void NotifyBrushTriggerExit() {
-      --_triggeringBrushCount;
+    public override void NotifyBrushDislocated() {
+      _dislocatedBrushCounter = 0;
       updateContactMode();
     }
 
@@ -485,7 +482,7 @@ namespace Leap.Unity.Interaction {
           Gizmos.color = Color.gray;
         } else if (_contactMode == ContactMode.GRASPED) {
           Gizmos.color = Color.green;
-        } else if (_showDebugRecievedVelocity && _contactMode == ContactMode.SOFT) {
+        } else if (_contactMode == ContactMode.SOFT) {
           Gizmos.color = Color.red;
         } else if (_showDebugRecievedVelocity) {
           Gizmos.color = Color.yellow;
@@ -494,7 +491,6 @@ namespace Leap.Unity.Interaction {
         }
 
         Gizmos.DrawWireCube(_debugBounds.center, _debugBounds.size);
-
         Gizmos.matrix = gizmosMatrix;
       }
     }
@@ -507,7 +503,7 @@ namespace Leap.Unity.Interaction {
       if(base.IsBeingGrasped) {
         desiredContactMode = ContactMode.GRASPED;
       }
-      else if(_triggeringBrushCount != 0 || (_contactMode == ContactMode.SOFT && _minHandDistance <= 0.0f )) {
+      else if(_dislocatedBrushCounter < DISLOCATED_BRUSH_COOLDOWN || (_contactMode == ContactMode.SOFT && _minHandDistance <= 0.0f )) {
         desiredContactMode = ContactMode.SOFT;
       }
 

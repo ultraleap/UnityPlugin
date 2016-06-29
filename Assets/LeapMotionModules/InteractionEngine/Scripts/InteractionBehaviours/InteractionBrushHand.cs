@@ -132,24 +132,20 @@ namespace Leap.Unity.Interaction {
           // most friction is lost as the bones roll on contact.
           body.MoveRotation(bone.Rotation.ToQuaternion());
 
-          // Switch to triggering either when dislocated or remain overlapping an InteractionBehaviour
-          bool shouldTrigger = brushBone.triggerCounter != 0;
-          if(shouldTrigger == false) {
+          if(brushBone.updateTriggering() == false) {
             // Calculate how far off the mark the brushes are.
             float targetingError = (brushBone.lastTarget - body.position).magnitude / bone.Width;
             float massScale = Mathf.Clamp(1.0f - (targetingError*2.0f), 0.1f, 1.0f);
             body.mass = _perBoneMass * massScale;
 
             if(targetingError >= DISLOCATION_FRACTION) {
-              shouldTrigger = brushBone.dislocationCounter++ >= DISLOCATION_COUNTER;
+              if(brushBone.dislocationCounter++ >= DISLOCATION_COUNTER) {
+                brushBone.startTriggering();
+              }
             }
             else {
               brushBone.dislocationCounter = 0;
             }
-          }
-          if (brushBone.capsuleCollider.isTrigger != shouldTrigger) {
-            brushBone.capsuleCollider.isTrigger = shouldTrigger;
-            brushBone.gameObject.layer = shouldTrigger ? _manager.InteractionBrushTriggerLayer : _manager.InteractionBrushLayer;
           }
 
           // Add a deadzone to avoid vibration.
@@ -177,29 +173,5 @@ namespace Leap.Unity.Interaction {
 
       base.FinishHand();
     }
-
-#if UNITY_EDITOR
-    public void OnDrawGizmos(){
-      if (_brushBones == null) { return; }
-
-      Matrix4x4 gizmosMatrix = Gizmos.matrix;
-
-      float radius = _hand.Fingers[1].Bone((Bone.BoneType)1).Width;
-
-      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
-        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
-          int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
-          Rigidbody body = _brushBones[boneArrayIndex].capsuleBody;
-
-          Gizmos.matrix = body.transform.localToWorldMatrix;
-          Gizmos.color = _brushBones[boneArrayIndex].capsuleCollider.isTrigger ? Color.red : Color.green;
-
-          Gizmos.DrawWireSphere(body.centerOfMass, radius);
-        }
-      }
-
-      Gizmos.matrix = gizmosMatrix;
-    }
-#endif
   }
 }

@@ -74,10 +74,6 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected SingleLayer _brushLayer = 0;
 
-    [Tooltip("Layer that interaction brushes will be on when they have switched to triggering.")]
-    [SerializeField]
-    protected SingleLayer _brushTriggerLayer = 0;
-
     [Header("Debug")]
     [Tooltip("Allows simulation to be disabled without destroying the scene in any way.")]
     [SerializeField]
@@ -262,19 +258,6 @@ namespace Leap.Unity.Interaction {
       }
       set {
         _brushLayer = value;
-      }
-    }
-
-    /// <summary>
-    /// Gets the layer that interaction brushes should be on when they have switched to triggering
-    /// so that they still are triggering against InteractionNoClipLayer.
-    /// </summary>
-    public int InteractionBrushTriggerLayer {
-      get {
-        return _brushTriggerLayer;
-      }
-      set {
-        _brushTriggerLayer = value;
       }
     }
 
@@ -648,7 +631,6 @@ namespace Leap.Unity.Interaction {
       _interactionLayer = -1;
       _interactionNoClipLayer = -1;
       _brushLayer = -1;
-      _brushTriggerLayer = -1;
       for (int i = 8; i < 32; i++) {
         string layerName = LayerMask.LayerToName(i);
         if (string.IsNullOrEmpty(layerName)) {
@@ -658,14 +640,12 @@ namespace Leap.Unity.Interaction {
             _interactionNoClipLayer = i;
           } else if (_brushLayer == -1) {
             _brushLayer = i;
-          } else {
-            _brushTriggerLayer = i;
             break;
           }
         }
       }
 
-      if (_interactionLayer == -1 || _interactionNoClipLayer == -1 || _brushLayer == -1 || _brushTriggerLayer == -1) {
+      if (_interactionLayer == -1 || _interactionNoClipLayer == -1 || _brushLayer == -1)  {
         if (Application.isPlaying) {
           enabled = false;
         }
@@ -684,14 +664,11 @@ namespace Leap.Unity.Interaction {
 
         // Set brush layer to collide with nothing
         Physics.IgnoreLayerCollision(_brushLayer, i, true);
-        Physics.IgnoreLayerCollision(_brushTriggerLayer, i, true);
       }
 
       //After copy and set we specify the interactions between the brush and interaction objects
       if (_contactEnabled) {
         Physics.IgnoreLayerCollision(_brushLayer, _interactionLayer, false);
-        Physics.IgnoreLayerCollision(_brushTriggerLayer, _interactionLayer, false);
-        Physics.IgnoreLayerCollision(_brushTriggerLayer, _interactionNoClipLayer, false);
       }
     }
 

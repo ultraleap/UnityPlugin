@@ -10,25 +10,44 @@ namespace Leap.Unity.Interaction {
     public CapsuleCollider capsuleCollider;
     public Vector3 lastTarget;
     public int dislocationCounter = 0;
-    public int triggerCounter = 0;
     public InteractionBrushHand brushHand = null;
     public int boneArrayIndex = -1;
 
-    protected void OnTriggerEnter(Collider other) {
+    private const int DISLOCATED_BRUSH_COOLDOWN = 3;
+    private int _dislocatedBrushCounter = DISLOCATED_BRUSH_COOLDOWN;
+
+    public void startTriggering() {
+      capsuleCollider.isTrigger = true;
+      _dislocatedBrushCounter = 0;
+    }
+
+    public bool updateTriggering() {
+      if (_dislocatedBrushCounter < DISLOCATED_BRUSH_COOLDOWN) {
+        if (++_dislocatedBrushCounter == DISLOCATED_BRUSH_COOLDOWN) {
+          capsuleCollider.isTrigger = false;
+          return false;
+        }
+        return true;
+      }
+      return false;
+    }
+
+    private void tryNotify(Collider other) {
       IInteractionBehaviour ib = other.GetComponentInParent<IInteractionBehaviour>();
       if(ib) {
-        ib.NotifyBrushTriggerEnter();
-        ++triggerCounter;
+        _dislocatedBrushCounter = 0;
+        ib.NotifyBrushDislocated();
       }
     }
 
-    protected void OnTriggerExit(Collider other) {
-      IInteractionBehaviour ib = other.GetComponentInParent<IInteractionBehaviour>();
-      if(ib) {
-        ib.NotifyBrushTriggerExit();
-        --triggerCounter;
-      }
+    protected void OnTriggerEnter(Collider other) {
+      tryNotify(other);
     }
+
+    protected void OnTriggerStay(Collider other) {
+      tryNotify(other);
+    }
+
 #if UNITY_EDITOR
     private string ThisLabel() {
       return gameObject.name + " <layer " + LayerMask.LayerToName(gameObject.layer) + ">";
