@@ -18,7 +18,7 @@ namespace Leap.Unity {
       get { return isTracked; }
     }
 
-    public abstract Chirality Handedness { get; }
+    public abstract Chirality Handedness { get; set; }
     public abstract ModelType HandModelType { get; }
     public virtual void InitHand() {
     }

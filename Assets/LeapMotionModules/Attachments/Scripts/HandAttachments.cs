@@ -72,6 +72,7 @@ namespace Leap.Unity{
       get {
         return _handedness;
       }
+      set { }
     }
   
     public override void SetLeapHand(Hand hand) {
