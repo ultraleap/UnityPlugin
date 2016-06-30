@@ -176,10 +176,9 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Returns a collection of InteractionBehaviours that are currently registered with this manager.
     /// </summary>
-    public ReadonlyList<IInteractionBehaviour> RegisteredObjects {
+    public IEnumerable<IInteractionBehaviour> RegisteredObjects {
       get {
-        //TODO!
-        throw new Exception("asd");
+        return _activeManager.RegisteredObjects;
       }
     }
 
