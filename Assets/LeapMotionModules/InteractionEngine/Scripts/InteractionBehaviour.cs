@@ -72,7 +72,6 @@ namespace Leap.Unity.Interaction {
     protected RigidbodyWarper _warper;
 
     private Bounds _debugBounds;
-    private bool _showDebugRecievedVelocity = false;
 
     #region PUBLIC METHODS
 
@@ -196,18 +195,21 @@ namespace Leap.Unity.Interaction {
       revertRigidbodyState();
     }
 
-#if UNITY_EDITOR
     protected override void OnPreSolve() {
       base.OnPreSolve();
 
+      _recievedVelocityUpdate = false;
+      _notifiedOfTeleport = false;
+      ++_dislocatedBrushCounter;
+      _minHandDistance = float.MaxValue;
+
+#if UNITY_EDITOR
       if (_contactMode == ContactMode.GRASPED && UntrackedHandCount == 0 &&
           Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale) {
         _manager.ReleaseObject(this);
       }
-
-      _showDebugRecievedVelocity = false;
-    }
 #endif
+    }
 
     protected override void OnPostSolve() {
       base.OnPostSolve();
@@ -249,10 +251,6 @@ namespace Leap.Unity.Interaction {
       //Reset so we can accumulate for the next frame
       _accumulatedLinearAcceleration = Vector3.zero;
       _accumulatedAngularAcceleration = Vector3.zero;
-
-      _recievedVelocityUpdate = false;
-      _notifiedOfTeleport = false;
-      ++_dislocatedBrushCounter;
     }
 
     public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
@@ -335,11 +333,6 @@ namespace Leap.Unity.Interaction {
       }
 
       _minHandDistance = (results.resultFlags & ShapeInstanceResultFlags.MaxHand) == 0 ? float.MaxValue : results.minHandDistance;
-
-
-#if UNITY_EDITOR
-      _showDebugRecievedVelocity = _recievedVelocityUpdate;
-#endif
 
       updateContactMode();
     }
@@ -484,10 +477,12 @@ namespace Leap.Unity.Interaction {
         if (_rigidbody.IsSleeping()) {
           Gizmos.color = Color.gray;
         } else if (_contactMode == ContactMode.GRASPED) {
+          if (!_recievedVelocityUpdate) { Gizmos.color = Color.red; } // error
           Gizmos.color = Color.green;
         } else if (_contactMode == ContactMode.SOFT) {
-          Gizmos.color = Color.red;
-        } else if (_showDebugRecievedVelocity) {
+          Gizmos.color = new Color(255/255.0f,140/255.0f,0.0f); // dark orange
+          if (!_recievedVelocityUpdate) { Gizmos.color = Color.red; } // error
+        } else if (_recievedVelocityUpdate) {
           Gizmos.color = Color.yellow;
         } else {
           Gizmos.color = Color.blue;
