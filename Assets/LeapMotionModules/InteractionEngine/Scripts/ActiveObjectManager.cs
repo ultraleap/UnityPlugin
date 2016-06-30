@@ -45,6 +45,12 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public ReadonlyList<IInteractionBehaviour> ActiveBehaviours {
+      get {
+        return _activeBehaviours;
+      }
+    }
+
     public void Register(IInteractionBehaviour behaviour) {
       behaviour.NotifyRegistered();
       _registeredBehaviours.Add(behaviour);
@@ -59,13 +65,7 @@ namespace Leap.Unity.Interaction {
     public void NotifyMisbehaving(IInteractionBehaviour behaviour) {
       _misbehavingBehaviours.Add(behaviour);
     }
-
-    public ReadonlyList<IInteractionBehaviour> ActiveBehaviours {
-      get {
-        return _activeBehaviours;
-      }
-    }
-
+    
     public void Deactivate(IInteractionBehaviour interactionBehaviour) {
       Rigidbody rigidbody = interactionBehaviour.GetComponent<Rigidbody>();
       if (_activeObjects.ContainsKey(rigidbody)) {
