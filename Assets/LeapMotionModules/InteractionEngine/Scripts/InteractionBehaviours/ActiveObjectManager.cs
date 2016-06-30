@@ -207,6 +207,13 @@ namespace Leap.Unity.Interaction {
     private void handleColliderResults(int count, List<Rigidbody> list) {
       for (int i = 0; i < count; i++) {
         Collider collider = _colliderResults[i];
+
+        //Will happen if someone is using the interaction layers for their own needs
+        //We could throw an error/warning?
+        if (collider.attachedRigidbody == null) {
+          continue;
+        }
+
         //This will totally add duplicates
         list.Add(collider.attachedRigidbody);
       }
