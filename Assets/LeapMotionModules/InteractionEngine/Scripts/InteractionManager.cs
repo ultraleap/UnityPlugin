@@ -367,6 +367,8 @@ namespace Leap.Unity.Interaction {
     /// representation into the internal interaction scene.  If the manager is disabled,
     /// the registration will still succeed and the object will be added to the internal scene
     /// when the manager is next enabled.
+    /// 
+    /// Trying to register a behaviour that is already registered is safe and is a no-op.
     /// </summary>
     public void RegisterInteractionBehaviour(IInteractionBehaviour interactionBehaviour) {
       _activeManager.Register(interactionBehaviour);
@@ -375,6 +377,8 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Unregisters an InteractionObject from this manager.  This removes it from the internal
     /// scene and prevents any further interaction.
+    /// 
+    /// Trying to unregister a behaviour that is not registered is safe and is a no-op.
     /// </summary>
     public void UnregisterInteractionBehaviour(IInteractionBehaviour interactionBehaviour) {
       if (_graspedBehaviours.Remove(interactionBehaviour)) {
