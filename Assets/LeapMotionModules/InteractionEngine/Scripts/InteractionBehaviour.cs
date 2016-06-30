@@ -65,9 +65,6 @@ namespace Leap.Unity.Interaction {
     protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
 
-    private Bounds _debugBounds;
-    private bool _showDebugRecievedVelocity = false;
-
     #region PUBLIC METHODS
 
     /// <summary>
@@ -191,8 +188,6 @@ namespace Leap.Unity.Interaction {
           Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale) {
         _manager.ReleaseObject(this);
       }
-
-      _showDebugRecievedVelocity = false;
     }
 #endif
 
@@ -262,17 +257,6 @@ namespace Leap.Unity.Interaction {
       _solvedRotation = _rigidbody.rotation;
 
       updateLayer();
-
-#if UNITY_EDITOR
-      Collider[] colliders = GetComponentsInChildren<Collider>();
-      if (colliders.Length > 0) {
-        _debugBounds = colliders[0].bounds;
-        for (int i = 1; i < colliders.Length; i++) {
-          _debugBounds.Encapsulate(colliders[i].bounds);
-        }
-        _debugBounds.center = transform.InverseTransformPoint(_debugBounds.center);
-      }
-#endif
     }
 
     protected override void OnInteractionShapeDestroyed() {
@@ -318,10 +302,6 @@ namespace Leap.Unity.Interaction {
         _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
         _recievedVelocityUpdate = true;
       }
-
-#if UNITY_EDITOR
-      _showDebugRecievedVelocity = _recievedVelocityUpdate;
-#endif
 
       if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
         if (!_ignoringBrushes && results.maxHandDepth > _material.BrushDisableDistance * _manager.SimulationScale) {
@@ -457,30 +437,6 @@ namespace Leap.Unity.Interaction {
       }
     }
 #endif
-
-    protected virtual void OnDrawGizmos() {
-      if (IsRegisteredWithManager) {
-        Matrix4x4 gizmosMatrix = Gizmos.matrix;
-
-        Gizmos.matrix = Matrix4x4.TRS(_warper.RigidbodyPosition, _warper.RigidbodyRotation, Vector3.one);
-
-        if (_rigidbody.IsSleeping()) {
-          Gizmos.color = Color.gray;
-        } else if (IsBeingGrasped) {
-          Gizmos.color = Color.green;
-        } else if (_showDebugRecievedVelocity) {
-          Gizmos.color = Color.yellow;
-        } else if (_ignoringBrushes) {
-          Gizmos.color = Color.red;
-        } else {
-          Gizmos.color = Color.blue;
-        }
-
-        Gizmos.DrawWireCube(_debugBounds.center, _debugBounds.size);
-
-        Gizmos.matrix = gizmosMatrix;
-      }
-    }
     #endregion
 
     #region INTERNAL
