@@ -15,7 +15,10 @@ namespace Leap.Unity.Interaction {
     private List<Rigidbody> _rigidbodyList = new List<Rigidbody>();
     private Collider[] _colliderResults = new Collider[32];
 
+    private HashSet<IInteractionBehaviour> _registeredBehaviours = new HashSet<IInteractionBehaviour>();
     private List<IInteractionBehaviour> _activeBehaviours = new List<IInteractionBehaviour>();
+    private List<IInteractionBehaviour> _misbehavingBehaviours = new List<IInteractionBehaviour>();
+
     private List<IInteractionBehaviour> _activatedBehaviours = new List<IInteractionBehaviour>();
     private List<IInteractionBehaviour> _deactivatedBehaviours = new List<IInteractionBehaviour>();
 
@@ -42,21 +45,24 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public void Register(IInteractionBehaviour behaviour) {
+      behaviour.NotifyRegistered();
+      _registeredBehaviours.Add(behaviour);
+    }
+
+    public void Unregister(IInteractionBehaviour behaviour) {
+      if (_registeredBehaviours.Remove(behaviour)) {
+        Deactivate(behaviour);
+      }
+    }
+
+    public void NotifyMisbehaving(IInteractionBehaviour behaviour) {
+      _misbehavingBehaviours.Add(behaviour);
+    }
+
     public ReadonlyList<IInteractionBehaviour> ActiveBehaviours {
       get {
         return _activeBehaviours;
-      }
-    }
-
-    public ReadonlyList<IInteractionBehaviour> ActivatedBehaviours {
-      get {
-        return _activatedBehaviours;
-      }
-    }
-
-    public ReadonlyList<IInteractionBehaviour> DeactivatedBehaviours {
-      get {
-        return _deactivatedBehaviours;
       }
     }
 
@@ -68,8 +74,10 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public void DeactivateAll() {
+    public void DeactivateAll(out ReadonlyList<IInteractionBehaviour> deactivated) {
       _deactivatedBehaviours.AddRange(_activeBehaviours);
+      deactivated = new ReadonlyList<IInteractionBehaviour>(_deactivatedBehaviours);
+
       _activeBehaviours.Clear();
       _activatedBehaviours.Clear();
       _activeObjects.Clear();
@@ -79,7 +87,11 @@ namespace Leap.Unity.Interaction {
       return _activeBehaviours.Contains(interactionBehaviour);
     }
 
-    public void FindActiveObjects(Frame frame) {
+    public bool IsRegistered(IInteractionBehaviour interactionBehaviour) {
+      return _registeredBehaviours.Contains(interactionBehaviour);
+    }
+
+    public void Update(Frame frame, out ReadonlyList<IInteractionBehaviour> activated, out ReadonlyList<IInteractionBehaviour> deactivated) {
       List<Hand> hands = frame.Hands;
 
       markOverlappingObjects(hands);
@@ -89,6 +101,23 @@ namespace Leap.Unity.Interaction {
       deactivateStaleObjects();
 
       buildResultsLists();
+
+      activated = new ReadonlyList<IInteractionBehaviour>(_activatedBehaviours);
+      deactivated = new ReadonlyList<IInteractionBehaviour>(_deactivatedBehaviours);
+    }
+
+    public void UnregisterMisbehavingObjects() {
+      for (int i = 0; i < _misbehavingBehaviours.Count; i++) {
+        var behaviour = _misbehavingBehaviours[i];
+        if (behaviour != null) {
+          try {
+            Unregister(behaviour);
+          } catch (Exception e) {
+            Debug.LogException(e);
+          }
+        }
+      }
+      _misbehavingBehaviours.Clear();
     }
 
     private void markOverlappingObjects(List<Hand> hands) {
@@ -119,10 +148,19 @@ namespace Leap.Unity.Interaction {
         Rigidbody body = _rigidbodyList[i];
         ActiveObject activeObj;
         if (!_activeObjects.TryGetValue(body, out activeObj)) {
-          activeObj = body.gameObject.AddComponent<ActiveObject>();
+          var behaviour = body.GetComponent<IInteractionBehaviour>();
 
-          //TODO: validate that a behaviour actually exists (it should unless someone is being mean)
-          activeObj.interactionBehaviour = body.GetComponent<IInteractionBehaviour>();
+          if (behaviour == null) {
+            //Someone is using our layers for their own evil needs...
+            continue;
+          }
+
+          if (!_registeredBehaviours.Contains(behaviour)) {
+            continue;
+          }
+
+          activeObj = body.gameObject.AddComponent<ActiveObject>();
+          activeObj.interactionBehaviour = behaviour;
 
           _activatedBehaviours.Add(activeObj.interactionBehaviour);
 
