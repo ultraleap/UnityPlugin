@@ -503,7 +503,7 @@ namespace Leap.Unity.Interaction {
       if(base.IsBeingGrasped) {
         desiredContactMode = ContactMode.GRASPED;
       }
-      else if(_dislocatedBrushCounter < DISLOCATED_BRUSH_COOLDOWN || (_contactMode == ContactMode.SOFT && _minHandDistance <= 0.0f )) {
+      else if(_dislocatedBrushCounter < DISLOCATED_BRUSH_COOLDOWN || (_contactMode != ContactMode.NORMAL && _minHandDistance <= 0.0f )) {
         desiredContactMode = ContactMode.SOFT;
       }
 
