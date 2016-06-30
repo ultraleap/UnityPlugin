@@ -7,6 +7,49 @@ namespace Leap.Unity.Interaction {
     public IInteractionBehaviour interactionBehaviour;
     public int updateIndex = -1;
 
+    private ActiveObjectManager _manager;
+
+
+    void OnCollisionEnter(Collision collision) {
+      IInteractionBehaviour otherBehaviour;
+      if (!tryGetOtherBehaviour(collision, out otherBehaviour)) {
+        return;
+      }
+
+
+
+    }
+
+    void OnCollisionExit(Collision collision) {
+      IInteractionBehaviour otherBehaviour;
+      if (!tryGetOtherBehaviour(collision, out otherBehaviour)) {
+        return;
+      }
+
+
+    }
+
+    private bool tryGetOtherBehaviour(Collision collision, out IInteractionBehaviour behaviour) {
+      Rigidbody otherBody = collision.rigidbody;
+      if (otherBody == null) {
+        behaviour = null;
+        return false;
+      }
+
+      behaviour = otherBody.GetComponent<IInteractionBehaviour>();
+      if (behaviour == null) {
+        return false;
+      }
+
+      if (!_manager.IsRegistered(behaviour)) {
+        behaviour = null;
+        return false;
+      }
+
+      return true;
+    }
+
+
 #if UNITY_EDITOR
     private List<Collider> _colliderList = new List<Collider>();
     public void OnDrawGizmos() {
