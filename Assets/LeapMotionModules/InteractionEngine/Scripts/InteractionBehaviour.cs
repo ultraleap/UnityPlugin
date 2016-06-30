@@ -215,18 +215,12 @@ namespace Leap.Unity.Interaction {
       // Material already replaced in OnGraspBegin
       if (_contactMode != ContactMode.GRASPED) {
         if (_recievedVelocityUpdate) {
-          // Shapes in the contact graph of a hand do not bounce.
-          _materialReplacer.ReplaceMaterials();
-
           //If we recieved a velocity update, gravity must always be disabled because the
           //velocity update accounts for gravity.
           if (_rigidbody.useGravity) {
             _rigidbody.useGravity = false;
           }
         } else {
-          // Shapes in the contact graph of a hand do not bounce.
-          _materialReplacer.RevertMaterials();
-
           //If we did not recieve a velocity update, we set the rigidbody's gravity status
           //to match whatever the user has set.
           if (_rigidbody.useGravity != _useGravity) {
@@ -241,6 +235,14 @@ namespace Leap.Unity.Interaction {
           if (_accumulatedAngularAcceleration != Vector3.zero) {
             _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
           }
+        }
+
+        if (_recievedVelocityUpdate || _minHandDistance <= 0.0f) {
+          // Shapes in the contact graph of a hand do not bounce.
+          _materialReplacer.ReplaceMaterials();
+        } else {
+          // Shapes in the contact graph of a hand do not bounce.
+          _materialReplacer.RevertMaterials();
         }
       }
 
@@ -332,11 +334,12 @@ namespace Leap.Unity.Interaction {
         _recievedVelocityUpdate = true;
       }
 
+      _minHandDistance = (results.resultFlags & ShapeInstanceResultFlags.MaxHand) == 0 ? float.MaxValue : results.minHandDistance;
+
+
 #if UNITY_EDITOR
       _showDebugRecievedVelocity = _recievedVelocityUpdate;
 #endif
-
-      _minHandDistance = (results.resultFlags & ShapeInstanceResultFlags.MaxHand) == 0 ? float.MaxValue : results.minHandDistance;
 
       updateContactMode();
     }
