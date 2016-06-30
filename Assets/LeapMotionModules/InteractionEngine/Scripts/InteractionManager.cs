@@ -97,7 +97,7 @@ namespace Leap.Unity.Interaction {
     private bool _hasSceneBeenCreated = false;
     private bool _enableGraspingLast = false;
 
-    protected ActiveObjectManager _activeManager;
+    protected ActiveObjectManager _activeManager = new ActiveObjectManager();
     protected ShapeDescriptionPool _shapeDescriptionPool;
 
     //Maps the Interaction instance handle to the behaviour
@@ -449,6 +449,9 @@ namespace Leap.Unity.Interaction {
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
 
       Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "There should not be any instances before the creation step.");
+
+      _activeManager.LayerMask = (1 << InteractionLayer) | (1 << InteractionNoClipLayer);
+      _activeManager.OverlapRadius = _overlapRadius;
     }
 
     protected virtual void OnDisable() {

@@ -22,11 +22,6 @@ namespace Leap.Unity.Interaction {
     private List<IInteractionBehaviour> _activatedBehaviours = new List<IInteractionBehaviour>();
     private List<IInteractionBehaviour> _deactivatedBehaviours = new List<IInteractionBehaviour>();
 
-    public ActiveObjectManager(float overlapRadius, int layerMask) {
-      _overlapRadius = overlapRadius;
-      _layerMask = layerMask;
-    }
-
     public float OverlapRadius {
       get {
         return _overlapRadius;
@@ -77,6 +72,7 @@ namespace Leap.Unity.Interaction {
       if (_activeObjects.ContainsKey(rigidbody)) {
         _activeObjects.Remove(rigidbody);
         _activeBehaviours.Remove(interactionBehaviour);
+        _deactivatedBehaviours.Add(interactionBehaviour);
       }
     }
 
@@ -98,6 +94,8 @@ namespace Leap.Unity.Interaction {
     }
 
     public void Update(Frame frame, out ReadonlyList<IInteractionBehaviour> activated, out ReadonlyList<IInteractionBehaviour> deactivated) {
+      _updateIndex++;
+
       List<Hand> hands = frame.Hands;
 
       markOverlappingObjects(hands);
@@ -207,7 +205,7 @@ namespace Leap.Unity.Interaction {
     }
 
     private void handleColliderResults(int count, List<Rigidbody> list) {
-      for (int i = 0; i < _colliderResults.Length; i++) {
+      for (int i = 0; i < count; i++) {
         Collider collider = _colliderResults[i];
         //This will totally add duplicates
         list.Add(collider.attachedRigidbody);
