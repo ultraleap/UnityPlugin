@@ -94,37 +94,37 @@ namespace Leap.Unity.Interaction {
     }
 
     public ActivityMonitor Activate(IInteractionBehaviour interactionBehaviour) {
-      ActivityMonitor activeComponent;
-      if (_registeredBehaviours.TryGetValue(interactionBehaviour, out activeComponent)) {
-        if (activeComponent == null) {
-          activeComponent = interactionBehaviour.gameObject.AddComponent<ActivityMonitor>();
-          activeComponent.Init(interactionBehaviour, this);
+      ActivityMonitor monitor;
+      if (_registeredBehaviours.TryGetValue(interactionBehaviour, out monitor)) {
+        if (monitor == null) {
+          monitor = interactionBehaviour.gameObject.AddComponent<ActivityMonitor>();
+          monitor.Init(interactionBehaviour, this);
 
           //We need to do this in order to force Unity to reconsider collision callbacks for this object
           //Otherwise scripts added in the middle of a collision never recieve the Stay callbacks.
-          Collider singleCollider = activeComponent.GetComponentInChildren<Collider>();
+          Collider singleCollider = monitor.GetComponentInChildren<Collider>();
           if (singleCollider != null) {
             Physics.IgnoreCollision(singleCollider, singleCollider, true);
             Physics.IgnoreCollision(singleCollider, singleCollider, false);
           }
 
-          _registeredBehaviours[interactionBehaviour] = activeComponent;
+          _registeredBehaviours[interactionBehaviour] = monitor;
           _activeBehaviours.Add(interactionBehaviour);
 
           toggleIsChanged(interactionBehaviour);
         }
       }
-      return activeComponent;
+      return monitor;
     }
 
     public void Deactivate(IInteractionBehaviour interactionBehaviour) {
-      ActivityMonitor activeCompoonent;
-      if (_registeredBehaviours.TryGetValue(interactionBehaviour, out activeCompoonent)) {
-        if (activeCompoonent != null) {
+      ActivityMonitor monitor;
+      if (_registeredBehaviours.TryGetValue(interactionBehaviour, out monitor)) {
+        if (monitor != null) {
           _registeredBehaviours[interactionBehaviour] = null;
           _activeBehaviours.Remove(interactionBehaviour);
 
-          UnityEngine.Object.DestroyImmediate(activeCompoonent);
+          UnityEngine.Object.DestroyImmediate(monitor);
 
           toggleIsChanged(interactionBehaviour);
         }
@@ -219,12 +219,12 @@ namespace Leap.Unity.Interaction {
       //This loop doesn't care about duplicates
       for (int i = 0; i < _markedBehaviours.Count; i++) {
         IInteractionBehaviour behaviour = _markedBehaviours[i];
-        ActivityMonitor activeObj;
-        if (_registeredBehaviours.TryGetValue(behaviour, out activeObj)) {
-          if (activeObj == null) {
-            activeObj = Activate(behaviour);
+        ActivityMonitor monitor;
+        if (_registeredBehaviours.TryGetValue(behaviour, out monitor)) {
+          if (monitor == null) {
+            monitor = Activate(behaviour);
           }
-          activeObj.Revive();
+          monitor.Revive();
         } else {
           Debug.LogError("Should always be registered, since we checked in handleColliderResults");
         }
