@@ -7,7 +7,7 @@ using LeapInternal;
 namespace Leap.Unity.Interaction.CApi {
 
   public enum Version : uint {
-    Current = 0x0102,
+    Current = 0x0103,
     Major = 0xff00, // Any API breaking changes
     Minor = 0x00ff
   }
@@ -50,8 +50,7 @@ namespace Leap.Unity.Interaction.CApi {
   };
 
   public enum ShapeInfoFlags : uint {
-    None = 0x00,
-    HasRigidBody = 0x01,
+    None = 0x00
   };
 
   public enum UpdateInfoFlags : uint {
@@ -59,7 +58,8 @@ namespace Leap.Unity.Interaction.CApi {
     AccelerationEnabled = 0x01,
     VelocityEnabled = 0x02,
     GravityEnabled = 0x04,
-    ReportNoResult = 0x08
+    SoftContact = 0x08,
+    Kinematic = 0x10
   };
 
   public enum HandResultFlags : uint {
@@ -217,8 +217,7 @@ namespace Leap.Unity.Interaction.CApi {
     public ShapeInstanceResultFlags resultFlags;
     public LEAP_VECTOR linearVelocity;
     public LEAP_VECTOR angularVelocity;
-    public float maxHandDepth;
-    public LEAP_VECTOR maxHandVelocity;
+    public float minHandDistance;
     public float debugGrab;
     public float debugRelease;
   }
