@@ -18,6 +18,18 @@ namespace Leap.Unity.Graphing {
       }
     }
 
+    public struct GraphKey {
+      public string name;
+      public GraphUnits units;
+      public long tick;
+
+      public GraphKey(string name, GraphUnits units, long tick = 0) {
+        this.name = name;
+        this.units = units;
+        this.tick = tick;
+      }
+    }
+
     public enum GraphUnits {
       Miliseconds,
       Framerate
@@ -109,32 +121,23 @@ namespace Leap.Unity.Graphing {
     protected Dictionary<string, Graph> _graphs;
     protected Stack<Graph> _currentGraphStack = new Stack<Graph>();
 
+    protected RingBuffer<GraphKey> _keyBuffer = new RingBuffer<GraphKey>();
+
     //Custom sample timers
     protected long _preCullTicks, _renderTicks, _fixedTicks = -1;
 
+    public void BeginSample(GraphKey key) {
+      key.tick = _stopwatch.ElapsedTicks;
+      _keyBuffer.PushFront(key);
+    }
+
     public void BeginSample(string sampleName, GraphUnits units) {
-      long currTicks = _stopwatch.ElapsedTicks;
-
-      Graph graph = getGraph(sampleName, units);
-
-      if (_currentGraphStack.Count != 0) {
-        _currentGraphStack.Peek().PauseSample(currTicks);
-      }
-
-      graph.BeginSample(currTicks);
-
-      _currentGraphStack.Push(graph);
+      GraphKey key = new GraphKey(sampleName, units, _stopwatch.ElapsedTicks);
+      _keyBuffer.PushFront(key);
     }
 
     public void EndSample() {
-      long currTicks = _stopwatch.ElapsedTicks;
-
-      Graph graph = _currentGraphStack.Pop();
-      graph.EndSample(currTicks);
-
-      if (_currentGraphStack.Count != 0) {
-        _currentGraphStack.Peek().ResumeSample(currTicks);
-      }
+      _keyBuffer.PushFront(new GraphKey(null, GraphUnits.Miliseconds, _stopwatch.ElapsedTicks));
     }
 
     public void AddSample(string sampleName, GraphUnits units, long ticks) {
@@ -214,6 +217,8 @@ namespace Leap.Unity.Graphing {
       if (_sampleIndex < _samplesPerFrame) {
         return;
       }
+
+      replayKeys();
 
       foreach (Graph graph in _graphs.Values) {
         if (_paused) {
@@ -364,6 +369,32 @@ namespace Leap.Unity.Graphing {
 
     protected void addCallback(Button button, string name) {
       button.onClick.AddListener(() => SwtichGraph(name));
+    }
+
+    protected void replayKeys() {
+      GraphKey key;
+      while (_keyBuffer.Count > 0) {
+        _keyBuffer.PopBack(out key);
+
+        if (key.name != null) {
+          Graph graph = getGraph(key.name, key.units);
+
+          if (_currentGraphStack.Count != 0) {
+            _currentGraphStack.Peek().PauseSample(key.tick);
+          }
+
+          graph.BeginSample(key.tick);
+
+          _currentGraphStack.Push(graph);
+        } else {
+          Graph graph = _currentGraphStack.Pop();
+          graph.EndSample(key.tick);
+
+          if (_currentGraphStack.Count != 0) {
+            _currentGraphStack.Peek().ResumeSample(key.tick);
+          }
+        }
+      }
     }
 
     protected class Graph {
