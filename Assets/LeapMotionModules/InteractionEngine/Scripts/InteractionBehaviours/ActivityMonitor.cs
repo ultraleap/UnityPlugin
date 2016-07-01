@@ -6,6 +6,7 @@ namespace Leap.Unity.Interaction {
     private IInteractionBehaviour _interactionBehaviour;
     private ActivityManager _manager;
     private int _life;
+    private int _maxNeighborLife;
 
     public void Init(IInteractionBehaviour interactionBehaviour, ActivityManager manager) {
       _interactionBehaviour = interactionBehaviour;
@@ -15,9 +16,12 @@ namespace Leap.Unity.Interaction {
 
     public void Revive() {
       _life = _manager.MaxDepth;
+      _maxNeighborLife = _manager.MaxDepth;
     }
 
     void FixedUpdate() {
+      _life = _maxNeighborLife - 1;
+
       if (_life <= 0) {
         if (_interactionBehaviour.IsBeingGrasped || _interactionBehaviour.UntrackedHandCount > 0) {
           _life = 1;
@@ -26,10 +30,7 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      //Very important to decrement after the check
-      //If we decremented before, an object that just collided and set its life to 1 would be deactivated
-      //And would very likely be re-activated the very next frame due to another collision.
-      _life--;
+      _maxNeighborLife = 0;
     }
 
     void OnCollisionEnter(Collision collision) {
@@ -61,7 +62,7 @@ namespace Leap.Unity.Interaction {
           neighbor._life = _life - 1;
         }
       } else {
-        _life = Mathf.Max(_life, neighbor._life - 1);
+        _maxNeighborLife = Mathf.Max(_maxNeighborLife, neighbor._life);
       }
     }
 
