@@ -472,8 +472,11 @@ namespace Leap.Unity.Interaction {
       _idToInteractionHand.Clear();
       _graspedBehaviours.Clear();
 
-      ReadonlyList<IInteractionBehaviour> justDeactivated;
-      _activeManager.DeactivateAll(out justDeactivated);
+      _activeManager.DeactivateAll();
+
+      ReadonlyList<IInteractionBehaviour> justActivated, justDeactivated;
+      _activeManager.GetChanges(out justActivated, out justDeactivated);
+
       destroyShapes(justDeactivated);
 
       Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "All instances should have been destroyed.");
@@ -490,11 +493,6 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void FixedUpdate() {
       Frame frame = _leapProvider.CurrentFixedFrame;
-
-      ReadonlyList<IInteractionBehaviour> justActivated, justDeactivated;
-      _activeManager.Update(frame, out justActivated, out justDeactivated);
-      createShapes(justActivated);
-      destroyShapes(justDeactivated);
 
       if (OnPrePhysicalUpdate != null) {
         OnPrePhysicalUpdate();
@@ -522,7 +520,9 @@ namespace Leap.Unity.Interaction {
         return;
       }
 
-      dispatchOnHandsHolding(_leapProvider.CurrentFrame, isPhysics: false);
+      Frame frame = _leapProvider.CurrentFrame;
+
+      dispatchOnHandsHolding(frame, isPhysics: false);
 
       _activeManager.UnregisterMisbehavingObjects();
 
@@ -600,6 +600,14 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void simulateFrame(Frame frame) {
+      _activeManager.Update(frame);
+
+      ReadonlyList<IInteractionBehaviour> justActivated, justDeactivated;
+      _activeManager.GetChanges(out justActivated, out justDeactivated);
+
+      createShapes(justActivated);
+      destroyShapes(justDeactivated);
+
       var active = _activeManager.ActiveBehaviours;
 
       for (int i = 0; i < active.Count; i++) {

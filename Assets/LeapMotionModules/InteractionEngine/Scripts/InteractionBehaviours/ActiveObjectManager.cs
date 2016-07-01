@@ -1,24 +1,30 @@
 ﻿using UnityEngine;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction {
 
   public class ActiveObjectManager {
-    private Dictionary<Rigidbody, ActiveObject> _activeObjects = new Dictionary<Rigidbody, ActiveObject>();
-
     private int _updateIndex = 0;
 
     private float _overlapRadius = 0;
     private int _layerMask;
+    private int _maxDepth = 60;
 
-    private List<Rigidbody> _rigidbodyList = new List<Rigidbody>();
+    private List<IInteractionBehaviour> _markedBehaviours = new List<IInteractionBehaviour>();
     private Collider[] _colliderResults = new Collider[32];
 
-    private HashSet<IInteractionBehaviour> _registeredBehaviours = new HashSet<IInteractionBehaviour>();
+    //Maps registered objects to their active component, which is always null for inactive but still registered objects
+    private Dictionary<IInteractionBehaviour, ActiveObject> _registeredBehaviours = new Dictionary<IInteractionBehaviour, ActiveObject>();
+    //Technically provided by _registerBehaviours, but we want fast itteration over active objects, so pay a little more for a list
     private List<IInteractionBehaviour> _activeBehaviours = new List<IInteractionBehaviour>();
+
     private List<IInteractionBehaviour> _misbehavingBehaviours = new List<IInteractionBehaviour>();
 
+    //Whenever an object is activated or deactivated, its existence in the changed set is toggled.  When asked for changes,
+    //we use the changed set, as well as the currently active state to build two lists to hand to the client.
+    private HashSet<IInteractionBehaviour> _changed = new HashSet<IInteractionBehaviour>();
     private List<IInteractionBehaviour> _activatedBehaviours = new List<IInteractionBehaviour>();
     private List<IInteractionBehaviour> _deactivatedBehaviours = new List<IInteractionBehaviour>();
 
@@ -40,9 +46,18 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public int MaxDepth {
+      get {
+        return _maxDepth;
+      }
+      set {
+        _maxDepth = value;
+      }
+    }
+
     public IEnumerable<IInteractionBehaviour> RegisteredObjects {
       get {
-        return _registeredBehaviours;
+        return _registeredBehaviours.Keys;
       }
     }
 
@@ -54,58 +69,110 @@ namespace Leap.Unity.Interaction {
 
     public void Register(IInteractionBehaviour behaviour) {
       behaviour.NotifyRegistered();
-      _registeredBehaviours.Add(behaviour);
+      _registeredBehaviours.Add(behaviour, null);
     }
 
     public void Unregister(IInteractionBehaviour behaviour) {
-      if (_registeredBehaviours.Remove(behaviour)) {
+      if (!_registeredBehaviours.ContainsKey(behaviour)) {
+        return;
+      }
+
+      if (IsActive(behaviour)) {
         Deactivate(behaviour);
       }
+
+      _registeredBehaviours.Remove(behaviour);
+
+      behaviour.NotifyUnregistered();
     }
 
     public void NotifyMisbehaving(IInteractionBehaviour behaviour) {
       _misbehavingBehaviours.Add(behaviour);
     }
 
+    public ActiveObject Activate(IInteractionBehaviour interactionBehaviour) {
+      ActiveObject activeComponent;
+      if (_registeredBehaviours.TryGetValue(interactionBehaviour, out activeComponent)) {
+        if (activeComponent == null) {
+          activeComponent = interactionBehaviour.gameObject.AddComponent<ActiveObject>();
+          activeComponent.manager = this;
+          activeComponent.interactionBehaviour = interactionBehaviour;
+          activeComponent.life = _maxDepth;
+
+          Collider singleCollider = activeComponent.GetComponentInChildren<Collider>();
+          if (singleCollider != null) {
+            Physics.IgnoreCollision(singleCollider, singleCollider, true);
+            Physics.IgnoreCollision(singleCollider, singleCollider, false);
+          }
+
+          _registeredBehaviours[interactionBehaviour] = activeComponent;
+          _activeBehaviours.Add(interactionBehaviour);
+
+          if (_changed.Contains(interactionBehaviour)) {
+            _changed.Remove(interactionBehaviour);
+          } else {
+            _changed.Add(interactionBehaviour);
+          }
+        }
+      }
+      return activeComponent;
+    }
+
     public void Deactivate(IInteractionBehaviour interactionBehaviour) {
-      Rigidbody rigidbody = interactionBehaviour.GetComponent<Rigidbody>();
-      if (_activeObjects.ContainsKey(rigidbody)) {
-        _activeObjects.Remove(rigidbody);
-        _activeBehaviours.Remove(interactionBehaviour);
-        _deactivatedBehaviours.Add(interactionBehaviour);
+      ActiveObject activeCompoonent;
+      if (_registeredBehaviours.TryGetValue(interactionBehaviour, out activeCompoonent)) {
+        if (activeCompoonent != null) {
+          _registeredBehaviours[interactionBehaviour] = null;
+          _activeBehaviours.Remove(interactionBehaviour);
+
+          if (_changed.Contains(interactionBehaviour)) {
+            _changed.Remove(interactionBehaviour);
+          } else {
+            _changed.Add(interactionBehaviour);
+          }
+
+          UnityEngine.Object.DestroyImmediate(activeCompoonent);
+        }
       }
     }
 
-    public void DeactivateAll(out ReadonlyList<IInteractionBehaviour> deactivated) {
-      _deactivatedBehaviours.AddRange(_activeBehaviours);
-      deactivated = new ReadonlyList<IInteractionBehaviour>(_deactivatedBehaviours);
-
-      _activeBehaviours.Clear();
-      _activatedBehaviours.Clear();
-      _activeObjects.Clear();
+    public void DeactivateAll() {
+      while (_activeBehaviours.Count > 0) {
+        Deactivate(_activeBehaviours[0]);
+      }
     }
 
     public bool IsActive(IInteractionBehaviour interactionBehaviour) {
-      return _activeBehaviours.Contains(interactionBehaviour);
+      return _registeredBehaviours[interactionBehaviour] != null;
     }
 
     public bool IsRegistered(IInteractionBehaviour interactionBehaviour) {
-      return _registeredBehaviours.Contains(interactionBehaviour);
+      return _registeredBehaviours.ContainsKey(interactionBehaviour);
     }
 
-    public void Update(Frame frame, out ReadonlyList<IInteractionBehaviour> activated, out ReadonlyList<IInteractionBehaviour> deactivated) {
+    public void Update(Frame frame) {
       _updateIndex++;
 
       List<Hand> hands = frame.Hands;
 
       markOverlappingObjects(hands);
 
-      activateMarkedObjects();
+      activateAndKeepMarkedObjectsAlive();
+    }
 
-      deactivateStaleObjects();
+    public void GetChanges(out ReadonlyList<IInteractionBehaviour> activated, out ReadonlyList<IInteractionBehaviour> deactivated) {
+      _activatedBehaviours.Clear();
+      _deactivatedBehaviours.Clear();
 
-      buildResultsLists();
+      foreach (var changed in _changed) {
+        if (IsActive(changed)) {
+          _activatedBehaviours.Add(changed);
+        } else {
+          _deactivatedBehaviours.Add(changed);
+        }
+      }
 
+      _changed.Clear();
       activated = new ReadonlyList<IInteractionBehaviour>(_activatedBehaviours);
       deactivated = new ReadonlyList<IInteractionBehaviour>(_deactivatedBehaviours);
     }
@@ -125,13 +192,13 @@ namespace Leap.Unity.Interaction {
     }
 
     private void markOverlappingObjects(List<Hand> hands) {
-      _rigidbodyList.Clear();
+      _markedBehaviours.Clear();
 
       switch (hands.Count) {
         case 0:
           break;
         case 1:
-          getSphereResults(hands[0], _rigidbodyList);
+          getSphereResults(hands[0], _markedBehaviours);
           break;
 #if UNITY_5_4
         case 2:
@@ -140,71 +207,29 @@ namespace Leap.Unity.Interaction {
 #endif
         default:
           for (int i = 0; i < hands.Count; i++) {
-            getSphereResults(hands[i], _rigidbodyList);
+            getSphereResults(hands[i], _markedBehaviours);
           }
           break;
       }
     }
 
-    private void activateMarkedObjects() {
-      _activatedBehaviours.Clear();
-      for (int i = 0; i < _rigidbodyList.Count; i++) {
-        Rigidbody body = _rigidbodyList[i];
+    private void activateAndKeepMarkedObjectsAlive() {
+      //This loop doesn't care about duplicates
+      for (int i = 0; i < _markedBehaviours.Count; i++) {
+        IInteractionBehaviour behaviour = _markedBehaviours[i];
         ActiveObject activeObj;
-        if (!_activeObjects.TryGetValue(body, out activeObj)) {
-          var behaviour = body.GetComponent<IInteractionBehaviour>();
-
-          if (behaviour == null) {
-            //Someone is using our layers for their own evil needs...
-            continue;
+        if (_registeredBehaviours.TryGetValue(behaviour, out activeObj)) {
+          if (activeObj == null) {
+            activeObj = Activate(behaviour);
           }
-
-          if (!_registeredBehaviours.Contains(behaviour)) {
-            continue;
-          }
-
-          activeObj = body.gameObject.AddComponent<ActiveObject>();
-          activeObj.interactionBehaviour = behaviour;
-
-          _activatedBehaviours.Add(activeObj.interactionBehaviour);
-
-          _activeObjects[body] = activeObj;
-        }
-
-        activeObj.updateIndex = _updateIndex;
-      }
-    }
-
-    private void deactivateStaleObjects() {
-      //Find all active objects that have not had their index updated
-      _rigidbodyList.Clear();
-      _deactivatedBehaviours.Clear();
-      foreach (var pair in _activeObjects) {
-        if (pair.Value.updateIndex < _updateIndex) {
-          _deactivatedBehaviours.Add(pair.Value.interactionBehaviour);
-
-          //Destroy the component right away
-          UnityEngine.Object.DestroyImmediate(pair.Value);
-
-          //Add the key to the list for later removal
-          _rigidbodyList.Add(pair.Key);
+          activeObj.life = _maxDepth;
+        } else {
+          Debug.LogError("Should always be registered, since we checked in handleColliderResults");
         }
       }
-
-      //Remove all keys that were marked
-      for (int i = 0; i < _rigidbodyList.Count; i++) {
-        _activeObjects.Remove(_rigidbodyList[i]);
-      }
     }
 
-    private void buildResultsLists() {
-      _activeBehaviours.Clear();
-      foreach (var activeObj in _activeObjects.Values) {
-        _activeBehaviours.Add(activeObj.interactionBehaviour);
-      }
-    }
-
-    private void handleColliderResults(int count, List<Rigidbody> list) {
+    private void handleColliderResults(int count, List<IInteractionBehaviour> list) {
       for (int i = 0; i < count; i++) {
         Collider collider = _colliderResults[i];
 
@@ -214,12 +239,24 @@ namespace Leap.Unity.Interaction {
           continue;
         }
 
-        //This will totally add duplicates
-        list.Add(collider.attachedRigidbody);
+        IInteractionBehaviour behaviour = collider.attachedRigidbody.GetComponent<IInteractionBehaviour>();
+
+        //Also will happen if someone is abusing layers
+        if (behaviour == null) {
+          continue;
+        }
+
+        //Nothing stopping our overlaps from finding object of other managers, or unregistered objects
+        if (!IsRegistered(behaviour)) {
+          continue;
+        }
+
+        //This will totally add duplicates, we don't care
+        list.Add(behaviour);
       }
     }
 
-    private void getSphereResults(Hand hand, List<Rigidbody> list) {
+    private void getSphereResults(Hand hand, List<IInteractionBehaviour> list) {
       int count;
       while (true) {
         count = Physics.OverlapSphereNonAlloc(hand.PalmPosition.ToVector3(),
@@ -237,7 +274,7 @@ namespace Leap.Unity.Interaction {
     }
 
 #if UNITY_5_4
-    private void getCapsuleResults(Hand handA, Hand handB, List<Rigidbody> list) {
+    private void getCapsuleResults(Hand handA, Hand handB, List<IInteractionBehaviour> list) {
       int count;
       while (true) {
         count = Physics.OverlapCapsuleNonAlloc(handA.PalmPosition.ToVector3(),
