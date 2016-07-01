@@ -5,6 +5,8 @@ using System.Collections.Generic;
 namespace Leap.Unity.Interaction {
 
   public class ActivityManager {
+    private const int _lifeStep = 5;
+
     private float _overlapRadius = 0;
     private int _maxDepth = 0;
     private int _layerMask = 0;
@@ -37,6 +39,18 @@ namespace Leap.Unity.Interaction {
       }
       set {
         _maxDepth = value;
+      }
+    }
+
+    public int MaxLife {
+      get {
+        return _maxDepth * _lifeStep;
+      }
+    }
+
+    public int LifeStep {
+      get {
+        return _lifeStep;
       }
     }
 

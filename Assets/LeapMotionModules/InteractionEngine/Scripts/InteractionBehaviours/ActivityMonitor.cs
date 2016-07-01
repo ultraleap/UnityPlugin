@@ -15,12 +15,14 @@ namespace Leap.Unity.Interaction {
     }
 
     public void Revive() {
-      _life = _manager.MaxDepth;
-      _maxNeighborLife = _manager.MaxDepth;
+      _maxNeighborLife = _manager.MaxLife;
+      _life = _manager.MaxLife;
     }
 
     void FixedUpdate() {
-      _life = _maxNeighborLife - 1;
+      if (_life >= _maxNeighborLife) {
+        _life--;
+      }
 
       if (_life <= 0) {
         if (_interactionBehaviour.IsBeingGrasped || _interactionBehaviour.UntrackedHandCount > 0) {
@@ -57,9 +59,9 @@ namespace Leap.Unity.Interaction {
 
       ActivityMonitor neighbor = otherBehaviour.GetComponent<ActivityMonitor>();
       if (neighbor == null) {
-        if (_life > 1) {
+        if (_life > _manager.LifeStep) {
           neighbor = _manager.Activate(otherBehaviour);
-          neighbor._life = _life - 1;
+          neighbor._life = _life - _manager.LifeStep;
         }
       } else {
         _maxNeighborLife = Mathf.Max(_maxNeighborLife, neighbor._life);
@@ -76,7 +78,7 @@ namespace Leap.Unity.Interaction {
         Gizmos.color = Color.blue;
       }
 
-      Gizmos.color = Color.HSVToRGB(_life / (_manager.MaxDepth * 2.0f), 1, 1);
+      Gizmos.color = Color.HSVToRGB(_life / (_manager.MaxLife * 2.0f), 1, 1);
       GizmoUtility.DrawColliders(gameObject, useWireframe: true);
     }
 #endif
