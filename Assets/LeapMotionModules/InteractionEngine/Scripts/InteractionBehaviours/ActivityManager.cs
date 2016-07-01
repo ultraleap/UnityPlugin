@@ -106,6 +106,8 @@ namespace Leap.Unity.Interaction {
           }
 
           _registeredBehaviours[interactionBehaviour] = monitor;
+
+          monitor.arrayIndex = _activeBehaviours.Count;
           _activeBehaviours.Add(interactionBehaviour);
 
           if (OnActivate != null) {
@@ -120,9 +122,18 @@ namespace Leap.Unity.Interaction {
       ActivityMonitor monitor;
       if (_registeredBehaviours.TryGetValue(interactionBehaviour, out monitor)) {
         if (monitor != null) {
-          _registeredBehaviours[interactionBehaviour] = null;
-          _activeBehaviours.Remove(interactionBehaviour);
+          //The monitor that is last in the array of monitors
+          IInteractionBehaviour lastBehaviour = _activeBehaviours[_activeBehaviours.Count - 1];
+          ActivityMonitor lastMonitor = _registeredBehaviours[lastBehaviour];
 
+          //Replace the monitor we are going to destroy with the last monitor
+          _activeBehaviours[monitor.arrayIndex] = lastBehaviour;
+          //Make sure to update the index of the moved monitor!
+          lastMonitor.arrayIndex = monitor.arrayIndex;
+          //Remove the empty space at the end
+          _activeBehaviours.RemoveAt(_activeBehaviours.Count - 1);
+
+          _registeredBehaviours[interactionBehaviour] = null;
           UnityEngine.Object.Destroy(monitor);
 
           if (OnDeactivate != null) {

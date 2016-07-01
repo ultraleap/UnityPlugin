@@ -12,6 +12,8 @@ namespace Leap.Unity.Interaction {
 
     public static GizmoType gizmoType = GizmoType.InteractionStatus;
 
+    public int arrayIndex = -1;
+
     private IInteractionBehaviour _interactionBehaviour;
     private ActivityManager _manager;
     private int _life;
