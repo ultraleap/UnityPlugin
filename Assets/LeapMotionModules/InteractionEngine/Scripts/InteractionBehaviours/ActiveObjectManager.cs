@@ -13,7 +13,7 @@ namespace Leap.Unity.Interaction {
     private Collider[] _colliderResults = new Collider[32];
 
     //Maps registered objects to their active component, which is always null for inactive but still registered objects
-    private Dictionary<IInteractionBehaviour, ActiveObject> _registeredBehaviours = new Dictionary<IInteractionBehaviour, ActiveObject>();
+    private Dictionary<IInteractionBehaviour, ActivityMonitor> _registeredBehaviours = new Dictionary<IInteractionBehaviour, ActivityMonitor>();
     //Technically provided by _registerBehaviours, but we want fast iteration over active objects, so pay a little more for a list
     private List<IInteractionBehaviour> _activeBehaviours = new List<IInteractionBehaviour>();
 
@@ -93,14 +93,12 @@ namespace Leap.Unity.Interaction {
       _misbehavingBehaviours.Add(behaviour);
     }
 
-    public ActiveObject Activate(IInteractionBehaviour interactionBehaviour) {
-      ActiveObject activeComponent;
+    public ActivityMonitor Activate(IInteractionBehaviour interactionBehaviour) {
+      ActivityMonitor activeComponent;
       if (_registeredBehaviours.TryGetValue(interactionBehaviour, out activeComponent)) {
         if (activeComponent == null) {
-          activeComponent = interactionBehaviour.gameObject.AddComponent<ActiveObject>();
-          activeComponent.manager = this;
-          activeComponent.interactionBehaviour = interactionBehaviour;
-          activeComponent.life = _maxDepth;
+          activeComponent = interactionBehaviour.gameObject.AddComponent<ActivityMonitor>();
+          activeComponent.Init(interactionBehaviour, this);
 
           //We need to do this in order to force Unity to reconsider collision callbacks for this object
           //Otherwise scripts added in the middle of a collision never recieve the Stay callbacks.
@@ -120,7 +118,7 @@ namespace Leap.Unity.Interaction {
     }
 
     public void Deactivate(IInteractionBehaviour interactionBehaviour) {
-      ActiveObject activeCompoonent;
+      ActivityMonitor activeCompoonent;
       if (_registeredBehaviours.TryGetValue(interactionBehaviour, out activeCompoonent)) {
         if (activeCompoonent != null) {
           _registeredBehaviours[interactionBehaviour] = null;
@@ -160,7 +158,7 @@ namespace Leap.Unity.Interaction {
     public void GetChanges(out ReadonlyList<IInteractionBehaviour> activated, out ReadonlyList<IInteractionBehaviour> deactivated) {
       _activatedBehaviours.Clear();
       _deactivatedBehaviours.Clear();
-      
+
       foreach (var changed in _changed) {
         if (IsActive(changed)) {
           _activatedBehaviours.Add(changed);
@@ -187,7 +185,7 @@ namespace Leap.Unity.Interaction {
       }
       _misbehavingBehaviours.Clear();
     }
-    
+
     private void toggleIsChanged(IInteractionBehaviour interactionBehaviour) {
       if (!_changed.Remove(interactionBehaviour)) {
         _changed.Add(interactionBehaviour);
@@ -221,12 +219,12 @@ namespace Leap.Unity.Interaction {
       //This loop doesn't care about duplicates
       for (int i = 0; i < _markedBehaviours.Count; i++) {
         IInteractionBehaviour behaviour = _markedBehaviours[i];
-        ActiveObject activeObj;
+        ActivityMonitor activeObj;
         if (_registeredBehaviours.TryGetValue(behaviour, out activeObj)) {
           if (activeObj == null) {
             activeObj = Activate(behaviour);
           }
-          activeObj.life = _maxDepth;
+          activeObj.Revive();
         } else {
           Debug.LogError("Should always be registered, since we checked in handleColliderResults");
         }

@@ -3,25 +3,34 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction {
 
-  public class ActiveObject : MonoBehaviour {
-    public IInteractionBehaviour interactionBehaviour;
-    public ActiveObjectManager manager;
+  public class ActivityMonitor : MonoBehaviour {
+    private IInteractionBehaviour _interactionBehaviour;
+    private ActiveObjectManager _manager;
+    private int _life;
 
-    public int life;
+    public void Init(IInteractionBehaviour interactionBehaviour, ActiveObjectManager manager) {
+      _interactionBehaviour = interactionBehaviour;
+      _manager = manager;
+      Revive();
+    }
+
+    public void Revive() {
+      _life = _manager.MaxDepth;
+    }
 
     void FixedUpdate() {
-      if (life <= 0) {
-        if (interactionBehaviour.IsBeingGrasped || interactionBehaviour.UntrackedHandCount > 0) {
-          life = 1;
+      if (_life <= 0) {
+        if (_interactionBehaviour.IsBeingGrasped || _interactionBehaviour.UntrackedHandCount > 0) {
+          _life = 1;
         } else {
-          manager.Deactivate(interactionBehaviour);
+          _manager.Deactivate(_interactionBehaviour);
         }
       }
 
       //Very important to decrement after the check
       //If we decremented before, an object that just collided and set its life to 1 would be deactivated
       //And would very likely be re-activated the very next frame due to another collision.
-      life--;
+      _life--;
     }
 
     void OnCollisionEnter(Collision collision) {
@@ -43,14 +52,14 @@ namespace Leap.Unity.Interaction {
     }
 
     private void handleColliding(IInteractionBehaviour otherBehaviour) {
-      ActiveObject neighbor = otherBehaviour.GetComponent<ActiveObject>();
+      ActivityMonitor neighbor = otherBehaviour.GetComponent<ActivityMonitor>();
       if (neighbor == null) {
-        if (life > 1) {
-          neighbor = manager.Activate(otherBehaviour);
-          neighbor.life = life - 1;
+        if (_life > 1) {
+          neighbor = _manager.Activate(otherBehaviour);
+          neighbor._life = _life - 1;
         }
       } else {
-        life = Mathf.Max(life, neighbor.life - 1);
+        _life = Mathf.Max(_life, neighbor._life - 1);
       }
     }
 
@@ -66,7 +75,7 @@ namespace Leap.Unity.Interaction {
         return false;
       }
 
-      if (!manager.IsRegistered(behaviour)) {
+      if (!_manager.IsRegistered(behaviour)) {
         behaviour = null;
         return false;
       }
@@ -79,7 +88,7 @@ namespace Leap.Unity.Interaction {
     public void OnDrawGizmos() {
       Matrix4x4 currMatrix = Gizmos.matrix;
 
-      if (interactionBehaviour.IsBeingGrasped) {
+      if (_interactionBehaviour.IsBeingGrasped) {
         Gizmos.color = Color.green;
       } else if (GetComponent<Rigidbody>().IsSleeping()) {
         Gizmos.color = Color.gray;
@@ -87,17 +96,8 @@ namespace Leap.Unity.Interaction {
         Gizmos.color = Color.blue;
       }
 
-      Gizmos.color = Color.HSVToRGB(life / (manager.MaxDepth * 2.0f), 1, 1);
+      Gizmos.color = Color.HSVToRGB(_life / (_manager.MaxDepth * 2.0f), 1, 1);
       drawObject(gameObject, true);
-
-      /*
-      Gizmos.color = Color.blue;
-      foreach (var other in others) {
-        if(other != null) {
-          drawObject(other.gameObject, false);
-        }
-      }
-      */
 
       Gizmos.matrix = currMatrix;
     }
