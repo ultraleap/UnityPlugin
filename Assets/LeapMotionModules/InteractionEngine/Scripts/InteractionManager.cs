@@ -54,8 +54,13 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _depthUntilSphericalInside = 0.023f;
 
+    [Tooltip("Objects within this radius of a hand will be considered for interaction.")]
     [SerializeField]
-    protected float _overlapRadius = 0.15f;
+    protected float _activationRadius = 0.15f;
+
+    [Tooltip("How many objects away from the hand are still considered for interaction.")]
+    [SerializeField]
+    protected int _maxActivationDepth = 3;
 
     [Header("Layer Settings")]
     [SerializeField]
@@ -417,6 +422,14 @@ namespace Leap.Unity.Interaction {
       if (!Application.isPlaying && _autoGenerateLayers) {
         autoGenerateLayers();
       }
+
+      _activationRadius = Mathf.Max(0, _activationRadius);
+      _maxActivationDepth = Mathf.Max(1, _maxActivationDepth);
+
+      if (_activeManager != null) {
+        _activeManager.OverlapRadius = _activationRadius;
+        _activeManager.MaxDepth = _maxActivationDepth;
+      }
     }
 
     protected virtual void Awake() {
@@ -451,7 +464,7 @@ namespace Leap.Unity.Interaction {
       Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "There should not be any instances before the creation step.");
 
       _activeManager.LayerMask = (1 << InteractionLayer) | (1 << InteractionNoClipLayer);
-      _activeManager.OverlapRadius = _overlapRadius;
+      _activeManager.OverlapRadius = _activationRadius;
     }
 
     protected virtual void OnDisable() {
