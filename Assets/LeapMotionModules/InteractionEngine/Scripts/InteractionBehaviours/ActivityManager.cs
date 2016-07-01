@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction {
 
-  public class ActiveObjectManager {
+  public class ActivityManager {
     private float _overlapRadius = 0;
     private int _maxDepth = 0;
     private int _layerMask = 0;

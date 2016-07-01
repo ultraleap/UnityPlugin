@@ -4,10 +4,10 @@ namespace Leap.Unity.Interaction {
 
   public class ActivityMonitor : MonoBehaviour {
     private IInteractionBehaviour _interactionBehaviour;
-    private ActiveObjectManager _manager;
+    private ActivityManager _manager;
     private int _life;
 
-    public void Init(IInteractionBehaviour interactionBehaviour, ActiveObjectManager manager) {
+    public void Init(IInteractionBehaviour interactionBehaviour, ActivityManager manager) {
       _interactionBehaviour = interactionBehaviour;
       _manager = manager;
       Revive();
