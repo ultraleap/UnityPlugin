@@ -2159,9 +2159,9 @@ MonoBehaviour:
     CanDuplicate: 1
   - GroupName: BrushHands
     _handPool: {fileID: 0}
-    LeftModel: {fileID: 341847594}
+    LeftModel: {fileID: 1196371278}
     IsLeftToBeSpawned: 0
-    RightModel: {fileID: 1196371278}
+    RightModel: {fileID: 341847594}
     IsRightToBeSpawned: 0
     modelList: []
     modelsCheckedOut: []
