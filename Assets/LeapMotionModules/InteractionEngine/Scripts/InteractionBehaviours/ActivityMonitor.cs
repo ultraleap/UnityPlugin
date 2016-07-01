@@ -3,6 +3,13 @@
 namespace Leap.Unity.Interaction {
 
   public class ActivityMonitor : MonoBehaviour {
+    public enum GizmoType {
+      InteractionStatus,
+      ActivityDepth
+    }
+
+    public static GizmoType gizmoType = GizmoType.InteractionStatus;
+
     private IInteractionBehaviour _interactionBehaviour;
     private ActivityManager _manager;
     private int _life;
@@ -70,15 +77,21 @@ namespace Leap.Unity.Interaction {
 
 #if UNITY_EDITOR
     public void OnDrawGizmos() {
-      if (_interactionBehaviour.IsBeingGrasped) {
-        Gizmos.color = Color.green;
-      } else if (GetComponent<Rigidbody>().IsSleeping()) {
-        Gizmos.color = Color.gray;
-      } else {
-        Gizmos.color = Color.blue;
+      switch (gizmoType) {
+        case GizmoType.InteractionStatus:
+          if (_interactionBehaviour.IsBeingGrasped) {
+            Gizmos.color = Color.green;
+          } else if (GetComponent<Rigidbody>().IsSleeping()) {
+            Gizmos.color = Color.gray;
+          } else {
+            Gizmos.color = Color.blue;
+          }
+          break;
+        case GizmoType.ActivityDepth:
+          Gizmos.color = Color.HSVToRGB(_life / (_manager.MaxLife * 2.0f), 1, 1);
+          break;
       }
 
-      Gizmos.color = Color.HSVToRGB(_life / (_manager.MaxLife * 2.0f), 1, 1);
       GizmoUtility.DrawColliders(gameObject, useWireframe: true);
     }
 #endif
