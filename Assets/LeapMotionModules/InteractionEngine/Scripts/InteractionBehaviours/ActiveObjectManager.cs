@@ -14,7 +14,7 @@ namespace Leap.Unity.Interaction {
 
     //Maps registered objects to their active component, which is always null for inactive but still registered objects
     private Dictionary<IInteractionBehaviour, ActiveObject> _registeredBehaviours = new Dictionary<IInteractionBehaviour, ActiveObject>();
-    //Technically provided by _registerBehaviours, but we want fast itteration over active objects, so pay a little more for a list
+    //Technically provided by _registerBehaviours, but we want fast iteration over active objects, so pay a little more for a list
     private List<IInteractionBehaviour> _activeBehaviours = new List<IInteractionBehaviour>();
 
     private List<IInteractionBehaviour> _misbehavingBehaviours = new List<IInteractionBehaviour>();
