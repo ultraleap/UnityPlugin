@@ -103,7 +103,7 @@ namespace Leap.Unity.Interaction.Tests {
       InteractionC.AddShapeDescription(ref _scene, spherePtr, out _shapeDescriptionHandle);
 
       INTERACTION_CREATE_SHAPE_INFO info = new INTERACTION_CREATE_SHAPE_INFO();
-      info.shapeFlags = ShapeInfoFlags.HasRigidBody;
+      info.shapeFlags = ShapeInfoFlags.None;
 
       INTERACTION_TRANSFORM transform = new INTERACTION_TRANSFORM();
       transform.position = Vector3.zero.ToCVector();

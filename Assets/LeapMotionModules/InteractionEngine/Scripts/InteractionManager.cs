@@ -62,14 +62,17 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected SingleLayer _templateLayer = 0;
 
+    [Tooltip("Default layer that interaction objects")]
     [SerializeField]
     protected SingleLayer _interactionLayer = 0;
 
-    [SerializeField]
-    protected SingleLayer _brushHandLayer = 0;
-
+    [Tooltip("Default layer that interaction objects when they become grasped.")]
     [SerializeField]
     protected SingleLayer _interactionNoClipLayer = 0;
+
+    [Tooltip("Layer that interaction brushes will be on normally.")]
+    [SerializeField]
+    protected SingleLayer _brushLayer = 0;
 
     [Header("Debug")]
     [Tooltip("Allows simulation to be disabled without destroying the scene in any way.")]
@@ -247,14 +250,14 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Gets the layer that interaction brushes should be on.
+    /// Gets the layer that interaction brushes should be on normally.
     /// </summary>
     public int InteractionBrushLayer {
       get {
-        return _brushHandLayer;
+        return _brushLayer;
       }
       set {
-        _brushHandLayer = value;
+        _brushLayer = value;
       }
     }
 
@@ -464,16 +467,8 @@ namespace Leap.Unity.Interaction {
 
       Assert.IsFalse(_hasSceneBeenCreated, "Scene should not have been created yet");
 
-      try {
-        createScene();
-        applyDebugSettings();
-      } catch (Exception e) {
-        Debug.LogError("Error creating scene.  This might have been due to trying to build 32bit, which is not currently supported, or by missing dlls.");
-        Application.Quit();
-        Debug.Break();
-        enabled = false;
-        throw e;
-      }
+      createScene();
+      applyDebugSettings();
 
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
 
@@ -555,7 +550,7 @@ namespace Leap.Unity.Interaction {
         return;
       }
 
-      dispatchOnHandsHolding(_leapProvider.CurrentFrame, isPhysics: false);
+      dispatchOnHandsHoldingAll(_leapProvider.CurrentFrame, isPhysics: false);
 
       unregisterMisbehavingBehaviours();
 
@@ -588,23 +583,23 @@ namespace Leap.Unity.Interaction {
 
     protected void autoGenerateLayers() {
       _interactionLayer = -1;
-      _brushHandLayer = -1;
       _interactionNoClipLayer = -1;
+      _brushLayer = -1;
       for (int i = 8; i < 32; i++) {
         string layerName = LayerMask.LayerToName(i);
         if (string.IsNullOrEmpty(layerName)) {
           if (_interactionLayer == -1) {
             _interactionLayer = i;
-          } else if (_brushHandLayer == -1) {
-            _brushHandLayer = i;
-          } else {
+          } else if (_interactionNoClipLayer == -1) {
             _interactionNoClipLayer = i;
+          } else if (_brushLayer == -1) {
+            _brushLayer = i;
             break;
           }
         }
       }
 
-      if (_interactionLayer == -1 || _brushHandLayer == -1 || _interactionNoClipLayer == -1) {
+      if (_interactionLayer == -1 || _interactionNoClipLayer == -1 || _brushLayer == -1)  {
         if (Application.isPlaying) {
           enabled = false;
         }
@@ -616,19 +611,18 @@ namespace Leap.Unity.Interaction {
 
     private void autoSetupCollisionLayers() {
       for (int i = 0; i < 32; i++) {
-        //Copy ignore settings from template layer
+        // Copy ignore settings from template layer
         bool shouldIgnore = Physics.GetIgnoreLayerCollision(_templateLayer, i);
-
         Physics.IgnoreLayerCollision(_interactionLayer, i, shouldIgnore);
         Physics.IgnoreLayerCollision(_interactionNoClipLayer, i, shouldIgnore);
 
-        //Set brush layer to collide with nothing
-        Physics.IgnoreLayerCollision(_brushHandLayer, i, true);
+        // Set brush layer to collide with nothing
+        Physics.IgnoreLayerCollision(_brushLayer, i, true);
       }
 
       //After copy and set we specify the interactions between the brush and interaction objects
       if (_contactEnabled) {
-        Physics.IgnoreLayerCollision(_brushHandLayer, _interactionLayer, false);
+        Physics.IgnoreLayerCollision(_brushLayer, _interactionLayer, false);
       }
     }
 
@@ -637,7 +631,7 @@ namespace Leap.Unity.Interaction {
         _registeredBehaviours[i].NotifyPreSolve();
       }
 
-      dispatchOnHandsHolding(frame, isPhysics: true);
+      dispatchOnHandsHoldingAll(frame, isPhysics: true);
 
       updateInteractionRepresentations();
 
@@ -645,14 +639,9 @@ namespace Leap.Unity.Interaction {
 
       simulateInteraction();
 
-      bool didAnyHandGrasp;
-      updateInteractionStateChanges(frame, out didAnyHandGrasp);
+      updateInteractionStateChanges(frame);
 
       dispatchSimulationResults();
-
-      if (didAnyHandGrasp) {
-        dispatchOnHandsHolding(frame, isPhysics: true);
-      }
 
       for (int i = 0; i < _registeredBehaviours.Count; i++) {
         _registeredBehaviours[i].NotifyPostSolve();
@@ -681,9 +670,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected virtual void dispatchOnHandsHolding(Frame frame, bool isPhysics) {
+    protected virtual void dispatchOnHandsHoldingAll(Frame frame, bool isPhysics) {
       var hands = frame.Hands;
-
       //Loop through the currently grasped objects to dispatch their OnHandsHold callback
       for (int i = 0; i < _graspedBehaviours.Count; i++) {
         dispatchOnHandsHolding(hands, _graspedBehaviours[i], isPhysics);
@@ -731,16 +719,16 @@ namespace Leap.Unity.Interaction {
       InteractionC.UpdateController(ref _scene, ref _controllerTransform);
     }
 
-    protected virtual void updateInteractionStateChanges(Frame frame, out bool didAnyHandBeginGrasp) {
-      didAnyHandBeginGrasp = false;
+    protected virtual void updateInteractionStateChanges(Frame frame) {
       var hands = frame.Hands;
+
+      INTERACTION_HAND_RESULT handResult = new INTERACTION_HAND_RESULT();
 
       //First loop through all the hands and get their classifications from the engine
       for (int i = 0; i < hands.Count; i++) {
         Hand hand = hands[i];
 
-        bool hasHandResult = false;
-        INTERACTION_HAND_RESULT handResult = new INTERACTION_HAND_RESULT();
+        bool handResultForced = false;
 
         //Get the InteractionHand associated with this hand id
         InteractionHand interactionHand;
@@ -766,6 +754,8 @@ namespace Leap.Unity.Interaction {
             try {
               //This also dispatched InteractionObject.OnHandRegainedTracking()
               interactionHand.RegainTracking(hand);
+
+              // NotifyHandRegainedTracking() did not throw, continue on to NotifyHandsHoldPhysics().
               dispatchOnHandsHolding(hands, interactionHand.graspedObject, isPhysics: true);
             } catch (Exception e) {
               _misbehavingBehaviours.Add(interactionHand.graspedObject);
@@ -774,8 +764,7 @@ namespace Leap.Unity.Interaction {
             }
 
             //Override the existing classification to force the hand to grab the old object
-            hasHandResult = true;
-            handResult = new INTERACTION_HAND_RESULT();
+            handResultForced = true;
             handResult.classification = ManipulatorMode.Grasp;
             handResult.handFlags = HandResultFlags.ManipulatorMode;
             handResult.instanceHandle = interactionHand.graspedObject.ShapeInstanceHandle;
@@ -790,9 +779,8 @@ namespace Leap.Unity.Interaction {
           }
         }
 
-        if (!hasHandResult) {
+        if (!handResultForced) {
           handResult = getHandResults(interactionHand);
-          hasHandResult = true;
         }
 
         interactionHand.UpdateHand(hand);
@@ -804,14 +792,14 @@ namespace Leap.Unity.Interaction {
                 IInteractionBehaviour interactionBehaviour;
                 if (_instanceHandleToBehaviour.TryGetValue(handResult.instanceHandle, out interactionBehaviour)) {
                   if (interactionHand.graspedObject == null) {
-                    didAnyHandBeginGrasp = true;
-
                     if (!interactionBehaviour.IsBeingGrasped) {
                       _graspedBehaviours.Add(interactionBehaviour);
                     }
 
                     try {
                       interactionHand.GraspObject(interactionBehaviour, isUserGrasp: false);
+
+                      dispatchOnHandsHolding(hands, interactionBehaviour, isPhysics: true);
                     } catch (Exception e) {
                       _misbehavingBehaviours.Add(interactionBehaviour);
                       Debug.LogException(e);

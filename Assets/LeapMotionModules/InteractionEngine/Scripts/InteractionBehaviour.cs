@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Leap.Unity.Interaction.CApi;
 using LeapInternal;
 
@@ -35,8 +36,11 @@ namespace Leap.Unity.Interaction {
   [SelectionBase]
   [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviour : InteractionBehaviourBase {
-    public const int NUM_FINGERS = 5;
-    public const int NUM_BONES = 4;
+    protected enum ContactMode {
+      NORMAL = 0,  // Influenced by brushes and not by soft contact.
+      SOFT = 1,    // Influenced by soft contact and not by brushes.  Will not return to NORMAL until no brush or soft contact remains.
+      GRASPED = 2, // Not infuenced by either brushes or soft contact.  Returns to SOFT not NORMAL.
+    };
 
     [SerializeField]
     protected InteractionMaterial _material;
@@ -44,16 +48,21 @@ namespace Leap.Unity.Interaction {
     protected Transform[] _childrenArray;
     protected Rigidbody _rigidbody;
 
-    //Rigidbody settings
+    // Rigidbody shadow state
     protected bool _isKinematic;
     protected bool _useGravity;
     protected float _drag;
     protected float _angularDrag;
 
+    private const int DISLOCATED_BRUSH_COOLDOWN = 3;
+    protected uint _dislocatedBrushCounter = DISLOCATED_BRUSH_COOLDOWN;
+    protected ContactMode _contactMode = ContactMode.NORMAL;
+
     protected bool _recievedVelocityUpdate = false;
-    protected bool _recievedSimulationResults = false;
+    protected float _minHandDistance = float.MaxValue;
     protected bool _notifiedOfTeleport = false;
-    protected bool _ignoringBrushes = false;
+    protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
+    protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
 
     protected Vector3 _solvedPosition;
     protected Quaternion _solvedRotation;
@@ -62,13 +71,16 @@ namespace Leap.Unity.Interaction {
     protected PhysicMaterialReplacer _materialReplacer;
     protected RigidbodyWarper _warper;
 
-    protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
-    protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
-
     private Bounds _debugBounds;
-    private bool _showDebugRecievedVelocity = false;
 
     #region PUBLIC METHODS
+
+    public override bool IsBeingGrasped {
+      get {
+        Assert.IsTrue((_contactMode == ContactMode.GRASPED) == base.IsBeingGrasped);
+        return _contactMode == ContactMode.GRASPED;
+      }
+    }
 
     /// <summary>
     /// Sets or Gets whether or not this InteractionBehaviour is Kinematic or not.  Always use this instead
@@ -81,7 +93,7 @@ namespace Leap.Unity.Interaction {
       set {
         _isKinematic = value;
         if (HasShapeInstance) {
-          if (!IsBeingGrasped) {
+          if (_contactMode != ContactMode.GRASPED) {
             _rigidbody.isKinematic = value;
           }
         } else {
@@ -183,29 +195,27 @@ namespace Leap.Unity.Interaction {
       revertRigidbodyState();
     }
 
-#if UNITY_EDITOR
     protected override void OnPreSolve() {
       base.OnPreSolve();
 
-      if (IsBeingGrasped && UntrackedHandCount == 0 &&
+      _recievedVelocityUpdate = false;
+      _notifiedOfTeleport = false;
+      ++_dislocatedBrushCounter;
+      _minHandDistance = float.MaxValue;
+
+#if UNITY_EDITOR
+      if (_contactMode == ContactMode.GRASPED && UntrackedHandCount == 0 &&
           Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale) {
         _manager.ReleaseObject(this);
       }
-
-      _showDebugRecievedVelocity = false;
-    }
 #endif
+    }
 
     protected override void OnPostSolve() {
       base.OnPostSolve();
 
-      if (!IsBeingGrasped) {
-        if (_recievedSimulationResults) {
-          _materialReplacer.ReplaceMaterials();
-        } else {
-          _materialReplacer.RevertMaterials();
-        }
-
+      // Material already replaced in OnGraspBegin
+      if (_contactMode != ContactMode.GRASPED) {
         if (_recievedVelocityUpdate) {
           //If we recieved a velocity update, gravity must always be disabled because the
           //velocity update accounts for gravity.
@@ -228,23 +238,24 @@ namespace Leap.Unity.Interaction {
             _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
           }
         }
+
+        if (_recievedVelocityUpdate || _minHandDistance <= 0.0f) {
+          // Shapes in the contact graph of a hand do not bounce.
+          _materialReplacer.ReplaceMaterials();
+        } else {
+          // Shapes in the contact graph of a hand do not bounce.
+          _materialReplacer.RevertMaterials();
+        }
       }
 
       //Reset so we can accumulate for the next frame
       _accumulatedLinearAcceleration = Vector3.zero;
       _accumulatedAngularAcceleration = Vector3.zero;
-      _recievedVelocityUpdate = false;
-      _recievedSimulationResults = false;
     }
 
     public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
       createInfo = new INTERACTION_CREATE_SHAPE_INFO();
       createInfo.shapeFlags = ShapeInfoFlags.None;
-
-      if (!_isKinematic) {
-        //Kinematic objects do not need velocity simulation
-        createInfo.shapeFlags |= ShapeInfoFlags.HasRigidBody;
-      }
 
       createTransform = getRigidbodyTransform();
     }
@@ -286,19 +297,25 @@ namespace Leap.Unity.Interaction {
       updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
       updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
 
-      // Request notification of when hands are no longer touching (or influencing.)
-      if (_ignoringBrushes) {
-        updateInfo.updateFlags |= UpdateInfoFlags.ReportNoResult;
-      }
+      if(_isKinematic) {
+          updateInfo.updateFlags |= UpdateInfoFlags.Kinematic;
+      } else {
+        // Generates notifications even when hands are no longer influencing
+        if (_contactMode == ContactMode.SOFT) {
+          Assert.IsTrue(_material.ContactEnabled);
+          updateInfo.updateFlags |= UpdateInfoFlags.SoftContact;
+        }
 
-      if (_material.ContactEnabled && !_isKinematic && !IsBeingGrasped) {
-        updateInfo.updateFlags |= UpdateInfoFlags.AccelerationEnabled;
-        updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
-        updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
-      }
+        // All forms of acceleration.
+        if (_contactMode != ContactMode.GRASPED) {
+          updateInfo.updateFlags |= UpdateInfoFlags.AccelerationEnabled;
+          updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
+          updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
 
-      if (_useGravity) {
-        updateInfo.updateFlags |= UpdateInfoFlags.GravityEnabled;
+          if (_useGravity) {
+            updateInfo.updateFlags |= UpdateInfoFlags.GravityEnabled;
+          }
+        }
       }
 
       interactionTransform = getRigidbodyTransform();
@@ -307,31 +324,17 @@ namespace Leap.Unity.Interaction {
     protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
       base.OnRecievedSimulationResults(results);
 
-      _recievedSimulationResults = true;
-
-      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0 &&
-          !IsBeingGrasped &&
-          _material.ContactEnabled) {
-        //Use Sleep() to clear any forces that might have been applied by the user.
-        _rigidbody.Sleep();
+      // Velocities can propagate even when not able to contact the hand.
+      if (_contactMode != ContactMode.GRASPED && (results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
+        Assert.IsFalse(_isKinematic);
         _rigidbody.velocity = results.linearVelocity.ToVector3();
         _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
         _recievedVelocityUpdate = true;
       }
 
-#if UNITY_EDITOR
-      _showDebugRecievedVelocity = _recievedVelocityUpdate;
-#endif
+      _minHandDistance = (results.resultFlags & ShapeInstanceResultFlags.MaxHand) == 0 ? float.MaxValue : results.minHandDistance;
 
-      if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
-        if (!_ignoringBrushes && results.maxHandDepth > _material.BrushDisableDistance * _manager.SimulationScale) {
-          _ignoringBrushes = true;
-        }
-      } else if (_ignoringBrushes) {
-        _ignoringBrushes = false;
-      }
-
-      updateLayer();
+      updateContactMode();
     }
 
     protected override void OnHandGrasped(Hand hand) {
@@ -354,8 +357,6 @@ namespace Leap.Unity.Interaction {
       if (_controllers.ThrowingController != null) {
         _controllers.ThrowingController.OnHold(hands);
       }
-
-      _notifiedOfTeleport = false;
     }
 
     protected override void OnHandsHoldGraphics(ReadonlyList<Hand> hands) {
@@ -426,8 +427,7 @@ namespace Leap.Unity.Interaction {
       _controllers.MoveToController.SetGraspedState();
 
       _materialReplacer.ReplaceMaterials();
-
-      _ignoringBrushes = true;
+      updateContactMode();
     }
 
     protected override void OnGraspEnd(Hand lastHand) {
@@ -440,12 +440,22 @@ namespace Leap.Unity.Interaction {
       }
 
       revertRigidbodyState();
-
       _materialReplacer.RevertMaterials();
+      updateContactMode();
     }
     #endregion
 
+    #region BRUSH CALLBACKS
+
+    public override void NotifyBrushDislocated() {
+      _dislocatedBrushCounter = 0;
+      updateContactMode();
+    }
+
+    #endregion
+
     #region UNITY CALLBACKS
+
 #if UNITY_EDITOR
     private void OnCollisionEnter(Collision collision) {
       GameObject otherObj = collision.collider.gameObject;
@@ -466,18 +476,19 @@ namespace Leap.Unity.Interaction {
 
         if (_rigidbody.IsSleeping()) {
           Gizmos.color = Color.gray;
-        } else if (IsBeingGrasped) {
+        } else if (_contactMode == ContactMode.GRASPED) {
+          if (!_recievedVelocityUpdate) { Gizmos.color = Color.red; } // error
           Gizmos.color = Color.green;
-        } else if (_showDebugRecievedVelocity) {
+        } else if (_contactMode == ContactMode.SOFT) {
+          Gizmos.color = new Color(255/255.0f,140/255.0f,0.0f); // dark orange
+          if (!_recievedVelocityUpdate) { Gizmos.color = Color.red; } // error
+        } else if (_recievedVelocityUpdate) {
           Gizmos.color = Color.yellow;
-        } else if (_ignoringBrushes) {
-          Gizmos.color = Color.red;
         } else {
           Gizmos.color = Color.blue;
         }
 
         Gizmos.DrawWireCube(_debugBounds.center, _debugBounds.size);
-
         Gizmos.matrix = gizmosMatrix;
       }
     }
@@ -485,16 +496,33 @@ namespace Leap.Unity.Interaction {
 
     #region INTERNAL
 
+    protected void updateContactMode() {
+      ContactMode desiredContactMode = ContactMode.NORMAL;
+      if(base.IsBeingGrasped) {
+        desiredContactMode = ContactMode.GRASPED;
+      }
+      else if(_dislocatedBrushCounter < DISLOCATED_BRUSH_COOLDOWN || (_contactMode != ContactMode.NORMAL && _minHandDistance <= 0.0f )) {
+        desiredContactMode = ContactMode.SOFT;
+      }
+
+      if(_contactMode != desiredContactMode) {
+        _contactMode = desiredContactMode;
+        updateLayer();
+      }
+
+      Assert.IsTrue((_contactMode == ContactMode.GRASPED) == base.IsBeingGrasped);
+    }
+
     protected void updateLayer() {
       int layer;
       if (_controllers.LayerController != null) {
-        if (_ignoringBrushes) {
+        if (_contactMode != ContactMode.NORMAL) {
           layer = _controllers.LayerController.InteractionNoClipLayer;
         } else {
           layer = _controllers.LayerController.InteractionLayer;
         }
       } else {
-        if (_ignoringBrushes) {
+        if (_contactMode != ContactMode.NORMAL) {
           layer = _manager.InteractionNoClipLayer;
         } else {
           layer = _manager.InteractionLayer;

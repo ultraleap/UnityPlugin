@@ -159,5 +159,10 @@ namespace Leap.Unity.Interaction {
     /// too long.  The hand is no longer considered to be grasping the object.
     /// </summary>
     public abstract void NotifyHandTimeout(Hand oldHand);
+
+    /// <summary>
+    /// Called when a dislocated brush begins overlapping the InteractionBehaviour.
+    /// </summary>
+    public abstract void NotifyBrushDislocated();
   }
 }
