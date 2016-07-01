@@ -189,7 +189,7 @@ namespace Leap.Unity.Interaction {
 #if UNITY_5_4
         case 2:
           //Use capsule collider for efficiency.  Only need one overlap and no duplicates!
-          getCapsuleResults(hands[0], hands[1], _rigidbodyList);
+          getCapsuleResults(hands[0], hands[1], _markedBehaviours);
           break;
 #endif
         default:
@@ -269,7 +269,7 @@ namespace Leap.Unity.Interaction {
       while (true) {
         count = Physics.OverlapCapsuleNonAlloc(handA.PalmPosition.ToVector3(),
                                                handB.PalmPosition.ToVector3(),
-                                               _primaryRadius,
+                                               _overlapRadius,
                                                _colliderResults,
                                                _layerMask,
                                                QueryTriggerInteraction.Ignore);
