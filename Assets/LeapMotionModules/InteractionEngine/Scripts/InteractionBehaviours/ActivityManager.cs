@@ -5,8 +5,6 @@ using System.Collections.Generic;
 namespace Leap.Unity.Interaction {
 
   public class ActivityManager {
-    private const int _lifeStep = 5;
-
     private float _overlapRadius = 0;
     private int _maxDepth = 0;
     private int _layerMask = 0;
@@ -39,18 +37,6 @@ namespace Leap.Unity.Interaction {
       }
       set {
         _maxDepth = value;
-      }
-    }
-
-    public int MaxLife {
-      get {
-        return _maxDepth * _lifeStep;
-      }
-    }
-
-    public int LifeStep {
-      get {
-        return _lifeStep;
       }
     }
 
@@ -137,7 +123,7 @@ namespace Leap.Unity.Interaction {
           _registeredBehaviours[interactionBehaviour] = null;
           _activeBehaviours.Remove(interactionBehaviour);
 
-          UnityEngine.Object.DestroyImmediate(monitor);
+          UnityEngine.Object.Destroy(monitor);
 
           if (OnDeactivate != null) {
             OnDeactivate(interactionBehaviour);

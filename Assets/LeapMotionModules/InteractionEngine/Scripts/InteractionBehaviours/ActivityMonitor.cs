@@ -3,6 +3,8 @@
 namespace Leap.Unity.Interaction {
 
   public class ActivityMonitor : MonoBehaviour {
+    public const int DISABLE_HYSTERESIS = 5;
+
     public enum GizmoType {
       InteractionStatus,
       ActivityDepth
@@ -22,8 +24,8 @@ namespace Leap.Unity.Interaction {
     }
 
     public void Revive() {
-      _maxNeighborLife = _manager.MaxLife;
-      _life = _manager.MaxLife;
+      _maxNeighborLife = _manager.MaxDepth;
+      _life = _manager.MaxDepth;
     }
 
     void FixedUpdate() {
@@ -31,7 +33,7 @@ namespace Leap.Unity.Interaction {
         _life--;
       }
 
-      if (_life <= 0) {
+      if (_life < -DISABLE_HYSTERESIS) {
         if (_interactionBehaviour.IsBeingGrasped || _interactionBehaviour.UntrackedHandCount > 0) {
           _life = 1;
         } else {
@@ -39,7 +41,7 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      _maxNeighborLife = 0;
+      _maxNeighborLife = int.MinValue;
     }
 
     void OnCollisionEnter(Collision collision) {
@@ -66,9 +68,9 @@ namespace Leap.Unity.Interaction {
 
       ActivityMonitor neighbor = otherBehaviour.GetComponent<ActivityMonitor>();
       if (neighbor == null) {
-        if (_life > _manager.LifeStep) {
+        if (_life > 1) {
           neighbor = _manager.Activate(otherBehaviour);
-          neighbor._life = _life - _manager.LifeStep;
+          neighbor._life = _life - 1;
         }
       } else {
         _maxNeighborLife = Mathf.Max(_maxNeighborLife, neighbor._life);
@@ -88,7 +90,7 @@ namespace Leap.Unity.Interaction {
           }
           break;
         case GizmoType.ActivityDepth:
-          Gizmos.color = Color.HSVToRGB(_life / (_manager.MaxLife * 2.0f), 1, 1);
+          Gizmos.color = Color.HSVToRGB(Mathf.Max(0, _life) / (_manager.MaxDepth * 2.0f), 1, 1);
           break;
       }
 
