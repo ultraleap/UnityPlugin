@@ -41,10 +41,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _leapProvider: {fileID: 0}
-  _dataSubfolder: InteractionEngine
+  _ldatPath: InteractionEngine/IE.ldat
   _contactEnabled: 1
   _graspingEnabled: 1
   _depthUntilSphericalInside: 0.023
+  _activationRadius: 0.15
+  _maxActivationDepth: 3
   _autoGenerateLayers: 1
   _templateLayer:
     layer: 0
@@ -57,6 +59,7 @@ MonoBehaviour:
   _pauseSimulation: 0
   _showDebugLines: 0
   _showDebugOutput: 0
+  _debugTextView: {fileID: 0}
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
