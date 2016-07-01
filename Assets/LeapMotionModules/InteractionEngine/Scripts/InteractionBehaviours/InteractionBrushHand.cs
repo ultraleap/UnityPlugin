@@ -83,6 +83,7 @@ namespace Leap.Unity.Interaction {
           brushGameObject.layer = gameObject.layer;
 
           InteractionBrushBone brushBone = brushGameObject.GetComponent<InteractionBrushBone>();
+          brushBone.manager = _manager;
           _brushBones[boneArrayIndex] = brushBone;
 
           Transform capsuleTransform = brushGameObject.transform;
@@ -130,19 +131,18 @@ namespace Leap.Unity.Interaction {
           // most friction is lost as the bones roll on contact.
           body.MoveRotation(bone.Rotation.ToQuaternion());
 
-          if(brushBone.updateTriggering() == false) {
+          if (brushBone.updateTriggering() == false) {
             // Calculate how far off the mark the brushes are.
             float targetingError = (brushBone.lastTarget - body.position).magnitude / bone.Width;
-            float massScale = Mathf.Clamp(1.0f - (targetingError*2.0f), 0.1f, 1.0f);
+            float massScale = Mathf.Clamp(1.0f - (targetingError * 2.0f), 0.1f, 1.0f);
             body.mass = _perBoneMass * massScale;
 
-            if(targetingError >= DISLOCATION_FRACTION) {
-              if(brushBone.dislocationCounter++ >= DISLOCATION_COUNTER) {
+            if (targetingError >= DISLOCATION_FRACTION) {
+              if (brushBone.dislocationCounter++ >= DISLOCATION_COUNTER) {
                 brushBone.startTriggering();
                 brushBone.dislocationCounter = 0;
               }
-            }
-            else {
+            } else {
               brushBone.dislocationCounter = 0;
             }
           }
@@ -153,8 +153,7 @@ namespace Leap.Unity.Interaction {
           if (deltaLen <= deadzone) {
             body.velocity = Vector3.zero;
             brushBone.lastTarget = body.position;
-          }
-          else {
+          } else {
             delta *= (deltaLen - deadzone) / deltaLen;
             body.velocity = delta / Time.fixedDeltaTime;
             brushBone.lastTarget = body.position + delta;
@@ -164,7 +163,7 @@ namespace Leap.Unity.Interaction {
     }
 
     public override void FinishHand() {
-      for (int i = _brushBones.Length; i-- != 0; ) {
+      for (int i = _brushBones.Length; i-- != 0;) {
         GameObject.Destroy(_brushBones[i].gameObject);
       }
       GameObject.Destroy(_handParent);

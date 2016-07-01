@@ -286,12 +286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
-  _material: {fileID: 11400000, guid: a1a145592530d754f93841b3e0a6b0a1, type: 2}
-  _suspendableRenderers:
-  - {fileID: 2338880}
-  - {fileID: 2376786}
-  - {fileID: 2368078}
-  - {fileID: 2380504}
+  _material: {fileID: 11400000, guid: 2b36778cd97232c459902ea9b77fd3ec, type: 2}
 --- !u!135 &13536856
 SphereCollider:
   m_ObjectHideFlags: 1

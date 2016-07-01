@@ -6,6 +6,7 @@ namespace Leap.Unity.Interaction {
   public class InteractionBrushBone : MonoBehaviour {
 
     // Used by InteractionBrushHand:
+    public InteractionManager manager;
     public Rigidbody capsuleBody;
     public CapsuleCollider capsuleCollider;
     public Vector3 lastTarget;
@@ -34,7 +35,8 @@ namespace Leap.Unity.Interaction {
 
     private void tryNotify(Collider other) {
       IInteractionBehaviour ib = other.GetComponentInParent<IInteractionBehaviour>();
-      if(ib) {
+      if (ib) {
+        manager.EnsureActive(ib);
         _dislocatedCounter = 0;
         ib.NotifyBrushDislocated();
       }

@@ -71,8 +71,6 @@ namespace Leap.Unity.Interaction {
     protected PhysicMaterialReplacer _materialReplacer;
     protected RigidbodyWarper _warper;
 
-    private Bounds _debugBounds;
-
     #region PUBLIC METHODS
 
     public override bool IsBeingGrasped {
@@ -273,17 +271,6 @@ namespace Leap.Unity.Interaction {
       _solvedRotation = _rigidbody.rotation;
 
       updateLayer();
-
-#if UNITY_EDITOR
-      Collider[] colliders = GetComponentsInChildren<Collider>();
-      if (colliders.Length > 0) {
-        _debugBounds = colliders[0].bounds;
-        for (int i = 1; i < colliders.Length; i++) {
-          _debugBounds.Encapsulate(colliders[i].bounds);
-        }
-        _debugBounds.center = transform.InverseTransformPoint(_debugBounds.center);
-      }
-#endif
     }
 
     protected override void OnInteractionShapeDestroyed() {
@@ -467,31 +454,6 @@ namespace Leap.Unity.Interaction {
       }
     }
 #endif
-
-    protected virtual void OnDrawGizmos() {
-      if (IsRegisteredWithManager) {
-        Matrix4x4 gizmosMatrix = Gizmos.matrix;
-
-        Gizmos.matrix = Matrix4x4.TRS(_warper.RigidbodyPosition, _warper.RigidbodyRotation, Vector3.one);
-
-        if (_rigidbody.IsSleeping()) {
-          Gizmos.color = Color.gray;
-        } else if (_contactMode == ContactMode.GRASPED) {
-          if (!_recievedVelocityUpdate) { Gizmos.color = Color.red; } // error
-          Gizmos.color = Color.green;
-        } else if (_contactMode == ContactMode.SOFT) {
-          Gizmos.color = new Color(255/255.0f,140/255.0f,0.0f); // dark orange
-          if (!_recievedVelocityUpdate) { Gizmos.color = Color.red; } // error
-        } else if (_recievedVelocityUpdate) {
-          Gizmos.color = Color.yellow;
-        } else {
-          Gizmos.color = Color.blue;
-        }
-
-        Gizmos.DrawWireCube(_debugBounds.center, _debugBounds.size);
-        Gizmos.matrix = gizmosMatrix;
-      }
-    }
     #endregion
 
     #region INTERNAL
