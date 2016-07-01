@@ -5,8 +5,6 @@ using System.Collections.Generic;
 namespace Leap.Unity.Interaction {
 
   public class ActiveObjectManager {
-    private int _updateIndex = 0;
-
     private float _overlapRadius = 0;
     private int _maxDepth = 60;
     private int _layerMask = 0;
@@ -158,8 +156,6 @@ namespace Leap.Unity.Interaction {
     }
 
     public void Update(Frame frame) {
-      _updateIndex++;
-
       List<Hand> hands = frame.Hands;
 
       markOverlappingObjects(hands);
