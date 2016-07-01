@@ -9,8 +9,8 @@ namespace Leap.Unity.Interaction {
     private int _updateIndex = 0;
 
     private float _overlapRadius = 0;
-    private int _layerMask;
     private int _maxDepth = 60;
+    private int _layerMask = 0;
 
     private List<IInteractionBehaviour> _markedBehaviours = new List<IInteractionBehaviour>();
     private Collider[] _colliderResults = new Collider[32];
@@ -37,21 +37,21 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public int LayerMask {
-      get {
-        return _layerMask;
-      }
-      set {
-        _layerMask = value;
-      }
-    }
-
     public int MaxDepth {
       get {
         return _maxDepth;
       }
       set {
         _maxDepth = value;
+      }
+    }
+
+    public int LayerMask {
+      get {
+        return _layerMask;
+      }
+      set {
+        _layerMask = value;
       }
     }
 
@@ -68,11 +68,17 @@ namespace Leap.Unity.Interaction {
     }
 
     public void Register(IInteractionBehaviour behaviour) {
+      //Do nothing if already registered
+      if (_registeredBehaviours.ContainsKey(behaviour)) {
+        return;
+      }
+
       behaviour.NotifyRegistered();
       _registeredBehaviours.Add(behaviour, null);
     }
 
     public void Unregister(IInteractionBehaviour behaviour) {
+      //Do nothing if not registered
       if (!_registeredBehaviours.ContainsKey(behaviour)) {
         return;
       }
