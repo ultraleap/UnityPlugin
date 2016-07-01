@@ -34,24 +34,27 @@ namespace Leap.Unity.Interaction {
     }
 
     void OnCollisionEnter(Collision collision) {
-      IInteractionBehaviour otherBehaviour;
-      if (!tryGetOtherBehaviour(collision, out otherBehaviour)) {
-        return;
-      }
-
-      handleColliding(otherBehaviour);
+      handleCollision(collision);
     }
 
     void OnCollisionStay(Collision collision) {
-      IInteractionBehaviour otherBehaviour;
-      if (!tryGetOtherBehaviour(collision, out otherBehaviour)) {
+      handleCollision(collision);
+    }
+
+    private void handleCollision(Collision collision) {
+      if (collision.rigidbody == null) {
         return;
       }
 
-      handleColliding(otherBehaviour);
-    }
+      IInteractionBehaviour otherBehaviour = collision.rigidbody.GetComponent<IInteractionBehaviour>();
+      if (otherBehaviour == null) {
+        return;
+      }
 
-    private void handleColliding(IInteractionBehaviour otherBehaviour) {
+      if (!_manager.IsRegistered(otherBehaviour)) {
+        return;
+      }
+
       ActivityMonitor neighbor = otherBehaviour.GetComponent<ActivityMonitor>();
       if (neighbor == null) {
         if (_life > 1) {
@@ -61,26 +64,6 @@ namespace Leap.Unity.Interaction {
       } else {
         _life = Mathf.Max(_life, neighbor._life - 1);
       }
-    }
-
-    private bool tryGetOtherBehaviour(Collision collision, out IInteractionBehaviour behaviour) {
-      Rigidbody otherBody = collision.rigidbody;
-      if (otherBody == null) {
-        behaviour = null;
-        return false;
-      }
-
-      behaviour = otherBody.GetComponent<IInteractionBehaviour>();
-      if (behaviour == null) {
-        return false;
-      }
-
-      if (!_manager.IsRegistered(behaviour)) {
-        behaviour = null;
-        return false;
-      }
-
-      return true;
     }
 
 #if UNITY_EDITOR
