@@ -99,6 +99,8 @@ namespace Leap.Unity.Interaction {
           activeComponent.interactionBehaviour = interactionBehaviour;
           activeComponent.life = _maxDepth;
 
+          //We need to do this in order to force Unity to reconsider collision callbacks for this object
+          //Otherwise scripts added in the middle of a collision never recieve the Stay callbacks.
           Collider singleCollider = activeComponent.GetComponentInChildren<Collider>();
           if (singleCollider != null) {
             Physics.IgnoreCollision(singleCollider, singleCollider, true);
