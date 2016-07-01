@@ -113,11 +113,7 @@ namespace Leap.Unity.Interaction {
           _registeredBehaviours[interactionBehaviour] = activeComponent;
           _activeBehaviours.Add(interactionBehaviour);
 
-          if (_changed.Contains(interactionBehaviour)) {
-            _changed.Remove(interactionBehaviour);
-          } else {
-            _changed.Add(interactionBehaviour);
-          }
+          toggleIsChanged(interactionBehaviour);
         }
       }
       return activeComponent;
@@ -130,13 +126,9 @@ namespace Leap.Unity.Interaction {
           _registeredBehaviours[interactionBehaviour] = null;
           _activeBehaviours.Remove(interactionBehaviour);
 
-          if (_changed.Contains(interactionBehaviour)) {
-            _changed.Remove(interactionBehaviour);
-          } else {
-            _changed.Add(interactionBehaviour);
-          }
-
           UnityEngine.Object.DestroyImmediate(activeCompoonent);
+
+          toggleIsChanged(interactionBehaviour);
         }
       }
     }
@@ -161,10 +153,14 @@ namespace Leap.Unity.Interaction {
       activateAndKeepMarkedObjectsAlive();
     }
 
+    /// <summary>
+    /// Returns two lists, a list of objects that have been enabled since GetChanges was last called, and a list of objects
+    /// that have been disabled since GetChanges was last called.
+    /// </summary>
     public void GetChanges(out ReadonlyList<IInteractionBehaviour> activated, out ReadonlyList<IInteractionBehaviour> deactivated) {
       _activatedBehaviours.Clear();
       _deactivatedBehaviours.Clear();
-
+      
       foreach (var changed in _changed) {
         if (IsActive(changed)) {
           _activatedBehaviours.Add(changed);
@@ -191,6 +187,12 @@ namespace Leap.Unity.Interaction {
       }
       _misbehavingBehaviours.Clear();
     }
+    
+    private void toggleIsChanged(IInteractionBehaviour interactionBehaviour) {
+      if (!_changed.Remove(interactionBehaviour)) {
+        _changed.Add(interactionBehaviour);
+      }
+    }
 
     private void markOverlappingObjects(List<Hand> hands) {
       _markedBehaviours.Clear();
@@ -203,6 +205,7 @@ namespace Leap.Unity.Interaction {
           break;
 #if UNITY_5_4
         case 2:
+          //Use capsule collider for efficiency.  Only need one overlap and no duplicates!
           getCapsuleResults(hands[0], hands[1], _rigidbodyList);
           break;
 #endif
@@ -268,6 +271,9 @@ namespace Leap.Unity.Interaction {
         if (count < _colliderResults.Length) {
           break;
         }
+
+        //If the count was equal to the array length, we don't know if there are colliders that we missed.
+        //Double the length of the array and try again!
         _colliderResults = new Collider[_colliderResults.Length * 2];
       }
 
