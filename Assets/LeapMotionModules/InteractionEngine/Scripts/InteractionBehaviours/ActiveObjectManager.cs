@@ -6,7 +6,7 @@ namespace Leap.Unity.Interaction {
 
   public class ActiveObjectManager {
     private float _overlapRadius = 0;
-    private int _maxDepth = 60;
+    private int _maxDepth = 0;
     private int _layerMask = 0;
 
     private List<IInteractionBehaviour> _markedBehaviours = new List<IInteractionBehaviour>();
