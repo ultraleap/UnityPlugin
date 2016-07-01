@@ -19,11 +19,8 @@ namespace Leap.Unity.Interaction {
 
     private List<IInteractionBehaviour> _misbehavingBehaviours = new List<IInteractionBehaviour>();
 
-    //Whenever an object is activated or deactivated, its existence in the changed set is toggled.  When asked for changes,
-    //we use the changed set, as well as the currently active state to build two lists to hand to the client.
-    private HashSet<IInteractionBehaviour> _changed = new HashSet<IInteractionBehaviour>();
-    private List<IInteractionBehaviour> _activatedBehaviours = new List<IInteractionBehaviour>();
-    private List<IInteractionBehaviour> _deactivatedBehaviours = new List<IInteractionBehaviour>();
+    public event Action<IInteractionBehaviour> OnActivate;
+    public event Action<IInteractionBehaviour> OnDeactivate;
 
     public float OverlapRadius {
       get {
@@ -111,7 +108,9 @@ namespace Leap.Unity.Interaction {
           _registeredBehaviours[interactionBehaviour] = monitor;
           _activeBehaviours.Add(interactionBehaviour);
 
-          toggleIsChanged(interactionBehaviour);
+          if (OnActivate != null) {
+            OnActivate(interactionBehaviour);
+          }
         }
       }
       return monitor;
@@ -126,7 +125,9 @@ namespace Leap.Unity.Interaction {
 
           UnityEngine.Object.DestroyImmediate(monitor);
 
-          toggleIsChanged(interactionBehaviour);
+          if (OnDeactivate != null) {
+            OnDeactivate(interactionBehaviour);
+          }
         }
       }
     }
@@ -151,27 +152,6 @@ namespace Leap.Unity.Interaction {
       activateAndKeepMarkedObjectsAlive();
     }
 
-    /// <summary>
-    /// Returns two lists, a list of objects that have been enabled since GetChanges was last called, and a list of objects
-    /// that have been disabled since GetChanges was last called.
-    /// </summary>
-    public void GetChanges(out ReadonlyList<IInteractionBehaviour> activated, out ReadonlyList<IInteractionBehaviour> deactivated) {
-      _activatedBehaviours.Clear();
-      _deactivatedBehaviours.Clear();
-
-      foreach (var changed in _changed) {
-        if (IsActive(changed)) {
-          _activatedBehaviours.Add(changed);
-        } else {
-          _deactivatedBehaviours.Add(changed);
-        }
-      }
-
-      _changed.Clear();
-      activated = new ReadonlyList<IInteractionBehaviour>(_activatedBehaviours);
-      deactivated = new ReadonlyList<IInteractionBehaviour>(_deactivatedBehaviours);
-    }
-
     public void UnregisterMisbehavingObjects() {
       for (int i = 0; i < _misbehavingBehaviours.Count; i++) {
         var behaviour = _misbehavingBehaviours[i];
@@ -184,12 +164,6 @@ namespace Leap.Unity.Interaction {
         }
       }
       _misbehavingBehaviours.Clear();
-    }
-
-    private void toggleIsChanged(IInteractionBehaviour interactionBehaviour) {
-      if (!_changed.Remove(interactionBehaviour)) {
-        _changed.Add(interactionBehaviour);
-      }
     }
 
     private void markOverlappingObjects(List<Hand> hands) {

@@ -465,6 +465,8 @@ namespace Leap.Unity.Interaction {
 
       _activityManager.LayerMask = (1 << InteractionLayer) | (1 << InteractionNoClipLayer);
       _activityManager.OverlapRadius = _activationRadius;
+      _activityManager.OnActivate += createInteractionShape;
+      _activityManager.OnDeactivate += destroyInteractionShape;
     }
 
     protected virtual void OnDisable() {
@@ -486,11 +488,8 @@ namespace Leap.Unity.Interaction {
       _graspedBehaviours.Clear();
 
       _activityManager.DeactivateAll();
-
-      ReadonlyList<IInteractionBehaviour> justActivated, justDeactivated;
-      _activityManager.GetChanges(out justActivated, out justDeactivated);
-
-      destroyShapes(justDeactivated);
+      _activityManager.OnActivate -= createInteractionShape;
+      _activityManager.OnDeactivate -= destroyInteractionShape;
 
       Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "All instances should have been destroyed.");
 
@@ -614,12 +613,6 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void simulateFrame(Frame frame) {
       _activityManager.Update(frame);
-
-      ReadonlyList<IInteractionBehaviour> justActivated, justDeactivated;
-      _activityManager.GetChanges(out justActivated, out justDeactivated);
-
-      createShapes(justActivated);
-      destroyShapes(justDeactivated);
 
       var active = _activityManager.ActiveBehaviours;
 
@@ -921,28 +914,6 @@ namespace Leap.Unity.Interaction {
             _activityManager.NotifyMisbehaving(interactionBehaviour);
             Debug.LogException(e);
           }
-        }
-      }
-    }
-
-    protected virtual void createShapes(ReadonlyList<IInteractionBehaviour> behaviours) {
-      for (int i = 0; i < behaviours.Count; i++) {
-        try {
-          createInteractionShape(behaviours[i]);
-        } catch (Exception e) {
-          _activityManager.NotifyMisbehaving(behaviours[i]);
-          Debug.LogException(e);
-        }
-      }
-    }
-
-    protected virtual void destroyShapes(ReadonlyList<IInteractionBehaviour> behaviours) {
-      for (int i = 0; i < behaviours.Count; i++) {
-        try {
-          destroyInteractionShape(behaviours[i]);
-        } catch (Exception e) {
-          _activityManager.NotifyMisbehaving(behaviours[i]);
-          Debug.LogException(e);
         }
       }
     }
