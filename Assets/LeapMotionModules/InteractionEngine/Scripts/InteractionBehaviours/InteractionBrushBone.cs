@@ -2,7 +2,6 @@
 using Leap.Unity.Interaction;
 using UnityEditor;
 
-// This is a debug script for the editor.  Should not be instanced in game.
 namespace Leap.Unity.Interaction {
   public class InteractionBrushBone : MonoBehaviour {
 

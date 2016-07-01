@@ -164,7 +164,7 @@ namespace Leap.Unity.Interaction {
     }
 
     public override void FinishHand() {
-      for (int i = _brushBones.Length; i-- == 0; ) {
+      for (int i = _brushBones.Length; i-- != 0; ) {
         GameObject.Destroy(_brushBones[i].gameObject);
       }
       GameObject.Destroy(_handParent);
