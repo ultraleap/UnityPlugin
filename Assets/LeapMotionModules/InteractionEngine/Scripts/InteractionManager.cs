@@ -405,6 +405,12 @@ namespace Leap.Unity.Interaction {
 
       _activityManager.Unregister(interactionBehaviour);
     }
+
+    public void EnsureActive(IInteractionBehaviour interactionBehaviour) {
+      if (!_activityManager.IsActive(interactionBehaviour)) {
+        _activityManager.Activate(interactionBehaviour);
+      }
+    }
     #endregion
 
     #region UNITY CALLBACKS
@@ -526,7 +532,7 @@ namespace Leap.Unity.Interaction {
       if (_pauseSimulation) {
         return;
       }
-      
+
       Frame frame = _leapProvider.CurrentFrame;
 
       dispatchOnHandsHoldingAll(frame, isPhysics: false);
@@ -578,7 +584,7 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      if (_interactionLayer == -1 || _interactionNoClipLayer == -1 || _brushLayer == -1)  {
+      if (_interactionLayer == -1 || _interactionNoClipLayer == -1 || _brushLayer == -1) {
         if (Application.isPlaying) {
           enabled = false;
         }
