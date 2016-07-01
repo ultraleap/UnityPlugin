@@ -10,8 +10,12 @@ namespace Leap.Unity.Interaction {
     public int life;
 
     void FixedUpdate() {
-      if (life == 0) {
-        manager.Deactivate(interactionBehaviour);
+      if (life <= 0) {
+        if (interactionBehaviour.IsBeingGrasped || interactionBehaviour.UntrackedHandCount > 0) {
+          life = 1;
+        } else {
+          manager.Deactivate(interactionBehaviour);
+        }
       }
 
       //Very important to decrement after the check
