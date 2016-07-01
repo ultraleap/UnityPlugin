@@ -156,9 +156,7 @@ namespace Leap.Unity.Interaction {
     }
 
     public void Update(Frame frame) {
-      List<Hand> hands = frame.Hands;
-
-      markOverlappingObjects(hands);
+      markOverlappingObjects(frame.Hands);
 
       activateAndKeepMarkedObjectsAlive();
     }
