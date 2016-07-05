@@ -2498,6 +2498,7 @@ GameObject:
   m_Component:
   - 4: {fileID: 1805543667}
   - 114: {fileID: 1805543668}
+  - 114: {fileID: 1805543669}
   m_Layer: 0
   m_Name: LMHeadMountedRig
   m_TagString: Untagged
@@ -2534,6 +2535,17 @@ MonoBehaviour:
   _deviceOffsets:
   - DeviceName: oculus
     HeightOffset: 1
+--- !u!114 &1805543669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1805543666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da9f21ca685d0424aad2557da2a877c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1928180893
 GameObject:
   m_ObjectHideFlags: 0
