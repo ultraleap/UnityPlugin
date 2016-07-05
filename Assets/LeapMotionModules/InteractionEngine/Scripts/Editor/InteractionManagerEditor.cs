@@ -15,7 +15,6 @@ namespace Leap.Unity.Interaction {
       base.OnEnable();
 
       specifyCustomDrawer("_ldatPath", disableWhenRunning);
-      specifyCustomDrawer("_contactEnabled", disableWhenRunning);
       specifyCustomDrawer("_autoGenerateLayers", disableWhenRunning);
       specifyCustomDrawer("_templateLayer", disableWhenRunning);
 
