@@ -44,15 +44,19 @@ namespace Leap.Unity {
 
     protected SmoothedFloat _fixedOffset = new SmoothedFloat();
 
-    protected Frame _updateFrame;
-    protected Frame _fixedFrame;
+    protected Frame _untransformedUpdateFrame;
+    protected Frame _transformedUpdateFrame;
+
+    protected Frame _untransformedFixedFrame;
+    protected Frame _transformedFixedFrame;
+
     protected Image _currentImage;
 
     private ClockCorrelator clockCorrelator;
 
     public override Frame CurrentFrame {
       get {
-        return _updateFrame;
+        return _transformedUpdateFrame;
       }
     }
 
@@ -64,7 +68,7 @@ namespace Leap.Unity {
 
     public override Frame CurrentFixedFrame {
       get {
-        return _fixedFrame;
+        return _transformedFixedFrame;
       }
     }
 
@@ -139,6 +143,11 @@ namespace Leap.Unity {
       return new LeapDeviceInfo(LeapDeviceType.Invalid);
     }
 
+    public void ReTransformFrames() {
+      _transformedUpdateFrame = getTransformedFrame(_untransformedUpdateFrame);
+      _transformedFixedFrame = getTransformedFrame(_untransformedFixedFrame);
+    }
+
     protected virtual void Awake() {
       clockCorrelator = new ClockCorrelator();
       _fixedOffset.delay = 0.4f;
@@ -146,8 +155,8 @@ namespace Leap.Unity {
 
     protected virtual void Start() {
       createController();
-      _updateFrame = new Frame();
-      _fixedFrame = new Frame();
+      _transformedUpdateFrame = new Frame();
+      _transformedFixedFrame = new Frame();
       StartCoroutine(waitCoroutine());
     }
 
@@ -171,35 +180,38 @@ namespace Leap.Unity {
 
       _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
-      Frame serviceFrame;
       if (_useInterpolation) {
         Int64 unityTime = (Int64)(Time.time * 1e6);
         Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
         Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
-        serviceFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
+
+        _untransformedUpdateFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
       } else {
-        serviceFrame = leap_controller_.Frame();
+        _untransformedUpdateFrame = leap_controller_.Frame();
       }
 
-      if (serviceFrame != null) {
-        _updateFrame = getTransformedFrame(serviceFrame);
+      if (_untransformedUpdateFrame != null) {
+        _transformedUpdateFrame = getTransformedFrame(_untransformedUpdateFrame);
+
+        DispatchUpdateFrameEvent(_transformedUpdateFrame);
       }
     }
 
     protected virtual void FixedUpdate() {
-      Frame serviceFrame;
       if (_useInterpolation) {
         Int64 unityTime = (Int64)((Time.fixedTime + _fixedOffset.value) * 1e6);
         Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
         Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
 
-        serviceFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
+        _untransformedFixedFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
       } else {
-        serviceFrame = leap_controller_.Frame();
+        _untransformedFixedFrame = leap_controller_.Frame();
       }
 
-      if (serviceFrame != null) {
-        _fixedFrame = getTransformedFrame(serviceFrame);
+      if (_untransformedFixedFrame != null) {
+        _transformedFixedFrame = getTransformedFrame(_untransformedFixedFrame);
+
+        DispatchFixedFrameEvent(_transformedFixedFrame);
       }
     }
 
