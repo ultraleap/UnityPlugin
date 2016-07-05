@@ -1822,7 +1822,7 @@ MonoBehaviour:
     modelList: []
     modelsCheckedOut: []
     IsEnabled: 1
-    CanDuplicate: 0
+    CanDuplicate: 1
   - GroupName: Physics_Hands
     _handPool: {fileID: 0}
     LeftModel: {fileID: 170358230}
@@ -1832,7 +1832,7 @@ MonoBehaviour:
     modelList: []
     modelsCheckedOut: []
     IsEnabled: 1
-    CanDuplicate: 0
+    CanDuplicate: 1
 --- !u!114 &612653287
 MonoBehaviour:
   m_ObjectHideFlags: 0
