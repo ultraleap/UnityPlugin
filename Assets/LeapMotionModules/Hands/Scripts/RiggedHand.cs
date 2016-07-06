@@ -138,21 +138,25 @@ namespace Leap.Unity {
       }
       else perpendicular = Vector3.Cross(side1, side2);
       Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
-      //return calculatedPalmFacing;
-      if (Handedness == Chirality.Right) {
-        return new Vector3(0, -1, 0);
-      }
-      else return new Vector3(0, 1, 0);
+      return calculatedPalmFacing; //works for suit01, reversed for beta & LoPoly_Hands
+      //if (Handedness == Chirality.Right) {
+      //  return new Vector3(0, -1, 0);
+      //}
+      //else {
+      //  return new Vector3(0, 1, 0);
+      //}
     }
 
     private Vector3 calculateModelFingerPointing() {
       Vector3 distance = transform.InverseTransformPoint(fingers[2].transform.GetChild(0).transform.position) - transform.InverseTransformPoint(palm.position);
       Vector3 calculatedFingerPointing = CalculateZeroedVector(distance);
-      //return calculatedFingerPointing;
-      if (Handedness == Chirality.Right) {
-        return new Vector3(1, 0, 0);
-      }
-      else return new Vector3(-1, 0, 0);
+      return calculatedFingerPointing *-1f;
+
+      //Hard wired vectors below are Reversed between suit01 and LoPoly_Hands_Skeleton
+      //if (Handedness == Chirality.Right) {
+      //  return new Vector3(-1, 0, 0);
+      //}
+      //else return new Vector3(1, 0, 0);
     }
 
     public static Vector3 CalculateZeroedVector(Vector3 vectorToZero) {
@@ -169,46 +173,7 @@ namespace Leap.Unity {
       }
       return zeroed;
     }
-    [SerializeField]
-    private List<Quaternion> localRotations;
-    [SerializeField]
-    private List<Vector3> localPositions;
-    [SerializeField]
-    private List<UnityEngine.Matrix4x4> savedBindPoses;
 
-    [ContextMenu("StoreLocalPosAndRot")]
-    public void StoreLocalPosAndRot() {
-      Debug.Log("StoreLocalPosAndRot()");
-      SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
-      Mesh mesh = skinnedMesh.sharedMesh;
-      for (int i = 0; i < skinnedMesh.bones.Length; i++) {
-        Transform boneTrans = skinnedMesh.bones[i];
-        localRotations.Add(boneTrans.localRotation);
-        localPositions.Add(boneTrans.localPosition);
-      }
-    }
-    [ContextMenu("ResetLocalRotationsAndPositions")]
-    public void ResetLocalPosAndRot() {
-      Debug.Log("ResetLocalPosAndRot()");
-      if (localPositions.Count > 0 && localRotations.Count > 0) {
-        SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
-        Mesh mesh = skinnedMesh.sharedMesh;
-        for (int i = 0; i < skinnedMesh.bones.Length; i++) {
-          Transform boneTrans = skinnedMesh.bones[i];
-          boneTrans.localRotation = localRotations[i];
-          boneTrans.localPosition = localPositions[i];
-        }
-      }
-    }
-    [ContextMenu("SaveBindPose")]
-    public void SaveBindPose() {
-      Debug.Log("SaveBindPose()");
-      SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
-      Mesh mesh = skinnedMesh.sharedMesh;
-      for (int i = 0; i < skinnedMesh.bones.Length; i++) {
-        savedBindPoses.Add(mesh.bindposes[i]);
-      }
-    }
     [ContextMenu("ResetToBindPose")]
     public void ResetToBindPose() {
       Debug.Log("resetToBindPose()");
@@ -224,85 +189,6 @@ namespace Leap.Unity {
         //boneTrans.position = localMatrix.MultiplyPoint(Vector3.zero);
         boneTrans.rotation = Quaternion.LookRotation(localMatrix.GetColumn(2), localMatrix.GetColumn(1));
       }
-    }
-    /// <summary>
-    /// Extract translation from transform matrix.
-    /// </summary>
-    /// <param name="matrix">Transform matrix. This parameter is passed by reference
-    /// to improve performance; no changes will be made to it.</param>
-    /// <returns>
-    /// Translation offset.
-    /// </returns>
-    public static Vector3 ExtractTranslationFromMatrix(ref Matrix4x4 matrix) {
-      Vector3 translate;
-      translate.x = matrix.m03;
-      translate.y = matrix.m13;
-      translate.z = matrix.m23;
-      return translate;
-    }
-
-    /// <summary>
-    /// Extract rotation quaternion from transform matrix.
-    /// </summary>
-    /// <param name="matrix">Transform matrix. This parameter is passed by reference
-    /// to improve performance; no changes will be made to it.</param>
-    /// <returns>
-    /// Quaternion representation of rotation transform.
-    /// </returns>
-    public static Quaternion ExtractRotationFromMatrix(ref Matrix4x4 matrix) {
-      Vector3 forward;
-      forward.x = matrix.m02;
-      forward.y = matrix.m12;
-      forward.z = matrix.m22;
-
-      Vector3 upwards;
-      upwards.x = matrix.m01;
-      upwards.y = matrix.m11;
-      upwards.z = matrix.m21;
-
-      return Quaternion.LookRotation(forward, upwards);
-    }
-
-    /// <summary>
-    /// Extract scale from transform matrix.
-    /// </summary>
-    /// <param name="matrix">Transform matrix. This parameter is passed by reference
-    /// to improve performance; no changes will be made to it.</param>
-    /// <returns>
-    /// Scale vector.
-    /// </returns>
-    public static Vector3 ExtractScaleFromMatrix(ref Matrix4x4 matrix) {
-      Vector3 scale;
-      scale.x = new Vector4(matrix.m00, matrix.m10, matrix.m20, matrix.m30).magnitude;
-      scale.y = new Vector4(matrix.m01, matrix.m11, matrix.m21, matrix.m31).magnitude;
-      scale.z = new Vector4(matrix.m02, matrix.m12, matrix.m22, matrix.m32).magnitude;
-      return scale;
-    }
-
-    /// <summary>
-    /// Extract position, rotation and scale from TRS matrix.
-    /// </summary>
-    /// <param name="matrix">Transform matrix. This parameter is passed by reference
-    /// to improve performance; no changes will be made to it.</param>
-    /// <param name="localPosition">Output position.</param>
-    /// <param name="localRotation">Output rotation.</param>
-    /// <param name="localScale">Output scale.</param>
-    public static void DecomposeMatrix(ref Matrix4x4 matrix, out Vector3 localPosition, out Quaternion localRotation, out Vector3 localScale) {
-      localPosition = ExtractTranslationFromMatrix(ref matrix);
-      localRotation = ExtractRotationFromMatrix(ref matrix);
-      localScale = ExtractScaleFromMatrix(ref matrix);
-    }
-
-    /// <summary>
-    /// Set transform component from TRS matrix.
-    /// </summary>
-    /// <param name="transform">Transform component.</param>
-    /// <param name="matrix">Transform matrix. This parameter is passed by reference
-    /// to improve performance; no changes will be made to it.</param>
-    public static void SetTransformFromMatrix(Transform transform, ref Matrix4x4 matrix) {
-      transform.position = ExtractTranslationFromMatrix(ref matrix);
-      transform.rotation = ExtractRotationFromMatrix(ref matrix);
-      transform.localScale = ExtractScaleFromMatrix(ref matrix);
     }
   }
 }
