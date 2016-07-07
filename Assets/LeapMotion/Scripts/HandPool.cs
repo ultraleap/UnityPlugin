@@ -232,6 +232,12 @@ namespace Leap.Unity {
       newGroup.IsEnabled = true;
       ModelPool.Add(newGroup);
     }
+    public void RemoveGroup(string groupName) {
+      ModelGroup modelGroup = ModelPool.Find(i => i.GroupName == groupName);
+      if (modelGroup != null) {
+        ModelPool.Remove(modelGroup);
+      }
+    }
 
 #if UNITY_EDITOR
     /**In the Unity Editor, Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project. */
