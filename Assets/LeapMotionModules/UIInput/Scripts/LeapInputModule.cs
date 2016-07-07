@@ -275,6 +275,7 @@ namespace Leap.Unity.InputModule {
 
     //Process is called by UI system to process events
     public override void Process() {
+      
       //Send update events if there is a selected object
       //This is important for InputField to receive keyboard events
       SendUpdateEventToSelectedObject();
@@ -329,7 +330,7 @@ namespace Leap.Unity.InputModule {
           DebugSphereQueue.Enqueue(ProjectionOrigin);
           Debug.DrawRay(ProjectionOrigin, CurrentRotation * Vector3.forward * 5f);
         }
-
+        
         //Raycast from shoulder through tip of the index finger to the UI
         bool TipRaycast = false;
         if (InteractionMode != InteractionCapability.Projective) {
@@ -455,12 +456,14 @@ namespace Leap.Unity.InputModule {
                     if (Dragger != null) {
                       if (Dragger is EventTrigger) { //Hack: EventSystems intercepting Drag Events causing funkiness
                          PointEvents[whichPointer].pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(PointEvents[whichPointer].pointerDrag.transform.parent.gameObject);
-                         Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
-                         if ((Dragger != null)&&!(Dragger is EventTrigger)) {
-                           ExecuteEvents.Execute(PointEvents[whichPointer].pointerDrag, PointEvents[whichPointer], ExecuteEvents.beginDragHandler);
-                           PointEvents[whichPointer].dragging = true;
-                           currentGoing[whichPointer] = PointEvents[whichPointer].pointerDrag;
-                           DragBeginPosition[whichPointer] = PointEvents[whichPointer].position;
+                         if (PointEvents[whichPointer].pointerDrag != null) {
+                           Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
+                           if ((Dragger != null) && !(Dragger is EventTrigger)) {
+                             ExecuteEvents.Execute(PointEvents[whichPointer].pointerDrag, PointEvents[whichPointer], ExecuteEvents.beginDragHandler);
+                             PointEvents[whichPointer].dragging = true;
+                             currentGoing[whichPointer] = PointEvents[whichPointer].pointerDrag;
+                             DragBeginPosition[whichPointer] = PointEvents[whichPointer].position;
+                           }
                          }
                       } else {
                         ExecuteEvents.Execute(PointEvents[whichPointer].pointerDrag, PointEvents[whichPointer], ExecuteEvents.beginDragHandler);
@@ -539,6 +542,7 @@ namespace Leap.Unity.InputModule {
           }
         }
       }
+       
     }
 
     //Raycast from the EventCamera into UI Space
@@ -552,7 +556,7 @@ namespace Leap.Unity.InputModule {
       } else {
         PointEvents[whichPointer].Reset();
       }
-
+      
       //We're always going to assume we're "Left Clicking", for the benefit of uGUI
       PointEvents[whichPointer].button = PointerEventData.InputButton.Left;
 
@@ -585,7 +589,7 @@ namespace Leap.Unity.InputModule {
         EventCamera.transform.position = Origin;
         IndexFingerPosition = curFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
       }
-
+      
       //Draw Camera Origin
       if (DrawDebug)
         DebugSphereQueue.Enqueue(EventCamera.transform.position);
@@ -597,15 +601,9 @@ namespace Leap.Unity.InputModule {
       PointEvents[whichPointer].position = Vector2.Lerp(PrevScreenPosition[whichPointer], EventCamera.WorldToScreenPoint(IndexFingerPosition), 1.0f);//new Vector2(Screen.width / 2, Screen.height / 2);
       PointEvents[whichPointer].delta = (PointEvents[whichPointer].position - PrevScreenPosition[whichPointer]) * -10f;
       PointEvents[whichPointer].scrollDelta = Vector2.zero;
-
+      
       //Perform the Raycast and sort all the things we hit by distance...
       base.eventSystem.RaycastAll(PointEvents[whichPointer], m_RaycastResultCache);
-      m_RaycastResultCache = m_RaycastResultCache.OrderBy(o => o.distance).ToList();
-
-      //If the Canvas and an Element are Z-Fighting, remove the Canvas from the runnings
-      if ((m_RaycastResultCache.Count > 1) && (m_RaycastResultCache[0].gameObject.GetComponent<Canvas>()) && (Mathf.Abs(m_RaycastResultCache[0].distance - m_RaycastResultCache[1].distance))<0.1f) {
-         m_RaycastResultCache.RemoveAt(0);
-      }
 
       //Optional hack that subverts ScrollRect hierarchies; to avoid this, disable "RaycastTarget" on the Viewport and Content panes
       if (OverrideScrollViewClicks) {
