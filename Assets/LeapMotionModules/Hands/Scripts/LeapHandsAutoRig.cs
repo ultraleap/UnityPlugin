@@ -2,11 +2,15 @@
 using System.Collections;
 
 namespace Leap.Unity {
+  [ExecuteInEditMode]
   public class LeapHandsAutoRig : MonoBehaviour {
     public Animator AnimatorForMapping;
     public HandPool HandPoolToPopulate;
     public RiggedHand RiggedHand_L;
     public RiggedHand RiggedHand_R;
+    public HandTransitionBehavior HandTransitionBehavior_L;
+    public HandTransitionBehavior HandTransitionBehavior_R;
+
     public RiggedFinger RiggedFinger_L_Thumb;
     public RiggedFinger RiggedFinger_L_Index;
     public RiggedFinger RiggedFinger_L_Mid;
@@ -18,29 +22,33 @@ namespace Leap.Unity {
     public RiggedFinger RiggedFinger_R_Ring;
     public RiggedFinger RiggedFinger_R_Pinky;
 
+    public string ModelGroupName = "RiggedHands";
+
 
     public bool UseMetaCarpals;
 
     // Use this for initialization
     void Start() {
 
-
     }
 
     [ContextMenu("AutoRig")]
     void AutoRig() {
+      //Assigning these here since this component gets added and used at editor time
       AnimatorForMapping = gameObject.GetComponent<Animator>();
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
+      Reset();
+
       //Find hands and assign RiggedHands
       Transform Hand_L = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftHand);
       RiggedHand_L = Hand_L.gameObject.AddComponent<RiggedHand>();
-      Hand_L.gameObject.AddComponent<HandEnableDisable>();
+      HandTransitionBehavior_L =Hand_L.gameObject.AddComponent<HandEnableDisable>();
       RiggedHand_L.Handedness = Chirality.Left;
       RiggedHand_L.SetEditorLeapPose = false;
 
       Transform Hand_R = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightHand);
       RiggedHand_R = Hand_R.gameObject.AddComponent<RiggedHand>();
-      Hand_R.gameObject.AddComponent<HandEnableDisable>();
+      HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<HandEnableDisable>();
       RiggedHand_R.Handedness = Chirality.Right;
       RiggedHand_R.SetEditorLeapPose = false;
 
@@ -73,10 +81,28 @@ namespace Leap.Unity {
 
       RiggedHand_L.AutoRigRiggedHand(RiggedHand_L.palm, RiggedFinger_L_Pinky.transform, RiggedFinger_L_Index.transform);
       RiggedHand_R.AutoRigRiggedHand(RiggedHand_R.palm, RiggedFinger_R_Pinky.transform, RiggedFinger_R_Index.transform);
-      HandPoolToPopulate.AddNewGroup("RiggedHands", RiggedHand_L, RiggedHand_R);
+      ModelGroupName = transform.name;
+      HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
     }
-    void Reset() {
 
+
+    void Reset() {
+      RiggedFinger[] riggedFingers = GetComponentsInChildren<RiggedFinger>();
+      foreach (RiggedFinger finger in riggedFingers) {
+        DestroyImmediate(finger);
+      }
+      DestroyImmediate(RiggedHand_L);
+      DestroyImmediate(RiggedHand_R);
+      DestroyImmediate(HandTransitionBehavior_L);
+      DestroyImmediate(HandTransitionBehavior_R);
+      if (HandPoolToPopulate != null) {
+        HandPoolToPopulate.RemoveGroup(ModelGroupName);
+      }
+    }
+    void OnDestroy() {
+      if (HandPoolToPopulate != null) {
+        HandPoolToPopulate.RemoveGroup(ModelGroupName);
+      }
     }
 
     // Update is called once per frame
