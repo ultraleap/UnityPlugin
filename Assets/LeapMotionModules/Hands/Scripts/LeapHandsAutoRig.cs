@@ -23,10 +23,12 @@ namespace Leap.Unity {
     public RiggedFinger RiggedFinger_R_Pinky;
 
     public string ModelGroupName = "RiggedHands";
-
-
     public bool UseMetaCarpals;
 
+    public Vector3 modelFingerPointing_L = new Vector3(0, 0, 0);
+    public Vector3 modelPalmFacing_L = new Vector3(0, 0, 0);
+    public Vector3 modelFingerPointing_R = new Vector3(0, 0, 0);
+    public Vector3 modelPalmFacing_R = new Vector3(0, 0, 0);
     // Use this for initialization
     void Start() {
 
@@ -42,13 +44,13 @@ namespace Leap.Unity {
       //Find hands and assign RiggedHands
       Transform Hand_L = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftHand);
       RiggedHand_L = Hand_L.gameObject.AddComponent<RiggedHand>();
-      HandTransitionBehavior_L =Hand_L.gameObject.AddComponent<HandEnableDisable>();
+      HandTransitionBehavior_L =Hand_L.gameObject.AddComponent<HandDrop>();
       RiggedHand_L.Handedness = Chirality.Left;
       RiggedHand_L.SetEditorLeapPose = false;
 
       Transform Hand_R = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightHand);
       RiggedHand_R = Hand_R.gameObject.AddComponent<RiggedHand>();
-      HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<HandEnableDisable>();
+      HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<HandDrop>();
       RiggedHand_R.Handedness = Chirality.Right;
       RiggedHand_R.SetEditorLeapPose = false;
 
@@ -83,6 +85,11 @@ namespace Leap.Unity {
       RiggedHand_R.AutoRigRiggedHand(RiggedHand_R.palm, RiggedFinger_R_Pinky.transform, RiggedFinger_R_Index.transform);
       ModelGroupName = transform.name;
       HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
+
+      modelFingerPointing_L = RiggedHand_L.modelFingerPointing;
+      modelPalmFacing_L = RiggedHand_L.modelPalmFacing;
+      modelFingerPointing_R = RiggedHand_R.modelFingerPointing;
+      modelPalmFacing_R = RiggedHand_R.modelPalmFacing;
     }
 
 
@@ -99,6 +106,38 @@ namespace Leap.Unity {
         HandPoolToPopulate.RemoveGroup(ModelGroupName);
       }
     }
+    void OnValidate() {
+      //push palm and finger facing values to RiggedHand's and RiggedFinger's
+      RiggedHand_L.modelFingerPointing = modelFingerPointing_L;
+      RiggedHand_L.modelPalmFacing = modelPalmFacing_L;
+      RiggedHand_R.modelFingerPointing = modelFingerPointing_R;
+      RiggedHand_R.modelPalmFacing = modelPalmFacing_R;
+
+      RiggedFinger_L_Thumb.modelFingerPointing = modelFingerPointing_L;
+      RiggedFinger_L_Index.modelFingerPointing = modelFingerPointing_L;
+      RiggedFinger_L_Mid.modelFingerPointing = modelFingerPointing_L;
+      RiggedFinger_L_Ring.modelFingerPointing = modelFingerPointing_L;
+      RiggedFinger_L_Pinky.modelFingerPointing = modelFingerPointing_L;
+
+      RiggedFinger_L_Thumb.modelPalmFacing = modelPalmFacing_L;
+      RiggedFinger_L_Index.modelPalmFacing = modelPalmFacing_L;
+      RiggedFinger_L_Mid.modelPalmFacing = modelPalmFacing_L;
+      RiggedFinger_L_Ring.modelPalmFacing = modelPalmFacing_L;
+      RiggedFinger_L_Pinky.modelPalmFacing = modelPalmFacing_L;
+
+      RiggedFinger_R_Thumb.modelFingerPointing = modelFingerPointing_R;
+      RiggedFinger_R_Index.modelFingerPointing = modelFingerPointing_R;
+      RiggedFinger_R_Mid.modelFingerPointing = modelFingerPointing_R;
+      RiggedFinger_R_Ring.modelFingerPointing = modelFingerPointing_R;
+      RiggedFinger_R_Pinky.modelFingerPointing = modelFingerPointing_R;
+
+      RiggedFinger_R_Thumb.modelPalmFacing = modelPalmFacing_R;
+      RiggedFinger_R_Index.modelPalmFacing = modelPalmFacing_R;
+      RiggedFinger_R_Mid.modelPalmFacing = modelPalmFacing_R;
+      RiggedFinger_R_Ring.modelPalmFacing = modelPalmFacing_R;
+      RiggedFinger_R_Pinky.modelPalmFacing = modelPalmFacing_R;
+    }
+
     void OnDestroy() {
       if (HandPoolToPopulate != null) {
         HandPoolToPopulate.RemoveGroup(ModelGroupName);
