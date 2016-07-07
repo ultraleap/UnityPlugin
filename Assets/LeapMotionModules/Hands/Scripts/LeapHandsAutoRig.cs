@@ -71,8 +71,8 @@ namespace Leap.Unity {
       RiggedFinger_R_Pinky.fingerType = Finger.FingerType.TYPE_PINKY;
       //Trigger SetupRiggedHand in RiggedHands
 
-      RiggedHand_L.SetupRiggedHand();
-      RiggedHand_R.SetupRiggedHand();
+      RiggedHand_L.AutoRigRiggedHand(RiggedHand_L.palm, RiggedFinger_L_Pinky.transform, RiggedFinger_L_Index.transform);
+      RiggedHand_R.AutoRigRiggedHand(RiggedHand_R.palm, RiggedFinger_R_Pinky.transform, RiggedFinger_R_Index.transform);
       HandPoolToPopulate.AddNewGroup("RiggedHands", RiggedHand_L, RiggedHand_R);
     }
     void Reset() {

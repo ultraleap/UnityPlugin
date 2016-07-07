@@ -102,7 +102,17 @@ namespace Leap.Unity {
       modelFingerPointing = new Vector3(0, 0, 0);
       modelPalmFacing = new Vector3(0, 0, 0);
       findFingerModels();
-      modelPalmFacing = calculateModelPalmFacing();
+      modelPalmFacing = calculateModelPalmFacing(palm, fingers[1].transform, fingers[2].transform);
+      modelFingerPointing = calculateModelFingerPointing();
+      setFingerPalmFacing();
+    }
+    [ContextMenu("Auto Rig Hand")]
+    public void AutoRigRiggedHand(Transform palm, Transform finger1, Transform finger2) {
+      Debug.Log("AutoRigRiggedHand()");
+      modelFingerPointing = new Vector3(0, 0, 0);
+      modelPalmFacing = new Vector3(0, 0, 0);
+      findFingerModels();
+      modelPalmFacing = calculateModelPalmFacing(palm, finger1, finger2);
       modelFingerPointing = calculateModelFingerPointing();
       setFingerPalmFacing();
     }
@@ -124,10 +134,10 @@ namespace Leap.Unity {
       }
     }
 
-    private Vector3 calculateModelPalmFacing() {
+    private Vector3 calculateModelPalmFacing(Transform palm, Transform finger1, Transform finger2) {
       Vector3 a = transform.InverseTransformPoint(palm.position);
-      Vector3 b = transform.InverseTransformPoint(fingers[2].transform.position);
-      Vector3 c = transform.InverseTransformPoint(fingers[1].transform.position);
+      Vector3 b = transform.InverseTransformPoint(finger1.position);
+      Vector3 c = transform.InverseTransformPoint(finger2.position);
 
       Vector3 side1 = b - a;
       Vector3 side2 = c - a;
@@ -138,7 +148,7 @@ namespace Leap.Unity {
       }
       else perpendicular = Vector3.Cross(side1, side2);
       Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
-      return calculatedPalmFacing; //works for suit01, reversed for beta & LoPoly_Hands
+      return calculatedPalmFacing * -1; //works for suit01, reversed for beta & LoPoly_Hands
       //if (Handedness == Chirality.Right) {
       //  return new Vector3(0, -1, 0);
       //}
@@ -150,6 +160,7 @@ namespace Leap.Unity {
     private Vector3 calculateModelFingerPointing() {
       Vector3 distance = transform.InverseTransformPoint(fingers[2].transform.GetChild(0).transform.position) - transform.InverseTransformPoint(palm.position);
       Vector3 calculatedFingerPointing = CalculateZeroedVector(distance);
+      //reversed if using SetupRiggedHand on separate LoPoly_Hands
       return calculatedFingerPointing *-1f;
 
       //Hard wired vectors below are Reversed between suit01 and LoPoly_Hands_Skeleton
