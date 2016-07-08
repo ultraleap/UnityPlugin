@@ -459,17 +459,21 @@ namespace Leap.Unity.InputModule {
                          if (PointEvents[whichPointer].pointerDrag != null) {
                            Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
                            if ((Dragger != null) && !(Dragger is EventTrigger)) {
-                             ExecuteEvents.Execute(PointEvents[whichPointer].pointerDrag, PointEvents[whichPointer], ExecuteEvents.beginDragHandler);
-                             PointEvents[whichPointer].dragging = true;
                              currentGoing[whichPointer] = PointEvents[whichPointer].pointerDrag;
                              DragBeginPosition[whichPointer] = PointEvents[whichPointer].position;
+                             if (currentGo[whichPointer] && currentGo[whichPointer] == currentGoing[whichPointer]) {
+                               ExecuteEvents.Execute(PointEvents[whichPointer].pointerDrag, PointEvents[whichPointer], ExecuteEvents.beginDragHandler);
+                               PointEvents[whichPointer].dragging = true;
+                             }
                            }
                          }
                       } else {
-                        ExecuteEvents.Execute(PointEvents[whichPointer].pointerDrag, PointEvents[whichPointer], ExecuteEvents.beginDragHandler);
-                        PointEvents[whichPointer].dragging = true;
                         currentGoing[whichPointer] = PointEvents[whichPointer].pointerDrag;
                         DragBeginPosition[whichPointer] = PointEvents[whichPointer].position;
+                        if (currentGo[whichPointer] && currentGo[whichPointer] == currentGoing[whichPointer]) {
+                          ExecuteEvents.Execute(PointEvents[whichPointer].pointerDrag, PointEvents[whichPointer], ExecuteEvents.beginDragHandler);
+                          PointEvents[whichPointer].dragging = true;
+                        }
                       }
                     }
                   }
@@ -484,6 +488,9 @@ namespace Leap.Unity.InputModule {
             IDragHandler Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
             if (Dragger != null && Dragger is ScrollRect) {
               if (currentGo[whichPointer] && !(currentGo[whichPointer].GetComponent<ScrollRect>())) {
+                ExecuteEvents.Execute(PointEvents[whichPointer].pointerDrag, PointEvents[whichPointer], ExecuteEvents.beginDragHandler);
+                PointEvents[whichPointer].dragging = true;
+
                 ExecuteEvents.Execute(currentGo[whichPointer], PointEvents[whichPointer], ExecuteEvents.pointerUpHandler);
                 PointEvents[whichPointer].rawPointerPress = null;
                 PointEvents[whichPointer].pointerPress = null;
@@ -492,6 +499,7 @@ namespace Leap.Unity.InputModule {
             }
           }
           
+
           //If we WERE interacting last frame, but are not this frame...
           if (PrevTriggeringInteraction[whichPointer] && ((!isTriggeringInteraction(whichPointer, whichHand, whichFinger)) || (pointerState[whichPointer] == pointerStates.OffCanvas))) {
             PrevTriggeringInteraction[whichPointer] = false;
@@ -521,7 +529,7 @@ namespace Leap.Unity.InputModule {
           }
 
           //And for everything else, there is dragging.
-          if (PointEvents[whichPointer].pointerDrag != null) {
+          if (PointEvents[whichPointer].pointerDrag != null && PointEvents[whichPointer].dragging) {
             ExecuteEvents.Execute(PointEvents[whichPointer].pointerDrag, PointEvents[whichPointer], ExecuteEvents.dragHandler);
           }
         }
