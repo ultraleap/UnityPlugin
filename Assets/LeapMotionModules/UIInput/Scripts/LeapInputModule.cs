@@ -454,7 +454,7 @@ namespace Leap.Unity.InputModule {
                   if (PointEvents[whichPointer].pointerDrag) {
                     IDragHandler Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
                     if (Dragger != null) {
-                      if (Dragger is EventTrigger) { //Hack: EventSystems intercepting Drag Events causing funkiness
+                      if (Dragger is EventTrigger && PointEvents[whichPointer].pointerDrag.transform.parent) { //Hack: EventSystems intercepting Drag Events causing funkiness
                          PointEvents[whichPointer].pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(PointEvents[whichPointer].pointerDrag.transform.parent.gameObject);
                          if (PointEvents[whichPointer].pointerDrag != null) {
                            Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
