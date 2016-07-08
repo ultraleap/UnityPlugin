@@ -54,7 +54,8 @@ namespace Leap.Unity.Interaction {
     protected float _drag;
     protected float _angularDrag;
 
-    private const int DISLOCATED_BRUSH_COOLDOWN = 3;
+    // Try to allow brushes to exit gracefully when passing fingers between objects.
+    private const int DISLOCATED_BRUSH_COOLDOWN = 60;
     protected uint _dislocatedBrushCounter = DISLOCATED_BRUSH_COOLDOWN;
     protected ContactMode _contactMode = ContactMode.NORMAL;
 
