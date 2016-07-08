@@ -178,8 +178,8 @@ namespace Leap.Unity.InputModule {
 
       //Set the event camera of all currently existent Canvases to our Event Camera
       canvases = Resources.FindObjectsOfTypeAll<Canvas>();
-      foreach (Canvas canvas in canvases) {
-        canvas.worldCamera = EventCamera;
+      for (int i = 0; i < canvases.Length; i++) {
+        canvases[i].worldCamera = EventCamera;
       }
 
       //Set Projective/Tactile Modes
@@ -478,6 +478,7 @@ namespace Leap.Unity.InputModule {
             }
           }
 
+          
           //If we have dragged beyond the drag threshold
           if (currentGoing[whichPointer] && Vector2.Distance(PointEvents[whichPointer].position, DragBeginPosition[whichPointer])*100f > EventSystem.current.pixelDragThreshold) {
             IDragHandler Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
@@ -490,7 +491,7 @@ namespace Leap.Unity.InputModule {
               }
             }
           }
-
+          
           //If we WERE interacting last frame, but are not this frame...
           if (PrevTriggeringInteraction[whichPointer] && ((!isTriggeringInteraction(whichPointer, whichHand, whichFinger)) || (pointerState[whichPointer] == pointerStates.OffCanvas))) {
             PrevTriggeringInteraction[whichPointer] = false;
@@ -532,17 +533,16 @@ namespace Leap.Unity.InputModule {
         if (PrevTouchingMode != getTouchingMode() && RetractUI) {
           PrevTouchingMode = getTouchingMode();
           if (PrevTouchingMode) {
-            foreach (Canvas canvas in canvases) {
-              canvas.BroadcastMessage("Expand", SendMessageOptions.DontRequireReceiver);
+            for (int i = 0; i < canvases.Length; i++) {
+              canvases[i].BroadcastMessage("Expand", SendMessageOptions.DontRequireReceiver);
             }
           } else {
-            foreach (Canvas canvas in canvases) {
-              canvas.BroadcastMessage("Retract", SendMessageOptions.DontRequireReceiver);
+            for (int i = 0; i < canvases.Length; i++) {
+              canvases[i].BroadcastMessage("Retract", SendMessageOptions.DontRequireReceiver);
             }
           }
         }
       }
-       
     }
 
     //Raycast from the EventCamera into UI Space
@@ -608,11 +608,11 @@ namespace Leap.Unity.InputModule {
       //Optional hack that subverts ScrollRect hierarchies; to avoid this, disable "RaycastTarget" on the Viewport and Content panes
       if (OverrideScrollViewClicks) {
         PointEvents[whichPointer].pointerCurrentRaycast = new RaycastResult();
-        foreach (RaycastResult hit in m_RaycastResultCache) {
-          if (hit.gameObject.GetComponent<Scrollbar>() != null) {
-            PointEvents[whichPointer].pointerCurrentRaycast = hit;
-          } else if (PointEvents[whichPointer].pointerCurrentRaycast.gameObject == null && hit.gameObject.GetComponent<ScrollRect>() != null) {
-            PointEvents[whichPointer].pointerCurrentRaycast = hit;
+        for(int i = 0; i< m_RaycastResultCache.Count;i++){
+          if (m_RaycastResultCache[i].gameObject.GetComponent<Scrollbar>() != null) {
+            PointEvents[whichPointer].pointerCurrentRaycast = m_RaycastResultCache[i];
+          } else if (PointEvents[whichPointer].pointerCurrentRaycast.gameObject == null && m_RaycastResultCache[i].gameObject.GetComponent<ScrollRect>() != null) {
+            PointEvents[whichPointer].pointerCurrentRaycast = m_RaycastResultCache[i];
           }
         }
         if (PointEvents[whichPointer].pointerCurrentRaycast.gameObject == null) {
@@ -633,7 +633,7 @@ namespace Leap.Unity.InputModule {
       if ((PointEvents[whichPointer].pointerCurrentRaycast.gameObject != null)) {
         if (distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance) {
           if (isTriggeringInteraction(whichPointer, whichHand, whichFinger)) {
-            if (!PointEvents[whichPointer].pointerCurrentRaycast.gameObject.GetComponent<Canvas>()) {
+            if (ExecuteEvents.GetEventHandler<IPointerClickHandler>(PointEvents[whichPointer].pointerCurrentRaycast.gameObject)) {
               pointerState[whichPointer] = pointerStates.TouchingElement;
             } else {
               pointerState[whichPointer] = pointerStates.TouchingCanvas;
@@ -642,7 +642,7 @@ namespace Leap.Unity.InputModule {
             pointerState[whichPointer] = pointerStates.NearCanvas;
           }
         } else if (!forceTipRaycast) {
-          if (!PointEvents[whichPointer].pointerCurrentRaycast.gameObject.GetComponent<Canvas>()){// || PointEvents[whichPointer].dragging) {
+          if (ExecuteEvents.GetEventHandler<IPointerClickHandler>(PointEvents[whichPointer].pointerCurrentRaycast.gameObject)) {// || PointEvents[whichPointer].dragging) {
             if (isTriggeringInteraction(whichPointer, whichHand, whichFinger)) {
               pointerState[whichPointer] = pointerStates.PinchingToElement;
             } else {
@@ -838,8 +838,8 @@ namespace Leap.Unity.InputModule {
 
     public bool getTouchingMode() {
       bool mode = false;
-      foreach (pointerStates state in pointerState) {
-        if (state == pointerStates.NearCanvas || state == pointerStates.TouchingCanvas || state == pointerStates.TouchingElement) {
+      for (int i = 0; i < pointerState.Length; i++) {
+        if (pointerState[i] == pointerStates.NearCanvas || pointerState[i] == pointerStates.TouchingCanvas || pointerState[i] == pointerStates.TouchingElement) {
           mode = true;
         }
       }
