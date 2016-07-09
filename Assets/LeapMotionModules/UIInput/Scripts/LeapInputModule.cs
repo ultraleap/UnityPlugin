@@ -5,7 +5,6 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using System.Collections.Generic;
-using System.Linq;
 using Leap.Unity;
 using Leap;
 
@@ -113,7 +112,7 @@ namespace Leap.Unity.InputModule {
     public bool RetractUI = false;
 
     //Event related data
-    private Camera EventCamera;
+    //private Camera EventCamera;
     private PointerEventData[] PointEvents;
     private pointerStates[] pointerState;
     private Transform[] Pointers;
@@ -169,19 +168,20 @@ namespace Leap.Unity.InputModule {
       }
 
       //Camera from which rays into the UI will be cast.
+      /*
       EventCamera = new GameObject("UI Selection Camera").AddComponent<Camera>();
       EventCamera.clearFlags = CameraClearFlags.Nothing;
       EventCamera.enabled = false;
       EventCamera.nearClipPlane = 0.01f;
       EventCamera.fieldOfView = 179f;
       EventCamera.transform.SetParent(this.transform);
-
+      
       //Set the event camera of all currently existent Canvases to our Event Camera
       canvases = Resources.FindObjectsOfTypeAll<Canvas>();
       for (int i = 0; i < canvases.Length; i++) {
         canvases[i].worldCamera = EventCamera;
       }
-
+      */
       //Set Projective/Tactile Modes
       if (InteractionMode == InteractionCapability.Projective) {
         ProjectiveToTactileTransitionDistance = -100f;
@@ -275,6 +275,9 @@ namespace Leap.Unity.InputModule {
 
     //Process is called by UI system to process events
     public override void Process() {
+      /*
+      Vector3 OldCameraPos = Camera.main.transform.position;
+      Quaternion OldCameraRot = Camera.main.transform.rotation;
       
       //Send update events if there is a selected object
       //This is important for InputField to receive keyboard events
@@ -324,7 +327,7 @@ namespace Leap.Unity.InputModule {
               break;
           }
         }
-
+        
         //Draw Shoulders as Spheres, and the Raycast as a Line
         if (DrawDebug) {
           DebugSphereQueue.Enqueue(ProjectionOrigin);
@@ -374,7 +377,7 @@ namespace Leap.Unity.InputModule {
         PrevScreenPosition[whichPointer] = PointEvents[whichPointer].position;
 
         if (DrawDebug) {
-          PointerLines[whichPointer].SetPosition(0, EventCamera.transform.position);
+          PointerLines[whichPointer].SetPosition(0, Camera.main.transform.position);
           PointerLines[whichPointer].SetPosition(1, Pointers[whichPointer].position);
         }
 
@@ -391,7 +394,7 @@ namespace Leap.Unity.InputModule {
               //}
             }
           }
-
+          
           //If we hit something with our Raycast, let's see if we should interact with it
           if (PointEvents[whichPointer].pointerCurrentRaycast.gameObject != null && pointerState[whichPointer] != pointerStates.OffCanvas) {
             prevOverGo[whichPointer] = currentOverGo[whichPointer];
@@ -550,14 +553,20 @@ namespace Leap.Unity.InputModule {
             }
           }
         }
+           
       }
+      
+      Camera.main.transform.position = OldCameraPos;
+      Camera.main.transform.rotation = OldCameraRot;
+       * */
     }
 
     //Raycast from the EventCamera into UI Space
     private bool GetLookPointerEventData(int whichPointer, int whichHand, int whichFinger, Vector3 Origin, Vector3 Direction, bool forceTipRaycast) {
+
       //Whether or not this will be a raycast through the finger tip
       bool TipRaycast = false;
-
+      
       //Initialize a blank PointerEvent
       if (PointEvents[whichPointer] == null) {
         PointEvents[whichPointer] = new PointerEventData(base.eventSystem);
@@ -572,9 +581,9 @@ namespace Leap.Unity.InputModule {
       Vector3 IndexFingerPosition;
       if (getTouchingMode(whichPointer) || forceTipRaycast) {
         TipRaycast = true;
-        if (Camera.main != null) {
-          EventCamera.transform.position = Camera.main.transform.position;
-        }
+        //if (Camera.main != null) {
+        //  EventCamera.transform.position = Camera.main.transform.position;
+        //}
 
         //Focus pointer through the average of the extended fingers
         if (!perFingerPointer) {
@@ -594,19 +603,21 @@ namespace Leap.Unity.InputModule {
 
         //Else Raycast through the knuckle of the Index Finger
       } else {
-        EventCamera.transform.position = Origin;
+        //EventCamera.transform.position = Origin;
+        Camera.main.transform.position = Origin;
         IndexFingerPosition = curFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
       }
       
       //Draw Camera Origin
       if (DrawDebug)
-        DebugSphereQueue.Enqueue(EventCamera.transform.position);
+        DebugSphereQueue.Enqueue(Camera.main.transform.position);
 
       //Set EventCamera's Forward Direction
-      EventCamera.transform.forward = Direction;
+      //EventCamera.transform.forward = Direction;
+      Camera.main.transform.forward = Direction;
 
       //Set the Raycast Direction and Delta
-      PointEvents[whichPointer].position = Vector2.Lerp(PrevScreenPosition[whichPointer], EventCamera.WorldToScreenPoint(IndexFingerPosition), 1.0f);//new Vector2(Screen.width / 2, Screen.height / 2);
+      PointEvents[whichPointer].position = Vector2.Lerp(PrevScreenPosition[whichPointer], Camera.main.WorldToScreenPoint(IndexFingerPosition), 1.0f);//new Vector2(Screen.width / 2, Screen.height / 2);
       PointEvents[whichPointer].delta = (PointEvents[whichPointer].position - PrevScreenPosition[whichPointer]) * -10f;
       PointEvents[whichPointer].scrollDelta = Vector2.zero;
       
@@ -632,7 +643,7 @@ namespace Leap.Unity.InputModule {
 
       //Clear the list of things we hit; we don't need it anymore.
       m_RaycastResultCache.Clear();
-
+      
       return TipRaycast;
     }
 
