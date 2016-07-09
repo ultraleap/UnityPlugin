@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System;
 using System.Collections.Generic;
 
@@ -7,7 +8,8 @@ namespace Leap.Unity.Interaction {
   public class ActivityManager {
     private float _overlapRadius = 0;
     private int _maxDepth = 0;
-    private int _layerMask = 0;
+    private int _brushLayer = 0;
+    private int _brushLayerMask = 0;
 
     private List<IInteractionBehaviour> _markedBehaviours = new List<IInteractionBehaviour>();
     private Collider[] _colliderResults = new Collider[32];
@@ -40,12 +42,12 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public int LayerMask {
+    public int BrushLayer {
       get {
-        return _layerMask;
+        return _brushLayer;
       }
       set {
-        _layerMask = value;
+        _brushLayer = value;
       }
     }
 
@@ -178,6 +180,14 @@ namespace Leap.Unity.Interaction {
     }
 
     private void markOverlappingObjects(List<Hand> hands) {
+      // This should really be a single call into Unity.
+      // Find the set of layers that are currently colliding with the brush layer.
+      _brushLayerMask = 0;
+      for (int i = 0; i < 32; i++) {
+        _brushLayerMask |=  Physics.GetIgnoreLayerCollision(_brushLayer, i) ? 0 : (1 << i);
+      }
+
+      // Update _markedBehaviours.
       _markedBehaviours.Clear();
 
       switch (hands.Count) {
@@ -188,6 +198,11 @@ namespace Leap.Unity.Interaction {
           break;
 #if UNITY_5_4
         case 2:
+          if(hands[0].PalmPosition.DistanceTo(hands[1].PalmPosition) > (_overlapRadius*2.0f)) {
+            getSphereResults(hands[0], _markedBehaviours);
+            getSphereResults(hands[1], _markedBehaviours);
+            break;
+          }
           //Use capsule collider for efficiency.  Only need one overlap and no duplicates!
           getCapsuleResults(hands[0], hands[1], _markedBehaviours);
           break;
@@ -220,25 +235,19 @@ namespace Leap.Unity.Interaction {
       for (int i = 0; i < count; i++) {
         Collider collider = _colliderResults[i];
 
-        //Will happen if someone is using the interaction layers for their own needs
-        //We could throw an error/warning?
-        if (collider.attachedRigidbody == null) {
-          continue;
-        }
-
         IInteractionBehaviour behaviour = collider.attachedRigidbody.GetComponent<IInteractionBehaviour>();
-
-        //Also will happen if someone is abusing layers
         if (behaviour == null) {
+          // IInteractionBehaviour is a requirement for colliding with the brushLayer.
+          Assert.IsTrue(behaviour != null);
           continue;
         }
 
-        //Nothing stopping our overlaps from finding object of other managers, or unregistered objects
+        // Nothing stopping our overlaps from finding object of other managers, or unregistered objects
         if (!IsRegistered(behaviour)) {
           continue;
         }
 
-        //This will totally add duplicates, we don't care
+        // This will totally add duplicates, we don't care
         list.Add(behaviour);
       }
     }
@@ -249,7 +258,7 @@ namespace Leap.Unity.Interaction {
         count = Physics.OverlapSphereNonAlloc(hand.PalmPosition.ToVector3(),
                                               _overlapRadius,
                                               _colliderResults,
-                                              _layerMask,
+                                              _brushLayerMask,
                                               QueryTriggerInteraction.Ignore);
         if (count < _colliderResults.Length) {
           break;
@@ -271,7 +280,7 @@ namespace Leap.Unity.Interaction {
                                                handB.PalmPosition.ToVector3(),
                                                _overlapRadius,
                                                _colliderResults,
-                                               _layerMask,
+                                               _brushLayerMask,
                                                QueryTriggerInteraction.Ignore);
         if (count < _colliderResults.Length) {
           break;
