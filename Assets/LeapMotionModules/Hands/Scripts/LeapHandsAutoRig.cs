@@ -4,13 +4,20 @@ using System.Collections;
 namespace Leap.Unity {
   [ExecuteInEditMode]
   public class LeapHandsAutoRig : MonoBehaviour {
-    public Animator AnimatorForMapping;
     public HandPool HandPoolToPopulate;
+    public Animator AnimatorForMapping;
+
+    public string ModelGroupName = "RiggedHands";
+    public bool UseMetaCarpals;
+
+    [Header("RiggedHand Components")]
     public RiggedHand RiggedHand_L;
     public RiggedHand RiggedHand_R;
+    [Header("HandTransitionBehavior Components")]
     public HandTransitionBehavior HandTransitionBehavior_L;
     public HandTransitionBehavior HandTransitionBehavior_R;
 
+    [Header("RiggedFinger Components")]
     public RiggedFinger RiggedFinger_L_Thumb;
     public RiggedFinger RiggedFinger_L_Index;
     public RiggedFinger RiggedFinger_L_Mid;
@@ -22,9 +29,7 @@ namespace Leap.Unity {
     public RiggedFinger RiggedFinger_R_Ring;
     public RiggedFinger RiggedFinger_R_Pinky;
 
-    public string ModelGroupName = "RiggedHands";
-    public bool UseMetaCarpals;
-
+    [Header("Palm & Finger Direction Vectors.")]
     public Vector3 modelFingerPointing_L = new Vector3(0, 0, 0);
     public Vector3 modelPalmFacing_L = new Vector3(0, 0, 0);
     public Vector3 modelFingerPointing_R = new Vector3(0, 0, 0);
