@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace Leap.Unity {
   [ExecuteInEditMode]
+  [AddComponentMenu("Leap/Auto Rig Hands")]
   public class LeapHandsAutoRig : MonoBehaviour {
     public HandPool HandPoolToPopulate;
     public Animator AnimatorForMapping;
@@ -16,7 +17,6 @@ namespace Leap.Unity {
     [Header("HandTransitionBehavior Components")]
     public HandTransitionBehavior HandTransitionBehavior_L;
     public HandTransitionBehavior HandTransitionBehavior_R;
-
     [Header("RiggedFinger Components")]
     public RiggedFinger RiggedFinger_L_Thumb;
     public RiggedFinger RiggedFinger_L_Index;
@@ -28,16 +28,12 @@ namespace Leap.Unity {
     public RiggedFinger RiggedFinger_R_Mid;
     public RiggedFinger RiggedFinger_R_Ring;
     public RiggedFinger RiggedFinger_R_Pinky;
-
     [Header("Palm & Finger Direction Vectors.")]
     public Vector3 modelFingerPointing_L = new Vector3(0, 0, 0);
     public Vector3 modelPalmFacing_L = new Vector3(0, 0, 0);
     public Vector3 modelFingerPointing_R = new Vector3(0, 0, 0);
     public Vector3 modelPalmFacing_R = new Vector3(0, 0, 0);
-    // Use this for initialization
-    void Start() {
 
-    }
     [ContextMenu("AutoRig")]
     public void AutoRig() {
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
@@ -158,13 +154,11 @@ namespace Leap.Unity {
       ModelGroupName = transform.name;
       HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
 
-
       modelFingerPointing_L = RiggedHand_L.modelFingerPointing;
       modelPalmFacing_L = RiggedHand_L.modelPalmFacing;
       modelFingerPointing_R = RiggedHand_R.modelFingerPointing;
       modelPalmFacing_R = RiggedHand_R.modelPalmFacing;
     }
-
 
     void Reset() {
       RiggedFinger[] riggedFingers = GetComponentsInChildren<RiggedFinger>();
@@ -181,34 +175,54 @@ namespace Leap.Unity {
     }
     void OnValidate() {
       //push palm and finger facing values to RiggedHand's and RiggedFinger's
-      RiggedHand_L.modelFingerPointing = modelFingerPointing_L;
-      RiggedHand_L.modelPalmFacing = modelPalmFacing_L;
-      RiggedHand_R.modelFingerPointing = modelFingerPointing_R;
-      RiggedHand_R.modelPalmFacing = modelPalmFacing_R;
-
-      RiggedFinger_L_Thumb.modelFingerPointing = modelFingerPointing_L;
-      RiggedFinger_L_Index.modelFingerPointing = modelFingerPointing_L;
-      RiggedFinger_L_Mid.modelFingerPointing = modelFingerPointing_L;
-      RiggedFinger_L_Ring.modelFingerPointing = modelFingerPointing_L;
-      RiggedFinger_L_Pinky.modelFingerPointing = modelFingerPointing_L;
-
-      RiggedFinger_L_Thumb.modelPalmFacing = modelPalmFacing_L;
-      RiggedFinger_L_Index.modelPalmFacing = modelPalmFacing_L;
-      RiggedFinger_L_Mid.modelPalmFacing = modelPalmFacing_L;
-      RiggedFinger_L_Ring.modelPalmFacing = modelPalmFacing_L;
-      RiggedFinger_L_Pinky.modelPalmFacing = modelPalmFacing_L;
-
-      RiggedFinger_R_Thumb.modelFingerPointing = modelFingerPointing_R;
-      RiggedFinger_R_Index.modelFingerPointing = modelFingerPointing_R;
-      RiggedFinger_R_Mid.modelFingerPointing = modelFingerPointing_R;
-      RiggedFinger_R_Ring.modelFingerPointing = modelFingerPointing_R;
-      RiggedFinger_R_Pinky.modelFingerPointing = modelFingerPointing_R;
-
-      RiggedFinger_R_Thumb.modelPalmFacing = modelPalmFacing_R;
-      RiggedFinger_R_Index.modelPalmFacing = modelPalmFacing_R;
-      RiggedFinger_R_Mid.modelPalmFacing = modelPalmFacing_R;
-      RiggedFinger_R_Ring.modelPalmFacing = modelPalmFacing_R;
-      RiggedFinger_R_Pinky.modelPalmFacing = modelPalmFacing_R;
+      if (RiggedHand_L) {
+        RiggedHand_L.modelFingerPointing = modelFingerPointing_L;
+        RiggedHand_L.modelPalmFacing = modelPalmFacing_L;
+      }
+      if (RiggedHand_R) {
+        RiggedHand_R.modelFingerPointing = modelFingerPointing_R;
+        RiggedHand_R.modelPalmFacing = modelPalmFacing_R;
+      }
+      if (RiggedFinger_L_Thumb) {
+        RiggedFinger_L_Thumb.modelFingerPointing = modelFingerPointing_L;
+        RiggedFinger_L_Thumb.modelPalmFacing = modelPalmFacing_L;
+      }
+      if (RiggedFinger_L_Index) {
+        RiggedFinger_L_Index.modelFingerPointing = modelFingerPointing_L;
+        RiggedFinger_L_Index.modelPalmFacing = modelPalmFacing_L;
+      }
+      if (RiggedFinger_L_Mid) {
+        RiggedFinger_L_Mid.modelFingerPointing = modelFingerPointing_L;
+        RiggedFinger_L_Mid.modelPalmFacing = modelPalmFacing_L;
+      }
+      if (RiggedFinger_L_Ring) {
+        RiggedFinger_L_Ring.modelFingerPointing = modelFingerPointing_L;
+        RiggedFinger_L_Ring.modelPalmFacing = modelPalmFacing_L;
+      }
+      if (RiggedFinger_L_Pinky) {
+        RiggedFinger_L_Pinky.modelFingerPointing = modelFingerPointing_L;
+        RiggedFinger_L_Pinky.modelPalmFacing = modelPalmFacing_L;
+      }
+      if (RiggedFinger_R_Thumb) {
+        RiggedFinger_R_Thumb.modelFingerPointing = modelFingerPointing_R;
+        RiggedFinger_R_Thumb.modelPalmFacing = modelPalmFacing_R;
+      }
+      if (RiggedFinger_R_Index) {
+        RiggedFinger_R_Index.modelFingerPointing = modelFingerPointing_R;
+        RiggedFinger_R_Index.modelPalmFacing = modelPalmFacing_R;
+      }
+      if (RiggedFinger_R_Mid) {
+        RiggedFinger_R_Mid.modelFingerPointing = modelFingerPointing_R;
+        RiggedFinger_R_Mid.modelPalmFacing = modelPalmFacing_R;
+      }
+      if (RiggedFinger_R_Ring) {
+        RiggedFinger_R_Ring.modelFingerPointing = modelFingerPointing_R;
+        RiggedFinger_R_Ring.modelPalmFacing = modelPalmFacing_R;
+      }
+      if (RiggedFinger_R_Pinky) {
+        RiggedFinger_R_Pinky.modelFingerPointing = modelFingerPointing_R;
+        RiggedFinger_R_Pinky.modelPalmFacing = modelPalmFacing_R;
+      }
     }
 
     void OnDestroy() {
