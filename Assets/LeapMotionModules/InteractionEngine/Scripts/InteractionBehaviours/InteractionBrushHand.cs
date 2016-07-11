@@ -16,7 +16,6 @@ namespace Leap.Unity.Interaction {
     private const int N_ACTIVE_BONES = 3;
     private const float DEAD_ZONE_FRACTION = 0.05f;
     private const float DISLOCATION_FRACTION = 1.5f;
-    private const float DISLOCATION_COUNTER = 3;
 
     private InteractionBrushBone[] _brushBones;
     private Hand _hand;
@@ -138,12 +137,7 @@ namespace Leap.Unity.Interaction {
             body.mass = _perBoneMass * massScale;
 
             if (targetingError >= DISLOCATION_FRACTION) {
-              if (brushBone.dislocationCounter++ >= DISLOCATION_COUNTER) {
-                brushBone.startTriggering();
-                brushBone.dislocationCounter = 0;
-              }
-            } else {
-              brushBone.dislocationCounter = 0;
+              brushBone.startTriggering();
             }
           }
 
