@@ -211,7 +211,7 @@ namespace Leap.Unity {
       }
       else perpendicular = Vector3.Cross(side1, side2);
       Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
-      return calculatedPalmFacing * 1; //works for suit01, reversed for beta & LoPoly_Hands
+      return calculatedPalmFacing * 1; //+works for Mixamo, -reversed LoPoly_Hands_Skeleton and Winston
       //if (Handedness == Chirality.Right) {
       //  return new Vector3(0, -1, 0);
       //}

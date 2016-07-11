@@ -35,6 +35,16 @@ namespace Leap.Unity {
     }
     [ContextMenu("AutoRig")]
     void AutoRig() {
+      HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
+      AnimatorForMapping = gameObject.GetComponent<Animator>();
+      if (AnimatorForMapping != null) {
+        AutoRigMecanim();
+      }
+      else AutoRigByName();
+    }
+
+    [ContextMenu("AutoRigByName")]
+    void AutoRigByName() {
       //Assigning these here since this component gets added and used at editor time
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
       Reset();
@@ -72,6 +82,17 @@ namespace Leap.Unity {
 
       ModelGroupName = transform.name;
       HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
+
+      RiggedFinger_L_Thumb = (RiggedFinger)RiggedHand_L.fingers[0];
+      RiggedFinger_L_Index = (RiggedFinger)RiggedHand_L.fingers[1];
+      RiggedFinger_L_Mid = (RiggedFinger)RiggedHand_L.fingers[2];
+      RiggedFinger_L_Ring = (RiggedFinger)RiggedHand_L.fingers[3];
+      RiggedFinger_L_Pinky = (RiggedFinger)RiggedHand_L.fingers[4];
+      RiggedFinger_R_Thumb = (RiggedFinger)RiggedHand_R.fingers[0];
+      RiggedFinger_R_Index = (RiggedFinger)RiggedHand_R.fingers[1];
+      RiggedFinger_R_Mid = (RiggedFinger)RiggedHand_R.fingers[2];
+      RiggedFinger_R_Ring = (RiggedFinger)RiggedHand_R.fingers[3];
+      RiggedFinger_R_Pinky = (RiggedFinger)RiggedHand_R.fingers[4];
 
       modelFingerPointing_L = RiggedHand_L.modelFingerPointing;
       modelPalmFacing_L = RiggedHand_L.modelPalmFacing;
@@ -131,6 +152,7 @@ namespace Leap.Unity {
       RiggedHand_R.AutoRigRiggedHand(RiggedHand_R.palm, RiggedFinger_R_Pinky.transform, RiggedFinger_R_Index.transform);
       ModelGroupName = transform.name;
       HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
+
 
       modelFingerPointing_L = RiggedHand_L.modelFingerPointing;
       modelPalmFacing_L = RiggedHand_L.modelPalmFacing;
