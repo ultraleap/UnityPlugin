@@ -74,9 +74,5 @@ namespace Leap.Unity.InputModule {
       specifyConditionalDrawing(() => module.EnvironmentPointer,
              "environmentPinch");
     }
-
-    bool ProjectiveAllowed(LeapInputModule.InteractionCapability mode) {
-      return mode != LeapInputModule.InteractionCapability.Tactile;
-    }
   }
 }
