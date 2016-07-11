@@ -33,9 +33,55 @@ namespace Leap.Unity {
     void Start() {
 
     }
-
     [ContextMenu("AutoRig")]
     void AutoRig() {
+      //Assigning these here since this component gets added and used at editor time
+      HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
+      Reset();
+
+      //Find hands and assign RiggedHands
+      Transform Hand_L = null;
+      foreach (Transform t in transform) {
+        if (t.name.Contains("Left")){
+          Hand_L = t;
+        }
+      }
+      RiggedHand_L = Hand_L.gameObject.AddComponent<RiggedHand>();
+      HandTransitionBehavior_L = Hand_L.gameObject.AddComponent<HandDrop>();
+      RiggedHand_L.Handedness = Chirality.Left;
+      RiggedHand_L.SetEditorLeapPose = false;
+      RiggedHand_L.UseMetaCarpals = UseMetaCarpals;
+
+      Transform Hand_R = null;
+      foreach (Transform t in transform) {
+        if(t.name.Contains("Right")){
+          Hand_R = t;
+        }
+      }
+      RiggedHand_R = Hand_R.gameObject.AddComponent<RiggedHand>();
+      HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<HandDrop>();
+      RiggedHand_R.Handedness = Chirality.Right;
+      RiggedHand_R.SetEditorLeapPose = false;
+      RiggedHand_R.UseMetaCarpals = UseMetaCarpals;
+
+      //Find palms and assign to RiggedHands
+      //RiggedHand_L.palm = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftHand);
+      //RiggedHand_R.palm = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightHand);
+      RiggedHand_L.SetupRiggedHand();
+      RiggedHand_R.SetupRiggedHand();
+
+      ModelGroupName = transform.name;
+      HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
+
+      modelFingerPointing_L = RiggedHand_L.modelFingerPointing;
+      modelPalmFacing_L = RiggedHand_L.modelPalmFacing;
+      modelFingerPointing_R = RiggedHand_R.modelFingerPointing;
+      modelPalmFacing_R = RiggedHand_R.modelPalmFacing;
+    }
+
+
+    [ContextMenu("AutoRigMecanim")]
+    void AutoRigMecanim() {
       //Assigning these here since this component gets added and used at editor time
       AnimatorForMapping = gameObject.GetComponent<Animator>();
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();

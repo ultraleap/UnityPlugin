@@ -101,6 +101,7 @@ namespace Leap.Unity {
     public void SetupRiggedHand() {
       modelFingerPointing = new Vector3(0, 0, 0);
       modelPalmFacing = new Vector3(0, 0, 0);
+      assignRiggedFingersByName();
       findFingerModels();
       modelPalmFacing = calculateModelPalmFacing(palm, fingers[1].transform, fingers[2].transform);
       modelFingerPointing = calculateModelFingerPointing();
@@ -116,7 +117,69 @@ namespace Leap.Unity {
       modelFingerPointing = calculateModelFingerPointing();
       setFingerPalmFacing();
     }
+    [ContextMenu("Assign Rigged Fingers")]
+    private void assignRiggedFingersByName(){
+      Debug.Log("1");
+      //find palm by name
+      //Transform palm = null;
+      Transform thumb = null;
+      Transform index = null;
+      Transform middle = null;
+      Transform ring = null;
+      Transform pinky = null;
+      Transform[] children = transform.GetComponentsInChildren<Transform>();
+      if(transform.name.Contains("Palm")){
+        Debug.Log("2");
 
+        base.palm = transform;
+      }
+      else{
+        Debug.Log("3");
+
+        foreach (Transform t in children) {
+          if (t.name.Contains("Palm")) {
+            base.palm = t;
+
+          }
+        }
+ 
+      }
+      if (!palm) {
+        palm = transform;
+      }
+      if (palm) {
+        foreach (Transform t in children) {
+          if (t.name.Contains("thumb") && t.parent == palm) {
+            thumb = t;
+            RiggedFinger newRiggedFinger = thumb.gameObject.AddComponent<RiggedFinger>();
+            newRiggedFinger.fingerType = Finger.FingerType.TYPE_THUMB;
+          }
+          if (t.name.Contains("index") && t.parent == palm) {
+            index = t;
+            RiggedFinger newRiggedFinger = index.gameObject.AddComponent<RiggedFinger>();
+            newRiggedFinger.fingerType = Finger.FingerType.TYPE_INDEX;
+          }
+          if (t.name.Contains("middle") && t.parent == palm) {
+            middle = t;
+            RiggedFinger newRiggedFinger = middle.gameObject.AddComponent<RiggedFinger>();
+            newRiggedFinger.fingerType = Finger.FingerType.TYPE_MIDDLE;
+          }
+          if (t.name.Contains("ring") && t.parent == palm) {
+            ring = t;
+            RiggedFinger newRiggedFinger = ring.gameObject.AddComponent<RiggedFinger>();
+            newRiggedFinger.fingerType = Finger.FingerType.TYPE_RING;
+          }
+          if (t.name.Contains("pinky") && t.parent == palm) {
+            pinky = t;
+            RiggedFinger newRiggedFinger = pinky.gameObject.AddComponent<RiggedFinger>();
+            newRiggedFinger.fingerType = Finger.FingerType.TYPE_PINKY;
+          }
+        }
+      }
+
+
+
+    }
     private void findFingerModels() {
       RiggedFinger[] fingerModelList = GetComponentsInChildren<RiggedFinger>();
       for (int i = 0; i < 5; i++) {
@@ -135,9 +198,9 @@ namespace Leap.Unity {
     }
 
     private Vector3 calculateModelPalmFacing(Transform palm, Transform finger1, Transform finger2) {
-      Vector3 a = transform.InverseTransformPoint(palm.position);
-      Vector3 b = transform.InverseTransformPoint(finger1.position);
-      Vector3 c = transform.InverseTransformPoint(finger2.position);
+      Vector3 a = palm.transform.InverseTransformPoint(palm.position);
+      Vector3 b = palm.transform.InverseTransformPoint(finger1.position);
+      Vector3 c = palm.transform.InverseTransformPoint(finger2.position);
 
       Vector3 side1 = b - a;
       Vector3 side2 = c - a;
@@ -148,7 +211,7 @@ namespace Leap.Unity {
       }
       else perpendicular = Vector3.Cross(side1, side2);
       Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
-      return calculatedPalmFacing * -1; //works for suit01, reversed for beta & LoPoly_Hands
+      return calculatedPalmFacing * 1; //works for suit01, reversed for beta & LoPoly_Hands
       //if (Handedness == Chirality.Right) {
       //  return new Vector3(0, -1, 0);
       //}
@@ -158,10 +221,10 @@ namespace Leap.Unity {
     }
 
     private Vector3 calculateModelFingerPointing() {
-      Vector3 distance = transform.InverseTransformPoint(fingers[2].transform.GetChild(0).transform.position) - transform.InverseTransformPoint(palm.position);
+      Vector3 distance = palm.transform.InverseTransformPoint(fingers[2].transform.GetChild(0).transform.position) - palm.transform.InverseTransformPoint(palm.position);
       Vector3 calculatedFingerPointing = CalculateZeroedVector(distance);
       //reversed if using SetupRiggedHand on separate LoPoly_Hands
-      return calculatedFingerPointing *-1f;
+      return calculatedFingerPointing * -1f;
 
       //Hard wired vectors below are Reversed between suit01 and LoPoly_Hands_Skeleton
       //if (Handedness == Chirality.Right) {
