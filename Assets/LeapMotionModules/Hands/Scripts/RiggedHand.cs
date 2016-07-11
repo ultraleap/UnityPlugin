@@ -7,6 +7,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Leap;
 
 namespace Leap.Unity {
@@ -37,6 +38,7 @@ namespace Leap.Unity {
       if (SetEditorLeapPose == setEditorLeapPose) {
         SetEditorLeapPose = setEditorLeapPose;
       }
+
     }
 
     [Tooltip("Hands are typically rigged in 3D packages with the palm transform near the wrist. Uncheck this is your model's palm transform is at the center of the palm similar to Leap's API drives")]
@@ -120,6 +122,12 @@ namespace Leap.Unity {
     [ContextMenu("Assign Rigged Fingers")]
     private void assignRiggedFingersByName(){
       Debug.Log("1");
+      List<string> palmStrings = new List<string> { "palm", "Palm", "PALM" };
+      List<string> thumbStrings = new List<string> { "thumb", "tmb", "Thumb", "THUMB" };
+      List<string> indexStrings = new List<string> { "index", "idx" , "Index", "INDEX"};
+      List<string> middleStrings = new List<string> { "middle", "mid", "Middle", "MIDDLE" };
+      List<string> ringStrings = new List<string> { "ring", "Ring", "RING" };
+      List<string> pinkyStrings = new List<string> { "pinky", "pin", "Pinky", "PINKY" };
       //find palm by name
       //Transform palm = null;
       Transform thumb = null;
@@ -128,7 +136,7 @@ namespace Leap.Unity {
       Transform ring = null;
       Transform pinky = null;
       Transform[] children = transform.GetComponentsInChildren<Transform>();
-      if(transform.name.Contains("Palm")){
+      if (palmStrings.Any(w => transform.name.Contains(w)) ==true ){
         Debug.Log("2");
 
         base.palm = transform;
@@ -137,7 +145,7 @@ namespace Leap.Unity {
         Debug.Log("3");
 
         foreach (Transform t in children) {
-          if (t.name.Contains("Palm")) {
+          if (palmStrings.Any(w => t.name.Contains(w)) == true) {
             base.palm = t;
 
           }
@@ -149,27 +157,27 @@ namespace Leap.Unity {
       }
       if (palm) {
         foreach (Transform t in children) {
-          if (t.name.Contains("thumb") && t.parent == palm) {
+          if (thumbStrings.Any(w => t.name.Contains(w)) ==true && t.parent == palm) { 
             thumb = t;
             RiggedFinger newRiggedFinger = thumb.gameObject.AddComponent<RiggedFinger>();
             newRiggedFinger.fingerType = Finger.FingerType.TYPE_THUMB;
           }
-          if (t.name.Contains("index") && t.parent == palm) {
+          if (indexStrings.Any(w => t.name.Contains(w)) == true && t.parent == palm) {
             index = t;
             RiggedFinger newRiggedFinger = index.gameObject.AddComponent<RiggedFinger>();
             newRiggedFinger.fingerType = Finger.FingerType.TYPE_INDEX;
           }
-          if (t.name.Contains("middle") && t.parent == palm) {
+          if (middleStrings.Any(w => t.name.Contains(w)) == true && t.parent == palm) {
             middle = t;
             RiggedFinger newRiggedFinger = middle.gameObject.AddComponent<RiggedFinger>();
             newRiggedFinger.fingerType = Finger.FingerType.TYPE_MIDDLE;
           }
-          if (t.name.Contains("ring") && t.parent == palm) {
+          if (ringStrings.Any(w => t.name.Contains(w)) == true && t.parent == palm) {
             ring = t;
             RiggedFinger newRiggedFinger = ring.gameObject.AddComponent<RiggedFinger>();
             newRiggedFinger.fingerType = Finger.FingerType.TYPE_RING;
           }
-          if (t.name.Contains("pinky") && t.parent == palm) {
+          if (pinkyStrings.Any(w => t.name.Contains(w)) == true && t.parent == palm) {
             pinky = t;
             RiggedFinger newRiggedFinger = pinky.gameObject.AddComponent<RiggedFinger>();
             newRiggedFinger.fingerType = Finger.FingerType.TYPE_PINKY;
