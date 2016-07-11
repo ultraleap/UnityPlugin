@@ -39,7 +39,7 @@ namespace Leap.Unity {
 
     }
     [ContextMenu("AutoRig")]
-    void AutoRig() {
+    public void AutoRig() {
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
       AnimatorForMapping = gameObject.GetComponent<Animator>();
       if (AnimatorForMapping != null) {
