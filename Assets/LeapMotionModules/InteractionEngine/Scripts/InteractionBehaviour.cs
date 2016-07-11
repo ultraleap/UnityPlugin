@@ -164,6 +164,10 @@ namespace Leap.Unity.Interaction {
     }
     #endregion
 
+    public override bool IsAbleToBeDeactivated() {
+      return _contactMode == ContactMode.NORMAL && UntrackedHandCount == 0;
+    }
+
     #region INTERACTION CALLBACKS
 
     protected override void OnRegistered() {

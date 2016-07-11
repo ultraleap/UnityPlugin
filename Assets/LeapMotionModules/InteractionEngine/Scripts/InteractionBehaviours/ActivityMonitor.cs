@@ -32,8 +32,8 @@ namespace Leap.Unity.Interaction {
     }
 
     void FixedUpdate() {
-      // TODO: Is this the right place for this check, or is it already implicit?
-      if (_interactionBehaviour.IsBeingGrasped || _interactionBehaviour.UntrackedHandCount > 0) {
+      // Grasped objects do not intersect the brush layer but are still touching hands.
+      if (_interactionBehaviour.IsBeingGrasped) {
         Revive();
         return;
       }
@@ -41,8 +41,10 @@ namespace Leap.Unity.Interaction {
       if (_timeToLive > 0) {
         --_timeToLive;
         _timeToDie = 0;
-      } else if(++_timeToDie >= HYSTERESIS_TIMEOUT) {
-        _manager.Deactivate(_interactionBehaviour); //
+      } else {
+        if (_interactionBehaviour.IsAbleToBeDeactivated() && ++_timeToDie >= HYSTERESIS_TIMEOUT) {
+          _manager.Deactivate(_interactionBehaviour);
+        }
       }
     }
 
