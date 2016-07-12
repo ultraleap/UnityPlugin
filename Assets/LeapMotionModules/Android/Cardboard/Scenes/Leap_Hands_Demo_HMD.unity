@@ -1698,7 +1698,7 @@ MonoBehaviour:
   _overrideDeviceType: 1
   _overrideDeviceTypeWith: 1
   _useInterpolation: 1
-  _interpolationDelay: 45
+  _interpolationDelay: 20
 --- !u!1001 &593869531
 Prefab:
   m_ObjectHideFlags: 0
@@ -1822,7 +1822,7 @@ MonoBehaviour:
     modelList: []
     modelsCheckedOut: []
     IsEnabled: 1
-    CanDuplicate: 0
+    CanDuplicate: 1
   - GroupName: Physics_Hands
     _handPool: {fileID: 0}
     LeftModel: {fileID: 170358230}
@@ -1832,7 +1832,7 @@ MonoBehaviour:
     modelList: []
     modelsCheckedOut: []
     IsEnabled: 1
-    CanDuplicate: 0
+    CanDuplicate: 1
 --- !u!114 &612653287
 MonoBehaviour:
   m_ObjectHideFlags: 0
