@@ -8,7 +8,7 @@ namespace Leap.Unity {
     public HandPool HandPoolToPopulate;
     public Animator AnimatorForMapping;
 
-    public string ModelGroupName = "RiggedHands";
+    public string ModelGroupName = null;
     public bool UseMetaCarpals;
 
     [Header("RiggedHand Components")]
@@ -39,9 +39,15 @@ namespace Leap.Unity {
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
       AnimatorForMapping = gameObject.GetComponent<Animator>();
       if (AnimatorForMapping != null) {
-        AutoRigMecanim();
+        if (AnimatorForMapping.isHuman == true) {
+          AutoRigMecanim();
+          return;
+        }
+        else {
+          Debug.LogWarning("The Mecanim Avatar for this asset does not contain a valid IsHuman definition.  Attempting to auto map by name.");
+        }
       }
-      else AutoRigByName();
+      AutoRigByName();
     }
 
     [ContextMenu("AutoRigByName")]
@@ -58,7 +64,7 @@ namespace Leap.Unity {
         }
       }
       RiggedHand_L = Hand_L.gameObject.AddComponent<RiggedHand>();
-      HandTransitionBehavior_L = Hand_L.gameObject.AddComponent<HandDrop>();
+      HandTransitionBehavior_L = Hand_L.gameObject.AddComponent<HandEnableDisable>();
       RiggedHand_L.Handedness = Chirality.Left;
       RiggedHand_L.SetEditorLeapPose = false;
       RiggedHand_L.UseMetaCarpals = UseMetaCarpals;
@@ -70,7 +76,7 @@ namespace Leap.Unity {
         }
       }
       RiggedHand_R = Hand_R.gameObject.AddComponent<RiggedHand>();
-      HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<HandDrop>();
+      HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<HandEnableDisable>();
       RiggedHand_R.Handedness = Chirality.Right;
       RiggedHand_R.SetEditorLeapPose = false;
       RiggedHand_R.UseMetaCarpals = UseMetaCarpals;
@@ -81,7 +87,9 @@ namespace Leap.Unity {
       RiggedHand_L.SetupRiggedHand();
       RiggedHand_R.SetupRiggedHand();
 
-      ModelGroupName = transform.name;
+      if (ModelGroupName == null) {
+        ModelGroupName = transform.name;
+      }
       HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
 
       RiggedFinger_L_Thumb = (RiggedFinger)RiggedHand_L.fingers[0];
@@ -151,7 +159,9 @@ namespace Leap.Unity {
 
       RiggedHand_L.AutoRigRiggedHand(RiggedHand_L.palm, RiggedFinger_L_Pinky.transform, RiggedFinger_L_Index.transform);
       RiggedHand_R.AutoRigRiggedHand(RiggedHand_R.palm, RiggedFinger_R_Pinky.transform, RiggedFinger_R_Index.transform);
-      ModelGroupName = transform.name;
+      if (ModelGroupName == null) {
+        ModelGroupName = transform.name;
+      }
       HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
 
       modelFingerPointing_L = RiggedHand_L.modelFingerPointing;
@@ -229,11 +239,6 @@ namespace Leap.Unity {
       if (HandPoolToPopulate != null) {
         HandPoolToPopulate.RemoveGroup(ModelGroupName);
       }
-    }
-
-    // Update is called once per frame
-    void Update() {
-
     }
   }
 }
