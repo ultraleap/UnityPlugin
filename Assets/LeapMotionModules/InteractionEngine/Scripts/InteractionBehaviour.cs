@@ -192,6 +192,10 @@ namespace Leap.Unity.Interaction {
     protected override void OnUnregistered() {
       base.OnUnregistered();
 
+      Assert.IsTrue(UntrackedHandCount == 0);
+      _contactMode = ContactMode.NORMAL;
+      updateLayer();
+
       _warper.Dispose();
       _warper = null;
 

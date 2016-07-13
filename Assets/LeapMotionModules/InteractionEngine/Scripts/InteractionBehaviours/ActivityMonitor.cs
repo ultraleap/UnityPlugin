@@ -32,6 +32,7 @@ namespace Leap.Unity.Interaction {
     }
 
     void FixedUpdate() {
+
       // Grasped objects do not intersect the brush layer but are still touching hands.
       if (_interactionBehaviour.IsBeingGrasped) {
         Revive();
@@ -76,8 +77,11 @@ namespace Leap.Unity.Interaction {
           return;
         }
 
+        // Unregistered behaviours will fail to activate.
         neighbor = _manager.Activate(otherBehaviour);
-        neighbor._timeToLive = _timeToLive - 1;
+        if (neighbor != null) {
+          neighbor._timeToLive = _timeToLive - 1;
+        }
         return;
       }
 
