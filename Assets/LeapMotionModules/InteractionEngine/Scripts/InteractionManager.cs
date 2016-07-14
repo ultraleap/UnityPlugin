@@ -42,6 +42,9 @@ namespace Leap.Unity.Interaction {
     protected string _ldatPath = "InteractionEngine/IE.ldat";
 
     [Header("Interaction Settings")]
+    [Tooltip("The default Interaction Material to use for Interaction Behaviours if none is specified, or for Interaction Behaviours created via scripting.")]
+    public InteractionMaterial defaultInteractionMaterial;
+
     [Tooltip("Allow the Interaction Engine to modify object velocities when pushing.")]
     [SerializeField]
     protected bool _contactEnabled = true;
@@ -49,6 +52,10 @@ namespace Leap.Unity.Interaction {
     [Tooltip("Allow the Interaction plugin to modify object positions by grasping.")]
     [SerializeField]
     protected bool _graspingEnabled = true;
+
+    [Tooltip("Allow the Interaction plugin to modify object velocities when grazing object edges.")]
+    [SerializeField]
+    protected bool _brushingEnabled = true;
 
     [Tooltip("Depth before collision response becomes as if holding a sphere.")]
     [SerializeField]
@@ -201,20 +208,45 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Gets whether or not the Interaction Engine can modify object velocities when pushing.
+    /// Gets or sets whether or not the Interaction Engine can modify object velocities when pushing.
     /// </summary>
     public bool ContactEnabled {
       get {
         return _contactEnabled;
       }
+      set {
+        if (_contactEnabled != value) {
+          _contactEnabled = value;
+          UpdateSceneInfo();
+        }
+      }
     }
 
     /// <summary>
-    /// Gets whether or not the Interaction plugin to modify object positions by grasping.
+    /// Gets or sets whether or not the Interaction Engine can modify object positions by grasping.
     /// </summary>
     public bool GraspingEnabled {
       get {
         return _graspingEnabled;
+      }
+      set {
+        if (_graspingEnabled != value) {
+          _graspingEnabled = value;
+          UpdateSceneInfo();
+        }
+      }
+    }
+
+    /// <summary>
+    /// Gets or sets whether or not the Interaction Engine should allow brush hands when grazing the edges of objects.
+    /// </summary>
+    public bool BrushingEnabled {
+      get {
+        return _brushingEnabled;
+      }
+      set {
+        _brushingEnabled = value;
+        Physics.IgnoreLayerCollision(_brushHandLayer, _interactionLayer, !_brushingEnabled); // Don't ignore brush layer collision if contact is enabled
       }
     }
 
@@ -606,8 +638,8 @@ namespace Leap.Unity.Interaction {
       }
 
       //After copy and set we specify the interactions between the brush and interaction objects
-      if (_contactEnabled) {
-        Physics.IgnoreLayerCollision(_brushLayer, _interactionLayer, false);
+      if (_brushingEnabled) {
+        Physics.IgnoreLayerCollision(_brushHandLayer, _interactionLayer, false);
       }
     }
 

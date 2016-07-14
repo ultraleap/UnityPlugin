@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using Leap.Unity.Interaction.CApi;
 using LeapInternal;
+using UnityEditor;
 
 namespace Leap.Unity.Interaction {
 
@@ -122,6 +123,9 @@ namespace Leap.Unity.Interaction {
     public InteractionMaterial material {
       get {
         return _material;
+      }
+      set {
+        _material = value;
       }
     }
 
@@ -446,6 +450,23 @@ namespace Leap.Unity.Interaction {
     public override void NotifyBrushDislocated() {
       _dislocatedBrushCounter = 0;
       updateContactMode();
+    }
+
+    #endregion
+
+    #region UNITY EVENTS
+
+    protected override void Reset() {
+      base.Reset();
+      if (_material == null) {
+        if (_manager == null) {
+          return;
+        }
+        else {
+          Debug.LogWarning("No InteractionMaterial specified; will use the default InteractionMaterial as specified by the InteractionManager.");
+          _material = _manager.defaultInteractionMaterial;
+        }
+      }
     }
 
     #endregion

@@ -450,6 +450,11 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region UNITY MESSAGES
+
+    protected virtual void Awake() {
+      this.Reset();
+    }
+
     protected virtual void Reset() {
       if (_manager == null) {
         //If manager is null, first check our parents for one, then search the whole scene
