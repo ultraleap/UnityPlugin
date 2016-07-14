@@ -152,13 +152,18 @@ namespace Leap.Unity.Interaction {
     }
 
     public bool IsActive(IInteractionBehaviour interactionBehaviour) {
-      return _registeredBehaviours[interactionBehaviour] != null;
+      ActivityMonitor monitor;
+      if (_registeredBehaviours.TryGetValue(interactionBehaviour, out monitor)) {
+        return monitor != null;
+      }
+      return false; // Not even registered.
     }
 
     public bool IsRegistered(IInteractionBehaviour interactionBehaviour) {
       return _registeredBehaviours.ContainsKey(interactionBehaviour);
     }
 
+    // HACK FIXME TODO:  This needs to be on the FixedUpdate
     public void Update(Frame frame) {
       markOverlappingObjects(frame.Hands);
 
