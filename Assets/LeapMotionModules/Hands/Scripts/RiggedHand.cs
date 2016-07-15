@@ -269,7 +269,7 @@ namespace Leap.Unity {
         //SetTransformFromMatrix(boneTrans, ref localMatrix);
 
         //boneTrans.position = localMatrix.MultiplyPoint(Vector3.zero);
-        boneTrans.rotation = Quaternion.LookRotation(localMatrix.GetColumn(2), localMatrix.GetColumn(1));
+        boneTrans.rotation = palm.parent.transform.parent.rotation * Quaternion.LookRotation(localMatrix.GetColumn(2), localMatrix.GetColumn(1));
       }
     }
   }
