@@ -36,19 +36,25 @@ namespace Leap.Unity {
         setEditorLeapPose = value;
       }
     }
-    void OnValidate() {
-      if (SetEditorLeapPose == setEditorLeapPose) {
-        SetEditorLeapPose = setEditorLeapPose;
-      }
 
-    }
 
     [Tooltip("Hands are typically rigged in 3D packages with the palm transform near the wrist. Uncheck this is your model's palm transform is at the center of the palm similar to Leap's API drives")]
     public bool ModelPalmAtLeapWrist = true;
     public bool UseMetaCarpals;
     public Vector3 modelFingerPointing = new Vector3(0, 0, 0);
     public Vector3 modelPalmFacing = new Vector3(0, 0, 0);
+    [Header("Value for Stored Start Pose")]
+    [SerializeField]
+    private List<Quaternion> localRotations = new List<Quaternion>();
+    [SerializeField]
+    private List<Vector3> localPositions = new List<Vector3>();
 
+    void OnValidate() {
+      if (SetEditorLeapPose == setEditorLeapPose) {
+        SetEditorLeapPose = setEditorLeapPose;
+      }
+
+    }
     public override void InitHand() {
       UpdateHand();
     }
@@ -257,10 +263,6 @@ namespace Leap.Unity {
       }
       return zeroed;
     }
-    [SerializeField]
-    private List<Quaternion> localRotations = new List<Quaternion>();
-    [SerializeField]
-    private List<Vector3> localPositions = new List<Vector3>();
 
     [ContextMenu("StoreLocalRotations")]
     public void StoreLocalRotations() {

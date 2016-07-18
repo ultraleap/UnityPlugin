@@ -10,8 +10,6 @@ namespace Leap.Unity {
 
     public string ModelGroupName = null;
     public bool UseMetaCarpals;
-    public SkinnedMeshRenderer HandMesh_Left;
-    public SkinnedMeshRenderer HandMesh_Right;
 
     [Header("RiggedHand Components")]
     public RiggedHand RiggedHand_L;
@@ -36,6 +34,11 @@ namespace Leap.Unity {
     public Vector3 modelFingerPointing_R = new Vector3(0, 0, 0);
     public Vector3 modelPalmFacing_R = new Vector3(0, 0, 0);
 
+    //Skinnedmeshes are needed for storing Start Pose
+    [Header("Skinned Meshes for Hands")]
+    public SkinnedMeshRenderer HandMesh_Left;
+    public SkinnedMeshRenderer HandMesh_Right;
+
     [ContextMenu("AutoRig")]
     public void AutoRig() {
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
@@ -43,6 +46,7 @@ namespace Leap.Unity {
       if (AnimatorForMapping != null) {
         if (AnimatorForMapping.isHuman == true) {
           AutoRigMecanim();
+          AutoAssignSkinnedMesh();
           return;
         }
         else {
@@ -50,7 +54,26 @@ namespace Leap.Unity {
         }
       }
       AutoRigByName();
+      AutoAssignSkinnedMesh();
     }
+    public void AutoAssignSkinnedMesh() {
+      SkinnedMeshRenderer[] skinnedMeshesInChildren = GetComponentsInChildren<SkinnedMeshRenderer>();
+      if (skinnedMeshesInChildren.Length > 1) {
+        Debug.LogWarning("Since there are more than one skinned meshes in the hierarchy, please manually assign skinned meshes for each hand in the LeapHandsAutoRig component.");
+        return;
+      }
+      if(skinnedMeshesInChildren.Length == 1){
+        HandMesh_Left = skinnedMeshesInChildren[0];
+        HandMesh_Right = skinnedMeshesInChildren[0];
+        if (RiggedHand_L) {
+          RiggedHand_L.HandMesh = HandMesh_Left;
+        }
+        if (RiggedHand_R) {
+          RiggedHand_R.HandMesh = HandMesh_Right;
+        }
+      }
+    }
+
     [ContextMenu("StoreStartPose")]
     public void StoreStartPose() {
       RiggedHand_L.StoreLocalRotations();
