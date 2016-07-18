@@ -21,6 +21,8 @@ namespace Leap.Unity {
     public override bool SupportsEditorPersistence() {
       return SetEditorLeapPose;
     }
+    public SkinnedMeshRenderer HandMesh;
+
     [SerializeField]
     private bool setEditorLeapPose = true;
     
@@ -259,8 +261,10 @@ namespace Leap.Unity {
     [ContextMenu("ResetToBindPose")]
     public void ResetToBindPose() {
       Debug.Log("resetToBindPose()");
-      SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
-      Mesh mesh = skinnedMesh.sharedMesh;
+      //SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
+      SkinnedMeshRenderer skinnedMesh = HandMesh;
+      //Mesh mesh = skinnedMesh.sharedMesh;
+      Mesh mesh = HandMesh.sharedMesh;
       for (int i = 0; i < skinnedMesh.bones.Length; i++) {
         Transform boneTrans = skinnedMesh.bones[i];
         // Recreate the local transform matrix of the bone
