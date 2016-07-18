@@ -10,6 +10,8 @@ namespace Leap.Unity {
 
     public string ModelGroupName = null;
     public bool UseMetaCarpals;
+    public SkinnedMeshRenderer HandMesh_Left;
+    public SkinnedMeshRenderer HandMesh_Right;
 
     [Header("RiggedHand Components")]
     public RiggedHand RiggedHand_L;
@@ -48,6 +50,16 @@ namespace Leap.Unity {
         }
       }
       AutoRigByName();
+    }
+    [ContextMenu("StoreStartPose")]
+    public void StoreStartPose() {
+      RiggedHand_L.StoreLocalRotations();
+      RiggedHand_R.StoreLocalRotations();
+    }
+    [ContextMenu("ResetStartPose")]
+    public void ResetStartPose() {
+      RiggedHand_L.ResetLocalRotations();
+      RiggedHand_R.ResetLocalRotations();
     }
 
     [ContextMenu("AutoRigByName")]
@@ -233,6 +245,13 @@ namespace Leap.Unity {
         RiggedFinger_R_Pinky.modelFingerPointing = modelFingerPointing_R;
         RiggedFinger_R_Pinky.modelPalmFacing = modelPalmFacing_R;
       }
+      if (HandMesh_Left && RiggedHand_L) {
+        RiggedHand_L.HandMesh = HandMesh_Left;
+      }
+      if (HandMesh_Right && RiggedHand_R) {
+        RiggedHand_R.HandMesh = HandMesh_Right;
+      }
+
     }
 
     void OnDestroy() {
