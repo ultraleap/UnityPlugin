@@ -257,7 +257,37 @@ namespace Leap.Unity {
       }
       return zeroed;
     }
+    [SerializeField]
+    private List<Quaternion> localRotations = new List<Quaternion>();
+    [SerializeField]
+    private List<Vector3> localPositions = new List<Vector3>();
 
+    [ContextMenu("StoreLocalRotations")]
+    public void StoreLocalRotations() {
+      Debug.Log("StoreLocalRotations()");
+      //SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
+      //Mesh mesh = skinnedMesh.sharedMesh;
+      SkinnedMeshRenderer skinnedMesh = HandMesh;
+      Mesh mesh = HandMesh.sharedMesh;
+      for (int i = 0; i < skinnedMesh.bones.Length; i++) {
+        Transform boneTrans = skinnedMesh.bones[i];
+        localRotations.Add(boneTrans.localRotation);
+        localPositions.Add(boneTrans.localPosition);
+      }
+    }
+    [ContextMenu("ResetLocalRotations")]
+    public void ResetLocalRotations() {
+      Debug.Log("ResetLocalRotations()");
+      //SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
+      //Mesh mesh = skinnedMesh.sharedMesh;
+      SkinnedMeshRenderer skinnedMesh = HandMesh;
+      Mesh mesh = HandMesh.sharedMesh;
+      for (int i = 0; i < skinnedMesh.bones.Length; i++) {
+        Transform boneTrans = skinnedMesh.bones[i];
+        boneTrans.localRotation = localRotations[i];
+        boneTrans.localPosition = localPositions[i];
+      }
+    }
     [ContextMenu("ResetToBindPose")]
     public void ResetToBindPose() {
       Debug.Log("resetToBindPose()");
