@@ -21,7 +21,7 @@ namespace Leap.Unity {
     public override bool SupportsEditorPersistence() {
       return SetEditorLeapPose;
     }
-    public SkinnedMeshRenderer HandMesh;
+    private SkinnedMeshRenderer HandMesh;
 
     [SerializeField]
     private bool setEditorLeapPose = true;
@@ -44,6 +44,8 @@ namespace Leap.Unity {
     public Vector3 modelFingerPointing = new Vector3(0, 0, 0);
     public Vector3 modelPalmFacing = new Vector3(0, 0, 0);
     [Header("Values for Stored Start Pose")]
+    [SerializeField]
+    private List<Transform> jointList = new List<Transform>();
     [SerializeField]
     private List<Quaternion> localRotations = new List<Quaternion>();
     [SerializeField]
@@ -269,8 +271,10 @@ namespace Leap.Unity {
       Debug.Log("StoreLocalRotations()");
       //SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
       //Mesh mesh = skinnedMesh.sharedMesh;
+      
       SkinnedMeshRenderer skinnedMesh = HandMesh;
       Mesh mesh = HandMesh.sharedMesh;
+
       for (int i = 0; i < skinnedMesh.bones.Length; i++) {
         Transform boneTrans = skinnedMesh.bones[i];
         localRotations.Add(boneTrans.localRotation);
@@ -310,6 +314,23 @@ namespace Leap.Unity {
 
         //boneTrans.position = localMatrix.MultiplyPoint(Vector3.zero);
         boneTrans.rotation = palm.parent.transform.parent.rotation * Quaternion.LookRotation(localMatrix.GetColumn(2), localMatrix.GetColumn(1));
+      }
+    }
+
+    [ContextMenu("StoreJointsStartPose")]
+    public void StoreJointsStartPose() {
+      foreach (Transform t in palm.parent.GetComponentsInChildren<Transform>()) {
+        jointList.Add(t);
+        localRotations.Add(t.localRotation);
+        localPositions.Add(t.localPosition);
+      }
+    }
+    [ContextMenu("ReStoreJointsStartPose")]
+    public void ReStoreJointsStartPose() {
+      for (int i = 0; i < jointList.Count; i++) {
+        Transform jointTrans = jointList[i];
+        jointTrans.localRotation = localRotations[i];
+        jointTrans.localPosition = localPositions[i];
       }
     }
   }
