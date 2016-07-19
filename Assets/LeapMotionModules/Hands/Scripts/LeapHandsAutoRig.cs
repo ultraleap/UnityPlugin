@@ -33,6 +33,9 @@ namespace Leap.Unity {
     public Vector3 modelPalmFacing_L = new Vector3(0, 0, 0);
     public Vector3 modelFingerPointing_R = new Vector3(0, 0, 0);
     public Vector3 modelPalmFacing_R = new Vector3(0, 0, 0);
+    public bool FlipPalms = false;
+    private bool flippedPalmsState = false;
+    
 
     [ContextMenu("AutoRig")]
     public void AutoRig() {
@@ -205,7 +208,11 @@ namespace Leap.Unity {
       }
     }
     void OnValidate() {
-
+      if (FlipPalms != flippedPalmsState) {
+        modelPalmFacing_L = modelPalmFacing_L * -1f;
+        modelPalmFacing_R = modelPalmFacing_R * -1f;
+        flippedPalmsState = FlipPalms;
+      }
 
 
       //push palm and finger facing values to RiggedHand's and RiggedFinger's
