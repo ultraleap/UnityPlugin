@@ -21,8 +21,6 @@ namespace Leap.Unity {
     public override bool SupportsEditorPersistence() {
       return SetEditorLeapPose;
     }
-    private SkinnedMeshRenderer HandMesh;
-
     [SerializeField]
     private bool setEditorLeapPose = true;
     
@@ -31,12 +29,11 @@ namespace Leap.Unity {
       set {
 
         if (value == false) {
-          //ResetToBindPose();
+          RestoreJointsStartPose();
         }
         setEditorLeapPose = value;
       }
     }
-
 
     [Tooltip("Hands are typically rigged in 3D packages with the palm transform near the wrist. Uncheck this is your model's palm transform is at the center of the palm similar to Leap's API drives")]
     public bool ModelPalmAtLeapWrist = true;
@@ -55,7 +52,6 @@ namespace Leap.Unity {
       if (SetEditorLeapPose == setEditorLeapPose) {
         SetEditorLeapPose = setEditorLeapPose;
       }
-
     }
     public override void InitHand() {
       UpdateHand();
@@ -119,7 +115,6 @@ namespace Leap.Unity {
       modelFingerPointing = calculateModelFingerPointing();
       setFingerPalmFacing();
     }
-    [ContextMenu("Auto Rig Hand")]
     public void AutoRigRiggedHand(Transform palm, Transform finger1, Transform finger2) {
       Debug.Log("AutoRigRiggedHand()");
       modelFingerPointing = new Vector3(0, 0, 0);
@@ -129,9 +124,7 @@ namespace Leap.Unity {
       modelFingerPointing = calculateModelFingerPointing();
       setFingerPalmFacing();
     }
-    [ContextMenu("Assign Rigged Fingers")]
     private void assignRiggedFingersByName(){
-      Debug.Log("1");
       List<string> palmStrings = new List<string> { "palm", "Palm", "PALM" };
       List<string> thumbStrings = new List<string> { "thumb", "tmb", "Thumb", "THUMB" };
       List<string> indexStrings = new List<string> { "index", "idx" , "Index", "INDEX"};
@@ -147,13 +140,9 @@ namespace Leap.Unity {
       Transform pinky = null;
       Transform[] children = transform.GetComponentsInChildren<Transform>();
       if (palmStrings.Any(w => transform.name.Contains(w)) ==true ){
-        Debug.Log("2");
-
         base.palm = transform;
       }
       else{
-        Debug.Log("3");
-
         foreach (Transform t in children) {
           if (palmStrings.Any(w => t.name.Contains(w)) == true) {
             base.palm = t;
@@ -230,25 +219,12 @@ namespace Leap.Unity {
       else perpendicular = Vector3.Cross(side1, side2);
       Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
       return calculatedPalmFacing * 1; //+works for Mixamo, -reversed LoPoly_Hands_Skeleton and Winston
-      //if (Handedness == Chirality.Right) {
-      //  return new Vector3(0, -1, 0);
-      //}
-      //else {
-      //  return new Vector3(0, 1, 0);
-      //}
     }
 
     private Vector3 calculateModelFingerPointing() {
       Vector3 distance = palm.transform.InverseTransformPoint(fingers[2].transform.GetChild(0).transform.position) - palm.transform.InverseTransformPoint(palm.position);
       Vector3 calculatedFingerPointing = CalculateZeroedVector(distance);
-      //reversed if using SetupRiggedHand on separate LoPoly_Hands
       return calculatedFingerPointing * -1f;
-
-      //Hard wired vectors below are Reversed between suit01 and LoPoly_Hands_Skeleton
-      //if (Handedness == Chirality.Right) {
-      //  return new Vector3(-1, 0, 0);
-      //}
-      //else return new Vector3(1, 0, 0);
     }
 
     public static Vector3 CalculateZeroedVector(Vector3 vectorToZero) {
@@ -266,57 +242,6 @@ namespace Leap.Unity {
       return zeroed;
     }
 
-    [ContextMenu("StoreLocalRotations")]
-    public void StoreLocalRotations() {
-      Debug.Log("StoreLocalRotations()");
-      //SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
-      //Mesh mesh = skinnedMesh.sharedMesh;
-      
-      SkinnedMeshRenderer skinnedMesh = HandMesh;
-      Mesh mesh = HandMesh.sharedMesh;
-
-      for (int i = 0; i < skinnedMesh.bones.Length; i++) {
-        Transform boneTrans = skinnedMesh.bones[i];
-        localRotations.Add(boneTrans.localRotation);
-        localPositions.Add(boneTrans.localPosition);
-      }
-    }
-    [ContextMenu("ResetLocalRotations")]
-    public void ResetLocalRotations() {
-      Debug.Log("ResetLocalRotations()");
-      //SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
-      //Mesh mesh = skinnedMesh.sharedMesh;
-      if (localRotations.Count == 0 || localRotations == null) {
-        Debug.LogWarning("Store Local Rotations must be run before Reset Local Rotations");
-        return;
-      }
-      SkinnedMeshRenderer skinnedMesh = HandMesh;
-      Mesh mesh = HandMesh.sharedMesh;
-      for (int i = 0; i < skinnedMesh.bones.Length; i++) {
-        Transform boneTrans = skinnedMesh.bones[i];
-        boneTrans.localRotation = localRotations[i];
-        boneTrans.localPosition = localPositions[i];
-      }
-    }
-    [ContextMenu("ResetToBindPose")]
-    public void ResetToBindPose() {
-      Debug.Log("resetToBindPose()");
-      //SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
-      SkinnedMeshRenderer skinnedMesh = HandMesh;
-      //Mesh mesh = skinnedMesh.sharedMesh;
-      Mesh mesh = HandMesh.sharedMesh;
-      for (int i = 0; i < skinnedMesh.bones.Length; i++) {
-        Transform boneTrans = skinnedMesh.bones[i];
-        // Recreate the local transform matrix of the bone
-        Matrix4x4 localMatrix = mesh.bindposes[i].inverse;
-        //UnityEngine.Matrix4x4 localMatrix = savedBindPoses[i].inverse;
-        //SetTransformFromMatrix(boneTrans, ref localMatrix);
-
-        //boneTrans.position = localMatrix.MultiplyPoint(Vector3.zero);
-        boneTrans.rotation = palm.parent.transform.parent.rotation * Quaternion.LookRotation(localMatrix.GetColumn(2), localMatrix.GetColumn(1));
-      }
-    }
-
     [ContextMenu("StoreJointsStartPose")]
     public void StoreJointsStartPose() {
       foreach (Transform t in palm.parent.GetComponentsInChildren<Transform>()) {
@@ -325,8 +250,8 @@ namespace Leap.Unity {
         localPositions.Add(t.localPosition);
       }
     }
-    [ContextMenu("ReStoreJointsStartPose")]
-    public void ReStoreJointsStartPose() {
+    [ContextMenu("RestoreJointsStartPose")]
+    public void RestoreJointsStartPose() {
       for (int i = 0; i < jointList.Count; i++) {
         Transform jointTrans = jointList[i];
         jointTrans.localRotation = localRotations[i];
