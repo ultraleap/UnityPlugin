@@ -10,7 +10,7 @@ namespace Leap.Unity {
 
     public string ModelGroupName = null;
     public bool UseMetaCarpals;
-
+    public bool SetEditorLeapPose = false;
     [Header("RiggedHand Components")]
     public RiggedHand RiggedHand_L;
     public RiggedHand RiggedHand_R;
@@ -225,12 +225,17 @@ namespace Leap.Unity {
       }
     }
     void OnValidate() {
+
+
+
       //push palm and finger facing values to RiggedHand's and RiggedFinger's
       if (RiggedHand_L) {
+        RiggedHand_L.SetEditorLeapPose = SetEditorLeapPose;
         RiggedHand_L.modelFingerPointing = modelFingerPointing_L;
         RiggedHand_L.modelPalmFacing = modelPalmFacing_L;
       }
       if (RiggedHand_R) {
+        RiggedHand_R.SetEditorLeapPose = SetEditorLeapPose;
         RiggedHand_R.modelFingerPointing = modelFingerPointing_R;
         RiggedHand_R.modelPalmFacing = modelPalmFacing_R;
       }
