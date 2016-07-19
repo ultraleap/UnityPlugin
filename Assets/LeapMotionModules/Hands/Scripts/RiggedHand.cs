@@ -43,7 +43,7 @@ namespace Leap.Unity {
     public bool UseMetaCarpals;
     public Vector3 modelFingerPointing = new Vector3(0, 0, 0);
     public Vector3 modelPalmFacing = new Vector3(0, 0, 0);
-    [Header("Value for Stored Start Pose")]
+    [Header("Values for Stored Start Pose")]
     [SerializeField]
     private List<Quaternion> localRotations = new List<Quaternion>();
     [SerializeField]
@@ -282,6 +282,10 @@ namespace Leap.Unity {
       Debug.Log("ResetLocalRotations()");
       //SkinnedMeshRenderer skinnedMesh = GetComponentInChildren<SkinnedMeshRenderer>();
       //Mesh mesh = skinnedMesh.sharedMesh;
+      if (localRotations.Count == 0 || localRotations == null) {
+        Debug.LogWarning("Store Local Rotations must be run before Reset Local Rotations");
+        return;
+      }
       SkinnedMeshRenderer skinnedMesh = HandMesh;
       Mesh mesh = HandMesh.sharedMesh;
       for (int i = 0; i < skinnedMesh.bones.Length; i++) {

@@ -76,13 +76,19 @@ namespace Leap.Unity {
 
     [ContextMenu("StoreStartPose")]
     public void StoreStartPose() {
-      RiggedHand_L.StoreLocalRotations();
-      RiggedHand_R.StoreLocalRotations();
+      if (RiggedHand_L && RiggedHand_R) {
+        RiggedHand_L.StoreLocalRotations();
+        RiggedHand_R.StoreLocalRotations();
+      }
+      else Debug.LogWarning("Please AutoRig before attempting to Store Start Pose");
     }
     [ContextMenu("ResetStartPose")]
     public void ResetStartPose() {
-      RiggedHand_L.ResetLocalRotations();
-      RiggedHand_R.ResetLocalRotations();
+      if (RiggedHand_L && RiggedHand_R) {
+        RiggedHand_L.ResetLocalRotations();
+        RiggedHand_R.ResetLocalRotations();
+      }
+      else Debug.LogWarning("Please AutoRig and Start Pose before attempting to Reset to Start Pose");
     }
 
     [ContextMenu("AutoRigByName")]
