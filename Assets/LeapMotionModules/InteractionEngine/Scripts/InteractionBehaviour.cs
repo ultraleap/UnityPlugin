@@ -452,6 +452,28 @@ namespace Leap.Unity.Interaction {
 
     #region UNITY CALLBACKS
 
+    protected override void Awake() {
+      base.Awake();
+      CheckMaterial();
+    }
+
+    protected override void Reset() {
+      base.Reset();
+      CheckMaterial();
+    }
+
+    private void CheckMaterial() {
+      if (_material == null) {
+        if (_manager == null) {
+          return;
+        }
+        else {
+          Debug.LogWarning("No InteractionMaterial specified; will use the default InteractionMaterial as specified by the InteractionManager.");
+          _material = _manager.DefaultInteractionMaterial;
+        }
+      }
+    }
+
 #if UNITY_EDITOR
     private void OnCollisionEnter(Collision collision) {
       GameObject otherObj = collision.collider.gameObject;

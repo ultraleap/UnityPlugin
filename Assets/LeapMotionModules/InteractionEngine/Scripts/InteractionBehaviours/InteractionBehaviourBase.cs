@@ -450,7 +450,16 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region UNITY MESSAGES
+
+    protected virtual void Awake() {
+      FindInteractionManager();
+    }
+
     protected virtual void Reset() {
+      FindInteractionManager();
+    }
+
+    private void FindInteractionManager() {
       if (_manager == null) {
         //If manager is null, first check our parents for one, then search the whole scene
         _manager = GetComponentInParent<InteractionManager>();
