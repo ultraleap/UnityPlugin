@@ -469,7 +469,7 @@ namespace Leap.Unity.Interaction {
         }
         else {
           Debug.LogWarning("No InteractionMaterial specified; will use the default InteractionMaterial as specified by the InteractionManager.");
-          _material = _manager.defaultInteractionMaterial;
+          _material = _manager.DefaultInteractionMaterial;
         }
       }
     }

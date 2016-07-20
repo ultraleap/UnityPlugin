@@ -43,9 +43,8 @@ namespace Leap.Unity.Interaction {
 
     [Header("Interaction Settings")]
     [Tooltip("The default Interaction Material to use for Interaction Behaviours if none is specified, or for Interaction Behaviours created via scripting.")]
-    public InteractionMaterial defaultInteractionMaterial;
+    protected InteractionMaterial _defaultInteractionMaterial;
 
-    [Header("Interaction Settings")]
     [Tooltip("Allow the Interaction Engine to modify object velocities when pushing.")]
     [SerializeField]
     protected bool _contactEnabled = true;
@@ -201,6 +200,18 @@ namespace Leap.Unity.Interaction {
     public ReadonlyList<IInteractionBehaviour> GraspedObjects {
       get {
         return _graspedBehaviours;
+      }
+    }
+
+    /// <summary>
+    /// Gets or sets the default InteractionMaterial used when InteractionBehaviours are spawned without a material explicitly assigned.
+    /// </summary>
+    public InteractionMaterial DefaultInteractionMaterial {
+      get {
+        return _defaultInteractionMaterial;
+      }
+      set {
+        _defaultInteractionMaterial = value;
       }
     }
 
