@@ -50,8 +50,9 @@ namespace Leap.Unity {
 #if UNITY_EDITOR
     void Update() {
       Transform editorPoseSpace;
-      if (transform.root.GetComponentInChildren<LeapHandController>() != null) {
-        editorPoseSpace = transform.root.GetComponentInChildren<LeapHandController>().transform;
+      LeapServiceProvider leapServiceProvider = (LeapServiceProvider)FindObjectOfType(typeof(LeapServiceProvider));
+      if (leapServiceProvider) {
+        editorPoseSpace = leapServiceProvider.transform;
       }
       else editorPoseSpace = transform;
       if (!EditorApplication.isPlaying && SupportsEditorPersistence()) {
