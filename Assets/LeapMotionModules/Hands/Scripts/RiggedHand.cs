@@ -156,30 +156,34 @@ namespace Leap.Unity {
       }
       if (palm) {
         foreach (Transform t in children) {
-          if (thumbStrings.Any(w => t.name.Contains(w)) ==true && t.parent == palm) { 
-            thumb = t;
-            RiggedFinger newRiggedFinger = thumb.gameObject.AddComponent<RiggedFinger>();
-            newRiggedFinger.fingerType = Finger.FingerType.TYPE_THUMB;
-          }
-          if (indexStrings.Any(w => t.name.Contains(w)) == true && t.parent == palm) {
-            index = t;
-            RiggedFinger newRiggedFinger = index.gameObject.AddComponent<RiggedFinger>();
-            newRiggedFinger.fingerType = Finger.FingerType.TYPE_INDEX;
-          }
-          if (middleStrings.Any(w => t.name.Contains(w)) == true && t.parent == palm) {
-            middle = t;
-            RiggedFinger newRiggedFinger = middle.gameObject.AddComponent<RiggedFinger>();
-            newRiggedFinger.fingerType = Finger.FingerType.TYPE_MIDDLE;
-          }
-          if (ringStrings.Any(w => t.name.Contains(w)) == true && t.parent == palm) {
-            ring = t;
-            RiggedFinger newRiggedFinger = ring.gameObject.AddComponent<RiggedFinger>();
-            newRiggedFinger.fingerType = Finger.FingerType.TYPE_RING;
-          }
-          if (pinkyStrings.Any(w => t.name.Contains(w)) == true && t.parent == palm) {
-            pinky = t;
-            RiggedFinger newRiggedFinger = pinky.gameObject.AddComponent<RiggedFinger>();
-            newRiggedFinger.fingerType = Finger.FingerType.TYPE_PINKY;
+          RiggedFinger preExistingRiggedFinger;
+          preExistingRiggedFinger = t.GetComponent<RiggedFinger>();
+          if (!preExistingRiggedFinger) {
+            if (thumbStrings.Any(w => t.name.Contains(w)) == true && t.parent == palm) {
+              thumb = t;
+              RiggedFinger newRiggedFinger = thumb.gameObject.AddComponent<RiggedFinger>();
+              newRiggedFinger.fingerType = Finger.FingerType.TYPE_THUMB;
+            }
+            if (indexStrings.Any(w => t.name.Contains(w)) == true && t.parent == palm) {
+              index = t;
+              RiggedFinger newRiggedFinger = index.gameObject.AddComponent<RiggedFinger>();
+              newRiggedFinger.fingerType = Finger.FingerType.TYPE_INDEX;
+            }
+            if (middleStrings.Any(w => t.name.Contains(w)) == true && t.parent == palm) {
+              middle = t;
+              RiggedFinger newRiggedFinger = middle.gameObject.AddComponent<RiggedFinger>();
+              newRiggedFinger.fingerType = Finger.FingerType.TYPE_MIDDLE;
+            }
+            if (ringStrings.Any(w => t.name.Contains(w)) == true && t.parent == palm) {
+              ring = t;
+              RiggedFinger newRiggedFinger = ring.gameObject.AddComponent<RiggedFinger>();
+              newRiggedFinger.fingerType = Finger.FingerType.TYPE_RING;
+            }
+            if (pinkyStrings.Any(w => t.name.Contains(w)) == true && t.parent == palm) {
+              pinky = t;
+              RiggedFinger newRiggedFinger = pinky.gameObject.AddComponent<RiggedFinger>();
+              newRiggedFinger.fingerType = Finger.FingerType.TYPE_PINKY;
+            }
           }
         }
       }
