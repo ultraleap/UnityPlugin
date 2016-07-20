@@ -67,7 +67,10 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public abstract bool IsBeingGraspedByHand(int handId);
 
-
+    /// <summary>
+    /// Returns whether or not this object can be deactivated.
+    /// </summary>
+    public abstract bool IsAbleToBeDeactivated();
 
     /// <summary>
     /// Called by InteractionManager when the behaviour is successfully registered with the manager.

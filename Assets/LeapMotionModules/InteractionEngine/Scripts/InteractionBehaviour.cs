@@ -54,7 +54,8 @@ namespace Leap.Unity.Interaction {
     protected float _drag;
     protected float _angularDrag;
 
-    private const int DISLOCATED_BRUSH_COOLDOWN = 3;
+    // Try to allow brushes to exit gracefully when passing fingers between objects.
+    private const int DISLOCATED_BRUSH_COOLDOWN = 60;
     protected uint _dislocatedBrushCounter = DISLOCATED_BRUSH_COOLDOWN;
     protected ContactMode _contactMode = ContactMode.NORMAL;
 
@@ -163,6 +164,10 @@ namespace Leap.Unity.Interaction {
     }
     #endregion
 
+    public override bool IsAbleToBeDeactivated() {
+      return _contactMode == ContactMode.NORMAL && UntrackedHandCount == 0;
+    }
+
     #region INTERACTION CALLBACKS
 
     protected override void OnRegistered() {
@@ -186,6 +191,10 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnUnregistered() {
       base.OnUnregistered();
+
+      Assert.IsTrue(UntrackedHandCount == 0);
+      _contactMode = ContactMode.NORMAL;
+      updateLayer();
 
       _warper.Dispose();
       _warper = null;

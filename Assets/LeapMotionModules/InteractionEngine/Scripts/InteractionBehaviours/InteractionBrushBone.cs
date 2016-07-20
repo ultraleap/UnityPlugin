@@ -10,10 +10,9 @@ namespace Leap.Unity.Interaction {
     public Rigidbody capsuleBody;
     public CapsuleCollider capsuleCollider;
     public Vector3 lastTarget;
-    public int dislocationCounter = 0;
 
-    // Once the dislocationCounter expires and the brush becomes dislocated, the brush then
-    // remains dislocated until it stops triggering and then the _dislocatedCounter expires.
+    // Once the brush becomes dislocated, it then remains dislocated until it
+    // stops triggering and then the _dislocatedCounter expires.
     private const int DISLOCATED_BRUSH_COOLDOWN = 3;
     private int _dislocatedCounter = DISLOCATED_BRUSH_COOLDOWN;
 

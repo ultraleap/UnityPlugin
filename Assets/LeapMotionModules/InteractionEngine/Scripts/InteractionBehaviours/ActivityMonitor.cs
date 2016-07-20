@@ -3,21 +3,22 @@
 namespace Leap.Unity.Interaction {
 
   public class ActivityMonitor : MonoBehaviour {
-    public const int DISABLE_HYSTERESIS = 5;
+    private const int HYSTERESIS_TIMEOUT = 5;
 
     public enum GizmoType {
       InteractionStatus,
       ActivityDepth
     }
 
-    public static GizmoType gizmoType = GizmoType.InteractionStatus;
+    public static GizmoType gizmoType = GizmoType.ActivityDepth;
 
+    // Caches index into ActivityManager array.
     public int arrayIndex = -1;
 
     private IInteractionBehaviour _interactionBehaviour;
     private ActivityManager _manager;
-    private int _life;
-    private int _maxNeighborLife;
+    private int _timeToLive = 0; // Converges to remaining allowed distance to hands across contact graph.
+    private int _timeToDie = 0;  // Timer after _timeToLive goes negative before deactivation.
 
     public void Init(IInteractionBehaviour interactionBehaviour, ActivityManager manager) {
       _interactionBehaviour = interactionBehaviour;
@@ -26,24 +27,26 @@ namespace Leap.Unity.Interaction {
     }
 
     public void Revive() {
-      _maxNeighborLife = _manager.MaxDepth;
-      _life = _manager.MaxDepth;
+      // This has a contact graph distance of 0 from the hands.
+      _timeToLive = _manager.MaxDepth;
     }
 
     void FixedUpdate() {
-      if (_life >= _maxNeighborLife) {
-        _life--;
+
+      // Grasped objects do not intersect the brush layer but are still touching hands.
+      if (_interactionBehaviour.IsBeingGrasped) {
+        Revive();
+        return;
       }
 
-      if (_life < -DISABLE_HYSTERESIS) {
-        if (_interactionBehaviour.IsBeingGrasped || _interactionBehaviour.UntrackedHandCount > 0) {
-          _life = 1;
-        } else {
+      if (_timeToLive > 0) {
+        --_timeToLive;
+        _timeToDie = 0;
+      } else {
+        if (_interactionBehaviour.IsAbleToBeDeactivated() && ++_timeToDie >= HYSTERESIS_TIMEOUT) {
           _manager.Deactivate(_interactionBehaviour);
         }
       }
-
-      _maxNeighborLife = int.MinValue;
     }
 
     void OnCollisionEnter(Collision collision) {
@@ -55,27 +58,45 @@ namespace Leap.Unity.Interaction {
     }
 
     private void handleCollision(Collision collision) {
-      if (collision.rigidbody == null) {
+      IInteractionBehaviour otherBehaviour = null;
+      ActivityMonitor neighbor = collision.gameObject.GetComponent<ActivityMonitor>();
+      if (neighbor != null) {
+        if (arrayIndex > neighbor.arrayIndex) {
+          return; // Only need to do this on one side of a pair.
+        }
+
+        otherBehaviour = neighbor._interactionBehaviour;
+      }
+      else {
+        if(_timeToLive <= 1) {
+          return; // Do not activate neighbor.
+        }
+
+        otherBehaviour = collision.gameObject.GetComponent<IInteractionBehaviour>();
+        if (otherBehaviour == null) {
+          return;
+        }
+
+        // Unregistered behaviours will fail to activate.
+        neighbor = _manager.Activate(otherBehaviour);
+        if (neighbor != null) {
+          neighbor._timeToLive = _timeToLive - 1;
+        }
         return;
       }
 
-      IInteractionBehaviour otherBehaviour = collision.rigidbody.GetComponent<IInteractionBehaviour>();
-      if (otherBehaviour == null) {
-        return;
-      }
-
+      // Allow different managers.
       if (!_manager.IsRegistered(otherBehaviour)) {
         return;
       }
 
-      ActivityMonitor neighbor = otherBehaviour.GetComponent<ActivityMonitor>();
-      if (neighbor == null) {
-        if (_life > 1) {
-          neighbor = _manager.Activate(otherBehaviour);
-          neighbor._life = _life - 1;
-        }
-      } else {
-        _maxNeighborLife = Mathf.Max(_maxNeighborLife, neighbor._life);
+      // propagate both ways
+      int nextTime = ((_timeToLive > neighbor._timeToLive) ? _timeToLive : neighbor._timeToLive) - 1;
+      if(_timeToLive < nextTime) {
+        _timeToLive = nextTime;
+      }
+      else if(neighbor._timeToLive < nextTime) {
+        neighbor._timeToLive = nextTime;
       }
     }
 
@@ -92,7 +113,7 @@ namespace Leap.Unity.Interaction {
           }
           break;
         case GizmoType.ActivityDepth:
-          Gizmos.color = Color.HSVToRGB(Mathf.Max(0, _life) / (_manager.MaxDepth * 2.0f), 1, 1);
+          Gizmos.color = Color.HSVToRGB(Mathf.Max(0, _timeToLive) / (_manager.MaxDepth * 2.0f), 1, 1);
           break;
       }
 
