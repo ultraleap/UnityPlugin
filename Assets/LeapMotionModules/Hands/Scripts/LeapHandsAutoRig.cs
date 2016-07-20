@@ -111,7 +111,7 @@ namespace Leap.Unity {
       RiggedHand_L.SetupRiggedHand();
       RiggedHand_R.SetupRiggedHand();
 
-      if (ModelGroupName == null) {
+      if (ModelGroupName == "") {
         ModelGroupName = transform.name;
       }
       HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
@@ -143,13 +143,19 @@ namespace Leap.Unity {
 
       //Find hands and assign RiggedHands
       Transform Hand_L = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftHand);
-      RiggedHand_L = Hand_L.gameObject.AddComponent<RiggedHand>();
+      if (Hand_L.GetComponent<RiggedHand>()) {
+        RiggedHand_L = Hand_L.GetComponent<RiggedHand>();
+      }
+      else RiggedHand_L = Hand_L.gameObject.AddComponent<RiggedHand>();
       HandTransitionBehavior_L =Hand_L.gameObject.AddComponent<HandDrop>();
       RiggedHand_L.Handedness = Chirality.Left;
       RiggedHand_L.SetEditorLeapPose = false;
 
       Transform Hand_R = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightHand);
-      RiggedHand_R = Hand_R.gameObject.AddComponent<RiggedHand>();
+      if (Hand_R.GetComponent<RiggedHand>()) {
+        RiggedHand_R = Hand_R.GetComponent<RiggedHand>();
+      }
+      else RiggedHand_R = Hand_R.gameObject.AddComponent<RiggedHand>();
       HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<HandDrop>();
       RiggedHand_R.Handedness = Chirality.Right;
       RiggedHand_R.SetEditorLeapPose = false;
@@ -179,11 +185,10 @@ namespace Leap.Unity {
       RiggedFinger_R_Ring.fingerType = Finger.FingerType.TYPE_RING;
       RiggedFinger_R_Pinky = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightLittleProximal).gameObject.AddComponent<RiggedFinger>();
       RiggedFinger_R_Pinky.fingerType = Finger.FingerType.TYPE_PINKY;
-      //Trigger SetupRiggedHand in RiggedHands
 
       RiggedHand_L.AutoRigRiggedHand(RiggedHand_L.palm, RiggedFinger_L_Pinky.transform, RiggedFinger_L_Index.transform);
       RiggedHand_R.AutoRigRiggedHand(RiggedHand_R.palm, RiggedFinger_R_Pinky.transform, RiggedFinger_R_Index.transform);
-      if (ModelGroupName == null) {
+      if (ModelGroupName == "") {
         ModelGroupName = transform.name;
       }
       HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
@@ -207,6 +212,8 @@ namespace Leap.Unity {
         HandPoolToPopulate.RemoveGroup(ModelGroupName);
       }
     }
+    
+    //OnValidate push LeapHandsAutoRig values to RiggedHand and RiggedFinger components
     void OnValidate() {
       if (FlipPalms != flippedPalmsState) {
         modelPalmFacing_L = modelPalmFacing_L * -1f;
