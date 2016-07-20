@@ -42,6 +42,10 @@ namespace Leap.Unity.Interaction {
     protected string _ldatPath = "InteractionEngine/IE.ldat";
 
     [Header("Interaction Settings")]
+    [Tooltip("The default Interaction Material to use for Interaction Behaviours if none is specified, or for Interaction Behaviours created via scripting.")]
+    public InteractionMaterial defaultInteractionMaterial;
+
+    [Header("Interaction Settings")]
     [Tooltip("Allow the Interaction Engine to modify object velocities when pushing.")]
     [SerializeField]
     protected bool _contactEnabled = true;
@@ -201,20 +205,33 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Gets whether or not the Interaction Engine can modify object velocities when pushing.
+    /// Gets or sets whether or not the Interaction Engine can modify object velocities when pushing.
     /// </summary>
     public bool ContactEnabled {
       get {
         return _contactEnabled;
       }
+      set {
+        if (_contactEnabled != value) {
+          _contactEnabled = value;
+          UpdateSceneInfo();
+          Physics.IgnoreLayerCollision(_brushLayer, _interactionLayer, !_contactEnabled);
+        }
+      }
     }
 
     /// <summary>
-    /// Gets whether or not the Interaction plugin to modify object positions by grasping.
+    /// Gets or sets whether or not the Interaction Engine can modify object positions by grasping.
     /// </summary>
     public bool GraspingEnabled {
       get {
         return _graspingEnabled;
+      }
+      set {
+        if (_graspingEnabled != value) {
+          _graspingEnabled = value;
+          UpdateSceneInfo();
+        }
       }
     }
 
