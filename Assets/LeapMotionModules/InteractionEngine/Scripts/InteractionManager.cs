@@ -43,6 +43,7 @@ namespace Leap.Unity.Interaction {
 
     [Header("Interaction Settings")]
     [Tooltip("The default Interaction Material to use for Interaction Behaviours if none is specified, or for Interaction Behaviours created via scripting.")]
+    [SerializeField]
     protected InteractionMaterial _defaultInteractionMaterial;
 
     [Tooltip("Allow the Interaction Engine to modify object velocities when pushing.")]
