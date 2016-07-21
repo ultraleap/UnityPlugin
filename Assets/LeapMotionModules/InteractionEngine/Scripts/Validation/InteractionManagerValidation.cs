@@ -86,11 +86,13 @@ namespace Leap.Unity.Interaction {
         Assert.IsTrue(maxSuspensionTime >= 0,
                       "Max suspension time must always be non-negative.");
 
-        Assert.AreEqual(graspedObject != null, graspedObject.IsBeingGrasped,
+        if (graspedObject != null) {
+          Assert.IsTrue(graspedObject.IsBeingGrasped,
                         "Hand must always be grasping an object that reports as grasped.");
 
-        Assert.AreEqual(graspedObject != null, graspedObject.IsBeingGraspedByHand(hand.Id),
+          Assert.IsTrue(graspedObject.IsBeingGraspedByHand(hand.Id),
                         "Grasped object must always report as being grasped by this hand.");
+        }
 
         if (isUntracked) {
           Assert.IsNotNull(graspedObject,
