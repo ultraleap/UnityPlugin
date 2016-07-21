@@ -18,6 +18,11 @@ namespace Leap.Unity.Interaction {
 
         interactionObj.Validate();
 
+        if (interactionObj.IsBeingGrasped) {
+          Assert.IsTrue(IsActive(interactionObj)
+                        "Any object that is being grasped must also be active.");
+        }
+
         Assert.IsTrue(interactionObj.IsRegisteredWithManager,
                       "All registered behaviours must be reported as registered.");
 
