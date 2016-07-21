@@ -32,7 +32,7 @@ namespace Leap.Unity.Interaction {
   ///    - The DataSubfolder property must point to a valid subfolder in the StreamingAssets data folder.
   ///      The subfolder must contain a valid ldat file names IE.
   /// </remarks>
-  public class InteractionManager : MonoBehaviour {
+  public partial class InteractionManager : MonoBehaviour {
     #region SERIALIZED FIELDS
     [SerializeField]
     protected LeapProvider _leapProvider;
@@ -440,6 +440,7 @@ namespace Leap.Unity.Interaction {
         _activityManager.Activate(interactionBehaviour);
       }
     }
+
     #endregion
 
     #region UNITY CALLBACKS
