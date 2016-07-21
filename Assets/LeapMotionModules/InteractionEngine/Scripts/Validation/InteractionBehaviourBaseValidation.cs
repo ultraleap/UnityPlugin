@@ -5,7 +5,7 @@ namespace Leap.Unity.Interaction {
 
   public partial class InteractionBehaviourBase {
     
-    public void Validate() {
+    public virtual void Validate() {
 
     }
 
