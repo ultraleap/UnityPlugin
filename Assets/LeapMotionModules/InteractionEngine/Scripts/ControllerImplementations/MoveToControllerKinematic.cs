@@ -1,5 +1,5 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Leap.Unity.Interaction {
 
@@ -21,5 +21,14 @@ namespace Leap.Unity.Interaction {
     public override void OnGraspBegin() { }
 
     public override void OnGraspEnd() { }
+
+    public override void Validate() {
+      base.Validate();
+
+      if (_obj.IsBeingGrasped) {
+        Assert.IsTrue(_obj.rigidbody.isKinematic,
+                      "Object must be kinematic when being grasped.");
+      }
+    }
   }
 }

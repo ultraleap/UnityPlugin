@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
@@ -167,5 +168,11 @@ namespace Leap.Unity.Interaction {
     /// Called when a dislocated brush begins overlapping the InteractionBehaviour.
     /// </summary>
     public abstract void NotifyBrushDislocated();
+
+    /// <summary>
+    /// Called to validate the state of the object.
+    /// </summary>
+    [Conditional("UNITY_ASSERTIONS")]
+    public abstract void Validate();
   }
 }

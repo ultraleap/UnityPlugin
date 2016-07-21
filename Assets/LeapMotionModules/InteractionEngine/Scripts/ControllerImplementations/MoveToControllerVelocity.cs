@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Leap.Unity.Interaction {
 
@@ -54,5 +55,23 @@ namespace Leap.Unity.Interaction {
     public override void OnGraspBegin() { }
 
     public override void OnGraspEnd() { }
+
+    public override void Validate() {
+      base.Validate();
+
+      if (_obj.IsBeingGrasped && _obj.UntrackedHandCount == 0) {
+        Assert.IsFalse(_obj.rigidbody.isKinematic,
+                       "Object must not be kinematic when being grasped.");
+
+        Assert.IsFalse(_obj.rigidbody.useGravity,
+                       "Object must not be using gravity when being grasped.");
+
+        Assert.AreEqual(_obj.rigidbody.drag, 0,
+                        "Object drag must be zero when being grasped.");
+
+        Assert.AreEqual(_obj.rigidbody.angularDrag, 0,
+                        "Object angular drag must be zero when being grasped.");
+      }
+    }
   }
 }

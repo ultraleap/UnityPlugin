@@ -35,7 +35,7 @@ namespace Leap.Unity.Interaction {
   /// </remarks>
   [SelectionBase]
   [RequireComponent(typeof(Rigidbody))]
-  public class InteractionBehaviour : InteractionBehaviourBase {
+  public partial class InteractionBehaviour : InteractionBehaviourBase {
     protected enum ContactMode {
       NORMAL = 0,  // Influenced by brushes and not by soft contact.
       SOFT = 1,    // Influenced by soft contact and not by brushes.  Will not return to NORMAL until no brush or soft contact remains.

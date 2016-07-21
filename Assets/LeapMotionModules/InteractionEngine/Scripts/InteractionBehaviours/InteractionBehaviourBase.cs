@@ -26,7 +26,7 @@ namespace Leap.Unity.Interaction {
   ///      and must not be on a child transform.  The collider must also have a center value of zero.
   /// </remarks>
   [DisallowMultipleComponent]
-  public abstract class InteractionBehaviourBase : IInteractionBehaviour {
+  public abstract partial class InteractionBehaviourBase : IInteractionBehaviour {
 
     #region SERIALIZED FIELDS
     [SerializeField]

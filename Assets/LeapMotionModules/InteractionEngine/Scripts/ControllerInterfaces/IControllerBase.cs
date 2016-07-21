@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Diagnostics;
 
 namespace Leap.Unity.Interaction {
 
@@ -20,6 +21,9 @@ namespace Leap.Unity.Interaction {
       controller.Init(obj);
       return controller;
     }
+
+    [Conditional("UNITY_ASSERTIONS")]
+    public virtual void Validate() { }
 
     protected virtual void Init(InteractionBehaviour obj) {
       _obj = obj;
