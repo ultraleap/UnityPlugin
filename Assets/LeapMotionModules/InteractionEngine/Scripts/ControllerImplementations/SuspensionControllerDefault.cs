@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System;
+using UnityEngine.Assertions;
 
 namespace Leap.Unity.Interaction {
 
@@ -37,6 +37,15 @@ namespace Leap.Unity.Interaction {
     private void setRendererState(bool visible) {
       for (int i = 0; i < _renderers.Length; i++) {
         _renderers[i].enabled = visible;
+      }
+    }
+
+    public override void Validate() {
+      base.Validate();
+
+      if (_obj.UntrackedHandCount != 0) {
+        Assert.IsTrue(_obj.rigidbody.isKinematic,
+                      "Object must be kinematic when suspended.");
       }
     }
   }
