@@ -1,9 +1,11 @@
 ﻿using UnityEngine.Assertions;
+using System.Diagnostics;
 
 namespace Leap.Unity.Interaction {
 
   public partial class ActivityManager {
 
+    [Conditional("UNITY_ASSERTIONS")]
     public void Validate() {
 
       Assert.IsTrue(_overlapRadius > 0.0f,
@@ -19,7 +21,7 @@ namespace Leap.Unity.Interaction {
         interactionObj.Validate();
 
         if (interactionObj.IsBeingGrasped) {
-          Assert.IsTrue(IsActive(interactionObj)
+          Assert.IsTrue(IsActive(interactionObj),
                         "Any object that is being grasped must also be active.");
         }
 

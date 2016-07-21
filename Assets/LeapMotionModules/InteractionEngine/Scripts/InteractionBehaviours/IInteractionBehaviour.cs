@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
@@ -171,6 +172,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called to validate the state of the object.
     /// </summary>
+    [Conditional("UNITY_ASSERTIONS")]
     public abstract void Validate();
   }
 }

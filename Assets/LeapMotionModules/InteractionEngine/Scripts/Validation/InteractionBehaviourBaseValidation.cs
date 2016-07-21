@@ -1,10 +1,9 @@
 ﻿using UnityEngine.Assertions;
-using System;
 
 namespace Leap.Unity.Interaction {
 
   public partial class InteractionBehaviourBase {
-
+    
     public override void Validate() {
       Assert.AreEqual(isActiveAndEnabled, _isRegisteredWithManager,
                      "Must only active and enabled if registered with manager.");

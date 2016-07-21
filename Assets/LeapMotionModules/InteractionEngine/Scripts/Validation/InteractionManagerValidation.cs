@@ -2,11 +2,13 @@
 using UnityEngine.Assertions;
 using System;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Leap.Unity.Interaction {
 
   public partial class InteractionManager {
 
+    [Conditional("UNITY_ASSERTIONS")]
     public void Validate() {
       Assert.AreEqual(isActiveAndEnabled, _hasSceneBeenCreated,
                       "Activation status should always be equal to scene creation status.");
@@ -81,6 +83,7 @@ namespace Leap.Unity.Interaction {
 
     protected partial class InteractionHand {
 
+      [Conditional("UNITY_ASSERTIONS")]
       public void Validate() {
         Assert.IsTrue(lastTimeUpdated <= Time.unscaledTime,
                       "Last time can never be greater than the current time.");
