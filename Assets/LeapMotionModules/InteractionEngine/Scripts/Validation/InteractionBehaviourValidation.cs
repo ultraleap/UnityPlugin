@@ -8,6 +8,12 @@ namespace Leap.Unity.Interaction {
       base.Validate();
 
       bool shouldShadowStateMatch = true;
+
+      //Shadow state is only copied over once instance is created.
+      if (!HasShapeInstance) {
+        shouldShadowStateMatch = false;
+      }
+
       //If being grasped, actual state might be different than shadow state.
       if (IsBeingGrasped) {
         shouldShadowStateMatch = false;
