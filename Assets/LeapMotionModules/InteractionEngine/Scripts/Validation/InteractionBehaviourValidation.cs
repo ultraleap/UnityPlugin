@@ -3,7 +3,7 @@
 namespace Leap.Unity.Interaction {
 
   public partial class InteractionBehaviour {
-    
+
     public override void Validate() {
       base.Validate();
 
@@ -24,6 +24,10 @@ namespace Leap.Unity.Interaction {
 
         Assert.AreEqual(_rigidbody.useGravity, _useGravity,
                         "Gravity shadow state must match actual gravity state.");
+      }
+
+      if (IsRegisteredWithManager) {
+        _controllers.Validate();
       }
     }
 

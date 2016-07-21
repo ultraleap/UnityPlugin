@@ -1,10 +1,10 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
+using System.Diagnostics;
 
 namespace Leap.Unity.Interaction {
-  
+
   public class ControllerContainer {
-    
+
     private struct DefinableController<T> where T : IControllerBase {
       public T defaultController;
       public T registeredController;
@@ -47,7 +47,7 @@ namespace Leap.Unity.Interaction {
 
     public ControllerContainer(InteractionBehaviour obj, InteractionMaterial material) {
       _material = material;
-     
+
       _holdingPoseController = new DefinableController<IHoldingPoseController>(_material.CreateHoldingPoseController(obj));
       _layerController = new DefinableController<ILayerController>(_material.CreateLayerController(obj));
       _moveToController = new DefinableController<IMoveToController>(_material.CreateMoveToController(obj));
@@ -123,6 +123,15 @@ namespace Leap.Unity.Interaction {
 
     public void UnregisterCustomThrowingController() {
       _throwingController.UnregisterCustomController();
+    }
+
+    [Conditional("UNITY_ASSERTIONS")]
+    public void Validate() {
+      if (HoldingPoseController != null) HoldingPoseController.Validate();
+      if (LayerController != null) LayerController.Validate();
+      if (MoveToController != null) MoveToController.Validate();
+      if (SuspensionController != null) SuspensionController.Validate();
+      if (ThrowingController != null) ThrowingController.Validate();
     }
   }
 }
