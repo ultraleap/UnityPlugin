@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Leap.Unity {
   /**LeapHandAutoRig automates setting up the scripts that drive 3D skinned mesh hands. */
@@ -84,6 +86,9 @@ namespace Leap.Unity {
      * then calls methods in the RiggedHands that use transform nanes to discover fingers.*/
     [ContextMenu("AutoRigByName")]
     void AutoRigByName() {
+      List<string> LeftHandStrings = new List<string> { "left", "Left", "LEFT", "_L", "_l" };
+      List<string> RightHandStrings = new List<string> { "right", "Right", "RIGHT", "_R", "_r" };
+
       //Assigning these here since this component gets added and used at editor time
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
       Reset();
@@ -91,7 +96,7 @@ namespace Leap.Unity {
       //Find hands and assigns RiggedHands
       Transform Hand_L = null;
       foreach (Transform t in transform) {
-        if (t.name.Contains("Left")){
+        if (LeftHandStrings.Any(w => t.name.Contains(w))) {
           Hand_L = t;
         }
       }
@@ -103,7 +108,7 @@ namespace Leap.Unity {
 
       Transform Hand_R = null;
       foreach (Transform t in transform) {
-        if(t.name.Contains("Right")){
+        if (RightHandStrings.Any(w => t.name.Contains(w))) {
           Hand_R = t;
         }
       }

@@ -16,7 +16,7 @@ namespace Leap.Unity {
         autoRigger.StoreStartPose();
       }
       if (GUILayout.Button("Reset To Start Pose")) {
-        autoRigger.ResetStartPose();
+        autoRigger.RestoreStartPose();
       }
     }
   }
