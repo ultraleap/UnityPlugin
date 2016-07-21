@@ -167,5 +167,10 @@ namespace Leap.Unity.Interaction {
     /// Called when a dislocated brush begins overlapping the InteractionBehaviour.
     /// </summary>
     public abstract void NotifyBrushDislocated();
+
+    /// <summary>
+    /// Called to validate the state of the object.
+    /// </summary>
+    public abstract void Validate();
   }
 }

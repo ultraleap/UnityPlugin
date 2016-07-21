@@ -5,7 +5,7 @@ namespace Leap.Unity.Interaction {
 
   public partial class InteractionBehaviourBase {
 
-    public virtual void Validate() {
+    public override void Validate() {
       Assert.AreEqual(isActiveAndEnabled, _isRegisteredWithManager,
                      "Must only active and enabled if registered with manager.");
 

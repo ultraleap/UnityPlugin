@@ -16,6 +16,8 @@ namespace Leap.Unity.Interaction {
         var interactionObj = pair.Key;
         var monitor = pair.Value;
 
+        interactionObj.Validate();
+
         Assert.IsTrue(interactionObj.IsRegisteredWithManager,
                       "All registered behaviours must be reported as registered.");
 

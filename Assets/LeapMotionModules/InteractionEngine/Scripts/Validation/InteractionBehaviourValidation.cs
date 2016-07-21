@@ -1,5 +1,4 @@
 ﻿using UnityEngine.Assertions;
-using System.Collections;
 
 namespace Leap.Unity.Interaction {
 
