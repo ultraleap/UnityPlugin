@@ -2,6 +2,7 @@
 using System.Collections;
 
 namespace Leap.Unity {
+  /**LeapHandAutoRig automates setting up the scripts that drive 3D skinned mesh hands. */
   [ExecuteInEditMode]
   [AddComponentMenu("Leap/Auto Rig Hands")]
   public class LeapHandsAutoRig : MonoBehaviour {
@@ -9,7 +10,9 @@ namespace Leap.Unity {
     public Animator AnimatorForMapping;
 
     public string ModelGroupName = null;
+    [Tooltip("Set to True if each finger has an extra trasform between palm and base of the finger.")] 
     public bool UseMetaCarpals;
+    [Tooltip("When True, hands will be put into a Leap editor pose near the LeapServiceProvider's transform.  When False, the hands will be returned to their Start Pose if it has been saved.")]
     public bool SetEditorLeapPose = false;
     [Header("RiggedHand Components")]
     public RiggedHand RiggedHand_L;
@@ -17,6 +20,7 @@ namespace Leap.Unity {
     [Header("HandTransitionBehavior Components")]
     public HandTransitionBehavior HandTransitionBehavior_L;
     public HandTransitionBehavior HandTransitionBehavior_R;
+    [Tooltip("Test")]
     [Header("RiggedFinger Components")]
     public RiggedFinger RiggedFinger_L_Thumb;
     public RiggedFinger RiggedFinger_L_Index;
@@ -33,10 +37,12 @@ namespace Leap.Unity {
     public Vector3 modelPalmFacing_L = new Vector3(0, 0, 0);
     public Vector3 modelFingerPointing_R = new Vector3(0, 0, 0);
     public Vector3 modelPalmFacing_R = new Vector3(0, 0, 0);
+    [Tooltip("Toggling this value will reverse the ModelPalmFacing vectors to both RiggedHand's and all RiggedFingers.  Change if hands appear backward when tracking.")]
     public bool FlipPalms = false;
     private bool flippedPalmsState = false;
-    
 
+    /**AutoRig() Calls AutoRigMecanim() if a Unity Avatar exists.  Otherwise, AutoRigByName() is called.  
+     * Then it immediately RiggedHand.StoreJointStartPose() to store the rigged asset's original state.*/
     [ContextMenu("AutoRig")]
     public void AutoRig() {
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
@@ -56,7 +62,7 @@ namespace Leap.Unity {
       RiggedHand_L.StoreJointsStartPose();
       RiggedHand_R.StoreJointsStartPose();
     }
-
+    /**Allows a start pose for the rigged hands to be created and stored anytime. */
     [ContextMenu("StoreStartPose")]
     public void StoreStartPose() {
       if (RiggedHand_L && RiggedHand_R) {
@@ -65,22 +71,24 @@ namespace Leap.Unity {
       }
       else Debug.LogWarning("Please AutoRig before attempting to Store Start Pose");
     }
+    /**Returns all hand joint transforms to their original local positions and local rotations */
     [ContextMenu("ResetStartPose")]
-    public void ResetStartPose() {
+    public void RestoreStartPose() {
       if (RiggedHand_L && RiggedHand_R) {
         RiggedHand_L.RestoreJointsStartPose();
         RiggedHand_R.RestoreJointsStartPose();
       }
       else Debug.LogWarning("Please AutoRig and Start Pose before attempting to Reset to Start Pose");
     }
-
+    /**Uses transform names to discover and assign RiggedHands scripts,
+     * then calls methods in the RiggedHands that use transform nanes to discover fingers.*/
     [ContextMenu("AutoRigByName")]
     void AutoRigByName() {
       //Assigning these here since this component gets added and used at editor time
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
       Reset();
 
-      //Find hands and assign RiggedHands
+      //Find hands and assigns RiggedHands
       Transform Hand_L = null;
       foreach (Transform t in transform) {
         if (t.name.Contains("Left")){
@@ -133,7 +141,9 @@ namespace Leap.Unity {
       modelPalmFacing_R = RiggedHand_R.modelPalmFacing;
     }
 
-
+    /**Uses Mecanim transform mapping to find hands and assign RiggedHands scripts 
+     * and to find base of each finger and asisng RiggedFinger script.
+     * Then calls methods in the RiggedHands that use transform names to discover fingers */
     [ContextMenu("AutoRigMecanim")]
     void AutoRigMecanim() {
       //Assigning these here since this component gets added and used at editor time
@@ -198,7 +208,7 @@ namespace Leap.Unity {
       modelFingerPointing_R = RiggedHand_R.modelFingerPointing;
       modelPalmFacing_R = RiggedHand_R.modelPalmFacing;
     }
-
+    /**Removes existing RiggedFinger components so the auto rigging process can be rerun. */
     void Reset() {
       RiggedFinger[] riggedFingers = GetComponentsInChildren<RiggedFinger>();
       foreach (RiggedFinger finger in riggedFingers) {
@@ -213,7 +223,7 @@ namespace Leap.Unity {
       }
     }
     
-    //OnValidate push LeapHandsAutoRig values to RiggedHand and RiggedFinger components
+    //Monobehavior's OnValidate() is used to push LeapHandsAutoRig values to RiggedHand and RiggedFinger components
     void OnValidate() {
       if (FlipPalms != flippedPalmsState) {
         modelPalmFacing_L = modelPalmFacing_L * -1f;
@@ -274,7 +284,7 @@ namespace Leap.Unity {
         RiggedFinger_R_Pinky.modelPalmFacing = modelPalmFacing_R;
       }
     }
-
+    /**Removes the ModelGroup from HandPool that corresponds to this instance of LeapHandsAutoRig */
     void OnDestroy() {
       if (HandPoolToPopulate != null) {
         HandPoolToPopulate.RemoveGroup(ModelGroupName);

@@ -11,7 +11,7 @@ using System.Linq;
 using Leap;
 
 namespace Leap.Unity {
-  // Class to setup a rigged hand based on a model.
+  /** This version of IHandModel supports a hand respresentation based on a skinned and jointed 3D model asset.*/
   public class RiggedHand : HandModel {
     public override ModelType HandModelType {
       get {
@@ -21,6 +21,7 @@ namespace Leap.Unity {
     public override bool SupportsEditorPersistence() {
       return SetEditorLeapPose;
     }
+    [Tooltip("When True, hands will be put into a Leap editor pose near the LeapServiceProvider's transform.  When False, the hands will be returned to their Start Pose if it has been saved.")]
     [SerializeField]
     private bool setEditorLeapPose = true;
     
@@ -37,6 +38,7 @@ namespace Leap.Unity {
 
     [Tooltip("Hands are typically rigged in 3D packages with the palm transform near the wrist. Uncheck this is your model's palm transform is at the center of the palm similar to Leap's API drives")]
     public bool ModelPalmAtLeapWrist = true;
+    [Tooltip("Set to True if each finger has an extra trasform between palm and base of the finger.")]
     public bool UseMetaCarpals;
     public Vector3 modelFingerPointing = new Vector3(0, 0, 0);
     public Vector3 modelPalmFacing = new Vector3(0, 0, 0);
@@ -104,26 +106,28 @@ namespace Leap.Unity {
       Vector3 forward = trs.zBasis.ToVector3();
       return Quaternion.LookRotation(forward, up);
     }
-
+    /**Sets up the rigged hand by finding base of each finger by name */
     [ContextMenu("Setup Rigged Hand")]
     public void SetupRiggedHand() {
       modelFingerPointing = new Vector3(0, 0, 0);
       modelPalmFacing = new Vector3(0, 0, 0);
       assignRiggedFingersByName();
-      findFingerModels();
+      SetupRiggedFingers();
       modelPalmFacing = calculateModelPalmFacing(palm, fingers[1].transform, fingers[2].transform);
       modelFingerPointing = calculateModelFingerPointing();
       setFingerPalmFacing();
     }
+    /**Sets up the rigged hand if RiggedFinger scripts have already been assigned using Mecanim values.*/
     public void AutoRigRiggedHand(Transform palm, Transform finger1, Transform finger2) {
       Debug.Log("AutoRigRiggedHand()");
       modelFingerPointing = new Vector3(0, 0, 0);
       modelPalmFacing = new Vector3(0, 0, 0);
-      findFingerModels();
+      SetupRiggedFingers();
       modelPalmFacing = calculateModelPalmFacing(palm, finger1, finger2);
       modelFingerPointing = calculateModelFingerPointing();
       setFingerPalmFacing();
     }
+    /**Finds palm and finds root of each finger by name and assigns RiggedFinger scripts */
     private void assignRiggedFingersByName(){
       List<string> palmStrings = new List<string> { "palm", "Palm", "PALM" };
       List<string> thumbStrings = new List<string> { "thumb", "tmb", "Thumb", "THUMB" };
@@ -149,7 +153,6 @@ namespace Leap.Unity {
 
           }
         }
- 
       }
       if (!palm) {
         palm = transform;
@@ -187,11 +190,9 @@ namespace Leap.Unity {
           }
         }
       }
-
-
-
     }
-    private void findFingerModels() {
+    /**Triggers SetupRiggedFinger() in each RiggedFinger script for this RiggedHand */
+    private void SetupRiggedFingers() {
       RiggedFinger[] fingerModelList = GetComponentsInChildren<RiggedFinger>();
       for (int i = 0; i < 5; i++) {
         int fingersIndex = fingerModelList[i].fingerType.indexOf();
@@ -199,6 +200,7 @@ namespace Leap.Unity {
         fingerModelList[i].SetupRiggedFinger(UseMetaCarpals);
       }
     }
+    /**Sets the modelPalmFacing vector in each RiggedFinger to match this RiggedHand */
     private void setFingerPalmFacing() {
       RiggedFinger[] fingerModelList = GetComponentsInChildren<RiggedFinger>();
       for (int i = 0; i < 5; i++) {
@@ -207,7 +209,7 @@ namespace Leap.Unity {
         fingerModelList[i].modelPalmFacing = modelPalmFacing;
       }
     }
-
+    /**Calculates the palm facing direction by finding the vector perpendicular to the palm and two fingers  */
     private Vector3 calculateModelPalmFacing(Transform palm, Transform finger1, Transform finger2) {
       Vector3 a = palm.transform.InverseTransformPoint(palm.position);
       Vector3 b = palm.transform.InverseTransformPoint(finger1.position);
@@ -224,13 +226,13 @@ namespace Leap.Unity {
       Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
       return calculatedPalmFacing * 1; //+works for Mixamo, -reversed LoPoly_Hands_Skeleton and Winston
     }
-
+    /**Find finger direction by finding distance vector from palm to middle finger */
     private Vector3 calculateModelFingerPointing() {
       Vector3 distance = palm.transform.InverseTransformPoint(fingers[2].transform.GetChild(0).transform.position) - palm.transform.InverseTransformPoint(palm.position);
       Vector3 calculatedFingerPointing = CalculateZeroedVector(distance);
       return calculatedFingerPointing * -1f;
     }
-
+    /**Finds nearest cardinal vector to a vector */
     public static Vector3 CalculateZeroedVector(Vector3 vectorToZero) {
       var zeroed = new Vector3();
       float max = Mathf.Max(Mathf.Abs(vectorToZero.x), Mathf.Abs(vectorToZero.y), Mathf.Abs(vectorToZero.z));
@@ -245,7 +247,7 @@ namespace Leap.Unity {
       }
       return zeroed;
     }
-
+    /**Stores a snapshot of original joint positions */
     [ContextMenu("StoreJointsStartPose")]
     public void StoreJointsStartPose() {
       foreach (Transform t in palm.parent.GetComponentsInChildren<Transform>()) {
@@ -254,6 +256,7 @@ namespace Leap.Unity {
         localPositions.Add(t.localPosition);
       }
     }
+    /**Restores original joint positions, particularly after model has been placed in Leap's editor pose */
     [ContextMenu("RestoreJointsStartPose")]
     public void RestoreJointsStartPose() {
       for (int i = 0; i < jointList.Count; i++) {
