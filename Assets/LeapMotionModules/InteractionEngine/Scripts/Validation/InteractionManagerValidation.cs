@@ -30,7 +30,46 @@ namespace Leap.Unity.Interaction {
         interactionHand.Validate();
       }
 
+      foreach (var interactionObj in _instanceHandleToBehaviour.Values) {
+        assertIsRegisteredWithThisManager(interactionObj);
+      }
 
+      foreach (var graspedObj in _graspedBehaviours) {
+        assertIsRegisteredWithThisManager(graspedObj);
+
+        Assert.IsTrue(graspedObj.IsBeingGrasped,
+                      "All grasped objects must report as being grasped.");
+
+        foreach (var graspingId in graspedObj.GraspingHands) {
+          Assert.IsTrue(_idToInteractionHand.ContainsKey(graspingId),
+                        "Must be reporting as grasped by a hand we are tracking.");
+
+          Assert.AreEqual(_idToInteractionHand[graspingId].graspedObject, graspedObj,
+                          "Must be grasped by the hand that it is reporting to be grasped by.");
+        }
+
+        foreach (var untrackedId in graspedObj.UntrackedGraspingHands) {
+          Assert.IsTrue(_idToInteractionHand.ContainsKey(untrackedId),
+                        "Must be reporting as grasped by an untracked hand we are tracking.");
+
+          Assert.AreEqual(_idToInteractionHand[untrackedId].graspedObject, graspedObj,
+                          "Must be grasped by the hand that it is reporting to be grasped by.");
+
+          Assert.IsTrue(_idToInteractionHand[untrackedId].isUntracked,
+                        "Hand that is reported to be untracked must actually be untracked.");
+        }
+      }
+    }
+
+    private void assertIsRegisteredWithThisManager(IInteractionBehaviour interactionObj) {
+      Assert.IsTrue(interactionObj.IsRegisteredWithManager,
+                    "Object must be registered with a manager.");
+
+      Assert.AreEqual(interactionObj.Manager, this,
+                      "Object must be registered with this manager.");
+
+      Assert.IsTrue(interactionObj.isActiveAndEnabled,
+                    "Object must be active and enabled.");
     }
 
     private void assertNonNullWhenActive(object obj, string name) {
