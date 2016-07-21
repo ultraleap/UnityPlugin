@@ -20,6 +20,8 @@ namespace Leap.Unity.Interaction {
       assertNonNullWhenActive(_idToInteractionHand, "Id To Hand mapping");
       assertNonNullWhenActive(_graspedBehaviours, "Grasped behaviour list");
 
+      _activityManager.Validate();
+
       foreach (var pair in _idToInteractionHand) {
         int id = pair.Key;
         var interactionHand = pair.Value;
