@@ -40,7 +40,10 @@ namespace Leap.Unity {
     public Vector3 modelFingerPointing_R = new Vector3(0, 0, 0);
     public Vector3 modelPalmFacing_R = new Vector3(0, 0, 0);
     [Tooltip("Toggling this value will reverse the ModelPalmFacing vectors to both RiggedHand's and all RiggedFingers.  Change if hands appear backward when tracking.")]
+    [SerializeField]
     public bool FlipPalms = false;
+    [SerializeField]
+    [HideInInspector]
     private bool flippedPalmsState = false;
 
     /**AutoRig() Calls AutoRigMecanim() if a Unity Avatar exists.  Otherwise, AutoRigByName() is called.  
