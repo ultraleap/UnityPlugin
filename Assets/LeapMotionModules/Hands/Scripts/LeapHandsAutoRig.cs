@@ -7,7 +7,7 @@ namespace Leap.Unity {
   /**LeapHandAutoRig automates setting up the scripts that drive 3D skinned mesh hands. */
   [AddComponentMenu("Leap/Auto Rig Hands")]
   public class LeapHandsAutoRig : MonoBehaviour {
-    public HandPool HandPoolToPopulate;
+    private HandPool HandPoolToPopulate;
     public Animator AnimatorForMapping;
 
     public string ModelGroupName = null;
