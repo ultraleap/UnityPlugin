@@ -1,52 +1,10 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System;
 using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction.Testing {
 
   public class SadisticInteractionBehaviour : InteractionBehaviour {
-    public static List<SadisticDef> definitions;
     public SadisticDef currentDefinition;
-
-    static SadisticInteractionBehaviour() {
-      definitions = new List<SadisticDef>();
-
-      definitions.AddRange(combine(
-        allUnregisterOpterations(Callback.OnRegister),
-        allUnregisterOpterations(Callback.OnGrasp),
-        allUnregisterOpterations(Callback.OnRelease),
-        allUnregisterOpterations(Callback.OnSuspend),
-        allUnregisterOpterations(Callback.OnResume),
-        allUnregisterOpterations(Callback.OnUnregister),
-
-        new SadisticDef(Callback.OnGrasp, SadisticAction.ForceRelease),
-        new SadisticDef(Callback.OnRelease, SadisticAction.ForceGrab),
-        new SadisticDef(Callback.OnSuspend, SadisticAction.ForceRelease),
-        new SadisticDef(Callback.OnResume, SadisticAction.ForceGrab)
-        ));
-    }
-
-    private static IEnumerable<SadisticDef> combine(params object[] objs) {
-      foreach (var obj in objs) {
-        IEnumerable<SadisticDef> ien = obj as IEnumerable<SadisticDef>;
-        if (ien != null) {
-          foreach (var def in ien) {
-            yield return def;
-          }
-        } else {
-          yield return (obj as SadisticDef);
-        }
-      }
-    }
-
-    private static IEnumerable<SadisticDef> allUnregisterOpterations(Callback callback) {
-      yield return new SadisticDef(callback, SadisticAction.DisableComponent);
-      yield return new SadisticDef(callback, SadisticAction.DestroyComponent);
-      yield return new SadisticDef(callback, SadisticAction.DestroyComponentImmediately);
-      yield return new SadisticDef(callback, SadisticAction.DisableGameObject);
-      yield return new SadisticDef(callback, SadisticAction.DestroyGameObject);
-      yield return new SadisticDef(callback, SadisticAction.DestroyGameObjectImmediately);
-    }
 
     protected override void OnRegistered() {
       base.OnRegistered();
@@ -89,7 +47,7 @@ namespace Leap.Unity.Interaction.Testing {
     }
 
     private void checkCallback(Callback callback) {
-      if(currentDefinition.callback == callback) {
+      if (currentDefinition.callback == callback) {
         executeSadisticAction(currentDefinition.action);
       }
     }
@@ -126,27 +84,28 @@ namespace Leap.Unity.Interaction.Testing {
     }
 
     public enum SadisticAction {
-      DisableComponent,
-      DestroyComponent,
-      DestroyComponentImmediately,
-      DisableGameObject,
-      DestroyGameObject,
-      DestroyGameObjectImmediately,
-      ForceGrab,
-      ForceRelease
+      DisableComponent = 0x0001,
+      DestroyComponent = 0x0002,
+      DestroyComponentImmediately = 0x0004,
+      DisableGameObject = 0x0008,
+      DestroyGameObject = 0x0010,
+      DestroyGameObjectImmediately = 0x0020,
+      ForceGrab = 0x0040,
+      ForceRelease = 0x0080
     }
 
     public enum Callback {
-      OnRegister,
-      OnUnregister,
-      OnCreateInstance,
-      OnDestroyInstance,
-      OnGrasp,
-      OnRelease,
-      OnSuspend,
-      OnResume,
+      OnRegister = 0x0001,
+      OnUnregister = 0x0002,
+      OnCreateInstance = 0x0004,
+      OnDestroyInstance = 0x0008,
+      OnGrasp = 0x0010,
+      OnRelease = 0x0020,
+      OnSuspend = 0x0040,
+      OnResume = 0x0080,
     }
 
+    [Serializable]
     public class SadisticDef {
       public Callback callback;
       public SadisticAction action;

@@ -104,7 +104,7 @@ namespace UnityTest
 #endif
         }
 
-        public void OnValidate()
+        public virtual void OnValidate()
         {
             if (timeout < 0.01f) timeout = 0.01f;
         }
