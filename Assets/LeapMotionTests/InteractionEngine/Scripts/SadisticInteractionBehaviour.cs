@@ -1,44 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction.Testing {
 
   public class SadisticInteractionBehaviour : InteractionBehaviour {
-
-    public enum SadisticAction {
-      DisableComponent,
-      DestroyComponent,
-      DestroyComponentImmediately,
-      DisableGameObject,
-      DestroyGameObject,
-      DestroyGameObjectImmediately,
-      ForceGrab,
-      ForceRelease
-    }
-
-    public enum Callback {
-      OnRegister,
-      OnUnregister,
-      OnCreateInstance,
-      OnDestroyInstance,
-      OnGrasp,
-      OnRelease,
-      OnSuspend,
-      OnResume,
-    }
-
-    public class SadisticDef {
-      public Callback callback;
-      public SadisticAction action;
-
-      public SadisticDef(Callback callback, SadisticAction action) {
-        this.callback = callback;
-        this.action = action;
-      }
-    }
-
     public static List<SadisticDef> definitions;
-    public static SadisticDef definition;
+    public SadisticDef currentDefinition;
 
     static SadisticInteractionBehaviour() {
       definitions = new List<SadisticDef>();
@@ -54,7 +22,7 @@ namespace Leap.Unity.Interaction.Testing {
         new SadisticDef(Callback.OnGrasp, SadisticAction.ForceRelease),
         new SadisticDef(Callback.OnRelease, SadisticAction.ForceGrab),
         new SadisticDef(Callback.OnSuspend, SadisticAction.ForceRelease),
-        new SadisticDef(Callback.OnResume, SadisticAction.ForceGrab),
+        new SadisticDef(Callback.OnResume, SadisticAction.ForceGrab)
         ));
     }
 
@@ -82,9 +50,47 @@ namespace Leap.Unity.Interaction.Testing {
 
     protected override void OnRegistered() {
       base.OnRegistered();
+      checkCallback(Callback.OnRegister);
+    }
 
-      if (definition.callback == Callback.OnRegister) {
+    protected override void OnUnregistered() {
+      base.OnUnregistered();
+      checkCallback(Callback.OnUnregister);
+    }
 
+    protected override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
+      base.OnInteractionShapeCreated(instanceHandle);
+      checkCallback(Callback.OnCreateInstance);
+    }
+
+    protected override void OnInteractionShapeDestroyed() {
+      base.OnInteractionShapeDestroyed();
+      checkCallback(Callback.OnDestroyInstance);
+    }
+
+    protected override void OnGraspBegin() {
+      base.OnGraspBegin();
+      checkCallback(Callback.OnGrasp);
+    }
+
+    protected override void OnGraspEnd(Hand lastHand) {
+      base.OnGraspEnd(lastHand);
+      checkCallback(Callback.OnRelease);
+    }
+
+    protected override void OnHandLostTracking(Hand oldHand, out float maxSuspensionTime) {
+      base.OnHandLostTracking(oldHand, out maxSuspensionTime);
+      checkCallback(Callback.OnSuspend);
+    }
+
+    protected override void OnHandRegainedTracking(Hand newHand, int oldId) {
+      base.OnHandRegainedTracking(newHand, oldId);
+      checkCallback(Callback.OnResume);
+    }
+
+    private void checkCallback(Callback callback) {
+      if(currentDefinition.callback == callback) {
+        executeSadisticAction(currentDefinition.action);
       }
     }
 
@@ -119,6 +125,37 @@ namespace Leap.Unity.Interaction.Testing {
       }
     }
 
+    public enum SadisticAction {
+      DisableComponent,
+      DestroyComponent,
+      DestroyComponentImmediately,
+      DisableGameObject,
+      DestroyGameObject,
+      DestroyGameObjectImmediately,
+      ForceGrab,
+      ForceRelease
+    }
+
+    public enum Callback {
+      OnRegister,
+      OnUnregister,
+      OnCreateInstance,
+      OnDestroyInstance,
+      OnGrasp,
+      OnRelease,
+      OnSuspend,
+      OnResume,
+    }
+
+    public class SadisticDef {
+      public Callback callback;
+      public SadisticAction action;
+
+      public SadisticDef(Callback callback, SadisticAction action) {
+        this.callback = callback;
+        this.action = action;
+      }
+    }
 
   }
 }
