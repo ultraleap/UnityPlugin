@@ -50,11 +50,6 @@ namespace Leap.Unity {
     [SerializeField]
     private List<Vector3> localPositions = new List<Vector3>();
 
-    void OnValidate() {
-      if (SetEditorLeapPose == setEditorLeapPose) {
-        SetEditorLeapPose = setEditorLeapPose;
-      }
-    }
     public override void InitHand() {
       UpdateHand();
     }
@@ -109,6 +104,7 @@ namespace Leap.Unity {
     /**Sets up the rigged hand by finding base of each finger by name */
     [ContextMenu("Setup Rigged Hand")]
     public void SetupRiggedHand() {
+      Debug.Log("Using transform naming to setup RiggedHand on " + transform.name);
       modelFingerPointing = new Vector3(0, 0, 0);
       modelPalmFacing = new Vector3(0, 0, 0);
       assignRiggedFingersByName();
@@ -119,7 +115,7 @@ namespace Leap.Unity {
     }
     /**Sets up the rigged hand if RiggedFinger scripts have already been assigned using Mecanim values.*/
     public void AutoRigRiggedHand(Transform palm, Transform finger1, Transform finger2) {
-      Debug.Log("AutoRigRiggedHand()");
+      Debug.Log("Using Mecanim mapping to setup RiggedHand on " + transform.name);
       modelFingerPointing = new Vector3(0, 0, 0);
       modelPalmFacing = new Vector3(0, 0, 0);
       SetupRiggedFingers();

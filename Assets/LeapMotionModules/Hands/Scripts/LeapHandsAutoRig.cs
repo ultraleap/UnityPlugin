@@ -5,7 +5,6 @@ using System.Linq;
 
 namespace Leap.Unity {
   /**LeapHandAutoRig automates setting up the scripts that drive 3D skinned mesh hands. */
-  [ExecuteInEditMode]
   [AddComponentMenu("Leap/Auto Rig Hands")]
   public class LeapHandsAutoRig : MonoBehaviour {
     public HandPool HandPoolToPopulate;
