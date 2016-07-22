@@ -127,7 +127,7 @@ namespace Leap.Unity {
       RiggedHand_L.SetupRiggedHand();
       RiggedHand_R.SetupRiggedHand();
 
-      if (ModelGroupName == "") {
+      if (ModelGroupName == "" || ModelGroupName != null) {
         ModelGroupName = transform.name;
       }
       HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
@@ -206,7 +206,7 @@ namespace Leap.Unity {
 
       RiggedHand_L.AutoRigRiggedHand(RiggedHand_L.palm, RiggedFinger_L_Pinky.transform, RiggedFinger_L_Index.transform);
       RiggedHand_R.AutoRigRiggedHand(RiggedHand_R.palm, RiggedFinger_R_Pinky.transform, RiggedFinger_R_Index.transform);
-      if (ModelGroupName == "") {
+      if (ModelGroupName == "" || ModelGroupName != null) {
         ModelGroupName = transform.name;
       }
       HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);

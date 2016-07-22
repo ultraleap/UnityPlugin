@@ -233,9 +233,11 @@ namespace Leap.Unity {
       ModelPool.Add(newGroup);
     }
     public void RemoveGroup(string groupName) {
-      ModelGroup modelGroup = ModelPool.Find(i => i.GroupName == groupName);
-      if (modelGroup != null) {
-        ModelPool.Remove(modelGroup);
+      while (ModelPool.Find(i => i.GroupName == groupName) != null) {
+        ModelGroup modelGroup = ModelPool.Find(i => i.GroupName == groupName);
+        if (modelGroup != null) {
+          ModelPool.Remove(modelGroup);
+        }
       }
     }
 
