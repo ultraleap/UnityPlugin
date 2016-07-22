@@ -138,7 +138,7 @@ namespace Leap.Unity {
       Transform ring = null;
       Transform pinky = null;
       Transform[] children = transform.GetComponentsInChildren<Transform>();
-      if (palmStrings.Any(w => transform.name.ToLower().Contains(w)) ==true ){
+      if (palmStrings.Any(w => transform.name.ToLower().Contains(w))){
         base.palm = transform;
       }
       else{
@@ -158,27 +158,27 @@ namespace Leap.Unity {
           preExistingRiggedFinger = t.GetComponent<RiggedFinger>();
           string lowercaseName = t.name.ToLower();
           if (!preExistingRiggedFinger) {
-            if (thumbStrings.Any(w => lowercaseName.Contains(w)) == true && t.parent == palm) {
+            if (thumbStrings.Any(w => lowercaseName.Contains(w)) && t.parent == palm) {
               thumb = t;
               RiggedFinger newRiggedFinger = thumb.gameObject.AddComponent<RiggedFinger>();
               newRiggedFinger.fingerType = Finger.FingerType.TYPE_THUMB;
             }
-            if (indexStrings.Any(w => lowercaseName.Contains(w)) == true && t.parent == palm) {
+            if (indexStrings.Any(w => lowercaseName.Contains(w)) && t.parent == palm) {
               index = t;
               RiggedFinger newRiggedFinger = index.gameObject.AddComponent<RiggedFinger>();
               newRiggedFinger.fingerType = Finger.FingerType.TYPE_INDEX;
             }
-            if (middleStrings.Any(w => lowercaseName.Contains(w)) == true && t.parent == palm) {
+            if (middleStrings.Any(w => lowercaseName.Contains(w)) && t.parent == palm) {
               middle = t;
               RiggedFinger newRiggedFinger = middle.gameObject.AddComponent<RiggedFinger>();
               newRiggedFinger.fingerType = Finger.FingerType.TYPE_MIDDLE;
             }
-            if (ringStrings.Any(w => lowercaseName.Contains(w)) == true && t.parent == palm) {
+            if (ringStrings.Any(w => lowercaseName.Contains(w)) && t.parent == palm) {
               ring = t;
               RiggedFinger newRiggedFinger = ring.gameObject.AddComponent<RiggedFinger>();
               newRiggedFinger.fingerType = Finger.FingerType.TYPE_RING;
             }
-            if (pinkyStrings.Any(w => lowercaseName.Contains(w)) == true && t.parent == palm) {
+            if (pinkyStrings.Any(w => lowercaseName.Contains(w)) && t.parent == palm) {
               pinky = t;
               RiggedFinger newRiggedFinger = pinky.gameObject.AddComponent<RiggedFinger>();
               newRiggedFinger.fingerType = Finger.FingerType.TYPE_PINKY;
@@ -220,7 +220,7 @@ namespace Leap.Unity {
       }
       else perpendicular = Vector3.Cross(side1, side2);
       Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
-      return calculatedPalmFacing * 1; //+works for Mixamo, -reversed LoPoly_Hands_Skeleton and Winston
+      return calculatedPalmFacing; //+works for Mixamo, -reversed LoPoly_Hands_Skeleton and Winston
     }
     /**Find finger direction by finding distance vector from palm to middle finger */
     private Vector3 calculateModelFingerPointing() {
