@@ -50,7 +50,7 @@ namespace Leap.Unity {
 #if UNITY_EDITOR
     void Update() {
       Transform editorPoseSpace;
-      LeapServiceProvider leapServiceProvider = (LeapServiceProvider)FindObjectOfType(typeof(LeapServiceProvider));
+      LeapServiceProvider leapServiceProvider = FindObjectOfType<LeapServiceProvider>();
       if (leapServiceProvider) {
         editorPoseSpace = leapServiceProvider.transform;
       }
