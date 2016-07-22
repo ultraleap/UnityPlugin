@@ -88,8 +88,8 @@ namespace Leap.Unity {
      * then calls methods in the RiggedHands that use transform nanes to discover fingers.*/
     [ContextMenu("AutoRigByName")]
     void AutoRigByName() {
-      List<string> LeftHandStrings = new List<string> { "left", "Left", "LEFT", "_L", "_l" };
-      List<string> RightHandStrings = new List<string> { "right", "Right", "RIGHT", "_R", "_r" };
+      List<string> LeftHandStrings = new List<string> { "left", "_l" };
+      List<string> RightHandStrings = new List<string> { "right", "_r" };
 
       //Assigning these here since this component gets added and used at editor time
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
@@ -98,7 +98,7 @@ namespace Leap.Unity {
       //Find hands and assigns RiggedHands
       Transform Hand_L = null;
       foreach (Transform t in transform) {
-        if (LeftHandStrings.Any(w => t.name.Contains(w))) {
+        if (LeftHandStrings.Any(w => t.name.ToLower().Contains(w))) {
           Hand_L = t;
         }
       }
@@ -110,7 +110,7 @@ namespace Leap.Unity {
 
       Transform Hand_R = null;
       foreach (Transform t in transform) {
-        if (RightHandStrings.Any(w => t.name.Contains(w))) {
+        if (RightHandStrings.Any(w => t.name.ToLower().Contains(w))) {
           Hand_R = t;
         }
       }
