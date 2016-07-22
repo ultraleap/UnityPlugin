@@ -167,21 +167,6 @@ namespace Leap.Unity.InputModule {
         }
       }
 
-      //Camera from which rays into the UI will be cast.
-      /*
-      EventCamera = new GameObject("UI Selection Camera").AddComponent<Camera>();
-      EventCamera.clearFlags = CameraClearFlags.Nothing;
-      EventCamera.enabled = false;
-      EventCamera.nearClipPlane = 0.01f;
-      EventCamera.fieldOfView = 179f;
-      EventCamera.transform.SetParent(this.transform);
-      
-      //Set the event camera of all currently existent Canvases to our Event Camera
-      canvases = Resources.FindObjectsOfTypeAll<Canvas>();
-      for (int i = 0; i < canvases.Length; i++) {
-        canvases[i].worldCamera = EventCamera;
-      }
-      */
       //Set Projective/Tactile Modes
       if (InteractionMode == InteractionCapability.Projective) {
         ProjectiveToTactileTransitionDistance = -100f;
@@ -254,7 +239,7 @@ namespace Leap.Unity.InputModule {
       if (Camera.main != null) {
         CurrentRotation = Camera.main.transform.rotation;
       } else {
-        Debug.LogAssertion("Tag your Main Camera with 'MainCamera'");
+        Debug.LogAssertion("Tag your Main Camera with 'MainCamera' for the UI Module");
       }
 
       //Initializes the Queue of Spheres to draw in OnDrawGizmos
@@ -275,7 +260,6 @@ namespace Leap.Unity.InputModule {
 
     //Process is called by UI system to process events
     public override void Process() {
-      /*
       Vector3 OldCameraPos = Camera.main.transform.position;
       Quaternion OldCameraRot = Camera.main.transform.rotation;
       
@@ -487,7 +471,7 @@ namespace Leap.Unity.InputModule {
 
           
           //If we have dragged beyond the drag threshold
-          if (!PointEvents[whichPointer].dragging&&currentGoing[whichPointer] && Vector2.Distance(PointEvents[whichPointer].position, DragBeginPosition[whichPointer]) * 100f > EventSystem.current.pixelDragThreshold) {
+          if (!PointEvents[whichPointer].dragging&&currentGoing[whichPointer] && Vector2.Distance(PointEvents[whichPointer].position, DragBeginPosition[whichPointer]) > EventSystem.current.pixelDragThreshold) {
             IDragHandler Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
             if (Dragger != null && Dragger is ScrollRect) {
               if (currentGo[whichPointer] && !(currentGo[whichPointer].GetComponent<ScrollRect>())) {
@@ -558,7 +542,6 @@ namespace Leap.Unity.InputModule {
       
       Camera.main.transform.position = OldCameraPos;
       Camera.main.transform.rotation = OldCameraRot;
-       * */
     }
 
     //Raycast from the EventCamera into UI Space
@@ -581,16 +564,14 @@ namespace Leap.Unity.InputModule {
       Vector3 IndexFingerPosition;
       if (getTouchingMode(whichPointer) || forceTipRaycast) {
         TipRaycast = true;
-        //if (Camera.main != null) {
-        //  EventCamera.transform.position = Camera.main.transform.position;
-        //}
 
         //Focus pointer through the average of the extended fingers
         if (!perFingerPointer) {
           float numberOfExtendedFingers = 0.1f;
           IndexFingerPosition = curFrame.Hands[whichHand].Fingers[whichFinger].TipPosition.ToVector3() * 0.1f;
+          //Averages cursor position through average of extended fingers; ended up being worse than expected
           for (int i = 1; i < 4; i++) {
-            float fingerExtension = Mathf.Clamp01(Vector3.Dot(curFrame.Hands[whichHand].Fingers[i].Direction.ToVector3(), curFrame.Hands[whichPointer].Direction.ToVector3()));
+            float fingerExtension = Mathf.Clamp01(Vector3.Dot(curFrame.Hands[whichHand].Fingers[i].Direction.ToVector3(), curFrame.Hands[whichPointer].Direction.ToVector3()))/1.5f;
             if (fingerExtension > 0f) {
               numberOfExtendedFingers += fingerExtension;
               IndexFingerPosition += curFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3() * fingerExtension;
@@ -603,7 +584,6 @@ namespace Leap.Unity.InputModule {
 
         //Else Raycast through the knuckle of the Index Finger
       } else {
-        //EventCamera.transform.position = Origin;
         Camera.main.transform.position = Origin;
         IndexFingerPosition = curFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
       }
@@ -613,7 +593,6 @@ namespace Leap.Unity.InputModule {
         DebugSphereQueue.Enqueue(Camera.main.transform.position);
 
       //Set EventCamera's Forward Direction
-      //EventCamera.transform.forward = Direction;
       Camera.main.transform.forward = Direction;
 
       //Set the Raycast Direction and Delta
