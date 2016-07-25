@@ -221,13 +221,13 @@ ModelImporter:
     13700000: LoPoly_Hand_Mesh_Left
     13700002: LoPoly_Hand_Mesh_Right
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 0
     materialSearch: 1
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
-    resampleRotations: 1
+    resampleCurves: 1
     optimizeGameObjects: 0
     motionNodeName: 
     animationImportErrors: 
