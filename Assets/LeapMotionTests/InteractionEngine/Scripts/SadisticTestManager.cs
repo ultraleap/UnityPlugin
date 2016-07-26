@@ -62,11 +62,11 @@ namespace Leap.Unity.Interaction.Testing {
 
       for (int i = actionValues.Length; i-- != 0;) {
         var actionValue = actionValues[i];
-        if (((int)_actions & actionValue) == 0) continue;
+        if (((int)_actions & actionValue) != actionValue) continue;
 
         for (int j = callbackValues.Length; j-- != 0;) {
           var callbackValue = callbackValues[j];
-          if (((int)_callbacks & callbackValue) == 0) continue;
+          if (((int)_callbacks & callbackValue) != callbackValue) continue;
 
           GameObject testObj = new GameObject(ObjectNames.NicifyVariableName(callbackNames[j]) +
                                              " " +

@@ -30,8 +30,9 @@ namespace Leap.Unity.Interaction.Testing {
     }
 
     protected void clearShapes() {
-      var objs = _testRoot.GetComponentsInChildren<IInteractionBehaviour>();
+      var objs = _testRoot.GetComponentsInChildren<Transform>(true);
       foreach (var obj in objs) {
+        if (obj == _testRoot) continue;
         DestroyImmediate(obj.gameObject);
       }
     }

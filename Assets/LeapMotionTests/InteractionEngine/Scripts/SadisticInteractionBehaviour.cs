@@ -5,8 +5,6 @@ using Leap.Unity.Attributes;
 namespace Leap.Unity.Interaction.Testing {
 
   public class SadisticInteractionBehaviour : InteractionBehaviour {
-    public Callback allCallbacksRecieved = 0;
-
     protected override void OnRegistered() {
       base.OnRegistered();
       checkCallback(Callback.OnRegister);
@@ -48,7 +46,7 @@ namespace Leap.Unity.Interaction.Testing {
     }
 
     private void checkCallback(Callback callback) {
-      allCallbacksRecieved |= callback;
+      SadisticTest.allCallbacksRecieved |= callback;
 
       try {
         Validate();
@@ -94,6 +92,7 @@ namespace Leap.Unity.Interaction.Testing {
     }
 
     public enum SadisticAction {
+      DoNothing = 0x0000,
       DisableComponent = 0x0001,
       DestroyComponent = 0x0002,
       DestroyComponentImmediately = 0x0004,

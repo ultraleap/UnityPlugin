@@ -7,6 +7,7 @@ namespace Leap.Unity.Interaction.Testing {
 
   public class SadisticTest : TestComponent {
     public static SadisticInteractionBehaviour.SadisticDef currentDefinition;
+    public static SadisticInteractionBehaviour.Callback allCallbacksRecieved;
 
     [Header("Test Settings")]
     public InteractionTestRecording recording;
@@ -15,16 +16,21 @@ namespace Leap.Unity.Interaction.Testing {
     private InteractionManager _manager;
     private InteractionTestProvider _provider;
 
-    void Start() {
+    void OnEnable() {
       _manager = FindObjectOfType<InteractionManager>();
       _provider = FindObjectOfType<InteractionTestProvider>();
 
       currentDefinition = sadisticDefinition;
+      allCallbacksRecieved = 0;
 
       _provider.recording = recording;
       _provider.Play();
 
       Assert.raiseExceptions = true;
+    }
+
+    void OnDisable() {
+      _provider.recording = null;
     }
 
     void Update() {
@@ -36,16 +42,15 @@ namespace Leap.Unity.Interaction.Testing {
 
       //If we reach the end of the recording, we pass!
       if (!_provider.IsPlaying) {
-        foreach (var obj in FindObjectsOfType<SadisticInteractionBehaviour>()) {
-          if ((obj.allCallbacksRecieved & sadisticDefinition.expectedCallbacks) == sadisticDefinition.expectedCallbacks) {
-            IntegrationTest.Pass();
-          }
+        _provider.recording = null;
+
+        if ((allCallbacksRecieved & sadisticDefinition.expectedCallbacks) == sadisticDefinition.expectedCallbacks) {
+          IntegrationTest.Pass();
+          return;
         }
 
         Debug.LogError("Expected callback with code " + sadisticDefinition.expectedCallbacks);
-        foreach (var obj in FindObjectsOfType<SadisticInteractionBehaviour>()) {
-          Debug.LogError("Found object with callback code " + obj.allCallbacksRecieved);
-        }
+        Debug.LogError("Found object with callback code " + allCallbacksRecieved);
 
         IntegrationTest.Fail("Could not find an interaction behaviour that recieved all expected callbacks");
       }
