@@ -1,5 +1,6 @@
 ﻿using System;
 using Leap.Unity.Interaction.CApi;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction.Testing {
 
@@ -117,6 +118,7 @@ namespace Leap.Unity.Interaction.Testing {
     [Serializable]
     public class SadisticDef {
       public Callback callback;
+      [EnumFlags]
       public Callback expectedCallbacks;
       public SadisticAction action;
 
