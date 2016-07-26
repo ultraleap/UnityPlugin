@@ -38,7 +38,7 @@ namespace Leap.Unity.Playback {
     protected int _currentFrameIndex = 0;
     protected int _lastFrameUpdated = -1;
 
-    public Recording recording {
+    public virtual Recording recording {
       get {
         return _recording;
       }
@@ -48,20 +48,20 @@ namespace Leap.Unity.Playback {
       }
     }
 
-    public void Play() {
+    public virtual void Play() {
       _isPlaying = true;
     }
 
-    public void Pause() {
+    public virtual void Pause() {
       _isPlaying = false;
     }
 
-    public void Stop() {
+    public virtual void Stop() {
       Pause();
       Seek(0);
     }
 
-    public void Seek(int newFrameIndex) {
+    public virtual void Seek(int newFrameIndex) {
       newFrameIndex = Mathf.Clamp(newFrameIndex, 0, _recording.frames.Count - 1);
       if (newFrameIndex == _currentFrameIndex) {
         return;
@@ -70,20 +70,20 @@ namespace Leap.Unity.Playback {
       _currentFrameIndex = newFrameIndex;
     }
 
-    void Start() {
+    protected virtual void Start() {
       if (_autoPlay) {
         Play();
       }
     }
 
-    void Update() {
+    protected virtual void Update() {
       if (_isPlaying) {
         incrementOncePerFrame();
         DispatchUpdateFrameEvent(_recording.frames[_currentFrameIndex]);
       }
     }
 
-    void FixedUpdate() {
+    protected virtual void FixedUpdate() {
       if (_isPlaying) {
         incrementOncePerFrame();
         DispatchUpdateFrameEvent(_recording.frames[_currentFrameIndex]);
