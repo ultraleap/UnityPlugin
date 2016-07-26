@@ -1,22 +1,19 @@
-﻿using UnityEngine.Assertions;
+﻿using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Leap.Unity.Interaction {
 
   public partial class InteractionBehaviourBase {
-    
+
     public override void Validate() {
-      Assert.AreEqual(isActiveAndEnabled, _isRegisteredWithManager,
-                     "Must only active and enabled if registered with manager.");
+      AssertHelper.Implies("isActiveAndEnabled", isActiveAndEnabled,
+                           "_isRegisteredWithManager", _isRegisteredWithManager);
 
-      if (_hasShapeDescriptionBeenCreated) {
-        Assert.IsTrue(_isRegisteredWithManager,
-                      "If shape description is enabled, must be registered with manager.");
-      }
+      AssertHelper.Implies("_hasShapeDescriptionBeenCreated", _hasShapeDescriptionBeenCreated,
+                           "_isRegisteredWithManager", _isRegisteredWithManager);
 
-      if (_hasShapeInstanceHandle) {
-        Assert.IsTrue(_isRegisteredWithManager,
-                      "If has a shape instance, must be registered with manager.");
-      }
+      AssertHelper.Implies("_hasShapeInstanceHandle", _hasShapeInstanceHandle,
+                           "_isRegisteredWithManager", _isRegisteredWithManager);
 
       foreach (var untrackedId in _untrackedIds) {
         Assert.IsTrue(_graspingIds.Contains(untrackedId),

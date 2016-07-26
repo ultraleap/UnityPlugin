@@ -49,8 +49,26 @@ namespace Leap.Unity.Interaction.Testing {
           return;
         }
 
-        Debug.LogError("Expected callback with code " + sadisticDefinition.expectedCallbacks);
-        Debug.LogError("Found object with callback code " + allCallbacksRecieved);
+        var callbackType = typeof(SadisticInteractionBehaviour.Callback);
+        int[] callbackValues = (int[])Enum.GetValues(callbackType);
+        string[] callbackNames = Enum.GetNames(callbackType);
+
+        string errorMessage = "Expected callbacks:";
+        for (int i = 0; i < callbackValues.Length; i++) {
+          if ((callbackValues[i] & (int)sadisticDefinition.expectedCallbacks) != 0) {
+            errorMessage += "\n" + callbackNames[i];
+          }
+        }
+
+        string recievedMessage = "Recieved callbacks:";
+        for (int i = 0; i < callbackValues.Length; i++) {
+          if ((callbackValues[i] & (int)allCallbacksRecieved) != 0) {
+            recievedMessage += "\n" + callbackNames[i];
+          }
+        }
+
+        Debug.LogError(errorMessage);
+        Debug.LogError(recievedMessage);
 
         IntegrationTest.Fail("Could not find an interaction behaviour that recieved all expected callbacks");
       }

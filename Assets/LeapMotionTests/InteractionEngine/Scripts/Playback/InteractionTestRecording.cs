@@ -49,13 +49,13 @@ namespace Leap.Unity.Interaction.Testing {
       int index = 0;
 
       foreach (float radius in _sphereObjs) {
-        GameObject obj = new GameObject("Test Sphere Obj");
+        GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         obj.transform.parent = root;
         obj.transform.localPosition = _initialPositions[index];
         obj.transform.localRotation = _initialRotations[index];
         obj.transform.localScale = _initialScale[index];
 
-        obj.AddComponent<SphereCollider>().radius = radius;
+        obj.GetComponent<SphereCollider>().radius = radius;
 
         obj.AddComponent<InteractionBehaviour>();
 
@@ -63,13 +63,13 @@ namespace Leap.Unity.Interaction.Testing {
       }
 
       foreach (Vector3 size in _obbObjs) {
-        GameObject obj = new GameObject("Test Box Obj");
+        GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
         obj.transform.parent = root;
         obj.transform.localPosition = _initialPositions[index];
         obj.transform.localRotation = _initialRotations[index];
         obj.transform.localScale = _initialScale[index];
 
-        obj.AddComponent<BoxCollider>().size = size;
+        obj.GetComponent<BoxCollider>().size = size;
 
         obj.AddComponent<SadisticInteractionBehaviour>();
 

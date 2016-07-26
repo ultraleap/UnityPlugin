@@ -60,28 +60,37 @@ namespace Leap.Unity.Interaction.Testing {
       string[] actionNames = Enum.GetNames(actionType);
       string[] callbackNames = Enum.GetNames(callbackType);
 
-      for (int i = actionValues.Length; i-- != 0;) {
-        var actionValue = actionValues[i];
-        if (((int)_actions & actionValue) != actionValue) continue;
+      if (_callbacks == 0 || _actions == 0) {
+        createSubTest(ObjectNames.NicifyVariableName(name), 0, 0);
+      } else {
+        for (int i = actionValues.Length; i-- != 0;) {
+          var actionValue = actionValues[i];
+          if (((int)_actions & actionValue) != actionValue) continue;
 
-        for (int j = callbackValues.Length; j-- != 0;) {
-          var callbackValue = callbackValues[j];
-          if (((int)_callbacks & callbackValue) != callbackValue) continue;
+          for (int j = callbackValues.Length; j-- != 0;) {
+            var callbackValue = callbackValues[j];
+            if (((int)_callbacks & callbackValue) != callbackValue) continue;
 
-          GameObject testObj = new GameObject(ObjectNames.NicifyVariableName(callbackNames[j]) +
-                                             " " +
-                                             ObjectNames.NicifyVariableName(actionNames[i]));
-          testObj.transform.parent = transform;
-
-          var test = testObj.AddComponent<SadisticTest>();
-          test.sadisticDefinition = new SadisticInteractionBehaviour.SadisticDef(
-                                           (SadisticInteractionBehaviour.Callback)callbackValue,
-                                           _expectedCallbacks,
-                                           (SadisticInteractionBehaviour.SadisticAction)actionValue);
-          test.recording = _recording;
-          test.timeout = timeout;
+            string niceName = ObjectNames.NicifyVariableName(callbackNames[j]) +
+                              " " +
+                              ObjectNames.NicifyVariableName(actionNames[i]);
+            createSubTest(niceName, callbackValue, actionValue);
+          }
         }
       }
+    }
+
+    private void createSubTest(string name, int callbackValue, int actionValue) {
+      GameObject testObj = new GameObject(name);
+      testObj.transform.parent = transform;
+
+      var test = testObj.AddComponent<SadisticTest>();
+      test.sadisticDefinition = new SadisticInteractionBehaviour.SadisticDef(
+                                       (SadisticInteractionBehaviour.Callback)callbackValue,
+                                       _expectedCallbacks,
+                                       (SadisticInteractionBehaviour.SadisticAction)actionValue);
+      test.recording = _recording;
+      test.timeout = timeout;
     }
   }
 }

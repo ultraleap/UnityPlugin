@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using Leap.Unity.Interaction.CApi;
 using Leap.Unity.Attributes;
 
@@ -51,6 +52,7 @@ namespace Leap.Unity.Interaction.Testing {
       try {
         Validate();
       } catch (Exception e) {
+        Debug.LogException(e);
         IntegrationTest.Fail("Validation failed during callback " + callback + "\n" + e.Message);
       }
 
@@ -92,7 +94,6 @@ namespace Leap.Unity.Interaction.Testing {
     }
 
     public enum SadisticAction {
-      DoNothing = 0x0000,
       DisableComponent = 0x0001,
       DestroyComponent = 0x0002,
       DestroyComponentImmediately = 0x0004,
