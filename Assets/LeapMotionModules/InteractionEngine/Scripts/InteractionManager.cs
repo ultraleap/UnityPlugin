@@ -87,6 +87,10 @@ namespace Leap.Unity.Interaction {
     protected SingleLayer _brushLayer = 0;
 
     [Header("Debug")]
+    [Tooltip("Automatically validate integrity of simulation state each frame.  Can cause slowdown, but is always compiled out for release builds.")]
+    [SerializeField]
+    protected bool _automaticValidation = false;
+
     [Tooltip("Allows simulation to be disabled without destroying the scene in any way.")]
     [SerializeField]
     protected bool _pauseSimulation = false;
@@ -582,6 +586,10 @@ namespace Leap.Unity.Interaction {
           }
         }
         _debugTextView.text = text;
+      }
+
+      if (_automaticValidation) {
+        Validate();
       }
     }
 
