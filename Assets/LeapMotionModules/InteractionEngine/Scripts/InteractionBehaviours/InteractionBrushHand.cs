@@ -32,6 +32,7 @@ namespace Leap.Unity.Interaction {
     private Chirality handedness;
     public override Chirality Handedness {
       get { return handedness; }
+      set { handedness = value; }
     }
 
     [SerializeField]
