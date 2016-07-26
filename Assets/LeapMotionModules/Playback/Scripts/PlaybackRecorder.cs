@@ -39,11 +39,11 @@ namespace Leap.Unity.Playback {
 
     protected Recording _currentRecording;
 
-    public void StartRecording() {
+    public virtual  void StartRecording() {
       _currentRecording = ScriptableObject.CreateInstance<Recording>();
     }
 
-    public Recording EndRecording() {
+    public virtual Recording EndRecording() {
       Recording finishedRecording = _currentRecording;
       _currentRecording = null;
 
@@ -66,7 +66,7 @@ namespace Leap.Unity.Playback {
       return finishedRecording;
     }
 
-    void Update() {
+    protected virtual void Update() {
       if (_currentRecording != null) {
         if (_recordTime == RecordTime.Update) {
           Frame frame = _provider.CurrentFrame;
@@ -85,7 +85,7 @@ namespace Leap.Unity.Playback {
       }
     }
 
-    void FixedUpdate() {
+    protected virtual void FixedUpdate() {
       if (_currentRecording != null && _recordTime == RecordTime.FixedUpdate) {
         Frame frame = _provider.CurrentFixedFrame;
         if (frame != null) {
