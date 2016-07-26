@@ -9,10 +9,10 @@ namespace Leap.Unity.Interaction {
     public void Validate() {
 
       Assert.IsTrue(_overlapRadius > 0.0f,
-                    "Overlap radius must be positive and non-zero.");
+                    "Overlap radius was " + _overlapRadius + " but must be positive and non-zero.");
 
       Assert.IsTrue(_maxDepth >= 1,
-                    "Max depth must be positive and non-zero.");
+                    "Max depth was " + _maxDepth + " but must be positive and non-zero.");
 
       foreach (var pair in _registeredBehaviours) {
         var interactionObj = pair.Key;

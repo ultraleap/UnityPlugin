@@ -37,6 +37,7 @@ namespace Leap.Unity.Interaction.Testing {
       try {
         _manager.Validate();
       } catch (Exception e) {
+        Debug.LogException(e);
         IntegrationTest.Fail(e.Message);
       }
 

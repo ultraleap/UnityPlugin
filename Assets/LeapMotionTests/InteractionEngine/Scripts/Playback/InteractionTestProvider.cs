@@ -9,17 +9,24 @@ namespace Leap.Unity.Interaction.Testing {
     [SerializeField]
     protected Transform _testRoot;
 
+    private bool _needsToCreateInStart = true;
+
     public override Recording recording {
       set {
         clearShapes();
         base.recording = value;
         createShapes();
+
+        _needsToCreateInStart = false;
       }
     }
 
     protected override void Start() {
       base.Start();
-      createShapes();
+
+      if (_needsToCreateInStart) {
+        createShapes();
+      }
     }
 
     protected void createShapes() {

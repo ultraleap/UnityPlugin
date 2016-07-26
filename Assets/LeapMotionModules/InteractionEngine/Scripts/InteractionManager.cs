@@ -500,6 +500,7 @@ namespace Leap.Unity.Interaction {
 
       _activityManager.BrushLayer = InteractionBrushLayer;
       _activityManager.OverlapRadius = _activationRadius;
+      _activityManager.MaxDepth = _maxActivationDepth;
       _activityManager.OnActivate += createInteractionShape;
       _activityManager.OnDeactivate += destroyInteractionShape;
     }

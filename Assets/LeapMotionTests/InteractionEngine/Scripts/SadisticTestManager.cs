@@ -11,7 +11,7 @@ namespace Leap.Unity.Interaction.Testing {
 
     [Header("Sadistic Settings")]
     [SerializeField]
-    private InteractionTestRecording _recording;
+    private InteractionTestRecording[] _recordings;
 
     [EnumFlags]
     [SerializeField]
@@ -81,16 +81,18 @@ namespace Leap.Unity.Interaction.Testing {
     }
 
     private void createSubTest(string name, int callbackValue, int actionValue) {
-      GameObject testObj = new GameObject(name);
-      testObj.transform.parent = transform;
+      for (int i = 0; i < _recordings.Length; i++) {
+        GameObject testObj = new GameObject(name);
+        testObj.transform.parent = transform;
 
-      var test = testObj.AddComponent<SadisticTest>();
-      test.sadisticDefinition = new SadisticInteractionBehaviour.SadisticDef(
-                                       (SadisticInteractionBehaviour.Callback)callbackValue,
-                                       _expectedCallbacks,
-                                       (SadisticInteractionBehaviour.SadisticAction)actionValue);
-      test.recording = _recording;
-      test.timeout = timeout;
+        var test = testObj.AddComponent<SadisticTest>();
+        test.sadisticDefinition = new SadisticInteractionBehaviour.SadisticDef(
+                                         (SadisticInteractionBehaviour.Callback)callbackValue,
+                                         _expectedCallbacks,
+                                         (SadisticInteractionBehaviour.SadisticAction)actionValue);
+        test.recording = _recordings[i];
+        test.timeout = timeout;
+      }
     }
   }
 }

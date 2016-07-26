@@ -57,7 +57,7 @@ namespace Leap.Unity.Interaction.Testing {
 
         obj.GetComponent<SphereCollider>().radius = radius;
 
-        obj.AddComponent<InteractionBehaviour>();
+        obj.AddComponent<SadisticInteractionBehaviour>();
 
         index++;
       }
