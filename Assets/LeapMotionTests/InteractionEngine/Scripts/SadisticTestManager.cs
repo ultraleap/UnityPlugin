@@ -10,6 +10,9 @@ namespace Leap.Unity.Interaction.Testing {
   public class SadisticTestManager : TestComponent {
 
     [Header("Sadistic Settings")]
+    [SerializeField]
+    private InteractionTestRecording _recording;
+
     [EnumFlags]
     [SerializeField]
     private SadisticInteractionBehaviour.Callback _callbacks;
@@ -69,6 +72,7 @@ namespace Leap.Unity.Interaction.Testing {
           test.sadisticDefinition = new SadisticInteractionBehaviour.SadisticDef(
                                            (SadisticInteractionBehaviour.Callback)callbackValue,
                                            (SadisticInteractionBehaviour.SadisticAction)actionValue);
+          test.recording = _recording;
           test.timeout = timeout;
         }
       }
