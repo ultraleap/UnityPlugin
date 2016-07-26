@@ -3,6 +3,7 @@
 using UnityEditor;
 #endif
 using System;
+using System.IO;
 
 namespace Leap.Unity.Playback {
 
@@ -35,7 +36,7 @@ namespace Leap.Unity.Playback {
     protected SaveType _saveType = SaveType.None;
 
     [SerializeField]
-    protected string _unityAssetSavePath = "Assets/Recordings/Recording";
+    protected string _unityAssetSavePath = "Assets/Recording";
 
     protected Recording _currentRecording;
 
@@ -52,6 +53,7 @@ namespace Leap.Unity.Playback {
           break;
         case SaveType.UnityAsset:
 #if UNITY_EDITOR
+          Directory.CreateDirectory(_unityAssetSavePath);
           string path = AssetDatabase.GenerateUniqueAssetPath(_unityAssetSavePath + ".asset");
           AssetDatabase.CreateAsset(finishedRecording, path);
           AssetDatabase.SaveAssets();
