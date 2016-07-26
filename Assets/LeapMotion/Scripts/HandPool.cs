@@ -223,6 +223,23 @@ namespace Leap.Unity {
       }
       else Debug.LogWarning("A group matching that name does not exisit in the modelPool");
     }
+    public void AddNewGroup(string groupName, IHandModel leftModel, IHandModel rightModel) {
+      ModelGroup newGroup = new ModelGroup();
+      newGroup.LeftModel = leftModel;
+      newGroup.RightModel = rightModel;
+      newGroup.GroupName = groupName;
+      newGroup.CanDuplicate = false;
+      newGroup.IsEnabled = true;
+      ModelPool.Add(newGroup);
+    }
+    public void RemoveGroup(string groupName) {
+      while (ModelPool.Find(i => i.GroupName == groupName) != null) {
+        ModelGroup modelGroup = ModelPool.Find(i => i.GroupName == groupName);
+        if (modelGroup != null) {
+          ModelPool.Remove(modelGroup);
+        }
+      }
+    }
 
 #if UNITY_EDITOR
     /**In the Unity Editor, Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project. */
