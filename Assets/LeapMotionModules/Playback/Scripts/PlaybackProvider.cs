@@ -7,8 +7,8 @@ namespace Leap.Unity.Playback {
 
     public override Frame CurrentFrame {
       get {
-        incrementOncePerFrame();
         if (_recording != null) {
+          incrementOncePerFrame();
           return _recording.frames[_currentFrameIndex];
         } else {
           return null;
@@ -64,7 +64,9 @@ namespace Leap.Unity.Playback {
 
     public virtual void Stop() {
       Pause();
-      Seek(0);
+      if (_recording != null) {
+        Seek(0);
+      }
     }
 
     public virtual void Seek(int newFrameIndex) {

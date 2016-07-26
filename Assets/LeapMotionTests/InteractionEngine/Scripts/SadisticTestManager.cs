@@ -27,8 +27,8 @@ namespace Leap.Unity.Interaction.Testing {
       base.OnValidate();
 
       if (!Application.isPlaying) {
-        _update = true;
-        gameObject.SetActive(true);
+        //_update = true;
+        //gameObject.SetActive(true);
       }
     }
 
@@ -39,6 +39,7 @@ namespace Leap.Unity.Interaction.Testing {
       }
     }
 
+    [ContextMenu("Update tests")]
     private void updateChildrenTests() {
       Transform[] transforms = GetComponentsInChildren<Transform>(true);
       foreach (Transform child in transforms) {

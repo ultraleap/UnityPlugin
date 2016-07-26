@@ -540,6 +540,9 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void FixedUpdate() {
       Frame frame = _leapProvider.CurrentFixedFrame;
+      if (frame == null) {
+        return;
+      }
 
       if (OnPrePhysicalUpdate != null) {
         OnPrePhysicalUpdate();
@@ -568,6 +571,9 @@ namespace Leap.Unity.Interaction {
       }
 
       Frame frame = _leapProvider.CurrentFrame;
+      if (frame == null) {
+        return;
+      }
 
       dispatchOnHandsHoldingAll(frame, isPhysics: false);
 

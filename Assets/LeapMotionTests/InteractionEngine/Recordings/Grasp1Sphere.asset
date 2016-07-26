@@ -75064,6 +75064,8 @@ MonoBehaviour:
   - {x: 0, y: -0.19500002, z: 0.4}
   _initialRotations:
   - {x: 0, y: 0, z: 0, w: 1}
+  _initialScale:
+  - {x: 0.1, y: 0.1, z: 0.1}
   _sphereObjs:
   - 0.5
   _obbObjs: []

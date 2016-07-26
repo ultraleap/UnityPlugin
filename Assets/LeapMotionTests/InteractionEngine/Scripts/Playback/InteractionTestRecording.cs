@@ -12,6 +12,7 @@ namespace Leap.Unity.Interaction.Testing {
     [SerializeField]
     protected List<Quaternion> _initialRotations = new List<Quaternion>();
 
+    [SerializeField]
     protected List<Vector3> _initialScale = new List<Vector3>();
 
     [SerializeField]
