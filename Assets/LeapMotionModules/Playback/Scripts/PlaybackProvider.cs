@@ -38,6 +38,12 @@ namespace Leap.Unity.Playback {
     protected int _currentFrameIndex = 0;
     protected int _lastFrameUpdated = -1;
 
+    public virtual bool IsPlaying {
+      get {
+        return _isPlaying;
+      }
+    }
+
     public virtual Recording recording {
       get {
         return _recording;
