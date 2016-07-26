@@ -71,7 +71,7 @@ namespace Leap.Unity.Interaction.Testing {
 
         obj.AddComponent<BoxCollider>().size = size;
 
-        obj.AddComponent<InteractionBehaviour>();
+        obj.AddComponent<SadisticInteractionBehaviour>();
 
         index++;
       }

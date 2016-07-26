@@ -21,6 +21,10 @@ namespace Leap.Unity.Interaction.Testing {
     [SerializeField]
     private SadisticInteractionBehaviour.SadisticAction _actions;
 
+    [EnumFlags]
+    [SerializeField]
+    private SadisticInteractionBehaviour.Callback _expectedCallbacks;
+
     private bool _update = false;
 
     public override void OnValidate() {
@@ -72,6 +76,7 @@ namespace Leap.Unity.Interaction.Testing {
           var test = testObj.AddComponent<SadisticTest>();
           test.sadisticDefinition = new SadisticInteractionBehaviour.SadisticDef(
                                            (SadisticInteractionBehaviour.Callback)callbackValue,
+                                           _expectedCallbacks,
                                            (SadisticInteractionBehaviour.SadisticAction)actionValue);
           test.recording = _recording;
           test.timeout = timeout;

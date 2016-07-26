@@ -4,7 +4,7 @@ using Leap.Unity.Interaction.CApi;
 namespace Leap.Unity.Interaction.Testing {
 
   public class SadisticInteractionBehaviour : InteractionBehaviour {
-    public SadisticDef currentDefinition;
+    public Callback allCallbacksRecieved = 0;
 
     protected override void OnRegistered() {
       base.OnRegistered();
@@ -47,14 +47,17 @@ namespace Leap.Unity.Interaction.Testing {
     }
 
     private void checkCallback(Callback callback) {
+      allCallbacksRecieved |= callback;
+
       try {
         Validate();
       } catch (Exception e) {
         IntegrationTest.Fail("Validation failed during callback " + callback + "\n" + e.Message);
       }
 
-      if (currentDefinition.callback == callback) {
-        executeSadisticAction(currentDefinition.action);
+      
+      if (SadisticTest.currentDefinition.callback == callback) {
+        executeSadisticAction(SadisticTest.currentDefinition.action);
       }
     }
 
@@ -114,10 +117,12 @@ namespace Leap.Unity.Interaction.Testing {
     [Serializable]
     public class SadisticDef {
       public Callback callback;
+      public Callback expectedCallbacks;
       public SadisticAction action;
 
-      public SadisticDef(Callback callback, SadisticAction action) {
+      public SadisticDef(Callback callback, Callback expectedCallbacks, SadisticAction action) {
         this.callback = callback;
+        this.expectedCallbacks = expectedCallbacks;
         this.action = action;
       }
     }

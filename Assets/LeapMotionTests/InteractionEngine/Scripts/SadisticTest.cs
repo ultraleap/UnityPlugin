@@ -6,6 +6,7 @@ using System;
 namespace Leap.Unity.Interaction.Testing {
 
   public class SadisticTest : TestComponent {
+    public static SadisticInteractionBehaviour.SadisticDef currentDefinition;
 
     [Header("Test Settings")]
     public InteractionTestRecording recording;
@@ -17,6 +18,8 @@ namespace Leap.Unity.Interaction.Testing {
     void Start() {
       _manager = FindObjectOfType<InteractionManager>();
       _provider = FindObjectOfType<InteractionTestProvider>();
+
+      currentDefinition = sadisticDefinition;
 
       _provider.recording = recording;
       _provider.Play();
@@ -33,7 +36,18 @@ namespace Leap.Unity.Interaction.Testing {
 
       //If we reach the end of the recording, we pass!
       if (!_provider.IsPlaying) {
-        IntegrationTest.Pass();
+        foreach (var obj in FindObjectsOfType<SadisticInteractionBehaviour>()) {
+          if ((obj.allCallbacksRecieved & sadisticDefinition.expectedCallbacks) == sadisticDefinition.expectedCallbacks) {
+            IntegrationTest.Pass();
+          }
+        }
+
+        Debug.LogError("Expected callback with code " + sadisticDefinition.expectedCallbacks);
+        foreach (var obj in FindObjectsOfType<SadisticInteractionBehaviour>()) {
+          Debug.LogError("Found object with callback code " + obj.allCallbacksRecieved);
+        }
+
+        IntegrationTest.Fail("Could not find an interaction behaviour that recieved all expected callbacks");
       }
     }
   }
