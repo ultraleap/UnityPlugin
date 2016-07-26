@@ -7,7 +7,12 @@ namespace Leap.Unity.Playback {
 
     public override Frame CurrentFrame {
       get {
-        throw new NotImplementedException();
+        incrementOncePerFrame();
+        if (_recording != null) {
+          return _recording.frames[_currentFrameIndex];
+        } else {
+          return null;
+        }
       }
     }
 
@@ -73,23 +78,27 @@ namespace Leap.Unity.Playback {
 
     void Update() {
       if (_isPlaying) {
+        incrementOncePerFrame();
         DispatchUpdateFrameEvent(_recording.frames[_currentFrameIndex]);
-      }
-    }
-
-    void LateUpdate() {
-      if (_isPlaying) {
-        if (_currentFrameIndex == _recording.frames.Count - 1) {
-          Pause();
-        } else {
-          _currentFrameIndex++;
-        }
       }
     }
 
     void FixedUpdate() {
       if (_isPlaying) {
+        incrementOncePerFrame();
         DispatchUpdateFrameEvent(_recording.frames[_currentFrameIndex]);
+      }
+    }
+
+    private void incrementOncePerFrame() {
+      if (_lastFrameUpdated != Time.frameCount) {
+        _lastFrameUpdated = Time.frameCount;
+
+        if (_currentFrameIndex >= _recording.frames.Count - 1) {
+          Pause();
+        } else {
+          Seek(_currentFrameIndex + 1);
+        }
       }
     }
   }
