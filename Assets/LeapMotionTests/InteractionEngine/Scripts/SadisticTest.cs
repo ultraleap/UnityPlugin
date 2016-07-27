@@ -10,18 +10,14 @@ namespace Leap.Unity.Interaction.Testing {
 
   public class SadisticTest : TestComponent {
     public static SadisticTest current;
-    public static Callback allCallbacksRecieved;
+    public static InteractionCallback allCallbacksRecieved;
 
     [Header("Test Settings")]
     public InteractionTestRecording recording;
-
-    public Callback callback;
-
+    public InteractionCallback callback;
     [EnumFlags]
-    public Callback expectedCallbacks;
-
+    public InteractionCallback expectedCallbacks;
     public SadisticAction action;
-
     public float actionDelay;
 
     private InteractionManager _manager;
@@ -85,7 +81,7 @@ namespace Leap.Unity.Interaction.Testing {
           return;
         }
 
-        var callbackType = typeof(Callback);
+        var callbackType = typeof(InteractionCallback);
         int[] callbackValues = (int[])Enum.GetValues(callbackType);
         string[] callbackNames = Enum.GetNames(callbackType);
 
@@ -122,7 +118,7 @@ namespace Leap.Unity.Interaction.Testing {
     ForceRelease = 0x0080
   }
 
-  public enum Callback {
+  public enum InteractionCallback {
     OnRegister = 0x0001,
     OnUnregister = 0x0002,
     OnCreateInstance = 0x0004,

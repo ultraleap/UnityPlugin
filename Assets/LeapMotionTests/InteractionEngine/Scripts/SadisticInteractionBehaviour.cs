@@ -7,42 +7,42 @@ namespace Leap.Unity.Interaction.Testing {
   public class SadisticInteractionBehaviour : InteractionBehaviour {
     protected override void OnRegistered() {
       base.OnRegistered();
-      checkCallback(Callback.OnRegister);
+      checkCallback(InteractionCallback.OnRegister);
     }
 
     protected override void OnUnregistered() {
       base.OnUnregistered();
-      checkCallback(Callback.OnUnregister);
+      checkCallback(InteractionCallback.OnUnregister);
     }
 
     protected override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
       base.OnInteractionShapeCreated(instanceHandle);
-      checkCallback(Callback.OnCreateInstance);
+      checkCallback(InteractionCallback.OnCreateInstance);
     }
 
     protected override void OnInteractionShapeDestroyed() {
       base.OnInteractionShapeDestroyed();
-      checkCallback(Callback.OnDestroyInstance);
+      checkCallback(InteractionCallback.OnDestroyInstance);
     }
 
     protected override void OnGraspBegin() {
       base.OnGraspBegin();
-      checkCallback(Callback.OnGrasp);
+      checkCallback(InteractionCallback.OnGrasp);
     }
 
     protected override void OnGraspEnd(Hand lastHand) {
       base.OnGraspEnd(lastHand);
-      checkCallback(Callback.OnRelease);
+      checkCallback(InteractionCallback.OnRelease);
     }
 
     protected override void OnHandLostTracking(Hand oldHand, out float maxSuspensionTime) {
       base.OnHandLostTracking(oldHand, out maxSuspensionTime);
-      checkCallback(Callback.OnSuspend);
+      checkCallback(InteractionCallback.OnSuspend);
     }
 
     protected override void OnHandRegainedTracking(Hand newHand, int oldId) {
       base.OnHandRegainedTracking(newHand, oldId);
-      checkCallback(Callback.OnResume);
+      checkCallback(InteractionCallback.OnResume);
     }
 
     private float _afterDelayTime;
@@ -53,12 +53,12 @@ namespace Leap.Unity.Interaction.Testing {
 
     void Update() {
       if (Time.time >= _afterDelayTime) {
-        checkCallback(Callback.AfterDelay);
+        checkCallback(InteractionCallback.AfterDelay);
         _afterDelayTime = float.MaxValue;
       }
     }
 
-    private void checkCallback(Callback callback) {
+    private void checkCallback(InteractionCallback callback) {
       SadisticTest.allCallbacksRecieved |= callback;
 
       try {
