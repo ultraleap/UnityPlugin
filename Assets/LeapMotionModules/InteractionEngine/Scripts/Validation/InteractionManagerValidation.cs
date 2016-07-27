@@ -10,11 +10,11 @@ namespace Leap.Unity.Interaction {
 
     [Conditional("UNITY_ASSERTIONS")]
     public void Validate() {
-      Assert.AreEqual(isActiveAndEnabled, _hasSceneBeenCreated,
-                      "Activation status should always be equal to scene creation status.");
+      AssertHelper.Implies("_hasSceneBeenCreated", _hasSceneBeenCreated,
+                           "isActiveAndEnabled", isActiveAndEnabled);
 
-      Assert.AreEqual(isActiveAndEnabled, _scene.pScene != IntPtr.Zero,
-                      "Scene ptr should always be non-null when manager is active.");
+      AssertHelper.Implies(_scene.pScene != IntPtr.Zero, isActiveAndEnabled,
+                           "Scene ptr should always be non-null when manager is active.");
 
       assertNonNullWhenActive(_activityManager, "Activity Manager");
       assertNonNullWhenActive(_shapeDescriptionPool, "Shape Description Pool");
@@ -77,8 +77,8 @@ namespace Leap.Unity.Interaction {
     }
 
     private void assertNonNullWhenActive(object obj, string name) {
-      Assert.AreEqual(isActiveAndEnabled, obj != null,
-                      name + " should always be non-null when manager is active.");
+      AssertHelper.Implies(obj != null, isActiveAndEnabled,
+                           name + " should always be non-null when manager is active.");
     }
 
     protected partial class InteractionHand {

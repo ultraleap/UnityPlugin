@@ -334,7 +334,7 @@ namespace UnityTest
             k_ResultRenderer.Draw();
         }
 
-        private void StartNewTest()
+        protected virtual void StartNewTest()
         {
             m_TestMessages = "";
             m_Stacktrace = "";
@@ -361,7 +361,7 @@ namespace UnityTest
             TestRunnerCallback.TestStarted(testResult);
         }
 
-        private void FinishTest(TestResult.ResultType result)
+        protected virtual void FinishTest(TestResult.ResultType result)
         {
             m_TestsProvider.FinishTest(currentTest);
             var testResult = m_ResultList.Single(t => t.GameObject == currentTest.gameObject);

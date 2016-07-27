@@ -69,8 +69,9 @@ namespace Leap.Unity.Interaction {
         return;
       }
 
-      behaviour.NotifyRegistered();
       _registeredBehaviours.Add(behaviour, null);
+
+      behaviour.NotifyRegistered();
     }
 
     public void Unregister(IInteractionBehaviour behaviour) {
@@ -82,7 +83,7 @@ namespace Leap.Unity.Interaction {
       if (IsActive(behaviour)) {
         Deactivate(behaviour);
       }
-
+      
       _registeredBehaviours.Remove(behaviour);
 
       behaviour.NotifyUnregistered();
@@ -243,8 +244,7 @@ namespace Leap.Unity.Interaction {
 
         IInteractionBehaviour behaviour = collider.attachedRigidbody.GetComponent<IInteractionBehaviour>();
         if (behaviour == null) {
-          // IInteractionBehaviour is a requirement for colliding with the brushLayer.
-          Assert.IsTrue(behaviour != null);
+          Assert.IsNotNull(behaviour, "Only interaction behaviours are allowed to collide with the brush layer.");
           continue;
         }
 
