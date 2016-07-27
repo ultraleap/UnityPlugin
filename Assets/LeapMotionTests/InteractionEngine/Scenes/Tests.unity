@@ -85,41 +85,41 @@ NavMeshSettings:
     cellSize: 0.16666667
     manualCellSize: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &331633621
+--- !u!1 &238876482
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 331633622}
-  - 114: {fileID: 331633623}
+  - 4: {fileID: 238876483}
+  - 114: {fileID: 238876484}
   m_Layer: 0
-  m_Name: On Create Instance Destroy Component Immediately
+  m_Name: On Register Disable Game Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!4 &331633622
+--- !u!4 &238876483
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 331633621}
+  m_GameObject: {fileID: 238876482}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
-  m_Father: {fileID: 679071595}
-  m_RootOrder: 6
---- !u!114 &331633623
+  m_Father: {fileID: 1440827590}
+  m_RootOrder: 2
+--- !u!114 &238876484
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 331633621}
+  m_GameObject: {fileID: 238876482}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
@@ -137,9 +137,64 @@ MonoBehaviour:
   dynamicTypeName: 
   recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
   sadisticDefinition:
-    callback: 4
-    expectedCallbacks: 15
-    action: 4
+    callback: 1
+    expectedCallbacks: 3
+    action: 8
+--- !u!1 &293545447
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 293545448}
+  - 114: {fileID: 293545449}
+  m_Layer: 0
+  m_Name: On Register Disable Component
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &293545448
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 293545447}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 1440827590}
+  m_RootOrder: 5
+--- !u!114 &293545449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 293545447}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  sadisticDefinition:
+    callback: 1
+    expectedCallbacks: 3
+    action: 1
 --- !u!1 &421653856
 GameObject:
   m_ObjectHideFlags: 0
@@ -202,41 +257,41 @@ Light:
   m_ShadowRadius: 0
   m_ShadowAngle: 0
   m_AreaSize: {x: 1, y: 1}
---- !u!1 &547926082
+--- !u!1 &678464824
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 547926083}
-  - 114: {fileID: 547926084}
+  - 4: {fileID: 678464825}
+  - 114: {fileID: 678464826}
   m_Layer: 0
-  m_Name: On Create Instance Destroy Game Object Immediately
+  m_Name: On Create Instance Disable Component
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!4 &547926083
+--- !u!4 &678464825
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 547926082}
+  m_GameObject: {fileID: 678464824}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 679071595}
-  m_RootOrder: 0
---- !u!114 &547926084
+  m_RootOrder: 5
+--- !u!114 &678464826
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 547926082}
+  m_GameObject: {fileID: 678464824}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
@@ -256,7 +311,7 @@ MonoBehaviour:
   sadisticDefinition:
     callback: 4
     expectedCallbacks: 15
-    action: 32
+    action: 1
 --- !u!1 &679071593
 GameObject:
   m_ObjectHideFlags: 0
@@ -267,12 +322,12 @@ GameObject:
   - 4: {fileID: 679071595}
   - 114: {fileID: 679071594}
   m_Layer: 0
-  m_Name: DestroyAndDisableTests
+  m_Name: OnCreateInstanceTests
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &679071594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -296,7 +351,7 @@ MonoBehaviour:
   dynamicTypeName: 
   _recordings:
   - {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
-  _callbacks: 5
+  _callbacks: 4
   _actions: -193
   _expectedCallbacks: 15
 --- !u!4 &679071595
@@ -310,185 +365,14 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
-  - {fileID: 547926083}
-  - {fileID: 1473527389}
-  - {fileID: 1113584419}
-  - {fileID: 1932811371}
-  - {fileID: 1907414892}
-  - {fileID: 1019554671}
-  - {fileID: 331633622}
-  - {fileID: 1604039589}
-  - {fileID: 2015802335}
-  - {fileID: 2018176152}
-  - {fileID: 1297098875}
-  - {fileID: 703716732}
+  - {fileID: 1763540607}
+  - {fileID: 1971774050}
+  - {fileID: 1504947491}
+  - {fileID: 1134558195}
+  - {fileID: 1311397291}
+  - {fileID: 678464825}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
---- !u!1 &703716731
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 703716732}
-  - 114: {fileID: 703716733}
-  m_Layer: 0
-  m_Name: On Register Disable Component
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &703716732
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 703716731}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_Children: []
-  m_Father: {fileID: 679071595}
-  m_RootOrder: 11
---- !u!114 &703716733
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 703716731}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeout: 20
-  ignored: 0
-  succeedAfterAllAssertionsAreExecuted: 0
-  expectException: 0
-  expectedExceptionList: 
-  succeedWhenExceptionIsThrown: 0
-  includedPlatforms: -1
-  platformsToIgnore: []
-  dynamic: 0
-  dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
-  sadisticDefinition:
-    callback: 1
-    expectedCallbacks: 15
-    action: 1
---- !u!1 &1019554670
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1019554671}
-  - 114: {fileID: 1019554672}
-  m_Layer: 0
-  m_Name: On Register Disable Game Object
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &1019554671
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1019554670}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_Children: []
-  m_Father: {fileID: 679071595}
-  m_RootOrder: 5
---- !u!114 &1019554672
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1019554670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeout: 20
-  ignored: 0
-  succeedAfterAllAssertionsAreExecuted: 0
-  expectException: 0
-  expectedExceptionList: 
-  succeedWhenExceptionIsThrown: 0
-  includedPlatforms: -1
-  platformsToIgnore: []
-  dynamic: 0
-  dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
-  sadisticDefinition:
-    callback: 1
-    expectedCallbacks: 15
-    action: 8
---- !u!1 &1113584418
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1113584419}
-  - 114: {fileID: 1113584420}
-  m_Layer: 0
-  m_Name: On Create Instance Destroy Game Object
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &1113584419
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1113584418}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_Children: []
-  m_Father: {fileID: 679071595}
-  m_RootOrder: 2
---- !u!114 &1113584420
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1113584418}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeout: 20
-  ignored: 0
-  succeedAfterAllAssertionsAreExecuted: 0
-  expectException: 0
-  expectedExceptionList: 
-  succeedWhenExceptionIsThrown: 0
-  includedPlatforms: -1
-  platformsToIgnore: []
-  dynamic: 0
-  dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
-  sadisticDefinition:
-    callback: 4
-    expectedCallbacks: 15
-    action: 16
+  m_RootOrder: 4
 --- !u!1 &1132386869
 GameObject:
   m_ObjectHideFlags: 0
@@ -504,7 +388,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1132386870
 Transform:
   m_ObjectHideFlags: 0
@@ -544,6 +428,61 @@ MonoBehaviour:
     callback: 0
     expectedCallbacks: 63
     action: 0
+--- !u!1 &1134558194
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1134558195}
+  - 114: {fileID: 1134558196}
+  m_Layer: 0
+  m_Name: On Create Instance Destroy Component Immediately
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1134558195
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1134558194}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 679071595}
+  m_RootOrder: 3
+--- !u!114 &1134558196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1134558194}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  sadisticDefinition:
+    callback: 4
+    expectedCallbacks: 15
+    action: 4
 --- !u!1 &1207110107
 GameObject:
   m_ObjectHideFlags: 0
@@ -743,41 +682,41 @@ MonoBehaviour:
     callback: 4
     expectedCallbacks: 31
     action: 64
---- !u!1 &1297098874
+--- !u!1 &1311397290
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 1297098875}
-  - 114: {fileID: 1297098876}
+  - 4: {fileID: 1311397291}
+  - 114: {fileID: 1311397292}
   m_Layer: 0
-  m_Name: On Create Instance Disable Component
+  m_Name: On Create Instance Destroy Component
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!4 &1297098875
+--- !u!4 &1311397291
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1297098874}
+  m_GameObject: {fileID: 1311397290}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 679071595}
-  m_RootOrder: 10
---- !u!114 &1297098876
+  m_RootOrder: 4
+--- !u!114 &1311397292
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1297098874}
+  m_GameObject: {fileID: 1311397290}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
@@ -797,7 +736,7 @@ MonoBehaviour:
   sadisticDefinition:
     callback: 4
     expectedCallbacks: 15
-    action: 1
+    action: 2
 --- !u!1 &1327637834
 GameObject:
   m_ObjectHideFlags: 0
@@ -874,6 +813,177 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1327637834}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1371808470
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1371808471}
+  - 114: {fileID: 1371808472}
+  m_Layer: 0
+  m_Name: On Register Destroy Component Immediately
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1371808471
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1371808470}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 1440827590}
+  m_RootOrder: 3
+--- !u!114 &1371808472
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1371808470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  sadisticDefinition:
+    callback: 1
+    expectedCallbacks: 3
+    action: 4
+--- !u!1 &1395152963
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1395152964}
+  - 114: {fileID: 1395152965}
+  m_Layer: 0
+  m_Name: On Register Destroy Component
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1395152964
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1395152963}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 1440827590}
+  m_RootOrder: 4
+--- !u!114 &1395152965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1395152963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  sadisticDefinition:
+    callback: 1
+    expectedCallbacks: 3
+    action: 2
+--- !u!1 &1440827588
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1440827590}
+  - 114: {fileID: 1440827589}
+  m_Layer: 0
+  m_Name: OnRegisterTests
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1440827589
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1440827588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ad7e45e1ddff514bb29f6461fa67e46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  _recordings:
+  - {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  _callbacks: 1
+  _actions: -193
+  _expectedCallbacks: 3
+--- !u!4 &1440827590
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1440827588}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.689457, y: -6.8565435, z: 0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 2013203885}
+  - {fileID: 1719970688}
+  - {fileID: 238876483}
+  - {fileID: 1371808471}
+  - {fileID: 1395152964}
+  - {fileID: 293545448}
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
 --- !u!1 &1466856493
 GameObject:
   m_ObjectHideFlags: 0
@@ -961,41 +1071,41 @@ Camera:
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
   m_StereoMirrorMode: 0
---- !u!1 &1473527388
+--- !u!1 &1504947490
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 1473527389}
-  - 114: {fileID: 1473527390}
+  - 4: {fileID: 1504947491}
+  - 114: {fileID: 1504947492}
   m_Layer: 0
-  m_Name: On Register Destroy Game Object Immediately
+  m_Name: On Create Instance Disable Game Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!4 &1473527389
+--- !u!4 &1504947491
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1473527388}
+  m_GameObject: {fileID: 1504947490}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 679071595}
-  m_RootOrder: 1
---- !u!114 &1473527390
+  m_RootOrder: 2
+--- !u!114 &1504947492
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1473527388}
+  m_GameObject: {fileID: 1504947490}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
@@ -1013,9 +1123,9 @@ MonoBehaviour:
   dynamicTypeName: 
   recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
   sadisticDefinition:
-    callback: 1
+    callback: 4
     expectedCallbacks: 15
-    action: 32
+    action: 8
 --- !u!1 &1510694140
 GameObject:
   m_ObjectHideFlags: 0
@@ -1133,41 +1243,41 @@ Light:
   m_ShadowRadius: 0
   m_ShadowAngle: 0
   m_AreaSize: {x: 1, y: 1}
---- !u!1 &1604039588
+--- !u!1 &1719970687
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 1604039589}
-  - 114: {fileID: 1604039590}
+  - 4: {fileID: 1719970688}
+  - 114: {fileID: 1719970689}
   m_Layer: 0
-  m_Name: On Register Destroy Component Immediately
+  m_Name: On Register Destroy Game Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!4 &1604039589
+--- !u!4 &1719970688
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1604039588}
+  m_GameObject: {fileID: 1719970687}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
-  m_Father: {fileID: 679071595}
-  m_RootOrder: 7
---- !u!114 &1604039590
+  m_Father: {fileID: 1440827590}
+  m_RootOrder: 1
+--- !u!114 &1719970689
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1604039588}
+  m_GameObject: {fileID: 1719970687}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
@@ -1186,8 +1296,63 @@ MonoBehaviour:
   recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
   sadisticDefinition:
     callback: 1
+    expectedCallbacks: 3
+    action: 16
+--- !u!1 &1763540606
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1763540607}
+  - 114: {fileID: 1763540608}
+  m_Layer: 0
+  m_Name: On Create Instance Destroy Game Object Immediately
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1763540607
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1763540606}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 679071595}
+  m_RootOrder: 0
+--- !u!114 &1763540608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1763540606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  sadisticDefinition:
+    callback: 4
     expectedCallbacks: 15
-    action: 4
+    action: 32
 --- !u!1 &1827185151
 GameObject:
   m_ObjectHideFlags: 0
@@ -1203,7 +1368,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1827185152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1245,7 +1410,7 @@ Transform:
   - {fileID: 1510694141}
   - {fileID: 1132386870}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
 --- !u!1 &1849882202
 GameObject:
   m_ObjectHideFlags: 0
@@ -1343,41 +1508,41 @@ MonoBehaviour:
     callback: 1
     expectedCallbacks: 31
     action: 64
---- !u!1 &1907414891
+--- !u!1 &1971774049
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 1907414892}
-  - 114: {fileID: 1907414893}
+  - 4: {fileID: 1971774050}
+  - 114: {fileID: 1971774051}
   m_Layer: 0
-  m_Name: On Create Instance Disable Game Object
+  m_Name: On Create Instance Destroy Game Object
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!4 &1907414892
+--- !u!4 &1971774050
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1907414891}
+  m_GameObject: {fileID: 1971774049}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 679071595}
-  m_RootOrder: 4
---- !u!114 &1907414893
+  m_RootOrder: 1
+--- !u!114 &1971774051
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1907414891}
+  m_GameObject: {fileID: 1971774049}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
@@ -1396,153 +1561,43 @@ MonoBehaviour:
   recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
   sadisticDefinition:
     callback: 4
-    expectedCallbacks: 15
-    action: 8
---- !u!1 &1932811370
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 1932811371}
-  - 114: {fileID: 1932811372}
-  m_Layer: 0
-  m_Name: On Register Destroy Game Object
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &1932811371
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1932811370}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_Children: []
-  m_Father: {fileID: 679071595}
-  m_RootOrder: 3
---- !u!114 &1932811372
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1932811370}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeout: 20
-  ignored: 0
-  succeedAfterAllAssertionsAreExecuted: 0
-  expectException: 0
-  expectedExceptionList: 
-  succeedWhenExceptionIsThrown: 0
-  includedPlatforms: -1
-  platformsToIgnore: []
-  dynamic: 0
-  dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
-  sadisticDefinition:
-    callback: 1
     expectedCallbacks: 15
     action: 16
---- !u!1 &2015802334
+--- !u!1 &2013203884
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 2015802335}
-  - 114: {fileID: 2015802336}
+  - 4: {fileID: 2013203885}
+  - 114: {fileID: 2013203886}
   m_Layer: 0
-  m_Name: On Create Instance Destroy Component
+  m_Name: On Register Destroy Game Object Immediately
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!4 &2015802335
+--- !u!4 &2013203885
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2015802334}
+  m_GameObject: {fileID: 2013203884}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
-  m_Father: {fileID: 679071595}
-  m_RootOrder: 8
---- !u!114 &2015802336
+  m_Father: {fileID: 1440827590}
+  m_RootOrder: 0
+--- !u!114 &2013203886
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2015802334}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeout: 20
-  ignored: 0
-  succeedAfterAllAssertionsAreExecuted: 0
-  expectException: 0
-  expectedExceptionList: 
-  succeedWhenExceptionIsThrown: 0
-  includedPlatforms: -1
-  platformsToIgnore: []
-  dynamic: 0
-  dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
-  sadisticDefinition:
-    callback: 4
-    expectedCallbacks: 15
-    action: 2
---- !u!1 &2018176151
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 2018176152}
-  - 114: {fileID: 2018176153}
-  m_Layer: 0
-  m_Name: On Register Destroy Component
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &2018176152
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2018176151}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_Children: []
-  m_Father: {fileID: 679071595}
-  m_RootOrder: 9
---- !u!114 &2018176153
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2018176151}
+  m_GameObject: {fileID: 2013203884}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
@@ -1561,5 +1616,5 @@ MonoBehaviour:
   recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
   sadisticDefinition:
     callback: 1
-    expectedCallbacks: 15
-    action: 2
+    expectedCallbacks: 3
+    action: 32
