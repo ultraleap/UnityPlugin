@@ -10,7 +10,6 @@ namespace Leap.Unity.Interaction.Testing {
 
   public class SadisticTest : TestComponent {
     public static SadisticTest current;
-    public static InteractionCallback allCallbacksRecieved;
 
     [Header("Test Settings")]
     [Disable]
@@ -38,6 +37,8 @@ namespace Leap.Unity.Interaction.Testing {
     private InteractionTestProvider _provider;
     private SadisticTestManager _testManager;
 
+    private InteractionCallback allCallbacksRecieved;
+
     void OnEnable() {
       _manager = FindObjectOfType<InteractionManager>();
       _provider = FindObjectOfType<InteractionTestProvider>();
@@ -57,6 +58,15 @@ namespace Leap.Unity.Interaction.Testing {
       _provider.Play();
 
       Assert.raiseExceptions = true;
+    }
+
+    public void ReportCallback(InteractionCallback callback) {
+      if ((callback & forbiddenCallbacks) != 0) {
+        IntegrationTest.Fail("Recieved a forbidden callback " + callback);
+        return;
+      }
+
+      allCallbacksRecieved |= callback;
     }
 
     IEnumerator waitForHandCoroutine() {
@@ -84,13 +94,6 @@ namespace Leap.Unity.Interaction.Testing {
       } catch (Exception e) {
         Debug.LogException(e);
         IntegrationTest.Fail(e.Message);
-      }
-
-      if ((allCallbacksRecieved & forbiddenCallbacks) != 0) {
-        Debug.LogError(getEnumMessage("Forbidden callbacks:", forbiddenCallbacks));
-        Debug.LogError(getEnumMessage("Recieved callbacks:", allCallbacksRecieved));
-        IntegrationTest.Fail("Recieved a callback that was forbidden.");
-        return;
       }
 
       //If we reach the end of the recording, we pass!

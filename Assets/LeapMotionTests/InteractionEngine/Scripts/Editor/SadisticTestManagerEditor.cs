@@ -16,6 +16,7 @@ namespace Leap.Unity.Interaction.Testing {
         "_callbacks",
         "_actions",
         "_expectedCallbacks",
+        "_forbiddenCallbacks",
         "_actionDelay",
         "_spawnObjectTime",
         "_spawnObjectDelay",

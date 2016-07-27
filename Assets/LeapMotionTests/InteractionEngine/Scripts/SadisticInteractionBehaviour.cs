@@ -59,7 +59,7 @@ namespace Leap.Unity.Interaction.Testing {
     }
 
     private void checkCallback(InteractionCallback callback) {
-      SadisticTest.allCallbacksRecieved |= callback;
+      SadisticTest.current.ReportCallback(callback);
 
       try {
         Validate();
