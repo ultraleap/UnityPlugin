@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Threading;
 using System.Collections;
 using System.Diagnostics;
 
@@ -16,6 +15,4 @@ public class FrameLimiter : MonoBehaviour {
       lastTick = stopwatch.ElapsedTicks;
     }
   }
-
-
 }
