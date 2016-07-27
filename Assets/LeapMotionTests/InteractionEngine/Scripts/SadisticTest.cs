@@ -14,11 +14,15 @@ namespace Leap.Unity.Interaction.Testing {
 
     [Header("Test Settings")]
     public InteractionTestRecording recording;
+
     public Callback callback;
+
     [EnumFlags]
     public Callback expectedCallbacks;
+
     public SadisticAction action;
-    public float delay;
+
+    public float actionDelay;
 
     private InteractionManager _manager;
     private InteractionTestProvider _provider;

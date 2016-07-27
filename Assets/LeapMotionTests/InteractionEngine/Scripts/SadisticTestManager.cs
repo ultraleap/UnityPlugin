@@ -111,7 +111,7 @@ namespace Leap.Unity.Interaction.Testing {
         test.callback = (Callback)callbackValue;
         test.expectedCallbacks = _expectedCallbacks;
         test.action = (SadisticAction)actionValue;
-        test.delay = _actionDelay;
+        test.actionDelay = _actionDelay;
       }
     }
 

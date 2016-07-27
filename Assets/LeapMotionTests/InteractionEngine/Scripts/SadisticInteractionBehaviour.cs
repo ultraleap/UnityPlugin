@@ -48,7 +48,7 @@ namespace Leap.Unity.Interaction.Testing {
     private float _afterDelayTime;
     protected override void OnEnable() {
       base.OnEnable();
-      _afterDelayTime = Time.time + SadisticTest.current.delay;
+      _afterDelayTime = Time.time + SadisticTest.current.actionDelay;
     }
 
     void Update() {
