@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Leap.Unity{
+namespace Leap.Unity {
   /// <summary>
   /// Time-step independent exponential smoothing.
   /// </summary>
@@ -12,18 +12,15 @@ namespace Leap.Unity{
     public Vector3 value = Vector3.zero; // Filtered value
     public float delay = 0f; // Mean delay
     public bool reset = true; // Reset on Next Update
-    
-    public void SetBlend(float blend, float deltaTime = 1f)
-    {
+
+    public void SetBlend(float blend, float deltaTime = 1f) {
       delay = deltaTime * blend / (1f - blend);
     }
-  
-    public Vector3 Update(Vector3 input, float deltaTime = 1f)
-    {
-      if (deltaTime > 0f &&
-          !reset) {
+
+    public Vector3 Update(Vector3 input, float deltaTime = 1f) {
+      if (deltaTime > 0f && !reset) {
         float alpha = delay / deltaTime;
-        float blend =  alpha / (1f + alpha);
+        float blend = alpha / (1f + alpha);
         // NOTE: If delay -> 0 then blend -> 0,
         // reducing the filter to this.value = value.
         // NOTE: If deltaTime -> 0 blend -> 1,
