@@ -7,15 +7,13 @@ public class FrameLimiter : MonoBehaviour {
   
   IEnumerator Start() {
     Stopwatch stopwatch = new Stopwatch();
+    stopwatch.Start();
+    long lastTick = stopwatch.ElapsedTicks;
+    long ticks = Stopwatch.Frequency * 13 / 1000;
     while (true) {
-      yield return new WaitForEndOfFrame();
-      long delta = 15 - stopwatch.ElapsedMilliseconds;
-      if(delta > 0) {
-        Thread.Sleep((int)delta);
-      }
-      
-      stopwatch.Reset();
-      stopwatch.Start();
+      yield return null;
+      while((stopwatch.ElapsedTicks - lastTick) < ticks) { }
+      lastTick = stopwatch.ElapsedTicks;
     }
   }
 
