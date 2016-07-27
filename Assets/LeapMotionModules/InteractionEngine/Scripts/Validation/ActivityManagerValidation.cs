@@ -20,10 +20,8 @@ namespace Leap.Unity.Interaction {
 
         interactionObj.Validate();
 
-        if (interactionObj.IsBeingGrasped) {
-          Assert.IsTrue(IsActive(interactionObj),
-                        "Any object that is being grasped must also be active.");
-        }
+        AssertHelper.Implies("IsBeingGrasped", interactionObj.IsBeingGrasped,
+                             "IsActive", IsActive(interactionObj));
 
         Assert.IsTrue(interactionObj.IsRegisteredWithManager,
                       "All registered behaviours must be reported as registered.");
@@ -37,10 +35,9 @@ namespace Leap.Unity.Interaction {
         Assert.AreEqual(monitor != null, IsActive(interactionObj),
                         "Monitor must be non-null for objects reported as active.");
 
-        if (monitor != null) {
-          Assert.IsTrue(monitor.isActiveAndEnabled,
-                        "Monitor must be active and enabled.");
-        }
+        AssertHelper.Implies(monitor != null,
+                             monitor.isActiveAndEnabled,
+                             "If the monitor is non-null, it must always be active and enabled.");
       }
 
       foreach (var activeObj in _activeBehaviours) {

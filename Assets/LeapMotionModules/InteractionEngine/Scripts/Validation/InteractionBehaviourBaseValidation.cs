@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction {
 
@@ -15,11 +18,9 @@ namespace Leap.Unity.Interaction {
       AssertHelper.Implies("_hasShapeInstanceHandle", _hasShapeInstanceHandle,
                            "_isRegisteredWithManager", _isRegisteredWithManager);
 
-      foreach (var untrackedId in _untrackedIds) {
-        Assert.IsTrue(_graspingIds.Contains(untrackedId),
-                      "All untracked ids must be considered grasping.");
+      foreach(var untrackedId in _untrackedIds) {
+        AssertHelper.Contains(untrackedId, _graspingIds, "An untracked id must always be considered grasping.");
       }
     }
-
   }
 }

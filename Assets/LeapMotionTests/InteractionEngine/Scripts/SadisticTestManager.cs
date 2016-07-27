@@ -25,7 +25,28 @@ namespace Leap.Unity.Interaction.Testing {
     [SerializeField]
     private SadisticInteractionBehaviour.Callback _expectedCallbacks;
 
+    [Header("Spawn Settings")]
+    [SerializeField]
+    private SpawnObjectsTime _spawnObjectTime = SpawnObjectsTime.AtStart;
+
+    [MinValue(0)]
+    [Units("Seconds")]
+    [SerializeField]
+    private float _spawnObjectDelay = 0;
+
     private bool _update = false;
+
+    public SpawnObjectsTime spawnObjectTime {
+      get {
+        return _spawnObjectTime;
+      }
+    }
+
+    public float spawnObjectDelay {
+      get {
+        return _spawnObjectDelay;
+      }
+    }
 
     public override void OnValidate() {
       base.OnValidate();
@@ -93,6 +114,11 @@ namespace Leap.Unity.Interaction.Testing {
         test.recording = _recordings[i];
         test.timeout = timeout;
       }
+    }
+
+    public enum SpawnObjectsTime {
+      AtStart,
+      UponFirstHand
     }
   }
 }

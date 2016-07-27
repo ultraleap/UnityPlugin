@@ -13,30 +13,23 @@ namespace Leap.Unity.Interaction.Testing {
 
     public override Recording recording {
       set {
-        clearShapes();
         base.recording = value;
-        createShapes();
-
         _needsToCreateInStart = false;
       }
     }
 
     protected override void Start() {
       base.Start();
-
-      if (_needsToCreateInStart) {
-        createShapes();
-      }
     }
 
-    protected void createShapes() {
+    public void SpawnShapes() {
       if (base.recording is InteractionTestRecording) {
         var interactionRecording = base.recording as InteractionTestRecording;
         interactionRecording.CreateInitialShapes(_testRoot);
       }
     }
 
-    protected void clearShapes() {
+    public void DestroyShapes() {
       var objs = _testRoot.GetComponentsInChildren<Transform>(true);
       foreach (var obj in objs) {
         if (obj == _testRoot) continue;

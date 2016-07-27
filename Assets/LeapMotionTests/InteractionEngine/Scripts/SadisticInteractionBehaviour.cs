@@ -83,7 +83,8 @@ namespace Leap.Unity.Interaction.Testing {
           DestroyImmediate(gameObject);
           break;
         case SadisticAction.ForceGrab:
-          //TODO
+          Hand hand = FindObjectOfType<LeapProvider>().CurrentFrame.Hands[0];
+          _manager.GraspWithHand(hand, this);
           break;
         case SadisticAction.ForceRelease:
           //TODO
