@@ -1,5 +1,5 @@
 ﻿using UnityEngine.Assertions;
-using System.Text;
+using System;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -11,8 +11,20 @@ public static class AssertHelper {
     }
   }
 
+  public static void Implies(bool condition, Func<bool> result, string message = "") {
+    if (condition) {
+      Implies(condition, result(), message);
+    }
+  }
+
   public static void Implies(string conditionName, bool condition, string resultName, bool result) {
     Implies(condition, result, "When " + conditionName + " is true, " + resultName + " must always be true.");
+  }
+
+  public static void Implies(string conditionName, bool condition, string resultName, Func<bool> result) {
+    if (condition) {
+      Implies(conditionName, condition, resultName, result());
+    }
   }
 
   public static void Contains<T>(T value, IEnumerable<T> collection, string message = "") {

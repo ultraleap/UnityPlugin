@@ -1,5 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
+using System;
+using System.Collections.Generic;
 using Leap.Unity.Interaction.CApi;
 using Leap.Unity.Attributes;
 
@@ -46,6 +47,19 @@ namespace Leap.Unity.Interaction.Testing {
       checkCallback(Callback.OnResume);
     }
 
+    private float _afterDelayTime;
+    protected override void OnEnable() {
+      base.OnEnable();
+      _afterDelayTime = Time.time + SadisticTest.currentDefinition.delay;
+    }
+
+    void Update() {
+      if (Time.time >= _afterDelayTime) {
+        checkCallback(Callback.AfterDelay);
+        _afterDelayTime = float.MaxValue;
+      }
+    }
+
     private void checkCallback(Callback callback) {
       SadisticTest.allCallbacksRecieved |= callback;
 
@@ -56,7 +70,7 @@ namespace Leap.Unity.Interaction.Testing {
         IntegrationTest.Fail("Validation failed during callback " + callback + "\n" + e.Message);
       }
 
-      
+
       if (SadisticTest.currentDefinition.callback == callback) {
         executeSadisticAction(SadisticTest.currentDefinition.action);
       }
@@ -87,7 +101,7 @@ namespace Leap.Unity.Interaction.Testing {
           _manager.GraspWithHand(hand, this);
           break;
         case SadisticAction.ForceRelease:
-          //TODO
+          _manager.ReleaseObject(this);
           break;
         default:
           break;
@@ -114,6 +128,7 @@ namespace Leap.Unity.Interaction.Testing {
       OnRelease = 0x0020,
       OnSuspend = 0x0040,
       OnResume = 0x0080,
+      AfterDelay = 0x0100,
     }
 
     [Serializable]
@@ -122,13 +137,14 @@ namespace Leap.Unity.Interaction.Testing {
       [EnumFlags]
       public Callback expectedCallbacks;
       public SadisticAction action;
+      public float delay;
 
-      public SadisticDef(Callback callback, Callback expectedCallbacks, SadisticAction action) {
+      public SadisticDef(Callback callback, Callback expectedCallbacks, SadisticAction action, float delay) {
         this.callback = callback;
         this.expectedCallbacks = expectedCallbacks;
         this.action = action;
+        this.delay = delay;
       }
     }
-
   }
 }

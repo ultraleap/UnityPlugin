@@ -25,6 +25,9 @@ namespace Leap.Unity.Interaction.Testing {
     [SerializeField]
     private SadisticInteractionBehaviour.Callback _expectedCallbacks;
 
+    [SerializeField]
+    private float _actionDelay = 0;
+
     [Header("Spawn Settings")]
     [SerializeField]
     private SpawnObjectsTime _spawnObjectTime = SpawnObjectsTime.AtStart;
@@ -110,7 +113,9 @@ namespace Leap.Unity.Interaction.Testing {
         test.sadisticDefinition = new SadisticInteractionBehaviour.SadisticDef(
                                          (SadisticInteractionBehaviour.Callback)callbackValue,
                                          _expectedCallbacks,
-                                         (SadisticInteractionBehaviour.SadisticAction)actionValue);
+                                         (SadisticInteractionBehaviour.SadisticAction)actionValue,
+                                         _actionDelay);
+
         test.recording = _recordings[i];
         test.timeout = timeout;
       }
