@@ -9,12 +9,9 @@ namespace Leap.Unity.Interaction.Testing {
     [SerializeField]
     protected Transform _testRoot;
 
-    private bool _needsToCreateInStart = true;
-
     public override Recording recording {
       set {
         base.recording = value;
-        _needsToCreateInStart = false;
       }
     }
 
