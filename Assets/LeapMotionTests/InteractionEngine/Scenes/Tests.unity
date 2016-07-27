@@ -593,7 +593,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2d53554227124ca485c87bdfa387665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetRenderRate: 90
+  targetRenderRate: 75
   targetRenderRateStep: 1
   fixedPhysicsRate: 100
   fixedPhysicsRateStep: 1
@@ -630,6 +630,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bc0855dbfef6bd46a03a1d230b9d977, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  frameRate: 75
 --- !u!1 &1264153173
 GameObject:
   m_ObjectHideFlags: 0
