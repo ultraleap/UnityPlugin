@@ -65,7 +65,7 @@ namespace Leap.Unity.Interaction.Testing {
       Transform[] transforms = GetComponentsInChildren<Transform>(true);
       foreach (Transform child in transforms) {
         if (child != transform) {
-          DestroyImmediate(child.gameObject);
+          Undo.DestroyObjectImmediate(child.gameObject);
         }
       }
 
@@ -100,9 +100,15 @@ namespace Leap.Unity.Interaction.Testing {
     private void createSubTest(string name, int callbackValue, int actionValue) {
       for (int i = 0; i < _recordings.Length; i++) {
         GameObject testObj = new GameObject(name);
+        Undo.RegisterCreatedObjectUndo(testObj, "Created automatic test");
+
+        Undo.RecordObject(testObj.transform, "Reparenting automatic test object");
         testObj.transform.parent = transform;
 
         var test = testObj.AddComponent<SadisticTest>();
+        Undo.RegisterCreatedObjectUndo(test, "Created autoamtic test component");
+
+        Undo.RecordObject(test, "Set test settings");
         test.timeout = timeout;
 
         test.recording = _recordings[i];
@@ -111,8 +117,6 @@ namespace Leap.Unity.Interaction.Testing {
         test.forbiddenCallbacks = _forbiddenCallbacks;
         test.action = (SadisticAction)actionValue;
         test.actionDelay = _actionDelay;
-
-        EditorUtility.SetDirty(test.gameObject);
       }
     }
 
