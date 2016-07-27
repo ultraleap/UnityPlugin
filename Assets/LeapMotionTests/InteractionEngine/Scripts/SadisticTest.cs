@@ -4,15 +4,21 @@ using UnityTest;
 using System;
 using System.Collections;
 
+using Leap.Unity.Attributes;
+
 namespace Leap.Unity.Interaction.Testing {
 
   public class SadisticTest : TestComponent {
-    public static SadisticInteractionBehaviour.SadisticDef currentDefinition;
-    public static SadisticInteractionBehaviour.Callback allCallbacksRecieved;
+    public static SadisticTest current;
+    public static Callback allCallbacksRecieved;
 
     [Header("Test Settings")]
     public InteractionTestRecording recording;
-    public SadisticInteractionBehaviour.SadisticDef sadisticDefinition;
+    public Callback callback;
+    [EnumFlags]
+    public Callback expectedCallbacks;
+    public SadisticAction action;
+    public float delay;
 
     private InteractionManager _manager;
     private InteractionTestProvider _provider;
@@ -23,7 +29,7 @@ namespace Leap.Unity.Interaction.Testing {
       _provider = FindObjectOfType<InteractionTestProvider>();
       _testManager = GetComponentInParent<SadisticTestManager>();
 
-      currentDefinition = sadisticDefinition;
+      current = this;
       allCallbacksRecieved = 0;
 
       _provider.recording = recording;
@@ -70,18 +76,18 @@ namespace Leap.Unity.Interaction.Testing {
       if (!_provider.IsPlaying) {
         _provider.DestroyShapes();
 
-        if ((allCallbacksRecieved & sadisticDefinition.expectedCallbacks) == sadisticDefinition.expectedCallbacks) {
+        if ((allCallbacksRecieved & expectedCallbacks) == expectedCallbacks) {
           IntegrationTest.Pass();
           return;
         }
 
-        var callbackType = typeof(SadisticInteractionBehaviour.Callback);
+        var callbackType = typeof(Callback);
         int[] callbackValues = (int[])Enum.GetValues(callbackType);
         string[] callbackNames = Enum.GetNames(callbackType);
 
         string errorMessage = "Expected callbacks:";
         for (int i = 0; i < callbackValues.Length; i++) {
-          if ((callbackValues[i] & (int)sadisticDefinition.expectedCallbacks) != 0) {
+          if ((callbackValues[i] & (int)expectedCallbacks) != 0) {
             errorMessage += "\n" + callbackNames[i];
           }
         }
@@ -99,5 +105,28 @@ namespace Leap.Unity.Interaction.Testing {
         IntegrationTest.Fail("Could not find an interaction behaviour that recieved all expected callbacks");
       }
     }
+  }
+
+  public enum SadisticAction {
+    DisableComponent = 0x0001,
+    DestroyComponent = 0x0002,
+    DestroyComponentImmediately = 0x0004,
+    DisableGameObject = 0x0008,
+    DestroyGameObject = 0x0010,
+    DestroyGameObjectImmediately = 0x0020,
+    ForceGrab = 0x0040,
+    ForceRelease = 0x0080
+  }
+
+  public enum Callback {
+    OnRegister = 0x0001,
+    OnUnregister = 0x0002,
+    OnCreateInstance = 0x0004,
+    OnDestroyInstance = 0x0008,
+    OnGrasp = 0x0010,
+    OnRelease = 0x0020,
+    OnSuspend = 0x0040,
+    OnResume = 0x0080,
+    AfterDelay = 0x0100,
   }
 }

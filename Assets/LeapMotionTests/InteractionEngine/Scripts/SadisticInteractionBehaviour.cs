@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System;
-using System.Collections.Generic;
 using Leap.Unity.Interaction.CApi;
-using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction.Testing {
 
@@ -50,7 +48,7 @@ namespace Leap.Unity.Interaction.Testing {
     private float _afterDelayTime;
     protected override void OnEnable() {
       base.OnEnable();
-      _afterDelayTime = Time.time + SadisticTest.currentDefinition.delay;
+      _afterDelayTime = Time.time + SadisticTest.current.delay;
     }
 
     void Update() {
@@ -71,8 +69,8 @@ namespace Leap.Unity.Interaction.Testing {
       }
 
 
-      if (SadisticTest.currentDefinition.callback == callback) {
-        executeSadisticAction(SadisticTest.currentDefinition.action);
+      if (SadisticTest.current.callback == callback) {
+        executeSadisticAction(SadisticTest.current.action);
       }
     }
 
@@ -105,45 +103,6 @@ namespace Leap.Unity.Interaction.Testing {
           break;
         default:
           break;
-      }
-    }
-
-    public enum SadisticAction {
-      DisableComponent = 0x0001,
-      DestroyComponent = 0x0002,
-      DestroyComponentImmediately = 0x0004,
-      DisableGameObject = 0x0008,
-      DestroyGameObject = 0x0010,
-      DestroyGameObjectImmediately = 0x0020,
-      ForceGrab = 0x0040,
-      ForceRelease = 0x0080
-    }
-
-    public enum Callback {
-      OnRegister = 0x0001,
-      OnUnregister = 0x0002,
-      OnCreateInstance = 0x0004,
-      OnDestroyInstance = 0x0008,
-      OnGrasp = 0x0010,
-      OnRelease = 0x0020,
-      OnSuspend = 0x0040,
-      OnResume = 0x0080,
-      AfterDelay = 0x0100,
-    }
-
-    [Serializable]
-    public class SadisticDef {
-      public Callback callback;
-      [EnumFlags]
-      public Callback expectedCallbacks;
-      public SadisticAction action;
-      public float delay;
-
-      public SadisticDef(Callback callback, Callback expectedCallbacks, SadisticAction action, float delay) {
-        this.callback = callback;
-        this.expectedCallbacks = expectedCallbacks;
-        this.action = action;
-        this.delay = delay;
       }
     }
   }

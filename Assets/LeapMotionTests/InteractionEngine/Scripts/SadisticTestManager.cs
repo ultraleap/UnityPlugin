@@ -7,7 +7,7 @@ using Leap.Unity.Attributes;
 namespace Leap.Unity.Interaction.Testing {
 
   public class SadisticTestManager : TestComponent {
-    [Header("Sadistic Settings")]
+    [Header("Test Definition")]
     [Tooltip("The recordings to be used in the tests.")]
     [SerializeField]
     private InteractionTestRecording[] _recordings;
@@ -15,21 +15,27 @@ namespace Leap.Unity.Interaction.Testing {
     [EnumFlags]
     [Tooltip("The callbacks to be used as triggers for actions.")]
     [SerializeField]
-    private SadisticInteractionBehaviour.Callback _callbacks;
+    private Callback _callbacks;
 
     [EnumFlags]
     [Tooltip("The actions to be dispatched when a callback is triggered.")]
     [SerializeField]
-    private SadisticInteractionBehaviour.SadisticAction _actions;
-
-    [EnumFlags]
-    [Tooltip("If any of these callbacks has not been dispatched by the time the test has finished, the test will fail.")]
-    [SerializeField]
-    private SadisticInteractionBehaviour.Callback _expectedCallbacks;
+    private SadisticAction _actions;
 
     [Tooltip("How long after start should the AfterDelay callback be dispatched.")]
     [SerializeField]
     private float _actionDelay = 0;
+
+    [Header("Test Conditions")]
+    [EnumFlags]
+    [Tooltip("If any of these callbacks has not been dispatched by the time the test has finished, the test will fail.")]
+    [SerializeField]
+    private Callback _expectedCallbacks;
+
+    [EnumFlags]
+    [Tooltip("If any of these callbacks is dispatched, the test will fail.")]
+    [SerializeField]
+    private Callback _forbiddenCallbacks;
 
     [Header("Spawn Settings")]
     [Tooltip("Under what condition should the objects be spawned")]
@@ -65,8 +71,8 @@ namespace Leap.Unity.Interaction.Testing {
         }
       }
 
-      var actionType = typeof(SadisticInteractionBehaviour.SadisticAction);
-      var callbackType = typeof(SadisticInteractionBehaviour.Callback);
+      var actionType = typeof(SadisticAction);
+      var callbackType = typeof(Callback);
 
       int[] actionValues = (int[])Enum.GetValues(actionType);
       int[] callbackValues = (int[])Enum.GetValues(callbackType);
@@ -99,14 +105,13 @@ namespace Leap.Unity.Interaction.Testing {
         testObj.transform.parent = transform;
 
         var test = testObj.AddComponent<SadisticTest>();
-        test.sadisticDefinition = new SadisticInteractionBehaviour.SadisticDef(
-                                         (SadisticInteractionBehaviour.Callback)callbackValue,
-                                         _expectedCallbacks,
-                                         (SadisticInteractionBehaviour.SadisticAction)actionValue,
-                                         _actionDelay);
+        test.timeout = timeout;
 
         test.recording = _recordings[i];
-        test.timeout = timeout;
+        test.callback = (Callback)callbackValue;
+        test.expectedCallbacks = _expectedCallbacks;
+        test.action = (SadisticAction)actionValue;
+        test.delay = _actionDelay;
       }
     }
 
