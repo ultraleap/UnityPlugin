@@ -48,8 +48,6 @@ namespace Leap.Unity.Interaction.Testing {
     [SerializeField]
     private float _spawnObjectDelay = 0;
 
-    private bool _update = false;
-
     public SpawnObjectsTime spawnObjectTime {
       get {
         return _spawnObjectTime;
