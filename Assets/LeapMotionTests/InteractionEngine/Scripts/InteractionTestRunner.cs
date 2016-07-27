@@ -3,7 +3,7 @@ using UnityTest;
 
 namespace Leap.Unity.Interaction.Testing {
 
-  public class PrefabTestRunner : TestRunner {
+  public class InteractionTestRunner : TestRunner {
 
     [SerializeField]
     protected GameObject _testPrefab;
