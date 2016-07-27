@@ -111,6 +111,8 @@ namespace Leap.Unity.Interaction.Testing {
         test.forbiddenCallbacks = _forbiddenCallbacks;
         test.action = (SadisticAction)actionValue;
         test.actionDelay = _actionDelay;
+
+        EditorUtility.SetDirty(test.gameObject);
       }
     }
 
