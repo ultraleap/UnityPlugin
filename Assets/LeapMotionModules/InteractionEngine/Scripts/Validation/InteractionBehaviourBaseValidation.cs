@@ -1,9 +1,4 @@
-﻿using UnityEngine;
-using UnityEngine.Assertions;
-using System;
-using System.Linq;
-using System.Collections.Generic;
-
+﻿
 namespace Leap.Unity.Interaction {
 
   public partial class InteractionBehaviourBase {
