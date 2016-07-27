@@ -61,13 +61,7 @@ namespace Leap.Unity.Interaction.Testing {
     private void checkCallback(InteractionCallback callback) {
       SadisticTest.current.ReportCallback(callback);
 
-      try {
-        Validate();
-      } catch (Exception e) {
-        Debug.LogException(e);
-        IntegrationTest.Fail("Validation failed during callback " + callback + "\n" + e.Message);
-      }
-
+      Validate();
 
       if (SadisticTest.current.callback == callback) {
         executeSadisticAction(SadisticTest.current.action);

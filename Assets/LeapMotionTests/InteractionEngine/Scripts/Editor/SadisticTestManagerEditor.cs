@@ -38,6 +38,5 @@ namespace Leap.Unity.Interaction.Testing {
         (target as SadisticTestManager).UpdateChildrenTests();
       }
     }
-
   }
 }

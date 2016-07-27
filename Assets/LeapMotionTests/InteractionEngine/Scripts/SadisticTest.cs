@@ -89,12 +89,7 @@ namespace Leap.Unity.Interaction.Testing {
     }
 
     void Update() {
-      try {
-        _manager.Validate();
-      } catch (Exception e) {
-        Debug.LogException(e);
-        IntegrationTest.Fail(e.Message);
-      }
+      _manager.Validate();
 
       //If we reach the end of the recording, we pass!
       if (!_provider.IsPlaying) {
