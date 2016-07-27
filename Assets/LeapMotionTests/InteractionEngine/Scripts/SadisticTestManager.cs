@@ -110,6 +110,7 @@ namespace Leap.Unity.Interaction.Testing {
         test.recording = _recordings[i];
         test.callback = (InteractionCallback)callbackValue;
         test.expectedCallbacks = _expectedCallbacks;
+        test.forbiddenCallbacks = _forbiddenCallbacks;
         test.action = (SadisticAction)actionValue;
         test.actionDelay = _actionDelay;
       }

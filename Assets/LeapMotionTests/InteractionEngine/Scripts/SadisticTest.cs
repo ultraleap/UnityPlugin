@@ -17,6 +17,7 @@ namespace Leap.Unity.Interaction.Testing {
     public InteractionCallback callback;
     [EnumFlags]
     public InteractionCallback expectedCallbacks;
+    public InteractionCallback forbiddenCallbacks;
     public SadisticAction action;
     public float actionDelay;
 
@@ -72,6 +73,13 @@ namespace Leap.Unity.Interaction.Testing {
         IntegrationTest.Fail(e.Message);
       }
 
+      if ((allCallbacksRecieved & forbiddenCallbacks) != 0) {
+        Debug.LogError(getEnumMessage("Forbidden callbacks:", forbiddenCallbacks));
+        Debug.LogError(getEnumMessage("Recieved callbacks:", allCallbacksRecieved));
+        IntegrationTest.Fail("Recieved a callback that was forbidden.");
+        return;
+      }
+
       //If we reach the end of the recording, we pass!
       if (!_provider.IsPlaying) {
         _provider.DestroyShapes();
@@ -81,29 +89,25 @@ namespace Leap.Unity.Interaction.Testing {
           return;
         }
 
-        var callbackType = typeof(InteractionCallback);
-        int[] callbackValues = (int[])Enum.GetValues(callbackType);
-        string[] callbackNames = Enum.GetNames(callbackType);
-
-        string errorMessage = "Expected callbacks:";
-        for (int i = 0; i < callbackValues.Length; i++) {
-          if ((callbackValues[i] & (int)expectedCallbacks) != 0) {
-            errorMessage += "\n" + callbackNames[i];
-          }
-        }
-
-        string recievedMessage = "Recieved callbacks:";
-        for (int i = 0; i < callbackValues.Length; i++) {
-          if ((callbackValues[i] & (int)allCallbacksRecieved) != 0) {
-            recievedMessage += "\n" + callbackNames[i];
-          }
-        }
-
-        Debug.LogError(errorMessage);
-        Debug.LogError(recievedMessage);
+        Debug.LogError(getEnumMessage("Expected callbacks:", expectedCallbacks));
+        Debug.LogError(getEnumMessage("Recieved callbacks:", allCallbacksRecieved));
 
         IntegrationTest.Fail("Could not find an interaction behaviour that recieved all expected callbacks");
       }
+    }
+
+    private string getEnumMessage(string message, InteractionCallback values) {
+      var callbackType = typeof(InteractionCallback);
+      int[] callbackValues = (int[])Enum.GetValues(callbackType);
+      string[] callbackNames = Enum.GetNames(callbackType);
+
+      for (int i = 0; i < callbackValues.Length; i++) {
+        if ((callbackValues[i] & (int)expectedCallbacks) != 0) {
+          message += "\n" + callbackNames[i];
+        }
+      }
+
+      return message;
     }
   }
 
