@@ -11,7 +11,7 @@ namespace Leap.Unity.Playback {
           incrementOncePerFrame();
           return _recording.frames[_currentFrameIndex];
         } else {
-          return null;
+          return new Frame();
         }
       }
     }
