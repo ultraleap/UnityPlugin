@@ -53,7 +53,7 @@ namespace Leap.Unity.Playback {
           break;
         case SaveType.UnityAsset:
 #if UNITY_EDITOR
-          Directory.CreateDirectory(_unityAssetSavePath);
+          Directory.CreateDirectory(_unityAssetSavePath + ".dummy");
           string path = AssetDatabase.GenerateUniqueAssetPath(_unityAssetSavePath + ".asset");
           AssetDatabase.CreateAsset(finishedRecording, path);
           AssetDatabase.SaveAssets();
