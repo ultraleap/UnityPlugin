@@ -10,6 +10,8 @@ namespace Leap.Unity {
     protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedDecorators;
     protected Dictionary<string, List<Func<bool>>> _conditionalProperties;
 
+    protected List<SerializedProperty> _modifiedProperties = new List<SerializedProperty>();
+
     /// <summary>
     /// Specify a callback to be used to draw a specific named property.  Should be called in OnEnable.
     /// </summary>
@@ -93,6 +95,7 @@ namespace Leap.Unity {
      * Individual properties can be specified to have custom drawers.
      */
     public override void OnInspectorGUI() {
+      _modifiedProperties.Clear();
       SerializedProperty iterator = serializedObject.GetIterator();
       bool isFirst = true;
 
@@ -117,12 +120,18 @@ namespace Leap.Unity {
           }
         }
 
+        EditorGUI.BeginChangeCheck();
+
         if (_specifiedDrawers.TryGetValue(iterator.name, out customDrawer)) {
           customDrawer(iterator);
         } else {
           using (new EditorGUI.DisabledGroupScope(isFirst)) {
             EditorGUILayout.PropertyField(iterator, true);
           }
+        }
+
+        if (EditorGUI.EndChangeCheck()) {
+          _modifiedProperties.Add(iterator.Copy());
         }
 
         isFirst = false;

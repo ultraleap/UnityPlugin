@@ -6,33 +6,38 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction.Testing {
 
-  [ExecuteInEditMode]
   public class SadisticTestManager : TestComponent {
-
     [Header("Sadistic Settings")]
+    [Tooltip("The recordings to be used in the tests.")]
     [SerializeField]
     private InteractionTestRecording[] _recordings;
 
     [EnumFlags]
+    [Tooltip("The callbacks to be used as triggers for actions.")]
     [SerializeField]
     private SadisticInteractionBehaviour.Callback _callbacks;
 
     [EnumFlags]
+    [Tooltip("The actions to be dispatched when a callback is triggered.")]
     [SerializeField]
     private SadisticInteractionBehaviour.SadisticAction _actions;
 
     [EnumFlags]
+    [Tooltip("If any of these callbacks has not been dispatched by the time the test has finished, the test will fail.")]
     [SerializeField]
     private SadisticInteractionBehaviour.Callback _expectedCallbacks;
 
+    [Tooltip("How long after start should the AfterDelay callback be dispatched.")]
     [SerializeField]
     private float _actionDelay = 0;
 
     [Header("Spawn Settings")]
+    [Tooltip("Under what condition should the objects be spawned")]
     [SerializeField]
     private SpawnObjectsTime _spawnObjectTime = SpawnObjectsTime.AtStart;
 
     [MinValue(0)]
+    [Tooltip("Once the spawn condition is met, how long before the objects are spawned.")]
     [Units("Seconds")]
     [SerializeField]
     private float _spawnObjectDelay = 0;
@@ -51,24 +56,8 @@ namespace Leap.Unity.Interaction.Testing {
       }
     }
 
-    public override void OnValidate() {
-      base.OnValidate();
-
-      if (!Application.isPlaying) {
-        //_update = true;
-        //gameObject.SetActive(true);
-      }
-    }
-
-    void Update() {
-      if (_update) {
-        updateChildrenTests();
-        _update = false;
-      }
-    }
-
     [ContextMenu("Update tests")]
-    private void updateChildrenTests() {
+    public void UpdateChildrenTests() {
       Transform[] transforms = GetComponentsInChildren<Transform>(true);
       foreach (Transform child in transforms) {
         if (child != transform) {
