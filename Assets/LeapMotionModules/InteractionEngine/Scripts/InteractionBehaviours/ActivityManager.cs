@@ -69,8 +69,9 @@ namespace Leap.Unity.Interaction {
         return;
       }
 
-      behaviour.NotifyRegistered();
       _registeredBehaviours.Add(behaviour, null);
+
+      behaviour.NotifyRegistered();
     }
 
     public void Unregister(IInteractionBehaviour behaviour) {
@@ -82,7 +83,7 @@ namespace Leap.Unity.Interaction {
       if (IsActive(behaviour)) {
         Deactivate(behaviour);
       }
-
+      
       _registeredBehaviours.Remove(behaviour);
 
       behaviour.NotifyUnregistered();
