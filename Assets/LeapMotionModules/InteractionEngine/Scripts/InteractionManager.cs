@@ -394,6 +394,9 @@ namespace Leap.Unity.Interaction {
         throw new InvalidOperationException("Cannot grasp " + interactionBehaviour + " because it is not registered with this manager.");
       }
 
+      //Ensure behaviour is active already
+      _activityManager.Activate(interactionBehaviour);
+
       if (!interactionBehaviour.IsBeingGrasped) {
         _graspedBehaviours.Add(interactionBehaviour);
       }
@@ -425,7 +428,11 @@ namespace Leap.Unity.Interaction {
         foreach (var interactionHand in _idToInteractionHand.Values) {
           if (interactionHand.graspedObject == interactionBehaviour) {
             try {
-              interactionHand.ReleaseObject();
+              if (interactionHand.isUntracked) {
+                interactionHand.MarkTimeout();
+              } else {
+                interactionHand.ReleaseObject();
+              }
             } catch (Exception e) {
               //Only log to console
               //We want to continue so we can destroy the shape and dispatch OnUnregister
