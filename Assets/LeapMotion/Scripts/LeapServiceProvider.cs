@@ -23,6 +23,12 @@ namespace Leap.Unity {
     [SerializeField]
     protected LeapVRTemporalWarping _temporalWarping;
 
+    [Tooltip("When true, update frames will be re-used for physics.  This is an optimization, since the total number " + 
+             "of frames that need to be calculated is halved.  However, this introduces extra latency and inaccuracy " +
+             "into the physics frames.")]
+    [SerializeField]
+    protected bool _reuseFramesForPhysics = false;
+
     [Header("Device Type")]
     [SerializeField]
     protected bool _overrideDeviceType = false;
