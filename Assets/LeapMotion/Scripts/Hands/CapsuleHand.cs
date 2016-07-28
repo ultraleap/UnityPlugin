@@ -65,6 +65,7 @@ namespace Leap.Unity {
       get {
         return handedness;
       }
+      set { }
     }
 
     public override bool SupportsEditorPersistence() {
