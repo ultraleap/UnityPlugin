@@ -795,6 +795,10 @@ namespace Leap.Unity.Interaction {
               //This also dispatched InteractionObject.OnHandRegainedTracking()
               interactionHand.RegainTracking(hand);
 
+              if (interactionHand.graspedObject == null) {
+                continue;
+              }
+
               // NotifyHandRegainedTracking() did not throw, continue on to NotifyHandsHoldPhysics().
               dispatchOnHandsHolding(hands, interactionHand.graspedObject, isPhysics: true);
             } catch (Exception e) {
