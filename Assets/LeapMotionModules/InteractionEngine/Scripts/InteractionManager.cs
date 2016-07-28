@@ -829,7 +829,7 @@ namespace Leap.Unity.Interaction {
                       interactionHand.GraspObject(interactionBehaviour, isUserGrasp: false);
 
                       //the grasp callback might have caused the object to become ungrasped
-                      if (interactionHand.graspedObject == interactionBehaviour) {
+                      if (interactionHand.graspedObject == interactionBehaviour && interactionBehaviour != null) {
                         dispatchOnHandsHolding(hands, interactionBehaviour, isPhysics: true);
                       }
                     } catch (Exception e) {
