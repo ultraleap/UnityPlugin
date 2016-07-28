@@ -100,8 +100,8 @@ namespace Leap.Unity.Interaction.Testing {
           return;
         }
 
-        Debug.LogError(getEnumMessage("Expected callbacks:", expectedCallbacks));
-        Debug.LogError(getEnumMessage("Recieved callbacks:", allCallbacksRecieved));
+        Debug.LogError(getEnumMessage("Expected callbacks: " + expectedCallbacks, expectedCallbacks));
+        Debug.LogError(getEnumMessage("Recieved callbacks: " + allCallbacksRecieved, allCallbacksRecieved));
 
         IntegrationTest.Fail("Could not find an interaction behaviour that recieved all expected callbacks");
       }
@@ -113,7 +113,7 @@ namespace Leap.Unity.Interaction.Testing {
       string[] callbackNames = Enum.GetNames(callbackType);
 
       for (int i = 0; i < callbackValues.Length; i++) {
-        if ((callbackValues[i] & (int)expectedCallbacks) != 0) {
+        if ((callbackValues[i] & (int)values) != 0) {
           message += "\n" + callbackNames[i];
         }
       }
