@@ -23,7 +23,7 @@ namespace Leap.Unity {
     [SerializeField]
     protected LeapVRTemporalWarping _temporalWarping;
 
-    [Tooltip("When true, update frames will be re-used for physics.  This is an optimization, since the total number " + 
+    [Tooltip("When true, update frames will be re-used for physics.  This is an optimization, since the total number " +
              "of frames that need to be calculated is halved.  However, this introduces extra latency and inaccuracy " +
              "into the physics frames.")]
     [SerializeField]
@@ -74,7 +74,11 @@ namespace Leap.Unity {
 
     public override Frame CurrentFixedFrame {
       get {
-        return _transformedFixedFrame;
+        if (_reuseFramesForPhysics) {
+          return _transformedUpdateFrame;
+        } else {
+          return _transformedFixedFrame;
+        }
       }
     }
 
@@ -206,6 +210,10 @@ namespace Leap.Unity {
     }
 
     protected virtual void FixedUpdate() {
+      if (_reuseFramesForPhysics) {
+        return;
+      }
+
       if (_useInterpolation) {
         Int64 unityTime = (Int64)((Time.fixedTime + _fixedOffset.value) * 1e6);
         Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
