@@ -144,8 +144,8 @@ namespace Leap.Unity {
     }
 
     public void ReTransformFrames() {
-      _transformedUpdateFrame = getTransformedFrame(_untransformedUpdateFrame);
-      _transformedFixedFrame = getTransformedFrame(_untransformedFixedFrame);
+      transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
+      transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
     }
 
     protected virtual void Awake() {
@@ -185,13 +185,13 @@ namespace Leap.Unity {
         Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
         Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
 
-        _untransformedUpdateFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
+        leap_controller_.GetInterpolatedFrame(_untransformedUpdateFrame, leapFrameTime);
       } else {
-        _untransformedUpdateFrame = leap_controller_.Frame();
+        leap_controller_.Frame(_untransformedUpdateFrame);
       }
 
       if (_untransformedUpdateFrame != null) {
-        _transformedUpdateFrame = getTransformedFrame(_untransformedUpdateFrame);
+        transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
 
         DispatchUpdateFrameEvent(_transformedUpdateFrame);
       }
@@ -209,7 +209,7 @@ namespace Leap.Unity {
       }
 
       if (_untransformedFixedFrame != null) {
-        _transformedFixedFrame = getTransformedFrame(_untransformedFixedFrame);
+        transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
 
         DispatchFixedFrameEvent(_transformedFixedFrame);
       }
@@ -280,7 +280,7 @@ namespace Leap.Unity {
       leap_controller_.Device -= onHandControllerConnect;
     }
 
-    protected Frame getTransformedFrame(Frame source) {
+    protected void transformFrame(Frame source, Frame dest) {
       LeapTransform leapTransform;
       if (_temporalWarping != null) {
         Vector3 warpedPosition;
@@ -295,7 +295,7 @@ namespace Leap.Unity {
         leapTransform = transform.GetLeapMatrix();
       }
 
-      return source.TransformedCopy(leapTransform);
+      dest.CopyFrom(source).Transform(leapTransform);
     }
   }
 }
