@@ -352,10 +352,14 @@ namespace Leap.Unity.Interaction {
 
       foreach (var interactionHand in _idToInteractionHand.Values) {
         if (interactionHand.graspedObject == graspedObject) {
-          if (_graspingEnabled) {
-            InteractionC.OverrideHandResult(ref _scene, (uint)interactionHand.hand.Id, ref result);
+          if (interactionHand.isUntracked) {
+            interactionHand.MarkTimeout();
+          } else {
+            if (_graspingEnabled) {
+              InteractionC.OverrideHandResult(ref _scene, (uint)interactionHand.hand.Id, ref result);
+            }
+            interactionHand.ReleaseObject();
           }
-          interactionHand.ReleaseObject();
         }
       }
 
