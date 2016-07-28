@@ -19,6 +19,9 @@ namespace Leap.Unity.Packaging {
     protected string _packageName = "New Package";
 
     [SerializeField]
+    protected bool _generateBuildDropdown = false;
+
+    [SerializeField]
     protected string[] _dependantFolders;
 
     [SerializeField]
@@ -83,6 +86,19 @@ namespace Leap.Unity.Packaging {
 
       folder = EditorPrefs.GetString(key);
       return true;
+    }
+
+    public static void BuildPackage(string packageGUID) {
+      string assetPath = AssetDatabase.GUIDToAssetPath(packageGUID);
+      var packageDef = AssetDatabase.LoadAssetAtPath<PackageDefinition>(assetPath);
+
+      if (packageDef != null) {
+        packageDef.BuildPackage(interactive: false);
+      }
+    }
+
+    public void GenerateBuildMenuItem() {
+
     }
 
     /// <summary>
