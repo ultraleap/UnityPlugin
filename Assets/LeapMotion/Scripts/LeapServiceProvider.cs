@@ -211,6 +211,7 @@ namespace Leap.Unity {
 
     protected virtual void FixedUpdate() {
       if (_reuseFramesForPhysics) {
+        DispatchFixedFrameEvent(_transformedUpdateFrame);
         return;
       }
 
@@ -219,9 +220,9 @@ namespace Leap.Unity {
         Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
         Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
 
-        _untransformedFixedFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
+        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, leapFrameTime);
       } else {
-        _untransformedFixedFrame = leap_controller_.Frame();
+        leap_controller_.Frame(_untransformedFixedFrame);
       }
 
       if (_untransformedFixedFrame != null) {
