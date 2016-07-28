@@ -157,6 +157,8 @@ namespace Leap.Unity {
       createController();
       _transformedUpdateFrame = new Frame();
       _transformedFixedFrame = new Frame();
+      _untransformedUpdateFrame = new Frame();
+      _untransformedFixedFrame = new Frame();
       StartCoroutine(waitCoroutine());
     }
 
