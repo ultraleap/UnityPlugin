@@ -1035,13 +1035,13 @@ namespace Leap.Unity.Interaction {
       public bool isUserGrasp { get; protected set; }
 
       public InteractionHand(Hand hand) {
-        this.hand = hand;
+        this.hand = new Hand().CopyFrom(hand);
         lastTimeUpdated = Time.unscaledTime;
         graspedObject = null;
       }
 
       public void UpdateHand(Hand hand) {
-        this.hand = hand;
+        this.hand.CopyFrom(hand);
         lastTimeUpdated = Time.unscaledTime;
       }
 
