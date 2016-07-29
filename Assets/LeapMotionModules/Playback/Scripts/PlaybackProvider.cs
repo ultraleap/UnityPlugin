@@ -38,6 +38,7 @@ namespace Leap.Unity.Playback {
 
     protected bool _isPlaying = false;
     protected int _currentFrameIndex = 0;
+    protected float _startTime = 0;
 
     public virtual bool IsPlaying {
       get {
@@ -56,6 +57,17 @@ namespace Leap.Unity.Playback {
     }
 
     public virtual void Play() {
+      float delta = _recording.frameTimes[_currentFrameIndex] - _recording.frameTimes[0];
+
+      switch (_playbackTimeline) {
+        case PlaybackTimeline.Graphics:
+          _startTime = Time.time - delta;
+          break;
+        case PlaybackTimeline.Physics:
+          _startTime = Time.fixedTime - delta;
+          break;
+      }
+
       _isPlaying = true;
     }
 
@@ -88,7 +100,7 @@ namespace Leap.Unity.Playback {
     protected virtual void Update() {
       if (_isPlaying) {
         if (_playbackTimeline == PlaybackTimeline.Graphics) {
-          stepRecording(Time.time);
+          stepRecording(Time.time - _startTime);
         }
         DispatchUpdateFrameEvent(_recording.frames[_currentFrameIndex]);
       }
@@ -97,7 +109,7 @@ namespace Leap.Unity.Playback {
     protected virtual void FixedUpdate() {
       if (_isPlaying) {
         if (_playbackTimeline == PlaybackTimeline.Physics) {
-          stepRecording(Time.fixedTime);
+          stepRecording(Time.fixedTime - _startTime);
         }
         DispatchFixedFrameEvent(_recording.frames[_currentFrameIndex]);
       }
