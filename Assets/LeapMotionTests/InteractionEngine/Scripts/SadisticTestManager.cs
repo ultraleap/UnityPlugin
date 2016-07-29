@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityTest;
 using System;
 using Leap.Unity.Attributes;
@@ -60,6 +62,7 @@ namespace Leap.Unity.Interaction.Testing {
       }
     }
 
+#if UNITY_EDITOR
     [ContextMenu("Update tests")]
     public void UpdateChildrenTests() {
       Transform[] transforms = GetComponentsInChildren<Transform>(true);
@@ -119,6 +122,7 @@ namespace Leap.Unity.Interaction.Testing {
         test.actionDelay = _actionDelay;
       }
     }
+#endif
 
     public enum SpawnObjectsTime {
       AtStart,

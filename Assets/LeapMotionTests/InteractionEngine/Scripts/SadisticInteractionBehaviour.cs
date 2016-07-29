@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System;
 using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction.Testing {
