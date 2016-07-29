@@ -8,7 +8,6 @@ namespace Leap.Unity.Playback {
     public override Frame CurrentFrame {
       get {
         if (_recording != null) {
-          incrementOncePerFrame();
           return _recording.frames[_currentFrameIndex];
         } else {
           return new Frame();
@@ -32,11 +31,14 @@ namespace Leap.Unity.Playback {
     protected Recording _recording;
 
     [SerializeField]
+    protected PlaybackTimeline _playbackTimeline = PlaybackTimeline.Graphics;
+
+    [SerializeField]
     protected bool _autoPlay = true;
 
     protected bool _isPlaying = false;
     protected int _currentFrameIndex = 0;
-    protected int _lastFrameUpdated = -1;
+    protected float _startTime = 0;
 
     public virtual bool IsPlaying {
       get {
@@ -55,6 +57,17 @@ namespace Leap.Unity.Playback {
     }
 
     public virtual void Play() {
+      float delta = _recording.frameTimes[_currentFrameIndex] - _recording.frameTimes[0];
+
+      switch (_playbackTimeline) {
+        case PlaybackTimeline.Graphics:
+          _startTime = Time.time - delta;
+          break;
+        case PlaybackTimeline.Physics:
+          _startTime = Time.fixedTime - delta;
+          break;
+      }
+
       _isPlaying = true;
     }
 
@@ -86,28 +99,41 @@ namespace Leap.Unity.Playback {
 
     protected virtual void Update() {
       if (_isPlaying) {
-        incrementOncePerFrame();
+        if (_playbackTimeline == PlaybackTimeline.Graphics) {
+          stepRecording(Time.time - _startTime);
+        }
         DispatchUpdateFrameEvent(_recording.frames[_currentFrameIndex]);
       }
     }
 
     protected virtual void FixedUpdate() {
       if (_isPlaying) {
-        incrementOncePerFrame();
-        DispatchUpdateFrameEvent(_recording.frames[_currentFrameIndex]);
+        if (_playbackTimeline == PlaybackTimeline.Physics) {
+          stepRecording(Time.fixedTime - _startTime);
+        }
+        DispatchFixedFrameEvent(_recording.frames[_currentFrameIndex]);
       }
     }
 
-    private void incrementOncePerFrame() {
-      if (_lastFrameUpdated != Time.frameCount) {
-        _lastFrameUpdated = Time.frameCount;
-
+    private void stepRecording(float time) {
+      while (true) {
         if (_currentFrameIndex >= _recording.frames.Count - 1) {
           Pause();
-        } else {
+          break;
+        }
+
+        float crossover = (_recording.frameTimes[_currentFrameIndex + 1] + _recording.frameTimes[_currentFrameIndex]) / 2.0f;
+        if (time > crossover) {
           Seek(_currentFrameIndex + 1);
+        } else {
+          break;
         }
       }
+    }
+
+    public enum PlaybackTimeline {
+      Graphics,
+      Physics
     }
   }
 }

@@ -8,10 +8,15 @@ namespace Leap.Unity.Interaction.Testing {
     [SerializeField]
     protected GameObject _testPrefab;
 
+    [SerializeField]
+    protected float _timeScale = 10;
+
     private GameObject _spawned;
 
     protected override void StartNewTest() {
       _spawned = Instantiate(_testPrefab);
+
+      Time.timeScale = _timeScale;
 
       base.StartNewTest();
     }
