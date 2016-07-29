@@ -12,43 +12,43 @@ namespace Leap.Unity.Interaction.Testing {
     [Header("Test Definition")]
     [Tooltip("The recordings to be used in the tests.")]
     [SerializeField]
-    private InteractionTestRecording[] _recordings;
+    protected InteractionTestRecording[] _recordings;
 
     [EnumFlags]
     [Tooltip("The callbacks to be used as triggers for actions.")]
     [SerializeField]
-    private InteractionCallback _callbacks;
+    protected InteractionCallback _callbacks;
 
     [EnumFlags]
     [Tooltip("The actions to be dispatched when a callback is triggered.")]
     [SerializeField]
-    private SadisticAction _actions;
+    protected SadisticAction _actions;
 
     [Tooltip("How long after start should the AfterDelay callback be dispatched.")]
     [SerializeField]
-    private float _actionDelay = 0;
+    protected float _actionDelay = 0;
 
     [Header("Test Conditions")]
     [EnumFlags]
     [Tooltip("If any of these callbacks has not been dispatched by the time the test has finished, the test will fail.")]
     [SerializeField]
-    private InteractionCallback _expectedCallbacks;
+    protected InteractionCallback _expectedCallbacks;
 
     [EnumFlags]
     [Tooltip("If any of these callbacks is dispatched, the test will fail.")]
     [SerializeField]
-    private InteractionCallback _forbiddenCallbacks;
+    protected InteractionCallback _forbiddenCallbacks;
 
     [Header("Spawn Settings")]
     [Tooltip("Under what condition should the objects be spawned")]
     [SerializeField]
-    private SpawnObjectsTime _spawnObjectTime = SpawnObjectsTime.AtStart;
+    protected SpawnObjectsTime _spawnObjectTime = SpawnObjectsTime.AtStart;
 
     [MinValue(0)]
     [Tooltip("Once the spawn condition is met, how long before the objects are spawned.")]
     [Units("Seconds")]
     [SerializeField]
-    private float _spawnObjectDelay = 0;
+    protected float _spawnObjectDelay = 0;
 
     public SpawnObjectsTime spawnObjectTime {
       get {

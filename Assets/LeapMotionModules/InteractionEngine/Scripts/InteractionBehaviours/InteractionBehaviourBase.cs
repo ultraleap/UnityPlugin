@@ -52,7 +52,12 @@ namespace Leap.Unity.Interaction {
     private List<int> _graspingIds = new List<int>();
     private List<int> _untrackedIds = new List<int>();
 
+#if UNITY_ASSERTIONS
     private BaseCallGuard _baseCallGuard = new BaseCallGuard();
+#else
+    protected BaseCallGuard _baseCallGuard = null;
+#endif
+
     #endregion
 
     #region PUBLIC METHODS

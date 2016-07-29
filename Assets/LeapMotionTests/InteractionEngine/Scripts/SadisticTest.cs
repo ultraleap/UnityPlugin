@@ -33,11 +33,11 @@ namespace Leap.Unity.Interaction.Testing {
     [Disable]
     public float actionDelay;
 
-    private InteractionManager _manager;
-    private InteractionTestProvider _provider;
-    private SadisticTestManager _testManager;
+    protected InteractionManager _manager;
+    protected InteractionTestProvider _provider;
+    protected SadisticTestManager _testManager;
 
-    private InteractionCallback allCallbacksRecieved;
+    protected InteractionCallback allCallbacksRecieved;
 
     void OnEnable() {
       _manager = FindObjectOfType<InteractionManager>();
