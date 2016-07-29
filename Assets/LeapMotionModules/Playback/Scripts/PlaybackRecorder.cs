@@ -57,10 +57,10 @@ namespace Leap.Unity.Playback {
           string path = AssetDatabase.GenerateUniqueAssetPath(_unityAssetSavePath + ".asset");
           AssetDatabase.CreateAsset(finishedRecording, path);
           AssetDatabase.SaveAssets();
+          break;
 #else
               throw new Exception("Cannot save unity assets outside of Unity Editor");
 #endif
-          break;
         default:
           break;
       }

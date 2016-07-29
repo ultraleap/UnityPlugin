@@ -508,18 +508,22 @@ namespace Leap.Unity.Interaction {
 
     protected void updateLayer() {
       int layer;
-      if (_controllers.LayerController != null) {
-        if (_contactMode != ContactMode.NORMAL) {
-          layer = _controllers.LayerController.InteractionNoClipLayer;
+      if (IsRegisteredWithManager) {
+        if (_controllers.LayerController != null) {
+          if (_contactMode != ContactMode.NORMAL) {
+            layer = _controllers.LayerController.InteractionNoClipLayer;
+          } else {
+            layer = _controllers.LayerController.InteractionLayer;
+          }
         } else {
-          layer = _controllers.LayerController.InteractionLayer;
+          if (_contactMode != ContactMode.NORMAL) {
+            layer = _manager.InteractionNoClipLayer;
+          } else {
+            layer = _manager.InteractionLayer;
+          }
         }
       } else {
-        if (_contactMode != ContactMode.NORMAL) {
-          layer = _manager.InteractionNoClipLayer;
-        } else {
-          layer = _manager.InteractionLayer;
-        }
+        layer = LayerMask.NameToLayer("Default");
       }
 
       if (gameObject.layer != layer) {

@@ -56,6 +56,12 @@ namespace Leap.Unity.Interaction {
     }
 
     public override void OnThrow(Hand throwingHand) {
+      if (_velocityQueue.Count < 2) {
+        _obj.rigidbody.velocity = Vector3.zero;
+        _obj.rigidbody.angularVelocity = Vector3.zero;
+        return;
+      }
+
       float windowEnd = Time.fixedTime - _windowDelay;
       float windowStart = windowEnd - _windowLength;
 

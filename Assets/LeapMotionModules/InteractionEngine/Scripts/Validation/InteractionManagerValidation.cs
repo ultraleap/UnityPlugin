@@ -28,8 +28,10 @@ namespace Leap.Unity.Interaction {
         int id = pair.Key;
         var interactionHand = pair.Value;
 
-        Assert.AreEqual(id, interactionHand.hand.Id,
-                        "Id should always map to a hand of the same Id.");
+        if (interactionHand.hand != null) {
+          Assert.AreEqual(id, interactionHand.hand.Id,
+                          "Id should always map to a hand of the same Id.");
+        }
 
         interactionHand.Validate();
       }
@@ -97,22 +99,22 @@ namespace Leap.Unity.Interaction {
 
           Assert.IsTrue(graspedObject.IsBeingGraspedByHand(hand.Id),
                         "Grasped object must always report as being grasped by this hand.");
-        }
 
-        if (isUntracked) {
-          Assert.IsNotNull(graspedObject,
-                           "If untracked, must also always be grasping an object.");
+          if (isUntracked) {
+            Assert.IsNotNull(graspedObject,
+                             "If untracked, must also always be grasping an object.");
 
-          Assert.AreNotEqual(graspedObject.UntrackedHandCount, 0,
-                             "If untracked, grasped object must report at least one untracked hand.");
+            Assert.AreNotEqual(graspedObject.UntrackedHandCount, 0,
+                               "If untracked, grasped object must report at least one untracked hand.");
 
-          Assert.IsTrue(graspedObject.UntrackedGraspingHands.Contains(hand.Id),
-                        "If untracked, grasped object must report to be grasped by an untracked hand of this id.");
-        }
+            Assert.IsTrue(graspedObject.UntrackedGraspingHands.Contains(hand.Id),
+                          "If untracked, grasped object must report to be grasped by an untracked hand of this id.");
+          }
 
-        if (isUserGrasp) {
-          Assert.IsNotNull(graspedObject,
-                           "If a user grasp is taking place, we must always be grasping an object.");
+          if (isUserGrasp) {
+            Assert.IsNotNull(graspedObject,
+                             "If a user grasp is taking place, we must always be grasping an object.");
+          }
         }
       }
     }

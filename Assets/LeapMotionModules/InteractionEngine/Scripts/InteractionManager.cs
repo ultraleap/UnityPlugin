@@ -352,10 +352,14 @@ namespace Leap.Unity.Interaction {
 
       foreach (var interactionHand in _idToInteractionHand.Values) {
         if (interactionHand.graspedObject == graspedObject) {
-          if (_graspingEnabled) {
-            InteractionC.OverrideHandResult(ref _scene, (uint)interactionHand.hand.Id, ref result);
+          if (interactionHand.isUntracked) {
+            interactionHand.MarkTimeout();
+          } else {
+            if (_graspingEnabled) {
+              InteractionC.OverrideHandResult(ref _scene, (uint)interactionHand.hand.Id, ref result);
+            }
+            interactionHand.ReleaseObject();
           }
-          interactionHand.ReleaseObject();
         }
       }
 
@@ -394,6 +398,9 @@ namespace Leap.Unity.Interaction {
         throw new InvalidOperationException("Cannot grasp " + interactionBehaviour + " because it is not registered with this manager.");
       }
 
+      //Ensure behaviour is active already
+      _activityManager.Activate(interactionBehaviour);
+
       if (!interactionBehaviour.IsBeingGrasped) {
         _graspedBehaviours.Add(interactionBehaviour);
       }
@@ -425,7 +432,11 @@ namespace Leap.Unity.Interaction {
         foreach (var interactionHand in _idToInteractionHand.Values) {
           if (interactionHand.graspedObject == interactionBehaviour) {
             try {
-              interactionHand.ReleaseObject();
+              if (interactionHand.isUntracked) {
+                interactionHand.MarkTimeout();
+              } else {
+                interactionHand.ReleaseObject();
+              }
             } catch (Exception e) {
               //Only log to console
               //We want to continue so we can destroy the shape and dispatch OnUnregister
@@ -784,6 +795,10 @@ namespace Leap.Unity.Interaction {
               //This also dispatched InteractionObject.OnHandRegainedTracking()
               interactionHand.RegainTracking(hand);
 
+              if (interactionHand.graspedObject == null) {
+                continue;
+              }
+
               // NotifyHandRegainedTracking() did not throw, continue on to NotifyHandsHoldPhysics().
               dispatchOnHandsHolding(hands, interactionHand.graspedObject, isPhysics: true);
             } catch (Exception e) {
@@ -828,7 +843,11 @@ namespace Leap.Unity.Interaction {
                     try {
                       interactionHand.GraspObject(interactionBehaviour, isUserGrasp: false);
 
-                      dispatchOnHandsHolding(hands, interactionBehaviour, isPhysics: true);
+                      //the grasp callback might have caused the object to become ungrasped
+                      //the component might have also destroyed itself!
+                      if (interactionHand.graspedObject == interactionBehaviour && interactionBehaviour != null) {
+                        dispatchOnHandsHolding(hands, interactionBehaviour, isPhysics: true);
+                      }
                     } catch (Exception e) {
                       _activityManager.NotifyMisbehaving(interactionBehaviour);
                       Debug.LogException(e);
