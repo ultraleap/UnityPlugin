@@ -88,7 +88,7 @@ namespace Leap.Unity.Playback {
     protected virtual void Update() {
       if (_isPlaying) {
         if (_playbackTimeline == PlaybackTimeline.Graphics) {
-          stepRecording(Time.deltaTime);
+          stepRecording(Time.time);
         }
         DispatchUpdateFrameEvent(_recording.frames[_currentFrameIndex]);
       }
@@ -97,7 +97,7 @@ namespace Leap.Unity.Playback {
     protected virtual void FixedUpdate() {
       if (_isPlaying) {
         if (_playbackTimeline == PlaybackTimeline.Physics) {
-          stepRecording(Time.fixedDeltaTime);
+          stepRecording(Time.fixedTime);
         }
         DispatchFixedFrameEvent(_recording.frames[_currentFrameIndex]);
       }

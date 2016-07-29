@@ -82,7 +82,7 @@ namespace Leap.Unity.Playback {
         if (_recordTime == RecordTime.Update) {
           Frame frame = _provider.CurrentFrame;
           if (frame != null) {
-            _currentRecording.frames.Add(frame);
+            _currentRecording.frames.Add(new Frame().CopyFrom(frame));
             _currentRecording.frameTimes.Add(Time.time - _beginTime);
           }
         }
@@ -101,7 +101,7 @@ namespace Leap.Unity.Playback {
       if (_currentRecording != null && _recordTime == RecordTime.FixedUpdate) {
         Frame frame = _provider.CurrentFixedFrame;
         if (frame != null) {
-          _currentRecording.frames.Add(frame);
+          _currentRecording.frames.Add(new Frame().CopyFrom(frame));
           _currentRecording.frameTimes.Add(Time.fixedTime - _beginTime);
         }
       }
