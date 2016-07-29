@@ -52,6 +52,11 @@ namespace Leap.Unity.Playback {
         frames.RemoveAt(0);
         frameTimes.RemoveAt(0);
       }
+
+      float startTime = frameTimes[0];
+      for (int i = 0; i < frameTimes.Count; i++) {
+        frameTimes[i] -= startTime;
+      }
     }
 
     public virtual void TrimEnd(int trimCount) {

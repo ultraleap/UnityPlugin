@@ -140,7 +140,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 128
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -196,7 +196,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 16
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -252,7 +252,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: b2c9c54ccc3f6794fa3a2f405aa71e2e, type: 2}
+  recording: {fileID: 0}
   callback: 0
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -308,7 +308,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: e8373ffb6942864469bbfef82c61bf03, type: 2}
+  recording: {fileID: 0}
   callback: 1
   expectedCallbacks: 31
   forbiddenCallbacks: 0
@@ -364,7 +364,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 1
   expectedCallbacks: 3
   forbiddenCallbacks: 0
@@ -408,7 +408,7 @@ MonoBehaviour:
   dynamic: 0
   dynamicTypeName: 
   _recordings:
-  - {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  - {fileID: 0}
   _callbacks: 48
   _actions: -193
   _actionDelay: 0
@@ -491,7 +491,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 4
   expectedCallbacks: 15
   forbiddenCallbacks: 0
@@ -547,7 +547,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 4
   expectedCallbacks: 15
   forbiddenCallbacks: 0
@@ -603,7 +603,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 128
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -722,7 +722,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 64
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -778,7 +778,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 1
   expectedCallbacks: 3
   forbiddenCallbacks: 0
@@ -834,7 +834,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 64
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -890,7 +890,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 64
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -946,7 +946,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: e8373ffb6942864469bbfef82c61bf03, type: 2}
+  recording: {fileID: 0}
   callback: 4
   expectedCallbacks: 31
   forbiddenCallbacks: 0
@@ -1002,7 +1002,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 128
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -1058,7 +1058,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 32
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -1114,7 +1114,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 64
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -1170,7 +1170,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 32
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -1226,7 +1226,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 32
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -1282,7 +1282,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 32
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -1338,7 +1338,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 0
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -1394,7 +1394,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 32
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -1438,7 +1438,7 @@ MonoBehaviour:
   dynamic: 0
   dynamicTypeName: 
   _recordings:
-  - {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  - {fileID: 0}
   _callbacks: 0
   _actions: 0
   _actionDelay: 0
@@ -1510,7 +1510,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 16
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -1566,7 +1566,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 4
   expectedCallbacks: 15
   forbiddenCallbacks: 0
@@ -1610,7 +1610,7 @@ MonoBehaviour:
   dynamic: 0
   dynamicTypeName: 
   _recordings:
-  - {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  - {fileID: 0}
   _callbacks: 224
   _actions: -193
   _actionDelay: 0
@@ -1773,7 +1773,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 0
   expectedCallbacks: 255
   forbiddenCallbacks: 0
@@ -1829,7 +1829,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 4
   expectedCallbacks: 15
   forbiddenCallbacks: 0
@@ -1873,7 +1873,7 @@ MonoBehaviour:
   dynamic: 0
   dynamicTypeName: 
   _recordings:
-  - {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  - {fileID: 0}
   _callbacks: 4
   _actions: -193
   _actionDelay: 0
@@ -1938,7 +1938,7 @@ MonoBehaviour:
   dynamic: 0
   dynamicTypeName: 
   _recordings:
-  - {fileID: 11400000, guid: e8373ffb6942864469bbfef82c61bf03, type: 2}
+  - {fileID: 0}
   _callbacks: 261
   _actions: 64
   _actionDelay: 0.5
@@ -2012,7 +2012,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 32
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -2068,7 +2068,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 16
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -2203,7 +2203,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 1
   expectedCallbacks: 3
   forbiddenCallbacks: 0
@@ -2259,7 +2259,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 256
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -2315,7 +2315,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 64
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -2371,7 +2371,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 1
   expectedCallbacks: 3
   forbiddenCallbacks: 0
@@ -2514,7 +2514,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 4
   expectedCallbacks: 15
   forbiddenCallbacks: 0
@@ -2570,7 +2570,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 64
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -2689,7 +2689,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 64
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -2745,7 +2745,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 128
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -2801,7 +2801,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 16
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -2857,7 +2857,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 16
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -2913,7 +2913,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 32
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -2969,7 +2969,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 128
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -3025,7 +3025,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 32
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -3081,7 +3081,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 4
   expectedCallbacks: 15
   forbiddenCallbacks: 0
@@ -3125,8 +3125,8 @@ MonoBehaviour:
   dynamic: 0
   dynamicTypeName: 
   _recordings:
-  - {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
-  - {fileID: 11400000, guid: b2c9c54ccc3f6794fa3a2f405aa71e2e, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
   _callbacks: 0
   _actions: 0
   _actionDelay: 0
@@ -3199,7 +3199,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: e8373ffb6942864469bbfef82c61bf03, type: 2}
+  recording: {fileID: 0}
   callback: 256
   expectedCallbacks: 31
   forbiddenCallbacks: 0
@@ -3297,7 +3297,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 1
   expectedCallbacks: 3
   forbiddenCallbacks: 0
@@ -3353,7 +3353,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 16
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -3409,7 +3409,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 32
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -3465,7 +3465,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 1
   expectedCallbacks: 3
   forbiddenCallbacks: 0
@@ -3509,7 +3509,7 @@ MonoBehaviour:
   dynamic: 0
   dynamicTypeName: 
   _recordings:
-  - {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  - {fileID: 0}
   _callbacks: 1
   _actions: -193
   _actionDelay: 0
@@ -3586,7 +3586,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 16
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -3642,7 +3642,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 32
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -3698,7 +3698,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: fb00bd6b088070a4b915d60dee458ebb, type: 2}
+  recording: {fileID: 0}
   callback: 32
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -3742,7 +3742,7 @@ MonoBehaviour:
   dynamic: 0
   dynamicTypeName: 
   _recordings:
-  - {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  - {fileID: 0}
   _callbacks: 336
   _actions: 128
   _actionDelay: 0.3
@@ -3816,7 +3816,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 128
   expectedCallbacks: 63
   forbiddenCallbacks: 0
@@ -3872,7 +3872,7 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 5e39c530b0c8d6446a8deb4f7aab3d5b, type: 2}
+  recording: {fileID: 0}
   callback: 32
   expectedCallbacks: 63
   forbiddenCallbacks: 0

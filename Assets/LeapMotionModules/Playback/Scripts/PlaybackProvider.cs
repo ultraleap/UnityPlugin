@@ -38,7 +38,6 @@ namespace Leap.Unity.Playback {
 
     protected bool _isPlaying = false;
     protected int _currentFrameIndex = 0;
-    protected float _residualFrame = 0;
 
     public virtual bool IsPlaying {
       get {
@@ -104,16 +103,18 @@ namespace Leap.Unity.Playback {
       }
     }
 
-    private void stepRecording(float deltaTime) {
-      _residualFrame += deltaTime;
-      float delta = 1.0f / _recording.framesPerSecond;
-      while (_residualFrame >= 1.0f / _recording.framesPerSecond) {
-        _residualFrame -= delta;
-
+    private void stepRecording(float time) {
+      while (true) {
         if (_currentFrameIndex >= _recording.frames.Count - 1) {
           Pause();
-        } else {
+          break;
+        }
+
+        float crossover = (_recording.frameTimes[_currentFrameIndex + 1] + _recording.frameTimes[_currentFrameIndex]) / 2.0f;
+        if (time > crossover) {
           Seek(_currentFrameIndex + 1);
+        } else {
+          break;
         }
       }
     }
