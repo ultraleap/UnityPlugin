@@ -8,7 +8,6 @@ namespace Leap.Unity.Playback {
     public override Frame CurrentFrame {
       get {
         if (_recording != null) {
-          incrementOncePerFrame();
           return _recording.frames[_currentFrameIndex];
         } else {
           return new Frame();
@@ -32,11 +31,14 @@ namespace Leap.Unity.Playback {
     protected Recording _recording;
 
     [SerializeField]
+    protected PlaybackTimeline _playbackTimeline = PlaybackTimeline.Graphics;
+
+    [SerializeField]
     protected bool _autoPlay = true;
 
     protected bool _isPlaying = false;
     protected int _currentFrameIndex = 0;
-    protected int _lastFrameUpdated = -1;
+    protected float _residualFrame = 0;
 
     public virtual bool IsPlaying {
       get {
@@ -86,21 +88,27 @@ namespace Leap.Unity.Playback {
 
     protected virtual void Update() {
       if (_isPlaying) {
-        incrementOncePerFrame();
+        if (_playbackTimeline == PlaybackTimeline.Graphics) {
+          stepRecording(Time.deltaTime);
+        }
         DispatchUpdateFrameEvent(_recording.frames[_currentFrameIndex]);
       }
     }
 
     protected virtual void FixedUpdate() {
       if (_isPlaying) {
-        incrementOncePerFrame();
-        DispatchUpdateFrameEvent(_recording.frames[_currentFrameIndex]);
+        if (_playbackTimeline == PlaybackTimeline.Physics) {
+          stepRecording(Time.fixedDeltaTime);
+        }
+        DispatchFixedFrameEvent(_recording.frames[_currentFrameIndex]);
       }
     }
 
-    private void incrementOncePerFrame() {
-      if (_lastFrameUpdated != Time.frameCount) {
-        _lastFrameUpdated = Time.frameCount;
+    private void stepRecording(float deltaTime) {
+      _residualFrame += deltaTime;
+      float delta = 1.0f / _recording.framesPerSecond;
+      while (_residualFrame >= 1.0f / _recording.framesPerSecond) {
+        _residualFrame -= delta;
 
         if (_currentFrameIndex >= _recording.frames.Count - 1) {
           Pause();
@@ -108,6 +116,11 @@ namespace Leap.Unity.Playback {
           Seek(_currentFrameIndex + 1);
         }
       }
+    }
+
+    public enum PlaybackTimeline {
+      Graphics,
+      Physics
     }
   }
 }
