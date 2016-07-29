@@ -38,9 +38,18 @@ namespace Leap.Unity.Playback {
     [SerializeField]
     protected string _unityAssetSavePath = "Assets/Recording";
 
+    protected float _beginTime;
     protected Recording _currentRecording;
 
-    public virtual  void StartRecording() {
+    public virtual void StartRecording() {
+      switch (_recordTime) {
+        case RecordTime.FixedUpdate:
+          _beginTime = Time.fixedTime;
+          break;
+        case RecordTime.Update:
+          _beginTime = Time.time;
+          break;
+      }
       _currentRecording = ScriptableObject.CreateInstance<Recording>();
     }
 
@@ -74,6 +83,7 @@ namespace Leap.Unity.Playback {
           Frame frame = _provider.CurrentFrame;
           if (frame != null) {
             _currentRecording.frames.Add(frame);
+            _currentRecording.frameTimes.Add(Time.time - _beginTime);
           }
         }
 
@@ -92,6 +102,7 @@ namespace Leap.Unity.Playback {
         Frame frame = _provider.CurrentFixedFrame;
         if (frame != null) {
           _currentRecording.frames.Add(frame);
+          _currentRecording.frameTimes.Add(Time.fixedTime - _beginTime);
         }
       }
     }

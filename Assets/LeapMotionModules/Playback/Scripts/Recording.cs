@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace Leap.Unity.Playback {
 
   public class Recording : ScriptableObject {
-    public float framesPerSecond;
     public List<Frame> frames = new List<Frame>();
+    public List<float> frameTimes = new List<float>();
 
     public virtual void TrimStartOfEmptyFrames(int framesToRemain) {
       int firstFrameWithHand = -1;
@@ -50,12 +50,14 @@ namespace Leap.Unity.Playback {
     public virtual void TrimStart(int trimCount) {
       for (int i = 0; i < trimCount; i++) {
         frames.RemoveAt(0);
+        frameTimes.RemoveAt(0);
       }
     }
 
     public virtual void TrimEnd(int trimCount) {
       for (int i = 0; i < trimCount; i++) {
         frames.RemoveAt(frames.Count - 1);
+        frameTimes.RemoveAt(frames.Count - 1);
       }
     }
   }
