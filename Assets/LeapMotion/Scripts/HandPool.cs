@@ -152,6 +152,10 @@ namespace Leap.Unity {
      * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
     */
     public void EnableGroup(string groupName) {
+      StartCoroutine(enableGroup(groupName));
+    }
+    private IEnumerator enableGroup(string groupName) {
+      yield return new WaitForEndOfFrame();
       ModelGroup group = null;
       for (int i = 0; i < ModelPool.Count; i++) {
         if (ModelPool[i].GroupName == groupName) {
@@ -176,6 +180,10 @@ namespace Leap.Unity {
      * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
      */
     public void DisableGroup(string groupName) {
+      StartCoroutine(disableGroup(groupName));
+    }
+    private IEnumerator disableGroup(string groupName) {
+      yield return new WaitForEndOfFrame();
       ModelGroup group = null;
       for (int i = 0; i < ModelPool.Count; i++) {
         if (ModelPool[i].GroupName == groupName) {
@@ -198,6 +206,10 @@ namespace Leap.Unity {
       }
     }
     public void ToggleGroup(string groupName) {
+      StartCoroutine(toggleGroup(groupName));
+    }
+    private IEnumerator toggleGroup(string groupName) {
+      yield return new WaitForEndOfFrame();
       ModelGroup modelGroup = ModelPool.Find(i => i.GroupName == groupName);
       if (modelGroup != null) {
         if (modelGroup.IsEnabled == true) {
@@ -210,6 +222,23 @@ namespace Leap.Unity {
         }
       }
       else Debug.LogWarning("A group matching that name does not exisit in the modelPool");
+    }
+    public void AddNewGroup(string groupName, IHandModel leftModel, IHandModel rightModel) {
+      ModelGroup newGroup = new ModelGroup();
+      newGroup.LeftModel = leftModel;
+      newGroup.RightModel = rightModel;
+      newGroup.GroupName = groupName;
+      newGroup.CanDuplicate = false;
+      newGroup.IsEnabled = true;
+      ModelPool.Add(newGroup);
+    }
+    public void RemoveGroup(string groupName) {
+      while (ModelPool.Find(i => i.GroupName == groupName) != null) {
+        ModelGroup modelGroup = ModelPool.Find(i => i.GroupName == groupName);
+        if (modelGroup != null) {
+          ModelPool.Remove(modelGroup);
+        }
+      }
     }
 
 #if UNITY_EDITOR

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.VR;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Leap.Unity {
@@ -228,6 +229,7 @@ namespace Leap.Unity {
     protected void Start() {
       if (provider.IsConnected()) {
         deviceInfo = provider.GetDeviceInfo();
+        _shouldSetLocalPosition = true;
         LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
         if (deviceInfo.type == LeapDeviceType.Invalid) {
           Debug.LogWarning("Invalid Leap Device -> enabled = false");
@@ -235,13 +237,25 @@ namespace Leap.Unity {
           return;
         }
       } else {
+        StartCoroutine(waitForConnection());
         Controller controller = provider.GetLeapController();
         controller.Device += OnDevice;
       }
     }
 
+    private IEnumerator waitForConnection() {
+      while (!provider.IsConnected()) {
+        yield return null;
+      }
+      LeapVRCameraControl.OnValidCameraParams -= onValidCameraParams; //avoid multiple subscription
+      LeapVRCameraControl.OnValidCameraParams += onValidCameraParams;
+    }
+
+    private bool _shouldSetLocalPosition = false;
     protected void OnDevice(object sender, DeviceEventArgs args) {
       deviceInfo = provider.GetDeviceInfo();
+      _shouldSetLocalPosition = true;
+
       if (deviceInfo.type == LeapDeviceType.Invalid) {
         Debug.LogWarning("Invalid Leap Device -> enabled = false");
         enabled = false;
@@ -268,6 +282,11 @@ namespace Leap.Unity {
     }
 
     protected void Update() {
+      if (_shouldSetLocalPosition) {
+        transform.localPosition = transform.forward * deviceInfo.focalPlaneOffset;
+        _shouldSetLocalPosition = false;
+      }
+
       if (Input.GetKeyDown(recenter) && VRSettings.enabled && VRDevice.isPresent) {
         InputTracking.Recenter();
       }
@@ -342,6 +361,7 @@ namespace Leap.Unity {
       Quaternion referenceRotation = Quaternion.Slerp(currCenterRot, pastCenterRot, tweenImageWarping);
 
       Quaternion quatWarp = Quaternion.Inverse(currCenterRot) * referenceRotation;
+      quatWarp = Quaternion.Euler(quatWarp.eulerAngles.x, quatWarp.eulerAngles.y, -quatWarp.eulerAngles.z);
       Matrix4x4 matWarp = _projectionMatrix * Matrix4x4.TRS(Vector3.zero, quatWarp, Vector3.one) * _projectionMatrix.inverse;
 
       Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", matWarp);

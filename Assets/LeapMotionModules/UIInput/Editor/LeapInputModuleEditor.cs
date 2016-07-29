@@ -10,15 +10,27 @@ namespace Leap.Unity.InputModule {
       base.OnEnable();
       LeapInputModule module = target as LeapInputModule;
 
-      specifyConditionalDrawing(() => ProjectiveAllowed(module.InteractionMode),
-                               "PinchingThreshold");
+      specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || module.InteractionMode == LeapInputModule.InteractionCapability.Projective,
+                               "PinchingThreshold",
+                               "EnvironmentPointer",
+                               "environmentPinch",
+                               "PointerPinchScale");
 
-      specifyConditionalDrawing(() => isTrue(module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid),
-                               "ProjectiveToTactileTransitionDistance");
+      specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || module.InteractionMode == LeapInputModule.InteractionCapability.Tactile,
+                               "TactilePadding");
 
-      specifyConditionalDrawing(() => isTrue(module.ShowAdvancedOptions),
+      specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid,
+                               "ProjectiveToTactileTransitionDistance",
+                               "RetractUI");
+
+      specifyConditionalDrawing(() => module.InnerPointer,
+                         "InnerPointerOpacityScalar");
+
+      specifyConditionalDrawing(() => module.ShowAdvancedOptions,
                          "InteractionMode",
                          "OverrideScrollViewClicks",
+                         "InnerPointer",
+                         "InnerPointerOpacityScalar",
                          "DrawDebug",
                          "TriggerHoverOnElementSwitch",
                          "BeginHoverSound",
@@ -35,21 +47,32 @@ namespace Leap.Unity.InputModule {
                          "ProjectiveToTactileTransitionDistance",
                          "PinchingThreshold",
                          "RetractUI",
-                         "ShowExperimentalOptions");
+                         "TactilePadding",
+                         "EnvironmentPointer",
+                         "perFingerPointer",
+                         "ShowExperimentalOptions",
+                         "PointerDistanceScale",
+                         "PointerPinchScale",
+                         "environmentPinch");
 
-      specifyConditionalDrawing(() => isTrue(module.ShowExperimentalOptions),
+      specifyConditionalDrawing(() => module.ShowExperimentalOptions,
+                   "InteractionMode",
+                   "PointerDistanceScale",
+                   "PointerPinchScale",
+                   "ProjectiveToTactileTransitionDistance",
+                   "PinchingThreshold",
+                   "InnerPointer",
+                   "InnerPointerOpacityScalar",
                    "OverrideScrollViewClicks",
                    "DrawDebug",
                    "TriggerHoverOnElementSwitch",
-                   "RetractUI");
-    }
+                   "perFingerPointer",
+                   "RetractUI",
+                   "EnvironmentPointer",
+                   "environmentPinch");
 
-    bool ProjectiveAllowed(LeapInputModule.InteractionCapability mode) {
-      return mode != LeapInputModule.InteractionCapability.Tactile;
-    }
-
-    bool isTrue(bool truth) {
-      return truth;
+      specifyConditionalDrawing(() => module.EnvironmentPointer,
+             "environmentPinch");
     }
   }
 }
