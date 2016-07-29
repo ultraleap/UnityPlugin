@@ -1,0 +1,874 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0da9e3d0ecc41b4bac3e27be36365bd, type: 3}
+  m_Name: Recording
+  m_EditorClassIdentifier: 
+  frames:
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  - Id: 1073032
+    Timestamp: 537204065493
+    CurrentFramesPerSecond: 127.82804
+    Hands: []
+  frameTimes:
+  - 0
+  - 0.00999999
+  - 0.01999998
+  - 0.029999971
+  - 0.03999996
+  - 0.049999952
+  - 0.06000018
+  - 0.07000017
+  - 0.08000016
+  - 0.09000015
+  - 0.10000014
+  - 0.11000013
+  - 0.120000124
+  - 0.13000011
+  - 0.1400001
+  - 0.1500001
+  - 0.16000009
+  - 0.17000008
+  - 0.18000007
+  - 0.19000006
+  - 0.20000005
+  - 0.21000004
+  - 0.22000003
+  - 0.23000002
+  - 0.24000001
+  - 0.25
+  - 0.26
+  - 0.26999998
+  - 0.27999997
+  - 0.28999996
+  - 0.29999995
+  - 0.31000018
+  - 0.32000017
+  - 0.33000016
+  - 0.34000015
+  - 0.3499999
+  - 0.36000013
+  - 0.3699999
+  - 0.3800001
+  - 0.38999987
+  - 0.4000001
+  - 0.40999985
+  - 0.42000008
+  - 0.42999983
+  - 0.44000006
+  - 0.4500003
+  - 0.46000004
+  - 0.47000027
+  - 0.48000002
+  - 0.49000025
+  - 0.5
+  - 0.5100002
+  - 0.52
+  - 0.5300002
+  - 0.53999996
+  - 0.5500002
+  - 0.55999994
+  - 0.5700002
+  - 0.5799999
+  - 0.59000015
+  - 0.5999999
+  - 0.61000013
+  - 0.6199999
+  - 0.6300001
+  - 0.63999987
+  - 0.6500001
+  - 0.65999985
+  - 0.6700001
+  - 0.6799998
+  - 0.69000006
+  - 0.7000003
+  - 0.71000004
+  - 0.72000027
+  - 0.73
+  - 0.74000025
+  - 0.75
+  - 0.7600002
+  - 0.77
+  - 0.7800002
+  - 0.78999996
+  - 0.8000002
+  - 0.80999994
+  - 0.8200002
+  - 0.8299999
+  - 0.84000015
+  - 0.8499999
+  - 0.86000013
+  - 0.8699999
+  - 0.8800001
+  - 0.88999987
+  - 0.9000001
+  - 0.90999985
+  - 0.9200001
+  - 0.9299998
+  - 0.94000006
+  - 0.9500003
+  - 0.96000004
+  - 0.97000027
+  - 0.98
+  - 0.99000025
+  - 1
+  - 1.0100002
+  - 1.02
+  - 1.0300002
+  - 1.04
+  - 1.0500002
+  - 1.06
+  - 1.0700002
+  - 1.0799999
+  - 1.0900002
+  - 1.0999999
+  - 1.1100001
+  - 1.1199999
+  - 1.1300001
+  - 1.1399999
+  - 1.1500001
+  - 1.1599998
+  - 1.1700001
+  - 1.1799998
+  - 1.19
+  - 1.1999998
+  - 1.21
+  - 1.2200003
+  - 1.23
+  - 1.2400002
+  - 1.25
+  - 1.2600002
+  - 1.27
+  - 1.2800002
+  - 1.29
+  - 1.3000002
+  - 1.31
+  - 1.3200002
+  - 1.3299999
+  - 1.3400002
+  - 1.3499999
+  - 1.3600001
+  - 1.3699999
+  - 1.3800001
+  - 1.3899999
+  - 1.4000001
+  - 1.4099998
+  - 1.4200001
+  - 1.4299998
+  - 1.44
+  - 1.4499998
+  - 1.46
+  - 1.4700003
+  - 1.48
+  - 1.4900002
+  - 1.5
+  - 1.5100002
+  - 1.52
+  - 1.5300002
+  - 1.54
+  - 1.5500002
+  - 1.56
+  - 1.5700002
+  - 1.5799999
+  - 1.5900002
+  - 1.5999999
+  - 1.6100001
+  - 1.6199999
+  - 1.6300001
+  - 1.6399999
+  - 1.6500001
+  - 1.6599998
+  - 1.6700001
+  - 1.6799998
+  - 1.71
+  _initialPositions:
+  - {x: 0.000000001603269, y: -0.19500004, z: 0.4}
+  _initialRotations:
+  - {x: -0.000000046582517, y: 0.0000000042104724, z: -0.000000024129985, w: 1}
+  _initialScale:
+  - {x: 0.1, y: 0.1, z: 0.1}
+  _sphereObjs: []
+  _obbObjs:
+  - {x: 1, y: 1, z: 1}

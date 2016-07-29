@@ -1,0 +1,1144 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0da9e3d0ecc41b4bac3e27be36365bd, type: 3}
+  m_Name: Grasp1Sphere_Left
+  m_EditorClassIdentifier: 
+  frames:
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  - Id: 1065233
+    Timestamp: 537143069628
+    CurrentFramesPerSecond: 127.87532
+    Hands: []
+  frameTimes:
+  - 0
+  - 0.009999752
+  - 0.01999998
+  - 0.029999733
+  - 0.03999996
+  - 0.049999714
+  - 0.059999943
+  - 0.069999695
+  - 0.07999992
+  - 0.089999676
+  - 0.099999905
+  - 0.10999966
+  - 0.119999886
+  - 0.12999964
+  - 0.13999987
+  - 0.14999962
+  - 0.15999985
+  - 0.1699996
+  - 0.17999983
+  - 0.19000006
+  - 0.19999981
+  - 0.21000004
+  - 0.21999979
+  - 0.23000002
+  - 0.23999977
+  - 0.25
+  - 0.25999975
+  - 0.26999998
+  - 0.27999973
+  - 0.28999996
+  - 0.2999997
+  - 0.30999994
+  - 0.3199997
+  - 0.32999992
+  - 0.33999968
+  - 0.3499999
+  - 0.35999966
+  - 0.3699999
+  - 0.37999964
+  - 0.38999987
+  - 0.39999962
+  - 0.40999985
+  - 0.4199996
+  - 0.42999983
+  - 0.43999958
+  - 0.4499998
+  - 0.46000004
+  - 0.4699998
+  - 0.48000002
+  - 0.48999977
+  - 0.5
+  - 0.50999975
+  - 0.52
+  - 0.52999973
+  - 0.53999996
+  - 0.5499997
+  - 0.55999994
+  - 0.5699997
+  - 0.5799999
+  - 0.5899997
+  - 0.5999999
+  - 0.60999966
+  - 0.6199999
+  - 0.62999964
+  - 0.63999987
+  - 0.6499996
+  - 0.65999985
+  - 0.6699996
+  - 0.6799998
+  - 0.6899996
+  - 0.6999998
+  - 0.71000004
+  - 0.7199998
+  - 0.73
+  - 0.7399998
+  - 0.75
+  - 0.75999975
+  - 0.77
+  - 0.77999973
+  - 0.78999996
+  - 0.7999997
+  - 0.80999994
+  - 0.8199997
+  - 0.8299999
+  - 0.8399997
+  - 0.8499999
+  - 0.85999966
+  - 0.8699999
+  - 0.87999964
+  - 0.88999987
+  - 0.8999996
+  - 0.90999985
+  - 0.9199996
+  - 0.9299998
+  - 0.9399996
+  - 0.9499998
+  - 0.96000004
+  - 0.9699998
+  - 0.98
+  - 0.9899998
+  - 1
+  - 1.0099998
+  - 1.02
+  - 1.0299997
+  - 1.04
+  - 1.0499997
+  - 1.06
+  - 1.0699997
+  - 1.0799999
+  - 1.0899997
+  - 1.0999999
+  - 1.1099997
+  - 1.1199999
+  - 1.1299996
+  - 1.1399999
+  - 1.1499996
+  - 1.1599998
+  - 1.1699996
+  - 1.1799998
+  - 1.1899996
+  - 1.1999998
+  - 1.2099996
+  - 1.2199998
+  - 1.23
+  - 1.2399998
+  - 1.25
+  - 1.2599998
+  - 1.27
+  - 1.2799997
+  - 1.29
+  - 1.2999997
+  - 1.31
+  - 1.3199997
+  - 1.3299999
+  - 1.3399997
+  - 1.3499999
+  - 1.3599997
+  - 1.3699999
+  - 1.3799996
+  - 1.3899999
+  - 1.3999996
+  - 1.4099998
+  - 1.4199996
+  - 1.4299998
+  - 1.4399996
+  - 1.4499998
+  - 1.4599996
+  - 1.4699998
+  - 1.48
+  - 1.4899998
+  - 1.5
+  - 1.5099998
+  - 1.52
+  - 1.5299997
+  - 1.54
+  - 1.5499997
+  - 1.56
+  - 1.5699997
+  - 1.5799999
+  - 1.5899997
+  - 1.5999999
+  - 1.6099997
+  - 1.6199999
+  - 1.6299996
+  - 1.6399999
+  - 1.6499996
+  - 1.6599998
+  - 1.6699996
+  - 1.6799998
+  - 1.6899996
+  - 1.6999998
+  - 1.7099996
+  - 1.7199998
+  - 1.73
+  - 1.7399998
+  - 1.75
+  - 1.7599998
+  - 1.77
+  - 1.7799997
+  - 1.79
+  - 1.7999997
+  - 1.81
+  - 1.8199997
+  - 1.8299999
+  - 1.8399997
+  - 1.8499999
+  - 1.8599997
+  - 1.8699999
+  - 1.8799996
+  - 1.8899999
+  - 1.8999996
+  - 1.9099998
+  - 1.9199996
+  - 1.9299998
+  - 1.9399996
+  - 1.9499998
+  - 1.9599996
+  - 1.9699998
+  - 1.98
+  - 1.9899998
+  - 2
+  - 2.0099998
+  - 2.02
+  - 2.0299997
+  - 2.04
+  - 2.0499997
+  - 2.06
+  - 2.0699997
+  - 2.08
+  - 2.0899997
+  - 2.1
+  - 2.1099997
+  - 2.12
+  - 2.1299996
+  - 2.1399999
+  - 2.1499996
+  - 2.1599998
+  - 2.1699996
+  - 2.1799998
+  - 2.1899996
+  - 2.1999998
+  - 2.2099996
+  - 2.2199998
+  - 2.25
+  _initialPositions:
+  - {x: 0, y: -0.19500002, z: 0.4}
+  _initialRotations:
+  - {x: -0, y: -0, z: -0, w: 1}
+  _initialScale:
+  - {x: 0.1, y: 0.1, z: 0.1}
+  _sphereObjs:
+  - 0.5
+  _obbObjs: []
