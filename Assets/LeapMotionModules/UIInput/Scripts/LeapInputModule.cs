@@ -167,6 +167,8 @@ namespace Leap.Unity.InputModule {
         }
       }
 
+      canvases = Resources.FindObjectsOfTypeAll<Canvas>();
+
       //Set Projective/Tactile Modes
       if (InteractionMode == InteractionCapability.Projective) {
         ProjectiveToTactileTransitionDistance = -100f;

@@ -7,16 +7,15 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.InputModule {
   public class PhysicsUI : MonoBehaviour {
-    [Tooltip("The physically enabled body of the button")]
+    [Tooltip("The physically-enabled body of the button")]
     public Transform ButtonFace;
     [Tooltip("OPTIONAL: If you have a dropshadow image that you would like to opacity fade upon compression, add one here")]
     public UnityEngine.UI.Image Shadow;
 
     private float MaxShadowOpacity;
-    private Rigidbody rigidbody;
+    private Rigidbody body;
     private SpringJoint SpringJoint;
     private Vector3 InitialLocalPosition;
-    private Button SelectableButton;
     private Vector3 PhysicsPosition = Vector3.zero;
     private Vector3 PhysicsVelocity = Vector3.zero;
     private bool physicsOccurred = false;
@@ -32,10 +31,9 @@ namespace Leap.Unity.InputModule {
           Shadow.color = new Color(Shadow.color.r, Shadow.color.g, Shadow.color.b, 0f);
         }
 
-        rigidbody = ButtonFace.GetComponent<Rigidbody>();
+        body = ButtonFace.GetComponent<Rigidbody>();
         SpringJoint = ButtonFace.GetComponent<SpringJoint>();
         InitialLocalPosition = ButtonFace.localPosition;
-        SelectableButton = GetComponent<Button>();
 
         pointerEvent = new PointerEventData(EventSystem.current);
         pointerEvent.button = PointerEventData.InputButton.Left;
@@ -50,26 +48,30 @@ namespace Leap.Unity.InputModule {
     }
 
     void FixedUpdate() {
-      physicsOccurred = true;
-      rigidbody.position = PhysicsPosition;
+      if (!physicsOccurred) {
+        physicsOccurred = true;
+        body.position = PhysicsPosition;
+        body.velocity = PhysicsVelocity;
+      }
     }
 
     void Update() {
       if (physicsOccurred) {
         physicsOccurred = false;
-        Vector3 localPhysicsPosition = transform.InverseTransformPoint(rigidbody.position);
+
+        Vector3 localPhysicsPosition = transform.InverseTransformPoint(body.position);
         localPhysicsPosition = new Vector3(InitialLocalPosition.x, InitialLocalPosition.y, localPhysicsPosition.z);
         Vector3 newWorldPhysicsPosition = transform.TransformPoint(localPhysicsPosition);
         PhysicsPosition = newWorldPhysicsPosition;
 
-        Vector3 localPhysicsVelocity = transform.InverseTransformDirection(rigidbody.velocity);
+        Vector3 localPhysicsVelocity = transform.InverseTransformDirection(body.velocity);
         localPhysicsVelocity = new Vector3(0f, 0f, localPhysicsVelocity.z);
         Vector3 newWorldPhysicsVelocity = transform.TransformDirection(localPhysicsVelocity);
         PhysicsVelocity = newWorldPhysicsVelocity;
 
         if (localPhysicsPosition.z > 0) {
           ButtonFace.localPosition = new Vector3(InitialLocalPosition.x, InitialLocalPosition.y, 0f);
-          rigidbody.velocity = rigidbody.velocity / 2f;
+          PhysicsVelocity = PhysicsVelocity / 2f;
           isDepressed = true;
         } else if (localPhysicsPosition.z < SpringJoint.connectedAnchor.z * 2f) {
           ButtonFace.localPosition = new Vector3(InitialLocalPosition.x, InitialLocalPosition.y, SpringJoint.connectedAnchor.z * 2f);
