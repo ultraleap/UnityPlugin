@@ -107,7 +107,11 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public new Rigidbody rigidbody {
+    public
+#if UNITY_EDITOR
+      new
+#endif
+      Rigidbody rigidbody {
       get {
         return _rigidbody;
       }
@@ -293,8 +297,8 @@ namespace Leap.Unity.Interaction {
       updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
       updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
 
-      if(_isKinematic) {
-          updateInfo.updateFlags |= UpdateInfoFlags.Kinematic;
+      if (_isKinematic) {
+        updateInfo.updateFlags |= UpdateInfoFlags.Kinematic;
       } else {
         // Generates notifications even when hands are no longer influencing
         if (_contactMode == ContactMode.SOFT) {
@@ -466,8 +470,7 @@ namespace Leap.Unity.Interaction {
       if (_material == null) {
         if (_manager == null) {
           return;
-        }
-        else {
+        } else {
           Debug.LogWarning("No InteractionMaterial specified; will use the default InteractionMaterial as specified by the InteractionManager.");
           _material = _manager.DefaultInteractionMaterial;
         }
@@ -491,14 +494,13 @@ namespace Leap.Unity.Interaction {
 
     protected void updateContactMode() {
       ContactMode desiredContactMode = ContactMode.NORMAL;
-      if(base.IsBeingGrasped) {
+      if (base.IsBeingGrasped) {
         desiredContactMode = ContactMode.GRASPED;
-      }
-      else if(_dislocatedBrushCounter < DISLOCATED_BRUSH_COOLDOWN || (_contactMode != ContactMode.NORMAL && _minHandDistance <= 0.0f )) {
+      } else if (_dislocatedBrushCounter < DISLOCATED_BRUSH_COOLDOWN || (_contactMode != ContactMode.NORMAL && _minHandDistance <= 0.0f)) {
         desiredContactMode = ContactMode.SOFT;
       }
 
-      if(_contactMode != desiredContactMode) {
+      if (_contactMode != desiredContactMode) {
         _contactMode = desiredContactMode;
         updateLayer();
       }
