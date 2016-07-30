@@ -102,6 +102,12 @@ namespace Leap.Unity.Interaction.Testing {
         case SadisticAction.ForceRelease:
           _manager.ReleaseObject(this);
           break;
+        case SadisticAction.DisableGrasping:
+          _manager.GraspingEnabled = false;
+          break;
+        case SadisticAction.DisableContact:
+          _manager.ContactEnabled = false;
+          break;
         default:
           break;
       }

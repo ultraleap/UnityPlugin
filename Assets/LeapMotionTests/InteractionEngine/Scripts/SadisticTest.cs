@@ -130,7 +130,9 @@ namespace Leap.Unity.Interaction.Testing {
     DestroyGameObject = 0x0010,
     DestroyGameObjectImmediately = 0x0020,
     ForceGrab = 0x0040,
-    ForceRelease = 0x0080
+    ForceRelease = 0x0080,
+    DisableGrasping = 0x0100,
+    DisableContact = 0x0200
   }
 
   public enum InteractionCallback {

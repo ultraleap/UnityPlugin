@@ -9,7 +9,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c0da9e3d0ecc41b4bac3e27be36365bd, type: 3}
-  m_Name: Recording
+  m_Name: Crush1Box_Left
   m_EditorClassIdentifier: 
   frames:
   - Id: 2575873
