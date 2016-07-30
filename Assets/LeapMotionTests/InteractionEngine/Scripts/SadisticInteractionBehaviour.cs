@@ -60,8 +60,8 @@ namespace Leap.Unity.Interaction.Testing {
 
     void Update() {
       if (Time.time >= _afterDelayTime) {
-        checkCallback(InteractionCallback.AfterDelay);
         _afterDelayTime = float.MaxValue;
+        checkCallback(InteractionCallback.AfterDelay);
       }
     }
 
