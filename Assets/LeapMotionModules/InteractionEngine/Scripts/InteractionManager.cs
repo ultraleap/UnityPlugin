@@ -398,6 +398,15 @@ namespace Leap.Unity.Interaction {
         throw new InvalidOperationException("Cannot grasp " + interactionBehaviour + " because it is not registered with this manager.");
       }
 
+      InteractionHand interactionHand;
+      if (!_idToInteractionHand.TryGetValue(hand.Id, out interactionHand)) {
+        throw new InvalidOperationException("Hand with id " + hand.Id + " is not registered with this manager.");
+      }
+
+      if (interactionHand.graspedObject != null) {
+        throw new InvalidOperationException("Cannot grasp with hand " + hand.Id + " because that hand is already grasping " + interactionHand.graspedObject);
+      }
+
       //Ensure behaviour is active already
       _activityManager.Activate(interactionBehaviour);
 
@@ -405,7 +414,6 @@ namespace Leap.Unity.Interaction {
         _graspedBehaviours.Add(interactionBehaviour);
       }
 
-      InteractionHand interactionHand = _idToInteractionHand[hand.Id];
       interactionHand.GraspObject(interactionBehaviour, isUserGrasp: true);
     }
 

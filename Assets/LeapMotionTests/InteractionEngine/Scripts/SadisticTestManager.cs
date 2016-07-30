@@ -113,6 +113,13 @@ namespace Leap.Unity.Interaction.Testing {
 
         Undo.RecordObject(test, "Set test settings");
         test.timeout = timeout;
+        test.ignored = ignored;
+        test.succeedAfterAllAssertionsAreExecuted = succeedAfterAllAssertionsAreExecuted;
+        test.expectException = expectException;
+        test.expectedExceptionList = expectedExceptionList;
+        test.succeedWhenExceptionIsThrown = succeedWhenExceptionIsThrown;
+        test.includedPlatforms = includedPlatforms;
+        test.platformsToIgnore = platformsToIgnore;
 
         test.recording = _recordings[i];
         test.callback = (InteractionCallback)callbackValue;

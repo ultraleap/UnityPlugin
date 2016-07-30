@@ -314,41 +314,97 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 4
   actionDelay: 0
---- !u!1 &148134209
+--- !u!1 &104733784
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 148134210}
-  - 114: {fileID: 148134211}
+  - 4: {fileID: 104733785}
+  - 114: {fileID: 104733786}
   m_Layer: 0
-  m_Name: On Suspend Force Release
+  m_Name: On Release Disable Grasping
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!4 &148134210
+--- !u!4 &104733785
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 148134209}
+  m_GameObject: {fileID: 104733784}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 12
+--- !u!114 &104733786
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 104733784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: db1b6036a8887684c9b72fa33044d8cd, type: 2}
+  callback: 32
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 256
+  actionDelay: 0.5
+--- !u!1 &121829719
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 121829720}
+  - 114: {fileID: 121829721}
+  m_Layer: 0
+  m_Name: On Grasp Force Release
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &121829720
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 121829719}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 2102466576}
-  m_RootOrder: 1
---- !u!114 &148134211
+  m_RootOrder: 5
+--- !u!114 &121829721
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 148134209}
+  m_GameObject: {fileID: 121829719}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
@@ -365,11 +421,67 @@ MonoBehaviour:
   dynamic: 0
   dynamicTypeName: 
   recording: {fileID: 11400000, guid: 7489d85df63bb144998521ebbdaf4e3d, type: 2}
-  callback: 64
+  callback: 16
   expectedCallbacks: 63
   forbiddenCallbacks: 0
   action: 128
   actionDelay: 0.3
+--- !u!1 &174677360
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 174677361}
+  - 114: {fileID: 174677362}
+  m_Layer: 0
+  m_Name: Recieve Velocity Results Force Release
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &174677361
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 174677360}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 17
+--- !u!114 &174677362
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 174677360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 5f426ea0b20e079409f65686ec192a63, type: 2}
+  callback: 512
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 128
+  actionDelay: 0.5
 --- !u!1 &176336988
 GameObject:
   m_ObjectHideFlags: 0
@@ -440,7 +552,7 @@ Transform:
   - {fileID: 638973628}
   - {fileID: 1564434987}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 14
 --- !u!1 &177526053
 GameObject:
   m_ObjectHideFlags: 0
@@ -609,6 +721,258 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 2
   actionDelay: 0
+--- !u!1 &251338280
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 251338281}
+  - 114: {fileID: 251338282}
+  m_Layer: 0
+  m_Name: On Release Disable Grasping
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &251338281
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 251338280}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 13
+--- !u!114 &251338282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 251338280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 5f426ea0b20e079409f65686ec192a63, type: 2}
+  callback: 32
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 256
+  actionDelay: 0.5
+--- !u!1 &323536294
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 323536296}
+  - 114: {fileID: 323536295}
+  m_Layer: 0
+  m_Name: HitLotsOfBoxes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &323536295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 323536294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ad7e45e1ddff514bb29f6461fa67e46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  _recordings:
+  - {fileID: 11400000, guid: db1b6036a8887684c9b72fa33044d8cd, type: 2}
+  - {fileID: 11400000, guid: 5f426ea0b20e079409f65686ec192a63, type: 2}
+  _callbacks: 816
+  _actions: -128
+  _actionDelay: 0.5
+  _expectedCallbacks: 15
+  _forbiddenCallbacks: 0
+  _spawnObjectTime: 0
+  _spawnObjectDelay: 0
+--- !u!4 &323536296
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 323536294}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.689457, y: -6.8565435, z: 0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 1556907335}
+  - {fileID: 1310020903}
+  - {fileID: 2035040587}
+  - {fileID: 1390684982}
+  - {fileID: 1717473969}
+  - {fileID: 683926945}
+  - {fileID: 1075672017}
+  - {fileID: 479527782}
+  - {fileID: 1025407418}
+  - {fileID: 1270112332}
+  - {fileID: 493369233}
+  - {fileID: 429328313}
+  - {fileID: 104733785}
+  - {fileID: 251338281}
+  - {fileID: 1312376899}
+  - {fileID: 1289383323}
+  - {fileID: 1517962978}
+  - {fileID: 174677361}
+  - {fileID: 1326034207}
+  - {fileID: 772212259}
+  - {fileID: 735015302}
+  - {fileID: 1594053828}
+  - {fileID: 1420212526}
+  - {fileID: 351418338}
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+--- !u!1 &351418337
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 351418338}
+  - 114: {fileID: 351418339}
+  m_Layer: 0
+  m_Name: On Grasp Force Release
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &351418338
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 351418337}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 23
+--- !u!114 &351418339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 351418337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 5f426ea0b20e079409f65686ec192a63, type: 2}
+  callback: 16
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 128
+  actionDelay: 0.5
+--- !u!1 &390004657
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 390004658}
+  - 114: {fileID: 390004659}
+  m_Layer: 0
+  m_Name: Can Crush Test
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &390004658
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 390004657}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 650338777}
+  m_RootOrder: 0
+--- !u!114 &390004659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 390004657}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 63d1c3aed738c694a9612c0c482d3e04, type: 2}
+  callback: 0
+  expectedCallbacks: 527
+  forbiddenCallbacks: 240
+  action: 0
+  actionDelay: 0
 --- !u!1 &421653856
 GameObject:
   m_ObjectHideFlags: 0
@@ -728,6 +1092,62 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 4
   actionDelay: 0
+--- !u!1 &429328312
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 429328313}
+  - 114: {fileID: 429328314}
+  m_Layer: 0
+  m_Name: After Delay Disable Grasping
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &429328313
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 429328312}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 11
+--- !u!114 &429328314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 429328312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 5f426ea0b20e079409f65686ec192a63, type: 2}
+  callback: 256
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 256
+  actionDelay: 0.5
 --- !u!1 &457389169
 GameObject:
   m_ObjectHideFlags: 0
@@ -784,41 +1204,41 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 4
   actionDelay: 0
---- !u!1 &486281064
+--- !u!1 &479527781
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 486281065}
-  - 114: {fileID: 486281066}
+  - 4: {fileID: 479527782}
+  - 114: {fileID: 479527783}
   m_Layer: 0
-  m_Name: On Grasp Force Release
+  m_Name: On Grasp Disable Contact
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!4 &486281065
+--- !u!4 &479527782
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 486281064}
+  m_GameObject: {fileID: 479527781}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
-  m_Father: {fileID: 2102466576}
-  m_RootOrder: 2
---- !u!114 &486281066
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 7
+--- !u!114 &479527783
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 486281064}
+  m_GameObject: {fileID: 479527781}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
@@ -834,12 +1254,128 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 7489d85df63bb144998521ebbdaf4e3d, type: 2}
+  recording: {fileID: 11400000, guid: 5f426ea0b20e079409f65686ec192a63, type: 2}
   callback: 16
-  expectedCallbacks: 63
+  expectedCallbacks: 15
   forbiddenCallbacks: 0
-  action: 128
-  actionDelay: 0.3
+  action: 512
+  actionDelay: 0.5
+--- !u!1 &493369232
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 493369233}
+  - 114: {fileID: 493369234}
+  m_Layer: 0
+  m_Name: After Delay Disable Grasping
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &493369233
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 493369232}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 10
+--- !u!114 &493369234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 493369232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: db1b6036a8887684c9b72fa33044d8cd, type: 2}
+  callback: 256
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 256
+  actionDelay: 0.5
+--- !u!1 &509658613
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 509658615}
+  - 114: {fileID: 509658614}
+  m_Layer: 0
+  m_Name: ForceReleaseOfUngrasped
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &509658614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 509658613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ad7e45e1ddff514bb29f6461fa67e46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  _recordings:
+  - {fileID: 11400000, guid: 95ad2a0bac1ce8e4da79d824ec057534, type: 2}
+  _callbacks: 256
+  _actions: 128
+  _actionDelay: 0.2
+  _expectedCallbacks: 15
+  _forbiddenCallbacks: 240
+  _spawnObjectTime: 0
+  _spawnObjectDelay: 0
+--- !u!4 &509658615
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 509658613}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.689457, y: -6.8565435, z: 0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 1199714158}
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
 --- !u!1 &599197446
 GameObject:
   m_ObjectHideFlags: 0
@@ -1120,6 +1656,122 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 2
   actionDelay: 0
+--- !u!1 &650338775
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 650338777}
+  - 114: {fileID: 650338776}
+  m_Layer: 0
+  m_Name: CanCrushTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &650338776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 650338775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ad7e45e1ddff514bb29f6461fa67e46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  _recordings:
+  - {fileID: 11400000, guid: 63d1c3aed738c694a9612c0c482d3e04, type: 2}
+  _callbacks: 0
+  _actions: 0
+  _actionDelay: 0
+  _expectedCallbacks: 527
+  _forbiddenCallbacks: 240
+  _spawnObjectTime: 0
+  _spawnObjectDelay: 0
+--- !u!4 &650338777
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 650338775}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.689457, y: -6.8565435, z: 0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 390004658}
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+--- !u!1 &683926944
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 683926945}
+  - 114: {fileID: 683926946}
+  m_Layer: 0
+  m_Name: On Release Disable Contact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &683926945
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 683926944}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 5
+--- !u!114 &683926946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 683926944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 5f426ea0b20e079409f65686ec192a63, type: 2}
+  callback: 32
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 512
+  actionDelay: 0.5
 --- !u!1 &691372642
 GameObject:
   m_ObjectHideFlags: 0
@@ -1232,41 +1884,41 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 32
   actionDelay: 0
---- !u!1 &722593381
+--- !u!1 &704906781
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 4
   m_Component:
-  - 4: {fileID: 722593382}
-  - 114: {fileID: 722593383}
+  - 4: {fileID: 704906782}
+  - 114: {fileID: 704906783}
   m_Layer: 0
-  m_Name: After Delay Force Release
+  m_Name: Recieve Velocity Results Disable Contact
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!4 &722593382
+--- !u!4 &704906782
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 722593381}
+  m_GameObject: {fileID: 704906781}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
-  m_Father: {fileID: 2102466576}
+  m_Father: {fileID: 902792760}
   m_RootOrder: 0
---- !u!114 &722593383
+--- !u!114 &704906783
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 722593381}
+  m_GameObject: {fileID: 704906781}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
@@ -1282,12 +1934,68 @@ MonoBehaviour:
   platformsToIgnore: []
   dynamic: 0
   dynamicTypeName: 
-  recording: {fileID: 11400000, guid: 7489d85df63bb144998521ebbdaf4e3d, type: 2}
-  callback: 256
-  expectedCallbacks: 63
+  recording: {fileID: 11400000, guid: 63d1c3aed738c694a9612c0c482d3e04, type: 2}
+  callback: 512
+  expectedCallbacks: 15
+  forbiddenCallbacks: 240
+  action: 512
+  actionDelay: 0.2
+--- !u!1 &735015301
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 735015302}
+  - 114: {fileID: 735015303}
+  m_Layer: 0
+  m_Name: On Release Force Release
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &735015302
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 735015301}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 20
+--- !u!114 &735015303
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 735015301}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: db1b6036a8887684c9b72fa33044d8cd, type: 2}
+  callback: 32
+  expectedCallbacks: 15
   forbiddenCallbacks: 0
   action: 128
-  actionDelay: 0.3
+  actionDelay: 0.5
 --- !u!1 &739957324
 GameObject:
   m_ObjectHideFlags: 0
@@ -1400,6 +2108,62 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 2
   actionDelay: 0
+--- !u!1 &772212258
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 772212259}
+  - 114: {fileID: 772212260}
+  m_Layer: 0
+  m_Name: After Delay Force Release
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &772212259
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 772212258}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 19
+--- !u!114 &772212260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 772212258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 5f426ea0b20e079409f65686ec192a63, type: 2}
+  callback: 256
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 128
+  actionDelay: 0.5
 --- !u!1 &787412038
 GameObject:
   m_ObjectHideFlags: 0
@@ -1624,6 +2388,130 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 32
   actionDelay: 0
+--- !u!1 &902792758
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 902792760}
+  - 114: {fileID: 902792759}
+  m_Layer: 0
+  m_Name: DisableContact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &902792759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 902792758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ad7e45e1ddff514bb29f6461fa67e46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  _recordings:
+  - {fileID: 11400000, guid: 63d1c3aed738c694a9612c0c482d3e04, type: 2}
+  - {fileID: 11400000, guid: 264258cdc5fc62347be166c22c111b60, type: 2}
+  _callbacks: 768
+  _actions: 512
+  _actionDelay: 0.2
+  _expectedCallbacks: 15
+  _forbiddenCallbacks: 240
+  _spawnObjectTime: 0
+  _spawnObjectDelay: 0
+--- !u!4 &902792760
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 902792758}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.689457, y: -6.8565435, z: 0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 704906782}
+  - {fileID: 1508498107}
+  - {fileID: 1878057416}
+  - {fileID: 1572982382}
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+--- !u!1 &919911907
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 919911909}
+  - 114: {fileID: 919911908}
+  m_Layer: 0
+  m_Name: ForceGraspOf2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &919911908
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 919911907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ad7e45e1ddff514bb29f6461fa67e46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 1
+  expectedExceptionList: InvalidOperationException
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  _recordings:
+  - {fileID: 11400000, guid: f2c2dc5dfb89e914e949c3a232fa11bb, type: 2}
+  _callbacks: 256
+  _actions: 64
+  _actionDelay: 0.2
+  _expectedCallbacks: 63
+  _forbiddenCallbacks: 0
+  _spawnObjectTime: 0
+  _spawnObjectDelay: 0
+--- !u!4 &919911909
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 919911907}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.689457, y: -6.8565435, z: 0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 1115929754}
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
 --- !u!1 &943618517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1848,6 +2736,118 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 8
   actionDelay: 0
+--- !u!1 &1025407417
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1025407418}
+  - 114: {fileID: 1025407419}
+  m_Layer: 0
+  m_Name: Recieve Velocity Results Disable Grasping
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1025407418
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1025407417}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 8
+--- !u!114 &1025407419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1025407417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: db1b6036a8887684c9b72fa33044d8cd, type: 2}
+  callback: 512
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 256
+  actionDelay: 0.5
+--- !u!1 &1075672016
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1075672017}
+  - 114: {fileID: 1075672018}
+  m_Layer: 0
+  m_Name: On Grasp Disable Contact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1075672017
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1075672016}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 6
+--- !u!114 &1075672018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1075672016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: db1b6036a8887684c9b72fa33044d8cd, type: 2}
+  callback: 16
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 512
+  actionDelay: 0.5
 --- !u!1 &1089357992
 GameObject:
   m_ObjectHideFlags: 0
@@ -1904,6 +2904,62 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 8
   actionDelay: 0
+--- !u!1 &1115929753
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1115929754}
+  - 114: {fileID: 1115929755}
+  m_Layer: 0
+  m_Name: After Delay Force Grab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1115929754
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1115929753}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 919911909}
+  m_RootOrder: 0
+--- !u!114 &1115929755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1115929753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 1
+  expectedExceptionList: InvalidOperationException
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: f2c2dc5dfb89e914e949c3a232fa11bb, type: 2}
+  callback: 256
+  expectedCallbacks: 63
+  forbiddenCallbacks: 0
+  action: 64
+  actionDelay: 0.2
 --- !u!1 &1135052444
 GameObject:
   m_ObjectHideFlags: 0
@@ -2075,7 +3131,63 @@ Transform:
   m_Children:
   - {fileID: 1244745347}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
+--- !u!1 &1199714157
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1199714158}
+  - 114: {fileID: 1199714159}
+  m_Layer: 0
+  m_Name: After Delay Force Release
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1199714158
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1199714157}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 509658615}
+  m_RootOrder: 0
+--- !u!114 &1199714159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1199714157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 95ad2a0bac1ce8e4da79d824ec057534, type: 2}
+  callback: 256
+  expectedCallbacks: 15
+  forbiddenCallbacks: 240
+  action: 128
+  actionDelay: 0.2
 --- !u!1 &1202966042
 GameObject:
   m_ObjectHideFlags: 0
@@ -2152,7 +3264,7 @@ Transform:
   - {fileID: 1741202607}
   - {fileID: 1135052445}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 15
 --- !u!1 &1207110107
 GameObject:
   m_ObjectHideFlags: 0
@@ -2291,7 +3403,7 @@ Transform:
   - {fileID: 38756118}
   - {fileID: 23164171}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 13
 --- !u!1 &1244745346
 GameObject:
   m_ObjectHideFlags: 0
@@ -2465,7 +3577,63 @@ Transform:
   - {fileID: 1141106816}
   - {fileID: 947402584}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 8
+--- !u!1 &1270112331
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1270112332}
+  - 114: {fileID: 1270112333}
+  m_Layer: 0
+  m_Name: Recieve Velocity Results Disable Grasping
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1270112332
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1270112331}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 9
+--- !u!114 &1270112333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1270112331}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 5f426ea0b20e079409f65686ec192a63, type: 2}
+  callback: 512
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 256
+  actionDelay: 0.5
 --- !u!1 &1285950610
 GameObject:
   m_ObjectHideFlags: 0
@@ -2522,6 +3690,286 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 1
   actionDelay: 0
+--- !u!1 &1289383322
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1289383323}
+  - 114: {fileID: 1289383324}
+  m_Layer: 0
+  m_Name: On Grasp Disable Grasping
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1289383323
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1289383322}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 15
+--- !u!114 &1289383324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1289383322}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 5f426ea0b20e079409f65686ec192a63, type: 2}
+  callback: 16
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 256
+  actionDelay: 0.5
+--- !u!1 &1289566022
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1289566023}
+  - 114: {fileID: 1289566024}
+  m_Layer: 0
+  m_Name: On Grasp Disable Grasping
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1289566023
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1289566022}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 2102466576}
+  m_RootOrder: 2
+--- !u!114 &1289566024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1289566022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 7489d85df63bb144998521ebbdaf4e3d, type: 2}
+  callback: 16
+  expectedCallbacks: 63
+  forbiddenCallbacks: 0
+  action: 256
+  actionDelay: 0.3
+--- !u!1 &1310020902
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1310020903}
+  - 114: {fileID: 1310020904}
+  m_Layer: 0
+  m_Name: Recieve Velocity Results Disable Contact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1310020903
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1310020902}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 1
+--- !u!114 &1310020904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1310020902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 5f426ea0b20e079409f65686ec192a63, type: 2}
+  callback: 512
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 512
+  actionDelay: 0.5
+--- !u!1 &1312376898
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1312376899}
+  - 114: {fileID: 1312376900}
+  m_Layer: 0
+  m_Name: On Grasp Disable Grasping
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1312376899
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1312376898}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 14
+--- !u!114 &1312376900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1312376898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: db1b6036a8887684c9b72fa33044d8cd, type: 2}
+  callback: 16
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 256
+  actionDelay: 0.5
+--- !u!1 &1326034206
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1326034207}
+  - 114: {fileID: 1326034208}
+  m_Layer: 0
+  m_Name: After Delay Force Release
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1326034207
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1326034206}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 18
+--- !u!114 &1326034208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1326034206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: db1b6036a8887684c9b72fa33044d8cd, type: 2}
+  callback: 256
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 128
+  actionDelay: 0.5
 --- !u!1 &1326947966
 GameObject:
   m_ObjectHideFlags: 0
@@ -2713,6 +4161,118 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 2
   actionDelay: 0
+--- !u!1 &1390684981
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1390684982}
+  - 114: {fileID: 1390684983}
+  m_Layer: 0
+  m_Name: After Delay Disable Contact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1390684982
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1390684981}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 3
+--- !u!114 &1390684983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1390684981}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 5f426ea0b20e079409f65686ec192a63, type: 2}
+  callback: 256
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 512
+  actionDelay: 0.5
+--- !u!1 &1420212525
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1420212526}
+  - 114: {fileID: 1420212527}
+  m_Layer: 0
+  m_Name: On Grasp Force Release
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1420212526
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1420212525}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 22
+--- !u!114 &1420212527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1420212525}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: db1b6036a8887684c9b72fa33044d8cd, type: 2}
+  callback: 16
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 128
+  actionDelay: 0.5
 --- !u!1 &1445052000
 GameObject:
   m_ObjectHideFlags: 0
@@ -2856,6 +4416,118 @@ Camera:
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
   m_StereoMirrorMode: 0
+--- !u!1 &1508498106
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1508498107}
+  - 114: {fileID: 1508498108}
+  m_Layer: 0
+  m_Name: Recieve Velocity Results Disable Contact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1508498107
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1508498106}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 902792760}
+  m_RootOrder: 1
+--- !u!114 &1508498108
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1508498106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 264258cdc5fc62347be166c22c111b60, type: 2}
+  callback: 512
+  expectedCallbacks: 15
+  forbiddenCallbacks: 240
+  action: 512
+  actionDelay: 0.2
+--- !u!1 &1515443589
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1515443590}
+  - 114: {fileID: 1515443591}
+  m_Layer: 0
+  m_Name: After Delay Force Release
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1515443590
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1515443589}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 2102466576}
+  m_RootOrder: 3
+--- !u!114 &1515443591
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1515443589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 7489d85df63bb144998521ebbdaf4e3d, type: 2}
+  callback: 256
+  expectedCallbacks: 63
+  forbiddenCallbacks: 0
+  action: 128
+  actionDelay: 0.3
 --- !u!1 &1517705228
 GameObject:
   m_ObjectHideFlags: 0
@@ -2919,6 +4591,62 @@ Light:
   m_BounceIntensity: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1 &1517962977
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1517962978}
+  - 114: {fileID: 1517962979}
+  m_Layer: 0
+  m_Name: Recieve Velocity Results Force Release
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1517962978
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1517962977}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 16
+--- !u!114 &1517962979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1517962977}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: db1b6036a8887684c9b72fa33044d8cd, type: 2}
+  callback: 512
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 128
+  actionDelay: 0.5
 --- !u!1 &1527300327
 GameObject:
   m_ObjectHideFlags: 0
@@ -2975,6 +4703,118 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 16
   actionDelay: 0
+--- !u!1 &1556473803
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1556473804}
+  - 114: {fileID: 1556473805}
+  m_Layer: 0
+  m_Name: On Suspend Disable Grasping
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1556473804
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1556473803}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 2102466576}
+  m_RootOrder: 1
+--- !u!114 &1556473805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1556473803}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 7489d85df63bb144998521ebbdaf4e3d, type: 2}
+  callback: 64
+  expectedCallbacks: 63
+  forbiddenCallbacks: 0
+  action: 256
+  actionDelay: 0.3
+--- !u!1 &1556907334
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1556907335}
+  - 114: {fileID: 1556907336}
+  m_Layer: 0
+  m_Name: Recieve Velocity Results Disable Contact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1556907335
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1556907334}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 0
+--- !u!114 &1556907336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1556907334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: db1b6036a8887684c9b72fa33044d8cd, type: 2}
+  callback: 512
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 512
+  actionDelay: 0.5
 --- !u!1 &1558338003
 GameObject:
   m_ObjectHideFlags: 0
@@ -3087,6 +4927,234 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 1
   actionDelay: 0
+--- !u!1 &1572982381
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1572982382}
+  - 114: {fileID: 1572982383}
+  m_Layer: 0
+  m_Name: After Delay Disable Contact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1572982382
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1572982381}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 902792760}
+  m_RootOrder: 3
+--- !u!114 &1572982383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1572982381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 264258cdc5fc62347be166c22c111b60, type: 2}
+  callback: 256
+  expectedCallbacks: 15
+  forbiddenCallbacks: 240
+  action: 512
+  actionDelay: 0.2
+--- !u!1 &1576420569
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1576420571}
+  - 114: {fileID: 1576420570}
+  m_Layer: 0
+  m_Name: CanPokeTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1576420570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1576420569}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ad7e45e1ddff514bb29f6461fa67e46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  _recordings:
+  - {fileID: 11400000, guid: 264258cdc5fc62347be166c22c111b60, type: 2}
+  _callbacks: 0
+  _actions: 0
+  _actionDelay: 0
+  _expectedCallbacks: 15
+  _forbiddenCallbacks: 752
+  _spawnObjectTime: 0
+  _spawnObjectDelay: 0
+--- !u!4 &1576420571
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1576420569}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.689457, y: -6.8565435, z: 0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 2007988878}
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+--- !u!1 &1594053827
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1594053828}
+  - 114: {fileID: 1594053829}
+  m_Layer: 0
+  m_Name: On Release Force Release
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1594053828
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1594053827}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 21
+--- !u!114 &1594053829
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1594053827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 5f426ea0b20e079409f65686ec192a63, type: 2}
+  callback: 32
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 128
+  actionDelay: 0.5
+--- !u!1 &1627065574
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1627065575}
+  - 114: {fileID: 1627065576}
+  m_Layer: 0
+  m_Name: On Suspend Force Release
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1627065575
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1627065574}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 2102466576}
+  m_RootOrder: 4
+--- !u!114 &1627065576
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1627065574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 7489d85df63bb144998521ebbdaf4e3d, type: 2}
+  callback: 64
+  expectedCallbacks: 63
+  forbiddenCallbacks: 0
+  action: 128
+  actionDelay: 0.3
 --- !u!1 &1669747414
 GameObject:
   m_ObjectHideFlags: 0
@@ -3143,6 +5211,118 @@ MonoBehaviour:
   forbiddenCallbacks: 0
   action: 8
   actionDelay: 0
+--- !u!1 &1684098185
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1684098186}
+  - 114: {fileID: 1684098187}
+  m_Layer: 0
+  m_Name: After Delay Disable Grasping
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1684098186
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1684098185}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 2102466576}
+  m_RootOrder: 0
+--- !u!114 &1684098187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1684098185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 7489d85df63bb144998521ebbdaf4e3d, type: 2}
+  callback: 256
+  expectedCallbacks: 63
+  forbiddenCallbacks: 0
+  action: 256
+  actionDelay: 0.3
+--- !u!1 &1717473968
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1717473969}
+  - 114: {fileID: 1717473970}
+  m_Layer: 0
+  m_Name: On Release Disable Contact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1717473969
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1717473968}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 4
+--- !u!114 &1717473970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1717473968}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: db1b6036a8887684c9b72fa33044d8cd, type: 2}
+  callback: 32
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 512
+  actionDelay: 0.5
 --- !u!1 &1741202606
 GameObject:
   m_ObjectHideFlags: 0
@@ -3428,7 +5608,7 @@ Transform:
   - {fileID: 1754356739}
   - {fileID: 864684573}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
 --- !u!1 &1849143279
 GameObject:
   m_ObjectHideFlags: 0
@@ -3528,6 +5708,62 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!1 &1878057415
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1878057416}
+  - 114: {fileID: 1878057417}
+  m_Layer: 0
+  m_Name: After Delay Disable Contact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1878057416
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1878057415}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 902792760}
+  m_RootOrder: 2
+--- !u!114 &1878057417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1878057415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 63d1c3aed738c694a9612c0c482d3e04, type: 2}
+  callback: 256
+  expectedCallbacks: 15
+  forbiddenCallbacks: 240
+  action: 512
+  actionDelay: 0.2
 --- !u!1 &1928046961
 GameObject:
   m_ObjectHideFlags: 0
@@ -3704,7 +5940,119 @@ Transform:
   - {fileID: 648740467}
   - {fileID: 1757945466}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 12
+--- !u!1 &2007988877
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 2007988878}
+  - 114: {fileID: 2007988879}
+  m_Layer: 0
+  m_Name: Can Poke Test
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &2007988878
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2007988877}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 1576420571}
+  m_RootOrder: 0
+--- !u!114 &2007988879
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2007988877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 264258cdc5fc62347be166c22c111b60, type: 2}
+  callback: 0
+  expectedCallbacks: 15
+  forbiddenCallbacks: 752
+  action: 0
+  actionDelay: 0
+--- !u!1 &2035040586
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 2035040587}
+  - 114: {fileID: 2035040588}
+  m_Layer: 0
+  m_Name: After Delay Disable Contact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &2035040587
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2035040586}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 323536296}
+  m_RootOrder: 2
+--- !u!114 &2035040588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2035040586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: db1b6036a8887684c9b72fa33044d8cd, type: 2}
+  callback: 256
+  expectedCallbacks: 15
+  forbiddenCallbacks: 0
+  action: 512
+  actionDelay: 0.5
 --- !u!1 &2098056942
 GameObject:
   m_ObjectHideFlags: 0
@@ -3857,7 +6205,7 @@ MonoBehaviour:
   _recordings:
   - {fileID: 11400000, guid: 7489d85df63bb144998521ebbdaf4e3d, type: 2}
   _callbacks: 336
-  _actions: 128
+  _actions: 384
   _actionDelay: 0.3
   _expectedCallbacks: 63
   _forbiddenCallbacks: 0
@@ -3874,8 +6222,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
-  - {fileID: 722593382}
-  - {fileID: 148134210}
-  - {fileID: 486281065}
+  - {fileID: 1684098186}
+  - {fileID: 1556473804}
+  - {fileID: 1289566023}
+  - {fileID: 1515443590}
+  - {fileID: 1627065575}
+  - {fileID: 121829720}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 9

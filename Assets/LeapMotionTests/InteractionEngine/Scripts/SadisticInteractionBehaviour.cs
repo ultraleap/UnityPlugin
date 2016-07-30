@@ -44,6 +44,14 @@ namespace Leap.Unity.Interaction.Testing {
       checkCallback(InteractionCallback.OnResume);
     }
 
+    protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
+      base.OnRecievedSimulationResults(results);
+
+      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
+        checkCallback(InteractionCallback.RecieveVelocityResults);
+      }
+    }
+
     private float _afterDelayTime;
     protected override void OnEnable() {
       base.OnEnable();
@@ -52,8 +60,8 @@ namespace Leap.Unity.Interaction.Testing {
 
     void Update() {
       if (Time.time >= _afterDelayTime) {
-        checkCallback(InteractionCallback.AfterDelay);
         _afterDelayTime = float.MaxValue;
+        checkCallback(InteractionCallback.AfterDelay);
       }
     }
 
@@ -93,6 +101,12 @@ namespace Leap.Unity.Interaction.Testing {
           break;
         case SadisticAction.ForceRelease:
           _manager.ReleaseObject(this);
+          break;
+        case SadisticAction.DisableGrasping:
+          _manager.GraspingEnabled = false;
+          break;
+        case SadisticAction.DisableContact:
+          _manager.ContactEnabled = false;
           break;
         default:
           break;
