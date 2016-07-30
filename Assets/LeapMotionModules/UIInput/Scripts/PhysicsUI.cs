@@ -42,6 +42,9 @@ namespace Leap.Unity.InputModule {
         pointerEvent.pointerCurrentRaycast = result;
         pointerEvent.pointerPress = gameObject;
         pointerEvent.rawPointerPress = gameObject;
+        ButtonFace.localPosition = new Vector3(InitialLocalPosition.x, InitialLocalPosition.y, SpringJoint.connectedAnchor.z);
+        PhysicsPosition = transform.TransformPoint(new Vector3(InitialLocalPosition.x, InitialLocalPosition.y, SpringJoint.connectedAnchor.z));
+        body.position = PhysicsPosition;
       } else {
         Debug.LogWarning("Ensure that you have a UI Element allotted in the Layer Transform!");
       }
@@ -56,6 +59,7 @@ namespace Leap.Unity.InputModule {
     }
 
     void Update() {
+      pointerEvent.position = Camera.main.WorldToScreenPoint(ButtonFace.transform.position);
       if (physicsOccurred) {
         physicsOccurred = false;
 
@@ -91,19 +95,13 @@ namespace Leap.Unity.InputModule {
 
       if (isDepressed && !prevDepressed) {
         prevDepressed = true;
-        EventSystem.current.SetSelectedGameObject(gameObject);
-        ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerClickHandler);
+        ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerEnterHandler);
         ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerDownHandler);
       } else if (!isDepressed && prevDepressed) {
         prevDepressed = false;
+        ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerExitHandler);
+        ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerClickHandler);
         ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerUpHandler);
-      }
-      SendUpdateEventToSelectedObject();
-    }
-
-    private void SendUpdateEventToSelectedObject() {
-      if (EventSystem.current.currentSelectedGameObject != null) {
-        ExecuteEvents.Execute(EventSystem.current.currentSelectedGameObject, new PointerEventData(EventSystem.current), ExecuteEvents.updateSelectedHandler);
       }
     }
   }
