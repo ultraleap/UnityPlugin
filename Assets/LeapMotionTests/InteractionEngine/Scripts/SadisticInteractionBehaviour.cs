@@ -44,6 +44,14 @@ namespace Leap.Unity.Interaction.Testing {
       checkCallback(InteractionCallback.OnResume);
     }
 
+    protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
+      base.OnRecievedSimulationResults(results);
+
+      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
+        checkCallback(InteractionCallback.RecieveVelocityResults);
+      }
+    }
+
     private float _afterDelayTime;
     protected override void OnEnable() {
       base.OnEnable();

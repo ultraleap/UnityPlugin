@@ -143,5 +143,6 @@ namespace Leap.Unity.Interaction.Testing {
     OnSuspend = 0x0040,
     OnResume = 0x0080,
     AfterDelay = 0x0100,
+    RecieveVelocityResults = 0x0200,
   }
 }
