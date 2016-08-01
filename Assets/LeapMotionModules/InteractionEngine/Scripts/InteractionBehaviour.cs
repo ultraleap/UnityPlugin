@@ -179,13 +179,6 @@ namespace Leap.Unity.Interaction {
 
       _controllers = new ControllerContainer(this, _material);
 
-      _rigidbody = GetComponent<Rigidbody>();
-      if (_rigidbody == null) {
-        //Should only happen if the user has done some trickery since there is a RequireComponent attribute
-        throw new InvalidOperationException("InteractionBehaviour must have a Rigidbody component attached to it.");
-      }
-      _rigidbody.maxAngularVelocity = float.PositiveInfinity;
-
       _materialReplacer = new PhysicMaterialReplacer(transform, _material);
       _warper = new RigidbodyWarper(_manager, transform, _rigidbody, _material.GraphicalReturnTime);
 
@@ -273,12 +266,6 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
       base.OnInteractionShapeCreated(instanceHandle);
-
-      //Copy over existing settings for defaults
-      _isKinematic = _rigidbody.isKinematic;
-      _useGravity = _rigidbody.useGravity;
-      _drag = _rigidbody.drag;
-      _angularDrag = _rigidbody.angularDrag;
 
       _solvedPosition = _rigidbody.position;
       _solvedRotation = _rigidbody.rotation;
@@ -460,6 +447,21 @@ namespace Leap.Unity.Interaction {
 
     protected override void Awake() {
       base.Awake();
+
+      _rigidbody = GetComponent<Rigidbody>();
+      if (_rigidbody == null) {
+        //Should only happen if the user has done some trickery since there is a RequireComponent attribute
+        enabled = false;
+        throw new InvalidOperationException("InteractionBehaviour must have a Rigidbody component attached to it.");
+      }
+      _rigidbody.maxAngularVelocity = float.PositiveInfinity;
+
+      //Copy over existing settings for defaults
+      _isKinematic = _rigidbody.isKinematic;
+      _useGravity = _rigidbody.useGravity;
+      _drag = _rigidbody.drag;
+      _angularDrag = _rigidbody.angularDrag;
+
       CheckMaterial();
     }
 
