@@ -288,6 +288,8 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnInteractionShapeDestroyed() {
       base.OnInteractionShapeDestroyed();
+      updateContactMode();
+      revertRigidbodyState();
     }
 
     public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
