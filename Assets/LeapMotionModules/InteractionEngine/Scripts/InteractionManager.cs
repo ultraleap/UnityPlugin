@@ -524,16 +524,8 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void OnDisable() {
-      foreach (var interactionHand in _idToInteractionHand.Values) {
-        IInteractionBehaviour graspedBehaviour = interactionHand.graspedObject;
-        if (graspedBehaviour != null) {
-          try {
-            interactionHand.ReleaseObject();
-          } catch (Exception e) {
-            _activityManager.NotifyMisbehaving(graspedBehaviour);
-            Debug.LogException(e);
-          }
-        }
+      for (int i = _graspedBehaviours.Count; i-- != 0;) {
+        ReleaseObject(_graspedBehaviours[i]);
       }
 
       _activityManager.UnregisterMisbehavingObjects();
