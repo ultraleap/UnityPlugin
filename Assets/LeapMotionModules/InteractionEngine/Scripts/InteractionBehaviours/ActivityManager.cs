@@ -205,16 +205,15 @@ namespace Leap.Unity.Interaction {
           getSphereResults(hands[0], _markedBehaviours);
           break;
 #if UNITY_5_4
-        // jselstad reported crashes here with Unity 5.4b24
-        //        case 2:
-        //          if(hands[0].PalmPosition.DistanceTo(hands[1].PalmPosition) > (_overlapRadius*2.0f)) {
-        //            getSphereResults(hands[0], _markedBehaviours);
-        //            getSphereResults(hands[1], _markedBehaviours);
-        //            break;
-        //          }
-        //          //Use capsule collider for efficiency.  Only need one overlap and no duplicates!
-        //          getCapsuleResults(hands[0], hands[1], _markedBehaviours);
-        //          break;
+        case 2:
+          if (hands[0].PalmPosition.DistanceTo(hands[1].PalmPosition) > (_overlapRadius * 2.0f)) {
+            getSphereResults(hands[0], _markedBehaviours);
+            getSphereResults(hands[1], _markedBehaviours);
+            break;
+          }
+          //Use capsule collider for efficiency.  Only need one overlap and no duplicates!
+          getCapsuleResults(hands[0], hands[1], _markedBehaviours);
+          break;
 #endif
         default:
           for (int i = 0; i < hands.Count; i++) {
@@ -281,25 +280,23 @@ namespace Leap.Unity.Interaction {
     }
 
 #if UNITY_5_4
-    // jselstad reported crashes here with Unity 5.4b24
-    //
-    //private void getCapsuleResults(Hand handA, Hand handB, List<IInteractionBehaviour> list) {
-    //  int count;
-    //  while (true) {
-    //    count = Physics.OverlapCapsuleNonAlloc(handA.PalmPosition.ToVector3(),
-    //                                           handB.PalmPosition.ToVector3(),
-    //                                           _overlapRadius,
-    //                                           _colliderResults,
-    //                                           _brushLayerMask,
-    //                                           QueryTriggerInteraction.Ignore);
-    //    if (count < _colliderResults.Length) {
-    //      break;
-    //    }
-    //    _colliderResults = new Collider[_colliderResults.Length * 2];
-    //  }
+    private void getCapsuleResults(Hand handA, Hand handB, List<IInteractionBehaviour> list) {
+      int count;
+      while (true) {
+        count = Physics.OverlapCapsuleNonAlloc(handA.PalmPosition.ToVector3(),
+                                               handB.PalmPosition.ToVector3(),
+                                               _overlapRadius,
+                                               _colliderResults,
+                                               _brushLayerMask,
+                                               QueryTriggerInteraction.Ignore);
+        if (count < _colliderResults.Length) {
+          break;
+        }
+        _colliderResults = new Collider[_colliderResults.Length * 2];
+      }
 
-    //  handleColliderResults(count, list);
-    //}
+      handleColliderResults(count, list);
+    }
 #endif
   }
 }
