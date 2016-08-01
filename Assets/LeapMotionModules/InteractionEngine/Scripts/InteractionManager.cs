@@ -300,6 +300,19 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Gets or sets the max activation depth.
+    /// </summary>
+    public int MaxActivationDepth {
+      get {
+        return _maxActivationDepth;
+      }
+      set {
+        _maxActivationDepth = value;
+        _activityManager.MaxDepth = value;
+      }
+    }
+
     /// Force an update of the internal scene info.  This should be called if gravity has changed.
     /// </summary>
     public void UpdateSceneInfo() {

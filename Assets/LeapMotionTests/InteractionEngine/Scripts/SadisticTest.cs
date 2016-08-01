@@ -33,6 +33,9 @@ namespace Leap.Unity.Interaction.Testing {
     [Disable]
     public float actionDelay;
 
+    [Disable]
+    public int activationDepth;
+
     protected InteractionManager _manager;
     protected InteractionTestProvider _provider;
     protected SadisticTestManager _testManager;
@@ -43,6 +46,8 @@ namespace Leap.Unity.Interaction.Testing {
       _manager = FindObjectOfType<InteractionManager>();
       _provider = FindObjectOfType<InteractionTestProvider>();
       _testManager = GetComponentInParent<SadisticTestManager>();
+
+      _manager.MaxActivationDepth = activationDepth;
 
       current = this;
       allCallbacksRecieved = 0;

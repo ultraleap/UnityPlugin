@@ -28,6 +28,9 @@ namespace Leap.Unity.Interaction.Testing {
     [SerializeField]
     protected float _actionDelay = 0;
 
+    [SerializeField]
+    protected int[] _activationDepths = { 3 };
+
     [Header("Test Conditions")]
     [EnumFlags]
     [Tooltip("If any of these callbacks has not been dispatched by the time the test has finished, the test will fail.")]
@@ -80,27 +83,29 @@ namespace Leap.Unity.Interaction.Testing {
       string[] actionNames = Enum.GetNames(actionType);
       string[] callbackNames = Enum.GetNames(callbackType);
 
-      if (_callbacks == 0 || _actions == 0) {
-        createSubTest(ObjectNames.NicifyVariableName(name), 0, 0);
-      } else {
-        for (int i = actionValues.Length; i-- != 0;) {
-          var actionValue = actionValues[i];
-          if (((int)_actions & actionValue) != actionValue) continue;
+      foreach (int activationDepth in _activationDepths) {
+        if (_callbacks == 0 || _actions == 0) {
+          createSubTest(ObjectNames.NicifyVariableName(name), 0, 0, activationDepth);
+        } else {
+          for (int i = actionValues.Length; i-- != 0;) {
+            var actionValue = actionValues[i];
+            if (((int)_actions & actionValue) != actionValue) continue;
 
-          for (int j = callbackValues.Length; j-- != 0;) {
-            var callbackValue = callbackValues[j];
-            if (((int)_callbacks & callbackValue) != callbackValue) continue;
+            for (int j = callbackValues.Length; j-- != 0;) {
+              var callbackValue = callbackValues[j];
+              if (((int)_callbacks & callbackValue) != callbackValue) continue;
 
-            string niceName = ObjectNames.NicifyVariableName(callbackNames[j]) +
-                              " " +
-                              ObjectNames.NicifyVariableName(actionNames[i]);
-            createSubTest(niceName, callbackValue, actionValue);
+              string niceName = ObjectNames.NicifyVariableName(callbackNames[j]) +
+                                " " +
+                                ObjectNames.NicifyVariableName(actionNames[i]);
+              createSubTest(niceName, callbackValue, actionValue, activationDepth);
+            }
           }
         }
       }
     }
 
-    private void createSubTest(string name, int callbackValue, int actionValue) {
+    private void createSubTest(string name, int callbackValue, int actionValue, int activationDepth) {
       for (int i = 0; i < _recordings.Length; i++) {
         GameObject testObj = new GameObject(name);
         Undo.RegisterCreatedObjectUndo(testObj, "Created automatic test");
@@ -127,6 +132,7 @@ namespace Leap.Unity.Interaction.Testing {
         test.forbiddenCallbacks = _forbiddenCallbacks;
         test.action = (SadisticAction)actionValue;
         test.actionDelay = _actionDelay;
+        test.activationDepth = activationDepth;
       }
     }
 #endif
