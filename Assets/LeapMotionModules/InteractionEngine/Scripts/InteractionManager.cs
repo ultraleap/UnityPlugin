@@ -670,7 +670,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void simulateFrame(Frame frame) {
-      _activityManager.Update(frame);
+      _activityManager.UpdateState(frame);
 
       var active = _activityManager.ActiveBehaviours;
 
