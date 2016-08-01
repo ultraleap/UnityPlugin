@@ -34,10 +34,6 @@ namespace Leap.Unity.Interaction {
 
         Assert.AreEqual(monitor != null, IsActive(interactionObj),
                         "Monitor must be non-null for objects reported as active.");
-
-        AssertHelper.Implies(monitor != null,
-                             () => monitor.isActiveAndEnabled,
-                             "If the monitor is non-null, it must always be active and enabled.");
       }
 
       foreach (var activeObj in _activeBehaviours) {

@@ -292,6 +292,7 @@ namespace Leap.Unity.Interaction {
         if (count < _colliderResults.Length) {
           break;
         }
+
         _colliderResults = new Collider[_colliderResults.Length * 2];
       }
 
