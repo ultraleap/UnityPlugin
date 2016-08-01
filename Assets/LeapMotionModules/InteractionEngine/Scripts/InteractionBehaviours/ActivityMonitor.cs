@@ -85,7 +85,7 @@ namespace Leap.Unity.Interaction {
         --_timeToLive;
         _timeToDie = 0;
       } else {
-        if (_interactionBehaviour.IsAbleToBeDeactivated() && ++_timeToDie >= HYSTERESIS_TIMEOUT) {
+        if (++_timeToDie >= HYSTERESIS_TIMEOUT) {
           _manager.Deactivate(_interactionBehaviour);
         }
       }

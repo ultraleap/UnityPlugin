@@ -119,6 +119,10 @@ namespace Leap.Unity.Interaction {
     }
 
     public void Deactivate(IInteractionBehaviour interactionBehaviour) {
+      if (!interactionBehaviour.IsAbleToBeDeactivated()) {
+        return;
+      }
+
       IActivityMonitor monitor;
       if (_registeredBehaviours.TryGetValue(interactionBehaviour, out monitor)) {
         if (monitor != null) {
