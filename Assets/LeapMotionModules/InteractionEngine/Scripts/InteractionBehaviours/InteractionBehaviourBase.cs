@@ -177,6 +177,12 @@ namespace Leap.Unity.Interaction {
         enabled = false;
       }
 
+      if (_hasShapeDescriptionBeenCreated) {
+        _manager.ShapePool.ReturnShape(_shapeDescriptionHandle);
+        _shapeDescriptionHandle = new INTERACTION_SHAPE_DESCRIPTION_HANDLE();
+        _hasShapeDescriptionBeenCreated = false;
+      }
+
       _baseCallGuard.Begin("OnUnregistered");
       OnUnregistered();
       _baseCallGuard.AssertBaseCalled();
@@ -205,8 +211,6 @@ namespace Leap.Unity.Interaction {
 
     public override sealed void NotifyInteractionShapeDestroyed() {
       _shapeInstanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
-      _shapeDescriptionHandle = new INTERACTION_SHAPE_DESCRIPTION_HANDLE();
-      _hasShapeDescriptionBeenCreated = false;
       _hasShapeInstanceHandle = false;
 
       _baseCallGuard.Begin("OnInteractionShapeDestroyed");
