@@ -19,10 +19,10 @@ namespace Leap.Unity.Interaction {
     private Dictionary<INTERACTION_SHAPE_DESCRIPTION_HANDLE, ShapeInfo> _allHandles;
 
     public struct ShapeInfo {
-      public bool isPersistent;
+      public bool isCached;
 
-      public ShapeInfo(bool isPersistent) {
-        this.isPersistent = isPersistent;
+      public ShapeInfo(bool isCached) {
+        this.isCached = isCached;
       }
     }
 
@@ -59,7 +59,7 @@ namespace Leap.Unity.Interaction {
         throw new InvalidOperationException("Tried to return a handle that was not allocated.");
       }
 
-      if (!info.isPersistent) {
+      if (!info.isCached) {
         _allHandles.Remove(handle);
         InteractionC.RemoveShapeDescription(ref _scene, ref handle);
       }
@@ -78,7 +78,7 @@ namespace Leap.Unity.Interaction {
         StructAllocator.CleanupAllocations();
 
         _sphereDescMap[roundedRadius] = handle;
-        _allHandles[handle] = new ShapeInfo(isPersistent: true);
+        _allHandles[handle] = new ShapeInfo(isCached: true);
       }
 
       return handle;
@@ -100,7 +100,7 @@ namespace Leap.Unity.Interaction {
         StructAllocator.CleanupAllocations();
 
         _obbDescMap[roundedExtents] = handle;
-        _allHandles[handle] = new ShapeInfo(isPersistent: true);
+        _allHandles[handle] = new ShapeInfo(isCached: true);
       }
 
       return handle;
@@ -114,7 +114,7 @@ namespace Leap.Unity.Interaction {
       IntPtr capsulePtr = allocateCapsule(p0, p1, radius);
       InteractionC.AddShapeDescription(ref _scene, capsulePtr, out handle);
       StructAllocator.CleanupAllocations();
-      _allHandles[handle] = new ShapeInfo(isPersistent: false);
+      _allHandles[handle] = new ShapeInfo(isCached: false);
       return handle;
     }
 
@@ -132,7 +132,7 @@ namespace Leap.Unity.Interaction {
         StructAllocator.CleanupAllocations();
 
         _meshDescMap[meshCollider.sharedMesh] = handle;
-        _allHandles[handle] = new ShapeInfo(isPersistent: false);
+        _allHandles[handle] = new ShapeInfo(isCached: false);
       }
 
       return handle;
@@ -151,7 +151,7 @@ namespace Leap.Unity.Interaction {
       InteractionC.AddShapeDescription(ref _scene, meshPtr, out handle);
       StructAllocator.CleanupAllocations();
 
-      _allHandles[handle] = new ShapeInfo(isPersistent: false);
+      _allHandles[handle] = new ShapeInfo(isCached: false);
 
       return handle;
     }
@@ -281,7 +281,7 @@ namespace Leap.Unity.Interaction {
       StructAllocator.CleanupAllocations();
 
       _tempColliderList.Clear();
-      _allHandles[handle] = new ShapeInfo(isPersistent: false);
+      _allHandles[handle] = new ShapeInfo(isCached: false);
 
       return handle;
     }
