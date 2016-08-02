@@ -60,8 +60,8 @@ namespace Leap.Unity.Interaction {
       }
 
       if (!info.isPersistent) {
-        InteractionC.RemoveShapeDescription(ref _scene, ref handle);
         _allHandles.Remove(handle);
+        InteractionC.RemoveShapeDescription(ref _scene, ref handle);
       }
     }
 
