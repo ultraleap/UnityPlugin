@@ -98,7 +98,7 @@ namespace Leap.Unity.Interaction {
       if (_registeredBehaviours.TryGetValue(interactionBehaviour, out monitor)) {
         if (monitor == null) {
           if (_maxDepth == 1) {
-            monitor = new ActivityMonitorNoTransfer();
+            monitor = new ActivityMonitorLite();
           } else {
             monitor = interactionBehaviour.gameObject.AddComponent<ActivityMonitor>();
           }

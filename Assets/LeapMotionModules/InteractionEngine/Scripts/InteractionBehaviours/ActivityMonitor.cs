@@ -10,7 +10,7 @@ namespace Leap.Unity.Interaction {
     int arrayIndex { get; set; }
   }
 
-  public class ActivityMonitorNoTransfer : IActivityMonitor {
+  public class ActivityMonitorLite : IActivityMonitor {
     public const int HYSTERESIS_TIMEOUT = 5;
 
     public int arrayIndex { get; set; }
