@@ -8,6 +8,8 @@ using Leap.Unity.Interaction.CApi;
 namespace Leap.Unity.Interaction {
 
   public class ShapeDescriptionPool {
+    public const int DECIMAL_PRECISION = 3;
+
     private INTERACTION_SCENE _scene;
 
     private Dictionary<float, INTERACTION_SHAPE_DESCRIPTION_HANDLE> _sphereDescMap;
@@ -67,13 +69,15 @@ namespace Leap.Unity.Interaction {
     /// Gets a handle to a sphere shape description of the given radius
     /// </summary>
     public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetSphere(float radius) {
+      float roundedRadius = (float)Math.Round(radius, DECIMAL_PRECISION);
+
       INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
-      if (!_sphereDescMap.TryGetValue(radius, out handle)) {
-        IntPtr spherePtr = allocateSphere(radius);
+      if (!_sphereDescMap.TryGetValue(roundedRadius, out handle)) {
+        IntPtr spherePtr = allocateSphere(roundedRadius);
         InteractionC.AddShapeDescription(ref _scene, spherePtr, out handle);
         StructAllocator.CleanupAllocations();
 
-        _sphereDescMap[radius] = handle;
+        _sphereDescMap[roundedRadius] = handle;
         _allHandles[handle] = new ShapeInfo(isPersistent: true);
       }
 
@@ -84,13 +88,18 @@ namespace Leap.Unity.Interaction {
     /// Gets a handle to an OBB description of the given extents
     /// </summary>
     public INTERACTION_SHAPE_DESCRIPTION_HANDLE GetOBB(Vector3 extents) {
+      Vector3 roundedExtents = new Vector3();
+      roundedExtents.x = (float)Math.Round(extents.x, DECIMAL_PRECISION);
+      roundedExtents.y = (float)Math.Round(extents.y, DECIMAL_PRECISION);
+      roundedExtents.z = (float)Math.Round(extents.z, DECIMAL_PRECISION);
+
       INTERACTION_SHAPE_DESCRIPTION_HANDLE handle;
-      if (!_obbDescMap.TryGetValue(extents, out handle)) {
-        IntPtr obbPtr = allocateObb(extents);
+      if (!_obbDescMap.TryGetValue(roundedExtents, out handle)) {
+        IntPtr obbPtr = allocateObb(roundedExtents);
         InteractionC.AddShapeDescription(ref _scene, obbPtr, out handle);
         StructAllocator.CleanupAllocations();
 
-        _obbDescMap[extents] = handle;
+        _obbDescMap[roundedExtents] = handle;
         _allHandles[handle] = new ShapeInfo(isPersistent: true);
       }
 
