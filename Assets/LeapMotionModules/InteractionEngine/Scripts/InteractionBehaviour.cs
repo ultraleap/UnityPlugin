@@ -34,7 +34,6 @@ namespace Leap.Unity.Interaction {
   ///      properties of this behaviour instead of the properties on the Rigidbody component.
   /// </remarks>
   [SelectionBase]
-  [RequireComponent(typeof(Rigidbody))]
   public partial class InteractionBehaviour : InteractionBehaviourBase {
     protected enum ContactMode {
       NORMAL = 0,  // Influenced by brushes and not by soft contact.
@@ -447,12 +446,14 @@ namespace Leap.Unity.Interaction {
 
     protected override void Awake() {
       base.Awake();
+      CheckMaterial();
+    }
 
+    protected override void OnEnable() {
       _rigidbody = GetComponent<Rigidbody>();
       if (_rigidbody == null) {
-        //Should only happen if the user has done some trickery since there is a RequireComponent attribute
         enabled = false;
-        throw new InvalidOperationException("InteractionBehaviour must have a Rigidbody component attached to it.");
+        throw new InvalidOperationException("InteractionBehaviour must have a Rigidbody component attached to it to be enabled.");
       }
       _rigidbody.maxAngularVelocity = float.PositiveInfinity;
 
@@ -462,7 +463,7 @@ namespace Leap.Unity.Interaction {
       _drag = _rigidbody.drag;
       _angularDrag = _rigidbody.angularDrag;
 
-      CheckMaterial();
+      base.OnEnable();
     }
 
     protected override void Reset() {
