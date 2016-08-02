@@ -15,7 +15,7 @@ namespace Leap.Unity.Interaction {
     private Collider[] _colliderResults = new Collider[32];
 
     //Maps registered objects to their active component, which is always null for inactive but still registered objects
-    private Dictionary<IInteractionBehaviour, ActivityMonitor> _registeredBehaviours = new Dictionary<IInteractionBehaviour, ActivityMonitor>();
+    private Dictionary<IInteractionBehaviour, IActivityMonitor> _registeredBehaviours = new Dictionary<IInteractionBehaviour, IActivityMonitor>();
     //Technically provided by _registerBehaviours, but we want fast iteration over active objects, so pay a little more for a list
     private List<IInteractionBehaviour> _activeBehaviours = new List<IInteractionBehaviour>();
 
@@ -83,7 +83,7 @@ namespace Leap.Unity.Interaction {
       if (IsActive(behaviour)) {
         Deactivate(behaviour);
       }
-      
+
       _registeredBehaviours.Remove(behaviour);
 
       behaviour.NotifyUnregistered();
@@ -93,20 +93,17 @@ namespace Leap.Unity.Interaction {
       _misbehavingBehaviours.Add(behaviour);
     }
 
-    public ActivityMonitor Activate(IInteractionBehaviour interactionBehaviour) {
-      ActivityMonitor monitor;
+    public IActivityMonitor Activate(IInteractionBehaviour interactionBehaviour) {
+      IActivityMonitor monitor;
       if (_registeredBehaviours.TryGetValue(interactionBehaviour, out monitor)) {
         if (monitor == null) {
-          monitor = interactionBehaviour.gameObject.AddComponent<ActivityMonitor>();
-          monitor.Init(interactionBehaviour, this);
-
-          //We need to do this in order to force Unity to reconsider collision callbacks for this object
-          //Otherwise scripts added in the middle of a collision never recieve the Stay callbacks.
-          Collider singleCollider = monitor.GetComponentInChildren<Collider>();
-          if (singleCollider != null) {
-            Physics.IgnoreCollision(singleCollider, singleCollider, true);
-            Physics.IgnoreCollision(singleCollider, singleCollider, false);
+          if (_maxDepth == 1) {
+            monitor = new ActivityMonitorLite();
+          } else {
+            monitor = interactionBehaviour.gameObject.AddComponent<ActivityMonitor>();
           }
+
+          monitor.Init(interactionBehaviour, this);
 
           _registeredBehaviours[interactionBehaviour] = monitor;
 
@@ -122,12 +119,12 @@ namespace Leap.Unity.Interaction {
     }
 
     public void Deactivate(IInteractionBehaviour interactionBehaviour) {
-      ActivityMonitor monitor;
+      IActivityMonitor monitor;
       if (_registeredBehaviours.TryGetValue(interactionBehaviour, out monitor)) {
         if (monitor != null) {
           //The monitor that is last in the array of monitors
           IInteractionBehaviour lastBehaviour = _activeBehaviours[_activeBehaviours.Count - 1];
-          ActivityMonitor lastMonitor = _registeredBehaviours[lastBehaviour];
+          IActivityMonitor lastMonitor = _registeredBehaviours[lastBehaviour];
 
           //Replace the monitor we are going to destroy with the last monitor
           _activeBehaviours[monitor.arrayIndex] = lastBehaviour;
@@ -137,7 +134,9 @@ namespace Leap.Unity.Interaction {
           _activeBehaviours.RemoveAt(_activeBehaviours.Count - 1);
 
           _registeredBehaviours[interactionBehaviour] = null;
-          UnityEngine.Object.Destroy(monitor);
+          if (monitor is UnityEngine.Object) {
+            UnityEngine.Object.Destroy(monitor as UnityEngine.Object);
+          }
 
           if (OnDeactivate != null) {
             OnDeactivate(interactionBehaviour);
@@ -153,7 +152,7 @@ namespace Leap.Unity.Interaction {
     }
 
     public bool IsActive(IInteractionBehaviour interactionBehaviour) {
-      ActivityMonitor monitor;
+      IActivityMonitor monitor;
       if (_registeredBehaviours.TryGetValue(interactionBehaviour, out monitor)) {
         return monitor != null;
       }
@@ -164,8 +163,11 @@ namespace Leap.Unity.Interaction {
       return _registeredBehaviours.ContainsKey(interactionBehaviour);
     }
 
-    // HACK FIXME TODO:  This needs to be on the FixedUpdate
-    public void Update(Frame frame) {
+    public void UpdateState(Frame frame) {
+      for (int i = _activeBehaviours.Count; i-- != 0;) {
+        _registeredBehaviours[_activeBehaviours[i]].UpdateState();
+      }
+
       markOverlappingObjects(frame.Hands);
 
       activateAndKeepMarkedObjectsAlive();
@@ -190,7 +192,7 @@ namespace Leap.Unity.Interaction {
       // Find the set of layers that are currently colliding with the brush layer.
       _brushLayerMask = 0;
       for (int i = 0; i < 32; i++) {
-        _brushLayerMask |=  Physics.GetIgnoreLayerCollision(_brushLayer, i) ? 0 : (1 << i);
+        _brushLayerMask |= Physics.GetIgnoreLayerCollision(_brushLayer, i) ? 0 : (1 << i);
       }
 
       // Update _markedBehaviours.
@@ -203,16 +205,15 @@ namespace Leap.Unity.Interaction {
           getSphereResults(hands[0], _markedBehaviours);
           break;
 #if UNITY_5_4
-// jselstad reported crashes here with Unity 5.4b24
-//        case 2:
-//          if(hands[0].PalmPosition.DistanceTo(hands[1].PalmPosition) > (_overlapRadius*2.0f)) {
-//            getSphereResults(hands[0], _markedBehaviours);
-//            getSphereResults(hands[1], _markedBehaviours);
-//            break;
-//          }
-//          //Use capsule collider for efficiency.  Only need one overlap and no duplicates!
-//          getCapsuleResults(hands[0], hands[1], _markedBehaviours);
-//          break;
+        case 2:
+          if (hands[0].PalmPosition.DistanceTo(hands[1].PalmPosition) > (_overlapRadius * 2.0f)) {
+            getSphereResults(hands[0], _markedBehaviours);
+            getSphereResults(hands[1], _markedBehaviours);
+            break;
+          }
+          //Use capsule collider for efficiency.  Only need one overlap and no duplicates!
+          getCapsuleResults(hands[0], hands[1], _markedBehaviours);
+          break;
 #endif
         default:
           for (int i = 0; i < hands.Count; i++) {
@@ -226,7 +227,7 @@ namespace Leap.Unity.Interaction {
       //This loop doesn't care about duplicates
       for (int i = 0; i < _markedBehaviours.Count; i++) {
         IInteractionBehaviour behaviour = _markedBehaviours[i];
-        ActivityMonitor monitor;
+        IActivityMonitor monitor;
         if (_registeredBehaviours.TryGetValue(behaviour, out monitor)) {
           if (monitor == null) {
             monitor = Activate(behaviour);
@@ -279,25 +280,24 @@ namespace Leap.Unity.Interaction {
     }
 
 #if UNITY_5_4
-    // jselstad reported crashes here with Unity 5.4b24
-    //
-    //private void getCapsuleResults(Hand handA, Hand handB, List<IInteractionBehaviour> list) {
-    //  int count;
-    //  while (true) {
-    //    count = Physics.OverlapCapsuleNonAlloc(handA.PalmPosition.ToVector3(),
-    //                                           handB.PalmPosition.ToVector3(),
-    //                                           _overlapRadius,
-    //                                           _colliderResults,
-    //                                           _brushLayerMask,
-    //                                           QueryTriggerInteraction.Ignore);
-    //    if (count < _colliderResults.Length) {
-    //      break;
-    //    }
-    //    _colliderResults = new Collider[_colliderResults.Length * 2];
-    //  }
+    private void getCapsuleResults(Hand handA, Hand handB, List<IInteractionBehaviour> list) {
+      int count;
+      while (true) {
+        count = Physics.OverlapCapsuleNonAlloc(handA.PalmPosition.ToVector3(),
+                                               handB.PalmPosition.ToVector3(),
+                                               _overlapRadius,
+                                               _colliderResults,
+                                               _brushLayerMask,
+                                               QueryTriggerInteraction.Ignore);
+        if (count < _colliderResults.Length) {
+          break;
+        }
 
-    //  handleColliderResults(count, list);
-    //}
+        _colliderResults = new Collider[_colliderResults.Length * 2];
+      }
+
+      handleColliderResults(count, list);
+    }
 #endif
   }
 }

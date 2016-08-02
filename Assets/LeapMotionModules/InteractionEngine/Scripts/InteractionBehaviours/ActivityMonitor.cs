@@ -2,8 +2,42 @@
 
 namespace Leap.Unity.Interaction {
 
-  public class ActivityMonitor : MonoBehaviour {
-    private const int HYSTERESIS_TIMEOUT = 5;
+  public interface IActivityMonitor {
+    void Init(IInteractionBehaviour interactionBehaviour, ActivityManager manager);
+    void Revive();
+    void UpdateState();
+
+    int arrayIndex { get; set; }
+  }
+
+  public class ActivityMonitorLite : IActivityMonitor {
+    public const int HYSTERESIS_TIMEOUT = 5;
+
+    public int arrayIndex { get; set; }
+
+    private IInteractionBehaviour _interactionBehaviour;
+    private ActivityManager _manager;
+    private int _timeToLive = 1;
+
+    public void Init(IInteractionBehaviour interactionBehaviour, ActivityManager manager) {
+      _interactionBehaviour = interactionBehaviour;
+      _manager = manager;
+    }
+
+    public void Revive() {
+      _timeToLive = 1;
+    }
+
+    public void UpdateState() {
+      _timeToLive--;
+      if (_interactionBehaviour.IsAbleToBeDeactivated() && _timeToLive == -HYSTERESIS_TIMEOUT) {
+        _manager.Deactivate(_interactionBehaviour);
+      }
+    }
+  }
+
+  public class ActivityMonitor : MonoBehaviour, IActivityMonitor {
+    public const int HYSTERESIS_TIMEOUT = 5;
 
     public enum GizmoType {
       InteractionStatus,
@@ -13,7 +47,7 @@ namespace Leap.Unity.Interaction {
     public static GizmoType gizmoType = GizmoType.ActivityDepth;
 
     // Caches index into ActivityManager array.
-    public int arrayIndex = -1;
+    public int arrayIndex { get; set; }
 
     private IInteractionBehaviour _interactionBehaviour;
     private ActivityManager _manager;
@@ -24,6 +58,14 @@ namespace Leap.Unity.Interaction {
       _interactionBehaviour = interactionBehaviour;
       _manager = manager;
       Revive();
+
+      //We need to do this in order to force Unity to reconsider collision callbacks for this object
+      //Otherwise scripts added in the middle of a collision never recieve the Stay callbacks.
+      Collider singleCollider = GetComponentInChildren<Collider>();
+      if (singleCollider != null) {
+        Physics.IgnoreCollision(singleCollider, singleCollider, true);
+        Physics.IgnoreCollision(singleCollider, singleCollider, false);
+      }
     }
 
     public void Revive() {
@@ -31,7 +73,7 @@ namespace Leap.Unity.Interaction {
       _timeToLive = _manager.MaxDepth;
     }
 
-    void FixedUpdate() {
+    public void UpdateState() {
 
       // Grasped objects do not intersect the brush layer but are still touching hands.
       if (_interactionBehaviour.IsBeingGrasped) {
@@ -66,9 +108,8 @@ namespace Leap.Unity.Interaction {
         }
 
         otherBehaviour = neighbor._interactionBehaviour;
-      }
-      else {
-        if(_timeToLive <= 1) {
+      } else {
+        if (_timeToLive <= 1) {
           return; // Do not activate neighbor.
         }
 
@@ -78,7 +119,7 @@ namespace Leap.Unity.Interaction {
         }
 
         // Unregistered behaviours will fail to activate.
-        neighbor = _manager.Activate(otherBehaviour);
+        neighbor = _manager.Activate(otherBehaviour) as ActivityMonitor;
         if (neighbor != null) {
           neighbor._timeToLive = _timeToLive - 1;
         }
@@ -92,10 +133,9 @@ namespace Leap.Unity.Interaction {
 
       // propagate both ways
       int nextTime = ((_timeToLive > neighbor._timeToLive) ? _timeToLive : neighbor._timeToLive) - 1;
-      if(_timeToLive < nextTime) {
+      if (_timeToLive < nextTime) {
         _timeToLive = nextTime;
-      }
-      else if(neighbor._timeToLive < nextTime) {
+      } else if (neighbor._timeToLive < nextTime) {
         neighbor._timeToLive = nextTime;
       }
     }

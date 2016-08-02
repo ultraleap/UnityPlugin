@@ -300,6 +300,19 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Gets or sets the max activation depth.
+    /// </summary>
+    public int MaxActivationDepth {
+      get {
+        return _maxActivationDepth;
+      }
+      set {
+        _maxActivationDepth = value;
+        _activityManager.MaxDepth = value;
+      }
+    }
+
     /// Force an update of the internal scene info.  This should be called if gravity has changed.
     /// </summary>
     public void UpdateSceneInfo() {
@@ -345,17 +358,16 @@ namespace Leap.Unity.Interaction {
         return false;
       }
 
-      INTERACTION_HAND_RESULT result = new INTERACTION_HAND_RESULT();
-      result.classification = ManipulatorMode.Contact;
-      result.handFlags = HandResultFlags.ManipulatorMode;
-      result.instanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
-
       foreach (var interactionHand in _idToInteractionHand.Values) {
         if (interactionHand.graspedObject == graspedObject) {
           if (interactionHand.isUntracked) {
             interactionHand.MarkTimeout();
           } else {
             if (_graspingEnabled) {
+              INTERACTION_HAND_RESULT result = new INTERACTION_HAND_RESULT();
+              result.classification = ManipulatorMode.Contact;
+              result.handFlags = HandResultFlags.ManipulatorMode;
+              result.instanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
               InteractionC.OverrideHandResult(ref _scene, (uint)interactionHand.hand.Id, ref result);
             }
             interactionHand.ReleaseObject();
@@ -525,16 +537,8 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void OnDisable() {
-      foreach (var interactionHand in _idToInteractionHand.Values) {
-        IInteractionBehaviour graspedBehaviour = interactionHand.graspedObject;
-        if (graspedBehaviour != null) {
-          try {
-            interactionHand.ReleaseObject();
-          } catch (Exception e) {
-            _activityManager.NotifyMisbehaving(graspedBehaviour);
-            Debug.LogException(e);
-          }
-        }
+      for (int i = _graspedBehaviours.Count; i-- != 0;) {
+        ReleaseObject(_graspedBehaviours[i]);
       }
 
       _activityManager.UnregisterMisbehavingObjects();
@@ -670,7 +674,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void simulateFrame(Frame frame) {
-      _activityManager.Update(frame);
+      _activityManager.UpdateState(frame);
 
       var active = _activityManager.ActiveBehaviours;
 
