@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System;
 using System.Collections.Generic;
 using LeapInternal;
@@ -12,7 +13,16 @@ namespace Leap.Unity.Interaction {
     private Dictionary<float, INTERACTION_SHAPE_DESCRIPTION_HANDLE> _sphereDescMap;
     private Dictionary<Vector3, INTERACTION_SHAPE_DESCRIPTION_HANDLE> _obbDescMap;
     private Dictionary<Mesh, INTERACTION_SHAPE_DESCRIPTION_HANDLE> _meshDescMap;
-    private List<INTERACTION_SHAPE_DESCRIPTION_HANDLE> _allHandles;
+
+    private Dictionary<INTERACTION_SHAPE_DESCRIPTION_HANDLE, ShapeInfo> _allHandles;
+
+    public struct ShapeInfo {
+      public bool isPersistent;
+
+      public ShapeInfo(bool isPersistent) {
+        this.isPersistent = isPersistent;
+      }
+    }
 
     public ShapeDescriptionPool(INTERACTION_SCENE scene) {
       _scene = scene;
@@ -20,22 +30,37 @@ namespace Leap.Unity.Interaction {
       _sphereDescMap = new Dictionary<float, INTERACTION_SHAPE_DESCRIPTION_HANDLE>();
       _obbDescMap = new Dictionary<Vector3, INTERACTION_SHAPE_DESCRIPTION_HANDLE>();
       _meshDescMap = new Dictionary<Mesh, INTERACTION_SHAPE_DESCRIPTION_HANDLE>();
-      _allHandles = new List<INTERACTION_SHAPE_DESCRIPTION_HANDLE>();
+      _allHandles = new Dictionary<INTERACTION_SHAPE_DESCRIPTION_HANDLE, ShapeInfo>();
     }
 
     /// <summary>
     /// Removes and destroys all descriptions from the internal scene.
     /// </summary>
     public void RemoveAllShapes() {
-      for (int i = 0; i < _allHandles.Count; i++) {
-        INTERACTION_SHAPE_DESCRIPTION_HANDLE handle = _allHandles[i];
-        InteractionC.RemoveShapeDescription(ref _scene, ref handle);
+      foreach (var handle in _allHandles.Keys) {
+        var localHandle = handle;
+        InteractionC.RemoveShapeDescription(ref _scene, ref localHandle);
       }
 
       _allHandles.Clear();
       _sphereDescMap.Clear();
       _obbDescMap.Clear();
       _meshDescMap.Clear();
+    }
+
+    /// <summary>
+    /// Returns a shape handle into the pool. 
+    /// </summary>
+    public void ReturnShape(INTERACTION_SHAPE_DESCRIPTION_HANDLE handle) {
+      ShapeInfo info;
+      if (!_allHandles.TryGetValue(handle, out info)) {
+        throw new InvalidOperationException("Tried to return a handle that was not allocated.");
+      }
+
+      if (!info.isPersistent) {
+        InteractionC.RemoveShapeDescription(ref _scene, ref handle);
+        _allHandles.Remove(handle);
+      }
     }
 
     /// <summary>
@@ -49,7 +74,7 @@ namespace Leap.Unity.Interaction {
         StructAllocator.CleanupAllocations();
 
         _sphereDescMap[radius] = handle;
-        _allHandles.Add(handle);
+        _allHandles[handle] = new ShapeInfo(isPersistent: true);
       }
 
       return handle;
@@ -66,7 +91,7 @@ namespace Leap.Unity.Interaction {
         StructAllocator.CleanupAllocations();
 
         _obbDescMap[extents] = handle;
-        _allHandles.Add(handle);
+        _allHandles[handle] = new ShapeInfo(isPersistent: true);
       }
 
       return handle;
@@ -80,7 +105,7 @@ namespace Leap.Unity.Interaction {
       IntPtr capsulePtr = allocateCapsule(p0, p1, radius);
       InteractionC.AddShapeDescription(ref _scene, capsulePtr, out handle);
       StructAllocator.CleanupAllocations();
-      _allHandles.Add(handle);
+      _allHandles[handle] = new ShapeInfo(isPersistent: false);
       return handle;
     }
 
@@ -98,7 +123,7 @@ namespace Leap.Unity.Interaction {
         StructAllocator.CleanupAllocations();
 
         _meshDescMap[meshCollider.sharedMesh] = handle;
-        _allHandles.Add(handle);
+        _allHandles[handle] = new ShapeInfo(isPersistent: false);
       }
 
       return handle;
@@ -117,7 +142,7 @@ namespace Leap.Unity.Interaction {
       InteractionC.AddShapeDescription(ref _scene, meshPtr, out handle);
       StructAllocator.CleanupAllocations();
 
-      _allHandles.Add(handle);
+      _allHandles[handle] = new ShapeInfo(isPersistent: false);
 
       return handle;
     }
@@ -157,7 +182,7 @@ namespace Leap.Unity.Interaction {
 
       // Try optimized encodings for a single collider.  Everything else is a compound.
       if (_tempColliderList.Count == 1) {
-        if(getCollisionSingleInternal(parentObject, ref handle)) {
+        if (getCollisionSingleInternal(parentObject, ref handle)) {
           return handle;
         }
       }
@@ -183,7 +208,7 @@ namespace Leap.Unity.Interaction {
         // Transform to apply to collision shape.
         Matrix4x4 localToParentRelative = inverseParentRelativePose * collider.transform.localToWorldMatrix;
 
-          // Values used to construct INTERACTION_TRANSFORM.
+        // Values used to construct INTERACTION_TRANSFORM.
         Vector3 parentRelativePos = Vector3.zero;
         Quaternion parentRelativeRot = Quaternion.identity;
 
@@ -214,14 +239,14 @@ namespace Leap.Unity.Interaction {
             shapePtr = allocateObb(extents);
           } else if (collider is CapsuleCollider) {
             CapsuleCollider capsuleCollider = collider as CapsuleCollider;
-            if((uint)capsuleCollider.direction >= 3u)
+            if ((uint)capsuleCollider.direction >= 3u)
               throw new InvalidOperationException("Unexpected capsule direction " + capsuleCollider.direction);
 
             parentRelativePos = localToParentRelative.MultiplyPoint(capsuleCollider.center);
 
-            Vector3 primaryAxis = new Vector3((capsuleCollider.direction==0)?1:0, (capsuleCollider.direction==1)?1:0, (capsuleCollider.direction==2)?1:0);
+            Vector3 primaryAxis = new Vector3((capsuleCollider.direction == 0) ? 1 : 0, (capsuleCollider.direction == 1) ? 1 : 0, (capsuleCollider.direction == 2) ? 1 : 0);
             float primaryAxisScale = scaleAlongLocalToParentAxes[capsuleCollider.direction];
-            float perpendicularScale = Mathf.Max(scaleAlongLocalToParentAxes[(capsuleCollider.direction + 1)%3], scaleAlongLocalToParentAxes[(capsuleCollider.direction + 2)%3]);
+            float perpendicularScale = Mathf.Max(scaleAlongLocalToParentAxes[(capsuleCollider.direction + 1) % 3], scaleAlongLocalToParentAxes[(capsuleCollider.direction + 2) % 3]);
 
             float scaledHeight = capsuleCollider.height * primaryAxisScale;
             float scaledRadius = capsuleCollider.radius * perpendicularScale;
@@ -229,8 +254,7 @@ namespace Leap.Unity.Interaction {
 
             Vector3 p0 = primaryAxis * interiorExtent;
             shapePtr = allocateCapsule(p0, -p0, scaledRadius);
-          }
-          else {
+          } else {
             throw new InvalidOperationException("Unsupported collider type " + collider.GetType());
           }
         }
@@ -248,7 +272,7 @@ namespace Leap.Unity.Interaction {
       StructAllocator.CleanupAllocations();
 
       _tempColliderList.Clear();
-      _allHandles.Add(handle);
+      _allHandles[handle] = new ShapeInfo(isPersistent: false);
 
       return handle;
     }
@@ -328,7 +352,7 @@ namespace Leap.Unity.Interaction {
     private IntPtr allocateConvex(MeshCollider meshCollider, Matrix4x4 localToParentRelative) {
 
       if (meshCollider.sharedMesh == null) { throw new NotImplementedException("MeshCollider missing sharedMesh."); }
-      if (meshCollider.convex == false)    { throw new NotImplementedException("MeshCollider must be convex."); }
+      if (meshCollider.convex == false) { throw new NotImplementedException("MeshCollider must be convex."); }
 
       Mesh mesh = meshCollider.sharedMesh;
 
