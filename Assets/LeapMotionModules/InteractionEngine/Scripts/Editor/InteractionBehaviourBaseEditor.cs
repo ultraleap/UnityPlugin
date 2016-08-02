@@ -34,14 +34,16 @@ namespace Leap.Unity.Interaction {
 
       Rigidbody rigidbody = _interactionBehaviour.GetComponent<Rigidbody>();
 
-      if (rigidbody == null && _interactionBehaviour.enabled) {
-        using (new GUILayout.HorizontalScope()) {
-          EditorGUILayout.HelpBox("This component requires a Rigidbody to be enabled", MessageType.Error);
-          if (GUILayout.Button("Auto-Fix")) {
-            rigidbody = _interactionBehaviour.gameObject.AddComponent<Rigidbody>();
-            rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-            rigidbody.useGravity = true;
-            rigidbody.isKinematic = false;
+      if (rigidbody == null) {
+        if (_interactionBehaviour.enabled) {
+          using (new GUILayout.HorizontalScope()) {
+            EditorGUILayout.HelpBox("This component requires a Rigidbody to be enabled", MessageType.Error);
+            if (GUILayout.Button("Auto-Fix")) {
+              rigidbody = _interactionBehaviour.gameObject.AddComponent<Rigidbody>();
+              rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+              rigidbody.useGravity = true;
+              rigidbody.isKinematic = false;
+            }
           }
         }
       } else {
