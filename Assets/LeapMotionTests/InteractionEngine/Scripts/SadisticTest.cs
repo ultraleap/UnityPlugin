@@ -3,6 +3,9 @@ using UnityEngine.Assertions;
 using UnityTest;
 using System;
 using System.Collections;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 using Leap.Unity.Attributes;
 
@@ -112,7 +115,17 @@ namespace Leap.Unity.Interaction.Testing {
 
         IntegrationTest.Fail("Could not find an interaction behaviour that recieved all expected callbacks");
       }
+#if UNITY_EDITOR
+      else {
+        InteractionBrushBone[] bb = FindObjectsOfType(typeof(InteractionBrushBone)) as InteractionBrushBone[];
+        GameObject[] objs = new GameObject[bb.Length];
+         for(int i = 0; i < bb.Length; i++){
+              objs[i] = bb[i].gameObject;
+         }
+  		  Selection.objects = objs;
+      }
     }
+#endif
 
     private string getEnumMessage(string message, InteractionCallback values) {
       var callbackType = typeof(InteractionCallback);
