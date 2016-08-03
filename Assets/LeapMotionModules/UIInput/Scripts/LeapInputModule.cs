@@ -942,5 +942,9 @@ namespace Leap.Unity.InputModule {
         }
       }
     }
+
+    public override bool ShouldActivateModule() {
+      return curFrame!=null && curFrame.Hands.Count > 0 && base.ShouldActivateModule();
+    }
   }
 }
