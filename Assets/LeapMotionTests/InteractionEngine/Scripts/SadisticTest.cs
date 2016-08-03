@@ -48,6 +48,8 @@ namespace Leap.Unity.Interaction.Testing {
       _testManager = GetComponentInParent<SadisticTestManager>();
 
       _manager.MaxActivationDepth = activationDepth;
+      _manager.ShowDebugLines = true;
+      _manager.ShowDebugOutput = true;
 
       current = this;
       allCallbacksRecieved = 0;
