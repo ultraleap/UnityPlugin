@@ -123,7 +123,7 @@ namespace Leap.Unity.RuntimeGizmos {
     public static void DrawCube(Vector3 position, Vector3 size) {
       DrawMesh(cubeMesh, position, Quaternion.identity, size);
     }
-    
+
     /// <summary>
     /// Draws a wire gizmo cube at the given position with the given size.
     /// </summary>
@@ -305,6 +305,23 @@ namespace Leap.Unity.RuntimeGizmos {
         GameObject obj = _objList[i];
         obj.GetComponentsInChildren(false, _gizmoList);
         for (int j = 0; j < _gizmoList.Count; j++) {
+          Transform componentTransform = (_gizmoList[i] as Component).transform;
+
+          bool isDisabled = false;
+          do {
+            var toggle = componentTransform.GetComponentInParent<RuntimeGizmoToggle>();
+            if (!toggle.enabled) {
+              isDisabled = true;
+              break;
+            }
+
+            componentTransform = componentTransform.parent;
+          } while (componentTransform != null);
+
+          if (isDisabled) {
+            continue;
+          }
+
           RGizmos.sphereMesh = _sphereMesh;
           RGizmos.cubeMesh = _cubeMesh;
           RGizmos.wireSphereMesh = _wireSphereMesh;
