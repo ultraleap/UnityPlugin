@@ -332,6 +332,32 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// Enables the display of proximity information from the library.
+    /// </summary>
+    public bool ShowDebugLines {
+      get {
+        return _showDebugLines;
+      }
+      set {
+        _showDebugLines = value;
+        applyDebugSettings();
+      }
+    }
+
+    /// <summary>
+    /// Enables the display of debug text from the library.
+    /// </summary>
+    public bool ShowDebugOutput {
+      get {
+        return _showDebugOutput;
+      }
+      set {
+        _showDebugOutput = value;
+        applyDebugSettings();
+      }
+    }
+
     /// Force an update of the internal scene info.  This should be called if gravity has changed.
     /// </summary>
     public void UpdateSceneInfo() {

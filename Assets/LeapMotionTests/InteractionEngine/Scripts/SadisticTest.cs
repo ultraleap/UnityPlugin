@@ -3,6 +3,9 @@ using UnityEngine.Assertions;
 using UnityTest;
 using System;
 using System.Collections;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 using Leap.Unity.Attributes;
 
@@ -51,6 +54,8 @@ namespace Leap.Unity.Interaction.Testing {
       _testManager = GetComponentInParent<SadisticTestManager>();
 
       _manager.MaxActivationDepth = activationDepth;
+      _manager.ShowDebugLines = true;
+      _manager.ShowDebugOutput = true;
 
       current = this;
       allCallbacksRecieved = 0;
@@ -113,7 +118,18 @@ namespace Leap.Unity.Interaction.Testing {
 
         IntegrationTest.Fail("Could not find an interaction behaviour that recieved all expected callbacks");
       }
+#if UNITY_EDITOR
+      else {
+        // Show Gizmos for InteractionBrushBone.
+        InteractionBrushBone[] bb = FindObjectsOfType(typeof(InteractionBrushBone)) as InteractionBrushBone[];
+        GameObject[] objs = new GameObject[bb.Length];
+         for(int i = 0; i < bb.Length; i++){
+              objs[i] = bb[i].gameObject;
+         }
+  		  Selection.objects = objs;
+      }
     }
+#endif
 
     private string getEnumMessage(string message, InteractionCallback values) {
       var callbackType = typeof(InteractionCallback);
