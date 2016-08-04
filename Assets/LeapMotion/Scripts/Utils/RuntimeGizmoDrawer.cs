@@ -5,6 +5,11 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.RuntimeGizmos {
 
+  /// <summary>
+  /// Have your MonoBehaviour implement this interface to be able to draw runtime gizmos.
+  /// Remember that you must use the RGizmos class, not Unity's Gizmos class, for runtime
+  /// gizmos to work!  You must also have a RuntimeGizmoDrawer component in the scene.
+  /// </summary>
   public interface IRuntimeGizmoDrawer {
     void OnDrawRuntimeGizmos();
   }
