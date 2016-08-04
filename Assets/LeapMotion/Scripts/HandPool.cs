@@ -85,6 +85,19 @@ namespace Leap.Unity {
       }
     }
     public void ReturnToPool(IHandModel model) {
+      //First see if there is another active representation that can use this model
+      for (int i = 0; i < activeHandReps.Count; i++) {
+        if (activeHandReps[i] != null) {
+          HandRepresentation rep = activeHandReps[i];
+          if (rep.RepChirality == model.Handedness) {
+            if (model.GetLeapHand() != rep.MostRecentHand) {
+              rep.AddModel(model);
+              break;
+            }
+          }
+        }
+      }
+      //if not, then return to pool
       ModelGroup modelGroup;
       bool groupFound = modelGroupMapping.TryGetValue(model, out modelGroup);
       modelGroup.ReturnToGroup(model);
@@ -136,9 +149,11 @@ namespace Leap.Unity {
         ModelGroup group = ModelPool[i];
         if (group.IsEnabled) {
           IHandModel model = group.TryGetModel(handChirality, modelType);
-          if (model != null) {
+          if (model != null ) {
             handRep.AddModel(model);
-            modelToHandRepMapping.Add(model, handRep);
+            if (!modelToHandRepMapping.ContainsKey(model)) {
+              modelToHandRepMapping.Add(model, handRep);
+            }
           }
         }
       }
