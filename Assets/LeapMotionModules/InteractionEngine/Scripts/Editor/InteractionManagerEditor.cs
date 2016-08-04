@@ -86,11 +86,13 @@ namespace Leap.Unity.Interaction {
     }
 
     private void providerDectorator(SerializedProperty prop) {
-      if (Physics.defaultContactOffset > InteractionManager.RECOMENDED_CONTACT_OFFSET_MAXIMUM) {
+      var manager = target as InteractionManager;
+
+      if (Physics.defaultContactOffset > manager.RecomendedContactOffsetMaximum) {
         GUILayout.BeginHorizontal();
-        EditorGUILayout.HelpBox("The current default contact offset is " + Physics.defaultContactOffset + ", which is greater than the recomended value.", MessageType.Warning);
+        EditorGUILayout.HelpBox("The current default contact offset is " + Physics.defaultContactOffset + ", which is greater than the recomended value " + manager.RecomendedContactOffsetMaximum, MessageType.Warning);
         if (GUILayout.Button("Auto-fix")) {
-          Physics.defaultContactOffset = InteractionManager.RECOMENDED_CONTACT_OFFSET_MAXIMUM;
+          Physics.defaultContactOffset = manager.RecomendedContactOffsetMaximum;
         }
         GUILayout.EndHorizontal();
       }

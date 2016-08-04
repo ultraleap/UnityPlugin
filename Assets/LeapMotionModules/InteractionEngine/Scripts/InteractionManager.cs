@@ -109,7 +109,12 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL FIELDS
-    public const float RECOMENDED_CONTACT_OFFSET_MAXIMUM = 0.001f; //One millimeter
+    private const float UNSCALED_RECOMENDED_CONTACT_OFFSET_MAXIMUM = 0.001f; //One millimeter
+    public float RecomendedContactOffsetMaximum {
+      get {
+        return UNSCALED_RECOMENDED_CONTACT_OFFSET_MAXIMUM * SimulationScale;
+      }
+    }
 
     protected INTERACTION_SCENE _scene;
     private bool _hasSceneBeenCreated = false;
@@ -125,7 +130,6 @@ namespace Leap.Unity.Interaction {
     protected Dictionary<int, InteractionHand> _idToInteractionHand = new Dictionary<int, InteractionHand>();
     protected List<IInteractionBehaviour> _graspedBehaviours = new List<IInteractionBehaviour>();
 
-    private float _cachedSimulationScale = 1;
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
     private List<int> _handIdsToRemove = new List<int>();
     //A temp list that is recycled.  Used as the argument to OnHandsHold.
@@ -160,7 +164,11 @@ namespace Leap.Unity.Interaction {
 
     public float SimulationScale {
       get {
-        return _cachedSimulationScale;
+        if (_leapProvider != null) {
+          return _leapProvider.transform.lossyScale.x;
+        } else {
+          return 1;
+        }
       }
     }
 
