@@ -579,7 +579,6 @@ namespace Leap.Unity.Interaction {
 
       _cachedSimulationScale = _leapProvider.transform.lossyScale.x;
 
-      Debug.Log(_cachedSimulationScale);
       _activityManager.BrushLayer = InteractionBrushLayer;
       _activityManager.OverlapRadius = _activationRadius * _cachedSimulationScale;
       _activityManager.MaxDepth = _maxActivationDepth;
