@@ -8,8 +8,9 @@ PhysicsManager:
   m_DefaultMaterial: {fileID: 0}
   m_BounceThreshold: 0.05
   m_SleepThreshold: 0.005
-  m_DefaultContactOffset: 0.01
+  m_DefaultContactOffset: 0.001
   m_SolverIterationCount: 20
+  m_SolverVelocityIterations: 1
   m_QueriesHitTriggers: 1
   m_EnableAdaptiveForce: 0
   m_LayerCollisionMatrix: ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff

@@ -109,6 +109,8 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL FIELDS
+    public const float RECOMENDED_CONTACT_OFFSET_MAXIMUM = 0.001f; //One milimeter
+
     protected INTERACTION_SCENE _scene;
     private bool _hasSceneBeenCreated = false;
     private bool _enableGraspingLast = false;

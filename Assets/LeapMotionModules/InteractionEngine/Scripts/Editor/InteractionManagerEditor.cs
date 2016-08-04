@@ -86,9 +86,19 @@ namespace Leap.Unity.Interaction {
     }
 
     private void providerDectorator(SerializedProperty prop) {
+      if (Physics.defaultContactOffset > InteractionManager.RECOMENDED_CONTACT_OFFSET_MAXIMUM) {
+        GUILayout.BeginHorizontal();
+        EditorGUILayout.HelpBox("The current default contact offset is " + Physics.defaultContactOffset + ", which is greater than the recomended value.", MessageType.Warning);
+        if (GUILayout.Button("Auto-fix")) {
+          Physics.defaultContactOffset = InteractionManager.RECOMENDED_CONTACT_OFFSET_MAXIMUM;
+        }
+        GUILayout.EndHorizontal();
+      }
+
       if (_anyBehavioursUnregistered) {
+        GUILayout.BeginHorizontal();
         EditorGUILayout.HelpBox("Some Interaction Behaviours do not have their manager assigned!  Do you want to assign them to this manager?", MessageType.Warning);
-        if (GUILayout.Button("Assign To This Manager")) {
+        if (GUILayout.Button("Auto-fix")) {
           for (int i = 0; i < _interactionBehaviours.Length; i++) {
             var behaviour = _interactionBehaviours[i];
             if (behaviour.Manager == null) {
@@ -98,7 +108,7 @@ namespace Leap.Unity.Interaction {
           }
           _anyBehavioursUnregistered = false;
         }
-        GUILayout.Space(EditorGUIUtility.singleLineHeight);
+        GUILayout.EndHorizontal();
       }
     }
 
