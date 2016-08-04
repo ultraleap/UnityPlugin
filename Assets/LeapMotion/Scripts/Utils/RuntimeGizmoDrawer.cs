@@ -24,14 +24,23 @@ namespace Leap.Unity.RuntimeGizmos {
 
     public static Mesh cubeMesh, wireCubeMesh, sphereMesh, wireSphereMesh;
 
+    /// <summary>
+    /// Causes all remaining gizmos drawing to be done in the local coordinate space of the given transform.
+    /// </summary>
     public static void RelativeTo(Transform transform) {
       matrix = transform.localToWorldMatrix;
     }
 
+    /// <summary>
+    /// Saves the current gizmo matrix to the gizmo matrix stack.
+    /// </summary>
     public static void PushMatrix() {
       _matrixStack.Push(_currMatrix);
     }
 
+    /// <summary>
+    /// Restores the current gizmo matrix from the gizmo matrix stack.
+    /// </summary>
     public static void PopMatrix() {
       matrix = _matrixStack.Pop();
     }
