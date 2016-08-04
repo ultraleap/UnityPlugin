@@ -246,10 +246,6 @@ namespace Leap.Unity.RuntimeGizmos {
     private List<IRuntimeGizmoDrawer> _gizmoList = new List<IRuntimeGizmoDrawer>();
     void Update() {
       RGizmos.ClearAllGizmos();
-      RGizmos.sphereMesh = _sphereMesh;
-      RGizmos.cubeMesh = _cubeMesh;
-      RGizmos.wireSphereMesh = _wireSphereMesh;
-      RGizmos.wireCubeMesh = _wireCubeMesh;
 
       Scene scene = SceneManager.GetActiveScene();
       scene.GetRootGameObjects(_objList);
@@ -257,6 +253,11 @@ namespace Leap.Unity.RuntimeGizmos {
         GameObject obj = _objList[i];
         obj.GetComponentsInChildren(false, _gizmoList);
         for (int j = 0; j < _gizmoList.Count; j++) {
+          RGizmos.sphereMesh = _sphereMesh;
+          RGizmos.cubeMesh = _cubeMesh;
+          RGizmos.wireSphereMesh = _wireSphereMesh;
+          RGizmos.wireCubeMesh = _wireCubeMesh;
+
           if (RGizmos.matrix != Matrix4x4.identity) {
             RGizmos.matrix = Matrix4x4.identity;
           }
