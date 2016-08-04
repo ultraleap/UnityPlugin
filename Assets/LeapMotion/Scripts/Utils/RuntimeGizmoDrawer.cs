@@ -22,7 +22,7 @@ namespace Leap.Unity.RuntimeGizmos {
 
     private static bool _isInWireMode = false;
 
-    public static Mesh cubeMesh, sphereMesh;
+    public static Mesh cubeMesh, wireCubeMesh, sphereMesh, wireSphereMesh;
 
     public static void RelativeTo(Transform transform) {
       matrix = transform.localToWorldMatrix;
@@ -86,7 +86,7 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     public static void DrawWireCube(Vector3 position, Vector3 size) {
-      DrawWireMesh(cubeMesh, position, Quaternion.identity, size);
+      DrawWireMesh(wireCubeMesh, position, Quaternion.identity, size);
     }
 
     public static void DrawSphere(Vector3 center, float radius) {
@@ -94,7 +94,7 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     public static void DrawWireSphere(Vector3 center, float radius) {
-      DrawWireMesh(sphereMesh, center, Quaternion.identity, Vector3.one * radius * 2);
+      DrawWireMesh(wireSphereMesh, center, Quaternion.identity, Vector3.one * radius * 2);
     }
 
     public static void ClearAllGizmos() {
@@ -110,53 +110,55 @@ namespace Leap.Unity.RuntimeGizmos {
 
     private static Material _currMat;
     public static void DrawAllGizmosToScreen(Material wireMaterial, Material filledMaterial) {
-      int matrixIndex = 0;
-      int colorIndex = 0;
-      int lineIndex = 0;
-      int meshIndex = 0;
+      try {
+        int matrixIndex = 0;
+        int colorIndex = 0;
+        int lineIndex = 0;
+        int meshIndex = 0;
 
-      _currMat = null;
-      _currColor = Color.white;
+        _currMat = null;
+        _currColor = Color.white;
 
-      GL.wireframe = false;
+        GL.wireframe = false;
 
-      for (int i = 0; i < _operations.Count; i++) {
-        OperationType type = _operations[i];
-        switch (type) {
-          case OperationType.SetMatrix:
-            _currMatrix = _matrices[matrixIndex++];
-            break;
-          case OperationType.SetColor:
-            _currColor = _colors[colorIndex++];
-            _currMat = null;
-            break;
-          case OperationType.ToggleWireframe:
-            GL.wireframe = !GL.wireframe;
-            break;
-          case OperationType.DrawLine:
-            setMaterial(wireMaterial);
-
-            GL.Begin(GL.LINES);
-            Line line = _lines[lineIndex++];
-            GL.Vertex(_currMatrix.MultiplyPoint3x4(line.a));
-            GL.Vertex(_currMatrix.MultiplyPoint3x4(line.b));
-            GL.End();
-            break;
-          case OperationType.DrawMesh:
-            if (GL.wireframe) {
+        for (int i = 0; i < _operations.Count; i++) {
+          OperationType type = _operations[i];
+          switch (type) {
+            case OperationType.SetMatrix:
+              _currMatrix = _matrices[matrixIndex++];
+              break;
+            case OperationType.SetColor:
+              _currColor = _colors[colorIndex++];
+              _currMat = null;
+              break;
+            case OperationType.ToggleWireframe:
+              GL.wireframe = !GL.wireframe;
+              break;
+            case OperationType.DrawLine:
               setMaterial(wireMaterial);
-            } else {
-              setMaterial(filledMaterial);
-            }
 
-            Graphics.DrawMeshNow(_meshes[meshIndex++], _currMatrix * _matrices[matrixIndex++]);
-            break;
-          default:
-            throw new InvalidOperationException("Unexpected operation type " + type);
+              GL.Begin(GL.LINES);
+              Line line = _lines[lineIndex++];
+              GL.Vertex(_currMatrix.MultiplyPoint3x4(line.a));
+              GL.Vertex(_currMatrix.MultiplyPoint3x4(line.b));
+              GL.End();
+              break;
+            case OperationType.DrawMesh:
+              if (GL.wireframe) {
+                setMaterial(wireMaterial);
+              } else {
+                setMaterial(filledMaterial);
+              }
+
+              Graphics.DrawMeshNow(_meshes[meshIndex++], _currMatrix * _matrices[matrixIndex++]);
+              break;
+            default:
+              throw new InvalidOperationException("Unexpected operation type " + type);
+          }
         }
+      } finally {
+        GL.wireframe = false;
       }
-
-      GL.wireframe = false;
     }
 
     private static void setMaterial(Material mat) {
@@ -200,13 +202,10 @@ namespace Leap.Unity.RuntimeGizmos {
 
   [ExecuteInEditMode]
   public class RuntimeGizmoDrawer : MonoBehaviour {
-    public const int CIRCLE_RESOLUTION = 16;
+    public const int CIRCLE_RESOLUTION = 32;
 
     [SerializeField]
     private bool displayInGameView = true;
-
-    [SerializeField]
-    private Mesh _cubeMesh;
 
     [SerializeField]
     private Mesh _sphereMesh;
@@ -218,6 +217,7 @@ namespace Leap.Unity.RuntimeGizmos {
     private Shader _filledShader;
 
     private Material _wireMaterial, _filledMaterial;
+    private Mesh _cubeMesh, _wireCubeMesh, _wireSphereMesh;
 
     private void onPostRender(Camera camera) {
       bool isSceneCamera = camera.gameObject.hideFlags == HideFlags.HideAndDontSave;
@@ -229,6 +229,8 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     void OnEnable() {
+      generateMeshes();
+
       _wireMaterial = new Material(_wireShader);
       _filledMaterial = new Material(_filledShader);
 
@@ -246,6 +248,8 @@ namespace Leap.Unity.RuntimeGizmos {
       RGizmos.ClearAllGizmos();
       RGizmos.sphereMesh = _sphereMesh;
       RGizmos.cubeMesh = _cubeMesh;
+      RGizmos.wireSphereMesh = _wireSphereMesh;
+      RGizmos.wireCubeMesh = _wireCubeMesh;
 
       Scene scene = SceneManager.GetActiveScene();
       scene.GetRootGameObjects(_objList);
@@ -259,6 +263,104 @@ namespace Leap.Unity.RuntimeGizmos {
           _gizmoList[j].OnDrawRuntimeGizmos();
         }
       }
+    }
+
+    private void generateMeshes() {
+      _cubeMesh = new Mesh();
+      _cubeMesh.name = "RuntimeGizmoCube";
+      _cubeMesh.hideFlags = HideFlags.HideAndDontSave;
+
+      List<Vector3> verts = new List<Vector3>();
+      List<int> indexes = new List<int>();
+
+      addQuad(verts, indexes, Vector3.forward, -Vector3.right, Vector3.up);
+      addQuad(verts, indexes, -Vector3.forward, Vector3.right, Vector3.up);
+      addQuad(verts, indexes, Vector3.right, -Vector3.up, Vector3.forward);
+      addQuad(verts, indexes, -Vector3.right, Vector3.up, Vector3.forward);
+      addQuad(verts, indexes, Vector3.up, -Vector3.forward, Vector3.right);
+      addQuad(verts, indexes, -Vector3.up, Vector3.forward, Vector3.right);
+
+      _cubeMesh.SetVertices(verts);
+      _cubeMesh.SetIndices(indexes.ToArray(), MeshTopology.Quads, 0);
+      _cubeMesh.RecalculateNormals();
+      _cubeMesh.RecalculateBounds();
+      _cubeMesh.UploadMeshData(true);
+
+      _wireCubeMesh = new Mesh();
+      _wireCubeMesh.name = "RuntimeWireCubeMesh";
+      _wireCubeMesh.hideFlags = HideFlags.HideAndDontSave;
+
+      verts.Clear();
+      indexes.Clear();
+
+      verts.Add(0.5f * new Vector3(1, 1, 1));
+      verts.Add(0.5f * new Vector3(1, 1, -1));
+      verts.Add(0.5f * new Vector3(1, -1, 1));
+      verts.Add(0.5f * new Vector3(1, -1, -1));
+      verts.Add(0.5f * new Vector3(-1, 1, 1));
+      verts.Add(0.5f * new Vector3(-1, 1, -1));
+      verts.Add(0.5f * new Vector3(-1, -1, 1));
+      verts.Add(0.5f * new Vector3(-1, -1, -1));
+
+      addCorner(indexes, 0, 1, 2, 4);
+      addCorner(indexes, 3, 1, 2, 7);
+      addCorner(indexes, 5, 1, 4, 7);
+      addCorner(indexes, 6, 2, 4, 7);
+
+      _wireCubeMesh.SetVertices(verts);
+      _wireCubeMesh.SetIndices(indexes.ToArray(), MeshTopology.Lines, 0);
+      _wireCubeMesh.RecalculateBounds();
+      _wireCubeMesh.UploadMeshData(true);
+
+      _wireSphereMesh = new Mesh();
+      _wireSphereMesh.name = "RuntimeWireSphereMesh";
+      _wireSphereMesh.hideFlags = HideFlags.HideAndDontSave;
+
+      verts.Clear();
+      indexes.Clear();
+
+      int totalVerts = CIRCLE_RESOLUTION * 3;
+      for (int i = 0; i < CIRCLE_RESOLUTION; i++) {
+        float angle = Mathf.PI * 2 * i / CIRCLE_RESOLUTION;
+        float dx = 0.5f * Mathf.Cos(angle);
+        float dy = 0.5f * Mathf.Sin(angle);
+
+        indexes.Add((i * 3 + 0) % totalVerts);
+        indexes.Add((i * 3 + 3) % totalVerts);
+
+        indexes.Add((i * 3 + 1) % totalVerts);
+        indexes.Add((i * 3 + 4) % totalVerts);
+
+        indexes.Add((i * 3 + 2) % totalVerts);
+        indexes.Add((i * 3 + 5) % totalVerts);
+
+        verts.Add(new Vector3(dx, dy, 0));
+        verts.Add(new Vector3(0, dx, dy));
+        verts.Add(new Vector3(dx, 0, dy));
+      }
+
+      _wireSphereMesh.SetVertices(verts);
+      _wireSphereMesh.SetIndices(indexes.ToArray(), MeshTopology.Lines, 0);
+      _wireSphereMesh.RecalculateBounds();
+      _wireSphereMesh.UploadMeshData(true);
+    }
+
+    private void addQuad(List<Vector3> verts, List<int> indexes, Vector3 normal, Vector3 axis1, Vector3 axis2) {
+      indexes.Add(verts.Count + 0);
+      indexes.Add(verts.Count + 1);
+      indexes.Add(verts.Count + 2);
+      indexes.Add(verts.Count + 3);
+
+      verts.Add(normal + axis1 + axis2);
+      verts.Add(normal + axis1 - axis2);
+      verts.Add(normal - axis1 - axis2);
+      verts.Add(normal - axis1 + axis2);
+    }
+
+    private void addCorner(List<int> indexes, int a, int b, int c, int d) {
+      indexes.Add(a); indexes.Add(b);
+      indexes.Add(a); indexes.Add(c);
+      indexes.Add(a); indexes.Add(d);
     }
   }
 }
