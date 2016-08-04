@@ -36,6 +36,9 @@ namespace Leap.Unity.Interaction.Testing {
     [Disable]
     public int activationDepth;
 
+    [Disable]
+    public float scale;
+
     protected InteractionManager _manager;
     protected InteractionTestProvider _provider;
     protected SadisticTestManager _testManager;
