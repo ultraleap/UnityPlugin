@@ -58,6 +58,9 @@ namespace Leap.Unity.RuntimeGizmos {
         return _currColor;
       }
       set {
+        if (_currColor == value) {
+          return;
+        }
         _currColor = value;
         _operations.Add(OperationType.SetColor);
         _colors.Add(_currColor);
@@ -73,6 +76,9 @@ namespace Leap.Unity.RuntimeGizmos {
         return _currMatrix;
       }
       set {
+        if (_currMatrix == value) {
+          return;
+        }
         _currMatrix = value;
         _operations.Add(OperationType.SetMatrix);
         _matrices.Add(_currMatrix);
