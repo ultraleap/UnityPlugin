@@ -314,7 +314,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Gets or sets the max activation depth.
+    /// Enables the display of proximity information from the library.
     /// </summary>
     public bool ShowDebugLines {
       get {
@@ -327,7 +327,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Gets or sets the max activation depth.
+    /// Enables the display of debug text from the library.
     /// </summary>
     public bool ShowDebugOutput {
       get {
