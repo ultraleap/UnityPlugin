@@ -130,6 +130,7 @@ namespace Leap.Unity.Interaction {
     protected Dictionary<int, InteractionHand> _idToInteractionHand = new Dictionary<int, InteractionHand>();
     protected List<IInteractionBehaviour> _graspedBehaviours = new List<IInteractionBehaviour>();
 
+    private float _cachedSimulationScale = -1;
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
     private List<int> _handIdsToRemove = new List<int>();
     //A temp list that is recycled.  Used as the argument to OnHandsHold.
@@ -164,11 +165,19 @@ namespace Leap.Unity.Interaction {
 
     public float SimulationScale {
       get {
-        if (_leapProvider != null) {
-          return _leapProvider.transform.lossyScale.x;
+#if UNITY_EDITOR
+        if (Application.isPlaying) {
+          return _cachedSimulationScale;
         } else {
-          return 1;
+          if (_leapProvider != null) {
+            return _leapProvider.transform.lossyScale.x;
+          } else {
+            return 1;
+          }
         }
+#else
+        return _cachedSimulationScale;
+#endif
       }
     }
 
@@ -538,6 +547,8 @@ namespace Leap.Unity.Interaction {
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
 
       Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "There should not be any instances before the creation step.");
+
+      _cachedSimulationScale = _leapProvider.transform.lossyScale.x;
 
       _activityManager.BrushLayer = InteractionBrushLayer;
       _activityManager.OverlapRadius = _activationRadius;
