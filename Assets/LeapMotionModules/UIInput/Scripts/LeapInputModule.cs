@@ -393,7 +393,7 @@ namespace Leap.Unity.InputModule {
             if (!PrevTriggeringInteraction[whichPointer] && isTriggeringInteraction(whichPointer, whichHand, whichFinger)) {
               PrevTriggeringInteraction[whichPointer] = true;
 
-              if ((Time.time - timeEnteredCanvas[whichPointer] > ActivationTime)) {
+              //if ((Time.time - timeEnteredCanvas[whichPointer] > ActivationTime)) {
                 //Deselect all objects
                 if (base.eventSystem.currentSelectedGameObject) {
                   base.eventSystem.SetSelectedGameObject(null);
@@ -467,7 +467,7 @@ namespace Leap.Unity.InputModule {
                     }
                   }
                 }
-              }
+              //}
             }
           }
 
