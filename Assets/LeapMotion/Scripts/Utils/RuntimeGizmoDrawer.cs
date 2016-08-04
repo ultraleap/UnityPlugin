@@ -352,10 +352,10 @@ namespace Leap.Unity.RuntimeGizmos {
       indexes.Add(verts.Count + 2);
       indexes.Add(verts.Count + 3);
 
-      verts.Add(normal + axis1 + axis2);
-      verts.Add(normal + axis1 - axis2);
-      verts.Add(normal - axis1 - axis2);
-      verts.Add(normal - axis1 + axis2);
+      verts.Add(0.5f * (normal + axis1 + axis2));
+      verts.Add(0.5f * (normal + axis1 - axis2));
+      verts.Add(0.5f * (normal - axis1 - axis2));
+      verts.Add(0.5f * (normal - axis1 + axis2));
     }
 
     private void addCorner(List<int> indexes, int a, int b, int c, int d) {

@@ -1,14 +1,13 @@
 fileFormatVersion: 2
 guid: 81dc33a21758b384586807f3656587d1
-timeCreated: 1470270811
+timeCreated: 1470350904
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
   defaultReferences:
-  - _cubeMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   - _sphereMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
   - _wireShader: {fileID: 10755, guid: 0000000000000000f000000000000000, type: 0}
-  - _filledShader: {fileID: 10755, guid: 0000000000000000f000000000000000, type: 0}
+  - _filledShader: {fileID: 4800000, guid: 309635e4933310a4d98f0e016c806769, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
