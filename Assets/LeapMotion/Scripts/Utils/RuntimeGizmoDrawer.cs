@@ -283,9 +283,6 @@ namespace Leap.Unity.RuntimeGizmos {
     void OnEnable() {
       generateMeshes();
 
-      _wireMaterial = new Material(_wireShader);
-      _filledMaterial = new Material(_filledShader);
-
       Camera.onPostRender -= onPostRender;
       Camera.onPostRender += onPostRender;
     }
@@ -297,6 +294,24 @@ namespace Leap.Unity.RuntimeGizmos {
     private List<GameObject> _objList = new List<GameObject>();
     private List<IRuntimeGizmoDrawer> _gizmoList = new List<IRuntimeGizmoDrawer>();
     void Update() {
+      if (_wireMaterial == null) {
+        if (_wireShader == null) {
+          return;
+        }
+        _wireMaterial = new Material(_wireShader);
+        _wireMaterial.name = "Runtime Gizmos Wire Material";
+        _wireMaterial.hideFlags = HideFlags.HideAndDontSave;
+      }
+
+      if (_filledMaterial == null) {
+        if (_filledShader == null) {
+          return;
+        }
+        _filledMaterial = new Material(_filledShader);
+        _filledMaterial.name = "Runtime Gizmos Filled Material";
+        _filledMaterial.hideFlags = HideFlags.HideAndDontSave;
+      }
+
       RGizmos.ClearAllGizmos();
 
       Scene scene = SceneManager.GetActiveScene();
@@ -305,11 +320,15 @@ namespace Leap.Unity.RuntimeGizmos {
         GameObject obj = _objList[i];
         obj.GetComponentsInChildren(false, _gizmoList);
         for (int j = 0; j < _gizmoList.Count; j++) {
-          Transform componentTransform = (_gizmoList[i] as Component).transform;
+          Transform componentTransform = (_gizmoList[j] as Component).transform;
 
           bool isDisabled = false;
           do {
             var toggle = componentTransform.GetComponentInParent<RuntimeGizmoToggle>();
+            if (toggle == null) {
+              break;
+            }
+
             if (!toggle.enabled) {
               isDisabled = true;
               break;
