@@ -117,6 +117,7 @@ namespace Leap.Unity.Interaction.Testing {
       }
 #if UNITY_EDITOR
       else {
+        // Show Gizmos for InteractionBrushBone.
         InteractionBrushBone[] bb = FindObjectsOfType(typeof(InteractionBrushBone)) as InteractionBrushBone[];
         GameObject[] objs = new GameObject[bb.Length];
          for(int i = 0; i < bb.Length; i++){

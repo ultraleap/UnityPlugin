@@ -521,12 +521,6 @@ namespace Leap.Unity.Interaction {
     }
 
     protected void updateLayer() {
-      if (!IsRegisteredWithManager) {
-        // Adrian, why was this check here?
-//        Debug.LogError("Calling updateLayer after unregistration.");
-        return;
-      }
-
       int layer;
       if (_controllers.LayerController != null) {
         if (_contactMode != ContactMode.NORMAL) {
