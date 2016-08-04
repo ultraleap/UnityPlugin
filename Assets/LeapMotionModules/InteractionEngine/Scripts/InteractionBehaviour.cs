@@ -190,7 +190,9 @@ namespace Leap.Unity.Interaction {
       base.OnUnregistered();
 
       Assert.IsTrue(UntrackedHandCount == 0);
-      _contactMode = ContactMode.NORMAL;
+
+      // Ditch this object in the layer that doesn't collide with brushes in case they are still embedded.
+      _contactMode = ContactMode.SOFT;
       updateLayer();
 
       _warper.Dispose();
@@ -255,6 +257,7 @@ namespace Leap.Unity.Interaction {
       //Reset so we can accumulate for the next frame
       _accumulatedLinearAcceleration = Vector3.zero;
       _accumulatedAngularAcceleration = Vector3.zero;
+      _minHandDistance = float.MaxValue;
     }
 
     public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
@@ -321,7 +324,9 @@ namespace Leap.Unity.Interaction {
         _recievedVelocityUpdate = true;
       }
 
-      _minHandDistance = (results.resultFlags & ShapeInstanceResultFlags.MaxHand) == 0 ? float.MaxValue : results.minHandDistance;
+      if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
+        _minHandDistance = results.minHandDistance;
+      }
 
       updateContactMode();
     }
@@ -429,7 +434,10 @@ namespace Leap.Unity.Interaction {
       }
 
       revertRigidbodyState();
-      _materialReplacer.RevertMaterials();
+
+      // Transition to soft contact when exiting grasp.  This is because the fingers
+      // are probably embedded.
+      _dislocatedBrushCounter = 0;
       updateContactMode();
     }
     #endregion
@@ -514,22 +522,18 @@ namespace Leap.Unity.Interaction {
 
     protected void updateLayer() {
       int layer;
-      if (IsRegisteredWithManager) {
-        if (_controllers.LayerController != null) {
-          if (_contactMode != ContactMode.NORMAL) {
-            layer = _controllers.LayerController.InteractionNoClipLayer;
-          } else {
-            layer = _controllers.LayerController.InteractionLayer;
-          }
+      if (_controllers.LayerController != null) {
+        if (_contactMode != ContactMode.NORMAL) {
+          layer = _controllers.LayerController.InteractionNoClipLayer;
         } else {
-          if (_contactMode != ContactMode.NORMAL) {
-            layer = _manager.InteractionNoClipLayer;
-          } else {
-            layer = _manager.InteractionLayer;
-          }
+          layer = _controllers.LayerController.InteractionLayer;
         }
       } else {
-        layer = LayerMask.NameToLayer("Default");
+        if (_contactMode != ContactMode.NORMAL) {
+          layer = _manager.InteractionNoClipLayer;
+        } else {
+          layer = _manager.InteractionLayer;
+        }
       }
 
       if (gameObject.layer != layer) {
