@@ -109,6 +109,13 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL FIELDS
+    private const float UNSCALED_RECOMMENDED_CONTACT_OFFSET_MAXIMUM = 0.001f; //One millimeter
+    public float RecommendedContactOffsetMaximum {
+      get {
+        return UNSCALED_RECOMMENDED_CONTACT_OFFSET_MAXIMUM * SimulationScale;
+      }
+    }
+
     protected INTERACTION_SCENE _scene;
     private bool _hasSceneBeenCreated = false;
     private bool _enableGraspingLast = false;
@@ -123,7 +130,7 @@ namespace Leap.Unity.Interaction {
     protected Dictionary<int, InteractionHand> _idToInteractionHand = new Dictionary<int, InteractionHand>();
     protected List<IInteractionBehaviour> _graspedBehaviours = new List<IInteractionBehaviour>();
 
-    private float _cachedSimulationScale = 1;
+    private float _cachedSimulationScale = -1;
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
     private List<int> _handIdsToRemove = new List<int>();
     //A temp list that is recycled.  Used as the argument to OnHandsHold.
@@ -158,7 +165,19 @@ namespace Leap.Unity.Interaction {
 
     public float SimulationScale {
       get {
+#if UNITY_EDITOR
+        if (Application.isPlaying) {
+          return _cachedSimulationScale;
+        } else {
+          if (_leapProvider != null) {
+            return _leapProvider.transform.lossyScale.x;
+          } else {
+            return 1;
+          }
+        }
+#else
         return _cachedSimulationScale;
+#endif
       }
     }
 
@@ -554,6 +573,8 @@ namespace Leap.Unity.Interaction {
       _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
 
       Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "There should not be any instances before the creation step.");
+
+      _cachedSimulationScale = _leapProvider.transform.lossyScale.x;
 
       _activityManager.BrushLayer = InteractionBrushLayer;
       _activityManager.OverlapRadius = _activationRadius;
