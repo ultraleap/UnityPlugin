@@ -62,6 +62,7 @@ namespace Leap.Unity.Interaction {
                                                              new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
 
     [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
+    [MinValue(0)]
     [SerializeField]
     protected float _graphicalReturnTime = 0.25f;
 
