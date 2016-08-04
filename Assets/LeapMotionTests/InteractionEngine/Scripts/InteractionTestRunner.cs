@@ -13,12 +13,15 @@ namespace Leap.Unity.Interaction.Testing {
 
     private GameObject _spawned;
 
-    protected override void StartNewTest() {
-      _spawned = Instantiate(_testPrefab);
+    public void SpawnObjects(float scale) {
+      transform.localScale = Vector3.one * scale;
+
+      _spawned = Instantiate(_testPrefab, transform) as GameObject;
+      _spawned.transform.localPosition = Vector3.zero;
+      _spawned.transform.localRotation = Quaternion.identity;
+      _spawned.transform.localScale = Vector3.one;
 
       Time.timeScale = _timeScale;
-
-      base.StartNewTest();
     }
 
     protected override void FinishTest(TestResult.ResultType result) {

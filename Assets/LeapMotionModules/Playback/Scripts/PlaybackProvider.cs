@@ -7,11 +7,7 @@ namespace Leap.Unity.Playback {
 
     public override Frame CurrentFrame {
       get {
-        if (_recording != null) {
-          return _recording.frames[_currentFrameIndex];
-        } else {
-          return new Frame();
-        }
+        return _transformedFrame;
       }
     }
 
@@ -39,6 +35,8 @@ namespace Leap.Unity.Playback {
     protected bool _isPlaying = false;
     protected int _currentFrameIndex = 0;
     protected float _startTime = 0;
+
+    protected Frame _transformedFrame = new Frame();
 
     public virtual bool IsPlaying {
       get {
@@ -89,6 +87,7 @@ namespace Leap.Unity.Playback {
       }
 
       _currentFrameIndex = newFrameIndex;
+      _transformedFrame.CopyFrom(_recording.frames[_currentFrameIndex]).Transform(new LeapTransform(transform.position.ToVector(), transform.rotation.ToLeapQuaternion(), transform.lossyScale.ToVector()));
     }
 
     protected virtual void Start() {
@@ -102,7 +101,7 @@ namespace Leap.Unity.Playback {
         if (_playbackTimeline == PlaybackTimeline.Graphics) {
           stepRecording(Time.time - _startTime);
         }
-        DispatchUpdateFrameEvent(_recording.frames[_currentFrameIndex]);
+        DispatchUpdateFrameEvent(_transformedFrame);
       }
     }
 
@@ -111,7 +110,7 @@ namespace Leap.Unity.Playback {
         if (_playbackTimeline == PlaybackTimeline.Physics) {
           stepRecording(Time.fixedTime - _startTime);
         }
-        DispatchFixedFrameEvent(_recording.frames[_currentFrameIndex]);
+        DispatchFixedFrameEvent(_transformedFrame);
       }
     }
 

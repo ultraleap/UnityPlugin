@@ -375,6 +375,9 @@ namespace Leap.Unity.Interaction {
         InteractionC.UpdateSceneInfo(ref _scene, ref info);
       }
       _enableGraspingLast = _graspingEnabled;
+
+      _cachedSimulationScale = _leapProvider.transform.lossyScale.x;
+      _activityManager.OverlapRadius = _activationRadius * _cachedSimulationScale;
     }
 
     /// <summary>
@@ -576,8 +579,9 @@ namespace Leap.Unity.Interaction {
 
       _cachedSimulationScale = _leapProvider.transform.lossyScale.x;
 
+      Debug.Log(_cachedSimulationScale);
       _activityManager.BrushLayer = InteractionBrushLayer;
-      _activityManager.OverlapRadius = _activationRadius;
+      _activityManager.OverlapRadius = _activationRadius * _cachedSimulationScale;
       _activityManager.MaxDepth = _maxActivationDepth;
       _activityManager.OnActivate += createInteractionShape;
       _activityManager.OnDeactivate += destroyInteractionShape;

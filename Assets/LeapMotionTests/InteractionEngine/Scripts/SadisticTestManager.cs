@@ -30,7 +30,7 @@ namespace Leap.Unity.Interaction.Testing {
 
     [SerializeField]
     protected int[] _activationDepths = { 3 };
-    
+
     [SerializeField]
     protected float[] _scales = { 1 };
 
@@ -113,6 +113,10 @@ namespace Leap.Unity.Interaction.Testing {
     private void createSubTest(string name, int callbackValue, int actionValue, int activationDepth, float scale) {
       for (int i = 0; i < _recordings.Length; i++) {
         GameObject testObj = new GameObject(name);
+        if (scale != 1) {
+          testObj.name = testObj.name + " " + scale + "x";
+        }
+
         Undo.RegisterCreatedObjectUndo(testObj, "Created automatic test");
 
         Undo.RecordObject(testObj.transform, "Reparenting automatic test object");
