@@ -36,6 +36,9 @@ namespace Leap.Unity.RuntimeGizmos {
       matrix = _matrixStack.Pop();
     }
 
+    /// <summary>
+    /// Sets or gets the color for the gizmos that will be drawn next.
+    /// </summary>
     public static Color color {
       get {
         return _currColor;
@@ -47,6 +50,10 @@ namespace Leap.Unity.RuntimeGizmos {
       }
     }
 
+
+    /// <summary>
+    /// Sets or gets the matrix used to transform all gizmos.
+    /// </summary>
     public static Matrix4x4 matrix {
       get {
         return _currMatrix;
@@ -58,41 +65,68 @@ namespace Leap.Unity.RuntimeGizmos {
       }
     }
 
+    /// <summary>
+    /// Draw a filled gizmo mesh using the given matrix transform.
+    /// </summary>
     public static void DrawMesh(Mesh mesh, Matrix4x4 matrix) {
       setWireMode(false);
       drawMeshInternal(mesh, matrix);
     }
 
+    /// <summary>
+    /// Draws a filled gizmo mesh at the given transform location.
+    /// </summary>
     public static void DrawMesh(Mesh mesh, Vector3 position, Quaternion rotation, Vector3 scale) {
       DrawMesh(mesh, Matrix4x4.TRS(position, rotation, scale));
     }
 
+    /// <summary>
+    /// Draws a wire gizmo mesh using the given matrix transform.
+    /// </summary>
     public static void DrawWireMesh(Mesh mesh, Matrix4x4 matrix) {
       setWireMode(true);
       drawMeshInternal(mesh, matrix);
     }
 
+    /// <summary>
+    /// Draws a wire gizmo mesh at the given transform location.
+    /// </summary>
     public static void DrawWireMesh(Mesh mesh, Vector3 position, Quaternion rotation, Vector3 scale) {
       DrawWireMesh(mesh, Matrix4x4.TRS(position, rotation, scale));
     }
 
+    /// <summary>
+    /// Draws a gizmo line that connects the two positions.
+    /// </summary>
     public static void DrawLine(Vector3 a, Vector3 b) {
       _operations.Add(OperationType.DrawLine);
       _lines.Add(new Line(a, b));
     }
 
+    /// <summary>
+    /// Draws a filled gizmo cube at the given position with the given size.
+    /// </summary>
     public static void DrawCube(Vector3 position, Vector3 size) {
       DrawMesh(cubeMesh, position, Quaternion.identity, size);
     }
-
+    
+    /// <summary>
+    /// Draws a wire gizmo cube at the given position with the given size.
+    /// </summary>
     public static void DrawWireCube(Vector3 position, Vector3 size) {
       DrawWireMesh(wireCubeMesh, position, Quaternion.identity, size);
     }
 
+    /// <summary>
+    /// Draws a filled gizmo sphere at the given position with the given radius.
+    /// </summary>
     public static void DrawSphere(Vector3 center, float radius) {
       DrawMesh(sphereMesh, center, Quaternion.identity, Vector3.one * radius * 2);
     }
 
+    /// <summary>
+    /// Draws a wire gizmo sphere at the given position with the given radius.
+    /// </summary>
     public static void DrawWireSphere(Vector3 center, float radius) {
       DrawWireMesh(wireSphereMesh, center, Quaternion.identity, Vector3.one * radius * 2);
     }
@@ -204,15 +238,19 @@ namespace Leap.Unity.RuntimeGizmos {
   public class RuntimeGizmoDrawer : MonoBehaviour {
     public const int CIRCLE_RESOLUTION = 32;
 
+    [Tooltip("Should the gizmos be visible in the game view.")]
     [SerializeField]
     private bool displayInGameView = true;
 
+    [Tooltip("The mesh to use for the filled sphere gizmo.")]
     [SerializeField]
     private Mesh _sphereMesh;
 
+    [Tooltip("The shader to use for rendering wire gizmos.")]
     [SerializeField]
     private Shader _wireShader;
 
+    [Tooltip("The shader to use for rendering filled gizmos.")]
     [SerializeField]
     private Shader _filledShader;
 
