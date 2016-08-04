@@ -109,10 +109,10 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region INTERNAL FIELDS
-    private const float UNSCALED_RECOMENDED_CONTACT_OFFSET_MAXIMUM = 0.001f; //One millimeter
-    public float RecomendedContactOffsetMaximum {
+    private const float UNSCALED_RECOMMENDED_CONTACT_OFFSET_MAXIMUM = 0.001f; //One millimeter
+    public float RecommendedContactOffsetMaximum {
       get {
-        return UNSCALED_RECOMENDED_CONTACT_OFFSET_MAXIMUM * SimulationScale;
+        return UNSCALED_RECOMMENDED_CONTACT_OFFSET_MAXIMUM * SimulationScale;
       }
     }
 
