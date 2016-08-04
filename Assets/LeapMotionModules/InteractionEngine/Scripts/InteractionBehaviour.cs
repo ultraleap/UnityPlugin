@@ -540,10 +540,18 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void revertRigidbodyState() {
-      _rigidbody.useGravity = _useGravity;
-      _rigidbody.isKinematic = _isKinematic;
-      _rigidbody.drag = _drag;
-      _rigidbody.angularDrag = _angularDrag;
+      if (_rigidbody.useGravity != _useGravity) {
+        _rigidbody.useGravity = _useGravity;
+      }
+      if (_rigidbody.isKinematic != _isKinematic) {
+        _rigidbody.isKinematic = _isKinematic;
+      }
+      if (_rigidbody.drag != _drag) {
+        _rigidbody.drag = _drag;
+      }
+      if (_rigidbody.angularDrag != _angularDrag) {
+        _rigidbody.angularDrag = _angularDrag;
+      }
     }
 
     protected INTERACTION_TRANSFORM getRigidbodyTransform() {
