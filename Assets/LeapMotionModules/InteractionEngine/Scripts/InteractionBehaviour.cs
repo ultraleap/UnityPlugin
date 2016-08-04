@@ -211,7 +211,8 @@ namespace Leap.Unity.Interaction {
 
 #if UNITY_EDITOR
       if (_contactMode == ContactMode.GRASPED && UntrackedHandCount == 0 &&
-          Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale) {
+          Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale ||
+          Quaternion.Angle(_solvedRotation, _warper.RigidbodyRotation) > _material.ReleaseAngle) {
         _manager.ReleaseObject(this);
       }
 #endif

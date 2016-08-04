@@ -4,6 +4,7 @@ using UnityEditor;
 #endif
 using System;
 using System.IO;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction {
 
@@ -28,6 +29,7 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _contactEnabled = true;
 
+    [MinValue(0)]
     [SerializeField]
     protected float _brushDisableDistance = 0.017f;
 
@@ -41,8 +43,14 @@ namespace Leap.Unity.Interaction {
 
     [Header("Grasp Settings")]
     [Tooltip("How far the object can get from the hand before it is released.")]
+    [MinValue(0)]
     [SerializeField]
     protected float _releaseDistance = 0.15f;
+
+    [Tooltip("How far the object can rotate out of the hand before it is released.  At 180 degrees release due to rotation is impossible.")]
+    [Range(0, 180)]
+    [SerializeField]
+    protected float _releaseAngle = 45;
 
     [Tooltip("Can objects using this material warp the graphical anchor through time to reduce percieved latency.")]
     [SerializeField]
@@ -112,6 +120,12 @@ namespace Leap.Unity.Interaction {
     public float ReleaseDistance {
       get {
         return _releaseDistance;
+      }
+    }
+
+    public float ReleaseAngle {
+      get {
+        return _releaseAngle;
       }
     }
 
