@@ -59,12 +59,19 @@ namespace Leap.Unity.Interaction {
       _manager = manager;
       Revive();
 
+      Rigidbody rigidbody = GetComponent<Rigidbody>();
+      bool wasSleeping = rigidbody.IsSleeping();
+
       //We need to do this in order to force Unity to reconsider collision callbacks for this object
       //Otherwise scripts added in the middle of a collision never recieve the Stay callbacks.
       Collider singleCollider = GetComponentInChildren<Collider>();
       if (singleCollider != null) {
         Physics.IgnoreCollision(singleCollider, singleCollider, true);
         Physics.IgnoreCollision(singleCollider, singleCollider, false);
+      }
+
+      if (wasSleeping) {
+        rigidbody.Sleep();
       }
     }
 
