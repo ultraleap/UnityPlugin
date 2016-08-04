@@ -39,20 +39,29 @@ namespace Leap.Unity.Interaction.Testing {
     [Disable]
     public int activationDepth;
 
+    [Disable]
+    public float scale;
+
     protected InteractionManager _manager;
     protected InteractionTestProvider _provider;
     protected SadisticTestManager _testManager;
+    protected InteractionTestRunner _testRunner;
 
     protected InteractionCallback allCallbacksRecieved;
 
     void OnEnable() {
+      _testManager = GetComponentInParent<SadisticTestManager>();
+      _testRunner = FindObjectOfType<InteractionTestRunner>();
+
+      _testRunner.SpawnObjects(scale);
+
       _manager = FindObjectOfType<InteractionManager>();
       _provider = FindObjectOfType<InteractionTestProvider>();
-      _testManager = GetComponentInParent<SadisticTestManager>();
 
       _manager.MaxActivationDepth = activationDepth;
       _manager.ShowDebugLines = true;
       _manager.ShowDebugOutput = true;
+      _manager.UpdateSceneInfo();
 
       current = this;
       allCallbacksRecieved = 0;

@@ -81,6 +81,7 @@ namespace Leap.Unity.Interaction {
 
           GameObject brushGameObject = new GameObject(gameObject.name, typeof(CapsuleCollider), typeof(Rigidbody), typeof(InteractionBrushBone));
           brushGameObject.layer = gameObject.layer;
+          brushGameObject.transform.localScale = Vector3.one;
 
           InteractionBrushBone brushBone = brushGameObject.GetComponent<InteractionBrushBone>();
           brushBone.manager = _manager;
@@ -88,7 +89,6 @@ namespace Leap.Unity.Interaction {
 
           Transform capsuleTransform = brushGameObject.transform;
           capsuleTransform.SetParent(_handParent.transform, false);
-          capsuleTransform.localScale = new Vector3(1f / transform.lossyScale.x, 1f / transform.lossyScale.y, 1f / transform.lossyScale.z);
 
           CapsuleCollider capsule = brushGameObject.GetComponent<CapsuleCollider>();
           capsule.direction = 2;
