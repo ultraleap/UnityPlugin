@@ -3,54 +3,77 @@ using UnityEngine.SceneManagement;
 using System;
 using System.Collections.Generic;
 
-namespace Leap.Unity.Gizmos {
+namespace Leap.Unity.RuntimeGizmos {
 
-  public interface IRuntimeGizmo {
-    void OnRuntimeGizmos();
+  public interface IRuntimeGizmoDrawer {
+    void OnDrawRuntimeGizmos();
   }
 
   [ExecuteInEditMode]
-  public class RuntimeGizmos : MonoBehaviour {
+  public class RuntimeGizmoDrawer : MonoBehaviour {
     public const int CIRCLE_RESOLUTION = 16;
 
     [SerializeField]
     private bool displayInGameView = true;
 
-    private static List<OperationType> _operations = new List<OperationType>();
-    private static List<Matrix4x4> _matrices = new List<Matrix4x4>();
-    private static List<Color> _colors = new List<Color>();
-    private static List<int> _lineCounts = new List<int>();
+    [SerializeField]
+    private Mesh _cubeMesh;
 
-    private static List<Vector3> _verts = new List<Vector3>();
-    private static bool _clearOnWrite = false;
+    [SerializeField]
+    private Mesh _sphereMesh;
 
-    private static Material _unlitColor, _unlitTransparent;
+    [SerializeField]
+    private Shader _wireShader;
 
-    public static void MultMatrix(Matrix4x4 matrix) {
+    [SerializeField]
+    private Shader _filledShader;
+
+    private List<OperationType> _operations = new List<OperationType>();
+    private List<Matrix4x4> _matrices = new List<Matrix4x4>();
+    private List<Color> _colors = new List<Color>();
+    private List<int> _lineCounts = new List<int>();
+
+    private List<Vector3> _verts = new List<Vector3>();
+    private List<Mesh> _meshes = new List<Mesh>();
+    private bool _clearOnWrite = false;
+
+    private Material _wireMaterial, _filledMaterial;
+
+    public void MultMatrix(Matrix4x4 matrix) {
       _operations.Add(OperationType.MultMatrix);
       _matrices.Add(matrix);
     }
 
-    public static void RelativeTo(Transform transform) {
+    public void RelativeTo(Transform transform) {
       MultMatrix(transform.localToWorldMatrix);
     }
 
-    public static void PushMatrix() {
+    public void PushMatrix() {
       _operations.Add(OperationType.PushMatrix);
     }
 
-    public static void PopMatrix() {
+    public void PopMatrix() {
       _operations.Add(OperationType.PopMatrix);
     }
 
-    public static Color color {
+    public Color color {
       set {
         _operations.Add(OperationType.Color);
         _colors.Add(value);
       }
     }
 
-    public static void DrawLine(Vector3 a, Vector3 b) {
+    public void DrawMesh(Mesh mesh, Matrix4x4 matrix) {
+      _operations.Add(OperationType.Mesh);
+      _meshes.Add(mesh);
+      _matrices.Add(matrix);
+    }
+
+    public void DrawMesh(Mesh mesh, Vector3 position, Quaternion rotation, Vector3 scale) {
+      DrawMesh(mesh, Matrix4x4.TRS(position, rotation, scale));
+    }
+
+    public void DrawLine(Vector3 a, Vector3 b) {
       if (_operations[_operations.Count - 1] != OperationType.Lines) {
         _operations.Add(OperationType.Lines);
         _lineCounts.Add(0);
@@ -61,7 +84,13 @@ namespace Leap.Unity.Gizmos {
       _verts.Add(b);
     }
 
-    public static void DrawWireCube(Vector3 position, Vector3 size) {
+    public void DrawCube(Vector3 position, Vector3 size) {
+      _operations.Add(OperationType.Mesh);
+      _meshes.Add(_cubeMesh);
+      _matrices.Add(Matrix4x4.TRS(position, Quaternion.identity, size));
+    }
+
+    public void DrawWireCube(Vector3 position, Vector3 size) {
       Vector3 p000 = position + new Vector3(size.x, size.y, size.z) * 0.5f;
       Vector3 p001 = position + new Vector3(size.x, size.y, -size.z) * 0.5f;
       Vector3 p010 = position + new Vector3(size.x, -size.y, size.z) * 0.5f;
@@ -88,7 +117,13 @@ namespace Leap.Unity.Gizmos {
       DrawLine(p101, p001);
     }
 
-    public static void DrawWireSphere(Vector3 center, float radius) {
+    public void DrawSphere(Vector3 center, float radius) {
+      _operations.Add(OperationType.Mesh);
+      _meshes.Add(_sphereMesh);
+      _matrices.Add(Matrix4x4.TRS(center, Quaternion.identity, Vector3.one * radius));
+    }
+
+    public void DrawWireSphere(Vector3 center, float radius) {
       float prevDx = 0, prevDy = 0;
 
       for (int i = 0; i <= CIRCLE_RESOLUTION; i++) {
@@ -118,13 +153,10 @@ namespace Leap.Unity.Gizmos {
       int lineIndex = 0;
 
       int vertIndex = 0;
+      int meshIndex = 0;
 
-      if (_unlitColor == null) {
-        _unlitColor = new Material(Shader.Find("Unlit/Color"));
-      }
-
-      _unlitColor.color = Color.white;
-      _unlitColor.SetPass(0);
+      Color currColor = Color.white;
+      Material currMat = null;
 
       for (int i = 0; i < _operations.Count; i++) {
         OperationType type = _operations[i];
@@ -139,16 +171,31 @@ namespace Leap.Unity.Gizmos {
             GL.MultMatrix(_matrices[matrixIndex++]);
             break;
           case OperationType.Color:
-            _unlitColor.color = _colors[colorIndex++];
-            _unlitColor.SetPass(0);
+            currColor = _colors[colorIndex++];
+            currMat = null;
             break;
           case OperationType.Lines:
+            if (currMat != _wireMaterial) {
+              currMat = _wireMaterial;
+              currMat.color = currColor;
+              currMat.SetPass(0);
+            }
+
             GL.Begin(GL.LINES);
             int vertCount = _lineCounts[lineIndex++] * 2;
             for (int j = vertCount; j-- != 0;) {
               GL.Vertex(_verts[vertIndex++]);
             }
             GL.End();
+            break;
+          case OperationType.Mesh:
+            if (currMat != _filledMaterial) {
+              currMat = _filledMaterial;
+              currMat.color = currColor;
+              currMat.SetPass(0);
+            }
+
+            Graphics.DrawMeshNow(_meshes[meshIndex++], _matrices[matrixIndex++]);
             break;
           default:
             throw new InvalidOperationException("Unexpected operation type " + type);
@@ -157,8 +204,8 @@ namespace Leap.Unity.Gizmos {
     }
 
     void Awake() {
-      Camera.onPostRender -= onPostRender;
-      Camera.onPostRender += onPostRender;
+      _wireMaterial = new Material(_wireShader);
+      _filledMaterial = new Material(_filledShader);
     }
 
     void OnEnable() {
@@ -170,8 +217,8 @@ namespace Leap.Unity.Gizmos {
       Camera.onPostRender -= onPostRender;
     }
 
-    List<GameObject> _objList = new List<GameObject>();
-    List<IRuntimeGizmo> _gizmoList = new List<IRuntimeGizmo>();
+    private List<GameObject> _objList = new List<GameObject>();
+    private List<IRuntimeGizmoDrawer> _gizmoList = new List<IRuntimeGizmoDrawer>();
     void Update() {
       clear();
 
@@ -181,17 +228,18 @@ namespace Leap.Unity.Gizmos {
         GameObject obj = _objList[i];
         obj.GetComponentsInChildren(false, _gizmoList);
         for (int j = 0; j < _gizmoList.Count; j++) {
-          _gizmoList[j].OnRuntimeGizmos();
+          _gizmoList[j].OnDrawRuntimeGizmos();
         }
       }
     }
 
-    private static void clear() {
+    private void clear() {
       _operations.Clear();
       _matrices.Clear();
       _colors.Clear();
       _lineCounts.Clear();
       _verts.Clear();
+      _meshes.Clear();
     }
 
     private enum OperationType {
@@ -200,7 +248,7 @@ namespace Leap.Unity.Gizmos {
       MultMatrix,
       Color,
       Lines,
-      Tris
+      Mesh
     }
   }
 }
