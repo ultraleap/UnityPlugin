@@ -534,6 +534,7 @@ namespace Leap.Unity.RuntimeGizmos {
         int lineIndex = 0;
         int meshIndex = 0;
 
+        _currMatrix = Matrix4x4.identity;
         _currMat = null;
         _currColor = Color.white;
 
