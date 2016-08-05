@@ -293,6 +293,15 @@ namespace Leap.Unity.RuntimeGizmos {
       RGizmos.DrawAllGizmosToScreen(_wireMaterial, _filledMaterial);
     }
 
+    void OnValidate() {
+      if (_wireMaterial != null) {
+        _wireMaterial.shader = _wireShader;
+      }
+      if (_filledMaterial != null) {
+        _filledMaterial.shader = _filledShader;
+      }
+    }
+
     void OnEnable() {
       generateMeshes();
       assignMeshes();
