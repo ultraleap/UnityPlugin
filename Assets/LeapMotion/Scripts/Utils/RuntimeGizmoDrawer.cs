@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Leap.Unity.RuntimeGizmos {
@@ -291,6 +292,10 @@ namespace Leap.Unity.RuntimeGizmos {
 
       Camera.onPostRender -= onPostRender;
       Camera.onPostRender += onPostRender;
+
+      if (Application.isPlaying) {
+        StartCoroutine(clearGizmoCoroutine());
+      }
     }
 
     void OnDisable() {
@@ -318,7 +323,12 @@ namespace Leap.Unity.RuntimeGizmos {
         _filledMaterial.hideFlags = HideFlags.HideAndDontSave;
       }
 
-      RGizmos.ClearAllGizmos();
+#if UNITY_EDITOR
+      //If the application is playing, gizmos are cleared at the end of frame instead
+      if (!Application.isPlaying) {
+        RGizmos.ClearAllGizmos();
+      }
+#endif
 
       Scene scene = SceneManager.GetActiveScene();
       scene.GetRootGameObjects(_objList);
@@ -357,6 +367,14 @@ namespace Leap.Unity.RuntimeGizmos {
           }
           _gizmoList[j].OnDrawRuntimeGizmos();
         }
+      }
+    }
+
+    private IEnumerator clearGizmoCoroutine() {
+      WaitForEndOfFrame endOfFrameWaiter = new WaitForEndOfFrame();
+      while (true) {
+        yield return endOfFrameWaiter;
+        RGizmos.ClearAllGizmos();
       }
     }
 
