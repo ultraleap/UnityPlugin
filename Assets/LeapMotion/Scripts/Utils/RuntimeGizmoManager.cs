@@ -502,7 +502,12 @@ namespace Leap.Unity.RuntimeGizmos {
         } else if (collider is MeshCollider) {
           MeshCollider mesh = collider as MeshCollider;
           if (mesh.sharedMesh != null) {
-            DrawWireMesh(mesh.sharedMesh, Matrix4x4.identity);
+            if (useWireframe) {
+              DrawWireMesh(mesh.sharedMesh, Matrix4x4.identity);
+            } else {
+              DrawMesh(mesh.sharedMesh, Matrix4x4.identity);
+            }
+            
           }
         }
       }

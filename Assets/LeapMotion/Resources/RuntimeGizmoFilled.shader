@@ -27,7 +27,7 @@
         v2f o;
         o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
         float3 viewDir = normalize(ObjSpaceViewDir(v.vertex));
-        o.fresnelValue = saturate(dot(v.normal, viewDir));
+        o.fresnelValue = lerp(0.39, 0.66, saturate(dot(v.normal, viewDir)));
         return o;
       }
 
