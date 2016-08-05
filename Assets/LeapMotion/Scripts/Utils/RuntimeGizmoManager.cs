@@ -41,7 +41,9 @@ namespace Leap.Unity.RuntimeGizmos {
     protected Material _wireMaterial, _filledMaterial;
     protected Mesh _cubeMesh, _wireCubeMesh, _wireSphereMesh;
 
-    protected static RuntimeGizmoDrawer _drawer = null;
+    protected static RuntimeGizmoDrawer _backDrawer = null;
+    protected static RuntimeGizmoDrawer _fromDrawer = null;
+    private bool _readyForSwap = false;
 
     /// <summary>
     /// Tries to get a gizmo drawer.  Will fail if there is no Gizmo manager in the 
@@ -51,7 +53,7 @@ namespace Leap.Unity.RuntimeGizmos {
     /// The gizmo color will be set to white.
     /// </summary>
     public static bool TryGetGizmoDrawer(out RuntimeGizmoDrawer drawer) {
-      drawer = _drawer;
+      drawer = _backDrawer;
       if (drawer != null) {
         drawer.ResetMatrixAndColorState();
         return true;
@@ -69,7 +71,7 @@ namespace Leap.Unity.RuntimeGizmos {
     /// The gizmo color will be set to white.
     /// </summary>
     public static bool TryGetGizmoDrawer(GameObject attatchedGameObject, out RuntimeGizmoDrawer drawer) {
-      drawer = _drawer;
+      drawer = _backDrawer;
       if (drawer != null && !areGizmosDisabled(attatchedGameObject.transform)) {
         drawer.ResetMatrixAndColorState();
         return true;
@@ -90,7 +92,16 @@ namespace Leap.Unity.RuntimeGizmos {
       }
 #endif
 
-      _drawer.DrawAllGizmosToScreen(_wireMaterial, _filledMaterial);
+      if (_readyForSwap) {
+        RuntimeGizmoDrawer tempDrawer = _backDrawer;
+        _backDrawer = _fromDrawer;
+        _fromDrawer = tempDrawer;
+
+        _readyForSwap = false;
+        _backDrawer.ClearAllGizmos();
+      }
+
+      _fromDrawer.DrawAllGizmosToScreen(_wireMaterial, _filledMaterial);
     }
 
     protected virtual void OnValidate() {
@@ -109,21 +120,20 @@ namespace Leap.Unity.RuntimeGizmos {
       }
 #endif
 
-      _drawer = new RuntimeGizmoDrawer();
+      _fromDrawer = new RuntimeGizmoDrawer();
+      _backDrawer = new RuntimeGizmoDrawer();
 
       generateMeshes();
       assignMeshes();
 
       Camera.onPostRender -= onPostRender;
       Camera.onPostRender += onPostRender;
-
-      if (Application.isPlaying) {
-        StartCoroutine(clearGizmoCoroutine());
-      }
     }
 
     protected virtual void OnDisable() {
-      _drawer = null;
+      _fromDrawer = null;
+      _backDrawer = null;
+
       Camera.onPostRender -= onPostRender;
     }
 
@@ -148,13 +158,6 @@ namespace Leap.Unity.RuntimeGizmos {
         _filledMaterial.hideFlags = HideFlags.HideAndDontSave;
       }
 
-#if UNITY_EDITOR
-      //If the application is playing, gizmos are cleared at the end of frame instead
-      if (!Application.isPlaying) {
-        _drawer.ClearAllGizmos();
-      }
-#endif
-
       Scene scene = SceneManager.GetActiveScene();
       scene.GetRootGameObjects(_objList);
       for (int i = 0; i < _objList.Count; i++) {
@@ -165,12 +168,14 @@ namespace Leap.Unity.RuntimeGizmos {
             continue;
           }
 
-          _drawer.ResetMatrixAndColorState();
+          _backDrawer.ResetMatrixAndColorState();
           assignMeshes();
 
-          _gizmoList[j].OnDrawRuntimeGizmos(_drawer);
+          _gizmoList[j].OnDrawRuntimeGizmos(_backDrawer);
         }
       }
+
+      _readyForSwap = true;
     }
 
     protected static bool areGizmosDisabled(Transform transform) {
@@ -192,19 +197,11 @@ namespace Leap.Unity.RuntimeGizmos {
       return isDisabled;
     }
 
-    private IEnumerator clearGizmoCoroutine() {
-      WaitForEndOfFrame endOfFrameWaiter = new WaitForEndOfFrame();
-      while (true) {
-        yield return endOfFrameWaiter;
-        _drawer.ClearAllGizmos();
-      }
-    }
-
     private void assignMeshes() {
-      _drawer.sphereMesh = _sphereMesh;
-      _drawer.cubeMesh = _cubeMesh;
-      _drawer.wireSphereMesh = _wireSphereMesh;
-      _drawer.wireCubeMesh = _wireCubeMesh;
+      _backDrawer.sphereMesh = _sphereMesh;
+      _backDrawer.cubeMesh = _cubeMesh;
+      _backDrawer.wireSphereMesh = _wireSphereMesh;
+      _backDrawer.wireCubeMesh = _wireCubeMesh;
     }
 
     private void generateMeshes() {
