@@ -32,7 +32,7 @@ namespace Leap.Unity.RuntimeGizmos {
     [Tooltip("The shader to use for rendering gizmos.")]
     [SerializeField]
     protected Shader _gizmoShader;
-    
+
     protected Mesh _cubeMesh, _wireCubeMesh, _wireSphereMesh;
 
     protected static RuntimeGizmoDrawer _backDrawer = null;
@@ -72,31 +72,6 @@ namespace Leap.Unity.RuntimeGizmos {
       } else {
         return false;
       }
-    }
-
-    protected void onPostRender(Camera camera) {
-#if UNITY_EDITOR
-      //Hard-coded name of the camera used to generate the pre-render view
-      if (camera.gameObject.name == "PreRenderCamera") {
-        return;
-      }
-
-      bool isSceneCamera = camera.gameObject.hideFlags == HideFlags.HideAndDontSave;
-      if (!isSceneCamera && !_displayInGameView) {
-        return;
-      }
-#endif
-
-      if (_readyForSwap) {
-        RuntimeGizmoDrawer tempDrawer = _backDrawer;
-        _backDrawer = _frontDrawer;
-        _frontDrawer = tempDrawer;
-
-        _readyForSwap = false;
-        _backDrawer.ClearAllGizmos();
-      }
-
-      _frontDrawer.DrawAllGizmosToScreen();
     }
 
     protected virtual void OnValidate() {
@@ -155,6 +130,31 @@ namespace Leap.Unity.RuntimeGizmos {
       }
 
       _readyForSwap = true;
+    }
+
+    protected void onPostRender(Camera camera) {
+#if UNITY_EDITOR
+      //Hard-coded name of the camera used to generate the pre-render view
+      if (camera.gameObject.name == "PreRenderCamera") {
+        return;
+      }
+
+      bool isSceneCamera = camera.gameObject.hideFlags == HideFlags.HideAndDontSave;
+      if (!isSceneCamera && !_displayInGameView) {
+        return;
+      }
+#endif
+
+      if (_readyForSwap) {
+        RuntimeGizmoDrawer tempDrawer = _backDrawer;
+        _backDrawer = _frontDrawer;
+        _frontDrawer = tempDrawer;
+
+        _readyForSwap = false;
+        _backDrawer.ClearAllGizmos();
+      }
+
+      _frontDrawer.DrawAllGizmosToScreen();
     }
 
     protected static bool areGizmosDisabled(Transform transform) {
