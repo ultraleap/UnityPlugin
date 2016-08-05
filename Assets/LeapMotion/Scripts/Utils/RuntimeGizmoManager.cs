@@ -370,7 +370,6 @@ namespace Leap.Unity.RuntimeGizmos {
       }
     }
 
-
     /// <summary>
     /// Sets or gets the matrix used to transform all gizmos.
     /// </summary>
