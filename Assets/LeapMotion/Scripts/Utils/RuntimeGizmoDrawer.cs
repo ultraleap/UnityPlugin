@@ -152,6 +152,55 @@ namespace Leap.Unity.RuntimeGizmos {
       DrawWireMesh(wireSphereMesh, center, Quaternion.identity, Vector3.one * radius * 2);
     }
 
+    private static List<Collider> _colliderList = new List<Collider>();
+    public static void DrawColliders(GameObject gameObject, bool useWireframe = true, bool traverseHierarchy = true) {
+      PushMatrix();
+
+      if (traverseHierarchy) {
+        gameObject.GetComponentsInChildren(_colliderList);
+      } else {
+        gameObject.GetComponents(_colliderList);
+      }
+
+      for (int i = 0; i < _colliderList.Count; i++) {
+        Collider collider = _colliderList[i];
+        RelativeTo(collider.transform);
+
+        if (collider is BoxCollider) {
+          BoxCollider box = collider as BoxCollider;
+          if (useWireframe) {
+            DrawWireCube(box.center, box.size);
+          } else {
+            DrawCube(box.center, box.size);
+          }
+        } else if (collider is SphereCollider) {
+          SphereCollider sphere = collider as SphereCollider;
+          if (useWireframe) {
+            DrawWireSphere(sphere.center, sphere.radius);
+          } else {
+            DrawSphere(sphere.center, sphere.radius);
+          }
+        } else if (collider is CapsuleCollider) {
+          CapsuleCollider capsule = collider as CapsuleCollider;
+          Vector3 size = Vector3.zero;
+          size += Vector3.one * capsule.radius * 2;
+          size += new Vector3(capsule.direction == 0 ? 1 : 0,
+                              capsule.direction == 1 ? 1 : 0,
+                              capsule.direction == 2 ? 1 : 0) * (capsule.height - capsule.radius * 2);
+          if (useWireframe) {
+            DrawWireCube(capsule.center, size);
+          } else {
+            DrawCube(capsule.center, size);
+          }
+        } else if (collider is MeshCollider) {
+          MeshCollider mesh = collider as MeshCollider;
+          DrawWireMesh(mesh.sharedMesh, Matrix4x4.identity);
+        }
+      }
+
+      PopMatrix();
+    }
+
     public static void ClearAllGizmos() {
       _operations.Clear();
       _matrices.Clear();
@@ -261,28 +310,28 @@ namespace Leap.Unity.RuntimeGizmos {
 
     [Tooltip("Should the gizmos be visible in the game view.")]
     [SerializeField]
-    private bool _displayInGameView = true;
+    protected bool _displayInGameView = true;
 
     [Tooltip("Should the gizmos be visible in a build.")]
     [SerializeField]
-    private bool _enabledForBuild = true;
+    protected bool _enabledForBuild = true;
 
     [Tooltip("The mesh to use for the filled sphere gizmo.")]
     [SerializeField]
-    private Mesh _sphereMesh;
+    protected Mesh _sphereMesh;
 
     [Tooltip("The shader to use for rendering wire gizmos.")]
     [SerializeField]
-    private Shader _wireShader;
+    protected Shader _wireShader;
 
     [Tooltip("The shader to use for rendering filled gizmos.")]
     [SerializeField]
-    private Shader _filledShader;
+    protected Shader _filledShader;
 
-    private Material _wireMaterial, _filledMaterial;
-    private Mesh _cubeMesh, _wireCubeMesh, _wireSphereMesh;
+    protected Material _wireMaterial, _filledMaterial;
+    protected Mesh _cubeMesh, _wireCubeMesh, _wireSphereMesh;
 
-    private void onPostRender(Camera camera) {
+    protected void onPostRender(Camera camera) {
 #if UNITY_EDITOR
       if (camera.gameObject.name == "PreRenderCamera") {
         return;
@@ -297,7 +346,7 @@ namespace Leap.Unity.RuntimeGizmos {
       RGizmos.DrawAllGizmosToScreen(_wireMaterial, _filledMaterial);
     }
 
-    void OnValidate() {
+    protected virtual void OnValidate() {
       if (_wireMaterial != null) {
         _wireMaterial.shader = _wireShader;
       }
@@ -306,7 +355,7 @@ namespace Leap.Unity.RuntimeGizmos {
       }
     }
 
-    void OnEnable() {
+    protected virtual void OnEnable() {
 #if !UNITY_EDITOR
       if (_enabledForBuild) {
         enabled = false;
@@ -324,13 +373,13 @@ namespace Leap.Unity.RuntimeGizmos {
       }
     }
 
-    void OnDisable() {
+    protected virtual void OnDisable() {
       Camera.onPostRender -= onPostRender;
     }
 
     private List<GameObject> _objList = new List<GameObject>();
     private List<IRuntimeGizmoDrawer> _gizmoList = new List<IRuntimeGizmoDrawer>();
-    void Update() {
+    protected virtual void Update() {
       if (_wireMaterial == null) {
         if (_wireShader == null) {
           return;
