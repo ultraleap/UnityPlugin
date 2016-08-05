@@ -96,7 +96,7 @@ namespace Leap.Unity.RuntimeGizmos {
         _backDrawer.ClearAllGizmos();
       }
 
-      _frontDrawer.DrawAllGizmosToScreen(_wireMaterial, _filledMaterial);
+      _frontDrawer.DrawAllGizmosToScreen();
     }
 
     protected virtual void OnValidate() {
@@ -525,7 +525,7 @@ namespace Leap.Unity.RuntimeGizmos {
       _currColor = Color.white;
     }
 
-    public void DrawAllGizmosToScreen(Material wireMaterial, Material filledMaterial) {
+    public void DrawAllGizmosToScreen() {
       try {
         int matrixIndex = 0;
         int colorIndex = 0;
