@@ -127,6 +127,7 @@ namespace Leap.Unity.RuntimeGizmos {
       generateMeshes();
       assignMeshes();
 
+      //Unsubscribe to prevent double-subscription
       Camera.onPostRender -= onPostRender;
       Camera.onPostRender += onPostRender;
     }
