@@ -245,14 +245,13 @@ namespace Leap.Unity.RuntimeGizmos {
       verts.Clear();
       indexes.Clear();
 
-      verts.Add(0.5f * new Vector3(1, 1, 1));
-      verts.Add(0.5f * new Vector3(1, 1, -1));
-      verts.Add(0.5f * new Vector3(1, -1, 1));
-      verts.Add(0.5f * new Vector3(1, -1, -1));
-      verts.Add(0.5f * new Vector3(-1, 1, 1));
-      verts.Add(0.5f * new Vector3(-1, 1, -1));
-      verts.Add(0.5f * new Vector3(-1, -1, 1));
-      verts.Add(0.5f * new Vector3(-1, -1, -1));
+      for (int dx = 1; dx >= -1; dx -= 2) {
+        for (int dy = 1; dy >= -1; dy -= 2) {
+          for (int dz = 1; dz >= -1; dz -= 2) {
+            verts.Add(0.5f * new Vector3(dx, dy, dz));
+          }
+        }
+      }
 
       addCorner(indexes, 0, 1, 2, 4);
       addCorner(indexes, 3, 1, 2, 7);
@@ -277,14 +276,10 @@ namespace Leap.Unity.RuntimeGizmos {
         float dx = 0.5f * Mathf.Cos(angle);
         float dy = 0.5f * Mathf.Sin(angle);
 
-        indexes.Add((i * 3 + 0) % totalVerts);
-        indexes.Add((i * 3 + 3) % totalVerts);
-
-        indexes.Add((i * 3 + 1) % totalVerts);
-        indexes.Add((i * 3 + 4) % totalVerts);
-
-        indexes.Add((i * 3 + 2) % totalVerts);
-        indexes.Add((i * 3 + 5) % totalVerts);
+        for (int j = 0; j < 3; j++) {
+          indexes.Add((i * 3 + j + 0) % totalVerts);
+          indexes.Add((i * 3 + j + 3) % totalVerts);
+        }
 
         verts.Add(new Vector3(dx, dy, 0));
         verts.Add(new Vector3(0, dx, dy));
