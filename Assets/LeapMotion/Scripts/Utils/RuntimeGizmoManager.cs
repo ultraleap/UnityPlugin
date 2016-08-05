@@ -8,15 +8,14 @@ namespace Leap.Unity.RuntimeGizmos {
 
   /// <summary>
   /// Have your MonoBehaviour implement this interface to be able to draw runtime gizmos.
-  /// Remember that you must use the RGizmos class, not Unity's Gizmos class, for runtime
-  /// gizmos to work!  You must also have a RuntimeGizmoDrawer component in the scene.
+  /// You must also have a RuntimeGizmoManager component in the scene to recieve callbacks.
   /// </summary>
-  public interface IRuntimeGizmoDrawer {
-    void OnDrawRuntimeGizmos(RGizmos drawer);
+  public interface IRuntimeGizmoComponent {
+    void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer);
   }
 
   [ExecuteInEditMode]
-  public class RuntimeGizmoDrawer : MonoBehaviour {
+  public class RuntimeGizmoManager : MonoBehaviour {
     public const int CIRCLE_RESOLUTION = 32;
 
     [Tooltip("Should the gizmos be visible in the game view.")]
@@ -42,11 +41,41 @@ namespace Leap.Unity.RuntimeGizmos {
     protected Material _wireMaterial, _filledMaterial;
     protected Mesh _cubeMesh, _wireCubeMesh, _wireSphereMesh;
 
-    protected static RGizmos _drawer;
+    protected static RuntimeGizmoDrawer _drawer = null;
 
-    public static RGizmos GetGizmoDrawer() {
-      _drawer.ResetMatrixAndColorState();
-      return _drawer;
+    /// <summary>
+    /// Tries to get a gizmo drawer.  Will fail if there is no Gizmo manager in the 
+    /// scene, or if it is disabled.
+    /// 
+    /// The gizmo matrix will be set to the identity matrix.
+    /// The gizmo color will be set to white.
+    /// </summary>
+    public static bool TryGetGizmoDrawer(out RuntimeGizmoDrawer drawer) {
+      drawer = _drawer;
+      if (drawer != null) {
+        drawer.ResetMatrixAndColorState();
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    /// <summary>
+    /// Tries to get a gizmo drawer for a given gameObject.  Will fail if there is no
+    /// gizmo manager in the scene, or if it is disabled.  Will also fail if there is
+    /// a disable RuntimeGizmoToggle as a parent of the gameObject.
+    /// 
+    /// The gizmo matrix will be set to the identity matrix.
+    /// The gizmo color will be set to white.
+    /// </summary>
+    public static bool TryGetGizmoDrawer(GameObject attatchedGameObject, out RuntimeGizmoDrawer drawer) {
+      drawer = _drawer;
+      if (drawer != null && !areGizmosDisabled(attatchedGameObject.transform)) {
+        drawer.ResetMatrixAndColorState();
+        return true;
+      } else {
+        return false;
+      }
     }
 
     protected void onPostRender(Camera camera) {
@@ -80,7 +109,7 @@ namespace Leap.Unity.RuntimeGizmos {
       }
 #endif
 
-      _drawer = new RGizmos();
+      _drawer = new RuntimeGizmoDrawer();
 
       generateMeshes();
       assignMeshes();
@@ -94,11 +123,12 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     protected virtual void OnDisable() {
+      _drawer = null;
       Camera.onPostRender -= onPostRender;
     }
 
     private List<GameObject> _objList = new List<GameObject>();
-    private List<IRuntimeGizmoDrawer> _gizmoList = new List<IRuntimeGizmoDrawer>();
+    private List<IRuntimeGizmoComponent> _gizmoList = new List<IRuntimeGizmoComponent>();
     protected virtual void Update() {
       if (_wireMaterial == null) {
         if (_wireShader == null) {
@@ -131,33 +161,35 @@ namespace Leap.Unity.RuntimeGizmos {
         GameObject obj = _objList[i];
         obj.GetComponentsInChildren(false, _gizmoList);
         for (int j = 0; j < _gizmoList.Count; j++) {
-          Transform componentTransform = (_gizmoList[j] as Component).transform;
-
-          bool isDisabled = false;
-          do {
-            var toggle = componentTransform.GetComponentInParent<RuntimeGizmoToggle>();
-            if (toggle == null) {
-              break;
-            }
-
-            if (!toggle.enabled) {
-              isDisabled = true;
-              break;
-            }
-
-            componentTransform = componentTransform.parent;
-          } while (componentTransform != null);
-
-          if (isDisabled) {
+          if (areGizmosDisabled((_gizmoList[j] as Component).transform)) {
             continue;
           }
 
           _drawer.ResetMatrixAndColorState();
           assignMeshes();
-          
+
           _gizmoList[j].OnDrawRuntimeGizmos(_drawer);
         }
       }
+    }
+
+    protected static bool areGizmosDisabled(Transform transform) {
+      bool isDisabled = false;
+      do {
+        var toggle = transform.GetComponentInParent<RuntimeGizmoToggle>();
+        if (toggle == null) {
+          break;
+        }
+
+        if (!toggle.enabled) {
+          isDisabled = true;
+          break;
+        }
+
+        transform = transform.parent;
+      } while (transform != null);
+
+      return isDisabled;
     }
 
     private IEnumerator clearGizmoCoroutine() {
@@ -274,7 +306,7 @@ namespace Leap.Unity.RuntimeGizmos {
     }
   }
 
-  public class RGizmos {
+  public class RuntimeGizmoDrawer {
     private List<OperationType> _operations = new List<OperationType>();
     private List<Matrix4x4> _matrices = new List<Matrix4x4>();
     private List<Color> _colors = new List<Color>();
