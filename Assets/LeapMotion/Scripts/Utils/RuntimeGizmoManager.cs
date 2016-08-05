@@ -82,6 +82,7 @@ namespace Leap.Unity.RuntimeGizmos {
 
     protected void onPostRender(Camera camera) {
 #if UNITY_EDITOR
+      //Hard-coded name of the camera used to generate the pre-render view
       if (camera.gameObject.name == "PreRenderCamera") {
         return;
       }
