@@ -87,10 +87,10 @@ namespace Leap.Unity {
       //First see if there is another active representation that can use this model
       for (int i = 0; i < activeHandReps.Count; i++) {
         HandProxy rep = activeHandReps[i];
-        if (rep.RepChirality == model.Handedness && model.GetLeapHand() != rep.MostRecentHand) {
+        if (rep.RepChirality == model.Handedness && rep.RepType == model.HandModelType) {
+          bool modelFromGroupFound = false;
           if (rep.handModels != null) {
             //And that represention does not contain a model from this model's modelGroup
-            bool modelFromGroupFound = false;
             for (int j = 0; j < modelGroup.modelsCheckedOut.Count; j++) {
               IHandModel modelToCompare = modelGroup.modelsCheckedOut[j];
               for (int k = 0; k < rep.handModels.Count; k++) {
@@ -99,11 +99,11 @@ namespace Leap.Unity {
                 }
               }
             }
-            if (!modelFromGroupFound) {
-              rep.AddModel(model);
-              modelToHandRepMapping[model] = rep;
-              return;
-            }
+          }
+          if (!modelFromGroupFound) {
+            rep.AddModel(model);
+            modelToHandRepMapping[model] = rep;
+            return;
           }
         }
       }
