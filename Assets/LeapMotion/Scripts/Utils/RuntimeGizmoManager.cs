@@ -501,7 +501,6 @@ namespace Leap.Unity.RuntimeGizmos {
             } else {
               DrawMesh(mesh.sharedMesh, Matrix4x4.identity);
             }
-
           }
         }
       }
