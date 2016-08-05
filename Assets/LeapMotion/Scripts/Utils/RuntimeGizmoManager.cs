@@ -539,7 +539,7 @@ namespace Leap.Unity.RuntimeGizmos {
               break;
             case OperationType.SetColor:
               _currColor = _colors[colorIndex++];
-              currPass = -1;
+              currPass = -1; //force pass to be set the next time we need to draw
               break;
             case OperationType.ToggleWireframe:
               GL.wireframe = !GL.wireframe;
