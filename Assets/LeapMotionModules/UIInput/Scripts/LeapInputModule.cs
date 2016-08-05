@@ -118,7 +118,6 @@ namespace Leap.Unity.InputModule {
     private Transform[] Pointers;
     private Transform[] InnerPointers;
     private LineRenderer[] PointerLines;
-    private float ActivationTime = 0.1f;
 
     //Object the pointer is hovering over
     private GameObject[] currentOverGo;
@@ -393,7 +392,7 @@ namespace Leap.Unity.InputModule {
             if (!PrevTriggeringInteraction[whichPointer] && isTriggeringInteraction(whichPointer, whichHand, whichFinger)) {
               PrevTriggeringInteraction[whichPointer] = true;
 
-              //if ((Time.time - timeEnteredCanvas[whichPointer] > ActivationTime)) {
+              if ((Time.time - timeEnteredCanvas[whichPointer] >= Time.deltaTime)) {
                 //Deselect all objects
                 if (base.eventSystem.currentSelectedGameObject) {
                   base.eventSystem.SetSelectedGameObject(null);
@@ -467,7 +466,7 @@ namespace Leap.Unity.InputModule {
                     }
                   }
                 }
-              //}
+              }
             }
           }
 
