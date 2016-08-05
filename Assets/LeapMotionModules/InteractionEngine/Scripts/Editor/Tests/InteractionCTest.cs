@@ -75,7 +75,7 @@ namespace Leap.Unity.Interaction.Tests {
 
       uint lineCount;
       IntPtr lineBuffer;
-      InteractionC.GetDebugLines(ref _scene, out lineCount, out lineBuffer);
+      InteractionC.GetDebugLines(ref _scene, new List<INTERACTION_DEBUG_LINE>());
     }
 
     [Test]
