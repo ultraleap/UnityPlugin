@@ -66,8 +66,7 @@ namespace Leap.Unity.InputModule {
     void Start() {
       for (int i = 0; i < Layers.Length; i++) {
         if (Layers[i].LayerTransform != null) {
-          Vector3 LocalPosition = transform.InverseTransformPoint(Layers[i].LayerTransform.position);
-          Layers[i].LayerTransform.position = transform.TransformPoint(new Vector3(LocalPosition.x, LocalPosition.y, 0f));
+          Layers[i].LayerTransform.localPosition = new Vector3(Layers[i].LayerTransform.localPosition.x, Layers[i].LayerTransform.localPosition.y, 0f);
 
           if (Layers[i].Shadow != null) {
             Layers[i].MaxShadowOpacity = Layers[i].Shadow.color.a;
@@ -85,8 +84,7 @@ namespace Leap.Unity.InputModule {
     void OnApplicationQuit() {
       for (int i = 0; i < Layers.Length; i++) {
         if (Layers[i].LayerTransform != null) {
-          Vector3 LocalPosition = transform.InverseTransformPoint(Layers[i].LayerTransform.position);
-          Layers[i].LayerTransform.position = transform.TransformPoint(new Vector3(LocalPosition.x, LocalPosition.y, 0f));
+          Layers[i].LayerTransform.localPosition = new Vector3(Layers[i].LayerTransform.localPosition.x, Layers[i].LayerTransform.localPosition.y, 0f);
         }
       }
     }
@@ -162,8 +160,8 @@ namespace Leap.Unity.InputModule {
           }
         }
         if (Layers[i].LayerTransform != null) {
-          Vector3 LocalPosition = transform.InverseTransformPoint(Layers[i].LayerTransform.position);
-          Layers[i].LayerTransform.position = transform.TransformPoint(new Vector3(LocalPosition.x, LocalPosition.y, -Layers[i].CurrentFloatingDistance / transform.lossyScale.z));
+          Vector3 LocalPosition = Layers[i].LayerTransform.parent.InverseTransformPoint(transform.TransformPoint(new Vector3(0f, 0f, -Layers[i].CurrentFloatingDistance / transform.lossyScale.z)));
+          Layers[i].LayerTransform.localPosition = new Vector3(Layers[i].LayerTransform.localPosition.x, Layers[i].LayerTransform.localPosition.y, LocalPosition.z);
         }
       }
     }
