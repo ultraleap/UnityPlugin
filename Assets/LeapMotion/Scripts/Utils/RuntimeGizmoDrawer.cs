@@ -295,6 +295,7 @@ namespace Leap.Unity.RuntimeGizmos {
 
     void OnEnable() {
       generateMeshes();
+      assignMeshes();
 
       Camera.onPostRender -= onPostRender;
       Camera.onPostRender += onPostRender;
@@ -363,10 +364,7 @@ namespace Leap.Unity.RuntimeGizmos {
             continue;
           }
 
-          RGizmos.sphereMesh = _sphereMesh;
-          RGizmos.cubeMesh = _cubeMesh;
-          RGizmos.wireSphereMesh = _wireSphereMesh;
-          RGizmos.wireCubeMesh = _wireCubeMesh;
+          assignMeshes();
 
           if (RGizmos.matrix != Matrix4x4.identity) {
             RGizmos.matrix = Matrix4x4.identity;
@@ -382,6 +380,13 @@ namespace Leap.Unity.RuntimeGizmos {
         yield return endOfFrameWaiter;
         RGizmos.ClearAllGizmos();
       }
+    }
+
+    private void assignMeshes() {
+      RGizmos.sphereMesh = _sphereMesh;
+      RGizmos.cubeMesh = _cubeMesh;
+      RGizmos.wireSphereMesh = _wireSphereMesh;
+      RGizmos.wireCubeMesh = _wireCubeMesh;
     }
 
     private void generateMeshes() {
