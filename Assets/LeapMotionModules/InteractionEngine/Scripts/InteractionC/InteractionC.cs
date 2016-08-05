@@ -474,6 +474,7 @@ namespace Leap.Unity.Interaction.CApi {
       IntPtr arrayPtr;
       var rs = LeapIEGetDebugLines(ref scene, out lineCount, out arrayPtr);
 
+      lines.Clear();
       for (int i = 0; i < lineCount; i++) {
         INTERACTION_DEBUG_LINE line;
         StructMarshal<INTERACTION_DEBUG_LINE>.ArrayElementToStruct(arrayPtr, i, out line);
