@@ -279,10 +279,16 @@ namespace Leap.Unity.RuntimeGizmos {
     private Mesh _cubeMesh, _wireCubeMesh, _wireSphereMesh;
 
     private void onPostRender(Camera camera) {
+#if UNITY_EDITOR
+      if (camera.gameObject.name == "PreRenderCamera") {
+        return;
+      }
+
       bool isSceneCamera = camera.gameObject.hideFlags == HideFlags.HideAndDontSave;
       if (!isSceneCamera && !displayInGameView) {
         return;
       }
+#endif
 
       RGizmos.DrawAllGizmosToScreen(_wireMaterial, _filledMaterial);
     }
