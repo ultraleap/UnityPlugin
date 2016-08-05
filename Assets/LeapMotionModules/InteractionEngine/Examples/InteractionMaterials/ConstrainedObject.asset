@@ -11,9 +11,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 183146e09617b2e41a21d0ecf5e56fcb, type: 3}
   m_Name: ConstrainedObject
   m_EditorClassIdentifier: 
-  _releaseDistance: 0.15
+  _contactEnabled: 1
+  _brushDisableDistance: 0.017
   _physicMaterialMode: 1
   _replacementMaterial: {fileID: 0}
+  _releaseDistance: 0.15
+  _releaseAngle: 180
   _warpingEnabled: 0
   _warpCurve:
     serializedVersion: 2
@@ -48,6 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5f7ab934b62d25438bd10ceb74720d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _solveMethod: 0
 --- !u!114 &11427758
 MonoBehaviour:
   m_ObjectHideFlags: 3

@@ -16,6 +16,7 @@ MonoBehaviour:
   _physicMaterialMode: 1
   _replacementMaterial: {fileID: 0}
   _releaseDistance: 0.15
+  _releaseAngle: 180
   _warpingEnabled: 1
   _warpCurve:
     serializedVersion: 2
