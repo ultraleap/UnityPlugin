@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using Leap.Unity.RuntimeGizmos;
+using System;
 
 namespace Leap.Unity.Interaction {
 
@@ -36,7 +38,7 @@ namespace Leap.Unity.Interaction {
     }
   }
 
-  public class ActivityMonitor : MonoBehaviour, IActivityMonitor {
+  public class ActivityMonitor : MonoBehaviour, IActivityMonitor, IRuntimeGizmoComponent {
     public const int HYSTERESIS_TIMEOUT = 5;
 
     public enum GizmoType {
@@ -147,25 +149,23 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-#if UNITY_EDITOR
-    public void OnDrawGizmos() {
+    public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
       switch (gizmoType) {
         case GizmoType.InteractionStatus:
           if (_interactionBehaviour.IsBeingGrasped) {
-            Gizmos.color = Color.green;
+            drawer.color = Color.green;
           } else if (GetComponent<Rigidbody>().IsSleeping()) {
-            Gizmos.color = Color.gray;
+            drawer.color = Color.gray;
           } else {
-            Gizmos.color = Color.blue;
+            drawer.color = Color.blue;
           }
           break;
         case GizmoType.ActivityDepth:
-          Gizmos.color = Color.HSVToRGB(Mathf.Max(0, _timeToLive) / (_manager.MaxDepth * 2.0f), 1, 1);
+          drawer.color = Color.HSVToRGB(Mathf.Max(0, _timeToLive) / (_manager.MaxDepth * 2.0f), 1, 1);
           break;
       }
 
-      GizmoUtility.DrawColliders(gameObject, useWireframe: true);
+      drawer.DrawColliders(gameObject);
     }
-#endif
   }
 }
