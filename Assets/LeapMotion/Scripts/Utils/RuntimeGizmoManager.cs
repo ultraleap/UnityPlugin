@@ -533,7 +533,8 @@ namespace Leap.Unity.RuntimeGizmos {
         GL.wireframe = false;
 
         for (int i = 0; i < _operations.Count; i++) {
-          switch (_operations[i]) {
+          OperationType type = _operations[i];
+          switch (type) {
             case OperationType.SetMatrix:
               _currMatrix = _matrices[matrixIndex++];
               break;
@@ -549,8 +550,8 @@ namespace Leap.Unity.RuntimeGizmos {
 
               GL.Begin(GL.LINES);
               Line line = _lines[lineIndex++];
-              GL.Vertex(_currMatrix.MultiplyPoint3x4(line.a));
-              GL.Vertex(_currMatrix.MultiplyPoint3x4(line.b));
+              GL.Vertex(_currMatrix.MultiplyPoint(line.a));
+              GL.Vertex(_currMatrix.MultiplyPoint(line.b));
               GL.End();
               break;
             case OperationType.DrawMesh:
