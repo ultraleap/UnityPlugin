@@ -2,10 +2,9 @@
 using UnityEngine.UI;
 using UnityEngine.Assertions;
 using System;
-using System.IO;
 using System.Collections.Generic;
+using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Interaction.CApi;
-using System.Runtime.InteropServices;
 
 namespace Leap.Unity.Interaction {
 
@@ -137,6 +136,8 @@ namespace Leap.Unity.Interaction {
     private List<Hand> _holdingHands = new List<Hand>();
     //A temp list that is recycled.  Used to recieve results from InteractionC.
     private List<INTERACTION_SHAPE_INSTANCE_RESULTS> _resultList = new List<INTERACTION_SHAPE_INSTANCE_RESULTS>();
+    //A temp list that is recycled.  Used to recieve debug lines from InteractionC.
+    private List<INTERACTION_DEBUG_LINE> _debugLines = new List<INTERACTION_DEBUG_LINE>();
     //A temp list that is recycled.  Used to recieve debug logs from InteractionC.
     private List<string> _debugOutput = new List<string>();
     #endregion
@@ -628,7 +629,15 @@ namespace Leap.Unity.Interaction {
       }
 
       if (_showDebugLines) {
-        InteractionC.DrawDebugLines(ref _scene);
+        RuntimeGizmoDrawer gizmoDrawer;
+        if (RuntimeGizmoManager.TryGetGizmoDrawer(gameObject, out gizmoDrawer)) {
+          InteractionC.GetDebugLines(ref _scene, _debugLines);
+          for (int i = 0; i < _debugLines.Count; i++) {
+            var line = _debugLines[i];
+            gizmoDrawer.color = line.color.ToUnityColor();
+            gizmoDrawer.DrawLine(line.start.ToVector3(), line.end.ToVector3());
+          }
+        }
       }
 
       if (_showDebugOutput) {
