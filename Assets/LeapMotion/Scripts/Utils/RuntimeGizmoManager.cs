@@ -42,7 +42,7 @@ namespace Leap.Unity.RuntimeGizmos {
     protected Mesh _cubeMesh, _wireCubeMesh, _wireSphereMesh;
 
     protected static RuntimeGizmoDrawer _backDrawer = null;
-    protected static RuntimeGizmoDrawer _fromDrawer = null;
+    protected static RuntimeGizmoDrawer _frontDrawer = null;
     private bool _readyForSwap = false;
 
     /// <summary>
@@ -94,14 +94,14 @@ namespace Leap.Unity.RuntimeGizmos {
 
       if (_readyForSwap) {
         RuntimeGizmoDrawer tempDrawer = _backDrawer;
-        _backDrawer = _fromDrawer;
-        _fromDrawer = tempDrawer;
+        _backDrawer = _frontDrawer;
+        _frontDrawer = tempDrawer;
 
         _readyForSwap = false;
         _backDrawer.ClearAllGizmos();
       }
 
-      _fromDrawer.DrawAllGizmosToScreen(_wireMaterial, _filledMaterial);
+      _frontDrawer.DrawAllGizmosToScreen(_wireMaterial, _filledMaterial);
     }
 
     protected virtual void OnValidate() {
@@ -111,7 +111,7 @@ namespace Leap.Unity.RuntimeGizmos {
       if (_filledMaterial != null) {
         _filledMaterial.shader = _filledShader;
       }
-      if (_fromDrawer != null && _backDrawer != null) {
+      if (_frontDrawer != null && _backDrawer != null) {
         assignMeshes();
       }
     }
@@ -124,7 +124,7 @@ namespace Leap.Unity.RuntimeGizmos {
       }
 #endif
 
-      _fromDrawer = new RuntimeGizmoDrawer();
+      _frontDrawer = new RuntimeGizmoDrawer();
       _backDrawer = new RuntimeGizmoDrawer();
 
       generateMeshes();
@@ -136,7 +136,7 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     protected virtual void OnDisable() {
-      _fromDrawer = null;
+      _frontDrawer = null;
       _backDrawer = null;
 
       Camera.onPostRender -= onPostRender;
@@ -206,10 +206,10 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     private void assignMeshes() {
-      _fromDrawer.sphereMesh = _sphereMesh;
-      _fromDrawer.cubeMesh = _cubeMesh;
-      _fromDrawer.wireSphereMesh = _wireSphereMesh;
-      _fromDrawer.wireCubeMesh = _wireCubeMesh;
+      _frontDrawer.sphereMesh = _sphereMesh;
+      _frontDrawer.cubeMesh = _cubeMesh;
+      _frontDrawer.wireSphereMesh = _wireSphereMesh;
+      _frontDrawer.wireCubeMesh = _wireCubeMesh;
 
       _backDrawer.sphereMesh = _sphereMesh;
       _backDrawer.cubeMesh = _cubeMesh;
