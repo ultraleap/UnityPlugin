@@ -29,13 +29,9 @@ namespace Leap.Unity.RuntimeGizmos {
     [SerializeField]
     protected Mesh _sphereMesh;
 
-    [Tooltip("The shader to use for rendering wire gizmos.")]
+    [Tooltip("The shader to use for rendering gizmos.")]
     [SerializeField]
-    protected Shader _wireShader;
-
-    [Tooltip("The shader to use for rendering filled gizmos.")]
-    [SerializeField]
-    protected Shader _filledShader;
+    protected Shader _gizmoShader;
 
     protected Material _wireMaterial, _filledMaterial;
     protected Mesh _cubeMesh, _wireCubeMesh, _wireSphereMesh;
@@ -105,14 +101,8 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     protected virtual void OnValidate() {
-      if (_wireMaterial != null) {
-        _wireMaterial.shader = _wireShader;
-      }
-      if (_filledMaterial != null) {
-        _filledMaterial.shader = _filledShader;
-      }
       if (_frontDrawer != null && _backDrawer != null) {
-        assignMeshes();
+        assignDrawerParams();
       }
     }
 
@@ -128,7 +118,7 @@ namespace Leap.Unity.RuntimeGizmos {
       _backDrawer = new RuntimeGizmoDrawer();
 
       generateMeshes();
-      assignMeshes();
+      assignDrawerParams();
 
       //Unsubscribe to prevent double-subscription
       Camera.onPostRender -= onPostRender;
@@ -145,24 +135,6 @@ namespace Leap.Unity.RuntimeGizmos {
     private List<GameObject> _objList = new List<GameObject>();
     private List<IRuntimeGizmoComponent> _gizmoList = new List<IRuntimeGizmoComponent>();
     protected virtual void Update() {
-      if (_wireMaterial == null) {
-        if (_wireShader == null) {
-          return;
-        }
-        _wireMaterial = new Material(_wireShader);
-        _wireMaterial.name = "Runtime Gizmos Wire Material";
-        _wireMaterial.hideFlags = HideFlags.HideAndDontSave;
-      }
-
-      if (_filledMaterial == null) {
-        if (_filledShader == null) {
-          return;
-        }
-        _filledMaterial = new Material(_filledShader);
-        _filledMaterial.name = "Runtime Gizmos Filled Material";
-        _filledMaterial.hideFlags = HideFlags.HideAndDontSave;
-      }
-
       Scene scene = SceneManager.GetActiveScene();
       scene.GetRootGameObjects(_objList);
       for (int i = 0; i < _objList.Count; i++) {
@@ -205,7 +177,10 @@ namespace Leap.Unity.RuntimeGizmos {
       return isDisabled;
     }
 
-    private void assignMeshes() {
+    private void assignDrawerParams() {
+      _frontDrawer.gizmoShader = _gizmoShader;
+      _backDrawer.gizmoShader = _gizmoShader;
+
       _frontDrawer.sphereMesh = _sphereMesh;
       _frontDrawer.cubeMesh = _cubeMesh;
       _frontDrawer.wireSphereMesh = _wireSphereMesh;
@@ -311,6 +286,11 @@ namespace Leap.Unity.RuntimeGizmos {
   }
 
   public class RuntimeGizmoDrawer {
+    public const int UNLIT_SOLID_PASS = 0;
+    public const int UNLIT_TRANSPARENT_PASS = 1;
+    public const int SHADED_SOLID_PASS = 2;
+    public const int SHADED_TRANSPARENT_PASS = 3;
+
     private List<OperationType> _operations = new List<OperationType>();
     private List<Matrix4x4> _matrices = new List<Matrix4x4>();
     private List<Color> _colors = new List<Color>();
@@ -322,6 +302,26 @@ namespace Leap.Unity.RuntimeGizmos {
     private Stack<Matrix4x4> _matrixStack = new Stack<Matrix4x4>();
 
     private bool _isInWireMode = false;
+    private Material _gizmoMaterial;
+
+    public Shader gizmoShader {
+      get {
+        if (_gizmoMaterial == null) {
+          return null;
+        } else {
+          return _gizmoMaterial.shader;
+        }
+      }
+      set {
+        if (_gizmoMaterial == null) {
+          _gizmoMaterial = new Material(value);
+          _gizmoMaterial.name = "Runtime Gizmo Material";
+          _gizmoMaterial.hideFlags = HideFlags.HideAndDontSave;
+        } else {
+          _gizmoMaterial.shader = value;
+        }
+      }
+    }
 
     public Mesh cubeMesh, wireCubeMesh, sphereMesh, wireSphereMesh;
 
@@ -507,7 +507,7 @@ namespace Leap.Unity.RuntimeGizmos {
             } else {
               DrawMesh(mesh.sharedMesh, Matrix4x4.identity);
             }
-            
+
           }
         }
       }
@@ -526,7 +526,6 @@ namespace Leap.Unity.RuntimeGizmos {
       _currColor = Color.white;
     }
 
-    private Material _currMat;
     public void DrawAllGizmosToScreen(Material wireMaterial, Material filledMaterial) {
       try {
         int matrixIndex = 0;
@@ -534,8 +533,8 @@ namespace Leap.Unity.RuntimeGizmos {
         int lineIndex = 0;
         int meshIndex = 0;
 
+        int currPass = -1;
         _currMatrix = Matrix4x4.identity;
-        _currMat = null;
         _currColor = Color.white;
 
         GL.wireframe = false;
@@ -548,13 +547,13 @@ namespace Leap.Unity.RuntimeGizmos {
               break;
             case OperationType.SetColor:
               _currColor = _colors[colorIndex++];
-              _currMat = null;
+              currPass = -1;
               break;
             case OperationType.ToggleWireframe:
               GL.wireframe = !GL.wireframe;
               break;
             case OperationType.DrawLine:
-              setMaterial(wireMaterial);
+              setPass(ref currPass, isUnlit: true);
 
               GL.Begin(GL.LINES);
               Line line = _lines[lineIndex++];
@@ -564,9 +563,9 @@ namespace Leap.Unity.RuntimeGizmos {
               break;
             case OperationType.DrawMesh:
               if (GL.wireframe) {
-                setMaterial(wireMaterial);
+                setPass(ref currPass, isUnlit: true);
               } else {
-                setMaterial(filledMaterial);
+                setPass(ref currPass, isUnlit: false);
               }
 
               Graphics.DrawMeshNow(_meshes[meshIndex++], _currMatrix * _matrices[matrixIndex++]);
@@ -580,11 +579,26 @@ namespace Leap.Unity.RuntimeGizmos {
       }
     }
 
-    private void setMaterial(Material mat) {
-      if (_currMat != mat) {
-        _currMat = mat;
-        _currMat.color = _currColor;
-        _currMat.SetPass(0);
+    private void setPass(ref int currPass, bool isUnlit) {
+      int newPass;
+      if (isUnlit) {
+        if (_currColor.a < 1) {
+          newPass = UNLIT_TRANSPARENT_PASS;
+        } else {
+          newPass = UNLIT_SOLID_PASS;
+        }
+      } else {
+        if (_currColor.a < 1) {
+          newPass = SHADED_TRANSPARENT_PASS;
+        } else {
+          newPass = SHADED_SOLID_PASS;
+        }
+      }
+
+      if (currPass != newPass) {
+        currPass = newPass;
+        _gizmoMaterial.color = _currColor;
+        _gizmoMaterial.SetPass(currPass);
       }
     }
 
