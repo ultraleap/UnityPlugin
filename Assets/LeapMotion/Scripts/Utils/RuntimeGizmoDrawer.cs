@@ -12,9 +12,9 @@ namespace Leap.Unity.RuntimeGizmos {
   /// gizmos to work!  You must also have a RuntimeGizmoDrawer component in the scene.
   /// </summary>
   public interface IRuntimeGizmoDrawer {
-    void OnDrawRuntimeGizmos();
+    void OnDrawRuntimeGizmos(RGizmos drawer);
   }
-  
+
   [ExecuteInEditMode]
   public class RuntimeGizmoDrawer : MonoBehaviour {
     public const int CIRCLE_RESOLUTION = 32;
@@ -42,6 +42,13 @@ namespace Leap.Unity.RuntimeGizmos {
     protected Material _wireMaterial, _filledMaterial;
     protected Mesh _cubeMesh, _wireCubeMesh, _wireSphereMesh;
 
+    protected static RGizmos _drawer;
+
+    public static RGizmos GetGizmoDrawer() {
+      _drawer.ResetMatrixAndColorState();
+      return _drawer;
+    }
+
     protected void onPostRender(Camera camera) {
 #if UNITY_EDITOR
       if (camera.gameObject.name == "PreRenderCamera") {
@@ -54,7 +61,7 @@ namespace Leap.Unity.RuntimeGizmos {
       }
 #endif
 
-      RGizmos.DrawAllGizmosToScreen(_wireMaterial, _filledMaterial);
+      _drawer.DrawAllGizmosToScreen(_wireMaterial, _filledMaterial);
     }
 
     protected virtual void OnValidate() {
@@ -72,6 +79,8 @@ namespace Leap.Unity.RuntimeGizmos {
         enabled = false;
       }
 #endif
+
+      _drawer = new RGizmos();
 
       generateMeshes();
       assignMeshes();
@@ -112,7 +121,7 @@ namespace Leap.Unity.RuntimeGizmos {
 #if UNITY_EDITOR
       //If the application is playing, gizmos are cleared at the end of frame instead
       if (!Application.isPlaying) {
-        RGizmos.ClearAllGizmos();
+        _drawer.ClearAllGizmos();
       }
 #endif
 
@@ -143,12 +152,10 @@ namespace Leap.Unity.RuntimeGizmos {
             continue;
           }
 
+          _drawer.ResetMatrixAndColorState();
           assignMeshes();
-
-          if (RGizmos.matrix != Matrix4x4.identity) {
-            RGizmos.matrix = Matrix4x4.identity;
-          }
-          _gizmoList[j].OnDrawRuntimeGizmos();
+          
+          _gizmoList[j].OnDrawRuntimeGizmos(_drawer);
         }
       }
     }
@@ -157,15 +164,15 @@ namespace Leap.Unity.RuntimeGizmos {
       WaitForEndOfFrame endOfFrameWaiter = new WaitForEndOfFrame();
       while (true) {
         yield return endOfFrameWaiter;
-        RGizmos.ClearAllGizmos();
+        _drawer.ClearAllGizmos();
       }
     }
 
     private void assignMeshes() {
-      RGizmos.sphereMesh = _sphereMesh;
-      RGizmos.cubeMesh = _cubeMesh;
-      RGizmos.wireSphereMesh = _wireSphereMesh;
-      RGizmos.wireCubeMesh = _wireCubeMesh;
+      _drawer.sphereMesh = _sphereMesh;
+      _drawer.cubeMesh = _cubeMesh;
+      _drawer.wireSphereMesh = _wireSphereMesh;
+      _drawer.wireCubeMesh = _wireCubeMesh;
     }
 
     private void generateMeshes() {
@@ -267,46 +274,58 @@ namespace Leap.Unity.RuntimeGizmos {
     }
   }
 
-  public static class RGizmos {
-    private static List<OperationType> _operations = new List<OperationType>();
-    private static List<Matrix4x4> _matrices = new List<Matrix4x4>();
-    private static List<Color> _colors = new List<Color>();
-    private static List<Line> _lines = new List<Line>();
-    private static List<Mesh> _meshes = new List<Mesh>();
+  public class RGizmos {
+    private List<OperationType> _operations = new List<OperationType>();
+    private List<Matrix4x4> _matrices = new List<Matrix4x4>();
+    private List<Color> _colors = new List<Color>();
+    private List<Line> _lines = new List<Line>();
+    private List<Mesh> _meshes = new List<Mesh>();
 
-    private static Color _currColor = Color.white;
-    private static Matrix4x4 _currMatrix = Matrix4x4.identity;
-    private static Stack<Matrix4x4> _matrixStack = new Stack<Matrix4x4>();
+    private Color _currColor = Color.white;
+    private Matrix4x4 _currMatrix = Matrix4x4.identity;
+    private Stack<Matrix4x4> _matrixStack = new Stack<Matrix4x4>();
 
-    private static bool _isInWireMode = false;
+    private bool _isInWireMode = false;
 
-    public static Mesh cubeMesh, wireCubeMesh, sphereMesh, wireSphereMesh;
+    public Mesh cubeMesh, wireCubeMesh, sphereMesh, wireSphereMesh;
 
     /// <summary>
     /// Causes all remaining gizmos drawing to be done in the local coordinate space of the given transform.
     /// </summary>
-    public static void RelativeTo(Transform transform) {
+    public void RelativeTo(Transform transform) {
       matrix = transform.localToWorldMatrix;
     }
 
     /// <summary>
     /// Saves the current gizmo matrix to the gizmo matrix stack.
     /// </summary>
-    public static void PushMatrix() {
+    public void PushMatrix() {
       _matrixStack.Push(_currMatrix);
     }
 
     /// <summary>
     /// Restores the current gizmo matrix from the gizmo matrix stack.
     /// </summary>
-    public static void PopMatrix() {
+    public void PopMatrix() {
       matrix = _matrixStack.Pop();
+    }
+
+    /// <summary>
+    /// Resets the matrix to the identity matrix and the color to white.
+    /// </summary>
+    public void ResetMatrixAndColorState() {
+      if (_currMatrix != Matrix4x4.identity) {
+        matrix = Matrix4x4.identity;
+      }
+      if (_currColor != Color.white) {
+        color = Color.white;
+      }
     }
 
     /// <summary>
     /// Sets or gets the color for the gizmos that will be drawn next.
     /// </summary>
-    public static Color color {
+    public Color color {
       get {
         return _currColor;
       }
@@ -324,7 +343,7 @@ namespace Leap.Unity.RuntimeGizmos {
     /// <summary>
     /// Sets or gets the matrix used to transform all gizmos.
     /// </summary>
-    public static Matrix4x4 matrix {
+    public Matrix4x4 matrix {
       get {
         return _currMatrix;
       }
@@ -341,7 +360,7 @@ namespace Leap.Unity.RuntimeGizmos {
     /// <summary>
     /// Draw a filled gizmo mesh using the given matrix transform.
     /// </summary>
-    public static void DrawMesh(Mesh mesh, Matrix4x4 matrix) {
+    public void DrawMesh(Mesh mesh, Matrix4x4 matrix) {
       setWireMode(false);
       drawMeshInternal(mesh, matrix);
     }
@@ -349,14 +368,14 @@ namespace Leap.Unity.RuntimeGizmos {
     /// <summary>
     /// Draws a filled gizmo mesh at the given transform location.
     /// </summary>
-    public static void DrawMesh(Mesh mesh, Vector3 position, Quaternion rotation, Vector3 scale) {
+    public void DrawMesh(Mesh mesh, Vector3 position, Quaternion rotation, Vector3 scale) {
       DrawMesh(mesh, Matrix4x4.TRS(position, rotation, scale));
     }
 
     /// <summary>
     /// Draws a wire gizmo mesh using the given matrix transform.
     /// </summary>
-    public static void DrawWireMesh(Mesh mesh, Matrix4x4 matrix) {
+    public void DrawWireMesh(Mesh mesh, Matrix4x4 matrix) {
       setWireMode(true);
       drawMeshInternal(mesh, matrix);
     }
@@ -364,14 +383,14 @@ namespace Leap.Unity.RuntimeGizmos {
     /// <summary>
     /// Draws a wire gizmo mesh at the given transform location.
     /// </summary>
-    public static void DrawWireMesh(Mesh mesh, Vector3 position, Quaternion rotation, Vector3 scale) {
+    public void DrawWireMesh(Mesh mesh, Vector3 position, Quaternion rotation, Vector3 scale) {
       DrawWireMesh(mesh, Matrix4x4.TRS(position, rotation, scale));
     }
 
     /// <summary>
     /// Draws a gizmo line that connects the two positions.
     /// </summary>
-    public static void DrawLine(Vector3 a, Vector3 b) {
+    public void DrawLine(Vector3 a, Vector3 b) {
       _operations.Add(OperationType.DrawLine);
       _lines.Add(new Line(a, b));
     }
@@ -379,33 +398,33 @@ namespace Leap.Unity.RuntimeGizmos {
     /// <summary>
     /// Draws a filled gizmo cube at the given position with the given size.
     /// </summary>
-    public static void DrawCube(Vector3 position, Vector3 size) {
+    public void DrawCube(Vector3 position, Vector3 size) {
       DrawMesh(cubeMesh, position, Quaternion.identity, size);
     }
 
     /// <summary>
     /// Draws a wire gizmo cube at the given position with the given size.
     /// </summary>
-    public static void DrawWireCube(Vector3 position, Vector3 size) {
+    public void DrawWireCube(Vector3 position, Vector3 size) {
       DrawWireMesh(wireCubeMesh, position, Quaternion.identity, size);
     }
 
     /// <summary>
     /// Draws a filled gizmo sphere at the given position with the given radius.
     /// </summary>
-    public static void DrawSphere(Vector3 center, float radius) {
+    public void DrawSphere(Vector3 center, float radius) {
       DrawMesh(sphereMesh, center, Quaternion.identity, Vector3.one * radius * 2);
     }
 
     /// <summary>
     /// Draws a wire gizmo sphere at the given position with the given radius.
     /// </summary>
-    public static void DrawWireSphere(Vector3 center, float radius) {
+    public void DrawWireSphere(Vector3 center, float radius) {
       DrawWireMesh(wireSphereMesh, center, Quaternion.identity, Vector3.one * radius * 2);
     }
 
-    private static List<Collider> _colliderList = new List<Collider>();
-    public static void DrawColliders(GameObject gameObject, bool useWireframe = true, bool traverseHierarchy = true) {
+    private List<Collider> _colliderList = new List<Collider>();
+    public void DrawColliders(GameObject gameObject, bool useWireframe = true, bool traverseHierarchy = true) {
       PushMatrix();
 
       if (traverseHierarchy) {
@@ -446,14 +465,16 @@ namespace Leap.Unity.RuntimeGizmos {
           }
         } else if (collider is MeshCollider) {
           MeshCollider mesh = collider as MeshCollider;
-          DrawWireMesh(mesh.sharedMesh, Matrix4x4.identity);
+          if (mesh.sharedMesh != null) {
+            DrawWireMesh(mesh.sharedMesh, Matrix4x4.identity);
+          }
         }
       }
 
       PopMatrix();
     }
 
-    public static void ClearAllGizmos() {
+    public void ClearAllGizmos() {
       _operations.Clear();
       _matrices.Clear();
       _colors.Clear();
@@ -464,8 +485,8 @@ namespace Leap.Unity.RuntimeGizmos {
       _currColor = Color.white;
     }
 
-    private static Material _currMat;
-    public static void DrawAllGizmosToScreen(Material wireMaterial, Material filledMaterial) {
+    private Material _currMat;
+    public void DrawAllGizmosToScreen(Material wireMaterial, Material filledMaterial) {
       try {
         int matrixIndex = 0;
         int colorIndex = 0;
@@ -517,7 +538,7 @@ namespace Leap.Unity.RuntimeGizmos {
       }
     }
 
-    private static void setMaterial(Material mat) {
+    private void setMaterial(Material mat) {
       if (_currMat != mat) {
         _currMat = mat;
         _currMat.color = _currColor;
@@ -525,13 +546,13 @@ namespace Leap.Unity.RuntimeGizmos {
       }
     }
 
-    private static void drawMeshInternal(Mesh mesh, Matrix4x4 matrix) {
+    private void drawMeshInternal(Mesh mesh, Matrix4x4 matrix) {
       _operations.Add(OperationType.DrawMesh);
       _meshes.Add(mesh);
       _matrices.Add(matrix);
     }
 
-    private static void setWireMode(bool wireMode) {
+    private void setWireMode(bool wireMode) {
       if (_isInWireMode != wireMode) {
         _operations.Add(OperationType.ToggleWireframe);
         _isInWireMode = wireMode;
