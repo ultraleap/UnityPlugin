@@ -225,12 +225,11 @@ namespace Leap.Unity.RuntimeGizmos {
       List<Vector3> verts = new List<Vector3>();
       List<int> indexes = new List<int>();
 
-      addQuad(verts, indexes, Vector3.forward, -Vector3.right, Vector3.up);
-      addQuad(verts, indexes, -Vector3.forward, Vector3.right, Vector3.up);
-      addQuad(verts, indexes, Vector3.right, -Vector3.up, Vector3.forward);
-      addQuad(verts, indexes, -Vector3.right, Vector3.up, Vector3.forward);
-      addQuad(verts, indexes, Vector3.up, -Vector3.forward, Vector3.right);
-      addQuad(verts, indexes, -Vector3.up, Vector3.forward, Vector3.right);
+      Vector3[] faces = new Vector3[] { Vector3.forward, Vector3.right, Vector3.up };
+      for (int i = 0; i < 3; i++) {
+        addQuad(verts, indexes, faces[(i + 0) % 3], -faces[(i + 1) % 3], faces[(i + 2) % 3]);
+        addQuad(verts, indexes, -faces[(i + 0) % 3], faces[(i + 1) % 3], faces[(i + 2) % 3]);
+      }
 
       _cubeMesh.SetVertices(verts);
       _cubeMesh.SetIndices(indexes.ToArray(), MeshTopology.Quads, 0);
