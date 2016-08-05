@@ -1,4 +1,4 @@
-﻿Shader "Hidden/Runtime Gizmo Filled" {
+﻿Shader "Hidden/Runtime Gizmos" {
   Properties {
     _Color ("Color", Color) = (1,1,1,1)
   }
