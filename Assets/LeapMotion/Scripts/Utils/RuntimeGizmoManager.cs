@@ -349,12 +349,8 @@ namespace Leap.Unity.RuntimeGizmos {
     /// Resets the matrix to the identity matrix and the color to white.
     /// </summary>
     public void ResetMatrixAndColorState() {
-      if (_currMatrix != Matrix4x4.identity) {
-        matrix = Matrix4x4.identity;
-      }
-      if (_currColor != Color.white) {
-        color = Color.white;
-      }
+      matrix = Matrix4x4.identity;
+      color = Color.white;
     }
 
     /// <summary>
