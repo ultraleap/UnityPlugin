@@ -261,7 +261,11 @@ namespace Leap.Unity.RuntimeGizmos {
 
     [Tooltip("Should the gizmos be visible in the game view.")]
     [SerializeField]
-    private bool displayInGameView = true;
+    private bool _displayInGameView = true;
+
+    [Tooltip("Should the gizmos be visible in a build.")]
+    [SerializeField]
+    private bool _enabledForBuild = true;
 
     [Tooltip("The mesh to use for the filled sphere gizmo.")]
     [SerializeField]
@@ -285,7 +289,7 @@ namespace Leap.Unity.RuntimeGizmos {
       }
 
       bool isSceneCamera = camera.gameObject.hideFlags == HideFlags.HideAndDontSave;
-      if (!isSceneCamera && !displayInGameView) {
+      if (!isSceneCamera && !_displayInGameView) {
         return;
       }
 #endif
@@ -303,6 +307,12 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     void OnEnable() {
+#if !UNITY_EDITOR
+      if (_enabledForBuild) {
+        enabled = false;
+      }
+#endif
+
       generateMeshes();
       assignMeshes();
 
