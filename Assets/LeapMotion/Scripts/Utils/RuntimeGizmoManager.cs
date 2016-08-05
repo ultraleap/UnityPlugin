@@ -32,8 +32,7 @@ namespace Leap.Unity.RuntimeGizmos {
     [Tooltip("The shader to use for rendering gizmos.")]
     [SerializeField]
     protected Shader _gizmoShader;
-
-    protected Material _wireMaterial, _filledMaterial;
+    
     protected Mesh _cubeMesh, _wireCubeMesh, _wireSphereMesh;
 
     protected static RuntimeGizmoDrawer _backDrawer = null;
