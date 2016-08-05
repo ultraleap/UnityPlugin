@@ -111,6 +111,9 @@ namespace Leap.Unity.RuntimeGizmos {
       if (_filledMaterial != null) {
         _filledMaterial.shader = _filledShader;
       }
+      if (_fromDrawer != null && _backDrawer != null) {
+        assignMeshes();
+      }
     }
 
     protected virtual void OnEnable() {
