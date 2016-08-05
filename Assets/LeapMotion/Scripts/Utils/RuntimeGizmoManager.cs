@@ -169,7 +169,6 @@ namespace Leap.Unity.RuntimeGizmos {
           }
 
           _backDrawer.ResetMatrixAndColorState();
-          assignMeshes();
 
           _gizmoList[j].OnDrawRuntimeGizmos(_backDrawer);
         }
@@ -198,6 +197,11 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     private void assignMeshes() {
+      _fromDrawer.sphereMesh = _sphereMesh;
+      _fromDrawer.cubeMesh = _cubeMesh;
+      _fromDrawer.wireSphereMesh = _wireSphereMesh;
+      _fromDrawer.wireCubeMesh = _wireCubeMesh;
+
       _backDrawer.sphereMesh = _sphereMesh;
       _backDrawer.cubeMesh = _cubeMesh;
       _backDrawer.wireSphereMesh = _wireSphereMesh;
