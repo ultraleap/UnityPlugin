@@ -170,7 +170,11 @@ namespace Leap.Unity.RuntimeGizmos {
 
           _backDrawer.ResetMatrixAndColorState();
 
-          _gizmoList[j].OnDrawRuntimeGizmos(_backDrawer);
+          try {
+            _gizmoList[j].OnDrawRuntimeGizmos(_backDrawer);
+          } catch (Exception e) {
+            Debug.LogException(e);
+          }
         }
       }
 
@@ -580,6 +584,9 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     private void drawMeshInternal(Mesh mesh, Matrix4x4 matrix) {
+      if (mesh == null) {
+        throw new InvalidOperationException("Mesh cannot be null!");
+      }
       _operations.Add(OperationType.DrawMesh);
       _meshes.Add(mesh);
       _matrices.Add(matrix);
