@@ -117,6 +117,7 @@ namespace Leap.Unity.RuntimeGizmos {
 #if !UNITY_EDITOR
       if (!_enabledForBuild) {
         enabled = false;
+        return;
       }
 #endif
 
