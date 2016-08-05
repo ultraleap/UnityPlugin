@@ -533,8 +533,7 @@ namespace Leap.Unity.RuntimeGizmos {
         GL.wireframe = false;
 
         for (int i = 0; i < _operations.Count; i++) {
-          OperationType type = _operations[i];
-          switch (type) {
+          switch (_operations[i]) {
             case OperationType.SetMatrix:
               _currMatrix = _matrices[matrixIndex++];
               break;
