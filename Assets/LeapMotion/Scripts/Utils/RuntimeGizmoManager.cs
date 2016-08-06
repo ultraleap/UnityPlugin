@@ -15,6 +15,7 @@ namespace Leap.Unity.RuntimeGizmos {
 
   [ExecuteInEditMode]
   public class RuntimeGizmoManager : MonoBehaviour {
+    public const string DEFAULT_SHADER_NAME = "Hidden/Runtime Gizmos";
     public const int CIRCLE_RESOLUTION = 32;
 
     [Tooltip("Should the gizmos be visible in the game view.")]
@@ -75,9 +76,31 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     protected virtual void OnValidate() {
+      if (_gizmoShader == null) {
+        _gizmoShader = Shader.Find(DEFAULT_SHADER_NAME);
+      }
+
+      Material tempMat = new Material(_gizmoShader);
+      tempMat.hideFlags = HideFlags.HideAndDontSave;
+      if (tempMat.passCount != 4) {
+        Debug.LogError("Shader " + _gizmoShader + " does not have 4 passes and cannot be used as a gizmo shader.");
+        _gizmoShader = Shader.Find(DEFAULT_SHADER_NAME);
+      }
+
+      if (_sphereMesh == null) {
+        GameObject tempSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        tempSphere.hideFlags = HideFlags.HideAndDontSave;
+        _sphereMesh = tempSphere.GetComponent<MeshFilter>().sharedMesh;
+        tempSphere.GetComponent<MeshFilter>().sharedMesh = null;
+      }
+
       if (_frontDrawer != null && _backDrawer != null) {
         assignDrawerParams();
       }
+    }
+
+    protected virtual void Reset() {
+      _gizmoShader = Shader.Find(DEFAULT_SHADER_NAME);
     }
 
     protected virtual void OnEnable() {
@@ -177,8 +200,10 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     private void assignDrawerParams() {
-      _frontDrawer.gizmoShader = _gizmoShader;
-      _backDrawer.gizmoShader = _gizmoShader;
+      if (_gizmoShader != null) {
+        _frontDrawer.gizmoShader = _gizmoShader;
+        _backDrawer.gizmoShader = _gizmoShader;
+      }
 
       _frontDrawer.sphereMesh = _sphereMesh;
       _frontDrawer.cubeMesh = _cubeMesh;
