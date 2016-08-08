@@ -23,10 +23,20 @@ namespace Leap.Unity.Attributes {
       bool canUseDefaultDrawer = true;
       bool shouldDisable = false;
 
+      Component attachedComponent = null;
+      if (!property.serializedObject.isEditingMultipleObjects) {
+        attachedComponent = property.serializedObject.targetObject as Component;
+      }
+
       RangeAttribute rangeAttribute = fieldInfo.GetCustomAttributes(typeof(RangeAttribute), true).FirstOrDefault() as RangeAttribute;
 
       IFullPropertyDrawer fullPropertyDrawer = null;
       foreach (var a in attributes) {
+        if (a is CombinablePropertyAttribute) {
+          (a as CombinablePropertyAttribute).fieldInfo = fieldInfo;
+          (a as CombinablePropertyAttribute).component = attachedComponent;
+        }
+
         if (a is IBeforeLabelAdditiveDrawer) {
           EditorGUIUtility.labelWidth -= (a as IBeforeLabelAdditiveDrawer).GetWidth();
         }

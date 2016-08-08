@@ -2,6 +2,7 @@
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using System.Reflection;
 
 namespace Leap.Unity.Attributes {
 
@@ -35,5 +36,8 @@ namespace Leap.Unity.Attributes {
   public interface IBeforeFieldAdditiveDrawer : IAdditiveDrawer { }
   public interface IAfterFieldAdditiveDrawer : IAdditiveDrawer { }
 
-  public abstract class CombinablePropertyAttribute : PropertyAttribute { }
+  public abstract class CombinablePropertyAttribute : PropertyAttribute {
+    public FieldInfo fieldInfo;
+    public Component component;
+  }
 }
