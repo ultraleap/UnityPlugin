@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Leap;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
 
@@ -30,6 +30,7 @@ namespace Leap.Unity {
      * Set automatically if not explicitly set in the editor.
      * @since 4.1.2
      */
+    [AutoFind(AutoFindLocations.Parents)]
     [Tooltip("The hand model to watch. Set automatically if detector is on a hand.")]
     public IHandModel HandModel = null;
   
@@ -48,9 +49,6 @@ namespace Leap.Unity {
 
     void Awake () {
       watcherCoroutine = extendedFingerWatcher();
-      if(HandModel == null){
-        HandModel = gameObject.GetComponentInParent<IHandModel>();
-      }
     }
   
     void OnEnable () {

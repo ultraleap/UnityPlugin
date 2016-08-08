@@ -7,20 +7,40 @@ using UnityEngine;
 
 namespace Leap.Unity.Attributes {
 
+  public enum AutoFindLocations {
+    Object = 0x01,
+    Children = 0x02,
+    Parents = 0x04,
+    Scene = 0x08,
+    All = 0xFFFF
+  }
+
   public class AutoFindAttribute : CombinablePropertyAttribute, IPropertyConstrainer {
+    private AutoFindLocations _searchLocations;
+
+    public AutoFindAttribute(AutoFindLocations searchLocations = AutoFindLocations.All) {
+      _searchLocations = searchLocations;
+    }
 
 #if UNITY_EDITOR
     public void ConstrainValue(SerializedProperty property) {
       if (property.objectReferenceValue != null) return;
       if (component == null) return;
 
-      property.objectReferenceValue = component.GetComponentInChildren(fieldInfo.FieldType);
-      if (property.objectReferenceValue != null) return;
+      if (search(AutoFindLocations.Object, component.GetComponent)) return;
+      if (search(AutoFindLocations.Parents, component.GetComponentInParent)) return;
+      if (search(AutoFindLocations.Children, component.GetComponentInChildren)) return;
+      if (search(AutoFindLocations.Scene, UnityEngine.Object.FindObjectOfType)) return;
+    }
 
-      property.objectReferenceValue = component.GetComponentInParent(fieldInfo.FieldType);
-      if (property.objectReferenceValue != null) return;
-
-      property.objectReferenceValue = UnityEngine.Object.FindObjectOfType(fieldInfo.FieldType);
+    private bool search(AutoFindLocations location, Func<Type, UnityEngine.Object> searchDelegate) {
+      if ((_searchLocations & location) != 0) {
+        var value = searchDelegate(fieldInfo.FieldType);
+        if (value != null) {
+          return true;
+        }
+      }
+      return false;
     }
 
     public override IEnumerable<SerializedPropertyType> SupportedTypes {
