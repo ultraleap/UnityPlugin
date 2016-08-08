@@ -42,11 +42,12 @@ namespace Leap.Unity.Attributes {
     public FieldInfo fieldInfo;
     public Component component;
 
-    public virtual IEnumerable<Type> SupportedTypes {
+#if UNITY_EDITOR
+    public virtual IEnumerable<SerializedPropertyType> SupportedTypes {
       get {
         yield break;
       }
-      
     }
+#endif
   }
 }

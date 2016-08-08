@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -20,6 +21,12 @@ namespace Leap.Unity.Attributes {
       if (property.objectReferenceValue != null) return;
 
       property.objectReferenceValue = UnityEngine.Object.FindObjectOfType(fieldInfo.FieldType);
+    }
+
+    public override IEnumerable<SerializedPropertyType> SupportedTypes {
+      get {
+        yield return SerializedPropertyType.ObjectReference;
+      }
     }
 #endif
   }

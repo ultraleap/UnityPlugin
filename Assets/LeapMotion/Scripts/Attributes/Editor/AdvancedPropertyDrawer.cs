@@ -13,16 +13,8 @@ namespace Leap.Unity.Attributes {
         foreach (object o in fieldInfo.GetCustomAttributes(typeof(CombinablePropertyAttribute), true)) {
           CombinablePropertyAttribute combinableProperty = o as CombinablePropertyAttribute;
           if (combinableProperty != null) {
-            if (combinableProperty.SupportedTypes.Contains(fieldInfo.FieldType)) {
-              yield return combinableProperty;
-            } else {
-              Debug.LogError("Property attribute " +
-                             combinableProperty.GetType().Name +
-                             " does not support type " +
-                             fieldInfo.FieldType.Name + ".");
-            }
+            yield return combinableProperty;
           }
-          yield return o as CombinablePropertyAttribute;
         }
       }
     }
@@ -43,6 +35,12 @@ namespace Leap.Unity.Attributes {
 
       IFullPropertyDrawer fullPropertyDrawer = null;
       foreach (var a in attributes) {
+        if (a.SupportedTypes.Count() != 0 && !a.SupportedTypes.Contains(property.propertyType)) {
+          Debug.LogError("Property attribute " + a.GetType().Name + " does not support property type " + property.propertyType + ".");
+          continue;
+        }
+
+
         a.fieldInfo = fieldInfo;
         a.component = attachedComponent;
 

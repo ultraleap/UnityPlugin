@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -20,6 +21,13 @@ namespace Leap.Unity.Attributes {
         property.intValue = Mathf.Min((int)maxValue, property.intValue);
       } else {
         Debug.LogWarning("Should not use MaxValue for fields that are not float or int!");
+      }
+    }
+
+    public override IEnumerable<SerializedPropertyType> SupportedTypes {
+      get {
+        yield return SerializedPropertyType.Integer;
+        yield return SerializedPropertyType.Float;
       }
     }
 #endif

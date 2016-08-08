@@ -22,6 +22,13 @@ namespace Leap.Unity.Attributes {
         Debug.LogWarning("Should not use MinValue for fields that are not float or int!");
       }
     }
+
+    public override IEnumerable<SerializedPropertyType> SupportedTypes {
+      get {
+        yield return SerializedPropertyType.Integer;
+        yield return SerializedPropertyType.Float;
+      }
+    }
 #endif
   }
 }
