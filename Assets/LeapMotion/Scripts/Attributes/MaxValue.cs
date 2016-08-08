@@ -19,8 +19,6 @@ namespace Leap.Unity.Attributes {
         property.floatValue = Mathf.Min(maxValue, property.floatValue);
       } else if (property.propertyType == SerializedPropertyType.Integer) {
         property.intValue = Mathf.Min((int)maxValue, property.intValue);
-      } else {
-        Debug.LogWarning("Should not use MaxValue for fields that are not float or int!");
       }
     }
 

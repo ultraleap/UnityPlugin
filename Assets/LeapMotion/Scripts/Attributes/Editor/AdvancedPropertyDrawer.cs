@@ -8,18 +8,27 @@ namespace Leap.Unity.Attributes {
   [CustomPropertyDrawer(typeof(CombinablePropertyAttribute), true)]
   public class CombinablePropertyDrawer : PropertyDrawer {
 
-    private IEnumerable<CombinablePropertyAttribute> attributes {
-      get {
-        foreach (object o in fieldInfo.GetCustomAttributes(typeof(CombinablePropertyAttribute), true)) {
-          CombinablePropertyAttribute combinableProperty = o as CombinablePropertyAttribute;
-          if (combinableProperty != null) {
-            yield return combinableProperty;
+    private List<CombinablePropertyAttribute> attributes = new List<CombinablePropertyAttribute>();
+    private void getAtrributes(SerializedProperty property) {
+      attributes.Clear();
+      foreach (object o in fieldInfo.GetCustomAttributes(typeof(CombinablePropertyAttribute), true)) {
+        CombinablePropertyAttribute combinableProperty = o as CombinablePropertyAttribute;
+        if (combinableProperty != null) {
+          if (combinableProperty.SupportedTypes.Count() != 0 && !combinableProperty.SupportedTypes.Contains(property.propertyType)) {
+            Debug.LogError("Property attribute " + 
+                           combinableProperty.GetType().Name + 
+                           " does not support property type " + 
+                           property.propertyType + ".");
+            continue;
           }
+          attributes.Add(combinableProperty);
         }
       }
     }
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+      getAtrributes(property);
+
       float defaultLabelWidth = EditorGUIUtility.labelWidth;
       float fieldWidth = position.width - EditorGUIUtility.labelWidth;
 
@@ -35,12 +44,6 @@ namespace Leap.Unity.Attributes {
 
       IFullPropertyDrawer fullPropertyDrawer = null;
       foreach (var a in attributes) {
-        if (a.SupportedTypes.Count() != 0 && !a.SupportedTypes.Contains(property.propertyType)) {
-          Debug.LogError("Property attribute " + a.GetType().Name + " does not support property type " + property.propertyType + ".");
-          continue;
-        }
-
-
         a.fieldInfo = fieldInfo;
         a.component = attachedComponent;
 
