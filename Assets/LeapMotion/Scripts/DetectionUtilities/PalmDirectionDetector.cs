@@ -96,9 +96,6 @@ namespace Leap.Unity {
 
     private void Awake () {
       watcherCoroutine = palmWatcher();
-      if(HandModel == null){
-        HandModel = gameObject.GetComponentInParent<IHandModel>();
-      }
     }
 
     private void OnEnable () {
