@@ -26,17 +26,18 @@ namespace Leap.Unity.Attributes {
     public void ConstrainValue(SerializedProperty property) {
       if (property.objectReferenceValue != null) return;
       if (component == null) return;
-
-      if (search(AutoFindLocations.Object, component.GetComponent)) return;
-      if (search(AutoFindLocations.Parents, component.GetComponentInParent)) return;
-      if (search(AutoFindLocations.Children, component.GetComponentInChildren)) return;
-      if (search(AutoFindLocations.Scene, UnityEngine.Object.FindObjectOfType)) return;
+      
+      if (search(property, AutoFindLocations.Object, component.GetComponent)) return;
+      if (search(property, AutoFindLocations.Parents, component.GetComponentInParent)) return;
+      if (search(property, AutoFindLocations.Children, component.GetComponentInChildren)) return;
+      if (search(property, AutoFindLocations.Scene, UnityEngine.Object.FindObjectOfType)) return;
     }
 
-    private bool search(AutoFindLocations location, Func<Type, UnityEngine.Object> searchDelegate) {
+    private bool search(SerializedProperty property, AutoFindLocations location,Func<Type, UnityEngine.Object> searchDelegate) {
       if ((_searchLocations & location) != 0) {
         var value = searchDelegate(fieldInfo.FieldType);
         if (value != null) {
+          property.objectReferenceValue = value;
           return true;
         }
       }
