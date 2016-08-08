@@ -11,6 +11,17 @@ namespace Leap.Unity.Attributes {
     private IEnumerable<CombinablePropertyAttribute> attributes {
       get {
         foreach (object o in fieldInfo.GetCustomAttributes(typeof(CombinablePropertyAttribute), true)) {
+          CombinablePropertyAttribute combinableProperty = o as CombinablePropertyAttribute;
+          if (combinableProperty != null) {
+            if (combinableProperty.SupportedTypes.Contains(fieldInfo.FieldType)) {
+              yield return combinableProperty;
+            } else {
+              Debug.LogError("Property attribute " +
+                             combinableProperty.GetType().Name +
+                             " does not support type " +
+                             fieldInfo.FieldType.Name + ".");
+            }
+          }
           yield return o as CombinablePropertyAttribute;
         }
       }
@@ -32,10 +43,8 @@ namespace Leap.Unity.Attributes {
 
       IFullPropertyDrawer fullPropertyDrawer = null;
       foreach (var a in attributes) {
-        if (a is CombinablePropertyAttribute) {
-          (a as CombinablePropertyAttribute).fieldInfo = fieldInfo;
-          (a as CombinablePropertyAttribute).component = attachedComponent;
-        }
+        a.fieldInfo = fieldInfo;
+        a.component = attachedComponent;
 
         if (a is IBeforeLabelAdditiveDrawer) {
           EditorGUIUtility.labelWidth -= (a as IBeforeLabelAdditiveDrawer).GetWidth();

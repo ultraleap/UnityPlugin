@@ -2,7 +2,9 @@
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using System;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Attributes {
 
@@ -39,5 +41,12 @@ namespace Leap.Unity.Attributes {
   public abstract class CombinablePropertyAttribute : PropertyAttribute {
     public FieldInfo fieldInfo;
     public Component component;
+
+    public virtual IEnumerable<Type> SupportedTypes {
+      get {
+        yield break;
+      }
+      
+    }
   }
 }
