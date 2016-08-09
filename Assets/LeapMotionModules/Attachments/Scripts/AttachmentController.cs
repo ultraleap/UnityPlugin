@@ -101,7 +101,6 @@ namespace Leap.Unity {
     protected virtual void ChangeChildState(){
       if(Transition != null){
         Transition.OnComplete.RemoveListener(ChangeChildState);
-        Transition.OnComplete.RemoveListener(ChangeChildState);
       }
       Transform[] children = GetComponentsInChildren<Transform>(true);
       for(int g = 0; g < children.Length; g++){
