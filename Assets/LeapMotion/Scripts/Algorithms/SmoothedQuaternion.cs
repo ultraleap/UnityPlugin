@@ -1,0 +1,36 @@
+﻿using UnityEngine;
+
+namespace Leap.Unity {
+  /// <summary>
+  /// Time-step independent exponential smoothing.
+  /// </summary>
+  /// <remarks>
+  /// When moving at a constant speed: speed * delay = Value - ExponentialSmoothing.value.
+  /// </remarks>
+  [System.Serializable]
+  public class SmoothedQuaternion {
+    public Quaternion value = Quaternion.identity; // Filtered value
+    public float delay = 0f; // Mean delay
+    public bool reset = true; // Reset on Next Update
+
+    public void SetBlend(float blend, float deltaTime = 1f) {
+      delay = deltaTime * blend / (1f - blend);
+    }
+
+    public Quaternion Update(Quaternion input, float deltaTime = 1f) {
+      if (deltaTime > 0f && !reset) {
+        float alpha = delay / deltaTime;
+        float blend = alpha / (1f + alpha);
+        // NOTE: If delay -> 0 then blend -> 0,
+        // reducing the filter to this.value = value.
+        // NOTE: If deltaTime -> 0 blend -> 1,
+        // so the change in the filtered value will be suppressed
+        value = Quaternion.Slerp(value, input, 1f - blend);
+      } else {
+        value = input;
+        reset = false;
+      }
+      return value;
+    }
+  }
+}
