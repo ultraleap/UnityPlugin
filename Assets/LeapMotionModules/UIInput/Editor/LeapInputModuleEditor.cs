@@ -14,7 +14,10 @@ namespace Leap.Unity.InputModule {
                                "PinchingThreshold",
                                "EnvironmentPointer",
                                "environmentPinch",
-                               "PointerPinchScale");
+                               "PointerPinchScale",
+                               "LeftHandDetector",
+                               "RightHandDetector",
+                               "HoveringColor");
 
       specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || module.InteractionMode == LeapInputModule.InteractionCapability.Tactile,
                                "TactilePadding");

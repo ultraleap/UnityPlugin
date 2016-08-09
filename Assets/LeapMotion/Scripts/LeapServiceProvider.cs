@@ -23,6 +23,12 @@ namespace Leap.Unity {
     [SerializeField]
     protected LeapVRTemporalWarping _temporalWarping;
 
+    [Tooltip("When true, update frames will be re-used for physics.  This is an optimization, since the total number " +
+             "of frames that need to be calculated is halved.  However, this introduces extra latency and inaccuracy " +
+             "into the physics frames.")]
+    [SerializeField]
+    protected bool _reuseFramesForPhysics = false;
+
     [Header("Device Type")]
     [SerializeField]
     protected bool _overrideDeviceType = false;
@@ -68,7 +74,11 @@ namespace Leap.Unity {
 
     public override Frame CurrentFixedFrame {
       get {
-        return _transformedFixedFrame;
+        if (_reuseFramesForPhysics) {
+          return _transformedUpdateFrame;
+        } else {
+          return _transformedFixedFrame;
+        }
       }
     }
 
@@ -144,8 +154,8 @@ namespace Leap.Unity {
     }
 
     public void ReTransformFrames() {
-      _transformedUpdateFrame = getTransformedFrame(_untransformedUpdateFrame);
-      _transformedFixedFrame = getTransformedFrame(_untransformedFixedFrame);
+      transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
+      transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
     }
 
     protected virtual void Awake() {
@@ -157,6 +167,8 @@ namespace Leap.Unity {
       createController();
       _transformedUpdateFrame = new Frame();
       _transformedFixedFrame = new Frame();
+      _untransformedUpdateFrame = new Frame();
+      _untransformedFixedFrame = new Frame();
       StartCoroutine(waitCoroutine());
     }
 
@@ -185,31 +197,36 @@ namespace Leap.Unity {
         Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
         Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
 
-        _untransformedUpdateFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
+        leap_controller_.GetInterpolatedFrame(_untransformedUpdateFrame, leapFrameTime);
       } else {
-        _untransformedUpdateFrame = leap_controller_.Frame();
+        leap_controller_.Frame(_untransformedUpdateFrame);
       }
 
       if (_untransformedUpdateFrame != null) {
-        _transformedUpdateFrame = getTransformedFrame(_untransformedUpdateFrame);
+        transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
 
         DispatchUpdateFrameEvent(_transformedUpdateFrame);
       }
     }
 
     protected virtual void FixedUpdate() {
+      if (_reuseFramesForPhysics) {
+        DispatchFixedFrameEvent(_transformedUpdateFrame);
+        return;
+      }
+
       if (_useInterpolation) {
         Int64 unityTime = (Int64)((Time.fixedTime + _fixedOffset.value) * 1e6);
         Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
         Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
 
-        _untransformedFixedFrame = leap_controller_.GetInterpolatedFrame(leapFrameTime);
+        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, leapFrameTime);
       } else {
-        _untransformedFixedFrame = leap_controller_.Frame();
+        leap_controller_.Frame(_untransformedFixedFrame);
       }
 
       if (_untransformedFixedFrame != null) {
-        _transformedFixedFrame = getTransformedFrame(_untransformedFixedFrame);
+        transformFrame(_untransformedFixedFrame, _transformedFixedFrame);
 
         DispatchFixedFrameEvent(_transformedFixedFrame);
       }
@@ -280,7 +297,7 @@ namespace Leap.Unity {
       leap_controller_.Device -= onHandControllerConnect;
     }
 
-    protected Frame getTransformedFrame(Frame source) {
+    protected void transformFrame(Frame source, Frame dest) {
       LeapTransform leapTransform;
       if (_temporalWarping != null) {
         Vector3 warpedPosition;
@@ -295,7 +312,7 @@ namespace Leap.Unity {
         leapTransform = transform.GetLeapMatrix();
       }
 
-      return source.TransformedCopy(leapTransform);
+      dest.CopyFrom(source).Transform(leapTransform);
     }
   }
 }
