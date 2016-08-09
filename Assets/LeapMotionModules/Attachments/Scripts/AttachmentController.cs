@@ -26,8 +26,15 @@ namespace Leap.Unity {
      * Reports whether this attachment is in an activated state or not.
      *  @since 4.1.1
      */
-    public bool IsActive = false;
-
+    public bool IsActive {
+      get {
+        return _isActive;
+      }
+      set {
+        _isActive = value;
+      }
+    }
+    private bool _isActive = false;
     /**
     * Activate child objects when the attachment is enabled.
     * When true, attached objects are enabled and activated when the 

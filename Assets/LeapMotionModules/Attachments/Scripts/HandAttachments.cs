@@ -159,8 +159,10 @@ namespace Leap.Unity{
       Debug.DrawLine(hand.Arm.ElbowPosition.ToVector3(), hand.Arm.WristPosition.ToVector3(), Color.red); //Arm
       Debug.DrawLine(hand.WristPosition.ToVector3(), hand.PalmPosition.ToVector3(), Color.white); //Wrist to palm line
       Debug.DrawLine(hand.PalmPosition.ToVector3(), (hand.PalmPosition + hand.PalmNormal * hand.PalmWidth / 2).ToVector3(), Color.black); //Hand Normal
-      DrawBasis(PinchPoint.position, PinchPoint.GetLeapMatrix(), .01f); //Pinch basis
-      DrawBasis(GrabPoint.position, GrabPoint.GetLeapMatrix(), .01f); //Grab basis
+      if(PinchPoint != null)
+        DrawBasis(PinchPoint.position, PinchPoint.GetLeapMatrix(), .01f); //Pinch basis
+      if(GrabPoint != null)
+        DrawBasis(GrabPoint.position, GrabPoint.GetLeapMatrix(), .01f); //Grab basis
 
       for (int f = 0; f < 5; f++) { //Fingers
         Finger finger = hand.Fingers[f];
