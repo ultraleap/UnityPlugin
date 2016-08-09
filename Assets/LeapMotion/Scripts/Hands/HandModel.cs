@@ -28,7 +28,6 @@ namespace Leap.Unity{
       get { return handedness; }
       set { handedness = value; }
     }
-    public override bool SupportsEditorPersistence() { return true; }
 
     private ModelType handModelType;
     public override abstract ModelType HandModelType {
