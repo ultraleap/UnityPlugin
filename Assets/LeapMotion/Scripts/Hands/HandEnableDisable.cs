@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 using Leap;
 
 namespace Leap.Unity{
@@ -11,11 +12,21 @@ namespace Leap.Unity{
 
   	protected override void HandReset() {
       gameObject.SetActive(true);
+    }
+
+    protected override void HandFinish () {
+      StopAllCoroutines();
+      try {
+        StartCoroutine(changeStateNextTick(false));
+      } catch (Exception e) {
+        gameObject.SetActive(false);
+      }
   	}
-  
-  	protected override void HandFinish () {
-  		gameObject.SetActive(false);
-  	}
-  	
+
+    /** Let child objects finish hierarchy modifications. */
+    private IEnumerator changeStateNextTick(bool state) {
+      yield return null;
+      gameObject.SetActive(state);
+    }
   }
 }

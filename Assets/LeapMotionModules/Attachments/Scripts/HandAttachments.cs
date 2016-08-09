@@ -25,22 +25,33 @@ namespace Leap.Unity{
   public class HandAttachments : IHandModel {
   
     /** The palm of the hand. */
+    [Tooltip("The palm of the hand.")]
     public Transform Palm;
-    /** The center of the arm. */
+    /** The center of the forearm. */
+    [Tooltip("The center of the forearm.")]
     public Transform Arm;
     /** The tip of the thumb. */
+    [Tooltip("The tip of the thumb.")]
     public Transform Thumb;
     /** The point midway between the thumb and index finger tips.*/
+    [Tooltip("The pont between the thumb and index finger.")]
     public Transform PinchPoint;
     /** The tip of the index finger. */
+    [Tooltip("The tip of the index finger.")]
     public Transform Index;
     /** The tip of the middle finger. */
+    [Tooltip("The tip of the middle finger.")]
     public Transform Middle;
     /** The tip of the ring finger. */
+    [Tooltip("The tip of the ring finger.")]
     public Transform Ring;
     /** The tip of the pinky finger. */
+    [Tooltip("The tip of the little finger.")]
     public Transform Pinky;
-  
+    /** The point midway between the finger tips. */
+    [Tooltip("The point midway between the finger tips.")]
+    public Transform GrabPoint;
+
     private Hand _hand;
   
     public override ModelType HandModelType {
@@ -49,6 +60,7 @@ namespace Leap.Unity{
       }
     }
   
+    [Tooltip("Whether to use this for right or left hands")]
     [SerializeField]
     private Chirality _handedness;
 
@@ -60,6 +72,7 @@ namespace Leap.Unity{
       get {
         return _handedness;
       }
+      set { }
     }
   
     public override void SetLeapHand(Hand hand) {
@@ -100,13 +113,68 @@ namespace Leap.Unity{
         Pinky.position = _hand.Fingers[4].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToVector3();
         Pinky.rotation = _hand.Fingers[4].Bone(Bone.BoneType.TYPE_DISTAL).Rotation.ToQuaternion();
       }
-      if(PinchPoint != null){
+      if (PinchPoint != null) {
         Vector thumbTip = _hand.Fingers[0].TipPosition;
         Vector indexTip = _hand.Fingers[1].TipPosition;
         Vector pinchPoint = Vector.Lerp(thumbTip, indexTip, 0.5f);
         PinchPoint.position = pinchPoint.ToVector3();
-        PinchPoint.rotation = _hand.Rotation.ToQuaternion();
+
+        Vector forward = pinchPoint - _hand.Fingers[1].Bone(Bone.BoneType.TYPE_PROXIMAL).PrevJoint;
+        Vector up = _hand.Fingers[1].Bone(Bone.BoneType.TYPE_PROXIMAL).Direction.Cross(forward);
+        PinchPoint.rotation = Quaternion.LookRotation(forward.ToVector3(), up.ToVector3());
       }
+      if (GrabPoint != null) {
+        var fingers = _hand.Fingers;
+        Vector3 GrabCenter = _hand.WristPosition.ToVector3();
+        Vector3 GrabForward = Vector3.zero;
+        for (int i = 0; i < fingers.Count; i++) {
+          Finger finger = fingers[i];
+          GrabCenter += finger.TipPosition.ToVector3();
+          if (i > 0) { //don't include thumb
+            GrabForward += finger.TipPosition.ToVector3();
+          }
+        }
+        GrabPoint.position = GrabCenter / 6.0f; //average between wrist and fingertips
+        GrabForward = (GrabForward / 4 - _hand.WristPosition.ToVector3()).normalized;
+        Vector3 thumbToPinky = fingers[0].TipPosition.ToVector3() - fingers[4].TipPosition.ToVector3();
+        Vector3 GrabNormal = Vector3.Cross(GrabForward, thumbToPinky).normalized;
+        GrabPoint.rotation = Quaternion.LookRotation(GrabForward, GrabNormal);
+      }
+    }
+
+    public override bool SupportsEditorPersistence() { return true; }
+
+    private void OnDrawGizmos() {
+      DrawDebugLines();
+    }
+
+    /** The colors used for each bone. */
+    protected Color[] colors = { Color.gray, Color.yellow, Color.cyan, Color.magenta };
+
+    /**
+    * Draws lines from elbow to wrist, wrist to palm, and normal to the palm.
+    */
+    protected void DrawDebugLines() {
+      Hand hand = GetLeapHand();
+      Debug.DrawLine(hand.Arm.ElbowPosition.ToVector3(), hand.Arm.WristPosition.ToVector3(), Color.red); //Arm
+      Debug.DrawLine(hand.WristPosition.ToVector3(), hand.PalmPosition.ToVector3(), Color.white); //Wrist to palm line
+      Debug.DrawLine(hand.PalmPosition.ToVector3(), (hand.PalmPosition + hand.PalmNormal * hand.PalmWidth / 2).ToVector3(), Color.black); //Hand Normal
+      DrawBasis(PinchPoint.position, PinchPoint.GetLeapMatrix(), .01f); //Pinch basis
+      DrawBasis(GrabPoint.position, GrabPoint.GetLeapMatrix(), .01f); //Grab basis
+
+      for (int f = 0; f < 5; f++) { //Fingers
+        Finger finger = hand.Fingers[f];
+        for (int i = 0; i < 4; ++i) {
+          Bone bone = finger.Bone((Bone.BoneType)i);
+          Debug.DrawLine(bone.PrevJoint.ToVector3(), bone.PrevJoint.ToVector3() + bone.Direction.ToVector3() * bone.Length, colors[i]);
+        }
+      }
+    }
+
+    public void DrawBasis(Vector3 origin, LeapTransform basis, float scale) {
+      Debug.DrawLine(origin, origin + basis.xBasis.ToVector3() * scale, Color.red);
+      Debug.DrawLine(origin, origin + basis.yBasis.ToVector3() * scale, Color.green);
+      Debug.DrawLine(origin, origin + basis.zBasis.ToVector3() * scale, Color.blue);
     }
   }
 }

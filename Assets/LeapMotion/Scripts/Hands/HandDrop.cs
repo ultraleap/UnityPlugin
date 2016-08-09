@@ -26,7 +26,7 @@ namespace Leap.Unity {
     private IEnumerator LerpToStart() {
       Vector3 droppedPosition = palm.localPosition;
       Quaternion droppedOrientation = palm.localRotation;
-      float duration = 1.0f;
+      float duration = .25f;
       float startTime = Time.time;
       float endTime = startTime + duration;
 

@@ -5,7 +5,9 @@ using Leap;
 
 namespace Leap.Unity{
   public class MinimalHand : IHandModel {
-  
+    public override bool SupportsEditorPersistence() {
+      return true;
+    }
     [SerializeField]
     private Mesh _palmMesh;
   
@@ -32,6 +34,7 @@ namespace Leap.Unity{
       get {
         return Chirality.Either;
       }
+      set { }
     }
   
     public override ModelType HandModelType {

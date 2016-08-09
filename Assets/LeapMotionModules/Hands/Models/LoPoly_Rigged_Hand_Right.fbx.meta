@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 2ba3b0e75be6e104ab1fb5ee56bda5a9
+guid: ce6112dd14179d448958c91c5b4e8de2
 timeCreated: 1459814087
 licenseType: Free
 ModelImporter:
@@ -65,13 +65,13 @@ ModelImporter:
     9500000: //RootNode
     13700000: LoPoly_Hand_Mesh_Right
   materials:
-    importMaterials: 1
+    importMaterials: 0
     materialName: 1
     materialSearch: 1
   animations:
     legacyGenerateAnimations: 4
     bakeSimulation: 0
-    resampleRotations: 1
+    resampleCurves: 1
     optimizeGameObjects: 0
     motionNodeName: 
     animationImportErrors: 
@@ -105,8 +105,8 @@ ModelImporter:
     useFileScale: 1
   tangentSpace:
     normalSmoothAngle: 162
-    normalImportMode: 1
-    tangentImportMode: 3
+    normalImportMode: 0
+    tangentImportMode: 0
   importAnimation: 1
   copyAvatar: 0
   humanDescription:

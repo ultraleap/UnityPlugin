@@ -124,7 +124,7 @@ namespace Leap.Unity {
           hand = HandModel.GetLeapHand();
           if(hand != null){
             targetDirection = selectedDirection(hand.Fingers[selectedFinger].TipPosition.ToVector3());
-            fingerDirection = hand.Fingers[selectedFinger].Direction.ToVector3();
+            fingerDirection = hand.Fingers[selectedFinger].Bone(Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
             float angleTo = Vector3.Angle(fingerDirection, targetDirection);
             if(HandModel.IsTracked && angleTo <= OnAngle){
               Activate();
@@ -182,8 +182,9 @@ namespace Leap.Unity {
           innerColor = Color.blue;
         }
         Finger finger = HandModel.GetLeapHand().Fingers[selectedFingerOrdinal()];
-        Utils.DrawCone(finger.TipPosition.ToVector3(), finger.Direction.ToVector3(), OnAngle, finger.Length, innerColor);
-        Utils.DrawCone(finger.TipPosition.ToVector3(), finger.Direction.ToVector3(), OffAngle, finger.Length, Color.red);
+        Vector3 fingerDirection = finger.Bone(Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
+        Utils.DrawCone(finger.TipPosition.ToVector3(), fingerDirection, OnAngle, finger.Length, innerColor);
+        Utils.DrawCone(finger.TipPosition.ToVector3(), fingerDirection, OffAngle, finger.Length, Color.red);
         Debug.DrawRay(finger.TipPosition.ToVector3(), selectedDirection(finger.TipPosition.ToVector3()), Color.grey);
       }
     }

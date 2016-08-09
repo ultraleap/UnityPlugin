@@ -67,6 +67,30 @@ namespace Leap.Unity {
         thisPoint = nextPoint;
       }
     }
+    public static void DrawArcArb(float start, float arc,
+                           Vector3 center,
+                           Vector3 forward,
+                           Vector3 normal,
+                           float radius,
+                           Color color,
+                           int quality = 32,
+                           float duration = 0,
+                           bool depthTest = true) {
+
+      Vector3 right = Vector3.Cross(normal, forward).normalized;
+      float deltaAngle = arc / quality;
+      Vector3 thisPoint = center + forward * radius;
+      Vector3 nextPoint = new Vector3();
+      for (float angle = start; Mathf.Abs(angle + start) <= Mathf.Abs(arc); angle += deltaAngle) {
+        float cosAngle = Mathf.Cos(angle * Constants.DEG_TO_RAD);
+        float sinAngle = Mathf.Sin(angle * Constants.DEG_TO_RAD);
+        nextPoint.x = center.x + radius * (cosAngle * forward.x + sinAngle * right.x);
+        nextPoint.y = center.y + radius * (cosAngle * forward.y + sinAngle * right.y);
+        nextPoint.z = center.z + radius * (cosAngle * forward.z + sinAngle * right.z);
+        Debug.DrawLine(thisPoint, nextPoint, color, duration, depthTest);
+        thisPoint = nextPoint;
+      }
+    }
 
     public static void DrawCone(Vector3 origin, 
                            Vector3 direction, 
