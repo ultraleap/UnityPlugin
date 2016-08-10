@@ -13,16 +13,16 @@ SceneSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 6
+  serializedVersion: 7
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.13356, g: 0.14300999, b: 0.16317, a: 0.63}
-  m_AmbientEquatorColor: {r: 0.07182, g: 0.07875, b: 0.08379, a: 0.63}
-  m_AmbientGroundColor: {r: 0.029609999, g: 0.02709, b: 0.02205, a: 0.63}
+  m_AmbientSkyColor: {r: 0.084142804, g: 0.090096295, b: 0.1027971, a: 0.3969}
+  m_AmbientEquatorColor: {r: 0.045246597, g: 0.0496125, b: 0.0527877, a: 0.3969}
+  m_AmbientGroundColor: {r: 0.0186543, g: 0.0170667, b: 0.0138915, a: 0.3969}
   m_AmbientIntensity: 0.63
   m_AmbientMode: 0
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
@@ -37,12 +37,12 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
+  m_IndirectSpecularColor: {r: 0.28158227, g: 0.31283337, b: 0.3613446, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 6
+  serializedVersion: 7
   m_GIWorkflowMode: 0
-  m_LightmapsMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -53,17 +53,22 @@ LightmapSettings:
     m_EnableBakedLightmaps: 1
     m_EnableRealtimeLightmaps: 1
   m_LightmapEditorSettings:
-    serializedVersion: 3
+    serializedVersion: 4
     m_Resolution: 2
     m_BakeResolution: 40
     m_TextureWidth: 1024
     m_TextureHeight: 1024
+    m_AO: 0
     m_AOMaxDistance: 1
-    m_Padding: 2
     m_CompAOExponent: 0
+    m_CompAOExponentDirect: 0
+    m_Padding: 2
     m_LightmapParameters: {fileID: 0}
+    m_LightmapsBakeMode: 1
     m_TextureCompression: 1
+    m_DirectLightInLightProbes: 1
     m_FinalGather: 0
+    m_FinalGatherFiltering: 1
     m_FinalGatherRayCount: 1024
     m_ReflectionCompression: 2
   m_LightingDataAsset: {fileID: 0}
@@ -140,6 +145,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isHeadMounted: 1
   _temporalWarping: {fileID: 1928180895}
+  _reuseFramesForPhysics: 0
   _overrideDeviceType: 1
   _overrideDeviceTypeWith: 1
   _useInterpolation: 0
@@ -510,17 +516,20 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 0584718ba366d46a994848f1796a90ea, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
   m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_SelectedWireframeHidden: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -889,7 +898,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  HandModel: {fileID: 0}
+  HandModel: {fileID: 1545945338}
   FingerName: 0
   PointingDirection: {x: 0, y: 1, z: 0}
   PointingType: 2
@@ -919,12 +928,14 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  HandModel: {fileID: 0}
+  HandModel: {fileID: 1545945338}
   Thumb: 0
   Index: 1
   Middle: 1
   Ring: 1
   Pinky: 1
+  MinimumExtendedCount: 1
+  MaximumExtendedCount: 1
 --- !u!114 &687963585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1032,7 +1043,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  HandModel: {fileID: 0}
+  HandModel: {fileID: 1545945338}
   FingerName: 1
   PointingDirection: {x: 0, y: 0, z: 1}
   PointingType: 3
@@ -1273,12 +1284,14 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  HandModel: {fileID: 0}
+  HandModel: {fileID: 1061438465}
   Thumb: 0
   Index: 1
   Middle: 1
   Ring: 1
   Pinky: 1
+  MinimumExtendedCount: 1
+  MaximumExtendedCount: 1
 --- !u!114 &1101896909
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1302,7 +1315,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  HandModel: {fileID: 0}
+  HandModel: {fileID: 1061438465}
   FingerName: 0
   PointingDirection: {x: 0, y: 1, z: 0}
   PointingType: 2
@@ -1416,7 +1429,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  HandModel: {fileID: 0}
+  HandModel: {fileID: 1061438465}
   FingerName: 1
   PointingDirection: {x: 0, y: 0, z: 1}
   PointingType: 3
@@ -1694,7 +1707,7 @@ Light:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1433044063}
   m_Enabled: 1
-  serializedVersion: 6
+  serializedVersion: 7
   m_Type: 1
   m_Color: {r: 1, g: 0.821518, b: 0.547, a: 1}
   m_Intensity: 0.67
@@ -1704,6 +1717,7 @@ Light:
   m_Shadows:
     m_Type: 2
     m_Resolution: -1
+    m_CustomResolution: -1
     m_Strength: 1
     m_Bias: 0.05
     m_NormalBias: 0.4
@@ -1716,10 +1730,10 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_Lightmapping: 4
+  m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
-  m_AreaSize: {x: 1, y: 1}
 --- !u!1 &1478378567
 GameObject:
   m_ObjectHideFlags: 0
@@ -1887,17 +1901,20 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 66e97fbc349a749c6be1f12a1f6283b1, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
   m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_SelectedWireframeHidden: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -2205,7 +2222,7 @@ Light:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1966885502}
   m_Enabled: 1
-  serializedVersion: 6
+  serializedVersion: 7
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
   m_Intensity: 0.73
@@ -2215,6 +2232,7 @@ Light:
   m_Shadows:
     m_Type: 2
     m_Resolution: -1
+    m_CustomResolution: -1
     m_Strength: 1
     m_Bias: 0.05
     m_NormalBias: 0.4
@@ -2227,10 +2245,10 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_Lightmapping: 4
+  m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
-  m_AreaSize: {x: 1, y: 1}
 --- !u!4 &1966885504
 Transform:
   m_ObjectHideFlags: 0
@@ -2284,17 +2302,20 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 75ac83db1cec6459382f15d263a76c5f, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
   m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_SelectedWireframeHidden: 0
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89

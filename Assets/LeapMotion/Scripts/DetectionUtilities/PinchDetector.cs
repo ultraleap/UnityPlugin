@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
 
@@ -15,8 +16,23 @@ namespace Leap.Unity {
     public bool DidStartPinch { get { return this.DidStartHold; } }
     public bool DidEndPinch { get { return this.DidRelease; } }
 
-    public float relaxDeltaDistance = .005f; //meters
     private float _lastActiveDistance;
+
+    [MinValue(0)]
+    [SerializeField]
+    protected float _activatePinchDist = 0.03f;
+
+    [MinValue(0)]
+    [SerializeField]
+    protected float _deactivatePinchDist = 0.04f;
+
+    protected bool _isPinching = false;
+
+    protected float _lastPinchTime = 0.0f;
+    protected float _lastUnpinchTime = 0.0f;
+
+    protected Vector3 _pinchPos;
+    protected Quaternion _pinchRotation;
 
     protected virtual void OnValidate() {
       ActivateDistance = Mathf.Max(0, ActivateDistance);
@@ -48,7 +64,7 @@ namespace Leap.Unity {
       _position = ((hand.Fingers[0].TipPosition + hand.Fingers[1].TipPosition) * .5f).ToVector3();
 
       if (IsActive) {
-        if (_distance > DeactivateDistance || Mathf.Abs(_lastActiveDistance - _distance) > relaxDeltaDistance) {
+        if (_distance > DeactivateDistance) {
           changeState(false);
           //return;
         }

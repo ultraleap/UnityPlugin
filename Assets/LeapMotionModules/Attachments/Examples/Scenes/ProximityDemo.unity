@@ -645,7 +645,8 @@ MonoBehaviour:
   ControlsTransform: 1
   ActivateDistance: 0.03
   DeactivateDistance: 0.04
-  relaxDeltaDistance: 0.005
+  _activatePinchDist: 0.03
+  _deactivatePinchDist: 0.04
 --- !u!114 &427298639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3181,7 +3182,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  HandModel: {fileID: 0}
+  HandModel: {fileID: 540169376}
   Thumb: 0
   Index: 0
   Middle: 1
@@ -3525,7 +3526,7 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   Period: 0.1
-  HandModel: {fileID: 0}
+  HandModel: {fileID: 375805477}
   Thumb: 0
   Index: 0
   Middle: 1
@@ -3873,7 +3874,8 @@ MonoBehaviour:
   ControlsTransform: 1
   ActivateDistance: 0.03
   DeactivateDistance: 0.04
-  relaxDeltaDistance: 0.005
+  _activatePinchDist: 0.03
+  _deactivatePinchDist: 0.04
 --- !u!114 &1232644032
 MonoBehaviour:
   m_ObjectHideFlags: 0

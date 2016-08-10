@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
-using Leap;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity { 
 
@@ -15,6 +14,7 @@ namespace Leap.Unity {
     /** Implementations must implement this method. */
     protected abstract void ensureUpToDate();
 
+    [AutoFind(AutoFindLocations.Parents)]
     [SerializeField]
     protected IHandModel _handModel;
     public IHandModel HandModel { get { return _handModel; } set { _handModel = value; } }

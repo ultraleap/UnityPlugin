@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -10,11 +11,6 @@ namespace Leap.Unity.Attributes {
 
 #if UNITY_EDITOR
     public void Draw(Rect rect, SerializedProperty property) {
-      if (property.propertyType != SerializedPropertyType.Integer) {
-        Debug.LogWarning("Cannot use Incrementable for a field type other than Int!");
-        return;
-      }
-
       rect.width = BUTTON_WIDTH;
 
       if (GUI.Button(rect, "-")) {
@@ -30,6 +26,12 @@ namespace Leap.Unity.Attributes {
 
     public float GetWidth() {
       return BUTTON_WIDTH * 2;
+    }
+
+    public override IEnumerable<SerializedPropertyType> SupportedTypes {
+      get {
+        yield return SerializedPropertyType.Integer;
+      }
     }
 #endif
   }
