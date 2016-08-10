@@ -29,19 +29,21 @@ namespace Leap.Unity{
   */
   [ExecuteInEditMode]
   public class Transition : MonoBehaviour {
-  
+
     /**
     * Specifies whether to animate position.
     * The position of the Transition game object is animated. Any child objects maintain their
     * respective local positions relative to the transition object.
     * @since 4.1.3
     */
+    [Tooltip("Whether to animate position")]
     public bool AnimatePosition = false;
 
     /**
     * The position of the transition object in the fully transitioned (out) state.
     * @since 4.1.3
     */
+    [Tooltip("Position before in transition and after an out transition")]
     public Vector3 OutPosition = Vector3.zero;
 
     /**
@@ -49,6 +51,7 @@ namespace Leap.Unity{
     * A curve value of 1 is fully transitioned off. A curve value of 0 is the on state (the transition settings have no influence on position).
     * @since 4.1.3
     */
+    [Tooltip("Easing curve for position transitions. [-1,0] is in transition; [0,+1] is out transition.")]
     public AnimationCurve PositionCurve = new AnimationCurve(new Keyframe(-1,1), new Keyframe(0,0), new Keyframe(1,1));
 
     /**
@@ -57,13 +60,14 @@ namespace Leap.Unity{
     * respective local rotations relative to the transition object.
     * @since 4.1.3
     */
+    [Tooltip("Whether to animate rotation")]
     public bool AnimateRotation = false;
 
     /**
     * The rotation of the transition object in the fully transitioned (out) state.
     * @since 4.1.3
     */
-    //public Vector3 OutRotation = Vector3.zero;
+    [Tooltip("Rotation before an in transition and after an out transition.")]
     public Quaternion OutRotation = Quaternion.identity;
 
     /**
@@ -71,6 +75,7 @@ namespace Leap.Unity{
     * A curve value of 1 is fully transitioned off. A curve value of 0 is the on state (the transition settings have no influence on rotation).
     * @since 4.1.3
     */
+    [Tooltip("Easing curve for rotation transitions. [-1,0] is in transition; [0,+1] is out transition.")]
     public AnimationCurve RotationCurve = new AnimationCurve(new Keyframe(-1, 1), new Keyframe(0, 0), new Keyframe(1, 1));
 
     /**
@@ -79,12 +84,14 @@ namespace Leap.Unity{
     * respective local scale relative to the transition object.
     * @since 4.1.3
     */
+    [Tooltip("Whether to animate scale.")]
     public bool AnimateScale = false;
 
     /**
     * The scale of the transition object in the fully transitioned (out) state.
     * @since 4.1.3
     */
+    [Tooltip("Scale before an in transition and after an out transition.")]
     public Vector3 OutScale = Vector3.one;
 
     /**
@@ -92,6 +99,7 @@ namespace Leap.Unity{
     * A curve value of 1 is fully transitioned off. A curve value of 0 is the on state (the transition settings have no influence on scale).
     * @since 4.1.3
     */
+    [Tooltip("Easing curve for scale transitions. [-1,0] is in transition; [0,+1] is out transition.")]
     public AnimationCurve ScaleCurve = new AnimationCurve(new Keyframe(-1, 1), new Keyframe(0, 0), new Keyframe(1, 1));
 
     /**
@@ -103,6 +111,7 @@ namespace Leap.Unity{
     * changes in alpha to be rendered. Other shaders may have their own requirements.
     * @since 4.1.3
     */
+    [Tooltip("Whether to animate color")]
     public bool AnimateColor = false;
 
     /**
@@ -114,6 +123,7 @@ namespace Leap.Unity{
     * All objects whose color you wish to animate must use the same color name. 
     * @since 4.1.3
     */
+    [Tooltip("The name of the shader property controlling object color")]
     public string ColorShaderPropertyName = "_Color";
 
     /**
@@ -121,6 +131,7 @@ namespace Leap.Unity{
     * The color is applied to the shader property specified by ColorShaderPropertyName variable.
     * @since 4.1.3
     */
+    [Tooltip("Color before an in transition and after an out transition.")]
     public Color OutColor = Color.black;
 
     /**
@@ -128,20 +139,23 @@ namespace Leap.Unity{
     * A curve value of 1 is fully transitioned off. A curve value of 0 is the on state (the transition settings have no influence on color).
     * @since 4.1.3
     */
+    [Tooltip("Easing curve for color transitions. [-1,0] is in transition; [0,+1] is out transition.")]
     public AnimationCurve ColorCurve = new AnimationCurve(new Keyframe(-1, 1), new Keyframe(0, 0), new Keyframe(1, 1));
 
     /**
     * The duration of the transition in seconds.
     * @since 4.1.3
     */
+    [Tooltip("Length of transition in seconds")]
     [Range(.001f, 2.0f)]
     public float Duration = 0.5f; //seconds
-    
+
     /**
     * A value used in edit mode to simulate the transition.
     * Change the value to observe how the transition will look when played.
     * @since 4.1.3
     */
+    [Tooltip("Simulates transition in edit mode")]
     [Range (-1, 1)]
     public float Simulate = 0.0f;
     
@@ -155,6 +169,7 @@ namespace Leap.Unity{
     * Dispatched when a transition is complete.
     * @since 4.1.3
     */
+    [Tooltip("Dispatched when a transition is finished")]
     public UnityEvent OnComplete;
 
     /**
@@ -163,6 +178,7 @@ namespace Leap.Unity{
     * for an out transition.
     * @since 4.1.4
     */
+    [Tooltip("Dispatched each frame during a transition")]
     public AnimationStepEvent OnAnimationStep;
 
 #if UNITY_EDITOR

@@ -65,8 +65,8 @@ namespace Leap.Unity{
     private Chirality _handedness;
 
     /** 
-     * Restrict this set of attachments to one hand or another. Set to
-     * Either if the attachment object can be used for both hands.
+     * Whether to use this for right or left hands.
+     * @since 4.1.1
      */
     public override Chirality Handedness {
       get {
@@ -153,6 +153,7 @@ namespace Leap.Unity{
 
     /**
     * Draws lines from elbow to wrist, wrist to palm, and normal to the palm.
+    * Also draws the orthogonal basis vectors for the pinch and grab points.
     */
     protected void DrawDebugLines() {
       Hand hand = GetLeapHand();
