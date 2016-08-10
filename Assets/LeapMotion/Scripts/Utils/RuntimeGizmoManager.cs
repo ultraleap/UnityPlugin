@@ -478,6 +478,16 @@ namespace Leap.Unity.RuntimeGizmos {
       DrawWireMesh(wireSphereMesh, center, Quaternion.identity, Vector3.one * radius * 2);
     }
 
+    /// <summary>
+    /// Draws a wire gizmo circle at the given position, with the given normal and radius.
+    /// </summary>
+    public void DrawWireCirlce(Vector3 center, Vector3 direction, float radius) {
+      PushMatrix();
+      matrix = Matrix4x4.TRS(center, Quaternion.LookRotation(direction), new Vector3(1, 1, 0)) * matrix;
+      DrawWireSphere(Vector3.zero, radius);
+      PopMatrix();
+    }
+
     private List<Collider> _colliderList = new List<Collider>();
     public void DrawColliders(GameObject gameObject, bool useWireframe = true, bool traverseHierarchy = true) {
       PushMatrix();
