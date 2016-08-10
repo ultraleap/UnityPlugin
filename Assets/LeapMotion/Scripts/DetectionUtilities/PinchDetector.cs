@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
 
@@ -9,12 +10,15 @@ namespace Leap.Unity {
   public class PinchDetector : Detector {
     protected const float MM_TO_M = 0.001f;
 
+    [AutoFind(AutoFindLocations.Parents)]
     [SerializeField]
     protected IHandModel _handModel;
 
+    [MinValue(0)]
     [SerializeField]
     protected float _activatePinchDist = 0.03f;
 
+    [MinValue(0)]
     [SerializeField]
     protected float _deactivatePinchDist = 0.04f;
 

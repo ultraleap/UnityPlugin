@@ -8,25 +8,45 @@ namespace Leap.Unity.Attributes {
   [CustomPropertyDrawer(typeof(CombinablePropertyAttribute), true)]
   public class CombinablePropertyDrawer : PropertyDrawer {
 
-    private IEnumerable<CombinablePropertyAttribute> attributes {
-      get {
-        foreach (object o in fieldInfo.GetCustomAttributes(typeof(CombinablePropertyAttribute), true)) {
-          yield return o as CombinablePropertyAttribute;
+    private List<CombinablePropertyAttribute> attributes = new List<CombinablePropertyAttribute>();
+    private void getAtrributes(SerializedProperty property) {
+      attributes.Clear();
+      foreach (object o in fieldInfo.GetCustomAttributes(typeof(CombinablePropertyAttribute), true)) {
+        CombinablePropertyAttribute combinableProperty = o as CombinablePropertyAttribute;
+        if (combinableProperty != null) {
+          if (combinableProperty.SupportedTypes.Count() != 0 && !combinableProperty.SupportedTypes.Contains(property.propertyType)) {
+            Debug.LogError("Property attribute " + 
+                           combinableProperty.GetType().Name + 
+                           " does not support property type " + 
+                           property.propertyType + ".");
+            continue;
+          }
+          attributes.Add(combinableProperty);
         }
       }
     }
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+      getAtrributes(property);
+
       float defaultLabelWidth = EditorGUIUtility.labelWidth;
       float fieldWidth = position.width - EditorGUIUtility.labelWidth;
 
       bool canUseDefaultDrawer = true;
       bool shouldDisable = false;
 
+      Component attachedComponent = null;
+      if (!property.serializedObject.isEditingMultipleObjects) {
+        attachedComponent = property.serializedObject.targetObject as Component;
+      }
+
       RangeAttribute rangeAttribute = fieldInfo.GetCustomAttributes(typeof(RangeAttribute), true).FirstOrDefault() as RangeAttribute;
 
       IFullPropertyDrawer fullPropertyDrawer = null;
       foreach (var a in attributes) {
+        a.fieldInfo = fieldInfo;
+        a.component = attachedComponent;
+
         if (a is IBeforeLabelAdditiveDrawer) {
           EditorGUIUtility.labelWidth -= (a as IBeforeLabelAdditiveDrawer).GetWidth();
         }
