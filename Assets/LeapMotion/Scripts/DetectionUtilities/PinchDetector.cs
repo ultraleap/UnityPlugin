@@ -82,8 +82,8 @@ namespace Leap.Unity {
         _lastNormal = _normal;
       }
       if (ControlsTransform) {
-        transform.position = _lastPosition;
-        transform.rotation = _lastRotation;
+        transform.position = _position;
+        transform.rotation = _rotation;
       }
       _lastActiveDistance = _distance;
     }
