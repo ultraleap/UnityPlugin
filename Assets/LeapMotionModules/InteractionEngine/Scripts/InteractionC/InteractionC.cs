@@ -469,30 +469,26 @@ namespace Leap.Unity.Interaction.CApi {
                                                            out IntPtr ppLineBuffer);
 
     public static ReturnStatus GetDebugLines(ref INTERACTION_SCENE scene,
-                                             out UInt32 nLines,
-                                             out IntPtr ppLineBuffer) {
-      var rs = LeapIEGetDebugLines(ref scene, out nLines, out ppLineBuffer);
-      Logger.HandleReturnStatus(scene, "Get Debug Lines", LogLevel.AllCalls, rs);
-      return rs;
-    }
-
-    public static void DrawDebugLines(ref INTERACTION_SCENE scene) {
-      UInt32 lines;
+                                                 List<INTERACTION_DEBUG_LINE> lines) {
+      UInt32 lineCount;
       IntPtr arrayPtr;
-      GetDebugLines(ref scene, out lines, out arrayPtr);
+      var rs = LeapIEGetDebugLines(ref scene, out lineCount, out arrayPtr);
 
-      for (int i = 0; i < lines; i++) {
+      lines.Clear();
+      for (int i = 0; i < lineCount; i++) {
         INTERACTION_DEBUG_LINE line;
         StructMarshal<INTERACTION_DEBUG_LINE>.ArrayElementToStruct(arrayPtr, i, out line);
-        line.Draw();
+        lines.Add(line);
       }
+
+      return rs;
     }
 
     /*** Get Debug Strings ***/
     [DllImport(DLL_NAME, EntryPoint = "LeapIEGetDebugStrings")]
     private static extern ReturnStatus LeapIEGetDebugStrings(ref INTERACTION_SCENE scene,
-                                                           out UInt32 nStrings,
-                                                           out IntPtr pppStrings);
+                                                             out UInt32 nStrings,
+                                                             out IntPtr pppStrings);
 
     public static ReturnStatus GetDebugStrings(ref INTERACTION_SCENE scene,
                                                    List<string> strings) {
