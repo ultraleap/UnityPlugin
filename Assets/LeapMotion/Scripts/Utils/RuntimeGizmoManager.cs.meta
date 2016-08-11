@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 81dc33a21758b384586807f3656587d1
+timeCreated: 1470438805
+licenseType: Pro
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - _sphereMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  - _gizmoShader: {fileID: 4800000, guid: 309635e4933310a4d98f0e016c806769, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
