@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 using System.Collections;
+using System.Collections.Generic;
 using Leap;
 
 namespace Leap.Unity{
@@ -33,6 +34,20 @@ namespace Leap.Unity{
     public GameObject[] TargetObjects;
 
     /**
+    * Include objects with the specified tag in the list of target objects.
+    * Objects are not added dynamically, however, so objects spawned with the tag will
+    * not be included.
+    * @since 4.1.3
+    */
+    [Tooltip("Objects with this tag are added to the list of targets.")]
+    public string TagName = "";
+
+    [Tooltip("Use a Layer instead of the target list.")]
+    public bool UseLayersNotList = false;
+    [Tooltip("The Layer containing the objects to check.")]
+    public LayerMask Layer;
+
+    /**
      * The distance in meters between this game object and the target game object that
      * will pass the proximity check.
      * @since 4.1.2
@@ -61,8 +76,19 @@ namespace Leap.Unity{
     private IEnumerator proximityWatcherCoroutine;
     private GameObject _currentObj = null;
 
-    void Awake(){
+    void Awake() {
       proximityWatcherCoroutine = proximityWatcher();
+      if (TagName != "") {
+        GameObject[] taggedObjects = GameObject.FindGameObjectsWithTag(TagName);
+        List<GameObject> targets = new List<GameObject>(taggedObjects.Length + TargetObjects.Length);
+        for (int t = 0; t < TargetObjects.Length; t++) {
+          targets.Add(TargetObjects[t]);
+        }
+        for (int t = 0; t < taggedObjects.Length; t++) {
+          targets.Add(taggedObjects[t]);
+        }
+        TargetObjects = targets.ToArray();
+      }
     }
 
     void OnEnable () {
@@ -72,6 +98,7 @@ namespace Leap.Unity{
   
     void OnDisable () {
       StopCoroutine(proximityWatcherCoroutine);
+      Deactivate();
     }
 
     IEnumerator proximityWatcher(){
@@ -86,13 +113,22 @@ namespace Leap.Unity{
             proximityState = false;
           }
         } else {
-          for(int obj = 0; obj < TargetObjects.Length; obj++){
-            GameObject target = TargetObjects[obj];
-            if(distanceSquared(target) < onSquared){
-              _currentObj = target;
+          if (UseLayersNotList) {
+            Collider[] nearby = Physics.OverlapSphere(transform.position, OnDistance, Layer);
+            if(nearby.Length > 0) {
+              _currentObj = nearby[0].gameObject;
               proximityState = true;
               OnProximity.Invoke(_currentObj);
-              break; // pick first match
+            }
+          } else {
+            for (int obj = 0; obj < TargetObjects.Length; obj++) {
+              GameObject target = TargetObjects[obj];
+              if (distanceSquared(target) < onSquared) {
+                _currentObj = target;
+                proximityState = true;
+                OnProximity.Invoke(_currentObj);
+                break; // pick first match
+              }
             }
           }
         }

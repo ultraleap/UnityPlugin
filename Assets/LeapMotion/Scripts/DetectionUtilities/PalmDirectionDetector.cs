@@ -104,6 +104,7 @@ namespace Leap.Unity {
 
     private void OnDisable () {
       StopCoroutine(watcherCoroutine);
+      Deactivate();
     }
 
     private IEnumerator palmWatcher() {
