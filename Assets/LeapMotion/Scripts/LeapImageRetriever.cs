@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using System;
 using System.Collections;
-using Leap;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
   // To use the LeapImageRetriever you must be on version 2.1+
@@ -24,6 +24,7 @@ namespace Leap.Unity {
     public const int RIGHT_IMAGE_INDEX = 1;
     public const float IMAGE_SETTING_POLL_RATE = 2.0f;
 
+    [AutoFind]
     [SerializeField]
     LeapServiceProvider _provider;
 
@@ -31,6 +32,7 @@ namespace Leap.Unity {
     [FormerlySerializedAs("gammaCorrection")]
     private float _gammaCorrection = 1.0f;
 
+    [MinValue(0)]
     [SerializeField]
     protected long ImageTimeout = 9000; //microseconds
 
