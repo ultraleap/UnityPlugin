@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-namespace Leap.Unity{
+namespace Leap.Unity.Attachments {
 
   /**
   * The CameraFollower component controls the rotation of its parent game object so that

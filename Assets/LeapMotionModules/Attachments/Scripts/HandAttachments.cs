@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections;
 using Leap;
+using Leap.Unity;
 
-namespace Leap.Unity{
+namespace Leap.Unity.Attachments {
 
   /**
   * An IHandModel object that has no graphics of its own, but which allows you to 

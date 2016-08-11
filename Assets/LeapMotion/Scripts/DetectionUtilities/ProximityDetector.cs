@@ -98,6 +98,7 @@ namespace Leap.Unity{
   
     void OnDisable () {
       StopCoroutine(proximityWatcherCoroutine);
+      Deactivate();
     }
 
     IEnumerator proximityWatcher(){

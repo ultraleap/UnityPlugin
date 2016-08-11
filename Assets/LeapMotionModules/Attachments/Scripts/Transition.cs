@@ -4,9 +4,8 @@ using UnityEngine.Events;
 using UnityEditor;
 #endif
 using System.Collections;
-using System.Collections.Generic;
 
-namespace Leap.Unity{
+namespace Leap.Unity.Attachments{
   
   /**
   * The Transition class animates the position, rotation, scale, and color of child game objects.
@@ -34,22 +33,30 @@ namespace Leap.Unity{
     * Specifies whether to animate position.
     * The position of the Transition game object is animated. Any child objects maintain their
     * respective local positions relative to the transition object.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     [Tooltip("Whether to animate position")]
     public bool AnimatePosition = false;
 
+
     /**
-    * The position of the transition object in the fully transitioned (out) state.
-    * @since 4.1.3
+    * The position of the transition object in the fully active state.
+    * @since 4.1.4
     */
-    [Tooltip("Position before in transition and after an out transition")]
-    public Vector3 OutPosition = Vector3.zero;
+    [Tooltip("The fully on position in meters")]
+    public Vector3 OnPosition = Vector3.zero;
+
+    /**
+    * The position of the transition object in the fully transitioned (off) state.
+    * @since 4.1.4
+    */
+    [Tooltip("The fully off position in meters")]
+    public Vector3 OffPosition = Vector3.zero;
 
     /**
     * The curve controlling position.
     * A curve value of 1 is fully transitioned off. A curve value of 0 is the on state (the transition settings have no influence on position).
-    * @since 4.1.3
+    * @since 4.1.4
     */
     [Tooltip("Easing curve for position transitions. [-1,0] is in transition; [0,+1] is out transition.")]
     public AnimationCurve PositionCurve = new AnimationCurve(new Keyframe(-1,1), new Keyframe(0,0), new Keyframe(1,1));
@@ -58,22 +65,51 @@ namespace Leap.Unity{
     * Specifies whether to animate rotation.
     * The rotation of the Transition game object is animated. Any child objects maintain their
     * respective local rotations relative to the transition object.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     [Tooltip("Whether to animate rotation")]
     public bool AnimateRotation = false;
 
     /**
-    * The rotation of the transition object in the fully transitioned (out) state.
-    * @since 4.1.3
+    * The rotation of the transition object in the fully active state.
+    * The rotation is expressed as Euler angles in degrees.
+    * @since 4.1.4
     */
-    [Tooltip("Rotation before an in transition and after an out transition.")]
-    public Quaternion OutRotation = Quaternion.identity;
+    [Tooltip("The fully active rotation in degrees")]
+    public Vector3 OnRotation = Vector3.zero;
+
+    /**
+    * The rotation of the transition object in the fully transitioned (off) state.
+    * The rotation is expressed as Euler angles in degrees.
+    * @since 4.1.4
+    */
+    [Tooltip("The fully off rotation in degrees")]
+    public Vector3 OffRotation = Vector3.zero;
+
+    /**
+    * The off rotation as a quaternion.
+    * @since 4.1.4
+    */
+    public Quaternion OffRotationQuaternion {
+      get {
+        return Quaternion.Euler(OffRotation);
+      }
+    }
+
+    /**
+    * The on rotation as a quaternion.
+    * @since 4.1.4
+    */
+    public Quaternion OnRotationQuaternion {
+      get {
+        return Quaternion.Euler(OnRotation);
+      }
+    }
 
     /**
     * The curve controlling rotation.
     * A curve value of 1 is fully transitioned off. A curve value of 0 is the on state (the transition settings have no influence on rotation).
-    * @since 4.1.3
+    * @since 4.1.4
     */
     [Tooltip("Easing curve for rotation transitions. [-1,0] is in transition; [0,+1] is out transition.")]
     public AnimationCurve RotationCurve = new AnimationCurve(new Keyframe(-1, 1), new Keyframe(0, 0), new Keyframe(1, 1));
@@ -82,22 +118,29 @@ namespace Leap.Unity{
     * Specifies whether to animate scale.
     * The scale of the Transition game object is animated. Any child objects maintain their
     * respective local scale relative to the transition object.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     [Tooltip("Whether to animate scale.")]
     public bool AnimateScale = false;
 
     /**
-    * The scale of the transition object in the fully transitioned (out) state.
-    * @since 4.1.3
+    * The scale of the transition object in the fully on state.
+    * @since 4.1.4
     */
-    [Tooltip("Scale before an in transition and after an out transition.")]
-    public Vector3 OutScale = Vector3.one;
+    [Tooltip("The fully on scale")]
+    public Vector3 OnScale = Vector3.one;
+
+    /**
+    * The scale of the transition object in the fully transitioned (off) state.
+    * @since 4.1.4
+    */
+    [Tooltip("The fully off scale")]
+    public Vector3 OffScale = Vector3.one;
 
     /**
     * The curve controlling scale.
     * A curve value of 1 is fully transitioned off. A curve value of 0 is the on state (the transition settings have no influence on scale).
-    * @since 4.1.3
+    * @since 4.1.4
     */
     [Tooltip("Easing curve for scale transitions. [-1,0] is in transition; [0,+1] is out transition.")]
     public AnimationCurve ScaleCurve = new AnimationCurve(new Keyframe(-1, 1), new Keyframe(0, 0), new Keyframe(1, 1));
@@ -109,7 +152,7 @@ namespace Leap.Unity{
     * To change the alpha color component, the shader must also support alpha blending. The standard
     * Unity shaders have a Rendering Mode property that must be set to Transparency or Fade in order for
     * changes in alpha to be rendered. Other shaders may have their own requirements.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     [Tooltip("Whether to animate color")]
     public bool AnimateColor = false;
@@ -121,7 +164,7 @@ namespace Leap.Unity{
     * "Edit Shader..." command from the shader component's drop-down menu.
     * 
     * All objects whose color you wish to animate must use the same color name. 
-    * @since 4.1.3
+    * @since 4.1.4
     */
     [Tooltip("The name of the shader property controlling object color")]
     public string ColorShaderPropertyName = "_Color";
@@ -129,22 +172,23 @@ namespace Leap.Unity{
     /**
     * The color of the transition object in the fully transitioned (out) state.
     * The color is applied to the shader property specified by ColorShaderPropertyName variable.
-    * @since 4.1.3
+    * The color used when the objects under the transition are fully on is the taken from the assigned material.
+    * @since 4.1.4
     */
-    [Tooltip("Color before an in transition and after an out transition.")]
-    public Color OutColor = Color.black;
+    [Tooltip("The fully off color")]
+    public Color TransitionColor = Color.black;
 
     /**
     * The curve controlling color.
     * A curve value of 1 is fully transitioned off. A curve value of 0 is the on state (the transition settings have no influence on color).
-    * @since 4.1.3
+    * @since 4.1.4
     */
     [Tooltip("Easing curve for color transitions. [-1,0] is in transition; [0,+1] is out transition.")]
     public AnimationCurve ColorCurve = new AnimationCurve(new Keyframe(-1, 1), new Keyframe(0, 0), new Keyframe(1, 1));
 
     /**
     * The duration of the transition in seconds.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     [Tooltip("Length of transition in seconds")]
     [Range(.001f, 2.0f)]
@@ -153,7 +197,7 @@ namespace Leap.Unity{
     /**
     * A value used in edit mode to simulate the transition.
     * Change the value to observe how the transition will look when played.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     [Tooltip("Simulates transition in edit mode")]
     [Range (-1, 1)]
@@ -161,16 +205,13 @@ namespace Leap.Unity{
     
     private float progress = 0.0f;
     private MaterialPropertyBlock materialProperties;
-    private Vector3 localPosition;
-    private Quaternion localRotation;
-    private Vector3 localScale;
 
     /**
-    * Dispatched when a transition is complete.
-    * @since 4.1.3
+    * Dispatched when a transition starts.
+    * @since 4.1.4
     */
-    [Tooltip("Dispatched when a transition is finished")]
-    public UnityEvent OnComplete;
+    [Tooltip("Dispatched when a transition begins")]
+    public UnityEvent OnStart;
 
     /**
     * Dispatched for each animation step before the transition does its own update.
@@ -181,11 +222,14 @@ namespace Leap.Unity{
     [Tooltip("Dispatched each frame during a transition")]
     public AnimationStepEvent OnAnimationStep;
 
-#if UNITY_EDITOR
-    private void Reset() {
-      captureInitialState();
-    }
+    /**
+    * Dispatched when a transition is complete.
+    * @since 4.1.4
+    */
+    [Tooltip("Dispatched when a transition is finished")]
+    public UnityEvent OnComplete;
 
+#if UNITY_EDITOR
     private void Update() {
       if (!EditorApplication.isPlaying) {
         updateTransition(Simulate);
@@ -195,16 +239,16 @@ namespace Leap.Unity{
   
     private void Awake(){
       materialProperties = new MaterialPropertyBlock();
-      captureInitialState();
       updateTransition(0.0f);
     }
 
     /**
     * Play the transition from off to on.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     public void TransitionIn(){
       if (isActiveAndEnabled) {
+        OnStart.Invoke();
         StopAllCoroutines();
         StartCoroutine(transitionIn());
       }
@@ -212,38 +256,19 @@ namespace Leap.Unity{
 
     /**
     * Play the transition from on to off.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     public void TransitionOut(){
       if (isActiveAndEnabled) {
+        OnStart.Invoke();
         StopAllCoroutines();
         StartCoroutine(transitionOut());
       }
     }
 
     /**
-    * Saves the local transform values to use as the on state.
-    * @since 4.1.3
-    */
-    protected virtual void captureInitialState() {
-      localPosition = transform.localPosition;
-      localRotation = transform.localRotation;
-      localScale = transform.localScale;
-    }
-
-    /**
-    * Sets the transition directly to the on state without any animation.
-    * @since 4.1.3
-    */
-    public virtual void GotoOnState() {
-      transform.localPosition = localPosition;
-      transform.localRotation = localRotation;
-      transform.localScale = localScale;
-    }
-
-    /**
     * A coroutine that updates the transition state when playing the "in" transition.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     protected IEnumerator transitionIn(){
       float start = Time.time;
@@ -259,7 +284,7 @@ namespace Leap.Unity{
 
     /**
     * A coroutine that updates the transition state when playing the "out" transition.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     protected IEnumerator transitionOut(){
       float start = Time.time;
@@ -275,42 +300,42 @@ namespace Leap.Unity{
 
     /**
     * Calls the individual animation functions.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     protected virtual void updateTransition(float interpolationPoint){
+      if (AnimateScale) doAnimateScale(interpolationPoint);
       if (AnimatePosition) doAnimatePosition(interpolationPoint);
       if (AnimateRotation) doAnimateRotation(interpolationPoint);
-      if (AnimateScale) doAnimateScale(interpolationPoint);
       if (AnimateColor) doAnimateColor(interpolationPoint);
     }
 
     /**
     * Lerps between the in and out positions based on the animation curve.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     protected virtual void doAnimatePosition(float interpolationPoint) {
-      transform.localPosition = Vector3.Lerp(localPosition, OutPosition, PositionCurve.Evaluate(interpolationPoint));
+      transform.localPosition = Vector3.Lerp(OnPosition, OffPosition, PositionCurve.Evaluate(interpolationPoint));
     }
 
     /**
     * Lerps between the in and out rotations based on the animation curve.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     protected virtual void doAnimateRotation(float interpolationPoint) {
-      transform.localRotation = Quaternion.Lerp(localRotation, OutRotation, RotationCurve.Evaluate(interpolationPoint));
+      transform.localRotation = Quaternion.Lerp(OnRotationQuaternion, OffRotationQuaternion, RotationCurve.Evaluate(interpolationPoint));
     }
 
     /**
     * Lerps between the in and out scales based on the animation curve.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     protected virtual void doAnimateScale(float interpolationPoint) {
-      transform.localScale = Vector3.Lerp(localScale, OutScale, ScaleCurve.Evaluate(interpolationPoint));
+      transform.localScale = Vector3.Lerp(OnScale, OffScale, ScaleCurve.Evaluate(interpolationPoint));
     }
 
     /**
     * For all child objects, lerps between the in and out colors based on the animation curve.
-    * @since 4.1.3
+    * @since 4.1.4
     */
     protected virtual void doAnimateColor(float interpolationPoint) {
       float influence = ColorCurve.Evaluate(interpolationPoint);
@@ -320,12 +345,11 @@ namespace Leap.Unity{
         if (renderer != null) {
           materialProperties = new MaterialPropertyBlock();
           renderer.GetPropertyBlock(materialProperties);
-          materialProperties.SetColor(ColorShaderPropertyName, Color.Lerp(renderer.sharedMaterial.color, OutColor, influence));
+          materialProperties.SetColor(ColorShaderPropertyName, Color.Lerp(renderer.sharedMaterial.color, TransitionColor, influence));
           renderer.SetPropertyBlock(materialProperties);
         }
       }
     }
-
   }
 
   /**

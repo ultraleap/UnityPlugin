@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
-using System.Collections;
 
-namespace Leap.Unity {
+namespace Leap.Unity.Attachments {
 
   /**
    * Controls activation and deactivation of child game objects, optionally using a transition.
@@ -69,13 +67,9 @@ namespace Leap.Unity {
     public virtual void Activate(bool doTransition = true){
       IsActive = true;
       ChangeChildState();
-      if (Transition != null) {
-        if(doTransition){
-          Transition.OnComplete.AddListener(ChangeChildState);
-          Transition.TransitionIn();
-        } else {
-          Transition.GotoOnState();
-        }
+      if (Transition != null && doTransition) {
+        Transition.OnComplete.AddListener(ChangeChildState);
+        Transition.TransitionIn();
       }
     }
 
@@ -91,7 +85,6 @@ namespace Leap.Unity {
           Transition.OnComplete.AddListener(ChangeChildState);
           Transition.TransitionOut();
         } else {
-          Transition.GotoOnState();
           ChangeChildState();
         }
       } else {
