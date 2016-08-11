@@ -331,6 +331,7 @@ namespace Leap.Unity.RuntimeGizmos {
 
     private bool _isInWireMode = false;
     private Material _gizmoMaterial;
+    private int _operationCountOnGuard = -1;
 
     public Shader gizmoShader {
       get {
@@ -352,6 +353,29 @@ namespace Leap.Unity.RuntimeGizmos {
     }
 
     public Mesh cubeMesh, wireCubeMesh, sphereMesh, wireSphereMesh;
+
+    /// <summary>
+    /// Begins a draw-guard.  If any gizmos are drawn to this drawer an exception will be thrown at the end of the guard.
+    /// </summary>
+    public void BeginGuard() {
+      if (_operationCountOnGuard != -1) {
+        throw new Exception("Cannot lock this drawer because it is already locked.");
+      }
+      _operationCountOnGuard = _operations.Count;
+    }
+
+    /// <summary>
+    /// Ends a draw-guard.  If any gizmos were drawn to this drawer during the guard, an exception will be thrown.
+    /// </summary>
+    public void EndGuard() {
+      if (_operationCountOnGuard == -1) {
+        throw new Exception("Cannot unlock this drawer because it is already unlocked.");
+      }
+      if (_operations.Count != _operationCountOnGuard) {
+        throw new Exception("New gizmos were drawn to the front buffer!  Make sure to never keep a reference to a Drawer, always get a new one every time you want to start drawing.");
+      }
+      _operationCountOnGuard = -1;
+    }
 
     /// <summary>
     /// Causes all remaining gizmos drawing to be done in the local coordinate space of the given transform.
