@@ -179,6 +179,12 @@ namespace Leap.Unity.RuntimeGizmos {
 
         _readyForSwap = false;
         _backDrawer.ClearAllGizmos();
+
+        //Guard the front drawer for rendering
+        _frontDrawer.BeginGuard();
+
+        //Unguard the back drawer to allow gizmos to be drawn to it
+        _backDrawer.EndGuard();
       }
 
       _frontDrawer.DrawAllGizmosToScreen();
