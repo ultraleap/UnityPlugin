@@ -4,7 +4,7 @@ using UnityEditor;
 #endif
 using System;
 using System.Collections;
-using Leap;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
   /**LeapServiceProvider creates a Controller and supplies Leap Hands and images */
@@ -20,6 +20,7 @@ namespace Leap.Unity {
     [SerializeField]
     protected bool _isHeadMounted = false;
 
+    [AutoFind]
     [SerializeField]
     protected LeapVRTemporalWarping _temporalWarping;
 
