@@ -114,6 +114,8 @@ namespace Leap.Unity.RuntimeGizmos {
       _frontDrawer = new RuntimeGizmoDrawer();
       _backDrawer = new RuntimeGizmoDrawer();
 
+      _frontDrawer.BeginGuard();
+
       if (_gizmoShader == null) {
         _gizmoShader = Shader.Find(DEFAULT_SHADER_NAME);
       }
@@ -177,14 +179,14 @@ namespace Leap.Unity.RuntimeGizmos {
         _backDrawer = _frontDrawer;
         _frontDrawer = tempDrawer;
 
-        _readyForSwap = false;
-        _backDrawer.ClearAllGizmos();
-
         //Guard the front drawer for rendering
         _frontDrawer.BeginGuard();
 
         //Unguard the back drawer to allow gizmos to be drawn to it
         _backDrawer.EndGuard();
+
+        _readyForSwap = false;
+        _backDrawer.ClearAllGizmos();
       }
 
       _frontDrawer.DrawAllGizmosToScreen();
@@ -364,9 +366,6 @@ namespace Leap.Unity.RuntimeGizmos {
     /// Begins a draw-guard.  If any gizmos are drawn to this drawer an exception will be thrown at the end of the guard.
     /// </summary>
     public void BeginGuard() {
-      if (_operationCountOnGuard != -1) {
-        throw new Exception("Cannot lock this drawer because it is already locked.");
-      }
       _operationCountOnGuard = _operations.Count;
     }
 
@@ -374,13 +373,12 @@ namespace Leap.Unity.RuntimeGizmos {
     /// Ends a draw-guard.  If any gizmos were drawn to this drawer during the guard, an exception will be thrown.
     /// </summary>
     public void EndGuard() {
-      if (_operationCountOnGuard == -1) {
-        throw new Exception("Cannot unlock this drawer because it is already unlocked.");
-      }
-      if (_operations.Count != _operationCountOnGuard) {
-        throw new Exception("New gizmos were drawn to the front buffer!  Make sure to never keep a reference to a Drawer, always get a new one every time you want to start drawing.");
-      }
+      bool wereGizmosDrawn = _operations.Count > _operationCountOnGuard;
       _operationCountOnGuard = -1;
+
+      if (wereGizmosDrawn) {
+        Debug.LogError("New gizmos were drawn to the front buffer!  Make sure to never keep a reference to a Drawer, always get a new one every time you want to start drawing.");
+      }
     }
 
     /// <summary>
