@@ -41,6 +41,12 @@ namespace Leap.Unity.RuntimeGizmos {
     private bool _readyForSwap = false;
 
     /// <summary>
+    /// Subscribe to this event if you want to draw gizmos after rendering is complete.  Doing gizmo
+    /// rendering inside of the normal Camera.onPoseRender event will cause rendering artifacts.
+    /// </summary>
+    public static event Action<RuntimeGizmoDrawer> OnPostRenderGizmos;
+
+    /// <summary>
     /// Tries to get a gizmo drawer.  Will fail if there is no Gizmo manager in the 
     /// scene, or if it is disabled.
     /// 
@@ -175,6 +181,11 @@ namespace Leap.Unity.RuntimeGizmos {
 #endif
 
       if (_readyForSwap) {
+        if (OnPostRenderGizmos != null) {
+          _backDrawer.ResetMatrixAndColorState();
+          OnPostRenderGizmos(_backDrawer);
+        }
+
         RuntimeGizmoDrawer tempDrawer = _backDrawer;
         _backDrawer = _frontDrawer;
         _frontDrawer = tempDrawer;
