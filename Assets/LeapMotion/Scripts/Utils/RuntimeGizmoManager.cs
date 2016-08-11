@@ -114,6 +114,10 @@ namespace Leap.Unity.RuntimeGizmos {
       _frontDrawer = new RuntimeGizmoDrawer();
       _backDrawer = new RuntimeGizmoDrawer();
 
+      if (_gizmoShader == null) {
+        _gizmoShader = Shader.Find(DEFAULT_SHADER_NAME);
+      }
+
       generateMeshes();
       assignDrawerParams();
 
