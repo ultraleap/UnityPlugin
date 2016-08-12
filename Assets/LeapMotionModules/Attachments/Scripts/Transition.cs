@@ -252,11 +252,11 @@ namespace Leap.Unity.Attachments{
     * Play the transition from off to on.
     * @since 4.1.4
     */
-    public void TransitionIn(){
-      if (isActiveAndEnabled && gameObject.activeInHierarchy) {
+    public void TransitionIn() {
+      if (gameObject.activeInHierarchy) {
         OnStart.Invoke();
         StopAllCoroutines();
-        StartCoroutine(transitionIn());
+        StartCoroutine(doTransitionIn());
       }
     }
 
@@ -265,10 +265,10 @@ namespace Leap.Unity.Attachments{
     * @since 4.1.4
     */
     public void TransitionOut(){
-      if (isActiveAndEnabled && gameObject.activeInHierarchy) {
+      if (gameObject.activeInHierarchy) {
         OnStart.Invoke();
         StopAllCoroutines();
-        StartCoroutine(transitionOut());
+        StartCoroutine(doTransitionOut());
       }
     }
 
@@ -276,7 +276,7 @@ namespace Leap.Unity.Attachments{
     * A coroutine that updates the transition state when playing the "in" transition.
     * @since 4.1.4
     */
-    protected IEnumerator transitionIn(){
+    protected IEnumerator doTransitionIn(){
       float start = Time.time;
       do {
         progress = (Time.time - start)/Duration;
@@ -292,7 +292,7 @@ namespace Leap.Unity.Attachments{
     * A coroutine that updates the transition state when playing the "out" transition.
     * @since 4.1.4
     */
-    protected IEnumerator transitionOut(){
+    protected IEnumerator doTransitionOut(){
       float start = Time.time;
       do {
         progress = (Time.time - start)/Duration;
