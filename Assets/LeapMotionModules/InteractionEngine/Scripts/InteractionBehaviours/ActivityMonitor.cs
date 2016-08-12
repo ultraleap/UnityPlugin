@@ -12,18 +12,19 @@ namespace Leap.Unity.Interaction {
   }
 
   public class ActivityMonitorLite : IActivityMonitor, IRuntimeGizmoComponent {
-    public enum GizmoType {
-      InteractionStatus,
-      ActivityDepth
-    }
-
     public static GizmoType gizmoType = GizmoType.ActivityDepth;
 
+    public const float EXPLOSION_VELOCITY = 100;
     public const int HYSTERESIS_TIMEOUT = 5;
 
     protected Rigidbody _rigidbody;
     protected IInteractionBehaviour _interactionBehaviour;
     protected ActivityManager _manager;
+
+    // For explosion protection
+    protected Vector3 _prevPosition;
+    protected Vector3 _prevVelocity;
+    protected Vector3 _prevAngularVelocity;
 
     protected int _timeToLive = 1;
     protected int _timeToDie = 0;  // Timer after _timeToLive goes negative before deactivation.
@@ -41,6 +42,19 @@ namespace Leap.Unity.Interaction {
     }
 
     public override void UpdateState() {
+      if (_rigidbody.isKinematic) {
+        if ((_rigidbody.position - _prevPosition).sqrMagnitude / Time.fixedDeltaTime >= EXPLOSION_VELOCITY * EXPLOSION_VELOCITY) {
+          _rigidbody.velocity = _prevVelocity;
+          _rigidbody.angularVelocity = _prevAngularVelocity;
+          _rigidbody.position = _rigidbody.position + _rigidbody.velocity * Time.fixedDeltaTime;
+          _rigidbody.rotation = _rigidbody.rotation;
+        }
+      }
+
+      _prevPosition = _rigidbody.position;
+      _prevVelocity = _rigidbody.velocity;
+      _prevAngularVelocity = _rigidbody.angularVelocity;
+
       // Grasped objects do not intersect the brush layer but are still touching hands.
       if (_interactionBehaviour.IsBeingGrasped) {
         Revive();
@@ -74,6 +88,11 @@ namespace Leap.Unity.Interaction {
       }
 
       drawer.DrawColliders(gameObject);
+    }
+
+    public enum GizmoType {
+      InteractionStatus,
+      ActivityDepth
     }
   }
 
