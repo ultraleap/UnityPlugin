@@ -56,6 +56,10 @@ namespace Leap.Unity.Interaction {
         }
 
         if (didExplode) {
+          Debug.LogWarning("Explosion was detected!  Object " + gameObject + " has been reset to its previous state.  If this was " +
+                           "intentional movement, make sure you have called NotifyTeleported on the InteractionBehaviour, or raise " +
+                           "the explosion velocity threshold.");
+
           _rigidbody.velocity = _prevVelocity;
           _rigidbody.angularVelocity = _prevAngularVelocity;
           _rigidbody.position = _rigidbody.position + _rigidbody.velocity * Time.fixedDeltaTime;
