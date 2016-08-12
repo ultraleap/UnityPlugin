@@ -204,7 +204,8 @@ namespace Leap.Unity.Interaction {
         case 1:
           getSphereResults(hands[0], _markedBehaviours);
           break;
-#if UNITY_5_4
+        //Currently broken on android for some unknown reason
+#if UNITY_5_4 && false
         case 2:
           if (hands[0].PalmPosition.DistanceTo(hands[1].PalmPosition) > (_overlapRadius * 2.0f)) {
             getSphereResults(hands[0], _markedBehaviours);

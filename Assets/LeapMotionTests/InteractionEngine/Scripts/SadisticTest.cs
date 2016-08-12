@@ -129,13 +129,13 @@ namespace Leap.Unity.Interaction.Testing {
         // Show Gizmos for InteractionBrushBone.
         InteractionBrushBone[] bb = FindObjectsOfType(typeof(InteractionBrushBone)) as InteractionBrushBone[];
         GameObject[] objs = new GameObject[bb.Length];
-         for(int i = 0; i < bb.Length; i++){
-              objs[i] = bb[i].gameObject;
-         }
-  		  Selection.objects = objs;
+        for (int i = 0; i < bb.Length; i++) {
+          objs[i] = bb[i].gameObject;
+        }
+        Selection.objects = objs;
       }
-    }
 #endif
+    }
 
     private string getEnumMessage(string message, InteractionCallback values) {
       var callbackType = typeof(InteractionCallback);
