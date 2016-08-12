@@ -47,7 +47,15 @@ namespace Leap.Unity.Interaction {
 
     public override void UpdateState() {
       if (!_rigidbody.isKinematic) {
-        if ((_rigidbody.position - _prevPosition).sqrMagnitude / Time.fixedDeltaTime >= explosionVelocity * explosionVelocity) {
+        bool didExplode = (_rigidbody.position - _prevPosition).sqrMagnitude / Time.fixedDeltaTime >= explosionVelocity * explosionVelocity;
+
+        if (_interactionBehaviour is InteractionBehaviour) {
+          if ((_interactionBehaviour as InteractionBehaviour).WasTeleported) {
+            didExplode = false;
+          }
+        }
+
+        if (didExplode) {
           _rigidbody.velocity = _prevVelocity;
           _rigidbody.angularVelocity = _prevAngularVelocity;
           _rigidbody.position = _rigidbody.position + _rigidbody.velocity * Time.fixedDeltaTime;
