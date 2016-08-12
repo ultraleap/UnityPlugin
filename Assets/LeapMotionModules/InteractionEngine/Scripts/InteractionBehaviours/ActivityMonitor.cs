@@ -4,19 +4,23 @@ using Leap.Unity.RuntimeGizmos;
 namespace Leap.Unity.Interaction {
 
   public abstract class IActivityMonitor : MonoBehaviour {
+    public static GizmoType gizmoType = GizmoType.ActivityDepth;
+    public static float explosionVelocity = 100;
+    public static int hysteresisTimeout = 5;
+
     public abstract void Init(IInteractionBehaviour interactionBehaviour, ActivityManager manager);
     public abstract void Revive();
     public abstract void UpdateState();
 
     public int arrayIndex;
+
+    public enum GizmoType {
+      InteractionStatus,
+      ActivityDepth
+    }
   }
 
   public class ActivityMonitorLite : IActivityMonitor, IRuntimeGizmoComponent {
-    public static GizmoType gizmoType = GizmoType.ActivityDepth;
-
-    public const float EXPLOSION_VELOCITY = 100;
-    public const int HYSTERESIS_TIMEOUT = 5;
-
     protected Rigidbody _rigidbody;
     protected IInteractionBehaviour _interactionBehaviour;
     protected ActivityManager _manager;
@@ -43,7 +47,7 @@ namespace Leap.Unity.Interaction {
 
     public override void UpdateState() {
       if (_rigidbody.isKinematic) {
-        if ((_rigidbody.position - _prevPosition).sqrMagnitude / Time.fixedDeltaTime >= EXPLOSION_VELOCITY * EXPLOSION_VELOCITY) {
+        if ((_rigidbody.position - _prevPosition).sqrMagnitude / Time.fixedDeltaTime >= explosionVelocity * explosionVelocity) {
           _rigidbody.velocity = _prevVelocity;
           _rigidbody.angularVelocity = _prevAngularVelocity;
           _rigidbody.position = _rigidbody.position + _rigidbody.velocity * Time.fixedDeltaTime;
@@ -65,7 +69,7 @@ namespace Leap.Unity.Interaction {
         --_timeToLive;
         _timeToDie = 0;
       } else {
-        if (_interactionBehaviour.IsAbleToBeDeactivated() && ++_timeToDie >= HYSTERESIS_TIMEOUT) {
+        if (_interactionBehaviour.IsAbleToBeDeactivated() && ++_timeToDie >= hysteresisTimeout) {
           _manager.Deactivate(_interactionBehaviour);
         }
       }
@@ -88,11 +92,6 @@ namespace Leap.Unity.Interaction {
       }
 
       drawer.DrawColliders(gameObject);
-    }
-
-    public enum GizmoType {
-      InteractionStatus,
-      ActivityDepth
     }
   }
 
