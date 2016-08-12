@@ -1,11 +1,8 @@
 ﻿
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Leap.Unity.Interaction.CApi;
-using LeapInternal;
 
 namespace Leap.Unity.Interaction {
 
@@ -146,6 +143,16 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Gets whether or not this InteractionBehaviour was teleported this frame or not.  Is set to true when
+    /// NotiftyTeleported is called, and reset to false once the interaction solve has completed.
+    /// </summary>
+    public bool WasTeleported {
+      get {
+        return _notifiedOfTeleport;
+      }
+    }
+
+    /// <summary>
     /// Adds a linear acceleration to the center of mass of this object.  Use this instead of Rigidbody.AddForce()
     /// </summary>
     public void AddLinearAcceleration(Vector3 acceleration) {
@@ -203,9 +210,8 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnPreSolve() {
       base.OnPreSolve();
-
       _recievedVelocityUpdate = false;
-      _notifiedOfTeleport = false;
+      
       ++_dislocatedBrushCounter;
       _minHandDistance = float.MaxValue;
 
@@ -259,6 +265,7 @@ namespace Leap.Unity.Interaction {
       _accumulatedLinearAcceleration = Vector3.zero;
       _accumulatedAngularAcceleration = Vector3.zero;
       _minHandDistance = float.MaxValue;
+      _notifiedOfTeleport = false;
     }
 
     public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {

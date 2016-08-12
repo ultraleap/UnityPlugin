@@ -98,7 +98,7 @@ namespace Leap.Unity.Interaction {
       if (_registeredBehaviours.TryGetValue(interactionBehaviour, out monitor)) {
         if (monitor == null) {
           if (_maxDepth == 1) {
-            monitor = new ActivityMonitorLite();
+            monitor = interactionBehaviour.gameObject.AddComponent<ActivityMonitorLite>();
           } else {
             monitor = interactionBehaviour.gameObject.AddComponent<ActivityMonitor>();
           }
@@ -134,9 +134,7 @@ namespace Leap.Unity.Interaction {
           _activeBehaviours.RemoveAt(_activeBehaviours.Count - 1);
 
           _registeredBehaviours[interactionBehaviour] = null;
-          if (monitor is UnityEngine.Object) {
-            UnityEngine.Object.Destroy(monitor as UnityEngine.Object);
-          }
+          UnityEngine.Object.Destroy(monitor);
 
           if (OnDeactivate != null) {
             OnDeactivate(interactionBehaviour);

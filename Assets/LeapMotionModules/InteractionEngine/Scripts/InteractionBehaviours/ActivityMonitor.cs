@@ -1,88 +1,77 @@
 ﻿using UnityEngine;
 using Leap.Unity.RuntimeGizmos;
-using System;
 
 namespace Leap.Unity.Interaction {
 
-  public interface IActivityMonitor {
-    void Init(IInteractionBehaviour interactionBehaviour, ActivityManager manager);
-    void Revive();
-    void UpdateState();
+  public abstract class IActivityMonitor : MonoBehaviour {
+    public static GizmoType gizmoType = GizmoType.ActivityDepth;
+    public static float explosionVelocity = 100;                   //In meters per second
+    public static int hysteresisTimeout = 5;                       //In fixed frames
 
-    int arrayIndex { get; set; }
-  }
+    public abstract void Init(IInteractionBehaviour interactionBehaviour, ActivityManager manager);
+    public abstract void Revive();
+    public abstract void UpdateState();
 
-  public class ActivityMonitorLite : IActivityMonitor {
-    public const int HYSTERESIS_TIMEOUT = 5;
-
-    public int arrayIndex { get; set; }
-
-    private IInteractionBehaviour _interactionBehaviour;
-    private ActivityManager _manager;
-    private int _timeToLive = 1;
-
-    public void Init(IInteractionBehaviour interactionBehaviour, ActivityManager manager) {
-      _interactionBehaviour = interactionBehaviour;
-      _manager = manager;
-    }
-
-    public void Revive() {
-      _timeToLive = 1;
-    }
-
-    public void UpdateState() {
-      _timeToLive--;
-      if (_interactionBehaviour.IsAbleToBeDeactivated() && _timeToLive == -HYSTERESIS_TIMEOUT) {
-        _manager.Deactivate(_interactionBehaviour);
-      }
-    }
-  }
-
-  public class ActivityMonitor : MonoBehaviour, IActivityMonitor, IRuntimeGizmoComponent {
-    public const int HYSTERESIS_TIMEOUT = 5;
+    public int arrayIndex;
 
     public enum GizmoType {
       InteractionStatus,
       ActivityDepth
     }
+  }
 
-    public static GizmoType gizmoType = GizmoType.ActivityDepth;
+  public class ActivityMonitorLite : IActivityMonitor, IRuntimeGizmoComponent {
+    protected Rigidbody _rigidbody;
+    protected IInteractionBehaviour _interactionBehaviour;
+    protected ActivityManager _manager;
 
-    // Caches index into ActivityManager array.
-    public int arrayIndex { get; set; }
+    // For explosion protection
+    protected Vector3 _prevPosition;
+    protected Quaternion _prevRotation;
+    protected Vector3 _prevVelocity;
+    protected Vector3 _prevAngularVelocity;
 
-    private IInteractionBehaviour _interactionBehaviour;
-    private ActivityManager _manager;
-    private int _timeToLive = 0; // Converges to remaining allowed distance to hands across contact graph.
-    private int _timeToDie = 0;  // Timer after _timeToLive goes negative before deactivation.
+    protected int _timeToLive = 1;
+    protected int _timeToDie = 0;  // Timer after _timeToLive goes negative before deactivation.
 
-    public void Init(IInteractionBehaviour interactionBehaviour, ActivityManager manager) {
+    public override void Init(IInteractionBehaviour interactionBehaviour, ActivityManager manager) {
       _interactionBehaviour = interactionBehaviour;
       _manager = manager;
       Revive();
 
-      Rigidbody rigidbody = GetComponent<Rigidbody>();
-      bool wasSleeping = rigidbody.IsSleeping();
-
-      //We need to do this in order to force Unity to reconsider collision callbacks for this object
-      //Otherwise scripts added in the middle of a collision never recieve the Stay callbacks.
-      Collider singleCollider = GetComponentInChildren<Collider>();
-      if (singleCollider != null) {
-        Physics.IgnoreCollision(singleCollider, singleCollider, true);
-        Physics.IgnoreCollision(singleCollider, singleCollider, false);
-      }
-
-      if (wasSleeping) {
-        rigidbody.Sleep();
-      }
+      _rigidbody = GetComponent<Rigidbody>();
     }
 
-    public void Revive() {
-      // This has a contact graph distance of 0 from the hands.
-      _timeToLive = _manager.MaxDepth;
+    public override void Revive() {
+      _timeToLive = 1;
     }
 
-    public void UpdateState() {
+    public override void UpdateState() {
+      if (!_rigidbody.isKinematic) {
+        bool didExplode = (_rigidbody.position - _prevPosition).sqrMagnitude / Time.fixedDeltaTime >= explosionVelocity * explosionVelocity;
+
+        if (_interactionBehaviour is InteractionBehaviour) {
+          if ((_interactionBehaviour as InteractionBehaviour).WasTeleported) {
+            didExplode = false;
+          }
+        }
+
+        if (didExplode) {
+          Debug.LogWarning("Explosion was detected!  Object " + gameObject + " has been reset to its previous state.  If this was " +
+                           "intentional movement, make sure you have called NotifyTeleported on the InteractionBehaviour, or raise " +
+                           "the explosion velocity threshold.");
+
+          _rigidbody.velocity = _prevVelocity;
+          _rigidbody.angularVelocity = _prevAngularVelocity;
+          _rigidbody.position = _prevPosition + _rigidbody.velocity * Time.fixedDeltaTime;
+          _rigidbody.rotation = _prevRotation;
+        }
+      }
+
+      _prevPosition = _rigidbody.position;
+      _prevRotation = _rigidbody.rotation;
+      _prevVelocity = _rigidbody.velocity;
+      _prevAngularVelocity = _rigidbody.angularVelocity;
 
       // Grasped objects do not intersect the brush layer but are still touching hands.
       if (_interactionBehaviour.IsBeingGrasped) {
@@ -94,9 +83,49 @@ namespace Leap.Unity.Interaction {
         --_timeToLive;
         _timeToDie = 0;
       } else {
-        if (_interactionBehaviour.IsAbleToBeDeactivated() && ++_timeToDie >= HYSTERESIS_TIMEOUT) {
+        if (_interactionBehaviour.IsAbleToBeDeactivated() && ++_timeToDie >= hysteresisTimeout) {
           _manager.Deactivate(_interactionBehaviour);
         }
+      }
+    }
+
+    public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
+      switch (gizmoType) {
+        case GizmoType.InteractionStatus:
+          if (_interactionBehaviour.IsBeingGrasped) {
+            drawer.color = Color.green;
+          } else if (GetComponent<Rigidbody>().IsSleeping()) {
+            drawer.color = Color.gray;
+          } else {
+            drawer.color = Color.blue;
+          }
+          break;
+        case GizmoType.ActivityDepth:
+          drawer.color = Color.HSVToRGB(Mathf.Max(0, _timeToLive) / (_manager.MaxDepth * 2.0f), 1, 1);
+          break;
+      }
+
+      drawer.DrawColliders(gameObject);
+    }
+  }
+
+  public class ActivityMonitor : ActivityMonitorLite {
+
+    public override void Init(IInteractionBehaviour interactionBehaviour, ActivityManager manager) {
+      base.Init(interactionBehaviour, manager);
+
+      bool wasSleeping = _rigidbody.IsSleeping();
+
+      //We need to do this in order to force Unity to reconsider collision callbacks for this object
+      //Otherwise scripts added in the middle of a collision never recieve the Stay callbacks.
+      Collider singleCollider = GetComponentInChildren<Collider>();
+      if (singleCollider != null) {
+        Physics.IgnoreCollision(singleCollider, singleCollider, true);
+        Physics.IgnoreCollision(singleCollider, singleCollider, false);
+      }
+
+      if (wasSleeping) {
+        _rigidbody.Sleep();
       }
     }
 
@@ -147,25 +176,6 @@ namespace Leap.Unity.Interaction {
       } else if (neighbor._timeToLive < nextTime) {
         neighbor._timeToLive = nextTime;
       }
-    }
-
-    public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      switch (gizmoType) {
-        case GizmoType.InteractionStatus:
-          if (_interactionBehaviour.IsBeingGrasped) {
-            drawer.color = Color.green;
-          } else if (GetComponent<Rigidbody>().IsSleeping()) {
-            drawer.color = Color.gray;
-          } else {
-            drawer.color = Color.blue;
-          }
-          break;
-        case GizmoType.ActivityDepth:
-          drawer.color = Color.HSVToRGB(Mathf.Max(0, _timeToLive) / (_manager.MaxDepth * 2.0f), 1, 1);
-          break;
-      }
-
-      drawer.DrawColliders(gameObject);
     }
   }
 }
