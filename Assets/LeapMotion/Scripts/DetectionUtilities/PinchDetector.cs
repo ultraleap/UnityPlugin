@@ -16,8 +16,6 @@ namespace Leap.Unity {
     public bool DidStartPinch { get { return this.DidStartHold; } }
     public bool DidEndPinch { get { return this.DidRelease; } }
 
-    private float _lastActiveDistance;
-
     [MinValue(0)]
     [SerializeField]
     protected float _activatePinchDist = 0.03f;
@@ -85,7 +83,6 @@ namespace Leap.Unity {
         transform.position = _position;
         transform.rotation = _rotation;
       }
-      _lastActiveDistance = _distance;
     }
 
 #if UNITY_EDITOR
@@ -116,6 +113,5 @@ namespace Leap.Unity {
       }
     }
     #endif
-
   }
 }
