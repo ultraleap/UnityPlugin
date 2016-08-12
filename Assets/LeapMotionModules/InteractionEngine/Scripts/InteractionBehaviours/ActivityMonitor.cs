@@ -5,8 +5,8 @@ namespace Leap.Unity.Interaction {
 
   public abstract class IActivityMonitor : MonoBehaviour {
     public static GizmoType gizmoType = GizmoType.ActivityDepth;
-    public static float explosionVelocity = 100;
-    public static int hysteresisTimeout = 5;
+    public static float explosionVelocity = 100;                   //In meters per second
+    public static int hysteresisTimeout = 5;                       //In fixed frames
 
     public abstract void Init(IInteractionBehaviour interactionBehaviour, ActivityManager manager);
     public abstract void Revive();
@@ -46,7 +46,7 @@ namespace Leap.Unity.Interaction {
     }
 
     public override void UpdateState() {
-      if (_rigidbody.isKinematic) {
+      if (!_rigidbody.isKinematic) {
         if ((_rigidbody.position - _prevPosition).sqrMagnitude / Time.fixedDeltaTime >= explosionVelocity * explosionVelocity) {
           _rigidbody.velocity = _prevVelocity;
           _rigidbody.angularVelocity = _prevAngularVelocity;
