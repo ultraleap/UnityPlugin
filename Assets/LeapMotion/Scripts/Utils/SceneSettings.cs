@@ -22,9 +22,13 @@ namespace Leap.Unity {
     [SerializeField]
     private ToggleVector3 _gravity = new ToggleVector3();
 
+    [SerializeField]
+    private ToggleFloat _sleepThreshold = new ToggleFloat();
+
     void Reset() {
       _shadowDistance.Value = QualitySettings.shadowDistance;
       _gravity.Value = Physics.gravity;
+      _sleepThreshold.Value = Physics.sleepThreshold;
     }
 
     void Awake() {
@@ -34,6 +38,10 @@ namespace Leap.Unity {
 
       if (_gravity.Override) {
         Physics.gravity = _gravity.Value;
+      }
+
+      if (_sleepThreshold.Override) {
+        Physics.sleepThreshold = _sleepThreshold.Value;
       }
     }
   }
