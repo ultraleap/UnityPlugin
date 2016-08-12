@@ -5,7 +5,7 @@ using System;
 namespace Leap.Unity.Interaction {
 
   [RequireComponent(typeof(InteractionBehaviourBase))]
-  public class InteractionBehaviourEvents : MonoBehaviour {
+  public class InteractionGraspEvents : MonoBehaviour {
 
     public UnityEvent onGraspBegin;
     public UnityEvent onGraspEnd;
