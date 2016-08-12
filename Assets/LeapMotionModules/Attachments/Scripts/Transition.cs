@@ -29,6 +29,8 @@ namespace Leap.Unity.Attachments{
   [ExecuteInEditMode]
   public class Transition : MonoBehaviour {
 
+    public Transform RootTransform;
+
     /**
     * Specifies whether to animate position.
     * The position of the Transition game object is animated. Any child objects maintain their
@@ -232,12 +234,16 @@ namespace Leap.Unity.Attachments{
 #if UNITY_EDITOR
     private void Update() {
       if (!EditorApplication.isPlaying) {
+        if (RootTransform == null)
+          RootTransform = transform;
         updateTransition(Simulate);
       }
     }
   #endif
   
     private void Awake(){
+      if (RootTransform == null)
+        RootTransform = transform;
       materialProperties = new MaterialPropertyBlock();
       updateTransition(0.0f);
     }
@@ -247,7 +253,7 @@ namespace Leap.Unity.Attachments{
     * @since 4.1.4
     */
     public void TransitionIn(){
-      if (isActiveAndEnabled) {
+      if (isActiveAndEnabled && gameObject.activeInHierarchy) {
         OnStart.Invoke();
         StopAllCoroutines();
         StartCoroutine(transitionIn());
@@ -259,7 +265,7 @@ namespace Leap.Unity.Attachments{
     * @since 4.1.4
     */
     public void TransitionOut(){
-      if (isActiveAndEnabled) {
+      if (isActiveAndEnabled && gameObject.activeInHierarchy) {
         OnStart.Invoke();
         StopAllCoroutines();
         StartCoroutine(transitionOut());
@@ -314,7 +320,7 @@ namespace Leap.Unity.Attachments{
     * @since 4.1.4
     */
     protected virtual void doAnimatePosition(float interpolationPoint) {
-      transform.localPosition = Vector3.Lerp(OnPosition, OffPosition, PositionCurve.Evaluate(interpolationPoint));
+      RootTransform.transform.localPosition = Vector3.Lerp(OnPosition, OffPosition, PositionCurve.Evaluate(interpolationPoint));
     }
 
     /**
@@ -322,7 +328,7 @@ namespace Leap.Unity.Attachments{
     * @since 4.1.4
     */
     protected virtual void doAnimateRotation(float interpolationPoint) {
-      transform.localRotation = Quaternion.Lerp(OnRotationQuaternion, OffRotationQuaternion, RotationCurve.Evaluate(interpolationPoint));
+      RootTransform.transform.localRotation = Quaternion.Lerp(OnRotationQuaternion, OffRotationQuaternion, RotationCurve.Evaluate(interpolationPoint));
     }
 
     /**
@@ -330,7 +336,7 @@ namespace Leap.Unity.Attachments{
     * @since 4.1.4
     */
     protected virtual void doAnimateScale(float interpolationPoint) {
-      transform.localScale = Vector3.Lerp(OnScale, OffScale, ScaleCurve.Evaluate(interpolationPoint));
+      RootTransform.transform.localScale = Vector3.Lerp(OnScale, OffScale, ScaleCurve.Evaluate(interpolationPoint));
     }
 
     /**
@@ -339,7 +345,7 @@ namespace Leap.Unity.Attachments{
     */
     protected virtual void doAnimateColor(float interpolationPoint) {
       float influence = ColorCurve.Evaluate(interpolationPoint);
-      Transform[] children = GetComponentsInChildren<Transform>(true);
+      Transform[] children = RootTransform.gameObject.GetComponentsInChildren<Transform>(true);
       for (int g = 0; g < children.Length; g++) {
         Renderer renderer = children[g].gameObject.GetComponent<Renderer>();
         if (renderer != null) {
