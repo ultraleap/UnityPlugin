@@ -27,6 +27,7 @@ namespace Leap.Unity.Interaction {
 
     // For explosion protection
     protected Vector3 _prevPosition;
+    protected Quaternion _prevRotation;
     protected Vector3 _prevVelocity;
     protected Vector3 _prevAngularVelocity;
 
@@ -62,12 +63,13 @@ namespace Leap.Unity.Interaction {
 
           _rigidbody.velocity = _prevVelocity;
           _rigidbody.angularVelocity = _prevAngularVelocity;
-          _rigidbody.position = _rigidbody.position + _rigidbody.velocity * Time.fixedDeltaTime;
-          _rigidbody.rotation = _rigidbody.rotation;
+          _rigidbody.position = _prevPosition + _rigidbody.velocity * Time.fixedDeltaTime;
+          _rigidbody.rotation = _prevRotation;
         }
       }
 
       _prevPosition = _rigidbody.position;
+      _prevRotation = _rigidbody.rotation;
       _prevVelocity = _rigidbody.velocity;
       _prevAngularVelocity = _rigidbody.angularVelocity;
 
