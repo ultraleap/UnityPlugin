@@ -206,11 +206,6 @@ Prefab:
       propertyPath: m_Interpolate
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 13536856, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
-      propertyPath: m_Material
-      value: 
-      objectReference: {fileID: 13400000, guid: 736ce6a56268a5f4e82243e04df6cf6a,
-        type: 2}
     - target: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
       propertyPath: m_IsActive
       value: 1
@@ -223,6 +218,11 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 0.12456134
       objectReference: {fileID: 0}
+    - target: {fileID: 13536856, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: 37b1f9135ed80e5438922256002328c6,
+        type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
   m_IsPrefabParent: 0
