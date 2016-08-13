@@ -49,7 +49,7 @@ namespace Leap.Unity.Attachments {
      *  @since 4.1.1
      */
     [Tooltip("The transition to play when this attachment controller activates or deactivates")]
-    public Transition Transition;
+    public ITransition Transition;
 
     /**
      * Activates the attachment's child object.

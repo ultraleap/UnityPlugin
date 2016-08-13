@@ -27,7 +27,7 @@ namespace Leap.Unity.Attachments{
   * @since 4.1.4
   */
   [ExecuteInEditMode]
-  public class Transition : MonoBehaviour {
+  public class Transition : ITransition {
 
     public Transform RootTransform;
 
@@ -213,7 +213,12 @@ namespace Leap.Unity.Attachments{
     * @since 4.1.4
     */
     [Tooltip("Dispatched when a transition begins")]
-    public UnityEvent OnStart;
+    [SerializeField]
+    private UnityEvent _onStart;
+    public override UnityEvent OnStart {
+      get { return _onStart; }
+      set { _onStart = value; }
+    }
 
     /**
     * Dispatched for each animation step before the transition does its own update.
@@ -222,14 +227,24 @@ namespace Leap.Unity.Attachments{
     * @since 4.1.4
     */
     [Tooltip("Dispatched each frame during a transition")]
-    public AnimationStepEvent OnAnimationStep;
+    [SerializeField]
+    private AnimationStepEvent _onAnimationStep;
+    public override AnimationStepEvent OnAnimationStep {
+      get { return _onAnimationStep; }
+      set { _onAnimationStep = value; }
+    }
 
     /**
     * Dispatched when a transition is complete.
     * @since 4.1.4
     */
     [Tooltip("Dispatched when a transition is finished")]
-    public UnityEvent OnComplete;
+    [SerializeField]
+    private UnityEvent _onComplete;
+    public override UnityEvent OnComplete {
+      get { return _onComplete; }
+      set { _onComplete = value; }
+    }
 
 #if UNITY_EDITOR
     private void Update() {
@@ -252,7 +267,7 @@ namespace Leap.Unity.Attachments{
     * Play the transition from off to on.
     * @since 4.1.4
     */
-    public void TransitionIn() {
+    public override void TransitionIn() {
       if (gameObject.activeInHierarchy) {
         OnStart.Invoke();
         StopAllCoroutines();
@@ -264,7 +279,7 @@ namespace Leap.Unity.Attachments{
     * Play the transition from on to off.
     * @since 4.1.4
     */
-    public void TransitionOut(){
+    public override void TransitionOut(){
       if (gameObject.activeInHierarchy) {
         OnStart.Invoke();
         StopAllCoroutines();
@@ -358,14 +373,4 @@ namespace Leap.Unity.Attachments{
     }
   }
 
-  /**
-   * An event class that is dispatched by a Transition for each animation
-   * step during a transition. The event occurs once per frame for the duration of
-   * a transition.
-   * The event parameter provides the current interpolation value between -1 and 0 for an
-   * in transition and between 0 and +1 for an out transition..
-   * @since 4.1.4
-   */
-  [System.Serializable]
-  public class AnimationStepEvent : UnityEvent<float> { }
 }
