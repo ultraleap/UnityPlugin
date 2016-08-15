@@ -19,6 +19,13 @@ namespace Leap.Unity.InputModule {
                                "RightHandDetector",
                                "HoveringColor");
 
+      specifyConditionalDrawing(() => module.PointerSprite != null,
+                         "PointerMaterial",
+                         "StandardColor",
+                         "HoveringColor",
+                         "TriggeringColor",
+                         "TriggerMissedColor");
+
       specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || module.InteractionMode == LeapInputModule.InteractionCapability.Tactile,
                                "TactilePadding");
 

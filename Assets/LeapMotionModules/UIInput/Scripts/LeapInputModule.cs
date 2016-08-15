@@ -188,7 +188,7 @@ namespace Leap.Unity.InputModule {
         SpriteRenderer renderer = pointer.AddComponent<SpriteRenderer>();
         renderer.sortingOrder = 1000;
 
-        //Add your sprite to the Canvas
+        //Add your sprite to the Sprite Renderer
         renderer.sprite = PointerSprite;
         renderer.material = Instantiate(PointerMaterial); //Make sure to instantiate the material so each pointer can be modified independently
 
@@ -200,9 +200,6 @@ namespace Leap.Unity.InputModule {
           PointerLines[index].SetWidth(0.001f, 0.001f);
         }
 
-        if (PointerSprite == null)
-          Debug.LogError("Set PointerSprite on " + this.gameObject.name + " to the sprite you want to use as your pointer.", this.gameObject);
-
         Pointers[index] = pointer.GetComponent<Transform>();
 
         if (InnerPointer) {
@@ -213,6 +210,7 @@ namespace Leap.Unity.InputModule {
 
           //Add your sprite to the Canvas
           renderer.sprite = PointerSprite;
+
           renderer.material = Instantiate(PointerMaterial);
 
           InnerPointers[index] = innerPointer.GetComponent<Transform>();
@@ -263,6 +261,7 @@ namespace Leap.Unity.InputModule {
     public override void Process() {
       Vector3 OldCameraPos = Camera.main.transform.position;
       Quaternion OldCameraRot = Camera.main.transform.rotation;
+      float OldCameraFoV = Camera.main.fieldOfView;
 
       //Send update events if there is a selected object
       //This is important for InputField to receive keyboard events
@@ -543,6 +542,7 @@ namespace Leap.Unity.InputModule {
 
       Camera.main.transform.position = OldCameraPos;
       Camera.main.transform.rotation = OldCameraRot;
+      Camera.main.fieldOfView = OldCameraFoV;
     }
 
     //Raycast from the EventCamera into UI Space
@@ -568,6 +568,7 @@ namespace Leap.Unity.InputModule {
 
         //Focus pointer through the average of the extended fingers
         if (!perFingerPointer) {
+          /*
           float numberOfExtendedFingers = 0.1f;
           IndexFingerPosition = curFrame.Hands[whichHand].Fingers[whichFinger].TipPosition.ToVector3() * 0.1f;
           //Averages cursor position through average of extended fingers; ended up being worse than expected
@@ -579,6 +580,17 @@ namespace Leap.Unity.InputModule {
             }
           }
           IndexFingerPosition /= numberOfExtendedFingers;
+          */
+          float farthest = 0f;
+          IndexFingerPosition = curFrame.Hands[whichHand].Fingers[1].StabilizedTipPosition.ToVector3();
+          for (int i = 1; i < 3; i++) {
+            float fingerDistance = Vector3.Distance(Camera.main.transform.position, curFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3());
+            float fingerExtension = Mathf.Clamp01(Vector3.Dot(curFrame.Hands[whichHand].Fingers[i].Direction.ToVector3(), curFrame.Hands[whichPointer].Direction.ToVector3())) / 1.5f;
+            if (fingerDistance > farthest && fingerExtension>0.5f) {
+              farthest = fingerDistance;
+              IndexFingerPosition = curFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3();
+            }
+          }
         } else {
           IndexFingerPosition = curFrame.Hands[whichHand].Fingers[whichFinger].TipPosition.ToVector3();
         }
@@ -593,8 +605,8 @@ namespace Leap.Unity.InputModule {
       if (DrawDebug)
         DebugSphereQueue.Enqueue(Camera.main.transform.position);
 
-      //Set EventCamera's Forward Direction
-      Camera.main.transform.forward = Direction;
+      //Set EventCamera's FoV
+      Camera.main.fieldOfView = 179f;
 
       //Set the Raycast Direction and Delta
       PointEvents[whichPointer].position = Vector2.Lerp(PrevScreenPosition[whichPointer], Camera.main.WorldToScreenPoint(IndexFingerPosition), 1.0f);//new Vector2(Screen.width / 2, Screen.height / 2);
