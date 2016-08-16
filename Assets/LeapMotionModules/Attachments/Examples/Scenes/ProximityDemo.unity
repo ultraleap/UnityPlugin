@@ -120,6 +120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ModelsParent: {fileID: 251471404}
   ModelPool:
   - GroupName: Graphics
     _handPool: {fileID: 0}

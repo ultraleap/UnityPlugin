@@ -11209,6 +11209,9 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   _handModel: {fileID: 1000655849}
+  ControlsTransform: 1
+  ActivateDistance: 0.03
+  DeactivateDistance: 0.04
   _activatePinchDist: 0.03
   _deactivatePinchDist: 0.04
 --- !u!4 &422496982 stripped
@@ -25941,6 +25944,9 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   _handModel: {fileID: 1724301390}
+  ControlsTransform: 1
+  ActivateDistance: 0.03
+  DeactivateDistance: 0.04
   _activatePinchDist: 0.03
   _deactivatePinchDist: 0.04
 --- !u!1 &1192671702
@@ -32811,6 +32817,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ModelsParent: {fileID: 2111363452}
   ModelPool:
   - GroupName: CapsuleHands
     _handPool: {fileID: 0}
