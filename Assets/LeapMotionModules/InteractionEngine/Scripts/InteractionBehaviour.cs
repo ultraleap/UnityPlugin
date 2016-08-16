@@ -190,6 +190,8 @@ namespace Leap.Unity.Interaction {
       _warper = new RigidbodyWarper(_manager, transform, _rigidbody, _material.GraphicalReturnTime);
 
       _childrenArray = GetComponentsInChildren<Transform>(true);
+
+      _contactMode = ContactMode.NORMAL;
       updateLayer();
     }
 
