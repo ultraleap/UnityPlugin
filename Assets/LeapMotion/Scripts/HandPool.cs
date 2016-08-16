@@ -127,8 +127,10 @@ namespace Leap.Unity {
         } else {
           leftModel = collectionGroup.LeftModel;
         }
-        collectionGroup.modelList.Add(leftModel);
-        modelGroupMapping.Add(leftModel, collectionGroup);
+        if (leftModel != null) {
+          collectionGroup.modelList.Add(leftModel);
+          modelGroupMapping.Add(leftModel, collectionGroup);
+        }
 
         if (collectionGroup.IsRightToBeSpawned) {
           IHandModel modelToSpawn = collectionGroup.RightModel;
@@ -138,8 +140,10 @@ namespace Leap.Unity {
         } else {
           rightModel = collectionGroup.RightModel;
         }
-        collectionGroup.modelList.Add(rightModel);
-        modelGroupMapping.Add(rightModel, collectionGroup);
+        if (rightModel != null) {
+          collectionGroup.modelList.Add(rightModel);
+          modelGroupMapping.Add(rightModel, collectionGroup);
+        }
       }
     }
 
