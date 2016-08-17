@@ -48,7 +48,7 @@ namespace Leap.Unity.InputModule {
     public float PushPaddingDistance = 0.01f;
     //public bool RetractWhenOutsideofTouchingDistance = false;
 
-    [Tooltip("Triggered when the layers that have 'TriggerLayerEvent' enabled go from 'Expanded' to 'Partially Collapsed'")]
+    [Tooltip("Triggered when the layers that have 'TriggerLayerEvent' enabled go from 'Expanded' to 'Partially Expanded'")]
     public UnityEvent LayerDepress;
     [Tooltip("Triggered when the layers that have 'TriggerLayerEvent' enabled go from 'Expanded' or 'Partially Expanded' to 'Collapsed'")]
     public UnityEvent LayerCollapse;
