@@ -8,6 +8,19 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction {
 
+  /**
+  * An Interaction Engine material that controls several aspects of the interaction between
+  * BrushHands and an interactable object.
+  *
+  * InteractionMaterials can be assigned directly to a the InteractionBehavior component of
+  * an interactable object, and can be assigned as the default material of an InteractionManager.
+  * A default material is used for any objects that aren't assigned a specific InteractionMaterial.
+  *
+  * To create a new Interaction Material, you can either use the Unity menu command: 
+  * Assets>Create>Interaction Material, or right-click in the project window and 
+  * select Create>Interaction Material.
+  * @since 4.1.4
+  */
   public class InteractionMaterial : ScriptableObject {
 
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
@@ -19,12 +32,26 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /*
+    * The options for controlling how the Interaction replaces a rigid body's physics material.
+    * 
+    * * NoAction -- the material is not replaced.
+    * * DuplicateExisting -- a modified copy of the original material is used.
+    * * Replace -- the material is replaced with the specified material.
+    * 
+    * @since 4.1.4
+    */
     public enum PhysicMaterialModeEnum {
       NoAction,
       DuplicateExisting,
       Replace
     }
 
+    /**
+    * Whether contact between an object and the BrushHands can occur.
+    * If false, hands will pass through an object without affecting it.
+    * @since 4.1.4
+    */
     [Header("Contact Settings")]
     [SerializeField]
     protected bool _contactEnabled = true;
@@ -33,6 +60,16 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _brushDisableDistance = 0.017f;
 
+    /*
+    * Controls how the Interaction Engine replaces a rigid body's physics material when 
+    * the object is picked up.
+    * 
+    * * NoAction -- the material is not replaced.
+    * * DuplicateExisting -- a modified copy of the original material is used.
+    * * Replace -- the material is replaced with the specified material.
+    * 
+    * @since 4.1.4
+    */
     [Tooltip("What to do with the physic materials when a grasp occurs.")]
     [SerializeField]
     protected PhysicMaterialModeEnum _physicMaterialMode = PhysicMaterialModeEnum.DuplicateExisting;
