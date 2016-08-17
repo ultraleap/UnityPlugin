@@ -17,7 +17,9 @@ namespace Leap.Unity.InputModule {
       specifyCustomDrawer("Layers", doLayoutList);
 
       specifyConditionalDrawing(() => showEventTrigger(),
-                            "LayerCollapseStateChange");
+                            "LayerCollapse",
+                            "LayerExpand",
+                            "LayerDepress");
     }
 
     private bool showEventTrigger() {

@@ -48,8 +48,12 @@ namespace Leap.Unity.InputModule {
     public float PushPaddingDistance = 0.01f;
     //public bool RetractWhenOutsideofTouchingDistance = false;
 
-    [Tooltip("Triggered when the layers that have 'TriggerLayerEvent' enabled are beginning to be collapsed")]
-    public UnityEvent LayerCollapseStateChange;
+    [Tooltip("Triggered when the layers that have 'TriggerLayerEvent' enabled go from 'Expanded' to 'Partially Expanded'")]
+    public UnityEvent LayerDepress;
+    [Tooltip("Triggered when the layers that have 'TriggerLayerEvent' enabled go from 'Expanded' or 'Partially Expanded' to 'Collapsed'")]
+    public UnityEvent LayerCollapse;
+    [Tooltip("Triggered when the layers that have 'TriggerLayerEvent' enabled go from 'Collapsed' to 'Partially Expanded' or 'Expanded'")]
+    public UnityEvent LayerExpand;
 
     //How quickly the button layers are Lerping
     private float curLerpSpeed = 0.1f;
@@ -65,7 +69,7 @@ namespace Leap.Unity.InputModule {
     //Reset the Positions of the UI Elements on both Start and Quit
     void Start() {
       for (int i = 0; i < Layers.Length; i++) {
-        if (Layers[i].LayerTransform != null) {
+        if (Layers[i].LayerTransform != null && Layers[i].LayerTransform != transform) {
           Layers[i].LayerTransform.localPosition = new Vector3(Layers[i].LayerTransform.localPosition.x, Layers[i].LayerTransform.localPosition.y, 0f);
 
           if (Layers[i].Shadow != null) {
@@ -73,7 +77,7 @@ namespace Leap.Unity.InputModule {
             Layers[i].Shadow.color = new Color(Layers[i].Shadow.color.r, Layers[i].Shadow.color.g, Layers[i].Shadow.color.b, 0f);
           }
         } else {
-          Debug.LogWarning("Ensure that the layers that you have allotted have UI Elements in them!");
+          Debug.LogWarning("Ensure that the layers that you have allotted are children of CompressibleUI object and have UI Elements in them!");
         }
       }
       //if (!RetractWhenOutsideofTouchingDistance) {
@@ -102,31 +106,23 @@ namespace Leap.Unity.InputModule {
               Layers[i].CurrentFloatingDistance = Mathf.Lerp(Layers[i].CurrentFloatingDistance, HoveringDistance, 0.7f); //Set lower than 1f for delayed touching
               if (Layers[i].TriggerLayerEvent && !Layers[i].touchingFinger) {
                 Layers[i].touchingFinger = true;
-                Graphic image = Layers[i].LayerTransform.GetComponent<Graphic>();
-                if (image != null) {
-                  image.color = new Color(image.color.r - 0.175f, image.color.g - 0.175f, image.color.b - 0.175f, image.color.a);
-                }
-                LayerCollapseStateChange.Invoke();
+                LayerDepress.Invoke();
               }
             } else if (HoveringDistance < Layers[i].MinFloatDistance) {
-              Layers[i].CurrentFloatingDistance = Mathf.Lerp(Layers[i].CurrentFloatingDistance, Layers[i].MinFloatDistance, 0.7f);
-              if (Layers[i].TriggerLayerEvent && !Layers[i].touchingFinger) {
-                Layers[i].touchingFinger = true;
-                Graphic image = Layers[i].LayerTransform.GetComponent<Graphic>();
-                if (image != null) {
-                  image.color = new Color(image.color.r - 0.175f, image.color.g - 0.175f, image.color.b - 0.175f, image.color.a);
+              if (Layers[i].TriggerLayerEvent) {
+                if (!Layers[i].touchingFinger) {
+                  Layers[i].touchingFinger = true;
                 }
-                LayerCollapseStateChange.Invoke();
+                if (Layers[i].CurrentFloatingDistance > Layers[i].MinFloatDistance) {
+                  LayerCollapse.Invoke();
+                }
               }
+              Layers[i].CurrentFloatingDistance = Layers[i].MinFloatDistance;
             } else {
               Layers[i].CurrentFloatingDistance = Mathf.Lerp(Layers[i].CurrentFloatingDistance, Layers[i].MaxFloatDistance, curLerpSpeed);
               if (Layers[i].TriggerLayerEvent && Layers[i].touchingFinger) {
                 Layers[i].touchingFinger = false;
-                Graphic image = Layers[i].LayerTransform.GetComponent<Graphic>();
-                if (image != null) {
-                  image.color = new Color(image.color.r + 0.175f, image.color.g + 0.175f, image.color.b + 0.175f, image.color.a);
-                }
-                LayerCollapseStateChange.Invoke();
+                LayerExpand.Invoke();
               }
             }
           }
@@ -136,10 +132,6 @@ namespace Leap.Unity.InputModule {
             Layers[i].CurrentFloatingDistance = Mathf.Lerp(Layers[i].CurrentFloatingDistance, 0f, curLerpSpeed);
             if (Layers[i].TriggerLayerEvent && Layers[i].touchingFinger) {
               Layers[i].touchingFinger = false;
-              Graphic image = Layers[i].LayerTransform.GetComponent<Graphic>();
-              if (image != null) {
-                image.color = new Color(image.color.r + 0.175f, image.color.g + 0.175f, image.color.b + 0.175f, image.color.a);
-              }
             }
           }
         }
