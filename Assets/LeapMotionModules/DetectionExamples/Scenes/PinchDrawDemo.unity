@@ -13,7 +13,7 @@ SceneSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 6
+  serializedVersion: 7
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -37,12 +37,12 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
+  m_IndirectSpecularColor: {r: 0.44692546, g: 0.49678695, b: 0.5750854, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 6
+  serializedVersion: 7
   m_GIWorkflowMode: 0
-  m_LightmapsMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -53,17 +53,22 @@ LightmapSettings:
     m_EnableBakedLightmaps: 1
     m_EnableRealtimeLightmaps: 1
   m_LightmapEditorSettings:
-    serializedVersion: 3
+    serializedVersion: 4
     m_Resolution: 2
     m_BakeResolution: 40
     m_TextureWidth: 1024
     m_TextureHeight: 1024
+    m_AO: 0
     m_AOMaxDistance: 1
-    m_Padding: 2
     m_CompAOExponent: 0
+    m_CompAOExponentDirect: 0
+    m_Padding: 2
     m_LightmapParameters: {fileID: 0}
+    m_LightmapsBakeMode: 1
     m_TextureCompression: 1
+    m_DirectLightInLightProbes: 1
     m_FinalGather: 0
+    m_FinalGatherFiltering: 1
     m_FinalGatherRayCount: 1024
     m_ReflectionCompression: 2
   m_LightingDataAsset: {fileID: 0}
@@ -111,8 +116,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 188161268}
-  m_LocalRotation: {x: -0.99437046, y: 0.073994994, z: 0.00924224, w: -0.075277835}
-  m_LocalPosition: {x: -0.026117416, y: 0.14833029, z: 0.059976712}
+  m_LocalRotation: {x: -0.99437046, y: 0.073994994, z: 0.0092422385, w: -0.075277835}
+  m_LocalPosition: {x: -0.026117416, y: 0.14833033, z: 0.059976712}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 8.5308, y: -178.2894, z: -171.3609}
   m_Children: []
@@ -141,6 +146,9 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   _handModel: {fileID: 1781939140}
+  ControlsTransform: 1
+  ActivateDistance: 0.03
+  DeactivateDistance: 0.04
   _activatePinchDist: 0.03
   _deactivatePinchDist: 0.04
 --- !u!1 &193323429
@@ -226,7 +234,7 @@ Light:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 417545311}
   m_Enabled: 1
-  serializedVersion: 6
+  serializedVersion: 7
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 0.2
@@ -236,6 +244,7 @@ Light:
   m_Shadows:
     m_Type: 0
     m_Resolution: -1
+    m_CustomResolution: -1
     m_Strength: 1
     m_Bias: 0.05
     m_NormalBias: 0.4
@@ -248,10 +257,10 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_Lightmapping: 4
+  m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
-  m_AreaSize: {x: 1, y: 1}
 --- !u!4 &417545313
 Transform:
   m_ObjectHideFlags: 0
@@ -343,7 +352,7 @@ Light:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1023543769}
   m_Enabled: 1
-  serializedVersion: 6
+  serializedVersion: 7
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
@@ -353,6 +362,7 @@ Light:
   m_Shadows:
     m_Type: 2
     m_Resolution: -1
+    m_CustomResolution: -1
     m_Strength: 1
     m_Bias: 0.01
     m_NormalBias: 0.4
@@ -365,10 +375,10 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_Lightmapping: 4
+  m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
-  m_AreaSize: {x: 1, y: 1}
 --- !u!4 &1023543771
 Transform:
   m_ObjectHideFlags: 0
@@ -416,6 +426,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ModelsParent: {fileID: 389918922}
   ModelPool:
   - GroupName: gfx
     _handPool: {fileID: 0}
@@ -453,6 +464,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isHeadMounted: 1
   _temporalWarping: {fileID: 531819953}
+  _reuseFramesForPhysics: 0
   _overrideDeviceType: 1
   _overrideDeviceTypeWith: 1
   _useInterpolation: 0
@@ -492,8 +504,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1686091044}
-  m_LocalRotation: {x: -0.99437046, y: -0.0739949, z: -0.009242237, w: -0.075277835}
-  m_LocalPosition: {x: 0.026117422, y: 0.14833029, z: 0.059976712}
+  m_LocalRotation: {x: -0.99437046, y: -0.0739949, z: -0.0092422385, w: -0.075277835}
+  m_LocalPosition: {x: 0.026117422, y: 0.14833035, z: 0.059976712}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 8.5308, y: 178.2894, z: 171.3609}
   m_Children: []
@@ -522,6 +534,9 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   _handModel: {fileID: 1759863751}
+  ControlsTransform: 1
+  ActivateDistance: 0.03
+  DeactivateDistance: 0.04
   _activatePinchDist: 0.03
   _deactivatePinchDist: 0.04
 --- !u!1 &1714544383
