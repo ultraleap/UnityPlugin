@@ -69,7 +69,7 @@ namespace Leap.Unity.InputModule {
     //Reset the Positions of the UI Elements on both Start and Quit
     void Start() {
       for (int i = 0; i < Layers.Length; i++) {
-        if (Layers[i].LayerTransform != null) {
+        if (Layers[i].LayerTransform != null && Layers[i].LayerTransform != transform) {
           Layers[i].LayerTransform.localPosition = new Vector3(Layers[i].LayerTransform.localPosition.x, Layers[i].LayerTransform.localPosition.y, 0f);
 
           if (Layers[i].Shadow != null) {
@@ -77,7 +77,7 @@ namespace Leap.Unity.InputModule {
             Layers[i].Shadow.color = new Color(Layers[i].Shadow.color.r, Layers[i].Shadow.color.g, Layers[i].Shadow.color.b, 0f);
           }
         } else {
-          Debug.LogWarning("Ensure that the layers that you have allotted have UI Elements in them!");
+          Debug.LogWarning("Ensure that the layers that you have allotted are children of CompressibleUI object and have UI Elements in them!");
         }
       }
       //if (!RetractWhenOutsideofTouchingDistance) {

@@ -372,6 +372,7 @@ namespace Leap.Unity.InputModule {
           GameObject Hoverer = ExecuteEvents.GetEventHandler<IPointerClickHandler>(PointEvents[whichPointer].pointerCurrentRaycast.gameObject);
           if ((Hoverer != null)) {
             ILeapWidget comp = Hoverer.GetComponent<ILeapWidget>();
+            if (comp == null) { comp = Hoverer.GetComponentInParent<ILeapWidget>(); }
             if (comp != null) {
               //if (!isTriggeringInteraction(whichPointer, whichHand, whichFinger)) { //I forget why I put this here....
               ((ILeapWidget)comp).HoverDistance(distanceOfTipToPointer(whichPointer, whichHand, whichFinger));
@@ -586,7 +587,7 @@ namespace Leap.Unity.InputModule {
           for (int i = 1; i < 3; i++) {
             float fingerDistance = Vector3.Distance(Camera.main.transform.position, curFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3());
             float fingerExtension = Mathf.Clamp01(Vector3.Dot(curFrame.Hands[whichHand].Fingers[i].Direction.ToVector3(), curFrame.Hands[whichPointer].Direction.ToVector3())) / 1.5f;
-            if (fingerDistance > farthest && fingerExtension>0.5f) {
+            if (fingerDistance > farthest && fingerExtension > 0.5f) {
               farthest = fingerDistance;
               IndexFingerPosition = curFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3();
             }
@@ -955,7 +956,7 @@ namespace Leap.Unity.InputModule {
     }
 
     public override bool ShouldActivateModule() {
-      return curFrame!=null && curFrame.Hands.Count > 0 && base.ShouldActivateModule();
+      return curFrame != null && curFrame.Hands.Count > 0 && base.ShouldActivateModule();
     }
   }
 }
