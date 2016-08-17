@@ -4,7 +4,7 @@ using Leap.Unity.RuntimeGizmos;
 namespace Leap.Unity.Interaction {
 
   public abstract class IActivityMonitor : MonoBehaviour {
-    public static GizmoType gizmoType = GizmoType.ActivityDepth;
+    public static GizmoType gizmoType = GizmoType.InteractionStatus;
     public static float explosionVelocity = 100;                   //In meters per second
     public static int hysteresisTimeout = 5;                       //In fixed frames
 
