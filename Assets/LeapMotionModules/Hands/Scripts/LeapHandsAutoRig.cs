@@ -164,7 +164,7 @@ namespace Leap.Unity {
         RiggedHand_L = Hand_L.GetComponent<RiggedHand>();
       }
       else RiggedHand_L = Hand_L.gameObject.AddComponent<RiggedHand>();
-      HandTransitionBehavior_L =Hand_L.gameObject.AddComponent<HandDrop>();
+      HandTransitionBehavior_L =Hand_L.gameObject.AddComponent<WristLeapToIKBlend>();
       RiggedHand_L.Handedness = Chirality.Left;
       RiggedHand_L.SetEditorLeapPose = false;
 
@@ -173,7 +173,7 @@ namespace Leap.Unity {
         RiggedHand_R = Hand_R.GetComponent<RiggedHand>();
       }
       else RiggedHand_R = Hand_R.gameObject.AddComponent<RiggedHand>();
-      HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<HandDrop>();
+      HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<WristLeapToIKBlend>();
       RiggedHand_R.Handedness = Chirality.Right;
       RiggedHand_R.SetEditorLeapPose = false;
 
