@@ -8,6 +8,19 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction {
 
+  /**
+  * An Interaction Engine material that controls several aspects of the interaction between
+  * BrushHands and an interactable object.
+  *
+  * InteractionMaterials can be assigned directly to a the InteractionBehavior component of
+  * an interactable object, and can be assigned as the default material of an InteractionManager.
+  * A default material is used for any objects that aren't assigned a specific InteractionMaterial.
+  *
+  * To create a new Interaction Material, you can either use the Unity menu command: 
+  * Assets>Create>Interaction Material, or right-click in the project window and 
+  * select Create>Interaction Material.
+  * @since 4.1.4
+  */
   public class InteractionMaterial : ScriptableObject {
 
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
@@ -19,6 +32,15 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /*
+    * The options for controlling how the Interaction replaces a rigid body's physics material.
+    * 
+    * * NoAction -- the material is not replaced.
+    * * DuplicateExisting -- a modified copy of the original material is used.
+    * * Replace -- the material is replaced with the specified material.
+    * 
+    * @since 4.1.4
+    */
     public enum PhysicMaterialModeEnum {
       NoAction,
       DuplicateExisting,
@@ -26,11 +48,13 @@ namespace Leap.Unity.Interaction {
     }
 
     [Header("Contact Settings")]
+    [Tooltip("Whether the object can be touched.")]
     [SerializeField]
     protected bool _contactEnabled = true;
 
     [MinValue(0)]
     [SerializeField]
+    [Tooltip("How far from any BrushHand an object must be to go to sleep.")]
     protected float _brushDisableDistance = 0.017f;
 
     [Tooltip("What to do with the physic materials when a grasp occurs.")]
@@ -86,74 +110,145 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected ILayerController _layerController;
 
+    /**
+    * Constructs an instance of the material's HoldingPoseController implementation 
+    * for an instance of an InteractionBehavior.
+    * @since 4.1.4
+    */
     public IHoldingPoseController CreateHoldingPoseController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _holdingPoseController);
     }
 
+    /**
+    * Constructs an instance of the material's MoveToController implementation 
+    * for an instance of an InteractionBehavior.
+    * @since 4.1.4
+    */
     public IMoveToController CreateMoveToController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _moveToController);
     }
 
+    /**
+    * Constructs an instance of the material's SuspensionController implementation 
+    * for an instance of an InteractionBehavior.
+    * @since 4.1.4
+    */
     public ISuspensionController CreateSuspensionController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _suspensionController);
     }
 
+    /**
+    * Constructs an instance of the material's ThrowingController implementation 
+    * for an instance of an InteractionBehavior.
+    * @since 4.1.4
+    */
     public IThrowingController CreateThrowingController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _throwingController);
     }
 
+    /**
+    * Constructs an instance of the material's LayerController implementation 
+    * for an instance of an InteractionBehavior.
+    * @since 4.1.4
+    */
     public ILayerController CreateLayerController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _layerController);
     }
 
+    /**
+    * Whether contact between an object and the BrushHands can occur.
+    * If false, hands will pass through an object without affecting it.
+    * @since 4.1.4
+    */
     public bool ContactEnabled {
       get {
         return _contactEnabled;
       }
     }
 
+    /**
+    * The distance from the closest hand at which an object will go to sleep.
+    * @since 4.1.4
+    */
     public float BrushDisableDistance {
       get {
         return 0.017f;
       }
     }
 
+    /**
+    * How far an object can move from the holding hand before it releases.
+    * @since 4.1.4
+    */
     public float ReleaseDistance {
       get {
         return _releaseDistance;
       }
     }
 
+    /**
+    * How far an object can twist in the holding hand before it releases.
+    * @since 4.1.4
+    */
     public float ReleaseAngle {
       get {
         return _releaseAngle;
       }
     }
 
+    /**
+    * Controls how the Interaction Engine replaces a rigid body's physics material when 
+    * the object is picked up.
+    * 
+    * * NoAction -- the material is not replaced.
+    * * DuplicateExisting -- a modified copy of the original material is used.
+    * * Replace -- the material is replaced with material specified by ReplacementPhysicMaterial.
+    * 
+    * @since 4.1.4
+    */
     public PhysicMaterialModeEnum PhysicMaterialMode {
       get {
         return _physicMaterialMode;
       }
     }
 
+    /**
+    * Specifies the physics material to use when the parent game object is held and the PhysicMaterialMode
+    * is set to PhysicMaterialModeEnum.Replace.
+    * @since 4.1.4
+    */
     public PhysicMaterial ReplacementPhysicMaterial {
       get {
         return _replacementMaterial;
       }
     }
 
+    /**
+    * Specifies whether the Interaction Engine can sperate the physic representation and the graphics 
+    * representation of an interactable object. Warping can decrease perceived latency.
+    * @since 4.1.4
+    */
     public bool WarpingEnabled {
       get {
         return _warpingEnabled;
       }
     }
 
+    /**
+    * Controls the amount of warping based on the distance between the current position and the 
+    * desired position.
+    * @since 4.1.4
+    */
     public AnimationCurve WarpCurve {
       get {
         return _warpCurve;
       }
     }
 
+    /**
+    * How long it takes for the graphical anchor to return to the origin after a release. 
+    * @since 4.1.4
+    */
     public float GraphicalReturnTime {
       get {
         return _graphicalReturnTime;

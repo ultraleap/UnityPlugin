@@ -5,15 +5,29 @@ using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
+  /**
+  * The HoldingPoseControllerKabsch class implements a holding pose controller that  
+  * solves for the position that best fits the object into the hand (using a Kabsch algorithm).
+  *
+  * Two solving methods are provided:
+  *
+  * * SixDegreeSolve -- allows the object to move and rotate in any direction.
+  * * PivotAroundOrigin -- constrains the object to rotations only. Use this solving method
+  *   for objects that cannot change position, such as a lever or attached wheel.
+  * 
+  * @since 4.1.4
+  */
   public class HoldingPoseControllerKabsch : IHoldingPoseController {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 
+    /** The defined solving methods. */
     public enum SolveMethod {
       SixDegreeSolve,
       PivotAroundOrigin
     }
 
+    /** The specified solving method. */
     [SerializeField]
     protected SolveMethod _solveMethod;
 

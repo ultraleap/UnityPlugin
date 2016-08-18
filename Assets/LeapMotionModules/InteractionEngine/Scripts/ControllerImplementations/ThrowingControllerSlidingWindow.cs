@@ -5,12 +5,19 @@ using System;
 
 namespace Leap.Unity.Interaction {
 
+  /**
+  * The ThrowingControllerSlidingWindow class averages the object's velocity
+  * over the specified window and applies it to the object when released.
+  * @since 4.1.4
+  */
   public class ThrowingControllerSlidingWindow : IThrowingController {
 
+    /** The length of the averaging window in seconds. */
     [Tooltip("How long the averaging window is in seconds.")]
     [SerializeField]
     private float _windowLength = 0.05f;
 
+    /** The delay between the averaging window and the current time. */
     [Tooltip("The delay between the averaging window and the current time.")]
     [SerializeField]
     private float _windowDelay = 0.02f;
@@ -40,6 +47,7 @@ namespace Leap.Unity.Interaction {
 
     private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>();
 
+    /** Samples the current velocity and adds it to the rolling average. */
     public override void OnHold(ReadonlyList<Hand> hands) {
       _velocityQueue.Enqueue(new VelocitySample(_obj.warper.RigidbodyPosition, _obj.warper.RigidbodyRotation, Time.fixedTime));
 
@@ -55,6 +63,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /** Transfers the averaged velocity to the released object. */
     public override void OnThrow(Hand throwingHand) {
       if (_velocityQueue.Count < 2) {
         _obj.rigidbody.velocity = Vector3.zero;
