@@ -11,9 +11,13 @@ namespace Leap.Unity {
     private Quaternion startingOrientation;
     private Transform palm;
 
+    public Vector3 PalmPositionAtLateUpdate;
+    private Quaternion PalmRotationAtLateUpdate;
+    public Chirality Handedness;
+    private float positionIKWeight;
+    private float rotationIKWeight;
+
     protected override void Awake() {
-
-
       base.Awake();
       animator = transform.root.GetComponentInChildren<Animator>();
       palm = GetComponent<HandModel>().palm;
@@ -23,25 +27,40 @@ namespace Leap.Unity {
 
     protected override void HandFinish() {
       StartCoroutine(LerpToStart());
+      positionIKWeight = 0;
+      rotationIKWeight = 0;
     }
     protected override void HandReset() {
       StopAllCoroutines();
+      positionIKWeight = 1;
+      rotationIKWeight = 1;
+    }
+
+    void LateUpdate() {
+      PalmPositionAtLateUpdate = palm.position;
+      PalmRotationAtLateUpdate = palm.rotation;
     }
 
     public void OnAnimatorIK(int layerIndex) {
-      Debug.Log("IK");
-      animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1);
-      animator.SetIKPosition(AvatarIKGoal.LeftHand, palm.position);
-      //Debug.Log(palm.position);
-      animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1);
-      animator.SetIKRotation(AvatarIKGoal.LeftHand, palm.rotation);
-
-      animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1);
-      animator.SetIKPosition(AvatarIKGoal.RightHand, palm.position);
-      animator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1);
-      animator.SetIKRotation(AvatarIKGoal.RightHand, palm.rotation);
+      //Debug.Log("IK");
+      if (Handedness == Chirality.Left) {
+        animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, positionIKWeight);
+        animator.SetIKPosition(AvatarIKGoal.LeftHand, PalmPositionAtLateUpdate);
+        //Debug.Log(palm.position);
+        animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotationIKWeight);
+        animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
+      }
+      //Debug.Log("Behaviour Frame: " + Time.frameCount);
+      if (Handedness == Chirality.Right) {
+        animator.SetIKPositionWeight(AvatarIKGoal.RightHand, positionIKWeight);
+        animator.SetIKPosition(AvatarIKGoal.RightHand, PalmPositionAtLateUpdate);
+        animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotationIKWeight);
+        animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
+      }
     }
-
+    private IEnumerator LerpPositionIKWeight(float destinationWeight, float duration) {
+      return null;
+    }
     private IEnumerator LerpToStart() {
       Vector3 droppedPosition = palm.localPosition;
       Quaternion droppedOrientation = palm.localRotation;
@@ -55,6 +74,9 @@ namespace Leap.Unity {
         palm.localRotation = Quaternion.Lerp(droppedOrientation, startingOrientation, t);
         yield return null;
       }
+    }
+    void OnValidate() {
+      Handedness = GetComponent<IHandModel>().Handedness;
     }
   }
 }
