@@ -47,129 +47,72 @@ namespace Leap.Unity.Interaction {
       Replace
     }
 
-    /**
-    * Whether contact between an object and the BrushHands can occur.
-    * If false, hands will pass through an object without affecting it.
-    * @since 4.1.4
-    */
     [Header("Contact Settings")]
+    [Tooltip("Whether the object can be touched.")]
     [SerializeField]
     protected bool _contactEnabled = true;
 
     [MinValue(0)]
     [SerializeField]
+    [Tooltip("How far from any BrushHand an object must be to go to sleep.")]
     protected float _brushDisableDistance = 0.017f;
 
-    /**
-    * Controls how the Interaction Engine replaces a rigid body's physics material when 
-    * the object is picked up.
-    * 
-    * * NoAction -- the material is not replaced.
-    * * DuplicateExisting -- a modified copy of the original material is used.
-    * * Replace -- the material is replaced with material specified by _replacementMaterial.
-    * 
-    * @since 4.1.4
-    */
     [Tooltip("What to do with the physic materials when a grasp occurs.")]
     [SerializeField]
     protected PhysicMaterialModeEnum _physicMaterialMode = PhysicMaterialModeEnum.DuplicateExisting;
 
-    /**
-    * Specifies the physics material to use when the parent game object is held and the _physicsMaterialMode
-    * is set to PhysicMaterialModeEnum.Replace.
-    * @since 4.1.4
-    */
     [Tooltip("What material to replace with when a grasp occurs.")]
     [SerializeField]
     protected PhysicMaterial _replacementMaterial;
 
-    /**
-    *
-    * @since 4.1.4
-    */
     [Header("Grasp Settings")]
     [Tooltip("How far the object can get from the hand before it is released.")]
     [MinValue(0)]
     [SerializeField]
     protected float _releaseDistance = 0.15f;
 
-    /**
-    *
-    * @since 4.1.4
-    */
     [Tooltip("How far the object can rotate out of the hand before it is released.  At 180 degrees release due to rotation is impossible.")]
     [Range(0, 180)]
     [SerializeField]
     protected float _releaseAngle = 45;
 
-    /**
-    *
-    * @since 4.1.4
-    */
     [Tooltip("Can objects using this material warp the graphical anchor through time to reduce percieved latency.")]
     [SerializeField]
     protected bool _warpingEnabled = true;
 
-    /**
-    *
-    * @since 4.1.4
-    */
     [Tooltip("The amount of warping to perform based on the distance between the actual position and the graphical position.")]
     [SerializeField]
     protected AnimationCurve _warpCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                              new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
 
-    /**
-    *
-    * @since 4.1.4
-    */
     [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
     [MinValue(0)]
     [SerializeField]
     protected float _graphicalReturnTime = 0.25f;
 
-    /**
-    *
-    * @since 4.1.4
-    */
     [Controller]
     [SerializeField]
     protected IHoldingPoseController _holdingPoseController;
 
-    /**
-    *
-    * @since 4.1.4
-    */
     [Controller]
     [SerializeField]
     protected IMoveToController _moveToController;
 
-    /**
-    *
-    * @since 4.1.4
-    */
     [Controller(allowNone: true)]
     [SerializeField]
     protected ISuspensionController _suspensionController;
 
-    /**
-    *
-    * @since 4.1.4
-    */
     [Controller(allowNone: true)]
     [SerializeField]
     protected IThrowingController _throwingController;
 
-    /**
-    *
-    * @since 4.1.4
-    */
     [Controller(allowNone: true)]
     [SerializeField]
     protected ILayerController _layerController;
 
     /**
-    *
+    * Constructs an instance of the material's HoldingPoseController implementation 
+    * for an instance of an InteractionBehavior.
     * @since 4.1.4
     */
     public IHoldingPoseController CreateHoldingPoseController(InteractionBehaviour obj) {
@@ -177,7 +120,8 @@ namespace Leap.Unity.Interaction {
     }
 
     /**
-    *
+    * Constructs an instance of the material's MoveToController implementation 
+    * for an instance of an InteractionBehavior.
     * @since 4.1.4
     */
     public IMoveToController CreateMoveToController(InteractionBehaviour obj) {
@@ -185,7 +129,8 @@ namespace Leap.Unity.Interaction {
     }
 
     /**
-    *
+    * Constructs an instance of the material's SuspensionController implementation 
+    * for an instance of an InteractionBehavior.
     * @since 4.1.4
     */
     public ISuspensionController CreateSuspensionController(InteractionBehaviour obj) {
@@ -193,7 +138,8 @@ namespace Leap.Unity.Interaction {
     }
 
     /**
-    *
+    * Constructs an instance of the material's ThrowingController implementation 
+    * for an instance of an InteractionBehavior.
     * @since 4.1.4
     */
     public IThrowingController CreateThrowingController(InteractionBehaviour obj) {
@@ -201,7 +147,8 @@ namespace Leap.Unity.Interaction {
     }
 
     /**
-    *
+    * Constructs an instance of the material's LayerController implementation 
+    * for an instance of an InteractionBehavior.
     * @since 4.1.4
     */
     public ILayerController CreateLayerController(InteractionBehaviour obj) {
@@ -209,7 +156,8 @@ namespace Leap.Unity.Interaction {
     }
 
     /**
-    *
+    * Whether contact between an object and the BrushHands can occur.
+    * If false, hands will pass through an object without affecting it.
     * @since 4.1.4
     */
     public bool ContactEnabled {
@@ -219,7 +167,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /**
-    *
+    * The distance from the closest hand at which an object will go to sleep.
     * @since 4.1.4
     */
     public float BrushDisableDistance {
@@ -229,7 +177,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /**
-    *
+    * How far an object can move from the holding hand before it releases.
     * @since 4.1.4
     */
     public float ReleaseDistance {
@@ -239,7 +187,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /**
-    *
+    * How far an object can twist in the holding hand before it releases.
     * @since 4.1.4
     */
     public float ReleaseAngle {
@@ -249,7 +197,13 @@ namespace Leap.Unity.Interaction {
     }
 
     /**
-    *
+    * Controls how the Interaction Engine replaces a rigid body's physics material when 
+    * the object is picked up.
+    * 
+    * * NoAction -- the material is not replaced.
+    * * DuplicateExisting -- a modified copy of the original material is used.
+    * * Replace -- the material is replaced with material specified by ReplacementPhysicMaterial.
+    * 
     * @since 4.1.4
     */
     public PhysicMaterialModeEnum PhysicMaterialMode {
@@ -259,7 +213,8 @@ namespace Leap.Unity.Interaction {
     }
 
     /**
-    *
+    * Specifies the physics material to use when the parent game object is held and the PhysicMaterialMode
+    * is set to PhysicMaterialModeEnum.Replace.
     * @since 4.1.4
     */
     public PhysicMaterial ReplacementPhysicMaterial {
@@ -269,7 +224,8 @@ namespace Leap.Unity.Interaction {
     }
 
     /**
-    *
+    * Specifies whether the Interaction Engine can sperate the physic representation and the graphics 
+    * representation of an interactable object. Warping can decrease perceived latency.
     * @since 4.1.4
     */
     public bool WarpingEnabled {
@@ -279,7 +235,8 @@ namespace Leap.Unity.Interaction {
     }
 
     /**
-    *
+    * Controls the amount of warping based on the distance between the current position and the 
+    * desired position.
     * @since 4.1.4
     */
     public AnimationCurve WarpCurve {
@@ -289,7 +246,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /**
-    *
+    * How long it takes for the graphical anchor to return to the origin after a release. 
     * @since 4.1.4
     */
     public float GraphicalReturnTime {

@@ -5,12 +5,22 @@ using UnityEditor;
 #endif
 
 namespace Leap.Unity.Interaction {
+
+  /**
+  * The InteractiveBrushBone class is a physics element of an InteractiveBrushHand object.
+  * It contains Unity physics components that are controlled by the Interaction Engine.
+  * @since 4.1.3
+  */
   public class InteractionBrushBone : MonoBehaviour {
 
     // Used by InteractionBrushHand:
+    /** The active InteractionManager. */
     public InteractionManager manager;
+    /** This InteractiveBrushBone's RigidBody. */
     public Rigidbody capsuleBody;
+    /** This InteractiveBrushBone's Collider. */
     public CapsuleCollider capsuleCollider;
+    /** This InteractiveBrushBone's target position. */
     public Vector3 lastTarget;
 
     // Once the brush becomes dislocated, it then remains dislocated until it
@@ -18,11 +28,13 @@ namespace Leap.Unity.Interaction {
     private const int DISLOCATED_BRUSH_COOLDOWN = 3;
     private int _dislocatedCounter = DISLOCATED_BRUSH_COOLDOWN;
 
+    /** Changes the collider to react to collisions as a trigger. */
     public void startTriggering() {
       capsuleCollider.isTrigger = true;
       _dislocatedCounter = 0;
     }
 
+    /** Determines whether the brush bone should react to collisions as a trigger. */
     public bool updateTriggering() {
       if (_dislocatedCounter < DISLOCATED_BRUSH_COOLDOWN) {
         if (++_dislocatedCounter == DISLOCATED_BRUSH_COOLDOWN) {
