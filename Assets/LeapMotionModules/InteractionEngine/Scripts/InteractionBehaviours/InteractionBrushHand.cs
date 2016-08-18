@@ -15,7 +15,7 @@ namespace Leap.Unity.Interaction {
   * provide natural and subtle interaction between hands and physically
   * simulated virtual objects. 
   *
-  * Use the InteractionBrushHand models when using the Iteraction Engine instead of the 
+  * Use the InteractionBrushHand models when using the Interaction Engine instead of the 
   * other physics hand models.
   * @since 4.1.3
   */
@@ -34,7 +34,7 @@ namespace Leap.Unity.Interaction {
       get { return ModelType.Physics; }
     }
 
-    /** The InteractionManager that manages this hand model for the Iteraction Engine. */
+    /** The InteractionManager that manages this hand model for the Interaction Engine. */
     [SerializeField]
     private InteractionManager _manager;
 
