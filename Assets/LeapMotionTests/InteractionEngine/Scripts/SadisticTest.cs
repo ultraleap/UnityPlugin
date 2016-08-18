@@ -42,6 +42,12 @@ namespace Leap.Unity.Interaction.Testing {
     [Disable]
     public float scale;
 
+    [Disable]
+    public bool contactEnabled;
+
+    [Disable]
+    public bool graspEnabled;
+
     protected InteractionManager _manager;
     protected InteractionTestProvider _provider;
     protected SadisticTestManager _testManager;
@@ -61,6 +67,8 @@ namespace Leap.Unity.Interaction.Testing {
       _manager.MaxActivationDepth = activationDepth;
       _manager.ShowDebugLines = true;
       _manager.ShowDebugOutput = true;
+      _manager.ContactEnabled = contactEnabled;
+      _manager.GraspingEnabled = graspEnabled;
       _manager.UpdateSceneInfo();
 
       current = this;
