@@ -3,6 +3,12 @@ using UnityEngine.Assertions;
 
 namespace Leap.Unity.Interaction {
 
+  /**
+  * The SuspensionControllerDefault class turns off rendering of suspended objects
+  * and restores rendering when the suspension times out or the interaction 
+  * simulation resumes.
+  * @since 4.1.4
+  */
   public class SuspensionControllerDefault : ISuspensionController {
     [SerializeField]
     private float _maxSuspensionTime = 4;
@@ -15,21 +21,25 @@ namespace Leap.Unity.Interaction {
       _renderers = obj.GetComponentsInChildren<Renderer>();
     }
 
+    /** The timeout period. */
     public override float MaxSuspensionTime {
       get {
         return _maxSuspensionTime;
       }
     }
 
+    /** Resumes rendering of the object. */
     public override void Resume() {
       setRendererState(true);
     }
 
+    /** Suspends rendering of the object and sets the IsKinematic property of its rigid body to true. */
     public override void Suspend() {
       _obj.rigidbody.isKinematic = true;
       setRendererState(false);
     }
 
+    /** Resumes rendering of the object. */
     public override void Timeout() {
       setRendererState(true);
     }
@@ -40,6 +50,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /** Validates that the object remains kinematic when it is suspended. */
     public override void Validate() {
       base.Validate();
 
