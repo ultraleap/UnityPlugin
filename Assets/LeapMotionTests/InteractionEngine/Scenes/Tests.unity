@@ -649,7 +649,7 @@ Transform:
   - {fileID: 1825586420}
   - {fileID: 1673082420}
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 15
 --- !u!1 &188946668
 GameObject:
   m_ObjectHideFlags: 0
@@ -1442,6 +1442,66 @@ Transform:
   - {fileID: 1420969564}
   m_Father: {fileID: 0}
   m_RootOrder: 1
+--- !u!1 &338437874
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 338437875}
+  - 114: {fileID: 338437876}
+  m_Layer: 0
+  m_Name: Can Grasp Without Contact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &338437875
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 338437874}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 1623034904}
+  m_RootOrder: 1
+--- !u!114 &338437876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 338437874}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: e155ad1dea67e584a998f55582154f44, type: 2}
+  callback: 0
+  expectedCallbacks: 63
+  forbiddenCallbacks: 0
+  action: 0
+  actionDelay: 0
+  activationDepth: 3
+  scale: 1
+  contactEnabled: 0
+  graspEnabled: 1
 --- !u!1 &342857303
 GameObject:
   m_ObjectHideFlags: 0
@@ -1742,6 +1802,73 @@ MonoBehaviour:
   scale: 1
   contactEnabled: 1
   graspEnabled: 1
+--- !u!1 &371582291
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 371582293}
+  - 114: {fileID: 371582292}
+  m_Layer: 0
+  m_Name: CantGraspWhenGraspDisabled
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &371582292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 371582291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ad7e45e1ddff514bb29f6461fa67e46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  _recordings:
+  - {fileID: 11400000, guid: 7489d85df63bb144998521ebbdaf4e3d, type: 2}
+  - {fileID: 11400000, guid: e155ad1dea67e584a998f55582154f44, type: 2}
+  _callbacks: 0
+  _actions: 0
+  _actionDelay: 0
+  _activationDepths: 03000000
+  _scales:
+  - 1
+  _contactEnabled: 1
+  _graspEnabled: 0
+  _expectedCallbacks: 15
+  _forbiddenCallbacks: 240
+  _spawnObjectTime: 0
+  _spawnObjectDelay: 0
+--- !u!4 &371582293
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 371582291}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.689457, y: -6.8565435, z: 0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 1486143301}
+  - {fileID: 789215463}
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
 --- !u!1 &374607564
 GameObject:
   m_ObjectHideFlags: 0
@@ -2345,6 +2472,66 @@ MonoBehaviour:
   scale: 1
   contactEnabled: 1
   graspEnabled: 1
+--- !u!1 &472563321
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 472563322}
+  - 114: {fileID: 472563323}
+  m_Layer: 0
+  m_Name: Can Grasp Without Contact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &472563322
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 472563321}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 1623034904}
+  m_RootOrder: 0
+--- !u!114 &472563323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 472563321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 7489d85df63bb144998521ebbdaf4e3d, type: 2}
+  callback: 0
+  expectedCallbacks: 63
+  forbiddenCallbacks: 0
+  action: 0
+  actionDelay: 0
+  activationDepth: 3
+  scale: 1
+  contactEnabled: 0
+  graspEnabled: 1
 --- !u!1 &503054990
 GameObject:
   m_ObjectHideFlags: 0
@@ -2420,7 +2607,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &509658614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2469,7 +2656,7 @@ Transform:
   m_Children:
   - {fileID: 833193554}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 11
 --- !u!1 &529739086
 GameObject:
   m_ObjectHideFlags: 0
@@ -3138,7 +3325,7 @@ Transform:
   - {fileID: 503054991}
   - {fileID: 1904305942}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 7
 --- !u!1 &665278664
 GameObject:
   m_ObjectHideFlags: 0
@@ -3379,6 +3566,66 @@ MonoBehaviour:
   scale: 1
   contactEnabled: 1
   graspEnabled: 1
+--- !u!1 &789215462
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 789215463}
+  - 114: {fileID: 789215464}
+  m_Layer: 0
+  m_Name: Cant Grasp When Grasp Disabled
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &789215463
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 789215462}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 371582293}
+  m_RootOrder: 1
+--- !u!114 &789215464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 789215462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: e155ad1dea67e584a998f55582154f44, type: 2}
+  callback: 0
+  expectedCallbacks: 15
+  forbiddenCallbacks: 240
+  action: 0
+  actionDelay: 0
+  activationDepth: 3
+  scale: 1
+  contactEnabled: 1
+  graspEnabled: 0
 --- !u!1 &794752736
 GameObject:
   m_ObjectHideFlags: 0
@@ -3574,7 +3821,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &833193554
 Transform:
   m_ObjectHideFlags: 0
@@ -3927,7 +4174,7 @@ Transform:
   - {fileID: 1996714578}
   - {fileID: 1763935959}
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 8
 --- !u!1 &913378577
 GameObject:
   m_ObjectHideFlags: 0
@@ -4052,7 +4299,7 @@ Transform:
   m_Children:
   - {fileID: 1884019798}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 12
 --- !u!1 &922123927
 GameObject:
   m_ObjectHideFlags: 0
@@ -5081,7 +5328,7 @@ Transform:
   - {fileID: 205875091}
   - {fileID: 560551831}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 5
 --- !u!1 &1181509553
 GameObject:
   m_ObjectHideFlags: 0
@@ -5229,7 +5476,7 @@ Transform:
   - {fileID: 1313838035}
   - {fileID: 166972506}
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 16
 --- !u!1 &1207110107
 GameObject:
   m_ObjectHideFlags: 0
@@ -5496,7 +5743,7 @@ Transform:
   - {fileID: 797012781}
   - {fileID: 2116220148}
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 14
 --- !u!1 &1264153173
 GameObject:
   m_ObjectHideFlags: 0
@@ -5563,7 +5810,7 @@ Transform:
   - {fileID: 1763764762}
   - {fileID: 360802277}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 9
 --- !u!1 &1266140701
 GameObject:
   m_ObjectHideFlags: 0
@@ -6737,6 +6984,66 @@ MonoBehaviour:
   scale: 1
   contactEnabled: 1
   graspEnabled: 1
+--- !u!1 &1486143300
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1486143301}
+  - 114: {fileID: 1486143302}
+  m_Layer: 0
+  m_Name: Cant Grasp When Grasp Disabled
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1486143301
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1486143300}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.689457, y: 6.8565435, z: -0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 371582293}
+  m_RootOrder: 0
+--- !u!114 &1486143302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1486143300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1acb1dbc6534d46b4a22f1a4ed35dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  recording: {fileID: 11400000, guid: 7489d85df63bb144998521ebbdaf4e3d, type: 2}
+  callback: 0
+  expectedCallbacks: 15
+  forbiddenCallbacks: 240
+  action: 0
+  actionDelay: 0
+  activationDepth: 3
+  scale: 1
+  contactEnabled: 1
+  graspEnabled: 0
 --- !u!1 &1492990224
 GameObject:
   m_ObjectHideFlags: 0
@@ -7288,7 +7595,7 @@ Transform:
   - {fileID: 426422196}
   - {fileID: 1672074525}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 6
 --- !u!1 &1595358581
 GameObject:
   m_ObjectHideFlags: 0
@@ -7469,6 +7776,73 @@ MonoBehaviour:
   scale: 1
   contactEnabled: 1
   graspEnabled: 1
+--- !u!1 &1623034902
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1623034904}
+  - 114: {fileID: 1623034903}
+  m_Layer: 0
+  m_Name: CanGraspWithoutContact
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &1623034903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1623034902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ad7e45e1ddff514bb29f6461fa67e46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeout: 20
+  ignored: 0
+  succeedAfterAllAssertionsAreExecuted: 0
+  expectException: 0
+  expectedExceptionList: 
+  succeedWhenExceptionIsThrown: 0
+  includedPlatforms: -1
+  platformsToIgnore: []
+  dynamic: 0
+  dynamicTypeName: 
+  _recordings:
+  - {fileID: 11400000, guid: 7489d85df63bb144998521ebbdaf4e3d, type: 2}
+  - {fileID: 11400000, guid: e155ad1dea67e584a998f55582154f44, type: 2}
+  _callbacks: 0
+  _actions: 0
+  _actionDelay: 0
+  _activationDepths: 03000000
+  _scales:
+  - 1
+  _contactEnabled: 0
+  _graspEnabled: 1
+  _expectedCallbacks: 63
+  _forbiddenCallbacks: 0
+  _spawnObjectTime: 0
+  _spawnObjectDelay: 0
+--- !u!4 &1623034904
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1623034902}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.689457, y: -6.8565435, z: 0.30845022}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 472563322}
+  - {fileID: 338437875}
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
 --- !u!1 &1672074524
 GameObject:
   m_ObjectHideFlags: 0
@@ -8261,7 +8635,7 @@ Transform:
   - {fileID: 913378578}
   - {fileID: 1573856474}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 4
 --- !u!1 &1834161363
 GameObject:
   m_ObjectHideFlags: 0
@@ -8531,7 +8905,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentTest: {fileID: 0}
   _testPrefab: {fileID: 113452, guid: 17918aa090e11cb429326a59ee029545, type: 2}
-  _timeScale: 10
+  _timeScale: 1
 --- !u!4 &1849882204
 Transform:
   m_ObjectHideFlags: 0
@@ -9097,7 +9471,7 @@ Transform:
   - {fileID: 1540872821}
   - {fileID: 420357969}
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 13
 --- !u!1 &1996714577
 GameObject:
   m_ObjectHideFlags: 0
@@ -9407,7 +9781,7 @@ Transform:
   - {fileID: 1181509554}
   - {fileID: 544610912}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 10
 --- !u!1 &2116220147
 GameObject:
   m_ObjectHideFlags: 0
