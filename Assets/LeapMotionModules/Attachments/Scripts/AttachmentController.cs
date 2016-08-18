@@ -35,14 +35,6 @@ namespace Leap.Unity.Attachments {
       }
     }
     private bool _isActive = false;
-    /**
-    * Activate child objects when the attachment is enabled.
-    * When true, attached objects are enabled and activated when the 
-    * hand appears.
-    * @since 4.1.3
-    */
-    [Tooltip("Activate child objects automatically without playing a transition")]
-    public bool ActivateOnEnable = false;
 
     /**
     * Deactivate child objects when the attachment is disabled.
@@ -57,7 +49,7 @@ namespace Leap.Unity.Attachments {
      *  @since 4.1.1
      */
     [Tooltip("The transition to play when this attachment controller activates or deactivates")]
-    public Transition Transition;
+    public ITransition Transition;
 
     /**
      * Activates the attachment's child object.
@@ -68,7 +60,7 @@ namespace Leap.Unity.Attachments {
       IsActive = true;
       ChangeChildState();
       if (Transition != null && doTransition) {
-        Transition.OnComplete.AddListener(ChangeChildState);
+        Transition.OnComplete.AddListener(FinishInTransition);
         Transition.TransitionIn();
       }
     }
@@ -80,16 +72,33 @@ namespace Leap.Unity.Attachments {
      */
     public virtual void Deactivate(bool doTransition = true) {
       IsActive = false;
-      if(Transition != null) {
-        if (doTransition) {
-          Transition.OnComplete.AddListener(ChangeChildState);
+      if(Transition != null && doTransition) {
+          Transition.OnComplete.AddListener(FinishOutTransition);
           Transition.TransitionOut();
-        } else {
-          ChangeChildState();
-        }
       } else {
         ChangeChildState();
       }
+    }
+
+    /**
+    * Performs post-transition tasks after an "in" transition.
+    * @since 4.1.4
+    */
+    protected virtual void FinishInTransition() {
+      if (Transition != null) {
+        Transition.OnComplete.RemoveListener(FinishInTransition);
+      }
+    }
+
+    /**
+    * Performs post-transition tasks after an "out" transition.
+    * @since 4.1.4
+    */
+    protected virtual void FinishOutTransition() {
+      if (Transition != null) {
+        Transition.OnComplete.RemoveListener(FinishOutTransition);
+      }
+      ChangeChildState();
     }
 
     /**
@@ -97,9 +106,6 @@ namespace Leap.Unity.Attachments {
      *  @since 4.1.1
      */
     protected virtual void ChangeChildState(){
-      if(Transition != null){
-        Transition.OnComplete.RemoveListener(ChangeChildState);
-      }
       Transform[] children = GetComponentsInChildren<Transform>(true);
       for(int g = 0; g < children.Length; g++){
         if ( children[g].gameObject.GetInstanceID() != gameObject.GetInstanceID() ) {
@@ -113,9 +119,5 @@ namespace Leap.Unity.Attachments {
         Deactivate(false);
     }
 
-    private void OnEnable() {
-      if (ActivateOnEnable)
-        Activate(false);
-     }
   }
 }

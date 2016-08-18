@@ -27,7 +27,9 @@ namespace Leap.Unity.Attachments{
   * @since 4.1.4
   */
   [ExecuteInEditMode]
-  public class Transition : MonoBehaviour {
+  public class Transition : ITransition {
+
+    public Transform RootTransform;
 
     /**
     * Specifies whether to animate position.
@@ -211,7 +213,12 @@ namespace Leap.Unity.Attachments{
     * @since 4.1.4
     */
     [Tooltip("Dispatched when a transition begins")]
-    public UnityEvent OnStart;
+    [SerializeField]
+    private UnityEvent _onStart;
+    public override UnityEvent OnStart {
+      get { return _onStart; }
+      set { _onStart = value; }
+    }
 
     /**
     * Dispatched for each animation step before the transition does its own update.
@@ -220,24 +227,38 @@ namespace Leap.Unity.Attachments{
     * @since 4.1.4
     */
     [Tooltip("Dispatched each frame during a transition")]
-    public AnimationStepEvent OnAnimationStep;
+    [SerializeField]
+    private AnimationStepEvent _onAnimationStep;
+    public override AnimationStepEvent OnAnimationStep {
+      get { return _onAnimationStep; }
+      set { _onAnimationStep = value; }
+    }
 
     /**
     * Dispatched when a transition is complete.
     * @since 4.1.4
     */
     [Tooltip("Dispatched when a transition is finished")]
-    public UnityEvent OnComplete;
+    [SerializeField]
+    private UnityEvent _onComplete;
+    public override UnityEvent OnComplete {
+      get { return _onComplete; }
+      set { _onComplete = value; }
+    }
 
 #if UNITY_EDITOR
     private void Update() {
       if (!EditorApplication.isPlaying) {
+        if (RootTransform == null)
+          RootTransform = transform;
         updateTransition(Simulate);
       }
     }
   #endif
   
     private void Awake(){
+      if (RootTransform == null)
+        RootTransform = transform;
       materialProperties = new MaterialPropertyBlock();
       updateTransition(0.0f);
     }
@@ -246,11 +267,11 @@ namespace Leap.Unity.Attachments{
     * Play the transition from off to on.
     * @since 4.1.4
     */
-    public void TransitionIn(){
-      if (isActiveAndEnabled) {
+    public override void TransitionIn() {
+      if (gameObject.activeInHierarchy) {
         OnStart.Invoke();
         StopAllCoroutines();
-        StartCoroutine(transitionIn());
+        StartCoroutine(doTransitionIn());
       }
     }
 
@@ -258,11 +279,11 @@ namespace Leap.Unity.Attachments{
     * Play the transition from on to off.
     * @since 4.1.4
     */
-    public void TransitionOut(){
-      if (isActiveAndEnabled) {
+    public override void TransitionOut(){
+      if (gameObject.activeInHierarchy) {
         OnStart.Invoke();
         StopAllCoroutines();
-        StartCoroutine(transitionOut());
+        StartCoroutine(doTransitionOut());
       }
     }
 
@@ -270,7 +291,7 @@ namespace Leap.Unity.Attachments{
     * A coroutine that updates the transition state when playing the "in" transition.
     * @since 4.1.4
     */
-    protected IEnumerator transitionIn(){
+    protected IEnumerator doTransitionIn(){
       float start = Time.time;
       do {
         progress = (Time.time - start)/Duration;
@@ -286,7 +307,7 @@ namespace Leap.Unity.Attachments{
     * A coroutine that updates the transition state when playing the "out" transition.
     * @since 4.1.4
     */
-    protected IEnumerator transitionOut(){
+    protected IEnumerator doTransitionOut(){
       float start = Time.time;
       do {
         progress = (Time.time - start)/Duration;
@@ -314,7 +335,7 @@ namespace Leap.Unity.Attachments{
     * @since 4.1.4
     */
     protected virtual void doAnimatePosition(float interpolationPoint) {
-      transform.localPosition = Vector3.Lerp(OnPosition, OffPosition, PositionCurve.Evaluate(interpolationPoint));
+      RootTransform.transform.localPosition = Vector3.Lerp(OnPosition, OffPosition, PositionCurve.Evaluate(interpolationPoint));
     }
 
     /**
@@ -322,7 +343,7 @@ namespace Leap.Unity.Attachments{
     * @since 4.1.4
     */
     protected virtual void doAnimateRotation(float interpolationPoint) {
-      transform.localRotation = Quaternion.Lerp(OnRotationQuaternion, OffRotationQuaternion, RotationCurve.Evaluate(interpolationPoint));
+      RootTransform.transform.localRotation = Quaternion.Lerp(OnRotationQuaternion, OffRotationQuaternion, RotationCurve.Evaluate(interpolationPoint));
     }
 
     /**
@@ -330,7 +351,7 @@ namespace Leap.Unity.Attachments{
     * @since 4.1.4
     */
     protected virtual void doAnimateScale(float interpolationPoint) {
-      transform.localScale = Vector3.Lerp(OnScale, OffScale, ScaleCurve.Evaluate(interpolationPoint));
+      RootTransform.transform.localScale = Vector3.Lerp(OnScale, OffScale, ScaleCurve.Evaluate(interpolationPoint));
     }
 
     /**
@@ -339,7 +360,7 @@ namespace Leap.Unity.Attachments{
     */
     protected virtual void doAnimateColor(float interpolationPoint) {
       float influence = ColorCurve.Evaluate(interpolationPoint);
-      Transform[] children = GetComponentsInChildren<Transform>(true);
+      Transform[] children = RootTransform.gameObject.GetComponentsInChildren<Transform>(true);
       for (int g = 0; g < children.Length; g++) {
         Renderer renderer = children[g].gameObject.GetComponent<Renderer>();
         if (renderer != null) {
@@ -352,14 +373,4 @@ namespace Leap.Unity.Attachments{
     }
   }
 
-  /**
-   * An event class that is dispatched by a Transition for each animation
-   * step during a transition. The event occurs once per frame for the duration of
-   * a transition.
-   * The event parameter provides the current interpolation value between -1 and 0 for an
-   * in transition and between 0 and +1 for an out transition..
-   * @since 4.1.4
-   */
-  [System.Serializable]
-  public class AnimationStepEvent : UnityEvent<float> { }
 }
