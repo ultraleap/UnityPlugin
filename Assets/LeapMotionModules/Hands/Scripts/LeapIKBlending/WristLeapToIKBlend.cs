@@ -5,7 +5,10 @@ using Leap.Unity;
 namespace Leap.Unity {
   public class WristLeapToIKBlend : HandTransitionBehavior {
     public Animator animator;
-
+    public Transform ElbowIKTarget;
+    private HandModel handModel;
+    private Vector3 armDirection;
+    public float ElbowOffset;
 
     private Vector3 startingPalmPosition;
     private Quaternion startingOrientation;
@@ -20,6 +23,7 @@ namespace Leap.Unity {
     protected override void Awake() {
       base.Awake();
       animator = transform.root.GetComponentInChildren<Animator>();
+      handModel = transform.GetComponent<HandModel>();
       palm = GetComponent<HandModel>().palm;
       startingPalmPosition = palm.localPosition;
       startingOrientation = palm.localRotation;
@@ -39,6 +43,10 @@ namespace Leap.Unity {
     void LateUpdate() {
       PalmPositionAtLateUpdate = palm.position;
       PalmRotationAtLateUpdate = palm.rotation;
+
+      //get Arm Directions and set elbow target position
+      armDirection =  handModel.GetArmDirection();
+      ElbowIKTarget.position = palm.position + (armDirection * ElbowOffset);
     }
 
     public void OnAnimatorIK(int layerIndex) {
@@ -49,6 +57,8 @@ namespace Leap.Unity {
         //Debug.Log(palm.position);
         animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotationIKWeight);
         animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
+        animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, positionIKWeight);
+        animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
       }
       //Debug.Log("Behaviour Frame: " + Time.frameCount);
       if (Handedness == Chirality.Right) {
@@ -56,6 +66,8 @@ namespace Leap.Unity {
         animator.SetIKPosition(AvatarIKGoal.RightHand, PalmPositionAtLateUpdate);
         animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotationIKWeight);
         animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
+        animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, positionIKWeight);
+        animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
       }
     }
     private IEnumerator LerpPositionIKWeight(float destinationWeight, float duration) {
