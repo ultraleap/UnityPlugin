@@ -18,12 +18,14 @@ namespace Leap.Unity {
   public class HandPool :
     HandFactory {
     [SerializeField]
+    [Tooltip("Reference for the transform that is a child of the camera rig's root and is a parent to all hand models")]
+    private Transform ModelsParent;
+    [SerializeField]
     private List<ModelGroup> ModelPool;
     private List<HandProxy> activeHandReps = new List<HandProxy>();
 
     private Dictionary<IHandModel, ModelGroup> modelGroupMapping = new Dictionary<IHandModel, ModelGroup>();
     private Dictionary<IHandModel, HandProxy> modelToHandRepMapping = new Dictionary<IHandModel, HandProxy>();
-
     /**
      * ModelGroup contains a left/right pair of IHandModel's 
      * @param modelList The IHandModels available for use by HandProxys
@@ -65,7 +67,7 @@ namespace Leap.Unity {
             if (modelsCheckedOut[i].HandModelType == modelType && modelsCheckedOut[i].Handedness == chirality) {
               IHandModel modelToSpawn = modelsCheckedOut[i];
               IHandModel spawnedModel = GameObject.Instantiate(modelToSpawn);
-              spawnedModel.transform.parent = _handPool.transform;
+              spawnedModel.transform.parent = _handPool.ModelsParent;
               _handPool.modelGroupMapping.Add(spawnedModel, this);
               modelsCheckedOut.Add(spawnedModel);
               return spawnedModel;
@@ -115,6 +117,9 @@ namespace Leap.Unity {
     }
     /** Popuates the ModelPool with the contents of the ModelCollection */
     void Start() {
+      if (ModelsParent == null) {
+        Debug.LogWarning("HandPool.ModelsParent needs to reference the parent transform of the hand models.  This transform should be a child of the LMHeadMountedRig transform.");
+      }
       foreach (ModelGroup collectionGroup in ModelPool) {
         collectionGroup._handPool = this;
         IHandModel leftModel;
@@ -123,23 +128,27 @@ namespace Leap.Unity {
           IHandModel modelToSpawn = collectionGroup.LeftModel;
           GameObject spawnedGO = GameObject.Instantiate(modelToSpawn.gameObject);
           leftModel = spawnedGO.GetComponent<IHandModel>();
-          leftModel.transform.parent = transform;
+          leftModel.transform.parent = ModelsParent;
         } else {
           leftModel = collectionGroup.LeftModel;
         }
-        collectionGroup.modelList.Add(leftModel);
-        modelGroupMapping.Add(leftModel, collectionGroup);
+        if (leftModel != null) {
+          collectionGroup.modelList.Add(leftModel);
+          modelGroupMapping.Add(leftModel, collectionGroup);
+        }
 
         if (collectionGroup.IsRightToBeSpawned) {
           IHandModel modelToSpawn = collectionGroup.RightModel;
           GameObject spawnedGO = GameObject.Instantiate(modelToSpawn.gameObject);
           rightModel = spawnedGO.GetComponent<IHandModel>();
-          rightModel.transform.parent = transform;
+          rightModel.transform.parent = ModelsParent;
         } else {
           rightModel = collectionGroup.RightModel;
         }
-        collectionGroup.modelList.Add(rightModel);
-        modelGroupMapping.Add(rightModel, collectionGroup);
+        if (rightModel != null) {
+          collectionGroup.modelList.Add(rightModel);
+          modelGroupMapping.Add(rightModel, collectionGroup);
+        }
       }
     }
 
