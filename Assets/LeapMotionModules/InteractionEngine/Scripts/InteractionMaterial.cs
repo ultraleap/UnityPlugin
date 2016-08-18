@@ -60,13 +60,13 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected float _brushDisableDistance = 0.017f;
 
-    /*
+    /**
     * Controls how the Interaction Engine replaces a rigid body's physics material when 
     * the object is picked up.
     * 
     * * NoAction -- the material is not replaced.
     * * DuplicateExisting -- a modified copy of the original material is used.
-    * * Replace -- the material is replaced with the specified material.
+    * * Replace -- the material is replaced with material specified by _replacementMaterial.
     * 
     * @since 4.1.4
     */
@@ -74,123 +74,224 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected PhysicMaterialModeEnum _physicMaterialMode = PhysicMaterialModeEnum.DuplicateExisting;
 
+    /**
+    * Specifies the physics material to use when the parent game object is held and the _physicsMaterialMode
+    * is set to PhysicMaterialModeEnum.Replace.
+    * @since 4.1.4
+    */
     [Tooltip("What material to replace with when a grasp occurs.")]
     [SerializeField]
     protected PhysicMaterial _replacementMaterial;
 
+    /**
+    *
+    * @since 4.1.4
+    */
     [Header("Grasp Settings")]
     [Tooltip("How far the object can get from the hand before it is released.")]
     [MinValue(0)]
     [SerializeField]
     protected float _releaseDistance = 0.15f;
 
+    /**
+    *
+    * @since 4.1.4
+    */
     [Tooltip("How far the object can rotate out of the hand before it is released.  At 180 degrees release due to rotation is impossible.")]
     [Range(0, 180)]
     [SerializeField]
     protected float _releaseAngle = 45;
 
+    /**
+    *
+    * @since 4.1.4
+    */
     [Tooltip("Can objects using this material warp the graphical anchor through time to reduce percieved latency.")]
     [SerializeField]
     protected bool _warpingEnabled = true;
 
+    /**
+    *
+    * @since 4.1.4
+    */
     [Tooltip("The amount of warping to perform based on the distance between the actual position and the graphical position.")]
     [SerializeField]
     protected AnimationCurve _warpCurve = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                              new Keyframe(0.02f, 0.0f, 0.0f, 0.0f));
 
+    /**
+    *
+    * @since 4.1.4
+    */
     [Tooltip("How long it takes for the graphical anchor to return to the origin after a release.")]
     [MinValue(0)]
     [SerializeField]
     protected float _graphicalReturnTime = 0.25f;
 
+    /**
+    *
+    * @since 4.1.4
+    */
     [Controller]
     [SerializeField]
     protected IHoldingPoseController _holdingPoseController;
 
+    /**
+    *
+    * @since 4.1.4
+    */
     [Controller]
     [SerializeField]
     protected IMoveToController _moveToController;
 
+    /**
+    *
+    * @since 4.1.4
+    */
     [Controller(allowNone: true)]
     [SerializeField]
     protected ISuspensionController _suspensionController;
 
+    /**
+    *
+    * @since 4.1.4
+    */
     [Controller(allowNone: true)]
     [SerializeField]
     protected IThrowingController _throwingController;
 
+    /**
+    *
+    * @since 4.1.4
+    */
     [Controller(allowNone: true)]
     [SerializeField]
     protected ILayerController _layerController;
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public IHoldingPoseController CreateHoldingPoseController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _holdingPoseController);
     }
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public IMoveToController CreateMoveToController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _moveToController);
     }
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public ISuspensionController CreateSuspensionController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _suspensionController);
     }
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public IThrowingController CreateThrowingController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _throwingController);
     }
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public ILayerController CreateLayerController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _layerController);
     }
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public bool ContactEnabled {
       get {
         return _contactEnabled;
       }
     }
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public float BrushDisableDistance {
       get {
         return 0.017f;
       }
     }
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public float ReleaseDistance {
       get {
         return _releaseDistance;
       }
     }
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public float ReleaseAngle {
       get {
         return _releaseAngle;
       }
     }
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public PhysicMaterialModeEnum PhysicMaterialMode {
       get {
         return _physicMaterialMode;
       }
     }
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public PhysicMaterial ReplacementPhysicMaterial {
       get {
         return _replacementMaterial;
       }
     }
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public bool WarpingEnabled {
       get {
         return _warpingEnabled;
       }
     }
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public AnimationCurve WarpCurve {
       get {
         return _warpCurve;
       }
     }
 
+    /**
+    *
+    * @since 4.1.4
+    */
     public float GraphicalReturnTime {
       get {
         return _graphicalReturnTime;
