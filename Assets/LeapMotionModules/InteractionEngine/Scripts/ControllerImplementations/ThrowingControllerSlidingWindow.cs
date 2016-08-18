@@ -15,6 +15,7 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     private float _windowDelay = 0.02f;
 
+    [Tooltip("Maps the release speed into a multiplier which is used to scale the release velocity.")]
     [SerializeField]
     private AnimationCurve _velocityScaleCurve = new AnimationCurve(new Keyframe(0, 1, 0, 0),
                                                                     new Keyframe(3, 1.5f, 0, 0));
