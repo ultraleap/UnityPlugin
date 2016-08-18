@@ -15,9 +15,9 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     private float _windowDelay = 0.02f;
 
-    [Tooltip("Maps the release speed into a multiplier which is used to scale the release velocity.")]
+    [Tooltip("X axis is the speed of the released object.  Y axis is the value to multiply the speed by.")]
     [SerializeField]
-    private AnimationCurve _velocityScaleCurve = new AnimationCurve(new Keyframe(0, 1, 0, 0),
+    private AnimationCurve _velocityMultiplierCurve = new AnimationCurve(new Keyframe(0, 1, 0, 0),
                                                                     new Keyframe(3, 1.5f, 0, 0));
 
     private struct VelocitySample {
@@ -99,7 +99,7 @@ namespace Leap.Unity.Interaction {
       _obj.rigidbody.velocity = PhysicsUtility.ToLinearVelocity(start.position, end.position, _windowLength);
       _obj.rigidbody.angularVelocity = PhysicsUtility.ToAngularVelocity(start.rotation, end.rotation, _windowLength);
 
-      _obj.rigidbody.velocity *= _velocityScaleCurve.Evaluate(_obj.rigidbody.velocity.magnitude);
+      _obj.rigidbody.velocity *= _velocityMultiplierCurve.Evaluate(_obj.rigidbody.velocity.magnitude);
     }
   }
 }
