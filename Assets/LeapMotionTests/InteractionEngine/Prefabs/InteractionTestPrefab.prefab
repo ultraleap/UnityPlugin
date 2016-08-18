@@ -7210,7 +7210,6 @@ MonoBehaviour:
   _brushLayer:
     layer: 10
   _automaticValidation: 0
-  _pauseSimulation: 0
   _showDebugLines: 1
   _showDebugOutput: 1
   _debugTextView: {fileID: 0}
@@ -7236,6 +7235,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c592f16851a620743868a31232613370, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ModelsParent: {fileID: 494174}
   ModelPool:
   - GroupName: GraphicalHands
     _handPool: {fileID: 0}

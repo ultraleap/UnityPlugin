@@ -149,6 +149,8 @@ namespace Leap.Unity.Interaction.Testing {
         test.actionDelay = _actionDelay;
         test.activationDepth = activationDepth;
         test.scale = scale;
+        test.contactEnabled = _contactEnabled;
+        test.graspEnabled = _graspEnabled;
       }
     }
 #endif
