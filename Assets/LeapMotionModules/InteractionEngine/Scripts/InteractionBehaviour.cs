@@ -13,21 +13,21 @@ namespace Leap.Unity.Interaction {
   /// <remarks>
   /// It has the following features:
   ///    - Extends from InteractionBehaviourBase to take advantage of it's bookkeeping and callbacks.
-  ///    - Supports kinematic movement as well as physical movement.
+  ///    - Supports kinematic movement as well as physical, non-kinematic movement.
   ///    - When non-kinematic, supports pushing.
   ///    - Has the concept of a graphical anchor to reduce apparent latency between a hand moving and the object responding.
   ///      This can result in the graphical representation diverging slightly from the physical representation.
   ///    - Utilizes the Kabsch algorithm to determine how the object should rest in the hand when grabbed.
-  ///      This allows more fidelity than simple rigid atatchment to the hand, as well as more intuitive multi-hand
+  ///      This allows more fidelity than simple rigid atatchment to the hand, as well as more intuitive multi-hand.
   ///      interaction.
   ///
   /// This default implementation has the following requirements:
-  ///    - A Rigidbody is required
+  ///    - A Rigidbody is required.
   ///    - Kinematic movement must still be simulated via Rigidbody kinematic movement, as opposed to rigid movement of the Transform.
   ///    - Any non-continuous movement must be noted using the NotifyTeleported() method.
   ///    - Any forces or torques must be applied using the AddLinearAcceleration and AddAngularAcceleration methods instead of
   ///      the Rigidbody AddForce or AddTorque methods.
-  ///    - Any update of the kinematic or gravity status of the object must be done through setting the IsKinematic or UseGravity
+  ///    - Any runtime update of the kinematic or gravity status of the object must be done through setting the IsKinematic or UseGravity
   ///      properties of this behaviour instead of the properties on the Rigidbody component.
   /// </remarks>
   [SelectionBase]
@@ -79,7 +79,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Sets or Gets whether or not this InteractionBehaviour is Kinematic or not.  Always use this instead
+    /// Whether or not this InteractionBehaviour is Kinematic.  Always use this property instead
     /// of Rigidbody.IsKinematic because InteractionBehaviour overrides the kinematic status of the Rigidbody.
     /// </summary>
     public bool isKinematic {
@@ -127,7 +127,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Sets or Gets whether or not this InteractionBehaviour uses Gravity or not.  Always use this instead
+    /// Whether or not this InteractionBehaviour uses Gravity.  Always use this property instead
     /// of Rigidbody.UseGravity because InteractionBehaviour overrides the gravity status of the Rigidbody.
     /// </summary>
     public bool useGravity {
@@ -143,8 +143,10 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Gets whether or not this InteractionBehaviour was teleported this frame or not.  Is set to true when
-    /// NotiftyTeleported is called, and reset to false once the interaction solve has completed.
+    /// Whether or not this InteractionBehaviour was teleported in the current Unity frame. 
+    /// The InteractionBehaviour sets this property to true when
+    /// NotifyTeleported() is called, and resets the property to false once the interaction
+    /// simulation has finished updating its internal representation.
     /// </summary>
     public bool WasTeleported {
       get {
@@ -153,22 +155,27 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Adds a linear acceleration to the center of mass of this object.  Use this instead of Rigidbody.AddForce()
+    /// Adds a linear acceleration to the center of mass of this object. 
+    /// Use this instead of Rigidbody.AddForce() to accelerate an interactable object.
     /// </summary>
     public void AddLinearAcceleration(Vector3 acceleration) {
       _accumulatedLinearAcceleration += acceleration;
     }
 
     /// <summary>
-    /// Adds an angular acceleration to the center of mass of this object.  Use this instead of Rigidbody.AddTorque()
+    /// Adds an angular acceleration to the center of mass of this object. 
+    /// Use this instead of Rigidbody.AddTorque() to add angular acceleration 
+    /// to an interactable object
     /// </summary>
     public void AddAngularAcceleration(Vector3 acceleration) {
       _accumulatedAngularAcceleration += acceleration;
     }
 
     /// <summary>
-    /// This method should always be called if the object is teleported to a new location instead of moving there.  If
-    /// this method is not called, it can cause the simulation to become unstable.
+    /// This method should always be called if the object is teleported to a new 
+    /// location instead of moving there through applied forces or collisions. If
+    /// this method is not called, teleporting objects can cause the simulation to 
+    /// become unstable.
     /// </summary>
     public void NotifyTeleported() {
       _notifiedOfTeleport = true;

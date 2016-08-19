@@ -154,7 +154,7 @@ namespace Leap.Unity.Interaction {
     public Action OnPostPhysicalUpdate;
 
     /// <summary>
-    /// Gets the current debug flags for this manager.
+    /// Gets the current set of debug flags for this manager.
     /// </summary>
     public virtual DebugFlags DebugFlags {
       get {
