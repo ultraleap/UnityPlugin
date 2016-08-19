@@ -20,6 +20,10 @@ namespace Leap.Unity {
     private float positionIKWeight;
     private float rotationIKWeight;
 
+    public Transform Shoulder_L;
+    public Transform Shoulder_R;
+
+
     protected override void Awake() {
       base.Awake();
       animator = transform.root.GetComponentInChildren<Animator>();
@@ -39,14 +43,15 @@ namespace Leap.Unity {
       positionIKWeight = 1;
       rotationIKWeight = 1;
     }
+    void Update() {
+      //get Arm Directions and set elbow target position
+      armDirection = handModel.GetArmDirection();
+      ElbowIKTarget.position = palm.position + (armDirection * ElbowOffset);
+    }
 
     void LateUpdate() {
       PalmPositionAtLateUpdate = palm.position;
       PalmRotationAtLateUpdate = palm.rotation;
-
-      //get Arm Directions and set elbow target position
-      armDirection =  handModel.GetArmDirection();
-      ElbowIKTarget.position = palm.position + (armDirection * ElbowOffset);
     }
 
     public void OnAnimatorIK(int layerIndex) {
@@ -59,6 +64,10 @@ namespace Leap.Unity {
         animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
         animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, positionIKWeight);
         animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
+        if (ElbowIKTarget.position.y >= Shoulder_L.position.y) {
+          animator.SetFloat("shoulder_up_left", 2.0f);
+        }
+        else animator.SetFloat("shoulder_up_left", 0.0f);
       }
       //Debug.Log("Behaviour Frame: " + Time.frameCount);
       if (Handedness == Chirality.Right) {
@@ -68,6 +77,10 @@ namespace Leap.Unity {
         animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
         animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, positionIKWeight);
         animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
+        if (ElbowIKTarget.position.y >= Shoulder_R.position.y) {
+          animator.SetFloat("shoulder_up_right", 2.0f);
+        }
+        else animator.SetFloat("shoulder_up_right", 0.0f);
       }
     }
     private IEnumerator LerpPositionIKWeight(float destinationWeight, float duration) {

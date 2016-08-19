@@ -2641,6 +2641,8 @@ MonoBehaviour:
   ElbowOffset: -0.5
   PalmPositionAtLateUpdate: {x: 0, y: 0, z: 0}
   Handedness: 1
+  Shoulder_L: {fileID: 280429013}
+  Shoulder_R: {fileID: 255291018}
 --- !u!114 &1307167012
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3719,6 +3721,8 @@ MonoBehaviour:
   ElbowOffset: -0.5
   PalmPositionAtLateUpdate: {x: 0, y: 0, z: 0}
   Handedness: 0
+  Shoulder_L: {fileID: 280429013}
+  Shoulder_R: {fileID: 1307167010}
 --- !u!114 &1968911876
 MonoBehaviour:
   m_ObjectHideFlags: 0
