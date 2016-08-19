@@ -41,7 +41,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _leapProvider: {fileID: 0}
+  _handPool: {fileID: 0}
   _ldatPath: InteractionEngine/IE.ldat
+  _defaultInteractionMaterial: {fileID: 11400000, guid: 2b36778cd97232c459902ea9b77fd3ec,
+    type: 2}
+  _brushGroupName: BrushHands
   _contactEnabled: 1
   _graspingEnabled: 1
   _depthUntilSphericalInside: 0.023
@@ -52,11 +56,11 @@ MonoBehaviour:
     layer: 0
   _interactionLayer:
     layer: 8
-  _brushHandLayer:
-    layer: 9
   _interactionNoClipLayer:
+    layer: 9
+  _brushLayer:
     layer: 10
-  _pauseSimulation: 0
+  _automaticValidation: 0
   _showDebugLines: 0
   _showDebugOutput: 0
   _debugTextView: {fileID: 0}
