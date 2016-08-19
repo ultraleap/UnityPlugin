@@ -311,7 +311,6 @@ namespace Leap.Unity.Interaction {
       } else {
         // Generates notifications even when hands are no longer influencing
         if (_contactMode == ContactMode.SOFT) {
-          Assert.IsTrue(_material.ContactEnabled);
           updateInfo.updateFlags |= UpdateInfoFlags.SoftContact;
         }
 

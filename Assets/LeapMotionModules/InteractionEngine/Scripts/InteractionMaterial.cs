@@ -48,10 +48,6 @@ namespace Leap.Unity.Interaction {
     }
 
     [Header("Contact Settings")]
-    [Tooltip("Whether the object can be touched.")]
-    [SerializeField]
-    protected bool _contactEnabled = true;
-
     [MinValue(0)]
     [SerializeField]
     [Tooltip("How far from any BrushHand an object must be to go to sleep.")]
@@ -153,17 +149,6 @@ namespace Leap.Unity.Interaction {
     */
     public ILayerController CreateLayerController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _layerController);
-    }
-
-    /**
-    * Whether contact between an object and the BrushHands can occur.
-    * If false, hands will pass through an object without affecting it.
-    * @since 4.1.4
-    */
-    public bool ContactEnabled {
-      get {
-        return _contactEnabled;
-      }
     }
 
     /**

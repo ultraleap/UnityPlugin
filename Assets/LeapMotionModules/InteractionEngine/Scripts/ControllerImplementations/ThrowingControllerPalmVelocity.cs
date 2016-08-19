@@ -11,9 +11,10 @@ namespace Leap.Unity.Interaction {
   */
   public class ThrowingControllerPalmVelocity : IThrowingController {
 
+    [Tooltip("X axis is the speed of the released object.  Y axis is the value to multiply the speed by.")]
     [SerializeField]
-    private AnimationCurve _throwingVelocityCurve = new AnimationCurve(new Keyframe(0, 1.5f, 0, 0),
-                                                                       new Keyframe(2, 1.3f, 0, 0));
+    private AnimationCurve _velocityMultiplierCurve = new AnimationCurve(new Keyframe(0, 1, 0, 0),
+                                                                    new Keyframe(3, 1.5f, 0, 0));
 
     /** Does nothing in this implementation. */
     public override void OnHold(ReadonlyList<Hand> hands) { }
@@ -22,7 +23,7 @@ namespace Leap.Unity.Interaction {
     public override void OnThrow(Hand throwingHand) {
       Vector3 palmVel = throwingHand.PalmVelocity.ToVector3();
       float speed = palmVel.magnitude;
-      float multiplier = _throwingVelocityCurve.Evaluate(speed / _obj.Manager.SimulationScale);
+      float multiplier = _velocityMultiplierCurve.Evaluate(speed / _obj.Manager.SimulationScale);
       _obj.rigidbody.velocity = palmVel * multiplier;
     }
   }

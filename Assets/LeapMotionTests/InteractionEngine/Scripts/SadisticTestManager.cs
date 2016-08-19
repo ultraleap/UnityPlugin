@@ -34,6 +34,12 @@ namespace Leap.Unity.Interaction.Testing {
     [SerializeField]
     protected float[] _scales = { 1 };
 
+    [SerializeField]
+    protected bool _contactEnabled = true;
+
+    [SerializeField]
+    protected bool _graspEnabled = true;
+
     [Header("Test Conditions")]
     [EnumFlags]
     [Tooltip("If any of these callbacks has not been dispatched by the time the test has finished, the test will fail.")]
@@ -143,6 +149,8 @@ namespace Leap.Unity.Interaction.Testing {
         test.actionDelay = _actionDelay;
         test.activationDepth = activationDepth;
         test.scale = scale;
+        test.contactEnabled = _contactEnabled;
+        test.graspEnabled = _graspEnabled;
       }
     }
 #endif

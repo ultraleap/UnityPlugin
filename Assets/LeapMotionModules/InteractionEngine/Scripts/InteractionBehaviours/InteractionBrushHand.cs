@@ -87,6 +87,8 @@ namespace Leap.Unity.Interaction {
       if (_material == null || _material.bounciness != 0.0f || _material.bounceCombine != PhysicMaterialCombine.Minimum) {
         Debug.LogError("An InteractionBrushHand must have a material with 0 bounciness and a bounceCombine of Minimum.  Name: " + gameObject.name);
       }
+
+      checkContactState();
 #endif
 
       _handParent = new GameObject(gameObject.name);
@@ -135,8 +137,9 @@ namespace Leap.Unity.Interaction {
     /** Updates this hand model. */
     public override void UpdateHand() {
 #if UNITY_EDITOR
-      if (!EditorApplication.isPlaying)
+      if (!EditorApplication.isPlaying) {
         return;
+      }
 #endif
 
       float deadzone = DEAD_ZONE_FRACTION * _hand.Fingers[1].Bone((Bone.BoneType)1).Width;
@@ -187,6 +190,15 @@ namespace Leap.Unity.Interaction {
       _brushBones = null;
 
       base.FinishHand();
+    }
+
+    private void checkContactState() {
+      if (Application.isPlaying && !_manager.ContactEnabled) {
+        Debug.LogError("Brush hand was created even though contact is disabled!  " +
+                       "Make sure the brush group name of the Interaction Manager matches " +
+                       "the actual name of the model group.");
+        return;
+      }
     }
   }
 }
