@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Interaction.CApi;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction {
 
@@ -33,8 +34,13 @@ namespace Leap.Unity.Interaction {
   /// </remarks>
   public partial class InteractionManager : MonoBehaviour {
     #region SERIALIZED FIELDS
+    [AutoFind]
     [SerializeField]
     protected LeapProvider _leapProvider;
+
+    [AutoFind]
+    [SerializeField]
+    protected HandPool _handPool;
 
     [Tooltip("The streaming asset subpath of the ldat engine.")]
     [SerializeField]
@@ -44,6 +50,10 @@ namespace Leap.Unity.Interaction {
     [Tooltip("The default Interaction Material to use for Interaction Behaviours if none is specified, or for Interaction Behaviours created via scripting.")]
     [SerializeField]
     protected InteractionMaterial _defaultInteractionMaterial;
+
+    [Tooltip("The name of the model group of the Hand Pool containing the brush hands.")]
+    [SerializeField]
+    protected string _brushGroupName = "BrushHands";
 
     [Tooltip("Allow the Interaction Engine to modify object velocities when pushing.")]
     [SerializeField]
@@ -246,8 +256,16 @@ namespace Leap.Unity.Interaction {
       set {
         if (_contactEnabled != value) {
           _contactEnabled = value;
+
+          if (_handPool != null) {
+            if (_contactEnabled) {
+              _handPool.EnableGroup(_brushGroupName);
+            } else {
+              _handPool.DisableGroup(_brushGroupName);
+            }
+          }
+
           UpdateSceneInfo();
-          Physics.IgnoreLayerCollision(_brushLayer, _interactionLayer, !_contactEnabled);
         }
       }
     }
@@ -581,6 +599,14 @@ namespace Leap.Unity.Interaction {
       _activityManager.MaxDepth = _maxActivationDepth;
       _activityManager.OnActivate += createInteractionShape;
       _activityManager.OnDeactivate += destroyInteractionShape;
+
+      if (_handPool != null) {
+        if (_contactEnabled) {
+          _handPool.EnableGroup(_brushGroupName);
+        } else {
+          _handPool.DisableGroup(_brushGroupName);
+        }
+      }
     }
 
     protected virtual void OnDisable() {
@@ -615,7 +641,7 @@ namespace Leap.Unity.Interaction {
       if (OnPrePhysicalUpdate != null) {
         OnPrePhysicalUpdate();
       }
-      
+
       simulateFrame(frame);
 
       if (OnPostPhysicalUpdate != null) {
