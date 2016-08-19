@@ -11,7 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 183146e09617b2e41a21d0ecf5e56fcb, type: 3}
   m_Name: Default
   m_EditorClassIdentifier: 
-  _contactEnabled: 1
   _brushDisableDistance: 0.017
   _physicMaterialMode: 1
   _replacementMaterial: {fileID: 0}
@@ -93,7 +92,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _windowLength: 0.05
   _windowDelay: 0.02
-  _velocityScaleCurve:
+  _velocityMultiplierCurve:
     serializedVersion: 2
     m_Curve:
     - time: 0
