@@ -8905,7 +8905,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentTest: {fileID: 0}
   _testPrefab: {fileID: 113452, guid: 17918aa090e11cb429326a59ee029545, type: 2}
-  _timeScale: 1
+  _timeScale: 10
 --- !u!4 &1849882204
 Transform:
   m_ObjectHideFlags: 0
