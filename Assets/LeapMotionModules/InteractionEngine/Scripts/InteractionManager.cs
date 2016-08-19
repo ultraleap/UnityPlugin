@@ -742,10 +742,8 @@ namespace Leap.Unity.Interaction {
         Physics.IgnoreLayerCollision(_brushLayer, i, true);
       }
 
-      //After copy and set we specify the interactions between the brush and interaction objects
-      if (_contactEnabled) {
-        Physics.IgnoreLayerCollision(_brushLayer, _interactionLayer, false);
-      }
+      //After copy and set we enable the interaction between the brushes and interaction objects
+      Physics.IgnoreLayerCollision(_brushLayer, _interactionLayer, false);
     }
 
     protected virtual void simulateFrame(Frame frame) {
