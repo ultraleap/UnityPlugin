@@ -26,9 +26,6 @@ namespace Leap.Unity.Interaction {
     }
 
     [Header("Contact Settings")]
-    [SerializeField]
-    protected bool _contactEnabled = true;
-
     [MinValue(0)]
     [SerializeField]
     protected float _brushDisableDistance = 0.017f;
@@ -104,12 +101,6 @@ namespace Leap.Unity.Interaction {
 
     public ILayerController CreateLayerController(InteractionBehaviour obj) {
       return IControllerBase.CreateInstance(obj, _layerController);
-    }
-
-    public bool ContactEnabled {
-      get {
-        return _contactEnabled;
-      }
     }
 
     public float BrushDisableDistance {
