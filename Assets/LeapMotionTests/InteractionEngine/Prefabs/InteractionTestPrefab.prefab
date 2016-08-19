@@ -7192,9 +7192,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _leapProvider: {fileID: 11432318}
+  _handPool: {fileID: 11422940}
   _ldatPath: InteractionEngine/IE.ldat
   _defaultInteractionMaterial: {fileID: 11400000, guid: 2b36778cd97232c459902ea9b77fd3ec,
     type: 2}
+  _brushGroupName: BrushHands
   _contactEnabled: 1
   _graspingEnabled: 1
   _depthUntilSphericalInside: 0.023

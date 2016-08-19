@@ -116,8 +116,6 @@ namespace Leap.Unity.Interaction {
 
     public override void UpdateHand() {
 #if UNITY_EDITOR
-      checkContactState();
-
       if (!EditorApplication.isPlaying) {
         return;
       }
