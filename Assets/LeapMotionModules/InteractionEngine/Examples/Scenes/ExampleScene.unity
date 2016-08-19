@@ -1932,7 +1932,7 @@ MonoBehaviour:
   tweenPositionalWarping: 0
   syncMode: 0
   allowManualTimeAlignment: 0
-  warpingAdjustment: 60
+  warpingAdjustment: 30
   unlockHold: 303
   moreRewind: 276
   lessRewind: 275
