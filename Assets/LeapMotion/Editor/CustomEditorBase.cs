@@ -10,17 +10,19 @@ namespace Leap.Unity {
     protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedDecorators;
     protected Dictionary<string, List<Func<bool>>> _conditionalProperties;
 
+    protected List<SerializedProperty> _modifiedProperties = new List<SerializedProperty>();
+
     /// <summary>
     /// Specify a callback to be used to draw a specific named property.  Should be called in OnEnable.
     /// </summary>
     /// <param name="propertyName"></param>
     /// <param name="propertyDrawer"></param>
     protected void specifyCustomDrawer(string propertyName, Action<SerializedProperty> propertyDrawer) {
-      if (serializedObject.FindProperty(propertyName) != null) {
-        _specifiedDrawers[propertyName] = propertyDrawer;
-      } else {
-        Debug.LogWarning("Specified a custom drawer for the nonexistant property [" + propertyName + "] !\nWas it renamed or deleted?");
+      if (!validateProperty(propertyName)) {
+        return;
       }
+
+      _specifiedDrawers[propertyName] = propertyDrawer;
     }
 
     /// <summary>
@@ -29,18 +31,17 @@ namespace Leap.Unity {
     /// <param name="propertyName"></param>
     /// <param name="decoratorDrawer"></param>
     protected void specifyCustomDecorator(string propertyName, Action<SerializedProperty> decoratorDrawer) {
-      if (serializedObject.FindProperty(propertyName) != null) {
-
-        List<Action<SerializedProperty>> list;
-        if (!_specifiedDecorators.TryGetValue(propertyName, out list)) {
-          list = new List<Action<SerializedProperty>>();
-          _specifiedDecorators[propertyName] = list;
-        }
-
-        list.Add(decoratorDrawer);
-      } else {
-        Debug.LogWarning("Specified a custom drawer for the nonexistant property [" + propertyName + "] !\nWas it renamed or deleted?");
+      if (!validateProperty(propertyName)) {
+        return;
       }
+
+      List<Action<SerializedProperty>> list;
+      if (!_specifiedDecorators.TryGetValue(propertyName, out list)) {
+        list = new List<Action<SerializedProperty>>();
+        _specifiedDecorators[propertyName] = list;
+      }
+
+      list.Add(decoratorDrawer);
     }
 
     /// <summary>
@@ -50,14 +51,23 @@ namespace Leap.Unity {
     /// <param name="conditionalName"></param>
     /// <param name="dependantProperties"></param>
     protected void specifyConditionalDrawing(string conditionalName, params string[] dependantProperties) {
+      if (!validateProperty(conditionalName)) {
+        return;
+      }
+
       SerializedProperty conditionalProp = serializedObject.FindProperty(conditionalName);
       specifyConditionalDrawing(() => conditionalProp.boolValue, dependantProperties);
     }
 
     protected void specifyConditionalDrawing(Func<bool> conditional, params string[] dependantProperties) {
       for (int i = 0; i < dependantProperties.Length; i++) {
-        List<Func<bool>> list;
         string dependant = dependantProperties[i];
+
+        if (!validateProperty(dependant)) {
+          continue;
+        }
+
+        List<Func<bool>> list;
         if (!_conditionalProperties.TryGetValue(dependant, out list)) {
           list = new List<Func<bool>>();
           _conditionalProperties[dependant] = list;
@@ -72,11 +82,20 @@ namespace Leap.Unity {
       _conditionalProperties = new Dictionary<string, List<Func<bool>>>();
     }
 
+    protected bool validateProperty(string propertyName) {
+      if (serializedObject.FindProperty(propertyName) == null) {
+        Debug.LogWarning("Property " + propertyName + " does not exist, was it removed or renamed?");
+        return false;
+      }
+      return true;
+    }
+
     /* 
      * This method draws all visible properties, mirroring the default behavior of OnInspectorGUI. 
      * Individual properties can be specified to have custom drawers.
      */
     public override void OnInspectorGUI() {
+      _modifiedProperties.Clear();
       SerializedProperty iterator = serializedObject.GetIterator();
       bool isFirst = true;
 
@@ -101,12 +120,18 @@ namespace Leap.Unity {
           }
         }
 
+        EditorGUI.BeginChangeCheck();
+
         if (_specifiedDrawers.TryGetValue(iterator.name, out customDrawer)) {
           customDrawer(iterator);
         } else {
           using (new EditorGUI.DisabledGroupScope(isFirst)) {
             EditorGUILayout.PropertyField(iterator, true);
           }
+        }
+
+        if (EditorGUI.EndChangeCheck()) {
+          _modifiedProperties.Add(iterator.Copy());
         }
 
         isFirst = false;
