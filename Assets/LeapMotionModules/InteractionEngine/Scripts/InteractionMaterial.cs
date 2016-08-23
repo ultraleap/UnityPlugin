@@ -175,7 +175,7 @@ namespace Leap.Unity.Interaction {
 
     /**
     * How far an object can twist in the holding hand before it releases.
-    * The distance is calculated between the current rotation of the object and
+    * The angle is calculated between the current rotation of the object and
     * the rotation determined by the material's IHoldingPoseController.
     * @since 4.1.4
     */
