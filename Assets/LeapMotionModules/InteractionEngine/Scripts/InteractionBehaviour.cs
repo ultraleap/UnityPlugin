@@ -132,7 +132,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Whether or not this InteractionBehaviour uses Gravity.  Always use this property instead
     /// of Rigidbody.UseGravity because InteractionBehaviour overrides the gravity status of the Rigidbody.
-    /// The Interaction Enigine manages this property during interaction, changing and restoring its value when needed.
+    /// The Interaction Engine manages this property during interaction, changing and restoring its value when needed.
     /// </summary>
     public bool useGravity {
       get {
