@@ -5,7 +5,6 @@ using Leap.Unity;
 namespace Leap.Unity {
   public class WristLeapToIKBlend : HandTransitionBehavior {
     public Animator animator;
-    public Transform ElbowIKTarget;
     private HandModel handModel;
     private Vector3 armDirection;
     public float ElbowOffset;
@@ -20,14 +19,11 @@ namespace Leap.Unity {
     private float positionIKWeight;
     private float rotationIKWeight;
 
-    public Transform Scapula_L;
-    public Transform Scapula_R;
-    public Transform Shoulder_L;
-    public Transform Shoulder_R;
-    public Transform Elbow_L;
-    public Transform Elbow_R;
-    public Transform ElbowMarker_L;
-    public Transform ElbowMarker_R;
+    public Transform Scapula;
+    public Transform Shoulder;
+    public Transform Elbow;
+    public Transform ElbowMarker;
+    public Transform ElbowIKTarget;
     public Transform Neck;
     private float shoulder_up_target_weight;
     private float shoulder_up_weight;
@@ -65,8 +61,8 @@ namespace Leap.Unity {
     void LateUpdate() {
       PalmPositionAtLateUpdate = palm.position;
       PalmRotationAtLateUpdate = palm.rotation;
-      ElbowMarker_L.position = Elbow_L.position;
-      ElbowMarker_R.position = Elbow_R.position;
+      ElbowMarker.position = Elbow.position;
+      ElbowMarker.rotation = Elbow.rotation;
       shoulder_up_weight = Mathf.Lerp(shoulder_up_weight, shoulder_up_target_weight, .4f);
       shoulder_forward_weight = Mathf.Lerp(shoulder_forward_weight, shoulder_forward_target_weight, .4f);
     }
@@ -82,17 +78,17 @@ namespace Leap.Unity {
         animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
 
         //Debug.Log(("ElbowMarker_L.position.y: " + ElbowMarker_L.position.y + " - Shoulder_L.position.y: " + Shoulder_L.position.y));
-        if (ElbowMarker_L.position.y > Scapula_L.position.y) {
-          shoulder_up_target_weight = (ElbowMarker_L.position.y - Shoulder_L.position.y) * 10f;
+        if (ElbowMarker.position.y > Scapula.position.y) {
+          shoulder_up_target_weight = (ElbowMarker.position.y - Shoulder.position.y) * 10f;
           animator.SetFloat("shoulder_up_left", shoulder_up_weight);
         }
         else {
           shoulder_up_target_weight = 0.0f;
           animator.SetFloat("shoulder_up_left", shoulder_up_weight);
         }
-        if (ElbowMarker_R.position.z > Scapula_R.position.z) {
-          Debug.Log("Left Forward: " + shoulder_forward_target_weight);
-          shoulder_forward_target_weight = (ElbowMarker_L.position.z - Shoulder_L.position.z) * 10f;
+        if (ElbowMarker.position.z > Scapula.position.z) {
+          //Debug.Log("Left Forward: " + shoulder_forward_target_weight);
+          shoulder_forward_target_weight = (ElbowMarker.position.z - Shoulder.position.z) * 10f;
           animator.SetFloat("shoulder_forward_left", shoulder_forward_weight);
         }
         else {
@@ -107,17 +103,17 @@ namespace Leap.Unity {
         animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
         animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, positionIKWeight);
         animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
-        if (ElbowMarker_R.position.y > Scapula_R.position.y + 0f) {
+        if (ElbowMarker.position.y > Scapula.position.y + 0f) {
           Debug.Log("Right Above");
-          shoulder_up_target_weight = (ElbowMarker_R.position.y - Shoulder_R.position.y) * 10f;
+          shoulder_up_target_weight = (ElbowMarker.position.y - Shoulder.position.y) * 10f;
           animator.SetFloat("shoulder_up_right", shoulder_up_weight);
         }
         else {
           shoulder_up_target_weight = 0.0f;
           animator.SetFloat("shoulder_up_right", shoulder_up_weight);
         }
-        if (ElbowMarker_R.position.z > Scapula_R.position.z) {
-          shoulder_forward_target_weight = (ElbowMarker_R.position.z - Shoulder_R.position.z) * 10f;
+        if (ElbowMarker.position.z > Scapula.position.z) {
+          shoulder_forward_target_weight = (ElbowMarker.position.z - Shoulder.position.z) * 10f;
           Debug.Log("Right Forward: " + shoulder_forward_target_weight);
           animator.SetFloat("shoulder_forward_right", shoulder_forward_weight);
         }
