@@ -1,0 +1,7 @@
+*.dll
+*.dll.meta
+*.pdb
+*.pdb.meta
+*.ilk
+*.ilk.meta
+
