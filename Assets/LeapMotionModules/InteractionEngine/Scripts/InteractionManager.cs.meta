@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 99abcac5e6e214041876299e0504c871
+timeCreated: 1469053206
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - _leapProvider: {instanceID: 0}
+  - _defaultInteractionMaterial: {fileID: 11400000, guid: 2b36778cd97232c459902ea9b77fd3ec,
+      type: 2}
+  - _debugTextView: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
