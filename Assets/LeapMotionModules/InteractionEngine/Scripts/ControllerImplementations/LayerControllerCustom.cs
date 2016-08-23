@@ -12,9 +12,11 @@ namespace Leap.Unity.Interaction {
   */
   public class LayerControllerCustom : ILayerController {
 
+    [Tooltip("The normal layer for interactable objects.")]
     [SerializeField]
     private SingleLayer _interactionLayer;
 
+    [Tooltip("The layer used for interactable objects when they cannot collide with hands.")]
     [SerializeField]
     private SingleLayer _interactionNoClipLayer;
 

@@ -76,6 +76,7 @@ namespace Leap.Unity.Interaction {
     protected int _maxActivationDepth = 3;
 
     [Header("Layer Settings")]
+    [Tooltip("Whether or not to create the layers used for interaction when the scene runs.")]
     [SerializeField]
     protected bool _autoGenerateLayers = false;
 

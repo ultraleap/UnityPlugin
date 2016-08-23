@@ -11,10 +11,12 @@ namespace Leap.Unity.Interaction {
   public class MoveToControllerVelocity : IMoveToController {
 
      /** The maximum allowed velocity in meters per second. */
+    [Tooltip("The maximum allowed velocity in meters per second.")]
     [SerializeField]
     protected float _maxVelocity = 6;
 
     /** Function used to modify the strength of the force used to move the object by the distance to the target position. */
+    [Tooltip("Function used to modify the strength of the force used to move the object by the distance to the target position.")]
     [SerializeField]
     protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
                                                                       new Keyframe(0.02f, 0.3f, 0.0f, 0.0f));

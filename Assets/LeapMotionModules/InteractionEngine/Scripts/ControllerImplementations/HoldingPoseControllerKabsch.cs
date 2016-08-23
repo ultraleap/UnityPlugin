@@ -28,6 +28,7 @@ namespace Leap.Unity.Interaction {
     }
 
     /** The specified solving method. */
+    [Tooltip("The algorithm used to find the best holding position and rotation.")]
     [SerializeField]
     protected SolveMethod _solveMethod;
 

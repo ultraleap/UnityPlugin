@@ -163,6 +163,8 @@ namespace Leap.Unity.Interaction {
 
     /**
     * How far an object can move from the holding hand before it releases.
+    * The distance is calculated between the current position of the object and
+    * the position determined by the material's IHoldingPoseController.
     * @since 4.1.4
     */
     public float ReleaseDistance {
@@ -173,6 +175,8 @@ namespace Leap.Unity.Interaction {
 
     /**
     * How far an object can twist in the holding hand before it releases.
+    * The distance is calculated between the current rotation of the object and
+    * the rotation determined by the material's IHoldingPoseController.
     * @since 4.1.4
     */
     public float ReleaseAngle {

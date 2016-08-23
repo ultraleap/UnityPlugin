@@ -29,6 +29,7 @@ namespace Leap.Unity.Interaction {
   public abstract partial class InteractionBehaviourBase : IInteractionBehaviour {
 
     #region SERIALIZED FIELDS
+    [Tooltip("The InteractionManager controlling this behavior.")]
     [SerializeField]
     protected InteractionManager _manager;
     #endregion

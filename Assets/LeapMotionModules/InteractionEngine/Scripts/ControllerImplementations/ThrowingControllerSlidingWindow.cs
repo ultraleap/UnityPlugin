@@ -22,6 +22,15 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     private float _windowDelay = 0.02f;
 
+    /** 
+     * Modifies the release velocity.
+     *
+     * Use this curve to modify the velocity transfered based on its canonical speed.
+     * If the animation curve value is below 1.0 at a particular speed, then the transfered 
+     * velocity is diminished; if the curve value is greater than one, the transfered 
+     * velocity is amplified.
+     * @since 4.1.4
+     */
     [Tooltip("X axis is the speed of the released object.  Y axis is the value to multiply the speed by.")]
     [SerializeField]
     private AnimationCurve _velocityMultiplierCurve = new AnimationCurve(new Keyframe(0, 1, 0, 0),

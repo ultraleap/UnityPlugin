@@ -22,8 +22,8 @@ namespace Leap.Unity.Interaction {
   ///      interaction.
   ///
   /// This default implementation has the following requirements:
-  ///    - A Rigidbody is required.
-  ///    - Kinematic movement must still be simulated via Rigidbody kinematic movement, as opposed to rigid movement of the Transform.
+  ///    - A Rigidbody is required. If you want interaction without other rigidbody physics, such as collisons and gravity, set the
+  ///      rigid body's IsKinematic flag to true in the Unity editor.
   ///    - Any non-continuous movement must be noted using the NotifyTeleported() method.
   ///    - Any forces or torques must be applied using the AddLinearAcceleration and AddAngularAcceleration methods instead of
   ///      the Rigidbody AddForce or AddTorque methods.
@@ -39,13 +39,15 @@ namespace Leap.Unity.Interaction {
       GRASPED = 2, // Not infuenced by either brushes or soft contact.  Returns to SOFT not NORMAL.
     };
 
+    [Tooltip("The InteractionMaterial defining interaction behaviors.")]
     [SerializeField]
     protected InteractionMaterial _material;
 
     protected Transform[] _childrenArray;
     protected Rigidbody _rigidbody;
 
-    // Rigidbody shadow state
+    // Rigidbody shadow state. The Interaction Engine manages these entities during interaction, 
+    // changing and restoring their values when needed.
     protected bool _isKinematic;
     protected bool _useGravity;
     protected float _drag;
@@ -81,6 +83,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Whether or not this InteractionBehaviour is Kinematic.  Always use this property instead
     /// of Rigidbody.IsKinematic because InteractionBehaviour overrides the kinematic status of the Rigidbody.
+    /// The Interaction Engine manages this property during interaction, changing and restoring its value when needed.
     /// </summary>
     public bool isKinematic {
       get {
@@ -129,6 +132,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Whether or not this InteractionBehaviour uses Gravity.  Always use this property instead
     /// of Rigidbody.UseGravity because InteractionBehaviour overrides the gravity status of the Rigidbody.
+    /// The Interaction Enigine manages this property during interaction, changing and restoring its value when needed.
     /// </summary>
     public bool useGravity {
       get {
