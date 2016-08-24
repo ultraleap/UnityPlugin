@@ -594,7 +594,7 @@ Transform:
   - {fileID: 756682936}
   - {fileID: 1928180894}
   m_Father: {fileID: 1805543667}
-  m_RootOrder: 1
+  m_RootOrder: 2
 --- !u!114 &266907293
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1178,7 +1178,7 @@ Transform:
   - {fileID: 1063928239}
   - {fileID: 1638027727}
   m_Father: {fileID: 1805543667}
-  m_RootOrder: 0
+  m_RootOrder: 1
 --- !u!114 &518695920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1203,7 +1203,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1243fc1ad47270141b90b5b93961403f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ReferenceTransform: {fileID: 756682936}
+  ReferenceTransform: {fileID: 1357382250}
   Target: {fileID: 266907292}
 --- !u!114 &518695922
 MonoBehaviour:
@@ -1217,7 +1217,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   NeckReferenceTransform: {fileID: 1014761650}
-  Target: {fileID: 266907292}
+  Target: {fileID: 756682936}
   Smoothing: 0
 --- !u!4 &527920336
 Transform:
@@ -1471,7 +1471,7 @@ GameObject:
   - 65: {fileID: 756682934}
   - 23: {fileID: 756682933}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: ChestTargetCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2356,7 +2356,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1115824362}
-  m_LocalRotation: {x: -0.3652911, y: 0.68162274, z: -0.61818194, w: 0.14072712}
+  m_LocalRotation: {x: -0.36529106, y: 0.6816227, z: -0.6181819, w: 0.1407271}
   m_LocalPosition: {x: -0.39896223, y: -0.40335023, z: -0.12674014}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2817,6 +2817,85 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1357382249
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1357382250}
+  - 33: {fileID: 1357382253}
+  - 65: {fileID: 1357382252}
+  - 23: {fileID: 1357382251}
+  m_Layer: 0
+  m_Name: SpineReferenceCube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1357382250
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1357382249}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.01, y: 0.23, z: 1.06}
+  m_LocalScale: {x: 0.17957729, y: 0.17957734, z: 0.17957734}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 1805543667}
+  m_RootOrder: 0
+--- !u!23 &1357382251
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1357382249}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_SubsetIndices: 
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_SelectedWireframeHidden: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+--- !u!65 &1357382252
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1357382249}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!33 &1357382253
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1357382249}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1397937758
 GameObject:
   m_ObjectHideFlags: 0
@@ -3325,6 +3404,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
+  - {fileID: 1357382250}
   - {fileID: 518695919}
   - {fileID: 266907292}
   - {fileID: 2141459593}
@@ -4061,4 +4141,4 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 1805543667}
-  m_RootOrder: 2
+  m_RootOrder: 3

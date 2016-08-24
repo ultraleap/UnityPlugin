@@ -51,6 +51,17 @@ namespace Leap.Unity {
         Shoulder = animator.GetBoneTransform(HumanBodyBones.RightUpperArm);
         Elbow = animator.GetBoneTransform(HumanBodyBones.RightLowerArm);
       }
+      MarkerPrefab = Resources.Load("AxisTripod") as GameObject;
+      if (ElbowMarker == null) {
+        ElbowMarker = GameObject.Instantiate(MarkerPrefab).transform;
+        ElbowMarker.transform.name = animator.transform.name + "_ElbowMarker" + Handedness.ToString();
+        ElbowMarker.position = Elbow.position;
+        ElbowMarker.rotation = Elbow.rotation;
+      }
+      if (ElbowIKTarget == null) {
+        ElbowIKTarget = GameObject.Instantiate(MarkerPrefab).transform;
+        ElbowIKTarget.transform.name = animator.transform.name + "_ElbowIKTarget" + Handedness.ToString();
+      }
     }
 
     protected override void HandFinish() {
@@ -155,7 +166,10 @@ namespace Leap.Unity {
         yield return null;
       }
     }
-    void OnValidate() {
+
+
+    public override void OnSetup() {
+      Awake();
       MarkerPrefab = Resources.Load("AxisTripod") as GameObject;
       Debug.Log("MarkerPrefab: " + MarkerPrefab);
       Handedness = GetComponent<IHandModel>().Handedness;
@@ -170,16 +184,16 @@ namespace Leap.Unity {
         Elbow = animator.GetBoneTransform(HumanBodyBones.RightLowerArm);
       }
 
-      if (ElbowMarker == null) {
-        ElbowMarker = GameObject.Instantiate(MarkerPrefab).transform;
-        ElbowMarker.transform.name = animator.transform.name + "_ElbowMarker" + Handedness.ToString();
-        ElbowMarker.position = Elbow.position;
-        ElbowMarker.rotation = Elbow.rotation;
-      }
-      if (ElbowIKTarget == null) {
-        ElbowIKTarget = GameObject.Instantiate(MarkerPrefab).transform;
-        ElbowIKTarget.transform.name = animator.transform.name + "_ElbowIKTarget" + Handedness.ToString();
-      }
+      //if (ElbowMarker == null) {
+      //  ElbowMarker = GameObject.Instantiate(MarkerPrefab).transform;
+      //  ElbowMarker.transform.name = animator.transform.name + "_ElbowMarker" + Handedness.ToString();
+      //  ElbowMarker.position = Elbow.position;
+      //  ElbowMarker.rotation = Elbow.rotation;
+      //}
+      //if (ElbowIKTarget == null) {
+      //  ElbowIKTarget = GameObject.Instantiate(MarkerPrefab).transform;
+      //  ElbowIKTarget.transform.name = animator.transform.name + "_ElbowIKTarget" + Handedness.ToString();
+      //}
     }
   }
 }

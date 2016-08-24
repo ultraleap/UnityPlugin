@@ -26,5 +26,7 @@ namespace Leap.Unity {
       iHandModel.OnBegin -= HandReset;
       iHandModel.OnFinish -= HandFinish;
     }
+    public virtual void OnSetup () {
+    }
   } 
 }

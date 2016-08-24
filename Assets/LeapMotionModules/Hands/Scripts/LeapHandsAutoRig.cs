@@ -9,7 +9,7 @@ namespace Leap.Unity {
   public class LeapHandsAutoRig : MonoBehaviour {
     private HandPool HandPoolToPopulate;
     public Animator AnimatorForMapping;
-    public RuntimeAnimatorController runtimeAnimatorController;
+    private RuntimeAnimatorController runtimeAnimatorController;
     public string ModelGroupName = null;
     [Tooltip("Set to True if each finger has an extra trasform between palm and base of the finger.")] 
     public bool UseMetaCarpals;
@@ -53,7 +53,10 @@ namespace Leap.Unity {
       AnimatorForMapping = gameObject.GetComponent<Animator>();
       if (AnimatorForMapping != null) {
         if (AnimatorForMapping.isHuman == true) {
+          AnimatorForMapping.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("TestController");
           AutoRigMecanim();
+          HandTransitionBehavior_L.OnSetup();
+          HandTransitionBehavior_R.OnSetup();
           RiggedHand_L.StoreJointsStartPose();
           RiggedHand_R.StoreJointsStartPose();
           return;
@@ -237,7 +240,7 @@ namespace Leap.Unity {
       SpineFollowTargetBehavior spineFollowTargetBehavior = gameObject.AddComponent<SpineFollowTargetBehavior>();
       ShoulderTurnBehavior shoulderTurnBehavior = gameObject.AddComponent<ShoulderTurnBehavior>();
       //Assign and configure Animator Controller to Animator
-      AnimatorForMapping.runtimeAnimatorController = runtimeAnimatorController;
+      //AnimatorForMapping.runtimeAnimatorController = runtimeAnimatorController;
       AnimatorForMapping.updateMode = AnimatorUpdateMode.AnimatePhysics;
       AnimatorForMapping.cullingMode = AnimatorCullingMode.AlwaysAnimate;
     }
