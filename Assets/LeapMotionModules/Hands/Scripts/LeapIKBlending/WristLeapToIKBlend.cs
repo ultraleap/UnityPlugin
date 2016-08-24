@@ -4,27 +4,29 @@ using Leap.Unity;
 
 namespace Leap.Unity {
   public class WristLeapToIKBlend : HandTransitionBehavior {
+    [Leap.Unity.Attributes.AutoFind]
     public Animator animator;
+    public Chirality Handedness;
     private HandModel handModel;
     private Vector3 armDirection;
-    public float ElbowOffset;
+    public float ElbowOffset = -0.5f;
 
     private Vector3 startingPalmPosition;
     private Quaternion startingOrientation;
     private Transform palm;
 
-    public Vector3 PalmPositionAtLateUpdate;
+    private Vector3 PalmPositionAtLateUpdate;
     private Quaternion PalmRotationAtLateUpdate;
-    public Chirality Handedness;
     private float positionIKWeight;
     private float rotationIKWeight;
 
-    public Transform Scapula;
-    public Transform Shoulder;
-    public Transform Elbow;
+    private Transform Scapula;
+    private Transform Shoulder;
+    private Transform Elbow;
+    public GameObject MarkerPrefab;
     public Transform ElbowMarker;
     public Transform ElbowIKTarget;
-    public Transform Neck;
+    private Transform Neck;
     private float shoulder_up_target_weight;
     private float shoulder_up_weight;
     private float shoulder_forward_weight;
@@ -38,6 +40,17 @@ namespace Leap.Unity {
       palm = GetComponent<HandModel>().palm;
       startingPalmPosition = palm.localPosition;
       startingOrientation = palm.localRotation;
+      Neck = animator.GetBoneTransform(HumanBodyBones.Neck);
+      if(Handedness == Chirality.Left){
+        Scapula = animator.GetBoneTransform(HumanBodyBones.LeftShoulder);
+        Shoulder = animator.GetBoneTransform(HumanBodyBones.LeftUpperArm);
+        Elbow = animator.GetBoneTransform(HumanBodyBones.LeftLowerArm);
+      }
+      if (Handedness == Chirality.Right) {
+        Scapula = animator.GetBoneTransform(HumanBodyBones.RightShoulder);
+        Shoulder = animator.GetBoneTransform(HumanBodyBones.RightUpperArm);
+        Elbow = animator.GetBoneTransform(HumanBodyBones.RightLowerArm);
+      }
     }
 
     protected override void HandFinish() {
@@ -104,7 +117,7 @@ namespace Leap.Unity {
         animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, positionIKWeight);
         animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
         if (ElbowMarker.position.y > Scapula.position.y + 0f) {
-          Debug.Log("Right Above");
+          //.Log("Right Above");
           shoulder_up_target_weight = (ElbowMarker.position.y - Shoulder.position.y) * 10f;
           animator.SetFloat("shoulder_up_right", shoulder_up_weight);
         }
@@ -114,7 +127,7 @@ namespace Leap.Unity {
         }
         if (ElbowMarker.position.z > Scapula.position.z) {
           shoulder_forward_target_weight = (ElbowMarker.position.z - Shoulder.position.z) * 10f;
-          Debug.Log("Right Forward: " + shoulder_forward_target_weight);
+          //Debug.Log("Right Forward: " + shoulder_forward_target_weight);
           animator.SetFloat("shoulder_forward_right", shoulder_forward_weight);
         }
         else {
@@ -143,7 +156,30 @@ namespace Leap.Unity {
       }
     }
     void OnValidate() {
+      MarkerPrefab = Resources.Load("AxisTripod") as GameObject;
+      Debug.Log("MarkerPrefab: " + MarkerPrefab);
       Handedness = GetComponent<IHandModel>().Handedness;
+      if (Handedness == Chirality.Left) {
+        Scapula = animator.GetBoneTransform(HumanBodyBones.LeftShoulder);
+        Shoulder = animator.GetBoneTransform(HumanBodyBones.LeftUpperArm);
+        Elbow = animator.GetBoneTransform(HumanBodyBones.LeftLowerArm);
+      }
+      if (Handedness == Chirality.Right) {
+        Scapula = animator.GetBoneTransform(HumanBodyBones.RightShoulder);
+        Shoulder = animator.GetBoneTransform(HumanBodyBones.RightUpperArm);
+        Elbow = animator.GetBoneTransform(HumanBodyBones.RightLowerArm);
+      }
+
+      if (ElbowMarker == null) {
+        ElbowMarker = GameObject.Instantiate(MarkerPrefab).transform;
+        ElbowMarker.transform.name = animator.transform.name + "_ElbowMarker" + Handedness.ToString();
+        ElbowMarker.position = Elbow.position;
+        ElbowMarker.rotation = Elbow.rotation;
+      }
+      if (ElbowIKTarget == null) {
+        ElbowIKTarget = GameObject.Instantiate(MarkerPrefab).transform;
+        ElbowIKTarget.transform.name = animator.transform.name + "_ElbowIKTarget" + Handedness.ToString();
+      }
     }
   }
 }

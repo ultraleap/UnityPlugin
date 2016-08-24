@@ -9,7 +9,7 @@ namespace Leap.Unity {
   public class LeapHandsAutoRig : MonoBehaviour {
     private HandPool HandPoolToPopulate;
     public Animator AnimatorForMapping;
-
+    public RuntimeAnimatorController runtimeAnimatorController;
     public string ModelGroupName = null;
     [Tooltip("Set to True if each finger has an extra trasform between palm and base of the finger.")] 
     public bool UseMetaCarpals;
@@ -229,7 +229,18 @@ namespace Leap.Unity {
         HandPoolToPopulate.RemoveGroup(ModelGroupName);
       }
     }
-    
+    [ContextMenu("AutoRigUpperBody")]
+    public void AutoRigUpperBody() {
+      OnAnimatorIKCaller onAnimatorIKCaller =  gameObject.AddComponent<OnAnimatorIKCaller>();
+      onAnimatorIKCaller.wristLeapToIKBlend_L = (WristLeapToIKBlend)HandTransitionBehavior_L;
+      onAnimatorIKCaller.wristLeapToIKBlend_R = (WristLeapToIKBlend)HandTransitionBehavior_R;
+      SpineFollowTargetBehavior spineFollowTargetBehavior = gameObject.AddComponent<SpineFollowTargetBehavior>();
+      ShoulderTurnBehavior shoulderTurnBehavior = gameObject.AddComponent<ShoulderTurnBehavior>();
+      //Assign and configure Animator Controller to Animator
+      AnimatorForMapping.runtimeAnimatorController = runtimeAnimatorController;
+      AnimatorForMapping.updateMode = AnimatorUpdateMode.AnimatePhysics;
+      AnimatorForMapping.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+    }
     //Monobehavior's OnValidate() is used to push LeapHandsAutoRig values to RiggedHand and RiggedFinger components
     void OnValidate() {
       if (FlipPalms != flippedPalmsState) {
