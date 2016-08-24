@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Leap.Unity;
 
 public class ShoulderTurnBehavior : MonoBehaviour {
 
@@ -23,9 +24,15 @@ public class ShoulderTurnBehavior : MonoBehaviour {
   // Use this for initialization
   void Start() {
     m_animator = GetComponent<Animator>();
+    NeckReferenceTransform = m_animator.GetBoneTransform(HumanBodyBones.Neck);
+    GameObject markerPrefab = Resources.Load("AxisTripod") as GameObject;
+    Target = GameObject.Instantiate(markerPrefab).transform;
+    Target.name = transform.name + "_ChestReferenceMarker";
+    Target.parent = GameObject.FindObjectOfType<LeapVRCameraControl>().transform;
+    Target.localPosition = new Vector3(0, 0, 2);
   }
 
-  // Update is called once per frame
+  // Update is called once per frame 
   void LateUpdate() {
     rotateChestToFollow(Target);
   }
