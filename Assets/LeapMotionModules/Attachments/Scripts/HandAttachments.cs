@@ -23,7 +23,7 @@ namespace Leap.Unity.Attachments {
   * hand poses.
   *  @since 4.1.1
   */
-  public class HandAttachments : IHandModel {
+  public class HandAttachments : IHandModel, IRuntimeGizmoComponent {
   
     /** The palm of the hand. */
     [Tooltip("The palm of the hand.")]
@@ -75,7 +75,11 @@ namespace Leap.Unity.Attachments {
       }
       set { }
     }
-  
+
+    /** Whether to draw lines to visualize the hand. */
+    [Tooltip(" Whether to draw lines to visualize the hand.")]
+    public bool DrawHand = false;
+
     public override void SetLeapHand(Hand hand) {
       _hand = hand;
     }
@@ -145,10 +149,6 @@ namespace Leap.Unity.Attachments {
 
     public override bool SupportsEditorPersistence() { return true; }
 
-    private void OnDrawGizmos() {
-      DrawDebugLines();
-    }
-
     /** The colors used for each bone. */
     protected Color[] colors = { Color.gray, Color.yellow, Color.cyan, Color.magenta };
 
@@ -156,9 +156,8 @@ namespace Leap.Unity.Attachments {
     * Draws lines from elbow to wrist, wrist to palm, and normal to the palm.
     * Also draws the orthogonal basis vectors for the pinch and grab points.
     */
-    protected void DrawDebugLines() {
-      RuntimeGizmoDrawer gizmoDrawer;
-      if (RuntimeGizmoManager.TryGetGizmoDrawer(gameObject, out gizmoDrawer)) {
+    public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer gizmoDrawer) {
+      if (DrawHand && RuntimeGizmoManager.TryGetGizmoDrawer(gameObject, out gizmoDrawer)) {
         Hand hand = GetLeapHand();
         gizmoDrawer.color = Color.red;
         gizmoDrawer.DrawLine(hand.Arm.ElbowPosition.ToVector3(), hand.Arm.WristPosition.ToVector3());
@@ -189,10 +188,6 @@ namespace Leap.Unity.Attachments {
       gizmoDrawer.DrawLine(origin, origin + basis.yBasis.ToVector3() * scale);
       gizmoDrawer.color = Color.blue;
       gizmoDrawer.DrawLine(origin, origin + basis.zBasis.ToVector3() * scale);
-
-      //Debug.DrawLine(origin, origin + basis.xBasis.ToVector3() * scale, Color.red);
-      //Debug.DrawLine(origin, origin + basis.yBasis.ToVector3() * scale, Color.green);
-      //Debug.DrawLine(origin, origin + basis.zBasis.ToVector3() * scale, Color.blue);
     }
   }
 }

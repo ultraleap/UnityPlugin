@@ -482,6 +482,7 @@ MonoBehaviour:
   Pinky: {fileID: 0}
   GrabPoint: {fileID: 0}
   _handedness: 1
+  DrawHand: 0
 --- !u!114 &375805478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2890,6 +2891,7 @@ MonoBehaviour:
   Pinky: {fileID: 0}
   GrabPoint: {fileID: 0}
   _handedness: 0
+  DrawHand: 0
 --- !u!1 &869187714
 GameObject:
   m_ObjectHideFlags: 0
@@ -4889,7 +4891,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _displayInGameView: 1
-  _enabledForBuild: 1
+  _enabledForBuild: 0
   _sphereMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
   _gizmoShader: {fileID: 4800000, guid: 309635e4933310a4d98f0e016c806769, type: 3}
 --- !u!4 &1963548385
