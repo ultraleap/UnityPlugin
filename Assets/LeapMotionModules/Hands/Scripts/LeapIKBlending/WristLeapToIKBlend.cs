@@ -19,6 +19,8 @@ namespace Leap.Unity {
     private Quaternion PalmRotationAtLateUpdate;
     private float positionIKWeight;
     private float rotationIKWeight;
+    private float positionIKTargetWeight;
+    private float rotationIKTargetWeight;
 
     private Transform Scapula;
     private Transform Shoulder;
@@ -31,6 +33,11 @@ namespace Leap.Unity {
     private float shoulder_up_weight;
     private float shoulder_forward_weight;
     private float shoulder_forward_target_weight;
+
+    private float shouldersLayerWeight;
+    private float shouldersLayerTargetWeight;
+    private float spineLayerWeight;
+    private float spineLayerTargetWeight;
 
 
     protected override void Awake() {
@@ -66,15 +73,19 @@ namespace Leap.Unity {
 
     protected override void HandFinish() {
       StartCoroutine(LerpToStart());
-      positionIKWeight = 0;
+      positionIKTargetWeight = 0;
       rotationIKWeight = 0;
       shoulder_forward_target_weight = 0;
       shoulder_up_target_weight = 0;
+      shouldersLayerTargetWeight = 0f;
+      spineLayerTargetWeight = 1f;
     }
     protected override void HandReset() {
       StopAllCoroutines();
-      positionIKWeight = 1;
+      positionIKTargetWeight = 1;
       rotationIKWeight = 1;
+      shouldersLayerTargetWeight = 1f;
+      spineLayerTargetWeight = 1f;
     }
     void Update() {
       //get Arm Directions and set elbow target position
@@ -89,6 +100,9 @@ namespace Leap.Unity {
       ElbowMarker.rotation = Elbow.rotation;
       shoulder_up_weight = Mathf.Lerp(shoulder_up_weight, shoulder_up_target_weight, .4f);
       shoulder_forward_weight = Mathf.Lerp(shoulder_forward_weight, shoulder_forward_target_weight, .4f);
+      positionIKWeight = Mathf.Lerp(positionIKWeight, positionIKTargetWeight, .4f);
+      animator.SetLayerWeight(2, spineLayerTargetWeight);
+      animator.SetLayerWeight(3, shouldersLayerTargetWeight);
     }
 
     public void OnAnimatorIK(int layerIndex) {

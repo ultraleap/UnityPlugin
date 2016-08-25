@@ -96,7 +96,7 @@ AnimatorController:
   - serializedVersion: 5
     m_Name: NoHands
     m_StateMachine: {fileID: 110769662}
-    m_Mask: {fileID: 101100000, guid: c14681937b8eb1b41be2774377932691, type: 2}
+    m_Mask: {fileID: 0}
     m_Motions: []
     m_Behaviours: []
     m_BlendingMode: 0

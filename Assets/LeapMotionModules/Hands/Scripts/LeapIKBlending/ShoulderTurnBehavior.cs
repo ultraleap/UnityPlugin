@@ -34,6 +34,8 @@ public class ShoulderTurnBehavior : MonoBehaviour {
 
   // Update is called once per frame 
   void LateUpdate() {
+    Vector3 flattenedTargetPosition = new Vector3(Target.position.x, NeckReferenceTransform.position.y, Target.position.z);
+    Target.position = flattenedTargetPosition;
     rotateChestToFollow(Target);
   }
 
@@ -47,7 +49,7 @@ public class ShoulderTurnBehavior : MonoBehaviour {
     while (aboutYRotation > 180.0f) { aboutYRotation -= 360.0f; }
 
     float normalYRotation = (aboutYRotation - MIN_LIMIT) / (MAX_LIMIT - MIN_LIMIT);
-    // float smoothedNormalYRotation = m_lastNormalYRotation + (normalYRotation * (1.0f - Smoothing));
+    //float smoothedNormalYRotation = m_lastNormalYRotation + (normalYRotation * (1.0f - Smoothing));
     //m_lastNormalYRotation = smoothedNormalYRotation;
 
     setChestTwist(normalYRotation);
