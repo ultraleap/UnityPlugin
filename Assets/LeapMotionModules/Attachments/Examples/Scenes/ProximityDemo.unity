@@ -482,6 +482,7 @@ MonoBehaviour:
   Pinky: {fileID: 0}
   GrabPoint: {fileID: 0}
   _handedness: 1
+  DrawHand: 0
 --- !u!114 &375805478
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2890,6 +2891,7 @@ MonoBehaviour:
   Pinky: {fileID: 0}
   GrabPoint: {fileID: 0}
   _handedness: 0
+  DrawHand: 0
 --- !u!1 &869187714
 GameObject:
   m_ObjectHideFlags: 0
@@ -3134,7 +3136,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 151c8c2f008764de9a6626d477f47115, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ActivateOnEnable: 0
   DeactivateOnDisable: 1
   Transition: {fileID: 0}
 --- !u!114 &995332416
@@ -3547,7 +3548,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 151c8c2f008764de9a6626d477f47115, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ActivateOnEnable: 0
   DeactivateOnDisable: 1
   Transition: {fileID: 0}
 --- !u!114 &1061438465 stripped
@@ -4863,6 +4863,50 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
   m_IsPrefabParent: 0
+--- !u!1 &1963548383
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1963548385}
+  - 114: {fileID: 1963548384}
+  m_Layer: 0
+  m_Name: RuntimeGizmoManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1963548384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1963548383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81dc33a21758b384586807f3656587d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _displayInGameView: 1
+  _enabledForBuild: 0
+  _sphereMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  _gizmoShader: {fileID: 4800000, guid: 309635e4933310a4d98f0e016c806769, type: 3}
+--- !u!4 &1963548385
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1963548383}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.07051369, y: -1.4947022, z: 0.14004657}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
 --- !u!1 &1966885502
 GameObject:
   m_ObjectHideFlags: 0
