@@ -33,7 +33,7 @@ public class SpineFollowTargetBehavior : MonoBehaviour {
     ReferenceTransform = GameObject.Instantiate(markerPrefab).transform;
     ReferenceTransform.name = transform.name + "_SpineReferenceMarker";
     ReferenceTransform.parent = transform;
-    ReferenceTransform.position = new Vector3(0, 0, 2);
+    ReferenceTransform.localPosition = new Vector3(0, 0, 2);
     m_spineRootTransform = getSpineRootTransform();
   }
 
@@ -50,7 +50,7 @@ public class SpineFollowTargetBehavior : MonoBehaviour {
     const float MIN_LIMIT = -40.0f; // In degrees from 0 (straight up)
     const float MAX_LIMIT = 40.0f;
 
-    Vector3 ToTarget = (target.position - m_spineRootTransform.position).normalized;
+    Vector3 ToTarget = (transform.parent.InverseTransformPoint( target.position) - transform.parent.InverseTransformPoint( m_spineRootTransform.position).normalized);
     Quaternion toTargetRotation = Quaternion.FromToRotation(ReferenceTransform.up, ToTarget);
     float aboutZRotation = toTargetRotation.eulerAngles.z;
     float aboutXRotation = toTargetRotation.eulerAngles.x;
