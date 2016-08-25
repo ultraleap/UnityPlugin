@@ -157,7 +157,7 @@ namespace Leap.Unity.Attachments {
     * Also draws the orthogonal basis vectors for the pinch and grab points.
     */
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer gizmoDrawer) {
-      if (DrawHand && RuntimeGizmoManager.TryGetGizmoDrawer(gameObject, out gizmoDrawer)) {
+      if (DrawHand) {
         Hand hand = GetLeapHand();
         gizmoDrawer.color = Color.red;
         gizmoDrawer.DrawLine(hand.Arm.ElbowPosition.ToVector3(), hand.Arm.WristPosition.ToVector3());
