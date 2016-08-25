@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Leap.Unity.Attributes;
+using UnityEngine.Serialization;
 
 namespace Leap.Unity {
 
@@ -10,19 +11,16 @@ namespace Leap.Unity {
   public class PinchDetector : AbstractHoldDetector {
     protected const float MM_TO_M = 0.001f;
 
+
+    [MinValue(0)]
+    [FormerlySerializedAs("_activatePinchDist")]
     public float ActivateDistance = .03f; //meters
+    [MinValue(0)]
+    [FormerlySerializedAs("_deactivatePinchDist")]
     public float DeactivateDistance = .04f; //meters
     public bool IsPinching { get { return this.IsHolding; } }
     public bool DidStartPinch { get { return this.DidStartHold; } }
     public bool DidEndPinch { get { return this.DidRelease; } }
-
-    [MinValue(0)]
-    [SerializeField]
-    protected float _activatePinchDist = 0.03f;
-
-    [MinValue(0)]
-    [SerializeField]
-    protected float _deactivatePinchDist = 0.04f;
 
     protected bool _isPinching = false;
 
