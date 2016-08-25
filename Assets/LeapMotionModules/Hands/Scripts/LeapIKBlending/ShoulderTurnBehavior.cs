@@ -42,7 +42,7 @@ public class ShoulderTurnBehavior : MonoBehaviour {
   private void rotateChestToFollow(Transform target) {
     const float MIN_LIMIT = -40.0f;
     const float MAX_LIMIT = 40.0f;
-    Vector3 toTarget = (target.position - NeckReferenceTransform.position).normalized;
+    Vector3 toTarget = (transform.root.InverseTransformPoint(target.position) - transform.root.InverseTransformPoint(NeckReferenceTransform.position)).normalized;
     Quaternion toTargetRotation = Quaternion.FromToRotation(NeckReferenceTransform.forward, toTarget);
     float aboutYRotation = NeckReferenceTransform.rotation.eulerAngles.y + toTargetRotation.eulerAngles.y;
 
