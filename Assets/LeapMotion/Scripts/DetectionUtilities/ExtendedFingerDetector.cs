@@ -142,9 +142,9 @@ namespace Leap.Unity {
           if (matchFingerState(finger, state[f]) && 
              (extendedCount <= MaximumExtendedCount) && 
              (extendedCount >= MinimumExtendedCount)) {
-            Gizmos.color = Color.green;
+            Gizmos.color = OnColor;
           } else {
-            Gizmos.color = Color.red;
+            Gizmos.color = OffColor;
           }
           Gizmos.DrawWireSphere(finger.TipPosition.ToVector3(), finger.Width);
         }
