@@ -101,8 +101,14 @@ namespace Leap.Unity {
       shoulder_up_weight = Mathf.Lerp(shoulder_up_weight, shoulder_up_target_weight, .4f);
       shoulder_forward_weight = Mathf.Lerp(shoulder_forward_weight, shoulder_forward_target_weight, .4f);
       positionIKWeight = Mathf.Lerp(positionIKWeight, positionIKTargetWeight, .4f);
-      animator.SetLayerWeight(2, spineLayerTargetWeight);
-      animator.SetLayerWeight(3, shouldersLayerTargetWeight);
+      if (Handedness == Chirality.Left) {
+        animator.SetLayerWeight(3, shouldersLayerTargetWeight);
+      }
+      if (Handedness == Chirality.Right) {
+        animator.SetLayerWeight(4, shouldersLayerTargetWeight);
+      }
+      //animator.SetLayerWeight(2, spineLayerTargetWeight);
+      
     }
 
     public void OnAnimatorIK(int layerIndex) {
