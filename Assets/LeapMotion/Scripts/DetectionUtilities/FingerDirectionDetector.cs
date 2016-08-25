@@ -175,15 +175,16 @@ namespace Leap.Unity {
       if (ShowGizmos && HandModel != null) {
         Color innerColor;
         if (IsActive) {
-          innerColor = Color.green;
+          innerColor = OnColor;
         } else {
-          innerColor = Color.blue;
+          innerColor = OffColor;
         }
         Finger finger = HandModel.GetLeapHand().Fingers[selectedFingerOrdinal()];
         Vector3 fingerDirection = finger.Bone(Bone.BoneType.TYPE_DISTAL).Direction.ToVector3();
         Utils.DrawCone(finger.TipPosition.ToVector3(), fingerDirection, OnAngle, finger.Length, innerColor);
-        Utils.DrawCone(finger.TipPosition.ToVector3(), fingerDirection, OffAngle, finger.Length, Color.red);
-        Debug.DrawRay(finger.TipPosition.ToVector3(), selectedDirection(finger.TipPosition.ToVector3()), Color.grey);
+        Utils.DrawCone(finger.TipPosition.ToVector3(), fingerDirection, OffAngle, finger.Length, LimitColor);
+        Gizmos.color = DirectionColor;
+        Gizmos.DrawRay(finger.TipPosition.ToVector3(), selectedDirection(finger.TipPosition.ToVector3()));
       }
     }
   #endif

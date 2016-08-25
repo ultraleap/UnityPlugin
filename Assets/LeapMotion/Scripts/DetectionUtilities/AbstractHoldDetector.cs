@@ -180,16 +180,18 @@ namespace Leap.Unity {
         Vector3 centerPosition = _position;
         Quaternion circleRotation = _rotation;
         if (IsHolding) {
-          centerColor = Color.green;
+          centerColor = OnColor;
         } else {
-          centerColor = Color.red;
+          centerColor = OffColor;
         }
         Vector3 axis;
         float angle;
         circleRotation.ToAngleAxis(out angle, out axis);
         Utils.DrawCircle(centerPosition, Normal, Distance / 2, centerColor);
-        Debug.DrawLine(centerPosition, centerPosition + Direction * Distance / 2, Color.grey);
-        Debug.DrawLine(centerPosition, centerPosition + Normal * Distance / 2, Color.white);
+        Gizmos.color = NormalColor;
+        Gizmos.DrawLine(centerPosition, centerPosition + Direction * Distance / 2);
+        Gizmos.color = DirectionColor;
+        Gizmos.DrawLine(centerPosition, centerPosition + Normal * Distance / 2);
       }
     }
     #endif

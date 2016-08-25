@@ -150,14 +150,15 @@ namespace Leap.Unity {
       if(ShowGizmos && HandModel != null){
         Color centerColor;
         if (IsActive) {
-          centerColor = Color.green;
+          centerColor = OnColor;
         } else {
-          centerColor = Color.red;
+          centerColor = OffColor;
         }
         Hand hand = HandModel.GetLeapHand();
         Utils.DrawCone(hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3(), OnAngle, hand.PalmWidth, centerColor, 8);
-        Utils.DrawCone(hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3(), OffAngle, hand.PalmWidth, Color.blue, 8);
-        Debug.DrawRay(hand.PalmPosition.ToVector3(), selectedDirection(hand.PalmPosition.ToVector3()), Color.grey, 0, true);
+        Utils.DrawCone(hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3(), OffAngle, hand.PalmWidth, LimitColor, 8);
+        Gizmos.color = DirectionColor;
+        Gizmos.DrawRay(hand.PalmPosition.ToVector3(), selectedDirection(hand.PalmPosition.ToVector3()));
       }
     }
     #endif
