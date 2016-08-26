@@ -39,6 +39,9 @@ namespace Leap.Unity {
     private float spineLayerWeight;
     private float spineLayerTargetWeight;
 
+    public Transform RestIKPosition;
+    private bool isTracking;
+
 
     protected override void Awake() {
       base.Awake();
@@ -72,8 +75,9 @@ namespace Leap.Unity {
     }
 
     protected override void HandFinish() {
-      StartCoroutine(LerpToStart());
-      positionIKTargetWeight = 0;
+      isTracking = false;
+      //StartCoroutine(LerpToStart());
+      positionIKTargetWeight = 1;
       rotationIKWeight = 0;
       shoulder_forward_target_weight = 0;
       shoulder_up_target_weight = 0;
@@ -81,6 +85,7 @@ namespace Leap.Unity {
       spineLayerTargetWeight = 1f;
     }
     protected override void HandReset() {
+      isTracking = true;
       StopAllCoroutines();
       positionIKTargetWeight = 1;
       rotationIKWeight = 1;
@@ -108,62 +113,81 @@ namespace Leap.Unity {
         animator.SetLayerWeight(4, shouldersLayerTargetWeight);
       }
       //animator.SetLayerWeight(2, spineLayerTargetWeight);
-      
     }
 
     public void OnAnimatorIK(int layerIndex) {
       //Debug.Log("IK");
       if (Handedness == Chirality.Left) {
-        animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, positionIKWeight);
-        animator.SetIKPosition(AvatarIKGoal.LeftHand, PalmPositionAtLateUpdate);
-        animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotationIKWeight);
-        animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
-        animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, positionIKWeight);
-        animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
+        if (isTracking) {
+          animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, positionIKWeight);
+          animator.SetIKPosition(AvatarIKGoal.LeftHand, PalmPositionAtLateUpdate);
+          animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotationIKWeight);
+          animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
+          animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, positionIKWeight);
+          animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
 
-        //Debug.Log(("ElbowMarker_L.position.y: " + ElbowMarker_L.position.y + " - Shoulder_L.position.y: " + Shoulder_L.position.y));
-        if (ElbowMarker.position.y > Scapula.position.y) {
-          shoulder_up_target_weight = (ElbowMarker.position.y - Shoulder.position.y) * 10f;
-          animator.SetFloat("shoulder_up_left", shoulder_up_weight);
+          //Debug.Log(("ElbowMarker_L.position.y: " + ElbowMarker_L.position.y + " - Shoulder_L.position.y: " + Shoulder_L.position.y));
+          if (ElbowMarker.position.y > Scapula.position.y) {
+            shoulder_up_target_weight = (ElbowMarker.position.y - Shoulder.position.y) * 10f;
+            animator.SetFloat("shoulder_up_left", shoulder_up_weight);
+          }
+          else {
+            shoulder_up_target_weight = 0.0f;
+            animator.SetFloat("shoulder_up_left", shoulder_up_weight);
+          }
+          if (ElbowMarker.position.z > Scapula.position.z) {
+            //Debug.Log("Left Forward: " + shoulder_forward_target_weight);
+            shoulder_forward_target_weight = (ElbowMarker.position.z - Shoulder.position.z) * 10f;
+            animator.SetFloat("shoulder_forward_left", shoulder_forward_weight);
+          }
+          else {
+            shoulder_forward_target_weight = 0.0f;
+            animator.SetFloat("shoulder_forward_left", shoulder_forward_weight);
+          }
         }
         else {
-          shoulder_up_target_weight = 0.0f;
-          animator.SetFloat("shoulder_up_left", shoulder_up_weight);
-        }
-        if (ElbowMarker.position.z > Scapula.position.z) {
-          //Debug.Log("Left Forward: " + shoulder_forward_target_weight);
-          shoulder_forward_target_weight = (ElbowMarker.position.z - Shoulder.position.z) * 10f;
-          animator.SetFloat("shoulder_forward_left", shoulder_forward_weight);
-        }
-        else {
-          shoulder_forward_target_weight = 0.0f;
-          animator.SetFloat("shoulder_forward_left", shoulder_forward_weight);
+          animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, positionIKWeight);
+          animator.SetIKPosition(AvatarIKGoal.LeftHand, RestIKPosition.position);
+          animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotationIKWeight);
+          animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
+          animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, 0);
+          animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
         }
       }
       if (Handedness == Chirality.Right) {
-        animator.SetIKPositionWeight(AvatarIKGoal.RightHand, positionIKWeight);
-        animator.SetIKPosition(AvatarIKGoal.RightHand, PalmPositionAtLateUpdate);
-        animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotationIKWeight);
-        animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
-        animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, positionIKWeight);
-        animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
-        if (ElbowMarker.position.y > Scapula.position.y + 0f) {
-          //.Log("Right Above");
-          shoulder_up_target_weight = (ElbowMarker.position.y - Shoulder.position.y) * 10f;
-          animator.SetFloat("shoulder_up_right", shoulder_up_weight);
+        if (isTracking) {
+          animator.SetIKPositionWeight(AvatarIKGoal.RightHand, positionIKWeight);
+          animator.SetIKPosition(AvatarIKGoal.RightHand, PalmPositionAtLateUpdate);
+          animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotationIKWeight);
+          animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
+          animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, positionIKWeight);
+          animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
+          if (ElbowMarker.position.y > Scapula.position.y + 0f) {
+            //.Log("Right Above");
+            shoulder_up_target_weight = (ElbowMarker.position.y - Shoulder.position.y) * 10f;
+            animator.SetFloat("shoulder_up_right", shoulder_up_weight);
+          }
+          else {
+            shoulder_up_target_weight = 0.0f;
+            animator.SetFloat("shoulder_up_right", shoulder_up_weight);
+          }
+          if (ElbowMarker.position.z > Scapula.position.z) {
+            shoulder_forward_target_weight = (ElbowMarker.position.z - Shoulder.position.z) * 10f;
+            //Debug.Log("Right Forward: " + shoulder_forward_target_weight);
+            animator.SetFloat("shoulder_forward_right", shoulder_forward_weight);
+          }
+          else {
+            shoulder_forward_target_weight = 0.0f;
+            animator.SetFloat("shoulder_forward_right", shoulder_forward_weight);
+          }
         }
         else {
-          shoulder_up_target_weight = 0.0f;
-          animator.SetFloat("shoulder_up_right", shoulder_up_weight);
-        }
-        if (ElbowMarker.position.z > Scapula.position.z) {
-          shoulder_forward_target_weight = (ElbowMarker.position.z - Shoulder.position.z) * 10f;
-          //Debug.Log("Right Forward: " + shoulder_forward_target_weight);
-          animator.SetFloat("shoulder_forward_right", shoulder_forward_weight);
-        }
-        else {
-          shoulder_forward_target_weight = 0.0f;
-          animator.SetFloat("shoulder_forward_right", shoulder_forward_weight);
+          animator.SetIKPositionWeight(AvatarIKGoal.RightHand, positionIKWeight);
+          animator.SetIKPosition(AvatarIKGoal.RightHand, RestIKPosition.position);
+          animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotationIKWeight);
+          animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
+          animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, 0);
+          animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
         }
       }
     }
