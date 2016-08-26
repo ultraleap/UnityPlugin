@@ -40,6 +40,7 @@ namespace Leap.Unity {
     private float spineLayerTargetWeight;
 
     public Transform RestIKPosition;
+    public Vector3 UntrackedIKPosition;
     private bool isTracking;
 
 
@@ -76,7 +77,7 @@ namespace Leap.Unity {
 
     protected override void HandFinish() {
       isTracking = false;
-      //StartCoroutine(LerpToStart());
+      StartCoroutine(LerpToRestPosition(palm.position));
       positionIKTargetWeight = 1;
       rotationIKWeight = 0;
       shoulder_forward_target_weight = 0;
@@ -147,7 +148,7 @@ namespace Leap.Unity {
         }
         else {
           animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, positionIKWeight);
-          animator.SetIKPosition(AvatarIKGoal.LeftHand, RestIKPosition.position);
+          animator.SetIKPosition(AvatarIKGoal.LeftHand, UntrackedIKPosition);
           animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotationIKWeight);
           animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
           animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, 0);
@@ -183,7 +184,7 @@ namespace Leap.Unity {
         }
         else {
           animator.SetIKPositionWeight(AvatarIKGoal.RightHand, positionIKWeight);
-          animator.SetIKPosition(AvatarIKGoal.RightHand, RestIKPosition.position);
+          animator.SetIKPosition(AvatarIKGoal.RightHand, UntrackedIKPosition);
           animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotationIKWeight);
           animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
           animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, 0);
@@ -196,17 +197,18 @@ namespace Leap.Unity {
     }
 
 
-    private IEnumerator LerpToStart() {
-      Vector3 droppedPosition = palm.localPosition;
-      Quaternion droppedOrientation = palm.localRotation;
+    private IEnumerator LerpToRestPosition(Vector3 startPosition) {
+      //Vector3 droppedPosition = palm.localPosition;
+      Vector3 droppedPosition = startPosition;
+      //Quaternion droppedOrientation = palm.localRotation;
       float duration = .25f;
       float startTime = Time.time;
       float endTime = startTime + duration;
 
       while (Time.time <= endTime) {
         float t = (Time.time - startTime) / duration;
-        palm.localPosition = Vector3.Lerp(droppedPosition, startingPalmPosition, t);
-        palm.localRotation = Quaternion.Lerp(droppedOrientation, startingOrientation, t);
+        UntrackedIKPosition = Vector3.Lerp(droppedPosition, RestIKPosition.position, t);
+        //palm.localRotation = Quaternion.Lerp(droppedOrientation, startingOrientation, t);
         yield return null;
       }
     }
