@@ -1081,14 +1081,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddf0cd3a39afe58408b46938272903e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 1629697975}
   Handedness: 1
-  ElbowOffset: -0.5
   MarkerPrefab: {fileID: 100000, guid: f776c65287e65d44b843a52c5fdbf7b4, type: 3}
   ElbowMarker: {fileID: 520564827}
   ElbowIKTarget: {fileID: 1451335158}
+  ElbowOffset: -0.5
   RestIKPosition: {fileID: 466182915}
-  UntrackedIKPosition: {x: 0, y: 0, z: 0}
   DropCurveX:
     serializedVersion: 2
     m_Curve:
@@ -1349,14 +1347,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddf0cd3a39afe58408b46938272903e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animator: {fileID: 1629697975}
   Handedness: 0
-  ElbowOffset: -0.5
   MarkerPrefab: {fileID: 100000, guid: f776c65287e65d44b843a52c5fdbf7b4, type: 3}
   ElbowMarker: {fileID: 1140958881}
   ElbowIKTarget: {fileID: 286608861}
+  ElbowOffset: -0.5
   RestIKPosition: {fileID: 1008230487}
-  UntrackedIKPosition: {x: 0, y: 0, z: 0}
   DropCurveX:
     serializedVersion: 2
     m_Curve:
