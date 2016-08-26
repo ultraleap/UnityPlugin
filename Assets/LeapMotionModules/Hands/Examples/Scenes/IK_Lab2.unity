@@ -1088,6 +1088,71 @@ MonoBehaviour:
   ElbowMarker: {fileID: 520564827}
   ElbowIKTarget: {fileID: 1451335158}
   RestIKPosition: {fileID: 466182915}
+  UntrackedIKPosition: {x: 0, y: 0, z: 0}
+  DropCurveX:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 0.35003898
+      value: 0.19145241
+      inSlope: 1.5036762
+      outSlope: 1.5036762
+      tangentMode: 0
+    - time: 0.82790625
+      value: 1.7933811
+      inSlope: 0.95665455
+      outSlope: 0.95665455
+      tangentMode: 0
+    - time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  DropCurveY:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0.49676156
+      outSlope: 0.49676156
+      tangentMode: 0
+    - time: 0.9270774
+      value: 0.94705343
+      inSlope: 2.5318935
+      outSlope: 2.5318935
+      tangentMode: 0
+    - time: 1
+      value: 1
+      inSlope: 0.116167925
+      outSlope: 0.116167925
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  DropCurveZ:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+    - time: 1
+      value: 1.0023499
+      inSlope: 3.3247437
+      outSlope: 3.3247437
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  ArmDropDuration: 0.25
 --- !u!114 &1608686388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1291,6 +1356,71 @@ MonoBehaviour:
   ElbowMarker: {fileID: 1140958881}
   ElbowIKTarget: {fileID: 286608861}
   RestIKPosition: {fileID: 1008230487}
+  UntrackedIKPosition: {x: 0, y: 0, z: 0}
+  DropCurveX:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 0.35003898
+      value: 0.19145241
+      inSlope: 1.5036762
+      outSlope: 1.5036762
+      tangentMode: 0
+    - time: 0.82790625
+      value: 1.7933811
+      inSlope: 0.95665455
+      outSlope: 0.95665455
+      tangentMode: 0
+    - time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  DropCurveY:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0.49676156
+      outSlope: 0.49676156
+      tangentMode: 0
+    - time: 0.9270774
+      value: 0.94705343
+      inSlope: 2.5318935
+      outSlope: 2.5318935
+      tangentMode: 0
+    - time: 1
+      value: 1
+      inSlope: 0.116167925
+      outSlope: 0.116167925
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  DropCurveZ:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+    - time: 1
+      value: 1.0023499
+      inSlope: 3.3247437
+      outSlope: 3.3247437
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  ArmDropDuration: 0.25
 --- !u!114 &1698214173
 MonoBehaviour:
   m_ObjectHideFlags: 0
