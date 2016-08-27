@@ -48,6 +48,8 @@ namespace Leap.Unity {
     public AnimationCurve DropCurveZ;
     public float ArmDropDuration = .25f;
 
+    public IKMarkersAssembly m_IKMarkerAssembly;
+
     protected override void Awake() {
       base.Awake();
       animator = transform.root.GetComponentInChildren<Animator>();
@@ -64,17 +66,35 @@ namespace Leap.Unity {
         Shoulder = animator.GetBoneTransform(HumanBodyBones.RightUpperArm);
         Elbow = animator.GetBoneTransform(HumanBodyBones.RightLowerArm);
       }
-      MarkerPrefab = Resources.Load("AxisTripod") as GameObject;
-      if (ElbowMarker == null) {
-        ElbowMarker = GameObject.Instantiate(MarkerPrefab).transform;
-        ElbowMarker.transform.name = animator.transform.name + "_ElbowMarker" + Handedness.ToString();
-        ElbowMarker.position = Elbow.position;
-        ElbowMarker.rotation = Elbow.rotation;
+      //MarkerPrefab = Resources.Load("AxisTripod") as GameObject;
+      //if (ElbowMarker == null) {
+      //  ElbowMarker = GameObject.Instantiate(MarkerPrefab).transform;
+      //  ElbowMarker.transform.name = animator.transform.name + "_ElbowMarker" + Handedness.ToString();
+      //  ElbowMarker.position = Elbow.position;
+      //  ElbowMarker.rotation = Elbow.rotation;
+      //}
+      //if (ElbowIKTarget == null) {
+      //  ElbowIKTarget = GameObject.Instantiate(MarkerPrefab).transform;
+      //  ElbowIKTarget.transform.name = animator.transform.name + "_ElbowIKTarget" + Handedness.ToString();
+      //}
+    }
+
+    public void AssignIKMarkers() {
+      if (Handedness == Chirality.Left) {
+        Debug.Log(transform.name + " - Left");
+        ElbowMarker = m_IKMarkerAssembly.ElbowMarker_L;
+        ElbowIKTarget = m_IKMarkerAssembly.ElbowIKTarget_L;
+        RestIKPosition = m_IKMarkerAssembly.RestIKPosition_L;
       }
-      if (ElbowIKTarget == null) {
-        ElbowIKTarget = GameObject.Instantiate(MarkerPrefab).transform;
-        ElbowIKTarget.transform.name = animator.transform.name + "_ElbowIKTarget" + Handedness.ToString();
+      if (Handedness == Chirality.Right) {
+        Debug.Log(transform.name + " - Right");
+        ElbowMarker = m_IKMarkerAssembly.ElbowMarker_R;
+        ElbowIKTarget = m_IKMarkerAssembly.ElbowIKTarget_R;
+        RestIKPosition = m_IKMarkerAssembly.RestIKPosition_R;
       }
+      DropCurveX = m_IKMarkerAssembly.DropCurveX;
+      DropCurveY = m_IKMarkerAssembly.DropCurveY;
+      DropCurveZ = m_IKMarkerAssembly.DropCurveZ;
     }
 
     protected override void HandFinish() {
@@ -227,17 +247,7 @@ namespace Leap.Unity {
         Shoulder = animator.GetBoneTransform(HumanBodyBones.RightUpperArm);
         Elbow = animator.GetBoneTransform(HumanBodyBones.RightLowerArm);
       }
-
-      //if (ElbowMarker == null) {
-      //  ElbowMarker = GameObject.Instantiate(MarkerPrefab).transform;
-      //  ElbowMarker.transform.name = animator.transform.name + "_ElbowMarker" + Handedness.ToString();
-      //  ElbowMarker.position = Elbow.position;
-      //  ElbowMarker.rotation = Elbow.rotation;
-      //}
-      //if (ElbowIKTarget == null) {
-      //  ElbowIKTarget = GameObject.Instantiate(MarkerPrefab).transform;
-      //  ElbowIKTarget.transform.name = animator.transform.name + "_ElbowIKTarget" + Handedness.ToString();
-      //}
+      AssignIKMarkers();
     }
   }
 }

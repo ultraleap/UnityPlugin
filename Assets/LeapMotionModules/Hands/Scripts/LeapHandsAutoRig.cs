@@ -44,6 +44,8 @@ namespace Leap.Unity {
     [SerializeField]
     [HideInInspector]
     private bool flippedPalmsState = false;
+    private IKMarkersAssembly ikMarkersAssemblyPrefab;
+    private IKMarkersAssembly iKMarkersAssembly;
 
     /**AutoRig() Calls AutoRigMecanim() if a Unity Avatar exists.  Otherwise, AutoRigByName() is called.  
      * Then it immediately RiggedHand.StoreJointStartPose() to store the rigged asset's original state.*/
@@ -161,13 +163,21 @@ namespace Leap.Unity {
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
       Reset();
 
+      ikMarkersAssemblyPrefab = Resources.Load<IKMarkersAssembly>("IKMarkersAssembly");
+      iKMarkersAssembly = GameObject.Instantiate(ikMarkersAssemblyPrefab) as IKMarkersAssembly;
+      iKMarkersAssembly.transform.parent = transform;
+      iKMarkersAssembly.transform.localPosition = new Vector3(0, 0, 0);
+
       //Find hands and assign RiggedHands
       Transform Hand_L = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftHand);
       if (Hand_L.GetComponent<RiggedHand>()) {
         RiggedHand_L = Hand_L.GetComponent<RiggedHand>();
       }
       else RiggedHand_L = Hand_L.gameObject.AddComponent<RiggedHand>();
-      HandTransitionBehavior_L =Hand_L.gameObject.AddComponent<WristLeapToIKBlend>();
+      WristLeapToIKBlend WristLeapToIKBlend_L = Hand_L.gameObject.AddComponent<WristLeapToIKBlend>();
+      HandTransitionBehavior_L = WristLeapToIKBlend_L;
+      WristLeapToIKBlend_L.m_IKMarkerAssembly = iKMarkersAssembly;
+      //WristLeapToIKBlend_L.AssignIKMarkers();
       RiggedHand_L.Handedness = Chirality.Left;
       RiggedHand_L.SetEditorLeapPose = false;
 
@@ -176,7 +186,10 @@ namespace Leap.Unity {
         RiggedHand_R = Hand_R.GetComponent<RiggedHand>();
       }
       else RiggedHand_R = Hand_R.gameObject.AddComponent<RiggedHand>();
-      HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<WristLeapToIKBlend>();
+      WristLeapToIKBlend WristLeapToIKBlend_R = Hand_R.gameObject.AddComponent<WristLeapToIKBlend>();
+      HandTransitionBehavior_R = WristLeapToIKBlend_R;
+      WristLeapToIKBlend_R.m_IKMarkerAssembly = iKMarkersAssembly;
+      //WristLeapToIKBlend_R.AssignIKMarkers();
       RiggedHand_R.Handedness = Chirality.Right;
       RiggedHand_R.SetEditorLeapPose = false;
 
@@ -217,6 +230,7 @@ namespace Leap.Unity {
       modelPalmFacing_L = RiggedHand_L.modelPalmFacing;
       modelFingerPointing_R = RiggedHand_R.modelFingerPointing;
       modelPalmFacing_R = RiggedHand_R.modelPalmFacing;
+      AutoRigUpperBody();
     }
     /**Removes existing RiggedFinger components so the auto rigging process can be rerun. */
     void Reset() {

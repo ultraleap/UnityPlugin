@@ -49,7 +49,6 @@ public class SpineFollowTargetBehavior : MonoBehaviour {
   private void rotateSpineToFollow(Transform target) {
     const float MIN_LIMIT = -40.0f; // In degrees from 0 (straight up)
     const float MAX_LIMIT = 40.0f;
-
     Vector3 ToTarget = (transform.parent.InverseTransformPoint( target.position) - transform.parent.InverseTransformPoint( m_spineRootTransform.position)).normalized;
     Quaternion toTargetRotation = Quaternion.FromToRotation(ReferenceTransform.up, ToTarget);
     float aboutZRotation = toTargetRotation.eulerAngles.z;
