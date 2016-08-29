@@ -28,6 +28,7 @@ namespace Leap.Unity {
      * @since 4.1.2
      */
     [Tooltip("The interval in seconds at which to check this detector's conditions.")]
+    [MinValue(0)]
     public float Period = .1f; //seconds
     /**
      * The IHandModel instance to observe. 
@@ -85,6 +86,11 @@ namespace Leap.Unity {
     [Tooltip("The angle in degrees from the target direction at which to turn off.")]
     [Range(0, 360)]
     public float OffAngle = 65; //degrees
+    /** Whether to draw the detector's Gizmos for debugging. (Not every detector provides gizmos.)
+     * @since 4.1.2 
+     */
+    [Tooltip("Draw this detector's Gizmos, if any. (Gizmos must be on in Unity edtor, too.)")]
+    public bool ShowGizmos = true;
 
     private IEnumerator watcherCoroutine;
 

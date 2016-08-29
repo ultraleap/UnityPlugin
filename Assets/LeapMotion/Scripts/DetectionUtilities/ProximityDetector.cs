@@ -2,7 +2,7 @@
 using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
-using Leap;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity{
 
@@ -13,18 +13,19 @@ namespace Leap.Unity{
    */
   public class ProximityDetector : Detector {
     /**
-     * The interval at which to check palm direction.
-     * @since 4.1.2
-     */
-    [Tooltip("The interval in seconds at which to check this detector's conditions.")]
-    public float Period = .1f; //seconds
-    /**
      * Dispatched when the proximity check succeeds.
      * The ProximityEvent object provides a reference to the proximate GameObject. 
      * @since 4.1.2
      */
     [Tooltip("Dispatched when close enough to a target.")]
     public ProximityEvent OnProximity;
+    /**
+     * The interval at which to check palm direction.
+     * @since 4.1.2
+     */
+    [MinValue(0)]
+    [Tooltip("The interval in seconds at which to check this detector's conditions.")]
+    public float Period = .1f; //seconds
 
     /**
      * The list of objects which can activate the detector by proximity.
@@ -72,9 +73,24 @@ namespace Leap.Unity{
      * @since 4.1.2
      */
     public GameObject CurrentObject { get { return _currentObj; } }
+    /** Whether to draw the detector's Gizmos for debugging. (Not every detector provides gizmos.)
+     * @since 4.1.2 
+     */
+    [Tooltip("Draw this detector's Gizmos, if any. (Gizmos must be on in Unity edtor, too.)")]
+    public bool ShowGizmos = true;
 
     private IEnumerator proximityWatcherCoroutine;
     private GameObject _currentObj = null;
+
+    protected virtual void OnValidate() {
+      OnDistance = Mathf.Max(0, OnDistance);
+      OffDistance = Mathf.Max(0, OffDistance);
+
+      //Activate value cannot be less than deactivate value
+      if (OffDistance < OnDistance) {
+        OffDistance = OnDistance;
+      }
+    }
 
     void Awake() {
       proximityWatcherCoroutine = proximityWatcher();
@@ -153,15 +169,17 @@ namespace Leap.Unity{
     }
 
     #if UNITY_EDITOR
-    void OnDrawGizmos(){
-      if(IsActive){
-        Gizmos.color = Color.green;
-      } else {
-        Gizmos.color = Color.red;
+    void OnDrawGizmos() {
+      if (ShowGizmos) {
+        if (IsActive) {
+          Gizmos.color = Color.green;
+        } else {
+          Gizmos.color = Color.red;
+        }
+        Gizmos.DrawWireSphere(transform.position, OnDistance);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, OffDistance);
       }
-      Gizmos.DrawWireSphere(transform.position, OnDistance);
-      Gizmos.color = Color.blue;
-      Gizmos.DrawWireSphere(transform.position, OffDistance);
     }
     #endif
   }

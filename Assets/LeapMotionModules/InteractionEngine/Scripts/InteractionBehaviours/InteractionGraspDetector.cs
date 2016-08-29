@@ -17,6 +17,14 @@ namespace Leap.Unity.Interaction {
   public class InteractionGraspDetector : Detector {
 
     /**
+     * Dispatched when a target interactable object is grasped.
+     * The InteractiveBehaviorGraspEvent object provides a reference to the IInteractiveBehavior instance. 
+     * @since 4.1.5
+     */
+    [Tooltip("Dispatched when a target object is grasped.")]
+    public InteractiveBehaviorGraspEvent OnGrasp;
+
+    /**
     * The InteractionManager managing the target objects. All
     * targets must be managed by this manager.
     * @since 4.1.5
@@ -24,6 +32,7 @@ namespace Leap.Unity.Interaction {
     [AutoFind(AutoFindLocations.Scene)]
     [Tooltip("The Interaction Manager.")]
     public InteractionManager ieManager = null;
+
     /**
      * The IHandModel instance to observe. 
      * Set automatically if not explicitly set in the editor.
@@ -34,18 +43,12 @@ namespace Leap.Unity.Interaction {
     public IHandModel HandModel = null;
 
     /**
- * The interval at which to check palm direction.
- * @since 4.1.5
- */
+    * The interval at which to check palm direction.
+    * @since 4.1.5
+    */
+    [MinValue(0)]
     [Tooltip("The interval in seconds at which to check this detector's conditions.")]
     public float Period = .1f; //seconds
-    /**
-     * Dispatched when a target interactable object is grasped.
-     * The InteractiveBehaviorGraspEvent object provides a reference to the IInteractiveBehavior instance. 
-     * @since 4.1.5
-     */
-    [Tooltip("Dispatched when a target object is grasped.")]
-    public InteractiveBehaviorGraspEvent OnGrasp;
 
     [Tooltip("Activate when any interactable object is grasped.")]
     public bool AnyInteractionObject = false;
