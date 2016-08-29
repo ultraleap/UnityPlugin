@@ -122,10 +122,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 899526197}
   m_RootOrder: 2
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -2, y: -226}
-  m_SizeDelta: {x: 67, y: 327}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -2, y: 79.4895}
+  m_SizeDelta: {x: 567, y: 327}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &24978903
 MonoBehaviour:
@@ -193,10 +193,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 60693053}
   m_RootOrder: 4
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 46.95375, y: 0}
-  m_SizeDelta: {x: 116, y: 24.450043}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 258.15375, y: 0}
+  m_SizeDelta: {x: 116, y: 209.05005}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &42406199
 MonoBehaviour:
@@ -270,10 +270,10 @@ RectTransform:
   - {fileID: 42406198}
   m_Father: {fileID: 108865406}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -211.2, y: 92.3}
+  m_SizeDelta: {x: 422.4, y: 184.6}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &60693054
 MonoBehaviour:
@@ -546,7 +546,17 @@ MonoBehaviour:
   ExpandSpeed: 0.1
   ContractSpeed: 0.1
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -894,7 +904,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -1522,10 +1542,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1645446916}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0.10072446, y: 0.21576102}
-  m_AnchorMax: {x: 0.86036485, y: 0.8426822}
-  m_AnchoredPosition: {x: 0.15080339, y: -0.03159387}
-  m_SizeDelta: {x: -0.33501095, y: -0.16027054}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -1.499012, y: 1.1197371}
+  m_SizeDelta: {x: 64.08252, y: 24.540424}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &169751454
 MonoBehaviour:
@@ -1701,10 +1721,10 @@ RectTransform:
   - {fileID: 2016738029}
   m_Father: {fileID: 96818250}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.5}
-  m_SizeDelta: {x: -15.199974, y: -10.599998}
+  m_SizeDelta: {x: 84.800026, y: 39.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &282242992
 MonoBehaviour:
@@ -1775,10 +1795,10 @@ RectTransform:
   - {fileID: 734707615}
   m_Father: {fileID: 108865406}
   m_RootOrder: 1
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: -50}
-  m_SizeDelta: {x: 0, y: 50}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -211.2, y: -142.3}
+  m_SizeDelta: {x: 422.4, y: 50}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &303246070
 MonoBehaviour:
@@ -2330,7 +2350,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -2408,10 +2438,10 @@ RectTransform:
   - {fileID: 1500545568}
   m_Father: {fileID: 899526197}
   m_RootOrder: 4
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000002861023, y: -224.66}
-  m_SizeDelta: {x: 0, y: 249.33}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 80.8295}
+  m_SizeDelta: {x: 500, y: 249.33}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &410109114
 MonoBehaviour:
@@ -2503,8 +2533,6 @@ MonoBehaviour:
   ControlsTransform: 1
   ActivateDistance: 0.03
   DeactivateDistance: 0.04
-  _activatePinchDist: 0.03
-  _deactivatePinchDist: 0.04
 --- !u!4 &422496982 stripped
 Transform:
   m_PrefabParentObject: {fileID: 464466, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
@@ -2774,10 +2802,10 @@ RectTransform:
   - {fileID: 349765319}
   m_Father: {fileID: 60693053}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 55, y: 250}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -211.2, y: 92.3}
+  m_SizeDelta: {x: 477.40002, y: 250}
   m_Pivot: {x: 0, y: 1}
 --- !u!82 &464611488
 AudioSource:
@@ -3048,7 +3076,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -3246,10 +3284,10 @@ RectTransform:
   - {fileID: 884439602}
   m_Father: {fileID: 1769833338}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.5}
-  m_SizeDelta: {x: -15.199974, y: -10.599998}
+  m_SizeDelta: {x: 84.800026, y: 39.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &570906132
 MonoBehaviour:
@@ -3463,10 +3501,10 @@ RectTransform:
   - {fileID: 1216081051}
   m_Father: {fileID: 1583992255}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -20, y: -20}
+  m_SizeDelta: {x: 30, y: 214.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &617988127
 GameObject:
@@ -3499,10 +3537,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1896443981}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.6, y: 0.2}
-  m_SizeDelta: {x: -12.7, y: -8.1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 1.6000004, y: 0.19999981}
+  m_SizeDelta: {x: 72.10002, y: 31.300001}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &617988129
 MonoBehaviour:
@@ -3662,10 +3700,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1458808924}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0.10072446, y: 0.21576102}
-  m_AnchorMax: {x: 0.86036485, y: 0.8426822}
-  m_AnchoredPosition: {x: 0.15080339, y: -0.03159387}
-  m_SizeDelta: {x: -0.33501095, y: -0.16027054}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -1.499012, y: 1.1197371}
+  m_SizeDelta: {x: 64.08252, y: 24.540424}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &671601707
 MonoBehaviour:
@@ -3774,10 +3812,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 60693053}
   m_RootOrder: 3
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: -40.853745, y: 0}
-  m_SizeDelta: {x: 99, y: 24.450043}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -252.05374, y: 0}
+  m_SizeDelta: {x: 99.000015, y: 209.05005}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &716211552
 MonoBehaviour:
@@ -3844,10 +3882,10 @@ RectTransform:
   - {fileID: 1019386785}
   m_Father: {fileID: 303246069}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -20, y: -20}
+  m_SizeDelta: {x: 402.4, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &743741871
 GameObject:
@@ -3880,10 +3918,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 899526197}
   m_RootOrder: 3
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -2.0000143, y: -486.30994}
-  m_SizeDelta: {x: 67, y: 327}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -2.0000153, y: -180.82043}
+  m_SizeDelta: {x: 567, y: 327}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &743741873
 MonoBehaviour:
@@ -4117,7 +4155,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -4415,7 +4463,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -4558,10 +4616,10 @@ RectTransform:
   - {fileID: 1827121096}
   m_Father: {fileID: 921806136}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.5}
-  m_SizeDelta: {x: -15.199974, y: -10.599998}
+  m_SizeDelta: {x: 84.800026, y: 39.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &861655855
 MonoBehaviour:
@@ -4629,10 +4687,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 570906131}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.6, y: 0.2}
-  m_SizeDelta: {x: -12.7, y: -8.1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 1.6000004, y: 0.19999981}
+  m_SizeDelta: {x: 72.10002, y: 31.300001}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &884439603
 MonoBehaviour:
@@ -4894,7 +4952,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -4966,10 +5034,10 @@ RectTransform:
   - {fileID: 1172680717}
   m_Father: {fileID: 1500545568}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.5}
-  m_SizeDelta: {x: -15.199974, y: -10.599998}
+  m_SizeDelta: {x: 84.800026, y: 39.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &920194424
 MonoBehaviour:
@@ -5243,7 +5311,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -5477,7 +5555,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -5548,10 +5636,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1422057072}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0.10072446, y: 0.21576102}
-  m_AnchorMax: {x: 0.86036485, y: 0.8426822}
-  m_AnchoredPosition: {x: 0.15080339, y: -0.03159387}
-  m_SizeDelta: {x: -0.33501095, y: -0.16027054}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -1.499012, y: 1.1197371}
+  m_SizeDelta: {x: 64.08252, y: 24.540424}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &929067558
 MonoBehaviour:
@@ -5626,10 +5714,10 @@ RectTransform:
   - {fileID: 1096977765}
   m_Father: {fileID: 1154381785}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.5}
-  m_SizeDelta: {x: -15.199974, y: -10.599998}
+  m_SizeDelta: {x: 84.800026, y: 39.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &974898185
 MonoBehaviour:
@@ -6043,7 +6131,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -6404,10 +6502,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1205492503}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0.10072446, y: 0.21576102}
-  m_AnchorMax: {x: 0.86036485, y: 0.8426822}
-  m_AnchoredPosition: {x: 0.15080339, y: -0.03159387}
-  m_SizeDelta: {x: -0.33501095, y: -0.16027054}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -1.499012, y: 1.1197371}
+  m_SizeDelta: {x: 64.08252, y: 24.540424}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1051378818
 MonoBehaviour:
@@ -6481,10 +6579,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 974898184}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.6, y: 0.2}
-  m_SizeDelta: {x: -12.7, y: -8.1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 1.6000004, y: 0.19999981}
+  m_SizeDelta: {x: 72.10002, y: 31.300001}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1096977766
 MonoBehaviour:
@@ -6764,7 +6862,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -6835,10 +6943,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 920194423}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0.10072446, y: 0.21576102}
-  m_AnchorMax: {x: 0.86036485, y: 0.8426822}
-  m_AnchoredPosition: {x: 0.15080339, y: -0.03159387}
-  m_SizeDelta: {x: -0.33501095, y: -0.16027054}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -1.499012, y: 1.1197371}
+  m_SizeDelta: {x: 64.08252, y: 24.540424}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1172680718
 MonoBehaviour:
@@ -6936,8 +7044,6 @@ MonoBehaviour:
   ControlsTransform: 1
   ActivateDistance: 0.03
   DeactivateDistance: 0.04
-  _activatePinchDist: 0.03
-  _deactivatePinchDist: 0.04
 --- !u!1 &1193560620
 GameObject:
   m_ObjectHideFlags: 0
@@ -7041,10 +7147,10 @@ RectTransform:
   - {fileID: 1051378817}
   m_Father: {fileID: 923523103}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.5}
-  m_SizeDelta: {x: -15.199974, y: -10.599998}
+  m_SizeDelta: {x: 84.800026, y: 39.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1205492504
 MonoBehaviour:
@@ -7306,10 +7412,10 @@ RectTransform:
   - {fileID: 1703117139}
   m_Father: {fileID: 1486027864}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.5}
-  m_SizeDelta: {x: -15.199974, y: -10.599998}
+  m_SizeDelta: {x: 84.800026, y: 39.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1261925067
 MonoBehaviour:
@@ -7377,10 +7483,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2133480910}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.6, y: 0.2}
-  m_SizeDelta: {x: -12.7, y: -8.1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 1.6000004, y: 0.19999981}
+  m_SizeDelta: {x: 72.10002, y: 31.300001}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1274015688
 MonoBehaviour:
@@ -7509,10 +7615,10 @@ RectTransform:
   - {fileID: 929067557}
   m_Father: {fileID: 827493362}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.5}
-  m_SizeDelta: {x: -15.199974, y: -10.599998}
+  m_SizeDelta: {x: 84.800026, y: 39.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1422057073
 MonoBehaviour:
@@ -7580,10 +7686,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 60693053}
   m_RootOrder: 2
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: -33.025024}
-  m_SizeDelta: {x: 42.70749, y: 85}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -125.32503}
+  m_SizeDelta: {x: 465.10748, y: 85}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1425598939
 MonoBehaviour:
@@ -7652,10 +7758,10 @@ RectTransform:
   - {fileID: 108865406}
   m_Father: {fileID: 899526197}
   m_RootOrder: 5
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -486.31}
-  m_SizeDelta: {x: 0, y: 249.33}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -180.8205}
+  m_SizeDelta: {x: 500, y: 249.33}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1434503100
 MonoBehaviour:
@@ -7724,10 +7830,10 @@ RectTransform:
   - {fileID: 671601706}
   m_Father: {fileID: 916023353}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.5}
-  m_SizeDelta: {x: -15.199974, y: -10.599998}
+  m_SizeDelta: {x: 84.800026, y: 39.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1458808925
 MonoBehaviour:
@@ -7958,7 +8064,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -8192,7 +8308,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -8266,10 +8392,10 @@ RectTransform:
   - {fileID: 581134436}
   m_Father: {fileID: 108865406}
   m_RootOrder: 2
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 51.1, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 262.3, y: 92.3}
+  m_SizeDelta: {x: 50, y: 234.6}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &1583992256
 MonoBehaviour:
@@ -8429,10 +8555,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 60693053}
   m_RootOrder: 1
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 9.9012375, y: 23.71392}
-  m_SizeDelta: {x: 42.705017, y: 67.97781}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 9.9012375, y: 116.01392}
+  m_SizeDelta: {x: 465.105, y: 67.97781}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1597455674
 MonoBehaviour:
@@ -8666,7 +8792,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -8798,10 +8934,10 @@ RectTransform:
   - {fileID: 169751453}
   m_Father: {fileID: 476021899}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.5}
-  m_SizeDelta: {x: -15.199974, y: -10.599998}
+  m_SizeDelta: {x: 84.800026, y: 39.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1645446917
 MonoBehaviour:
@@ -8901,10 +9037,10 @@ RectTransform:
   - {fileID: 1924683471}
   m_Father: {fileID: 899526197}
   m_RootOrder: 1
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -33}
-  m_SizeDelta: {x: 0, y: 61}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 272.4895}
+  m_SizeDelta: {x: 500, y: 61}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1694111783
 MonoBehaviour:
@@ -8972,10 +9108,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1261925066}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0.10072446, y: 0.21576102}
-  m_AnchorMax: {x: 0.86036485, y: 0.8426822}
-  m_AnchoredPosition: {x: 0.15080339, y: -0.03159387}
-  m_SizeDelta: {x: -0.33501095, y: -0.16027054}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -1.499012, y: 1.1197371}
+  m_SizeDelta: {x: 64.08252, y: 24.540424}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1703117140
 MonoBehaviour:
@@ -9261,7 +9397,17 @@ MonoBehaviour:
   ExpandSpeed: 0.2
   ContractSpeed: 0.2
   PushPaddingDistance: 0
-  LayerCollapseStateChange:
+  LayerDepress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerCollapse:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  LayerExpand:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
@@ -9332,10 +9478,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 861655854}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.6, y: 0.2}
-  m_SizeDelta: {x: -12.7, y: -8.1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 1.6000004, y: 0.19999981}
+  m_SizeDelta: {x: 72.10002, y: 31.300001}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1827121097
 MonoBehaviour:
@@ -9409,10 +9555,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 899526197}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -2.0000038, y: -42}
-  m_SizeDelta: {x: 67, y: 128}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -2, y: 263.4895}
+  m_SizeDelta: {x: 567, y: 128}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1827372278
 MonoBehaviour:
@@ -9481,10 +9627,10 @@ RectTransform:
   - {fileID: 617988128}
   m_Father: {fileID: 366393751}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.5}
-  m_SizeDelta: {x: -15.199974, y: -10.599998}
+  m_SizeDelta: {x: 84.800026, y: 39.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1896443982
 MonoBehaviour:
@@ -9552,10 +9698,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1694111782}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.5}
-  m_SizeDelta: {x: -167, y: -16.697}
+  m_SizeDelta: {x: 333, y: 44.303}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1924683472
 MonoBehaviour:
@@ -9659,10 +9805,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 282242991}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 1.6, y: 0.2}
-  m_SizeDelta: {x: -12.7, y: -8.1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 1.6000004, y: 0.19999981}
+  m_SizeDelta: {x: 72.10002, y: 31.300001}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2016738030
 MonoBehaviour:
@@ -9840,10 +9986,10 @@ RectTransform:
   - {fileID: 1274015687}
   m_Father: {fileID: 1029299682}
   m_RootOrder: 0
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 3.5}
-  m_SizeDelta: {x: -15.199974, y: -10.599998}
+  m_SizeDelta: {x: 84.800026, y: 39.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2133480911
 MonoBehaviour:
