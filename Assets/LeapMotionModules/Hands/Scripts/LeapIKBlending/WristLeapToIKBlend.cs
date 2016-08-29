@@ -159,7 +159,7 @@ namespace Leap.Unity {
           }
 
           if (ElbowMarker.position.z > Scapula.position.z) {
-            shoulder_forward_target_weight = (ElbowMarker.position.z - Shoulder.position.z) * 10f;
+            shoulder_forward_target_weight = (ElbowMarker.position.z - (Shoulder.position.z + .15f)) * 10f;
             animator.SetFloat("shoulder_forward_left", shoulder_forward_weight);
           }
           else {
@@ -194,7 +194,7 @@ namespace Leap.Unity {
           }
 
           if (ElbowMarker.position.z > Scapula.position.z) {
-            shoulder_forward_target_weight = (ElbowMarker.position.z - Shoulder.position.z) * 10f;
+            shoulder_forward_target_weight = (ElbowMarker.position.z - (Shoulder.position.z + .15f)) * 10f;
             animator.SetFloat("shoulder_forward_right", shoulder_forward_weight);
           }
           else {
