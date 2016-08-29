@@ -31,7 +31,7 @@ namespace Leap.Unity.Interaction {
     */
     [AutoFind(AutoFindLocations.Scene)]
     [Tooltip("The Interaction Manager.")]
-    public InteractionManager ieManager = null;
+    public InteractionManager interactionManager = null;
 
     /**
      * The IHandModel instance to observe. 
@@ -50,6 +50,8 @@ namespace Leap.Unity.Interaction {
     [Tooltip("The interval in seconds at which to check this detector's conditions.")]
     public float Period = .1f; //seconds
 
+    /** If true, grasping any interactable object activates the detector. */
+    [Header("Detector Targets")]
     [Tooltip("Activate when any interactable object is grasped.")]
     public bool AnyInteractionObject = false;
     /**
@@ -59,13 +61,17 @@ namespace Leap.Unity.Interaction {
      * @since 4.1.5
      */
     [Tooltip("The list of target objects.")]
+    [DisableIf("AnyInteractionObject", true)]
     public IInteractionBehaviour[] TargetObjects;
 
     /**
     * IInteractiveBehaviour objects with this tag name will activate the detector.
+    * The object with the tag does not need to be in the target list and any objects in the target
+    * list will also activate the detector, even if they have a different tag name, or no tag name.
     * @since 4.1.3
     */
     [Tooltip("Activate if the held object has this tag name.")]
+    [DisableIf("AnyInteractionObject", true)]
     public string TagName = "";
 
     /**
@@ -97,14 +103,14 @@ namespace Leap.Unity.Interaction {
       IInteractionBehaviour graspedObject;
       int handId = 0;
       while (true) {
-        if (ieManager != null) {
+        if (interactionManager != null) {
           Leap.Hand hand = HandModel.GetLeapHand();
           if(hand != null) {
             handId = hand.Id;
           } else {
             handId = 0;
           }
-          ieManager.TryGetGraspedObject(handId, out graspedObject);
+          interactionManager.TryGetGraspedObject(handId, out graspedObject);
           graspingState = false;
           if (graspedObject != null) {
             if ((AnyInteractionObject ||

@@ -24,6 +24,7 @@ namespace Leap.Unity {
      * @since 4.1.2
      */
     [Tooltip("The interval in seconds at which to check this detector's conditions.")]
+    [Units("seconds")]
     [MinValue(0)]
     public float Period = .1f; //seconds
 
@@ -37,6 +38,7 @@ namespace Leap.Unity {
     public IHandModel HandModel = null;
   
     /** The required thumb state. */
+    [Header("Finger States")]
     [Tooltip("Required state of the thumb.")]
     public PointingState Thumb = PointingState.Either;
     /** The required index finger state. */
@@ -53,6 +55,7 @@ namespace Leap.Unity {
     public PointingState Pinky = PointingState.Either;
 
     /** How many fingers must be extended for the detector to activate. */
+    [Header("Min and Max Finger Counts")]
     [Range(0,5)]
     [Tooltip("The minimum number of fingers extended.")]
     public int MinimumExtendedCount = 0;
@@ -63,6 +66,7 @@ namespace Leap.Unity {
     /** Whether to draw the detector's Gizmos for debugging. (Not every detector provides gizmos.)
      * @since 4.1.2 
      */
+    [Header("")]
     [Tooltip("Draw this detector's Gizmos, if any. (Gizmos must be on in Unity edtor, too.)")]
     public bool ShowGizmos = true;
 
