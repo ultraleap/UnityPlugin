@@ -118,7 +118,15 @@ namespace Leap.Unity {
     void Update() {
       //get Arm Directions and set elbow target position
       armDirection = handModel.GetArmDirection();
-      ElbowIKTarget.position = palm.position + (armDirection * ElbowOffset);
+      Vector3 ElbowTargetPosition = palm.position + (armDirection * ElbowOffset);
+      if (Handedness == Chirality.Left && ElbowTargetPosition.x > 0) {
+        ElbowTargetPosition.x = 0;
+      }
+      if (Handedness == Chirality.Right && ElbowTargetPosition.x < 0) {
+        ElbowTargetPosition.x = 0;
+      }
+      ElbowIKTarget.position = ElbowTargetPosition;
+
     }
 
     void LateUpdate() {
@@ -131,6 +139,7 @@ namespace Leap.Unity {
       positionIKWeight = Mathf.Lerp(positionIKWeight, positionIKTargetWeight, .4f);
       if (Handedness == Chirality.Left) {
         animator.SetLayerWeight(3, shouldersLayerTargetWeight);
+
       }
       if (Handedness == Chirality.Right) {
         animator.SetLayerWeight(4, shouldersLayerTargetWeight);
