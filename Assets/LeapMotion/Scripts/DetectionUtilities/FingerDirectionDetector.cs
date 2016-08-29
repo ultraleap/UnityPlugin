@@ -24,7 +24,9 @@ namespace Leap.Unity {
      * The interval at which to check finger state.
      * @since 4.1.2
      */
+    [Units("seconds")]
     [Tooltip("The interval in seconds at which to check this detector's conditions.")]
+    [MinValue(0)]
     public float Period = .1f; //seconds
 
     /**
@@ -43,13 +45,6 @@ namespace Leap.Unity {
     [Tooltip("The finger to observe.")]
     public Finger.FingerType FingerName = Finger.FingerType.TYPE_INDEX;
 
-    /**
-     * The target direction as interpreted by the PointingType setting.
-     * Ignored when Pointingtype is "AtTarget."
-     * @since 4.1.2
-     */
-    [Tooltip("The target direction.")]
-    public Vector3 PointingDirection = Vector3.forward;
 
     /**
      * Specifies how to interprete the direction specified by PointingDirection.
@@ -66,12 +61,24 @@ namespace Leap.Unity {
      * of (0, 1, 0) for absolute up, are often the most useful settings.
      * @since 4.1.2
      */
+    [Header("Direction Settings")]
     [Tooltip("How to treat the target direction.")]
     public PointingType PointingType = PointingType.RelativeToHorizon;
+
+    /**
+     * The target direction as interpreted by the PointingType setting.
+     * Ignored when Pointingtype is "AtTarget."
+     * @since 4.1.2
+     */
+    [Tooltip("The target direction.")]
+    [DisableIf("PointingType", isEqualTo: PointingType.AtTarget)]
+    public Vector3 PointingDirection = Vector3.forward;
+
     /**
      * The object to point at when the PointingType is "AtTarget." Ignored otherwise.
      */
     [Tooltip("A target object(optional). Use PointingType.AtTarget")]
+    [DisableIf("PointingType", isNotEqualTo: PointingType.AtTarget)]
     public Transform TargetObject = null;
     /**
      * The turn-on angle. The detector activates when the specified finger points within this
@@ -79,7 +86,7 @@ namespace Leap.Unity {
      * @since 4.1.2
      */
     [Tooltip("The angle in degrees from the target direction at which to turn on.")]
-    [Range(0, 360)]
+    [Range(0, 180)]
     public float OnAngle = 15f; //degrees
 
     /**
@@ -88,8 +95,14 @@ namespace Leap.Unity {
     * @since 4.1.2
     */
     [Tooltip("The angle in degrees from the target direction at which to turn off.")]
-    [Range(0, 360)]
+    [Range(0, 180)]
     public float OffAngle = 25f; //degrees
+    /** Whether to draw the detector's Gizmos for debugging. (Not every detector provides gizmos.)
+     * @since 4.1.2 
+     */
+    [Header("")]
+    [Tooltip("Draw this detector's Gizmos, if any. (Gizmos must be on in Unity edtor, too.)")]
+    public bool ShowGizmos = true;
 
     private IEnumerator watcherCoroutine;
 

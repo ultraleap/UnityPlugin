@@ -27,11 +27,6 @@ namespace Leap.Unity {
      */
     public bool IsActive{ get{ return _isActive;}}
     private bool _isActive = false;
-    /** Whether to draw the detector's Gizmos for debugging. (Not every detector provides gizmos.)
-     * @since 4.1.2 
-     */
-    [Tooltip("Draw this detector's Gizmos, if any. (Gizmos must be on in Unity edtor, too.)")]
-    public bool ShowGizmos = true;
     /** Dispatched when the detector activates (becomes true). 
      * @since 4.1.2
      */

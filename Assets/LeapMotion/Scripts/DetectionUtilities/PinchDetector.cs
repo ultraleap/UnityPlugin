@@ -11,13 +11,18 @@ namespace Leap.Unity {
   public class PinchDetector : AbstractHoldDetector {
     protected const float MM_TO_M = 0.001f;
 
-
+    [Tooltip("The distance at which to enter the pinching state.")]
+    [Header("Distance Settings")]
     [MinValue(0)]
+    [Units("meters")]
     [FormerlySerializedAs("_activatePinchDist")]
     public float ActivateDistance = .03f; //meters
+    [Tooltip("The distance at which to leave the pinching state.")]
     [MinValue(0)]
+    [Units("meters")]
     [FormerlySerializedAs("_deactivatePinchDist")]
     public float DeactivateDistance = .04f; //meters
+
     public bool IsPinching { get { return this.IsHolding; } }
     public bool DidStartPinch { get { return this.DidStartHold; } }
     public bool DidEndPinch { get { return this.DidRelease; } }

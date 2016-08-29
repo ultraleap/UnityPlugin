@@ -25,7 +25,13 @@ namespace Leap.Unity {
     *
     * If false, the Transform is not affected.
     */
+    [Tooltip("Whether to change the transform of the parent object.")]
     public bool ControlsTransform = true;
+    /** Whether to draw the detector's Gizmos for debugging. (Not every detector provides gizmos.)
+     * @since 4.1.2 
+     */
+    [Tooltip("Draw this detector's Gizmos, if any. (Gizmos must be on in Unity edtor, too.)")]
+    public bool ShowGizmos = true;
 
     protected int _lastUpdateFrame = -1;
 
