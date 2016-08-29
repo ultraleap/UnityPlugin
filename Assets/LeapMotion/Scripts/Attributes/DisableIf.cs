@@ -11,18 +11,26 @@ namespace Leap.Unity.Attributes {
     public readonly object testValue;
     public readonly bool disableResult;
 
-    public DisableIf(string propertyName, object equalTo = null, object notEqualTo = null) {
+    /// <summary>
+    /// Conditionally disables a property based on the value of another property.  The only condition
+    /// types that are currently supported are bool types, and enum types.  The property has two arguments
+    /// names 'equalTo' and 'notEqualTo'.  Exactly one of them must be specified, like so:
+    /// 
+    /// [DisableIf("myBoolProperty", isEqualTo: true)]
+    /// [DisableIf("myEnumProperty", isNotEqualTo: MyEnum.Value)]
+    /// </summary>
+    public DisableIf(string propertyName, object isEqualTo = null, object isNotEqualTo = null) {
       this.propertyName = propertyName;
 
-      if ((equalTo != null) == (notEqualTo != null)) {
+      if ((isEqualTo != null) == (isNotEqualTo != null)) {
         throw new ArgumentException("Must specify exactly one of 'equalTo' or 'notEqualTo'.");
       }
 
-      if (equalTo != null) {
-        testValue = equalTo;
+      if (isEqualTo != null) {
+        testValue = isEqualTo;
         disableResult = true;
-      } else if (notEqualTo != null) {
-        testValue = notEqualTo;
+      } else if (isNotEqualTo != null) {
+        testValue = isNotEqualTo;
         disableResult = false;
       }
 
