@@ -1,4 +1,8 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Linq;
+using System.Reflection;
+using System.Collections;
+using NUnit.Framework;
 
 namespace Leap.Unity.Tests {
 
@@ -23,6 +27,66 @@ namespace Leap.Unity.Tests {
           Finger oldFinger = oldHand.Fingers[j];
           Finger newFinger = newHand.Fingers[j];
           Assert.That(oldFinger.Id, Is.EqualTo(newFinger.Id));
+        }
+      }
+    }
+
+    [Test]
+    public void AreBinaryEqual() {
+      assertObjectsEqual(_originalFrame, _frame);
+    }
+
+    private void assertObjectsEqual(object a, object b) {
+      if ((a == null) != (b == null)) {
+        Assert.Fail("One object was null an the other was not.");
+        return;
+      }
+
+      Type typeA = a.GetType();
+      Type typeB = b.GetType();
+
+      if (typeA != typeB) {
+        Assert.Fail("Type " + typeA + " is not equal to type " + typeB + ".");
+      }
+
+      if (typeA.IsValueType) {
+        Assert.That(a, Is.EqualTo(b));
+        return;
+      }
+
+      if (a is IList) {
+        IList aList = a as IList;
+        IList bList = b as IList;
+
+        Assert.That(aList.Count, Is.EqualTo(bList.Count));
+
+        for (int i = 0; i < aList.Count; i++) {
+          assertObjectsEqual(aList[i], bList[i]);
+        }
+      } else {
+        FieldInfo[] fields = typeA.GetFields(BindingFlags.Public | BindingFlags.Instance);
+        foreach (FieldInfo field in fields) {
+          assertObjectsEqual(field.GetValue(a), field.GetValue(b));
+        }
+
+        PropertyInfo[] properties = typeA.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        foreach (PropertyInfo property in properties) {
+          if (property.GetIndexParameters().Length == 0) {
+            object propA;
+            try {
+              propA = property.GetValue(a, null);
+            } catch (Exception exceptionA) {
+              try {
+                property.GetValue(b, null);
+              } catch (Exception exceptionB) {
+                Assert.That(exceptionA.GetType(), Is.EqualTo(exceptionB.GetType()), "Both properties threw exceptions but their types were different.");
+              }
+            }
+
+            object propB = property.GetValue(b, null);
+
+            assertObjectsEqual(propA, propB);
+          }
         }
       }
     }
