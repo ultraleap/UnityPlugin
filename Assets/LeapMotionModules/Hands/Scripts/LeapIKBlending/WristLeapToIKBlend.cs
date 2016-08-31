@@ -116,22 +116,26 @@ namespace Leap.Unity {
       spineLayerTargetWeight = 1f;
     }
     void Update() {
-      //get Arm Directions and set elbow target position
-      armDirection = handModel.GetArmDirection();
-      Vector3 ElbowTargetPosition = palm.position + (armDirection * ElbowOffset);
-      if (Handedness == Chirality.Left && ElbowTargetPosition.x > .4f) {
-        Debug.Log("Left Elbow Inside");
-        ElbowTargetPosition.x = 0;
-      }
-      if (Handedness == Chirality.Right && ElbowTargetPosition.x < -.4f) {
-        Debug.Log("Right Elbow Inside");
-        ElbowTargetPosition.x = 0;
-      }
-      ElbowIKTarget.position = ElbowTargetPosition;
+
 
     }
 
     void LateUpdate() {
+
+      //get Arm Directions and set elbow target position
+      armDirection = handModel.GetArmDirection();
+      Vector3 ElbowTargetPosition = palm.position + (armDirection * ElbowOffset);
+      if (Handedness == Chirality.Left && ElbowTargetPosition.x > -.05f) {
+        Debug.Log("Left Elbow Inside");
+        ElbowTargetPosition.x = -.1f;
+      }
+      if (Handedness == Chirality.Right && ElbowTargetPosition.x < .05f) {
+        Debug.Log("Right Elbow Inside");
+        ElbowTargetPosition.x = .1f;
+      }
+      ElbowIKTarget.position = ElbowTargetPosition;
+
+
       PalmPositionAtLateUpdate = palm.position;
       PalmRotationAtLateUpdate = palm.rotation;
       ElbowMarker.position = Elbow.position;
