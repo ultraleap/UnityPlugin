@@ -38,7 +38,7 @@ namespace Leap.Unity {
                            float duration = 0, 
                            bool depthTest = true) {
       Vector3 planeA = Vector3.Slerp(normal, -normal, 0.5f);
-      DrawArc(360, center, planeA, normal, radius, color, quality, duration, depthTest);
+      DrawArc(360, center, planeA, normal, radius, color, quality);
     }
 
     /* Adapted from: Zarrax (http://math.stackexchange.com/users/3035/zarrax), Parametric Equation of a Circle in 3D Space?, 
@@ -49,10 +49,9 @@ namespace Leap.Unity {
                            Vector3 normal,
                            float radius, 
                            Color color, 
-                           int quality = 32, 
-                           float duration = 0, 
-                           bool depthTest = true) {
+                           int quality = 32) {
 
+      Gizmos.color = color;
       Vector3 right = Vector3.Cross(normal, forward).normalized;
       float deltaAngle = arc/quality;
       Vector3 thisPoint = center + forward * radius;
@@ -63,7 +62,7 @@ namespace Leap.Unity {
         nextPoint.x = center.x + radius * (cosAngle * forward.x + sinAngle * right.x);
         nextPoint.y = center.y + radius * (cosAngle * forward.y + sinAngle * right.y);
         nextPoint.z = center.z + radius * (cosAngle * forward.z + sinAngle * right.z);
-        Debug.DrawLine(thisPoint, nextPoint, color, duration, depthTest);
+        Gizmos.DrawLine(thisPoint, nextPoint);
         thisPoint = nextPoint;
       }
     }
