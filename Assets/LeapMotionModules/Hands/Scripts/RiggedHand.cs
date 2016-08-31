@@ -95,7 +95,7 @@ namespace Leap.Unity {
       return Quaternion.identity;
     }
 
-    private Quaternion CalculateRotation(this LeapTransform trs) {
+    private Quaternion CalculateRotation(LeapTransform trs) {
       Vector3 up = trs.yBasis.ToVector3();
       Vector3 forward = trs.zBasis.ToVector3();
       return Quaternion.LookRotation(forward, up);
