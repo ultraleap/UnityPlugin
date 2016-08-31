@@ -119,10 +119,12 @@ namespace Leap.Unity {
       //get Arm Directions and set elbow target position
       armDirection = handModel.GetArmDirection();
       Vector3 ElbowTargetPosition = palm.position + (armDirection * ElbowOffset);
-      if (Handedness == Chirality.Left && ElbowTargetPosition.x > 0) {
+      if (Handedness == Chirality.Left && ElbowTargetPosition.x > .4f) {
+        Debug.Log("Left Elbow Inside");
         ElbowTargetPosition.x = 0;
       }
-      if (Handedness == Chirality.Right && ElbowTargetPosition.x < 0) {
+      if (Handedness == Chirality.Right && ElbowTargetPosition.x < -.4f) {
+        Debug.Log("Right Elbow Inside");
         ElbowTargetPosition.x = 0;
       }
       ElbowIKTarget.position = ElbowTargetPosition;
