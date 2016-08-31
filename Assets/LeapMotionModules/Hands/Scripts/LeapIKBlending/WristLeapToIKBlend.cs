@@ -153,8 +153,8 @@ namespace Leap.Unity {
         if (isTracking) {
           animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, positionIKWeight);
           animator.SetIKPosition(AvatarIKGoal.LeftHand, PalmPositionAtLateUpdate);
-          animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotationIKWeight);
-          animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
+          //animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotationIKWeight * .75f);
+          //animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
           animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, positionIKWeight);
           animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
 
@@ -189,8 +189,8 @@ namespace Leap.Unity {
         if (isTracking) {
           animator.SetIKPositionWeight(AvatarIKGoal.RightHand, positionIKWeight);
           animator.SetIKPosition(AvatarIKGoal.RightHand, PalmPositionAtLateUpdate);
-          animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotationIKWeight);
-          animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
+          //animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotationIKWeight  * .75f);
+          //animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
           animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, positionIKWeight);
           animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
           if (ElbowMarker.position.y > Scapula.position.y + 0f) {
@@ -219,6 +219,10 @@ namespace Leap.Unity {
           animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, 1);
           animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
         }
+        if (Input.GetKey(KeyCode.X)) {
+          animator.SetFloat("forearm_twist_left", 1f);
+        }
+        else animator.SetFloat("forearm_twist_left", 0f);
       }
     }
     private IEnumerator LerpPositionIKWeight(float destinationWeight, float duration) {

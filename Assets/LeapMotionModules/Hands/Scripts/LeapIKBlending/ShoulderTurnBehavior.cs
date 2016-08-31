@@ -21,6 +21,9 @@ public class ShoulderTurnBehavior : MonoBehaviour {
 
   private float m_lastNormalYRotation;
 
+  private Transform head;
+  public Transform CamTarg;
+
   // Use this for initialization
   void Start() {
     m_animator = GetComponent<Animator>();
@@ -30,14 +33,23 @@ public class ShoulderTurnBehavior : MonoBehaviour {
     Target.name = transform.name + "_ChestReferenceMarker";
     Target.parent = GameObject.FindObjectOfType<LeapVRCameraControl>().transform;
     Target.localPosition = new Vector3(0, 0, 2);
-  }
 
+    head = m_animator.GetBoneTransform(HumanBodyBones.Head);
+  }
   // Update is called once per frame 
   void LateUpdate() {
     Vector3 flattenedTargetPosition = new Vector3(Target.position.x, NeckReferenceTransform.position.y, Target.position.z);
     Target.position = flattenedTargetPosition;
     rotateChestToFollow(Target);
+
+    //Head Rotation
+    Vector3 startRotation = head.rotation.eulerAngles;
+    Vector3 relativePos = CamTarg.position - head.transform.position;
+    Quaternion rotation = Quaternion.LookRotation(relativePos, CamTarg.up);
+    rotation = Quaternion.Euler (rotation.eulerAngles + startRotation);
+    head.transform.rotation = rotation;
   }
+
 
   private void rotateChestToFollow(Transform target) {
     const float MIN_LIMIT = -40.0f;
@@ -59,8 +71,11 @@ public class ShoulderTurnBehavior : MonoBehaviour {
     normalizedTwist = Mathf.Clamp01(normalizedTwist);
     float rightVal = normalizedTwist;
     float leftVal = 1.0f - normalizedTwist;
-
-    m_animator.SetFloat(TWIST_RIGHT_LABEL, rightVal);
-    m_animator.SetFloat(TWIST_LEFT_LABEL, leftVal);
+    float currentRightVal = m_animator.GetFloat(TWIST_RIGHT_LABEL);
+    float currentLeftVal = m_animator.GetFloat(TWIST_LEFT_LABEL);
+    m_animator.SetFloat(TWIST_RIGHT_LABEL, Mathf.Lerp(currentRightVal, rightVal, .05f));
+    m_animator.SetFloat(TWIST_LEFT_LABEL, Mathf.Lerp(currentLeftVal, leftVal, .05f));
+    //m_animator.SetFloat(TWIST_RIGHT_LABEL, rightVal);
+    //m_animator.SetFloat(TWIST_LEFT_LABEL, leftVal);
   }
 }
