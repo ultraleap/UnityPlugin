@@ -43,11 +43,9 @@ public class ShoulderTurnBehavior : MonoBehaviour {
     rotateChestToFollow(Target);
 
     //Head Rotation
-    Vector3 startRotation = head.rotation.eulerAngles;
-    Vector3 relativePos = CamTarg.position - head.transform.position;
-    Quaternion rotation = Quaternion.LookRotation(relativePos, CamTarg.up);
-    rotation = Quaternion.Euler (rotation.eulerAngles + startRotation);
-    head.transform.rotation = rotation;
+    //Vector3 relativePos = CamTarg.position - head.transform.position;
+    //Quaternion rotation = Quaternion.LookRotation(relativePos, CamTarg.up);
+    //head.transform.rotation = rotation;
   }
 
 
@@ -77,5 +75,10 @@ public class ShoulderTurnBehavior : MonoBehaviour {
     m_animator.SetFloat(TWIST_LEFT_LABEL, Mathf.Lerp(currentLeftVal, leftVal, .05f));
     //m_animator.SetFloat(TWIST_RIGHT_LABEL, rightVal);
     //m_animator.SetFloat(TWIST_LEFT_LABEL, leftVal);
+  }
+
+  public void OnAnimatorIK(int layerIndex) {
+    m_animator.SetLookAtWeight(1.0f);
+    m_animator.SetLookAtPosition(CamTarg.position);
   }
 }
