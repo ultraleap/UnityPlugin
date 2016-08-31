@@ -78,8 +78,11 @@ namespace Leap.Unity.Tests {
             } catch (Exception exceptionA) {
               try {
                 property.GetValue(b, null);
+                Assert.Fail("One property threw an exception where the other did not.");
+                return;
               } catch (Exception exceptionB) {
                 Assert.That(exceptionA.GetType(), Is.EqualTo(exceptionB.GetType()), "Both properties threw exceptions but their types were different.");
+                return;
               }
             }
 
