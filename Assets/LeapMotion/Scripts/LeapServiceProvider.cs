@@ -142,7 +142,7 @@ namespace Leap.Unity {
 
         // TODO: Add baseline & offset when included in API
         // NOTE: Alternative is to use device type since all parameters are invariant
-        info.isEmbedded = devices[0].Type == Device.DeviceType.TYPE_KEYBOARD || devices[0].Type == Device.DeviceType.TYPE_LAPTOP;
+        info.isEmbedded = devices[0].Type != Device.DeviceType.TYPE_PERIPHERAL;
         info.horizontalViewAngle = devices[0].HorizontalViewAngle * Mathf.Rad2Deg;
         info.verticalViewAngle = devices[0].VerticalViewAngle * Mathf.Rad2Deg;
         info.trackingRange = devices[0].Range / 1000f;

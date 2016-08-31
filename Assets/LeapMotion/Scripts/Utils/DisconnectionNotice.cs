@@ -52,7 +52,7 @@ namespace Leap.Unity{
       DeviceList devices = leap_controller_.Devices;
       if (devices.Count == 0)
         return false;
-      return devices[0].Type == Device.DeviceType.TYPE_LAPTOP || devices[0].Type == Device.DeviceType.TYPE_KEYBOARD;
+      return devices[0].Type != Device.DeviceType.TYPE_PERIPHERAL;
     }
           
     void Update() {
