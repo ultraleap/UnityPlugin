@@ -54,7 +54,6 @@ public class ShoulderTurnBehavior : MonoBehaviour {
     const float MAX_LIMIT = 40.0f;
     float targetRotationZ = CamTarg.parent.localEulerAngles.z;
     Debug.Log(targetRotationZ);
-   // m_animator.SetFloat("head_tilt_left", targetRotationZ);
     while (targetRotationZ > 180.0f) { targetRotationZ -= 360.0f; }
     float normalZRotation = (targetRotationZ - MIN_LIMIT) / (MAX_LIMIT - MIN_LIMIT);
     setHeadRoll(normalZRotation);
@@ -62,9 +61,11 @@ public class ShoulderTurnBehavior : MonoBehaviour {
   private void setHeadRoll(float normalizedRoll) {
     normalizedRoll = Mathf.Clamp01(normalizedRoll);
     float rightVal = normalizedRoll;
-    float leftVal = 10 - normalizedRoll;
-    m_animator.SetFloat("head_tilt_right", rightVal);
+    float leftVal = 1.0f - normalizedRoll;
     m_animator.SetFloat("head_tilt_left", leftVal);
+    m_animator.SetFloat("head_tilt_right", rightVal);
+    m_animator.SetFloat("neck_tilt_left", leftVal * .1f);
+    m_animator.SetFloat("neck_tilt_right", rightVal * .1f);
   }
 
   private void rotateChestToFollow(Transform target) {
