@@ -41,13 +41,31 @@ public class ShoulderTurnBehavior : MonoBehaviour {
     Vector3 flattenedTargetPosition = new Vector3(Target.position.x, NeckReferenceTransform.position.y, Target.position.z);
     Target.position = flattenedTargetPosition;
     rotateChestToFollow(Target);
+    rollHead();
+
 
     //Head Rotation
     //Vector3 relativePos = CamTarg.position - head.transform.position;
     //Quaternion rotation = Quaternion.LookRotation(relativePos, CamTarg.up);
     //head.transform.rotation = rotation;
   }
-
+  private void rollHead() {
+    const float MIN_LIMIT = -40.0f;
+    const float MAX_LIMIT = 40.0f;
+    float targetRotationZ = CamTarg.parent.localEulerAngles.z;
+    Debug.Log(targetRotationZ);
+   // m_animator.SetFloat("head_tilt_left", targetRotationZ);
+    while (targetRotationZ > 180.0f) { targetRotationZ -= 360.0f; }
+    float normalZRotation = (targetRotationZ - MIN_LIMIT) / (MAX_LIMIT - MIN_LIMIT);
+    setHeadRoll(normalZRotation);
+  }
+  private void setHeadRoll(float normalizedRoll) {
+    normalizedRoll = Mathf.Clamp01(normalizedRoll);
+    float rightVal = normalizedRoll;
+    float leftVal = 10 - normalizedRoll;
+    m_animator.SetFloat("head_tilt_right", rightVal);
+    m_animator.SetFloat("head_tilt_left", leftVal);
+  }
 
   private void rotateChestToFollow(Transform target) {
     const float MIN_LIMIT = -40.0f;
