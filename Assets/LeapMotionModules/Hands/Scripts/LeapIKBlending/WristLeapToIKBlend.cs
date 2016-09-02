@@ -49,10 +49,12 @@ namespace Leap.Unity {
     public float ArmDropDuration = .25f;
 
     public IKMarkersAssembly m_IKMarkerAssembly;
+    private Transform characterRoot;
 
     protected override void Awake() {
       base.Awake();
       animator = transform.root.GetComponentInChildren<Animator>();
+      characterRoot = animator.transform;
       handModel = transform.GetComponent<HandModel>();
       palm = GetComponent<HandModel>().palm;
       Neck = animator.GetBoneTransform(HumanBodyBones.Neck);
@@ -170,8 +172,8 @@ namespace Leap.Unity {
           animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, positionIKWeight);
           animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
 
-          if (ElbowMarker.position.y > Scapula.position.y) {
-            shoulder_up_target_weight = (ElbowMarker.position.y - Shoulder.position.y) * 10f;
+          if (characterRoot.InverseTransformPoint(ElbowMarker.position).y > characterRoot.InverseTransformPoint(Scapula.position).y) {
+            shoulder_up_target_weight = (characterRoot.InverseTransformPoint(ElbowMarker.position).y - characterRoot.InverseTransformPoint(Shoulder.position).y) * 10f;
             animator.SetFloat("shoulder_up_left", shoulder_up_weight);
           }
           else {
@@ -208,8 +210,8 @@ namespace Leap.Unity {
           //animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
           animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, positionIKWeight);
           animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
-          if (ElbowMarker.position.y > Scapula.position.y + 0f) {
-            shoulder_up_target_weight = (ElbowMarker.position.y - Shoulder.position.y) * 10f;
+          if (characterRoot.InverseTransformPoint(ElbowMarker.position).y > characterRoot.InverseTransformPoint(Scapula.position).y) {
+            shoulder_up_target_weight = (characterRoot.InverseTransformPoint(ElbowMarker.position).y - characterRoot.InverseTransformPoint(Shoulder.position).y) * 10f;
             animator.SetFloat("shoulder_up_right", shoulder_up_weight);
           }
           else {
@@ -266,7 +268,7 @@ namespace Leap.Unity {
 
     public override void OnSetup() {
       Awake();
-      MarkerPrefab = Resources.Load("AxisTripod") as GameObject;
+      MarkerPrefab = Resources.Load("RuntimeGizmoMarker") as GameObject;
       Debug.Log("MarkerPrefab: " + MarkerPrefab);
       Handedness = GetComponent<IHandModel>().Handedness;
       if (Handedness == Chirality.Left) {

@@ -28,11 +28,16 @@ public class ShoulderTurnBehavior : MonoBehaviour {
   void Start() {
     m_animator = GetComponent<Animator>();
     NeckReferenceTransform = m_animator.GetBoneTransform(HumanBodyBones.Neck);
-    GameObject markerPrefab = Resources.Load("AxisTripod") as GameObject;
+    GameObject markerPrefab = Resources.Load("RuntimeGizmoMarker") as GameObject;
     Target = GameObject.Instantiate(markerPrefab).transform;
     Target.name = transform.name + "_ChestReferenceMarker";
     Target.parent = GameObject.FindObjectOfType<LeapVRCameraControl>().transform;
     Target.localPosition = new Vector3(0, 0, 2);
+
+    CamTarg = GameObject.Instantiate(markerPrefab).transform;
+    CamTarg.name = transform.name + "_HeadTarget";
+    CamTarg.parent = GameObject.FindObjectOfType<LeapVRCameraControl>().transform;
+    CamTarg.localPosition = new Vector3(0, 0, 2);
 
     head = m_animator.GetBoneTransform(HumanBodyBones.Head);
   }
@@ -64,8 +69,8 @@ public class ShoulderTurnBehavior : MonoBehaviour {
     float leftVal = 1.0f - normalizedRoll;
     m_animator.SetFloat("head_tilt_left", leftVal);
     m_animator.SetFloat("head_tilt_right", rightVal);
-    m_animator.SetFloat("neck_tilt_left", leftVal * .1f);
-    m_animator.SetFloat("neck_tilt_right", rightVal * .1f);
+    m_animator.SetFloat("neck_tilt_left", leftVal * .2f);
+    m_animator.SetFloat("neck_tilt_right", rightVal * .2f);
   }
 
   private void rotateChestToFollow(Transform target) {

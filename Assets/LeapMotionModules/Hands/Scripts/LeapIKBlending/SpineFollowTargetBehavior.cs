@@ -29,7 +29,7 @@ public class SpineFollowTargetBehavior : MonoBehaviour {
   void Start() {
     m_animator = GetComponent<Animator>();
     Target = GameObject.FindObjectOfType<LeapVRCameraControl>().transform;
-    GameObject markerPrefab = Resources.Load("AxisTripod") as GameObject;
+    GameObject markerPrefab = Resources.Load("RuntimeGizmoMarker") as GameObject;
     ReferenceTransform = GameObject.Instantiate(markerPrefab).transform;
     ReferenceTransform.name = transform.name + "_SpineReferenceMarker";
     ReferenceTransform.parent = transform;
