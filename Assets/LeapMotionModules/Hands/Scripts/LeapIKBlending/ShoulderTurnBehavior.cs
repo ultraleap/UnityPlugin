@@ -53,7 +53,7 @@ public class ShoulderTurnBehavior : MonoBehaviour {
     const float MIN_LIMIT = -40.0f;
     const float MAX_LIMIT = 40.0f;
     float targetRotationZ = CamTarg.parent.localEulerAngles.z;
-    Debug.Log(targetRotationZ);
+    //Debug.Log(targetRotationZ);
     while (targetRotationZ > 180.0f) { targetRotationZ -= 360.0f; }
     float normalZRotation = (targetRotationZ - MIN_LIMIT) / (MAX_LIMIT - MIN_LIMIT);
     setHeadRoll(normalZRotation);

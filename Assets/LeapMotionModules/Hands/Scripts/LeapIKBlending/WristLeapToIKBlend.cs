@@ -121,13 +121,16 @@ namespace Leap.Unity {
       armDirection = handModel.GetArmDirection();
       Vector3 ElbowTargetPosition = palm.position + (armDirection * ElbowOffset);
       if (Handedness == Chirality.Left ) {
-        ElbowTargetPosition.x -= .2f;
+        //Debug.Log("Left palm z: " + PalmPositionAtLateUpdate.z);
+        ElbowTargetPosition.x -= PalmPositionAtLateUpdate.z -.2f;
       }
       if (Handedness == Chirality.Right) {
-        ElbowTargetPosition.x += .2f;
+        //Debug.Log("Right palm z: " + PalmPositionAtLateUpdate.z);
+        ElbowTargetPosition.x += PalmPositionAtLateUpdate.z -.2f;
       }
 
       if (Handedness == Chirality.Left && ElbowTargetPosition.x > -.05f) {
+
         Debug.Log("Left Elbow Inside");
         ElbowTargetPosition.x = -.1f;
       }
