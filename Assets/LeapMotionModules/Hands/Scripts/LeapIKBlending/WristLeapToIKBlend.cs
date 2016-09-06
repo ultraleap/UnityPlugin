@@ -134,11 +134,11 @@ namespace Leap.Unity {
       if (Handedness == Chirality.Left && ElbowTargetPosition.x > -.05f) {
 
         Debug.Log("Left Elbow Inside");
-        //ElbowTargetPosition.x = -.1f;
+        ElbowTargetPosition.x = -.1f;
       }
       if (Handedness == Chirality.Right && ElbowTargetPosition.x < .05f) {
         Debug.Log("Right Elbow Inside");
-        //ElbowTargetPosition.x = .1f;
+        ElbowTargetPosition.x = .1f;
       }
       ElbowIKTarget.position = ElbowTargetPosition;
     }
