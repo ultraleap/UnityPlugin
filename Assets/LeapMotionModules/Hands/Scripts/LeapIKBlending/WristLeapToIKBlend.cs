@@ -121,18 +121,18 @@ namespace Leap.Unity {
     void Update() {
       //get Arm Directions and set elbow target position
       armDirection = handModel.GetArmDirection();
-      Vector3 ElbowTargetPosition = palm.position + (armDirection * ElbowOffset);
+      Vector3 ElbowTargetPosition = animator.transform.InverseTransformPoint(palm.position + (armDirection * ElbowOffset));
+      Vector3 palmInAnimatorSpace = animator.transform.InverseTransformPoint(PalmPositionAtLateUpdate);
       if (Handedness == Chirality.Left ) {
         //Debug.Log("Left palm z: " + PalmPositionAtLateUpdate.z);
-        ElbowTargetPosition.x -= PalmPositionAtLateUpdate.z ;
+        ElbowTargetPosition.x -= palmInAnimatorSpace.z;
       }
       if (Handedness == Chirality.Right) {
         //Debug.Log("Right palm z: " + PalmPositionAtLateUpdate.z);
-        ElbowTargetPosition.x += PalmPositionAtLateUpdate.z;
+        ElbowTargetPosition.x += palmInAnimatorSpace.z;
       }
 
       if (Handedness == Chirality.Left && ElbowTargetPosition.x > -.05f) {
-
         Debug.Log("Left Elbow Inside");
         ElbowTargetPosition.x = -.1f;
       }
@@ -140,7 +140,7 @@ namespace Leap.Unity {
         Debug.Log("Right Elbow Inside");
         ElbowTargetPosition.x = .1f;
       }
-      ElbowIKTarget.position = ElbowTargetPosition;
+      ElbowIKTarget.position = animator.transform.TransformPoint( ElbowTargetPosition);
     }
 
     void LateUpdate() {
