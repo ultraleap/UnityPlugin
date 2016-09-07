@@ -108,7 +108,10 @@ namespace Leap.Unity {
       shouldersLayerTargetWeight = 0f;
       spineLayerTargetWeight = 1f;
       iKVelocitySnapShot = averageIKVelocity;
-      VelocityMarker.position = iKVelocitySnapShot;
+      if (iKVelocitySnapShot.z < .2f) {
+        iKVelocitySnapShot.z = .2f;
+      }
+      VelocityMarker.position = iKVelocitySnapShot * .1f;
       StartCoroutine(MoveTowardWithVelocity(palm.position));
       lastTrackedPosition = palm.position;      
     }
@@ -287,7 +290,7 @@ namespace Leap.Unity {
       UntrackedIKPosition = startPosition;
       float startTime = Time.time;
       float endTime = startTime + ArmDropDuration;
-      float speed = averageIKVelocity.magnitude * .04f;
+      float speed = averageIKVelocity.magnitude * .015f;
     
       while (Time.time <= endTime) {
         float t = (Time.time - startTime) / ArmDropDuration;
