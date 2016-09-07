@@ -68,17 +68,7 @@ namespace Leap.Unity {
         Shoulder = animator.GetBoneTransform(HumanBodyBones.RightUpperArm);
         Elbow = animator.GetBoneTransform(HumanBodyBones.RightLowerArm);
       }
-      //MarkerPrefab = Resources.Load("AxisTripod") as GameObject;
-      //if (ElbowMarker == null) {
-      //  ElbowMarker = GameObject.Instantiate(MarkerPrefab).transform;
-      //  ElbowMarker.transform.name = animator.transform.name + "_ElbowMarker" + Handedness.ToString();
-      //  ElbowMarker.position = Elbow.position;
-      //  ElbowMarker.rotation = Elbow.rotation;
-      //}
-      //if (ElbowIKTarget == null) {
-      //  ElbowIKTarget = GameObject.Instantiate(MarkerPrefab).transform;
-      //  ElbowIKTarget.transform.name = animator.transform.name + "_ElbowIKTarget" + Handedness.ToString();
-      //}
+      HandFinish();
     }
 
     public void AssignIKMarkers() {
@@ -118,31 +108,6 @@ namespace Leap.Unity {
       spineLayerTargetWeight = 1f;
     }
 
-    void Update() {
-      //get Arm Directions and set elbow target position
-      armDirection = handModel.GetArmDirection();
-      Vector3 ElbowTargetPosition = animator.transform.InverseTransformPoint(palm.position + (armDirection * ElbowOffset));
-      Vector3 palmInAnimatorSpace = animator.transform.InverseTransformPoint(PalmPositionAtLateUpdate);
-      if (Handedness == Chirality.Left ) {
-        //Debug.Log("Left palm z: " + PalmPositionAtLateUpdate.z);
-        ElbowTargetPosition.x -= palmInAnimatorSpace.z;
-      }
-      if (Handedness == Chirality.Right) {
-        //Debug.Log("Right palm z: " + PalmPositionAtLateUpdate.z);
-        ElbowTargetPosition.x += palmInAnimatorSpace.z;
-      }
-
-      if (Handedness == Chirality.Left && ElbowTargetPosition.x > -.05f) {
-        Debug.Log("Left Elbow Inside");
-        ElbowTargetPosition.x = -.1f;
-      }
-      if (Handedness == Chirality.Right && ElbowTargetPosition.x < .05f) {
-        Debug.Log("Right Elbow Inside");
-        ElbowTargetPosition.x = .1f;
-      }
-      ElbowIKTarget.position = animator.transform.TransformPoint( ElbowTargetPosition);
-    }
-
     void LateUpdate() {
       PalmPositionAtLateUpdate = palm.position;
       PalmRotationAtLateUpdate = palm.rotation;
@@ -153,12 +118,33 @@ namespace Leap.Unity {
       positionIKWeight = Mathf.Lerp(positionIKWeight, positionIKTargetWeight, .4f);
       if (Handedness == Chirality.Left) {
         animator.SetLayerWeight(3, shouldersLayerTargetWeight);
-
       }
       if (Handedness == Chirality.Right) {
         animator.SetLayerWeight(4, shouldersLayerTargetWeight);
       }
       //animator.SetLayerWeight(2, spineLayerTargetWeight);
+
+      //get Arm Directions and set elbow target position
+      armDirection = handModel.GetArmDirection();
+      Vector3 ElbowTargetPosition = animator.transform.InverseTransformPoint(palm.position + (armDirection * ElbowOffset));
+      Vector3 palmInAnimatorSpace = animator.transform.InverseTransformPoint(PalmPositionAtLateUpdate);
+      float distanceShoulderToPalm = (palm.position - Shoulder.transform.position).magnitude;
+      if (Handedness == Chirality.Left) {
+        ElbowTargetPosition.x -= distanceShoulderToPalm;
+      }
+      if (Handedness == Chirality.Right) {
+        ElbowTargetPosition.x += distanceShoulderToPalm;
+      }
+
+      if (Handedness == Chirality.Left && ElbowTargetPosition.x > -.05f) {
+        Debug.Log("Left Elbow Inside");
+        ElbowTargetPosition.x = -.1f;
+      }
+      if (Handedness == Chirality.Right && ElbowTargetPosition.x < .05f) {
+        Debug.Log("Right Elbow Inside");
+        ElbowTargetPosition.x = .1f;
+      }
+      ElbowIKTarget.position = animator.transform.TransformPoint(ElbowTargetPosition);
     }
 
     public void OnAnimatorIK(int layerIndex) {
@@ -180,8 +166,8 @@ namespace Leap.Unity {
             shoulder_up_target_weight = 0.0f;
             animator.SetFloat("shoulder_up_left", shoulder_up_weight);
           }
-          if (ElbowMarker.position.x > Shoulder.position.x) {
-            shoulder_forward_target_weight = Mathf.Abs(ElbowMarker.position.x - Shoulder.position.x * 10f);
+          if (characterRoot.InverseTransformPoint(ElbowMarker.position).x > characterRoot.InverseTransformPoint(Shoulder.position).x) {
+            shoulder_forward_target_weight = Mathf.Abs(characterRoot.InverseTransformPoint(ElbowMarker.position).x - characterRoot.InverseTransformPoint(Shoulder.position).x * 10f);
             animator.SetFloat("shoulder_forward_left", shoulder_forward_weight);
           }
           //if (ElbowMarker.position.z > Scapula.position.z) {
@@ -218,8 +204,8 @@ namespace Leap.Unity {
             shoulder_up_target_weight = 0.0f;
             animator.SetFloat("shoulder_up_right", shoulder_up_weight);
           }
-          if (ElbowMarker.position.x < Shoulder.position.x) {
-            shoulder_forward_target_weight = Mathf.Abs(ElbowMarker.position.x - Shoulder.position.x * 10f);
+          if (characterRoot.InverseTransformPoint(ElbowMarker.position).x < characterRoot.InverseTransformPoint(Shoulder.position).x) {
+            shoulder_forward_target_weight = Mathf.Abs(characterRoot.InverseTransformPoint(ElbowMarker.position).x - characterRoot.InverseTransformPoint(Shoulder.position).x * 10f);
             animator.SetFloat("shoulder_forward_right", shoulder_forward_weight);
           }
 
@@ -246,10 +232,6 @@ namespace Leap.Unity {
         else animator.SetFloat("forearm_twist_left", 0f);
       }
     }
-    private IEnumerator LerpPositionIKWeight(float destinationWeight, float duration) {
-      return null;
-    }
-
 
     private IEnumerator LerpToRestPosition(Vector3 droppedPosition) {
       float startTime = Time.time;
