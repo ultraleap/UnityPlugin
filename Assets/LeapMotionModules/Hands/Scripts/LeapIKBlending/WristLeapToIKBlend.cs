@@ -107,11 +107,14 @@ namespace Leap.Unity {
       shoulder_up_target_weight = 0;
       shouldersLayerTargetWeight = 0f;
       spineLayerTargetWeight = 1f;
+
+      //snapshot and constrain velocity derived
       iKVelocitySnapShot = averageIKVelocity;
-      if (iKVelocitySnapShot.z < .2f) {
-        iKVelocitySnapShot.z = .2f;
+      if (iKVelocitySnapShot.z < .25f) {
+        iKVelocitySnapShot.z = .25f;
       }
-      VelocityMarker.position = iKVelocitySnapShot * .1f;
+      iKVelocitySnapShot = iKVelocitySnapShot * .5f;// scale the velocity so arm doesn't reach as far;
+      VelocityMarker.position = iKVelocitySnapShot;
       StartCoroutine(MoveTowardWithVelocity(palm.position));
       lastTrackedPosition = palm.position;      
     }
@@ -176,10 +179,13 @@ namespace Leap.Unity {
         averageIKVelocity += v;
       }
       averageIKVelocity = (averageIKVelocity / 3);
-      Debug.Log("iKVelocity: " + iKVelocity + " || velocityList.Count: " + velocityList.Count + " || averageIKVelocity: " + averageIKVelocity);
+      //Debug.Log("iKVelocity: " + iKVelocity + " || velocityList.Count: " + velocityList.Count + " || averageIKVelocity: " + averageIKVelocity);
       previousPalmPosition = palm.position;
+      if (!isTracking && Handedness == Chirality.Left) {
+        Debug.DrawLine(lastTrackedPosition, iKVelocitySnapShot, Color.blue);
+      }
       if (!isTracking && Handedness == Chirality.Right) {
-        Debug.DrawLine(lastTrackedPosition, iKVelocitySnapShot, Color.yellow);
+        Debug.DrawLine(lastTrackedPosition, iKVelocitySnapShot, Color.green);
       }
 
     }
@@ -291,6 +297,11 @@ namespace Leap.Unity {
       float startTime = Time.time;
       float endTime = startTime + ArmDropDuration;
       float speed = averageIKVelocity.magnitude * .015f;
+      float distanceToTarget = (startPosition - RestIKPosition.position).magnitude;
+      if (speed < .02f ) {
+        speed = .02f;
+      }
+      Debug.Log("speed: " + speed + " || distanceToTarget: " + distanceToTarget);
     
       while (Time.time <= endTime) {
         float t = (Time.time - startTime) / ArmDropDuration;
