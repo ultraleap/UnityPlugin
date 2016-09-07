@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Leap.Unity;
 
 namespace Leap.Unity {
@@ -52,6 +53,14 @@ namespace Leap.Unity {
     private Transform characterRoot;
     private float distanceShoulderToPalm;
 
+    private Vector3 previousPalmPosition;
+    private Vector3 iKVelocity;
+    public Transform VelocityMarker;
+    private Vector3 lastTrackedPosition;
+    private Vector3 iKVelocitySnapShot;
+    private Queue<Vector3> velocityList = new Queue<Vector3>();
+    private Vector3 averageIKVelocity;
+
     protected override void Awake() {
       base.Awake();
       animator = transform.root.GetComponentInChildren<Animator>();
@@ -92,13 +101,16 @@ namespace Leap.Unity {
 
     protected override void HandFinish() {
       isTracking = false;
-      StartCoroutine(LerpToRestPosition(palm.position));
       positionIKTargetWeight = 1;
       rotationIKWeight = 0;
       shoulder_forward_target_weight = 0;
       shoulder_up_target_weight = 0;
       shouldersLayerTargetWeight = 0f;
       spineLayerTargetWeight = 1f;
+      iKVelocitySnapShot = averageIKVelocity;
+      VelocityMarker.position = iKVelocitySnapShot;
+      StartCoroutine(MoveTowardWithVelocity(palm.position));
+      lastTrackedPosition = palm.position;      
     }
     protected override void HandReset() {
       isTracking = true;
@@ -146,6 +158,27 @@ namespace Leap.Unity {
         ElbowTargetPosition.x = .1f;
       }
       ElbowIKTarget.position = characterRoot.TransformPoint(ElbowTargetPosition);
+
+      iKVelocity = (palm.position - previousPalmPosition) / Time.deltaTime;
+      if (velocityList.Count >= 3) {
+        velocityList.Dequeue();
+      }
+      if (velocityList.Count < 3) {
+        velocityList.Enqueue(iKVelocity);
+      }
+
+      averageIKVelocity = new Vector3(0, 0, 0);
+
+      foreach (Vector3 v in velocityList) {
+        averageIKVelocity += v;
+      }
+      averageIKVelocity = (averageIKVelocity / 3);
+      Debug.Log("iKVelocity: " + iKVelocity + " || velocityList.Count: " + velocityList.Count + " || averageIKVelocity: " + averageIKVelocity);
+      previousPalmPosition = palm.position;
+      if (!isTracking && Handedness == Chirality.Right) {
+        Debug.DrawLine(lastTrackedPosition, iKVelocitySnapShot, Color.yellow);
+      }
+
     }
 
     public void OnAnimatorIK(int layerIndex) {
@@ -246,6 +279,20 @@ namespace Leap.Unity {
         float lerpedPositionY = Mathf.Lerp(droppedPosition.y, RestIKPosition.position.y, DropCurveY.Evaluate(t));
         float lerpedPositionZ = Mathf.Lerp(droppedPosition.z, RestIKPosition.position.z, DropCurveZ.Evaluate(t));
         UntrackedIKPosition = new Vector3(lerpedPositionX, lerpedPositionY, lerpedPositionZ);
+        yield return null;
+      }
+    }
+
+    private IEnumerator MoveTowardWithVelocity(Vector3 startPosition){
+      UntrackedIKPosition = startPosition;
+      float startTime = Time.time;
+      float endTime = startTime + ArmDropDuration;
+      float speed = averageIKVelocity.magnitude * .04f;
+    
+      while (Time.time <= endTime) {
+        float t = (Time.time - startTime) / ArmDropDuration;
+        UntrackedIKPosition = Vector3.MoveTowards(UntrackedIKPosition, VelocityMarker.position, speed);
+        VelocityMarker.position = Vector3.Lerp(iKVelocitySnapShot, RestIKPosition.position, DropCurveX.Evaluate(t * 2));
         yield return null;
       }
     }
