@@ -47,6 +47,7 @@ using System.Runtime.InteropServices;
                 new Vector(0,0,0),
                 new Vector(0,0,0),
                 Vector.Down,
+                LeapQuaternion.Identity,
                 Vector.Forward,
                 new Vector(-4.36385750984f, 6.5f, 31.0111342526f)
             );
