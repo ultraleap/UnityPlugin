@@ -138,6 +138,9 @@ namespace Leap.Unity.InputModule {
     private Frame curFrame;
     private GameObject[] currentGo;
     private GameObject[] currentGoing;
+    private Vector3 OldCameraPos;
+    private Quaternion OldCameraRot;
+    private float OldCameraFoV;
 
     //Queue of Spheres to Debug Draw
     private Queue<Vector3> DebugSphereQueue;
@@ -251,17 +254,17 @@ namespace Leap.Unity.InputModule {
     void Update() {
       curFrame = LeapDataProvider.CurrentFrame;
 
-      if (Camera.main != null) {
-        Quaternion HeadYaw = Quaternion.Euler(0f, Camera.main.transform.rotation.eulerAngles.y, 0f);
+      if (Camera.main != null && OldCameraRot != null) {
+        Quaternion HeadYaw = Quaternion.Euler(0f, OldCameraRot.eulerAngles.y, 0f);
         CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.1f);
       }
     }
 
     //Process is called by UI system to process events
     public override void Process() {
-      Vector3 OldCameraPos = Camera.main.transform.position;
-      Quaternion OldCameraRot = Camera.main.transform.rotation;
-      float OldCameraFoV = Camera.main.fieldOfView;
+      OldCameraPos = Camera.main.transform.position;
+      OldCameraRot = Camera.main.transform.rotation;
+      OldCameraFoV = Camera.main.fieldOfView;
 
       //Send update events if there is a selected object
       //This is important for InputField to receive keyboard events
@@ -304,10 +307,10 @@ namespace Leap.Unity.InputModule {
         if (Camera.main != null) {
           switch (curFrame.Hands[whichHand].IsRight) {
             case true:
-              ProjectionOrigin = Camera.main.transform.position + CurrentRotation * new Vector3(0.15f, -0.2f, 0f);
+              ProjectionOrigin = OldCameraPos + CurrentRotation * new Vector3(0.15f, -0.2f, 0f);
               break;
             case false:
-              ProjectionOrigin = Camera.main.transform.position + CurrentRotation * new Vector3(-0.15f, -0.2f, 0f);
+              ProjectionOrigin = OldCameraPos + CurrentRotation * new Vector3(-0.15f, -0.2f, 0f);
               break;
           }
         }
