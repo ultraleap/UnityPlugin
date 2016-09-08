@@ -334,7 +334,7 @@ namespace Leap.Unity.InputModule {
             PrevState[whichPointer] = pointerState[whichPointer]; //Store old state for sound transitionary purposes
           }
           UpdatePointer(whichPointer, PointEvents[whichPointer], PointEvents[whichPointer].pointerCurrentRaycast.gameObject);
-          if (!TipRaycast && distanceOfTipToPointer(whichPointer, whichHand, whichPointer) < ProjectiveToTactileTransitionDistance) {
+          if (!TipRaycast && distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance) {
             PointEvents[whichPointer].pointerCurrentRaycast = new RaycastResult();
           }
           ProcessState(whichPointer, whichHand, whichFinger, TipRaycast);
