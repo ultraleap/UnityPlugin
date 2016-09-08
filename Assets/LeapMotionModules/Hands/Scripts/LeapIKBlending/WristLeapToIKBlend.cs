@@ -21,6 +21,7 @@ namespace Leap.Unity {
     private float positionIKTargetWeight;
     private float rotationIKTargetWeight;
 
+    private Transform Hips;
     private Transform Scapula;
     private Transform Shoulder;
     private Transform Elbow;
@@ -68,6 +69,7 @@ namespace Leap.Unity {
       handModel = transform.GetComponent<HandModel>();
       palm = GetComponent<HandModel>().palm;
       Neck = animator.GetBoneTransform(HumanBodyBones.Neck);
+      Hips = animator.GetBoneTransform(HumanBodyBones.Hips);
       if(Handedness == Chirality.Left){
         Scapula = animator.GetBoneTransform(HumanBodyBones.LeftShoulder);
         Shoulder = animator.GetBoneTransform(HumanBodyBones.LeftUpperArm);
@@ -110,8 +112,8 @@ namespace Leap.Unity {
 
       //snapshot and constrain velocity derived
       iKVelocitySnapShot = averageIKVelocity;
-      if (iKVelocitySnapShot.z < .25f) {
-        iKVelocitySnapShot.z = .25f;
+      if (characterRoot.InverseTransformPoint(iKVelocitySnapShot).z < characterRoot.InverseTransformPoint(Hips.position).z + .5f) {
+        iKVelocitySnapShot.z = characterRoot.InverseTransformPoint(Hips.position).z + .5f;
       }
       iKVelocitySnapShot = iKVelocitySnapShot * .5f;// scale the velocity so arm doesn't reach as far;
       VelocityMarker.position = iKVelocitySnapShot;
@@ -149,18 +151,18 @@ namespace Leap.Unity {
       Vector3 palmInAnimatorSpace = characterRoot.InverseTransformPoint(PalmPositionAtLateUpdate);
       distanceShoulderToPalm = (palm.position - Shoulder.transform.position).magnitude;
       if (Handedness == Chirality.Left) {
-        ElbowTargetPosition.x -= distanceShoulderToPalm;
+        ElbowTargetPosition.x -= distanceShoulderToPalm * .6f;
       }
       if (Handedness == Chirality.Right) {
-        ElbowTargetPosition.x += distanceShoulderToPalm;
+        ElbowTargetPosition.x += distanceShoulderToPalm * .6f;
       }
 
       if (Handedness == Chirality.Left && ElbowTargetPosition.x > -.05f) {
-        Debug.Log("Left Elbow Inside");
+        //Debug.Log("Left Elbow Inside");
         ElbowTargetPosition.x = -.1f;
       }
       if (Handedness == Chirality.Right && ElbowTargetPosition.x < .05f) {
-        Debug.Log("Right Elbow Inside");
+        //Debug.Log("Right Elbow Inside");
         ElbowTargetPosition.x = .1f;
       }
       ElbowIKTarget.position = characterRoot.TransformPoint(ElbowTargetPosition);
@@ -224,12 +226,7 @@ namespace Leap.Unity {
           animator.SetFloat("shoulder_forward_left", shoulder_forward_weight);
         }
         else {
-          animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, positionIKWeight);
-          animator.SetIKPosition(AvatarIKGoal.LeftHand, UntrackedIKPosition);
-          animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotationIKWeight);
-          animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
-          animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, 1);
-          animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
+          UntrackedIKHandling();
         }
       }
       if (Handedness == Chirality.Right) {
@@ -240,6 +237,7 @@ namespace Leap.Unity {
           //animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
           animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, positionIKWeight);
           animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
+
           if (characterRoot.InverseTransformPoint(ElbowMarker.position).y > characterRoot.InverseTransformPoint(Scapula.position).y) {
             shoulder_up_target_weight = (characterRoot.InverseTransformPoint(ElbowMarker.position).y - characterRoot.InverseTransformPoint(Shoulder.position).y) * 10f;
             animator.SetFloat("shoulder_up_right", shoulder_up_weight);
@@ -264,12 +262,7 @@ namespace Leap.Unity {
           animator.SetFloat("shoulder_forward_right", shoulder_forward_weight);
         }
         else {
-          animator.SetIKPositionWeight(AvatarIKGoal.RightHand, positionIKWeight);
-          animator.SetIKPosition(AvatarIKGoal.RightHand, UntrackedIKPosition);
-          animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotationIKWeight);
-          animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
-          animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, 1);
-          animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
+          UntrackedIKHandling();
         }
         if (Input.GetKey(KeyCode.X)) {
           animator.SetFloat("forearm_twist_left", 1f);
@@ -277,6 +270,26 @@ namespace Leap.Unity {
         else animator.SetFloat("forearm_twist_left", 0f);
       }
     }
+
+    private void UntrackedIKHandling() {
+      if (Handedness == Chirality.Left) {
+        animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, positionIKWeight);
+        animator.SetIKPosition(AvatarIKGoal.LeftHand, UntrackedIKPosition);
+        animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotationIKWeight);
+        animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
+        animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, 1);
+        animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
+      }
+      if (Handedness == Chirality.Right) {
+        animator.SetIKPositionWeight(AvatarIKGoal.RightHand, positionIKWeight);
+        animator.SetIKPosition(AvatarIKGoal.RightHand, UntrackedIKPosition);
+        animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotationIKWeight);
+        animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
+        animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, 1);
+        animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
+      }
+    }
+
 
     private IEnumerator LerpToRestPosition(Vector3 droppedPosition) {
       float startTime = Time.time;
@@ -298,8 +311,8 @@ namespace Leap.Unity {
       float endTime = startTime + ArmDropDuration;
       float speed = averageIKVelocity.magnitude * .015f;
       float distanceToTarget = (startPosition - RestIKPosition.position).magnitude;
-      if (speed < .02f ) {
-        speed = .02f;
+      if (speed < .015f ) {
+        speed = .015f;
       }
       Debug.Log("speed: " + speed + " || distanceToTarget: " + distanceToTarget);
     
