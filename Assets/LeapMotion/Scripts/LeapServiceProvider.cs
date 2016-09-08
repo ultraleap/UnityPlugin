@@ -41,8 +41,7 @@ namespace Leap.Unity {
     [SerializeField]
     protected bool _useInterpolation = true;
 
-    [Tooltip("How much delay should be added to interpolation.  A non-zero amount is needed to prevent extrapolation artifacts.")]
-    [SerializeField]
+    [Tooltip("How much delay should be added to interpolation.")]
     protected long _interpolationDelay = 0;
 
     protected Controller leap_controller_;
