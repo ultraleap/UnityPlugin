@@ -1447,6 +1447,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddf0cd3a39afe58408b46938272903e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  VelocityMarker: {fileID: 383176475}
   Handedness: 0
   MarkerPrefab: {fileID: 100000, guid: f776c65287e65d44b843a52c5fdbf7b4, type: 3}
   ElbowMarker: {fileID: 846773618}
@@ -1501,9 +1502,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  ArmDropDuration: 1
+  ArmDropDuration: 1.5
   m_IKMarkerAssembly: {fileID: 171469918}
-  VelocityMarker: {fileID: 383176475}
 --- !u!114 &1141235355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1916,6 +1916,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddf0cd3a39afe58408b46938272903e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  VelocityMarker: {fileID: 268921760}
   Handedness: 1
   MarkerPrefab: {fileID: 100000, guid: f776c65287e65d44b843a52c5fdbf7b4, type: 3}
   ElbowMarker: {fileID: 350741106}
@@ -1970,9 +1971,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  ArmDropDuration: 1
+  ArmDropDuration: 1.5
   m_IKMarkerAssembly: {fileID: 171469918}
-  VelocityMarker: {fileID: 268921760}
 --- !u!114 &1681696027
 MonoBehaviour:
   m_ObjectHideFlags: 0

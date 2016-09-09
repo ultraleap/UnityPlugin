@@ -236,6 +236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddf0cd3a39afe58408b46938272903e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  VelocityMarker: {fileID: 1992691166}
   Handedness: 1
   MarkerPrefab: {fileID: 100000, guid: f776c65287e65d44b843a52c5fdbf7b4, type: 3}
   ElbowMarker: {fileID: 295622679}
@@ -290,9 +291,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  ArmDropDuration: 1
+  ArmDropDuration: 1.5
   m_IKMarkerAssembly: {fileID: 222472435}
-  VelocityMarker: {fileID: 1992691166}
 --- !u!114 &151255025
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -895,6 +895,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ddf0cd3a39afe58408b46938272903e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  VelocityMarker: {fileID: 1359949806}
   Handedness: 0
   MarkerPrefab: {fileID: 100000, guid: f776c65287e65d44b843a52c5fdbf7b4, type: 3}
   ElbowMarker: {fileID: 224984928}
@@ -949,9 +950,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  ArmDropDuration: 1
+  ArmDropDuration: 1.5
   m_IKMarkerAssembly: {fileID: 222472435}
-  VelocityMarker: {fileID: 1359949806}
 --- !u!4 &437932459 stripped
 Transform:
   m_PrefabParentObject: {fileID: 400046, guid: 2bac320ccd086cf4dad5387339c32be6, type: 3}
