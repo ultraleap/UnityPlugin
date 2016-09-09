@@ -204,6 +204,7 @@ namespace Leap.Unity.InputModule {
         }
 
         Pointers[index] = pointer.GetComponent<Transform>();
+        pointer.SetActive(false);
 
         if (InnerPointer) {
           //Create the Canvas to render the Pointer on
@@ -217,6 +218,7 @@ namespace Leap.Unity.InputModule {
           renderer.material = Instantiate(PointerMaterial);
 
           InnerPointers[index] = innerPointer.GetComponent<Transform>();
+          innerPointer.SetActive(false);
         }
       }
 
@@ -585,8 +587,9 @@ namespace Leap.Unity.InputModule {
           }
           IndexFingerPosition /= numberOfExtendedFingers;
           */
+          
           float farthest = 0f;
-          IndexFingerPosition = curFrame.Hands[whichHand].Fingers[1].StabilizedTipPosition.ToVector3();
+          IndexFingerPosition = curFrame.Hands[whichHand].Fingers[1].TipPosition.ToVector3();
           for (int i = 1; i < 3; i++) {
             float fingerDistance = Vector3.Distance(Camera.main.transform.position, curFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3());
             float fingerExtension = Mathf.Clamp01(Vector3.Dot(curFrame.Hands[whichHand].Fingers[i].Direction.ToVector3(), curFrame.Hands[whichPointer].Direction.ToVector3())) / 1.5f;
