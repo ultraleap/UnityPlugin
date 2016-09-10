@@ -9,6 +9,8 @@ namespace Leap.Unity {
     public Transform ElbowIKTarget_R;
     public Transform RestIKPosition_L;
     public Transform RestIKPosition_R;
+    public Transform VelocityMarker_L;
+    public Transform VelocityMarker_R;
 
     public AnimationCurve DropCurveX;
     public AnimationCurve DropCurveY;

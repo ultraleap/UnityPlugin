@@ -177,7 +177,7 @@ namespace Leap.Unity {
       WristLeapToIKBlend WristLeapToIKBlend_L = Hand_L.gameObject.AddComponent<WristLeapToIKBlend>();
       HandTransitionBehavior_L = WristLeapToIKBlend_L;
       WristLeapToIKBlend_L.m_IKMarkerAssembly = iKMarkersAssembly;
-      //WristLeapToIKBlend_L.AssignIKMarkers();
+      WristLeapToIKBlend_L.AssignIKMarkers();
       RiggedHand_L.Handedness = Chirality.Left;
       RiggedHand_L.SetEditorLeapPose = false;
 
@@ -189,7 +189,7 @@ namespace Leap.Unity {
       WristLeapToIKBlend WristLeapToIKBlend_R = Hand_R.gameObject.AddComponent<WristLeapToIKBlend>();
       HandTransitionBehavior_R = WristLeapToIKBlend_R;
       WristLeapToIKBlend_R.m_IKMarkerAssembly = iKMarkersAssembly;
-      //WristLeapToIKBlend_R.AssignIKMarkers();
+      WristLeapToIKBlend_R.AssignIKMarkers();
       RiggedHand_R.Handedness = Chirality.Right;
       RiggedHand_R.SetEditorLeapPose = false;
 

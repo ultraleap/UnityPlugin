@@ -93,12 +93,14 @@ namespace Leap.Unity {
         ElbowMarker = m_IKMarkerAssembly.ElbowMarker_L;
         ElbowIKTarget = m_IKMarkerAssembly.ElbowIKTarget_L;
         RestIKPosition = m_IKMarkerAssembly.RestIKPosition_L;
+        VelocityMarker = m_IKMarkerAssembly.VelocityMarker_L;
       }
       if (Handedness == Chirality.Right) {
         Debug.Log(transform.name + " - Right");
         ElbowMarker = m_IKMarkerAssembly.ElbowMarker_R;
         ElbowIKTarget = m_IKMarkerAssembly.ElbowIKTarget_R;
         RestIKPosition = m_IKMarkerAssembly.RestIKPosition_R;
+        VelocityMarker = m_IKMarkerAssembly.VelocityMarker_R;
       }
       DropCurveX = m_IKMarkerAssembly.DropCurveX;
       DropCurveY = m_IKMarkerAssembly.DropCurveY;
@@ -140,14 +142,15 @@ namespace Leap.Unity {
       PalmRotationAtLateUpdate = palm.rotation;
       ElbowMarker.position = Elbow.position;
       ElbowMarker.rotation = Elbow.rotation;
+
       shoulder_up_weight = Mathf.Lerp(shoulder_up_weight, shoulder_up_target_weight, .4f);
       shoulder_forward_weight = Mathf.Lerp(shoulder_forward_weight, shoulder_forward_target_weight, .1f);
       shoulder_back_weight = Mathf.Lerp(shoulder_back_weight, shoulder_back_target_weight, .05f);
-
       positionIKWeight = Mathf.Lerp(positionIKWeight, positionIKTargetWeight, .4f);
       rotationIKWeight = Mathf.Lerp(rotationIKWeight, rotationIKTargetWeight, .4f);
       elbowIKWeight = Mathf.Lerp(elbowIKWeight, elbowIKTargetWeight, .4f);
       shouldersLayerWeight = Mathf.Lerp(shouldersLayerWeight, shouldersLayerTargetWeight, .1f);
+
       if (Handedness == Chirality.Left) {
         animator.SetLayerWeight(3, shouldersLayerWeight);
       }
@@ -167,16 +170,17 @@ namespace Leap.Unity {
         ElbowTargetPosition.x += distanceShoulderToPalm * .6f;
       }
       if (Handedness == Chirality.Left && ElbowTargetPosition.x > -.05f) {
-        //Debug.Log("Left Elbow Inside");
         ElbowTargetPosition.x = -.1f;
       }
       if (Handedness == Chirality.Right && ElbowTargetPosition.x < .05f) {
         ElbowTargetPosition.x = .1f;
       }
-      ElbowIKTarget.position = characterRoot.TransformPoint(ElbowTargetPosition);
-      //ElbowIKTarget.position = Vector3.Lerp(characterRoot.TransformPoint(ElbowTargetPosition), characterRoot.TransformPoint(ElbowTargetPosition), .2f);
+      if (isTracking) {
+        ElbowIKTarget.position = characterRoot.TransformPoint(ElbowTargetPosition);
+      }
+      else ElbowIKTarget.position = Vector3.Lerp(ElbowIKTarget.position, characterRoot.TransformPoint(ElbowTargetPosition), .4f);
 
-      //Average Velocity
+      //Keep Average Velocity
       iKVelocity = (palm.position - previousPalmPosition) / Time.deltaTime;
       if (velocityList.Count >= 3) {
         velocityList.Dequeue();
