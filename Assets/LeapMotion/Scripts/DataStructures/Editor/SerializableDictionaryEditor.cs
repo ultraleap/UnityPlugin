@@ -196,7 +196,7 @@ public class SerializableDictionaryEditor : PropertyDrawer {
       copy.NextVisible(true);
       while (!SerializedProperty.EqualContents(copy, endProp)) {
         r.height = EditorGUI.GetPropertyHeight(copy);
-        EditorGUI.PropertyField(r, copy, false);
+        EditorGUI.PropertyField(r, copy, true);
         r.y += r.height;
         copy.NextVisible(false);
       }
