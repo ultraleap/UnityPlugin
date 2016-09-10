@@ -964,8 +964,8 @@ GameObject:
   - 4: {fileID: 572274669}
   - 33: {fileID: 572274673}
   - 23: {fileID: 572274672}
-  - 65: {fileID: 572274671}
   - 114: {fileID: 572274670}
+  - 135: {fileID: 572274671}
   m_Layer: 0
   m_Name: ElbowIKTargetRight
   m_TagString: Untagged
@@ -1000,17 +1000,17 @@ MonoBehaviour:
   color: {r: 0, g: 1, b: 0.5034485, a: 1}
   useWireframe: 1
   traverseHierarchy: 1
---- !u!65 &572274671
-BoxCollider:
+--- !u!135 &572274671
+SphereCollider:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 572274668}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.1, y: 0.1, z: 0.1}
+  m_Radius: 0.07651651
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &572274672
 MeshRenderer:
@@ -1148,7 +1148,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.05
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &769931684
 MeshFilter:
@@ -1167,7 +1167,8 @@ GameObject:
   - 4: {fileID: 783862514}
   - 33: {fileID: 783862517}
   - 23: {fileID: 783862516}
-  - 65: {fileID: 783862515}
+  - 135: {fileID: 783862515}
+  - 114: {fileID: 783862518}
   m_Layer: 0
   m_Name: ElbowIKTargetLeft
   m_TagString: Untagged
@@ -1188,17 +1189,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1603189095}
   m_RootOrder: 2
---- !u!65 &783862515
-BoxCollider:
+--- !u!135 &783862515
+SphereCollider:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 783862513}
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.1, y: 0.1, z: 0.1}
+  m_Radius: 0.07651651
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &783862516
 MeshRenderer:
@@ -1238,6 +1239,20 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 783862513}
   m_Mesh: {fileID: 4300000, guid: f776c65287e65d44b843a52c5fdbf7b4, type: 3}
+--- !u!114 &783862518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 783862513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 817c95a76d8efef46a0c534c85bab918, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 0.034482475, g: 0, b: 1, a: 1}
+  useWireframe: 1
+  traverseHierarchy: 1
 --- !u!4 &873974385 stripped
 Transform:
   m_PrefabParentObject: {fileID: 400114, guid: 0efff3089713e0d41adbb35a1a06b1c1, type: 3}
@@ -2173,7 +2188,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1805543666}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4a00d86828282ef41ac433ce1e54746a, type: 3}
   m_Name: 
@@ -2397,7 +2412,7 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.05
+  m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &1994981598
 MeshFilter:

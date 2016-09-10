@@ -178,7 +178,7 @@ namespace Leap.Unity {
       if (isTracking) {
         ElbowIKTarget.position = characterRoot.TransformPoint(ElbowTargetPosition);
       }
-      else ElbowIKTarget.position = Vector3.Lerp(ElbowIKTarget.position, characterRoot.TransformPoint(ElbowTargetPosition), .4f);
+      else ElbowIKTarget.position = Vector3.Lerp(ElbowIKTarget.position, characterRoot.TransformPoint(ElbowTargetPosition), .01f);
 
       //Keep Average Velocity
       iKVelocity = (palm.position - previousPalmPosition) / Time.deltaTime;
@@ -204,14 +204,15 @@ namespace Leap.Unity {
     }
 
     public void OnAnimatorIK(int layerIndex) {
+      //turn off elbow hint if hand close to shoulder
+      if (distanceShoulderToPalm < .1f) {
+        elbowIKTargetWeight = 0;
+      }
       if (isTracking) {
         Vector3 elbow = characterRoot.InverseTransformPoint(ElbowMarker.position);
         Vector3 scapula = characterRoot.InverseTransformPoint(Scapula.position);
         Vector3 shoulder = characterRoot.InverseTransformPoint(Shoulder.position);
-        //turn off elbow hint if hand close to shoulder
-        if (distanceShoulderToPalm < .1f) {
-          elbowIKTargetWeight = 0;
-        }
+
         //raise shoulder as elbow goes above shoulder
         if (elbow.y > scapula.y) {
           shoulder_up_target_weight = (elbow.y - shoulder.y) * 10f;
