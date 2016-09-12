@@ -83,8 +83,15 @@ namespace Leap.Unity {
       rect.x += rect.width - 110;
       rect.width = 110;
       if (GUI.Button(rect, "Clear Duplicates")) {
+        markDirty(_currProperty);
+
         Undo.RecordObject(_currProperty.serializedObject.targetObject, "Cleared duplicates");
         (fieldInfo.GetValue(_currProperty.serializedObject.targetObject) as ICanReportDuplicateInformation).ClearDuplicates();
+
+        _currProperty.serializedObject.Update();
+
+        markDirty(_currProperty);
+        updatePairsFromProperty(_currProperty);
       }
     }
 
@@ -130,8 +137,8 @@ namespace Leap.Unity {
       SerializedProperty keys = _currProperty.FindPropertyRelative("_keys");
       SerializedProperty values = _currProperty.FindPropertyRelative("_values");
 
-      keys.DeleteArrayElementAtIndex(list.index);
-      values.DeleteArrayElementAtIndex(list.index);
+      actuallyDeleteAt(keys, list.index);
+      actuallyDeleteAt(values, list.index);
 
       updatePairsFromProperty(_currProperty);
     }
@@ -210,6 +217,22 @@ namespace Leap.Unity {
       } else {
         r.height = EditorGUI.GetPropertyHeight(prop);
         EditorGUI.PropertyField(r, prop, GUIContent.none, false);
+      }
+    }
+
+    private void markDirty(SerializedProperty property) {
+      SerializedProperty keys = property.FindPropertyRelative("_keys");
+      int size = keys.arraySize;
+
+      keys.InsertArrayElementAtIndex(size);
+      actuallyDeleteAt(keys, size);
+    }
+
+    private static void actuallyDeleteAt(SerializedProperty property, int index) {
+      int arraySize = property.arraySize;
+
+      while (property.arraySize == arraySize) {
+        property.DeleteArrayElementAtIndex(index);
       }
     }
   }
