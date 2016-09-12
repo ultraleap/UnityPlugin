@@ -10,8 +10,10 @@ namespace Leap.Unity {
   public class SDictionaryAttribute : PropertyAttribute { }
 
   public interface ICanReportDuplicateInformation {
+#if UNITY_EDITOR
     List<int> GetDuplicationInformation();
     void ClearDuplicates();
+#endif
   }
 
   /// <summary>
