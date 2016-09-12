@@ -33,7 +33,14 @@ namespace Leap.Unity {
       if (_keys != null && _values != null) {
         int count = Mathf.Min(_keys.Count, _values.Count);
         for (int i = 0; i < count; i++) {
-          this[_keys[i]] = _values[i];
+          TKey key = _keys[i];
+          TValue value = _values[i];
+
+          if (key == null) {
+            continue;
+          }
+
+          this[key] = value;
         }
       }
 
@@ -49,6 +56,10 @@ namespace Leap.Unity {
 
       for (int i = 0; i < _keys.Count; i++) {
         TKey key = _keys[i];
+        if (key == null) {
+          continue;
+        }
+
         if (info.ContainsKey(key)) {
           info[key]++;
         } else {
@@ -58,7 +69,12 @@ namespace Leap.Unity {
 
       List<int> dups = new List<int>();
       for (int i = 0; i < _keys.Count; i++) {
-        dups.Add(info[_keys[i]]);
+        TKey key = _keys[i];
+        if (key == null) {
+          continue;
+        }
+
+        dups.Add(info[key]);
       }
 
       return dups;
@@ -90,7 +106,10 @@ namespace Leap.Unity {
 
 #if UNITY_EDITOR
       for (int i = _keys.Count; i-- != 0;) {
-        if (!ContainsKey(_keys[i])) {
+        TKey key = _keys[i];
+        if (key == null) continue;
+
+        if (!ContainsKey(key)) {
           _keys.RemoveAt(i);
           _values.RemoveAt(i);
         }

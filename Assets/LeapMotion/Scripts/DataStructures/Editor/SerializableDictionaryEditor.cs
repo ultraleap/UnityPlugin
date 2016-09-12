@@ -102,6 +102,11 @@ namespace Leap.Unity {
         GUI.color = new Color(1, 0.7f, 0.5f);
       }
 
+      if (pair.a.propertyType == SerializedPropertyType.ObjectReference && pair.a.objectReferenceValue == null) {
+        GUI.contentColor = new Color(1, 0, 0);
+        GUI.color = new Color(1, 0, 0);
+      }
+
       drawProp(pair.a, leftRect);
 
       GUI.contentColor = Color.white;
