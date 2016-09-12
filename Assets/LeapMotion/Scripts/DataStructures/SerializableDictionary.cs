@@ -20,10 +20,10 @@ namespace Leap.Unity {
   /// for using the UnityEvent class as well. 
   /// </summary>
   public class SerializableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, ICanReportDuplicateInformation, ISerializationCallbackReceiver {
-    
+
     [SerializeField]
     private List<TKey> _keys;
-    
+
     [SerializeField]
     private List<TValue> _values;
 
@@ -36,8 +36,14 @@ namespace Leap.Unity {
           this[_keys[i]] = _values[i];
         }
       }
+
+#if !UNITY_EDITOR
+      _keys.Clear();
+      _values.Clear();
+#endif
     }
 
+#if UNITY_EDITOR
     public List<int> GetDuplicationInformation() {
       Dictionary<TKey, int> info = new Dictionary<TKey, int>();
 
@@ -71,6 +77,7 @@ namespace Leap.Unity {
         }
       }
     }
+#endif
 
     public void OnBeforeSerialize() {
       if (_keys == null) {
@@ -81,21 +88,28 @@ namespace Leap.Unity {
         _values = new List<TValue>();
       }
 
+#if UNITY_EDITOR
       for (int i = _keys.Count; i-- != 0;) {
         if (!ContainsKey(_keys[i])) {
           _keys.RemoveAt(i);
           _values.RemoveAt(i);
         }
       }
+#endif
 
       Enumerator enumerator = GetEnumerator();
       while (enumerator.MoveNext()) {
         var pair = enumerator.Current;
 
+#if UNITY_EDITOR
         if (!_keys.Contains(pair.Key)) {
           _keys.Add(pair.Key);
           _values.Add(pair.Value);
         }
+#else
+        _keys.Add(pair.Key);
+        _values.Add(pair.Value);
+#endif
       }
     }
   }
