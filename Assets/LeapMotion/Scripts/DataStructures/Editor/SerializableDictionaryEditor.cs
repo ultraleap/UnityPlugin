@@ -43,18 +43,27 @@ namespace Leap.Unity {
 
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
-      _currProperty = property;
+      if (property.hasMultipleDifferentValues) {
+        GUI.Box(position, "");
+        EditorGUI.LabelField(position, "Multi-object editing not supported for Serialized Dictionaries.", EditorStyles.miniLabel);
+      } else {
+        _currProperty = property;
 
-      updatePairsFromProperty(property);
+        updatePairsFromProperty(property);
 
-      EditorGUIUtility.labelWidth /= 2;
-      _list.DoList(position);
-      EditorGUIUtility.labelWidth *= 2;
+        EditorGUIUtility.labelWidth /= 2;
+        _list.DoList(position);
+        EditorGUIUtility.labelWidth *= 2;
+      }
     }
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-      updatePairsFromProperty(property);
-      return _list.GetHeight();
+      if (property.hasMultipleDifferentValues) {
+        return EditorGUIUtility.singleLineHeight;
+      } else {
+        updatePairsFromProperty(property);
+        return _list.GetHeight();
+      }
     }
 
     private void updatePairsFromProperty(SerializedProperty property) {
