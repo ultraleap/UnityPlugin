@@ -70,6 +70,8 @@ namespace Leap.Unity {
     [Leap.Unity.Attributes.AutoFind]
     public LeapHandController leapHandController;
     public Text ZvalueText;
+    public Text twistText;
+    public Text outText;
 
     protected override void Awake() {
 
@@ -153,26 +155,43 @@ namespace Leap.Unity {
           ZvalueText.text = handRotationZ.ToString();
         }
         //if (handRotationZ > 0) {
-          //Debug.Log(handRotationZ);
-          if (Handedness == Chirality.Left) {
-            if (handRotationZ > 0) {
-              animator.SetFloat("forearm_twist_left", 1 - handRotationZ * 1);
-            }
-            if (handRotationZ < 0) {
-              animator.SetFloat("forearm_twist_left", 1 - handRotationZ * 1);
-            }
+        //Debug.Log(handRotationZ);
+        if (Handedness == Chirality.Left) {
+          if (handRotationZ > 0) {
+            animator.SetFloat("forearm_twist_left", handRotationZ);
           }
-          if (Handedness == Chirality.Right) {
-            if (handRotationZ > 0) {
-              animator.SetFloat("forearm_twist_right", 1 - handRotationZ * 1);
-            }
-            if (handRotationZ < 0) {
-              animator.SetFloat("forearm_twist_out_right", handRotationZ * 1);
-            }
+          else {
+            twistText.text = animator.GetFloat("forearm_twist_right").ToString();
           }
+          if (handRotationZ < 0) {
+            animator.SetFloat("forearm_twist_out_left", handRotationZ);
+          }
+          else {
+            outText.text = animator.GetFloat("forearm_twist_out_left").ToString();
+          }
+          twistText.text = animator.GetFloat("forearm_twist_left").ToString();
+          outText.text = animator.GetFloat("forearm_twist_out_left").ToString();
+
+        }
+        if (Handedness == Chirality.Right) {
+          if (handRotationZ > 0) {
+            animator.SetFloat("forearm_twist_right", 1 - handRotationZ * 1);
+          }
+          if (handRotationZ < 0) {
+            animator.SetFloat("forearm_twist_out_right", handRotationZ * 1);
+          }
+          twistText.text = animator.GetFloat("forearm_twist_right").ToString();
+          outText.text = animator.GetFloat("forearm_twist_out_right").ToString();
+        }
+
         //}
       }
-
+      else {
+        //animator.SetFloat("forearm_twist_left", 0);
+        //animator.SetFloat("forearm_twist_out_left", 0);
+        //animator.SetFloat("forearm_twist_right", 0);
+        //animator.SetFloat("forearm_twist_out_right", 0);
+      }
       //if (Input.GetKey(KeyCode.G)) {
       //  animator.SetFloat("forearm_twist_left", 1);
       //}
