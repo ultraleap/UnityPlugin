@@ -138,6 +138,30 @@ namespace Leap.Unity {
       spineLayerTargetWeight = 1f;
     }
     void LateUpdate() {
+      if (Input.GetKey(KeyCode.G)) {
+        animator.SetFloat("forearm_twist_left", 1);
+      }
+      else {
+        animator.SetFloat("forearm_twist_left", 0);
+      }
+      if(Input.GetKey(KeyCode.H)) {
+        animator.SetFloat("forearm_twist_out_left", 1);
+      }
+      else {
+        animator.SetFloat("forearm_twist_out_left", 0);
+      }
+      if (Input.GetKey(KeyCode.J)) {
+        animator.SetFloat("forearm_twist_right", 1);
+      }
+      else {
+        animator.SetFloat("forearm_twist_right", 0);
+      }
+      if (Input.GetKey(KeyCode.K)) {
+        animator.SetFloat("forearm_twist_out_right", 1);
+      }
+      else {
+        animator.SetFloat("forearm_twist_out_right", 0);
+      }
       PalmPositionAtLateUpdate = palm.position;
       PalmRotationAtLateUpdate = palm.rotation;
       ElbowMarker.position = Elbow.position;
@@ -247,10 +271,11 @@ namespace Leap.Unity {
         animator.SetFloat("shoulder_back_left", shoulder_back_weight);
         animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, positionIKWeight);
         animator.SetIKPosition(AvatarIKGoal.LeftHand, PalmPositionAtLateUpdate);
-        animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotationIKWeight * .75f);
+        animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotationIKWeight * .25f);
         animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
         animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, elbowIKWeight);
         animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
+
       }
       if (Handedness == Chirality.Right) {
         animator.SetFloat("shoulder_up_right", shoulder_up_weight);
@@ -259,10 +284,11 @@ namespace Leap.Unity {
         animator.SetFloat("shoulder_back_right", shoulder_back_weight);
         animator.SetIKPositionWeight(AvatarIKGoal.RightHand, positionIKWeight);
         animator.SetIKPosition(AvatarIKGoal.RightHand, PalmPositionAtLateUpdate);
-        animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotationIKWeight * .75f);
+        animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotationIKWeight * .25f);
         animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
         animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, elbowIKWeight);
         animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
+
       }
     }
     private void UntrackedIKHandling() {
