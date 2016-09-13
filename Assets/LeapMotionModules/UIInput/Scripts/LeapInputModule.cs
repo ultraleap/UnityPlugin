@@ -138,6 +138,9 @@ namespace Leap.Unity.InputModule {
     private Frame curFrame;
     private GameObject[] currentGo;
     private GameObject[] currentGoing;
+    private Vector3 OldCameraPos;
+    private Quaternion OldCameraRot;
+    private float OldCameraFoV;
 
     //Queue of Spheres to Debug Draw
     private Queue<Vector3> DebugSphereQueue;
@@ -201,6 +204,7 @@ namespace Leap.Unity.InputModule {
         }
 
         Pointers[index] = pointer.GetComponent<Transform>();
+        pointer.SetActive(false);
 
         if (InnerPointer) {
           //Create the Canvas to render the Pointer on
@@ -214,6 +218,7 @@ namespace Leap.Unity.InputModule {
           renderer.material = Instantiate(PointerMaterial);
 
           InnerPointers[index] = innerPointer.GetComponent<Transform>();
+          innerPointer.SetActive(false);
         }
       }
 
@@ -251,17 +256,17 @@ namespace Leap.Unity.InputModule {
     void Update() {
       curFrame = LeapDataProvider.CurrentFrame;
 
-      if (Camera.main != null) {
-        Quaternion HeadYaw = Quaternion.Euler(0f, Camera.main.transform.rotation.eulerAngles.y, 0f);
+      if (Camera.main != null && OldCameraRot != null) {
+        Quaternion HeadYaw = Quaternion.Euler(0f, OldCameraRot.eulerAngles.y, 0f);
         CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.1f);
       }
     }
 
     //Process is called by UI system to process events
     public override void Process() {
-      Vector3 OldCameraPos = Camera.main.transform.position;
-      Quaternion OldCameraRot = Camera.main.transform.rotation;
-      float OldCameraFoV = Camera.main.fieldOfView;
+      OldCameraPos = Camera.main.transform.position;
+      OldCameraRot = Camera.main.transform.rotation;
+      OldCameraFoV = Camera.main.fieldOfView;
 
       //Send update events if there is a selected object
       //This is important for InputField to receive keyboard events
@@ -304,10 +309,10 @@ namespace Leap.Unity.InputModule {
         if (Camera.main != null) {
           switch (curFrame.Hands[whichHand].IsRight) {
             case true:
-              ProjectionOrigin = Camera.main.transform.position + CurrentRotation * new Vector3(0.15f, -0.2f, 0f);
+              ProjectionOrigin = OldCameraPos + CurrentRotation * new Vector3(0.15f, -0.2f, 0f);
               break;
             case false:
-              ProjectionOrigin = Camera.main.transform.position + CurrentRotation * new Vector3(-0.15f, -0.2f, 0f);
+              ProjectionOrigin = OldCameraPos + CurrentRotation * new Vector3(-0.15f, -0.2f, 0f);
               break;
           }
         }
@@ -334,7 +339,7 @@ namespace Leap.Unity.InputModule {
             PrevState[whichPointer] = pointerState[whichPointer]; //Store old state for sound transitionary purposes
           }
           UpdatePointer(whichPointer, PointEvents[whichPointer], PointEvents[whichPointer].pointerCurrentRaycast.gameObject);
-          if (!TipRaycast && distanceOfTipToPointer(whichPointer, whichHand, whichPointer) < ProjectiveToTactileTransitionDistance) {
+          if (!TipRaycast && distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance) {
             PointEvents[whichPointer].pointerCurrentRaycast = new RaycastResult();
           }
           ProcessState(whichPointer, whichHand, whichFinger, TipRaycast);
@@ -582,8 +587,9 @@ namespace Leap.Unity.InputModule {
           }
           IndexFingerPosition /= numberOfExtendedFingers;
           */
+          
           float farthest = 0f;
-          IndexFingerPosition = curFrame.Hands[whichHand].Fingers[1].StabilizedTipPosition.ToVector3();
+          IndexFingerPosition = curFrame.Hands[whichHand].Fingers[1].TipPosition.ToVector3();
           for (int i = 1; i < 3; i++) {
             float fingerDistance = Vector3.Distance(Camera.main.transform.position, curFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3());
             float fingerExtension = Mathf.Clamp01(Vector3.Dot(curFrame.Hands[whichHand].Fingers[i].Direction.ToVector3(), curFrame.Hands[whichPointer].Direction.ToVector3())) / 1.5f;
