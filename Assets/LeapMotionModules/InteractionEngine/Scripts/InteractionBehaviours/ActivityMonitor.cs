@@ -40,6 +40,11 @@ namespace Leap.Unity.Interaction {
       Revive();
 
       _rigidbody = GetComponent<Rigidbody>();
+
+      _prevPosition = _rigidbody.position;
+      _prevVelocity = _rigidbody.velocity;
+      _prevRotation = _rigidbody.rotation;
+      _prevAngularVelocity = _rigidbody.angularVelocity;
     }
 
     public override void Revive() {
