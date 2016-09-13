@@ -180,7 +180,6 @@ namespace Leap.Unity.Interaction.CApi {
   public struct INTERACTION_SCENE_INFO {
     public SceneInfoFlags sceneFlags;
     public LEAP_VECTOR gravity;
-    public float depthUntilSphericalInside;
     public float physicsScale;
     public IntPtr ldatData;
     public UInt32 ldatSize;
