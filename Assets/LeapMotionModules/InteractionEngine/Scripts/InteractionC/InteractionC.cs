@@ -7,7 +7,7 @@ using LeapInternal;
 namespace Leap.Unity.Interaction.CApi {
 
   public enum Version : uint {
-    Current = 0x0103,
+    Current = 0x0200,
     Major = 0xff00, // Any API breaking changes
     Minor = 0x00ff
   }
