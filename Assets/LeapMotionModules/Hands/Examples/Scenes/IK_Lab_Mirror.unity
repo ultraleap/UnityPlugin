@@ -357,6 +357,8 @@ MonoBehaviour:
     m_RotationOrder: 0
   ArmDropDuration: 1.5
   m_IKMarkerAssembly: {fileID: 1303171081}
+  leapHandController: {fileID: 72891528}
+  ZvalueText: {fileID: 0}
 --- !u!114 &150127915
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -758,6 +760,8 @@ MonoBehaviour:
     m_RotationOrder: 0
   ArmDropDuration: 1.5
   m_IKMarkerAssembly: {fileID: 1303171081}
+  leapHandController: {fileID: 72891528}
+  ZvalueText: {fileID: 0}
 --- !u!114 &476160561
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1369,6 +1373,8 @@ MonoBehaviour:
   ElbowIKTarget_R: {fileID: 115784500}
   RestIKPosition_L: {fileID: 1789177465}
   RestIKPosition_R: {fileID: 319734461}
+  VelocityMarker_L: {fileID: 0}
+  VelocityMarker_R: {fileID: 0}
   DropCurveX:
     serializedVersion: 2
     m_Curve:

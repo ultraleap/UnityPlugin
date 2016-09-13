@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Leap.Unity;
+using UnityEngine.UI;
 
 namespace Leap.Unity {
   public class WristLeapToIKBlend : HandTransitionBehavior {
@@ -66,7 +67,14 @@ namespace Leap.Unity {
 
     public IKMarkersAssembly m_IKMarkerAssembly;
 
+    [Leap.Unity.Attributes.AutoFind]
+    public LeapHandController leapHandController;
+    public Text ZvalueText;
+
     protected override void Awake() {
+
+
+
       base.Awake();
       animator = transform.root.GetComponentInChildren<Animator>();
       characterRoot = animator.transform;
@@ -138,30 +146,57 @@ namespace Leap.Unity {
       spineLayerTargetWeight = 1f;
     }
     void LateUpdate() {
-      if (Input.GetKey(KeyCode.G)) {
-        animator.SetFloat("forearm_twist_left", 1);
+      if (isTracking) {
+        Quaternion spacedRot = Quaternion.Inverse(leapHandController.transform.rotation) * (handModel.GetLeapHand().Rotation).ToQuaternion();
+        float handRotationZ = spacedRot.z;
+        if (ZvalueText != null) {
+          ZvalueText.text = handRotationZ.ToString();
+        }
+        //if (handRotationZ > 0) {
+          //Debug.Log(handRotationZ);
+          if (Handedness == Chirality.Left) {
+            if (handRotationZ > 0) {
+              animator.SetFloat("forearm_twist_left", 1 - handRotationZ * 1);
+            }
+            if (handRotationZ < 0) {
+              animator.SetFloat("forearm_twist_left", 1 - handRotationZ * 1);
+            }
+          }
+          if (Handedness == Chirality.Right) {
+            if (handRotationZ > 0) {
+              animator.SetFloat("forearm_twist_right", 1 - handRotationZ * 1);
+            }
+            if (handRotationZ < 0) {
+              animator.SetFloat("forearm_twist_out_right", handRotationZ * 1);
+            }
+          }
+        //}
       }
-      else {
-        animator.SetFloat("forearm_twist_left", 0);
-      }
-      if(Input.GetKey(KeyCode.H)) {
-        animator.SetFloat("forearm_twist_out_left", 1);
-      }
-      else {
-        animator.SetFloat("forearm_twist_out_left", 0);
-      }
-      if (Input.GetKey(KeyCode.J)) {
-        animator.SetFloat("forearm_twist_right", 1);
-      }
-      else {
-        animator.SetFloat("forearm_twist_right", 0);
-      }
-      if (Input.GetKey(KeyCode.K)) {
-        animator.SetFloat("forearm_twist_out_right", 1);
-      }
-      else {
-        animator.SetFloat("forearm_twist_out_right", 0);
-      }
+
+      //if (Input.GetKey(KeyCode.G)) {
+      //  animator.SetFloat("forearm_twist_left", 1);
+      //}
+      //else {
+      //  animator.SetFloat("forearm_twist_left", 0);
+      //}
+      //if(Input.GetKey(KeyCode.H)) {
+      //  animator.SetFloat("forearm_twist_out_left", 1);
+      //}
+      //else {
+      //  animator.SetFloat("forearm_twist_out_left", 0);
+      //}
+      //if (Input.GetKey(KeyCode.J)) {
+      //  animator.SetFloat("forearm_twist_right", 1.5f);
+      //}
+      //else {
+      //  animator.SetFloat("forearm_twist_right", 0);
+      //}
+      //if (Input.GetKey(KeyCode.K)) {
+      //  animator.SetFloat("forearm_twist_out_right", 1.5f);
+      //}
+      //else {
+      //  animator.SetFloat("forearm_twist_out_right", 0);
+      //}
       PalmPositionAtLateUpdate = palm.position;
       PalmRotationAtLateUpdate = palm.rotation;
       ElbowMarker.position = Elbow.position;
