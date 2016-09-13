@@ -152,36 +152,34 @@ namespace Leap.Unity {
         Quaternion spacedRot = Quaternion.Inverse(leapHandController.transform.rotation) * (handModel.GetLeapHand().Rotation).ToQuaternion();
         float handRotationZ = spacedRot.z;
         if (ZvalueText != null) {
-          ZvalueText.text = handRotationZ.ToString();
+          ZvalueText.text = handRotationZ.ToString("F2");
         }
         //if (handRotationZ > 0) {
         //Debug.Log(handRotationZ);
         if (Handedness == Chirality.Left) {
           if (handRotationZ > 0) {
             animator.SetFloat("forearm_twist_left", handRotationZ);
-          }
-          else {
-            twistText.text = animator.GetFloat("forearm_twist_right").ToString();
+            //animator.SetFloat("forearm_twist_out_left", 0);
+
           }
           if (handRotationZ < 0) {
             animator.SetFloat("forearm_twist_out_left", handRotationZ);
+            //animator.SetFloat("forearm_twist_left", 0);
+
           }
-          else {
-            outText.text = animator.GetFloat("forearm_twist_out_left").ToString();
-          }
-          twistText.text = animator.GetFloat("forearm_twist_left").ToString();
-          outText.text = animator.GetFloat("forearm_twist_out_left").ToString();
+          twistText.text = animator.GetFloat("forearm_twist_left").ToString("F2");
+          outText.text = animator.GetFloat("forearm_twist_out_left").ToString("F2");
 
         }
         if (Handedness == Chirality.Right) {
           if (handRotationZ > 0) {
-            animator.SetFloat("forearm_twist_right", 1 - handRotationZ * 1);
+            animator.SetFloat("forearm_twist_right", 1 - handRotationZ);
           }
           if (handRotationZ < 0) {
-            animator.SetFloat("forearm_twist_out_right", handRotationZ * 1);
+            animator.SetFloat("forearm_twist_out_right", handRotationZ);
           }
-          twistText.text = animator.GetFloat("forearm_twist_right").ToString();
-          outText.text = animator.GetFloat("forearm_twist_out_right").ToString();
+          twistText.text = animator.GetFloat("forearm_twist_right").ToString("F2");
+          outText.text = animator.GetFloat("forearm_twist_out_right").ToString("F2");
         }
 
         //}
@@ -382,7 +380,7 @@ namespace Leap.Unity {
       UntrackedIKPosition = startPosition;
       float startTime = Time.time;
       float endTime = startTime + ArmDropDuration;
-      float speed = averageIKVelocity.magnitude * .01f;
+      float speed = averageIKVelocity.magnitude * .012f;
       float distanceToTarget = (startPosition - RestIKPosition.position).magnitude;
       if (speed < .01f ) {
         speed = .01f;
