@@ -383,6 +383,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 1928180894}
+  - {fileID: 1063356888}
   m_Father: {fileID: 1805543667}
   m_RootOrder: 0
 --- !u!114 &266907293
@@ -575,10 +576,15 @@ MonoBehaviour:
       inSlope: 0
       outSlope: 0
       tangentMode: 0
+    - time: 0.43564904
+      value: 0.104931876
+      inSlope: 0.85208565
+      outSlope: 0.85208565
+      tangentMode: 0
     - time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -726,7 +732,7 @@ RectTransform:
   m_RootOrder: 0
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.16, y: 0}
+  m_AnchoredPosition: {x: -0.025, y: 0}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &443258328
@@ -761,7 +767,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: Rot Z
 --- !u!222 &443258329
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1493,8 +1499,8 @@ RectTransform:
   - {fileID: 1672003821}
   - {fileID: 1219505722}
   - {fileID: 1716174182}
-  m_Father: {fileID: 1805543667}
-  m_RootOrder: 4
+  m_Father: {fileID: 266907292}
+  m_RootOrder: 1
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
@@ -1754,7 +1760,7 @@ RectTransform:
   m_RootOrder: 4
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.331, y: -0.153}
+  m_AnchoredPosition: {x: 0.23, y: -0.153}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1219505723
@@ -1789,7 +1795,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Right_Twist
+  m_Text: Out
 --- !u!222 &1219505724
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1936,7 +1942,7 @@ RectTransform:
   m_RootOrder: 1
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.331, y: 0}
+  m_AnchoredPosition: {x: 0.23, y: 0}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1399044199
@@ -1971,7 +1977,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: Rot Z
 --- !u!222 &1399044200
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2221,7 +2227,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1603189095
 Transform:
   m_ObjectHideFlags: 0
@@ -2357,7 +2363,7 @@ RectTransform:
   m_RootOrder: 2
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.16, y: -0.068}
+  m_AnchoredPosition: {x: -0.025, y: -0.068}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1626439821
@@ -2392,7 +2398,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Left_Out
+  m_Text: Twist
 --- !u!222 &1626439822
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2463,7 +2469,7 @@ RectTransform:
   m_RootOrder: 3
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.331, y: -0.068}
+  m_AnchoredPosition: {x: 0.23, y: -0.068}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1672003822
@@ -2498,7 +2504,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Right_Twist
+  m_Text: Twist
 --- !u!222 &1672003823
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2569,7 +2575,7 @@ RectTransform:
   m_RootOrder: 5
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.16, y: -0.153}
+  m_AnchoredPosition: {x: -0.025, y: -0.153}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1716174183
@@ -2604,7 +2610,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Left_Out
+  m_Text: Out
 --- !u!222 &1716174184
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2743,7 +2749,6 @@ Transform:
   - {fileID: 2141459593}
   - {fileID: 130856206}
   - {fileID: 728321348}
-  - {fileID: 1063356888}
   m_Father: {fileID: 0}
   m_RootOrder: 1
 --- !u!114 &1805543668

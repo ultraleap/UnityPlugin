@@ -158,7 +158,7 @@ namespace Leap.Unity {
         //Debug.Log(handRotationZ);
         if (Handedness == Chirality.Left) {
           if (handRotationZ > 0) {
-            animator.SetFloat("forearm_twist_left", handRotationZ);
+            animator.SetFloat("forearm_twist_left", 1 - handRotationZ);
             //animator.SetFloat("forearm_twist_out_left", 0);
 
           }
@@ -169,7 +169,6 @@ namespace Leap.Unity {
           }
           twistText.text = animator.GetFloat("forearm_twist_left").ToString("F2");
           outText.text = animator.GetFloat("forearm_twist_out_left").ToString("F2");
-
         }
         if (Handedness == Chirality.Right) {
           if (handRotationZ > 0) {
@@ -240,10 +239,10 @@ namespace Leap.Unity {
       Vector3 palmInAnimatorSpace = characterRoot.InverseTransformPoint(PalmPositionAtLateUpdate);
       distanceShoulderToPalm = (palm.position - Shoulder.transform.position).magnitude;
       if (Handedness == Chirality.Left) {
-        ElbowTargetPosition.x -= distanceShoulderToPalm * .6f;
+        ElbowTargetPosition.x -= distanceShoulderToPalm * .2f;
       }
       if (Handedness == Chirality.Right) {
-        ElbowTargetPosition.x += distanceShoulderToPalm * .6f;
+        ElbowTargetPosition.x += distanceShoulderToPalm * .2f;
       }
       if (Handedness == Chirality.Left && ElbowTargetPosition.x > -.05f) {
         ElbowTargetPosition.x = -.1f;
