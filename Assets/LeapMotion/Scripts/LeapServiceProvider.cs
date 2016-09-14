@@ -37,7 +37,7 @@ namespace Leap.Unity {
     protected LeapDeviceType _overrideDeviceTypeWith = LeapDeviceType.Peripheral;
 
     [Header("Interpolation")]
-    [Tooltip("Interpolate frames to deliver a smoother motion.")]
+    [Tooltip("Interpolate frames to deliver smoother motion.")]
     [SerializeField]
     protected bool _useInterpolation = true;
 
