@@ -63,7 +63,7 @@ namespace Leap.Unity {
     public AnimationCurve DropCurveX;
     public AnimationCurve DropCurveY;
     public AnimationCurve DropCurveZ;
-    public float ArmDropDuration = .25f;
+    public float ArmDropDuration = 1.5f;
 
     public IKMarkersAssembly m_IKMarkerAssembly;
 
@@ -79,6 +79,7 @@ namespace Leap.Unity {
 
       base.Awake();
       animator = transform.root.GetComponentInChildren<Animator>();
+      leapHandController = transform.root.GetComponentInChildren<LeapHandController>();
       characterRoot = animator.transform;
       handModel = transform.GetComponent<HandModel>();
       palm = GetComponent<HandModel>().palm;
