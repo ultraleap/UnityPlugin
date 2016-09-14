@@ -7,7 +7,7 @@ using LeapInternal;
 namespace Leap.Unity.Interaction.CApi {
 
   public enum Version : uint {
-    Current = 0x0103,
+    Current = 0x0200,
     Major = 0xff00, // Any API breaking changes
     Minor = 0x00ff
   }
@@ -180,7 +180,6 @@ namespace Leap.Unity.Interaction.CApi {
   public struct INTERACTION_SCENE_INFO {
     public SceneInfoFlags sceneFlags;
     public LEAP_VECTOR gravity;
-    public float depthUntilSphericalInside;
     public float physicsScale;
     public IntPtr ldatData;
     public UInt32 ldatSize;
