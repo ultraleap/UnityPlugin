@@ -167,8 +167,10 @@ namespace Leap.Unity {
             //animator.SetFloat("forearm_twist_left", 0);
 
           }
-          twistText.text = animator.GetFloat("forearm_twist_left").ToString("F2");
-          outText.text = animator.GetFloat("forearm_twist_out_left").ToString("F2");
+          if (twistText != null && outText != null) {
+            twistText.text = animator.GetFloat("forearm_twist_left").ToString("F2");
+            outText.text = animator.GetFloat("forearm_twist_out_left").ToString("F2");
+          }
         }
         if (Handedness == Chirality.Right) {
           if (handRotationZ > 0) {
@@ -177,9 +179,12 @@ namespace Leap.Unity {
           if (handRotationZ < 0) {
             animator.SetFloat("forearm_twist_out_right", handRotationZ);
           }
-          twistText.text = animator.GetFloat("forearm_twist_right").ToString("F2");
-          outText.text = animator.GetFloat("forearm_twist_out_right").ToString("F2");
+          if (twistText != null && outText != null) {
+            twistText.text = animator.GetFloat("forearm_twist_right").ToString("F2");
+            outText.text = animator.GetFloat("forearm_twist_out_right").ToString("F2");
+          }
         }
+
 
         //}
       }
