@@ -379,7 +379,7 @@ namespace Leap.Unity {
       UntrackedIKPosition = startPosition;
       float startTime = Time.time;
       float endTime = startTime + ArmDropDuration;
-      float speed = averageIKVelocity.magnitude * .012f;
+      float speed = averageIKVelocity.magnitude * .01f;
       float distanceToTarget = (startPosition - RestIKPosition.position).magnitude;
       if (speed < .01f ) {
         speed = .01f;
