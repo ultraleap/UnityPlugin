@@ -389,12 +389,22 @@ namespace Leap.Unity {
     
       while (Time.time <= endTime) {
         float t = (Time.time - startTime) / ArmDropDuration;
-        UntrackedIKPosition = Vector3.MoveTowards(UntrackedIKPosition, VelocityMarker.position, speed);
         //VelocityMarker.position = Vector3.Lerp(iKVelocitySnapShot, RestIKPosition.position, DropCurveX.Evaluate(t * 2));
         float lerpedPositionX = Mathf.Lerp(iKVelocitySnapShot.x, RestIKPosition.position.x, DropCurveX.Evaluate(t * 2));
         float lerpedPositionY = Mathf.Lerp(iKVelocitySnapShot.y, RestIKPosition.position.y, DropCurveY.Evaluate(t * 2));
         float lerpedPositionZ = Mathf.Lerp(iKVelocitySnapShot.z, RestIKPosition.position.z, DropCurveZ.Evaluate(t * 2));
-        VelocityMarker.position = new Vector3(lerpedPositionX, lerpedPositionY, lerpedPositionZ);
+        Vector3 newMarkerPosition = new Vector3(lerpedPositionX, lerpedPositionY, lerpedPositionZ);
+        if (characterRoot.InverseTransformPoint(newMarkerPosition).z < characterRoot.InverseTransformPoint(Hips.position).z + .5f) {
+          if (Handedness == Chirality.Left && characterRoot.InverseTransformPoint(newMarkerPosition).x > characterRoot.InverseTransformPoint(Hips.position).x + .2f) {
+            newMarkerPosition.z = characterRoot.InverseTransformPoint(Hips.position).z + .5f;
+          }
+          if (Handedness == Chirality.Right && characterRoot.InverseTransformPoint(newMarkerPosition).x < characterRoot.InverseTransformPoint(Hips.position).x + .2f) {
+            newMarkerPosition.z = characterRoot.InverseTransformPoint(Hips.position).z + .5f;
+          }
+        }
+        VelocityMarker.position = newMarkerPosition;
+        UntrackedIKPosition = Vector3.MoveTowards(UntrackedIKPosition, VelocityMarker.position, speed);
+
         yield return null;
       }
     }
