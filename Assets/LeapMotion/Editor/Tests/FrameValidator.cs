@@ -112,6 +112,13 @@ namespace Leap.Unity.Tests {
       }
     }
 
+    [Test]
+    public void RotationIsValid() {
+      foreach (Hand hand in _frame.Hands) {
+        Assert.That(hand.Rotation.IsValid());
+      }
+    }
+
     protected Bone getBone(Hand hand, Finger.FingerType fingerType, Bone.BoneType boneType) {
       if (boneType < 0 || (int)boneType >= 4) {
         return null;

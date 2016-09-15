@@ -5,7 +5,7 @@ using System.Collections;
 namespace Leap.Unity {
   public class FpsLabel : MonoBehaviour {
     public LeapProvider Provider;
-  	public Text frameRateText;
+  	public TextMesh frameRateText;
     private float fps;
 
   	void Update () {

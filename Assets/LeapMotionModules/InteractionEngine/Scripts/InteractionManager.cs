@@ -63,10 +63,6 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _graspingEnabled = true;
 
-    [Tooltip("Depth before collision response becomes as if holding a sphere.")]
-    [SerializeField]
-    protected float _depthUntilSphericalInside = 0.023f;
-
     [Tooltip("Objects within this radius of a hand will be considered for interaction.")]
     [SerializeField]
     protected float _activationRadius = 0.15f;
@@ -283,19 +279,6 @@ namespace Leap.Unity.Interaction {
           _graspingEnabled = value;
           UpdateSceneInfo();
         }
-      }
-    }
-
-    /// <summary>
-    /// Depth before collision response becomes as if holding a sphere..
-    /// </summary>
-    public float DepthUntilSphericalInside {
-      get {
-        return _depthUntilSphericalInside;
-      }
-      set {
-        _depthUntilSphericalInside = value;
-        UpdateSceneInfo();
       }
     }
 
@@ -1109,11 +1092,6 @@ namespace Leap.Unity.Interaction {
       if (Physics.gravity.sqrMagnitude != 0.0f) {
         info.sceneFlags |= SceneInfoFlags.HasGravity;
         info.gravity = Physics.gravity.ToCVector();
-      }
-
-      if (_depthUntilSphericalInside > 0.0f) {
-        info.sceneFlags |= SceneInfoFlags.SphericalInside;
-        info.depthUntilSphericalInside = _depthUntilSphericalInside;
       }
 
       if (_contactEnabled) {

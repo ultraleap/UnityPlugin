@@ -30,6 +30,7 @@ namespace Leap.Unity.Interaction {
     public static LEAP_HAND CreateHand(Hand hand) {
       LEAP_HAND leapHand = new LEAP_HAND();
       leapHand.id = (uint)hand.Id;
+      leapHand.flags = 0;
       leapHand.type = hand.IsLeft ? eLeapHandType.eLeapHandType_Right : eLeapHandType.eLeapHandType_Left; //HACK: flip due to coordinate space handedness
       leapHand.confidence = hand.Confidence;
       leapHand.visible_time = (uint)(hand.TimeVisible * 1000);
@@ -45,6 +46,7 @@ namespace Leap.Unity.Interaction {
       palm.normal = new LEAP_VECTOR(hand.PalmNormal);
       palm.width = hand.PalmWidth;
       palm.direction = new LEAP_VECTOR(hand.Direction);
+      palm.orientation = new LEAP_QUATERNION(hand.Rotation);
 
       leapHand.palm = palm;
       leapHand.arm = CreateBone(hand.Arm);

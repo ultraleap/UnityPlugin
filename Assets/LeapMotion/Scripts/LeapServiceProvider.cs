@@ -13,8 +13,6 @@ namespace Leap.Unity {
     protected const float NS_TO_S = 1e-6f;
     /** Conversion factor for seconds to nanoseconds. */
     protected const float S_TO_NS = 1e6f;
-    /** How much smoothing to use when calculating the FixedUpdate offset. */
-    protected const float FIXED_UPDATE_OFFSET_SMOOTHING_DELAY = 0.1f;
 
     [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
     [SerializeField]
@@ -39,17 +37,17 @@ namespace Leap.Unity {
     protected LeapDeviceType _overrideDeviceTypeWith = LeapDeviceType.Peripheral;
 
     [Header("Interpolation")]
-    [Tooltip("Interpolate frames to deliver a potentially smoother experience.  Currently experimental.")]
+    [Tooltip("Interpolate frames to deliver smoother motion.")]
     [SerializeField]
-    protected bool _useInterpolation = false;
+    protected bool _useInterpolation = true;
 
-    [Tooltip("How much delay should be added to interpolation.  A non-zero amount is needed to prevent extrapolation artifacts.")]
-    [SerializeField]
-    protected long _interpolationDelay = 15;
+    [Tooltip("How much delay should be added to interpolation.")]
+    protected long _interpolationDelay = 0;
 
     protected Controller leap_controller_;
 
     protected SmoothedFloat _fixedOffset = new SmoothedFloat();
+    protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
 
     protected Frame _untransformedUpdateFrame;
     protected Frame _transformedUpdateFrame;
@@ -58,8 +56,6 @@ namespace Leap.Unity {
     protected Frame _transformedFixedFrame;
 
     protected Image _currentImage;
-
-    private ClockCorrelator clockCorrelator;
 
     public override Frame CurrentFrame {
       get {
@@ -142,7 +138,7 @@ namespace Leap.Unity {
 
         // TODO: Add baseline & offset when included in API
         // NOTE: Alternative is to use device type since all parameters are invariant
-        info.isEmbedded = devices[0].IsEmbedded;
+        info.isEmbedded = devices[0].Type != Device.DeviceType.TYPE_PERIPHERAL;
         info.horizontalViewAngle = devices[0].HorizontalViewAngle * Mathf.Rad2Deg;
         info.verticalViewAngle = devices[0].VerticalViewAngle * Mathf.Rad2Deg;
         info.trackingRange = devices[0].Range / 1000f;
@@ -160,8 +156,8 @@ namespace Leap.Unity {
     }
 
     protected virtual void Awake() {
-      clockCorrelator = new ClockCorrelator();
       _fixedOffset.delay = 0.4f;
+      _smoothedTrackingLatency.SetBlend(0.01f, 0.0111f);
     }
 
     protected virtual void Start() {
@@ -170,16 +166,6 @@ namespace Leap.Unity {
       _transformedFixedFrame = new Frame();
       _untransformedUpdateFrame = new Frame();
       _untransformedFixedFrame = new Frame();
-      StartCoroutine(waitCoroutine());
-    }
-
-    protected IEnumerator waitCoroutine() {
-      WaitForEndOfFrame endWaiter = new WaitForEndOfFrame();
-      while (true) {
-        yield return endWaiter;
-        Int64 unityTime = (Int64)(Time.time * 1e6);
-        clockCorrelator.UpdateRebaseEstimate(unityTime);
-      }
     }
 
     protected virtual void Update() {
@@ -194,11 +180,14 @@ namespace Leap.Unity {
       _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
       if (_useInterpolation) {
-        Int64 unityTime = (Int64)(Time.time * 1e6);
-        Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
-        Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
-
-        leap_controller_.GetInterpolatedFrame(_untransformedUpdateFrame, leapFrameTime);
+#if UNITY_ANDROID
+        Int64 time = leap_controller_.Now() - (_interpolationDelay+16) * 1000;
+        leap_controller_.GetInterpolatedFrame(_untransformedUpdateFrame, time);
+#else
+        _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 25000f);
+        _smoothedTrackingLatency.Update((float)(leap_controller_.Now() - leap_controller_.FrameTimestamp()), Time.deltaTime);
+        leap_controller_.GetInterpolatedFrame(_untransformedUpdateFrame, leap_controller_.Now() - (long)_smoothedTrackingLatency.value - (_interpolationDelay * 1000));
+#endif
       } else {
         leap_controller_.Frame(_untransformedUpdateFrame);
       }
@@ -217,11 +206,14 @@ namespace Leap.Unity {
       }
 
       if (_useInterpolation) {
-        Int64 unityTime = (Int64)((Time.fixedTime + _fixedOffset.value) * 1e6);
-        Int64 unityOffsetTime = unityTime - _interpolationDelay * 1000;
-        Int64 leapFrameTime = clockCorrelator.ExternalClockToLeapTime(unityOffsetTime);
-
-        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, leapFrameTime);
+#if UNITY_ANDROID
+        Int64 time = leap_controller_.Now() - (_interpolationDelay+16) * 1000;
+        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, time);
+#else
+        _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 25000f);
+        _smoothedTrackingLatency.Update((float)(leap_controller_.Now() - leap_controller_.FrameTimestamp()), Time.deltaTime);
+        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, leap_controller_.Now() - (long)_smoothedTrackingLatency.value - (_interpolationDelay * 1000));
+#endif
       } else {
         leap_controller_.Frame(_untransformedFixedFrame);
       }
