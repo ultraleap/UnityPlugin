@@ -73,10 +73,9 @@ namespace Leap.Unity {
     public Text twistText;
     public Text outText;
 
+    private bool isLerping;
+
     protected override void Awake() {
-
-
-
       base.Awake();
       animator = transform.root.GetComponentInChildren<Animator>();
       leapHandController = transform.root.GetComponentInChildren<LeapHandController>();
@@ -351,7 +350,12 @@ namespace Leap.Unity {
     private void UntrackedIKHandling() {
       if (Handedness == Chirality.Left) {
         animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, positionIKWeight);
-        animator.SetIKPosition(AvatarIKGoal.LeftHand, UntrackedIKPosition);
+        if (isLerping) {
+          animator.SetIKPosition(AvatarIKGoal.LeftHand, UntrackedIKPosition);
+        }
+        else {
+          animator.SetIKPosition(AvatarIKGoal.LeftHand, RestIKPosition.position);
+        }
         animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, rotationIKWeight);
         animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
         animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, elbowIKWeight);
@@ -359,7 +363,12 @@ namespace Leap.Unity {
       }
       if (Handedness == Chirality.Right) {
         animator.SetIKPositionWeight(AvatarIKGoal.RightHand, positionIKWeight);
-        animator.SetIKPosition(AvatarIKGoal.RightHand, UntrackedIKPosition);
+        if (isLerping) {
+          animator.SetIKPosition(AvatarIKGoal.RightHand, UntrackedIKPosition);
+        }
+        else {
+          animator.SetIKPosition(AvatarIKGoal.RightHand, RestIKPosition.position);
+        }        
         animator.SetIKRotationWeight(AvatarIKGoal.RightHand, rotationIKWeight);
         animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
         animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, elbowIKWeight);
@@ -382,6 +391,7 @@ namespace Leap.Unity {
     }
 
     private IEnumerator MoveTowardWithVelocity(Vector3 startPosition){
+      isLerping = true;
       UntrackedIKPosition = startPosition;
       float startTime = Time.time;
       float endTime = startTime + ArmDropDuration;
@@ -410,9 +420,9 @@ namespace Leap.Unity {
         }
         VelocityMarker.position = newMarkerPosition;
         UntrackedIKPosition = Vector3.MoveTowards(UntrackedIKPosition, VelocityMarker.position, speed);
-
         yield return null;
       }
+      isLerping = false;
     }
 
     public override void OnSetup() {
