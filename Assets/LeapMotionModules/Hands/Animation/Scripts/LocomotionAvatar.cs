@@ -26,11 +26,14 @@ namespace Leap.Unity {
       distanceToRoot = flatCamPosition - flatRootPosition;
       speed = distanceToRoot.magnitude;
       //Debug.Log(speed);
-
-      Vector3 CameraDirection = Camera.main.transform.forward;
+      
+      // Get camera rotation.    
+      Vector3 CameraDirection = transform.InverseTransformPoint( Camera.main.transform.forward);
       CameraDirection.y = 0.0f;
-      Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, transform.forward);
-      Vector3 moveDirection = referentialShift *  CameraDirection;
+      Quaternion referentialShift = Quaternion.FromToRotation(transform.forward, CameraDirection);
+      
+      // Convert joystick input in Worldspace coordinates
+      Vector3 moveDirection = referentialShift * CameraDirection;
 
       if (speed > .01f) {
         Vector3 axis = Vector3.Cross(rootDirection, moveDirection);
@@ -43,8 +46,6 @@ namespace Leap.Unity {
      
       if (animator && Camera.main) {
         //JoystickToEvents.Do(transform, Camera.main.transform, ref speed, ref direction);
-        //locomotion.Do(speed * 1, direction * 180);
-
         locomotion.Do(speed * 10f, direction * 180);
       }
     }
