@@ -54,7 +54,7 @@ namespace Leap.Unity.Attributes {
 
       for (int j = 0; j < scripts.Length; j++) {
         MonoBehaviour script = scripts[j];
-        
+
         SerializedObject sObj = new SerializedObject(script);
         SerializedProperty it = sObj.GetIterator();
 
@@ -68,6 +68,8 @@ namespace Leap.Unity.Attributes {
           KeyValuePair<AutoFindAttribute, FieldInfo> info;
           if (!cache.TryGetValue(key, out info)) {
             FieldInfo field = scriptType.GetField(it.name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+            if (field == null) continue;
+
             object[] attributes = field.GetCustomAttributes(typeof(AutoFindAttribute), true);
 
             if (attributes.Length == 0) {
