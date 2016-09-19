@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Leap.Unity {
 
@@ -32,12 +33,14 @@ namespace Leap.Unity {
     
     public override string ToString() {
       StringBuilder toReturn = new StringBuilder();
+      List<TKey> keys = Keys.ToList<TKey>();
+      List<TValue> values = Values.ToList<TValue>();
       toReturn.Append("[");
-      for (int i = 0; i < _keys.Count; i++) {
+      for (int i = 0; i < keys.Count; i++) {
         toReturn.Append("{");
-        toReturn.Append(_keys[i].ToString());
+        toReturn.Append(keys[i].ToString());
         toReturn.Append(" : ");
-        toReturn.Append(_values[i].ToString());
+        toReturn.Append(values[i].ToString());
         toReturn.Append("}, \n");
       }
       toReturn.Remove(toReturn.Length-3, 3);
