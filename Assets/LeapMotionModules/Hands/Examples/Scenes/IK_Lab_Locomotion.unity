@@ -215,7 +215,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wristLeapToIKBlend_L: {fileID: 1126655353}
   wristLeapToIKBlend_R: {fileID: 334745007}
---- !u!114 &130856211
+--- !u!114 &130856210
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -223,9 +223,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 130856205}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72cc7364eecefa34c87df4d2db6e17b9, type: 3}
+  m_Script: {fileID: 11500000, guid: 80ed4fcf91d801c4a9979689d2e13e1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  LMRig: {fileID: 0}
 --- !u!1 &149310061 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 100162, guid: 0efff3089713e0d41adbb35a1a06b1c1, type: 3}

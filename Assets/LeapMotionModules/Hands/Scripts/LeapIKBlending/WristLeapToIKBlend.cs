@@ -78,7 +78,7 @@ namespace Leap.Unity {
     protected override void Awake() {
       base.Awake();
       animator = transform.root.GetComponentInChildren<Animator>();
-      leapHandController = transform.root.GetComponentInChildren<LeapHandController>();
+      leapHandController = GameObject.FindObjectOfType<LeapHandController>();
       characterRoot = animator.transform;
       handModel = transform.GetComponent<HandModel>();
       palm = GetComponent<HandModel>().palm;

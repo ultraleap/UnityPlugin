@@ -10,8 +10,8 @@ public class Locomotion
     private int m_DirectionId = 0;
 
     public float m_SpeedDampTime = 0.1f;
-    public float m_AnguarSpeedDampTime = 5.25f;
-    public float m_DirectionResponseTime = 5.2f;
+    public float m_AnguarSpeedDampTime = 0.25f;
+    public float m_DirectionResponseTime = 0.2f;
     
     public Locomotion(Animator animator)
     {
@@ -39,7 +39,7 @@ public class Locomotion
 
         float angularSpeed = direction / m_DirectionResponseTime;
         
-        m_Animator.SetFloat(m_SpeedId, 0, speedDampTime, Time.deltaTime);
+        m_Animator.SetFloat(m_SpeedId, speed, speedDampTime, Time.deltaTime);
         m_Animator.SetFloat(m_AgularSpeedId, angularSpeed, angularSpeedDampTime, Time.deltaTime);
         m_Animator.SetFloat(m_DirectionId, direction, directionDampTime, Time.deltaTime);      
     }	
