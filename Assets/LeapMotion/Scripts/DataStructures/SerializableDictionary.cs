@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Text;
 using System.Collections.Generic;
 
 namespace Leap.Unity {
@@ -28,6 +29,21 @@ namespace Leap.Unity {
 
     [SerializeField]
     private List<TValue> _values;
+    
+    public override string ToString() {
+      StringBuilder toReturn = new StringBuilder();
+      toReturn.Append("[");
+      for (int i = 0; i < _keys.Count; i++) {
+        toReturn.Append("{");
+        toReturn.Append(_keys[i].ToString());
+        toReturn.Append(" : ");
+        toReturn.Append(_values[i].ToString());
+        toReturn.Append("}, \n");
+      }
+      toReturn.Remove(toReturn.Length-3, 3);
+      toReturn.Append("]");
+      return toReturn.ToString();
+    }
 
     public void OnAfterDeserialize() {
       Clear();
