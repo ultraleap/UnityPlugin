@@ -24,7 +24,7 @@ public class Locomotion
 
     public void Do(float speed, float direction)
     {
-      Debug.Log("Locomotion.direction: " + direction + " | Locomotion.speed: " + speed);
+      //Debug.Log("Locomotion.direction: " + direction + " | Locomotion.speed: " + speed);
       
       AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0);
       

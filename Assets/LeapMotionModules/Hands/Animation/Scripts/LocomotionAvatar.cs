@@ -21,7 +21,7 @@ namespace Leap.Unity {
       rootDirection = transform.forward;
     }
     void Update() {
-      rootDirection = transform.forward;
+      rootDirection = transform.forward + transform.position;
       Vector3 flatCamPosition = transform.InverseTransformPoint(Camera.main.transform.position);
       flatCamPosition.y = 0;
       flatCamPosition.x = 0;
@@ -39,7 +39,7 @@ namespace Leap.Unity {
 
       
       // Get camera rotation.    
-      Vector3 CameraDirection = transform.InverseTransformPoint( Camera.main.transform.forward);
+      Vector3 CameraDirection = transform.InverseTransformDirection( Camera.main.transform.forward);
       CameraDirection.y = 0.0f;
       Quaternion referentialShift = Quaternion.FromToRotation(transform.forward, CameraDirection);
       
@@ -54,19 +54,23 @@ namespace Leap.Unity {
       else {
         speed = 0.0f;
       }
-      Debug.Log(direction * 180);
-      Debug.Log("transform.forward: " + transform.forward);
+      speed = 0;// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      //Debug.Log(direction * 180);
+      Debug.Log(" = = = = = = = = = = = = = = = = = = = = = = = = =");
+      Debug.Log("transform.forward: " + transform.forward + "| CamDirection: " + CameraDirection);
+      Debug.Log("referentialShift: " + referentialShift);
+      Debug.Log("rootDirection: " + rootDirection + " | moveDirection: " + moveDirection);
 
       float joySpeed = 0;
       float joyDirection = 0;
       if (animator && Camera.main) {
         JoystickToEvents.Do(transform, Camera.main.transform, ref joySpeed, ref joyDirection);
-        speed += joySpeed;
-        if (joyDirection != 0) {
-          direction = joyDirection;
+        if (joyDirection != 0 || joyDirection != 0) {
+          //direction = joyDirection;
+          speed = joySpeed;
         }
 
-        locomotion.Do(speed * 10f, (direction * 180)/2);
+        locomotion.Do(speed * 10f, (direction * 180));
       }
     }
 
