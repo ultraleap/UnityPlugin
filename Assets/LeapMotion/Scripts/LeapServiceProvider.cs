@@ -5,6 +5,7 @@ using UnityEditor;
 using System;
 using System.Collections;
 using Leap.Unity.Attributes;
+using Leap.Unity.Graphing;
 
 namespace Leap.Unity {
   /**LeapServiceProvider creates a Controller and supplies Leap Hands and images */
@@ -46,6 +47,9 @@ namespace Leap.Unity {
 
     protected Controller leap_controller_;
 
+    protected bool manualUpdateHasBeenCalledSinceUpdate;
+    protected Vector3 warpedPosition;
+    protected Quaternion warpedRotation;
     protected SmoothedFloat _fixedOffset = new SmoothedFloat();
     protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
 
@@ -55,7 +59,12 @@ namespace Leap.Unity {
     protected Frame _untransformedFixedFrame;
     protected Frame _transformedFixedFrame;
 
+    protected Frame _untransformedPreCullFrame;
+    protected Frame _transformedPreCullFrame;
+
     protected Image _currentImage;
+
+    protected Matrix4x4[] _transformArray = new Matrix4x4[6];
 
     public override Frame CurrentFrame {
       get {
@@ -164,8 +173,10 @@ namespace Leap.Unity {
       createController();
       _transformedUpdateFrame = new Frame();
       _transformedFixedFrame = new Frame();
+      _transformedPreCullFrame = new Frame();
       _untransformedUpdateFrame = new Frame();
       _untransformedFixedFrame = new Frame();
+      _untransformedPreCullFrame = new Frame();
     }
 
     protected virtual void Update() {
@@ -197,6 +208,7 @@ namespace Leap.Unity {
 
         DispatchUpdateFrameEvent(_transformedUpdateFrame);
       }
+      manualUpdateHasBeenCalledSinceUpdate = false;
     }
 
     protected virtual void FixedUpdate() {
@@ -221,6 +233,19 @@ namespace Leap.Unity {
 
         DispatchFixedFrameEvent(_transformedFixedFrame);
       }
+    }
+
+    public void ManuallyUpdateFrame(long temporalOffset = 0) {
+      if (_useInterpolation) {
+        leap_controller_.GetInterpolatedFrame(_untransformedPreCullFrame, leap_controller_.Now() - (long)_smoothedTrackingLatency.value - ((_interpolationDelay + temporalOffset) * 1000));
+      } else {
+        leap_controller_.Frame(_untransformedPreCullFrame);
+      }
+
+      if (_untransformedPreCullFrame != null) {
+        transformFrame(_untransformedPreCullFrame, _transformedPreCullFrame, false);
+      }
+      manualUpdateHasBeenCalledSinceUpdate = true;
     }
 
     protected virtual void OnDestroy() {
@@ -288,14 +313,13 @@ namespace Leap.Unity {
       leap_controller_.Device -= onHandControllerConnect;
     }
 
-    protected void transformFrame(Frame source, Frame dest) {
+    protected void transformFrame(Frame source, Frame dest, bool resampleTemporalWarping = true) {
       LeapTransform leapTransform;
       if (_temporalWarping != null) {
-        Vector3 warpedPosition;
-        Quaternion warpedRotation;
-        _temporalWarping.TryGetWarpedTransform(LeapVRTemporalWarping.WarpedAnchor.CENTER, out warpedPosition, out warpedRotation, source.Timestamp);
-
-        warpedRotation = warpedRotation * transform.localRotation;
+        if (resampleTemporalWarping) {
+          _temporalWarping.TryGetWarpedTransform(LeapVRTemporalWarping.WarpedAnchor.CENTER, out warpedPosition, out warpedRotation, source.Timestamp);
+          warpedRotation = warpedRotation * transform.localRotation;
+        }
 
         leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), transform.lossyScale.ToVector() * 1e-3f);
         leapTransform.MirrorZ();
@@ -304,6 +328,67 @@ namespace Leap.Unity {
       }
 
       dest.CopyFrom(source).Transform(leapTransform);
+    }
+
+    //Late-Latching Functions
+    protected virtual void OnEnable() {
+      Camera.onPreCull -= LateUpdateHandTransforms;
+      Camera.onPreCull += LateUpdateHandTransforms;
+      _transformArray = new Matrix4x4[6];
+      Shader.SetGlobalMatrixArray("_handTransforms", _transformArray);
+    }
+
+    protected virtual void OnDisable() {
+      Camera.onPreCull -= LateUpdateHandTransforms;
+      _transformArray = new Matrix4x4[6];
+      Shader.SetGlobalMatrixArray("_handTransforms", _transformArray);
+    }
+
+    public void LateUpdateHandTransforms(Camera camera) {
+      if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.BeginSample("Vertex Offset", RealtimeGraph.GraphUnits.Miliseconds); }
+
+#if UNITY_EDITOR
+      //Hard-coded name of the camera used to generate the pre-render view
+      if (camera.gameObject.name == "PreRenderCamera") {
+        return;
+      }
+
+      bool isScenePreviewCamera = camera.gameObject.hideFlags == HideFlags.HideAndDontSave;
+      if (isScenePreviewCamera) {
+        return;
+      }
+#endif
+
+      if (Application.isPlaying) {
+        if (!manualUpdateHasBeenCalledSinceUpdate) {
+          //Add back the latency we gain by late latch to match the game latency (but increase smoothness)
+          long interpolationAmount = 160;// (long)((Time.smoothDeltaTime / Time.timeScale) * 1000f);
+          ManuallyUpdateFrame(interpolationAmount);
+        }
+
+        if (_transformedPreCullFrame != null) {
+          for (int i = 0; i < _transformedPreCullFrame.Hands.Count; i++) {
+            Hand preCullHand = _transformedPreCullFrame.Hands[i];
+            Hand updateHand = _transformedUpdateFrame.Hand(preCullHand.Id);
+
+            if (preCullHand != null && updateHand != null) {
+              if (!_transformedPreCullFrame.Hands[i].IsLeft) {
+                _transformArray[0] = Matrix4x4.TRS(preCullHand.PalmPosition.ToVector3() - updateHand.PalmPosition.ToVector3(), Quaternion.identity, Vector3.one); //Step Three: Offset the model in worldspace
+                _transformArray[1] = Matrix4x4.TRS(new Vector3(0.05f, 0f, 0f), Quaternion.Inverse(updateHand.Rotation.ToQuaternion()) * preCullHand.Rotation.ToQuaternion(), Vector3.one); //Step Two: Rotate the model around the palm and translate back to wrist.
+                _transformArray[2] = Matrix4x4.TRS(new Vector3(-0.05f, 0f, 0f), Quaternion.identity, Vector3.one); //Step One: Translate wrist to palm (rotation pivot) 
+              } else {
+                _transformArray[3] = Matrix4x4.TRS(preCullHand.PalmPosition.ToVector3() - updateHand.PalmPosition.ToVector3(), Quaternion.identity, Vector3.one); //Step Three: Offset the model in worldspace
+                _transformArray[4] = Matrix4x4.TRS(new Vector3(-0.05f, 0f, 0f), Quaternion.Inverse(updateHand.Rotation.ToQuaternion()) * preCullHand.Rotation.ToQuaternion(), Vector3.one); //Step Two: Rotate the model around the palm and translate back to wrist.
+                _transformArray[5] = Matrix4x4.TRS(new Vector3(0.05f, 0f, 0f), Quaternion.identity, Vector3.one); //Step One: Translate wrist to palm (rotation pivot) 
+              }
+            }
+          }
+        }
+
+        Shader.SetGlobalMatrixArray("_handTransforms", _transformArray);
+
+      }
+      if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.EndSample(); }
     }
   }
 }
