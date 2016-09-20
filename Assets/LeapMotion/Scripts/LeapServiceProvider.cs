@@ -374,12 +374,12 @@ namespace Leap.Unity {
             if (preCullHand != null && updateHand != null) {
               if (!_transformedPreCullFrame.Hands[i].IsLeft) {
                 _transformArray[0] = Matrix4x4.TRS(preCullHand.PalmPosition.ToVector3() - updateHand.PalmPosition.ToVector3(), Quaternion.identity, Vector3.one); //Step Three: Offset the model in worldspace
-                _transformArray[1] = Matrix4x4.TRS(new Vector3(0.05f, 0f, 0f), Quaternion.Inverse(updateHand.Rotation.ToQuaternion()) * preCullHand.Rotation.ToQuaternion(), Vector3.one); //Step Two: Rotate the model around the palm and translate back to wrist.
-                _transformArray[2] = Matrix4x4.TRS(new Vector3(-0.05f, 0f, 0f), Quaternion.identity, Vector3.one); //Step One: Translate wrist to palm (rotation pivot) 
+                _transformArray[1] = Matrix4x4.TRS(new Vector3(0.05f, 0f, 0f), Quaternion.Euler(0f, 90f, 0f) * (Quaternion.Inverse(updateHand.Rotation.ToQuaternion()) * preCullHand.Rotation.ToQuaternion()), Vector3.one); //Step Two: Rotate the model around the palm and translate back to wrist.
+                _transformArray[2] = Matrix4x4.TRS(new Vector3(0f, 0f, -0.05f), Quaternion.Euler(0f, -90f, 0f), Vector3.one); //Step One: Translate wrist to palm (rotation pivot) 
               } else {
                 _transformArray[3] = Matrix4x4.TRS(preCullHand.PalmPosition.ToVector3() - updateHand.PalmPosition.ToVector3(), Quaternion.identity, Vector3.one); //Step Three: Offset the model in worldspace
-                _transformArray[4] = Matrix4x4.TRS(new Vector3(-0.05f, 0f, 0f), Quaternion.Inverse(updateHand.Rotation.ToQuaternion()) * preCullHand.Rotation.ToQuaternion(), Vector3.one); //Step Two: Rotate the model around the palm and translate back to wrist.
-                _transformArray[5] = Matrix4x4.TRS(new Vector3(0.05f, 0f, 0f), Quaternion.identity, Vector3.one); //Step One: Translate wrist to palm (rotation pivot) 
+                _transformArray[4] = Matrix4x4.TRS(new Vector3(-0.05f, 0f, 0f), Quaternion.Euler(0f,90f,0f)*(Quaternion.Inverse(updateHand.Rotation.ToQuaternion()) * preCullHand.Rotation.ToQuaternion()), Vector3.one); //Step Two: Rotate the model around the palm and translate back to wrist.
+                _transformArray[5] = Matrix4x4.TRS(new Vector3(0f, 0f, 0.05f), Quaternion.Euler(0f, -90f, 0f), Vector3.one); //Step One: Translate wrist to palm (rotation pivot) 
               }
             }
           }
