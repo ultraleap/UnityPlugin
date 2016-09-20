@@ -220,8 +220,7 @@ namespace Leap.Unity {
       //}
       PalmPositionAtLateUpdate = palm.position;
       PalmRotationAtLateUpdate = palm.rotation;
-      ElbowMarker.position = Elbow.position;
-      ElbowMarker.rotation = Elbow.rotation;
+
 
       shoulder_up_weight = Mathf.Lerp(shoulder_up_weight, shoulder_up_target_weight, .4f);
       shoulder_forward_weight = Mathf.Lerp(shoulder_forward_weight, shoulder_forward_target_weight, .1f);
@@ -284,6 +283,8 @@ namespace Leap.Unity {
     }
 
     public void OnAnimatorIK(int layerIndex) {
+      ElbowMarker.position = Elbow.position;
+      ElbowMarker.rotation = Elbow.rotation;
       //turn off elbow hint if hand close to shoulder
       if (distanceShoulderToPalm < .1f) {
         elbowIKTargetWeight = 0;
