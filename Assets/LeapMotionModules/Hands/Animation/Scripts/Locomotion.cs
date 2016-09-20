@@ -23,9 +23,7 @@ public class Locomotion
     }
 
     public void Do(float speed, float direction)
-    {
-      //Debug.Log("Locomotion.direction: " + direction + " | Locomotion.speed: " + speed);
-      
+    {      
       AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0);
       
         bool inTransition = m_Animator.IsInTransition(0);

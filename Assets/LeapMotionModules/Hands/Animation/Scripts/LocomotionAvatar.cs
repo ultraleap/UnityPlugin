@@ -11,10 +11,12 @@ namespace Leap.Unity {
     
     private Vector3 distanceToRoot;
     private Vector3 rootDirection;
-
     public Transform LMRig;
 
-    // Use this for initialization
+    void Awake() {
+      LMRig = GameObject.FindObjectOfType<LeapHandController>().transform.root;
+    }
+    
     void Start() {
       animator = GetComponent<Animator>();
       locomotion = new Locomotion(animator);
@@ -23,21 +25,11 @@ namespace Leap.Unity {
     void Update() {
       Vector3 flatCamPosition = transform.InverseTransformPoint(Camera.main.transform.position);
       flatCamPosition.y = 0;
-      //flatCamPosition.x = 0;
       Vector3 flatRootPosition = transform.InverseTransformPoint(transform.position);
       flatRootPosition.y = 0;
-      //flatRootPosition.x = 0;
       distanceToRoot = flatCamPosition - flatRootPosition;
       speed = distanceToRoot.magnitude;
-      //float ZForwardSpeed = flatCamPosition.z - flatRootPosition.z;
-      //if (ZForwardSpeed < 0) {
-      //  speed = 0;
-      //}
 
-      //Debug.Log("speed: " + speed);
-      //Debug.Log("ZForwardSpeed: " + ZForwardSpeed);
-
-      
       // Get camera rotation.
       rootDirection = transform.forward;// +transform.position;
       Vector3 CameraDirection = Camera.main.transform.forward;
@@ -49,19 +41,11 @@ namespace Leap.Unity {
       //Vector3 moveDirection = referentialShift * CameraDirection;
       Vector3 axis = Vector3.Cross(rootDirection, moveDirection);
       direction = Vector3.Angle(rootDirection, moveDirection) / 180f * (axis.y < 0 ? -1 : 1);
-      if (speed > .01f) {
-        //Debug.Log("Speed > .01: " + speed);
+      if (speed > .01f) { //Dead "stick"
       }
       else {
         speed = 0.0f;
       }
-      //speed = 0;// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      Debug.Log("LocomotionAvatar.direction: " + direction * 180);
-      //Debug.Log(" = = = = = = = = = = = = = = = = = = = = = = = = =");
-      //Debug.Log("transform.forward: " + transform.forward + "| CamDirection: " + CameraDirection);
-      //Debug.Log("referentialShift: " + referentialShift);
-      //Debug.Log("rootDirection: " + rootDirection + " | moveDirection: " + moveDirection);
-
       float joySpeed = 0;
       float joyDirection = 0;
       if (animator && Camera.main) {
@@ -70,10 +54,8 @@ namespace Leap.Unity {
           //direction += joyDirection;
           speed += joySpeed;
         }
-
         locomotion.Do(speed * 2 , (direction * 180 ));
       }
-
     }
 
     void OnAnimatorIK() {

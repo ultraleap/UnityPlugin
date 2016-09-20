@@ -55,7 +55,6 @@ namespace Leap.Unity {
       AnimatorForMapping = gameObject.GetComponent<Animator>();
       if (AnimatorForMapping != null) {
         if (AnimatorForMapping.isHuman == true) {
-          AnimatorForMapping.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("TestController");
           AutoRigMecanim();
           HandTransitionBehavior_L.OnSetup();
           HandTransitionBehavior_R.OnSetup();
@@ -230,7 +229,7 @@ namespace Leap.Unity {
       modelPalmFacing_L = RiggedHand_L.modelPalmFacing;
       modelFingerPointing_R = RiggedHand_R.modelFingerPointing;
       modelPalmFacing_R = RiggedHand_R.modelPalmFacing;
-      AutoRigUpperBody();
+      //AutoRigUpperBody();
     }
     /**Removes existing RiggedFinger components so the auto rigging process can be rerun. */
     void Reset() {
@@ -248,11 +247,14 @@ namespace Leap.Unity {
     }
     [ContextMenu("AutoRigUpperBody")]
     public void AutoRigUpperBody() {
+      AnimatorForMapping.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("TestController");
+
       OnAnimatorIKCaller onAnimatorIKCaller =  gameObject.AddComponent<OnAnimatorIKCaller>();
       onAnimatorIKCaller.wristLeapToIKBlend_L = (WristLeapToIKBlend)HandTransitionBehavior_L;
       onAnimatorIKCaller.wristLeapToIKBlend_R = (WristLeapToIKBlend)HandTransitionBehavior_R;
       SpineFollowTargetBehavior spineFollowTargetBehavior = gameObject.AddComponent<SpineFollowTargetBehavior>();
       ShoulderTurnBehavior shoulderTurnBehavior = gameObject.AddComponent<ShoulderTurnBehavior>();
+      LocomotionAvatar locomotionAvatar = gameObject.AddComponent<LocomotionAvatar>();
       //Assign and configure Animator Controller to Animator
       //AnimatorForMapping.runtimeAnimatorController = runtimeAnimatorController;
       AnimatorForMapping.updateMode = AnimatorUpdateMode.AnimatePhysics;
