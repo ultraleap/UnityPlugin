@@ -157,7 +157,7 @@ namespace Leap.Unity {
 
     protected virtual void Awake() {
       _fixedOffset.delay = 0.4f;
-      _smoothedTrackingLatency.SetBlend(0.01f, 0.0111f);
+      _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
     }
 
     protected virtual void Start() {
