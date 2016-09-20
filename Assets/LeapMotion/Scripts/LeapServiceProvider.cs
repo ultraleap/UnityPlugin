@@ -5,7 +5,7 @@ using UnityEditor;
 using System;
 using System.Collections;
 using Leap.Unity.Attributes;
-using Leap.Unity.Graphing;
+//using Leap.Unity.Graphing;
 
 namespace Leap.Unity {
   /**LeapServiceProvider creates a Controller and supplies Leap Hands and images */
@@ -257,7 +257,7 @@ namespace Leap.Unity {
       }
     }
 
-    public void ManuallyUpdateFrame(long temporalOffset = 0) {
+    public void ManualUpdateFrame(long temporalOffset = 0) {
       if (_useInterpolation) {
         leap_controller_.GetInterpolatedFrame(_untransformedPreCullFrame, leap_controller_.Now() - (long)_smoothedTrackingLatency.value - ((_interpolationDelay + temporalOffset) * 1000));
       } else {
@@ -352,7 +352,7 @@ namespace Leap.Unity {
       dest.CopyFrom(source).Transform(leapTransform);
     }
 
-    //Late-Latching Functions
+    //Precull-Latching Functions
     protected virtual void OnEnable() {
       Camera.onPreCull -= LateUpdateHandTransforms;
       Camera.onPreCull += LateUpdateHandTransforms;
@@ -370,7 +370,7 @@ namespace Leap.Unity {
 
     public void LateUpdateHandTransforms(Camera camera) {
       if (_updateHandInPrecull) {
-        if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.BeginSample("Vertex Offset", RealtimeGraph.GraphUnits.Miliseconds); }
+       // if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.BeginSample("Vertex Offset", RealtimeGraph.GraphUnits.Miliseconds); }
 
 #if UNITY_EDITOR
         //Hard-coded name of the camera used to generate the pre-render view
@@ -386,11 +386,11 @@ namespace Leap.Unity {
 
         if (Application.isPlaying) {
           if (!manualUpdateHasBeenCalledSinceUpdate) {
-            ManuallyUpdateFrame();
+            ManualUpdateFrame();
           }
 
           if (_transformedPreCullFrame != null) {
-            if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.AddSample("Precull Tracking Latency", RealtimeGraph.GraphUnits.Miliseconds, (GetLeapController().Now() - _transformedPreCullFrame.Timestamp) * 0.001f); }
+            //if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.AddSample("Precull Tracking Latency", RealtimeGraph.GraphUnits.Miliseconds, (GetLeapController().Now() - _transformedPreCullFrame.Timestamp) * 0.001f); }
             for (int i = 0; i < _transformedPreCullFrame.Hands.Count; i++) {
               Hand preCullHand = _transformedPreCullFrame.Hands[i];
               Hand updateHand = _transformedUpdateFrame.Hand(preCullHand.Id);
@@ -405,7 +405,7 @@ namespace Leap.Unity {
           }
           Shader.SetGlobalMatrixArray("_handTransforms", _transformArray);
         }
-        if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.EndSample(); }
+        //if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.EndSample(); }
       }
     }
   }
