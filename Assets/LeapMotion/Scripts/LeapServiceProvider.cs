@@ -157,7 +157,7 @@ namespace Leap.Unity {
 
     protected virtual void Awake() {
       _fixedOffset.delay = 0.4f;
-      _smoothedTrackingLatency.SetBlend(0.01f, 0.0111f);
+      _smoothedTrackingLatency.SetBlend(0.99f, 0.0111f);
     }
 
     protected virtual void Start() {
@@ -210,8 +210,6 @@ namespace Leap.Unity {
         Int64 time = leap_controller_.Now() - (_interpolationDelay+16) * 1000;
         leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, time);
 #else
-        _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 25000f);
-        _smoothedTrackingLatency.Update((float)(leap_controller_.Now() - leap_controller_.FrameTimestamp()), Time.deltaTime);
         leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, leap_controller_.Now() - (long)_smoothedTrackingLatency.value - (_interpolationDelay * 1000));
 #endif
       } else {
