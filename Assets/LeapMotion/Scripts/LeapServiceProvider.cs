@@ -42,6 +42,12 @@ namespace Leap.Unity {
     [SerializeField]
     protected bool _useInterpolation = true;
 
+    [Header("Late Update")]
+    [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
+    [SerializeField]
+    protected bool _updateHandInPrecull = true;
+    protected bool _prevUpdateHandInPrecull = true;
+
     [Tooltip("How much delay should be added to interpolation.")]
     protected long _interpolationDelay = 0;
 
@@ -64,7 +70,7 @@ namespace Leap.Unity {
 
     protected Image _currentImage;
 
-    protected Matrix4x4[] _transformArray = new Matrix4x4[6];
+    protected Matrix4x4[] _transformArray = new Matrix4x4[2];
 
     public override Frame CurrentFrame {
       get {
@@ -94,6 +100,15 @@ namespace Leap.Unity {
       }
       set {
         _useInterpolation = value;
+      }
+    }
+
+    public bool UpdateHandInPrecull {
+      get {
+        return _updateHandInPrecull;
+      }
+      set {
+        _updateHandInPrecull = value;
       }
     }
 
@@ -188,16 +203,23 @@ namespace Leap.Unity {
       }
 #endif
 
+      if (_updateHandInPrecull!=_prevUpdateHandInPrecull && !_updateHandInPrecull) {
+        _transformArray[0] = Matrix4x4.identity;
+        _transformArray[1] = Matrix4x4.identity;
+        Shader.SetGlobalMatrixArray("_handTransforms", _transformArray);
+      }
+      _prevUpdateHandInPrecull = _updateHandInPrecull;
+
       _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
       if (_useInterpolation) {
 #if UNITY_ANDROID
-        Int64 time = leap_controller_.Now() - (_interpolationDelay+16) * 1000;
+        Int64 time = leap_controller_.Now() - ((_interpolationDelay+16) * 1000) + (_updateHandInPrecull ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0);
         leap_controller_.GetInterpolatedFrame(_untransformedUpdateFrame, time);
 #else
-        _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 25000f);
+        _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
         _smoothedTrackingLatency.Update((float)(leap_controller_.Now() - leap_controller_.FrameTimestamp()), Time.deltaTime);
-        leap_controller_.GetInterpolatedFrame(_untransformedUpdateFrame, leap_controller_.Now() - (long)_smoothedTrackingLatency.value - (_interpolationDelay * 1000));
+        leap_controller_.GetInterpolatedFrame(_untransformedUpdateFrame, leap_controller_.Now() - (long)_smoothedTrackingLatency.value - (_interpolationDelay * 1000) + (_updateHandInPrecull ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0));
 #endif
       } else {
         leap_controller_.Frame(_untransformedUpdateFrame);
@@ -219,10 +241,10 @@ namespace Leap.Unity {
 
       if (_useInterpolation) {
 #if UNITY_ANDROID
-        Int64 time = leap_controller_.Now() - (_interpolationDelay+16) * 1000;
+        Int64 time = leap_controller_.Now() - ((_interpolationDelay+16) * 1000) + (_updateHandInPrecull ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0);
         leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, time);
 #else
-        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, leap_controller_.Now() - (long)_smoothedTrackingLatency.value - (_interpolationDelay * 1000));
+        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, leap_controller_.Now() - (long)_smoothedTrackingLatency.value - (_interpolationDelay * 1000) + (_updateHandInPrecull ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0));
 #endif
       } else {
         leap_controller_.Frame(_untransformedFixedFrame);
@@ -334,61 +356,57 @@ namespace Leap.Unity {
     protected virtual void OnEnable() {
       Camera.onPreCull -= LateUpdateHandTransforms;
       Camera.onPreCull += LateUpdateHandTransforms;
-      _transformArray = new Matrix4x4[6];
+      _transformArray[0] = Matrix4x4.identity;
+      _transformArray[1] = Matrix4x4.identity;
       Shader.SetGlobalMatrixArray("_handTransforms", _transformArray);
     }
 
     protected virtual void OnDisable() {
       Camera.onPreCull -= LateUpdateHandTransforms;
-      _transformArray = new Matrix4x4[6];
+      _transformArray[0] = Matrix4x4.identity;
+      _transformArray[1] = Matrix4x4.identity;
       Shader.SetGlobalMatrixArray("_handTransforms", _transformArray);
     }
 
     public void LateUpdateHandTransforms(Camera camera) {
-      if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.BeginSample("Vertex Offset", RealtimeGraph.GraphUnits.Miliseconds); }
+      if (_updateHandInPrecull) {
+        if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.BeginSample("Vertex Offset", RealtimeGraph.GraphUnits.Miliseconds); }
 
 #if UNITY_EDITOR
-      //Hard-coded name of the camera used to generate the pre-render view
-      if (camera.gameObject.name == "PreRenderCamera") {
-        return;
-      }
-
-      bool isScenePreviewCamera = camera.gameObject.hideFlags == HideFlags.HideAndDontSave;
-      if (isScenePreviewCamera) {
-        return;
-      }
-#endif
-
-      if (Application.isPlaying) {
-        if (!manualUpdateHasBeenCalledSinceUpdate) {
-          //Add back the latency we gain by late latch to match the game latency (but increase smoothness)
-          long interpolationAmount = 160;// (long)((Time.smoothDeltaTime / Time.timeScale) * 1000f);
-          ManuallyUpdateFrame(interpolationAmount);
+        //Hard-coded name of the camera used to generate the pre-render view
+        if (camera.gameObject.name == "PreRenderCamera") {
+          return;
         }
 
-        if (_transformedPreCullFrame != null) {
-          for (int i = 0; i < _transformedPreCullFrame.Hands.Count; i++) {
-            Hand preCullHand = _transformedPreCullFrame.Hands[i];
-            Hand updateHand = _transformedUpdateFrame.Hand(preCullHand.Id);
+        bool isScenePreviewCamera = camera.gameObject.hideFlags == HideFlags.HideAndDontSave;
+        if (isScenePreviewCamera) {
+          return;
+        }
+#endif
 
-            if (preCullHand != null && updateHand != null) {
-              if (!_transformedPreCullFrame.Hands[i].IsLeft) {
-                _transformArray[0] = Matrix4x4.TRS(preCullHand.PalmPosition.ToVector3() - updateHand.PalmPosition.ToVector3(), Quaternion.identity, Vector3.one); //Step Three: Offset the model in worldspace
-                _transformArray[1] = Matrix4x4.TRS(new Vector3(0.05f, 0f, 0f), Quaternion.Euler(0f, 90f, 0f) * (Quaternion.Inverse(updateHand.Rotation.ToQuaternion()) * preCullHand.Rotation.ToQuaternion()), Vector3.one); //Step Two: Rotate the model around the palm and translate back to wrist.
-                _transformArray[2] = Matrix4x4.TRS(new Vector3(0f, 0f, -0.05f), Quaternion.Euler(0f, -90f, 0f), Vector3.one); //Step One: Translate wrist to palm (rotation pivot) 
-              } else {
-                _transformArray[3] = Matrix4x4.TRS(preCullHand.PalmPosition.ToVector3() - updateHand.PalmPosition.ToVector3(), Quaternion.identity, Vector3.one); //Step Three: Offset the model in worldspace
-                _transformArray[4] = Matrix4x4.TRS(new Vector3(-0.05f, 0f, 0f), Quaternion.Euler(0f,90f,0f)*(Quaternion.Inverse(updateHand.Rotation.ToQuaternion()) * preCullHand.Rotation.ToQuaternion()), Vector3.one); //Step Two: Rotate the model around the palm and translate back to wrist.
-                _transformArray[5] = Matrix4x4.TRS(new Vector3(0f, 0f, 0.05f), Quaternion.Euler(0f, -90f, 0f), Vector3.one); //Step One: Translate wrist to palm (rotation pivot) 
+        if (Application.isPlaying) {
+          if (!manualUpdateHasBeenCalledSinceUpdate) {
+            ManuallyUpdateFrame();
+          }
+
+          if (_transformedPreCullFrame != null) {
+            if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.AddSample("Precull Tracking Latency", RealtimeGraph.GraphUnits.Miliseconds, (GetLeapController().Now() - _transformedPreCullFrame.Timestamp) * 0.001f); }
+            for (int i = 0; i < _transformedPreCullFrame.Hands.Count; i++) {
+              Hand preCullHand = _transformedPreCullFrame.Hands[i];
+              Hand updateHand = _transformedUpdateFrame.Hand(preCullHand.Id);
+
+              if (preCullHand != null && updateHand != null) {
+                //Pass PreCullHand * Inverse(UpdateHand) to the shader
+                _transformArray[_transformedPreCullFrame.Hands[i].IsLeft ? 1 : 0] =
+                                    Matrix4x4.TRS(preCullHand.PalmPosition.ToVector3(), preCullHand.Rotation.ToQuaternion(), Vector3.one) *
+                  Matrix4x4.Inverse(Matrix4x4.TRS(updateHand.PalmPosition.ToVector3(), updateHand.Rotation.ToQuaternion(), Vector3.one));
               }
             }
           }
+          Shader.SetGlobalMatrixArray("_handTransforms", _transformArray);
         }
-
-        Shader.SetGlobalMatrixArray("_handTransforms", _transformArray);
-
+        if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.EndSample(); }
       }
-      if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.EndSample(); }
     }
   }
 }

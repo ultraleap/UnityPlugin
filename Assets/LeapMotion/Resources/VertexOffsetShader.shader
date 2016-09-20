@@ -17,11 +17,11 @@
 			// Use shader model 3.0 target, to get nicer looking lighting
 #pragma target 3.0
 
-			uniform float4x4 _handTransforms[6];
+			uniform float4x4 _handTransforms[2];
 			int _isLeftHand;
 			void vert(inout appdata_full v) {
-				int startIndex = _isLeftHand * 3;
-				v.vertex = mul(unity_WorldToObject, mul(_handTransforms[startIndex], mul(unity_ObjectToWorld, mul(_handTransforms[startIndex + 1],mul(_handTransforms[startIndex + 2], v.vertex)))));
+				int startIndex = _isLeftHand;
+				v.vertex = mul(unity_WorldToObject, mul(_handTransforms[startIndex], mul(unity_ObjectToWorld, v.vertex)));
 			}
 
 			sampler2D _MainTex;
