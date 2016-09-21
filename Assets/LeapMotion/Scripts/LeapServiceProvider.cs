@@ -214,7 +214,7 @@ namespace Leap.Unity {
 
       if (_useInterpolation) {
 #if UNITY_ANDROID
-        Int64 time = leap_controller_.Now() - ((_interpolationDelay+16) * 1000) + (_updateHandInPrecull ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0);
+        Int64 time = leap_controller_.Now() - ((_interpolationDelay + 16) * 1000);
         leap_controller_.GetInterpolatedFrame(_untransformedUpdateFrame, time);
 #else
         _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
@@ -241,7 +241,7 @@ namespace Leap.Unity {
 
       if (_useInterpolation) {
 #if UNITY_ANDROID
-        Int64 time = leap_controller_.Now() - ((_interpolationDelay+16) * 1000) + (_updateHandInPrecull ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0);
+        Int64 time = leap_controller_.Now() - ((_interpolationDelay + 16) * 1000);
         leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, time);
 #else
         leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, leap_controller_.Now() - (long)_smoothedTrackingLatency.value - (_interpolationDelay * 1000) + (_updateHandInPrecull ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0));
