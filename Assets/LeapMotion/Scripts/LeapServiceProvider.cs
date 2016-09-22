@@ -288,6 +288,26 @@ namespace Leap.Unity {
       destroyController();
     }
 
+    protected virtual void OnEnable() {
+      Camera.onPreCull -= LateUpdateHandTransforms;
+      Camera.onPreCull += LateUpdateHandTransforms;
+      resetTransforms();
+    }
+
+    protected virtual void OnDisable() {
+      Camera.onPreCull -= LateUpdateHandTransforms;
+      resetTransforms();
+    }
+
+    /*
+     * Resets the Global Hand Transform Shader Matrices
+     */
+    protected void resetTransforms() {
+      _transformArray[0] = Matrix4x4.identity;
+      _transformArray[1] = Matrix4x4.identity;
+      Shader.SetGlobalMatrixArray(HAND_ARRAY, _transformArray);
+    }
+
     /*
      * Initializes the Leap Motion policy flags.
      * The POLICY_OPTIMIZE_HMD flag improves tracking for head-mounted devices.
@@ -350,24 +370,6 @@ namespace Leap.Unity {
       }
 
       dest.CopyFrom(source).Transform(leapTransform);
-    }
-
-    //Precull-Latching Functions
-    protected virtual void OnEnable() {
-      Camera.onPreCull -= LateUpdateHandTransforms;
-      Camera.onPreCull += LateUpdateHandTransforms;
-      resetTransforms();
-    }
-
-    protected virtual void OnDisable() {
-      Camera.onPreCull -= LateUpdateHandTransforms;
-      resetTransforms();
-    }
-
-    protected void resetTransforms() {
-      _transformArray[0] = Matrix4x4.identity;
-      _transformArray[1] = Matrix4x4.identity;
-      Shader.SetGlobalMatrixArray(HAND_ARRAY, _transformArray);
     }
 
     public void LateUpdateHandTransforms(Camera camera) {
