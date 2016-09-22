@@ -12,6 +12,7 @@ namespace Leap.Unity {
     private Vector3 distanceToRoot;
     private Vector3 rootDirection;
     public Transform LMRig;
+    public bool LMRigToFollowAnimator;
 
     void Awake() {
       LMRig = GameObject.FindObjectOfType<LeapHandController>().transform.root;
@@ -22,7 +23,15 @@ namespace Leap.Unity {
       locomotion = new Locomotion(animator);
       rootDirection = transform.forward;
     }
+
     void Update() {
+      if (LMRigToFollowAnimator == true) {
+        LMRigLococmotion();
+      }
+      else AnimatorLocomotion();
+    }
+    void LMRigLococmotion() {
+      //Requires positioning of LMHeadMountedRig OnAnimatorIK()
       Vector3 flatCamPosition = transform.InverseTransformPoint(Camera.main.transform.position);
       flatCamPosition.y = 0;
       Vector3 flatRootPosition = transform.InverseTransformPoint(transform.position);
@@ -58,8 +67,37 @@ namespace Leap.Unity {
       }
     }
 
+    void AnimatorLocomotion() {
+      Vector3 flatCamPosition = Camera.main.transform.position;
+      flatCamPosition.y = 0;
+      Vector3 flatRootPosition = transform.position;
+      flatRootPosition.y = 0;
+      distanceToRoot = flatCamPosition - flatRootPosition;
+      speed = distanceToRoot.magnitude;
+
+      // Get camera rotation.
+      rootDirection = transform.forward;// +transform.position;
+      Vector3 DirectionToCamera = Camera.main.transform.position - transform.position;
+      DirectionToCamera.y = 0.0f;
+      Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, DirectionToCamera);
+
+      // Convert joystick input in Worldspace coordinates
+      Vector3 moveDirection = DirectionToCamera;
+      //Vector3 moveDirection = referentialShift * CameraDirection;
+      Vector3 axis = Vector3.Cross(rootDirection, moveDirection);
+      direction = Vector3.Angle(rootDirection, moveDirection) / 180f * (axis.y < 0 ? -1 : 1);
+      if (speed < .1f) { //Dead "stick"
+        speed = 0.0f;
+      }
+      if (animator && Camera.main) {
+        locomotion.Do(speed, (direction * 180));
+      }
+    }
+
     void OnAnimatorIK() {
-      LMRig.position = new Vector3(transform.position.x, LMRig.position.y, transform.position.z);
+      if (LMRigToFollowAnimator) {
+        LMRig.position = new Vector3(transform.position.x, LMRig.position.y, transform.position.z);
+      }
     }
   }
 }
