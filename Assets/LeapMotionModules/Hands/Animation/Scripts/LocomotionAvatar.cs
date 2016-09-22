@@ -39,14 +39,8 @@ namespace Leap.Unity {
       distanceToRoot = flatCamPosition - flatRootPosition;
       speed = distanceToRoot.magnitude;
 
-      // Get camera rotation.
-      rootDirection = transform.forward;// +transform.position;
-      Vector3 CameraDirection = Camera.main.transform.forward;
-      CameraDirection.y = 0.0f;
-      Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, CameraDirection);
-      
       // Convert joystick input in Worldspace coordinates
-      Vector3 moveDirection = CameraDirection;
+      Vector3 moveDirection = MoveDirectionCameraDirection();
       //Vector3 moveDirection = referentialShift * CameraDirection;
       Vector3 axis = Vector3.Cross(rootDirection, moveDirection);
       direction = Vector3.Angle(rootDirection, moveDirection) / 180f * (axis.y < 0 ? -1 : 1);
@@ -63,34 +57,59 @@ namespace Leap.Unity {
           //direction += joyDirection;
           speed += joySpeed;
         }
-        locomotion.Do(speed * 2 , (direction * 180 ));
+        locomotion.Do(speed * 2 , (direction * 180 ), 1);
       }
+    }
+    Vector3 MoveDirectionCameraDirection() {
+      // Get camera rotation.
+      rootDirection = transform.forward;// +transform.position;
+      Vector3 CameraDirection = Camera.main.transform.forward;
+      CameraDirection.y = 0.0f;
+      //Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, CameraDirection);
+      return CameraDirection;
+    }
+    Vector3 MoveDirectionTowardCamera () {
+        // Get camera rotation.
+        rootDirection = transform.forward;// +transform.position;
+        Vector3 DirectionToCamera = Camera.main.transform.position - transform.position;
+        DirectionToCamera.y = 0.0f;
+        Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, DirectionToCamera);
+        // Convert joystick input in Worldspace coordinates
+        return DirectionToCamera;
     }
 
     void AnimatorLocomotion() {
+      float reverse = 1;
+      Vector3 moveDirection;
       Vector3 flatCamPosition = Camera.main.transform.position;
       flatCamPosition.y = 0;
       Vector3 flatRootPosition = transform.position;
       flatRootPosition.y = 0;
       distanceToRoot = flatCamPosition - flatRootPosition;
       speed = distanceToRoot.magnitude;
+      Debug.Log(transform.InverseTransformPoint( Camera.main.transform.position));
+      if (speed < .1f) { //Dead "stick" and matching LMRigLococmotion method for turning in place
+        speed = 0.0f;
+        moveDirection = MoveDirectionCameraDirection();
+      }
 
-      // Get camera rotation.
-      rootDirection = transform.forward;// +transform.position;
-      Vector3 DirectionToCamera = Camera.main.transform.position - transform.position;
-      DirectionToCamera.y = 0.0f;
-      Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, DirectionToCamera);
+      else {
+        Debug.Log("Moving");
+        moveDirection = MoveDirectionTowardCamera();
+        if (transform.InverseTransformPoint(Camera.main.transform.position).z < -.2f) {
+          Debug.Log("Reversing");
+          moveDirection = MoveDirectionCameraDirection();
+          reverse = -1;
+        }
+      }
 
-      // Convert joystick input in Worldspace coordinates
-      Vector3 moveDirection = DirectionToCamera;
       //Vector3 moveDirection = referentialShift * CameraDirection;
       Vector3 axis = Vector3.Cross(rootDirection, moveDirection);
       direction = Vector3.Angle(rootDirection, moveDirection) / 180f * (axis.y < 0 ? -1 : 1);
-      if (speed < .1f) { //Dead "stick"
-        speed = 0.0f;
-      }
+
       if (animator && Camera.main) {
-        locomotion.Do(speed, (direction * 180));
+        locomotion.Do(speed, (direction * 180), reverse);
+        Debug.DrawLine(transform.position, moveDirection * 2, Color.red);
       }
     }
 

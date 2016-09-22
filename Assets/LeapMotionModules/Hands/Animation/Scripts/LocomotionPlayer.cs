@@ -30,7 +30,7 @@ public class LocomotionPlayer : MonoBehaviour {
         if (animator && Camera.main)
 		{
             JoystickToEvents.Do(transform,Camera.main.transform, ref speed, ref direction);
-            locomotion.Do(speed * 1, direction * 180);
+            locomotion.Do(speed * 1, direction * 180, 1);
 		}		
 	}
 }
