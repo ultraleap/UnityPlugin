@@ -77,7 +77,7 @@ namespace Leap.Unity {
         // Convert joystick input in Worldspace coordinates
         return DirectionToCamera;
     }
-
+    bool standing = true;
     void AnimatorLocomotion() {
       float reverse = 1;
       Vector3 moveDirection;
@@ -87,14 +87,21 @@ namespace Leap.Unity {
       flatRootPosition.y = 0;
       distanceToRoot = flatCamPosition - flatRootPosition;
       speed = distanceToRoot.magnitude;
-      Debug.Log(transform.InverseTransformPoint( Camera.main.transform.position));
-      if (speed < .1f) { //Dead "stick" and matching LMRigLococmotion method for turning in place
+      //Debug.Log(transform.InverseTransformPoint( Camera.main.transform.position));
+      if (!standing && speed < .1f) {
+        standing = true;
+        Debug.Log("Switching Standing to True ++++++++++++++++++++++++++++++++++++++++++++++++");
+      }
+      if (standing && speed > .3) {
+        standing = false;
+        Debug.Log("Switching Standing to False -----------------------------------------------");
+      }
+      if (standing ) { //Dead "stick" and matching LMRigLococmotion method for turning in place
         speed = 0.0f;
         moveDirection = MoveDirectionCameraDirection();
       }
-
       else {
-        Debug.Log("Moving");
+        //Debug.Log("Moving while Standing = " + standing);
         moveDirection = MoveDirectionTowardCamera();
         if (transform.InverseTransformPoint(Camera.main.transform.position).z < -.2f) {
           Debug.Log("Reversing");
@@ -102,6 +109,7 @@ namespace Leap.Unity {
           reverse = -1;
         }
       }
+
 
       //Vector3 moveDirection = referentialShift * CameraDirection;
       Vector3 axis = Vector3.Cross(rootDirection, moveDirection);
