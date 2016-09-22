@@ -203,7 +203,7 @@ namespace Leap.Unity {
       }
 #endif
 
-      if (_updateHandInPrecull!=_prevUpdateHandInPrecull && !_updateHandInPrecull) {
+      if (_updateHandInPrecull != _prevUpdateHandInPrecull && !_updateHandInPrecull) {
         _transformArray[0] = Matrix4x4.identity;
         _transformArray[1] = Matrix4x4.identity;
         Shader.SetGlobalMatrixArray("_handTransforms", _transformArray);
@@ -213,14 +213,11 @@ namespace Leap.Unity {
       _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
       if (_useInterpolation) {
-#if UNITY_ANDROID
-        Int64 time = leap_controller_.Now() - ((_interpolationDelay + 16) * 1000);
-        leap_controller_.GetInterpolatedFrame(_untransformedUpdateFrame, time);
-#else
+#if !UNITY_ANDROID
         _smoothedTrackingLatency.value = Mathf.Min(_smoothedTrackingLatency.value, 30000f);
         _smoothedTrackingLatency.Update((float)(leap_controller_.Now() - leap_controller_.FrameTimestamp()), Time.deltaTime);
-        leap_controller_.GetInterpolatedFrame(_untransformedUpdateFrame, leap_controller_.Now() - (long)_smoothedTrackingLatency.value - (_interpolationDelay * 1000) + (_updateHandInPrecull ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0));
 #endif
+        leap_controller_.GetInterpolatedFrame(_untransformedUpdateFrame, CalculateInterpolationTime());
       } else {
         leap_controller_.Frame(_untransformedUpdateFrame);
       }
@@ -240,12 +237,7 @@ namespace Leap.Unity {
       }
 
       if (_useInterpolation) {
-#if UNITY_ANDROID
-        Int64 time = leap_controller_.Now() - ((_interpolationDelay + 16) * 1000);
-        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, time);
-#else
-        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, leap_controller_.Now() - (long)_smoothedTrackingLatency.value - (_interpolationDelay * 1000) + (_updateHandInPrecull ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0));
-#endif
+        leap_controller_.GetInterpolatedFrame(_untransformedFixedFrame, CalculateInterpolationTime());
       } else {
         leap_controller_.Frame(_untransformedFixedFrame);
       }
@@ -259,7 +251,7 @@ namespace Leap.Unity {
 
     public void ManualUpdateFrame(long temporalOffset = 0) {
       if (_useInterpolation) {
-        leap_controller_.GetInterpolatedFrame(_untransformedPreCullFrame, leap_controller_.Now() - (long)_smoothedTrackingLatency.value - ((_interpolationDelay + temporalOffset) * 1000));
+        leap_controller_.GetInterpolatedFrame(_untransformedPreCullFrame, CalculateInterpolationTime());
       } else {
         leap_controller_.Frame(_untransformedPreCullFrame);
       }
@@ -268,6 +260,14 @@ namespace Leap.Unity {
         transformFrame(_untransformedPreCullFrame, _transformedPreCullFrame, false);
       }
       manualUpdateHasBeenCalledSinceUpdate = true;
+    }
+
+    long CalculateInterpolationTime(bool endOfFrame = false, long temporalOffset = 0) {
+#if UNITY_ANDROID
+      return leap_controller_.Now() - ((_interpolationDelay + temporalOffset + 16) * 1000);
+#else
+      leap_controller_.Now() - (long)_smoothedTrackingLatency.value - (_interpolationDelay + temporalOffset * 1000) + (_updateHandInPrecull&&!endOfFrame ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0));
+#endif
     }
 
     protected virtual void OnDestroy() {
@@ -384,11 +384,8 @@ namespace Leap.Unity {
         }
 #endif
 
-        if (Application.isPlaying) {
-          if (!manualUpdateHasBeenCalledSinceUpdate) {
-            ManualUpdateFrame();
-          }
-
+        if (Application.isPlaying && !manualUpdateHasBeenCalledSinceUpdate) {
+          ManualUpdateFrame();
           if (_transformedPreCullFrame != null) {
             //if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.AddSample("Precull Tracking Latency", RealtimeGraph.GraphUnits.Miliseconds, (GetLeapController().Now() - _transformedPreCullFrame.Timestamp) * 0.001f); }
             for (int i = 0; i < _transformedPreCullFrame.Hands.Count; i++) {
