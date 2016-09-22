@@ -44,13 +44,12 @@ namespace Leap.Unity {
     [SerializeField]
     protected bool _useInterpolation = true;
 
-    [Header("Late Update")]
+    [Header("[Experimental]")]
     [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
     [SerializeField]
-    protected bool _updateHandInPrecull = true;
-    protected bool _prevUpdateHandInPrecull = true;
+    protected bool _updateHandInPrecull = false;
+    protected bool _prevUpdateHandInPrecull = false;
 
-    [Tooltip("How much delay should be added to interpolation.")]
     protected long _interpolationDelay = 0;
 
     protected Controller leap_controller_;
@@ -266,7 +265,7 @@ namespace Leap.Unity {
 #if UNITY_ANDROID
       return leap_controller_.Now() - ((_interpolationDelay + temporalOffset + 16) * 1000);
 #else
-      leap_controller_.Now() - (long)_smoothedTrackingLatency.value - (_interpolationDelay + temporalOffset * 1000) + (_updateHandInPrecull&&!endOfFrame ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0));
+      return leap_controller_.Now() - (long)_smoothedTrackingLatency.value - (_interpolationDelay + temporalOffset * 1000) + (_updateHandInPrecull&&!endOfFrame ? (long)(Time.smoothDeltaTime * S_TO_NS / Time.timeScale) : 0);
 #endif
     }
 
