@@ -256,7 +256,7 @@ namespace Leap.Unity.InputModule {
     void Update() {
       curFrame = LeapDataProvider.CurrentFrame;
 
-      if (Camera.main != null && OldCameraRot != Quaternion.identity) {
+      if (Camera.main != null) {
         Quaternion HeadYaw = Quaternion.Euler(0f, OldCameraRot.eulerAngles.y, 0f);
         CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.1f);
       }
