@@ -15,7 +15,7 @@ namespace Leap.Unity {
     /** Conversion factor for seconds to nanoseconds. */
     protected const float S_TO_NS = 1e6f;
     /** Transform Array for Precull Latching **/
-    protected const string HAND_ARRAY = "_handTransforms";
+    protected const string HAND_ARRAY = "_LeapHandTransforms";
 
     [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
     [SerializeField]
@@ -205,10 +205,8 @@ namespace Leap.Unity {
       }
 #endif
 
-      if (_updateHandInPrecull != _prevUpdateHandInPrecull && !_updateHandInPrecull) {
-        _transformArray[0] = Matrix4x4.identity;
-        _transformArray[1] = Matrix4x4.identity;
-        Shader.SetGlobalMatrixArray(HAND_ARRAY, _transformArray);
+      if (!_updateHandInPrecull && _prevUpdateHandInPrecull) {
+        resetTransforms();
       }
       _prevUpdateHandInPrecull = _updateHandInPrecull;
 
@@ -358,13 +356,15 @@ namespace Leap.Unity {
     protected virtual void OnEnable() {
       Camera.onPreCull -= LateUpdateHandTransforms;
       Camera.onPreCull += LateUpdateHandTransforms;
-      _transformArray[0] = Matrix4x4.identity;
-      _transformArray[1] = Matrix4x4.identity;
-      Shader.SetGlobalMatrixArray(HAND_ARRAY, _transformArray);
+      resetTransforms();
     }
 
     protected virtual void OnDisable() {
       Camera.onPreCull -= LateUpdateHandTransforms;
+      resetTransforms();
+    }
+
+    protected void resetTransforms() {
       _transformArray[0] = Matrix4x4.identity;
       _transformArray[1] = Matrix4x4.identity;
       Shader.SetGlobalMatrixArray(HAND_ARRAY, _transformArray);

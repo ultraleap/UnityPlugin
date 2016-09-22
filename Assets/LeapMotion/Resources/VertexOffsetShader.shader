@@ -13,15 +13,13 @@
 			CGPROGRAM
 			// Physically based Standard lighting model, and enable shadows on all light types
 #pragma surface surf Standard fullforwardshadows vertex:vert
-
+#include "LeapCG.cginc"
 			// Use shader model 3.0 target, to get nicer looking lighting
 #pragma target 3.0
 
-			uniform float4x4 _handTransforms[2];
 			int _isLeftHand;
 			void vert(inout appdata_full v) {
-				int startIndex = _isLeftHand;
-				v.vertex = mul(unity_WorldToObject, mul(_handTransforms[startIndex], mul(unity_ObjectToWorld, v.vertex)));
+				v.vertex = LeapGetLateVertexPos(v.vertex, _isLeftHand);
 			}
 
 			sampler2D _MainTex;
