@@ -69,13 +69,13 @@ namespace Leap.Unity {
       return CameraDirection;
     }
     Vector3 MoveDirectionTowardCamera () {
-        // Get camera rotation.
-        rootDirection = transform.forward;// +transform.position;
-        Vector3 DirectionToCamera = Camera.main.transform.position - transform.position;
-        DirectionToCamera.y = 0.0f;
-        Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, DirectionToCamera);
-        // Convert joystick input in Worldspace coordinates
-        return DirectionToCamera;
+      // Get camera rotation.
+      rootDirection = transform.forward;// +transform.position;
+      Vector3 DirectionToCamera = Camera.main.transform.position - transform.position;
+      DirectionToCamera.y = 0.0f;
+      Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, DirectionToCamera);
+      // Convert joystick input in Worldspace coordinates
+      return DirectionToCamera;
     }
     bool standing = true;
     void AnimatorLocomotion() {
@@ -88,11 +88,12 @@ namespace Leap.Unity {
       distanceToRoot = flatCamPosition - flatRootPosition;
       speed = distanceToRoot.magnitude;
       //Debug.Log(transform.InverseTransformPoint( Camera.main.transform.position));
+      Debug.Log("speed: " + speed);
       if (!standing && speed < .1f) {
         standing = true;
         Debug.Log("Switching Standing to True ++++++++++++++++++++++++++++++++++++++++++++++++");
       }
-      if (standing && speed > .3) {
+      if (standing && speed > .25) {
         standing = false;
         Debug.Log("Switching Standing to False -----------------------------------------------");
       }
@@ -103,13 +104,13 @@ namespace Leap.Unity {
       else {
         //Debug.Log("Moving while Standing = " + standing);
         moveDirection = MoveDirectionTowardCamera();
-        if (transform.InverseTransformPoint(Camera.main.transform.position).z < -.2f) {
+        if (transform.InverseTransformPoint(Camera.main.transform.position).z < -.2f
+          && direction > -20 && direction < 20) {
           Debug.Log("Reversing");
           moveDirection = MoveDirectionCameraDirection();
           reverse = -1;
         }
       }
-
 
       //Vector3 moveDirection = referentialShift * CameraDirection;
       Vector3 axis = Vector3.Cross(rootDirection, moveDirection);
