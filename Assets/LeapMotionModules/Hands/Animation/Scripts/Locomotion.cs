@@ -10,8 +10,8 @@ public class Locomotion {
   private int m_ReverseID = 0;
 
   public float m_SpeedDampTime = 0.1f;
-  public float m_AnguarSpeedDampTime = 0.25f;
-  public float m_DirectionResponseTime = 0.2f;
+  public float m_AnguarSpeedDampTime = 0.45f;
+  public float m_DirectionResponseTime = 0.4f;
 
   public Animation walkAnim;
 
@@ -26,6 +26,9 @@ public class Locomotion {
 
 
   public void Do(float speed, float direction, float reverse) {
+    if (direction > 179 || direction < -179) {
+      Debug.Log("180^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^+");
+    }
     AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0);
 
     bool inTransition = m_Animator.IsInTransition(0);
@@ -40,7 +43,7 @@ public class Locomotion {
     float angularSpeed = direction / m_DirectionResponseTime;
 
     m_Animator.SetFloat(m_SpeedId, speed, speedDampTime, Time.deltaTime);
-    m_Animator.SetFloat(m_AgularSpeedId, angularSpeed * reverse , angularSpeedDampTime, Time.deltaTime);
+    m_Animator.SetFloat(m_AgularSpeedId, angularSpeed * reverse *2, angularSpeedDampTime, Time.deltaTime);
     m_Animator.SetFloat(m_DirectionId, direction * reverse, directionDampTime, Time.deltaTime);
     m_Animator.SetFloat(m_ReverseID, reverse, 0, Time.deltaTime);
   }

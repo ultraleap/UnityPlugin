@@ -402,7 +402,7 @@ namespace Leap.Unity {
         speed = .01f;
       }
       //if(speed > )
-      Debug.Log("speed: " + speed + " || distanceToTarget: " + distanceToTarget);
+      //Debug.Log("speed: " + speed + " || distanceToTarget: " + distanceToTarget);
     
       while (Time.time <= endTime) {
         float t = (Time.time - startTime) / ArmDropDuration;

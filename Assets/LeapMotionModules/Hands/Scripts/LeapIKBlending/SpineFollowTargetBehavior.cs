@@ -60,6 +60,7 @@ public class SpineFollowTargetBehavior : MonoBehaviour {
     float normalZRotation = (aboutZRotation - MIN_LIMIT) / (MAX_LIMIT - MIN_LIMIT);
     float normalXRotation = (aboutXRotation - MIN_LIMIT) / (MAX_LIMIT - MIN_LIMIT);
 
+
     setSpineMuscles(normalXRotation, normalZRotation);
   }
 

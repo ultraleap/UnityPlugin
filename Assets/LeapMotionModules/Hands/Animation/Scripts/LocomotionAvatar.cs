@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.VR;
 using System.Collections;
 
 namespace Leap.Unity {
@@ -8,6 +9,9 @@ namespace Leap.Unity {
     private float speed = 0;
     private float direction = 0;
     private Locomotion locomotion = null;
+
+    private Vector3 moveDirection;
+
     
     private Vector3 distanceToRoot;
     private Vector3 rootDirection;
@@ -19,6 +23,7 @@ namespace Leap.Unity {
     }
     
     void Start() {
+      InputTracking.Recenter();
       animator = GetComponent<Animator>();
       locomotion = new Locomotion(animator);
       rootDirection = transform.forward;
@@ -40,7 +45,7 @@ namespace Leap.Unity {
       speed = distanceToRoot.magnitude;
 
       // Convert joystick input in Worldspace coordinates
-      Vector3 moveDirection = MoveDirectionCameraDirection();
+      moveDirection = MoveDirectionCameraDirection();
       //Vector3 moveDirection = referentialShift * CameraDirection;
       Vector3 axis = Vector3.Cross(rootDirection, moveDirection);
       direction = Vector3.Angle(rootDirection, moveDirection) / 180f * (axis.y < 0 ? -1 : 1);
@@ -65,7 +70,6 @@ namespace Leap.Unity {
       rootDirection = transform.forward;// +transform.position;
       Vector3 CameraDirection = Camera.main.transform.forward;
       CameraDirection.y = 0.0f;
-      //Quaternion referentialShift = Quaternion.FromToRotation(Vector3.forward, CameraDirection);
       return CameraDirection;
     }
     Vector3 MoveDirectionTowardCamera () {
@@ -78,22 +82,22 @@ namespace Leap.Unity {
       return DirectionToCamera;
     }
     bool standing = true;
+    
     void AnimatorLocomotion() {
       float reverse = 1;
-      Vector3 moveDirection;
       Vector3 flatCamPosition = Camera.main.transform.position;
       flatCamPosition.y = 0;
       Vector3 flatRootPosition = transform.position;
       flatRootPosition.y = 0;
       distanceToRoot = flatCamPosition - flatRootPosition;
       speed = distanceToRoot.magnitude;
-      //Debug.Log(transform.InverseTransformPoint( Camera.main.transform.position));
-      Debug.Log("speed: " + speed);
-      if (!standing && speed < .1f) {
+      //Debug.Log("speed: " + speed);
+      if (!standing && speed < .3f) {
         standing = true;
+        StartCoroutine(centerUnderCamera());
         Debug.Log("Switching Standing to True ++++++++++++++++++++++++++++++++++++++++++++++++");
       }
-      if (standing && speed > .25) {
+      if (standing && speed > .5) {
         standing = false;
         Debug.Log("Switching Standing to False -----------------------------------------------");
       }
@@ -102,9 +106,8 @@ namespace Leap.Unity {
         moveDirection = MoveDirectionCameraDirection();
       }
       else {
-        //Debug.Log("Moving while Standing = " + standing);
         moveDirection = MoveDirectionTowardCamera();
-        if (transform.InverseTransformPoint(Camera.main.transform.position).z < -.2f
+        if (transform.InverseTransformPoint(Camera.main.transform.position).z < -.1f
           && direction > -20 && direction < 20) {
           Debug.Log("Reversing");
           moveDirection = MoveDirectionCameraDirection();
@@ -125,6 +128,18 @@ namespace Leap.Unity {
     void OnAnimatorIK() {
       if (LMRigToFollowAnimator) {
         LMRig.position = new Vector3(transform.position.x, LMRig.position.y, transform.position.z);
+      }
+      Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
+      transform.position = Vector3.Lerp(transform.position, placeAnimatorUnderCam, .001f);
+    }
+
+    private IEnumerator centerUnderCamera () {
+      while (distanceToRoot.magnitude > .05f) {
+        Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
+        transform.position = Vector3.Lerp(transform.position, placeAnimatorUnderCam, Time.deltaTime * 10f);
+        Debug.Log("Centering");
+        yield return null;
+
       }
     }
   }
