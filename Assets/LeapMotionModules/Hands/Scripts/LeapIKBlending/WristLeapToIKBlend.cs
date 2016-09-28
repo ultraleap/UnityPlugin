@@ -42,7 +42,7 @@ namespace Leap.Unity {
     private float spineLayerTargetWeight;
 
     private Vector3 UntrackedIKPosition;
-    private bool isTracking;
+    public bool isTracking;
     private Transform characterRoot;
     private float distanceShoulderToPalm;
 

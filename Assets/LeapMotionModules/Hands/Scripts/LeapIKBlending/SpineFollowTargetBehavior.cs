@@ -25,6 +25,9 @@ public class SpineFollowTargetBehavior : MonoBehaviour {
   private Animator m_animator;
   private Transform m_spineRootTransform;
 
+  public WristLeapToIKBlend wristLeapToIKBlend_L;
+  public WristLeapToIKBlend wristLeapToIKBlend_R;
+
   // Use this for initialization
   void Start() {
     m_animator = GetComponent<Animator>();
@@ -39,7 +42,13 @@ public class SpineFollowTargetBehavior : MonoBehaviour {
 
   // Update is called once per frame
   void LateUpdate() {
-    rotateSpineToFollow(Target);
+    if (wristLeapToIKBlend_L.isTracking || wristLeapToIKBlend_R.isTracking) {
+      rotateSpineToFollow(Target);
+    }
+    else {
+      Debug.Log("returning spine muscles");
+      returnSpineMuscles();
+    }
   }
 
   private Transform getSpineRootTransform() {
@@ -78,6 +87,18 @@ public class SpineFollowTargetBehavior : MonoBehaviour {
 
     m_animator.SetFloat(propertyName(maxDirection), maxVal);
     m_animator.SetFloat(propertyName(minDirection), minVal);
+
+  }
+
+  private void returnSpineMuscles() {
+    m_animator.SetFloat("spine_back", Mathf.Lerp(m_animator.GetFloat("spine_back"), 0, .1f));
+    m_animator.SetFloat("spine_forward", Mathf.Lerp(m_animator.GetFloat("spine_forward"), 0, .1f));
+    m_animator.SetFloat("spine_left", Mathf.Lerp(m_animator.GetFloat("spine_left"), 0, .1f));
+    m_animator.SetFloat("spine_right", Mathf.Lerp(m_animator.GetFloat("spine_right"), 0, .1f));
+    //m_animator.SetFloat(BACK_LABEL, 0);
+    //m_animator.SetFloat(FORWARD_LABEL, 0);
+    //m_animator.SetFloat(LEFT_LABEL, 0);
+    //m_animator.SetFloat(RIGHT_LABEL, 0);
   }
 
   // I should have made this a dictionary.
