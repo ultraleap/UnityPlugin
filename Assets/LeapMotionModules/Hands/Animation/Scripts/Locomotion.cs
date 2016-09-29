@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class Locomotion {
@@ -14,7 +15,6 @@ public class Locomotion {
   public float m_DirectionResponseTime = 0.4f;
 
   public Animation walkAnim;
-
   public Locomotion(Animator animator) {
     m_Animator = animator;
 
@@ -43,8 +43,9 @@ public class Locomotion {
     float angularSpeed = direction / m_DirectionResponseTime;
 
     m_Animator.SetFloat(m_SpeedId, speed, speedDampTime, Time.deltaTime);
-    m_Animator.SetFloat(m_AgularSpeedId, angularSpeed * reverse *2, angularSpeedDampTime, Time.deltaTime);
-    m_Animator.SetFloat(m_DirectionId, direction * reverse, directionDampTime, Time.deltaTime);
+    m_Animator.SetFloat(m_AgularSpeedId, angularSpeed * reverse, angularSpeedDampTime, Time.deltaTime);
+    m_Animator.SetFloat(m_DirectionId, direction * reverse, 0, Time.deltaTime);
     m_Animator.SetFloat(m_ReverseID, reverse, 0, Time.deltaTime);
+
   }
 }

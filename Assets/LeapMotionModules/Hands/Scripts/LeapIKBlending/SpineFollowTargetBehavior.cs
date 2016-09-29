@@ -46,7 +46,6 @@ public class SpineFollowTargetBehavior : MonoBehaviour {
       rotateSpineToFollow(Target);
     }
     else {
-      Debug.Log("returning spine muscles");
       returnSpineMuscles();
     }
   }

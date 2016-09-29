@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.VR;
 using System.Collections;
 
@@ -18,11 +19,19 @@ namespace Leap.Unity {
     public Transform LMRig;
     public bool LMRigToFollowAnimator;
 
+    public Text standWalkStateText;
+    public Text m_AnimatorStateText;
+    public Text CenteringText;
+    public Text DistanceText;
+    public Text SpeedText;
+
     void Awake() {
       LMRig = GameObject.FindObjectOfType<LeapHandController>().transform.root;
     }
     
     void Start() {
+      CenteringText.text = "";
+
       InputTracking.Recenter();
       animator = GetComponent<Animator>();
       locomotion = new Locomotion(animator);
@@ -34,6 +43,25 @@ namespace Leap.Unity {
         LMRigLococmotion();
       }
       else AnimatorLocomotion();
+
+      if (standing) {
+        standWalkStateText.text = "Idle/Turning";
+      }
+      else standWalkStateText.text = "WalkRun";
+
+      AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(1);
+      if (state.IsName("Locomotion.Idle")) {
+        m_AnimatorStateText.text = "State: Idle";
+      }
+      if (state.IsName("Locomotion.TurnOnSpot")) {
+        m_AnimatorStateText.text = "State: TurnOnSpot";
+      }
+      if (state.IsName("Locomotion.WalkRun")) {
+        m_AnimatorStateText.text = "State: WalkRun";
+      }
+      DistanceText.text = distanceToRoot.magnitude.ToString("F2");
+      SpeedText.text = animator.GetFloat("Speed").ToString("F2");
+
     }
     void LMRigLococmotion() {
       //Requires positioning of LMHeadMountedRig OnAnimatorIK()
@@ -92,12 +120,15 @@ namespace Leap.Unity {
       distanceToRoot = flatCamPosition - flatRootPosition;
       speed = distanceToRoot.magnitude;
       //Debug.Log("speed: " + speed);
-      if (!standing && speed < .3f) {
+      if (!standing && speed < .15f) {
         standing = true;
-        StartCoroutine(centerUnderCamera());
+        if (!isCentering && distanceToRoot.magnitude > .05f) {
+          StartCoroutine(centerUnderCamera());
+        }
         Debug.Log("Switching Standing to True ++++++++++++++++++++++++++++++++++++++++++++++++");
       }
-      if (standing && speed > .5) {
+      if (standing && speed > .30) {
+        StopAllCoroutines();
         standing = false;
         Debug.Log("Switching Standing to False -----------------------------------------------");
       }
@@ -107,12 +138,12 @@ namespace Leap.Unity {
       }
       else {
         moveDirection = MoveDirectionTowardCamera();
-        if (transform.InverseTransformPoint(Camera.main.transform.position).z < -.1f
-          && direction > -20 && direction < 20) {
-          Debug.Log("Reversing");
-          moveDirection = MoveDirectionCameraDirection();
-          reverse = -1;
-        }
+        //if (transform.InverseTransformPoint(Camera.main.transform.position).z < -.1f
+        //  && direction > -20 && direction < 20) {
+        //  Debug.Log("Reversing");
+        //  moveDirection = MoveDirectionCameraDirection();
+        //  reverse = -1;
+        //}
       }
 
       //Vector3 moveDirection = referentialShift * CameraDirection;
@@ -120,7 +151,7 @@ namespace Leap.Unity {
       direction = Vector3.Angle(rootDirection, moveDirection) / 180f * (axis.y < 0 ? -1 : 1);
 
       if (animator && Camera.main) {
-        locomotion.Do(speed, (direction * 180), reverse);
+        locomotion.Do(speed , (direction * 180), reverse);
         Debug.DrawLine(transform.position, moveDirection * 2, Color.red);
       }
     }
@@ -130,16 +161,21 @@ namespace Leap.Unity {
         LMRig.position = new Vector3(transform.position.x, LMRig.position.y, transform.position.z);
       }
       Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
-      transform.position = Vector3.Lerp(transform.position, placeAnimatorUnderCam, .001f);
+      //transform.position = Vector3.Lerp(transform.position, placeAnimatorUnderCam, .001f);
     }
+    private bool isCentering = false;
 
     private IEnumerator centerUnderCamera () {
+      CenteringText.text = "Centering Start";
+      isCentering = true;
       while (distanceToRoot.magnitude > .05f) {
         Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
-        transform.position = Vector3.Lerp(transform.position, placeAnimatorUnderCam, Time.deltaTime * 10f);
-        Debug.Log("Centering");
+        transform.position = Vector3.Lerp(transform.position, placeAnimatorUnderCam, .1f);
+        //Debug.Log("Centering");
+        CenteringText.text = "Centering";
         yield return null;
-
+        isCentering = false;
+        CenteringText.text = "";
       }
     }
   }
