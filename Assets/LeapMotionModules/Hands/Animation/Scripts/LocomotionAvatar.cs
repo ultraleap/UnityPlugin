@@ -2,18 +2,21 @@
 using UnityEngine.UI;
 using UnityEngine.VR;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Leap.Unity {
   public class LocomotionAvatar : MonoBehaviour {
     protected Animator animator;
 
     private float speed = 0;
+    private float averageSpeed = 0;
+    private Queue<float> speedList = new Queue<float>(5);
     private float direction = 0;
     private Locomotion locomotion = null;
 
     private Vector3 moveDirection;
-
     
+
     private Vector3 distanceToRoot;
     private Vector3 rootDirection;
     public Transform LMRig;
@@ -28,7 +31,7 @@ namespace Leap.Unity {
     void Awake() {
       LMRig = GameObject.FindObjectOfType<LeapHandController>().transform.root;
     }
-    
+
     void Start() {
       CenteringText.text = "";
 
@@ -48,7 +51,6 @@ namespace Leap.Unity {
         standWalkStateText.text = "Idle/Turning";
       }
       else standWalkStateText.text = "WalkRun";
-
       AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(1);
       if (state.IsName("Locomotion.Idle")) {
         m_AnimatorStateText.text = "State: Idle";
@@ -61,8 +63,8 @@ namespace Leap.Unity {
       }
       DistanceText.text = distanceToRoot.magnitude.ToString("F2");
       SpeedText.text = animator.GetFloat("Speed").ToString("F2");
-
     }
+
     void LMRigLococmotion() {
       //Requires positioning of LMHeadMountedRig OnAnimatorIK()
       Vector3 flatCamPosition = transform.InverseTransformPoint(Camera.main.transform.position);
@@ -90,7 +92,7 @@ namespace Leap.Unity {
           //direction += joyDirection;
           speed += joySpeed;
         }
-        locomotion.Do(speed * 2 , (direction * 180 ), 1);
+        locomotion.Do(speed * 2, (direction * 180), 1);
       }
     }
     Vector3 MoveDirectionCameraDirection() {
@@ -100,7 +102,7 @@ namespace Leap.Unity {
       CameraDirection.y = 0.0f;
       return CameraDirection;
     }
-    Vector3 MoveDirectionTowardCamera () {
+    Vector3 MoveDirectionTowardCamera() {
       // Get camera rotation.
       rootDirection = transform.forward;// +transform.position;
       Vector3 DirectionToCamera = Camera.main.transform.position - transform.position;
@@ -110,7 +112,7 @@ namespace Leap.Unity {
       return DirectionToCamera;
     }
     bool standing = true;
-    
+
     void AnimatorLocomotion() {
       float reverse = 1;
       Vector3 flatCamPosition = Camera.main.transform.position;
@@ -119,21 +121,29 @@ namespace Leap.Unity {
       flatRootPosition.y = 0;
       distanceToRoot = flatCamPosition - flatRootPosition;
       speed = distanceToRoot.magnitude;
-      //Debug.Log("speed: " + speed);
-      if (!standing && speed < .15f) {
+
+      if (speedList.Count >= 5) {
+        speedList.Dequeue();
+      }
+      if (speedList.Count < 5) {
+        speedList.Enqueue(speed);
+      }
+      averageSpeed = 0;
+      foreach (float s in speedList) {
+        averageSpeed += s;
+      }
+      averageSpeed = (averageSpeed / 5);
+
+
+
+      if (!standing && averageSpeed < .15f) {
         standing = true;
-        if (!isCentering && distanceToRoot.magnitude > .05f) {
-          StartCoroutine(centerUnderCamera());
-        }
-        Debug.Log("Switching Standing to True ++++++++++++++++++++++++++++++++++++++++++++++++");
       }
-      if (standing && speed > .30) {
-        StopAllCoroutines();
+      if (standing && averageSpeed > .30) {
         standing = false;
-        Debug.Log("Switching Standing to False -----------------------------------------------");
       }
-      if (standing ) { //Dead "stick" and matching LMRigLococmotion method for turning in place
-        speed = 0.0f;
+      if (standing) { //Dead "stick" and matching LMRigLococmotion method for turning in place
+        averageSpeed = 0.0f;
         moveDirection = MoveDirectionCameraDirection();
       }
       else {
@@ -149,9 +159,8 @@ namespace Leap.Unity {
       //Vector3 moveDirection = referentialShift * CameraDirection;
       Vector3 axis = Vector3.Cross(rootDirection, moveDirection);
       direction = Vector3.Angle(rootDirection, moveDirection) / 180f * (axis.y < 0 ? -1 : 1);
-
       if (animator && Camera.main) {
-        locomotion.Do(speed , (direction * 180), reverse);
+        locomotion.Do(averageSpeed, (direction * 180), reverse);
         Debug.DrawLine(transform.position, moveDirection * 2, Color.red);
       }
     }
@@ -160,23 +169,9 @@ namespace Leap.Unity {
       if (LMRigToFollowAnimator) {
         LMRig.position = new Vector3(transform.position.x, LMRig.position.y, transform.position.z);
       }
-      Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
+      //Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
+      
       //transform.position = Vector3.Lerp(transform.position, placeAnimatorUnderCam, .001f);
-    }
-    private bool isCentering = false;
-
-    private IEnumerator centerUnderCamera () {
-      CenteringText.text = "Centering Start";
-      isCentering = true;
-      while (distanceToRoot.magnitude > .05f) {
-        Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
-        transform.position = Vector3.Lerp(transform.position, placeAnimatorUnderCam, .1f);
-        //Debug.Log("Centering");
-        CenteringText.text = "Centering";
-        yield return null;
-        isCentering = false;
-        CenteringText.text = "";
-      }
     }
   }
 }
