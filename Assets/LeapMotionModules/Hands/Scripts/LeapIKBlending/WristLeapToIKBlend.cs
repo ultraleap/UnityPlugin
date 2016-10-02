@@ -231,10 +231,10 @@ namespace Leap.Unity {
       shouldersLayerWeight = Mathf.Lerp(shouldersLayerWeight, shouldersLayerTargetWeight, .1f);
 
       if (Handedness == Chirality.Left) {
-        animator.SetLayerWeight(3, shouldersLayerWeight);
+        animator.SetLayerWeight(2, shouldersLayerWeight);
       }
       if (Handedness == Chirality.Right) {
-        animator.SetLayerWeight(4, shouldersLayerWeight);
+        animator.SetLayerWeight(3, shouldersLayerWeight);
       }
 
       //get Arm Directions and set elbow target position
@@ -281,7 +281,6 @@ namespace Leap.Unity {
         Debug.DrawLine(lastTrackedPosition, iKVelocitySnapShot, Color.green);
       }
     }
-
     public void OnAnimatorIK(int layerIndex) {
       ElbowMarker.position = Elbow.position;
       ElbowMarker.rotation = Elbow.rotation;
@@ -296,6 +295,7 @@ namespace Leap.Unity {
 
         //raise shoulder as elbow goes above shoulder
         if (elbow.y > scapula.y) {
+          Debug.Log("Y");
           shoulder_up_target_weight = (elbow.y - shoulder.y) * 10f;
         }
         else {

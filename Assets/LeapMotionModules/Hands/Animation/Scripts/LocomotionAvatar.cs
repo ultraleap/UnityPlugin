@@ -51,7 +51,7 @@ namespace Leap.Unity {
         standWalkStateText.text = "Idle/Turning";
       }
       else standWalkStateText.text = "WalkRun";
-      AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(1);
+      AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
       if (state.IsName("Locomotion.Idle")) {
         m_AnimatorStateText.text = "State: Idle";
       }
