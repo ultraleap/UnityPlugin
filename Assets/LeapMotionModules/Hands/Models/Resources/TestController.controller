@@ -235,7 +235,18 @@ AnimatorStateMachine:
   m_ExitPosition: {x: 800, y: 120, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
   m_DefaultState: {fileID: 1102000013810938022}
---- !u!114 &114000012812954230
+--- !u!114 &114000013432270700
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b24675a2d9b20064ebab65e77b557975, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &114000013690992264
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -1004,7 +1015,7 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 4
     m_ConditionEvent: Speed
-    m_EventTreshold: 0.5
+    m_EventTreshold: 0.3
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1102000013810938022}
   m_Solo: 0
@@ -1049,7 +1060,7 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 3
     m_ConditionEvent: Speed
-    m_EventTreshold: 0.5
+    m_EventTreshold: 0.3
   - m_ConditionMode: 3
     m_ConditionEvent: Direction
     m_EventTreshold: -30
@@ -1207,7 +1218,7 @@ AnimatorState:
   - {fileID: 1101000010443914756}
   - {fileID: 1101000010324575958}
   m_StateMachineBehaviours:
-  - {fileID: 114000012812954230}
+  - {fileID: 114000013690992264}
   m_Position: {x: 36, y: -120, z: 0}
   m_IKOnFeet: 1
   m_WriteDefaultValues: 1
@@ -1215,7 +1226,7 @@ AnimatorState:
   m_SpeedParameterActive: 0
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
-  m_Motion: {fileID: 7400000, guid: dffa50cfe77e0434bbfa71245b3dd529, type: 3}
+  m_Motion: {fileID: 7400014, guid: ce448a8080b4e934b8473badd27be402, type: 3}
   m_Tag: 
   m_SpeedParameter: Reverse
   m_MirrorParameter: 
