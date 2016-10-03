@@ -267,12 +267,21 @@ namespace Leap.Unity {
       onAnimatorIKCaller.wristLeapToIKBlend_L = (WristLeapToIKBlend)HandTransitionBehavior_L;
       onAnimatorIKCaller.wristLeapToIKBlend_R = (WristLeapToIKBlend)HandTransitionBehavior_R;
       SpineFollowTargetBehavior spineFollowTargetBehavior = gameObject.AddComponent<SpineFollowTargetBehavior>();
+      spineFollowTargetBehavior.wristLeapToIKBlend_L = WristLeapToIKBlend_L;
+      spineFollowTargetBehavior.wristLeapToIKBlend_R = WristLeapToIKBlend_R;
       ShoulderTurnBehavior shoulderTurnBehavior = gameObject.AddComponent<ShoulderTurnBehavior>();
-      LocomotionAvatar locomotionAvatar = gameObject.AddComponent<LocomotionAvatar>();
       //Assign and configure Animator Controller to Animator
       //AnimatorForMapping.runtimeAnimatorController = runtimeAnimatorController;
       AnimatorForMapping.updateMode = AnimatorUpdateMode.AnimatePhysics;
       AnimatorForMapping.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+    }
+    [ContextMenu("AutoRigLocomotion")]
+    public void AutoRigLocomotion() {
+      LocomotionAvatar locomotionAvatar = gameObject.AddComponent<LocomotionAvatar>();
+      //OnAnimatorIKCaller onAnimatorIKCaller = gameObject.GetComponent<OnAnimatorIKCaller>();
+      //onAnimatorIKCaller.wristLeapToIKBlend_L = RiggedHand_L.gameObject.GetComponent<WristLeapToIKBlend>();
+      //onAnimatorIKCaller.wristLeapToIKBlend_R = RiggedHand_R.gameObject.GetComponent<WristLeapToIKBlend>();
+      //Assign OnAnimatorIK Caller
     }
     //Monobehavior's OnValidate() is used to push LeapHandsAutoRig values to RiggedHand and RiggedFinger components
     void OnValidate() {

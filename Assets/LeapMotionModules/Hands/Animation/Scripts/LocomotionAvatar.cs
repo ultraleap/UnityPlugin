@@ -27,14 +27,14 @@ namespace Leap.Unity {
     public Text CenteringText;
     public Text DistanceText;
     public Text SpeedText;
-    private bool isDisplayState = true;
+    private bool isDisplayState = false;
 
     void Awake() {
       LMRig = GameObject.FindObjectOfType<LeapHandController>().transform.root;
     }
 
     void Start() {
-      CenteringText.text = "";
+      //CenteringText.text = "";
 
       InputTracking.Recenter();
       animator = GetComponent<Animator>();
