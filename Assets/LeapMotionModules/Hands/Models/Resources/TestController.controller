@@ -224,7 +224,7 @@ AnimatorStateMachine:
   m_ChildStateMachines:
   - serializedVersion: 1
     m_StateMachine: {fileID: 1107000010164574112}
-    m_Position: {x: 228, y: -48, z: 0}
+    m_Position: {x: 108, y: -72, z: 0}
   m_AnyStateTransitions: []
   m_EntryTransitions:
   - {fileID: 1109000013759643810}
@@ -252,7 +252,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b24675a2d9b20064ebab65e77b557975, type: 3}
   m_Name: 

@@ -280,10 +280,11 @@ namespace Leap.Unity {
       if (!isTracking && Handedness == Chirality.Right) {
         Debug.DrawLine(lastTrackedPosition, iKVelocitySnapShot, Color.green);
       }
-    }
-    public void OnAnimatorIK(int layerIndex) {
       ElbowMarker.position = Elbow.position;
       ElbowMarker.rotation = Elbow.rotation;
+    }
+    public void OnAnimatorIK(int layerIndex) {
+
       //turn off elbow hint if hand close to shoulder
       if (distanceShoulderToPalm < .1f) {
         elbowIKTargetWeight = 0;
@@ -295,7 +296,6 @@ namespace Leap.Unity {
 
         //raise shoulder as elbow goes above shoulder
         if (elbow.y > scapula.y) {
-          Debug.Log("Y");
           shoulder_up_target_weight = (elbow.y - shoulder.y) * 10f;
         }
         else {

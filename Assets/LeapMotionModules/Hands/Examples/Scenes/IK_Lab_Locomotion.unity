@@ -785,7 +785,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  ArmDropDuration: 1.5
+  ArmDropDuration: 0.001
   m_IKMarkerAssembly: {fileID: 1603189097}
   leapHandController: {fileID: 72891528}
   ZvalueText: {fileID: 1399044199}
@@ -1896,7 +1896,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
-  ArmDropDuration: 1.5
+  ArmDropDuration: 0.001
   m_IKMarkerAssembly: {fileID: 1603189097}
   leapHandController: {fileID: 72891528}
   ZvalueText: {fileID: 443258328}
@@ -2500,6 +2500,10 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 13700000, guid: 0efff3089713e0d41adbb35a1a06b1c1, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 400106, guid: 0efff3089713e0d41adbb35a1a06b1c1, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2692,6 +2696,14 @@ Prefab:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 13700000, guid: 0efff3089713e0d41adbb35a1a06b1c1, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300000, guid: 2249cefbe3b93c04dae9e62d1cc17db7, type: 3}
+    - target: {fileID: 13700000, guid: 0efff3089713e0d41adbb35a1a06b1c1, type: 3}
+      propertyPath: m_Materials.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100000, guid: 09f3117c14e04b040ac5eb8843251253, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 0efff3089713e0d41adbb35a1a06b1c1, type: 3}
   m_IsPrefabParent: 0

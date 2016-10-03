@@ -43,7 +43,7 @@ public class CenterOnIdle : StateMachineBehaviour {
     flatRootPosition.y = 0;
     Vector3 distanceToRoot = flatCamPosition - flatRootPosition;
 
-    if (!hasRun && elapsedTime > 3.0f && distanceToRoot.magnitude > .15f) {
+    if (!hasRun && elapsedTime > 1.0f && distanceToRoot.magnitude > .15f) {
       Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, animator.transform.position.y, Camera.main.transform.position.z);
       animator.transform.position = Vector3.Lerp(startPos, placeAnimatorUnderCam, percentComplete);
       percentComplete += .05f;

@@ -27,6 +27,7 @@ namespace Leap.Unity {
     public Text CenteringText;
     public Text DistanceText;
     public Text SpeedText;
+    private bool isDisplayState = true;
 
     void Awake() {
       LMRig = GameObject.FindObjectOfType<LeapHandController>().transform.root;
@@ -46,25 +47,13 @@ namespace Leap.Unity {
         LMRigLococmotion();
       }
       else AnimatorLocomotion();
-
-      if (standing) {
-        standWalkStateText.text = "Idle/Turning";
+      
+      if (isDisplayState) {
+        StateDisplay();
       }
-      else standWalkStateText.text = "WalkRun";
-      AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
-      if (state.IsName("Locomotion.Idle")) {
-        m_AnimatorStateText.text = "State: Idle";
-      }
-      if (state.IsName("Locomotion.TurnOnSpot")) {
-        m_AnimatorStateText.text = "State: TurnOnSpot";
-      }
-      if (state.IsName("Locomotion.WalkRun")) {
-        m_AnimatorStateText.text = "State: WalkRun";
-      }
-      DistanceText.text = distanceToRoot.magnitude.ToString("F2");
-      SpeedText.text = animator.GetFloat("Speed").ToString("F2");
+      
     }
-
+   
     void LMRigLococmotion() {
       //Requires positioning of LMHeadMountedRig OnAnimatorIK()
       Vector3 flatCamPosition = transform.InverseTransformPoint(Camera.main.transform.position);
@@ -172,6 +161,25 @@ namespace Leap.Unity {
       //Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
       
       //transform.position = Vector3.Lerp(transform.position, placeAnimatorUnderCam, .001f);
+    }
+
+    void StateDisplay() {
+      if (standing) {
+        standWalkStateText.text = "Idle/Turning";
+      }
+      else standWalkStateText.text = "WalkRun";
+      AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+      if (state.IsName("Locomotion.Idle")) {
+        m_AnimatorStateText.text = "State: Idle";
+      }
+      if (state.IsName("Locomotion.TurnOnSpot")) {
+        m_AnimatorStateText.text = "State: TurnOnSpot";
+      }
+      if (state.IsName("Locomotion.WalkRun")) {
+        m_AnimatorStateText.text = "State: WalkRun";
+      }
+      DistanceText.text = distanceToRoot.magnitude.ToString("F2");
+      SpeedText.text = animator.GetFloat("Speed").ToString("F2");
     }
   }
 }
