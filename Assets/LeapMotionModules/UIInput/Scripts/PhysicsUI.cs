@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Leap.Unity.InputModule {
-  /** A physics-enabled button. Activation is triggered by physically push the button back to its unsprung position. 
+  /** A physics-enabled button. Activation is triggered by physically pushing the button back to its unsprung position. 
     * Requires a SpringJoint.
     */
   public class PhysicsUI : MonoBehaviour {

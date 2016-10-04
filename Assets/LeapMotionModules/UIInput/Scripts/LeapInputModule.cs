@@ -866,7 +866,7 @@ namespace Leap.Unity.InputModule {
       Pointers[whichPointer].localScale = Pointerscale * new Vector3(1f, 1f /*+ pointData.delta.magnitude*1f*/, 1f);
     }
 
-    /** A boolean function that returns when a "click" is being triggered. */
+    /** A boolean function that returns true if a "click" is being triggered during the current frame. */
     public bool isTriggeringInteraction(int whichPointer, int whichHand, int whichFinger) {
 
       if (InteractionMode != InteractionCapability.Projective) {
