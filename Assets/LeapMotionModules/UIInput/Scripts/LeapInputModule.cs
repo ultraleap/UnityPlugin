@@ -14,7 +14,7 @@ namespace Leap.Unity.InputModule {
     //General Interaction Parameters
     [Header(" Interaction Setup")]
     [Tooltip("The current Leap Data Provider for the scene.")]
-    /** The LeapProvider providing tracking data to the scene." */
+    /** The LeapProvider providing tracking data to the scene. */
     public LeapProvider LeapDataProvider;
     [Tooltip("An optional alternate detector for pinching on the left hand.")]
     /** An optional component that will be used to detect pinch motions if set.
@@ -52,7 +52,7 @@ namespace Leap.Unity.InputModule {
     public Color TriggeringColor = Color.gray;
     [Tooltip("The color of the pointer when it is triggering blank canvas.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
-    /** The color for the cursor when it is touching or triggering a non-active part of the UI (i.e. the canvas). */
+    /** The color for the cursor when it is touching or triggering a non-active part of the UI (such as the canvas). */
     public Color TriggerMissedColor = Color.gray;
 
     //Advanced Options

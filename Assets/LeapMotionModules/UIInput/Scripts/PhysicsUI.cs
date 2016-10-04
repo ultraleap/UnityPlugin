@@ -11,7 +11,7 @@ namespace Leap.Unity.InputModule {
     */
   public class PhysicsUI : MonoBehaviour {
     [Tooltip("The physically-enabled body of the button")]
-    /** The spring-loaded game object that serves as the movable pressable portion of the button.*/
+    /** The spring-loaded game object that serves as the movable, pressable portion of the button.*/
     public Transform ButtonFace;
     [Tooltip("OPTIONAL: If you have a dropshadow image that you would like to opacity fade upon compression, add one here")]
     /** An optional drop-shadow image. The opacity of this shadow is modified as the button is compressed. */
