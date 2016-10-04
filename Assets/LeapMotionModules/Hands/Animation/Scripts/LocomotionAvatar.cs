@@ -10,7 +10,7 @@ namespace Leap.Unity {
 
     private float speed = 0;
     private float averageSpeed = 0;
-    private Queue<float> speedList = new Queue<float>(5);
+    private Queue<float> speedList = new Queue<float>(10);
     private float direction = 0;
     private Locomotion locomotion = null;
 
@@ -28,6 +28,10 @@ namespace Leap.Unity {
     public Text DistanceText;
     public Text SpeedText;
     private bool isDisplayState = false;
+
+    //For debugging - - - - - - - - - - - - - - - - 
+    public Transform AnimatorRoot;
+    public Transform CameraOnGround;
 
     void Awake() {
       LMRig = GameObject.FindObjectOfType<LeapHandController>().transform.root;
@@ -111,17 +115,17 @@ namespace Leap.Unity {
       distanceToRoot = flatCamPosition - flatRootPosition;
       speed = distanceToRoot.magnitude;
 
-      if (speedList.Count >= 5) {
+      if (speedList.Count >= 10) {
         speedList.Dequeue();
       }
-      if (speedList.Count < 5) {
+      if (speedList.Count < 10) {
         speedList.Enqueue(speed);
       }
       averageSpeed = 0;
       foreach (float s in speedList) {
         averageSpeed += s;
       }
-      averageSpeed = (averageSpeed / 5);
+      averageSpeed = (averageSpeed / 10);
 
 
 
@@ -149,18 +153,22 @@ namespace Leap.Unity {
       Vector3 axis = Vector3.Cross(rootDirection, moveDirection);
       direction = Vector3.Angle(rootDirection, moveDirection) / 180f * (axis.y < 0 ? -1 : 1);
       if (animator && Camera.main) {
-        locomotion.Do(averageSpeed, (direction * 180), reverse);
+        locomotion.Do(averageSpeed * 1.25f, (direction * 180), reverse);
         Debug.DrawLine(transform.position, moveDirection * 2, Color.red);
       }
     }
-
+    public bool IsCentering = false;
     void OnAnimatorIK() {
       if (LMRigToFollowAnimator) {
         LMRig.position = new Vector3(transform.position.x, LMRig.position.y, transform.position.z);
       }
-      //Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
-      
-      //transform.position = Vector3.Lerp(transform.position, placeAnimatorUnderCam, .001f);
+      Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
+      //CameraOnGround.position = placeAnimatorUnderCam;
+      //AnimatorRoot.position = animator.rootPosition;  
+      //if(Input.GetKey(KeyCode.Space)){
+      if (IsCentering) {
+        animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam, .1f);
+      }
     }
 
     void StateDisplay() {

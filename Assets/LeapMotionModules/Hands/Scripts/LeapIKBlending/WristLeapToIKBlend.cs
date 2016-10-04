@@ -241,12 +241,25 @@ namespace Leap.Unity {
       armDirection = handModel.GetArmDirection();
       Vector3 ElbowTargetPosition = characterRoot.InverseTransformPoint(palm.position + (armDirection * ElbowOffset));
       Vector3 palmInAnimatorSpace = characterRoot.InverseTransformPoint(PalmPositionAtLateUpdate);
+      Vector3 shoulderInAnimatorSpace = characterRoot.InverseTransformDirection(Shoulder.position);
       distanceShoulderToPalm = (palm.position - Shoulder.transform.position).magnitude;
       if (Handedness == Chirality.Left) {
-        ElbowTargetPosition.x -= distanceShoulderToPalm * .2f;
+        ElbowTargetPosition.x -= distanceShoulderToPalm * .5f;
+        if(palmInAnimatorSpace.z < 0){
+          ElbowTargetPosition.x += palmInAnimatorSpace.z * 10;
+          if (ElbowTargetPosition.y > shoulderInAnimatorSpace.y) {
+            ElbowTargetPosition.y = shoulderInAnimatorSpace.y;
+          }
+        }
       }
       if (Handedness == Chirality.Right) {
-        ElbowTargetPosition.x += distanceShoulderToPalm * .2f;
+        ElbowTargetPosition.x += distanceShoulderToPalm * .5f;
+        if (palmInAnimatorSpace.z < 0) {
+          ElbowTargetPosition.x -= palmInAnimatorSpace.z * 10;
+          if (ElbowTargetPosition.y > shoulderInAnimatorSpace.y) {
+            ElbowTargetPosition.y = shoulderInAnimatorSpace.y;
+          }
+        }
       }
       if (Handedness == Chirality.Left && ElbowTargetPosition.x > -.05f) {
         ElbowTargetPosition.x = -.1f;
