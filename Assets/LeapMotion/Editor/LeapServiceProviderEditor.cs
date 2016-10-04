@@ -7,9 +7,6 @@ namespace Leap.Unity {
     protected override void OnEnable() {
       base.OnEnable();
 
-      specifyConditionalDrawing("_useInterpolation",
-                                "_interpolationDelay");
-
       specifyConditionalDrawing("_overrideDeviceType",
                                 "_overrideDeviceTypeWith");
     }

@@ -138,8 +138,8 @@ namespace Leap.Unity.InputModule {
     private Frame curFrame;
     private GameObject[] currentGo;
     private GameObject[] currentGoing;
-    private Vector3 OldCameraPos;
-    private Quaternion OldCameraRot;
+    private Vector3 OldCameraPos = Vector3.zero;
+    private Quaternion OldCameraRot = Quaternion.identity;
     private float OldCameraFoV;
 
     //Queue of Spheres to Debug Draw
@@ -256,7 +256,7 @@ namespace Leap.Unity.InputModule {
     void Update() {
       curFrame = LeapDataProvider.CurrentFrame;
 
-      if (Camera.main != null && OldCameraRot != null) {
+      if (Camera.main != null) {
         Quaternion HeadYaw = Quaternion.Euler(0f, OldCameraRot.eulerAngles.y, 0f);
         CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.1f);
       }
