@@ -477,7 +477,7 @@ namespace Leap.Unity.InputModule {
 
 
           //If we have dragged beyond the drag threshold
-          if (!PointEvents[whichPointer].dragging && currentGoing[whichPointer] && Vector2.Distance(PointEvents[whichPointer].position, DragBeginPosition[whichPointer]) > EventSystem.current.pixelDragThreshold) {
+          if (!PointEvents[whichPointer].dragging && currentGoing[whichPointer] && Vector2.Distance(PointEvents[whichPointer].position, DragBeginPosition[whichPointer])*100f > EventSystem.current.pixelDragThreshold) {
             IDragHandler Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
             if (Dragger != null && Dragger is ScrollRect) {
               if (currentGo[whichPointer] && !(currentGo[whichPointer].GetComponent<ScrollRect>())) {
