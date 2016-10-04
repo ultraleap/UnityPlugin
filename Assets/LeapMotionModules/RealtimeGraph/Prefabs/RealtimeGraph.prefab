@@ -1741,7 +1741,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 162dcfeacb7a56142a2c54f61504a50e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _defaultGraph: GPU Time
+  _defaultGraph: Frame Delta
   _graphMode: 1
   _historyLength: 64
   _updatePeriod: 1
