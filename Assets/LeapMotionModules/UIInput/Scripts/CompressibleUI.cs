@@ -36,7 +36,7 @@ namespace Leap.Unity.InputModule {
       /** An optional dropshadow image component. */
       public UnityEngine.UI.Image Shadow;
       [Tooltip("If the shadow effect is not childed to this layer, but the layer above it (for masking purposes)")]
-      /** Whether the shadow effect is not a child of this layer, but rather, a child of the layer above it (i.e. for masking purposes). */
+      /** Whether the shadow effect is not a child of this layer, but rather, a child of the layer above it (for masking purposes). */
       public bool ShadowOnAboveLayer;
       [Tooltip("If the event is triggered upon touching this layer (useful for ratcheted sounds)")]
       /** Whether a layer event is triggered upon touching this layer. */
