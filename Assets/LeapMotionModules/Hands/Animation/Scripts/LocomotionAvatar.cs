@@ -16,7 +16,6 @@ namespace Leap.Unity {
 
     private Vector3 moveDirection;
     
-
     private Vector3 distanceToRoot;
     private Vector3 rootDirection;
     public Transform LMRig;
@@ -55,7 +54,9 @@ namespace Leap.Unity {
       if (isDisplayState) {
         StateDisplay();
       }
-      
+      if (Input.GetKeyUp(KeyCode.Space)) {
+        CenterUnderCamera();
+      }
     }
    
     void LMRigLococmotion() {
@@ -105,6 +106,10 @@ namespace Leap.Unity {
       return DirectionToCamera;
     }
     bool standing = true;
+
+    public void CenterUnderCamera() {
+      animator.transform.position = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
+    }
 
     void AnimatorLocomotion() {
       float reverse = 1;
@@ -167,7 +172,7 @@ namespace Leap.Unity {
       //AnimatorRoot.position = animator.rootPosition;  
       //if(Input.GetKey(KeyCode.Space)){
       if (IsCentering) {
-        animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam, .1f);
+        animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam, .05f);
       }
     }
 
