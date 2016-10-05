@@ -78,10 +78,7 @@ namespace Leap.Unity.Graphing {
     protected Text titleLabel;
 
     [SerializeField]
-    protected Canvas valueCanvas;
-
-    [SerializeField]
-    protected Text valueLabel;
+    protected TextMesh valueMesh;
 
     [SerializeField]
     protected GameObject customGraphPrefab;
@@ -207,7 +204,9 @@ namespace Leap.Unity.Graphing {
 
       _preCullTicks = -1;
 
-      AddSample("Tracking Framerate", GraphUnits.Framerate, 1000.0f / _provider.CurrentFrame.CurrentFramesPerSecond);
+      if (_provider != null) {
+        AddSample("Tracking Framerate", GraphUnits.Framerate, 1000.0f / _provider.CurrentFrame.CurrentFramesPerSecond);
+      }
 
       if (_currentGraph == null) {
         return;
@@ -272,8 +271,11 @@ namespace Leap.Unity.Graphing {
         endOfFrameTicks = newTicks;
 
         AddSample("Render Delta", GraphUnits.Miliseconds, _renderTicks);
+        AddSample("GPU Time", GraphUnits.Miliseconds, UnityEngine.VR.VRStats.gpuTimeLastFrame);
 
-        AddSample("Tracking Latency", GraphUnits.Miliseconds, (_provider.GetLeapController().Now() - _provider.CurrentFrame.Timestamp) * 0.001f);
+        if (_provider != null) {
+          AddSample("Tracking Latency", GraphUnits.Miliseconds, (_provider.GetLeapController().Now() - _provider.CurrentFrame.Timestamp) * 0.001f);
+        }
       }
     }
 
@@ -336,11 +338,11 @@ namespace Leap.Unity.Graphing {
       _texture.SetPixels32(_colors);
       _texture.Apply();
 
-      valueLabel.text = msToString(_smoothedValue.value);
+      valueMesh.text = msToString(_smoothedValue.value);
 
-      Vector3 localP = valueCanvas.transform.localPosition;
+      Vector3 localP = valueMesh.transform.localPosition;
       localP.y = _smoothedValue.value / max - 0.5f;
-      valueCanvas.transform.localPosition = localP;
+      valueMesh.transform.localPosition = localP;
     }
 
     protected Graph getGraph(string name, GraphUnits units) {

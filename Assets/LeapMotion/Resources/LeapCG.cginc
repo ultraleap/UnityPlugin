@@ -19,6 +19,8 @@ uniform float2 _LeapGlobalStereoUVOffset;
 
 uniform float4x4 _LeapGlobalWarpedOffset;
 
+uniform float4x4 _LeapHandTransforms[2];
+
 /////////////// Constants for Dragonfly Color Correction ///////////////
 #define RGB_SCALE     1.5 * float3(1.5, 1.0, 0.5)
 
@@ -68,6 +70,13 @@ float2 LeapGetStereoUndistortedUV(float4 screenPos){
 float4 LeapGetWarpedScreenPos(float4 transformedVertex){
   float4 warpedPosition = mul(_LeapGlobalWarpedOffset, transformedVertex);
   return ComputeScreenPos(warpedPosition);
+}
+
+
+/*** LEAP VERTEX WARPING ***/
+
+float4 LeapGetLateVertexPos(float4 vertex, int isLeft){
+	return mul(unity_WorldToObject, mul(_LeapHandTransforms[isLeft], mul(unity_ObjectToWorld, vertex)));
 }
 
 
