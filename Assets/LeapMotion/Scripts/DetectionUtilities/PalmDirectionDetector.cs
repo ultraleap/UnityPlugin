@@ -163,7 +163,7 @@ namespace Leap.Unity {
 
     #if UNITY_EDITOR
     private void OnDrawGizmos(){
-      if(ShowGizmos && HandModel != null){
+      if(ShowGizmos && HandModel != null && HandModel.IsTracked){
         Color centerColor;
         if (IsActive) {
           centerColor = OnColor;
