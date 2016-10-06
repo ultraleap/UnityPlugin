@@ -22,22 +22,24 @@ public class CenterOnIdle : StateMachineBehaviour {
 
   //OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks
   override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-    elapsedTime += Time.deltaTime;
-    Vector3 flatCamPosition = Camera.main.transform.position;
-    flatCamPosition.y = 0;
-    Vector3 flatRootPosition = animator.transform.position;
-    flatRootPosition.y = 0;
-    Vector3 distanceToRoot = flatCamPosition - flatRootPosition;
+    if (locoMotionAvatar != null) {
+      elapsedTime += Time.deltaTime;
+      Vector3 flatCamPosition = Camera.main.transform.position;
+      flatCamPosition.y = 0;
+      Vector3 flatRootPosition = animator.transform.position;
+      flatRootPosition.y = 0;
+      Vector3 distanceToRoot = flatCamPosition - flatRootPosition;
 
-    if (!hasRun && elapsedTime > 1.5f && distanceToRoot.magnitude > .05f) {
-      //Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, animator.transform.position.y, Camera.main.transform.position.z);
-      //animator.transform.position = Vector3.Lerp(startPos, placeAnimatorUnderCam, percentComplete);
-      //percentComplete += .1f;
-      locoMotionAvatar.IsCentering = true;
-    }
-    else if (distanceToRoot.magnitude < .10f) {
-      locoMotionAvatar.IsCentering = false;
-      hasRun = true;
+      if (!hasRun && elapsedTime > 1.5f && distanceToRoot.magnitude > .05f) {
+        //Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, animator.transform.position.y, Camera.main.transform.position.z);
+        //animator.transform.position = Vector3.Lerp(startPos, placeAnimatorUnderCam, percentComplete);
+        //percentComplete += .1f;
+        locoMotionAvatar.IsCentering = true;
+      }
+      else if (distanceToRoot.magnitude < .10f) {
+        locoMotionAvatar.IsCentering = false;
+        hasRun = true;
+      }
     }
   }
 
