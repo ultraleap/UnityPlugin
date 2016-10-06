@@ -239,7 +239,7 @@ namespace Leap.Unity {
     }
     [ContextMenu("AutoRigUpperBody")]
     public void AutoRigUpperBody() {
-      AnimatorForMapping.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("TestController");
+      AnimatorForMapping.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("LeapAvatarController");
       ikMarkersAssemblyPrefab = Resources.Load<IKMarkersAssembly>("IKMarkersAssembly");
       iKMarkersAssembly = GameObject.Instantiate(ikMarkersAssemblyPrefab) as IKMarkersAssembly;
       iKMarkersAssembly.transform.parent = transform;
