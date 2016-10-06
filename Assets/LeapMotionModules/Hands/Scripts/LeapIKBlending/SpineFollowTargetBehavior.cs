@@ -27,6 +27,7 @@ public class SpineFollowTargetBehavior : MonoBehaviour {
 
   public WristLeapToIKBlend wristLeapToIKBlend_L;
   public WristLeapToIKBlend wristLeapToIKBlend_R;
+  public bool AlwaysDriveSpine = true;
 
   // Use this for initialization
   void Start() {

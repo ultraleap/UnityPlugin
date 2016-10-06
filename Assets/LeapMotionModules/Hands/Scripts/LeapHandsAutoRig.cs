@@ -278,10 +278,8 @@ namespace Leap.Unity {
     [ContextMenu("AutoRigLocomotion")]
     public void AutoRigLocomotion() {
       LocomotionAvatar locomotionAvatar = gameObject.AddComponent<LocomotionAvatar>();
-      //OnAnimatorIKCaller onAnimatorIKCaller = gameObject.GetComponent<OnAnimatorIKCaller>();
-      //onAnimatorIKCaller.wristLeapToIKBlend_L = RiggedHand_L.gameObject.GetComponent<WristLeapToIKBlend>();
-      //onAnimatorIKCaller.wristLeapToIKBlend_R = RiggedHand_R.gameObject.GetComponent<WristLeapToIKBlend>();
-      //Assign OnAnimatorIK Caller
+      SpineFollowTargetBehavior spineFollowTargetBehavior = gameObject.GetComponent<SpineFollowTargetBehavior>();
+      spineFollowTargetBehavior.AlwaysDriveSpine = false;
     }
     //Monobehavior's OnValidate() is used to push LeapHandsAutoRig values to RiggedHand and RiggedFinger components
     void OnValidate() {
