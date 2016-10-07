@@ -43,7 +43,7 @@ public class SpineFollowTargetBehavior : MonoBehaviour {
 
   // Update is called once per frame
   void LateUpdate() {
-    if (wristLeapToIKBlend_L.isTracking || wristLeapToIKBlend_R.isTracking) {
+    if (AlwaysDriveSpine == true || wristLeapToIKBlend_L.isTracking || wristLeapToIKBlend_R.isTracking) {
       rotateSpineToFollow(Target);
     }
     else {
@@ -68,7 +68,6 @@ public class SpineFollowTargetBehavior : MonoBehaviour {
 
     float normalZRotation = (aboutZRotation - MIN_LIMIT) / (MAX_LIMIT - MIN_LIMIT);
     float normalXRotation = (aboutXRotation - MIN_LIMIT) / (MAX_LIMIT - MIN_LIMIT);
-
 
     setSpineMuscles(normalXRotation, normalZRotation);
   }

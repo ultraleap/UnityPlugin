@@ -239,6 +239,9 @@ namespace Leap.Unity {
     }
     [ContextMenu("AutoRigUpperBody")]
     public void AutoRigUpperBody() {
+      VRHeightOffset vRHeightOffset = GameObject.FindObjectOfType<VRHeightOffset>();
+      float characterHeadHeight = AnimatorForMapping.GetBoneTransform(HumanBodyBones.Head).transform.position.y;
+      vRHeightOffset._deviceOffsets[0].HeightOffset = characterHeadHeight + .1f;//small offset above head for eye height 
       AnimatorForMapping.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("LeapAvatarController");
       ikMarkersAssemblyPrefab = Resources.Load<IKMarkersAssembly>("IKMarkersAssembly");
       iKMarkersAssembly = GameObject.Instantiate(ikMarkersAssemblyPrefab) as IKMarkersAssembly;
