@@ -1,4 +1,4 @@
-﻿#define VALIDATE
+﻿//#define VALIDATE
 using UnityEngine;
 using System;
 
