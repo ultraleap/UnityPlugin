@@ -149,7 +149,7 @@ namespace Leap.Unity {
 
     #if UNITY_EDITOR
     void OnDrawGizmos () {
-      if (ShowGizmos && HandModel != null) {
+      if (ShowGizmos && HandModel != null && HandModel.IsTracked) {
         PointingState[] state = { Thumb, Index, Middle, Ring, Pinky };
         Hand hand = HandModel.GetLeapHand();
         int extendedCount = 0;
