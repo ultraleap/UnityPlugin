@@ -13,8 +13,6 @@ namespace Leap.Unity {
     public string ModelGroupName = null;
     [Tooltip("Set to True if each finger has an extra trasform between palm and base of the finger.")] 
     public bool UseMetaCarpals;
-    [Tooltip("When True, hands will be put into a Leap editor pose near the LeapServiceProvider's transform.  When False, the hands will be returned to their Start Pose if it has been saved.")]
-    public bool SetEditorLeapPose = false;
     [Header("RiggedHand Components")]
     public RiggedHand RiggedHand_L;
     public RiggedHand RiggedHand_R;
@@ -74,15 +72,6 @@ namespace Leap.Unity {
         RiggedHand_R.StoreJointsStartPose();
       }
       else Debug.LogWarning("Please AutoRig before attempting to Store Start Pose");
-    }
-    /**Returns all hand joint transforms to their original local positions and local rotations */
-    [ContextMenu("ResetStartPose")]
-    public void RestoreStartPose() {
-      if (RiggedHand_L && RiggedHand_R) {
-        RiggedHand_L.RestoreJointsStartPose();
-        RiggedHand_R.RestoreJointsStartPose();
-      }
-      else Debug.LogWarning("Please AutoRig and Start Pose before attempting to Reset to Start Pose");
     }
     /**Uses transform names to discover and assign RiggedHands scripts,
      * then calls methods in the RiggedHands that use transform nanes to discover fingers.*/
@@ -238,15 +227,12 @@ namespace Leap.Unity {
         flippedPalmsState = FlipPalms;
       }
 
-
       //push palm and finger facing values to RiggedHand's and RiggedFinger's
       if (RiggedHand_L) {
-        RiggedHand_L.SetEditorLeapPose = SetEditorLeapPose;
         RiggedHand_L.modelFingerPointing = modelFingerPointing_L;
         RiggedHand_L.modelPalmFacing = modelPalmFacing_L;
       }
       if (RiggedHand_R) {
-        RiggedHand_R.SetEditorLeapPose = SetEditorLeapPose;
         RiggedHand_R.modelFingerPointing = modelFingerPointing_R;
         RiggedHand_R.modelPalmFacing = modelPalmFacing_R;
       }
