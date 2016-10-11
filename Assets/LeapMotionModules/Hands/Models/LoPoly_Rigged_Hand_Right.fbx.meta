@@ -62,6 +62,7 @@ ModelImporter:
     400052: R_thumb_meta
     400054: R_Wrist
     4300000: LoPoly_Hand_Mesh_Right
+    7400000: Take 001
     9500000: //RootNode
     13700000: LoPoly_Hand_Mesh_Right
   materials:
