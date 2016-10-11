@@ -231,12 +231,10 @@ namespace Leap.Unity {
 
       //push palm and finger facing values to RiggedHand's and RiggedFinger's
       if (RiggedHand_L) {
-        RiggedHand_L.SetEditorLeapPose = SetEditorLeapPose;
         RiggedHand_L.modelFingerPointing = modelFingerPointing_L;
         RiggedHand_L.modelPalmFacing = modelPalmFacing_L;
       }
       if (RiggedHand_R) {
-        RiggedHand_R.SetEditorLeapPose = SetEditorLeapPose;
         RiggedHand_R.modelFingerPointing = modelFingerPointing_R;
         RiggedHand_R.modelPalmFacing = modelPalmFacing_R;
       }
