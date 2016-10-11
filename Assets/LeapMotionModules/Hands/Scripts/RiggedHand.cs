@@ -34,6 +34,13 @@ namespace Leap.Unity {
         setEditorLeapPose = value;
       }
     }
+    [SerializeField]
+    public bool DeformPositionsInFingers;
+    [Tooltip("When True, hands will be put into a Leap editor pose near the LeapServiceProvider's transform.  When False, the hands will be returned to their Start Pose if it has been saved.")]
+    [SerializeField]
+    [HideInInspector]
+    private bool deformPositionsState = false;
+
 
     [Tooltip("Hands are typically rigged in 3D packages with the palm transform near the wrist. Uncheck this is your model's palm transform is at the center of the palm similar to Leap's API drives")]
     public bool ModelPalmAtLeapWrist = true;
@@ -255,10 +262,27 @@ namespace Leap.Unity {
     /**Restores original joint positions, particularly after model has been placed in Leap's editor pose */
     [ContextMenu("RestoreJointsStartPose")]
     public void RestoreJointsStartPose() {
+      Debug.Log("RestoreJointsStartPose()");
       for (int i = 0; i < jointList.Count; i++) {
         Transform jointTrans = jointList[i];
         jointTrans.localRotation = localRotations[i];
         jointTrans.localPosition = localPositions[i];
+      }
+    }
+    private void setDeformPositionsInFingers(bool onOff) {
+      RiggedFinger[] riggedFingers = GetComponentsInChildren<RiggedFinger>();
+      foreach(RiggedFinger finger in riggedFingers){
+        finger.deformPosition = onOff;
+      }
+    }
+    public void OnValidate() {
+      if (DeformPositionsInFingers != deformPositionsState) {
+        RestoreJointsStartPose();
+        setDeformPositionsInFingers(DeformPositionsInFingers);
+        deformPositionsState = DeformPositionsInFingers;
+      }
+      if (setEditorLeapPose == false) {
+        RestoreJointsStartPose();
       }
     }
   }

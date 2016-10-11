@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿//#define VALIDATE
+using UnityEngine;
 using System;
 
 namespace Leap.Unity {
@@ -25,7 +26,7 @@ namespace Leap.Unity {
 
     public void Insert(T element) {
 #if VALIDATE
-    validateHeap("Insert");
+      validateHeapInternal("Insert");
 #endif
 
       //if the array isn't big enough, expand it
@@ -63,7 +64,7 @@ namespace Leap.Unity {
 
     private T removeAt(int index) {
 #if VALIDATE
-    validateHeap("Remove At");
+      validateHeapInternal("Remove At");
 #endif
 
       T ret = _array[index];
@@ -108,7 +109,7 @@ namespace Leap.Unity {
       _array[element.heapIndex] = element;
 
 #if VALIDATE
-    validateHeap("Bubble Up");
+      validateHeapInternal("Bubble Up");
 #endif
     }
 
@@ -158,7 +159,7 @@ namespace Leap.Unity {
       _array[elementIndex] = element;
 
 #if VALIDATE
-    validateHeap("Bubble Down");
+      validateHeapInternal("Bubble Down");
 #endif
     }
 
