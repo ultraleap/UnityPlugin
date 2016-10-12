@@ -225,15 +225,7 @@ namespace Leap.Unity {
         HandPoolToPopulate.RemoveGroup(ModelGroupName);
       }
     }
-    
-    //Monobehavior's OnValidate() is used to push LeapHandsAutoRig values to RiggedHand and RiggedFinger components
-    void OnValidate() {
-      if (FlipPalms != flippedPalmsState) {
-        modelPalmFacing_L = modelPalmFacing_L * -1f;
-        modelPalmFacing_R = modelPalmFacing_R * -1f;
-        flippedPalmsState = FlipPalms;
-      }
-
+    public void PushVectorValues() {
       //push palm and finger facing values to RiggedHand's and RiggedFinger's
       if (RiggedHand_L) {
         RiggedHand_L.modelFingerPointing = modelFingerPointing_L;
@@ -282,6 +274,15 @@ namespace Leap.Unity {
       if (RiggedFinger_R_Pinky) {
         RiggedFinger_R_Pinky.modelFingerPointing = modelFingerPointing_R;
         RiggedFinger_R_Pinky.modelPalmFacing = modelPalmFacing_R;
+      }
+    }
+
+    //Monobehavior's OnValidate() is used to push LeapHandsAutoRig values to RiggedHand and RiggedFinger components
+    void OnValidate() {
+      if (FlipPalms != flippedPalmsState) {
+        modelPalmFacing_L = modelPalmFacing_L * -1f;
+        modelPalmFacing_R = modelPalmFacing_R * -1f;
+        flippedPalmsState = FlipPalms;
       }
     }
     /**Removes the ModelGroup from HandPool that corresponds to this instance of LeapHandsAutoRig */
