@@ -283,6 +283,7 @@ namespace Leap.Unity {
         modelPalmFacing_L = modelPalmFacing_L * -1f;
         modelPalmFacing_R = modelPalmFacing_R * -1f;
         flippedPalmsState = FlipPalms;
+        PushVectorValues();
       }
     }
     /**Removes the ModelGroup from HandPool that corresponds to this instance of LeapHandsAutoRig */
