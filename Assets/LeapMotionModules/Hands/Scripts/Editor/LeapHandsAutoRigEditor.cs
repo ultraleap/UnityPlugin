@@ -17,6 +17,9 @@ namespace Leap.Unity {
       if (GUILayout.Button("AutoRig")) {
         autoRigger.AutoRig();
       }
+      if (GUILayout.Button("Push Vector Values")) {
+        autoRigger.PushVectorValues();
+      }
     }
   }
 }

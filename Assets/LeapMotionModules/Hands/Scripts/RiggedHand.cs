@@ -262,7 +262,6 @@ namespace Leap.Unity {
     /**Restores original joint positions, particularly after model has been placed in Leap's editor pose */
     [ContextMenu("RestoreJointsStartPose")]
     public void RestoreJointsStartPose() {
-      Debug.Log("RestoreJointsStartPose()");
       for (int i = 0; i < jointList.Count; i++) {
         Transform jointTrans = jointList[i];
         jointTrans.localRotation = localRotations[i];
