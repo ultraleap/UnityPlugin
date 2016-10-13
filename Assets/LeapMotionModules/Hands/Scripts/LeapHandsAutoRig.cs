@@ -111,7 +111,6 @@ namespace Leap.Unity {
       Transform Hand_R = null;
       foreach (Transform t in transform) {
         if (RightHandStrings.Any(w => t.name.ToLower().Contains(w))) {
-          Debug.Log("Hand_R = " + t.name);
           Hand_R = t;
         }
       }
