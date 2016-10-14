@@ -83,7 +83,7 @@ namespace Leap.Unity {
       List<string> RightHandStrings = new List<string> { "right" };
 
       //Assigning these here since this component gets added and used at editor time
-      HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
+      //HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
       Reset();
 
       //Find hands and assigns RiggedHands
@@ -153,8 +153,8 @@ namespace Leap.Unity {
     [ContextMenu("AutoRigMecanim")]
     void AutoRigMecanim() {
       //Assigning these here since this component gets added and used at editor time
-      AnimatorForMapping = gameObject.GetComponent<Animator>();
-      HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
+      //AnimatorForMapping = gameObject.GetComponent<Animator>();
+      //HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
       Reset();
 
 
@@ -237,7 +237,7 @@ namespace Leap.Unity {
       VRHeightOffset vRHeightOffset = GameObject.FindObjectOfType<VRHeightOffset>();
       float characterHeadHeight = AnimatorForMapping.GetBoneTransform(HumanBodyBones.Head).transform.position.y;
       vRHeightOffset._deviceOffsets[0].HeightOffset = characterHeadHeight + .1f;//small offset above head for eye height 
-      AnimatorForMapping.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("LeapAvatarController");
+      AnimatorForMapping.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("LeapIKArmsController");
       ikMarkersAssemblyPrefab = Resources.Load<IKMarkersAssembly>("IKMarkersAssembly");
       iKMarkersAssembly = GameObject.Instantiate(ikMarkersAssemblyPrefab) as IKMarkersAssembly;
       iKMarkersAssembly.transform.parent = transform;
@@ -272,6 +272,7 @@ namespace Leap.Unity {
     }
     [ContextMenu("AutoRigUpperBody")]
     public void AutoRigUpperBody() {
+      AnimatorForMapping.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("LeapUpperBodyController");
       SpineFollowTargetBehavior spineFollowTargetBehavior = gameObject.AddComponent<SpineFollowTargetBehavior>();
       WristLeapToIKBlend WristLeapToIKBlend_L = RiggedHand_L.gameObject.GetComponent<WristLeapToIKBlend>();
       WristLeapToIKBlend WristLeapToIKBlend_R = RiggedHand_R.gameObject.GetComponent<WristLeapToIKBlend>();
@@ -281,6 +282,7 @@ namespace Leap.Unity {
     }
     [ContextMenu("AutoRigLocomotion")]
     public void AutoRigLocomotion() {
+      AnimatorForMapping.runtimeAnimatorController = Resources.Load<RuntimeAnimatorController>("LeapAvatarController");
       LocomotionAvatar locomotionAvatar = gameObject.AddComponent<LocomotionAvatar>();
       SpineFollowTargetBehavior spineFollowTargetBehavior = gameObject.GetComponent<SpineFollowTargetBehavior>();
       spineFollowTargetBehavior.AlwaysDriveSpine = false;
