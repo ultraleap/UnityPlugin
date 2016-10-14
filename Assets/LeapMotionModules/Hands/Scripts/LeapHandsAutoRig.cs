@@ -47,8 +47,8 @@ namespace Leap.Unity {
 
     /**AutoRig() Calls AutoRigMecanim() if a Unity Avatar exists.  Otherwise, AutoRigByName() is called.  
      * Then it immediately RiggedHand.StoreJointStartPose() to store the rigged asset's original state.*/
-    [ContextMenu("AutoRig")]
-    public void AutoRig() {
+    [ContextMenu("AutoRigHands")]
+    public void AutoRigHands() {
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
       AnimatorForMapping = gameObject.GetComponent<Animator>();
       if (AnimatorForMapping != null) {
@@ -232,8 +232,8 @@ namespace Leap.Unity {
         HandPoolToPopulate.RemoveGroup(ModelGroupName);
       }
     }
-    [ContextMenu("AutoRigUpperBody")]
-    public void AutoRigUpperBody() {
+    [ContextMenu("AutoRigArms")]
+    public void AutoRigArms() {
       VRHeightOffset vRHeightOffset = GameObject.FindObjectOfType<VRHeightOffset>();
       float characterHeadHeight = AnimatorForMapping.GetBoneTransform(HumanBodyBones.Head).transform.position.y;
       vRHeightOffset._deviceOffsets[0].HeightOffset = characterHeadHeight + .1f;//small offset above head for eye height 
@@ -264,14 +264,20 @@ namespace Leap.Unity {
       OnAnimatorIKCaller onAnimatorIKCaller =  gameObject.AddComponent<OnAnimatorIKCaller>();
       onAnimatorIKCaller.wristLeapToIKBlend_L = (WristLeapToIKBlend)HandTransitionBehavior_L;
       onAnimatorIKCaller.wristLeapToIKBlend_R = (WristLeapToIKBlend)HandTransitionBehavior_R;
-      SpineFollowTargetBehavior spineFollowTargetBehavior = gameObject.AddComponent<SpineFollowTargetBehavior>();
-      spineFollowTargetBehavior.wristLeapToIKBlend_L = WristLeapToIKBlend_L;
-      spineFollowTargetBehavior.wristLeapToIKBlend_R = WristLeapToIKBlend_R;
-      ShoulderTurnBehavior shoulderTurnBehavior = gameObject.AddComponent<ShoulderTurnBehavior>();
+
       //Assign and configure Animator Controller to Animator
       //AnimatorForMapping.runtimeAnimatorController = runtimeAnimatorController;
       AnimatorForMapping.updateMode = AnimatorUpdateMode.AnimatePhysics;
       AnimatorForMapping.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+    }
+    [ContextMenu("AutoRigUpperBody")]
+    public void AutoRigUpperBody() {
+      SpineFollowTargetBehavior spineFollowTargetBehavior = gameObject.AddComponent<SpineFollowTargetBehavior>();
+      WristLeapToIKBlend WristLeapToIKBlend_L = RiggedHand_L.gameObject.GetComponent<WristLeapToIKBlend>();
+      WristLeapToIKBlend WristLeapToIKBlend_R = RiggedHand_R.gameObject.GetComponent<WristLeapToIKBlend>();
+      spineFollowTargetBehavior.wristLeapToIKBlend_L = WristLeapToIKBlend_L;
+      spineFollowTargetBehavior.wristLeapToIKBlend_R = WristLeapToIKBlend_R;
+      ShoulderTurnBehavior shoulderTurnBehavior = gameObject.AddComponent<ShoulderTurnBehavior>();
     }
     [ContextMenu("AutoRigLocomotion")]
     public void AutoRigLocomotion() {
