@@ -265,6 +265,9 @@ namespace Leap.Unity {
       onAnimatorIKCaller.wristLeapToIKBlend_L = (WristLeapToIKBlend)HandTransitionBehavior_L;
       onAnimatorIKCaller.wristLeapToIKBlend_R = (WristLeapToIKBlend)HandTransitionBehavior_R;
 
+      WristLeapToIKBlend_L.ArmDropDuration = .001f;
+      WristLeapToIKBlend_R.ArmDropDuration = .001f;
+
       //Assign and configure Animator Controller to Animator
       //AnimatorForMapping.runtimeAnimatorController = runtimeAnimatorController;
       AnimatorForMapping.updateMode = AnimatorUpdateMode.AnimatePhysics;
@@ -276,6 +279,8 @@ namespace Leap.Unity {
       SpineFollowTargetBehavior spineFollowTargetBehavior = gameObject.AddComponent<SpineFollowTargetBehavior>();
       WristLeapToIKBlend WristLeapToIKBlend_L = RiggedHand_L.gameObject.GetComponent<WristLeapToIKBlend>();
       WristLeapToIKBlend WristLeapToIKBlend_R = RiggedHand_R.gameObject.GetComponent<WristLeapToIKBlend>();
+      WristLeapToIKBlend_L.ArmDropDuration = 1.5f;
+      WristLeapToIKBlend_R.ArmDropDuration = 1.5f;
       spineFollowTargetBehavior.wristLeapToIKBlend_L = WristLeapToIKBlend_L;
       spineFollowTargetBehavior.wristLeapToIKBlend_R = WristLeapToIKBlend_R;
       ShoulderTurnBehavior shoulderTurnBehavior = gameObject.AddComponent<ShoulderTurnBehavior>();

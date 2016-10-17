@@ -22,6 +22,7 @@ GameObject:
   - 33: {fileID: 33000014141548334}
   - 23: {fileID: 23000011096874778}
   - 65: {fileID: 65000012549366532}
+  - 114: {fileID: 114000013692958716}
   m_Layer: 0
   m_Name: ElbowIKTargetLeft
   m_TagString: Untagged
@@ -834,6 +835,20 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010640485556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 817c95a76d8efef46a0c534c85bab918, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  color: {r: 0, g: 0.2965517, b: 1, a: 1}
+  useWireframe: 1
+  traverseHierarchy: 1
+--- !u!114 &114000013692958716
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010123983128}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 817c95a76d8efef46a0c534c85bab918, type: 3}
