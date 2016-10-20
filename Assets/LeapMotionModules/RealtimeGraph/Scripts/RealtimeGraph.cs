@@ -219,7 +219,8 @@ namespace Leap.Unity.Graphing {
 
       replayKeys();
 
-      foreach (Graph graph in _graphs.Values) {
+      for (var it = _graphs.GetEnumerator(); it.MoveNext();) {
+        var graph = it.Current.Value;
         if (_paused) {
           graph.ClearSample();
         } else {

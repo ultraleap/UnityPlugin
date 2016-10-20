@@ -39,7 +39,8 @@ namespace Leap.Unity.Interaction {
     /// Removes and destroys all descriptions from the internal scene.
     /// </summary>
     public void RemoveAllShapes() {
-      foreach (var handle in _allHandles.Keys) {
+      for (var it = _allHandles.GetEnumerator(); it.MoveNext();) {
+        var handle = it.Current.Key;
         var localHandle = handle;
         InteractionC.RemoveShapeDescription(ref _scene, ref localHandle);
       }
@@ -172,7 +173,7 @@ namespace Leap.Unity.Interaction {
 
       // Remove Colliders that are children of other IInteractionBehaviour.
       Transform parentTransform = parentObject.transform;
-      for (int i = _tempColliderList.Count; i-- > 0; ) {
+      for (int i = _tempColliderList.Count; i-- > 0;) {
         Transform it = _tempColliderList[i].transform;
         while (it != parentTransform) {
           if (it.GetComponent<IInteractionBehaviour>() != null) {

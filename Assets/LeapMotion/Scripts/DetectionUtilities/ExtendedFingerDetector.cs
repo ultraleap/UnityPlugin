@@ -75,7 +75,8 @@ namespace Leap.Unity {
     void OnValidate() {
       int required = 0, forbidden = 0;
       PointingState[] stateArray = { Thumb, Index, Middle, Ring, Pinky };
-      foreach(PointingState state in stateArray) {
+      for(int i=0; i<stateArray.Length; i++) {
+        var state = stateArray[i];
         switch (state) {
           case PointingState.Extended:
             required++;
