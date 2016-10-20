@@ -228,7 +228,7 @@ namespace Leap.Unity {
       else perpendicular = Vector3.Cross(side2, side1);
       //flip perpendicular if it is above palm
       Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
-      return calculatedPalmFacing; //+works for Mixamo, -reversed LoPoly_Hands_Skeleton and Winston
+      return calculatedPalmFacing;
     }
     /**Find finger direction by finding distance vector from palm to middle finger */
     private Vector3 calculateModelFingerPointing() {
