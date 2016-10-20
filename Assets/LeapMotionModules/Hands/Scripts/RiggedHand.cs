@@ -115,7 +115,7 @@ namespace Leap.Unity {
       modelPalmFacing = new Vector3(0, 0, 0);
       assignRiggedFingersByName();
       SetupRiggedFingers();
-      modelPalmFacing = calculateModelPalmFacing(palm, fingers[1].transform, fingers[2].transform);
+      modelPalmFacing = calculateModelPalmFacing(palm, fingers[2].transform, fingers[1].transform);
       modelFingerPointing = calculateModelFingerPointing();
       setFingerPalmFacing();
     }
@@ -223,11 +223,12 @@ namespace Leap.Unity {
       Vector3 perpendicular;
 
       if (Handedness == Chirality.Left) {
-        perpendicular = Vector3.Cross(side2, side1);
+        perpendicular = Vector3.Cross(side1, side2);
       }
-      else perpendicular = Vector3.Cross(side1, side2);
+      else perpendicular = Vector3.Cross(side2, side1);
+      //flip perpendicular if it is above palm
       Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
-      return calculatedPalmFacing; //+works for Mixamo, -reversed LoPoly_Hands_Skeleton and Winston
+      return calculatedPalmFacing;
     }
     /**Find finger direction by finding distance vector from palm to middle finger */
     private Vector3 calculateModelFingerPointing() {
@@ -246,7 +247,7 @@ namespace Leap.Unity {
         zeroed = (vectorToZero.y < 0) ? new Vector3(0, 1, 0) : new Vector3(0, -1, 0);
       }
       if (Mathf.Abs(vectorToZero.z) == max) {
-        zeroed = (vectorToZero.y < 0) ? new Vector3(0, 0, 1) : new Vector3(0, 0, -1);
+        zeroed = (vectorToZero.z < 0) ? new Vector3(0, 0, 1) : new Vector3(0, 0, -1);
       }
       return zeroed;
     }
