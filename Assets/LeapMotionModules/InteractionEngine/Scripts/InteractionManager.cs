@@ -405,7 +405,8 @@ namespace Leap.Unity.Interaction {
         return false;
       }
 
-      foreach (var interactionHand in _idToInteractionHand.Values) {
+      for (var it = _idToInteractionHand.GetEnumerator(); it.MoveNext();) {
+        var interactionHand = it.Current.Value;
         if (interactionHand.graspedObject == graspedObject) {
           if (interactionHand.isUntracked) {
             interactionHand.MarkTimeout();
@@ -496,7 +497,8 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public void UnregisterInteractionBehaviour(IInteractionBehaviour interactionBehaviour) {
       if (_graspedBehaviours.Remove(interactionBehaviour)) {
-        foreach (var interactionHand in _idToInteractionHand.Values) {
+        for (var it = _idToInteractionHand.GetEnumerator(); it.MoveNext();) {
+          var interactionHand = it.Current.Value;
           if (interactionHand.graspedObject == interactionBehaviour) {
             try {
               if (interactionHand.isUntracked) {
@@ -845,7 +847,8 @@ namespace Leap.Unity.Interaction {
 
           //First we see if there is an untracked interactionHand that can be re-connected using this one
           InteractionHand untrackedInteractionHand = null;
-          foreach (var pair in _idToInteractionHand) {
+          for (var it = _idToInteractionHand.GetEnumerator(); it.MoveNext();) {
+            var pair = it.Current;
             //If the old ieHand is untracked, and the handedness matches, we re-connect it
             if (pair.Value.isUntracked && pair.Value.hand.IsLeft == hand.IsLeft) {
               untrackedInteractionHand = pair.Value;
@@ -952,7 +955,8 @@ namespace Leap.Unity.Interaction {
       }
 
       //Loop through all ieHands to check for timeouts and loss of tracking
-      foreach (var pair in _idToInteractionHand) {
+      for (var it = _idToInteractionHand.GetEnumerator(); it.MoveNext();) {
+        var pair = it.Current;
         var id = pair.Key;
         var ieHand = pair.Value;
 
