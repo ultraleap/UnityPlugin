@@ -10,7 +10,8 @@ namespace Leap.Unity {
 
     /// <summary>
     /// Constructs a new produce consumer buffer of a given capacity.  This capacity
-    /// is fixed and cannot be changed after the buffer is created.
+    /// is fixed and cannot be changed after the buffer is created.  This capacity
+    /// must be a power of two.
     /// </summary>
     public ProduceConsumeBuffer(int capacity) {
       if (capacity <= 0) {
