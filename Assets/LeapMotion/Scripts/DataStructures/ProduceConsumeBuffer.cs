@@ -38,11 +38,11 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Tries to push a value into the buffer.  If the buffer is already full, this
+    /// Tries to enqueue a value into the buffer.  If the buffer is already full, this
     /// method will perform no action and return false.  This method is only safe to
     /// be called from a single producer thread.
     /// </summary>
-    public bool TryPush(ref T t) {
+    public bool TryEnqueue(ref T t) {
       uint nextTail = (_tail + 1) & _bufferMask;
       if (nextTail == _head) return false;
 
@@ -52,11 +52,11 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Tries to pop a value off of the buffer.  If the buffer is empty this method
+    /// Tries to dequeue a value off of the buffer.  If the buffer is empty this method
     /// will perform no action and return false.  This method is only safe to be
     /// called from a single consumer thread.
     /// </summary>
-    public bool TryPop(out T t) {
+    public bool TryDequeue(out T t) {
       if (_tail == _head) {
         t = default(T);
         return false;

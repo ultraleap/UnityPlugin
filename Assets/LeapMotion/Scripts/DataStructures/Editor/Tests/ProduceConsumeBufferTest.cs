@@ -37,7 +37,7 @@ namespace Leap.Unity.Tests {
           TestStruct s;
           s.index = i;
           s.name = i.ToString();
-          while (!buffer.TryPush(ref s)) { }
+          while (!buffer.TryEnqueue(ref s)) { }
         }
       } catch (Exception e) {
         Assert.Fail(e.Message);
@@ -48,7 +48,7 @@ namespace Leap.Unity.Tests {
       try {
         for (int i = 0; i < buffer.Capacity; i++) {
           TestStruct s;
-          while (!buffer.TryPop(out s)) { }
+          while (!buffer.TryDequeue(out s)) { }
 
           Assert.That(s.index, Is.EqualTo(i));
           Assert.That(s.name, Is.EqualTo(i.ToString()));
