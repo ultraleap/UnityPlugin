@@ -53,7 +53,8 @@ namespace Leap.Unity.VRVisualizer{
       if (m_controller != null)
         m_leapConnected = m_controller.IsConnected;
 
-      Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, false);
+      
+      //Screen.SetResolution(Screen.currentResolution.width, Screen.currentResolution.height, false);
       if (VRDevice.isPresent)
       {
         goVR();    

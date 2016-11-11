@@ -49,10 +49,11 @@ namespace Leap.Unity{
     
     /** Whether the controller is embedded in a keyboard or laptop.*/
     bool IsEmbedded() {
-      DeviceList devices = leap_controller_.Devices;
-      if (devices.Count == 0)
-        return false;
-      return devices[0].Type != Device.DeviceType.TYPE_PERIPHERAL;
+      return false;
+      //DeviceList devices = leap_controller_.Devices;
+      //if (devices.Count == 0)
+      //  return false;
+      //return devices[0].Type != Device.DeviceType.TYPE_PERIPHERAL;
     }
           
     void Update() {
