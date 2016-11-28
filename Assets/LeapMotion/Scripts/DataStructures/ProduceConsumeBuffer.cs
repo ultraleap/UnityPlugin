@@ -12,6 +12,10 @@ namespace Leap.Unity {
     /// Constructs a new produce consumer buffer of a given capacity.  This capacity
     /// is fixed and cannot be changed after the buffer is created.  This capacity
     /// must be a power of two.
+    /// 
+    /// The power of two requirement is an optimization.  Internally this class can
+    /// use a bitwise AND operation instead of a slower modulus operation for indexing
+    /// if the length of the buffer is a power of two.
     /// </summary>
     public ProduceConsumeBuffer(int capacity) {
       if (capacity <= 0) {
