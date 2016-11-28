@@ -9,21 +9,30 @@ namespace Leap.Unity {
     private uint _head, _tail;
 
     /// <summary>
-    /// Constructs a new produce consumer buffer of a given capacity.  This capacity
-    /// is fixed and cannot be changed after the buffer is created.  This capacity
-    /// must be a power of two.
+    /// Constructs a new produce consumer buffer of at least a certain capacity.  Once the
+    /// buffer is created, the capacity cannot be modified.
     /// 
-    /// The power of two requirement is an optimization.  Internally this class can
-    /// use a bitwise AND operation instead of a slower modulus operation for indexing
-    /// if the length of the buffer is a power of two.
+    /// If the minimum capacity is a power of two, it will be used as the actual capacity.
+    /// If the minimum capacity is not a power of two, the next highest power of two will
+    /// be used as the capacity.  This behavior is an optimization, Internally this class 
+    /// uses a bitwise AND operation instead of a slower modulus operation for indexing, 
+    /// which only is possible if the array length is a power of two.
     /// </summary>
-    public ProduceConsumeBuffer(int capacity) {
-      if (capacity <= 0) {
+    public ProduceConsumeBuffer(int minCapacity) {
+      if (minCapacity <= 0) {
         throw new ArgumentOutOfRangeException("The capacity of the ProduceConsumeBuffer must be positive and non-zero.");
       }
 
-      if (Mathf.ClosestPowerOfTwo(capacity) != capacity) {
-        throw new ArgumentException("The capacity of the ProduceConsumeBuffer must be a power of two.");
+      int capacity;
+      int closestPowerOfTwo = Mathf.ClosestPowerOfTwo(minCapacity);
+      if (closestPowerOfTwo == minCapacity) {
+        capacity = minCapacity;
+      } else {
+        if (closestPowerOfTwo < minCapacity) {
+          capacity = closestPowerOfTwo * 2;
+        } else {
+          capacity = closestPowerOfTwo;
+        }
       }
 
       _buffer = new T[capacity];
