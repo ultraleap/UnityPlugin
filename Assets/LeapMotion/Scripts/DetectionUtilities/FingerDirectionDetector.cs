@@ -131,7 +131,7 @@ namespace Leap.Unity {
       Vector3 targetDirection;
       int selectedFinger = selectedFingerOrdinal();
       while(true){
-        if(HandModel != null){
+        if(HandModel != null && HandModel.IsTracked){
           hand = HandModel.GetLeapHand();
           if(hand != null){
             targetDirection = selectedDirection(hand.Fingers[selectedFinger].TipPosition.ToVector3());
@@ -185,7 +185,7 @@ namespace Leap.Unity {
 
   #if UNITY_EDITOR
     private void OnDrawGizmos () {
-      if (ShowGizmos && HandModel != null) {
+      if (ShowGizmos && HandModel != null && HandModel.IsTracked) {
         Color innerColor;
         if (IsActive) {
           innerColor = OnColor;

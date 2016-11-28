@@ -13,8 +13,6 @@ namespace Leap.Unity {
     public string ModelGroupName = null;
     [Tooltip("Set to True if each finger has an extra trasform between palm and base of the finger.")] 
     public bool UseMetaCarpals;
-    [Tooltip("When True, hands will be put into a Leap editor pose near the LeapServiceProvider's transform.  When False, the hands will be returned to their Start Pose if it has been saved.")]
-    public bool SetEditorLeapPose = false;
     [Header("RiggedHand Components")]
     public RiggedHand RiggedHand_L;
     public RiggedHand RiggedHand_R;
@@ -63,8 +61,6 @@ namespace Leap.Unity {
         }
       }
       AutoRigByName();
-      RiggedHand_L.StoreJointsStartPose();
-      RiggedHand_R.StoreJointsStartPose();
     }
     /**Allows a start pose for the rigged hands to be created and stored anytime. */
     [ContextMenu("StoreStartPose")]
@@ -75,21 +71,12 @@ namespace Leap.Unity {
       }
       else Debug.LogWarning("Please AutoRig before attempting to Store Start Pose");
     }
-    /**Returns all hand joint transforms to their original local positions and local rotations */
-    [ContextMenu("ResetStartPose")]
-    public void RestoreStartPose() {
-      if (RiggedHand_L && RiggedHand_R) {
-        RiggedHand_L.RestoreJointsStartPose();
-        RiggedHand_R.RestoreJointsStartPose();
-      }
-      else Debug.LogWarning("Please AutoRig and Start Pose before attempting to Reset to Start Pose");
-    }
     /**Uses transform names to discover and assign RiggedHands scripts,
      * then calls methods in the RiggedHands that use transform nanes to discover fingers.*/
     [ContextMenu("AutoRigByName")]
     void AutoRigByName() {
-      List<string> LeftHandStrings = new List<string> { "left", "_l" };
-      List<string> RightHandStrings = new List<string> { "right", "_r" };
+      List<string> LeftHandStrings = new List<string> { "left" };
+      List<string> RightHandStrings = new List<string> { "right" };
 
       //Assigning these here since this component gets added and used at editor time
       HandPoolToPopulate = GameObject.FindObjectOfType<HandPool>();
@@ -102,50 +89,58 @@ namespace Leap.Unity {
           Hand_L = t;
         }
       }
-      RiggedHand_L = Hand_L.gameObject.AddComponent<RiggedHand>();
-      HandTransitionBehavior_L = Hand_L.gameObject.AddComponent<HandEnableDisable>();
-      RiggedHand_L.Handedness = Chirality.Left;
-      RiggedHand_L.SetEditorLeapPose = false;
-      RiggedHand_L.UseMetaCarpals = UseMetaCarpals;
+      if (Hand_L != null) {
+        RiggedHand_L = Hand_L.gameObject.AddComponent<RiggedHand>();
+        HandTransitionBehavior_L = Hand_L.gameObject.AddComponent<HandEnableDisable>();
+        RiggedHand_L.Handedness = Chirality.Left;
+        RiggedHand_L.SetEditorLeapPose = false;
+        RiggedHand_L.UseMetaCarpals = UseMetaCarpals;
+        RiggedHand_L.SetupRiggedHand();
 
+        RiggedFinger_L_Thumb = (RiggedFinger)RiggedHand_L.fingers[0];
+        RiggedFinger_L_Index = (RiggedFinger)RiggedHand_L.fingers[1];
+        RiggedFinger_L_Mid = (RiggedFinger)RiggedHand_L.fingers[2];
+        RiggedFinger_L_Ring = (RiggedFinger)RiggedHand_L.fingers[3];
+        RiggedFinger_L_Pinky = (RiggedFinger)RiggedHand_L.fingers[4];
+
+        modelFingerPointing_L = RiggedHand_L.modelFingerPointing;
+        modelPalmFacing_L = RiggedHand_L.modelPalmFacing;
+
+        RiggedHand_L.StoreJointsStartPose();
+      }
       Transform Hand_R = null;
       foreach (Transform t in transform) {
         if (RightHandStrings.Any(w => t.name.ToLower().Contains(w))) {
           Hand_R = t;
         }
       }
-      RiggedHand_R = Hand_R.gameObject.AddComponent<RiggedHand>();
-      HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<HandEnableDisable>();
-      RiggedHand_R.Handedness = Chirality.Right;
-      RiggedHand_R.SetEditorLeapPose = false;
-      RiggedHand_R.UseMetaCarpals = UseMetaCarpals;
+      if (Hand_R != null) {
+        RiggedHand_R = Hand_R.gameObject.AddComponent<RiggedHand>();
+        HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<HandEnableDisable>();
+        RiggedHand_R.Handedness = Chirality.Right;
+        RiggedHand_R.SetEditorLeapPose = false;
+        RiggedHand_R.UseMetaCarpals = UseMetaCarpals;
+        RiggedHand_R.SetupRiggedHand();
 
+        RiggedFinger_R_Thumb = (RiggedFinger)RiggedHand_R.fingers[0];
+        RiggedFinger_R_Index = (RiggedFinger)RiggedHand_R.fingers[1];
+        RiggedFinger_R_Mid = (RiggedFinger)RiggedHand_R.fingers[2];
+        RiggedFinger_R_Ring = (RiggedFinger)RiggedHand_R.fingers[3];
+        RiggedFinger_R_Pinky = (RiggedFinger)RiggedHand_R.fingers[4];
+
+        modelFingerPointing_R = RiggedHand_R.modelFingerPointing;
+        modelPalmFacing_R = RiggedHand_R.modelPalmFacing;
+
+        RiggedHand_R.StoreJointsStartPose();
+      }
       //Find palms and assign to RiggedHands
       //RiggedHand_L.palm = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftHand);
       //RiggedHand_R.palm = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightHand);
-      RiggedHand_L.SetupRiggedHand();
-      RiggedHand_R.SetupRiggedHand();
 
       if (ModelGroupName == "" || ModelGroupName != null) {
         ModelGroupName = transform.name;
       }
       HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
-
-      RiggedFinger_L_Thumb = (RiggedFinger)RiggedHand_L.fingers[0];
-      RiggedFinger_L_Index = (RiggedFinger)RiggedHand_L.fingers[1];
-      RiggedFinger_L_Mid = (RiggedFinger)RiggedHand_L.fingers[2];
-      RiggedFinger_L_Ring = (RiggedFinger)RiggedHand_L.fingers[3];
-      RiggedFinger_L_Pinky = (RiggedFinger)RiggedHand_L.fingers[4];
-      RiggedFinger_R_Thumb = (RiggedFinger)RiggedHand_R.fingers[0];
-      RiggedFinger_R_Index = (RiggedFinger)RiggedHand_R.fingers[1];
-      RiggedFinger_R_Mid = (RiggedFinger)RiggedHand_R.fingers[2];
-      RiggedFinger_R_Ring = (RiggedFinger)RiggedHand_R.fingers[3];
-      RiggedFinger_R_Pinky = (RiggedFinger)RiggedHand_R.fingers[4];
-
-      modelFingerPointing_L = RiggedHand_L.modelFingerPointing;
-      modelPalmFacing_L = RiggedHand_L.modelPalmFacing;
-      modelFingerPointing_R = RiggedHand_R.modelFingerPointing;
-      modelPalmFacing_R = RiggedHand_R.modelPalmFacing;
     }
 
     /**Uses Mecanim transform mapping to find hands and assign RiggedHands scripts 
@@ -229,24 +224,13 @@ namespace Leap.Unity {
         HandPoolToPopulate.RemoveGroup(ModelGroupName);
       }
     }
-    
-    //Monobehavior's OnValidate() is used to push LeapHandsAutoRig values to RiggedHand and RiggedFinger components
-    void OnValidate() {
-      if (FlipPalms != flippedPalmsState) {
-        modelPalmFacing_L = modelPalmFacing_L * -1f;
-        modelPalmFacing_R = modelPalmFacing_R * -1f;
-        flippedPalmsState = FlipPalms;
-      }
-
-
+    public void PushVectorValues() {
       //push palm and finger facing values to RiggedHand's and RiggedFinger's
       if (RiggedHand_L) {
-        RiggedHand_L.SetEditorLeapPose = SetEditorLeapPose;
         RiggedHand_L.modelFingerPointing = modelFingerPointing_L;
         RiggedHand_L.modelPalmFacing = modelPalmFacing_L;
       }
       if (RiggedHand_R) {
-        RiggedHand_R.SetEditorLeapPose = SetEditorLeapPose;
         RiggedHand_R.modelFingerPointing = modelFingerPointing_R;
         RiggedHand_R.modelPalmFacing = modelPalmFacing_R;
       }
@@ -289,6 +273,16 @@ namespace Leap.Unity {
       if (RiggedFinger_R_Pinky) {
         RiggedFinger_R_Pinky.modelFingerPointing = modelFingerPointing_R;
         RiggedFinger_R_Pinky.modelPalmFacing = modelPalmFacing_R;
+      }
+    }
+
+    //Monobehavior's OnValidate() is used to push LeapHandsAutoRig values to RiggedHand and RiggedFinger components
+    void OnValidate() {
+      if (FlipPalms != flippedPalmsState) {
+        modelPalmFacing_L = modelPalmFacing_L * -1f;
+        modelPalmFacing_R = modelPalmFacing_R * -1f;
+        flippedPalmsState = FlipPalms;
+        PushVectorValues();
       }
     }
     /**Removes the ModelGroup from HandPool that corresponds to this instance of LeapHandsAutoRig */

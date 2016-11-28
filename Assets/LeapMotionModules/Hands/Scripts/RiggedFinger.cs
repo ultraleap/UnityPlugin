@@ -20,6 +20,7 @@ namespace Leap.Unity {
     /** Allows the mesh to be stretched to align with finger joint positions
      * Only set to true when mesh is not visible
      */
+    [HideInInspector]
     public bool deformPosition = false;
 
     public Vector3 modelFingerPointing = Vector3.forward;

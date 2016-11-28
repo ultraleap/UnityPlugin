@@ -90,7 +90,7 @@ namespace Leap.Unity {
 
 #if UNITY_EDITOR
     protected override void OnDrawGizmos () {
-      if (ShowGizmos && _handModel != null) {
+      if (ShowGizmos && _handModel != null && _handModel.IsTracked) {
         Color centerColor = Color.clear;
         Vector3 centerPosition = Vector3.zero;
         Quaternion circleRotation = Quaternion.identity;
