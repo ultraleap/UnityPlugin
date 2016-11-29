@@ -121,7 +121,7 @@ namespace Leap.Unity {
               && matchFingerState(hand.Fingers[4], Pinky);
 
             int extendedCount = 0;
-            for (int f = 0; f < 4; f++) {
+            for (int f = 0; f < 5; f++) {
               if (hand.Fingers[f].IsExtended) {
                 extendedCount++;
               }
