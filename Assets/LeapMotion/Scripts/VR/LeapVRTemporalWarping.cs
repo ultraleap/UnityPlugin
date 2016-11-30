@@ -185,7 +185,7 @@ namespace Leap.Unity {
     }
 
     public bool TryGetWarpedTransform(WarpedAnchor anchor, out Vector3 rewoundPosition, out Quaternion rewoundRotation) {
-      long timestamp = provider.GetLeapController().FrameTimestamp();// CurrentFrame.Timestamp;
+      long timestamp = provider.imageTimeStamp;
       if (TryGetWarpedTransform(anchor, out rewoundPosition, out rewoundRotation, timestamp)) {
         return true;
       }
