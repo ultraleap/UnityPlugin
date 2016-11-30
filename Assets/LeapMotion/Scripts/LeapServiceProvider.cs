@@ -31,9 +31,7 @@ namespace Leap.Unity {
     [SerializeField]
     protected LeapVRTemporalWarping _temporalWarping;
 
-    [Tooltip("When true, update frames will be re-used for physics.  This is an optimization, since the total number " +
-             "of frames that need to be calculated is halved.  However, this introduces extra latency and inaccuracy " +
-             "into the physics frames.")]
+    [Tooltip("When enabled, the provider will only calculate one leap frame instead of two.")]
     [SerializeField]
     protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
@@ -222,7 +220,7 @@ namespace Leap.Unity {
 
       _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
-      if(_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
+      if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
         DispatchUpdateFrameEvent(_transformedFixedFrame);
         return;
       }
