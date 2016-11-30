@@ -17,6 +17,12 @@ namespace Leap.Unity {
     /** Transform Array for Precull Latching **/
     protected const string HAND_ARRAY = "_LeapHandTransforms";
 
+    public enum FrameOptimizationMode {
+      None,
+      ReuseUpdateForPhysics,
+      ReusePhysicsForUpdate,
+    }
+
     [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
     [SerializeField]
     protected bool _isHeadMounted = false;
@@ -29,7 +35,7 @@ namespace Leap.Unity {
              "of frames that need to be calculated is halved.  However, this introduces extra latency and inaccuracy " +
              "into the physics frames.")]
     [SerializeField]
-    protected bool _reuseFramesForPhysics = false;
+    protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
     [Header("Device Type")]
     [SerializeField]
@@ -75,7 +81,11 @@ namespace Leap.Unity {
 
     public override Frame CurrentFrame {
       get {
-        return _transformedUpdateFrame;
+        if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
+          return _transformedFixedFrame;
+        } else {
+          return _transformedUpdateFrame;
+        }
       }
     }
 
@@ -87,7 +97,7 @@ namespace Leap.Unity {
 
     public override Frame CurrentFixedFrame {
       get {
-        if (_reuseFramesForPhysics) {
+        if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
           return _transformedUpdateFrame;
         } else {
           return _transformedFixedFrame;
@@ -203,6 +213,7 @@ namespace Leap.Unity {
         return;
       }
 #endif
+      manualUpdateHasBeenCalledSinceUpdate = false;
 
       if (!_updateHandInPrecull && _prevUpdateHandInPrecull) {
         resetTransforms();
@@ -210,6 +221,11 @@ namespace Leap.Unity {
       _prevUpdateHandInPrecull = _updateHandInPrecull;
 
       _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
+
+      if(_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
+        DispatchUpdateFrameEvent(_transformedFixedFrame);
+        return;
+      }
 
       if (_useInterpolation) {
 #if !UNITY_ANDROID
@@ -226,11 +242,10 @@ namespace Leap.Unity {
 
         DispatchUpdateFrameEvent(_transformedUpdateFrame);
       }
-      manualUpdateHasBeenCalledSinceUpdate = false;
     }
 
     protected virtual void FixedUpdate() {
-      if (_reuseFramesForPhysics) {
+      if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
         DispatchFixedFrameEvent(_transformedUpdateFrame);
         return;
       }
@@ -337,7 +352,7 @@ namespace Leap.Unity {
       }
     }
 
-    /** Calling this method stop the connection for the existing instance of a Controller, 
+    /** Calling this method stop the connection for the existing instance of a Controller,
      * clears old policy flags and resets to null */
     protected void destroyController() {
       if (leap_controller_ != null) {
@@ -373,7 +388,7 @@ namespace Leap.Unity {
 
     public void LateUpdateHandTransforms(Camera camera) {
       if (_updateHandInPrecull) {
-       // if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.BeginSample("Vertex Offset", RealtimeGraph.GraphUnits.Miliseconds); }
+        // if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.BeginSample("Vertex Offset", RealtimeGraph.GraphUnits.Miliseconds); }
 
 #if UNITY_EDITOR
         //Hard-coded name of the camera used to generate the pre-render view
