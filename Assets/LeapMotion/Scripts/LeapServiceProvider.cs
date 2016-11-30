@@ -406,7 +406,7 @@ namespace Leap.Unity {
             //if (RealtimeGraph.Instance != null) { RealtimeGraph.Instance.AddSample("Precull Tracking Latency", RealtimeGraph.GraphUnits.Miliseconds, (GetLeapController().Now() - _transformedPreCullFrame.Timestamp) * 0.001f); }
             for (int i = 0; i < _transformedPreCullFrame.Hands.Count; i++) {
               Hand preCullHand = _transformedPreCullFrame.Hands[i];
-              Hand updateHand = _transformedUpdateFrame.Hand(preCullHand.Id);
+              Hand updateHand = CurrentFrame.Hand(preCullHand.Id);
 
               if (preCullHand != null && updateHand != null) {
                 //Pass PreCullHand * Inverse(UpdateHand) to the shader
