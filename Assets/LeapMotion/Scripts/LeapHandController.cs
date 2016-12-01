@@ -81,7 +81,8 @@ namespace Leap.Unity {
     * @param frame The Leap Frame containing Leap Hand data for each currently tracked hand
     */
     protected virtual void UpdateHandRepresentations(Dictionary<int, HandRepresentation> all_hand_reps, ModelType modelType, Frame frame) {
-      foreach (Leap.Hand curHand in frame.Hands) {
+      for (int i = 0; i < frame.Hands.Count; i++) {
+        var curHand = frame.Hands[i];
         HandRepresentation rep;
         if (!all_hand_reps.TryGetValue(curHand.Id, out rep)) {
           rep = factory.MakeHandRepresentation(curHand, modelType);
@@ -98,7 +99,8 @@ namespace Leap.Unity {
 
       /** Mark-and-sweep to finish unused HandRepresentations */
       HandRepresentation toBeDeleted = null;
-      foreach (KeyValuePair<int, HandRepresentation> r in all_hand_reps) {
+      for (var it = all_hand_reps.GetEnumerator(); it.MoveNext();) {
+        var r = it.Current;
         if (r.Value != null) {
           if (r.Value.IsMarked) {
             r.Value.IsMarked = false;

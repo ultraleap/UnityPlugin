@@ -182,28 +182,10 @@ namespace Leap.Unity {
       //Find palms and assign to RiggedHands
       RiggedHand_L.palm = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftHand);
       RiggedHand_R.palm = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightHand);
+      RiggedHand_R.UseMetaCarpals = UseMetaCarpals;
+      RiggedHand_L.UseMetaCarpals = UseMetaCarpals;
 
-      //Find Fingers and assign RiggedFingers
-      RiggedFinger_L_Thumb = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftThumbProximal).gameObject.AddComponent<RiggedFinger>();
-      RiggedFinger_L_Thumb.fingerType = Finger.FingerType.TYPE_THUMB;
-      RiggedFinger_L_Index = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftIndexProximal).gameObject.AddComponent<RiggedFinger>();
-      RiggedFinger_L_Index.fingerType = Finger.FingerType.TYPE_INDEX;
-      RiggedFinger_L_Mid = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftMiddleProximal).gameObject.AddComponent<RiggedFinger>();
-      RiggedFinger_L_Mid.fingerType = Finger.FingerType.TYPE_MIDDLE;
-      RiggedFinger_L_Ring = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftRingProximal).gameObject.AddComponent<RiggedFinger>();
-      RiggedFinger_L_Ring.fingerType = Finger.FingerType.TYPE_RING;
-      RiggedFinger_L_Pinky = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftLittleProximal).gameObject.AddComponent<RiggedFinger>();
-      RiggedFinger_L_Pinky.fingerType = Finger.FingerType.TYPE_PINKY;
-      RiggedFinger_R_Thumb = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightThumbProximal).gameObject.AddComponent<RiggedFinger>();
-      RiggedFinger_R_Thumb.fingerType = Finger.FingerType.TYPE_THUMB;
-      RiggedFinger_R_Index = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightIndexProximal).gameObject.AddComponent<RiggedFinger>();
-      RiggedFinger_R_Index.fingerType = Finger.FingerType.TYPE_INDEX;
-      RiggedFinger_R_Mid = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightMiddleProximal).gameObject.AddComponent<RiggedFinger>();
-      RiggedFinger_R_Mid.fingerType = Finger.FingerType.TYPE_MIDDLE;
-      RiggedFinger_R_Ring = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightRingProximal).gameObject.AddComponent<RiggedFinger>();
-      RiggedFinger_R_Ring.fingerType = Finger.FingerType.TYPE_RING;
-      RiggedFinger_R_Pinky = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightLittleProximal).gameObject.AddComponent<RiggedFinger>();
-      RiggedFinger_R_Pinky.fingerType = Finger.FingerType.TYPE_PINKY;
+      findAndAssignRiggedFingers(UseMetaCarpals);
 
       RiggedHand_L.AutoRigRiggedHand(RiggedHand_L.palm, RiggedFinger_L_Pinky.transform, RiggedFinger_L_Index.transform);
       RiggedHand_R.AutoRigRiggedHand(RiggedHand_R.palm, RiggedFinger_R_Pinky.transform, RiggedFinger_R_Index.transform);
@@ -218,6 +200,45 @@ namespace Leap.Unity {
       modelPalmFacing_R = RiggedHand_R.modelPalmFacing;
       //AutoRigUpperBody();
     }
+
+    //Find Fingers and assign RiggedFingers
+    private void findAndAssignRiggedFingers(bool useMetaCarpals) {
+      if (!useMetaCarpals) {
+        RiggedFinger_L_Thumb = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftThumbProximal).gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_L_Index = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftIndexProximal).gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_L_Mid = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftMiddleProximal).gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_L_Ring = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftRingProximal).gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_L_Pinky = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftLittleProximal).gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_R_Thumb = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightThumbProximal).gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_R_Index = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightIndexProximal).gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_R_Mid = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightMiddleProximal).gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_R_Ring = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightRingProximal).gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_R_Pinky = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightLittleProximal).gameObject.AddComponent<RiggedFinger>();
+      }
+      else {
+        RiggedFinger_L_Thumb = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftThumbProximal).gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_L_Index = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftIndexProximal).gameObject.transform.parent.gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_L_Mid = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftMiddleProximal).gameObject.transform.parent.gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_L_Ring = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftRingProximal).gameObject.transform.parent.gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_L_Pinky = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftLittleProximal).gameObject.transform.parent.gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_R_Thumb = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightThumbProximal).gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_R_Index = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightIndexProximal).gameObject.transform.parent.gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_R_Mid = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightMiddleProximal).gameObject.transform.parent.gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_R_Ring = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightRingProximal).gameObject.transform.parent.gameObject.AddComponent<RiggedFinger>();
+        RiggedFinger_R_Pinky = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightLittleProximal).gameObject.transform.parent.gameObject.AddComponent<RiggedFinger>();
+      }
+      RiggedFinger_L_Thumb.fingerType = Finger.FingerType.TYPE_THUMB;
+      RiggedFinger_L_Index.fingerType = Finger.FingerType.TYPE_INDEX;
+      RiggedFinger_L_Mid.fingerType = Finger.FingerType.TYPE_MIDDLE;
+      RiggedFinger_L_Ring.fingerType = Finger.FingerType.TYPE_RING;
+      RiggedFinger_L_Pinky.fingerType = Finger.FingerType.TYPE_PINKY;
+      RiggedFinger_R_Thumb.fingerType = Finger.FingerType.TYPE_THUMB;
+      RiggedFinger_R_Index.fingerType = Finger.FingerType.TYPE_INDEX;
+      RiggedFinger_R_Mid.fingerType = Finger.FingerType.TYPE_MIDDLE;
+      RiggedFinger_R_Ring.fingerType = Finger.FingerType.TYPE_RING;
+      RiggedFinger_R_Pinky.fingerType = Finger.FingerType.TYPE_PINKY;
+    }
+
     /**Removes existing RiggedFinger components so the auto rigging process can be rerun. */
     void Reset() {
       RiggedFinger[] riggedFingers = GetComponentsInChildren<RiggedFinger>();
