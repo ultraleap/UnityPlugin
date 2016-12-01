@@ -52,7 +52,6 @@ namespace Leap.Unity {
     [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
     [SerializeField]
     protected bool _updateHandInPrecull = false;
-    protected bool _prevUpdateHandInPrecull = false;
 
 //Extrapolate on Android to compensate for the latency introduced by its graphics pipeline
 #if UNITY_ANDROID
@@ -124,6 +123,7 @@ namespace Leap.Unity {
         return _updateHandInPrecull;
       }
       set {
+        resetTransforms();
         _updateHandInPrecull = value;
       }
     }
@@ -210,11 +210,6 @@ namespace Leap.Unity {
       }
 #endif
       manualUpdateHasBeenCalledSinceUpdate = false;
-
-      if (!_updateHandInPrecull && _prevUpdateHandInPrecull) {
-        resetTransforms();
-      }
-      _prevUpdateHandInPrecull = _updateHandInPrecull;
 
       _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
 
