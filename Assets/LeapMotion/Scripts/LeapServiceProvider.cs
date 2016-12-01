@@ -17,6 +17,12 @@ namespace Leap.Unity {
     /** Transform Array for Precull Latching **/
     protected const string HAND_ARRAY = "_LeapHandTransforms";
 
+    public enum FrameOptimizationMode {
+      None,
+      ReuseUpdateForPhysics,
+      ReusePhysicsForUpdate,
+    }
+
     [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
     [SerializeField]
     protected bool _isHeadMounted = false;
@@ -25,11 +31,9 @@ namespace Leap.Unity {
     [SerializeField]
     protected LeapVRTemporalWarping _temporalWarping;
 
-    [Tooltip("When true, update frames will be re-used for physics.  This is an optimization, since the total number " +
-             "of frames that need to be calculated is halved.  However, this introduces extra latency and inaccuracy " +
-             "into the physics frames.")]
+    [Tooltip("When enabled, the provider will only calculate one leap frame instead of two.")]
     [SerializeField]
-    protected bool _reuseFramesForPhysics = false;
+    protected FrameOptimizationMode _frameOptimization = FrameOptimizationMode.None;
 
     [Header("Device Type")]
     [SerializeField]
@@ -82,7 +86,11 @@ namespace Leap.Unity {
 
     public override Frame CurrentFrame {
       get {
-        return _transformedUpdateFrame;
+        if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
+          return _transformedFixedFrame;
+        } else {
+          return _transformedUpdateFrame;
+        }
       }
     }
 
@@ -94,7 +102,7 @@ namespace Leap.Unity {
 
     public override Frame CurrentFixedFrame {
       get {
-        if (_reuseFramesForPhysics) {
+        if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
           return _transformedUpdateFrame;
         } else {
           return _transformedFixedFrame;
@@ -201,6 +209,7 @@ namespace Leap.Unity {
         return;
       }
 #endif
+      manualUpdateHasBeenCalledSinceUpdate = false;
 
       if (!_updateHandInPrecull && _prevUpdateHandInPrecull) {
         resetTransforms();
@@ -208,6 +217,11 @@ namespace Leap.Unity {
       _prevUpdateHandInPrecull = _updateHandInPrecull;
 
       _fixedOffset.Update(Time.time - Time.fixedTime, Time.deltaTime);
+
+      if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
+        DispatchUpdateFrameEvent(_transformedFixedFrame);
+        return;
+      }
 
       if (_useInterpolation) {
 #if !UNITY_ANDROID
@@ -224,11 +238,10 @@ namespace Leap.Unity {
 
         DispatchUpdateFrameEvent(_transformedUpdateFrame);
       }
-      manualUpdateHasBeenCalledSinceUpdate = false;
     }
 
     protected virtual void FixedUpdate() {
-      if (_reuseFramesForPhysics) {
+      if (_frameOptimization == FrameOptimizationMode.ReuseUpdateForPhysics) {
         DispatchFixedFrameEvent(_transformedUpdateFrame);
         return;
       }
@@ -405,8 +418,8 @@ namespace Leap.Unity {
           //Find the Left and/or Right Hand(s) to Latch
           Hand leftHand = null, rightHand = null;
           LeapTransform PrecullLeftHand = LeapTransform.Identity, PrecullRightHand = LeapTransform.Identity;
-          for (int i = 0; i < _transformedUpdateFrame.Hands.Count; i++) {
-            Hand updateHand = _transformedUpdateFrame.Hands[i];
+          for (int i = 0; i < CurrentFrame.Hands.Count; i++) {
+            Hand updateHand = CurrentFrame.Hands[i];
             if (updateHand.IsLeft && leftHand == null) {
               leftHand = updateHand;
             } else if (updateHand.IsRight && rightHand == null) {
