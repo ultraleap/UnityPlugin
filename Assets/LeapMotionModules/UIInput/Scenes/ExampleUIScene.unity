@@ -8826,7 +8826,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e309ac4138f124f9f8ad312a14a8e9ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowGizmos: 1
   OnActivate:
     m_PersistentCalls:
       m_Calls: []
@@ -8839,6 +8838,7 @@ MonoBehaviour:
       PublicKeyToken=null
   _handModel: {fileID: 1000655849}
   ControlsTransform: 1
+  ShowGizmos: 1
   ActivateDistance: 0.03
   DeactivateDistance: 0.04
 --- !u!4 &422496982 stripped
@@ -20880,7 +20880,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e309ac4138f124f9f8ad312a14a8e9ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ShowGizmos: 1
   OnActivate:
     m_PersistentCalls:
       m_Calls: []
@@ -20893,6 +20892,7 @@ MonoBehaviour:
       PublicKeyToken=null
   _handModel: {fileID: 1724301390}
   ControlsTransform: 1
+  ShowGizmos: 1
   ActivateDistance: 0.03
   DeactivateDistance: 0.04
 --- !u!1 &1192671702
@@ -26884,7 +26884,7 @@ MonoBehaviour:
     modelsCheckedOut: []
     IsEnabled: 1
     CanDuplicate: 0
-  - GroupName: CapsuleHands
+  - GroupName: RigidHands
     _handPool: {fileID: 0}
     LeftModel: {fileID: 2010297922}
     IsLeftToBeSpawned: 0
@@ -28273,7 +28273,7 @@ MonoBehaviour:
   _overrideDeviceType: 1
   _overrideDeviceTypeWith: 1
   _useInterpolation: 1
-  _interpolationDelay: 30
+  _updateHandInPrecull: 0
 --- !u!4 &1587970164
 Transform:
   m_ObjectHideFlags: 0
