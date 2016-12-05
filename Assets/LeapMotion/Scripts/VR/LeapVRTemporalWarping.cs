@@ -157,7 +157,7 @@ namespace Leap.Unity {
         return false;
       }
 
-      TransformData past = transformAtTime(leapTime - warpingAdjustment * 1000);
+      TransformData past = transformAtTime((leapTime - warpingAdjustment * 1000)+20000);
       
       // Rewind position and rotation
       if (_trackingAnchor == null) {
@@ -185,7 +185,7 @@ namespace Leap.Unity {
     }
 
     public bool TryGetWarpedTransform(WarpedAnchor anchor, out Vector3 rewoundPosition, out Quaternion rewoundRotation) {
-      long timestamp = provider.CurrentFrame.Timestamp;
+      long timestamp = provider.imageTimeStamp;
       if (TryGetWarpedTransform(anchor, out rewoundPosition, out rewoundRotation, timestamp)) {
         return true;
       }
@@ -354,19 +354,23 @@ namespace Leap.Unity {
 
       //Get the transform at the time when the latest frame was captured
       long rewindTime = provider.CurrentFrame.Timestamp - warpingAdjustment * 1000;
+      long imageRewindTime = provider.imageTimeStamp - warpingAdjustment * 1000;
+
+      TransformData imagePast = transformAtTime(imageRewindTime);
+      Quaternion imagePastCenterRot = _trackingAnchor.rotation * imagePast.localRotation;
+
+      //Apply only a rotation ~ assume all objects are infinitely distant
+      Quaternion imageReferenceRotation = Quaternion.Slerp(currCenterRot, imagePastCenterRot, tweenImageWarping);
+
+      Quaternion imageQuatWarp = Quaternion.Inverse(currCenterRot) * imageReferenceRotation;
+      imageQuatWarp = Quaternion.Euler(imageQuatWarp.eulerAngles.x, imageQuatWarp.eulerAngles.y, -imageQuatWarp.eulerAngles.z);
+      Matrix4x4 imageMatWarp = _projectionMatrix * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one) * _projectionMatrix.inverse;
+
+      Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
 
       TransformData past = transformAtTime(rewindTime);
       Vector3 pastCenterPos = _trackingAnchor.TransformPoint(past.localPosition);
       Quaternion pastCenterRot = _trackingAnchor.rotation * past.localRotation;
-
-      //Apply only a rotation ~ assume all objects are infinitely distant
-      Quaternion referenceRotation = Quaternion.Slerp(currCenterRot, pastCenterRot, tweenImageWarping);
-
-      Quaternion quatWarp = Quaternion.Inverse(currCenterRot) * referenceRotation;
-      quatWarp = Quaternion.Euler(quatWarp.eulerAngles.x, quatWarp.eulerAngles.y, -quatWarp.eulerAngles.z);
-      Matrix4x4 matWarp = _projectionMatrix * Matrix4x4.TRS(Vector3.zero, quatWarp, Vector3.one) * _projectionMatrix.inverse;
-
-      Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", matWarp);
 
       transform.position = Vector3.Lerp(currCenterPos, pastCenterPos, tweenPositionalWarping);
       transform.rotation = Quaternion.Slerp(currCenterRot, pastCenterRot, tweenRotationalWarping);
