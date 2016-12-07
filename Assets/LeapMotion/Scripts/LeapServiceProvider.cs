@@ -80,6 +80,9 @@ namespace Leap.Unity {
 
     protected Matrix4x4[] _transformArray = new Matrix4x4[2];
 
+    [NonSerialized]
+    public long imageTimeStamp = 0;
+
     public override Frame CurrentFrame {
       get {
         if (_frameOptimization == FrameOptimizationMode.ReusePhysicsForUpdate) {
@@ -222,6 +225,8 @@ namespace Leap.Unity {
       } else {
         leap_controller_.Frame(_untransformedUpdateFrame);
       }
+
+      imageTimeStamp = leap_controller_.FrameTimestamp();
 
       if (_untransformedUpdateFrame != null) {
         transformFrame(_untransformedUpdateFrame, _transformedUpdateFrame);
