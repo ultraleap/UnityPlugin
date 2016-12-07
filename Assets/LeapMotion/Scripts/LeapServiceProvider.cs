@@ -43,15 +43,12 @@ namespace Leap.Unity {
     [SerializeField]
     protected LeapDeviceType _overrideDeviceTypeWith = LeapDeviceType.Peripheral;
 
-    [Header("Interpolation")]
-    [Tooltip("Interpolate frames to deliver smoother motion.")]
-    [SerializeField]
-    protected bool _useInterpolation = true;
-
     [Header("[Experimental]")]
     [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
     [SerializeField]
     protected bool _updateHandInPrecull = false;
+
+    protected bool _useInterpolation = true;
 
 //Extrapolate on Android to compensate for the latency introduced by its graphics pipeline
 #if UNITY_ANDROID
@@ -106,7 +103,7 @@ namespace Leap.Unity {
       }
     }
 
-    public bool UseInterpolation {
+    protected bool UseInterpolation {
       get {
         return _useInterpolation;
       }
