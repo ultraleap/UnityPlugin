@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
-using UnityTest;
+//using UnityTest;
 using System;
 using System.Collections;
 #if UNITY_EDITOR
@@ -11,7 +11,7 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction.Testing {
 
-  public class SadisticTest : TestComponent {
+  public class SadisticTest : MonoBehaviour /*TestComponent*/ {
     public static SadisticTest current;
 
     [Header("Test Settings")]
@@ -89,7 +89,7 @@ namespace Leap.Unity.Interaction.Testing {
 
     public void ReportCallback(InteractionCallback callback) {
       if ((callback & forbiddenCallbacks) != 0) {
-        IntegrationTest.Fail("Recieved a forbidden callback " + callback);
+        //IntegrationTest.Fail("Recieved a forbidden callback " + callback);
         return;
       }
 
@@ -123,14 +123,14 @@ namespace Leap.Unity.Interaction.Testing {
         _provider.DestroyShapes();
 
         if ((allCallbacksRecieved & expectedCallbacks) == expectedCallbacks) {
-          IntegrationTest.Pass();
+          //IntegrationTest.Pass();
           return;
         }
 
         Debug.LogError(getEnumMessage("Expected callbacks: " + expectedCallbacks, expectedCallbacks));
         Debug.LogError(getEnumMessage("Recieved callbacks: " + allCallbacksRecieved, allCallbacksRecieved));
 
-        IntegrationTest.Fail("Could not find an interaction behaviour that recieved all expected callbacks");
+        //IntegrationTest.Fail("Could not find an interaction behaviour that recieved all expected callbacks");
       }
 #if UNITY_EDITOR
       else {
