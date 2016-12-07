@@ -76,9 +76,6 @@ namespace Leap.Unity {
     protected Frame _untransformedFixedFrame;
     protected Frame _transformedFixedFrame;
 
-    protected Frame _untransformedPreCullFrame;
-    protected Frame _transformedPreCullFrame;
-
     protected Image _currentImage;
 
     protected Matrix4x4[] _transformArray = new Matrix4x4[2];
@@ -195,10 +192,8 @@ namespace Leap.Unity {
       createController();
       _transformedUpdateFrame = new Frame();
       _transformedFixedFrame = new Frame();
-      _transformedPreCullFrame = new Frame();
       _untransformedUpdateFrame = new Frame();
       _untransformedFixedFrame = new Frame();
-      _untransformedPreCullFrame = new Frame();
     }
 
     protected virtual void Update() {
@@ -252,19 +247,6 @@ namespace Leap.Unity {
 
         DispatchFixedFrameEvent(_transformedFixedFrame);
       }
-    }
-
-    public void ManualUpdateFrame() {
-      if (_useInterpolation) {
-        leap_controller_.GetInterpolatedFrame(_untransformedPreCullFrame, CalculateInterpolationTime());
-      } else {
-        leap_controller_.Frame(_untransformedPreCullFrame);
-      }
-
-      if (_untransformedPreCullFrame != null) {
-        transformFrame(_untransformedPreCullFrame, _transformedPreCullFrame, false);
-      }
-      manualUpdateHasBeenCalledSinceUpdate = true;
     }
 
     long CalculateInterpolationTime(bool endOfFrame = false) {
