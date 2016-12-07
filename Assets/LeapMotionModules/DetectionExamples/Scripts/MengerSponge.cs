@@ -126,7 +126,6 @@ namespace Leap.Unity.DetectionExamples {
       mesh.RecalculateNormals();
       mesh.RecalculateBounds();
 
-      ;
       mesh.UploadMeshData(true);
 
       return mesh;
