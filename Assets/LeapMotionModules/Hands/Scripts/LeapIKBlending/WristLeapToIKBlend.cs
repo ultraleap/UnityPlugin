@@ -166,7 +166,7 @@ namespace Leap.Unity {
           if (handRotationZ < 0) {
             Debug.Log("Rule 2 <<<< 0");
             //animator.SetFloat("forearm_twist_out_left", 0);
-            animator.SetFloat("forearm_twist_left", (1 - Mathf.Abs(handRotationZ)) * 1.25f);
+            animator.SetFloat("forearm_twist_left", (1 - Mathf.Abs(handRotationZ)) * 1.5f);
           }
           if (twistText != null && outText != null) {
             twistText.text = "Twist: " + animator.GetFloat("forearm_twist_left").ToString("F2");
@@ -175,7 +175,7 @@ namespace Leap.Unity {
         }
         if (Handedness == Chirality.Right) {
           if (handRotationZ > 0) {
-            animator.SetFloat("forearm_twist_right", (1 - handRotationZ) * 1.25f);
+            animator.SetFloat("forearm_twist_right", (1 - handRotationZ) * 1.5f);
           }
           if (handRotationZ < 0) {
             animator.SetFloat("forearm_twist_out_right", handRotationZ);
@@ -224,7 +224,7 @@ namespace Leap.Unity {
 
 
       shoulder_up_weight = Mathf.Lerp(shoulder_up_weight, shoulder_up_target_weight, .4f);
-      shoulder_forward_weight = Mathf.Lerp(shoulder_forward_weight, shoulder_forward_target_weight, .05f);
+      shoulder_forward_weight = Mathf.Lerp(shoulder_forward_weight, shoulder_forward_target_weight, .02f);
       shoulder_back_weight = Mathf.Lerp(shoulder_back_weight, shoulder_back_target_weight, .05f);
       positionIKWeight = Mathf.Lerp(positionIKWeight, positionIKTargetWeight, .4f);
       rotationIKWeight = Mathf.Lerp(rotationIKWeight, rotationIKTargetWeight, .4f);
@@ -246,7 +246,7 @@ namespace Leap.Unity {
       distanceShoulderToPalm = (palm.position - Shoulder.transform.position).magnitude;
       if (Handedness == Chirality.Left) {
         ElbowTargetPosition.x -= distanceShoulderToPalm * .5f;
-        if(palmInAnimatorSpace.z < 0){
+        if (palmInAnimatorSpace.z < 0) {
           ElbowTargetPosition.x += palmInAnimatorSpace.z * 10;
           if (ElbowTargetPosition.y > shoulderInAnimatorSpace.y) {
             ElbowTargetPosition.y = shoulderInAnimatorSpace.y;
