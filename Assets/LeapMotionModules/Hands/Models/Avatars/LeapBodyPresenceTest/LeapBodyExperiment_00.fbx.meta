@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 17192e084745a744892bf6839b75c774
-timeCreated: 1479949681
+timeCreated: 1481592914
 licenseType: Pro
 ModelImporter:
   serializedVersion: 19
@@ -181,16 +181,18 @@ ModelImporter:
     motionNodeName: 
     animationImportErrors: 
     animationImportWarnings: "\nDefault bone length found in this file is different
-      form the one found in the source avatar:\n\t'Elbow_L' : position error = 23.057777
-      mm\n\t'Palm_L' : position error = 19.991116 mm\n\t'Elbow_R' : position error
-      = 23.058603 mm\n\t'Palm_R' : position error = 19.991613 mm\n\nInbetween bone
+      form the one found in the source avatar:\n\t'Elbow_L' : position error = 23.223019
+      mm\n\t'Palm_L' : position error = 20.134378 mm\n\t'Elbow_R' : position error
+      = 23.223850 mm\n\t'Palm_R' : position error = 20.134884 mm\n\nInbetween bone
       default rotation found in this file is different from the one found in the source
       avatar:\n\t'index_meta_L' : rotation error = 17.690874 deg\n\t'middle_meta_L'
       : rotation error = 20.779799 deg\n\t'ring_meta_L' : rotation error = 25.450720
       deg\n\t'pinky_meta_L' : rotation error = 29.531061 deg\n\t'index_meta_R' : rotation
       error = 17.691639 deg\n\t'middle_meta_R' : rotation error = 20.781151 deg\n\t'ring_meta_R'
       : rotation error = 25.451389 deg\n\t'pinky_meta_R' : rotation error = 29.531101
-      deg\n"
+      deg\n\nClip 'Take 001' has import animation warnings that might lower retargeting
+      quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Chest_M'
+      is inbetween humanoid transforms and has rotation animation that will be discarded.\n"
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     animationCompression: 3
@@ -290,7 +292,7 @@ ModelImporter:
         value: {x: 0, y: 0, z: 0}
         length: 0
         modified: 0
-    - boneName: Chest_M
+    - boneName: Spine1Part2_M
       humanName: Chest
       limit:
         min: {x: 0, y: 0, z: 0}
