@@ -175,44 +175,33 @@ namespace Leap.Unity {
 
         Quaternion spacedRot = Quaternion.Inverse(leapHandController.transform.rotation) * (handModel.GetLeapHand().Rotation).ToQuaternion();
         float handRotationZ = spacedRot.z;
-        if (ZvalueText != null) {
-          ZvalueText.text = "Rot Z: " + handRotationZ.ToString("F2");
-        }
-        //if (handRotationZ > 0) {
-        //Debug.Log(handRotationZ);
+        //if (ZvalueText != null) {
+        //  ZvalueText.text = "Rot Z: " + handRotationZ.ToString("F2");
+        //}
         if (Handedness == Chirality.Left) {
           if (handRotationZ > 0) {
-            Debug.Log("Rule 1 >>>> 0");
-            //animator.SetFloat("forearm_twist_left", 0);
             animator.SetFloat("forearm_twist_out_left", -1f * handRotationZ);
-
           }
           if (handRotationZ < 0) {
-            Debug.Log("Rule 2 <<<< 0");
-            //animator.SetFloat("forearm_twist_out_left", 0);
-            animator.SetFloat("forearm_twist_left", (1 - Mathf.Abs(handRotationZ)) * 1.5f);
+            animator.SetFloat("forearm_twist_left", (1 - Mathf.Abs(handRotationZ)) * 2f);
           }
-          if (twistText != null && outText != null) {
-            twistText.text = "Twist: " + animator.GetFloat("forearm_twist_left").ToString("F2");
-            outText.text = "Out: " + animator.GetFloat("forearm_twist_out_left").ToString("F2");
-          }
+          //if (twistText != null && outText != null) {
+          //  twistText.text = "Twist: " + animator.GetFloat("forearm_twist_left").ToString("F2");
+          //  outText.text = "Out: " + animator.GetFloat("forearm_twist_out_left").ToString("F2");
+          //}
         }
         if (Handedness == Chirality.Right) {
           if (handRotationZ > 0) {
-            animator.SetFloat("forearm_twist_right", (1 - handRotationZ) * 1.5f);
+            animator.SetFloat("forearm_twist_right", (1 - handRotationZ) * 2f);
           }
           if (handRotationZ < 0) {
             animator.SetFloat("forearm_twist_out_right", handRotationZ);
           }
-          if (twistText != null && outText != null) {
-            twistText.text = "Twist: " + animator.GetFloat("forearm_twist_right").ToString("F2");
-            outText.text = "Out: " + animator.GetFloat("forearm_twist_out_right").ToString("F2");
-          }
+          //if (twistText != null && outText != null) {
+          //  twistText.text = "Twist: " + animator.GetFloat("forearm_twist_right").ToString("F2");
+          //  outText.text = "Out: " + animator.GetFloat("forearm_twist_out_right").ToString("F2");
+          //}
         }
-
-
-        //}
-
     }
     
     public void CalculateElbowIKTargetPos() {
@@ -343,7 +332,6 @@ namespace Leap.Unity {
         animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
         animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, elbowIKWeight);
         animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
-
       }
       if (Handedness == Chirality.Right) {
         animator.SetFloat("shoulder_up_right", shoulder_up_weight);
@@ -372,6 +360,9 @@ namespace Leap.Unity {
         animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
         animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, elbowIKWeight);
         animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
+
+        animator.SetFloat("forearm_twist_left", 0);
+        animator.SetFloat("forearm_twist_out_left", 0);
       }
       if (Handedness == Chirality.Right) {
         animator.SetIKPositionWeight(AvatarIKGoal.RightHand, positionIKWeight);
@@ -385,6 +376,8 @@ namespace Leap.Unity {
         animator.SetIKRotation(AvatarIKGoal.RightHand, PalmRotationAtLateUpdate);
         animator.SetIKHintPositionWeight(AvatarIKHint.RightElbow, elbowIKWeight);
         animator.SetIKHintPosition(AvatarIKHint.RightElbow, ElbowIKTarget.position);
+        animator.SetFloat("forearm_twist_right", 0);
+        animator.SetFloat("forearm_twist_out_right", 0);
       }
     }
 
