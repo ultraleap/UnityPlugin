@@ -3817,6 +3817,14 @@ Prefab:
       propertyPath: m_MotionVectors
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 100154, guid: 17192e084745a744892bf6839b75c774, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 100042, guid: 17192e084745a744892bf6839b75c774, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 17192e084745a744892bf6839b75c774, type: 3}
   m_IsPrefabParent: 0
@@ -5153,7 +5161,7 @@ Transform:
   - {fileID: 1140342725}
   - {fileID: 1889823259}
   m_Father: {fileID: 868500653}
-  m_RootOrder: 2
+  m_RootOrder: 3
 --- !u!114 &2017104051
 MonoBehaviour:
   m_ObjectHideFlags: 0
