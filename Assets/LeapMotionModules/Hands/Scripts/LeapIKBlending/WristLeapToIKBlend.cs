@@ -130,9 +130,9 @@ namespace Leap.Unity {
 
       //snapshot and constrain velocity derived
       iKVelocitySnapShot = averageIKVelocity;
-      if (characterRoot.InverseTransformPoint(iKVelocitySnapShot).z < characterRoot.InverseTransformPoint(Hips.position).z + .5f) {
-        iKVelocitySnapShot.z = characterRoot.InverseTransformPoint(Hips.position).z + .8f;
-      }
+      //if (characterRoot.InverseTransformPoint(iKVelocitySnapShot).z < characterRoot.InverseTransformPoint(Hips.position).z + .5f) {
+      //  iKVelocitySnapShot.z = characterRoot.InverseTransformPoint(Hips.position).z + .8f;
+      //}
       iKVelocitySnapShot = iKVelocitySnapShot * .3f;// scale the velocity so arm doesn't reach as far;
       VelocityMarker.position = iKVelocitySnapShot;
       StartCoroutine(DropWithVelocity(palm.position));
@@ -375,15 +375,17 @@ namespace Leap.Unity {
         animator.SetFloat("forearm_twist_out_right", 0);
       }
       if (!isTracking && Handedness == Chirality.Left) {
-        Debug.DrawLine(lastTrackedPosition, iKVelocitySnapShot, Color.blue);
+        Debug.DrawRay(lastTrackedPosition, iKVelocitySnapShot, Color.blue);
       }
       if (!isTracking && Handedness == Chirality.Right) {
-        Debug.DrawLine(lastTrackedPosition, iKVelocitySnapShot, Color.green);
+        Debug.DrawRay(lastTrackedPosition, iKVelocitySnapShot, Color.green);
       }
     }
 
 
     private IEnumerator DropWithVelocity(Vector3 startPosition){
+      Ray ray = new Ray(startPosition, iKVelocitySnapShot);
+      Vector3 projectedPoint = ray.GetPoint(averageIKVelocity.magnitude * .5f);
       isLerping = true;
       UntrackedIKPosition = startPosition;
       float startTime = Time.time;
@@ -399,10 +401,11 @@ namespace Leap.Unity {
       while (Time.time <= endTime) {
         float t = (Time.time - startTime) / ArmDropDuration;
         //VelocityMarker.position = Vector3.Lerp(iKVelocitySnapShot, RestIKPosition.position, DropCurveX.Evaluate(t * 2));
-        float lerpedPositionX = Mathf.Lerp(iKVelocitySnapShot.x, RestIKPosition.position.x, DropCurveX.Evaluate(t * 2));
-        float lerpedPositionY = Mathf.Lerp(iKVelocitySnapShot.y, RestIKPosition.position.y, DropCurveY.Evaluate(t * 2));
-        float lerpedPositionZ = Mathf.Lerp(iKVelocitySnapShot.z, RestIKPosition.position.z, DropCurveZ.Evaluate(t * 2));
+        float lerpedPositionX = Mathf.Lerp(projectedPoint.x, RestIKPosition.position.x, DropCurveX.Evaluate(t * 2));
+        float lerpedPositionY = Mathf.Lerp(projectedPoint.y, RestIKPosition.position.y, DropCurveY.Evaluate(t * 2));
+        float lerpedPositionZ = Mathf.Lerp(projectedPoint.z, RestIKPosition.position.z, DropCurveZ.Evaluate(t * 2));
         Vector3 newMarkerPosition = new Vector3(lerpedPositionX, lerpedPositionY, lerpedPositionZ);
+        //Keep target in front of hips
         if (characterRoot.InverseTransformPoint(newMarkerPosition).z < characterRoot.InverseTransformPoint(Hips.position).z + .5f) {
           if (Handedness == Chirality.Left && characterRoot.InverseTransformPoint(newMarkerPosition).x > characterRoot.InverseTransformPoint(Hips.position).x + .2f) {
             newMarkerPosition.z = characterRoot.InverseTransformPoint(Hips.position).z + .5f;
