@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditorInternal;
 using System;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Leap.Unity.Packaging {
@@ -23,6 +24,9 @@ namespace Leap.Unity.Packaging {
       createList("_dependantFolders", drawFolderElement);
       createList("_dependantFiles", drawFileElement);
       createList("_dependantPackages", drawPackageElement);
+
+      specifyCustomDrawer("_packageName", drawPackageName);
+      specifyCustomDrawer("_generateBuildDropdown", drawGenerateBuildDropdown);
 
       specifyCustomDecorator("_dependantFolders", drawPackageExportFolder);
     }
@@ -46,6 +50,29 @@ namespace Leap.Unity.Packaging {
         }
         EditorGUI.EndDisabledGroup();
 
+      }
+    }
+
+    private void drawPackageName(SerializedProperty property) {
+      string newName = EditorGUILayout.DelayedTextField("Package Name", property.stringValue);
+      string filteredName = new string(newName.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray()).Trim();
+
+      if (filteredName != "" && filteredName != property.stringValue) {
+        property.stringValue = filteredName;
+
+        if (_def.GenerateBuildDropdown) {
+          property.serializedObject.ApplyModifiedProperties();
+          generateBuildMenuScript();
+        }
+      }
+    }
+
+    private void drawGenerateBuildDropdown(SerializedProperty property) {
+      EditorGUI.BeginChangeCheck();
+      EditorGUILayout.PropertyField(property);
+      if (EditorGUI.EndChangeCheck()) {
+        property.serializedObject.ApplyModifiedProperties();
+        generateBuildMenuScript();
       }
     }
 
@@ -146,6 +173,37 @@ namespace Leap.Unity.Packaging {
       }
 
       return relativePath;
+    }
+
+    private void generateBuildMenuScript() {
+      var definitions = Resources.FindObjectsOfTypeAll<PackageDefinition>();
+
+      List<string> lines = new List<string>();
+      lines.Add("using UnityEditor;");
+      lines.Add("");
+      lines.Add("namespace Leap.Unity.Packaging {");
+      lines.Add("");
+      lines.Add("  public class PackageDefinitionBuildMenuItems {");
+
+      foreach (var def in definitions) {
+        if (!def.GenerateBuildDropdown) continue;
+
+        string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(def));
+
+        lines.Add("");
+        lines.Add("    // " + def.PackageName);
+        lines.Add("    [MenuItem(\"Build/" + def.PackageName + "\")]");
+        lines.Add("    public static void Build" + guid + "() {");
+        lines.Add("      PackageDefinition.BuildPackage(\"" + guid + "\");");
+        lines.Add("    }");
+      }
+
+      lines.Add("  }");
+      lines.Add("}");
+      lines.Add("");
+
+      File.WriteAllLines("Assets/LeapMotionModules/Package/Editor/PackageDefinitionBuildMenuItems.cs", lines.ToArray());
+      AssetDatabase.Refresh();
     }
   }
 }

@@ -30,6 +30,18 @@ namespace Leap.Unity.Packaging {
     [SerializeField]
     protected PackageDefinition[] _dependantPackages;
 
+    public string PackageName {
+      get {
+        return _packageName;
+      }
+    }
+
+    public bool GenerateBuildDropdown {
+      get {
+        return _generateBuildDropdown;
+      }
+    }
+
     [ContextMenu("Reset Export Folder")]
     public void ResetExportFolder() {
       EditorPrefs.DeleteKey(getExportFolderKey());
@@ -95,10 +107,6 @@ namespace Leap.Unity.Packaging {
       if (packageDef != null) {
         packageDef.BuildPackage(interactive: false);
       }
-    }
-
-    public void GenerateBuildMenuItem() {
-
     }
 
     /// <summary>
@@ -232,7 +240,7 @@ namespace Leap.Unity.Packaging {
       }
     }
 
-    [MenuItem("Assets/Build All Packages")]
+    [MenuItem("Build/All", priority = -20)]
     private static void buildAllPackages() {
       var packages = Resources.FindObjectsOfTypeAll<PackageDefinition>();
       buildPackages(packages);
