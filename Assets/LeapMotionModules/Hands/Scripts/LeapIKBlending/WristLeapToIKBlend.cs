@@ -172,36 +172,35 @@ namespace Leap.Unity {
     }
 
     public void CalculateWristTwists() {
-
-        Quaternion spacedRot = Quaternion.Inverse(leapHandController.transform.rotation) * (handModel.GetLeapHand().Rotation).ToQuaternion();
-        float handRotationZ = spacedRot.z;
-        //if (ZvalueText != null) {
-        //  ZvalueText.text = "Rot Z: " + handRotationZ.ToString("F2");
+      Quaternion spacedRot = Quaternion.Inverse(leapHandController.transform.rotation) * (handModel.GetLeapHand().Rotation).ToQuaternion();
+      float handRotationZ = spacedRot.z;
+      //if (ZvalueText != null) {
+      //  ZvalueText.text = "Rot Z: " + handRotationZ.ToString("F2");
+      //}
+      if (Handedness == Chirality.Left) {
+        if (handRotationZ > 0) {
+          animator.SetFloat("forearm_twist_out_left", -1f * handRotationZ);
+        }
+        if (handRotationZ < 0) {
+          animator.SetFloat("forearm_twist_left", (1 - Mathf.Abs(handRotationZ)) * 2f);
+        }
+        //if (twistText != null && outText != null) {
+        //  twistText.text = "Twist: " + animator.GetFloat("forearm_twist_left").ToString("F2");
+        //  outText.text = "Out: " + animator.GetFloat("forearm_twist_out_left").ToString("F2");
         //}
-        if (Handedness == Chirality.Left) {
-          if (handRotationZ > 0) {
-            animator.SetFloat("forearm_twist_out_left", -1f * handRotationZ);
-          }
-          if (handRotationZ < 0) {
-            animator.SetFloat("forearm_twist_left", (1 - Mathf.Abs(handRotationZ)) * 2f);
-          }
-          //if (twistText != null && outText != null) {
-          //  twistText.text = "Twist: " + animator.GetFloat("forearm_twist_left").ToString("F2");
-          //  outText.text = "Out: " + animator.GetFloat("forearm_twist_out_left").ToString("F2");
-          //}
+      }
+      if (Handedness == Chirality.Right) {
+        if (handRotationZ > 0) {
+          animator.SetFloat("forearm_twist_right", (1 - handRotationZ) * 2f);
         }
-        if (Handedness == Chirality.Right) {
-          if (handRotationZ > 0) {
-            animator.SetFloat("forearm_twist_right", (1 - handRotationZ) * 2f);
-          }
-          if (handRotationZ < 0) {
-            animator.SetFloat("forearm_twist_out_right", handRotationZ);
-          }
-          //if (twistText != null && outText != null) {
-          //  twistText.text = "Twist: " + animator.GetFloat("forearm_twist_right").ToString("F2");
-          //  outText.text = "Out: " + animator.GetFloat("forearm_twist_out_right").ToString("F2");
-          //}
+        if (handRotationZ < 0) {
+          animator.SetFloat("forearm_twist_out_right", handRotationZ);
         }
+        //if (twistText != null && outText != null) {
+        //  twistText.text = "Twist: " + animator.GetFloat("forearm_twist_right").ToString("F2");
+        //  outText.text = "Out: " + animator.GetFloat("forearm_twist_out_right").ToString("F2");
+        //}
+      }
     }
     
     public void CalculateElbowIKTargetPos() {
@@ -211,7 +210,7 @@ namespace Leap.Unity {
       Vector3 shoulderInAnimatorSpace = characterRoot.InverseTransformDirection(Shoulder.position);
       distanceShoulderToPalm = (palm.position - Shoulder.transform.position).magnitude;
       if (Handedness == Chirality.Left) {
-        ElbowTargetPosition.x -= distanceShoulderToPalm * .5f;
+        ElbowTargetPosition.x -= distanceShoulderToPalm * .2f;
         if (palmInAnimatorSpace.z < 0) {
           ElbowTargetPosition.x += palmInAnimatorSpace.z * 10;
           if (ElbowTargetPosition.y > shoulderInAnimatorSpace.y) {
@@ -220,7 +219,7 @@ namespace Leap.Unity {
         }
       }
       if (Handedness == Chirality.Right) {
-        ElbowTargetPosition.x += distanceShoulderToPalm * .5f;
+        ElbowTargetPosition.x += distanceShoulderToPalm * .2f;
         if (palmInAnimatorSpace.z < 0) {
           ElbowTargetPosition.x -= palmInAnimatorSpace.z * 10;
           if (ElbowTargetPosition.y > shoulderInAnimatorSpace.y) {
@@ -253,7 +252,6 @@ namespace Leap.Unity {
         averageIKVelocity += v;
       }
       averageIKVelocity = (averageIKVelocity / 3);
-      //Debug.Log("iKVelocity: " + iKVelocity + " || velocityList.Count: " + velocityList.Count + " || averageIKVelocity: " + averageIKVelocity);
       previousPalmPosition = palm.position;
 
     }
@@ -384,26 +382,22 @@ namespace Leap.Unity {
 
 
     private IEnumerator DropWithVelocity(Vector3 startPosition){
-      Ray ray = new Ray(startPosition, iKVelocitySnapShot);
-      Vector3 projectedPoint = ray.GetPoint(averageIKVelocity.magnitude * .5f);
+      Ray velocityRay = new Ray(startPosition, iKVelocitySnapShot);
+      Vector3 projectedVelocity = velocityRay.GetPoint(averageIKVelocity.magnitude * .5f);
       isLerping = true;
       UntrackedIKPosition = startPosition;
       float startTime = Time.time;
       float endTime = startTime + ArmDropDuration;
       float speed = averageIKVelocity.magnitude * .01f;
-      float distanceToTarget = (startPosition - RestIKPosition.position).magnitude;
       if (speed < .01f ) {
         speed = .01f;
       }
-      //if(speed > )
-      //Debug.Log("speed: " + speed + " || distanceToTarget: " + distanceToTarget);
     
       while (Time.time <= endTime) {
         float t = (Time.time - startTime) / ArmDropDuration;
-        //VelocityMarker.position = Vector3.Lerp(iKVelocitySnapShot, RestIKPosition.position, DropCurveX.Evaluate(t * 2));
-        float lerpedPositionX = Mathf.Lerp(projectedPoint.x, RestIKPosition.position.x, DropCurveX.Evaluate(t * 2));
-        float lerpedPositionY = Mathf.Lerp(projectedPoint.y, RestIKPosition.position.y, DropCurveY.Evaluate(t * 2));
-        float lerpedPositionZ = Mathf.Lerp(projectedPoint.z, RestIKPosition.position.z, DropCurveZ.Evaluate(t * 2));
+        float lerpedPositionX = Mathf.Lerp(projectedVelocity.x, RestIKPosition.position.x, DropCurveX.Evaluate(t * 2));
+        float lerpedPositionY = Mathf.Lerp(projectedVelocity.y, RestIKPosition.position.y, DropCurveY.Evaluate(t * 2));
+        float lerpedPositionZ = Mathf.Lerp(projectedVelocity.z, RestIKPosition.position.z, DropCurveZ.Evaluate(t * 2));
         Vector3 newMarkerPosition = new Vector3(lerpedPositionX, lerpedPositionY, lerpedPositionZ);
         //Keep target in front of hips
         if (characterRoot.InverseTransformPoint(newMarkerPosition).z < characterRoot.InverseTransformPoint(Hips.position).z + .5f) {
