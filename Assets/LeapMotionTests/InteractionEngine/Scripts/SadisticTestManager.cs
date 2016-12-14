@@ -2,13 +2,13 @@
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using UnityTest;
+//using UnityTest;
 using System;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction.Testing {
 
-  public class SadisticTestManager : TestComponent {
+  public class SadisticTestManager : MonoBehaviour /*TestComponent*/ {
     [Header("Test Definition")]
     [Tooltip("The recordings to be used in the tests.")]
     [SerializeField]
@@ -132,6 +132,7 @@ namespace Leap.Unity.Interaction.Testing {
         Undo.RegisterCreatedObjectUndo(test, "Created autoamtic test component");
 
         Undo.RecordObject(test, "Set test settings");
+        /*
         test.timeout = timeout;
         test.ignored = ignored;
         test.succeedAfterAllAssertionsAreExecuted = succeedAfterAllAssertionsAreExecuted;
@@ -140,6 +141,7 @@ namespace Leap.Unity.Interaction.Testing {
         test.succeedWhenExceptionIsThrown = succeedWhenExceptionIsThrown;
         test.includedPlatforms = includedPlatforms;
         test.platformsToIgnore = platformsToIgnore;
+        */
 
         test.recording = _recordings[i];
         test.callback = (InteractionCallback)callbackValue;
