@@ -283,6 +283,7 @@ namespace Leap.Unity {
       }
     }
 
+    //Apply Shoulder Rigging Rules
     public void CalculateShoulderMuscles() {
       Vector3 elbow = characterRoot.InverseTransformPoint(ElbowMarker.position);
       Vector3 scapula = characterRoot.InverseTransformPoint(Scapula.position);
