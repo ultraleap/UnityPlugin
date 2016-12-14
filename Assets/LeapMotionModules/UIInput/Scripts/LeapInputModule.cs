@@ -9,56 +9,79 @@ using Leap.Unity;
 using Leap;
 
 namespace Leap.Unity.InputModule {
+  /** An InputModule that supports the use of Leap Motion tracking data for manipulating Unity UI controls. */
   public class LeapInputModule : BaseInputModule {
     //General Interaction Parameters
     [Header(" Interaction Setup")]
     [Tooltip("The current Leap Data Provider for the scene.")]
+    /** The LeapProvider providing tracking data to the scene. */
     public LeapProvider LeapDataProvider;
     [Tooltip("An optional alternate detector for pinching on the left hand.")]
+    /** An optional component that will be used to detect pinch motions if set.
+     * Primarily used for projective or hybrid interaction modes (under experimental features).
+     */
     public Leap.Unity.PinchDetector LeftHandDetector;
     [Tooltip("An optional alternate detector for pinching on the right hand.")]
+    /** An optional component that will be used to detect pinch motions if set.
+     * Primarily used for projective or hybrid interaction modes (under experimental features).
+     */
     public Leap.Unity.PinchDetector RightHandDetector;
     [Tooltip("How many hands and pointers the Input Module should allocate for.")]
+    /** The number of pointers to create. By default, one pointer is created for each hand. */
     int NumberOfPointers = 2;
 
     //Customizable Pointer Parameters
     [Header(" Pointer Setup")]
     [Tooltip("The sprite used to represent your pointers during projective interaction.")]
+    /** The sprite for the cursor. */
     public Sprite PointerSprite;
     [Tooltip("The material to be instantiated for your pointers during projective interaction.")]
+    /** The cursor material. */
     public Material PointerMaterial;
     [Tooltip("The color of the pointer when it is hovering over blank canvas.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
+    /** The color for the cursor when it is not in a special state. */
     public Color StandardColor = Color.white;
     [Tooltip("The color of the pointer when it is hovering over any other UI element.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
+    /** The color for the cursor when it is hovering over a control. */
     public Color HoveringColor = Color.green;
     [Tooltip("The color of the pointer when it is triggering a UI element.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
+    /** The color for the cursor when it is actively interacting with a control. */
     public Color TriggeringColor = Color.gray;
     [Tooltip("The color of the pointer when it is triggering blank canvas.")]
     [ColorUsageAttribute(true, false, 0, 8, 0.125f, 3)]
+    /** The color for the cursor when it is touching or triggering a non-active part of the UI (such as the canvas). */
     public Color TriggerMissedColor = Color.gray;
 
-    //Customizable Pointer Parameters
+    //Advanced Options
     [Header(" Advanced Options")]
     [Tooltip("Whether or not to show Advanced Options in the Inspector.")]
     public bool ShowAdvancedOptions = false;
     [Tooltip("The distance from the base of a UI element that tactile interaction is triggered.")]
+    /** The distance from the base of a UI element that tactile interaction is triggered.*/
     public float TactilePadding = 0.005f;
     [Tooltip("The sound that is played when the pointer transitions from canvas to element.")]
+    /** The sound that is played when the pointer transitions from canvas to element.*/
     public AudioClip BeginHoverSound;
     [Tooltip("The sound that is played when the pointer transitions from canvas to element.")]
+    /** The sound that is played when the pointer transitions from canvas to element.*/
     public AudioClip EndHoverSound;
     [Tooltip("The sound that is played when the pointer triggers a UI element.")]
+    /** The sound that is played when the pointer triggers a UI element.*/
     public AudioClip BeginTriggerSound;
     [Tooltip("The sound that is played when the pointer triggers a UI element.")]
+    /** The sound that is played when the pointer triggers a UI element.*/
     public AudioClip EndTriggerSound;
     [Tooltip("The sound that is played when the pointer triggers blank canvas.")]
+    /** The sound that is played when the pointer triggers blank canvas.*/
     public AudioClip BeginMissedSound;
     [Tooltip("The sound that is played when the pointer triggers blank canvas.")]
+    /** The sound that is played when the pointer triggers blank canvas.*/
     public AudioClip EndMissedSound;
     [Tooltip("The sound that is played while the pointer is dragging an object.")]
+    /** The sound that is played while the pointer is dragging an object.*/
     public AudioClip DragLoopSound;
 
     // Event delegates triggered by Input
@@ -67,48 +90,74 @@ namespace Leap.Unity.InputModule {
 
     [Header(" Event Setup")]
     [Tooltip("The event that is triggered upon clicking on a non-canvas UI element.")]
+    /** The event that is triggered upon clicking on a non-canvas UI element.*/
     public PositionEvent onClickDown;
     [Tooltip("The event that is triggered upon lifting up from a non-canvas UI element (Not 1:1 with onClickDown!)")]
+    /** The event that is triggered upon lifting up from a non-canvas UI element (Not 1:1 with onClickDown!)*/
     public PositionEvent onClickUp;
     [Tooltip("The event that is triggered upon hovering over a non-canvas UI element.")]
+    /** The event that is triggered upon hovering over a non-canvas UI element.*/
     public PositionEvent onHover;
     [Tooltip("The event that is triggered while holding down a non-canvas UI element.")]
+    /** The event that is triggered while holding down a non-canvas UI element.*/
     public PositionEvent whileClickHeld;
 
     [Tooltip("Whether or not to show unsupported Experimental Options in the Inspector.")]
     public bool ShowExperimentalOptions = false;
+    /** Defines the interaction modes :
+     *
+     *  - Hybrid: Both tactile and projective interaction. The active mode depends on the ProjectiveToTactileTransitionDistance value.
+     *
+     *  - Tactile: The user must physically touch the controls.
+     *
+     *  - Projective: A cursor is projected from the user's knuckle.
+     */
     public enum InteractionCapability : int {
       Hybrid,
       Tactile,
       Projective
     };
     [Tooltip("The interaction mode that the Input Module will be restricted to.")]
+    /** The mode to use for interaction. The default mode is tactile. The projective mode is considered experimental.*/
     public InteractionCapability InteractionMode = InteractionCapability.Tactile;
     [Tooltip("The distance from the base of a UI element that interaction switches from Projective-Pointer based to Touch based.")]
+    /** The distance from the canvas at which to switch to projective mode. */
     public float ProjectiveToTactileTransitionDistance = 0.4f;
     [Tooltip("The size of the pointer in world coordinates with respect to the distance between the cursor and the camera.")]
+    /** The size of the pointer in world coordinates with respect to the distance between the cursor and the camera.*/
     public AnimationCurve PointerDistanceScale = AnimationCurve.Linear(0f, 0.1f, 6f, 1f);
     [Tooltip("The size of the pointer in world coordinates with respect to the distance between the thumb and forefinger.")]
+    /** The size of the pointer in world coordinates with respect to the distance between the thumb and forefinger.*/
     public AnimationCurve PointerPinchScale = AnimationCurve.Linear(30f, 0.6f, 70f, 1.1f);
     [Tooltip("When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.")]
+    /** When not using a PinchDetector, the distance in mm that the tip of the thumb and forefinger should be to activate selection during projective interaction.*/
     public float PinchingThreshold = 30f;
     [Tooltip("Create a pointer for each finger.")]
+    /** Create a pointer for each finger.*/
     public bool perFingerPointer = false;
     [Tooltip("Render the pointer onto the enviroment.")]
+    /** Render the pointer onto the enviroment.*/
     public bool EnvironmentPointer = false;
     [Tooltip("The event that is triggered while pinching to a point in the environment.")]
+    /** The event that is triggered while pinching to a point in the environment.*/
     public PositionEvent environmentPinch;
     [Tooltip("Render a smaller pointer inside of the main pointer.")]
+    /** Render a smaller pointer inside of the main pointer.*/
     public bool InnerPointer = true;
     [Tooltip("The Opacity of the Inner Pointer relative to the Primary Pointer.")]
+    /** The Opacity of the Inner Pointer relative to the Primary Pointer.*/
     public float InnerPointerOpacityScalar = 0.77f;
     [Tooltip("Trigger a Hover Event when switching between UI elements.")]
+    /** Trigger a Hover Event when switching between UI elements.*/
     public bool TriggerHoverOnElementSwitch = false;
     [Tooltip("If the ScrollView still doesn't work even after disabling RaycastTarget on the intermediate layers.")]
+    /** If the ScrollView still doesn't work even after disabling RaycastTarget on the intermediate layers.*/
     public bool OverrideScrollViewClicks = false;
     [Tooltip("Draw the raycast for projective interaction.")]
+    /** Draw the raycast for projective interaction.*/
     public bool DrawDebug = false;
     [Tooltip("Retract compressible widgets when not using Tactile Interaction.")]
+    /** Retract compressible widgets when not using Tactile Interaction.*/
     public bool RetractUI = false;
 
     //Event related data
@@ -138,6 +187,9 @@ namespace Leap.Unity.InputModule {
     private Frame curFrame;
     private GameObject[] currentGo;
     private GameObject[] currentGoing;
+    private Vector3 OldCameraPos = Vector3.zero;
+    private Quaternion OldCameraRot = Quaternion.identity;
+    private float OldCameraFoV;
 
     //Queue of Spheres to Debug Draw
     private Queue<Vector3> DebugSphereQueue;
@@ -188,7 +240,7 @@ namespace Leap.Unity.InputModule {
         SpriteRenderer renderer = pointer.AddComponent<SpriteRenderer>();
         renderer.sortingOrder = 1000;
 
-        //Add your sprite to the Canvas
+        //Add your sprite to the Sprite Renderer
         renderer.sprite = PointerSprite;
         renderer.material = Instantiate(PointerMaterial); //Make sure to instantiate the material so each pointer can be modified independently
 
@@ -200,10 +252,8 @@ namespace Leap.Unity.InputModule {
           PointerLines[index].SetWidth(0.001f, 0.001f);
         }
 
-        if (PointerSprite == null)
-          Debug.LogError("Set PointerSprite on " + this.gameObject.name + " to the sprite you want to use as your pointer.", this.gameObject);
-
         Pointers[index] = pointer.GetComponent<Transform>();
+        pointer.SetActive(false);
 
         if (InnerPointer) {
           //Create the Canvas to render the Pointer on
@@ -213,9 +263,11 @@ namespace Leap.Unity.InputModule {
 
           //Add your sprite to the Canvas
           renderer.sprite = PointerSprite;
+
           renderer.material = Instantiate(PointerMaterial);
 
           InnerPointers[index] = innerPointer.GetComponent<Transform>();
+          innerPointer.SetActive(false);
         }
       }
 
@@ -254,15 +306,16 @@ namespace Leap.Unity.InputModule {
       curFrame = LeapDataProvider.CurrentFrame;
 
       if (Camera.main != null) {
-        Quaternion HeadYaw = Quaternion.Euler(0f, Camera.main.transform.rotation.eulerAngles.y, 0f);
+        Quaternion HeadYaw = Quaternion.Euler(0f, OldCameraRot.eulerAngles.y, 0f);
         CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.1f);
       }
     }
 
     //Process is called by UI system to process events
     public override void Process() {
-      Vector3 OldCameraPos = Camera.main.transform.position;
-      Quaternion OldCameraRot = Camera.main.transform.rotation;
+      OldCameraPos = Camera.main.transform.position;
+      OldCameraRot = Camera.main.transform.rotation;
+      OldCameraFoV = Camera.main.fieldOfView;
 
       //Send update events if there is a selected object
       //This is important for InputField to receive keyboard events
@@ -305,10 +358,10 @@ namespace Leap.Unity.InputModule {
         if (Camera.main != null) {
           switch (curFrame.Hands[whichHand].IsRight) {
             case true:
-              ProjectionOrigin = Camera.main.transform.position + CurrentRotation * new Vector3(0.15f, -0.2f, 0f);
+              ProjectionOrigin = OldCameraPos + CurrentRotation * new Vector3(0.15f, -0.2f, 0f);
               break;
             case false:
-              ProjectionOrigin = Camera.main.transform.position + CurrentRotation * new Vector3(-0.15f, -0.2f, 0f);
+              ProjectionOrigin = OldCameraPos + CurrentRotation * new Vector3(-0.15f, -0.2f, 0f);
               break;
           }
         }
@@ -335,7 +388,7 @@ namespace Leap.Unity.InputModule {
             PrevState[whichPointer] = pointerState[whichPointer]; //Store old state for sound transitionary purposes
           }
           UpdatePointer(whichPointer, PointEvents[whichPointer], PointEvents[whichPointer].pointerCurrentRaycast.gameObject);
-          if (!TipRaycast && distanceOfTipToPointer(whichPointer, whichHand, whichPointer) < ProjectiveToTactileTransitionDistance) {
+          if (!TipRaycast && distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance) {
             PointEvents[whichPointer].pointerCurrentRaycast = new RaycastResult();
           }
           ProcessState(whichPointer, whichHand, whichFinger, TipRaycast);
@@ -373,6 +426,7 @@ namespace Leap.Unity.InputModule {
           GameObject Hoverer = ExecuteEvents.GetEventHandler<IPointerClickHandler>(PointEvents[whichPointer].pointerCurrentRaycast.gameObject);
           if ((Hoverer != null)) {
             ILeapWidget comp = Hoverer.GetComponent<ILeapWidget>();
+            if (comp == null) { comp = Hoverer.GetComponentInParent<ILeapWidget>(); }
             if (comp != null) {
               //if (!isTriggeringInteraction(whichPointer, whichHand, whichFinger)) { //I forget why I put this here....
               ((ILeapWidget)comp).HoverDistance(distanceOfTipToPointer(whichPointer, whichHand, whichFinger));
@@ -472,7 +526,7 @@ namespace Leap.Unity.InputModule {
 
 
           //If we have dragged beyond the drag threshold
-          if (!PointEvents[whichPointer].dragging && currentGoing[whichPointer] && Vector2.Distance(PointEvents[whichPointer].position, DragBeginPosition[whichPointer]) > EventSystem.current.pixelDragThreshold) {
+          if (!PointEvents[whichPointer].dragging && currentGoing[whichPointer] && Vector2.Distance(PointEvents[whichPointer].position, DragBeginPosition[whichPointer])*100f > EventSystem.current.pixelDragThreshold) {
             IDragHandler Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
             if (Dragger != null && Dragger is ScrollRect) {
               if (currentGo[whichPointer] && !(currentGo[whichPointer].GetComponent<ScrollRect>())) {
@@ -543,6 +597,7 @@ namespace Leap.Unity.InputModule {
 
       Camera.main.transform.position = OldCameraPos;
       Camera.main.transform.rotation = OldCameraRot;
+      Camera.main.fieldOfView = OldCameraFoV;
     }
 
     //Raycast from the EventCamera into UI Space
@@ -568,6 +623,7 @@ namespace Leap.Unity.InputModule {
 
         //Focus pointer through the average of the extended fingers
         if (!perFingerPointer) {
+          /*
           float numberOfExtendedFingers = 0.1f;
           IndexFingerPosition = curFrame.Hands[whichHand].Fingers[whichFinger].TipPosition.ToVector3() * 0.1f;
           //Averages cursor position through average of extended fingers; ended up being worse than expected
@@ -579,6 +635,18 @@ namespace Leap.Unity.InputModule {
             }
           }
           IndexFingerPosition /= numberOfExtendedFingers;
+          */
+          
+          float farthest = 0f;
+          IndexFingerPosition = curFrame.Hands[whichHand].Fingers[1].TipPosition.ToVector3();
+          for (int i = 1; i < 3; i++) {
+            float fingerDistance = Vector3.Distance(Camera.main.transform.position, curFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3());
+            float fingerExtension = Mathf.Clamp01(Vector3.Dot(curFrame.Hands[whichHand].Fingers[i].Direction.ToVector3(), curFrame.Hands[whichPointer].Direction.ToVector3())) / 1.5f;
+            if (fingerDistance > farthest && fingerExtension > 0.5f) {
+              farthest = fingerDistance;
+              IndexFingerPosition = curFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3();
+            }
+          }
         } else {
           IndexFingerPosition = curFrame.Hands[whichHand].Fingers[whichFinger].TipPosition.ToVector3();
         }
@@ -593,8 +661,8 @@ namespace Leap.Unity.InputModule {
       if (DrawDebug)
         DebugSphereQueue.Enqueue(Camera.main.transform.position);
 
-      //Set EventCamera's Forward Direction
-      Camera.main.transform.forward = Direction;
+      //Set EventCamera's FoV
+      Camera.main.fieldOfView = 179f;
 
       //Set the Raycast Direction and Delta
       PointEvents[whichPointer].position = Vector2.Lerp(PrevScreenPosition[whichPointer], Camera.main.WorldToScreenPoint(IndexFingerPosition), 1.0f);//new Vector2(Screen.width / 2, Screen.height / 2);
@@ -798,7 +866,7 @@ namespace Leap.Unity.InputModule {
       Pointers[whichPointer].localScale = Pointerscale * new Vector3(1f, 1f /*+ pointData.delta.magnitude*1f*/, 1f);
     }
 
-    //A boolean that returns when a "click" is being triggered
+    /** A boolean function that returns true if a "click" is being triggered during the current frame. */
     public bool isTriggeringInteraction(int whichPointer, int whichHand, int whichFinger) {
 
       if (InteractionMode != InteractionCapability.Projective) {
@@ -821,20 +889,21 @@ namespace Leap.Unity.InputModule {
       return false;
     }
 
-    //The z position of the index finger tip to the Pointer
+    /** The z position of the index finger tip to the Pointer. */
     public float distanceOfTipToPointer(int whichPointer, int whichHand, int whichFinger) {
       //Get Base of Index Finger Position
       Vector3 TipPosition = curFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToVector3();
       return (-Pointers[whichPointer].InverseTransformPoint(TipPosition).z * Pointers[whichPointer].lossyScale.z) - TactilePadding;
     }
 
-    //The z position of the index finger tip to the Pointer
+    /** The z position of the index finger tip to the specified transform. */
     public float distanceOfTipToElement(Transform UIElement, int whichHand, int whichFinger) {
       //Get Base of Index Finger Position
       Vector3 TipPosition = curFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToVector3();
       return (-UIElement.InverseTransformPoint(TipPosition).z * UIElement.lossyScale.z) - TactilePadding;
     }
 
+    /** Returns true if any active pointer is in the "touching" interaction mode, i.e, whether it is touching or nearly touching a canvas or control. */
     public bool getTouchingMode() {
       bool mode = false;
       for (int i = 0; i < pointerState.Length; i++) {
@@ -845,6 +914,7 @@ namespace Leap.Unity.InputModule {
       return mode;
     }
 
+    /** Returns true if the specified pointer is in the "touching" interaction mode, i.e, whether it is touching or nearly touching a canvas or control. */
     public bool getTouchingMode(int whichPointer) {
       return (pointerState[whichPointer] == pointerStates.NearCanvas || pointerState[whichPointer] == pointerStates.TouchingCanvas || pointerState[whichPointer] == pointerStates.TouchingElement);
     }
@@ -895,6 +965,11 @@ namespace Leap.Unity.InputModule {
 
     //Where the lerping of the pointer's color takes place
     //If RGB are 0f or Alpha is 1f, then it will ignore those components and only lerp the remaining components
+    /** Linearly interpolates the color of a cursor toward the specified color. 
+     *  @param whichPointer The identifier of the pointer to change.
+     *  @param color The target color.
+     *  @param lerpalpha The amount to interpolate by.
+     */
     public void lerpPointerColor(int whichPointer, Color color, float lerpalpha) {
       SpriteRenderer PointerSprite = Pointers[whichPointer].GetComponent<SpriteRenderer>();
       Color oldColor = PointerSprite.color;
@@ -942,8 +1017,9 @@ namespace Leap.Unity.InputModule {
       }
     }
 
+    /** Only activate the InputModule when there are hands in the scene. */
     public override bool ShouldActivateModule() {
-      return curFrame!=null && curFrame.Hands.Count > 0 && base.ShouldActivateModule();
+      return curFrame != null && curFrame.Hands.Count > 0 && base.ShouldActivateModule();
     }
   }
 }

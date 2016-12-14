@@ -120,7 +120,9 @@ namespace Leap.Unity {
       if (ModelsParent == null) {
         Debug.LogWarning("HandPool.ModelsParent needs to reference the parent transform of the hand models.  This transform should be a child of the LMHeadMountedRig transform.");
       }
-      foreach (ModelGroup collectionGroup in ModelPool) {
+      
+      for(int i=0; i<ModelPool.Count; i++) {
+        var collectionGroup = ModelPool[i];
         collectionGroup._handPool = this;
         IHandModel leftModel;
         IHandModel rightModel;

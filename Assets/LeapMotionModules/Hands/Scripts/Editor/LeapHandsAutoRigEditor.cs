@@ -17,11 +17,8 @@ namespace Leap.Unity {
       if (GUILayout.Button("AutoRig")) {
         autoRigger.AutoRig();
       }
-      if (GUILayout.Button("Store Start Pose")) {
-        autoRigger.StoreStartPose();
-      }
-      if (GUILayout.Button("Reset To Start Pose")) {
-        autoRigger.RestoreStartPose();
+      if (GUILayout.Button("Push Vector Values")) {
+        autoRigger.PushVectorValues();
       }
     }
   }
