@@ -16,5 +16,4 @@ MonoBehaviour:
   _dependantFolders:
   - Assets\LeapMotionModules\Attachments
   _dependantFiles: []
-  _dependantPackages:
-  - {fileID: 0}
+  _dependantPackages: []

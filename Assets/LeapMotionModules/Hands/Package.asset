@@ -16,5 +16,4 @@ MonoBehaviour:
   _dependantFolders:
   - Assets\LeapMotionModules\Hands
   _dependantFiles: []
-  _dependantPackages:
-  - {fileID: 0}
+  _dependantPackages: []
