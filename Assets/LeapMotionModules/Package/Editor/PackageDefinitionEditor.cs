@@ -149,9 +149,11 @@ namespace Leap.Unity.Packaging {
 
       if (GUI.Button(rightRect, "Change")) {
         string chosenFolder = openAction("Select Folder", Application.dataPath, "");
-        string relativePath = makeRelativePath(Application.dataPath, chosenFolder);
-        if (!string.IsNullOrEmpty(relativePath) && !relativePath.StartsWith("..")) {
-          property.stringValue = relativePath;
+        if (!string.IsNullOrEmpty(chosenFolder)) {
+          string relativePath = makeRelativePath(Application.dataPath, chosenFolder);
+          if (!string.IsNullOrEmpty(relativePath) && !relativePath.StartsWith("..")) {
+            property.stringValue = relativePath;
+          }
         }
       }
     }

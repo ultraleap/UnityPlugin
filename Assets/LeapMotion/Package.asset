@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Name: Core
   m_EditorClassIdentifier: 
   _packageName: Core
+  _generateBuildDropdown: 1
   _dependantFolders:
   - Assets\LeapMotion
   _dependantFiles:
