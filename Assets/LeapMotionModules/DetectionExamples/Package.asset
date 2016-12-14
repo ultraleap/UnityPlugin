@@ -11,12 +11,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 437f3e9ccf671e241b2a1697e38ddc2b, type: 3}
   m_Name: Package
   m_EditorClassIdentifier: 
-  _packageName: Core
+  _packageName: Detection Examples
   _generateBuildDropdown: 1
   _dependantFolders:
-  - Assets\LeapMotion
-  _dependantFiles:
-  - Assets\Plugins\LeapCSharp.NET3.5.dll
-  - Assets\Plugins\x86\LeapC.dll
-  - Assets\Plugins\x86_64\LeapC.dll
+  - Assets\LeapMotionModules\DetectionExamples
+  _dependantFiles: []
   _dependantPackages: []
