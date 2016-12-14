@@ -135,7 +135,7 @@ namespace Leap.Unity {
       }
       iKVelocitySnapShot = iKVelocitySnapShot * .3f;// scale the velocity so arm doesn't reach as far;
       VelocityMarker.position = iKVelocitySnapShot;
-      StartCoroutine(MoveTowardWithVelocity(palm.position));
+      StartCoroutine(DropWithVelocity(palm.position));
       lastTrackedPosition = palm.position;      
     }
     protected override void HandReset() {
@@ -255,12 +255,7 @@ namespace Leap.Unity {
       averageIKVelocity = (averageIKVelocity / 3);
       //Debug.Log("iKVelocity: " + iKVelocity + " || velocityList.Count: " + velocityList.Count + " || averageIKVelocity: " + averageIKVelocity);
       previousPalmPosition = palm.position;
-      if (!isTracking && Handedness == Chirality.Left) {
-        Debug.DrawLine(lastTrackedPosition, iKVelocitySnapShot, Color.blue);
-      }
-      if (!isTracking && Handedness == Chirality.Right) {
-        Debug.DrawLine(lastTrackedPosition, iKVelocitySnapShot, Color.green);
-      }
+
     }
 
     public void LerpMuscleWeights() {
@@ -379,23 +374,16 @@ namespace Leap.Unity {
         animator.SetFloat("forearm_twist_right", 0);
         animator.SetFloat("forearm_twist_out_right", 0);
       }
-    }
-
-    private IEnumerator LerpToRestPosition(Vector3 droppedPosition) {
-      float startTime = Time.time;
-      float endTime = startTime + ArmDropDuration;
-
-      while (Time.time <= endTime) {
-        float t = (Time.time - startTime) / ArmDropDuration;
-        float lerpedPositionX = Mathf.Lerp(droppedPosition.x, RestIKPosition.position.x, DropCurveX.Evaluate(t));
-        float lerpedPositionY = Mathf.Lerp(droppedPosition.y, RestIKPosition.position.y, DropCurveY.Evaluate(t));
-        float lerpedPositionZ = Mathf.Lerp(droppedPosition.z, RestIKPosition.position.z, DropCurveZ.Evaluate(t));
-        UntrackedIKPosition = new Vector3(lerpedPositionX, lerpedPositionY, lerpedPositionZ);
-        yield return null;
+      if (!isTracking && Handedness == Chirality.Left) {
+        Debug.DrawLine(lastTrackedPosition, iKVelocitySnapShot, Color.blue);
+      }
+      if (!isTracking && Handedness == Chirality.Right) {
+        Debug.DrawLine(lastTrackedPosition, iKVelocitySnapShot, Color.green);
       }
     }
 
-    private IEnumerator MoveTowardWithVelocity(Vector3 startPosition){
+
+    private IEnumerator DropWithVelocity(Vector3 startPosition){
       isLerping = true;
       UntrackedIKPosition = startPosition;
       float startTime = Time.time;
