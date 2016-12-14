@@ -276,6 +276,6 @@ namespace Leap.Unity.Packaging {
 
       Selection.activeObject = package;
     }
-  }
 #endif
+  }
 }
