@@ -4,6 +4,7 @@ using UnityEditorInternal;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Collections.Generic;
 
 namespace Leap.Unity.Packaging {
@@ -180,31 +181,31 @@ namespace Leap.Unity.Packaging {
     private void generateBuildMenuScript() {
       var definitions = PackageDefinition.FindAll();
 
-      List<string> lines = new List<string>();
-      lines.Add("using UnityEditor;");
-      lines.Add("");
-      lines.Add("namespace Leap.Unity.Packaging {");
-      lines.Add("");
-      lines.Add("  public class PackageDefinitionBuildMenuItems {");
+      StringBuilder builder = new StringBuilder();
+      builder.AppendLine("using UnityEditor;");
+      builder.AppendLine();
+      builder.AppendLine("namespace Leap.Unity.Packaging {");
+      builder.AppendLine();
+      builder.AppendLine("  public class PackageDefinitionBuildMenuItems {");
 
       foreach (var def in definitions) {
         if (!def.GenerateBuildDropdown) continue;
 
         string guid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(def));
 
-        lines.Add("");
-        lines.Add("    // " + def.PackageName);
-        lines.Add("    [MenuItem(\"Build/" + def.PackageName + "\")]");
-        lines.Add("    public static void Build_" + guid + "() {");
-        lines.Add("      PackageDefinition.BuildPackage(\"" + guid + "\");");
-        lines.Add("    }");
+        builder.AppendLine("");
+        builder.AppendLine("    // " + def.PackageName);
+        builder.AppendLine("    [MenuItem(\"Build/" + def.PackageName + "\")]");
+        builder.AppendLine("    public static void Build_" + guid + "() {");
+        builder.AppendLine("      PackageDefinition.BuildPackage(\"" + guid + "\");");
+        builder.AppendLine("    }");
       }
 
-      lines.Add("  }");
-      lines.Add("}");
-      lines.Add("");
+      builder.AppendLine("  }");
+      builder.AppendLine("}");
+      builder.AppendLine();
 
-      File.WriteAllLines("Assets/LeapMotionModules/Package/Editor/PackageDefinitionBuildMenuItems.cs", lines.ToArray());
+      File.WriteAllText("Assets/LeapMotionModules/Package/Editor/PackageDefinitionBuildMenuItems.cs", builder.ToString());
       AssetDatabase.Refresh();
     }
   }
