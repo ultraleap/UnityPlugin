@@ -45,7 +45,7 @@ namespace Leap.Unity.Packaging {
           EditorGUILayout.ObjectField(childPackage, typeof(PackageDefinition), false);
         }
         EditorGUI.EndDisabledGroup();
-        
+
       }
     }
 

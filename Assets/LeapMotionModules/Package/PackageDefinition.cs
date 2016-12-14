@@ -63,7 +63,7 @@ namespace Leap.Unity.Packaging {
     }
 
     /// <summary>
-    /// Returns whether or not the export folder has been defined for this user. 
+    /// Returns whether or not the export folder has been defined for this user.
     /// </summary>
     public bool HasExportFolderBeenDefined() {
       string key = getExportFolderKey();
@@ -165,6 +165,8 @@ namespace Leap.Unity.Packaging {
     }
 
     private void buildPackageSet(HashSet<PackageDefinition> packages) {
+      if (_dependantPackages == null) return;
+
       for (int i = 0; i < _dependantPackages.Length; i++) {
         PackageDefinition package = _dependantPackages[i];
         if (package == null) {
