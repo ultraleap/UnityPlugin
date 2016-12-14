@@ -42,6 +42,15 @@ namespace Leap.Unity.Packaging {
       }
     }
 
+#if UNITY_EDITOR
+    public static PackageDefinition[] FindAll() {
+      return AssetDatabase.FindAssets("t:PackageDefinition").
+             Select(guid => AssetDatabase.GUIDToAssetPath(guid)).
+             Select(path => AssetDatabase.LoadAssetAtPath<PackageDefinition>(path)).
+             OrderBy(def => def._packageName).
+             ToArray();
+    }
+
     [ContextMenu("Reset Export Folder")]
     public void ResetExportFolder() {
       EditorPrefs.DeleteKey(getExportFolderKey());
@@ -242,8 +251,7 @@ namespace Leap.Unity.Packaging {
 
     [MenuItem("Build/All", priority = -20)]
     private static void buildAllPackages() {
-      var packages = Resources.FindObjectsOfTypeAll<PackageDefinition>();
-      buildPackages(packages);
+      buildPackages(FindAll());
     }
 
     [MenuItem("Assets/Create/Package Definition", priority = 201)]
@@ -269,4 +277,5 @@ namespace Leap.Unity.Packaging {
       Selection.activeObject = package;
     }
   }
+#endif
 }

@@ -178,7 +178,7 @@ namespace Leap.Unity.Packaging {
     }
 
     private void generateBuildMenuScript() {
-      var definitions = Resources.FindObjectsOfTypeAll<PackageDefinition>();
+      var definitions = PackageDefinition.FindAll();
 
       List<string> lines = new List<string>();
       lines.Add("using UnityEditor;");
@@ -195,7 +195,7 @@ namespace Leap.Unity.Packaging {
         lines.Add("");
         lines.Add("    // " + def.PackageName);
         lines.Add("    [MenuItem(\"Build/" + def.PackageName + "\")]");
-        lines.Add("    public static void Build" + guid + "() {");
+        lines.Add("    public static void Build_" + guid + "() {");
         lines.Add("      PackageDefinition.BuildPackage(\"" + guid + "\");");
         lines.Add("    }");
       }
