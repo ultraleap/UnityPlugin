@@ -2,6 +2,9 @@
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using System;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Attributes {
 
@@ -35,5 +38,16 @@ namespace Leap.Unity.Attributes {
   public interface IBeforeFieldAdditiveDrawer : IAdditiveDrawer { }
   public interface IAfterFieldAdditiveDrawer : IAdditiveDrawer { }
 
-  public abstract class CombinablePropertyAttribute : PropertyAttribute { }
+  public abstract class CombinablePropertyAttribute : PropertyAttribute {
+    public FieldInfo fieldInfo;
+    public Component component;
+
+#if UNITY_EDITOR
+    public virtual IEnumerable<SerializedPropertyType> SupportedTypes {
+      get {
+        yield break;
+      }
+    }
+#endif
+  }
 }

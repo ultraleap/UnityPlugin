@@ -83,12 +83,12 @@ namespace Leap.Unity {
         transform.SetParent(null, true);
       }
 
-      if (_pinchDetectorA != null && _pinchDetectorA.IsPinching && 
-          _pinchDetectorB != null &&_pinchDetectorB.IsPinching) {
+      if (_pinchDetectorA != null && _pinchDetectorA.IsActive && 
+          _pinchDetectorB != null &&_pinchDetectorB.IsActive) {
         transformDoubleAnchor();
-      } else if (_pinchDetectorA != null && _pinchDetectorA.IsPinching) {
+      } else if (_pinchDetectorA != null && _pinchDetectorA.IsActive) {
         transformSingleAnchor(_pinchDetectorA);
-      } else if (_pinchDetectorB != null && _pinchDetectorB.IsPinching) {
+      } else if (_pinchDetectorB != null && _pinchDetectorB.IsActive) {
         transformSingleAnchor(_pinchDetectorB);
       }
 

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Leap;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
 
@@ -27,22 +27,18 @@ namespace Leap.Unity {
      * The interval at which to check palm direction.
      * @since 4.1.2
      */
+    [Units("seconds")]
     [Tooltip("The interval in seconds at which to check this detector's conditions.")]
+    [MinValue(0)]
     public float Period = .1f; //seconds
     /**
      * The IHandModel instance to observe. 
      * Set automatically if not explicitly set in the editor.
      * @since 4.1.2
      */
+    [AutoFind(AutoFindLocations.Parents)]
     [Tooltip("The hand model to watch. Set automatically if detector is on a hand.")]
     public IHandModel HandModel = null;
-    /**
-     * The target direction as interpreted by the PointingType setting.
-     * Ignored when Pointingtype is "AtTarget."
-     * @since 4.1.2
-     */
-    [Tooltip("The target direction.")]
-    public Vector3 PointingDirection = Vector3.forward;
 
     /**
      * Specifies how to interprete the direction specified by PointingDirection.
@@ -59,21 +55,33 @@ namespace Leap.Unity {
      * of (0, 1, 0) for absolute up, are often the most useful settings.
      * @since 4.1.2
      */
+    [Header("Direction Settings")]
     [Tooltip("How to treat the target direction.")]
     public PointingType PointingType = PointingType.RelativeToHorizon;
+
+    /**
+    * The target direction as interpreted by the PointingType setting.
+    * Ignored when Pointingtype is "AtTarget."
+    * @since 4.1.2
+    */
+    [Tooltip("The target direction.")]
+    [DisableIf("PointingType", isEqualTo: PointingType.AtTarget)]
+    public Vector3 PointingDirection = Vector3.forward;
 
     /**
      * The object to point at when the PointingType is "AtTarget." Ignored otherwise.
      */
     [Tooltip("A target object(optional). Use PointingType.AtTarget")]
+    [DisableIf("PointingType", isNotEqualTo: PointingType.AtTarget)]
     public Transform TargetObject = null;
+
     /**
      * The turn-on angle. The detector activates when the palm points within this
      * many degrees of the target direction.
      * @since 4.1.2
      */
     [Tooltip("The angle in degrees from the target direction at which to turn on.")]
-    [Range(0, 360)]
+    [Range(0, 180)]
     public float OnAngle = 45; // degrees
 
     /**
@@ -82,8 +90,15 @@ namespace Leap.Unity {
     * @since 4.1.2
     */
     [Tooltip("The angle in degrees from the target direction at which to turn off.")]
-    [Range(0, 360)]
+    [Range(0, 180)]
     public float OffAngle = 65; //degrees
+
+    /** Whether to draw the detector's Gizmos for debugging. (Not every detector provides gizmos.)
+     * @since 4.1.2 
+     */
+    [Header("")]
+    [Tooltip("Draw this detector's Gizmos, if any. (Gizmos must be on in Unity edtor, too.)")]
+    public bool ShowGizmos = true;
 
     private IEnumerator watcherCoroutine;
 
@@ -95,9 +110,6 @@ namespace Leap.Unity {
 
     private void Awake () {
       watcherCoroutine = palmWatcher();
-      if(HandModel == null){
-        HandModel = gameObject.GetComponentInParent<IHandModel>();
-      }
     }
 
     private void OnEnable () {
@@ -106,6 +118,7 @@ namespace Leap.Unity {
 
     private void OnDisable () {
       StopCoroutine(watcherCoroutine);
+      Deactivate();
     }
 
     private IEnumerator palmWatcher() {
@@ -140,7 +153,9 @@ namespace Leap.Unity {
         case PointingType.RelativeToWorld:
           return PointingDirection;
         case PointingType.AtTarget:
-          return TargetObject.position - tipPosition;
+          if (TargetObject != null)
+            return TargetObject.position - tipPosition;
+          else return Vector3.zero;
         default:
           return PointingDirection;
       }
@@ -148,17 +163,18 @@ namespace Leap.Unity {
 
     #if UNITY_EDITOR
     private void OnDrawGizmos(){
-      if(ShowGizmos && HandModel != null){
+      if(ShowGizmos && HandModel != null && HandModel.IsTracked){
         Color centerColor;
         if (IsActive) {
-          centerColor = Color.green;
+          centerColor = OnColor;
         } else {
-          centerColor = Color.red;
+          centerColor = OffColor;
         }
         Hand hand = HandModel.GetLeapHand();
         Utils.DrawCone(hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3(), OnAngle, hand.PalmWidth, centerColor, 8);
-        Utils.DrawCone(hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3(), OffAngle, hand.PalmWidth, Color.blue, 8);
-        Debug.DrawRay(hand.PalmPosition.ToVector3(), selectedDirection(hand.PalmPosition.ToVector3()), Color.grey, 0, true);
+        Utils.DrawCone(hand.PalmPosition.ToVector3(), hand.PalmNormal.ToVector3(), OffAngle, hand.PalmWidth, LimitColor, 8);
+        Gizmos.color = DirectionColor;
+        Gizmos.DrawRay(hand.PalmPosition.ToVector3(), selectedDirection(hand.PalmPosition.ToVector3()));
       }
     }
     #endif

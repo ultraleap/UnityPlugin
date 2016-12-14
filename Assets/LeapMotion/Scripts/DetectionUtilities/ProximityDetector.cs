@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 using System.Collections;
-using Leap;
+using System.Collections.Generic;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity{
 
@@ -12,32 +13,54 @@ namespace Leap.Unity{
    */
   public class ProximityDetector : Detector {
     /**
-     * The interval at which to check palm direction.
-     * @since 4.1.2
-     */
-    [Tooltip("The interval in seconds at which to check this detector's conditions.")]
-    public float Period = .1f; //seconds
-    /**
      * Dispatched when the proximity check succeeds.
      * The ProximityEvent object provides a reference to the proximate GameObject. 
      * @since 4.1.2
      */
     [Tooltip("Dispatched when close enough to a target.")]
     public ProximityEvent OnProximity;
+    /**
+     * The interval at which to check palm direction.
+     * @since 4.1.2
+     */
+    [Units("seconds")]
+    [MinValue(0)]
+    [Tooltip("The interval in seconds at which to check this detector's conditions.")]
+    public float Period = .1f; //seconds
 
     /**
      * The list of objects which can activate the detector by proximity.
      * @since 4.1.2
      */
+    [Header("Detector Targets")]
     [Tooltip("The list of target objects.")]
+    [DisableIf("UseLayersNotList", true)]
     public GameObject[] TargetObjects;
+
+    /**
+    * Include objects with the specified tag in the list of target objects.
+    * Objects are not added dynamically, however, so objects spawned with the tag will
+    * not be included.
+    * @since 4.1.3
+    */
+    [Tooltip("Objects with this tag are added to the list of targets.")]
+    [DisableIf("UseLayersNotList", true)]
+    public string TagName = "";
+
+    [Tooltip("Use a Layer instead of the target list.")]
+    public bool UseLayersNotList = false;
+    [Tooltip("The Layer containing the objects to check.")]
+    [DisableIf("UseLayersNotList", false)]
+    public LayerMask Layer;
 
     /**
      * The distance in meters between this game object and the target game object that
      * will pass the proximity check.
      * @since 4.1.2
      */
+    [Header("Distance Settings")]
     [Tooltip("The target distance in meters to activate the detector.")]
+    [MinValue(0)]
     public float OnDistance = .01f; //meters
 
     /**
@@ -57,12 +80,36 @@ namespace Leap.Unity{
      * @since 4.1.2
      */
     public GameObject CurrentObject { get { return _currentObj; } }
+    /** Whether to draw the detector's Gizmos for debugging. (Not every detector provides gizmos.)
+     * @since 4.1.2 
+     */
+    [Header("")]
+    [Tooltip("Draw this detector's Gizmos, if any. (Gizmos must be on in Unity edtor, too.)")]
+    public bool ShowGizmos = true;
 
     private IEnumerator proximityWatcherCoroutine;
     private GameObject _currentObj = null;
 
-    void Awake(){
+    protected virtual void OnValidate() {
+      //Activate value cannot be less than deactivate value
+      if (OffDistance < OnDistance) {
+        OffDistance = OnDistance;
+      }
+    }
+
+    void Awake() {
       proximityWatcherCoroutine = proximityWatcher();
+      if (TagName != "") {
+        GameObject[] taggedObjects = GameObject.FindGameObjectsWithTag(TagName);
+        List<GameObject> targets = new List<GameObject>(taggedObjects.Length + TargetObjects.Length);
+        for (int t = 0; t < TargetObjects.Length; t++) {
+          targets.Add(TargetObjects[t]);
+        }
+        for (int t = 0; t < taggedObjects.Length; t++) {
+          targets.Add(taggedObjects[t]);
+        }
+        TargetObjects = targets.ToArray();
+      }
     }
 
     void OnEnable () {
@@ -72,6 +119,7 @@ namespace Leap.Unity{
   
     void OnDisable () {
       StopCoroutine(proximityWatcherCoroutine);
+      Deactivate();
     }
 
     IEnumerator proximityWatcher(){
@@ -86,13 +134,22 @@ namespace Leap.Unity{
             proximityState = false;
           }
         } else {
-          for(int obj = 0; obj < TargetObjects.Length; obj++){
-            GameObject target = TargetObjects[obj];
-            if(distanceSquared(target) < onSquared){
-              _currentObj = target;
+          if (UseLayersNotList) {
+            Collider[] nearby = Physics.OverlapSphere(transform.position, OnDistance, Layer);
+            if(nearby.Length > 0) {
+              _currentObj = nearby[0].gameObject;
               proximityState = true;
               OnProximity.Invoke(_currentObj);
-              break; // pick first match
+            }
+          } else {
+            for (int obj = 0; obj < TargetObjects.Length; obj++) {
+              GameObject target = TargetObjects[obj];
+              if (distanceSquared(target) < onSquared) {
+                _currentObj = target;
+                proximityState = true;
+                OnProximity.Invoke(_currentObj);
+                break; // pick first match
+              }
             }
           }
         }
@@ -117,15 +174,17 @@ namespace Leap.Unity{
     }
 
     #if UNITY_EDITOR
-    void OnDrawGizmos(){
-      if(IsActive){
-        Gizmos.color = Color.green;
-      } else {
-        Gizmos.color = Color.red;
+    void OnDrawGizmos() {
+      if (ShowGizmos) {
+        if (IsActive) {
+          Gizmos.color = Color.green;
+        } else {
+          Gizmos.color = Color.red;
+        }
+        Gizmos.DrawWireSphere(transform.position, OnDistance);
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, OffDistance);
       }
-      Gizmos.DrawWireSphere(transform.position, OnDistance);
-      Gizmos.color = Color.blue;
-      Gizmos.DrawWireSphere(transform.position, OffDistance);
     }
     #endif
   }

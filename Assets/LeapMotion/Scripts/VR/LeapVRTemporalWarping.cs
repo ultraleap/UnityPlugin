@@ -3,6 +3,7 @@ using UnityEngine.VR;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
   /// <summary>
@@ -18,9 +19,9 @@ namespace Leap.Unity {
     }
 
     public enum SyncMode {
-      /* SyncWithHands causes both Images and the Transform to be updated at the same time during LateUpdate.  This causes
+      /* SyncWithImages causes both Images and the Transform to be updated at the same time during LateUpdate.  This causes
        * the images to line up properly, but the images will lag behind the virtual world, causing drift. */
-      SYNC_WITH_HANDS,
+      SYNC_WITH_IMAGES,
       /* LowLatency causes the Images to be warped directly prior to rendering, causing them to line up better with virtual
        * objects.  Since transforms cannot be modified at this point in the update step, the Transform will still be updated
        * during LateUpdate, causing a misalignment between images and leap space. */
@@ -45,6 +46,7 @@ namespace Leap.Unity {
       }
     }
 
+    [AutoFind]
     [SerializeField]
     private LeapServiceProvider provider;
 
@@ -76,9 +78,9 @@ namespace Leap.Unity {
     [SerializeField]
     private float tweenPositionalWarping = 0f;
 
-    [Tooltip("Controls when this script synchronizes the time warp of images.  Use LowLatency for AR, and SyncWithHands for VR.")]
+    [Tooltip("Controls when this script synchronizes the time warp of images.  Use LowLatency for VR, and SyncWithImages for AR.")]
     [SerializeField]
-    private SyncMode syncMode = SyncMode.SYNC_WITH_HANDS;
+    private SyncMode syncMode = SyncMode.LOW_LATENCY;
 
     // Manual Time Alignment
     [Tooltip("Allow manual adjustment of the rewind time.")]
@@ -155,8 +157,8 @@ namespace Leap.Unity {
         return false;
       }
 
-      TransformData past = transformAtTime(leapTime - warpingAdjustment * 1000);
-      
+      TransformData past = transformAtTime((leapTime - warpingAdjustment * 1000) + (syncMode == SyncMode.SYNC_WITH_IMAGES?20000:0));
+
       // Rewind position and rotation
       if (_trackingAnchor == null) {
         rewoundRotation = past.localRotation;
@@ -183,7 +185,7 @@ namespace Leap.Unity {
     }
 
     public bool TryGetWarpedTransform(WarpedAnchor anchor, out Vector3 rewoundPosition, out Quaternion rewoundRotation) {
-      long timestamp = provider.CurrentFrame.Timestamp;
+      long timestamp = provider.imageTimeStamp;
       if (TryGetWarpedTransform(anchor, out rewoundPosition, out rewoundRotation, timestamp)) {
         return true;
       }
@@ -352,19 +354,23 @@ namespace Leap.Unity {
 
       //Get the transform at the time when the latest frame was captured
       long rewindTime = provider.CurrentFrame.Timestamp - warpingAdjustment * 1000;
+      long imageRewindTime = provider.imageTimeStamp - warpingAdjustment * 1000;
+
+      TransformData imagePast = transformAtTime(imageRewindTime);
+      Quaternion imagePastCenterRot = _trackingAnchor.rotation * imagePast.localRotation;
+
+      //Apply only a rotation ~ assume all objects are infinitely distant
+      Quaternion imageReferenceRotation = Quaternion.Slerp(currCenterRot, imagePastCenterRot, tweenImageWarping);
+
+      Quaternion imageQuatWarp = Quaternion.Inverse(currCenterRot) * imageReferenceRotation;
+      imageQuatWarp = Quaternion.Euler(imageQuatWarp.eulerAngles.x, imageQuatWarp.eulerAngles.y, -imageQuatWarp.eulerAngles.z);
+      Matrix4x4 imageMatWarp = _projectionMatrix * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one) * _projectionMatrix.inverse;
+
+      Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
 
       TransformData past = transformAtTime(rewindTime);
       Vector3 pastCenterPos = _trackingAnchor.TransformPoint(past.localPosition);
       Quaternion pastCenterRot = _trackingAnchor.rotation * past.localRotation;
-
-      //Apply only a rotation ~ assume all objects are infinitely distant
-      Quaternion referenceRotation = Quaternion.Slerp(currCenterRot, pastCenterRot, tweenImageWarping);
-
-      Quaternion quatWarp = Quaternion.Inverse(currCenterRot) * referenceRotation;
-      quatWarp = Quaternion.Euler(quatWarp.eulerAngles.x, quatWarp.eulerAngles.y, -quatWarp.eulerAngles.z);
-      Matrix4x4 matWarp = _projectionMatrix * Matrix4x4.TRS(Vector3.zero, quatWarp, Vector3.one) * _projectionMatrix.inverse;
-
-      Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", matWarp);
 
       transform.position = Vector3.Lerp(currCenterPos, pastCenterPos, tweenPositionalWarping);
       transform.rotation = Quaternion.Slerp(currCenterRot, pastCenterRot, tweenRotationalWarping);

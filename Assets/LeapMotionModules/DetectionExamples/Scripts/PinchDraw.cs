@@ -71,15 +71,15 @@ namespace Leap.Unity.DetectionExamples {
         var detector = _pinchDetectors[i];
         var drawState = _drawStates[i];
 
-        if (detector.DidStartPinch) {
+        if (detector.DidStartHold) {
           drawState.BeginNewLine();
         }
 
-        if (detector.DidEndPinch) {
+        if (detector.DidRelease) {
           drawState.FinishLine();
         }
 
-        if (detector.IsPinching) {
+        if (detector.IsHolding) {
           drawState.UpdateLine(detector.Position);
         }
       }
@@ -149,7 +149,6 @@ namespace Leap.Unity.DetectionExamples {
       }
 
       public void FinishLine() {
-        _mesh.Optimize();
         _mesh.UploadMeshData(true);
       }
 

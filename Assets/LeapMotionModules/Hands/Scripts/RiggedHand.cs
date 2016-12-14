@@ -34,6 +34,13 @@ namespace Leap.Unity {
         setEditorLeapPose = value;
       }
     }
+    [SerializeField]
+    public bool DeformPositionsInFingers;
+    [Tooltip("When True, hands will be put into a Leap editor pose near the LeapServiceProvider's transform.  When False, the hands will be returned to their Start Pose if it has been saved.")]
+    [SerializeField]
+    [HideInInspector]
+    private bool deformPositionsState = false;
+
 
     [Tooltip("Hands are typically rigged in 3D packages with the palm transform near the wrist. Uncheck this is your model's palm transform is at the center of the palm similar to Leap's API drives")]
     public bool ModelPalmAtLeapWrist = true;
@@ -95,7 +102,7 @@ namespace Leap.Unity {
       return Quaternion.identity;
     }
 
-    private Quaternion CalculateRotation(this LeapTransform trs) {
+    private Quaternion CalculateRotation(LeapTransform trs) {
       Vector3 up = trs.yBasis.ToVector3();
       Vector3 forward = trs.zBasis.ToVector3();
       return Quaternion.LookRotation(forward, up);
@@ -108,7 +115,7 @@ namespace Leap.Unity {
       modelPalmFacing = new Vector3(0, 0, 0);
       assignRiggedFingersByName();
       SetupRiggedFingers();
-      modelPalmFacing = calculateModelPalmFacing(palm, fingers[1].transform, fingers[2].transform);
+      modelPalmFacing = calculateModelPalmFacing(palm, fingers[2].transform, fingers[1].transform);
       modelFingerPointing = calculateModelFingerPointing();
       setFingerPalmFacing();
     }
@@ -216,11 +223,12 @@ namespace Leap.Unity {
       Vector3 perpendicular;
 
       if (Handedness == Chirality.Left) {
-        perpendicular = Vector3.Cross(side2, side1);
+        perpendicular = Vector3.Cross(side1, side2);
       }
-      else perpendicular = Vector3.Cross(side1, side2);
+      else perpendicular = Vector3.Cross(side2, side1);
+      //flip perpendicular if it is above palm
       Vector3 calculatedPalmFacing = CalculateZeroedVector(perpendicular);
-      return calculatedPalmFacing; //+works for Mixamo, -reversed LoPoly_Hands_Skeleton and Winston
+      return calculatedPalmFacing;
     }
     /**Find finger direction by finding distance vector from palm to middle finger */
     private Vector3 calculateModelFingerPointing() {
@@ -239,7 +247,7 @@ namespace Leap.Unity {
         zeroed = (vectorToZero.y < 0) ? new Vector3(0, 1, 0) : new Vector3(0, -1, 0);
       }
       if (Mathf.Abs(vectorToZero.z) == max) {
-        zeroed = (vectorToZero.y < 0) ? new Vector3(0, 0, 1) : new Vector3(0, 0, -1);
+        zeroed = (vectorToZero.z < 0) ? new Vector3(0, 0, 1) : new Vector3(0, 0, -1);
       }
       return zeroed;
     }
@@ -255,10 +263,27 @@ namespace Leap.Unity {
     /**Restores original joint positions, particularly after model has been placed in Leap's editor pose */
     [ContextMenu("RestoreJointsStartPose")]
     public void RestoreJointsStartPose() {
+      Debug.Log("RestoreJointsStartPose()");
       for (int i = 0; i < jointList.Count; i++) {
         Transform jointTrans = jointList[i];
         jointTrans.localRotation = localRotations[i];
         jointTrans.localPosition = localPositions[i];
+      }
+    }
+    private void setDeformPositionsInFingers(bool onOff) {
+      RiggedFinger[] riggedFingers = GetComponentsInChildren<RiggedFinger>();
+      foreach(RiggedFinger finger in riggedFingers){
+        finger.deformPosition = onOff;
+      }
+    }
+    public void OnValidate() {
+      if (DeformPositionsInFingers != deformPositionsState) {
+        RestoreJointsStartPose();
+        setDeformPositionsInFingers(DeformPositionsInFingers);
+        deformPositionsState = DeformPositionsInFingers;
+      }
+      if (setEditorLeapPose == false) {
+        RestoreJointsStartPose();
       }
     }
   }

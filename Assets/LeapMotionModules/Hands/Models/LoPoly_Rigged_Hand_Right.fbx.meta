@@ -62,6 +62,7 @@ ModelImporter:
     400052: R_thumb_meta
     400054: R_Wrist
     4300000: LoPoly_Hand_Mesh_Right
+    7400000: Take 001
     9500000: //RootNode
     13700000: LoPoly_Hand_Mesh_Right
   materials:
@@ -106,10 +107,11 @@ ModelImporter:
   tangentSpace:
     normalSmoothAngle: 162
     normalImportMode: 0
-    tangentImportMode: 0
+    tangentImportMode: 3
   importAnimation: 1
   copyAvatar: 0
   humanDescription:
+    serializedVersion: 2
     human: []
     skeleton: []
     armTwist: 0.5
@@ -120,7 +122,10 @@ ModelImporter:
     legStretch: 0.05
     feetSpacing: 0
     rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
     hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 0
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   animationType: 2
   humanoidOversampling: 1

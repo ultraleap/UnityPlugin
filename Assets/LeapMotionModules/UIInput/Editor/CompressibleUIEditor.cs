@@ -17,15 +17,19 @@ namespace Leap.Unity.InputModule {
       specifyCustomDrawer("Layers", doLayoutList);
 
       specifyConditionalDrawing(() => showEventTrigger(),
-                            "LayerCollapseStateChange");
+                            "LayerCollapse",
+                            "LayerExpand",
+                            "LayerDepress");
     }
 
     private bool showEventTrigger() {
       CompressibleUI module = target as CompressibleUI;
       bool showEventTrigger = false;
-      for (int i = 0; i < module.Layers.Length; i++) {
-        if (module.Layers[i].TriggerLayerEvent) {
-          showEventTrigger = true;
+      if (module.Layers != null) {
+        for (int i = 0; i < module.Layers.Length; i++) {
+          if (module.Layers[i].TriggerLayerEvent) {
+            showEventTrigger = true;
+          }
         }
       }
       return showEventTrigger;
