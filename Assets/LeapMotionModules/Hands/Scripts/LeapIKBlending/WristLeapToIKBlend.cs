@@ -317,7 +317,8 @@ namespace Leap.Unity {
     private void TrackedIKHandling() {
       if (Handedness == Chirality.Left) {
         animator.SetFloat("shoulder_up_left", shoulder_up_weight);
-        shoulder_forward_target_weight += distanceShoulderToPalm * 2f;
+        //TODO: Roll off this value when looking down
+        shoulder_forward_target_weight += distanceShoulderToPalm * .5f;
         animator.SetFloat("shoulder_forward_left", shoulder_forward_weight);
         animator.SetFloat("shoulder_back_left", shoulder_back_weight);
         animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, positionIKWeight);
@@ -328,8 +329,9 @@ namespace Leap.Unity {
         animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
       }
       if (Handedness == Chirality.Right) {
+        //TODO: Roll off this value when looking down
         animator.SetFloat("shoulder_up_right", shoulder_up_weight);
-        shoulder_forward_target_weight += distanceShoulderToPalm * 2;
+        shoulder_forward_target_weight += distanceShoulderToPalm * .5f;
         animator.SetFloat("shoulder_forward_right", shoulder_forward_weight);
         animator.SetFloat("shoulder_back_right", shoulder_back_weight);
         animator.SetIKPositionWeight(AvatarIKGoal.RightHand, positionIKWeight);
