@@ -58,7 +58,7 @@ namespace Leap.Unity.Packaging {
 
     [ContextMenu("Reset Export Folder For All")]
     public void ResetAllExportFolders() {
-      var allPackageDefs = Resources.FindObjectsOfTypeAll<PackageDefinition>();
+      var allPackageDefs = FindAll();
       foreach (var package in allPackageDefs) {
         package.ResetExportFolder();
       }
@@ -152,7 +152,7 @@ namespace Leap.Unity.Packaging {
 
       //Build a set of paths to package definitions
       //We want to be able to exclude paths from the export that are paths to package definitions
-      var packagePaths = new HashSet<string>(Resources.FindObjectsOfTypeAll<PackageDefinition>().Select(package => Path.GetFullPath(AssetDatabase.GetAssetPath(package))));
+      var packagePaths = new HashSet<string>(FindAll().Select(package => Path.GetFullPath(AssetDatabase.GetAssetPath(package))));
 
       //Filter paths to:
       // - paths that point to existing files
@@ -202,7 +202,7 @@ namespace Leap.Unity.Packaging {
     /// </summary>
     public List<PackageDefinition> GetChildPackages() {
       List<PackageDefinition> children = new List<PackageDefinition>();
-      var allPackages = Resources.FindObjectsOfTypeAll<PackageDefinition>();
+      var allPackages = FindAll();
 
       //Just search through all existing package definitions and check their dependancies
       HashSet<PackageDefinition> packages = new HashSet<PackageDefinition>();
