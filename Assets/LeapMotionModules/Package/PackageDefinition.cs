@@ -18,15 +18,19 @@ namespace Leap.Unity.Packaging {
     [SerializeField]
     protected string _packageName = "New Package";
 
+    [Tooltip("If true, will generate a menu item to build this package.")]
     [SerializeField]
     protected bool _generateBuildDropdown = false;
 
+    [Tooltip("All files within each folder will be included in this package when built.")]
     [SerializeField]
     protected string[] _dependantFolders;
 
+    [Tooltip("All files specified in this list will be included in this package when built.")]
     [SerializeField]
     protected string[] _dependantFiles;
 
+    [Tooltip("All files specified in each package will be included in this package when built.")]
     [SerializeField]
     protected PackageDefinition[] _dependantPackages;
 
