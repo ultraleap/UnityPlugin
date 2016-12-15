@@ -22,7 +22,7 @@ namespace Leap.Unity.Attributes {
       } else if (property.propertyType == SerializedPropertyType.Vector2) {
         property.vector2Value = new Vector2(Mathf.Min(minValue, property.vector2Value.x), Mathf.Min(minValue, property.vector2Value.y));
       } else if (property.propertyType == SerializedPropertyType.Vector3) {
-        property.vector3Value = new Vector3(Mathf.Min(minValue, property.vector3Value.x), Mathf.Min(minValue, property.vector3Value.y), Mathf.Max(minValue, property.vector3Value.z));
+        property.vector3Value = new Vector3(Mathf.Min(minValue, property.vector3Value.x), Mathf.Min(minValue, property.vector3Value.y), Mathf.Min(minValue, property.vector3Value.z));
       } 
     }
 
