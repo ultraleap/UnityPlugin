@@ -143,6 +143,19 @@ namespace Leap.Unity.Packaging {
       buildPackageSet(totalPackages);
 
       foreach (var package in totalPackages) {
+
+        //Check for missing files.  Any dependant file that is missing is an error and build cannot continue!
+        var missingFiles = package._dependantFiles.Distinct().Where(path => !File.Exists(path));
+        if (missingFiles.Any()) {
+          string message = "Could not build package [" + package.PackageName + "] because the following dependant files were not found:\n";
+          foreach (var missingFile in missingFiles) {
+            message += "\n" + missingFile;
+          }
+
+          EditorUtility.DisplayDialog("Build Failed: Missing file", message, "Ok");
+          return;
+        }
+
         assets.UnionWith(package._dependantFiles);
 
         //package exporter expands directories, we do it manually so that we can filter later
