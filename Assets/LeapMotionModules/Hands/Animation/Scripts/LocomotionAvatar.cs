@@ -31,6 +31,9 @@ namespace Leap.Unity {
     //For debugging - - - - - - - - - - - - - - - - 
     public Transform AnimatorRoot;
     public Transform CameraOnGround;
+    public bool IsCentering = false;
+
+    public bool WalkingEnabled = true;
 
     void Awake() {
       LMRig = GameObject.FindObjectOfType<LeapHandController>().transform.root;
@@ -162,7 +165,6 @@ namespace Leap.Unity {
         Debug.DrawLine(transform.position, moveDirection * 2, Color.red);
       }
     }
-    public bool IsCentering = false;
     void OnAnimatorIK() {
       if (LMRigToFollowAnimator) {
         LMRig.position = new Vector3(transform.position.x, LMRig.position.y, transform.position.z);
@@ -171,7 +173,7 @@ namespace Leap.Unity {
       //CameraOnGround.position = placeAnimatorUnderCam;
       //AnimatorRoot.position = animator.rootPosition;  
       //if(Input.GetKey(KeyCode.Space)){
-      if (IsCentering) {
+      if (IsCentering || !WalkingEnabled) {
         animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam, .05f);
       }
     }
