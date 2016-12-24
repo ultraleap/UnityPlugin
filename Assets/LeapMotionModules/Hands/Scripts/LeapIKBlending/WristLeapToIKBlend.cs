@@ -210,23 +210,30 @@ namespace Leap.Unity {
       Vector3 shoulderInAnimatorSpace = characterRoot.InverseTransformDirection(Shoulder.position);
       distanceShoulderToPalm = (palm.position - Shoulder.transform.position).magnitude;
       if (Handedness == Chirality.Left) {
+        //Rule 1: Move elbow target out as palm approaches shoulder to control flipping
         ElbowTargetPosition.x -= distanceShoulderToPalm * .2f;
+        //Rule 2: If palm goes behind controller move elbow target out (happens when hand drops)
         if (palmInAnimatorSpace.z < 0) {
           ElbowTargetPosition.x += palmInAnimatorSpace.z * 10;
+          //Rule 2.5: 
           if (ElbowTargetPosition.y > shoulderInAnimatorSpace.y) {
             ElbowTargetPosition.y = shoulderInAnimatorSpace.y;
           }
         }
       }
       if (Handedness == Chirality.Right) {
+        //Rule 1: Move elbow target out as palm approaches shoulder to control flipping
         ElbowTargetPosition.x += distanceShoulderToPalm * .2f;
+        //Rule 2: If palm goes behind controller move elbow target out (happens when hand drops)
         if (palmInAnimatorSpace.z < 0) {
           ElbowTargetPosition.x -= palmInAnimatorSpace.z * 10;
+          //Rule 2.5: 
           if (ElbowTargetPosition.y > shoulderInAnimatorSpace.y) {
             ElbowTargetPosition.y = shoulderInAnimatorSpace.y;
           }
         }
       }
+      //Rule 4:  Prevent elbow targets from crossing body midpoint
       if (Handedness == Chirality.Left && ElbowTargetPosition.x > -.05f) {
         ElbowTargetPosition.x = -.1f;
       }
@@ -235,6 +242,8 @@ namespace Leap.Unity {
       }
       if (isTracking) {
         ElbowIKTarget.position = characterRoot.TransformPoint(ElbowTargetPosition);
+        //ElbowIKTarget.position = characterRoot.TransformPoint(handModel.GetElbowPosition());
+
       }
       else ElbowIKTarget.position = Vector3.Lerp(ElbowIKTarget.position, characterRoot.TransformPoint(ElbowTargetPosition), .01f);
     }
