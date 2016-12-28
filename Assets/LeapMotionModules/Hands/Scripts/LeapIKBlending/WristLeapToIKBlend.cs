@@ -321,7 +321,7 @@ namespace Leap.Unity {
       }
       //Shrug shoulders if elbow closer to should than length of upperArm
       else if (ShoulderRestPos && elbowToShoulder < upperArmLength * .7f && shrugShoulders) {
-        shrugWeight = Mathf.Lerp(shrugWeight, (upperArmLength - elbowToShoulder) * 10f, .1f);
+        shrugWeight = Mathf.Lerp(shrugWeight, (upperArmLength - elbowToShoulder) * 8.5f, .2f);
         if (shrugWeight > shoulder_up_target_weight) {
           shoulder_up_target_weight = shrugWeight;
         }
@@ -420,7 +420,7 @@ namespace Leap.Unity {
       Vector3 localVelocity = characterRoot.InverseTransformPoint(projectedVelocity);
       //push targets forward if tracking lost over head to avoid arm flipping
       if (localVelocity.z < .2f && localVelocity.y > 1.5f) {
-        projectedVelocity = projectedVelocity + (characterRoot.forward * .5f);
+        projectedVelocity = projectedVelocity + (characterRoot.forward * .75f);
       }
       isLerping = true;
       UntrackedIKPosition = startPosition;
