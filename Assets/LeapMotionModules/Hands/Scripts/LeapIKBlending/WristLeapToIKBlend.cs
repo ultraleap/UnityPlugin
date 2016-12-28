@@ -137,10 +137,6 @@ namespace Leap.Unity {
 
       //snapshot and constrain velocity derived
       iKVelocitySnapShot = averageIKVelocity;
-      //TODO: Move this to drop method
-      //if (characterRoot.InverseTransformPoint(iKVelocitySnapShot).z < characterRoot.InverseTransformPoint(Hips.position).z + .5f) {
-      //  iKVelocitySnapShot.z = characterRoot.InverseTransformPoint(Hips.position).z + .8f;
-      //}
       iKVelocitySnapShot = iKVelocitySnapShot * .3f;// scale the velocity so arm doesn't reach as far;
       VelocityMarker.position = iKVelocitySnapShot;
       StartCoroutine(DropWithVelocity(palm.position));
@@ -420,11 +416,11 @@ namespace Leap.Unity {
     private IEnumerator DropWithVelocity(Vector3 startPosition){
       float magnitude = averageIKVelocity.magnitude;
       Ray velocityRay = new Ray(startPosition, iKVelocitySnapShot);
-      Vector3 projectedVelocity = velocityRay.GetPoint(magnitude * .5f);
+      Vector3 projectedVelocity = velocityRay.GetPoint(magnitude * .75f);
       Vector3 localVelocity = characterRoot.InverseTransformPoint(projectedVelocity);
       //push targets forward if tracking lost over head to avoid arm flipping
       if (localVelocity.z < .2f && localVelocity.y > 1.5f) {
-        projectedVelocity = projectedVelocity + (characterRoot.forward * 1f);
+        projectedVelocity = projectedVelocity + (characterRoot.forward * .5f);
       }
       isLerping = true;
       UntrackedIKPosition = startPosition;
