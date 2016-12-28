@@ -137,11 +137,9 @@ namespace Leap.Unity {
 
       //snapshot and constrain velocity derived
       iKVelocitySnapShot = averageIKVelocity;
+      //TODO: Move this to drop method
       //if (characterRoot.InverseTransformPoint(iKVelocitySnapShot).z < characterRoot.InverseTransformPoint(Hips.position).z + .5f) {
       //  iKVelocitySnapShot.z = characterRoot.InverseTransformPoint(Hips.position).z + .8f;
-      //}
-      //if (characterRoot.InverseTransformPoint(iKVelocitySnapShot).z < 1f) {
-      //  iKVelocitySnapShot = new Vector3(iKVelocitySnapShot.x, iKVelocitySnapShot.y, characterRoot.InverseTransformPoint(new Vector3(0f, 0f, 2f)).z);
       //}
       iKVelocitySnapShot = iKVelocitySnapShot * .3f;// scale the velocity so arm doesn't reach as far;
       VelocityMarker.position = iKVelocitySnapShot;
@@ -313,7 +311,10 @@ namespace Leap.Unity {
       Vector3 elbow = characterRoot.InverseTransformPoint(ElbowMarker.position);
       Vector3 scapula = characterRoot.InverseTransformPoint(Scapula.position);
       Vector3 shoulder = characterRoot.InverseTransformPoint(Shoulder.position);
-      float elbowToShoulder = Vector3.Distance(handModel.GetElbowPosition(), ShoulderRestPos.position);
+      float elbowToShoulder = 0;
+      if (ShoulderRestPos) {
+        elbowToShoulder = Vector3.Distance(handModel.GetElbowPosition(), ShoulderRestPos.position);
+      }
 
       //raise shoulder as elbow goes above shoulder
       if (elbow.y > scapula.y) {
@@ -323,7 +324,7 @@ namespace Leap.Unity {
         }
       }
       //Shrug shoulders if elbow closer to should than length of upperArm
-      else if (elbowToShoulder < upperArmLength * .7f && shrugShoulders) {
+      else if (ShoulderRestPos && elbowToShoulder < upperArmLength * .7f && shrugShoulders) {
         shrugWeight = Mathf.Lerp(shrugWeight, (upperArmLength - elbowToShoulder) * 10f, .1f);
         if (shrugWeight > shoulder_up_target_weight) {
           shoulder_up_target_weight = shrugWeight;
