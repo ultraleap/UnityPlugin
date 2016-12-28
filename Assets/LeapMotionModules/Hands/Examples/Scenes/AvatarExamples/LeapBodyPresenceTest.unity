@@ -1529,7 +1529,7 @@ MonoBehaviour:
   AnimatorRoot: {fileID: 0}
   CameraOnGround: {fileID: 0}
   IsCentering: 1
-  WalkingEnabled: 0
+  WalkingEnabled: 1
 --- !u!4 &908200045 stripped
 Transform:
   m_PrefabParentObject: {fileID: 400084, guid: 17192e084745a744892bf6839b75c774, type: 3}

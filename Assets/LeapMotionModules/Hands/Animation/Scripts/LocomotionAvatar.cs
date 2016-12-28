@@ -173,7 +173,7 @@ namespace Leap.Unity {
       //CameraOnGround.position = placeAnimatorUnderCam;
       //AnimatorRoot.position = animator.rootPosition;  
       //if(Input.GetKey(KeyCode.Space)){
-      if (IsCentering || !WalkingEnabled) {
+      if (IsCentering || !WalkingEnabled && !standing) {
         animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam, .05f);
       }
     }
