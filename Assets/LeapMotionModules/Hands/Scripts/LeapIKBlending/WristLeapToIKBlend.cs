@@ -29,6 +29,7 @@ namespace Leap.Unity {
     private Transform Shoulder;
     private Transform Elbow;
     private Transform Neck;
+    private float upperArmLength;
     private float shoulder_up_target_weight;
     private float shoulder_up_weight;
     private float shoulder_forward_weight;
@@ -60,6 +61,7 @@ namespace Leap.Unity {
     public Transform ElbowIKTarget;
     public float ElbowOffset = -0.5f;
     public Transform RestIKPosition;
+    public Transform ShoulderRestPos;
     public AnimationCurve DropCurveX;
     public AnimationCurve DropCurveY;
     public AnimationCurve DropCurveZ;
@@ -84,6 +86,8 @@ namespace Leap.Unity {
       palm = GetComponent<HandModel>().palm;
       Neck = animator.GetBoneTransform(HumanBodyBones.Neck);
       Hips = animator.GetBoneTransform(HumanBodyBones.Hips);
+
+
       if(Handedness == Chirality.Left){
         Scapula = animator.GetBoneTransform(HumanBodyBones.LeftShoulder);
         Shoulder = animator.GetBoneTransform(HumanBodyBones.LeftUpperArm);
@@ -95,6 +99,8 @@ namespace Leap.Unity {
         Elbow = animator.GetBoneTransform(HumanBodyBones.RightLowerArm);
       }
       HandFinish();
+      upperArmLength = Vector3.Distance(Shoulder.position, Elbow.position);
+
     }
 
     public void AssignIKMarkers() {
@@ -209,6 +215,11 @@ namespace Leap.Unity {
       Vector3 palmInAnimatorSpace = characterRoot.InverseTransformPoint(PalmPositionAtLateUpdate);
       Vector3 shoulderInAnimatorSpace = characterRoot.InverseTransformDirection(Shoulder.position);
       distanceShoulderToPalm = (palm.position - Shoulder.transform.position).magnitude;
+
+      //turn off elbow hint if hand close to shoulder
+      if (distanceShoulderToPalm < .1f) {
+        elbowIKTargetWeight = 0;
+      }
       if (Handedness == Chirality.Left) {
         //Rule 1: Move elbow target out as palm approaches shoulder to control flipping
         ElbowTargetPosition.x -= distanceShoulderToPalm * .2f;
@@ -233,7 +244,7 @@ namespace Leap.Unity {
           }
         }
       }
-      //Rule 4:  Prevent elbow targets from crossing body midpoint
+      //Rule 3:  Prevent elbow targets from crossing body midpoint
       if (Handedness == Chirality.Left && ElbowTargetPosition.x > -.05f) {
         ElbowTargetPosition.x = -.1f;
       }
@@ -291,27 +302,36 @@ namespace Leap.Unity {
         UntrackedIKHandling();
       }
     }
+    float shrugWeight = 0;
 
     //Apply Shoulder Rigging Rules
     public void CalculateShoulderMuscles() {
       Vector3 elbow = characterRoot.InverseTransformPoint(ElbowMarker.position);
       Vector3 scapula = characterRoot.InverseTransformPoint(Scapula.position);
       Vector3 shoulder = characterRoot.InverseTransformPoint(Shoulder.position);
-      //turn off elbow hint if hand close to shoulder
-      if (distanceShoulderToPalm < .1f) {
-        elbowIKTargetWeight = 0;
-      }
+      float elbowToShoulder = Vector3.Distance(handModel.GetElbowPosition(), ShoulderRestPos.position);
+
 
       //raise shoulder as elbow goes above shoulder
       if (elbow.y > scapula.y) {
-        shoulder_up_target_weight = (elbow.y - shoulder.y) * 10f;
+        //if (((elbow.y - shoulder.y) * 10f) > shoulder_up_target_weight)
+        if (((elbow.y - shoulder.y) * 10f > shrugWeight)) {
+          shoulder_up_target_weight = (elbow.y - shoulder.y) * 10f;
+        }
+      }
+      else if (elbowToShoulder < upperArmLength * .9f) {
+        shrugWeight = (upperArmLength - elbowToShoulder) * 10f;
+        if (shrugWeight > shoulder_up_target_weight) {
+          shoulder_up_target_weight = shrugWeight;
+        }
       }
       else {
+        shrugWeight = 0;
         shoulder_up_target_weight = 0.0f;
       }
       //move shoulder back when hand close to shoulder
       if (distanceShoulderToPalm < .2f) {
-        shoulder_back_target_weight = 5 - distanceShoulderToPalm * 10;
+        shoulder_back_target_weight = 5 - distanceShoulderToPalm * 2;
       }
       else shoulder_back_target_weight = 0;
       //bring shouler forward as elbow comes close to center
@@ -365,7 +385,6 @@ namespace Leap.Unity {
         animator.SetIKRotation(AvatarIKGoal.LeftHand, PalmRotationAtLateUpdate);
         animator.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, elbowIKWeight);
         animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
-
         animator.SetFloat("forearm_twist_left", 0);
         animator.SetFloat("forearm_twist_out_left", 0);
       }
