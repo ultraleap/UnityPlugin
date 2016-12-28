@@ -928,7 +928,7 @@ MonoBehaviour:
   ZvalueText: {fileID: 1399044199}
   twistText: {fileID: 1672003822}
   outText: {fileID: 1219505723}
-  shrugShoulders: 0
+  shrugShoulders: 1
 --- !u!114 &606466260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2454,7 +2454,7 @@ MonoBehaviour:
   ZvalueText: {fileID: 443258328}
   twistText: {fileID: 1626439821}
   outText: {fileID: 1716174183}
-  shrugShoulders: 0
+  shrugShoulders: 1
 --- !u!4 &1333008633 stripped
 Transform:
   m_PrefabParentObject: {fileID: 400056, guid: 17192e084745a744892bf6839b75c774, type: 3}

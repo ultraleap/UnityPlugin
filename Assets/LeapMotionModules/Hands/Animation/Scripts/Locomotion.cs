@@ -27,7 +27,7 @@ public class Locomotion {
 
   public void Do(float speed, float direction, float reverse) {
     if (direction > 179 || direction < -179) {
-      Debug.Log("180^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^+");
+      //Debug.Log("180^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^+");
     }
     AnimatorStateInfo state = m_Animator.GetCurrentAnimatorStateInfo(0);
 

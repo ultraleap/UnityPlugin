@@ -140,6 +140,9 @@ namespace Leap.Unity {
       //if (characterRoot.InverseTransformPoint(iKVelocitySnapShot).z < characterRoot.InverseTransformPoint(Hips.position).z + .5f) {
       //  iKVelocitySnapShot.z = characterRoot.InverseTransformPoint(Hips.position).z + .8f;
       //}
+      //if (characterRoot.InverseTransformPoint(iKVelocitySnapShot).z < 1f) {
+      //  iKVelocitySnapShot = new Vector3(iKVelocitySnapShot.x, iKVelocitySnapShot.y, characterRoot.InverseTransformPoint(new Vector3(0f, 0f, 2f)).z);
+      //}
       iKVelocitySnapShot = iKVelocitySnapShot * .3f;// scale the velocity so arm doesn't reach as far;
       VelocityMarker.position = iKVelocitySnapShot;
       StartCoroutine(DropWithVelocity(palm.position));
@@ -320,15 +323,15 @@ namespace Leap.Unity {
         }
       }
       //Shrug shoulders if elbow closer to should than length of upperArm
-      else if (elbowToShoulder < upperArmLength * .9f && shrugShoulders) {
-        shrugWeight = Mathf.Lerp(shrugWeight, (upperArmLength - elbowToShoulder) * 10f, .05f);
+      else if (elbowToShoulder < upperArmLength * .7f && shrugShoulders) {
+        shrugWeight = Mathf.Lerp(shrugWeight, (upperArmLength - elbowToShoulder) * 10f, .1f);
         if (shrugWeight > shoulder_up_target_weight) {
           shoulder_up_target_weight = shrugWeight;
         }
       }
       else {
         shrugWeight = Mathf.Lerp(shrugWeight, 0f, .05f);
-        shoulder_up_target_weight = 0.0f;
+        shoulder_up_target_weight = Mathf.Lerp(shoulder_up_target_weight, 0f, .05f);
       }
       //move shoulder back when hand close to shoulder
       if (distanceShoulderToPalm < .2f) {
@@ -417,6 +420,11 @@ namespace Leap.Unity {
       float magnitude = averageIKVelocity.magnitude;
       Ray velocityRay = new Ray(startPosition, iKVelocitySnapShot);
       Vector3 projectedVelocity = velocityRay.GetPoint(magnitude * .5f);
+      Vector3 localVelocity = characterRoot.InverseTransformPoint(projectedVelocity);
+      //push targets forward if tracking lost over head to avoid arm flipping
+      if (localVelocity.z < .2f && localVelocity.y > 1.5f) {
+        projectedVelocity = projectedVelocity + (characterRoot.forward * 1f);
+      }
       isLerping = true;
       UntrackedIKPosition = startPosition;
       float startTime = Time.time;
