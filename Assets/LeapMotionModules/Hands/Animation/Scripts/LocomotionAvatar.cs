@@ -31,9 +31,11 @@ namespace Leap.Unity {
     //For debugging - - - - - - - - - - - - - - - - 
     public Transform AnimatorRoot;
     public Transform CameraOnGround;
+    [HideInInspector]
     public bool IsCentering = false;
 
     public bool WalkingEnabled = true;
+    public bool crouchEnabled = false;
 
     void Awake() {
       LMRig = GameObject.FindObjectOfType<LeapHandController>().transform.root;
@@ -166,10 +168,20 @@ namespace Leap.Unity {
       }
     }
     void OnAnimatorIK() {
+      //Floating crouch
+      if (crouchEnabled && !WalkingEnabled) {
+        float heightOffset = 0;
+        if (Camera.main.transform.position.y < 1.5f) {
+          heightOffset = Camera.main.transform.position.y - 1.5f;
+          animator.transform.position = new Vector3(animator.transform.position.x, heightOffset, animator.transform.position.z);
+        }
+      }
+
       if (LMRigToFollowAnimator) {
         LMRig.position = new Vector3(transform.position.x, LMRig.position.y, transform.position.z);
       }
       Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
+
       //CameraOnGround.position = placeAnimatorUnderCam;
       //AnimatorRoot.position = animator.rootPosition;  
       //if(Input.GetKey(KeyCode.Space)){

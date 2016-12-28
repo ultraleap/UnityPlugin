@@ -1529,7 +1529,8 @@ MonoBehaviour:
   AnimatorRoot: {fileID: 0}
   CameraOnGround: {fileID: 0}
   IsCentering: 1
-  WalkingEnabled: 1
+  WalkingEnabled: 0
+  crouchEnabled: 1
 --- !u!4 &908200045 stripped
 Transform:
   m_PrefabParentObject: {fileID: 400084, guid: 17192e084745a744892bf6839b75c774, type: 3}
@@ -3988,6 +3989,10 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 0.01
       objectReference: {fileID: 0}
+    - target: {fileID: 13700002, guid: 17192e084745a744892bf6839b75c774, type: 3}
+      propertyPath: m_UpdateWhenOffscreen
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 17192e084745a744892bf6839b75c774, type: 3}
   m_IsPrefabParent: 0
@@ -5364,7 +5369,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2017104048}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81dc33a21758b384586807f3656587d1, type: 3}
   m_Name: 
