@@ -928,6 +928,7 @@ MonoBehaviour:
   ZvalueText: {fileID: 1399044199}
   twistText: {fileID: 1672003822}
   outText: {fileID: 1219505723}
+  shrugShoulders: 0
 --- !u!114 &606466260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2137,7 +2138,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1224488740}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.269, y: 0.76699996, z: -0.099}
+  m_LocalPosition: {x: -0.22, y: 0.76699996, z: -0.099}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2017104050}
@@ -2453,6 +2454,7 @@ MonoBehaviour:
   ZvalueText: {fileID: 443258328}
   twistText: {fileID: 1626439821}
   outText: {fileID: 1716174183}
+  shrugShoulders: 0
 --- !u!4 &1333008633 stripped
 Transform:
   m_PrefabParentObject: {fileID: 400056, guid: 17192e084745a744892bf6839b75c774, type: 3}
@@ -2519,7 +2521,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1364643204}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.259, y: 0.747, z: -0.162}
+  m_LocalPosition: {x: 0.22, y: 0.747, z: -0.162}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2017104050}
@@ -5362,7 +5364,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2017104048}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81dc33a21758b384586807f3656587d1, type: 3}
   m_Name: 

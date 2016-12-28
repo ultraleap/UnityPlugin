@@ -76,6 +76,7 @@ namespace Leap.Unity {
     public Text outText;
 
     private bool isLerping;
+    public bool shrugShoulders = false;
 
     protected override void Awake() {
       base.Awake();
@@ -277,7 +278,7 @@ namespace Leap.Unity {
     }
 
     public void LerpMuscleWeights() {
-      shoulder_up_weight = Mathf.Lerp(shoulder_up_weight, shoulder_up_target_weight, .4f);
+      shoulder_up_weight = Mathf.Lerp(shoulder_up_weight, shoulder_up_target_weight, .3f);
       shoulder_forward_weight = Mathf.Lerp(shoulder_forward_weight, shoulder_forward_target_weight, .05f);
       shoulder_back_weight = Mathf.Lerp(shoulder_back_weight, shoulder_back_target_weight, .05f);
       positionIKWeight = Mathf.Lerp(positionIKWeight, positionIKTargetWeight, .4f);
@@ -311,7 +312,6 @@ namespace Leap.Unity {
       Vector3 shoulder = characterRoot.InverseTransformPoint(Shoulder.position);
       float elbowToShoulder = Vector3.Distance(handModel.GetElbowPosition(), ShoulderRestPos.position);
 
-
       //raise shoulder as elbow goes above shoulder
       if (elbow.y > scapula.y) {
         //if (((elbow.y - shoulder.y) * 10f) > shoulder_up_target_weight)
@@ -319,14 +319,15 @@ namespace Leap.Unity {
           shoulder_up_target_weight = (elbow.y - shoulder.y) * 10f;
         }
       }
-      else if (elbowToShoulder < upperArmLength * .9f) {
-        shrugWeight = (upperArmLength - elbowToShoulder) * 10f;
+      //Shrug shoulders if elbow closer to should than length of upperArm
+      else if (elbowToShoulder < upperArmLength * .9f && shrugShoulders) {
+        shrugWeight = Mathf.Lerp(shrugWeight, (upperArmLength - elbowToShoulder) * 10f, .05f);
         if (shrugWeight > shoulder_up_target_weight) {
           shoulder_up_target_weight = shrugWeight;
         }
       }
       else {
-        shrugWeight = 0;
+        shrugWeight = Mathf.Lerp(shrugWeight, 0f, .05f);
         shoulder_up_target_weight = 0.0f;
       }
       //move shoulder back when hand close to shoulder
@@ -413,13 +414,14 @@ namespace Leap.Unity {
 
 
     private IEnumerator DropWithVelocity(Vector3 startPosition){
+      float magnitude = averageIKVelocity.magnitude;
       Ray velocityRay = new Ray(startPosition, iKVelocitySnapShot);
-      Vector3 projectedVelocity = velocityRay.GetPoint(averageIKVelocity.magnitude * .5f);
+      Vector3 projectedVelocity = velocityRay.GetPoint(magnitude * .5f);
       isLerping = true;
       UntrackedIKPosition = startPosition;
       float startTime = Time.time;
-      float endTime = startTime + ArmDropDuration;
-      float speed = averageIKVelocity.magnitude * .01f;
+      float endTime = startTime + ArmDropDuration * magnitude;
+      float speed = magnitude * .01f;
       if (speed < .01f ) {
         speed = .01f;
       }
