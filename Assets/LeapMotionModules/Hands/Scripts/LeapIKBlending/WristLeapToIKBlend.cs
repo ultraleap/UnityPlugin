@@ -29,6 +29,7 @@ namespace Leap.Unity {
     private Transform Shoulder;
     private Transform Elbow;
     private Transform Neck;
+    private Transform Head;
     private float upperArmLength;
     private float shoulder_up_target_weight;
     private float shoulder_up_weight;
@@ -86,6 +87,7 @@ namespace Leap.Unity {
       handModel = transform.GetComponent<HandModel>();
       palm = GetComponent<HandModel>().palm;
       Neck = animator.GetBoneTransform(HumanBodyBones.Neck);
+      Head = animator.GetBoneTransform(HumanBodyBones.Head);
       Hips = animator.GetBoneTransform(HumanBodyBones.Hips);
 
 
@@ -209,11 +211,14 @@ namespace Leap.Unity {
     
     public void CalculateElbowIKTargetPos() {
       armDirection = handModel.GetArmDirection();
-      Vector3 ElbowTargetPosition = characterRoot.InverseTransformPoint(palm.position + (armDirection * ElbowOffset));
+      Vector3 ElbowTargetPosition = palm.position + (armDirection * ElbowOffset);
       Vector3 palmInAnimatorSpace = characterRoot.InverseTransformPoint(PalmPositionAtLateUpdate);
       Vector3 shoulderInAnimatorSpace = characterRoot.InverseTransformDirection(Shoulder.position);
       distanceShoulderToPalm = (palm.position - Shoulder.transform.position).magnitude;
-
+      //Rule 0: pull down targets slightly if head is looking down
+      if (Head.transform.localRotation.z < .15) {
+        ElbowTargetPosition.y -= (.15f - Head.transform.localRotation.z) * 1f;
+      }
       //turn off elbow hint if hand close to shoulder
       if (distanceShoulderToPalm < .1f) {
         elbowIKTargetWeight = 0;
@@ -250,7 +255,7 @@ namespace Leap.Unity {
         ElbowTargetPosition.x = .1f;
       }
       if (isTracking) {
-        ElbowIKTarget.position = characterRoot.TransformPoint(ElbowTargetPosition);
+        ElbowIKTarget.position = ElbowTargetPosition;
         //ElbowIKTarget.position = characterRoot.TransformPoint(handModel.GetElbowPosition());
 
       }
