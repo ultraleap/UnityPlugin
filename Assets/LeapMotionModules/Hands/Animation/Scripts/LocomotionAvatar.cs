@@ -36,6 +36,7 @@ namespace Leap.Unity {
 
     public bool WalkingEnabled = true;
     public bool crouchEnabled = false;
+    private float userHeight = 1.63241f;
 
     void Awake() {
       LMRig = GameObject.FindObjectOfType<LeapHandController>().transform.root;
@@ -61,6 +62,7 @@ namespace Leap.Unity {
       }
       if (Input.GetKeyUp(KeyCode.Space)) {
         CenterUnderCamera();
+        userHeight = Camera.main.transform.position.y;
       }
     }
    
@@ -171,8 +173,8 @@ namespace Leap.Unity {
       //Floating crouch
       if (crouchEnabled && !WalkingEnabled) {
         float heightOffset = 0;
-        if (Camera.main.transform.position.y < 1.5f) {
-          heightOffset = Camera.main.transform.position.y - 1.5f;
+        if (Camera.main.transform.position.y < userHeight) {
+          heightOffset = Camera.main.transform.position.y - userHeight;
           animator.transform.position = new Vector3(animator.transform.position.x, heightOffset, animator.transform.position.z);
         }
       }
@@ -185,7 +187,7 @@ namespace Leap.Unity {
       //CameraOnGround.position = placeAnimatorUnderCam;
       //AnimatorRoot.position = animator.rootPosition;  
       //if(Input.GetKey(KeyCode.Space)){
-      if (IsCentering || !WalkingEnabled && !standing) {
+      if (IsCentering || !WalkingEnabled) {
         animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam, .05f);
       }
     }

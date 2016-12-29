@@ -321,7 +321,7 @@ namespace Leap.Unity {
       }
       //Shrug shoulders if elbow closer to should than length of upperArm
       else if (ShoulderRestPos && elbowToShoulder < upperArmLength * .7f && shrugShoulders) {
-        shrugWeight = Mathf.Lerp(shrugWeight, (upperArmLength - elbowToShoulder) * 8.5f, .2f);
+        shrugWeight = Mathf.Lerp(shrugWeight, (upperArmLength - elbowToShoulder) * 8.0f, .2f);
         if (shrugWeight > shoulder_up_target_weight) {
           shoulder_up_target_weight = shrugWeight;
         }
