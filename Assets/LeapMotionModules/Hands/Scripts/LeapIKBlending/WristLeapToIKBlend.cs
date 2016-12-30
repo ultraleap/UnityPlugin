@@ -211,7 +211,7 @@ namespace Leap.Unity {
     
     public void CalculateElbowIKTargetPos() {
       armDirection = handModel.GetArmDirection();
-      Vector3 ElbowTargetPosition = palm.position + (armDirection * ElbowOffset);
+      Vector3 ElbowTargetPosition = characterRoot.InverseTransformPoint(palm.position + (armDirection * ElbowOffset));
       Vector3 palmInAnimatorSpace = characterRoot.InverseTransformPoint(PalmPositionAtLateUpdate);
       Vector3 shoulderInAnimatorSpace = characterRoot.InverseTransformDirection(Shoulder.position);
       distanceShoulderToPalm = (palm.position - Shoulder.transform.position).magnitude;
@@ -255,7 +255,7 @@ namespace Leap.Unity {
         ElbowTargetPosition.x = .1f;
       }
       if (isTracking) {
-        ElbowIKTarget.position = ElbowTargetPosition;
+        ElbowIKTarget.position = characterRoot.TransformPoint(ElbowTargetPosition);
         //ElbowIKTarget.position = characterRoot.TransformPoint(handModel.GetElbowPosition());
 
       }
