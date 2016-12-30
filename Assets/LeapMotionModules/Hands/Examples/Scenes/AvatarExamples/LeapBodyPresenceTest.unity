@@ -878,6 +878,12 @@ MonoBehaviour:
       outSlope: 0
       tangentMode: 0
     - serializedVersion: 2
+      time: 0.48749673
+      value: 0.82189786
+      inSlope: 1.231432
+      outSlope: 1.231432
+      tangentMode: 0
+    - serializedVersion: 2
       time: 1
       value: 1
       inSlope: 0
@@ -896,10 +902,22 @@ MonoBehaviour:
       outSlope: 0
       tangentMode: 0
     - serializedVersion: 2
+      time: 0.5124162
+      value: 0.12520172
+      inSlope: 0.82455575
+      outSlope: 0.82455575
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.7998925
+      value: 0.9786169
+      inSlope: 0.3070282
+      outSlope: 0.3070282
+      tangentMode: 0
+    - serializedVersion: 2
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
+      inSlope: 0.089562565
+      outSlope: 0.089562565
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -914,10 +932,16 @@ MonoBehaviour:
       outSlope: 0
       tangentMode: 0
     - serializedVersion: 2
-      time: 0.5110961
-      value: 0.1783536
+      time: 0.396982
+      value: 0.15730552
       inSlope: 1.1451542
       outSlope: 1.1451542
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.8115271
+      value: 0.9860031
+      inSlope: 0.2086811
+      outSlope: 0.2086811
       tangentMode: 0
     - serializedVersion: 2
       time: 1
@@ -2411,6 +2435,12 @@ MonoBehaviour:
       outSlope: 0
       tangentMode: 0
     - serializedVersion: 2
+      time: 0.48749673
+      value: 0.82189786
+      inSlope: 1.231432
+      outSlope: 1.231432
+      tangentMode: 0
+    - serializedVersion: 2
       time: 1
       value: 1
       inSlope: 0
@@ -2429,10 +2459,22 @@ MonoBehaviour:
       outSlope: 0
       tangentMode: 0
     - serializedVersion: 2
+      time: 0.5124162
+      value: 0.12520172
+      inSlope: 0.82455575
+      outSlope: 0.82455575
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.7998925
+      value: 0.9786169
+      inSlope: 0.3070282
+      outSlope: 0.3070282
+      tangentMode: 0
+    - serializedVersion: 2
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
+      inSlope: 0.089562565
+      outSlope: 0.089562565
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -2447,10 +2489,16 @@ MonoBehaviour:
       outSlope: 0
       tangentMode: 0
     - serializedVersion: 2
-      time: 0.5110961
-      value: 0.1783536
+      time: 0.396982
+      value: 0.15730552
       inSlope: 1.1451542
       outSlope: 1.1451542
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 0.8115271
+      value: 0.9860031
+      inSlope: 0.2086811
+      outSlope: 0.2086811
       tangentMode: 0
     - serializedVersion: 2
       time: 1
@@ -5405,7 +5453,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2017104048}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81dc33a21758b384586807f3656587d1, type: 3}
   m_Name: 
