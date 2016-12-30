@@ -914,6 +914,12 @@ MonoBehaviour:
       outSlope: 0
       tangentMode: 0
     - serializedVersion: 2
+      time: 0.5110961
+      value: 0.1783536
+      inSlope: 1.1451542
+      outSlope: 1.1451542
+      tangentMode: 0
+    - serializedVersion: 2
       time: 1
       value: 1
       inSlope: 0
@@ -928,7 +934,7 @@ MonoBehaviour:
   ZvalueText: {fileID: 1399044199}
   twistText: {fileID: 1672003822}
   outText: {fileID: 1219505723}
-  shrugShoulders: 1
+  shrugShoulders: 0
 --- !u!114 &606466260
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2441,6 +2447,12 @@ MonoBehaviour:
       outSlope: 0
       tangentMode: 0
     - serializedVersion: 2
+      time: 0.5110961
+      value: 0.1783536
+      inSlope: 1.1451542
+      outSlope: 1.1451542
+      tangentMode: 0
+    - serializedVersion: 2
       time: 1
       value: 1
       inSlope: 0
@@ -2455,7 +2467,7 @@ MonoBehaviour:
   ZvalueText: {fileID: 443258328}
   twistText: {fileID: 1626439821}
   outText: {fileID: 1716174183}
-  shrugShoulders: 1
+  shrugShoulders: 0
 --- !u!4 &1333008633 stripped
 Transform:
   m_PrefabParentObject: {fileID: 400056, guid: 17192e084745a744892bf6839b75c774, type: 3}
@@ -3993,6 +4005,30 @@ Prefab:
       propertyPath: m_UpdateWhenOffscreen
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 17192e084745a744892bf6839b75c774, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 17192e084745a744892bf6839b75c774, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 17192e084745a744892bf6839b75c774, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 17192e084745a744892bf6839b75c774, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: 17192e084745a744892bf6839b75c774, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 17192e084745a744892bf6839b75c774, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.01
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 17192e084745a744892bf6839b75c774, type: 3}
   m_IsPrefabParent: 0
@@ -5369,7 +5405,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2017104048}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81dc33a21758b384586807f3656587d1, type: 3}
   m_Name: 

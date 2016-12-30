@@ -423,19 +423,21 @@ namespace Leap.Unity {
       Ray velocityRay = new Ray(startPosition, iKVelocitySnapShot);
       Vector3 projectedVelocity = velocityRay.GetPoint(magnitude * .75f);
       Vector3 localVelocity = characterRoot.InverseTransformPoint(projectedVelocity);
-      //push targets forward if tracking lost over head to avoid arm flipping
-      if (localVelocity.z < .2f && localVelocity.y > 1.5f) {
-        projectedVelocity = projectedVelocity + (characterRoot.forward * .75f);
-      }
+
       isLerping = true;
       UntrackedIKPosition = startPosition;
       float startTime = Time.time;
-      float endTime = startTime + ArmDropDuration * magnitude;
       float speed = magnitude * .01f;
       if (speed < .01f ) {
         speed = .01f;
       }
-    
+      //push targets forward if tracking lost over head to avoid arm flipping
+      if (localVelocity.z < .2f && localVelocity.y > 1.5f) {
+        projectedVelocity = projectedVelocity + (characterRoot.forward * 2f);
+        ArmDropDuration += .5f;
+      }
+      float endTime = startTime + ArmDropDuration * magnitude;
+
       while (Time.time <= endTime) {
         float t = (Time.time - startTime) / ArmDropDuration;
         float lerpedPositionX = Mathf.Lerp(projectedVelocity.x, RestIKPosition.position.x, DropCurveX.Evaluate(t * 2));
