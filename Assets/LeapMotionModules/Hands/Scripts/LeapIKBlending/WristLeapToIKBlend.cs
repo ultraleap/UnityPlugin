@@ -44,6 +44,7 @@ namespace Leap.Unity {
     private float spineLayerTargetWeight;
 
     private Vector3 UntrackedIKPosition;
+    [HideInInspector]
     public bool isTracking;
     private Transform characterRoot;
     private float distanceShoulderToPalm;
@@ -55,7 +56,8 @@ namespace Leap.Unity {
     private Vector3 iKVelocitySnapShot;
     private Queue<Vector3> velocityList = new Queue<Vector3>();
     private Vector3 averageIKVelocity;
-    
+    private bool isLerping;
+
     public Chirality Handedness;
     public GameObject MarkerPrefab;
     public Transform ElbowMarker;
@@ -76,7 +78,6 @@ namespace Leap.Unity {
     public Text twistText;
     public Text outText;
 
-    private bool isLerping;
     public bool shrugShoulders = false;
 
     protected override void Awake() {
@@ -103,7 +104,6 @@ namespace Leap.Unity {
       }
       HandFinish();
       upperArmLength = Vector3.Distance(Shoulder.position, Elbow.position);
-
     }
 
     public void AssignIKMarkers() {
@@ -131,9 +131,6 @@ namespace Leap.Unity {
       positionIKTargetWeight = 1;
       elbowIKTargetWeight = 1;
       rotationIKWeight = 0;
-      //shoulder_forward_target_weight = 0;
-      //shoulder_back_target_weight = 0;
-      //shoulder_up_target_weight = 0;
       shouldersLayerTargetWeight = 0f;
       spineLayerTargetWeight = 1f;
 
@@ -256,8 +253,6 @@ namespace Leap.Unity {
       }
       if (isTracking) {
         ElbowIKTarget.position = characterRoot.TransformPoint(ElbowTargetPosition);
-        //ElbowIKTarget.position = characterRoot.TransformPoint(handModel.GetElbowPosition());
-
       }
       else ElbowIKTarget.position = Vector3.Lerp(ElbowIKTarget.position, characterRoot.TransformPoint(ElbowTargetPosition), .01f);
     }
@@ -352,7 +347,6 @@ namespace Leap.Unity {
     private void TrackedIKHandling() {
       if (Handedness == Chirality.Left) {
         animator.SetFloat("shoulder_up_left", shoulder_up_weight);
-        //TODO: Roll off this value when looking down
         shoulder_forward_target_weight += distanceShoulderToPalm * .5f;
         //animator.SetFloat("shoulder_forward_left", shoulder_forward_weight);
         animator.SetFloat("shoulder_back_left", shoulder_back_weight);
@@ -364,7 +358,6 @@ namespace Leap.Unity {
         animator.SetIKHintPosition(AvatarIKHint.LeftElbow, ElbowIKTarget.position);
       }
       if (Handedness == Chirality.Right) {
-        //TODO: Roll off this value when looking down
         animator.SetFloat("shoulder_up_right", shoulder_up_weight);
         shoulder_forward_target_weight += distanceShoulderToPalm * .5f;
         //animator.SetFloat("shoulder_forward_right", shoulder_forward_weight);
@@ -434,7 +427,7 @@ namespace Leap.Unity {
       //push targets forward if tracking lost over head to avoid arm flipping
       if (localVelocity.z < .2f && localVelocity.y > 1.5f) {
         projectedVelocity = projectedVelocity + (characterRoot.forward * 2f);
-        ArmDropDuration += .5f;
+        ArmDropDuration += .2f;
       }
       float endTime = startTime + ArmDropDuration * magnitude;
 
