@@ -29,6 +29,8 @@ namespace Leap.Unity.Query {
         if (!_predicate(_source.Current)) {
           _hasPredicateFailed = true;
           return false;
+        } else {
+          return true;
         }
       }
     }

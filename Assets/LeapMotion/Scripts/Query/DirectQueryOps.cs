@@ -113,5 +113,41 @@ namespace Leap.Unity.Query {
         }
       }
     }
+
+    private static List<QueryType> _utilityList = new List<QueryType>();
+    public QueryType[] ToArray() {
+      try {
+        FillList(_utilityList);
+        return _utilityList.ToArray();
+      } finally {
+        _utilityList.Clear();
+      }
+    }
+
+    public void FillArray(QueryType[] array, int offset = 0) {
+      using (thisAndConsume) {
+        while (_op.MoveNext()) {
+          array[offset++] = _op.Current;
+        }
+      }
+    }
+
+    public List<QueryType> ToList() {
+      List<QueryType> list = new List<QueryType>();
+      using (thisAndConsume) {
+        while (_op.MoveNext()) {
+          list.Add(_op.Current);
+        }
+      }
+      return list;
+    }
+
+    public void FillList(List<QueryType> list) {
+      using (thisAndConsume) {
+        while (_op.MoveNext()) {
+          list.Add(_op.Current);
+        }
+      }
+    }
   }
 }
