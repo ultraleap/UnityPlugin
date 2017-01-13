@@ -5,6 +5,8 @@ public class MinimalBody : MonoBehaviour {
 
   void Start() {
     prevDeltaTime = 0.001f;
+    prevPosition = transform.position;
+    prevRotation = transform.rotation;
   }
 
   void Update() {
