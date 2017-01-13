@@ -3,6 +3,27 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.Query {
 
+  /// <summary>
+  /// The wrapper for all leap queries.  These queries are meant to mirror the queries present in the System.Linq.Enumerable
+  /// class.  These queries are meant to be functionaly identical, but allocate zero garbage, both during the generation of
+  /// the query, as well as the execution.  The speed is also aimed to be as fast or faster.
+  ///
+  /// There is some difference between using Linq and using Leap queries. One is that is you must prefix your query with
+  /// a call to a Query() method if you are starting with an external data structure.  So for example if you want to query a
+  /// list, your method call would look something like this:
+  ///
+  /// myList.Query().Where(someCondition).First();
+  ///
+  /// The other major difference is that you can only use a query once.  So the following will not work:
+  ///
+  /// var myQuery = myList.Query().Where(someCondition);
+  ///
+  /// foreach(var item in myQuery) { }
+  /// foreach(var item in myQuery) { } // will not work, query has already been used!
+  ///
+  /// All of these limitations and changes are made in the name of performance and to reduce garbage allocated to zero, while
+  /// hopefully not impacting the productivity of the user too much.
+  /// </summary>
   public partial struct QueryWrapper<QueryType, QueryOp> : IDisposable where QueryOp : IEnumerator<QueryType> {
 
     private enum State : byte {
