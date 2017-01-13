@@ -1,16 +1,49 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Query {
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
-    private QueryOp op;
+  public partial struct QueryWrapper<QueryType, QueryOp> : IDisposable where QueryOp : IEnumerator<QueryType> {
+
+    private enum State : byte {
+      Ready,
+      ReturnedEnumerator,
+      AlreadyDisposed
+    }
+
+    private QueryOp _op;
+    private State _state;
 
     public QueryWrapper(QueryOp op) {
-      this.op = op;
+      _op = op;
+      _state = State.Ready;
     }
 
     public QueryOp GetEnumerator() {
-      return op;
+      return thisAndConsume._op;
+    }
+
+    public void Dispose() {
+      if (_state == State.AlreadyDisposed) {
+        throw new InvalidOperationException("This QueryWrapper has already been disposed");
+      }
+
+      _state = State.AlreadyDisposed;
+      _op.Dispose();
+    }
+
+    private QueryWrapper<QueryType, QueryOp> thisAndConsume {
+      get {
+        switch (_state) {
+          case State.AlreadyDisposed:
+            throw new InvalidOperationException("This QueryWrapper has already been disposed.");
+          case State.ReturnedEnumerator:
+            throw new InvalidOperationException("Get Enumerator has already been called for this QueryWrapper.");
+        }
+
+        _state = State.ReturnedEnumerator;
+        return this;
+      }
     }
   }
 

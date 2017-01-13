@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Leap.Unity.Query {
@@ -6,19 +7,19 @@ namespace Leap.Unity.Query {
   public struct OfTypeOp<SourceType, ResultType, SourceOp> : IEnumerator<ResultType>
   where SourceOp : IEnumerator<SourceType>
   where ResultType : class {
-    private SourceOp source;
+    private SourceOp _source;
 
     public OfTypeOp(SourceOp source) {
-      this.source = source;
+      _source = source;
     }
 
     public bool MoveNext() {
       while (true) {
-        if (!source.MoveNext()) {
+        if (!_source.MoveNext()) {
           return false;
         }
 
-        if (source.Current is ResultType) {
+        if (_source.Current is ResultType) {
           return true;
         }
       }
@@ -26,28 +27,28 @@ namespace Leap.Unity.Query {
 
     public ResultType Current {
       get {
-        return source.Current as ResultType;
+        return _source.Current as ResultType;
       }
     }
 
     object IEnumerator.Current {
       get {
-        return null;
+        throw new InvalidOperationException();
       }
     }
 
     public void Reset() {
-      source.Reset();
+      throw new InvalidOperationException();
     }
 
     public void Dispose() {
-      source.Dispose();
+      _source.Dispose();
     }
   }
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
     public QueryWrapper<CastType, OfTypeOp<QueryType, CastType, QueryOp>> OfType<CastType>() where CastType : class {
-      return new QueryWrapper<CastType, OfTypeOp<QueryType, CastType, QueryOp>>(new OfTypeOp<QueryType, CastType, QueryOp>(op));
+      return new QueryWrapper<CastType, OfTypeOp<QueryType, CastType, QueryOp>>(new OfTypeOp<QueryType, CastType, QueryOp>(_op));
     }
   }
 }

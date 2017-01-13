@@ -4,44 +4,45 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.Query {
 
-  public struct SelectOp<SourceType, ResultType, SourceOp> : IEnumerator<ResultType> where SourceOp : IEnumerator<SourceType> {
-    private SourceOp source;
-    private Func<SourceType, ResultType> mapping;
+  public struct SelectOp<SourceType, ResultType, SourceOp> : IEnumerator<ResultType>
+    where SourceOp : IEnumerator<SourceType> {
+    private SourceOp _source;
+    private Func<SourceType, ResultType> _mapping;
 
     public SelectOp(SourceOp enumerator, Func<SourceType, ResultType> mapping) {
-      this.source = enumerator;
-      this.mapping = mapping;
+      _source = enumerator;
+      _mapping = mapping;
     }
 
     public bool MoveNext() {
-      return source.MoveNext();
+      return _source.MoveNext();
     }
 
     public ResultType Current {
       get {
-        return mapping(source.Current);
+        return _mapping(_source.Current);
       }
     }
 
     object IEnumerator.Current {
       get {
-        return null;
+        throw new InvalidOperationException();
       }
     }
 
     public void Reset() {
-      source.Reset();
+      throw new InvalidOperationException();
     }
 
     public void Dispose() {
-      source.Dispose();
-      mapping = null;
+      _source.Dispose();
+      _mapping = null;
     }
   }
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
     public QueryWrapper<NewType, SelectOp<QueryType, NewType, QueryOp>> Select<NewType>(Func<QueryType, NewType> mapping) {
-      return new QueryWrapper<NewType, SelectOp<QueryType, NewType, QueryOp>>(new SelectOp<QueryType, NewType, QueryOp>(op, mapping));
+      return new QueryWrapper<NewType, SelectOp<QueryType, NewType, QueryOp>>(new SelectOp<QueryType, NewType, QueryOp>(_op, mapping));
     }
   }
 }

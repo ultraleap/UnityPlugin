@@ -6,90 +6,110 @@ namespace Leap.Unity.Query {
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
 
     public bool Any() {
-      return op.MoveNext();
+      using (thisAndConsume) {
+        return _op.MoveNext();
+      }
     }
 
     public bool Any(Func<QueryType, bool> predicate) {
-      while (op.MoveNext()) {
-        if (predicate(op.Current)) {
-          return true;
+      using (thisAndConsume) {
+        while (_op.MoveNext()) {
+          if (predicate(_op.Current)) {
+            return true;
+          }
         }
+        return false;
       }
-      return false;
     }
 
     public bool All(Func<QueryType, bool> predicate) {
-      while (op.MoveNext()) {
-        if (!predicate(op.Current)) {
-          return false;
+      using (thisAndConsume) {
+        while (_op.MoveNext()) {
+          if (!predicate(_op.Current)) {
+            return false;
+          }
         }
+        return true;
       }
-      return true;
     }
 
     public bool Contains(QueryType instance) {
-      while (op.MoveNext()) {
-        if (op.Current.Equals(instance)) {
-          return true;
+      using (thisAndConsume) {
+        while (_op.MoveNext()) {
+          if (_op.Current.Equals(instance)) {
+            return true;
+          }
         }
+        return false;
       }
-      return false;
     }
 
     public int Count() {
-      int count = 0;
-      while (op.MoveNext()) {
-        count++;
+      using (thisAndConsume) {
+        int count = 0;
+        while (_op.MoveNext()) {
+          count++;
+        }
+        return count;
       }
-      return count;
     }
 
     public int Count(Func<QueryType, bool> predicate) {
-      int count = 0;
-      while (op.MoveNext()) {
-        if (predicate(op.Current)) {
-          count++;
+      using (thisAndConsume) {
+        int count = 0;
+        while (_op.MoveNext()) {
+          if (predicate(_op.Current)) {
+            count++;
+          }
         }
+        return count;
       }
-      return count;
     }
 
     public QueryType First() {
-      if (!op.MoveNext()) {
-        throw new InvalidOperationException("The source query is empty.");
-      }
+      using (thisAndConsume) {
+        if (!_op.MoveNext()) {
+          throw new InvalidOperationException("The source query is empty.");
+        }
 
-      return op.Current;
+        return _op.Current;
+      }
     }
 
     public QueryType First(Func<QueryType, bool> predicate) {
-      while (true) {
-        if (!op.MoveNext()) {
-          throw new InvalidOperationException("The source query did not have any elements that satisfied the predicate.");
-        }
+      using (thisAndConsume) {
+        while (true) {
+          if (!_op.MoveNext()) {
+            throw new InvalidOperationException("The source query did not have any elements that satisfied the predicate.");
+          }
 
-        if (predicate(op.Current)) {
-          return op.Current;
+          if (predicate(_op.Current)) {
+            return _op.Current;
+          }
         }
       }
     }
 
     public QueryType FirstOrDefault() {
-      if (!op.MoveNext()) {
-        return default(QueryType);
-      }
-
-      return op.Current;
-    }
-
-    public QueryType FirstOrDefault(Func<QueryType, bool> predicate) {
-      while (true) {
-        if (!op.MoveNext()) {
+      using (thisAndConsume) {
+        if (!_op.MoveNext()) {
           return default(QueryType);
         }
 
-        if (predicate(op.Current)) {
-          return op.Current;
+        return _op.Current;
+      }
+    }
+
+    public QueryType FirstOrDefault(Func<QueryType, bool> predicate) {
+      using (thisAndConsume) {
+        while (true) {
+          if (!_op.MoveNext()) {
+            return default(QueryType);
+          }
+
+          if (predicate(_op.Current)) {
+            return _op.Current;
+          }
         }
       }
     }

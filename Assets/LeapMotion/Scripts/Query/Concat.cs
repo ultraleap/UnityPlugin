@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Leap.Unity.Query {
@@ -7,60 +8,58 @@ namespace Leap.Unity.Query {
   where SourceOpA : IEnumerator<SourceType>
   where SourceOpB : IEnumerator<SourceType> {
 
-    private SourceOpA sourceA;
-    private SourceOpB sourceB;
-    private bool isOnA;
+    private SourceOpA _sourceA;
+    private SourceOpB _sourceB;
+    private bool _isOnA;
 
     public ConcatOp(SourceOpA enumeratorA, SourceOpB enumeratorB) {
-      this.sourceA = enumeratorA;
-      this.sourceB = enumeratorB;
-      this.isOnA = true;
+      _sourceA = enumeratorA;
+      _sourceB = enumeratorB;
+      _isOnA = true;
     }
 
     public bool MoveNext() {
-      if (isOnA) {
-        if (sourceA.MoveNext()) {
+      if (_isOnA) {
+        if (_sourceA.MoveNext()) {
           return true;
         } else {
-          isOnA = false;
+          _isOnA = false;
         }
       }
 
-      return sourceB.MoveNext();
+      return _sourceB.MoveNext();
     }
 
     public SourceType Current {
       get {
-        if (isOnA) {
-          return sourceA.Current;
+        if (_isOnA) {
+          return _sourceA.Current;
         } else {
-          return sourceB.Current;
+          return _sourceB.Current;
         }
       }
     }
 
     object IEnumerator.Current {
       get {
-        return null;
+        throw new InvalidOperationException();
       }
     }
 
     public void Reset() {
-      sourceA.Reset();
-      sourceB.Reset();
-      isOnA = true;
+      throw new InvalidOperationException();
     }
 
     public void Dispose() {
-      sourceA.Dispose();
-      sourceB.Dispose();
+      _sourceA.Dispose();
+      _sourceB.Dispose();
     }
   }
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
     public QueryWrapper<QueryType, ConcatOp<QueryType, QueryOp, SourceBOp>> Concat<SourceBOp>(QueryWrapper<QueryType, SourceBOp> sourceB)
       where SourceBOp : IEnumerator<QueryType> {
-      return new QueryWrapper<QueryType, ConcatOp<QueryType, QueryOp, SourceBOp>>(new ConcatOp<QueryType, QueryOp, SourceBOp>(op, sourceB.op));
+      return new QueryWrapper<QueryType, ConcatOp<QueryType, QueryOp, SourceBOp>>(new ConcatOp<QueryType, QueryOp, SourceBOp>(_op, sourceB._op));
     }
   }
 }

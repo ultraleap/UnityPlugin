@@ -6,28 +6,28 @@ namespace Leap.Unity.Query {
 
   public struct TakeWhileOp<SourceType, SourceOp> : IEnumerator<SourceType>
   where SourceOp : IEnumerator<SourceType> {
-    private SourceOp source;
-    private Func<SourceType, bool> predicate;
-    private bool hasPredicateFailed;
+    private SourceOp _source;
+    private Func<SourceType, bool> _predicate;
+    private bool _hasPredicateFailed;
 
     public TakeWhileOp(SourceOp source, Func<SourceType, bool> predicate) {
-      this.source = source;
-      this.predicate = predicate;
-      this.hasPredicateFailed = false;
+      _source = source;
+      _predicate = predicate;
+      _hasPredicateFailed = false;
     }
 
     public bool MoveNext() {
-      if (hasPredicateFailed) {
+      if (_hasPredicateFailed) {
         return false;
       }
 
       while (true) {
-        if (!source.MoveNext()) {
+        if (!_source.MoveNext()) {
           return false;
         }
 
-        if (!predicate(source.Current)) {
-          hasPredicateFailed = true;
+        if (!_predicate(_source.Current)) {
+          _hasPredicateFailed = true;
           return false;
         }
       }
@@ -35,29 +35,28 @@ namespace Leap.Unity.Query {
 
     public SourceType Current {
       get {
-        return source.Current;
+        return _source.Current;
       }
     }
 
     object IEnumerator.Current {
       get {
-        return null;
+        throw new InvalidOperationException();
       }
     }
 
     public void Reset() {
-      source.Reset();
-      hasPredicateFailed = false;
+      throw new InvalidOperationException();
     }
 
     public void Dispose() {
-      source.Dispose();
+      _source.Dispose();
     }
   }
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
     public QueryWrapper<QueryType, TakeWhileOp<QueryType, QueryOp>> TakeWhile(Func<QueryType, bool> predicate) {
-      return new QueryWrapper<QueryType, TakeWhileOp<QueryType, QueryOp>>(new TakeWhileOp<QueryType, QueryOp>(op, predicate));
+      return new QueryWrapper<QueryType, TakeWhileOp<QueryType, QueryOp>>(new TakeWhileOp<QueryType, QueryOp>(_op, predicate));
     }
   }
 }

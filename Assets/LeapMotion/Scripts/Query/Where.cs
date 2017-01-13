@@ -4,52 +4,53 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.Query {
 
-  public struct WhereOp<T, EnumType> : IEnumerator<T> where EnumType : IEnumerator<T> {
-    private EnumType enumerator;
-    private Func<T, bool> predicate;
+  public struct WhereOp<SourceType, SourceOp> : IEnumerator<SourceType>
+    where SourceOp : IEnumerator<SourceType> {
+    private SourceOp _source;
+    private Func<SourceType, bool> _predicate;
 
-    public WhereOp(EnumType enumerator, Func<T, bool> predicate) {
-      this.enumerator = enumerator;
-      this.predicate = predicate;
+    public WhereOp(SourceOp enumerator, Func<SourceType, bool> predicate) {
+      _source = enumerator;
+      _predicate = predicate;
     }
 
     public bool MoveNext() {
       while (true) {
-        if (!enumerator.MoveNext()) {
+        if (!_source.MoveNext()) {
           return false;
         }
 
-        if (predicate(enumerator.Current)) {
+        if (_predicate(_source.Current)) {
           return true;
         }
       }
     }
 
-    public T Current {
+    public SourceType Current {
       get {
-        return enumerator.Current;
+        return _source.Current;
       }
     }
 
     object IEnumerator.Current {
       get {
-        return null;
+        throw new InvalidOperationException();
       }
     }
 
     public void Reset() {
-      enumerator.Reset();
+      throw new InvalidOperationException();
     }
 
     public void Dispose() {
-      enumerator.Dispose();
-      predicate = null;
+      _source.Dispose();
+      _predicate = null;
     }
   }
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
     public QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>> Where(Func<QueryType, bool> predicate) {
-      return new QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>>(new WhereOp<QueryType, QueryOp>(op, predicate));
+      return new QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>>(new WhereOp<QueryType, QueryOp>(_op, predicate));
     }
   }
 }
