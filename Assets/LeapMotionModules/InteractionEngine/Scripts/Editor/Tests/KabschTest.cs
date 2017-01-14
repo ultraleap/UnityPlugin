@@ -2,22 +2,21 @@
 using System.Linq;
 using NUnit.Framework;
 using LeapInternal;
-using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction.Tests {
 
   [TestFixture(Category = "KabschC")]
   public class KabschTest {
-    LEAP_IE_KABSCH _kabsch;
+    //LEAP_IE_KABSCH _kabsch;
 
     [SetUp]
     public void Setup() {
-      KabschC.Construct(ref _kabsch);
+      //KabschC.Construct(ref _kabsch);
     }
 
     [TearDown]
     public void Teardown() {
-      KabschC.Destruct(ref _kabsch);
+      //KabschC.Destruct(ref _kabsch);
     }
 
     [Test]
@@ -57,16 +56,16 @@ namespace Leap.Unity.Interaction.Tests {
       for (int i = 0; i < 3; i++) {
         var l0 = (v0[i]).ToCVector();
         var l1 = (v1[i]).ToCVector();
-        KabschC.AddPoint(ref _kabsch, ref l0, ref l1, 1.0f);
+        //KabschC.AddPoint(ref _kabsch, ref l0, ref l1, 1.0f);
       }
 
-      KabschC.Solve(ref _kabsch);
+      //KabschC.Solve(ref _kabsch);
 
-      LEAP_VECTOR leapTranslation;
-      LEAP_QUATERNION leapRotation;
+      LEAP_VECTOR leapTranslation = new LEAP_VECTOR();
+      LEAP_QUATERNION leapRotation = new LEAP_QUATERNION();
 
-      KabschC.GetTranslation(ref _kabsch, out leapTranslation);
-      KabschC.GetRotation(ref _kabsch, out leapRotation);
+      //KabschC.GetTranslation(ref _kabsch, out leapTranslation);
+      //KabschC.GetRotation(ref _kabsch, out leapRotation);
 
       solvedTranslation = leapTranslation.ToVector3();
       solvedRotation = leapRotation.ToQuaternion();

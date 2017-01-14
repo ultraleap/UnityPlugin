@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using LeapInternal;
-using Leap.Unity.Interaction.CApi;
+//using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
@@ -33,13 +33,13 @@ namespace Leap.Unity.Interaction {
     protected SolveMethod _solveMethod;
 
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
-    protected LEAP_IE_KABSCH _kabsch;
+    //protected LEAP_IE_KABSCH _kabsch;
 
     protected override void Init(InteractionBehaviour obj) {
       base.Init(obj);
 
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
-      KabschC.Construct(ref _kabsch);
+      //KabschC.Construct(ref _kabsch);
     }
 
     public override void TransferHandId(int oldId, int newId) {
@@ -76,7 +76,7 @@ namespace Leap.Unity.Interaction {
     }
 
     public override void GetHoldingPose(ReadonlyList<Hand> hands, out Vector3 newPosition, out Quaternion newRotation) {
-      KabschC.Reset(ref _kabsch);
+      //KabschC.Reset(ref _kabsch);
 
       Vector3 bodyPosition = _obj.warper.RigidbodyPosition;
       Quaternion bodyRotation = _obj.warper.RigidbodyRotation;
@@ -102,17 +102,17 @@ namespace Leap.Unity.Interaction {
             LEAP_VECTOR point1 = (it.MultiplyPoint3x4(localPos) - bodyPosition).ToCVector();
             LEAP_VECTOR point2 = (bonePos - bodyPosition).ToCVector();
 
-            KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
+            //KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
           }
         }
       }
 
       performSolve();
 
-      LEAP_VECTOR leapTranslation;
-      LEAP_QUATERNION leapRotation;
-      KabschC.GetTranslation(ref _kabsch, out leapTranslation);
-      KabschC.GetRotation(ref _kabsch, out leapRotation);
+      LEAP_VECTOR leapTranslation = new LEAP_VECTOR();
+      LEAP_QUATERNION leapRotation = new LEAP_QUATERNION();
+      //KabschC.GetTranslation(ref _kabsch, out leapTranslation);
+      //KabschC.GetRotation(ref _kabsch, out leapRotation);
 
       newPosition = bodyPosition + leapTranslation.ToVector3();
       newRotation = leapRotation.ToQuaternion() * bodyRotation;
@@ -121,12 +121,12 @@ namespace Leap.Unity.Interaction {
     protected void performSolve() {
       switch (_solveMethod) {
         case SolveMethod.SixDegreeSolve:
-          KabschC.Solve(ref _kabsch);
+          //KabschC.Solve(ref _kabsch);
           break;
         case SolveMethod.PivotAroundOrigin:
           LEAP_VECTOR v = new LEAP_VECTOR();
           v.x = v.y = v.z = 0;
-          KabschC.SolveWithPivot(ref _kabsch, ref v);
+          //KabschC.SolveWithPivot(ref _kabsch, ref v);
           break;
       }
     }

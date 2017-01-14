@@ -1,8 +1,6 @@
-﻿
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
@@ -42,7 +40,7 @@ namespace Leap.Unity.Interaction {
     [Tooltip("The InteractionMaterial defining interaction behaviors.")]
     [SerializeField]
     protected InteractionMaterial _material;
-
+    
     protected Transform[] _childrenArray;
     protected Rigidbody _rigidbody;
 
@@ -91,11 +89,7 @@ namespace Leap.Unity.Interaction {
       }
       set {
         _isKinematic = value;
-        if (HasShapeInstance) {
-          if (_contactMode != ContactMode.GRASPED) {
-            _rigidbody.isKinematic = value;
-          }
-        } else {
+        if (_contactMode != ContactMode.GRASPED) {
           _rigidbody.isKinematic = value;
         }
       }
@@ -140,9 +134,7 @@ namespace Leap.Unity.Interaction {
       }
       set {
         _useGravity = value;
-        if (!HasShapeInstance) {
-          _rigidbody.useGravity = _useGravity;
-        }
+        _rigidbody.useGravity = _useGravity;
       }
     }
 
@@ -279,76 +271,6 @@ namespace Leap.Unity.Interaction {
       _accumulatedAngularAcceleration = Vector3.zero;
       _minHandDistance = float.MaxValue;
       _notifiedOfTeleport = false;
-    }
-
-    public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
-      createInfo = new INTERACTION_CREATE_SHAPE_INFO();
-      createInfo.shapeFlags = ShapeInfoFlags.None;
-
-      createTransform = getRigidbodyTransform();
-    }
-
-    protected override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
-      base.OnInteractionShapeCreated(instanceHandle);
-
-      _solvedPosition = _rigidbody.position;
-      _solvedRotation = _rigidbody.rotation;
-
-      updateLayer();
-    }
-
-    protected override void OnInteractionShapeDestroyed() {
-      base.OnInteractionShapeDestroyed();
-      updateContactMode();
-      revertRigidbodyState();
-    }
-
-    public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
-      updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
-
-      updateInfo.updateFlags = UpdateInfoFlags.VelocityEnabled;
-      updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
-      updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
-
-      if (_isKinematic) {
-        updateInfo.updateFlags |= UpdateInfoFlags.Kinematic;
-      } else {
-        // Generates notifications even when hands are no longer influencing
-        if (_contactMode == ContactMode.SOFT) {
-          updateInfo.updateFlags |= UpdateInfoFlags.SoftContact;
-        }
-
-        // All forms of acceleration.
-        if (_contactMode != ContactMode.GRASPED) {
-          updateInfo.updateFlags |= UpdateInfoFlags.AccelerationEnabled;
-          updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
-          updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
-
-          if (_useGravity) {
-            updateInfo.updateFlags |= UpdateInfoFlags.GravityEnabled;
-          }
-        }
-      }
-
-      interactionTransform = getRigidbodyTransform();
-    }
-
-    protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
-      base.OnRecievedSimulationResults(results);
-
-      // Velocities can propagate even when not able to contact the hand.
-      if (_contactMode != ContactMode.GRASPED && (results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
-        Assert.IsFalse(_isKinematic);
-        _rigidbody.velocity = results.linearVelocity.ToVector3();
-        _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
-        _recievedVelocityUpdate = true;
-      }
-
-      if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
-        _minHandDistance = results.minHandDistance;
-      }
-
-      updateContactMode();
     }
 
     protected override void OnHandGrasped(Hand hand) {
@@ -576,21 +498,6 @@ namespace Leap.Unity.Interaction {
       if (_rigidbody.angularDrag != _angularDrag) {
         _rigidbody.angularDrag = _angularDrag;
       }
-    }
-
-    protected INTERACTION_TRANSFORM getRigidbodyTransform() {
-      INTERACTION_TRANSFORM interactionTransform = new INTERACTION_TRANSFORM();
-
-      if (IsBeingGrasped) {
-        interactionTransform.position = _solvedPosition.ToCVector();
-        interactionTransform.rotation = _solvedRotation.ToCQuaternion();
-      } else {
-        interactionTransform.position = _warper.RigidbodyPosition.ToCVector();
-        interactionTransform.rotation = _warper.RigidbodyRotation.ToCQuaternion();
-      }
-
-      interactionTransform.wallTime = Time.fixedTime;
-      return interactionTransform;
     }
     #endregion
   }
