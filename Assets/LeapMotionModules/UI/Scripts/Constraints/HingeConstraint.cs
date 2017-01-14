@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Leap.UI.Constraints {
 
-  public class PivotConstraint : AngularRotationConstraint {
+  public class HingeConstraint : AngularRotationConstraint {
 
     [Header("Lever Configuration")]
     [Tooltip("Whether the lever's angular range of motion should extend from its beginning, center, or end.")]

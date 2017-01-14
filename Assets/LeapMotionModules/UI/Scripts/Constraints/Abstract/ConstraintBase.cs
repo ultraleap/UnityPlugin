@@ -1,4 +1,5 @@
-﻿using Leap.Unity.Attributes;
+﻿using Leap.Unity;
+using Leap.Unity.Attributes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,6 +23,8 @@ namespace Leap.UI.Constraints {
   }
 
   [ExecuteInEditMode]
+  [ExecuteAfter(typeof(MinimalBody))]
+  [ExecuteAfter(typeof(SpringBase))]
   /// <summary>
   /// Base class for Constraints, which enforce boundaries on the local-space positions of Transforms.
   /// </summary>

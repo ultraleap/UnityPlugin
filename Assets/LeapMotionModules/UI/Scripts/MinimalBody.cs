@@ -1,10 +1,17 @@
-﻿using UnityEngine;
+﻿using Leap.Unity;
+using UnityEngine;
 
+[ExecuteBefore(typeof(SpringBase))]
 public class MinimalBody : MonoBehaviour {
-  Vector3 prevPosition; Quaternion prevRotation; float prevDeltaTime;
+
+  Vector3 prevPosition;
+  Quaternion prevRotation;
+  float prevDeltaTime;
 
   void Start() {
     prevDeltaTime = 0.001f;
+    prevPosition = transform.position;
+    prevRotation = transform.rotation;
   }
 
   void Update() {
