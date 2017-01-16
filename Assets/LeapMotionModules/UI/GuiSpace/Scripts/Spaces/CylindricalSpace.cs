@@ -22,6 +22,26 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private float _radiusOfConstantWidth = 0.3f;
 
+    public Vector3 localCenter {
+      get {
+        return new Vector3(_xOffset, 0, _zOffset);
+      }
+      set {
+        _xOffset = value.x;
+        _zOffset = value.z;
+        //TODO: update guis
+      }
+    }
+
+    public Vector3 worldCenter {
+      get {
+        return transform.TransformPoint(localCenter);
+      }
+      set {
+        localCenter = transform.InverseTransformPoint(value);
+      }
+    }
+
     public enum CylindricalType {
       ConstantWidth,
       Angular
@@ -67,6 +87,13 @@ namespace Leap.Unity.Gui.Space {
 
     void OnDrawGizmosSelected() {
       Gizmos.matrix = transform.localToWorldMatrix * Matrix4x4.TRS(new Vector3(_xOffset, 0, _zOffset), Quaternion.identity, new Vector3(1, 0, 1));
+      
+      if (_type == CylindricalType.Angular) {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(Vector3.zero, _radiusOfConstantWidth);
+      }
+
+      Gizmos.color = Color.white;
       Gizmos.DrawWireSphere(Vector3.zero, 0.1f);
     }
   }
