@@ -19,6 +19,7 @@
 ExportedObj/
 Temp/
 
+.vscode/
 
 *~
 *.swp

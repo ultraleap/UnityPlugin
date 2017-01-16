@@ -5,12 +5,23 @@
 \******************************************************************************/
 
 using UnityEngine;
-using System.Collections;
-using Leap;
 
 namespace Leap.Unity {
 
   public static class Utils {
+    
+    /// <summary>
+    /// Similar to Unity's Transform.LookAt(), but resolves the forward vector of this
+    /// Transform to point away from the argument Transform.
+    /// 
+    /// Useful for billboarding Quads and UI elements whose forward vectors should match
+    /// rather than oppose the Main Camera.
+    /// </summary>
+    public static void LookAwayFrom(this Transform thisTransform, Transform transform) {
+      thisTransform.rotation = Quaternion.LookRotation(thisTransform.position - transform.position, Vector3.up);
+    }
+
+#region Physics Utils
 
     public static void IgnoreCollisions(GameObject first, GameObject second, bool ignore = true) {
       if (first == null || second == null)
@@ -29,7 +40,10 @@ namespace Leap.Unity {
       }
     }
 
-    /* Visual debugging utilities */
+  #endregion
+
+#region Gizmo Utils
+
     public static void DrawCircle(Vector3 center, 
                            Vector3 normal, 
                            float radius, 
@@ -82,5 +96,8 @@ namespace Leap.Unity {
       }
     }
 
+#endregion
+
   }
+
 }
