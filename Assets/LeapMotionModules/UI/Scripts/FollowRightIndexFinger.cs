@@ -3,6 +3,7 @@ using Leap.Unity;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.InternalExtensionAPI;
 
 public class FollowRightIndexFinger : MonoBehaviour {
 

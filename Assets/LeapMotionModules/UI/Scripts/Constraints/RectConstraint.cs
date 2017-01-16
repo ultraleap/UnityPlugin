@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.InternalExtensionAPI;
 
 namespace Leap.UI.Constraints {
 

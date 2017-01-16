@@ -25,7 +25,7 @@ namespace Leap.UI.Constraints {
       Vector3 zeroToLocalPosition = localPosition - PositionAtZero;
       Vector3 zeroToOne = PositionAtOne - PositionAtZero;
       float unclampedProgress = Vector3.Dot(zeroToLocalPosition, zeroToOne) / zeroToOne.sqrMagnitude;
-      return unclampedProgress.Clamp01();
+      return Mathf.Clamp01(unclampedProgress);
     }
 
     public override float GetConstraintProjection() {
