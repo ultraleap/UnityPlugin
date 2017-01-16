@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 
-public static class ValueMappingExtensions {
+namespace Leap.InternalExtensionAPI {
+
+  public static class ValueMappingExtensions {
 
   /// <summary>
   /// Maps the value between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
@@ -55,5 +57,7 @@ public static class ValueMappingExtensions {
   public static Vector2 CompDiv(this Vector2 A, Vector2 B) {
     return new Vector2(A.x / B.x, A.y / B.y);
   }
+
+}
 
 }

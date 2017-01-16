@@ -1,5 +1,5 @@
 ﻿
-namespace Leap.Unity {
+namespace Leap.InternalExtensionAPI {
 
   public static class FingerType {
 

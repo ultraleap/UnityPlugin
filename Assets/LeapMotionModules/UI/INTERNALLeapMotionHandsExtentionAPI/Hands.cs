@@ -3,7 +3,7 @@ using Leap.Unity;
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace Leap.Unity {
+namespace Leap.InternalExtensionAPI {
 
   public static class Hands {
 

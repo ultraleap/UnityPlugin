@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Leap.Unity {
+namespace Leap.InternalExtensionAPI {
 
   public static class Util {
 
