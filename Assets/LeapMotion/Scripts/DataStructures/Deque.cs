@@ -3,12 +3,12 @@ using UnityEngine;
 
 namespace Leap.Unity.Graphing {
 
-  public class RingBuffer<T> {
+  public class Deque<T> {
     private T[] _array;
     private uint _front, _count;
     private uint _indexMask;
 
-    public RingBuffer(int minCapacity = 8) {
+    public Deque(int minCapacity = 8) {
       if (minCapacity <= 0) {
         throw new ArgumentException("Capacity must be positive and nonzero.");
       }
