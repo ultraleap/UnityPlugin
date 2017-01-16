@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Leap.Unity.Attributes;
@@ -42,9 +43,34 @@ namespace Leap.Unity.Gui.Space {
       }
     }
 
-    public enum CylindricalType {
-      ConstantWidth,
-      Angular
+    protected override int SelectionIndexForAllVariant {
+      get {
+        switch (_type) {
+          case CylindricalType.ConstantWidth:
+            return 1;
+          case CylindricalType.Angular:
+            return 2;
+          default:
+            throw new InvalidOperationException("Unexpected type " + _type);
+        }
+      }
+    }
+
+    protected override string ShaderVariantName {
+      get {
+        switch (_type) {
+          case CylindricalType.ConstantWidth:
+            return FEATURE_CYLINDRICAL_CONST_WIDTH;
+          case CylindricalType.Angular:
+            return FEATURE_CYLINDRICAL_ANGULAR;
+          default:
+            throw new InvalidOperationException("Unexpected type " + _type);
+        }
+      }
+    }
+
+    protected override void UpdatePropertyBlock(MaterialPropertyBlock block) {
+      //TODO
     }
 
     public override Vector3 FromRect(Vector3 rectPos) {
@@ -87,7 +113,7 @@ namespace Leap.Unity.Gui.Space {
 
     void OnDrawGizmosSelected() {
       Gizmos.matrix = transform.localToWorldMatrix * Matrix4x4.TRS(new Vector3(_xOffset, 0, _zOffset), Quaternion.identity, new Vector3(1, 0, 1));
-      
+
       if (_type == CylindricalType.Angular) {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(Vector3.zero, _radiusOfConstantWidth);
@@ -95,6 +121,11 @@ namespace Leap.Unity.Gui.Space {
 
       Gizmos.color = Color.white;
       Gizmos.DrawWireSphere(Vector3.zero, 0.1f);
+    }
+
+    public enum CylindricalType {
+      ConstantWidth,
+      Angular
     }
   }
 }
