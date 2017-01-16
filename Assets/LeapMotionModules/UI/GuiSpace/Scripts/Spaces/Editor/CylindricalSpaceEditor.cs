@@ -33,8 +33,8 @@ namespace Leap.Unity.Gui.Space {
                                             Vector3.forward,
                                             0.1f * HandleUtility.GetHandleSize(_space.worldCenter),
                                             Handles.DotCap,
-                                            0.05f,
-                                            true);
+                                            snap: 0.05f,
+                                            drawHelper: false);
     }
   }
 }

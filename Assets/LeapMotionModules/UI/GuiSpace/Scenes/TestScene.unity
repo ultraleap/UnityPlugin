@@ -119,7 +119,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _xOffset: 0
-  _zOffset: 0
+  _zOffset: -0.1
   _type: 0
   _radiusOfConstantWidth: 0.3
 --- !u!4 &794991849
