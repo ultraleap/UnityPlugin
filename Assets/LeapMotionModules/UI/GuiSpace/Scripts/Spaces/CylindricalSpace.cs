@@ -121,7 +121,7 @@ namespace Leap.Unity.Gui.Space {
     }
 
     protected override Matrix4x4 GetGuiSpace() {
-      return transform.worldToLocalMatrix * Matrix4x4.TRS(-worldCenter, Quaternion.identity, Vector3.one);
+      return Matrix4x4.TRS(-localCenter, Quaternion.identity, Vector3.one) * transform.worldToLocalMatrix;
     }
 
     protected override void OnValidate() {
