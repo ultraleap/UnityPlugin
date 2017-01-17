@@ -1,7 +1,4 @@
 ﻿using Leap.Unity;
-using Leap.Unity.Attributes;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.UI.Constraints {

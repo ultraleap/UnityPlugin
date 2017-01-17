@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using Leap.Unity;
 
+[ExecuteBefore(typeof(MinimalBody))]
 public class BoxDepenetrator : MonoBehaviour {
 
   public SphereCollider sphere;
@@ -16,12 +16,14 @@ public class BoxDepenetrator : MonoBehaviour {
   
   private DepenetrationRay _depenetrationRay;
   private bool _requiresDepenetrationThisFrame = false;
+  private MinimalBody body;
 
   void Start() {
     if (box == null) box = GetComponent<BoxCollider>();
     if (box == null) {
       Debug.LogError("No box found. Please attach the desired box collider (should be in this or a child).");
     }
+    body = GetComponent<MinimalBody>();
   }
 
   void Update() {
@@ -35,8 +37,15 @@ public class BoxDepenetrator : MonoBehaviour {
       _depenetrationRay.position    = nearestBoxPoint;
       _depenetrationRay.direction   = boxPointToSphereCenter + ((sphereCenterInsideBox ? 1F : -1F) * boxPointToSphereCenter.normalized) * (sphere.radius * sphere.transform.localScale.x);
 
-      //box.transform.position += _depenetrationRay.direction;
-      Constraints.ConstrainToPoint(transform, _depenetrationRay.position, _depenetrationRay.position + _depenetrationRay.direction, 0.1f);
+      //How Hard the depenetration is
+      float hardness = 0.1f;
+      if (body) {
+        if(!body.lockRotation) {
+          Constraints.ConstrainToPoint(transform, _depenetrationRay.position, _depenetrationRay.position + _depenetrationRay.direction, hardness);
+        }else if (body.lockRotation && !body.lockPosition) {
+          transform.position += _depenetrationRay.direction * hardness;
+        }
+      }
     }
   }
 
