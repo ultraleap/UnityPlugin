@@ -62,40 +62,9 @@ namespace Leap.UI.Constraints {
       }
     }
 
-    private float ComponentOf(Vector3 vector, Axis axis) {
-      switch (axis) {
-        case Axis.X:
-          return (vector.y == 180F && vector.z == 180F ? 180F : 0F) - vector.x * (vector.y == 180F && vector.z == 180F ? 1 : -1F);
-        case Axis.Y:
-          return vector.y;
-        case Axis.Z:
-        default:
-          return vector.z;
-      }
-    }
-
     public override void EnforceConstraint() {
       this.transform.localPosition = constraintLocalPosition;
       this.transform.localRotation = constraintLocalRotation * EvaluateRotationAlongConstraint(GetConstraintProjectionAngle());
-    }
-
-    public Vector3 LocalCenter {
-      get { return constraintLocalPosition; }
-    }
-
-    public float LocalRotationAngle {
-      get {
-        Quaternion undoConstraintBasis = Quaternion.Inverse(constraintLocalRotation);
-        switch (hingeAxis) {
-          case Axis.X:
-            return (undoConstraintBasis * this.transform.localRotation).eulerAngles.x;
-          case Axis.Y:
-            return (undoConstraintBasis * this.transform.localRotation).eulerAngles.y;
-          case Axis.Z:
-          default:
-            return (undoConstraintBasis * this.transform.localRotation).eulerAngles.z;
-        }
-      }
     }
 
     public Vector3 ProjectionDirection {
@@ -112,7 +81,7 @@ namespace Leap.UI.Constraints {
       }
     }
 
-    public float MinAngle {
+    private float MinAngle {
       get {
         switch (hingeAnchor) {
           case Anchor.Beginning: {
@@ -129,7 +98,7 @@ namespace Leap.UI.Constraints {
       }
     }
 
-    public float MaxAngle {
+    private float MaxAngle {
       get {
         switch (hingeAnchor) {
           case Anchor.Beginning: {
