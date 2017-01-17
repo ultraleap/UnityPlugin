@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311947, g: 0.38074005, b: 0.35872722, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -3084,8 +3084,8 @@ MonoBehaviour:
   constraintLocalRotation: {x: -0.13584529, y: 0, z: 0, w: 0.99073005}
   constraintLocalEulerRot: {x: 344.385, y: 0, z: 0}
   _angleAlongConstraint: -0
-  leverAnchor: 0
-  leverAxis: 0
+  hingeAnchor: 1
+  hingeAxis: 0
   angularWidth: 29.99
 --- !u!114 &1658908509
 MonoBehaviour:
@@ -3170,9 +3170,9 @@ MonoBehaviour:
   constraintLocalPosition: {x: 0, y: -0.0024, z: 0.0083}
   constraintLocalRotation: {x: 0.39883286, y: 0, z: 0, w: 0.9170237}
   constraintLocalEulerRot: {x: 47.01048, y: 0, z: 0}
-  _angleAlongConstraint: 0
-  leverAnchor: 2
-  leverAxis: 0
+  _angleAlongConstraint: -0
+  hingeAnchor: 1
+  hingeAxis: 0
   angularWidth: 90
 --- !u!114 &1703260326
 MonoBehaviour:
@@ -3372,7 +3372,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4000011246058586, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.y
-      value: 0.3575552
+      value: 0.35755524
       objectReference: {fileID: 0}
     - target: {fileID: 4000011246058586, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.z
@@ -3380,7 +3380,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4000011246058586, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.w
-      value: -0.76508355
+      value: -0.7650837
       objectReference: {fileID: 0}
     - target: {fileID: 4000012644673856, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.x
@@ -3486,15 +3486,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4000013339564706, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.x
-      value: -0.000000059604645
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4000013339564706, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.y
-      value: 0.000000029802322
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4000013339564706, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.z
-      value: 0.000000014901161
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 4000013339564706, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.w
@@ -4010,6 +4010,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1945507552}
+  - component: {fileID: 1945507553}
   m_Layer: 0
   m_Name: Joystick
   m_TagString: Untagged
@@ -4031,7 +4032,27 @@ Transform:
   - {fileID: 518945880}
   m_Father: {fileID: 1173329514}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -29.169, z: 0}
+--- !u!114 &1945507553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1945507551}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7887e61f7eab4004ab08bb095db17ccf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debugConstraint: 0
+  constraintLocalPosition: {x: 0.1116, y: 0.10741056, z: -0.001294177}
+  constraintLocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  constraintLocalEulerRot: {x: -0, y: 0, z: 0}
+  _theta: 0
+  _phi: 0
+  _twist: 0
+  jointAxis: 2
+  coneAngularWidth: 120
 --- !u!1 &1968710318
 GameObject:
   m_ObjectHideFlags: 0

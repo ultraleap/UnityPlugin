@@ -1,7 +1,4 @@
-﻿using Leap.UI.Constraints;
-using Leap.Unity.Attributes;
-using System.Collections;
-using System.Collections.Generic;
+﻿using Leap.Unity.Attributes;
 using UnityEngine;
 
 namespace Leap.UI.Constraints {
@@ -9,18 +6,18 @@ namespace Leap.UI.Constraints {
   public class HingeConstraint : AngularRotationConstraint {
 
     [Header("Lever Configuration")]
-    [Tooltip("Whether the lever's angular range of motion should extend from its beginning, center, or end.")]
-    public Anchor leverAnchor = Anchor.Center;
-    [Tooltip("The local-space axis around which the lever allows rotation.")]
-    public Axis leverAxis = Axis.X;
-    [Tooltip("The total angular width the lever is allowed to rotate.")]
+    [Tooltip("Whether the hinge's angular range of motion should extend from its beginning, center, or end.")]
+    public Anchor hingeAnchor = Anchor.Center;
+    [Tooltip("The local-space axis around which the hinge allows rotation.")]
+    public Axis hingeAxis = Axis.X;
+    [Tooltip("The total angular width the hinge is allowed to rotate.")]
     [MinValue(0F)]
     [MaxValue(360F)]
     public float angularWidth = 60F;
 
     public override Quaternion EvaluateRotationAlongConstraint(float angleAlongConstraint) {
-      float axisSign = leverAnchor == Anchor.End ? -1 : 1;
-      return Quaternion.AngleAxis(angleAlongConstraint, axisSign * (leverAxis.ToUnitVector3()));
+      float axisSign = hingeAnchor == Anchor.End ? -1 : 1;
+      return Quaternion.AngleAxis(angleAlongConstraint, axisSign * (hingeAxis.ToUnitVector3()));
     }
 
     public override float GetConstraintProjectionAngle() {
@@ -28,7 +25,7 @@ namespace Leap.UI.Constraints {
       transform.localRotation = Quaternion.Lerp(transform.localRotation, this.transform.localRotation, 1F);
 
       // Find angle by projection and trig.
-      Vector3 localLeverAxis = constraintLocalRotation * leverAxis.ToUnitVector3();
+      Vector3 localLeverAxis = constraintLocalRotation * hingeAxis.ToUnitVector3();
       Vector3 localProjection = Vector3.ProjectOnPlane(transform.localRotation * ProjectionDirection, localLeverAxis).normalized;
       if (localProjection.magnitude < 0.0001F) {
         return 0F;
@@ -43,12 +40,12 @@ namespace Leap.UI.Constraints {
           // negative angle
           angle = -angle;
         }
-        if (leverAnchor == Anchor.Beginning) {
+        if (hingeAnchor == Anchor.Beginning) {
           float cutoffAngle = (MinAngle + (MaxAngle - 360F)) / 2F;
           if (angle < cutoffAngle) angle += 360F;
           return Mathf.Clamp(angle, MinAngle, MaxAngle);
         }
-        else if (leverAnchor == Anchor.End) {
+        else if (hingeAnchor == Anchor.End) {
           angle = -angle;
           if (angle < 0F) {
             angle += 360F;
@@ -89,7 +86,7 @@ namespace Leap.UI.Constraints {
     public float LocalRotationAngle {
       get {
         Quaternion undoConstraintBasis = Quaternion.Inverse(constraintLocalRotation);
-        switch (leverAxis) {
+        switch (hingeAxis) {
           case Axis.X:
             return (undoConstraintBasis * this.transform.localRotation).eulerAngles.x;
           case Axis.Y:
@@ -103,7 +100,7 @@ namespace Leap.UI.Constraints {
 
     public Vector3 ProjectionDirection {
       get {
-        switch (leverAxis) {
+        switch (hingeAxis) {
           case Axis.X:
             return Vector3.forward * -1F;
           case Axis.Y:
@@ -117,7 +114,7 @@ namespace Leap.UI.Constraints {
 
     public float MinAngle {
       get {
-        switch (leverAnchor) {
+        switch (hingeAnchor) {
           case Anchor.Beginning: {
               return 0F;
             }
@@ -134,7 +131,7 @@ namespace Leap.UI.Constraints {
 
     public float MaxAngle {
       get {
-        switch (leverAnchor) {
+        switch (hingeAnchor) {
           case Anchor.Beginning: {
               return angularWidth;
             }
