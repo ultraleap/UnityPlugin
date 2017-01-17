@@ -11,6 +11,9 @@ namespace Leap.Unity.Gui.Space {
     public const string FEATURE_CYLINDRICAL_ANGULAR = "GUI_SPACE_CYLINDRICAL_ANGULAR";
     public static string[] ALL_FEATURES = { FEATURE_ALL, FEATURE_CYLINDRICAL_CONST_WIDTH, FEATURE_CYLINDRICAL_ANGULAR };
 
+    public const int GUI_SPACE_LIMIT = 32;
+    private GuiSpace[] _allGuiSpaces = new GuiSpace[GUI_SPACE_LIMIT];
+
     private MaterialPropertyBlock _propertyBlock;
 
     public abstract Vector3 FromRect(Vector3 rectPos);
@@ -79,18 +82,18 @@ namespace Leap.Unity.Gui.Space {
     }
 
     void OnEnable() {
-
+      for (int i = 0; i < GUI_SPACE_LIMIT; i++) {
+        
+      }
     }
 
     void OnDisable() {
 
     }
 
-#if UNITY_EDITOR
-    void Update() {
+    protected virtual void Update() {
 
     }
-#endif
 
     protected abstract string ShaderVariantName { get; }
     protected abstract int SelectionIndexForAllVariant { get; }

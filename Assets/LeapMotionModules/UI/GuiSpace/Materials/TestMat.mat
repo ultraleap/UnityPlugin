@@ -8,7 +8,7 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: TestMat
   m_Shader: {fileID: 4800000, guid: 58a1119dcb2b0194abf2c166908e5e34, type: 3}
-  m_ShaderKeywords: _EMISSION
+  m_ShaderKeywords: GUI_SPACE_ALL _EMISSION
   m_LightmapFlags: 1
   m_CustomRenderQueue: -1
   stringTagMap: {}

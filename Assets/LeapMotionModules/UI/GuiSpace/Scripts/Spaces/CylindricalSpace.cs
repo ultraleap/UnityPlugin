@@ -111,6 +111,10 @@ namespace Leap.Unity.Gui.Space {
       throw new System.NotImplementedException();
     }
 
+    protected override void Update() {
+      base.Update();
+    }
+
     void OnDrawGizmosSelected() {
       Gizmos.matrix = transform.localToWorldMatrix * Matrix4x4.TRS(new Vector3(_xOffset, 0, _zOffset), Quaternion.identity, new Vector3(1, 0, 1));
 
