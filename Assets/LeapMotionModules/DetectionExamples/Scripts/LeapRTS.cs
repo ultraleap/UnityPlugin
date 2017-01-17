@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Leap.Unity {
 
@@ -12,28 +14,6 @@ namespace Leap.Unity {
       None,
       Single,
       Full
-    }
-
-    [SerializeField]
-    private PinchDetector _pinchDetectorA;
-    public PinchDetector PinchDetectorA {
-      get {
-        return _pinchDetectorA;
-      }
-      set {
-        _pinchDetectorA = value;
-      }
-    }
-
-    [SerializeField]
-    private PinchDetector _pinchDetectorB;
-    public PinchDetector PinchDetectorB {
-      get {
-        return _pinchDetectorB;
-      }
-      set {
-        _pinchDetectorB = value;
-      }
     }
 
     [SerializeField]
@@ -57,39 +37,49 @@ namespace Leap.Unity {
     private float _defaultNearClip;
 
     void Start() {
-//      if (_pinchDetectorA == null || _pinchDetectorB == null) {
-//        Debug.LogWarning("Both Pinch Detectors of the LeapRTS component must be assigned. This component has been disabled.");
-//        enabled = false;
-//      }
-
       GameObject pinchControl = new GameObject("RTS Anchor");
       _anchor = pinchControl.transform;
       _anchor.transform.parent = transform.parent;
       transform.parent = _anchor;
     }
 
+    private Hand _lHand;
+    private Hand _rHand;
+    private bool _lHandPinchingLastFrame = false;
+    private bool _rHandPinchingLastFrame = false;
+
     void Update() {
       if (Input.GetKeyDown(_toggleGuiState)) {
         _showGUI = !_showGUI;
       }
 
-      bool didUpdate = false;
-      if(_pinchDetectorA != null)
-        didUpdate |= _pinchDetectorA.DidChangeFromLastFrame;
-      if(_pinchDetectorB != null)
-        didUpdate |= _pinchDetectorB.DidChangeFromLastFrame;
+      _lHand = Hands.Left;
+      _rHand = Hands.Right;
 
+      bool didUpdate = false;
+      bool lHandIsPinching = _lHand != null && _lHand.IsPinching();
+      bool rHandIsPinching = _rHand != null && _rHand.IsPinching();
+      if (lHandIsPinching ^ _lHandPinchingLastFrame) {
+        didUpdate = true;
+      }
+      if (rHandIsPinching ^ _rHandPinchingLastFrame) {
+        didUpdate = true;
+      }
       if (didUpdate) {
         transform.SetParent(null, true);
       }
 
-      if (_pinchDetectorA != null && _pinchDetectorA.IsActive && 
-          _pinchDetectorB != null &&_pinchDetectorB.IsActive) {
-        transformDoubleAnchor();
-      } else if (_pinchDetectorA != null && _pinchDetectorA.IsActive) {
-        transformSingleAnchor(_pinchDetectorA);
-      } else if (_pinchDetectorB != null && _pinchDetectorB.IsActive) {
-        transformSingleAnchor(_pinchDetectorB);
+      _lHandPinchingLastFrame = _lHand != null && _lHand.IsPinching();
+      _rHandPinchingLastFrame = _rHand != null && _rHand.IsPinching();
+
+      if (lHandIsPinching && rHandIsPinching) {
+        transformDoubleAnchor(_lHand, _rHand);
+      }
+      else if (lHandIsPinching) {
+        transformSingleAnchor(_lHand);
+      }
+      else if (rHandIsPinching) {
+        transformSingleAnchor(_rHand);
       }
 
       if (didUpdate) {
@@ -130,46 +120,48 @@ namespace Leap.Unity {
       GUILayout.EndHorizontal();
     }
 
-    private void transformDoubleAnchor() {
-      _anchor.position = (_pinchDetectorA.Position + _pinchDetectorB.Position) / 2.0f;
+    private void transformDoubleAnchor(Hand left, Hand right) {
+      _anchor.position = (left.GetPinchPosition() + right.GetPinchPosition()) / 2.0f;
 
       switch (_twoHandedRotationMethod) {
         case RotationMethod.None:
           break;
         case RotationMethod.Single:
-          Vector3 p = _pinchDetectorA.Position;
+          Vector3 p = left.GetPinchPosition();
           p.y = _anchor.position.y;
           _anchor.LookAt(p);
           break;
         case RotationMethod.Full:
-          Quaternion pp = Quaternion.Lerp(_pinchDetectorA.Rotation, _pinchDetectorB.Rotation, 0.5f);
+          Quaternion pp = Quaternion.Lerp(left.Rotation.ToQuaternion(), right.Rotation.ToQuaternion(), 0.5f);
           Vector3 u = pp * Vector3.up;
-          _anchor.LookAt(_pinchDetectorA.Position, u);
+          _anchor.LookAt(left.GetPinchPosition(), u);
           break;
       }
 
       if (_allowScale) {
-        _anchor.localScale = Vector3.one * Vector3.Distance(_pinchDetectorA.Position, _pinchDetectorB.Position);
+        _anchor.localScale = Vector3.one * Vector3.Distance(left.GetPinchPosition(), right.GetPinchPosition());
       }
     }
 
-    private void transformSingleAnchor(PinchDetector singlePinch) {
-      _anchor.position = singlePinch.Position;
+    private void transformSingleAnchor(Hand hand) {
+      _anchor.position = hand.GetPinchPosition();
 
       switch (_oneHandedRotationMethod) {
         case RotationMethod.None:
           break;
         case RotationMethod.Single:
-          Vector3 p = singlePinch.Rotation * Vector3.right;
+          Vector3 p = hand.Rotation.ToQuaternion() * Vector3.right;
           p.y = _anchor.position.y;
           _anchor.LookAt(p);
           break;
         case RotationMethod.Full:
-          _anchor.rotation = singlePinch.Rotation;
+          _anchor.rotation = hand.Rotation.ToQuaternion();
           break;
       }
 
       _anchor.localScale = Vector3.one;
     }
+
   }
+
 }
