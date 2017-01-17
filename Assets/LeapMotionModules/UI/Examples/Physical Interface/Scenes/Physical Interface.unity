@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311947, g: 0.38074005, b: 0.35872722, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -1012,6 +1012,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lockPosition: 0
   lockRotation: 1
+  linearDamping: 0
+  angularDamping: 0
 --- !u!114 &636692150
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1481,6 +1483,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lockPosition: 0
   lockRotation: 1
+  linearDamping: 0
+  angularDamping: 0
 --- !u!1 &842883296
 GameObject:
   m_ObjectHideFlags: 0
@@ -3088,7 +3092,7 @@ MonoBehaviour:
   constraintLocalRotation: {x: -0.13584529, y: 0, z: 0, w: 0.99073005}
   constraintLocalEulerRot: {x: 344.385, y: 0, z: 0}
   _angleAlongConstraint: -0
-  hingeAnchor: 1
+  hingeAnchor: 0
   hingeAxis: 0
   angularWidth: 29.99
 --- !u!114 &1658908509
@@ -3117,6 +3121,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lockPosition: 1
   lockRotation: 0
+  linearDamping: 0
+  angularDamping: 0
 --- !u!65 &1658908511
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3176,8 +3182,8 @@ MonoBehaviour:
   constraintLocalPosition: {x: 0, y: -0.0024, z: 0.0083}
   constraintLocalRotation: {x: 0.39883286, y: 0, z: 0, w: 0.9170237}
   constraintLocalEulerRot: {x: 47.01048, y: 0, z: 0}
-  _angleAlongConstraint: -0
-  hingeAnchor: 1
+  _angleAlongConstraint: 0
+  hingeAnchor: 2
   hingeAxis: 0
   angularWidth: 90
 --- !u!114 &1703260326
@@ -3206,6 +3212,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lockPosition: 1
   lockRotation: 0
+  linearDamping: 0
+  angularDamping: 0
 --- !u!1 &1846177071
 GameObject:
   m_ObjectHideFlags: 0
@@ -3320,6 +3328,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lockPosition: 0
   lockRotation: 1
+  linearDamping: 0
+  angularDamping: 0
 --- !u!114 &1846177078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3382,7 +3392,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4000011246058586, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.y
-      value: 0.35755524
+      value: 0.3575552
       objectReference: {fileID: 0}
     - target: {fileID: 4000011246058586, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.z
@@ -3390,7 +3400,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4000011246058586, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.w
-      value: -0.7650837
+      value: -0.76508355
       objectReference: {fileID: 0}
     - target: {fileID: 4000012644673856, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.x
@@ -3496,15 +3506,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4000013339564706, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: -0.000000059604645
       objectReference: {fileID: 0}
     - target: {fileID: 4000013339564706, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0.000000029802322
       objectReference: {fileID: 0}
     - target: {fileID: 4000013339564706, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0.000000014901161
       objectReference: {fileID: 0}
     - target: {fileID: 4000013339564706, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalRotation.w
@@ -4189,6 +4199,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lockPosition: 0
   lockRotation: 1
+  linearDamping: 0
+  angularDamping: 0
 --- !u!1 &2049174105
 GameObject:
   m_ObjectHideFlags: 0
