@@ -23,6 +23,7 @@ namespace Leap.Unity.Gui.Space {
 
     public void UpdateRenderer(Renderer renderer) {
 #if UNITY_EDITOR
+      _propertyBlock = _propertyBlock ?? new MaterialPropertyBlock();
       updateRendererEditor(renderer);
 #else
       updateRendererRuntime(renderer);
@@ -52,6 +53,7 @@ namespace Leap.Unity.Gui.Space {
 
     public void ResetRenderer(Renderer renderer) {
 #if UNITY_EDITOR
+      _propertyBlock = _propertyBlock ?? new MaterialPropertyBlock();
       resetRendererEditor(renderer);
 #else
       resetRendererRuntime(renderer);

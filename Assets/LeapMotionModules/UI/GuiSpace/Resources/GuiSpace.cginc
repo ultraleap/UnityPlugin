@@ -20,18 +20,21 @@ uniform int _GuiSpaceSelection;
 
 uniform float4 _GuiSpaceParams; 
 
-float4 applyCylindricalSpaceConstantWidth(float4 vert) {
-
+void applyCylindricalSpaceConstantWidth(inout float4 vert) {
+  float theta = vert.x / vert.z;
+  vert.x = sin(theta) * vert.z;
+  vert.z = cos(theta) * vert.z;
 }
 
-float4 applyCylindricalSpaceAngular(float4 vert) {
+void applyCylindricalSpaceAngular(inout float4 vert) {
 
 }
 
 // Takes an object space vertex and converts it to a clip space vertex
 float4 GuiVertToClipSpace(float4 vert) {
-	float4 worldVert = mul(unity_ObjectToWorld, vert);
+	vert = mul(unity_ObjectToWorld, vert);
 
+  /*
 #ifdef GUI_SPACE_ALL
   if (_GuiSpaceSelection == GUI_SPACE_CYLINDRICAL_CONSTANT_WIDTH) {
     applyCylindricalSpaceConstantWidth(vert);
@@ -43,6 +46,9 @@ float4 GuiVertToClipSpace(float4 vert) {
 #elseifdef GUI_SPACE_CYLINDRICAL_ANGULAR
   applyCylindricalSpaceAngular(vert);
 #endif
+*/
 
-	return mul(UNITY_MATRIX_VP, worldVert);
+  applyCylindricalSpaceConstantWidth(vert);
+
+	return mul(UNITY_MATRIX_VP, vert);
 }

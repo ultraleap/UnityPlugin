@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Gui.Space {
 
+  [ExecuteInEditMode]
   [RequireComponent(typeof(Renderer))]
   public class GuiSpaceModifier : MonoBehaviour {
 
