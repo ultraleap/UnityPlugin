@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.Gui.Space {
 
@@ -10,15 +11,24 @@ namespace Leap.Unity.Gui.Space {
   public class CylindricalSpaceEditor : CustomEditorBase {
 
     private CylindricalSpace _space;
+    private SerializedProperty _typeProperty;
 
     protected override void OnEnable() {
       base.OnEnable();
 
       _space = target as CylindricalSpace;
 
-      SerializedProperty type = serializedObject.FindProperty("_type");
-      Func<bool> isUsingAngularType = () => type.intValue == (int)CylindricalSpace.CylindricalType.Angular;
-      specifyConditionalDrawing(isUsingAngularType, "_radiusOfConstantWidth");
+      _typeProperty = serializedObject.FindProperty("_type");
+      Func<bool> isUsingAngularType = () => _typeProperty.intValue == (int)CylindricalSpace.CylindricalType.Angular;
+      specifyConditionalDrawing(isUsingAngularType, "_offsetOfConstantWidth");
+    }
+
+    public override void OnInspectorGUI() {
+      base.OnInspectorGUI();
+
+      if (_modifiedProperties.Query().Any(p => SerializedProperty.EqualContents(p, _typeProperty))) {
+        _space.UpdateSpace();
+      }
     }
 
     void OnSceneGUI() {
@@ -26,6 +36,7 @@ namespace Leap.Unity.Gui.Space {
         return;
       }
 
+      EditorUtility.SetDirty(_space);
       Undo.RecordObject(_space, "Move Center");
       _space.worldCenter = Handles.Slider2D(_space.worldCenter,
                                             Vector3.up,
@@ -35,6 +46,8 @@ namespace Leap.Unity.Gui.Space {
                                             Handles.DotCap,
                                             snap: 0.05f,
                                             drawHelper: false);
+
+      serializedObject.Update();
     }
   }
 }

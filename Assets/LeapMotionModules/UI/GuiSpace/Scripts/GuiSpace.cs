@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.Gui.Space {
 
@@ -12,9 +13,15 @@ namespace Leap.Unity.Gui.Space {
     public static string[] ALL_FEATURES = { FEATURE_ALL, FEATURE_CYLINDRICAL_CONST_WIDTH, FEATURE_CYLINDRICAL_ANGULAR };
 
     public const int GUI_SPACE_LIMIT = 32;
-    private GuiSpace[] _allGuiSpaces = new GuiSpace[GUI_SPACE_LIMIT];
+    private static GuiSpace[] _allGuiSpaces = new GuiSpace[GUI_SPACE_LIMIT];
 
-    private MaterialPropertyBlock _propertyBlock;
+    private static GuiSpaceMatrixProperty _guiTransforms = new GuiSpaceMatrixProperty("_WorldToGuiSpace", GUI_SPACE_LIMIT);
+    private static GuiSpaceMatrixProperty _guiInverseTransforms = new GuiSpaceMatrixProperty("_GuiToWorldSpace", GUI_SPACE_LIMIT);
+    private static GuiSpaceVectorProperty _guiParams0 = new GuiSpaceVectorProperty("_GuiSpaceParams0", GUI_SPACE_LIMIT);
+
+    private static MaterialPropertyBlock _propertyBlock;
+
+    private int _index;
 
     public abstract Vector3 FromRect(Vector3 rectPos);
 
@@ -23,6 +30,16 @@ namespace Leap.Unity.Gui.Space {
     public abstract void FromRect(Vector3 rectPos, Quaternion rectRot, out Vector3 guiPos, out Quaternion guiRot);
 
     public abstract void ToRect(Vector3 guiPos, Quaternion guiRot, out Vector3 rectPos, out Quaternion rectRot);
+
+    /// <summary>
+    /// Update the entire space and all elements that are inside it.  Use this for large changes that require
+    /// a complete re-traversal.
+    /// </summary>
+    public void UpdateSpace() {
+      foreach (var modifier in GetComponentsInChildren<GuiSpaceModifier>()) {
+        modifier.UpdateSpace();
+      }
+    }
 
     public void UpdateRenderer(Renderer renderer) {
 #if UNITY_EDITOR
@@ -40,6 +57,7 @@ namespace Leap.Unity.Gui.Space {
 
       renderer.GetPropertyBlock(_propertyBlock);
       _propertyBlock.SetFloat("_GuiSpaceSelection", SelectionIndexForAllVariant);
+      _propertyBlock.SetFloat("_GuiSelectionIndex", _index);
       UpdatePropertyBlock(_propertyBlock);
       renderer.SetPropertyBlock(_propertyBlock);
     }
@@ -50,11 +68,12 @@ namespace Leap.Unity.Gui.Space {
       }
 
       renderer.GetPropertyBlock(_propertyBlock);
+      _propertyBlock.SetFloat("_GuiSelectionIndex", _index);
       UpdatePropertyBlock(_propertyBlock);
       renderer.SetPropertyBlock(_propertyBlock);
     }
 
-    public void ResetRenderer(Renderer renderer) {
+    public static void ResetRenderer(Renderer renderer) {
 #if UNITY_EDITOR
       _propertyBlock = _propertyBlock ?? new MaterialPropertyBlock();
       resetRendererEditor(renderer);
@@ -63,13 +82,13 @@ namespace Leap.Unity.Gui.Space {
 #endif
     }
 
-    private void resetRendererEditor(Renderer renderer) {
+    private static void resetRendererEditor(Renderer renderer) {
       renderer.GetPropertyBlock(_propertyBlock);
       _propertyBlock.SetFloat("_GuiSpaceSelection", 0);
       renderer.SetPropertyBlock(_propertyBlock);
     }
 
-    private void resetRendererRuntime(Renderer renderer) {
+    private static void resetRendererRuntime(Renderer renderer) {
       foreach (var material in renderer.sharedMaterials) {
         foreach (var feature in ALL_FEATURES) {
           material.DisableKeyword(feature);
@@ -77,26 +96,65 @@ namespace Leap.Unity.Gui.Space {
       }
     }
 
-    void Awake() {
-      _propertyBlock = new MaterialPropertyBlock();
-    }
+    protected virtual void OnValidate() { }
 
-    void OnEnable() {
-      for (int i = 0; i < GUI_SPACE_LIMIT; i++) {
-        
+    void Awake() {
+      if (_propertyBlock == null) {
+        _propertyBlock = new MaterialPropertyBlock();
       }
     }
 
-    void OnDisable() {
+    void OnEnable() {
+      _index = -1;
+      for (int i = 0; i < GUI_SPACE_LIMIT; i++) {
+        if (_allGuiSpaces[i] == null) {
+          _index = i;
+          break;
+        }
+      }
 
+      if (_index == -1) {
+        Debug.LogError("Tried to create more gui spaces than the maximum amount!");
+        enabled = false;
+        return;
+      }
+
+      _allGuiSpaces[_index] = this;
+
+      UpdateSpace();
+    }
+
+    void OnDisable() {
+      _allGuiSpaces[_index] = null;
+      _index = -1;
+
+      UpdateSpace();
     }
 
     protected virtual void Update() {
 
     }
 
+    protected virtual void LateUpdate() {
+      var guiSpace = GetGuiSpace();
+
+      _guiTransforms[_index] = guiSpace;
+      _guiInverseTransforms[_index] = guiSpace.inverse;
+
+      //TODO: this might upload more than once per frame, how to fix?
+      _guiTransforms.UploadIfDirty();
+      _guiInverseTransforms.UploadIfDirty();
+      _guiParams0.UploadIfDirty();
+    }
+
+    protected void SetGenericGuiParams(Vector4 genericParams) {
+      if (_index == -1) return;
+      _guiParams0[_index] = genericParams;
+    }
+
     protected abstract string ShaderVariantName { get; }
     protected abstract int SelectionIndexForAllVariant { get; }
     protected abstract void UpdatePropertyBlock(MaterialPropertyBlock block);
+    protected abstract Matrix4x4 GetGuiSpace();
   }
 }

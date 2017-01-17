@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.Gui.Space {
 
@@ -12,17 +13,25 @@ namespace Leap.Unity.Gui.Space {
     private Renderer _renderer;
 
     void OnEnable() {
-      if (_parentSpace == null) {
-        _parentSpace = GetComponentInParent<GuiSpace>();
-      }
-
-      _renderer = GetComponent<Renderer>();
-
-      _parentSpace.UpdateRenderer(_renderer);
+      UpdateSpace();
     }
 
     void OnDisable() {
-      _parentSpace.ResetRenderer(_renderer);
+      GuiSpace.ResetRenderer(_renderer);
+    }
+
+    private static List<GuiSpace> _spaces = new List<GuiSpace>();
+    public void UpdateSpace() {
+      GetComponentsInParent<GuiSpace>(true, _spaces);
+      _parentSpace = _spaces.Query().FirstOrDefault(s => s.enabled);
+
+      _renderer = GetComponent<Renderer>();
+
+      if (_parentSpace != null && _parentSpace.enabled && enabled) {
+        _parentSpace.UpdateRenderer(_renderer);
+      } else {
+        GuiSpace.ResetRenderer(_renderer);
+      }
     }
 
     public void SetParent(Transform parent) {

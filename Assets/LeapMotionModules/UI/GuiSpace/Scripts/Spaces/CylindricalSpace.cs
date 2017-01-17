@@ -7,7 +7,6 @@ using Leap.Unity.Attributes;
 namespace Leap.Unity.Gui.Space {
 
   public class CylindricalSpace : GuiSpace {
-
     [SerializeField]
     private float _xOffset;
 
@@ -19,9 +18,8 @@ namespace Leap.Unity.Gui.Space {
 
     [Tooltip("When a gui element is this distance from the center of the space, it will have the same width " +
              "inside of the rect space and the gui space.")]
-    [MinValue(0)]
     [SerializeField]
-    private float _radiusOfConstantWidth = 0.3f;
+    private float _offsetOfConstantWidth = 0.3f;
 
     public Vector3 localCenter {
       get {
@@ -40,6 +38,17 @@ namespace Leap.Unity.Gui.Space {
       }
       set {
         localCenter = transform.InverseTransformPoint(value);
+        SetGenericGuiParams(new Vector4(_offsetOfConstantWidth - _zOffset, 0, 0, 0));
+      }
+    }
+
+    public float RadiusOfConstantWidth {
+      get {
+        return _offsetOfConstantWidth;
+      }
+      set {
+        _offsetOfConstantWidth = value;
+        SetGenericGuiParams(new Vector4(_offsetOfConstantWidth - _zOffset, 0, 0, 0));
       }
     }
 
@@ -79,7 +88,7 @@ namespace Leap.Unity.Gui.Space {
       if (_type == CylindricalType.ConstantWidth) {
         radius = rectPos.z;
       } else {
-        radius = _radiusOfConstantWidth;
+        radius = _offsetOfConstantWidth;
       }
 
       float theta = rectPos.x / radius;
@@ -95,7 +104,7 @@ namespace Leap.Unity.Gui.Space {
       if (_type == CylindricalType.ConstantWidth) {
         radius = guiPos.z;
       } else {
-        radius = _radiusOfConstantWidth;
+        radius = _offsetOfConstantWidth;
       }
 
       float x = Mathf.Atan2(guiPos.x, guiPos.z) * radius;
@@ -111,6 +120,15 @@ namespace Leap.Unity.Gui.Space {
       throw new System.NotImplementedException();
     }
 
+    protected override Matrix4x4 GetGuiSpace() {
+      return transform.worldToLocalMatrix * Matrix4x4.TRS(-worldCenter, Quaternion.identity, Vector3.one);
+    }
+
+    protected override void OnValidate() {
+      base.OnValidate();
+      SetGenericGuiParams(new Vector4(_offsetOfConstantWidth - _zOffset, 0, 0, 0));
+    }
+
     protected override void Update() {
       base.Update();
     }
@@ -120,7 +138,7 @@ namespace Leap.Unity.Gui.Space {
 
       if (_type == CylindricalType.Angular) {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(Vector3.zero, _radiusOfConstantWidth);
+        Gizmos.DrawWireSphere(Vector3.zero, _offsetOfConstantWidth - _zOffset);
       }
 
       Gizmos.color = Color.white;

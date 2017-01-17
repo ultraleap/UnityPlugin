@@ -7,6 +7,7 @@
 
     Pass {
       CGPROGRAM
+      #pragma multi_compile _ GUI_SPACE_ALL GUI_SPACE_CYLINDRICAL_CONSTANT_WIDTH GUI_SPACE_CYLINDRICAL_ANGULAR
       #pragma vertex vert
       #pragma fragment frag
       #include "Assets/LeapMotionModules/UI/GuiSpace/Resources/GUiSpace.cginc"
