@@ -682,14 +682,11 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void updateInteractionStateChanges(Frame frame) {
-      /*
       var hands = frame.Hands;
 
       //First loop through all the hands and get their classifications from the engine
       for (int i = 0; i < hands.Count; i++) {
         Hand hand = hands[i];
-
-        bool handResultForced = false;
 
         //Get the InteractionHand associated with this hand id
         InteractionHand interactionHand;
@@ -712,6 +709,7 @@ namespace Leap.Unity.Interaction {
             //Remove the old id from the mapping
             _idToInteractionHand.Remove(untrackedInteractionHand.hand.Id);
             _idToInteractionHand[hand.Id] = interactionHand;
+            interactionHand.hand.Id = hand.Id;
 
             try {
               //This also dispatched InteractionObject.OnHandRegainedTracking()
@@ -730,14 +728,7 @@ namespace Leap.Unity.Interaction {
             }
 
             //Override the existing classification to force the hand to grab the old object
-            handResultForced = true;
-            handResult.classification = ManipulatorMode.Grasp;
-            handResult.handFlags = HandResultFlags.ManipulatorMode;
-            handResult.instanceHandle = interactionHand.graspedObject.ShapeInstanceHandle;
-
-            if (_graspingEnabled) {
-              InteractionC.OverrideHandResult(ref _scene, (uint)hand.Id, ref handResult);
-            }
+            //HANDLE THIS IF NECESSARY?
           } else {
             //Otherwise just create a new one
             interactionHand = new InteractionHand(hand);
@@ -745,106 +736,50 @@ namespace Leap.Unity.Interaction {
           }
         }
 
-        if (!handResultForced) {
-          handResult = getHandResults(interactionHand);
-        }
-
         interactionHand.UpdateHand(hand);
 
-        if (!interactionHand.isUserGrasp) {
-          switch (handResult.classification) {
-            case ManipulatorMode.Grasp:
-              {
-                IInteractionBehaviour interactionBehaviour;
-                if (_instanceHandleToBehaviour.TryGetValue(handResult.instanceHandle, out interactionBehaviour)) {
-                  if (interactionHand.graspedObject == null) {
-                    if (!interactionBehaviour.IsBeingGrasped) {
-                      _graspedBehaviours.Add(interactionBehaviour);
-                    }
+        //Loop through all ieHands to check for timeouts and loss of tracking
+        for (var it = _idToInteractionHand.GetEnumerator(); it.MoveNext();) {
+          var pair = it.Current;
+          var id = pair.Key;
+          var ieHand = pair.Value;
 
-                    try {
-                      interactionHand.GraspObject(interactionBehaviour, isUserGrasp: false);
-
-                      //the grasp callback might have caused the object to become ungrasped
-                      //the component might have also destroyed itself!
-                      if (interactionHand.graspedObject == interactionBehaviour && interactionBehaviour != null) {
-                        dispatchOnHandsHolding(hands, interactionBehaviour, isPhysics: true);
-                      }
-                    } catch (Exception e) {
-                      _activityManager.NotifyMisbehaving(interactionBehaviour);
-                      Debug.LogException(e);
-                      continue;
-                    }
-                  }
-                } else {
-                  Debug.LogError("Recieved a hand result with an unkown handle " + handResult.instanceHandle.handle);
-                }
-                break;
-              }
-            case ManipulatorMode.Contact:
-              {
-                if (interactionHand.graspedObject != null) {
-                  if (interactionHand.graspedObject.GraspingHandCount == 1) {
-                    _graspedBehaviours.Remove(interactionHand.graspedObject);
-                  }
-
-                  try {
-                    interactionHand.ReleaseObject();
-                  } catch (Exception e) {
-                    _activityManager.NotifyMisbehaving(interactionHand.graspedObject);
-                    Debug.LogException(e);
-                    continue;
-                  }
-                }
-                break;
-              }
-            default:
-              throw new InvalidOperationException("Unexpected classification " + handResult.classification);
-          }
-        }
-      }
-
-      //Loop through all ieHands to check for timeouts and loss of tracking
-      for (var it = _idToInteractionHand.GetEnumerator(); it.MoveNext();) {
-        var pair = it.Current;
-        var id = pair.Key;
-        var ieHand = pair.Value;
-
-        float handAge = Time.unscaledTime - ieHand.lastTimeUpdated;
-        //Check to see if the hand is at least 1 frame old
-        //We assume it has become untracked if this is the case
-        if (handAge > 0) {
-          //If the hand isn't grasping anything, just remove it
-          if (ieHand.graspedObject == null) {
-            _handIdsToRemove.Add(id);
-            continue;
-          }
-
-          //If is isn't already marked as untracked, mark it as untracked
-          if (!ieHand.isUntracked) {
-            try {
-              //This also dispatches InteractionObject.OnHandLostTracking()
-              ieHand.MarkUntracked();
-            } catch (Exception e) {
-              _activityManager.NotifyMisbehaving(ieHand.graspedObject);
-              Debug.LogException(e);
+          float handAge = Time.unscaledTime - ieHand.lastTimeUpdated;
+          //Check to see if the hand is at least 1 frame old
+          //We assume it has become untracked if this is the case
+          if (handAge > 0) {
+            //If the hand isn't grasping anything, just remove it
+            if (ieHand.graspedObject == null) {
+              _handIdsToRemove.Add(id);
+              continue;
             }
-          }
 
-          //If the age is longer than the timeout, we also remove it from the list
-          if (handAge >= ieHand.maxSuspensionTime) {
-            _handIdsToRemove.Add(id);
-
-            try {
-              if (ieHand.graspedObject.GraspingHandCount == 1) {
-                _graspedBehaviours.Remove(ieHand.graspedObject);
+            //If is isn't already marked as untracked, mark it as untracked
+            if (!ieHand.isUntracked) {
+              try {
+                //This also dispatches InteractionObject.OnHandLostTracking()
+                ieHand.MarkUntracked();
+              } catch (Exception e) {
+                _activityManager.NotifyMisbehaving(ieHand.graspedObject);
+                Debug.LogException(e);
               }
+            }
 
-              //This also dispatched InteractionObject.OnHandTimeout()
-              ieHand.MarkTimeout();
-            } catch (Exception e) {
-              _activityManager.NotifyMisbehaving(ieHand.graspedObject);
-              Debug.LogException(e);
+            //If the age is longer than the timeout, we also remove it from the list
+            if (handAge >= ieHand.maxSuspensionTime) {
+              _handIdsToRemove.Add(id);
+
+              try {
+                if (ieHand.graspedObject.GraspingHandCount == 1) {
+                  _graspedBehaviours.Remove(ieHand.graspedObject);
+                }
+
+                //This also dispatched InteractionObject.OnHandTimeout()
+                ieHand.MarkTimeout();
+              } catch (Exception e) {
+                _activityManager.NotifyMisbehaving(ieHand.graspedObject);
+                Debug.LogException(e);
+              }
             }
           }
         }
@@ -855,7 +790,6 @@ namespace Leap.Unity.Interaction {
         _idToInteractionHand.Remove(_handIdsToRemove[i]);
       }
       _handIdsToRemove.Clear();
-      */
     }
 
     //A persistant structure for storing useful data about a hand as it interacts with objects
