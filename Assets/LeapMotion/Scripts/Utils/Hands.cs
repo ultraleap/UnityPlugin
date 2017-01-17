@@ -68,7 +68,8 @@ namespace Leap.Unity {
     public static Hand Left {
       get {
         if (Provider == null) return null;
-        else return Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand => hand.IsLeft);
+        if (Provider.CurrentFrame == null) return null;
+        return Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand => hand.IsLeft);
       }
     }
 
@@ -77,6 +78,7 @@ namespace Leap.Unity {
     public static Hand Right {
       get {
         if (Provider == null) return null;
+        if (Provider.CurrentFrame == null) return null;
         else return Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand => hand.IsRight);
       }
     }
@@ -114,10 +116,10 @@ namespace Leap.Unity {
     /// The direction away from the thumb would be called the ulnar axis. </summary>
     public static Vector3 RadialAxis(this Hand hand) {
       if (hand.IsRight) {
-        return hand.Basis.xBasis.ToVector3();
+        return -hand.Basis.xBasis.ToVector3();
       }
       else {
-        return -hand.Basis.xBasis.ToVector3();
+        return hand.Basis.xBasis.ToVector3();
       }
     }
 
@@ -159,7 +161,7 @@ namespace Leap.Unity {
             + Vector3.Dot(hand.Fingers[2].Direction.ToVector3(), -hand.DistalAxis() )
             + Vector3.Dot(hand.Fingers[3].Direction.ToVector3(), -hand.DistalAxis() )
             + Vector3.Dot(hand.Fingers[4].Direction.ToVector3(), -hand.DistalAxis() )
-            + Vector3.Dot(hand.Fingers[0].Direction.ToVector3(),  hand.RadialAxis() )
+            + Vector3.Dot(hand.Fingers[0].Direction.ToVector3(), -hand.RadialAxis() )
             ).Map(-5, 5, 0, 1);
     }
 
