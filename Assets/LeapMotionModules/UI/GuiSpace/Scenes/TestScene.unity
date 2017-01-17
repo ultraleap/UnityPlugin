@@ -213,7 +213,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _xOffset: 0
   _zOffset: -0.19
-  _type: 1
+  _type: 0
   _offsetOfConstantWidth: 0
 --- !u!4 &794991849
 Transform:
