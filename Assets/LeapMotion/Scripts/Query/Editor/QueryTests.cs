@@ -92,5 +92,11 @@ namespace Leap.Unity.Query.Test {
       Assert.AreEqual(LIST_0.FirstOrDefault(i => i > 10),
                       LIST_0.Query().FirstOrDefault(i => i > 10));
     }
+
+    [Test]
+    public void IndexOfTests() {
+      Assert.AreEqual(LIST_0.Query().IndexOf(3), 2);
+      Assert.AreEqual(LIST_0.Query().IndexOf(100), -1);
+    }
   }
 }
