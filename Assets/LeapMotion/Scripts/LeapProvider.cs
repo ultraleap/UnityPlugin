@@ -28,8 +28,6 @@ namespace Leap.Unity {
     /// </summary>
     public abstract Frame CurrentFixedFrame { get; }
 
-    public abstract Image CurrentImage { get; }
-
     protected void DispatchUpdateFrameEvent(Frame frame) {
       if (OnUpdateFrame != null) {
         OnUpdateFrame(frame);
