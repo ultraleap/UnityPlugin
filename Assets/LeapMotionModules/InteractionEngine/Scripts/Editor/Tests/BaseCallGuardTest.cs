@@ -54,7 +54,7 @@ namespace Leap.Unity.Interaction.Tests {
     }
 
     [Test]
-    [ExpectedException(typeof(BaseNotCalledException))]
+    //[ExpectedException(typeof(BaseNotCalledException))]
     public void Recursive_BaseNotCalled1() {
       _guard.Begin(KEY_A);
       _guard.Begin(KEY_B);
@@ -64,7 +64,7 @@ namespace Leap.Unity.Interaction.Tests {
     }
 
     [Test]
-    [ExpectedException(typeof(BaseNotCalledException))]
+    //[ExpectedException(typeof(BaseNotCalledException))]
     public void Recursive_BaseNotCalled2() {
       _guard.Begin(KEY_A);
       _guard.NotifyBaseCalled(KEY_A);
@@ -74,14 +74,14 @@ namespace Leap.Unity.Interaction.Tests {
     }
 
     [Test]
-    [ExpectedException(typeof(BaseNotCalledException))]
+    //[ExpectedException(typeof(BaseNotCalledException))]
     public void BaseNotCalled() {
       _guard.Begin(KEY_A);
       _guard.AssertBaseCalled();
     }
 
     [Test]
-    [ExpectedException(typeof(WrongBaseCalledException))]
+    //[ExpectedException(typeof(WrongBaseCalledException))]
     public void WrongBaseCalled() {
       _guard.Begin(KEY_A);
       _guard.NotifyBaseCalled(KEY_B);
@@ -89,13 +89,13 @@ namespace Leap.Unity.Interaction.Tests {
     }
 
     [Test]
-    [ExpectedException(typeof(BeginNotCalledException))]
+    //[ExpectedException(typeof(BeginNotCalledException))]
     public void BeginNotCalled_Nofity() {
       _guard.NotifyBaseCalled(KEY_B);
     }
 
     [Test]
-    [ExpectedException(typeof(BeginNotCalledException))]
+    //[ExpectedException(typeof(BeginNotCalledException))]
     public void BeginNotCalled_Assert() {
       _guard.AssertBaseCalled();
     }
