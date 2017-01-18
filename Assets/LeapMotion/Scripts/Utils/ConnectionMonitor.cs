@@ -1,6 +1,11 @@
-﻿using UnityEngine;
+﻿/******************************************************************************\
+* Copyright (C) Leap Motion, Inc. 2011-2017.                                   *
+* Leap Motion proprietary. Licensed under Apache 2.0                           *
+* Available at http://www.apache.org/licenses/LICENSE-2.0.html                 *
+\******************************************************************************/
+
+using UnityEngine;
 using System.Collections;
-using Leap.Unity;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity {
@@ -14,7 +19,7 @@ namespace Leap.Unity {
   public class ConnectionMonitor : MonoBehaviour {
     /** The LeapServiceProvider in the scene. */
     [AutoFind]
-    [Tooltip("The scene LeapServiceProvider")]
+    [Tooltip("The scene LeapServiceProvider.")]
     public LeapServiceProvider provider;
     /** The speed to fade the sprite alpha from 0 to 1. */
     [Tooltip("How fast to make the connection notice sprite visible.")]
