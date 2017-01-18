@@ -5,12 +5,39 @@
 \******************************************************************************/
 
 using UnityEngine;
-using System.Collections;
-using Leap;
 
 namespace Leap.Unity {
 
   public static class Utils {
+
+    #region Orientation Utils
+
+    /// <summary>
+    /// Similar to Unity's Transform.LookAt(), but resolves the forward vector of this
+    /// Transform to point away from the argument Transform.
+    /// 
+    /// Useful for billboarding Quads and UI elements whose forward vectors should match
+    /// rather than oppose the Main Camera.
+    /// </summary>
+    public static void LookAwayFrom(this Transform thisTransform, Transform transform) {
+      thisTransform.rotation = Quaternion.LookRotation(thisTransform.position - transform.position, Vector3.up);
+    }
+
+    /// <summary>
+    /// Similar to Unity's Transform.LookAt(), but resolves the forward vector of this
+    /// Transform to point away from the argument Transform.
+    /// 
+    /// Allows specifying an upwards parameter; this is passed as the upwards vector to the Quaternion.LookRotation.
+    /// </summary>
+    /// <param name="thisTransform"></param>
+    /// <param name="transform"></param>
+    public static void LookAwayFrom(this Transform thisTransform, Transform transform, Vector3 upwards) {
+      thisTransform.rotation = Quaternion.LookRotation(thisTransform.position - transform.position, upwards);
+    }
+
+    #endregion
+
+    #region Physics Utils
 
     public static void IgnoreCollisions(GameObject first, GameObject second, bool ignore = true) {
       if (first == null || second == null)
@@ -29,7 +56,10 @@ namespace Leap.Unity {
       }
     }
 
-    /* Visual debugging utilities */
+  #endregion
+
+    #region Gizmo Utils
+
     public static void DrawCircle(Vector3 center, 
                            Vector3 normal, 
                            float radius, 
@@ -82,5 +112,8 @@ namespace Leap.Unity {
       }
     }
 
+    #endregion
+
   }
+
 }

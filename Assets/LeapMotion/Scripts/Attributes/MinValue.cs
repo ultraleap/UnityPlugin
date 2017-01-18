@@ -20,10 +20,12 @@ namespace Leap.Unity.Attributes {
       } else if (property.propertyType == SerializedPropertyType.Integer) {
         property.intValue = Mathf.Max((int)minValue, property.intValue);
       } else if (property.propertyType == SerializedPropertyType.Vector2) {
-        property.vector2Value = new Vector2(Mathf.Max(minValue, property.vector2Value.x), Mathf.Max(minValue, property.vector2Value.y));
+        property.vector2Value = Vector2.Max(new Vector2(minValue, minValue), property.vector2Value);
       } else if (property.propertyType == SerializedPropertyType.Vector3) {
-        property.vector3Value = new Vector3(Mathf.Max(minValue, property.vector3Value.x), Mathf.Max(minValue, property.vector3Value.y), Mathf.Max(minValue, property.vector3Value.z));
-      } 
+        property.vector3Value = Vector3.Max(new Vector3(minValue, minValue, minValue), property.vector3Value);
+      } else if (property.propertyType == SerializedPropertyType.Vector4) {
+        property.vector4Value = Vector4.Max(new Vector4(minValue, minValue, minValue, minValue), property.vector4Value);
+      }
     }
 
     public override IEnumerable<SerializedPropertyType> SupportedTypes {
@@ -32,6 +34,7 @@ namespace Leap.Unity.Attributes {
         yield return SerializedPropertyType.Float;
         yield return SerializedPropertyType.Vector2;
         yield return SerializedPropertyType.Vector3;
+        yield return SerializedPropertyType.Vector4;
       }
     }
 #endif

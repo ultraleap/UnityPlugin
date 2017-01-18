@@ -73,8 +73,6 @@ namespace Leap.Unity {
     protected Frame _untransformedFixedFrame;
     protected Frame _transformedFixedFrame;
 
-    protected Image _currentImage;
-
     protected Matrix4x4[] _transformArray = new Matrix4x4[2];
 
     [NonSerialized]
@@ -87,12 +85,6 @@ namespace Leap.Unity {
         } else {
           return _transformedUpdateFrame;
         }
-      }
-    }
-
-    public override Image CurrentImage {
-      get {
-        return _currentImage;
       }
     }
 
