@@ -1,69 +1,73 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/// <summary> Allows you to add to a capped-size ring buffer of Vector3s and,
-/// when full, compute the buffer's average change over time. </summary>
-public class DeltaBuffer {
+/// <summary> Allows you to add to a capped-size ring buffer of Ts and,
+/// when full, compute the buffer's average change over time.
+/// DeltaBuffer without type parameters supports Vector3s;
+/// DeltaFloatBuffer supports floats. To support other types,
+/// subclass DeltaBuffer<YourType> and implement its Delta() averaging function.</summary>
+public abstract class DeltaBuffer<T> {
 
-  private RingBuffer<Vector3> _buffer;
-  private RingBuffer<float> _timeBuffer;
+  protected struct ValueTimePair<T> {
+    public T value;
+    public float time;
+  }
 
   public DeltaBuffer(int bufferSize) {
-    _buffer = new RingBuffer<Vector3>(bufferSize);
-    _timeBuffer = new RingBuffer<float>(bufferSize);
+    _buffer = new RingBuffer<ValueTimePair<T>>(bufferSize);
   }
 
-  public int Length {
-    get {
-      return _buffer.Length;
-    }
-  }
+  protected RingBuffer<ValueTimePair<T>> _buffer; 
 
-  public bool isFull {
-    get { return _buffer.isFull; }
-  }
+  public int  Length { get { return _buffer.Length; } }
+  public bool IsFull { get { return _buffer.IsFull; } }
 
-  public void Clear() {
-    _buffer.Clear();
-    _timeBuffer.Clear();
-  }
+  public void Clear() { _buffer.Clear(); }
 
-  float _previousSampleTime = 0F;
-  public void Add(Vector3 sample, float sampleTime) {
+  private float _previousSampleTime = 0F;
+  public void Add(T sample, float sampleTime) {
     if (sampleTime == _previousSampleTime) {
       SetLatest(sample, sampleTime);
       return;
     }
 
-    _buffer.Add(sample);
-    _timeBuffer.Add(sampleTime);
-    _previousSampleTime = sampleTime;
+    _buffer.Add(new ValueTimePair<T> { value = sample, time = sampleTime });
   }
 
-  public Vector3 Get(int idx) {
-    return _buffer.Get(idx);
+  public T Get(int idx) {
+    return _buffer.Get(idx).value;
   }
 
-  public Vector3 GetLatest() {
+  public T GetLatest() {
     return Get(Length - 1);
   }
 
-  public void Set(int idx, Vector3 sample, float sampleTime) {
-    _buffer.Set(idx, sample);
-    _timeBuffer.Set(idx, sampleTime);
+  public void Set(int idx, T sample, float sampleTime) {
+    _buffer.Set(idx, new ValueTimePair<T> { value = sample, time = sampleTime });
   }
 
-  public void SetLatest(Vector3 sample, float sampleTime) {
+  public void SetLatest(T sample, float sampleTime) {
     Set(Length - 1, sample, sampleTime);
   }
 
   public float GetTime(int idx) {
-    return _timeBuffer.Get(idx);
+    return _buffer.Get(idx).time;
   }
 
-  /// <summary>Returns the average change between each sample per unit time, or zero if the buffer is not full.</summary>
-  public Vector3 Delta() {
-    if (!isFull) {
+  /// <summary> Returns the average change between each sample per unit time, or zero if the buffer is not full. </summary>
+  public abstract T Delta();
+
+}
+
+/// <summary> Allows you to add to a capped-size ring buffer of Vector3s and,
+/// when full, compute the buffer's average change over time. </summary>
+public class DeltaBuffer : DeltaBuffer<Vector3> {
+
+  public DeltaBuffer(int bufferSize) : base(bufferSize) { }
+
+  /// <summary> Returns the average change between each sample per unit time, or zero if the buffer is not full. </summary>
+  public override Vector3 Delta() {
+    if (!IsFull) {
       return Vector3.zero;
     }
     Vector3 deltaPerTimeSum = Vector3.zero;
@@ -78,67 +82,13 @@ public class DeltaBuffer {
 
 /// <summary> Allows you to add to a capped-size ring buffer of floats and,
 /// when full, compute the buffer's average change over time. </summary>
-public class DeltaFloatBuffer {
+public class DeltaFloatBuffer : DeltaBuffer<float> {
 
-  private RingBuffer<float> _buffer;
-  private RingBuffer<float> _timeBuffer;
-
-  public DeltaFloatBuffer(int bufferSize) {
-    _buffer = new RingBuffer<float>(bufferSize);
-    _timeBuffer = new RingBuffer<float>(bufferSize);
-  }
-
-  public int Length {
-    get {
-      return _buffer.Length;
-    }
-  }
-
-  public bool isFull {
-    get { return _buffer.isFull; }
-  }
-
-  public void Clear() {
-    _buffer.Clear();
-    _timeBuffer.Clear();
-  }
-
-  float _previousSampleTime = 0F;
-  public void Add(float sample, float sampleTime) {
-    if (sampleTime == _previousSampleTime) {
-      SetLatest(sample, sampleTime);
-      return;
-    }
-
-    _buffer.Add(sample);
-    _timeBuffer.Add(sampleTime);
-    _previousSampleTime = sampleTime;
-  }
-
-  public float Get(int idx) {
-    return _buffer.Get(idx);
-  }
-
-  public float GetLatest() {
-    return Get(Length - 1);
-  }
-
-  public void Set(int idx, float sample, float sampleTime) {
-    _buffer.Set(idx, sample);
-    _timeBuffer.Set(idx, sampleTime);
-  }
-
-  public void SetLatest(float sample, float sampleTime) {
-    Set(Length - 1, sample, sampleTime);
-  }
-
-  public float GetTime(int idx) {
-    return _timeBuffer.Get(idx);
-  }
+  public DeltaFloatBuffer(int bufferSize) : base(bufferSize) { }
 
   /// <summary>Returns the average change between each sample per unit time, or zero if the buffer is not full.</summary>
-  public float Delta() {
-    if (!isFull) {
+  public override float Delta() {
+    if (!IsFull) {
       return 0F;
     }
     float deltaPerTimeSum = 0F;

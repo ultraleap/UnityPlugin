@@ -21,7 +21,7 @@ public class RingBuffer<T> {
     }
   }
 
-  public bool isFull {
+  public bool IsFull {
     get { return Length == arr.Length; }
   }
 
@@ -31,7 +31,7 @@ public class RingBuffer<T> {
   }
 
   public void Add(T t) {
-    if (isFull) {
+    if (IsFull) {
       firstIdx += 1;
       firstIdx %= arr.Length;
     }

@@ -17,7 +17,7 @@ public class DelayBuffer<T> {
   /// contain the oldest value in the buffer, otherwise returns false. </summary>
   public bool Add(T t, out T delayedT) {
     bool willOutputValue;
-    if (buffer.isFull) {
+    if (buffer.IsFull) {
       willOutputValue = true;
       delayedT = buffer.GetOldest();
     }
