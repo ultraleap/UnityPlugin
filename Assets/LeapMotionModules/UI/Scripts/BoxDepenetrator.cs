@@ -41,7 +41,7 @@ public class BoxDepenetrator : MonoBehaviour {
       float hardness = 0.1f;
       if (body) {
         if(!body.lockRotation) {
-          Constraints.ConstrainToPoint(transform, _depenetrationRay.position, _depenetrationRay.position + _depenetrationRay.direction, hardness);
+          ConstraintsUtil.ConstrainToPoint(transform, _depenetrationRay.position, _depenetrationRay.position + _depenetrationRay.direction, hardness);
         }else if (body.lockRotation && !body.lockPosition) {
           transform.position += _depenetrationRay.direction * hardness;
         }

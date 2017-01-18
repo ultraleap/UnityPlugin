@@ -1,4 +1,5 @@
 ﻿using Leap.Unity.Attributes;
+using Leap.InternalExtensionAPI;
 using UnityEngine;
 
 namespace Leap.UI.Constraints {
@@ -54,9 +55,8 @@ namespace Leap.UI.Constraints {
     public override void InitializeDebuggingConstraint() { }
 
     /// <summary>
-    /// Returns the local-space rotation of this Transform along this AngularConstraint
-    /// evaluated at progressAlongConstaint [0..360].
-    /// Hint: Use ConstraintBase.constraintLocalRotation as the origin rotation.
+    /// Returns the local-space rotation of this Transform evaluated with the input
+    /// JointAngles.
     /// </summary>
     public Quaternion EvaluateRotationAlongConstraint(JointAngles jointAngles) {
       return Quaternion.identity;
@@ -73,7 +73,25 @@ namespace Leap.UI.Constraints {
     }
 
     public override void EnforceConstraint() {
-      this.transform.localRotation = constraintLocalRotation * EvaluateRotationAlongConstraint(GetConstraintProjectionAngles());
+      this.transform.localPosition = constraintLocalPosition;
+      //this.transform.localRotation = constraintLocalRotation * EvaluateRotationAlongConstraint(GetConstraintProjectionAngles());
+      this.transform.localRotation = ConstraintsUtil.ConstrainRotationToConeWithTwist(this.transform.localRotation,
+                                                                                      constraintLocalRotation * jointAxis.ToUnitVector3(),
+                                                                                      jointAxis.ToUnitVector3(),
+                                                                                      Mathf.Cos(coneAngularWidth / 2F * Mathf.Deg2Rad), 0.999F);
+    }
+
+    public Vector3 ProjectionDirection {
+      get {
+        switch (jointAxis) {
+          case Axis.X:
+            return Axis.Z.ToUnitVector3();
+          case Axis.Y:
+            return Axis.Z.ToUnitVector3();
+          case Axis.Z: default:
+            return Axis.Y.ToUnitVector3();
+        }
+      }
     }
 
     #region Gizmos
@@ -81,9 +99,9 @@ namespace Leap.UI.Constraints {
     void OnDrawGizmos() {
       Gizmos.color = DefaultGizmoColor;
       Gizmos.matrix = Matrix4x4.TRS(this.transform.position,
-                                    this.transform.rotation,
+                                    this.transform.rotation * Quaternion.Inverse(this.transform.localRotation) * this.constraintLocalRotation,
                                     Vector3.one);
-      
+
       int stepsPerQuadrant = 8;
       int numSteps = stepsPerQuadrant * 4;
       float phiStep = 360F / numSteps;
@@ -128,9 +146,11 @@ namespace Leap.UI.Constraints {
     private Vector3 VisualAxisVector {
       get {
         switch (jointAxis) {
-          case Axis.X: case Axis.Y:
+          case Axis.X:
+          case Axis.Y:
             return jointAxis.ToUnitVector3();
-          case Axis.Z: default:
+          case Axis.Z:
+          default:
             return -jointAxis.ToUnitVector3(); // Joysticks on Z should trace cones towards the player
         }
       }
