@@ -57,7 +57,7 @@ namespace Leap.Unity.Gui.Space {
 
       renderer.GetPropertyBlock(_propertyBlock);
       _propertyBlock.SetFloat("_GuiSpaceSelection", SelectionIndexForAllVariant);
-      _propertyBlock.SetFloat("_GuiSelectionIndex", _index);
+      _propertyBlock.SetFloat("_GuiSpaceIndex", _index);
       UpdatePropertyBlock(_propertyBlock);
       renderer.SetPropertyBlock(_propertyBlock);
     }
@@ -68,7 +68,7 @@ namespace Leap.Unity.Gui.Space {
       }
 
       renderer.GetPropertyBlock(_propertyBlock);
-      _propertyBlock.SetFloat("_GuiSelectionIndex", _index);
+      _propertyBlock.SetFloat("_GuiSpaceIndex", _index);
       UpdatePropertyBlock(_propertyBlock);
       renderer.SetPropertyBlock(_propertyBlock);
     }

@@ -1,6 +1,7 @@
 ﻿Shader "Unlit/NewUnlitShader" {
   Properties {
     _MainTex ("Texture", 2D) = "white" {}
+    _GuiSpaceIndex ("Index", Float) = 0
   }
   SubShader {
     Tags { "Queue"="Geometry" "RenderType"="Opaque" }
@@ -34,7 +35,18 @@
       }
       
       fixed4 frag (v2f i) : SV_Target {
-        return tex2D(_MainTex, i.uv);
+        float4 c;
+        if(_GuiSpaceIndex == 0){
+          c = float4(1, 0, 0, 1);
+        } else if(_GuiSpaceIndex == 1){
+          c = float4(0, 1, 0, 1); 
+        } else {
+          c = float4(0, 0, 0, 0);
+        }
+
+
+
+        return tex2D(_MainTex, i.uv) * c;
       }
       ENDCG
     }
