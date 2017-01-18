@@ -8,16 +8,16 @@ using System.Collections;
 /// subclass DeltaBuffer<YourType> and implement its Delta() averaging function.</summary>
 public abstract class DeltaBuffer<T> {
 
-  protected struct ValueTimePair<T> {
+  protected struct ValueTimePair {
     public T value;
     public float time;
   }
 
   public DeltaBuffer(int bufferSize) {
-    _buffer = new RingBuffer<ValueTimePair<T>>(bufferSize);
+    _buffer = new RingBuffer<ValueTimePair>(bufferSize);
   }
 
-  protected RingBuffer<ValueTimePair<T>> _buffer; 
+  protected RingBuffer<ValueTimePair> _buffer; 
 
   public int  Length { get { return _buffer.Length; } }
   public bool IsFull { get { return _buffer.IsFull; } }
@@ -31,7 +31,7 @@ public abstract class DeltaBuffer<T> {
       return;
     }
 
-    _buffer.Add(new ValueTimePair<T> { value = sample, time = sampleTime });
+    _buffer.Add(new ValueTimePair { value = sample, time = sampleTime });
   }
 
   public T Get(int idx) {
@@ -43,7 +43,7 @@ public abstract class DeltaBuffer<T> {
   }
 
   public void Set(int idx, T sample, float sampleTime) {
-    _buffer.Set(idx, new ValueTimePair<T> { value = sample, time = sampleTime });
+    _buffer.Set(idx, new ValueTimePair { value = sample, time = sampleTime });
   }
 
   public void SetLatest(T sample, float sampleTime) {
