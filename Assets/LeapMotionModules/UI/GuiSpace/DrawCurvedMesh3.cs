@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class DrawCurvedMesh : MonoBehaviour {
-
-  public Behaviour toggler;
+public class DrawCurvedMesh3 : MonoBehaviour {
 
   void OnEnable() {
-    toggler.enabled = false;
     foreach (var r in GetComponentsInChildren<Renderer>()) {
       r.enabled = false;
     }
@@ -18,15 +15,14 @@ public class DrawCurvedMesh : MonoBehaviour {
     foreach (var r in GetComponentsInChildren<Renderer>()) {
       r.enabled = true;
     }
-    toggler.enabled = true;
   }
 
   public float radius = 1;
   void Update() {
     RadialPos p;
     p.radius = radius;
-    p.angle = 0;
-    p.height = 0;
+    p.angleX = 0;
+    p.angleY = 0;
     recurse(transform, p);
   }
 
@@ -43,15 +39,20 @@ public class DrawCurvedMesh : MonoBehaviour {
 
         RadialPos vertPos;
         vertPos.radius = pos.radius + delta.z;
-        vertPos.height = pos.height + delta.y;
-        vertPos.angle = pos.angle + delta.x / pos.radius;
+        vertPos.angleX = pos.angleX + delta.y / pos.radius;
+        vertPos.angleY = pos.angleY + delta.x / pos.radius;
 
         Vector3 v;
-        v.x = Mathf.Sin(vertPos.angle) * vertPos.radius;
-        v.y = vertPos.height;
-        v.z = Mathf.Cos(vertPos.angle) * vertPos.radius - radius;
+        v.x = 0;
+        v.y = Mathf.Sin(vertPos.angleX) * vertPos.radius;
+        v.z = Mathf.Cos(vertPos.angleX) * vertPos.radius;
 
-        verts[i] = v;
+        Vector3 v1 = v;
+        v1.x = v.z * Mathf.Sin(vertPos.angleY);
+        v1.y = v.y;
+        v1.z = v.z * Mathf.Cos(vertPos.angleY);
+
+        verts[i] = v1 - Vector3.forward * radius;
       }
 
       m.vertices = verts;
@@ -66,8 +67,8 @@ public class DrawCurvedMesh : MonoBehaviour {
 
       RadialPos childPos;
       childPos.radius = pos.radius + delta.z;
-      childPos.height = pos.height + delta.y;
-      childPos.angle = pos.angle + delta.x / pos.radius;
+      childPos.angleX = pos.angleX + delta.y / pos.radius;
+      childPos.angleY = pos.angleY + delta.x / pos.radius;
 
       recurse(child, childPos);
     }
@@ -75,7 +76,7 @@ public class DrawCurvedMesh : MonoBehaviour {
 
   public struct RadialPos {
     public float radius;
-    public float angle;
-    public float height;
+    public float angleX;
+    public float angleY;
   }
 }
