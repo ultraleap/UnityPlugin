@@ -162,7 +162,7 @@ namespace Leap.Unity.Interaction {
             body.mass = _perBoneMass * massScale;
 
             if (targetingError >= DISLOCATION_FRACTION) {
-              //brushBone.startTriggering();
+              brushBone.startTriggering();
             }
           }
 

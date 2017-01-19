@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections.Generic;
 using Leap.Unity.RuntimeGizmos;
 
@@ -9,20 +10,27 @@ using UnityEditor;
 namespace Leap.Unity.Interaction {
   public class HeuristicGrabClassifier : IHandModel, IRuntimeGizmoComponent {
     public bool TwoHandedGrab = false;
+    Collider[] collidingCandidates = new Collider[10];
 
     //Grab Classifier Logic
     public void UpdateClassifier(GrabClassifier classifier) {
+      classifier.warpTrans = Matrix4x4.TRS(classifier.warper.RigidbodyPosition, classifier.warper.RigidbodyRotation, classifier.transform.localScale);
+      
+      //For each probe (fingertip)
       for (int j = 0; j < classifier.probes.Length; j++) {
-        classifier.warpTrans = Matrix4x4.TRS(classifier.warper.RigidbodyPosition, classifier.warper.RigidbodyRotation, classifier.transform.localScale);
+        //Calculate how extended the finger is
         float tempCurl = Vector3.Dot(_hand.Fingers[j].Direction.ToVector3(), (j != 0) ? _hand.Direction.ToVector3() : (_hand.IsLeft ? 1f : -1f) * _hand.Basis.xBasis.ToVector3());
-        //bool tempIsInside = classifier.collider.isInsideCollider(localTipPos, j == 0 ? 0.015f : 0.01f) && (tempCurl < 0.65f);
-        Collider[] colliding = Physics.OverlapSphere(_hand.Fingers[j].TipPosition.ToVector3(), j == 0 ? 0.015f : 0.01f);
+
+        //Determine if this probe is intersecting an object
+        Array.Clear(collidingCandidates, 0, 10);
+        Physics.OverlapSphereNonAlloc(_hand.Fingers[j].TipPosition.ToVector3(), j == 0 ? 0.015f : 0.01f, collidingCandidates);
         bool collidingWithObject = false;
-        foreach(Collider col in colliding) {
-          collidingWithObject = (col == classifier.collider) ? true : collidingWithObject;
-        }
+        foreach(Collider col in collidingCandidates) { collidingWithObject = (col == classifier.collider) ? true : collidingWithObject; }
+
+        //Nullify above findings if fingers are extended
         bool tempIsInside = collidingWithObject && (tempCurl < 0.65f);
 
+        //Probes go inside when they intersect, probes come out when they uncurl
         if (!classifier.probes[j].isInside) {
           classifier.probes[j].isInside = tempIsInside;
           classifier.probes[j].curl = tempCurl + (j==0?0.15f:0f);

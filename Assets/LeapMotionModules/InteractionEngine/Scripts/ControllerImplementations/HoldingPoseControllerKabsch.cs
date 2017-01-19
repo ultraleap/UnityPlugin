@@ -133,7 +133,11 @@ namespace Leap.Unity.Interaction {
         case SolveMethod.PivotAroundOrigin:
           objectCentroid /= boneCount;
           handCentroid /= boneCount;
-          return Matrix4x4.TRS(Vector3.zero, Quaternion.FromToRotation(objectCentroid, handCentroid), Vector3.one);
+          if (!objectCentroid.Equals(handCentroid)) {
+            return Matrix4x4.TRS(Vector3.zero, Quaternion.FromToRotation(objectCentroid, handCentroid), Vector3.one);
+          }else {
+            return Matrix4x4.identity;
+          }
         default:
           return _kabsch.SolveKabsch(points, refPoints);
       }

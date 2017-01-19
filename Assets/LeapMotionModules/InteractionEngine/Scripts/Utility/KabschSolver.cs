@@ -73,7 +73,10 @@ namespace Leap.Unity.Interaction {
   }
 
   public static class FromMatrixExtension {
-    public static Vector3 GetVector3(this Matrix4x4 m) { return (Vector3)m.GetColumn(3); }
-    public static Quaternion GetQuaternion(this Matrix4x4 m) { return Quaternion.LookRotation(m.GetColumn(2), m.GetColumn(1)); }
+    public static Vector3 GetVector3(this Matrix4x4 m) { return m.GetColumn(3); }
+    public static Quaternion GetQuaternion(this Matrix4x4 m) {
+      if (m.GetColumn(2).Equals(m.GetColumn(1))) { return Quaternion.identity; }
+      return Quaternion.LookRotation(m.GetColumn(2), m.GetColumn(1));
+    }
   }
 }
