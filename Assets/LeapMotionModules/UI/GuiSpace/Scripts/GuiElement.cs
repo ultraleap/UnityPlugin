@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using Leap.Unity;
 using Leap.Unity.Attributes;
 
@@ -16,8 +19,11 @@ public class GuiElement : MonoBehaviour {
   [SerializeField]
   private Mesh _mesh;
 
+  //Don't serialize references to the textures directly, or else unity will include
+  //them in the build!  We don't want them in the build because they are being baked
+  //into an atlas that will be included instead.
   [SerializeField]
-  private Texture2D texture;
+  private string[] textureGUIDs;
 
   [Tooltip("If the mesh has no vertex colors, use this color as a vertex color. " +
            "If the mesh does have vertex colors, tint them with this color. " +
@@ -40,9 +46,20 @@ public class GuiElement : MonoBehaviour {
     }
   }
 
+#if UNITY_EDITOR
   public Texture2D GetTexture(int channel) {
-    return null;
+    if (channel < 0 || channel >= textureGUIDs.Length) {
+      return null;
+    }
+
+    string path = AssetDatabase.GUIDToAssetPath(textureGUIDs[channel]);
+    if (string.IsNullOrEmpty(path)) {
+      return null;
+    }
+
+    return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
   }
+#endif
 
   public Color vertexColor {
     get {
