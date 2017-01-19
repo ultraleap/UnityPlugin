@@ -578,7 +578,7 @@ namespace Leap.Unity{
             break;
           case NodeType.LOCKED:
             if (minIndex < node.executionIndex) {
-              Debug.LogError("Note enough execution indexes to fit all of the scripts!");
+              Debug.LogError("Not enough execution indexes to fit all of the scripts!");
               return false;
             }
             minIndex = node.executionIndex;
@@ -606,7 +606,7 @@ namespace Leap.Unity{
             break;
           case NodeType.LOCKED:
             if (maxIndex > node.executionIndex) {
-              Debug.LogError("Note enough execution indexes to fit all of the scripts!");
+              Debug.LogError("Not enough execution indexes to fit all of the scripts!");
               return false;
             }
             maxIndex = node.executionIndex;
