@@ -32,7 +32,7 @@ public class GuiMeshBaker : MonoBehaviour {
 
   [Tooltip("Tint the baked vertex colors with this color.")]
   [SerializeField]
-  private Color bakedTint;
+  private Color _bakedTint = Color.white;
 
   /// <summary>
   /// Enabling any of these options will cause UV3's to be baked into the mesh.  The W component
@@ -43,12 +43,12 @@ public class GuiMeshBaker : MonoBehaviour {
   [Header("Animation Options")]
   [Tooltip("Allows gui elements to move around freely.")]
   [SerializeField]
-  private bool enableElementMotion = false;
+  private bool _enableElementMotion = false;
 
   [Tooltip("Allows each gui element to move, instead of being stationary.  Also allows " +
            "the properties of the gui space to be changed at runtime.")]
   [SerializeField]
-  private MotionType motionType = MotionType.TranslationOnly;
+  private MotionType _motionType = MotionType.TranslationOnly;
 
   [Tooltip("Allows each gui element to recieve a different tint color at runtime.")]
   [SerializeField]
@@ -61,7 +61,7 @@ public class GuiMeshBaker : MonoBehaviour {
 
   [Tooltip("Defines what coordinate space blend shapes are defined in.")]
   [SerializeField]
-  private BlendShapeSpace blendShapeSpace = BlendShapeSpace.Local;
+  private BlendShapeSpace _blendShapeSpace = BlendShapeSpace.Local;
 
   /// <summary>
   /// The basic shader does not support any custom animation by default.  If you want
@@ -103,8 +103,8 @@ public class GuiMeshBaker : MonoBehaviour {
   }
 
   void Update() {
-    //Bake();
-    //Graphics.DrawMesh(bakedMesh, Matrix4x4.identity, material, 0);
+    Bake();
+    GetComponent<MeshFilter>().sharedMesh = _bakedMesh;
   }
 
   public void Bake() {
@@ -147,7 +147,9 @@ public class GuiMeshBaker : MonoBehaviour {
         elements.Query().Select(e => e.GetTexture(i)).FillArray(textureArray);
 
         var atlas = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: false);
-        packedUvs[i] = atlas.PackTextures(textureArray, _atlasSettings.padding);
+        packedUvs[i] = atlas.PackTextures(textureArray, _atlasSettings.padding, _atlasSettings.maximumAtlasSize);
+
+        GetComponent<MeshRenderer>().sharedMaterial.SetTexture(_texturePropertyNames[i], atlas);
       }
 
       //Remap and bake out all uvs
@@ -159,8 +161,9 @@ public class GuiMeshBaker : MonoBehaviour {
                                                           packedRect.y + packedRect.height * uv.y));
         });
 
+        allUvs[texIndex] = new List<Vector2>();
         foreach (var remappedUvs in remapping) {
-          allUvs[texIndex] = remappedUvs.ToList();
+          remappedUvs.FillList(allUvs[texIndex]);
         }
       }
 
@@ -176,7 +179,7 @@ public class GuiMeshBaker : MonoBehaviour {
       foreach (var element in elements) {
         var elementMesh = element.mesh;
         int vertexCount = elementMesh.vertexCount;
-        Color vertexColorTint = element.vertexColor * bakedTint;
+        Color vertexColorTint = element.vertexColor * _bakedTint;
 
         var vertexColors = elementMesh.colors;
         if (vertexColors.Length != vertexCount) {

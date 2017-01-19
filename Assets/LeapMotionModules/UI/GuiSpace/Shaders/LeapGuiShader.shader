@@ -41,8 +41,7 @@
       float4 _Offset;
       
       fixed4 frag (v2f i) : SV_Target {
-        int index = i.color.r;
-        return index;
+        return tex2D(_MainTex, i.uv) * i.color;
       }
       ENDCG
     }

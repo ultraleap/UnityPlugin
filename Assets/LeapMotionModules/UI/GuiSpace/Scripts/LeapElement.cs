@@ -31,11 +31,11 @@ public class LeapElement : MonoBehaviour {
            "This property cannot be changed at runtime, use tints instead.")]
   [HideInInspector]
   [SerializeField]
-  private Color _vertexColor;
+  private Color _vertexColor = Color.white;
 
   [HideInInspector]
   [SerializeField]
-  private Color _tint;
+  private Color _tint = Color.white;
 
   [HideInInspector]
   [SerializeField]

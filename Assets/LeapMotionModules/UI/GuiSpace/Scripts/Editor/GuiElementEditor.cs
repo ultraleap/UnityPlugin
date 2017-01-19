@@ -97,6 +97,4 @@ public class LeapElementEditor : CustomEditorBase {
 
     serializedObject.ApplyModifiedProperties();
   }
-
-
 }
