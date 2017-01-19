@@ -17,10 +17,14 @@ namespace Leap.Unity.Query {
     public SelectManyOp(SourceOp source, Func<SourceType, QueryWrapper<ResultType, ResultOp>> selector) {
       _source = source;
       _selector = selector;
+
+      if (_source.MoveNext()) {
+        _innerSource = _selector(_source.Current).GetEnumerator();
+      }
     }
 
     public bool MoveNext() {
-      if (!_innerSource.MoveNext()) {
+      while (!_innerSource.MoveNext()) {
         if (!_source.MoveNext()) {
           return false;
         }

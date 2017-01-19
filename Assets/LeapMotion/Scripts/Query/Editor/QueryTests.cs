@@ -28,6 +28,12 @@ namespace Leap.Unity.Query.Test {
     }
 
     [Test]
+    public void SelectManyTest() {
+      Assert.That(LIST_0.SelectMany(i => LIST_1.Select(j => j * i)).SequenceEqual(
+                  LIST_0.Query().SelectMany(i => LIST_1.Query().Select(j => j * i)).ToList()));
+    }
+
+    [Test]
     public void TakeWhileTest() {
       Assert.That(LIST_0.TakeWhile(i => i < 4).SequenceEqual(
                   LIST_0.Query().TakeWhile(i => i < 4).ToList()));
@@ -37,6 +43,12 @@ namespace Leap.Unity.Query.Test {
     public void WhereTest() {
       Assert.That(LIST_0.Where(i => i % 2 == 0).SequenceEqual(
                   LIST_0.Query().Where(i => i % 2 == 0).ToList()));
+    }
+
+    [Test]
+    public void ZipTest() {
+      Assert.That(LIST_0.Query().Zip(LIST_1.Query(), (a, b) => a.ToString() + b.ToString()).ToList().SequenceEqual(
+                  new string[] { "16", "27", "38", "49", "510" }));
     }
 
     [Test]
@@ -91,12 +103,6 @@ namespace Leap.Unity.Query.Test {
 
       Assert.AreEqual(LIST_0.FirstOrDefault(i => i > 10),
                       LIST_0.Query().FirstOrDefault(i => i > 10));
-    }
-
-    [Test]
-    public void ZipTest() {
-      Assert.That(LIST_0.Query().Zip(LIST_1.Query(), (a, b) => a.ToString() + b.ToString()).ToList().SequenceEqual(
-                  new string[] { "16", "27", "38", "49", "510" }));
     }
   }
 }
