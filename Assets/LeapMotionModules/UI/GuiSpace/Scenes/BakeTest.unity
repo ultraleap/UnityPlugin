@@ -132,11 +132,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _baker: {fileID: 1062225333}
-  mesh: {fileID: 0}
-  texture: {fileID: 0}
-  vertexColor: {r: 0, g: 0, b: 0, a: 0}
-  tint: {r: 0, g: 0, b: 0, a: 0}
-  blendShape: {fileID: 0}
+  _mesh: {fileID: 0}
+  _textureGUIDs:
+  - 30de3e8b697c14506b42816b8f33a1a7
+  - 41844c716792706449720732c95b2747
+  - d0c2746a73af5b444ae0d8dde4413ea7
+  _vertexColor: {r: 0, g: 0, b: 0, a: 0}
+  _tint: {r: 0, g: 0, b: 0, a: 0}
+  _blendShape: {fileID: 0}
 --- !u!1 &518545547
 GameObject:
   m_ObjectHideFlags: 0
@@ -265,11 +268,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _baker: {fileID: 1062225333}
-  mesh: {fileID: 0}
-  texture: {fileID: 0}
-  vertexColor: {r: 0, g: 0, b: 0, a: 0}
-  tint: {r: 0, g: 0, b: 0, a: 0}
-  blendShape: {fileID: 0}
+  _mesh: {fileID: 0}
+  _textureGUIDs:
+  - 30de3e8b697c14506b42816b8f33a1a7
+  - 41844c716792706449720732c95b2747
+  - d0c2746a73af5b444ae0d8dde4413ea7
+  _vertexColor: {r: 0, g: 0, b: 0, a: 0}
+  _tint: {r: 0, g: 0, b: 0, a: 0}
+  _blendShape: {fileID: 0}
 --- !u!1 &1038507682
 GameObject:
   m_ObjectHideFlags: 0
@@ -360,18 +366,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c604e498c651df46aeeab50c30b03f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableTextures: 0
-  atlasSettings:
+  _textureChannels: 3
+  _texturePropertyNames: []
+  _atlasSettings:
     padding: 0
     maximumAtlasSize: 2048
     filterMode: 1
     wrapMode: 1
-  enableVertexColors: 0
+  _enableVertexColors: 1
   bakedTint: {r: 0, g: 0, b: 0, a: 0}
   enableElementMotion: 1
   motionType: 1
-  enableTinting: 1
-  enableBlendShapes: 1
+  _enableTinting: 1
+  _enableBlendShapes: 1
   blendShapeSpace: 0
   enableCustomChannels: 0
   customChannels:
@@ -381,6 +388,7 @@ MonoBehaviour:
     type: 0
   - name: Bendyness
     type: 3
+  _bakedMesh: {fileID: 0}
 --- !u!4 &1062225334
 Transform:
   m_ObjectHideFlags: 0
@@ -438,11 +446,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _baker: {fileID: 1062225333}
-  mesh: {fileID: 0}
-  texture: {fileID: 0}
-  vertexColor: {r: 0, g: 0, b: 0, a: 0}
-  tint: {r: 0, g: 0, b: 0, a: 0}
-  blendShape: {fileID: 0}
+  _mesh: {fileID: 0}
+  _textureGUIDs:
+  - 30de3e8b697c14506b42816b8f33a1a7
+  - 41844c716792706449720732c95b2747
+  - d0c2746a73af5b444ae0d8dde4413ea7
+  _vertexColor: {r: 0, g: 0, b: 0, a: 0}
+  _tint: {r: 0, g: 0, b: 0, a: 0}
+  _blendShape: {fileID: 0}
 --- !u!1 &2042400537
 GameObject:
   m_ObjectHideFlags: 0

@@ -17,18 +17,18 @@ public class GuiMeshBaker : MonoBehaviour {
            "so that the gui can be drawn with a single draw call.")]
   [Range(0, 3)]
   [SerializeField]
-  private int textureChannels = 1;
+  private int _textureChannels = 1;
 
   [SerializeField]
-  private string[] texturePropertyNames;
+  private string[] _texturePropertyNames;
 
   [SerializeField]
-  private AtlasSettings atlasSettings;
+  private AtlasSettings _atlasSettings;
 
   [Tooltip("Enabling this will cause the vertex colors of each gui element to be baked into " +
            "the final gui mesh.")]
   [SerializeField]
-  private bool enableVertexColors;
+  private bool _enableVertexColors;
 
   [Tooltip("Tint the baked vertex colors with this color.")]
   [SerializeField]
@@ -52,12 +52,12 @@ public class GuiMeshBaker : MonoBehaviour {
 
   [Tooltip("Allows each gui element to recieve a different tint color at runtime.")]
   [SerializeField]
-  private bool enableTinting = false;
+  private bool _enableTinting = false;
 
   [Tooltip("Allows each gui element to warp to and from a different shape at runtime.  " +
            "Shape data is baked out as a position delta into UV3.")]
   [SerializeField]
-  private bool enableBlendShapes = false;
+  private bool _enableBlendShapes = false;
 
   [Tooltip("Defines what coordinate space blend shapes are defined in.")]
   [SerializeField]
@@ -78,6 +78,29 @@ public class GuiMeshBaker : MonoBehaviour {
   [SerializeField]
   private Mesh _bakedMesh;
 
+  public int textureChannels {
+    get {
+      return _textureChannels;
+    }
+  }
+
+  public bool enableVertexColors {
+    get {
+      return _enableVertexColors;
+    }
+  }
+
+  public bool enableTinting {
+    get {
+      return _enableTinting;
+    }
+  }
+
+  public bool enableBlendShapes {
+    get {
+      return _enableBlendShapes;
+    }
+  }
 
   void Update() {
     //Bake();
@@ -85,7 +108,7 @@ public class GuiMeshBaker : MonoBehaviour {
   }
 
   public void Bake() {
-    var elements = GetComponentsInChildren<GuiElement>();
+    var elements = GetComponentsInChildren<LeapElement>();
 
     if (_bakedMesh == null) {
       _bakedMesh = new Mesh();
@@ -115,21 +138,21 @@ public class GuiMeshBaker : MonoBehaviour {
 
     //Texture UV generation
     {
-      List<Vector2>[] allUvs = new List<Vector2>[textureChannels];
+      List<Vector2>[] allUvs = new List<Vector2>[_textureChannels];
 
       //Atlas all textures
-      Rect[][] packedUvs = new Rect[textureChannels][];
+      Rect[][] packedUvs = new Rect[_textureChannels][];
       Texture2D[] textureArray = new Texture2D[elements.Length];
-      for (int i = 0; i < textureChannels; i++) {
+      for (int i = 0; i < _textureChannels; i++) {
         elements.Query().Select(e => e.GetTexture(i)).FillArray(textureArray);
 
         var atlas = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: false);
-        packedUvs[i] = atlas.PackTextures(textureArray, atlasSettings.padding);
+        packedUvs[i] = atlas.PackTextures(textureArray, _atlasSettings.padding);
       }
 
       //Remap and bake out all uvs
       List<Vector2> tempUvs = new List<Vector2>();
-      for (int texIndex = 0; texIndex < textureChannels; texIndex++) {
+      for (int texIndex = 0; texIndex < _textureChannels; texIndex++) {
         var remapping = elements.Query().Zip(packedUvs[texIndex].Query(), (element, packedRect) => {
           element.mesh.GetUVs(texIndex, tempUvs);
           return tempUvs.Query().Select(uv => new Vector2(packedRect.x + packedRect.width * uv.x,
@@ -141,13 +164,13 @@ public class GuiMeshBaker : MonoBehaviour {
         }
       }
 
-      for (int i = 0; i < textureChannels; i++) {
+      for (int i = 0; i < _textureChannels; i++) {
         _bakedMesh.SetUVs(i, allUvs[i]);
       }
     }
 
     //Assign vertex colors if they are enabled
-    if (enableVertexColors) {
+    if (_enableVertexColors) {
       List<Color> colors = new List<Color>();
 
       foreach (var element in elements) {
@@ -175,7 +198,7 @@ public class GuiMeshBaker : MonoBehaviour {
       for (int elementID = 0; elementID < elements.Length; elementID++) {
         var element = elements[elementID];
 
-        if (enableBlendShapes && element.blendShape != null) {
+        if (_enableBlendShapes && element.blendShape != null) {
           var blendShape = element.blendShape;
 
           element.mesh.vertices.Query().

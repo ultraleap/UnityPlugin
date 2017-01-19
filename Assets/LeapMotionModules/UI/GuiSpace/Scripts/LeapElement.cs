@@ -7,7 +7,7 @@ using UnityEditor;
 using Leap.Unity;
 using Leap.Unity.Attributes;
 
-public class GuiElement : MonoBehaviour {
+public class LeapElement : MonoBehaviour {
 
   [Disable]
   [AutoFind(AutoFindLocations.Parents)]
@@ -22,20 +22,30 @@ public class GuiElement : MonoBehaviour {
   //Don't serialize references to the textures directly, or else unity will include
   //them in the build!  We don't want them in the build because they are being baked
   //into an atlas that will be included instead.
+  [HideInInspector]
   [SerializeField]
-  private string[] textureGUIDs;
+  private string[] _textureGUIDs;
 
   [Tooltip("If the mesh has no vertex colors, use this color as a vertex color. " +
            "If the mesh does have vertex colors, tint them with this color. " +
            "This property cannot be changed at runtime, use tints instead.")]
+  [HideInInspector]
   [SerializeField]
   private Color _vertexColor;
 
+  [HideInInspector]
   [SerializeField]
-  private Color tint;
+  private Color _tint;
 
+  [HideInInspector]
   [SerializeField]
   private GuiBlendShape _blendShape;
+
+  public GuiMeshBaker baker {
+    get {
+      return _baker;
+    }
+  }
 
   public Mesh mesh {
     get {
@@ -48,11 +58,11 @@ public class GuiElement : MonoBehaviour {
 
 #if UNITY_EDITOR
   public Texture2D GetTexture(int channel) {
-    if (channel < 0 || channel >= textureGUIDs.Length) {
+    if (channel < 0 || channel >= _textureGUIDs.Length) {
       return null;
     }
 
-    string path = AssetDatabase.GUIDToAssetPath(textureGUIDs[channel]);
+    string path = AssetDatabase.GUIDToAssetPath(_textureGUIDs[channel]);
     if (string.IsNullOrEmpty(path)) {
       return null;
     }
