@@ -20,6 +20,9 @@ public class GuiMeshBaker : MonoBehaviour {
   private int textureChannels = 1;
 
   [SerializeField]
+  private string[] texturePropertyNames;
+
+  [SerializeField]
   private AtlasSettings atlasSettings;
 
   [Tooltip("Enabling this will cause the vertex colors of each gui element to be baked into " +
@@ -84,41 +87,117 @@ public class GuiMeshBaker : MonoBehaviour {
   public void Bake() {
     var elements = GetComponentsInChildren<GuiElement>();
 
-    /// Pack textures that need packing
-    Rect[][] packedCoordinates = new Rect[textureChannels][];
-    {
-      Texture2D[] textureArray = new Texture2D[elements.Length];
-      for (int i = 0; i < textureChannels; i++) {
-        elements.Query().Select(e => e.GetTexture(i)).FillArray(textureArray);
-
-        var atlas = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: false);
-        packedCoordinates[i] = atlas.PackTextures(textureArray, atlasSettings.padding);
-      }
-    }
-
-
-    List<Vector3> verts = new List<Vector3>();
-    List<Vector3> normals = new List<Vector3>();
-    List<int> tris = new List<int>();
-
-    foreach (var element in elements) {
-      var elementMesh = element.mesh;
-      var elementTransform = element.transform;
-
-      elementMesh.GetIndices(0).Query().Select(i => i + verts.Count).FillList(tris);
-      elementMesh.vertices.Query().Select(v => elementTransform.TransformPoint(v)).FillList(verts);
-      normals.AddRange(elementMesh.normals);
-    }
-
     if (_bakedMesh == null) {
       _bakedMesh = new Mesh();
     } else {
       _bakedMesh.Clear();
     }
 
-    _bakedMesh.SetVertices(verts);
-    _bakedMesh.SetTriangles(tris, 0);
-    _bakedMesh.SetNormals(normals);
+    //Bake all vertex information and remap triangles
+    {
+      List<Vector3> verts = new List<Vector3>();
+      List<Vector3> normals = new List<Vector3>();
+      List<int> tris = new List<int>();
+
+      foreach (var element in elements) {
+        var elementMesh = element.mesh;
+        var elementTransform = element.transform;
+
+        elementMesh.GetIndices(0).Query().Select(i => i + verts.Count).FillList(tris);
+        elementMesh.vertices.Query().Select(v => elementTransform.TransformPoint(v)).FillList(verts);
+        normals.AddRange(elementMesh.normals);
+      }
+
+      _bakedMesh.SetVertices(verts);
+      _bakedMesh.SetNormals(normals);
+      _bakedMesh.SetTriangles(tris, 0);
+    }
+
+    //Texture UV generation
+    {
+      List<Vector2>[] allUvs = new List<Vector2>[textureChannels];
+
+      //Atlas all textures
+      Rect[][] packedUvs = new Rect[textureChannels][];
+      Texture2D[] textureArray = new Texture2D[elements.Length];
+      for (int i = 0; i < textureChannels; i++) {
+        elements.Query().Select(e => e.GetTexture(i)).FillArray(textureArray);
+
+        var atlas = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: false);
+        packedUvs[i] = atlas.PackTextures(textureArray, atlasSettings.padding);
+      }
+
+      //Remap and bake out all uvs
+      List<Vector2> tempUvs = new List<Vector2>();
+      for (int texIndex = 0; texIndex < textureChannels; texIndex++) {
+        var remapping = elements.Query().Zip(packedUvs[texIndex].Query(), (element, packedRect) => {
+          element.mesh.GetUVs(texIndex, tempUvs);
+          return tempUvs.Query().Select(uv => new Vector2(packedRect.x + packedRect.width * uv.x,
+                                                          packedRect.y + packedRect.height * uv.y));
+        });
+
+        foreach (var remappedUvs in remapping) {
+          allUvs[texIndex] = remappedUvs.ToList();
+        }
+      }
+
+      for (int i = 0; i < textureChannels; i++) {
+        _bakedMesh.SetUVs(i, allUvs[i]);
+      }
+    }
+
+    //Assign vertex colors if they are enabled
+    if (enableVertexColors) {
+      List<Color> colors = new List<Color>();
+
+      foreach (var element in elements) {
+        var elementMesh = element.mesh;
+        int vertexCount = elementMesh.vertexCount;
+        Color vertexColorTint = element.vertexColor * bakedTint;
+
+        var vertexColors = elementMesh.colors;
+        if (vertexColors.Length != vertexCount) {
+          for (int i = 0; i < vertexCount; i++) {
+            colors.Add(vertexColorTint);
+          }
+        } else {
+          vertexColors.Query().Select(c => c * vertexColorTint).FillList(colors);
+        }
+      }
+
+      _bakedMesh.SetColors(colors);
+    }
+
+    //Bake out the element id's into uv3, and blend deltas too if they are enabled
+    {
+      List<Vector4> uv3 = new List<Vector4>();
+
+      for (int elementID = 0; elementID < elements.Length; elementID++) {
+        var element = elements[elementID];
+
+        if (enableBlendShapes && element.blendShape != null) {
+          var blendShape = element.blendShape;
+
+          element.mesh.vertices.Query().
+            Zip(blendShape.vertices.Query(), (v0, v1) => {
+              return element.transform.InverseTransformPoint(v1) - v0;
+            }).
+            Select(delta => new Vector4(delta.x, delta.y, delta.z, elementID)).
+            FillList(uv3);
+        } else {
+          element.mesh.vertices.Query().
+            Select(v => new Vector4(0, 0, 0, elementID)).
+            FillList(uv3);
+        }
+      }
+
+      _bakedMesh.SetUVs(3, uv3);
+    }
+
+
+
+
+
   }
 
   public enum MotionType {

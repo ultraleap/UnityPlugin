@@ -23,13 +23,13 @@ public class GuiElement : MonoBehaviour {
            "If the mesh does have vertex colors, tint them with this color. " +
            "This property cannot be changed at runtime, use tints instead.")]
   [SerializeField]
-  private Color vertexColor;
+  private Color _vertexColor;
 
   [SerializeField]
   private Color tint;
 
   [SerializeField]
-  private GuiBlendShape blendShape;
+  private GuiBlendShape _blendShape;
 
   public Mesh mesh {
     get {
@@ -44,9 +44,20 @@ public class GuiElement : MonoBehaviour {
     return null;
   }
 
+  public Color vertexColor {
+    get {
+      return _vertexColor;
+    }
+    set {
+      _vertexColor = value;
+    }
+  }
 
-
-
+  public GuiBlendShape blendShape {
+    get {
+      return _blendShape;
+    }
+  }
 
 
 
