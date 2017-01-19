@@ -52,7 +52,7 @@ namespace Leap.Unity.Interaction {
     protected float _angularDrag;
 
     // Try to allow brushes to exit gracefully when passing fingers between objects.
-    private const int DISLOCATED_BRUSH_COOLDOWN = 120;
+    private const int DISLOCATED_BRUSH_COOLDOWN = 30;
     protected uint _dislocatedBrushCounter = DISLOCATED_BRUSH_COOLDOWN;
     protected ContactMode _contactMode = ContactMode.NORMAL;
 
@@ -220,9 +220,13 @@ namespace Leap.Unity.Interaction {
       ++_dislocatedBrushCounter;
       _minHandDistance = float.MaxValue;
 
+      if (_dislocatedBrushCounter == DISLOCATED_BRUSH_COOLDOWN) {
+        updateContactMode();
+      }
+
 #if UNITY_EDITOR
       if (_contactMode == ContactMode.GRASPED && UntrackedHandCount == 0 &&
-          Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale ||
+          //Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale ||
           Quaternion.Angle(_solvedRotation, _warper.RigidbodyRotation) > _material.ReleaseAngle) {
         _manager.ReleaseObject(this);
       }

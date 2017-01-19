@@ -120,7 +120,7 @@ namespace Leap.Unity.Interaction {
     private bool _hasSceneBeenCreated = false;
     private bool _enableGraspingLast = false;
 
-    protected ActivityManager _activityManager = new ActivityManager();
+    public ActivityManager _activityManager = new ActivityManager();
     protected Dictionary<int, InteractionHand> _idToInteractionHand = new Dictionary<int, InteractionHand>();
     protected List<IInteractionBehaviour> _graspedBehaviours = new List<IInteractionBehaviour>();
 
