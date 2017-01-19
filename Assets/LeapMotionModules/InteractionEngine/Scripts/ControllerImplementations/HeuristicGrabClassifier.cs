@@ -25,7 +25,11 @@ namespace Leap.Unity.Interaction {
         Array.Clear(collidingCandidates, 0, 10);
         Physics.OverlapSphereNonAlloc(_hand.Fingers[j].TipPosition.ToVector3(), j == 0 ? 0.015f : 0.01f, collidingCandidates);
         bool collidingWithObject = false;
-        foreach(Collider col in collidingCandidates) { collidingWithObject = (col == classifier.collider) ? true : collidingWithObject; }
+        foreach(Collider col in collidingCandidates) {
+          if (col!=null && col.attachedRigidbody != null) {
+            collidingWithObject = (col.attachedRigidbody == classifier.body) ? true : collidingWithObject;
+          }
+        }
 
         //Nullify above findings if fingers are extended
         bool tempIsInside = collidingWithObject && (tempCurl < 0.65f);
@@ -111,7 +115,7 @@ namespace Leap.Unity.Interaction {
       public bool prevGrabbing;
       public GrabProbe[] probes = new GrabProbe[5];
       public Transform transform;
-      public Collider collider;
+      public Rigidbody body;
       public RigidbodyWarper warper;
       public Matrix4x4 warpTrans;
       public int warmUp;
@@ -119,17 +123,14 @@ namespace Leap.Unity.Interaction {
       public GrabClassifier(IInteractionBehaviour behaviour) {
         probes = new GrabProbe[5];
         transform = behaviour.transform;
-        collider = behaviour.GetComponentInChildren<Collider>();
+        body = behaviour.GetComponent<Rigidbody>();
         warper = (behaviour as InteractionBehaviour).warper;
         warmUp = 0;
       }
     }
 
     //Per-Finger Per-Object Probe
-    public struct GrabProbe {
-      public bool isInside;
-      public float curl;
-    }
+    public struct GrabProbe { public bool isInside; public float curl; };
 
     //Draw Debug Telemetry
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
