@@ -159,7 +159,8 @@ namespace Leap.Unity{
   
       if (!nodes.Any(n => n.nodeType == NodeType.RELATIVE_UNORDERED)) {
         //If we don't have any unordered nodes, there is no work to do.
-        return;
+        // TODO: This isn't always correct!
+        //return;
       }
   
       unanchorReferencedNodes(ref nodes);

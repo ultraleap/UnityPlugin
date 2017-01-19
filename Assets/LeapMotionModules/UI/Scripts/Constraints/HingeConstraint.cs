@@ -1,7 +1,7 @@
 ﻿using Leap.Unity.Attributes;
 using UnityEngine;
 
-namespace Leap.UI.Constraints {
+namespace Leap.Unity.UI.Constraints {
 
   public class HingeConstraint : AngularRotationConstraint {
 

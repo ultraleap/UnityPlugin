@@ -1,11 +1,11 @@
-﻿using Leap.Unity.Attributes;
+﻿using Leap.Unity;
+using Leap.Unity.Attributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.InternalExtensionAPI;
 
-namespace Leap.UI.Constraints {
+namespace Leap.Unity.UI.Constraints {
 
   public class RectConstraint : Linear2Constraint {
 

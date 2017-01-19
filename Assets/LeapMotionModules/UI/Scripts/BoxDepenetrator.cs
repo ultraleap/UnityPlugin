@@ -1,60 +1,95 @@
 ﻿using UnityEngine;
 using Leap.Unity;
+using Leap.Unity.Query;
+using System.Collections.Generic;
 
-[ExecuteBefore(typeof(MinimalBody))]
-public class BoxDepenetrator : MonoBehaviour {
-
-  public SphereCollider sphere;
-
-  [Header("Automatic if null (this)")]
-  public BoxCollider box;
+namespace Leap.Unity.UI {
 
   public struct DepenetrationRay {
     public Vector3 position;
     public Vector3 direction;
   }
-  
-  private DepenetrationRay _depenetrationRay;
-  private bool _requiresDepenetrationThisFrame = false;
-  private MinimalBody body;
 
-  void Start() {
-    if (box == null) box = GetComponent<BoxCollider>();
-    if (box == null) {
-      Debug.LogError("No box found. Please attach the desired box collider (should be in this or a child).");
+  [ExecuteAfter(typeof(LeapServiceProvider))]
+  [ExecuteBefore(typeof(MinimalBody))]
+  public class BoxDepenetrator : MonoBehaviour {
+
+    public SphereCollider sphere;
+
+    [Header("Automatic, searches this and children")]
+    public List<BoxCollider> boxColliders;
+
+    private MinimalBody body;
+
+    void Start() {
+
+      // TODO: the Query()/Concat here is test code. Replace with good compound collider logic.
+      boxColliders = new List<BoxCollider>();
+      GetComponents<BoxCollider>(boxColliders);
+
+      List<BoxCollider> inChildren = new List<BoxCollider>();
+      GetComponentsInChildren<BoxCollider>(inChildren);
+
+      boxColliders = boxColliders.Query().Concat(inChildren.Query()).ToList();
+      // end TODO
+
+      body = GetComponent<MinimalBody>();
     }
-    body = GetComponent<MinimalBody>();
-  }
 
-  void Update() {
-    Vector3 nearestBoxPoint = box.transform.TransformPoint(box.closestPointOnSurface(box.transform.InverseTransformPoint(sphere.transform.position)));
-    Vector3 boxPointToSphereCenter = sphere.transform.position - nearestBoxPoint;
-    _requiresDepenetrationThisFrame = boxPointToSphereCenter.sqrMagnitude < (sphere.radius * sphere.transform.localScale.x) * (sphere.radius * sphere.transform.localScale.x);
+    void Update() {
+      DepenetrationRay shortestMagnitudeDepenetration = default(DepenetrationRay);
+      bool requiresDepenetration = false;
+      DepenetrationRay testRay;
+      foreach (var box in boxColliders) {
+        if (Depenetrate(sphere, box, out testRay)) {
+          if (!requiresDepenetration || testRay.direction.magnitude < shortestMagnitudeDepenetration.direction.magnitude) {
+            shortestMagnitudeDepenetration = testRay;
+            requiresDepenetration = true;
+          }
+        }
+      }
 
-    if (_requiresDepenetrationThisFrame) {
-      bool sphereCenterInsideBox = box.isPointInside(box.transform.InverseTransformPoint(sphere.transform.position));
-      _depenetrationRay = new DepenetrationRay();
-      _depenetrationRay.position    = nearestBoxPoint;
-      _depenetrationRay.direction   = boxPointToSphereCenter + ((sphereCenterInsideBox ? 1F : -1F) * boxPointToSphereCenter.normalized) * (sphere.radius * sphere.transform.localScale.x);
+      if (requiresDepenetration) {
+        DepenetrationRay depenetrationRay = shortestMagnitudeDepenetration;
 
-      //How Hard the depenetration is
-      float hardness = 0.1f;
-      if (body) {
-        if(!body.lockRotation) {
-          ConstraintsUtil.ConstrainToPoint(transform, _depenetrationRay.position, _depenetrationRay.position + _depenetrationRay.direction, hardness);
-        }else if (body.lockRotation && !body.lockPosition) {
-          transform.position += _depenetrationRay.direction * hardness;
+        //How Hard the depenetration is
+        float hardness = 0.5f;
+        if (body) {
+          if (!body.lockRotation) {
+            ConstraintsUtil.ConstrainToPoint(transform, depenetrationRay.position, depenetrationRay.position + depenetrationRay.direction, hardness);
+          }
+          else if (body.lockRotation && !body.lockPosition) {
+            transform.position += depenetrationRay.direction * hardness;
+          }
         }
       }
     }
-  }
 
-  //void OnDrawGizmos() {
-  //  if (_requiresDepenetrationThisFrame) {
-  //    Gizmos.color = Color.red;
-  //    Gizmos.DrawSphere(_depenetrationRay.position + _depenetrationRay.direction, 0.002F);
-  //    Gizmos.DrawRay(_depenetrationRay.position, _depenetrationRay.direction);
-  //  }
-  //}
+    public static bool Depenetrate(SphereCollider sphere, BoxCollider box, out DepenetrationRay depenetrationRay) {
+      Vector3 spherePosition = sphere.transform.position;
+      float sphereRadius = (sphere.radius * sphere.transform.lossyScale.x);
+      return Depenetrate(spherePosition, sphereRadius, box, out depenetrationRay);
+    }
+
+    public static bool Depenetrate(Vector3 spherePosition, float sphereRadius, BoxCollider box, out DepenetrationRay depenetrationRay) {
+      Vector3 nearestBoxPoint = box.transform.TransformPoint(box.closestPointOnSurface(box.transform.InverseTransformPoint(spherePosition)));
+      Vector3 boxPointToSphereCenter = spherePosition - nearestBoxPoint;
+      bool requiresDepenetration = boxPointToSphereCenter.sqrMagnitude < (sphereRadius * sphereRadius);
+
+      if (requiresDepenetration) {
+        bool sphereCenterInsideBox = box.isPointInside(box.transform.InverseTransformPoint(spherePosition));
+        depenetrationRay = new DepenetrationRay {
+          position = nearestBoxPoint,
+          direction = boxPointToSphereCenter + ((sphereCenterInsideBox ? 1F : -1F) * boxPointToSphereCenter.normalized) * sphereRadius
+        };
+        return true;
+      }
+      else {
+        depenetrationRay = default(DepenetrationRay);
+        return false;
+      }
+    }
+
+  }
 
 }

@@ -4,15 +4,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.UI.Constraints {
+namespace Leap.Unity.UI.Constraints {
 
   public class LineConstraint : LinearConstraint {
 
     [Header("Line Configuration")]
     [Tooltip("The local-space axis the line constraint follows. This axis is independent of the constrained transform's local rotation.")]
     public Axis lineAxis = Axis.Z;
-    [Tooltip("The line constraint can be specified relative to this.transform.localPosition as its beginning, center, or end.")]
-    public Anchor lineAnchor = Anchor.Beginning;
+    [Tooltip("How far along the constraint does this object initialize? 0 is the beginning of the constraint, 0.5 the center, and 1 the end.")]
+    [Range(0F, 1F)]
+    public float anchorPosition = 0.5F;
     [MinValue(0.0001F)]
     [Tooltip("The total length of the line constraint. This value is NOT affected by this.transform.localScale.")]
     public float length = 0.02F;
@@ -62,14 +63,7 @@ namespace Leap.UI.Constraints {
     /// </summary>
     private Vector3 LocalCenter {
       get {
-        switch (lineAnchor) {
-          case Anchor.Beginning:
-            return constraintLocalPosition + LineVector;
-          case Anchor.Center:
-            return constraintLocalPosition;
-          case Anchor.End: default:
-            return constraintLocalPosition - LineVector;
-        }
+        return constraintLocalPosition + LineVector * (anchorPosition.Map(1, 0, -1, 1));
       }
     }
 

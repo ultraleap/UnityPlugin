@@ -1,8 +1,7 @@
 ﻿using Leap.Unity.Attributes;
-using Leap.InternalExtensionAPI;
 using UnityEngine;
 
-namespace Leap.UI.Constraints {
+namespace Leap.Unity.UI.Constraints {
 
   public struct JointAngles {
     public float theta;
@@ -73,7 +72,7 @@ namespace Leap.UI.Constraints {
     }
 
     public override void EnforceConstraint() {
-      this.transform.localPosition = constraintLocalPosition;
+      //this.transform.localPosition = constraintLocalPosition;
       //this.transform.localRotation = constraintLocalRotation * EvaluateRotationAlongConstraint(GetConstraintProjectionAngles());
       this.transform.localRotation = ConstraintsUtil.ConstrainRotationToConeWithTwist(this.transform.localRotation,
                                                                                       constraintLocalRotation * jointAxis.ToUnitVector3(),

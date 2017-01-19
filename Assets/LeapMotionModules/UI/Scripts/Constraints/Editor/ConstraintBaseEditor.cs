@@ -6,7 +6,7 @@ using UnityEngine;
 using System.Reflection;
 using System;
 
-namespace Leap.UI.Constraints {
+namespace Leap.Unity.UI.Constraints {
 
   [CustomEditor(typeof(ConstraintBase), true)]
   public class ConstraintBaseEditor : CustomEditorBase {

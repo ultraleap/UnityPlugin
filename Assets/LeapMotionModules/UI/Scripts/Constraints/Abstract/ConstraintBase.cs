@@ -1,7 +1,7 @@
 ﻿using Leap.Unity;
 using UnityEngine;
 
-namespace Leap.UI.Constraints {
+namespace Leap.Unity.UI.Constraints {
 
   public enum Axis   { X, Y, Z }
   public enum Anchor { Beginning, Center, End }
@@ -22,6 +22,7 @@ namespace Leap.UI.Constraints {
   [ExecuteInEditMode]
   [ExecuteAfter(typeof(MinimalBody))]
   [ExecuteAfter(typeof(SpringBase))]
+  [ExecuteAfter(typeof(LeapServiceProvider))]
   /// <summary>
   /// Base class for Constraints, which enforce boundaries on the local-space positions of Transforms.
   /// </summary>
