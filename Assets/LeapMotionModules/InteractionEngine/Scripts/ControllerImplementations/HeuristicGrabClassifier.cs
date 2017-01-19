@@ -8,9 +8,18 @@ using UnityEditor;
 #endif
 
 namespace Leap.Unity.Interaction {
-  public class HeuristicGrabClassifier : IHandModel, IRuntimeGizmoComponent {
+  public class HeuristicGrabClassifier {
     public bool TwoHandedGrab = false;
     Collider[] collidingCandidates = new Collider[10];
+    public InteractionManager _manager;
+    private Hand _hand;
+
+    Dictionary<IInteractionBehaviour, GrabClassifier> leftGrabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifier>();
+    Dictionary<IInteractionBehaviour, GrabClassifier> rightGrabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifier>();
+
+    public HeuristicGrabClassifier(InteractionManager manager) {
+      _manager = manager;
+    }
 
     //Grab Classifier Logic
     public void UpdateClassifier(GrabClassifier classifier) {
@@ -62,12 +71,11 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    Dictionary<IInteractionBehaviour, GrabClassifier> grabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifier>();
     public void UpdateBehaviour(IInteractionBehaviour behaviour) {
       GrabClassifier classifier;
-      if (!grabClassifiers.TryGetValue(behaviour, out classifier)) {
+      if (!(_hand.IsLeft?leftGrabClassifiers: rightGrabClassifiers).TryGetValue(behaviour, out classifier)) {
         classifier = new GrabClassifier(behaviour);
-        grabClassifiers.Add(behaviour, classifier);
+        (_hand.IsLeft ? leftGrabClassifiers : rightGrabClassifiers).Add(behaviour, classifier);
       }
 
       //Do the actual grab classification logic
@@ -85,8 +93,9 @@ namespace Leap.Unity.Interaction {
     }
 
     //Classifier bookkeeping
-    public void Update() {
-      if (gameObject.activeInHierarchy && _hand != null) {
+    public void UpdateHeuristicClassifier(Hand hand) {
+      if (hand != null) {
+        _hand = hand;
 
         //First check if already holding an object and only process that one
         bool alreadyGrasping = false;
@@ -131,81 +140,5 @@ namespace Leap.Unity.Interaction {
 
     //Per-Finger Per-Object Probe
     public struct GrabProbe { public bool isInside; public float curl; };
-
-    //Draw Debug Telemetry
-    public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      if (gameObject.activeInHierarchy && _hand != null) {
-        for (var it = grabClassifiers.GetEnumerator(); it.MoveNext();) {
-          bool isActive = false;
-          for (int i = 0; i < _manager._activityManager.ActiveBehaviours.Count; i++) {
-            if (_manager._activityManager.ActiveBehaviours[i] == it.Current.Key) {
-              isActive = true;
-              break;
-            }
-          }
-          if (isActive) {
-            for (int i = 0; i < it.Current.Value.probes.Length; i++) {
-              if (it.Current.Value.probes[i].isInside) {
-                drawer.color = Color.red;
-                drawer.DrawSphere(_hand.Fingers[i].TipPosition.ToVector3(), i == 0 ? 0.015f : 0.01f);
-              }
-            }
-          }
-        }
-      }
-    }
-
-    //HAND INTERFACE
-    //-------------------------------------------------------------------
-    public InteractionManager _manager;
-    private Hand _hand;
-
-    /** The model type. An InteractionBrushHand is a type of physics model. */
-    public override ModelType HandModelType {
-      get { return ModelType.Physics; }
-    }
-
-    [SerializeField]
-    private Chirality handedness;
-    /** Whether this model can be used to represent a right or a left hand.*/
-    public override Chirality Handedness {
-      get { return handedness; }
-      set { handedness = value; }
-    }
-
-    /** Gets the Leap.Hand object whose data is used to update this model. */
-    public override Hand GetLeapHand() { return _hand; }
-    /** Sets the Leap.Hand object to use to update this model. */
-    public override void SetLeapHand(Hand hand) { _hand = hand; }
-
-    /** Initializes this hand model. */
-    public override void InitHand() {
-      base.InitHand();
-      if (Application.isPlaying) {
-        if (_manager == null) {
-          _manager = FindObjectOfType<InteractionManager>();
-        }
-        gameObject.layer = _manager.InteractionBrushLayer;
-      }
-    }
-
-    /** Updates this hand model. */
-    public override void UpdateHand() {
-#if UNITY_EDITOR
-      if (!EditorApplication.isPlaying) {
-        return;
-      }
-#endif
-    }
-
-    public override void BeginHand() {
-      base.BeginHand();
-      gameObject.SetActive(true);
-    }
-
-    public override void FinishHand() {
-      gameObject.SetActive(false);
-      base.FinishHand();
-    }
   }
 }

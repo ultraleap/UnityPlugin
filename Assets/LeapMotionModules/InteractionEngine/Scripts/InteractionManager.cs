@@ -123,6 +123,7 @@ namespace Leap.Unity.Interaction {
     public ActivityManager _activityManager = new ActivityManager();
     protected Dictionary<int, InteractionHand> _idToInteractionHand = new Dictionary<int, InteractionHand>();
     protected List<IInteractionBehaviour> _graspedBehaviours = new List<IInteractionBehaviour>();
+    protected HeuristicGrabClassifier _grabClassifier;
 
     private float _cachedSimulationScale = -1;
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
@@ -495,6 +496,7 @@ namespace Leap.Unity.Interaction {
         autoGenerateLayers();
         autoSetupCollisionLayers();
       }
+      _grabClassifier = new HeuristicGrabClassifier(this);
     }
 
     protected virtual void OnEnable() {
@@ -709,7 +711,6 @@ namespace Leap.Unity.Interaction {
             //Remove the old id from the mapping
             _idToInteractionHand.Remove(untrackedInteractionHand.hand.Id);
             _idToInteractionHand[hand.Id] = interactionHand;
-            interactionHand.hand.Id = hand.Id;
 
             try {
               //This also dispatched InteractionObject.OnHandRegainedTracking()
@@ -737,6 +738,9 @@ namespace Leap.Unity.Interaction {
         }
 
         interactionHand.UpdateHand(hand);
+        if (_graspingEnabled) {
+          _grabClassifier.UpdateHeuristicClassifier(interactionHand.hand);
+        }
 
         //Loop through all ieHands to check for timeouts and loss of tracking
         for (var it = _idToInteractionHand.GetEnumerator(); it.MoveNext();) {
