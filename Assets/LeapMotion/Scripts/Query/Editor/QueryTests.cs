@@ -92,5 +92,11 @@ namespace Leap.Unity.Query.Test {
       Assert.AreEqual(LIST_0.FirstOrDefault(i => i > 10),
                       LIST_0.Query().FirstOrDefault(i => i > 10));
     }
+
+    [Test]
+    public void ZipTest() {
+      Assert.That(LIST_0.Query().Zip(LIST_1.Query(), (a, b) => a.ToString() + b.ToString()).ToList().SequenceEqual(
+                  new string[] { "16", "27", "38", "49", "510" }));
+    }
   }
 }
