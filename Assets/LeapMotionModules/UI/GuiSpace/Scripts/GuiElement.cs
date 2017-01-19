@@ -11,8 +11,10 @@ public class GuiElement : MonoBehaviour {
   [SerializeField]
   private GuiMeshBaker _baker;
 
+  [Tooltip("Mesh to display for this gui element.  Is must have a topology of " +
+           "triangles, and have only a single submesh.")]
   [SerializeField]
-  private Mesh mesh;
+  private Mesh _mesh;
 
   [SerializeField]
   private Texture2D texture;
@@ -29,10 +31,30 @@ public class GuiElement : MonoBehaviour {
   [SerializeField]
   private GuiBlendShape blendShape;
 
+  public Mesh mesh {
+    get {
+      return _mesh;
+    }
+    set {
+      _mesh = value;
+    }
+  }
+
+  public Texture2D GetTexture(int channel) {
+    return null;
+  }
+
+
+
+
+
+
+
+
   void OnDrawGizmos() {
     Gizmos.matrix = transform.localToWorldMatrix;
     Gizmos.color = new Color(0, 0, 0, 0);
-    Gizmos.DrawMesh(mesh);
+    Gizmos.DrawMesh(_mesh);
   }
 
   public struct ColorChannel {

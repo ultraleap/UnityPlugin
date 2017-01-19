@@ -15,8 +15,9 @@ public class GuiMeshBaker : MonoBehaviour {
   [Tooltip("Enabling this will cause the UV0 channel to contain coordinates for displaying " +
            "the textures stored in Gui Elements.  The textures will be packed into an atlas " +
            "so that the gui can be drawn with a single draw call.")]
+  [Range(0, 3)]
   [SerializeField]
-  private bool enableTextures;
+  private int textureChannels = 1;
 
   [SerializeField]
   private AtlasSettings atlasSettings;
@@ -71,48 +72,54 @@ public class GuiMeshBaker : MonoBehaviour {
   [SerializeField]
   private ChannelDef[] customChannels;
 
+  [SerializeField]
+  private Mesh _bakedMesh;
+
+
   void Update() {
     //Bake();
     //Graphics.DrawMesh(bakedMesh, Matrix4x4.identity, material, 0);
   }
 
-  /*
   public void Bake() {
     var elements = GetComponentsInChildren<GuiElement>();
 
+    /// Pack textures that need packing
+    Rect[][] packedCoordinates = new Rect[textureChannels][];
+    {
+      Texture2D[] textureArray = new Texture2D[elements.Length];
+      for (int i = 0; i < textureChannels; i++) {
+        elements.Query().Select(e => e.GetTexture(i)).FillArray(textureArray);
+
+        var atlas = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: false);
+        packedCoordinates[i] = atlas.PackTextures(textureArray, atlasSettings.padding);
+      }
+    }
+
+
     List<Vector3> verts = new List<Vector3>();
     List<Vector3> normals = new List<Vector3>();
-    List<int> indexes = new List<int>();
-    List<Vector2> uvs = new List<Vector2>();
-    List<Color> colors = new List<Color>();
+    List<int> tris = new List<int>();
 
     foreach (var element in elements) {
       var elementMesh = element.mesh;
       var elementTransform = element.transform;
 
-      elementMesh.GetIndices(0).Query().Select(i => i + verts.Count).FillList(indexes);
+      elementMesh.GetIndices(0).Query().Select(i => i + verts.Count).FillList(tris);
       elementMesh.vertices.Query().Select(v => elementTransform.TransformPoint(v)).FillList(verts);
-
       normals.AddRange(elementMesh.normals);
-      uvs.AddRange(elementMesh.uv);
     }
 
-    if (bakedMesh == null) {
-      bakedMesh = new Mesh();
-      bakedMesh.hideFlags = HideFlags.HideAndDontSave;
+    if (_bakedMesh == null) {
+      _bakedMesh = new Mesh();
     } else {
-      bakedMesh.Clear();
+      _bakedMesh.Clear();
     }
 
-    bakedMesh.SetVertices(verts);
-    bakedMesh.SetTriangles(indexes, 0);
-    bakedMesh.SetNormals(normals);
-    bakedMesh.SetUVs(0, uvs);
-
-    colors.AddRange(uvs.Query().Select(u => new Color(2.8E-45f, 0.5f, 1)).ToList());
-    bakedMesh.SetColors(colors);
+    _bakedMesh.SetVertices(verts);
+    _bakedMesh.SetTriangles(tris, 0);
+    _bakedMesh.SetNormals(normals);
   }
-  */
 
   public enum MotionType {
     TranslationOnly,
@@ -134,8 +141,7 @@ public class GuiMeshBaker : MonoBehaviour {
     Float,
     Vector,
     Color,
-    Matrix,
-    Texture
+    Matrix
   }
 
   [Serializable]
