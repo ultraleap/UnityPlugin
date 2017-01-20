@@ -67,7 +67,7 @@ namespace Leap.Unity.Gui.Space {
 
       string path = AssetDatabase.GUIDToAssetPath(_textureGUIDs[channel]);
       if (string.IsNullOrEmpty(path)) {
-        return null;
+        return Texture2D.whiteTexture;
       }
 
       return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
