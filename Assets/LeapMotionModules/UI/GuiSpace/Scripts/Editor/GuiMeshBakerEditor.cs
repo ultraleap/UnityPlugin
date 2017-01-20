@@ -5,141 +5,137 @@ using UnityEngine.Rendering;
 using UnityEditor;
 using UnityEditor.AnimatedValues;
 
-[CustomEditor(typeof(GuiMeshBaker))]
-public class GuiMeshBakerEditor : Editor {
+namespace Leap.Unity.Gui.Space {
 
-  SerializedProperty textureChannels;
-  SerializedProperty texturePropertyNames;
-  SerializedProperty atlasSettings;
+  [CustomEditor(typeof(GuiMeshBaker))]
+  public class GuiMeshBakerEditor : Editor {
 
-  SerializedProperty enableVertexColors;
-  SerializedProperty bakedTint;
-  AnimBool animVertexColors;
+    SerializedProperty textureChannels;
+    SerializedProperty texturePropertyNames;
+    SerializedProperty atlasSettings;
 
-  SerializedProperty enableElementMotion;
-  SerializedProperty motionType;
-  AnimBool animElementMotion;
+    SerializedProperty enableVertexColors;
+    SerializedProperty bakedTint;
+    AnimBool animVertexColors;
 
-  SerializedProperty enableTinting;
+    SerializedProperty enableElementMotion;
+    SerializedProperty motionType;
+    AnimBool animElementMotion;
 
-  SerializedProperty enableBlendShapes;
-  SerializedProperty blendShapeSpace;
-  AnimBool animBlendShapes;
+    SerializedProperty enableTinting;
 
-  void OnEnable() {
-    textureChannels = serializedObject.FindProperty("_textureChannels");
-    texturePropertyNames = serializedObject.FindProperty("_texturePropertyNames");
-    atlasSettings = serializedObject.FindProperty("_atlasSettings");
+    SerializedProperty enableBlendShapes;
+    SerializedProperty blendShapeSpace;
+    AnimBool animBlendShapes;
 
-    enableVertexColors = serializedObject.FindProperty("_enableVertexColors");
-    bakedTint = serializedObject.FindProperty("_bakedTint");
-    animVertexColors = createAnimBool(enableVertexColors.boolValue);
+    void OnEnable() {
+      textureChannels = serializedObject.FindProperty("_textureChannels");
+      texturePropertyNames = serializedObject.FindProperty("_texturePropertyNames");
+      atlasSettings = serializedObject.FindProperty("_atlasSettings");
 
-    enableElementMotion = serializedObject.FindProperty("_enableElementMotion");
-    motionType = serializedObject.FindProperty("_motionType");
-    animElementMotion = createAnimBool(enableElementMotion.boolValue);
+      enableVertexColors = serializedObject.FindProperty("_enableVertexColors");
+      bakedTint = serializedObject.FindProperty("_bakedTint");
+      animVertexColors = createAnimBool(enableVertexColors.boolValue);
 
-    enableTinting = serializedObject.FindProperty("_enableTinting");
+      enableElementMotion = serializedObject.FindProperty("_enableElementMotion");
+      motionType = serializedObject.FindProperty("_motionType");
+      animElementMotion = createAnimBool(enableElementMotion.boolValue);
 
-    enableBlendShapes = serializedObject.FindProperty("_enableBlendShapes");
-    blendShapeSpace = serializedObject.FindProperty("_blendShapeSpace");
-    animBlendShapes = createAnimBool(enableBlendShapes.boolValue);
-  }
-  public override void OnInspectorGUI() {
-    drawTextureChannelInfo();
+      enableTinting = serializedObject.FindProperty("_enableTinting");
 
-    drawVertexColorInfo();
+      enableBlendShapes = serializedObject.FindProperty("_enableBlendShapes");
+      blendShapeSpace = serializedObject.FindProperty("_blendShapeSpace");
+      animBlendShapes = createAnimBool(enableBlendShapes.boolValue);
+    }
+    public override void OnInspectorGUI() {
+      drawTextureChannelInfo();
 
-    drawElementMotionInfo();
+      drawVertexColorInfo();
 
-    EditorGUILayout.PropertyField(enableTinting);
+      drawElementMotionInfo();
 
-    drawBlendShapeInfo();
+      EditorGUILayout.PropertyField(enableTinting);
 
-    serializedObject.ApplyModifiedProperties();
-  }
+      drawBlendShapeInfo();
 
-  private void drawTextureChannelInfo() {
-    EditorGUILayout.PropertyField(textureChannels);
-    EditorGUI.indentLevel++;
-
-    //Make sure array is large enough to hold all the names
-    while (texturePropertyNames.arraySize < textureChannels.intValue) {
-      texturePropertyNames.InsertArrayElementAtIndex(texturePropertyNames.arraySize);
+      serializedObject.ApplyModifiedProperties();
     }
 
-    for (int i = 0; i < textureChannels.intValue; i++) {
-      SerializedProperty propertyName = texturePropertyNames.GetArrayElementAtIndex(i);
+    private void drawTextureChannelInfo() {
+      EditorGUILayout.PropertyField(textureChannels);
+      EditorGUI.indentLevel++;
 
-      if (i == 0) {
-        propertyName.stringValue = "_MainTex";
-        EditorGUI.BeginDisabledGroup(true);
+      //Make sure array is large enough to hold all the names
+      while (texturePropertyNames.arraySize < textureChannels.intValue) {
+        texturePropertyNames.InsertArrayElementAtIndex(texturePropertyNames.arraySize);
       }
 
-      if (string.IsNullOrEmpty(propertyName.stringValue)) {
-        propertyName.stringValue = "_Texture" + i;
+      for (int i = 0; i < textureChannels.intValue; i++) {
+        SerializedProperty propertyName = texturePropertyNames.GetArrayElementAtIndex(i);
+
+        if (i == 0) {
+          propertyName.stringValue = "_MainTex";
+          EditorGUI.BeginDisabledGroup(true);
+        }
+
+        if (string.IsNullOrEmpty(propertyName.stringValue)) {
+          propertyName.stringValue = "_Texture" + i;
+        }
+
+        EditorGUILayout.PropertyField(propertyName);
+
+        if (i == 0) {
+          EditorGUI.EndDisabledGroup();
+        }
       }
 
-      EditorGUILayout.PropertyField(propertyName);
-
-      if (i == 0) {
-        EditorGUI.EndDisabledGroup();
+      if (textureChannels.intValue > 0) {
+        EditorGUILayout.PropertyField(atlasSettings, includeChildren: true);
       }
-    }
-
-    if (textureChannels.intValue > 0) {
-      EditorGUILayout.PropertyField(atlasSettings, includeChildren: true);
-    }
-    EditorGUI.indentLevel--;
-  }
-
-  private void drawVertexColorInfo() {
-    EditorGUILayout.PropertyField(enableVertexColors);
-    animVertexColors.target = enableVertexColors.boolValue;
-
-    if (EditorGUILayout.BeginFadeGroup(animVertexColors.faded)) {
-      EditorGUI.indentLevel++;
-      EditorGUILayout.PropertyField(bakedTint);
       EditorGUI.indentLevel--;
     }
-    EditorGUILayout.EndFadeGroup();
-  }
 
-  private void drawElementMotionInfo() {
-    EditorGUILayout.PropertyField(enableElementMotion);
-    animElementMotion.target = enableElementMotion.boolValue;
+    private void drawVertexColorInfo() {
+      EditorGUILayout.PropertyField(enableVertexColors);
+      animVertexColors.target = enableVertexColors.boolValue;
 
-    if (EditorGUILayout.BeginFadeGroup(animElementMotion.faded)) {
-      EditorGUI.indentLevel++;
-      EditorGUILayout.PropertyField(motionType);
-      EditorGUI.indentLevel--;
+      if (EditorGUILayout.BeginFadeGroup(animVertexColors.faded)) {
+        EditorGUI.indentLevel++;
+        EditorGUILayout.PropertyField(bakedTint);
+        EditorGUI.indentLevel--;
+      }
+      EditorGUILayout.EndFadeGroup();
     }
-    EditorGUILayout.EndFadeGroup();
-  }
 
-  private void drawBlendShapeInfo() {
-    EditorGUILayout.PropertyField(enableBlendShapes);
-    animBlendShapes.target = enableBlendShapes.boolValue;
+    private void drawElementMotionInfo() {
+      EditorGUILayout.PropertyField(enableElementMotion);
+      animElementMotion.target = enableElementMotion.boolValue;
 
-    if (EditorGUILayout.BeginFadeGroup(animBlendShapes.faded)) {
-      EditorGUI.indentLevel++;
-      EditorGUILayout.PropertyField(blendShapeSpace);
-      EditorGUI.indentLevel--;
+      if (EditorGUILayout.BeginFadeGroup(animElementMotion.faded)) {
+        EditorGUI.indentLevel++;
+        EditorGUILayout.PropertyField(motionType);
+        EditorGUI.indentLevel--;
+      }
+      EditorGUILayout.EndFadeGroup();
     }
-    EditorGUILayout.EndFadeGroup();
-  }
 
-  private AnimBool createAnimBool(bool enabled) {
-    var animBool = new AnimBool(enabled);
-    animBool.valueChanged.AddListener(Repaint);
-    animBool.speed = 5;
-    return animBool;
-  }
+    private void drawBlendShapeInfo() {
+      EditorGUILayout.PropertyField(enableBlendShapes);
+      animBlendShapes.target = enableBlendShapes.boolValue;
 
-  public enum UpdateMode {
-    EveryFrame,
-    Lazy,
-    ScriptControlled
-  }
+      if (EditorGUILayout.BeginFadeGroup(animBlendShapes.faded)) {
+        EditorGUI.indentLevel++;
+        EditorGUILayout.PropertyField(blendShapeSpace);
+        EditorGUI.indentLevel--;
+      }
+      EditorGUILayout.EndFadeGroup();
+    }
 
+    private AnimBool createAnimBool(bool enabled) {
+      var animBool = new AnimBool(enabled);
+      animBool.valueChanged.AddListener(Repaint);
+      animBool.speed = 5;
+      return animBool;
+    }
+  }
 }

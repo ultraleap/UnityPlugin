@@ -6,6 +6,7 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Gui.Space {
 
+  [ExecuteInEditMode]
   public class CylindricalSpace : GuiSpace {
     [SerializeField]
     private float _xOffset;
@@ -90,6 +91,18 @@ namespace Leap.Unity.Gui.Space {
 
     public override void ToRect(Vector3 guiPos, Quaternion guiRot, out Vector3 rectPos, out Quaternion rectRot) {
       throw new System.NotImplementedException();
+    }
+
+    void Update() {
+      Material mat = GetComponent<Renderer>().sharedMaterial;
+
+      Vector4[] arr = new Vector4[6];
+      for (int i = 0; i < arr.Length; i++) {
+        arr[i] = new Vector4(0, i, _offsetOfConstantWidth, 0);
+      }
+
+      mat.SetFloat("_GuiSpaceCylindrical_ReferenceRadius", _offsetOfConstantWidth);
+      mat.SetVectorArray("_GuiSpaceCylindrical_ParentPosition", arr);
     }
 
     void OnDrawGizmosSelected() {

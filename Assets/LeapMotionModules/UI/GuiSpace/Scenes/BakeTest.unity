@@ -528,7 +528,7 @@ MonoBehaviour:
   _xOffset: 0
   _zOffset: 0
   _type: 0
-  _offsetOfConstantWidth: 0.3
+  _offsetOfConstantWidth: 1.94
 --- !u!1 &1038507682
 GameObject:
   m_ObjectHideFlags: 0

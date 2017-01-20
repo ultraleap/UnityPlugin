@@ -11,13 +11,14 @@
       CGPROGRAM
       #pragma vertex vert
       #pragma fragment frag
-      
+      #include "Assets/LeapMotionModules/UI/GuiSpace/Resources/GuiSpace.cginc"
       #include "UnityCG.cginc"
 
       struct appdata {
         float4 vertex : POSITION;
         float2 uv : TEXCOORD0;
         float4 color : COLOR;
+        float4 vertInfo : TEXCOORD3;
       };
 
       struct v2f {
@@ -31,6 +32,7 @@
       
       v2f vert (appdata v) {
         v2f o;
+        WarpVert(v.vertex, v.vertInfo);
         o.vertex = UnityObjectToClipPos(v.vertex);
         o.uv = TRANSFORM_TEX(v.uv, _MainTex);
         o.color = v.color;
