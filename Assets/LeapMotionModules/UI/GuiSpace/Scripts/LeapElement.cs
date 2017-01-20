@@ -9,6 +9,7 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Gui.Space {
 
+  [DisallowMultipleComponent]
   public class LeapElement : MonoBehaviour {
 
     [Disable]

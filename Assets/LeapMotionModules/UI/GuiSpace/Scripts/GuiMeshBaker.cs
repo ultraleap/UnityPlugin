@@ -15,12 +15,13 @@ namespace Leap.Unity.Gui.Space {
   [RequireComponent(typeof(MeshFilter))]
   [RequireComponent(typeof(MeshRenderer))]
   public class GuiMeshBaker : MonoBehaviour {
-
-    [Header("Space Options")]
-    private GuiSpace _space;
-
+    public const string GUI_SPACE_SHADER_FEATURE_PREFIX = "GUI_SPACE_";
 
     [Header("Mesh Options")]
+    [AutoFind(AutoFindLocations.Object)]
+    [SerializeField]
+    private GuiSpace _space;
+
     [Tooltip("Enabling this will cause the UV0 channel to contain coordinates for displaying " +
              "the textures stored in Gui Elements.  The textures will be packed into an atlas " +
              "so that the gui can be drawn with a single draw call.")]
@@ -113,7 +114,13 @@ namespace Leap.Unity.Gui.Space {
 
     void Update() {
       Bake();
+
       GetComponent<MeshFilter>().sharedMesh = _bakedMesh;
+
+      if (_space != null) {
+        _space.BuildPerElementData();
+        _space.UpdateMaterial(GetComponent<Renderer>().sharedMaterial);
+      }
     }
 
 #if UNITY_EDITOR
@@ -151,7 +158,12 @@ namespace Leap.Unity.Gui.Space {
           var elementTransform = element.transform;
 
           elementMesh.GetIndices(0).Query().Select(i => i + verts.Count).FillList(tris);
-          elementMesh.vertices.Query().Select(v => elementTransform.TransformPoint(v)).FillList(verts);
+
+          //TODO: bake out space if no motion is enabled
+          elementMesh.vertices.Query().Select(v => {
+            return Matrix4x4.TRS(Vector3.zero, element.transform.rotation, element.transform.localScale).MultiplyPoint3x4(v);
+          }).FillList(verts);
+
           normals.AddRange(elementMesh.normals);
         }
 

@@ -8,8 +8,9 @@ namespace Leap.Unity.Gui.Space {
 
   [ExecuteInEditMode]
   public class CylindricalSpace : GuiSpace {
-    [SerializeField]
-    private float _xOffset;
+    public const string SHADER_VARIANT_NAME = GuiMeshBaker.GUI_SPACE_SHADER_FEATURE_PREFIX + "Cylindrical";
+    public const string PARENT_POSITION_PROPERTY_NAME = "_GuiSpaceCylindrical_ParentPosition";
+    public const string REFERENCE_RADIUS_PROPERTY_NAME = "_GuiSpaceCylindrical_ReferenceRadius";
 
     [SerializeField]
     private float _zOffset;
@@ -22,23 +23,14 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private float _offsetOfConstantWidth = 0.3f;
 
-    public Vector3 localCenter {
-      get {
-        return new Vector3(_xOffset, 0, _zOffset);
-      }
-      set {
-        _xOffset = value.x;
-        _zOffset = value.z;
-        //TODO: update guis
-      }
-    }
+    private List<Vector4> _elementPositions = new List<Vector4>();
 
-    public Vector3 worldCenter {
+    public float zOffset {
       get {
-        return transform.TransformPoint(localCenter);
+        return _zOffset;
       }
       set {
-        localCenter = transform.InverseTransformPoint(value);
+        _zOffset = value;
       }
     }
 
@@ -51,8 +43,10 @@ namespace Leap.Unity.Gui.Space {
       }
     }
 
-    protected override string ShaderVariantName {
-      get { throw new NotImplementedException(); }
+    public override string ShaderVariantName {
+      get {
+        return SHADER_VARIANT_NAME;
+      }
     }
 
     public override Vector3 FromRect(Vector3 rectPos) {
@@ -93,20 +87,43 @@ namespace Leap.Unity.Gui.Space {
       throw new System.NotImplementedException();
     }
 
-    void Update() {
-      Material mat = GetComponent<Renderer>().sharedMaterial;
+    public override void BuildPerElementData() {
+      _elementPositions.Clear();
+      buildPerElementDataRecursively(transform, new Vector3(0, 0, _zOffset));
+    }
 
-      Vector4[] arr = new Vector4[6];
-      for (int i = 0; i < arr.Length; i++) {
-        arr[i] = new Vector4(0, i, _offsetOfConstantWidth, 0);
+    private void buildPerElementDataRecursively(Transform root, Vector3 rootPos) {
+      int childCount = root.childCount;
+      for (int i = 0; i < childCount; i++) {
+        var child = root.GetChild(i);
+
+        Vector3 delta = transform.InverseTransformPoint(child.position) - transform.InverseTransformPoint(root.position);
+
+        Vector3 childPos = rootPos;
+        childPos.x += delta.x / rootPos.z;
+        childPos.y += delta.y;
+        childPos.z += delta.z;
+
+        LeapElement childElement = child.GetComponent<LeapElement>();
+        if (childElement != null) {
+          _elementPositions.Add(childPos);
+        }
+
+        buildPerElementDataRecursively(child, childPos);
       }
+    }
 
-      mat.SetFloat("_GuiSpaceCylindrical_ReferenceRadius", _offsetOfConstantWidth);
-      mat.SetVectorArray("_GuiSpaceCylindrical_ParentPosition", arr);
+    public override void RebuildPerElementData(int index, int count) {
+      throw new NotImplementedException();
+    }
+
+    public override void UpdateMaterial(Material mat) {
+      mat.SetVectorArray(PARENT_POSITION_PROPERTY_NAME, _elementPositions);
+      mat.SetFloat(REFERENCE_RADIUS_PROPERTY_NAME, _zOffset);
     }
 
     void OnDrawGizmosSelected() {
-      Gizmos.matrix = transform.localToWorldMatrix * Matrix4x4.TRS(new Vector3(_xOffset, 0, _zOffset), Quaternion.identity, new Vector3(1, 0, 1));
+      Gizmos.matrix = transform.localToWorldMatrix * Matrix4x4.TRS(new Vector3(0, 0, _zOffset), Quaternion.identity, new Vector3(1, 0, 1));
 
       if (_type == CylindricalType.Angular) {
         Gizmos.color = Color.red;

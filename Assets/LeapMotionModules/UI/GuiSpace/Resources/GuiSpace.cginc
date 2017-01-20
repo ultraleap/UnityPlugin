@@ -1,3 +1,5 @@
+#define GUI_ELEMENT_MOVEMENT_TRANSLATION
+#define GUI_SPACE_CYLINDRICAL
 
 /* Space name:
  *  _ (none)
@@ -19,25 +21,21 @@
 
 #ifdef GUI_ELEMENT_MOVEMENT_TRANSLATION
 #define GUI_ELEMENTS_HAVE_MOTION
-float3 _ElementPosition[ELEMENT_MAX]
-
-void ApplyElementMotion(inout float4 vert, int elementId) {
-  vert.xyz += _ElementPosition[elementId];
-}
+void ApplyElementMotion(inout float4 vert, int elementId) { }
 #endif
 
 #ifdef GUI_ELEMENT_MOVEMENT_FULL
 #define GUI_ELEMENTS_HAVE_MOTION
-float4x4 _ElementTransform[ELEMENT_MAX]
+float4x4 _GuiElementMovement_Transform[ELEMENT_MAX];
 
 void ApplyElementMotion(inout float4 vert, int elementId) {
-  vert = mul(_ElementTransform[elementId], vert);
+  vert = mul(_GuiElementMovement_Transform[elementId], vert);
 }
 #endif
 
 #ifdef GUI_SPACE_CYLINDRICAL
 float _GuiSpaceCylindrical_ReferenceRadius;
-float3 _GuiSpaceCylindrical_ParentPosition[ELEMENT_MAX]
+float3 _GuiSpaceCylindrical_ParentPosition[ELEMENT_MAX];
 
 void ApplyGuiWarping(inout float4 vert, int elementId) {
   float3 parentPos = _GuiSpaceCylindrical_ParentPosition[elementId];
@@ -52,11 +50,12 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 #endif
 
 // Takes an object space vertex and converts it to a clip space vertex
-float4 WarpVert(float4 vert, int elementId) {
+float4 WarpVert(inout float4 vert, float4 vertInfo) {
+  int elementId = vertInfo.w;
 
 #ifdef GUI_ELEMENTS_HAVE_MOTION
-  ApplyGuiWarping(vert, elementId);
   ApplyElementMotion(vert, elementId);
+  ApplyGuiWarping(vert, elementId);
 #endif
 
 	return vert;

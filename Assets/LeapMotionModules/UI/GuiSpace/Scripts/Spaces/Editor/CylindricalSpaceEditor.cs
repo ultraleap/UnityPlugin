@@ -19,6 +19,7 @@ namespace Leap.Unity.Gui.Space {
     }
 
     void OnSceneGUI() {
+      /*
       if (Tools.current != Tool.None && Tools.current != Tool.View) {
         return;
       }
@@ -35,6 +36,7 @@ namespace Leap.Unity.Gui.Space {
                                             drawHelper: false);
 
       serializedObject.Update();
+       * */
     }
   }
 }
