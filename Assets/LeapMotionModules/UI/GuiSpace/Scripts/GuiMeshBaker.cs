@@ -129,17 +129,7 @@ namespace Leap.Unity.Gui.Space {
 
       //Filter out elements that have assets that cannot be made readable
       List<LeapElement> elements = new List<LeapElement>();
-      childElements.Query().Where(element => {
-        if (!element.mesh.EnsureReadWriteEnabled()) {
-          return false;
-        }
-        for (int i = 0; i < _textureChannels; i++) {
-          if (!element.GetTexture(i).EnsureReadWriteEnabled()) {
-            return false;
-          }
-        }
-        return true;
-      }).FillList(elements);
+      childElements.Query().Where(element => element.mesh.EnsureReadWriteEnabled()).FillList(elements);
 
       if (_bakedMesh == null) {
         _bakedMesh = new Mesh();
@@ -178,14 +168,54 @@ namespace Leap.Unity.Gui.Space {
       {
         List<Vector2>[] allUvs = new List<Vector2>[_textureChannels];
 
+        var whiteTexture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false);
+        whiteTexture.SetPixel(0, 0, Color.white);
+        whiteTexture.Apply();
+
         //Atlas all textures
         Rect[][] packedUvs = new Rect[_textureChannels][];
+
         Texture2D[] textureArray = new Texture2D[elements.Count];
+        Dictionary<Texture2D, Texture2D> textureMapping = new Dictionary<Texture2D, Texture2D>();
         for (int i = 0; i < _textureChannels; i++) {
-          elements.Query().Select(e => e.GetTexture(i)).FillArray(textureArray);
+          textureMapping.Clear();
+          for (int j = 0; j < elements.Count; j++) {
+            var element = elements[j];
+            Texture2D tex = element.GetTexture(i);
+            Texture2D mappedTex;
+            if (tex == null || !tex.EnsureReadWriteEnabled()) {
+              mappedTex = whiteTexture;
+            } else {
+              if (!textureMapping.TryGetValue(tex, out mappedTex)) {
+                mappedTex = Instantiate(tex);
+                mappedTex.AddBorder(_atlasSettings.border);
+                textureMapping[tex] = mappedTex;
+              }
+            }
+
+            textureArray[i] = mappedTex;
+          }
 
           var atlas = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: false);
-          packedUvs[i] = atlas.PackTextures(textureArray, _atlasSettings.padding, _atlasSettings.maximumAtlasSize);
+          atlas.filterMode = _atlasSettings.filterMode;
+          atlas.wrapMode = _atlasSettings.wrapMode;
+
+          var uvs = atlas.PackTextures(textureArray, _atlasSettings.padding, _atlasSettings.maximumAtlasSize);
+
+          float dx = _atlasSettings.border / (float)atlas.width;
+          float dy = _atlasSettings.border / (float)atlas.height;
+          for (int j = 0; j < textureArray.Length; i++) {
+            if (textureArray[j] != whiteTexture) {
+              Rect rect = uvs[j];
+              rect.x += dx;
+              rect.y += dy;
+              rect.width -= dx * 2;
+              rect.height -= dy * 2;
+              uvs[j] = rect;
+            }
+          }
+
+          packedUvs[i] = uvs;
 
           GetComponent<MeshRenderer>().sharedMaterial.SetTexture(_texturePropertyNames[i], atlas);
         }
@@ -320,6 +350,9 @@ namespace Leap.Unity.Gui.Space {
 
     [Serializable]
     public class AtlasSettings {
+      [Range(1, 16)]
+      public int border = 1;
+
       [MinValue(0)]
       public int padding;
 
