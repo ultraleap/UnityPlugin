@@ -167,8 +167,12 @@ namespace Leap.Unity.Gui.Space {
       {
         List<Vector2>[] allUvs = new List<Vector2>[_textureChannels];
 
-        var whiteTexture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false);
-        whiteTexture.SetPixel(0, 0, Color.white);
+        var whiteTexture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false, linear: true);
+        for (int i = 0; i < 3; i++) {
+          for (int j = 0; j < 3; j++) {
+            whiteTexture.SetPixel(i, j, Color.white);
+          }
+        }
         whiteTexture.Apply();
 
         //Atlas all textures
@@ -195,7 +199,7 @@ namespace Leap.Unity.Gui.Space {
               }
             }
 
-            textureArray[i] = mappedTex;
+            textureArray[j] = mappedTex;
           }
 
           var atlas = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: false);
@@ -204,20 +208,23 @@ namespace Leap.Unity.Gui.Space {
 
           var uvs = atlas.PackTextures(textureArray, _atlasSettings.padding, _atlasSettings.maximumAtlasSize);
 
-          float dx = _atlasSettings.border / (float)atlas.width;
-          float dy = _atlasSettings.border / (float)atlas.height;
           for (int j = 0; j < textureArray.Length; j++) {
+            float dx = 1.0f / atlas.width;
+            float dy = 1.0f / atlas.height;
 
             //Uvs will point to the larger texture, pull the uvs in so they match the original texture size
             //White texture wasn't bordered so the uvs are already correct
             if (textureArray[j] != whiteTexture) {
-              Rect rect = uvs[j];
-              rect.x += dx;
-              rect.y += dy;
-              rect.width -= dx * 2;
-              rect.height -= dy * 2;
-              uvs[j] = rect;
+              dx *= _atlasSettings.border;
+              dy *= _atlasSettings.border;
             }
+
+            Rect rect = uvs[j];
+            rect.x += dx;
+            rect.y += dy;
+            rect.width -= dx * 2;
+            rect.height -= dy * 2;
+            uvs[j] = rect;
           }
 
           packedUvs[i] = uvs;
@@ -355,7 +362,7 @@ namespace Leap.Unity.Gui.Space {
 
     [Serializable]
     public class AtlasSettings {
-      [Range(1, 16)]
+      [Range(0, 16)]
       public int border = 1;
 
       [MinValue(0)]

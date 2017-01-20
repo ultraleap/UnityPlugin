@@ -1438,7 +1438,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toggler: {fileID: 949718565}
-  radius: 3
+  radius: 3.35
 --- !u!4 &949718564
 Transform:
   m_ObjectHideFlags: 0
@@ -1718,7 +1718,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 400000, guid: 788acd8ba3c3dc74b8f73bcb83447f45, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.47
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 788acd8ba3c3dc74b8f73bcb83447f45, type: 3}
       propertyPath: m_LocalPosition.y
