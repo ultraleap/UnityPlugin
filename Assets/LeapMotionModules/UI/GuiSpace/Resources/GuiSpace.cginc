@@ -1,65 +1,55 @@
 
-/* Feature name:
+/* Space name:
  *  _ (none)
  *    rect space, with no distortion
- *  GUI_SPACE_ALL
- *    all spaces, controlled with a property value.  Very slow but flexible.
- *  GUI_SPACE_CYLINDRICAL_CONSTANT_WIDTH
- *    cylindrical space with a constant width mapping
- *  GUI_SPACE_CYLINDRICAL_ANGULAR
- *    cylindrical space with an angular mapping
+ *  GUI_SPACE_CYLINDRICAL
+ *    cylindrical space
  */
 
-#define GUI_SPACE_LIMIT 32
+/* Movement name:
+ *  _ (none)
+ *    no movement, position is baked into mesh
+ *  GUI_ELEMENT_MOVEMENT_TRANSLATION
+ *    elements can move around in rect space, but no rotation or scaling
+ *  GUI_ELEMENT_MOVEMENT_FULL
+ *    each element has a float4x4 to describe it's motion
+ */
 
-uniform int _GuiSpaceIndex;
+#define ELEMENT_MAX 32
 
-uniform float4x4 _WorldToGuiSpace[GUI_SPACE_LIMIT];
-uniform float4x4 _GuiToWorldSpace[GUI_SPACE_LIMIT];
+#ifdef GUI_ELEMENT_MOVEMENT_TRANSLATION
+#define GUI_ELEMENTS_HAVE_MOTION
+float3 _ElementPosition[ELEMENT_MAX]
 
-#ifdef GUI_SPACE_ALL
-uniform int _GuiSpaceSelection;
-#define GUI_SPACE_CYLINDRICAL_CONSTANT_WIDTH   1
-#define GUI_SPACE_CYLINDRICAL_ANGULAR          2
+void ApplyElementMotion(inout float4 vert, int elementId) {
+  vert.xyz += _ElementPosition[elementId];
+}
 #endif
 
-uniform float4 _GuiSpaceParams0[GUI_SPACE_LIMIT];
+#ifdef GUI_ELEMENT_MOVEMENT_FULL
+#define GUI_ELEMENTS_HAVE_MOTION
+float4x4 _ElementTransform[ELEMENT_MAX]
 
-void applyCylindricalSpaceConstantWidth(inout float4 vert) {
+void ApplyElementMotion(inout float4 vert, int elementId) {
+  vert = mul(_ElementTransform[elementId], vert);
+}
+#endif
+
+#ifdef GUI_SPACE_CYLINDRICAL
+float3 _ParentPosition[ELEMENT_MAX]
+
+void ApplyGuiWarping(inout float4 vert, int elementId) {
+  float3 parentPos = _ParentPositions[elementId];
+
   float theta = vert.x / vert.z;
   vert.x = sin(theta) * vert.z;
   vert.z = cos(theta) * vert.z;
 }
-
-void applyCylindricalSpaceAngular(inout float4 vert) {
-  float theta = vert.x / _GuiSpaceParams0[_GuiSpaceIndex].x;
-  vert.x = sin(theta) * vert.z;
-  vert.z = cos(theta) * vert.z;
-}
+#endif
 
 // Takes an object space vertex and converts it to a clip space vertex
-float4 GuiVertToClipSpace(float4 vert) {
-	vert = mul(unity_ObjectToWorld, vert);
-  vert = mul(_WorldToGuiSpace[_GuiSpaceIndex], vert);
-
-#ifdef GUI_SPACE_ALL
-  if (_GuiSpaceSelection == GUI_SPACE_CYLINDRICAL_CONSTANT_WIDTH) {
-    applyCylindricalSpaceConstantWidth(vert);
-  } else if (_GuiSpaceSelection == GUI_SPACE_CYLINDRICAL_ANGULAR) {
-    applyCylindricalSpaceAngular(vert);
-  }
-#else 
-#ifdef GUI_SPACE_CYLINDRICAL_CONSTANT_WIDTH
-  applyCylindricalSpaceConstantWidth(vert);
-#else 
-#ifdef GUI_SPACE_CYLINDRICAL_ANGULAR
-  applyCylindricalSpaceAngular(vert);
-#endif
-#endif
-#endif
-
-  vert = mul(_GuiToWorldSpace[_GuiSpaceIndex], vert);
-  vert = mul(UNITY_MATRIX_VP, vert);
+float4 WarpVert(float4 vert) {
+  applySpaceWarping(vert);
 
 	return vert;
 }
