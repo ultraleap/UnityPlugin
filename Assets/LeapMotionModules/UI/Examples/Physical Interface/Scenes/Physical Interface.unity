@@ -359,7 +359,6 @@ MonoBehaviour:
   toPull: {fileID: 1846177077}
   springCoefficient: 1
   springLength: 0.1
-  friction: 0.1
 --- !u!1 &203913819
 GameObject:
   m_ObjectHideFlags: 0
@@ -1616,7 +1615,7 @@ Transform:
   m_LocalScale: {x: 0.030254206, y: 0.030254198, z: 0.030254198}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &696194859
 GameObject:
@@ -2333,7 +2332,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1168484708}
   m_LocalRotation: {x: -0.28064573, y: -0, z: -0, w: 0.9598115}
-  m_LocalPosition: {x: 0.259, y: -0.068, z: 0.422}
+  m_LocalPosition: {x: -0.271, y: -0.068, z: 0.422}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 676024747}
@@ -2341,7 +2340,7 @@ Transform:
   - {fileID: 1611302530}
   - {fileID: 1968015705}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: -32.598003, y: 0, z: 0}
 --- !u!1 &1173329513
 GameObject:
@@ -2365,7 +2364,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1173329513}
   m_LocalRotation: {x: 0.30070576, y: 0, z: 0, w: 0.953717}
-  m_LocalPosition: {x: -0.018, y: -0.089, z: 0.539}
+  m_LocalPosition: {x: -0.548, y: -0.089, z: 0.539}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 416282588}
@@ -2740,7 +2739,6 @@ MonoBehaviour:
   toPull: {fileID: 1611302532}
   springCoefficient: 1
   springLength: 0.1
-  friction: 2
 --- !u!1 &1375975682
 GameObject:
   m_ObjectHideFlags: 0
@@ -3635,7 +3633,7 @@ Transform:
   m_LocalScale: {x: 0.01568685, y: 0.015686851, z: 0.015686851}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1583538329
 MonoBehaviour:
