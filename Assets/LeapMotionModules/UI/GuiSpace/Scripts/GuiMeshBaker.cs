@@ -178,6 +178,9 @@ namespace Leap.Unity.Gui.Space {
         Texture2D[] textureArray = new Texture2D[elements.Count];
         Dictionary<Texture2D, Texture2D> textureMapping = new Dictionary<Texture2D, Texture2D>();
         for (int i = 0; i < _textureChannels; i++) {
+
+          //PackTextures automatically pools shared textures, but we need to manually
+          //pool because we are creating new textures with Border()
           textureMapping.Clear();
           for (int j = 0; j < elements.Count; j++) {
             var element = elements[j];
@@ -204,7 +207,10 @@ namespace Leap.Unity.Gui.Space {
 
           float dx = _atlasSettings.border / (float)atlas.width;
           float dy = _atlasSettings.border / (float)atlas.height;
-          for (int j = 0; j < textureArray.Length; i++) {
+          for (int j = 0; j < textureArray.Length; j++) {
+
+            //Uvs will point to the larger texture, pull the uvs in so they match the original texture size
+            //White texture wasn't bordered so the uvs are already correct
             if (textureArray[j] != whiteTexture) {
               Rect rect = uvs[j];
               rect.x += dx;
