@@ -36,20 +36,28 @@ void ApplyElementMotion(inout float4 vert, int elementId) {
 #endif
 
 #ifdef GUI_SPACE_CYLINDRICAL
-float3 _ParentPosition[ELEMENT_MAX]
+float _GuiSpaceCylindrical_ReferenceRadius;
+float3 _GuiSpaceCylindrical_ParentPosition[ELEMENT_MAX]
 
 void ApplyGuiWarping(inout float4 vert, int elementId) {
-  float3 parentPos = _ParentPositions[elementId];
+  float3 parentPos = _GuiSpaceCylindrical_ParentPosition[elementId];
 
-  float theta = vert.x / vert.z;
-  vert.x = sin(theta) * vert.z;
-  vert.z = cos(theta) * vert.z;
+  parentPos.x += vert.x / parentPos.z;
+  parentPos.yz += vert.yz;
+
+  vert.x = sin(parentPos.x) * parentPos.z;
+  vert.y = parentPos.y;
+  vert.z = cos(parentPos.x) * parentPos.z - _GuiSpaceCylindrical_ReferenceRadius;
 }
 #endif
 
 // Takes an object space vertex and converts it to a clip space vertex
-float4 WarpVert(float4 vert) {
-  applySpaceWarping(vert);
+float4 WarpVert(float4 vert, int elementId) {
+
+#ifdef GUI_ELEMENTS_HAVE_MOTION
+  ApplyGuiWarping(vert, elementId);
+  ApplyElementMotion(vert, elementId);
+#endif
 
 	return vert;
 }
