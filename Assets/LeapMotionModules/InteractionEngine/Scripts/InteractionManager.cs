@@ -62,6 +62,10 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _graspingEnabled = true;
 
+    [Tooltip("When grasping is enabled, allow two hands to grasp the same object simultaneously.")]
+    [SerializeField]
+    protected bool _twoHandedGrasping = false;
+
     [Tooltip("Objects within this radius of a hand will be considered for interaction.")]
     [SerializeField]
     protected float _activationRadius = 0.15f;
@@ -232,6 +236,20 @@ namespace Leap.Unity.Interaction {
         if (_graspingEnabled != value) {
           _graspingEnabled = value;
           UpdateSceneInfo();
+        }
+      }
+    }
+
+    /// <summary>
+    /// Gets or sets whether or not the Interaction Engine can modify object positions by grasping with two hands simultaneously.
+    /// </summary>
+    public bool TwoHandedGrasping {
+      get {
+        return _twoHandedGrasping;
+      }
+      set {
+        if (_twoHandedGrasping != value) {
+          _twoHandedGrasping = value;
         }
       }
     }

@@ -9,7 +9,6 @@ using UnityEditor;
 
 namespace Leap.Unity.Interaction {
   public class HeuristicGrabClassifier {
-    public bool TwoHandedGrab = false;
     Collider[] collidingCandidates = new Collider[10];
     public InteractionManager _manager;
     private Hand _hand;
@@ -83,7 +82,7 @@ namespace Leap.Unity.Interaction {
 
       if (classifier.isGrabbing != classifier.prevGrabbing) {
         if (classifier.isGrabbing) {
-          if (!TwoHandedGrab) { _manager.ReleaseObject(behaviour); }
+          if (!_manager.TwoHandedGrasping) { _manager.ReleaseObject(behaviour); }
           _manager.GraspWithHand(_hand, behaviour);
         } else if (!classifier.isGrabbing || behaviour.IsBeingGraspedByHand(_hand.Id)) {
           _manager.ReleaseHand(_hand.Id);
