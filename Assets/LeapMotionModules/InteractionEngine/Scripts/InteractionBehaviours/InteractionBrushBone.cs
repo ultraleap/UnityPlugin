@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using Leap.Unity.Interaction;
+using System;
+using System.Collections;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -12,16 +14,20 @@ namespace Leap.Unity.Interaction {
   * @since 4.1.3
   */
   public class InteractionBrushBone : MonoBehaviour {
+    public static event Action OnCollision;
 
     // Used by InteractionBrushHand:
     /** The active InteractionManager. */
     public InteractionManager manager;
     /** This InteractiveBrushBone's RigidBody. */
-    public Rigidbody capsuleBody;
+    public Rigidbody body;
     /** This InteractiveBrushBone's Collider. */
-    public CapsuleCollider capsuleCollider;
+    public Collider col;
     /** This InteractiveBrushBone's target position. */
     public Vector3 lastTarget;
+
+    public Vector3 desiredPosition;
+    public Quaternion desiredRotation;
 
     // Once the brush becomes dislocated, it then remains dislocated until it
     // stops triggering and then the _dislocatedCounter expires.
@@ -30,7 +36,7 @@ namespace Leap.Unity.Interaction {
 
     /** Changes the collider to react to collisions as a trigger. */
     public void startTriggering() {
-      capsuleCollider.isTrigger = true;
+      col.isTrigger = true;
       _dislocatedCounter = 0;
     }
 
@@ -38,7 +44,7 @@ namespace Leap.Unity.Interaction {
     public bool updateTriggering() {
       if (_dislocatedCounter < DISLOCATED_BRUSH_COOLDOWN) {
         if (++_dislocatedCounter == DISLOCATED_BRUSH_COOLDOWN) {
-          capsuleCollider.isTrigger = false;
+          col.isTrigger = false;
           return false;
         }
         return true;
@@ -51,7 +57,9 @@ namespace Leap.Unity.Interaction {
       if (ib) {
         manager.EnsureActive(ib);
         _dislocatedCounter = 0;
-        ib.NotifyBrushDislocated();
+        if (!_tempColliderDisabled) {
+          ib.NotifyBrushDislocated();
+        }
       }
     }
 
@@ -63,6 +71,31 @@ namespace Leap.Unity.Interaction {
       tryNotify(other);
     }
 
+    private bool _tempColliderDisabled = false;
+    public void DisableColliderTemporarily(float seconds) {
+      StartCoroutine(TemporaryDisable(seconds));
+    }
+    private IEnumerator TemporaryDisable(float seconds) {
+      col.isTrigger = true;
+      _tempColliderDisabled = true;
+      yield return new WaitForSecondsRealtime(seconds);
+      col.isTrigger = false;
+      _tempColliderDisabled = false;
+    }
+
+    private void OnCollisionEnter(Collision collision) {
+      if (OnCollision != null) {
+        OnCollision();
+      }
+
+      /*
+      GameObject otherObj = collision.collider.gameObject;
+      if (otherObj.GetComponentInParent<InteractionBehaviourBase>() == null) {
+        Debug.LogError("For interaction to work properly please prevent collision between an InteractionBrushHand and non-interaction objects. " + ThisLabel() + ", " + ThatLabel(collision));
+      }
+       * */
+    }
+
 #if UNITY_EDITOR
     private string ThisLabel() {
       return gameObject.name + " <layer " + LayerMask.LayerToName(gameObject.layer) + ">";
@@ -71,13 +104,6 @@ namespace Leap.Unity.Interaction {
     private string ThatLabel(Collision collision) {
       GameObject otherObj = collision.collider.gameObject;
       return otherObj.name + " <layer " + LayerMask.LayerToName(otherObj.layer) + ">";
-    }
-
-    private void OnCollisionEnter(Collision collision) {
-      GameObject otherObj = collision.collider.gameObject;
-      if (otherObj.GetComponentInParent<InteractionBehaviourBase>() == null) {
-        Debug.LogError("For interaction to work properly please prevent collision between an InteractionBrushHand and non-interaction objects. " + ThisLabel() + ", " + ThatLabel(collision));
-      }
     }
 #endif // UNITY_EDITOR
   }
