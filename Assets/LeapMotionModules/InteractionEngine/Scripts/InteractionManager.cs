@@ -670,10 +670,12 @@ namespace Leap.Unity.Interaction {
       }
 
       try {
-        if (isPhysics) {
-          interactionBehaviour.NotifyHandsHoldPhysics(_holdingHands);
-        } else {
-          interactionBehaviour.NotifyHandsHoldGraphics(_holdingHands);
+        if (_holdingHands.Count > 0) {
+          if (isPhysics) {
+            interactionBehaviour.NotifyHandsHoldPhysics(_holdingHands);
+          } else {
+            interactionBehaviour.NotifyHandsHoldGraphics(_holdingHands);
+          }
         }
       } catch (Exception e) {
         _activityManager.NotifyMisbehaving(interactionBehaviour);
