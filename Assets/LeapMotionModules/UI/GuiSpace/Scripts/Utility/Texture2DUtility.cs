@@ -16,21 +16,23 @@ public static class Texture2DUtility {
     texture.SetPixels(pixelAmount, pixelAmount, originalWidth, originalHeight, colors);
 
     if (texture.wrapMode == TextureWrapMode.Clamp) {
+
+      //TODO: refactor this mess
       for (int x = 0; x < newWidth; x++) {
         for (int dy = 0; dy < pixelAmount; dy++) {
-          int ix = Mathf.Clamp(x - pixelAmount, 0, originalWidth - 1);
+          int ix = Mathf.Clamp(x - pixelAmount, 0, originalWidth - 1) + pixelAmount;
 
           texture.SetPixel(x, dy, texture.GetPixel(ix, pixelAmount));
-          texture.SetPixel(x, newHeight - dy, texture.GetPixel(ix, newHeight - pixelAmount));
+          texture.SetPixel(x, newHeight - dy - 1, texture.GetPixel(ix, newHeight - pixelAmount - 1));
         }
       }
 
-      for (int y = 0; y < newWidth; y++) {
+      for (int y = 0; y < newHeight; y++) {
         for (int dx = 0; dx < pixelAmount; dx++) {
-          int iy = Mathf.Clamp(y - pixelAmount, 0, originalHeight - 1);
+          int iy = Mathf.Clamp(y - pixelAmount, 0, originalHeight - 1) + pixelAmount;
 
           texture.SetPixel(dx, y, texture.GetPixel(pixelAmount, iy));
-          texture.SetPixel(newHeight - dx, y, texture.GetPixel(newWidth - pixelAmount, iy));
+          texture.SetPixel(newWidth - dx - 1, y, texture.GetPixel(newWidth - pixelAmount - 1, iy));
         }
       }
     } else {
