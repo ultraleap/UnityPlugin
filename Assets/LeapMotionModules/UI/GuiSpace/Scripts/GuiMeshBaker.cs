@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using Leap.Unity.Attributes;
 using Leap.Unity.Query;
 
@@ -107,8 +110,23 @@ public class GuiMeshBaker : MonoBehaviour {
     GetComponent<MeshFilter>().sharedMesh = _bakedMesh;
   }
 
+#if UNITY_EDITOR
   public void Bake() {
-    var elements = GetComponentsInChildren<LeapElement>();
+    var childElements = GetComponentsInChildren<LeapElement>();
+
+    //Filter out elements that have assets that cannot be made readable
+    List<LeapElement> elements = new List<LeapElement>();
+    childElements.Query().Where(element => {
+      if (!element.mesh.EnsureReadWriteEnabled()) {
+        return false;
+      }
+      for (int i = 0; i < _textureChannels; i++) {
+        if (!element.GetTexture(i).EnsureReadWriteEnabled()) {
+          return false;
+        }
+      }
+      return true;
+    }).FillList(elements);
 
     if (_bakedMesh == null) {
       _bakedMesh = new Mesh();
@@ -142,7 +160,7 @@ public class GuiMeshBaker : MonoBehaviour {
 
       //Atlas all textures
       Rect[][] packedUvs = new Rect[_textureChannels][];
-      Texture2D[] textureArray = new Texture2D[elements.Length];
+      Texture2D[] textureArray = new Texture2D[elements.Count];
       for (int i = 0; i < _textureChannels; i++) {
         elements.Query().Select(e => e.GetTexture(i)).FillArray(textureArray);
 
@@ -157,6 +175,15 @@ public class GuiMeshBaker : MonoBehaviour {
       for (int texIndex = 0; texIndex < _textureChannels; texIndex++) {
         var remapping = elements.Query().Zip(packedUvs[texIndex].Query(), (element, packedRect) => {
           element.mesh.GetUVs(texIndex, tempUvs);
+
+          //If mesh has wrong number of uvs, just fill with zeros
+          if (tempUvs.Count != element.mesh.vertexCount) {
+            tempUvs.Clear();
+            for (int i = 0; i < element.mesh.vertexCount; i++) {
+              tempUvs.Add(Vector2.zero);
+            }
+          }
+
           return tempUvs.Query().Select(uv => new Vector2(packedRect.x + packedRect.width * uv.x,
                                                           packedRect.y + packedRect.height * uv.y));
         });
@@ -198,7 +225,7 @@ public class GuiMeshBaker : MonoBehaviour {
     {
       List<Vector4> uv3 = new List<Vector4>();
 
-      for (int elementID = 0; elementID < elements.Length; elementID++) {
+      for (int elementID = 0; elementID < elements.Count; elementID++) {
         var element = elements[elementID];
 
         if (_enableBlendShapes && element.blendShape != null) {
@@ -219,12 +246,8 @@ public class GuiMeshBaker : MonoBehaviour {
 
       _bakedMesh.SetUVs(3, uv3);
     }
-
-
-
-
-
   }
+#endif
 
   public enum MotionType {
     TranslationOnly,
