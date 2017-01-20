@@ -114,6 +114,32 @@ namespace Leap.Unity.Query {
       }
     }
 
+    public int IndexOf(QueryType value) {
+      using (thisAndConsume) {
+        int index = 0;
+        while (_op.MoveNext()) {
+          if (_op.Current.Equals(value)) {
+            return index;
+          }
+          index++;
+        }
+      }
+      return -1;
+    }
+
+    public int IndexOf(Func<QueryType, bool> predicate) {
+      using (thisAndConsume) {
+        int index = 0;
+        while (_op.MoveNext()) {
+          if (predicate(_op.Current)) {
+            return index;
+          }
+          index++;
+        }
+      }
+      return -1;
+    }
+
     private static List<QueryType> _utilityList = new List<QueryType>();
     public QueryType[] ToArray() {
       try {
