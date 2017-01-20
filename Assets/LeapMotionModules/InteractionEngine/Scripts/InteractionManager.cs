@@ -727,9 +727,6 @@ namespace Leap.Unity.Interaction {
               Debug.LogException(e);
               continue;
             }
-
-            //Override the existing classification to force the hand to grab the old object
-            //HANDLE THIS IF NECESSARY?
           } else {
             //Otherwise just create a new one
             interactionHand = new InteractionHand(hand);
@@ -741,49 +738,49 @@ namespace Leap.Unity.Interaction {
         if (_graspingEnabled) {
           _grabClassifier.UpdateHeuristicClassifier(interactionHand.hand);
         }
+      }
 
-        //Loop through all ieHands to check for timeouts and loss of tracking
-        for (var it = _idToInteractionHand.GetEnumerator(); it.MoveNext();) {
-          var pair = it.Current;
-          var id = pair.Key;
-          var ieHand = pair.Value;
+      //Loop through all ieHands to check for timeouts and loss of tracking
+      for (var it = _idToInteractionHand.GetEnumerator(); it.MoveNext();) {
+        var pair = it.Current;
+        var id = pair.Key;
+        var ieHand = pair.Value;
 
-          float handAge = Time.unscaledTime - ieHand.lastTimeUpdated;
-          //Check to see if the hand is at least 1 frame old
-          //We assume it has become untracked if this is the case
-          if (handAge > 0) {
-            //If the hand isn't grasping anything, just remove it
-            if (ieHand.graspedObject == null) {
-              _handIdsToRemove.Add(id);
-              continue;
+        float handAge = Time.unscaledTime - ieHand.lastTimeUpdated;
+        //Check to see if the hand is at least 1 frame old
+        //We assume it has become untracked if this is the case
+        if (handAge > 0) {
+          //If the hand isn't grasping anything, just remove it
+          if (ieHand.graspedObject == null) {
+            _handIdsToRemove.Add(id);
+            continue;
+          }
+
+          //If is isn't already marked as untracked, mark it as untracked
+          if (!ieHand.isUntracked) {
+            try {
+              //This also dispatches InteractionObject.OnHandLostTracking()
+              ieHand.MarkUntracked();
+            } catch (Exception e) {
+              _activityManager.NotifyMisbehaving(ieHand.graspedObject);
+              Debug.LogException(e);
             }
+          }
 
-            //If is isn't already marked as untracked, mark it as untracked
-            if (!ieHand.isUntracked) {
-              try {
-                //This also dispatches InteractionObject.OnHandLostTracking()
-                ieHand.MarkUntracked();
-              } catch (Exception e) {
-                _activityManager.NotifyMisbehaving(ieHand.graspedObject);
-                Debug.LogException(e);
+          //If the age is longer than the timeout, we also remove it from the list
+          if (handAge >= ieHand.maxSuspensionTime) {
+            _handIdsToRemove.Add(id);
+
+            try {
+              if (ieHand.graspedObject.GraspingHandCount == 1) {
+                _graspedBehaviours.Remove(ieHand.graspedObject);
               }
-            }
 
-            //If the age is longer than the timeout, we also remove it from the list
-            if (handAge >= ieHand.maxSuspensionTime) {
-              _handIdsToRemove.Add(id);
-
-              try {
-                if (ieHand.graspedObject.GraspingHandCount == 1) {
-                  _graspedBehaviours.Remove(ieHand.graspedObject);
-                }
-
-                //This also dispatched InteractionObject.OnHandTimeout()
-                ieHand.MarkTimeout();
-              } catch (Exception e) {
-                _activityManager.NotifyMisbehaving(ieHand.graspedObject);
-                Debug.LogException(e);
-              }
+              //This also dispatched InteractionObject.OnHandTimeout()
+              ieHand.MarkTimeout();
+            } catch (Exception e) {
+              _activityManager.NotifyMisbehaving(ieHand.graspedObject);
+              Debug.LogException(e);
             }
           }
         }
