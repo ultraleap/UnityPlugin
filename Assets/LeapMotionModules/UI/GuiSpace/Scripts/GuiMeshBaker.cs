@@ -151,8 +151,10 @@ namespace Leap.Unity.Gui.Space {
 
           //TODO: bake out space if no motion is enabled
           elementMesh.vertices.Query().Select(v => {
-            Matrix4x4 mat = element.transform.localToWorldMatrix * transform.worldToLocalMatrix;
-            return mat.MultiplyPoint3x4(v) + transform.position - element.transform.position;
+            v = element.transform.TransformPoint(v);
+            v = transform.InverseTransformPoint(v);
+            v -= transform.InverseTransformPoint(element.transform.position);
+            return v;
           }).FillList(verts);
 
           normals.AddRange(elementMesh.normals);
