@@ -20,9 +20,6 @@ namespace Leap.Unity.UI.Constraints {
   }
 
   [ExecuteInEditMode]
-  [ExecuteAfter(typeof(MinimalBody))]
-  [ExecuteAfter(typeof(SpringBase))]
-  [ExecuteAfter(typeof(LeapServiceProvider))]
   /// <summary>
   /// Base class for Constraints, which enforce boundaries on the local-space positions of Transforms.
   /// </summary>

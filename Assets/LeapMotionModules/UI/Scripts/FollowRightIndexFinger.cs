@@ -6,8 +6,6 @@ using UnityEngine;
 
 namespace Leap.Unity.UI {
 
-  [ExecuteAfter(typeof(LeapServiceProvider))]
-  [ExecuteBefore(typeof(SweepSphere))]
   public class FollowRightIndexFinger : MonoBehaviour {
 
     void Update() {

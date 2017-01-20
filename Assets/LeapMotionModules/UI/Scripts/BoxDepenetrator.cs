@@ -10,8 +10,6 @@ namespace Leap.Unity.UI {
     public Vector3 direction;
   }
 
-  [ExecuteAfter(typeof(LeapServiceProvider))]
-  [ExecuteBefore(typeof(MinimalBody))]
   public class BoxDepenetrator : MonoBehaviour {
 
     public SphereCollider sphere;

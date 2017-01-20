@@ -4,9 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteAfter(typeof(LeapServiceProvider))]
-[ExecuteBefore(typeof(MinimalBody))]
-[ExecuteBefore(typeof(ConstraintBase))]
 public class SpringBase : MonoBehaviour {
 
   #region Gizmos

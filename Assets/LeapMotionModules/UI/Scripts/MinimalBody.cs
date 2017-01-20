@@ -2,8 +2,6 @@
 using Leap.Unity.Attributes;
 using UnityEngine;
 
-[ExecuteAfter(typeof(LeapServiceProvider))]
-[ExecuteAfter(typeof(SpringBase))]
 public class MinimalBody : MonoBehaviour {
 
   public bool lockPosition = false;

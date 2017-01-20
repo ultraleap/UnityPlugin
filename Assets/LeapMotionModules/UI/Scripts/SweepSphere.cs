@@ -6,8 +6,6 @@ using UnityEngine;
 
 namespace Leap.Unity.UI {
 
-  [ExecuteAfter(typeof(LeapServiceProvider))]
-  [ExecuteBefore(typeof(MinimalBody))]
   [RequireComponent(typeof(SphereCollider))]
   public class SweepSphere : MonoBehaviour, IRuntimeGizmoComponent {
 
