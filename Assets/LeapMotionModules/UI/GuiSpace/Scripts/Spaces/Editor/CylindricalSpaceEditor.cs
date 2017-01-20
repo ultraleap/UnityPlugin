@@ -11,24 +11,11 @@ namespace Leap.Unity.Gui.Space {
   public class CylindricalSpaceEditor : CustomEditorBase {
 
     private CylindricalSpace _space;
-    private SerializedProperty _typeProperty;
 
     protected override void OnEnable() {
       base.OnEnable();
 
       _space = target as CylindricalSpace;
-
-      _typeProperty = serializedObject.FindProperty("_type");
-      Func<bool> isUsingAngularType = () => _typeProperty.intValue == (int)CylindricalSpace.CylindricalType.Angular;
-      specifyConditionalDrawing(isUsingAngularType, "_offsetOfConstantWidth");
-    }
-
-    public override void OnInspectorGUI() {
-      base.OnInspectorGUI();
-
-      if (_modifiedProperties.Query().Any(p => SerializedProperty.EqualContents(p, _typeProperty))) {
-        _space.UpdateSpace();
-      }
     }
 
     void OnSceneGUI() {

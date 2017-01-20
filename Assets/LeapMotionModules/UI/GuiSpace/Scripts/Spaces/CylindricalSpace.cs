@@ -38,7 +38,6 @@ namespace Leap.Unity.Gui.Space {
       }
       set {
         localCenter = transform.InverseTransformPoint(value);
-        SetGenericGuiParams(new Vector4(_offsetOfConstantWidth - _zOffset, 0, 0, 0));
       }
     }
 
@@ -48,38 +47,11 @@ namespace Leap.Unity.Gui.Space {
       }
       set {
         _offsetOfConstantWidth = value;
-        SetGenericGuiParams(new Vector4(_offsetOfConstantWidth - _zOffset, 0, 0, 0));
-      }
-    }
-
-    protected override int SelectionIndexForAllVariant {
-      get {
-        switch (_type) {
-          case CylindricalType.ConstantWidth:
-            return 1;
-          case CylindricalType.Angular:
-            return 2;
-          default:
-            throw new InvalidOperationException("Unexpected type " + _type);
-        }
       }
     }
 
     protected override string ShaderVariantName {
-      get {
-        switch (_type) {
-          case CylindricalType.ConstantWidth:
-            return FEATURE_CYLINDRICAL_CONST_WIDTH;
-          case CylindricalType.Angular:
-            return FEATURE_CYLINDRICAL_ANGULAR;
-          default:
-            throw new InvalidOperationException("Unexpected type " + _type);
-        }
-      }
-    }
-
-    protected override void UpdatePropertyBlock(MaterialPropertyBlock block) {
-      //TODO
+      get { throw new NotImplementedException(); }
     }
 
     public override Vector3 FromRect(Vector3 rectPos) {
@@ -118,19 +90,6 @@ namespace Leap.Unity.Gui.Space {
 
     public override void ToRect(Vector3 guiPos, Quaternion guiRot, out Vector3 rectPos, out Quaternion rectRot) {
       throw new System.NotImplementedException();
-    }
-
-    protected override Matrix4x4 GetGuiSpace() {
-      return Matrix4x4.TRS(-localCenter, Quaternion.identity, Vector3.one) * transform.worldToLocalMatrix;
-    }
-
-    protected override void OnValidate() {
-      base.OnValidate();
-      SetGenericGuiParams(new Vector4(_offsetOfConstantWidth - _zOffset, 0, 0, 0));
-    }
-
-    protected override void Update() {
-      base.Update();
     }
 
     void OnDrawGizmosSelected() {
