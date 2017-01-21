@@ -135,22 +135,28 @@ namespace Leap.Unity.Gui.Space {
     public void Bake() {
       var elements = GetComponentsInChildren<LeapElement>();
 
+      //Ready mesh for baking, clear out pre-existing data or just create a new mesh
       if (_bakedMesh == null) {
         _bakedMesh = new Mesh();
       } else {
         _bakedMesh.Clear();
       }
 
+      //First bake out vertex and normal information into the mesh
       bakeVerts(elements);
 
+      //Then atlas all textures used by the gui elements
       var packedUvs = atlasTextures(elements);
 
+      //Use the packed uvs to bake out uv coordinates into the baked mesh
       bakeUvs(elements, packedUvs);
 
+      //If vertex colors are enabled, bake them out into the mesh
       if (_enableVertexColors) {
         bakeColors(elements);
       }
 
+      //Bake out blend shapes and element id information into the mesh
       bakeBlendShapes(elements);
     }
 
