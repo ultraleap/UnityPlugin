@@ -291,13 +291,10 @@ namespace Leap.Unity.Gui.Space {
         var remapping = elements.Query().Zip(packedUvs[texIndex].Query(), (element, packedRect) => {
           var mesh = element.GetMesh();
           mesh.GetUVs(texIndex, tempUvs);
-          //
+
           //If mesh has wrong number of uvs, just fill with zeros
           if (tempUvs.Count != mesh.vertexCount) {
-            tempUvs.Clear();
-            for (int i = 0; i < mesh.vertexCount; i++) {
-              tempUvs.Add(Vector2.zero);
-            }
+            tempUvs.Fill(mesh.vertexCount, Vector2.zero);
           }
 
           return tempUvs.Query().Select(uv => new Vector2(packedRect.x + packedRect.width * uv.x,
@@ -329,9 +326,7 @@ namespace Leap.Unity.Gui.Space {
 
         var vertexColors = elementMesh.colors;
         if (vertexColors.Length != vertexCount) {
-          for (int i = 0; i < vertexCount; i++) {
-            colors.Add(vertexColorTint);
-          }
+          colors.Fill(vertexCount, vertexColorTint);
         } else {
           vertexColors.Query().Select(c => c * vertexColorTint).AppendList(colors);
         }
