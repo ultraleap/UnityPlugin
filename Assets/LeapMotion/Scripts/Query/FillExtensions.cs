@@ -28,14 +28,12 @@ namespace Leap.Unity.Query {
 
     public static void Fill<T>(this List<T> list, int count, T value) {
       list.Clear();
-      list.Capacity = count;
       for (int i = 0; i < count; i++) {
         list.Add(value);
       }
     }
 
     public static void Append<T>(this List<T> list, int count, T value) {
-      list.Capacity = Mathf.Max(list.Capacity, list.Count + count);
       for (int i = 0; i < count; i++) {
         list.Add(value);
       }
