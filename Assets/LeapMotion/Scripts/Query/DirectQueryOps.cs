@@ -143,7 +143,7 @@ namespace Leap.Unity.Query {
     private static List<QueryType> _utilityList = new List<QueryType>();
     public QueryType[] ToArray() {
       try {
-        FillList(_utilityList);
+        AppendList(_utilityList);
         return _utilityList.ToArray();
       } finally {
         _utilityList.Clear();
@@ -169,6 +169,15 @@ namespace Leap.Unity.Query {
     }
 
     public void FillList(List<QueryType> list) {
+      using (thisAndConsume) {
+        list.Clear();
+        while (_op.MoveNext()) {
+          list.Add(_op.Current);
+        }
+      }
+    }
+
+    public void AppendList(List<QueryType> list) {
       using (thisAndConsume) {
         while (_op.MoveNext()) {
           list.Add(_op.Current);
