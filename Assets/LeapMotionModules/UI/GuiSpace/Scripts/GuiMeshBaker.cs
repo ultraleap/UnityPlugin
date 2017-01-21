@@ -220,9 +220,7 @@ namespace Leap.Unity.Gui.Space {
       _atlases = new Texture2D[_textureChannels];
 
       var whiteTexture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false, linear: true);
-      Color[] whiteColors = new Color[3 * 3];
-      whiteColors.Fill(Color.white);
-      whiteTexture.SetPixels(whiteColors);
+      whiteTexture.SetPixels(new Color[3 * 3].Fill(Color.white));
       whiteTexture.Apply();
 
       //Atlas all textures
