@@ -130,6 +130,7 @@ namespace Leap.Unity.Gui.Space {
 
     #endregion
 
+    #region BAKING
 #if UNITY_EDITOR
     public void Bake() {
       var elements = GetComponentsInChildren<LeapElement>();
@@ -140,184 +141,196 @@ namespace Leap.Unity.Gui.Space {
         _bakedMesh.Clear();
       }
 
-      //Bake all vertex information and remap triangles
-      {
-        List<Vector3> verts = new List<Vector3>();
-        List<Vector3> normals = new List<Vector3>();
-        List<int> tris = new List<int>();
+      bakeVerts(elements);
 
-        foreach (var element in elements) {
-          var elementMesh = element.GetMesh();
-          var elementTransform = element.transform;
+      var packedUvs = atlasTextures(elements);
 
-          elementMesh.GetIndices(0).Query().Select(i => i + verts.Count).FillList(tris);
+      bakeUvs(elements, packedUvs);
 
-          //TODO: bake out space if no motion is enabled
-          elementMesh.vertices.Query().Select(v => {
-            v = element.transform.TransformPoint(v);
-            v = transform.InverseTransformPoint(v);
-            v -= transform.InverseTransformPoint(element.transform.position);
-            return v;
-          }).FillList(verts);
-
-          normals.AddRange(elementMesh.normals);
-        }
-
-        _bakedMesh.SetVertices(verts);
-        _bakedMesh.SetNormals(normals);
-        _bakedMesh.SetTriangles(tris, 0);
-      }
-
-      //Texture UV generation
-      {
-        List<Vector2>[] allUvs = new List<Vector2>[_textureChannels];
-        _atlases = new Texture2D[_textureChannels];
-
-        var whiteTexture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false, linear: true);
-        for (int i = 0; i < 3; i++) {
-          for (int j = 0; j < 3; j++) {
-            whiteTexture.SetPixel(i, j, Color.white);
-          }
-        }
-        whiteTexture.Apply();
-
-        //Atlas all textures
-        Rect[][] packedUvs = new Rect[_textureChannels][];
-
-        Texture2D[] textureArray = new Texture2D[elements.Length];
-        Dictionary<Texture2D, Texture2D> textureMapping = new Dictionary<Texture2D, Texture2D>();
-        for (int i = 0; i < _textureChannels; i++) {
-
-          //PackTextures automatically pools shared textures, but we need to manually
-          //pool because we are creating new textures with Border()
-          textureMapping.Clear();
-          for (int j = 0; j < elements.Length; j++) {
-            var element = elements[j];
-            Texture2D tex = element.GetTexture(i);
-            Texture2D mappedTex;
-            if (tex == null || !tex.EnsureReadWriteEnabled()) {
-              mappedTex = whiteTexture;
-            } else {
-              if (!textureMapping.TryGetValue(tex, out mappedTex)) {
-                mappedTex = Instantiate(tex);
-                mappedTex.AddBorder(_atlasSettings.border);
-                textureMapping[tex] = mappedTex;
-              }
-            }
-
-            textureArray[j] = mappedTex;
-          }
-
-          var atlas = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: false);
-          atlas.filterMode = _atlasSettings.filterMode;
-          atlas.wrapMode = _atlasSettings.wrapMode;
-
-          var uvs = atlas.PackTextures(textureArray, _atlasSettings.padding, _atlasSettings.maximumAtlasSize);
-
-          for (int j = 0; j < textureArray.Length; j++) {
-            float dx = 1.0f / atlas.width;
-            float dy = 1.0f / atlas.height;
-
-            //Uvs will point to the larger texture, pull the uvs in so they match the original texture size
-            //White texture wasn't bordered so the uvs are already correct
-            if (textureArray[j] != whiteTexture) {
-              dx *= _atlasSettings.border;
-              dy *= _atlasSettings.border;
-            }
-
-            Rect rect = uvs[j];
-            rect.x += dx;
-            rect.y += dy;
-            rect.width -= dx * 2;
-            rect.height -= dy * 2;
-            uvs[j] = rect;
-          }
-
-          packedUvs[i] = uvs;
-
-          _atlases[i] = atlas;
-          GetComponent<MeshRenderer>().sharedMaterial.SetTexture(_texturePropertyNames[i], atlas);
-        }
-
-        //Remap and bake out all uvs
-        List<Vector2> tempUvs = new List<Vector2>();
-        for (int texIndex = 0; texIndex < _textureChannels; texIndex++) {
-          var remapping = elements.Query().Zip(packedUvs[texIndex].Query(), (element, packedRect) => {
-            var mesh = element.GetMesh();
-            mesh.GetUVs(texIndex, tempUvs);
-            //
-            //If mesh has wrong number of uvs, just fill with zeros
-            if (tempUvs.Count != mesh.vertexCount) {
-              tempUvs.Clear();
-              for (int i = 0; i < mesh.vertexCount; i++) {
-                tempUvs.Add(Vector2.zero);
-              }
-            }
-
-            return tempUvs.Query().Select(uv => new Vector2(packedRect.x + packedRect.width * uv.x,
-                                                            packedRect.y + packedRect.height * uv.y));
-          });
-
-          allUvs[texIndex] = new List<Vector2>();
-          foreach (var remappedUvs in remapping) {
-            remappedUvs.FillList(allUvs[texIndex]);
-          }
-        }
-
-        for (int i = 0; i < _textureChannels; i++) {
-          _bakedMesh.SetUVs(i, allUvs[i]);
-        }
-      }
-
-      //Assign vertex colors if they are enabled
       if (_enableVertexColors) {
-        List<Color> colors = new List<Color>();
-
-        foreach (var element in elements) {
-          var elementMesh = element.GetMesh();
-          int vertexCount = elementMesh.vertexCount;
-          Color vertexColorTint = element.vertexColor * _bakedTint;
-
-          var vertexColors = elementMesh.colors;
-          if (vertexColors.Length != vertexCount) {
-            for (int i = 0; i < vertexCount; i++) {
-              colors.Add(vertexColorTint);
-            }
-          } else {
-            vertexColors.Query().Select(c => c * vertexColorTint).FillList(colors);
-          }
-        }
-
-        _bakedMesh.SetColors(colors);
+        bakeColors(elements);
       }
 
-      //Bake out the element id's into uv3, and blend deltas too if they are enabled
-      {
-        List<Vector4> uv3 = new List<Vector4>();
+      bakeBlendShapes(elements);
+    }
 
-        for (int elementID = 0; elementID < elements.Length; elementID++) {
-          var element = elements[elementID];
+    private void bakeVerts(LeapElement[] elements) {
+      List<Vector3> verts = new List<Vector3>();
+      List<Vector3> normals = new List<Vector3>();
+      List<int> tris = new List<int>();
 
-          if (_enableBlendShapes && element.blendShape != null) {
-            var blendShape = element.blendShape;
+      foreach (var element in elements) {
+        var elementMesh = element.GetMesh();
+        var elementTransform = element.transform;
 
-            element.GetMesh().vertices.Query().
-              Zip(blendShape.vertices.Query(), (v0, v1) => {
-                return element.transform.InverseTransformPoint(v1) - v0;
-              }).
-              Select(delta => new Vector4(delta.x, delta.y, delta.z, elementID)).
-              FillList(uv3);
+        elementMesh.GetIndices(0).Query().Select(i => i + verts.Count).FillList(tris);
+
+        //TODO: bake out space if no motion is enabled
+        elementMesh.vertices.Query().Select(v => {
+          v = element.transform.TransformPoint(v);
+          v = transform.InverseTransformPoint(v);
+          v -= transform.InverseTransformPoint(element.transform.position);
+          return v;
+        }).FillList(verts);
+
+        normals.AddRange(elementMesh.normals);
+      }
+
+      _bakedMesh.SetVertices(verts);
+      _bakedMesh.SetNormals(normals);
+      _bakedMesh.SetTriangles(tris, 0);
+    }
+
+    private Rect[][] atlasTextures(LeapElement[] elements) {
+      _atlases = new Texture2D[_textureChannels];
+
+      var whiteTexture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false, linear: true);
+      for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+          whiteTexture.SetPixel(i, j, Color.white);
+        }
+      }
+      whiteTexture.Apply();
+
+      //Atlas all textures
+      Rect[][] packedUvs = new Rect[_textureChannels][];
+
+      Texture2D[] textureArray = new Texture2D[elements.Length];
+      Dictionary<Texture2D, Texture2D> textureMapping = new Dictionary<Texture2D, Texture2D>();
+      for (int i = 0; i < _textureChannels; i++) {
+
+        //PackTextures automatically pools shared textures, but we need to manually
+        //pool because we are creating new textures with Border()
+        textureMapping.Clear();
+        for (int j = 0; j < elements.Length; j++) {
+          var element = elements[j];
+          Texture2D tex = element.GetTexture(i);
+          Texture2D mappedTex;
+          if (tex == null || !tex.EnsureReadWriteEnabled()) {
+            mappedTex = whiteTexture;
           } else {
-            element.GetMesh().vertices.Query().
-              Select(v => new Vector4(0, 0, 0, elementID)).
-              FillList(uv3);
+            if (!textureMapping.TryGetValue(tex, out mappedTex)) {
+              mappedTex = Instantiate(tex);
+              mappedTex.AddBorder(_atlasSettings.border);
+              textureMapping[tex] = mappedTex;
+            }
           }
+
+          textureArray[j] = mappedTex;
         }
 
-        _bakedMesh.SetUVs(3, uv3);
+        var atlas = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: false);
+        atlas.filterMode = _atlasSettings.filterMode;
+        atlas.wrapMode = _atlasSettings.wrapMode;
+
+        var uvs = atlas.PackTextures(textureArray, _atlasSettings.padding, _atlasSettings.maximumAtlasSize);
+
+        for (int j = 0; j < textureArray.Length; j++) {
+          float dx = 1.0f / atlas.width;
+          float dy = 1.0f / atlas.height;
+
+          //Uvs will point to the larger texture, pull the uvs in so they match the original texture size
+          //White texture wasn't bordered so the uvs are already correct
+          if (textureArray[j] != whiteTexture) {
+            dx *= _atlasSettings.border;
+            dy *= _atlasSettings.border;
+          }
+
+          Rect rect = uvs[j];
+          rect.x += dx;
+          rect.y += dy;
+          rect.width -= dx * 2;
+          rect.height -= dy * 2;
+          uvs[j] = rect;
+        }
+
+        packedUvs[i] = uvs;
+
+        _atlases[i] = atlas;
+        GetComponent<MeshRenderer>().sharedMaterial.SetTexture(_texturePropertyNames[i], atlas);
+      }
+
+      return packedUvs;
+    }
+
+    private void bakeUvs(LeapElement[] elements, Rect[][] packedUvs) {
+      List<Vector2>[] allUvs = new List<Vector2>[_textureChannels];
+      List<Vector2> tempUvs = new List<Vector2>();
+      for (int texIndex = 0; texIndex < _textureChannels; texIndex++) {
+        var remapping = elements.Query().Zip(packedUvs[texIndex].Query(), (element, packedRect) => {
+          var mesh = element.GetMesh();
+          mesh.GetUVs(texIndex, tempUvs);
+          //
+          //If mesh has wrong number of uvs, just fill with zeros
+          if (tempUvs.Count != mesh.vertexCount) {
+            tempUvs.Clear();
+            for (int i = 0; i < mesh.vertexCount; i++) {
+              tempUvs.Add(Vector2.zero);
+            }
+          }
+
+          return tempUvs.Query().Select(uv => new Vector2(packedRect.x + packedRect.width * uv.x,
+                                                          packedRect.y + packedRect.height * uv.y));
+        });
+
+        allUvs[texIndex] = new List<Vector2>();
+        foreach (var remappedUvs in remapping) {
+          remappedUvs.FillList(allUvs[texIndex]);
+        }
+      }
+
+      for (int i = 0; i < _textureChannels; i++) {
+        _bakedMesh.SetUVs(i, allUvs[i]);
       }
     }
+
+    private void bakeColors(LeapElement[] elements) {
+      List<Color> colors = new List<Color>();
+
+      foreach (var element in elements) {
+        var elementMesh = element.GetMesh();
+        int vertexCount = elementMesh.vertexCount;
+        Color vertexColorTint = element.vertexColor * _bakedTint;
+
+        var vertexColors = elementMesh.colors;
+        if (vertexColors.Length != vertexCount) {
+          for (int i = 0; i < vertexCount; i++) {
+            colors.Add(vertexColorTint);
+          }
+        } else {
+          vertexColors.Query().Select(c => c * vertexColorTint).FillList(colors);
+        }
+      }
+
+      _bakedMesh.SetColors(colors);
+    }
+
+    private void bakeBlendShapes(LeapElement[] elements) {
+      List<Vector4> uv3 = new List<Vector4>();
+
+      for (int elementID = 0; elementID < elements.Length; elementID++) {
+        var element = elements[elementID];
+
+        if (_enableBlendShapes && element.blendShape != null) {
+          var blendShape = element.blendShape;
+
+          element.GetMesh().vertices.Query().
+            Zip(blendShape.vertices.Query(), (v0, v1) => {
+              return element.transform.InverseTransformPoint(v1) - v0;
+            }).
+            Select(delta => new Vector4(delta.x, delta.y, delta.z, elementID)).
+            FillList(uv3);
+        } else {
+          element.GetMesh().vertices.Query().
+            Select(v => new Vector4(0, 0, 0, elementID)).
+            FillList(uv3);
+        }
+      }
+
+      _bakedMesh.SetUVs(3, uv3);
+    }
 #endif
+    #endregion
 
     public enum MotionType {
       TranslationOnly,
@@ -340,27 +353,6 @@ namespace Leap.Unity.Gui.Space {
       Vector,
       Color,
       Matrix
-    }
-
-    [Serializable]
-    public struct ChannelDef {
-      public string name;
-      public ChannelType type;
-    }
-
-    public class ColorChannel {
-      public string name;
-      public List<Color> colors;
-    }
-
-    public class TransformChannel {
-      public string name;
-      public List<Matrix4x4> transforms;
-    }
-
-    public class VectorChannel {
-      public string name;
-      public List<Vector4> vectors;
     }
 
     public enum BlendShapeSpace {
