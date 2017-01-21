@@ -17,7 +17,16 @@ namespace Leap.Unity.Gui.Space {
   public class GuiMeshBaker : MonoBehaviour {
     public const string GUI_SPACE_SHADER_FEATURE_PREFIX = "GUI_SPACE_";
 
+    public const string TINTING_FEATURE_NAME = "GUI_SPACE_TINTING";
+    public const string BLEND_SHAPE_FEATURE_NAME = "GUI_SPACE_BLEND_SHAPES";
+
+    public const string TRANSLATION_FEATURE_NAME = "GUI_SPACE_MOVEMENT_TRANSLATION";
+    public const string FULL_MOTION_FEATURE_NAME = "GUI_SPACE_MOVEMENT_FULL";
+
     #region INSPECTOR FIELDS
+    [SerializeField]
+    private Shader _shader;
+
     [Header("Mesh Options")]
     [AutoFind(AutoFindLocations.Object)]
     [SerializeField]
@@ -83,6 +92,7 @@ namespace Leap.Unity.Gui.Space {
     private Texture2D[] _atlases;
 
     private MeshRenderer _renderer;
+    private Material _material;
 
     private bool _isTintDirty = true;
     private List<Color> _tints = new List<Color>();
@@ -128,12 +138,18 @@ namespace Leap.Unity.Gui.Space {
 
     #region UNITY CALLBACKS
 
+    void Awake() {
+      _renderer = GetComponent<MeshRenderer>();
+
+      for (int i = 0; i < _textureChannels; i++) {
+        _renderer.sharedMaterial.SetTexture(_texturePropertyNames[i], _atlases[i]);
+      }
+    }
+
     void Update() {
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
-        Bake();
-
-        GetComponent<MeshFilter>().sharedMesh = _bakedMesh;
+        bakeMesh();
       }
 
       if (_space != null) {
@@ -146,12 +162,12 @@ namespace Leap.Unity.Gui.Space {
     }
 
     void LateUpdate() {
-      if (_isTintDirty) {
+      if (_enableTinting && _isTintDirty) {
         _renderer.sharedMaterial.SetColorArray("_GuiElement_Tints", _tints);
         _isTintDirty = false;
       }
 
-      if (_areBlendShapeAmountsDirty) {
+      if (_enableBlendShapes && _areBlendShapeAmountsDirty) {
         _renderer.sharedMaterial.SetFloatArray("_GuiElement_BlendShapeAmounts", _blendShapeAmounts);
         _areBlendShapeAmountsDirty = false;
       }
@@ -159,14 +175,20 @@ namespace Leap.Unity.Gui.Space {
 
     #endregion
 
+    private void setupShaderFeatures() {
+      if (_enableElementMotion) {
+      }
+    }
+
     #region BAKING
 #if UNITY_EDITOR
-    public void Bake() {
+    private void bakeMesh() {
       var elements = GetComponentsInChildren<LeapElement>();
 
       //Ready mesh for baking, clear out pre-existing data or just create a new mesh
       if (_bakedMesh == null) {
         _bakedMesh = new Mesh();
+        _bakedMesh.name = "Baked GUI Mesh";
       } else {
         _bakedMesh.Clear();
       }
@@ -187,6 +209,8 @@ namespace Leap.Unity.Gui.Space {
 
       //Bake out blend shapes and element id information into the mesh
       bakeBlendShapes(elements);
+
+      GetComponent<MeshFilter>().sharedMesh = _bakedMesh;
     }
 
     private void bakeVerts(LeapElement[] elements) {
