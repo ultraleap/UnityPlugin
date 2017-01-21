@@ -88,6 +88,9 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private Mesh _bakedMesh;
 
+    [SerializeField]
+    private Texture2D[] _atlases;
+
     public int textureChannels {
       get {
         return _textureChannels;
@@ -113,14 +116,20 @@ namespace Leap.Unity.Gui.Space {
     }
 
     void Update() {
-      Bake();
+#if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        Bake();
 
-      GetComponent<MeshFilter>().sharedMesh = _bakedMesh;
+        GetComponent<MeshFilter>().sharedMesh = _bakedMesh;
+      }
 
       if (_space != null) {
+        GetComponent<MeshRenderer>().sharedMaterial.mainTexture = _atlases[0];
+
         _space.BuildPerElementData();
         _space.UpdateMaterial(GetComponent<Renderer>().sharedMaterial);
       }
+#endif
     }
 
 #if UNITY_EDITOR
@@ -168,6 +177,7 @@ namespace Leap.Unity.Gui.Space {
       //Texture UV generation
       {
         List<Vector2>[] allUvs = new List<Vector2>[_textureChannels];
+        _atlases = new Texture2D[_textureChannels];
 
         var whiteTexture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false, linear: true);
         for (int i = 0; i < 3; i++) {
@@ -231,6 +241,7 @@ namespace Leap.Unity.Gui.Space {
 
           packedUvs[i] = uvs;
 
+          _atlases[i] = atlas;
           GetComponent<MeshRenderer>().sharedMaterial.SetTexture(_texturePropertyNames[i], atlas);
         }
 
