@@ -198,7 +198,7 @@ namespace Leap.Unity.Gui.Space {
         var elementMesh = element.GetMesh();
         var elementTransform = element.transform;
 
-        elementMesh.GetIndices(0).Query().Select(i => i + verts.Count).FillList(tris);
+        elementMesh.GetIndices(0).Query().Select(i => i + verts.Count).AppendList(tris);
 
         //TODO: bake out space if no motion is enabled
         elementMesh.vertices.Query().Select(v => {
@@ -206,7 +206,7 @@ namespace Leap.Unity.Gui.Space {
           v = transform.InverseTransformPoint(v);
           v -= transform.InverseTransformPoint(element.transform.position);
           return v;
-        }).FillList(verts);
+        }).AppendList(verts);
 
         normals.AddRange(elementMesh.normals);
       }
@@ -220,11 +220,9 @@ namespace Leap.Unity.Gui.Space {
       _atlases = new Texture2D[_textureChannels];
 
       var whiteTexture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false, linear: true);
-      for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-          whiteTexture.SetPixel(i, j, Color.white);
-        }
-      }
+      Color[] whiteColors = new Color[3 * 3];
+      whiteColors.Fill(Color.white);
+      whiteTexture.SetPixels(whiteColors);
       whiteTexture.Apply();
 
       //Atlas all textures
@@ -310,7 +308,7 @@ namespace Leap.Unity.Gui.Space {
 
         allUvs[texIndex] = new List<Vector2>();
         foreach (var remappedUvs in remapping) {
-          remappedUvs.FillList(allUvs[texIndex]);
+          remappedUvs.AppendList(allUvs[texIndex]);
         }
       }
 
@@ -337,7 +335,7 @@ namespace Leap.Unity.Gui.Space {
             colors.Add(vertexColorTint);
           }
         } else {
-          vertexColors.Query().Select(c => c * vertexColorTint).FillList(colors);
+          vertexColors.Query().Select(c => c * vertexColorTint).AppendList(colors);
         }
       }
 
@@ -360,11 +358,11 @@ namespace Leap.Unity.Gui.Space {
               return element.transform.InverseTransformPoint(v1) - v0;
             }).
             Select(delta => new Vector4(delta.x, delta.y, delta.z, elementID)).
-            FillList(uv3);
+            AppendList(uv3);
         } else {
           element.GetMesh().vertices.Query().
             Select(v => new Vector4(0, 0, 0, elementID)).
-            FillList(uv3);
+            AppendList(uv3);
         }
       }
 
