@@ -3,12 +3,24 @@
 public static class ConstraintsUtil {
 
   public static void ConstrainToPoint(this Transform transform, Vector3 oldPoint, Vector3 newPoint, float weight = 1f) {
+    Vector3 translation;
+    Quaternion rotation;
+    ConstrainToPoint(transform, oldPoint, newPoint, out translation, out rotation, weight);
+
+    transform.position += translation;
+    transform.rotation = rotation * transform.rotation;
+  }
+
+  public static void ConstrainToPoint(Transform transform, Vector3 oldPoint, Vector3 newPoint, out Vector3 translation, out Quaternion rotation, float weight = 1F) {
     Vector3 oldDisplacement = transform.position - oldPoint;
     Vector3 newCenterPosition = newPoint + (transform.position - newPoint).normalized * oldDisplacement.magnitude;
     Vector3 newDisplacement = newCenterPosition - newPoint;
 
-    transform.position = Vector3.Lerp(transform.position, newCenterPosition, weight);
-    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(oldDisplacement, newDisplacement) * transform.rotation, weight);
+    Vector3 newPosition = Vector3.Lerp(transform.position, newCenterPosition, weight);
+    Quaternion newRotation = Quaternion.Slerp(transform.rotation, Quaternion.FromToRotation(oldDisplacement, newDisplacement) * transform.rotation, weight);
+
+    translation = newPosition - transform.position;
+    rotation = newRotation * Quaternion.Inverse(transform.rotation);
   }
 
   public static Vector3 ConstrainToCone(this Vector3 point, Vector3 origin, Vector3 normalDirection, float minDot) {

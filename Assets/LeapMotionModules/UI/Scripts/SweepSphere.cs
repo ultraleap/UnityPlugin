@@ -64,7 +64,6 @@ namespace Leap.Unity.UI {
         DepenetrationRay popOut;
         BoxDepenetrator.Depenetrate(sweepAndSlidePosition, _sphereRadius, closestBox, out popOut);
 
-        //Vector3 popOut = -sweepSegment.direction * sweepSlide.magnitude * 1F;
         this.transform.position = sweepAndSlidePosition + (-popOut.direction * 0.5F);
       }
     }
@@ -79,12 +78,12 @@ namespace Leap.Unity.UI {
 
     private RingBuffer<Ray> _boxHitNormal = new RingBuffer<Ray>(10);
 
-    //void OnDrawGizmos() {
-    //  Gizmos.color = Color.white;
-    //  for (int i = 0; i < _sweepBuffer.Length; i++) {
-    //    Gizmos.DrawRay(_sweepBuffer.Get(i).origin, _sweepBuffer.Get(i).direction * _sweepDistanceBuffer.Get(i));
-    //  }
-    //}
+    void OnDrawGizmos() {
+      Gizmos.color = Color.white;
+      for (int i = 0; i < _sweepBuffer.Length; i++) {
+        Gizmos.DrawRay(_sweepBuffer.Get(i).origin, _sweepBuffer.Get(i).direction * _sweepDistanceBuffer.Get(i));
+      }
+    }
 
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
       drawer.color = Color.white;

@@ -21,6 +21,6 @@ public class LimitedJoint : MonoBehaviour {
     handle.localPosition = handle.localPosition.ConstrainToNormal(Vector3.up, minDotProduct);
 
     //Propagate the leftover displacement down the chain
-    //if (!lockBase) { transform.ConstrainToPoint(handle.position, target.position); }
+    if (!lockBase) { transform.ConstrainToPoint(handle.position, target.position); }
   }
 }
