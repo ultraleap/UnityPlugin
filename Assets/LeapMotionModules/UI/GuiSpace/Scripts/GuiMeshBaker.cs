@@ -17,6 +17,7 @@ namespace Leap.Unity.Gui.Space {
   public class GuiMeshBaker : MonoBehaviour {
     public const string GUI_SPACE_SHADER_FEATURE_PREFIX = "GUI_SPACE_";
 
+    #region INSPECTOR FIELDS
     [Header("Mesh Options")]
     [AutoFind(AutoFindLocations.Object)]
     [SerializeField]
@@ -73,17 +74,7 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private BlendShapeSpace _blendShapeSpace = BlendShapeSpace.Local;
 
-    /// <summary>
-    /// The basic shader does not support any custom animation by default.  If you want
-    /// custom animation for your gui, you will need to create new shaders to handle
-    /// the additional animation data.
-    /// </summary>
-    [Header("Custom Animation")]
-    [SerializeField]
-    private bool enableCustomChannels = false;
-
-    [SerializeField]
-    private ChannelDef[] customChannels;
+    #endregion
 
     [SerializeField]
     private Mesh _bakedMesh;
@@ -91,6 +82,7 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private Texture2D[] _atlases;
 
+    #region PUBLIC API
     public int textureChannels {
       get {
         return _textureChannels;
@@ -115,6 +107,10 @@ namespace Leap.Unity.Gui.Space {
       }
     }
 
+    #endregion
+
+    #region UNITY CALLBACKS
+
     void Update() {
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
@@ -132,13 +128,11 @@ namespace Leap.Unity.Gui.Space {
 #endif
     }
 
+    #endregion
+
 #if UNITY_EDITOR
     public void Bake() {
-      var childElements = GetComponentsInChildren<LeapElement>();
-
-      //Filter out elements that have assets that cannot be made readable
-      List<LeapElement> elements = new List<LeapElement>();
-      childElements.Query().Where(element => element.mesh.EnsureReadWriteEnabled()).FillList(elements);
+      var elements = GetComponentsInChildren<LeapElement>();
 
       if (_bakedMesh == null) {
         _bakedMesh = new Mesh();
@@ -190,14 +184,14 @@ namespace Leap.Unity.Gui.Space {
         //Atlas all textures
         Rect[][] packedUvs = new Rect[_textureChannels][];
 
-        Texture2D[] textureArray = new Texture2D[elements.Count];
+        Texture2D[] textureArray = new Texture2D[elements.Length];
         Dictionary<Texture2D, Texture2D> textureMapping = new Dictionary<Texture2D, Texture2D>();
         for (int i = 0; i < _textureChannels; i++) {
 
           //PackTextures automatically pools shared textures, but we need to manually
           //pool because we are creating new textures with Border()
           textureMapping.Clear();
-          for (int j = 0; j < elements.Count; j++) {
+          for (int j = 0; j < elements.Length; j++) {
             var element = elements[j];
             Texture2D tex = element.GetTexture(i);
             Texture2D mappedTex;
@@ -300,7 +294,7 @@ namespace Leap.Unity.Gui.Space {
       {
         List<Vector4> uv3 = new List<Vector4>();
 
-        for (int elementID = 0; elementID < elements.Count; elementID++) {
+        for (int elementID = 0; elementID < elements.Length; elementID++) {
           var element = elements[elementID];
 
           if (_enableBlendShapes && element.blendShape != null) {

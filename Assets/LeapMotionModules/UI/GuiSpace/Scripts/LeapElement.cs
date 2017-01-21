@@ -17,14 +17,14 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private GuiMeshBaker _baker;
 
-    [Tooltip("Mesh to display for this gui element.  Is must have a topology of " +
-             "triangles, and have only a single submesh.")]
-    [SerializeField]
-    private Mesh _mesh;
+    //For mesh and textures don't serialize references to the objects directly, or else 
+    //unity will include them in the build!  We don't want them in the build because 
+    //they are being baked into the final gui instead.
 
-    //Don't serialize references to the textures directly, or else unity will include
-    //them in the build!  We don't want them in the build because they are being baked
-    //into an atlas that will be included instead.
+    [HideInInspector]
+    [SerializeField]
+    private string _meshGUID;
+
     [HideInInspector]
     [SerializeField]
     private string[] _textureGUIDs;
@@ -60,6 +60,10 @@ namespace Leap.Unity.Gui.Space {
     }
 
 #if UNITY_EDITOR
+    public Mesh GetMesh() {
+      AssetDatabase.GUIDToAssetPath(_meshGUID);
+    }
+
     public Texture2D GetTexture(int channel) {
       if (channel < 0 || channel >= _textureGUIDs.Length) {
         return null;
@@ -88,9 +92,6 @@ namespace Leap.Unity.Gui.Space {
         return _blendShape;
       }
     }
-
-
-
 
     void OnDrawGizmos() {
       Gizmos.matrix = transform.localToWorldMatrix;
