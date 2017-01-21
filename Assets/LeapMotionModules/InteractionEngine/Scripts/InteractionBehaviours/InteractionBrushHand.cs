@@ -106,7 +106,7 @@ namespace Leap.Unity.Interaction {
 #endif
 
       _handParent = new GameObject(gameObject.name);
-      _handParent.transform.parent = null; // Prevent hand from moving when you turn your head.
+      _handParent.transform.parent = FindObjectOfType<InteractionManager>().transform; // Prevent hand from moving when you turn your head.
 
 #if UNITY_EDITOR
       _handParent.AddComponent<RuntimeColliderGizmos>();
@@ -204,6 +204,25 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public void fillBones(Hand inHand) {
+      if (Application.isPlaying) {
+        for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
+          for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
+            Bone bone = inHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
+            int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
+            Vector displacement = _brushBones[boneArrayIndex].body.position.ToVector() - bone.Center;
+            bone.Center += displacement;
+            bone.PrevJoint += displacement;
+            bone.NextJoint += displacement;
+            bone.Rotation = _brushBones[boneArrayIndex].body.rotation.ToLeapQuaternion();
+          }
+        }
+          
+          //inHand.PalmPosition += _brushBones[_brushBones.Length - 1].body.position.ToVector() - inHand.PalmPosition;
+          //inHand.Rotation = _brushBones[_brushBones.Length - 1].body.rotation.ToLeapQuaternion();
+      }
+    }
+
     private void UpdateBone(Bone bone, int boneArrayIndex, float deadzone) {
       InteractionBrushBone brushBone = _brushBones[boneArrayIndex];
       Rigidbody body = brushBone.body;
@@ -223,7 +242,7 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      /*
+
       // Add a deadzone to avoid vibration.
       Vector3 delta = bone.Center.ToVector3() - body.position;
       float deltaLen = delta.magnitude;
@@ -234,25 +253,7 @@ namespace Leap.Unity.Interaction {
         delta *= (deltaLen - deadzone) / deltaLen;
         body.velocity = delta / Time.fixedDeltaTime;
         brushBone.lastTarget = body.position + delta;
-      }*/
-      Vector3 delta = bone.Center.ToVector3() - body.position;
-      float deltaLen = delta.magnitude;
-      delta *= (deltaLen - deadzone) / deltaLen;
-      body.velocity = delta / Time.fixedDeltaTime;
-      brushBone.lastTarget = bone.Center.ToVector3();
-    }
-
-    void FixedUpdate() {
-      int boneArrayIndex = 0;
-      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
-        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
-          Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
-          boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
-          _brushBones[boneArrayIndex].body.position = _brushBones[boneArrayIndex].lastTarget;
-        }
       }
-      boneArrayIndex++;
-      _brushBones[boneArrayIndex].body.position = _brushBones[boneArrayIndex].lastTarget;
     }
 
   /** Cleans up this hand model when it no longer actively represents a tracked hand. */
