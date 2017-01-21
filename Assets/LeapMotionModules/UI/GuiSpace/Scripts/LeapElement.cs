@@ -44,6 +44,9 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private GuiBlendShape _blendShape;
 
+    [SerializeField]
+    private int _elementId;
+
     public GuiMeshBaker baker {
       get {
         return _baker;
@@ -62,6 +65,15 @@ namespace Leap.Unity.Gui.Space {
     public GuiBlendShape blendShape {
       get {
         return _blendShape;
+      }
+    }
+
+    public Color tint {
+      get {
+        return _tint;
+      }
+      set {
+        _tint = value;
       }
     }
 

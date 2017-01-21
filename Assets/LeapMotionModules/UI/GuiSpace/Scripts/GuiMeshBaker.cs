@@ -82,6 +82,14 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private Texture2D[] _atlases;
 
+    private MeshRenderer _renderer;
+
+    private bool _isTintDirty = true;
+    private List<Color> _tints = new List<Color>();
+
+    private bool _areBlendShapeAmountsDirty = true;
+    private List<float> _blendShapeAmounts = new List<float>();
+
     #region PUBLIC API
     public int textureChannels {
       get {
@@ -107,6 +115,15 @@ namespace Leap.Unity.Gui.Space {
       }
     }
 
+    public void SetTint(int elementId, Color tint) {
+      _isTintDirty = true;
+      _tints[elementId] = tint;
+    }
+
+    public void SetBlendShapeAmount(int elementId, float shapeAmount) {
+      _areBlendShapeAmountsDirty = true;
+      _blendShapeAmounts[elementId] = shapeAmount;
+    }
     #endregion
 
     #region UNITY CALLBACKS
@@ -126,6 +143,18 @@ namespace Leap.Unity.Gui.Space {
         _space.UpdateMaterial(GetComponent<Renderer>().sharedMaterial);
       }
 #endif
+    }
+
+    void LateUpdate() {
+      if (_isTintDirty) {
+        _renderer.sharedMaterial.SetColorArray("_GuiElement_Tints", _tints);
+        _isTintDirty = false;
+      }
+
+      if (_areBlendShapeAmountsDirty) {
+        _renderer.sharedMaterial.SetFloatArray("_GuiElement_BlendShapeAmounts", _blendShapeAmounts);
+        _areBlendShapeAmountsDirty = false;
+      }
     }
 
     #endregion
@@ -291,6 +320,10 @@ namespace Leap.Unity.Gui.Space {
     }
 
     private void bakeColors(LeapElement[] elements) {
+      if (_enableTinting) {
+        _tints = new List<Color>(elements.Length);
+      }
+
       List<Color> colors = new List<Color>();
 
       foreach (var element in elements) {
@@ -312,6 +345,8 @@ namespace Leap.Unity.Gui.Space {
     }
 
     private void bakeBlendShapes(LeapElement[] elements) {
+      _blendShapeAmounts = new List<float>(elements.Length);
+
       List<Vector4> uv3 = new List<Vector4>();
 
       for (int elementID = 0; elementID < elements.Length; elementID++) {
