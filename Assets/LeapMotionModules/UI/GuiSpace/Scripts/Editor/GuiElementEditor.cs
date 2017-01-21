@@ -17,7 +17,9 @@ namespace Leap.Unity.Gui.Space {
     private List<LeapElement> elements;
     private List<GuiMeshBaker> bakers;
 
-    private SerializedProperty textureGUIDs;
+    private SerializedProperty meshGuid;
+
+    private SerializedProperty textures;
     private int minTextureChannels;
 
     private SerializedProperty vertexColor;
@@ -36,15 +38,18 @@ namespace Leap.Unity.Gui.Space {
       elements = targets.Query().OfType<LeapElement>().ToList();
       bakers = elements.Query().Select(e => e.baker).ToList();
 
-      textureGUIDs = serializedObject.FindProperty("_textureGUIDs");
+      var mesh = serializedObject.FindProperty("_mesh");
+      meshGuid = mesh.FindPropertyRelative("_guid");
+
+      textures = serializedObject.FindProperty("_textures");
 
       minTextureChannels = int.MaxValue;
       foreach (var baker in bakers) {
         minTextureChannels = Mathf.Min(minTextureChannels, baker.textureChannels);
       }
 
-      while (textureGUIDs.arraySize < minTextureChannels) {
-        textureGUIDs.InsertArrayElementAtIndex(textureGUIDs.arraySize);
+      while (textures.arraySize < minTextureChannels) {
+        textures.InsertArrayElementAtIndex(textures.arraySize);
       }
 
       vertexColor = serializedObject.FindProperty("_vertexColor");
@@ -62,11 +67,28 @@ namespace Leap.Unity.Gui.Space {
     public override void OnInspectorGUI() {
       base.OnInspectorGUI();
 
+      Mesh currMesh = element.GetMesh();
+      Object newMesh = EditorGUILayout.ObjectField("Mesh",
+                                                   currMesh,
+                                                   typeof(Mesh),
+                                                   allowSceneObjects: false,
+                                                   options: GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
+
+      if (newMesh != currMesh) {
+        if (newMesh == null) {
+          meshGuid.stringValue = "";
+        } else {
+          string newPath = AssetDatabase.GetAssetPath(newMesh);
+          meshGuid.stringValue = AssetDatabase.AssetPathToGUID(newPath);
+        }
+      }
+
       for (int i = 0; i < minTextureChannels; i++) {
-        SerializedProperty texGUID = textureGUIDs.GetArrayElementAtIndex(i);
+        SerializedProperty noReferenceElement = textures.GetArrayElementAtIndex(i);
+        SerializedProperty guid = noReferenceElement.FindPropertyRelative("_guid");
         string label = "Texture " + i;
 
-        EditorGUI.showMixedValue = texGUID.hasMultipleDifferentValues;
+        EditorGUI.showMixedValue = guid.hasMultipleDifferentValues;
         Texture2D currTex = element.GetTexture(i);
         Object newTexture = EditorGUILayout.ObjectField(label,
                                                         currTex,
@@ -77,10 +99,10 @@ namespace Leap.Unity.Gui.Space {
 
         if (currTex != newTexture) {
           if (newTexture == null) {
-            texGUID.stringValue = "";
+            guid.stringValue = "";
           } else {
             string newPath = AssetDatabase.GetAssetPath(newTexture);
-            texGUID.stringValue = AssetDatabase.AssetPathToGUID(newPath);
+            guid.stringValue = AssetDatabase.AssetPathToGUID(newPath);
           }
         }
       }

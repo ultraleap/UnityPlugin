@@ -147,7 +147,7 @@ namespace Leap.Unity.Gui.Space {
         List<int> tris = new List<int>();
 
         foreach (var element in elements) {
-          var elementMesh = element.mesh;
+          var elementMesh = element.GetMesh();
           var elementTransform = element.transform;
 
           elementMesh.GetIndices(0).Query().Select(i => i + verts.Count).FillList(tris);
@@ -243,12 +243,13 @@ namespace Leap.Unity.Gui.Space {
         List<Vector2> tempUvs = new List<Vector2>();
         for (int texIndex = 0; texIndex < _textureChannels; texIndex++) {
           var remapping = elements.Query().Zip(packedUvs[texIndex].Query(), (element, packedRect) => {
-            element.mesh.GetUVs(texIndex, tempUvs);
-
+            var mesh = element.GetMesh();
+            mesh.GetUVs(texIndex, tempUvs);
+            //
             //If mesh has wrong number of uvs, just fill with zeros
-            if (tempUvs.Count != element.mesh.vertexCount) {
+            if (tempUvs.Count != mesh.vertexCount) {
               tempUvs.Clear();
-              for (int i = 0; i < element.mesh.vertexCount; i++) {
+              for (int i = 0; i < mesh.vertexCount; i++) {
                 tempUvs.Add(Vector2.zero);
               }
             }
@@ -273,7 +274,7 @@ namespace Leap.Unity.Gui.Space {
         List<Color> colors = new List<Color>();
 
         foreach (var element in elements) {
-          var elementMesh = element.mesh;
+          var elementMesh = element.GetMesh();
           int vertexCount = elementMesh.vertexCount;
           Color vertexColorTint = element.vertexColor * _bakedTint;
 
@@ -300,14 +301,14 @@ namespace Leap.Unity.Gui.Space {
           if (_enableBlendShapes && element.blendShape != null) {
             var blendShape = element.blendShape;
 
-            element.mesh.vertices.Query().
+            element.GetMesh().vertices.Query().
               Zip(blendShape.vertices.Query(), (v0, v1) => {
                 return element.transform.InverseTransformPoint(v1) - v0;
               }).
               Select(delta => new Vector4(delta.x, delta.y, delta.z, elementID)).
               FillList(uv3);
           } else {
-            element.mesh.vertices.Query().
+            element.GetMesh().vertices.Query().
               Select(v => new Vector4(0, 0, 0, elementID)).
               FillList(uv3);
           }

@@ -23,11 +23,11 @@ namespace Leap.Unity.Gui.Space {
 
     [HideInInspector]
     [SerializeField]
-    private string _meshGUID;
+    private NoReferenceMesh _mesh;
 
     [HideInInspector]
     [SerializeField]
-    private string[] _textureGUIDs;
+    private NoReferenceTexture2D[] _textures;
 
     [Tooltip("If the mesh has no vertex colors, use this color as a vertex color. " +
              "If the mesh does have vertex colors, tint them with this color. " +
@@ -50,34 +50,6 @@ namespace Leap.Unity.Gui.Space {
       }
     }
 
-    public Mesh mesh {
-      get {
-        return _mesh;
-      }
-      set {
-        _mesh = value;
-      }
-    }
-
-#if UNITY_EDITOR
-    public Mesh GetMesh() {
-      AssetDatabase.GUIDToAssetPath(_meshGUID);
-    }
-
-    public Texture2D GetTexture(int channel) {
-      if (channel < 0 || channel >= _textureGUIDs.Length) {
-        return null;
-      }
-
-      string path = AssetDatabase.GUIDToAssetPath(_textureGUIDs[channel]);
-      if (string.IsNullOrEmpty(path)) {
-        return null;
-      }
-
-      return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
-    }
-#endif
-
     public Color vertexColor {
       get {
         return _vertexColor;
@@ -93,10 +65,20 @@ namespace Leap.Unity.Gui.Space {
       }
     }
 
+    public Mesh GetMesh() {
+      return _mesh.GetValue();
+    }
+
+    public Texture2D GetTexture(int channel) {
+      return _textures[channel].GetValue();
+    }
+
     void OnDrawGizmos() {
+      /*
       Gizmos.matrix = transform.localToWorldMatrix;
       Gizmos.color = new Color(0, 0, 0, 0);
       Gizmos.DrawMesh(_mesh);
+       * */
     }
 
     public struct ColorChannel {
