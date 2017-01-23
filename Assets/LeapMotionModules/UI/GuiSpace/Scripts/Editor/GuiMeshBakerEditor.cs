@@ -11,8 +11,8 @@ namespace Leap.Unity.Gui.Space {
   public class GuiMeshBakerEditor : Editor {
 
     SerializedProperty space;
+
     SerializedProperty textureChannels;
-    SerializedProperty texturePropertyNames;
     SerializedProperty atlasSettings;
 
     SerializedProperty enableVertexNormals;
@@ -34,7 +34,6 @@ namespace Leap.Unity.Gui.Space {
     void OnEnable() {
       space = serializedObject.FindProperty("_space");
       textureChannels = serializedObject.FindProperty("_textureChannels");
-      texturePropertyNames = serializedObject.FindProperty("_texturePropertyNames");
       atlasSettings = serializedObject.FindProperty("_atlasSettings");
 
       enableVertexNormals = serializedObject.FindProperty("_enableVertexNormals");
@@ -72,34 +71,39 @@ namespace Leap.Unity.Gui.Space {
     }
 
     private void drawTextureChannelInfo() {
-      EditorGUILayout.PropertyField(textureChannels);
+      int newSize = EditorGUILayout.IntField("Texture Channels", textureChannels.arraySize);
+      if (newSize < 0) newSize = 0;
+
+      while (textureChannels.arraySize > newSize) {
+        textureChannels.DeleteArrayElementAtIndex(textureChannels.arraySize - 1);
+      }
+
+      while (textureChannels.arraySize < newSize) {
+        textureChannels.InsertArrayElementAtIndex(textureChannels.arraySize);
+      }
+
       EditorGUI.indentLevel++;
 
-      //Make sure array is large enough to hold all the names
-      while (texturePropertyNames.arraySize < textureChannels.intValue) {
-        texturePropertyNames.InsertArrayElementAtIndex(texturePropertyNames.arraySize);
-      }
-
-      for (int i = 0; i < textureChannels.intValue; i++) {
-        SerializedProperty propertyName = texturePropertyNames.GetArrayElementAtIndex(i);
-
-        if (i == 0) {
-          propertyName.stringValue = "_MainTex";
-          EditorGUI.BeginDisabledGroup(true);
-        }
+      for (int i = 0; i < textureChannels.arraySize; i++) {
+        SerializedProperty element = textureChannels.GetArrayElementAtIndex(i);
+        SerializedProperty propertyName = element.FindPropertyRelative("propertyName");
+        SerializedProperty channel = element.FindPropertyRelative("channel");
 
         if (string.IsNullOrEmpty(propertyName.stringValue)) {
-          propertyName.stringValue = "_Texture" + i;
+          propertyName.stringValue = "_MainTex";
         }
 
-        EditorGUILayout.PropertyField(propertyName);
-
-        if (i == 0) {
-          EditorGUI.EndDisabledGroup();
+        if (channel.intValue == 0) {
+          channel.intValue = (int)GuiMeshBaker.UVChannel.UV0;
         }
+
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.PropertyField(propertyName, GUIContent.none);
+        EditorGUILayout.PropertyField(channel, GUIContent.none);
+        EditorGUILayout.EndHorizontal();
       }
 
-      if (textureChannels.intValue > 0) {
+      if (textureChannels.arraySize > 0) {
         EditorGUILayout.PropertyField(atlasSettings, includeChildren: true);
       }
       EditorGUI.indentLevel--;
