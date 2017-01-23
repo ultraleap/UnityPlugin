@@ -14,7 +14,6 @@ namespace Leap.Unity.Gui.Space {
     SerializedProperty space;
 
     SerializedProperty textureChannels;
-    SerializedProperty atlasSettings;
 
     SerializedProperty enableVertexNormals;
 
@@ -37,7 +36,6 @@ namespace Leap.Unity.Gui.Space {
 
       space = serializedObject.FindProperty("_space");
       textureChannels = serializedObject.FindProperty("_textureChannels");
-      atlasSettings = serializedObject.FindProperty("_atlasSettings");
 
       enableVertexNormals = serializedObject.FindProperty("_enableVertexNormals");
 
@@ -108,9 +106,6 @@ namespace Leap.Unity.Gui.Space {
         EditorGUILayout.EndHorizontal();
       }
 
-      if (textureChannels.arraySize > 0) {
-        EditorGUILayout.PropertyField(atlasSettings, includeChildren: true);
-      }
       EditorGUI.indentLevel--;
     }
 

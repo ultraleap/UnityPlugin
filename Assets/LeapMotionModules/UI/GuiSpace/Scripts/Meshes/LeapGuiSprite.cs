@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LeapGuiSprite : MonoBehaviour {
+public class GuiMeshSprite : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {

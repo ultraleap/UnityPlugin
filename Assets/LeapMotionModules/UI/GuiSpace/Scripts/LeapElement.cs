@@ -27,7 +27,7 @@ namespace Leap.Unity.Gui.Space {
 
     [HideInInspector]
     [SerializeField]
-    private NoReferenceSprite[] _sprites;
+    private Sprite[] _sprites;
 
     [Tooltip("If the mesh has no vertex colors, use this color as a vertex color. " +
              "If the mesh does have vertex colors, tint them with this color. " +
@@ -104,11 +104,25 @@ namespace Leap.Unity.Gui.Space {
     }
 
     public Mesh GetMesh() {
-      return _mesh.GetValue();
+      var meshSource = GetComponent<ProceduralMeshSource>();
+      if (meshSource != null && meshSource.enabled) {
+        return meshSource.GetMesh();
+      } else {
+        return _mesh.GetValue();
+      }
+    }
+
+    public bool DoesMeshHaveAtlasUvs(int uvChannel) {
+      var meshSource = GetComponent<ProceduralMeshSource>();
+      if (meshSource != null && meshSource.enabled) {
+        return meshSource.DoesMeshHaveAtlasUvs(uvChannel);
+      } else {
+        return false; //Assume user assigned meshes never have atlas coordinates
+      }
     }
 
     public Sprite GetSprite(int channel) {
-      return _sprites[channel].GetValue();
+      return _sprites[channel];
     }
 
     void OnDrawGizmos() {

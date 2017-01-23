@@ -86,27 +86,8 @@ namespace Leap.Unity.Gui.Space {
       }
 
       for (int i = 0; i < minTextureChannels; i++) {
-        SerializedProperty noReferenceElement = sprites.GetArrayElementAtIndex(i);
-        SerializedProperty guid = noReferenceElement.FindPropertyRelative("_guid");
-        string label = "Sprite " + i;
-
-        EditorGUI.showMixedValue = guid.hasMultipleDifferentValues;
-        Texture2D currTex = element.GetSprite(i);
-        Object newTexture = EditorGUILayout.ObjectField(label,
-                                                        currTex,
-                                                        typeof(Sprite),
-                                                        allowSceneObjects: false,
-                                                        options: GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
-        EditorGUI.showMixedValue = false;
-
-        if (currTex != newTexture) {
-          if (newTexture == null) {
-            guid.stringValue = "";
-          } else {
-            string newPath = AssetDatabase.GetAssetPath(newTexture);
-            guid.stringValue = AssetDatabase.AssetPathToGUID(newPath);
-          }
-        }
+        SerializedProperty sprite = sprites.GetArrayElementAtIndex(i);
+        EditorGUILayout.PropertyField(sprite, new GUIContent("Sprite " + i));
       }
 
       if (vertexColorsEnabledForAll) {

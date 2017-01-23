@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.Sprites;
 #endif
 using Leap.Unity.Attributes;
 using Leap.Unity.Query;
@@ -93,9 +94,6 @@ namespace Leap.Unity.Gui.Space {
     private Mesh _bakedMesh;
 
     [SerializeField]
-    private Texture2D[] _atlases;
-
-    [SerializeField]
     private Material _material;
 
     [SerializeField]
@@ -181,6 +179,7 @@ namespace Leap.Unity.Gui.Space {
       if (_material.shader != _shader) {
         _material.shader = _shader;
       }
+
       if (_renderer.sharedMaterial != _material) {
         _renderer.sharedMaterial = _material;
       }
@@ -233,7 +232,11 @@ namespace Leap.Unity.Gui.Space {
       }
 
       for (int i = 0; i < _textureChannels.Length; i++) {
-        _material.SetTexture(_textureChannels[i].propertyName, _atlases[i]);
+        string atlasName;
+        Texture2D atlasTexture;
+        Packer.GetAtlasDataForSprite(_elements[0].GetSprite(i), out atlasName, out atlasTexture);
+
+        _material.SetTexture(_textureChannels[i].propertyName, atlasTexture);
       }
     }
 
@@ -270,6 +273,8 @@ namespace Leap.Unity.Gui.Space {
 
 #if UNITY_EDITOR
     private void bakeMesh() {
+      Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+
       _elements.Clear();
       bakeElementHierarchy(transform);
 
@@ -339,30 +344,28 @@ namespace Leap.Unity.Gui.Space {
     }
 
     private void bakeUvs() {
-      List<Vector2>[] allUvs = new List<Vector2>[_textureChannels.Length];
       List<Vector2> tempUvs = new List<Vector2>();
+      List<Vector2> remappedUvs = new List<Vector2>();
       for (int texIndex = 0; texIndex < _textureChannels.Length; texIndex++) {
-        var remapping = _elements.Query().Zip(packedUvs[texIndex].Query(), (element, packedRect) => {
-          var mesh = element.GetMesh();
+        remappedUvs.Clear();
+        foreach (var element in _elements) {
+          Sprite sprite = element.GetSprite(texIndex);
+          Mesh mesh = element.GetMesh();
           mesh.GetUVs(texIndex, tempUvs);
 
-          //If mesh has wrong number of uvs, just fill with zeros
-          if (tempUvs.Count != mesh.vertexCount) {
-            tempUvs.Fill(mesh.vertexCount, Vector2.zero);
+          if (sprite.packed && sprite.packingMode == SpritePackingMode.Rectangle && !element.DoesMeshHaveAtlasUvs(texIndex)) {
+            Vector2[] uvs = SpriteUtility.GetSpriteUVs(sprite, getAtlasData: true);
+
+            tempUvs.Query().Select(uv => new Vector2(Mathf.Lerp(uvs[0].x, uvs[1].x, uv.x),
+                                                     Mathf.Lerp(uvs[0].y, uvs[2].y, uv.y))).
+                            AppendList(remappedUvs);
+            continue;
+          } else {
+            remappedUvs.AddRange(tempUvs);
           }
-
-          return tempUvs.Query().Select(uv => new Vector2(packedRect.x + packedRect.width * uv.x,
-                                                          packedRect.y + packedRect.height * uv.y));
-        });
-
-        allUvs[texIndex] = new List<Vector2>();
-        foreach (var remappedUvs in remapping) {
-          remappedUvs.AppendList(allUvs[texIndex]);
         }
-      }
 
-      for (int i = 0; i < _textureChannels.Length; i++) {
-        _bakedMesh.SetUVs(i, allUvs[i]);
+        _bakedMesh.SetUVs(texIndex, remappedUvs);
       }
     }
 
