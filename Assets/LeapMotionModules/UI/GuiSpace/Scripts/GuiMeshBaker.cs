@@ -16,6 +16,7 @@ namespace Leap.Unity.Gui.Space {
   [RequireComponent(typeof(MeshRenderer))]
   public class GuiMeshBaker : MonoBehaviour {
     public const string GUI_SPACE_SHADER_FEATURE_PREFIX = "GUI_SPACE_";
+    public const string GUI_SPACE_PROPERTY_PREFIX = "_GuiSpace_";
 
     public const string UV_CHANNEL_0_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "UV_0";
     public const string UV_CHANNEL_1_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "UV_1";
@@ -24,10 +25,12 @@ namespace Leap.Unity.Gui.Space {
     public const string VERTEX_NORMALS_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "NORMALS";
     public const string VERTEX_COLORS_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "VERTEX_COLORS";
 
-    public const string MOTION_TRANSLATION_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "TRANSLATION";
-    public const string MOTION_FULL_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "FULL";
+    public const string MOTION_TRANSLATION_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "MOVEMENT_TRANSLATION";
+    public const string MOTION_FULL_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "MOVEMENT_FULL";
 
     public const string TINTING_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "TINTING";
+    public const string TINT_PROPERTY = GUI_SPACE_PROPERTY_PREFIX + "Tints";
+
     public const string BLEND_SHAPE_FEATURE = "GUI_SPACE_BLEND_SHAPES";
 
 
@@ -101,7 +104,7 @@ namespace Leap.Unity.Gui.Space {
     private MeshRenderer _renderer;
 
 
-    private bool _isTintDirty = true;
+    private bool _areTintsDirty = true;
     private List<Color> _tints = new List<Color>();
 
     private bool _areBlendShapeAmountsDirty = true;
@@ -133,7 +136,7 @@ namespace Leap.Unity.Gui.Space {
     }
 
     public void SetTint(int elementId, Color tint) {
-      _isTintDirty = true;
+      _areTintsDirty = true;
       _tints[elementId] = tint;
     }
 
@@ -147,19 +150,25 @@ namespace Leap.Unity.Gui.Space {
 
     void Awake() {
       _renderer = GetComponent<MeshRenderer>();
+
+      initAnimationData();
     }
 
 #if UNITY_EDITOR
     void Update() {
       if (!Application.isPlaying) {
         bakeMesh();
+        initAnimationData();
         setupMaterial();
+        updateMaterial();
       }
     }
 #endif
 
     void LateUpdate() {
-      updateMaterial();
+      if (Application.isPlaying) {
+        updateMaterial();
+      }
     }
 
     #endregion
@@ -227,26 +236,45 @@ namespace Leap.Unity.Gui.Space {
       for (int i = 0; i < _textureChannels.Length; i++) {
         _material.SetTexture(_textureChannels[i].propertyName, _atlases[i]);
       }
+
+      foreach (var keyword in _material.shaderKeywords) {
+        Debug.Log(keyword);
+      }
     }
 
     private void updateMaterial() {
       if (_space != null) {
         _space.BuildPerElementData();
-        _space.UpdateMaterial(GetComponent<Renderer>().sharedMaterial);
+        _space.UpdateMaterial(_material);
       }
 
-      if (_enableTinting && _isTintDirty) {
-        _renderer.sharedMaterial.SetColorArray("_GuiElement_Tints", _tints);
-        _isTintDirty = false;
+      if (_enableTinting && _areTintsDirty) {
+        _material.SetColorArray(TINT_PROPERTY, _tints);
+        _areTintsDirty = false;
       }
 
       if (_enableBlendShapes && _areBlendShapeAmountsDirty) {
-        _renderer.sharedMaterial.SetFloatArray("_GuiElement_BlendShapeAmounts", _blendShapeAmounts);
+        _material.SetFloatArray("_GuiElement_BlendShapeAmounts", _blendShapeAmounts);
         _areBlendShapeAmountsDirty = false;
       }
     }
 
     #region BAKING
+
+    private void initAnimationData() {
+      var elements = GetComponentsInChildren<LeapElement>();
+
+      if (_enableTinting) {
+        _tints = new List<Color>().Fill(elements.Length, Color.white);
+        _areTintsDirty = true;
+      }
+
+      if (_enableBlendShapes) {
+        _blendShapeAmounts = new List<float>().Fill(elements.Length, 0);
+        _areBlendShapeAmountsDirty = true;
+      }
+    }
+
 #if UNITY_EDITOR
     private void bakeMesh() {
       var elements = GetComponentsInChildren<LeapElement>();
@@ -403,10 +431,6 @@ namespace Leap.Unity.Gui.Space {
     }
 
     private void bakeColors(LeapElement[] elements) {
-      if (_enableTinting) {
-        _tints = new List<Color>(elements.Length);
-      }
-
       List<Color> colors = new List<Color>();
 
       foreach (var element in elements) {

@@ -1,5 +1,7 @@
 #include "UnityCG.cginc"
 
+#define ELEMENT_MAX 32
+
 /************************************************************************* 
  * Movement name:
  *  _ (none)
@@ -61,12 +63,17 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
  *    runtime tinting on a per-element basis
  ***********************************/
 
+#ifdef GUI_SPACE_VERTEX_COLORS
+#define GUI_ELEMENTS_HAVE_COLOR
+#endif
+
 #ifdef GUI_SPACE_TINTING
 #define GUI_ELEMENTS_HAVE_ID
-float _GuiSpace_Tints[ELEMENT_MAX];
+#define GUI_ELEMENTS_HAVE_COLOR
+float4 _GuiSpace_Tints[ELEMENT_MAX];
 
-void ApplyGuiTinting(inout float4 color, int elementId) {
-  color *= _GuiSpace_Tints[elementId];
+float4 GetElementTint(int elementId) {
+  return _GuiSpace_Tints[elementId];
 }
 #endif
 
@@ -86,8 +93,6 @@ void ApplyBlendShapes(inout float4 vert, int elementId) {
   color.xyz += _GuiSpace_BlendShapeAmmounts[elementId];
 }
 #endif
-
-#define ELEMENT_MAX 32
 
 struct appdata_gui {
   float4 vertex : POSITION;
@@ -136,7 +141,7 @@ struct v2f_gui {
   float2 uv2 : TEXCOORD3;
 #endif
 
-#ifdef GUI_SPACE_VERTEX_COLORS
+#ifdef GUI_ELEMENTS_HAVE_COLOR
   float4 color : COLOR;
 #endif
 };
@@ -174,6 +179,13 @@ v2f_gui ApplyGuiSpace(appdata_gui v) {
 
 #ifdef GUI_SPACE_VERTEX_COLORS
   o.color = v.color;
+#ifdef GUI_SPACE_TINTING
+  o.color *= GetElementTint(elementId);  
+#endif
+#else
+#ifdef GUI_SPACE_TINTING
+  o.color = GetElementTint(elementId);
+#endif
 #endif
 
   return o;

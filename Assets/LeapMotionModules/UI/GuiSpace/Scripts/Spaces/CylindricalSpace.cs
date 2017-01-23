@@ -8,7 +8,7 @@ namespace Leap.Unity.Gui.Space {
 
   [ExecuteInEditMode]
   public class CylindricalSpace : GuiSpace {
-    public const string SHADER_VARIANT_NAME = GuiMeshBaker.GUI_SPACE_SHADER_FEATURE_PREFIX + "Cylindrical";
+    public const string SHADER_VARIANT_NAME = GuiMeshBaker.GUI_SPACE_SHADER_FEATURE_PREFIX + "CYLINDRICAL";
     public const string PARENT_POSITION_PROPERTY_NAME = "_GuiSpaceCylindrical_ParentPosition";
     public const string REFERENCE_RADIUS_PROPERTY_NAME = "_GuiSpaceCylindrical_ReferenceRadius";
 
