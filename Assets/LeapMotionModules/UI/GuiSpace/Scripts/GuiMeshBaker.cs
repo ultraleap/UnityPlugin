@@ -47,9 +47,6 @@ namespace Leap.Unity.Gui.Space {
     private TextureChannel[] _textureChannels;
 
     [SerializeField]
-    private AtlasSettings _atlasSettings;
-
-    [SerializeField]
     private bool _enableVertexNormals = false;
 
     [Tooltip("Enabling this will cause the vertex colors of each gui element to be baked into " +
@@ -287,11 +284,8 @@ namespace Leap.Unity.Gui.Space {
       //First bake out vertex and normal information into the mesh
       bakeVerts();
 
-      //Then atlas all textures used by the gui elements
-      var packedUvs = atlasTextures();
-
       //Use the packed uvs to bake out uv coordinates into the baked mesh
-      bakeUvs(packedUvs);
+      bakeUvs();
 
       //If vertex colors are enabled, bake them out into the mesh
       if (_enableVertexColors) {
@@ -344,75 +338,7 @@ namespace Leap.Unity.Gui.Space {
       _bakedMesh.SetTriangles(tris, 0);
     }
 
-    private Rect[][] atlasTextures() {
-      _atlases = new Texture2D[_textureChannels.Length];
-
-      var whiteTexture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false, linear: true);
-      whiteTexture.SetPixels(new Color[3 * 3].Fill(Color.white));
-      whiteTexture.Apply();
-
-      //Atlas all textures
-      Rect[][] packedUvs = new Rect[_textureChannels.Length][];
-
-      Texture2D[] textureArray = new Texture2D[_elements.Count];
-      Dictionary<Texture2D, Texture2D> textureMapping = new Dictionary<Texture2D, Texture2D>();
-      for (int i = 0; i < _textureChannels.Length; i++) {
-
-        //PackTextures automatically pools shared textures, but we need to manually
-        //pool because we are creating new textures with Border()
-        textureMapping.Clear();
-        for (int j = 0; j < _elements.Count; j++) {
-          var element = _elements[j];
-          Texture2D tex = element.GetTexture(i);
-          Texture2D mappedTex;
-          if (tex == null || !tex.EnsureReadWriteEnabled()) {
-            mappedTex = whiteTexture;
-          } else {
-            if (!textureMapping.TryGetValue(tex, out mappedTex)) {
-              mappedTex = Instantiate(tex);
-              mappedTex.AddBorder(_atlasSettings.border);
-              textureMapping[tex] = mappedTex;
-            }
-          }
-
-          textureArray[j] = mappedTex;
-        }
-
-        var atlas = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: false);
-        atlas.filterMode = _atlasSettings.filterMode;
-        atlas.wrapMode = _atlasSettings.wrapMode;
-
-        var uvs = atlas.PackTextures(textureArray, _atlasSettings.padding, _atlasSettings.maximumAtlasSize);
-
-        for (int j = 0; j < textureArray.Length; j++) {
-          float dx = 1.0f / atlas.width;
-          float dy = 1.0f / atlas.height;
-
-          //Uvs will point to the larger texture, pull the uvs in so they match the original texture size
-          //White texture wasn't bordered so the uvs are already correct
-          if (textureArray[j] != whiteTexture) {
-            dx *= _atlasSettings.border;
-            dy *= _atlasSettings.border;
-          }
-
-          Rect rect = uvs[j];
-          rect.x += dx;
-          rect.y += dy;
-          rect.width -= dx * 2;
-          rect.height -= dy * 2;
-          uvs[j] = rect;
-        }
-
-        packedUvs[i] = uvs;
-
-        _atlases[i] = atlas;
-        GetComponent<MeshRenderer>().sharedMaterial.SetTexture(_textureChannels[i].propertyName, atlas);
-      }
-
-      return packedUvs;
-    }
-
-    private void bakeUvs(Rect[][] packedUvs) {
+    private void bakeUvs() {
       List<Vector2>[] allUvs = new List<Vector2>[_textureChannels.Length];
       List<Vector2> tempUvs = new List<Vector2>();
       for (int texIndex = 0; texIndex < _textureChannels.Length; texIndex++) {
@@ -493,24 +419,6 @@ namespace Leap.Unity.Gui.Space {
       Full
     }
 
-    public enum TintChannels {
-      One,
-      Two
-    }
-
-    public enum BlendShapeChannels {
-      One,
-      Two,
-      Three
-    }
-
-    public enum ChannelType {
-      Float,
-      Vector,
-      Color,
-      Matrix
-    }
-
     public enum BlendShapeSpace {
       Local,
       World
@@ -526,23 +434,6 @@ namespace Leap.Unity.Gui.Space {
       UV0 = UVChannelFlags.UV0,
       UV1 = UVChannelFlags.UV1,
       UV2 = UVChannelFlags.UV2
-    }
-
-    [Serializable]
-    public class AtlasSettings {
-      [Range(0, 16)]
-      public int border = 1;
-
-      [MinValue(0)]
-      public int padding;
-
-      [MinValue(32)]
-      [MaxValue(4096)]
-      public int maximumAtlasSize = 2048;
-
-      public FilterMode filterMode = FilterMode.Bilinear;
-
-      public TextureWrapMode wrapMode = TextureWrapMode.Clamp;
     }
   }
 }
