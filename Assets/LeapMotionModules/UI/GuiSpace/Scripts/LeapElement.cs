@@ -45,12 +45,26 @@ namespace Leap.Unity.Gui.Space {
     private GuiBlendShape _blendShape;
 
     [HideInInspector]
+    [Range(0, 1)]
+    [SerializeField]
+    private float _blendShapeAmount = 0;
+
+    [HideInInspector]
     [SerializeField]
     private int _elementId;
 
     public GuiMeshBaker baker {
       get {
         return _baker;
+      }
+    }
+
+    public int elementId {
+      get {
+        return _elementId;
+      }
+      set {
+        _elementId = value;
       }
     }
 
@@ -75,15 +89,17 @@ namespace Leap.Unity.Gui.Space {
       }
       set {
         _tint = value;
+        _baker.SetTint(_elementId, _tint);
       }
     }
 
-    public int elementId {
+    public float blendShapeAmount {
       get {
-        return _elementId;
+        return _blendShapeAmount;
       }
       set {
-        _elementId = value;
+        _blendShapeAmount = value;
+        _baker.SetBlendShapeAmount(_elementId, _blendShapeAmount);
       }
     }
 
@@ -101,26 +117,6 @@ namespace Leap.Unity.Gui.Space {
       Gizmos.color = new Color(0, 0, 0, 0);
       Gizmos.DrawMesh(_mesh);
        * */
-    }
-
-    public struct ColorChannel {
-      public string name;
-      public Color color;
-    }
-
-    public struct FloatChannels {
-      public string name;
-      public float value;
-    }
-
-    public struct VectorChannels {
-      public string name;
-      public Vector4 vector;
-    }
-
-    public struct TextureChannels {
-      public string name;
-      public Sprite sprite;
     }
   }
 }

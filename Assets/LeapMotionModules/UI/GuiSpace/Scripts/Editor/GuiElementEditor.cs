@@ -29,6 +29,7 @@ namespace Leap.Unity.Gui.Space {
     private bool tintingEnabledForAll;
 
     private SerializedProperty blendShape;
+    private SerializedProperty blendShapeAmount;
     private bool blendShapesEnabledForAll;
 
     protected override void OnEnable() {
@@ -59,6 +60,7 @@ namespace Leap.Unity.Gui.Space {
       tintingEnabledForAll = bakers.Query().All(baker => baker.enableTinting);
 
       blendShape = serializedObject.FindProperty("_blendShape");
+      blendShapeAmount = serializedObject.FindProperty("_blendShapeAmount");
       blendShapesEnabledForAll = bakers.Query().All(baker => baker.enableBlendShapes);
 
       serializedObject.ApplyModifiedProperties();
@@ -117,6 +119,7 @@ namespace Leap.Unity.Gui.Space {
 
       if (blendShapesEnabledForAll) {
         EditorGUILayout.PropertyField(blendShape);
+        EditorGUILayout.PropertyField(blendShapeAmount);
       }
 
       serializedObject.ApplyModifiedProperties();

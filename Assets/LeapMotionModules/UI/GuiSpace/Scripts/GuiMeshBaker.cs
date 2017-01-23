@@ -261,15 +261,13 @@ namespace Leap.Unity.Gui.Space {
     #region BAKING
 
     private void initAnimationData() {
-      var elements = GetComponentsInChildren<LeapElement>();
-
       if (_enableTinting) {
-        _tints = new List<Color>().Fill(elements.Length, Color.white);
+        _elements.Query().Select(e => e.tint).FillList(_tints);
         _areTintsDirty = true;
       }
 
       if (_enableBlendShapes) {
-        _blendShapeAmounts = new List<float>().Fill(elements.Length, 0);
+        _elements.Query().Select(e => e.blendShapeAmount).FillList(_blendShapeAmounts);
         _areBlendShapeAmountsDirty = true;
       }
     }

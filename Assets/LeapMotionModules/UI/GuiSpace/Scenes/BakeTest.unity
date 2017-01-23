@@ -91,7 +91,7 @@ NavMeshSettings:
     cellSize: 0.16666667
     accuratePlacement: 0
   m_NavMeshData: {fileID: 0}
---- !u!28 &145591677
+--- !u!28 &451115194
 Texture2D:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -257,8 +257,9 @@ MonoBehaviour:
   _textures:
   - _guid: 
   _vertexColor: {r: 1, g: 1, b: 1, a: 0}
-  _tint: {r: 0.8602941, g: 0.8602941, b: 0.8602941, a: 0}
+  _tint: {r: 1, g: 1, b: 1, a: 0}
   _blendShape: {fileID: 0}
+  _blendShapeAmount: 0
   _elementId: 0
 --- !u!1 &1029770397
 GameObject:
@@ -307,12 +308,15 @@ MonoBehaviour:
   _enableElementMotion: 1
   _motionType: 0
   _enableTinting: 1
-  _enableBlendShapes: 0
+  _enableBlendShapes: 1
   _blendShapeSpace: 0
   _bakedMesh: {fileID: 1895241774}
   _atlases:
-  - {fileID: 145591677}
+  - {fileID: 451115194}
   _material: {fileID: 1145251066}
+  _elements:
+  - {fileID: 618537554}
+  - {fileID: 1704998186}
 --- !u!4 &1029770399
 Transform:
   m_ObjectHideFlags: 0
@@ -450,8 +454,8 @@ Material:
   m_PrefabInternal: {fileID: 0}
   m_Name: GUI Space Material
   m_Shader: {fileID: 4800000, guid: c9811e06840adc745900174423cbf864, type: 3}
-  m_ShaderKeywords: GUI_SPACE_CYLINDRICAL GUI_SPACE_MOVEMENT_TRANSLATION GUI_SPACE_TINTING
-    GUI_SPACE_UV_0
+  m_ShaderKeywords: GUI_SPACE_BLEND_SHAPES GUI_SPACE_CYLINDRICAL GUI_SPACE_MOVEMENT_TRANSLATION
+    GUI_SPACE_TINTING GUI_SPACE_UV_0
   m_LightmapFlags: 5
   m_CustomRenderQueue: -1
   stringTagMap: {}
@@ -461,7 +465,7 @@ Material:
     - first:
         name: _MainTex
       second:
-        m_Texture: {fileID: 145591677}
+        m_Texture: {fileID: 451115194}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats: []
@@ -514,7 +518,8 @@ MonoBehaviour:
   _vertexColor: {r: 0.5012976, g: 0.7988008, b: 0.89705884, a: 1}
   _tint: {r: 0.8602941, g: 0.8602941, b: 0.8602941, a: 0}
   _blendShape: {fileID: 0}
-  _elementId: 0
+  _blendShapeAmount: 0
+  _elementId: 1
 --- !u!43 &1895241774
 Mesh:
   m_ObjectHideFlags: 0
