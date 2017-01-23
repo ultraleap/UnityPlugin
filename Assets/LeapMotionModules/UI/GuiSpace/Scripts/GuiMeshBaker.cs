@@ -34,7 +34,6 @@ namespace Leap.Unity.Gui.Space {
     public const string BLEND_SHAPE_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "BLEND_SHAPES";
     public const string BLEND_SHAPE_AMOUNTS_PROPERTY = GUI_SPACE_PROPERTY_PREFIX + "BlendShapeAmounts";
 
-
     #region INSPECTOR FIELDS
     [SerializeField]
     private Shader _shader;
