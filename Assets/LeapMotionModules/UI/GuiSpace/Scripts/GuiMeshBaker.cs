@@ -102,6 +102,9 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private Material _material;
 
+    [SerializeField]
+    private List<LeapElement> _elements;
+
     private MeshRenderer _renderer;
 
 
@@ -274,7 +277,8 @@ namespace Leap.Unity.Gui.Space {
 
 #if UNITY_EDITOR
     private void bakeMesh() {
-      var elements = GetComponentsInChildren<LeapElement>();
+      _elements.Clear();
+      bakeElementHierarchy(transform);
 
       //Ready mesh for baking, clear out pre-existing data or just create a new mesh
       if (_bakedMesh == null) {
@@ -285,31 +289,43 @@ namespace Leap.Unity.Gui.Space {
       }
 
       //First bake out vertex and normal information into the mesh
-      bakeVerts(elements);
+      bakeVerts();
 
       //Then atlas all textures used by the gui elements
-      var packedUvs = atlasTextures(elements);
+      var packedUvs = atlasTextures();
 
       //Use the packed uvs to bake out uv coordinates into the baked mesh
-      bakeUvs(elements, packedUvs);
+      bakeUvs(packedUvs);
 
       //If vertex colors are enabled, bake them out into the mesh
       if (_enableVertexColors) {
-        bakeColors(elements);
+        bakeColors();
       }
 
       //Bake out blend shapes and element id information into the mesh
-      bakeBlendShapes(elements);
+      bakeBlendShapes();
 
       GetComponent<MeshFilter>().sharedMesh = _bakedMesh;
     }
 
-    private void bakeVerts(LeapElement[] elements) {
+    private void bakeElementHierarchy(Transform root) {
+      int childCount = root.childCount;
+      for (int i = 0; i < childCount; i++) {
+        Transform child = root.GetChild(i);
+
+        var element = child.GetComponent<LeapElement>();
+        _elements.Add(element);
+
+        bakeElementHierarchy(child);
+      }
+    }
+
+    private void bakeVerts() {
       List<Vector3> verts = new List<Vector3>();
       List<Vector3> normals = new List<Vector3>();
       List<int> tris = new List<int>();
 
-      foreach (var element in elements) {
+      foreach (var element in _elements) {
         var elementMesh = element.GetMesh();
         var elementTransform = element.transform;
 
@@ -331,7 +347,7 @@ namespace Leap.Unity.Gui.Space {
       _bakedMesh.SetTriangles(tris, 0);
     }
 
-    private Rect[][] atlasTextures(LeapElement[] elements) {
+    private Rect[][] atlasTextures() {
       _atlases = new Texture2D[_textureChannels.Length];
 
       var whiteTexture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false, linear: true);
@@ -341,15 +357,15 @@ namespace Leap.Unity.Gui.Space {
       //Atlas all textures
       Rect[][] packedUvs = new Rect[_textureChannels.Length][];
 
-      Texture2D[] textureArray = new Texture2D[elements.Length];
+      Texture2D[] textureArray = new Texture2D[_elements.Count];
       Dictionary<Texture2D, Texture2D> textureMapping = new Dictionary<Texture2D, Texture2D>();
       for (int i = 0; i < _textureChannels.Length; i++) {
 
         //PackTextures automatically pools shared textures, but we need to manually
         //pool because we are creating new textures with Border()
         textureMapping.Clear();
-        for (int j = 0; j < elements.Length; j++) {
-          var element = elements[j];
+        for (int j = 0; j < _elements.Count; j++) {
+          var element = _elements[j];
           Texture2D tex = element.GetTexture(i);
           Texture2D mappedTex;
           if (tex == null || !tex.EnsureReadWriteEnabled()) {
@@ -399,11 +415,11 @@ namespace Leap.Unity.Gui.Space {
       return packedUvs;
     }
 
-    private void bakeUvs(LeapElement[] elements, Rect[][] packedUvs) {
+    private void bakeUvs(Rect[][] packedUvs) {
       List<Vector2>[] allUvs = new List<Vector2>[_textureChannels.Length];
       List<Vector2> tempUvs = new List<Vector2>();
       for (int texIndex = 0; texIndex < _textureChannels.Length; texIndex++) {
-        var remapping = elements.Query().Zip(packedUvs[texIndex].Query(), (element, packedRect) => {
+        var remapping = _elements.Query().Zip(packedUvs[texIndex].Query(), (element, packedRect) => {
           var mesh = element.GetMesh();
           mesh.GetUVs(texIndex, tempUvs);
 
@@ -427,10 +443,10 @@ namespace Leap.Unity.Gui.Space {
       }
     }
 
-    private void bakeColors(LeapElement[] elements) {
+    private void bakeColors() {
       List<Color> colors = new List<Color>();
 
-      foreach (var element in elements) {
+      foreach (var element in _elements) {
         var elementMesh = element.GetMesh();
         int vertexCount = elementMesh.vertexCount;
         Color vertexColorTint = element.vertexColor * _bakedTint;
@@ -446,13 +462,13 @@ namespace Leap.Unity.Gui.Space {
       _bakedMesh.SetColors(colors);
     }
 
-    private void bakeBlendShapes(LeapElement[] elements) {
-      _blendShapeAmounts = new List<float>(elements.Length);
+    private void bakeBlendShapes() {
+      _blendShapeAmounts = new List<float>(_elements.Count);
 
       List<Vector4> uv3 = new List<Vector4>();
 
-      for (int elementID = 0; elementID < elements.Length; elementID++) {
-        var element = elements[elementID];
+      for (int elementID = 0; elementID < _elements.Count; elementID++) {
+        var element = _elements[elementID];
 
         if (_enableBlendShapes && element.blendShape != null) {
           var blendShape = element.blendShape;
