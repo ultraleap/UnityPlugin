@@ -10,6 +10,7 @@ namespace Leap.Unity.Gui.Space {
   [CustomEditor(typeof(GuiMeshBaker))]
   public class GuiMeshBakerEditor : Editor {
 
+    SerializedProperty shader;
     SerializedProperty space;
 
     SerializedProperty textureChannels;
@@ -32,6 +33,8 @@ namespace Leap.Unity.Gui.Space {
     AnimBool animBlendShapes;
 
     void OnEnable() {
+      shader = serializedObject.FindProperty("_shader");
+
       space = serializedObject.FindProperty("_space");
       textureChannels = serializedObject.FindProperty("_textureChannels");
       atlasSettings = serializedObject.FindProperty("_atlasSettings");
@@ -53,6 +56,8 @@ namespace Leap.Unity.Gui.Space {
       animBlendShapes = createAnimBool(enableBlendShapes.boolValue);
     }
     public override void OnInspectorGUI() {
+      EditorGUILayout.PropertyField(shader);
+
       EditorGUILayout.PropertyField(space);
 
       drawTextureChannelInfo();

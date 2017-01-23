@@ -95,8 +95,11 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private Texture2D[] _atlases;
 
-    private MeshRenderer _renderer;
+    [SerializeField]
     private Material _material;
+
+    private MeshRenderer _renderer;
+
 
     private bool _isTintDirty = true;
     private List<Color> _tints = new List<Color>();
@@ -154,32 +157,30 @@ namespace Leap.Unity.Gui.Space {
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
         bakeMesh();
-      }
-
-      if (_space != null) {
-        GetComponent<MeshRenderer>().sharedMaterial.mainTexture = _atlases[0];
-
-        _space.BuildPerElementData();
-        _space.UpdateMaterial(GetComponent<Renderer>().sharedMaterial);
+        setupMaterial();
       }
 #endif
     }
 
     void LateUpdate() {
-      if (_enableTinting && _isTintDirty) {
-        _renderer.sharedMaterial.SetColorArray("_GuiElement_Tints", _tints);
-        _isTintDirty = false;
-      }
-
-      if (_enableBlendShapes && _areBlendShapeAmountsDirty) {
-        _renderer.sharedMaterial.SetFloatArray("_GuiElement_BlendShapeAmounts", _blendShapeAmounts);
-        _areBlendShapeAmountsDirty = false;
-      }
+      updateMaterial();
     }
 
     #endregion
 
-    private void setupShaderFeatures() {
+    private void setupMaterial() {
+      if (_material == null) {
+        _material = new Material(_shader);
+        _material.name = "GUI Space Material";
+      }
+
+      if (_material.shader != _shader) {
+        _material.shader = _shader;
+      }
+      if (_renderer.sharedMaterial != _material) {
+        _renderer.sharedMaterial = _material;
+      }
+
       foreach (var keyword in _material.shaderKeywords.Query().Where(k => k.StartsWith(GUI_SPACE_SHADER_FEATURE_PREFIX))) {
         _material.DisableKeyword(keyword);
       }
@@ -221,6 +222,27 @@ namespace Leap.Unity.Gui.Space {
 
       if (_enableBlendShapes) {
         _material.EnableKeyword(BLEND_SHAPE_FEATURE);
+      }
+
+      for (int i = 0; i < _textureChannels.Length; i++) {
+        _material.SetTexture(_textureChannels[i].propertyName, _atlases[i]);
+      }
+    }
+
+    private void updateMaterial() {
+      if (_space != null) {
+        _space.BuildPerElementData();
+        _space.UpdateMaterial(GetComponent<Renderer>().sharedMaterial);
+      }
+
+      if (_enableTinting && _isTintDirty) {
+        _renderer.sharedMaterial.SetColorArray("_GuiElement_Tints", _tints);
+        _isTintDirty = false;
+      }
+
+      if (_enableBlendShapes && _areBlendShapeAmountsDirty) {
+        _renderer.sharedMaterial.SetFloatArray("_GuiElement_BlendShapeAmounts", _blendShapeAmounts);
+        _areBlendShapeAmountsDirty = false;
       }
     }
 
