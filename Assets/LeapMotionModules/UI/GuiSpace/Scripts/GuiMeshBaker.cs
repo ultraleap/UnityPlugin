@@ -237,10 +237,6 @@ namespace Leap.Unity.Gui.Space {
       for (int i = 0; i < _textureChannels.Length; i++) {
         _material.SetTexture(_textureChannels[i].propertyName, _atlases[i]);
       }
-
-      foreach (var keyword in _material.shaderKeywords) {
-        Debug.Log(keyword);
-      }
     }
 
     private void updateMaterial() {

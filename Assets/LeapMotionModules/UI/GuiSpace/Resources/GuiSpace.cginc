@@ -90,7 +90,7 @@ float4 GetElementTint(int elementId) {
 float3 _GuiSpace_BlendShapeAmmounts[ELEMENT_MAX];
 
 void ApplyBlendShapes(inout float4 vert, int elementId) {
-  color.xyz += _GuiSpace_BlendShapeAmmounts[elementId];
+  vert.xyz += _GuiSpace_BlendShapeAmmounts[elementId];
 }
 #endif
 
