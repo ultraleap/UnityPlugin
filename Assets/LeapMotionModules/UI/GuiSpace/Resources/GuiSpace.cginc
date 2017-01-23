@@ -4,19 +4,19 @@
  * Movement name:
  *  _ (none)
  *    no movement, position is baked into mesh
- *  GUI_ELEMENT_MOVEMENT_TRANSLATION
+ *  GUI_SPACE_MOVEMENT_TRANSLATION
  *    elements can move around in rect space, but no rotation or scaling
- *  GUI_ELEMENT_MOVEMENT_FULL
+ *  GUI_SPACE_MOVEMENT_FULL
  *    each element has a float4x4 to describe it's motion
  *************************************************************************/
 
-#ifdef GUI_ELEMENT_MOVEMENT_TRANSLATION
-#define GUI_ELEMENTS_HAVE_MOTION
+#ifdef GUI_SPACE_MOVEMENT_TRANSLATION
+#define GUI_ELEMENTS_HAVE_MOVEMENT
 void ApplyElementMotion(inout float4 vert, int elementId) { }
 #endif
 
-#ifdef GUI_ELEMENT_MOVEMENT_FULL
-#define GUI_ELEMENTS_HAVE_MOTION
+#ifdef GUI_SPACE_MOVEMENT_FULL
+#define GUI_ELEMENTS_HAVE_MOVEMENT
 float4x4 _GuiElementMovement_Transform[ELEMENT_MAX];
 
 void ApplyElementMotion(inout float4 vert, int elementId) {
@@ -24,7 +24,7 @@ void ApplyElementMotion(inout float4 vert, int elementId) {
 }
 #endif
 
-#ifdef GUI_ELEMENTS_HAVE_MOTION
+#ifdef GUI_ELEMENTS_HAVE_MOVEMENT
 #define GUI_ELEMENTS_HAVE_ID
 #endif
 
@@ -144,9 +144,11 @@ struct v2f_gui {
 
 // Takes an object space vertex and converts it to a clip space vertex
 v2f_gui ApplyGuiSpace(appdata_gui v) {
+#ifdef GUI_ELEMENTS_HAVE_ID
   int elementId = v.vertInfo.w;
+#endif
 
-#ifdef GUI_ELEMENTS_HAVE_MOTION
+#ifdef GUI_ELEMENTS_HAVE_MOVEMENT
   ApplyElementMotion(v.vertex, elementId);
   ApplyGuiWarping(v.vertex, elementId);
 #endif
@@ -173,4 +175,6 @@ v2f_gui ApplyGuiSpace(appdata_gui v) {
 #ifdef GUI_SPACE_VERTEX_COLORS
   o.color = v.color;
 #endif
+
+  return o;
 }

@@ -147,20 +147,16 @@ namespace Leap.Unity.Gui.Space {
 
     void Awake() {
       _renderer = GetComponent<MeshRenderer>();
-
-      for (int i = 0; i < _textureChannels.Length; i++) {
-        _renderer.sharedMaterial.SetTexture(_textureChannels[i].propertyName, _atlases[i]);
-      }
     }
 
-    void Update() {
 #if UNITY_EDITOR
+    void Update() {
       if (!Application.isPlaying) {
         bakeMesh();
         setupMaterial();
       }
-#endif
     }
+#endif
 
     void LateUpdate() {
       updateMaterial();
@@ -203,6 +199,10 @@ namespace Leap.Unity.Gui.Space {
 
       if (_enableVertexColors) {
         _material.EnableKeyword(VERTEX_COLORS_FEATURE);
+      }
+
+      if (_enableElementMotion && _space != null) {
+        _material.EnableKeyword(_space.ShaderVariantName);
       }
 
       if (_enableElementMotion) {
