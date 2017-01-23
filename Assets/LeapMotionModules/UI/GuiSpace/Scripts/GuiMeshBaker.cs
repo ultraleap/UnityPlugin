@@ -29,9 +29,10 @@ namespace Leap.Unity.Gui.Space {
     public const string MOTION_FULL_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "MOVEMENT_FULL";
 
     public const string TINTING_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "TINTING";
-    public const string TINT_PROPERTY = GUI_SPACE_PROPERTY_PREFIX + "Tints";
+    public const string TINTS_PROPERTY = GUI_SPACE_PROPERTY_PREFIX + "Tints";
 
-    public const string BLEND_SHAPE_FEATURE = "GUI_SPACE_BLEND_SHAPES";
+    public const string BLEND_SHAPE_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "BLEND_SHAPES";
+    public const string BLEND_SHAPE_AMOUNTS_PROPERTY = GUI_SPACE_PROPERTY_PREFIX + "BlendShapeAmounts";
 
 
     #region INSPECTOR FIELDS
@@ -249,12 +250,12 @@ namespace Leap.Unity.Gui.Space {
       }
 
       if (_enableTinting && _areTintsDirty) {
-        _material.SetColorArray(TINT_PROPERTY, _tints);
+        _material.SetColorArray(TINTS_PROPERTY, _tints);
         _areTintsDirty = false;
       }
 
       if (_enableBlendShapes && _areBlendShapeAmountsDirty) {
-        _material.SetFloatArray("_GuiElement_BlendShapeAmounts", _blendShapeAmounts);
+        _material.SetFloatArray(BLEND_SHAPE_AMOUNTS_PROPERTY, _blendShapeAmounts);
         _areBlendShapeAmountsDirty = false;
       }
     }
