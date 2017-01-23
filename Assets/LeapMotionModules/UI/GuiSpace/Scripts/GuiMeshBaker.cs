@@ -350,7 +350,7 @@ namespace Leap.Unity.Gui.Space {
 
         var vertexColors = elementMesh.colors;
         if (vertexColors.Length != vertexCount) {
-          colors.Fill(vertexCount, vertexColorTint);
+          colors.Append(vertexCount, vertexColorTint);
         } else {
           vertexColors.Query().Select(c => c * vertexColorTint).AppendList(colors);
         }
