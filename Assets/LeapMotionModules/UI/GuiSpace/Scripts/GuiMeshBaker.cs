@@ -326,8 +326,10 @@ namespace Leap.Unity.Gui.Space {
         Transform child = root.GetChild(i);
 
         var element = child.GetComponent<LeapElement>();
-        element.elementId = _elements.Count;
-        _elements.Add(element);
+        if (element != null) {
+          element.elementId = _elements.Count;
+          _elements.Add(element);
+        }
 
         bakeElementHierarchy(child);
       }
@@ -346,10 +348,7 @@ namespace Leap.Unity.Gui.Space {
 
         //TODO: bake out space if no motion is enabled
         elementMesh.vertices.Query().Select(v => {
-          v = element.transform.TransformPoint(v);
-          v = transform.InverseTransformPoint(v);
-          v -= transform.InverseTransformPoint(element.transform.position);
-          return v;
+          return elementVertToBakedVert(element.transform, v);
         }).AppendList(verts);
 
         normals.AddRange(elementMesh.normals);
@@ -417,8 +416,8 @@ namespace Leap.Unity.Gui.Space {
           var blendShape = element.blendShape;
 
           element.GetMesh().vertices.Query().
-            Zip(blendShape.vertices.Query(), (v0, v1) => {
-              return element.transform.InverseTransformPoint(v1) - v0;
+            Zip(blendShape.vertices.Query(), (elementVert, shapeVert) => {
+              return elementVertToBakedVert(blendShape.transform, shapeVert) - elementVertToBakedVert(element.transform, elementVert);
             }).
             Select(delta => new Vector4(delta.x, delta.y, delta.z, elementID)).
             AppendList(uv3);
@@ -431,6 +430,14 @@ namespace Leap.Unity.Gui.Space {
 
       _bakedMesh.SetUVs(3, uv3);
     }
+
+    private Vector3 elementVertToBakedVert(Transform elementTransform, Vector3 vert) {
+      vert = elementTransform.TransformPoint(vert);
+      vert = transform.InverseTransformPoint(vert);
+      vert -= transform.InverseTransformPoint(elementTransform.position);
+      return vert;
+    }
+
 #endif
     #endregion
 

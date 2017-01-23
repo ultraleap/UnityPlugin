@@ -13,12 +13,12 @@
  *************************************************************************/
 
 #ifdef GUI_SPACE_MOVEMENT_TRANSLATION
-#define GUI_ELEMENTS_HAVE_MOVEMENT
+#define GUI_SPACE_MOVEMENT
 void ApplyElementMotion(inout float4 vert, int elementId) { }
 #endif
 
 #ifdef GUI_SPACE_MOVEMENT_FULL
-#define GUI_ELEMENTS_HAVE_MOVEMENT
+#define GUI_SPACE_MOVEMENT
 float4x4 _GuiElementMovement_Transform[ELEMENT_MAX];
 
 void ApplyElementMotion(inout float4 vert, int elementId) {
@@ -26,8 +26,10 @@ void ApplyElementMotion(inout float4 vert, int elementId) {
 }
 #endif
 
-#ifdef GUI_ELEMENTS_HAVE_MOVEMENT
+#ifdef GUI_SPACE_MOVEMENT
+#ifndef GUI_ELEMENTS_HAVE_ID
 #define GUI_ELEMENTS_HAVE_ID
+#endif
 #endif
 
 /***********************************
@@ -39,7 +41,7 @@ void ApplyElementMotion(inout float4 vert, int elementId) {
  ***********************************/
 
 #ifdef GUI_SPACE_CYLINDRICAL
-#define GUI_ELEMENTS_HAVE_ID
+#define GUI_SPACE_WARPING
 float _GuiSpaceCylindrical_ReferenceRadius;
 float3 _GuiSpaceCylindrical_ParentPosition[ELEMENT_MAX];
 
@@ -55,6 +57,12 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 }
 #endif
 
+#ifdef GUI_SPACE_WARPING
+#ifndef GUI_ELEMENTS_HAVE_ID
+#define GUI_ELEMENTS_HAVE_ID
+#endif
+#endif
+
 /***********************************
  * Feature name:
  *  _ (none)
@@ -63,13 +71,14 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
  *    runtime tinting on a per-element basis
  ***********************************/
 
-#ifdef GUI_SPACE_VERTEX_COLORS
+#ifdef GUI_SPACE_TINTING
+#ifndef GUI_ELEMENTS_HAVE_ID
+#define GUI_ELEMENTS_HAVE_ID
+#endif
+#ifndef GUI_ELEMENTS_HAVE_COLOR
 #define GUI_ELEMENTS_HAVE_COLOR
 #endif
 
-#ifdef GUI_SPACE_TINTING
-#define GUI_ELEMENTS_HAVE_ID
-#define GUI_ELEMENTS_HAVE_COLOR
 float4 _GuiSpace_Tints[ELEMENT_MAX];
 
 float4 GetElementTint(int elementId) {
@@ -86,12 +95,21 @@ float4 GetElementTint(int elementId) {
  ***********************************/
 
 #ifdef GUI_SPACE_BLEND_SHAPES
+#ifndef GUI_ELEMENTS_HAVE_ID
 #define GUI_ELEMENTS_HAVE_ID
-float3 _GuiSpace_BlendShapeAmmounts[ELEMENT_MAX];
+#endif
 
-void ApplyBlendShapes(inout float4 vert, int elementId) {
-  vert.xyz += _GuiSpace_BlendShapeAmmounts[elementId];
+float _GuiSpace_BlendShapeAmounts[ELEMENT_MAX];
+
+void ApplyBlendShapes(inout float4 vert, float4 uv3, int elementId) {
+  vert.xyz += uv3.xyz * _GuiSpace_BlendShapeAmounts[elementId];
 }
+#endif
+
+#ifdef GUI_SPACE_VERTEX_COLORS
+#ifndef GUI_ELEMENTS_HAVE_COLOR
+#define GUI_ELEMENTS_HAVE_COLOR
+#endif
 #endif
 
 struct appdata_gui {
@@ -106,11 +124,11 @@ struct appdata_gui {
 #endif
 
 #ifdef GUI_SPACE_UV_1
-  float2 uv1 : TEXCOORD2;
+  float2 uv1 : TEXCOORD1;
 #endif
 
 #ifdef GUI_SPACE_UV_2
-  float2 uv2 : TEXCOORD3;
+  float2 uv2 : TEXCOORD2;
 #endif
 
 #ifdef GUI_ELEMENTS_HAVE_ID
@@ -153,8 +171,15 @@ v2f_gui ApplyGuiSpace(appdata_gui v) {
   int elementId = v.vertInfo.w;
 #endif
 
-#ifdef GUI_ELEMENTS_HAVE_MOVEMENT
+#ifdef GUI_SPACE_BLEND_SHAPES
+  ApplyBlendShapes(v.vertex, v.vertInfo, elementId);
+#endif
+
+#ifdef GUI_SPACE_MOVEMENT
   ApplyElementMotion(v.vertex, elementId);
+#endif
+
+#ifdef GUI_SPACE_WARPING
   ApplyGuiWarping(v.vertex, elementId);
 #endif
 
