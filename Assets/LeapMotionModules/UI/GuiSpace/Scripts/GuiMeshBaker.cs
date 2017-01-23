@@ -107,7 +107,6 @@ namespace Leap.Unity.Gui.Space {
 
     private MeshRenderer _renderer;
 
-
     private bool _areTintsDirty = true;
     private List<Color> _tints = new List<Color>();
 
@@ -314,6 +313,7 @@ namespace Leap.Unity.Gui.Space {
         Transform child = root.GetChild(i);
 
         var element = child.GetComponent<LeapElement>();
+        element.elementId = _elements.Count;
         _elements.Add(element);
 
         bakeElementHierarchy(child);
