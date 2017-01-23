@@ -19,7 +19,7 @@ namespace Leap.Unity.Gui.Space {
 
     private SerializedProperty meshGuid;
 
-    private SerializedProperty textures;
+    private SerializedProperty sprites;
     private int minTextureChannels;
 
     private SerializedProperty vertexColor;
@@ -42,15 +42,15 @@ namespace Leap.Unity.Gui.Space {
       var mesh = serializedObject.FindProperty("_mesh");
       meshGuid = mesh.FindPropertyRelative("_guid");
 
-      textures = serializedObject.FindProperty("_textures");
+      sprites = serializedObject.FindProperty("_sprites");
 
       minTextureChannels = int.MaxValue;
       foreach (var baker in bakers) {
         minTextureChannels = Mathf.Min(minTextureChannels, baker.textureChannels);
       }
 
-      while (textures.arraySize < minTextureChannels) {
-        textures.InsertArrayElementAtIndex(textures.arraySize);
+      while (sprites.arraySize < minTextureChannels) {
+        sprites.InsertArrayElementAtIndex(sprites.arraySize);
       }
 
       vertexColor = serializedObject.FindProperty("_vertexColor");
@@ -86,15 +86,15 @@ namespace Leap.Unity.Gui.Space {
       }
 
       for (int i = 0; i < minTextureChannels; i++) {
-        SerializedProperty noReferenceElement = textures.GetArrayElementAtIndex(i);
+        SerializedProperty noReferenceElement = sprites.GetArrayElementAtIndex(i);
         SerializedProperty guid = noReferenceElement.FindPropertyRelative("_guid");
-        string label = "Texture " + i;
+        string label = "Sprite " + i;
 
         EditorGUI.showMixedValue = guid.hasMultipleDifferentValues;
-        Texture2D currTex = element.GetTexture(i);
+        Texture2D currTex = element.GetSprite(i);
         Object newTexture = EditorGUILayout.ObjectField(label,
                                                         currTex,
-                                                        typeof(Texture2D),
+                                                        typeof(Sprite),
                                                         allowSceneObjects: false,
                                                         options: GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
         EditorGUI.showMixedValue = false;

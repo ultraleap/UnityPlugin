@@ -6,7 +6,7 @@ using UnityEditor;
 #endif
 
 [Serializable]
-public class NoReferenceTexture2D : NoReferenceField<Texture2D> { }
+public class NoReferenceSprite : NoReferenceField<Sprite> { }
 
 [Serializable]
 public class NoReferenceMesh : NoReferenceField<Mesh> { }
