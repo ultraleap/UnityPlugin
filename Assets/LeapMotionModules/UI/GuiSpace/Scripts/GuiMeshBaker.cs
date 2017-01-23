@@ -148,14 +148,14 @@ namespace Leap.Unity.Gui.Space {
     void Awake() {
       _renderer = GetComponent<MeshRenderer>();
 
-      initAnimationData();
+      initData();
     }
 
 #if UNITY_EDITOR
     void Update() {
       if (!Application.isPlaying) {
         bakeMesh();
-        initAnimationData();
+        initData();
         setupMaterial();
         updateMaterial();
       }
@@ -170,6 +170,47 @@ namespace Leap.Unity.Gui.Space {
 
     #endregion
 
+
+
+    private void updateMaterial() {
+      if (_space != null) {
+        _space.BuildPerElementData();
+        _space.UpdateMaterial(_material);
+      }
+
+      if (_enableTinting && _areTintsDirty) {
+        _material.SetColorArray(TINTS_PROPERTY, _tints);
+        _areTintsDirty = false;
+      }
+
+      if (_enableBlendShapes && _areBlendShapeAmountsDirty) {
+        _material.SetFloatArray(BLEND_SHAPE_AMOUNTS_PROPERTY, _blendShapeAmounts);
+        _areBlendShapeAmountsDirty = false;
+      }
+    }
+
+    #region BAKING
+
+    private void initData() {
+      if (Application.isPlaying) {
+        //Can only access atlas during playmode
+        for (int i = 0; i < _textureChannels.Length; i++) {
+          _material.SetTexture(_textureChannels[i].propertyName, _elements[0].GetSprite(i).texture);
+        }
+      }
+
+      if (_enableTinting) {
+        _elements.Query().Select(e => e.tint).FillList(_tints);
+        _areTintsDirty = true;
+      }
+
+      if (_enableBlendShapes) {
+        _elements.Query().Select(e => e.blendShapeAmount).FillList(_blendShapeAmounts);
+        _areBlendShapeAmountsDirty = true;
+      }
+    }
+
+#if UNITY_EDITOR
     private void setupMaterial() {
       if (_material == null) {
         _material = new Material(_shader);
@@ -236,42 +277,18 @@ namespace Leap.Unity.Gui.Space {
         Texture2D atlasTexture;
         Packer.GetAtlasDataForSprite(_elements[0].GetSprite(i), out atlasName, out atlasTexture);
 
-        _material.SetTexture(_textureChannels[i].propertyName, atlasTexture);
+        //Gotta make a copy and mark it as 'dont save' or else unity will yell at us
+        //because the atlas texture cannot be serialized
+        var copy = new Texture2D(atlasTexture.width, atlasTexture.height, atlasTexture.format, atlasTexture.mipmapCount > 1);
+        copy.hideFlags = HideFlags.HideAndDontSave;
+        copy.wrapMode = atlasTexture.wrapMode;
+        copy.filterMode = atlasTexture.filterMode;
+        Graphics.CopyTexture(atlasTexture, copy);
+
+        _material.SetTexture(_textureChannels[i].propertyName, copy);
       }
     }
 
-    private void updateMaterial() {
-      if (_space != null) {
-        _space.BuildPerElementData();
-        _space.UpdateMaterial(_material);
-      }
-
-      if (_enableTinting && _areTintsDirty) {
-        _material.SetColorArray(TINTS_PROPERTY, _tints);
-        _areTintsDirty = false;
-      }
-
-      if (_enableBlendShapes && _areBlendShapeAmountsDirty) {
-        _material.SetFloatArray(BLEND_SHAPE_AMOUNTS_PROPERTY, _blendShapeAmounts);
-        _areBlendShapeAmountsDirty = false;
-      }
-    }
-
-    #region BAKING
-
-    private void initAnimationData() {
-      if (_enableTinting) {
-        _elements.Query().Select(e => e.tint).FillList(_tints);
-        _areTintsDirty = true;
-      }
-
-      if (_enableBlendShapes) {
-        _elements.Query().Select(e => e.blendShapeAmount).FillList(_blendShapeAmounts);
-        _areBlendShapeAmountsDirty = true;
-      }
-    }
-
-#if UNITY_EDITOR
     private void bakeMesh() {
       Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
 
