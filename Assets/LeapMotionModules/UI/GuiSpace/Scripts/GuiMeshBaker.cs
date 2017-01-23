@@ -17,11 +17,19 @@ namespace Leap.Unity.Gui.Space {
   public class GuiMeshBaker : MonoBehaviour {
     public const string GUI_SPACE_SHADER_FEATURE_PREFIX = "GUI_SPACE_";
 
-    public const string TINTING_FEATURE_NAME = "GUI_SPACE_TINTING";
-    public const string BLEND_SHAPE_FEATURE_NAME = "GUI_SPACE_BLEND_SHAPES";
+    public const string UV_CHANNEL_0_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "UV_0";
+    public const string UV_CHANNEL_1_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "UV_1";
+    public const string UV_CHANNEL_2_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "UV_2";
 
-    public const string TRANSLATION_FEATURE_NAME = "GUI_SPACE_MOVEMENT_TRANSLATION";
-    public const string FULL_MOTION_FEATURE_NAME = "GUI_SPACE_MOVEMENT_FULL";
+    public const string VERTEX_NORMALS_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "NORMALS";
+    public const string VERTEX_COLORS_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "VERTEX_COLORS";
+
+    public const string MOTION_TRANSLATION_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "TRANSLATION";
+    public const string MOTION_FULL_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "FULL";
+
+    public const string TINTING_FEATURE = GUI_SPACE_SHADER_FEATURE_PREFIX + "TINTING";
+    public const string BLEND_SHAPE_FEATURE = "GUI_SPACE_BLEND_SHAPES";
+
 
     #region INSPECTOR FIELDS
     [SerializeField]
@@ -44,6 +52,9 @@ namespace Leap.Unity.Gui.Space {
 
     [SerializeField]
     private AtlasSettings _atlasSettings;
+
+    [SerializeField]
+    private bool _enableVertexNormals = false;
 
     [Tooltip("Enabling this will cause the vertex colors of each gui element to be baked into " +
              "the final gui mesh.")]
@@ -176,7 +187,47 @@ namespace Leap.Unity.Gui.Space {
     #endregion
 
     private void setupShaderFeatures() {
+      foreach (var keyword in _material.shaderKeywords.Query().Where(k => k.StartsWith(GUI_SPACE_SHADER_FEATURE_PREFIX))) {
+        _material.DisableKeyword(keyword);
+      }
+
+      if (_textureChannels >= 1) {
+        _material.EnableKeyword(UV_CHANNEL_0_FEATURE);
+      }
+
+      if (_textureChannels >= 2) {
+        _material.EnableKeyword(UV_CHANNEL_1_FEATURE);
+      }
+
+      if (_textureChannels >= 3) {
+        _material.EnableKeyword(UV_CHANNEL_2_FEATURE);
+      }
+
+      if (_enableVertexNormals) {
+        _material.EnableKeyword(VERTEX_NORMALS_FEATURE);
+      }
+
+      if (_enableVertexColors) {
+        _material.EnableKeyword(VERTEX_COLORS_FEATURE);
+      }
+
       if (_enableElementMotion) {
+        switch (_motionType) {
+          case MotionType.TranslationOnly:
+            _material.EnableKeyword(MOTION_TRANSLATION_FEATURE);
+            break;
+          case MotionType.Full:
+            _material.EnableKeyword(MOTION_FULL_FEATURE);
+            break;
+        }
+      }
+
+      if (_enableTinting) {
+        _material.EnableKeyword(TINTING_FEATURE);
+      }
+
+      if (_enableBlendShapes) {
+        _material.EnableKeyword(BLEND_SHAPE_FEATURE);
       }
     }
 

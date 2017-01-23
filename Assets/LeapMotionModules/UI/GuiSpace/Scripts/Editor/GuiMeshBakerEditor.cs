@@ -15,6 +15,8 @@ namespace Leap.Unity.Gui.Space {
     SerializedProperty texturePropertyNames;
     SerializedProperty atlasSettings;
 
+    SerializedProperty enableVertexNormals;
+
     SerializedProperty enableVertexColors;
     SerializedProperty bakedTint;
     AnimBool animVertexColors;
@@ -35,6 +37,8 @@ namespace Leap.Unity.Gui.Space {
       texturePropertyNames = serializedObject.FindProperty("_texturePropertyNames");
       atlasSettings = serializedObject.FindProperty("_atlasSettings");
 
+      enableVertexNormals = serializedObject.FindProperty("_enableVertexNormals");
+
       enableVertexColors = serializedObject.FindProperty("_enableVertexColors");
       bakedTint = serializedObject.FindProperty("_bakedTint");
       animVertexColors = createAnimBool(enableVertexColors.boolValue);
@@ -53,6 +57,8 @@ namespace Leap.Unity.Gui.Space {
       EditorGUILayout.PropertyField(space);
 
       drawTextureChannelInfo();
+
+      EditorGUILayout.PropertyField(enableVertexNormals);
 
       drawVertexColorInfo();
 
