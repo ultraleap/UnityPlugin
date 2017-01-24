@@ -12,6 +12,7 @@ namespace Leap.Unity.UI {
       Hand rHand = Hands.Get(Chirality.Right);
       if (rHand != null) {
         this.transform.position = rHand.Index().TipPosition.ToVector3();
+        this.transform.rotation = Quaternion.AngleAxis(180F, rHand.DistalAxis()) * rHand.Rotation.ToQuaternion();
       }
     }
 

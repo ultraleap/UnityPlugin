@@ -17,22 +17,13 @@ public class RigidbodyParenting : MonoBehaviour, IRuntimeGizmoComponent {
     _childBody = GetComponent<Rigidbody>();
     _parentBody = _childBody.transform.parent.GetComponent<Rigidbody>();
     if (_parentBody == null) { Debug.LogError("[RigidbodyParenting] Must be attached to a Rigidbody that is the child of another Rigidbody."); }
+
     InitializeBodies();
-  }
-
-  private bool _physicsUpdated = false;
-
-  void FixedUpdate() {
-    if (!_physicsUpdated) {
-      OnPrePhysics();
-      _physicsUpdated = true;
-    }
+    PhysicsCallbacks.Provider.OnPrePhysics  += OnPrePhysics;
+    PhysicsCallbacks.Provider.OnPostPhysics += OnPostPhysics;
   }
 
   void Update() {
-    OnPostPhysics();
-    _physicsUpdated = false;
-
     if (outputText != null) {
       outputText.text = "Child Local Position: \n" + _childBody.transform.localPosition.ToString("G4") + "      "
                       + "Child Body Velocity: \n" + _childBody.velocity;
@@ -87,35 +78,34 @@ public class RigidbodyParenting : MonoBehaviour, IRuntimeGizmoComponent {
     _childT.transform.localScale = _childBody.transform.localScale;
   }
 
-  private Vector3    _prePhysicsParentPosition;
-  private Quaternion _prePhysicsParentRotation;
   private Vector3    _prePhysicsChildTransformPosition;
-  private Quaternion _prePhysicsChildTransformRotation;
+  private Quaternion _prePhysicsChildTransformRotation = Quaternion.identity;
 
-  private Vector3    _childPosUpdate = Vector3.zero;
-  private Quaternion _childRotUpdate = Quaternion.identity;
+  private bool _hasPostPhysics = false;
+  private Vector3    _childPosNextPhysicsUpdate = Vector3.zero;
+  private Quaternion _childRotNextPhysicsUpdate = Quaternion.identity;
 
-  // called once per frame, on the first FixedUpdate
   private void OnPrePhysics() {
-    _prePhysicsParentPosition = _parentBody.position;
-    _prePhysicsParentRotation = _parentBody.rotation;
-
-    _childBody.position = _childBody.position + _childPosUpdate;
-    _childBody.rotation = _childBody.rotation * _childRotUpdate;
+    if (_hasPostPhysics) {
+      _childBody.position = _childPosNextPhysicsUpdate;
+      _childBody.rotation = _childRotNextPhysicsUpdate;
+    }
 
     _childT.position = _childBody.position;
     _childT.rotation = _childBody.rotation;
+
     _prePhysicsChildTransformPosition = _childT.position;
     _prePhysicsChildTransformRotation = _childT.rotation;
   }
 
-  // called on Update
   private void OnPostPhysics() {
+    // This implicitly moves _childT via the transform hierarchy.
     _parentT.position = _parentBody.position;
     _parentT.rotation = _parentBody.rotation;
 
-    _childPosUpdate = _childT.position - _prePhysicsChildTransformPosition;
-    _childRotUpdate = Quaternion.Inverse(_prePhysicsChildTransformRotation) * _childT.rotation;
+    _childPosNextPhysicsUpdate = _childBody.position + (_childT.position - _prePhysicsChildTransformPosition);
+    _childRotNextPhysicsUpdate = _childBody.rotation * (Quaternion.Inverse(_prePhysicsChildTransformRotation) * _childT.rotation);
+    _hasPostPhysics = true;
   }
 
   #endregion
