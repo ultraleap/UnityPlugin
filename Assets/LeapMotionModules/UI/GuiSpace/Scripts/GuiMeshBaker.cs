@@ -215,15 +215,16 @@ namespace Leap.Unity.Gui.Space {
 
 #if UNITY_EDITOR
     private void setupMaterial() {
-      if (_material == null) {
-        _material = new Material(_shader);
-        _material.name = "GUI Space Material";
+      //Have to destroy and re-create.  When you set an array, it fixes the size
+      //and prevents it from growing.  This in turn prevents additional elements
+      //from being properly represented.
+      if (_material != null) {
+        DestroyImmediate(_material);
       }
 
-      if (_material.shader != _shader) {
-        _material.shader = _shader;
-      }
-
+      _material = new Material(_shader);
+      _material.name = "GUI Space Material";
+      _renderer.sharedMaterial = _material;
       if (_renderer.sharedMaterial != _material) {
         _renderer.sharedMaterial = _material;
       }
