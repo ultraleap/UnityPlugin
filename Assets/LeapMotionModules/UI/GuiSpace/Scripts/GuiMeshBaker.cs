@@ -339,7 +339,6 @@ namespace Leap.Unity.Gui.Space {
 
     private void bakeVerts() {
       List<Vector3> verts = new List<Vector3>();
-      List<Vector3> normals = new List<Vector3>();
       List<int> tris = new List<int>();
 
       foreach (var element in _elements) {
@@ -354,12 +353,9 @@ namespace Leap.Unity.Gui.Space {
         elementMesh.vertices.Query().Select(v => {
           return elementVertToBakedVert(element.transform, v);
         }).AppendList(verts);
-
-        normals.AddRange(elementMesh.normals);
       }
 
       _bakedMesh.SetVertices(verts);
-      _bakedMesh.SetNormals(normals);
       _bakedMesh.SetTriangles(tris, 0);
     }
 

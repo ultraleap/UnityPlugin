@@ -9,7 +9,7 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity.Gui.Space {
 
-  public class GuiMeshSprite : ProceduralMeshSource {
+  public class LeapGuiSprite : ProceduralMeshSource {
 
     public override Mesh GetMesh(LeapElement element) {
 #if UNITY_EDITOR
@@ -33,7 +33,7 @@ namespace Leap.Unity.Gui.Space {
     }
 
     public override bool CanGenerateMeshForElement(LeapElement element) {
-      throw new System.NotImplementedException();
+      return true;
     }
   }
 }
