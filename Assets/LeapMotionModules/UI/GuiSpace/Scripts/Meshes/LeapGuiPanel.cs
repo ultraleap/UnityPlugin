@@ -26,5 +26,9 @@ namespace Leap.Unity.Gui.Space {
     public override bool DoesMeshHaveAtlasUvs(int uvChannel) {
       throw new System.NotImplementedException();
     }
+
+    public override bool CanGenerateMeshForElement(LeapElement element) {
+      throw new System.NotImplementedException();
+    }
   }
 }

@@ -106,7 +106,7 @@ namespace Leap.Unity.Gui.Space {
     public Mesh GetMesh() {
       var meshSource = GetComponent<ProceduralMeshSource>();
       if (meshSource != null && meshSource.enabled) {
-        return meshSource.GetMesh();
+        return meshSource.GetMesh(this);
       } else {
         return _mesh.GetValue();
       }
