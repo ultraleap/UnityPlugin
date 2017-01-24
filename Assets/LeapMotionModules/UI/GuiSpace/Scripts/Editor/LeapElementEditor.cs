@@ -71,11 +71,18 @@ namespace Leap.Unity.Gui.Space {
 
       using (new EditorGUI.DisabledGroupScope(elements.Query().Any(e => e.IsUsingProceduralMeshSource()))) {
         Mesh currMesh = element.GetMesh();
+
+        if (elements.Query().Where(e => e != element).Any(e => e.GetMesh() != currMesh)) {
+          EditorGUI.showMixedValue = true;
+        }
+
         Object newMesh = EditorGUILayout.ObjectField("Mesh",
                                                      currMesh,
                                                      typeof(Mesh),
                                                      allowSceneObjects: false,
                                                      options: GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
+
+        EditorGUI.showMixedValue = false;
 
         if (newMesh != currMesh) {
           if (newMesh == null) {
