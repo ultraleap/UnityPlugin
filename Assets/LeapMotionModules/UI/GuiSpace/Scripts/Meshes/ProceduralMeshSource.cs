@@ -6,7 +6,7 @@ namespace Leap.Unity.Gui.Space {
 
   [RequireComponent(typeof(LeapElement))]
   public abstract class ProceduralMeshSource : MonoBehaviour {
-    public abstract Mesh GetMesh();
+    public abstract Mesh GetMesh(LeapElement element);
     public abstract bool DoesMeshHaveAtlasUvs(int uvChannel);
   }
 }

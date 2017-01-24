@@ -19,7 +19,7 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private bool _isNineSliced = true;
 
-    public override Mesh GetMesh() {
+    public override Mesh GetMesh(LeapElement element) {
       throw new System.NotImplementedException();
     }
 

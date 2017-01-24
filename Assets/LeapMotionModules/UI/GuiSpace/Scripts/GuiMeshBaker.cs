@@ -225,9 +225,7 @@ namespace Leap.Unity.Gui.Space {
       _material = new Material(_shader);
       _material.name = "GUI Space Material";
       _renderer.sharedMaterial = _material;
-      if (_renderer.sharedMaterial != _material) {
-        _renderer.sharedMaterial = _material;
-      }
+      if (_renderer.sharedMaterial != _material)
 
       foreach (var keyword in _material.shaderKeywords.Query().Where(k => k.StartsWith(GUI_SPACE_SHADER_FEATURE_PREFIX))) {
         _material.DisableKeyword(keyword);
