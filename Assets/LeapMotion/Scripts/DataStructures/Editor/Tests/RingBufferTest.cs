@@ -18,7 +18,7 @@ namespace Leap.Unity.Graphing.Tests {
     }
 
     [Test]
-    [ExpectedException(typeof(ArgumentException))]
+    //[ExpectedException(typeof(ArgumentException))]
     public void InvalidCapacity([Values(int.MinValue, -1, 0)] int minCapacity) {
       new Deque<int>(minCapacity);
     }
@@ -33,21 +33,21 @@ namespace Leap.Unity.Graphing.Tests {
     }
 
     [Test]
-    [ExpectedException(typeof(InvalidOperationException))]
+    //[ExpectedException(typeof(InvalidOperationException))]
     public void AccessEmptyBack() {
       int value = _buffer.Front;
       Assert.NotNull(value);  //Just to remove unused value warning
     }
 
     [Test]
-    [ExpectedException(typeof(InvalidOperationException))]
+    //[ExpectedException(typeof(InvalidOperationException))]
     public void AccessEmptyFront() {
       int value = _buffer.Front;
       Assert.NotNull(value);  //Just to remove unused value warning
     }
 
     [Test]
-    [ExpectedException(typeof(IndexOutOfRangeException))]
+    //[ExpectedException(typeof(IndexOutOfRangeException))]
     public void InvalidIndex([Values(int.MinValue, -1, 5, int.MaxValue)] int index) {
       for (int i = 0; i < 5; i++) {
         _buffer.PushBack(0);

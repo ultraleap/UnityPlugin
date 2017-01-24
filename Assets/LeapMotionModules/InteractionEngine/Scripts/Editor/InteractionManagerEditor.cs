@@ -29,6 +29,9 @@ namespace Leap.Unity.Interaction {
                                 "_interactionNoClipLayer",
                                 "_brushLayer");
 
+      specifyConditionalDrawing(() => serializedObject.FindProperty("_graspingEnabled").boolValue,
+                          "_twoHandedGrasping");
+
       specifyCustomDecorator("_interactionLayer", collisionLayerHelper);
 
       _interactionBehaviours = FindObjectsOfType<IInteractionBehaviour>();
