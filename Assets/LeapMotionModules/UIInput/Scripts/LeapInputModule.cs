@@ -192,6 +192,8 @@ namespace Leap.Unity.InputModule {
     private Vector3 OldCameraPos = Vector3.zero;
     private Quaternion OldCameraRot = Quaternion.identity;
     private float OldCameraFoV;
+    private bool forceProjective = false;
+    private bool forceTactile = false;
 
     //Queue of Spheres to Debug Draw
     private Queue<Vector3> DebugSphereQueue;
@@ -224,9 +226,13 @@ namespace Leap.Unity.InputModule {
 
       //Set Projective/Tactile Modes
       if (InteractionMode == InteractionCapability.Projective) {
-        ProjectiveToTactileTransitionDistance = -100f;
+        ProjectiveToTactileTransitionDistance = -float.MaxValue;
+        forceTactile = false;
+        forceProjective = true;
       } else if (InteractionMode == InteractionCapability.Tactile) {
-        ProjectiveToTactileTransitionDistance = 100f;
+        ProjectiveToTactileTransitionDistance = float.MaxValue;
+        forceTactile = true;
+        forceProjective = false;
       }
 
       //Initialize the Pointers for Projective Interaction
@@ -395,7 +401,7 @@ namespace Leap.Unity.InputModule {
             PrevState[whichPointer] = pointerState[whichPointer]; //Store old state for sound transitionary purposes
           }
           UpdatePointer(whichPointer, PointEvents[whichPointer], PointEvents[whichPointer].pointerCurrentRaycast.gameObject);
-          if (!TipRaycast && distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance) {
+          if (!TipRaycast && (forceTactile || (!forceProjective && distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance))) {
             PointEvents[whichPointer].pointerCurrentRaycast = new RaycastResult();
           }
           ProcessState(whichPointer, whichHand, whichFinger, TipRaycast);
@@ -533,7 +539,7 @@ namespace Leap.Unity.InputModule {
 
 
           //If we have dragged beyond the drag threshold
-          if (!PointEvents[whichPointer].dragging && currentGoing[whichPointer] && Vector2.Distance(PointEvents[whichPointer].position, DragBeginPosition[whichPointer])*100f > EventSystem.current.pixelDragThreshold) {
+          if (!PointEvents[whichPointer].dragging && currentGoing[whichPointer] && Vector2.Distance(PointEvents[whichPointer].position, DragBeginPosition[whichPointer]) * 100f > EventSystem.current.pixelDragThreshold) {
             IDragHandler Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
             if (Dragger != null && Dragger is ScrollRect) {
               if (currentGo[whichPointer] && !(currentGo[whichPointer].GetComponent<ScrollRect>())) {
@@ -643,7 +649,7 @@ namespace Leap.Unity.InputModule {
           }
           IndexFingerPosition /= numberOfExtendedFingers;
           */
-          
+
           float farthest = 0f;
           IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].TipPosition.ToVector3();
           for (int i = 1; i < 3; i++) {
@@ -705,7 +711,7 @@ namespace Leap.Unity.InputModule {
     //Tree to decide the State of the Pointer
     private void ProcessState(int whichPointer, int whichHand, int whichFinger, bool forceTipRaycast) {
       if ((PointEvents[whichPointer].pointerCurrentRaycast.gameObject != null)) {
-        if (distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance) {
+        if (forceTactile || (!forceProjective && distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance)) {
           if (isTriggeringInteraction(whichPointer, whichHand, whichFinger)) {
             if (ExecuteEvents.GetEventHandler<IPointerClickHandler>(PointEvents[whichPointer].pointerCurrentRaycast.gameObject)) {
               pointerState[whichPointer] = pointerStates.TouchingElement;
