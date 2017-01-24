@@ -76,6 +76,7 @@ namespace Leap.Unity.Gui.Space {
     private void drawTextureChannelInfo() {
       int newSize = EditorGUILayout.IntField("Texture Channels", textureChannels.arraySize);
       if (newSize < 0) newSize = 0;
+      if (newSize > 1) newSize = 1;//TODO: Allow more than 1 :P
 
       while (textureChannels.arraySize > newSize) {
         textureChannels.DeleteArrayElementAtIndex(textureChannels.arraySize - 1);

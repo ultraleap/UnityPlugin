@@ -47,6 +47,7 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private TextureChannel[] _textureChannels;
 
+    [Disable] //TODO, make this work!
     [SerializeField]
     private bool _enableVertexNormals = false;
 
@@ -72,6 +73,7 @@ namespace Leap.Unity.Gui.Space {
 
     [Tooltip("Allows each gui element to move, instead of being stationary.  Also allows " +
              "the properties of the gui space to be changed at runtime.")]
+    [Disable] //TODO, make this work!
     [SerializeField]
     private MotionType _motionType = MotionType.TranslationOnly;
 
@@ -85,6 +87,7 @@ namespace Leap.Unity.Gui.Space {
     private bool _enableBlendShapes = false;
 
     [Tooltip("Defines what coordinate space blend shapes are defined in.")]
+    [Disable] //TODO: make this work!
     [SerializeField]
     private BlendShapeSpace _blendShapeSpace = BlendShapeSpace.Local;
 
@@ -342,6 +345,8 @@ namespace Leap.Unity.Gui.Space {
 
       foreach (var element in _elements) {
         var elementMesh = element.GetMesh();
+        if (elementMesh == null) continue;
+
         var elementTransform = element.transform;
 
         elementMesh.GetIndices(0).Query().Select(i => i + verts.Count).AppendList(tris);
@@ -365,11 +370,17 @@ namespace Leap.Unity.Gui.Space {
       for (int texIndex = 0; texIndex < _textureChannels.Length; texIndex++) {
         remappedUvs.Clear();
         foreach (var element in _elements) {
-          Sprite sprite = element.GetSprite(texIndex);
           Mesh mesh = element.GetMesh();
+          if (mesh == null) continue;
+
+          Sprite sprite = element.GetSprite(texIndex);
+
           mesh.GetUVs(texIndex, tempUvs);
 
-          if (sprite.packed && sprite.packingMode == SpritePackingMode.Rectangle && !element.DoesMeshHaveAtlasUvs(texIndex)) {
+          if (sprite != null &&
+              sprite.packed &&
+              sprite.packingMode == SpritePackingMode.Rectangle &&
+              !element.DoesMeshHaveAtlasUvs(texIndex)) {
             Vector2[] uvs = SpriteUtility.GetSpriteUVs(sprite, getAtlasData: true);
 
             tempUvs.Query().Select(uv => new Vector2(Mathf.Lerp(uvs[0].x, uvs[1].x, uv.x),
@@ -412,17 +423,20 @@ namespace Leap.Unity.Gui.Space {
       for (int elementID = 0; elementID < _elements.Count; elementID++) {
         var element = _elements[elementID];
 
+        var mesh = element.GetMesh();
+        if (mesh == null) continue;
+
         if (_enableBlendShapes && element.blendShape != null) {
           var blendShape = element.blendShape;
 
-          element.GetMesh().vertices.Query().
+          mesh.vertices.Query().
             Zip(blendShape.vertices.Query(), (elementVert, shapeVert) => {
               return elementVertToBakedVert(blendShape.transform, shapeVert) - elementVertToBakedVert(element.transform, elementVert);
             }).
             Select(delta => new Vector4(delta.x, delta.y, delta.z, elementID)).
             AppendList(uv3);
         } else {
-          element.GetMesh().vertices.Query().
+          mesh.vertices.Query().
             Select(v => new Vector4(0, 0, 0, elementID)).
             AppendList(uv3);
         }
@@ -453,7 +467,9 @@ namespace Leap.Unity.Gui.Space {
 
     [Serializable]
     public class TextureChannel {
+      [Disable] //TODO: more logic for this!
       public string propertyName;
+      [Disable] //TODO: make this work!
       public UVChannel channel;
     }
 
