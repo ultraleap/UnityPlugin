@@ -122,7 +122,6 @@ namespace Leap.Unity.Interaction {
     }
 
     private bool _hasSceneBeenCreated = false;
-    private bool _enableGraspingLast = false;
 
     public ActivityManager _activityManager = new ActivityManager();
     protected Dictionary<int, InteractionHand> _idToInteractionHand = new Dictionary<int, InteractionHand>();
@@ -333,8 +332,6 @@ namespace Leap.Unity.Interaction {
       if (!_hasSceneBeenCreated) {
         return; // UpdateSceneInfo is a side effect of a lot of changes.
       }
-
-      _enableGraspingLast = _graspingEnabled;
 
       _cachedSimulationScale = _leapProvider.transform.lossyScale.x;
       _activityManager.OverlapRadius = _activationRadius * _cachedSimulationScale;
