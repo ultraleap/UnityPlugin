@@ -1,7 +1,7 @@
 ﻿using Leap.Unity.Attributes;
 using UnityEngine;
 
-namespace Leap.Unity.UI.Constraints {
+namespace Leap.Unity.UI.zzOldConstraints {
 
   public struct JointAngles {
     public float theta;

@@ -1,7 +1,7 @@
 ﻿using Leap.Unity;
 using UnityEngine;
 
-namespace Leap.Unity.UI.Constraints {
+namespace Leap.Unity.UI.zzOldConstraints {
 
   public enum Axis   { X, Y, Z }
   public enum Anchor { Beginning, Center, End }

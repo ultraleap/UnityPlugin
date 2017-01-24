@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity.Attributes;
 
-namespace Leap.Unity.UI.Constraints {
+namespace Leap.Unity.UI.zzOldConstraints {
 
   /// <summary>
   /// One-dimensional linear constraint from 0 (beginning) to 1 (end).

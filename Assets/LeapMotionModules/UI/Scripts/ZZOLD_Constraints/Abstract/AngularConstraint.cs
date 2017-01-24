@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.UI.Constraints {
+namespace Leap.Unity.UI.zzOldConstraints {
 
   /// <summary>
   /// One-dimensional angular constraint in degrees [0..360].
