@@ -1,100 +1,85 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 public static class ColliderUtil {
 
-  private static List<Collider> _colliderList = new List<Collider>();
-
   //*************
   //GENRAL HELPER
 
-  /* Returns whether or not a given vector is within a given radius to a center point
-   */
-  public static bool withinDistance(Vector3 point, Vector3 center, float radius) {
+  /// <summary>
+  /// Returns whether or not a given vector is within a given radius to a center point
+  /// </summary>
+  public static bool WithinDistance(Vector3 point, Vector3 center, float radius) {
     return (point - center).sqrMagnitude < radius * radius;
   }
 
-  public static bool withinDistance(Vector3 pointToOrigin, float radius) {
+  public static bool WithinDistance(Vector3 pointToOrigin, float radius) {
     return pointToOrigin.sqrMagnitude < radius * radius;
   }
 
-  /* Given a point and a center, return a new point that is along the axis created by the 
-   * two vectors, and is a given distance from the center
-   */
-  public static Vector3 getPointAtDistance(Vector3 point, Vector3 center, float distance) {
+  /// <summary>
+  /// Given a point and a center, return a new point that is along the axis created by the 
+  /// two vectors, and is a given distance from the center
+  /// </summary>
+  public static Vector3 GetPointAtDistance(Vector3 point, Vector3 center, float distance) {
     return (point - center).normalized * distance + center;
   }
 
+  /// <summary>
+  /// Given a collider and a position relative to the colliders transform, return whether or not the 
+  /// position lies within the collider.  Can also optionally extrude the collider.
+  /// </summary>
+  public static bool IsInsideCollider(this Collider collider, Vector3 localPosition, float extrude = 0.0f) {
+    if (collider is SphereCollider) return (collider as SphereCollider).IsPointInside(localPosition, extrude);
+    if (collider is BoxCollider) return (collider as BoxCollider).IsPointInside(localPosition, extrude);
+    if (collider is CapsuleCollider) return (collider as CapsuleCollider).IsPointInside(localPosition, extrude);
 
-  /* Given a collider and a position relative to the colliders transform, return whether or not the 
-   * position lies within the collider.  Can also provide the allowed distance tolerance
-   */
-  public static bool isInsideCollider(this Collider collider, Vector3 localPosition, float tolerance = 0.0f) {
-    SphereCollider sphereCollider = collider as SphereCollider;
-    if (sphereCollider != null) {
-      return sphereCollider.isPointInside(localPosition, tolerance);
-    }
-    BoxCollider boxCollider = collider as BoxCollider;
-    if (boxCollider != null) {
-      return boxCollider.isPointInside(localPosition, tolerance);
-    }
-    CapsuleCollider capsuleCollider = collider as CapsuleCollider;
-    if (capsuleCollider != null) {
-      return capsuleCollider.isPointInside(localPosition, tolerance);
-    }
-    Debug.LogWarning("ColliderUtil does not work for Mesh Colliders!");
-    return false;
+    throw nullOrInvalidException(collider);
   }
 
-  /* Given a collider and a position reltative to the colliders transform, return the point on the
-   * surface of the collider closest to the position
-   */
-  public static Vector3 closestPointOnSurface(this Collider collider, Vector3 localPosition, float extrude = 0.0f) {
-    SphereCollider sphereCollider = collider as SphereCollider;
-    if (sphereCollider != null) {
-      return sphereCollider.closestPointOnSurface(localPosition, extrude);
-    }
-    BoxCollider boxCollider = collider as BoxCollider;
-    if (boxCollider != null) {
-      return boxCollider.closestPointOnSurface(localPosition, extrude);
-    }
-    CapsuleCollider capsuleCollider = collider as CapsuleCollider;
-    if (capsuleCollider != null) {
-      return capsuleCollider.closestPointOnSurface(localPosition, extrude);
-    }
-    Debug.LogWarning("ColliderUtil does not work for Mesh Colliders!");
-    return Vector3.zero;
+  /// <summary>
+  /// Given a collider and a position relative to the colliders transform, return the point on the surface 
+  /// of the collider closest to the position.  Can also optionally extrude the collider.
+  /// </summary>
+  public static Vector3 ClosestPointOnSurface(this Collider collider, Vector3 localPosition, float extrude = 0.0f) {
+    if (collider is SphereCollider) return (collider as SphereCollider).ClosestPointOnSurface(localPosition, extrude);
+    if (collider is BoxCollider) return (collider as BoxCollider).ClosestPointOnSurface(localPosition, extrude);
+    if (collider is CapsuleCollider) return (collider as CapsuleCollider).ClosestPointOnSurface(localPosition, extrude);
+
+    throw nullOrInvalidException(collider);
   }
 
-  /* Given a GameObject and a position in global space, return whether or not the position lies within
-   * one of the colliders on the GameObject or one of it's children.  Can also provide the allowed 
-   * distance tolerance
-   */
-  public static bool isInsideColliders(GameObject obj, Vector3 globalPosition, float tolerance = 0.0f) {
-    obj.GetComponentsInChildren<Collider>(false, _colliderList);
-    foreach (Collider collider in _colliderList) {
+  /// <summary>
+  /// Given a list of colliders and a position in global space, return whether or not the position lies
+  /// within any of the colliders.  Can also optionally extrude the collider.
+  /// </summary>
+  public static bool IsInsideColliders(List<Collider> colliders, Vector3 globalPosition, float extrude = 0.0f) {
+    for (int i = 0; i < colliders.Count; i++) {
+      Collider collider = colliders[i];
       Vector3 localPosition = collider.transform.InverseTransformPoint(globalPosition);
-      if (collider.isInsideCollider(localPosition, tolerance)) {
+      if (collider.IsInsideCollider(localPosition, extrude)) {
         return true;
       }
     }
     return false;
   }
 
-  /* Given a GameObject and a position in global space, return a point on the surface of one of the
-   * colliders on the GameObject or one of it's children that is closest to the given position
-   */
-  public static Vector3 closestPointOnSurfaces(GameObject obj, Vector3 globalPosition, float extrude = 0.0f) {
-    obj.GetComponentsInChildren<Collider>(false, _colliderList);
-
+  /// <summary>
+  /// Given a list of colliders and a position in global space, return the point on the surface of any
+  /// of the colliders that is closest to the given position.  NOTE that this point might be inside of 
+  /// a collider!  Can also optionally extrude the colliders.
+  /// </summary>
+  public static Vector3 ClosestPointOnSurfaces(List<Collider> colliders, Vector3 globalPosition, float extrude = 0.0f) {
     Transform chosenTransform = null;
     Vector3 closestPoint = Vector3.zero;
     float closestDistance = float.MaxValue;
 
-    foreach (Collider collider in _colliderList) {
+    for (int i = 0; i < colliders.Count; i++) {
+      Collider collider = colliders[i];
       Vector3 localPoint = collider.transform.InverseTransformPoint(globalPosition);
-      Vector3 point = collider.closestPointOnSurface(localPoint, extrude);
+      Vector3 point = collider.ClosestPointOnSurface(localPoint, extrude);
       float distance = (globalPosition - point).sqrMagnitude;
       if (distance < closestDistance) {
         chosenTransform = collider.transform;
@@ -109,17 +94,15 @@ public static class ColliderUtil {
   //***************
   //Raycasting
 
-  public static bool segmentCast(GameObject obj, Vector3 start, Vector3 end, out RaycastHit hitInfo) {
-    Ray ray = new Ray(start, end - start);
-    float dist = Vector3.Distance(start, end);
-
-    obj.GetComponentsInChildren<Collider>(false, _colliderList);
+  public static bool SegmentCast(List<Collider> colliders, Vector3 worldStart, Vector3 worldEnd, out RaycastHit hitInfo) {
+    Ray ray = new Ray(worldStart, worldEnd - worldStart);
+    float dist = Vector3.Distance(worldStart, worldEnd);
 
     hitInfo = new RaycastHit();
 
     bool hitAny = false;
     RaycastHit tempHit;
-    foreach (Collider collider in _colliderList) {
+    foreach (Collider collider in colliders) {
       if (collider.Raycast(ray, out tempHit, dist)) {
         if (!hitAny || tempHit.distance < hitInfo.distance) {
           hitInfo = tempHit;
@@ -134,33 +117,33 @@ public static class ColliderUtil {
   //***************
   //SPHERE COLLIDER
 
-  public static bool isPointInside(this SphereCollider collider, Vector3 localPosition, float tolerance = 0.0f) {
+  public static bool IsPointInside(this SphereCollider collider, Vector3 localPosition, float extrude = 0.0f) {
     localPosition -= collider.center;
-    return withinDistance(localPosition, collider.radius + tolerance);
+    return WithinDistance(localPosition, collider.radius + extrude);
   }
 
-  public static Vector3 closestPointOnSurface(this SphereCollider collider, Vector3 localPosition, float extrude = 0.0f) {
-    return getPointAtDistance(localPosition, collider.center, collider.radius + extrude);
+  public static Vector3 ClosestPointOnSurface(this SphereCollider collider, Vector3 localPosition, float extrude = 0.0f) {
+    return GetPointAtDistance(localPosition, collider.center, collider.radius + extrude);
   }
 
   //************
   //BOX COLLIDER
 
-  public static bool isPointInside(this BoxCollider collider, Vector3 localPosition, float tolerance = 0.0f) {
+  public static bool IsPointInside(this BoxCollider collider, Vector3 localPosition, float extrude = 0.0f) {
     localPosition -= collider.center;
-    if (Mathf.Abs(localPosition.x) > collider.size.x / 2.0f + tolerance) {
+    if (Mathf.Abs(localPosition.x) > collider.size.x / 2.0f + extrude) {
       return false;
     }
-    if (Mathf.Abs(localPosition.y) > collider.size.y / 2.0f + tolerance) {
+    if (Mathf.Abs(localPosition.y) > collider.size.y / 2.0f + extrude) {
       return false;
     }
-    if (Mathf.Abs(localPosition.z) > collider.size.z / 2.0f + tolerance) {
+    if (Mathf.Abs(localPosition.z) > collider.size.z / 2.0f + extrude) {
       return false;
     }
     return true;
   }
 
-  public static Vector3 closestPointOnSurface(this BoxCollider collider, Vector3 localPosition, float extrude = 0.0f) {
+  public static Vector3 ClosestPointOnSurface(this BoxCollider collider, Vector3 localPosition, float extrude = 0.0f) {
     localPosition -= collider.center;
 
     Vector3 radius = collider.size / 2.0f;
@@ -182,18 +165,15 @@ public static class ColliderUtil {
         if (Mathf.Abs(localPosition.x) > Mathf.Abs(localPosition.z)) {
           //x is farthest
           localPosition.x = (localPosition.x > 0) ? radius.x : -radius.x;
-        }
-        else {
+        } else {
           //z is farthest
           localPosition.z = (localPosition.z > 0) ? radius.z : -radius.z;
         }
-      }
-      else {
+      } else {
         if (Mathf.Abs(localPosition.y) > Mathf.Abs(localPosition.z)) {
           //y is farthest
           localPosition.y = (localPosition.y > 0) ? radius.y : -radius.y;
-        }
-        else {
+        } else {
           //z is farthest
           localPosition.z = (localPosition.z > 0) ? radius.z : -radius.z;
         }
@@ -207,15 +187,15 @@ public static class ColliderUtil {
   //****************
   //CAPSULE COLLIDER
 
-  /* A capsule is defined as a line segment with a radius.  This method returns the two endpoints of that segment, 
-   * as well as it's length, in local space.
-   */
-  public static void getSegmentInfo(this CapsuleCollider collider, out Vector3 localV0, out Vector3 localV1, out float length) {
+  /// <summary>
+  /// A capsule is defined as a line segment with a radius.  This method returns the two endpoints 
+  /// of that segment, as well as it's length, in local space.
+  /// </summary>
+  public static void GetSegmentInfo(this CapsuleCollider collider, out Vector3 localV0, out Vector3 localV1, out float length) {
     Vector3 axis = Vector3.right;
     if (collider.direction == 1) {
       axis = Vector3.up;
-    }
-    else {
+    } else {
       axis = Vector3.forward;
     }
 
@@ -224,49 +204,49 @@ public static class ColliderUtil {
     localV1 = -axis * length / 2.0f + collider.center;
   }
 
-  public static bool isPointInside(this CapsuleCollider collider, Vector3 localPosition, float tolerance = 0.0f) {
+  public static bool IsPointInside(this CapsuleCollider collider, Vector3 localPosition, float tolerance = 0.0f) {
     Vector3 v0, v1;
     float length;
-    collider.getSegmentInfo(out v0, out v1, out length);
+    collider.GetSegmentInfo(out v0, out v1, out length);
 
     if (length == 0.0f) {
-      return withinDistance(localPosition, collider.radius + tolerance);
+      return WithinDistance(localPosition, collider.radius + tolerance);
     }
 
     float t = Vector3.Dot(localPosition - v0, v1 - v0) / (length * length);
     if (t <= 0.0f) {
-      return withinDistance(localPosition, v0, collider.radius + tolerance);
+      return WithinDistance(localPosition, v0, collider.radius + tolerance);
     }
     if (t >= 1.0f) {
-      return withinDistance(localPosition, v1, collider.radius + tolerance);
+      return WithinDistance(localPosition, v1, collider.radius + tolerance);
     }
 
     Vector3 projection = v0 + t * (v1 - v0);
-    return withinDistance(localPosition, projection, collider.radius + tolerance);
+    return WithinDistance(localPosition, projection, collider.radius + tolerance);
   }
 
-  public static Vector3 closestPointOnSurface(this CapsuleCollider collider, Vector3 localPosition, float extrude = 0.0f) {
+  public static Vector3 ClosestPointOnSurface(this CapsuleCollider collider, Vector3 localPosition, float extrude = 0.0f) {
     Vector3 v0, v1;
     float length;
-    collider.getSegmentInfo(out v0, out v1, out length);
+    collider.GetSegmentInfo(out v0, out v1, out length);
 
     if (length == 0.0f) {
-      return getPointAtDistance(localPosition, collider.center, collider.radius);
+      return GetPointAtDistance(localPosition, collider.center, collider.radius);
     }
 
     float t = Vector3.Dot(localPosition - v0, v1 - v0) / (length * length);
     if (t <= 0.0f) {
-      return getPointAtDistance(localPosition, v0, collider.radius + extrude);
+      return GetPointAtDistance(localPosition, v0, collider.radius + extrude);
     }
     if (t >= 1.0f) {
-      return getPointAtDistance(localPosition, v1, collider.radius + extrude);
+      return GetPointAtDistance(localPosition, v1, collider.radius + extrude);
     }
 
     Vector3 projection = v0 + t * (v1 - v0);
-    return getPointAtDistance(localPosition, projection, collider.radius + extrude);
+    return GetPointAtDistance(localPosition, projection, collider.radius + extrude);
   }
 
-  public static float distanceToSegment(Vector3 a, Vector3 b, Vector3 p) {
+  public static float DistanceToSegment(Vector3 a, Vector3 b, Vector3 p) {
     float t = Vector3.Dot(p - a, b - a) / Vector3.Dot(a - b, a - b);
     if (t <= 0.0f) {
       return Vector3.Distance(p, a);
@@ -278,4 +258,11 @@ public static class ColliderUtil {
     return Vector3.Distance(p, projection);
   }
 
+  private static Exception nullOrInvalidException(Collider collider) {
+    if (collider == null) {
+      return new ArgumentNullException();
+    } else {
+      return new ArgumentException("Collider type of " + collider.GetType() + " is not supported.");
+    }
+  }
 }

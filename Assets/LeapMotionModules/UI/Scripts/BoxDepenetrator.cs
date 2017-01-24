@@ -70,12 +70,12 @@ namespace Leap.Unity.UI {
     }
 
     public static bool Depenetrate(Vector3 spherePosition, float sphereRadius, BoxCollider box, out DepenetrationRay depenetrationRay) {
-      Vector3 nearestBoxPoint = box.transform.TransformPoint(box.closestPointOnSurface(box.transform.InverseTransformPoint(spherePosition)));
+      Vector3 nearestBoxPoint = box.transform.TransformPoint(box.ClosestPointOnSurface(box.transform.InverseTransformPoint(spherePosition)));
       Vector3 boxPointToSphereCenter = spherePosition - nearestBoxPoint;
       bool requiresDepenetration = boxPointToSphereCenter.sqrMagnitude < (sphereRadius * sphereRadius);
 
       if (requiresDepenetration) {
-        bool sphereCenterInsideBox = box.isPointInside(box.transform.InverseTransformPoint(spherePosition));
+        bool sphereCenterInsideBox = box.IsPointInside(box.transform.InverseTransformPoint(spherePosition));
         depenetrationRay = new DepenetrationRay {
           position = nearestBoxPoint,
           direction = boxPointToSphereCenter + ((sphereCenterInsideBox ? 1F : -1F) * boxPointToSphereCenter.normalized) * sphereRadius
