@@ -9,6 +9,11 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity.Gui.Space {
 
+  /// <summary>
+  /// Grabs the mesh from the sprite itself instead of using a rect.  This is really
+  /// only useful for displaying tightly packed sprites that have non-rectangular
+  /// mesh outlines.
+  /// </summary>
   public class LeapGuiSprite : ProceduralMeshSource {
 
     public override Mesh GetMesh(LeapElement element) {
