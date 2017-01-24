@@ -105,6 +105,7 @@ namespace Leap.Unity.UI.zzOldConstraints {
 
     #endregion
 
+    public override void InitializeDebuggingConstraint() { }
   }
 
 }
