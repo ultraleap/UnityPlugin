@@ -24,6 +24,8 @@ namespace Leap.Unity.Gui.Space {
       }
 
       Mesh mesh = new Mesh();
+      mesh.hideFlags = HideFlags.HideAndDontSave;
+      mesh.name = "Procedural Sprite Mesh";
       mesh.vertices = sprite.vertices.Query().Select(v => (Vector3)v).ToArray();
       mesh.triangles = sprite.triangles.Query().Select(i => (int)i).ToArray();
       mesh.uv = SpriteUtility.GetSpriteUVs(element.GetSprite(0), getAtlasData: true);
@@ -38,7 +40,7 @@ namespace Leap.Unity.Gui.Space {
     }
 
     public override bool CanGenerateMeshForElement(LeapElement element) {
-      return true;
+      return element.GetSprite(0) != null;
     }
   }
 }

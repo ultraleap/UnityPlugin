@@ -7,6 +7,9 @@ namespace Leap.Unity.Gui.Space {
   [RequireComponent(typeof(LeapElement))]
   public abstract class ProceduralMeshSource : MonoBehaviour {
 
+    // Just to make sure all procedural mesh sources can be enabled/disabled
+    protected virtual void Start() { }
+
     /// <summary>
     /// Returns whether or not this generator can generate a mesh for the given
     /// element.  This method can return false if the element does not have 

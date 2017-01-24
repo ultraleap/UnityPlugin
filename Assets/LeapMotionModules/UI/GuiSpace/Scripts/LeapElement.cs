@@ -53,6 +53,8 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private int _elementId;
 
+    private ProceduralMeshSource _meshSource;
+
     public GuiMeshBaker baker {
       get {
         return _baker ?? GetComponentInParent<GuiMeshBaker>();
@@ -104,21 +106,24 @@ namespace Leap.Unity.Gui.Space {
     }
 
     public Mesh GetMesh() {
-      var meshSource = GetComponent<ProceduralMeshSource>();
-      if (meshSource != null && meshSource.enabled) {
-        return meshSource.GetMesh(this);
+      if (IsUsingProceduralMeshSource()) {
+        return _meshSource.GetMesh(this);
       } else {
         return _mesh.GetValue();
       }
     }
 
     public bool DoesMeshHaveAtlasUvs(int uvChannel) {
-      var meshSource = GetComponent<ProceduralMeshSource>();
-      if (meshSource != null && meshSource.enabled) {
-        return meshSource.DoesMeshHaveAtlasUvs(uvChannel);
+      if (IsUsingProceduralMeshSource()) {
+        return _meshSource.DoesMeshHaveAtlasUvs(uvChannel);
       } else {
-        return false; //Assume user assigned meshes never have atlas coordinates
+        return false;//Assume user assigned meshes never have atlas coordinates
       }
+    }
+
+    public bool IsUsingProceduralMeshSource() {
+      _meshSource = GetComponent<ProceduralMeshSource>();
+      return _meshSource != null && _meshSource.enabled && _meshSource.CanGenerateMeshForElement(this);
     }
 
     public Sprite GetSprite(int channel) {

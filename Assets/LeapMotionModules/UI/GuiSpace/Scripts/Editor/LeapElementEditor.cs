@@ -69,19 +69,21 @@ namespace Leap.Unity.Gui.Space {
     public override void OnInspectorGUI() {
       base.OnInspectorGUI();
 
-      Mesh currMesh = element.GetMesh();
-      Object newMesh = EditorGUILayout.ObjectField("Mesh",
-                                                   currMesh,
-                                                   typeof(Mesh),
-                                                   allowSceneObjects: false,
-                                                   options: GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
+      using (new EditorGUI.DisabledGroupScope(elements.Query().Any(e => e.IsUsingProceduralMeshSource()))) {
+        Mesh currMesh = element.GetMesh();
+        Object newMesh = EditorGUILayout.ObjectField("Mesh",
+                                                     currMesh,
+                                                     typeof(Mesh),
+                                                     allowSceneObjects: false,
+                                                     options: GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
 
-      if (newMesh != currMesh) {
-        if (newMesh == null) {
-          meshGuid.stringValue = "";
-        } else {
-          string newPath = AssetDatabase.GetAssetPath(newMesh);
-          meshGuid.stringValue = AssetDatabase.AssetPathToGUID(newPath);
+        if (newMesh != currMesh) {
+          if (newMesh == null) {
+            meshGuid.stringValue = "";
+          } else {
+            string newPath = AssetDatabase.GetAssetPath(newMesh);
+            meshGuid.stringValue = AssetDatabase.AssetPathToGUID(newPath);
+          }
         }
       }
 
