@@ -11,10 +11,7 @@ public class GrabLocomotion : MonoBehaviour {
   private bool _rGrab;
 
   private Vector3 _grabAnchorPosition;
-  private Vector3 _grabAnchorLookVector;
-
-  private Vector3 _oldGrabPositionFromRig;
-  private Vector3 _curGrabPositionFromRig;
+  private Quaternion _grabAnchorRotation;
 
   void Update() {
     _lHand = Hands.Left;
@@ -24,34 +21,21 @@ public class GrabLocomotion : MonoBehaviour {
     UpdateGrabState(out grabStateChanged);
     if (grabStateChanged) {
       _grabAnchorPosition = GetGrabAnchorPosition();
-      _grabAnchorLookVector = GetGrabAnchorLookVector();
+      _grabAnchorRotation = GetGrabAnchorRotation();
     }
 
-    //Vector3 translationThisFrame = _grabAnchorPosition - GetGrabAnchorPosition();
-    //Quaternion rotationThisFrame = Quaternion.FromToRotation(GetGrabAnchorLookVector(), _grabAnchorLookVector);
+    Vector3 grabPositionDelta = _grabAnchorPosition - GetGrabAnchorPosition();
+    Hands.Rig.transform.position += grabPositionDelta;
 
-    //Hands.Rig.transform.position += translationThisFrame;
-    //Hands.Rig.transform.rotation = rotationThisFrame * Hands.Rig.transform.rotation;
-
-    Transform rig = Hands.Rig.transform;
-
-    if (_rHand != null) {
-      _curGrabPositionFromRig = _rHand.PalmPosition.ToVector3() - rig.position;
-    }
-
-    //if (_rGrab) {
-    //  Quaternion.
-    //  rig.RotateAround(grabPosition, )
-    //}
-
-    _oldGrabPositionFromRig = _curGrabPositionFromRig;
+    Quaternion grabRotationDelta = _grabAnchorRotation * Quaternion.Inverse(GetGrabAnchorRotation());
+    Hands.Rig.transform.rotation = Quaternion.Slerp(Hands.Rig.transform.rotation, grabRotationDelta * Hands.Rig.transform.rotation, 10F * Time.deltaTime);
   }
 
   // Returns true if the grab state is different than the previous known grab state, false otherwise.
   private void UpdateGrabState(out bool didChange) {
     didChange = false;
 
-    if (_lHand != null && _lHand.FistStrength() > 0.75F) {
+    if (_lHand != null && _lHand.PinchStrength > 0.7F) {
       if (!_lGrab) didChange = true;
       _lGrab = true;
     }
@@ -60,7 +44,7 @@ public class GrabLocomotion : MonoBehaviour {
       _lGrab = false;
     }
 
-    if (_rHand != null && _rHand.FistStrength() > 0.75F) {
+    if (_rHand != null && _rHand.PinchStrength > 0.7F) {
       if (!_rGrab) didChange = true;
       _rGrab = true;
     }
@@ -84,29 +68,18 @@ public class GrabLocomotion : MonoBehaviour {
     return (grabCount > 0) ? (positionSum / grabCount) : positionSum;
   }
 
-  private Vector3 GetGrabAnchorLookVector() {
-
+  private Quaternion GetGrabAnchorRotation() {
     if (_rGrab) {
-      return _rHand.PalmPosition.ToVector3() - (_rHand.PalmPosition.ToVector3() + _rHand.DistalAxis());
-      //return _rHand.PalmPosition.ToVector3() - _rHand.Arm.ElbowPosition.ToVector3();
+      return _rHand.Rotation.ToQuaternion();
     }
     else if (_lGrab) {
-      return _lHand.PalmPosition.ToVector3() - (_lHand.PalmPosition.ToVector3() + _lHand.DistalAxis());
-      return _lHand.PalmPosition.ToVector3() - _lHand.Arm.ElbowPosition.ToVector3();
+      return _lHand.Rotation.ToQuaternion();
     }
-    return Vector3.up;
-
-    if (_lGrab && _rGrab) {
-      //return _lHand.PalmPosition.ToVector3() - _rHand.PalmPosition.ToVector3();
+    else if (_lGrab && _rGrab) {
+      return Quaternion.Slerp(_rHand.Rotation.ToQuaternion(), _lHand.Rotation.ToQuaternion(), 0.5F);
     }
-    //else if (_lGrab) {
-    //  return _lHand.DistalAxis();
-    //}
-    //else if (_rGrab) {
-    //  return _rHand.DistalAxis();
-    //}
     else {
-      return Vector3.up;
+      return Quaternion.identity;
     }
   }
 
