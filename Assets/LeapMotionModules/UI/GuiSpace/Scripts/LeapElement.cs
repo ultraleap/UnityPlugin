@@ -55,7 +55,7 @@ namespace Leap.Unity.Gui.Space {
 
     public GuiMeshBaker baker {
       get {
-        return _baker;
+        return _baker ?? GetComponentInParent<GuiMeshBaker>();
       }
     }
 

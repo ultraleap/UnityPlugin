@@ -15,11 +15,13 @@ namespace Leap.Unity.Gui.Space {
     [SerializeField]
     private float _zOffset;
 
+    [Disable]
     [SerializeField]
     private CylindricalType _type = CylindricalType.ConstantWidth;
 
     [Tooltip("When a gui element is this distance from the center of the space, it will have the same width " +
              "inside of the rect space and the gui space.")]
+    [Disable]
     [SerializeField]
     private float _offsetOfConstantWidth = 0.3f;
 
