@@ -43,7 +43,6 @@ namespace Leap.Unity {
     public float distanceToCamera = 12.0f;
 
     private float fadedIn = 0.0f;
-    private int frames_disconnected = 0;
     private SpriteRenderer spriteRenderer;
     private bool connected = false;
 
