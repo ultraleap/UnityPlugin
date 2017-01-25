@@ -29,7 +29,7 @@ namespace Leap.Unity.UI.Constraints {
 
   [ExecuteInEditMode]
   /// <summary>
-  /// Base class for Constraints, which enforce boundaries on the local-space positions of Transforms.
+  /// Base class for Constraints, which enforce boundaries on the motion Rigidbodies.
   /// </summary>
   public abstract class ConstraintBase : MonoBehaviour {
 
