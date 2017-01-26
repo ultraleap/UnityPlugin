@@ -18,8 +18,8 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   private List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
   private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
 
-  private Dictionary<LeapGuiTextureFeature, Texture2D> _atlases = new Dictionary<LeapGuiTextureFeature, Texture2D>();
-  private Dictionary<UVChannelFlags, Rect[]> _atlasedUvs = new Dictionary<UVChannelFlags, Rect[]>();
+  private Dictionary<LeapGuiTextureFeature, Texture2D> _atlases;
+  private Dictionary<UVChannelFlags, Rect[]> _atlasedUvs;
 
   private Mesh _bakedMesh;
   private Material _material;
@@ -150,6 +150,9 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   }
 
   private void atlasTextures() {
+    _atlases = new Dictionary<LeapGuiTextureFeature, Texture2D>();
+    _atlasedUvs = new Dictionary<UVChannelFlags, Rect[]>();
+
     var whiteTexture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false);
     whiteTexture.SetPixels(new Color[3 * 3].Fill(Color.white));
     whiteTexture.Apply();
@@ -161,7 +164,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
       var feature = _textureFeatures.Query().FirstOrDefault(f => f.channel == uvChannel);
       if (feature != null) {
 
-        //Do atlas
+        //Do atlasing
         feature.data.Query().
              Select(d => {
                if (d.texture == null) {
@@ -183,7 +186,23 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
         var atlas = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: true);
         var atlasedUvs = atlas.PackTextures(textures, 1);
 
-        //TODO: correct uv rects to account for extra border
+        //Correct uvs to account for the added border
+        for (int i = 0; i < atlasedUvs.Length; i++) {
+          float dx = 1.0f / atlas.width;
+          float dy = 1.0f / atlas.height;
+          Rect r = atlasedUvs[i];
+
+          if (textures[i] != whiteTexture) {
+            dx *= borderAmount;
+            dy *= borderAmount;
+          }
+
+          r.x += dx;
+          r.y += dy;
+          r.width -= dx * 2;
+          r.height -= dy * 2;
+          atlasedUvs[i] = r;
+        }
 
         _atlases[feature] = atlas;
         _atlasedUvs[uvChannel] = atlasedUvs;
@@ -210,8 +229,13 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
     //Extract uvs from feature data
     List<Vector4> tempUvList = new List<Vector4>();
     foreach (var feature in _meshFeatures) {
-      foreach (var data in feature.data) {
+      for (int elementIndex = 0; elementIndex < feature.data.Count; elementIndex++) {
+        var data = feature.data[elementIndex];
         var mesh = data.mesh;
+        if (mesh == null) {
+          continue;
+        }
+
         foreach (var pair in uvs) {
           mesh.GetUVs(GetUvChannelIndex(pair.Key), tempUvList);
 
@@ -219,9 +243,17 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
             tempUvList.Fill(mesh.vertexCount, Vector4.zero);
           }
 
-          //TODO: atlas correction of uvs if textures are atlased
-
-          uvs[pair.Key].AddRange(tempUvList);
+          Rect[] atlasedUvs;
+          if (_atlasedUvs != null && _atlasedUvs.TryGetValue(pair.Key, out atlasedUvs)) {
+            Rect elementRect = atlasedUvs[elementIndex];
+            tempUvList.Query().Select(uv => new Vector4(elementRect.x + uv.x * elementRect.width,
+                                                        elementRect.y + uv.y * elementRect.height,
+                                                        uv.z,
+                                                        uv.w)).
+                               AppendList(uvs[pair.Key]);
+          } else {
+            uvs[pair.Key].AddRange(tempUvList);
+          }
         }
       }
     }

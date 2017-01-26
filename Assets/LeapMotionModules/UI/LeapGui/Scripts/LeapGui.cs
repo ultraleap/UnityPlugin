@@ -46,6 +46,10 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
+  public LeapGuiRenderer GetRenderer() {
+    return _renderer;
+  }
+
 #if UNITY_EDITOR
   public void SetRenderer(LeapGuiRenderer renderer) {
     if (Application.isPlaying) {
@@ -94,10 +98,20 @@ public class LeapGui : MonoBehaviour {
     for (int i = 0; i < _elements.Count; i++) {
       var element = _elements[i];
 
+      //If data points to a different element, instantite it and point it to the correct element
+      for (int j = 0; j < element.data.Count; j++) {
+        var data = element.data[j];
+        if (data.element != element) {
+          data = Instantiate(data);
+          data.element = element;
+          element.data[j] = data;
+        }
+      }
+
       //First make a map of existing data objects to their correct indexes
       var dataToNewIndex = new Dictionary<LeapGuiElementData, int>();
       foreach (var data in element.data) {
-        if (data == null || data.feature == null || data.element == null) {
+        if (data == null || data.feature == null) {
           continue;
         }
 

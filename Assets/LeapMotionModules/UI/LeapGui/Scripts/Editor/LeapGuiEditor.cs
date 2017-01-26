@@ -20,6 +20,9 @@ public class LeapGuiEditor : CustomEditorBase {
     if (GUILayout.Button("Add Renderer")) {
       (target as LeapGui).SetRenderer(ScriptableObject.CreateInstance<LeapGuiBakedRenderer>());
     }
+
+    var renderer = (target as LeapGui).GetRenderer();
+    Editor.CreateEditor(renderer).DrawDefaultInspector();
   }
 
   private void drawAddButtons(SerializedProperty features) {
