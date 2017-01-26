@@ -4,6 +4,8 @@ using UnityEngine;
 
 public abstract class LeapGuiRenderer : ScriptableObject {
 
+  public LeapGui gui;
+
   public abstract void OnEnableRenderer();
   public abstract void OnDisableRenderer();
   public abstract void OnUpdateRenderer();

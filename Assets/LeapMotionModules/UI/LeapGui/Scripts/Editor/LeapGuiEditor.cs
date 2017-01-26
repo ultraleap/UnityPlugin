@@ -14,6 +14,14 @@ public class LeapGuiEditor : CustomEditorBase {
     specifyCustomDrawer("_features", drawFeatures);
   }
 
+  public override void OnInspectorGUI() {
+    base.OnInspectorGUI();
+
+    if (GUILayout.Button("Add Renderer")) {
+      (target as LeapGui).SetRenderer(ScriptableObject.CreateInstance<LeapGuiBakedRenderer>());
+    }
+  }
+
   private void drawAddButtons(SerializedProperty features) {
     EditorGUILayout.BeginHorizontal();
 
@@ -21,6 +29,7 @@ public class LeapGuiEditor : CustomEditorBase {
       addFeature<LeapGuiMeshFeature>(features);
     }
 
+    /*
     if (GUILayout.Button("Texture")) {
       addFeature<LeapGuiTextureFeature>(features);
     }
@@ -28,6 +37,7 @@ public class LeapGuiEditor : CustomEditorBase {
     if (GUILayout.Button("Tint")) {
       addFeature<LeapGuiTintFeature>(features);
     }
+    */
 
     EditorGUILayout.EndHorizontal();
   }

@@ -2,4 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
 public interface ISupportsFeature<T> where T : LeapGuiFeature { }
+*/

@@ -3,21 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class LeapGuiTextureFeature : LeapGuiFeature {
 
-  [SerializeField]
-  private string _propertyName = "_MainTex";
+public class LeapGuiTextureFeature : LeapGuiFeature<LeapGuiTextureData> {
+  public string propertyName = "_MainTex";
+  public UVChannelFlags channel = UVChannelFlags.UV0;
+}
 
-  [SerializeField]
-  private UVChannelFlags _channel = UVChannelFlags.UV0;
-
-  public override ScriptableObject CreateSettingsObject() {
-    return ScriptableObject.CreateInstance<TextureSettings>();
-  }
-
-  public class TextureSettings : ElementSettings {
-
-    [SerializeField]
-    private Texture2D _texture;
-  }
+public class LeapGuiTextureData : LeapGuiElementData {
+  public Texture2D texture;
 }

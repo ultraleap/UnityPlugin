@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
 public class LeapGuiTintFeature : LeapGuiFeature {
 
   public override ScriptableObject CreateSettingsObject() {
@@ -14,3 +15,4 @@ public class LeapGuiTintFeature : LeapGuiFeature {
     private Color _tint;
   }
 }
+*/

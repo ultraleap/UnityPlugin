@@ -1,40 +1,28 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
-public class LeapGuiMeshFeature : LeapGuiFeature {
+public class LeapGuiMeshFeature : LeapGuiFeature<LeapGuiMeshData> {
+  public bool uv0;
+  public bool uv1;
+  public bool uv2;
+  public bool uv3;
+  public bool color;
+  public Color tint;
+  public bool normals;
 
-  [SerializeField]
-  private bool _uv0;
-
-  [SerializeField]
-  private bool _uv1;
-
-  [SerializeField]
-  private bool _uv2;
-
-  [SerializeField]
-  private bool _uv3;
-
-  [SerializeField]
-  private bool _color;
-
-  [SerializeField]
-  private Color _tint;
-
-  [SerializeField]
-  private bool _normals;
-
-  public override ScriptableObject CreateSettingsObject() {
-    return ScriptableObject.CreateInstance<MeshSettings>();
+  public IEnumerable<UVChannelFlags> enabledUvChannels {
+    get {
+      if (uv0) yield return UVChannelFlags.UV0;
+      if (uv1) yield return UVChannelFlags.UV1;
+      if (uv2) yield return UVChannelFlags.UV2;
+      if (uv3) yield return UVChannelFlags.UV3;
+    }
   }
+}
 
-  public class MeshSettings : ElementSettings {
-
-    [SerializeField]
-    private Mesh _mesh;
-
-    [SerializeField]
-    private Color _color;
-  }
+public class LeapGuiMeshData : LeapGuiElementData {
+  public Mesh mesh;
+  public Color color;
 }

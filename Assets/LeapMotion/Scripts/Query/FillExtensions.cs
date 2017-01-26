@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +10,13 @@ namespace Leap.Unity.Query {
     public static T[] Fill<T>(this T[] array, T value) {
       for (int i = 0; i < array.Length; i++) {
         array[i] = value;
+      }
+      return array;
+    }
+
+    public static T[] Fill<T>(this T[] array, Func<T> constructor) {
+      for (int i = 0; i < array.Length; i++) {
+        array[i] = constructor();
       }
       return array;
     }
