@@ -98,7 +98,7 @@ public class LeapGui : MonoBehaviour {
     for (int i = 0; i < _elements.Count; i++) {
       var element = _elements[i];
 
-      //If data points to a different element, instantite it and point it to the correct element
+      //If data points to a different element, copy it and point it to the correct element
       for (int j = 0; j < element.data.Count; j++) {
         var data = element.data[j];
         if (data.element != element) {
