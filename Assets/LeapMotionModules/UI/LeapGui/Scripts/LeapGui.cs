@@ -17,7 +17,7 @@ public class LeapGui : MonoBehaviour {
 
   public int elementCount {
     get {
-      return 0;
+      return _elements.Count;
     }
   }
 

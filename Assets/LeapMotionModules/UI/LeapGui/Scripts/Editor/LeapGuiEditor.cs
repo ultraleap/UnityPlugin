@@ -29,11 +29,11 @@ public class LeapGuiEditor : CustomEditorBase {
       addFeature<LeapGuiMeshFeature>(features);
     }
 
-    /*
     if (GUILayout.Button("Texture")) {
       addFeature<LeapGuiTextureFeature>(features);
     }
 
+    /*
     if (GUILayout.Button("Tint")) {
       addFeature<LeapGuiTintFeature>(features);
     }

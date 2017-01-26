@@ -170,6 +170,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
 
                Texture2D bordered;
                if (!_originalToBordered.TryGetValue(d.texture, out bordered)) {
+                 d.texture.EnsureReadWriteEnabled();
                  bordered = Instantiate(d.texture);
                  bordered.AddBorder(borderAmount);
                  _originalToBordered[d.texture] = bordered;
@@ -187,6 +188,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
         _atlases[feature] = atlas;
         _atlasedUvs[uvChannel] = atlasedUvs;
       }
+    }
+
+    foreach (var feature in _textureFeatures) {
+      _material.SetTexture(feature.propertyName, _atlases[feature]);
     }
   }
 

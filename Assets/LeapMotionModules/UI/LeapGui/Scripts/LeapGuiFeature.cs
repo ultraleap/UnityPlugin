@@ -22,7 +22,7 @@ public abstract class LeapGuiFeature<DataType> : LeapGuiFeatureBase
   /// <summary>
   /// A list of all element data object.
   /// </summary>
-  public List<DataType> data;
+  public List<DataType> data = new List<DataType>();
 
   public override void ClearDataObjectReferences() {
     data.Clear();
