@@ -67,6 +67,15 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
     }
 
     bakeUvs();
+
+    switch (_motionType) {
+      case MotionType.TranslationOnly:
+        _material.EnableKeyword(LeapGui.FEATURE_MOVEMENT_TRANSLATION);
+        break;
+      case MotionType.Full:
+        _material.EnableKeyword(LeapGui.FEATURE_MOVEMENT_FULL);
+        break;
+    }
   }
 
   private void ensureObjectsAreValid() {
@@ -165,7 +174,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
     whiteTexture.SetPixels(new Color[3 * 3].Fill(Color.white));
     whiteTexture.Apply();
 
-    Texture2D[] textures = new Texture2D[gui.elementCount];
+    Texture2D[] textures = new Texture2D[gui.elements.Count];
     var _originalToBordered = new Dictionary<Texture2D, Texture2D>();
 
     foreach (var uvChannel in allUvChannels) {
@@ -284,6 +293,16 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
 
       _material.EnableKeyword(LeapGuiMeshFeature.GetUvFeature(pair.Key));
     }
+  }
+
+  /// <summary>
+  /// Returns whether or not this baker will need to use uv3 to store additional
+  /// information like element id or blend shape vertex offset
+  /// </summary>
+  public bool DoesNeedUv3() {
+    if (_motionType != MotionType.None) return true;
+    //TODO: add more conditions!
+    return false;
   }
 
   private Vector3 elementVertToBakedVert(Transform elementTransform, Vector3 vert) {

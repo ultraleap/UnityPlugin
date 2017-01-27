@@ -18,13 +18,7 @@ public class LeapGui : MonoBehaviour {
   [SerializeField]
   private LeapGuiRenderer _renderer;
 
-  private List<LeapGuiElement> _elements;
-
-  public int elementCount {
-    get {
-      return _elements.Count;
-    }
-  }
+  public List<LeapGuiElement> elements;
 
   void OnEnable() {
     if (Application.isPlaying) {
@@ -43,7 +37,7 @@ public class LeapGui : MonoBehaviour {
       if (Application.isPlaying) {
         _renderer.OnUpdateRenderer();
       } else {
-        _elements.Clear();
+        elements.Clear();
         rebuildElementList(transform);
         rebuildFeatureData();
         _renderer.OnUpdateRendererEditor();
@@ -88,7 +82,7 @@ public class LeapGui : MonoBehaviour {
 
       var element = child.GetComponent<LeapGuiElement>();
       if (element != null) {
-        _elements.Add(element);
+        elements.Add(element);
       }
 
       rebuildElementList(child);
@@ -100,8 +94,8 @@ public class LeapGui : MonoBehaviour {
       feature.ClearDataObjectReferences();
     }
 
-    for (int i = 0; i < _elements.Count; i++) {
-      var element = _elements[i];
+    for (int i = 0; i < elements.Count; i++) {
+      var element = elements[i];
 
       //If data points to a different element, copy it and point it to the correct element
       for (int j = 0; j < element.data.Count; j++) {
