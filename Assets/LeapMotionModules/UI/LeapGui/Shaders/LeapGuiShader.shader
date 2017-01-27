@@ -12,16 +12,16 @@
       #pragma vertex vert
       #pragma fragment frag
 
-      #pragma shader_feature _ GUI_SPACE_CYLINDRICAL
-      #pragma shader_feature _ GUI_SPACE_NORMALS
-      #pragma shader_feature _ GUI_SPACE_UV_0
-      #pragma shader_feature _ GUI_SPACE_UV_1
-      #pragma shader_feature _ GUI_SPACE_UV_2
-      #pragma shader_feature _ GUI_SPACE_VERTEX_COLORS
-      #pragma shader_feature _ GUI_SPACE_MOVEMENT_TRANSLATION GUI_SPACE_MOVEMENT_FULL
-      #pragma shader_feature _ GUI_SPACE_TINTING
-      #pragma shader_feature _ GUI_SPACE_BLEND_SHAPES
-      #include "Assets/LeapMotionModules/UI/GuiSpace/Resources/GuiSpace.cginc"
+      #pragma shader_feature _ LEAP_GUI_CYLINDRICAL
+      #pragma shader_feature _ LEAP_GUI_VERTEX_NORMALS
+      #pragma shader_feature _ LEAP_GUI_VERTEX_UV_0
+      #pragma shader_feature _ LEAP_GUI_VERTEX_UV_1
+      #pragma shader_feature _ LEAP_GUI_VERTEX_UV_2
+      #pragma shader_feature _ LEAP_GUI_VERTEX_COLORS
+      #pragma shader_feature _ LEAP_GUI_MOVEMENT_TRANSLATION GUI_SPACE_MOVEMENT_FULL
+      #pragma shader_feature _ LEAP_GUI_TINTING
+      #pragma shader_feature _ LEAP_GUI_BLEND_SHAPES
+      #include "Assets/LeapMotionModules/UI/LeapGui/Resources/GuiSpace.cginc"
       #include "UnityCG.cginc"
 
       sampler2D _MainTex;
@@ -31,7 +31,7 @@
       }
       
       fixed4 frag (v2f_gui i) : SV_Target {
-#ifdef GUI_SPACE_UV_0
+#ifdef LEAP_GUI_VERTEX_UV_0
         fixed4 color = tex2D(_MainTex, i.uv0);
 #ifdef GUI_ELEMENTS_HAVE_COLOR
         color *= i.color;

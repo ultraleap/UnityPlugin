@@ -6,6 +6,8 @@ using Leap.Unity.Query;
 
 [ExecuteInEditMode]
 public class LeapGui : MonoBehaviour {
+  public const string FEATURE_PREFIX = "LEAP_GUI_";
+  public const string PROPERTY_PREFIX = "_LeapGui";
 
   [SerializeField]
   private List<LeapGuiFeatureBase> _features;

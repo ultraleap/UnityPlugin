@@ -88,10 +88,12 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
       _shader = Shader.Find("Unlit/LeapGuiShader");
     }
 
-    if (_material == null) {
-      _material = new Material(_shader);
-      _material.name = "Baked Gui Material";
+    if (_material != null) {
+      DestroyImmediate(_material);
     }
+
+    _material = new Material(_shader);
+    _material.name = "Baked Gui Material";
 
     if (_filter == null) {
       _filter = _displayObject.AddComponent<MeshFilter>();
@@ -128,6 +130,11 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   }
 
   private void bakeColors() {
+    //If no mesh feature wants colors, don't bake them!
+    if (!_meshFeatures.Query().Any(f => f.color)) {
+      return;
+    }
+
     List<Color> colors = new List<Color>();
 
     foreach (var feature in _meshFeatures) {
@@ -147,6 +154,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
     }
 
     _bakedMesh.SetColors(colors);
+    _material.EnableKeyword(LeapGuiMeshFeature.COLORS_FEATURE);
   }
 
   private void atlasTextures() {
@@ -273,6 +281,8 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
                                      Select(v => (Vector2)v).
                                      ToList());
       }
+
+      _material.EnableKeyword(LeapGuiMeshFeature.GetUvFeature(pair.Key));
     }
   }
 
