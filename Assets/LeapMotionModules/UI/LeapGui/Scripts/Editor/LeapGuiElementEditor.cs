@@ -6,15 +6,31 @@ using UnityEditor;
 [CustomEditor(typeof(LeapGuiElement))]
 public class LeapGuiElementEditor : Editor {
 
+  SerializedProperty data;
+
+  void OnEnable() {
+    data = serializedObject.FindProperty("data");
+  }
+
   public override void OnInspectorGUI() {
     base.OnInspectorGUI();
 
-    if (GUILayout.Button("Add Mesh Data")) {
-      (target as LeapGuiElement).data.Add(ScriptableObject.CreateInstance<LeapGuiMeshData>());
-    }
+    for (int i = 0; i < data.arraySize; i++) {
+      var dataRef = data.GetArrayElementAtIndex(i);
 
-    foreach (var data in (target as LeapGuiElement).data) {
-      Editor.CreateEditor(data).DrawDefaultInspector();
+      var dataObj = dataRef.objectReferenceValue;
+      EditorGUILayout.LabelField(dataObj.GetType().Name);
+      EditorGUI.indentLevel++;
+
+      SerializedObject sobj = new SerializedObject(dataObj);
+      SerializedProperty it = sobj.GetIterator();
+      it.NextVisible(true);
+
+      while (it.NextVisible(false)) {
+        EditorGUILayout.PropertyField(it);
+      }
+
+      EditorGUI.indentLevel--;
     }
   }
 }

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class LeapGuiFeatureBase : ScriptableObject {
-  public bool isDirty;
-
   public abstract void ClearDataObjectReferences();
   public abstract void AddDataObjectReference(LeapGuiElementData data);
 
@@ -12,7 +10,9 @@ public abstract class LeapGuiFeatureBase : ScriptableObject {
 }
 
 public abstract class LeapGuiElementData : ScriptableObject {
+  [HideInInspector]
   public LeapGuiElement element;
+  [HideInInspector]
   public LeapGuiFeatureBase feature;
 }
 
@@ -22,6 +22,7 @@ public abstract class LeapGuiFeature<DataType> : LeapGuiFeatureBase
   /// <summary>
   /// A list of all element data object.
   /// </summary>
+  [HideInInspector]
   public List<DataType> data = new List<DataType>();
 
   public override void ClearDataObjectReferences() {

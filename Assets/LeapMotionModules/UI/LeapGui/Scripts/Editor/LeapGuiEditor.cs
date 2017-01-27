@@ -51,8 +51,13 @@ public class LeapGuiEditor : CustomEditorBase {
     for (int i = 0; i < count; i++) {
       var feature = features.GetArrayElementAtIndex(i);
 
-      var featureEditor = Editor.CreateEditor(feature.objectReferenceValue);
-      featureEditor.DrawDefaultInspector();
+      EditorGUILayout.LabelField(feature.objectReferenceValue.GetType().Name);
+      EditorGUI.indentLevel++;
+
+      var editor = Editor.CreateEditor(feature.objectReferenceValue);
+      editor.OnInspectorGUI();
+
+      EditorGUI.indentLevel--;
     }
   }
 
