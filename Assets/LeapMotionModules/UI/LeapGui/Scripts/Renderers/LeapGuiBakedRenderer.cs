@@ -37,6 +37,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   private Dictionary<LeapGuiTextureFeature, Texture2D> _atlases;
   private Dictionary<UVChannelFlags, Rect[]> _atlasedUvs;
 
+  //Cylindrical space
+  private const string CYLINDRICAL_POSITIONS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementPositions";
+  private List<Vector4> _cylindrical_elementPositions = new List<Vector4>();
+
   public override void OnEnableRenderer() {
   }
 
@@ -44,6 +48,19 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   }
 
   public override void OnUpdateRenderer() {
+    if (gui.space is LeapGuiCylindricalSpace) {
+      var cylindricalSpace = gui.space as LeapGuiCylindricalSpace;
+
+      _cylindrical_elementPositions.Clear();
+      foreach (var element in gui.elements) {
+        Vector4 pos = cylindricalSpace.GetCylindricalPosition(element.transform);
+        _cylindrical_elementPositions.Add(pos);
+      }
+
+      _material.SetFloat(LeapGuiCylindricalSpace.RADIUS_PROPERTY, cylindricalSpace.radius);
+      Debug.Log(CYLINDRICAL_POSITIONS);
+      _material.SetVectorArray(CYLINDRICAL_POSITIONS, _cylindrical_elementPositions);
+    }
   }
 
   public override void OnEnableRendererEditor() {
@@ -78,6 +95,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
 
     bakeUvs();
 
+    if (DoesNeedUv3()) {
+      bakeUv3();
+    }
+
     switch (_motionType) {
       case MotionType.TranslationOnly:
         _material.EnableKeyword(LeapGui.FEATURE_MOVEMENT_TRANSLATION);
@@ -86,6 +107,12 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
         _material.EnableKeyword(LeapGui.FEATURE_MOVEMENT_FULL);
         break;
     }
+
+    if (gui.space is LeapGuiCylindricalSpace) {
+      _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);
+    }
+
+    OnUpdateRenderer();
   }
 
   private void ensureObjectsAreValid() {
@@ -305,6 +332,21 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
     }
   }
 
+  private void bakeUv3() {
+    List<Vector4> uv3 = new List<Vector4>();
+
+    foreach (var feature in _meshFeatures) {
+      for (int i = 0; i < feature.data.Count; i++) {
+        var mesh = feature.data[i].mesh;
+
+        //TODO, support a single blend shape
+        uv3.Append(mesh.vertexCount, new Vector4(0, 0, 0, i));
+      }
+    }
+
+    _bakedMesh.SetUVs(3, uv3);
+  }
+
   /// <summary>
   /// Returns whether or not this baker will need to use uv3 to store additional
   /// information like element id or blend shape vertex offset
@@ -318,7 +360,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   private Vector3 elementVertToBakedVert(Transform elementTransform, Vector3 vert) {
     vert = elementTransform.TransformPoint(vert);
     vert = gui.transform.InverseTransformPoint(vert);
-    //vert -= gui.transform.InverseTransformPoint(elementTransform.position);
+    vert -= gui.transform.InverseTransformPoint(elementTransform.position);
     return vert;
   }
 

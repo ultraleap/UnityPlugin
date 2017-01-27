@@ -20,6 +20,16 @@ public class LeapGui : MonoBehaviour {
 
   public List<LeapGuiElement> elements;
 
+  private LeapGuiSpace _cachedGuiSpace;
+  public LeapGuiSpace space {
+    get {
+      if (_cachedGuiSpace == null) {
+        _cachedGuiSpace = GetComponent<LeapGuiSpace>();
+      }
+      return _cachedGuiSpace;
+    }
+  }
+
   void OnEnable() {
     if (Application.isPlaying) {
       _renderer.OnEnableRenderer();
@@ -40,6 +50,8 @@ public class LeapGui : MonoBehaviour {
         elements.Clear();
         rebuildElementList(transform);
         rebuildFeatureData();
+        space.BuildElementData(transform);
+
         _renderer.OnUpdateRendererEditor();
       }
     }
@@ -82,6 +94,7 @@ public class LeapGui : MonoBehaviour {
 
       var element = child.GetComponent<LeapGuiElement>();
       if (element != null) {
+        element.elementId = elements.Count;
         elements.Add(element);
       }
 
