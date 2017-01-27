@@ -53,7 +53,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
 
       _cylindrical_elementPositions.Clear();
       foreach (var element in gui.elements) {
-        Vector4 pos = cylindricalSpace.GetCylindricalPosition(element.transform);
+        Vector4 pos = cylindricalSpace.GetAnchorPosition(element.transform);
         _cylindrical_elementPositions.Add(pos);
       }
 
