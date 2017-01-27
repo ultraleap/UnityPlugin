@@ -9,6 +9,9 @@ public class LeapGui : MonoBehaviour {
   public const string FEATURE_PREFIX = "LEAP_GUI_";
   public const string PROPERTY_PREFIX = "_LeapGui";
 
+  public const string FEATURE_MOVEMENT_TRANSLATION = FEATURE_PREFIX + "MOVEMENT_TRANSLATION";
+  public const string FEATURE_MOVEMENT_FULL = FEATURE_PREFIX + "MOVEMENT_FULL";
+
   [SerializeField]
   private List<LeapGuiFeatureBase> _features;
 

@@ -18,7 +18,7 @@
       #pragma shader_feature _ LEAP_GUI_VERTEX_UV_1
       #pragma shader_feature _ LEAP_GUI_VERTEX_UV_2
       #pragma shader_feature _ LEAP_GUI_VERTEX_COLORS
-      #pragma shader_feature _ LEAP_GUI_MOVEMENT_TRANSLATION GUI_SPACE_MOVEMENT_FULL
+      #pragma shader_feature _ LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_MOVEMENT_FULL
       #pragma shader_feature _ LEAP_GUI_TINTING
       #pragma shader_feature _ LEAP_GUI_BLEND_SHAPES
       #include "Assets/LeapMotionModules/UI/LeapGui/Resources/GuiSpace.cginc"
