@@ -31,6 +31,10 @@ public class LeapGuiElementEditor : Editor {
       }
 
       EditorGUI.indentLevel--;
+
+      sobj.ApplyModifiedProperties();
     }
+
+    serializedObject.ApplyModifiedProperties();
   }
 }

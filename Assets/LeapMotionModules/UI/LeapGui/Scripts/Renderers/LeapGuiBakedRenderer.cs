@@ -15,17 +15,27 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   [SerializeField]
   private int borderAmount = 0;
 
+  [Header("Debug")]
+  [SerializeField]
+  private Mesh _bakedMesh;
+
+  [SerializeField]
+  private Material _material;
+
+  [SerializeField]
+  private GameObject _displayObject;
+
+  [SerializeField]
+  private MeshFilter _filter;
+
+  [SerializeField]
+  private MeshRenderer _renderer;
+
   private List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
   private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
 
   private Dictionary<LeapGuiTextureFeature, Texture2D> _atlases;
   private Dictionary<UVChannelFlags, Rect[]> _atlasedUvs;
-
-  private Mesh _bakedMesh;
-  private Material _material;
-  private GameObject _displayObject;
-  private MeshFilter _filter;
-  private MeshRenderer _renderer;
 
   public override void OnEnableRenderer() {
   }

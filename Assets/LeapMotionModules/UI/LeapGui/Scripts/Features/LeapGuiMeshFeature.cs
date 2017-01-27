@@ -44,8 +44,3 @@ public class LeapGuiMeshFeature : LeapGuiFeature<LeapGuiMeshData> {
     }
   }
 }
-
-public class LeapGuiMeshData : LeapGuiElementData {
-  public Mesh mesh;
-  public Color color;
-}

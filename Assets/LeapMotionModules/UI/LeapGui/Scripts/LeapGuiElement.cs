@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class LeapGuiElement : MonoBehaviour {
 
-  [HideInInspector]
+  //[HideInInspector]
   [SerializeField]
   private int _elementId;
 
-  [HideInInspector]
+  //[HideInInspector]
   [SerializeField]
   public List<LeapGuiElementData> data;
 

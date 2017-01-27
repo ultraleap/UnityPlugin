@@ -8,7 +8,3 @@ public class LeapGuiTextureFeature : LeapGuiFeature<LeapGuiTextureData> {
   public string propertyName = "_MainTex";
   public UVChannelFlags channel = UVChannelFlags.UV0;
 }
-
-public class LeapGuiTextureData : LeapGuiElementData {
-  public Texture2D texture;
-}

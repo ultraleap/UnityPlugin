@@ -97,16 +97,6 @@ public class LeapGui : MonoBehaviour {
     for (int i = 0; i < elements.Count; i++) {
       var element = elements[i];
 
-      //If data points to a different element, copy it and point it to the correct element
-      for (int j = 0; j < element.data.Count; j++) {
-        var data = element.data[j];
-        if (data.element != element) {
-          data = Instantiate(data);
-          data.element = element;
-          element.data[j] = data;
-        }
-      }
-
       //First make a map of existing data objects to their correct indexes
       var dataToNewIndex = new Dictionary<LeapGuiElementData, int>();
       foreach (var data in element.data) {
@@ -123,6 +113,16 @@ public class LeapGui : MonoBehaviour {
       //Then re-map the existing data objects to the correct index
       foreach (var pair in dataToNewIndex) {
         element.data[pair.Value] = pair.Key;
+      }
+
+      //If data points to a different element, copy it and point it to the correct element
+      for (int j = 0; j < element.data.Count; j++) {
+        var data = element.data[j];
+        if (data != null && data.element != element) {
+          data = Instantiate(data);
+          data.element = element;
+          element.data[j] = data;
+        }
       }
 
       //Then construct new data objects if there is not yet one

@@ -10,9 +10,9 @@ public abstract class LeapGuiFeatureBase : ScriptableObject {
 }
 
 public abstract class LeapGuiElementData : ScriptableObject {
-  [HideInInspector]
+  //[HideInInspector]
   public LeapGuiElement element;
-  [HideInInspector]
+  //[HideInInspector]
   public LeapGuiFeatureBase feature;
 }
 
