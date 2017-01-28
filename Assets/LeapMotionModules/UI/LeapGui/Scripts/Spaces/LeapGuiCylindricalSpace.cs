@@ -12,16 +12,18 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace {
   private Dictionary<Transform, ElementData> _transformToAnchor = new Dictionary<Transform, ElementData>();
 
   public Vector3 GetAnchorPosition(Transform element) {
-    return _transformToAnchor[element];
+    //return _transformToAnchor[element];
+    return new Vector3();
   }
 
   public override void BuildElementData(Transform root) {
     _transformToAnchor.Clear();
-    _transformToAnchor[root] = new Vector3(0, 0, radius);
+    //_transformToAnchor[root] = new Vector3(0, 0, radius);
     RefreshElementData(root);
   }
 
   public override void RefreshElementData(Transform root) {
+    /*
     ElementData anchor = _transformToAnchor[root];
     Vector3 anchorPos = anchor.cylindricalPosition;
 
@@ -47,6 +49,7 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace {
 
       RefreshElementData(child);
     }
+     * */
   }
 
   public override Vector3 TransformPoint(Vector3 worldRectPos) {
@@ -58,11 +61,12 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace {
   }
 
   public override Vector3 TransformPoint(LeapGuiElement element, Vector3 localRectPos) {
-    Vector3 elementPos = _transformToAnchor[element.transform];
-    elementPos.x += localRectPos.x / elementPos.z;
-    elementPos.y += localRectPos.y;
-    elementPos.z += localRectPos.z;
-    return elementPos;
+    //Vector3 elementPos = _transformToAnchor[element.transform];
+    //elementPos.x += localRectPos.x / elementPos.z;
+    //elementPos.y += localRectPos.y;
+    //elementPos.z += localRectPos.z;
+    //return elementPos;
+    return Vector3.zero;
   }
 
   public override Vector3 InverseTransformPoint(LeapGuiElement element, Vector3 worldGuiPos) {
