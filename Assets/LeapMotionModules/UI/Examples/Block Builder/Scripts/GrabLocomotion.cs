@@ -13,6 +13,8 @@ public class GrabLocomotion : MonoBehaviour {
   private Vector3 _grabAnchorPosition;
   private Quaternion _grabAnchorRotation;
 
+  private DeltaBuffer _rigPosBuffer = new DeltaBuffer(5);
+
   void Update() {
     _lHand = Hands.Left;
     _rHand = Hands.Right;
@@ -27,8 +29,20 @@ public class GrabLocomotion : MonoBehaviour {
     Vector3 grabPositionDelta = _grabAnchorPosition - GetGrabAnchorPosition();
     Hands.Rig.transform.position += grabPositionDelta;
 
+
+    float rigMovementSpeed = 0F;
+
+    _rigPosBuffer.Add(Hands.Rig.transform.position, Time.time);
+    if (_rigPosBuffer.IsFull) {
+      Vector3 rigVelocity = _rigPosBuffer.Delta();
+      rigMovementSpeed = rigVelocity.magnitude;
+    }
+
+    float rotationSlerpCoeff = 10F * Time.deltaTime * rigMovementSpeed.Map(0F, 2F, 1F, 0F);
     Quaternion grabRotationDelta = _grabAnchorRotation * Quaternion.Inverse(GetGrabAnchorRotation());
-    Hands.Rig.transform.rotation = Quaternion.Slerp(Hands.Rig.transform.rotation, grabRotationDelta * Hands.Rig.transform.rotation, 10F * Time.deltaTime);
+    Hands.Rig.transform.rotation = Quaternion.Slerp(Hands.Rig.transform.rotation, grabRotationDelta * Hands.Rig.transform.rotation, rotationSlerpCoeff);
+
+    Hands.Provider.ReTransformFrames();
   }
 
   // Returns true if the grab state is different than the previous known grab state, false otherwise.

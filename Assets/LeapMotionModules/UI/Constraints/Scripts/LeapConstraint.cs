@@ -9,12 +9,12 @@ namespace Leap.Unity.UI.Constraints {
     public Constraint[] constraints;
 
     public enum ConstraintType {
-      Line,
-      Plane,
-      Sphere,
-      Box,
-      Capsule,
-      Clip
+      Line    = 0,
+      Plane   = 1,
+      Sphere  = 2,
+      Box     = 3,
+      Capsule = 4,
+      Clip    = 5
     }
 
     [System.Serializable]
@@ -30,18 +30,23 @@ namespace Leap.Unity.UI.Constraints {
       public Vector3 start;
       public Vector3 end;
 
-      public void Evaluate(Transform inTransform, Transform refTransform) {
+      public void Evaluate(Transform inTransform, Transform parentTransform, Rigidbody inBody=null) {
         switch (type) {
           case ConstraintType.Line:
-            if (refTransform != null) {
+            if (parentTransform != null) {
               inTransform.localPosition = Vector3.Project(inTransform.localPosition - start, end - start) + start;
+              if (inBody != null) {
+                Vector3 projectedVelocity = Vector3.Project(inBody.velocity, end - start);
+                inBody.velocity = projectedVelocity;
+                //float progress = Vector3.Dot(inTransform.localPosition - start, end - start);
+              }
             }
             else {
               inTransform.position = Vector3.Project(inTransform.position - start, end - start) + start;
             }
             break;
           case ConstraintType.Plane:
-            if (refTransform != null) {
+            if (parentTransform != null) {
               inTransform.localPosition = Vector3.ProjectOnPlane(inTransform.localPosition - center, normal) + center;
             }
             else {
@@ -49,7 +54,7 @@ namespace Leap.Unity.UI.Constraints {
             }
             break;
           case ConstraintType.Sphere:
-            if (refTransform != null) {
+            if (parentTransform != null) {
               float Distance = Vector3.Distance(inTransform.localPosition, center);
               inTransform.localPosition = ((inTransform.localPosition - center) / Distance) * Mathf.Clamp(Distance, 0f, radius);
             }
@@ -62,9 +67,17 @@ namespace Leap.Unity.UI.Constraints {
       }
     }
 
-    void Update() {
+    void Start() {
+      PhysicsCallbacks.OnPrePhysics += OnPrePhysics;
+
+      _body = GetComponent<Rigidbody>();
+    }
+
+    private Rigidbody _body;
+
+    private void OnPrePhysics() {
       for (int i = 0; i < constraints.Length; i++) {
-        constraints[i].Evaluate(transform, transform.parent);
+        constraints[i].Evaluate(transform, transform.parent, _body);
       }
     }
 
