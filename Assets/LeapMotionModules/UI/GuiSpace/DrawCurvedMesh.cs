@@ -19,6 +19,10 @@ public class DrawCurvedMesh : MonoBehaviour {
 
   public float radius = 1;
   void Update() {
+    foreach (var m in toDestroy) {
+      DestroyImmediate(m);
+    }
+
     RadialPos p;
     p.radius = radius;
     p.angle = 0;
@@ -32,6 +36,8 @@ public class DrawCurvedMesh : MonoBehaviour {
 
     recurse(transform, a);
   }
+
+  List<Mesh> toDestroy = new List<Mesh>();
 
   private struct Anchor {
     public Transform transform;
@@ -58,6 +64,7 @@ public class DrawCurvedMesh : MonoBehaviour {
     var r = t.GetComponent<Renderer>();
     if (r != null) {
       Mesh m = Instantiate(r.GetComponent<MeshFilter>().sharedMesh);
+      toDestroy.Add(m);
       m.hideFlags = HideFlags.HideAndDontSave;
 
       var verts = m.vertices;
