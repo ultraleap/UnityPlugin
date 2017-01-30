@@ -170,7 +170,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
 
         //TODO: bake out space if no motion is enabled
         data.mesh.vertices.Query().Select(v => {
-          return elementVertToBakedVert(data.element.transform, v);
+          return elementVertToBakedVert(data.element, v);
         }).AppendList(verts);
       }
     }
