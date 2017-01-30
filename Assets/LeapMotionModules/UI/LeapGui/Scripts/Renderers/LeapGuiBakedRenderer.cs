@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Leap.Unity.Query;
+using Leap.Unity.Attributes;
 
 public class LeapGuiBakedRenderer : LeapGuiRenderer {
 
@@ -13,23 +14,24 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   [SerializeField]
   private MotionType _motionType = MotionType.Translation;
 
+  [MinValue(0)]
   [SerializeField]
   private int borderAmount = 0;
 
   [Header("Debug")]
-  [SerializeField]
+  [HideInInspector, SerializeField]
   private Mesh _bakedMesh;
 
-  [SerializeField]
+  [HideInInspector, SerializeField]
   private Material _material;
 
-  [SerializeField]
+  [HideInInspector, SerializeField]
   private GameObject _displayObject;
 
-  [SerializeField]
+  [HideInInspector, SerializeField]
   private MeshFilter _filter;
 
-  [SerializeField]
+  [HideInInspector, SerializeField]
   private MeshRenderer _renderer;
 
   private List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
