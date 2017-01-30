@@ -20,6 +20,8 @@ public class LeapGui : MonoBehaviour {
 
   public List<LeapGuiElement> elements;
 
+  public List<AnchorOfConstantSize> anchors;
+
   private LeapGuiSpace _cachedGuiSpace;
   public LeapGuiSpace space {
     get {
@@ -48,6 +50,7 @@ public class LeapGui : MonoBehaviour {
         _renderer.OnUpdateRenderer();
       } else {
         elements.Clear();
+        anchors.Clear();
         rebuildElementList(transform);
         rebuildFeatureData();
         space.BuildElementData(transform);
@@ -87,18 +90,27 @@ public class LeapGui : MonoBehaviour {
     return features.Count != 0;
   }
 
-  public void rebuildElementList(Transform root) {
+  public void rebuildElementList(Transform root, AnchorOfConstantSize currAnchor) {
     int count = root.childCount;
     for (int i = 0; i < count; i++) {
       Transform child = root.GetChild(i);
 
+      var childAnchor = currAnchor;
+
+      var anchor = child.GetComponent<AnchorOfConstantSize>();
+      if (anchor != null) {
+        childAnchor = anchor;
+        anchors.Add(anchor);
+      }
+
       var element = child.GetComponent<LeapGuiElement>();
       if (element != null) {
+        element.anchor = childAnchor;
         element.elementId = elements.Count;
         elements.Add(element);
       }
 
-      rebuildElementList(child);
+      rebuildElementList(child, childAnchor);
     }
   }
 
