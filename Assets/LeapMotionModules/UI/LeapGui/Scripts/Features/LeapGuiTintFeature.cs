@@ -1,18 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
-/*
-public class LeapGuiTintFeature : LeapGuiFeature {
+[LeapGuiFeatureName("Tint")]
+public class LeapGuiTintFeature : LeapGuiFeature<LeapGuiTintData> {
 
-  public override ScriptableObject CreateSettingsObject() {
-    return ScriptableObject.CreateInstance<TintSettings>();
+#if UNITY_EDITOR
+  public override void DrawFeatureEditor(Rect rect, bool isActive, bool isFocused) {
+    EditorGUI.LabelField(rect, "Tint");
   }
 
-  public class TintSettings : ElementSettings {
-
-    [SerializeField]
-    private Color _tint;
+  public override float GetEditorHeight() {
+    return EditorGUIUtility.singleLineHeight;
   }
+#endif
 }
-*/
+

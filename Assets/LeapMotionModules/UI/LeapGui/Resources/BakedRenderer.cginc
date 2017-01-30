@@ -56,6 +56,29 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 #endif
 #endif
 
+/***********************************
+ * Feature name:
+ *  _ (none)
+ *    no runtime tinting, base color only
+ *  LEAP_GUI_TINTING
+ *    runtime tinting on a per-element basis
+ ***********************************/
+
+#ifdef LEAP_GUI_TINTING
+#ifndef GUI_ELEMENTS_HAVE_ID
+#define GUI_ELEMENTS_HAVE_ID
+#endif
+#ifndef GUI_ELEMENTS_HAVE_COLOR
+#define GUI_ELEMENTS_HAVE_COLOR
+#endif
+
+float4 _LeapGui_Tints[ELEMENT_MAX];
+
+float4 GetElementTint(int elementId) {
+  return _GuiSpace_Tints[elementId];
+}
+#endif
+
 #ifdef LEAP_GUI_VERTEX_COLORS
 #ifndef GUI_ELEMENTS_HAVE_COLOR
 #define GUI_ELEMENTS_HAVE_COLOR

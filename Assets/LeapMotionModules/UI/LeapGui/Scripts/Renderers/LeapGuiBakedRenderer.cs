@@ -38,6 +38,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   private Dictionary<LeapGuiTextureFeature, Texture2D> _atlases;
   private Dictionary<UVChannelFlags, Rect[]> _atlasedUvs;
 
+  //Tinting
+  private const string TINT = LeapGui.PROPERTY_PREFIX + "Tints";
+  private List<Color> _tintColors = new List<Color>();
+
   //Cylindrical space
   private const string CYLINDRICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementParameters";
   private List<Vector4> _cylindrical_elementParameters = new List<Vector4>();
