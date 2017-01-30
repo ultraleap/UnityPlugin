@@ -4,6 +4,7 @@ using UnityEngine;
 
 public abstract class LeapGuiRenderer : ScriptableObject {
 
+  [HideInInspector]
   public LeapGui gui;
 
   /// <summary>
