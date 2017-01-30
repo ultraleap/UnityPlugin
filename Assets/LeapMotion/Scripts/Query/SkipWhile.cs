@@ -20,8 +20,14 @@ namespace Leap.Unity.Query {
 
     public bool MoveNext() {
       while (!_finishedSkipping) {
-        if (!_source.MoveNext() || !_predicate(_source.Current)) {
+        if (!_source.MoveNext()) {
           _finishedSkipping = true;
+          return false;
+        }
+
+        if (!_predicate(_source.Current)) {
+          _finishedSkipping = true;
+          return true;
         }
       }
 
