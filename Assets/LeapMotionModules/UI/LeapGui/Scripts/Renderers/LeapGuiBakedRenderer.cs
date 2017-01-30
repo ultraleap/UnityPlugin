@@ -62,7 +62,6 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
       }
 
       _material.SetFloat(LeapGuiCylindricalSpace.RADIUS_PROPERTY, cylindricalSpace.radius);
-      Debug.Log(CYLINDRICAL_PARAMETERS);
       _material.SetVectorArray(CYLINDRICAL_PARAMETERS, _cylindrical_elementParameters);
     }
   }
