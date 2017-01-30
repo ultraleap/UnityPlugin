@@ -12,14 +12,18 @@ public class LeapGui : MonoBehaviour {
   public const string FEATURE_MOVEMENT_TRANSLATION = FEATURE_PREFIX + "MOVEMENT_TRANSLATION";
   public const string FEATURE_MOVEMENT_FULL = FEATURE_PREFIX + "MOVEMENT_FULL";
 
-  [SerializeField]
-  private List<LeapGuiFeatureBase> _features;
+  public List<LeapGuiFeatureBase> features;
 
-  [SerializeField]
-  private LeapGuiRenderer _renderer;
+#if UNITY_EDITOR
+  public new LeapGuiRenderer renderer;
+#else
+  public LeapGuiRenderer renderer;
+#endif
 
+  [HideInInspector]
   public List<LeapGuiElement> elements;
 
+  [HideInInspector]
   public List<AnchorOfConstantSize> anchors;
 
   private LeapGuiSpace _cachedGuiSpace;
@@ -34,20 +38,20 @@ public class LeapGui : MonoBehaviour {
 
   void OnEnable() {
     if (Application.isPlaying) {
-      _renderer.OnEnableRenderer();
+      renderer.OnEnableRenderer();
     }
   }
 
   void OnDisable() {
     if (Application.isPlaying) {
-      _renderer.OnDisableRenderer();
+      renderer.OnDisableRenderer();
     }
   }
 
   void LateUpdate() {
-    if (_renderer != null) {
+    if (renderer != null) {
       if (Application.isPlaying) {
-        _renderer.OnUpdateRenderer();
+        renderer.OnUpdateRenderer();
       } else {
         elements.Clear();
         anchors.Clear();
@@ -55,38 +59,38 @@ public class LeapGui : MonoBehaviour {
         rebuildFeatureData();
         space.BuildElementData(transform);
 
-        _renderer.OnUpdateRendererEditor();
+        renderer.OnUpdateRendererEditor();
       }
     }
   }
 
   public LeapGuiRenderer GetRenderer() {
-    return _renderer;
+    return renderer;
   }
 
 #if UNITY_EDITOR
-  public void SetRenderer(LeapGuiRenderer renderer) {
+  public void SetRenderer(LeapGuiRenderer newRenderer) {
     if (Application.isPlaying) {
       throw new InvalidOperationException("Cannot change renderer at runtime.");
     }
 
-    if (_renderer != null) {
-      _renderer.OnDisableRendererEditor();
-      DestroyImmediate(_renderer);
-      _renderer = null;
+    if (renderer != null) {
+      renderer.OnDisableRendererEditor();
+      DestroyImmediate(renderer);
+      renderer = null;
     }
 
-    _renderer = renderer;
-    _renderer.gui = this;
+    renderer = newRenderer;
+    renderer.gui = this;
 
-    if (_renderer != null) {
-      _renderer.OnEnableRendererEditor();
+    if (renderer != null) {
+      renderer.OnEnableRendererEditor();
     }
   }
 #endif
 
   public bool GetAllFeaturesOfType<T>(List<T> features) where T : LeapGuiFeatureBase {
-    _features.Query().OfType<T>().FillList(features);
+    this.features.Query().OfType<T>().FillList(features);
     return features.Count != 0;
   }
 
@@ -115,7 +119,7 @@ public class LeapGui : MonoBehaviour {
   }
 
   private void rebuildFeatureData() {
-    foreach (var feature in _features) {
+    foreach (var feature in features) {
       feature.ClearDataObjectReferences();
     }
 
@@ -129,11 +133,14 @@ public class LeapGui : MonoBehaviour {
           continue;
         }
 
-        dataToNewIndex[data] = _features.IndexOf(data.feature);
+        int index = features.IndexOf(data.feature);
+        if (index >= 0) {
+          dataToNewIndex[data] = index;
+        }
       }
 
       //Then make sure the data array has enough spaces for all the data objects
-      element.data.Fill(_features.Count, null);
+      element.data.Fill(features.Count, null);
 
       //Then re-map the existing data objects to the correct index
       foreach (var pair in dataToNewIndex) {
@@ -151,8 +158,8 @@ public class LeapGui : MonoBehaviour {
       }
 
       //Then construct new data objects if there is not yet one
-      for (int j = 0; j < _features.Count; j++) {
-        var feature = _features[j];
+      for (int j = 0; j < features.Count; j++) {
+        var feature = features[j];
 
         if (element.data[j] == null) {
           element.data[j] = feature.CreateDataObject(element);

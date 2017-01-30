@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class LeapGuiMeshFeature : LeapGuiFeature<LeapGuiMeshData> {
   public const string UV_0_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_UV_0";
@@ -43,4 +46,40 @@ public class LeapGuiMeshFeature : LeapGuiFeature<LeapGuiMeshData> {
       if (uv3) yield return UVChannelFlags.UV3;
     }
   }
+
+#if UNITY_EDITOR
+  public override void DrawFeatureEditor(Rect rect, bool isActive, bool isFocused) {
+    Rect line = rect.SingleLine();
+
+    EditorGUI.LabelField(line, "Mesh");
+    line = line.NextLine();
+
+    line = line.Indent();
+
+    Rect left, right;
+    line.SplitHorizontally(out left, out right);
+
+    uv0 = EditorGUI.ToggleLeft(left, "Uv0", uv0);
+    uv1 = EditorGUI.ToggleLeft(right, "Uv1", uv1);
+    line = line.NextLine();
+
+    line.SplitHorizontally(out left, out right);
+    uv2 = EditorGUI.ToggleLeft(left, "Uv2", uv2);
+    uv3 = EditorGUI.ToggleLeft(right, "Uv3", uv3);
+    line = line.NextLine();
+
+    line.SplitHorizontally(out left, out right);
+    color = EditorGUI.ToggleLeft(left, "Color", color);
+    normals = EditorGUI.ToggleLeft(right, "Normals", normals);
+    line = line.NextLine();
+
+    if (color) {
+      tint = EditorGUI.ColorField(line, "Tint", tint);
+    }
+  }
+
+  public override float GetEditorHeight() {
+    return EditorGUIUtility.singleLineHeight * (color ? 5 : 4);
+  }
+#endif
 }

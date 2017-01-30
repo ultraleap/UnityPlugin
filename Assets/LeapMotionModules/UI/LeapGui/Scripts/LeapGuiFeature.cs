@@ -1,12 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public abstract class LeapGuiFeatureBase : ScriptableObject {
   public abstract void ClearDataObjectReferences();
   public abstract void AddDataObjectReference(LeapGuiElementData data);
 
   public abstract LeapGuiElementData CreateDataObject(LeapGuiElement element);
+
+#if UNITY_EDITOR
+  public abstract void DrawFeatureEditor(Rect rect, bool isActive, bool isFocused);
+  public abstract float GetEditorHeight();
+#endif
 }
 
 public abstract class LeapGuiElementData : ScriptableObject {
