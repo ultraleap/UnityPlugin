@@ -23,13 +23,8 @@ public class DrawCurvedMesh : MonoBehaviour {
       DestroyImmediate(m);
     }
 
-    RadialPos p;
-    p.radius = radius;
-    p.angle = 0;
-    p.height = 0;
-
     Anchor a;
-    a.transform = transform;
+    a.rectPos = transform.position;
     a.anchorPos.radius = radius;
     a.anchorPos.height = 0;
     a.anchorPos.angle = 0;
@@ -39,24 +34,15 @@ public class DrawCurvedMesh : MonoBehaviour {
 
   List<Mesh> toDestroy = new List<Mesh>();
 
-  private struct Anchor {
-    public Transform transform;
-    public RadialPos anchorPos;
-  }
+
 
   private void recurse(Transform t, Anchor anchor) {
 
     var da = t.GetComponent<AnchorOfConstantSize>();
     if (da != null && da.enabled) {
-      Vector3 delta = t.position - anchor.transform.position;
-
       var newAnchor = new Anchor();
-      newAnchor.anchorPos = anchor.anchorPos;
-      newAnchor.anchorPos.angle += delta.x / anchor.anchorPos.radius;
-      newAnchor.anchorPos.height += delta.y;
-      newAnchor.anchorPos.radius += delta.z;
-
-      newAnchor.transform = t;
+      newAnchor.anchorPos = TransformPos(t.position, anchor);
+      newAnchor.rectPos = t.position;
 
       anchor = newAnchor;
     }
@@ -70,19 +56,12 @@ public class DrawCurvedMesh : MonoBehaviour {
       var verts = m.vertices;
       for (int i = 0; i < verts.Length; i++) {
         Vector3 vert = verts[i];
-        Vector3 delta = t.TransformPoint(vert) - anchor.transform.position;
+        Vector3 worldVert = t.TransformPoint(vert);
 
-        RadialPos vertPos = anchor.anchorPos;
-        vertPos.angle += delta.x / vertPos.radius;
-        vertPos.radius += delta.z;
-        vertPos.height += delta.y;
+        var radialVert = TransformPos(worldVert, anchor);
+        var transformedVert = RadialPosToWorld(radialVert);
 
-        Vector3 v;
-        v.x = Mathf.Sin(vertPos.angle) * vertPos.radius;
-        v.y = vertPos.height;
-        v.z = Mathf.Cos(vertPos.angle) * vertPos.radius - radius;
-
-        verts[i] = v;
+        verts[i] = transformedVert;
       }
 
       m.vertices = verts;
@@ -93,15 +72,32 @@ public class DrawCurvedMesh : MonoBehaviour {
     }
 
     foreach (Transform child in t) {
-      Vector3 delta = child.position - anchor.transform.position;
-
-      RadialPos childPos = anchor.anchorPos;
-      childPos.angle += delta.x / childPos.radius;
-      childPos.radius += delta.z;
-      childPos.height += delta.y;
-
+      if (!child.gameObject.activeSelf) continue;
       recurse(child, anchor);
     }
+  }
+
+  public RadialPos TransformPos(Vector3 worldPos, Anchor anchor) {
+    RadialPos rp = anchor.anchorPos;
+    Vector3 delta = worldPos - anchor.rectPos;
+    rp.angle += delta.x / rp.radius;
+    rp.height += delta.y;
+    rp.radius += delta.z;
+
+    return rp;
+  }
+
+  public Vector3 RadialPosToWorld(RadialPos pos) {
+    Vector3 worldPos;
+    worldPos.x = Mathf.Sin(pos.angle) * pos.radius;
+    worldPos.y = pos.height;
+    worldPos.z = Mathf.Cos(pos.angle) * pos.radius - radius;
+    return worldPos;
+  }
+
+  public struct Anchor {
+    public Vector3 rectPos;
+    public RadialPos anchorPos;
   }
 
   public struct RadialPos {
