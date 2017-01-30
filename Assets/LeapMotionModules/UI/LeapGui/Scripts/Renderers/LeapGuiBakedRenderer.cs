@@ -42,8 +42,8 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   private Dictionary<UVChannelFlags, Rect[]> _atlasedUvs;
 
   //Cylindrical space
-  private const string CYLINDRICAL_POSITIONS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementPositions";
-  private List<Vector4> _cylindrical_elementPositions = new List<Vector4>();
+  private const string CYLINDRICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementParameters";
+  private List<Vector4> _cylindrical_elementParameters = new List<Vector4>();
 
   public override void OnEnableRenderer() {
   }
@@ -55,15 +55,18 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
     if (gui.space is LeapGuiCylindricalSpace) {
       var cylindricalSpace = gui.space as LeapGuiCylindricalSpace;
 
-      _cylindrical_elementPositions.Clear();
+      _cylindrical_elementParameters.Clear();
       foreach (var element in gui.elements) {
-        Vector4 pos = cylindricalSpace.GetAnchorPosition(element.transform);
-        _cylindrical_elementPositions.Add(pos);
+        Vector4 guiPos = gui.transform.InverseTransformPoint(element.transform.position);
+
+        var parameters = cylindricalSpace.GetElementParameters(element.anchor, element.transform.position);
+
+        _cylindrical_elementParameters.Add(parameters);
       }
 
       _material.SetFloat(LeapGuiCylindricalSpace.RADIUS_PROPERTY, cylindricalSpace.radius);
-      Debug.Log(CYLINDRICAL_POSITIONS);
-      _material.SetVectorArray(CYLINDRICAL_POSITIONS, _cylindrical_elementPositions);
+      Debug.Log(CYLINDRICAL_PARAMETERS);
+      _material.SetVectorArray(CYLINDRICAL_PARAMETERS, _cylindrical_elementParameters);
     }
   }
 

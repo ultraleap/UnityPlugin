@@ -98,13 +98,13 @@ public class LeapGui : MonoBehaviour {
       var childAnchor = currAnchor;
 
       var anchor = child.GetComponent<AnchorOfConstantSize>();
-      if (anchor != null) {
+      if (anchor != null && anchor.enabled) {
         childAnchor = anchor;
         anchors.Add(anchor);
       }
 
       var element = child.GetComponent<LeapGuiElement>();
-      if (element != null) {
+      if (element != null && element.enabled) {
         element.anchor = childAnchor;
         element.elementId = elements.Count;
         elements.Add(element);

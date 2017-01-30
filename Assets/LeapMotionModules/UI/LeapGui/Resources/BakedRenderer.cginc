@@ -42,11 +42,11 @@ void ApplyElementMotion(inout float4 vert, int elementId) {
 #define LEAP_GUI_WARPING
 #include "Assets/LeapMotionModules/UI/LeapGui/Resources/CylindricalSpace.cginc"
 
-float3 _LeapGuiCylindrical_ElementPositions[ELEMENT_MAX];
+float4 _LeapGuiCylindrical_ElementParameters[ELEMENT_MAX];
 
 void ApplyGuiWarping(inout float4 vert, int elementId) {
-  float3 elementPos = _LeapGuiCylindrical_ElementPositions[elementId];
-  Cylindrical_LocalToWorld(elementPos, vert.xyz);
+  float4 elementParams = _LeapGuiCylindrical_ElementParameters[elementId];
+  Cylindrical_LocalToWorld(vert.xyz, elementParams);
 }
 #endif
 

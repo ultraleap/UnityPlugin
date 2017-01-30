@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity.Query;
@@ -9,47 +10,82 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace {
 
   public float radius = 1;
 
-  private Dictionary<Transform, ElementData> _transformToAnchor = new Dictionary<Transform, ElementData>();
+  private Dictionary<AnchorOfConstantSize, AnchorData> _anchorData = new Dictionary<AnchorOfConstantSize, AnchorData>();
 
-  public Vector3 GetAnchorPosition(Transform element) {
-    //return _transformToAnchor[element];
-    return new Vector3();
+
+  public AnchorData GetAnchorData(AnchorOfConstantSize anchor) {
+    return _anchorData[anchor];
+  }
+
+  public ElementParameters GetElementParameters(AnchorOfConstantSize anchor, Vector3 rectPosWorld) {
+    AnchorData anchorData;
+    Vector3 anchorDelta;
+
+    Vector3 guiPos = gui.transform.InverseTransformPoint(rectPosWorld);
+    if (anchor == null) {
+      anchorDelta = guiPos;
+      anchorData.anchorAngle = 0;
+      anchorData.anchorHeight = 0;
+      anchorData.anchorRadius = radius;
+    } else {
+      Vector3 anchorGuiPos = gui.transform.InverseTransformPoint(anchor.transform.position);
+      anchorDelta = guiPos - anchorGuiPos;
+      anchorData = _anchorData[anchor];
+    }
+
+    float angleOffset = anchorData.anchorAngle + anchorDelta.x / anchorData.anchorRadius;
+    float heightOffset = anchorData.anchorHeight + anchorDelta.y;
+    float radiusOffset = anchorData.anchorRadius + anchorDelta.z;
+
+    ElementParameters parameters;
+    parameters.angleOffset = angleOffset;
+    parameters.radianPerMeter = 1.0f / anchorData.anchorRadius;
+    parameters.heightOffset = heightOffset;
+    parameters.radiusOffset = radiusOffset;
+
+    return parameters;
   }
 
   public override void BuildElementData(Transform root) {
-    _transformToAnchor.Clear();
-    //_transformToAnchor[root] = new Vector3(0, 0, radius);
-    RefreshElementData(root);
+    _anchorData.Clear();
+    refreshElementData(root, null);
   }
 
   public override void RefreshElementData(Transform root) {
-    /*
-    ElementData anchor = _transformToAnchor[root];
-    Vector3 anchorPos = anchor.cylindricalPosition;
+    refreshElementData(root, null);
+  }
 
-    var anchorComponent = root.GetComponent<ConstantSizeAnchor>();
-    if (anchorComponent != null) {
-      Vector3 delta = root.position - anchor.transform.position;
-      anchorPos.x += delta.x / anchorPos.z;
-      anchorPos.y += delta.y;
-      anchorPos.z += delta.z;
+  private void refreshElementData(Transform root, AnchorOfConstantSize parentAnchor) {
+    var anchorComponent = root.GetComponent<AnchorOfConstantSize>();
+    if (anchorComponent != null && anchorComponent.enabled) {
+      Vector3 guiSpaceDelta;
+      AnchorData parentData;
+
+      Vector3 guiPosition = gui.transform.InverseTransformPoint(root.position);
+      if (parentAnchor != null) {
+        Vector3 guiAnchor = gui.transform.InverseTransformPoint(parentAnchor.transform.position);
+        guiSpaceDelta = guiPosition - guiAnchor;
+        parentData = _anchorData[parentAnchor];
+      } else {
+        guiSpaceDelta = guiPosition;
+        parentData.anchorAngle = 0;
+        parentData.anchorHeight = 0;
+        parentData.anchorRadius = radius;
+      }
+
+      AnchorData newData = parentData;
+      newData.anchorAngle += guiSpaceDelta.x / parentData.anchorRadius;
+      newData.anchorHeight += guiSpaceDelta.y;
+      newData.anchorRadius += guiSpaceDelta.z;
+
+      parentAnchor = anchorComponent;
+      _anchorData[parentAnchor] = newData;
     }
 
     int childCount = root.childCount;
     for (int i = 0; i < childCount; i++) {
-      Transform child = root.GetChild(i);
-      Vector3 delta = child.position - Vector3.zero;
-
-      Vector3 childPos;
-      childPos.x = delta.x / radius;
-      childPos.y = delta.y; 
-      childPos.z = delta.z + radius;
-
-      _transformToAnchor[child] = childPos;
-
-      RefreshElementData(child);
+      refreshElementData(root.GetChild(i), parentAnchor);
     }
-     * */
   }
 
   public override Vector3 TransformPoint(Vector3 worldRectPos) {
@@ -73,9 +109,23 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace {
     throw new System.NotImplementedException();
   }
 
-  private struct ElementData {
-    public Transform anchor;
-    public Vector3 anchorPosition;
-    public Vector3 position;
+  public struct ElementParameters {
+    public float angleOffset;
+    public float radianPerMeter;
+    public float heightOffset;
+    public float radiusOffset;
+
+    public static implicit operator Vector4(ElementParameters parameters) {
+      return new Vector4(parameters.angleOffset,
+                         parameters.radianPerMeter,
+                         parameters.heightOffset,
+                         parameters.radiusOffset);
+    }
+  }
+
+  public struct AnchorData {
+    public float anchorAngle;
+    public float anchorHeight;
+    public float anchorRadius;
   }
 }
