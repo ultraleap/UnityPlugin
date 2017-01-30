@@ -2620,7 +2620,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &937917424
 Transform:
   m_ObjectHideFlags: 0
@@ -2628,7 +2628,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 937917423}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 3.66}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1260845964}
@@ -2675,7 +2675,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b38a0be393f6f724c9d5249c313a909f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 0.24
+  radius: 4.47
 --- !u!4 &949718564
 Transform:
   m_ObjectHideFlags: 0
@@ -3326,7 +3326,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 788acd8ba3c3dc74b8f73bcb83447f45, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.37
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 788acd8ba3c3dc74b8f73bcb83447f45, type: 3}
       propertyPath: m_LocalRotation.x
