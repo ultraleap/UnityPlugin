@@ -60,7 +60,11 @@ public class LeapGuiEditor : CustomEditorBase {
     foreach (var renderer in allRenderers) {
       _addRendererMenu.AddItem(new GUIContent(renderer.Name),
                                false,
-                               () => gui.SetRenderer(ScriptableObject.CreateInstance(renderer) as LeapGuiRenderer));
+                               () => {
+                                 gui.SetRenderer(ScriptableObject.CreateInstance(renderer) as LeapGuiRenderer);
+                                 _rendererEditor = Editor.CreateEditor(gui.renderer);
+                                 serializedObject.Update();
+                               });
     }
 
     if (gui.renderer != null) {
@@ -109,10 +113,6 @@ public class LeapGuiEditor : CustomEditorBase {
     EditorGUI.LabelField(left, "Renderer", EditorStyles.miniButtonLeft);
     if (GUI.Button(right, "+", EditorStyles.miniButtonRight)) {
       _addRendererMenu.ShowAsContext();
-
-      if (gui.renderer != null) {
-        _rendererEditor = Editor.CreateEditor(gui.renderer);
-      }
     }
 
     if (_rendererEditor != null) {

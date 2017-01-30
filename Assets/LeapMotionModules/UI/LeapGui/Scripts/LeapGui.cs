@@ -70,6 +70,8 @@ public class LeapGui : MonoBehaviour {
 
 #if UNITY_EDITOR
   public void SetRenderer(LeapGuiRenderer newRenderer) {
+    UnityEditor.Undo.RecordObject(this, "Changed Gui Renderer");
+
     if (Application.isPlaying) {
       throw new InvalidOperationException("Cannot change renderer at runtime.");
     }
@@ -86,6 +88,8 @@ public class LeapGui : MonoBehaviour {
     if (renderer != null) {
       renderer.OnEnableRendererEditor();
     }
+
+    UnityEditor.EditorUtility.SetDirty(this);
   }
 #endif
 

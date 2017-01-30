@@ -121,6 +121,8 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   private void ensureObjectsAreValid() {
     if (_displayObject == null) {
       _displayObject = new GameObject("Baked Gui Mesh");
+      _displayObject.transform.SetParent(gui.transform);
+      _displayObject.transform.SetSiblingIndex(0);
     }
 
     _displayObject.transform.SetParent(gui.transform);
