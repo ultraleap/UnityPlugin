@@ -46,7 +46,7 @@ public class LeapGuiEditor : CustomEditorBase {
 
     _addFeatureMenu = new GenericMenu();
     foreach (var feature in allFeatures) {
-      _addFeatureMenu.AddItem(new GUIContent(feature.Name),
+      _addFeatureMenu.AddItem(new GUIContent(LeapGuiFeatureNameAttribute.GetFeatureName(feature)),
                               false,
                               () => gui.features.Add(ScriptableObject.CreateInstance(feature) as LeapGuiFeatureBase));
     }

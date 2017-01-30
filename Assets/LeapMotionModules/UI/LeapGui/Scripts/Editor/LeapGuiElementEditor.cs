@@ -2,24 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Leap.Unity;
 
 [CustomEditor(typeof(LeapGuiElement))]
-public class LeapGuiElementEditor : Editor {
-
-  SerializedProperty data;
+public class LeapGuiElementEditor : CustomEditorBase {
 
   void OnEnable() {
-    data = serializedObject.FindProperty("data");
+    base.OnEnable();
+
+    specifyCustomDrawer("data", drawData);
   }
 
-  public override void OnInspectorGUI() {
-    base.OnInspectorGUI();
-
-    for (int i = 0; i < data.arraySize; i++) {
-      var dataRef = data.GetArrayElementAtIndex(i);
+  private void drawData(SerializedProperty property) {
+    for (int i = 0; i < property.arraySize; i++) {
+      var dataRef = property.GetArrayElementAtIndex(i);
 
       var dataObj = dataRef.objectReferenceValue;
-      EditorGUILayout.LabelField(dataObj.GetType().Name);
+      EditorGUILayout.LabelField(LeapGuiFeatureNameAttribute.GetFeatureName((dataObj as LeapGuiElementData).feature.GetType()));
       EditorGUI.indentLevel++;
 
       SerializedObject sobj = new SerializedObject(dataObj);
@@ -34,7 +33,5 @@ public class LeapGuiElementEditor : Editor {
 
       sobj.ApplyModifiedProperties();
     }
-
-    serializedObject.ApplyModifiedProperties();
   }
 }
