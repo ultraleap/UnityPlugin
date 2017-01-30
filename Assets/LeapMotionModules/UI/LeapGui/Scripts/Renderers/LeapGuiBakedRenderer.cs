@@ -11,9 +11,6 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   private Shader _shader;
 
   [SerializeField]
-  private MovableElements _movableElements = MovableElements.Anchors;
-
-  [SerializeField]
   private MotionType _motionType = MotionType.Translation;
 
   [SerializeField]
@@ -365,39 +362,20 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   }
 
   private Vector3 elementVertToBakedVert(LeapGuiElement element, Vector3 vert) {
-    switch (_movableElements) {
-      case MovableElements.Anchors:
-        switch (_motionType) {
-          case MotionType.Translation:
-            Vector3 worldVert = element.transform.TransformPoint(vert);
-            Vector3 guiVert = gui.transform.InverseTransformPoint(worldVert);
-            if (element.anchor == null) {
-              return guiVert;
-            } else {
-              return guiVert - gui.transform.InverseTransformPoint(element.anchor.transform.position);
-            }
-        }
-        break;
-      case MovableElements.AllElements:
-        switch (_motionType) {
-          case MotionType.Translation:
-            Vector3 worldVert = element.transform.TransformPoint(vert);
-            Vector3 guiVert = gui.transform.InverseTransformPoint(worldVert);
-            return guiVert - gui.transform.InverseTransformPoint(element.transform.position);
-        }
-        break;
+    switch (_motionType) {
+      case MotionType.None:
+        return gui.space.TransformPoint(vert);
+      case MotionType.Translation:
+        Vector3 worldVert = element.transform.TransformPoint(vert);
+        Vector3 guiVert = gui.transform.InverseTransformPoint(worldVert);
+        return guiVert - gui.transform.InverseTransformPoint(element.transform.position);
     }
 
     throw new NotImplementedException();
   }
 
-  public enum MovableElements {
-    None,
-    Anchors,
-    AllElements
-  }
-
   public enum MotionType {
+    None,
     Translation,
     Full
   }
