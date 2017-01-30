@@ -356,7 +356,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   /// information like element id or blend shape vertex offset
   /// </summary>
   public bool DoesNeedUv3() {
-    if (_movableElements != MovableElements.None) return true;
+    if (_motionType != MotionType.None) return true;
     //TODO: add more conditions!
     return false;
   }
