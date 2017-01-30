@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -10,7 +11,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   private Shader _shader;
 
   [SerializeField]
-  private MotionType _motionType = MotionType.None;
+  private MovableElements _movableElements = MovableElements.Anchors;
+
+  [SerializeField]
+  private MotionType _motionType = MotionType.Translation;
 
   [SerializeField]
   private int borderAmount = 0;
@@ -100,7 +104,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
     }
 
     switch (_motionType) {
-      case MotionType.TranslationOnly:
+      case MotionType.Translation:
         _material.EnableKeyword(LeapGui.FEATURE_MOVEMENT_TRANSLATION);
         break;
       case MotionType.Full:
@@ -352,21 +356,46 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   /// information like element id or blend shape vertex offset
   /// </summary>
   public bool DoesNeedUv3() {
-    if (_motionType != MotionType.None) return true;
+    if (_movableElements != MovableElements.None) return true;
     //TODO: add more conditions!
     return false;
   }
 
-  private Vector3 elementVertToBakedVert(Transform elementTransform, Vector3 vert) {
-    vert = elementTransform.TransformPoint(vert);
-    vert = gui.transform.InverseTransformPoint(vert);
-    vert -= gui.transform.InverseTransformPoint(elementTransform.position);
-    return vert;
+  private Vector3 elementVertToBakedVert(LeapGuiElement element, Vector3 vert) {
+    switch (_movableElements) {
+      case MovableElements.Anchors:
+        switch (_motionType) {
+          case MotionType.Translation:
+            Vector3 worldVert = element.transform.TransformPoint(vert);
+            Vector3 guiVert = gui.transform.InverseTransformPoint(worldVert);
+            if (element.anchor == null) {
+              return guiVert;
+            } else {
+              return guiVert - gui.transform.InverseTransformPoint(element.anchor.transform.position);
+            }
+        }
+        break;
+      case MovableElements.AllElements:
+        switch (_motionType) {
+          case MotionType.Translation:
+            Vector3 worldVert = element.transform.TransformPoint(vert);
+            Vector3 guiVert = gui.transform.InverseTransformPoint(worldVert);
+            return guiVert - gui.transform.InverseTransformPoint(element.transform.position);
+        }
+        break;
+    }
+
+    throw new NotImplementedException();
+  }
+
+  public enum MovableElements {
+    None,
+    Anchors,
+    AllElements
   }
 
   public enum MotionType {
-    None,
-    TranslationOnly,
+    Translation,
     Full
   }
 
