@@ -21,6 +21,8 @@ public class LeapGuiElementEditor : CustomEditorBase {
       EditorGUILayout.LabelField(LeapGuiFeatureNameAttribute.GetFeatureName((dataObj as LeapGuiElementData).feature.GetType()));
       EditorGUI.indentLevel++;
 
+      EditorGUI.BeginChangeCheck();
+
       SerializedObject sobj = new SerializedObject(dataObj);
       SerializedProperty it = sobj.GetIterator();
       it.NextVisible(true);
@@ -31,7 +33,10 @@ public class LeapGuiElementEditor : CustomEditorBase {
 
       EditorGUI.indentLevel--;
 
-      sobj.ApplyModifiedProperties();
+      if (EditorGUI.EndChangeCheck()) {
+        sobj.ApplyModifiedProperties();
+        (dataObj as LeapGuiElementData).feature.isDirty = true;
+      }
     }
   }
 }

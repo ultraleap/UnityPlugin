@@ -34,6 +34,25 @@ public class LeapGuiFeatureNameAttribute : Attribute {
 }
 
 public abstract class LeapGuiFeatureBase : ScriptableObject {
+  private bool _isDirty = true; //everything defaults dirty at the start!
+
+  public bool isDirty {
+    get {
+#if UNITY_EDITOR
+      if (Application.isPlaying) {
+        return _isDirty;
+      } else {
+        return true;
+      }
+#else
+      return _isDirty;
+#endif
+    }
+    set {
+      _isDirty = value;
+    }
+  }
+
   public abstract void ClearDataObjectReferences();
   public abstract void AddDataObjectReference(LeapGuiElementData data);
 

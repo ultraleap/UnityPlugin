@@ -68,6 +68,16 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
       _material.SetFloat(LeapGuiCylindricalSpace.RADIUS_PROPERTY, cylindricalSpace.radius);
       _material.SetVectorArray(CYLINDRICAL_PARAMETERS, _cylindrical_elementParameters);
     }
+
+    foreach (var feature in gui.features) {
+      if (feature.isDirty) {
+        if (feature is LeapGuiTintFeature) {
+          var tintFeature = feature as LeapGuiTintFeature;
+          tintFeature.data.Query().Select(data => data.tint).FillList(_tintColors);
+          _material.SetColorArray(TINT, _tintColors);
+        }
+      }
+    }
   }
 
   public override void OnEnableRendererEditor() {
@@ -104,6 +114,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
 
     if (DoesNeedUv3()) {
       bakeUv3();
+    }
+
+    if (gui.features.Query().Any(f => f is LeapGuiTintFeature)) {
+      _material.EnableKeyword(LeapGuiTintFeature.FEATURE_NAME);
     }
 
     switch (_motionType) {
@@ -362,6 +376,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   /// </summary>
   public bool DoesNeedUv3() {
     if (_motionType != MotionType.None) return true;
+    if (gui.features.Query().Any(f => f is LeapGuiTintFeature)) return true;
     //TODO: add more conditions!
     return false;
   }

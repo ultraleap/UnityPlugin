@@ -3,5 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LeapGuiTintData : LeapGuiElementData {
-  public Color tint = Color.white;
+
+  [SerializeField]
+  private Color _tint = Color.white;
+
+  public Color tint {
+    get {
+      return _tint;
+    }
+    set {
+      _tint = value;
+      feature.isDirty = true;
+    }
+  }
 }

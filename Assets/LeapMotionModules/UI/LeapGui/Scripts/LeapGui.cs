@@ -52,6 +52,9 @@ public class LeapGui : MonoBehaviour {
     if (renderer != null) {
       if (Application.isPlaying) {
         renderer.OnUpdateRenderer();
+        foreach (var feature in features) {
+          feature.isDirty = false;
+        }
       } else {
         elements.Clear();
         anchors.Clear();

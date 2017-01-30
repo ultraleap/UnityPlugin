@@ -72,10 +72,10 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 #define GUI_ELEMENTS_HAVE_COLOR
 #endif
 
-float4 _LeapGui_Tints[ELEMENT_MAX];
+float4 _LeapGuiTints[ELEMENT_MAX];
 
 float4 GetElementTint(int elementId) {
-  return _GuiSpace_Tints[elementId];
+  return _LeapGuiTints[elementId];
 }
 #endif
 
@@ -153,8 +153,15 @@ v2f_gui_baked ApplyBakedGui(appdata_gui_baked v) {
   o.uv0 = v.uv0;
 #endif
 
+#ifdef LEAP_GUI_TINTING
+  o.color = GetElementTint(elementId);
+#ifdef LEAP_GUI_VERTEX_COLORS
+  o.color *= v.color;
+#endif
+#else
 #ifdef LEAP_GUI_VERTEX_COLORS
   o.color = v.color;
+#endif
 #endif
 
   return o;
