@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class LeapGuiElement : MonoBehaviour {
 
+  //Used to ensure that gui elements can be enabled/disabled
+  void Start() { }
+
   [HideInInspector]
   public int elementId;
 
