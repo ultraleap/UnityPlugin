@@ -51,7 +51,7 @@ public class LeapGui : MonoBehaviour {
       } else {
         elements.Clear();
         anchors.Clear();
-        rebuildElementList(transform);
+        rebuildElementList(transform, null);
         rebuildFeatureData();
         space.BuildElementData(transform);
 
