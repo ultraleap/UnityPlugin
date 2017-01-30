@@ -34,6 +34,24 @@ namespace Leap.Unity.Query.Test {
     }
 
     [Test]
+    public void SkipTest() {
+      Assert.That(LIST_0.Skip(3).SequenceEqual(
+                  LIST_0.Query().Skip(3).ToList()));
+    }
+
+    [Test]
+    public void SkipWhileTest() {
+      Assert.That(LIST_0.SkipWhile(i => i < 4).SequenceEqual(
+                  LIST_0.Query().SkipWhile(i => i < 4).ToList()));
+    }
+
+    [Test]
+    public void TakeTest() {
+      Assert.That(LIST_0.Take(4).SequenceEqual(
+                  LIST_0.Query().Take(4).ToList()));
+    }
+
+    [Test]
     public void TakeWhileTest() {
       Assert.That(LIST_0.TakeWhile(i => i < 4).SequenceEqual(
                   LIST_0.Query().TakeWhile(i => i < 4).ToList()));
