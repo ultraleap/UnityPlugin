@@ -36,6 +36,7 @@ public class LeapGuiEditor : CustomEditorBase {
     _featureList.elementHeight = EditorGUIUtility.singleLineHeight;
     _featureList.elementHeightCallback = featureHeightCallback;
     _featureList.drawElementCallback = drawFeatureCallback;
+    _featureList.onReorderCallback = onReorderFeaturesCallback;
 
     var allTypes = Assembly.GetAssembly(typeof(LeapGui)).GetTypes();
 
@@ -97,6 +98,7 @@ public class LeapGuiEditor : CustomEditorBase {
 
     EditorGUI.BeginChangeCheck();
 
+    Undo.RecordObject(target, "Changed feature list.");
     _featureList.DoLayoutList();
 
     if (EditorGUI.EndChangeCheck()) {
@@ -173,6 +175,11 @@ public class LeapGuiEditor : CustomEditorBase {
     if (EditorGUI.EndChangeCheck()) {
       EditorUtility.SetDirty(feature);
     }
+  }
+
+  private void onReorderFeaturesCallback(ReorderableList list) {
+    EditorUtility.SetDirty(target);
+    serializedObject.Update();
   }
 }
 
