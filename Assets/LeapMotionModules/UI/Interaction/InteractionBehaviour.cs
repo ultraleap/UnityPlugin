@@ -6,85 +6,75 @@ namespace Leap.Unity.UI.Interaction {
 
   public class InteractionBehaviour : InteractionBehaviourBase {
 
-    public enum HoverType {
-      Proximity
-    }
+    /// <summary> The RigidbodyWarper manipulates the graphical (but not physical) position
+    /// of grasped objects based on the movement of the Leap hand so they appear move with less latency. </summary>
+    [HideInInspector]
+    public Leap.Unity.Interaction.RigidbodyWarper rigidbodyWarper;
 
-    public enum TouchType {
-      SoftContact,
-      CallbacksOnly
-    }
 
-    public enum GrabType {
-      GrabOrPinch,
-      GrabOnly,
-      PinchOnly
-    }
-
-    [Header("Interaction Types")]
-    public bool enableHover = true;
-    public HoverType hoverType;
-    public bool enableTouch = true;
-    public TouchType touchType;
-    public bool enableGrab = true;
-    public GrabType grabType;
-
-    public override void OnHoverBegin(Hand hand, HoverEventData data) {
+    public override float GetHoverScore(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnHoverStay(Hand hand, HoverEventData data) {
+    public override void OnHoverBegin(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnHoverEnd(Hand hand, HoverEventData data) {
+    public override void OnHoverStay(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnPrimaryHoverBegin(Hand hand, HoverEventData data) {
+    public override void OnHoverEnd(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnPrimaryHoverStay(Hand hand, HoverEventData data) {
+    public override void OnPrimaryHoverBegin(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnPrimaryHoverEnd(Hand hand, HoverEventData data) {
+    public override void OnPrimaryHoverStay(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnTouchBegin(Hand hand, TouchEventData data) {
+    public override void OnPrimaryHoverEnd(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnTouchStay(Hand hand, TouchEventData data) {
+    public override void OnTouchBegin(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnTouchEnd(Hand hand, TouchEventData data) {
+    public override void OnTouchStay(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnGrab(Hand hand, GrabEventData data) {
+    public override void OnTouchEnd(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnHold(Hand hand, GrabEventData data) {
+    public override bool IsBeingGrabbedBy(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnRelease(Hand hand, GrabEventData data) {
+    public override void OnGraspBegin(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnSuspend(Hand hand, GrabEventData data) {
+    public override void OnGraspHold(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnResume(Hand hand, GrabEventData data) {
+    public override void OnGraspRelease(Hand hand) {
       throw new System.NotImplementedException();
     }
 
+    public override void OnSuspend(Hand hand) {
+      throw new System.NotImplementedException();
+    }
+
+    public override void OnResume(Hand hand) {
+      throw new System.NotImplementedException();
+    }
   }
 
 }

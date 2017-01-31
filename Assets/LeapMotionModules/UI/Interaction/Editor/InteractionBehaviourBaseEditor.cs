@@ -6,8 +6,8 @@ using UnityEditor;
 
 namespace Leap.Unity.UI.Interaction {
 
-  [CustomEditor(typeof(InteractionBehaviour))]
-  public class InteractionBehaviourEditor : CustomEditorBase {
+  [CustomEditor(typeof(InteractionBehaviourBase))]
+  public class InteractionBehaviourBaseEditor : CustomEditorBase {
 
     protected override void OnEnable() {
       base.OnEnable();
@@ -15,6 +15,7 @@ namespace Leap.Unity.UI.Interaction {
       specifyConditionalDrawing("enableHover", "hoverType");
       specifyConditionalDrawing("enableTouch", "touchType");
       specifyConditionalDrawing("enableGrab",  "grabType");
+      specifyConditionalDrawing("enableGrab", "allowTwoHandedGrab");
     }
 
   }
