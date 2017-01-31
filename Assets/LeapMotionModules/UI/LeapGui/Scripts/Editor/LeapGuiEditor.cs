@@ -144,34 +144,43 @@ public class LeapGuiEditor : CustomEditorBase {
   }
 
   private float featureHeightCallback(int index) {
-    return gui.features[index].GetEditorHeight();
+    return gui.features[index].GetEditorHeight() + EditorGUIUtility.singleLineHeight;
   }
 
   private void drawFeatureCallback(Rect rect, int index, bool isActive, bool isFocused) {
     var feature = gui.features[index];
 
-    /*
-    if (isFocused) {
-      Rect backgroundRect = rect;
-      backgroundRect.height = featureHeightCallback(index) - EditorGUIUtility.singleLineHeight;
-      backgroundRect.y += EditorGUIUtility.singleLineHeight;
+    string featureName = LeapGuiFeatureNameAttribute.GetFeatureName(gui.features[index].GetType());
+    GUIContent featureLabel = new GUIContent(featureName);
 
-      //TODO, find the right tint???
-      var tex = EditorGUIUtility.whiteTexture;
-
-      var prevMat = GUI.matrix;
-      GUIUtility.ScaleAroundPivot(new Vector2(backgroundRect.width / tex.width, backgroundRect.height / tex.height), new Vector2(backgroundRect.x, backgroundRect.y));
-      GUI.Box(backgroundRect, tex, GUIStyle.none);
-      GUI.matrix = prevMat;
-
-      GUI.color = Color.white;
+    var supportInfo = gui.supportInfo[index];
+    switch (supportInfo.support) {
+      case SupportType.Warning:
+        GUI.color = Color.yellow;
+        featureLabel.tooltip = supportInfo.message;
+        break;
+      case SupportType.Error:
+        GUI.color = Color.red;
+        featureLabel.tooltip = supportInfo.message;
+        break;
     }
-    */
+
+    Vector2 size = EditorStyles.label.CalcSize(featureLabel);
+
+    Rect labelRect = rect;
+    labelRect.width = size.x;
+
+    GUI.Box(labelRect, "");
+    EditorGUI.LabelField(labelRect, featureLabel);
+
+    GUI.color = Color.white;
+
+
 
     Undo.RecordObject(feature, "Modified Gui Feature");
 
     EditorGUI.BeginChangeCheck();
-    feature.DrawFeatureEditor(rect, isActive, isFocused);
+    feature.DrawFeatureEditor(rect.NextLine().Indent(), isActive, isFocused);
     if (EditorGUI.EndChangeCheck()) {
       EditorUtility.SetDirty(feature);
     }

@@ -52,11 +52,6 @@ public class LeapGuiMeshFeature : LeapGuiFeature<LeapGuiMeshData> {
   public override void DrawFeatureEditor(Rect rect, bool isActive, bool isFocused) {
     Rect line = rect.SingleLine();
 
-    EditorGUI.LabelField(line, "Mesh");
-    line = line.NextLine();
-
-    line = line.Indent();
-
     Rect left, right;
     line.SplitHorizontally(out left, out right);
 
@@ -80,7 +75,7 @@ public class LeapGuiMeshFeature : LeapGuiFeature<LeapGuiMeshData> {
   }
 
   public override float GetEditorHeight() {
-    return EditorGUIUtility.singleLineHeight * (color ? 5 : 4);
+    return EditorGUIUtility.singleLineHeight * (color ? 4 : 3);
   }
 #endif
 }

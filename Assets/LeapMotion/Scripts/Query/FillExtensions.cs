@@ -45,6 +45,21 @@ namespace Leap.Unity.Query {
       return list;
     }
 
+    public static List<T> FillEach<T>(this List<T> list, Func<T> generator) {
+      for (int i = 0; i < list.Count; i++) {
+        list[i] = generator();
+      }
+      return list;
+    }
+
+    public static List<T> FillEach<T>(this List<T> list, int count, Func<T> generator) {
+      list.Clear();
+      for (int i = 0; i < count; i++) {
+        list.Add(generator());
+      }
+      return list;
+    }
+
     public static List<T> Append<T>(this List<T> list, int count, T value) {
       for (int i = 0; i < count; i++) {
         list.Add(value);

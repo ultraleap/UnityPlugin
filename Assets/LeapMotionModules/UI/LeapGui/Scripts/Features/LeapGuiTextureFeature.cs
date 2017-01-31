@@ -15,10 +15,6 @@ public class LeapGuiTextureFeature : LeapGuiFeature<LeapGuiTextureData> {
   public override void DrawFeatureEditor(Rect rect, bool isActive, bool isFocused) {
     Rect line = rect.SingleLine();
 
-    EditorGUI.LabelField(line, "Texture");
-    line = line.NextLine();
-    line = line.Indent();
-
     propertyName = EditorGUI.TextField(line, "Property Name", propertyName);
     line = line.NextLine();
 
@@ -26,7 +22,7 @@ public class LeapGuiTextureFeature : LeapGuiFeature<LeapGuiTextureData> {
   }
 
   public override float GetEditorHeight() {
-    return EditorGUIUtility.singleLineHeight * 3;
+    return EditorGUIUtility.singleLineHeight * 2;
   }
 #endif
 }

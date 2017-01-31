@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,6 +26,9 @@ public class LeapGui : MonoBehaviour {
 
   [HideInInspector]
   public List<AnchorOfConstantSize> anchors;
+
+  [NonSerialized]
+  public List<FeatureSupportInfo> supportInfo;
 
   private LeapGuiSpace _cachedGuiSpace;
   public LeapGuiSpace space {
@@ -60,6 +64,8 @@ public class LeapGui : MonoBehaviour {
         anchors.Clear();
         rebuildElementList(transform, null);
         rebuildFeatureData();
+        rebuildFeatureSupportInfo();
+
         space.BuildElementData(transform);
 
         renderer.OnUpdateRendererEditor();
@@ -175,6 +181,60 @@ public class LeapGui : MonoBehaviour {
         //Add the correct reference into the feature list
         feature.AddDataObjectReference(element.data[j]);
       }
+    }
+  }
+
+  private void rebuildFeatureSupportInfo() {
+    var typeToFeatures = new Dictionary<Type, List<LeapGuiFeatureBase>>();
+    foreach (var feature in features) {
+      Type featureType = feature.GetType();
+      List<LeapGuiFeatureBase> list;
+      if (!typeToFeatures.TryGetValue(featureType, out list)) {
+        list = new List<LeapGuiFeatureBase>();
+        typeToFeatures[featureType] = list;
+      }
+
+      list.Add(feature);
+    }
+
+
+    var featureToInfo = new Dictionary<LeapGuiFeatureBase, FeatureSupportInfo>();
+
+    foreach (var pair in typeToFeatures) {
+      var featureType = pair.Key;
+      var featureList = pair.Value;
+      var infoList = new List<FeatureSupportInfo>().FillEach(featureList.Count, () => FeatureSupportInfo.FullSupport());
+
+      var castList = Activator.CreateInstance(typeof(List<>).MakeGenericType(featureType)) as IList;
+      foreach (var feature in featureList) {
+        castList.Add(feature);
+      }
+
+      try {
+        var interfaceType = typeof(ISupportsFeature<>).MakeGenericType(featureType);
+        if (!interfaceType.IsAssignableFrom(renderer.GetType())) {
+          infoList.FillEach(() => FeatureSupportInfo.Error("This renderer does not support this feature."));
+          continue;
+        }
+
+        var supportDelegate = interfaceType.GetMethod("GetSupportInfo");
+
+        if (supportDelegate == null) {
+          Debug.LogError("Could not find support delegate.");
+          continue;
+        }
+
+        supportDelegate.Invoke(renderer, new object[] { castList, infoList });
+      } finally {
+        for (int i = 0; i < featureList.Count; i++) {
+          featureToInfo[featureList[i]] = infoList[i];
+        }
+      }
+    }
+
+    supportInfo = new List<FeatureSupportInfo>();
+    foreach (var feature in features) {
+      supportInfo.Add(featureToInfo[feature]);
     }
   }
 }
