@@ -70,6 +70,8 @@ public class LeapGui : MonoBehaviour {
         space.BuildElementData(transform);
 
         renderer.OnUpdateRendererEditor();
+
+        rebuildPickingMeshes();
       }
     }
   }
@@ -237,6 +239,47 @@ public class LeapGui : MonoBehaviour {
     supportInfo = new List<FeatureSupportInfo>();
     foreach (var feature in features) {
       supportInfo.Add(featureToInfo[feature]);
+    }
+  }
+
+  private void rebuildPickingMeshes() {
+    List<Vector3> pickingVerts = new List<Vector3>();
+    List<int> pickingTris = new List<int>();
+
+    foreach (var element in elements) {
+      pickingVerts.Clear();
+      pickingTris.Clear();
+
+      Mesh pickingMesh = element.pickingMesh;
+      if (pickingMesh == null) {
+        pickingMesh = new Mesh();
+        pickingMesh.MarkDynamic();
+        pickingMesh.hideFlags = HideFlags.HideAndDontSave;
+        pickingMesh.name = "Gui Element Picking Mesh";
+        element.pickingMesh = pickingMesh;
+      }
+      pickingMesh.Clear();
+
+      foreach (var dataObj in element.data) {
+        if (dataObj is LeapGuiMeshData) {
+          var meshData = dataObj as LeapGuiMeshData;
+
+          var tris = meshData.mesh.triangles;
+          for (int i = 0; i < tris.Length; i++) {
+            pickingTris.Add(tris[i] + pickingVerts.Count);
+          }
+
+          var verts = meshData.mesh.vertices;
+          for (int i = 0; i < verts.Length; i++) {
+            Vector3 localRectVert = transform.InverseTransformPoint(element.transform.TransformPoint(verts[i]));
+            pickingVerts.Add(space.TransformPoint(element, localRectVert));
+          }
+        }
+      }
+
+      pickingMesh.SetVertices(pickingVerts);
+      pickingMesh.SetTriangles(pickingTris, 0, calculateBounds: true);
+      pickingMesh.RecalculateNormals();
     }
   }
 }

@@ -103,12 +103,29 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace {
   }
 
   public override Vector3 TransformPoint(LeapGuiElement element, Vector3 localRectPos) {
-    //Vector3 elementPos = _transformToAnchor[element.transform];
-    //elementPos.x += localRectPos.x / elementPos.z;
-    //elementPos.y += localRectPos.y;
-    //elementPos.z += localRectPos.z;
-    //return elementPos;
-    return Vector3.zero;
+    AnchorData anchorData;
+    Vector3 anchorDelta;
+
+    if (element.anchor == null) {
+      anchorDelta = localRectPos;
+      anchorData.anchorAngle = 0;
+      anchorData.anchorHeight = 0;
+      anchorData.anchorRadius = radius;
+    } else {
+      Vector3 anchorGuiPos = gui.transform.InverseTransformPoint(element.anchor.transform.position);
+      anchorDelta = localRectPos - anchorGuiPos;
+      anchorData = _anchorData[element.anchor];
+    }
+
+    float angleOffset = anchorData.anchorAngle + anchorDelta.x / anchorData.anchorRadius;
+    float heightOffset = anchorData.anchorHeight + anchorDelta.y;
+    float radiusOffset = anchorData.anchorRadius + anchorDelta.z;
+
+    Vector3 position;
+    position.x = Mathf.Sin(angleOffset) * radiusOffset;
+    position.y = heightOffset;
+    position.z = Mathf.Cos(angleOffset) * radiusOffset - radius;
+    return position;
   }
 
   public override Vector3 InverseTransformPoint(LeapGuiElement element, Vector3 worldGuiPos) {
