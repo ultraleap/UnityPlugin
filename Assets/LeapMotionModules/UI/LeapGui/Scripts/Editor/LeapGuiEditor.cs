@@ -85,7 +85,7 @@ public class LeapGuiEditor : CustomEditorBase {
     EditorGUI.LabelField(left, "Element Features", EditorStyles.miniButtonLeft);
 
     EditorGUI.BeginDisabledGroup(gui.features.Count == 0);
-    if (GUI.Button(middle, "-", EditorStyles.miniButtonMid)) {
+    if (GUI.Button(middle, "-", EditorStyles.miniButtonMid) && _featureList.index >= 0) {
       gui.features.RemoveAt(_featureList.index);
       EditorUtility.SetDirty(gui);
     }
