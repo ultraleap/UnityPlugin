@@ -146,6 +146,8 @@ public class LeapGuiEditor : CustomEditorBase {
     string featureName = LeapGuiFeatureNameAttribute.GetFeatureName(gui.features[index].GetType());
     GUIContent featureLabel = new GUIContent(featureName);
 
+    Color originalColor = GUI.color;
+
     if (!EditorApplication.isPlaying && gui.supportInfo != null) {
       var supportInfo = gui.supportInfo[index];
       switch (supportInfo.support) {
@@ -167,6 +169,7 @@ public class LeapGuiEditor : CustomEditorBase {
 
     GUI.Box(labelRect, "");
     EditorGUI.LabelField(labelRect, featureLabel);
+    GUI.color = originalColor;
 
     Undo.RecordObject(feature, "Modified Gui Feature");
 
