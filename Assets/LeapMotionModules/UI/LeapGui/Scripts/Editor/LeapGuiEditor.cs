@@ -146,16 +146,18 @@ public class LeapGuiEditor : CustomEditorBase {
     string featureName = LeapGuiFeatureNameAttribute.GetFeatureName(gui.features[index].GetType());
     GUIContent featureLabel = new GUIContent(featureName);
 
-    var supportInfo = gui.supportInfo[index];
-    switch (supportInfo.support) {
-      case SupportType.Warning:
-        GUI.color = Color.yellow;
-        featureLabel.tooltip = supportInfo.message;
-        break;
-      case SupportType.Error:
-        GUI.color = Color.red;
-        featureLabel.tooltip = supportInfo.message;
-        break;
+    if (!EditorApplication.isPlaying) {
+      var supportInfo = gui.supportInfo[index];
+      switch (supportInfo.support) {
+        case SupportType.Warning:
+          GUI.color = Color.yellow;
+          featureLabel.tooltip = supportInfo.message;
+          break;
+        case SupportType.Error:
+          GUI.color = Color.red;
+          featureLabel.tooltip = supportInfo.message;
+          break;
+      }
     }
 
     Vector2 size = EditorStyles.label.CalcSize(featureLabel);
@@ -165,8 +167,6 @@ public class LeapGuiEditor : CustomEditorBase {
 
     GUI.Box(labelRect, "");
     EditorGUI.LabelField(labelRect, featureLabel);
-
-    GUI.color = Color.white;
 
     Undo.RecordObject(feature, "Modified Gui Feature");
 
