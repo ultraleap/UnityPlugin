@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 using Leap.Unity.Query;
 
 [ExecuteInEditMode]
@@ -63,15 +64,30 @@ public class LeapGui : MonoBehaviour {
       } else {
         elements.Clear();
         anchors.Clear();
+
+        Profiler.BeginSample("Rebuild Element List");
         rebuildElementList(transform, null);
+        Profiler.EndSample();
+
+        Profiler.BeginSample("Rebuild Feature Data");
         rebuildFeatureData();
+        Profiler.EndSample();
+
+        Profiler.BeginSample("Rebuild Support Info");
         rebuildFeatureSupportInfo();
+        Profiler.EndSample();
 
+        Profiler.BeginSample("Build Element Data");
         space.BuildElementData(transform);
+        Profiler.EndSample();
 
+        Profiler.BeginSample("Update Renderer");
         renderer.OnUpdateRendererEditor();
+        Profiler.EndSample();
 
+        Profiler.BeginSample("Rebuild Picking Meshes");
         rebuildPickingMeshes();
+        Profiler.EndSample();
       }
     }
   }
