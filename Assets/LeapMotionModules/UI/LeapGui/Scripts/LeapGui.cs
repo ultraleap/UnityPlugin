@@ -112,6 +112,7 @@ public class LeapGui : MonoBehaviour {
     int count = root.childCount;
     for (int i = 0; i < count; i++) {
       Transform child = root.GetChild(i);
+      if (!child.gameObject.activeSelf) continue;
 
       var childAnchor = currAnchor;
 

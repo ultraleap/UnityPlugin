@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
@@ -123,18 +124,29 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     _bakedMesh.Clear();
 
     if (gui.GetAllFeaturesOfType(_meshFeatures)) {
+      Profiler.BeginSample("Bake Verts");
       bakeVerts();
+      Profiler.EndSample();
+
+      Profiler.BeginSample("Bake Colors");
       bakeColors();
+      Profiler.EndSample();
     }
 
     if (gui.GetAllFeaturesOfType(_textureFeatures)) {
+      Profiler.BeginSample("Atlas Textures");
       atlasTextures();
+      Profiler.EndSample();
     }
 
+    Profiler.BeginSample("Bake Uvs");
     bakeUvs();
+    Profiler.EndSample();
 
     if (DoesNeedUv3()) {
+      Profiler.BeginSample("Bake Uv3");
       bakeUv3();
+      Profiler.EndSample();
     }
 
     if (gui.features.Query().Any(f => f is LeapGuiTintFeature)) {
@@ -198,25 +210,31 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     _renderer.sharedMaterial = _material;
   }
 
+  private List<Vector3> _tempVertList = new List<Vector3>();
+  private List<int> _tempTriList = new List<int>();
   private void bakeVerts() {
-    List<Vector3> verts = new List<Vector3>();
-    List<int> tris = new List<int>();
+    _tempVertList.Clear();
+    _tempTriList.Clear();
 
     foreach (var meshFeature in _meshFeatures) {
       foreach (var data in meshFeature.data) {
         if (data.mesh == null) continue;
 
-        data.mesh.GetIndices(0).Query().Select(i => i + verts.Count).AppendList(tris);
+        var indices = data.mesh.GetIndices(0);
+        int vertOffset = _tempVertList.Count;
+        for (int i = 0; i < indices.Length; i++) {
+          _tempTriList.Add(indices[i] + vertOffset);
+        }
 
-        //TODO: bake out space if no motion is enabled
-        data.mesh.vertices.Query().Select(v => {
-          return elementVertToBakedVert(data.element, v);
-        }).AppendList(verts);
+        var verts = data.mesh.vertices;
+        for (int i = 0; i < verts.Length; i++) {
+          _tempVertList.Add(elementVertToBakedVert(data.element, verts[i]));
+        }
       }
     }
 
-    _bakedMesh.SetVertices(verts);
-    _bakedMesh.SetTriangles(tris, 0);
+    _bakedMesh.SetVertices(_tempVertList);
+    _bakedMesh.SetTriangles(_tempTriList, 0);
   }
 
   private void bakeColors() {
@@ -344,11 +362,14 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
           Rect[] atlasedUvs;
           if (_atlasedUvs != null && _atlasedUvs.TryGetValue(pair.Key, out atlasedUvs)) {
             Rect elementRect = atlasedUvs[elementIndex];
-            tempUvList.Query().Select(uv => new Vector4(elementRect.x + uv.x * elementRect.width,
-                                                        elementRect.y + uv.y * elementRect.height,
-                                                        uv.z,
-                                                        uv.w)).
-                               AppendList(uvs[pair.Key]);
+            var target = uvs[pair.Key];
+            for (int i = 0; i < tempUvList.Count; i++) {
+              var uv = tempUvList[i];
+              target.Add(new Vector4(elementRect.x + uv.x * elementRect.width,
+                                     elementRect.y + uv.y * elementRect.height,
+                                     uv.z,
+                                     uv.w));
+            }
           } else {
             uvs[pair.Key].AddRange(tempUvList);
           }

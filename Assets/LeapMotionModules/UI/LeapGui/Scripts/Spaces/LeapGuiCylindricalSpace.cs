@@ -88,11 +88,17 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace {
     }
   }
 
-  public override Vector3 TransformPoint(Vector3 worldRectPos) {
-    throw new System.NotImplementedException();
+  public override Vector3 TransformPoint(Vector3 localRectPos) {
+    Vector3 localGuiPos;
+    float angle = localRectPos.x / radius;
+    float pointRadius = localRectPos.z + radius;
+    localGuiPos.x = Mathf.Sin(angle) * pointRadius;
+    localGuiPos.y = localRectPos.y;
+    localGuiPos.z = Mathf.Cos(angle) * pointRadius - radius;
+    return localGuiPos;
   }
 
-  public override Vector3 InverseTransformPoint(Vector3 worldGuiPos) {
+  public override Vector3 InverseTransformPoint(Vector3 localGuiPos) {
     throw new System.NotImplementedException();
   }
 
@@ -127,5 +133,33 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace {
     public float anchorAngle;
     public float anchorHeight;
     public float anchorRadius;
+  }
+
+  private const float GIZMO_WIDTH = 1.0f;
+  private const float GIZMO_HEIGHT = 0.2f;
+  private const int GIZMO_Y_COUNT = 2;
+  private const float GIZMO_RES = 0.05f;
+  void OnDrawGizmos() {
+    Gizmos.matrix = transform.localToWorldMatrix;
+    Gizmos.color = Color.white;
+    for (int y = -GIZMO_Y_COUNT; y <= GIZMO_Y_COUNT; y++) {
+      float dy = y * GIZMO_HEIGHT / GIZMO_Y_COUNT;
+      for (float dx = 0; dx < 1; dx += GIZMO_RES) {
+        Vector3 a = new Vector3(dx, dy, 0);
+        Vector3 b = new Vector3(dx + GIZMO_RES, dy, 0);
+        Vector3 c = a;
+        Vector3 d = b;
+        c.x = -c.x;
+        d.x = -d.x;
+
+        a = TransformPoint(a);
+        b = TransformPoint(b);
+        c = TransformPoint(c);
+        d = TransformPoint(d);
+
+        Gizmos.DrawLine(a, b);
+        Gizmos.DrawLine(c, d);
+      }
+    }
   }
 }
