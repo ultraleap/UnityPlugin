@@ -43,6 +43,7 @@ public class LeapGui : MonoBehaviour {
   void OnEnable() {
     if (Application.isPlaying) {
       renderer.OnEnableRenderer();
+      if (space != null) space.BuildElementData(transform);
     }
   }
 
