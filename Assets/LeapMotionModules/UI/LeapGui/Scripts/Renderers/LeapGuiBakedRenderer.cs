@@ -220,15 +220,15 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
       foreach (var data in meshFeature.data) {
         if (data.mesh == null) continue;
 
-        var indices = data.mesh.GetIndices(0);
+        CachedTopology topology = getTopology(data.mesh);
+
         int vertOffset = _tempVertList.Count;
-        for (int i = 0; i < indices.Length; i++) {
-          _tempTriList.Add(indices[i] + vertOffset);
+        for (int i = 0; i < topology.tris.Length; i++) {
+          _tempTriList.Add(topology.tris[i] + vertOffset);
         }
 
-        var verts = data.mesh.vertices;
-        for (int i = 0; i < verts.Length; i++) {
-          _tempVertList.Add(elementVertToBakedVert(data.element, verts[i]));
+        for (int i = 0; i < topology.verts.Length; i++) {
+          _tempVertList.Add(elementVertToBakedVert(data.element, topology.verts[i]));
         }
       }
     }
@@ -463,5 +463,21 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
         return 3;
     }
     return -1;
+  }
+
+  private Dictionary<Mesh, CachedTopology> _topologyCache = new Dictionary<Mesh, CachedTopology>();
+  private CachedTopology getTopology(Mesh mesh) {
+    CachedTopology topology;
+    if (!_topologyCache.TryGetValue(mesh, out topology)) {
+      topology.tris = mesh.GetIndices(0);
+      topology.verts = mesh.vertices;
+      _topologyCache[mesh] = topology;
+    }
+    return topology;
+  }
+
+  private struct CachedTopology {
+    public Vector3[] verts;
+    public int[] tris;
   }
 }
