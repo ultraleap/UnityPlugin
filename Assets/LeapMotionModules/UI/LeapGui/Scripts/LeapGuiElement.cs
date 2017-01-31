@@ -30,8 +30,10 @@ public class LeapGuiElement : MonoBehaviour {
   }
 
   void OnDrawGizmos() {
-    Gizmos.color = new Color(0, 0, 0, 0);
-    Gizmos.DrawMesh(_pickingMesh);
+    if (_pickingMesh != null) {
+      Gizmos.color = new Color(0, 0, 0, 0);
+      Gizmos.DrawMesh(_pickingMesh);
+    }
   }
 #endif
 }
