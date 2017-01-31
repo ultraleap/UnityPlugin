@@ -118,15 +118,6 @@ public class LeapGuiEditor : CustomEditorBase {
     if (_rendererEditor != null) {
       _rendererEditor.DrawDefaultInspector();
     }
-
-    /*
-    if (GUILayout.Button("Add Renderer")) {
-      (target as LeapGui).SetRenderer(ScriptableObject.CreateInstance<LeapGuiBakedRenderer>());
-    }
-
-    var renderer = (target as LeapGui).GetRenderer();
-    Editor.CreateEditor(renderer).DrawDefaultInspector();
-     * */
   }
 
 
@@ -174,8 +165,6 @@ public class LeapGuiEditor : CustomEditorBase {
     EditorGUI.LabelField(labelRect, featureLabel);
 
     GUI.color = Color.white;
-
-
 
     Undo.RecordObject(feature, "Modified Gui Feature");
 
