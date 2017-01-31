@@ -146,7 +146,7 @@ public class LeapGuiEditor : CustomEditorBase {
     string featureName = LeapGuiFeatureNameAttribute.GetFeatureName(gui.features[index].GetType());
     GUIContent featureLabel = new GUIContent(featureName);
 
-    if (!EditorApplication.isPlaying) {
+    if (!EditorApplication.isPlaying && gui.supportInfo != null) {
       var supportInfo = gui.supportInfo[index];
       switch (supportInfo.support) {
         case SupportType.Warning:
