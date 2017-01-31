@@ -6,7 +6,10 @@ using UnityEngine.Rendering;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
-public class LeapGuiBakedRenderer : LeapGuiRenderer {
+public class LeapGuiBakedRenderer : LeapGuiRenderer,
+  ISupportsFeature<LeapGuiMeshFeature>,
+  ISupportsFeature<LeapGuiTextureFeature>,
+  ISupportsFeature<LeapGuiTintFeature> {
 
   [SerializeField]
   private Shader _shader;
@@ -47,6 +50,22 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer {
   //Cylindrical space
   private const string CYLINDRICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementParameters";
   private List<Vector4> _cylindrical_elementParameters = new List<Vector4>();
+
+  public void GetSupportInfo(List<LeapGuiMeshFeature> features, List<FeatureSupportInfo> info) {
+    FeatureSupportUtil.OnlySupportFirstFeature(features, info);
+
+    if (DoesNeedUv3() && features[0].uv3) {
+      info[0] = FeatureSupportInfo.Warning("Uv3 will be ignored because the baker is using it.");
+    }
+  }
+
+  public void GetSupportInfo(List<LeapGuiTextureFeature> features, List<FeatureSupportInfo> info) {
+    FeatureSupportUtil.OnlySupportFirstFeature(features, info);
+  }
+
+  public void GetSupportInfo(List<LeapGuiTintFeature> features, List<FeatureSupportInfo> info) {
+    FeatureSupportUtil.OnlySupportFirstFeature(features, info);
+  }
 
   public override void OnEnableRenderer() {
   }
