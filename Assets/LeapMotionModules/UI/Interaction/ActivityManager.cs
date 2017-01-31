@@ -17,7 +17,7 @@ namespace Leap.Unity.UI.Interaction {
     public InteractionManager manager;
 
     private Collider[] _colliderResultsBuffer = new Collider[32];
-    private HashSet<InteractionBehaviourBase> _activeBehaviours;
+    private HashSet<InteractionBehaviourBase> _activeBehaviours = new HashSet<InteractionBehaviourBase>();
 
     public HashSet<InteractionBehaviourBase> ActiveBehaviours {
       get { return _activeBehaviours; }
@@ -40,9 +40,10 @@ namespace Leap.Unity.UI.Interaction {
       int overlapCount = 0;
       while (true) {
         overlapCount = Physics.OverlapSphereNonAlloc(hand.PalmPosition.ToVector3(),
-                                                         activationRadius,
+                                                         activationRadius * 100,
                                                          resultsBuffer_in,
-                                                         LayerMask.NameToLayer("Default"));
+                                                         ~0,
+                                                         QueryTriggerInteraction.Collide);
         if (overlapCount < resultsBuffer_out.Length) {
           break;
         }
@@ -52,6 +53,7 @@ namespace Leap.Unity.UI.Interaction {
           // that couldn't be returned because the array wasn't large enough, so try again with increased length.
           // The _in, _out argument setup allows allocating a new array from within this function.
           resultsBuffer_out = new Collider[resultsBuffer_out.Length * 2];
+          resultsBuffer_in = resultsBuffer_out;
         }
       }
       return overlapCount;
@@ -61,7 +63,9 @@ namespace Leap.Unity.UI.Interaction {
       _activeBehaviours.Clear();
 
       for (int i = 0; i < numResults; i++) {
-        AddResult(results[i].attachedRigidbody.GetComponent<InteractionBehaviourBase>());
+        if (results[i].attachedRigidbody != null) {
+          AddResult(results[i].attachedRigidbody.GetComponent<InteractionBehaviourBase>());
+        }
       }
     }
 

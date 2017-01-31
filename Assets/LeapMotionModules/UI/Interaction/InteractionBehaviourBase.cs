@@ -5,39 +5,20 @@ using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
-  public enum HoverType {
-    Proximity
-  }
-
-  public enum TouchType {
-    SoftContact,
-    CallbacksOnly
-  }
-
-  public enum GrabType {
-    GrabOrPinch,
-    GrabOnly,
-    PinchOnly
-  }
-
   public abstract class InteractionBehaviourBase : MonoBehaviour {
 
     public InteractionManager manager;
 
     [Header("Interaction Types")]
-    public bool enableHover = true;
-    public HoverType hoverType;
-    public bool enableTouch = true;
-    public TouchType touchType;
-    public bool enableGrab = true;
-    public GrabType grabType;
+    public bool enableHovering = true;
+    public bool enableContact = true;
+    public bool enableGrasping = true;
     public bool allowsTwoHandedGrab = false;
 
-    #region Hover
+    #region hovering
 
     /// <summary> Values >= zero are "hovered." Of hovered objects, the one with the highest score is the "primary" hovered object. </summary>
     public abstract float GetHoverScore(Hand hand);
-
 
     /// <summary> Called per-hand when that hand produces a non-zero hover score for this object. </summary>
     public abstract void OnHoverBegin(Hand hand);
@@ -61,22 +42,18 @@ namespace Leap.Unity.UI.Interaction {
     #endregion
 
 
-    #region Touch
+    #region Contact
 
-    public abstract void OnTouchBegin(Hand hand);
+    public abstract void OnContactBegin(Hand hand);
 
-    public abstract void OnTouchStay(Hand hand);
+    public abstract void OnContactStay(Hand hand);
 
-    public abstract void OnTouchEnd(Hand hand);
+    public abstract void OnContactEnd(Hand hand);
 
     #endregion
 
 
-    #region Grab
-
-    /// <summary> Returns whether the argument hand is currently grabbing this object.
-    /// No grab classification is performed here; this method simply asks the Interaction Manager about grab states. </summary>
-    public abstract bool IsBeingGrabbedBy(Hand hand);
+    #region Grasping
 
     public abstract void OnGraspBegin(Hand hand);
 

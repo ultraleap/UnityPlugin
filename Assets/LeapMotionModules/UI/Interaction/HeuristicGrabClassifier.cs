@@ -109,7 +109,7 @@ namespace Leap.Unity.UI.Interaction {
           if (!behaviour.allowsTwoHandedGrab) { interactionHand.ReleaseObject(behaviour); }
           interactionHand.Grasp(behaviour);
         }
-        else if (!classifier.isGrabbing || behaviour.IsBeingGrabbedBy(_hand)) {
+        else if (!classifier.isGrabbing || interactionHand.IsGrasping(behaviour)) {
           interactionHand.ReleaseGrasp();
         }
       }

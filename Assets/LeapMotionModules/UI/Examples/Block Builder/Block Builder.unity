@@ -158,6 +158,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 630161d5d4c851c468f6070be2ed3ea5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 630161d5d4c851c468f6070be2ed3ea5, type: 3}
   m_IsPrefabParent: 0
@@ -189,9 +193,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 587912}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f13b45b671ea07458823683fd353000, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &587915
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -207,52 +219,17 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!1001 &5266019
-Prefab:
+--- !u!114 &587918
+MonoBehaviour:
   m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 2055964846}
-    m_Modifications:
-    - target: {fileID: 445514, guid: 883db5ea00b778f4e8a59bba5aa8f866, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 445514, guid: 883db5ea00b778f4e8a59bba5aa8f866, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 445514, guid: 883db5ea00b778f4e8a59bba5aa8f866, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 445514, guid: 883db5ea00b778f4e8a59bba5aa8f866, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 445514, guid: 883db5ea00b778f4e8a59bba5aa8f866, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 445514, guid: 883db5ea00b778f4e8a59bba5aa8f866, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 445514, guid: 883db5ea00b778f4e8a59bba5aa8f866, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 445514, guid: 883db5ea00b778f4e8a59bba5aa8f866, type: 2}
-      propertyPath: m_RootOrder
-      value: 3
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 883db5ea00b778f4e8a59bba5aa8f866, type: 2}
-  m_IsPrefabParent: 0
---- !u!4 &5266020 stripped
-Transform:
-  m_PrefabParentObject: {fileID: 445514, guid: 883db5ea00b778f4e8a59bba5aa8f866, type: 2}
-  m_PrefabInternal: {fileID: 5266019}
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 587912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &24219693
 GameObject:
   m_ObjectHideFlags: 0
@@ -262,7 +239,7 @@ GameObject:
   m_Component:
   - component: {fileID: 24219694}
   - component: {fileID: 24219695}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Rod Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -456,6 +433,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: -45
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
   m_IsPrefabParent: 0
@@ -475,9 +456,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 80016638}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &80016640
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -493,6 +482,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &80016643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 80016638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &92546220
 GameObject:
   m_ObjectHideFlags: 0
@@ -604,6 +604,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: 45
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
   m_IsPrefabParent: 0
@@ -623,9 +627,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 99090518}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &99090520
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -641,6 +653,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &99090523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 99090518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &107275863
 GameObject:
   m_ObjectHideFlags: 0
@@ -885,6 +908,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 630161d5d4c851c468f6070be2ed3ea5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 630161d5d4c851c468f6070be2ed3ea5, type: 3}
   m_IsPrefabParent: 0
@@ -916,9 +943,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 169351214}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f13b45b671ea07458823683fd353000, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &169351217
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -934,6 +969,17 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &169351220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 169351214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &194052176
 GameObject:
   m_ObjectHideFlags: 0
@@ -942,7 +988,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 194052177}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Scale X
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -973,7 +1019,7 @@ GameObject:
   m_Component:
   - component: {fileID: 196578029}
   - component: {fileID: 196578030}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Rod Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1014,7 +1060,7 @@ GameObject:
   m_Component:
   - component: {fileID: 216629877}
   - component: {fileID: 216629878}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Rod Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1057,10 +1103,11 @@ GameObject:
   - component: {fileID: 222225561}
   - component: {fileID: 222225560}
   - component: {fileID: 222225559}
-  - component: {fileID: 222225562}
   - component: {fileID: 222225564}
   - component: {fileID: 222225563}
-  m_Layer: 0
+  - component: {fileID: 222225562}
+  - component: {fileID: 222225565}
+  m_Layer: 4
   m_Name: Scale Pos Y
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1138,9 +1185,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 222225557}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!65 &222225563
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1168,6 +1223,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &222225565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 222225557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &257510025
 GameObject:
   m_ObjectHideFlags: 0
@@ -1176,7 +1242,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 257510026}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Scale Handles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1312,7 +1378,7 @@ GameObject:
   m_Component:
   - component: {fileID: 308681902}
   - component: {fileID: 308681903}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Rod Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1436,10 +1502,11 @@ GameObject:
   - component: {fileID: 348634151}
   - component: {fileID: 348634150}
   - component: {fileID: 348634149}
-  - component: {fileID: 348634152}
   - component: {fileID: 348634154}
   - component: {fileID: 348634153}
-  m_Layer: 0
+  - component: {fileID: 348634152}
+  - component: {fileID: 348634155}
+  m_Layer: 4
   m_Name: Scale Pos Z
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1517,9 +1584,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 348634147}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!65 &348634153
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1547,6 +1622,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &348634155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 348634147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &351348326
 GameObject:
   m_ObjectHideFlags: 0
@@ -1556,7 +1642,7 @@ GameObject:
   m_Component:
   - component: {fileID: 351348327}
   - component: {fileID: 351348328}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Handle Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1740,6 +1826,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: -45.000004
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
   m_IsPrefabParent: 0
@@ -1759,9 +1849,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 380663630}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &380663632
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1777,6 +1875,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &380663635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 380663630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &435838776
 GameObject:
   m_ObjectHideFlags: 0
@@ -1786,7 +1895,7 @@ GameObject:
   m_Component:
   - component: {fileID: 435838777}
   - component: {fileID: 435838778}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Rod Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1889,6 +1998,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: 45
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
   m_IsPrefabParent: 0
@@ -1908,9 +2021,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 555685147}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &555685149
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1926,6 +2047,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &555685152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 555685147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &578139812
 GameObject:
   m_ObjectHideFlags: 0
@@ -2060,7 +2192,7 @@ GameObject:
   m_Component:
   - component: {fileID: 632357406}
   - component: {fileID: 632357407}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Handle Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2100,7 +2232,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 649020611}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Scale Y
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2130,7 +2262,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 680287560}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Translate X
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2223,6 +2355,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: -45
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
   m_IsPrefabParent: 0
@@ -2242,9 +2378,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 704611755}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &704611757
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2260,6 +2404,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &704611760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 704611755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &704808701
 GameObject:
   m_ObjectHideFlags: 0
@@ -2268,7 +2423,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 704808702}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Transform Handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2299,8 +2454,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 706613723}
+  - component: {fileID: 706613724}
   m_Layer: 0
-  m_Name: Focus Manager
+  m_Name: Interaction Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2319,6 +2475,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &706613724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 706613722}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0625e574c0d47a241b7dfc7a8c67ca2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  hoverActivationRadius: 0.5
+  touchActivationRadius: 0.15
+  contactOrGraspingEnabled: 1
 --- !u!1 &735793354
 GameObject:
   m_ObjectHideFlags: 0
@@ -2328,7 +2501,7 @@ GameObject:
   m_Component:
   - component: {fileID: 735793355}
   - component: {fileID: 735793356}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Rod Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2368,7 +2541,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 748904867}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Translate Z
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2481,7 +2654,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 811378499}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Y Rotator Handles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2595,7 +2768,7 @@ GameObject:
   m_Component:
   - component: {fileID: 827299351}
   - component: {fileID: 827299352}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Handle Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2636,7 +2809,7 @@ GameObject:
   m_Component:
   - component: {fileID: 839746413}
   - component: {fileID: 839746414}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Rod Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2739,6 +2912,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: 45
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
   m_IsPrefabParent: 0
@@ -2758,9 +2935,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 849898415}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &849898417
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2776,6 +2961,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &849898420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 849898415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &907109358
 GameObject:
   m_ObjectHideFlags: 0
@@ -2785,7 +2981,7 @@ GameObject:
   m_Component:
   - component: {fileID: 907109359}
   - component: {fileID: 907109360}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Rod Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2826,7 +3022,7 @@ GameObject:
   m_Component:
   - component: {fileID: 914653634}
   - component: {fileID: 914653635}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Handle Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2930,7 +3126,7 @@ GameObject:
   m_Component:
   - component: {fileID: 933824417}
   - component: {fileID: 933824418}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Rod Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2973,10 +3169,11 @@ GameObject:
   - component: {fileID: 1060371166}
   - component: {fileID: 1060371165}
   - component: {fileID: 1060371164}
-  - component: {fileID: 1060371167}
   - component: {fileID: 1060371169}
   - component: {fileID: 1060371168}
-  m_Layer: 0
+  - component: {fileID: 1060371167}
+  - component: {fileID: 1060371170}
+  m_Layer: 4
   m_Name: Scale Neg X
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3054,9 +3251,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1060371162}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!65 &1060371168
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3084,6 +3289,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1060371170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1060371162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1067244357
 GameObject:
   m_ObjectHideFlags: 0
@@ -3197,7 +3413,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1072377036}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Z Rotator Handles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3292,6 +3508,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: -45
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
   m_IsPrefabParent: 0
@@ -3311,9 +3531,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1104693721}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &1104693723
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3329,6 +3557,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1104693726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1104693721}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1110601936
 GameObject:
   m_ObjectHideFlags: 0
@@ -3421,10 +3660,11 @@ GameObject:
   - component: {fileID: 1110988030}
   - component: {fileID: 1110988029}
   - component: {fileID: 1110988028}
-  - component: {fileID: 1110988031}
   - component: {fileID: 1110988033}
   - component: {fileID: 1110988032}
-  m_Layer: 0
+  - component: {fileID: 1110988031}
+  - component: {fileID: 1110988034}
+  m_Layer: 4
   m_Name: Scale Pos X
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3502,9 +3742,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1110988026}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!65 &1110988032
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3532,6 +3780,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1110988034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1110988026}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1129185287
 GameObject:
   m_ObjectHideFlags: 0
@@ -3540,7 +3799,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1129185288}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Rotate Handles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3571,7 +3830,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1138976805}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Scale Z
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3601,7 +3860,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1144153705}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Translate Handles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3714,7 +3973,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1154834566}
   - component: {fileID: 1154834567}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Handle Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3755,7 +4014,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1174749867}
   - component: {fileID: 1174749868}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Handle Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3796,7 +4055,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1178310332}
   - component: {fileID: 1178310333}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Rod Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4001,10 +4260,11 @@ GameObject:
   - component: {fileID: 1243998592}
   - component: {fileID: 1243998591}
   - component: {fileID: 1243998590}
-  - component: {fileID: 1243998593}
   - component: {fileID: 1243998595}
   - component: {fileID: 1243998594}
-  m_Layer: 0
+  - component: {fileID: 1243998593}
+  - component: {fileID: 1243998596}
+  m_Layer: 4
   m_Name: Scale Neg Z
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4082,9 +4342,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1243998588}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!65 &1243998594
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4112,6 +4380,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1243998596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1243998588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1248027429
 GameObject:
   m_ObjectHideFlags: 0
@@ -4326,7 +4605,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1309227521}
   - component: {fileID: 1309227522}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Handle Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4395,7 +4674,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4000013295772620, guid: 585b1cb301cc5094d8606d5e869e94e6, type: 2}
       propertyPath: m_RootOrder
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 585b1cb301cc5094d8606d5e869e94e6, type: 2}
@@ -5155,6 +5434,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: 45
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
   m_IsPrefabParent: 0
@@ -5174,9 +5457,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1393283209}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &1393283211
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5192,6 +5483,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1393283214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1393283209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1422347796
 Prefab:
   m_ObjectHideFlags: 0
@@ -5263,6 +5565,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: -45.000004
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
   m_IsPrefabParent: 0
@@ -5282,9 +5588,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1422347798}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &1422347800
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5300,6 +5614,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1422347803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1422347798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1433262619
 GameObject:
   m_ObjectHideFlags: 0
@@ -5311,10 +5636,11 @@ GameObject:
   - component: {fileID: 1433262623}
   - component: {fileID: 1433262622}
   - component: {fileID: 1433262621}
-  - component: {fileID: 1433262624}
   - component: {fileID: 1433262626}
   - component: {fileID: 1433262625}
-  m_Layer: 0
+  - component: {fileID: 1433262624}
+  - component: {fileID: 1433262627}
+  m_Layer: 4
   m_Name: Scale Neg Y
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5392,9 +5718,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1433262619}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!65 &1433262625
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5422,6 +5756,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1433262627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1433262619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1459325490
 GameObject:
   m_ObjectHideFlags: 0
@@ -5431,7 +5776,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1459325491}
   - component: {fileID: 1459325492}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Rod Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5553,7 +5898,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1496146765}
   - component: {fileID: 1496146766}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Handle Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5656,6 +6001,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: -45.000004
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
   m_IsPrefabParent: 0
@@ -5675,9 +6024,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1542990747}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &1542990749
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5693,6 +6050,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1542990752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1542990747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1557400531
 Prefab:
   m_ObjectHideFlags: 0
@@ -5756,6 +6124,10 @@ Prefab:
       propertyPath: m_Name
       value: Translate Neg X
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 630161d5d4c851c468f6070be2ed3ea5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 630161d5d4c851c468f6070be2ed3ea5, type: 3}
   m_IsPrefabParent: 0
@@ -5787,9 +6159,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1557400533}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f13b45b671ea07458823683fd353000, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &1557400536
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5805,6 +6185,17 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1557400539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1557400533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1563450399
 GameObject:
   m_ObjectHideFlags: 0
@@ -5814,7 +6205,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1563450400}
   - component: {fileID: 1563450401}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Handle Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5917,6 +6308,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: 45.000004
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
   m_IsPrefabParent: 0
@@ -5936,9 +6331,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1617468039}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &1617468041
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5954,6 +6357,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1617468044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1617468039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1718988480
 GameObject:
   m_ObjectHideFlags: 0
@@ -6118,52 +6532,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1731190710}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1001 &1756264167
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 2055964846}
-    m_Modifications:
-    - target: {fileID: 461838, guid: d842be8e446ddfd44b0570433526d45f, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 461838, guid: d842be8e446ddfd44b0570433526d45f, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 461838, guid: d842be8e446ddfd44b0570433526d45f, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 461838, guid: d842be8e446ddfd44b0570433526d45f, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 461838, guid: d842be8e446ddfd44b0570433526d45f, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 461838, guid: d842be8e446ddfd44b0570433526d45f, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 461838, guid: d842be8e446ddfd44b0570433526d45f, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 461838, guid: d842be8e446ddfd44b0570433526d45f, type: 2}
-      propertyPath: m_RootOrder
-      value: 2
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: d842be8e446ddfd44b0570433526d45f, type: 2}
-  m_IsPrefabParent: 0
---- !u!4 &1756264168 stripped
-Transform:
-  m_PrefabParentObject: {fileID: 461838, guid: d842be8e446ddfd44b0570433526d45f, type: 2}
-  m_PrefabInternal: {fileID: 1756264167}
 --- !u!1001 &1799006745
 Prefab:
   m_ObjectHideFlags: 0
@@ -6231,6 +6599,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: 90
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 630161d5d4c851c468f6070be2ed3ea5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 630161d5d4c851c468f6070be2ed3ea5, type: 3}
   m_IsPrefabParent: 0
@@ -6262,9 +6634,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1799006747}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f13b45b671ea07458823683fd353000, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &1799006750
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6280,6 +6660,17 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1799006753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1799006747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1831318051
 Prefab:
   m_ObjectHideFlags: 0
@@ -6317,7 +6708,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 448170, guid: fa5c11a695dad43f3944909204969330, type: 2}
       propertyPath: m_RootOrder
-      value: 4
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 451880, guid: fa5c11a695dad43f3944909204969330, type: 2}
       propertyPath: m_LocalRotation.x
@@ -6642,6 +7033,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 630161d5d4c851c468f6070be2ed3ea5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 630161d5d4c851c468f6070be2ed3ea5, type: 3}
   m_IsPrefabParent: 0
@@ -6673,9 +7068,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1835329067}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f13b45b671ea07458823683fd353000, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &1835329070
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6691,6 +7094,17 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1835329073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1835329067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1844226294
 GameObject:
   m_ObjectHideFlags: 0
@@ -6923,6 +7337,10 @@ Prefab:
       propertyPath: m_Name
       value: Translate Pos X
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 630161d5d4c851c468f6070be2ed3ea5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 630161d5d4c851c468f6070be2ed3ea5, type: 3}
   m_IsPrefabParent: 0
@@ -6954,9 +7372,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1907022578}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f13b45b671ea07458823683fd353000, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &1907022581
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6968,11 +7394,11 @@ Rigidbody:
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 0
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1907022582
+--- !u!114 &1907022584
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -6980,15 +7406,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1907022578}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableHover: 1
-  hoverType: 0
-  enableTouch: 0
-  touchType: 0
-  enableGrab: 1
-  grabType: 0
 --- !u!1 &1952026202
 GameObject:
   m_ObjectHideFlags: 0
@@ -6997,7 +7417,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1952026203}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Translate Y
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7039,7 +7459,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1979565604}
   - component: {fileID: 1979565605}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Rod Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7142,6 +7562,10 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.x
       value: 45
       objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
+      propertyPath: m_Layer
+      value: 4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f66aefa5326c0b740bcffa47c21dbce5, type: 3}
   m_IsPrefabParent: 0
@@ -7161,9 +7585,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 2005346062}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff044f66e217de0449de7ebeac60c9e1, type: 3}
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  manager: {fileID: 706613724}
+  enableHovering: 1
+  enableContact: 1
+  enableGrasping: 1
+  allowsTwoHandedGrab: 0
+  hoverType: 0
+  touchType: 0
+  grabType: 0
 --- !u!54 &2005346064
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7179,6 +7611,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &2005346067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2005346062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2053941808
 GameObject:
   m_ObjectHideFlags: 0
@@ -7188,7 +7631,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2053941809}
   - component: {fileID: 2053941810}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Handle Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7247,8 +7690,6 @@ Transform:
   m_Children:
   - {fileID: 1352481675}
   - {fileID: 2087134888}
-  - {fileID: 1756264168}
-  - {fileID: 5266020}
   - {fileID: 57283634}
   - {fileID: 1970135732}
   m_Father: {fileID: 1865366725}
@@ -7881,7 +8322,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 2116897027}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: X Rotator Handles
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7914,7 +8355,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2122525932}
   - component: {fileID: 2122525933}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Handle Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -7955,7 +8396,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2124024922}
   - component: {fileID: 2124024923}
-  m_Layer: 0
+  m_Layer: 4
   m_Name: Handle Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}

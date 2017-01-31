@@ -12,10 +12,16 @@ namespace Leap.Unity.UI.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
 
-      specifyConditionalDrawing("enableHover", "hoverType");
-      specifyConditionalDrawing("enableTouch", "touchType");
-      specifyConditionalDrawing("enableGrab",  "grabType");
-      specifyConditionalDrawing("enableGrab", "allowTwoHandedGrab");
+      specifyConditionalDrawing("enableGrasping", "allowsTwoHandedGrab");
+    }
+
+  }
+
+  [CustomEditor(typeof(InteractionBehaviour))]
+  public class InteractionBehaviourEditor : InteractionBehaviourBaseEditor {
+
+    protected override void OnEnable() {
+      base.OnEnable();
     }
 
   }

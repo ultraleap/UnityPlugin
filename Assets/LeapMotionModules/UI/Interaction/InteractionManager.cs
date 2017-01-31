@@ -14,11 +14,13 @@ namespace Leap.Unity.UI.Interaction {
 
     [Header("Interaction Settings")]
     [DisableIf("enableHovering", isEqualTo: false)]
-    public float hoverActivationRadius = 0.3F;
+    public float hoverActivationRadius = 0.5F;
     [DisableIf("contactOrGraspingEnabled", isEqualTo: false)]
     public float touchActivationRadius = 0.15F;
 
     #pragma warning disable 0414
+    [HideInInspector]
+    [SerializeField]
     // Editor-only utility variable for touchActivationRadius property drawing.
     private bool contactOrGraspingEnabled = true;
     #pragma warning restore 0414
@@ -65,7 +67,7 @@ namespace Leap.Unity.UI.Interaction {
 
     void FixedUpdate() {
       foreach (var interactionHand in interactionHands) {
-        interactionHand.FixedUpdateHand();
+        interactionHand.FixedUpdateHand(enableHovering, enableContact, enableGrasping);
       }
     }
 

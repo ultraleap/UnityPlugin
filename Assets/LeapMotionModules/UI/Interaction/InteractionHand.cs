@@ -27,11 +27,11 @@ namespace Leap.Unity.UI.Interaction {
       return _hand;
     }
 
-    public void FixedUpdateHand() {
+    public void FixedUpdateHand(bool doHovering, bool doContact, bool doGrasping) {
       _hand = _handAccessor();
 
-      FixedUpdateHovering();
-      FixedUpdateGrasping();
+      if (doHovering) FixedUpdateHovering();
+      if (doGrasping) FixedUpdateGrasping();
     }
 
     #region Hovering
@@ -73,7 +73,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private HashSet<InteractionBehaviourBase> _hoverableCache = new HashSet<InteractionBehaviourBase>();
-    private HoverCheckResults CheckHoverForHand(Hand hand, IEnumerable<InteractionBehaviourBase> hoverCandidates) {
+    private HoverCheckResults CheckHoverForHand(Hand hand, HashSet<InteractionBehaviourBase> hoverCandidates) {
       _hoverableCache.Clear();
       HoverCheckResults results = new HoverCheckResults() { hovered = _hoverableCache,
                                                             primaryHovered = null,
@@ -98,9 +98,9 @@ namespace Leap.Unity.UI.Interaction {
       return curResults;
     }
 
-    private List<InteractionBehaviourBase> _hoveredRemovalCache = new List<InteractionBehaviourBase>();
+    // TODO: Delete unnecessary cache variable
+    //private List<InteractionBehaviourBase> _hoveredRemovalCache = new List<InteractionBehaviourBase>();
     private void ProcessHoverCheckResults(HoverCheckResults hoverResults) {
-
       foreach (var hoverable in _hoverActivityManager.ActiveBehaviours) {
         bool inLastFrame = false, inCurFrame = false;
         if (hoverResults.hovered.Contains(hoverable)) {
@@ -124,29 +124,30 @@ namespace Leap.Unity.UI.Interaction {
       }
 
       // Also need to make sure _hoveredLastFrame doesn't
-      // contain anything outside the Hover Candidate list.
-      foreach (var lastFrameHoverable in _hoveredLastFrame) {
-        if (!_hoverActivityManager.ActiveBehaviours.Contains(lastFrameHoverable)) {
-          lastFrameHoverable.OnHoverEnd(hoverResults.checkedHand);
-          _hoveredRemovalCache.Add(lastFrameHoverable);
-        }
-      }
-      foreach (var hoverable in _hoveredRemovalCache) {
-        _hoveredLastFrame.Remove(hoverable);
-      }
-      _hoveredRemovalCache.Clear();
+      // contain anything outside the hover candidate list.
+      // Wait, no you don't. The above does handle every case. TODO: Delete this after confirming it works.
+      //foreach (var lastFrameHoverable in _hoveredLastFrame) {
+      //  if (!_hoverActivityManager.ActiveBehaviours.Contains(lastFrameHoverable)) {
+      //    lastFrameHoverable.OnHoverEnd(hoverResults.checkedHand);
+      //    _hoveredRemovalCache.Add(lastFrameHoverable);
+      //  }
+      //}
+      //foreach (var hoverable in _hoveredRemovalCache) {
+      //  _hoveredLastFrame.Remove(hoverable);
+      //}
+      //_hoveredRemovalCache.Clear();
     }
 
     private void ProcessPrimaryHoverCheckResults(HoverCheckResults hoverResults) {
       if (hoverResults.primaryHovered == _primaryHoveredLastFrame) {
-        hoverResults.primaryHovered.OnPrimaryHoverStay(hoverResults.checkedHand);
+        if (hoverResults.primaryHovered != null) hoverResults.primaryHovered.OnPrimaryHoverStay(hoverResults.checkedHand);
       }
       else {
         if (_primaryHoveredLastFrame != null) {
           _primaryHoveredLastFrame.OnPrimaryHoverEnd(hoverResults.checkedHand);
         }
         _primaryHoveredLastFrame = hoverResults.primaryHovered;
-        _primaryHoveredLastFrame.OnPrimaryHoverBegin(hoverResults.checkedHand);
+        if (_primaryHoveredLastFrame != null) _primaryHoveredLastFrame.OnPrimaryHoverBegin(hoverResults.checkedHand);
       }
     }
 
@@ -217,6 +218,10 @@ namespace Leap.Unity.UI.Interaction {
 
     public HashSet<InteractionBehaviourBase> GetGraspCandidates() {
       return _touchActivityManager.ActiveBehaviours;
+    }
+
+    public bool IsGrasping(InteractionBehaviourBase interactionObj) {
+      return _graspedObject == interactionObj;
     }
 
     #endregion
