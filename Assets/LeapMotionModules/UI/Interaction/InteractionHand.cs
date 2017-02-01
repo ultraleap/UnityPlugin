@@ -20,6 +20,7 @@ namespace Leap.Unity.UI.Interaction {
 
       InitHovering(hoverActivationRadius);
       InitTouch(touchActivationRadius);
+      //InitContact(); // TODO: Not yet implemented.
       InitGrasping();
     }
 
@@ -32,7 +33,7 @@ namespace Leap.Unity.UI.Interaction {
 
       if (doHovering) FixedUpdateHovering();
       if (doContact || doGrasping) FixedUpdateTouch();
-      //if (doContact) FixedUpdateContact(); // Not yet implemented.
+      //if (doContact) FixedUpdateContact(); // TODO: Not yet implemented.
       if (doGrasping) FixedUpdateGrasping();
     }
 
@@ -142,7 +143,7 @@ namespace Leap.Unity.UI.Interaction {
     #region Touch (common logic for Contact and Grasping)
 
     /// <summary>
-    /// Encapsulates trackintg Hand <-> Interactionbehaviour contact and grasping candidates
+    /// Encapsulates tracking Hand <-> InteractionBehaviour contact and grasping candidates
     /// (broad-phase) via PhysX sphere queries.
     /// </summary>
     private ActivityManager _touchActivityManager;
@@ -165,7 +166,7 @@ namespace Leap.Unity.UI.Interaction {
 
     #endregion
 
-    #region Grasp
+    #region Grasping
 
     private HeuristicGrabClassifier _grabClassifier;
     private InteractionBehaviourBase _graspedObject;
@@ -215,6 +216,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     #endregion
+
   }
 
 }
