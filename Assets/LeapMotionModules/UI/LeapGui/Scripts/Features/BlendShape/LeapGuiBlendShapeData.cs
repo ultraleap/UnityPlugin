@@ -58,7 +58,7 @@ public class LeapGuiBlendShapeData : LeapGuiElementData {
 
       if (_type == BlendShapeType.Mesh) {
         //If the vert count is different, we are in trouble
-        if (_mesh.vertexCount != mesh.vertexCount) {
+        if (_mesh == null || _mesh.vertexCount != mesh.vertexCount) {
           return null;
         }
 

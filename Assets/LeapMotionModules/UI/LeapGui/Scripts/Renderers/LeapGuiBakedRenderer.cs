@@ -180,6 +180,9 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
       _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);
     }
 
+    //Make the mesh bounds huge, since the bounds don't properly reflect visual representation most of the time
+    _bakedMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000);
+
     OnUpdateRenderer();
   }
 
