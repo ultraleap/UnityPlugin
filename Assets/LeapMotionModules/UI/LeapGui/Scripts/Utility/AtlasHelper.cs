@@ -7,6 +7,7 @@ using Leap.Unity.Query;
 public static class AtlasHelper {
   public static List<UVChannelFlags> allUvChannels;
   static AtlasHelper() {
+    allUvChannels = new List<UVChannelFlags>();
     allUvChannels.Add(UVChannelFlags.UV0);
     allUvChannels.Add(UVChannelFlags.UV1);
     allUvChannels.Add(UVChannelFlags.UV2);
@@ -24,6 +25,7 @@ public static class AtlasHelper {
 
     foreach (var channel in allUvChannels) {
       var mainTexture = textureFeatures.Query().FirstOrDefault(f => f.channel == channel);
+      if (mainTexture == null) continue;
 
       Texture2D defaultTexture, atlasTexture;
       prepFeatureForAtlas(mainTexture, borderAmount, textureArray, out defaultTexture, out atlasTexture);
