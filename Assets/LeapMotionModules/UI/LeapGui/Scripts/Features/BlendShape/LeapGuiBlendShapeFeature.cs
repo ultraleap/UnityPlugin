@@ -7,6 +7,7 @@ using UnityEditor;
 
 [LeapGuiFeatureName("Blend Shape")]
 public class LeapGuiBlendShapeFeature : LeapGuiFeature<LeapGuiBlendShapeData> {
+  public const string FEATURE_NAME = LeapGui.FEATURE_PREFIX + "BLEND_SHAPES";
 
   [SerializeField]
   private BlendShapeSpace _space;

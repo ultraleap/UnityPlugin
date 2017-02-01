@@ -10,7 +10,8 @@ using Leap.Unity.Attributes;
 public class LeapGuiBakedRenderer : LeapGuiRenderer,
   ISupportsFeature<LeapGuiMeshFeature>,
   ISupportsFeature<LeapGuiTextureFeature>,
-  ISupportsFeature<LeapGuiTintFeature> {
+  ISupportsFeature<LeapGuiTintFeature>,
+  ISupportsFeature<LeapGuiBlendShapeFeature> {
 
   [SerializeField]
   private Shader _shader;
@@ -40,6 +41,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
   private List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
   private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
+  private List<LeapGuiBlendShapeFeature> _blendShapeFeatures = new List<LeapGuiBlendShapeFeature>();
 
   private Dictionary<LeapGuiTextureFeature, Texture2D> _atlases;
   private Dictionary<UVChannelFlags, Rect[]> _atlasedUvs;
@@ -47,6 +49,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   //Tinting
   private const string TINT = LeapGui.PROPERTY_PREFIX + "Tints";
   private List<Color> _tintColors = new List<Color>();
+
+  //Blend Shapes
+  private const string BLEND_SHAPE = LeapGui.PROPERTY_PREFIX + "BlendShapeAmounts";
+  private List<float> _blendShapeAmounts = new List<float>();
 
   //Cylindrical space
   private const string CYLINDRICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementParameters";
@@ -65,6 +71,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   }
 
   public void GetSupportInfo(List<LeapGuiTintFeature> features, List<FeatureSupportInfo> info) {
+    FeatureSupportUtil.OnlySupportFirstFeature(features, info);
+  }
+
+  public void GetSupportInfo(List<LeapGuiBlendShapeFeature> features, List<FeatureSupportInfo> info) {
     FeatureSupportUtil.OnlySupportFirstFeature(features, info);
   }
 
@@ -92,12 +102,16 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     }
 
     foreach (var feature in gui.features) {
-      if (feature.isDirty) {
-        if (feature is LeapGuiTintFeature) {
-          var tintFeature = feature as LeapGuiTintFeature;
-          tintFeature.data.Query().Select(data => data.tint).FillList(_tintColors);
-          _material.SetColorArray(TINT, _tintColors);
-        }
+      if (!feature.isDirty) continue;
+
+      if (feature is LeapGuiTintFeature) {
+        var tintFeature = feature as LeapGuiTintFeature;
+        tintFeature.data.Query().Select(data => data.tint).FillList(_tintColors);
+        _material.SetColorArray(TINT, _tintColors);
+      } else if (feature is LeapGuiBlendShapeFeature) {
+        var blendShapeFeature = feature as LeapGuiBlendShapeFeature;
+        blendShapeFeature.data.Query().Select(data => data.amount).FillList(_blendShapeAmounts);
+        _material.SetFloatArray(BLEND_SHAPE, _blendShapeAmounts);
       }
     }
   }
@@ -400,12 +414,39 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   private void bakeUv3() {
     List<Vector4> uv3 = new List<Vector4>();
 
+
+
     foreach (var feature in _meshFeatures) {
       for (int i = 0; i < feature.data.Count; i++) {
         var mesh = feature.data[i].mesh;
 
-        //TODO, support a single blend shape
         uv3.Append(mesh.vertexCount, new Vector4(0, 0, 0, i));
+      }
+    }
+
+    gui.GetAllFeaturesOfType(_blendShapeFeatures);
+    var blendShape = _blendShapeFeatures.Query().FirstOrDefault();
+    if (blendShape != null) {
+      _material.EnableKeyword(LeapGuiBlendShapeFeature.FEATURE_NAME);
+
+      int vertIndex = 0;
+      for (int i = 0; i < blendShape.data.Count; i++) {
+        var mesh = blendShape.data[i].blendShape;
+        var element = gui.elements[i];
+
+        var shapeVerts = mesh.vertices;
+        for (int j = 0; j < shapeVerts.Length; j++) {
+          Vector3 shapeVert = shapeVerts[j];
+          Vector3 delta = elementVertToBakedVert(element, shapeVert) - _tempVertList[vertIndex];
+
+          Vector4 currUv3 = uv3[vertIndex];
+          currUv3.x = delta.x;
+          currUv3.y = delta.y;
+          currUv3.z = delta.z;
+          uv3[vertIndex] = currUv3;
+
+          vertIndex++;
+        }
       }
     }
 
@@ -419,7 +460,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   public bool DoesNeedUv3() {
     if (_motionType != MotionType.None) return true;
     if (gui.features.Query().Any(f => f is LeapGuiTintFeature)) return true;
-    //TODO: add more conditions!
+    if (gui.features.Query().Any(f => f is LeapGuiBlendShapeFeature)) return true;
     return false;
   }
 

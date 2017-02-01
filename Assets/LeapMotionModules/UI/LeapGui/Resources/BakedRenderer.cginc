@@ -79,6 +79,26 @@ float4 GetElementTint(int elementId) {
 }
 #endif
 
+/***********************************
+ * Feature name:
+ *  _ (none)
+ *    no runtime blend shapes
+ *  LEAP_GUI_BLEND_SHAPES
+ *    runtime application of blend shapes on a per-element basis
+ ***********************************/
+
+#ifdef LEAP_GUI_BLEND_SHAPES
+#ifndef GUI_ELEMENTS_HAVE_ID
+#define GUI_ELEMENTS_HAVE_ID
+#endif
+
+float _LeapGuiBlendShapeAmounts[ELEMENT_MAX];
+
+void ApplyBlendShapes(inout float4 vert, float4 uv3, int elementId) {
+  vert.xyz += uv3.xyz * _LeapGuiBlendShapeAmounts[elementId];
+}
+#endif
+
 #ifdef LEAP_GUI_VERTEX_COLORS
 #ifndef GUI_ELEMENTS_HAVE_COLOR
 #define GUI_ELEMENTS_HAVE_COLOR
@@ -140,6 +160,10 @@ struct v2f_gui_baked {
 v2f_gui_baked ApplyBakedGui(appdata_gui_baked v) {
 #ifdef GUI_ELEMENTS_HAVE_ID
   int elementId = v.vertInfo.w;
+#endif
+
+#ifdef LEAP_GUI_BLEND_SHAPES
+  ApplyBlendShapes(v.vertex, v.vertInfo, elementId);
 #endif
 
 #ifdef LEAP_GUI_WARPING
