@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Gui.Space {
-
   [RequireComponent(typeof(LeapElement))]
   public abstract class ProceduralMeshSource : MonoBehaviour {
 
@@ -33,4 +31,3 @@ namespace Leap.Unity.Gui.Space {
     /// </summary>
     public abstract bool DoesMeshHaveAtlasUvs(int uvChannel);
   }
-}
