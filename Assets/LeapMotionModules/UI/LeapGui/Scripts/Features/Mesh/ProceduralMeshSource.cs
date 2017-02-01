@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-  [RequireComponent(typeof(LeapElement))]
+  //[RequireComponent(typeof(LeapElement))]
   public abstract class ProceduralMeshSource : MonoBehaviour {
 
+    /*
     // Just to make sure all procedural mesh sources can be enabled/disabled
     protected virtual void Start() { }
 
@@ -30,4 +31,5 @@ using UnityEngine;
     /// be done in all cases (like if the texture is a tightly packed sprite).
     /// </summary>
     public abstract bool DoesMeshHaveAtlasUvs(int uvChannel);
+     * */
   }

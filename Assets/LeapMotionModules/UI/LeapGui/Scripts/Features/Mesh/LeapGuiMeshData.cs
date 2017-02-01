@@ -11,7 +11,7 @@ public class LeapGuiMeshData : LeapGuiElementData {
 
   public Mesh mesh {
     get {
-
+      return _mesh;
     }
     set {
       _mesh = value;

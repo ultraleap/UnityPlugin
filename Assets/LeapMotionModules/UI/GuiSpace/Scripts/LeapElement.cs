@@ -106,24 +106,26 @@ namespace Leap.Unity.Gui.Space {
     }
 
     public Mesh GetMesh() {
-      if (IsUsingProceduralMeshSource()) {
-        return _meshSource.GetMesh(this);
-      } else {
+      //if (IsUsingProceduralMeshSource()) {
+        //return _meshSource.GetMesh(this);
+      //}// else {
         return _mesh.GetValue();
-      }
+      //}
     }
 
     public bool DoesMeshHaveAtlasUvs(int uvChannel) {
-      if (IsUsingProceduralMeshSource()) {
-        return _meshSource.DoesMeshHaveAtlasUvs(uvChannel);
-      } else {
-        return false;//Assume user assigned meshes never have atlas coordinates
-      }
+      //if (IsUsingProceduralMeshSource()) {
+      //  return _meshSource.DoesMeshHaveAtlasUvs(uvChannel);
+      //} else {
+      //  return false;//Assume user assigned meshes never have atlas coordinates
+      //}
+      return true;
     }
 
     public bool IsUsingProceduralMeshSource() {
-      _meshSource = GetComponent<ProceduralMeshSource>();
-      return _meshSource != null && _meshSource.enabled && _meshSource.CanGenerateMeshForElement(this);
+      return false;
+      //_meshSource = GetComponent<ProceduralMeshSource>();
+      //return _meshSource != null && _meshSource.enabled && _meshSource.CanGenerateMeshForElement(this);
     }
 
     public Sprite GetSprite(int channel) {
