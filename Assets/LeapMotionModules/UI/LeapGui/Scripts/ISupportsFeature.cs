@@ -33,6 +33,14 @@ public struct FeatureSupportInfo {
   public static FeatureSupportInfo Error(string message) {
     return new FeatureSupportInfo() { support = SupportType.Error, message = message };
   }
+
+  public FeatureSupportInfo OrWorse(FeatureSupportInfo other) {
+    if (other.support > support) {
+      return other;
+    } else {
+      return this;
+    }
+  }
 }
 
 public enum SupportType {

@@ -4,6 +4,7 @@ using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using Leap.Unity.Query;
 
 [LeapGuiFeatureName("Blend Shape")]
 public class LeapGuiBlendShapeFeature : LeapGuiFeature<LeapGuiBlendShapeData> {
@@ -25,6 +26,14 @@ public class LeapGuiBlendShapeFeature : LeapGuiFeature<LeapGuiBlendShapeData> {
   public enum BlendShapeSpace {
     Local,
     World
+  }
+
+  public override FeatureSupportInfo GetSupportInfo(LeapGui gui) {
+    if (gui.features.Query().Any(f => f is LeapGuiMeshFeature)) {
+      return FeatureSupportInfo.FullSupport();
+    } else {
+      return FeatureSupportInfo.Error("Blend Shapes require a Mesh feature.");
+    }
   }
 
 #if UNITY_EDITOR

@@ -254,7 +254,7 @@ public class LeapGui : MonoBehaviour {
 
     supportInfo = new List<FeatureSupportInfo>();
     foreach (var feature in features) {
-      supportInfo.Add(featureToInfo[feature]);
+      supportInfo.Add(feature.GetSupportInfo(this).OrWorse(featureToInfo[feature]));
     }
   }
 

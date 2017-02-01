@@ -62,7 +62,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     FeatureSupportUtil.OnlySupportFirstFeature(features, info);
 
     if (DoesNeedUv3() && features[0].uv3) {
-      info[0] = FeatureSupportInfo.Warning("Uv3 will be ignored because the baker is using it.");
+      info[0] = info[0].OrWorse(FeatureSupportInfo.Warning("Uv3 will be ignored because the baker is using it."));
     }
   }
 
