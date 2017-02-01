@@ -6,6 +6,15 @@ using Leap.Unity;
 using Leap.Unity.Query;
 
 [CanEditMultipleObjects]
+[CustomEditor(typeof(LeapGuiElementData), editorForChildClasses: true, isFallback = true)]
+public class DefaultFeatureDataEditor : CustomEditorBase {
+  protected override void OnEnable() {
+    base.OnEnable();
+    dontShowScriptField();
+  }
+}
+
+[CanEditMultipleObjects]
 [CustomEditor(typeof(LeapGuiElement))]
 public class LeapGuiElementEditor : Editor {
 
@@ -27,21 +36,17 @@ public class LeapGuiElementEditor : Editor {
     for (int i = 0; i < gui.features.Count; i++) {
       var objs = elements.Query().Select(e => e.data[i]).ToArray();
 
-      var sobj = new SerializedObject(objs);
-      var it = sobj.GetIterator();
-      it.NextVisible(true);
+      var editor = Editor.CreateEditor(objs);
 
       EditorGUI.BeginChangeCheck();
       EditorGUILayout.LabelField(LeapGuiFeatureNameAttribute.GetFeatureName(gui.features[i].GetType()));
       EditorGUI.indentLevel++;
 
-      while (it.NextVisible(false)) {
-        EditorGUILayout.PropertyField(it);
-      }
+      editor.OnInspectorGUI();
 
       EditorGUI.indentLevel--;
       if (EditorGUI.EndChangeCheck()) {
-        sobj.ApplyModifiedProperties();
+        editor.serializedObject.ApplyModifiedProperties();
       }
     }
   }
