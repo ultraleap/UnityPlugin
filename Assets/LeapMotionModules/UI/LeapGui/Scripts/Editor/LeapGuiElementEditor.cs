@@ -19,6 +19,7 @@ public class DefaultFeatureDataEditor : CustomEditorBase {
 public class LeapGuiElementEditor : Editor {
 
   List<LeapGuiElement> elements = new List<LeapGuiElement>();
+  List<Editor> editorCache = new List<Editor>();
 
   public override void OnInspectorGUI() {
     base.OnInspectorGUI();
@@ -36,7 +37,15 @@ public class LeapGuiElementEditor : Editor {
     for (int i = 0; i < gui.features.Count; i++) {
       var objs = elements.Query().Select(e => e.data[i]).ToArray();
 
-      var editor = Editor.CreateEditor(objs);
+      Editor editor = null;
+      if (editorCache.Count <= i) {
+        editorCache.Add(null);
+      } else {
+        editor = editorCache[i];
+      }
+
+      Editor.CreateCachedEditor(objs, null, ref editor);
+      editorCache[i] = editor;
 
       EditorGUI.BeginChangeCheck();
       EditorGUILayout.LabelField(LeapGuiFeatureNameAttribute.GetFeatureName(gui.features[i].GetType()));
