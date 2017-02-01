@@ -89,10 +89,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
       _cylindrical_elementParameters.Clear();
       foreach (var element in gui.elements) {
-        Vector4 guiPos = gui.transform.InverseTransformPoint(element.transform.position);
-
         var parameters = cylindricalSpace.GetElementParameters(element.anchor, element.transform.position);
-
         _cylindrical_elementParameters.Add(parameters);
       }
 
