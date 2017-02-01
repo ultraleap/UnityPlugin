@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LeapGuiCustomBlendShape : MonoBehaviour {
+public abstract class LeapGuiCustomBlendShape : MonoBehaviour {
 
-  public Mesh shape;
+  protected virtual void Start() { }
+
+  public abstract bool TryGetBlendShape(LeapGuiBlendShapeData data, out Mesh shape);
 
 }

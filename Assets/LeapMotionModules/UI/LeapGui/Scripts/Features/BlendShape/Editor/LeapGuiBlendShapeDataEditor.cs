@@ -14,5 +14,6 @@ public class LeapGuiBlendShapeDataEditor : CustomEditorBase {
     specifyConditionalDrawing("_type", (int)LeapGuiBlendShapeData.BlendShapeType.Translation, "_translation");
     specifyConditionalDrawing("_type", (int)LeapGuiBlendShapeData.BlendShapeType.Rotation, "_rotation");
     specifyConditionalDrawing("_type", (int)LeapGuiBlendShapeData.BlendShapeType.Scale, "_scale");
+    specifyConditionalDrawing("_type", (int)LeapGuiBlendShapeData.BlendShapeType.Mesh, "_mesh");
   }
 }

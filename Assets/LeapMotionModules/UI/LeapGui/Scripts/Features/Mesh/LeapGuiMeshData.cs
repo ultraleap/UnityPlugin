@@ -1,6 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Query;
+
+public static class LeapGuiMeshExtensions {
+  public static LeapGuiMeshData Mesh(this LeapGuiElement element) {
+    return element.data.Query().FirstOrDefault(d => d is LeapGuiMeshData) as LeapGuiMeshData;
+  }
+}
 
 public class LeapGuiMeshData : LeapGuiElementData {
 
