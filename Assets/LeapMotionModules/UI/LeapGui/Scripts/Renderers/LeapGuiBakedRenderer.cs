@@ -43,8 +43,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
   private List<LeapGuiBlendShapeFeature> _blendShapeFeatures = new List<LeapGuiBlendShapeFeature>();
 
-  private Dictionary<LeapGuiTextureFeature, Texture2D> _atlases;
-  private Dictionary<UVChannelFlags, Rect[]> _atlasedUvs;
+  private Dictionary<UVChannelFlags, Rect[]> _atlasedRects;
 
   //Tinting
   private const string TINT = LeapGui.PROPERTY_PREFIX + "Tints";
@@ -283,67 +282,13 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   }
 
   private void atlasTextures() {
-    _atlases = new Dictionary<LeapGuiTextureFeature, Texture2D>();
-    _atlasedUvs = new Dictionary<UVChannelFlags, Rect[]>();
+    Texture2D[] atlasTextures;
+    AtlasHelper.DoAtlas(_textureFeatures, borderAmount,
+                    out atlasTextures,
+                    out _atlasedRects);
 
-    var whiteTexture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false);
-    whiteTexture.SetPixels(new Color[3 * 3].Fill(Color.white));
-    whiteTexture.Apply();
-
-    Texture2D[] textures = new Texture2D[gui.elements.Count];
-    var _originalToBordered = new Dictionary<Texture2D, Texture2D>();
-
-    foreach (var uvChannel in allUvChannels) {
-      var feature = _textureFeatures.Query().FirstOrDefault(f => f.channel == uvChannel);
-      if (feature != null) {
-
-        //Do atlasing
-        feature.data.Query().
-             Select(d => {
-               if (d.texture == null) {
-                 return whiteTexture;
-               }
-
-               Texture2D bordered;
-               if (!_originalToBordered.TryGetValue(d.texture, out bordered)) {
-                 d.texture.EnsureReadWriteEnabled();
-                 bordered = Instantiate(d.texture);
-                 bordered.AddBorder(borderAmount);
-                 _originalToBordered[d.texture] = bordered;
-               }
-
-               return bordered;
-             }).
-             FillArray(textures);
-
-        var atlas = new Texture2D(1, 1, TextureFormat.ARGB32, mipmap: true);
-        var atlasedUvs = atlas.PackTextures(textures, 1);
-
-        //Correct uvs to account for the added border
-        for (int i = 0; i < atlasedUvs.Length; i++) {
-          float dx = 1.0f / atlas.width;
-          float dy = 1.0f / atlas.height;
-          Rect r = atlasedUvs[i];
-
-          if (textures[i] != whiteTexture) {
-            dx *= borderAmount;
-            dy *= borderAmount;
-          }
-
-          r.x += dx;
-          r.y += dy;
-          r.width -= dx * 2;
-          r.height -= dy * 2;
-          atlasedUvs[i] = r;
-        }
-
-        _atlases[feature] = atlas;
-        _atlasedUvs[uvChannel] = atlasedUvs;
-      }
-    }
-
-    foreach (var feature in _textureFeatures) {
-      _material.SetTexture(feature.propertyName, _atlases[feature]);
+    for (int i = 0; i < _textureFeatures.Count; i++) {
+      _material.SetTexture(_textureFeatures[i].propertyName, atlasTextures[i]);
     }
   }
 
@@ -377,7 +322,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
           }
 
           Rect[] atlasedUvs;
-          if (_atlasedUvs != null && _atlasedUvs.TryGetValue(pair.Key, out atlasedUvs)) {
+          if (_atlasedRects != null && _atlasedRects.TryGetValue(pair.Key, out atlasedUvs)) {
             Rect elementRect = atlasedUvs[elementIndex];
             var target = uvs[pair.Key];
             for (int i = 0; i < tempUvList.Count; i++) {

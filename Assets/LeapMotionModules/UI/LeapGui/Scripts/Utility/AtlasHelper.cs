@@ -13,10 +13,12 @@ public static class AtlasHelper {
     allUvChannels.Add(UVChannelFlags.UV3);
   }
 
-  public static List<AtlasResults> DoAtlas(List<LeapGuiTextureFeature> textureFeatures) {
-    var resultMap = new Dictionary<LeapGuiTextureFeature, AtlasResults>();
-
-    int borderAmount = 1;
+  public static void DoAtlas(List<LeapGuiTextureFeature> textureFeatures,
+                             int borderAmount,
+                         out Texture2D[] atlasTextures,
+                         out Dictionary<UVChannelFlags, Rect[]> channelMapping) {
+    atlasTextures = new Texture2D[textureFeatures.Count];
+    channelMapping = new Dictionary<UVChannelFlags, Rect[]>();
 
     Texture2D[] textureArray = new Texture2D[textureFeatures[0].data.Count];
 
@@ -49,18 +51,14 @@ public static class AtlasHelper {
         atlasedRects[i] = r;
       }
 
-      resultMap[mainTexture] = new AtlasResults() {
-        atlasTexture = atlasTexture,
-        atlasedRects = atlasedRects
-      };
+      atlasTextures[textureFeatures.IndexOf(mainTexture)] = atlasTexture;
+      channelMapping[channel] = atlasedRects;
 
       //All texture features that are NOT the main texture do not get their own atlas step
       //They are simply copied into a new texture
       //var nonMainTextures = textureFeatures.Query().Where(f => f.channel == channel).Skip(1).ToList();
       //TODO: much lower priority ;)
     }
-
-    return textureFeatures.Query().Select(f => resultMap[f]).ToList();
   }
 
   private static void prepFeatureForAtlas(LeapGuiTextureFeature feature,
@@ -86,11 +84,6 @@ public static class AtlasHelper {
     }
 
     atlasTexture = new Texture2D(1, 1, format, mipmap: false);
-  }
-
-  public struct AtlasResults {
-    public Texture2D atlasTexture;
-    public Rect[] atlasedRects;
   }
 
   private static Dictionary<BorderKey, Texture2D> _cachedBorderedTextures = new Dictionary<BorderKey, Texture2D>();
