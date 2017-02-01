@@ -14,6 +14,7 @@ public class LeapGuiElement : MonoBehaviour {
   [HideInInspector]
   public AnchorOfConstantSize anchor;
 
+  [HideInInspector]
   [SerializeField]
   public List<LeapGuiElementData> data;
 

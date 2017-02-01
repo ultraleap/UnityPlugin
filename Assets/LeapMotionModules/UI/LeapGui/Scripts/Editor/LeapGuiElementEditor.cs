@@ -3,39 +3,45 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Leap.Unity;
+using Leap.Unity.Query;
 
+[CanEditMultipleObjects]
 [CustomEditor(typeof(LeapGuiElement))]
-public class LeapGuiElementEditor : CustomEditorBase {
+public class LeapGuiElementEditor : Editor {
 
-  void OnEnable() {
-    base.OnEnable();
+  List<LeapGuiElement> elements = new List<LeapGuiElement>();
 
-    specifyCustomDrawer("data", drawData);
-  }
+  public override void OnInspectorGUI() {
+    base.OnInspectorGUI();
 
-  private void drawData(SerializedProperty property) {
-    for (int i = 0; i < property.arraySize; i++) {
-      var dataRef = property.GetArrayElementAtIndex(i);
+    targets.Query().Where(e => e != null).Select(e => e as LeapGuiElement).FillList(elements);
 
-      var dataObj = dataRef.objectReferenceValue;
-      EditorGUILayout.LabelField(LeapGuiFeatureNameAttribute.GetFeatureName((dataObj as LeapGuiElementData).feature.GetType()));
-      EditorGUI.indentLevel++;
+    if (elements.Count == 0) return;
+
+    var gui = elements[0].GetComponentInParent<LeapGui>();
+    if (elements.Query().Any(e => e.GetComponentInParent<LeapGui>() != gui)) {
+      EditorGUILayout.HelpBox("Cannot edit multiple elements from different gui's.", MessageType.Info);
+      return;
+    }
+
+    for (int i = 0; i < gui.features.Count; i++) {
+      var objs = elements.Query().Select(e => e.data[i]).ToArray();
+
+      var sobj = new SerializedObject(objs);
+      var it = sobj.GetIterator();
+      it.NextVisible(true);
 
       EditorGUI.BeginChangeCheck();
-
-      SerializedObject sobj = new SerializedObject(dataObj);
-      SerializedProperty it = sobj.GetIterator();
-      it.NextVisible(true);
+      EditorGUILayout.LabelField(LeapGuiFeatureNameAttribute.GetFeatureName(gui.features[i].GetType()));
+      EditorGUI.indentLevel++;
 
       while (it.NextVisible(false)) {
         EditorGUILayout.PropertyField(it);
       }
 
       EditorGUI.indentLevel--;
-
       if (EditorGUI.EndChangeCheck()) {
         sobj.ApplyModifiedProperties();
-        (dataObj as LeapGuiElementData).feature.isDirty = true;
       }
     }
   }
