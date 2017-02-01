@@ -4,9 +4,9 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Leap.Unity.Query;
 
-public static class AtlasHelper {
+public static class AtlasUtil {
   public static List<UVChannelFlags> allUvChannels;
-  static AtlasHelper() {
+  static AtlasUtil() {
     allUvChannels = new List<UVChannelFlags>();
     allUvChannels.Add(UVChannelFlags.UV0);
     allUvChannels.Add(UVChannelFlags.UV1);

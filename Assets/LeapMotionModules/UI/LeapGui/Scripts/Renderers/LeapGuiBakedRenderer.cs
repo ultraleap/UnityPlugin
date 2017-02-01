@@ -283,7 +283,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
   private void atlasTextures() {
     Texture2D[] atlasTextures;
-    AtlasHelper.DoAtlas(_textureFeatures, borderAmount,
+    AtlasUtil.DoAtlas(_textureFeatures, borderAmount,
                     out atlasTextures,
                     out _atlasedRects);
 
