@@ -53,6 +53,10 @@ public abstract class LeapGuiFeatureBase : ScriptableObject {
     }
   }
 
+  public virtual FeatureSupportInfo GetSupportInfo() {
+    return FeatureSupportInfo.FullSupport();
+  }
+
   public abstract void ClearDataObjectReferences();
   public abstract void AddDataObjectReference(LeapGuiElementData data);
 
