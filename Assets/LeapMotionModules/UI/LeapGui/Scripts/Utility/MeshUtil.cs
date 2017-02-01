@@ -23,6 +23,16 @@ public static class MeshUtil {
     }
   }
 
+  public static void SetUVsAuto(this Mesh mesh, int channel, List<Vector4> uvs) {
+    if (uvs.Query().Any(v => v.w != 0)) {
+      mesh.SetUVs(channel, uvs);
+    } else if (uvs.Query().Any(v => v.z != 0)) {
+      mesh.SetUVs(channel, uvs.Query().Select(v => (Vector3)v).ToList());
+    } else {
+      mesh.SetUVs(channel, uvs.Query().Select(v => (Vector2)v).ToList());
+    }
+  }
+
   public static int Index(this UVChannelFlags flags) {
     switch (flags) {
       case UVChannelFlags.UV0:

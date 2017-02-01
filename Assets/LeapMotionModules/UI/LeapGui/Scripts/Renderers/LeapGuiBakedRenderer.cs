@@ -329,20 +329,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
     //Asign uvs to baked mesh
     foreach (var pair in uvs) {
-      if (pair.Value.Query().Any(v => v.w != 0)) {
-        _bakedMesh.SetUVs(pair.Key.Index(), pair.Value);
-      } else if (pair.Value.Query().Any(v => v.z != 0)) {
-        _bakedMesh.SetUVs(pair.Key.Index(),
-                          pair.Value.Query().
-                                     Select(v => (Vector3)v).
-                                     ToList());
-      } else {
-        _bakedMesh.SetUVs(pair.Key.Index(),
-                          pair.Value.Query().
-                                     Select(v => (Vector2)v).
-                                     ToList());
-      }
-
+      _bakedMesh.SetUVsAuto(pair.Key.Index(), pair.Value);
       _material.EnableKeyword(LeapGuiMeshFeature.GetUvFeature(pair.Key));
     }
   }
