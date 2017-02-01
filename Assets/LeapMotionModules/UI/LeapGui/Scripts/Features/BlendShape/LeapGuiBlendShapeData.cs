@@ -13,6 +13,10 @@ public static class LeapGuiBlendShapeExtensions {
 
 public class LeapGuiBlendShapeData : LeapGuiElementData {
 
+  [Range(0, 1)]
+  [SerializeField]
+  private float _amount = 0;
+
   [SerializeField]
   private BlendShapeType _type = BlendShapeType.Scale;
 
@@ -28,6 +32,16 @@ public class LeapGuiBlendShapeData : LeapGuiElementData {
 
   [SerializeField]
   private Mesh _mesh;
+
+  public float amount {
+    get {
+      return _amount;
+    }
+    set {
+      feature.isDirty = true;
+      _amount = value;
+    }
+  }
 
   private Mesh _cachedBlendShape;
   public Mesh blendShape {
