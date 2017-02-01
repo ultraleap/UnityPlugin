@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
+  [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviour : InteractionBehaviourBase {
 
     public enum HoverType {
@@ -34,8 +35,12 @@ namespace Leap.Unity.UI.Interaction {
     /// <summary> The RigidbodyWarper manipulates the graphical (but not physical) position
     /// of grasped objects based on the movement of the Leap hand so they appear move with less latency. </summary>
     [HideInInspector]
-    public Leap.Unity.Interaction.RigidbodyWarper rigidbodyWarper;
+    public RigidbodyWarper rigidbodyWarper;
 
+    void Start() {
+      Rigidbody body = GetComponent<Rigidbody>();
+      rigidbodyWarper = new RigidbodyWarper(manager, this.transform, body, 0.25F);
+    }
 
     #region Hovering
 
@@ -47,49 +52,49 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public Action<Hand> OnHoverBeginEvent = (hand) => { };
-    public override void OnHoverBegin(Hand hand) {
-      OnHoverBeginEvent(hand);
+    public Action<Hand> OnHoverBegin = (hand) => { };
+    public override void HoverBegin(Hand hand) {
+      OnHoverBegin(hand);
     }
 
-    public Action<Hand> OnHoverStayEvent = (hand) => { };
-    public override void OnHoverStay(Hand hand) {
-      OnHoverStayEvent(hand);
+    public Action<Hand> OnHoverStay = (hand) => { };
+    public override void HoverStay(Hand hand) {
+      OnHoverStay(hand);
     }
 
-    public Action<Hand> OnHoverEndEvent = (hand) => { };
-    public override void OnHoverEnd(Hand hand) {
-      OnHoverEndEvent(hand);
+    public Action<Hand> OnHoverEnd = (hand) => { };
+    public override void HoverEnd(Hand hand) {
+      OnHoverEnd(hand);
     }
 
-    public Action<Hand> OnPrimaryHoverBeginEvent = (hand) => { };
-    public override void OnPrimaryHoverBegin(Hand hand) {
-      OnPrimaryHoverBeginEvent(hand);
+    public Action<Hand> OnPrimaryHoverBegin = (hand) => { };
+    public override void PrimaryHoverBegin(Hand hand) {
+      OnPrimaryHoverBegin(hand);
     }
 
-    public Action<Hand> OnPrimaryHoverStayEvent = (hand) => { };
-    public override void OnPrimaryHoverStay(Hand hand) {
-      OnPrimaryHoverStayEvent(hand);
+    public Action<Hand> OnPrimaryHoverStay = (hand) => { };
+    public override void PrimaryHoverStay(Hand hand) {
+      OnPrimaryHoverStay(hand);
     }
 
-    public Action<Hand> OnPrimaryHoverEndEvent = (hand) => { };
-    public override void OnPrimaryHoverEnd(Hand hand) {
-      OnPrimaryHoverEndEvent(hand);
+    public Action<Hand> OnPrimaryHoverEnd = (hand) => { };
+    public override void PrimaryHoverEnd(Hand hand) {
+      OnPrimaryHoverEnd(hand);
     }
 
     #endregion
 
     #region Contact
 
-    public override void OnContactBegin(Hand hand) {
+    public override void ContactBegin(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnContactStay(Hand hand) {
+    public override void ContactStay(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnContactEnd(Hand hand) {
+    public override void ContactEnd(Hand hand) {
       throw new System.NotImplementedException();
     }
 
@@ -97,23 +102,26 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Grasping
 
-    public override void OnGraspBegin(Hand hand) {
+    public Action<Hand> OnGraspBegin = (hand) => { };
+    public override void GraspBegin(Hand hand) {
+      OnGraspBegin(hand);
+    }
+
+    public Action<Hand> OnGraspHold = (hand) => { };
+    public override void GraspHold(Hand hand) {
+      OnGraspHold(hand);
+    }
+
+    public Action<Hand> OnGraspEnd = (hand) => { };
+    public override void GraspEnd(Hand hand) {
+      OnGraspEnd(hand);
+    }
+
+    public override void GraspSuspendObject(Hand hand) {
       throw new System.NotImplementedException();
     }
 
-    public override void OnGraspHold(Hand hand) {
-      throw new System.NotImplementedException();
-    }
-
-    public override void OnGraspRelease(Hand hand) {
-      throw new System.NotImplementedException();
-    }
-
-    public override void OnSuspend(Hand hand) {
-      throw new System.NotImplementedException();
-    }
-
-    public override void OnResume(Hand hand) {
+    public override void GraspResumeObject(Hand hand) {
       throw new System.NotImplementedException();
     }
 

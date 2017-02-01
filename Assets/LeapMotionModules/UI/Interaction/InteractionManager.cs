@@ -1,4 +1,5 @@
 ﻿using Leap.Unity.Attributes;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -34,6 +35,10 @@ namespace Leap.Unity.UI.Interaction {
     public LeapServiceProvider Provider { get; set; }
     private float _providerScale = 1F;
 
+    public Action OnGraphicalUpdate = () => { };
+    public Action OnPrePhysicalUpdate = () => { };
+    public Action OnPostPhysicalUpdate = () => { };
+
     /// <summary>
     /// Interaction objects further than this distance from a given hand will not be
     /// considered for any hover interactions with that hand.
@@ -66,9 +71,13 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     void FixedUpdate() {
+      OnPrePhysicalUpdate();
+
       foreach (var interactionHand in interactionHands) {
         interactionHand.FixedUpdateHand(enableHovering, enableContact, enableGrasping);
       }
+
+      OnPostPhysicalUpdate();
     }
 
     void Update() {
@@ -80,6 +89,10 @@ namespace Leap.Unity.UI.Interaction {
           interactionHand.TouchActivationRadius = WorldTouchActivationRadius;
         }
       }
+    }
+
+    void LateUpdate() {
+      OnGraphicalUpdate();
     }
 
     #region Accessors

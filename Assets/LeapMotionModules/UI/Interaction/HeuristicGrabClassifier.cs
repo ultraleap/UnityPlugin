@@ -123,7 +123,7 @@ namespace Leap.Unity.UI.Interaction {
       public GrabProbe[] probes = new GrabProbe[5];
       public Transform transform;
       public Rigidbody body;
-      public Leap.Unity.Interaction.RigidbodyWarper warper;
+      public RigidbodyWarper warper;
       public Matrix4x4 warpTrans;
       public int warmUp;
 

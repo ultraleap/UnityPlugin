@@ -20,12 +20,12 @@ public class SimpleScaleOnHover : MonoBehaviour {
   void Start() {
     _interaction = GetComponent<InteractionBehaviour>();
     if (_interaction != null) {
-      _interaction.OnPrimaryHoverBeginEvent += OnPrimaryHoverBegin;
-      _interaction.OnPrimaryHoverStayEvent  += OnPrimaryHoverStay;
-      _interaction.OnPrimaryHoverEndEvent   += OnPrimaryHoverEnd;
-      _interaction.OnHoverBeginEvent        += OnHoverBegin;
-      _interaction.OnHoverStayEvent         += OnHoverStay;
-      _interaction.OnHoverEndEvent          += OnHoverEnd;
+      _interaction.OnPrimaryHoverBegin += OnPrimaryHoverBegin;
+      _interaction.OnPrimaryHoverStay  += OnPrimaryHoverStay;
+      _interaction.OnPrimaryHoverEnd   += OnPrimaryHoverEnd;
+      _interaction.OnHoverBegin        += OnHoverBegin;
+      _interaction.OnHoverStay         += OnHoverStay;
+      _interaction.OnHoverEnd          += OnHoverEnd;
     }
     _baseScale = this.transform.localScale;
   }
@@ -72,16 +72,9 @@ public class SimpleScaleOnHover : MonoBehaviour {
       _targetScale = 1.3F;
     }
 
-    _closestHoverDistance = 10000F;
+    _closestHoverDistance = 10000F; // reset hover distance, recalculated in OnHoverStay
     _curScale = Mathf.Lerp(_curScale, _targetScale, 10F * Time.deltaTime);
     this.transform.localScale = _baseScale * _curScale;
-
-    if (_hoverCount < 0) {
-      Debug.LogError("Something's wrong with the hover logic!!! Hover count < 0");
-    }
-    if (_primaryHoverCount < 0) {
-      Debug.LogError("Something's wrong with the hover logic!!! Primary hover count < 0");
-    }
   }
 
 }

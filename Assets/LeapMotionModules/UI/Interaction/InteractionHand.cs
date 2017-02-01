@@ -8,7 +8,7 @@ namespace Leap.Unity.UI.Interaction {
   public class InteractionHand {
 
     private InteractionManager _interactionManager;
-    private Func<Hand>         _handAccessor;
+    private Func<Hand> _handAccessor;
     private Hand _hand;
 
     public InteractionHand(InteractionManager interactionManager,
@@ -31,6 +31,8 @@ namespace Leap.Unity.UI.Interaction {
       _hand = _handAccessor();
 
       if (doHovering) FixedUpdateHovering();
+      if (doContact || doGrasping) FixedUpdateTouch();
+      //if (doContact) FixedUpdateContact(); // Not yet implemented.
       if (doGrasping) FixedUpdateGrasping();
     }
 
@@ -98,8 +100,6 @@ namespace Leap.Unity.UI.Interaction {
       return curResults;
     }
 
-    // TODO: Delete unnecessary cache variable
-    //private List<InteractionBehaviourBase> _hoveredRemovalCache = new List<InteractionBehaviourBase>();
     private void ProcessHoverCheckResults(HoverCheckResults hoverResults) {
       foreach (var hoverable in _hoverActivityManager.ActiveBehaviours) {
         bool inLastFrame = false, inCurFrame = false;
@@ -111,43 +111,29 @@ namespace Leap.Unity.UI.Interaction {
         }
 
         if (inCurFrame && !inLastFrame) {
-          hoverable.OnHoverBegin(hoverResults.checkedHand);
+          hoverable.HoverBegin(hoverResults.checkedHand);
           _hoveredLastFrame.Add(hoverable);
         }
         if (inCurFrame && inLastFrame) {
-          hoverable.OnHoverStay(hoverResults.checkedHand);
+          hoverable.HoverStay(hoverResults.checkedHand);
         }
         if (!inCurFrame && inLastFrame) {
-          hoverable.OnHoverEnd(hoverResults.checkedHand);
+          hoverable.HoverEnd(hoverResults.checkedHand);
           _hoveredLastFrame.Remove(hoverable);
         }
       }
-
-      // Also need to make sure _hoveredLastFrame doesn't
-      // contain anything outside the hover candidate list.
-      // Wait, no you don't. The above does handle every case. TODO: Delete this after confirming it works.
-      //foreach (var lastFrameHoverable in _hoveredLastFrame) {
-      //  if (!_hoverActivityManager.ActiveBehaviours.Contains(lastFrameHoverable)) {
-      //    lastFrameHoverable.OnHoverEnd(hoverResults.checkedHand);
-      //    _hoveredRemovalCache.Add(lastFrameHoverable);
-      //  }
-      //}
-      //foreach (var hoverable in _hoveredRemovalCache) {
-      //  _hoveredLastFrame.Remove(hoverable);
-      //}
-      //_hoveredRemovalCache.Clear();
     }
 
     private void ProcessPrimaryHoverCheckResults(HoverCheckResults hoverResults) {
       if (hoverResults.primaryHovered == _primaryHoveredLastFrame) {
-        if (hoverResults.primaryHovered != null) hoverResults.primaryHovered.OnPrimaryHoverStay(hoverResults.checkedHand);
+        if (hoverResults.primaryHovered != null) hoverResults.primaryHovered.PrimaryHoverStay(hoverResults.checkedHand);
       }
       else {
         if (_primaryHoveredLastFrame != null) {
-          _primaryHoveredLastFrame.OnPrimaryHoverEnd(hoverResults.checkedHand);
+          _primaryHoveredLastFrame.PrimaryHoverEnd(hoverResults.checkedHand);
         }
         _primaryHoveredLastFrame = hoverResults.primaryHovered;
-        if (_primaryHoveredLastFrame != null) _primaryHoveredLastFrame.OnPrimaryHoverBegin(hoverResults.checkedHand);
+        if (_primaryHoveredLastFrame != null) _primaryHoveredLastFrame.PrimaryHoverBegin(hoverResults.checkedHand);
       }
     }
 
@@ -173,6 +159,10 @@ namespace Leap.Unity.UI.Interaction {
       _touchActivityManager = new ActivityManager(_interactionManager, touchActivationRadius);
     }
 
+    private void FixedUpdateTouch() {
+      _touchActivityManager.FixedUpdateHand(_hand);
+    }
+
     #endregion
 
     #region Grasp
@@ -188,17 +178,17 @@ namespace Leap.Unity.UI.Interaction {
       _grabClassifier.FixedUpdate();
 
       if (_graspedObject != null) {
-        _graspedObject.OnGraspHold(_hand);
+        _graspedObject.GraspHold(_hand);
       }
     }
 
     public void Grasp(InteractionBehaviourBase interactionObj) {
-      interactionObj.OnGraspBegin(_hand);
+      interactionObj.GraspBegin(_hand);
       _graspedObject = interactionObj;
     }
 
     public void ReleaseGrasp() {
-      _graspedObject.OnGraspRelease(_hand);
+      _graspedObject.GraspEnd(_hand);
       _graspedObject = null;
     }
 
