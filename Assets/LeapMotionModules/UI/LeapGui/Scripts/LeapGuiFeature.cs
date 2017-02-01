@@ -53,6 +53,7 @@ public abstract class LeapGuiFeatureBase : ScriptableObject {
     }
   }
 
+  //TODO: add logic in LeapGUI to use this method
   public virtual FeatureSupportInfo GetSupportInfo() {
     return FeatureSupportInfo.FullSupport();
   }
