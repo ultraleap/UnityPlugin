@@ -121,8 +121,17 @@ public class LeapGui : MonoBehaviour {
   }
 #endif
 
-  public bool GetAllFeaturesOfType<T>(List<T> features) where T : LeapGuiFeatureBase {
-    this.features.Query().OfType<T>().FillList(features);
+  public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
+    features.Clear();
+    for (int i = 0; i < this.features.Count; i++) {
+      var feature = this.features[i];
+      if (!(feature is T)) continue;
+
+      if (supportInfo[i].support != SupportType.Warning) {
+        features.Add(feature as T);
+      }
+    }
+
     return features.Count != 0;
   }
 
