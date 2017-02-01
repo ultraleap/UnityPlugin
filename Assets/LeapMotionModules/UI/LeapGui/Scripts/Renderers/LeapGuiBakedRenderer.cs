@@ -315,26 +315,14 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
         }
 
         foreach (var pair in uvs) {
-          mesh.GetUVs(GetUvChannelIndex(pair.Key), tempUvList);
-
-          if (tempUvList.Count != mesh.vertexCount) {
-            tempUvList.Fill(mesh.vertexCount, Vector4.zero);
-          }
+          mesh.GetUVsOrDefault(pair.Key.Index(), tempUvList);
 
           Rect[] atlasedUvs;
           if (_atlasedRects != null && _atlasedRects.TryGetValue(pair.Key, out atlasedUvs)) {
-            Rect elementRect = atlasedUvs[elementIndex];
-            var target = uvs[pair.Key];
-            for (int i = 0; i < tempUvList.Count; i++) {
-              var uv = tempUvList[i];
-              target.Add(new Vector4(elementRect.x + uv.x * elementRect.width,
-                                     elementRect.y + uv.y * elementRect.height,
-                                     uv.z,
-                                     uv.w));
-            }
-          } else {
-            uvs[pair.Key].AddRange(tempUvList);
+            MeshUtil.RemapUvs(tempUvList, atlasedUvs[elementIndex]);
           }
+
+          uvs[pair.Key].AddRange(tempUvList);
         }
       }
     }
@@ -342,14 +330,14 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     //Asign uvs to baked mesh
     foreach (var pair in uvs) {
       if (pair.Value.Query().Any(v => v.w != 0)) {
-        _bakedMesh.SetUVs(GetUvChannelIndex(pair.Key), pair.Value);
+        _bakedMesh.SetUVs(pair.Key.Index(), pair.Value);
       } else if (pair.Value.Query().Any(v => v.z != 0)) {
-        _bakedMesh.SetUVs(GetUvChannelIndex(pair.Key),
+        _bakedMesh.SetUVs(pair.Key.Index(),
                           pair.Value.Query().
                                      Select(v => (Vector3)v).
                                      ToList());
       } else {
-        _bakedMesh.SetUVs(GetUvChannelIndex(pair.Key),
+        _bakedMesh.SetUVs(pair.Key.Index(),
                           pair.Value.Query().
                                      Select(v => (Vector2)v).
                                      ToList());
@@ -429,29 +417,6 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     None,
     Translation,
     Full
-  }
-
-  private IEnumerable<UVChannelFlags> allUvChannels {
-    get {
-      yield return UVChannelFlags.UV0;
-      yield return UVChannelFlags.UV1;
-      yield return UVChannelFlags.UV2;
-      yield return UVChannelFlags.UV3;
-    }
-  }
-
-  private int GetUvChannelIndex(UVChannelFlags channel) {
-    switch (channel) {
-      case UVChannelFlags.UV0:
-        return 0;
-      case UVChannelFlags.UV1:
-        return 1;
-      case UVChannelFlags.UV2:
-        return 2;
-      case UVChannelFlags.UV3:
-        return 3;
-    }
-    return -1;
   }
 
   private Dictionary<Mesh, CachedTopology> _topologyCache = new Dictionary<Mesh, CachedTopology>();
