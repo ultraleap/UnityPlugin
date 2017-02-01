@@ -10,7 +10,7 @@ public class LeapGuiBlendShapeData : LeapGuiElementData {
 
   [MinValue(0)]
   [SerializeField]
-  private float _scaleAmount = 1.1f;
+  private float _scale = 1.1f;
 
   [SerializeField]
   private Vector3 _translation = new Vector3(0, 0, 0.1f);

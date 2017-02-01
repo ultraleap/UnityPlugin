@@ -63,7 +63,28 @@ namespace Leap.Unity {
       }
 
       SerializedProperty conditionalProp = serializedObject.FindProperty(conditionalName);
-      specifyConditionalDrawing(() => conditionalProp.boolValue, dependantProperties);
+      specifyConditionalDrawing(() => {
+        if (conditionalProp.hasMultipleDifferentValues) {
+          return false;
+        } else {
+          return conditionalProp.boolValue;
+        }
+      }, dependantProperties);
+    }
+
+    protected void specifyConditionalDrawing(string enumName, int enumValue, params string[] dependantProperties) {
+      if (!validateProperty(enumName)) {
+        return;
+      }
+
+      SerializedProperty enumProp = serializedObject.FindProperty(enumName);
+      specifyConditionalDrawing(() => {
+        if (enumProp.hasMultipleDifferentValues) {
+          return false;
+        } else {
+          return enumProp.intValue == enumValue;
+        }
+      }, dependantProperties);
     }
 
     protected void specifyConditionalDrawing(Func<bool> conditional, params string[] dependantProperties) {
