@@ -21,7 +21,7 @@ namespace Leap.Unity.UI.Interaction {
     public HeuristicGrabClassifier(InteractionManager.InteractionHand interactionHand) {
       this.interactionHand = interactionHand;
 
-      for (int i = 0; i < 5; i++) {
+      for(int i = 0; i < 5; i++) {
         _collidingCandidates[i] = new Collider[10];
       }
     }
@@ -130,7 +130,6 @@ namespace Leap.Unity.UI.Interaction {
         classifier.warmUp = 0;
       }
     }
-
     void UpdateContactingColliders() {
       for (int i = 0; i < _hand.Fingers.Count; i++) {
         Array.Clear(_collidingCandidates[i], 0, _collidingCandidates[i].Length);
