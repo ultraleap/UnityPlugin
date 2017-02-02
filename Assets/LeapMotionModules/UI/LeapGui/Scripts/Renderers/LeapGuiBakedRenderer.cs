@@ -17,6 +17,9 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   private Shader _shader;
 
   [SerializeField]
+  private LayerMask _layer;
+
+  [SerializeField]
   private MotionType _motionType = MotionType.Translation;
 
   [MinValue(0)]
@@ -29,15 +32,6 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
   [HideInInspector, SerializeField]
   private Material _material;
-
-  [HideInInspector, SerializeField]
-  private GameObject _displayObject;
-
-  [HideInInspector, SerializeField]
-  private MeshFilter _filter;
-
-  [HideInInspector, SerializeField]
-  private MeshRenderer _renderer;
 
   //Feature lists
   private List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
@@ -112,6 +106,8 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
         _material.SetFloatArray(BLEND_SHAPE, _blendShapeAmounts);
       }
     }
+
+    Graphics.DrawMesh(_bakedMesh, gui.transform.localToWorldMatrix, _material, 0);
   }
 
   public override void OnEnableRendererEditor() {
@@ -119,15 +115,11 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   }
 
   public override void OnDisableRendererEditor() {
-    DestroyImmediate(_displayObject);
     DestroyImmediate(_bakedMesh);
     DestroyImmediate(_material);
 
     _bakedMesh = null;
     _material = null;
-    _displayObject = null;
-    _filter = null;
-    _renderer = null;
   }
 
   public override void OnUpdateRendererEditor() {
@@ -185,17 +177,6 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   }
 
   private void ensureObjectsAreValid() {
-    if (_displayObject == null) {
-      _displayObject = new GameObject("Baked Gui Mesh");
-      _displayObject.transform.SetParent(gui.transform);
-      _displayObject.transform.SetSiblingIndex(0);
-    }
-
-    _displayObject.transform.SetParent(gui.transform);
-    _displayObject.transform.localPosition = Vector3.zero;
-    _displayObject.transform.localRotation = Quaternion.identity;
-    _displayObject.transform.localScale = Vector3.one;
-
     if (_bakedMesh == null) {
       _bakedMesh = new Mesh();
       _bakedMesh.name = "Baked Gui Mesh";
@@ -211,18 +192,6 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
     _material = new Material(_shader);
     _material.name = "Baked Gui Material";
-
-    if (_filter == null) {
-      _filter = _displayObject.AddComponent<MeshFilter>();
-    }
-
-    _filter.mesh = _bakedMesh;
-
-    if (_renderer == null) {
-      _renderer = _displayObject.AddComponent<MeshRenderer>();
-    }
-
-    _renderer.sharedMaterial = _material;
   }
 
   private List<Vector3> _tempVertList = new List<Vector3>();
