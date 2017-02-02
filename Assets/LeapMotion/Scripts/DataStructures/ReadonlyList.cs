@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity {
 
   public struct ReadonlyList<T> {
     private readonly List<T> _list;
