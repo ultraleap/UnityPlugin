@@ -11,7 +11,7 @@ public class LeapGuiElement : MonoBehaviour {
   [HideInInspector]
   public int elementId;
 
-  [HideInInspector]
+  //[HideInInspector]
   public AnchorOfConstantSize anchor;
 
   [HideInInspector]

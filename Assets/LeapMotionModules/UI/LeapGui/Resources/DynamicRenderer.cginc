@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
 #include "Assets/LeapMotionModules/UI/LeapGui/Resources/LeapGui.cginc"
 
 /***********************************
@@ -8,15 +10,23 @@
  *    cylindrical space
  ***********************************/
 
+float4x4 _LeapGui_WorldToGui;
+float4x4 _LeapGui_GuiToWorld;
+
 #ifdef LEAP_GUI_CYLINDRICAL
 #define LEAP_GUI_WARPING
 #include "Assets/LeapMotionModules/UI/LeapGui/Resources/CylindricalSpace.cginc"
 
-float _LeapGuiCylindrical_ElementRadius[ELEMENT_MAX];
+float4x4 _LeapGuiCylindrical_WorldToAnchor[ELEMENT_MAX];
+float4 _LeapGuiCylindrical_ElementParameters[ELEMENT_MAX];
 
 void ApplyGuiWarping(inout float4 vert, int elementId) {
-  float raius = _LeapGuiCylindrical_ElementRadius[elementId];
-  Cylindrical_ApplyCurvature(vert.xyz, raius);
+  vert = mul(_LeapGuiCylindrical_WorldToAnchor[elementId], vert);
+
+  float4 parameters = _LeapGuiCylindrical_ElementParameters[elementId];
+  Cylindrical_LocalToWorld(vert.xyz, parameters);
+
+  //vert = mul(_LeapGuiCylindrical_AnchorToWorld[elementId], vert);
 }
 #endif
 
@@ -136,12 +146,16 @@ v2f_gui_dynamic ApplyDynamicGui(appdata_gui_dynamic v) {
   ApplyBlendShapes(v.vertex, v.vertInfo, elementId);
 #endif
 
-#ifdef LEAP_GUI_WARPING
-  ApplyGuiWarping(v.vertex, elementId);
-#endif
-
   v2f_gui_dynamic o;
-  o.vertex = UnityObjectToClipPos(v.vertex);
+
+#ifdef LEAP_GUI_WARPING
+  v.vertex = mul(unity_ObjectToWorld, v.vertex);
+  //v.vertex = mul(_LeapGuiCylindrical_WorldToAnchor[elementId], v.vertex);
+  ApplyGuiWarping(v.vertex, elementId);
+  o.vertex = mul(UNITY_MATRIX_VP, v.vertex);
+#else
+  o.vertex = UnityObjectToClipPos (v.vertex);
+#endif
 
 #ifdef LEAP_GUI_VERTEX_UV_0
   o.uv0 = v.uv0;

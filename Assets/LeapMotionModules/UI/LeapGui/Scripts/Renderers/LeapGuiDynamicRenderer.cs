@@ -14,9 +14,6 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   ISupportsFeature<LeapGuiMeshFeature> {
 
   [SerializeField]
-  private MotionType _motionType = MotionType.Translation;
-
-  [SerializeField]
   private Shader _shader;
 
   [MinValue(0)]
@@ -34,6 +31,12 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   //Textures
   private Dictionary<UVChannelFlags, Rect[]> _atlasedRects;
 
+  //Cylindrical space
+  private const string CYLINDRICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementParameters";
+  private List<Matrix4x4> _cylindrical_worldToAnchor = new List<Matrix4x4>();
+  private List<Matrix4x4> _cylindrical_meshTransforms = new List<Matrix4x4>();
+  private List<Vector4> _cylindrical_elementParameters = new List<Vector4>();
+
   public void GetSupportInfo(List<LeapGuiMeshFeature> features, List<FeatureSupportInfo> info) { }
 
 
@@ -45,9 +48,22 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
     throw new NotImplementedException();
   }
 
+  public float scale;
   public override void OnUpdateRenderer() {
     if (gui.space is LeapGuiCylindricalSpace) {
       var cylindricalSpace = gui.space as LeapGuiCylindricalSpace;
+
+      if (_cylindrical_worldToAnchor.Count != gui.elements.Count) {
+        _cylindrical_worldToAnchor.Fill(gui.elements.Count, Matrix4x4.identity);
+      }
+
+      if (_cylindrical_elementParameters.Count != gui.elements.Count) {
+        _cylindrical_elementParameters.Fill(gui.elements.Count, Vector4.zero);
+      }
+
+      if (_cylindrical_meshTransforms.Count != gui.elements.Count) {
+        _cylindrical_meshTransforms.Fill(gui.elements.Count, Matrix4x4.identity);
+      }
 
       for (int i = 0; i < _elementMeshes.Count; i++) {
         var element = gui.elements[i];
@@ -56,7 +72,21 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
         Quaternion rot = Quaternion.Euler(0, parameters.angleOffset * Mathf.Rad2Deg, 0);
 
-        Graphics.DrawMesh(_elementMeshes[i], pos, rot, _material, 0);
+        Matrix4x4 guiTransform = Matrix4x4.TRS(pos, rot, Vector3.one);
+        Matrix4x4 totalTransform = guiTransform * Matrix4x4.TRS(-element.transform.position, Quaternion.identity, Vector3.one) * element.transform.localToWorldMatrix;
+        Matrix4x4 invTransform = guiTransform.inverse;
+
+        _cylindrical_elementParameters[i] = parameters;
+        _cylindrical_meshTransforms[i] = totalTransform;
+        _cylindrical_worldToAnchor[i] = invTransform;
+      }
+
+      _material.SetFloat(LeapGuiCylindricalSpace.RADIUS_PROPERTY, cylindricalSpace.radius);
+      _material.SetMatrixArray("_LeapGuiCylindrical_WorldToAnchor", _cylindrical_worldToAnchor);
+      _material.SetVectorArray("_LeapGuiCylindrical_ElementParameters", _cylindrical_elementParameters);
+
+      for (int i = 0; i < _elementMeshes.Count; i++) {
+        Graphics.DrawMesh(_elementMeshes[i], _cylindrical_meshTransforms[i], _material, 0);
       }
     }
   }
@@ -70,6 +100,8 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   }
 
   public override void OnUpdateRendererEditor() {
+    MeshCache.Clear();
+
     ensureObjectsAreValid();
 
     if (gui.GetSupportedFeatures(_meshFeatures)) {
@@ -80,12 +112,20 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       Profiler.BeginSample("Bake Colors");
       bakeColors();
       Profiler.EndSample();
+
+      Profiler.BeginSample("Bake Uv3");
+      bakeUv3();
+      Profiler.EndSample();
     }
 
     if (gui.GetSupportedFeatures(_textureFeatures)) {
       Profiler.BeginSample("Atlas Textures");
       atlasTextures();
       Profiler.EndSample();
+    }
+
+    if (gui.space is LeapGuiCylindricalSpace) {
+      _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);
     }
 
     OnUpdateRenderer();
@@ -126,9 +166,6 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   private List<int> _tempTriList = new List<int>();
   private void bakeVerts() {
     for (int i = 0; i < gui.elements.Count; i++) {
-      _tempVertList.Clear();
-      _tempTriList.Clear();
-
       foreach (var meshFeature in _meshFeatures) {
         var elementData = meshFeature.data[i];
         var mesh = elementData.mesh;
@@ -144,17 +181,10 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
         _tempVertList.AddRange(topology.verts);
       }
 
-      int min = int.MaxValue, max = int.MinValue;
-      foreach (var index in _tempTriList) {
-        min = Mathf.Min(index, min);
-        max = Mathf.Max(index, max);
-      }
-      Debug.Log(":::: " + min + " : " + max);
-
       _elementMeshes[i].SetVertices(_tempVertList);
       _elementMeshes[i].SetTriangles(_tempTriList, 0);
-
-      Debug.Log(_elementMeshes[i].vertexCount);
+      _tempVertList.Clear();
+      _tempTriList.Clear();
     }
   }
 
@@ -166,8 +196,6 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
     }
 
     for (int i = 0; i < gui.elements.Count; i++) {
-      _tempColorList.Clear();
-
       foreach (var meshFeature in _meshFeatures) {
         var elementData = meshFeature.data[i];
         var mesh = elementData.mesh;
@@ -184,9 +212,28 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       }
 
       _elementMeshes[i].SetColors(_tempColorList);
+      _tempColorList.Clear();
     }
 
     _material.EnableKeyword(LeapGuiMeshFeature.COLORS_FEATURE);
+  }
+
+  List<Vector4> _tempUv3List = new List<Vector4>();
+  private void bakeUv3() {
+    for (int i = 0; i < gui.elements.Count; i++) {
+      var element = gui.elements[i];
+
+      foreach (var meshFeature in _meshFeatures) {
+        var elementData = meshFeature.data[i];
+        var mesh = elementData.mesh;
+        if (mesh == null) continue;
+
+        _tempUv3List.Append(mesh.vertexCount, new Vector4(0, 0, 0, i));
+      }
+
+      _elementMeshes[i].SetUVs(3, _tempUv3List);
+      _tempUv3List.Clear();
+    }
   }
 
   private void atlasTextures() {
@@ -199,13 +246,6 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       _material.SetTexture(_textureFeatures[i].propertyName, atlasTextures[i]);
     }
   }
-
-  public enum MotionType {
-    Translation,
-    Full
-  }
-
-
 
 
 }
