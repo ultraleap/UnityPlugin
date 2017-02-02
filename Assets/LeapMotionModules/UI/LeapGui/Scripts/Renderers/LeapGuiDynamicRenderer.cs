@@ -16,7 +16,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   [SerializeField]
   private Shader _shader;
 
-  [MinValue(0)]2
+  [MinValue(0)]
   [SerializeField]
   private int _borderAmount;
 
