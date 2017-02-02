@@ -11,17 +11,18 @@ namespace Leap.Unity.UI.Interaction {
 
   public class HeuristicGrabClassifier {
 
-    public InteractionHand interactionHand;
+    public InteractionManager.InteractionHand interactionHand;
 
     private Hand _hand;
     private Collider[] _collidingCandidates = new Collider[10];
 
     Dictionary<InteractionBehaviourBase, GrabClassifier> classifiers = new Dictionary<InteractionBehaviourBase, GrabClassifier>();
 
-    public HeuristicGrabClassifier(InteractionHand interactionHand) {
+    public HeuristicGrabClassifier(InteractionManager.InteractionHand interactionHand) {
       this.interactionHand = interactionHand;
     }
 
+    List<InteractionBehaviourBase> _keyRemovalCache = new List<InteractionBehaviourBase>();
     public void FixedUpdate() {
       _hand = interactionHand.GetHand();
 
@@ -37,6 +38,17 @@ namespace Leap.Unity.UI.Interaction {
           var graspCandidates = interactionHand.GetGraspCandidates();
           foreach (var graspCandidate in graspCandidates) {
             UpdateBehaviour(graspCandidate);
+          }
+
+          // Clear classifiers on non-grasp-candidates.
+          _keyRemovalCache.Clear();
+          foreach (var objClassifierPair in classifiers) {
+            if (!graspCandidates.Contains(objClassifierPair.Key)) {
+              _keyRemovalCache.Add(objClassifierPair.Key);
+            }
+          }
+          foreach (var obj in _keyRemovalCache) {
+            classifiers.Remove(obj);
           }
         }
       }
@@ -106,7 +118,7 @@ namespace Leap.Unity.UI.Interaction {
 
       if (classifier.isGrabbing != classifier.prevGrabbing) {
         if (classifier.isGrabbing) {
-          if (!behaviour.allowsTwoHandedGrab) { interactionHand.ReleaseObject(behaviour); }
+          if (!behaviour.allowsTwoHandedGrasp) { interactionHand.ReleaseObject(behaviour); }
           interactionHand.Grasp(behaviour);
         }
         else if (!classifier.isGrabbing || interactionHand.IsGrasping(behaviour)) {
@@ -114,6 +126,13 @@ namespace Leap.Unity.UI.Interaction {
         }
       }
       classifier.prevGrabbing = classifier.isGrabbing;
+    }
+
+    public void NotifyGraspReleased(InteractionBehaviourBase interactionObj) {
+      GrabClassifier classifier;
+      if (classifiers.TryGetValue(interactionObj, out classifier)) {
+        classifier.isGrabbing = false;
+      }
     }
 
     //Per-Object Per-Hand Classifier

@@ -212,11 +212,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -506,11 +503,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -553,46 +547,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d48c72b1db29e644ca8429be1a1b2a8d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &92546220
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 92546221}
-  - component: {fileID: 92546222}
-  m_Layer: 0
-  m_Name: Attention Position Gizmo
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &92546221
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 92546220}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.852437, y: -3.4606905, z: 20.268305}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 8
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &92546222
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 92546220}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a3724268679c4b41821e2e476443f4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1001 &99090516
@@ -708,11 +662,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -1055,11 +1006,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -1313,11 +1261,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -1728,11 +1673,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -2024,11 +1966,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -2227,11 +2166,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -2615,11 +2551,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -3203,11 +3136,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -3535,11 +3465,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -3846,11 +3773,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -4073,11 +3997,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -4689,11 +4610,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -5835,11 +5753,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -5997,11 +5912,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -6143,11 +6055,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -6480,11 +6389,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -6646,11 +6552,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -6849,11 +6752,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -7183,11 +7083,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -7648,11 +7545,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -7983,11 +7877,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
@@ -8227,11 +8118,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  manager: {fileID: 706613724}
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  allowsTwoHandedGrab: 0
+  interactionManager: {fileID: 706613724}
+  allowsTwoHandedGrasp: 0
   hoverType: 0
   touchType: 0
   grabType: 0
