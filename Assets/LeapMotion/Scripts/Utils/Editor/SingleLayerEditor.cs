@@ -3,7 +3,7 @@ using UnityEditor;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity {
 
   [CustomPropertyDrawer(typeof(SingleLayer))]
   public class SingleLayerEditor : PropertyDrawer {

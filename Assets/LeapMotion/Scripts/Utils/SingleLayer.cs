@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity {
 
   [Serializable]
   public struct SingleLayer {
