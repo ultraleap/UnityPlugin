@@ -202,7 +202,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     }
 
     if (_shader == null) {
-      _shader = Shader.Find("Unlit/LeapGuiShader");
+      _shader = Shader.Find("LeapGui/Defaults/Baked");
     }
 
     if (_material != null) {

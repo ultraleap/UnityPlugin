@@ -34,8 +34,6 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   //Textures
   private Dictionary<UVChannelFlags, Rect[]> _atlasedRects;
 
-
-
   public void GetSupportInfo(List<LeapGuiMeshFeature> features, List<FeatureSupportInfo> info) { }
 
 
@@ -48,7 +46,19 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   }
 
   public override void OnUpdateRenderer() {
-    throw new NotImplementedException();
+    if (gui.space is LeapGuiCylindricalSpace) {
+      var cylindricalSpace = gui.space as LeapGuiCylindricalSpace;
+
+      for (int i = 0; i < _elementMeshes.Count; i++) {
+        var element = gui.elements[i];
+        var parameters = cylindricalSpace.GetElementParameters(element.anchor, element.transform.position);
+        var pos = cylindricalSpace.TransformPoint(element, gui.transform.InverseTransformPoint(element.transform.position));
+
+        Quaternion rot = Quaternion.Euler(0, parameters.angleOffset * Mathf.Rad2Deg, 0);
+
+        Graphics.DrawMesh(_elementMeshes[i], pos, rot, _material, 0);
+      }
+    }
   }
 
   public override void OnEnableRendererEditor() {
@@ -60,6 +70,28 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   }
 
   public override void OnUpdateRendererEditor() {
+    ensureObjectsAreValid();
+
+    if (gui.GetSupportedFeatures(_meshFeatures)) {
+      Profiler.BeginSample("Bake Verts");
+      bakeVerts();
+      Profiler.EndSample();
+
+      Profiler.BeginSample("Bake Colors");
+      bakeColors();
+      Profiler.EndSample();
+    }
+
+    if (gui.GetSupportedFeatures(_textureFeatures)) {
+      Profiler.BeginSample("Atlas Textures");
+      atlasTextures();
+      Profiler.EndSample();
+    }
+
+    OnUpdateRenderer();
+  }
+
+  private void ensureObjectsAreValid() {
     //Destroy meshes that will no longer be used
     while (_elementMeshes.Count > gui.elements.Count) {
       DestroyImmediate(_elementMeshes.RemoveLast());
@@ -78,21 +110,16 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       _elementMeshes.Add(elementMesh);
     }
 
-    if (gui.GetSupportedFeatures(_meshFeatures)) {
-      Profiler.BeginSample("Bake Verts");
-      bakeVerts();
-      Profiler.EndSample();
-
-      Profiler.BeginSample("Bake Colors");
-      bakeColors();
-      Profiler.EndSample();
+    if (_shader == null) {
+      _shader = Shader.Find("LeapGui/Defaults/Dynamic");
     }
 
-    if (gui.GetSupportedFeatures(_textureFeatures)) {
-      Profiler.BeginSample("Atlas Textures");
-      atlasTextures();
-      Profiler.EndSample();
+    if (_material != null) {
+      DestroyImmediate(_material);
     }
+
+    _material = new Material(_shader);
+    _material.name = "Dynamic Gui Material";
   }
 
   private List<Vector3> _tempVertList = new List<Vector3>();
