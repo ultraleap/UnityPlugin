@@ -31,49 +31,74 @@ namespace Leap.Unity.UI.Interaction {
     public Action<Hand> OnPrimaryHoverStay  = (hand) => { };
     public Action<Hand> OnPrimaryHoverEnd   = (hand) => { };
 
-    public enum HoverType {
-      Proximity
+    /// <summary>
+    /// When the object is grasped, what should it do? FollowHand utilizes a Kabsch
+    /// solve algorithm to move the object with the hand. Or, choose DoNothing and
+    /// use the grasp events to specify your own behavior.
+    /// </summary>
+    public enum GraspedHoldBehavior {
+      FollowHand,
+      DoNothing
     }
+    [Tooltip("When the object is grasped, what should it do? FollowHand utilizes a Kabsch "
+           + "solve algorithm to move the object with the hand. Or, choose DoNothing and "
+           + "use the grasp events to specify your own behavior.")]
+    public GraspedHoldBehavior graspedHoldBehavior;
 
-    public enum ContactType {
-      SoftContact,
-      CallbacksOnly
+    /// <summary>
+    /// When the object is moved by the FollowHand behavior, how should it move to its
+    /// new position? Nonkinematic bodies will collide with other Rigidbodies, so they
+    /// might not reach the target position. Kinematic rigidbodies will always move to the
+    /// target position, ignoring collisions. Inherit will simply use the isKinematic
+    /// state of the Rigidbody from before it was grasped.
+    /// </summary>
+    public enum GraspedHoldMovementType {
+      Inherit,
+      Kinematic,
+      Nonkinematic
     }
-
-    public enum GrabType {
-      GrabOrPinch,
-      GrabOnly,
-      PinchOnly
-    }
-
-    public HoverType hoverType;
-    public ContactType touchType;
-    public GrabType grabType;
+    [DisableIf("graspedHoldBehavior", isEqualTo: GraspedHoldBehavior.DoNothing)]
+    [Tooltip("When the object is moved by the FollowHand behavior, how should it move to its"
+      + "new position? Nonkinematic bodies will collide with other Rigidbodies, so they "
+      + "might not reach the target position. Kinematic rigidbodies will always move to the "
+      + "target position, ignoring collisions. Inherit will simply use the isKinematic "
+      + "state of the Rigidbody from before it was grasped.")]
+    public GraspedHoldMovementType graspedHoldMovementType;
 
     /// <summary> The RigidbodyWarper manipulates the graphical (but not physical) position
     /// of grasped objects based on the movement of the Leap hand so they appear move with less latency. </summary>
     [HideInInspector]
     public RigidbodyWarper rigidbodyWarper;
 
+    [Header("Advanced Settings")]
+    [Tooltip("")]
+    public bool GraspHoldWarpingEnabled = true;
+
+    private Rigidbody _body;
+
     void Start() {
       interactionManager.RegisterInteractionBehaviour(this);
 
-      Rigidbody body = GetComponent<Rigidbody>();
-      rigidbodyWarper = new RigidbodyWarper(interactionManager, this.transform, body, 0.25F);
+      _body = GetComponent<Rigidbody>();
+      rigidbodyWarper = new RigidbodyWarper(interactionManager, this.transform, _body, 0.25F);
+
+      InitGrasping();
     }
 
-    /// <summary> InteractionManager manually calls this directly
+    /// <summary>
+    /// InteractionManager manually calls this directly
     /// after all InteractionHands are updated (in FixedUpdate).
     /// 
     /// These methods fire per-object interaction events, e.g., OnObjectHoverStay,
     /// in contrast to methods like OnHoverStay, which fire per-hand.
     /// Events like OnObjectHoverStay only fire once per FixedUpdate, no matter
-    /// how many hands are hovering over the object. </summary>
+    /// how many hands are hovering over the object.
+    /// </summary>
     public override void FixedUpdateObject() {
       // Fire per-object interaction events
       // (As opposed to per-hand interaction events, which are handled by InteractionHand).
       FixedUpdateObjectHovering();
-      //FixedUpdateObjectContact(); // Contact not yet implemented.
+      //FixedUpdateObjectContact();  // Contact not yet implemented.
       //FixedUpdateObjectGrasping(); // Not yet necessary (two-handed grabbing NYI).
     }
 
@@ -111,11 +136,8 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public override float GetHoverScore(Hand hand) {
-      switch (hoverType) {
-        case HoverType.Proximity: default:
-          // TODO: Need to get distance from THE COLLIDER. Need to do some good logic based on checking for Rigidbodies and Colliders.
-          return Vector3.Distance(this.transform.position, hand.PalmPosition.ToVector3()).Map(0F, 0.5F, 10F, 0F);
-      }
+      // TODO: Need to get distance from the InteractionBehaviour's colliders. Probably has to wait until 5.6 (Physics.ClosestPoint)
+      return Vector3.Distance(this.transform.position, hand.PalmPosition.ToVector3()).Map(0F, interactionManager.WorldHoverActivationRadius, 10F, 0F);
     }
 
     public override void HoverBegin(Hand hand) {
@@ -187,6 +209,22 @@ namespace Leap.Unity.UI.Interaction {
 
     private int _graspCount = 0;
 
+    private IGraspedHoldBehaviour     _graspedHoldBehaviour;
+    private IGraspedHoldBehaviour GraspedHoldBehaviour {
+      get {
+        if (_graspedHoldBehaviour == null) {
+          _graspedHoldBehaviour = new KabschHoldBehaviour();
+        }
+        return _graspedHoldBehaviour;
+      }
+    }
+    private IGraspedMovementBehaviour _graspedMovementBehaviour;
+
+    private void InitGrasping() {
+      _graspedHoldBehaviour = new KabschHoldBehaviour();
+      //_graspedMovementBehaviour = new 
+    }
+
     public override bool IsGrasped {
       get { return _graspCount > 0; }
     }
@@ -202,10 +240,21 @@ namespace Leap.Unity.UI.Interaction {
         Debug.LogWarning("Two-handed grasping is not yet supported!");
       }
 
+      SnapToHand(hand);
+
       OnGraspBegin(hand);
     }
 
+    // Not yet implemented.
+    private void SnapToHand(Hand hand) {
+      // TODO: When you grasp an object, snap the object into a good holding position.
+    }
+
     public override void GraspHold(Hand hand) {
+      if (graspedHoldBehavior == GraspedHoldBehavior.FollowHand) {
+        //KabschFollow(hand);
+      }
+
       OnGraspHold(hand);
     }
 

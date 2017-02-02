@@ -43,13 +43,13 @@ namespace Leap.Unity.UI.Interaction {
     /// Interaction objects further than this distance from a given hand will not be
     /// considered for any hover interactions with that hand.
     /// </summary>
-    private float WorldHoverActivationRadius { get { return hoverActivationRadius * _providerScale; } }
+    public float WorldHoverActivationRadius { get { return hoverActivationRadius * _providerScale; } }
 
     /// <summary>
     /// Interaction objects further than this distance from a given hand will not be
     /// considered for any contact or grasping interactions with that hand.
     /// </summary>
-    private float WorldTouchActivationRadius { get { return touchActivationRadius * _providerScale; } }
+    public float WorldTouchActivationRadius { get { return touchActivationRadius * _providerScale; } }
 
     private InteractionHand[] _interactionHands = new InteractionHand[2];
     private HashSet<InteractionBehaviourBase> _interactionBehaviours = new HashSet<InteractionBehaviourBase>();

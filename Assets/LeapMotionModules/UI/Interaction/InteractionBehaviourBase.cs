@@ -12,7 +12,22 @@ namespace Leap.Unity.UI.Interaction {
     [Header("Interaction Settings -- currently ignored!")]
     public bool allowsTwoHandedGrasp = false;
 
+    /// <summary>
+    /// Called by the InteractionManager every FixedUpdate,
+    /// after InteracitonHands have FixedUpdated. InteractionBehaviour uses this
+    /// to fire per-object interaction events.
+    /// </summary>
     public abstract void FixedUpdateObject();
+
+    /// <summary>
+    /// Gets or sets whether this interaction object is currently
+    /// eligible to be hovered, touched, or held. Setting to false will prevent
+    /// new interactions from beginning for this object, and if any interactions
+    /// are currently in-progress, the interactions will end (and the object will
+    /// receive, e.g. OnHoverEnd, OnGraspEnd events).
+    /// </summary>
+    /// // TODO: Implement by checking it in InteractionHand
+    public bool IsInteractionEligible { get; set; }
 
     #region Hovering
 
