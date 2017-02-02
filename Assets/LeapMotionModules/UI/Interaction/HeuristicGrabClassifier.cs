@@ -11,14 +11,14 @@ namespace Leap.Unity.UI.Interaction {
 
   public class HeuristicGrabClassifier {
 
-    public InteractionHand interactionHand;
+    public InteractionManager.InteractionHand interactionHand;
 
     private Hand _hand;
     private Collider[][] _collidingCandidates = new Collider[5][];
 
     Dictionary<InteractionBehaviourBase, GrabClassifier> classifiers = new Dictionary<InteractionBehaviourBase, GrabClassifier>();
 
-    public HeuristicGrabClassifier(InteractionHand interactionHand) {
+    public HeuristicGrabClassifier(InteractionManager.InteractionHand interactionHand) {
       this.interactionHand = interactionHand;
 
       for(int i = 0; i < 5; i++) {
@@ -26,11 +26,12 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
+    List<InteractionBehaviourBase> _keyRemovalCache = new List<InteractionBehaviourBase>();
     public void FixedUpdate() {
       _hand = interactionHand.GetHand();
 
       if (_hand != null) {
-        updateContactingColliders();
+        UpdateContactingColliders();
 
         //First check if already holding an object and only process that one
         var graspedObject = interactionHand.GetGraspedObject();
@@ -42,6 +43,17 @@ namespace Leap.Unity.UI.Interaction {
           var graspCandidates = interactionHand.GetGraspCandidates();
           foreach (var graspCandidate in graspCandidates) {
             UpdateBehaviour(graspCandidate);
+          }
+
+          // Clear classifiers on non-grasp-candidates.
+          _keyRemovalCache.Clear();
+          foreach (var objClassifierPair in classifiers) {
+            if (!graspCandidates.Contains(objClassifierPair.Key)) {
+              _keyRemovalCache.Add(objClassifierPair.Key);
+            }
+          }
+          foreach (var obj in _keyRemovalCache) {
+            classifiers.Remove(obj);
           }
         }
       }
@@ -59,9 +71,10 @@ namespace Leap.Unity.UI.Interaction {
 
       if (classifier.isGrabbing != classifier.prevGrabbing) {
         if (classifier.isGrabbing) {
-          if (!behaviour.allowsTwoHandedGrab) { interactionHand.ReleaseObject(behaviour); }
+          if (!behaviour.allowsTwoHandedGrasp) { interactionHand.ReleaseObject(behaviour); }
           interactionHand.Grasp(behaviour);
-        } else if (!classifier.isGrabbing || interactionHand.IsGrasping(behaviour)) {
+        }
+        else if (!classifier.isGrabbing || interactionHand.IsGrasping(behaviour)) {
           interactionHand.ReleaseGrasp();
         }
       }
@@ -117,11 +130,17 @@ namespace Leap.Unity.UI.Interaction {
         classifier.warmUp = 0;
       }
     }
-
-    void updateContactingColliders() {
+    void UpdateContactingColliders() {
       for (int i = 0; i < _hand.Fingers.Count; i++) {
         Array.Clear(_collidingCandidates[i], 0, _collidingCandidates[i].Length);
         Physics.OverlapSphereNonAlloc(_hand.Fingers[i].TipPosition.ToVector3(), i == 0 ? 0.015f : 0.01f, _collidingCandidates[i]);
+      }
+    }
+
+    public void NotifyGraspReleased(InteractionBehaviourBase interactionObj) {
+      GrabClassifier classifier;
+      if (classifiers.TryGetValue(interactionObj, out classifier)) {
+        classifier.isGrabbing = false;
       }
     }
 

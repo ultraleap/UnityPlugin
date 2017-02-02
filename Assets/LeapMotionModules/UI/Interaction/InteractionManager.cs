@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
-  public class InteractionManager : MonoBehaviour {
+  public partial class InteractionManager : MonoBehaviour {
 
     [Header("Interactions")]
     public bool enableHovering = true;
@@ -51,13 +51,14 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     private float WorldTouchActivationRadius { get { return touchActivationRadius * _providerScale; } }
 
-    private InteractionHand[] interactionHands = new InteractionHand[2];
+    private InteractionHand[] _interactionHands = new InteractionHand[2];
+    private HashSet<InteractionBehaviourBase> _interactionBehaviours = new HashSet<InteractionBehaviourBase>();
 
     void Awake() {
       Provider = Hands.Provider;
 
-      interactionHands[0] = new InteractionHand(this, () => { return Hands.FixedLeft;  }, WorldHoverActivationRadius, WorldTouchActivationRadius);
-      interactionHands[1] = new InteractionHand(this, () => { return Hands.FixedRight; }, WorldHoverActivationRadius, WorldTouchActivationRadius);
+      _interactionHands[0] = new InteractionHand(this, () => { return Hands.FixedLeft;  }, WorldHoverActivationRadius, WorldTouchActivationRadius);
+      _interactionHands[1] = new InteractionHand(this, () => { return Hands.FixedRight; }, WorldHoverActivationRadius, WorldTouchActivationRadius);
     }
 
     void OnValidate() {
@@ -73,8 +74,12 @@ namespace Leap.Unity.UI.Interaction {
     void FixedUpdate() {
       OnPrePhysicalUpdate();
 
-      foreach (var interactionHand in interactionHands) {
+      foreach (var interactionHand in _interactionHands) {
         interactionHand.FixedUpdateHand(enableHovering, enableContact, enableGrasping);
+      }
+
+      foreach (var interactionObj in _interactionBehaviours) {
+        interactionObj.FixedUpdateObject();
       }
 
       OnPostPhysicalUpdate();
@@ -84,7 +89,7 @@ namespace Leap.Unity.UI.Interaction {
       if (Provider != null) {
         _providerScale = Provider.transform.lossyScale.x;
 
-        foreach (var interactionHand in interactionHands) {
+        foreach (var interactionHand in _interactionHands) {
           interactionHand.HoverActivationRadius = WorldHoverActivationRadius;
           interactionHand.TouchActivationRadius = WorldTouchActivationRadius;
         }
@@ -95,34 +100,39 @@ namespace Leap.Unity.UI.Interaction {
       OnGraphicalUpdate();
     }
 
-    #region Accessors
+    #region Object Registration
 
-    public InteractionHand GetInteractionHand(Chirality whichHand) {
-      if (whichHand == Chirality.Left) {
-        return interactionHands[0];
-      }
-      else {
-        return interactionHands[1];
-      }
+    public void RegisterInteractionBehaviour(InteractionBehaviourBase interactionObj) {
+      _interactionBehaviours.Add(interactionObj);
     }
 
     #endregion
 
-    #region Hovering
+    public InteractionHand GetInteractionHand(Chirality whichHand) {
+      if (whichHand == Chirality.Left) {
+        return _interactionHands[0];
+      }
+      else {
+        return _interactionHands[1];
+      }
+    }
 
-    #endregion
+    /// <summary> Returns true if the object was released from a grasped hand, or false if the object was not held in the first place. </summary>
+    public bool ReleaseObjectFromGrasp(InteractionBehaviourBase interactionObj) {
+      if (!_interactionBehaviours.Contains(interactionObj)) {
+        Debug.LogError("ReleaseObjectFromGrasp was called, but the interaction object " + interactionObj.transform.name + " is not registered"
+          + " with this InteractionManager.");
+        return false;
+      }
 
-    #region "Touch" (Contact / Grasping)
-
-    #endregion
-
-    #region Contact
-
-    #endregion
-
-    #region Grasping
-
-    #endregion
+      foreach (var hand in _interactionHands) {
+        if (hand.IsGrasping(interactionObj)) {
+          hand.ReleaseGrasp();
+          return true;
+        }
+      }
+      return false;
+    }
 
   }
 

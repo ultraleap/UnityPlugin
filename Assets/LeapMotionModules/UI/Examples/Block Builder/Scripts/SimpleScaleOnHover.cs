@@ -12,7 +12,6 @@ public class SimpleScaleOnHover : MonoBehaviour {
   private float _curScale = 1F;
   private float _targetScale = 1F;
 
-  private int _hoverCount = 0;
   private float _closestHoverDistance;
   private int _primaryHoverCount = 0;
   private float _primaryHoverDistance;
@@ -23,9 +22,10 @@ public class SimpleScaleOnHover : MonoBehaviour {
       _interaction.OnPrimaryHoverBegin += OnPrimaryHoverBegin;
       _interaction.OnPrimaryHoverStay  += OnPrimaryHoverStay;
       _interaction.OnPrimaryHoverEnd   += OnPrimaryHoverEnd;
-      _interaction.OnHoverBegin        += OnHoverBegin;
-      _interaction.OnHoverStay         += OnHoverStay;
-      _interaction.OnHoverEnd          += OnHoverEnd;
+
+      _interaction.OnObjectHoverBegin  += OnObjectHoverBegin;
+      _interaction.OnObjectHoverStay   += OnObjectHoverStay;
+      _interaction.OnObjectHoverEnd    += OnObjectHoverEnd;
     }
     _baseScale = this.transform.localScale;
   }
@@ -35,38 +35,27 @@ public class SimpleScaleOnHover : MonoBehaviour {
   }
 
   private void OnPrimaryHoverStay(Hand hand) {
-    _primaryHoverDistance = Vector3.Distance(hand.AttentionPosition(), this.transform.position);
+    _primaryHoverDistance = Vector3.Distance(hand.PalmPosition.ToVector3(), this.transform.position);
   }
 
   private void OnPrimaryHoverEnd(Hand hand) {
     _primaryHoverCount--;
   }
 
-  private void OnHoverBegin(Hand hand) {
-    _hoverCount++;
-    if (_hoverCount == 1) {
-      _closestHoverDistance = Vector3.Distance(hand.AttentionPosition(), this.transform.position);
-    }
+  private void OnObjectHoverBegin(Hand closestHand) {
+    _closestHoverDistance = Vector3.Distance(closestHand.PalmPosition.ToVector3(), this.transform.position);
   }
 
-  private void OnHoverStay(Hand hand) {
-    float distanceTest = Vector3.Distance(hand.AttentionPosition(), this.transform.position);
-    if (distanceTest < _closestHoverDistance) {
-      _closestHoverDistance = distanceTest;
-    }
+  private void OnObjectHoverStay(Hand closestHand) {
+    _closestHoverDistance = Vector3.Distance(closestHand.PalmPosition.ToVector3(), this.transform.position);
   }
 
-  private void OnHoverEnd(Hand hand) {
-    _hoverCount--;
+  private void OnObjectHoverEnd(Hand closestHand) {
+    _closestHoverDistance = 1000F;
   }
 
   void Update() {
-    if (_hoverCount > 0) {
-      _targetScale = _closestHoverDistance.Map(0.12F, 0.4F, 1.1F, 1F);
-    }
-    else {
-      _targetScale = 1F;
-    }
+    _targetScale = _closestHoverDistance.Map(0.12F, 0.4F, 1.1F, 1F);
 
     if (_primaryHoverCount > 0 && _primaryHoverDistance < 0.1F) {
       _targetScale = 1.3F;
