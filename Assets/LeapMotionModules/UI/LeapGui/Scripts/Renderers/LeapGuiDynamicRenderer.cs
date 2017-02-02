@@ -45,11 +45,9 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   }
 
   public override void OnEnableRenderer() {
-    throw new NotImplementedException();
   }
 
   public override void OnDisableRenderer() {
-    throw new NotImplementedException();
   }
 
   public float scale;
@@ -96,11 +94,9 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   }
 
   public override void OnEnableRendererEditor() {
-    throw new NotImplementedException();
   }
 
   public override void OnDisableRendererEditor() {
-    throw new NotImplementedException();
   }
 
   public override void OnUpdateRendererEditor() {
