@@ -16,14 +16,20 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   [SerializeField]
   private Shader _shader;
 
+  [MinValue(0)]2
+  [SerializeField]
+  private int _borderAmount;
+
 
   private List<Mesh> _elementMeshes = new List<Mesh>();
+  private Material _material;
 
   //Feature lists
   private List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
   private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
 
-
+  //Textures
+  private Dictionary<UVChannelFlags, Rect[]> _atlasedRects;
 
 
 
@@ -78,6 +84,12 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       bakeColors();
       Profiler.EndSample();
     }
+
+    if(gui.GetSupportedFeatures(_textureFeatures)){
+      Profiler.BeginSample("Atlas Textures");
+      atlasTextures();
+      Profiler.EndSample();
+    }
   }
 
   private List<Vector3> _tempVertList = new List<Vector3>();
@@ -89,6 +101,8 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
       foreach (var meshFeature in _meshFeatures) {
         var elementData = meshFeature.data[i];
+        var mesh = elementData.mesh;
+        if (mesh == null) continue;
 
         var topology = MeshCache.GetTopology(elementData.mesh);
 
@@ -117,10 +131,37 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
       foreach (var meshFeature in _meshFeatures) {
         var elementData = meshFeature.data[i];
+        var mesh = elementData.mesh;
+        if (mesh == null) continue;
+
+        Color totalTint = elementData.color * meshFeature.tint;
+
+        var colors = MeshCache.GetColors(mesh);
+        if (colors != null) {
+          colors.Query().Select(c => c * totalTint).AppendList(_tempColorList);
+        } else {
+          _tempColorList.Append(mesh.vertexCount, totalTint);
+        }
       }
+
+      _elementMeshes[i].SetColors(_tempColorList);
     }
 
+    _material.EnableKeyword(LeapGuiMeshFeature.COLORS_FEATURE);
   }
+
+  private void atlasTextures() {
+    Texture2D[] atlasTextures;
+    AtlasUtil.DoAtlas(_textureFeatures, _borderAmount,
+                  out atlasTextures,
+                  out _atlasedRects);
+
+    for(int i=0; i<_textureFeatures.Count; i++){
+      _material.SetTexture(_textureFeatures[i].propertyName, atlasTextures[i]);
+    }
+  }
+
+
 
 
 

@@ -25,6 +25,10 @@ public static class MeshCache {
     Color[] colors;
     if (!_colorCache.TryGetValue(mesh, out colors)) {
       colors = mesh.colors;
+      if (colors.Length != mesh.vertexCount) {
+        colors = null;
+      }
+
       _colorCache[mesh] = colors;
     }
     return colors;
