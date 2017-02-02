@@ -14,10 +14,16 @@ public static class AtlasUtil {
     allUvChannels.Add(UVChannelFlags.UV3);
   }
 
+  public static void ClearCache() {
+    _cachedBorderedTextures.Clear();
+  }
+
   public static void DoAtlas(List<LeapGuiTextureFeature> textureFeatures,
                              int borderAmount,
                          out Texture2D[] atlasTextures,
                          out Dictionary<UVChannelFlags, Rect[]> channelMapping) {
+    ClearCache();
+
     atlasTextures = new Texture2D[textureFeatures.Count];
     channelMapping = new Dictionary<UVChannelFlags, Rect[]>();
 

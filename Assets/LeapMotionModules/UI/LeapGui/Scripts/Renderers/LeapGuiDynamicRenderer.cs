@@ -11,7 +11,8 @@ using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
 public class LeapGuiDynamicRenderer : LeapGuiRenderer,
-  ISupportsFeature<LeapGuiMeshFeature> {
+  ISupportsFeature<LeapGuiMeshFeature>,
+  ISupportsFeature<LeapGuiTextureFeature> {
 
   [SerializeField]
   private Shader _shader;
@@ -39,6 +40,9 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
   public void GetSupportInfo(List<LeapGuiMeshFeature> features, List<FeatureSupportInfo> info) { }
 
+  public void GetSupportInfo(List<LeapGuiTextureFeature> features, List<FeatureSupportInfo> info) {
+    FeatureSupportUtil.OnlySupportFirstFeature(features, info);
+  }
 
   public override void OnEnableRenderer() {
     throw new NotImplementedException();
@@ -123,6 +127,10 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       atlasTextures();
       Profiler.EndSample();
     }
+
+    Profiler.BeginSample("Bake Uvs");
+    bakeUvs();
+    Profiler.EndSample();
 
     if (gui.space is LeapGuiCylindricalSpace) {
       _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);
@@ -218,24 +226,6 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
     _material.EnableKeyword(LeapGuiMeshFeature.COLORS_FEATURE);
   }
 
-  List<Vector4> _tempUv3List = new List<Vector4>();
-  private void bakeUv3() {
-    for (int i = 0; i < gui.elements.Count; i++) {
-      var element = gui.elements[i];
-
-      foreach (var meshFeature in _meshFeatures) {
-        var elementData = meshFeature.data[i];
-        var mesh = elementData.mesh;
-        if (mesh == null) continue;
-
-        _tempUv3List.Append(mesh.vertexCount, new Vector4(0, 0, 0, i));
-      }
-
-      _elementMeshes[i].SetUVs(3, _tempUv3List);
-      _tempUv3List.Clear();
-    }
-  }
-
   private void atlasTextures() {
     Texture2D[] atlasTextures;
     AtlasUtil.DoAtlas(_textureFeatures, _borderAmount,
@@ -246,6 +236,62 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       _material.SetTexture(_textureFeatures[i].propertyName, atlasTextures[i]);
     }
   }
+
+  private List<Vector4> _tempUvList = new List<Vector4>();
+  private void bakeUvs() {
+    var enabledChannels = new List<UVChannelFlags>();
+
+    //Build up uv dictionary
+    foreach (var feature in _meshFeatures) {
+      foreach (var enabledChannel in feature.enabledUvChannels) {
+        if (!enabledChannels.Contains(enabledChannel)) {
+          enabledChannels.Add(enabledChannel);
+          _material.EnableKeyword(LeapGuiMeshFeature.GetUvFeature(enabledChannel));
+        }
+      }
+    }
+
+    for (int i = 0; i < gui.elements.Count; i++) {
+      var element = gui.elements[i];
+
+      foreach (var meshFeature in _meshFeatures) {
+        var elementData = meshFeature.data[i];
+        var mesh = elementData.mesh;
+        if (mesh == null) continue;
+
+        foreach (var channel in enabledChannels) {
+          mesh.GetUVsOrDefault(channel.Index(), _tempUvList);
+
+          Rect[] atlasedRects;
+          if (_atlasedRects != null && _atlasedRects.TryGetValue(channel, out atlasedRects)) {
+            MeshUtil.RemapUvs(_tempUvList, atlasedRects[i]);
+          }
+
+          _elementMeshes[i].SetUVsAuto(channel.Index(), _tempUvList);
+          _tempUvList.Clear();
+        }
+      }
+    }
+  }
+
+  private void bakeUv3() {
+    for (int i = 0; i < gui.elements.Count; i++) {
+      var element = gui.elements[i];
+
+      foreach (var meshFeature in _meshFeatures) {
+        var elementData = meshFeature.data[i];
+        var mesh = elementData.mesh;
+        if (mesh == null) continue;
+
+        _tempUvList.Append(mesh.vertexCount, new Vector4(0, 0, 0, i));
+      }
+
+      _elementMeshes[i].SetUVs(3, _tempUvList);
+      _tempUvList.Clear();
+    }
+  }
+
+
 
 
 }
