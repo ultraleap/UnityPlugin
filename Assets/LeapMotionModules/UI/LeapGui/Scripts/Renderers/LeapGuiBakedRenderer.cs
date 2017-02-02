@@ -39,10 +39,12 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   [HideInInspector, SerializeField]
   private MeshRenderer _renderer;
 
+  //Feature lists
   private List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
   private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
   private List<LeapGuiBlendShapeFeature> _blendShapeFeatures = new List<LeapGuiBlendShapeFeature>();
 
+  //Textures
   private Dictionary<UVChannelFlags, Rect[]> _atlasedRects;
 
   //Tinting
@@ -233,7 +235,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
       foreach (var data in meshFeature.data) {
         if (data.mesh == null) continue;
 
-        var topology = MeshUtil.GetTopology(data.mesh);
+        var topology = MeshCache.GetTopology(data.mesh);
 
         int vertOffset = _tempVertList.Count;
         for (int i = 0; i < topology.tris.Length; i++) {

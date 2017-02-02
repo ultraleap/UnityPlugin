@@ -46,20 +46,4 @@ public static class MeshUtil {
     }
     throw new InvalidOperationException();
   }
-
-  private static Dictionary<Mesh, CachedTopology> _topologyCache = new Dictionary<Mesh, CachedTopology>();
-  public static CachedTopology GetTopology(Mesh mesh) {
-    CachedTopology topology;
-    if (!_topologyCache.TryGetValue(mesh, out topology)) {
-      topology.tris = mesh.GetIndices(0);
-      topology.verts = mesh.vertices;
-      _topologyCache[mesh] = topology;
-    }
-    return topology;
-  }
-
-  public struct CachedTopology {
-    public Vector3[] verts;
-    public int[] tris;
-  }
 }
