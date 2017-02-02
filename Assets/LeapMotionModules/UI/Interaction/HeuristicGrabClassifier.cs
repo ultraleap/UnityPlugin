@@ -14,12 +14,16 @@ namespace Leap.Unity.UI.Interaction {
     public InteractionManager.InteractionHand interactionHand;
 
     private Hand _hand;
-    private Collider[] _collidingCandidates = new Collider[10];
+    private Collider[][] _collidingCandidates = new Collider[5][];
 
     Dictionary<InteractionBehaviourBase, GrabClassifier> classifiers = new Dictionary<InteractionBehaviourBase, GrabClassifier>();
 
     public HeuristicGrabClassifier(InteractionManager.InteractionHand interactionHand) {
       this.interactionHand = interactionHand;
+
+      for (int i = 0; i < 5; i++) {
+        _collidingCandidates[i] = new Collider[10];
+      }
     }
 
     List<InteractionBehaviourBase> _keyRemovalCache = new List<InteractionBehaviourBase>();
@@ -27,6 +31,7 @@ namespace Leap.Unity.UI.Interaction {
       _hand = interactionHand.GetHand();
 
       if (_hand != null) {
+        UpdateContactingColliders();
 
         //First check if already holding an object and only process that one
         var graspedObject = interactionHand.GetGraspedObject();
@@ -54,6 +59,28 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
+    private void UpdateBehaviour(InteractionBehaviourBase behaviour) {
+      GrabClassifier classifier;
+      if (!classifiers.TryGetValue(behaviour, out classifier)) {
+        classifier = new GrabClassifier(behaviour);
+        classifiers.Add(behaviour, classifier);
+      }
+
+      //Do the actual grab classification logic
+      UpdateClassifier(classifier);
+
+      if (classifier.isGrabbing != classifier.prevGrabbing) {
+        if (classifier.isGrabbing) {
+          if (!behaviour.allowsTwoHandedGrasp) { interactionHand.ReleaseObject(behaviour); }
+          interactionHand.Grasp(behaviour);
+        }
+        else if (!classifier.isGrabbing || interactionHand.IsGrasping(behaviour)) {
+          interactionHand.ReleaseGrasp();
+        }
+      }
+      classifier.prevGrabbing = classifier.isGrabbing;
+    }
+
     //Grab Classifier Logic
     private void UpdateClassifier(GrabClassifier classifier) {
       classifier.warpTrans = Matrix4x4.TRS(classifier.warper.RigidbodyPosition, classifier.warper.RigidbodyRotation, classifier.transform.localScale);
@@ -64,10 +91,8 @@ namespace Leap.Unity.UI.Interaction {
         float tempCurl = Vector3.Dot(_hand.Fingers[j].Direction.ToVector3(), (j != 0) ? _hand.Direction.ToVector3() : (_hand.IsLeft ? 1f : -1f) * _hand.Basis.xBasis.ToVector3());
 
         //Determine if this probe is intersecting an object
-        Array.Clear(_collidingCandidates, 0, 10);
-        Physics.OverlapSphereNonAlloc(_hand.Fingers[j].TipPosition.ToVector3(), j == 0 ? 0.015f : 0.01f, _collidingCandidates);
         bool collidingWithObject = false;
-        foreach (Collider col in _collidingCandidates) {
+        foreach (Collider col in _collidingCandidates[j]) {
           if (col != null && col.attachedRigidbody != null) {
             collidingWithObject = (col.attachedRigidbody == classifier.body) ? true : collidingWithObject;
           }
@@ -106,26 +131,11 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    private void UpdateBehaviour(InteractionBehaviourBase behaviour) {
-      GrabClassifier classifier;
-      if (!classifiers.TryGetValue(behaviour, out classifier)) {
-        classifier = new GrabClassifier(behaviour);
-        classifiers.Add(behaviour, classifier);
+    void UpdateContactingColliders() {
+      for (int i = 0; i < _hand.Fingers.Count; i++) {
+        Array.Clear(_collidingCandidates[i], 0, _collidingCandidates[i].Length);
+        Physics.OverlapSphereNonAlloc(_hand.Fingers[i].TipPosition.ToVector3(), i == 0 ? 0.015f : 0.01f, _collidingCandidates[i]);
       }
-
-      //Do the actual grab classification logic
-      UpdateClassifier(classifier);
-
-      if (classifier.isGrabbing != classifier.prevGrabbing) {
-        if (classifier.isGrabbing) {
-          if (!behaviour.allowsTwoHandedGrasp) { interactionHand.ReleaseObject(behaviour); }
-          interactionHand.Grasp(behaviour);
-        }
-        else if (!classifier.isGrabbing || interactionHand.IsGrasping(behaviour)) {
-          interactionHand.ReleaseGrasp();
-        }
-      }
-      classifier.prevGrabbing = classifier.isGrabbing;
     }
 
     public void NotifyGraspReleased(InteractionBehaviourBase interactionObj) {
