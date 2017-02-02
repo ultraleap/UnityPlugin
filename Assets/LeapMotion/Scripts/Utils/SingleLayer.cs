@@ -1,7 +1,13 @@
 ﻿using System;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity {
 
+  /// <summary>
+  /// An object you can use to represent a single layer as a
+  /// dropdown in the inspector.  Can be converted back and 
+  /// forth between the integer representation Unity usually
+  /// uses in it's own methods.
+  /// </summary>
   [Serializable]
   public struct SingleLayer {
     public int layer;

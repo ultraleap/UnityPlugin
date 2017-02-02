@@ -1,8 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity {
 
+  /// <summary>
+  /// A simple wrapper around List to provide readonly access.
+  /// Useful when you want to return a list to someone but you want
+  /// to make sure they don't muck it up!
+  /// </summary>
   public struct ReadonlyList<T> {
     private readonly List<T> _list;
 
