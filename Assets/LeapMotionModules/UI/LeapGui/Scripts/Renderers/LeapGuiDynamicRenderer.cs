@@ -14,6 +14,9 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   ISupportsFeature<LeapGuiMeshFeature> {
 
   [SerializeField]
+  private MotionType _motionType = MotionType.Translation;
+
+  [SerializeField]
   private Shader _shader;
 
   [MinValue(0)]
@@ -85,7 +88,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       Profiler.EndSample();
     }
 
-    if(gui.GetSupportedFeatures(_textureFeatures)){
+    if (gui.GetSupportedFeatures(_textureFeatures)) {
       Profiler.BeginSample("Atlas Textures");
       atlasTextures();
       Profiler.EndSample();
@@ -156,12 +159,15 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
                   out atlasTextures,
                   out _atlasedRects);
 
-    for(int i=0; i<_textureFeatures.Count; i++){
+    for (int i = 0; i < _textureFeatures.Count; i++) {
       _material.SetTexture(_textureFeatures[i].propertyName, atlasTextures[i]);
     }
   }
 
-
+  public enum MotionType {
+    Translation,
+    Full
+  }
 
 
 

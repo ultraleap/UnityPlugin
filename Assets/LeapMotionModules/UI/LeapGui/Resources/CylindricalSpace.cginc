@@ -24,3 +24,10 @@ void Cylindrical_LocalToWorld(inout float3 localVert, float4 parameters) {
   localVert.y = height;
   localVert.z = cos(angle) * radius - _LeapGuiCylindrical_Radius;
 }
+
+void Cylindrical_ApplyCurvature(inout float3 localVert, float radius) {
+  float angle = localVert.x / radius;
+
+  localVert.x = sin(angle) * radius;
+  localVert.z = cos(angle) * radius - radius;
+}
