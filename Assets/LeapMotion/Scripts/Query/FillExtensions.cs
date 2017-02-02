@@ -69,6 +69,7 @@ namespace Leap.Unity.Query {
 
     public static T RemoveLast<T>(this List<T> list) {
       T last = list[list.Count - 1];
+      list.RemoveAt(list.Count - 1);
       return last;
     }
   }

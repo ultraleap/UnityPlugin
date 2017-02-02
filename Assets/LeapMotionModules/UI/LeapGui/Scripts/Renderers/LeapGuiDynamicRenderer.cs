@@ -138,14 +138,23 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
         int vertOffset = _tempVertList.Count;
         for (int j = 0; j < topology.tris.Length; j++) {
-          _tempTriList.Add(topology.tris[i] + vertOffset);
+          _tempTriList.Add(topology.tris[j] + vertOffset);
         }
 
         _tempVertList.AddRange(topology.verts);
       }
 
+      int min = int.MaxValue, max = int.MinValue;
+      foreach (var index in _tempTriList) {
+        min = Mathf.Min(index, min);
+        max = Mathf.Max(index, max);
+      }
+      Debug.Log(":::: " + min + " : " + max);
+
       _elementMeshes[i].SetVertices(_tempVertList);
       _elementMeshes[i].SetTriangles(_tempTriList, 0);
+
+      Debug.Log(_elementMeshes[i].vertexCount);
     }
   }
 
