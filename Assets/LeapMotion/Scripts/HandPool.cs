@@ -86,12 +86,6 @@ namespace Leap.Unity {
         modelList.Add(model);
         this._handPool.modelToHandRepMapping.Remove(model);
       }
-      public void ApplyPostProcess(Hand inHand) {
-        HandPostProcesses.Invoke(inHand);
-      }
-      public int PostProcessCount() {
-        return HandPostProcesses.GetPersistentEventCount();
-      }
     }
     public void ReturnToPool(IHandModel model) {
       ModelGroup modelGroup;
