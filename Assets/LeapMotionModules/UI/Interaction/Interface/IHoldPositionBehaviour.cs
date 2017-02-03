@@ -5,16 +5,16 @@ using UnityEngine;
 namespace Leap.Unity.UI.Interaction {
 
   /// <summary>
-  /// IGraspedHoldBehaviour specifies where an object grasped by a hand (or
+  /// IHoldPositionBehaviour specifies where an object grasped by a hand (or
   /// multiple hands) should move as the grasping hand(s) move. The most common
   /// implementation is the KabschHoldBehaviour, which produces a physically
   /// intuitive following motion for the object no matter how the hand moves.
   /// 
-  /// IGraspedHoldBehaviours do not actually move the object; they only calculate
+  /// IHoldPositionBehaviours do not actually move the object; they only calculate
   /// where the object should be moved. Actually moving the object is the concern
   /// of an IGraspedMovementBehavior.
   /// </summary>
-  public interface IGraspedHoldBehaviour {
+  public interface IHoldPositionBehaviour {
 
     /// <summary>
     /// Called when a new InteractionHand begins grasping a certain object.

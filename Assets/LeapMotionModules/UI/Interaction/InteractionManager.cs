@@ -51,6 +51,12 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     public float WorldTouchActivationRadius { get { return touchActivationRadius * _providerScale; } }
 
+    /// <summary>
+    /// A scale that can be used to appropriately transform distances that otherwise expect
+    /// one Unity unit to correspond to one meter.
+    /// </summary>
+    public float SimulationScale { get { return _providerScale; } }
+
     private InteractionHand[] _interactionHands = new InteractionHand[2];
     private HashSet<InteractionBehaviourBase> _interactionBehaviours = new HashSet<InteractionBehaviourBase>();
 

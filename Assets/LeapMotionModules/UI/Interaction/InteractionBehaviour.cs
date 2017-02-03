@@ -69,6 +69,7 @@ namespace Leap.Unity.UI.Interaction {
     public bool graspHoldWarpingEnabled = true; // TODO: Warping not yet implemented.
 
     private Rigidbody _body;
+    public Rigidbody Rigidbody { get { return _body; } }
 
     void Start() {
       interactionManager.RegisterInteractionBehaviour(this);
@@ -204,27 +205,33 @@ namespace Leap.Unity.UI.Interaction {
     private int _graspCount = 0;
     private bool _wasMovingObjectWhenGraspedLastFrame;
 
-    private IGraspedHoldBehaviour _graspedHoldBehaviour;
-    // TODO: Investigate the best way to allow custom holding behavior specification.
-    private IGraspedHoldBehaviour GraspedHoldBehaviour {
+    private IHoldPositionBehaviour _graspedPositionBehaviour;
+    private IHoldPositionBehaviour GraspedPositionBehaviour {
       get {
-        if (_graspedHoldBehaviour == null) {
-          _graspedHoldBehaviour = new KabschHoldBehaviour();
+        if (_graspedPositionBehaviour == null) {
+          _graspedPositionBehaviour = new KabschHoldPositionBehaviour(this);
         }
-        return _graspedHoldBehaviour;
+        return _graspedPositionBehaviour;
       }
     }
-    private IGraspedMovementBehaviour _graspedMovementBehaviour;
+
+    private IHoldMovementBehaviour _graspedMovementBehaviour;
+    private IHoldMovementBehaviour GraspedMovementBehaviour {
+      get {
+        if (_graspedMovementBehaviour == null) {
+          _graspedMovementBehaviour = new KinematicHoldMovementBehaviour();
+        }
+        return _graspedMovementBehaviour;
+      }
+    }
 
     private void InitGrasping() {
-      _graspedHoldBehaviour = new KabschHoldBehaviour();
       _wasMovingObjectWhenGraspedLastFrame = moveObjectWhenGrasped;
-      //_graspedMovementBehaviour = new // TODO: implement IGraspedMovementBehaviour.
     }
 
     private void FixedUpdateGrasping() {
       if (!moveObjectWhenGrasped && _wasMovingObjectWhenGraspedLastFrame) {
-        _graspedHoldBehaviour.ClearHands();
+        GraspedPositionBehaviour.ClearHands();
       }
 
       _wasMovingObjectWhenGraspedLastFrame = moveObjectWhenGrasped;
@@ -248,7 +255,7 @@ namespace Leap.Unity.UI.Interaction {
       // SnapToHand(hand); // TODO: When you grasp an object, snap the object into a good holding position.
 
       if (moveObjectWhenGrasped) {
-        GraspedHoldBehaviour.AddHand(interactionManager.GetInteractionHand(hand.Handedness()));
+        GraspedPositionBehaviour.AddHand(interactionManager.GetInteractionHand(hand.Handedness()));
       }
 
       OnGraspBegin(hand);
@@ -258,8 +265,9 @@ namespace Leap.Unity.UI.Interaction {
       if (moveObjectWhenGrasped) {
         Vector3 newPosition;
         Quaternion newRotation;
-        _graspedHoldBehaviour.GetHoldingPose(out newPosition, out newRotation);
-        //_graspedMovementBehaviour.
+        GraspedPositionBehaviour.GetHoldingPose(out newPosition, out newRotation);
+        GraspedMovementBehaviour.MoveTo(newPosition, newRotation, this, null);
+        // TODO: Don't pass null grasping hands
       }
 
       OnGraspHold(hand);
@@ -269,7 +277,7 @@ namespace Leap.Unity.UI.Interaction {
       _graspCount--;
 
       if (moveObjectWhenGrasped) {
-        _graspedHoldBehaviour.RemoveHand(interactionManager.GetInteractionHand(hand.Handedness()));
+        GraspedPositionBehaviour.RemoveHand(interactionManager.GetInteractionHand(hand.Handedness()));
       }
 
       OnGraspEnd(hand);

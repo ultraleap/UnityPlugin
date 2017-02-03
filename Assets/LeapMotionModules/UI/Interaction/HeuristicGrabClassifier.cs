@@ -28,7 +28,7 @@ namespace Leap.Unity.UI.Interaction {
 
     List<InteractionBehaviourBase> _keyRemovalCache = new List<InteractionBehaviourBase>();
     public void FixedUpdate() {
-      _hand = interactionHand.GetHand();
+      _hand = interactionHand.GetLeapHand();
 
       if (_hand != null) {
         UpdateContactingColliders();

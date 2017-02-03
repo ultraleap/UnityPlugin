@@ -26,7 +26,7 @@ namespace Leap.Unity.UI.Interaction {
         InitGrasping();
       }
 
-      public Hand GetHand() {
+      public Hand GetLeapHand() {
         return _hand;
       }
 

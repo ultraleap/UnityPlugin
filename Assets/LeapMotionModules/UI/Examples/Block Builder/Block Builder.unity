@@ -214,9 +214,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &587915
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -505,9 +505,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &80016640
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -664,9 +664,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &99090520
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -860,7 +860,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &147983684
 Transform:
   m_ObjectHideFlags: 0
@@ -1008,9 +1008,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &169351217
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1263,9 +1263,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!65 &222225563
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1675,9 +1675,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!65 &348634153
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1968,9 +1968,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &380663632
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2168,9 +2168,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &555685149
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2553,9 +2553,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &704611757
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3138,9 +3138,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &849898417
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3467,9 +3467,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!65 &1060371168
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3775,9 +3775,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &1104693723
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3999,9 +3999,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!65 &1110988032
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4612,9 +4612,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!65 &1243998594
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5755,9 +5755,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &1393283211
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5914,9 +5914,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &1422347800
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6057,9 +6057,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!65 &1433262625
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6391,9 +6391,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &1542990749
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6554,9 +6554,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &1557400536
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6754,9 +6754,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &1617468041
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7085,9 +7085,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &1799006750
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7547,9 +7547,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &1835329070
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7879,9 +7879,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &1907022581
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -8120,9 +8120,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
   allowsTwoHandedGrasp: 0
-  hoverType: 0
-  touchType: 0
-  grabType: 0
+  moveObjectWhenGrasped: 1
+  graspedHoldMovementType: 0
+  graspHoldWarpingEnabled: 1
 --- !u!54 &2005346064
 Rigidbody:
   m_ObjectHideFlags: 0
