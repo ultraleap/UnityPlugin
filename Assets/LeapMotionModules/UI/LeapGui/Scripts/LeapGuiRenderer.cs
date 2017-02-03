@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class LeapGuiRenderer : ScriptableObject {
+public abstract class LeapGuiRenderer : HidableMonobehaviour {
 
   [HideInInspector]
   public LeapGui gui;

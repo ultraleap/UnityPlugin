@@ -14,7 +14,7 @@ public class LeapGui : MonoBehaviour {
   public const string FEATURE_MOVEMENT_TRANSLATION = FEATURE_PREFIX + "MOVEMENT_TRANSLATION";
   public const string FEATURE_MOVEMENT_FULL = FEATURE_PREFIX + "MOVEMENT_FULL";
 
-  public List<LeapGuiFeatureBase> features;
+  public List<LeapGuiFeatureBase> features = new List<LeapGuiFeatureBase>();
 
   public LeapGuiSpace space;
 
@@ -71,7 +71,7 @@ public class LeapGui : MonoBehaviour {
   }
 
 #if UNITY_EDITOR
-  public void SetSpace(LeapGuiSpace newSpace) {
+  public void SetSpace(Type spaceType) {
     if (Application.isPlaying) {
       throw new InvalidOperationException("Cannot change the space at runtime.");
     }
@@ -84,14 +84,19 @@ public class LeapGui : MonoBehaviour {
       space = null;
     }
 
-    space = newSpace;
+    space = gameObject.AddComponent(spaceType) as LeapGuiSpace;
 
     if (space != null) {
       space.gui = this;
     }
   }
 
-  public void SetRenderer(LeapGuiRenderer newRenderer) {
+  public void AddFeature(Type featureType) {
+    var feature = gameObject.AddComponent(featureType);
+    features.Add(feature as LeapGuiFeatureBase);
+  }
+
+  public void SetRenderer(Type rendererType) {
     if (Application.isPlaying) {
       throw new InvalidOperationException("Cannot change renderer at runtime.");
     }
@@ -105,7 +110,7 @@ public class LeapGui : MonoBehaviour {
       renderer = null;
     }
 
-    renderer = newRenderer;
+    renderer = gameObject.AddComponent(rendererType) as LeapGuiRenderer;
 
     if (renderer != null) {
       renderer.gui = this;
@@ -199,48 +204,23 @@ public class LeapGui : MonoBehaviour {
     for (int i = 0; i < elements.Count; i++) {
       var element = elements[i];
 
-      //First make a map of existing data objects to their correct indexes
-      var dataToNewIndex = new Dictionary<LeapGuiElementData, int>();
-      foreach (var data in element.data) {
-        if (data == null || data.feature == null) {
-          continue;
+      List<LeapGuiElementData> dataList = new List<LeapGuiElementData>();
+      foreach (var feature in features) {
+        var dataObj = element.data.Query().OfType(feature.GetDataObjectType()).FirstOrDefault();
+        if (dataObj != null) {
+          element.data.Remove(dataObj);
+        } else {
+          dataObj = feature.CreateDataObject(element);
         }
-
-        int index = features.IndexOf(data.feature);
-        if (index >= 0) {
-          dataToNewIndex[data] = index;
-        }
+        feature.AddDataObjectReference(dataObj);
+        dataList.Add(dataObj);
       }
 
-      //Then make sure the data array has enough spaces for all the data objects
-      element.data.Fill(features.Count, null);
-
-      //Then re-map the existing data objects to the correct index
-      foreach (var pair in dataToNewIndex) {
-        element.data[pair.Value] = pair.Key;
+      foreach (var dataObj in element.data) {
+        DestroyImmediate(dataObj);
       }
 
-      //If data points to a different element, copy it and point it to the correct element
-      for (int j = 0; j < element.data.Count; j++) {
-        var data = element.data[j];
-        if (data != null && data.element != element) {
-          data = Instantiate(data);
-          data.element = element;
-          element.data[j] = data;
-        }
-      }
-
-      //Then construct new data objects if there is not yet one
-      for (int j = 0; j < features.Count; j++) {
-        var feature = features[j];
-
-        if (element.data[j] == null) {
-          element.data[j] = feature.CreateDataObject(element);
-        }
-
-        //Add the correct reference into the feature list
-        feature.AddDataObjectReference(element.data[j]);
-      }
+      element.data = dataList;
     }
   }
 
@@ -320,6 +300,7 @@ public class LeapGui : MonoBehaviour {
       foreach (var dataObj in element.data) {
         if (dataObj is LeapGuiMeshData) {
           var meshData = dataObj as LeapGuiMeshData;
+          if (meshData.mesh == null) continue;
 
           var tris = meshData.mesh.triangles;
           for (int i = 0; i < tris.Length; i++) {

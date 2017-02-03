@@ -20,7 +20,6 @@ public class LeapGuiTintData : LeapGuiElementData {
     }
     set {
       _tint = value;
-      feature.isDirty = true;
     }
   }
 }

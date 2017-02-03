@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
@@ -52,7 +50,7 @@ public class LeapGuiEditor : CustomEditorBase {
     foreach (var feature in allFeatures) {
       _addFeatureMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(feature)),
                               false,
-                              () => gui.features.Add(ScriptableObject.CreateInstance(feature) as LeapGuiFeatureBase));
+                              () => gui.AddFeature(feature));
     }
 
     var allSpaces = allTypes.Query().
@@ -65,8 +63,8 @@ public class LeapGuiEditor : CustomEditorBase {
       _addSpaceMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(space)),
                             false,
                             () => {
-                              gui.SetSpace(ScriptableObject.CreateInstance(space) as LeapGuiSpace);
-                              _spaceEditor = Editor.CreateEditor(gui.space);
+                              gui.SetSpace(space);
+                              _spaceEditor = CreateEditor(gui.space);
                               serializedObject.Update();
                             });
     }
@@ -81,18 +79,18 @@ public class LeapGuiEditor : CustomEditorBase {
       _addRendererMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(renderer)),
                                false,
                                () => {
-                                 gui.SetRenderer(ScriptableObject.CreateInstance(renderer) as LeapGuiRenderer);
-                                 _rendererEditor = Editor.CreateEditor(gui.renderer);
+                                 gui.SetRenderer(renderer);
+                                 _rendererEditor = CreateEditor(gui.renderer);
                                  serializedObject.Update();
                                });
     }
 
     if (gui.renderer != null) {
-      _rendererEditor = Editor.CreateEditor(gui.renderer);
+      _rendererEditor = CreateEditor(gui.renderer);
     }
 
     if (gui.space != null) {
-      _spaceEditor = Editor.CreateEditor(gui.space);
+      _spaceEditor = CreateEditor(gui.space);
     }
 
     specifyCustomDrawer("features", drawFeatures);

@@ -7,11 +7,13 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-public abstract class LeapGuiFeatureBase : ScriptableObject {
+public abstract class LeapGuiFeatureBase : HidableMonobehaviour {
   private bool _isDirty = true; //everything defaults dirty at the start!
 
-  public bool isDirty {
-    get {
+  public bool isDirty
+  {
+    get
+    {
 #if UNITY_EDITOR
       if (Application.isPlaying) {
         return _isDirty;
@@ -22,7 +24,8 @@ public abstract class LeapGuiFeatureBase : ScriptableObject {
       return _isDirty;
 #endif
     }
-    set {
+    set
+    {
       _isDirty = value;
     }
   }
@@ -35,6 +38,7 @@ public abstract class LeapGuiFeatureBase : ScriptableObject {
   public abstract void ClearDataObjectReferences();
   public abstract void AddDataObjectReference(LeapGuiElementData data);
 
+  public abstract Type GetDataObjectType();
   public abstract LeapGuiElementData CreateDataObject(LeapGuiElement element);
 
 #if UNITY_EDITOR
@@ -43,11 +47,9 @@ public abstract class LeapGuiFeatureBase : ScriptableObject {
 #endif
 }
 
-public abstract class LeapGuiElementData : ScriptableObject {
+public abstract class LeapGuiElementData : HidableMonobehaviour {
   [HideInInspector]
   public LeapGuiElement element;
-  [HideInInspector]
-  public LeapGuiFeatureBase feature;
 }
 
 public abstract class LeapGuiFeature<DataType> : LeapGuiFeatureBase
@@ -67,10 +69,13 @@ public abstract class LeapGuiFeature<DataType> : LeapGuiFeatureBase
     this.data.Add(data as DataType);
   }
 
+  public override Type GetDataObjectType() {
+    return typeof(DataType);
+  }
+
   public override LeapGuiElementData CreateDataObject(LeapGuiElement element) {
-    var dataObj = ScriptableObject.CreateInstance<DataType>();
+    var dataObj = element.gameObject.AddComponent<DataType>();
     dataObj.element = element;
-    dataObj.feature = this;
     return dataObj;
   }
 }

@@ -35,7 +35,7 @@ public class LeapGuiElementEditor : Editor {
     if (tempArray.Length != elements.Count) {
       tempArray = new Object[elements.Count];
     }
-
+    
     while (editorCache.Count < mainElement.data.Count) {
       editorCache.Add(null);
     }
@@ -66,8 +66,9 @@ public class LeapGuiElementEditor : Editor {
       tempList.CopyTo(tempArray);
 
       Editor editor = editorCache[i];
-      Editor.CreateCachedEditor(tempArray, null, ref editor);
+      CreateCachedEditor(tempArray, null, ref editor);
       editorCache[i] = editor;
+      editor.serializedObject.Update();
 
       EditorGUI.BeginChangeCheck();
       EditorGUILayout.LabelField(LeapGuiTagAttribute.GetTag(mainDataType));

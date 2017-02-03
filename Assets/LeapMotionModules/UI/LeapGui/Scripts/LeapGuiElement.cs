@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[DisallowMultipleComponent]
 public class LeapGuiElement : MonoBehaviour {
 
   //Used to ensure that gui elements can be enabled/disabled
@@ -14,9 +15,42 @@ public class LeapGuiElement : MonoBehaviour {
   [HideInInspector]
   public AnchorOfConstantSize anchor;
 
-  [HideInInspector]
+  //[HideInInspector]
   [SerializeField]
-  public List<LeapGuiElementData> data;
+  public List<LeapGuiElementData> data = new List<LeapGuiElementData>();
+
+  protected void OnValidate() {
+    //Delete any null references
+    for (int i = data.Count; i-- != 0;) {
+      if (data[i] == null) {
+        data.RemoveAt(i);
+      }
+    }
+
+    //Destroy any components that are not referenced by me
+    var allComponents = GetComponents<LeapGuiElementData>();
+    foreach (var component in allComponents) {
+      if (!data.Contains(component)) {
+        InternalUtility.Destroy(component);
+      }
+    }
+
+#if UNITY_EDITOR
+    for (int i = data.Count; i-- != 0;) {
+      var component = data[i];
+      if (component.gameObject != gameObject) {
+        Component movedComponent;
+        if (InternalUtility.TryMoveComponent(component, gameObject, out movedComponent)) {
+          data[i] = movedComponent as LeapGuiElementData;
+        } else {
+          Debug.LogWarning("Could not move component " + component + "!");
+          InternalUtility.Destroy(component);
+          data.RemoveAt(i);
+        }
+      }
+    }
+#endif
+  }
 
 #if UNITY_EDITOR
   /// <summary>
