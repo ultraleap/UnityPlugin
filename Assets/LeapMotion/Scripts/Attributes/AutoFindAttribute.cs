@@ -18,10 +18,10 @@ namespace Leap.Unity.Attributes {
   }
 
   public class AutoFindAttribute : CombinablePropertyAttribute, IPropertyConstrainer {
-    private AutoFindLocations _searchLocations;
+    public readonly AutoFindLocations searchLocations;
 
     public AutoFindAttribute(AutoFindLocations searchLocations = AutoFindLocations.All) {
-      _searchLocations = searchLocations;
+      this.searchLocations = searchLocations;
     }
 
 #if UNITY_EDITOR
@@ -36,7 +36,7 @@ namespace Leap.Unity.Attributes {
     }
 
     private bool search(SerializedProperty property, AutoFindLocations location, Func<Type, UnityEngine.Object> searchDelegate) {
-      if ((_searchLocations & location) != 0) {
+      if ((searchLocations & location) != 0) {
         var value = searchDelegate(fieldInfo.FieldType);
         if (value != null) {
           property.objectReferenceValue = value;
