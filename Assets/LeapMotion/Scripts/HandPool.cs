@@ -9,10 +9,10 @@ using Leap;
 
 namespace Leap.Unity {
   /** 
-   * HandPool holds a pool of IHandModels and makes HandProxys 
+   * HandPool holds a pool of IHandModels and makes HandRepresentations 
    * when given a Leap Hand and a model type of graphics or physics.
-   * When a HandProxy is created, an IHandModel is removed from the pool.
-   * When a HandProxy is finished, its IHandModel is returned to the pool.
+   * When a HandRepresentation is created, an IHandModel is removed from the pool.
+   * When a HandRepresentation is finished, its IHandModel is returned to the pool.
    */
   public class HandPool : MonoBehaviour {
     [SerializeField]
@@ -20,14 +20,14 @@ namespace Leap.Unity {
     private Transform ModelsParent;
     [SerializeField]
     private List<ModelGroup> ModelPool;
-    private List<HandProxy> activeHandProxies = new List<HandProxy>();
+    private List<HandRepresentation> activeHandReps = new List<HandRepresentation>();
 
     private Dictionary<IHandModel, ModelGroup> modelGroupMapping = new Dictionary<IHandModel, ModelGroup>();
-    private Dictionary<IHandModel, HandProxy> modelToHandProxMapping = new Dictionary<IHandModel, HandProxy>();
+    private Dictionary<IHandModel, HandRepresentation> modelToHandRepMapping = new Dictionary<IHandModel, HandRepresentation>();
     /**
      * ModelGroup contains a left/right pair of IHandModel's 
-     * @param modelList The IHandModels available for use by HandProxys
-     * @param modelsCheckedOut The IHandModels currently in use by active HandProxys
+     * @param modelList The IHandModels available for use by HandRepresentations
+     * @param modelsCheckedOut The IHandModels currently in use by active HandRepresentations
      * @param IsEnabled determines whether the ModelGroup is active at app Start(), though ModelGroup's are controlled with the EnableGroup() & DisableGroup methods.
      * @param CanDuplicate Allows a IHandModels in the ModelGroup to be cloned at runtime if a suitable IHandModel isn't available.
      */
@@ -80,32 +80,32 @@ namespace Leap.Unity {
       public void ReturnToGroup(IHandModel model) {
         modelsCheckedOut.Remove(model);
         modelList.Add(model);
-        this._handPool.modelToHandProxMapping.Remove(model);
+        this._handPool.modelToHandRepMapping.Remove(model);
       }
     }
     public void ReturnToPool(IHandModel model) {
       ModelGroup modelGroup;
       bool groupFound = modelGroupMapping.TryGetValue(model, out modelGroup);
       Assert.IsTrue(groupFound);
-      //First see if there is another active Proxy that can use this model
-      for (int i = 0; i < activeHandProxies.Count; i++) {
-        HandProxy Prox = activeHandProxies[i];
-        if (Prox.ProxChirality == model.Handedness && Prox.ProxType == model.HandModelType) {
+      //First see if there is another active Representation that can use this model
+      for (int i = 0; i < activeHandReps.Count; i++) {
+        HandRepresentation rep = activeHandReps[i];
+        if (rep.RepChirality == model.Handedness && rep.RepType == model.HandModelType) {
           bool modelFromGroupFound = false;
-          if (Prox.handModels != null) {
-            //And that Proxresention does not contain a model from this model's modelGroup
+          if (rep.handModels != null) {
+            //And that Represention does not contain a model from this model's modelGroup
             for (int j = 0; j < modelGroup.modelsCheckedOut.Count; j++) {
               IHandModel modelToCompare = modelGroup.modelsCheckedOut[j];
-              for (int k = 0; k < Prox.handModels.Count; k++) {
-                if (Prox.handModels[k] == modelToCompare) {
+              for (int k = 0; k < rep.handModels.Count; k++) {
+                if (rep.handModels[k] == modelToCompare) {
                   modelFromGroupFound = true;
                 }
               }
             }
           }
           if (!modelFromGroupFound) {
-            Prox.AddModel(model);
-            modelToHandProxMapping[model] = Prox;
+            rep.AddModel(model);
+            modelToHandRepMapping[model] = rep;
             return;
           }
         }
@@ -113,8 +113,8 @@ namespace Leap.Unity {
       //Otherwise return to pool
       modelGroup.ReturnToGroup(model);
     }
-    public void RemoveHandProxy(HandProxy handProx) {
-      activeHandProxies.Remove(handProx);
+    public void RemoveHandRepresentation(HandRepresentation handRepresentation) {
+      activeHandReps.Remove(handRepresentation);
     }
     /** Popuates the ModelPool with the contents of the ModelCollection */
     void Start() {
@@ -156,32 +156,32 @@ namespace Leap.Unity {
     }
 
     /**
-     * MakeHandProxy receives a Hand and combines that with an IHandModel to create a HandProxy
+     * MakeHandRepresentation receives a Hand and combines that with an IHandModel to create a HandRepresentation
      * @param hand The Leap Hand data to be drive an IHandModel
      * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
      */
 
-    public HandProxy MakeHandProxy(Hand hand, ModelType modelType) {
+    public HandRepresentation MakeHandRepresentation(Hand hand, ModelType modelType) {
       Chirality handChirality = hand.IsRight ? Chirality.Right : Chirality.Left;
-      HandProxy handProx = new HandProxy(this, hand, handChirality, modelType);
+      HandRepresentation handRep = new HandRepresentation(this, hand, handChirality, modelType);
       for (int i = 0; i < ModelPool.Count; i++) {
         ModelGroup group = ModelPool[i];
         if (group.IsEnabled) {
           IHandModel model = group.TryGetModel(handChirality, modelType);
           if (model != null ) {
-            handProx.AddModel(model);
-            handProx.Group = group;
-            if (!modelToHandProxMapping.ContainsKey(model)) {
-              modelToHandProxMapping.Add(model, handProx);
+            handRep.AddModel(model);
+            handRep.Group = group;
+            if (!modelToHandRepMapping.ContainsKey(model)) {
+              modelToHandRepMapping.Add(model, handRep);
             }
           }
         }
       }
-      activeHandProxies.Add(handProx);
-      return handProx;
+      activeHandReps.Add(handRep);
+      return handRep;
     }
     /**
-    * EnableGroup finds suitable HandProxys and adds IHandModels from the ModelGroup, returns them to their ModelGroup and sets the groups IsEnabled to true.
+    * EnableGroup finds suitable HandRepresentations and adds IHandModels from the ModelGroup, returns them to their ModelGroup and sets the groups IsEnabled to true.
      * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
     */
     public void EnableGroup(string groupName) {
@@ -193,12 +193,12 @@ namespace Leap.Unity {
       for (int i = 0; i < ModelPool.Count; i++) {
         if (ModelPool[i].GroupName == groupName) {
           group = ModelPool[i];
-          for (int hp = 0; hp < activeHandProxies.Count; hp++) {
-            HandProxy handProx = activeHandProxies[hp];
-            IHandModel model = group.TryGetModel(handProx.ProxChirality, handProx.ProxType);
+          for (int hp = 0; hp < activeHandReps.Count; hp++) {
+            HandRepresentation handRep = activeHandReps[hp];
+            IHandModel model = group.TryGetModel(handRep.RepChirality, handRep.RepType);
             if (model != null) {
-              handProx.AddModel(model);
-              modelToHandProxMapping.Add(model, handProx);
+              handRep.AddModel(model);
+              modelToHandRepMapping.Add(model, handRep);
             }
           }
           group.IsEnabled = true;
@@ -209,7 +209,7 @@ namespace Leap.Unity {
       }
     }
     /**
-     * DisableGroup finds and removes the ModelGroup's IHandModels from their HandProxys, returns them to their ModelGroup and sets the groups IsEnabled to false.
+     * DisableGroup finds and removes the ModelGroup's IHandModels from their HandRepresentations, returns them to their ModelGroup and sets the groups IsEnabled to false.
      * @param groupName Takes a string that matches the ModelGroup's groupName serialized in the Inspector
      */
     public void DisableGroup(string groupName) {
@@ -223,9 +223,9 @@ namespace Leap.Unity {
           group = ModelPool[i];
           for (int m = 0; m < group.modelsCheckedOut.Count; m++) {
             IHandModel model = group.modelsCheckedOut[m];
-            HandProxy handProx;
-            if (modelToHandProxMapping.TryGetValue(model, out handProx)) {
-              handProx.RemoveModel(model);
+            HandRepresentation handRep;
+            if (modelToHandRepMapping.TryGetValue(model, out handRep)) {
+              handRep.RemoveModel(model);
               group.ReturnToGroup(model);
               m--;
             }

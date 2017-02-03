@@ -1,37 +1,34 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using Leap;
+﻿using System.Collections.Generic;
 
 namespace Leap.Unity {
   /**
-   * HandProxy is a container class that facillitates the IHandModel lifecycle
-   * @param parent The HandPool which creates HandProxies
+   * HandRepresentation is a container class that facillitates the IHandModel lifecycle
+   * @param parent The HandPool which creates HandRepresentations
    * @param handModel the IHandModel to be paired with Leap Hand data.
    * @param hand The Leap Hand data to paired with an IHandModel
-   */ 
-  public class HandProxy {
+   */
+  public class HandRepresentation {
     HandPool parent;
     public int HandID { get; private set; }
     public int LastUpdatedTime { get; set; }
     public bool IsMarked { get; set; }
-    public Chirality ProxChirality { get; protected set; }
-    public ModelType ProxType { get; protected set; }
+    public Chirality RepChirality { get; protected set; }
+    public ModelType RepType { get; protected set; }
     public Hand MostRecentHand { get; protected set; }
     public Hand PostProcessHand { get; set; }
     public HandPool.ModelGroup Group { get; set; }
     public List<IHandModel> handModels;
 
-    public HandProxy(HandPool parent, Hand hand, Chirality proxChirality, ModelType proxType) {
+    public HandRepresentation(HandPool parent, Hand hand, Chirality repChirality, ModelType repType) {
       this.parent = parent;
       HandID = hand.Id;
-      this.ProxChirality = proxChirality;
-      this.ProxType = proxType;
+      this.RepChirality = repChirality;
+      this.RepType = repType;
       this.MostRecentHand = hand;
       this.PostProcessHand = new Hand();
     }
 
-    /** To be called if the HandProxy no longer has a Leap Hand. */
+    /** To be called if the HandRepresentation no longer has a Leap Hand. */
     public void Finish() {
       if (handModels != null) {
         for (int i = 0; i < handModels.Count; i++) {
@@ -40,7 +37,7 @@ namespace Leap.Unity {
           handModels[i] = null;
         }
       }
-      parent.RemoveHandProxy(this);
+      parent.RemoveHandRepresentation(this);
     }
 
     public void AddModel(IHandModel model) {
@@ -68,8 +65,8 @@ namespace Leap.Unity {
       }
     }
 
-    /** Calls Updates in IHandModels that are part of this HandProxy */
-    public void UpdateProxy(Hand hand)
+    /** Calls Updates in IHandModels that are part of this HandRepresentation */
+    public void UpdateRepresentation(Hand hand)
     {
       MostRecentHand = hand;
       if (handModels != null) {
