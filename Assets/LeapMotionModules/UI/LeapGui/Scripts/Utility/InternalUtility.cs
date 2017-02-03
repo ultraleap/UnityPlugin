@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
-using UnityEditor.Callbacks;
 
 [InitializeOnLoad]
 public static class InternalUtility {
@@ -14,17 +13,18 @@ public static class InternalUtility {
 #if UNITY_EDITOR
   private static List<Component> _cachedComponentList0 = new List<Component>();
   private static List<Component> _cachedComponentList1 = new List<Component>();
-  public static bool TryMoveComponent(Component source, GameObject toGameObject, out Component result) {
-    UnityEditorInternal.ComponentUtility.CopyComponent(source);
+  public static bool TryMoveComponent<T>(T source, GameObject toGameObject, out T result)
+    where T : Component {
+    ComponentUtility.CopyComponent(source);
 
     toGameObject.GetComponents(_cachedComponentList0);
-    UnityEditorInternal.ComponentUtility.PasteComponentAsNew(toGameObject);
+    ComponentUtility.PasteComponentAsNew(toGameObject);
     toGameObject.GetComponents(_cachedComponentList1);
 
     foreach (var component in _cachedComponentList1) {
-      if (!_cachedComponentList0.Contains(component)) {
+      if (!_cachedComponentList0.Contains(component) && component is T) {
         Destroy(source);
-        result = component;
+        result = component as T;
         return true;
       }
     }
@@ -32,10 +32,15 @@ public static class InternalUtility {
     result = null;
     return false;
   }
+#endif
 
   private static List<Object> toDestroy = new List<Object>();
   public static void Destroy(Object obj) {
+#if UNITY_EDITOR
     toDestroy.Add(obj);
+#else
+    Object.Destroy(obj);
+#endif
   }
 
   private static void destroyLoop() {
@@ -46,6 +51,4 @@ public static class InternalUtility {
       toDestroy.Clear();
     }
   }
-#endif
-
 }

@@ -39,9 +39,9 @@ public class LeapGuiElement : MonoBehaviour {
     for (int i = data.Count; i-- != 0;) {
       var component = data[i];
       if (component.gameObject != gameObject) {
-        Component movedComponent;
-        if (InternalUtility.TryMoveComponent(component, gameObject, out movedComponent)) {
-          data[i] = movedComponent as LeapGuiElementData;
+        LeapGuiElementData movedData;
+        if (InternalUtility.TryMoveComponent(component, gameObject, out movedData)) {
+          data[i] = movedData;
         } else {
           Debug.LogWarning("Could not move component " + component + "!");
           InternalUtility.Destroy(component);

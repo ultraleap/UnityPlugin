@@ -4,7 +4,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(LeapGui))]
 [DisallowMultipleComponent]
-public abstract class LeapGuiSpace : HidableMonobehaviour {
+public abstract class LeapGuiSpace : LeapGuiComponentBase<LeapGui> {
 
   [HideInInspector]
   public LeapGui gui;

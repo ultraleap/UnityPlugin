@@ -33,6 +33,50 @@ public class LeapGui : MonoBehaviour {
   [NonSerialized]
   public List<FeatureSupportInfo> supportInfo;
 
+  void OnValidate() {
+    for (int i = features.Count; i-- != 0;) {
+      if (features[i] == null) {
+        features.RemoveAt(i);
+      }
+    }
+
+#if UNITY_EDITOR
+    for (int i = features.Count; i-- != 0;) {
+      var feature = features[i];
+      if (feature.gameObject != gameObject) {
+        LeapGuiFeatureBase movedFeature;
+        if (InternalUtility.TryMoveComponent(feature, gameObject, out movedFeature)) {
+          features[i] = movedFeature;
+        } else {
+          Debug.LogWarning("Could not move feature component " + feature + "!");
+          InternalUtility.Destroy(feature);
+          features.RemoveAt(i);
+        }
+      }
+    }
+
+    if (space != null && space.gameObject != gameObject) {
+      LeapGuiSpace movedSpace;
+      if (InternalUtility.TryMoveComponent(space, gameObject, out movedSpace)) {
+        space = movedSpace;
+      } else {
+        Debug.LogWarning("Could not move space component " + space + "!");
+        InternalUtility.Destroy(space);
+      }
+    }
+
+    if (renderer != null && renderer.gameObject != gameObject) {
+      LeapGuiRenderer movedRenderer;
+      if (InternalUtility.TryMoveComponent(renderer, gameObject, out movedRenderer)) {
+        renderer = movedRenderer;
+      } else {
+        Debug.LogWarning("Could not move renderer component " + renderer "!");
+        InternalUtility.Destroy(renderer);
+      }
+    }
+#endif
+  }
+
   void Awake() {
     if (space != null) {
       space.gui = this;
@@ -53,17 +97,15 @@ public class LeapGui : MonoBehaviour {
   }
 
   void LateUpdate() {
-    if (renderer != null) {
 #if UNITY_EDITOR
-      if (Application.isPlaying) {
-        doLateUpdateRuntime();
-      } else {
-        doLateUpdateEditor();
-      }
-#else
+    if (Application.isPlaying) {
       doLateUpdateRuntime();
-#endif
+    } else {
+      doLateUpdateEditor();
     }
+#else
+    doLateUpdateRuntime();
+#endif
   }
 
   public LeapGuiRenderer GetRenderer() {
@@ -175,24 +217,30 @@ public class LeapGui : MonoBehaviour {
     rebuildFeatureSupportInfo();
     Profiler.EndSample();
 
-    Profiler.BeginSample("Build Element Data");
-    space.BuildElementData(transform);
-    Profiler.EndSample();
+    if (space != null) {
+      Profiler.BeginSample("Build Element Data");
+      space.BuildElementData(transform);
+      Profiler.EndSample();
 
-    Profiler.BeginSample("Update Renderer");
-    renderer.OnUpdateRendererEditor();
-    Profiler.EndSample();
+      Profiler.BeginSample("Rebuild Picking Meshes");
+      rebuildPickingMeshes();
+      Profiler.EndSample();
+    }
 
-    Profiler.BeginSample("Rebuild Picking Meshes");
-    rebuildPickingMeshes();
-    Profiler.EndSample();
+    if (renderer != null) {
+      Profiler.BeginSample("Update Renderer");
+      renderer.OnUpdateRendererEditor();
+      Profiler.EndSample();
+    }
   }
 #endif
 
   private void doLateUpdateRuntime() {
-    renderer.OnUpdateRenderer();
-    foreach (var feature in features) {
-      feature.isDirty = false;
+    if (renderer != null) {
+      renderer.OnUpdateRenderer();
+      foreach (var feature in features) {
+        feature.isDirty = false;
+      }
     }
   }
 
@@ -240,34 +288,36 @@ public class LeapGui : MonoBehaviour {
 
     var featureToInfo = new Dictionary<LeapGuiFeatureBase, FeatureSupportInfo>();
 
-    foreach (var pair in typeToFeatures) {
-      var featureType = pair.Key;
-      var featureList = pair.Value;
-      var infoList = new List<FeatureSupportInfo>().FillEach(featureList.Count, () => FeatureSupportInfo.FullSupport());
+    if (renderer != null) {
+      foreach (var pair in typeToFeatures) {
+        var featureType = pair.Key;
+        var featureList = pair.Value;
+        var infoList = new List<FeatureSupportInfo>().FillEach(featureList.Count, () => FeatureSupportInfo.FullSupport());
 
-      var castList = Activator.CreateInstance(typeof(List<>).MakeGenericType(featureType)) as IList;
-      foreach (var feature in featureList) {
-        castList.Add(feature);
-      }
-
-      try {
-        var interfaceType = typeof(ISupportsFeature<>).MakeGenericType(featureType);
-        if (!interfaceType.IsAssignableFrom(renderer.GetType())) {
-          infoList.FillEach(() => FeatureSupportInfo.Error("This renderer does not support this feature."));
-          continue;
+        var castList = Activator.CreateInstance(typeof(List<>).MakeGenericType(featureType)) as IList;
+        foreach (var feature in featureList) {
+          castList.Add(feature);
         }
 
-        var supportDelegate = interfaceType.GetMethod("GetSupportInfo");
+        try {
+          var interfaceType = typeof(ISupportsFeature<>).MakeGenericType(featureType);
+          if (!interfaceType.IsAssignableFrom(renderer.GetType())) {
+            infoList.FillEach(() => FeatureSupportInfo.Error("This renderer does not support this feature."));
+            continue;
+          }
 
-        if (supportDelegate == null) {
-          Debug.LogError("Could not find support delegate.");
-          continue;
-        }
+          var supportDelegate = interfaceType.GetMethod("GetSupportInfo");
 
-        supportDelegate.Invoke(renderer, new object[] { castList, infoList });
-      } finally {
-        for (int i = 0; i < featureList.Count; i++) {
-          featureToInfo[featureList[i]] = infoList[i];
+          if (supportDelegate == null) {
+            Debug.LogError("Could not find support delegate.");
+            continue;
+          }
+
+          supportDelegate.Invoke(renderer, new object[] { castList, infoList });
+        } finally {
+          for (int i = 0; i < featureList.Count; i++) {
+            featureToInfo[featureList[i]] = infoList[i];
+          }
         }
       }
     }
@@ -302,14 +352,13 @@ public class LeapGui : MonoBehaviour {
           var meshData = dataObj as LeapGuiMeshData;
           if (meshData.mesh == null) continue;
 
-          var tris = meshData.mesh.triangles;
-          for (int i = 0; i < tris.Length; i++) {
-            pickingTris.Add(tris[i] + pickingVerts.Count);
+          var topology = MeshCache.GetTopology(meshData.mesh);
+          for (int i = 0; i < topology.tris.Length; i++) {
+            pickingTris.Add(topology.tris[i] + pickingVerts.Count);
           }
 
-          var verts = meshData.mesh.vertices;
-          for (int i = 0; i < verts.Length; i++) {
-            Vector3 localRectVert = transform.InverseTransformPoint(element.transform.TransformPoint(verts[i]));
+          for (int i = 0; i < topology.verts.Length; i++) {
+            Vector3 localRectVert = transform.InverseTransformPoint(element.transform.TransformPoint(topology.verts[i]));
             pickingVerts.Add(space.TransformPoint(element, localRectVert));
           }
         }

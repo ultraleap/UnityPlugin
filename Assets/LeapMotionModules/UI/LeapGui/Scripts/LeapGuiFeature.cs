@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Reflection;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
-public abstract class LeapGuiFeatureBase : HidableMonobehaviour {
+public abstract class LeapGuiFeatureBase : LeapGuiComponentBase<LeapGui> {
   private bool _isDirty = true; //everything defaults dirty at the start!
 
   public bool isDirty
@@ -47,9 +42,20 @@ public abstract class LeapGuiFeatureBase : HidableMonobehaviour {
 #endif
 }
 
-public abstract class LeapGuiElementData : HidableMonobehaviour {
+[ExecuteInEditMode]
+public abstract class LeapGuiElementData : LeapGuiComponentBase<LeapGuiElement> {
   [HideInInspector]
   public LeapGuiElement element;
+
+  protected override void OnValidate() {
+    base.OnValidate();
+
+    var connectedElement = GetComponent<LeapGuiElement>();
+    if (element == null ||
+        !element.data.Contains(this)) {
+      InternalUtility.Destroy(this);
+    }
+  }
 }
 
 public abstract class LeapGuiFeature<DataType> : LeapGuiFeatureBase
