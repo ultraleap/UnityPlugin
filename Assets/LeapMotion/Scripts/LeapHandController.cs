@@ -5,13 +5,13 @@ using Leap;
 
 namespace Leap.Unity {
   /**
-   * LeapHandController uses a Factory to create and update HandRepresentations based on Frame's received from a Provider  */
+   * LeapHandController uses a Factory to create and update HandProxies based on Frame's received from a Provider  */
   public class LeapHandController : MonoBehaviour {
     protected LeapProvider provider;
-    protected HandFactory factory;
+    protected HandPool pool;
 
-    protected Dictionary<int, HandRepresentation> graphicsReps = new Dictionary<int, HandRepresentation>();
-    protected Dictionary<int, HandRepresentation> physicsReps = new Dictionary<int, HandRepresentation>();
+    protected Dictionary<int, HandProxy> graphicsProxies = new Dictionary<int, HandProxy>();
+    protected Dictionary<int, HandProxy> physicsProxies = new Dictionary<int, HandProxy>();
 
     // Reference distance from thumb base to pinky base in mm.
     protected const float GIZMO_SCALE = 5.0f;
@@ -45,7 +45,7 @@ namespace Leap.Unity {
 
     protected virtual void OnEnable() {
       provider = requireComponent<LeapProvider>();
-      factory = requireComponent<HandFactory>();
+      pool = requireComponent<HandPool>();
 
       provider.OnUpdateFrame += OnUpdateFrame;
       provider.OnFixedFrame += OnFixedFrame;
@@ -56,56 +56,56 @@ namespace Leap.Unity {
       provider.OnFixedFrame -= OnFixedFrame;
     }
 
-    /** Updates the graphics HandRepresentations. */
+    /** Updates the graphics HandProxies. */
     protected virtual void OnUpdateFrame(Frame frame) {
       if (frame != null && graphicsEnabled) {
-        UpdateHandRepresentations(graphicsReps, ModelType.Graphics, frame);
+        UpdateHandProxies(graphicsProxies, ModelType.Graphics, frame);
       }
     }
 
-    /** Updates the physics HandRepresentations. */
+    /** Updates the physics HandProxies. */
     protected virtual void OnFixedFrame(Frame frame) {
       if (frame != null && physicsEnabled) {
-        UpdateHandRepresentations(physicsReps, ModelType.Physics, frame);
+        UpdateHandProxies(physicsProxies, ModelType.Physics, frame);
       }
     }
 
     /** 
-    * Updates HandRepresentations based in the specified HandRepresentation Dictionary.
-    * Active HandRepresentation instances are updated if the hand they represent is still
-    * present in the Provider's CurrentFrame; otherwise, the HandRepresentation is removed. If new
-    * Leap Hand objects are present in the Leap HandRepresentation Dictionary, new HandRepresentations are 
+    * Updates HandProxies based in the specified HandProxy Dictionary.
+    * Active HandProxy instances are updated if the hand they represent is still
+    * present in the Provider's CurrentFrame; otherwise, the HandProxy is removed. If new
+    * Leap Hand objects are present in the Leap HandProxy Dictionary, new HandProxies are 
     * created and added to the dictionary. 
-    * @param all_hand_reps = A dictionary of Leap Hand ID's with a paired HandRepresentation
+    * @param all_hand_proxies = A dictionary of Leap Hand ID's with a paired HandProxy
     * @param modelType Filters for a type of hand model, for example, physics or graphics hands.
     * @param frame The Leap Frame containing Leap Hand data for each currently tracked hand
     */
-    protected virtual void UpdateHandRepresentations(Dictionary<int, HandRepresentation> all_hand_reps, ModelType modelType, Frame frame) {
+    protected virtual void UpdateHandProxies(Dictionary<int, HandProxy> all_hand_proxies, ModelType modelType, Frame frame) {
       for (int i = 0; i < frame.Hands.Count; i++) {
         var curHand = frame.Hands[i];
-        HandRepresentation rep;
-        if (!all_hand_reps.TryGetValue(curHand.Id, out rep)) {
-          rep = factory.MakeHandRepresentation(curHand, modelType);
-          if (rep != null) {
-            all_hand_reps.Add(curHand.Id, rep);
+        HandProxy prox;
+        if (!all_hand_proxies.TryGetValue(curHand.Id, out prox)) {
+          prox = pool.MakeHandProxy(curHand, modelType);
+          if (prox != null) {
+            all_hand_proxies.Add(curHand.Id, prox);
           }
         }
-        if (rep != null) {
-          rep.IsMarked = true;
-          if (rep.Group.HandPostProcesses.GetPersistentEventCount() > 0) {
-            rep.PostProcessHand.CopyFrom(curHand);
-            rep.Group.HandPostProcesses.Invoke(rep.PostProcessHand);
-            rep.UpdateRepresentation(rep.PostProcessHand);
+        if (prox != null) {
+          prox.IsMarked = true;
+          if (prox.Group.HandPostProcesses.GetPersistentEventCount() > 0) {
+            prox.PostProcessHand.CopyFrom(curHand);
+            prox.Group.HandPostProcesses.Invoke(prox.PostProcessHand);
+            prox.UpdateProxy(prox.PostProcessHand);
           } else {
-            rep.UpdateRepresentation(curHand);
+            prox.UpdateProxy(curHand);
           }
-          rep.LastUpdatedTime = (int)frame.Timestamp;
+          prox.LastUpdatedTime = (int)frame.Timestamp;
         }
       }
 
-      /** Mark-and-sweep to finish unused HandRepresentations */
-      HandRepresentation toBeDeleted = null;
-      for (var it = all_hand_reps.GetEnumerator(); it.MoveNext();) {
+      /** Mark-and-sweep to finish unused HandProxies */
+      HandProxy toBeDeleted = null;
+      for (var it = all_hand_proxies.GetEnumerator(); it.MoveNext();) {
         var r = it.Current;
         if (r.Value != null) {
           if (r.Value.IsMarked) {
@@ -117,10 +117,10 @@ namespace Leap.Unity {
           }
         }
       }
-      /**Inform the representation that we will no longer be giving it any hand updates 
+      /**Inform the proxy that we will no longer be giving it any hand updates 
        * because the corresponding hand has gone away */
       if (toBeDeleted != null) {
-        all_hand_reps.Remove(toBeDeleted.HandID);
+        all_hand_proxies.Remove(toBeDeleted.HandID);
         toBeDeleted.Finish();
       }
     }
