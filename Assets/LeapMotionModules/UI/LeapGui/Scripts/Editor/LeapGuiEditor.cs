@@ -16,6 +16,9 @@ public class LeapGuiEditor : CustomEditorBase {
   private ReorderableList _featureList;
   private GenericMenu _addFeatureMenu;
 
+  private GenericMenu _addSpaceMenu;
+  private Editor _spaceEditor;
+
   private GenericMenu _addRendererMenu;
   private Editor _rendererEditor;
 
@@ -47,9 +50,25 @@ public class LeapGuiEditor : CustomEditorBase {
 
     _addFeatureMenu = new GenericMenu();
     foreach (var feature in allFeatures) {
-      _addFeatureMenu.AddItem(new GUIContent(LeapGuiFeatureNameAttribute.GetFeatureName(feature)),
+      _addFeatureMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(feature)),
                               false,
                               () => gui.features.Add(ScriptableObject.CreateInstance(feature) as LeapGuiFeatureBase));
+    }
+
+    var allSpaces = allTypes.Query().
+                             Where(t => !t.IsAbstract).
+                             Where(t => !t.IsGenericType).
+                             Where(t => t.IsSubclassOf(typeof(LeapGuiSpace)));
+
+    _addSpaceMenu = new GenericMenu();
+    foreach (var space in allSpaces) {
+      _addSpaceMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(space)),
+                            false,
+                            () => {
+                              gui.SetSpace(ScriptableObject.CreateInstance(space) as LeapGuiSpace);
+                              _spaceEditor = Editor.CreateEditor(gui.space);
+                              serializedObject.Update();
+                            });
     }
 
     var allRenderers = allTypes.Query().
@@ -59,7 +78,7 @@ public class LeapGuiEditor : CustomEditorBase {
 
     _addRendererMenu = new GenericMenu();
     foreach (var renderer in allRenderers) {
-      _addRendererMenu.AddItem(new GUIContent(renderer.Name),
+      _addRendererMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(renderer)),
                                false,
                                () => {
                                  gui.SetRenderer(ScriptableObject.CreateInstance(renderer) as LeapGuiRenderer);
@@ -72,7 +91,12 @@ public class LeapGuiEditor : CustomEditorBase {
       _rendererEditor = Editor.CreateEditor(gui.renderer);
     }
 
+    if (gui.space != null) {
+      _spaceEditor = Editor.CreateEditor(gui.space);
+    }
+
     specifyCustomDrawer("features", drawFeatures);
+    specifyCustomDrawer("space", drawSpace);
     specifyCustomDrawer("renderer", drawRenderer);
   }
 
@@ -106,11 +130,27 @@ public class LeapGuiEditor : CustomEditorBase {
     }
   }
 
-  private void drawRenderer(SerializedProperty property) {
+  private void drawSpace(SerializedProperty property) {
     Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
     Rect left, right;
     rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH);
 
+    EditorGUI.LabelField(left, "Space", EditorStyles.miniButtonLeft);
+    if (GUI.Button(right, "+", EditorStyles.miniButtonRight)) {
+      _addSpaceMenu.ShowAsContext();
+    }
+
+    if (_spaceEditor != null) {
+      _spaceEditor.DrawDefaultInspector();
+    }
+
+    EditorGUILayout.Space();
+  }
+
+  private void drawRenderer(SerializedProperty property) {
+    Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
+    Rect left, right;
+    rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH);
 
     EditorGUI.LabelField(left, "Renderer", EditorStyles.miniButtonLeft);
     if (GUI.Button(right, "+", EditorStyles.miniButtonRight)) {
@@ -121,7 +161,6 @@ public class LeapGuiEditor : CustomEditorBase {
       _rendererEditor.DrawDefaultInspector();
     }
   }
-
 
   // Feature list callbacks
 
@@ -143,7 +182,7 @@ public class LeapGuiEditor : CustomEditorBase {
   private void drawFeatureCallback(Rect rect, int index, bool isActive, bool isFocused) {
     var feature = gui.features[index];
 
-    string featureName = LeapGuiFeatureNameAttribute.GetFeatureName(gui.features[index].GetType());
+    string featureName = LeapGuiTagAttribute.GetTag(gui.features[index].GetType());
     GUIContent featureLabel = new GUIContent(featureName);
 
     Color originalColor = GUI.color;

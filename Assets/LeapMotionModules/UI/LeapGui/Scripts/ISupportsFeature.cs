@@ -54,7 +54,7 @@ public static class FeatureSupportUtil {
     where T : LeapGuiFeatureBase {
     for (int i = 1; i < features.Count; i++) {
       info[i] = FeatureSupportInfo.Error("This renderer only supports a single " +
-                                          LeapGuiFeatureNameAttribute.GetFeatureName(typeof(T)) +
+                                          LeapGuiTagAttribute.GetTag(typeof(T)) +
                                           " feature.");
     }
   }

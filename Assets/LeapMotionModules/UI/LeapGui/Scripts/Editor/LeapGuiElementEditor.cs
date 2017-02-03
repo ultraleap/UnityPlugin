@@ -48,7 +48,7 @@ public class LeapGuiElementEditor : Editor {
       editorCache[i] = editor;
 
       EditorGUI.BeginChangeCheck();
-      EditorGUILayout.LabelField(LeapGuiFeatureNameAttribute.GetFeatureName(gui.features[i].GetType()));
+      EditorGUILayout.LabelField(LeapGuiTagAttribute.GetTag(gui.features[i].GetType()));
       EditorGUI.indentLevel++;
 
       editor.OnInspectorGUI();

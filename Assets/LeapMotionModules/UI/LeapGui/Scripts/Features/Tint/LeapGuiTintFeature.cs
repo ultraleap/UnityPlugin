@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-[LeapGuiFeatureName("Tint")]
+[LeapGuiTag("Tint")]
 public class LeapGuiTintFeature : LeapGuiFeature<LeapGuiTintData> {
   public const string FEATURE_NAME = LeapGui.FEATURE_PREFIX + "TINTING";
 

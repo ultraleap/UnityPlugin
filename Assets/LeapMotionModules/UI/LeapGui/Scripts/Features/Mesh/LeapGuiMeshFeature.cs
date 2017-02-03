@@ -7,7 +7,7 @@ using UnityEngine.Rendering;
 using UnityEditor;
 #endif
 
-[LeapGuiFeatureName("Mesh")]
+[LeapGuiTag("Mesh")]
 public class LeapGuiMeshFeature : LeapGuiFeature<LeapGuiMeshData> {
   public const string UV_0_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_UV_0";
   public const string UV_1_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_UV_1";

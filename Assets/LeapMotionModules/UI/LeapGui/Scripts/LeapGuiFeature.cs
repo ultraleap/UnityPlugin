@@ -7,32 +7,6 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-public class LeapGuiFeatureNameAttribute : Attribute {
-  private static Dictionary<Type, string> _featureNameCache = new Dictionary<Type, string>();
-
-  public readonly string featureName;
-
-  public LeapGuiFeatureNameAttribute(string featureName) {
-    this.featureName = featureName;
-  }
-
-  public static string GetFeatureName(Type type) {
-    string featureName;
-    if (!_featureNameCache.TryGetValue(type, out featureName)) {
-      object[] attributes = type.GetCustomAttributes(typeof(LeapGuiFeatureNameAttribute), inherit: true);
-      if (attributes.Length == 1) {
-        featureName = (attributes[0] as LeapGuiFeatureNameAttribute).featureName;
-      } else {
-        featureName = type.Name;
-      }
-      _featureNameCache[type] = featureName;
-    }
-
-    return featureName;
-  }
-}
-
 public abstract class LeapGuiFeatureBase : ScriptableObject {
   private bool _isDirty = true; //everything defaults dirty at the start!
 

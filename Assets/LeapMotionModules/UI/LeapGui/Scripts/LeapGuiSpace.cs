@@ -4,17 +4,10 @@ using UnityEngine;
 
 [RequireComponent(typeof(LeapGui))]
 [DisallowMultipleComponent]
-public abstract class LeapGuiSpace : MonoBehaviour {
+public abstract class LeapGuiSpace : ScriptableObject {
 
-  private LeapGui _cachedLeapGui;
-  public LeapGui gui {
-    get {
-      if (_cachedLeapGui == null) {
-        _cachedLeapGui = GetComponent<LeapGui>();
-      }
-      return _cachedLeapGui;
-    }
-  }
+  [HideInInspector]
+  public LeapGui gui;
 
   /// <summary>
   /// Builds internal data for all existing gui elements in the gui from scratch.

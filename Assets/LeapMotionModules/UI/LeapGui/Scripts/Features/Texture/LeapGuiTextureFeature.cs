@@ -6,7 +6,7 @@ using UnityEngine.Rendering;
 using UnityEditor;
 #endif
 
-[LeapGuiFeatureName("Texture")]
+[LeapGuiTag("Texture")]
 public class LeapGuiTextureFeature : LeapGuiFeature<LeapGuiTextureData> {
   public string propertyName = "_MainTex";
   public UVChannelFlags channel = UVChannelFlags.UV0;

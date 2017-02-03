@@ -10,6 +10,7 @@ using UnityEditor;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
+[LeapGuiTag("Dynamic")]
 public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   ISupportsFeature<LeapGuiMeshFeature>,
   ISupportsFeature<LeapGuiTextureFeature> {
@@ -20,7 +21,6 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   [MinValue(0)]
   [SerializeField]
   private int _borderAmount;
-
 
   private List<Mesh> _elementMeshes = new List<Mesh>();
   private Material _material;

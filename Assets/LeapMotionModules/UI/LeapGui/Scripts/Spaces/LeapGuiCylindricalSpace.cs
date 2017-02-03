@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.Query;
+using Leap.Unity.Query;//
 
+[LeapGuiTag("Cylindrical")]
 public class LeapGuiCylindricalSpace : LeapGuiSpace {
   public const string FEATURE_NAME = LeapGui.FEATURE_PREFIX + "CYLINDRICAL";
   public const string RADIUS_PROPERTY = LeapGui.PROPERTY_PREFIX + "Cylindrical_Radius";
@@ -157,7 +158,7 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace {
   private const int GIZMO_Y_COUNT = 2;
   private const float GIZMO_RES = 0.05f;
   void OnDrawGizmos() {
-    Gizmos.matrix = transform.localToWorldMatrix;
+    Gizmos.matrix = gui.transform.localToWorldMatrix;
     Gizmos.color = Color.white;
     for (int y = -GIZMO_Y_COUNT; y <= GIZMO_Y_COUNT; y++) {
       float dy = y * GIZMO_HEIGHT / GIZMO_Y_COUNT;

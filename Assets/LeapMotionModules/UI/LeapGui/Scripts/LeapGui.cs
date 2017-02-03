@@ -16,6 +16,8 @@ public class LeapGui : MonoBehaviour {
 
   public List<LeapGuiFeatureBase> features;
 
+  public LeapGuiSpace space;
+
 #if UNITY_EDITOR
   public new LeapGuiRenderer renderer;
 #else
@@ -31,13 +33,9 @@ public class LeapGui : MonoBehaviour {
   [NonSerialized]
   public List<FeatureSupportInfo> supportInfo;
 
-  private LeapGuiSpace _cachedGuiSpace;
-  public LeapGuiSpace space {
-    get {
-      if (_cachedGuiSpace == null) {
-        _cachedGuiSpace = GetComponent<LeapGuiSpace>();
-      }
-      return _cachedGuiSpace;
+  void Awake() {
+    if (space != null) {
+      space.gui = this;
     }
   }
 
@@ -73,12 +71,33 @@ public class LeapGui : MonoBehaviour {
   }
 
 #if UNITY_EDITOR
-  public void SetRenderer(LeapGuiRenderer newRenderer) {
-    UnityEditor.Undo.RecordObject(this, "Changed Gui Renderer");
+  public void SetSpace(LeapGuiSpace newSpace) {
+    if (Application.isPlaying) {
+      throw new InvalidOperationException("Cannot change the space at runtime.");
+    }
 
+    UnityEditor.Undo.RecordObject(this, "Change Gui Space");
+    UnityEditor.EditorUtility.SetDirty(this);
+
+    if (space != null) {
+      DestroyImmediate(space);
+      space = null;
+    }
+
+    space = newSpace;
+
+    if (space != null) {
+      space.gui = this;
+    }
+  }
+
+  public void SetRenderer(LeapGuiRenderer newRenderer) {
     if (Application.isPlaying) {
       throw new InvalidOperationException("Cannot change renderer at runtime.");
     }
+
+    UnityEditor.Undo.RecordObject(this, "Changed Gui Renderer");
+    UnityEditor.EditorUtility.SetDirty(this);
 
     if (renderer != null) {
       renderer.OnDisableRendererEditor();
@@ -87,13 +106,11 @@ public class LeapGui : MonoBehaviour {
     }
 
     renderer = newRenderer;
-    renderer.gui = this;
 
     if (renderer != null) {
+      renderer.gui = this;
       renderer.OnEnableRendererEditor();
     }
-
-    UnityEditor.EditorUtility.SetDirty(this);
   }
 #endif
 
