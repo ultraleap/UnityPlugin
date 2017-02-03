@@ -36,33 +36,41 @@ public class LeapGuiElementEditor : Editor {
       tempArray = new Object[elements.Count];
     }
 
+    while (editorCache.Count < mainElement.data.Count) {
+      editorCache.Add(null);
+    }
+
     for (int i = 0; i < mainElement.data.Count; i++) {
       var mainDataObj = mainElement.data[i];
+      var mainDataType = mainDataObj.GetType();
       var typeIndex = mainElement.data.Query().Where(d => d.GetType() == mainDataObj.GetType()).IndexOf(mainDataObj);
+
+      tempList.Clear();
+      tempList.Add(mainDataObj);
 
       elements.Query().
                Skip(1).
                Select(e =>
                  e.data.Query().
-                        Where(d => d.GetType() == mainDataObj.GetType()).
-                        Skip(typeIndex).
-                        FirstOrDefault()).
+                        OfType(mainDataType).
+                        ElementAtOrDefault(typeIndex)).
                Where(d => d != null).
-               Select(d => d as Object).
-               FillList(tempList);
+               Cast<Object>().
+               AppendList(tempList);
 
-      Editor editor = null;
-      if (editorCache.Count <= i) {
-        editorCache.Add(null);
-      } else {
-        editor = editorCache[i];
+      if (tempList.Count != elements.Count) {
+        //Not all elements had a matching data object, so we don't display
+        continue;
       }
 
-      Editor.CreateCachedEditor(objs, null, ref editor);
+      tempList.CopyTo(tempArray);
+
+      Editor editor = editorCache[i];
+      Editor.CreateCachedEditor(tempArray, null, ref editor);
       editorCache[i] = editor;
 
       EditorGUI.BeginChangeCheck();
-      EditorGUILayout.LabelField(LeapGuiTagAttribute.GetTag(gui.features[i].GetType()));
+      EditorGUILayout.LabelField(LeapGuiTagAttribute.GetTag(mainDataType));
       EditorGUI.indentLevel++;
 
       editor.OnInspectorGUI();
