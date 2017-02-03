@@ -7,9 +7,8 @@ using UnityEditor;
 
 public static class ReadWriteUtility {
 
-
-#if UNITY_EDITOR
   public static bool EnsureReadWriteEnabled(this Texture texture) {
+#if UNITY_EDITOR
     string assetPath = AssetDatabase.GetAssetPath(texture);
     if (string.IsNullOrEmpty(assetPath)) {
       return false;
@@ -25,11 +24,13 @@ public static class ReadWriteUtility {
       importer.SaveAndReimport();
       AssetDatabase.Refresh();
     }
+#endif
 
     return true;
   }
 
   public static bool EnsureReadWriteEnabled(this Mesh mesh) {
+#if UNITY_EDITOR
     string assetPath = AssetDatabase.GetAssetPath(mesh);
     if (string.IsNullOrEmpty(assetPath)) {
       return false;
@@ -45,11 +46,8 @@ public static class ReadWriteUtility {
       importer.SaveAndReimport();
       AssetDatabase.Refresh();
     }
+#endif
 
     return true;
   }
-#endif
-
-
-
 }

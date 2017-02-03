@@ -56,39 +56,15 @@ public class LeapGui : MonoBehaviour {
 
   void LateUpdate() {
     if (renderer != null) {
+#if UNITY_EDITOR
       if (Application.isPlaying) {
-        renderer.OnUpdateRenderer();
-        foreach (var feature in features) {
-          feature.isDirty = false;
-        }
+        doLateUpdateRuntime();
       } else {
-        elements.Clear();
-        anchors.Clear();
-
-        Profiler.BeginSample("Rebuild Element List");
-        rebuildElementList(transform, null);
-        Profiler.EndSample();
-
-        Profiler.BeginSample("Rebuild Feature Data");
-        rebuildFeatureData();
-        Profiler.EndSample();
-
-        Profiler.BeginSample("Rebuild Support Info");
-        rebuildFeatureSupportInfo();
-        Profiler.EndSample();
-
-        Profiler.BeginSample("Build Element Data");
-        space.BuildElementData(transform);
-        Profiler.EndSample();
-
-        Profiler.BeginSample("Update Renderer");
-        renderer.OnUpdateRendererEditor();
-        Profiler.EndSample();
-
-        Profiler.BeginSample("Rebuild Picking Meshes");
-        rebuildPickingMeshes();
-        Profiler.EndSample();
+        doLateUpdateEditor();
       }
+#else
+      doLateUpdateRuntime();
+#endif
     }
   }
 
@@ -157,6 +133,44 @@ public class LeapGui : MonoBehaviour {
       }
 
       rebuildElementList(child, childAnchor);
+    }
+  }
+
+#if UNITY_EDITOR
+  private void doLateUpdateEditor() {
+    elements.Clear();
+    anchors.Clear();
+
+    Profiler.BeginSample("Rebuild Element List");
+    rebuildElementList(transform, null);
+    Profiler.EndSample();
+
+    Profiler.BeginSample("Rebuild Feature Data");
+    rebuildFeatureData();
+    Profiler.EndSample();
+
+    Profiler.BeginSample("Rebuild Support Info");
+    rebuildFeatureSupportInfo();
+    Profiler.EndSample();
+
+    Profiler.BeginSample("Build Element Data");
+    space.BuildElementData(transform);
+    Profiler.EndSample();
+
+    Profiler.BeginSample("Update Renderer");
+    renderer.OnUpdateRendererEditor();
+    Profiler.EndSample();
+
+    Profiler.BeginSample("Rebuild Picking Meshes");
+    rebuildPickingMeshes();
+    Profiler.EndSample();
+  }
+#endif
+
+  private void doLateUpdateRuntime() {
+    renderer.OnUpdateRenderer();
+    foreach (var feature in features) {
+      feature.isDirty = false;
     }
   }
 
@@ -267,6 +281,7 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
+#if UNITY_EDITOR
   private void rebuildPickingMeshes() {
     List<Vector3> pickingVerts = new List<Vector3>();
     List<int> pickingTris = new List<int>();
@@ -307,4 +322,5 @@ public class LeapGui : MonoBehaviour {
       pickingMesh.RecalculateNormals();
     }
   }
+#endif
 }
