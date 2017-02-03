@@ -24,6 +24,7 @@ namespace Leap.Unity {
 
     public HandProxy(HandPool parent, Hand hand, Chirality proxChirality, ModelType proxType) {
       this.parent = parent;
+      HandID = hand.Id;
       this.ProxChirality = proxChirality;
       this.ProxType = proxType;
       this.MostRecentHand = hand;
