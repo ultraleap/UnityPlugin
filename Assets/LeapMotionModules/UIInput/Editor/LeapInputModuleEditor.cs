@@ -63,7 +63,8 @@ namespace Leap.Unity.InputModule {
                          "ShowExperimentalOptions",
                          "PointerDistanceScale",
                          "PointerPinchScale",
-                         "environmentPinch");
+                         "environmentPinch",
+                         "MovingReferenceFrame");
 
       specifyConditionalDrawing(() => module.ShowExperimentalOptions,
                    "InteractionMode",
@@ -79,7 +80,8 @@ namespace Leap.Unity.InputModule {
                    "perFingerPointer",
                    "RetractUI",
                    "EnvironmentPointer",
-                   "environmentPinch");
+                   "environmentPinch",
+                   "MovingReferenceFrame");
 
       specifyConditionalDrawing(() => module.EnvironmentPointer,
              "environmentPinch");
