@@ -2,7 +2,7 @@
 using UnityEngine.Assertions;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using UnityEngine.Events;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -51,6 +51,11 @@ namespace Leap.Unity {
       public List<IHandModel> modelsCheckedOut;
       public bool IsEnabled = true;
       public bool CanDuplicate;
+
+      [System.Serializable]
+      public class HandEvent : UnityEvent<Hand> { }
+      public HandEvent HandPostProcesses;
+
       /*Looks for suitable IHandModel is the ModelGroup's modelList, if found, it is added to modelsCheckedOut.
        * If not, one can be cloned*/
       public IHandModel TryGetModel(Chirality chirality, ModelType modelType) {
@@ -80,6 +85,12 @@ namespace Leap.Unity {
         modelsCheckedOut.Remove(model);
         modelList.Add(model);
         this._handPool.modelToHandRepMapping.Remove(model);
+      }
+      public void ApplyPostProcess(Hand inHand) {
+        HandPostProcesses.Invoke(inHand);
+      }
+      public int PostProcessCount() {
+        return HandPostProcesses.GetPersistentEventCount();
       }
     }
     public void ReturnToPool(IHandModel model) {
@@ -169,6 +180,7 @@ namespace Leap.Unity {
           IHandModel model = group.TryGetModel(handChirality, modelType);
           if (model != null ) {
             handRep.AddModel(model);
+            handRep.Group = group;
             if (!modelToHandRepMapping.ContainsKey(model)) {
               modelToHandRepMapping.Add(model, handRep);
             }
