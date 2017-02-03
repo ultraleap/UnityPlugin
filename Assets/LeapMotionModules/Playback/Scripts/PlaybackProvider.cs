@@ -17,12 +17,6 @@ namespace Leap.Unity.Playback {
       }
     }
 
-    public override Image CurrentImage {
-      get {
-        return null;
-      }
-    }
-
     [SerializeField]
     protected Recording _recording;
 

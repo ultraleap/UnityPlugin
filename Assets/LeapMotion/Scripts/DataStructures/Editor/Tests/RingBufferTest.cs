@@ -4,11 +4,11 @@ using NUnit.Framework;
 namespace Leap.Unity.Graphing.Tests {
   public class RingBufferTest {
 
-    private RingBuffer<int> _buffer;
+    private Deque<int> _buffer;
 
     [SetUp]
     public void Setup() {
-      _buffer = new RingBuffer<int>();
+      _buffer = new Deque<int>();
     }
 
     [TearDown]
@@ -20,7 +20,7 @@ namespace Leap.Unity.Graphing.Tests {
     [Test]
     //[ExpectedException(typeof(ArgumentException))]
     public void InvalidCapacity([Values(int.MinValue, -1, 0)] int minCapacity) {
-      new RingBuffer<int>(minCapacity);
+      new Deque<int>(minCapacity);
     }
 
     [Test]
