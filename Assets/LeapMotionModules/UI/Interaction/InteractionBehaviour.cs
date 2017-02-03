@@ -59,10 +59,10 @@ namespace Leap.Unity.UI.Interaction {
     }
     [DisableIf("graspedHoldBehavior", isEqualTo: GraspedHoldBehavior.DoNothing)]
     [Tooltip("When the object is moved by the FollowHand behavior, how should it move to its"
-      + "new position? Nonkinematic bodies will collide with other Rigidbodies, so they "
-      + "might not reach the target position. Kinematic rigidbodies will always move to the "
-      + "target position, ignoring collisions. Inherit will simply use the isKinematic "
-      + "state of the Rigidbody from before it was grasped.")]
+           + "new position? Nonkinematic bodies will collide with other Rigidbodies, so they "
+           + "might not reach the target position. Kinematic rigidbodies will always move to the "
+           + "target position, ignoring collisions. Inherit will simply use the isKinematic "
+           + "state of the Rigidbody from before it was grasped.")]
     public GraspedHoldMovementType graspedHoldMovementType;
 
     /// <summary> The RigidbodyWarper manipulates the graphical (but not physical) position
@@ -71,8 +71,9 @@ namespace Leap.Unity.UI.Interaction {
     public RigidbodyWarper rigidbodyWarper;
 
     [Header("Advanced Settings")]
-    [Tooltip("")]
-    public bool GraspHoldWarpingEnabled = true;
+    [Tooltip("Warping manipulates the graphical (but not physical) position of grasped objects "
+           + "based on the movement of the Leap hand so the objects appear to move with less latency.")]
+    public bool graspHoldWarpingEnabled = true; // TODO: Warping not yet implemented.
 
     private Rigidbody _body;
 
