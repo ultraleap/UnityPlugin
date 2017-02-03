@@ -21,21 +21,35 @@ public class LeapGuiElementEditor : Editor {
   List<LeapGuiElement> elements = new List<LeapGuiElement>();
   List<Editor> editorCache = new List<Editor>();
 
+  Object[] tempArray = new Object[0];
+  List<Object> tempList = new List<Object>();
+
   public override void OnInspectorGUI() {
     base.OnInspectorGUI();
 
     targets.Query().Where(e => e != null).Select(e => e as LeapGuiElement).FillList(elements);
 
     if (elements.Count == 0) return;
+    var mainElement = elements[0];
 
-    var gui = elements[0].GetComponentInParent<LeapGui>();
-    if (elements.Query().Any(e => e.GetComponentInParent<LeapGui>() != gui)) {
-      EditorGUILayout.HelpBox("Cannot edit multiple elements from different gui's.", MessageType.Info);
-      return;
+    if (tempArray.Length != elements.Count) {
+      tempArray = new Object[elements.Count];
     }
 
-    for (int i = 0; i < gui.features.Count; i++) {
-      var objs = elements.Query().Select(e => e.data[i]).ToArray();
+    for (int i = 0; i < mainElement.data.Count; i++) {
+      var mainDataObj = mainElement.data[i];
+      var typeIndex = mainElement.data.Query().Where(d => d.GetType() == mainDataObj.GetType()).IndexOf(mainDataObj);
+
+      elements.Query().
+               Skip(1).
+               Select(e =>
+                 e.data.Query().
+                        Where(d => d.GetType() == mainDataObj.GetType()).
+                        Skip(typeIndex).
+                        FirstOrDefault()).
+               Where(d => d != null).
+               Select(d => d as Object).
+               FillList(tempList);
 
       Editor editor = null;
       if (editorCache.Count <= i) {
