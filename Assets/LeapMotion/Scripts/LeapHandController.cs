@@ -117,7 +117,7 @@ namespace Leap.Unity {
           }
         }
       }
-      /**Inform the repy that we will no longer be giving it any hand updates 
+      /**Inform the representation that we will no longer be giving it any hand updates 
        * because the corresponding hand has gone away */
       if (toBeDeleted != null) {
         all_hand_reps.Remove(toBeDeleted.HandID);
