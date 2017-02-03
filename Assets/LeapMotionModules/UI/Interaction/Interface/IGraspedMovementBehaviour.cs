@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IGraspedMovementBehaviour : MonoBehaviour {
+namespace Leap.Unity.UI.Interaction {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+  public abstract class IGraspedMovementBehaviour {
+
+    
+
+  }
+
 }

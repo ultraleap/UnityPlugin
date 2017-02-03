@@ -14,9 +14,14 @@ namespace Leap.Unity.UI.Interaction {
       throw new System.NotImplementedException();
     }
 
+    public void ClearHands() {
+      throw new System.NotImplementedException();
+    }
+
     public void GetHoldingPose(out Vector3 position, out Quaternion rotation) {
       throw new System.NotImplementedException();
     }
+
   }
 
 }

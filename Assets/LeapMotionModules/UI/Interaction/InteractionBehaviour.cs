@@ -13,6 +13,7 @@ namespace Leap.Unity.UI.Interaction {
     public Action<Hand> OnHoverStay  = (hand) => { };
     public Action<Hand> OnHoverEnd   = (hand) => { };
 
+    // TODO: Document OnObjectHover callbacks and how they differ from OnHover callbacks
     public Action<Hand> OnObjectHoverBegin = (closestHand) => { };
     public Action<Hand> OnObjectHoverStay  = (closestHand) => { };
     public Action<Hand> OnObjectHoverEnd   = (closestHand) => { };
@@ -23,7 +24,7 @@ namespace Leap.Unity.UI.Interaction {
 
     // TODO: When two-handed grasping becomes a thing, implement these.
     //public Action       OnObjectGraspBegin = () => { };
-    //public Action       OnObjectGraspStay  = () => { };
+    //public Action       OnObjectGraspHold  = () => { };
     //public Action       OnObjectGraspEnd   = () => { };
 
     // TODO: Primary hover not totally good yet. Needs work.
@@ -31,19 +32,11 @@ namespace Leap.Unity.UI.Interaction {
     public Action<Hand> OnPrimaryHoverStay  = (hand) => { };
     public Action<Hand> OnPrimaryHoverEnd   = (hand) => { };
 
-    /// <summary>
-    /// When the object is grasped, what should it do? FollowHand utilizes a Kabsch
-    /// solve algorithm to move the object with the hand. Or, choose DoNothing and
-    /// use the grasp events to specify your own behavior.
-    /// </summary>
-    public enum GraspedHoldBehavior {
-      FollowHand,
-      DoNothing
-    }
-    [Tooltip("When the object is grasped, what should it do? FollowHand utilizes a Kabsch "
-           + "solve algorithm to move the object with the hand. Or, choose DoNothing and "
-           + "use the grasp events to specify your own behavior.")]
-    public GraspedHoldBehavior graspedHoldBehavior;
+    [Tooltip("Should hands move the object as if it is held when the object is grasped? "
+           + "Use OnPostHoldMovement to constrain the object's motion while held, or "
+           + "set this property to false to specify your own behavior entirely in "
+           + "OnGraspHold or OnObjectGraspHold.")]
+    public bool moveObjectWhenGrasped = true;
 
     /// <summary>
     /// When the object is moved by the FollowHand behavior, how should it move to its
@@ -57,8 +50,8 @@ namespace Leap.Unity.UI.Interaction {
       Kinematic,
       Nonkinematic
     }
-    [DisableIf("graspedHoldBehavior", isEqualTo: GraspedHoldBehavior.DoNothing)]
-    [Tooltip("When the object is moved by the FollowHand behavior, how should it move to its"
+    [DisableIf("moveObjectWhenGrasped", isEqualTo: false)]
+    [Tooltip("When the object is moved by a holding InteractionHand, how should it move to its"
            + "new position? Nonkinematic bodies will collide with other Rigidbodies, so they "
            + "might not reach the target position. Kinematic rigidbodies will always move to the "
            + "target position, ignoring collisions. Inherit will simply use the isKinematic "
@@ -90,17 +83,17 @@ namespace Leap.Unity.UI.Interaction {
     /// InteractionManager manually calls this directly
     /// after all InteractionHands are updated (in FixedUpdate).
     /// 
-    /// These methods fire per-object interaction events, e.g., OnObjectHoverStay,
-    /// in contrast to methods like OnHoverStay, which fire per-hand.
-    /// Events like OnObjectHoverStay only fire once per FixedUpdate, no matter
-    /// how many hands are hovering over the object.
+    /// Hovering uses this to provide per-object (as opposed to per-hand)
+    /// hover callbacks, e.g. OnObjectHoverStay(), which fires once per frame
+    /// while the object is hovered by any number of hands greater than zero.
+    /// 
+    /// Grasping uses this to do support changing moveObjectWhenGrasping at
+    /// runtime.
     /// </summary>
     public override void FixedUpdateObject() {
-      // Fire per-object interaction events
-      // (As opposed to per-hand interaction events, which are handled by InteractionHand).
-      FixedUpdateObjectHovering();
-      //FixedUpdateObjectContact();  // Contact not yet implemented.
-      //FixedUpdateObjectGrasping(); // Not yet necessary (two-handed grabbing NYI).
+      FixedUpdateHovering();
+      //FixedUpdateContact();  // Contact not yet implemented.
+      FixedUpdateGrasping(); // Not yet necessary (two-handed grabbing NYI).
     }
 
     // TODO: Currently this gets the distance from the point to this transform, but this will
@@ -118,7 +111,7 @@ namespace Leap.Unity.UI.Interaction {
     private int   _hoveringHandsCountLastFrame = 0;
     private int   _hoveringHandsCount = 0;
 
-    private void FixedUpdateObjectHovering() {
+    private void FixedUpdateHovering() {
       if (_hoveringHandsCount > 0) {
         if (_hoveringHandsCountLastFrame == 0) {
           OnObjectHoverBegin(_closestHoveringHand);
@@ -209,8 +202,10 @@ namespace Leap.Unity.UI.Interaction {
     #region Grasping
 
     private int _graspCount = 0;
+    private bool _wasMovingObjectWhenGraspedLastFrame;
 
-    private IGraspedHoldBehaviour     _graspedHoldBehaviour;
+    private IGraspedHoldBehaviour _graspedHoldBehaviour;
+    // TODO: Investigate the best way to allow custom holding behavior specification.
     private IGraspedHoldBehaviour GraspedHoldBehaviour {
       get {
         if (_graspedHoldBehaviour == null) {
@@ -223,7 +218,16 @@ namespace Leap.Unity.UI.Interaction {
 
     private void InitGrasping() {
       _graspedHoldBehaviour = new KabschHoldBehaviour();
-      //_graspedMovementBehaviour = new 
+      _wasMovingObjectWhenGraspedLastFrame = moveObjectWhenGrasped;
+      //_graspedMovementBehaviour = new // TODO: implement IGraspedMovementBehaviour.
+    }
+
+    private void FixedUpdateGrasping() {
+      if (!moveObjectWhenGrasped && _wasMovingObjectWhenGraspedLastFrame) {
+        _graspedHoldBehaviour.ClearHands();
+      }
+
+      _wasMovingObjectWhenGraspedLastFrame = moveObjectWhenGrasped;
     }
 
     public override bool IsGrasped {
@@ -241,19 +245,21 @@ namespace Leap.Unity.UI.Interaction {
         Debug.LogWarning("Two-handed grasping is not yet supported!");
       }
 
-      SnapToHand(hand);
+      // SnapToHand(hand); // TODO: When you grasp an object, snap the object into a good holding position.
+
+      if (moveObjectWhenGrasped) {
+        GraspedHoldBehaviour.AddHand(interactionManager.GetInteractionHand(hand.Handedness()));
+      }
 
       OnGraspBegin(hand);
     }
 
-    // Not yet implemented.
-    private void SnapToHand(Hand hand) {
-      // TODO: When you grasp an object, snap the object into a good holding position.
-    }
-
     public override void GraspHold(Hand hand) {
-      if (graspedHoldBehavior == GraspedHoldBehavior.FollowHand) {
-        //KabschFollow(hand);
+      if (moveObjectWhenGrasped) {
+        Vector3 newPosition;
+        Quaternion newRotation;
+        _graspedHoldBehaviour.GetHoldingPose(out newPosition, out newRotation);
+        //_graspedMovementBehaviour.
       }
 
       OnGraspHold(hand);
@@ -262,9 +268,14 @@ namespace Leap.Unity.UI.Interaction {
     public override void GraspEnd(Hand hand) {
       _graspCount--;
 
+      if (moveObjectWhenGrasped) {
+        _graspedHoldBehaviour.RemoveHand(interactionManager.GetInteractionHand(hand.Handedness()));
+      }
+
       OnGraspEnd(hand);
     }
 
+    // TODO: Implement suspend/resume callbacks and example behavior.
     public override void GraspSuspendObject(Hand hand) {
       throw new System.NotImplementedException();
     }
