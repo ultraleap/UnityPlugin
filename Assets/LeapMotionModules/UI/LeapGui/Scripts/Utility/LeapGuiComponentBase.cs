@@ -13,7 +13,7 @@ public class LeapGuiComponentBase<AttatchedComponent> : MonoBehaviour
     if (attatched == null) {
       InternalUtility.Destroy(this);
     }
-    
+
     hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
   }
 }
