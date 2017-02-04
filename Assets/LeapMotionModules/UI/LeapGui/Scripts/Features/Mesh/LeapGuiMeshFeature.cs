@@ -31,13 +31,13 @@ public class LeapGuiMeshFeature : LeapGuiFeature<LeapGuiMeshData> {
     }
   }
 
-  public bool uv0;
-  public bool uv1;
-  public bool uv2;
-  public bool uv3;
-  public bool color;
-  public Color tint;
-  public bool normals;
+  public bool uv0 = true;
+  public bool uv1 = false;
+  public bool uv2 = false;
+  public bool uv3 = false;
+  public bool color = false;
+  public Color tint = Color.white;
+  public bool normals = false;
 
   public IEnumerable<UVChannelFlags> enabledUvChannels {
     get {
