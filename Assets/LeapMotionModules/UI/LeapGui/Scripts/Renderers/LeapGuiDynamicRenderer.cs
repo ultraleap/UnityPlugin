@@ -70,17 +70,18 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
         Quaternion rot = Quaternion.Euler(0, parameters.angleOffset * Mathf.Rad2Deg, 0);
 
-        Matrix4x4 guiTransform = Matrix4x4.TRS(pos, rot, Vector3.one);
-        Matrix4x4 totalTransform = guiTransform * Matrix4x4.TRS(-element.transform.position, Quaternion.identity, Vector3.one) * element.transform.localToWorldMatrix;
-        Matrix4x4 invTransform = guiTransform.inverse;
+        Matrix4x4 guiMesh = transform.localToWorldMatrix * Matrix4x4.TRS(pos, rot, Vector3.one);
+        Matrix4x4 deform = transform.worldToLocalMatrix * Matrix4x4.TRS(transform.position - element.transform.position, Quaternion.identity, Vector3.one) * element.transform.localToWorldMatrix;
+        Matrix4x4 total = guiMesh * deform;
 
         _cylindrical_elementParameters[i] = parameters;
-        _cylindrical_meshTransforms[i] = totalTransform;
-        _cylindrical_worldToAnchor[i] = invTransform;
+        _cylindrical_meshTransforms[i] = total;
+        _cylindrical_worldToAnchor[i] = guiMesh.inverse;
       }
 
       _material.SetFloat(LeapGuiCylindricalSpace.RADIUS_PROPERTY, cylindricalSpace.radius);
       _material.SetMatrixArray("_LeapGuiCylindrical_WorldToAnchor", _cylindrical_worldToAnchor);
+      _material.SetMatrix("_LeapGui_LocalToWorld", transform.localToWorldMatrix);
       _material.SetVectorArray("_LeapGuiCylindrical_ElementParameters", _cylindrical_elementParameters);
 
       for (int i = 0; i < _elementMeshes.Count; i++) {

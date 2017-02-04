@@ -19,6 +19,7 @@ float4x4 _LeapGui_GuiToWorld;
 
 float4x4 _LeapGuiCylindrical_WorldToAnchor[ELEMENT_MAX];
 float4 _LeapGuiCylindrical_ElementParameters[ELEMENT_MAX];
+float4x4 _LeapGui_LocalToWorld;
 
 void ApplyGuiWarping(inout float4 vert, int elementId) {
   vert = mul(_LeapGuiCylindrical_WorldToAnchor[elementId], vert);
@@ -26,7 +27,7 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
   float4 parameters = _LeapGuiCylindrical_ElementParameters[elementId];
   Cylindrical_LocalToWorld(vert.xyz, parameters);
 
-  //vert = mul(_LeapGuiCylindrical_AnchorToWorld[elementId], vert);
+  vert = mul(_LeapGui_LocalToWorld, vert);
 }
 #endif
 
