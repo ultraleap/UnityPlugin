@@ -76,6 +76,14 @@ public class LeapGui : MonoBehaviour {
 #endif
   }
 
+  void OnDestroy() {
+    if (renderer != null) DestroyImmediate(renderer);
+    if (space != null) DestroyImmediate(space);
+    foreach (var feature in features) {
+      if (feature != null) DestroyImmediate(feature);
+    }
+  }
+
   void Awake() {
     if (space != null) {
       space.gui = this;

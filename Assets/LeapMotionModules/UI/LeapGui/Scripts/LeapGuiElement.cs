@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[ExecuteInEditMode]
 [DisallowMultipleComponent]
 public class LeapGuiElement : MonoBehaviour {
 
@@ -49,6 +50,12 @@ public class LeapGuiElement : MonoBehaviour {
       }
     }
 #endif
+  }
+
+  void OnDestroy() {
+    foreach (var dataObj in data) {
+      if (dataObj != null) DestroyImmediate(dataObj);
+    }
   }
 
 #if UNITY_EDITOR
