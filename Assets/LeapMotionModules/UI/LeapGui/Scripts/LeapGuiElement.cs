@@ -54,7 +54,7 @@ public class LeapGuiElement : MonoBehaviour {
 
   void OnDestroy() {
     foreach (var dataObj in data) {
-      if (dataObj != null) DestroyImmediate(dataObj);
+      if (dataObj != null) InternalUtility.Destroy(dataObj);
     }
   }
 

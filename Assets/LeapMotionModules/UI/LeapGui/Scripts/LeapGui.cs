@@ -77,10 +77,10 @@ public class LeapGui : MonoBehaviour {
   }
 
   void OnDestroy() {
-    if (renderer != null) DestroyImmediate(renderer);
-    if (space != null) DestroyImmediate(space);
+    if (renderer != null) InternalUtility.Destroy(renderer);
+    if (space != null) InternalUtility.Destroy(space);
     foreach (var feature in features) {
-      if (feature != null) DestroyImmediate(feature);
+      if (feature != null) InternalUtility.Destroy(feature);
     }
   }
 

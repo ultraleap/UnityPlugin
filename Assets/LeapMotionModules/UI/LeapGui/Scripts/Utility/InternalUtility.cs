@@ -37,7 +37,11 @@ public static class InternalUtility {
   private static List<Object> toDestroy = new List<Object>();
   public static void Destroy(Object obj) {
 #if UNITY_EDITOR
-    toDestroy.Add(obj);
+    if (Application.isPlaying) {
+      Object.Destroy(obj);
+    } else {
+      toDestroy.Add(obj);
+    }
 #else
     Object.Destroy(obj);
 #endif
