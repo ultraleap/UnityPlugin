@@ -309,6 +309,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     foreach (var feature in _meshFeatures) {
       for (int i = 0; i < feature.data.Count; i++) {
         var mesh = feature.data[i].mesh;
+        if (mesh == null) continue;
 
         uv3.Append(mesh.vertexCount, new Vector4(0, 0, 0, i));
       }
