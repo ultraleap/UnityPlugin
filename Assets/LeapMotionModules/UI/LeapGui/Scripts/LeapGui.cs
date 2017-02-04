@@ -70,7 +70,7 @@ public class LeapGui : MonoBehaviour {
       if (InternalUtility.TryMoveComponent(renderer, gameObject, out movedRenderer)) {
         renderer = movedRenderer;
       } else {
-        Debug.LogWarning("Could not move renderer component " + renderer "!");
+        Debug.LogWarning("Could not move renderer component " + renderer + "!");
         InternalUtility.Destroy(renderer);
       }
     }

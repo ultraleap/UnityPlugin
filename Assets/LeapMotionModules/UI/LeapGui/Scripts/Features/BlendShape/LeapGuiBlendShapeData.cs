@@ -11,6 +11,7 @@ public static class LeapGuiBlendShapeExtensions {
   }
 }
 
+[AddComponentMenu("")]
 public class LeapGuiBlendShapeData : LeapGuiElementData {
 
   [Range(0, 1)]

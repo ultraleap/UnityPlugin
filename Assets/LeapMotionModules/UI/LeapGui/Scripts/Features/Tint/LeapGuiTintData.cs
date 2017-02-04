@@ -9,6 +9,7 @@ public static class LeapGuiTintExtensions {
   }
 }
 
+[AddComponentMenu("")]
 public class LeapGuiTintData : LeapGuiElementData {
 
   [SerializeField]

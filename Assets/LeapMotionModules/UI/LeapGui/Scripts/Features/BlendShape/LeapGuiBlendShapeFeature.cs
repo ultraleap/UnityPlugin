@@ -6,6 +6,7 @@ using UnityEditor;
 #endif
 using Leap.Unity.Query;
 
+[AddComponentMenu("")]
 [LeapGuiTag("Blend Shape")]
 public class LeapGuiBlendShapeFeature : LeapGuiFeature<LeapGuiBlendShapeData> {
   public const string FEATURE_NAME = LeapGui.FEATURE_PREFIX + "BLEND_SHAPES";

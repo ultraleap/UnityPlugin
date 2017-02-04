@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 using UnityEditor;
 #endif
 
+[AddComponentMenu("")]
 [LeapGuiTag("Texture")]
 public class LeapGuiTextureFeature : LeapGuiFeature<LeapGuiTextureData> {
   public string propertyName = "_MainTex";

@@ -9,6 +9,7 @@ public static class LeapGuiTextureExtensions {
   }
 }
 
+[AddComponentMenu("")]
 public class LeapGuiTextureData : LeapGuiElementData {
   public Texture2D texture;
 }

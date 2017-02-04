@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.Query;//
 
+[AddComponentMenu("")]
 [LeapGuiTag("Cylindrical")]
 public class LeapGuiCylindricalSpace : LeapGuiSpace {
   public const string FEATURE_NAME = LeapGui.FEATURE_PREFIX + "CYLINDRICAL";

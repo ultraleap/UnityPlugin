@@ -7,6 +7,7 @@ using UnityEngine.Rendering;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
+[AddComponentMenu("")]
 [LeapGuiTag("Baked")]
 public class LeapGuiBakedRenderer : LeapGuiRenderer,
   ISupportsFeature<LeapGuiMeshFeature>,

@@ -14,6 +14,6 @@ public class LeapGuiComponentBase<AttatchedComponent> : MonoBehaviour
       InternalUtility.Destroy(this);
     }
 
-    //hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
+    hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
   }
 }

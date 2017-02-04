@@ -10,6 +10,7 @@ using UnityEditor;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
+[AddComponentMenu("")]
 [LeapGuiTag("Dynamic")]
 public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   ISupportsFeature<LeapGuiMeshFeature>,

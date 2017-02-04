@@ -9,6 +9,7 @@ public static class LeapGuiMeshExtensions {
   }
 }
 
+[AddComponentMenu("")]
 public class LeapGuiMeshData : LeapGuiElementData {
 
   [SerializeField]
