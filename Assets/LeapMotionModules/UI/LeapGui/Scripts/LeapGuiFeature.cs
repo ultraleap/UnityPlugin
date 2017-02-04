@@ -50,7 +50,6 @@ public abstract class LeapGuiElementData : LeapGuiComponentBase<LeapGuiElement> 
   protected override void OnValidate() {
     base.OnValidate();
 
-    var connectedElement = GetComponent<LeapGuiElement>();
     if (element == null ||
         !element.data.Contains(this)) {
       InternalUtility.Destroy(this);

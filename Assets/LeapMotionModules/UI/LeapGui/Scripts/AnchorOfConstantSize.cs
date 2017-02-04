@@ -1,3 +1,5 @@
 ﻿using UnityEngine;
 
-public class AnchorOfConstantSize : MonoBehaviour { }
+public class AnchorOfConstantSize : MonoBehaviour {
+  void Start() { }
+}
