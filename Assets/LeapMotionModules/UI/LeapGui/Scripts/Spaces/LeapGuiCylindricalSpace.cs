@@ -4,7 +4,7 @@ using UnityEngine;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Cylindrical")]
-public class LeapGuiCylindricalSpace : LeapGuiSpace {
+public class LeapGuiCylindricalSpace : LeapGuiSpace, ISupportsAddRemove {
   public const string FEATURE_NAME = LeapGui.FEATURE_PREFIX + "CYLINDRICAL";
   public const string RADIUS_PROPERTY = LeapGui.PROPERTY_PREFIX + "Cylindrical_Radius";
 
@@ -12,6 +12,13 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace {
 
   private Dictionary<AnchorOfConstantSize, AnchorData> _anchorData = new Dictionary<AnchorOfConstantSize, AnchorData>();
 
+  public void OnAddElements(List<LeapGuiElement> element, List<int> indexes) {
+    BuildElementData(transform); //TODO, optimize
+  }
+
+  public void OnRemoveElements(List<int> toRemove) {
+    BuildElementData(transform); //TODO, optimize
+  }
 
   public AnchorData GetAnchorData(AnchorOfConstantSize anchor) {
     return _anchorData[anchor];
