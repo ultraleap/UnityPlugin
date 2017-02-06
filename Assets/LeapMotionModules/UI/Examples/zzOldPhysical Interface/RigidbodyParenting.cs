@@ -17,7 +17,7 @@ namespace Leap.Unity.UI.Constraints {
 
     void Start() {
       _childBody = GetComponent<Rigidbody>();
-      _parentBody = _childBody.transform.parent.GetComponent<Rigidbody>();
+      _parentBody = _childBody.transform.parent.GetComponentInParent<Rigidbody>();
       if (_parentBody == null) { Debug.LogError("[RigidbodyParenting] Must be attached to a Rigidbody that is the child of another Rigidbody."); }
 
       InitializeBodies();

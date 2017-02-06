@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
-  public interface IHoldMovementBehaviour {
+  public interface IHoldingMovementController {
 
     /// <summary>
     /// Called by an InteractionBehaviour when it calculates a target position
@@ -12,8 +12,7 @@ namespace Leap.Unity.UI.Interaction {
     /// to those positions.
     /// </summary>
     void MoveTo(Vector3 solvedPosition, Quaternion solvedRotation,
-                InteractionBehaviour interactionObj,
-                ReadonlyList<Hand> graspingHands);
+                InteractionBehaviour interactionObj);
 
   }
 

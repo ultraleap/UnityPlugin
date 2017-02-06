@@ -96,11 +96,11 @@ namespace Leap.Unity.UI.Interaction {
       }
 
       private HoverCheckResults CheckHoverForElement(Hand hand, InteractionBehaviourBase hoverable, HoverCheckResults curResults) {
-        float score = hoverable.GetHoverScore(hand);
+        float score = hoverable.GetHoverDistance(hand);
         if (score > 0F) {
           curResults.hovered.Add(hoverable);
         }
-        if (score > curResults.primaryHoveredScore) {
+        if (score < curResults.primaryHoveredScore) {
           curResults.primaryHovered = hoverable;
           curResults.primaryHoveredScore = score;
         }

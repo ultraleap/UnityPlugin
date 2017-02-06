@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
-  public class KabschHoldPositionBehaviour : IHoldPositionBehaviour {
+  public class KabschHoldingPose : IHoldingPoseController {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 
@@ -14,12 +14,14 @@ namespace Leap.Unity.UI.Interaction {
 
     // TODO: These variables are only used for PivotAroundOrigin calculation,
     // which is currently unused/unsupported
+#pragma warning disable 0414 // remove these when decision is made
     private Vector3 _handCentroid, _objectCentroid;
     private float _boneCount;
+#pragma warning restore 0414
 
     private Dictionary<InteractionManager.InteractionHand, HandPointCollection> _handToPoints;
 
-    public KabschHoldPositionBehaviour(InteractionBehaviour interactionObj) {
+    public KabschHoldingPose(InteractionBehaviour interactionObj) {
       _interactionObj = interactionObj;
       // TODO: If an InteractionBehaviour is required for this anyway, why isn't that a part of the IHoldPositionBehaviour interface...
 

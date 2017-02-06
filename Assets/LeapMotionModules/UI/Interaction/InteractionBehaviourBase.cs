@@ -1,4 +1,5 @@
 ﻿using Leap;
+using Leap.Unity.Attributes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,8 +10,20 @@ namespace Leap.Unity.UI.Interaction {
 
     public InteractionManager interactionManager;
 
-    [Header("Interaction Settings -- currently ignored!")]
-    public bool allowsTwoHandedGrasp = false;
+    [SerializeField]
+    [HideInInspector]
+    private bool _interactionManagerIsNull = true;
+
+    [Header("Interaction Settings")]
+    // TODO: Display a warning when the Interaction Manager has any of the actions below disabled.
+    [DisableIf("_interactionManagerIsNull", isEqualTo: true)]
+    public bool ignoreHover = false; // TODO: 
+    [DisableIf("_interactionManagerIsNull", isEqualTo: true)]
+    public bool ignoreContact = false; // TODO: Contact NYI.
+    [DisableIf("_interactionManagerIsNull", isEqualTo: true)]
+    public bool ignoreGrasping = false;
+    [DisableIf("_interactionManagerIsNull", isEqualTo: true)]
+    public bool allowsTwoHandedGrasp__curIgnored = false;
 
     /// <summary>
     /// Called by the InteractionManager every FixedUpdate,
@@ -29,11 +42,15 @@ namespace Leap.Unity.UI.Interaction {
     /// // TODO: Implement by checking it in InteractionHand
     public bool IsInteractionEligible { get; set; }
 
+    protected virtual void OnValidate() {
+      _interactionManagerIsNull = interactionManager == null;
+    }
+
     #region Hovering
 
     // TODO: Hover scores may not be the right idea here.
     /// <summary> Values >= zero are "hovered." Of hovered objects, the one with the highest score is the "primary" hovered object. </summary>
-    public abstract float GetHoverScore(Hand hand);
+    public abstract float GetHoverDistance(Hand hand);
 
 
     /// <summary> Called per-hand when that hand produces a non-zero hover score for this object. </summary>

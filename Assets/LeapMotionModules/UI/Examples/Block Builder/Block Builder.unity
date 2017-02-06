@@ -213,10 +213,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &587915
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -247,6 +247,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &587917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 587912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c526e4f3a2828d6479d719db3a05ff7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &587918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -504,10 +515,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &80016640
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -520,7 +531,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &80016641
@@ -538,6 +549,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &80016642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 80016638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae99288a7d10294dbf5fff25d171f68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &80016643
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -663,10 +685,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &99090520
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -679,7 +701,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &99090521
@@ -697,6 +719,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &99090522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 99090518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae99288a7d10294dbf5fff25d171f68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &99090523
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -860,7 +893,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &147983684
 Transform:
   m_ObjectHideFlags: 0
@@ -1007,10 +1040,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &169351217
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1041,6 +1074,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &169351219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 169351214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c526e4f3a2828d6479d719db3a05ff7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &169351220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1262,10 +1306,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!65 &222225563
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1290,7 +1334,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &222225565
@@ -1674,10 +1718,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!65 &348634153
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1702,7 +1746,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &348634155
@@ -1967,10 +2011,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &380663632
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1983,7 +2027,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &380663633
@@ -2001,6 +2045,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &380663634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 380663630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae99288a7d10294dbf5fff25d171f68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &380663635
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2167,10 +2222,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &555685149
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2183,7 +2238,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &555685150
@@ -2201,6 +2256,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &555685151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 555685147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae99288a7d10294dbf5fff25d171f68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &555685152
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2552,10 +2618,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &704611757
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2568,7 +2634,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &704611758
@@ -2586,6 +2652,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &704611759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 704611755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae99288a7d10294dbf5fff25d171f68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &704611760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2605,6 +2682,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 704808702}
+  - component: {fileID: 704808703}
+  - component: {fileID: 704808704}
   m_Layer: 4
   m_Name: Transform Handle
   m_TagString: Untagged
@@ -2628,6 +2707,33 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &704808703
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 704808701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ed3691bea2fbb8478c728ffa4a640a8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetObject: {fileID: 604984048}
+--- !u!54 &704808704
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 704808701}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &706613722
 GameObject:
   m_ObjectHideFlags: 0
@@ -3137,10 +3243,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &849898417
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3153,7 +3259,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &849898418
@@ -3171,6 +3277,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &849898419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 849898415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae99288a7d10294dbf5fff25d171f68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &849898420
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3466,10 +3583,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!65 &1060371168
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3494,7 +3611,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &1060371170
@@ -3774,10 +3891,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1104693723
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3790,7 +3907,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &1104693724
@@ -3808,6 +3925,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &1104693725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1104693721}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae99288a7d10294dbf5fff25d171f68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1104693726
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3998,10 +4126,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!65 &1110988032
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4026,7 +4154,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &1110988034
@@ -4611,10 +4739,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!65 &1243998594
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4639,7 +4767,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &1243998596
@@ -5754,10 +5882,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1393283211
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5770,7 +5898,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &1393283212
@@ -5788,6 +5916,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &1393283213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1393283209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae99288a7d10294dbf5fff25d171f68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1393283214
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5913,10 +6052,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1422347800
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5929,7 +6068,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &1422347801
@@ -5947,6 +6086,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &1422347802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1422347798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae99288a7d10294dbf5fff25d171f68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1422347803
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6056,10 +6206,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!65 &1433262625
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6084,7 +6234,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &1433262627
@@ -6390,10 +6540,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1542990749
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6406,7 +6556,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &1542990750
@@ -6424,6 +6574,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &1542990751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1542990747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae99288a7d10294dbf5fff25d171f68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1542990752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6553,10 +6714,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1557400536
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6587,6 +6748,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &1557400538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1557400533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c526e4f3a2828d6479d719db3a05ff7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1557400539
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6753,10 +6925,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1617468041
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6769,7 +6941,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &1617468042
@@ -6787,6 +6959,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &1617468043
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1617468039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae99288a7d10294dbf5fff25d171f68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1617468044
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7084,10 +7267,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1799006750
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7118,6 +7301,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &1799006752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1799006747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c526e4f3a2828d6479d719db3a05ff7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1799006753
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7546,10 +7740,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1835329070
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7580,6 +7774,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &1835329072
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1835329067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c526e4f3a2828d6479d719db3a05ff7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1835329073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7878,10 +8083,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1907022581
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -7893,7 +8098,7 @@ Rigidbody:
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 0
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -7912,6 +8117,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &1907022583
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1907022578}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c526e4f3a2828d6479d719db3a05ff7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1907022584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8119,10 +8335,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 706613724}
-  allowsTwoHandedGrasp: 0
+  allowsTwoHandedGrasp__curIgnored: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
-  graspHoldWarpingEnabled: 1
+  graspedHoldMovementType: 1
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &2005346064
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -8135,7 +8351,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 1
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 0
   m_CollisionDetection: 0
 --- !u!114 &2005346065
@@ -8153,6 +8369,17 @@ MonoBehaviour:
   selectedColor: {r: 1, g: 0.9310346, b: 0, a: 1}
   materialEmissionProperty: _EmissionColor
   selectedEmission: {r: 0.12327586, g: 0.125, b: 0, a: 1}
+--- !u!114 &2005346066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2005346062}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ae99288a7d10294dbf5fff25d171f68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &2005346067
 MonoBehaviour:
   m_ObjectHideFlags: 0
