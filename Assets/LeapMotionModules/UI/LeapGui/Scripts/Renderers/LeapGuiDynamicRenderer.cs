@@ -8,6 +8,7 @@ using Leap.Unity.Attributes;
 [AddComponentMenu("")]
 [LeapGuiTag("Dynamic")]
 public class LeapGuiDynamicRenderer : LeapGuiRenderer,
+  ISupportsAddRemove,
   ISupportsFeature<LeapGuiMeshFeature>,
   ISupportsFeature<LeapGuiTextureFeature> {
 
@@ -33,6 +34,16 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   private List<Matrix4x4> _cylindrical_worldToAnchor = new List<Matrix4x4>();
   private List<Matrix4x4> _cylindrical_meshTransforms = new List<Matrix4x4>();
   private List<Vector4> _cylindrical_elementParameters = new List<Vector4>();
+
+  public void OnAddElements(List<LeapGuiElement> elements, List<int> indexes) {
+    //TODO, this is super slow and sad
+    OnUpdateRendererEditor();
+  }
+
+  public void OnRemoveElements(List<int> toRemove) {
+    //TODO, this is super slow and sad
+    OnUpdateRendererEditor();
+  }
 
   public void GetSupportInfo(List<LeapGuiMeshFeature> features, List<FeatureSupportInfo> info) { }
 
@@ -101,7 +112,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
     ensureObjectsAreValid();
 
-    if (gui.GetSupportedFeatures(_meshFeatures)) {
+    if (gui.GetFeatures(_meshFeatures)) {
       Profiler.BeginSample("Bake Verts");
       bakeVerts();
       Profiler.EndSample();
@@ -115,7 +126,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       Profiler.EndSample();
     }
 
-    if (gui.GetSupportedFeatures(_textureFeatures)) {
+    if (gui.GetFeatures(_textureFeatures)) {
       Profiler.BeginSample("Atlas Textures");
       atlasTextures();
       Profiler.EndSample();
@@ -283,8 +294,4 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       _tempUvList.Clear();
     }
   }
-
-
-
-
 }

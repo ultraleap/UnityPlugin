@@ -128,7 +128,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
     _bakedMesh.Clear();
 
-    if (gui.GetSupportedFeatures(_meshFeatures)) {
+    if (gui.GetFeatures(_meshFeatures)) {
       Profiler.BeginSample("Bake Verts");
       bakeVerts();
       Profiler.EndSample();
@@ -138,7 +138,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
       Profiler.EndSample();
     }
 
-    if (gui.GetSupportedFeatures(_textureFeatures)) {
+    if (gui.GetFeatures(_textureFeatures)) {
       Profiler.BeginSample("Atlas Textures");
       atlasTextures();
       Profiler.EndSample();
@@ -315,7 +315,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
       }
     }
 
-    gui.GetSupportedFeatures(_blendShapeFeatures);
+    gui.GetFeatures(_blendShapeFeatures);
     var blendShape = _blendShapeFeatures.Query().FirstOrDefault();
     if (blendShape != null) {
       _material.EnableKeyword(LeapGuiBlendShapeFeature.FEATURE_NAME);

@@ -93,7 +93,10 @@ namespace Leap.Unity.Query {
     public static bool RemoveUnordered<T>(this List<T> list, T element) {
       for (int i = 0; i < list.Count; i++) {
         if (list[i].Equals(element)) {
-          list[i] = list.RemoveLast();
+          T removed = list.RemoveLast();
+          if (i != list.Count) {
+            list[i] = removed;
+          }
           return true;
         }
       }

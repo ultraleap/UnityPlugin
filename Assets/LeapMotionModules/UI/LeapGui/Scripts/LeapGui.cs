@@ -167,15 +167,13 @@ public class LeapGui : MonoBehaviour {
     _toRemove.Add(element);
   }
 
-  public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
+  public bool GetFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
     features.Clear();
     for (int i = 0; i < this.features.Count; i++) {
       var feature = this.features[i];
       if (!(feature is T)) continue;
 
-      if (supportInfo[i].support != SupportType.Warning) {
-        features.Add(feature as T);
-      }
+      features.Add(feature as T);
     }
 
     return features.Count != 0;
@@ -279,12 +277,14 @@ public class LeapGui : MonoBehaviour {
         }
       }
 
-      (renderer as ISupportsAddRemove).OnRemoveElements(_tempIndexList);
-      (space as ISupportsAddRemove).OnRemoveElements(_tempIndexList);
+      elements.RemoveAtMany(_tempIndexList);
 
       foreach (var feature in features) {
         feature.RemoveDataObjectReferences(_tempIndexList);
       }
+
+      (space as ISupportsAddRemove).OnRemoveElements(_tempIndexList);
+      (renderer as ISupportsAddRemove).OnRemoveElements(_tempIndexList);
 
       foreach (var notRemoved in _toRemove) {
         Debug.LogWarning("The element " + notRemoved + " was not removed because it was not part of the gui.");
@@ -317,6 +317,8 @@ public class LeapGui : MonoBehaviour {
       _tempIndexList.Clear();
       _toAdd.Clear();
     }
+
+    space.BuildElementData(transform);
 
     renderer.OnUpdateRenderer();
     foreach (var feature in features) {
