@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("")]
@@ -43,6 +44,16 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace {
     parameters.radiusOffset = radiusOffset;
 
     return parameters;
+  }
+
+  public override bool TryAddElement(LeapGuiElement element, int index) {
+    //Not supported currently.
+    return false;
+  }
+
+  public override bool TryRemoveElement(LeapGuiElement element, int index) {
+    //Not supported currently.
+    return false;
   }
 
   public override void BuildElementData(Transform root) {

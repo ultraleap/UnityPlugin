@@ -5,10 +5,8 @@ using UnityEngine;
 public abstract class LeapGuiFeatureBase : LeapGuiComponentBase<LeapGui> {
   private bool _isDirty = true; //everything defaults dirty at the start!
 
-  public bool isDirty
-  {
-    get
-    {
+  public bool isDirty {
+    get {
 #if UNITY_EDITOR
       if (Application.isPlaying) {
         return _isDirty;
@@ -19,8 +17,7 @@ public abstract class LeapGuiFeatureBase : LeapGuiComponentBase<LeapGui> {
       return _isDirty;
 #endif
     }
-    set
-    {
+    set {
       _isDirty = value;
     }
   }
@@ -32,6 +29,8 @@ public abstract class LeapGuiFeatureBase : LeapGuiComponentBase<LeapGui> {
 
   public abstract void ClearDataObjectReferences();
   public abstract void AddDataObjectReference(LeapGuiElementData data);
+  public abstract void AddDataObjectReference(LeapGuiElementData data, int index);
+  public abstract void RemoveDataObjectReference(int index);
 
   public abstract Type GetDataObjectType();
   public abstract LeapGuiElementData CreateDataObject(LeapGuiElement element);
@@ -72,6 +71,14 @@ public abstract class LeapGuiFeature<DataType> : LeapGuiFeatureBase
 
   public override void AddDataObjectReference(LeapGuiElementData data) {
     this.data.Add(data as DataType);
+  }
+
+  public override void AddDataObjectReference(LeapGuiElementData data, int index) {
+    this.data.Insert(index, data as DataType);
+  }
+
+  public override void RemoveDataObjectReference(int index) {
+    data.RemoveAt(index);
   }
 
   public override Type GetDataObjectType() {
