@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Leap.Unity.Query {
 
-  public static class FillExtensions {
+  public static class ListAndArrayExtensions {
 
     public static T[] Fill<T>(this T[] array, T value) {
       for (int i = 0; i < array.Length; i++) {
@@ -52,10 +50,25 @@ namespace Leap.Unity.Query {
       return list;
     }
 
+    public static List<T> FillEach<T>(this List<T> list, Func<int, T> generator) {
+      for (int i = 0; i < list.Count; i++) {
+        list[i] = generator(i);
+      }
+      return list;
+    }
+
     public static List<T> FillEach<T>(this List<T> list, int count, Func<T> generator) {
       list.Clear();
       for (int i = 0; i < count; i++) {
         list.Add(generator());
+      }
+      return list;
+    }
+
+    public static List<T> FillEach<T>(this List<T> list, int count, Func<int, T> generator) {
+      list.Clear();
+      for (int i = 0; i < count; i++) {
+        list.Add(generator(i));
       }
       return list;
     }
@@ -108,6 +121,10 @@ namespace Leap.Unity.Query {
             while (from < list.Count) {
               list[to++] = list[from++];
             }
+
+            //Remove the last elements on the end
+            list.RemoveRange(list.Count - index, index);
+
             return;
           }
         }
