@@ -14,12 +14,15 @@ namespace Leap.Unity {
     public Chirality RepChirality { get; protected set;}
     public ModelType RepType { get; protected set;}
     public Hand MostRecentHand { get; protected set; }
+    public Hand PostProcessHand { get; set; }
+    public HandPool.ModelGroup Group { get; set; }
 
     public HandRepresentation(int handID, Hand hand, Chirality chirality, ModelType modelType) {
       HandID = handID;
       this.MostRecentHand = hand;
       this.RepChirality = chirality;
       this.RepType = modelType;
+      this.PostProcessHand = new Hand();
 
     }
 

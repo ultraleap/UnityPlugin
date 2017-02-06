@@ -165,6 +165,50 @@ namespace Leap.Unity {
             ).Map(-5, 5, 0, 1);
     }
 
+    /// <summary>
+    /// Transforms a bone by a position and rotation.
+    /// </summary>
+    public static void Transform(this Bone bone, Vector3 position, Quaternion rotation) {
+      bone.Transform(new LeapTransform(position.ToVector(), rotation.ToLeapQuaternion()));
+    }
+
+    /// <summary>
+    /// Transforms a finger by a position and rotation.
+    /// </summary>
+    public static void Transform(this Finger finger, Vector3 position, Quaternion rotation) {
+      finger.Transform(new LeapTransform(position.ToVector(), rotation.ToLeapQuaternion()));
+    }
+
+    /// <summary>
+    /// Transforms a hand by a position and rotation.
+    /// </summary>
+    public static void Transform(this Hand hand, Vector3 position, Quaternion rotation) {
+      hand.Transform(new LeapTransform(position.ToVector(), rotation.ToLeapQuaternion()));
+    }
+
+    /// <summary>
+    /// Transforms a frame by a position and rotation.
+    /// </summary>
+    public static void Transform(this Frame frame, Vector3 position, Quaternion rotation) {
+      frame.Transform(new LeapTransform(position.ToVector(), rotation.ToLeapQuaternion()));
+    }
+
+    /// <summary>
+    /// Transforms a bone to a position and rotation.
+    /// </summary>
+    public static void SetTransform(this Bone bone, Vector3 position, Quaternion rotation) {
+      bone.Transform(Vector3.zero, (rotation * Quaternion.Inverse(bone.Rotation.ToQuaternion())));
+      bone.Transform(position - bone.PrevJoint.ToVector3(), Quaternion.identity);
+    }
+
+    /// <summary>
+    /// Transforms a hand to a position and rotation.
+    /// </summary>
+    public static void SetTransform(this Hand hand, Vector3 position, Quaternion rotation) {
+      hand.Transform(Vector3.zero, (rotation * Quaternion.Inverse(hand.Rotation.ToQuaternion())));
+      hand.Transform(position - hand.PalmPosition.ToVector3(), Quaternion.identity);
+    }
+
   }
 
 }
