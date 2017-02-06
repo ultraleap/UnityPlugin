@@ -35,6 +35,12 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   private List<Matrix4x4> _cylindrical_meshTransforms = new List<Matrix4x4>();
   private List<Vector4> _cylindrical_elementParameters = new List<Vector4>();
 
+  //Spherical space
+  private const string SPHERICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Spherical_ElementParameters";
+  private List<Matrix4x4> _spherical_worldToAnchor = new List<Matrix4x4>();
+  private List<Matrix4x4> _spherical_meshTransforms = new List<Matrix4x4>();
+  private List<Vector4> _spherical_elementParameters = new List<Vector4>();
+
   public void OnAddElements(List<LeapGuiElement> elements, List<int> indexes) {
     //TODO, this is super slow and sad
     OnUpdateRendererEditor();
@@ -56,7 +62,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
   public override void OnDisableRenderer() {
   }
-  
+
   public override void OnUpdateRenderer() {
     if (gui.space is LeapGuiRectSpace) {
       for (int i = 0; i < gui.elements.Count; i++) {
@@ -100,6 +106,47 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
       for (int i = 0; i < _elementMeshes.Count; i++) {
         Graphics.DrawMesh(_elementMeshes[i], _cylindrical_meshTransforms[i], _material, 0);
+      }
+    } else if (gui.space is LeapGuiSphericalSpace) {
+      var sphericalSpace = gui.space as LeapGuiSphericalSpace;
+
+      if (_spherical_worldToAnchor.Count != gui.elements.Count) {
+        _spherical_worldToAnchor.Fill(gui.elements.Count, Matrix4x4.identity);
+      }
+
+      if (_spherical_elementParameters.Count != gui.elements.Count) {
+        _spherical_elementParameters.Fill(gui.elements.Count, Vector4.zero);
+      }
+
+      if (_spherical_meshTransforms.Count != gui.elements.Count) {
+        _spherical_meshTransforms.Fill(gui.elements.Count, Matrix4x4.identity);
+      }
+
+      for (int i = 0; i < _elementMeshes.Count; i++) {
+        var element = gui.elements[i];
+        var parameters = sphericalSpace.GetElementParameters(element.anchor, element.transform.position);
+        var pos = sphericalSpace.TransformPoint(element, gui.transform.InverseTransformPoint(element.transform.position));
+
+        Quaternion rot = Quaternion.Euler(parameters.angleYOffset * Mathf.Rad2Deg,
+                                          parameters.angleXOffset * Mathf.Rad2Deg,
+                                          0);
+
+        Matrix4x4 guiMesh = transform.localToWorldMatrix * Matrix4x4.TRS(pos, rot, Vector3.one);
+        Matrix4x4 deform = transform.worldToLocalMatrix * Matrix4x4.TRS(transform.position - element.transform.position, Quaternion.identity, Vector3.one) * element.transform.localToWorldMatrix;
+        Matrix4x4 total = guiMesh * deform;
+
+        _spherical_elementParameters[i] = parameters;
+        _spherical_meshTransforms[i] = total;
+        _spherical_worldToAnchor[i] = guiMesh.inverse;
+      }
+
+      _material.SetFloat(LeapGuiSphericalSpace.RADIUS_PROPERTY, sphericalSpace.radius);
+      _material.SetMatrixArray("_LeapGuiSpherical_WorldToAnchor", _spherical_worldToAnchor);
+      _material.SetMatrix("_LeapGui_LocalToWorld", transform.localToWorldMatrix);
+      _material.SetVectorArray("_LeapGuiSpherical_ElementParameters", _spherical_elementParameters);
+
+      for (int i = 0; i < _elementMeshes.Count; i++) {
+        Graphics.DrawMesh(_elementMeshes[i], _spherical_meshTransforms[i], _material, 0);
       }
     }
   }
