@@ -50,6 +50,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   private const string BLEND_SHAPE = LeapGui.PROPERTY_PREFIX + "BlendShapeAmounts";
   private List<float> _blendShapeAmounts = new List<float>();
 
+  //Rect soace
+  private const string RECT_POSITIONS = LeapGui.PROPERTY_PREFIX + "Rect_ElementPositions";
+  private List<Vector4> _rect_elementPositions = new List<Vector4>();
+
   //Cylindrical space
   private const string CYLINDRICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementParameters";
   private List<Vector4> _cylindrical_elementParameters = new List<Vector4>();
@@ -81,7 +85,15 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   }
 
   public override void OnUpdateRenderer() {
-    if (gui.space is LeapGuiCylindricalSpace) {
+    if (gui.space is LeapGuiRectSpace) {
+      _rect_elementPositions.Clear();
+      foreach (var element in gui.elements) {
+        var guiSpace = transform.InverseTransformPoint(element.transform.position);
+        _rect_elementPositions.Add(guiSpace);
+      }
+
+      _material.SetVectorArray(RECT_POSITIONS, _rect_elementPositions);
+    } else if (gui.space is LeapGuiCylindricalSpace) {
       var cylindricalSpace = gui.space as LeapGuiCylindricalSpace;
 
       _cylindrical_elementParameters.Clear();

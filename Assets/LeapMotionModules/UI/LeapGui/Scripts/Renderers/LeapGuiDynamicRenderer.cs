@@ -56,10 +56,13 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
   public override void OnDisableRenderer() {
   }
-
-  public float scale;
+  
   public override void OnUpdateRenderer() {
-    if (gui.space is LeapGuiCylindricalSpace) {
+    if (gui.space is LeapGuiRectSpace) {
+      for (int i = 0; i < gui.elements.Count; i++) {
+        Graphics.DrawMesh(_elementMeshes[i], gui.elements[i].transform.localToWorldMatrix, _material, 0);
+      }
+    } else if (gui.space is LeapGuiCylindricalSpace) {
       var cylindricalSpace = gui.space as LeapGuiCylindricalSpace;
 
       if (_cylindrical_worldToAnchor.Count != gui.elements.Count) {

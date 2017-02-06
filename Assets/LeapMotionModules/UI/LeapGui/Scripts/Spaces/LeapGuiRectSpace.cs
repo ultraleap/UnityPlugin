@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+[AddComponentMenu("")]
+[LeapGuiTag("None")]
 public class LeapGuiRectSpace : LeapGuiSpace, ISupportsAddRemove {
 
   public void OnAddElements(List<LeapGuiElement> element, List<int> indexes) { }

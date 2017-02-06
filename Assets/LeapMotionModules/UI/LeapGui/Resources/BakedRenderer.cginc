@@ -50,11 +50,23 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 }
 #endif
 
+//Base-case fallback, rect transformations
+#ifndef LEAP_GUI_WARPING
+#define LEAP_GUI_WARPING
+float3 _LeapGuiRect_ElementPositions[ELEMENT_MAX];
+
+void ApplyGuiWarping(inout float4 vert, int elementId) {
+  vert.xyz += _LeapGuiRect_ElementPositions[elementId];
+}
+#endif
+
 #ifdef LEAP_GUI_WARPING
 #ifndef GUI_ELEMENTS_HAVE_ID
 #define GUI_ELEMENTS_HAVE_ID
 #endif
 #endif
+
+
 
 /***********************************
  * Feature name:
