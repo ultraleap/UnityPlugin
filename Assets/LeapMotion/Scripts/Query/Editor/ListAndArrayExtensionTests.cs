@@ -36,8 +36,6 @@ namespace Leap.Unity.Query.Test {
       List<int> listA = new List<int>().FillEach(100, i => i);
       List<int> listB = new List<int>(listA);
 
-      var stopwatch = new System.Diagnostics.Stopwatch();
-
       for (int i = toRemove.Count; i-- != 0;) {
         listA.RemoveAt(toRemove[i]);
       }
