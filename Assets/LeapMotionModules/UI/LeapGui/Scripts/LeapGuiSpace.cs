@@ -8,20 +8,6 @@ public abstract class LeapGuiSpace : LeapGuiComponentBase<LeapGui> {
   public LeapGui gui;
 
   /// <summary>
-  /// Called at runtime when the user wants to add a new element to 
-  /// the gui.  Return false if the attempt should fail, or true if
-  /// it could be completed.
-  /// </summary>
-  public abstract bool TryAddElement(LeapGuiElement element, int index);
-
-  /// <summary>
-  /// Called at runtime when the user wants to remove an element from
-  /// the gui.  Return false if the attempt should fail, or true if
-  /// it could be completed.
-  /// </summary>
-  public abstract bool TryRemoveElement(LeapGuiElement element, int index);
-
-  /// <summary>
   /// Builds internal data for all existing gui elements in the gui from scratch.
   /// Will only ever be called with the gui transform as the root.
   /// </summary>

@@ -34,10 +34,24 @@ public class LeapGui : MonoBehaviour {
 
   [NonSerialized]
   public List<FeatureSupportInfo> supportInfo;
+
+  [HideInInspector]
+  [SerializeField]
+  public bool addRemoveSupported;
   #endregion
 
   #region UNITY CALLBACKS
   void OnValidate() {
+    if (!Application.isPlaying) {
+      addRemoveSupported = true;
+      if (renderer != null) {
+        addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(renderer.GetType());
+      }
+      if (space != null) {
+        addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(space.GetType());
+      }
+    }
+
     for (int i = features.Count; i-- != 0;) {
       if (features[i] == null) {
         features.RemoveAt(i);
@@ -130,6 +144,9 @@ public class LeapGui : MonoBehaviour {
     throw new NotImplementedException();
   }
 
+  /// <summary>
+  /// Tries to remove a gui element from this gui at runtime.
+  /// </summary>
   public bool TryRemoveElement(LeapGuiElement element) {
     AssertHelper.AssertRuntimeOnly();
     throw new NotImplementedException();
