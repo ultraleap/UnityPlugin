@@ -13,6 +13,7 @@ public class LeapGui : MonoBehaviour {
   public const string FEATURE_MOVEMENT_TRANSLATION = FEATURE_PREFIX + "MOVEMENT_TRANSLATION";
   public const string FEATURE_MOVEMENT_FULL = FEATURE_PREFIX + "MOVEMENT_FULL";
 
+  #region INSPECTOR FIELDS
   public List<LeapGuiFeatureBase> features = new List<LeapGuiFeatureBase>();
 
   public LeapGuiSpace space;
@@ -22,7 +23,9 @@ public class LeapGui : MonoBehaviour {
 #else
   public LeapGuiRenderer renderer;
 #endif
+  #endregion
 
+  #region PRIVATE VARIABLES
   [HideInInspector]
   public List<LeapGuiElement> elements;
 
@@ -31,7 +34,9 @@ public class LeapGui : MonoBehaviour {
 
   [NonSerialized]
   public List<FeatureSupportInfo> supportInfo;
+  #endregion
 
+  #region UNITY CALLBACKS
   void OnValidate() {
     for (int i = features.Count; i-- != 0;) {
       if (features[i] == null) {
@@ -114,16 +119,40 @@ public class LeapGui : MonoBehaviour {
     doLateUpdateRuntime();
 #endif
   }
+  #endregion
 
-  public LeapGuiRenderer GetRenderer() {
-    return renderer;
+  #region PUBLIC API
+  /// <summary>
+  /// Tries to add a new gui element to this gui at runtime.
+  /// </summary>
+  public bool TryAddElement(LeapGuiElement element) {
+    AssertHelper.AssertRuntimeOnly();
+    throw new NotImplementedException();
   }
 
+  public bool TryRemoveElement(LeapGuiElement element) {
+    AssertHelper.AssertRuntimeOnly();
+    throw new NotImplementedException();
+  }
+
+  public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
+    features.Clear();
+    for (int i = 0; i < this.features.Count; i++) {
+      var feature = this.features[i];
+      if (!(feature is T)) continue;
+
+      if (supportInfo[i].support != SupportType.Warning) {
+        features.Add(feature as T);
+      }
+    }
+
+    return features.Count != 0;
+  }
+
+  //Begin editor-only private api
 #if UNITY_EDITOR
   public void SetSpace(Type spaceType) {
-    if (Application.isPlaying) {
-      throw new InvalidOperationException("Cannot change the space at runtime.");
-    }
+    AssertHelper.AssertEditorOnly();
 
     UnityEditor.Undo.RecordObject(this, "Change Gui Space");
     UnityEditor.EditorUtility.SetDirty(this);
@@ -141,14 +170,14 @@ public class LeapGui : MonoBehaviour {
   }
 
   public void AddFeature(Type featureType) {
+    AssertHelper.AssertEditorOnly();
+
     var feature = gameObject.AddComponent(featureType);
     features.Add(feature as LeapGuiFeatureBase);
   }
 
   public void SetRenderer(Type rendererType) {
-    if (Application.isPlaying) {
-      throw new InvalidOperationException("Cannot change renderer at runtime.");
-    }
+    AssertHelper.AssertEditorOnly();
 
     UnityEditor.Undo.RecordObject(this, "Changed Gui Renderer");
     UnityEditor.EditorUtility.SetDirty(this);
@@ -167,22 +196,10 @@ public class LeapGui : MonoBehaviour {
     }
   }
 #endif
+  #endregion
 
-  public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
-    features.Clear();
-    for (int i = 0; i < this.features.Count; i++) {
-      var feature = this.features[i];
-      if (!(feature is T)) continue;
-
-      if (supportInfo[i].support != SupportType.Warning) {
-        features.Add(feature as T);
-      }
-    }
-
-    return features.Count != 0;
-  }
-
-  public void rebuildElementList(Transform root, AnchorOfConstantSize currAnchor) {
+  #region PRIVATE IMPLEMENTATION
+  private void rebuildElementList(Transform root, AnchorOfConstantSize currAnchor) {
     int count = root.childCount;
     for (int i = 0; i < count; i++) {
       Transform child = root.GetChild(i);
@@ -377,4 +394,5 @@ public class LeapGui : MonoBehaviour {
     }
   }
 #endif
+  #endregion
 }
