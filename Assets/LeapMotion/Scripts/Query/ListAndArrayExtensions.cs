@@ -100,12 +100,30 @@ namespace Leap.Unity.Query {
       return false;
     }
 
+    public static void RemoveAtUnordered<T>(this List<T> list, int index) {
+      list[index] = list.RemoveLast();
+    }
+
+    public static void InsertUnordered<T>(this List<T> list, int index, T element) {
+      list.Add(list[index]);
+      list[index] = element;
+    }
+
     /// <summary>
-    /// Removes each element references by the 'sortedIndexes' list.  This
+    /// Removes each element referenced by the 'sortedIndexes' list.  This
     /// is much faster than calling RemoveAt for each index individually.
+    /// 
+    /// This operation is equivilent to calling RemoveAt for each index in 
+    /// the *reverse* order as provided by 'sortedIndexes'.
     /// </summary>
     public static void RemoveAtMany<T>(this List<T> list, List<int> sortedIndexes) {
       if (sortedIndexes.Count == 0) return;
+
+      //If just removing one, might as well use built-in function
+      if (sortedIndexes.Count == 1) {
+        list.RemoveAt(sortedIndexes[0]);
+        return;
+      }
 
       int to = sortedIndexes[0];
       int from = to;
@@ -130,6 +148,45 @@ namespace Leap.Unity.Query {
         }
 
         list[to++] = list[from++];
+      }
+    }
+
+    /// <summary>
+    /// Inserts each element in the 'elements' list into each index referenced by the 'sorted'Indexes'
+    /// list.  This is much faster than calling Insert for each element individually.  
+    /// 
+    /// This operation is equivilent to calling Insert for each element in the same order the elements 
+    /// are found in the argument list. 
+    /// </summary>
+    public static void InsertMany<T>(this List<T> list, List<int> sortedIndexes, List<T> elements) {
+      if (sortedIndexes.Count == 0) return;
+
+      if (sortedIndexes.Count == 1) {
+        list.Insert(sortedIndexes[0], elements[0]);
+        return;
+      }
+
+      int from = list.Count - 1;
+
+      //First expand array to be large enough to hold all the new elements
+      for (int i = 0; i < sortedIndexes.Count; i++) {
+        list.Add(default(T));
+      }
+
+      int to = list.Count - 1;
+
+      int index = sortedIndexes.Count - 1;
+
+      while (true) {
+        while (to == sortedIndexes[index]) {
+          list[to--] = elements[index--];
+
+          if (index == -1) {
+            return;
+          }
+        }
+
+        list[to--] = list[from--];
       }
     }
   }
