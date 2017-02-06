@@ -40,6 +40,16 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
     FeatureSupportUtil.OnlySupportFirstFeature(features, info);
   }
 
+  public override bool TryAddElement(LeapGuiElement element, int index) {
+    //Not supported right now.
+    return false;
+  }
+
+  public override bool TryRemoveElement(LeapGuiElement element, int index) {
+    //Not supported right now.
+    return false;
+  }
+
   public override void OnEnableRenderer() {
   }
 

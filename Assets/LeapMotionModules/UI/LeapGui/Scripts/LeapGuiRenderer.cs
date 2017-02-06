@@ -6,6 +6,20 @@ public abstract class LeapGuiRenderer : LeapGuiComponentBase<LeapGui> {
   public LeapGui gui;
 
   /// <summary>
+  /// Called at runtime when the user wants to add a new element to 
+  /// the gui.  Return false if the attempt should fail, or true if
+  /// it could be completed.
+  /// </summary>
+  public abstract bool TryAddElement(LeapGuiElement element, int index);
+
+  /// <summary>
+  /// Called at runtime when the user wants to remove an element from
+  /// the gui.  Return false if the attempt should fail, or true if
+  /// it could be completed.
+  /// </summary>
+  public abstract bool TryRemoveElement(LeapGuiElement element, int index);
+
+  /// <summary>
   /// Called when the leap gui is enabled at runtime.
   /// </summary>
   public abstract void OnEnableRenderer();
