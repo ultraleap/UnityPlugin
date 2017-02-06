@@ -42,7 +42,9 @@ public class LeapGui : MonoBehaviour {
 
   private List<LeapGuiElement> _toAdd = new List<LeapGuiElement>();
   private List<LeapGuiElement> _toRemove = new List<LeapGuiElement>();
-  private List<ElementIndexPair> _tempPairList = new List<ElementIndexPair>();
+
+  private List<LeapGuiElement> _tempElementList = new List<LeapGuiElement>();
+  private List<int> _tempIndexList = new List<int>();
   #endregion
 
   #region UNITY CALLBACKS
@@ -229,30 +231,6 @@ public class LeapGui : MonoBehaviour {
   #endregion
 
   #region PRIVATE IMPLEMENTATION
-  private void rebuildElementList(Transform root, AnchorOfConstantSize currAnchor) {
-    int count = root.childCount;
-    for (int i = 0; i < count; i++) {
-      Transform child = root.GetChild(i);
-      if (!child.gameObject.activeSelf) continue;
-
-      var childAnchor = currAnchor;
-
-      var anchor = child.GetComponent<AnchorOfConstantSize>();
-      if (anchor != null && anchor.enabled) {
-        childAnchor = anchor;
-        anchors.Add(anchor);
-      }
-
-      var element = child.GetComponent<LeapGuiElement>();
-      if (element != null && element.enabled) {
-        element.anchor = childAnchor;
-        element.elementId = elements.Count;
-        elements.Add(element);
-      }
-
-      rebuildElementList(child, childAnchor);
-    }
-  }
 
 #if UNITY_EDITOR
   private void doLateUpdateEditor() {
@@ -297,31 +275,47 @@ public class LeapGui : MonoBehaviour {
       for (int i = 0; i < elements.Count; i++) {
         var element = elements[i];
         if (_toRemove.RemoveUnordered(element)) {
-          _tempPairList.Add(new ElementIndexPair() { element = element, index = i });
+          _tempIndexList.Add(i);
         }
       }
 
-      (space as ISupportsAddRemove).OnRemoveElements(_tempPairList);
-      (renderer as ISupportsAddRemove).OnRemoveElements(_tempPairList);
+      (renderer as ISupportsAddRemove).OnRemoveElements(_tempIndexList);
+      (space as ISupportsAddRemove).OnRemoveElements(_tempIndexList);
 
       foreach (var feature in features) {
-        foreach (var pair in _tempPairList) {
-          feature.RemoveDataObjectReference(pair.index);
-        }
+        feature.RemoveDataObjectReferences(_tempIndexList);
       }
-
-
 
       foreach (var notRemoved in _toRemove) {
         Debug.LogWarning("The element " + notRemoved + " was not removed because it was not part of the gui.");
       }
 
-      _tempPairList.Clear();
+      _tempIndexList.Clear();
       _toRemove.Clear();
     }
 
     if (_toAdd.Count != 0) {
+      elements.Clear();
+      anchors.Clear();
 
+      //TODO, both of these rebuild operations can probably be optimized a ton
+      rebuildElementList(transform, null);
+      rebuildFeatureData();
+
+      for (int i = 0; i < elements.Count; i++) {
+        var element = elements[i];
+        if (_toAdd.Remove(element)) {
+          _tempElementList.Add(element);
+          _tempIndexList.Add(i);
+        }
+      }
+
+      (space as ISupportsAddRemove).OnAddElements(_tempElementList, _tempIndexList);
+      (renderer as ISupportsAddRemove).OnAddElements(_tempElementList, _tempIndexList);
+
+      _tempElementList.Clear();
+      _tempIndexList.Clear();
+      _toAdd.Clear();
     }
 
     renderer.OnUpdateRenderer();
@@ -330,9 +324,35 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
+  private void rebuildElementList(Transform root, AnchorOfConstantSize currAnchor) {
+    int count = root.childCount;
+    for (int i = 0; i < count; i++) {
+      Transform child = root.GetChild(i);
+      if (!child.gameObject.activeSelf) continue;
+
+      var childAnchor = currAnchor;
+
+      var anchor = child.GetComponent<AnchorOfConstantSize>();
+      if (anchor != null && anchor.enabled) {
+        childAnchor = anchor;
+        anchors.Add(anchor);
+      }
+
+      var element = child.GetComponent<LeapGuiElement>();
+      if (element != null && element.enabled) {
+        element.anchor = childAnchor;
+        element.elementId = elements.Count;
+        elements.Add(element);
+      }
+
+      rebuildElementList(child, childAnchor);
+    }
+  }
+
   private void rebuildFeatureData() {
     foreach (var feature in features) {
       feature.ClearDataObjectReferences();
+      feature.isDirty = true;
     }
 
     for (int i = 0; i < elements.Count; i++) {

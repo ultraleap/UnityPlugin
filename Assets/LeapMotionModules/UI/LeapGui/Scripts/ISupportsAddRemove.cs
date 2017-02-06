@@ -2,11 +2,6 @@
 using Leap.Unity;
 
 public interface ISupportsAddRemove {
-  void OnAddElements(ReadonlyList<ElementIndexPair> toAdd);
-  void OnRemoveElements(ReadonlyList<ElementIndexPair> toRemove);
-}
-
-public struct ElementIndexPair {
-  public LeapGuiElement element;
-  public int index;
+  void OnAddElements(List<LeapGuiElement> element, List<int> indexes);
+  void OnRemoveElements(List<int> toRemove);
 }
