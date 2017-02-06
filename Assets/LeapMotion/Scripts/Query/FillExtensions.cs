@@ -72,5 +72,19 @@ namespace Leap.Unity.Query {
       list.RemoveAt(list.Count - 1);
       return last;
     }
+
+    /// <summary>
+    /// If the element exists in the list, the first instance is replaced 
+    /// with the last element of the list.
+    /// </summary>
+    public static bool RemoveUnordered<T>(this List<T> list, T element) {
+      for (int i = 0; i < list.Count; i++) {
+        if (list[i].Equals(element)) {
+          list[i] = list.RemoveLast();
+          return true;
+        }
+      }
+      return false;
+    }
   }
 }

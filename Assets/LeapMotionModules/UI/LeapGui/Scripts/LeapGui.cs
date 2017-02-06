@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Profiling;
 using Leap.Unity.Query;
 
@@ -38,6 +39,10 @@ public class LeapGui : MonoBehaviour {
   [HideInInspector]
   [SerializeField]
   public bool addRemoveSupported;
+
+  private List<LeapGuiElement> _toAdd = new List<LeapGuiElement>();
+  private List<LeapGuiElement> _toRemove = new List<LeapGuiElement>();
+  private List<ElementIndexPair> _tempPairList = new List<ElementIndexPair>();
   #endregion
 
   #region UNITY CALLBACKS
@@ -138,18 +143,26 @@ public class LeapGui : MonoBehaviour {
   #region PUBLIC API
   /// <summary>
   /// Tries to add a new gui element to this gui at runtime.
+  /// Element is not actually added until the next gui cycle.
   /// </summary>
-  public bool TryAddElement(LeapGuiElement element) {
+  public void AddElement(LeapGuiElement element) {
     AssertHelper.AssertRuntimeOnly();
-    throw new NotImplementedException();
+    Assert.IsNotNull(element);
+    throwIfAddRemoveNotSupported();
+
+    _toAdd.Add(element);
   }
 
   /// <summary>
   /// Tries to remove a gui element from this gui at runtime.
+  /// Element is not actually removed until the next gui cycle.
   /// </summary>
-  public bool TryRemoveElement(LeapGuiElement element) {
+  public void RemoveElement(LeapGuiElement element) {
     AssertHelper.AssertRuntimeOnly();
-    throw new NotImplementedException();
+    Assert.IsNotNull(element);
+    throwIfAddRemoveNotSupported();
+
+    _toRemove.Add(element);
   }
 
   public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
@@ -277,11 +290,35 @@ public class LeapGui : MonoBehaviour {
 #endif
 
   private void doLateUpdateRuntime() {
-    if (renderer != null) {
-      renderer.OnUpdateRenderer();
-      foreach (var feature in features) {
-        feature.isDirty = false;
+    if (renderer == null) return;
+    if (space == null) return;
+
+    if (_toRemove.Count != 0) {
+      for (int i = 0; i < elements.Count; i++) {
+        var element = elements[i];
+        if (_toRemove.RemoveUnordered(element)) {
+          _tempPairList.Add(new ElementIndexPair() { element = element, index = i });
+        }
       }
+
+      (space as ISupportsAddRemove).OnRemoveElements(_tempPairList);
+      (renderer as ISupportsAddRemove).OnRemoveElements(_tempPairList);
+
+      foreach (var notRemoved in _toRemove) {
+        Debug.LogWarning("The element " + notRemoved + " was not removed because it was not part of the gui.");
+      }
+
+      _tempPairList.Clear();
+      _toRemove.Clear();
+    }
+
+    if (_toAdd.Count != 0) {
+
+    }
+
+    renderer.OnUpdateRenderer();
+    foreach (var feature in features) {
+      feature.isDirty = false;
     }
   }
 
@@ -411,5 +448,12 @@ public class LeapGui : MonoBehaviour {
     }
   }
 #endif
+
+  private void throwIfAddRemoveNotSupported() {
+    if (!addRemoveSupported) {
+      throw new InvalidOperationException("Adding or removing elements at runtime is not supported by this renderer/space configuration.");
+    }
+  }
+
   #endregion
 }

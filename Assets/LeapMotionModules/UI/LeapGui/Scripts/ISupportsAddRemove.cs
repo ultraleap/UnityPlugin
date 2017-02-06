@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using Leap.Unity;
 
 public interface ISupportsAddRemove {
-  void OnAddElements(List<ElementIndexPair> toAdd);
-  void OnRemoveElements(List<ElementIndexPair> toRemove);
+  void OnAddElements(ReadonlyList<ElementIndexPair> toAdd);
+  void OnRemoveElements(ReadonlyList<ElementIndexPair> toRemove);
 }
 
 public struct ElementIndexPair {
