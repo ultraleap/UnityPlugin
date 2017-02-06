@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Query;
 
 public abstract class LeapGuiFeatureBase : LeapGuiComponentBase<LeapGui> {
   private bool _isDirty = true; //everything defaults dirty at the start!
@@ -30,7 +31,7 @@ public abstract class LeapGuiFeatureBase : LeapGuiComponentBase<LeapGui> {
   public abstract void ClearDataObjectReferences();
   public abstract void AddDataObjectReference(LeapGuiElementData data);
   public abstract void AddDataObjectReference(LeapGuiElementData data, int index);
-  public abstract void RemoveDataObjectReference(int index);
+  public abstract void RemoveDataObjectReferences(List<int> sortedIndexes);
 
   public abstract Type GetDataObjectType();
   public abstract LeapGuiElementData CreateDataObject(LeapGuiElement element);
@@ -77,8 +78,8 @@ public abstract class LeapGuiFeature<DataType> : LeapGuiFeatureBase
     this.data.Insert(index, data as DataType);
   }
 
-  public override void RemoveDataObjectReference(int index) {
-    data.RemoveAt(index);
+  public override void RemoveDataObjectReferences(List<int> sortedIndexes) {
+    data.RemoveAtMany(sortedIndexes);
   }
 
   public override Type GetDataObjectType() {
