@@ -86,5 +86,34 @@ namespace Leap.Unity.Query {
       }
       return false;
     }
+
+    /// <summary>
+    /// Removes each element references by the 'sortedIndexes' list.  This
+    /// is much faster than calling RemoveAt for each index individually.
+    /// </summary>
+    public static void RemoveAtMany<T>(this List<T> list, List<int> sortedIndexes) {
+      if (sortedIndexes.Count == 0) return;
+
+      int to = sortedIndexes[0];
+      int from = to;
+      int index = 0;
+
+      while (true) {
+        while (from == sortedIndexes[index]) {
+          from++;
+          index++;
+
+          if (index == sortedIndexes.Count) {
+            //Copy remaining
+            while (from < list.Count) {
+              list[to++] = list[from++];
+            }
+            return;
+          }
+        }
+
+        list[to++] = list[from++];
+      }
+    }
   }
 }

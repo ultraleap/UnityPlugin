@@ -304,6 +304,14 @@ public class LeapGui : MonoBehaviour {
       (space as ISupportsAddRemove).OnRemoveElements(_tempPairList);
       (renderer as ISupportsAddRemove).OnRemoveElements(_tempPairList);
 
+      foreach (var feature in features) {
+        foreach (var pair in _tempPairList) {
+          feature.RemoveDataObjectReference(pair.index);
+        }
+      }
+
+
+
       foreach (var notRemoved in _toRemove) {
         Debug.LogWarning("The element " + notRemoved + " was not removed because it was not part of the gui.");
       }
