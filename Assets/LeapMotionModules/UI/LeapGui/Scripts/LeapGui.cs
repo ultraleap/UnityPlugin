@@ -340,6 +340,7 @@ public class LeapGui : MonoBehaviour {
 
       var element = child.GetComponent<LeapGuiElement>();
       if (element != null && element.enabled) {
+        element.gui = this;
         element.anchor = childAnchor;
         element.elementId = elements.Count;
         elements.Add(element);

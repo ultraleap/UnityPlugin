@@ -19,6 +19,9 @@ public class LeapGuiElement : MonoBehaviour {
   [SerializeField]
   public List<LeapGuiElementData> data = new List<LeapGuiElementData>();
 
+  [SerializeField]
+  public LeapGui gui;
+
   protected void OnValidate() {
     //Delete any null references
     for (int i = data.Count; i-- != 0;) {
@@ -56,6 +59,33 @@ public class LeapGuiElement : MonoBehaviour {
     foreach (var dataObj in data) {
       if (dataObj != null) InternalUtility.Destroy(dataObj);
     }
+  }
+
+  void OnEnable() {
+#if UNITY_EDITOR
+    if (Application.isPlaying) {
+#endif
+      if (gui == null) {
+        gui = GetComponentInParent<LeapGui>();
+      }
+      if (gui != null) {
+        gui.AddElement(this);
+      }
+#if UNITY_EDITOR
+    }
+#endif
+  }
+
+  void OnDisable() {
+#if UNITY_EDITOR
+    if (Application.isPlaying) {
+#endif
+      if (gui != null) {
+        gui.RemoveElement(this);
+      }
+#if UNITY_EDITOR
+    }
+#endif
   }
 
 #if UNITY_EDITOR
