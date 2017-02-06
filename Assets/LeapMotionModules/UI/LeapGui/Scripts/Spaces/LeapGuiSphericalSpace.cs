@@ -95,6 +95,8 @@ public class LeapGuiSphericalSpace : LeapGuiSpace, ISupportsAddRemove {
   }
 
   public override Vector3 TransformPoint(Vector3 localRectPos) {
+    //TODO: this is wrong
+    Debug.LogWarning("IMplement thes");
     Vector3 localGuiPos;
     float angle = localRectPos.x / radius;
     float pointRadius = localRectPos.z + radius;

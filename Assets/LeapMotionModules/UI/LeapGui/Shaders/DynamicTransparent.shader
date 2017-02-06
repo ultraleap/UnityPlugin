@@ -14,7 +14,7 @@
       #pragma vertex vert
       #pragma fragment frag
 
-      #pragma shader_feature _ LEAP_GUI_CYLINDRICAL
+      #pragma shader_feature _ LEAP_GUI_CYLINDRICAL LEAP_GUI_SPHERICAL
       #pragma shader_feature _ LEAP_GUI_VERTEX_NORMALS
       #pragma shader_feature _ LEAP_GUI_VERTEX_UV_0
       #pragma shader_feature _ LEAP_GUI_VERTEX_UV_1

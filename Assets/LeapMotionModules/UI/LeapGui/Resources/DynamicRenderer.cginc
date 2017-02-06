@@ -31,6 +31,25 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 }
 #endif
 
+#ifdef LEAP_GUI_SPHERICAL
+#define LEAP_GUI_WARPING
+#include "Assets/LeapMotionModules/UI/LeapGui/Resources/SphericalSpace.cginc"
+
+float4x4 _LeapGuiSpherical_WorldToAnchor[ELEMENT_MAX];
+float4 _LeapGuiSpherical_ElementParameters[ELEMENT_MAX];
+float4x4 _LeapGui_LocalToWorld;
+
+void ApplyGuiWarping(inout float4 vert, int elementId) {
+  vert = mul(_LeapGuiSpherical_WorldToAnchor[elementId], vert);
+
+  float4 parameters = _LeapGuiSpherical_ElementParameters[elementId];
+  Spherical_LocalToWorld(vert.xyz, parameters);
+
+  vert = mul(_LeapGui_LocalToWorld, vert);
+}
+
+#endif
+
 #ifdef LEAP_GUI_WARPING
 #ifndef GUI_ELEMENTS_HAVE_ID
 #define GUI_ELEMENTS_HAVE_ID

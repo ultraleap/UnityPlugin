@@ -127,7 +127,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
         var parameters = sphericalSpace.GetElementParameters(element.anchor, element.transform.position);
         var pos = sphericalSpace.TransformPoint(element, gui.transform.InverseTransformPoint(element.transform.position));
 
-        Quaternion rot = Quaternion.Euler(parameters.angleYOffset * Mathf.Rad2Deg,
+        Quaternion rot = Quaternion.Euler(-parameters.angleYOffset * Mathf.Rad2Deg,
                                           parameters.angleXOffset * Mathf.Rad2Deg,
                                           0);
 
@@ -188,6 +188,8 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
     if (gui.space is LeapGuiCylindricalSpace) {
       _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);
+    } else if (gui.space is LeapGuiSphericalSpace) {
+      _material.EnableKeyword(LeapGuiSphericalSpace.FEATURE_NAME);
     }
 
     OnUpdateRenderer();
