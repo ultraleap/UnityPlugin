@@ -4,7 +4,6 @@ using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
-using System;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Dynamic")]
@@ -20,7 +19,10 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   [SerializeField]
   private int _borderAmount;
 
+  [SerializeField]
   private List<Mesh> _elementMeshes = new List<Mesh>();
+
+  [SerializeField]
   private Material _material;
 
   //Feature lists
