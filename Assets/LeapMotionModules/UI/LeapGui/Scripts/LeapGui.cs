@@ -34,7 +34,7 @@ public class LeapGui : MonoBehaviour {
   public List<AnchorOfConstantSize> anchors;
 
   [NonSerialized]
-  public List<FeatureSupportInfo> supportInfo;
+  public List<SupportInfo> supportInfo;
 
   //[HideInInspector]
   [SerializeField]
@@ -395,13 +395,13 @@ public class LeapGui : MonoBehaviour {
     }
 
 
-    var featureToInfo = new Dictionary<LeapGuiFeatureBase, FeatureSupportInfo>();
+    var featureToInfo = new Dictionary<LeapGuiFeatureBase, SupportInfo>();
 
     if (renderer != null) {
       foreach (var pair in typeToFeatures) {
         var featureType = pair.Key;
         var featureList = pair.Value;
-        var infoList = new List<FeatureSupportInfo>().FillEach(featureList.Count, () => FeatureSupportInfo.FullSupport());
+        var infoList = new List<SupportInfo>().FillEach(featureList.Count, () => SupportInfo.FullSupport());
 
         var castList = Activator.CreateInstance(typeof(List<>).MakeGenericType(featureType)) as IList;
         foreach (var feature in featureList) {
@@ -411,7 +411,7 @@ public class LeapGui : MonoBehaviour {
         try {
           var interfaceType = typeof(ISupportsFeature<>).MakeGenericType(featureType);
           if (!interfaceType.IsAssignableFrom(renderer.GetType())) {
-            infoList.FillEach(() => FeatureSupportInfo.Error("This renderer does not support this feature."));
+            infoList.FillEach(() => SupportInfo.Error("This renderer does not support this feature."));
             continue;
           }
 
@@ -431,7 +431,7 @@ public class LeapGui : MonoBehaviour {
       }
     }
 
-    supportInfo = new List<FeatureSupportInfo>();
+    supportInfo = new List<SupportInfo>();
     foreach (var feature in features) {
       supportInfo.Add(feature.GetSupportInfo(this).OrWorse(featureToInfo[feature]));
     }

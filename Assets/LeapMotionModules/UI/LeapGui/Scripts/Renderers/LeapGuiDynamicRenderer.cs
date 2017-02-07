@@ -4,6 +4,7 @@ using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
+using System;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Dynamic")]
@@ -51,10 +52,20 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
     OnUpdateRendererEditor();
   }
 
-  public void GetSupportInfo(List<LeapGuiMeshFeature> features, List<FeatureSupportInfo> info) { }
+  public void GetSupportInfo(List<LeapGuiMeshFeature> features, List<SupportInfo> info) { }
 
-  public void GetSupportInfo(List<LeapGuiTextureFeature> features, List<FeatureSupportInfo> info) {
-    FeatureSupportUtil.OnlySupportFirstFeature(features, info);
+  public void GetSupportInfo(List<LeapGuiTextureFeature> features, List<SupportInfo> info) {
+    SupportUtil.OnlySupportFirstFeature(features, info);
+  }
+
+  public override SupportInfo GetSpaceSupportInfo(LeapGuiSpace space) {
+    if (space is LeapGuiRectSpace ||
+        space is LeapGuiCylindricalSpace ||
+        space is LeapGuiSphericalSpace) {
+      return SupportInfo.FullSupport();
+    } else {
+      return SupportInfo.Error("Dynamic Renderer does not support " + space.GetType().Name);
+    }
   }
 
   public override void OnEnableRenderer() {

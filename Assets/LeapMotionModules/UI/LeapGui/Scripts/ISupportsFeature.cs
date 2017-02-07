@@ -13,47 +13,5 @@ public interface ISupportsFeature<T> where T : LeapGuiFeatureBase {
   /// 
   /// This method will NEVER be called if there are 0 features of type T.
   /// </summary>
-  void GetSupportInfo(List<T> features, List<FeatureSupportInfo> info);
-}
-
-public struct FeatureSupportInfo {
-  public SupportType support;
-  public string message;
-
-  public static FeatureSupportInfo FullSupport() {
-    return new FeatureSupportInfo() { support = SupportType.Full, message = null };
-  }
-
-  public static FeatureSupportInfo Warning(string message) {
-    return new FeatureSupportInfo() { support = SupportType.Warning, message = message };
-  }
-
-  public static FeatureSupportInfo Error(string message) {
-    return new FeatureSupportInfo() { support = SupportType.Error, message = message };
-  }
-
-  public FeatureSupportInfo OrWorse(FeatureSupportInfo other) {
-    if (other.support > support) {
-      return other;
-    } else {
-      return this;
-    }
-  }
-}
-
-public enum SupportType {
-  Full,
-  Warning,
-  Error
-}
-
-public static class FeatureSupportUtil {
-  public static void OnlySupportFirstFeature<T>(List<T> features, List<FeatureSupportInfo> info)
-    where T : LeapGuiFeatureBase {
-    for (int i = 1; i < features.Count; i++) {
-      info[i] = FeatureSupportInfo.Error("This renderer only supports a single " +
-                                          LeapGuiTagAttribute.GetTag(typeof(T)) +
-                                          " feature.");
-    }
-  }
+  void GetSupportInfo(List<T> features, List<SupportInfo> info);
 }

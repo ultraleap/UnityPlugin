@@ -24,8 +24,8 @@ public abstract class LeapGuiFeatureBase : LeapGuiComponentBase<LeapGui> {
   }
 
   //TODO: add logic in LeapGUI to use this method
-  public virtual FeatureSupportInfo GetSupportInfo(LeapGui gui) {
-    return FeatureSupportInfo.FullSupport();
+  public virtual SupportInfo GetSupportInfo(LeapGui gui) {
+    return SupportInfo.FullSupport();
   }
 
   public abstract void ClearDataObjectReferences();

@@ -58,24 +58,33 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   private const string CYLINDRICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementParameters";
   private List<Vector4> _cylindrical_elementParameters = new List<Vector4>();
 
-  public void GetSupportInfo(List<LeapGuiMeshFeature> features, List<FeatureSupportInfo> info) {
-    FeatureSupportUtil.OnlySupportFirstFeature(features, info);
+  public void GetSupportInfo(List<LeapGuiMeshFeature> features, List<SupportInfo> info) {
+    SupportUtil.OnlySupportFirstFeature(features, info);
 
     if (DoesNeedUv3() && features[0].uv3) {
-      info[0] = info[0].OrWorse(FeatureSupportInfo.Warning("Uv3 will be ignored because the baker is using it."));
+      info[0] = info[0].OrWorse(SupportInfo.Warning("Uv3 will be ignored because the baker is using it."));
     }
   }
 
-  public void GetSupportInfo(List<LeapGuiTextureFeature> features, List<FeatureSupportInfo> info) {
-    FeatureSupportUtil.OnlySupportFirstFeature(features, info);
+  public void GetSupportInfo(List<LeapGuiTextureFeature> features, List<SupportInfo> info) {
+    SupportUtil.OnlySupportFirstFeature(features, info);
   }
 
-  public void GetSupportInfo(List<LeapGuiTintFeature> features, List<FeatureSupportInfo> info) {
-    FeatureSupportUtil.OnlySupportFirstFeature(features, info);
+  public void GetSupportInfo(List<LeapGuiTintFeature> features, List<SupportInfo> info) {
+    SupportUtil.OnlySupportFirstFeature(features, info);
   }
 
-  public void GetSupportInfo(List<LeapGuiBlendShapeFeature> features, List<FeatureSupportInfo> info) {
-    FeatureSupportUtil.OnlySupportFirstFeature(features, info);
+  public void GetSupportInfo(List<LeapGuiBlendShapeFeature> features, List<SupportInfo> info) {
+    SupportUtil.OnlySupportFirstFeature(features, info);
+  }
+
+  public override SupportInfo GetSpaceSupportInfo(LeapGuiSpace space) {
+    if (space is LeapGuiRectSpace ||
+        space is LeapGuiCylindricalSpace) {
+      return SupportInfo.FullSupport();
+    } else {
+      return SupportInfo.Error("Baked Renderer does not support " + space.GetType().Name);
+    }
   }
 
   public override void OnEnableRenderer() {

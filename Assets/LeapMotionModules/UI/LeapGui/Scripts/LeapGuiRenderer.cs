@@ -5,6 +5,8 @@ public abstract class LeapGuiRenderer : LeapGuiComponentBase<LeapGui> {
   [HideInInspector]
   public LeapGui gui;
 
+  public abstract SupportInfo GetSpaceSupportInfo(LeapGuiSpace space, SupportInfo info);
+
   /// <summary>
   /// Called when the leap gui is enabled at runtime.
   /// </summary>
