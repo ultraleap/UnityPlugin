@@ -36,6 +36,8 @@ void ApplyElementMotion(inout float4 vert, int elementId) {
  *    rect space, with no distortion
  *  LEAP_GUI_CYLINDRICAL
  *    cylindrical space
+ *  LEAP_GUI_SPHERICAL
+ *    spherical space
  ***********************************/
 
 #ifdef LEAP_GUI_CYLINDRICAL
@@ -47,6 +49,18 @@ float4 _LeapGuiCylindrical_ElementParameters[ELEMENT_MAX];
 void ApplyGuiWarping(inout float4 vert, int elementId) {
   float4 elementParams = _LeapGuiCylindrical_ElementParameters[elementId];
   Cylindrical_LocalToWorld(vert.xyz, elementParams);
+}
+#endif
+
+#ifdef LEAP_GUI_SPHERICAL
+#define LEAP_GUI_WARPING
+#include "Assets/LeapMotionModules/UI/LeapGui/Resources/SphericalSpace.cginc"
+
+float4 _LeapGuiSpherical_ElementParameters[ELEMENT_MAX];
+
+void ApplyGuiWarping(inout float4 vert, int elementId) {
+  float4 elementParams = _LeapGuiSpherical_ElementParameters[elementId];
+  Spherical_LocalToWorld(vert.xyz, elementParams);
 }
 #endif
 
