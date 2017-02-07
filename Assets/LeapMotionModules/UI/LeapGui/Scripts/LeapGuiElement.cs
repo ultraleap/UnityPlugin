@@ -19,6 +19,7 @@ public class LeapGuiElement : MonoBehaviour {
   [SerializeField]
   public List<LeapGuiElementData> data = new List<LeapGuiElementData>();
 
+  [HideInInspector]
   [SerializeField]
   public LeapGui gui;
 
