@@ -58,6 +58,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   private const string CYLINDRICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementParameters";
   private List<Vector4> _cylindrical_elementParameters = new List<Vector4>();
 
+  //Spherical space
+  private const string SPHERICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Spherical_ElementParameters";
+  private List<Vector4> _spherical_elementParameters = new List<Vector4>();
+
   public void GetSupportInfo(List<LeapGuiMeshFeature> features, List<SupportInfo> info) {
     SupportUtil.OnlySupportFirstFeature(features, info);
 
@@ -117,6 +121,17 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
       _material.SetFloat(LeapGuiCylindricalSpace.RADIUS_PROPERTY, cylindricalSpace.radius);
       _material.SetVectorArray(CYLINDRICAL_PARAMETERS, _cylindrical_elementParameters);
+    } else if (gui.space is LeapGuiSphericalSpace) {
+      var sphericalSpace = gui.space as LeapGuiSphericalSpace;
+
+      _spherical_elementParameters.Clear();
+      foreach (var element in gui.elements) {
+        var parameters = sphericalSpace.GetElementParameters(element.anchor, element.transform.position);
+        _spherical_elementParameters.Add(parameters);
+      }
+
+      _material.SetFloat(LeapGuiSphericalSpace.RADIUS_PROPERTY, sphericalSpace.radius);
+      _material.SetVectorArray(SPHERICAL_PARAMETERS, _spherical_elementParameters);
     }
 
     foreach (var feature in gui.features) {
@@ -196,6 +211,8 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
     if (gui.space is LeapGuiCylindricalSpace) {
       _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);
+    } else if (gui.space is LeapGuiSphericalSpace) {
+      _material.EnableKeyword(LeapGuiSphericalSpace.FEATURE_NAME);
     }
 
     //Make the mesh bounds huge, since the bounds don't properly reflect visual representation most of the time

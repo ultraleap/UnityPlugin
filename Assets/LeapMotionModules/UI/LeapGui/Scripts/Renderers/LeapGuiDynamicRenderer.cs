@@ -19,10 +19,11 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   [SerializeField]
   private int _borderAmount;
 
-  [SerializeField]
+  [Header("Debug")]
+  [HideInInspector, SerializeField]
   private List<Mesh> _elementMeshes = new List<Mesh>();
 
-  [SerializeField]
+  [HideInInspector, SerializeField]
   private Material _material;
 
   //Feature lists
