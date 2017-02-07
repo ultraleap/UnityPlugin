@@ -10,7 +10,6 @@ public abstract class LeapGuiFeatureBase : LeapGuiComponentBase<LeapGui> {
     get {
 #if UNITY_EDITOR
       if (Application.isPlaying) {
-        return true;
         return _isDirty;
       } else {
         return true;
