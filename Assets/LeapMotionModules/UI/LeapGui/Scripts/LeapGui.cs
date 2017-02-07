@@ -36,7 +36,7 @@ public class LeapGui : MonoBehaviour {
   [NonSerialized]
   public List<SupportInfo> supportInfo;
 
-  //[HideInInspector]
+  [HideInInspector]
   [SerializeField]
   public bool addRemoveSupported;
 
