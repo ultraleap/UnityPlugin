@@ -10,6 +10,7 @@ public abstract class LeapGuiFeatureBase : LeapGuiComponentBase<LeapGui> {
     get {
 #if UNITY_EDITOR
       if (Application.isPlaying) {
+        return true;
         return _isDirty;
       } else {
         return true;
@@ -46,15 +47,6 @@ public abstract class LeapGuiFeatureBase : LeapGuiComponentBase<LeapGui> {
 public abstract class LeapGuiElementData : LeapGuiComponentBase<LeapGuiElement> {
   [HideInInspector]
   public LeapGuiElement element;
-
-  protected override void OnValidate() {
-    base.OnValidate();
-
-    if (element == null ||
-        !element.data.Contains(this)) {
-      InternalUtility.Destroy(this);
-    }
-  }
 }
 
 public abstract class LeapGuiFeature<DataType> : LeapGuiFeatureBase

@@ -1,14 +1,20 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditorInternal;
+#endif
 
+#if UNITY_EDITOR
 [InitializeOnLoad]
+#endif
 public static class InternalUtility {
 
+#if UNITY_EDITOR
   static InternalUtility() {
     EditorApplication.update += destroyLoop;
   }
+#endif
 
 #if UNITY_EDITOR
   private static List<Component> _cachedComponentList0 = new List<Component>();

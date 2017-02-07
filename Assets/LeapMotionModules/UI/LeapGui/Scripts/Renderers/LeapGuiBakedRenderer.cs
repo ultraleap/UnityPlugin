@@ -95,13 +95,17 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
   public override void OnUpdateRenderer() {
     if (gui.space is LeapGuiRectSpace) {
+      Profiler.BeginSample("Build Array");
       _rect_elementPositions.Clear();
       foreach (var element in gui.elements) {
         var guiSpace = transform.InverseTransformPoint(element.transform.position);
         _rect_elementPositions.Add(guiSpace);
       }
+      Profiler.EndSample();
 
+      Profiler.BeginSample("Upload Array");
       _material.SetVectorArray(RECT_POSITIONS, _rect_elementPositions);
+      Profiler.EndSample();
     } else if (gui.space is LeapGuiCylindricalSpace) {
       var cylindricalSpace = gui.space as LeapGuiCylindricalSpace;
 
@@ -129,7 +133,9 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
       }
     }
 
+    Profiler.BeginSample("Draw Mesh");
     Graphics.DrawMesh(_bakedMesh, gui.transform.localToWorldMatrix, _material, 0);
+    Profiler.EndSample();
   }
 
   public override void OnEnableRendererEditor() {

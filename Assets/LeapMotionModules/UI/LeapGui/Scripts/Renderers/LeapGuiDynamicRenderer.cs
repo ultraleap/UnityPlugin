@@ -94,6 +94,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
         _cylindrical_meshTransforms.Fill(gui.elements.Count, Matrix4x4.identity);
       }
 
+      Profiler.BeginSample("Assemble Data");
       for (int i = 0; i < _elementMeshes.Count; i++) {
         var element = gui.elements[i];
         var parameters = cylindricalSpace.GetElementParameters(element.anchor, element.transform.position);
@@ -109,15 +110,20 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
         _cylindrical_meshTransforms[i] = total;
         _cylindrical_worldToAnchor[i] = guiMesh.inverse;
       }
+      Profiler.EndSample();
 
+      Profiler.BeginSample("Update Material");
       _material.SetFloat(LeapGuiCylindricalSpace.RADIUS_PROPERTY, cylindricalSpace.radius);
       _material.SetMatrixArray("_LeapGuiCylindrical_WorldToAnchor", _cylindrical_worldToAnchor);
       _material.SetMatrix("_LeapGui_LocalToWorld", transform.localToWorldMatrix);
       _material.SetVectorArray("_LeapGuiCylindrical_ElementParameters", _cylindrical_elementParameters);
+      Profiler.EndSample();
 
+      Profiler.BeginSample("Draw Meshes");
       for (int i = 0; i < _elementMeshes.Count; i++) {
         Graphics.DrawMesh(_elementMeshes[i], _cylindrical_meshTransforms[i], _material, 0);
       }
+      Profiler.EndSample();
     } else if (gui.space is LeapGuiSphericalSpace) {
       var sphericalSpace = gui.space as LeapGuiSphericalSpace;
 

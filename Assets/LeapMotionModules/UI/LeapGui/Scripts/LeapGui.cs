@@ -268,8 +268,9 @@ public class LeapGui : MonoBehaviour {
   private void doLateUpdateRuntime() {
     if (renderer == null) return;
     if (space == null) return;
-
+    
     if (_toRemove.Count != 0) {
+      Profiler.BeginSample("Remove Elements");
       for (int i = 0; i < elements.Count; i++) {
         var element = elements[i];
         if (_toRemove.RemoveUnordered(element)) {
@@ -292,9 +293,11 @@ public class LeapGui : MonoBehaviour {
 
       _tempIndexList.Clear();
       _toRemove.Clear();
+      Profiler.EndSample();
     }
 
     if (_toAdd.Count != 0) {
+      Profiler.BeginSample("Add Elements");
       elements.Clear();
       anchors.Clear();
 
@@ -316,11 +319,17 @@ public class LeapGui : MonoBehaviour {
       _tempElementList.Clear();
       _tempIndexList.Clear();
       _toAdd.Clear();
+      Profiler.EndSample();
     }
 
+    Profiler.BeginSample("Build Element Data");
     space.BuildElementData(transform);
+    Profiler.EndSample();
 
+    Profiler.BeginSample("Update Renderer");
     renderer.OnUpdateRenderer();
+    Profiler.EndSample();
+
     foreach (var feature in features) {
       feature.isDirty = false;
     }
