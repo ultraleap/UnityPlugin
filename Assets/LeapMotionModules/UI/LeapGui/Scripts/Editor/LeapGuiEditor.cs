@@ -23,6 +23,10 @@ public class LeapGuiEditor : CustomEditorBase {
   protected override void OnEnable() {
     base.OnEnable();
 
+    if (target == null) {
+      return;
+    }
+
     gui = target as LeapGui;
 
     _featureList = new ReorderableList(gui.features,
