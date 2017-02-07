@@ -8,7 +8,7 @@ using Leap.Unity.Query;
 
 [CustomEditor(typeof(LeapGui))]
 public class LeapGuiEditor : CustomEditorBase {
-  private const int BUTTON_WIDTH = 23;
+  private const int BUTTON_WIDTH = 30;
 
   private LeapGui gui;
   private ReorderableList _featureList;
@@ -135,10 +135,10 @@ public class LeapGuiEditor : CustomEditorBase {
   private void drawSpace(SerializedProperty property) {
     Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
     Rect left, right;
-    rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH);
+    rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH * 2);
 
     EditorGUI.LabelField(left, "Space", EditorStyles.miniButtonLeft);
-    if (GUI.Button(right, "+", EditorStyles.miniButtonRight)) {
+    if (GUI.Button(right, "v", EditorStyles.miniButtonRight)) {
       _addSpaceMenu.ShowAsContext();
     }
 
@@ -152,10 +152,10 @@ public class LeapGuiEditor : CustomEditorBase {
   private void drawRenderer(SerializedProperty property) {
     Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
     Rect left, right;
-    rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH);
+    rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH * 2);
 
     EditorGUI.LabelField(left, "Renderer", EditorStyles.miniButtonLeft);
-    if (GUI.Button(right, "+", EditorStyles.miniButtonRight)) {
+    if (GUI.Button(right, "v", EditorStyles.miniButtonRight)) {
       _addRendererMenu.ShowAsContext();
     }
 
