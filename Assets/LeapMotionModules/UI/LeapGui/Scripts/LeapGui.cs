@@ -422,7 +422,7 @@ public class LeapGui : MonoBehaviour {
         DestroyImmediate(dataObj);
       }
 
-      element.data = dataList;
+      element.OnAssignFeatureData(dataList);
     }
   }
 

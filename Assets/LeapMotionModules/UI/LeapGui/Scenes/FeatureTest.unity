@@ -162,12 +162,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 6
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 107610888}
   - {fileID: 107610890}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &107610890
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -283,12 +281,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 13
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 154215071}
   - {fileID: 154215073}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &154215073
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -373,12 +369,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 25
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 197433623}
   - {fileID: 197433625}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &197433625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -438,12 +432,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 11
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 197726511}
   - {fileID: 197726513}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &197726513
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -553,12 +545,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 17
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 255055652}
   - {fileID: 255055654}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &255055654
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -648,12 +638,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 26
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 364576880}
   - {fileID: 364576878}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &364576880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -764,12 +752,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 16
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 368492348}
   - {fileID: 368492350}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &368492350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -903,12 +889,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 4
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 410823474}
   - {fileID: 410823476}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &410823476
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -984,29 +968,6 @@ Transform:
   m_Father: {fileID: 389666384}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &610693242
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Baked Gui Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
-  m_LightmapFlags: 5
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  m_SavedProperties:
-    serializedVersion: 2
-    m_TexEnvs:
-    - first:
-        name: _MainTex
-      second:
-        m_Texture: {fileID: 1815095522}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &623919297
 GameObject:
   m_ObjectHideFlags: 0
@@ -1078,12 +1039,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 18
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 623919300}
   - {fileID: 623919302}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &623919302
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1199,12 +1158,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 2
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 714477774}
   - {fileID: 714477776}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &714477776
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1289,12 +1246,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 24
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 736878629}
   - {fileID: 736878631}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &736878631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1410,12 +1365,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 15
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 854053649}
   - {fileID: 854053651}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &854053651
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1500,12 +1453,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 7
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 913285605}
   - {fileID: 913285607}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &913285607
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1570,7 +1521,7 @@ MonoBehaviour:
   _motionType: 1
   borderAmount: 0
   _bakedMesh: {fileID: 971348391}
-  _material: {fileID: 610693242}
+  _material: {fileID: 1313874324}
 --- !u!114 &951993291
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1704,7 +1655,7 @@ MonoBehaviour:
   - {fileID: 364576879}
   anchors:
   - {fileID: 389666383}
-  addRemoveSupported: 1
+  addRemoveSupported: 0
 --- !u!4 &951993294
 Transform:
   m_ObjectHideFlags: 0
@@ -2068,12 +2019,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 22
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 1093251730}
   - {fileID: 1093251732}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &1093251732
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2158,12 +2107,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 8
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 1111130721}
   - {fileID: 1111130723}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &1111130723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2310,12 +2257,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 10
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 1245773135}
   - {fileID: 1245773137}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &1245773137
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2329,6 +2274,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   element: {fileID: 1245773136}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
+--- !u!21 &1313874324
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Baked Gui Material
+  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  m_ShaderKeywords: LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+    - first:
+        name: _MainTex
+      second:
+        m_Texture: {fileID: 1512277111}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &1322836238
 GameObject:
   m_ObjectHideFlags: 0
@@ -2400,12 +2368,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 3
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 1322836241}
   - {fileID: 1322836243}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &1322836243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2521,12 +2487,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 23
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 1381224041}
   - {fileID: 1381224043}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &1381224043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2611,12 +2575,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 5
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 1398235161}
   - {fileID: 1398235163}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &1398235163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2701,12 +2663,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 1
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 1473176424}
   - {fileID: 1473176426}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &1473176426
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2720,6 +2680,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   element: {fileID: 1473176425}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
+--- !u!28 &1512277111
+Texture2D:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  serializedVersion: 2
+  m_Width: 32
+  m_Height: 32
+  m_CompleteImageSize: 4096
+  m_TextureFormat: 5
+  m_MipCount: 1
+  m_IsReadable: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 1
+  m_TextureDimension: 2
+  m_TextureSettings:
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapMode: 0
+  m_LightmapFormat: 0
+  m_ColorSpace: 1
+  image data: 4096
+  _typelessdata: ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffffffffffff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffffffffffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffffffffffff000000ff000000ffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffff000000ff000000ffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffff000000ff000000ffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffff000000ff000000ffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffff000000ff000000ffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffff000000ff000000ffffffffffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffffffffffff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffffffffffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000
+  m_StreamData:
+    offset: 0
+    size: 0
+    path: 
 --- !u!1 &1530917346
 GameObject:
   m_ObjectHideFlags: 0
@@ -2766,12 +2758,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 14
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 1530917347}
   - {fileID: 1530917349}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &1530917349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2882,12 +2872,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 0
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 1586997254}
   - {fileID: 1586997256}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &1586997256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2972,12 +2960,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 12
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 1771621695}
   - {fileID: 1771621697}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &1771621697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3062,12 +3048,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 9
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 1790306989}
   - {fileID: 1790306991}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &1790306991
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3081,38 +3065,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   element: {fileID: 1790306990}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
---- !u!28 &1815095522
-Texture2D:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  serializedVersion: 2
-  m_Width: 32
-  m_Height: 32
-  m_CompleteImageSize: 4096
-  m_TextureFormat: 5
-  m_MipCount: 1
-  m_IsReadable: 0
-  m_AlphaIsTransparency: 0
-  m_ImageCount: 1
-  m_TextureDimension: 2
-  m_TextureSettings:
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapMode: 0
-  m_LightmapFormat: 0
-  m_ColorSpace: 1
-  image data: 4096
-  _typelessdata: ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffffffffffff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffffffffffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffffffffffff000000ff000000ffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffff000000ff000000ffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffff000000ff000000ffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffff000000ff000000ffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffff000000ff000000ffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffff000000ff000000ffffffffffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffffffffffff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ffffffffffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ff000000ff000000ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ffc3c3c3ff000000ff000000ff000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000ff000000
-  m_StreamData:
-    offset: 0
-    size: 0
-    path: 
 --- !u!1 &1911383640
 GameObject:
   m_ObjectHideFlags: 0
@@ -3184,12 +3136,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 19
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 1911383643}
   - {fileID: 1911383645}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &1911383645
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3274,12 +3224,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 21
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 2084899208}
   - {fileID: 2084899210}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &2084899210
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3364,12 +3312,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70430290575353e4aadc0a042bc31c54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  elementId: 20
-  anchor: {fileID: 389666383}
-  data:
+  _data:
   - {fileID: 2111573673}
   - {fileID: 2111573675}
-  attachedGui: {fileID: 951993293}
+  _attachedGui: {fileID: 951993293}
 --- !u!114 &2111573675
 MonoBehaviour:
   m_ObjectHideFlags: 0

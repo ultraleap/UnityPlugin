@@ -8,18 +8,18 @@ public class LeapGuiElement : MonoBehaviour {
 
   #region INSPECTOR FIELDS
   [HideInInspector]
-  public int elementId;
+  private int _elementId;
 
   [HideInInspector]
-  public AnchorOfConstantSize anchor;
-
-  [HideInInspector]
-  [SerializeField]
-  public List<LeapGuiElementData> data = new List<LeapGuiElementData>();
+  private AnchorOfConstantSize _anchor;
 
   [HideInInspector]
   [SerializeField]
-  public LeapGui attachedGui;
+  private List<LeapGuiElementData> _data = new List<LeapGuiElementData>();
+
+  [HideInInspector]
+  [SerializeField]
+  private LeapGui _attachedGui;
   #endregion
 
   #region PRIVATE VARIABLES
@@ -35,9 +35,33 @@ public class LeapGuiElement : MonoBehaviour {
   #endregion
 
   #region PUBLIC API
+  public int elementId {
+    get {
+      return _elementId;
+    }
+  }
+
+  public AnchorOfConstantSize anchor {
+    get {
+      return _anchor;
+    }
+  }
+
+  public List<LeapGuiElementData> data {
+    get {
+      return _data;
+    }
+  }
+
+  public LeapGui attachedGui {
+    get {
+      return _attachedGui;
+    }
+  }
+
   public bool IsAttachedToGui {
     get {
-      return attachedGui != null;
+      return _attachedGui != null;
     }
   }
 
@@ -53,44 +77,50 @@ public class LeapGuiElement : MonoBehaviour {
 #endif
 
   public virtual void OnAttachedToGui(LeapGui gui, AnchorOfConstantSize anchor, int elementId) {
-    attachedGui = gui;
-    this.anchor = anchor;
-    this.elementId = elementId;
+    _attachedGui = gui;
+    _anchor = anchor;
+    _elementId = elementId;
   }
 
   public virtual void OnDetachedFromGui() {
-    attachedGui = null;
+    _attachedGui = null;
+    _anchor = null;
+    _elementId = -1;
+  }
+
+  public virtual void OnAssignFeatureData(List<LeapGuiElementData> data) {
+    _data = data;
   }
   #endregion
 
   #region UNITY CALLBACKS
   protected void OnValidate() {
     //Delete any null references
-    for (int i = data.Count; i-- != 0;) {
-      if (data[i] == null) {
-        data.RemoveAt(i);
+    for (int i = _data.Count; i-- != 0;) {
+      if (_data[i] == null) {
+        _data.RemoveAt(i);
       }
     }
 
     //Destroy any components that are not referenced by me
     var allComponents = GetComponents<LeapGuiElementData>();
     foreach (var component in allComponents) {
-      if (!data.Contains(component)) {
+      if (!_data.Contains(component)) {
         InternalUtility.Destroy(component);
       }
     }
 
 #if UNITY_EDITOR
-    for (int i = data.Count; i-- != 0;) {
-      var component = data[i];
+    for (int i = _data.Count; i-- != 0;) {
+      var component = _data[i];
       if (component.gameObject != gameObject) {
         LeapGuiElementData movedData;
         if (InternalUtility.TryMoveComponent(component, gameObject, out movedData)) {
-          data[i] = movedData;
+          _data[i] = movedData;
         } else {
           Debug.LogWarning("Could not move component " + component + "!");
           InternalUtility.Destroy(component);
-          data.RemoveAt(i);
+          _data.RemoveAt(i);
         }
       }
     }
@@ -98,7 +128,7 @@ public class LeapGuiElement : MonoBehaviour {
   }
 
   void OnDestroy() {
-    foreach (var dataObj in data) {
+    foreach (var dataObj in _data) {
       if (dataObj != null) InternalUtility.Destroy(dataObj);
     }
   }
@@ -120,7 +150,7 @@ public class LeapGuiElement : MonoBehaviour {
     if (Application.isPlaying) {
 #endif
       if (IsAttachedToGui) {
-        attachedGui.TryRemoveElement(this);
+        _attachedGui.TryRemoveElement(this);
       }
 #if UNITY_EDITOR
     }
