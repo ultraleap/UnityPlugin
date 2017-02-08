@@ -19,7 +19,7 @@ public class LeapGuiMeshData : LeapGuiElementData {
   private static List<ProceduralMeshSource> _meshSourceList = new List<ProceduralMeshSource>();
   public Mesh mesh {
     get {
-      element.GetComponents<ProceduralMeshSource>(_meshSourceList);
+      element.GetComponents(_meshSourceList);
       for (int i = 0; i < _meshSourceList.Count; i++) {
         var proceduralSource = _meshSourceList[i];
         Mesh proceduralMesh;

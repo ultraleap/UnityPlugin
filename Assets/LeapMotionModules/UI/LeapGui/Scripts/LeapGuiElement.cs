@@ -125,6 +125,10 @@ public class LeapGuiElement : MonoBehaviour {
       }
     }
 #endif
+
+    foreach (var dataObj in _data) {
+      dataObj.element = this;
+    }
   }
 
   void OnDestroy() {
