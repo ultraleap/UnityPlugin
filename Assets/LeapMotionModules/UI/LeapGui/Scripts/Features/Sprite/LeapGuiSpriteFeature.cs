@@ -11,6 +11,17 @@ public class LeapGuiSpriteFeature : LeapGuiFeature<LeapGuiSpriteData> {
   public UVChannelFlags channel = UVChannelFlags.UV0;
 
 #if UNITY_EDITOR
+  public bool AreAllSpritesPacked() {
+    foreach (var dataObj in data) {
+      if (dataObj.sprite == null) continue;
+
+      if (!dataObj.sprite.packed) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   public override void DrawFeatureEditor(Rect rect, bool isActive, bool isFocused) {
     Rect line = rect.SingleLine();
 

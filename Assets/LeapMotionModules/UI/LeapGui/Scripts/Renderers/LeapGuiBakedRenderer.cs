@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.Sprites;
+#endif
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
@@ -11,6 +15,7 @@ using Leap.Unity.Attributes;
 public class LeapGuiBakedRenderer : LeapGuiRenderer,
   ISupportsFeature<LeapGuiMeshFeature>,
   ISupportsFeature<LeapGuiTextureFeature>,
+  ISupportsFeature<LeapGuiSpriteFeature>,
   ISupportsFeature<LeapGuiTintFeature>,
   ISupportsFeature<LeapGuiBlendShapeFeature> {
 
@@ -72,6 +77,18 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
   public void GetSupportInfo(List<LeapGuiTextureFeature> features, List<SupportInfo> info) {
     SupportUtil.OnlySupportFirstFeature(features, info);
+  }
+
+  public void GetSupportInfo(List<LeapGuiSpriteFeature> features, List<SupportInfo> info) {
+    SupportUtil.OnlySupportFirstFeature(features, info);
+
+    for (int i = 0; i < features.Count; i++) {
+      var feature = features[i];
+
+      if (!feature.AreAllSpritesPacked()) {
+        info[i] = info[i].OrWorse(SupportInfo.Warning("Not all sprites are packed."));
+      }
+    }
   }
 
   public void GetSupportInfo(List<LeapGuiTintFeature> features, List<SupportInfo> info) {
