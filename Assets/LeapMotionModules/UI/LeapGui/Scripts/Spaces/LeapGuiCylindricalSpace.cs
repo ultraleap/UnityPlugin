@@ -10,7 +10,7 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace, ISupportsAddRemove {
 
   public float radius = 1;
 
-  private Dictionary<AnchorOfConstantSize, AnchorData> _anchorData = new Dictionary<AnchorOfConstantSize, AnchorData>();
+  private Dictionary<Transform, AnchorData> _anchorData = new Dictionary<Transform, AnchorData>();
 
   public void OnAddElements(List<LeapGuiElement> element, List<int> indexes) {
     BuildElementData(transform); //TODO, optimize
@@ -20,25 +20,18 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace, ISupportsAddRemove {
     BuildElementData(transform); //TODO, optimize
   }
 
-  public AnchorData GetAnchorData(AnchorOfConstantSize anchor) {
+  public AnchorData GetAnchorData(Transform anchor) {
     return _anchorData[anchor];
   }
 
-  public ElementParameters GetElementParameters(AnchorOfConstantSize anchor, Vector3 rectPosWorld) {
+  public ElementParameters GetElementParameters(Transform anchor, Vector3 rectPosWorld) {
     AnchorData anchorData;
     Vector3 anchorDelta;
 
     Vector3 guiPos = gui.transform.InverseTransformPoint(rectPosWorld);
-    if (anchor == null) {
-      anchorDelta = guiPos;
-      anchorData.anchorAngle = 0;
-      anchorData.anchorHeight = 0;
-      anchorData.anchorRadius = radius;
-    } else {
-      Vector3 anchorGuiPos = gui.transform.InverseTransformPoint(anchor.transform.position);
-      anchorDelta = guiPos - anchorGuiPos;
-      anchorData = _anchorData[anchor];
-    }
+    Vector3 anchorGuiPos = gui.transform.InverseTransformPoint(anchor.transform.position);
+    anchorDelta = guiPos - anchorGuiPos;
+    anchorData = _anchorData[anchor];
 
     float angleOffset = anchorData.anchorAngle + anchorDelta.x / anchorData.anchorRadius;
     float heightOffset = anchorData.anchorHeight + anchorDelta.y;
@@ -55,37 +48,36 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace, ISupportsAddRemove {
 
   public override void BuildElementData(Transform root) {
     _anchorData.Clear();
-    refreshElementData(root, null);
+    _anchorData[root] = new AnchorData() {
+      anchorAngle = 0,
+      anchorHeight = 0,
+      anchorRadius = radius
+    };
+
+    refreshElementData(root, root);
   }
 
   public override void RefreshElementData(Transform root) {
-    refreshElementData(root, null);
+    refreshElementData(root, root);
   }
 
-  private void refreshElementData(Transform root, AnchorOfConstantSize parentAnchor) {
+  private void refreshElementData(Transform root, Transform parentAnchor) {
     var anchorComponent = root.GetComponent<AnchorOfConstantSize>();
     if (anchorComponent != null && anchorComponent.enabled) {
       Vector3 guiSpaceDelta;
       AnchorData parentData;
 
       Vector3 guiPosition = gui.transform.InverseTransformPoint(root.position);
-      if (parentAnchor != null) {
-        Vector3 guiAnchor = gui.transform.InverseTransformPoint(parentAnchor.transform.position);
-        guiSpaceDelta = guiPosition - guiAnchor;
-        parentData = _anchorData[parentAnchor];
-      } else {
-        guiSpaceDelta = guiPosition;
-        parentData.anchorAngle = 0;
-        parentData.anchorHeight = 0;
-        parentData.anchorRadius = radius;
-      }
+      Vector3 guiAnchor = gui.transform.InverseTransformPoint(parentAnchor.position);
+      guiSpaceDelta = guiPosition - guiAnchor;
+      parentData = _anchorData[parentAnchor];
 
       AnchorData newData = parentData;
       newData.anchorAngle += guiSpaceDelta.x / parentData.anchorRadius;
       newData.anchorHeight += guiSpaceDelta.y;
       newData.anchorRadius += guiSpaceDelta.z;
 
-      parentAnchor = anchorComponent;
+      parentAnchor = anchorComponent.transform;
       _anchorData[parentAnchor] = newData;
     }
 
@@ -113,16 +105,9 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace, ISupportsAddRemove {
     AnchorData anchorData;
     Vector3 anchorDelta;
 
-    if (element.anchor == null) {
-      anchorDelta = localRectPos;
-      anchorData.anchorAngle = 0;
-      anchorData.anchorHeight = 0;
-      anchorData.anchorRadius = radius;
-    } else {
-      Vector3 anchorGuiPos = gui.transform.InverseTransformPoint(element.anchor.transform.position);
-      anchorDelta = localRectPos - anchorGuiPos;
-      anchorData = _anchorData[element.anchor];
-    }
+    Vector3 anchorGuiPos = gui.transform.InverseTransformPoint(element.anchor.position);
+    anchorDelta = localRectPos - anchorGuiPos;
+    anchorData = _anchorData[element.anchor];
 
     float angleOffset = anchorData.anchorAngle + anchorDelta.x / anchorData.anchorRadius;
     float heightOffset = anchorData.anchorHeight + anchorDelta.y;

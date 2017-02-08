@@ -400,10 +400,10 @@ public class LeapGui : MonoBehaviour {
     _elements.Clear();
     _anchors.Clear();
 
-    rebuildElementListRecursively(transform, null);
+    rebuildElementListRecursively(transform, transform);
   }
 
-  private void rebuildElementListRecursively(Transform root, AnchorOfConstantSize currAnchor) {
+  private void rebuildElementListRecursively(Transform root, Transform currAnchor) {
     int count = root.childCount;
     for (int i = 0; i < count; i++) {
       Transform child = root.GetChild(i);
@@ -411,10 +411,10 @@ public class LeapGui : MonoBehaviour {
 
       var childAnchor = currAnchor;
 
-      var anchor = child.GetComponent<AnchorOfConstantSize>();
-      if (anchor != null && anchor.enabled) {
-        childAnchor = anchor;
-        _anchors.Add(anchor);
+      var anchorComponent = child.GetComponent<AnchorOfConstantSize>();
+      if (anchorComponent != null && anchorComponent.enabled) {
+        childAnchor = anchorComponent.transform;
+        _anchors.Add(anchorComponent);
       }
 
       var element = child.GetComponent<LeapGuiElement>();

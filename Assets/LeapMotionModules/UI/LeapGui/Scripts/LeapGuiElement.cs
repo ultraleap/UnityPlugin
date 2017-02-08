@@ -11,7 +11,7 @@ public class LeapGuiElement : MonoBehaviour {
   private int _elementId;
 
   [HideInInspector]
-  private AnchorOfConstantSize _anchor;
+  private Transform _anchor;
 
   [HideInInspector]
   [SerializeField]
@@ -41,7 +41,7 @@ public class LeapGuiElement : MonoBehaviour {
     }
   }
 
-  public AnchorOfConstantSize anchor {
+  public Transform anchor {
     get {
       return _anchor;
     }
@@ -76,7 +76,7 @@ public class LeapGuiElement : MonoBehaviour {
   }
 #endif
 
-  public virtual void OnAttachedToGui(LeapGui gui, AnchorOfConstantSize anchor, int elementId) {
+  public virtual void OnAttachedToGui(LeapGui gui, Transform anchor, int elementId) {
     _attachedGui = gui;
     _anchor = anchor;
     _elementId = elementId;
