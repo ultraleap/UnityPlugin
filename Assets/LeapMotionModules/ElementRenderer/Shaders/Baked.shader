@@ -21,7 +21,7 @@
       #pragma shader_feature _ LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_MOVEMENT_FULL
       #pragma shader_feature _ LEAP_GUI_TINTING
       #pragma shader_feature _ LEAP_GUI_BLEND_SHAPES
-      #include "Assets/LeapMotionModules/UI/LeapGui/Resources/BakedRenderer.cginc"
+      #include "Assets/LeapMotionModules/ElementRenderer/Resources/BakedRenderer.cginc"
       #include "UnityCG.cginc"
 
       sampler2D _MainTex;
