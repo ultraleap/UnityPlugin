@@ -22,13 +22,35 @@ public class LeapGuiElement : MonoBehaviour {
   public LeapGui attachedGui;
   #endregion
 
-  #region PUBLIC API
+  #region PRIVATE VARIABLES
+  /// <summary>
+  /// At edit time a special mesh is set to each element so that they can be
+  /// correctly picked in the scene view, even though their graphical 
+  /// representation might be part of a different object.
+  /// </summary>
+#if UNITY_EDITOR
+  [NonSerialized]
+  private Mesh _pickingMesh;
+#endif
+  #endregion
 
+  #region PUBLIC API
   public bool IsAttachedToGui {
     get {
       return attachedGui != null;
     }
   }
+
+#if UNITY_EDITOR
+  public Mesh pickingMesh {
+    get {
+      return _pickingMesh;
+    }
+    set {
+      _pickingMesh = value;
+    }
+  }
+#endif
 
   public virtual void OnAttachedToGui(LeapGui gui, AnchorOfConstantSize anchor, int elementId) {
     attachedGui = gui;
@@ -39,7 +61,6 @@ public class LeapGuiElement : MonoBehaviour {
   public virtual void OnDetachedFromGui() {
     attachedGui = null;
   }
-
   #endregion
 
   #region UNITY MESSAGES
@@ -107,18 +128,10 @@ public class LeapGuiElement : MonoBehaviour {
   }
 
 #if UNITY_EDITOR
-  /// <summary>
-  /// At edit time a special mesh is set to each element so that they can be
-  /// correctly picked in the scene view, even though their graphical 
-  /// representation might be part of a different object.
-  /// </summary>
-  [NonSerialized]
-  public Mesh pickingMesh;
-
   void OnDrawGizmos() {
-    if (pickingMesh != null && pickingMesh.vertexCount != 0) {
+    if (_pickingMesh != null && _pickingMesh.vertexCount != 0) {
       Gizmos.color = new Color(0, 0, 0, 0);
-      Gizmos.DrawMesh(pickingMesh);
+      Gizmos.DrawMesh(_pickingMesh);
     }
   }
 #endif
