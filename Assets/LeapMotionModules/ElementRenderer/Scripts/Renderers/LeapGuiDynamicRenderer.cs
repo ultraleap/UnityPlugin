@@ -186,7 +186,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
     ensureObjectsAreValid();
 
-    if (gui.GetFeatures(_meshFeatures)) {
+    if (gui.GetSupportedFeatures(_meshFeatures)) {
       Profiler.BeginSample("Load Meshes");
       loadMeshes();
       Profiler.EndSample();
@@ -204,7 +204,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       Profiler.EndSample();
     }
 
-    if (gui.GetFeatures(_textureFeatures)) {
+    if (gui.GetSupportedFeatures(_textureFeatures)) {
       Profiler.BeginSample("Pack Textures");
       packTextures();
       Profiler.EndSample();

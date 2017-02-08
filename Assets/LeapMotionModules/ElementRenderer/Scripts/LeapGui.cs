@@ -26,17 +26,16 @@ public class LeapGui : MonoBehaviour {
   #endregion
 
   #region PRIVATE VARIABLES
-  [HideInInspector]
+  [SerializeField, HideInInspector]
   private List<LeapGuiElement> _elements = new List<LeapGuiElement>();
 
-  [HideInInspector]
+  [SerializeField, HideInInspector]
   private List<AnchorOfConstantSize> _anchors = new List<AnchorOfConstantSize>();
 
-  [NonSerialized]
+  [SerializeField, HideInInspector]
   private List<SupportInfo> _supportInfo = new List<SupportInfo>();
 
-  [HideInInspector]
-  [SerializeField]
+  [SerializeField, HideInInspector]
   private bool _addRemoveSupported;
 
   private List<LeapGuiElement> _toAdd = new List<LeapGuiElement>();
@@ -123,11 +122,12 @@ public class LeapGui : MonoBehaviour {
     return true;
   }
 
-  public bool GetFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
+  public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
     features.Clear();
     for (int i = 0; i < _features.Count; i++) {
       var feature = _features[i];
       if (!(feature is T)) continue;
+      if (_supportInfo[i].support == SupportType.Error) continue;
 
       features.Add(feature as T);
     }

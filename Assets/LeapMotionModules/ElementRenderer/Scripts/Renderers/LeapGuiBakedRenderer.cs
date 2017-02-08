@@ -44,31 +44,34 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   //Feature lists
   private List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
   private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
+  private List<LeapGuiSpriteFeature> _spriteFeatures = new List<LeapGuiSpriteFeature>();
   private List<LeapGuiBlendShapeFeature> _blendShapeFeatures = new List<LeapGuiBlendShapeFeature>();
 
-  //Meshes
+  //## Meshes
   private Dictionary<LeapGuiMeshData, LeapGuiMeshData.MeshData> _meshData = new Dictionary<LeapGuiMeshData, LeapGuiMeshData.MeshData>();
 
-  //Textures
+  //## Textures
+  //Maps a uv channel to an array of Rects, where each Rect maps the uvs of that element to an atlas
+  //This atlas mapping might be created from packing, or due to atlased sprites
   private Dictionary<UVChannelFlags, Rect[]> _packedRects;
 
-  //Tinting
+  //## Tinting
   private const string TINT = LeapGui.PROPERTY_PREFIX + "Tints";
   private List<Color> _tintColors = new List<Color>();
 
-  //Blend Shapes
+  //## Blend Shapes
   private const string BLEND_SHAPE = LeapGui.PROPERTY_PREFIX + "BlendShapeAmounts";
   private List<float> _blendShapeAmounts = new List<float>();
 
-  //Rect soace
+  //## Rect soace
   private const string RECT_POSITIONS = LeapGui.PROPERTY_PREFIX + "Rect_ElementPositions";
   private List<Vector4> _rect_elementPositions = new List<Vector4>();
 
-  //Cylindrical space
+  //## Cylindrical space
   private const string CYLINDRICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementParameters";
   private List<Vector4> _cylindrical_elementParameters = new List<Vector4>();
 
-  //Spherical space
+  //## Spherical space
   private const string SPHERICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Spherical_ElementParameters";
   private List<Vector4> _spherical_elementParameters = new List<Vector4>();
   #endregion
@@ -99,7 +102,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
       var feature = features[i];
 
       if (!feature.AreAllSpritesPacked()) {
-        info[i] = info[i].OrWorse(SupportInfo.Warning("Not all sprites are packed."));
+        info[i] = SupportInfo.Error("Not all sprites are packed.");
       }
     }
   }
@@ -121,7 +124,11 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     }
   }
 
-  public override void OnEnableRenderer() { }
+  public override void OnEnableRenderer() {
+    if (gui.GetSupportedFeatures(_spriteFeatures)) {
+      uploadSpriteTextures();
+    }
+  }
 
   public override void OnDisableRenderer() { }
 
@@ -198,7 +205,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
     _bakedMesh.Clear();
 
-    if (gui.GetFeatures(_meshFeatures)) {
+    if (gui.GetSupportedFeatures(_meshFeatures)) {
       Profiler.BeginSample("Load Meshes");
       loadAllMeshes();
       Profiler.EndSample();
@@ -212,9 +219,19 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
       Profiler.EndSample();
     }
 
-    if (gui.GetFeatures(_textureFeatures)) {
+    if (gui.GetSupportedFeatures(_textureFeatures)) {
       Profiler.BeginSample("Pack Textures");
       packTextures();
+      Profiler.EndSample();
+    }
+
+    if (gui.GetSupportedFeatures(_spriteFeatures)) {
+      Profiler.BeginSample("Extract Sprite Rects");
+      extractSpriteRects();
+      Profiler.EndSample();
+
+      Profiler.BeginSample("Upload Sprite Textures");
+      uploadSpriteTextures();
       Profiler.EndSample();
     }
 
@@ -349,6 +366,58 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     }
   }
 
+  private void extractSpriteRects() {
+    if (_packedRects == null) {
+      _packedRects = new Dictionary<UVChannelFlags, Rect[]>();
+    }
+
+    foreach (var spriteFeature in _spriteFeatures) {
+      var rects = new Rect[gui.elements.Count];
+      _packedRects[spriteFeature.channel] = rects;
+
+      for (int i = 0; i < spriteFeature.data.Count; i++) {
+        var dataObj = spriteFeature.data[i];
+        var sprite = dataObj.sprite;
+        if (sprite == null) continue;
+
+        Vector2[] uvs = SpriteUtility.GetSpriteUVs(sprite, getAtlasData: true);
+        float minX, minY, maxX, maxY;
+        minX = maxX = uvs[0].x;
+        minY = maxY = uvs[0].y;
+
+        for (int j = 1; j < uvs.Length; j++) {
+          minX = Mathf.Min(minX, uvs[j].x);
+          minY = Mathf.Min(minY, uvs[j].y);
+          maxX = Mathf.Max(maxX, uvs[j].x);
+          maxY = Mathf.Max(maxY, uvs[j].y);
+        }
+
+        rects[i] = Rect.MinMaxRect(minX, minY, maxX, maxY);
+      }
+    }
+  }
+
+  private void uploadSpriteTextures() {
+    foreach (var spriteFeature in _spriteFeatures) {
+      var tex = spriteFeature.data.Query().
+                                   Select(d => d.sprite).
+                                   Where(s => s != null).
+                                   Select(s => {
+#if UNITY_EDITOR
+                                     return SpriteUtility.GetSpriteTexture(s, getAtlasData: true);
+#else
+                                     return s.texture;
+#endif
+
+                                   }).
+                                   FirstOrDefault();
+
+      if (tex != null) {
+        _material.SetTexture(spriteFeature.propertyName, tex);
+      }
+    }
+  }
+
   private void bakeUvs() {
     var uvs = new Dictionary<UVChannelFlags, List<Vector4>>();
 
@@ -403,7 +472,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
       }
     }
 
-    gui.GetFeatures(_blendShapeFeatures);
+    gui.GetSupportedFeatures(_blendShapeFeatures);
     var blendShape = _blendShapeFeatures.Query().FirstOrDefault();
     if (blendShape != null) {
       _material.EnableKeyword(LeapGuiBlendShapeFeature.FEATURE_NAME);
