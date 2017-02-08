@@ -118,11 +118,9 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     }
   }
 
-  public override void OnEnableRenderer() {
-  }
+  public override void OnEnableRenderer() { }
 
-  public override void OnDisableRenderer() {
-  }
+  public override void OnDisableRenderer() { }
 
   public override void OnUpdateRenderer() {
     if (gui.space is LeapGuiRectSpace) {

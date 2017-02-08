@@ -75,13 +75,12 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
     }
   }
 
-  public override void OnEnableRenderer() {
-  }
+  public override void OnEnableRenderer() { }
 
-  public override void OnDisableRenderer() {
-  }
+  public override void OnDisableRenderer() { }
 
   public override void OnUpdateRenderer() {
+    //TODO: combine this logic somehow, lots of duplication
     if (gui.space is LeapGuiRectSpace) {
       for (int i = 0; i < gui.elements.Count; i++) {
         Graphics.DrawMesh(_elementMeshes[i], gui.elements[i].transform.localToWorldMatrix, _material, 0);
@@ -175,11 +174,9 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
     }
   }
 
-  public override void OnEnableRendererEditor() {
-  }
+  public override void OnEnableRendererEditor() { }
 
-  public override void OnDisableRendererEditor() {
-  }
+  public override void OnDisableRendererEditor() { }
 
   public override void OnUpdateRendererEditor() {
     MeshCache.Clear();
