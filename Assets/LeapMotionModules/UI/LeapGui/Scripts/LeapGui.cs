@@ -237,6 +237,9 @@ public class LeapGui : MonoBehaviour {
       }
     }
 #endif
+
+    if (_space != null) _space.gui = this;
+    if (_renderer != null) _renderer.gui = this;
   }
 
   void OnDestroy() {
