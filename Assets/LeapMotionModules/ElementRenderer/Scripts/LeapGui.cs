@@ -534,8 +534,9 @@ public class LeapGui : MonoBehaviour {
       foreach (var dataObj in element.data) {
         if (dataObj is LeapGuiMeshData) {
           var meshData = dataObj as LeapGuiMeshData;
+          meshData.RefreshMeshData();
 
-          Mesh mesh = meshData.GetMeshData().mesh;
+          Mesh mesh = meshData.mesh;
           if (mesh == null) continue;
 
           var topology = MeshCache.GetTopology(mesh);

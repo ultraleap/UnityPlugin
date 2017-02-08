@@ -47,12 +47,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   private List<LeapGuiSpriteFeature> _spriteFeatures = new List<LeapGuiSpriteFeature>();
   private List<LeapGuiBlendShapeFeature> _blendShapeFeatures = new List<LeapGuiBlendShapeFeature>();
 
-  //## Meshes
-  private Dictionary<LeapGuiMeshData, LeapGuiMeshData.MeshData> _meshData = new Dictionary<LeapGuiMeshData, LeapGuiMeshData.MeshData>();
-
   //## Textures
-  //Maps a uv channel to an array of Rects, where each Rect maps the uvs of that element to an atlas
-  //This atlas mapping might be created from packing, or due to atlased sprites
   private Dictionary<UVChannelFlags, Rect[]> _packedRects;
 
   //## Tinting
@@ -212,8 +207,8 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     _bakedMesh.Clear();
 
     if (gui.GetSupportedFeatures(_meshFeatures)) {
-      Profiler.BeginSample("Load Meshes");
-      loadAllMeshes();
+      Profiler.BeginSample("Refresh Meshes");
+      refreshMeshData();
       Profiler.EndSample();
 
       Profiler.BeginSample("Bake Verts");
@@ -298,10 +293,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     _material.name = "Baked Gui Material";
   }
 
-  private void loadAllMeshes() {
+  private void refreshMeshData() {
     foreach (var meshFeature in _meshFeatures) {
       foreach (var meshData in meshFeature.data) {
-        _meshData[meshData] = meshData.GetMeshData();
+        meshData.RefreshMeshData();
       }
     }
   }
@@ -314,10 +309,9 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
     foreach (var meshFeature in _meshFeatures) {
       foreach (var data in meshFeature.data) {
-        var meshData = _meshData[data];
-        if (meshData.mesh == null) continue;
+        if (data.mesh == null) continue;
 
-        var topology = MeshCache.GetTopology(meshData.mesh);
+        var topology = MeshCache.GetTopology(data.mesh);
 
         int vertOffset = _tempVertList.Count;
         for (int i = 0; i < topology.tris.Length; i++) {
@@ -344,13 +338,12 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
     foreach (var feature in _meshFeatures) {
       foreach (var data in feature.data) {
-        var meshData = _meshData[data];
-        if (meshData.mesh == null) continue;
+        if (data.mesh == null) continue;
 
-        int vertexCount = meshData.mesh.vertexCount;
+        int vertexCount = data.mesh.vertexCount;
         Color totalTint = data.tint * feature.tint;
 
-        var vertexColors = meshData.mesh.colors;
+        var vertexColors = data.mesh.colors;
         if (vertexColors.Length != vertexCount) {
           colors.Append(vertexCount, totalTint);
         } else {
@@ -442,7 +435,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     List<Vector4> tempUvList = new List<Vector4>();
     foreach (var feature in _meshFeatures) {
       for (int elementIndex = 0; elementIndex < feature.data.Count; elementIndex++) {
-        var meshData = _meshData[feature.data[elementIndex]];
+        var meshData = feature.data[elementIndex];
         if (meshData.mesh == null) continue;
 
         foreach (var pair in uvs) {
@@ -473,7 +466,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
     foreach (var feature in _meshFeatures) {
       for (int i = 0; i < feature.data.Count; i++) {
-        var meshData = _meshData[feature.data[i]];
+        var meshData = feature.data[i];
         if (meshData.mesh == null) continue;
 
         uv3.Append(meshData.mesh.vertexCount, new Vector4(0, 0, 0, i));

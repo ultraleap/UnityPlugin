@@ -49,7 +49,8 @@ public class LeapGuiBlendShapeData : LeapGuiElementData {
         return null;
       }
 
-      Mesh mesh = meshData.GetMeshData().mesh;
+      meshData.RefreshMeshData();
+      Mesh mesh = meshData.mesh;
       if (mesh == null) {
         return null;
       }

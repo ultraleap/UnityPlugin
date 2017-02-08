@@ -14,7 +14,7 @@ public static class LeapGuiMeshExtensions {
 public class LeapGuiMeshData : LeapGuiElementData {
 
   [SerializeField]
-  private Mesh _customMesh;
+  private Mesh _mesh;
 
   [Tooltip("All channels that are allowed to be remapped into atlas coordinates.")]
   [EnumFlags]
@@ -26,30 +26,25 @@ public class LeapGuiMeshData : LeapGuiElementData {
 
   public Color tint = Color.white;
 
+  public Mesh mesh { get; private set; }
+  public UVChannelFlags remappableChannels { get; private set; }
+
   private static List<ProceduralMeshSource> _meshSourceList = new List<ProceduralMeshSource>();
-  public MeshData GetMeshData() {
+  public void RefreshMeshData() {
     element.GetComponents(_meshSourceList);
     for (int i = 0; i < _meshSourceList.Count; i++) {
       var proceduralSource = _meshSourceList[i];
-      MeshData proceduralData;
-      if (proceduralSource.enabled && proceduralSource.TryGenerateMesh(this, out proceduralData)) {
-        return proceduralData;
+      Mesh proceduralMesh;
+      UVChannelFlags proceduralFlags;
+      if (proceduralSource.enabled && proceduralSource.TryGenerateMesh(this,
+                                                                  out proceduralMesh,
+                                                                  out proceduralFlags)) {
+        mesh = proceduralMesh;
+        remappableChannels = proceduralFlags;
       }
     }
 
-    return new MeshData() {
-      mesh = _customMesh,
-      remappableChannels = _remappableChannels
-    };
-  }
-
-  private enum MeshType {
-    Custom,
-    Procedural
-  }
-
-  public struct MeshData {
-    public Mesh mesh;
-    public UVChannelFlags remappableChannels;
+    mesh = _mesh;
+    remappableChannels = _remappableChannels;
   }
 }

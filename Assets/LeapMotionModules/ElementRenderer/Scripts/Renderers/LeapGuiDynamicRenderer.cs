@@ -32,9 +32,6 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   private List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
   private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
 
-  //Meshes
-  private Dictionary<LeapGuiMeshData, LeapGuiMeshData.MeshData> _meshData = new Dictionary<LeapGuiMeshData, LeapGuiMeshData.MeshData>();
-
   //Textures
   private Dictionary<UVChannelFlags, Rect[]> _packedRects;
 
@@ -259,7 +256,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   private void loadMeshes() {
     foreach (var meshFeature in _meshFeatures) {
       foreach (var dataObj in meshFeature.data) {
-        _meshData[dataObj] = dataObj.GetMeshData();
+        dataObj.RefreshMeshData();
       }
     }
   }
@@ -269,7 +266,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   private void bakeVerts() {
     for (int i = 0; i < gui.elements.Count; i++) {
       foreach (var meshFeature in _meshFeatures) {
-        var meshData = _meshData[meshFeature.data[i]];
+        var meshData = meshFeature.data[i];
         if (meshData.mesh == null) continue;
 
         var topology = MeshCache.GetTopology(meshData.mesh);
@@ -298,11 +295,10 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
     for (int i = 0; i < gui.elements.Count; i++) {
       foreach (var meshFeature in _meshFeatures) {
-        var dataObj = meshFeature.data[i];
-        var meshData = _meshData[dataObj];
+        var meshData = meshFeature.data[i];
         if (meshData.mesh == null) continue;
 
-        Color totalTint = dataObj.tint * meshFeature.tint;
+        Color totalTint = meshData.tint * meshFeature.tint;
 
         var colors = MeshCache.GetColors(meshData.mesh);
         if (colors != null) {
@@ -348,7 +344,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       var element = gui.elements[i];
 
       foreach (var meshFeature in _meshFeatures) {
-        var meshData = _meshData[meshFeature.data[i]];
+        var meshData = meshFeature.data[i];
         if (meshData.mesh == null) continue;
 
         foreach (var channel in enabledChannels) {
@@ -373,7 +369,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       var element = gui.elements[i];
 
       foreach (var meshFeature in _meshFeatures) {
-        var meshData = _meshData[meshFeature.data[i]];
+        var meshData = meshFeature.data[i];
         if (meshData.mesh == null) continue;
 
         _tempUvList.Append(meshData.mesh.vertexCount, new Vector4(0, 0, 0, i));
