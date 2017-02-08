@@ -10,12 +10,26 @@ namespace Leap.Unity.UI.Constraints {
 
     private Rigidbody _body;
 
+    void Awake() {
+      InitBasePositions();
+    }
+
     void Start() {
       _body = GetComponent<Rigidbody>();
       PhysicsCallbacks.OnPrePhysics += OnPrePhysics;
     }
 
-    /// <summary> Conveniences for getting/setting Rigidbody local-to-parent position. Cache the result whenever possible. </summary>
+    void OnValidate() {
+      InitBasePositions();
+    }
+
+    private void InitBasePositions() {
+      for (int i = 0; i < constraints.Length; i++) {
+        constraints[i].basePosition = this.transform.localPosition;
+      }
+    }
+
+    /// <summary> Convenience for getting/setting Rigidbody local-to-parent position. Cache the result whenever possible. </summary>
     private Vector3 RigidbodyLocalPosition {
       get {
         if (this.transform.parent == null) {
@@ -56,8 +70,6 @@ namespace Leap.Unity.UI.Constraints {
     }
 
     private void OnPrePhysics() {
-      bool parentIsNull = this.transform.parent == null;
-
       for (int i = 0; i < constraints.Length; i++) {
         if (_body != null) {
           // Enforce constraint on Rigidbody __local__ position and velocity.
@@ -91,6 +103,7 @@ namespace Leap.Unity.UI.Constraints {
       [HideInInspector]
       public string label;
 
+      // Constraint struct contains data for all possible constraints; no one constraint uses every parameter.
       public ConstraintType type;
       public float radius;
       public Vector3 normal;
@@ -99,25 +112,30 @@ namespace Leap.Unity.UI.Constraints {
       public Vector3 start;
       public Vector3 end;
 
+      // Automatically set to the local position of the transform. Offsets all positions.
+      public Vector3 basePosition;
+
       public Vector3 Evaluate(Vector3 localPosition) {
         switch (type) {
           case ConstraintType.Line:
-            Vector3 line = (end - start);
+            Vector3 line   = (end - start);
+            Vector3 bStart = basePosition + start;
+            Vector3 bEnd   = basePosition + end;
+
             if (line.x == 0F && line.y == 0F && line.z == 0F) { return start; } // Early out for line length = 0.
 
             // Project local position to line.
-            Vector3 projectedLocalPosition = Vector3.Project(localPosition - start, end - start) + start;
+            Vector3 projectedLocalPosition = Vector3.Project(localPosition - bStart, bEnd - bStart) + bStart;
 
             // Clamp to line length.
-            float progressSqrdAlongLine = (projectedLocalPosition - start).sqrMagnitude;
-            progressSqrdAlongLine = Mathf.Clamp(progressSqrdAlongLine, 0F, line.sqrMagnitude);
+            float progressAlongLine = (projectedLocalPosition - bStart).magnitude;
+            progressAlongLine = Mathf.Clamp(progressAlongLine, 0F, line.magnitude);
 
             // Return constrained local position.
-            Vector3 lineDir = (end - start).normalized;
-            return start + lineDir * Mathf.Sqrt(progressSqrdAlongLine);
+            Vector3 lineDir = (bEnd - bStart).normalized;
+            return bStart + lineDir * progressAlongLine;
 
           default:
-            return Vector3.zero;
             throw new System.NotImplementedException();
           //case ConstraintType.Plane:
           //  if (parentTransform != null) {

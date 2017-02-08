@@ -11,7 +11,7 @@ public class RotationHandle : TransformHandle {
     get { return _interactionObj.Rigidbody; }
   }
 
-  void Start() {
+  protected override void Start() {
     base.Start();
 
     _interactionObj = GetComponent<InteractionBehaviour>();

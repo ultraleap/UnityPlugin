@@ -29,10 +29,13 @@ namespace Leap.Unity.UI.Interaction {
     //public Action       OnObjectGraspHold  = () => { };
     //public Action       OnObjectGraspEnd   = () => { };
 
-    // TODO: Primary hover not totally good yet. Needs work.
     public Action<Hand> OnPrimaryHoverBegin = (hand) => { };
     public Action<Hand> OnPrimaryHoverStay  = (hand) => { };
     public Action<Hand> OnPrimaryHoverEnd   = (hand) => { };
+
+    public Action<Hand> OnObjectPrimaryHoverBegin = (closestHand) => { };
+    public Action<Hand> OnObjectPrimaryHoverStay  = (closestHand) => { };
+    public Action<Hand> OnObjectPrimaryHoverEnd   = (closestHand) => { };
 
     [Tooltip("Should hands move the object as if it is held when the object is grasped? "
            + "Use OnPostHoldingMovement to constrain the object's motion while held, or "
@@ -99,6 +102,7 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     public override void FixedUpdateObject() {
       FixedUpdateHovering();
+      FixedUpdatePrimaryHovering();
       //FixedUpdateContact();  // Contact not yet implemented.
       FixedUpdateGrasping(); // Not yet necessary (two-handed grabbing NYI).
     }
@@ -137,9 +141,33 @@ namespace Leap.Unity.UI.Interaction {
       _closestHoveringHandDistance = float.PositiveInfinity;
     }
 
-    public override float GetHoverDistance(Hand hand) {
+    private Hand _closestPrimaryHoveringHand = null;
+    private float _closestPrimaryHoveringHandDistance = float.PositiveInfinity;
+    private Hand _closestJustStoppedPrimaryHoveringHand = null; // Provided for OnObjectPrimaryHoverEnd.
+    private int _primaryHoveringHandsCountLastFrame = 0;
+    private int _primaryHoveringHandsCount = 0;
+
+    private void FixedUpdatePrimaryHovering() {
+      if (_primaryHoveringHandsCount > 0) {
+        if (_primaryHoveringHandsCountLastFrame == 0) {
+          OnObjectPrimaryHoverBegin(_closestPrimaryHoveringHand);
+        }
+        else {
+          OnObjectPrimaryHoverStay(_closestPrimaryHoveringHand);
+        }
+      }
+      else if (_primaryHoveringHandsCountLastFrame > 0) {
+        OnObjectPrimaryHoverEnd(_closestJustStoppedPrimaryHoveringHand);
+      }
+
+      _primaryHoveringHandsCountLastFrame = _primaryHoveringHandsCount;
+      _closestPrimaryHoveringHand = null;
+      _closestPrimaryHoveringHandDistance = float.PositiveInfinity;
+    }
+
+    public override float GetHoverDistance(Vector3 worldPosition) {
       // TODO: Need to get distance from the InteractionBehaviour's colliders. Probably has to wait until 5.6 (Physics.ClosestPoint)
-      return GetInteractionDistanceToPoint(hand.PalmPosition.ToVector3());
+      return GetInteractionDistanceToPoint(worldPosition);
     }
 
     public override void HoverBegin(Hand hand) {
@@ -179,14 +207,38 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public override void PrimaryHoverBegin(Hand hand) {
+      EvaluatePrimaryHoverCloseness(hand);
+      _primaryHoveringHandsCount++;
+
       OnPrimaryHoverBegin(hand);
     }
 
     public override void PrimaryHoverStay(Hand hand) {
+      EvaluatePrimaryHoverCloseness(hand);
+
       OnPrimaryHoverStay(hand);
     }
 
+    private void EvaluatePrimaryHoverCloseness(Hand hand) {
+      float handDistance = GetInteractionDistanceToPoint(hand.PalmPosition.ToVector3());
+      if (_primaryHoveringHandsCount == 0 || _closestPrimaryHoveringHand == null) {
+        _closestPrimaryHoveringHand = hand;
+        _closestPrimaryHoveringHandDistance = handDistance;
+      }
+      else {
+        if (handDistance < _closestPrimaryHoveringHandDistance) {
+          _closestPrimaryHoveringHand = hand;
+          _closestPrimaryHoveringHandDistance = handDistance;
+        }
+      }
+    }
+
     public override void PrimaryHoverEnd(Hand hand) {
+      _primaryHoveringHandsCount--;
+      if (_primaryHoveringHandsCount == 0) {
+        _closestJustStoppedPrimaryHoveringHand = hand;
+      }      
+
       OnPrimaryHoverEnd(hand);
     }
 

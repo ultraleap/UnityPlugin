@@ -19,7 +19,7 @@ namespace Leap.Unity.UI.Interaction {
     private float _boneCount;
 #pragma warning restore 0414
 
-    private Dictionary<InteractionManager.InteractionHand, HandPointCollection> _handToPoints;
+    private Dictionary<InteractionHand, HandPointCollection> _handToPoints;
 
     public KabschHoldingPose(InteractionBehaviour interactionObj) {
       _interactionObj = interactionObj;
@@ -27,10 +27,10 @@ namespace Leap.Unity.UI.Interaction {
 
       _kabsch = new KabschSolver();
       _points = new List<Vector3>(20); _refPoints = new List<Vector3>(20);
-      _handToPoints = new Dictionary<InteractionManager.InteractionHand, HandPointCollection>();
+      _handToPoints = new Dictionary<InteractionHand, HandPointCollection>();
     }
 
-    public void AddHand(InteractionManager.InteractionHand hand) {
+    public void AddHand(InteractionHand hand) {
       var newPoints = HandPointCollection.Create(_interactionObj.Rigidbody.position,
                                                      _interactionObj.Rigidbody.rotation);
       _handToPoints[hand] = newPoints;
@@ -51,7 +51,7 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public void RemoveHand(InteractionManager.InteractionHand hand) {
+    public void RemoveHand(InteractionHand hand) {
       var collection = _handToPoints[hand];
       _handToPoints.Remove(hand);
 
@@ -75,7 +75,7 @@ namespace Leap.Unity.UI.Interaction {
       _handCentroid = Vector3.zero; _objectCentroid = Vector3.zero; _boneCount = 0f;
 
       foreach (var handPointPair in _handToPoints) {
-        InteractionManager.InteractionHand hand = handPointPair.Key;
+        InteractionHand hand = handPointPair.Key;
         Leap.Hand leapHand = hand.GetLeapHand();
         HandPointCollection points = _handToPoints[hand];
 

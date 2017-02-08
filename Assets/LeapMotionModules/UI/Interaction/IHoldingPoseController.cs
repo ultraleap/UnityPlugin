@@ -20,13 +20,13 @@ namespace Leap.Unity.UI.Interaction {
     /// Called when a new InteractionHand begins grasping a certain object.
     /// The hand should be included in the held pose calculation.
     /// </summary>
-    void AddHand(InteractionManager.InteractionHand hand);
+    void AddHand(InteractionHand hand);
 
     /// <summary>
     /// Called when an InteractionHand stops grasping a certain object;
     /// the hand should no longer be included in the held pose calculation.
     /// </summary>
-    void RemoveHand(InteractionManager.InteractionHand hand);
+    void RemoveHand(InteractionHand hand);
 
     /// <summary>
     /// Called if an InteractionBehaviour is set not to move while being grasped;

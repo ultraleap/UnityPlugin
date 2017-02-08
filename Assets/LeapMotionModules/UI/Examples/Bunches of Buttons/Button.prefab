@@ -40,6 +40,7 @@ GameObject:
   - component: {fileID: 114230622874444114}
   - component: {fileID: 114656800092828498}
   - component: {fileID: 114391803484524762}
+  - component: {fileID: 114823322565567024}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -186,8 +187,8 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  m_Constraints: 112
+  m_CollisionDetection: 2
 --- !u!65 &65351796097336912
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -252,6 +253,7 @@ MonoBehaviour:
     extents: {x: 0, y: 0, z: 0}
     start: {x: 0, y: 0, z: 0.01}
     end: {x: 0, y: 0, z: 0}
+    basePosition: {x: 0, y: 0, z: 0}
 --- !u!114 &114656800092828498
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -263,3 +265,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0604ce4a315cd5b468bb23a033a4a5d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114823322565567024
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1279575781970260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9c494457d6905c4a996aa07f8721eb4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  primaryHoverColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

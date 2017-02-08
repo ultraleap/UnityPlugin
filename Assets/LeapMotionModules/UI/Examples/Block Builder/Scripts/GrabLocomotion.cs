@@ -17,7 +17,7 @@ public class GrabLocomotion : MonoBehaviour {
 
   void Update() {
     _lHand = Hands.Left;
-    //_rHand = Hands.Right;
+    _rHand = Hands.Right;
 
     bool grabStateChanged = false;
     UpdateGrabState(out grabStateChanged);

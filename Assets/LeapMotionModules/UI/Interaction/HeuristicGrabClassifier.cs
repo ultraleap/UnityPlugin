@@ -11,14 +11,14 @@ namespace Leap.Unity.UI.Interaction {
 
   public class HeuristicGrabClassifier {
 
-    public InteractionManager.InteractionHand interactionHand;
+    public InteractionHand interactionHand;
 
     private Hand _hand;
     private Collider[][] _collidingCandidates = new Collider[5][];
 
     Dictionary<InteractionBehaviourBase, GrabClassifier> classifiers = new Dictionary<InteractionBehaviourBase, GrabClassifier>();
 
-    public HeuristicGrabClassifier(InteractionManager.InteractionHand interactionHand) {
+    public HeuristicGrabClassifier(InteractionHand interactionHand) {
       this.interactionHand = interactionHand;
 
       for(int i = 0; i < 5; i++) {
@@ -42,7 +42,9 @@ namespace Leap.Unity.UI.Interaction {
           //If not, process all objects
           var graspCandidates = interactionHand.GetGraspCandidates();
           foreach (var graspCandidate in graspCandidates) {
-            UpdateBehaviour(graspCandidate);
+            if (!graspCandidate.ignoreGrasping) {
+              UpdateBehaviour(graspCandidate);
+            }
           }
 
           // Clear classifiers on non-grasp-candidates.

@@ -12,7 +12,10 @@ namespace Leap.Unity.UI.Interaction {
 
     [SerializeField]
     [HideInInspector]
+    #pragma warning disable 0414
+    // Variable used only for inspector rendering.
     private bool _interactionManagerIsNull = true;
+    #pragma warning restore 0414
 
     [Header("Interaction Settings")]
     // TODO: Display a warning when the Interaction Manager has any of the actions below disabled.
@@ -48,9 +51,8 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Hovering
 
-    // TODO: Hover scores may not be the right idea here.
-    /// <summary> Values >= zero are "hovered." Of hovered objects, the one with the highest score is the "primary" hovered object. </summary>
-    public abstract float GetHoverDistance(Hand hand);
+    /// <summary> Return the distance the interaction object is from the given world position. </summary>
+    public abstract float GetHoverDistance(Vector3 worldPosition);
 
 
     /// <summary> Called per-hand when that hand produces a non-zero hover score for this object. </summary>
