@@ -1,11 +1,29 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Leap.Unity.Query;
+using Leap.Unity.Attributes;
 
-public static class AtlasUtil {
+public static class PackUtil {
+
+  [Serializable]
+  public class Settings {
+    [MinValue(0)]
+    public int border = 1;
+
+    [MinValue(0)]
+    public int padding = 0;
+
+    [MinValue(16)]
+    [MaxValue(8192)]
+    public int maxAtlasSize = 4096;
+
+    public FilterMode filterMode = FilterMode.Bilinear;
+  }
+
   public static List<UVChannelFlags> allUvChannels;
-  static AtlasUtil() {
+  static PackUtil() {
     allUvChannels = new List<UVChannelFlags>();
     allUvChannels.Add(UVChannelFlags.UV0);
     allUvChannels.Add(UVChannelFlags.UV1);
@@ -17,13 +35,13 @@ public static class AtlasUtil {
     _cachedBorderedTextures.Clear();
   }
 
-  public static void DoAtlas(List<LeapGuiTextureFeature> textureFeatures,
-                             int borderAmount,
-                         out Texture2D[] atlasTextures,
-                         out Dictionary<UVChannelFlags, Rect[]> channelMapping) {
+  public static void DoPack(List<LeapGuiTextureFeature> textureFeatures,
+                            Settings settings,
+                        out Texture2D[] packedTextures,
+                        out Dictionary<UVChannelFlags, Rect[]> channelMapping) {
     ClearCache();
 
-    atlasTextures = new Texture2D[textureFeatures.Count];
+    packedTextures = new Texture2D[textureFeatures.Count];
     channelMapping = new Dictionary<UVChannelFlags, Rect[]>();
 
     Texture2D[] textureArray = new Texture2D[textureFeatures[0].data.Count];
@@ -32,34 +50,34 @@ public static class AtlasUtil {
       var mainTexture = textureFeatures.Query().FirstOrDefault(f => f.channel == channel);
       if (mainTexture == null) continue;
 
-      Texture2D defaultTexture, atlasTexture;
-      prepFeatureForAtlas(mainTexture, borderAmount, textureArray, out defaultTexture, out atlasTexture);
+      Texture2D defaultTexture, packedTexture;
+      prepareForPacking(mainTexture, settings, textureArray, out defaultTexture, out packedTexture);
 
-      var atlasedRects = atlasTexture.PackTextures(textureArray,
-                                                   padding: 0,
-                                                   maximumAtlasSize: 4096,
+      var packedRects = packedTexture.PackTextures(textureArray,
+                                                   padding: settings.padding,
+                                                   maximumAtlasSize: settings.maxAtlasSize,
                                                    makeNoLongerReadable: true);
 
       //Correct uvs to account for the added border
-      for (int i = 0; i < atlasedRects.Length; i++) {
-        float dx = 1.0f / atlasTexture.width;
-        float dy = 1.0f / atlasTexture.height;
-        Rect r = atlasedRects[i];
+      for (int i = 0; i < packedRects.Length; i++) {
+        float dx = 1.0f / packedTexture.width;
+        float dy = 1.0f / packedTexture.height;
+        Rect r = packedRects[i];
 
         if (textureArray[i] != defaultTexture) {
-          dx *= borderAmount;
-          dy *= borderAmount;
+          dx *= settings.border;
+          dy *= settings.border;
         }
 
         r.x += dx;
         r.y += dy;
         r.width -= dx * 2;
         r.height -= dy * 2;
-        atlasedRects[i] = r;
+        packedRects[i] = r;
       }
 
-      atlasTextures[textureFeatures.IndexOf(mainTexture)] = atlasTexture;
-      channelMapping[channel] = atlasedRects;
+      packedTextures[textureFeatures.IndexOf(mainTexture)] = packedTexture;
+      channelMapping[channel] = packedRects;
 
       //All texture features that are NOT the main texture do not get their own atlas step
       //They are simply copied into a new texture
@@ -68,12 +86,12 @@ public static class AtlasUtil {
     }
   }
 
-  private static void prepFeatureForAtlas(LeapGuiTextureFeature feature,
-                                          int borderAmount,
-                                          Texture2D[] textureArray,
-                                      out Texture2D defaultTexture,
-                                      out Texture2D atlasTexture) {
-    feature.data.Query().Select(dataObj => getBordered(dataObj.texture, borderAmount)).FillArray(textureArray);
+  private static void prepareForPacking(LeapGuiTextureFeature feature,
+                                        Settings settings,
+                                        Texture2D[] textureArray,
+                                    out Texture2D defaultTexture,
+                                    out Texture2D packedTexture) {
+    feature.data.Query().Select(dataObj => getBordered(dataObj.texture, settings.border)).FillArray(textureArray);
 
     var nonNullTexture = feature.data.Query().Select(d => d.texture).FirstOrDefault(t => t != null);
     TextureFormat format;
@@ -90,7 +108,8 @@ public static class AtlasUtil {
       }
     }
 
-    atlasTexture = new Texture2D(1, 1, format, mipmap: false);
+    packedTexture = new Texture2D(1, 1, format, mipmap: false);
+    packedTexture.filterMode = settings.filterMode;
   }
 
   private static Dictionary<BorderKey, Texture2D> _cachedBorderedTextures = new Dictionary<BorderKey, Texture2D>();
@@ -103,7 +122,7 @@ public static class AtlasUtil {
     BorderKey key = new BorderKey() { texture = source, border = border };
     if (!_cachedBorderedTextures.TryGetValue(key, out bordered)) {
       source.EnsureReadWriteEnabled();
-      bordered = Object.Instantiate(source);
+      bordered = UnityEngine.Object.Instantiate(source);
       bordered.AddBorder(border);
       _cachedBorderedTextures[key] = bordered;
     }

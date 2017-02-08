@@ -29,9 +29,8 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   [SerializeField]
   private MotionType _motionType = MotionType.Translation;
 
-  [MinValue(0)]
   [SerializeField]
-  private int _borderAmount = 0;
+  private PackUtil.Settings _atlasSettings;
 
   [Header("Debug")]
   [HideInInspector, SerializeField]
@@ -48,7 +47,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   private List<LeapGuiBlendShapeFeature> _blendShapeFeatures = new List<LeapGuiBlendShapeFeature>();
 
   //Textures
-  private Dictionary<UVChannelFlags, Rect[]> _atlasedRects;
+  private Dictionary<UVChannelFlags, Rect[]> _packedRects;
 
   //Tinting
   private const string TINT = LeapGui.PROPERTY_PREFIX + "Tints";
@@ -209,8 +208,8 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     }
 
     if (gui.GetFeatures(_textureFeatures)) {
-      Profiler.BeginSample("Atlas Textures");
-      atlasTextures();
+      Profiler.BeginSample("Pack Textures");
+      packTextures();
       Profiler.EndSample();
     }
 
@@ -324,14 +323,14 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     _material.EnableKeyword(LeapGuiMeshFeature.COLORS_FEATURE);
   }
 
-  private void atlasTextures() {
-    Texture2D[] atlasTextures;
-    AtlasUtil.DoAtlas(_textureFeatures, _borderAmount,
-                  out atlasTextures,
-                  out _atlasedRects);
+  private void packTextures() {
+    Texture2D[] packedTextures;
+    PackUtil.DoPack(_textureFeatures, _atlasSettings,
+                out packedTextures,
+                out _packedRects);
 
     for (int i = 0; i < _textureFeatures.Count; i++) {
-      _material.SetTexture(_textureFeatures[i].propertyName, atlasTextures[i]);
+      _material.SetTexture(_textureFeatures[i].propertyName, packedTextures[i]);
     }
   }
 
@@ -361,7 +360,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
           mesh.GetUVsOrDefault(pair.Key.Index(), tempUvList);
 
           Rect[] atlasedUvs;
-          if (_atlasedRects != null && _atlasedRects.TryGetValue(pair.Key, out atlasedUvs)) {
+          if (_packedRects != null && _packedRects.TryGetValue(pair.Key, out atlasedUvs)) {
             MeshUtil.RemapUvs(tempUvList, atlasedUvs[elementIndex]);
           }
 

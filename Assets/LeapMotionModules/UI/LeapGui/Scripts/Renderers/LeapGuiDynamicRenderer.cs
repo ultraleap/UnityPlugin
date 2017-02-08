@@ -15,10 +15,9 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   #region INSPECTOR FIELDS
   [SerializeField]
   private Shader _shader;
-
-  [MinValue(0)]
+  
   [SerializeField]
-  private int _borderAmount;
+  private PackUtil.Settings _atlasSettings;
 
   [Header("Debug")]
   [HideInInspector, SerializeField]
@@ -34,7 +33,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
 
   //Textures
-  private Dictionary<UVChannelFlags, Rect[]> _atlasedRects;
+  private Dictionary<UVChannelFlags, Rect[]> _packedRects;
 
   //Cylindrical space
   private const string CYLINDRICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementParameters";
@@ -202,8 +201,8 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
     }
 
     if (gui.GetFeatures(_textureFeatures)) {
-      Profiler.BeginSample("Atlas Textures");
-      atlasTextures();
+      Profiler.BeginSample("Pack Textures");
+      packTextures();
       Profiler.EndSample();
     }
 
@@ -309,14 +308,14 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
     _material.EnableKeyword(LeapGuiMeshFeature.COLORS_FEATURE);
   }
 
-  private void atlasTextures() {
-    Texture2D[] atlasTextures;
-    AtlasUtil.DoAtlas(_textureFeatures, _borderAmount,
-                  out atlasTextures,
-                  out _atlasedRects);
+  private void packTextures() {
+    Texture2D[] packedTextures;
+    PackUtil.DoPack(_textureFeatures, _atlasSettings,
+                out packedTextures,
+                out _packedRects);
 
     for (int i = 0; i < _textureFeatures.Count; i++) {
-      _material.SetTexture(_textureFeatures[i].propertyName, atlasTextures[i]);
+      _material.SetTexture(_textureFeatures[i].propertyName, packedTextures[i]);
     }
   }
 
@@ -346,7 +345,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
           mesh.GetUVsOrDefault(channel.Index(), _tempUvList);
 
           Rect[] atlasedRects;
-          if (_atlasedRects != null && _atlasedRects.TryGetValue(channel, out atlasedRects)) {
+          if (_packedRects != null && _packedRects.TryGetValue(channel, out atlasedRects)) {
             MeshUtil.RemapUvs(_tempUvList, atlasedRects[i]);
           }
 
