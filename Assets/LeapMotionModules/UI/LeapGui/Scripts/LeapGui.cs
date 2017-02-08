@@ -308,7 +308,7 @@ public class LeapGui : MonoBehaviour {
       Profiler.EndSample();
     }
 
-    if (_renderer != null) {
+    if (_renderer != null && _elements.Count != 0) {
       Profiler.BeginSample("Update Renderer");
       _renderer.OnUpdateRendererEditor();
       Profiler.EndSample();
@@ -372,13 +372,16 @@ public class LeapGui : MonoBehaviour {
       Profiler.EndSample();
     }
 
+    //TODO, optimize this!  Don't do it every frame for the whole thing!
     Profiler.BeginSample("Build Element Data");
     _space.BuildElementData(transform);
     Profiler.EndSample();
 
-    Profiler.BeginSample("Update Renderer");
-    _renderer.OnUpdateRenderer();
-    Profiler.EndSample();
+    if (_elements.Count != 0) {
+      Profiler.BeginSample("Update Renderer");
+      _renderer.OnUpdateRenderer();
+      Profiler.EndSample();
+    }
 
     foreach (var feature in _features) {
       feature.isDirty = false;
