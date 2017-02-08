@@ -534,9 +534,11 @@ public class LeapGui : MonoBehaviour {
       foreach (var dataObj in element.data) {
         if (dataObj is LeapGuiMeshData) {
           var meshData = dataObj as LeapGuiMeshData;
-          if (meshData.mesh == null) continue;
 
-          var topology = MeshCache.GetTopology(meshData.mesh);
+          Mesh mesh = meshData.GetMeshData().mesh;
+          if (mesh == null) continue;
+
+          var topology = MeshCache.GetTopology(mesh);
           for (int i = 0; i < topology.tris.Length; i++) {
             pickingTris.Add(topology.tris[i] + pickingVerts.Count);
           }

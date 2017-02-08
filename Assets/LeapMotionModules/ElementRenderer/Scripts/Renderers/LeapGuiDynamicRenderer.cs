@@ -15,7 +15,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   #region INSPECTOR FIELDS
   [SerializeField]
   private Shader _shader;
-  
+
   [SerializeField]
   private PackUtil.Settings _atlasSettings;
 
@@ -31,6 +31,9 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   //Feature lists
   private List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
   private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
+
+  //Meshes
+  private Dictionary<LeapGuiMeshData, LeapGuiMeshData.MeshData> _meshData = new Dictionary<LeapGuiMeshData, LeapGuiMeshData.MeshData>();
 
   //Textures
   private Dictionary<UVChannelFlags, Rect[]> _packedRects;
@@ -184,6 +187,10 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
     ensureObjectsAreValid();
 
     if (gui.GetFeatures(_meshFeatures)) {
+      Profiler.BeginSample("Load Meshes");
+      loadMeshes();
+      Profiler.EndSample();
+
       Profiler.BeginSample("Bake Verts");
       bakeVerts();
       Profiler.EndSample();
@@ -249,16 +256,23 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
     _material.name = "Dynamic Gui Material";
   }
 
+  private void loadMeshes() {
+    foreach (var meshFeature in _meshFeatures) {
+      foreach (var dataObj in meshFeature.data) {
+        _meshData[dataObj] = dataObj.GetMeshData();
+      }
+    }
+  }
+
   private List<Vector3> _tempVertList = new List<Vector3>();
   private List<int> _tempTriList = new List<int>();
   private void bakeVerts() {
     for (int i = 0; i < gui.elements.Count; i++) {
       foreach (var meshFeature in _meshFeatures) {
-        var elementData = meshFeature.data[i];
-        var mesh = elementData.mesh;
-        if (mesh == null) continue;
+        var meshData = _meshData[meshFeature.data[i]];
+        if (meshData.mesh == null) continue;
 
-        var topology = MeshCache.GetTopology(elementData.mesh);
+        var topology = MeshCache.GetTopology(meshData.mesh);
 
         int vertOffset = _tempVertList.Count;
         for (int j = 0; j < topology.tris.Length; j++) {
@@ -284,17 +298,17 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
     for (int i = 0; i < gui.elements.Count; i++) {
       foreach (var meshFeature in _meshFeatures) {
-        var elementData = meshFeature.data[i];
-        var mesh = elementData.mesh;
-        if (mesh == null) continue;
+        var dataObj = meshFeature.data[i];
+        var meshData = _meshData[dataObj];
+        if (meshData.mesh == null) continue;
 
-        Color totalTint = elementData.color * meshFeature.tint;
+        Color totalTint = dataObj.tint * meshFeature.tint;
 
-        var colors = MeshCache.GetColors(mesh);
+        var colors = MeshCache.GetColors(meshData.mesh);
         if (colors != null) {
           colors.Query().Select(c => c * totalTint).AppendList(_tempColorList);
         } else {
-          _tempColorList.Append(mesh.vertexCount, totalTint);
+          _tempColorList.Append(meshData.mesh.vertexCount, totalTint);
         }
       }
 
@@ -334,12 +348,11 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       var element = gui.elements[i];
 
       foreach (var meshFeature in _meshFeatures) {
-        var elementData = meshFeature.data[i];
-        var mesh = elementData.mesh;
-        if (mesh == null) continue;
+        var meshData = _meshData[meshFeature.data[i]];
+        if (meshData.mesh == null) continue;
 
         foreach (var channel in enabledChannels) {
-          mesh.GetUVsOrDefault(channel.Index(), _tempUvList);
+          meshData.mesh.GetUVsOrDefault(channel.Index(), _tempUvList);
 
           Rect[] atlasedRects;
           if (_packedRects != null && _packedRects.TryGetValue(channel, out atlasedRects)) {
@@ -358,11 +371,10 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       var element = gui.elements[i];
 
       foreach (var meshFeature in _meshFeatures) {
-        var elementData = meshFeature.data[i];
-        var mesh = elementData.mesh;
-        if (mesh == null) continue;
+        var meshData = _meshData[meshFeature.data[i]];
+        if (meshData.mesh == null) continue;
 
-        _tempUvList.Append(mesh.vertexCount, new Vector4(0, 0, 0, i));
+        _tempUvList.Append(meshData.mesh.vertexCount, new Vector4(0, 0, 0, i));
       }
 
       _elementMeshes[i].SetUVs(3, _tempUvList);

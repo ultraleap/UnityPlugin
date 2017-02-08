@@ -46,6 +46,9 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
   private List<LeapGuiBlendShapeFeature> _blendShapeFeatures = new List<LeapGuiBlendShapeFeature>();
 
+  //Meshes
+  private Dictionary<LeapGuiMeshData, LeapGuiMeshData.MeshData> _meshData = new Dictionary<LeapGuiMeshData, LeapGuiMeshData.MeshData>();
+
   //Textures
   private Dictionary<UVChannelFlags, Rect[]> _packedRects;
 
@@ -196,6 +199,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     _bakedMesh.Clear();
 
     if (gui.GetFeatures(_meshFeatures)) {
+      Profiler.BeginSample("Load Meshes");
+      loadAllMeshes();
+      Profiler.EndSample();
+
       Profiler.BeginSample("Bake Verts");
       bakeVerts();
       Profiler.EndSample();
@@ -266,6 +273,14 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     _material.name = "Baked Gui Material";
   }
 
+  private void loadAllMeshes() {
+    foreach (var meshFeature in _meshFeatures) {
+      foreach (var meshData in meshFeature.data) {
+        _meshData[meshData] = meshData.GetMeshData();
+      }
+    }
+  }
+
   private List<Vector3> _tempVertList = new List<Vector3>();
   private List<int> _tempTriList = new List<int>();
   private void bakeVerts() {
@@ -274,9 +289,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
     foreach (var meshFeature in _meshFeatures) {
       foreach (var data in meshFeature.data) {
-        if (data.mesh == null) continue;
+        var meshData = _meshData[data];
+        if (meshData.mesh == null) continue;
 
-        var topology = MeshCache.GetTopology(data.mesh);
+        var topology = MeshCache.GetTopology(meshData.mesh);
 
         int vertOffset = _tempVertList.Count;
         for (int i = 0; i < topology.tris.Length; i++) {
@@ -303,12 +319,13 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
     foreach (var feature in _meshFeatures) {
       foreach (var data in feature.data) {
-        if (data.mesh == null) continue;
+        var meshData = _meshData[data];
+        if (meshData.mesh == null) continue;
 
-        int vertexCount = data.mesh.vertexCount;
-        Color totalTint = data.color * feature.tint;
+        int vertexCount = meshData.mesh.vertexCount;
+        Color totalTint = data.tint * feature.tint;
 
-        var vertexColors = data.mesh.colors;
+        var vertexColors = meshData.mesh.colors;
         if (vertexColors.Length != vertexCount) {
           colors.Append(vertexCount, totalTint);
         } else {
@@ -348,14 +365,11 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     List<Vector4> tempUvList = new List<Vector4>();
     foreach (var feature in _meshFeatures) {
       for (int elementIndex = 0; elementIndex < feature.data.Count; elementIndex++) {
-        var data = feature.data[elementIndex];
-        var mesh = data.mesh;
-        if (mesh == null) {
-          continue;
-        }
+        var meshData = _meshData[feature.data[elementIndex]];
+        if (meshData.mesh == null) continue;
 
         foreach (var pair in uvs) {
-          mesh.GetUVsOrDefault(pair.Key.Index(), tempUvList);
+          meshData.mesh.GetUVsOrDefault(pair.Key.Index(), tempUvList);
 
           Rect[] atlasedUvs;
           if (_packedRects != null && _packedRects.TryGetValue(pair.Key, out atlasedUvs)) {
@@ -379,10 +393,10 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
     foreach (var feature in _meshFeatures) {
       for (int i = 0; i < feature.data.Count; i++) {
-        var mesh = feature.data[i].mesh;
-        if (mesh == null) continue;
+        var meshData = _meshData[feature.data[i]];
+        if (meshData.mesh == null) continue;
 
-        uv3.Append(mesh.vertexCount, new Vector4(0, 0, 0, i));
+        uv3.Append(meshData.mesh.vertexCount, new Vector4(0, 0, 0, i));
       }
     }
 

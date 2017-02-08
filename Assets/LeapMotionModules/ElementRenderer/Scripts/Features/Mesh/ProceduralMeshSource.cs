@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Rendering;
 
 [RequireComponent(typeof(LeapGuiElement))]
 public abstract class ProceduralMeshSource : MonoBehaviour {
@@ -9,5 +10,5 @@ public abstract class ProceduralMeshSource : MonoBehaviour {
   /// <summary>
   /// Tried so generate a procedural mesh for the given mesh feature. 
   /// </summary>
-  public abstract bool TryGenerateMesh(LeapGuiMeshData meshFeature, out Mesh mesh);
+  public abstract bool TryGenerateMesh(LeapGuiMeshData meshFeature, out LeapGuiMeshData.MeshData data);
 }
