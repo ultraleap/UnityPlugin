@@ -2,6 +2,7 @@
 using UnityEngine.Rendering;
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.Sprites;
 #endif
 
 [AddComponentMenu("")]
@@ -19,6 +20,27 @@ public class LeapGuiSpriteFeature : LeapGuiFeature<LeapGuiSpriteData> {
         return false;
       }
     }
+    return true;
+  }
+
+  public bool AreAllSpritesOnSameTexture() {
+    Texture2D mainTex = null;
+    foreach (var dataObj in data) {
+      if (dataObj.sprite == null) continue;
+
+      string atlasName;
+      Texture2D atlasTex;
+      Packer.GetAtlasDataForSprite(dataObj.sprite, out atlasName, out atlasTex);
+
+      if (mainTex == null) {
+        mainTex = atlasTex;
+      } else {
+        if (mainTex != atlasTex) {
+          return false;
+        }
+      }
+    }
+
     return true;
   }
 

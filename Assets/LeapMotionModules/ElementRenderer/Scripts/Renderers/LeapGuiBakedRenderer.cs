@@ -98,11 +98,17 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   public void GetSupportInfo(List<LeapGuiSpriteFeature> features, List<SupportInfo> info) {
     SupportUtil.OnlySupportFirstFeature(features, info);
 
+    Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+
     for (int i = 0; i < features.Count; i++) {
       var feature = features[i];
 
       if (!feature.AreAllSpritesPacked()) {
         info[i] = SupportInfo.Error("Not all sprites are packed.");
+      }
+
+      if (!feature.AreAllSpritesOnSameTexture()) {
+        info[i] = SupportInfo.Error("Not all sprites are packed into same atlas.");
       }
     }
   }
@@ -226,6 +232,8 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     }
 
     if (gui.GetSupportedFeatures(_spriteFeatures)) {
+      Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+
       Profiler.BeginSample("Extract Sprite Rects");
       extractSpriteRects();
       Profiler.EndSample();
