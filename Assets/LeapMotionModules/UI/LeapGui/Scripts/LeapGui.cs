@@ -15,15 +15,14 @@ public class LeapGui : MonoBehaviour {
   public const string FEATURE_MOVEMENT_FULL = FEATURE_PREFIX + "MOVEMENT_FULL";
 
   #region INSPECTOR FIELDS
-  public List<LeapGuiFeatureBase> features = new List<LeapGuiFeatureBase>();
+  [SerializeField]
+  private List<LeapGuiFeatureBase> _features = new List<LeapGuiFeatureBase>();
 
-  public LeapGuiSpace space;
+  [SerializeField]
+  private LeapGuiSpace _space;
 
-#if UNITY_EDITOR
-  public new LeapGuiRenderer renderer;
-#else
-  public LeapGuiRenderer renderer;
-#endif
+  [SerializeField]
+  private LeapGuiRenderer _renderer;
   #endregion
 
   #region PRIVATE VARIABLES
@@ -51,81 +50,81 @@ public class LeapGui : MonoBehaviour {
   void OnValidate() {
     if (!Application.isPlaying) {
       addRemoveSupported = true;
-      if (renderer != null) {
+      if (_renderer != null) {
         addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(renderer.GetType());
       }
-      if (space != null) {
+      if (_space != null) {
         addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(space.GetType());
       }
     }
 
-    for (int i = features.Count; i-- != 0;) {
-      if (features[i] == null) {
-        features.RemoveAt(i);
+    for (int i = _features.Count; i-- != 0;) {
+      if (_features[i] == null) {
+        _features.RemoveAt(i);
       }
     }
 
 #if UNITY_EDITOR
-    for (int i = features.Count; i-- != 0;) {
-      var feature = features[i];
+    for (int i = _features.Count; i-- != 0;) {
+      var feature = _features[i];
       if (feature.gameObject != gameObject) {
         LeapGuiFeatureBase movedFeature;
         if (InternalUtility.TryMoveComponent(feature, gameObject, out movedFeature)) {
-          features[i] = movedFeature;
+          _features[i] = movedFeature;
         } else {
           Debug.LogWarning("Could not move feature component " + feature + "!");
           InternalUtility.Destroy(feature);
-          features.RemoveAt(i);
+          _features.RemoveAt(i);
         }
       }
     }
 
-    if (space != null && space.gameObject != gameObject) {
+    if (_space != null && _space.gameObject != gameObject) {
       LeapGuiSpace movedSpace;
-      if (InternalUtility.TryMoveComponent(space, gameObject, out movedSpace)) {
-        space = movedSpace;
+      if (InternalUtility.TryMoveComponent(_space, gameObject, out movedSpace)) {
+        _space = movedSpace;
       } else {
-        Debug.LogWarning("Could not move space component " + space + "!");
-        InternalUtility.Destroy(space);
+        Debug.LogWarning("Could not move space component " + _space + "!");
+        InternalUtility.Destroy(_space);
       }
     }
 
-    if (renderer != null && renderer.gameObject != gameObject) {
+    if (_renderer != null && _renderer.gameObject != gameObject) {
       LeapGuiRenderer movedRenderer;
-      if (InternalUtility.TryMoveComponent(renderer, gameObject, out movedRenderer)) {
-        renderer = movedRenderer;
+      if (InternalUtility.TryMoveComponent(_renderer, gameObject, out movedRenderer)) {
+        _renderer = movedRenderer;
       } else {
-        Debug.LogWarning("Could not move renderer component " + renderer + "!");
-        InternalUtility.Destroy(renderer);
+        Debug.LogWarning("Could not move renderer component " + _renderer + "!");
+        InternalUtility.Destroy(_renderer);
       }
     }
 #endif
   }
 
   void OnDestroy() {
-    if (renderer != null) InternalUtility.Destroy(renderer);
-    if (space != null) InternalUtility.Destroy(space);
-    foreach (var feature in features) {
+    if (_renderer != null) InternalUtility.Destroy(_renderer);
+    if (_space != null) InternalUtility.Destroy(space);
+    foreach (var feature in _features) {
       if (feature != null) InternalUtility.Destroy(feature);
     }
   }
 
   void Awake() {
-    if (space != null) {
-      space.gui = this;
+    if (_space != null) {
+      _space.gui = this;
     }
   }
 
   void OnEnable() {
     if (Application.isPlaying) {
-      renderer.OnEnableRenderer();
-      if (space != null) space.BuildElementData(transform);
+      _renderer.OnEnableRenderer();
+      if (_space != null) _space.BuildElementData(transform);
     }
   }
 
   void OnDisable() {
     if (Application.isPlaying) {
-      renderer.OnDisableRenderer();
+      _renderer.OnDisableRenderer();
     }
   }
 
@@ -143,6 +142,28 @@ public class LeapGui : MonoBehaviour {
   #endregion
 
   #region PUBLIC API
+  public List<LeapGuiFeatureBase> features {
+    get {
+      return _features;
+    }
+  }
+
+  public LeapGuiSpace space {
+    get {
+      return _space;
+    }
+  }
+
+#if UNITY_EDITOR
+  public new LeapGuiRenderer renderer {
+#else
+  public LeapGuiRenderer renderer {
+#endif
+    get {
+      return _renderer;
+    }
+  }
+
   /// <summary>
   /// Tries to add a new gui element to this gui at runtime.
   /// Element is not actually added until the next gui cycle.
@@ -175,8 +196,8 @@ public class LeapGui : MonoBehaviour {
 
   public bool GetFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
     features.Clear();
-    for (int i = 0; i < this.features.Count; i++) {
-      var feature = this.features[i];
+    for (int i = 0; i < _features.Count; i++) {
+      var feature = _features[i];
       if (!(feature is T)) continue;
 
       features.Add(feature as T);
@@ -193,15 +214,15 @@ public class LeapGui : MonoBehaviour {
     UnityEditor.Undo.RecordObject(this, "Change Gui Space");
     UnityEditor.EditorUtility.SetDirty(this);
 
-    if (space != null) {
-      DestroyImmediate(space);
-      space = null;
+    if (_space != null) {
+      DestroyImmediate(_space);
+      _space = null;
     }
 
-    space = gameObject.AddComponent(spaceType) as LeapGuiSpace;
+    _space = gameObject.AddComponent(spaceType) as LeapGuiSpace;
 
-    if (space != null) {
-      space.gui = this;
+    if (_space != null) {
+      _space.gui = this;
     }
   }
 
@@ -209,7 +230,7 @@ public class LeapGui : MonoBehaviour {
     AssertHelper.AssertEditorOnly();
 
     var feature = gameObject.AddComponent(featureType);
-    features.Add(feature as LeapGuiFeatureBase);
+    _features.Add(feature as LeapGuiFeatureBase);
   }
 
   public void SetRenderer(Type rendererType) {
@@ -218,17 +239,17 @@ public class LeapGui : MonoBehaviour {
     UnityEditor.Undo.RecordObject(this, "Changed Gui Renderer");
     UnityEditor.EditorUtility.SetDirty(this);
 
-    if (renderer != null) {
-      renderer.OnDisableRendererEditor();
-      DestroyImmediate(renderer);
-      renderer = null;
+    if (_renderer != null) {
+      _renderer.OnDisableRendererEditor();
+      DestroyImmediate(_renderer);
+      _renderer = null;
     }
 
-    renderer = gameObject.AddComponent(rendererType) as LeapGuiRenderer;
+    _renderer = gameObject.AddComponent(rendererType) as LeapGuiRenderer;
 
-    if (renderer != null) {
-      renderer.gui = this;
-      renderer.OnEnableRendererEditor();
+    if (_renderer != null) {
+      _renderer.gui = this;
+      _renderer.OnEnableRendererEditor();
     }
   }
 #endif
@@ -250,9 +271,9 @@ public class LeapGui : MonoBehaviour {
     rebuildFeatureSupportInfo();
     Profiler.EndSample();
 
-    if (space != null) {
+    if (_space != null) {
       Profiler.BeginSample("Build Element Data");
-      space.BuildElementData(transform);
+      _space.BuildElementData(transform);
       Profiler.EndSample();
 
       Profiler.BeginSample("Rebuild Picking Meshes");
@@ -260,17 +281,17 @@ public class LeapGui : MonoBehaviour {
       Profiler.EndSample();
     }
 
-    if (renderer != null) {
+    if (_renderer != null) {
       Profiler.BeginSample("Update Renderer");
-      renderer.OnUpdateRendererEditor();
+      _renderer.OnUpdateRendererEditor();
       Profiler.EndSample();
     }
   }
 #endif
 
   private void doLateUpdateRuntime() {
-    if (renderer == null) return;
-    if (space == null) return;
+    if (_renderer == null) return;
+    if (_space == null) return;
 
     if (_toRemove.Count != 0) {
       Profiler.BeginSample("Remove Elements");
@@ -284,12 +305,12 @@ public class LeapGui : MonoBehaviour {
 
       elements.RemoveAtMany(_tempIndexList);
 
-      foreach (var feature in features) {
+      foreach (var feature in _features) {
         feature.RemoveDataObjectReferences(_tempIndexList);
       }
 
-      (space as ISupportsAddRemove).OnRemoveElements(_tempIndexList);
-      (renderer as ISupportsAddRemove).OnRemoveElements(_tempIndexList);
+      (_space as ISupportsAddRemove).OnRemoveElements(_tempIndexList);
+      (_renderer as ISupportsAddRemove).OnRemoveElements(_tempIndexList);
 
       foreach (var notRemoved in _toRemove) {
         Debug.LogWarning("The element " + notRemoved + " was not removed because it was not part of the gui.");
@@ -315,8 +336,8 @@ public class LeapGui : MonoBehaviour {
         }
       }
 
-      (space as ISupportsAddRemove).OnAddElements(_tempElementList, _tempIndexList);
-      (renderer as ISupportsAddRemove).OnAddElements(_tempElementList, _tempIndexList);
+      (_space as ISupportsAddRemove).OnAddElements(_tempElementList, _tempIndexList);
+      (_renderer as ISupportsAddRemove).OnAddElements(_tempElementList, _tempIndexList);
 
       _tempElementList.Clear();
       _tempIndexList.Clear();
@@ -325,14 +346,14 @@ public class LeapGui : MonoBehaviour {
     }
 
     Profiler.BeginSample("Build Element Data");
-    space.BuildElementData(transform);
+    _space.BuildElementData(transform);
     Profiler.EndSample();
 
     Profiler.BeginSample("Update Renderer");
-    renderer.OnUpdateRenderer();
+    _renderer.OnUpdateRenderer();
     Profiler.EndSample();
 
-    foreach (var feature in features) {
+    foreach (var feature in _features) {
       feature.isDirty = false;
     }
   }
@@ -377,7 +398,7 @@ public class LeapGui : MonoBehaviour {
   }
 
   private void rebuildFeatureData() {
-    foreach (var feature in features) {
+    foreach (var feature in _features) {
       feature.ClearDataObjectReferences();
       feature.isDirty = true;
     }
@@ -386,7 +407,7 @@ public class LeapGui : MonoBehaviour {
       var element = elements[i];
 
       List<LeapGuiElementData> dataList = new List<LeapGuiElementData>();
-      foreach (var feature in features) {
+      foreach (var feature in _features) {
         var dataObj = element.data.Query().OfType(feature.GetDataObjectType()).FirstOrDefault();
         if (dataObj != null) {
           element.data.Remove(dataObj);
@@ -407,7 +428,7 @@ public class LeapGui : MonoBehaviour {
 
   private void rebuildFeatureSupportInfo() {
     var typeToFeatures = new Dictionary<Type, List<LeapGuiFeatureBase>>();
-    foreach (var feature in features) {
+    foreach (var feature in _features) {
       Type featureType = feature.GetType();
       List<LeapGuiFeatureBase> list;
       if (!typeToFeatures.TryGetValue(featureType, out list)) {
@@ -421,7 +442,7 @@ public class LeapGui : MonoBehaviour {
 
     var featureToInfo = new Dictionary<LeapGuiFeatureBase, SupportInfo>();
 
-    if (renderer != null) {
+    if (_renderer != null) {
       foreach (var pair in typeToFeatures) {
         var featureType = pair.Key;
         var featureList = pair.Value;
@@ -434,7 +455,7 @@ public class LeapGui : MonoBehaviour {
 
         try {
           var interfaceType = typeof(ISupportsFeature<>).MakeGenericType(featureType);
-          if (!interfaceType.IsAssignableFrom(renderer.GetType())) {
+          if (!interfaceType.IsAssignableFrom(_renderer.GetType())) {
             infoList.FillEach(() => SupportInfo.Error("This renderer does not support this feature."));
             continue;
           }
@@ -446,7 +467,7 @@ public class LeapGui : MonoBehaviour {
             continue;
           }
 
-          supportDelegate.Invoke(renderer, new object[] { castList, infoList });
+          supportDelegate.Invoke(_renderer, new object[] { castList, infoList });
         } finally {
           for (int i = 0; i < featureList.Count; i++) {
             featureToInfo[featureList[i]] = infoList[i];
@@ -456,7 +477,7 @@ public class LeapGui : MonoBehaviour {
     }
 
     supportInfo = new List<SupportInfo>();
-    foreach (var feature in features) {
+    foreach (var feature in _features) {
       supportInfo.Add(feature.GetSupportInfo(this).OrWorse(featureToInfo[feature]));
     }
   }
@@ -492,7 +513,7 @@ public class LeapGui : MonoBehaviour {
 
           for (int i = 0; i < topology.verts.Length; i++) {
             Vector3 localRectVert = transform.InverseTransformPoint(element.transform.TransformPoint(topology.verts[i]));
-            pickingVerts.Add(space.TransformPoint(element, localRectVert));
+            pickingVerts.Add(_space.TransformPoint(element, localRectVert));
           }
         }
       }

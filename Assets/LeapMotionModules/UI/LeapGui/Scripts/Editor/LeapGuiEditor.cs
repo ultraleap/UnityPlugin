@@ -97,9 +97,9 @@ public class LeapGuiEditor : CustomEditorBase {
       _spaceEditor = CreateEditor(gui.space);
     }
 
-    specifyCustomDrawer("features", drawFeatures);
-    specifyCustomDrawer("space", drawSpace);
-    specifyCustomDrawer("renderer", drawRenderer);
+    specifyCustomDrawer("_features", drawFeatures);
+    specifyCustomDrawer("_space", drawSpace);
+    specifyCustomDrawer("_renderer", drawRenderer);
   }
 
   private void drawFeatures(SerializedProperty property) {
