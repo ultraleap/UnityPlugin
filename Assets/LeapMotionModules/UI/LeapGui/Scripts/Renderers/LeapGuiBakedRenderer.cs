@@ -19,6 +19,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   ISupportsFeature<LeapGuiTintFeature>,
   ISupportsFeature<LeapGuiBlendShapeFeature> {
 
+  #region INSPECTOR FIELDS
   [SerializeField]
   private Shader _shader;
 
@@ -30,7 +31,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
   [MinValue(0)]
   [SerializeField]
-  private int borderAmount = 0;
+  private int _borderAmount = 0;
 
   [Header("Debug")]
   [HideInInspector, SerializeField]
@@ -38,7 +39,9 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
   [HideInInspector, SerializeField]
   private Material _material;
+  #endregion
 
+  #region PRIVATE VARIABLES
   //Feature lists
   private List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
   private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
@@ -66,11 +69,19 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   //Spherical space
   private const string SPHERICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Spherical_ElementParameters";
   private List<Vector4> _spherical_elementParameters = new List<Vector4>();
+  #endregion
+
+  #region PUBLIC API
+  public enum MotionType {
+    None,
+    Translation,
+    Full
+  }
 
   public void GetSupportInfo(List<LeapGuiMeshFeature> features, List<SupportInfo> info) {
     SupportUtil.OnlySupportFirstFeature(features, info);
 
-    if (DoesNeedUv3() && features[0].uv3) {
+    if (doesNeedUv3() && features[0].uv3) {
       info[0] = info[0].OrWorse(SupportInfo.Warning("Uv3 will be ignored because the baker is using it."));
     }
   }
@@ -207,7 +218,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     bakeUvs();
     Profiler.EndSample();
 
-    if (DoesNeedUv3()) {
+    if (doesNeedUv3()) {
       Profiler.BeginSample("Bake Uv3");
       bakeUv3();
       Profiler.EndSample();
@@ -237,7 +248,9 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
     OnUpdateRenderer();
   }
+  #endregion
 
+  #region PRIVATE IMPLEMENTATION
   private void ensureObjectsAreValid() {
     if (_bakedMesh == null) {
       _bakedMesh = new Mesh();
@@ -313,7 +326,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
   private void atlasTextures() {
     Texture2D[] atlasTextures;
-    AtlasUtil.DoAtlas(_textureFeatures, borderAmount,
+    AtlasUtil.DoAtlas(_textureFeatures, _borderAmount,
                   out atlasTextures,
                   out _atlasedRects);
 
@@ -409,7 +422,7 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   /// Returns whether or not this baker will need to use uv3 to store additional
   /// information like element id or blend shape vertex offset
   /// </summary>
-  public bool DoesNeedUv3() {
+  private bool doesNeedUv3() {
     if (_motionType != MotionType.None) return true;
     if (gui.features.Query().Any(f => f is LeapGuiTintFeature)) return true;
     if (gui.features.Query().Any(f => f is LeapGuiBlendShapeFeature)) return true;
@@ -428,10 +441,5 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
     throw new NotImplementedException();
   }
-
-  public enum MotionType {
-    None,
-    Translation,
-    Full
-  }
+  #endregion
 }
