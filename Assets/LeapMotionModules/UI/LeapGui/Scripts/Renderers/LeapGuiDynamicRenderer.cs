@@ -12,6 +12,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   ISupportsFeature<LeapGuiMeshFeature>,
   ISupportsFeature<LeapGuiTextureFeature> {
 
+  #region INSPECTOR FIELDS
   [SerializeField]
   private Shader _shader;
 
@@ -25,7 +26,9 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
   [HideInInspector, SerializeField]
   private Material _material;
+  #endregion
 
+  #region PRIVATE VARIABLES
   //Feature lists
   private List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
   private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
@@ -44,7 +47,9 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   private List<Matrix4x4> _spherical_worldToAnchor = new List<Matrix4x4>();
   private List<Matrix4x4> _spherical_meshTransforms = new List<Matrix4x4>();
   private List<Vector4> _spherical_elementParameters = new List<Vector4>();
+  #endregion
 
+  #region PUBLIC API
   public void OnAddElements(List<LeapGuiElement> elements, List<int> indexes) {
     //TODO, this is super slow and sad
     OnUpdateRendererEditor();
@@ -214,7 +219,9 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
 
     OnUpdateRenderer();
   }
+  #endregion
 
+  #region PRIVATE IMPLEMENTATION
   private void ensureObjectsAreValid() {
     //Destroy meshes that will no longer be used
     while (_elementMeshes.Count > gui.elements.Count) {
@@ -366,4 +373,5 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       _tempUvList.Clear();
     }
   }
+  #endregion
 }
