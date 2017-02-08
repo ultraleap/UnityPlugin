@@ -63,7 +63,7 @@ public class LeapGuiElement : MonoBehaviour {
   }
   #endregion
 
-  #region UNITY MESSAGES
+  #region UNITY CALLBACKS
   protected void OnValidate() {
     //Delete any null references
     for (int i = data.Count; i-- != 0;) {

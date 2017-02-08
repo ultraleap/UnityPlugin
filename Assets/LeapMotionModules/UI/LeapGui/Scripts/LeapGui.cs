@@ -46,101 +46,6 @@ public class LeapGui : MonoBehaviour {
   private List<int> _tempIndexList = new List<int>();
   #endregion
 
-  #region UNITY CALLBACKS
-  void OnValidate() {
-    if (!Application.isPlaying) {
-      addRemoveSupported = true;
-      if (_renderer != null) {
-        addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(renderer.GetType());
-      }
-      if (_space != null) {
-        addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(space.GetType());
-      }
-    }
-
-    for (int i = _features.Count; i-- != 0;) {
-      if (_features[i] == null) {
-        _features.RemoveAt(i);
-      }
-    }
-
-#if UNITY_EDITOR
-    for (int i = _features.Count; i-- != 0;) {
-      var feature = _features[i];
-      if (feature.gameObject != gameObject) {
-        LeapGuiFeatureBase movedFeature;
-        if (InternalUtility.TryMoveComponent(feature, gameObject, out movedFeature)) {
-          _features[i] = movedFeature;
-        } else {
-          Debug.LogWarning("Could not move feature component " + feature + "!");
-          InternalUtility.Destroy(feature);
-          _features.RemoveAt(i);
-        }
-      }
-    }
-
-    if (_space != null && _space.gameObject != gameObject) {
-      LeapGuiSpace movedSpace;
-      if (InternalUtility.TryMoveComponent(_space, gameObject, out movedSpace)) {
-        _space = movedSpace;
-      } else {
-        Debug.LogWarning("Could not move space component " + _space + "!");
-        InternalUtility.Destroy(_space);
-      }
-    }
-
-    if (_renderer != null && _renderer.gameObject != gameObject) {
-      LeapGuiRenderer movedRenderer;
-      if (InternalUtility.TryMoveComponent(_renderer, gameObject, out movedRenderer)) {
-        _renderer = movedRenderer;
-      } else {
-        Debug.LogWarning("Could not move renderer component " + _renderer + "!");
-        InternalUtility.Destroy(_renderer);
-      }
-    }
-#endif
-  }
-
-  void OnDestroy() {
-    if (_renderer != null) InternalUtility.Destroy(_renderer);
-    if (_space != null) InternalUtility.Destroy(space);
-    foreach (var feature in _features) {
-      if (feature != null) InternalUtility.Destroy(feature);
-    }
-  }
-
-  void Awake() {
-    if (_space != null) {
-      _space.gui = this;
-    }
-  }
-
-  void OnEnable() {
-    if (Application.isPlaying) {
-      _renderer.OnEnableRenderer();
-      if (_space != null) _space.BuildElementData(transform);
-    }
-  }
-
-  void OnDisable() {
-    if (Application.isPlaying) {
-      _renderer.OnDisableRenderer();
-    }
-  }
-
-  void LateUpdate() {
-#if UNITY_EDITOR
-    if (Application.isPlaying) {
-      doLateUpdateRuntime();
-    } else {
-      doLateUpdateEditor();
-    }
-#else
-    doLateUpdateRuntime();
-#endif
-  }
-  #endregion
-
   #region PUBLIC API
   public List<LeapGuiFeatureBase> features {
     get {
@@ -253,6 +158,101 @@ public class LeapGui : MonoBehaviour {
     }
   }
 #endif
+  #endregion
+
+  #region UNITY CALLBACKS
+  void OnValidate() {
+    if (!Application.isPlaying) {
+      addRemoveSupported = true;
+      if (_renderer != null) {
+        addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(renderer.GetType());
+      }
+      if (_space != null) {
+        addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(space.GetType());
+      }
+    }
+
+    for (int i = _features.Count; i-- != 0;) {
+      if (_features[i] == null) {
+        _features.RemoveAt(i);
+      }
+    }
+
+#if UNITY_EDITOR
+    for (int i = _features.Count; i-- != 0;) {
+      var feature = _features[i];
+      if (feature.gameObject != gameObject) {
+        LeapGuiFeatureBase movedFeature;
+        if (InternalUtility.TryMoveComponent(feature, gameObject, out movedFeature)) {
+          _features[i] = movedFeature;
+        } else {
+          Debug.LogWarning("Could not move feature component " + feature + "!");
+          InternalUtility.Destroy(feature);
+          _features.RemoveAt(i);
+        }
+      }
+    }
+
+    if (_space != null && _space.gameObject != gameObject) {
+      LeapGuiSpace movedSpace;
+      if (InternalUtility.TryMoveComponent(_space, gameObject, out movedSpace)) {
+        _space = movedSpace;
+      } else {
+        Debug.LogWarning("Could not move space component " + _space + "!");
+        InternalUtility.Destroy(_space);
+      }
+    }
+
+    if (_renderer != null && _renderer.gameObject != gameObject) {
+      LeapGuiRenderer movedRenderer;
+      if (InternalUtility.TryMoveComponent(_renderer, gameObject, out movedRenderer)) {
+        _renderer = movedRenderer;
+      } else {
+        Debug.LogWarning("Could not move renderer component " + _renderer + "!");
+        InternalUtility.Destroy(_renderer);
+      }
+    }
+#endif
+  }
+
+  void OnDestroy() {
+    if (_renderer != null) InternalUtility.Destroy(_renderer);
+    if (_space != null) InternalUtility.Destroy(space);
+    foreach (var feature in _features) {
+      if (feature != null) InternalUtility.Destroy(feature);
+    }
+  }
+
+  void Awake() {
+    if (_space != null) {
+      _space.gui = this;
+    }
+  }
+
+  void OnEnable() {
+    if (Application.isPlaying) {
+      _renderer.OnEnableRenderer();
+      if (_space != null) _space.BuildElementData(transform);
+    }
+  }
+
+  void OnDisable() {
+    if (Application.isPlaying) {
+      _renderer.OnDisableRenderer();
+    }
+  }
+
+  void LateUpdate() {
+#if UNITY_EDITOR
+    if (Application.isPlaying) {
+      doLateUpdateRuntime();
+    } else {
+      doLateUpdateEditor();
+    }
+#else
+    doLateUpdateRuntime();
+#endif
+  }
   #endregion
 
   #region PRIVATE IMPLEMENTATION
