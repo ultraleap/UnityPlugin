@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(LeapGui))]
 [DisallowMultipleComponent]
 public abstract class LeapGuiSpace : LeapGuiComponentBase<LeapGui> {
 
