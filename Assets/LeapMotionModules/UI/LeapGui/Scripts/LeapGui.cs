@@ -27,17 +27,17 @@ public class LeapGui : MonoBehaviour {
 
   #region PRIVATE VARIABLES
   [HideInInspector]
-  public List<LeapGuiElement> elements = new List<LeapGuiElement>();
+  private List<LeapGuiElement> _elements = new List<LeapGuiElement>();
 
   [HideInInspector]
-  public List<AnchorOfConstantSize> anchors = new List<AnchorOfConstantSize>();
+  private List<AnchorOfConstantSize> _anchors = new List<AnchorOfConstantSize>();
 
   [NonSerialized]
-  public List<SupportInfo> supportInfo = new List<SupportInfo>();
+  private List<SupportInfo> _supportInfo = new List<SupportInfo>();
 
   [HideInInspector]
   [SerializeField]
-  public bool addRemoveSupported;
+  private bool _addRemoveSupported;
 
   private List<LeapGuiElement> _toAdd = new List<LeapGuiElement>();
   private List<LeapGuiElement> _toRemove = new List<LeapGuiElement>();
@@ -69,6 +69,30 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
+  public List<LeapGuiElement> elements {
+    get {
+      return _elements;
+    }
+  }
+
+  public List<AnchorOfConstantSize> anchors {
+    get {
+      return _anchors;
+    }
+  }
+
+  public List<SupportInfo> supportInfo {
+    get {
+      return _supportInfo;
+    }
+  }
+
+  public bool addRemoveSupported {
+    get {
+      return _addRemoveSupported;
+    }
+  }
+
   /// <summary>
   /// Tries to add a new gui element to this gui at runtime.
   /// Element is not actually added until the next gui cycle.
@@ -76,7 +100,7 @@ public class LeapGui : MonoBehaviour {
   public bool TryAddElement(LeapGuiElement element) {
     AssertHelper.AssertRuntimeOnly();
     Assert.IsNotNull(element);
-    if (!addRemoveSupported) {
+    if (!_addRemoveSupported) {
       return false;
     }
 
@@ -91,7 +115,7 @@ public class LeapGui : MonoBehaviour {
   public bool TryRemoveElement(LeapGuiElement element) {
     AssertHelper.AssertRuntimeOnly();
     Assert.IsNotNull(element);
-    if (!addRemoveSupported) {
+    if (!_addRemoveSupported) {
       return false;
     }
 
@@ -163,12 +187,12 @@ public class LeapGui : MonoBehaviour {
   #region UNITY CALLBACKS
   void OnValidate() {
     if (!Application.isPlaying) {
-      addRemoveSupported = true;
+      _addRemoveSupported = true;
       if (_renderer != null) {
-        addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(renderer.GetType());
+        _addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(renderer.GetType());
       }
       if (_space != null) {
-        addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(space.GetType());
+        _addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(space.GetType());
       }
     }
 
@@ -295,15 +319,15 @@ public class LeapGui : MonoBehaviour {
 
     if (_toRemove.Count != 0) {
       Profiler.BeginSample("Remove Elements");
-      for (int i = 0; i < elements.Count; i++) {
-        var element = elements[i];
+      for (int i = 0; i < _elements.Count; i++) {
+        var element = _elements[i];
         if (_toRemove.RemoveUnordered(element)) {
           element.OnDetachedFromGui();
           _tempIndexList.Add(i);
         }
       }
 
-      elements.RemoveAtMany(_tempIndexList);
+      _elements.RemoveAtMany(_tempIndexList);
 
       foreach (var feature in _features) {
         feature.RemoveDataObjectReferences(_tempIndexList);
@@ -328,8 +352,8 @@ public class LeapGui : MonoBehaviour {
       rebuildElementList();
       rebuildFeatureData();
 
-      for (int i = 0; i < elements.Count; i++) {
-        var element = elements[i];
+      for (int i = 0; i < _elements.Count; i++) {
+        var element = _elements[i];
         if (_toAdd.Remove(element)) {
           _tempElementList.Add(element);
           _tempIndexList.Add(i);
@@ -361,14 +385,14 @@ public class LeapGui : MonoBehaviour {
   private void rebuildElementList() {
 #if UNITY_EDITOR
     if (!Application.isPlaying) {
-      foreach (var element in elements) {
+      foreach (var element in _elements) {
         element.OnDetachedFromGui();
       }
     }
 #endif
 
-    elements.Clear();
-    anchors.Clear();
+    _elements.Clear();
+    _anchors.Clear();
 
     rebuildElementListRecursively(transform, null);
   }
@@ -384,13 +408,13 @@ public class LeapGui : MonoBehaviour {
       var anchor = child.GetComponent<AnchorOfConstantSize>();
       if (anchor != null && anchor.enabled) {
         childAnchor = anchor;
-        anchors.Add(anchor);
+        _anchors.Add(anchor);
       }
 
       var element = child.GetComponent<LeapGuiElement>();
       if (element != null && element.enabled) {
-        element.OnAttachedToGui(this, childAnchor, elements.Count);
-        elements.Add(element);
+        element.OnAttachedToGui(this, childAnchor, _elements.Count);
+        _elements.Add(element);
       }
 
       rebuildElementListRecursively(child, childAnchor);
@@ -403,8 +427,8 @@ public class LeapGui : MonoBehaviour {
       feature.isDirty = true;
     }
 
-    for (int i = 0; i < elements.Count; i++) {
-      var element = elements[i];
+    for (int i = 0; i < _elements.Count; i++) {
+      var element = _elements[i];
 
       List<LeapGuiElementData> dataList = new List<LeapGuiElementData>();
       foreach (var feature in _features) {
@@ -476,9 +500,9 @@ public class LeapGui : MonoBehaviour {
       }
     }
 
-    supportInfo = new List<SupportInfo>();
+    _supportInfo = new List<SupportInfo>();
     foreach (var feature in _features) {
-      supportInfo.Add(feature.GetSupportInfo(this).OrWorse(featureToInfo[feature]));
+      _supportInfo.Add(feature.GetSupportInfo(this).OrWorse(featureToInfo[feature]));
     }
   }
 
@@ -487,7 +511,7 @@ public class LeapGui : MonoBehaviour {
     List<Vector3> pickingVerts = new List<Vector3>();
     List<int> pickingTris = new List<int>();
 
-    foreach (var element in elements) {
+    foreach (var element in _elements) {
       pickingVerts.Clear();
       pickingTris.Clear();
 
@@ -524,12 +548,5 @@ public class LeapGui : MonoBehaviour {
     }
   }
 #endif
-
-  private void throwIfAddRemoveNotSupported() {
-    if (!addRemoveSupported) {
-      throw new InvalidOperationException("Adding or removing elements at runtime is not supported by this renderer/space configuration.");
-    }
-  }
-
   #endregion
 }
