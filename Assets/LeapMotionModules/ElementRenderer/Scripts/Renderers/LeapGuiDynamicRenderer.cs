@@ -355,7 +355,9 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
           meshData.mesh.GetUVsOrDefault(channel.Index(), _tempUvList);
 
           Rect[] atlasedRects;
-          if (_packedRects != null && _packedRects.TryGetValue(channel, out atlasedRects)) {
+          if (_packedRects != null &&                                     //If we have packed rects
+              _packedRects.TryGetValue(channel, out atlasedRects) &&      //And if we have a packed rect for this channel
+              (meshData.remappableChannels & channel) != 0) {             //And if that channel can be remapped for this mesh
             MeshUtil.RemapUvs(_tempUvList, atlasedRects[i]);
           }
 

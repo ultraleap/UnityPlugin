@@ -369,10 +369,13 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
         if (meshData.mesh == null) continue;
 
         foreach (var pair in uvs) {
-          meshData.mesh.GetUVsOrDefault(pair.Key.Index(), tempUvList);
+          var channel = pair.Key;
+          meshData.mesh.GetUVsOrDefault(channel.Index(), tempUvList);
 
           Rect[] atlasedUvs;
-          if (_packedRects != null && _packedRects.TryGetValue(pair.Key, out atlasedUvs)) {
+          if (_packedRects != null &&
+              _packedRects.TryGetValue(channel, out atlasedUvs) &&
+              (meshData.remappableChannels & channel) != 0) {
             MeshUtil.RemapUvs(tempUvList, atlasedUvs[elementIndex]);
           }
 
