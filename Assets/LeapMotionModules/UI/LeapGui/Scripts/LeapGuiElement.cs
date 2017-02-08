@@ -6,9 +6,7 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class LeapGuiElement : MonoBehaviour {
 
-  //Used to ensure that gui elements can be enabled/disabled
-  void Start() { }
-
+  #region INSPECTOR FIELDS
   [HideInInspector]
   public int elementId;
 
@@ -21,8 +19,30 @@ public class LeapGuiElement : MonoBehaviour {
 
   [HideInInspector]
   [SerializeField]
-  public LeapGui gui;
+  public LeapGui attachedGui;
+  #endregion
 
+  #region PUBLIC API
+
+  public bool IsAttachedToGui {
+    get {
+      return attachedGui != null;
+    }
+  }
+
+  public virtual void OnAttachedToGui(LeapGui gui, AnchorOfConstantSize anchor, int elementId) {
+    attachedGui = gui;
+    this.anchor = anchor;
+    this.elementId = elementId;
+  }
+
+  public virtual void OnDetachedFromGui() {
+    attachedGui = null;
+  }
+
+  #endregion
+
+  #region UNITY MESSAGES
   protected void OnValidate() {
     //Delete any null references
     for (int i = data.Count; i-- != 0;) {
@@ -66,11 +86,8 @@ public class LeapGuiElement : MonoBehaviour {
 #if UNITY_EDITOR
     if (Application.isPlaying) {
 #endif
-      if (gui == null) {
-        gui = GetComponentInParent<LeapGui>();
-      }
-      if (gui != null) {
-        gui.AddElement(this);
+      if (!IsAttachedToGui) {
+        GetComponentInParent<LeapGui>().TryAddElement(this);
       }
 #if UNITY_EDITOR
     }
@@ -81,8 +98,8 @@ public class LeapGuiElement : MonoBehaviour {
 #if UNITY_EDITOR
     if (Application.isPlaying) {
 #endif
-      if (gui != null) {
-        gui.RemoveElement(this);
+      if (IsAttachedToGui) {
+        attachedGui.TryRemoveElement(this);
       }
 #if UNITY_EDITOR
     }
@@ -105,4 +122,5 @@ public class LeapGuiElement : MonoBehaviour {
     }
   }
 #endif
+  #endregion
 }

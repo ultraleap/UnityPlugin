@@ -147,24 +147,30 @@ public class LeapGui : MonoBehaviour {
   /// Tries to add a new gui element to this gui at runtime.
   /// Element is not actually added until the next gui cycle.
   /// </summary>
-  public void AddElement(LeapGuiElement element) {
+  public bool TryAddElement(LeapGuiElement element) {
     AssertHelper.AssertRuntimeOnly();
     Assert.IsNotNull(element);
-    throwIfAddRemoveNotSupported();
+    if (!addRemoveSupported) {
+      return false;
+    }
 
     _toAdd.Add(element);
+    return true;
   }
 
   /// <summary>
   /// Tries to remove a gui element from this gui at runtime.
   /// Element is not actually removed until the next gui cycle.
   /// </summary>
-  public void RemoveElement(LeapGuiElement element) {
+  public bool TryRemoveElement(LeapGuiElement element) {
     AssertHelper.AssertRuntimeOnly();
     Assert.IsNotNull(element);
-    throwIfAddRemoveNotSupported();
+    if (!addRemoveSupported) {
+      return false;
+    }
 
     _toRemove.Add(element);
+    return true;
   }
 
   public bool GetFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
@@ -232,11 +238,8 @@ public class LeapGui : MonoBehaviour {
 
 #if UNITY_EDITOR
   private void doLateUpdateEditor() {
-    elements.Clear();
-    anchors.Clear();
-
     Profiler.BeginSample("Rebuild Element List");
-    rebuildElementList(transform, null);
+    rebuildElementList();
     Profiler.EndSample();
 
     Profiler.BeginSample("Rebuild Feature Data");
@@ -268,12 +271,13 @@ public class LeapGui : MonoBehaviour {
   private void doLateUpdateRuntime() {
     if (renderer == null) return;
     if (space == null) return;
-    
+
     if (_toRemove.Count != 0) {
       Profiler.BeginSample("Remove Elements");
       for (int i = 0; i < elements.Count; i++) {
         var element = elements[i];
         if (_toRemove.RemoveUnordered(element)) {
+          element.OnDetachedFromGui();
           _tempIndexList.Add(i);
         }
       }
@@ -298,11 +302,9 @@ public class LeapGui : MonoBehaviour {
 
     if (_toAdd.Count != 0) {
       Profiler.BeginSample("Add Elements");
-      elements.Clear();
-      anchors.Clear();
 
       //TODO, both of these rebuild operations can probably be optimized a ton
-      rebuildElementList(transform, null);
+      rebuildElementList();
       rebuildFeatureData();
 
       for (int i = 0; i < elements.Count; i++) {
@@ -335,7 +337,22 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
-  private void rebuildElementList(Transform root, AnchorOfConstantSize currAnchor) {
+  private void rebuildElementList() {
+#if UNITY_EDITOR
+    if (!Application.isPlaying) {
+      foreach (var element in elements) {
+        element.OnDetachedFromGui();
+      }
+    }
+#endif
+
+    elements.Clear();
+    anchors.Clear();
+
+    rebuildElementListRecursively(transform, null);
+  }
+
+  private void rebuildElementListRecursively(Transform root, AnchorOfConstantSize currAnchor) {
     int count = root.childCount;
     for (int i = 0; i < count; i++) {
       Transform child = root.GetChild(i);
@@ -351,13 +368,11 @@ public class LeapGui : MonoBehaviour {
 
       var element = child.GetComponent<LeapGuiElement>();
       if (element != null && element.enabled) {
-        element.gui = this;
-        element.anchor = childAnchor;
-        element.elementId = elements.Count;
+        element.OnAttachedToGui(this, childAnchor, elements.Count);
         elements.Add(element);
       }
 
-      rebuildElementList(child, childAnchor);
+      rebuildElementListRecursively(child, childAnchor);
     }
   }
 
