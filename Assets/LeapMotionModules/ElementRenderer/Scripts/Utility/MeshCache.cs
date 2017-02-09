@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
+using Leap.Unity.Query;
 
 public static class MeshCache {
 
@@ -33,8 +35,30 @@ public static class MeshCache {
     return colors;
   }
 
+  private static Dictionary<UvKey, List<Vector4>> _uvCache = new Dictionary<UvKey, List<Vector4>>();
+  public static List<Vector4> GetUvs(Mesh mesh, UVChannelFlags channel) {
+    var key = new UvKey() { mesh = mesh, channel = channel };
+    List<Vector4> uvs;
+    if (!_uvCache.TryGetValue(key, out uvs)) {
+      mesh.GetUVs(channel.Index(), uvs);
+
+      if (uvs.Count != mesh.vertexCount) {
+        uvs.Fill(mesh.vertexCount, Vector4.zero);
+      }
+
+      _uvCache[key] = uvs;
+    }
+
+    return uvs;
+  }
+
   public struct CachedTopology {
     public Vector3[] verts;
     public int[] tris;
+  }
+
+  private struct UvKey {
+    public Mesh mesh;
+    public UVChannelFlags channel;
   }
 }
