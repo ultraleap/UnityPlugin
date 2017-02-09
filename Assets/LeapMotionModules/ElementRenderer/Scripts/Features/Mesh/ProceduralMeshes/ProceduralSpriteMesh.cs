@@ -22,6 +22,7 @@ public class ProceduralSpriteMesh : ProceduralMeshSource {
     mesh.name = "Sprite Mesh";
     mesh.hideFlags = HideFlags.HideAndDontSave;
     mesh.vertices = sprite.vertices.Query().Select(v => (Vector3)v).ToArray();
+    mesh.triangles = sprite.triangles.Query().Select(i => (int)i).ToArray();
     mesh.uv = SpriteAtlasUtil.GetAtlasedUvs(sprite);
     mesh.RecalculateBounds();
 

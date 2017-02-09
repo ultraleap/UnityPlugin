@@ -41,6 +41,7 @@ public class LeapGuiMeshData : LeapGuiElementData {
                                                                   out proceduralFlags)) {
         mesh = proceduralMesh;
         remappableChannels = proceduralFlags;
+        return;
       }
     }
 
