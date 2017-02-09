@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
-#if UNITY_EDITOR
-using UnityEditor;
-using UnityEditor.Sprites;
-#endif
-using Leap.Unity.Query;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Baked")]
