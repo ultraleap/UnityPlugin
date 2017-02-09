@@ -148,6 +148,7 @@ GameObject:
   - component: {fileID: 951993297}
   - component: {fileID: 951993290}
   - component: {fileID: 951993289}
+  - component: {fileID: 951993298}
   m_Layer: 0
   m_Name: Leap Gui
   m_TagString: Untagged
@@ -264,7 +265,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _features:
   - {fileID: 951993292}
-  - {fileID: 951993297}
+  - {fileID: 951993298}
   _space: {fileID: 951993289}
   _renderer: {fileID: 951993290}
   _elements:
@@ -358,6 +359,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 36ae2dc675d304041af3c95461f228e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data:
+  - {fileID: 0}
+  propertyName: _MainTex
+  channel: 1
+--- !u!114 &951993298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 951993288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb8619b4d0e4d744183adf2e5fb82581, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   data:
@@ -599,8 +615,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 1586997251}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
+  m_Script: {fileID: 11500000, guid: b051eb69afb505b479d2ea649875e390, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   element: {fileID: 1586997255}
-  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
+  sprite: {fileID: 21300000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}

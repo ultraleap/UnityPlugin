@@ -7,18 +7,16 @@ using UnityEngine;
 public class LeapGuiElement : MonoBehaviour {
 
   #region INSPECTOR FIELDS
-  [HideInInspector]
+  [SerializeField, HideInInspector]
   private int _elementId;
 
-  [HideInInspector]
+  [SerializeField, HideInInspector]
   private Transform _anchor;
 
-  [HideInInspector]
-  [SerializeField]
+  [SerializeField, HideInInspector]
   private List<LeapGuiElementData> _data = new List<LeapGuiElementData>();
 
-  [HideInInspector]
-  [SerializeField]
+  [SerializeField, HideInInspector]
   private LeapGui _attachedGui;
   #endregion
 

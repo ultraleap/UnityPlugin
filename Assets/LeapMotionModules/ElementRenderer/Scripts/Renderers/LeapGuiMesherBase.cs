@@ -23,7 +23,9 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   private PackUtil.Settings _atlasSettings = new PackUtil.Settings();
 
   //Generated data
+  [SerializeField, HideInInspector]
   protected List<Mesh> _meshes = new List<Mesh>();
+  [SerializeField, HideInInspector]
   protected Material _material;
 
   //Current state of builder
