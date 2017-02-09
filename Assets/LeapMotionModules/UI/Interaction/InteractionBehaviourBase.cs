@@ -49,10 +49,10 @@ namespace Leap.Unity.UI.Interaction {
       _interactionManagerIsNull = interactionManager == null;
     }
 
-    #region Hovering
-
     /// <summary> Return the distance the interaction object is from the given world position. </summary>
-    public abstract float GetHoverDistance(Vector3 worldPosition);
+    public abstract float GetDistance(Vector3 worldPosition);
+
+    #region Hovering
 
 
     /// <summary> Called per-hand when that hand produces a non-zero hover score for this object. </summary>

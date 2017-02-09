@@ -37,6 +37,14 @@ namespace Leap.Unity.UI.Interaction {
     public Action<Hand> OnObjectPrimaryHoverStay  = (closestHand) => { };
     public Action<Hand> OnObjectPrimaryHoverEnd   = (closestHand) => { };
 
+    public Action<Hand> OnContactBegin = (hand) => { };
+    public Action<Hand> OnContactStay  = (hand) => { };
+    public Action<Hand> OnContactEnd   = (hand) => { };
+
+    //public Action<Hand> OnObjectContactBegin = (closestHand) => { };
+    //public Action<Hand> OnObjectContactStay  = (closestHand) => { };
+    //public Action<Hand> OnObjectContactEnd   = (closestHand) => { };
+
     [Tooltip("Should hands move the object as if it is held when the object is grasped? "
            + "Use OnPostHoldingMovement to constrain the object's motion while held, or "
            + "set this property to false to specify your own behavior entirely in "
@@ -165,7 +173,7 @@ namespace Leap.Unity.UI.Interaction {
       _closestPrimaryHoveringHandDistance = float.PositiveInfinity;
     }
 
-    public override float GetHoverDistance(Vector3 worldPosition) {
+    public override float GetDistance(Vector3 worldPosition) {
       // TODO: Need to get distance from the InteractionBehaviour's colliders. Probably has to wait until 5.6 (Physics.ClosestPoint)
       return GetInteractionDistanceToPoint(worldPosition);
     }
@@ -247,15 +255,15 @@ namespace Leap.Unity.UI.Interaction {
     #region Contact
 
     public override void ContactBegin(Hand hand) {
-      throw new System.NotImplementedException();
+      OnContactBegin(hand);
     }
 
     public override void ContactStay(Hand hand) {
-      throw new System.NotImplementedException();
+      OnContactStay(hand);
     }
 
     public override void ContactEnd(Hand hand) {
-      throw new System.NotImplementedException();
+      OnContactEnd(hand);
     }
 
     #endregion

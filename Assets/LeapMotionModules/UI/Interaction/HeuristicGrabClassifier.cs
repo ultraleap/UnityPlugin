@@ -14,7 +14,7 @@ namespace Leap.Unity.UI.Interaction {
     public InteractionHand interactionHand;
 
     private Hand _hand;
-    private Collider[][] _collidingCandidates = new Collider[5][];
+    public Collider[][] _collidingCandidates = new Collider[5][]; // TODO: Make this private again once Contact doesn't need it
 
     Dictionary<InteractionBehaviourBase, GrabClassifier> classifiers = new Dictionary<InteractionBehaviourBase, GrabClassifier>();
 

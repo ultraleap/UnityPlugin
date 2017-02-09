@@ -34,8 +34,8 @@ namespace Leap.Unity.UI.Interaction {
 
       if (doHovering) FixedUpdateHovering();
       if (doContact || doGrasping) FixedUpdateTouch();
-      //if (doContact) FixedUpdateContact(); // TODO: Not yet implemented.
       if (doGrasping) FixedUpdateGrasping();
+      if (doContact) FixedUpdateContact(); // TODO: Reorder once contact doesn't rely on grasping
     }
 
     #region Hovering
@@ -97,7 +97,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private HoverCheckResults CheckHoverForElement(Hand hand, InteractionBehaviourBase hoverable, HoverCheckResults curResults) {
-      float distance = hoverable.GetHoverDistance(_intentionPosition);
+      float distance = hoverable.GetDistance(_intentionPosition);
       if (distance > 0F) {
         curResults.hovered.Add(hoverable);
       }
@@ -358,6 +358,64 @@ namespace Leap.Unity.UI.Interaction {
 
     private void FixedUpdateTouch() {
       _touchActivityManager.FixedUpdateHand(_hand);
+    }
+
+    #endregion
+
+    #region Contact
+
+    private const float FINGERTIP_RADIUS = 0.02F;
+
+    private HashSet<InteractionBehaviourBase> _contactBehaviours = new HashSet<InteractionBehaviourBase>();
+    private HashSet<InteractionBehaviourBase> _contactBehaviourLastFrame = new HashSet<InteractionBehaviourBase>();
+    private List<InteractionBehaviourBase> _contactBehaviourRemovalCache = new List<InteractionBehaviourBase>();
+
+
+    private void FixedUpdateContact() {
+      // Naive implementation to begin with that only provides callbacks w/ index finger.
+      _contactBehaviours.Clear();
+      if (_hand != null) {
+        int hitCount = CheckIndexSphere();
+        for (int i = 0; i < hitCount; i++) {
+          Collider collider = _contactResults[i];
+          Rigidbody body = collider.attachedRigidbody;
+          if (body == null) continue;
+          InteractionBehaviourBase interactionObj = body.GetComponent<InteractionBehaviourBase>();
+          if (interactionObj == null) continue;
+          _contactBehaviours.Add(interactionObj);
+        }
+      }
+
+      // Provide contact callbacks
+      foreach (var interactionObj in _contactBehaviourLastFrame) {
+        if (!_contactBehaviours.Contains(interactionObj)) {
+          interactionObj.ContactEnd(_hand);
+          _contactBehaviourRemovalCache.Add(interactionObj);
+        }
+      }
+      foreach (var interactionObj in _contactBehaviourRemovalCache) {
+        _contactBehaviourLastFrame.Remove(interactionObj);
+      }
+      _contactBehaviourRemovalCache.Clear();
+      foreach (var interactionObj in _contactBehaviours) {
+        if (_contactBehaviourLastFrame.Contains(interactionObj)) {
+          interactionObj.ContactStay(_hand);
+        }
+        else {
+          interactionObj.ContactBegin(_hand);
+          _contactBehaviourLastFrame.Add(interactionObj);
+        }
+      }
+    }
+
+    private Collider[] _contactResults = new Collider[32];
+    private int CheckIndexSphere() {
+      int hitCount = Physics.OverlapSphereNonAlloc(_hand.Fingers[1].TipPosition.ToVector3(), FINGERTIP_RADIUS, _contactResults);
+      if (hitCount == _contactResults.Length) {
+        _contactResults = new Collider[_contactResults.Length * 2];
+        return CheckIndexSphere();
+      }
+      return hitCount;
     }
 
     #endregion
