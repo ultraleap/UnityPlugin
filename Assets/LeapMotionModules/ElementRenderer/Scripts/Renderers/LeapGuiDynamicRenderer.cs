@@ -1,37 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Rendering;
 using Leap.Unity.Query;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Dynamic")]
-public class LeapGuiDynamicRenderer : LeapGuiRenderer,
-  ISupportsAddRemove,
-  ISupportsFeature<LeapGuiMeshFeature>,
-  ISupportsFeature<LeapGuiTextureFeature> {
-
-  #region INSPECTOR FIELDS
-  [SerializeField]
-  private Shader _shader;
-
-  [SerializeField]
-  private PackUtil.Settings _atlasSettings;
-
-  [Header("Debug")]
-  [HideInInspector, SerializeField]
-  private List<Mesh> _elementMeshes = new List<Mesh>();
-
-  [HideInInspector, SerializeField]
-  private Material _material;
-  #endregion
+public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
+  ISupportsAddRemove {
 
   #region PRIVATE VARIABLES
-  //Feature lists
-  private List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
-  private List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
-
-  //Textures
-  private Dictionary<UVChannelFlags, Rect[]> _packedRects;
 
   //Cylindrical space
   private const string CYLINDRICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementParameters";
@@ -46,7 +22,6 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   private List<Vector4> _spherical_elementParameters = new List<Vector4>();
   #endregion
 
-  #region PUBLIC API
   public void OnAddElements(List<LeapGuiElement> elements, List<int> indexes) {
     //TODO, this is super slow and sad
     OnUpdateRendererEditor();
@@ -55,12 +30,6 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
   public void OnRemoveElements(List<int> toRemove) {
     //TODO, this is super slow and sad
     OnUpdateRendererEditor();
-  }
-
-  public void GetSupportInfo(List<LeapGuiMeshFeature> features, List<SupportInfo> info) { }
-
-  public void GetSupportInfo(List<LeapGuiTextureFeature> features, List<SupportInfo> info) {
-    SupportUtil.OnlySupportFirstFeature(features, info);
   }
 
   public override SupportInfo GetSpaceSupportInfo(LeapGuiSpace space) {
@@ -73,15 +42,11 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
     }
   }
 
-  public override void OnEnableRenderer() { }
-
-  public override void OnDisableRenderer() { }
-
   public override void OnUpdateRenderer() {
     //TODO: combine this logic somehow, lots of duplication
     if (gui.space is LeapGuiRectSpace) {
       for (int i = 0; i < gui.elements.Count; i++) {
-        Graphics.DrawMesh(_elementMeshes[i], gui.elements[i].transform.localToWorldMatrix, _material, 0);
+        Graphics.DrawMesh(_meshes[i], gui.elements[i].transform.localToWorldMatrix, _material, 0);
       }
     } else if (gui.space is LeapGuiCylindricalSpace) {
       var cylindricalSpace = gui.space as LeapGuiCylindricalSpace;
@@ -99,7 +64,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       }
 
       using (new ProfilerSample("Assemble Data")) {
-        for (int i = 0; i < _elementMeshes.Count; i++) {
+        for (int i = 0; i < _meshes.Count; i++) {
           var element = gui.elements[i];
           var parameters = cylindricalSpace.GetElementParameters(element.anchor, element.transform.position);
           var pos = cylindricalSpace.TransformPoint(element, gui.transform.InverseTransformPoint(element.transform.position));
@@ -124,8 +89,8 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       }
 
       using (new ProfilerSample("Draw Meshes")) {
-        for (int i = 0; i < _elementMeshes.Count; i++) {
-          Graphics.DrawMesh(_elementMeshes[i], _cylindrical_meshTransforms[i], _material, 0);
+        for (int i = 0; i < _meshes.Count; i++) {
+          Graphics.DrawMesh(_meshes[i], _cylindrical_meshTransforms[i], _material, 0);
         }
       }
     } else if (gui.space is LeapGuiSphericalSpace) {
@@ -143,7 +108,7 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
         _spherical_meshTransforms.Fill(gui.elements.Count, Matrix4x4.identity);
       }
 
-      for (int i = 0; i < _elementMeshes.Count; i++) {
+      for (int i = 0; i < _meshes.Count; i++) {
         var element = gui.elements[i];
         var parameters = sphericalSpace.GetElementParameters(element.anchor, element.transform.position);
         var pos = sphericalSpace.TransformPoint(element, gui.transform.InverseTransformPoint(element.transform.position));
@@ -166,211 +131,35 @@ public class LeapGuiDynamicRenderer : LeapGuiRenderer,
       _material.SetMatrix("_LeapGui_LocalToWorld", transform.localToWorldMatrix);
       _material.SetVectorArray("_LeapGuiSpherical_ElementParameters", _spherical_elementParameters);
 
-      for (int i = 0; i < _elementMeshes.Count; i++) {
-        Graphics.DrawMesh(_elementMeshes[i], _spherical_meshTransforms[i], _material, 0);
+      for (int i = 0; i < _meshes.Count; i++) {
+        Graphics.DrawMesh(_meshes[i], _spherical_meshTransforms[i], _material, 0);
       }
     }
   }
 
-  public override void OnEnableRendererEditor() { }
-
-  public override void OnDisableRendererEditor() { }
-
-  public override void OnUpdateRendererEditor() {
-    MeshCache.Clear();
-
-    ensureObjectsAreValid();
-
-    if (gui.GetSupportedFeatures(_meshFeatures)) {
-      loadMeshes();
-      bakeVerts();
-      bakeColors();
-      bakeUv3();
+  protected override void doGenerationSetup() {
+    if (_shader == null) {
+      _shader = Shader.Find("LeapGui/Defaults/Dynamic");
     }
 
-    if (gui.GetSupportedFeatures(_textureFeatures)) {
-      packTextures();
-    }
-
-    bakeUvs();
+    base.doGenerationSetup();
 
     if (gui.space is LeapGuiCylindricalSpace) {
       _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);
     } else if (gui.space is LeapGuiSphericalSpace) {
       _material.EnableKeyword(LeapGuiSphericalSpace.FEATURE_NAME);
     }
-
-    OnUpdateRenderer();
-  }
-  #endregion
-
-  #region PRIVATE IMPLEMENTATION
-  private void ensureObjectsAreValid() {
-    //Destroy meshes that will no longer be used
-    while (_elementMeshes.Count > gui.elements.Count) {
-      DestroyImmediate(_elementMeshes.RemoveLast());
-    }
-
-    //Clear out the meshes that remain
-    foreach (var mesh in _elementMeshes) {
-      mesh.Clear();
-    }
-
-    //Create new meshes that need to exist
-    while (_elementMeshes.Count < gui.elements.Count) {
-      Mesh elementMesh = new Mesh();
-      elementMesh.MarkDynamic();
-      elementMesh.name = "Generated Element Mesh";
-      _elementMeshes.Add(elementMesh);
-    }
-
-    if (_shader == null) {
-      _shader = Shader.Find("LeapGui/Defaults/Dynamic");
-    }
-
-    if (_material != null) {
-      DestroyImmediate(_material);
-    }
-
-    _material = new Material(_shader);
-    _material.name = "Dynamic Gui Material";
   }
 
-  private void loadMeshes() {
-    foreach (var meshFeature in _meshFeatures) {
-      foreach (var dataObj in meshFeature.data) {
-        dataObj.RefreshMeshData();
-      }
-    }
+  protected override void buildElement() {
+    //Always start a new mesh for each element
+    finishMesh();
+    beginMesh();
+
+    base.buildElement();
   }
 
-  private List<Vector3> _tempVertList = new List<Vector3>();
-  private List<int> _tempTriList = new List<int>();
-  private void bakeVerts() {
-    using (new ProfilerSample("Bake Verts")) {
-      for (int i = 0; i < gui.elements.Count; i++) {
-        foreach (var meshFeature in _meshFeatures) {
-          var meshData = meshFeature.data[i];
-          if (meshData.mesh == null) continue;
-
-          var topology = MeshCache.GetTopology(meshData.mesh);
-
-          int vertOffset = _tempVertList.Count;
-          for (int j = 0; j < topology.tris.Length; j++) {
-            _tempTriList.Add(topology.tris[j] + vertOffset);
-          }
-
-          _tempVertList.AddRange(topology.verts);
-        }
-
-        _elementMeshes[i].SetVertices(_tempVertList);
-        _elementMeshes[i].SetTriangles(_tempTriList, 0);
-        _tempVertList.Clear();
-        _tempTriList.Clear();
-      }
-    }
+  protected override Vector3 elementVertToMeshVert(Vector3 vertex) {
+    return vertex;
   }
-
-  private List<Color> _tempColorList = new List<Color>();
-  private void bakeColors() {
-    using (new ProfilerSample("Bake Colors")) {
-      //If no mesh feature wants colors, don't bake them!
-      if (!_meshFeatures.Query().Any(f => f.color)) {
-        return;
-      }
-
-      for (int i = 0; i < gui.elements.Count; i++) {
-        foreach (var meshFeature in _meshFeatures) {
-          var meshData = meshFeature.data[i];
-          if (meshData.mesh == null) continue;
-
-          Color totalTint = meshData.tint * meshFeature.tint;
-
-          var colors = MeshCache.GetColors(meshData.mesh);
-          if (colors != null) {
-            colors.Query().Select(c => c * totalTint).AppendList(_tempColorList);
-          } else {
-            _tempColorList.Append(meshData.mesh.vertexCount, totalTint);
-          }
-        }
-
-        _elementMeshes[i].SetColors(_tempColorList);
-        _tempColorList.Clear();
-      }
-
-      _material.EnableKeyword(LeapGuiMeshFeature.COLORS_FEATURE);
-    }
-  }
-
-  private void packTextures() {
-    using (new ProfilerSample("Pack Textures")) {
-      Texture2D[] packedTextures;
-      PackUtil.DoPack(_textureFeatures, _atlasSettings,
-                  out packedTextures,
-                  out _packedRects);
-
-      for (int i = 0; i < _textureFeatures.Count; i++) {
-        _material.SetTexture(_textureFeatures[i].propertyName, packedTextures[i]);
-      }
-    }
-  }
-
-  private List<Vector4> _tempUvList = new List<Vector4>();
-  private void bakeUvs() {
-    using (new ProfilerSample("Bake Uvs")) {
-      var enabledChannels = new List<UVChannelFlags>();
-
-      //Build up uv dictionary
-      foreach (var feature in _meshFeatures) {
-        foreach (var enabledChannel in feature.enabledUvChannels) {
-          if (!enabledChannels.Contains(enabledChannel)) {
-            enabledChannels.Add(enabledChannel);
-            _material.EnableKeyword(LeapGuiMeshFeature.GetUvFeature(enabledChannel));
-          }
-        }
-      }
-
-      for (int i = 0; i < gui.elements.Count; i++) {
-        var element = gui.elements[i];
-
-        foreach (var meshFeature in _meshFeatures) {
-          var meshData = meshFeature.data[i];
-          if (meshData.mesh == null) continue;
-
-          foreach (var channel in enabledChannels) {
-            meshData.mesh.GetUVsOrDefault(channel.Index(), _tempUvList);
-
-            Rect[] atlasedRects;
-            if (_packedRects != null &&                                     //If we have packed rects
-                _packedRects.TryGetValue(channel, out atlasedRects) &&      //And if we have a packed rect for this channel
-                (meshData.remappableChannels & channel) != 0) {             //And if that channel can be remapped for this mesh
-              MeshUtil.RemapUvs(_tempUvList, atlasedRects[i]);
-            }
-
-            _elementMeshes[i].SetUVsAuto(channel.Index(), _tempUvList);
-            _tempUvList.Clear();
-          }
-        }
-      }
-    }
-  }
-
-  private void bakeUv3() {
-    using (new ProfilerSample("Bake Uv3d")) {
-      for (int i = 0; i < gui.elements.Count; i++) {
-        var element = gui.elements[i];
-
-        foreach (var meshFeature in _meshFeatures) {
-          var meshData = meshFeature.data[i];
-          if (meshData.mesh == null) continue;
-
-          _tempUvList.Append(meshData.mesh.vertexCount, new Vector4(0, 0, 0, i));
-        }
-
-        _elementMeshes[i].SetUVs(3, _tempUvList);
-        _tempUvList.Clear();
-      }
-    }
-  }
-  #endregion
 }
