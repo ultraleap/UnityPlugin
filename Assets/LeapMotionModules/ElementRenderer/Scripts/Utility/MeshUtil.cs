@@ -16,7 +16,11 @@ public static class MeshUtil {
   }
 
   public static void RemapUvs(List<Vector4> uvs, Rect mapping) {
-    for (int i = 0; i < uvs.Count; i++) {
+    RemapUvs(uvs, mapping, uvs.Count);
+  }
+
+  public static void RemapUvs(List<Vector4> uvs, Rect mapping, int lastCount) {
+    for (int i = uvs.Count - lastCount; i < uvs.Count; i++) {
       Vector4 uv = uvs[i];
       uv.x = mapping.x + uv.x * mapping.width;
       uv.y = mapping.y + uv.y * mapping.height;

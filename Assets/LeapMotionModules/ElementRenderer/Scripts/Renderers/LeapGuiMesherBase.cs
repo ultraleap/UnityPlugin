@@ -59,6 +59,14 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   //#### Textures ####
   private Dictionary<UVChannelFlags, Rect[]> _packedRects;
 
+  //#### Tinting ####
+  protected const string TINTS_PROPERTY = LeapGui.PROPERTY_PREFIX + "Tints";
+  protected List<Color> _tintColors = new List<Color>();
+
+  //#### Blend Shapes ####
+  protected const string BLEND_SHAPE_AMOUNTS_PROPERTY = LeapGui.PROPERTY_PREFIX + "BlendShapeAmounts";
+  protected List<float> _blendShapeAmounts = new List<float>();
+
   public virtual void GetSupportInfo(List<LeapGuiMeshFeature> features, List<SupportInfo> info) {
     SupportUtil.OnlySupportFirstFeature(features, info);
     //TODO: handle uv3 warning?
@@ -106,7 +114,53 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
     }
   }
 
+  public override void OnDisableRenderer() { }
+
+  public override void OnUpdateRenderer() {
+    updateTinting();
+    updateBlendShapes();
+  }
+
+  public override void OnEnableRendererEditor() { }
+
+  public override void OnDisableRendererEditor() {
+    foreach (var mesh in _meshes) {
+      DestroyImmediate(mesh);
+    }
+
+    DestroyImmediate(_material);
+  }
+
   public override void OnUpdateRendererEditor() {
+    doGenerationSetup();
+    doMeshGeneration();
+
+    //After editor generation step, trigger the normal runtime display logic
+    OnUpdateRenderer();
+  }
+
+  #region UPDATE
+  protected virtual void updateTinting() {
+    foreach (var tintFeature in _tintFeatures) {
+      if (!tintFeature.isDirty) continue;
+
+      tintFeature.data.Query().Select(d => d.tint).FillList(_tintColors);
+      _material.SetColorArray(TINTS_PROPERTY, _tintColors);
+    }
+  }
+
+  protected virtual void updateBlendShapes() {
+    foreach (var blendShapeFeature in _blendShapeFeatures) {
+      if (!blendShapeFeature.isDirty) continue;
+
+      blendShapeFeature.data.Query().Select(d => d.amount).FillList(_blendShapeAmounts);
+      _material.SetFloatArray(BLEND_SHAPE_AMOUNTS_PROPERTY, _blendShapeAmounts);
+    }
+  }
+  #endregion
+
+  #region GENERATION SETUP
+  protected virtual void doGenerationSetup() {
     loadAllSupportedFeatures();
     prepareMeshes();
     prepareMaterial();
@@ -130,6 +184,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
     }
 
     if (_spriteFeatures.Count != 0) {
+      Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
       extractSpriteRects();
       uploadSpriteTextures();
     }
@@ -141,11 +196,8 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
     if (_blendShapeFeatures.Count != 0) {
       _material.EnableKeyword(LeapGuiBlendShapeFeature.FEATURE_NAME);
     }
-
-    buildAllElements();
   }
 
-  #region PRE GENERATION
   protected virtual void loadAllSupportedFeatures() {
     gui.GetSupportedFeatures(_meshFeatures);
     gui.GetSupportedFeatures(_textureFeatures);
@@ -156,6 +208,8 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
     _doesRequireColors = doesRequireMeshColors();
     _doesRequireNormals = doesRequireMeshNormals();
     _doesRequireUv3 = doesRequireUvChannel(UVChannelFlags.UV3);
+
+    _requiredUvChannels.Clear();
     foreach (var channel in MeshUtil.allUvChannels) {
       if (doesRequireUvChannel(channel)) {
         _requiredUvChannels.Add(channel);
@@ -168,6 +222,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
       DestroyImmediate(mesh);
     }
     _meshes.Clear();
+    _currMesh = null;
   }
 
   protected virtual void prepareMaterial() {
@@ -259,7 +314,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   #endregion
 
   #region MESH GENERATION
-  protected virtual void buildAllElements() {
+  protected virtual void doMeshGeneration() {
     beginMesh();
     for (_currIndex = 0; _currIndex < gui.elements.Count; _currIndex++) {
       _currElement = gui.elements[_currIndex];
@@ -304,7 +359,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
 
     int vertOffset = _verts.Count;
     for (int i = 0; i < topology.tris.Length; i++) {
-      _tris.Add(topology.tris[i] = vertOffset);
+      _tris.Add(topology.tris[i] + vertOffset);
     }
 
     for (int i = 0; i < topology.verts.Length; i++) {
@@ -319,15 +374,16 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
 
   protected virtual void buildUvs(UVChannelFlags channel, LeapGuiMeshData meshData) {
     var uvs = MeshCache.GetUvs(meshData.mesh, channel);
+    var targetList = _uvs[channel.Index()];
+
+    targetList.AddRange(uvs);
 
     Rect[] atlasedUvs;
     if (_packedRects != null &&
        _packedRects.TryGetValue(channel, out atlasedUvs) &&
        (meshData.remappableChannels & channel) != 0) {
-      MeshUtil.RemapUvs(uvs, atlasedUvs[_currIndex]);
+      MeshUtil.RemapUvs(targetList, atlasedUvs[_currIndex], uvs.Count);
     }
-
-    _uvs[channel.Index()].AddRange(uvs);
   }
 
   protected virtual void buildUv3(LeapGuiMeshData meshData) {
@@ -387,13 +443,17 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
       _currMesh.SetColors(_colors);
     }
 
-    for (int i = 0; i < 4; i++) {
-      _currMesh.SetUVsAuto(i, _uvs[i]);
+    foreach (var channel in _requiredUvChannels) {
+      _currMesh.SetUVsAuto(channel.Index(), _uvs[channel.Index()]);
     }
+
+    postProcessMesh();
 
     _meshes.Add(_currMesh);
     _currMesh = null;
   }
+
+  protected virtual void postProcessMesh() { }
   #endregion
 
   #region UTILITY

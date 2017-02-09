@@ -27,7 +27,7 @@ public static class MeshCache {
     if (!_colorCache.TryGetValue(mesh, out colors)) {
       colors = mesh.colors;
       if (colors.Length != mesh.vertexCount) {
-        colors = null;
+        colors = new Color[mesh.vertexCount].Fill(Color.white);
       }
 
       _colorCache[mesh] = colors;
@@ -40,6 +40,7 @@ public static class MeshCache {
     var key = new UvKey() { mesh = mesh, channel = channel };
     List<Vector4> uvs;
     if (!_uvCache.TryGetValue(key, out uvs)) {
+      uvs = new List<Vector4>();
       mesh.GetUVs(channel.Index(), uvs);
 
       if (uvs.Count != mesh.vertexCount) {
@@ -48,7 +49,6 @@ public static class MeshCache {
 
       _uvCache[key] = uvs;
     }
-
     return uvs;
   }
 
