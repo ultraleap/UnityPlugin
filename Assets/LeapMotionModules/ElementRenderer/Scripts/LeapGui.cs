@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Profiling;
 using Leap.Unity.Query;
 
 [ExecuteInEditMode]
@@ -286,32 +285,17 @@ public class LeapGui : MonoBehaviour {
 
 #if UNITY_EDITOR
   private void doLateUpdateEditor() {
-    Profiler.BeginSample("Rebuild Element List");
     rebuildElementList();
-    Profiler.EndSample();
-
-    Profiler.BeginSample("Rebuild Feature Data");
     rebuildFeatureData();
-    Profiler.EndSample();
-
-    Profiler.BeginSample("Rebuild Support Info");
     rebuildFeatureSupportInfo();
-    Profiler.EndSample();
 
     if (_space != null) {
-      Profiler.BeginSample("Build Element Data");
       _space.BuildElementData(transform);
-      Profiler.EndSample();
-
-      Profiler.BeginSample("Rebuild Picking Meshes");
       rebuildPickingMeshes();
-      Profiler.EndSample();
     }
 
     if (_renderer != null && _elements.Count != 0) {
-      Profiler.BeginSample("Update Renderer");
       _renderer.OnUpdateRendererEditor();
-      Profiler.EndSample();
     }
   }
 #endif
@@ -321,7 +305,27 @@ public class LeapGui : MonoBehaviour {
     if (_space == null) return;
 
     if (_toRemove.Count != 0) {
-      Profiler.BeginSample("Remove Elements");
+      performElementRemoval();
+    }
+
+    if (_toAdd.Count != 0) {
+      performElementAddition();
+    }
+
+    //TODO, optimize this!  Don't do it every frame for the whole thing!
+    _space.BuildElementData(transform);
+
+    if (_elements.Count != 0) {
+      _renderer.OnUpdateRenderer();
+    }
+
+    foreach (var feature in _features) {
+      feature.isDirty = false;
+    }
+  }
+
+  private void performElementRemoval() {
+    using (new ProfilerSample("Remove Elements")) {
       for (int i = 0; i < _elements.Count; i++) {
         var element = _elements[i];
         if (_toRemove.RemoveUnordered(element)) {
@@ -345,11 +349,11 @@ public class LeapGui : MonoBehaviour {
 
       _tempIndexList.Clear();
       _toRemove.Clear();
-      Profiler.EndSample();
     }
+  }
 
-    if (_toAdd.Count != 0) {
-      Profiler.BeginSample("Add Elements");
+  private void performElementAddition() {
+    using (new ProfilerSample("Add Elements")) {
 
       //TODO, both of these rebuild operations can probably be optimized a ton
       rebuildElementList();
@@ -369,38 +373,24 @@ public class LeapGui : MonoBehaviour {
       _tempElementList.Clear();
       _tempIndexList.Clear();
       _toAdd.Clear();
-      Profiler.EndSample();
-    }
-
-    //TODO, optimize this!  Don't do it every frame for the whole thing!
-    Profiler.BeginSample("Build Element Data");
-    _space.BuildElementData(transform);
-    Profiler.EndSample();
-
-    if (_elements.Count != 0) {
-      Profiler.BeginSample("Update Renderer");
-      _renderer.OnUpdateRenderer();
-      Profiler.EndSample();
-    }
-
-    foreach (var feature in _features) {
-      feature.isDirty = false;
     }
   }
 
   private void rebuildElementList() {
+    using (new ProfilerSample("Rebuild Element List")) {
 #if UNITY_EDITOR
-    if (!Application.isPlaying) {
-      foreach (var element in _elements) {
-        element.OnDetachedFromGui();
+      if (!Application.isPlaying) {
+        foreach (var element in _elements) {
+          element.OnDetachedFromGui();
+        }
       }
-    }
 #endif
 
-    _elements.Clear();
-    _anchors.Clear();
+      _elements.Clear();
+      _anchors.Clear();
 
-    rebuildElementListRecursively(transform, transform);
+      rebuildElementListRecursively(transform, transform);
+    }
   }
 
   private void rebuildElementListRecursively(Transform root, Transform currAnchor) {
@@ -428,132 +418,138 @@ public class LeapGui : MonoBehaviour {
   }
 
   private void rebuildFeatureData() {
-    foreach (var feature in _features) {
-      feature.ClearDataObjectReferences();
-      feature.isDirty = true;
-    }
-
-    for (int i = 0; i < _elements.Count; i++) {
-      var element = _elements[i];
-
-      List<LeapGuiElementData> dataList = new List<LeapGuiElementData>();
+    using (new ProfilerSample("Rebuild Feature Data")) {
       foreach (var feature in _features) {
-        var dataObj = element.data.Query().OfType(feature.GetDataObjectType()).FirstOrDefault();
-        if (dataObj != null) {
-          element.data.Remove(dataObj);
-        } else {
-          dataObj = feature.CreateDataObject(element);
+        feature.ClearDataObjectReferences();
+        feature.isDirty = true;
+      }
+
+      for (int i = 0; i < _elements.Count; i++) {
+        var element = _elements[i];
+
+        List<LeapGuiElementData> dataList = new List<LeapGuiElementData>();
+        foreach (var feature in _features) {
+          var dataObj = element.data.Query().OfType(feature.GetDataObjectType()).FirstOrDefault();
+          if (dataObj != null) {
+            element.data.Remove(dataObj);
+          } else {
+            dataObj = feature.CreateDataObject(element);
+          }
+          feature.AddDataObjectReference(dataObj);
+          dataList.Add(dataObj);
         }
-        feature.AddDataObjectReference(dataObj);
-        dataList.Add(dataObj);
-      }
 
-      foreach (var dataObj in element.data) {
-        DestroyImmediate(dataObj);
-      }
+        foreach (var dataObj in element.data) {
+          DestroyImmediate(dataObj);
+        }
 
-      element.OnAssignFeatureData(dataList);
+        element.OnAssignFeatureData(dataList);
+      }
     }
   }
 
   private void rebuildFeatureSupportInfo() {
-    var typeToFeatures = new Dictionary<Type, List<LeapGuiFeatureBase>>();
-    foreach (var feature in _features) {
-      Type featureType = feature.GetType();
-      List<LeapGuiFeatureBase> list;
-      if (!typeToFeatures.TryGetValue(featureType, out list)) {
-        list = new List<LeapGuiFeatureBase>();
-        typeToFeatures[featureType] = list;
-      }
-
-      list.Add(feature);
-    }
-
-
-    var featureToInfo = new Dictionary<LeapGuiFeatureBase, SupportInfo>();
-
-    foreach (var pair in typeToFeatures) {
-      var featureType = pair.Key;
-      var featureList = pair.Value;
-      var infoList = new List<SupportInfo>().FillEach(featureList.Count, () => SupportInfo.FullSupport());
-
-      var castList = Activator.CreateInstance(typeof(List<>).MakeGenericType(featureType)) as IList;
-      foreach (var feature in featureList) {
-        castList.Add(feature);
-      }
-
-      try {
-        if (_renderer == null) continue;
-
-        var interfaceType = typeof(ISupportsFeature<>).MakeGenericType(featureType);
-        if (!interfaceType.IsAssignableFrom(_renderer.GetType())) {
-          infoList.FillEach(() => SupportInfo.Error("This renderer does not support this feature."));
-          continue;
+    using (new ProfilerSample("Rebuild Support Info")) {
+      var typeToFeatures = new Dictionary<Type, List<LeapGuiFeatureBase>>();
+      foreach (var feature in _features) {
+        Type featureType = feature.GetType();
+        List<LeapGuiFeatureBase> list;
+        if (!typeToFeatures.TryGetValue(featureType, out list)) {
+          list = new List<LeapGuiFeatureBase>();
+          typeToFeatures[featureType] = list;
         }
 
-        var supportDelegate = interfaceType.GetMethod("GetSupportInfo");
+        list.Add(feature);
+      }
 
-        if (supportDelegate == null) {
-          Debug.LogError("Could not find support delegate.");
-          continue;
+
+      var featureToInfo = new Dictionary<LeapGuiFeatureBase, SupportInfo>();
+
+      foreach (var pair in typeToFeatures) {
+        var featureType = pair.Key;
+        var featureList = pair.Value;
+        var infoList = new List<SupportInfo>().FillEach(featureList.Count, () => SupportInfo.FullSupport());
+
+        var castList = Activator.CreateInstance(typeof(List<>).MakeGenericType(featureType)) as IList;
+        foreach (var feature in featureList) {
+          castList.Add(feature);
         }
 
-        supportDelegate.Invoke(_renderer, new object[] { castList, infoList });
-      } finally {
-        for (int i = 0; i < featureList.Count; i++) {
-          featureToInfo[featureList[i]] = infoList[i];
+        try {
+          if (_renderer == null) continue;
+
+          var interfaceType = typeof(ISupportsFeature<>).MakeGenericType(featureType);
+          if (!interfaceType.IsAssignableFrom(_renderer.GetType())) {
+            infoList.FillEach(() => SupportInfo.Error("This renderer does not support this feature."));
+            continue;
+          }
+
+          var supportDelegate = interfaceType.GetMethod("GetSupportInfo");
+
+          if (supportDelegate == null) {
+            Debug.LogError("Could not find support delegate.");
+            continue;
+          }
+
+          supportDelegate.Invoke(_renderer, new object[] { castList, infoList });
+        } finally {
+          for (int i = 0; i < featureList.Count; i++) {
+            featureToInfo[featureList[i]] = infoList[i];
+          }
         }
       }
-    }
 
-    _supportInfo = new List<SupportInfo>();
-    foreach (var feature in _features) {
-      _supportInfo.Add(feature.GetSupportInfo(this).OrWorse(featureToInfo[feature]));
+      _supportInfo = new List<SupportInfo>();
+      foreach (var feature in _features) {
+        _supportInfo.Add(feature.GetSupportInfo(this).OrWorse(featureToInfo[feature]));
+      }
     }
   }
 
 #if UNITY_EDITOR
   private void rebuildPickingMeshes() {
-    List<Vector3> pickingVerts = new List<Vector3>();
-    List<int> pickingTris = new List<int>();
+    using (new ProfilerSample("Rebuild Picking Meshes")) {
+      List<Vector3> pickingVerts = new List<Vector3>();
+      List<int> pickingTris = new List<int>();
 
-    foreach (var element in _elements) {
-      pickingVerts.Clear();
-      pickingTris.Clear();
+      foreach (var element in _elements) {
+        pickingVerts.Clear();
+        pickingTris.Clear();
 
-      Mesh pickingMesh = element.pickingMesh;
-      if (pickingMesh == null) {
-        pickingMesh = new Mesh();
-        pickingMesh.MarkDynamic();
-        pickingMesh.hideFlags = HideFlags.HideAndDontSave;
-        pickingMesh.name = "Gui Element Picking Mesh";
-        element.pickingMesh = pickingMesh;
-      }
-      pickingMesh.Clear();
+        Mesh pickingMesh = element.pickingMesh;
+        if (pickingMesh == null) {
+          pickingMesh = new Mesh();
+          pickingMesh.MarkDynamic();
+          pickingMesh.hideFlags = HideFlags.HideAndDontSave;
+          pickingMesh.name = "Gui Element Picking Mesh";
+          element.pickingMesh = pickingMesh;
+        }
+        pickingMesh.Clear();
 
-      foreach (var dataObj in element.data) {
-        if (dataObj is LeapGuiMeshData) {
-          var meshData = dataObj as LeapGuiMeshData;
-          meshData.RefreshMeshData();
+        foreach (var dataObj in element.data) {
+          if (dataObj is LeapGuiMeshData) {
+            var meshData = dataObj as LeapGuiMeshData;
+            meshData.RefreshMeshData();
 
-          Mesh mesh = meshData.mesh;
-          if (mesh == null) continue;
+            Mesh mesh = meshData.mesh;
+            if (mesh == null) continue;
 
-          var topology = MeshCache.GetTopology(mesh);
-          for (int i = 0; i < topology.tris.Length; i++) {
-            pickingTris.Add(topology.tris[i] + pickingVerts.Count);
-          }
+            var topology = MeshCache.GetTopology(mesh);
+            for (int i = 0; i < topology.tris.Length; i++) {
+              pickingTris.Add(topology.tris[i] + pickingVerts.Count);
+            }
 
-          for (int i = 0; i < topology.verts.Length; i++) {
-            Vector3 localRectVert = transform.InverseTransformPoint(element.transform.TransformPoint(topology.verts[i]));
-            pickingVerts.Add(_space.TransformPoint(element, localRectVert));
+            for (int i = 0; i < topology.verts.Length; i++) {
+              Vector3 localRectVert = transform.InverseTransformPoint(element.transform.TransformPoint(topology.verts[i]));
+              pickingVerts.Add(_space.TransformPoint(element, localRectVert));
+            }
           }
         }
-      }
 
-      pickingMesh.SetVertices(pickingVerts);
-      pickingMesh.SetTriangles(pickingTris, 0, calculateBounds: true);
-      pickingMesh.RecalculateNormals();
+        pickingMesh.SetVertices(pickingVerts);
+        pickingMesh.SetTriangles(pickingTris, 0, calculateBounds: true);
+        pickingMesh.RecalculateNormals();
+      }
     }
   }
 #endif
