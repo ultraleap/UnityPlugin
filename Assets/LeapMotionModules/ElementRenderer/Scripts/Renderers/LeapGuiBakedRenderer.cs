@@ -107,10 +107,12 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
         break;
     }
 
-    if (gui.space is LeapGuiCylindricalSpace) {
-      _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);
-    } else if (gui.space is LeapGuiSphericalSpace) {
-      _material.EnableKeyword(LeapGuiSphericalSpace.FEATURE_NAME);
+    if (_motionType != MotionType.None) {
+      if (gui.space is LeapGuiCylindricalSpace) {
+        _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);
+      } else if (gui.space is LeapGuiSphericalSpace) {
+        _material.EnableKeyword(LeapGuiSphericalSpace.FEATURE_NAME);
+      }
     }
   }
 
@@ -142,11 +144,11 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   }
 
   protected override Vector3 elementVertToMeshVert(Vector3 vertex) {
+    Vector3 worldVert = _currElement.transform.TransformPoint(vertex);
     switch (_motionType) {
       case MotionType.None:
-        return gui.space.TransformPoint(vertex);
+        return gui.space.TransformPoint(_currElement, gui.transform.InverseTransformPoint(worldVert));
       case MotionType.Translation:
-        Vector3 worldVert = _currElement.transform.TransformPoint(vertex);
         Vector3 guiVert = gui.transform.InverseTransformPoint(worldVert);
         return guiVert - gui.transform.InverseTransformPoint(_currElement.transform.position);
     }
