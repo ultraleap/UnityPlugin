@@ -143,11 +143,11 @@ GameObject:
   - component: {fileID: 951993293}
   - component: {fileID: 951993292}
   - component: {fileID: 951993291}
-  - component: {fileID: 951993290}
-  - component: {fileID: 951993289}
   - component: {fileID: 951993295}
   - component: {fileID: 951993296}
   - component: {fileID: 951993297}
+  - component: {fileID: 951993290}
+  - component: {fileID: 951993289}
   m_Layer: 0
   m_Name: Leap Gui
   m_TagString: Untagged
@@ -163,10 +163,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 951993288}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c33f2536258f7be429aa50ceabb6aa51, type: 3}
+  m_Script: {fileID: 11500000, guid: 9261239b711172441b484496a58d001c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   gui: {fileID: 951993293}
+  radius: 1
 --- !u!114 &951993290
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -541,7 +542,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1586997251}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.075, y: 0, z: 0}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children: []
   m_Father: {fileID: 389666384}

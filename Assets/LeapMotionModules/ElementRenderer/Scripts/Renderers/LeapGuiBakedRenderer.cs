@@ -133,6 +133,14 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     _currMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000);
   }
 
+  protected override bool doesRequireSpecialUv3() {
+    if (_motionType != MotionType.None) {
+      return true;
+    }
+
+    return base.doesRequireSpecialUv3();
+  }
+
   protected override Vector3 elementVertToMeshVert(Vector3 vertex) {
     switch (_motionType) {
       case MotionType.None:

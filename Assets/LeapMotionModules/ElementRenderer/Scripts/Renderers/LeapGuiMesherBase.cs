@@ -46,7 +46,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   //Internal cache of requirements 
   private bool _doesRequireColors;
   private bool _doesRequireNormals;
-  private bool _doesRequireUv3;
+  private bool _doesRequireSpecialUv3;
   private List<UVChannelFlags> _requiredUvChannels = new List<UVChannelFlags>();
 
   //Feature lists
@@ -207,10 +207,12 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
 
     _doesRequireColors = doesRequireMeshColors();
     _doesRequireNormals = doesRequireMeshNormals();
-    _doesRequireUv3 = doesRequireUvChannel(UVChannelFlags.UV3);
+    _doesRequireSpecialUv3 = doesRequireSpecialUv3();
 
     _requiredUvChannels.Clear();
     foreach (var channel in MeshUtil.allUvChannels) {
+      if (channel == UVChannelFlags.UV3 && _doesRequireSpecialUv3) continue;
+
       if (doesRequireUvChannel(channel)) {
         _requiredUvChannels.Add(channel);
       }
@@ -340,8 +342,8 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
         buildUvs(channel, meshData);
       }
 
-      if (_doesRequireUv3) {
-        buildUv3(meshData);
+      if (_doesRequireSpecialUv3) {
+        buildSpecialUv3(meshData);
       }
     }
 
@@ -386,7 +388,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
     }
   }
 
-  protected virtual void buildUv3(LeapGuiMeshData meshData) {
+  protected virtual void buildSpecialUv3(LeapGuiMeshData meshData) {
     _uvs[3].Append(meshData.mesh.vertexCount, new Vector4(0, 0, 0, _currIndex));
   }
 
@@ -447,6 +449,10 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
       _currMesh.SetUVsAuto(channel.Index(), _uvs[channel.Index()]);
     }
 
+    if (_doesRequireSpecialUv3) {
+      _currMesh.SetUVs(3, _uvs[3]);
+    }
+
     postProcessMesh();
 
     _meshes.Add(_currMesh);
@@ -474,12 +480,15 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
       case UVChannelFlags.UV2:
         return _meshFeatures.Query().Any(f => f.uv2);
       case UVChannelFlags.UV3:
-        return _meshFeatures.Query().Any(f => f.uv3) ||
-               _blendShapeFeatures.Count != 0 ||
-               _tintFeatures.Count != 0;
+        return _meshFeatures.Query().Any(f => f.uv3);
       default:
         throw new ArgumentException("Invalid channel argument.");
     }
+  }
+
+  protected virtual bool doesRequireSpecialUv3() {
+    return _tintFeatures.Count != 0 ||
+           _blendShapeFeatures.Count != 0;
   }
 
   protected abstract Vector3 elementVertToMeshVert(Vector3 vertex);
