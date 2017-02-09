@@ -5,6 +5,7 @@ using UnityEngine.Rendering;
 using Leap.Unity.Query;
 
 public static class MeshUtil {
+  public const int MAX_VERT_COUNT = 65535;
 
   public static List<UVChannelFlags> allUvChannels;
   static MeshUtil() {
