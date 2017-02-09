@@ -6,6 +6,15 @@ using Leap.Unity.Query;
 
 public static class MeshUtil {
 
+  public static List<UVChannelFlags> allUvChannels;
+  static MeshUtil() {
+    allUvChannels = new List<UVChannelFlags>();
+    allUvChannels.Add(UVChannelFlags.UV0);
+    allUvChannels.Add(UVChannelFlags.UV1);
+    allUvChannels.Add(UVChannelFlags.UV2);
+    allUvChannels.Add(UVChannelFlags.UV3);
+  }
+
   public static void RemapUvs(List<Vector4> uvs, Rect mapping) {
     for (int i = 0; i < uvs.Count; i++) {
       Vector4 uv = uvs[i];

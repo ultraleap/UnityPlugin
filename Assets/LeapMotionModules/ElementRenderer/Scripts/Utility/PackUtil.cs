@@ -22,14 +22,7 @@ public static class PackUtil {
     public FilterMode filterMode = FilterMode.Bilinear;
   }
 
-  public static List<UVChannelFlags> allUvChannels;
-  static PackUtil() {
-    allUvChannels = new List<UVChannelFlags>();
-    allUvChannels.Add(UVChannelFlags.UV0);
-    allUvChannels.Add(UVChannelFlags.UV1);
-    allUvChannels.Add(UVChannelFlags.UV2);
-    allUvChannels.Add(UVChannelFlags.UV3);
-  }
+
 
   public static void ClearCache() {
     _cachedBorderedTextures.Clear();
@@ -46,7 +39,7 @@ public static class PackUtil {
 
     Texture2D[] textureArray = new Texture2D[textureFeatures[0].data.Count];
 
-    foreach (var channel in allUvChannels) {
+    foreach (var channel in MeshUtil.allUvChannels) {
       var mainTexture = textureFeatures.Query().FirstOrDefault(f => f.channel == channel);
       if (mainTexture == null) continue;
 
