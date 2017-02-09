@@ -12,7 +12,6 @@ public class ProceduralSpriteMesh : ProceduralMeshSource {
     if (spriteData == null || spriteData.sprite == null) {
       mesh = null;
       remappableChannels = 0;
-      Debug.Log("obn");
       return false;
     }
 
