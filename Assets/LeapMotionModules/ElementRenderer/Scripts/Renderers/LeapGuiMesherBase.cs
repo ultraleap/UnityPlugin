@@ -4,11 +4,17 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Assertions;
 #if UNITY_EDITOR
+using UnityEditor;
 using UnityEditor.Sprites;
 #endif
 using Leap.Unity.Query;
 
-public abstract class LeapGuiMesherBase : LeapGuiRenderer {
+public abstract class LeapGuiMesherBase : LeapGuiRenderer,
+  ISupportsFeature<LeapGuiMeshFeature>,
+  ISupportsFeature<LeapGuiTextureFeature>,
+  ISupportsFeature<LeapGuiSpriteFeature>,
+  ISupportsFeature<LeapGuiTintFeature>,
+  ISupportsFeature<LeapGuiBlendShapeFeature> {
 
   [SerializeField]
   protected Shader _shader;
@@ -52,6 +58,43 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer {
 
   //#### Textures ####
   private Dictionary<UVChannelFlags, Rect[]> _packedRects;
+
+  public virtual void GetSupportInfo(List<LeapGuiMeshFeature> features, List<SupportInfo> info) {
+    SupportUtil.OnlySupportFirstFeature(features, info);
+    //TODO: handle uv3 warning?
+  }
+
+  public virtual void GetSupportInfo(List<LeapGuiTextureFeature> features, List<SupportInfo> info) {
+    SupportUtil.OnlySupportFirstFeature(features, info);
+  }
+
+  public virtual void GetSupportInfo(List<LeapGuiSpriteFeature> features, List<SupportInfo> info) {
+    SupportUtil.OnlySupportFirstFeature(features, info);
+
+#if UNITY_EDITOR
+    Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+
+    for (int i = 0; i < features.Count; i++) {
+      var feature = features[i];
+
+      if (!feature.AreAllSpritesPacked()) {
+        info[i] = SupportInfo.Error("Not all sprites are packed.");
+      }
+
+      if (!feature.AreAllSpritesOnSameTexture()) {
+        info[i] = SupportInfo.Error("Not all sprites are packed into same atlas.");
+      }
+    }
+#endif
+  }
+
+  public virtual void GetSupportInfo(List<LeapGuiTintFeature> features, List<SupportInfo> info) {
+    SupportUtil.OnlySupportFirstFeature(features, info);
+  }
+
+  public virtual void GetSupportInfo(List<LeapGuiBlendShapeFeature> features, List<SupportInfo> info) {
+    SupportUtil.OnlySupportFirstFeature(features, info);
+  }
 
   public override void OnEnableRenderer() {
     loadAllSupportedFeatures();
