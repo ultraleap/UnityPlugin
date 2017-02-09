@@ -115,6 +115,8 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   }
 
   protected override void buildTopology(LeapGuiMeshData meshData) {
+    //If the next element is going to put us over the limit, finish the current mesh
+    //and start a new one.
     if (_verts.Count + meshData.mesh.vertexCount > MeshUtil.MAX_VERT_COUNT) {
       finishMesh();
       beginMesh();
@@ -126,6 +128,8 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   protected override void postProcessMesh() {
     base.postProcessMesh();
 
+    //For the baked renderer, the mesh really never accurately represents it's visual position 
+    //or size, so just disable culling entirely by making the bound gigantic.
     _currMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000);
   }
 
