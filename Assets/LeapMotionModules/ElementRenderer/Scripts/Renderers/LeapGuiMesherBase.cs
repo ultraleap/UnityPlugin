@@ -20,7 +20,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   protected Shader _shader;
 
   [SerializeField]
-  private PackUtil.Settings _atlasSettings;
+  private PackUtil.Settings _atlasSettings = new PackUtil.Settings();
 
   //Generated data
   protected List<Mesh> _meshes = new List<Mesh>();
