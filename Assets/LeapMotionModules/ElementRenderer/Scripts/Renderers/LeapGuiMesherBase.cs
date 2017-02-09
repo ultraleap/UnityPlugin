@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -32,6 +32,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer {
   protected List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
   protected List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
   protected List<LeapGuiSpriteFeature> _spriteFeatures = new List<LeapGuiSpriteFeature>();
+  protected List<LeapGuiTintFeature> _tintFeatures = new List<LeapGuiTintFeature>();
   protected List<LeapGuiBlendShapeFeature> _blendShapeFeatures = new List<LeapGuiBlendShapeFeature>();
 
   //#### Textures ####
@@ -141,6 +142,31 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer {
       currUv.y = delta.y;
       currUv.z = delta.z;
       _uvs[3][i + offset] = currUv;
+    }
+  }
+
+  protected virtual bool doesRequireMeshColors() {
+    return _meshFeatures.Query().Any(f => f.color);
+  }
+
+  protected virtual bool doesRequireMeshNormals() {
+    return _meshFeatures.Query().Any(f => f.normals);
+  }
+
+  protected virtual bool doesRequireUvChannel(UVChannelFlags channel) {
+    switch (channel) {
+      case UVChannelFlags.UV0:
+        return _meshFeatures.Query().Any(f => f.uv0);
+      case UVChannelFlags.UV1:
+        return _meshFeatures.Query().Any(f => f.uv1);
+      case UVChannelFlags.UV2:
+        return _meshFeatures.Query().Any(f => f.uv2);
+      case UVChannelFlags.UV3:
+        return _meshFeatures.Query().Any(f => f.uv3) ||
+               _blendShapeFeatures.Count != 0 ||
+               _tintFeatures.Count != 0;
+      default:
+        throw new ArgumentException("Invalid channel argument.");
     }
   }
 
