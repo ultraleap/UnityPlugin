@@ -76,7 +76,7 @@ public class ProceduralPanel : ProceduralMeshSource {
 
     for (int vy = 0; vy < vertsY - 1; vy++) {
       for (int vx = 0; vx < vertsX - 1; vx++) {
-        int vertIndex = vy * vertsY + vx;
+        int vertIndex = vy * vertsX + vx;
 
         tris.Add(vertIndex);
         tris.Add(vertIndex + 1);
@@ -112,7 +112,7 @@ public class ProceduralPanel : ProceduralMeshSource {
       } else if (dv == (vertCount - 2)) {
         return size - border1;
       } else {
-        return ((dv - 1.0f) / (vertCount - 2.0f)) * (size - border0 - border1) + border0;
+        return ((dv - 1.0f) / (vertCount - 3.0f)) * (size - border0 - border1) + border0;
       }
     } else {
       return (dv / (vertCount - 1.0f)) * size;

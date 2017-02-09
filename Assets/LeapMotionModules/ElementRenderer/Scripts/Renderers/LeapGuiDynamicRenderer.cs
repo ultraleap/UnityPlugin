@@ -159,6 +159,10 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
     base.buildElement();
   }
 
+  protected override bool doesRequireSpecialUv3() {
+    return true;
+  }
+
   protected override Vector3 elementVertToMeshVert(Vector3 vertex) {
     return vertex;
   }
