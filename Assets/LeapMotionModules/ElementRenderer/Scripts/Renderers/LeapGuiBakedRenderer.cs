@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.Rendering;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Sprites;
 #endif
 using Leap.Unity.Query;
-using Leap.Unity.Attributes;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Baked")]
@@ -135,17 +133,17 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
 
   public override void OnUpdateRenderer() {
     if (gui.space is LeapGuiRectSpace) {
-      Profiler.BeginSample("Build Array");
-      _rect_elementPositions.Clear();
-      foreach (var element in gui.elements) {
-        var guiSpace = transform.InverseTransformPoint(element.transform.position);
-        _rect_elementPositions.Add(guiSpace);
+      using (new ProfilerSample("Build Array")) {
+        _rect_elementPositions.Clear();
+        foreach (var element in gui.elements) {
+          var guiSpace = transform.InverseTransformPoint(element.transform.position);
+          _rect_elementPositions.Add(guiSpace);
+        }
       }
-      Profiler.EndSample();
 
-      Profiler.BeginSample("Upload Array");
-      _material.SetVectorArray(RECT_POSITIONS, _rect_elementPositions);
-      Profiler.EndSample();
+      using (new ProfilerSample("Upload Array")) {
+        _material.SetVectorArray(RECT_POSITIONS, _rect_elementPositions);
+      }
     } else if (gui.space is LeapGuiCylindricalSpace) {
       var cylindricalSpace = gui.space as LeapGuiCylindricalSpace;
 
@@ -184,9 +182,9 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
       }
     }
 
-    Profiler.BeginSample("Draw Mesh");
-    Graphics.DrawMesh(_bakedMesh, gui.transform.localToWorldMatrix, _material, 0);
-    Profiler.EndSample();
+    using (new ProfilerSample("Draw Mesh")) {
+      Graphics.DrawMesh(_bakedMesh, gui.transform.localToWorldMatrix, _material, 0);
+    }
   }
 
   public override void OnEnableRendererEditor() {
@@ -207,45 +205,25 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
     _bakedMesh.Clear();
 
     if (gui.GetSupportedFeatures(_meshFeatures)) {
-      Profiler.BeginSample("Refresh Meshes");
       refreshMeshData();
-      Profiler.EndSample();
-
-      Profiler.BeginSample("Bake Verts");
       bakeVerts();
-      Profiler.EndSample();
-
-      Profiler.BeginSample("Bake Colors");
       bakeColors();
-      Profiler.EndSample();
     }
 
     if (gui.GetSupportedFeatures(_textureFeatures)) {
-      Profiler.BeginSample("Pack Textures");
       packTextures();
-      Profiler.EndSample();
     }
 
     if (gui.GetSupportedFeatures(_spriteFeatures)) {
       Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
-
-      Profiler.BeginSample("Extract Sprite Rects");
       extractSpriteRects();
-      Profiler.EndSample();
-
-      Profiler.BeginSample("Upload Sprite Textures");
       uploadSpriteTextures();
-      Profiler.EndSample();
     }
-
-    Profiler.BeginSample("Bake Uvs");
+    
     bakeUvs();
-    Profiler.EndSample();
 
     if (doesNeedUv3()) {
-      Profiler.BeginSample("Bake Uv3");
       bakeUv3();
-      Profiler.EndSample();
     }
 
     if (gui.features.Query().Any(f => f is LeapGuiTintFeature)) {
@@ -294,9 +272,11 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   }
 
   private void refreshMeshData() {
-    foreach (var meshFeature in _meshFeatures) {
-      foreach (var meshData in meshFeature.data) {
-        meshData.RefreshMeshData();
+    using (new ProfilerSample("Refresh Mesh Data")) {
+      foreach (var meshFeature in _meshFeatures) {
+        foreach (var meshData in meshFeature.data) {
+          meshData.RefreshMeshData();
+        }
       }
     }
   }
@@ -304,202 +284,216 @@ public class LeapGuiBakedRenderer : LeapGuiRenderer,
   private List<Vector3> _tempVertList = new List<Vector3>();
   private List<int> _tempTriList = new List<int>();
   private void bakeVerts() {
-    _tempVertList.Clear();
-    _tempTriList.Clear();
+    using (new ProfilerSample("Bake Verts")) {
+      _tempVertList.Clear();
+      _tempTriList.Clear();
 
-    foreach (var meshFeature in _meshFeatures) {
-      foreach (var data in meshFeature.data) {
-        if (data.mesh == null) continue;
+      foreach (var meshFeature in _meshFeatures) {
+        foreach (var data in meshFeature.data) {
+          if (data.mesh == null) continue;
 
-        var topology = MeshCache.GetTopology(data.mesh);
+          var topology = MeshCache.GetTopology(data.mesh);
 
-        int vertOffset = _tempVertList.Count;
-        for (int i = 0; i < topology.tris.Length; i++) {
-          _tempTriList.Add(topology.tris[i] + vertOffset);
-        }
+          int vertOffset = _tempVertList.Count;
+          for (int i = 0; i < topology.tris.Length; i++) {
+            _tempTriList.Add(topology.tris[i] + vertOffset);
+          }
 
-        for (int i = 0; i < topology.verts.Length; i++) {
-          _tempVertList.Add(elementVertToBakedVert(data.element, topology.verts[i]));
+          for (int i = 0; i < topology.verts.Length; i++) {
+            _tempVertList.Add(elementVertToBakedVert(data.element, topology.verts[i]));
+          }
         }
       }
-    }
 
-    _bakedMesh.SetVertices(_tempVertList);
-    _bakedMesh.SetTriangles(_tempTriList, 0);
+      _bakedMesh.SetVertices(_tempVertList);
+      _bakedMesh.SetTriangles(_tempTriList, 0);
+    }
   }
 
   private void bakeColors() {
-    //If no mesh feature wants colors, don't bake them!
-    if (!_meshFeatures.Query().Any(f => f.color)) {
-      return;
-    }
+    using (new ProfilerSample("Bake Colors")) {
+      //If no mesh feature wants colors, don't bake them!
+      if (!_meshFeatures.Query().Any(f => f.color)) {
+        return;
+      }
 
-    List<Color> colors = new List<Color>();
+      List<Color> colors = new List<Color>();
 
-    foreach (var feature in _meshFeatures) {
-      foreach (var data in feature.data) {
-        if (data.mesh == null) continue;
+      foreach (var feature in _meshFeatures) {
+        foreach (var data in feature.data) {
+          if (data.mesh == null) continue;
 
-        int vertexCount = data.mesh.vertexCount;
-        Color totalTint = data.tint * feature.tint;
+          int vertexCount = data.mesh.vertexCount;
+          Color totalTint = data.tint * feature.tint;
 
-        var vertexColors = data.mesh.colors;
-        if (vertexColors.Length != vertexCount) {
-          colors.Append(vertexCount, totalTint);
-        } else {
-          vertexColors.Query().Select(c => c * totalTint).AppendList(colors);
+          var vertexColors = data.mesh.colors;
+          if (vertexColors.Length != vertexCount) {
+            colors.Append(vertexCount, totalTint);
+          } else {
+            vertexColors.Query().Select(c => c * totalTint).AppendList(colors);
+          }
         }
       }
-    }
 
-    _bakedMesh.SetColors(colors);
-    _material.EnableKeyword(LeapGuiMeshFeature.COLORS_FEATURE);
+      _bakedMesh.SetColors(colors);
+      _material.EnableKeyword(LeapGuiMeshFeature.COLORS_FEATURE);
+    }
   }
 
   private void packTextures() {
-    Texture2D[] packedTextures;
-    PackUtil.DoPack(_textureFeatures, _atlasSettings,
-                out packedTextures,
-                out _packedRects);
+    using (new ProfilerSample("Pack Textures")) {
+      Texture2D[] packedTextures;
+      PackUtil.DoPack(_textureFeatures, _atlasSettings,
+                  out packedTextures,
+                  out _packedRects);
 
-    for (int i = 0; i < _textureFeatures.Count; i++) {
-      _material.SetTexture(_textureFeatures[i].propertyName, packedTextures[i]);
+      for (int i = 0; i < _textureFeatures.Count; i++) {
+        _material.SetTexture(_textureFeatures[i].propertyName, packedTextures[i]);
+      }
     }
   }
 
   private void extractSpriteRects() {
-    if (_packedRects == null) {
-      _packedRects = new Dictionary<UVChannelFlags, Rect[]>();
-    }
+    using (new ProfilerSample("Extract Sprite Rects")) {
+      if (_packedRects == null) {
+        _packedRects = new Dictionary<UVChannelFlags, Rect[]>();
+      }
 
-    foreach (var spriteFeature in _spriteFeatures) {
-      var rects = new Rect[gui.elements.Count];
-      _packedRects[spriteFeature.channel] = rects;
+      foreach (var spriteFeature in _spriteFeatures) {
+        var rects = new Rect[gui.elements.Count];
+        _packedRects[spriteFeature.channel] = rects;
 
-      for (int i = 0; i < spriteFeature.data.Count; i++) {
-        var dataObj = spriteFeature.data[i];
-        var sprite = dataObj.sprite;
-        if (sprite == null) continue;
+        for (int i = 0; i < spriteFeature.data.Count; i++) {
+          var dataObj = spriteFeature.data[i];
+          var sprite = dataObj.sprite;
+          if (sprite == null) continue;
 
-        Vector2[] uvs = SpriteUtility.GetSpriteUVs(sprite, getAtlasData: true);
-        float minX, minY, maxX, maxY;
-        minX = maxX = uvs[0].x;
-        minY = maxY = uvs[0].y;
+          Vector2[] uvs = SpriteUtility.GetSpriteUVs(sprite, getAtlasData: true);
+          float minX, minY, maxX, maxY;
+          minX = maxX = uvs[0].x;
+          minY = maxY = uvs[0].y;
 
-        for (int j = 1; j < uvs.Length; j++) {
-          minX = Mathf.Min(minX, uvs[j].x);
-          minY = Mathf.Min(minY, uvs[j].y);
-          maxX = Mathf.Max(maxX, uvs[j].x);
-          maxY = Mathf.Max(maxY, uvs[j].y);
+          for (int j = 1; j < uvs.Length; j++) {
+            minX = Mathf.Min(minX, uvs[j].x);
+            minY = Mathf.Min(minY, uvs[j].y);
+            maxX = Mathf.Max(maxX, uvs[j].x);
+            maxY = Mathf.Max(maxY, uvs[j].y);
+          }
+
+          rects[i] = Rect.MinMaxRect(minX, minY, maxX, maxY);
         }
-
-        rects[i] = Rect.MinMaxRect(minX, minY, maxX, maxY);
       }
     }
   }
 
   private void uploadSpriteTextures() {
-    foreach (var spriteFeature in _spriteFeatures) {
-      var tex = spriteFeature.data.Query().
-                                   Select(d => d.sprite).
-                                   Where(s => s != null).
-                                   Select(s => {
+    using (new ProfilerSample("Upload Sprite Textures")) {
+      foreach (var spriteFeature in _spriteFeatures) {
+        var tex = spriteFeature.data.Query().
+                                     Select(d => d.sprite).
+                                     Where(s => s != null).
+                                     Select(s => {
 #if UNITY_EDITOR
-                                     return SpriteUtility.GetSpriteTexture(s, getAtlasData: true);
+                                       return SpriteUtility.GetSpriteTexture(s, getAtlasData: true);
 #else
                                      return s.texture;
 #endif
 
-                                   }).
-                                   FirstOrDefault();
+                                     }).
+                                     FirstOrDefault();
 
-      if (tex != null) {
-        _material.SetTexture(spriteFeature.propertyName, tex);
+        if (tex != null) {
+          _material.SetTexture(spriteFeature.propertyName, tex);
+        }
       }
     }
   }
 
   private void bakeUvs() {
-    var uvs = new Dictionary<UVChannelFlags, List<Vector4>>();
+    using (new ProfilerSample("Bake Uvs")) {
+      var uvs = new Dictionary<UVChannelFlags, List<Vector4>>();
 
-    //Build up uv dictionary 
-    foreach (var feature in _meshFeatures) {
-      foreach (var enabledChannel in feature.enabledUvChannels) {
-        if (!uvs.ContainsKey(enabledChannel)) {
-          uvs.Add(enabledChannel, new List<Vector4>());
-        }
-      }
-    }
-
-    //Extract uvs from feature data
-    List<Vector4> tempUvList = new List<Vector4>();
-    foreach (var feature in _meshFeatures) {
-      for (int elementIndex = 0; elementIndex < feature.data.Count; elementIndex++) {
-        var meshData = feature.data[elementIndex];
-        if (meshData.mesh == null) continue;
-
-        foreach (var pair in uvs) {
-          var channel = pair.Key;
-          meshData.mesh.GetUVsOrDefault(channel.Index(), tempUvList);
-
-          Rect[] atlasedUvs;
-          if (_packedRects != null &&
-              _packedRects.TryGetValue(channel, out atlasedUvs) &&
-              (meshData.remappableChannels & channel) != 0) {
-            MeshUtil.RemapUvs(tempUvList, atlasedUvs[elementIndex]);
+      //Build up uv dictionary 
+      foreach (var feature in _meshFeatures) {
+        foreach (var enabledChannel in feature.enabledUvChannels) {
+          if (!uvs.ContainsKey(enabledChannel)) {
+            uvs.Add(enabledChannel, new List<Vector4>());
           }
-
-          uvs[pair.Key].AddRange(tempUvList);
         }
       }
-    }
 
-    //Asign uvs to baked mesh
-    foreach (var pair in uvs) {
-      _bakedMesh.SetUVsAuto(pair.Key.Index(), pair.Value);
-      _material.EnableKeyword(LeapGuiMeshFeature.GetUvFeature(pair.Key));
+      //Extract uvs from feature data
+      List<Vector4> tempUvList = new List<Vector4>();
+      foreach (var feature in _meshFeatures) {
+        for (int elementIndex = 0; elementIndex < feature.data.Count; elementIndex++) {
+          var meshData = feature.data[elementIndex];
+          if (meshData.mesh == null) continue;
+
+          foreach (var pair in uvs) {
+            var channel = pair.Key;
+            meshData.mesh.GetUVsOrDefault(channel.Index(), tempUvList);
+
+            Rect[] atlasedUvs;
+            if (_packedRects != null &&
+                _packedRects.TryGetValue(channel, out atlasedUvs) &&
+                (meshData.remappableChannels & channel) != 0) {
+              MeshUtil.RemapUvs(tempUvList, atlasedUvs[elementIndex]);
+            }
+
+            uvs[pair.Key].AddRange(tempUvList);
+          }
+        }
+      }
+
+      //Asign uvs to baked mesh
+      foreach (var pair in uvs) {
+        _bakedMesh.SetUVsAuto(pair.Key.Index(), pair.Value);
+        _material.EnableKeyword(LeapGuiMeshFeature.GetUvFeature(pair.Key));
+      }
     }
   }
 
   private void bakeUv3() {
-    List<Vector4> uv3 = new List<Vector4>();
+    using (new ProfilerSample("Bake Uv3s")) {
+      List<Vector4> uv3 = new List<Vector4>();
 
-    foreach (var feature in _meshFeatures) {
-      for (int i = 0; i < feature.data.Count; i++) {
-        var meshData = feature.data[i];
-        if (meshData.mesh == null) continue;
+      foreach (var feature in _meshFeatures) {
+        for (int i = 0; i < feature.data.Count; i++) {
+          var meshData = feature.data[i];
+          if (meshData.mesh == null) continue;
 
-        uv3.Append(meshData.mesh.vertexCount, new Vector4(0, 0, 0, i));
-      }
-    }
-
-    gui.GetSupportedFeatures(_blendShapeFeatures);
-    var blendShape = _blendShapeFeatures.Query().FirstOrDefault();
-    if (blendShape != null) {
-      _material.EnableKeyword(LeapGuiBlendShapeFeature.FEATURE_NAME);
-
-      int vertIndex = 0;
-      for (int i = 0; i < blendShape.data.Count; i++) {
-        var mesh = blendShape.data[i].blendShape;
-        var element = gui.elements[i];
-
-        var shapeVerts = mesh.vertices;
-        for (int j = 0; j < shapeVerts.Length; j++) {
-          Vector3 shapeVert = shapeVerts[j];
-          Vector3 delta = elementVertToBakedVert(element, shapeVert) - _tempVertList[vertIndex];
-
-          Vector4 currUv3 = uv3[vertIndex];
-          currUv3.x = delta.x;
-          currUv3.y = delta.y;
-          currUv3.z = delta.z;
-          uv3[vertIndex] = currUv3;
-
-          vertIndex++;
+          uv3.Append(meshData.mesh.vertexCount, new Vector4(0, 0, 0, i));
         }
       }
-    }
 
-    _bakedMesh.SetUVs(3, uv3);
+      gui.GetSupportedFeatures(_blendShapeFeatures);
+      var blendShape = _blendShapeFeatures.Query().FirstOrDefault();
+      if (blendShape != null) {
+        _material.EnableKeyword(LeapGuiBlendShapeFeature.FEATURE_NAME);
+
+        int vertIndex = 0;
+        for (int i = 0; i < blendShape.data.Count; i++) {
+          var mesh = blendShape.data[i].blendShape;
+          var element = gui.elements[i];
+
+          var shapeVerts = mesh.vertices;
+          for (int j = 0; j < shapeVerts.Length; j++) {
+            Vector3 shapeVert = shapeVerts[j];
+            Vector3 delta = elementVertToBakedVert(element, shapeVert) - _tempVertList[vertIndex];
+
+            Vector4 currUv3 = uv3[vertIndex];
+            currUv3.x = delta.x;
+            currUv3.y = delta.y;
+            currUv3.z = delta.z;
+            uv3[vertIndex] = currUv3;
+
+            vertIndex++;
+          }
+        }
+      }
+
+      _bakedMesh.SetUVs(3, uv3);
+    }
   }
 
   /// <summary>
