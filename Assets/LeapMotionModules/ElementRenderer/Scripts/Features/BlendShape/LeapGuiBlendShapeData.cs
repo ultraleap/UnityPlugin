@@ -85,9 +85,12 @@ public class LeapGuiBlendShapeData : LeapGuiElementData {
           _cachedBlendShape.name = "Generated Blend Shape Mesh";
         }
 
+        _cachedBlendShape.Clear();
         _cachedBlendShape.vertices = mesh.vertices.Query().
                                      Select(v => transformation.MultiplyPoint3x4(v)).
                                      ToArray();
+        _cachedBlendShape.triangles = mesh.triangles;
+
         return _cachedBlendShape;
       }
     }
