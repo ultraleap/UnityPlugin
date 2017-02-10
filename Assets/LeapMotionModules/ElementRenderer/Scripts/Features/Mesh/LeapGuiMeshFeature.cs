@@ -66,7 +66,11 @@ public class LeapGuiMeshFeature : LeapGuiFeature<LeapGuiMeshData> {
 
     line.SplitHorizontally(out left, out right);
     color = EditorGUI.ToggleLeft(left, "Color", color);
-    normals = EditorGUI.ToggleLeft(right, "Normals", normals);
+
+    using (new EditorGUI.DisabledGroupScope(true)) {
+      normals = EditorGUI.ToggleLeft(right, "Normals", normals);
+    }
+
     line = line.NextLine();
 
     if (color) {

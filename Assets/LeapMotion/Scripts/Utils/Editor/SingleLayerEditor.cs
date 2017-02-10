@@ -13,7 +13,7 @@ namespace Leap.Unity {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
       ensureLayersInitialized();
 
-      SerializedProperty layerProperty = property.FindPropertyRelative("layer");
+      SerializedProperty layerProperty = property.FindPropertyRelative("layerIndex");
 
       int index = _layerValues.IndexOf(layerProperty.intValue);
       if (index < 0) {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity;
 using Leap.Unity.Query;
 
 [AddComponentMenu("")]
@@ -10,7 +11,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   #region INSPECTOR FIELDS
 
   [SerializeField]
-  private LayerMask _layer;
+  private SingleLayer _layer = 0;
 
   [SerializeField]
   private MotionType _motionType = MotionType.Translation;
@@ -27,6 +28,15 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   private List<Vector4> _curved_elementParameters = new List<Vector4>();
 
   #endregion
+
+  protected override void OnValidate() {
+    base.OnValidate();
+
+    //Currently full motion is not supported
+    if (_motionType == MotionType.Full) {
+      _motionType = MotionType.Translation;
+    }
+  }
 
   public enum MotionType {
     None,
@@ -74,7 +84,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
     using (new ProfilerSample("Draw Meshes")) {
       foreach (var mesh in _meshes) {
-        Graphics.DrawMesh(mesh, gui.transform.localToWorldMatrix, _material, 0);
+        Graphics.DrawMesh(mesh, gui.transform.localToWorldMatrix, _material, _layer);
       }
     }
   }
