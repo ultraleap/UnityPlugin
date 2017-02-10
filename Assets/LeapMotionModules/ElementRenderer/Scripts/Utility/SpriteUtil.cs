@@ -8,11 +8,11 @@ public static class SpriteAtlasUtil {
 
   public static Vector2[] GetAtlasedUvs(Sprite sprite) {
 #if UNITY_EDITOR
-    if (Application.isPlaying)
-      return getAtlasedUvsRuntime(sprite);
+    if (!Application.isPlaying)
+      return getAtlasedUvsEditor(sprite);
     else
 #endif
-      return getAtlasedUvsEditor(sprite);
+      return getAtlasedUvsRuntime(sprite);
   }
 
   private static Vector2[] getAtlasedUvsRuntime(Sprite sprite) {

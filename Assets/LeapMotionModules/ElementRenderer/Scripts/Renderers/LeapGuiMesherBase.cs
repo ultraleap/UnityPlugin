@@ -192,7 +192,9 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
       }
 
       if (_spriteFeatures.Count != 0) {
+#if UNITY_EDITOR
         Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+#endif
         extractSpriteRects();
         uploadSpriteTextures();
       }
@@ -275,7 +277,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
           var sprite = dataObj.sprite;
           if (sprite == null) continue;
 
-          Vector2[] uvs = SpriteUtility.GetSpriteUVs(sprite, getAtlasData: true);
+          Vector2[] uvs = SpriteAtlasUtil.GetAtlasedUvs(sprite);
           float minX, minY, maxX, maxY;
           minX = maxX = uvs[0].x;
           minY = maxY = uvs[0].y;
