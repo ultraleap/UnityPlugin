@@ -75,12 +75,12 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
     }
   }
 
-  protected override void doGenerationSetup() {
+  protected override void setupForBuilding() {
     if (_shader == null) {
       _shader = Shader.Find("LeapGui/Defaults/Dynamic");
     }
 
-    base.doGenerationSetup();
+    base.setupForBuilding();
 
     if (gui.space is LeapGuiCylindricalSpace) {
       _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);

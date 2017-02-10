@@ -89,12 +89,12 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     }
   }
 
-  protected override void doGenerationSetup() {
+  protected override void setupForBuilding() {
     if (_shader == null) {
       _shader = Shader.Find("LeapGui/Defaults/Baked");
     }
 
-    base.doGenerationSetup();
+    base.setupForBuilding();
 
     switch (_motionType) {
       case MotionType.Translation:

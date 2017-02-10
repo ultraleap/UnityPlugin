@@ -134,8 +134,8 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   }
 
   public override void OnUpdateRendererEditor() {
-    doGenerationSetup();
-    doMeshGeneration();
+    setupForBuilding();
+    buildMesh();
 
     //After editor generation step, trigger the normal runtime display logic
     OnUpdateRenderer();
@@ -146,8 +146,11 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
     foreach (var tintFeature in _tintFeatures) {
       if (!tintFeature.isDirty) continue;
 
-      tintFeature.data.Query().Select(d => d.tint).FillList(_tintColors);
-      _material.SetColorArray(TINTS_PROPERTY, _tintColors);
+
+      using (new ProfilerSample("Update Tinting")) {
+        tintFeature.data.Query().Select(d => d.tint).FillList(_tintColors);
+        _material.SetColorArray(TINTS_PROPERTY, _tintColors);
+      }
     }
   }
 
@@ -155,68 +158,74 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
     foreach (var blendShapeFeature in _blendShapeFeatures) {
       if (!blendShapeFeature.isDirty) continue;
 
-      blendShapeFeature.data.Query().Select(d => d.amount).FillList(_blendShapeAmounts);
-      _material.SetFloatArray(BLEND_SHAPE_AMOUNTS_PROPERTY, _blendShapeAmounts);
+      using (new ProfilerSample("Update Blend Shapes")) {
+        blendShapeFeature.data.Query().Select(d => d.amount).FillList(_blendShapeAmounts);
+        _material.SetFloatArray(BLEND_SHAPE_AMOUNTS_PROPERTY, _blendShapeAmounts);
+      }
     }
   }
   #endregion
 
   #region GENERATION SETUP
-  protected virtual void doGenerationSetup() {
-    loadAllSupportedFeatures();
-    prepareMeshes();
-    prepareMaterial();
+  protected virtual void setupForBuilding() {
+    using (new ProfilerSample("Mesh Setup")) {
+      loadAllSupportedFeatures();
+      prepareMeshes();
+      prepareMaterial();
 
-    if (_meshFeatures.Count != 0) {
-      if (_doesRequireColors) {
-        _material.EnableKeyword(LeapGuiMeshFeature.COLORS_FEATURE);
+      if (_meshFeatures.Count != 0) {
+        if (_doesRequireColors) {
+          _material.EnableKeyword(LeapGuiMeshFeature.COLORS_FEATURE);
+        }
+
+        if (_doesRequireNormals) {
+          _material.EnableKeyword(LeapGuiMeshFeature.NORMALS_FEATURE);
+        }
+
+        foreach (var channel in _requiredUvChannels) {
+          _material.EnableKeyword(LeapGuiMeshFeature.GetUvFeature(channel));
+        }
       }
 
-      if (_doesRequireNormals) {
-        _material.EnableKeyword(LeapGuiMeshFeature.NORMALS_FEATURE);
+      if (_textureFeatures.Count != 0) {
+        packTextures();
       }
 
-      foreach (var channel in _requiredUvChannels) {
-        _material.EnableKeyword(LeapGuiMeshFeature.GetUvFeature(channel));
+      if (_spriteFeatures.Count != 0) {
+        Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+        extractSpriteRects();
+        uploadSpriteTextures();
       }
-    }
 
-    if (_textureFeatures.Count != 0) {
-      packTextures();
-    }
+      if (_tintFeatures.Count != 0) {
+        _material.EnableKeyword(LeapGuiTintFeature.FEATURE_NAME);
+      }
 
-    if (_spriteFeatures.Count != 0) {
-      Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
-      extractSpriteRects();
-      uploadSpriteTextures();
-    }
-
-    if (_tintFeatures.Count != 0) {
-      _material.EnableKeyword(LeapGuiTintFeature.FEATURE_NAME);
-    }
-
-    if (_blendShapeFeatures.Count != 0) {
-      _material.EnableKeyword(LeapGuiBlendShapeFeature.FEATURE_NAME);
+      if (_blendShapeFeatures.Count != 0) {
+        _material.EnableKeyword(LeapGuiBlendShapeFeature.FEATURE_NAME);
+      }
     }
   }
 
   protected virtual void loadAllSupportedFeatures() {
-    gui.GetSupportedFeatures(_meshFeatures);
-    gui.GetSupportedFeatures(_textureFeatures);
-    gui.GetSupportedFeatures(_spriteFeatures);
-    gui.GetSupportedFeatures(_tintFeatures);
-    gui.GetSupportedFeatures(_blendShapeFeatures);
+    using (new ProfilerSample("Load All Supported Features")) {
+      gui.GetSupportedFeatures(_meshFeatures);
+      gui.GetSupportedFeatures(_textureFeatures);
+      gui.GetSupportedFeatures(_spriteFeatures);
+      gui.GetSupportedFeatures(_tintFeatures);
+      gui.GetSupportedFeatures(_blendShapeFeatures);
 
-    _doesRequireColors = doesRequireMeshColors();
-    _doesRequireNormals = doesRequireMeshNormals();
-    _doesRequireSpecialUv3 = doesRequireSpecialUv3();
+      _doesRequireColors = doesRequireMeshColors();
+      _doesRequireNormals = doesRequireMeshNormals();
+      _doesRequireSpecialUv3 = doesRequireSpecialUv3();
 
-    _requiredUvChannels.Clear();
-    foreach (var channel in MeshUtil.allUvChannels) {
-      if (channel == UVChannelFlags.UV3 && _doesRequireSpecialUv3) continue;
+      _requiredUvChannels.Clear();
+      foreach (var channel in MeshUtil.allUvChannels) {
+        if (channel == UVChannelFlags.UV3 && _doesRequireSpecialUv3) continue;
 
-      if (doesRequireUvChannel(channel)) {
-        _requiredUvChannels.Add(channel);
+        if (doesRequireUvChannel(channel)) {
+          _requiredUvChannels.Add(channel);
+        }
       }
     }
   }
@@ -318,97 +327,113 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   #endregion
 
   #region MESH GENERATION
-  protected virtual void doMeshGeneration() {
-    beginMesh();
-    for (_currIndex = 0; _currIndex < gui.elements.Count; _currIndex++) {
-      _currElement = gui.elements[_currIndex];
-      buildElement();
+  protected virtual void buildMesh() {
+    using (new ProfilerSample("Build Mesh")) {
+      beginMesh();
+      for (_currIndex = 0; _currIndex < gui.elements.Count; _currIndex++) {
+        _currElement = gui.elements[_currIndex];
+        buildElement();
+      }
+      finishMesh();
     }
-    finishMesh();
   }
 
   protected virtual void buildElement() {
-    foreach (var meshFeature in _meshFeatures) {
-      var meshData = meshFeature.data[_currIndex];
+    using (new ProfilerSample("Build Element")) {
+      foreach (var meshFeature in _meshFeatures) {
+        var meshData = meshFeature.data[_currIndex];
 
-      refreshMeshData(meshData);
-      if (meshData.mesh == null) continue;
+        refreshMeshData(meshData);
+        if (meshData.mesh == null) continue;
 
-      buildTopology(meshData);
+        buildTopology(meshData);
 
-      if (_doesRequireColors) {
-        buildColors(meshFeature, meshData);
+        if (_doesRequireColors) {
+          buildColors(meshFeature, meshData);
+        }
+
+        foreach (var channel in _requiredUvChannels) {
+          buildUvs(channel, meshData);
+        }
+
+        if (_doesRequireSpecialUv3) {
+          buildSpecialUv3(meshData);
+        }
       }
 
-      foreach (var channel in _requiredUvChannels) {
-        buildUvs(channel, meshData);
+      foreach (var blendShapeFeature in _blendShapeFeatures) {
+        buildBlendShapes(blendShapeFeature.data[_currIndex]);
       }
-
-      if (_doesRequireSpecialUv3) {
-        buildSpecialUv3(meshData);
-      }
-    }
-
-    foreach (var blendShapeFeature in _blendShapeFeatures) {
-      buildBlendShapes(blendShapeFeature.data[_currIndex]);
     }
   }
 
   protected virtual void refreshMeshData(LeapGuiMeshData meshData) {
-    meshData.RefreshMeshData();
+    using (new ProfilerSample("Refresh Mesh Data")) {
+      meshData.RefreshMeshData();
+    }
   }
 
   protected virtual void buildTopology(LeapGuiMeshData meshData) {
-    var topology = MeshCache.GetTopology(meshData.mesh);
+    using (new ProfilerSample("Build Topology")) {
+      var topology = MeshCache.GetTopology(meshData.mesh);
 
-    int vertOffset = _verts.Count;
-    for (int i = 0; i < topology.tris.Length; i++) {
-      _tris.Add(topology.tris[i] + vertOffset);
-    }
+      int vertOffset = _verts.Count;
+      for (int i = 0; i < topology.tris.Length; i++) {
+        _tris.Add(topology.tris[i] + vertOffset);
+      }
 
-    for (int i = 0; i < topology.verts.Length; i++) {
-      _verts.Add(elementVertToMeshVert(topology.verts[i]));
+      for (int i = 0; i < topology.verts.Length; i++) {
+        _verts.Add(elementVertToMeshVert(topology.verts[i]));
+      }
     }
   }
 
   protected virtual void buildColors(LeapGuiMeshFeature feature, LeapGuiMeshData meshData) {
-    Color totalTint = feature.tint * meshData.tint;
-    MeshCache.GetColors(meshData.mesh).Query().Select(c => c * totalTint).AppendList(_colors);
+    using (new ProfilerSample("Build Colors")) {
+      Color totalTint = feature.tint * meshData.tint;
+      MeshCache.GetColors(meshData.mesh).Query().Select(c => c * totalTint).AppendList(_colors);
+    }
   }
 
   protected virtual void buildUvs(UVChannelFlags channel, LeapGuiMeshData meshData) {
-    var uvs = MeshCache.GetUvs(meshData.mesh, channel);
-    var targetList = _uvs[channel.Index()];
+    using (new ProfilerSample("Build Uvs")) {
+      var uvs = MeshCache.GetUvs(meshData.mesh, channel);
+      var targetList = _uvs[channel.Index()];
 
-    targetList.AddRange(uvs);
+      targetList.AddRange(uvs);
 
-    Rect[] atlasedUvs;
-    if (_packedRects != null &&
-       _packedRects.TryGetValue(channel, out atlasedUvs) &&
-       (meshData.remappableChannels & channel) != 0) {
-      MeshUtil.RemapUvs(targetList, atlasedUvs[_currIndex], uvs.Count);
+      Rect[] atlasedUvs;
+      if (_packedRects != null &&
+         _packedRects.TryGetValue(channel, out atlasedUvs) &&
+         (meshData.remappableChannels & channel) != 0) {
+        MeshUtil.RemapUvs(targetList, atlasedUvs[_currIndex], uvs.Count);
+      }
     }
   }
 
   protected virtual void buildSpecialUv3(LeapGuiMeshData meshData) {
-    _uvs[3].Append(meshData.mesh.vertexCount, new Vector4(0, 0, 0, _currIndex));
+    using (new ProfilerSample("Build Special Uv3")) {
+      _uvs[3].Append(meshData.mesh.vertexCount, new Vector4(0, 0, 0, _currIndex));
+    }
   }
 
   protected virtual void buildBlendShapes(LeapGuiBlendShapeData blendShapeData) {
-    var shape = blendShapeData.blendShape;
+    using (new ProfilerSample("Build Blend Shapes")) {
+      var shape = blendShapeData.blendShape;
 
-    int offset = _verts.Count - shape.vertexCount;
+      int offset = _verts.Count - shape.vertexCount;
 
-    var verts = shape.vertices;
-    for (int i = 0; i < verts.Length; i++) {
-      Vector3 shapeVert = verts[i];
-      Vector3 delta = blendShapeDelta(shapeVert, _verts[i + offset]);
+      var verts = shape.vertices;
+      for (int i = 0; i < verts.Length; i++) {
+        Vector3 shapeVert = verts[i];
+        Vector3 delta = blendShapeDelta(shapeVert, _verts[i + offset]);
 
-      Vector4 currUv = _uvs[3][i + offset];
-      currUv.x = delta.x;
-      currUv.y = delta.y;
-      currUv.z = delta.z;
-      _uvs[3][i + offset] = currUv;
+        Vector4 currUv = _uvs[3][i + offset];
+        currUv.x = delta.x;
+        currUv.y = delta.y;
+        currUv.z = delta.z;
+        _uvs[3][i + offset] = currUv;
+      }
     }
   }
 
