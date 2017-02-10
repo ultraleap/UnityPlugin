@@ -402,7 +402,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
     var verts = shape.vertices;
     for (int i = 0; i < verts.Length; i++) {
       Vector3 shapeVert = verts[i];
-      Vector3 delta = elementVertToMeshVert(shapeVert) - _verts[i + offset];
+      Vector3 delta = blendShapeDelta(shapeVert, _verts[i + offset]);
 
       Vector4 currUv = _uvs[3][i + offset];
       currUv.x = delta.x;
@@ -410,6 +410,10 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
       currUv.z = delta.z;
       _uvs[3][i + offset] = currUv;
     }
+  }
+
+  protected virtual Vector3 blendShapeDelta(Vector3 shapeVert, Vector3 originalVert) {
+    return elementVertToMeshVert(shapeVert) - originalVert;
   }
 
   protected virtual void beginMesh() {

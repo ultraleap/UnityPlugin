@@ -8,7 +8,6 @@
     Blend SrcAlpha OneMinusSrcAlpha
     ZTest On
     ZWrite Off
-    Cull Off
 
     Pass {
       CGPROGRAM

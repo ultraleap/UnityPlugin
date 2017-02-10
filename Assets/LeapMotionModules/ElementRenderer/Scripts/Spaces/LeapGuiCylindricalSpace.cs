@@ -35,23 +35,8 @@ public class LeapGuiCylindricalSpace : LeapGuiRadialSpace, ISupportsAddRemove {
     //refreshElementData(root, root);
   }
 
-  public override ITransformer GetAnchorTransformer(Transform anchor) {
+  public override ITransformer GetTransformer(Transform anchor) {
     return _transformerData[anchor];
-  }
-
-  public override ITransformer GetLocalTransformer(LeapGuiElement element) {
-    Vector3 elementGuiPos = gui.transform.InverseTransformPoint(element.transform.position);
-    Vector3 anchorGuiPos = gui.transform.InverseTransformPoint(element.anchor.position);
-    Vector3 delta = elementGuiPos - anchorGuiPos;
-
-    Transformer anchor = _transformerData[element.anchor];
-
-    return new Transformer() {
-      angleOffset = anchor.angleOffset + delta.x / anchor.radiusOffset,
-      heightOffset = anchor.heightOffset + delta.y,
-      radiusOffset = anchor.radiusOffset + delta.z,
-      radiansPerMeter = 1.0f / anchor.radiusOffset
-    };
   }
 
   private void refreshElementData(Transform root, Transformer curr) {
@@ -128,11 +113,37 @@ public class LeapGuiCylindricalSpace : LeapGuiRadialSpace, ISupportsAddRemove {
       throw new NotImplementedException();
     }
 
-    public Vector4 GetVectorRepresentation() {
-      return new Vector4(angleOffset,
-                         heightOffset,
-                         radiusOffset,
-                         radiansPerMeter);
+    public Matrix4x4 GetTransformationMatrix(Vector3 localRectPos) {
+      Vector3 anchorDelta;
+
+      Vector3 anchorGuiPos = space.gui.transform.InverseTransformPoint(anchor.position);
+      anchorDelta = localRectPos - anchorGuiPos;
+
+      float angle = angleOffset + anchorDelta.x / radiusOffset;
+      float height = heightOffset + anchorDelta.y;
+      float radius = radiusOffset + anchorDelta.z;
+
+      Vector3 position;
+      position.x = Mathf.Sin(angle) * radius;
+      position.y = height;
+      position.z = Mathf.Cos(angle) * radius - space.radius;
+
+      Quaternion rotation = Quaternion.Euler(0, angle * Mathf.Rad2Deg, 0);
+
+      return Matrix4x4.TRS(position, rotation, Vector3.one);
+    }
+
+    public Vector4 GetVectorRepresentation(LeapGuiElement element) {
+      Vector3 elementGuiPos = space.gui.transform.InverseTransformPoint(element.transform.position);
+      Vector3 anchorGuiPos = space.gui.transform.InverseTransformPoint(anchor.position);
+      Vector3 delta = elementGuiPos - anchorGuiPos;
+
+      Vector4 rep;
+      rep.x = angleOffset + delta.x / radiusOffset;
+      rep.y = heightOffset + delta.y;
+      rep.z = radiusOffset + delta.z;
+      rep.w = 1.0f / radiusOffset;
+      return rep;
     }
   }
 }

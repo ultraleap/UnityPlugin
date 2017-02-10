@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("")]
@@ -12,15 +13,12 @@ public class LeapGuiRectSpace : LeapGuiSpace, ISupportsAddRemove {
   public override void BuildElementData(Transform root) { }
   public override void RefreshElementData(Transform root) { }
 
-  public override ITransformer GetAnchorTransformer(Transform anchor) {
-    return _transformer;
-  }
-
-  public override ITransformer GetLocalTransformer(LeapGuiElement element) {
+  public override ITransformer GetTransformer(Transform anchor) {
     return _transformer;
   }
 
   public struct Transformer : ITransformer {
+
     public Vector3 InverseTransformDirection(Vector3 direction) {
       return direction;
     }
@@ -43,6 +41,10 @@ public class LeapGuiRectSpace : LeapGuiSpace, ISupportsAddRemove {
 
     public Quaternion TransformRotation(Quaternion localRectRot) {
       return localRectRot;
+    }
+
+    public Matrix4x4 GetTransformationMatrix(Vector3 localRectPos) {
+      return Matrix4x4.identity;
     }
   }
 }

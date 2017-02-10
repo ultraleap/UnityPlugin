@@ -7,6 +7,6 @@ public abstract class LeapGuiRadialSpace : LeapGuiSpace {
   public float radius = 1;
 
   public interface IRadialTransformer {
-    Vector4 GetVectorRepresentation();
+    Vector4 GetVectorRepresentation(LeapGuiElement element);
   }
 }

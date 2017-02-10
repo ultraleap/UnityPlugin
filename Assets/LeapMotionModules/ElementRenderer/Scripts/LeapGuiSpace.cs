@@ -31,6 +31,12 @@ public interface ITransformer {
   /// Transform a direction from gui-local gui space to gui-local rect space.
   /// </summary>
   Vector3 InverseTransformDirection(Vector3 direction);
+
+  /// <summary>
+  /// Get a transformation matrix that maps a position in local rect space 
+  /// to a position in local gui space.
+  /// </summary>
+  Matrix4x4 GetTransformationMatrix(Vector3 localRectPos);
 }
 
 public abstract class LeapGuiSpace : LeapGuiComponentBase<LeapGui> {
@@ -54,10 +60,5 @@ public abstract class LeapGuiSpace : LeapGuiComponentBase<LeapGui> {
   /// <summary>
   /// 
   /// </summary>
-  public abstract ITransformer GetAnchorTransformer(Transform anchor);
-
-  /// <summary>
-  /// 
-  /// </summary>
-  public abstract ITransformer GetLocalTransformer(LeapGuiElement element);
+  public abstract ITransformer GetTransformer(Transform anchor);
 }

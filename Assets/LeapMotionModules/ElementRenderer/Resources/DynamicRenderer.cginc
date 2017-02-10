@@ -17,17 +17,15 @@ float4x4 _LeapGui_GuiToWorld;
 #define LEAP_GUI_WARPING
 #include "Assets/LeapMotionModules/ElementRenderer/Resources/CylindricalSpace.cginc"
 
-float4x4 _LeapGuiCylindrical_WorldToAnchor[ELEMENT_MAX];
-float4 _LeapGuiCylindrical_ElementParameters[ELEMENT_MAX];
+float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
 float4x4 _LeapGui_LocalToWorld;
 
-void ApplyGuiWarping(inout float4 vert, int elementId) {
-  vert = mul(_LeapGuiCylindrical_WorldToAnchor[elementId], vert);
+void ApplyGuiWarping(inout float4 anchorSpaceVert, int elementId) {
+  float4 parameters = _LeapGuiCurved_ElementParameters[elementId];
 
-  float4 parameters = _LeapGuiCylindrical_ElementParameters[elementId];
-  Cylindrical_LocalToWorld(vert.xyz, parameters);
+  Cylindrical_LocalToWorld(anchorSpaceVert.xyz, parameters);
 
-  vert = mul(_LeapGui_LocalToWorld, vert);
+  anchorSpaceVert = mul(_LeapGui_LocalToWorld, vert);
 }
 #endif
 
@@ -35,17 +33,15 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 #define LEAP_GUI_WARPING
 #include "Assets/LeapMotionModules/ElementRenderer/Resources/SphericalSpace.cginc"
 
-float4x4 _LeapGuiSpherical_WorldToAnchor[ELEMENT_MAX];
-float4 _LeapGuiSpherical_ElementParameters[ELEMENT_MAX];
+float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
 float4x4 _LeapGui_LocalToWorld;
 
-void ApplyGuiWarping(inout float4 vert, int elementId) {
-  vert = mul(_LeapGuiSpherical_WorldToAnchor[elementId], vert);
+void ApplyGuiWarping(inout float4 anchorSpaceVert, int elementId) {
+  float4 parameters = _LeapGuiCurved_ElementParameters[elementId];
 
-  float4 parameters = _LeapGuiSpherical_ElementParameters[elementId];
-  Spherical_LocalToWorld(vert.xyz, parameters);
+  Spherical_LocalToWorld(anchorSpaceVert.xyz, parameters);
 
-  vert = mul(_LeapGui_LocalToWorld, vert);
+  anchorSpaceVert = mul(_LeapGui_LocalToWorld, anchorSpaceVert);
 }
 
 #endif
@@ -53,6 +49,9 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 #ifdef LEAP_GUI_WARPING
 #ifndef GUI_ELEMENTS_HAVE_ID
 #define GUI_ELEMENTS_HAVE_ID
+#endif
+#ifndef GUI_ELEMENTS_NEED_ANCHOR_SPACE
+#define GUI_ELEMENTS_NEED_ANCHOR_SPACE
 #endif
 #endif
 
@@ -91,6 +90,9 @@ float4 GetElementTint(int elementId) {
 #ifndef GUI_ELEMENTS_HAVE_ID
 #define GUI_ELEMENTS_HAVE_ID
 #endif
+#ifndef GUI_ELEMENTS_NEED_ANCHOR_SPACE
+#define GUI_ELEMENTS_NEED_ANCHOR_SPACE
+#endif
 
 float _LeapGuiBlendShapeAmounts[ELEMENT_MAX];
 
@@ -103,6 +105,10 @@ void ApplyBlendShapes(inout float4 vert, float4 uv3, int elementId) {
 #ifndef GUI_ELEMENTS_HAVE_COLOR
 #define GUI_ELEMENTS_HAVE_COLOR
 #endif
+#endif
+
+#ifdef GUI_ELEMENTS_NEED_ANCHOR_SPACE
+float4x4 _LeapGuiCurved_WorldToAnchor[ELEMENT_MAX];
 #endif
 
 struct appdata_gui_dynamic {
@@ -162,19 +168,24 @@ v2f_gui_dynamic ApplyDynamicGui(appdata_gui_dynamic v) {
   int elementId = v.vertInfo.w;
 #endif
 
+#ifdef GUI_ELEMENTS_NEED_ANCHOR_SPACE
+  v.vertex = mul(unity_ObjectToWorld, v.vertex);
+  v.vertex = mul(_LeapGuiCurved_WorldToAnchor[elementId], v.vertex);
+#endif
+
 #ifdef LEAP_GUI_BLEND_SHAPES
   ApplyBlendShapes(v.vertex, v.vertInfo, elementId);
 #endif
 
-  v2f_gui_dynamic o;
-
 #ifdef LEAP_GUI_WARPING
-  v.vertex = mul(unity_ObjectToWorld, v.vertex);
-  //v.vertex = mul(_LeapGuiCylindrical_WorldToAnchor[elementId], v.vertex);
   ApplyGuiWarping(v.vertex, elementId);
+#endif
+
+  v2f_gui_dynamic o;
+#ifdef GUI_ELEMENTS_NEED_ANCHOR_SPACE
   o.vertex = mul(UNITY_MATRIX_VP, v.vertex);
 #else
-  o.vertex = UnityObjectToClipPos (v.vertex);
+  o.vertex = UnityObjectToClipPos(v.vertex);
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_0
