@@ -6,6 +6,9 @@ using Leap.Unity;
 public class LeapGuiBlendShapeDataEditor : CustomEditorBase {
   protected override void OnEnable() {
     base.OnEnable();
+
+    if (target == null) return;
+
     dontShowScriptField();
 
     specifyConditionalDrawing("_type", (int)LeapGuiBlendShapeData.BlendShapeType.Translation, "_translation");
