@@ -37,6 +37,7 @@ public class LeapGuiBlendShapeData : LeapGuiElementData {
       return _amount;
     }
     set {
+      feature.isDirty = true;
       _amount = value;
     }
   }
