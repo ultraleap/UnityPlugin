@@ -72,12 +72,11 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
       var radialSpace = gui.space as LeapGuiRadialSpace;
 
       using (new ProfilerSample("Build Material Data")) {
-        gui.elements.Query().
-                     Select(e => {
-                       var t = radialSpace.GetTransformer(e.anchor) as LeapGuiRadialSpace.IRadialTransformer;
-                       return t.GetVectorRepresentation(e);
-                     }).
-                     FillList(_curved_elementParameters);
+        _curved_elementParameters.Clear();
+        foreach (var element in gui.elements) {
+          var t = radialSpace.GetTransformer(element.anchor) as LeapGuiRadialSpace.IRadialTransformer;
+          _curved_elementParameters.Add(t.GetVectorRepresentation(element));
+        }
       }
 
       using (new ProfilerSample("Upload Material Data")) {

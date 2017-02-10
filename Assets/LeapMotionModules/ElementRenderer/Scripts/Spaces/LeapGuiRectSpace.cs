@@ -17,7 +17,7 @@ public class LeapGuiRectSpace : LeapGuiSpace, ISupportsAddRemove {
     return _transformer;
   }
 
-  public struct Transformer : ITransformer {
+  public class Transformer : ITransformer {
 
     public Vector3 InverseTransformDirection(Vector3 direction) {
       return direction;

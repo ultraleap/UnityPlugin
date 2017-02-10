@@ -282,6 +282,11 @@ public class LeapGui : MonoBehaviour {
     } else {
       doLateUpdateEditor();
     }
+
+    //Always rebuild picking meshes every frame when in editor
+    if (_space != null) {
+      rebuildEditorPickingMeshes();
+    }
 #else
     doLateUpdateRuntime();
 #endif
@@ -298,11 +303,12 @@ public class LeapGui : MonoBehaviour {
 
     if (_space != null) {
       _space.BuildElementData(transform);
-      rebuildPickingMeshes();
     }
 
     if (_renderer != null && _elements.Count != 0) {
-      _renderer.OnUpdateRendererEditor();
+      using (new ProfilerSample("Update Renderer")) {
+        _renderer.OnUpdateRendererEditor();
+      }
     }
   }
 #endif
@@ -323,7 +329,9 @@ public class LeapGui : MonoBehaviour {
     _space.BuildElementData(transform);
 
     if (_elements.Count != 0) {
-      _renderer.OnUpdateRenderer();
+      using (new ProfilerSample("Update Renderer")) {
+        _renderer.OnUpdateRenderer();
+      }
     }
 
     foreach (var feature in _features) {
@@ -519,7 +527,7 @@ public class LeapGui : MonoBehaviour {
   }
 
 #if UNITY_EDITOR
-  private void rebuildPickingMeshes() {
+  private void rebuildEditorPickingMeshes() {
     using (new ProfilerSample("Rebuild Picking Meshes")) {
       List<Vector3> pickingVerts = new List<Vector3>();
       List<int> pickingTris = new List<int>();

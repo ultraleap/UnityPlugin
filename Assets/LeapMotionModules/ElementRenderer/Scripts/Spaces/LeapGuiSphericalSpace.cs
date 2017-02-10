@@ -84,7 +84,7 @@ public class LeapGuiSphericalSpace : LeapGuiRadialSpace, ISupportsAddRemove {
     }
   }
 
-  public struct Transformer : ITransformer, IRadialTransformer {
+  public class Transformer : ITransformer, IRadialTransformer {
     public LeapGuiSphericalSpace space;
     public Transform anchor;
 
