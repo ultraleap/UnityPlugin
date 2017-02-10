@@ -272,7 +272,10 @@ namespace Leap.Unity.Graphing {
         endOfFrameTicks = newTicks;
 
         AddSample("Render Delta", GraphUnits.Miliseconds, _renderTicks);
-        AddSample("GPU Time", GraphUnits.Miliseconds, UnityEngine.VR.VRStats.gpuTimeLastFrame);
+
+        float gpuTime;
+        UnityEngine.VR.VRStats.TryGetGPUTimeLastFrame(out gpuTime);
+        AddSample("GPU Time", GraphUnits.Miliseconds, gpuTime);
 
         if (_provider != null) {
           AddSample("Tracking Latency", GraphUnits.Miliseconds, (_provider.GetLeapController().Now() - _provider.CurrentFrame.Timestamp) * 0.001f);
