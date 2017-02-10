@@ -253,6 +253,13 @@ public class LeapGui : MonoBehaviour {
     if (_space != null) {
       _space.gui = this;
     }
+    if (_renderer != null) {
+      _renderer.gui = this;
+    }
+
+    foreach (var feature in _features) {
+      feature.AssignFeatureReferences();
+    }
   }
 
   void OnEnable() {

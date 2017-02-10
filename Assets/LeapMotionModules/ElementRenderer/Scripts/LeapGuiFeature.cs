@@ -28,6 +28,7 @@ public abstract class LeapGuiFeatureBase : LeapGuiComponentBase<LeapGui> {
     return SupportInfo.FullSupport();
   }
 
+  public abstract void AssignFeatureReferences();
   public abstract void ClearDataObjectReferences();
   public abstract void AddDataObjectReference(LeapGuiElementData data);
   public abstract void AddDataObjectReference(LeapGuiElementData data, int index);
@@ -59,6 +60,12 @@ public abstract class LeapGuiFeature<DataType> : LeapGuiFeatureBase
   /// </summary>
   [HideInInspector]
   public List<DataType> data = new List<DataType>();
+
+  public override void AssignFeatureReferences() {
+    foreach (var dataObj in data) {
+      dataObj.feature = this;
+    }
+  }
 
   public override void ClearDataObjectReferences() {
     data.Clear();
