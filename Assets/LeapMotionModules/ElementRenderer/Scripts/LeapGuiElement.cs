@@ -162,7 +162,7 @@ public class LeapGuiElement : MonoBehaviour {
 #if UNITY_EDITOR
   void OnDrawGizmos() {
     if (_pickingMesh != null && _pickingMesh.vertexCount != 0) {
-      Gizmos.color = new Color(0, 0, 0, 0);
+      Gizmos.color = new Color(1, 0, 0, 0);
       Gizmos.DrawMesh(_pickingMesh);
     }
   }

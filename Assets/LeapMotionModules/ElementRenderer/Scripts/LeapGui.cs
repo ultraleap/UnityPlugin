@@ -508,7 +508,6 @@ public class LeapGui : MonoBehaviour {
 
 #if UNITY_EDITOR
   private void rebuildPickingMeshes() {
-    /*
     using (new ProfilerSample("Rebuild Picking Meshes")) {
       List<Vector3> pickingVerts = new List<Vector3>();
       List<int> pickingTris = new List<int>();
@@ -540,9 +539,10 @@ public class LeapGui : MonoBehaviour {
               pickingTris.Add(topology.tris[i] + pickingVerts.Count);
             }
 
+            ITransformer transformer = _space.GetTransformer(element.anchor);
             for (int i = 0; i < topology.verts.Length; i++) {
               Vector3 localRectVert = transform.InverseTransformPoint(element.transform.TransformPoint(topology.verts[i]));
-              pickingVerts.Add(_space.TransformPoint(element, localRectVert));
+              pickingVerts.Add(transformer.TransformPoint(localRectVert));
             }
           }
         }
@@ -552,7 +552,6 @@ public class LeapGui : MonoBehaviour {
         pickingMesh.RecalculateNormals();
       }
     }
-    */
   }
 #endif
   #endregion
