@@ -50,6 +50,17 @@ public abstract class LeapGuiElementData : LeapGuiComponentBase<LeapGuiElement> 
 
   [NonSerialized]
   public LeapGuiFeatureBase feature;
+
+  protected override void OnValidate() {
+    base.OnValidate();
+
+    //Feature is not serialized, so could totally be null in the editor right as
+    //the game starts.  Not an issue at runtime because OnValidate is not called
+    //at runtime.
+    if (feature != null) {
+      feature.isDirty = true;
+    }
+  }
 }
 
 public abstract class LeapGuiFeature<DataType> : LeapGuiFeatureBase
