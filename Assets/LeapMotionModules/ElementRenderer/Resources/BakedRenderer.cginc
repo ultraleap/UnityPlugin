@@ -56,10 +56,10 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 #define LEAP_GUI_WARPING
 #include "Assets/LeapMotionModules/ElementRenderer/Resources/SphericalSpace.cginc"
 
-float4 _LeapGuiSpherical_ElementParameters[ELEMENT_MAX];
+float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
 
 void ApplyGuiWarping(inout float4 vert, int elementId) {
-  float4 elementParams = _LeapGuiSpherical_ElementParameters[elementId];
+  float4 elementParams = _LeapGuiCurved_ElementParameters[elementId];
   Spherical_LocalToWorld(vert.xyz, elementParams);
 }
 #endif

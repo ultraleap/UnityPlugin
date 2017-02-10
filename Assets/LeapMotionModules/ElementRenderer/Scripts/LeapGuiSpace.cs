@@ -54,10 +54,10 @@ public abstract class LeapGuiSpace : LeapGuiComponentBase<LeapGui> {
   /// <summary>
   /// 
   /// </summary>
-  public abstract ITransformer GetTransformer(Transform anchor);
+  public abstract ITransformer GetAnchorTransformer(Transform anchor);
 
   /// <summary>
   /// 
   /// </summary>
-  public abstract ITransformer GetTransformer(LeapGuiElement element);
+  public abstract ITransformer GetLocalTransformer(LeapGuiElement element);
 }

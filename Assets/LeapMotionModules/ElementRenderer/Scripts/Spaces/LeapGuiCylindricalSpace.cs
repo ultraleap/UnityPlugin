@@ -35,11 +35,11 @@ public class LeapGuiCylindricalSpace : LeapGuiRadialSpace, ISupportsAddRemove {
     //refreshElementData(root, root);
   }
 
-  public override ITransformer GetTransformer(Transform anchor) {
+  public override ITransformer GetAnchorTransformer(Transform anchor) {
     return _transformerData[anchor];
   }
 
-  public override ITransformer GetTransformer(LeapGuiElement element) {
+  public override ITransformer GetLocalTransformer(LeapGuiElement element) {
     Vector3 elementGuiPos = gui.transform.InverseTransformPoint(element.transform.position);
     Vector3 anchorGuiPos = gui.transform.InverseTransformPoint(element.anchor.position);
     Vector3 delta = elementGuiPos - anchorGuiPos;

@@ -12,11 +12,11 @@ public class LeapGuiRectSpace : LeapGuiSpace, ISupportsAddRemove {
   public override void BuildElementData(Transform root) { }
   public override void RefreshElementData(Transform root) { }
 
-  public override ITransformer GetTransformer(Transform anchor) {
+  public override ITransformer GetAnchorTransformer(Transform anchor) {
     return _transformer;
   }
 
-  public override ITransformer GetTransformer(LeapGuiElement element) {
+  public override ITransformer GetLocalTransformer(LeapGuiElement element) {
     return _transformer;
   }
 

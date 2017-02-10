@@ -62,7 +62,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
       var radialSpace = gui.space as LeapGuiRadialSpace;
 
       gui.elements.Query().
-                   Select(e => radialSpace.GetTransformer(e)).
+                   Select(e => radialSpace.GetLocalTransformer(e)).
                    Cast<LeapGuiRadialSpace.IRadialTransformer>().
                    Select(t => t.GetVectorRepresentation()).
                    FillList(_curved_elementParameters);
@@ -97,8 +97,8 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     if (_motionType != MotionType.None) {
       if (gui.space is LeapGuiCylindricalSpace) {
         _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);
-        //} else if (gui.space is LeapGuiSphericalSpace) {
-        //  _material.EnableKeyword(LeapGuiSphericalSpace.FEATURE_NAME);
+        } else if (gui.space is LeapGuiSphericalSpace) {
+          _material.EnableKeyword(LeapGuiSphericalSpace.FEATURE_NAME);
       }
     }
   }
@@ -135,7 +135,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     Vector3 guiVert = gui.transform.InverseTransformPoint(worldVert);
     switch (_motionType) {
       case MotionType.None:
-        return gui.space.GetTransformer(_currElement.anchor).TransformPoint(guiVert);
+        return gui.space.GetAnchorTransformer(_currElement.anchor).TransformPoint(guiVert);
       case MotionType.Translation:
         return guiVert - gui.transform.InverseTransformPoint(_currElement.transform.position);
     }
