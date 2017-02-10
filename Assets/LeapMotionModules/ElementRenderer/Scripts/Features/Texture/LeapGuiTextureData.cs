@@ -3,7 +3,7 @@ using Leap.Unity.Query;
 
 public static class LeapGuiTextureExtensions {
   public static LeapGuiTextureData Texture(this LeapGuiElement element) {
-    return element.data.Query().FirstOrDefault(d => d is LeapGuiTextureData) as LeapGuiTextureData;
+    return element.data.Query().OfType<LeapGuiTextureData>().FirstOrDefault();
   }
 }
 

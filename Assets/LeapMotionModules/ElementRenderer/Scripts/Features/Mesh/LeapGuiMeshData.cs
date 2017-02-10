@@ -6,7 +6,7 @@ using Leap.Unity.Attributes;
 
 public static class LeapGuiMeshExtensions {
   public static LeapGuiMeshData Mesh(this LeapGuiElement element) {
-    return element.data.Query().FirstOrDefault(d => d is LeapGuiMeshData) as LeapGuiMeshData;
+    return element.data.Query().OfType<LeapGuiMeshData>().FirstOrDefault();
   }
 }
 

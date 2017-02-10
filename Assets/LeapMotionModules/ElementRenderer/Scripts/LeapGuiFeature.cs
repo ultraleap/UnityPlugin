@@ -46,6 +46,9 @@ public abstract class LeapGuiFeatureBase : LeapGuiComponentBase<LeapGui> {
 public abstract class LeapGuiElementData : LeapGuiComponentBase<LeapGuiElement> {
   [HideInInspector]
   public LeapGuiElement element;
+
+  [NonSerialized]
+  public LeapGuiFeatureBase feature;
 }
 
 public abstract class LeapGuiFeature<DataType> : LeapGuiFeatureBase

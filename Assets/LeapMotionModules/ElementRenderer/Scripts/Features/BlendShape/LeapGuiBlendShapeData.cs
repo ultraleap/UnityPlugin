@@ -5,7 +5,7 @@ using Leap.Unity.Attributes;
 
 public static class LeapGuiBlendShapeExtensions {
   public static LeapGuiBlendShapeData BlendShape(this LeapGuiElement element) {
-    return element.data.Query().FirstOrDefault(d => d is LeapGuiBlendShapeData) as LeapGuiBlendShapeData;
+    return element.data.Query().OfType<LeapGuiBlendShapeData>().FirstOrDefault();
   }
 }
 
