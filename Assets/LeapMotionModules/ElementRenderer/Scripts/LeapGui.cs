@@ -452,6 +452,11 @@ public class LeapGui : MonoBehaviour {
 
         element.OnAssignFeatureData(dataList);
       }
+
+      //Could be more efficient
+      foreach (var feature in _features) {
+        feature.AssignFeatureReferences();
+      }
     }
   }
 
