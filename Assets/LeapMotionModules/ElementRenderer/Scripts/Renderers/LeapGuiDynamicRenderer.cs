@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.Query;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Dynamic")]
@@ -40,37 +39,45 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
     base.OnUpdateRenderer();
 
     if (gui.space is LeapGuiRectSpace) {
-      for (int i = 0; i < gui.elements.Count; i++) {
-        Graphics.DrawMesh(_meshes[i], gui.elements[i].transform.localToWorldMatrix, _material, 0);
+      using (new ProfilerSample("Draw Meshes")) {
+        for (int i = 0; i < gui.elements.Count; i++) {
+          Graphics.DrawMesh(_meshes[i], gui.elements[i].transform.localToWorldMatrix, _material, 0);
+        }
       }
     } else if (gui.space is LeapGuiRadialSpace) {
       var curvedSpace = gui.space as LeapGuiRadialSpace;
 
-      _curved_worldToAnchor.Clear();
-      _curved_meshTransforms.Clear();
-      _curved_elementParameters.Clear();
-      for (int i = 0; i < _meshes.Count; i++) {
-        var element = gui.elements[i];
-        var transformer = curvedSpace.GetTransformer(element.anchor);
+      using (new ProfilerSample("Build Material Data")) {
+        _curved_worldToAnchor.Clear();
+        _curved_meshTransforms.Clear();
+        _curved_elementParameters.Clear();
+        for (int i = 0; i < _meshes.Count; i++) {
+          var element = gui.elements[i];
+          var transformer = curvedSpace.GetTransformer(element.anchor);
 
-        Vector3 guiLocalPos = gui.transform.InverseTransformPoint(element.transform.position);
+          Vector3 guiLocalPos = gui.transform.InverseTransformPoint(element.transform.position);
 
-        Matrix4x4 guiTransform = transformer.GetTransformationMatrix(guiLocalPos);
-        Matrix4x4 deform = transform.worldToLocalMatrix * Matrix4x4.TRS(transform.position - element.transform.position, Quaternion.identity, Vector3.one) * element.transform.localToWorldMatrix;
-        Matrix4x4 total = guiTransform * deform;
+          Matrix4x4 guiTransform = transformer.GetTransformationMatrix(guiLocalPos);
+          Matrix4x4 deform = transform.worldToLocalMatrix * Matrix4x4.TRS(transform.position - element.transform.position, Quaternion.identity, Vector3.one) * element.transform.localToWorldMatrix;
+          Matrix4x4 total = guiTransform * deform;
 
-        _curved_elementParameters.Add((transformer as LeapGuiRadialSpace.IRadialTransformer).GetVectorRepresentation(element));
-        _curved_meshTransforms.Add(total);
-        _curved_worldToAnchor.Add(guiTransform.inverse);
+          _curved_elementParameters.Add((transformer as LeapGuiRadialSpace.IRadialTransformer).GetVectorRepresentation(element));
+          _curved_meshTransforms.Add(total);
+          _curved_worldToAnchor.Add(guiTransform.inverse);
+        }
       }
 
-      _material.SetFloat(LeapGuiRadialSpace.RADIUS_PROPERTY, curvedSpace.radius);
-      _material.SetMatrixArray("_LeapGuiCurved_WorldToAnchor", _curved_worldToAnchor);
-      _material.SetMatrix("_LeapGui_LocalToWorld", transform.localToWorldMatrix);
-      _material.SetVectorArray("_LeapGuiCurved_ElementParameters", _curved_elementParameters);
+      using (new ProfilerSample("Upload Material Data")) {
+        _material.SetFloat(LeapGuiRadialSpace.RADIUS_PROPERTY, curvedSpace.radius);
+        _material.SetMatrixArray("_LeapGuiCurved_WorldToAnchor", _curved_worldToAnchor);
+        _material.SetMatrix("_LeapGui_LocalToWorld", transform.localToWorldMatrix);
+        _material.SetVectorArray("_LeapGuiCurved_ElementParameters", _curved_elementParameters);
+      }
 
-      for (int i = 0; i < _meshes.Count; i++) {
-        Graphics.DrawMesh(_meshes[i], _curved_meshTransforms[i], _material, 0);
+      using (new ProfilerSample("Draw Meshes")) {
+        for (int i = 0; i < _meshes.Count; i++) {
+          Graphics.DrawMesh(_meshes[i], _curved_meshTransforms[i], _material, 0);
+        }
       }
     }
   }

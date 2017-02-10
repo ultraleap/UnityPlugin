@@ -57,7 +57,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     base.OnUpdateRenderer();
 
     if (gui.space is LeapGuiRectSpace) {
-      using (new ProfilerSample("Build Array")) {
+      using (new ProfilerSample("Build Material Data")) {
         _rect_elementPositions.Clear();
         foreach (var element in gui.elements) {
           var guiSpace = transform.InverseTransformPoint(element.transform.position);
@@ -65,21 +65,25 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
         }
       }
 
-      using (new ProfilerSample("Upload Array")) {
+      using (new ProfilerSample("Upload Material Data")) {
         _material.SetVectorArray(RECT_POSITIONS, _rect_elementPositions);
       }
     } else if (gui.space is LeapGuiRadialSpace) {
       var radialSpace = gui.space as LeapGuiRadialSpace;
 
-      gui.elements.Query().
-                   Select(e => {
-                     var t = radialSpace.GetTransformer(e.anchor) as LeapGuiRadialSpace.IRadialTransformer;
-                     return t.GetVectorRepresentation(e);
-                   }).
-                   FillList(_curved_elementParameters);
+      using (new ProfilerSample("Build Material Data")) {
+        gui.elements.Query().
+                     Select(e => {
+                       var t = radialSpace.GetTransformer(e.anchor) as LeapGuiRadialSpace.IRadialTransformer;
+                       return t.GetVectorRepresentation(e);
+                     }).
+                     FillList(_curved_elementParameters);
+      }
 
-      _material.SetFloat(LeapGuiRadialSpace.RADIUS_PROPERTY, radialSpace.radius);
-      _material.SetVectorArray(CURVED_PARAMETERS, _curved_elementParameters);
+      using (new ProfilerSample("Upload Material Data")) {
+        _material.SetFloat(LeapGuiRadialSpace.RADIUS_PROPERTY, radialSpace.radius);
+        _material.SetVectorArray(CURVED_PARAMETERS, _curved_elementParameters);
+      }
     }
 
     using (new ProfilerSample("Draw Meshes")) {
