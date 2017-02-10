@@ -14,18 +14,6 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
   private List<Matrix4x4> _curved_worldToAnchor = new List<Matrix4x4>();
   private List<Matrix4x4> _curved_meshTransforms = new List<Matrix4x4>();
   private List<Vector4> _curved_elementParameters = new List<Vector4>();
-
-  //Cylindrical space
-  private const string CYLINDRICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementParameters";
-  private List<Matrix4x4> _cylindrical_worldToAnchor = new List<Matrix4x4>();
-  private List<Matrix4x4> _cylindrical_meshTransforms = new List<Matrix4x4>();
-  private List<Vector4> _cylindrical_elementParameters = new List<Vector4>();
-
-  //Spherical space
-  private const string SPHERICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Spherical_ElementParameters";
-  private List<Matrix4x4> _spherical_worldToAnchor = new List<Matrix4x4>();
-  private List<Matrix4x4> _spherical_meshTransforms = new List<Matrix4x4>();
-  private List<Vector4> _spherical_elementParameters = new List<Vector4>();
   #endregion
 
   public void OnAddElements(List<LeapGuiElement> elements, List<int> indexes) {
