@@ -4,13 +4,10 @@ using UnityEngine;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Cylindrical")]
-public class LeapGuiCylindricalSpace : LeapGuiSpace, ISupportsAddRemove {
+public class LeapGuiCylindricalSpace : LeapGuiRadialSpace, ISupportsAddRemove {
   public const string FEATURE_NAME = LeapGui.FEATURE_PREFIX + "CYLINDRICAL";
-  public const string RADIUS_PROPERTY = LeapGui.PROPERTY_PREFIX + "Cylindrical_Radius";
 
-  public float radius = 1;
-
-  private Dictionary<Transform, AnchorData> _anchorData = new Dictionary<Transform, AnchorData>();
+  private Dictionary<Transform, Transformer> _transformerData = new Dictionary<Transform, Transformer>();
 
   public void OnAddElements(List<LeapGuiElement> element, List<int> indexes) {
     BuildElementData(transform); //TODO, optimize
@@ -20,155 +17,122 @@ public class LeapGuiCylindricalSpace : LeapGuiSpace, ISupportsAddRemove {
     BuildElementData(transform); //TODO, optimize
   }
 
-  public AnchorData GetAnchorData(Transform anchor) {
-    return _anchorData[anchor];
-  }
-
-  public ElementParameters GetElementParameters(Transform anchor, Vector3 rectPosWorld) {
-    AnchorData anchorData;
-    Vector3 anchorDelta;
-
-    Vector3 guiPos = gui.transform.InverseTransformPoint(rectPosWorld);
-    Vector3 anchorGuiPos = gui.transform.InverseTransformPoint(anchor.transform.position);
-    anchorDelta = guiPos - anchorGuiPos;
-    anchorData = _anchorData[anchor];
-
-    float angleOffset = anchorData.anchorAngle + anchorDelta.x / anchorData.anchorRadius;
-    float heightOffset = anchorData.anchorHeight + anchorDelta.y;
-    float radiusOffset = anchorData.anchorRadius + anchorDelta.z;
-
-    ElementParameters parameters;
-    parameters.angleOffset = angleOffset;
-    parameters.radianPerMeter = 1.0f / anchorData.anchorRadius;
-    parameters.heightOffset = heightOffset;
-    parameters.radiusOffset = radiusOffset;
-
-    return parameters;
-  }
-
   public override void BuildElementData(Transform root) {
-    _anchorData.Clear();
-    _anchorData[root] = new AnchorData() {
-      anchorAngle = 0,
-      anchorHeight = 0,
-      anchorRadius = radius
-    };
+    _transformerData.Clear();
 
-    refreshElementData(root, root);
+    refreshElementData(root, new Transformer() {
+      space = this,
+      anchor = root,
+      angleOffset = 0,
+      heightOffset = 0,
+      radiusOffset = radius,
+      radiansPerMeter = 1.0f / radius
+    });
   }
 
   public override void RefreshElementData(Transform root) {
-    refreshElementData(root, root);
+    //TODO!
+    //refreshElementData(root, root);
   }
 
-  private void refreshElementData(Transform root, Transform parentAnchor) {
+  public override ITransformer GetTransformer(Transform anchor) {
+    return _transformerData[anchor];
+  }
+
+  public override ITransformer GetTransformer(LeapGuiElement element) {
+    Vector3 elementGuiPos = gui.transform.InverseTransformPoint(element.transform.position);
+    Vector3 anchorGuiPos = gui.transform.InverseTransformPoint(element.anchor.position);
+    Vector3 delta = elementGuiPos - anchorGuiPos;
+
+    Transformer anchor = _transformerData[element.anchor];
+
+    return new Transformer() {
+      angleOffset = anchor.angleOffset + delta.x / anchor.radiusOffset,
+      heightOffset = anchor.heightOffset + delta.y,
+      radiusOffset = anchor.radiusOffset + delta.z,
+      radiansPerMeter = 1.0f / anchor.radiusOffset
+    };
+  }
+
+  private void refreshElementData(Transform root, Transformer curr) {
+    _transformerData[curr.anchor] = curr;
+
     var anchorComponent = root.GetComponent<AnchorOfConstantSize>();
     if (anchorComponent != null && anchorComponent.enabled) {
-      Vector3 guiSpaceDelta;
-      AnchorData parentData;
-
       Vector3 guiPosition = gui.transform.InverseTransformPoint(root.position);
-      Vector3 guiAnchor = gui.transform.InverseTransformPoint(parentAnchor.position);
-      guiSpaceDelta = guiPosition - guiAnchor;
-      parentData = _anchorData[parentAnchor];
+      Vector3 guiAnchor = gui.transform.InverseTransformPoint(curr.anchor.position);
+      Vector3 guiSpaceDelta = guiPosition - guiAnchor;
 
-      AnchorData newData = parentData;
-      newData.anchorAngle += guiSpaceDelta.x / parentData.anchorRadius;
-      newData.anchorHeight += guiSpaceDelta.y;
-      newData.anchorRadius += guiSpaceDelta.z;
+      Transformer newTransformer = new Transformer() {
+        space = this,
+        anchor = root,
+        angleOffset = curr.angleOffset + guiSpaceDelta.x / curr.radiusOffset,
+        heightOffset = curr.heightOffset + guiSpaceDelta.y,
+        radiusOffset = curr.radiusOffset + guiSpaceDelta.z,
+        radiansPerMeter = 1.0f / (curr.radiusOffset + guiSpaceDelta.z)
+      };
 
-      parentAnchor = anchorComponent.transform;
-      _anchorData[parentAnchor] = newData;
+      _transformerData[root] = newTransformer;
+      curr = newTransformer;
     }
 
     int childCount = root.childCount;
     for (int i = 0; i < childCount; i++) {
-      refreshElementData(root.GetChild(i), parentAnchor);
+      refreshElementData(root.GetChild(i), curr);
     }
   }
 
-  public override Vector3 TransformPoint(Vector3 localRectPos) {
-    Vector3 localGuiPos;
-    float angle = localRectPos.x / radius;
-    float pointRadius = localRectPos.z + radius;
-    localGuiPos.x = Mathf.Sin(angle) * pointRadius;
-    localGuiPos.y = localRectPos.y;
-    localGuiPos.z = Mathf.Cos(angle) * pointRadius - radius;
-    return localGuiPos;
-  }
+  public struct Transformer : ITransformer, IRadialTransformer {
+    public LeapGuiCylindricalSpace space;
+    public Transform anchor;
 
-  public override Vector3 InverseTransformPoint(Vector3 localGuiPos) {
-    throw new System.NotImplementedException();
-  }
-
-  public override Vector3 TransformPoint(LeapGuiElement element, Vector3 localRectPos) {
-    AnchorData anchorData;
-    Vector3 anchorDelta;
-
-    Vector3 anchorGuiPos = gui.transform.InverseTransformPoint(element.anchor.position);
-    anchorDelta = localRectPos - anchorGuiPos;
-    anchorData = _anchorData[element.anchor];
-
-    float angleOffset = anchorData.anchorAngle + anchorDelta.x / anchorData.anchorRadius;
-    float heightOffset = anchorData.anchorHeight + anchorDelta.y;
-    float radiusOffset = anchorData.anchorRadius + anchorDelta.z;
-
-    Vector3 position;
-    position.x = Mathf.Sin(angleOffset) * radiusOffset;
-    position.y = heightOffset;
-    position.z = Mathf.Cos(angleOffset) * radiusOffset - radius;
-    return position;
-  }
-
-  public override Vector3 InverseTransformPoint(LeapGuiElement element, Vector3 worldGuiPos) {
-    throw new System.NotImplementedException();
-  }
-
-  public struct ElementParameters {
     public float angleOffset;
-    public float radianPerMeter;
     public float heightOffset;
     public float radiusOffset;
+    public float radiansPerMeter;
 
-    public static implicit operator Vector4(ElementParameters parameters) {
-      return new Vector4(parameters.angleOffset,
-                         parameters.radianPerMeter,
-                         parameters.heightOffset,
-                         parameters.radiusOffset);
+    public Vector3 TransformPoint(Vector3 localRectPos) {
+      Vector3 anchorDelta;
+
+      Vector3 anchorGuiPos = space.gui.transform.InverseTransformPoint(anchor.position);
+      anchorDelta = localRectPos - anchorGuiPos;
+
+      float angle = angleOffset + anchorDelta.x / radiusOffset;
+      float height = heightOffset + anchorDelta.y;
+      float radius = radiusOffset + anchorDelta.z;
+
+      Vector3 position;
+      position.x = Mathf.Sin(angle) * radius;
+      position.y = height;
+      position.z = Mathf.Cos(angle) * radius - space.radius;
+      return position;
     }
-  }
 
-  public struct AnchorData {
-    public float anchorAngle;
-    public float anchorHeight;
-    public float anchorRadius;
-  }
+    public Vector3 InverseTransformPoint(Vector3 localGuiPos) {
+      throw new NotImplementedException();
+    }
 
-  private const float GIZMO_WIDTH = 1.0f;
-  private const float GIZMO_HEIGHT = 0.2f;
-  private const int GIZMO_Y_COUNT = 2;
-  private const float GIZMO_RES = 0.05f;
-  void OnDrawGizmos() {
-    Gizmos.matrix = gui.transform.localToWorldMatrix;
-    Gizmos.color = Color.white;
-    for (int y = -GIZMO_Y_COUNT; y <= GIZMO_Y_COUNT; y++) {
-      float dy = y * GIZMO_HEIGHT / GIZMO_Y_COUNT;
-      for (float dx = 0; dx < 1; dx += GIZMO_RES) {
-        Vector3 a = new Vector3(dx, dy, 0);
-        Vector3 b = new Vector3(dx + GIZMO_RES, dy, 0);
-        Vector3 c = a;
-        Vector3 d = b;
-        c.x = -c.x;
-        d.x = -d.x;
+    public Quaternion TransformRotation(Quaternion localRectRot) {
+      throw new NotImplementedException();
+    }
 
-        a = TransformPoint(a);
-        b = TransformPoint(b);
-        c = TransformPoint(c);
-        d = TransformPoint(d);
+    public Quaternion InverseTransformRotation(Quaternion localGuiRot) {
+      throw new NotImplementedException();
+    }
 
-        Gizmos.DrawLine(a, b);
-        Gizmos.DrawLine(c, d);
-      }
+    public Vector3 TransformDirection(Vector3 direction) {
+      throw new NotImplementedException();
+    }
+
+    public Vector3 InverseTransformDirection(Vector3 direction) {
+      throw new NotImplementedException();
+    }
+
+    public Vector4 GetVectorRepresentation() {
+      return new Vector4(angleOffset,
+                         heightOffset,
+                         radiusOffset,
+                         radiansPerMeter);
     }
   }
 }

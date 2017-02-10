@@ -44,10 +44,10 @@ void ApplyElementMotion(inout float4 vert, int elementId) {
 #define LEAP_GUI_WARPING
 #include "Assets/LeapMotionModules/ElementRenderer/Resources/CylindricalSpace.cginc"
 
-float4 _LeapGuiCylindrical_ElementParameters[ELEMENT_MAX];
+float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
 
 void ApplyGuiWarping(inout float4 vert, int elementId) {
-  float4 elementParams = _LeapGuiCylindrical_ElementParameters[elementId];
+  float4 elementParams = _LeapGuiCurved_ElementParameters[elementId];
   Cylindrical_LocalToWorld(vert.xyz, elementParams);
 }
 #endif

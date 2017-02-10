@@ -2,6 +2,7 @@
 using UnityEngine;
 using Leap.Unity.Query;
 
+/*
 [AddComponentMenu("")]
 [LeapGuiTag("Dynamic")]
 public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
@@ -167,3 +168,5 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
     return vertex;
   }
 }
+*/
+ 

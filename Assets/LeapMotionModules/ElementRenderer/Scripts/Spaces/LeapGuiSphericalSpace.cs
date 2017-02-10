@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+/*
 [AddComponentMenu("")]
 [LeapGuiTag("Spherical")]
 public class LeapGuiSphericalSpace : LeapGuiSpace, ISupportsAddRemove {
@@ -180,3 +181,4 @@ public class LeapGuiSphericalSpace : LeapGuiSpace, ISupportsAddRemove {
     }
   }
 }
+*/

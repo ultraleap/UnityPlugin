@@ -508,6 +508,7 @@ public class LeapGui : MonoBehaviour {
 
 #if UNITY_EDITOR
   private void rebuildPickingMeshes() {
+    /*
     using (new ProfilerSample("Rebuild Picking Meshes")) {
       List<Vector3> pickingVerts = new List<Vector3>();
       List<int> pickingTris = new List<int>();
@@ -551,6 +552,7 @@ public class LeapGui : MonoBehaviour {
         pickingMesh.RecalculateNormals();
       }
     }
+    */
   }
 #endif
   #endregion

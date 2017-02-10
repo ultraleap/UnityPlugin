@@ -1,6 +1,38 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
-[DisallowMultipleComponent]
+public interface ITransformer {
+  /// <summary>
+  /// Transform a point from gui-local rect space to gui-local gui space.
+  /// </summary>
+  Vector3 TransformPoint(Vector3 localRectPos);
+
+  /// <summary>
+  /// Transform a point from gui-local gui space to gui-local rect space.
+  /// </summary>
+  Vector3 InverseTransformPoint(Vector3 localGuiPos);
+
+  /// <summary>
+  /// Transform a rotation from gui-local rect space to gui-local gui space.
+  /// </summary>
+  Quaternion TransformRotation(Quaternion localRectRot);
+
+  /// <summary>
+  /// Transform a rotation from gui-local gui space to gui-local rect space.
+  /// </summary>
+  Quaternion InverseTransformRotation(Quaternion localGuiRot);
+
+  /// <summary>
+  /// Transform a direction from gui-local rect space to gui-local gui space.
+  /// </summary>
+  Vector3 TransformDirection(Vector3 direction);
+
+  /// <summary>
+  /// Transform a direction from gui-local gui space to gui-local rect space.
+  /// </summary>
+  Vector3 InverseTransformDirection(Vector3 direction);
+}
+
 public abstract class LeapGuiSpace : LeapGuiComponentBase<LeapGui> {
 
   [HideInInspector]
@@ -19,17 +51,13 @@ public abstract class LeapGuiSpace : LeapGuiComponentBase<LeapGui> {
   /// </summary>
   public abstract void RefreshElementData(Transform root);
 
-  public abstract Vector3 TransformPoint(Vector3 worldRectPos);
-  public abstract Vector3 InverseTransformPoint(Vector3 worldGuiPos);
+  /// <summary>
+  /// 
+  /// </summary>
+  public abstract ITransformer GetTransformer(Transform anchor);
 
   /// <summary>
-  /// Transform a point that a local position relative to an element into gui world space.
+  /// 
   /// </summary>
-  public abstract Vector3 TransformPoint(LeapGuiElement element, Vector3 localRectPos);
-
-  /// <summary>
-  /// Transforms a point that is in world gui space into a local position relative to a 
-  /// chosen gui element.
-  /// </summary>
-  public abstract Vector3 InverseTransformPoint(LeapGuiElement element, Vector3 worldGuiPos);
+  public abstract ITransformer GetTransformer(LeapGuiElement element);
 }

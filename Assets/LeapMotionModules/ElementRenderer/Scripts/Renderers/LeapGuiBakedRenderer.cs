@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Query;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Baked")]
@@ -21,13 +22,10 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   private const string RECT_POSITIONS = LeapGui.PROPERTY_PREFIX + "Rect_ElementPositions";
   private List<Vector4> _rect_elementPositions = new List<Vector4>();
 
-  //## Cylindrical space
-  private const string CYLINDRICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Cylindrical_ElementParameters";
-  private List<Vector4> _cylindrical_elementParameters = new List<Vector4>();
+  //## Cylindrical/Spherical spaces
+  private const string CURVED_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Curved_ElementParameters";
+  private List<Vector4> _curved_elementParameters = new List<Vector4>();
 
-  //## Spherical space
-  private const string SPHERICAL_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Spherical_ElementParameters";
-  private List<Vector4> _spherical_elementParameters = new List<Vector4>();
   #endregion
 
   public enum MotionType {
@@ -60,28 +58,17 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
       using (new ProfilerSample("Upload Array")) {
         _material.SetVectorArray(RECT_POSITIONS, _rect_elementPositions);
       }
-    } else if (gui.space is LeapGuiCylindricalSpace) {
-      var cylindricalSpace = gui.space as LeapGuiCylindricalSpace;
+    } else if (gui.space is LeapGuiRadialSpace) {
+      var radialSpace = gui.space as LeapGuiRadialSpace;
 
-      _cylindrical_elementParameters.Clear();
-      foreach (var element in gui.elements) {
-        var parameters = cylindricalSpace.GetElementParameters(element.anchor, element.transform.position);
-        _cylindrical_elementParameters.Add(parameters);
-      }
+      gui.elements.Query().
+                   Select(e => radialSpace.GetTransformer(e)).
+                   Cast<LeapGuiRadialSpace.IRadialTransformer>().
+                   Select(t => t.GetVectorRepresentation()).
+                   FillList(_curved_elementParameters);
 
-      _material.SetFloat(LeapGuiCylindricalSpace.RADIUS_PROPERTY, cylindricalSpace.radius);
-      _material.SetVectorArray(CYLINDRICAL_PARAMETERS, _cylindrical_elementParameters);
-    } else if (gui.space is LeapGuiSphericalSpace) {
-      var sphericalSpace = gui.space as LeapGuiSphericalSpace;
-
-      _spherical_elementParameters.Clear();
-      foreach (var element in gui.elements) {
-        var parameters = sphericalSpace.GetElementParameters(element.anchor, element.transform.position);
-        _spherical_elementParameters.Add(parameters);
-      }
-
-      _material.SetFloat(LeapGuiSphericalSpace.RADIUS_PROPERTY, sphericalSpace.radius);
-      _material.SetVectorArray(SPHERICAL_PARAMETERS, _spherical_elementParameters);
+      _material.SetFloat(LeapGuiRadialSpace.RADIUS_PROPERTY, radialSpace.radius);
+      _material.SetVectorArray(CURVED_PARAMETERS, _curved_elementParameters);
     }
 
     using (new ProfilerSample("Draw Meshes")) {
@@ -110,8 +97,8 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     if (_motionType != MotionType.None) {
       if (gui.space is LeapGuiCylindricalSpace) {
         _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);
-      } else if (gui.space is LeapGuiSphericalSpace) {
-        _material.EnableKeyword(LeapGuiSphericalSpace.FEATURE_NAME);
+        //} else if (gui.space is LeapGuiSphericalSpace) {
+        //  _material.EnableKeyword(LeapGuiSphericalSpace.FEATURE_NAME);
       }
     }
   }
@@ -145,11 +132,11 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
   protected override Vector3 elementVertToMeshVert(Vector3 vertex) {
     Vector3 worldVert = _currElement.transform.TransformPoint(vertex);
+    Vector3 guiVert = gui.transform.InverseTransformPoint(worldVert);
     switch (_motionType) {
       case MotionType.None:
-        return gui.space.TransformPoint(_currElement, gui.transform.InverseTransformPoint(worldVert));
+        return gui.space.GetTransformer(_currElement.anchor).TransformPoint(guiVert);
       case MotionType.Translation:
-        Vector3 guiVert = gui.transform.InverseTransformPoint(worldVert);
         return guiVert - gui.transform.InverseTransformPoint(_currElement.transform.position);
     }
 
