@@ -94,6 +94,13 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
         }
       }
     }
+
+    for (int i = 0; i < features.Count; i++) {
+      var feature = features[i];
+      if (gui.features.Query().OfType<LeapGuiSpriteFeature>().Any(s => s.channel == feature.channel)) {
+        info[i] = info[i].OrWorse(SupportInfo.Error("Texture features cannot currently share uvs with sprite features."));
+      }
+    }
   }
 
   public virtual void GetSupportInfo(List<LeapGuiSpriteFeature> features, List<SupportInfo> info) {
@@ -114,6 +121,13 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
       }
     }
 #endif
+
+    for (int i = 0; i < features.Count; i++) {
+      var feature = features[i];
+      if (gui.features.Query().OfType<LeapGuiTextureFeature>().Any(s => s.channel == feature.channel)) {
+        info[i] = info[i].OrWorse(SupportInfo.Error("Sprite features cannot currently share uvs with texture features."));
+      }
+    }
   }
 
   public virtual void GetSupportInfo(List<LeapGuiTintFeature> features, List<SupportInfo> info) {
