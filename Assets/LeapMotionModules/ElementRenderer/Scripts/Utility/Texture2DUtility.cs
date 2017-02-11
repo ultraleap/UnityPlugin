@@ -1,8 +1,24 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public static class Texture2DUtility {
 
+  public static List<TextureFormat> readWriteFormats = new List<TextureFormat>() { 
+    TextureFormat.ARGB32,
+    TextureFormat.RGBA32,
+    TextureFormat.RGB24,
+    TextureFormat.Alpha8,
+    TextureFormat.RGBAHalf,
+    TextureFormat.RGFloat,
+    TextureFormat.RHalf,
+    TextureFormat.RGBAFloat,
+    TextureFormat.RGFloat,
+    TextureFormat.RFloat
+  };
+
   public static void AddBorder(this Texture2D texture, int pixelAmount) {
+    if (pixelAmount <= 0) return;
+
     texture.EnsureReadWriteEnabled();
     Color[] colors = texture.GetPixels();
 

@@ -76,6 +76,24 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
 
   public virtual void GetSupportInfo(List<LeapGuiTextureFeature> features, List<SupportInfo> info) {
     SupportUtil.OnlySupportFirstFeature(features, info);
+
+    if (_atlasSettings.border > 0) {
+      for (int i = 0; i < features.Count; i++) {
+        var feature = features[i];
+        foreach (var dataObj in feature.data) {
+          var tex = dataObj.texture;
+          if (tex == null) continue;
+
+          if (tex.wrapMode == TextureWrapMode.Repeat) {
+            info[i] = info[i].OrWorse(SupportInfo.Error("Currently textures must have their wrap mode set to Clamp when using a non-zero border amount."));
+          }
+
+          if (!Texture2DUtility.readWriteFormats.Contains(tex.format)) {
+            info[i] = info[i].OrWorse(SupportInfo.Error("Textures must use a format that supports writing (a non-compressed format) when using a non-zero-border."));
+          }
+        }
+      }
+    }
   }
 
   public virtual void GetSupportInfo(List<LeapGuiSpriteFeature> features, List<SupportInfo> info) {

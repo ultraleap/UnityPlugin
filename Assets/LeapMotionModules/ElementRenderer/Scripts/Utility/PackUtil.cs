@@ -126,7 +126,7 @@ public static class PackUtil {
   private static Texture2D getDefaultTexture(TextureFormat format) {
     Texture2D texture;
     if (!_cachedDefaultTextures.TryGetValue(format, out texture)) {
-      texture = new Texture2D(3, 3, format, mipmap: false);
+      texture = new Texture2D(3, 3, TextureFormat.ARGB32, mipmap: false);
       texture.SetPixels(new Color[3 * 3].Fill(Color.white));
       _cachedDefaultTextures[format] = texture;
     }
