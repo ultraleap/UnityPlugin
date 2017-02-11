@@ -1,10 +1,11 @@
 
 float _LeapGuiRadialSpace_Radius;
 
+//Parameter format:
 // x : degree X offset
 // y : degree Y offset
-// y : degrees per meter
 // w : total radius offset
+// w : degrees per meter
 void Spherical_LocalToWorld(inout float3 localVert, float4 parameters) {
   float angleX = parameters.x + localVert.x * parameters.w;
   float angleY = parameters.y + localVert.y * parameters.w;
