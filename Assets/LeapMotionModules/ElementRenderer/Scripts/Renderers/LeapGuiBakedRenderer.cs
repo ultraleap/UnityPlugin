@@ -29,19 +29,9 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
   #endregion
 
-  protected override void OnValidate() {
-    base.OnValidate();
-
-    //Currently full motion is not supported
-    if (_motionType == MotionType.Full) {
-      _motionType = MotionType.Translation;
-    }
-  }
-
   public enum MotionType {
     None,
-    Translation,
-    Full
+    Translation
   }
 
   public override SupportInfo GetSpaceSupportInfo(LeapGuiSpace space) {
@@ -102,9 +92,6 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     switch (_motionType) {
       case MotionType.Translation:
         _material.EnableKeyword(LeapGui.FEATURE_MOVEMENT_TRANSLATION);
-        break;
-      case MotionType.Full:
-        _material.EnableKeyword(LeapGui.FEATURE_MOVEMENT_FULL);
         break;
     }
 
