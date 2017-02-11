@@ -25,7 +25,7 @@ void ApplyGuiWarping(inout float4 anchorSpaceVert, int elementId) {
 
   Cylindrical_LocalToWorld(anchorSpaceVert.xyz, parameters);
 
-  anchorSpaceVert = mul(_LeapGui_LocalToWorld, vert);
+  anchorSpaceVert = mul(_LeapGui_LocalToWorld, anchorSpaceVert);
 }
 #endif
 
