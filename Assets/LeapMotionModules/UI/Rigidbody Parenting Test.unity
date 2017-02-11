@@ -366,6 +366,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   outputText: {fileID: 1240755534}
+  _parentBody: {fileID: 0}
 --- !u!1 &276113623
 GameObject:
   m_ObjectHideFlags: 0
@@ -1618,7 +1619,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1043414469
 Transform:
   m_ObjectHideFlags: 0
@@ -2506,6 +2507,70 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1418392393}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1428357565
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1428357567}
+  - component: {fileID: 1428357566}
+  m_Layer: 0
+  m_Name: Interaction Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1428357566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1428357565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99abcac5e6e214041876299e0504c871, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _leapProvider: {fileID: 1491664825}
+  _handPool: {fileID: 0}
+  _ldatPath: InteractionEngine/IE.ldat
+  _defaultInteractionMaterial: {fileID: 11400000, guid: 2b36778cd97232c459902ea9b77fd3ec,
+    type: 2}
+  _brushGroupName: BrushHands
+  _contactEnabled: 1
+  _graspingEnabled: 1
+  _twoHandedGrasping: 0
+  _activationRadius: 0.15
+  _maxActivationDepth: 3
+  _autoGenerateLayers: 0
+  _templateLayer:
+    layerIndex: 0
+  _interactionLayer:
+    layerIndex: 0
+  _interactionNoClipLayer:
+    layerIndex: 0
+  _brushLayer:
+    layerIndex: 0
+  _automaticValidation: 0
+  _showDebugLines: 0
+  _showDebugOutput: 0
+  _debugTextView: {fileID: 0}
+--- !u!4 &1428357567
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1428357565}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.0743464, y: 0.06167216, z: 0.045073118}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1491664822
 GameObject:
   m_ObjectHideFlags: 0
@@ -2569,7 +2634,7 @@ MonoBehaviour:
     IsRightToBeSpawned: 0
     modelList: []
     modelsCheckedOut: []
-    IsEnabled: 1
+    IsEnabled: 0
     CanDuplicate: 0
   - GroupName: Interaction Hands
     _handPool: {fileID: 0}
@@ -2579,7 +2644,7 @@ MonoBehaviour:
     IsRightToBeSpawned: 0
     modelList: []
     modelsCheckedOut: []
-    IsEnabled: 0
+    IsEnabled: 1
     CanDuplicate: 0
 --- !u!114 &1491664825
 MonoBehaviour:
@@ -2711,6 +2776,7 @@ GameObject:
   - component: {fileID: 1663856371}
   - component: {fileID: 1663856370}
   - component: {fileID: 1663856372}
+  - component: {fileID: 1663856373}
   m_Layer: 0
   m_Name: Parent Rigidbody
   m_TagString: Untagged
@@ -2729,7 +2795,7 @@ Rigidbody:
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 0
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
@@ -2755,11 +2821,23 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1663856369}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0202747f693dc924aaae62f953e28f8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1663856373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1663856369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34c7ce11be3fe984598f91d247cff83f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 1663856370}
 --- !u!1001 &1765190824
 Prefab:
   m_ObjectHideFlags: 0

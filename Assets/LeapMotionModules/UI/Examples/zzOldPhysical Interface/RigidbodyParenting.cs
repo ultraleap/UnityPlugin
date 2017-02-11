@@ -12,12 +12,15 @@ namespace Leap.Unity.UI.Constraints {
     [Header("Debug")]
     public Text outputText;
 
+    [SerializeField]
     private Rigidbody _parentBody;
     private Rigidbody _childBody;
 
     void Start() {
       _childBody = GetComponent<Rigidbody>();
-      _parentBody = _childBody.transform.parent.GetComponentInParent<Rigidbody>();
+      if (_parentBody == null) {
+        _parentBody = _childBody.transform.parent.GetComponent<Rigidbody>();
+      }
       if (_parentBody == null) { Debug.LogError("[RigidbodyParenting] Must be attached to a Rigidbody that is the child of another Rigidbody."); }
 
       InitializeBodies();
@@ -30,41 +33,22 @@ namespace Leap.Unity.UI.Constraints {
         outputText.text = "Child Local Position: \n" + _childBody.transform.localPosition.ToString("G4") + "      "
                         + "Child Body Velocity: \n" + _childBody.velocity;
       }
+
+      //Debug.Log("Num post physics: " + numPostPhysics);
+      //numPostPhysics = 0;
+      //Debug.Log("Num fixed update: " + numFixedUpdate);
+      //numFixedUpdate = 0;
     }
 
-    #region World Space Calculations (really really bad rotational drift)
-
-    //private Vector3 _prePhysicsParentPos;
-    //private Quaternion _prePhysicsParentRot;
-    //private Vector3 _prePhysicsChildPos;
-
-    //private Vector3 _childPosUpdate = Vector3.zero;
-    //private Vector3 _childPosFromRotUpdate = Vector3.zero;
-
-    //private void OnPrePhysics() {
-    //  _childBody.WakeUp();
-
-    //  _prePhysicsParentPos = _parentBody.position;
-    //  _prePhysicsParentRot = _parentBody.rotation;
-    //  _prePhysicsChildPos = _childBody.position;
-
-    //  _childBody.position = _childBody.position + _childPosUpdate + _childPosFromRotUpdate;
-    //}
-
-    //private void OnPostPhysics() {
-    //  Vector3 parentPosDelta = _parentBody.position - _prePhysicsParentPos;
-    //  _childPosUpdate = parentPosDelta;
-
-    //  Quaternion parentRotDelta = _parentBody.rotation * Quaternion.Inverse(_prePhysicsParentRot);
-    //  _childPosFromRotUpdate = parentRotDelta * (_prePhysicsChildPos - _prePhysicsParentPos) - (_prePhysicsChildPos - _prePhysicsParentPos);
-    //}
-
-    #endregion
-
-    #region Transform Calculations
+    //private int numPostPhysics = 0;
+    //private int numFixedUpdate = 0;
 
     private Transform _parentT;
     private Transform _childT;
+
+    //void FixedUpdate() {
+    //  numFixedUpdate++;
+    //}
 
     private void InitializeBodies() {
       _parentT = new GameObject("Transform Sim: " + _parentBody.gameObject.name).transform;
@@ -88,10 +72,10 @@ namespace Leap.Unity.UI.Constraints {
     private Quaternion _childRotNextPhysicsUpdate = Quaternion.identity;
 
     private void OnPrePhysics() {
-      if (_hasPostPhysics) {
-        _childBody.position = _childPosNextPhysicsUpdate;
-        _childBody.rotation = _childRotNextPhysicsUpdate;
-      }
+      //if (_hasPostPhysics) {
+      //  _childBody.position = _childPosNextPhysicsUpdate;
+      //  _childBody.rotation = _childRotNextPhysicsUpdate;
+      //}
 
       _childT.position = _childBody.position;
       _childT.rotation = _childBody.rotation;
@@ -101,6 +85,8 @@ namespace Leap.Unity.UI.Constraints {
     }
 
     private void OnPostPhysics() {
+      //numPostPhysics++;
+
       // This implicitly moves _childT via the transform hierarchy.
       _parentT.position = _parentBody.position;
       _parentT.rotation = _parentBody.rotation;
@@ -108,9 +94,10 @@ namespace Leap.Unity.UI.Constraints {
       _childPosNextPhysicsUpdate = _childBody.position + (_childT.position - _prePhysicsChildTransformPosition);
       _childRotNextPhysicsUpdate = _childBody.rotation * (Quaternion.Inverse(_prePhysicsChildTransformRotation) * _childT.rotation);
       _hasPostPhysics = true;
-    }
 
-    #endregion
+      _childBody.position = _childPosNextPhysicsUpdate;
+      _childBody.rotation = _childRotNextPhysicsUpdate;
+    }
 
     #region Gizmos
 

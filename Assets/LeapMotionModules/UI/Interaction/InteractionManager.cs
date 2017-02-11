@@ -59,6 +59,8 @@ namespace Leap.Unity.UI.Interaction {
 
     private InteractionHand[] _interactionHands = new InteractionHand[2];
     private HashSet<InteractionBehaviourBase> _interactionBehaviours = new HashSet<InteractionBehaviourBase>();
+    private Dictionary<Rigidbody, InteractionBehaviourBase> _rigidbodyRegistry = new Dictionary<Rigidbody, InteractionBehaviourBase>();
+    public Dictionary<Rigidbody, InteractionBehaviourBase> RigidbodyRegistry { get { return _rigidbodyRegistry; } }
 
     void Awake() {
       Provider = Hands.Provider;
@@ -108,8 +110,10 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Object Registration
 
+
     public void RegisterInteractionBehaviour(InteractionBehaviourBase interactionObj) {
       _interactionBehaviours.Add(interactionObj);
+      _rigidbodyRegistry[interactionObj.Rigidbody] = interactionObj;
     }
 
     #endregion

@@ -10,6 +10,9 @@ namespace Leap.Unity.UI.Interaction {
 
     public InteractionManager interactionManager;
 
+    protected Rigidbody _body;
+    public Rigidbody Rigidbody { get { return _body; } }
+
     [SerializeField]
     [HideInInspector]
     #pragma warning disable 0414
@@ -44,6 +47,13 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     /// // TODO: Implement by checking it in InteractionHand
     public bool IsInteractionEligible { get; set; }
+
+    protected virtual void Awake() {
+      _body = GetComponent<Rigidbody>();
+      _body.maxAngularVelocity = 100F;
+
+      interactionManager.RegisterInteractionBehaviour(this);
+    }
 
     protected virtual void OnValidate() {
       _interactionManagerIsNull = interactionManager == null;

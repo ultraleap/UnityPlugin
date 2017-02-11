@@ -64,9 +64,10 @@ namespace Leap.Unity.UI.Interaction {
 
       for (int i = 0; i < numResults; i++) {
         if (results[i].attachedRigidbody != null) {
-          var result = results[i].attachedRigidbody.GetComponent<InteractionBehaviourBase>();
-          if (result != null && result.interactionManager == this.manager) {
-            _activeBehaviours.Add(result);
+          Rigidbody body = results[i].attachedRigidbody;
+          InteractionBehaviourBase interactionObj;
+          if (body != null && manager.RigidbodyRegistry.TryGetValue(body, out interactionObj)) {
+            _activeBehaviours.Add(interactionObj);
           }
         }
       }
