@@ -11,10 +11,11 @@ void Cylindrical_LocalToWorld(inout float3 localVert, float3 elementPos) {
   localVert.z = cos(worldPos.x) * worldPos.z - _LeapGuiRadialSpace_Radius;
 }
 
+//Cylindrical parameters:
 // x : degree offset
-// y : degrees per meter
-// z : total height offset
-// w : total radius offset
+// y : total height offset
+// z : total radius offset
+// w: degrees per meter
 void Cylindrical_LocalToWorld(inout float3 localVert, float4 parameters) {
   float angle = localVert.x * parameters.w + parameters.x;
   float height = parameters.y + localVert.y;
