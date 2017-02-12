@@ -102,7 +102,7 @@ namespace Leap.Unity.Interaction {
 #endif
 
       _handParent = new GameObject(gameObject.name);
-      _handParent.transform.parent = FindObjectOfType<InteractionManager>().transform; // Prevent hand from moving when you turn your head.
+      _handParent.transform.parent = _manager.transform; // Prevent hand from moving when you turn your head.
 
 #if UNITY_EDITOR
       _handParent.AddComponent<RuntimeColliderGizmos>();
