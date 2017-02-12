@@ -1,10 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.Assertions;
-using System.Collections;
-using System.Collections.Generic;
-using Leap;
 using Leap.Unity.RuntimeGizmos;
-using System;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -24,7 +19,7 @@ namespace Leap.Unity.Interaction {
     private const int N_FINGERS = 5;
     private const int N_ACTIVE_BONES = 3;
     private const float DEAD_ZONE_FRACTION = 0.05f;
-    private const float DISLOCATION_FRACTION = 1.5f;
+    private const float DISLOCATION_FRACTION = 5.0f;
 
     public InteractionBrushBone[] _brushBones;
     private Hand _hand;
@@ -152,6 +147,7 @@ namespace Leap.Unity.Interaction {
         BeginBone(null, brushGameObject, boneArrayIndex, box);
       }
 
+      //Constrain the bones to eachother to prevent separation
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
@@ -196,18 +192,11 @@ namespace Leap.Unity.Interaction {
       if (collider_ is BoxCollider) {
         body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
       }
-
-      if (bone != null) {
-        body.position = bone.Center.ToVector3();
-        body.rotation = bone.Rotation.ToQuaternion();
-        brushBone.lastTarget = bone.Center.ToVector3();
-        body.mass = _perBoneMass;
-      } else {
-        body.position = _hand.PalmPosition.ToVector3();
-        body.rotation = _hand.Rotation.ToQuaternion();
-        brushBone.lastTarget = _hand.PalmPosition.ToVector3();
-        body.mass = _perBoneMass * 5f;
-      }
+      //body.maxDepenetrationVelocity = 3f;
+      body.mass = _perBoneMass;
+      body.position = bone != null ? bone.Center.ToVector3() : _hand.PalmPosition.ToVector3();
+      body.rotation = bone != null ? bone.Rotation.ToQuaternion(): _hand.Rotation.ToQuaternion();
+      brushBone.lastTarget = bone != null ? bone.Center.ToVector3() : _hand.PalmPosition.ToVector3();
 
       return brushBone;
     }
@@ -231,7 +220,6 @@ namespace Leap.Unity.Interaction {
       }
 
       {
-        // Palm is attached to the third metacarpal.
         Bone bone = _hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL);
         int boneArrayIndex = N_FINGERS * N_ACTIVE_BONES;
         UpdateBone(bone, boneArrayIndex, deadzone);
@@ -266,12 +254,13 @@ namespace Leap.Unity.Interaction {
 
       if (brushBone.updateTriggering() == false) {
         // Calculate how far off the mark the brushes are.
-        float targetingError = (brushBone.lastTarget - body.position).magnitude / bone.Width;
+        float targetingError = Vector3.Distance(brushBone.lastTarget, body.position)/bone.Width;
         float massScale = Mathf.Clamp(1.0f - (targetingError * 2.0f), 0.1f, 1.0f) * Mathf.Clamp(_hand.PalmVelocity.Magnitude * 10f, 1f, 10f);
         body.mass = _perBoneMass * massScale;
 
-        if (targetingError >= DISLOCATION_FRACTION && _hand.PalmVelocity.Magnitude < 1.5f) {
-          //brushBone.startTriggering();
+        Debug.DrawLine(brushBone.lastTarget, body.position);
+        if (targetingError >= DISLOCATION_FRACTION && _hand.PalmVelocity.Magnitude < 1.5f && boneArrayIndex != N_ACTIVE_BONES*N_FINGERS) {
+          brushBone.startTriggering();
         }
       }
 
@@ -284,10 +273,9 @@ namespace Leap.Unity.Interaction {
         brushBone.lastTarget = body.position;
       } else {
         delta *= (deltaLen - deadzone) / deltaLen;
-        delta /= Time.fixedDeltaTime;
-        delta = (delta / delta.magnitude) * Mathf.Clamp(delta.magnitude, 0f, 3f);
-        body.velocity = delta;
         brushBone.lastTarget = body.position + delta;
+        delta /= Time.fixedDeltaTime;
+        body.velocity = (delta / delta.magnitude) * Mathf.Clamp(delta.magnitude, 0f, 3f);
       }
     }
 
