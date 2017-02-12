@@ -18,7 +18,7 @@ namespace Leap.Unity.Interaction {
   public class InteractionBrushHand : IHandModel {
     private const int N_FINGERS = 5;
     private const int N_ACTIVE_BONES = 3;
-    private const float DEAD_ZONE_FRACTION = 0.05f;
+    private const float DEAD_ZONE_FRACTION = 0.1f;
     private const float DISLOCATION_FRACTION = 5.0f;
 
     public InteractionBrushBone[] _brushBones;
@@ -192,7 +192,7 @@ namespace Leap.Unity.Interaction {
       if (collider_ is BoxCollider) {
         body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
       }
-      //body.maxDepenetrationVelocity = 3f;
+
       body.mass = _perBoneMass;
       body.position = bone != null ? bone.Center.ToVector3() : _hand.PalmPosition.ToVector3();
       body.rotation = bone != null ? bone.Rotation.ToQuaternion(): _hand.Rotation.ToQuaternion();

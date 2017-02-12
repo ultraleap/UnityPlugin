@@ -383,7 +383,11 @@ namespace Leap.Unity.Interaction {
 
       // Transition to soft contact when exiting grasp.  This is because the fingers
       // are probably embedded.
-      _dislocatedBrushCounter = 0;
+      if (lastHand.PalmNormal.Dot(Vector.Up) < 0.2) {
+        _dislocatedBrushCounter = 0;
+      }else {
+        _dislocatedBrushCounter = DISLOCATED_BRUSH_COOLDOWN - 7;
+      }
       updateContactMode();
     }
     #endregion
