@@ -14,6 +14,10 @@ namespace Leap.Unity {
       ensureLayersInitialized();
 
       SerializedProperty layerProperty = property.FindPropertyRelative("layerIndex");
+      if (layerProperty == null) {
+        Debug.LogWarning("Could not find the layer index property, was it renamed or removed?");
+        return;
+      }
 
       int index = _layerValues.IndexOf(layerProperty.intValue);
       if (index < 0) {
