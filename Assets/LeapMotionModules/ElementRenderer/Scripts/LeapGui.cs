@@ -335,7 +335,9 @@ public class LeapGui : MonoBehaviour {
     }
 
     //TODO, optimize this!  Don't do it every frame for the whole thing!
-    _space.BuildElementData(transform);
+    using (new ProfilerSample("Refresh space data")) {
+      _space.RefreshElementData(transform, 0, anchors.Count);
+    }
 
     if (_elements.Count != 0) {
       using (new ProfilerSample("Update Renderer")) {
