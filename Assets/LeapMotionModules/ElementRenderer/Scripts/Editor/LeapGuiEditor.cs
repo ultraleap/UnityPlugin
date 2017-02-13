@@ -225,5 +225,23 @@ public class LeapGuiEditor : CustomEditorBase {
     EditorUtility.SetDirty(target);
     serializedObject.Update();
   }
+
+  private bool HasFrameBounds() {
+    return true;
+  }
+
+  private Bounds OnGetFrameBounds() {
+    Bounds[] allBounds = gui.elements.Query().
+                             Select(e => e.pickingMesh).
+                             Where(m => m != null).
+                             Select(m => m.bounds).
+                             ToArray();
+
+    Bounds bounds = allBounds[0];
+    for (int i = 1; i < allBounds.Length; i++) {
+      bounds.Encapsulate(allBounds[i]);
+    }
+    return bounds;
+  }
 }
 

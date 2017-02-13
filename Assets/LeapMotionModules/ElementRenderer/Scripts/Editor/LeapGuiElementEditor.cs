@@ -35,7 +35,7 @@ public class LeapGuiElementEditor : Editor {
     if (tempArray.Length != elements.Count) {
       tempArray = new Object[elements.Count];
     }
-    
+
     while (editorCache.Count < mainElement.data.Count) {
       editorCache.Add(null);
     }
@@ -81,5 +81,25 @@ public class LeapGuiElementEditor : Editor {
         editor.serializedObject.ApplyModifiedProperties();
       }
     }
+  }
+
+  private bool HasFrameBounds() {
+    return true;
+  }
+
+  private Bounds OnGetFrameBounds() {
+    Bounds[] allBounds = targets.Query().
+                                 Where(e => e != null).
+                                 OfType<LeapGuiElement>().
+                                 Select(e => e.pickingMesh).
+                                 Where(m => m != null).
+                                 Select(m => m.bounds).
+                                 ToArray();
+
+    Bounds bounds = allBounds[0];
+    for (int i = 1; i < allBounds.Length; i++) {
+      bounds.Encapsulate(allBounds[i]);
+    }
+    return bounds;
   }
 }
