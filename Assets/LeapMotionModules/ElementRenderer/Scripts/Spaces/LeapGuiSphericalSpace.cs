@@ -6,10 +6,10 @@ using UnityEngine;
 public class LeapGuiSphericalSpace : LeapGuiRadialSpace<LeapGuiSphericalSpace.Transformer> {
   public const string FEATURE_NAME = LeapGui.FEATURE_PREFIX + "SPHERICAL";
 
-  protected override Transformer GetRootTransformer() {
+  protected override Transformer ConstructTransformer(Transform root) {
     return new Transformer() {
       space = this,
-      anchor = transform,
+      anchor = root,
       angleXOffset = 0,
       angleYOffset = 0,
       radiusOffset = radius,

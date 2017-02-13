@@ -6,10 +6,10 @@ using UnityEngine;
 public class LeapGuiCylindricalSpace : LeapGuiRadialSpace<LeapGuiCylindricalSpace.Transformer> {
   public const string FEATURE_NAME = LeapGui.FEATURE_PREFIX + "CYLINDRICAL";
 
-  protected override Transformer GetRootTransformer() {
+  protected override Transformer ConstructTransformer(Transform root) {
     return new Transformer() {
       space = this,
-      anchor = transform,
+      anchor = root,
       angleOffset = 0,
       heightOffset = 0,
       radiusOffset = radius,

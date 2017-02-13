@@ -29,9 +29,9 @@ public abstract class LeapGuiRadialSpace<TType> : LeapGuiRadialSpaceBase, ISuppo
   public override void BuildElementData(Transform root) {
     _transformerData.Clear();
 
-    _transformerData[transform] = GetRootTransformer();
+    _transformerData[transform] = ConstructTransformer(root);
     foreach (var anchor in gui.anchors) {
-      _transformerData[anchor.transform] = GetRootTransformer();
+      _transformerData[anchor.transform] = ConstructTransformer(anchor.transform);
     }
 
     RefreshElementData(root, 0, gui.anchors.Count);
@@ -59,7 +59,7 @@ public abstract class LeapGuiRadialSpace<TType> : LeapGuiRadialSpaceBase, ISuppo
       SetTransformerRelativeTo(curr, parentTransformer, delta);
     }
   }
-
-  protected abstract TType GetRootTransformer();
+  
+  protected abstract TType ConstructTransformer(Transform anchor);
   protected abstract void SetTransformerRelativeTo(TType tartet, TType parent, Vector3 guiSpaceDelta);
 }
