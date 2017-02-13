@@ -228,6 +228,7 @@ namespace Leap.Unity.Interaction {
 
     public void fillBones(Hand inHand) {
       if (Application.isPlaying && _brushBones.Length == N_FINGERS * N_ACTIVE_BONES + 1) {
+        Vector elbowPos = inHand.Arm.ElbowPosition;
         inHand.SetTransform(_brushBones[N_FINGERS * N_ACTIVE_BONES].body.position, _brushBones[N_FINGERS * N_ACTIVE_BONES].body.rotation);
 
         for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
@@ -241,6 +242,8 @@ namespace Leap.Unity.Interaction {
             bone.Rotation = _brushBones[boneArrayIndex].body.rotation.ToLeapQuaternion();
           }
         }
+
+        inHand.Arm.PrevJoint = elbowPos; inHand.Arm.Direction = (inHand.Arm.PrevJoint - inHand.Arm.NextJoint).Normalized; inHand.Arm.Center = (inHand.Arm.PrevJoint + inHand.Arm.NextJoint) / 2f;
       }
     }
 
