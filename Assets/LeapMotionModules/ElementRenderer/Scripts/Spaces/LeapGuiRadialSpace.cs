@@ -42,7 +42,7 @@ public abstract class LeapGuiRadialSpace<TType> : LeapGuiRadialSpaceBase, ISuppo
   }
 
   public override void RefreshElementData(Transform root, int index, int count) {
-    for (int i = index; index < count; i++) {
+    for (int i = index; i < count; i++) {
       var anchor = gui.anchors[i];
       var parent = gui.anchorParents[i];
 
