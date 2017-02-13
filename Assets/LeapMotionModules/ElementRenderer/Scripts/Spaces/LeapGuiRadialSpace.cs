@@ -28,7 +28,12 @@ public abstract class LeapGuiRadialSpace<TType> : LeapGuiRadialSpaceBase, ISuppo
 
   public override void BuildElementData(Transform root) {
     _transformerData.Clear();
+
     _transformerData[transform] = GetRootTransformer();
+    foreach (var anchor in gui.anchors) {
+      _transformerData[anchor.transform] = GetRootTransformer();
+    }
+
     RefreshElementData(root, 0, gui.anchors.Count);
   }
 
