@@ -44,8 +44,8 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
           Graphics.DrawMesh(_meshes[i], gui.elements[i].transform.localToWorldMatrix, _material, 0);
         }
       }
-    } else if (gui.space is LeapGuiRadialSpace) {
-      var curvedSpace = gui.space as LeapGuiRadialSpace;
+    } else if (gui.space is LeapGuiRadialSpaceBase) {
+      var curvedSpace = gui.space as LeapGuiRadialSpaceBase;
 
       using (new ProfilerSample("Build Material Data")) {
         _curved_worldToAnchor.Clear();
@@ -61,14 +61,14 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
           Matrix4x4 deform = transform.worldToLocalMatrix * Matrix4x4.TRS(transform.position - element.transform.position, Quaternion.identity, Vector3.one) * element.transform.localToWorldMatrix;
           Matrix4x4 total = guiTransform * deform;
 
-          _curved_elementParameters.Add((transformer as LeapGuiRadialSpace.IRadialTransformer).GetVectorRepresentation(element));
+          _curved_elementParameters.Add((transformer as IRadialTransformer).GetVectorRepresentation(element));
           _curved_meshTransforms.Add(total);
           _curved_worldToAnchor.Add(guiTransform.inverse);
         }
       }
 
       using (new ProfilerSample("Upload Material Data")) {
-        _material.SetFloat(LeapGuiRadialSpace.RADIUS_PROPERTY, curvedSpace.radius);
+        _material.SetFloat(LeapGuiRadialSpaceBase.RADIUS_PROPERTY, curvedSpace.radius);
         _material.SetMatrixArray("_LeapGuiCurved_WorldToAnchor", _curved_worldToAnchor);
         _material.SetMatrix("_LeapGui_LocalToWorld", transform.localToWorldMatrix);
         _material.SetVectorArray("_LeapGuiCurved_ElementParameters", _curved_elementParameters);

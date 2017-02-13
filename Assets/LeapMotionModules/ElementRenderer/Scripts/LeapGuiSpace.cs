@@ -55,7 +55,7 @@ public abstract class LeapGuiSpace : LeapGuiComponentBase<LeapGui> {
   /// is the highest element in the hierarchy that could have changed.  This means
   /// that the root and ALL of it's children could potentially have changed.
   /// </summary>
-  public abstract void RefreshElementData(Transform root);
+  public abstract void RefreshElementData(Transform root, int index, int count);
 
   /// <summary>
   /// 

@@ -11,7 +11,7 @@ public class LeapGuiRectSpace : LeapGuiSpace, ISupportsAddRemove {
   public void OnRemoveElements(List<int> toRemove) { }
 
   public override void BuildElementData(Transform root) { }
-  public override void RefreshElementData(Transform root) { }
+  public override void RefreshElementData(Transform root, int index, int count) { }
 
   public override ITransformer GetTransformer(Transform anchor) {
     return _transformer;

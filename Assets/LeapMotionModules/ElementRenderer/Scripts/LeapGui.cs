@@ -32,7 +32,7 @@ public class LeapGui : MonoBehaviour {
   private List<AnchorOfConstantSize> _anchors = new List<AnchorOfConstantSize>();
 
   [SerializeField, HideInInspector]
-  private List<AnchorOfConstantSize> _anchorParents = new List<AnchorOfConstantSize>();
+  private List<Transform> _anchorParents = new List<Transform>();
 
   [SerializeField, HideInInspector]
   private List<SupportInfo> _supportInfo = new List<SupportInfo>();
@@ -82,7 +82,7 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
-  public List<AnchorOfConstantSize> anchorParents {
+  public List<Transform> anchorParents {
     get {
       return _anchorParents;
     }
@@ -428,7 +428,7 @@ public class LeapGui : MonoBehaviour {
 
       var anchorComponent = child.GetComponent<AnchorOfConstantSize>();
       if (anchorComponent != null && anchorComponent.enabled) {
-        _anchorParents.Add(currAnchor.GetComponent<AnchorOfConstantSize>());
+        _anchorParents.Add(currAnchor);
         childAnchor = anchorComponent.transform;
         _anchors.Add(anchorComponent);
       }

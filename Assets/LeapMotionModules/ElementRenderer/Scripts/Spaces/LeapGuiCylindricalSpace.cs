@@ -1,73 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Cylindrical")]
-public class LeapGuiCylindricalSpace : LeapGuiRadialSpace, ISupportsAddRemove {
+public class LeapGuiCylindricalSpace : LeapGuiRadialSpace<LeapGuiCylindricalSpace.Transformer> {
   public const string FEATURE_NAME = LeapGui.FEATURE_PREFIX + "CYLINDRICAL";
 
-  private Dictionary<Transform, Transformer> _transformerData = new Dictionary<Transform, Transformer>();
-
-  public void OnAddElements(List<LeapGuiElement> element, List<int> indexes) {
-    BuildElementData(transform); //TODO, optimize
-  }
-
-  public void OnRemoveElements(List<int> toRemove) {
-    BuildElementData(transform); //TODO, optimize
-  }
-
-  public override void BuildElementData(Transform root) {
-    _transformerData.Clear();
-
-    refreshElementData(root, new Transformer() {
+  protected override Transformer GetRootTransformer() {
+    return new Transformer() {
       space = this,
-      anchor = root,
+      anchor = transform,
       angleOffset = 0,
       heightOffset = 0,
       radiusOffset = radius,
       radiansPerMeter = 1.0f / radius
-    });
+    };
   }
 
-  public override void RefreshElementData(Transform root) {
-    //TODO!
-    //refreshElementData(root, root);
+  protected override void SetTransformerRelativeTo(Transformer target, Transformer parent, Vector3 guiSpaceDelta) {
+    target.angleOffset = parent.angleOffset + guiSpaceDelta.x / parent.radiusOffset;
+    target.heightOffset = parent.heightOffset + guiSpaceDelta.y;
+    target.radiusOffset = parent.radiusOffset + guiSpaceDelta.z;
+    target.radiansPerMeter = 1.0f / (target.radiansPerMeter);
   }
 
-  public override ITransformer GetTransformer(Transform anchor) {
-    return _transformerData[anchor];
-  }
-
-  private void refreshElementData(Transform root, Transformer curr) {
-    _transformerData[curr.anchor] = curr;
-
-    var anchorComponent = root.GetComponent<AnchorOfConstantSize>();
-    if (anchorComponent != null && anchorComponent.enabled) {
-      Vector3 guiPosition = gui.transform.InverseTransformPoint(root.position);
-      Vector3 guiAnchor = gui.transform.InverseTransformPoint(curr.anchor.position);
-      Vector3 guiSpaceDelta = guiPosition - guiAnchor;
-
-      Transformer newTransformer = new Transformer() {
-        space = this,
-        anchor = root,
-        angleOffset = curr.angleOffset + guiSpaceDelta.x / curr.radiusOffset,
-        heightOffset = curr.heightOffset + guiSpaceDelta.y,
-        radiusOffset = curr.radiusOffset + guiSpaceDelta.z,
-        radiansPerMeter = 1.0f / (curr.radiusOffset + guiSpaceDelta.z)
-      };
-
-      _transformerData[root] = newTransformer;
-      curr = newTransformer;
-    }
-
-    int childCount = root.childCount;
-    for (int i = 0; i < childCount; i++) {
-      refreshElementData(root.GetChild(i), curr);
-    }
-  }
-
-  public class Transformer : ITransformer, IRadialTransformer {
+  public class Transformer : IRadialTransformer {
     public LeapGuiCylindricalSpace space;
     public Transform anchor;
 

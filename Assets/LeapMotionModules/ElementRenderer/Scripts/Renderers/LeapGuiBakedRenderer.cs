@@ -58,19 +58,19 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
       using (new ProfilerSample("Upload Material Data")) {
         _material.SetVectorArray(RECT_POSITIONS, _rect_elementPositions);
       }
-    } else if (gui.space is LeapGuiRadialSpace) {
-      var radialSpace = gui.space as LeapGuiRadialSpace;
+    } else if (gui.space is LeapGuiRadialSpaceBase) {
+      var radialSpace = gui.space as LeapGuiRadialSpaceBase;
 
       using (new ProfilerSample("Build Material Data")) {
         _curved_elementParameters.Clear();
         foreach (var element in gui.elements) {
-          var t = radialSpace.GetTransformer(element.anchor) as LeapGuiRadialSpace.IRadialTransformer;
+          var t = radialSpace.GetTransformer(element.anchor) as IRadialTransformer;
           _curved_elementParameters.Add(t.GetVectorRepresentation(element));
         }
       }
 
       using (new ProfilerSample("Upload Material Data")) {
-        _material.SetFloat(LeapGuiRadialSpace.RADIUS_PROPERTY, radialSpace.radius);
+        _material.SetFloat(LeapGuiRadialSpaceBase.RADIUS_PROPERTY, radialSpace.radius);
         _material.SetVectorArray(CURVED_PARAMETERS, _curved_elementParameters);
       }
     }
