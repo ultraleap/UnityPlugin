@@ -22,18 +22,10 @@ public static class PackUtil {
     public FilterMode filterMode = FilterMode.Bilinear;
   }
 
-
-
-  public static void ClearCache() {
-    _cachedBorderedTextures.Clear();
-  }
-
   public static void DoPack(List<LeapGuiTextureFeature> textureFeatures,
                             Settings settings,
                         out Texture2D[] packedTextures,
                         out Dictionary<UVChannelFlags, Rect[]> channelMapping) {
-    ClearCache();
-
     packedTextures = new Texture2D[textureFeatures.Count];
     channelMapping = new Dictionary<UVChannelFlags, Rect[]>();
 
@@ -77,6 +69,12 @@ public static class PackUtil {
       //var nonMainTextures = textureFeatures.Query().Where(f => f.channel == channel).Skip(1).ToList();
       //TODO: much lower priority ;)
     }
+
+    //Clear cache
+    foreach (var texture in _cachedBorderedTextures.Values) {
+      UnityEngine.Object.DestroyImmediate(texture);
+    }
+    _cachedBorderedTextures.Clear();
   }
 
   private static void prepareForPacking(LeapGuiTextureFeature feature,
@@ -107,6 +105,10 @@ public static class PackUtil {
 
   private static Dictionary<BorderKey, Texture2D> _cachedBorderedTextures = new Dictionary<BorderKey, Texture2D>();
   private static Texture2D getBordered(Texture2D source, int border) {
+    if (border <= 0) {
+      return source;
+    }
+
     if (source == null) {
       return null;
     }
