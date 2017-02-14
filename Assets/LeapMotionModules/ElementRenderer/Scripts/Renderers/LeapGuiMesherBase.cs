@@ -85,10 +85,6 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
           var tex = dataObj.texture;
           if (tex == null) continue;
 
-          if (tex.wrapMode == TextureWrapMode.Repeat) {
-            info[i] = info[i].OrWorse(SupportInfo.Error("Currently textures must have their wrap mode set to Clamp when using a non-zero border amount."));
-          }
-
           if (!Texture2DUtility.readWriteFormats.Contains(tex.format)) {
             info[i] = info[i].OrWorse(SupportInfo.Error("Textures must use a format that supports writing (a non-compressed format) when using a non-zero-border."));
           }
