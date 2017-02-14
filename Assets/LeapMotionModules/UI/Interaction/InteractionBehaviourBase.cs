@@ -21,7 +21,6 @@ namespace Leap.Unity.UI.Interaction {
     #pragma warning restore 0414
 
     [Header("Interaction Settings")]
-    // TODO: Display a warning when the Interaction Manager has any of the actions below disabled.
     [DisableIf("_interactionManagerIsNull", isEqualTo: true)]
     public bool ignoreHover = false; // TODO: 
     [DisableIf("_interactionManagerIsNull", isEqualTo: true)]
@@ -37,16 +36,6 @@ namespace Leap.Unity.UI.Interaction {
     /// to fire per-object interaction events.
     /// </summary>
     public abstract void FixedUpdateObject();
-
-    /// <summary>
-    /// Gets or sets whether this interaction object is currently
-    /// eligible to be hovered, touched, or held. Setting to false will prevent
-    /// new interactions from beginning for this object, and if any interactions
-    /// are currently in-progress, the interactions will end (and the object will
-    /// receive, e.g. OnHoverEnd, OnGraspEnd events).
-    /// </summary>
-    /// // TODO: Implement by checking it in InteractionHand
-    public bool IsInteractionEligible { get; set; }
 
     protected virtual void Awake() {
       _body = GetComponent<Rigidbody>();

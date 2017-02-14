@@ -16,8 +16,6 @@
       struct Input {
         float3 objNormal;
         float3 objPos;
-        //float4 noiseValues0;
-        //float4 noiseValues1;
 
         float3 worldNormal;
         INTERNAL_DATA
@@ -41,19 +39,6 @@
         surfIn.objNormal = v.normal;
         surfIn.objPos = v.vertex;
 
-        // Noise harmonics for pixel albedo
-        //float freq = 124;
-        //float amp = 0.5;
-        //float seed = _BumpinessSeed;
-        //surfIn.noiseValues0 = float4(doNoise(surfIn, freq / 1,  amp, seed),
-        //                             doNoise(surfIn, freq / 2,  amp, seed + 0.01),
-        //                             doNoise(surfIn, freq / 4,  amp, seed + 0.02),
-        //                             doNoise(surfIn, freq / 8,  amp, seed + 0.04));
-        //surfIn.noiseValues1 = float4(doNoise(surfIn, freq / 16, amp, seed + 0.08),
-        //                             doNoise(surfIn, freq / 32, amp, seed + 0.16),
-        //                             0,
-        //                             0);
-
         // Vertex bumpiness offset   
         float bumpNoiseValue = cnoise(float4(surfIn.objPos.x * _BumpinessFreq,
                                              surfIn.objPos.y * _BumpinessFreq,
@@ -68,8 +53,6 @@
         float freq = 124;
         float amp = 0.5;
         float seed = _BumpinessSeed;
-        //float extraBump = noiseValues0.x + noiseValues0.y + noiseValues0.z + noiseValues0.w
-        //                + noiseValues1.x + noiseValues1.y + noiseValues1.z + noiseValues1.w;
         float extraBump = doNoise(surfIn, freq, amp, _BumpinessSeed);
         extraBump += doNoise(surfIn, freq / 2,  amp, seed + 0.01);
         extraBump += doNoise(surfIn, freq / 4,  amp, seed + 0.02);
@@ -80,6 +63,8 @@
         extraBump = extraBump * extraBump;
 
         o.Normal = WorldNormalVector(surfIn, o.Normal); // TODO: Can do better per-pixel normals...?
+
+        // TODO: This rock should use a texture instead of a fancy 4D noise shader
         o.Albedo = _Color * (extraBump);
       }
 		ENDCG
