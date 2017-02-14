@@ -40,7 +40,7 @@ namespace Leap.Unity.Interaction {
         }
 
         //Nullify above findings if fingers are extended
-        bool tempIsInside = collidingWithObject && (tempCurl < 0.65f);
+        bool tempIsInside = collidingWithObject && (tempCurl < 0.65f) && (tempCurl > -0.1f);
 
         //Probes go inside when they intersect, probes come out when they uncurl
         if (!classifier.probes[j].isInside) {
