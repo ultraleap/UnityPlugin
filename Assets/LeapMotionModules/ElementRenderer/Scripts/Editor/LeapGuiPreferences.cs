@@ -10,12 +10,24 @@ public class LeapGuiPreferences : MonoBehaviour {
   public const string LEAP_GUI_SHADER_FOLDER = "Assets/LeapMotionModules/ElementRenderer/Shaders/";
   private static Regex _elementMaxRegex = new Regex(@"^#define\s+ELEMENT_MAX\s+(\d+)\s*$");
 
-  public static bool TryCalculateElementMax(out int elementMax, out string errorMessage) {
-    string path;
-    List<string> lines;
-    int lineIndex;
+  private static int _cachedElementMax = -1; //-1 signals dirty
+  public static int ElementMax {
+    get {
+      if (_cachedElementMax == -1) {
+        string errorMesage;
+        string path;
+        List<string> lines;
+        int lineIndex;
 
-    return tryCalculateElementMax(out elementMax, out errorMessage, out path, out lines, out lineIndex);
+        tryCalculateElementMax(out _cachedElementMax, out errorMesage, out path, out lines, out lineIndex);
+
+        if (errorMesage != null) {
+          _cachedElementMax = int.MaxValue;
+        }
+      }
+
+      return _cachedElementMax;
+    }
   }
 
   [PreferenceItem("Leap Gui")]
@@ -26,6 +38,7 @@ public class LeapGuiPreferences : MonoBehaviour {
     List<string> lines;
     int lineIndex;
 
+    _cachedElementMax = -1;
     if (!tryCalculateElementMax(out elementMax, out errorMessage, out path, out lines, out lineIndex)) {
       EditorGUILayout.HelpBox(errorMessage +
                               "\n\nRe-installing the Leap Gui package can help fix this problem.",
@@ -55,7 +68,7 @@ public class LeapGuiPreferences : MonoBehaviour {
                                              out List<string> lines,
                                              out int lineIndex) {
     elementMax = -1;
-    errorMessage = "";
+    errorMessage = null;
     lines = null;
     lineIndex = -1;
 

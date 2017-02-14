@@ -96,9 +96,22 @@ public class LeapGuiEditor : CustomEditorBase {
       _spaceEditor = CreateEditor(gui.space);
     }
 
+    specifyCustomDecorator("_features", featureDecorator);
     specifyCustomDrawer("_features", drawFeatures);
     specifyCustomDrawer("_space", drawSpace);
     specifyCustomDrawer("_renderer", drawRenderer);
+  }
+
+  private void featureDecorator(SerializedProperty property) {
+    int elementMax = LeapGuiPreferences.ElementMax;
+
+    if (gui.elements.Count > elementMax) {
+      EditorGUILayout.HelpBox("This gui currently has " + gui.elements.Count.ToString() +
+                              " elements, which is greater than the maximum of " +
+                              elementMax + ".  Visit the preferences to change the maximum element count.",
+                              MessageType.Warning);
+      return;
+    }
   }
 
   private void drawFeatures(SerializedProperty property) {
