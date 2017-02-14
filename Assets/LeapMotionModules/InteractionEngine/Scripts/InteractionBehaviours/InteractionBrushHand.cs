@@ -24,6 +24,7 @@ namespace Leap.Unity.Interaction {
     public InteractionBrushBone[] _brushBones;
     private Hand _hand;
     private GameObject _handParent;
+    private bool _dislocated = false;
 
     /** The model type. An InteractionBrushHand is a type of physics model. */
     public override ModelType HandModelType {
@@ -144,7 +145,7 @@ namespace Leap.Unity.Interaction {
         box.size = new Vector3(bone.Length, bone.Width, bone.Length);
         box.material = _material;
 
-        BeginBone(null, brushGameObject, boneArrayIndex, box);
+        BeginBone(null, brushGameObject, boneArrayIndex, box).startTriggering();
       }
 
       //Constrain the bones to eachother to prevent separation
@@ -177,7 +178,7 @@ namespace Leap.Unity.Interaction {
 
       InteractionBrushBone brushBone = brushGameObject.GetComponent<InteractionBrushBone>();
       brushBone.col = collider_;
-      brushBone.startTriggering();
+      brushBone.hand = this;
       brushBone.manager = _manager;
       _brushBones[boneArrayIndex] = brushBone;
 
@@ -247,6 +248,21 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    public void setBonesDislocated(bool dislocated) {
+      _dislocated = dislocated;
+      if (_dislocated) {
+
+        for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
+          for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
+            _brushBones[fingerIndex * N_ACTIVE_BONES + jointIndex].body.mass = 0.00001f;
+            _brushBones[fingerIndex * N_ACTIVE_BONES + jointIndex].dislocationWeight = 0.15f;
+            _brushBones[fingerIndex * N_ACTIVE_BONES + jointIndex].startTriggering();
+          }
+        }
+        _brushBones[N_FINGERS * N_ACTIVE_BONES].body.mass = 0.00001f;
+      }
+    }
+
     private void UpdateBone(Bone bone, int boneArrayIndex, float deadzone) {
       InteractionBrushBone brushBone = _brushBones[boneArrayIndex];
       Rigidbody body = brushBone.body;
@@ -259,11 +275,13 @@ namespace Leap.Unity.Interaction {
         // Calculate how far off the mark the brushes are.
         float targetingError = Vector3.Distance(brushBone.lastTarget, body.position)/bone.Width;
         float massScale = Mathf.Clamp(1.0f - (targetingError * 2.0f), 0.1f, 1.0f) * Mathf.Clamp(_hand.PalmVelocity.Magnitude * 10f, 1f, 10f);
-        body.mass = _perBoneMass * massScale;
-
-        Debug.DrawLine(brushBone.lastTarget, body.position);
-        if (targetingError >= DISLOCATION_FRACTION && _hand.PalmVelocity.Magnitude < 1.5f && boneArrayIndex != N_ACTIVE_BONES*N_FINGERS) {
-          brushBone.startTriggering();
+        if (!_dislocated) {
+          if (targetingError >= DISLOCATION_FRACTION * brushBone.dislocationWeight && _hand.PalmVelocity.Magnitude < 1.5f && boneArrayIndex != N_ACTIVE_BONES * N_FINGERS) {
+            setBonesDislocated(true);
+          } else {
+            brushBone.dislocationWeight = Mathf.Lerp(brushBone.dislocationWeight, 1f, 0.1f);
+            body.mass = Mathf.Lerp(body.mass, _perBoneMass * massScale, 0.05f);
+          }
         }
       }
 

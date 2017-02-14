@@ -25,9 +25,12 @@ namespace Leap.Unity.Interaction {
     public Collider col;
     /** This InteractiveBrushBone's target position. */
     public Vector3 lastTarget;
+    /** This InteractiveBrushBone's hand. */
+    public InteractionBrushHand hand;
 
     public Vector3 desiredPosition;
     public Quaternion desiredRotation;
+    public float dislocationWeight = 1f;
 
     // Once the brush becomes dislocated, it then remains dislocated until it
     // stops triggering and then the _dislocatedCounter expires.
@@ -45,6 +48,7 @@ namespace Leap.Unity.Interaction {
       if (_dislocatedCounter < DISLOCATED_BRUSH_COOLDOWN) {
         if (++_dislocatedCounter == DISLOCATED_BRUSH_COOLDOWN) {
           col.isTrigger = false;
+          hand.setBonesDislocated(false);
           return false;
         }
         return true;
