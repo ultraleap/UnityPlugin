@@ -3,7 +3,7 @@
 using UnityEditor;
 #endif
 
-public static class GuIRectUtil {
+public static class GuiRectUtil {
 
   public static void SplitHorizontally(this Rect rect, out Rect left, out Rect right) {
     left = rect;
