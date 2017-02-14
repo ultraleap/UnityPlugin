@@ -32,7 +32,7 @@ public class LeapGuiElementEditor : Editor {
     if (elements.Count == 0) return;
     var mainElement = elements[0];
 
-    int maxElements = LeapGuiPreferences.ElementMax;
+    int maxElements = LeapGuiPreferences.elementMax;
     if (elements.Query().Any(e => e.attachedGui != null && e.attachedGui.elements.IndexOf(e) >= maxElements)) {
       string noun = elements.Count == 1 ? "This element" : "Some of these elements";
       string guiName = elements.Count == 1 ? "its gui" : "their guis";

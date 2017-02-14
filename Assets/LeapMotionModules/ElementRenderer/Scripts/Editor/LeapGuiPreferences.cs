@@ -11,7 +11,7 @@ public class LeapGuiPreferences : MonoBehaviour {
   private static Regex _elementMaxRegex = new Regex(@"^#define\s+ELEMENT_MAX\s+(\d+)\s*$");
 
   private static int _cachedElementMax = -1; //-1 signals dirty
-  public static int ElementMax {
+  public static int elementMax {
     get {
       if (_cachedElementMax == -1) {
         string errorMesage;

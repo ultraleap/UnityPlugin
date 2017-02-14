@@ -103,7 +103,7 @@ public class LeapGuiEditor : CustomEditorBase {
   }
 
   private void featureDecorator(SerializedProperty property) {
-    int elementMax = LeapGuiPreferences.ElementMax;
+    int elementMax = LeapGuiPreferences.elementMax;
 
     if (gui.elements.Count > elementMax) {
       EditorGUILayout.HelpBox("This gui currently has " + gui.elements.Count.ToString() +
