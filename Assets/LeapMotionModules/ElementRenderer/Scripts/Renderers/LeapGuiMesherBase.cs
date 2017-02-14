@@ -59,6 +59,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   protected List<LeapGuiBlendShapeFeature> _blendShapeFeatures = new List<LeapGuiBlendShapeFeature>();
 
   //#### Textures ####
+  private List<Texture2D> _packedTextures = new List<Texture2D>();
   private Dictionary<UVChannelFlags, Rect[]> _packedRects;
 
   //#### Tinting ####
@@ -273,12 +274,22 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   }
 
   protected virtual void prepareMaterial() {
+    foreach (var texture in _packedTextures) {
+      DestroyImmediate(texture);
+    }
+    _packedTextures.Clear();
+
     if (_material != null) {
       DestroyImmediate(_material);
     }
 
     _material = new Material(_shader);
     _material.name = "Procedural Gui Material";
+
+    if (_packedRects != null) {
+      _packedRects.Clear();
+      _packedRects = null;
+    }
   }
 
   protected virtual void packTextures() {
@@ -287,6 +298,8 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
       PackUtil.DoPack(_textureFeatures, _atlasSettings,
                   out packedTextures,
                   out _packedRects);
+
+      _packedTextures.AddRange(packedTextures);
 
       for (int i = 0; i < _textureFeatures.Count; i++) {
         _material.SetTexture(_textureFeatures[i].propertyName, packedTextures[i]);
