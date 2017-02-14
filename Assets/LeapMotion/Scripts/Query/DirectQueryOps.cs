@@ -66,6 +66,14 @@ namespace Leap.Unity.Query {
       }
     }
 
+    public QueryType ElementAt(int index) {
+      return Skip(index).First();
+    }
+
+    public QueryType ElementAtOrDefault(int index) {
+      return Skip(index).FirstOrDefault();
+    }
+
     public QueryType First() {
       using (thisAndConsume) {
         if (!_op.MoveNext()) {

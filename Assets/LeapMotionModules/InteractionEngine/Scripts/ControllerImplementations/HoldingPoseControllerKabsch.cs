@@ -92,7 +92,7 @@ namespace Leap.Unity.Interaction {
           Finger finger = hand.Fingers[f];
           Finger.FingerType fingerType = finger.Type;
 
-          for (int j = 0; j < NUM_BONES; j++) {
+          for (int j = 0; j < NUM_BONES-2; j++) {
             Bone.BoneType boneType = (Bone.BoneType)j;
             Bone bone = finger.Bone(boneType);
 

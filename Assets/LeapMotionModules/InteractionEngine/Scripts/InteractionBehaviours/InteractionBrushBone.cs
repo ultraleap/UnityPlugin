@@ -31,7 +31,7 @@ namespace Leap.Unity.Interaction {
 
     // Once the brush becomes dislocated, it then remains dislocated until it
     // stops triggering and then the _dislocatedCounter expires.
-    private const int DISLOCATED_BRUSH_COOLDOWN = 3;
+    private const int DISLOCATED_BRUSH_COOLDOWN = 30;
     private int _dislocatedCounter = DISLOCATED_BRUSH_COOLDOWN;
 
     /** Changes the collider to react to collisions as a trigger. */
