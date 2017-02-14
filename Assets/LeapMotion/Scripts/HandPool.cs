@@ -170,11 +170,11 @@ namespace Leap.Unity {
       HandProxy handRep = new HandProxy(this, hand, handChirality, modelType);
       for (int i = 0; i < ModelPool.Count; i++) {
         ModelGroup group = ModelPool[i];
+        handRep.Group = group;
         if (group.IsEnabled) {
           IHandModel model = group.TryGetModel(handChirality, modelType);
           if (model != null ) {
             handRep.AddModel(model);
-            handRep.Group = group;
             if (!modelToHandRepMapping.ContainsKey(model)) {
               modelToHandRepMapping.Add(model, handRep);
             }

@@ -92,7 +92,7 @@ namespace Leap.Unity {
         }
         if (rep != null) {
           rep.IsMarked = true;
-          if (rep.Group.HandPostProcesses.GetPersistentEventCount() > 0) {
+          if (rep.Group!=null && rep.Group.HandPostProcesses.GetPersistentEventCount() > 0) {
             rep.PostProcessHand.CopyFrom(curHand);
             rep.Group.HandPostProcesses.Invoke(rep.PostProcessHand);
             rep.UpdateRepresentation(rep.PostProcessHand);
