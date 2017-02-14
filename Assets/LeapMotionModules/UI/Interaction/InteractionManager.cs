@@ -1,4 +1,5 @@
 ﻿using Leap.Unity.Attributes;
+using Leap.Unity.RuntimeGizmos;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,18 +7,24 @@ using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
-  public partial class InteractionManager : MonoBehaviour {
+  public partial class InteractionManager : MonoBehaviour, IRuntimeGizmoComponent {
 
     [Header("Interactions")]
     public bool enableHovering = true;
     public bool enableContact  = true;
     public bool enableGrasping = true;
 
+    // TODO: Hide these settings behind a dropdown, they probably don't really ever need to be changed
     [Header("Interaction Settings")]
     [DisableIf("enableHovering", isEqualTo: false)]
     public float hoverActivationRadius = 0.5F;
     [DisableIf("contactOrGraspingEnabled", isEqualTo: false)]
     public float touchActivationRadius = 0.15F;
+
+    [SerializeField]
+    private bool _showDebugOptions = false;
+    [SerializeField]
+    private bool _debugDrawInteractionHands = false;
 
     #pragma warning disable 0414
     [HideInInspector]
@@ -143,6 +150,20 @@ namespace Leap.Unity.UI.Interaction {
       }
       return false;
     }
+
+    #region Runtime Gizmos
+
+    public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
+      if (_debugDrawInteractionHands) {
+        foreach (var hand in _interactionHands) {
+          if (hand != null) {
+            hand.OnDrawRuntimeGizmos(drawer);
+          }
+        }
+      }
+    }
+
+    #endregion
 
   }
 

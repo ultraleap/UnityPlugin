@@ -82,7 +82,7 @@ namespace Leap.Unity.UI.Interaction {
            + "based on the movement of the Leap hand so the objects appear to move with less latency.")]
     public bool graspHoldWarpingEnabled__curIgnored = true; // TODO: Warping not yet implemented.
 
-    void Awake() {
+    protected override void Awake() {
       base.Awake();
       rigidbodyWarper = new RigidbodyWarper(interactionManager, this.transform, _body, 0.25F);
     }

@@ -177,7 +177,7 @@ namespace Leap.Unity.UI.Interaction {
         Leap.Vector distalDirection = _hand.Basis.zBasis;
         var fingerUsage = ((medialFingerBoneDirection.x * distalDirection.x)
                          + (medialFingerBoneDirection.y * distalDirection.y)
-                         + (medialFingerBoneDirection.z * distalDirection.z)).Map(-0.6F, 1, 0, 1);
+                         + (medialFingerBoneDirection.z * distalDirection.z)).Map(-0.6F, 0.9F, 0, 1);
         usageSum += fingerUsage;
         averagePosition = new Leap.Vector(averagePosition.x + distalFingerBoneTip.x * fingerUsage,
                                           averagePosition.y + distalFingerBoneTip.y * fingerUsage,
@@ -476,41 +476,11 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Gizmos
 
-    private bool _enablePrimaryHoverGizmos = false;
-
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      if (_enablePrimaryHoverGizmos) {
-        //drawer.color = Color.red;
-        //drawer.DrawLine(_intentionPosition, _intentionPosition + _intentionRayDirections[0]);
-
-        //if (_hand != null) {
-        //  drawer.color = Color.blue;
-        //  for (int i = 1; i < _intentionRayDirections.Length; i++) {
-        //    drawer.DrawLine(_intentionPosition, _intentionPosition + _intentionRayDirections[i]);
-        //  }
-        //}
-
-        //if (_primaryHoverObj != null) {
-        //  drawer.color = new Color(0.8F, 0.5F, 0.2F);
-        //  drawer.DrawSphere(_primaryHoverCastPosition, 0.01F);
-        //}
-      }
+      // Draw runtime gizmos here
     }
 
     #endregion
-
-  }
-
-  public partial class InteractionManager : IRuntimeGizmoComponent {
-
-    // TODO: DELETEME
-    public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      foreach (var hand in _interactionHands) {
-        if (hand != null) {
-          hand.OnDrawRuntimeGizmos(drawer);
-        }
-      }
-    }
 
   }
 
