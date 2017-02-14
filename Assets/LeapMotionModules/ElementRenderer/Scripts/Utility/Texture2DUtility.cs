@@ -16,7 +16,7 @@ public static class Texture2DUtility {
     TextureFormat.RGFloat,
     TextureFormat.RFloat
   };
-
+  
   public static Color GetPixelUnbounded(this Texture2D texture, int x, int y) {
     if (texture.wrapMode == TextureWrapMode.Clamp) {
       x = Mathf.Clamp(x, 0, texture.width - 1);
@@ -25,12 +25,11 @@ public static class Texture2DUtility {
       x = Utils.Repeat(x, texture.width);
       y = Utils.Repeat(y, texture.height);
     }
+
     return texture.GetPixel(x, y);
   }
 
-  public static void AddBorder(this Texture2D texture, int pixelAmount) {
-    if (pixelAmount <= 0) return;
-
+  public static Texture2D GetBordered(this Texture2D texture, int pixelAmount) {
     texture.EnsureReadWriteEnabled();
     Color[] colors = texture.GetPixels();
 
@@ -38,9 +37,11 @@ public static class Texture2DUtility {
     int originalHeight = texture.height;
     int newWidth = originalWidth + pixelAmount * 2;
     int newHeight = originalHeight + pixelAmount * 2;
-    texture.Resize(newWidth, newHeight);
 
-    texture.SetPixels(pixelAmount, pixelAmount, originalWidth, originalHeight, colors);
+    var newTexture = Object.Instantiate(texture);
+    newTexture.Resize(newWidth, newHeight);
+
+    newTexture.SetPixels(pixelAmount, pixelAmount, originalWidth, originalHeight, colors);
 
     for (int x = 0; x < newWidth; x++) {
       for (int dy = 0; dy < pixelAmount; dy++) {
@@ -48,33 +49,33 @@ public static class Texture2DUtility {
         {
           int y = dy;
           int innerY = y - pixelAmount;
-          texture.SetPixel(x, y, texture.GetPixelUnbounded(innerX, innerY));
+          newTexture.SetPixel(x, y, texture.GetPixelUnbounded(innerX, innerY));
         }
         {
-          int y = texture.height - dy - 1;
-          int innerY = y + pixelAmount;
-          texture.SetPixel(x, y, texture.GetPixelUnbounded(innerX, innerY));
+          int y = newTexture.height - dy - 1;
+          int innerY = y - pixelAmount;
+          newTexture.SetPixel(x, y, texture.GetPixelUnbounded(innerX, innerY));
         }
       }
     }
 
-    for (int y = pixelAmount; y < newWidth - pixelAmount; y++) {
+    for (int y = pixelAmount; y < newHeight - pixelAmount; y++) {
       for (int dx = 0; dx < pixelAmount; dx++) {
         int innerY = y - pixelAmount;
         {
           int x = dx;
           int innerX = x - pixelAmount;
-          texture.SetPixel(x, y, texture.GetPixelUnbounded(innerX, innerY));
+          newTexture.SetPixel(x, y, texture.GetPixelUnbounded(innerX, innerY));
         }
         {
-          int x = texture.width - dx - 1;
-          int innerX = x + pixelAmount;
-          texture.SetPixel(x, y, texture.GetPixelUnbounded(innerX, innerY));
+          int x = newTexture.width - dx - 1;
+          int innerX = x - pixelAmount;
+          newTexture.SetPixel(x, y, texture.GetPixelUnbounded(innerX, innerY));
         }
       }
     }
 
-    texture.Apply();
+    newTexture.Apply();
+    return newTexture;
   }
-
 }
