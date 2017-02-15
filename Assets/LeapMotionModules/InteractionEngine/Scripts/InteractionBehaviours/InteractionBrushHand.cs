@@ -3,6 +3,7 @@ using UnityEngine.Assertions;
 using System.Collections;
 using System.Collections.Generic;
 using Leap;
+using Leap.Unity.RuntimeGizmos;
 using System;
 
 #if UNITY_EDITOR
@@ -25,7 +26,7 @@ namespace Leap.Unity.Interaction {
     private const float DEAD_ZONE_FRACTION = 0.05f;
     private const float DISLOCATION_FRACTION = 1.5f;
 
-    private InteractionBrushBone[] _brushBones;
+    public InteractionBrushBone[] _brushBones;
     private Hand _hand;
     private GameObject _handParent;
 
@@ -60,6 +61,8 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     private PhysicMaterial _material = null;
 
+    private bool handBegun = false;
+
     /** Gets the Leap.Hand object whose data is used to update this model. */
     public override Hand GetLeapHand() { return _hand; }
     /** Sets the Leap.Hand object to use to update this model. */
@@ -70,6 +73,9 @@ namespace Leap.Unity.Interaction {
       base.InitHand();
 
       if (Application.isPlaying) {
+        if (_manager == null) {
+          _manager = FindObjectOfType<InteractionManager>();
+        }
         gameObject.layer = _manager.InteractionBrushLayer;
       }
     }
@@ -77,6 +83,14 @@ namespace Leap.Unity.Interaction {
     /** Start using this hand model to represent a tracked hand. */
     public override void BeginHand() {
       base.BeginHand();
+
+      if (handBegun) {
+        for (int i = _brushBones.Length; i-- != 0; ) {
+          _brushBones[i].gameObject.SetActive(true);
+        }
+        _handParent.SetActive(true);
+        return;
+      }
 
 #if UNITY_EDITOR
       if (!EditorApplication.isPlaying) {
@@ -92,47 +106,77 @@ namespace Leap.Unity.Interaction {
 #endif
 
       _handParent = new GameObject(gameObject.name);
-      _handParent.transform.parent = null; // Prevent hand from moving when you turn your head.
+      _handParent.transform.parent = FindObjectOfType<InteractionManager>().transform; // Prevent hand from moving when you turn your head.
 
-      _brushBones = new InteractionBrushBone[N_FINGERS * N_ACTIVE_BONES];
+#if UNITY_EDITOR
+      _handParent.AddComponent<RuntimeColliderGizmos>();
+#endif
+
+      _brushBones = new InteractionBrushBone[N_FINGERS * N_ACTIVE_BONES + 1];
 
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
-          Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1)); // +1 to skip first bone.
+          Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
 
           GameObject brushGameObject = new GameObject(gameObject.name, typeof(CapsuleCollider), typeof(Rigidbody), typeof(InteractionBrushBone));
-          brushGameObject.layer = gameObject.layer;
-          brushGameObject.transform.localScale = Vector3.one;
-
-          InteractionBrushBone brushBone = brushGameObject.GetComponent<InteractionBrushBone>();
-          brushBone.manager = _manager;
-          _brushBones[boneArrayIndex] = brushBone;
-
-          Transform capsuleTransform = brushGameObject.transform;
-          capsuleTransform.SetParent(_handParent.transform, false);
 
           CapsuleCollider capsule = brushGameObject.GetComponent<CapsuleCollider>();
           capsule.direction = 2;
           capsule.radius = bone.Width * 0.5f;
           capsule.height = bone.Length + bone.Width;
           capsule.material = _material;
-          brushBone.capsuleCollider = capsule;
 
-          Rigidbody body = brushGameObject.GetComponent<Rigidbody>();
-          brushBone.capsuleBody = body;
-          body.position = bone.Center.ToVector3();
-          body.rotation = bone.Rotation.ToQuaternion();
-          body.freezeRotation = true;
-          body.useGravity = false;
-
-          body.mass = _perBoneMass;
-          body.collisionDetectionMode = _collisionDetection;
+          InteractionBrushBone brushBone = BeginBone(bone, brushGameObject, boneArrayIndex, capsule);
 
           brushBone.lastTarget = bone.Center.ToVector3();
         }
       }
+
+      {
+         // Palm is attached to the third metacarpal and derived from it.
+         Bone bone = _hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL);
+         int boneArrayIndex = N_FINGERS * N_ACTIVE_BONES;
+         GameObject brushGameObject = new GameObject(gameObject.name, typeof(BoxCollider), typeof(Rigidbody), typeof(InteractionBrushBone));
+  
+         BoxCollider box = brushGameObject.GetComponent<BoxCollider>();
+         box.center = new Vector3(_hand.IsLeft?-0.005f:0.005f, bone.Width * -0.3f, -0.01f);
+         box.size = new Vector3(bone.Length, bone.Width, bone.Length);
+         box.material = _material;
+ 
+         BeginBone(bone, brushGameObject, boneArrayIndex, box);
+      }
+      handBegun = true;
     }
+
+     private InteractionBrushBone BeginBone(Bone bone, GameObject brushGameObject, int boneArrayIndex, Collider collider_) {
+       brushGameObject.layer = gameObject.layer;
+       brushGameObject.transform.localScale = Vector3.one;
+ 
+       InteractionBrushBone brushBone = brushGameObject.GetComponent<InteractionBrushBone>();
+       brushBone.lastTarget = bone.Center.ToVector3();
+       brushBone.col = collider_;
+       brushBone.startTriggering();
+       brushBone.manager = _manager;
+       _brushBones[boneArrayIndex] = brushBone;
+ 
+       Transform capsuleTransform = brushGameObject.transform;
+       capsuleTransform.SetParent(_handParent.transform, false);
+ 
+       Rigidbody body = brushGameObject.GetComponent<Rigidbody>();
+       brushBone.body = body;
+       body.position = bone.Center.ToVector3();
+       body.rotation = bone.Rotation.ToQuaternion();
+       body.freezeRotation = true;
+       body.useGravity = false;
+       body.mass = _perBoneMass;
+       body.collisionDetectionMode = _collisionDetection;
+       if (collider_ is BoxCollider) {
+         body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+       }
+ 
+       return brushBone;
+     }
 
     /** Updates this hand model. */
     public override void UpdateHand() {
@@ -146,48 +190,78 @@ namespace Leap.Unity.Interaction {
 
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
-          Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex + 1));
+          Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
           int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
-          InteractionBrushBone brushBone = _brushBones[boneArrayIndex];
-          Rigidbody body = brushBone.capsuleBody;
-
-          // This hack works best when we set a fixed rotation for bones.  Otherwise
-          // most friction is lost as the bones roll on contact.
-          body.MoveRotation(bone.Rotation.ToQuaternion());
-
-          if (brushBone.updateTriggering() == false) {
-            // Calculate how far off the mark the brushes are.
-            float targetingError = (brushBone.lastTarget - body.position).magnitude / bone.Width;
-            float massScale = Mathf.Clamp(1.0f - (targetingError * 2.0f), 0.1f, 1.0f);
-            body.mass = _perBoneMass * massScale;
-
-            if (targetingError >= DISLOCATION_FRACTION) {
-              brushBone.startTriggering();
-            }
-          }
-
-          // Add a deadzone to avoid vibration.
-          Vector3 delta = bone.Center.ToVector3() - body.position;
-          float deltaLen = delta.magnitude;
-          if (deltaLen <= deadzone) {
-            body.velocity = Vector3.zero;
-            brushBone.lastTarget = body.position;
-          } else {
-            delta *= (deltaLen - deadzone) / deltaLen;
-            body.velocity = delta / Time.fixedDeltaTime;
-            brushBone.lastTarget = body.position + delta;
-          }
+          UpdateBone(bone, boneArrayIndex, deadzone);
         }
+      }
+
+      {
+        // Palm is attached to the third metacarpal.
+        Bone bone = _hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL);
+        int boneArrayIndex = N_FINGERS * N_ACTIVE_BONES;
+        UpdateBone(bone, boneArrayIndex, deadzone);
       }
     }
 
-    /** Cleans up this hand model when it no longer actively represents a tracked hand. */
-    public override void FinishHand() {
-      for (int i = _brushBones.Length; i-- != 0;) {
-        GameObject.Destroy(_brushBones[i].gameObject);
+    public void fillBones(Hand inHand) {
+      if (Application.isPlaying) {
+        for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
+          for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
+            Bone bone = inHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
+            int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
+            Vector displacement = _brushBones[boneArrayIndex].body.position.ToVector() - bone.Center;
+            bone.Center += displacement;
+            bone.PrevJoint += displacement;
+            bone.NextJoint += displacement;
+            bone.Rotation = _brushBones[boneArrayIndex].body.rotation.ToLeapQuaternion();
+          }
+        }
+          
+          //inHand.PalmPosition += _brushBones[_brushBones.Length - 1].body.position.ToVector() - inHand.PalmPosition;
+          //inHand.Rotation = _brushBones[_brushBones.Length - 1].body.rotation.ToLeapQuaternion();
       }
-      GameObject.Destroy(_handParent);
-      _brushBones = null;
+    }
+
+    private void UpdateBone(Bone bone, int boneArrayIndex, float deadzone) {
+      InteractionBrushBone brushBone = _brushBones[boneArrayIndex];
+      Rigidbody body = brushBone.body;
+
+      // This hack works best when we set a fixed rotation for bones.  Otherwise
+      // most friction is lost as the bones roll on contact.
+      body.MoveRotation(bone.Rotation.ToQuaternion());
+
+      if (brushBone.updateTriggering() == false) {
+        // Calculate how far off the mark the brushes are.
+        float targetingError = (brushBone.lastTarget - body.position).magnitude / bone.Width;
+        float massScale = Mathf.Clamp(1.0f - (targetingError * 2.0f), 0.1f, 1.0f) * Mathf.Clamp(_hand.PalmVelocity.Magnitude * 10f, 1f, 10f);
+        body.mass = _perBoneMass * massScale;
+
+        if (targetingError >= DISLOCATION_FRACTION && _hand.PalmVelocity.Magnitude < 1.5f) {
+          brushBone.startTriggering();
+        }
+      }
+
+
+      // Add a deadzone to avoid vibration.
+      Vector3 delta = bone.Center.ToVector3() - body.position;
+      float deltaLen = delta.magnitude;
+      if (deltaLen <= deadzone) {
+        body.velocity = Vector3.zero;
+        brushBone.lastTarget = body.position;
+      } else {
+        delta *= (deltaLen - deadzone) / deltaLen;
+        body.velocity = delta / Time.fixedDeltaTime;
+        brushBone.lastTarget = body.position + delta;
+      }
+    }
+
+  /** Cleans up this hand model when it no longer actively represents a tracked hand. */
+  public override void FinishHand() {
+      for (int i = _brushBones.Length; i-- != 0; ) {
+        _brushBones[i].gameObject.SetActive(false);
+      }
+      _handParent.SetActive(false);
 
       base.FinishHand();
     }

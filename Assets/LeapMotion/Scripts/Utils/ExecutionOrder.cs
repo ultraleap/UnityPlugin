@@ -159,7 +159,8 @@ namespace Leap.Unity{
   
       if (!nodes.Any(n => n.nodeType == NodeType.RELATIVE_UNORDERED)) {
         //If we don't have any unordered nodes, there is no work to do.
-        return;
+        // TODO: This isn't always correct!
+        //return;
       }
   
       unanchorReferencedNodes(ref nodes);
@@ -577,7 +578,7 @@ namespace Leap.Unity{
             break;
           case NodeType.LOCKED:
             if (minIndex < node.executionIndex) {
-              Debug.LogError("Note enough execution indexes to fit all of the scripts!");
+              Debug.LogError("Not enough execution indexes to fit all of the scripts!");
               return false;
             }
             minIndex = node.executionIndex;
@@ -605,7 +606,7 @@ namespace Leap.Unity{
             break;
           case NodeType.LOCKED:
             if (maxIndex > node.executionIndex) {
-              Debug.LogError("Note enough execution indexes to fit all of the scripts!");
+              Debug.LogError("Not enough execution indexes to fit all of the scripts!");
               return false;
             }
             maxIndex = node.executionIndex;
