@@ -20,6 +20,7 @@ namespace Leap.Unity {
     private Vector3 rootDirection;
     public Transform LMRig;
     public bool LMRigToFollowAnimator;
+    public Transform Target;
 
     public Text standWalkStateText;
     public Text m_AnimatorStateText;
@@ -49,6 +50,12 @@ namespace Leap.Unity {
       animator = GetComponent<Animator>();
       locomotion = new Locomotion(animator);
       rootDirection = transform.forward;
+
+      GameObject markerPrefab = Resources.Load("RuntimeGizmoMarker") as GameObject;
+      Target = GameObject.Instantiate(markerPrefab).transform;
+      Target.name = transform.name + "_ChestReferenceMarker";
+      Target.parent = GameObject.FindObjectOfType<LeapVRCameraControl>().transform;
+      Target.localPosition = new Vector3(0, 0, 2);
     }
 
     void Update() {
@@ -165,7 +172,7 @@ namespace Leap.Unity {
       Vector3 axis = Vector3.Cross(rootDirection, moveDirection);
       direction = Vector3.Angle(rootDirection, moveDirection) / 180f * (axis.y < 0 ? -1 : 1);
       if (animator && Camera.main) {
-        locomotion.Do(averageSpeed * 1.25f, (direction * 180), reverse);
+        //locomotion.Do(averageSpeed * 1.25f, (direction * 180), reverse);
         Debug.DrawLine(transform.position, moveDirection * 2, Color.red);
       }
     }
@@ -187,8 +194,16 @@ namespace Leap.Unity {
       //CameraOnGround.position = placeAnimatorUnderCam;
       //AnimatorRoot.position = animator.rootPosition;  
       //if(Input.GetKey(KeyCode.Space)){
-      if (IsCentering || !WalkingEnabled  && speed > .25) {
+      if (IsCentering || !WalkingEnabled  ) {
         animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam, .05f);
+        var lookPos = Target.position - transform.position;
+        lookPos.y = 0;
+        var rotation = Quaternion.LookRotation(lookPos);
+        animator.transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 1.5f);
+
+        //lock animator.transform rotation to camera y
+        //float CameraRotationY = Camera.main.transform.rotation.y;
+        //animator.transform.rotation = new Quaternion(animator.transform.rotation.x, CameraRotationY, animator.transform.rotation.z, animator.transform.rotation.w); 
       }
     }
 
