@@ -255,6 +255,9 @@ namespace Leap.Unity {
     /**Stores a snapshot of original joint positions */
     [ContextMenu("StoreJointsStartPose")]
     public void StoreJointsStartPose() {
+      jointList = new List<Transform>();
+      localRotations = new List<Quaternion>();
+      localPositions = new List<Vector3>();
       foreach (Transform t in palm.parent.GetComponentsInChildren<Transform>()) {
         jointList.Add(t);
         localRotations.Add(t.localRotation);
