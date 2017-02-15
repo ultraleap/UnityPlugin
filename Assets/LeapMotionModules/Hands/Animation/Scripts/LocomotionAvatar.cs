@@ -19,7 +19,6 @@ namespace Leap.Unity {
     private Vector3 distanceToRoot;
     private Vector3 rootDirection;
     public Transform LMRig;
-    public bool LMRigToFollowAnimator;
     public Transform Target;
 
     public Text standWalkStateText;
@@ -45,12 +44,12 @@ namespace Leap.Unity {
 
     void Start() {
       //CenteringText.text = "";
-
       InputTracking.Recenter();
       animator = GetComponent<Animator>();
       locomotion = new Locomotion(animator);
       rootDirection = transform.forward;
 
+      //Creating runtime gizmo target similar to ShoulderTurnBehavior.cs
       GameObject markerPrefab = Resources.Load("RuntimeGizmoMarker") as GameObject;
       Target = GameObject.Instantiate(markerPrefab).transform;
       Target.name = transform.name + "_ChestReferenceMarker";
@@ -59,50 +58,18 @@ namespace Leap.Unity {
     }
 
     void Update() {
-      if (LMRigToFollowAnimator == true) {
-        LMRigLococmotion();
-      }
-      else AnimatorLocomotion();
+      AnimatorLocomotion();
       
       if (isDisplayState) {
         StateDisplay();
       }
-      if (Input.GetKeyUp(KeyCode.Space)) {
-        CenterUnderCamera();
-        userHeight = Camera.main.transform.position.y;
-      }
+      //if (Input.GetKeyUp(KeyCode.Space)) {
+      //  CenterUnderCamera();
+      //  userHeight = Camera.main.transform.position.y;
+      //}
     }
    
-    void LMRigLococmotion() {
-      //Requires positioning of LMHeadMountedRig OnAnimatorIK()
-      Vector3 flatCamPosition = transform.InverseTransformPoint(Camera.main.transform.position);
-      flatCamPosition.y = 0;
-      Vector3 flatRootPosition = transform.InverseTransformPoint(transform.position);
-      flatRootPosition.y = 0;
-      distanceToRoot = flatCamPosition - flatRootPosition;
-      speed = distanceToRoot.magnitude;
-
-      // Convert joystick input in Worldspace coordinates
-      moveDirection = MoveDirectionCameraDirection();
-      //Vector3 moveDirection = referentialShift * CameraDirection;
-      Vector3 axis = Vector3.Cross(rootDirection, moveDirection);
-      direction = Vector3.Angle(rootDirection, moveDirection) / 180f * (axis.y < 0 ? -1 : 1);
-      if (speed > .01f) { //Dead "stick"
-      }
-      else {
-        speed = 0.0f;
-      }
-      float joySpeed = 0;
-      float joyDirection = 0;
-      if (animator && Camera.main) {
-        JoystickToEvents.Do(transform, Camera.main.transform, ref joySpeed, ref joyDirection);
-        if (joyDirection != 0 || joyDirection != 0) {
-          //direction += joyDirection;
-          speed += joySpeed;
-        }
-        locomotion.Do(speed * 2, (direction * 180), 1);
-      }
-    }
+   
     Vector3 MoveDirectionCameraDirection() {
       // Get camera rotation.
       rootDirection = transform.forward;// +transform.position;
@@ -171,8 +138,8 @@ namespace Leap.Unity {
       //Vector3 moveDirection = referentialShift * CameraDirection;
       Vector3 axis = Vector3.Cross(rootDirection, moveDirection);
       direction = Vector3.Angle(rootDirection, moveDirection) / 180f * (axis.y < 0 ? -1 : 1);
-      if (animator && Camera.main) {
-        //locomotion.Do(averageSpeed * 1.25f, (direction * 180), reverse);
+      if (animator && Camera.main && WalkingEnabled) {
+        locomotion.Do(averageSpeed * 1.25f, (direction * 180), reverse);
         Debug.DrawLine(transform.position, moveDirection * 2, Color.red);
       }
     }
@@ -185,23 +152,16 @@ namespace Leap.Unity {
           animator.transform.position = new Vector3(animator.transform.position.x, heightOffset, animator.transform.position.z);
         }
       }
-
-      if (LMRigToFollowAnimator) {
-        LMRig.position = new Vector3(transform.position.x, LMRig.position.y, transform.position.z);
-      }
       Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
 
-      //CameraOnGround.position = placeAnimatorUnderCam;
-      //AnimatorRoot.position = animator.rootPosition;  
-      //if(Input.GetKey(KeyCode.Space)){
-      if (IsCentering || !WalkingEnabled  ) {
+      if (IsCentering || !WalkingEnabled) {
         animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam, .05f);
         var lookPos = Target.position - transform.position;
         lookPos.y = 0;
         var rotation = Quaternion.LookRotation(lookPos);
         animator.transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 1.5f);
 
-        //lock animator.transform rotation to camera y
+        //Optional: lock animator.transform rotation to camera y
         //float CameraRotationY = Camera.main.transform.rotation.y;
         //animator.transform.rotation = new Quaternion(animator.transform.rotation.x, CameraRotationY, animator.transform.rotation.z, animator.transform.rotation.w); 
       }
