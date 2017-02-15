@@ -37,6 +37,15 @@ public class LeapGuiElementEditor : Editor {
         tempArray = new Object[elements.Count];
       }
 
+      int maxElements = LeapGuiPreferences.elementMax;
+      if (elements.Query().Any(e => e.attachedGui != null && e.attachedGui.elements.IndexOf(e) >= maxElements)) {
+        string noun = elements.Count == 1 ? "This element" : "Some of these elements";
+        string guiName = elements.Count == 1 ? "its gui" : "their guis";
+        EditorGUILayout.HelpBox(noun + " may not be properly displayed because there are too many elements on " + guiName + ".  " +
+                                "Either lower the number of elements or increase the maximum element count by visiting " +
+                                "Edit->Preferences.", MessageType.Warning);
+      }
+
       while (editorCache.Count < mainElement.data.Count) {
         editorCache.Add(null);
       }
