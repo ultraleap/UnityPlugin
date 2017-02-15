@@ -25,60 +25,62 @@ public class LeapGuiElementEditor : Editor {
   List<Object> tempList = new List<Object>();
 
   public override void OnInspectorGUI() {
-    base.OnInspectorGUI();
+    using (new ProfilerSample("Draw Leap Gui Element Editor")) {
+      base.OnInspectorGUI();
 
-    targets.Query().Where(e => e != null).Select(e => e as LeapGuiElement).FillList(elements);
+      targets.Query().Where(e => e != null).Select(e => e as LeapGuiElement).FillList(elements);
 
-    if (elements.Count == 0) return;
-    var mainElement = elements[0];
+      if (elements.Count == 0) return;
+      var mainElement = elements[0];
 
-    if (tempArray.Length != elements.Count) {
-      tempArray = new Object[elements.Count];
-    }
-
-    while (editorCache.Count < mainElement.data.Count) {
-      editorCache.Add(null);
-    }
-
-    for (int i = 0; i < mainElement.data.Count; i++) {
-      var mainDataObj = mainElement.data[i];
-      var mainDataType = mainDataObj.GetType();
-      var typeIndex = mainElement.data.Query().Where(d => d.GetType() == mainDataObj.GetType()).IndexOf(mainDataObj);
-
-      tempList.Clear();
-      tempList.Add(mainDataObj);
-
-      elements.Query().
-               Skip(1).
-               Select(e =>
-                 e.data.Query().
-                        OfType(mainDataType).
-                        ElementAtOrDefault(typeIndex)).
-               Where(d => d != null).
-               Cast<Object>().
-               AppendList(tempList);
-
-      if (tempList.Count != elements.Count) {
-        //Not all elements had a matching data object, so we don't display
-        continue;
+      if (tempArray.Length != elements.Count) {
+        tempArray = new Object[elements.Count];
       }
 
-      tempList.CopyTo(tempArray);
+      while (editorCache.Count < mainElement.data.Count) {
+        editorCache.Add(null);
+      }
 
-      Editor editor = editorCache[i];
-      CreateCachedEditor(tempArray, null, ref editor);
-      editorCache[i] = editor;
-      editor.serializedObject.Update();
+      for (int i = 0; i < mainElement.data.Count; i++) {
+        var mainDataObj = mainElement.data[i];
+        var mainDataType = mainDataObj.GetType();
+        var typeIndex = mainElement.data.Query().Where(d => d.GetType() == mainDataObj.GetType()).IndexOf(mainDataObj);
 
-      EditorGUI.BeginChangeCheck();
-      EditorGUILayout.LabelField(LeapGuiTagAttribute.GetTag(mainDataType));
-      EditorGUI.indentLevel++;
+        tempList.Clear();
+        tempList.Add(mainDataObj);
 
-      editor.OnInspectorGUI();
+        elements.Query().
+                 Skip(1).
+                 Select(e =>
+                   e.data.Query().
+                          OfType(mainDataType).
+                          ElementAtOrDefault(typeIndex)).
+                 Where(d => d != null).
+                 Cast<Object>().
+                 AppendList(tempList);
 
-      EditorGUI.indentLevel--;
-      if (EditorGUI.EndChangeCheck()) {
-        editor.serializedObject.ApplyModifiedProperties();
+        if (tempList.Count != elements.Count) {
+          //Not all elements had a matching data object, so we don't display
+          continue;
+        }
+
+        tempList.CopyTo(tempArray);
+
+        Editor editor = editorCache[i];
+        CreateCachedEditor(tempArray, null, ref editor);
+        editorCache[i] = editor;
+        editor.serializedObject.Update();
+
+        EditorGUI.BeginChangeCheck();
+        EditorGUILayout.LabelField(LeapGuiTagAttribute.GetTag(mainDataType));
+        EditorGUI.indentLevel++;
+
+        editor.OnInspectorGUI();
+
+        EditorGUI.indentLevel--;
+        if (EditorGUI.EndChangeCheck()) {
+          editor.serializedObject.ApplyModifiedProperties();
+        }
       }
     }
   }

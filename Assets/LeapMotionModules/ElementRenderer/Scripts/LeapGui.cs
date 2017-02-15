@@ -13,6 +13,10 @@ public class LeapGui : MonoBehaviour {
   public const string FEATURE_MOVEMENT_TRANSLATION = FEATURE_PREFIX + "MOVEMENT_TRANSLATION";
   public const string FEATURE_MOVEMENT_FULL = FEATURE_PREFIX + "MOVEMENT_FULL";
 
+#if UNITY_EDITOR
+  public static Action OnNeedRebuildPickingMeshes;
+#endif
+
   #region INSPECTOR FIELDS
   [SerializeField]
   private List<LeapGuiFeatureBase> _features = new List<LeapGuiFeatureBase>();
@@ -189,6 +193,57 @@ public class LeapGui : MonoBehaviour {
       _renderer.OnEnableRendererEditor();
     }
   }
+
+  public void RebuildEditorPickingMeshes() {
+    if (_space == null) {
+      return;
+    }
+
+    using (new ProfilerSample("Rebuild Picking Meshes")) {
+      List<Vector3> pickingVerts = new List<Vector3>();
+      List<int> pickingTris = new List<int>();
+
+      foreach (var element in _elements) {
+        pickingVerts.Clear();
+        pickingTris.Clear();
+
+        Mesh pickingMesh = element.pickingMesh;
+        if (pickingMesh == null) {
+          pickingMesh = new Mesh();
+          pickingMesh.MarkDynamic();
+          pickingMesh.hideFlags = HideFlags.HideAndDontSave;
+          pickingMesh.name = "Gui Element Picking Mesh";
+          element.pickingMesh = pickingMesh;
+        }
+        pickingMesh.Clear();
+
+        foreach (var dataObj in element.data) {
+          if (dataObj is LeapGuiMeshData) {
+            var meshData = dataObj as LeapGuiMeshData;
+            meshData.RefreshMeshData();
+
+            Mesh mesh = meshData.mesh;
+            if (mesh == null) continue;
+
+            var topology = MeshCache.GetTopology(mesh);
+            for (int i = 0; i < topology.tris.Length; i++) {
+              pickingTris.Add(topology.tris[i] + pickingVerts.Count);
+            }
+
+            ITransformer transformer = _space.GetTransformer(element.anchor);
+            for (int i = 0; i < topology.verts.Length; i++) {
+              Vector3 localRectVert = transform.InverseTransformPoint(element.transform.TransformPoint(topology.verts[i]));
+              pickingVerts.Add(transformer.TransformPoint(localRectVert));
+            }
+          }
+        }
+
+        pickingMesh.SetVertices(pickingVerts);
+        pickingMesh.SetTriangles(pickingTris, 0, calculateBounds: true);
+        pickingMesh.RecalculateNormals();
+      }
+    }
+  }
 #endif
   #endregion
 
@@ -290,11 +345,6 @@ public class LeapGui : MonoBehaviour {
       doLateUpdateRuntime();
     } else {
       doLateUpdateEditor();
-    }
-
-    //Always rebuild picking meshes every frame when in editor
-    if (_space != null) {
-      rebuildEditorPickingMeshes();
     }
 #else
     doLateUpdateRuntime();
@@ -538,54 +588,5 @@ public class LeapGui : MonoBehaviour {
       }
     }
   }
-
-#if UNITY_EDITOR
-  private void rebuildEditorPickingMeshes() {
-    using (new ProfilerSample("Rebuild Picking Meshes")) {
-      List<Vector3> pickingVerts = new List<Vector3>();
-      List<int> pickingTris = new List<int>();
-
-      foreach (var element in _elements) {
-        pickingVerts.Clear();
-        pickingTris.Clear();
-
-        Mesh pickingMesh = element.pickingMesh;
-        if (pickingMesh == null) {
-          pickingMesh = new Mesh();
-          pickingMesh.MarkDynamic();
-          pickingMesh.hideFlags = HideFlags.HideAndDontSave;
-          pickingMesh.name = "Gui Element Picking Mesh";
-          element.pickingMesh = pickingMesh;
-        }
-        pickingMesh.Clear();
-
-        foreach (var dataObj in element.data) {
-          if (dataObj is LeapGuiMeshData) {
-            var meshData = dataObj as LeapGuiMeshData;
-            meshData.RefreshMeshData();
-
-            Mesh mesh = meshData.mesh;
-            if (mesh == null) continue;
-
-            var topology = MeshCache.GetTopology(mesh);
-            for (int i = 0; i < topology.tris.Length; i++) {
-              pickingTris.Add(topology.tris[i] + pickingVerts.Count);
-            }
-
-            ITransformer transformer = _space.GetTransformer(element.anchor);
-            for (int i = 0; i < topology.verts.Length; i++) {
-              Vector3 localRectVert = transform.InverseTransformPoint(element.transform.TransformPoint(topology.verts[i]));
-              pickingVerts.Add(transformer.TransformPoint(localRectVert));
-            }
-          }
-        }
-
-        pickingMesh.SetVertices(pickingVerts);
-        pickingMesh.SetTriangles(pickingTris, 0, calculateBounds: true);
-        pickingMesh.RecalculateNormals();
-      }
-    }
-  }
-#endif
   #endregion
 }
