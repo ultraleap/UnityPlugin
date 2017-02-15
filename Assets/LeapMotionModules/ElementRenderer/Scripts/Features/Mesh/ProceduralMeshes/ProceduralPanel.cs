@@ -15,14 +15,6 @@ public class ProceduralPanel : ProceduralMeshSource {
   [SerializeField]
   private int _resolutionY = 8;
 
-  [MinValue(0)]
-  [SerializeField]
-  private float _width = 1;
-
-  [MinValue(0)]
-  [SerializeField]
-  private float _height = 1;
-
   [Tooltip("Uses sprite data to generate a nine sliced panel.")]
   [SerializeField]
   private bool _nineSliced = false;
@@ -32,6 +24,13 @@ public class ProceduralPanel : ProceduralMeshSource {
                                    out UVChannelFlags remappableChannels) {
     Vector4 borderSize = Vector4.zero;
     Vector4 borderUvs = Vector4.zero;
+
+    Rect rect = new Rect();
+
+    RectTransform t = GetComponent<RectTransform>();
+    if (t != null) {
+      rect = t.rect;
+    }
 
     if (_nineSliced) {
       var spriteData = meshFeature.element.Sprite();
@@ -63,9 +62,9 @@ public class ProceduralPanel : ProceduralMeshSource {
     for (int vy = 0; vy < vertsY; vy++) {
       for (int vx = 0; vx < vertsX; vx++) {
         Vector2 vert;
-        vert.x = calculateVertAxis(vx, vertsX, _width, borderSize.x, borderSize.z);
-        vert.y = calculateVertAxis(vy, vertsY, _height, borderSize.y, borderSize.w);
-        verts.Add(vert - new Vector2(_width / 2, _height / 2));
+        vert.x = calculateVertAxis(vx, vertsX, rect.width, borderSize.x, borderSize.z);
+        vert.y = calculateVertAxis(vy, vertsY, rect.height, borderSize.y, borderSize.w);
+        verts.Add(vert + new Vector2(rect.x, rect.y));
 
         Vector2 uv;
         uv.x = calculateVertAxis(vx, vertsX, 1, borderUvs.x, borderUvs.z);
