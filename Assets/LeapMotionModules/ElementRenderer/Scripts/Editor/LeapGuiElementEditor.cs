@@ -25,69 +25,71 @@ public class LeapGuiElementEditor : Editor {
   List<Object> tempList = new List<Object>();
 
   public override void OnInspectorGUI() {
-    base.OnInspectorGUI();
+    using (new ProfilerSample("Draw Leap Gui Element Editor")) {
+      base.OnInspectorGUI();
 
-    targets.Query().Where(e => e != null).Select(e => e as LeapGuiElement).FillList(elements);
+      targets.Query().Where(e => e != null).Select(e => e as LeapGuiElement).FillList(elements);
 
-    if (elements.Count == 0) return;
-    var mainElement = elements[0];
+      if (elements.Count == 0) return;
+      var mainElement = elements[0];
 
-    int maxElements = LeapGuiPreferences.elementMax;
-    if (elements.Query().Any(e => e.attachedGui != null && e.attachedGui.elements.IndexOf(e) >= maxElements)) {
-      string noun = elements.Count == 1 ? "This element" : "Some of these elements";
-      string guiName = elements.Count == 1 ? "its gui" : "their guis";
-      EditorGUILayout.HelpBox(noun + " may not be properly displayed because there are too many elements on " + guiName + ".  " +
-                              "Either lower the number of elements or increase the maximum element count by visiting " +
-                              "Edit->Preferences.", MessageType.Warning);
-    }
-
-    if (tempArray.Length != elements.Count) {
-      tempArray = new Object[elements.Count];
-    }
-
-    while (editorCache.Count < mainElement.data.Count) {
-      editorCache.Add(null);
-    }
-
-    for (int i = 0; i < mainElement.data.Count; i++) {
-      var mainDataObj = mainElement.data[i];
-      var mainDataType = mainDataObj.GetType();
-      var typeIndex = mainElement.data.Query().Where(d => d.GetType() == mainDataObj.GetType()).IndexOf(mainDataObj);
-
-      tempList.Clear();
-      tempList.Add(mainDataObj);
-
-      elements.Query().
-               Skip(1).
-               Select(e =>
-                 e.data.Query().
-                        OfType(mainDataType).
-                        ElementAtOrDefault(typeIndex)).
-               Where(d => d != null).
-               Cast<Object>().
-               AppendList(tempList);
-
-      if (tempList.Count != elements.Count) {
-        //Not all elements had a matching data object, so we don't display
-        continue;
+      if (tempArray.Length != elements.Count) {
+        tempArray = new Object[elements.Count];
       }
 
-      tempList.CopyTo(tempArray);
+      int maxElements = LeapGuiPreferences.elementMax;
+      if (elements.Query().Any(e => e.attachedGui != null && e.attachedGui.elements.IndexOf(e) >= maxElements)) {
+        string noun = elements.Count == 1 ? "This element" : "Some of these elements";
+        string guiName = elements.Count == 1 ? "its gui" : "their guis";
+        EditorGUILayout.HelpBox(noun + " may not be properly displayed because there are too many elements on " + guiName + ".  " +
+                                "Either lower the number of elements or increase the maximum element count by visiting " +
+                                "Edit->Preferences.", MessageType.Warning);
+      }
 
-      Editor editor = editorCache[i];
-      CreateCachedEditor(tempArray, null, ref editor);
-      editorCache[i] = editor;
-      editor.serializedObject.Update();
+      while (editorCache.Count < mainElement.data.Count) {
+        editorCache.Add(null);
+      }
 
-      EditorGUI.BeginChangeCheck();
-      EditorGUILayout.LabelField(LeapGuiTagAttribute.GetTag(mainDataType));
-      EditorGUI.indentLevel++;
+      for (int i = 0; i < mainElement.data.Count; i++) {
+        var mainDataObj = mainElement.data[i];
+        var mainDataType = mainDataObj.GetType();
+        var typeIndex = mainElement.data.Query().Where(d => d.GetType() == mainDataObj.GetType()).IndexOf(mainDataObj);
 
-      editor.OnInspectorGUI();
+        tempList.Clear();
+        tempList.Add(mainDataObj);
 
-      EditorGUI.indentLevel--;
-      if (EditorGUI.EndChangeCheck()) {
-        editor.serializedObject.ApplyModifiedProperties();
+        elements.Query().
+                 Skip(1).
+                 Select(e =>
+                   e.data.Query().
+                          OfType(mainDataType).
+                          ElementAtOrDefault(typeIndex)).
+                 Where(d => d != null).
+                 Cast<Object>().
+                 AppendList(tempList);
+
+        if (tempList.Count != elements.Count) {
+          //Not all elements had a matching data object, so we don't display
+          continue;
+        }
+
+        tempList.CopyTo(tempArray);
+
+        Editor editor = editorCache[i];
+        CreateCachedEditor(tempArray, null, ref editor);
+        editorCache[i] = editor;
+        editor.serializedObject.Update();
+
+        EditorGUI.BeginChangeCheck();
+        EditorGUILayout.LabelField(LeapGuiTagAttribute.GetTag(mainDataType));
+        EditorGUI.indentLevel++;
+
+        editor.OnInspectorGUI();
+
+        EditorGUI.indentLevel--;
+        if (EditorGUI.EndChangeCheck()) {
+          editor.serializedObject.ApplyModifiedProperties();
+        }
       }
     }
   }
