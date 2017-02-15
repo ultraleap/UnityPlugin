@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace Leap.Unity.Interaction {
 
   [CustomEditor(typeof(InteractionMaterial))]
-  public class InteractionMaterialEditor : CustomEditorBase {
+  public class InteractionMaterialEditor : CustomEditorBase<InteractionMaterial> {
 
     private Dictionary<string, TypeData> _propertyToType;
 

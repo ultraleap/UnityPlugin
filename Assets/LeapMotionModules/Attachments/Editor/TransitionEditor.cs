@@ -1,10 +1,9 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
 using Leap.Unity;
 using Leap.Unity.Attachments;
 
 [CustomEditor (typeof(Transition))]
-public class TransitionEditor : CustomEditorBase {
+public class TransitionEditor : CustomEditorBase<Transition> {
   protected override void OnEnable() {
     base.OnEnable();
 

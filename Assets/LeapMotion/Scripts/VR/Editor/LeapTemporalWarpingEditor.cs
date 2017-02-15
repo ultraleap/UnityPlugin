@@ -3,7 +3,7 @@
 namespace Leap.Unity {
 
   [CustomEditor(typeof(LeapVRTemporalWarping))]
-  public class LeapTemporalWarpingEditor : CustomEditorBase {
+  public class LeapTemporalWarpingEditor : CustomEditorBase<LeapVRTemporalWarping> {
 
     protected override void OnEnable() {
       base.OnEnable();
