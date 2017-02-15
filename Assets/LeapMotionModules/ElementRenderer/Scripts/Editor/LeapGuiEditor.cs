@@ -108,7 +108,7 @@ public class LeapGuiEditor : CustomEditorBase {
     if (gui.elements.Count > elementMax) {
       EditorGUILayout.HelpBox("This gui currently has " + gui.elements.Count.ToString() +
                               " elements, which is greater than the maximum of " +
-                              elementMax + ".  Visit the preferences to change the maximum element count.",
+                              elementMax + ".  Visit Edit->Preferences to change the maximum element count.",
                               MessageType.Warning);
       return;
     }

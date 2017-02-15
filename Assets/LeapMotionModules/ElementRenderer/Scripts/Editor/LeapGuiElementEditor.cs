@@ -37,8 +37,8 @@ public class LeapGuiElementEditor : Editor {
       string noun = elements.Count == 1 ? "This element" : "Some of these elements";
       string guiName = elements.Count == 1 ? "its gui" : "their guis";
       EditorGUILayout.HelpBox(noun + " may not be properly displayed because there are too many elements on " + guiName + ".  " +
-                              "Either lower the number of elements or increase the maximum element count in the " +
-                              "preferences window.", MessageType.Warning);
+                              "Either lower the number of elements or increase the maximum element count by visiting " +
+                              "Edit->Preferences.", MessageType.Warning);
     }
 
     if (tempArray.Length != elements.Count) {
