@@ -9,9 +9,11 @@ namespace Leap.Unity.UI.Interaction {
   public class InteractionManagerEditor : CustomEditorBase {
 
     void OnEnable() {
+      base.OnEnable();
+
       var manager = target as InteractionManager;
 
-      base.specifyConditionalDrawing("_showDebugOptions", "_debugIntHandRoughVolumes");
+      specifyConditionalDrawing("_showDebugOptions", "_debugDrawInteractionHands");
     }
 
   }
