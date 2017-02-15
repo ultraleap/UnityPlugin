@@ -43,11 +43,11 @@ public class ShoulderTurnBehavior : MonoBehaviour {
   }
   // Update is called once per frame 
   void LateUpdate() {
-    if (Input.GetKeyUp(KeyCode.Space)) {
+    //if (Input.GetKeyUp(KeyCode.Space)) {
       Target.position = CamTarg.position;
-    }
-    Vector3 flattenedTargetPosition = new Vector3(Target.position.x, NeckReferenceTransform.position.y, Target.position.z);
-    Target.position = flattenedTargetPosition;
+    //}
+    //Vector3 flattenedTargetPosition = new Vector3(Target.position.x, NeckReferenceTransform.position.y, Target.position.z);
+    //Target.position = flattenedTargetPosition;
     rotateChestToFollow(Target);
     rollHead();
     //Head Rotation
