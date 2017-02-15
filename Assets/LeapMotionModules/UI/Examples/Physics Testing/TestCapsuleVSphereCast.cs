@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Leap.Unity.Graphing;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Timing = System.Diagnostics;
@@ -6,11 +7,11 @@ using Timing = System.Diagnostics;
 public class TestCapsuleVSphereCast : MonoBehaviour {
 
   private const int DIMENSION_LENGTH = 7;
-  private const float SEPARATION_M = 0.04F;
+  private const float SEPARATION_M = 0.01F;
 
   void Start() {
     GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-    cube.transform.localScale = Vector3.one * 0.04F;
+    cube.transform.localScale = Vector3.one * 0.02F;
     cube.AddComponent<Rigidbody>();
     cube.GetComponent<Rigidbody>().useGravity = false;
     cube.GetComponent<Collider>().isTrigger = true;
@@ -60,8 +61,8 @@ public class TestCapsuleVSphereCast : MonoBehaviour {
   }
 
   private Vector3 _startPos = Vector3.zero;
-  private Vector3 _endPos = Vector3.one * 0.4F;
-  private float _radius = 0.2F;
+  private Vector3 _endPos = Vector3.one * 0.5F;
+  private float _radius = 0.05F;
 
   private void RunCapsuleCheckTest() {
     _stopwatch.Start();
