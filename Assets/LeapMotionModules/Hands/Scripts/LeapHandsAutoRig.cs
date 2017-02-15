@@ -12,7 +12,7 @@ namespace Leap.Unity {
     private RuntimeAnimatorController runtimeAnimatorController;
     public string ModelGroupName = null;
     [Tooltip("Set to True if each finger has an extra trasform between palm and base of the finger.")] 
-    public bool UseMetaCarpals;
+    public bool ModelHasMetaCarpals;
     [Header("RiggedHand Components")]
     public RiggedHand RiggedHand_L;
     public RiggedHand RiggedHand_R;
@@ -98,7 +98,7 @@ namespace Leap.Unity {
         HandTransitionBehavior_L = Hand_L.gameObject.AddComponent<HandEnableDisable>();
         RiggedHand_L.Handedness = Chirality.Left;
         RiggedHand_L.SetEditorLeapPose = false;
-        RiggedHand_L.UseMetaCarpals = UseMetaCarpals;
+        RiggedHand_L.UseMetaCarpalsOnSetup = ModelHasMetaCarpals;
         RiggedHand_L.SetupRiggedHand();
 
         RiggedFinger_L_Thumb = (RiggedFinger)RiggedHand_L.fingers[0];
@@ -123,7 +123,7 @@ namespace Leap.Unity {
         HandTransitionBehavior_R = Hand_R.gameObject.AddComponent<HandEnableDisable>();
         RiggedHand_R.Handedness = Chirality.Right;
         RiggedHand_R.SetEditorLeapPose = false;
-        RiggedHand_R.UseMetaCarpals = UseMetaCarpals;
+        RiggedHand_R.UseMetaCarpalsOnSetup = ModelHasMetaCarpals;
         RiggedHand_R.SetupRiggedHand();
 
         RiggedFinger_R_Thumb = (RiggedFinger)RiggedHand_R.fingers[0];
@@ -182,10 +182,10 @@ namespace Leap.Unity {
       //Find palms and assign to RiggedHands
       RiggedHand_L.palm = AnimatorForMapping.GetBoneTransform(HumanBodyBones.LeftHand);
       RiggedHand_R.palm = AnimatorForMapping.GetBoneTransform(HumanBodyBones.RightHand);
-      RiggedHand_R.UseMetaCarpals = UseMetaCarpals;
-      RiggedHand_L.UseMetaCarpals = UseMetaCarpals;
+      RiggedHand_R.UseMetaCarpalsOnSetup = ModelHasMetaCarpals;
+      RiggedHand_L.UseMetaCarpalsOnSetup = ModelHasMetaCarpals;
 
-      findAndAssignRiggedFingers(UseMetaCarpals);
+      findAndAssignRiggedFingers(ModelHasMetaCarpals);
 
       RiggedHand_L.AutoRigRiggedHand(RiggedHand_L.palm, RiggedFinger_L_Pinky.transform, RiggedFinger_L_Index.transform);
       RiggedHand_R.AutoRigRiggedHand(RiggedHand_R.palm, RiggedFinger_R_Pinky.transform, RiggedFinger_R_Index.transform);
