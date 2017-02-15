@@ -8,6 +8,14 @@ namespace Leap.Unity.Query.Test {
     public int[] LIST_1 = { 6, 7, 8, 9, 10 };
 
     [Test]
+    public void CastTest() {
+      object[] objs = new object[] { "Hello", "World", "These", "Are", "All", "Strings" };
+
+      Assert.That(objs.Cast<string>().SequenceEqual(
+                  objs.Query().Cast<string>().ToList()));
+    }
+
+    [Test]
     public void ConcatTest() {
       Assert.That(LIST_0.Concat(LIST_1).SequenceEqual(
                   LIST_0.Query().Concat(LIST_1.Query()).ToList()));
@@ -19,6 +27,9 @@ namespace Leap.Unity.Query.Test {
 
       Assert.That(objs.OfType<string>().SequenceEqual(
                   objs.Query().OfType<string>().ToList()));
+
+      Assert.That(objs.OfType<string>().SequenceEqual(
+                  objs.Query().OfType(typeof(string)).Cast<string>().ToList()));
     }
 
     [Test]
@@ -100,6 +111,15 @@ namespace Leap.Unity.Query.Test {
 
       Assert.AreEqual(LIST_0.Count(i => i % 2 == 0),
                       LIST_0.Query().Count(i => i % 2 == 0));
+    }
+
+    [Test]
+    public void ElemenAtTest() {
+      Assert.AreEqual(LIST_0.ElementAt(3),
+                      LIST_0.Query().ElementAt(3));
+
+      Assert.AreEqual(LIST_0.ElementAtOrDefault(100),
+                      LIST_0.Query().ElementAtOrDefault(100));
     }
 
     [Test]

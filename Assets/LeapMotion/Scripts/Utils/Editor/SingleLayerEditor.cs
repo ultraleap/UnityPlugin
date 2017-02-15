@@ -3,7 +3,7 @@ using UnityEditor;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity {
 
   [CustomPropertyDrawer(typeof(SingleLayer))]
   public class SingleLayerEditor : PropertyDrawer {
@@ -13,7 +13,11 @@ namespace Leap.Unity.Interaction {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
       ensureLayersInitialized();
 
-      SerializedProperty layerProperty = property.FindPropertyRelative("layer");
+      SerializedProperty layerProperty = property.FindPropertyRelative("layerIndex");
+      if (layerProperty == null) {
+        Debug.LogWarning("Could not find the layer index property, was it renamed or removed?");
+        return;
+      }
 
       int index = _layerValues.IndexOf(layerProperty.intValue);
       if (index < 0) {
