@@ -117,8 +117,7 @@ public static class PackUtil {
     BorderKey key = new BorderKey() { texture = source, border = border };
     if (!_cachedBorderedTextures.TryGetValue(key, out bordered)) {
       source.EnsureReadWriteEnabled();
-      bordered = UnityEngine.Object.Instantiate(source);
-      bordered.AddBorder(border);
+      bordered = source.GetBordered(border);
       _cachedBorderedTextures[key] = bordered;
     }
     return bordered;
