@@ -13,10 +13,6 @@ public class LeapGui : MonoBehaviour {
   public const string FEATURE_MOVEMENT_TRANSLATION = FEATURE_PREFIX + "MOVEMENT_TRANSLATION";
   public const string FEATURE_MOVEMENT_FULL = FEATURE_PREFIX + "MOVEMENT_FULL";
 
-#if UNITY_EDITOR
-  public static Action OnNeedRebuildPickingMeshes;
-#endif
-
   #region INSPECTOR FIELDS
   [SerializeField]
   private List<LeapGuiFeatureBase> _features = new List<LeapGuiFeatureBase>();
