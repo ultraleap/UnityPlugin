@@ -15,7 +15,7 @@ namespace Leap.Unity.Graphing {
 
     private int _history;
     private int _count;
-    private RingBuffer<IndexValuePair> _buffer = new RingBuffer<IndexValuePair>();
+    private Deque<IndexValuePair> _buffer = new Deque<IndexValuePair>();
 
     public SlidingMax(int history) {
       _history = history;

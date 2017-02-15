@@ -159,6 +159,9 @@ namespace Leap.Unity.InputModule {
     [Tooltip("Retract compressible widgets when not using Tactile Interaction.")]
     /** Retract compressible widgets when not using Tactile Interaction.*/
     public bool RetractUI = false;
+    [Tooltip("Retransform the Interaction Pointer to allow the Module to work in a non-stationary reference frame.")]
+    /** Retransform the Interaction Pointer to allow the Module to work in a non-stationary reference frame.*/
+    public bool MovingReferenceFrame = false;
 
     //Event related data
     //private Camera EventCamera;
@@ -184,12 +187,13 @@ namespace Leap.Unity.InputModule {
     private Canvas[] canvases;
     private Quaternion CurrentRotation;
     private AudioSource SoundPlayer;
-    private Frame curFrame;
     private GameObject[] currentGo;
     private GameObject[] currentGoing;
     private Vector3 OldCameraPos = Vector3.zero;
     private Quaternion OldCameraRot = Quaternion.identity;
     private float OldCameraFoV;
+    private bool forceProjective = false;
+    private bool forceTactile = false;
 
     //Queue of Spheres to Debug Draw
     private Queue<Vector3> DebugSphereQueue;
@@ -222,9 +226,13 @@ namespace Leap.Unity.InputModule {
 
       //Set Projective/Tactile Modes
       if (InteractionMode == InteractionCapability.Projective) {
-        ProjectiveToTactileTransitionDistance = -100f;
+        ProjectiveToTactileTransitionDistance = -float.MaxValue;
+        forceTactile = false;
+        forceProjective = true;
       } else if (InteractionMode == InteractionCapability.Tactile) {
-        ProjectiveToTactileTransitionDistance = 100f;
+        ProjectiveToTactileTransitionDistance = float.MaxValue;
+        forceTactile = true;
+        forceProjective = false;
       }
 
       //Initialize the Pointers for Projective Interaction
@@ -248,12 +256,18 @@ namespace Leap.Unity.InputModule {
           PointerLines[index] = pointer.AddComponent<LineRenderer>();
           PointerLines[index].material = Instantiate(PointerMaterial);
           PointerLines[index].material.color = new Color(0f, 0f, 0f, 0f);
+#if UNITY_5_5_OR_NEWER
           PointerLines[index].numPositions = 2;
           PointerLines[index].startWidth = 0.001f;
           PointerLines[index].endWidth = 0.001f;
+#else
+          PointerLines[index].SetVertexCount(2);
+          PointerLines[index].SetWidth(0.001f, 0.001f);
+#endif
         }
 
         Pointers[index] = pointer.GetComponent<Transform>();
+        Pointers[index].parent = transform;
         pointer.SetActive(false);
 
         if (InnerPointer) {
@@ -268,6 +282,7 @@ namespace Leap.Unity.InputModule {
           renderer.material = Instantiate(PointerMaterial);
 
           InnerPointers[index] = innerPointer.GetComponent<Transform>();
+          InnerPointers[index].parent = transform;
           innerPointer.SetActive(false);
         }
       }
@@ -304,8 +319,6 @@ namespace Leap.Unity.InputModule {
 
     //Update the Head Yaw for Calculating "Shoulder Positions"
     void Update() {
-      curFrame = LeapDataProvider.CurrentFrame;
-
       if (Camera.main != null) {
         Quaternion HeadYaw = Quaternion.Euler(0f, OldCameraRot.eulerAngles.y, 0f);
         CurrentRotation = Quaternion.Slerp(CurrentRotation, HeadYaw, 0.1f);
@@ -314,6 +327,10 @@ namespace Leap.Unity.InputModule {
 
     //Process is called by UI system to process events
     public override void Process() {
+      if (MovingReferenceFrame) {
+        (LeapDataProvider as LeapServiceProvider).ReTransformFrames();
+      }
+
       OldCameraPos = Camera.main.transform.position;
       OldCameraRot = Camera.main.transform.rotation;
       OldCameraFoV = Camera.main.fieldOfView;
@@ -330,7 +347,7 @@ namespace Leap.Unity.InputModule {
           whichHand = whichPointer <= 4 ? 0 : 1;
           whichFinger = whichPointer <= 4 ? whichPointer : whichPointer - 5;
           //Move on if this hand isn't visible in the frame
-          if (curFrame.Hands.Count - 1 < whichHand) {
+          if (LeapDataProvider.CurrentFrame.Hands.Count - 1 < whichHand) {
             if (Pointers[whichPointer].gameObject.activeInHierarchy == true) {
               Pointers[whichPointer].gameObject.SetActive(false);
               if (InnerPointer) {
@@ -343,7 +360,7 @@ namespace Leap.Unity.InputModule {
           whichHand = whichPointer;
           whichFinger = 1;
           //Move on if this hand isn't visible in the frame
-          if (curFrame.Hands.Count - 1 < whichHand) {
+          if (LeapDataProvider.CurrentFrame.Hands.Count - 1 < whichHand) {
             if (Pointers[whichPointer].gameObject.activeInHierarchy == true) {
               Pointers[whichPointer].gameObject.SetActive(false);
               if (InnerPointer) {
@@ -357,7 +374,7 @@ namespace Leap.Unity.InputModule {
         //Calculate Shoulder Positions (for Projection)
         Vector3 ProjectionOrigin = Vector3.zero;
         if (Camera.main != null) {
-          switch (curFrame.Hands[whichHand].IsRight) {
+          switch (LeapDataProvider.CurrentFrame.Hands[whichHand].IsRight) {
             case true:
               ProjectionOrigin = OldCameraPos + CurrentRotation * new Vector3(0.15f, -0.2f, 0f);
               break;
@@ -389,7 +406,7 @@ namespace Leap.Unity.InputModule {
             PrevState[whichPointer] = pointerState[whichPointer]; //Store old state for sound transitionary purposes
           }
           UpdatePointer(whichPointer, PointEvents[whichPointer], PointEvents[whichPointer].pointerCurrentRaycast.gameObject);
-          if (!TipRaycast && distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance) {
+          if (!TipRaycast && (forceTactile || (!forceProjective && distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance))) {
             PointEvents[whichPointer].pointerCurrentRaycast = new RaycastResult();
           }
           ProcessState(whichPointer, whichHand, whichFinger, TipRaycast);
@@ -397,7 +414,7 @@ namespace Leap.Unity.InputModule {
 
         //Handle the Environment Pointer
         if ((EnvironmentPointer) && (pointerState[whichPointer] == pointerStates.OffCanvas)) {
-          Vector3 IndexMetacarpal = curFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
+          Vector3 IndexMetacarpal = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
           RaycastHit EnvironmentSpot;
           Physics.Raycast(ProjectionOrigin, (IndexMetacarpal - ProjectionOrigin).normalized, out EnvironmentSpot);
           Pointers[whichPointer].position = EnvironmentSpot.point + (EnvironmentSpot.normal * 0.01f);
@@ -527,7 +544,7 @@ namespace Leap.Unity.InputModule {
 
 
           //If we have dragged beyond the drag threshold
-          if (!PointEvents[whichPointer].dragging && currentGoing[whichPointer] && Vector2.Distance(PointEvents[whichPointer].position, DragBeginPosition[whichPointer])*100f > EventSystem.current.pixelDragThreshold) {
+          if (!PointEvents[whichPointer].dragging && currentGoing[whichPointer] && Vector2.Distance(PointEvents[whichPointer].position, DragBeginPosition[whichPointer]) * 100f > EventSystem.current.pixelDragThreshold) {
             IDragHandler Dragger = PointEvents[whichPointer].pointerDrag.GetComponent<IDragHandler>();
             if (Dragger != null && Dragger is ScrollRect) {
               if (currentGo[whichPointer] && !(currentGo[whichPointer].GetComponent<ScrollRect>())) {
@@ -626,36 +643,36 @@ namespace Leap.Unity.InputModule {
         if (!perFingerPointer) {
           /*
           float numberOfExtendedFingers = 0.1f;
-          IndexFingerPosition = curFrame.Hands[whichHand].Fingers[whichFinger].TipPosition.ToVector3() * 0.1f;
+          IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[whichFinger].TipPosition.ToVector3() * 0.1f;
           //Averages cursor position through average of extended fingers; ended up being worse than expected
           for (int i = 1; i < 4; i++) {
-            float fingerExtension = Mathf.Clamp01(Vector3.Dot(curFrame.Hands[whichHand].Fingers[i].Direction.ToVector3(), curFrame.Hands[whichPointer].Direction.ToVector3())) / 1.5f;
+            float fingerExtension = Mathf.Clamp01(Vector3.Dot(LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[i].Direction.ToVector3(), LeapDataProvider.CurrentFrame.Hands[whichPointer].Direction.ToVector3())) / 1.5f;
             if (fingerExtension > 0f) {
               numberOfExtendedFingers += fingerExtension;
-              IndexFingerPosition += curFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3() * fingerExtension;
+              IndexFingerPosition += LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3() * fingerExtension;
             }
           }
           IndexFingerPosition /= numberOfExtendedFingers;
           */
-          
+
           float farthest = 0f;
-          IndexFingerPosition = curFrame.Hands[whichHand].Fingers[1].TipPosition.ToVector3();
+          IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[1].TipPosition.ToVector3();
           for (int i = 1; i < 3; i++) {
-            float fingerDistance = Vector3.Distance(Camera.main.transform.position, curFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3());
-            float fingerExtension = Mathf.Clamp01(Vector3.Dot(curFrame.Hands[whichHand].Fingers[i].Direction.ToVector3(), curFrame.Hands[whichPointer].Direction.ToVector3())) / 1.5f;
+            float fingerDistance = Vector3.Distance(Camera.main.transform.position, LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3());
+            float fingerExtension = Mathf.Clamp01(Vector3.Dot(LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[i].Direction.ToVector3(), LeapDataProvider.CurrentFrame.Hands[whichPointer].Direction.ToVector3())) / 1.5f;
             if (fingerDistance > farthest && fingerExtension > 0.5f) {
               farthest = fingerDistance;
-              IndexFingerPosition = curFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3();
+              IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[i].TipPosition.ToVector3();
             }
           }
         } else {
-          IndexFingerPosition = curFrame.Hands[whichHand].Fingers[whichFinger].TipPosition.ToVector3();
+          IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[whichFinger].TipPosition.ToVector3();
         }
 
         //Else Raycast through the knuckle of the Index Finger
       } else {
         Camera.main.transform.position = Origin;
-        IndexFingerPosition = curFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
+        IndexFingerPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_METACARPAL).Center.ToVector3();
       }
 
       //Draw Camera Origin
@@ -699,7 +716,7 @@ namespace Leap.Unity.InputModule {
     //Tree to decide the State of the Pointer
     private void ProcessState(int whichPointer, int whichHand, int whichFinger, bool forceTipRaycast) {
       if ((PointEvents[whichPointer].pointerCurrentRaycast.gameObject != null)) {
-        if (distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance) {
+        if (forceTactile || (!forceProjective && distanceOfTipToPointer(whichPointer, whichHand, whichFinger) < ProjectiveToTactileTransitionDistance)) {
           if (isTriggeringInteraction(whichPointer, whichHand, whichFinger)) {
             if (ExecuteEvents.GetEventHandler<IPointerClickHandler>(PointEvents[whichPointer].pointerCurrentRaycast.gameObject)) {
               pointerState[whichPointer] = pointerStates.TouchingElement;
@@ -857,9 +874,9 @@ namespace Leap.Unity.InputModule {
 
       if (!perFingerPointer && !getTouchingMode(whichPointer)) {
         if (whichPointer == 0) {
-          Pointerscale *= PointerPinchScale.Evaluate(curFrame.Hands[0].PinchDistance);
+          Pointerscale *= PointerPinchScale.Evaluate(LeapDataProvider.CurrentFrame.Hands[0].PinchDistance);
         } else if (whichPointer == 1) {
-          Pointerscale *= PointerPinchScale.Evaluate(curFrame.Hands[1].PinchDistance);
+          Pointerscale *= PointerPinchScale.Evaluate(LeapDataProvider.CurrentFrame.Hands[1].PinchDistance);
         }
       }
 
@@ -877,15 +894,15 @@ namespace Leap.Unity.InputModule {
       }
 
       if (InteractionMode != InteractionCapability.Tactile) {
-        if ((curFrame.Hands[whichHand].IsRight) && (RightHandDetector != null && RightHandDetector.IsPinching) || (RightHandDetector == null && curFrame.Hands[whichHand].PinchDistance < PinchingThreshold)) {
+        if ((LeapDataProvider.CurrentFrame.Hands[whichHand].IsRight) && (RightHandDetector != null && RightHandDetector.IsPinching) || (RightHandDetector == null && LeapDataProvider.CurrentFrame.Hands[whichHand].PinchDistance < PinchingThreshold)) {
           return true;
-        } else if ((curFrame.Hands[whichHand].IsLeft) && (LeftHandDetector != null && LeftHandDetector.IsPinching) || (LeftHandDetector == null && curFrame.Hands[whichHand].PinchDistance < PinchingThreshold)) {
+        } else if ((LeapDataProvider.CurrentFrame.Hands[whichHand].IsLeft) && (LeftHandDetector != null && LeftHandDetector.IsPinching) || (LeftHandDetector == null && LeapDataProvider.CurrentFrame.Hands[whichHand].PinchDistance < PinchingThreshold)) {
           return true;
         }
       }
 
       //Disabling Pinching during touch interactions; maybe still desirable?
-      //return curFrame.Hands[whichPointer].PinchDistance < PinchingThreshold;
+      //return LeapDataProvider.CurrentFrame.Hands[whichPointer].PinchDistance < PinchingThreshold;
 
       return false;
     }
@@ -893,14 +910,14 @@ namespace Leap.Unity.InputModule {
     /** The z position of the index finger tip to the Pointer. */
     public float distanceOfTipToPointer(int whichPointer, int whichHand, int whichFinger) {
       //Get Base of Index Finger Position
-      Vector3 TipPosition = curFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToVector3();
+      Vector3 TipPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToVector3();
       return (-Pointers[whichPointer].InverseTransformPoint(TipPosition).z * Pointers[whichPointer].lossyScale.z) - TactilePadding;
     }
 
     /** The z position of the index finger tip to the specified transform. */
     public float distanceOfTipToElement(Transform UIElement, int whichHand, int whichFinger) {
       //Get Base of Index Finger Position
-      Vector3 TipPosition = curFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToVector3();
+      Vector3 TipPosition = LeapDataProvider.CurrentFrame.Hands[whichHand].Fingers[whichFinger].Bone(Bone.BoneType.TYPE_DISTAL).NextJoint.ToVector3();
       return (-UIElement.InverseTransformPoint(TipPosition).z * UIElement.lossyScale.z) - TactilePadding;
     }
 
@@ -1020,7 +1037,7 @@ namespace Leap.Unity.InputModule {
 
     /** Only activate the InputModule when there are hands in the scene. */
     public override bool ShouldActivateModule() {
-      return curFrame != null && curFrame.Hands.Count > 0 && base.ShouldActivateModule();
+      return LeapDataProvider.CurrentFrame != null && LeapDataProvider.CurrentFrame.Hands.Count > 0 && base.ShouldActivateModule();
     }
   }
 }
