@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-public static class PickingMeshWatcher {
+public static class EditorPickingMeshRebuilder {
 
   [InitializeOnLoadMethod]
   private static void initManager() {
