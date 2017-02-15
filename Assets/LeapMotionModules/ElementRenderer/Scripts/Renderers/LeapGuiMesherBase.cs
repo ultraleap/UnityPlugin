@@ -60,7 +60,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
 
   //#### Textures ####
   private List<Texture2D> _packedTextures = new List<Texture2D>();
-  private Dictionary<UVChannelFlags, Rect[]> _packedRects;
+  private Rect[][] _packedRects;
 
   //#### Tinting ####
   protected const string TINTS_PROPERTY = LeapGui.PROPERTY_PREFIX + "Tints";
@@ -286,10 +286,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
     _material = new Material(_shader);
     _material.name = "Procedural Gui Material";
 
-    if (_packedRects != null) {
-      _packedRects.Clear();
-      _packedRects = null;
-    }
+    _packedRects = null;
   }
 
   protected virtual void packTextures() {
@@ -310,12 +307,12 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   protected virtual void extractSpriteRects() {
     using (new ProfilerSample("Extract Sprite Rects")) {
       if (_packedRects == null) {
-        _packedRects = new Dictionary<UVChannelFlags, Rect[]>();
+        _packedRects = new Rect[4][];
       }
 
       foreach (var spriteFeature in _spriteFeatures) {
         var rects = new Rect[gui.elements.Count];
-        _packedRects[spriteFeature.channel] = rects;
+        _packedRects[spriteFeature.channel.Index()] = rects;
 
         for (int i = 0; i < spriteFeature.data.Count; i++) {
           var dataObj = spriteFeature.data[i];
@@ -438,7 +435,11 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   protected virtual void buildColors(LeapGuiMeshFeature feature, LeapGuiMeshData meshData) {
     using (new ProfilerSample("Build Colors")) {
       Color totalTint = feature.tint * meshData.tint;
-      MeshCache.GetColors(meshData.mesh).Query().Select(c => c * totalTint).AppendList(_colors);
+
+      var colors = MeshCache.GetColors(meshData.mesh);
+      for (int i = 0; i < colors.Length; i++) {
+        _colors.Add(colors[i] * totalTint);
+      }
     }
   }
 
@@ -449,11 +450,12 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
 
       targetList.AddRange(uvs);
 
-      Rect[] atlasedUvs;
       if (_packedRects != null &&
-         _packedRects.TryGetValue(channel, out atlasedUvs) &&
          (meshData.remappableChannels & channel) != 0) {
-        MeshUtil.RemapUvs(targetList, atlasedUvs[_currIndex], uvs.Count);
+        var atlasedUvs = _packedRects[channel.Index()];
+        if (atlasedUvs != null) {
+          MeshUtil.RemapUvs(targetList, atlasedUvs[_currIndex], uvs.Count);
+        }
       }
     }
   }
@@ -505,36 +507,38 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   }
 
   protected virtual void finishMesh() {
-    //If there is no data, don't actually do anything
-    if (_verts.Count == 0) {
-      DestroyImmediate(_currMesh);
+    using (new ProfilerSample("Finish Mesh")) {
+      //If there is no data, don't actually do anything
+      if (_verts.Count == 0) {
+        DestroyImmediate(_currMesh);
+        _currMesh = null;
+        return;
+      }
+
+      _currMesh.SetVertices(_verts);
+      _currMesh.SetTriangles(_tris, 0);
+
+      if (_normals.Count == _verts.Count) {
+        _currMesh.SetNormals(_normals);
+      }
+
+      if (_colors.Count == _verts.Count) {
+        _currMesh.SetColors(_colors);
+      }
+
+      foreach (var channel in _requiredUvChannels) {
+        _currMesh.SetUVs(channel.Index(), _uvs[channel.Index()]);
+      }
+
+      if (_doesRequireSpecialUv3) {
+        _currMesh.SetUVs(3, _uvs[3]);
+      }
+
+      postProcessMesh();
+
+      _meshes.Add(_currMesh);
       _currMesh = null;
-      return;
     }
-
-    _currMesh.SetVertices(_verts);
-    _currMesh.SetTriangles(_tris, 0);
-
-    if (_normals.Count == _verts.Count) {
-      _currMesh.SetNormals(_normals);
-    }
-
-    if (_colors.Count == _verts.Count) {
-      _currMesh.SetColors(_colors);
-    }
-
-    foreach (var channel in _requiredUvChannels) {
-      _currMesh.SetUVsAuto(channel.Index(), _uvs[channel.Index()]);
-    }
-
-    if (_doesRequireSpecialUv3) {
-      _currMesh.SetUVs(3, _uvs[3]);
-    }
-
-    postProcessMesh();
-
-    _meshes.Add(_currMesh);
-    _currMesh = null;
   }
 
   protected virtual void postProcessMesh() { }
