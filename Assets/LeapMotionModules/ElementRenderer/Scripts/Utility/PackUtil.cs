@@ -25,9 +25,9 @@ public static class PackUtil {
   public static void DoPack(List<LeapGuiTextureFeature> textureFeatures,
                             Settings settings,
                         out Texture2D[] packedTextures,
-                        out Dictionary<UVChannelFlags, Rect[]> channelMapping) {
+                        out Rect[][] channelMapping) {
     packedTextures = new Texture2D[textureFeatures.Count];
-    channelMapping = new Dictionary<UVChannelFlags, Rect[]>();
+    channelMapping = new Rect[4][];
 
     Texture2D[] textureArray = new Texture2D[textureFeatures[0].data.Count];
 
@@ -62,7 +62,7 @@ public static class PackUtil {
       }
 
       packedTextures[textureFeatures.IndexOf(mainTexture)] = packedTexture;
-      channelMapping[channel] = packedRects;
+      channelMapping[channel.Index()] = packedRects;
 
       //All texture features that are NOT the main texture do not get their own atlas step
       //They are simply copied into a new texture
