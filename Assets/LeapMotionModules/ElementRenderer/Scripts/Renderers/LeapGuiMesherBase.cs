@@ -198,6 +198,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   #region GENERATION SETUP
   protected virtual void setupForBuilding() {
     using (new ProfilerSample("Mesh Setup")) {
+      MeshCache.Clear();
       loadAllSupportedFeatures();
       prepareMeshes();
       prepareMaterial();

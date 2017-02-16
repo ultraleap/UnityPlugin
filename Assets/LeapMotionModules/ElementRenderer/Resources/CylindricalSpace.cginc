@@ -25,3 +25,24 @@ void Cylindrical_LocalToWorld(inout float3 localVert, float4 parameters) {
   localVert.y = height;
   localVert.z = cos(angle) * radius - _LeapGuiRadialSpace_Radius;
 }
+
+void Cylindrical_LocalToWorld(inout float3 localVert, inout float3 localNormal, float4 parameters) {
+  float angle = localVert.x * parameters.w + parameters.x;
+  float height = parameters.y + localVert.y;
+  float radius = parameters.z + localVert.z;
+
+  float s, c;
+  sincos(angle, s, c);
+
+  localVert.x = s * radius;
+  localVert.y = height;
+  localVert.z = c * radius - _LeapGuiRadialSpace_Radius;
+  
+  float tX = c * localNormal.x + s * localNormal.z;
+  localNormal.z = c * localNormal.z - s * localNormal.x;
+  localNormal.x = tX;
+}
+
+
+
+
