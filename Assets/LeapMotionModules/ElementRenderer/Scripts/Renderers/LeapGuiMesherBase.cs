@@ -388,6 +388,10 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
 
         buildTopology(meshData);
 
+        if (_doesRequireNormals) {
+          buildNormals(meshData);
+        }
+
         if (_doesRequireColors) {
           buildColors(meshFeature, meshData);
         }
