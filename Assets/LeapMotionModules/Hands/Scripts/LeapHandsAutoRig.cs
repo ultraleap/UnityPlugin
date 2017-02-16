@@ -6,13 +6,14 @@ using System.Linq;
 namespace Leap.Unity {
   /**LeapHandAutoRig automates setting up the scripts that drive 3D skinned mesh hands. */
   [AddComponentMenu("Leap/Auto Rig Hands")]
+  [ExecuteInEditMode]
   public class LeapHandsAutoRig : MonoBehaviour {
     private HandPool HandPoolToPopulate;
     public Animator AnimatorForMapping;
     private RuntimeAnimatorController runtimeAnimatorController;
     public string ModelGroupName = null;
     [Tooltip("Set to True if each finger has an extra trasform between palm and base of the finger.")] 
-    public bool ModelHasMetaCarpals;
+    public bool ModelHasMetaCarpals = true;
     [Header("RiggedHand Components")]
     public RiggedHand RiggedHand_L;
     public RiggedHand RiggedHand_R;
@@ -189,16 +190,13 @@ namespace Leap.Unity {
 
       RiggedHand_L.AutoRigRiggedHand(RiggedHand_L.palm, RiggedFinger_L_Pinky.transform, RiggedFinger_L_Index.transform);
       RiggedHand_R.AutoRigRiggedHand(RiggedHand_R.palm, RiggedFinger_R_Pinky.transform, RiggedFinger_R_Index.transform);
-      if (ModelGroupName == "" || ModelGroupName != null) {
-        ModelGroupName = transform.name;
-      }
+      ModelGroupName = transform.name;
       HandPoolToPopulate.AddNewGroup(ModelGroupName, RiggedHand_L, RiggedHand_R);
 
       modelFingerPointing_L = RiggedHand_L.modelFingerPointing;
       modelPalmFacing_L = RiggedHand_L.modelPalmFacing;
       modelFingerPointing_R = RiggedHand_R.modelFingerPointing;
       modelPalmFacing_R = RiggedHand_R.modelPalmFacing;
-      //AutoRigUpperBody();
     }
 
     //Find Fingers and assign RiggedFingers
