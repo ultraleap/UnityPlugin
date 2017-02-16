@@ -27,6 +27,11 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   private const string CURVED_PARAMETERS = LeapGui.PROPERTY_PREFIX + "Curved_ElementParameters";
   private List<Vector4> _curved_elementParameters = new List<Vector4>();
 
+  //## Cache data to be used inside of elementVertToMeshVert
+  private Matrix4x4 _translation_elementVertToMeshVert;
+  private Matrix4x4 _noMotion_elementVertToGuiVert;
+  private ITransformer _noMotion_transformer;
+
   #endregion
 
   public enum MotionType {
@@ -112,6 +117,24 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
       beginMesh();
     }
 
+    switch (_motionType) {
+      case MotionType.None:
+        _noMotion_transformer = gui.space.GetTransformer(_currElement.anchor);
+        _noMotion_elementVertToGuiVert = _currElement.transform.localToWorldMatrix *
+                                         gui.transform.worldToLocalMatrix;
+        break;
+      case MotionType.Translation:
+        _translation_elementVertToMeshVert = Matrix4x4.TRS(-gui.transform.InverseTransformPoint(_currElement.transform.position),
+                                                           Quaternion.identity,
+                                                           Vector3.one) *
+                                             _currElement.transform.localToWorldMatrix *
+                                             gui.transform.worldToLocalMatrix;
+
+        break;
+      default:
+        throw new NotImplementedException();
+    }
+
     base.buildTopology(meshData);
   }
 
@@ -132,13 +155,12 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   }
 
   protected override Vector3 elementVertToMeshVert(Vector3 vertex) {
-    Vector3 worldVert = _currElement.transform.TransformPoint(vertex);
-    Vector3 guiVert = gui.transform.InverseTransformPoint(worldVert);
     switch (_motionType) {
       case MotionType.None:
-        return gui.space.GetTransformer(_currElement.anchor).TransformPoint(guiVert);
+        var guiVert = _noMotion_elementVertToGuiVert.MultiplyPoint3x4(vertex);
+        return _noMotion_transformer.TransformPoint(guiVert);
       case MotionType.Translation:
-        return guiVert - gui.transform.InverseTransformPoint(_currElement.transform.position);
+        return _translation_elementVertToMeshVert.MultiplyPoint3x4(vertex);
     }
 
     throw new NotImplementedException();

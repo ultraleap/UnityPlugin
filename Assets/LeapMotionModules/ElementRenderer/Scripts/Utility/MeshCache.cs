@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Leap.Unity.Query;
@@ -37,7 +38,7 @@ public static class MeshCache {
 
   private static Dictionary<UvKey, List<Vector4>> _uvCache = new Dictionary<UvKey, List<Vector4>>();
   public static List<Vector4> GetUvs(Mesh mesh, UVChannelFlags channel) {
-    var key = new UvKey() { mesh = mesh, channel = channel };
+    var key = new UvKey() { mesh = mesh, channel = (int)channel };
     List<Vector4> uvs;
     if (!_uvCache.TryGetValue(key, out uvs)) {
       uvs = new List<Vector4>();
@@ -57,8 +58,22 @@ public static class MeshCache {
     public int[] tris;
   }
 
-  private struct UvKey {
+  private struct UvKey : IComparable<UvKey>, IEquatable<UvKey> {
     public Mesh mesh;
-    public UVChannelFlags channel;
+    public int channel;
+
+    public int CompareTo(UvKey other) {
+      if (other.mesh != mesh) return 1;
+      if (other.channel != channel) return 1;
+      return 0;
+    }
+
+    public override int GetHashCode() {
+      return mesh.GetHashCode() + channel;
+    }
+
+    public bool Equals(UvKey other) {
+      return other.mesh == mesh && other.channel == channel;
+    }
   }
 }
