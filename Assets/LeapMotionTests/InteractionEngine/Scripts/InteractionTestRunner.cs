@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
-//using UnityTest;
+using UnityTest;
 
 namespace Leap.Unity.Interaction.Testing {
 
-  public class InteractionTestRunner : MonoBehaviour /*TestRunner*/ {
+  public class InteractionTestRunner : TestRunner {
 
     [SerializeField]
     protected GameObject _testPrefab;
@@ -24,13 +24,11 @@ namespace Leap.Unity.Interaction.Testing {
       Time.timeScale = _timeScale;
     }
 
-    /*
     protected override void FinishTest(TestResult.ResultType result) {
       base.FinishTest(result);
 
       DestroyImmediate(_spawned);
       _spawned = null;
     }
-    */
   }
 }
