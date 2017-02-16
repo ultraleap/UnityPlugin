@@ -3,7 +3,7 @@ using Leap.Unity;
 using Leap.Unity.Attachments;
 
 [CustomEditor (typeof(Transition))]
-public class TransitionEditor : CustomEditorBase<Transition> {
+public class TransitionEditor : CustomEditorBase {
   protected override void OnEnable() {
     base.OnEnable();
 

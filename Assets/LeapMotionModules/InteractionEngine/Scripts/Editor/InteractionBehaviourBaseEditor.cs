@@ -20,7 +20,7 @@ namespace Leap.Unity.Interaction {
         target = null;
       }
 
-      if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab) {
+      if (PrefabUtility.GetPrefabType(target.gameObject) != PrefabType.Prefab) {
         specifyCustomDecorator("_manager", managerDectorator);
       }
     }

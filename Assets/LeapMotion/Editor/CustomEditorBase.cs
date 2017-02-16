@@ -6,16 +6,28 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
-  public class CustomEditorBase<T> : Editor where T : UnityEngine.Object {
+  public class CustomEditorBase<T> : CustomEditorBase where T : UnityEngine.Object {
+    protected new T target;
+    protected new T[] targets;
+
+    protected override void OnEnable() {
+      base.OnEnable();
+
+      target = base.target as T;
+      targets = base.targets.Query().
+                             Where(t => t != null).
+                             OfType<T>().
+                             ToArray();
+    }
+  }
+
+  public class CustomEditorBase : Editor {
     protected Dictionary<string, Action<SerializedProperty>> _specifiedDrawers;
     protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedDecorators;
     protected Dictionary<string, List<Func<bool>>> _conditionalProperties;
     protected HashSet<string> _beginHorizontalProperties;
     protected HashSet<string> _endHorizontalProperties;
     protected bool _showScriptField = true;
-
-    protected new T target;
-    protected new T[] targets;
 
     protected List<SerializedProperty> _modifiedProperties = new List<SerializedProperty>();
 
@@ -121,12 +133,6 @@ namespace Leap.Unity {
       _conditionalProperties = new Dictionary<string, List<Func<bool>>>();
       _beginHorizontalProperties = new HashSet<string>();
       _endHorizontalProperties = new HashSet<string>();
-
-      target = base.target as T;
-      targets = base.targets.Query().
-                             Where(t => t != null).
-                             OfType<T>().
-                             ToArray();
     }
 
     protected bool validateProperty(string propertyName) {

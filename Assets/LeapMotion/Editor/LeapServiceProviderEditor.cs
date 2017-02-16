@@ -3,7 +3,7 @@
 namespace Leap.Unity {
 
   [CustomEditor(typeof(LeapServiceProvider))]
-  public class LeapServiceProviderEditor : CustomEditorBase<LeapServiceProvider> {
+  public class LeapServiceProviderEditor : CustomEditorBase {
     protected override void OnEnable() {
       base.OnEnable();
 
