@@ -1,16 +1,12 @@
-﻿using UnityEngine;
-using UnityEditor;
-using Leap.Unity;
-using System.Collections;
+﻿using UnityEditor;
 
 namespace Leap.Unity.InputModule {
   [CustomEditor(typeof(LeapInputModule))]
-  public class LeapInputModuleEditor : CustomEditorBase {
+  public class LeapInputModuleEditor : CustomEditorBase<LeapInputModule> {
     protected override void OnEnable() {
       base.OnEnable();
-      LeapInputModule module = target as LeapInputModule;
 
-      specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || module.InteractionMode == LeapInputModule.InteractionCapability.Projective,
+      specifyConditionalDrawing(() => target.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || target.InteractionMode == LeapInputModule.InteractionCapability.Projective,
                                "PinchingThreshold",
                                "EnvironmentPointer",
                                "environmentPinch",
@@ -19,24 +15,24 @@ namespace Leap.Unity.InputModule {
                                "RightHandDetector",
                                "HoveringColor");
 
-      specifyConditionalDrawing(() => module.PointerSprite != null,
+      specifyConditionalDrawing(() => target.PointerSprite != null,
                          "PointerMaterial",
                          "StandardColor",
                          "HoveringColor",
                          "TriggeringColor",
                          "TriggerMissedColor");
 
-      specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || module.InteractionMode == LeapInputModule.InteractionCapability.Tactile,
+      specifyConditionalDrawing(() => target.InteractionMode == LeapInputModule.InteractionCapability.Hybrid || target.InteractionMode == LeapInputModule.InteractionCapability.Tactile,
                                "TactilePadding");
 
-      specifyConditionalDrawing(() => module.InteractionMode == LeapInputModule.InteractionCapability.Hybrid,
+      specifyConditionalDrawing(() => target.InteractionMode == LeapInputModule.InteractionCapability.Hybrid,
                                "ProjectiveToTactileTransitionDistance",
                                "RetractUI");
 
-      specifyConditionalDrawing(() => module.InnerPointer,
+      specifyConditionalDrawing(() => target.InnerPointer,
                          "InnerPointerOpacityScalar");
 
-      specifyConditionalDrawing(() => module.ShowAdvancedOptions,
+      specifyConditionalDrawing(() => target.ShowAdvancedOptions,
                          "InteractionMode",
                          "OverrideScrollViewClicks",
                          "InnerPointer",
@@ -66,7 +62,7 @@ namespace Leap.Unity.InputModule {
                          "environmentPinch",
                          "MovingReferenceFrame");
 
-      specifyConditionalDrawing(() => module.ShowExperimentalOptions,
+      specifyConditionalDrawing(() => target.ShowExperimentalOptions,
                    "InteractionMode",
                    "PointerDistanceScale",
                    "PointerPinchScale",
@@ -83,7 +79,7 @@ namespace Leap.Unity.InputModule {
                    "environmentPinch",
                    "MovingReferenceFrame");
 
-      specifyConditionalDrawing(() => module.EnvironmentPointer,
+      specifyConditionalDrawing(() => target.EnvironmentPointer,
              "environmentPinch");
     }
   }

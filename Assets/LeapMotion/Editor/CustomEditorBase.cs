@@ -2,8 +2,24 @@
 using UnityEditor;
 using System;
 using System.Collections.Generic;
+using Leap.Unity.Query;
 
 namespace Leap.Unity {
+
+  public class CustomEditorBase<T> : CustomEditorBase where T : UnityEngine.Object {
+    protected new T target;
+    protected new T[] targets;
+
+    protected override void OnEnable() {
+      base.OnEnable();
+
+      target = base.target as T;
+      targets = base.targets.Query().
+                             Where(t => t != null).
+                             OfType<T>().
+                             ToArray();
+    }
+  }
 
   public class CustomEditorBase : Editor {
     protected Dictionary<string, Action<SerializedProperty>> _specifiedDrawers;
