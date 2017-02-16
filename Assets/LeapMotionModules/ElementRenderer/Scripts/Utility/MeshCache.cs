@@ -22,6 +22,16 @@ public static class MeshCache {
     return topology;
   }
 
+  private static Dictionary<Mesh, Vector3[]> _normalCache = new Dictionary<Mesh, Vector3[]>();
+  public static Vector3[] GetNormals(Mesh mesh) {
+    Vector3[] normals;
+    if (!_normalCache.TryGetValue(mesh, out normals)) {
+      normals = mesh.normals;
+      _normalCache[mesh] = normals;
+    }
+    return normals;
+  }
+
   private static Dictionary<Mesh, Color[]> _colorCache = new Dictionary<Mesh, Color[]>();
   public static Color[] GetColors(Mesh mesh) {
     Color[] colors;

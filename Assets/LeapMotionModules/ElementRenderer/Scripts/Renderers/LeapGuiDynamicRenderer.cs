@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [AddComponentMenu("")]
@@ -110,6 +111,10 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
 
   protected override Vector3 elementVertToMeshVert(Vector3 vertex) {
     return vertex;
+  }
+
+  protected override Vector3 elementNormalToMeshNormal(Vector3 normal) {
+    return normal;
   }
 
   protected override Vector3 blendShapeDelta(Vector3 shapeVert, Vector3 originalVert) {

@@ -46,10 +46,10 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   };
 
   //Internal cache of requirements 
-  private bool _doesRequireColors;
-  private bool _doesRequireNormals;
-  private bool _doesRequireSpecialUv3;
-  private List<UVChannelFlags> _requiredUvChannels = new List<UVChannelFlags>();
+  protected bool _doesRequireColors;
+  protected bool _doesRequireNormals;
+  protected bool _doesRequireSpecialUv3;
+  protected List<UVChannelFlags> _requiredUvChannels = new List<UVChannelFlags>();
 
   //Feature lists
   protected List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
@@ -428,6 +428,16 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
     }
   }
 
+  protected virtual void buildNormals(LeapGuiMeshData meshData) {
+    using (new ProfilerSample("Build Normals")) {
+      var normals = MeshCache.GetNormals(meshData.mesh);
+
+      for (int i = 0; i < normals.Length; i++) {
+        _normals.Add(elementNormalToMeshNormal(normals[i]));
+      }
+    }
+  }
+
   protected virtual void buildColors(LeapGuiMeshFeature feature, LeapGuiMeshData meshData) {
     using (new ProfilerSample("Build Colors")) {
       Color totalTint = feature.tint * meshData.tint;
@@ -570,5 +580,6 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   }
 
   protected abstract Vector3 elementVertToMeshVert(Vector3 vertex);
+  protected abstract Vector3 elementNormalToMeshNormal(Vector3 normal);
   #endregion
 }
