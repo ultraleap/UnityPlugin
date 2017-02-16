@@ -72,10 +72,10 @@ namespace Leap.Unity.UI.Constraints {
     private Quaternion _childRotNextPhysicsUpdate = Quaternion.identity;
 
     private void OnPrePhysics() {
-      //if (_hasPostPhysics) {
-      //  _childBody.position = _childPosNextPhysicsUpdate;
-      //  _childBody.rotation = _childRotNextPhysicsUpdate;
-      //}
+      if (_hasPostPhysics) {
+        _childBody.position = _childPosNextPhysicsUpdate;
+        _childBody.rotation = _childRotNextPhysicsUpdate;
+      }
 
       _childT.position = _childBody.position;
       _childT.rotation = _childBody.rotation;
@@ -94,9 +94,6 @@ namespace Leap.Unity.UI.Constraints {
       _childPosNextPhysicsUpdate = _childBody.position + (_childT.position - _prePhysicsChildTransformPosition);
       _childRotNextPhysicsUpdate = _childBody.rotation * (Quaternion.Inverse(_prePhysicsChildTransformRotation) * _childT.rotation);
       _hasPostPhysics = true;
-
-      _childBody.position = _childPosNextPhysicsUpdate;
-      _childBody.rotation = _childRotNextPhysicsUpdate;
     }
 
     #region Gizmos

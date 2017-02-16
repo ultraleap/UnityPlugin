@@ -22,7 +22,9 @@ namespace Leap.Unity.UI.Interaction {
     public float touchActivationRadius = 0.15F;
 
     [SerializeField]
+    #pragma warning disable 0414
     private bool _showDebugOptions = false;
+    #pragma warning restore 0414
     [SerializeField]
     private bool _debugDrawInteractionHands = false;
 
@@ -72,8 +74,8 @@ namespace Leap.Unity.UI.Interaction {
     void Awake() {
       Provider = Hands.Provider;
 
-      _interactionHands[0] = new InteractionHand(this, () => { return Hands.FixedLeft;  }, WorldHoverActivationRadius, WorldTouchActivationRadius);
-      _interactionHands[1] = new InteractionHand(this, () => { return Hands.FixedRight; }, WorldHoverActivationRadius, WorldTouchActivationRadius);
+      _interactionHands[0] = new InteractionHand(this, () => { return Hands.FixedLeft;  }, Chirality.Left, WorldHoverActivationRadius, WorldTouchActivationRadius);
+      _interactionHands[1] = new InteractionHand(this, () => { return Hands.FixedRight; }, Chirality.Right, WorldHoverActivationRadius, WorldTouchActivationRadius);
     }
 
     void OnValidate() {

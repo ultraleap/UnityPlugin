@@ -8,10 +8,8 @@ namespace Leap.Unity.UI.Interaction {
   [CustomEditor(typeof(InteractionManager))]
   public class InteractionManagerEditor : CustomEditorBase {
 
-    void OnEnable() {
+    protected override void OnEnable() {
       base.OnEnable();
-
-      var manager = target as InteractionManager;
 
       specifyConditionalDrawing("_showDebugOptions", "_debugDrawInteractionHands");
     }

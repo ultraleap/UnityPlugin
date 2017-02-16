@@ -308,7 +308,9 @@ namespace Leap.Unity.UI.Interaction {
 
       // TODO: Make two-handed grasping a thing.
       if (_graspCount > 1) {
-        Debug.LogWarning("Two-handed grasping is not yet supported!");
+        Debug.LogWarning("Two-handed grasping is not yet supported!"
+          + "This warning ever appearing is indicative of a bug because the lack of support means "
+          + "that _graspCount should NEVER become larger than 1.");
       }
       
       // Set kinematic state based on grasping hold movement type

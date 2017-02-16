@@ -34,7 +34,7 @@
                              surfIn.objPos.z * freq, seed)) * amp;
       }
 
-      void vert(inout appdata_base v, out Input surfIn) {
+      void vert(inout appdata_full v, out Input surfIn) {
         UNITY_INITIALIZE_OUTPUT(Input, surfIn);
         surfIn.objNormal = v.normal;
         surfIn.objPos = v.vertex;
