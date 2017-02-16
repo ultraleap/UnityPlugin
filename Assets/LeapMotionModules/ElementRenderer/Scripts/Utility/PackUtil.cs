@@ -96,6 +96,8 @@ public static class PackUtil {
     for (int i = 0; i < textureArray.Length; i++) {
       if (textureArray[i] == null) {
         textureArray[i] = defaultTexture;
+      } else {
+        textureArray[i].EnsureReadWriteEnabled();
       }
     }
 
