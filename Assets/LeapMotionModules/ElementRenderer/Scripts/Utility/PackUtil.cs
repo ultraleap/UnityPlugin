@@ -96,6 +96,8 @@ public static class PackUtil {
     for (int i = 0; i < textureArray.Length; i++) {
       if (textureArray[i] == null) {
         textureArray[i] = defaultTexture;
+      } else {
+        textureArray[i].EnsureReadWriteEnabled();
       }
     }
 
@@ -117,8 +119,7 @@ public static class PackUtil {
     BorderKey key = new BorderKey() { texture = source, border = border };
     if (!_cachedBorderedTextures.TryGetValue(key, out bordered)) {
       source.EnsureReadWriteEnabled();
-      bordered = UnityEngine.Object.Instantiate(source);
-      bordered.AddBorder(border);
+      bordered = source.GetBordered(border);
       _cachedBorderedTextures[key] = bordered;
     }
     return bordered;
