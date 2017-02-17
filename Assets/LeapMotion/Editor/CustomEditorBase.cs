@@ -22,6 +22,7 @@ namespace Leap.Unity {
   }
 
   public class CustomEditorBase : Editor {
+    protected Dictionary<string, string> _propertyNameMap = new Dictionary<string, string>();
     protected Dictionary<string, Action<SerializedProperty>> _specifiedDrawers;
     protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedDecorators;
     protected Dictionary<string, List<Func<bool>>> _conditionalProperties;
@@ -33,6 +34,14 @@ namespace Leap.Unity {
 
     protected void dontShowScriptField() {
       _showScriptField = false;
+    }
+
+    protected void renameProperty(string propertyName, string displayName) {
+      if (!validateProperty(propertyName)) {
+        return;
+      }
+
+      _propertyNameMap[propertyName] = displayName;
     }
 
     /// <summary>
@@ -143,6 +152,15 @@ namespace Leap.Unity {
       return true;
     }
 
+    protected GUIContent getGuiContent(SerializedProperty property) {
+      string customName;
+      if (_propertyNameMap.TryGetValue(property.name, out customName)) {
+        return new GUIContent(customName, property.tooltip);
+      } else {
+        return new GUIContent(property.displayName, property.tooltip);
+      }
+    }
+
     /* 
      * This method draws all visible properties, mirroring the default behavior of OnInspectorGUI. 
      * Individual properties can be specified to have custom drawers.
@@ -188,7 +206,13 @@ namespace Leap.Unity {
           customDrawer(iterator);
         } else {
           using (new EditorGUI.DisabledGroupScope(isFirst)) {
-            EditorGUILayout.PropertyField(iterator, true);
+            string customName;
+            if (_propertyNameMap.TryGetValue(iterator.name, out customName)) {
+              GUIContent content = new GUIContent(customName, iterator.tooltip);
+              EditorGUILayout.PropertyField(iterator, content, includeChildren: true);
+            } else {
+              EditorGUILayout.PropertyField(iterator, true);
+            }
           }
         }
 
