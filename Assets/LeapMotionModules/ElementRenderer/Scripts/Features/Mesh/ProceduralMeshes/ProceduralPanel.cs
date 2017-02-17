@@ -4,6 +4,7 @@ using UnityEngine.Rendering;
 using Leap.Unity.Attributes;
 
 public class ProceduralPanel : ProceduralMeshSource {
+  public const int MAX_VERTS = 128;
 
   [SerializeField]
   private ResolutionType _resolutionType = ResolutionType.Vertices;
@@ -33,6 +34,13 @@ public class ProceduralPanel : ProceduralMeshSource {
       } else {
         return new Rect(-_size / 2, _size);
       }
+    }
+  }
+
+  public bool canNineSlice {
+    get {
+      var spriteData = GetComponent<LeapGuiElement>().Sprite();
+      return spriteData != null && spriteData.sprite != null;
     }
   }
 
@@ -99,6 +107,9 @@ public class ProceduralPanel : ProceduralMeshSource {
 
     vertsX += _nineSliced ? 4 : 2;
     vertsY += _nineSliced ? 4 : 2;
+
+    vertsX = Mathf.Min(vertsX, MAX_VERTS);
+    vertsY = Mathf.Min(vertsY, MAX_VERTS);
 
     for (int vy = 0; vy < vertsY; vy++) {
       for (int vx = 0; vx < vertsX; vx++) {
