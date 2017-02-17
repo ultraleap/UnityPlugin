@@ -68,7 +68,7 @@ float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
 #ifdef LEAP_GUI_VERTEX_NORMALS
 void ApplyGuiWarping(inout float4 vert, inout float4 normal, int elementId) {
   float4 elementParams = _LeapGuiCurved_ElementParameters[elementId];
-  Spherical_LocalToWorld(vert.xyz, elementParams);
+  Spherical_LocalToWorld(vert.xyz, normal.xyz, elementParams);
 }
 #else
 void ApplyGuiWarping(inout float4 vert, int elementId) {
