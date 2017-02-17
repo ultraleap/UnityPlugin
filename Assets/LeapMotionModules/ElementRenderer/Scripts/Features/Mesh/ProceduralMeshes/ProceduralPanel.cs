@@ -78,12 +78,12 @@ public class ProceduralPanel : ProceduralMeshSource {
         int vertIndex = vy * vertsX + vx;
 
         tris.Add(vertIndex);
-        tris.Add(vertIndex + 1);
         tris.Add(vertIndex + 1 + vertsX);
+        tris.Add(vertIndex + 1);
 
         tris.Add(vertIndex);
-        tris.Add(vertIndex + 1 + vertsX);
         tris.Add(vertIndex + vertsX);
+        tris.Add(vertIndex + 1 + vertsX);
       }
     }
 
