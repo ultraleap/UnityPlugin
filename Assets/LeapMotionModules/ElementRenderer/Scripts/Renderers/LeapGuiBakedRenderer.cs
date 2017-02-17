@@ -126,8 +126,8 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
         _translation_elementVertToMeshVert = Matrix4x4.TRS(-gui.transform.InverseTransformPoint(_currElement.transform.position),
                                                            Quaternion.identity,
                                                            Vector3.one) *
-                                             _currElement.transform.localToWorldMatrix *
-                                             gui.transform.worldToLocalMatrix;
+                                             gui.transform.worldToLocalMatrix *
+                                             _currElement.transform.localToWorldMatrix;
 
         break;
       default:

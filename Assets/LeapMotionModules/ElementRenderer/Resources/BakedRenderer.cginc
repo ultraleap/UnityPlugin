@@ -177,7 +177,7 @@ struct v2f_gui_baked {
   float4 vertex : SV_POSITION;
 
 #ifdef LEAP_GUI_VERTEX_NORMALS
-  float4 normal : NORMAL;
+  float3 normal : NORMAL;
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_0
@@ -218,7 +218,7 @@ v2f_gui_baked ApplyBakedGui(appdata_gui_baked v) {
   o.vertex = UnityObjectToClipPos(v.vertex);
 
 #ifdef LEAP_GUI_VERTEX_NORMALS
-  o.normal = v.normal; //TODO object to clip??
+  o.normal = UnityObjectToWorldNormal(v.normal); //TODO object to clip??
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_0
