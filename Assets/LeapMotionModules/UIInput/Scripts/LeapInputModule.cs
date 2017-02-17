@@ -257,7 +257,11 @@ namespace Leap.Unity.InputModule {
           PointerLines[index].material = Instantiate(PointerMaterial);
           PointerLines[index].material.color = new Color(0f, 0f, 0f, 0f);
 #if UNITY_5_5_OR_NEWER
+#if UNITY_5_6_OR_NEWER
+          PointerLines[index].positionCount = 2;
+#else
           PointerLines[index].numPositions = 2;
+#endif
           PointerLines[index].startWidth = 0.001f;
           PointerLines[index].endWidth = 0.001f;
 #else
