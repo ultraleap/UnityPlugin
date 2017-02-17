@@ -6,30 +6,48 @@ using Leap.Unity.Attributes;
 public class ProceduralPanel : ProceduralMeshSource {
 
   [SerializeField]
-  private ResolutionMode _resolutionMode = ResolutionMode.Explicit;
-
-  [Tooltip("The number of vertices along the X axis.")]
-  [MinValue(0)]
-  [SerializeField]
-  private int _resolutionX = 8;
-
-  [Tooltip("The number of vertices along the Y axis.")]
-  [MinValue(0)]
-  [SerializeField]
-  private int _resolutionY = 8;
+  private ResolutionType _resolutionType = ResolutionType.Vertices;
 
   [MinValue(0)]
   [SerializeField]
-  private float _vertexPerMeterX = 10f;
+  private Vector2 _resolution_verts = new Vector2(10, 10);
 
   [MinValue(0)]
   [SerializeField]
-  private float _vertexPerMeterY = 10f;
+  private Vector2 _resolution_verts_per_meter = new Vector2(20, 20);
 
+  [MinValue(0)]
+  [SerializeField]
+  private Vector2 _size = new Vector2(0.1f, 0.1f);
 
   [Tooltip("Uses sprite data to generate a nine sliced panel.")]
   [SerializeField]
   private bool _nineSliced = false;
+
+  public Rect rect {
+    get {
+      RectTransform rectTransform = GetComponent<RectTransform>();
+      if (rectTransform != null) {
+        _size = rectTransform.rect.size;
+        return rectTransform.rect;
+      } else {
+        return new Rect(-_size / 2, _size);
+      }
+    }
+  }
+
+  public void OnValidate() {
+    if (_resolutionType == ResolutionType.Vertices) {
+      _resolution_verts_per_meter.x = _resolution_verts.x / rect.width;
+      _resolution_verts_per_meter.y = _resolution_verts.y / rect.height;
+    } else {
+      _resolution_verts.x = _resolution_verts_per_meter.x * rect.width;
+      _resolution_verts.y = _resolution_verts_per_meter.y * rect.height;
+    }
+
+    _resolution_verts.x = Mathf.RoundToInt(_resolution_verts.x);
+    _resolution_verts.y = Mathf.RoundToInt(_resolution_verts.y);
+  }
 
   public override bool TryGenerateMesh(LeapGuiMeshData meshFeature,
                                    out Mesh mesh,
@@ -37,11 +55,13 @@ public class ProceduralPanel : ProceduralMeshSource {
     Vector4 borderSize = Vector4.zero;
     Vector4 borderUvs = Vector4.zero;
 
-    Rect rect = new Rect();
-
-    RectTransform t = GetComponent<RectTransform>();
-    if (t != null) {
-      rect = t.rect;
+    Rect rect;
+    RectTransform rectTransform = GetComponent<RectTransform>();
+    if (rectTransform != null) {
+      rect = rectTransform.rect;
+      _size = rect.size;
+    } else {
+      rect = new Rect(-_size / 2, _size);
     }
 
     if (_nineSliced) {
@@ -69,12 +89,12 @@ public class ProceduralPanel : ProceduralMeshSource {
     List<int> tris = new List<int>();
 
     int vertsX, vertsY;
-    if (_resolutionMode == ResolutionMode.Explicit) {
-      vertsX = _resolutionX;
-      vertsY = _resolutionY;
+    if (_resolutionType == ResolutionType.Vertices) {
+      vertsX = Mathf.RoundToInt(_resolution_verts.x);
+      vertsY = Mathf.RoundToInt(_resolution_verts.y);
     } else {
-      vertsX = Mathf.RoundToInt(rect.width * _vertexPerMeterX);
-      vertsY = Mathf.RoundToInt(rect.height * _vertexPerMeterY);
+      vertsX = Mathf.RoundToInt(rect.width * _resolution_verts_per_meter.x);
+      vertsY = Mathf.RoundToInt(rect.height * _resolution_verts_per_meter.y);
     }
 
     vertsX += _nineSliced ? 4 : 2;
@@ -139,8 +159,8 @@ public class ProceduralPanel : ProceduralMeshSource {
     }
   }
 
-  public enum ResolutionMode {
-    Explicit,
-    Implicit
+  public enum ResolutionType {
+    Vertices,
+    VerticesPerMeter
   }
 }

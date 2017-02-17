@@ -8,13 +8,10 @@ public class ProceduralPanelEditor : CustomEditorBase<ProceduralPanel> {
   protected override void OnEnable() {
     base.OnEnable();
 
-    specifyConditionalDrawing("_resolutionMode", 
-                              (int)ProceduralPanel.ResolutionMode.Explicit, 
-                              "_resolutionX", 
-                              "_resolutionY");
-    specifyConditionalDrawing("_resolutionMode",
-                              (int)ProceduralPanel.ResolutionMode.Implicit,
-                              "_vertexPerMeterX",
-                              "_vertexPerMeterY");
+    specifyCustomDrawer("_resolutionType", resolutionTypeDecorator);
+  }
+
+  private void resolutionTypeDecorator(SerializedProperty prop) {
+    var newValue = EditorGUILayout.EnumPopup((ProceduralPanel.ResolutionType)prop.intValue);
   }
 }
