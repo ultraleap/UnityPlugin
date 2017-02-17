@@ -51,7 +51,7 @@ float4x4 _LeapGui_LocalToWorld;
 void ApplyGuiWarping(inout float4 anchorSpaceVert, inout float4 anchorSpaceNormal, int elementId) {
   float4 parameters = _LeapGuiCurved_ElementParameters[elementId];
 
-  Spherical_LocalToWorld(anchorSpaceVert.xyz, parameters);
+  Spherical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal.xyz, parameters);
 
   anchorSpaceVert = mul(_LeapGui_LocalToWorld, anchorSpaceVert);
   anchorSpaceNormal = mul(_LeapGui_LocalToWorld, float4(anchorSpaceNormal, 0));
