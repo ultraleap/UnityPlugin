@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
-  public class NonKinematicHoldingMovement : IHoldingMovementController {
+  public class NonKinematicGraspedMovement : IGraspedMovementController {
 
     protected float _maxVelocity = 6F;
 

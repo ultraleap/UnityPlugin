@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
-  public class KinematicHoldingMovement : IHoldingMovementController {
+  public class KinematicGraspedMovement : IGraspedMovementController {
 
     public void MoveTo(Vector3 solvedPosition, Quaternion solvedRotation,
                        InteractionBehaviour interactionObj) {

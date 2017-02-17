@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
-  public interface IHoldingMovementController {
+  public interface IGraspedMovementController {
 
     /// <summary>
     /// Called by an InteractionBehaviour when it calculates a target position

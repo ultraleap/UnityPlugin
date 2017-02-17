@@ -88,7 +88,69 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     void Start() {
+      RefreshPositionLockedState();
       InitGrasping();
+    }
+
+    // Position Lock State
+
+    private bool _isPositionLocked = false;
+
+    /// <summary>
+    /// Returns whether the InteractionBehaviour has its position fully locked
+    /// by its Rigidbody settings or by any attached PhysX Joints.
+    /// 
+    /// If the state of the underlying Rigidbody or Joints changes what this value
+    /// should be, it will not automatically update (as an optimization) at runtime;
+    /// instead, manually call RefreshPositionLockedState(). This is because the
+    /// type-checks required are relatively expensive and mustn't occur every frame.
+    /// </summary>
+    public bool IsPositionLocked { get { return _isPositionLocked; } }
+
+    /// <summary>
+    /// Call this method if the InteractionBehaviour's Rigidbody becomes or unbecomes
+    /// fully positionally locked (X, Y, Z) or if a Joint attached to the Rigidbody
+    /// no longer locks its position (e.g. by being destroyed or disabled).
+    /// </summary>
+    public void RefreshPositionLockedState() {
+      if ((_body.constraints & RigidbodyConstraints.FreezePositionX) > 0
+       && (_body.constraints & RigidbodyConstraints.FreezePositionY) > 0
+       && (_body.constraints & RigidbodyConstraints.FreezePositionZ) > 0) {
+        _isPositionLocked = true;
+        return;
+      }
+      else {
+        Joint[] joints = _body.GetComponents<Joint>();
+        foreach (var joint in joints) {
+          FixedJoint fixedJoint = joint as FixedJoint;
+          if (fixedJoint != null) {
+            _isPositionLocked = true; return;
+          }
+          HingeJoint hinge = joint as HingeJoint;
+          if (hinge != null) {
+            _isPositionLocked = true; return;
+          }
+          // SpringJoint -- no check required, spring joints never fully lock position.
+          CharacterJoint charJoint = joint as CharacterJoint;
+          if (charJoint != null) {
+            _isPositionLocked = true; return;
+          }
+          ConfigurableJoint configJoint = joint as ConfigurableJoint;
+          if (configJoint != null
+            && (configJoint.xMotion == ConfigurableJointMotion.Locked
+              || (configJoint.xMotion == ConfigurableJointMotion.Limited
+                && configJoint.linearLimit.limit == 0F))
+            && (configJoint.yMotion == ConfigurableJointMotion.Locked
+              || (configJoint.yMotion == ConfigurableJointMotion.Limited
+                && configJoint.linearLimit.limit == 0F))
+            && (configJoint.zMotion == ConfigurableJointMotion.Locked
+              || (configJoint.zMotion == ConfigurableJointMotion.Limited
+                && configJoint.linearLimit.limit == 0F))) {
+            _isPositionLocked = true; return;
+          }
+        }
+      }
+      _isPositionLocked = false;
     }
 
     /// <summary>
@@ -268,24 +330,27 @@ namespace Leap.Unity.UI.Interaction {
     private bool _moveObjectWhenGraspedEnabledLastFrame;
     private bool _wasKinematicBeforeGrab;
 
-    private IHoldingPoseController _graspedPositionController;
-    private IHoldingPoseController GraspedPositionController {
+    private IGraspedPositionController _graspedPositionController;
+    private IGraspedPositionController GraspedPositionController {
       get {
         if (_graspedPositionController == null) {
-          _graspedPositionController = new KabschHoldingPose(this);
+          _graspedPositionController = new KabschGraspedPosition(this);
         }
         return _graspedPositionController;
       }
+      set {
+        _graspedPositionController = value;
+      }
     }
 
-    private KinematicHoldingMovement    _kinematicHoldingMovement;
-    private NonKinematicHoldingMovement _nonKinematicHoldingMovement;
+    private KinematicGraspedMovement    _kinematicHoldingMovement;
+    private NonKinematicGraspedMovement _nonKinematicHoldingMovement;
 
     private void InitGrasping() {
       _moveObjectWhenGraspedEnabledLastFrame = moveObjectWhenGrasped;
 
-      _kinematicHoldingMovement = new KinematicHoldingMovement();
-      _nonKinematicHoldingMovement = new NonKinematicHoldingMovement();
+      _kinematicHoldingMovement = new KinematicGraspedMovement();
+      _nonKinematicHoldingMovement = new NonKinematicGraspedMovement();
     }
 
     private void FixedUpdateGrasping() {
@@ -339,7 +404,7 @@ namespace Leap.Unity.UI.Interaction {
         Vector3 newPosition; Quaternion newRotation;
         GraspedPositionController.GetHoldingPose(out newPosition, out newRotation);
 
-        IHoldingMovementController holdingMovementController;
+        IGraspedMovementController holdingMovementController;
         if (Rigidbody.isKinematic) {
           holdingMovementController = _kinematicHoldingMovement;
         }

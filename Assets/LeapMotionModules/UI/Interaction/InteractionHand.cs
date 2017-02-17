@@ -531,7 +531,9 @@ namespace Leap.Unity.UI.Interaction {
     #region Gizmos
 
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      // Draw runtime gizmos here
+      if (_contactBoneParent != null) {
+        drawer.DrawColliders(_contactBoneParent, true, true);
+      }
     }
 
     #endregion

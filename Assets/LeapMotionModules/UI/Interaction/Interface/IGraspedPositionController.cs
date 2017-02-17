@@ -14,7 +14,7 @@ namespace Leap.Unity.UI.Interaction {
   /// where the object should be moved. Actually moving the object is the concern
   /// of an IHoldingMovementController.
   /// </summary>
-  public interface IHoldingPoseController {
+  public interface IGraspedPositionController {
 
     /// <summary>
     /// Called when a new InteractionHand begins grasping a certain object.

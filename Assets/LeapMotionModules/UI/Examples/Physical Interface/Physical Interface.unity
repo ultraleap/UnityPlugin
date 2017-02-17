@@ -2281,13 +2281,12 @@ Transform:
   m_LocalPosition: {x: 0, y: -0.062, z: 0.594}
   m_LocalScale: {x: 0.39898014, y: 0.32845998, z: 0.39898008}
   m_Children:
-  - {fileID: 2001992174}
   - {fileID: 1079723228}
   - {fileID: 1867905073}
   - {fileID: 678248501}
   - {fileID: 877004272}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &635144417
 Rigidbody:
@@ -2310,7 +2309,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 635144415}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 52bb285103bee584380a5e690610f5bb, type: 3}
   m_Name: 
@@ -2560,7 +2559,7 @@ Transform:
   - {fileID: 1827874498}
   - {fileID: 289815691}
   m_Father: {fileID: 635144416}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!153 &678248502
 ConfigurableJoint:
@@ -3075,7 +3074,7 @@ Transform:
   - {fileID: 243315675}
   - {fileID: 541795358}
   m_Father: {fileID: 635144416}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &877004273
 Rigidbody:
@@ -3557,7 +3556,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 635144416}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 35, y: 0, z: 0}
 --- !u!23 &1079723229
 MeshRenderer:
@@ -6179,7 +6178,7 @@ Transform:
   m_Children:
   - {fileID: 1005952315}
   m_Father: {fileID: 635144416}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &1867905074
 Rigidbody:
@@ -6730,7 +6729,7 @@ MonoBehaviour:
   hoverActivationRadius: 0.5
   touchActivationRadius: 0.15
   _showDebugOptions: 0
-  _debugDrawInteractionHands: 0
+  _debugDrawInteractionHands: 1
   contactOrGraspingEnabled: 1
 --- !u!4 &2001992174
 Transform:
@@ -6738,12 +6737,12 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2001992172}
-  m_LocalRotation: {x: -0.30070576, y: 0, z: -0, w: 0.953717}
-  m_LocalPosition: {x: -7.702596, y: -0.9968859, z: 2.541136}
-  m_LocalScale: {x: 2.5063903, y: 2.867475, z: 2.6834273}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -3.0731828, y: -0.91174847, z: 1.2366974}
+  m_LocalScale: {x: 1, y: 1.0083774, z: 1.0083776}
   m_Children: []
-  m_Father: {fileID: 635144416}
-  m_RootOrder: 0
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2009817815
 GameObject:
@@ -6959,7 +6958,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2051092186}
   - component: {fileID: 2051092185}
-  - component: {fileID: 2051092187}
   m_Layer: 0
   m_Name: Runtime Gizmos
   m_TagString: Untagged
@@ -6995,20 +6993,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2051092187
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2051092184}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 817c95a76d8efef46a0c534c85bab918, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  color: {r: 1, g: 1, b: 1, a: 1}
-  useWireframe: 1
-  traverseHierarchy: 1
 --- !u!1 &2127519604
 GameObject:
   m_ObjectHideFlags: 0

@@ -26,7 +26,7 @@ namespace Leap.Unity.UI.Interaction {
     private bool _showDebugOptions = false;
     #pragma warning restore 0414
     [SerializeField]
-    private bool _debugDrawInteractionHands = false;
+    private bool _debugDrawHandGizmos = false;
 
     #pragma warning disable 0414
     [HideInInspector]
@@ -156,7 +156,7 @@ namespace Leap.Unity.UI.Interaction {
     #region Runtime Gizmos
 
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      if (_debugDrawInteractionHands) {
+      if (_debugDrawHandGizmos) {
         foreach (var hand in _interactionHands) {
           if (hand != null) {
             hand.OnDrawRuntimeGizmos(drawer);

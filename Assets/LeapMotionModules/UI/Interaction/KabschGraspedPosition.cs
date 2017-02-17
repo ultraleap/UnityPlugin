@@ -4,9 +4,15 @@ using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
-  public class KabschHoldingPose : IHoldingPoseController {
+  public class KabschGraspedPosition : IGraspedPositionController {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
+
+    public enum SolveMethod {
+      SixDegreeSolve,
+      PivotAroundOrigin
+    }
+    public SolveMethod _solveMethod;
 
     private InteractionBehaviour _interactionObj;
     private KabschSolver _kabsch;
@@ -21,7 +27,7 @@ namespace Leap.Unity.UI.Interaction {
 
     private Dictionary<InteractionHand, HandPointCollection> _handToPoints;
 
-    public KabschHoldingPose(InteractionBehaviour interactionObj) {
+    public KabschGraspedPosition(InteractionBehaviour interactionObj) {
       _interactionObj = interactionObj;
       // TODO: If an InteractionBehaviour is required for this anyway, why isn't that a part of the IHoldPositionBehaviour interface...
 
@@ -32,7 +38,7 @@ namespace Leap.Unity.UI.Interaction {
 
     public void AddHand(InteractionHand hand) {
       var newPoints = HandPointCollection.Create(_interactionObj.Rigidbody.position,
-                                                     _interactionObj.Rigidbody.rotation);
+                                                 _interactionObj.Rigidbody.rotation);
       _handToPoints[hand] = newPoints;
 
       for (int f = 0; f < NUM_FINGERS; f++) {
@@ -94,21 +100,29 @@ namespace Leap.Unity.UI.Interaction {
             Vector3 point1 = (it.MultiplyPoint3x4(localPos) - bodyPosition);
             Vector3 point2 = (bonePos - bodyPosition);
 
-            //switch (_solveMethod) {
-            //  case SolveMethod.SixDegreeSolve:
-               // Set the relevant points in each array
+            if (_interactionObj.IsPositionLocked) {
+              // Only rotate the object, pivoting around its origin.
+              _solveMethod = SolveMethod.PivotAroundOrigin;
+              _objectCentroid += point1;
+              _handCentroid += point2;
+              _boneCount += 1f;
+            }
+            else {
+              // Do normal Kabsch solve.
+              _solveMethod = SolveMethod.SixDegreeSolve;
+              _points.Add(point1); _refPoints.Add(point2);
+            }
+            switch (_solveMethod) {
+              case SolveMethod.SixDegreeSolve:
+                // Set the relevant points in each array
 
                 // TODO: Determine whether supporting PivotAroundOrigin needs to happen
-                _points.Add(point1); _refPoints.Add(point2);
 
-            //    break;
-            //  case SolveMethod.PivotAroundOrigin:
-            //    //Calculate the Centroids of the object and hand(s) points
-            //    objectCentroid += point1;
-            //    handCentroid += point2;
-            //    boneCount += 1f;
-            //    break;
-            //}
+                break;
+              case SolveMethod.PivotAroundOrigin:
+                //Calculate the Centroids of the object and hand(s) points
+                break;
+            }
           }
         }
       }
@@ -120,24 +134,24 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private Matrix4x4 PerformSolve(Vector3 position) {
-      //switch (_solveMethod) {
-      //  case SolveMethod.SixDegreeSolve:
+      switch (_solveMethod) {
+        case SolveMethod.SixDegreeSolve:
 
           // TODO: Determine whether supporting PivotAroundOrigin needs to happen, as above
           return _kabsch.SolveKabsch(_points, _refPoints);
 
-      //  case SolveMethod.PivotAroundOrigin:
-      //    objectCentroid /= boneCount;
-      //    handCentroid /= boneCount;
-      //    if (!objectCentroid.Equals(handCentroid)) {
-      //      return Matrix4x4.TRS(Vector3.zero, Quaternion.FromToRotation(objectCentroid, handCentroid), Vector3.one);
-      //    }
-      //    else {
-      //      return Matrix4x4.identity;
-      //    }
-      //  default:
-      //    return _kabsch.SolveKabsch(points, refPoints);
-      //}
+        case SolveMethod.PivotAroundOrigin:
+          _objectCentroid /= _boneCount;
+          _handCentroid /= _boneCount;
+          if (!_objectCentroid.Equals(_handCentroid)) {
+            return Matrix4x4.TRS(Vector3.zero, Quaternion.FromToRotation(_objectCentroid, _handCentroid), Vector3.one);
+          }
+          else {
+            return Matrix4x4.identity;
+          }
+        default:
+          return _kabsch.SolveKabsch(_points, _refPoints);
+      }
     }
 
     protected class HandPointCollection {
