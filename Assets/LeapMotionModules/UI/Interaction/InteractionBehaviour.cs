@@ -265,16 +265,16 @@ namespace Leap.Unity.UI.Interaction {
     #region Grasping
 
     private int _graspCount = 0;
-    private bool _wasMovingObjectWhenGraspedLastFrame;
+    private bool _moveObjectWhenGraspedEnabledLastFrame;
     private bool _wasKinematicBeforeGrab;
 
-    private IHoldingPoseController _graspedPositionBehaviour;
-    private IHoldingPoseController GraspedPositionBehaviour {
+    private IHoldingPoseController _graspedPositionController;
+    private IHoldingPoseController GraspedPositionController {
       get {
-        if (_graspedPositionBehaviour == null) {
-          _graspedPositionBehaviour = new KabschHoldingPose(this);
+        if (_graspedPositionController == null) {
+          _graspedPositionController = new KabschHoldingPose(this);
         }
-        return _graspedPositionBehaviour;
+        return _graspedPositionController;
       }
     }
 
@@ -282,18 +282,18 @@ namespace Leap.Unity.UI.Interaction {
     private NonKinematicHoldingMovement _nonKinematicHoldingMovement;
 
     private void InitGrasping() {
-      _wasMovingObjectWhenGraspedLastFrame = moveObjectWhenGrasped;
+      _moveObjectWhenGraspedEnabledLastFrame = moveObjectWhenGrasped;
 
       _kinematicHoldingMovement = new KinematicHoldingMovement();
       _nonKinematicHoldingMovement = new NonKinematicHoldingMovement();
     }
 
     private void FixedUpdateGrasping() {
-      if (!moveObjectWhenGrasped && _wasMovingObjectWhenGraspedLastFrame) {
-        GraspedPositionBehaviour.ClearHands();
+      if (!moveObjectWhenGrasped && _moveObjectWhenGraspedEnabledLastFrame) {
+        GraspedPositionController.ClearHands();
       }
 
-      _wasMovingObjectWhenGraspedLastFrame = moveObjectWhenGrasped;
+      _moveObjectWhenGraspedEnabledLastFrame = moveObjectWhenGrasped;
     }
 
     public override bool IsGrasped {
@@ -326,7 +326,7 @@ namespace Leap.Unity.UI.Interaction {
       // SnapToHand(hand); // TODO: When you grasp an object, snap the object into a good holding position.
 
       if (moveObjectWhenGrasped) {
-        GraspedPositionBehaviour.AddHand(interactionManager.GetInteractionHand(hand.Handedness()));
+        GraspedPositionController.AddHand(interactionManager.GetInteractionHand(hand.Handedness()));
       }
 
       OnGraspBegin(hand);
@@ -337,7 +337,7 @@ namespace Leap.Unity.UI.Interaction {
         OnPreHoldingMovement(Rigidbody.position, Rigidbody.rotation, hand);
 
         Vector3 newPosition; Quaternion newRotation;
-        GraspedPositionBehaviour.GetHoldingPose(out newPosition, out newRotation);
+        GraspedPositionController.GetHoldingPose(out newPosition, out newRotation);
 
         IHoldingMovementController holdingMovementController;
         if (Rigidbody.isKinematic) {
@@ -361,7 +361,7 @@ namespace Leap.Unity.UI.Interaction {
       Rigidbody.isKinematic = _wasKinematicBeforeGrab;
 
       if (moveObjectWhenGrasped) {
-        GraspedPositionBehaviour.RemoveHand(interactionManager.GetInteractionHand(hand.Handedness()));
+        GraspedPositionController.RemoveHand(interactionManager.GetInteractionHand(hand.Handedness()));
       }
 
       OnGraspEnd(hand);
