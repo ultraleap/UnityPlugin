@@ -274,7 +274,12 @@ namespace Leap.Unity.Graphing {
         AddSample("Render Delta", GraphUnits.Miliseconds, _renderTicks);
 
         float gpuTime;
+#if UNITY_5_6_OR_NEWER
         UnityEngine.VR.VRStats.TryGetGPUTimeLastFrame(out gpuTime);
+#else
+        gpuTime = UnityEngine.VR.VRStats.gpuTimeLastFrame;
+#endif
+
         AddSample("GPU Time", GraphUnits.Miliseconds, gpuTime);
 
         if (_provider != null) {
