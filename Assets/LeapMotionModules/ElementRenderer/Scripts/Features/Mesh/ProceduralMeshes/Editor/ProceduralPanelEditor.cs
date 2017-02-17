@@ -11,10 +11,7 @@ public class ProceduralPanelEditor : CustomEditorBase<ProceduralPanel> {
   protected override void OnEnable() {
     base.OnEnable();
 
-    renameProperty("_resolution_verts", "Resolution");
-    renameProperty("_resolution_verts_per_meter", "Resolution");
-    specifyConditionalDrawing("_resolutionType", (int)ProceduralPanel.ResolutionType.Vertices, "_resolution_verts");
-    specifyConditionalDrawing("_resolutionType", (int)ProceduralPanel.ResolutionType.VerticesPerMeter, "_resolution_verts_per_meter");
+    specifyCustomDrawer("_resolution_verts_per_meter", drawResolution);
 
     Func<bool> shouldDrawSize = () => {
       return targets.Query().All(p => p.GetComponent<RectTransform>() == null);
@@ -22,6 +19,48 @@ public class ProceduralPanelEditor : CustomEditorBase<ProceduralPanel> {
     specifyConditionalDrawing(shouldDrawSize, "_size");
 
     specifyCustomDrawer("_nineSliced", drawSize);
+  }
+
+  private void drawResolution(SerializedProperty property) {
+    ProceduralPanel.ResolutionType mainType = targets[0].resolutionType;
+    bool allSameType = targets.Query().All(p => p.resolutionType == mainType);
+
+    if (!allSameType) {
+      return;
+    }
+
+    Rect rect = EditorGUILayout.GetControlRect();
+
+    EditorGUI.LabelField(rect, "Resolution");
+
+    rect.x += EditorGUIUtility.labelWidth - 2;
+    rect.width -= EditorGUIUtility.labelWidth;
+    rect.width *= 0.6666666666f;
+
+    float originalWidth = EditorGUIUtility.labelWidth;
+    EditorGUIUtility.labelWidth = 14;
+
+    Rect left = rect;
+    left.width /= 2;
+    Rect right = left;
+    right.x += right.width + 1;
+
+    if (mainType == ProceduralPanel.ResolutionType.Vertices) {
+      SerializedProperty x = serializedObject.FindProperty("_resolution_vert_x");
+      SerializedProperty y = serializedObject.FindProperty("_resolution_vert_y");
+
+      x.intValue = EditorGUI.IntField(left, "X", x.intValue);
+      y.intValue = EditorGUI.IntField(right, "Y", y.intValue);
+    } else {
+      Vector2 value = property.vector2Value;
+
+      value.x = EditorGUI.FloatField(left, "X", value.x);
+      value.y = EditorGUI.FloatField(right, "Y", value.y);
+
+      property.vector2Value = value;
+    }
+
+    EditorGUIUtility.labelWidth = originalWidth;
   }
 
   private void drawSize(SerializedProperty property) {

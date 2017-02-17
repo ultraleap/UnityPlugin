@@ -9,11 +9,10 @@ public class ProceduralPanel : ProceduralMeshSource {
   [SerializeField]
   private ResolutionType _resolutionType = ResolutionType.Vertices;
 
-  [MinValue(0)]
+  [HideInInspector]
   [SerializeField]
-  private Vector2 _resolution_verts = new Vector2(10, 10);
+  private int _resolution_vert_x, _resolution_vert_y;
 
-  [MinValue(0)]
   [SerializeField]
   private Vector2 _resolution_verts_per_meter = new Vector2(20, 20);
 
@@ -24,6 +23,12 @@ public class ProceduralPanel : ProceduralMeshSource {
   [Tooltip("Uses sprite data to generate a nine sliced panel.")]
   [SerializeField]
   private bool _nineSliced = false;
+
+  public ResolutionType resolutionType {
+    get {
+      return _resolutionType;
+    }
+  }
 
   public Rect rect {
     get {
@@ -45,16 +50,17 @@ public class ProceduralPanel : ProceduralMeshSource {
   }
 
   public void OnValidate() {
-    if (_resolutionType == ResolutionType.Vertices) {
-      _resolution_verts_per_meter.x = _resolution_verts.x / rect.width;
-      _resolution_verts_per_meter.y = _resolution_verts.y / rect.height;
-    } else {
-      _resolution_verts.x = _resolution_verts_per_meter.x * rect.width;
-      _resolution_verts.y = _resolution_verts_per_meter.y * rect.height;
-    }
+    _resolution_vert_x = Mathf.Max(0, _resolution_vert_x);
+    _resolution_vert_y = Mathf.Max(0, _resolution_vert_y);
+    _resolution_verts_per_meter = Vector2.Max(_resolution_verts_per_meter, Vector2.zero);
 
-    _resolution_verts.x = Mathf.RoundToInt(_resolution_verts.x);
-    _resolution_verts.y = Mathf.RoundToInt(_resolution_verts.y);
+    if (_resolutionType == ResolutionType.Vertices) {
+      _resolution_verts_per_meter.x = _resolution_vert_x / rect.width;
+      _resolution_verts_per_meter.y = _resolution_vert_y / rect.height;
+    } else {
+      _resolution_vert_x = Mathf.RoundToInt(_resolution_verts_per_meter.x * rect.width);
+      _resolution_vert_y = Mathf.RoundToInt(_resolution_verts_per_meter.y * rect.height);
+    }
   }
 
   public override bool TryGenerateMesh(LeapGuiMeshData meshFeature,
@@ -98,8 +104,8 @@ public class ProceduralPanel : ProceduralMeshSource {
 
     int vertsX, vertsY;
     if (_resolutionType == ResolutionType.Vertices) {
-      vertsX = Mathf.RoundToInt(_resolution_verts.x);
-      vertsY = Mathf.RoundToInt(_resolution_verts.y);
+      vertsX = Mathf.RoundToInt(_resolution_vert_x);
+      vertsY = Mathf.RoundToInt(_resolution_vert_y);
     } else {
       vertsX = Mathf.RoundToInt(rect.width * _resolution_verts_per_meter.x);
       vertsY = Mathf.RoundToInt(rect.height * _resolution_verts_per_meter.y);
