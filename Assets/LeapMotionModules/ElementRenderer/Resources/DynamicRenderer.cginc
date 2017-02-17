@@ -24,7 +24,7 @@ float4x4 _LeapGui_LocalToWorld;
 void ApplyGuiWarping(inout float4 anchorSpaceVert, inout float4 anchorSpaceNormal, int elementId) {
   float4 parameters = _LeapGuiCurved_ElementParameters[elementId];
 
-  Cylindrical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal, parameters);
+  Cylindrical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal.xyz, parameters);
 
   anchorSpaceVert = mul(_LeapGui_LocalToWorld, anchorSpaceVert);
 }
@@ -53,6 +53,7 @@ void ApplyGuiWarping(inout float4 anchorSpaceVert, inout float4 anchorSpaceNorma
   Spherical_LocalToWorld(anchorSpaceVert.xyz, parameters);
 
   anchorSpaceVert = mul(_LeapGui_LocalToWorld, anchorSpaceVert);
+  anchorSpaceNormal = mul(_LeapGui_LocalToWorld, float4(anchorSpaceNormal, 0));
 }
 #else
 void ApplyGuiWarping(inout float4 anchorSpaceVert, int elementId) {
@@ -207,10 +208,14 @@ v2f_gui_dynamic ApplyDynamicGui(appdata_gui_dynamic v) {
   v2f_gui_dynamic o;
 #ifdef GUI_ELEMENTS_NEED_ANCHOR_SPACE
   o.vertex = mul(UNITY_MATRIX_VP, v.vertex);
-  o.normal = mul(UNITY_MATRIX_V, v.normal);
+#if LEAP_GUI_VERTEX_NORMALS
+  o.normal = v.normal;
+#endif
 #else
   o.vertex = UnityObjectToClipPos(v.vertex);
+#if LEAP_GUI_VERTEX_NORMALS
   o.normal = UnityObjectToWorldNormal(v.normal);
+#endif
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_0
