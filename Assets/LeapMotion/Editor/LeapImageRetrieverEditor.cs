@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Leap.Unity{
   [CustomEditor(typeof(LeapImageRetriever))]
-  public class LeapImageRetrieverEditor : CustomEditorBase {
+  public class LeapImageRetrieverEditor : CustomEditorBase<LeapImageRetriever> {
 
     private GUIContent _brightTextureGUIContent;
     private GUIContent _rawTextureGUIContent;
@@ -23,8 +21,7 @@ namespace Leap.Unity{
       base.OnInspectorGUI();
 
       if (Application.isPlaying) {
-        LeapImageRetriever retriever = target as LeapImageRetriever;
-        var data = retriever.TextureData;
+        var data = target.TextureData;
         var dataType = typeof(Object);
 
         EditorGUI.BeginDisabledGroup(true);

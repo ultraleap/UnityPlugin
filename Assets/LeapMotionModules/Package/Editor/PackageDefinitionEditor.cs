@@ -10,17 +10,13 @@ using System.Collections.Generic;
 namespace Leap.Unity.Packaging {
 
   [CustomEditor(typeof(PackageDefinition))]
-  public class PackageDefinitionEditor : CustomEditorBase {
-
-    private PackageDefinition _def;
+  public class PackageDefinitionEditor : CustomEditorBase<PackageDefinition> {
     private List<PackageDefinition> _childPackages;
 
     protected override void OnEnable() {
       base.OnEnable();
 
-      _def = target as PackageDefinition;
-
-      _childPackages = _def.GetChildPackages();
+      _childPackages = target.GetChildPackages();
 
       createList("_dependantFolders", drawFolderElement);
       createList("_dependantFiles", drawFileElement);
@@ -41,7 +37,7 @@ namespace Leap.Unity.Packaging {
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("Packages that depend on this package", EditorStyles.boldLabel);
         if (GUILayout.Button("Build All")) {
-          _def.BuildAllChildPackages();
+          target.BuildAllChildPackages();
         }
         EditorGUILayout.EndHorizontal();
 
@@ -61,7 +57,7 @@ namespace Leap.Unity.Packaging {
       if (filteredName != "" && filteredName != property.stringValue) {
         property.stringValue = filteredName;
 
-        if (_def.GenerateBuildDropdown) {
+        if (target.GenerateBuildDropdown) {
           property.serializedObject.ApplyModifiedProperties();
           generateBuildMenuScript();
         }
@@ -81,20 +77,20 @@ namespace Leap.Unity.Packaging {
       EditorGUILayout.BeginHorizontal();
 
       string folder;
-      if (_def.TryGetPackageExportFolder(out folder, promptIfNotDefined: false)) {
+      if (target.TryGetPackageExportFolder(out folder, promptIfNotDefined: false)) {
         EditorGUILayout.TextField("Package Export Folder", folder);
       } else {
         EditorGUILayout.LabelField("Package Export Folder");
       }
 
       if (GUILayout.Button("Change")) {
-        _def.PrompUserToSetExportPath();
+        target.PrompUserToSetExportPath();
       }
 
       EditorGUILayout.EndHorizontal();
 
       if (GUILayout.Button("Build Package", GUILayout.MinHeight(EditorGUIUtility.singleLineHeight * 2))) {
-        _def.BuildPackage(interactive: true);
+        target.BuildPackage(interactive: true);
       }
       GUILayout.Space(EditorGUIUtility.singleLineHeight * 2);
     }
