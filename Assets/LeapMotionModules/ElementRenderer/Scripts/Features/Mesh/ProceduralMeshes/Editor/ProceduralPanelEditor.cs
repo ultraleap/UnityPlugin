@@ -35,7 +35,7 @@ public class ProceduralPanelEditor : CustomEditorBase<ProceduralPanel> {
 
     rect.x += EditorGUIUtility.labelWidth - 2;
     rect.width -= EditorGUIUtility.labelWidth;
-    rect.width *= 0.6666666666f;
+    rect.width *= 2.0f / 3.0f;
 
     float originalWidth = EditorGUIUtility.labelWidth;
     EditorGUIUtility.labelWidth = 14;
