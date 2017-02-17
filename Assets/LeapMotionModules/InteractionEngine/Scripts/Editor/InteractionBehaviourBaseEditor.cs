@@ -5,40 +5,38 @@ namespace Leap.Unity.Interaction {
 
   [CanEditMultipleObjects]
   [CustomEditor(typeof(InteractionBehaviourBase), true)]
-  public class InteractionBehaviourBaseEditor : CustomEditorBase {
-    protected InteractionBehaviourBase _interactionBehaviour;
+  public class InteractionBehaviourBaseEditor : CustomEditorBase<InteractionBehaviourBase> {
     protected InteractionManager _manager;
 
     protected override void OnEnable() {
       base.OnEnable();
 
       if (targets.Length == 1) {
-        _interactionBehaviour = target as InteractionBehaviourBase;
-        _manager = _interactionBehaviour.GetComponentInParent<InteractionManager>();
+        _manager = target.GetComponentInParent<InteractionManager>();
         if (_manager == null) {
           _manager = FindObjectOfType<InteractionManager>();
         }
       } else {
-        _interactionBehaviour = null;
+        target = null;
       }
 
-      if (PrefabUtility.GetPrefabType((target as Component).gameObject) != PrefabType.Prefab) {
+      if (PrefabUtility.GetPrefabType(target.gameObject) != PrefabType.Prefab) {
         specifyCustomDecorator("_manager", managerDectorator);
       }
     }
 
     private void managerDectorator(SerializedProperty prop) {
-      if (_interactionBehaviour == null) {
+      if (target == null) {
         return;
       }
 
-      Rigidbody rigidbody = _interactionBehaviour.GetComponent<Rigidbody>();
+      Rigidbody rigidbody = target.GetComponent<Rigidbody>();
 
       if (rigidbody == null) {
         using (new GUILayout.HorizontalScope()) {
           EditorGUILayout.HelpBox("This component requires a Rigidbody", MessageType.Error);
           if (GUILayout.Button("Auto-Fix")) {
-            rigidbody = _interactionBehaviour.gameObject.AddComponent<Rigidbody>();
+            rigidbody = target.gameObject.AddComponent<Rigidbody>();
             rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
             rigidbody.useGravity = true;
             rigidbody.isKinematic = false;
@@ -85,16 +83,16 @@ namespace Leap.Unity.Interaction {
     public override void OnInspectorGUI() {
       base.OnInspectorGUI();
 
-      if (Application.isPlaying && _interactionBehaviour != null) {
+      if (Application.isPlaying && target != null) {
         EditorGUILayout.Space();
 
-        if (!_interactionBehaviour.IsRegisteredWithManager) {
+        if (!target.IsRegisteredWithManager) {
           EditorGUILayout.LabelField("Interaction Disabled", EditorStyles.boldLabel);
         } else {
           EditorGUILayout.LabelField("Interaction Info", EditorStyles.boldLabel);
           using (new EditorGUI.DisabledGroupScope(true)) {
-            EditorGUILayout.IntField("Grasping Hand Count", _interactionBehaviour.GraspingHandCount);
-            EditorGUILayout.IntField("Untracked Hand Count", _interactionBehaviour.UntrackedHandCount);
+            EditorGUILayout.IntField("Grasping Hand Count", target.GraspingHandCount);
+            EditorGUILayout.IntField("Untracked Hand Count", target.UntrackedHandCount);
           }
         }
       }
