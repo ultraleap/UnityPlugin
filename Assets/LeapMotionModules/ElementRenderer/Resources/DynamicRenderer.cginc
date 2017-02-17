@@ -27,6 +27,7 @@ void ApplyGuiWarping(inout float4 anchorSpaceVert, inout float4 anchorSpaceNorma
   Cylindrical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal.xyz, parameters);
 
   anchorSpaceVert = mul(_LeapGui_LocalToWorld, anchorSpaceVert);
+  anchorSpaceNormal = mul(_LeapGui_LocalToWorld, float4(anchorSpaceNormal.xyz, 0));
 }
 #else
 void ApplyGuiWarping(inout float4 anchorSpaceVert, int elementId) {
@@ -191,6 +192,10 @@ v2f_gui_dynamic ApplyDynamicGui(appdata_gui_dynamic v) {
 #ifdef GUI_ELEMENTS_NEED_ANCHOR_SPACE
   v.vertex = mul(unity_ObjectToWorld, v.vertex);
   v.vertex = mul(_LeapGuiCurved_WorldToAnchor[elementId], v.vertex);
+#ifdef LEAP_GUI_VERTEX_NORMALS
+  v.normal = mul(unity_ObjectToWorld, float4(v.normal.xyz, 0));
+  v.normal = mul(_LeapGuiCurved_WorldToAnchor[elementId], float4(v.normal.xyz, 0));
+#endif
 #endif
 
 #ifdef LEAP_GUI_BLEND_SHAPES
