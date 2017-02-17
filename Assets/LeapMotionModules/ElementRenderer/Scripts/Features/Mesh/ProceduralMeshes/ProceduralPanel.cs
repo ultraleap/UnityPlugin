@@ -5,6 +5,9 @@ using Leap.Unity.Attributes;
 
 public class ProceduralPanel : ProceduralMeshSource {
 
+  [SerializeField]
+  private ResolutionMode _resolutionMode = ResolutionMode.Explicit;
+
   [Tooltip("The number of vertices along the X axis.")]
   [MinValue(0)]
   [SerializeField]
@@ -14,6 +17,15 @@ public class ProceduralPanel : ProceduralMeshSource {
   [MinValue(0)]
   [SerializeField]
   private int _resolutionY = 8;
+
+  [MinValue(0)]
+  [SerializeField]
+  private float _vertexPerMeterX = 10f;
+
+  [MinValue(0)]
+  [SerializeField]
+  private float _vertexPerMeterY = 10f;
+
 
   [Tooltip("Uses sprite data to generate a nine sliced panel.")]
   [SerializeField]
@@ -56,8 +68,17 @@ public class ProceduralPanel : ProceduralMeshSource {
     List<Vector2> uvs = new List<Vector2>();
     List<int> tris = new List<int>();
 
-    int vertsX = _resolutionX + (_nineSliced ? 4 : 2);
-    int vertsY = _resolutionY + (_nineSliced ? 4 : 2);
+    int vertsX, vertsY;
+    if (_resolutionMode == ResolutionMode.Explicit) {
+      vertsX = _resolutionX;
+      vertsY = _resolutionY;
+    } else {
+      vertsX = Mathf.RoundToInt(rect.width * _vertexPerMeterX);
+      vertsY = Mathf.RoundToInt(rect.height * _vertexPerMeterY);
+    }
+
+    vertsX += _nineSliced ? 4 : 2;
+    vertsY += _nineSliced ? 4 : 2;
 
     for (int vy = 0; vy < vertsY; vy++) {
       for (int vx = 0; vx < vertsX; vx++) {
@@ -116,5 +137,10 @@ public class ProceduralPanel : ProceduralMeshSource {
     } else {
       return (dv / (vertCount - 1.0f)) * size;
     }
+  }
+
+  public enum ResolutionMode {
+    Explicit,
+    Implicit
   }
 }
