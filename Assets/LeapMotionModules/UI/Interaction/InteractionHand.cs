@@ -162,6 +162,7 @@ namespace Leap.Unity.UI.Interaction {
     private const float MAX_PRIMARY_HOVER_DISTANCE = 0.1F;
     private Vector3 _intentionPosition;
     private InteractionBehaviourBase _primaryHoveredLastFrame = null;
+    private float[] _intentionFingerWeights = new float[NUM_FINGERS] { 0F, 1F, 0.6F, 0.4F, 0.1F };
 
     private void CalculateIntentionPosition() {
       if (_hand == null) return;
@@ -174,9 +175,11 @@ namespace Leap.Unity.UI.Interaction {
         Leap.Vector distalFingerBoneTip = _hand.Fingers[i].bones[3].NextJoint;
         Leap.Vector medialFingerBoneDirection = _hand.Fingers[i].bones[2].Direction;
         Leap.Vector distalDirection = _hand.Basis.zBasis;
-        var fingerUsage = ((medialFingerBoneDirection.x * distalDirection.x)
+        var fingerUsage = (((medialFingerBoneDirection.x * distalDirection.x)
                          + (medialFingerBoneDirection.y * distalDirection.y)
-                         + (medialFingerBoneDirection.z * distalDirection.z)).Map(-0.6F, 0.9F, 0, 1);
+                         + (medialFingerBoneDirection.z * distalDirection.z))
+                         * _intentionFingerWeights[i])
+                         .Map(-0.3F, 0.9F, 0, 1);
         usageSum += fingerUsage;
         averagePosition = new Leap.Vector(averagePosition.x + distalFingerBoneTip.x * fingerUsage,
                                           averagePosition.y + distalFingerBoneTip.y * fingerUsage,
@@ -286,6 +289,7 @@ namespace Leap.Unity.UI.Interaction {
     private void InitContactBoneContainer() {
       _contactBoneParent = new GameObject((_isLeft ? "Left" : "Right") + " Interaction Hand Contact Bones");
       _contactBoneParent.transform.parent = _interactionManager.transform;
+      _contactBoneParent.layer = _interactionManager.ContactBoneLayer;
     }
 
     private void InitContactBones() {
@@ -298,6 +302,7 @@ namespace Leap.Unity.UI.Interaction {
           int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
 
           GameObject contactBoneObj = new GameObject("Contact Fingerbone", typeof(CapsuleCollider), typeof(Rigidbody), typeof(ContactBone));
+          contactBoneObj.layer = _interactionManager.ContactBoneLayer;
 
           contactBoneObj.transform.position = bone.Center.ToVector3();
           contactBoneObj.transform.rotation = bone.Rotation.ToQuaternion();
@@ -470,6 +475,22 @@ namespace Leap.Unity.UI.Interaction {
           _contactBehaviourLastFrame.Add(interactionObj);
         }
       }
+    }
+
+    internal void ContactBoneCollisionEnter(ContactBone contactBone, Collision collision) {
+
+    }
+
+    internal void ContactBoneCollisionExit(ContactBone contactBone, Collision collision) {
+
+    }
+
+    internal void ContactBoneTriggerEnter(ContactBone contactBone, Collider collider) {
+
+    }
+
+    internal void ContactBoneTriggerExit(ContactBone contactBone, Collider collider) {
+
     }
 
     #endregion

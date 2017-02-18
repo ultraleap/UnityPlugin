@@ -83,15 +83,15 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected SingleLayer _templateLayer = 0;
 
-    [Tooltip("Default layer that interaction objects")]
+    [Tooltip("The layer containing interaction objects.")]
     [SerializeField]
     protected SingleLayer _interactionLayer = 0;
 
-    [Tooltip("Default layer that interaction objects when they become grasped.")]
+    [Tooltip("The layer containing interaction objects when they become grasped.")]
     [SerializeField]
     protected SingleLayer _interactionNoClipLayer = 0;
 
-    [Tooltip("Layer that interaction brushes will be on normally.")]
+    [Tooltip("The layer containing the colliders for the bones of the hand.")]
     [SerializeField]
     protected SingleLayer _brushLayer = 0;
 

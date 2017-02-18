@@ -72,7 +72,7 @@ namespace Leap.Unity.UI.Interaction {
       _handToPoints.Clear();
     }
 
-    public void GetHoldingPose(out Vector3 newPosition, out Quaternion newRotation) {
+    public void GetGraspedPosition(out Vector3 newPosition, out Quaternion newRotation) {
       _points.Clear(); _refPoints.Clear();
       Vector3 bodyPosition = _interactionObj.Rigidbody.position;
       Quaternion bodyRotation = _interactionObj.Rigidbody.rotation;
@@ -111,17 +111,6 @@ namespace Leap.Unity.UI.Interaction {
               // Do normal Kabsch solve.
               _solveMethod = SolveMethod.SixDegreeSolve;
               _points.Add(point1); _refPoints.Add(point2);
-            }
-            switch (_solveMethod) {
-              case SolveMethod.SixDegreeSolve:
-                // Set the relevant points in each array
-
-                // TODO: Determine whether supporting PivotAroundOrigin needs to happen
-
-                break;
-              case SolveMethod.PivotAroundOrigin:
-                //Calculate the Centroids of the object and hand(s) points
-                break;
             }
           }
         }

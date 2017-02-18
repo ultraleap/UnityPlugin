@@ -12,6 +12,26 @@ namespace Leap.Unity.UI.Interaction {
     public Vector3 desiredPosition;
     public Quaternion desiredRotation;
 
+    #region Collision Callbacks
+
+    void OnCollisionEnter(Collision collision) {
+      interactionHand.ContactBoneCollisionEnter(this, collision);
+    }
+
+    void OnCollisionExit(Collision collision) {
+      interactionHand.ContactBoneCollisionExit(this, collision);
+    }
+
+    void OnTriggerEnter(Collider collider) {
+      interactionHand.ContactBoneTriggerEnter(this, collider);
+    }
+
+    void OnTriggerExit(Collider collider) {
+      interactionHand.ContactBoneTriggerExit(this, collider);
+    }
+
+    #endregion
+
     // TODO:
     #region rename weird "Triggering" silliness
 

@@ -16,7 +16,7 @@ public class TranslationHandle : TransformHandle {
 
     _interactionObj = GetComponent<InteractionBehaviour>();
     _interactionObj.OnGraspBegin          += OnGraspBegin;
-    _interactionObj.OnPostHoldingMovement += OnPostHoldingMovement;
+    _interactionObj.OnGraspedMovement += OnPostHoldingMovement;
 
     InitializeAxisAndOrientation();
   }

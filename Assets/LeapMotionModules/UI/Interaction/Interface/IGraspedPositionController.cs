@@ -38,7 +38,7 @@ namespace Leap.Unity.UI.Interaction {
     /// Calculate the best holding position and orientation given the current
     /// state of added InteractionHands (via AddHand()).
     /// </summary>
-    void GetHoldingPose(out Vector3 position, out Quaternion rotation);
+    void GetGraspedPosition(out Vector3 position, out Quaternion rotation);
 
   }
 

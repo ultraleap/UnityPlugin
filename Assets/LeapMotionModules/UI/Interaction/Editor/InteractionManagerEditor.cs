@@ -11,7 +11,7 @@ namespace Leap.Unity.UI.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
 
-      specifyConditionalDrawing("_showDebugOptions", "_debugDrawInteractionHands");
+      specifyConditionalDrawing("_showDebugOptions", "_debugDrawHandGizmos");
     }
 
   }

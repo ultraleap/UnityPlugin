@@ -21,6 +21,27 @@ namespace Leap.Unity.UI.Interaction {
     [DisableIf("contactOrGraspingEnabled", isEqualTo: false)]
     public float touchActivationRadius = 0.15F;
 
+    [Header("Layer Settings")]
+    [Tooltip("Whether or not to create the layers used for interaction when the scene runs.")]
+    [SerializeField]
+    protected bool _autoGenerateLayers = true;
+
+    [Tooltip("Layer to use for auto-generation.  The generated interaction layers will have the same collision settings as this layer.")]
+    [SerializeField]
+    protected SingleLayer _templateLayer = 0;
+
+    [Tooltip("The layer containing interaction objects.")]
+    [SerializeField]
+    protected SingleLayer _interactionLayer = 0;
+
+    [Tooltip("The layer containing interaction objects when they become grasped.")]
+    [SerializeField]
+    protected SingleLayer _graspedObjectLayer = 0;
+
+    [Tooltip("The layer containing the colliders for the bones of the hand.")]
+    [SerializeField]
+    protected SingleLayer _contactBoneLayer = 0;
+
     [SerializeField]
     #pragma warning disable 0414
     private bool _showDebugOptions = false;
@@ -71,15 +92,24 @@ namespace Leap.Unity.UI.Interaction {
     private Dictionary<Rigidbody, InteractionBehaviourBase> _rigidbodyRegistry = new Dictionary<Rigidbody, InteractionBehaviourBase>();
     public Dictionary<Rigidbody, InteractionBehaviourBase> RigidbodyRegistry { get { return _rigidbodyRegistry; } }
 
+    void OnValidate() {
+      contactOrGraspingEnabled = enableContact || enableGrasping;
+
+      if (!Application.isPlaying && _autoGenerateLayers) {
+        AutoGenerateLayers();
+      }
+    }
+
     void Awake() {
       Provider = Hands.Provider;
 
-      _interactionHands[0] = new InteractionHand(this, () => { return Hands.FixedLeft;  }, Chirality.Left, WorldHoverActivationRadius, WorldTouchActivationRadius);
+      _interactionHands[0] = new InteractionHand(this, () => { return Hands.FixedLeft; }, Chirality.Left, WorldHoverActivationRadius, WorldTouchActivationRadius);
       _interactionHands[1] = new InteractionHand(this, () => { return Hands.FixedRight; }, Chirality.Right, WorldHoverActivationRadius, WorldTouchActivationRadius);
-    }
 
-    void OnValidate() {
-      contactOrGraspingEnabled = enableContact || enableGrasping;
+      if (_autoGenerateLayers) {
+        AutoGenerateLayers();
+        AutoSetupCollisionLayers();
+      }
     }
 
     void Start() {
@@ -152,6 +182,59 @@ namespace Leap.Unity.UI.Interaction {
       }
       return false;
     }
+
+    #region Internal
+
+    public SingleLayer InteractionLayer { get { return _interactionLayer; } }
+    public SingleLayer GraspedObjectLayer { get { return _graspedObjectLayer; } }
+    public SingleLayer ContactBoneLayer { get { return _contactBoneLayer; } }
+
+    protected void AutoGenerateLayers() {
+      _interactionLayer = -1;
+      _graspedObjectLayer = -1;
+      _contactBoneLayer = -1;
+      for (int i = 8; i < 32; i++) {
+        string layerName = LayerMask.LayerToName(i);
+        if (string.IsNullOrEmpty(layerName)) {
+          if (_interactionLayer == -1) {
+            _interactionLayer = i;
+          }
+          else if (_graspedObjectLayer == -1) {
+            _graspedObjectLayer = i;
+          }
+          else if (_contactBoneLayer == -1) {
+            _contactBoneLayer = i;
+            break;
+          }
+        }
+      }
+
+      if (_interactionLayer == -1 || _graspedObjectLayer == -1 || _contactBoneLayer == -1) {
+        if (Application.isPlaying) {
+          enabled = false;
+        }
+        Debug.LogError("InteractionManager Could not find enough free layers for auto-setup, manual setup required.");
+        _autoGenerateLayers = false;
+        return;
+      }
+    }
+
+    private void AutoSetupCollisionLayers() {
+      for (int i = 0; i < 32; i++) {
+        // Copy ignore settings from template layer
+        bool shouldIgnore = Physics.GetIgnoreLayerCollision(_templateLayer, i);
+        Physics.IgnoreLayerCollision(_interactionLayer, i, shouldIgnore);
+        Physics.IgnoreLayerCollision(_graspedObjectLayer, i, shouldIgnore);
+
+        // Set brush layer to collide with nothing
+        Physics.IgnoreLayerCollision(_contactBoneLayer, i, true);
+      }
+
+      //After copy and set we enable the interaction between the brushes and interaction objects
+      Physics.IgnoreLayerCollision(_contactBoneLayer, _interactionLayer, false);
+    }
+
+    #endregion
 
     #region Runtime Gizmos
 

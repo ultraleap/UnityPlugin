@@ -17,8 +17,8 @@ public class RotationHandle : TransformHandle {
     _interactionObj = GetComponent<InteractionBehaviour>();
 
     _interactionObj.OnGraspBegin += OnGraspBegin;
-    _interactionObj.OnPreHoldingMovement += OnPreHoldingMovement;
-    _interactionObj.OnPostHoldingMovement += OnPostHoldingMovement;
+    _interactionObj.OnPreGraspedMovement += OnPreHoldingMovement;
+    _interactionObj.OnGraspedMovement += OnPostHoldingMovement;
     _interactionObj.OnGraspEnd += OnGraspEnd;
   }
 
