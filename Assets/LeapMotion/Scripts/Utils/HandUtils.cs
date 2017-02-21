@@ -1,5 +1,5 @@
 ﻿using Leap.Unity.Query;
-using System.Collections.Generic;
+using UnityEngine.Events;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -57,6 +57,9 @@ namespace Leap.Unity {
         return s_provider;
       }
     }
+
+    [System.Serializable]
+    public class HandEvent : UnityEvent<Hand> { }
 
     public static Hand Get(Chirality chirality) {
       if (chirality == Chirality.Left) return Left;
