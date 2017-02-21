@@ -25,6 +25,7 @@ namespace Leap.Unity {
 
     public bool WalkingEnabled = true;
     public bool crouchEnabled = false;
+    public Vector3 BodyCameraOffset;
     private float userHeight = 1.63241f;
     private bool standing = true;
 
@@ -66,7 +67,7 @@ namespace Leap.Unity {
           animator.transform.position = new Vector3(animator.transform.position.x, heightOffset, animator.transform.position.z);
         }
       }
-      Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
+      Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x + BodyCameraOffset.x, transform.position.y + BodyCameraOffset.y, Camera.main.transform.position.z + BodyCameraOffset.z);
 
       if (IsCentering || !WalkingEnabled) {
         animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam, .05f);
