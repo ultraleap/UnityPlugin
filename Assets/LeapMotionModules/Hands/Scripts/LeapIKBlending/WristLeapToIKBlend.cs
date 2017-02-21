@@ -80,6 +80,8 @@ namespace Leap.Unity {
 
     public bool shrugShoulders = false;
     public bool FreezeOnFinish;
+    [Range(.01f, .05f)]
+    public float ElbowDamp = .01f;
 
     protected override void Awake() {
       base.Awake();
@@ -257,7 +259,7 @@ namespace Leap.Unity {
       if (isTracking) {
         ElbowIKTarget.position = characterRoot.TransformPoint(ElbowTargetPosition);
       }
-      else ElbowIKTarget.position = Vector3.Lerp(ElbowIKTarget.position, characterRoot.TransformPoint(ElbowTargetPosition), .01f);
+      else ElbowIKTarget.position = Vector3.Lerp(ElbowIKTarget.position, characterRoot.TransformPoint(ElbowTargetPosition), ElbowDamp);
     }
 
     public void CalculateAvergeHandVelocity() {
