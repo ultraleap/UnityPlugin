@@ -74,7 +74,7 @@ namespace Leap.Unity.UI.zzOldConstraints {
     public override void EnforceConstraint() {
       //this.transform.localPosition = constraintLocalPosition;
       //this.transform.localRotation = constraintLocalRotation * EvaluateRotationAlongConstraint(GetConstraintProjectionAngles());
-      this.transform.localRotation = ConstraintsUtil.ConstrainRotationToConeWithTwist(this.transform.localRotation,
+      this.transform.localRotation = ConstraintsUtil_IK.ConstrainRotationToConeWithTwist(this.transform.localRotation,
                                                                                       constraintLocalRotation * jointAxis.ToUnitVector3(),
                                                                                       jointAxis.ToUnitVector3(),
                                                                                       Mathf.Cos(coneAngularWidth / 2F * Mathf.Deg2Rad), 0.999F);

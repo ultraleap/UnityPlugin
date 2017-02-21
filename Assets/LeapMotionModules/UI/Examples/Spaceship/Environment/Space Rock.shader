@@ -66,6 +66,7 @@
 
         // TODO: This rock should use a texture instead of a fancy 4D noise shader
         o.Albedo = _Color * (extraBump);
+        o.Emission = _Color * (0.2 * (extraBump * extraBump));
       }
 		ENDCG
 	}

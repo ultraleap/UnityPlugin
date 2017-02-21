@@ -54,7 +54,7 @@ namespace Leap.Unity.UI {
         float hardness = 0.5f;
         if (body) {
           if (!body.lockRotation) {
-            ConstraintsUtil.ConstrainToPoint(transform, depenetrationRay.position, depenetrationRay.position + depenetrationRay.direction, hardness);
+            ConstraintsUtil_IK.ConstrainToPoint(transform, depenetrationRay.position, depenetrationRay.position + depenetrationRay.direction, hardness);
           }
           else if (body.lockRotation && !body.lockPosition) {
             transform.position += depenetrationRay.direction * hardness;

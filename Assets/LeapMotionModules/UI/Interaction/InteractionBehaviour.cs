@@ -91,6 +91,8 @@ namespace Leap.Unity.UI.Interaction {
       rigidbodyWarper = new RigidbodyWarper(interactionManager, this.transform, _body, 0.25F);
     }
 
+
+
     void Start() {
       RefreshPositionLockedState();
       InitGrasping();
@@ -455,6 +457,8 @@ namespace Leap.Unity.UI.Interaction {
 
     protected void InitInternal() {
       _childrenArray = GetComponentsInChildren<Transform>(true);
+
+      FixedUpdateLayer();
     }
 
     #region Locked Position Checking

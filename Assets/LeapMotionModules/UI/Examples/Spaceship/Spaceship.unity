@@ -418,7 +418,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &101493271
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -793,7 +793,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &172186644
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -934,7 +934,6 @@ GameObject:
   m_Component:
   - component: {fileID: 217578171}
   - component: {fileID: 217578174}
-  - component: {fileID: 217578173}
   - component: {fileID: 217578172}
   m_Layer: 0
   m_Name: Throttle Box
@@ -987,18 +986,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!65 &217578173
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 217578170}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &217578174
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1326,7 +1313,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &291509291
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1636,7 +1623,6 @@ GameObject:
   m_Component:
   - component: {fileID: 353001152}
   - component: {fileID: 353001155}
-  - component: {fileID: 353001154}
   - component: {fileID: 353001153}
   m_Layer: 0
   m_Name: Midcap (4)
@@ -1689,18 +1675,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!65 &353001154
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 353001151}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &353001155
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -1920,7 +1894,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &395570905
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2224,7 +2198,6 @@ GameObject:
   m_Component:
   - component: {fileID: 465304840}
   - component: {fileID: 465304843}
-  - component: {fileID: 465304842}
   - component: {fileID: 465304841}
   m_Layer: 0
   m_Name: Midcap (2)
@@ -2277,18 +2250,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!65 &465304842
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 465304839}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &465304843
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -2313,7 +2274,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &483144139
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2503,7 +2464,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &507520566
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -2802,7 +2763,6 @@ GameObject:
   m_Component:
   - component: {fileID: 614951559}
   - component: {fileID: 614951562}
-  - component: {fileID: 614951561}
   - component: {fileID: 614951560}
   m_Layer: 0
   m_Name: Midcap (1)
@@ -2855,18 +2815,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!65 &614951561
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 614951558}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &614951562
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -3196,7 +3144,6 @@ GameObject:
   m_Component:
   - component: {fileID: 708305244}
   - component: {fileID: 708305247}
-  - component: {fileID: 708305246}
   - component: {fileID: 708305245}
   m_Layer: 0
   m_Name: Midcap (3)
@@ -3249,18 +3196,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!65 &708305246
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 708305243}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &708305247
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -4812,7 +4747,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &884421859
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -5152,7 +5087,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &914414020
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -5635,7 +5570,7 @@ BoxCollider:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 970431257}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
@@ -5693,6 +5628,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96aa02f8b71c0e5409241b136123ed31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  throttle: {fileID: 1239165514}
 --- !u!1 &989795512
 GameObject:
   m_ObjectHideFlags: 0
@@ -6039,7 +5975,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &1109212939
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -6466,6 +6402,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1239165513}
+  - component: {fileID: 1239165514}
   m_Layer: 0
   m_Name: Throttle
   m_TagString: Untagged
@@ -6490,6 +6427,18 @@ Transform:
   m_Father: {fileID: 569668359}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1239165514
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1239165512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d331a0db920ef8488a5346cd9734b46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spaceship: {fileID: 569668361}
 --- !u!1 &1245867024
 GameObject:
   m_ObjectHideFlags: 0
@@ -6562,7 +6511,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &1250539629
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -7020,7 +6969,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &1325400621
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -7242,7 +7191,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1390260178}
   - component: {fileID: 1390260181}
-  - component: {fileID: 1390260180}
   - component: {fileID: 1390260179}
   m_Layer: 0
   m_Name: Midcap (5)
@@ -7295,18 +7243,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!65 &1390260180
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1390260177}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &1390260181
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -7413,7 +7349,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &1409700986
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -8129,7 +8065,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1573512805}
   - component: {fileID: 1573512808}
-  - component: {fileID: 1573512807}
   - component: {fileID: 1573512806}
   m_Layer: 0
   m_Name: Handle Back Cap
@@ -8182,18 +8117,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!65 &1573512807
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1573512804}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &1573512808
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -8684,7 +8607,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1671378700}
   - component: {fileID: 1671378703}
-  - component: {fileID: 1671378702}
   - component: {fileID: 1671378701}
   m_Layer: 0
   m_Name: Handle Front Cap
@@ -8737,18 +8659,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!65 &1671378702
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1671378699}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &1671378703
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -9894,7 +9804,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &1899001991
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -10123,7 +10033,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2006500527}
   - component: {fileID: 2006500530}
-  - component: {fileID: 2006500529}
   - component: {fileID: 2006500528}
   m_Layer: 0
   m_Name: Midcap (6)
@@ -10176,18 +10085,6 @@ MeshRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
---- !u!65 &2006500529
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2006500526}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!33 &2006500530
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -10212,7 +10109,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &2007033241
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -10383,7 +10280,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &2061844289
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -10464,7 +10361,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!23 &2063019584
 MeshRenderer:
   m_ObjectHideFlags: 0

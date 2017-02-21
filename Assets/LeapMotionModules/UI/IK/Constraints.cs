@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public static class ConstraintsUtil {
+public static class ConstraintsUtil_IK {
 
   public static void ConstrainToPoint(this Transform transform, Vector3 oldPoint, Vector3 newPoint, float weight = 1f) {
     Vector3 translation;

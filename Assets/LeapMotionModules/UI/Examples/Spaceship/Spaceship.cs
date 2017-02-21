@@ -18,6 +18,10 @@ public class Spaceship : MonoBehaviour {
     get { return Quaternion.Inverse(this.transform.rotation) * _angularVelocity; }
   }
 
+  public Vector3 ShipAlignedVelocity {
+    get { return Quaternion.Inverse(this.transform.rotation) * _velocity; }
+  }
+
   void Start() {
     PhysicsCallbacks.OnPrePhysics += OnPrePhysics;
     _body = GetComponent<Rigidbody>();
@@ -45,6 +49,10 @@ public class Spaceship : MonoBehaviour {
 
   public void AddShipAlignedTorque(Vector3 shipAlignedTorque) {
     _accumulatedTorque += this.transform.rotation * shipAlignedTorque;
+  }
+
+  public void AddShipAlignedForce(Vector3 shipAlignedForce) {
+    _accumulatedForce += this.transform.rotation * shipAlignedForce;
   }
 
   private void OnPrePhysics() {

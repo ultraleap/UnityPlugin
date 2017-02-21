@@ -15,19 +15,28 @@ namespace Leap.Unity.UI.Interaction {
     #region Collision Callbacks
 
     void OnCollisionEnter(Collision collision) {
-      interactionHand.ContactBoneCollisionEnter(this, collision);
+      InteractionBehaviourBase interactionObj;
+      if (interactionHand.interactionManager.RigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
+        interactionHand.ContactBoneCollisionEnter(this, interactionObj);
+      }
     }
-
     void OnCollisionExit(Collision collision) {
-      interactionHand.ContactBoneCollisionExit(this, collision);
+      InteractionBehaviourBase interactionObj;
+      if (interactionHand.interactionManager.RigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
+        interactionHand.ContactBoneCollisionExit(this, interactionObj);
+      }
     }
-
     void OnTriggerEnter(Collider collider) {
-      interactionHand.ContactBoneTriggerEnter(this, collider);
+      InteractionBehaviourBase interactionObj;
+      if (interactionHand.interactionManager.RigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
+        interactionHand.ContactBoneCollisionEnter(this, interactionObj);
+      }
     }
-
     void OnTriggerExit(Collider collider) {
-      interactionHand.ContactBoneTriggerExit(this, collider);
+      InteractionBehaviourBase interactionObj;
+      if (interactionHand.interactionManager.RigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
+        interactionHand.ContactBoneCollisionExit(this, interactionObj);
+      }
     }
 
     #endregion

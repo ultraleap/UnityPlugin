@@ -46,13 +46,13 @@ namespace Leap.Unity.UI.Interaction {
 
     protected virtual void OnValidate() {
       _interactionManagerIsNull = interactionManager == null;
+      _body = GetComponent<Rigidbody>();
     }
 
     /// <summary> Return the distance the interaction object is from the given world position. </summary>
     public abstract float GetDistance(Vector3 worldPosition);
 
     #region Hovering
-
 
     /// <summary> Called per-hand when that hand produces a non-zero hover score for this object. </summary>
     public abstract void HoverBegin(Hand hand);

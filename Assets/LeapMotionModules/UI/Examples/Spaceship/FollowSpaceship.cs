@@ -1,4 +1,5 @@
-﻿using Leap.Unity.UI;
+﻿using Leap.Unity;
+using Leap.Unity.UI;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,6 +19,8 @@ public class FollowSpaceship : MonoBehaviour {
   void Update() {
     this.transform.position = spaceship.transform.TransformPoint(_positionFromSpaceship);
     this.transform.rotation = spaceship.transform.rotation * _rotationFromSpaceship;
+
+    Hands.Provider.ReTransformFrames();
   }
 
 }

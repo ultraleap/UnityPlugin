@@ -8,7 +8,8 @@ namespace Leap.Unity.UI.Interaction {
 
   public class InteractionHand {
 
-    private InteractionManager _interactionManager;
+    public InteractionManager interactionManager;
+
     private Func<Hand> _handAccessor;
     private Hand _hand;
     private bool _isLeft;
@@ -18,7 +19,7 @@ namespace Leap.Unity.UI.Interaction {
                            Chirality handedness,
                            float hoverActivationRadius,
                            float touchActivationRadius) {
-      _interactionManager = interactionManager;
+      this.interactionManager = interactionManager;
       _handAccessor = handAccessor;
       _isLeft = handedness == Chirality.Left;
 
@@ -45,7 +46,7 @@ namespace Leap.Unity.UI.Interaction {
 
     private void InitHovering(float hoverActivationRadius) {
       // Standard Hover
-      _hoverActivityManager = new ActivityManager(_interactionManager, hoverActivationRadius);
+      _hoverActivityManager = new ActivityManager(interactionManager, hoverActivationRadius);
     }
 
     private void FixedUpdateHovering() {
@@ -225,7 +226,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private void InitTouch(float touchActivationRadius) {
-      _touchActivityManager = new ActivityManager(_interactionManager, touchActivationRadius);
+      _touchActivityManager = new ActivityManager(interactionManager, touchActivationRadius);
     }
 
     private void FixedUpdateTouch() {
@@ -235,6 +236,8 @@ namespace Leap.Unity.UI.Interaction {
     #endregion
 
     #region Contact
+
+    #region Contact Bones
 
     private const int NUM_FINGERS = 5;
     private const int BONES_PER_FINGER = 3;
@@ -260,11 +263,6 @@ namespace Leap.Unity.UI.Interaction {
       // TODO: Ensure there aren't other optimal PhysicMaterial defaults to set here.
     }
 
-    // Contact callback support
-    private HashSet<InteractionBehaviourBase> _contactBehaviours = new HashSet<InteractionBehaviourBase>();
-    private HashSet<InteractionBehaviourBase> _contactBehaviourLastFrame = new HashSet<InteractionBehaviourBase>();
-    private List<InteractionBehaviourBase> _contactBehaviourRemovalCache = new List<InteractionBehaviourBase>();
-
     private bool _contactInitialized = false;
 
     private void InitContact() {
@@ -288,8 +286,8 @@ namespace Leap.Unity.UI.Interaction {
 
     private void InitContactBoneContainer() {
       _contactBoneParent = new GameObject((_isLeft ? "Left" : "Right") + " Interaction Hand Contact Bones");
-      _contactBoneParent.transform.parent = _interactionManager.transform;
-      _contactBoneParent.layer = _interactionManager.ContactBoneLayer;
+      _contactBoneParent.transform.parent = interactionManager.transform;
+      _contactBoneParent.layer = interactionManager.ContactBoneLayer;
     }
 
     private void InitContactBones() {
@@ -302,7 +300,7 @@ namespace Leap.Unity.UI.Interaction {
           int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
 
           GameObject contactBoneObj = new GameObject("Contact Fingerbone", typeof(CapsuleCollider), typeof(Rigidbody), typeof(ContactBone));
-          contactBoneObj.layer = _interactionManager.ContactBoneLayer;
+          contactBoneObj.layer = interactionManager.ContactBoneLayer;
 
           contactBoneObj.transform.position = bone.Center.ToVector3();
           contactBoneObj.transform.rotation = bone.Rotation.ToQuaternion();
@@ -451,47 +449,69 @@ namespace Leap.Unity.UI.Interaction {
         delta *= (deltaLen - deadzone) / deltaLen;
         contactBone.lastTarget = body.position + delta;
         delta /= Time.fixedDeltaTime;
-        body.velocity = (delta / delta.magnitude) * Mathf.Clamp(delta.magnitude, 0f, 3f);
+        body.velocity = (delta / delta.magnitude) * Mathf.Clamp(delta.magnitude, 0f, 100f);
       }
     }
 
+    #endregion
+
+    #region Contact Callbacks
+
+    private Dictionary<InteractionBehaviourBase, int> _contactBehaviours = new Dictionary<InteractionBehaviourBase, int>();
+    private HashSet<InteractionBehaviourBase> _contactBehavioursLastFrame = new HashSet<InteractionBehaviourBase>();
+    private List<InteractionBehaviourBase>    _contactBehaviourRemovalCache = new List<InteractionBehaviourBase>();
+
+    internal void ContactBoneCollisionEnter(ContactBone contactBone, InteractionBehaviourBase interactionObj) {
+      int count;
+      if (_contactBehaviours.TryGetValue(interactionObj, out count)) {
+        _contactBehaviours[interactionObj] = count + 1;
+      }
+      else {
+        _contactBehaviours[interactionObj] = 1;
+      }
+    }
+
+    internal void ContactBoneCollisionExit(ContactBone contactBone, InteractionBehaviourBase interactionObj) {
+      int count = _contactBehaviours[interactionObj];
+      if (count == 1) {
+        _contactBehaviours.Remove(interactionObj);
+      }
+      else {
+        _contactBehaviours[interactionObj] = count - 1;
+      }
+    }
+
+    // TODO: Is there a need for separate methods for Triggers?
+    //internal void ContactBoneTriggerEnter(ContactBone contactBone, InteractionBehaviourBase interactionObjr) {
+    //}
+
+    //internal void ContactBoneTriggerExit(ContactBone contactBone, InteractionBehaviourBase interactionObj) {
+    //}
+
     private void FixedUpdateContactCallbacks() {
-      foreach (var interactionObj in _contactBehaviourLastFrame) {
-        if (!_contactBehaviours.Contains(interactionObj)) {
+      foreach (var interactionObj in _contactBehavioursLastFrame) {
+        if (!_contactBehaviours.ContainsKey(interactionObj)) {
           interactionObj.ContactEnd(_hand);
           _contactBehaviourRemovalCache.Add(interactionObj);
         }
       }
       foreach (var interactionObj in _contactBehaviourRemovalCache) {
-        _contactBehaviourLastFrame.Remove(interactionObj);
+        _contactBehavioursLastFrame.Remove(interactionObj);
       }
       _contactBehaviourRemovalCache.Clear();
-      foreach (var interactionObj in _contactBehaviours) {
-        if (_contactBehaviourLastFrame.Contains(interactionObj)) {
+      foreach (var intObjCountPair in _contactBehaviours) {
+        var interactionObj = intObjCountPair.Key;
+        if (_contactBehavioursLastFrame.Contains(interactionObj)) {
           interactionObj.ContactStay(_hand);
         }
         else {
           interactionObj.ContactBegin(_hand);
-          _contactBehaviourLastFrame.Add(interactionObj);
+          _contactBehavioursLastFrame.Add(interactionObj);
         }
       }
     }
 
-    internal void ContactBoneCollisionEnter(ContactBone contactBone, Collision collision) {
-
-    }
-
-    internal void ContactBoneCollisionExit(ContactBone contactBone, Collision collision) {
-
-    }
-
-    internal void ContactBoneTriggerEnter(ContactBone contactBone, Collider collider) {
-
-    }
-
-    internal void ContactBoneTriggerExit(ContactBone contactBone, Collider collider) {
-
-    }
+    #endregion
 
     #endregion
 

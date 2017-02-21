@@ -14,12 +14,12 @@ namespace Leap.Unity.UI.Examples {
     public InteractionBehaviour leftHandle;
     public InteractionBehaviour rightHandle;
 
-    private float _rollSensitivity = 1.0F;
+    private float _globalSensitivity = 1.0F;
+    private float _rollSensitivity = 2.5F;
     private float _pitchSensitivity = 200.0F;
+    private float _yawSensitivity = 1.5F;
 
-    private float _baseHandleHeightDelta = 0F;
     private float _baseYokeHeight;
-    private float _baseHandleDepthDelta = 0F;
 
     private Vector3 _restLeftHandleLocalPosition;
     //private Quaternion _restLeftHandleLocalRotation;
@@ -51,36 +51,39 @@ namespace Leap.Unity.UI.Examples {
       handle.transform.rotation = Quaternion.Slerp(handle.Rigidbody.rotation, rot, slerp);
     }
 
-    private float RightRollAmountDegrees {
-      get {
-        Vector3 A = yokeHead.transform.right, B = (yokeHead.transform.position - leftHandle.transform.position).normalized;
-        Vector3 ACrossB = Vector3.Cross(A, B);
-        Vector3 crossDirectionalityBasis = yokeHead.transform.forward;
-        bool add90 = Vector3.Dot((yokeHead.transform.position - leftHandle.transform.position), yokeHead.transform.right) < 0;
-        return (Mathf.Asin(
-                  Mathf.Clamp01(ACrossB.magnitude)
-                ) * Mathf.Rad2Deg
-               + (add90 ? 90 : 0)) * (Vector3.Dot(ACrossB, crossDirectionalityBasis) > 0 ? 1 : -1);
-      }
-    }
-
-
-    // TODO: Test, and refactor the above and below to use this
-    public float SignedAngle(Vector3 A, Vector3 B, Vector3 directionOfPositiveRotation) {
-      A = A.normalized;
+    public float SignedAngle(Vector3 A, Vector3 B, Vector3 directionOfPositiveRotation, bool doAdd90) {
+      A = Vector3.ProjectOnPlane(A, directionOfPositiveRotation).normalized;
       B = B.normalized;
       Vector3 ACrossB = Vector3.Cross(A, B);
-      Vector3 crossDirectionalityBasis = yokeHead.transform.right;
-      bool add90 = Vector3.Dot(B, yokeHead.transform.forward) < 0;
+      Vector3 crossDirectionalityBasis = directionOfPositiveRotation;
+      bool add90 = Vector3.Dot(B, A) < 0;
       return (Mathf.Asin(
                 Mathf.Clamp01(ACrossB.magnitude)
               ) * Mathf.Rad2Deg
-              + (add90 ? 90 : 0)) * (Vector3.Dot(ACrossB, crossDirectionalityBasis) > 0 ? 1 : -1);
+              + (doAdd90 ? (add90 ? 90 : 0) : 0)) * (Vector3.Dot(ACrossB, crossDirectionalityBasis) > 0 ? 1 : -1);
+    }
+
+    private float RightRollAmountDegrees {
+      get {
+        Vector3 handleDisplacement = rightHandle.Rigidbody.position - leftHandle.Rigidbody.position;
+        Vector3 rightBasis = yokeHead.transform.right;
+        Vector3 directionalityBasis = -yokeHead.transform.forward;
+        float rollAllowance = Mathf.Clamp01(Vector3.Dot(Vector3.ProjectOnPlane(yokeHead.transform.position - Camera.main.transform.position, spaceship.transform.up), spaceship.transform.forward));
+        return SignedAngle(handleDisplacement, rightBasis, directionalityBasis, false) * rollAllowance;
+      }
     }
 
     private float PitchUpAmount {
       get {
-        return GetYokeHeadHeightFromBase() - _baseYokeHeight;
+        return _baseYokeHeight - GetYokeHeadHeightFromBase();
+      }
+    }
+
+    private float YawRightAmount {
+      get {
+        Vector3 handleDisplacement = Vector3.ProjectOnPlane(leftHandle.Rigidbody.position - rightHandle.Rigidbody.position, spaceship.transform.up);
+        float yawSuppression = Mathf.Clamp01(Vector3.Dot(Vector3.ProjectOnPlane(yokeHead.transform.position - Camera.main.transform.position, spaceship.transform.up), spaceship.transform.forward));
+        return SignedAngle(handleDisplacement, -spaceship.transform.right, -spaceship.transform.up, true) * (1 - yawSuppression);
       }
     }
 
@@ -110,15 +113,22 @@ namespace Leap.Unity.UI.Examples {
       Vector3 toYokeBase = (this.transform.position - yokeHead.transform.position).normalized;
       yokeHead.transform.rotation = Quaternion.LookRotation(toYokeBase, spaceship.transform.up);
 
-      float targetRollVelocity = RightRollAmountDegrees * _rollSensitivity;
-      float currentRollVelocity = spaceship.ShipAlignedAngularVelocity.z;
+      Vector3 shipAlignedAngularVelocity = spaceship.ShipAlignedAngularVelocity;
+
+      float targetRollVelocity = RightRollAmountDegrees * _rollSensitivity * _globalSensitivity;
+      float currentRollVelocity = shipAlignedAngularVelocity.z;
       float rollTorque = targetRollVelocity - currentRollVelocity;
       spaceship.AddShipAlignedTorque(rollTorque * Vector3.forward);
 
-      float targetPitchVelocity = PitchUpAmount * _pitchSensitivity;
-      float currentPitchVelocity = spaceship.ShipAlignedAngularVelocity.x;
+      float targetPitchVelocity = PitchUpAmount * _pitchSensitivity * _globalSensitivity;
+      float currentPitchVelocity = shipAlignedAngularVelocity.x;
       float pitchTorque = targetPitchVelocity - currentPitchVelocity;
       spaceship.AddShipAlignedTorque(pitchTorque * Vector3.right);
+
+      float targetYawVelocity = YawRightAmount * _yawSensitivity * _globalSensitivity;
+      float currentYawVelocity = shipAlignedAngularVelocity.y;
+      float yawTorque = targetYawVelocity - currentYawVelocity;
+      spaceship.AddShipAlignedTorque(yawTorque * Vector3.up);
     }
 
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
@@ -126,6 +136,8 @@ namespace Leap.Unity.UI.Examples {
       drawer.DrawLine(yokeHead.transform.position, yokeHead.transform.position + spaceship.transform.forward * RightRollAmountDegrees * _rollSensitivity * 0.002F);
       drawer.color = Color.red;
       drawer.DrawLine(yokeHead.transform.position, yokeHead.transform.position + spaceship.transform.right * PitchUpAmount * _pitchSensitivity * 0.002F);
+      drawer.color = Color.green;
+      drawer.DrawLine(yokeHead.transform.position, yokeHead.transform.position + spaceship.transform.up * YawRightAmount * _yawSensitivity * 0.002F);
     }
   }
 
