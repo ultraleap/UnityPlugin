@@ -79,6 +79,7 @@ namespace Leap.Unity {
     public Text outText;
 
     public bool shrugShoulders = false;
+    public bool FreezeOnFinish;
 
     protected override void Awake() {
       base.Awake();
@@ -127,7 +128,9 @@ namespace Leap.Unity {
     }
 
     protected override void HandFinish() {
-      isTracking = false;
+      if (!FreezeOnFinish) {
+        isTracking = false;
+      }
       positionIKTargetWeight = 1;
       elbowIKTargetWeight = 1;
       rotationIKWeight = 0;
@@ -138,7 +141,7 @@ namespace Leap.Unity {
       iKVelocitySnapShot = averageIKVelocity;
       iKVelocitySnapShot = iKVelocitySnapShot * .3f;// scale the velocity so arm doesn't reach as far;
       VelocityMarker.position = iKVelocitySnapShot;
-      StartCoroutine(DropWithVelocity(palm.position));
+      //StartCoroutine(DropWithVelocity(palm.position));
       lastTrackedPosition = palm.position;      
     }
     protected override void HandReset() {
