@@ -178,6 +178,6 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
 
   public enum ResolutionType {
     Vertices,
-    VerticesPerMeter
+    VerticesPerRectilinearMeter
   }
 }
