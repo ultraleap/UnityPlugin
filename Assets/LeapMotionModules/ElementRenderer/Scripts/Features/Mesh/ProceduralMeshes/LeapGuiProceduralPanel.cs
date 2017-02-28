@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Leap.Unity.Attributes;
 
-public class ProceduralPanel : ProceduralMeshSource {
+public class LeapGuiProceduralPanel : ProceduralMeshSource {
   public const int MAX_VERTS = 128;
 
   [SerializeField]

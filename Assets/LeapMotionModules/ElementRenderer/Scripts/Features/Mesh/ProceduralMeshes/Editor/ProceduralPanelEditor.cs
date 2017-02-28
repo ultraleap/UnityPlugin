@@ -5,8 +5,8 @@ using Leap.Unity;
 using Leap.Unity.Query;
 
 [CanEditMultipleObjects]
-[CustomEditor(typeof(ProceduralPanel))]
-public class ProceduralPanelEditor : CustomEditorBase<ProceduralPanel> {
+[CustomEditor(typeof(LeapGuiProceduralPanel))]
+public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPanel> {
 
   protected override void OnEnable() {
     base.OnEnable();
@@ -22,7 +22,7 @@ public class ProceduralPanelEditor : CustomEditorBase<ProceduralPanel> {
   }
 
   private void drawResolution(SerializedProperty property) {
-    ProceduralPanel.ResolutionType mainType = targets[0].resolutionType;
+    LeapGuiProceduralPanel.ResolutionType mainType = targets[0].resolutionType;
     bool allSameType = targets.Query().All(p => p.resolutionType == mainType);
 
     if (!allSameType) {
@@ -45,7 +45,7 @@ public class ProceduralPanelEditor : CustomEditorBase<ProceduralPanel> {
     Rect right = left;
     right.x += right.width + 1;
 
-    if (mainType == ProceduralPanel.ResolutionType.Vertices) {
+    if (mainType == LeapGuiProceduralPanel.ResolutionType.Vertices) {
       SerializedProperty x = serializedObject.FindProperty("_resolution_vert_x");
       SerializedProperty y = serializedObject.FindProperty("_resolution_vert_y");
 
