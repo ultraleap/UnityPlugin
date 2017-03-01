@@ -27,6 +27,11 @@ public static class MeshCache {
     Vector3[] normals;
     if (!_normalCache.TryGetValue(mesh, out normals)) {
       normals = mesh.normals;
+      if (normals.Length != mesh.vertexCount) {
+        mesh.RecalculateNormals();
+        normals = mesh.normals;
+      }
+
       _normalCache[mesh] = normals;
     }
     return normals;
