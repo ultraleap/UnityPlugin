@@ -2,7 +2,7 @@
 using UnityEngine.Rendering;
 using Leap.Unity.Query;
 
-public class ProceduralSpriteMesh : ProceduralMeshSource {
+public class LeapGuiProceduralSpriteMesh : ProceduralMeshSource {
 
   public override bool TryGenerateMesh(LeapGuiMeshData meshFeature,
                                    out Mesh mesh,

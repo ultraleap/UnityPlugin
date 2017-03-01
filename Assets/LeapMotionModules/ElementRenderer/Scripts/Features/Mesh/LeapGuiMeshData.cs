@@ -28,6 +28,7 @@ public class LeapGuiMeshData : LeapGuiElementData {
 
   public Mesh mesh { get; private set; }
   public UVChannelFlags remappableChannels { get; private set; }
+  public bool isUsingProcedural { get; private set; }
 
   private static List<ProceduralMeshSource> _meshSourceList = new List<ProceduralMeshSource>();
   public void RefreshMeshData() {
@@ -41,11 +42,13 @@ public class LeapGuiMeshData : LeapGuiElementData {
                                                                   out proceduralFlags)) {
         mesh = proceduralMesh;
         remappableChannels = proceduralFlags;
+        isUsingProcedural = true;
         return;
       }
     }
 
     mesh = _mesh;
     remappableChannels = _remappableChannels;
+    isUsingProcedural = false;
   }
 }
