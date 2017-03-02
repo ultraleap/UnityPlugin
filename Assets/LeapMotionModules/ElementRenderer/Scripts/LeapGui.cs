@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Leap.Unity;
 using Leap.Unity.Query;
 
 [ExecuteInEditMode]

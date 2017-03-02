@@ -7,6 +7,7 @@ using UnityEngine.Assertions;
 using UnityEditor;
 using UnityEditor.Sprites;
 #endif
+using Leap.Unity;
 using Leap.Unity.Query;
 
 public abstract class LeapGuiMesherBase : LeapGuiRenderer,
