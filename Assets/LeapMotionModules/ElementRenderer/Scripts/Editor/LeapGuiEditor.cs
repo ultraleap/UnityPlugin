@@ -194,6 +194,7 @@ public class LeapGuiEditor : CustomEditorBase {
   }
 
   private void drawFeatureCallback(Rect rect, int index, bool isActive, bool isFocused) {
+    rect = rect.SingleLine();
     var feature = gui.features[index];
 
     string featureName = LeapGuiTagAttribute.GetTag(gui.features[index].GetType());
