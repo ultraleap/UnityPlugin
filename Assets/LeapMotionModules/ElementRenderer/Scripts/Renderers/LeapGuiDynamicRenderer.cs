@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Dynamic")]
@@ -57,7 +59,7 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
 
           Vector3 guiLocalPos = gui.transform.InverseTransformPoint(element.transform.position);
 
-          Matrix4x4 guiTransform = transformer.GetTransformationMatrix(guiLocalPos);
+          Matrix4x4 guiTransform = transform.localToWorldMatrix * transformer.GetTransformationMatrix(guiLocalPos);
           Matrix4x4 deform = transform.worldToLocalMatrix * Matrix4x4.TRS(transform.position - element.transform.position, Quaternion.identity, Vector3.one) * element.transform.localToWorldMatrix;
           Matrix4x4 total = guiTransform * deform;
 
@@ -110,6 +112,10 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
 
   protected override Vector3 elementVertToMeshVert(Vector3 vertex) {
     return vertex;
+  }
+
+  protected override Vector3 elementNormalToMeshNormal(Vector3 normal) {
+    return normal;
   }
 
   protected override Vector3 blendShapeDelta(Vector3 shapeVert, Vector3 originalVert) {

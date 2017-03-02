@@ -31,6 +31,10 @@
       }
       
       fixed4 frag (v2f_gui_dynamic i) : SV_Target {
+#ifdef LEAP_GUI_VERTEX_NORMALS
+        return dot(normalize(i.normal.xyz), float3(0, 0, 1));
+#endif
+
 #ifdef LEAP_GUI_VERTEX_UV_0
         fixed4 color = tex2D(_MainTex, i.uv0);
 #ifdef GUI_ELEMENTS_HAVE_COLOR

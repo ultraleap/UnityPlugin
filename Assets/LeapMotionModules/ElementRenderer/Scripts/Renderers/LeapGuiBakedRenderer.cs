@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity;
-using Leap.Unity.Query;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Baked")]
@@ -127,8 +126,8 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
         _translation_elementVertToMeshVert = Matrix4x4.TRS(-gui.transform.InverseTransformPoint(_currElement.transform.position),
                                                            Quaternion.identity,
                                                            Vector3.one) *
-                                             _currElement.transform.localToWorldMatrix *
-                                             gui.transform.worldToLocalMatrix;
+                                             gui.transform.worldToLocalMatrix *
+                                             _currElement.transform.localToWorldMatrix;
 
         break;
       default:
@@ -161,6 +160,18 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
         return _noMotion_transformer.TransformPoint(guiVert);
       case MotionType.Translation:
         return _translation_elementVertToMeshVert.MultiplyPoint3x4(vertex);
+    }
+
+    throw new NotImplementedException();
+  }
+
+  protected override Vector3 elementNormalToMeshNormal(Vector3 normal) {
+    switch (_motionType) {
+      case MotionType.None:
+        var guiNormal = _noMotion_elementVertToGuiVert.MultiplyVector(normal);
+        return _noMotion_transformer.TransformDirection(guiNormal);
+      case MotionType.Translation:
+        return _translation_elementVertToMeshVert.MultiplyVector(normal);
     }
 
     throw new NotImplementedException();

@@ -7,6 +7,7 @@ using UnityEngine.Assertions;
 using UnityEditor;
 using UnityEditor.Sprites;
 #endif
+using Leap.Unity;
 using Leap.Unity.Query;
 
 public abstract class LeapGuiMesherBase : LeapGuiRenderer,
@@ -46,10 +47,10 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   };
 
   //Internal cache of requirements 
-  private bool _doesRequireColors;
-  private bool _doesRequireNormals;
-  private bool _doesRequireSpecialUv3;
-  private List<UVChannelFlags> _requiredUvChannels = new List<UVChannelFlags>();
+  protected bool _doesRequireColors;
+  protected bool _doesRequireNormals;
+  protected bool _doesRequireSpecialUv3;
+  protected List<UVChannelFlags> _requiredUvChannels = new List<UVChannelFlags>();
 
   //Feature lists
   protected List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
@@ -198,6 +199,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   #region GENERATION SETUP
   protected virtual void setupForBuilding() {
     using (new ProfilerSample("Mesh Setup")) {
+      MeshCache.Clear();
       loadAllSupportedFeatures();
       prepareMeshes();
       prepareMaterial();
@@ -388,6 +390,10 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
 
         buildTopology(meshData);
 
+        if (_doesRequireNormals) {
+          buildNormals(meshData);
+        }
+
         if (_doesRequireColors) {
           buildColors(meshFeature, meshData);
         }
@@ -424,6 +430,16 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
 
       for (int i = 0; i < topology.verts.Length; i++) {
         _verts.Add(elementVertToMeshVert(topology.verts[i]));
+      }
+    }
+  }
+
+  protected virtual void buildNormals(LeapGuiMeshData meshData) {
+    using (new ProfilerSample("Build Normals")) {
+      var normals = MeshCache.GetNormals(meshData.mesh);
+
+      for (int i = 0; i < normals.Length; i++) {
+        _normals.Add(elementNormalToMeshNormal(normals[i]));
       }
     }
   }
@@ -570,5 +586,6 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   }
 
   protected abstract Vector3 elementVertToMeshVert(Vector3 vertex);
+  protected abstract Vector3 elementNormalToMeshNormal(Vector3 normal);
   #endregion
 }
