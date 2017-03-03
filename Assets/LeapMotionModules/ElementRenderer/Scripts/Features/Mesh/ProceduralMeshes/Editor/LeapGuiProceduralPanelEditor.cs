@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Leap.Unity;
@@ -10,6 +11,8 @@ public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPa
 
   protected override void OnEnable() {
     base.OnEnable();
+
+    specifyCustomDrawer("_sourceData", drawSourceData);
 
     specifyCustomDrawer("_resolution_verts_per_meter", drawResolution);
 
@@ -30,6 +33,71 @@ public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPa
         target.nineSliced = false;
       }
     }
+    serializedObject.Update();
+  }
+
+  private void drawSourceData(SerializedProperty property) {
+    serializedObject.ApplyModifiedProperties();
+
+    var mainGui = targets.Query().
+                          Select(t => t.GetComponent<LeapGuiElement>().attachedGui).
+                          FirstOrDefault(g => g != null);
+
+    //If no element is connected to a gui, we can't draw anything
+    if (mainGui == null) {
+      Debug.Log("A");
+      return;
+    }
+
+    //If all the elements are not connected to the same gui, we can't draw anything
+    if (targets.Query().Any(t => t.GetComponent<LeapGuiElement>().attachedGui != mainGui)) {
+      Debug.Log("B");
+      return;
+    }
+
+    var features = new List<LeapGuiFeatureBase>();
+    foreach (var feature in mainGui.features) {
+      if (feature is LeapGuiTextureFeature || feature is LeapGuiSpriteFeature) {
+        features.Add(feature);
+      }
+    }
+
+    int index = -1;
+    foreach (var target in targets) {
+      int dataIndex = features.IndexOf(target.sourceData.feature);
+
+      if (index == -1) {
+        index = dataIndex;
+      } else if (index != dataIndex) {
+        index = -1;
+        break;
+      }
+    }
+
+    string[] options = features.Query().Select(f => f.ToString()).ToArray();
+
+    EditorGUI.BeginChangeCheck();
+
+    if (index == -1) {
+      EditorGUI.showMixedValue = true;
+    }
+
+    int newIndex = EditorGUILayout.Popup("Data Source", index, options);
+
+    EditorGUI.showMixedValue = false;
+    
+    if (EditorGUI.EndChangeCheck()) {
+      Debug.Log(newIndex);
+      foreach (var target in targets) {
+        var element = target.GetComponent<LeapGuiElement>();
+        List<LeapGuiElementData> data = element.data.Query().Where(f => f is LeapGuiTextureData || f is LeapGuiSpriteData).ToList();
+
+        Undo.RecordObject(target, "Setting source data");
+        EditorUtility.SetDirty(target);
+        target.sourceData = data[newIndex];
+      }
+    }
+
     serializedObject.Update();
   }
 

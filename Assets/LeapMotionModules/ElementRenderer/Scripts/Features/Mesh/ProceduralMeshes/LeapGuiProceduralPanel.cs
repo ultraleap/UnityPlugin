@@ -6,7 +6,6 @@ using Leap.Unity.Attributes;
 public class LeapGuiProceduralPanel : ProceduralMeshSource {
   public const int MAX_VERTS = 128;
 
-  [HideInInspector]
   [SerializeField]
   private LeapGuiElementData _sourceData;
 
@@ -27,6 +26,15 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
   [Tooltip("Uses sprite data to generate a nine sliced panel.")]
   [SerializeField]
   private bool _nineSliced = false;
+
+  public LeapGuiElementData sourceData {
+    get {
+      return _sourceData;
+    }
+    set {
+      _sourceData = value;
+    }
+  }
 
   public ResolutionType resolutionType {
     get {
@@ -57,7 +65,7 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
 
   public bool canNineSlice {
     get {
-      var spriteData = GetComponent<LeapGuiElement>().Sprite();
+      var spriteData = _sourceData as LeapGuiSpriteData;
       return spriteData != null && spriteData.sprite != null;
     }
   }
@@ -108,26 +116,24 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
       rect = new Rect(-_size / 2, _size);
     }
 
-    if (_nineSliced) {
-      var spriteData = meshFeature.element.Sprite();
-      if (spriteData != null) {
-        if (spriteData.sprite == null) {
-          mesh = null;
-          remappableChannels = 0;
-          return false;
-        }
-
-        var sprite = spriteData.sprite;
-
-        Vector4 border = sprite.border;
-        borderSize = border / sprite.pixelsPerUnit;
-
-        borderUvs = border;
-        borderUvs.x /= sprite.textureRect.width;
-        borderUvs.z /= sprite.textureRect.width;
-        borderUvs.y /= sprite.textureRect.height;
-        borderUvs.w /= sprite.textureRect.height;
+    if (_nineSliced && _sourceData is LeapGuiSpriteData) {
+      var spriteData = _sourceData as LeapGuiSpriteData;
+      if (spriteData.sprite == null) {
+        mesh = null;
+        remappableChannels = 0;
+        return false;
       }
+
+      var sprite = spriteData.sprite;
+
+      Vector4 border = sprite.border;
+      borderSize = border / sprite.pixelsPerUnit;
+
+      borderUvs = border;
+      borderUvs.x /= sprite.textureRect.width;
+      borderUvs.z /= sprite.textureRect.width;
+      borderUvs.y /= sprite.textureRect.height;
+      borderUvs.w /= sprite.textureRect.height;
     }
 
     List<Vector3> verts = new List<Vector3>();
@@ -152,7 +158,7 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
     for (int vy = 0; vy < vertsY; vy++) {
       for (int vx = 0; vx < vertsX; vx++) {
         Vector2 vert;
-        vert.x = rect.width - calculateVertAxis(vx, vertsX, rect.width, borderSize.x, borderSize.z);
+        vert.x = calculateVertAxis(vx, vertsX, rect.width, borderSize.x, borderSize.z);
         vert.y = calculateVertAxis(vy, vertsY, rect.height, borderSize.y, borderSize.w);
         verts.Add(vert + new Vector2(rect.x, rect.y));
 
@@ -182,7 +188,7 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
     mesh.hideFlags = HideFlags.HideAndDontSave;
     mesh.SetVertices(verts);
     mesh.SetTriangles(tris, 0);
-    mesh.SetUVs(uvChannel.Index(), uvs); //TODO, how to get correct channel??
+    mesh.SetUVs(uvChannel.Index(), uvs);
     mesh.RecalculateBounds();
 
     remappableChannels = UVChannelFlags.UV0;
