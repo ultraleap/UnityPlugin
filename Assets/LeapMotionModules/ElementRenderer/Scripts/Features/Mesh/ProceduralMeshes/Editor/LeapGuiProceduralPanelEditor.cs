@@ -86,7 +86,13 @@ public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPa
       }
     }
 
-    string[] options = features.Query().Select(f => f.ToString()).ToArray();
+    string[] options = features.Query().Select(f => {
+      if (f is LeapGuiTextureFeature) {
+        return (f as LeapGuiTextureFeature).propertyName + " (Texture)";
+      } else {
+        return (f as LeapGuiSpriteFeature).propertyName + " (Sprite)";
+      }
+    }).ToArray();
 
     EditorGUI.BeginChangeCheck();
 
