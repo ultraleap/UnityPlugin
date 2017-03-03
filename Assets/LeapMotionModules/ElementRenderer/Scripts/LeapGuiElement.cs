@@ -126,6 +126,10 @@ public class LeapGuiElement : MonoBehaviour {
 
     foreach (var dataObj in _data) {
       dataObj.element = this;
+
+      if (dataObj.feature != null) {
+        dataObj.feature.isDirty = true;
+      }
     }
   }
 
