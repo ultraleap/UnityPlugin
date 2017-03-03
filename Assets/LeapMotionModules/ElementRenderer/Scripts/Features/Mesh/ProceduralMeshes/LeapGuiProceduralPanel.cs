@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
 public class LeapGuiProceduralPanel : ProceduralMeshSource {
@@ -27,8 +28,16 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
   [SerializeField]
   private bool _nineSliced = false;
 
+  public static bool IsValidDataSource(LeapGuiElementData dataSource) {
+    return dataSource is LeapGuiTextureData ||
+           dataSource is LeapGuiSpriteData;
+  }
+
   public LeapGuiElementData sourceData {
     get {
+      if (_sourceData == null) {
+        assignDefaultSourceValue();
+      }
       return _sourceData;
     }
     set {
@@ -87,7 +96,15 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
     }
   }
 
+  private void Reset() {
+    assignDefaultSourceValue();
+  }
+
   public void OnValidate() {
+    if (_sourceData == null) {
+      assignDefaultSourceValue();
+    }
+
     _resolution_vert_x = Mathf.Max(0, _resolution_vert_x);
     _resolution_vert_y = Mathf.Max(0, _resolution_vert_y);
     _resolution_verts_per_meter = Vector2.Max(_resolution_verts_per_meter, Vector2.zero);
@@ -104,6 +121,10 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
   public override bool TryGenerateMesh(LeapGuiMeshData meshFeature,
                                    out Mesh mesh,
                                    out UVChannelFlags remappableChannels) {
+    if (_sourceData == null) {
+      assignDefaultSourceValue();
+    }
+
     Vector4 borderSize = Vector4.zero;
     Vector4 borderUvs = Vector4.zero;
 
@@ -211,6 +232,13 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
       }
     } else {
       return (dv / (vertCount - 1.0f)) * size;
+    }
+  }
+
+  private void assignDefaultSourceValue() {
+    var element = GetComponent<LeapGuiElement>();
+    if (element != null) {
+      _sourceData = element.data.Query().FirstOrDefault(IsValidDataSource);
     }
   }
 

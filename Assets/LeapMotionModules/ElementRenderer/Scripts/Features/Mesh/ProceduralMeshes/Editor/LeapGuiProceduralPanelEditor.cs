@@ -40,18 +40,21 @@ public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPa
     serializedObject.ApplyModifiedProperties();
 
     var mainGui = targets.Query().
-                          Select(t => t.GetComponent<LeapGuiElement>().attachedGui).
+                          Select(t => t.GetComponent<LeapGuiElement>()).
+                          Where(e => e != null).
+                          Select(e => e.attachedGui).
                           FirstOrDefault(g => g != null);
 
     //If no element is connected to a gui, we can't draw anything
     if (mainGui == null) {
-      Debug.Log("A");
       return;
     }
 
     //If all the elements are not connected to the same gui, we can't draw anything
-    if (targets.Query().Any(t => t.GetComponent<LeapGuiElement>().attachedGui != mainGui)) {
-      Debug.Log("B");
+    if (!targets.Query().All(t => {
+      var element = t.GetComponent<LeapGuiElement>();
+      return element != null && element.attachedGui == mainGui;
+    })) {
       return;
     }
 
@@ -62,8 +65,17 @@ public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPa
       }
     }
 
+    if (features.Count == 1) {
+      return;
+    }
+
     int index = -1;
     foreach (var target in targets) {
+      //If any of the targets have no source data, you can't use them
+      if (target.sourceData == null) {
+        return;
+      }
+
       int dataIndex = features.IndexOf(target.sourceData.feature);
 
       if (index == -1) {
@@ -85,9 +97,8 @@ public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPa
     int newIndex = EditorGUILayout.Popup("Data Source", index, options);
 
     EditorGUI.showMixedValue = false;
-    
+
     if (EditorGUI.EndChangeCheck()) {
-      Debug.Log(newIndex);
       foreach (var target in targets) {
         var element = target.GetComponent<LeapGuiElement>();
         List<LeapGuiElementData> data = element.data.Query().Where(f => f is LeapGuiTextureData || f is LeapGuiSpriteData).ToList();
