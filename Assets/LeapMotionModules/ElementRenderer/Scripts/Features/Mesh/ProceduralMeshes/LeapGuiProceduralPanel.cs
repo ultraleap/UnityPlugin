@@ -6,6 +6,10 @@ using Leap.Unity.Attributes;
 public class LeapGuiProceduralPanel : ProceduralMeshSource {
   public const int MAX_VERTS = 128;
 
+  [HideInInspector]
+  [SerializeField]
+  private LeapGuiElementData _sourceData;
+
   [SerializeField]
   private ResolutionType _resolutionType = ResolutionType.Vertices;
 
@@ -42,10 +46,36 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
     }
   }
 
+  public bool nineSliced {
+    get {
+      return _nineSliced && canNineSlice;
+    }
+    set {
+      _nineSliced = value;
+    }
+  }
+
   public bool canNineSlice {
     get {
       var spriteData = GetComponent<LeapGuiElement>().Sprite();
       return spriteData != null && spriteData.sprite != null;
+    }
+  }
+
+  public UVChannelFlags uvChannel {
+    get {
+      if (_sourceData == null) {
+        return UVChannelFlags.UV0;
+      }
+
+      var feature = _sourceData.feature;
+      if (feature is LeapGuiTextureFeature) {
+        return (feature as LeapGuiTextureFeature).channel;
+      } else if (feature is LeapGuiSpriteFeature) {
+        return (feature as LeapGuiSpriteFeature).channel;
+      } else {
+        return UVChannelFlags.UV0;
+      }
     }
   }
 
@@ -80,22 +110,24 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
 
     if (_nineSliced) {
       var spriteData = meshFeature.element.Sprite();
-      if (spriteData == null || spriteData.sprite == null) {
-        mesh = null;
-        remappableChannels = 0;
-        return false;
+      if (spriteData != null) {
+        if (spriteData.sprite == null) {
+          mesh = null;
+          remappableChannels = 0;
+          return false;
+        }
+
+        var sprite = spriteData.sprite;
+
+        Vector4 border = sprite.border;
+        borderSize = border / sprite.pixelsPerUnit;
+
+        borderUvs = border;
+        borderUvs.x /= sprite.textureRect.width;
+        borderUvs.z /= sprite.textureRect.width;
+        borderUvs.y /= sprite.textureRect.height;
+        borderUvs.w /= sprite.textureRect.height;
       }
-
-      var sprite = spriteData.sprite;
-
-      Vector4 border = sprite.border;
-      borderSize = border / sprite.pixelsPerUnit;
-
-      borderUvs = border;
-      borderUvs.x /= sprite.textureRect.width;
-      borderUvs.z /= sprite.textureRect.width;
-      borderUvs.y /= sprite.textureRect.height;
-      borderUvs.w /= sprite.textureRect.height;
     }
 
     List<Vector3> verts = new List<Vector3>();
@@ -120,7 +152,7 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
     for (int vy = 0; vy < vertsY; vy++) {
       for (int vx = 0; vx < vertsX; vx++) {
         Vector2 vert;
-        vert.x = calculateVertAxis(vx, vertsX, rect.width, borderSize.x, borderSize.z);
+        vert.x = rect.width - calculateVertAxis(vx, vertsX, rect.width, borderSize.x, borderSize.z);
         vert.y = calculateVertAxis(vy, vertsY, rect.height, borderSize.y, borderSize.w);
         verts.Add(vert + new Vector2(rect.x, rect.y));
 
@@ -150,7 +182,7 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
     mesh.hideFlags = HideFlags.HideAndDontSave;
     mesh.SetVertices(verts);
     mesh.SetTriangles(tris, 0);
-    mesh.SetUVs(0, uvs); //TODO, how to get correct channel??
+    mesh.SetUVs(uvChannel.Index(), uvs); //TODO, how to get correct channel??
     mesh.RecalculateBounds();
 
     remappableChannels = UVChannelFlags.UV0;

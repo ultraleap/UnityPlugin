@@ -5,8 +5,6 @@
   SubShader {
     Tags {"Queue"="Geometry" "RenderType"="Opaque" }
 
-    Cull Off
-
     Pass {
       CGPROGRAM
       #pragma vertex vert

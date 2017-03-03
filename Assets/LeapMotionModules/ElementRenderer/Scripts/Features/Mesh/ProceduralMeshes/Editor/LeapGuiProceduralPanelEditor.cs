@@ -21,6 +21,18 @@ public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPa
     specifyCustomDrawer("_nineSliced", drawSize);
   }
 
+  public override void OnInspectorGUI() {
+    base.OnInspectorGUI();
+
+    serializedObject.ApplyModifiedProperties();
+    foreach (var target in targets) {
+      if (!target.canNineSlice) {
+        target.nineSliced = false;
+      }
+    }
+    serializedObject.Update();
+  }
+
   private void drawResolution(SerializedProperty property) {
     LeapGuiProceduralPanel.ResolutionType mainType = targets[0].resolutionType;
     bool allSameType = targets.Query().All(p => p.resolutionType == mainType);
