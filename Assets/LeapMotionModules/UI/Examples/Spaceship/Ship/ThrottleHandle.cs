@@ -19,7 +19,7 @@ namespace Leap.Unity.UI.Examples {
     private float _contactScale = 1.3F;
 
     private bool _contactingHand;
-    private bool _beingHeld;
+    //private bool _beingHeld;
 
     private InteractionBehaviour _interactionObj;
 
@@ -31,8 +31,8 @@ namespace Leap.Unity.UI.Examples {
       _interactionObj = GetComponent<InteractionBehaviour>();
       _interactionObj.OnObjectContactBegin += OnObjectContactBegin;
       _interactionObj.OnObjectContactEnd   += OnObjectContactEnd;
-      _interactionObj.OnGraspBegin         += OnGraspBegin;
-      _interactionObj.OnGraspEnd           += OnGraspEnd;
+      //_interactionObj.OnGraspBegin         += OnGraspBegin;
+      //_interactionObj.OnGraspEnd           += OnGraspEnd;
       _interactionObj.OnPreGraspedMovement += OnPreGraspedMovement;
       _interactionObj.OnGraspedMovement    += OnGraspedMovement;
     }
@@ -45,13 +45,13 @@ namespace Leap.Unity.UI.Examples {
       _contactingHand = false;
     }
 
-    private void OnGraspBegin(Hand hand) {
-      _beingHeld = true;
-    }
+    //private void OnGraspBegin(Hand hand) {
+    //  _beingHeld = true;
+    //}
 
-    private void OnGraspEnd(Hand hand) {
-      _beingHeld = false;
-    }
+    //private void OnGraspEnd(Hand hand) {
+    //  _beingHeld = false;
+    //}
 
     Quaternion _origRot;
     private void OnPreGraspedMovement(Vector3 pos, Quaternion rot, Hand hand) {

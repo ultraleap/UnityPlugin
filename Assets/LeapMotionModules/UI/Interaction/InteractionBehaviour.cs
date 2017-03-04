@@ -63,7 +63,7 @@ namespace Leap.Unity.UI.Interaction {
     /// target position, ignoring collisions. Inherit will simply use the isKinematic
     /// state of the Rigidbody from before it was grasped.
     /// </summary>
-    public enum GraspedHoldMovementType {
+    public enum GraspedMovementType {
       Inherit,
       Kinematic,
       Nonkinematic
@@ -74,7 +74,7 @@ namespace Leap.Unity.UI.Interaction {
            + "might not reach the target position. Kinematic rigidbodies will always move to the "
            + "target position, ignoring collisions. Inherit will simply use the isKinematic "
            + "state of the Rigidbody from before it was grasped.")]
-    public GraspedHoldMovementType graspedHoldMovementType;
+    public GraspedMovementType graspedMovementType;
 
     /// <summary> The RigidbodyWarper manipulates the graphical (but not physical) position
     /// of grasped objects based on the movement of the Leap hand so they appear move with less latency. </summary>
@@ -104,18 +104,18 @@ namespace Leap.Unity.UI.Interaction {
     /// InteractionManager manually calls this directly
     /// after all InteractionHands are updated (in FixedUpdate).
     /// 
-    /// Hovering uses this to provide per-object (as opposed to per-hand)
+    /// Hovering uses its update to provide per-object (as opposed to per-hand)
     /// hover callbacks, e.g. OnObjectHoverStay(), which fires once per frame
     /// while the object is hovered by any number of hands greater than zero.
     /// 
-    /// Grasping uses this to do support changing moveObjectWhenGrasping at
+    /// Grasping uses its update to support changing moveObjectWhenGrasping at
     /// runtime.
     /// </summary>
     public override void FixedUpdateObject() {
       FixedUpdateHovering();
       FixedUpdatePrimaryHovering();
       FixedUpdateContact();
-      FixedUpdateGrasping(); // Not yet necessary (two-handed grabbing NYI).
+      FixedUpdateGrasping();
 
       FixedUpdateCollisionMode();
     }
@@ -388,11 +388,11 @@ namespace Leap.Unity.UI.Interaction {
       
       // Set kinematic state based on grasping hold movement type
       _wasKinematicBeforeGrab = Rigidbody.isKinematic;
-      switch (graspedHoldMovementType) {
-        case GraspedHoldMovementType.Inherit: break; // no change
-        case GraspedHoldMovementType.Kinematic:
+      switch (graspedMovementType) {
+        case GraspedMovementType.Inherit: break; // no change
+        case GraspedMovementType.Kinematic:
           Rigidbody.isKinematic = true; break;
-        case GraspedHoldMovementType.Nonkinematic:
+        case GraspedMovementType.Nonkinematic:
           Rigidbody.isKinematic = false; break;
       }
 
