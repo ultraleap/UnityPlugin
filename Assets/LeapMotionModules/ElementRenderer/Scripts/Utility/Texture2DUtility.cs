@@ -30,7 +30,6 @@ public static class Texture2DUtility {
   }
 
   public static Texture2D GetBordered(this Texture2D texture, int pixelAmount) {
-    texture.EnsureReadWriteEnabled();
     Color[] colors = texture.GetPixels();
 
     int originalWidth = texture.width;
