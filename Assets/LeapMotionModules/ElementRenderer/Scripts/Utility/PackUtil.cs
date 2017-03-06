@@ -113,9 +113,15 @@ public static class PackUtil {
     Texture2D bordered;
     ProcessKey key = new ProcessKey() { texture = source, border = border };
     if (!_cachedProcessedTextures.TryGetValue(key, out bordered)) {
-      var tempReadable = source.GetReadableTexture();
-      bordered = tempReadable.GetBordered(border);
-      UnityEngine.Object.DestroyImmediate(tempReadable);
+
+      if (source.IsReadable()) {
+        bordered = source.GetBordered(border);
+      } else {
+        var tempReadable = source.GetReadableTexture();
+        bordered = tempReadable.GetBordered(border);
+        UnityEngine.Object.DestroyImmediate(tempReadable);
+      }
+
       _cachedProcessedTextures[key] = bordered;
     }
     return bordered;
