@@ -137,6 +137,7 @@ public class LeapGuiElement : MonoBehaviour {
 
   void OnEnable() {
 #if UNITY_EDITOR
+    updateParentGui();
     if (Application.isPlaying) {
 #endif
       if (!IsAttachedToGui) {
@@ -149,6 +150,7 @@ public class LeapGuiElement : MonoBehaviour {
 
   void OnDisable() {
 #if UNITY_EDITOR
+    updateParentGui();
     if (Application.isPlaying) {
 #endif
       if (IsAttachedToGui) {
@@ -164,6 +166,13 @@ public class LeapGuiElement : MonoBehaviour {
     if (_pickingMesh != null && _pickingMesh.vertexCount != 0) {
       Gizmos.color = new Color(1, 0, 0, 0);
       Gizmos.DrawMesh(_pickingMesh);
+    }
+  }
+
+  private void updateParentGui() {
+    var gui = GetComponentInParent<LeapGui>();
+    if (gui != null) {
+      gui.ScheduleFullUpdate();
     }
   }
 #endif
