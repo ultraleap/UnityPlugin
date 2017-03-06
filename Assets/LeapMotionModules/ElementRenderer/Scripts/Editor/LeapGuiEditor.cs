@@ -231,6 +231,7 @@ public class LeapGuiEditor : CustomEditorBase {
     EditorGUI.BeginChangeCheck();
     feature.DrawFeatureEditor(rect.NextLine().Indent(), isActive, isFocused);
     if (EditorGUI.EndChangeCheck()) {
+      gui.ScheduleFullUpdate();
       EditorUtility.SetDirty(feature);
     }
   }
