@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Leap.Unity.UI.Interaction;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ namespace Leap.Unity.UI.Constraints {
     void Start() {
       _body = GetComponent<Rigidbody>();
       PhysicsCallbacks.OnPrePhysics += OnPrePhysics;
+      PhysicsCallbacks.OnPostPhysics += OnPostPhysics;
     }
 
     void OnValidate() {
@@ -41,15 +43,18 @@ namespace Leap.Unity.UI.Constraints {
       }
       set {
         if (this.transform.parent == null) {
-          _body.position = value;
+          _body.MovePosition(value);
+          //_body.position = value;
         }
         else {
-          _body.position = this.transform.parent.TransformPoint(value);
+          Vector3 newLocalPos = this.transform.parent.TransformPoint(value);
+          _body.MovePosition(newLocalPos);
+          //_body.position = newLocalPos;
         }
       }
     }
 
-    /// <summary> Conveniences for getting/setting Rigidbody local-to-parent velocity. Cache the result whenever possible. </summary>
+    /// <summary> Convenience for getting/setting Rigidbody local-to-parent velocity. Cache the result whenever possible. </summary>
     private Vector3 RigidbodyLocalVelocity {
       get {
         if (this.transform.parent == null) {
@@ -69,16 +74,30 @@ namespace Leap.Unity.UI.Constraints {
       }
     }
 
+    private bool _hasPostPhysicsData = false;
+    private Vector3 _onPostPhysicsLocalPosition;
+    private Vector3 _onPostPhysicsLocalVelocity;
+
     private void OnPrePhysics() {
+      if (_hasPostPhysicsData) {
+        RigidbodyLocalPosition = _onPostPhysicsLocalPosition;
+        RigidbodyLocalVelocity = _onPostPhysicsLocalVelocity;
+        _hasPostPhysicsData = false;
+      }
+    }
+
+    private void OnPostPhysics() {
       for (int i = 0; i < constraints.Length; i++) {
         if (_body != null) {
           // Enforce constraint on Rigidbody __local__ position and velocity.
           Vector3 bodyLocalPosition = constraints[i].Evaluate(RigidbodyLocalPosition);
-          RigidbodyLocalPosition = bodyLocalPosition;
+          _onPostPhysicsLocalPosition = bodyLocalPosition;
 
           Vector3 freePositionNextFrame = bodyLocalPosition + RigidbodyLocalVelocity * Time.fixedDeltaTime;
           Vector3 constrainedPositionNextFrame = constraints[i].Evaluate(freePositionNextFrame);
-          RigidbodyLocalVelocity = (constrainedPositionNextFrame - bodyLocalPosition) / Time.fixedDeltaTime;
+          _onPostPhysicsLocalVelocity = (constrainedPositionNextFrame - bodyLocalPosition) / Time.fixedDeltaTime;
+
+          _hasPostPhysicsData = true;
         }
         else {
           // No rigidbody; enforce constraint directly on the transform.
@@ -118,23 +137,9 @@ namespace Leap.Unity.UI.Constraints {
       public Vector3 Evaluate(Vector3 localPosition) {
         switch (type) {
           case ConstraintType.Line:
-            Vector3 line   = (end - start);
             Vector3 bStart = basePosition + start;
-            Vector3 bEnd   = basePosition + end;
-
-            if (line.x == 0F && line.y == 0F && line.z == 0F) { return start; } // Early out for line length = 0.
-
-            // Project local position to line.
-            Vector3 projectedLocalPosition = Vector3.Project(localPosition - bStart, bEnd - bStart) + bStart;
-
-            // Clamp to line length.
-            float progressAlongLine = (projectedLocalPosition - bStart).magnitude;
-            progressAlongLine = Mathf.Clamp(progressAlongLine, 0F, line.magnitude);
-
-            // Return constrained local position.
-            Vector3 lineDir = (bEnd - bStart).normalized;
-            return bStart + lineDir * progressAlongLine;
-
+            Vector3 bEnd = basePosition + end;
+            return ConstraintsUtil.ConstrainToLineSegment(localPosition, bStart, bEnd);
           default:
             throw new System.NotImplementedException();
           //case ConstraintType.Plane:
@@ -163,12 +168,17 @@ namespace Leap.Unity.UI.Constraints {
 
     #region Gizmos
 
+    public static Color DefaultGizmoColor { get { return new Color(0.7F, 0.2F, 0.5F, 1F); } }
+    public static Color DefaultGizmoSubtleColor { get { return new Color(0.7F, 0.2F, 0.5F, 0.3F); } }
+
     void OnDrawGizmos() {
       Gizmos.color = new Color(0.7F, 0.3F, 0.6F);
 
       foreach (var constraint in constraints) {
         DrawConstraintGizmo(transform, constraint);
       }
+
+      //DrawConstrainedLines();
     }
 
     void DrawConstraintGizmo(Transform transform, Constraint constraint) {
@@ -182,6 +192,16 @@ namespace Leap.Unity.UI.Constraints {
 
     void DrawLineConstraint(Transform transform, Constraint constraint) {
       Gizmos.matrix = transform.localToWorldMatrix;
+      Gizmos.color = DefaultGizmoColor;
+
+      // Start anchor
+      Gizmos.DrawWireSphere(constraint.start, 0.005F);
+      Gizmos.DrawWireSphere(constraint.start, 0.00375F);
+
+      // End anchor
+      Gizmos.DrawWireSphere(constraint.end, 0.005F);
+      Gizmos.DrawWireSphere(constraint.end, 0.00375F);
+
       Gizmos.DrawLine(constraint.start, constraint.end);
     }
 
