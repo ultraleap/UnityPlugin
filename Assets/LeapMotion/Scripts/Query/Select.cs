@@ -8,19 +8,26 @@ namespace Leap.Unity.Query {
     where SourceOp : IEnumerator<SourceType> {
     private SourceOp _source;
     private Func<SourceType, ResultType> _mapping;
+    private ResultType _current;
 
     public SelectOp(SourceOp enumerator, Func<SourceType, ResultType> mapping) {
       _source = enumerator;
       _mapping = mapping;
+      _current = default(ResultType);
     }
 
     public bool MoveNext() {
-      return _source.MoveNext();
+      if (_source.MoveNext()) {
+        _current = _mapping(_source.Current);
+        return true;
+      } else {
+        return false;
+      }
     }
 
     public ResultType Current {
       get {
-        return _mapping(_source.Current);
+        return _current;
       }
     }
 

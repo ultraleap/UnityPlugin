@@ -54,50 +54,56 @@ namespace Leap.Unity.Interaction.Tests {
     }
 
     [Test]
-    //[ExpectedException(typeof(BaseNotCalledException))]
     public void Recursive_BaseNotCalled1() {
-      _guard.Begin(KEY_A);
-      _guard.Begin(KEY_B);
-      _guard.NotifyBaseCalled(KEY_B);
-      _guard.AssertBaseCalled();
-      _guard.AssertBaseCalled();
+      Assert.That(() => {
+        _guard.Begin(KEY_A);
+        _guard.Begin(KEY_B);
+        _guard.NotifyBaseCalled(KEY_B);
+        _guard.AssertBaseCalled();
+        _guard.AssertBaseCalled();
+      }, Throws.InstanceOf<BaseNotCalledException>());
     }
 
     [Test]
-    //[ExpectedException(typeof(BaseNotCalledException))]
     public void Recursive_BaseNotCalled2() {
-      _guard.Begin(KEY_A);
-      _guard.NotifyBaseCalled(KEY_A);
-      _guard.Begin(KEY_B);
-      _guard.AssertBaseCalled();
-      _guard.AssertBaseCalled();
+      Assert.That(() => {
+        _guard.Begin(KEY_A);
+        _guard.NotifyBaseCalled(KEY_A);
+        _guard.Begin(KEY_B);
+        _guard.AssertBaseCalled();
+        _guard.AssertBaseCalled();
+      }, Throws.InstanceOf<BaseNotCalledException>());
     }
 
     [Test]
-    //[ExpectedException(typeof(BaseNotCalledException))]
     public void BaseNotCalled() {
-      _guard.Begin(KEY_A);
-      _guard.AssertBaseCalled();
+      Assert.That(() => {
+        _guard.Begin(KEY_A);
+        _guard.AssertBaseCalled();
+      }, Throws.InstanceOf<BaseNotCalledException>());
     }
 
     [Test]
-    //[ExpectedException(typeof(WrongBaseCalledException))]
     public void WrongBaseCalled() {
-      _guard.Begin(KEY_A);
-      _guard.NotifyBaseCalled(KEY_B);
-      _guard.AssertBaseCalled();
+      Assert.That(() => {
+        _guard.Begin(KEY_A);
+        _guard.NotifyBaseCalled(KEY_B);
+        _guard.AssertBaseCalled();
+      }, Throws.InstanceOf<WrongBaseCalledException>());
     }
 
     [Test]
-    //[ExpectedException(typeof(BeginNotCalledException))]
     public void BeginNotCalled_Nofity() {
-      _guard.NotifyBaseCalled(KEY_B);
+      Assert.That(() => {
+        _guard.NotifyBaseCalled(KEY_B);
+      }, Throws.InstanceOf<BeginNotCalledException>());
     }
 
     [Test]
-    //[ExpectedException(typeof(BeginNotCalledException))]
     public void BeginNotCalled_Assert() {
-      _guard.AssertBaseCalled();
+      Assert.That(() => {
+        _guard.AssertBaseCalled();
+      }, Throws.InstanceOf<BeginNotCalledException>());
     }
 
   }
