@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -46,6 +47,27 @@ public class LeapGuiMeshFeature : LeapGuiFeature<LeapGuiMeshData> {
       if (uv2) yield return UVChannelFlags.UV2;
       if (uv3) yield return UVChannelFlags.UV3;
     }
+  }
+
+  public override SupportInfo GetSupportInfo(LeapGui gui) {
+    var support = base.GetSupportInfo(gui);
+
+    foreach (var feature in gui.features) {
+      UVChannelFlags channel;
+      if (feature is LeapGuiTextureFeature) {
+        channel = (feature as LeapGuiTextureFeature).channel;
+      } else if (feature is LeapGuiSpriteFeature) {
+        channel = (feature as LeapGuiSpriteFeature).channel;
+      } else {
+        continue;
+      }
+
+      if (!enabledUvChannels.Contains(channel)) {
+        support = support.OrWorse(SupportInfo.Warning("The uv channel " + channel.Index() + " is disabled even though a feature needs it."));
+      }
+    }
+
+    return support;
   }
 
 #if UNITY_EDITOR
