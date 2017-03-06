@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity;
+using Leap.Unity.Query;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Baked")]
@@ -14,9 +15,15 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
   [SerializeField]
   private MotionType _motionType = MotionType.Translation;
+
+  [SerializeField]
+  private bool _createMeshRenderers;
   #endregion
 
   #region PRIVATE VARIABLES
+
+  [SerializeField, HideInInspector]
+  private List<MeshRendererContainer> _renderers;
 
   //## Rect space
   private const string RECT_POSITIONS = LeapGui.PROPERTY_PREFIX + "Rect_ElementPositions";
@@ -79,9 +86,32 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
       }
     }
 
-    using (new ProfilerSample("Draw Meshes")) {
-      foreach (var mesh in _meshes) {
-        Graphics.DrawMesh(mesh, gui.transform.localToWorldMatrix, _material, _layer);
+    if (!_createMeshRenderers) {
+      using (new ProfilerSample("Draw Meshes")) {
+        foreach (var mesh in _meshes) {
+          Graphics.DrawMesh(mesh, gui.transform.localToWorldMatrix, _material, _layer);
+        }
+      }
+    }
+  }
+
+  public override void OnUpdateRendererEditor() {
+    base.OnUpdateRendererEditor();
+
+    if (_createMeshRenderers) {
+      while (_renderers.Count > _meshes.Count) {
+        _renderers.RemoveLast().Destroy();
+      }
+      while (_renderers.Count < _meshes.Count) {
+        _renderers.Add(new MeshRendererContainer(transform));
+      }
+
+      for (int i = 0; i < _meshes.Count; i++) {
+        _renderers[i].MakeValid(transform, i, _meshes[i], _material);
+      }
+    } else {
+      while (_renderers.Count > 0) {
+        _renderers.RemoveLast().Destroy();
       }
     }
   }
@@ -175,5 +205,43 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     }
 
     throw new NotImplementedException();
+  }
+
+  [Serializable]
+  protected class MeshRendererContainer {
+    public GameObject obj;
+    public MeshFilter filter;
+    public MeshRenderer renderer;
+
+    public MeshRendererContainer(Transform root) {
+      obj = new GameObject("Graphic Renderer");
+      filter = null;
+      renderer = null;
+    }
+
+    public void Destroy() {
+      DestroyImmediate(obj);
+    }
+
+    public void MakeValid(Transform root, int index, Mesh mesh, Material material) {
+      obj.transform.SetParent(root);
+      obj.transform.SetSiblingIndex(index);
+      obj.SetActive(true);
+
+      obj.transform.localPosition = Vector3.zero;
+      obj.transform.localRotation = Quaternion.identity;
+      obj.transform.localScale = Vector3.one;
+
+      if (filter == null) {
+        filter = obj.AddComponent<MeshFilter>();
+      }
+      filter.sharedMesh = mesh;
+
+      if (renderer == null) {
+        renderer = obj.AddComponent<MeshRenderer>();
+      }
+      renderer.enabled = true;
+      renderer.sharedMaterial = material;
+    }
   }
 }
