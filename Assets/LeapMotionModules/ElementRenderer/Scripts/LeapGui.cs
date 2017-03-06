@@ -46,6 +46,8 @@ public class LeapGui : MonoBehaviour {
 
   private List<LeapGuiElement> _tempElementList = new List<LeapGuiElement>();
   private List<int> _tempIndexList = new List<int>();
+
+  private int _previousHierarchyHash;
   #endregion
 
   #region PUBLIC API
@@ -146,8 +148,14 @@ public class LeapGui : MonoBehaviour {
 
   //Begin editor-only private api
 #if UNITY_EDITOR
+  public void ScheduleFullUpdate() {
+    //Simply clear the hierarchy hash to force a full update
+    _previousHierarchyHash = 0;
+  }
+
   public void SetSpace(Type spaceType) {
     AssertHelper.AssertEditorOnly();
+    ScheduleFullUpdate();
 
     UnityEditor.Undo.RecordObject(this, "Change Gui Space");
     UnityEditor.EditorUtility.SetDirty(this);
@@ -166,6 +174,7 @@ public class LeapGui : MonoBehaviour {
 
   public void AddFeature(Type featureType) {
     AssertHelper.AssertEditorOnly();
+    ScheduleFullUpdate();
 
     var feature = gameObject.AddComponent(featureType);
     _features.Add(feature as LeapGuiFeatureBase);
@@ -173,6 +182,7 @@ public class LeapGui : MonoBehaviour {
 
   public void SetRenderer(Type rendererType) {
     AssertHelper.AssertEditorOnly();
+    ScheduleFullUpdate();
 
     UnityEditor.Undo.RecordObject(this, "Changed Gui Renderer");
     UnityEditor.EditorUtility.SetDirty(this);
@@ -353,19 +363,38 @@ public class LeapGui : MonoBehaviour {
 
 #if UNITY_EDITOR
   private void doLateUpdateEditor() {
-    rebuildElementList();
-    rebuildFeatureData();
-    rebuildFeatureSupportInfo();
-
-    if (_space != null) {
-      _space.BuildElementData(transform);
+    bool needsRebuild = false;
+    foreach (var feature in _features) {
+      if (feature.isDirty) {
+        needsRebuild = true;
+      }
     }
 
-    if (_renderer != null && _elements.Count != 0) {
+    int hierarchyHash = TransformUtil.GetHierarchyHash(transform);
+    if (_previousHierarchyHash != hierarchyHash) {
+      _previousHierarchyHash = hierarchyHash;
+      needsRebuild = true;
+    }
+
+    if (needsRebuild && _renderer != null && _elements.Count != 0) {
+      rebuildElementList();
+      rebuildFeatureData();
+      rebuildFeatureSupportInfo();
+
+      if (_space != null) {
+        _space.BuildElementData(transform);
+      }
+
       using (new ProfilerSample("Update Renderer")) {
         _renderer.OnUpdateRendererEditor();
       }
+
+      foreach(var feature in _features) {
+        feature.isDirty = false;
+      }
     }
+
+    _renderer.OnUpdateRenderer();
   }
 #endif
 

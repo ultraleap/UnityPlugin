@@ -44,6 +44,14 @@ public abstract class LeapGuiSpace : LeapGuiComponentBase<LeapGui> {
   [HideInInspector]
   public LeapGui gui;
 
+  protected override void OnValidate() {
+    base.OnValidate();
+
+    if (gui != null) {
+      gui.ScheduleFullUpdate();
+    }
+  }
+
   /// <summary>
   /// Builds internal data for all existing gui elements in the gui from scratch.
   /// Will only ever be called with the gui transform as the root.

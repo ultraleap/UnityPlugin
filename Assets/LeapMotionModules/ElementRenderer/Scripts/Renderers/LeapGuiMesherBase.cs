@@ -166,9 +166,6 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   public override void OnUpdateRendererEditor() {
     setupForBuilding();
     buildMesh();
-
-    //After editor generation step, trigger the normal runtime display logic
-    OnUpdateRenderer();
   }
 
   #region UPDATE
