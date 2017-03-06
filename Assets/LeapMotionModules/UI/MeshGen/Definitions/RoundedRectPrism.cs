@@ -9,52 +9,52 @@ namespace Leap.Unity.UI {
 
     private static class RoundedRectPrismSupport {
 
-      public static void AddFrontIndices(List<int> outIndices, int startingVertCount, int cornerDivisions) {
+      public static void AddFrontIndices(List<int> outIndices, int startingVertCount, int cornerDivisions, bool flipFacing = false) {
         List<int> i = outIndices;
         int v0 = startingVertCount;
 
         // Center Quad
-        i.AddTri(v0, 0, 1, 2);
-        i.AddTri(v0, 0, 2, 3);
+        i.AddTri(v0, 0, 1, 2, flipFacing);
+        i.AddTri(v0, 0, 2, 3, flipFacing);
 
         // Top Quad
-        i.AddTri(v0, 1, 4, 5);
-        i.AddTri(v0, 1, 5, 2);
+        i.AddTri(v0, 1, 4, 5, flipFacing);
+        i.AddTri(v0, 1, 5, 2, flipFacing);
 
         // Upper Right Corner
         int cornerStart = v0 + 5;
         for (int v = cornerStart; v < cornerStart + 1 + cornerDivisions; v++) {
-          i.AddTri(v0 + 2, v, v + 1);
+          i.AddTri(v0 + 2, v, v + 1, flipFacing);
         }
 
         // Right Quad
-        i.AddTri(v0 + 3, v0 + 2, cornerStart + 1 + cornerDivisions);
-        i.AddTri(v0 + 3, cornerStart + 1 + cornerDivisions, cornerStart + 2 + cornerDivisions);
+        i.AddTri(v0 + 3, v0 + 2, cornerStart + 1 + cornerDivisions, flipFacing);
+        i.AddTri(v0 + 3, cornerStart + 1 + cornerDivisions, cornerStart + 2 + cornerDivisions, flipFacing);
 
         // Lower Right Corner
         cornerStart = cornerStart + 2 + cornerDivisions;
         for (int v = cornerStart; v < cornerStart + 1 + cornerDivisions; v++) {
-          i.AddTri(v0 + 3, v, v + 1);
+          i.AddTri(v0 + 3, v, v + 1, flipFacing);
         }
 
         // Bottom Quad
-        i.AddTri(v0 + 0, v0 + 3, cornerStart + 2 + cornerDivisions);
-        i.AddTri(v0 + 3, cornerStart + 1 + cornerDivisions, cornerStart + 2 + cornerDivisions);
+        i.AddTri(v0 + 0, v0 + 3, cornerStart + 2 + cornerDivisions, flipFacing);
+        i.AddTri(v0 + 3, cornerStart + 1 + cornerDivisions, cornerStart + 2 + cornerDivisions, flipFacing);
 
         // Lower Left Corner
         cornerStart = cornerStart + 2 + cornerDivisions;
         for (int v = cornerStart; v < cornerStart + 1 + cornerDivisions; v++) {
-          i.AddTri(v0 + 0, v, v + 1);
+          i.AddTri(v0 + 0, v, v + 1, flipFacing);
         }
 
         // Left Quad
-        i.AddTri(v0 + 0, cornerStart + 1 + cornerDivisions, v0 + 1);
-        i.AddTri(v0 + 1, cornerStart + 1 + cornerDivisions, cornerStart + 2 + cornerDivisions);
+        i.AddTri(v0 + 0, cornerStart + 1 + cornerDivisions, v0 + 1, flipFacing);
+        i.AddTri(v0 + 1, cornerStart + 1 + cornerDivisions, cornerStart + 2 + cornerDivisions, flipFacing);
 
         // Upper Left Corner
         cornerStart = cornerStart + 2 + cornerDivisions;
         for (int v = cornerStart; v < cornerStart + 1 + cornerDivisions; v++) {
-          i.AddTri(v0 + 1, v, (v == cornerStart + cornerDivisions ? v0 + 4 : v + 1));
+          i.AddTri(v0 + 1, v, (v == cornerStart + cornerDivisions ? v0 + 4 : v + 1), flipFacing);
         }
       }
 

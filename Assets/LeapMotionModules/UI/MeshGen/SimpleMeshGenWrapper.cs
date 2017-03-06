@@ -17,6 +17,7 @@ public class SimpleMeshGenWrapper : MonoBehaviour {
   public float cornerRadius = 0.2F;
   [MinValue(0)]
   public int cornerDivisions = 5;
+  public bool withBack = true;
 
   private MeshFilter _filter;
 
@@ -43,7 +44,7 @@ public class SimpleMeshGenWrapper : MonoBehaviour {
     _filter.sharedMesh.Clear();
     _vertCache.Clear();
     _idxCache.Clear();
-    MeshGen.GenerateRoundedRectPrism(extents, cornerRadius, cornerDivisions, _vertCache, _idxCache);
+    MeshGen.GenerateRoundedRectPrism(extents, cornerRadius, cornerDivisions, _vertCache, _idxCache, withBack);
     _filter.sharedMesh.SetVertices(_vertCache);
     _filter.sharedMesh.SetTriangles(_idxCache, 0, true);
     _filter.sharedMesh.RecalculateNormals();
