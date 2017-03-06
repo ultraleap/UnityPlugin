@@ -51,6 +51,7 @@ public static class TransformUtil {
   public static int GetDataHashCode(this Transform transform) {
     int hash = 17;
     combineHash(ref hash, transform);
+    combineHash(ref hash, transform.gameObject.activeSelf);
     combineHash(ref hash, transform.localPosition);
     combineHash(ref hash, transform.localRotation);
     combineHash(ref hash, transform.localScale);
