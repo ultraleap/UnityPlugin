@@ -1,10 +1,14 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
 public class LeapGuiProceduralPanel : ProceduralMeshSource {
   public const int MAX_VERTS = 128;
+
+  [SerializeField]
+  private LeapGuiElementData _sourceData;
 
   [SerializeField]
   private ResolutionType _resolutionType = ResolutionType.Vertices;
@@ -24,6 +28,23 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
   [SerializeField]
   private bool _nineSliced = false;
 
+  public static bool IsValidDataSource(LeapGuiElementData dataSource) {
+    return dataSource is LeapGuiTextureData ||
+           dataSource is LeapGuiSpriteData;
+  }
+
+  public LeapGuiElementData sourceData {
+    get {
+      if (_sourceData == null) {
+        assignDefaultSourceValue();
+      }
+      return _sourceData;
+    }
+    set {
+      _sourceData = value;
+    }
+  }
+
   public ResolutionType resolutionType {
     get {
       return _resolutionType;
@@ -42,14 +63,48 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
     }
   }
 
+  public bool nineSliced {
+    get {
+      return _nineSliced && canNineSlice;
+    }
+    set {
+      _nineSliced = value;
+    }
+  }
+
   public bool canNineSlice {
     get {
-      var spriteData = GetComponent<LeapGuiElement>().Sprite();
+      var spriteData = _sourceData as LeapGuiSpriteData;
       return spriteData != null && spriteData.sprite != null;
     }
   }
 
+  public UVChannelFlags uvChannel {
+    get {
+      if (_sourceData == null) {
+        return UVChannelFlags.UV0;
+      }
+
+      var feature = _sourceData.feature;
+      if (feature is LeapGuiTextureFeature) {
+        return (feature as LeapGuiTextureFeature).channel;
+      } else if (feature is LeapGuiSpriteFeature) {
+        return (feature as LeapGuiSpriteFeature).channel;
+      } else {
+        return UVChannelFlags.UV0;
+      }
+    }
+  }
+
+  private void Reset() {
+    assignDefaultSourceValue();
+  }
+
   public void OnValidate() {
+    if (_sourceData == null) {
+      assignDefaultSourceValue();
+    }
+
     _resolution_vert_x = Mathf.Max(0, _resolution_vert_x);
     _resolution_vert_y = Mathf.Max(0, _resolution_vert_y);
     _resolution_verts_per_meter = Vector2.Max(_resolution_verts_per_meter, Vector2.zero);
@@ -66,6 +121,10 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
   public override bool TryGenerateMesh(LeapGuiMeshData meshFeature,
                                    out Mesh mesh,
                                    out UVChannelFlags remappableChannels) {
+    if (_sourceData == null) {
+      assignDefaultSourceValue();
+    }
+
     Vector4 borderSize = Vector4.zero;
     Vector4 borderUvs = Vector4.zero;
 
@@ -78,9 +137,9 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
       rect = new Rect(-_size / 2, _size);
     }
 
-    if (_nineSliced) {
-      var spriteData = meshFeature.element.Sprite();
-      if (spriteData == null || spriteData.sprite == null) {
+    if (_nineSliced && _sourceData is LeapGuiSpriteData) {
+      var spriteData = _sourceData as LeapGuiSpriteData;
+      if (spriteData.sprite == null) {
         mesh = null;
         remappableChannels = 0;
         return false;
@@ -150,7 +209,7 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
     mesh.hideFlags = HideFlags.HideAndDontSave;
     mesh.SetVertices(verts);
     mesh.SetTriangles(tris, 0);
-    mesh.SetUVs(0, uvs); //TODO, how to get correct channel??
+    mesh.SetUVs(uvChannel.Index(), uvs);
     mesh.RecalculateBounds();
 
     remappableChannels = UVChannelFlags.UV0;
@@ -173,6 +232,13 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
       }
     } else {
       return (dv / (vertCount - 1.0f)) * size;
+    }
+  }
+
+  private void assignDefaultSourceValue() {
+    var element = GetComponent<LeapGuiElement>();
+    if (element != null) {
+      _sourceData = element.data.Query().FirstOrDefault(IsValidDataSource);
     }
   }
 
