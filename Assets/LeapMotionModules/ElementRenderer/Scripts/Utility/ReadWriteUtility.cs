@@ -5,29 +5,24 @@ using UnityEditor;
 
 public static class ReadWriteUtility {
 
-  public static bool EnsureReadWriteEnabled(this Texture texture) {
-#if UNITY_EDITOR
-    string assetPath = AssetDatabase.GetAssetPath(texture);
-    if (string.IsNullOrEmpty(assetPath)) {
-      return false;
-    }
+  public static Texture2D GetReadableTexture(this Texture2D texture) {
+    RenderTexture rt = new RenderTexture(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+    Graphics.Blit(texture, rt);
 
-    TextureImporter importer = AssetImporter.GetAtPath(assetPath) as TextureImporter;
-    if (importer == null) {
-      return false;
-    }
+    Texture2D reciever = new Texture2D(texture.width, texture.height, TextureFormat.ARGB32, mipmap: false, linear: true);
 
-    if (!importer.isReadable) {
-      importer.isReadable = true;
-      importer.SaveAndReimport();
-      AssetDatabase.Refresh();
-    }
-#endif
+    RenderTexture.active = rt;
+    reciever.ReadPixels(new Rect(0, 0, texture.width, texture.height), 0, 0);
+    RenderTexture.active = null;
+    rt.Release();
 
-    return true;
+    reciever.Apply(updateMipmaps: false, makeNoLongerReadable: false);
+    reciever.filterMode = texture.filterMode;
+    reciever.wrapMode = texture.wrapMode;
+    return reciever;
   }
 
-  public static bool EnsureReadWriteEnabled(this Mesh mesh) {
+  public static bool TryEnableReadWrite(this Mesh mesh) {
 #if UNITY_EDITOR
     string assetPath = AssetDatabase.GetAssetPath(mesh);
     if (string.IsNullOrEmpty(assetPath)) {
@@ -46,6 +41,6 @@ public static class ReadWriteUtility {
     }
 #endif
 
-    return true;
+    return mesh.isReadable;
   }
 }
