@@ -67,7 +67,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
       }
 
       using (new ProfilerSample("Upload Material Data")) {
-        _material.SetVectorArray(RECT_POSITIONS, _rect_elementPositions);
+        _material.SetVectorArraySafe(RECT_POSITIONS, _rect_elementPositions);
       }
     } else if (gui.space is LeapGuiRadialSpaceBase) {
       var radialSpace = gui.space as LeapGuiRadialSpaceBase;
@@ -82,7 +82,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
       using (new ProfilerSample("Upload Material Data")) {
         _material.SetFloat(LeapGuiRadialSpaceBase.RADIUS_PROPERTY, radialSpace.radius);
-        _material.SetVectorArray(CURVED_PARAMETERS, _curved_elementParameters);
+        _material.SetVectorArraySafe(CURVED_PARAMETERS, _curved_elementParameters);
       }
     }
 
