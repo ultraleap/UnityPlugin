@@ -398,7 +398,10 @@ public class LeapGui : MonoBehaviour {
       }
     }
 
-    _delayedHeavyRebuild.QueueAction();
+    if (needsRebuild) {
+      _delayedHeavyRebuild.Reset();
+    }
+
     doEditorUpdateLogic(needsRebuild, heavyRebuild: false);
   }
 

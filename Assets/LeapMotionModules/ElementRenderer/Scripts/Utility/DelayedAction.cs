@@ -20,7 +20,7 @@ public class DelayedAction {
 #endif
   }
 
-  public void QueueAction() {
+  public void Reset() {
     _actionTime = currTime + _delay;
   }
 
