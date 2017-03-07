@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using Leap.Unity;
 using Leap.Unity.Query;
 
@@ -18,6 +21,12 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
   [SerializeField]
   private bool _createMeshRenderers;
+
+  [SerializeField]
+  private bool _bakeLightmapUvs;
+
+  [SerializeField]
+  private UnwrapParam _unwrapSettings;
   #endregion
 
   #region PRIVATE VARIABLES
@@ -43,6 +52,18 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   public enum MotionType {
     None,
     Translation
+  }
+
+  public override void GetSupportInfo(List<LeapGuiMeshFeature> features, List<SupportInfo> info) {
+    base.GetSupportInfo(features, info);
+
+    for (int i = 0; i < features.Count; i++) {
+      var feature = features[i];
+
+      if (_bakeLightmapUvs && !feature.uv1) {
+        info[i] = info[i].OrWorse(SupportInfo.Warning("Lightmap uvs are being generated, but the lightmap channel is not enabled!"));
+      }
+    }
   }
 
   public override SupportInfo GetSpaceSupportInfo(LeapGuiSpace space) {
