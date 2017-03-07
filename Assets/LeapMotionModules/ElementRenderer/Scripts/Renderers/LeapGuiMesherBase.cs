@@ -433,10 +433,11 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
 
   protected virtual void buildNormals(LeapGuiMeshData meshData) {
     using (new ProfilerSample("Build Normals")) {
+      var topology = MeshCache.GetTopology(meshData.mesh);
       var normals = MeshCache.GetNormals(meshData.mesh);
 
       for (int i = 0; i < normals.Length; i++) {
-        _normals.Add(elementNormalToMeshNormal(normals[i]));
+        _normals.Add(elementNormalToMeshNormal(topology.verts[i], normals[i]));
       }
     }
   }
@@ -583,6 +584,6 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   }
 
   protected abstract Vector3 elementVertToMeshVert(Vector3 vertex);
-  protected abstract Vector3 elementNormalToMeshNormal(Vector3 normal);
+  protected abstract Vector3 elementNormalToMeshNormal(Vector3 vertex, Vector3 normal);
   #endregion
 }

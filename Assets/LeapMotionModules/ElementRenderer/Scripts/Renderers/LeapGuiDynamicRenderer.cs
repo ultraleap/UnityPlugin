@@ -114,7 +114,7 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
     return vertex;
   }
 
-  protected override Vector3 elementNormalToMeshNormal(Vector3 normal) {
+  protected override Vector3 elementNormalToMeshNormal(Vector3 vertex, Vector3 normal) {
     return normal;
   }
 

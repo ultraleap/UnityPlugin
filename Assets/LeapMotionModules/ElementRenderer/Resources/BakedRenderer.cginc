@@ -207,7 +207,7 @@ v2f_gui_baked ApplyBakedGui(appdata_gui_baked v) {
 #endif
 
 #ifdef LEAP_GUI_WARPING
-#if LEAP_GUI_VERTEX_NORMALS
+#ifdef LEAP_GUI_VERTEX_NORMALS
   ApplyGuiWarping(v.vertex, v.normal, elementId);
 #else
   ApplyGuiWarping(v.vertex, elementId);

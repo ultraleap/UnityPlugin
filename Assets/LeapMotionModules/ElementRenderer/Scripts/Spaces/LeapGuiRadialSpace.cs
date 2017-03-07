@@ -9,6 +9,7 @@ public interface IRadialTransformer : ITransformer {
 public abstract class LeapGuiRadialSpaceBase : LeapGuiSpace {
   public const string RADIUS_PROPERTY = LeapGui.PROPERTY_PREFIX + "RadialSpace_Radius";
 
+  [Range(1.4f, 8.0f)]
   [SerializeField]
   public float radius = 1;
 }

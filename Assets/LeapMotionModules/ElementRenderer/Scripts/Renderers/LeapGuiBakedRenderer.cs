@@ -26,7 +26,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   private bool _bakeLightmapUvs;
 
   [SerializeField]
-  private UnwrapParam _unwrapSettings;
+  private LightmapUnwrapSettings _lightmapUnwrapSettings;
   #endregion
 
   #region PRIVATE VARIABLES
@@ -194,6 +194,10 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     //For the baked renderer, the mesh really never accurately represents it's visual position 
     //or size, so just disable culling entirely by making the bound gigantic.
     _currMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000);
+
+    if (_bakeLightmapUvs) {
+      _lightmapUnwrapSettings.GenerateLightmapUvs(_currMesh);
+    }
   }
 
   protected override bool doesRequireSpecialUv3() {
@@ -216,11 +220,12 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     throw new NotImplementedException();
   }
 
-  protected override Vector3 elementNormalToMeshNormal(Vector3 normal) {
+  protected override Vector3 elementNormalToMeshNormal(Vector3 vertex, Vector3 normal) {
     switch (_motionType) {
       case MotionType.None:
+        var guiVert = _noMotion_elementVertToGuiVert.MultiplyPoint3x4(vertex);
         var guiNormal = _noMotion_elementVertToGuiVert.MultiplyVector(normal);
-        return _noMotion_transformer.TransformDirection(guiNormal);
+        return _noMotion_transformer.GetTransformationMatrix(guiVert).MultiplyVector(guiNormal);
       case MotionType.Translation:
         return _translation_elementVertToMeshVert.MultiplyVector(normal);
     }
