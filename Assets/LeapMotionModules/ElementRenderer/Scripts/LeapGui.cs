@@ -48,6 +48,8 @@ public class LeapGui : MonoBehaviour {
   private List<int> _tempIndexList = new List<int>();
 
   private int _previousHierarchyHash;
+  private DelayedAction _delayedHeavyRebuild;
+  private bool _isDoingHeavyRebuild = false;
   #endregion
 
   #region PUBLIC API
@@ -100,6 +102,12 @@ public class LeapGui : MonoBehaviour {
   public bool addRemoveSupported {
     get {
       return _addRemoveSupported;
+    }
+  }
+
+  public bool isDoingHeavyRebuild {
+    get {
+      return _isDoingHeavyRebuild;
     }
   }
 
@@ -368,6 +376,10 @@ public class LeapGui : MonoBehaviour {
 
   #region PRIVATE IMPLEMENTATION
 
+  private LeapGui() {
+    _delayedHeavyRebuild = new DelayedAction(() => doEditorUpdateLogic(fullRebuild: true, heavyRebuild: true));
+  }
+
 #if UNITY_EDITOR
   private void doLateUpdateEditor() {
     bool needsRebuild = false;
@@ -386,8 +398,13 @@ public class LeapGui : MonoBehaviour {
       }
     }
 
+    _delayedHeavyRebuild.QueueAction();
+    doEditorUpdateLogic(needsRebuild, heavyRebuild: false);
+  }
+
+  private void doEditorUpdateLogic(bool fullRebuild, bool heavyRebuild) {
     if (_renderer != null && _space != null) {
-      if (needsRebuild) {
+      if (fullRebuild) {
         rebuildElementList();
         rebuildFeatureData();
         rebuildFeatureSupportInfo();
@@ -396,7 +413,9 @@ public class LeapGui : MonoBehaviour {
 
         using (new ProfilerSample("Update Renderer")) {
           UnityEditor.Undo.RecordObject(_renderer, "Doing main editor update");
+          _isDoingHeavyRebuild = heavyRebuild;
           _renderer.OnUpdateRendererEditor();
+          _isDoingHeavyRebuild = false;
         }
 
         foreach (var feature in _features) {

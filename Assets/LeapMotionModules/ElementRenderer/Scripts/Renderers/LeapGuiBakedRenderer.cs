@@ -195,7 +195,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     //or size, so just disable culling entirely by making the bound gigantic.
     _currMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000);
 
-    if (_bakeLightmapUvs) {
+    if (_createMeshRenderers && _bakeLightmapUvs && gui.isDoingHeavyRebuild) {
       _lightmapUnwrapSettings.GenerateLightmapUvs(_currMesh);
     }
   }
