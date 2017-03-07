@@ -308,8 +308,15 @@ public class LeapGui : MonoBehaviour {
     }
 #endif
 
-    if (_space != null) _space.gui = this;
-    if (_renderer != null) _renderer.gui = this;
+    _space = _space ?? GetComponent<LeapGuiSpace>() ?? gameObject.AddComponent<LeapGuiRectSpace>();
+    _renderer = _renderer ?? GetComponent<LeapGuiRenderer>() ?? gameObject.AddComponent<LeapGuiDynamicRenderer>();
+
+    _space.gui = this;
+    _renderer.gui = this;
+  }
+
+  private void Reset() {
+    OnValidate();
   }
 
   void OnDestroy() {
@@ -375,7 +382,7 @@ public class LeapGui : MonoBehaviour {
       _previousHierarchyHash = hierarchyHash;
       needsRebuild = true;
     }
-    
+
     if (_renderer != null && _space != null) {
       if (needsRebuild) {
         rebuildElementList();
