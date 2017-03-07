@@ -128,6 +128,13 @@ namespace Leap.Unity {
     }
 
     protected virtual void OnEnable() {
+      try {
+        if (serializedObject == null) { }
+      } catch (NullReferenceException) {
+        DestroyImmediate(this);
+        throw new Exception("Cleaning up an editor of type " + GetType() + ".  Make sure to always destroy your editors when you are done with them!");
+      }
+
       _specifiedDrawers = new Dictionary<string, Action<SerializedProperty>>();
       _specifiedDecorators = new Dictionary<string, List<Action<SerializedProperty>>>();
       _conditionalProperties = new Dictionary<string, List<Func<bool>>>();

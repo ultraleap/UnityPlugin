@@ -67,7 +67,7 @@ public class LeapGuiEditor : CustomEditorBase {
                             false,
                             () => {
                               gui.SetSpace(space);
-                              _spaceEditor = CreateEditor(gui.space);
+                              CreateCachedEditor(gui.space, null, ref _spaceEditor);
                               serializedObject.Update();
                             });
     }
@@ -83,23 +83,28 @@ public class LeapGuiEditor : CustomEditorBase {
                                false,
                                () => {
                                  gui.SetRenderer(renderer);
-                                 _rendererEditor = CreateEditor(gui.renderer);
+                                 CreateCachedEditor(gui.renderer, null, ref _rendererEditor);
                                  serializedObject.Update();
                                });
     }
 
-    if (gui.renderer != null) {
-      _rendererEditor = CreateEditor(gui.renderer);
+    if (gui.renderer != null) {//
+      CreateCachedEditor(gui.renderer, null, ref _rendererEditor);
     }
 
     if (gui.space != null) {
-      _spaceEditor = CreateEditor(gui.space);
+      CreateCachedEditor(gui.space, null, ref _spaceEditor);
     }
 
     specifyCustomDecorator("_features", featureDecorator);
     specifyCustomDrawer("_features", drawFeatures);
     specifyCustomDrawer("_space", drawSpace);
     specifyCustomDrawer("_renderer", drawRenderer);
+  }
+
+  private void OnDisable() {
+    if (_rendererEditor != null) DestroyImmediate(_rendererEditor);
+    if (_spaceEditor != null) DestroyImmediate(_spaceEditor);
   }
 
   private void featureDecorator(SerializedProperty property) {

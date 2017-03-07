@@ -119,6 +119,10 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
     base.OnUpdateRendererEditor(isHeavyUpdate);
 
+    if (_renderers == null) {
+      _renderers = new List<MeshRendererContainer>();
+    }
+
     if (_createMeshRenderers) {
       while (_renderers.Count > _meshes.Count) {
         _renderers.RemoveLast().Destroy();
