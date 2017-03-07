@@ -149,8 +149,8 @@ public class LeapGui : MonoBehaviour {
   //Begin editor-only private api
 #if UNITY_EDITOR
   public void ScheduleFullUpdate() {
-    //Simply clear the hierarchy hash to force a full update
-    _previousHierarchyHash = 0;
+    //Dirty the hash by changing it to something else
+    _previousHierarchyHash++;
   }
 
   public void SetSpace(Type spaceType) {
@@ -375,26 +375,26 @@ public class LeapGui : MonoBehaviour {
       _previousHierarchyHash = hierarchyHash;
       needsRebuild = true;
     }
+    
+    if (_renderer != null && _space != null) {
+      if (needsRebuild) {
+        rebuildElementList();
+        rebuildFeatureData();
+        rebuildFeatureSupportInfo();
 
-    if (needsRebuild && _renderer != null && _elements.Count != 0) {
-      rebuildElementList();
-      rebuildFeatureData();
-      rebuildFeatureSupportInfo();
-
-      if (_space != null) {
         _space.BuildElementData(transform);
+
+        using (new ProfilerSample("Update Renderer")) {
+          _renderer.OnUpdateRendererEditor();
+        }
+
+        foreach (var feature in _features) {
+          feature.isDirty = false;
+        }
       }
 
-      using (new ProfilerSample("Update Renderer")) {
-        _renderer.OnUpdateRendererEditor();
-      }
-
-      foreach(var feature in _features) {
-        feature.isDirty = false;
-      }
+      _renderer.OnUpdateRenderer();
     }
-
-    _renderer.OnUpdateRenderer();
   }
 #endif
 
