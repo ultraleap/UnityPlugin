@@ -371,16 +371,19 @@ public class LeapGui : MonoBehaviour {
 #if UNITY_EDITOR
   private void doLateUpdateEditor() {
     bool needsRebuild = false;
-    foreach (var feature in _features) {
-      if (feature.isDirty) {
+
+    using (new ProfilerSample("Calculate Should Rebuild")) {
+      foreach (var feature in _features) {
+        if (feature.isDirty) {
+          needsRebuild = true;
+        }
+      }
+
+      int hierarchyHash = HashUtil.GetHierarchyHash(transform);
+      if (_previousHierarchyHash != hierarchyHash) {
+        _previousHierarchyHash = hierarchyHash;
         needsRebuild = true;
       }
-    }
-
-    int hierarchyHash = TransformUtil.GetHierarchyHash(transform);
-    if (_previousHierarchyHash != hierarchyHash) {
-      _previousHierarchyHash = hierarchyHash;
-      needsRebuild = true;
     }
 
     if (_renderer != null && _space != null) {
