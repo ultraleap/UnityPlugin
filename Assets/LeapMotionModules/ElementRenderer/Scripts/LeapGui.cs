@@ -377,7 +377,7 @@ public class LeapGui : MonoBehaviour {
       }
     }
 
-    int hierarchyHash = TransformUtil.GetHierarchyHash(transform);
+    int hierarchyHash = HashUtil.GetHierarchyHash(transform);
     if (_previousHierarchyHash != hierarchyHash) {
       _previousHierarchyHash = hierarchyHash;
       needsRebuild = true;
