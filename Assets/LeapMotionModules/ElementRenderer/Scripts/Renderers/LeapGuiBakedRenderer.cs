@@ -26,7 +26,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   private bool _enableLightmapping;
 
   [SerializeField]
-  private MaterialGlobalIlluminationFlags _giFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+  private MaterialGlobalIlluminationFlags _giFlags = MaterialGlobalIlluminationFlags.None;
 
   [SerializeField]
   private LightmapUnwrapSettings _lightmapUnwrapSettings;
@@ -55,6 +55,14 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   public enum MotionType {
     None,
     Translation
+  }
+
+  protected override void OnValidate() {
+    base.OnValidate();
+
+    if (!_createMeshRenderers) {
+      _enableLightmapping = false;
+    }
   }
 
   public override void GetSupportInfo(List<LeapGuiMeshFeature> features, List<SupportInfo> info) {
@@ -166,6 +174,14 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     }
   }
 
+  protected override void prepareMaterial() {
+    base.prepareMaterial();
+
+    if (_enableLightmapping) {
+      _material.globalIlluminationFlags = _giFlags;
+    }
+  }
+
   protected override void buildTopology(LeapGuiMeshData meshData) {
     //If the next element is going to put us over the limit, finish the current mesh
     //and start a new one.
@@ -202,7 +218,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     //or size, so just disable culling entirely by making the bound gigantic.
     _currMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000);
 
-    if (_createMeshRenderers && _enableLightmapping && isHeavyUpdate) {
+    if (_enableLightmapping && isHeavyUpdate) {
       _lightmapUnwrapSettings.GenerateLightmapUvs(_currMesh);
     }
   }
