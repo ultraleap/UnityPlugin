@@ -395,6 +395,7 @@ public class LeapGui : MonoBehaviour {
         _space.BuildElementData(transform);
 
         using (new ProfilerSample("Update Renderer")) {
+          UnityEditor.Undo.RecordObject(_renderer, "Doing main editor update");
           _renderer.OnUpdateRendererEditor();
         }
 

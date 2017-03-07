@@ -156,7 +156,7 @@ public class LeapGuiEditor : CustomEditorBase {
     }
 
     if (_spaceEditor != null) {
-      _spaceEditor.DrawDefaultInspector();
+      _spaceEditor.OnInspectorGUI();
     }
 
     EditorGUILayout.Space();
@@ -173,7 +173,9 @@ public class LeapGuiEditor : CustomEditorBase {
     }
 
     if (_rendererEditor != null) {
-      _rendererEditor.DrawDefaultInspector();
+      _rendererEditor.serializedObject.Update();
+      _rendererEditor.OnInspectorGUI();
+      _rendererEditor.serializedObject.ApplyModifiedProperties();
     }
   }
 
