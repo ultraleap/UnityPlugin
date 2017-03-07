@@ -15,6 +15,8 @@ public abstract class LeapGuiRenderer : LeapGuiComponentBase<LeapGui> {
     }
   }
 
+  protected bool isHeavyUpdate { get; private set; }
+
   /// <summary>
   /// Called when the leap gui is enabled at runtime.
   /// </summary>
@@ -48,5 +50,7 @@ public abstract class LeapGuiRenderer : LeapGuiComponentBase<LeapGui> {
   /// called every time a change is performed to the gui, but it is
   /// not called all the time!
   /// </summary>
-  public abstract void OnUpdateRendererEditor();
+  public virtual void OnUpdateRendererEditor(bool isHeavyUpdate) {
+    this.isHeavyUpdate = isHeavyUpdate;
+  }
 }

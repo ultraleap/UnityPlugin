@@ -163,7 +163,9 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
     DestroyImmediate(_material);
   }
 
-  public override void OnUpdateRendererEditor() {
+  public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
+    base.OnUpdateRendererEditor(isHeavyUpdate);
+
     setupForBuilding();
     buildMesh();
   }

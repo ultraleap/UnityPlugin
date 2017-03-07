@@ -116,8 +116,8 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     }
   }
 
-  public override void OnUpdateRendererEditor() {
-    base.OnUpdateRendererEditor();
+  public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
+    base.OnUpdateRendererEditor(isHeavyUpdate);
 
     if (_createMeshRenderers) {
       while (_renderers.Count > _meshes.Count) {
@@ -195,7 +195,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     //or size, so just disable culling entirely by making the bound gigantic.
     _currMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000);
 
-    if (_createMeshRenderers && _bakeLightmapUvs && gui.isDoingHeavyRebuild) {
+    if (_createMeshRenderers && _bakeLightmapUvs && isHeavyUpdate) {
       _lightmapUnwrapSettings.GenerateLightmapUvs(_currMesh);
     }
   }

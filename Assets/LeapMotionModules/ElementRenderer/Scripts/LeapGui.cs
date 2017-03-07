@@ -49,7 +49,6 @@ public class LeapGui : MonoBehaviour {
 
   private int _previousHierarchyHash;
   private DelayedAction _delayedHeavyRebuild;
-  private bool _isDoingHeavyRebuild = false;
   #endregion
 
   #region PUBLIC API
@@ -102,12 +101,6 @@ public class LeapGui : MonoBehaviour {
   public bool addRemoveSupported {
     get {
       return _addRemoveSupported;
-    }
-  }
-
-  public bool isDoingHeavyRebuild {
-    get {
-      return _isDoingHeavyRebuild;
     }
   }
 
@@ -416,9 +409,7 @@ public class LeapGui : MonoBehaviour {
 
         using (new ProfilerSample("Update Renderer")) {
           UnityEditor.Undo.RecordObject(_renderer, "Doing main editor update");
-          _isDoingHeavyRebuild = heavyRebuild;
-          _renderer.OnUpdateRendererEditor();
-          _isDoingHeavyRebuild = false;
+          _renderer.OnUpdateRendererEditor(heavyRebuild);
         }
 
         foreach (var feature in _features) {

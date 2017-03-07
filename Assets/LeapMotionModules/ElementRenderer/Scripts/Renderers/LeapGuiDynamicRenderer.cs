@@ -19,12 +19,12 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
 
   public void OnAddElements(List<LeapGuiElement> elements, List<int> indexes) {
     //TODO, this is super slow and sad
-    OnUpdateRendererEditor();
+    OnUpdateRendererEditor(isHeavyUpdate: false);
   }
 
   public void OnRemoveElements(List<int> toRemove) {
     //TODO, this is super slow and sad
-    OnUpdateRendererEditor();
+    OnUpdateRendererEditor(isHeavyUpdate: false);
   }
 
   public override SupportInfo GetSpaceSupportInfo(LeapGuiSpace space) {
