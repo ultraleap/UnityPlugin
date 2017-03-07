@@ -23,7 +23,10 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   private bool _createMeshRenderers;
 
   [SerializeField]
-  private bool _bakeLightmapUvs;
+  private bool _enableLightmapping;
+
+  [SerializeField]
+  private MaterialGlobalIlluminationFlags _giFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
 
   [SerializeField]
   private LightmapUnwrapSettings _lightmapUnwrapSettings;
@@ -60,7 +63,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     for (int i = 0; i < features.Count; i++) {
       var feature = features[i];
 
-      if (_bakeLightmapUvs && !feature.uv1) {
+      if (_enableLightmapping && !feature.uv1) {
         info[i] = info[i].OrWorse(SupportInfo.Warning("Lightmap uvs are being generated, but the lightmap channel is not enabled!"));
       }
     }
@@ -199,7 +202,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     //or size, so just disable culling entirely by making the bound gigantic.
     _currMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000);
 
-    if (_createMeshRenderers && _bakeLightmapUvs && isHeavyUpdate) {
+    if (_createMeshRenderers && _enableLightmapping && isHeavyUpdate) {
       _lightmapUnwrapSettings.GenerateLightmapUvs(_currMesh);
     }
   }
