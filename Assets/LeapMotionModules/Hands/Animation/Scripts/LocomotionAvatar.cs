@@ -67,10 +67,10 @@ namespace Leap.Unity {
           animator.transform.position = new Vector3(animator.transform.position.x, heightOffset, animator.transform.position.z);
         }
       }
-      Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x + BodyCameraOffset.x, transform.position.y + BodyCameraOffset.y, Camera.main.transform.position.z + BodyCameraOffset.z);
+      Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
 
       if (IsCentering || !WalkingEnabled) {
-        animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam, .05f);
+        animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam + Camera.main.transform.InverseTransformVector(BodyCameraOffset), .05f);
         var lookPos = Target.position - transform.position;
         lookPos.y = 0;
         var rotation = Quaternion.LookRotation(lookPos);
