@@ -251,6 +251,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   element: {fileID: 566592325}
   sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+--- !u!21 &757673970
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Gui Material
+  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  m_ShaderKeywords: LEAP_GUI_CYLINDRICAL LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_VERTEX_COLORS
+    LEAP_GUI_VERTEX_UV_0
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+    - first:
+        name: _MainTex
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &951993288
 GameObject:
   m_ObjectHideFlags: 0
@@ -612,8 +636,8 @@ MonoBehaviour:
     maxAtlasSize: 16
     filterMode: 1
   _meshes:
-  - {fileID: 1561512775}
-  _material: {fileID: 1913791959}
+  - {fileID: 1278181532}
+  _material: {fileID: 757673970}
   _layer:
     layerIndex: 0
   _motionType: 1
@@ -995,7 +1019,7 @@ Light:
   serializedVersion: 7
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 3.8
+  m_Intensity: 0
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -1147,7 +1171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b7dca36e8e5c88459b2626007befebc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!43 &1561512775
+--- !u!43 &1278181532
 Mesh:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -1505,27 +1529,3 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   element: {fileID: 1631973768}
   sprite: {fileID: 21300000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
---- !u!21 &1913791959
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Gui Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: LEAP_GUI_CYLINDRICAL LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_VERTEX_COLORS
-    LEAP_GUI_VERTEX_UV_0
-  m_LightmapFlags: 5
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  m_SavedProperties:
-    serializedVersion: 2
-    m_TexEnvs:
-    - first:
-        name: _MainTex
-      second:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
