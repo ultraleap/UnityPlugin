@@ -253,6 +253,8 @@ public class LeapGuiEditor : CustomEditorBase {
   }
 
   private Bounds OnGetFrameBounds() {
+    gui.RebuildEditorPickingMeshes();
+
     Bounds[] allBounds = gui.elements.Query().
                              Select(e => e.pickingMesh).
                              Where(m => m != null).
