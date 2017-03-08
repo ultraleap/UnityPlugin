@@ -32,7 +32,7 @@ namespace Leap.Unity.UI.Interaction.Examples {
         _isReady = true;
       }
 
-      if (_interactionObj.IsPrimaryHovered && IsPressed && IsReady) {
+      if (_interactionObj.isPrimaryHovered && IsPressed && IsReady) {
         ActivateButton();
         _isReady = false;
       }

@@ -259,7 +259,7 @@ namespace Leap.Unity.Animation.Internal {
     private class TransformLocalScaleReferenceInterpolator : InterpolatorBase<Transform, Transform> {
       public override float length {
         get {
-          return Quaternion.Angle(_a.localRotation, _b.localRotation);
+          return Vector3.Distance(_a.localScale, _b.localScale);
         }
       }
 

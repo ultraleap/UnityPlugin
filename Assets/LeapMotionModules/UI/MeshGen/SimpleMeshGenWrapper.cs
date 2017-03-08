@@ -36,6 +36,9 @@ public class SimpleMeshGenWrapper : MonoBehaviour {
     if (_filter == null) _filter = GetComponent<MeshFilter>();
 
     if (_filter.sharedMesh == null || forceNew) {
+//#if UNITY_EDITOR
+//      DestroyImmediate(_filter.sharedMesh, true);
+//#endif
       Mesh mesh = new Mesh();
       mesh.name = "Generated Mesh " + _genCount++;
       _filter.sharedMesh = mesh;
@@ -47,6 +50,10 @@ public class SimpleMeshGenWrapper : MonoBehaviour {
     MeshGen.GenerateRoundedRectPrism(extents, cornerRadius, cornerDivisions, _vertCache, _idxCache, withBack);
     _filter.sharedMesh.SetVertices(_vertCache);
     _filter.sharedMesh.SetTriangles(_idxCache, 0, true);
+#if UNITY_EDITOR
+    UnityEditor.Unwrapping.GenerateSecondaryUVSet(_filter.sharedMesh);
+    _filter.sharedMesh.uv = _filter.sharedMesh.uv2;
+#endif
     _filter.sharedMesh.RecalculateNormals();
   }
 

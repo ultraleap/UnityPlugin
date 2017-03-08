@@ -10,8 +10,21 @@ namespace Leap.Unity.UI.Interaction {
   [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviour : InteractionBehaviourBase {
 
-    public bool IsHovered        { get { return _hoveringHandsCount > 0; } }
-    public bool IsPrimaryHovered { get { return _primaryHoveringHandsCount > 0; } }
+    /// <summary> Gets whether any hand is nearby. </summary>
+    public bool isHovered             { get { return _hoveringHandsCount > 0; } }
+
+    /// <summary> Gets the closest hand to this object, or null if no hand is nearby. </summary>
+    public Hand closestHoveringHand   { get { return _publicClosestHoveringHand; } }
+
+    /// <summary> Gets this object's primary hovering hand, or null if no hand is primarily
+    /// hovering over this interaction object. (That is, closer to this object than to any other object.) </summary>
+    public bool isPrimaryHovered      { get { return _primaryHoveringHandsCount > 0; } }
+
+    /// <summary> Returns the primary hovering hand for this interaction object, if it has one.
+    /// A hand is the primary hover for an interaction object only if it is closer to that object
+    /// than any other interaction object. If there are multiple such hands, this returns the hand
+    /// closest to this object. </summary>
+    public Hand primaryHoveringHand   { get { return _publicClosestPrimaryHoveringHand; } }
 
     public Action<Hand> OnHoverBegin = (hand) => { };
     public Action<Hand> OnHoverStay  = (hand) => { };
@@ -135,17 +148,22 @@ namespace Leap.Unity.UI.Interaction {
     private int   _hoveringHandsCountLastFrame = 0;
     private int   _hoveringHandsCount = 0;
 
+    private Hand _publicClosestHoveringHand = null;
+
     // Runs after InteractionHands have done FixedUpdateHand.
     private void FixedUpdateHovering() {
       if (_hoveringHandsCount > 0) {
         if (_hoveringHandsCountLastFrame == 0) {
+          _publicClosestHoveringHand = _closestHoveringHand;
           OnObjectHoverBegin(_closestHoveringHand);
         }
         else {
+          _publicClosestHoveringHand = _closestHoveringHand;
           OnObjectHoverStay(_closestHoveringHand);
         }
       }
       else if (_hoveringHandsCountLastFrame > 0) {
+        _closestHoveringHand = null;
         OnObjectHoverEnd(_closestJustStoppedHoveringHand);
       }
 
@@ -160,16 +178,21 @@ namespace Leap.Unity.UI.Interaction {
     private int _primaryHoveringHandsCountLastFrame = 0;
     private int _primaryHoveringHandsCount = 0;
 
+    private Hand _publicClosestPrimaryHoveringHand = null;
+
     private void FixedUpdatePrimaryHovering() {
       if (_primaryHoveringHandsCount > 0) {
         if (_primaryHoveringHandsCountLastFrame == 0) {
+          _publicClosestPrimaryHoveringHand = _closestPrimaryHoveringHand;
           OnObjectPrimaryHoverBegin(_closestPrimaryHoveringHand);
         }
         else {
+          _publicClosestPrimaryHoveringHand = _closestPrimaryHoveringHand;
           OnObjectPrimaryHoverStay(_closestPrimaryHoveringHand);
         }
       }
       else if (_primaryHoveringHandsCountLastFrame > 0) {
+        _publicClosestPrimaryHoveringHand = null;
         OnObjectPrimaryHoverEnd(_closestJustStoppedPrimaryHoveringHand);
       }
 
