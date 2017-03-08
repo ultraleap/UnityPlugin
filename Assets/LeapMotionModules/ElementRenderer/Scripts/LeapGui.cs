@@ -47,6 +47,9 @@ public class LeapGui : MonoBehaviour {
   private List<LeapGuiElement> _tempElementList = new List<LeapGuiElement>();
   private List<int> _tempIndexList = new List<int>();
 
+  [NonSerialized]
+  private bool _hasFinishedSetup = false;
+  [NonSerialized]
   private int _previousHierarchyHash;
   private DelayedAction _delayedHeavyRebuild;
   #endregion
@@ -101,6 +104,12 @@ public class LeapGui : MonoBehaviour {
   public bool addRemoveSupported {
     get {
       return _addRemoveSupported;
+    }
+  }
+
+  public bool hasFinishedSetup {
+    get {
+      return _hasFinishedSetup;
     }
   }
 
@@ -414,6 +423,8 @@ public class LeapGui : MonoBehaviour {
         foreach (var feature in _features) {
           feature.isDirty = false;
         }
+
+        _hasFinishedSetup = true;
       }
 
       _renderer.OnUpdateRenderer();
@@ -438,15 +449,15 @@ public class LeapGui : MonoBehaviour {
       _space.RefreshElementData(transform, 0, anchors.Count);
     }
 
-    if (_elements.Count != 0) {
-      using (new ProfilerSample("Update Renderer")) {
-        _renderer.OnUpdateRenderer();
-      }
+    using (new ProfilerSample("Update Renderer")) {
+      _renderer.OnUpdateRenderer();
     }
 
     foreach (var feature in _features) {
       feature.isDirty = false;
     }
+
+    _hasFinishedSetup = true;
   }
 
   private void performElementRemoval() {
