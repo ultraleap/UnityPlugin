@@ -169,7 +169,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     switch (_motionType) {
       case MotionType.None:
         var guiNormal = _noMotion_elementVertToGuiVert.MultiplyVector(normal);
-        return _noMotion_transformer.TransformDirection(guiNormal);
+        return _noMotion_transformer.TransformDirection(Vector3.zero, guiNormal);
       case MotionType.Translation:
         return _translation_elementVertToMeshVert.MultiplyVector(normal);
     }

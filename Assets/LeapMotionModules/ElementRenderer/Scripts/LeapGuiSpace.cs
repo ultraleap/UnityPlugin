@@ -15,22 +15,22 @@ public interface ITransformer {
   /// <summary>
   /// Transform a rotation from gui-local rect space to gui-local gui space.
   /// </summary>
-  Quaternion TransformRotation(Quaternion localRectRot);
+  Quaternion TransformRotation(Vector3 localRectPos, Quaternion localRectRot);
 
   /// <summary>
   /// Transform a rotation from gui-local gui space to gui-local rect space.
   /// </summary>
-  Quaternion InverseTransformRotation(Quaternion localGuiRot);
+  Quaternion InverseTransformRotation(Vector3 localGuiPos, Quaternion localGuiRot);
 
   /// <summary>
   /// Transform a direction from gui-local rect space to gui-local gui space.
   /// </summary>
-  Vector3 TransformDirection(Vector3 direction);
+  Vector3 TransformDirection(Vector3 localRectPos, Vector3 localRectDirection);
 
   /// <summary>
   /// Transform a direction from gui-local gui space to gui-local rect space.
   /// </summary>
-  Vector3 InverseTransformDirection(Vector3 direction);
+  Vector3 InverseTransformDirection(Vector3 localGuiPos, Vector3 localGuiDirection);
 
   /// <summary>
   /// Get a transformation matrix that maps a position in local rect space 

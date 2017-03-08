@@ -19,28 +19,28 @@ public class LeapGuiRectSpace : LeapGuiSpace, ISupportsAddRemove {
 
   public class Transformer : ITransformer {
 
-    public Vector3 InverseTransformDirection(Vector3 direction) {
-      return direction;
+    public Vector3 TransformPoint(Vector3 localRectPos) {
+      return localRectPos;
     }
 
     public Vector3 InverseTransformPoint(Vector3 localGuiPos) {
       return localGuiPos;
     }
 
-    public Quaternion InverseTransformRotation(Quaternion localGuiRot) {
+    public Quaternion TransformRotation(Vector3 localRectPos, Quaternion localRectRot) {
+      return localRectRot;
+    }
+
+    public Quaternion InverseTransformRotation(Vector3 localGuiPos, Quaternion localGuiRot) {
       return localGuiRot;
     }
 
-    public Vector3 TransformDirection(Vector3 direction) {
-      return direction;
+    public Vector3 TransformDirection(Vector3 localRectPos, Vector3 localRectDirection) {
+      return localRectDirection;
     }
 
-    public Vector3 TransformPoint(Vector3 localRectPos) {
-      return localRectPos;
-    }
-
-    public Quaternion TransformRotation(Quaternion localRectRot) {
-      return localRectRot;
+    public Vector3 InverseTransformDirection(Vector3 localGuiPos, Vector3 localGuiDirection) {
+      return localGuiDirection;
     }
 
     public Matrix4x4 GetTransformationMatrix(Vector3 localRectPos) {
