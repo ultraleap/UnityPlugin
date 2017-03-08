@@ -193,8 +193,8 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     switch (_motionType) {
       case MotionType.None:
         _noMotion_transformer = gui.space.GetTransformer(_currElement.anchor);
-        _noMotion_elementVertToGuiVert = _currElement.transform.localToWorldMatrix *
-                                         gui.transform.worldToLocalMatrix;
+        _noMotion_elementVertToGuiVert = gui.transform.worldToLocalMatrix * 
+                                         _currElement.transform.localToWorldMatrix;
         break;
       case MotionType.Translation:
         _translation_elementVertToMeshVert = Matrix4x4.TRS(-gui.transform.InverseTransformPoint(_currElement.transform.position),
@@ -243,14 +243,22 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     throw new NotImplementedException();
   }
 
-  protected override Vector3 elementNormalToMeshNormal(Vector3 vertex, Vector3 normal) {
+  protected override void elementVertNormalToMeshVertNormal(Vector3 vertex,
+                                                            Vector3 normal,
+                                                        out Vector3 meshVert,
+                                                        out Vector3 meshNormal) {
     switch (_motionType) {
       case MotionType.None:
         var guiVert = _noMotion_elementVertToGuiVert.MultiplyPoint3x4(vertex);
         var guiNormal = _noMotion_elementVertToGuiVert.MultiplyVector(normal);
-        return _noMotion_transformer.GetTransformationMatrix(guiVert).MultiplyVector(guiNormal);
+        var matrix = _noMotion_transformer.GetTransformationMatrix(guiVert);
+        meshVert = matrix.MultiplyPoint3x4(Vector3.zero);
+        meshNormal = matrix.MultiplyVector(guiNormal);
+        return;
       case MotionType.Translation:
-        return _translation_elementVertToMeshVert.MultiplyVector(normal);
+        meshVert = _translation_elementVertToMeshVert.MultiplyPoint3x4(vertex);
+        meshNormal = _translation_elementVertToMeshVert.MultiplyVector(normal);
+        return;
     }
 
     throw new NotImplementedException();
