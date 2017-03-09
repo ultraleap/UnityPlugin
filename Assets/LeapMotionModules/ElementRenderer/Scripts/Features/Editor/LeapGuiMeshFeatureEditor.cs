@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using Leap.Unity;
 
-[CustomEditor(typeof(LeapGuiMeshFeature))]
+
 public class LeapGuiMeshFeatureEditor : CustomEditorBase {
 
   protected override void OnEnable() {

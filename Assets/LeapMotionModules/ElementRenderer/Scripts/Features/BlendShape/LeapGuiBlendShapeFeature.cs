@@ -28,11 +28,15 @@ public class LeapGuiBlendShapeFeature : LeapGuiFeature<LeapGuiBlendShapeData> {
   }
 
   public override SupportInfo GetSupportInfo(LeapGuiGroup group) {
+    //TODO 
+    /*
     if (group.features.Query().Any(f => f is LeapGuiMeshFeature)) {
       return SupportInfo.FullSupport();
     } else {
       return SupportInfo.Error("Blend Shapes require a Mesh feature.");
     }
+    */
+    return SupportInfo.FullSupport();
   }
 
 #if UNITY_EDITOR

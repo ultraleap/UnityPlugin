@@ -43,6 +43,12 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     }
   }
 
+  public List<LeapGuiElement> elements {
+    get {
+      return _elements;
+    }
+  }
+
   /// <summary>
   /// Maps 1-to-1 with the feature list, where each element represents the
   /// support that feature currently has.

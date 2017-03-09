@@ -4,7 +4,8 @@ using UnityEngine.Rendering;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
-public class LeapGuiProceduralPanel : ProceduralMeshSource {
+public class LeapGuiProceduralPanel : LeapGuiMeshElement {
+  /*
   public const int MAX_VERTS = 128;
 
   [SerializeField]
@@ -262,4 +263,5 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
     Vertices,
     VerticesPerRectilinearMeter
   }
+  */
 }

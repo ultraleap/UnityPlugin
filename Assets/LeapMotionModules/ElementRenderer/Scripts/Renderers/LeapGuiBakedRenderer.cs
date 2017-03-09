@@ -65,18 +65,6 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     }
   }
 
-  public override void GetSupportInfo(List<LeapGuiMeshFeature> features, List<SupportInfo> info) {
-    base.GetSupportInfo(features, info);
-
-    for (int i = 0; i < features.Count; i++) {
-      var feature = features[i];
-
-      if (_enableLightmapping && !feature.uv1) {
-        info[i] = info[i].OrWorse(SupportInfo.Warning("Lightmap uvs are being generated, but the lightmap channel is not enabled!"));
-      }
-    }
-  }
-
   public override SupportInfo GetSpaceSupportInfo(LeapGuiSpace space) {
     if (space is LeapGuiRectSpace ||
         space is LeapGuiCylindricalSpace) {
@@ -182,10 +170,10 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     }
   }
 
-  protected override void buildTopology(LeapGuiMeshData meshData) {
+  protected override void buildTopology() {
     //If the next element is going to put us over the limit, finish the current mesh
     //and start a new one.
-    if (_verts.Count + meshData.mesh.vertexCount > MeshUtil.MAX_VERT_COUNT) {
+    if (_verts.Count + _currElement.mesh.vertexCount > MeshUtil.MAX_VERT_COUNT) {
       finishMesh();
       beginMesh();
     }
@@ -193,7 +181,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     switch (_motionType) {
       case MotionType.None:
         _noMotion_transformer = gui.space.GetTransformer(_currElement.anchor);
-        _noMotion_elementVertToGuiVert = gui.transform.worldToLocalMatrix * 
+        _noMotion_elementVertToGuiVert = gui.transform.worldToLocalMatrix *
                                          _currElement.transform.localToWorldMatrix;
         break;
       case MotionType.Translation:
@@ -208,7 +196,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
         throw new NotImplementedException();
     }
 
-    base.buildTopology(meshData);
+    base.buildTopology();
   }
 
   protected override void postProcessMesh() {

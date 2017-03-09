@@ -139,6 +139,8 @@ public class LeapGui : MonoBehaviour {
   }
 
   public void RebuildEditorPickingMeshes() {
+    //TODO
+    /*
     if (_space == null) {
       return;
     }
@@ -187,6 +189,7 @@ public class LeapGui : MonoBehaviour {
         pickingMesh.RecalculateNormals();
       }
     }
+    */
   }
 #endif
   #endregion

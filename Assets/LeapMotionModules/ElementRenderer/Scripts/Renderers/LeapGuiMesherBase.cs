@@ -11,17 +11,64 @@ using Leap.Unity;
 using Leap.Unity.Query;
 
 public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
-  ISupportsFeature<LeapGuiMeshFeature>,
   ISupportsFeature<LeapGuiTextureFeature>,
   ISupportsFeature<LeapGuiSpriteFeature>,
   ISupportsFeature<LeapGuiTintFeature>,
   ISupportsFeature<LeapGuiBlendShapeFeature> {
 
+  public const string UV_0_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_UV_0";
+  public const string UV_1_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_UV_1";
+  public const string UV_2_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_UV_2";
+  public const string UV_3_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_UV_3";
+  public const string COLORS_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_COLORS";
+  public const string NORMALS_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_NORMALS";
+
+  public static string GetUvFeature(UVChannelFlags flags) {
+    switch (flags) {
+      case UVChannelFlags.UV0:
+        return UV_0_FEATURE;
+      case UVChannelFlags.UV1:
+        return UV_1_FEATURE;
+      case UVChannelFlags.UV2:
+        return UV_2_FEATURE;
+      case UVChannelFlags.UV3:
+        return UV_3_FEATURE;
+      default:
+        throw new InvalidOperationException();
+    }
+  }
+
+  #region INSPECTOR FIELDS
+  [Header("Mesh Settings")]
+  [SerializeField]
+  private bool _useUv0 = true;
+
+  [SerializeField]
+  private bool _useUv1 = false;
+
+  [SerializeField]
+  private bool _uvsUv2 = false;
+
+  [SerializeField]
+  private bool _useUv3 = false;
+
+  [SerializeField]
+  private bool _useColors = false;
+
+  [SerializeField]
+  private Color _globalTint = Color.white;
+
+  [SerializeField]
+  private bool _useNormals = false;
+
+  [Header("Rendering Settings")]
   [SerializeField]
   protected Shader _shader;
 
   [SerializeField]
   private PackUtil.Settings _atlasSettings = new PackUtil.Settings();
+
+  #endregion
 
   //Generated data
   [SerializeField, HideInInspector]
@@ -30,7 +77,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
   protected Material _material;
 
   //Current state of builder
-  protected LeapGuiElement _currElement;
+  protected LeapGuiMeshElement _currElement;
   protected int _currIndex;
   protected Mesh _currMesh;
 
@@ -53,7 +100,6 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
   protected List<UVChannelFlags> _requiredUvChannels = new List<UVChannelFlags>();
 
   //Feature lists
-  protected List<LeapGuiMeshFeature> _meshFeatures = new List<LeapGuiMeshFeature>();
   protected List<LeapGuiTextureFeature> _textureFeatures = new List<LeapGuiTextureFeature>();
   protected List<LeapGuiSpriteFeature> _spriteFeatures = new List<LeapGuiSpriteFeature>();
   protected List<LeapGuiTintFeature> _tintFeatures = new List<LeapGuiTintFeature>();
@@ -70,11 +116,6 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
   //#### Blend Shapes ####
   protected const string BLEND_SHAPE_AMOUNTS_PROPERTY = LeapGui.PROPERTY_PREFIX + "BlendShapeAmounts";
   protected List<float> _blendShapeAmounts = new List<float>();
-
-  public virtual void GetSupportInfo(List<LeapGuiMeshFeature> features, List<SupportInfo> info) {
-    SupportUtil.OnlySupportFirstFeature(features, info);
-    //TODO: handle uv3 warning?
-  }
 
   public virtual void GetSupportInfo(List<LeapGuiTextureFeature> features, List<SupportInfo> info) {
     SupportUtil.OnlySupportFirstFeature(features, info);
@@ -203,18 +244,16 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
       prepareMeshes();
       prepareMaterial();
 
-      if (_meshFeatures.Count != 0) {
-        if (_doesRequireColors) {
-          _material.EnableKeyword(LeapGuiMeshFeature.COLORS_FEATURE);
-        }
+      if (_doesRequireColors) {
+        _material.EnableKeyword(COLORS_FEATURE);
+      }
 
-        if (_doesRequireNormals) {
-          _material.EnableKeyword(LeapGuiMeshFeature.NORMALS_FEATURE);
-        }
+      if (_doesRequireNormals) {
+        _material.EnableKeyword(NORMALS_FEATURE);
+      }
 
-        foreach (var channel in _requiredUvChannels) {
-          _material.EnableKeyword(LeapGuiMeshFeature.GetUvFeature(channel));
-        }
+      foreach (var channel in _requiredUvChannels) {
+        _material.EnableKeyword(GetUvFeature(channel));
       }
 
       if (_textureFeatures.Count != 0) {
@@ -241,7 +280,6 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
 
   protected virtual void loadAllSupportedFeatures() {
     using (new ProfilerSample("Load All Supported Features")) {
-      group.GetSupportedFeatures(_meshFeatures);
       group.GetSupportedFeatures(_textureFeatures);
       group.GetSupportedFeatures(_spriteFeatures);
       group.GetSupportedFeatures(_tintFeatures);
@@ -372,7 +410,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
     using (new ProfilerSample("Build Mesh")) {
       beginMesh();
       for (_currIndex = 0; _currIndex < gui.elements.Count; _currIndex++) {
-        _currElement = gui.elements[_currIndex];
+        _currElement = group.elements[_currIndex] as LeapGuiMeshElement;
         buildElement();
       }
       finishMesh();
@@ -381,25 +419,22 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
 
   protected virtual void buildElement() {
     using (new ProfilerSample("Build Element")) {
-      foreach (var meshFeature in _meshFeatures) {
-        var meshData = meshFeature.data[_currIndex];
 
-        refreshMeshData(meshData);
-        if (meshData.mesh == null) continue;
+      refreshMeshData();
+      if (_currElement.mesh == null) return;
 
-        buildTopology(meshData);
+      buildTopology();
 
-        if (_doesRequireColors) {
-          buildColors(meshFeature, meshData);
-        }
+      if (_doesRequireColors) {
+        buildColors();
+      }
 
-        foreach (var channel in _requiredUvChannels) {
-          buildUvs(channel, meshData);
-        }
+      foreach (var channel in _requiredUvChannels) {
+        buildUvs(channel);
+      }
 
-        if (_doesRequireSpecialUv3) {
-          buildSpecialUv3(meshData);
-        }
+      if (_doesRequireSpecialUv3) {
+        buildSpecialUv3();
       }
 
       foreach (var blendShapeFeature in _blendShapeFeatures) {
@@ -408,15 +443,15 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
     }
   }
 
-  protected virtual void refreshMeshData(LeapGuiMeshData meshData) {
+  protected virtual void refreshMeshData() {
     using (new ProfilerSample("Refresh Mesh Data")) {
-      meshData.RefreshMeshData();
+      _currElement.RefreshMeshData();
     }
   }
 
-  protected virtual void buildTopology(LeapGuiMeshData meshData) {
+  protected virtual void buildTopology() {
     using (new ProfilerSample("Build Topology")) {
-      var topology = MeshCache.GetTopology(meshData.mesh);
+      var topology = MeshCache.GetTopology(_currElement.mesh);
 
       int vertOffset = _verts.Count;
       for (int i = 0; i < topology.tris.Length; i++) {
@@ -424,7 +459,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
       }
 
       if (_doesRequireNormals) {
-        var normals = MeshCache.GetNormals(meshData.mesh);
+        var normals = MeshCache.GetNormals(_currElement.mesh);
         for (int i = 0; i < topology.verts.Length; i++) {
           Vector3 meshVert;
           Vector3 meshNormal;
@@ -441,26 +476,26 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
     }
   }
 
-  protected virtual void buildColors(LeapGuiMeshFeature feature, LeapGuiMeshData meshData) {
+  protected virtual void buildColors() {
     using (new ProfilerSample("Build Colors")) {
-      Color totalTint = feature.tint * meshData.tint;
+      Color totalTint = _globalTint * _currElement.tint;
 
-      var colors = MeshCache.GetColors(meshData.mesh);
+      var colors = MeshCache.GetColors(_currElement.mesh);
       for (int i = 0; i < colors.Length; i++) {
         _colors.Add(colors[i] * totalTint);
       }
     }
   }
 
-  protected virtual void buildUvs(UVChannelFlags channel, LeapGuiMeshData meshData) {
+  protected virtual void buildUvs(UVChannelFlags channel) {
     using (new ProfilerSample("Build Uvs")) {
-      var uvs = MeshCache.GetUvs(meshData.mesh, channel);
+      var uvs = MeshCache.GetUvs(_currElement.mesh, channel);
       var targetList = _uvs[channel.Index()];
 
       targetList.AddRange(uvs);
 
       if (_packedRects != null &&
-         (meshData.remappableChannels & channel) != 0) {
+         (_currElement.remappableChannels & channel) != 0) {
         var atlasedUvs = _packedRects[channel.Index()];
         if (atlasedUvs != null) {
           MeshUtil.RemapUvs(targetList, atlasedUvs[_currIndex], uvs.Count);
@@ -469,9 +504,9 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
     }
   }
 
-  protected virtual void buildSpecialUv3(LeapGuiMeshData meshData) {
+  protected virtual void buildSpecialUv3() {
     using (new ProfilerSample("Build Special Uv3")) {
-      _uvs[3].Append(meshData.mesh.vertexCount, new Vector4(0, 0, 0, _currIndex));
+      _uvs[3].Append(_currElement.mesh.vertexCount, new Vector4(0, 0, 0, _currIndex));
     }
   }
 
@@ -554,24 +589,34 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
   #endregion
 
   #region UTILITY
+
+  protected IEnumerable<UVChannelFlags> enabledUvChannels {
+    get {
+      if (_useUv0) yield return UVChannelFlags.UV0;
+      if (_useUv1) yield return UVChannelFlags.UV1;
+      if (_uvsUv2) yield return UVChannelFlags.UV2;
+      if (_useUv3) yield return UVChannelFlags.UV3;
+    }
+  }
+
   protected virtual bool doesRequireMeshColors() {
-    return _meshFeatures.Query().Any(f => f.color);
+    return _useColors;
   }
 
   protected virtual bool doesRequireMeshNormals() {
-    return _meshFeatures.Query().Any(f => f.normals);
+    return _useNormals;
   }
 
   protected virtual bool doesRequireUvChannel(UVChannelFlags channel) {
     switch (channel) {
       case UVChannelFlags.UV0:
-        return _meshFeatures.Query().Any(f => f.uv0);
+        return _useUv0;
       case UVChannelFlags.UV1:
-        return _meshFeatures.Query().Any(f => f.uv1);
+        return _useUv1;
       case UVChannelFlags.UV2:
-        return _meshFeatures.Query().Any(f => f.uv2);
+        return _uvsUv2;
       case UVChannelFlags.UV3:
-        return _meshFeatures.Query().Any(f => f.uv3);
+        return _useUv3;
       default:
         throw new ArgumentException("Invalid channel argument.");
     }

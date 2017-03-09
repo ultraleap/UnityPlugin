@@ -2,8 +2,8 @@
 using UnityEngine.Rendering;
 using Leap.Unity.Query;
 
-public class LeapGuiProceduralSpriteMesh : ProceduralMeshSource {
-
+public class LeapGuiProceduralSpriteMesh : LeapGuiMeshElement {
+  /*
   public override bool TryGenerateMesh(LeapGuiMeshData meshFeature,
                                    out Mesh mesh,
                                    out UVChannelFlags remappableChannels) {
@@ -30,4 +30,5 @@ public class LeapGuiProceduralSpriteMesh : ProceduralMeshSource {
 
     return true;
   }
+  */
 }
