@@ -127,6 +127,13 @@ namespace Leap.Unity {
       _endHorizontalProperties.Add(endProperty);
     }
 
+    protected void drawScriptField(bool disable = true) {
+      var scriptProp = serializedObject.FindProperty("m_Script");
+      EditorGUI.BeginDisabledGroup(disable);
+      EditorGUILayout.PropertyField(scriptProp);
+      EditorGUI.EndDisabledGroup();
+    }
+
     protected virtual void OnEnable() {
       try {
         if (serializedObject == null) { }

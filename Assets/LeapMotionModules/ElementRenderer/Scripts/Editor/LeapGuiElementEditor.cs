@@ -14,14 +14,19 @@ public class DefaultFeatureDataEditor : CustomEditorBase {
 }
 
 [CanEditMultipleObjects]
-[CustomEditor(typeof(LeapGuiElement))]
-public class LeapGuiElementEditor : Editor {
-  /*
+[CustomEditor(typeof(LeapGuiElement), editorForChildClasses: true)]
+public class LeapGuiElementEditor : CustomEditorBase {
   List<LeapGuiElement> elements = new List<LeapGuiElement>();
   List<Editor> editorCache = new List<Editor>();
 
   Object[] tempArray = new Object[0];
   List<Object> tempList = new List<Object>();
+
+  protected override void OnEnable() {
+    base.OnEnable();
+
+    dontShowScriptField();
+  }
 
   protected void OnDisable() {
     foreach (var editor in editorCache) {
@@ -31,20 +36,68 @@ public class LeapGuiElementEditor : Editor {
   }
 
   public override void OnInspectorGUI() {
+    targets.Query().Where(e => e != null).Select(e => e as LeapGuiElement).FillList(elements);
+
+    drawScriptAndGroupGui();
+
+    base.OnInspectorGUI();
+
+    drawFeatureData();
+  }
+
+  protected void drawScriptAndGroupGui() {
+    using (new GUILayout.HorizontalScope()) {
+      drawScriptField();
+
+      //Bail if any of the elements is not attached
+      if (elements.Query().Any(e => !e.IsAttachedToGroup)) {
+        return;
+      }
+
+      //Bail if all of the elements are not part of the same gui
+      var mainGui = elements[0].attachedGroup.gui;
+      if (!elements.Query().All(e => e.attachedGroup.gui == mainGui)) {
+        return;
+      }
+
+      var mainGroup = elements[0].attachedGroup;
+      string buttonText;
+      if (!elements.Query().All(e => e.attachedGroup == mainGroup)) {
+        buttonText = "-";
+      } else {
+        buttonText = mainGui.groups.IndexOf(mainGroup).ToString();
+      }
+
+      if (GUILayout.Button(buttonText, EditorStyles.miniButton, GUILayout.Width(60))) {
+        GenericMenu groupMenu = new GenericMenu();
+        int index = 0;
+        foreach (var group in mainGui.groups.Query().Where(g => g.renderer.IsValidElement(elements[0]))) {
+          groupMenu.AddItem(new GUIContent(index.ToString()), false, () => {
+            mainGroup.RemoveElements(elements);
+            group.AddElements(elements);
+          });
+          index++;
+        }
+        groupMenu.ShowAsContext();
+      }
+    }
+  }
+
+  protected void drawFeatureData() {
     using (new ProfilerSample("Draw Leap Gui Element Editor")) {
-      base.OnInspectorGUI();
-
-      targets.Query().Where(e => e != null).Select(e => e as LeapGuiElement).FillList(elements);
-
       if (elements.Count == 0) return;
       var mainElement = elements[0];
+
+      if (mainElement.data.Count == 0) {
+        return;
+      }
 
       if (tempArray.Length != elements.Count) {
         tempArray = new Object[elements.Count];
       }
 
       int maxElements = LeapGuiPreferences.elementMax;
-      if (elements.Query().Any(e => e.attachedGui != null && e.attachedGui.elements.IndexOf(e) >= maxElements)) {
+      if (elements.Query().Any(e => e.attachedGroup != null && e.attachedGroup.elements.IndexOf(e) >= maxElements)) {
         string noun = elements.Count == 1 ? "This element" : "Some of these elements";
         string guiName = elements.Count == 1 ? "its gui" : "their guis";
         EditorGUILayout.HelpBox(noun + " may not be properly displayed because there are too many elements on " + guiName + ".  " +
@@ -55,6 +108,9 @@ public class LeapGuiElementEditor : Editor {
       while (editorCache.Count < mainElement.data.Count) {
         editorCache.Add(null);
       }
+
+      EditorGUILayout.Space();
+      EditorGUILayout.LabelField("Feature Data: ", EditorStyles.boldLabel);
 
       for (int i = 0; i < mainElement.data.Count; i++) {
         var mainDataObj = mainElement.data[i];
@@ -119,5 +175,4 @@ public class LeapGuiElementEditor : Editor {
     }
     return bounds;
   }
-  */
 }

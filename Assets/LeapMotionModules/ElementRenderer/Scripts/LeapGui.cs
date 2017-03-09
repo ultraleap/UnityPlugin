@@ -256,6 +256,7 @@ public class LeapGui : MonoBehaviour {
 
     using (new ProfilerSample("Calculate Should Rebuild")) {
       //check groups and if their features are dirty
+      needsRebuild = true;
 
       int hierarchyHash = HashUtil.GetHierarchyHash(transform);
       if (_previousHierarchyHash != hierarchyHash) {
@@ -272,32 +273,47 @@ public class LeapGui : MonoBehaviour {
   }
 
   private void doEditorUpdateLogic(bool fullRebuild, bool heavyRebuild) {
-    //TODO: write this :P
-    /*
-    if (_renderer != null && _space != null) {
-      if (fullRebuild) {
-        rebuildElementList();
-        rebuildFeatureData();
-        rebuildFeatureSupportInfo();
+    if (fullRebuild) {
+      _anchors.Clear();
+      _anchorParents.Clear();
+      rebuildAnchorInfo(transform, transform);
+      _space.BuildElementData(transform);
 
-        _space.BuildElementData(transform);
-
-        using (new ProfilerSample("Update Renderer")) {
-          _renderer.OnUpdateRendererEditor(heavyRebuild);
-        }
-
-        foreach (var feature in _features) {
-          feature.isDirty = false;
-        }
-
-        _hasFinishedSetup = true;
+      foreach (var group in _groups) {
+        group.CollectUnattachedElements();
+        group.RebuildFeatureData();
+        group.RebuildFeatureSupportInfo();
+        group.UpdateRendererEditor(heavyRebuild);
       }
 
-      _renderer.OnUpdateRenderer();
+      _hasFinishedSetup = true;
     }
-    */
+
+    foreach (var group in _groups) {
+      group.UpdateRenderer();
+    }
   }
 #endif
+
+  private void rebuildAnchorInfo(Transform root, Transform currAnchor) {
+    int count = root.childCount;
+    for (int i = 0; i < count; i++) {
+      Transform child = root.GetChild(i);
+      if (!child.gameObject.activeSelf) continue;
+
+      var childAnchor = currAnchor;
+
+      var anchorComponent = child.GetComponent<AnchorOfConstantSize>();
+      if (anchorComponent != null && anchorComponent.enabled) {
+        _anchors.Add(anchorComponent);
+        _anchorParents.Add(currAnchor);
+
+        childAnchor = anchorComponent.transform;
+      }
+
+      rebuildAnchorInfo(child, childAnchor);
+    }
+  }
 
   private void doLateUpdateRuntime() {
     if (_space == null) return;

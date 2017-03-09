@@ -33,6 +33,12 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
   #region PUBLIC API
 
+  public LeapGui gui {
+    get {
+      return _gui;
+    }
+  }
+
 #if UNITY_EDITOR
   public new LeapGuiRendererBase renderer {
 #else
@@ -79,6 +85,9 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
     _renderer = gameObject.AddComponent(rendererType) as LeapGuiRendererBase;
     Assert.IsNotNull(_renderer);
+    _renderer.gui = _gui;
+    _renderer.group = this;
+    _renderer.OnEnableRendererEditor();
   }
 
   /// <summary>
@@ -120,15 +129,51 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     return features.Count != 0;
   }
 
-  public void AddElement(List<LeapGuiElement> elements) {
+  public void AddElements(List<LeapGuiElement> elements) {
     using (new ProfilerSample("Add Elements")) {
-      //TODO
+#if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        foreach (var element in elements) {
+          _elements.Add(element);
+
+          Transform t = element.transform;
+          while (true) {
+            var anchor = t.GetComponent<AnchorOfConstantSize>();
+            if (anchor != null && anchor.enabled) {
+              element.OnAttachedToGui(this, t);
+              break;
+            }
+
+            t = t.parent;
+
+            if (t = transform) {
+              element.OnAttachedToGui(this, transform);
+              break;
+            }
+          }
+        }
+
+        _gui.ScheduleEditorUpdate();
+        return;
+      }
+#endif
+      //TODO: runtime logic for addition
     }
   }
 
-  public void RemoveElement(List<LeapGuiElement> elements) {
+  public void RemoveElements(List<LeapGuiElement> elements) {
     using (new ProfilerSample("Remove Elements")) {
-      //TODO
+#if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        foreach (var element in elements) {
+          element.OnDetachedFromGui();
+          _elements.Remove(element);
+        }
+        _gui.ScheduleEditorUpdate();
+        return;
+      }
+#endif
+      //TODO: runtime logic for removal
     }
   }
 
@@ -140,36 +185,9 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     _features.Add(feature as LeapGuiFeatureBase);
   }
 
-  public void SetRenderer(Type rendererType) {
-    AssertHelper.AssertEditorOnly();
-    _gui.ScheduleEditorUpdate();
-
-    UnityEditor.Undo.RecordObject(this, "Changed Gui Renderer");
-    UnityEditor.EditorUtility.SetDirty(this);
-
-    if (_renderer != null) {
-      _renderer.OnDisableRendererEditor();
-      UnityEngine.Object.DestroyImmediate(_renderer);
-      _renderer = null;
-    }
-
-    _renderer = _gui.gameObject.AddComponent(rendererType) as LeapGuiRendererBase;
-
-    if (_renderer != null) {
-      _renderer.gui = _gui;
-      _renderer.group = this;
-      _renderer.OnEnableRendererEditor();
-    }
-  }
-
-  public void RebuildElementList() {
+  public void CollectUnattachedElements() {
     using (new ProfilerSample("Rebuild Element List")) {
-      foreach (var element in _elements) {
-        element.OnDetachedFromGui();
-      }
-      _elements.Clear();
-
-      rebuildElementListRecursively(_gui.transform, _gui.transform);
+      collectUnattachedElementsRecursively(_gui.transform, _gui.transform);
     }
   }
 
@@ -196,7 +214,7 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
         }
 
         foreach (var dataObj in element.data) {
-          UnityEngine.Object.DestroyImmediate(dataObj);
+          DestroyImmediate(dataObj);
         }
 
         element.OnAssignFeatureData(dataList);
@@ -267,6 +285,18 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     }
   }
 
+  public void UpdateRendererEditor(bool heavyRebuild) {
+    _renderer.OnUpdateRendererEditor(heavyRebuild);
+
+    foreach (var feature in _features) {
+      feature.isDirty = false;
+    }
+  }
+
+  public void UpdateRenderer() {
+    _renderer.OnUpdateRenderer();
+  }
+
   #endregion
 
   #region UNITY CALLBACKS
@@ -293,12 +323,25 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
         _features.RemoveAt(i);
       }
     }
+
+    if (_renderer != null) {
+      _renderer.gui = _gui;
+      _renderer.group = this;
+    }
+  }
+
+  private void OnDestroy() {
+    if (_renderer != null) DestroyImmediate(_renderer);
+
+    foreach (var feature in _features) {
+      DestroyImmediate(feature);
+    }
   }
 
   #endregion
 
   #region PRIVATE IMPLEMENTATION
-  private void rebuildElementListRecursively(Transform root, Transform currAnchor) {
+  private void collectUnattachedElementsRecursively(Transform root, Transform currAnchor) {
     int count = root.childCount;
     for (int i = 0; i < count; i++) {
       Transform child = root.GetChild(i);
@@ -312,14 +355,15 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
       }
 
       var element = _renderer.GetValidElementOnObject(child.gameObject);
-      if (element != null && element.enabled) {
-        element.OnAttachedToGui(this, childAnchor, _elements.Count);
-        _elements.Add(element);
+      if (!element.IsAttachedToGroup) {
+        if (element != null && element.enabled) {
+          element.OnAttachedToGui(this, childAnchor);
+          _elements.Add(element);
+        }
       }
 
-      rebuildElementListRecursively(child, childAnchor);
+      collectUnattachedElementsRecursively(child, childAnchor);
     }
   }
-
   #endregion
 }

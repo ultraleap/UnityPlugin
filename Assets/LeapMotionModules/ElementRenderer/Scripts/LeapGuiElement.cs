@@ -4,12 +4,9 @@ using UnityEngine;
 
 [ExecuteInEditMode]
 [DisallowMultipleComponent]
-public class LeapGuiElement : MonoBehaviour {
+public abstract class LeapGuiElement : MonoBehaviour {
 
   #region INSPECTOR FIELDS
-  [SerializeField, HideInInspector]
-  private int _elementId;
-
   [SerializeField, HideInInspector]
   private Transform _anchor;
 
@@ -33,12 +30,6 @@ public class LeapGuiElement : MonoBehaviour {
   #endregion
 
   #region PUBLIC API
-  public int elementId {
-    get {
-      return _elementId;
-    }
-  }
-
   public Transform anchor {
     get {
       return _anchor;
@@ -74,16 +65,14 @@ public class LeapGuiElement : MonoBehaviour {
   }
 #endif
 
-  public virtual void OnAttachedToGui(LeapGuiGroup group, Transform anchor, int elementId) {
+  public virtual void OnAttachedToGui(LeapGuiGroup group, Transform anchor) {
     _attachedGroup = group;
     _anchor = anchor;
-    _elementId = elementId;
   }
 
   public virtual void OnDetachedFromGui() {
     _attachedGroup = null;
     _anchor = null;
-    _elementId = -1;
   }
 
   public virtual void OnAssignFeatureData(List<LeapGuiElementData> data) {

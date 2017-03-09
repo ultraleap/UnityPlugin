@@ -36,10 +36,10 @@ public class LeapGuiMeshElement : LeapGuiElement {
         return;
       }
     }
+    */
 
     mesh = _mesh;
     remappableChannels = _remappableChannels;
-    isUsingProcedural = false;
-    */
+    //isUsingProcedural = false;
   }
 }
