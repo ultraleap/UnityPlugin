@@ -49,7 +49,9 @@ namespace Leap.Unity {
       Target = GameObject.Instantiate(markerPrefab).transform;
       Target.name = transform.name + "_ChestReferenceMarker";
       Target.parent = GameObject.FindObjectOfType<LeapVRCameraControl>().transform;
-      Target.localPosition = new Vector3(0, 0, 2);
+      Target.localPosition = new Vector3(0, BodyCameraOffset.y, 2);
+      transform.Translate(0f, BodyCameraOffset.y, 0f, transform);
+
     }
 
     void Update() {
@@ -64,14 +66,14 @@ namespace Leap.Unity {
         float heightOffset = 0;
         if (Camera.main.transform.position.y < userHeight) {
           heightOffset = Camera.main.transform.position.y - userHeight;
-          animator.transform.position = new Vector3(animator.transform.position.x, heightOffset, animator.transform.position.z);
+          animator.transform.position = new Vector3(animator.transform.position.x, heightOffset + BodyCameraOffset.y, animator.transform.position.z);
         }
       }
       Vector3 placeAnimatorUnderCam = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z);
 
       if (IsCentering || !WalkingEnabled) {
         animator.transform.position = Vector3.Lerp(animator.rootPosition, placeAnimatorUnderCam, .05f);
-        animator.transform.Translate(BodyCameraOffset.x, BodyCameraOffset.y, BodyCameraOffset.z, animator.transform);
+        animator.transform.Translate(BodyCameraOffset.x, 0f, BodyCameraOffset.z, animator.transform);
         var lookPos = Target.position - transform.position;
         lookPos.y = 0;
         var rotation = Quaternion.LookRotation(lookPos);
