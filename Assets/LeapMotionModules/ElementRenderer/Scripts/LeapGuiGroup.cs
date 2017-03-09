@@ -187,6 +187,25 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
   public void CollectUnattachedElements() {
     using (new ProfilerSample("Rebuild Element List")) {
+      for (int i = _elements.Count; i-- != 0;) {
+        var element = _elements[i];
+        if (element == null) {
+          _elements.RemoveAt(i);
+          continue;
+        }
+
+        if (!element.enabled) {
+          _elements.RemoveAt(i);
+          element.OnDetachedFromGui();
+          continue;
+        }
+
+        if (element.attachedGroup != this) {
+          _elements.RemoveAt(i);
+          continue;
+        }
+      }
+
       collectUnattachedElementsRecursively(_gui.transform, _gui.transform);
     }
   }
@@ -355,8 +374,16 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
       }
 
       var element = _renderer.GetValidElementOnObject(child.gameObject);
-      if (element != null && !element.IsAttachedToGroup) {
-        if (element != null && element.enabled) {
+
+      if (element != null) {
+        //If element claims to be attached, but actually isn't detatch it
+        if (element.attachedGroup == this && !_elements.Contains(element)) {
+          element.OnDetachedFromGui();
+        }
+
+        if (!element.IsAttachedToGroup && element.enabled) {
+          Assert.IsFalse(_elements.Contains(element));
+
           element.OnAttachedToGui(this, childAnchor);
           _elements.Add(element);
         }
