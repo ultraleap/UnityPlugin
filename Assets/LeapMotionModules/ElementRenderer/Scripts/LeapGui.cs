@@ -46,6 +46,8 @@ public class LeapGui : MonoBehaviour {
 
   private List<LeapGuiElement> _tempElementList = new List<LeapGuiElement>();
   private List<int> _tempIndexList = new List<int>();
+
+  private int _previousHierarchyHash;
   #endregion
 
   #region PUBLIC API
@@ -146,8 +148,14 @@ public class LeapGui : MonoBehaviour {
 
   //Begin editor-only private api
 #if UNITY_EDITOR
+  public void ScheduleFullUpdate() {
+    //Dirty the hash by changing it to something else
+    _previousHierarchyHash++;
+  }
+
   public void SetSpace(Type spaceType) {
     AssertHelper.AssertEditorOnly();
+    ScheduleFullUpdate();
 
     UnityEditor.Undo.RecordObject(this, "Change Gui Space");
     UnityEditor.EditorUtility.SetDirty(this);
@@ -166,6 +174,7 @@ public class LeapGui : MonoBehaviour {
 
   public void AddFeature(Type featureType) {
     AssertHelper.AssertEditorOnly();
+    ScheduleFullUpdate();
 
     var feature = gameObject.AddComponent(featureType);
     _features.Add(feature as LeapGuiFeatureBase);
@@ -173,6 +182,7 @@ public class LeapGui : MonoBehaviour {
 
   public void SetRenderer(Type rendererType) {
     AssertHelper.AssertEditorOnly();
+    ScheduleFullUpdate();
 
     UnityEditor.Undo.RecordObject(this, "Changed Gui Renderer");
     UnityEditor.EditorUtility.SetDirty(this);
@@ -298,8 +308,15 @@ public class LeapGui : MonoBehaviour {
     }
 #endif
 
-    if (_space != null) _space.gui = this;
-    if (_renderer != null) _renderer.gui = this;
+    _space = _space ?? GetComponent<LeapGuiSpace>() ?? gameObject.AddComponent<LeapGuiRectSpace>();
+    _renderer = _renderer ?? GetComponent<LeapGuiRenderer>() ?? gameObject.AddComponent<LeapGuiDynamicRenderer>();
+
+    _space.gui = this;
+    _renderer.gui = this;
+  }
+
+  private void Reset() {
+    OnValidate();
   }
 
   void OnDestroy() {
@@ -353,18 +370,40 @@ public class LeapGui : MonoBehaviour {
 
 #if UNITY_EDITOR
   private void doLateUpdateEditor() {
-    rebuildElementList();
-    rebuildFeatureData();
-    rebuildFeatureSupportInfo();
+    bool needsRebuild = false;
 
-    if (_space != null) {
-      _space.BuildElementData(transform);
+    using (new ProfilerSample("Calculate Should Rebuild")) {
+      foreach (var feature in _features) {
+        if (feature.isDirty) {
+          needsRebuild = true;
+        }
+      }
+
+      int hierarchyHash = HashUtil.GetHierarchyHash(transform);
+      if (_previousHierarchyHash != hierarchyHash) {
+        _previousHierarchyHash = hierarchyHash;
+        needsRebuild = true;
+      }
     }
 
-    if (_renderer != null && _elements.Count != 0) {
-      using (new ProfilerSample("Update Renderer")) {
-        _renderer.OnUpdateRendererEditor();
+    if (_renderer != null && _space != null) {
+      if (needsRebuild) {
+        rebuildElementList();
+        rebuildFeatureData();
+        rebuildFeatureSupportInfo();
+
+        _space.BuildElementData(transform);
+
+        using (new ProfilerSample("Update Renderer")) {
+          _renderer.OnUpdateRendererEditor();
+        }
+
+        foreach (var feature in _features) {
+          feature.isDirty = false;
+        }
       }
+
+      _renderer.OnUpdateRenderer();
     }
   }
 #endif

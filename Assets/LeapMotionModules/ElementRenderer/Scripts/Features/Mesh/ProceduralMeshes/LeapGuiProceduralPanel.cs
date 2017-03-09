@@ -40,9 +40,12 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
       }
       return _sourceData;
     }
+#if UNITY_EDITOR
     set {
       _sourceData = value;
+      setSourceFeatureDirty();
     }
+#endif
   }
 
   public ResolutionType resolutionType {
@@ -69,6 +72,7 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
     }
     set {
       _nineSliced = value;
+      setSourceFeatureDirty();
     }
   }
 
@@ -98,6 +102,7 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
 
   private void Reset() {
     assignDefaultSourceValue();
+    setSourceFeatureDirty();
   }
 
   public void OnValidate() {
@@ -116,6 +121,8 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
       _resolution_vert_x = Mathf.RoundToInt(_resolution_verts_per_meter.x * rect.width);
       _resolution_vert_y = Mathf.RoundToInt(_resolution_verts_per_meter.y * rect.height);
     }
+
+    setSourceFeatureDirty();
   }
 
   public override bool TryGenerateMesh(LeapGuiMeshData meshFeature,
@@ -239,6 +246,15 @@ public class LeapGuiProceduralPanel : ProceduralMeshSource {
     var element = GetComponent<LeapGuiElement>();
     if (element != null) {
       _sourceData = element.data.Query().FirstOrDefault(IsValidDataSource);
+    }
+  }
+
+  private void setSourceFeatureDirty() {
+    if (_sourceData != null) {
+      var feature = _sourceData.feature;
+      if (feature != null) {
+        feature.isDirty = true;
+      }
     }
   }
 

@@ -71,9 +71,9 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
 
       using (new ProfilerSample("Upload Material Data")) {
         _material.SetFloat(LeapGuiRadialSpaceBase.RADIUS_PROPERTY, curvedSpace.radius);
-        _material.SetMatrixArray("_LeapGuiCurved_WorldToAnchor", _curved_worldToAnchor);
+        _material.SetMatrixArraySafe("_LeapGuiCurved_WorldToAnchor", _curved_worldToAnchor);
         _material.SetMatrix("_LeapGui_LocalToWorld", transform.localToWorldMatrix);
-        _material.SetVectorArray("_LeapGuiCurved_ElementParameters", _curved_elementParameters);
+        _material.SetVectorArraySafe("_LeapGuiCurved_ElementParameters", _curved_elementParameters);
       }
 
       using (new ProfilerSample("Draw Meshes")) {

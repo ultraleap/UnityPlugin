@@ -7,6 +7,14 @@ public abstract class LeapGuiRenderer : LeapGuiComponentBase<LeapGui> {
 
   public abstract SupportInfo GetSpaceSupportInfo(LeapGuiSpace space);
 
+  protected override void OnValidate() {
+    base.OnValidate();
+
+    if (gui != null) {
+      gui.ScheduleFullUpdate();
+    }
+  }
+
   /// <summary>
   /// Called when the leap gui is enabled at runtime.
   /// </summary>
