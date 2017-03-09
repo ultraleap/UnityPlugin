@@ -131,7 +131,9 @@ public class LeapGuiEditor : CustomEditorBase {
         GUI.color = BUTTON_COLOR;
       }
 
-      if (GUILayout.Button(i.ToString(), EditorStyles.toolbarButton, GUILayout.MaxWidth(60))) {
+      var group = _gui.groups[i];
+      string tag = LeapGuiTagAttribute.GetTag(group.renderer.GetType());
+      if (GUILayout.Button(tag, EditorStyles.toolbarButton, GUILayout.MaxWidth(60))) {
         _selectedGroup.intValue = i;
         CreateCachedEditor(_gui.groups[i], null, ref _groupEditor);
       }

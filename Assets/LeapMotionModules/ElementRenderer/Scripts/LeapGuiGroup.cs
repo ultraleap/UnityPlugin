@@ -11,6 +11,7 @@ using Leap.Unity.Query;
 
 public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
+  #region INSPECTOR FIELDS
   [SerializeField, HideInInspector]
   private LeapGui _gui;
 
@@ -28,6 +29,7 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
   [SerializeField, HideInInspector]
   private bool _addRemoveSupported;
+  #endregion
 
   #region PUBLIC RUNTIME API
 
@@ -144,7 +146,7 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   #endregion
 
   #region PUBLIC EDITOR API
-
+#if UNITY_EDITOR
   public void Init(LeapGui gui, Type rendererType) {
     AssertHelper.AssertEditorOnly();
     Assert.IsNotNull(gui);
@@ -170,14 +172,17 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   }
 
   public void RemoveFeature(LeapGuiFeatureBase feature) {
+    AssertHelper.AssertEditorOnly();
     Assert.IsTrue(_features.Contains(feature));
 
     _features.Remove(feature);
-    DestroyImmediate(feature);
+    InternalUtility.Destroy(feature);
     _gui.ScheduleEditorUpdate();
   }
 
   public void CollectUnattachedElements() {
+    AssertHelper.AssertEditorOnly();
+
     using (new ProfilerSample("Rebuild Element List")) {
       for (int i = _elements.Count; i-- != 0;) {
         var element = _elements[i];
@@ -203,6 +208,8 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   }
 
   public void RebuildFeatureData() {
+    AssertHelper.AssertEditorOnly();
+
     using (new ProfilerSample("Rebuild Feature Data")) {
       foreach (var feature in _features) {
         feature.ClearDataObjectReferences();
@@ -239,6 +246,8 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   }
 
   public void RebuildFeatureSupportInfo() {
+    AssertHelper.AssertEditorOnly();
+
     using (new ProfilerSample("Rebuild Support Info")) {
       var typeToFeatures = new Dictionary<Type, List<LeapGuiFeatureBase>>();
       foreach (var feature in _features) {
@@ -297,6 +306,8 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   }
 
   public void UpdateRendererEditor(bool heavyRebuild) {
+    AssertHelper.AssertEditorOnly();
+
     _renderer.OnUpdateRendererEditor(heavyRebuild);
 
     foreach (var feature in _features) {
@@ -305,6 +316,8 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   }
 
   public void RebuildEditorPickingMeshes() {
+    AssertHelper.AssertEditorOnly();
+
     if (gui.space == null) {
       return;
     }
@@ -315,6 +328,7 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
       }
     }
   }
+#endif
   #endregion
 
   #region UNITY CALLBACKS

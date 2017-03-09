@@ -65,14 +65,14 @@ public class LeapGuiElementEditor : CustomEditorBase {
       if (!elements.Query().All(e => e.attachedGroup == mainGroup)) {
         buttonText = "-";
       } else {
-        buttonText = mainGui.groups.IndexOf(mainGroup).ToString();
+        buttonText = LeapGuiTagAttribute.GetTag(mainGroup.renderer.GetType());
       }
 
       if (GUILayout.Button(buttonText, EditorStyles.miniButton, GUILayout.Width(60))) {
         GenericMenu groupMenu = new GenericMenu();
-        int index = 0;
         foreach (var group in mainGui.groups.Query().Where(g => g.renderer.IsValidElement(elements[0]))) {
-          groupMenu.AddItem(new GUIContent(index.ToString()), false, () => {
+          string tag = LeapGuiTagAttribute.GetTag(group.renderer.GetType());
+          groupMenu.AddItem(new GUIContent(tag), false, () => {
             foreach (var element in elements) {
               Undo.RecordObject(element, "Change element group");
               EditorUtility.SetDirty(element);
@@ -82,7 +82,6 @@ public class LeapGuiElementEditor : CustomEditorBase {
 
             mainGui.ScheduleEditorUpdate();
           });
-          index++;
         }
         groupMenu.ShowAsContext();
       }

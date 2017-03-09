@@ -69,8 +69,9 @@ public class LeapGui : MonoBehaviour {
       return _hasFinishedSetup;
     }
   }
+  #endregion
 
-  //Begin editor-only public api
+  #region PUBLIC EDITOR API
 #if UNITY_EDITOR
   public void CreateGroup(Type rendererType) {
     AssertHelper.AssertEditorOnly();
@@ -97,6 +98,8 @@ public class LeapGui : MonoBehaviour {
   }
 
   public void ScheduleEditorUpdate() {
+    AssertHelper.AssertEditorOnly();
+
     //Dirty the hash by changing it to something else
     _previousHierarchyHash++;
   }
@@ -121,6 +124,8 @@ public class LeapGui : MonoBehaviour {
   }
 
   public void RebuildEditorPickingMeshes() {
+    AssertHelper.AssertEditorOnly();
+
     if (_space == null) {
       return;
     }
@@ -129,7 +134,6 @@ public class LeapGui : MonoBehaviour {
       group.RebuildEditorPickingMeshes();
     }
   }
-
 #endif
   #endregion
 
