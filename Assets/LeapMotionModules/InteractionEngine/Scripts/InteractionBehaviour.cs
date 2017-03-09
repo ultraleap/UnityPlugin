@@ -214,13 +214,12 @@ namespace Leap.Unity.Interaction {
       base.OnPreSolve();
       _recievedVelocityUpdate = false;
 
-#if UNITY_EDITOR
       if (_contactMode == ContactMode.GRASPED && UntrackedHandCount == 0 &&
-          //Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale ||
+          _solvedPosition != Vector3.zero &&
+          Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale ||
           Quaternion.Angle(_solvedRotation, _warper.RigidbodyRotation) > _material.ReleaseAngle) {
         _manager.ReleaseObject(this);
       }
-#endif
     }
 
     protected override void OnPostSolve() {
@@ -312,6 +311,7 @@ namespace Leap.Unity.Interaction {
       base.OnHandReleased(hand);
 
       _controllers.HoldingPoseController.RemoveHand(hand);
+      _solvedPosition = Vector3.zero;
     }
 
     protected override void OnHandLostTracking(Hand oldHand, out float maxSuspensionTime) {

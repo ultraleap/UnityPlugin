@@ -264,7 +264,7 @@ namespace Leap.Unity.Interaction {
                 } else {
                   Vector3 objectLocalBoneCenter = col.transform.InverseTransformPoint(boneCenter);
                   Vector3 objectPoint = col.transform.TransformPoint(col.ClosestPointOnSurface(objectLocalBoneCenter));
-                  contact.normal = (objectPoint - boneCenter).normalized * (col.IsInsideCollider(objectLocalBoneCenter) ? -1f : 1f);
+                  contact.normal = (objectPoint - boneCenter).normalized * (col.IsPointInside(objectLocalBoneCenter) ? -1f : 1f);
                 }
                 contact.position = boneCenter + (contact.normal * softContactBoneRadius);
                 contact.velocity = (boneCenter - previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime;
@@ -353,7 +353,7 @@ namespace Leap.Unity.Interaction {
           delta *= (deltaLen - deadzone) / deltaLen;
           brushBone.lastTarget = body.position + delta;
           delta /= Time.fixedDeltaTime;
-          body.velocity = (delta / delta.magnitude) * Mathf.Clamp(delta.magnitude, 0f, 3f);
+          body.velocity = (delta / delta.magnitude) * Mathf.Clamp(delta.magnitude, 0f, 7f);
         }
       }
     }

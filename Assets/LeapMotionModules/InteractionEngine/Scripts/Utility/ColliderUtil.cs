@@ -31,7 +31,7 @@ public static class ColliderUtil {
   /// Given a collider and a position relative to the colliders transform, return whether or not the 
   /// position lies within the collider.  Can also optionally extrude the collider.
   /// </summary>
-  public static bool IsInsideCollider(this Collider collider, Vector3 localPosition, float extrude = 0.0f) {
+  public static bool IsPointInside(this Collider collider, Vector3 localPosition, float extrude = 0.0f) {
     if (collider is SphereCollider) return (collider as SphereCollider).IsPointInside(localPosition, extrude);
     if (collider is BoxCollider) return (collider as BoxCollider).IsPointInside(localPosition, extrude);
     if (collider is CapsuleCollider) return (collider as CapsuleCollider).IsPointInside(localPosition, extrude);
@@ -57,11 +57,11 @@ public static class ColliderUtil {
   /// Given a list of colliders and a position in global space, return whether or not the position lies
   /// within any of the colliders.  Can also optionally extrude the collider.
   /// </summary>
-  public static bool IsInsideColliders(List<Collider> colliders, Vector3 globalPosition, float extrude = 0.0f) {
+  public static bool IsPointInside(List<Collider> colliders, Vector3 globalPosition, float extrude = 0.0f) {
     for (int i = 0; i < colliders.Count; i++) {
       Collider collider = colliders[i];
       Vector3 localPosition = collider.transform.InverseTransformPoint(globalPosition);
-      if (collider.IsInsideCollider(localPosition, extrude)) {
+      if (collider.IsPointInside(localPosition, extrude)) {
         return true;
       }
     }
