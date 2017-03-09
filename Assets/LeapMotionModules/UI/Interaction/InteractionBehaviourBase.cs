@@ -27,8 +27,9 @@ namespace Leap.Unity.UI.Interaction {
     public bool ignoreContact = false; // TODO: Contact NYI.
     [DisableIf("_interactionManagerIsNull", isEqualTo: true)]
     public bool ignoreGrasping = false;
+    /// <summary> Can this object be grasped with two or more hands? </summary>
     [DisableIf("_interactionManagerIsNull", isEqualTo: true)]
-    public bool allowsTwoHandedGrasp__curIgnored = false;
+    public bool allowMultiGrasp = false;
 
     /// <summary>
     /// Called by the InteractionManager every FixedUpdate, after
@@ -108,7 +109,7 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Grasping
 
-    public abstract bool IsGrasped { get; }
+    public abstract bool isGrasped { get; }
 
     public abstract void GraspBegin(Hand hand);
 

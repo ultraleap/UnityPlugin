@@ -5,16 +5,16 @@ using UnityEngine;
 namespace Leap.Unity.UI.Interaction {
 
   /// <summary>
-  /// IHoldingPoseController specifies where an object grasped by a hand (or
+  /// IGraspedPoseController specifies where an object grasped by a hand (or
   /// multiple hands) should move as the grasping hand(s) move. The most common
-  /// implementation is the KabschHoldBehaviour, which produces a physically
+  /// implementation is the KabschGraspedPose, which produces a physically
   /// intuitive following motion for the object no matter how the hand moves.
   /// 
-  /// IHoldingPoseControllers do not actually move the object; they only calculate
+  /// IGraspedPoseControllers do not actually move the object; they only calculate
   /// where the object should be moved. Actually moving the object is the concern
-  /// of an IHoldingMovementController.
+  /// of the IGraspedMovementController.
   /// </summary>
-  public interface IGraspedPositionController {
+  public interface IGraspedPoseController {
 
     /// <summary>
     /// Called when a new InteractionHand begins grasping a certain object.
@@ -29,7 +29,7 @@ namespace Leap.Unity.UI.Interaction {
     void RemoveHand(InteractionHand hand);
 
     /// <summary>
-    /// Called if an InteractionBehaviour is set not to move while being grasped;
+    /// Called e.g. if the InteractionBehaviour is set not to move while being grasped;
     /// this should clear any hands to be included in the grasping position calculation.
     /// </summary>
     void ClearHands();

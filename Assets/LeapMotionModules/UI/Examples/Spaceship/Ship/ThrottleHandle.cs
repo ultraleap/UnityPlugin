@@ -1,4 +1,5 @@
-﻿using Leap.Unity.UI.Interaction;
+﻿using Leap.Unity.UI.Constraints;
+using Leap.Unity.UI.Interaction;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,7 +34,6 @@ namespace Leap.Unity.UI.Examples {
       _interactionObj.OnObjectContactEnd   += OnObjectContactEnd;
       //_interactionObj.OnGraspBegin         += OnGraspBegin;
       //_interactionObj.OnGraspEnd           += OnGraspEnd;
-      _interactionObj.OnPreGraspedMovement += OnPreGraspedMovement;
       _interactionObj.OnGraspedMovement    += OnGraspedMovement;
     }
 
@@ -53,12 +53,7 @@ namespace Leap.Unity.UI.Examples {
     //  _beingHeld = false;
     //}
 
-    Quaternion _origRot;
-    private void OnPreGraspedMovement(Vector3 pos, Quaternion rot, Hand hand) {
-      _origRot = rot;
-    }
-
-    private void OnGraspedMovement(Vector3 newPos, Quaternion newRot, Hand hand) {
+    private void OnGraspedMovement(Vector3 origPos, Quaternion origRot, Vector3 newPos, Quaternion newRot, Hand hand) {
       Vector3 handlePos = ConstraintsUtil.ConstrainToLineSegment(newPos,
         this.transform.parent.TransformPoint(_localThrottleStartPos),
         this.transform.parent.TransformPoint(_localThrottleEndPos),
@@ -69,8 +64,8 @@ namespace Leap.Unity.UI.Examples {
       this.transform.position = handlePos;
       _interactionObj.Rigidbody.position = handlePos;
 
-      this.transform.rotation = _origRot;
-      _interactionObj.Rigidbody.rotation = _origRot;
+      this.transform.rotation = origRot;
+      _interactionObj.Rigidbody.rotation = origRot;
     }
 
     void Update() {

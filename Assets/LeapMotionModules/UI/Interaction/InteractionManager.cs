@@ -176,8 +176,13 @@ namespace Leap.Unity.UI.Interaction {
 
     #endregion
 
-    public InteractionHand GetInteractionHand(Chirality whichHand) {
-      if (whichHand == Chirality.Left) {
+    /// <summary>
+    /// Returns the InteractionHand object that corresponds to the given Hand object.
+    /// 
+    /// Currently, the InteractionManager supports only two InteractionHands at one time: one player's left and right hands.
+    /// </summary>
+    public InteractionHand GetInteractionHand(Hand hand) {
+      if (hand.Handedness() == Chirality.Left) {
         return _interactionHands[0];
       }
       else {

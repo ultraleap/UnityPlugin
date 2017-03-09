@@ -16,7 +16,7 @@ public class TranslationHandle : TransformHandle {
 
     _interactionObj = GetComponent<InteractionBehaviour>();
     _interactionObj.OnGraspBegin          += OnGraspBegin;
-    _interactionObj.OnGraspedMovement += OnPostHoldingMovement;
+    _interactionObj.OnGraspedMovement += OnGraspedMovement;
 
     InitializeAxisAndOrientation();
   }
@@ -31,7 +31,7 @@ public class TranslationHandle : TransformHandle {
     InitializeAxisAndOrientation();
   }
 
-  private void OnPostHoldingMovement(Vector3 solvedPos, Quaternion solvedRot, Hand hand) {
+  private void OnGraspedMovement(Vector3 preSolvedPos, Quaternion preSolvedRot, Vector3 solvedPos, Quaternion solvedRot, Hand hand) {
     // Don't actually move the InteractionBehaviour, but calculate where it WOULD have moved.
     _interactionObj.Rigidbody.rotation = _initRotation;
     _interactionObj.Rigidbody.position = _initPosition;

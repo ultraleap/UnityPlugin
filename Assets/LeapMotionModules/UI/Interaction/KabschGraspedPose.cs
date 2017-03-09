@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
-  public class KabschGraspedPosition : IGraspedPositionController {
+  public class KabschGraspedPose : IGraspedPoseController {
     public const int NUM_FINGERS = 5;
     public const int NUM_BONES = 4;
 
@@ -27,7 +27,7 @@ namespace Leap.Unity.UI.Interaction {
 
     private Dictionary<InteractionHand, HandPointCollection> _handToPoints;
 
-    public KabschGraspedPosition(InteractionBehaviour interactionObj) {
+    public KabschGraspedPose(InteractionBehaviour interactionObj) {
       _interactionObj = interactionObj;
       // TODO: If an InteractionBehaviour is required for this anyway, why isn't that a part of the IHoldPositionBehaviour interface...
 

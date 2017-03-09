@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.UI.Constraints {
 
   public static class ConstraintsUtil {
 

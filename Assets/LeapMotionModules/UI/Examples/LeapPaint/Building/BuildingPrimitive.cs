@@ -58,7 +58,6 @@ namespace Leap.Unity.LeapPaint {
       _intObj.OnGraspBegin += OnGraspBegin;
       _intObj.OnGraspEnd   += OnGraspEnd;
 
-      _intObj.OnPreGraspedMovement += PreGraspedMovement;
       _intObj.OnGraspedMovement    += SmoothGraspedMovement;
 
       //_intObj.OnMultiGraspBegin;
@@ -84,23 +83,15 @@ namespace Leap.Unity.LeapPaint {
       }
     }
 
-    private Vector3    _preSolvedPos;
-    private Quaternion _preSolvedRot;
-
-    private void PreGraspedMovement(Vector3 preSolvedPos, Quaternion preSolvedRot, Hand _) {
-      _preSolvedPos = preSolvedPos;
-      _preSolvedRot = preSolvedRot;
-    }
-
-    private void SmoothGraspedMovement(Vector3 solvedPos, Quaternion solvedRot, Hand _) {
+    private void SmoothGraspedMovement(Vector3 preSolvedPos, Quaternion preSolvedRot, Vector3 solvedPos, Quaternion solvedRot, Hand _) {
       // This speed-based (s)lerping allows more precise placement of objects
       // when the desired adjustment of the object's position/rotation is small.
 
-      float lerpCoeffPerSec = Vector3.Distance(_preSolvedPos, solvedPos).Map(0F, 0.2F, 0.01F, 100F);
-      float slerpCoeffPerSec = Quaternion.Angle(_preSolvedRot, solvedRot).Map(0F, 50F, 0.01F, 100F);
+      float lerpCoeffPerSec = Vector3.Distance(preSolvedPos, solvedPos).Map(0F, 0.2F, 0.01F, 100F);
+      float slerpCoeffPerSec = Quaternion.Angle(preSolvedRot, solvedRot).Map(0F, 50F, 0.01F, 100F);
 
-      _intObj.Rigidbody.position = Vector3.Lerp    (_preSolvedPos, solvedPos, lerpCoeffPerSec * Time.deltaTime);
-      _intObj.Rigidbody.rotation = Quaternion.Slerp(_preSolvedRot, solvedRot, slerpCoeffPerSec * Time.deltaTime);
+      _intObj.Rigidbody.position = Vector3.Lerp    (preSolvedPos, solvedPos, lerpCoeffPerSec * Time.deltaTime);
+      _intObj.Rigidbody.rotation = Quaternion.Slerp(preSolvedRot, solvedRot, slerpCoeffPerSec * Time.deltaTime);
     }
 
     #endregion

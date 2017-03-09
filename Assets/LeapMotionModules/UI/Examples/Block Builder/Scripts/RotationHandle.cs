@@ -17,8 +17,7 @@ public class RotationHandle : TransformHandle {
     _interactionObj = GetComponent<InteractionBehaviour>();
 
     _interactionObj.OnGraspBegin += OnGraspBegin;
-    _interactionObj.OnPreGraspedMovement += OnPreHoldingMovement;
-    _interactionObj.OnGraspedMovement += OnPostHoldingMovement;
+    _interactionObj.OnGraspedMovement += OnGraspedMovement;
     _interactionObj.OnGraspEnd += OnGraspEnd;
   }
 
@@ -26,18 +25,14 @@ public class RotationHandle : TransformHandle {
     RememberToolOffsets();
   }
 
-  private Vector3 _preMoveDirToBody;
-  private void OnPreHoldingMovement(Vector3 preSolvePos, Quaternion preSolveRot, Hand hand) {
-    _preMoveDirToBody = Vector3.ProjectOnPlane((preSolvePos - _tool.transform.position), Body.rotation * Vector3.up).normalized;
-  }
-
-  private void OnPostHoldingMovement(Vector3 solvedPos, Quaternion solvedRot, Hand hand) {
+  private void OnGraspedMovement(Vector3 preSolvedPos, Quaternion preSolvedRot, Vector3 solvedPos, Quaternion solvedRot, Hand hand) {
     Vector3 dirToBody = Vector3.ProjectOnPlane((solvedPos - _tool.transform.position), Body.rotation * Vector3.up).normalized;
     Body.position = _tool.transform.position + dirToBody * _distanceFromTool;
     Body.rotation = Quaternion.LookRotation(dirToBody, Body.rotation * Vector3.up);
 
-    float angle = Vector3.Angle(_preMoveDirToBody, dirToBody);
-    Vector3 axis = Vector3.Cross(_preMoveDirToBody, dirToBody).normalized;
+    Vector3 preMoveDirToBody = Vector3.ProjectOnPlane((preSolvedPos - _tool.transform.position), Body.rotation * Vector3.up).normalized;
+    float angle = Vector3.Angle(preMoveDirToBody, dirToBody);
+    Vector3 axis = Vector3.Cross(preMoveDirToBody, dirToBody).normalized;
     Quaternion toolRotation = Quaternion.AngleAxis(angle, axis);
     _tool.MoveTargetRotation(toolRotation);
   }

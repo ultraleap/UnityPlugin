@@ -12,7 +12,7 @@ namespace Leap.Unity.UI.Interaction {
     //                                                                  new Keyframe(0.02f, 0.3f, 0.0f, 0.0f));
 
     public void MoveTo(Vector3 solvedPosition, Quaternion solvedRotation,
-                       InteractionBehaviour interactionObj) {
+                       InteractionBehaviourBase interactionObj) {
       Vector3 targetVelocity = PhysicsUtility.ToLinearVelocity(
         interactionObj.Rigidbody.position, solvedPosition, Time.fixedDeltaTime);
       Vector3 targetAngularVelocity = PhysicsUtility.ToAngularVelocity(

@@ -27,21 +27,10 @@ namespace Leap.Unity.UI.Examples {
     //private Quaternion _restRightHandleLocalRotation;
 
     void Start() {
-      leftHandle.OnGraspedMovement += OnLeftHandlePostGraspedMovement;
-      rightHandle.OnGraspedMovement += OnRightHandlePostGraspedMovement;
-
       _baseYokeHeight = GetYokeHeadHeightFromBase();
 
       _restLeftHandleLocalPosition = leftHandle.transform.localPosition;
       _restRightHandleLocalPosition = rightHandle.transform.localPosition;
-    }
-
-    private void OnLeftHandlePostGraspedMovement(Vector3 newPos, Quaternion newRot, Hand hand) {
-      //CorrectHandleRotation(leftHandle);
-    }
-
-    private void OnRightHandlePostGraspedMovement(Vector3 newPos, Quaternion newRot, Hand hand) {
-      //CorrectHandleRotation(rightHandle);
     }
 
     private void CorrectHandleRotation(InteractionBehaviour handle) {
@@ -92,10 +81,10 @@ namespace Leap.Unity.UI.Examples {
     }
 
     void FixedUpdate() {
-      if (!leftHandle.IsGrasped)  CorrectHandleRotation(leftHandle);
-      if (!rightHandle.IsGrasped) CorrectHandleRotation(rightHandle);
+      if (!leftHandle.isGrasped)  CorrectHandleRotation(leftHandle);
+      if (!rightHandle.isGrasped) CorrectHandleRotation(rightHandle);
 
-      if (!leftHandle.IsGrasped && !rightHandle.IsGrasped) {
+      if (!leftHandle.isGrasped && !rightHandle.isGrasped) {
         float positionLerp = 10F * Time.fixedDeltaTime;
 
         Vector3 leftHandleTargetPosition = this.transform.TransformPoint(_restLeftHandleLocalPosition);

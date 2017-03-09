@@ -51,23 +51,34 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Grasping API
 
-    public Action<Hand>                      OnGraspBegin             = (hand) => { };
-    public Action<Vector3, Quaternion, Hand> OnPreGraspedMovement     = (preSolvePos, preSolveRot, hand) => { };
-    public Action<Vector3, Quaternion, Hand> OnGraspedMovement        = (solvedPos, solvedRot, hand) => { };
-    public Action<Hand>                      OnGraspHold              = (hand) => { };
-    public Action<Hand>                      OnGraspEnd               = (hand) => { };
+    /// <summary> Called directly after the grasped object's Rigidbody has had its position and rotation set
+    /// by the GraspedPoseController (which moves the object realistically with the hand). Subscribe to this
+    /// callback if you'd like to override the default behaviour for grasping. 
+    /// 
+    /// Use InteractionBehaviour.Rigidbody.position InteractionBehaviour.Rigidbody.rotation to modify the
+    /// object's position and rotation from the solved position. Setting the object's Transform position and
+    /// rotation is not recommended unless you know what you're doing. </summary>
+    public Action<Vector3, Quaternion, Vector3, Quaternion, Hand> OnGraspedMovement
+      = (preSolvedPos, preSolvedRot, solvedPos, solvedRot, hand) => { };
+
+    /// <summary> Called when any hand grasps this interaction object, even if the object is already held by another hand. </summary>
+    public Action<Hand> OnGraspBegin = (hand) => { };
+    public Action<Hand> OnGraspHold  = (hand) => { };
+    public Action<Hand> OnGraspEnd   = (hand) => { };
 
     // TODO: Implement!
-    // also document here
-    public Action      OnObjectGraspBegin = () => { };
-    public Action      OnObjectGraspHold  = () => { };
-    public Action      OnObjectGraspEnd   = () => { };
+    /// <summary> Called when the object is grasped by a hand. If multi-handed grasping is disabled, will fire End and Begin
+    /// if the object is grasped by a different hand, released by the first. If multi-handed grasping is enabled, Begin will
+    /// fire only once on the first grasp, and End will only fire once there are no more hands grasping the object. </summary>
+    public Action OnObjectGraspBegin = () => { };
+    public Action OnObjectGraspHold  = () => { };
+    public Action OnObjectGraspEnd   = () => { };
 
-    public Action<List<Hand>>                      OnMultiGraspBegin          = (hands) => { };
-    public Action<List<Hand>>                      OnMultiGraspHold           = (hands) => { };
-    public Action<Vector3, Quaternion, List<Hand>> OnPreMultiGraspedMovement  = (preSolvedPos, preSolvedRot, hands) => { };
-    public Action<Vector3, Quaternion, List<Hand>> OnMultiGraspedMovement     = (solvedPos, solvedRot, hands) => { };
-    public Action<List<Hand>>                      OnMultiGraspEnd            = (hands) => { };
+    /// <summary> Called when the number of objects grasping this object exceeds 1. This can only occur if multi-grasp is
+    /// enabled for this object. End will be called when the number of hands grasping the object becomes 1 or fewer. </summary>
+    public Action<List<Hand>> OnMultiGraspBegin = (hands) => { };
+    public Action<List<Hand>> OnMultiGraspHold  = (hands) => { };
+    public Action<List<Hand>> OnMultiGraspEnd   = (hands) => { };
 
     #endregion
 
@@ -144,8 +155,10 @@ namespace Leap.Unity.UI.Interaction {
     /// hover callbacks, e.g. OnObjectHoverStay(), which fires once per frame
     /// while the object is hovered by any number of hands greater than zero.
     /// 
-    /// Grasping uses its update to support changing moveObjectWhenGrasping at
-    /// runtime.
+    /// Grasping uses its update to provide per-object (as opposed to per-hand)
+    /// grasp callbacks, e.g. OnObjectGraspBegin(), similarly. It will also
+    /// fire multi-grasp callbacks, e.g. OnMultiGraspBegin(), but only if
+    /// multiHandGrasping is enabled.
     /// </summary>
     public override void FixedUpdateObject() {
       FixedUpdateHovering();
@@ -381,14 +394,14 @@ namespace Leap.Unity.UI.Interaction {
     #region Grasping
 
     private int _graspCount = 0;
-    private bool _moveObjectWhenGraspedEnabledLastFrame;
+    private bool _moveObjectWhenGrasped__WasEnabledLastFrame;
     private bool _wasKinematicBeforeGrab;
 
-    private IGraspedPositionController _graspedPositionController;
-    private IGraspedPositionController GraspedPositionController {
+    private IGraspedPoseController _graspedPositionController;
+    private IGraspedPoseController GraspedPoseController {
       get {
         if (_graspedPositionController == null) {
-          _graspedPositionController = new KabschGraspedPosition(this);
+          _graspedPositionController = new KabschGraspedPose(this);
         }
         return _graspedPositionController;
       }
@@ -401,51 +414,86 @@ namespace Leap.Unity.UI.Interaction {
     private NonKinematicGraspedMovement _nonKinematicHoldingMovement;
 
     private void InitGrasping() {
-      _moveObjectWhenGraspedEnabledLastFrame = moveObjectWhenGrasped;
+      _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
 
       _kinematicHoldingMovement = new KinematicGraspedMovement();
       _nonKinematicHoldingMovement = new NonKinematicGraspedMovement();
     }
 
+    private int _graspCountLastFrame = 0;
+    private List<Hand> _graspingHandsCache = new List<Hand>(4);
+    private List<Hand> _lastFrameGraspingHandsCache = new List<Hand>(4); // for OnMultiGraspEnd
+
     private void FixedUpdateGrasping() {
-      if (!moveObjectWhenGrasped && _moveObjectWhenGraspedEnabledLastFrame) {
-        GraspedPositionController.ClearHands();
+      if (!moveObjectWhenGrasped && _moveObjectWhenGrasped__WasEnabledLastFrame) {
+        GraspedPoseController.ClearHands();
+      }
+      _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
+
+      if (_graspCount > 0) {
+        if (_graspCountLastFrame == 0) {
+          OnObjectGraspBegin();
+        }
+        else {
+          OnObjectGraspHold();
+        }
+
+        if (_graspCount > 1) {
+          if (_graspCountLastFrame <= 1) {
+            OnMultiGraspBegin(_graspingHandsCache);
+          }
+          else {
+            OnMultiGraspHold(_graspingHandsCache);
+          }
+        }
+      }
+      if (_graspCount == 0) {
+        if (_graspCountLastFrame > 0) {
+          OnObjectGraspEnd();
+        }
+      }
+      if (_graspCount <= 1) {
+        if (_graspCountLastFrame > 1) {
+          OnMultiGraspEnd(_lastFrameGraspingHandsCache);
+        }
       }
 
-      _moveObjectWhenGraspedEnabledLastFrame = moveObjectWhenGrasped;
+      _graspCountLastFrame = _graspCount;
+      _lastFrameGraspingHandsCache.Clear();
+      foreach (var hand in _graspingHandsCache) {
+        _lastFrameGraspingHandsCache.Add(hand);
+
+      }
+      _graspingHandsCache.Clear();
     }
 
-    public override bool IsGrasped {
+    public override bool isGrasped {
       get { return _graspCount > 0; }
     }
 
     public override void GraspBegin(Hand hand) {
-      if (IsGrasped && !allowsTwoHandedGrasp__curIgnored) {
+      if (isGrasped && !allowMultiGrasp) {
         interactionManager.ReleaseObjectFromGrasp(this);
       }
+      _graspingHandsCache.Add(hand);
       _graspCount++;
-
-      // TODO: Make two-handed grasping a thing.
-      if (_graspCount > 1) {
-        Debug.LogWarning("Two-handed grasping is not yet supported!"
-          + "This warning ever appearing is indicative of a bug because the lack of support means "
-          + "that _graspCount should NEVER become larger than 1.");
-      }
       
       // Set kinematic state based on grasping hold movement type
-      _wasKinematicBeforeGrab = Rigidbody.isKinematic;
-      switch (graspedMovementType) {
-        case GraspedMovementType.Inherit: break; // no change
-        case GraspedMovementType.Kinematic:
-          Rigidbody.isKinematic = true; break;
-        case GraspedMovementType.Nonkinematic:
-          Rigidbody.isKinematic = false; break;
+      if (_graspCount == 1) {
+        _wasKinematicBeforeGrab = Rigidbody.isKinematic;
+        switch (graspedMovementType) {
+          case GraspedMovementType.Inherit: break; // no change
+          case GraspedMovementType.Kinematic:
+            Rigidbody.isKinematic = true; break;
+          case GraspedMovementType.Nonkinematic:
+            Rigidbody.isKinematic = false; break;
+        }
       }
 
       // SnapToHand(hand); // TODO: When you grasp an object, snap the object into a good holding position.
 
       if (moveObjectWhenGrasped) {
-        GraspedPositionController.AddHand(interactionManager.GetInteractionHand(hand.Handedness()));
+        GraspedPoseController.AddHand(interactionManager.GetInteractionHand(hand));
       }
 
       OnGraspBegin(hand);
@@ -453,22 +501,19 @@ namespace Leap.Unity.UI.Interaction {
 
     public override void GraspHold(Hand hand) {
       if (moveObjectWhenGrasped) {
-        OnPreGraspedMovement(Rigidbody.position, Rigidbody.rotation, hand);
-
+        Vector3 origPosition = Rigidbody.position; Quaternion origRotation = Rigidbody.rotation;
         Vector3 newPosition; Quaternion newRotation;
-        GraspedPositionController.GetGraspedPosition(out newPosition, out newRotation);
+        GraspedPoseController.GetGraspedPosition(out newPosition, out newRotation);
 
-        IGraspedMovementController holdingMovementController;
-        if (Rigidbody.isKinematic) {
-          holdingMovementController = _kinematicHoldingMovement;
-        }
-        else {
-          holdingMovementController = _nonKinematicHoldingMovement;
-        }
+        IGraspedMovementController holdingMovementController = Rigidbody.isKinematic ?
+                                                                 (IGraspedMovementController)_kinematicHoldingMovement
+                                                               : (IGraspedMovementController)_nonKinematicHoldingMovement;
         holdingMovementController.MoveTo(newPosition, newRotation, this);
 
-        OnGraspedMovement(newPosition, newRotation, hand);
+        OnGraspedMovement(origPosition, origRotation, newPosition, newRotation, hand);
       }
+
+      _graspingHandsCache.Add(hand);
 
       OnGraspHold(hand);
     }
@@ -476,11 +521,13 @@ namespace Leap.Unity.UI.Interaction {
     public override void GraspEnd(Hand hand) {
       _graspCount--;
 
-      // Revert kinematic state
-      Rigidbody.isKinematic = _wasKinematicBeforeGrab;
+      // Revert kinematic state if the grasp has ended
+      if (_graspCount == 0) {
+        Rigidbody.isKinematic = _wasKinematicBeforeGrab;
+      }
 
       if (moveObjectWhenGrasped) {
-        GraspedPositionController.RemoveHand(interactionManager.GetInteractionHand(hand.Handedness()));
+        GraspedPoseController.RemoveHand(interactionManager.GetInteractionHand(hand));
       }
 
       OnGraspEnd(hand);
@@ -583,7 +630,7 @@ namespace Leap.Unity.UI.Interaction {
 
     protected void FixedUpdateCollisionMode() {
       CollisionMode desiredCollisionMode = CollisionMode.Normal;
-      if (IsGrasped) {
+      if (isGrasped) {
         desiredCollisionMode = CollisionMode.Grasped;
       }
       //else if (_dislocatedBrushCounter < DISLOCATED_BRUSH_COOLDOWN || (_CollisionMode != CollisionMode.Normal && _minHandDistance <= 0.0f)) {
@@ -595,7 +642,7 @@ namespace Leap.Unity.UI.Interaction {
         FixedUpdateLayer();
       }
 
-      Assert.IsTrue((_collisionMode == CollisionMode.Grasped) == IsGrasped);
+      Assert.IsTrue((_collisionMode == CollisionMode.Grasped) == isGrasped);
     }
 
     protected void FixedUpdateLayer() {
