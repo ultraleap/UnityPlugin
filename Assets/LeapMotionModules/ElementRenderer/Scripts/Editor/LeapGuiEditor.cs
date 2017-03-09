@@ -6,16 +6,116 @@ using Leap.Unity;
 using Leap.Unity.Query;
 
 [CustomEditor(typeof(LeapGui))]
-public class LeapGuiEditor : CustomEditorBase {
-  /*
+public class LeapGuiEditor : Editor {
   private const int BUTTON_WIDTH = 30;
+  private static Color BUTTON_COLOR = Color.white * 0.95f;
 
   private LeapGui gui;
-  private ReorderableList _featureList;
-  private GenericMenu _addFeatureMenu;
 
   private GenericMenu _addSpaceMenu;
   private Editor _spaceEditor;
+
+  private GenericMenu _addGroupMenu;
+  private Editor _groupEditor;
+
+  private void OnEnable() {
+    if (target == null) {
+      return;
+    }
+
+    gui = target as LeapGui;
+
+    var allTypes = Assembly.GetAssembly(typeof(LeapGui)).GetTypes();
+
+    var allFeatures = allTypes.Query().
+                               Where(t => !t.IsAbstract).
+                               Where(t => !t.IsGenericType).
+                               Where(t => t.IsSubclassOf(typeof(LeapGuiFeatureBase)));
+
+    var allSpaces = allTypes.Query().
+                             Where(t => !t.IsAbstract).
+                             Where(t => !t.IsGenericType).
+                             Where(t => t.IsSubclassOf(typeof(LeapGuiSpace)));
+
+    _addSpaceMenu = new GenericMenu();
+    foreach (var space in allSpaces) {
+      _addSpaceMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(space)),
+                            false,
+                            () => {
+                              gui.SetSpace(space);
+                              CreateCachedEditor(gui.space, null, ref _spaceEditor);
+                              serializedObject.Update();
+                            });
+    }
+
+    var allRenderers = allTypes.Query().
+                                Where(t => !t.IsAbstract).
+                                Where(t => !t.IsGenericType).
+                                Where(t => t.IsSubclassOf(typeof(LeapGuiRendererBase)));
+
+    _addGroupMenu = new GenericMenu();
+    foreach (var renderer in allRenderers) {
+      _addGroupMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(renderer)),
+                            false,
+                            () => {
+                              //target.SetRenderer(renderer);
+                              //CreateCachedEditor(gui.GetComponent<Renderer>(), null, ref _rendererEditor);
+                              //serializedObject.Update();
+                            });
+    }
+
+    if (gui.space != null) {
+      CreateCachedEditor(gui.space, null, ref _spaceEditor);
+    }
+  }
+
+  public override void OnInspectorGUI() {
+    base.OnInspectorGUI();
+
+    //TODO: script header
+
+    if (_spaceEditor != null) {
+      _spaceEditor.OnInspectorGUI();
+    }
+
+    drawGroupHeader();
+
+    if (_groupEditor != null) {
+      _groupEditor.OnInspectorGUI();
+    }
+  }
+
+  private void drawGroupHeader() {
+    EditorGUILayout.BeginHorizontal();
+
+    GUI.color = BUTTON_COLOR;
+    for (int i = 0; i < gui.groups.Count; i++) {
+      if (GUILayout.Button(i.ToString(), EditorStyles.toolbarButton, GUILayout.MaxWidth(100))) {
+        //serializedObject.FindProperty("_selectedGroup").intValue = i;
+        //CreateCachedEditor(gui.groups[i], null, ref _groupEditor);
+      }
+    }
+    GUI.color = Color.white;
+
+    GUILayout.FlexibleSpace();
+    Rect rect = GUILayoutUtility.GetLastRect();
+    GUI.Label(rect, "", EditorStyles.toolbar);
+
+    GUI.color = BUTTON_COLOR;
+    if (GUILayout.Button("Create", EditorStyles.toolbarDropDown, GUILayout.MaxWidth(100))) {
+      //Create!
+    }
+    GUI.color = Color.white;
+
+    EditorGUILayout.EndHorizontal();
+  }
+
+
+
+  /*
+  
+  private ReorderableList _featureList;
+  private GenericMenu _addFeatureMenu;
 
   private GenericMenu _addRendererMenu;
   private Editor _rendererEditor;

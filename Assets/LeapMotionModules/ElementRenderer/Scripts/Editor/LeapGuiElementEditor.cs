@@ -16,7 +16,7 @@ public class DefaultFeatureDataEditor : CustomEditorBase {
 [CanEditMultipleObjects]
 [CustomEditor(typeof(LeapGuiElement))]
 public class LeapGuiElementEditor : Editor {
-
+  /*
   List<LeapGuiElement> elements = new List<LeapGuiElement>();
   List<Editor> editorCache = new List<Editor>();
 
@@ -119,4 +119,5 @@ public class LeapGuiElementEditor : Editor {
     }
     return bounds;
   }
+  */
 }

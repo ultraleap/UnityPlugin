@@ -42,8 +42,8 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
 
     if (gui.space is LeapGuiRectSpace) {
       using (new ProfilerSample("Draw Meshes")) {
-        for (int i = 0; i < gui.elements.Count; i++) {
-          Graphics.DrawMesh(_meshes[i], gui.elements[i].transform.localToWorldMatrix, _material, 0);
+        for (int i = 0; i < group.elements.Count; i++) {
+          Graphics.DrawMesh(_meshes[i], group.elements[i].transform.localToWorldMatrix, _material, 0);
         }
       }
     } else if (gui.space is LeapGuiRadialSpaceBase) {
@@ -54,7 +54,7 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
         _curved_meshTransforms.Clear();
         _curved_elementParameters.Clear();
         for (int i = 0; i < _meshes.Count; i++) {
-          var element = gui.elements[i];
+          var element = group.elements[i];
           var transformer = curvedSpace.GetTransformer(element.anchor);
 
           Vector3 guiLocalPos = gui.transform.InverseTransformPoint(element.transform.position);

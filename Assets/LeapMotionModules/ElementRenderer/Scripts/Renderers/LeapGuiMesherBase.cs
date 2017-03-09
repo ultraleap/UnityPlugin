@@ -346,7 +346,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
       }
 
       foreach (var spriteFeature in _spriteFeatures) {
-        var rects = new Rect[gui.elements.Count];
+        var rects = new Rect[group.elements.Count];
         _packedRects[spriteFeature.channel.Index()] = rects;
 
         for (int i = 0; i < spriteFeature.data.Count; i++) {
@@ -409,7 +409,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
   protected virtual void buildMesh() {
     using (new ProfilerSample("Build Mesh")) {
       beginMesh();
-      for (_currIndex = 0; _currIndex < gui.elements.Count; _currIndex++) {
+      for (_currIndex = 0; _currIndex < group.elements.Count; _currIndex++) {
         _currElement = group.elements[_currIndex] as LeapGuiMeshElement;
         buildElement();
       }

@@ -23,17 +23,15 @@ public class LeapGui : MonoBehaviour {
   #endregion
 
   #region PRIVATE VARIABLES
-  [SerializeField, HideInInspector]
-  private List<LeapGuiElement> _elements = new List<LeapGuiElement>();
+  //We serialize just for ease of use
+  [SerializeField]
+  private int _selectedGroup = 0;
 
-  [SerializeField, HideInInspector]
+  [SerializeField]
   private List<AnchorOfConstantSize> _anchors = new List<AnchorOfConstantSize>();
 
-  [SerializeField, HideInInspector]
+  [SerializeField]
   private List<Transform> _anchorParents = new List<Transform>();
-
-  [SerializeField, HideInInspector]
-  private List<SupportInfo> _supportInfo = new List<SupportInfo>();
 
   private List<LeapGuiElement> _toAdd = new List<LeapGuiElement>();
   private List<LeapGuiElement> _toRemove = new List<LeapGuiElement>();
@@ -56,9 +54,9 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
-  public List<LeapGuiElement> elements {
+  public List<LeapGuiGroup> groups {
     get {
-      return _elements;
+      return _groups;
     }
   }
 
@@ -71,12 +69,6 @@ public class LeapGui : MonoBehaviour {
   public List<Transform> anchorParents {
     get {
       return _anchorParents;
-    }
-  }
-
-  public List<SupportInfo> supportInfo {
-    get {
-      return _supportInfo;
     }
   }
 
@@ -327,55 +319,12 @@ public class LeapGui : MonoBehaviour {
 
     //TODO, optimize this!  Don't do it every frame for the whole thing!
     using (new ProfilerSample("Refresh space data")) {
-      _space.RefreshElementData(transform, 0, anchors.Count);
+      //_space.RefreshElementData(transform, 0, anchors.Count);
     }
 
     //TODO: update groups and reset feature dirty flags
 
     _hasFinishedSetup = true;
-  }
-
-  private void rebuildElementList() {
-    using (new ProfilerSample("Rebuild Element List")) {
-#if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        foreach (var element in _elements) {
-          element.OnDetachedFromGui();
-        }
-      }
-#endif
-
-      _elements.Clear();
-      _anchors.Clear();
-      _anchorParents.Clear();
-
-      rebuildElementListRecursively(transform, transform);
-    }
-  }
-
-  private void rebuildElementListRecursively(Transform root, Transform currAnchor) {
-    int count = root.childCount;
-    for (int i = 0; i < count; i++) {
-      Transform child = root.GetChild(i);
-      if (!child.gameObject.activeSelf) continue;
-
-      var childAnchor = currAnchor;
-
-      var anchorComponent = child.GetComponent<AnchorOfConstantSize>();
-      if (anchorComponent != null && anchorComponent.enabled) {
-        _anchorParents.Add(currAnchor);
-        childAnchor = anchorComponent.transform;
-        _anchors.Add(anchorComponent);
-      }
-
-      var element = child.GetComponent<LeapGuiElement>();
-      if (element != null && element.enabled) {
-        element.OnAttachedToGui(this, childAnchor, _elements.Count);
-        _elements.Add(element);
-      }
-
-      rebuildElementListRecursively(child, childAnchor);
-    }
   }
   #endregion
 }

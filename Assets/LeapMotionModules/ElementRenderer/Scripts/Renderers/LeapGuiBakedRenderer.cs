@@ -80,7 +80,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     if (gui.space is LeapGuiRectSpace) {
       using (new ProfilerSample("Build Material Data")) {
         _rect_elementPositions.Clear();
-        foreach (var element in gui.elements) {
+        foreach (var element in group.elements) {
           var guiSpace = transform.InverseTransformPoint(element.transform.position);
           _rect_elementPositions.Add(guiSpace);
         }
@@ -94,7 +94,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
       using (new ProfilerSample("Build Material Data")) {
         _curved_elementParameters.Clear();
-        foreach (var element in gui.elements) {
+        foreach (var element in group.elements) {
           var t = radialSpace.GetTransformer(element.anchor) as IRadialTransformer;
           _curved_elementParameters.Add(t.GetVectorRepresentation(element));
         }

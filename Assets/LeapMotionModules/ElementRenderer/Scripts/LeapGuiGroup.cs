@@ -232,6 +232,10 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   protected override void OnValidate() {
     base.OnValidate();
 
+    if (_gui == null) {
+      _gui = GetComponent<LeapGui>();
+    }
+
     if (!Application.isPlaying) {
       _addRemoveSupported = true;
       if (_renderer != null) {
