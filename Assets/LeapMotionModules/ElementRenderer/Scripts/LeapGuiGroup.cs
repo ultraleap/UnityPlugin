@@ -76,12 +76,11 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   }
 
   public bool TryAddElement(LeapGuiElement element) {
+    Assert.IsNotNull(element);
+
     if (!addRemoveSupportedOrEditTime()) {
       return false;
     }
-
-    Assert.IsNotNull(element);
-    Assert.IsTrue(addRemoveSupported);
 
     _elements.Add(element);
 
@@ -109,12 +108,11 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   }
 
   public bool TryRemoveElement(LeapGuiElement element) {
+    Assert.IsNotNull(element);
+
     if (!addRemoveSupportedOrEditTime()) {
       return false;
     }
-
-    AssertHelper.AssertRuntimeOnly();
-    Assert.IsNotNull(element);
 
     element.OnDetachedFromGui();
     _elements.Remove(element);
