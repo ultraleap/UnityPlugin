@@ -47,9 +47,11 @@ public abstract class LeapGuiSpace : LeapGuiComponentBase<LeapGui> {
   protected override void OnValidate() {
     base.OnValidate();
 
+#if UNITY_EDITOR
     if (gui != null) {
-      gui.ScheduleFullUpdate();
+      gui.ScheduleEditorUpdate();
     }
+#endif
   }
 
   /// <summary>

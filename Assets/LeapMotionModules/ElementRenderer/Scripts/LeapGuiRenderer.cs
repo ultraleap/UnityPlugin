@@ -15,9 +15,11 @@ public abstract class LeapGuiRendererBase : LeapGuiComponentBase<LeapGui> {
   protected override void OnValidate() {
     base.OnValidate();
 
+#if UNITY_EDITOR
     if (gui != null) {
-      gui.ScheduleFullUpdate();
+      gui.ScheduleEditorUpdate();
     }
+#endif
   }
 
   protected bool isHeavyUpdate { get; private set; }
