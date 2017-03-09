@@ -52,7 +52,7 @@ namespace Leap.Unity.Interaction {
     [HideInInspector]
     public bool _softContactMode = true;
     private List<SoftContact> softContacts = new List<SoftContact>(20);
-    private Collider[] tempColliderArray = new Collider[10];
+    private Collider[] tempColliderArray = new Collider[1];
     private Vector3[] previousBoneCenters = new Vector3[20];
     private int softContactHysteresisTimer = 0;
     private float softContactBoneRadius = 0.02f;
@@ -251,7 +251,6 @@ namespace Leap.Unity.Interaction {
             foreach (Collider col in tempColliderArray) {
               if (col != null && col.attachedRigidbody != null && !col.attachedRigidbody.isKinematic) {
                 SoftContact contact = new SoftContact();
-                contact.col = col;
                 contact.body = col.attachedRigidbody;
 
                 if (col is MeshCollider) {
@@ -371,15 +370,14 @@ namespace Leap.Unity.Interaction {
     }
 
     struct SoftContact {
-      public Collider col;
       public Rigidbody body;
       public Vector3 position;
       public Vector3 normal;
       public Vector3 velocity;
-      public Vector3 bodyPointVelocity;
     }
 
     public void disableSoftContact() {
+      /*
       _softContactMode = false;
       for (int i = _brushBones.Length; i-- != 0;) {
         _brushBones[i].gameObject.SetActive(true);
@@ -390,7 +388,7 @@ namespace Leap.Unity.Interaction {
       for (int i = _brushBones.Length; i-- != 0;) {
         _brushBones[i].DisableColliderTemporarily(0.3f);
       }
-      softContactHysteresisTimer = 0;
+      softContactHysteresisTimer = 0;*/
     }
 
     public void enableSoftContact() {
