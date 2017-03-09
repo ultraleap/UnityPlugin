@@ -108,7 +108,7 @@ public class LeapGuiEditor : CustomEditorBase {
 
     GUILayout.FlexibleSpace();
     Rect rect = GUILayoutUtility.GetLastRect();
-    GUI.Label(rect, "", EditorStyles.toolbar);
+    GUI.Label(rect, "", EditorStyles.toolbarButton);
 
     if (GUILayout.Button("Change", EditorStyles.toolbarDropDown, GUILayout.Width(BUTTON_WIDTH))) {
       _addSpaceMenu.ShowAsContext();
@@ -156,7 +156,7 @@ public class LeapGuiEditor : CustomEditorBase {
 
     GUILayout.FlexibleSpace();
     Rect rect = GUILayoutUtility.GetLastRect();
-    GUI.Label(rect, "", EditorStyles.toolbar);
+    GUI.Label(rect, "", EditorStyles.toolbarButton);
 
     GUI.color = BUTTON_COLOR;
 

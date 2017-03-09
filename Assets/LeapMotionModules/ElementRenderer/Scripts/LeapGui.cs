@@ -19,7 +19,7 @@ public class LeapGui : MonoBehaviour {
   private LeapGuiSpace _space;
 
   [SerializeField]
-  private List<LeapGuiGroup> _groups;
+  private List<LeapGuiGroup> _groups = new List<LeapGuiGroup>();
   #endregion
 
   #region PRIVATE VARIABLES
