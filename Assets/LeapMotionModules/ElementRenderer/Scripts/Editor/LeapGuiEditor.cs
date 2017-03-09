@@ -130,7 +130,7 @@ public class LeapGuiEditor : CustomEditorBase {
     EditorGUI.BeginDisabledGroup(gui.features.Count == 0);
     if (GUI.Button(middle, "-", EditorStyles.miniButtonMid) && _featureList.index >= 0) {
       gui.features.RemoveAt(_featureList.index);
-      gui.ScheduleFullUpdate();
+      gui.ScheduleEditorUpdate();
       EditorUtility.SetDirty(gui);
     }
     EditorGUI.EndDisabledGroup();
@@ -238,7 +238,7 @@ public class LeapGuiEditor : CustomEditorBase {
     EditorGUI.BeginChangeCheck();
     feature.DrawFeatureEditor(rect.NextLine().Indent(), isActive, isFocused);
     if (EditorGUI.EndChangeCheck()) {
-      gui.ScheduleFullUpdate();
+      gui.ScheduleEditorUpdate();
       EditorUtility.SetDirty(feature);
     }
   }

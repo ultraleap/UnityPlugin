@@ -23,8 +23,9 @@ public static class ReadWriteUtility {
     return reciever;
   }
 
-#if UNITY_EDITOR
+
   public static bool IsReadable(this Texture2D texture) {
+#if UNITY_EDITOR
     string assetPath = AssetDatabase.GetAssetPath(texture);
     if (string.IsNullOrEmpty(assetPath)) {
       return false;
@@ -36,8 +37,13 @@ public static class ReadWriteUtility {
     }
 
     return importer.isReadable;
-  }
+#else
+    //Welp, guess the user is just gonna have to eat the errors if they are wrong!
+    //No way to check currently :(
+    return true;
 #endif
+  }
+
 
   public static bool TryEnableReadWrite(this Mesh mesh) {
 #if UNITY_EDITOR

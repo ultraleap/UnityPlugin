@@ -218,9 +218,13 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     //or size, so just disable culling entirely by making the bound gigantic.
     _currMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000);
 
+    //No solution right now for baking lightmap uvs at runtime
+    //But, that wasn't important anyway :P
+#if UNITY_EDITOR
     if (_enableLightmapping && isHeavyUpdate) {
       _lightmapUnwrapSettings.GenerateLightmapUvs(_currMesh);
     }
+#endif
   }
 
   protected override bool doesRequireSpecialUv3() {
