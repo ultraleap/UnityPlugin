@@ -7,10 +7,12 @@ using Leap.Unity.Query;
 
 [CustomEditor(typeof(LeapGui))]
 public class LeapGuiEditor : Editor {
-  private const int BUTTON_WIDTH = 30;
+  private const int BUTTON_WIDTH = 60;
   private static Color BUTTON_COLOR = Color.white * 0.95f;
+  private static Color BUTTON_HIGHLIGHTED_COLOR = Color.white * 0.6f;
 
-  private LeapGui gui;
+  private LeapGui _gui;
+  private SerializedProperty _selectedGroup;
 
   private GenericMenu _addSpaceMenu;
   private Editor _spaceEditor;
@@ -23,7 +25,8 @@ public class LeapGuiEditor : Editor {
       return;
     }
 
-    gui = target as LeapGui;
+    _gui = target as LeapGui;
+    _selectedGroup = serializedObject.FindProperty("_selectedGroup");
 
     var allTypes = Assembly.GetAssembly(typeof(LeapGui)).GetTypes();
 
@@ -42,8 +45,8 @@ public class LeapGuiEditor : Editor {
       _addSpaceMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(space)),
                             false,
                             () => {
-                              gui.SetSpace(space);
-                              CreateCachedEditor(gui.space, null, ref _spaceEditor);
+                              _gui.SetSpace(space);
+                              CreateCachedEditor(_gui.space, null, ref _spaceEditor);
                               serializedObject.Update();
                             });
     }
@@ -58,15 +61,16 @@ public class LeapGuiEditor : Editor {
       _addGroupMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(renderer)),
                             false,
                             () => {
-                              //target.SetRenderer(renderer);
-                              //CreateCachedEditor(gui.GetComponent<Renderer>(), null, ref _rendererEditor);
-                              //serializedObject.Update();
+                              _gui.CreateGroup(renderer);
+                              updateGroupEditor();
                             });
     }
 
-    if (gui.space != null) {
-      CreateCachedEditor(gui.space, null, ref _spaceEditor);
+    if (_gui.space != null) {
+      CreateCachedEditor(_gui.space, null, ref _spaceEditor);
     }
+
+    updateGroupEditor();
   }
 
   public override void OnInspectorGUI() {
@@ -81,18 +85,27 @@ public class LeapGuiEditor : Editor {
     drawGroupHeader();
 
     if (_groupEditor != null) {
+      _groupEditor.serializedObject.Update();
       _groupEditor.OnInspectorGUI();
+      _groupEditor.serializedObject.ApplyModifiedProperties();
     }
+
+    serializedObject.ApplyModifiedProperties();
   }
 
   private void drawGroupHeader() {
     EditorGUILayout.BeginHorizontal();
 
-    GUI.color = BUTTON_COLOR;
-    for (int i = 0; i < gui.groups.Count; i++) {
-      if (GUILayout.Button(i.ToString(), EditorStyles.toolbarButton, GUILayout.MaxWidth(100))) {
-        //serializedObject.FindProperty("_selectedGroup").intValue = i;
-        //CreateCachedEditor(gui.groups[i], null, ref _groupEditor);
+    for (int i = 0; i < _gui.groups.Count; i++) {
+      if (i == _selectedGroup.intValue) {
+        GUI.color = BUTTON_HIGHLIGHTED_COLOR;
+      } else {
+        GUI.color = BUTTON_COLOR;
+      }
+
+      if (GUILayout.Button(i.ToString(), EditorStyles.toolbarButton, GUILayout.MaxWidth(60))) {
+        _selectedGroup.intValue = i;
+        CreateCachedEditor(_gui.groups[i], null, ref _groupEditor);
       }
     }
     GUI.color = Color.white;
@@ -102,14 +115,31 @@ public class LeapGuiEditor : Editor {
     GUI.Label(rect, "", EditorStyles.toolbar);
 
     GUI.color = BUTTON_COLOR;
-    if (GUILayout.Button("Create", EditorStyles.toolbarDropDown, GUILayout.MaxWidth(100))) {
-      //Create!
+
+    if (GUILayout.Button("Destroy", EditorStyles.toolbarButton, GUILayout.MaxWidth(60))) {
+      _gui.DestroySelectedGroup();
+      updateGroupEditor();
+    }
+
+    if (GUILayout.Button("Create", EditorStyles.toolbarDropDown, GUILayout.MaxWidth(60))) {
+      _addGroupMenu.ShowAsContext();
     }
     GUI.color = Color.white;
 
     EditorGUILayout.EndHorizontal();
   }
 
+  private void updateGroupEditor() {
+    serializedObject.Update();
+    if (_gui.groups.Count == 0) {
+      if (_groupEditor != null) {
+        
+        DestroyImmediate(_groupEditor);
+      }
+    } else {
+      CreateCachedEditor(_gui.groups[_selectedGroup.intValue], null, ref _groupEditor);
+    }
+  }
 
 
   /*

@@ -106,6 +106,30 @@ public class LeapGui : MonoBehaviour {
 
   //Begin editor-only private api
 #if UNITY_EDITOR
+  public void CreateGroup(Type rendererType) {
+    AssertHelper.AssertEditorOnly();
+    Assert.IsNotNull(rendererType);
+
+    var group = gameObject.AddComponent<LeapGuiGroup>();
+    group.Init(this, rendererType);
+
+    _selectedGroup = _groups.Count;
+    _groups.Add(group);
+  }
+
+  public void DestroySelectedGroup() {
+    AssertHelper.AssertEditorOnly();
+
+    var toDestroy = _groups[_selectedGroup];
+    _groups.RemoveAt(_selectedGroup);
+
+    if (_selectedGroup >= _groups.Count && _selectedGroup != 0) {
+      _selectedGroup--;
+    }
+
+    InternalUtility.Destroy(toDestroy);
+  }
+
   public void ScheduleEditorUpdate() {
     //Dirty the hash by changing it to something else
     _previousHierarchyHash++;

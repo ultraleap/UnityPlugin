@@ -14,13 +14,13 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   private LeapGuiRendererBase _renderer;
 
   [SerializeField]
-  private List<LeapGuiFeatureBase> _features;
+  private List<LeapGuiFeatureBase> _features = new List<LeapGuiFeatureBase>();
 
   [SerializeField, HideInInspector]
-  private List<LeapGuiElement> _elements;
+  private List<LeapGuiElement> _elements = new List<LeapGuiElement>();
 
   [SerializeField, HideInInspector]
-  private List<SupportInfo> _supportInfo;
+  private List<SupportInfo> _supportInfo = new List<SupportInfo>();
 
   [SerializeField, HideInInspector]
   private bool _addRemoveSupported;
@@ -63,6 +63,11 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     get {
       return _addRemoveSupported;
     }
+  }
+
+  public void Init(LeapGui gui, Type rendererType) {
+    _gui = gui;
+    //TODO
   }
 
   public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
