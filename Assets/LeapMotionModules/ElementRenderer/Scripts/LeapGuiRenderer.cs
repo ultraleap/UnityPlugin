@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
-public abstract class LeapGuiRenderer : LeapGuiComponentBase<LeapGui> {
+public abstract class LeapGuiRendererBase : LeapGuiComponentBase<LeapGui> {
 
   [HideInInspector]
   public LeapGui gui;
@@ -52,5 +54,14 @@ public abstract class LeapGuiRenderer : LeapGuiComponentBase<LeapGui> {
   /// </summary>
   public virtual void OnUpdateRendererEditor(bool isHeavyUpdate) {
     this.isHeavyUpdate = isHeavyUpdate;
+  }
+
+  public abstract LeapGuiElement GetValidElementOnObject(GameObject obj);
+}
+
+public abstract class LeapGuiRenderer<ElementType> : LeapGuiRendererBase where ElementType : LeapGuiElement {
+
+  public override LeapGuiElement GetValidElementOnObject(GameObject obj) {
+    return obj.GetComponent<ElementType>();
   }
 }

@@ -16,13 +16,10 @@ public class LeapGui : MonoBehaviour {
 
   #region INSPECTOR FIELDS
   [SerializeField]
-  private List<LeapGuiFeatureBase> _features = new List<LeapGuiFeatureBase>();
-
-  [SerializeField]
   private LeapGuiSpace _space;
 
   [SerializeField]
-  private LeapGuiRenderer _renderer;
+  private List<LeapGuiGrpup> _groups;
   #endregion
 
   #region PRIVATE VARIABLES
@@ -64,16 +61,6 @@ public class LeapGui : MonoBehaviour {
   public LeapGuiSpace space {
     get {
       return _space;
-    }
-  }
-
-#if UNITY_EDITOR
-  public new LeapGuiRenderer renderer {
-#else
-  public LeapGuiRenderer renderer {
-#endif
-    get {
-      return _renderer;
     }
   }
 
@@ -141,19 +128,6 @@ public class LeapGui : MonoBehaviour {
 
     _toRemove.Add(element);
     return true;
-  }
-
-  public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
-    features.Clear();
-    for (int i = 0; i < _features.Count; i++) {
-      var feature = _features[i];
-      if (!(feature is T)) continue;
-      if (_supportInfo[i].support == SupportType.Error) continue;
-
-      features.Add(feature as T);
-    }
-
-    return features.Count != 0;
   }
 
   //Begin editor-only private api

@@ -5,14 +5,14 @@ using UnityEngine;
 using Leap.Unity;
 using Leap.Unity.Query;
 
-[Serializable]
-public class LeapGuiGroup {
+
+public class LeapGuiGrpup {
 
   [SerializeField, HideInInspector]
   private LeapGui _gui;
 
   [SerializeField]
-  private LeapGuiRenderer _renderer;
+  private LeapGuiRendererBase _renderer;
 
   [SerializeField]
   private List<LeapGuiFeatureBase> _features;
@@ -23,7 +23,7 @@ public class LeapGuiGroup {
   [SerializeField, HideInInspector]
   private List<SupportInfo> _supportInfo;
 
-  public LeapGuiRenderer renderer {
+  public LeapGuiRendererBase renderer {
     get {
       return _renderer;
     }
@@ -43,6 +43,19 @@ public class LeapGuiGroup {
     get {
       return _supportInfo;
     }
+  }
+
+  public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
+    features.Clear();
+    for (int i = 0; i < _features.Count; i++) {
+      var feature = _features[i];
+      if (!(feature is T)) continue;
+      if (_supportInfo[i].support == SupportType.Error) continue;
+
+      features.Add(feature as T);
+    }
+
+    return features.Count != 0;
   }
 
   public void RebuildElementList() {
@@ -164,7 +177,7 @@ public class LeapGuiGroup {
         childAnchor = anchorComponent.transform;
       }
 
-      var element = child.GetComponent<LeapGuiElement>();
+      var element = _renderer.GetValidElementOnObject(child.gameObject);
       if (element != null && element.enabled) {
         element.OnAttachedToGui(_gui, childAnchor, _elements.Count);
         _elements.Add(element);

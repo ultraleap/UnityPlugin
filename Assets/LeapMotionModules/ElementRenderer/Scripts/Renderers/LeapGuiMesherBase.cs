@@ -10,7 +10,7 @@ using UnityEditor.Sprites;
 using Leap.Unity;
 using Leap.Unity.Query;
 
-public abstract class LeapGuiMesherBase : LeapGuiRenderer,
+public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
   ISupportsFeature<LeapGuiMeshFeature>,
   ISupportsFeature<LeapGuiTextureFeature>,
   ISupportsFeature<LeapGuiSpriteFeature>,
