@@ -179,12 +179,11 @@ namespace Leap.Unity {
             allTrue &= conditionalList[i]();
           }
           if (!allTrue) {
+            if (_endHorizontalProperties.Contains(iterator.name)) {
+              EditorGUILayout.EndHorizontal();
+            }
             continue;
           }
-        }
-
-        if (_beginHorizontalProperties.Contains(iterator.name)) {
-          EditorGUILayout.BeginHorizontal();
         }
 
         Action<SerializedProperty> customDrawer;
@@ -194,6 +193,10 @@ namespace Leap.Unity {
           for (int i = 0; i < decoratorList.Count; i++) {
             decoratorList[i](iterator);
           }
+        }
+
+        if (_beginHorizontalProperties.Contains(iterator.name)) {
+          EditorGUILayout.BeginHorizontal();
         }
 
         EditorGUI.BeginChangeCheck();

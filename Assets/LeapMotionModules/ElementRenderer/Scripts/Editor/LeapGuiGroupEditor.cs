@@ -89,6 +89,8 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
   }
 
   private void drawFeatures(SerializedProperty property) {
+    EditorGUILayout.Space();
+
     Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
     Rect left, middle, right;
     rect.SplitHorizontallyWithRight(out middle, out right, BUTTON_WIDTH);
@@ -146,7 +148,7 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
     GUIContent featureLabel = new GUIContent(featureName);
 
     Color originalColor = GUI.color;
-    
+
     //TODO
     /*
     if (!EditorApplication.isPlaying && target.supportInfo != null) {

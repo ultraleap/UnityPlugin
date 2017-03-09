@@ -154,7 +154,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!21 &195509617
+--- !u!21 &102762627
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
@@ -177,29 +177,38 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats: []
     m_Colors: []
---- !u!21 &330460679
-Material:
-  serializedVersion: 6
+--- !u!28 &490627300
+Texture2D:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Gui Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
-  m_LightmapFlags: 5
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  m_SavedProperties:
+  m_Name: 
+  m_ImageContentsHash:
     serializedVersion: 2
-    m_TexEnvs:
-    - first:
-        name: _MainTex
-      second:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
+    Hash: 00000000000000000000000000000000
+  serializedVersion: 2
+  m_Width: 1
+  m_Height: 1
+  m_CompleteImageSize: 4
+  m_TextureFormat: 5
+  m_MipCount: 1
+  m_IsReadable: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 1
+  m_TextureDimension: 2
+  m_TextureSettings:
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapMode: 0
+  m_LightmapFormat: 0
+  m_ColorSpace: 1
+  image data: 4
+  _typelessdata: cdcdcdcd
+  m_StreamData:
+    offset: 0
+    size: 0
+    path: 
 --- !u!1 &511008033
 GameObject:
   m_ObjectHideFlags: 0
@@ -214,6 +223,8 @@ GameObject:
   - component: {fileID: 511008039}
   - component: {fileID: 511008038}
   - component: {fileID: 511008037}
+  - component: {fileID: 511008042}
+  - component: {fileID: 511008041}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -291,7 +302,7 @@ MonoBehaviour:
     maxAtlasSize: 4096
     filterMode: 1
   _meshes: []
-  _material: {fileID: 195509617}
+  _material: {fileID: 102762627}
 --- !u!114 &511008038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -336,7 +347,7 @@ MonoBehaviour:
     maxAtlasSize: 4096
     filterMode: 1
   _meshes: []
-  _material: {fileID: 330460679}
+  _material: {fileID: 739493639}
   _layer:
     layerIndex: 0
   _motionType: 1
@@ -362,10 +373,66 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _gui: {fileID: 511008035}
   _renderer: {fileID: 511008039}
-  _features: []
+  _features:
+  - {fileID: 511008041}
+  - {fileID: 511008042}
   _elements: []
-  _supportInfo: []
+  _supportInfo:
+  - support: 0
+    message: 
+  - support: 0
+    message: 
   _addRemoveSupported: 0
+--- !u!114 &511008041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 511008033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f6ba66cc9da35149bbfcd9cac71cc62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data: []
+--- !u!114 &511008042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 511008033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36ae2dc675d304041af3c95461f228e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data: []
+  propertyName: _MainTex
+  channel: 1
+--- !u!21 &739493639
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Gui Material
+  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  m_ShaderKeywords: LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_TINTING LEAP_GUI_VERTEX_COLORS
+    LEAP_GUI_VERTEX_UV_0
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+    - first:
+        name: _MainTex
+      second:
+        m_Texture: {fileID: 490627300}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &2030497646
 GameObject:
   m_ObjectHideFlags: 0

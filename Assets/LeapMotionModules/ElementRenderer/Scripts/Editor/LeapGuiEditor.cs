@@ -6,7 +6,7 @@ using Leap.Unity;
 using Leap.Unity.Query;
 
 [CustomEditor(typeof(LeapGui))]
-public class LeapGuiEditor : Editor {
+public class LeapGuiEditor : CustomEditorBase {
   private const int BUTTON_WIDTH = 60;
   private static Color BUTTON_COLOR = Color.white * 0.95f;
   private static Color BUTTON_HIGHLIGHTED_COLOR = Color.white * 0.6f;
@@ -20,7 +20,9 @@ public class LeapGuiEditor : Editor {
   private GenericMenu _addGroupMenu;
   private Editor _groupEditor;
 
-  private void OnEnable() {
+  protected override void OnEnable() {
+    base.OnEnable();
+
     if (target == null) {
       return;
     }
@@ -79,22 +81,42 @@ public class LeapGuiEditor : Editor {
   }
 
   public override void OnInspectorGUI() {
-    //TODO: script header
+    drawScriptField();
+
+    EditorGUILayout.Space();
+    EditorGUILayout.LabelField("Gui Space", EditorStyles.boldLabel);
 
     drawSpaceHeader();
 
     drawGroupHeader();
 
     if (_groupEditor != null) {
+      GUILayout.BeginVertical(EditorStyles.helpBox);
+
       _groupEditor.serializedObject.Update();
       _groupEditor.OnInspectorGUI();
       _groupEditor.serializedObject.ApplyModifiedProperties();
+
+      GUILayout.EndVertical();
     }
 
     serializedObject.ApplyModifiedProperties();
   }
 
   private void drawSpaceHeader() {
+    EditorGUILayout.BeginHorizontal();
+
+    GUILayout.FlexibleSpace();
+    Rect rect = GUILayoutUtility.GetLastRect();
+    GUI.Label(rect, "", EditorStyles.toolbar);
+
+    if (GUILayout.Button("Change", EditorStyles.toolbarDropDown, GUILayout.Width(BUTTON_WIDTH))) {
+      _addSpaceMenu.ShowAsContext();
+    }
+
+    EditorGUILayout.EndHorizontal();
+
+    /*
     Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
     Rect left, right;
     rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH * 2);
@@ -103,6 +125,7 @@ public class LeapGuiEditor : Editor {
     if (GUI.Button(right, "v", EditorStyles.miniButtonRight)) {
       _addSpaceMenu.ShowAsContext();
     }
+    */
 
     if (_spaceEditor != null) {
       _spaceEditor.OnInspectorGUI();

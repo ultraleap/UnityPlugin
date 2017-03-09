@@ -39,7 +39,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
   }
 
   #region INSPECTOR FIELDS
-  [Header("Mesh Settings")]
+  //BEGIN MESH SETTINGS
   [SerializeField]
   private bool _useUv0 = true;
 
@@ -47,7 +47,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
   private bool _useUv1 = false;
 
   [SerializeField]
-  private bool _uvsUv2 = false;
+  private bool _useUv2 = false;
 
   [SerializeField]
   private bool _useUv3 = false;
@@ -60,8 +60,8 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
 
   [SerializeField]
   private bool _useNormals = false;
-
-  [Header("Rendering Settings")]
+  
+  //BEGIN RENDERING SETTINGS
   [SerializeField]
   protected Shader _shader;
 
@@ -594,7 +594,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
     get {
       if (_useUv0) yield return UVChannelFlags.UV0;
       if (_useUv1) yield return UVChannelFlags.UV1;
-      if (_uvsUv2) yield return UVChannelFlags.UV2;
+      if (_useUv2) yield return UVChannelFlags.UV2;
       if (_useUv3) yield return UVChannelFlags.UV3;
     }
   }
@@ -614,7 +614,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
       case UVChannelFlags.UV1:
         return _useUv1;
       case UVChannelFlags.UV2:
-        return _uvsUv2;
+        return _useUv2;
       case UVChannelFlags.UV3:
         return _useUv3;
       default:
