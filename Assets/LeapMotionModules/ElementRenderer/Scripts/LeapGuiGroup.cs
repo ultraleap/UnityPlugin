@@ -26,6 +26,11 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   [SerializeField, HideInInspector]
   private bool _addRemoveSupported;
 
+  #region PRIVATE VARIABLES
+  private List<LeapGuiElement> _toAdd = new List<LeapGuiElement>();
+  private List<LeapGuiElement> _toRemove = new List<LeapGuiElement>();
+  #endregion
+
   #region PUBLIC API
 
 #if UNITY_EDITOR
@@ -74,6 +79,32 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
     _renderer = gameObject.AddComponent(rendererType) as LeapGuiRendererBase;
     Assert.IsNotNull(_renderer);
+  }
+
+  /// <summary>
+  /// Tries to add a new gui element to this gui at runtime.
+  /// Element is not actually added until the next gui cycle.
+  /// </summary>
+  public bool TryAddElement(LeapGuiElement element) {
+    AssertHelper.AssertRuntimeOnly();
+    Assert.IsNotNull(element);
+    //TO WHICH GROUP AAAA
+
+    _toAdd.Add(element);
+    return true;
+  }
+
+  /// <summary>
+  /// Tries to remove a gui element from this gui at runtime.
+  /// Element is not actually removed until the next gui cycle.
+  /// </summary>
+  public bool TryRemoveElement(LeapGuiElement element) {
+    AssertHelper.AssertRuntimeOnly();
+    Assert.IsNotNull(element);
+    //TO WHICH GROUP AAAA
+
+    _toRemove.Add(element);
+    return true;
   }
 
   public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
@@ -282,7 +313,7 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
       var element = _renderer.GetValidElementOnObject(child.gameObject);
       if (element != null && element.enabled) {
-        element.OnAttachedToGui(_gui, childAnchor, _elements.Count);
+        element.OnAttachedToGui(this, childAnchor, _elements.Count);
         _elements.Add(element);
       }
 

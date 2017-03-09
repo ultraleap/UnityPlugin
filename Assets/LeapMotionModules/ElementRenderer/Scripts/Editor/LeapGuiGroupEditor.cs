@@ -136,6 +136,8 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
     return target.features[index].GetEditorHeight() + EditorGUIUtility.singleLineHeight;
   }
 
+  delegate void Action<T1, T2, T3, T4, T5>(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5);
+
   private void drawFeatureCallback(Rect rect, int index, bool isActive, bool isFocused) {
     rect = rect.SingleLine();
     var feature = target.features[index];
@@ -144,7 +146,7 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
     GUIContent featureLabel = new GUIContent(featureName);
 
     Color originalColor = GUI.color;
-
+    
     //TODO
     /*
     if (!EditorApplication.isPlaying && target.supportInfo != null) {

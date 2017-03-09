@@ -33,12 +33,6 @@ public class LeapGui : MonoBehaviour {
   [SerializeField]
   private List<Transform> _anchorParents = new List<Transform>();
 
-  private List<LeapGuiElement> _toAdd = new List<LeapGuiElement>();
-  private List<LeapGuiElement> _toRemove = new List<LeapGuiElement>();
-
-  private List<LeapGuiElement> _tempElementList = new List<LeapGuiElement>();
-  private List<int> _tempIndexList = new List<int>();
-
   [NonSerialized]
   private bool _hasFinishedSetup = false;
   [NonSerialized]
@@ -78,31 +72,6 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
-  /// <summary>
-  /// Tries to add a new gui element to this gui at runtime.
-  /// Element is not actually added until the next gui cycle.
-  /// </summary>
-  public bool TryAddElement(LeapGuiElement element) {
-    AssertHelper.AssertRuntimeOnly();
-    Assert.IsNotNull(element);
-    //TO WHICH GROUP AAAA
-
-    _toAdd.Add(element);
-    return true;
-  }
-
-  /// <summary>
-  /// Tries to remove a gui element from this gui at runtime.
-  /// Element is not actually removed until the next gui cycle.
-  /// </summary>
-  public bool TryRemoveElement(LeapGuiElement element) {
-    AssertHelper.AssertRuntimeOnly();
-    Assert.IsNotNull(element);
-    //TO WHICH GROUP AAAA
-
-    _toRemove.Add(element);
-    return true;
-  }
 
   //Begin editor-only private api
 #if UNITY_EDITOR
@@ -332,14 +301,6 @@ public class LeapGui : MonoBehaviour {
 
   private void doLateUpdateRuntime() {
     if (_space == null) return;
-
-    if (_toRemove.Count != 0) {
-      //doit
-    }
-
-    if (_toAdd.Count != 0) {
-      //doit
-    }
 
     //TODO, optimize this!  Don't do it every frame for the whole thing!
     using (new ProfilerSample("Refresh space data")) {

@@ -17,7 +17,7 @@ public class LeapGuiElement : MonoBehaviour {
   private List<LeapGuiElementData> _data = new List<LeapGuiElementData>();
 
   [SerializeField, HideInInspector]
-  private LeapGui _attachedGui;
+  private LeapGuiGroup _attachedGroup;
   #endregion
 
   #region PRIVATE VARIABLES
@@ -51,15 +51,15 @@ public class LeapGuiElement : MonoBehaviour {
     }
   }
 
-  public LeapGui attachedGui {
+  public LeapGuiGroup attachedGroup {
     get {
-      return _attachedGui;
+      return _attachedGroup;
     }
   }
 
-  public bool IsAttachedToGui {
+  public bool IsAttachedToGroup {
     get {
-      return _attachedGui != null;
+      return _attachedGroup != null;
     }
   }
 
@@ -74,14 +74,14 @@ public class LeapGuiElement : MonoBehaviour {
   }
 #endif
 
-  public virtual void OnAttachedToGui(LeapGui gui, Transform anchor, int elementId) {
-    _attachedGui = gui;
+  public virtual void OnAttachedToGui(LeapGuiGroup group, Transform anchor, int elementId) {
+    _attachedGroup = group;
     _anchor = anchor;
     _elementId = elementId;
   }
 
   public virtual void OnDetachedFromGui() {
-    _attachedGui = null;
+    _attachedGroup = null;
     _anchor = null;
     _elementId = -1;
   }
@@ -139,8 +139,8 @@ public class LeapGuiElement : MonoBehaviour {
 #if UNITY_EDITOR
     if (Application.isPlaying) {
 #endif
-      if (!IsAttachedToGui) {
-        GetComponentInParent<LeapGui>().TryAddElement(this);
+      if (!IsAttachedToGroup) {
+        //TRY connect at runtime, TODO!
       }
 #if UNITY_EDITOR
     }
@@ -151,8 +151,8 @@ public class LeapGuiElement : MonoBehaviour {
 #if UNITY_EDITOR
     if (Application.isPlaying) {
 #endif
-      if (IsAttachedToGui) {
-        _attachedGui.TryRemoveElement(this);
+      if (IsAttachedToGroup) {
+        _attachedGroup.TryRemoveElement(this);
       }
 #if UNITY_EDITOR
     }
