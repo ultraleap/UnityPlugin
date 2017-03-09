@@ -132,6 +132,9 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
       for (int i = 0; i < _meshes.Count; i++) {
         _renderers[i].MakeValid(transform, i, _meshes[i], _material);
+        if (_enableLightmapping) {
+          GameObjectUtility.SetStaticEditorFlags(_renderers[i].obj, StaticEditorFlags.LightmapStatic | StaticEditorFlags.ReflectionProbeStatic);
+        }
       }
     } else {
       while (_renderers.Count > 0) {

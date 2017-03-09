@@ -76,10 +76,10 @@ public class LeapGuiElementEditor : CustomEditorBase {
             foreach (var element in elements) {
               Undo.RecordObject(element, "Change element group");
               EditorUtility.SetDirty(element);
+              mainGroup.TryRemoveElement(element);
+              group.TryAddElement(element);
             }
 
-            mainGroup.RemoveElements(elements);
-            group.AddElements(elements);
             mainGui.ScheduleEditorUpdate();
           });
           index++;

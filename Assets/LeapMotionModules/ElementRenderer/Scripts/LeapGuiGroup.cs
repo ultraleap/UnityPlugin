@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using Leap.Unity;
 using Leap.Unity.Query;
 
@@ -26,12 +29,7 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   [SerializeField, HideInInspector]
   private bool _addRemoveSupported;
 
-  #region PRIVATE VARIABLES
-  private List<LeapGuiElement> _toAdd = new List<LeapGuiElement>();
-  private List<LeapGuiElement> _toRemove = new List<LeapGuiElement>();
-  #endregion
-
-  #region PUBLIC API
+  #region PUBLIC RUNTIME API
 
   public LeapGui gui {
     get {
@@ -77,42 +75,54 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     }
   }
 
-  public void Init(LeapGui gui, Type rendererType) {
-    AssertHelper.AssertEditorOnly();
-    Assert.IsNotNull(gui);
-    Assert.IsNotNull(rendererType);
-    _gui = gui;
-
-    _renderer = gameObject.AddComponent(rendererType) as LeapGuiRendererBase;
-    Assert.IsNotNull(_renderer);
-    _renderer.gui = _gui;
-    _renderer.group = this;
-    _renderer.OnEnableRendererEditor();
-  }
-
-  /// <summary>
-  /// Tries to add a new gui element to this gui at runtime.
-  /// Element is not actually added until the next gui cycle.
-  /// </summary>
   public bool TryAddElement(LeapGuiElement element) {
-    AssertHelper.AssertRuntimeOnly();
-    Assert.IsNotNull(element);
-    //TO WHICH GROUP AAAA
+    if (!addRemoveSupportedOrEditTime()) {
+      return false;
+    }
 
-    _toAdd.Add(element);
+    Assert.IsNotNull(element);
+    Assert.IsTrue(addRemoveSupported);
+
+    _elements.Add(element);
+
+    Transform t = element.transform;
+    while (true) {
+      var anchor = t.GetComponent<AnchorOfConstantSize>();
+      if (anchor != null && anchor.enabled) {
+        element.OnAttachedToGui(this, t);
+        break;
+      }
+
+      t = t.parent;
+
+      if (t = transform) {
+        element.OnAttachedToGui(this, transform);
+        break;
+      }
+    }
+
+#if UNITY_EDITOR
+    _gui.ScheduleEditorUpdate();
+#endif
+
     return true;
   }
 
-  /// <summary>
-  /// Tries to remove a gui element from this gui at runtime.
-  /// Element is not actually removed until the next gui cycle.
-  /// </summary>
   public bool TryRemoveElement(LeapGuiElement element) {
+    if (!addRemoveSupportedOrEditTime()) {
+      return false;
+    }
+
     AssertHelper.AssertRuntimeOnly();
     Assert.IsNotNull(element);
-    //TO WHICH GROUP AAAA
 
-    _toRemove.Add(element);
+    element.OnDetachedFromGui();
+    _elements.Remove(element);
+
+#if UNITY_EDITOR
+    _gui.ScheduleEditorUpdate();
+#endif
+
     return true;
   }
 
@@ -129,52 +139,25 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     return features.Count != 0;
   }
 
-  public void AddElements(List<LeapGuiElement> elements) {
-    using (new ProfilerSample("Add Elements")) {
-#if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        foreach (var element in elements) {
-          _elements.Add(element);
-
-          Transform t = element.transform;
-          while (true) {
-            var anchor = t.GetComponent<AnchorOfConstantSize>();
-            if (anchor != null && anchor.enabled) {
-              element.OnAttachedToGui(this, t);
-              break;
-            }
-
-            t = t.parent;
-
-            if (t = transform) {
-              element.OnAttachedToGui(this, transform);
-              break;
-            }
-          }
-        }
-
-        _gui.ScheduleEditorUpdate();
-        return;
-      }
-#endif
-      //TODO: runtime logic for addition
-    }
+  public void UpdateRenderer() {
+    _renderer.OnUpdateRenderer();
   }
 
-  public void RemoveElements(List<LeapGuiElement> elements) {
-    using (new ProfilerSample("Remove Elements")) {
-#if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        foreach (var element in elements) {
-          element.OnDetachedFromGui();
-          _elements.Remove(element);
-        }
-        _gui.ScheduleEditorUpdate();
-        return;
-      }
-#endif
-      //TODO: runtime logic for removal
-    }
+  #endregion
+
+  #region PUBLIC EDITOR API
+
+  public void Init(LeapGui gui, Type rendererType) {
+    AssertHelper.AssertEditorOnly();
+    Assert.IsNotNull(gui);
+    Assert.IsNotNull(rendererType);
+    _gui = gui;
+
+    _renderer = gameObject.AddComponent(rendererType) as LeapGuiRendererBase;
+    Assert.IsNotNull(_renderer);
+    _renderer.gui = _gui;
+    _renderer.group = this;
+    _renderer.OnEnableRendererEditor();
   }
 
   public void AddFeature(Type featureType) {
@@ -183,6 +166,17 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
     var feature = gameObject.AddComponent(featureType);
     _features.Add(feature as LeapGuiFeatureBase);
+
+    EditorUtility.SetDirty(this);
+    _gui.ScheduleEditorUpdate();
+  }
+
+  public void RemoveFeature(LeapGuiFeatureBase feature) {
+    Assert.IsTrue(_features.Contains(feature));
+
+    _features.Remove(feature);
+    DestroyImmediate(feature);
+    _gui.ScheduleEditorUpdate();
   }
 
   public void CollectUnattachedElements() {
@@ -312,10 +306,6 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     }
   }
 
-  public void UpdateRenderer() {
-    _renderer.OnUpdateRenderer();
-  }
-
   public void RebuildEditorPickingMeshes() {
     if (gui.space == null) {
       return;
@@ -402,6 +392,15 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
       collectUnattachedElementsRecursively(child, childAnchor);
     }
+  }
+
+  private bool addRemoveSupportedOrEditTime() {
+#if UNITY_EDITOR
+    if (Application.isPlaying) {
+      return true;
+    }
+#endif
+    return _addRemoveSupported;
   }
   #endregion
 }

@@ -102,8 +102,7 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
 
     EditorGUI.BeginDisabledGroup(target.features.Count == 0);
     if (GUI.Button(middle, "-", EditorStyles.miniButtonMid) && _featureList.index >= 0) {
-      target.features.RemoveAt(_featureList.index);
-      target.gui.ScheduleEditorUpdate();
+      target.RemoveFeature(target.features[_featureList.index]);
       EditorUtility.SetDirty(target);
     }
     EditorGUI.EndDisabledGroup();
