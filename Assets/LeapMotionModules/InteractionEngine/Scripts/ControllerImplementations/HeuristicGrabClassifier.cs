@@ -40,7 +40,7 @@ namespace Leap.Unity.Interaction {
         }
 
         //Nullify above findings if fingers are extended
-        bool tempIsInside = collidingWithObject && (tempCurl < 0.65f);
+        bool tempIsInside = collidingWithObject && (tempCurl < 0.65f) && (tempCurl > -0.1f);
 
         //Probes go inside when they intersect, probes come out when they uncurl
         if (!classifier.probes[j].isInside) {
@@ -58,15 +58,13 @@ namespace Leap.Unity.Interaction {
                                                                  classifier.probes[2].isInside ||
                                                                  classifier.probes[3].isInside ||
                                                                  classifier.probes[4].isInside));
-      //If grabbing for 2 frames, truly register it as a grab.
+      //If grabbing within 10 frames of releasing, discard grab.
       //Suppresses spurious regrabs and makes throws work better.
-      if (classifier.isGrabbing) {
-        if (classifier.warmUp <= 2) {
-          classifier.warmUp++;
+      if (classifier.coolDown <= 10) {
+        if (classifier.isGrabbing) {
           classifier.isGrabbing = false;
         }
-      } else {
-        classifier.warmUp = 0;
+        classifier.coolDown++;
       }
     }
 
@@ -86,6 +84,7 @@ namespace Leap.Unity.Interaction {
           _manager.GraspWithHand(_hand, behaviour);
         } else if (!classifier.isGrabbing || behaviour.IsBeingGraspedByHand(_hand.Id)) {
           _manager.ReleaseHand(_hand.Id);
+          classifier.coolDown = 0;
         }
       }
       classifier.prevGrabbing = classifier.isGrabbing;
@@ -126,14 +125,14 @@ namespace Leap.Unity.Interaction {
       public Rigidbody body;
       public RigidbodyWarper warper;
       public Matrix4x4 warpTrans;
-      public int warmUp;
+      public int coolDown;
 
       public GrabClassifier(IInteractionBehaviour behaviour) {
         probes = new GrabProbe[5];
         transform = behaviour.transform;
         body = behaviour.GetComponent<Rigidbody>();
         warper = (behaviour as InteractionBehaviour).warper;
-        warmUp = 0;
+        coolDown = 0;
       }
     }
 
