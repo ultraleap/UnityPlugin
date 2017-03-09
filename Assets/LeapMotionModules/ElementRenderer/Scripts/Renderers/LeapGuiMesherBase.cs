@@ -10,7 +10,7 @@ using UnityEditor.Sprites;
 using Leap.Unity;
 using Leap.Unity.Query;
 
-public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
+public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase>,
   ISupportsFeature<LeapGuiTextureFeature>,
   ISupportsFeature<LeapGuiSpriteFeature>,
   ISupportsFeature<LeapGuiTintFeature>,
@@ -60,7 +60,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
 
   [SerializeField]
   private bool _useNormals = false;
-  
+
   //BEGIN RENDERING SETTINGS
   [SerializeField]
   protected Shader _shader;
@@ -77,7 +77,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
   protected Material _material;
 
   //Current state of builder
-  protected LeapGuiMeshElement _currElement;
+  protected LeapGuiMeshElementBase _currElement;
   protected int _currIndex;
   protected Mesh _currMesh;
 
@@ -410,7 +410,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
     using (new ProfilerSample("Build Mesh")) {
       beginMesh();
       for (_currIndex = 0; _currIndex < group.elements.Count; _currIndex++) {
-        _currElement = group.elements[_currIndex] as LeapGuiMeshElement;
+        _currElement = group.elements[_currIndex] as LeapGuiMeshElementBase;
         buildElement();
       }
       finishMesh();
@@ -448,7 +448,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
       _currElement.RefreshMeshData();
     }
   }
-
+  
   protected virtual void buildTopology() {
     using (new ProfilerSample("Build Topology")) {
       var topology = MeshCache.GetTopology(_currElement.mesh);

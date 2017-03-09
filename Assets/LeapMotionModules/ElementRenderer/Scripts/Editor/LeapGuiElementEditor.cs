@@ -73,8 +73,14 @@ public class LeapGuiElementEditor : CustomEditorBase {
         int index = 0;
         foreach (var group in mainGui.groups.Query().Where(g => g.renderer.IsValidElement(elements[0]))) {
           groupMenu.AddItem(new GUIContent(index.ToString()), false, () => {
+            foreach (var element in elements) {
+              Undo.RecordObject(element, "Change element group");
+              EditorUtility.SetDirty(element);
+            }
+
             mainGroup.RemoveElements(elements);
             group.AddElements(elements);
+            mainGui.ScheduleEditorUpdate();
           });
           index++;
         }

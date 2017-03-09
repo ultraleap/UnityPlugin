@@ -78,6 +78,8 @@ public abstract class LeapGuiElement : MonoBehaviour {
   public virtual void OnAssignFeatureData(List<LeapGuiElementData> data) {
     _data = data;
   }
+
+  public virtual void RebuildEditorPickingMesh() { }
   #endregion
 
   #region UNITY CALLBACKS

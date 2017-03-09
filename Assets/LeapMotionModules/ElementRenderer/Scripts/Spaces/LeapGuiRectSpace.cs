@@ -44,7 +44,7 @@ public class LeapGuiRectSpace : LeapGuiSpace, ISupportsAddRemove {
     }
 
     public Matrix4x4 GetTransformationMatrix(Vector3 localRectPos) {
-      return Matrix4x4.identity;
+      return Matrix4x4.TRS(localRectPos, Quaternion.identity, Vector3.one);
     }
   }
 }

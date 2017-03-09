@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Leap.Unity;
-using Leap.Unity.Query;
 
 [ExecuteInEditMode]
 public class LeapGui : MonoBehaviour {
@@ -72,8 +70,7 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
-
-  //Begin editor-only private api
+  //Begin editor-only public api
 #if UNITY_EDITOR
   public void CreateGroup(Type rendererType) {
     AssertHelper.AssertEditorOnly();
@@ -124,58 +121,15 @@ public class LeapGui : MonoBehaviour {
   }
 
   public void RebuildEditorPickingMeshes() {
-    //TODO
-    /*
     if (_space == null) {
       return;
     }
 
-    using (new ProfilerSample("Rebuild Picking Meshes")) {
-      List<Vector3> pickingVerts = new List<Vector3>();
-      List<int> pickingTris = new List<int>();
-
-      foreach (var element in _elements) {
-        pickingVerts.Clear();
-        pickingTris.Clear();
-
-        Mesh pickingMesh = element.pickingMesh;
-        if (pickingMesh == null) {
-          pickingMesh = new Mesh();
-          pickingMesh.MarkDynamic();
-          pickingMesh.hideFlags = HideFlags.HideAndDontSave;
-          pickingMesh.name = "Gui Element Picking Mesh";
-          element.pickingMesh = pickingMesh;
-        }
-        pickingMesh.Clear();
-
-        foreach (var dataObj in element.data) {
-          if (dataObj is LeapGuiMeshData) {
-            var meshData = dataObj as LeapGuiMeshData;
-            meshData.RefreshMeshData();
-
-            Mesh mesh = meshData.mesh;
-            if (mesh == null) continue;
-
-            var topology = MeshCache.GetTopology(mesh);
-            for (int i = 0; i < topology.tris.Length; i++) {
-              pickingTris.Add(topology.tris[i] + pickingVerts.Count);
-            }
-
-            ITransformer transformer = _space.GetTransformer(element.anchor);
-            for (int i = 0; i < topology.verts.Length; i++) {
-              Vector3 localRectVert = transform.InverseTransformPoint(element.transform.TransformPoint(topology.verts[i]));
-              pickingVerts.Add(transformer.TransformPoint(localRectVert));
-            }
-          }
-        }
-
-        pickingMesh.SetVertices(pickingVerts);
-        pickingMesh.SetTriangles(pickingTris, 0, calculateBounds: true);
-        pickingMesh.RecalculateNormals();
-      }
+    foreach (var group in _groups) {
+      group.RebuildEditorPickingMeshes();
     }
-    */
   }
+
 #endif
   #endregion
 
@@ -258,8 +212,14 @@ public class LeapGui : MonoBehaviour {
     bool needsRebuild = false;
 
     using (new ProfilerSample("Calculate Should Rebuild")) {
-      //check groups and if their features are dirty
-      needsRebuild = true;
+      foreach (var group in _groups) {
+        foreach (var feature in group.features) {
+          if (feature.isDirty) {
+            needsRebuild = true;
+            break;
+          }
+        }
+      }
 
       int hierarchyHash = HashUtil.GetHierarchyHash(transform);
       if (_previousHierarchyHash != hierarchyHash) {

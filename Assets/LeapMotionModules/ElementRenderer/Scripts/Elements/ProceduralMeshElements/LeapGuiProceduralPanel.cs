@@ -3,8 +3,14 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
+using System;
 
-public class LeapGuiProceduralPanel : LeapGuiMeshElement {
+public class LeapGuiProceduralPanel : LeapGuiMeshElementBase {
+
+  public override void RefreshMeshData() {
+    throw new NotImplementedException();
+  }
+
   /*
   public const int MAX_VERTS = 128;
 

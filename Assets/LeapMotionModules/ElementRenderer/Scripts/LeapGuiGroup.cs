@@ -316,6 +316,17 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     _renderer.OnUpdateRenderer();
   }
 
+  public void RebuildEditorPickingMeshes() {
+    if (gui.space == null) {
+      return;
+    }
+
+    using (new ProfilerSample("Rebuild Picking Meshes")) {
+      foreach (var element in _elements) {
+        element.RebuildEditorPickingMesh();
+      }
+    }
+  }
   #endregion
 
   #region UNITY CALLBACKS

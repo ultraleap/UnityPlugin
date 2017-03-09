@@ -1,8 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
 using Leap.Unity.Query;
+using System;
 
-public class LeapGuiProceduralSpriteMesh : LeapGuiMeshElement {
+public class LeapGuiProceduralSpriteMesh : LeapGuiMeshElementBase {
+
+  public override void RefreshMeshData() {
+    throw new NotImplementedException();
+  }
+
   /*
   public override bool TryGenerateMesh(LeapGuiMeshData meshFeature,
                                    out Mesh mesh,
