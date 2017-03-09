@@ -73,14 +73,15 @@ public class LeapGuiEditor : Editor {
     updateGroupEditor();
   }
 
-  public override void OnInspectorGUI() {
-    base.OnInspectorGUI();
+  private void OnDisable() {
+    if (_spaceEditor != null) DestroyImmediate(_spaceEditor);
+    if (_groupEditor != null) DestroyImmediate(_groupEditor);
+  }
 
+  public override void OnInspectorGUI() {
     //TODO: script header
 
-    if (_spaceEditor != null) {
-      _spaceEditor.OnInspectorGUI();
-    }
+    drawSpaceHeader();
 
     drawGroupHeader();
 
@@ -93,7 +94,27 @@ public class LeapGuiEditor : Editor {
     serializedObject.ApplyModifiedProperties();
   }
 
+  private void drawSpaceHeader() {
+    Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
+    Rect left, right;
+    rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH * 2);
+
+    EditorGUI.LabelField(left, "Space", EditorStyles.miniButtonLeft);
+    if (GUI.Button(right, "v", EditorStyles.miniButtonRight)) {
+      _addSpaceMenu.ShowAsContext();
+    }
+
+    if (_spaceEditor != null) {
+      _spaceEditor.OnInspectorGUI();
+    }
+
+    EditorGUILayout.Space();
+  }
+
   private void drawGroupHeader() {
+    EditorGUILayout.Space();
+    EditorGUILayout.LabelField("Renderer Groups", EditorStyles.boldLabel);
+
     EditorGUILayout.BeginHorizontal();
 
     for (int i = 0; i < _gui.groups.Count; i++) {
@@ -133,7 +154,7 @@ public class LeapGuiEditor : Editor {
     serializedObject.Update();
     if (_gui.groups.Count == 0) {
       if (_groupEditor != null) {
-        
+
         DestroyImmediate(_groupEditor);
       }
     } else {
@@ -217,10 +238,6 @@ public class LeapGuiEditor : Editor {
                                  CreateCachedEditor(gui.GetComponent<Renderer>(), null, ref _rendererEditor);
                                  serializedObject.Update();
                                });
-    }
-
-    if (gui.GetComponent<Renderer>() != null) {//
-      CreateCachedEditor(gui.GetComponent<Renderer>(), null, ref _rendererEditor);
     }
 
     if (gui.space != null) {

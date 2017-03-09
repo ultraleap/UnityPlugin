@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Leap.Unity;
 using Leap.Unity.Query;
 
@@ -66,8 +67,13 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   }
 
   public void Init(LeapGui gui, Type rendererType) {
+    AssertHelper.AssertEditorOnly();
+    Assert.IsNotNull(gui);
+    Assert.IsNotNull(rendererType);
     _gui = gui;
-    //TODO
+
+    _renderer = gameObject.AddComponent(rendererType) as LeapGuiRendererBase;
+    Assert.IsNotNull(_renderer);
   }
 
   public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
