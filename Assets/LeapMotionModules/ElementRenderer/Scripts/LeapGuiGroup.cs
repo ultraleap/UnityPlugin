@@ -355,7 +355,7 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
       }
 
       var element = _renderer.GetValidElementOnObject(child.gameObject);
-      if (!element.IsAttachedToGroup) {
+      if (element != null && !element.IsAttachedToGroup) {
         if (element != null && element.enabled) {
           element.OnAttachedToGui(this, childAnchor);
           _elements.Add(element);
