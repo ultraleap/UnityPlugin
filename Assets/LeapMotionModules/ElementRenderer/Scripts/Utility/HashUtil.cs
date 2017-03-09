@@ -51,6 +51,14 @@ public static class HashUtil {
     return hash;
   }
 
+  public static int GetDataHashCode<T>(this List<T> list) {
+    int hash = 17;
+    for (int i = 0; i < list.Count; i++) {
+      Combine(ref hash, list[i]);
+    }
+    return hash;
+  }
+
   public static void Combine<T>(ref int hash, T combineWith) {
     hash = hash * 31 + combineWith.GetHashCode();
   }

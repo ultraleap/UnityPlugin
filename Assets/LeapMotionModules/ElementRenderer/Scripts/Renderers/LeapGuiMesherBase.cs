@@ -163,7 +163,9 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
     DestroyImmediate(_material);
   }
 
-  public override void OnUpdateRendererEditor() {
+  public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
+    base.OnUpdateRendererEditor(isHeavyUpdate);
+
     setupForBuilding();
     buildMesh();
   }
@@ -387,10 +389,6 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
 
         buildTopology(meshData);
 
-        if (_doesRequireNormals) {
-          buildNormals(meshData);
-        }
-
         if (_doesRequireColors) {
           buildColors(meshFeature, meshData);
         }
@@ -425,18 +423,20 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
         _tris.Add(topology.tris[i] + vertOffset);
       }
 
-      for (int i = 0; i < topology.verts.Length; i++) {
-        _verts.Add(elementVertToMeshVert(topology.verts[i]));
-      }
-    }
-  }
+      if (_doesRequireNormals) {
+        var normals = MeshCache.GetNormals(meshData.mesh);
+        for (int i = 0; i < topology.verts.Length; i++) {
+          Vector3 meshVert;
+          Vector3 meshNormal;
+          elementVertNormalToMeshVertNormal(topology.verts[i], normals[i], out meshVert, out meshNormal);
 
-  protected virtual void buildNormals(LeapGuiMeshData meshData) {
-    using (new ProfilerSample("Build Normals")) {
-      var normals = MeshCache.GetNormals(meshData.mesh);
-
-      for (int i = 0; i < normals.Length; i++) {
-        _normals.Add(elementNormalToMeshNormal(normals[i]));
+          _verts.Add(meshVert);
+          _normals.Add(meshNormal);
+        }
+      } else {
+        for (int i = 0; i < topology.verts.Length; i++) {
+          _verts.Add(elementVertToMeshVert(topology.verts[i]));
+        }
       }
     }
   }
@@ -583,6 +583,6 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer,
   }
 
   protected abstract Vector3 elementVertToMeshVert(Vector3 vertex);
-  protected abstract Vector3 elementNormalToMeshNormal(Vector3 normal);
+  protected abstract void elementVertNormalToMeshVertNormal(Vector3 vertex, Vector3 normal, out Vector3 meshVert, out Vector3 meshNormal);
   #endregion
 }
