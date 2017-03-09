@@ -7,6 +7,7 @@ using Leap.Unity.Query;
 
 [CustomEditor(typeof(LeapGui))]
 public class LeapGuiEditor : CustomEditorBase {
+  /*
   private const int BUTTON_WIDTH = 30;
 
   private LeapGui gui;
@@ -83,13 +84,13 @@ public class LeapGuiEditor : CustomEditorBase {
                                false,
                                () => {
                                  gui.SetRenderer(renderer);
-                                 CreateCachedEditor(gui.renderer, null, ref _rendererEditor);
+                                 CreateCachedEditor(gui.GetComponent<Renderer>(), null, ref _rendererEditor);
                                  serializedObject.Update();
                                });
     }
 
-    if (gui.renderer != null) {//
-      CreateCachedEditor(gui.renderer, null, ref _rendererEditor);
+    if (gui.GetComponent<Renderer>() != null) {//
+      CreateCachedEditor(gui.GetComponent<Renderer>(), null, ref _rendererEditor);
     }
 
     if (gui.space != null) {
@@ -267,5 +268,6 @@ public class LeapGuiEditor : CustomEditorBase {
     }
     return bounds;
   }
+  */
 }
 

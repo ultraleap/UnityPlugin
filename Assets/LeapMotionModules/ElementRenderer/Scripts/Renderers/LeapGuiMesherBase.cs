@@ -95,7 +95,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
 
     for (int i = 0; i < features.Count; i++) {
       var feature = features[i];
-      if (gui.features.Query().OfType<LeapGuiSpriteFeature>().Any(s => s.channel == feature.channel)) {
+      if (group.features.Query().OfType<LeapGuiSpriteFeature>().Any(s => s.channel == feature.channel)) {
         info[i] = info[i].OrWorse(SupportInfo.Error("Texture features cannot currently share uvs with sprite features."));
       }
     }
@@ -122,7 +122,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
 
     for (int i = 0; i < features.Count; i++) {
       var feature = features[i];
-      if (gui.features.Query().OfType<LeapGuiTextureFeature>().Any(s => s.channel == feature.channel)) {
+      if (group.features.Query().OfType<LeapGuiTextureFeature>().Any(s => s.channel == feature.channel)) {
         info[i] = info[i].OrWorse(SupportInfo.Error("Sprite features cannot currently share uvs with texture features."));
       }
     }
@@ -241,11 +241,11 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElement>,
 
   protected virtual void loadAllSupportedFeatures() {
     using (new ProfilerSample("Load All Supported Features")) {
-      gui.GetSupportedFeatures(_meshFeatures);
-      gui.GetSupportedFeatures(_textureFeatures);
-      gui.GetSupportedFeatures(_spriteFeatures);
-      gui.GetSupportedFeatures(_tintFeatures);
-      gui.GetSupportedFeatures(_blendShapeFeatures);
+      group.GetSupportedFeatures(_meshFeatures);
+      group.GetSupportedFeatures(_textureFeatures);
+      group.GetSupportedFeatures(_spriteFeatures);
+      group.GetSupportedFeatures(_tintFeatures);
+      group.GetSupportedFeatures(_blendShapeFeatures);
 
       _doesRequireColors = doesRequireMeshColors();
       _doesRequireNormals = doesRequireMeshNormals();

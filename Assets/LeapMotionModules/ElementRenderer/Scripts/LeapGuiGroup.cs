@@ -5,8 +5,7 @@ using UnityEngine;
 using Leap.Unity;
 using Leap.Unity.Query;
 
-
-public class LeapGuiGrpup {
+public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
   [SerializeField, HideInInspector]
   private LeapGui _gui;
@@ -23,7 +22,16 @@ public class LeapGuiGrpup {
   [SerializeField, HideInInspector]
   private List<SupportInfo> _supportInfo;
 
+  [SerializeField, HideInInspector]
+  private bool _addRemoveSupported;
+
+  #region PUBLIC API
+
+#if UNITY_EDITOR
+  public new LeapGuiRendererBase renderer {
+#else
   public LeapGuiRendererBase renderer {
+#endif
     get {
       return _renderer;
     }
@@ -45,6 +53,12 @@ public class LeapGuiGrpup {
     }
   }
 
+  public bool addRemoveSupported {
+    get {
+      return _addRemoveSupported;
+    }
+  }
+
   public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
     features.Clear();
     for (int i = 0; i < _features.Count; i++) {
@@ -56,6 +70,48 @@ public class LeapGuiGrpup {
     }
 
     return features.Count != 0;
+  }
+
+  public void AddElement(List<LeapGuiElement> elements) {
+    using (new ProfilerSample("Add Elements")) {
+      //TODO
+    }
+  }
+
+  public void RemoveElement(List<LeapGuiElement> elements) {
+    using (new ProfilerSample("Remove Elements")) {
+      //TODO
+    }
+  }
+
+  public void AddFeature(Type featureType) {
+    AssertHelper.AssertEditorOnly();
+    _gui.ScheduleFullUpdate();
+
+    var feature = gameObject.AddComponent(featureType);
+    _features.Add(feature as LeapGuiFeatureBase);
+  }
+
+  public void SetRenderer(Type rendererType) {
+    AssertHelper.AssertEditorOnly();
+    _gui.ScheduleFullUpdate();
+
+    UnityEditor.Undo.RecordObject(this, "Changed Gui Renderer");
+    UnityEditor.EditorUtility.SetDirty(this);
+
+    if (_renderer != null) {
+      _renderer.OnDisableRendererEditor();
+      UnityEngine.Object.DestroyImmediate(_renderer);
+      _renderer = null;
+    }
+
+    _renderer = _gui.gameObject.AddComponent(rendererType) as LeapGuiRendererBase;
+
+    if (_renderer != null) {
+      _renderer.gui = _gui;
+      _renderer.group = this;
+      _renderer.OnEnableRendererEditor();
+    }
   }
 
   public void RebuildElementList() {
@@ -158,10 +214,36 @@ public class LeapGuiGrpup {
 
       _supportInfo = new List<SupportInfo>();
       foreach (var feature in _features) {
-        _supportInfo.Add(feature.GetSupportInfo(_gui).OrWorse(featureToInfo[feature]));
+        _supportInfo.Add(feature.GetSupportInfo(this).OrWorse(featureToInfo[feature]));
       }
     }
   }
+
+  #endregion
+
+  #region UNITY CALLBACKS
+
+  protected override void OnValidate() {
+    base.OnValidate();
+
+    if (!Application.isPlaying) {
+      _addRemoveSupported = true;
+      if (_renderer != null) {
+        _addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(renderer.GetType());
+      }
+      if (_gui.space != null) {
+        _addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(_gui.space.GetType());
+      }
+    }
+
+    for (int i = _features.Count; i-- != 0;) {
+      if (_features[i] == null) {
+        _features.RemoveAt(i);
+      }
+    }
+  }
+
+  #endregion
 
   #region PRIVATE IMPLEMENTATION
   private void rebuildElementListRecursively(Transform root, Transform currAnchor) {

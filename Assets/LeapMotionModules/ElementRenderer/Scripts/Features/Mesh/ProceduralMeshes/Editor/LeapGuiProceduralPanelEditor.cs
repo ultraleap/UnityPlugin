@@ -8,7 +8,7 @@ using Leap.Unity.Query;
 [CanEditMultipleObjects]
 [CustomEditor(typeof(LeapGuiProceduralPanel))]
 public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPanel> {
-
+  /*
   protected override void OnEnable() {
     base.OnEnable();
 
@@ -180,4 +180,5 @@ public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPa
       }
     }
   }
+  */
 }

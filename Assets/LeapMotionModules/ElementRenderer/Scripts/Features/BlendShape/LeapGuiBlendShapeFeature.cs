@@ -27,8 +27,8 @@ public class LeapGuiBlendShapeFeature : LeapGuiFeature<LeapGuiBlendShapeData> {
     World
   }
 
-  public override SupportInfo GetSupportInfo(LeapGui gui) {
-    if (gui.features.Query().Any(f => f is LeapGuiMeshFeature)) {
+  public override SupportInfo GetSupportInfo(LeapGuiGroup group) {
+    if (group.features.Query().Any(f => f is LeapGuiMeshFeature)) {
       return SupportInfo.FullSupport();
     } else {
       return SupportInfo.Error("Blend Shapes require a Mesh feature.");

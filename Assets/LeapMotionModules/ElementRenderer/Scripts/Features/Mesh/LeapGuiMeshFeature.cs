@@ -49,10 +49,10 @@ public class LeapGuiMeshFeature : LeapGuiFeature<LeapGuiMeshData> {
     }
   }
 
-  public override SupportInfo GetSupportInfo(LeapGui gui) {
-    var support = base.GetSupportInfo(gui);
+  public override SupportInfo GetSupportInfo(LeapGuiGroup group) {
+    var support = base.GetSupportInfo(group);
 
-    foreach (var feature in gui.features) {
+    foreach (var feature in group.features) {
       UVChannelFlags channel;
       if (feature is LeapGuiTextureFeature) {
         channel = (feature as LeapGuiTextureFeature).channel;

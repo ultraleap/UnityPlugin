@@ -7,6 +7,9 @@ public abstract class LeapGuiRendererBase : LeapGuiComponentBase<LeapGui> {
   [HideInInspector]
   public LeapGui gui;
 
+  [HideInInspector]
+  public LeapGuiGroup group;
+
   public abstract SupportInfo GetSpaceSupportInfo(LeapGuiSpace space);
 
   protected override void OnValidate() {
