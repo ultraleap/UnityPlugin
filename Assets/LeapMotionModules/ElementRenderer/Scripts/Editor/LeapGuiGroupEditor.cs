@@ -59,6 +59,10 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
     specifyCustomDrawer("_renderer", drawRenderer);
   }
 
+  private void OnDisable() {
+    if (_rendererEditor != null) DestroyImmediate(_rendererEditor);
+  }
+
   private void drawRenderer(SerializedProperty property) {
     Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
     Rect left, right;

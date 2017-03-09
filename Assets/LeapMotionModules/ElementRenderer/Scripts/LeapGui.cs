@@ -208,7 +208,10 @@ public class LeapGui : MonoBehaviour {
 
   void OnDestroy() {
     if (_space != null) InternalUtility.Destroy(space);
-    //TODO, clean up groups too
+    foreach (var group in _groups) {
+      InternalUtility.Destroy(group);
+    }
+    _delayedHeavyRebuild.Dispose();
   }
 
   void Awake() {
