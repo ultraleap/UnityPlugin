@@ -153,9 +153,9 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
 
     Color originalColor = GUI.color;
 
-    //TODO
-    /*
-    if (!EditorApplication.isPlaying && target.supportInfo != null) {
+    if (!EditorApplication.isPlaying &&
+        target.supportInfo != null &&
+        index < target.supportInfo.Count) {
       var supportInfo = target.supportInfo[index];
       switch (supportInfo.support) {
         case SupportType.Warning:
@@ -168,7 +168,6 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
           break;
       }
     }
-    */
 
     Vector2 size = EditorStyles.label.CalcSize(featureLabel);
 
