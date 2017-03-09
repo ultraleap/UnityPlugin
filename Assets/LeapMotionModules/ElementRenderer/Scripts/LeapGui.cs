@@ -158,14 +158,14 @@ public class LeapGui : MonoBehaviour {
 
   //Begin editor-only private api
 #if UNITY_EDITOR
-  public void ScheduleFullUpdate() {
+  public void ScheduleEditorUpdate() {
     //Dirty the hash by changing it to something else
     _previousHierarchyHash++;
   }
 
   public void SetSpace(Type spaceType) {
     AssertHelper.AssertEditorOnly();
-    ScheduleFullUpdate();
+    ScheduleEditorUpdate();
 
     UnityEditor.Undo.RecordObject(this, "Change Gui Space");
     UnityEditor.EditorUtility.SetDirty(this);
@@ -184,7 +184,7 @@ public class LeapGui : MonoBehaviour {
 
   public void AddFeature(Type featureType) {
     AssertHelper.AssertEditorOnly();
-    ScheduleFullUpdate();
+    ScheduleEditorUpdate();
 
     var feature = gameObject.AddComponent(featureType);
     _features.Add(feature as LeapGuiFeatureBase);
@@ -192,7 +192,7 @@ public class LeapGui : MonoBehaviour {
 
   public void SetRenderer(Type rendererType) {
     AssertHelper.AssertEditorOnly();
-    ScheduleFullUpdate();
+    ScheduleEditorUpdate();
 
     UnityEditor.Undo.RecordObject(this, "Changed Gui Renderer");
     UnityEditor.EditorUtility.SetDirty(this);
@@ -379,7 +379,9 @@ public class LeapGui : MonoBehaviour {
   #region PRIVATE IMPLEMENTATION
 
   private LeapGui() {
+#if UNITY_EDITOR
     _delayedHeavyRebuild = new DelayedAction(() => doEditorUpdateLogic(fullRebuild: true, heavyRebuild: true));
+#endif
   }
 
 #if UNITY_EDITOR
