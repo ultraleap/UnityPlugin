@@ -31,9 +31,10 @@ namespace Leap.Unity.UI.Interaction {
     public bool allowsTwoHandedGrasp__curIgnored = false;
 
     /// <summary>
-    /// Called by the InteractionManager every FixedUpdate,
-    /// after InteracitonHands have FixedUpdated. InteractionBehaviour uses this
-    /// to fire per-object interaction events.
+    /// Called by the InteractionManager every FixedUpdate, after
+    /// InteractionHands have FixedUpdated.
+    /// 
+    /// InteractionBehaviour uses this to fire per-object interaction events.
     /// </summary>
     public abstract void FixedUpdateObject();
 
@@ -41,7 +42,22 @@ namespace Leap.Unity.UI.Interaction {
       _body = GetComponent<Rigidbody>();
       _body.maxAngularVelocity = 100F;
 
-      interactionManager.RegisterInteractionBehaviour(this);
+      if (interactionManager != null) {
+        interactionManager.RegisterInteractionBehaviour(this);
+      }
+    }
+
+    protected virtual void Start() {
+      if (interactionManager == null) {
+        interactionManager = InteractionManager.singleton;
+
+        if (interactionManager == null) {
+          Debug.LogError("Interaction Behaviours require an Interaction Manager. Please ensure you have an InteractionManager in your scene.");
+        }
+        else {
+          interactionManager.RegisterInteractionBehaviour(this);
+        }
+      }
     }
 
     protected virtual void OnValidate() {

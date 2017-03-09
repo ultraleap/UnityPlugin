@@ -10,6 +10,10 @@ namespace Leap.Unity.UI.Interaction {
   [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviour : InteractionBehaviourBase {
 
+    #region Public API
+
+    #region Hovering API
+
     /// <summary> Gets whether any hand is nearby. </summary>
     public bool isHovered             { get { return _hoveringHandsCount > 0; } }
 
@@ -33,34 +37,53 @@ namespace Leap.Unity.UI.Interaction {
     // TODO: Document OnObjectHover callbacks and how they differ from OnHover callbacks
     public Action<Hand> OnObjectHoverBegin = (closestHand) => { };
     public Action<Hand> OnObjectHoverStay  = (closestHand) => { };
-    public Action<Hand> OnObjectHoverEnd   = (closestHand) => { };
+    public Action<Hand> OnObjectHoverEnd = (closestHand) => { };
+
+    public Action<Hand> OnPrimaryHoverBegin = (hand) => { };
+    public Action<Hand> OnPrimaryHoverStay = (hand) => { };
+    public Action<Hand> OnPrimaryHoverEnd = (hand) => { };
+
+    public Action<Hand> OnObjectPrimaryHoverBegin = (closestHand) => { };
+    public Action<Hand> OnObjectPrimaryHoverStay = (closestHand) => { };
+    public Action<Hand> OnObjectPrimaryHoverEnd = (closestHand) => { };
+
+    #endregion
+
+    #region Grasping API
 
     public Action<Hand>                      OnGraspBegin             = (hand) => { };
     public Action<Vector3, Quaternion, Hand> OnPreGraspedMovement     = (preSolvePos, preSolveRot, hand) => { };
-    public Action<Vector3, Quaternion, Hand> OnGraspedMovement    = (solvedPos, solvedRot, hand) => { };
+    public Action<Vector3, Quaternion, Hand> OnGraspedMovement        = (solvedPos, solvedRot, hand) => { };
     public Action<Hand>                      OnGraspHold              = (hand) => { };
     public Action<Hand>                      OnGraspEnd               = (hand) => { };
 
-    // TODO: When two-handed grasping becomes a thing, implement these.
-    //public Action       OnObjectGraspBegin = () => { };
-    //public Action       OnObjectGraspHold  = () => { };
-    //public Action       OnObjectGraspEnd   = () => { };
+    // TODO: Implement!
+    // also document here
+    public Action      OnObjectGraspBegin = () => { };
+    public Action      OnObjectGraspHold  = () => { };
+    public Action      OnObjectGraspEnd   = () => { };
 
-    public Action<Hand> OnPrimaryHoverBegin = (hand) => { };
-    public Action<Hand> OnPrimaryHoverStay  = (hand) => { };
-    public Action<Hand> OnPrimaryHoverEnd   = (hand) => { };
+    public Action<List<Hand>>                      OnMultiGraspBegin          = (hands) => { };
+    public Action<List<Hand>>                      OnMultiGraspHold           = (hands) => { };
+    public Action<Vector3, Quaternion, List<Hand>> OnPreMultiGraspedMovement  = (preSolvedPos, preSolvedRot, hands) => { };
+    public Action<Vector3, Quaternion, List<Hand>> OnMultiGraspedMovement     = (solvedPos, solvedRot, hands) => { };
+    public Action<List<Hand>>                      OnMultiGraspEnd            = (hands) => { };
 
-    public Action<Hand> OnObjectPrimaryHoverBegin = (closestHand) => { };
-    public Action<Hand> OnObjectPrimaryHoverStay  = (closestHand) => { };
-    public Action<Hand> OnObjectPrimaryHoverEnd   = (closestHand) => { };
+    #endregion
+
+    #region Contact API
 
     public Action<Hand> OnContactBegin = (hand) => { };
     public Action<Hand> OnContactStay  = (hand) => { };
     public Action<Hand> OnContactEnd   = (hand) => { };
 
     public Action<Hand> OnObjectContactBegin = (closestHand) => { };
-    public Action<Hand> OnObjectContactStay = (closestHand) => { };
-    public Action<Hand> OnObjectContactEnd = (closestHand) => { };
+    public Action<Hand> OnObjectContactStay  = (closestHand) => { };
+    public Action<Hand> OnObjectContactEnd   = (closestHand) => { };
+
+    #endregion
+
+    #endregion
 
     [Tooltip("Should hands move the object as if it is held when the object is grasped? "
            + "Use OnPostHoldingMovement to constrain the object's motion while held, or "
@@ -104,9 +127,9 @@ namespace Leap.Unity.UI.Interaction {
       rigidbodyWarper = new RigidbodyWarper(interactionManager, this.transform, _body, 0.25F);
     }
 
+    protected override void Start() {
+      base.Start();
 
-
-    void Start() {
       RefreshPositionLockedState();
       InitGrasping();
 
@@ -492,12 +515,15 @@ namespace Leap.Unity.UI.Interaction {
     /// Returns whether the InteractionBehaviour has its position fully locked
     /// by its Rigidbody settings or by any attached PhysX Joints.
     /// 
+    /// This is useful for the GraspedMovementController to determine whether
+    /// it should attempt to move the interaction object or merely rotate it.
+    /// 
     /// If the state of the underlying Rigidbody or Joints changes what this value
     /// should be, it will not automatically update (as an optimization) at runtime;
     /// instead, manually call RefreshPositionLockedState(). This is because the
     /// type-checks required are relatively expensive and mustn't occur every frame.
     /// </summary>
-    public bool IsPositionLocked { get { return _isPositionLocked; } }
+    public bool isPositionLocked { get { return _isPositionLocked; } }
 
     /// <summary>
     /// Call this method if the InteractionBehaviour's Rigidbody becomes or unbecomes

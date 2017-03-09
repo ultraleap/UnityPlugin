@@ -100,7 +100,7 @@ namespace Leap.Unity.UI.Interaction {
             Vector3 point1 = (it.MultiplyPoint3x4(localPos) - bodyPosition);
             Vector3 point2 = (bonePos - bodyPosition);
 
-            if (_interactionObj.IsPositionLocked) {
+            if (_interactionObj.isPositionLocked) {
               // Only rotate the object, pivoting around its origin.
               _solveMethod = SolveMethod.PivotAroundOrigin;
               _objectCentroid += point1;

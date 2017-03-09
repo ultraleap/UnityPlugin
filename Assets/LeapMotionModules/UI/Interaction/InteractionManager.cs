@@ -9,6 +9,23 @@ namespace Leap.Unity.UI.Interaction {
 
   public partial class InteractionManager : MonoBehaviour, IRuntimeGizmoComponent {
 
+    /// <summary>
+    /// Usually, only one InteractionManager is necessary per Unity scene. This property
+    /// will contain that InteractionManager as soon as its Awake() method is called.
+    /// </summary>
+    /// 
+    /// <details>
+    /// By default, this property contains the first InteractionManager that has had
+    /// its Awake() method called in the current scene. If an InteractionBehaviourBase
+    /// does not have a non-null interactionManager by the time has Start() called,
+    /// it will default to using the InteractionManager referenced here.
+    /// 
+    /// If for some reason you have multiple InteractionManagers in your scene and you
+    /// desire to instantiate an InteractionBehaviour at runtime, you should assign its
+    /// InteractionManager appropriately as soon as you instantiate it.
+    /// </details>
+    public static InteractionManager singleton { get; set; }
+
     [Header("Interactions")]
     public bool enableHovering = true;
     public bool enableContact  = true;
@@ -101,6 +118,8 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     void Awake() {
+
+
       Provider = Hands.Provider;
 
       _interactionHands[0] = new InteractionHand(this, () => { return Hands.FixedLeft; }, Chirality.Left, WorldHoverActivationRadius, WorldTouchActivationRadius);
