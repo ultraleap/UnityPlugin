@@ -84,6 +84,8 @@ namespace Leap.Unity.Interaction {
         }
         if (_manager != null) {
           gameObject.layer = _manager.InteractionBrushLayer;
+        }else {
+          gameObject.layer = 2;
         }
       }
     }
@@ -250,7 +252,7 @@ namespace Leap.Unity.Interaction {
             Vector3 boneCenter = bone.Center.ToVector3();
 
             Array.Clear(tempColliderArray, 0, tempColliderArray.Length);
-            Physics.OverlapSphereNonAlloc(boneCenter, softContactBoneRadius, tempColliderArray, (_manager != null) ? 1 << _manager.InteractionLayer : int.MaxValue);
+            Physics.OverlapSphereNonAlloc(boneCenter, softContactBoneRadius, tempColliderArray, (_manager != null) ? 1 << _manager.InteractionLayer : ~(1<<2));
 
             foreach (Collider col in tempColliderArray) {
               if (col != null && col.attachedRigidbody != null && !col.attachedRigidbody.isKinematic) {
