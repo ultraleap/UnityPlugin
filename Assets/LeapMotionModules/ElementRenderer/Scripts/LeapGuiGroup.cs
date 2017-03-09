@@ -92,7 +92,7 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
   public void AddFeature(Type featureType) {
     AssertHelper.AssertEditorOnly();
-    _gui.ScheduleFullUpdate();
+    _gui.ScheduleEditorUpdate();
 
     var feature = gameObject.AddComponent(featureType);
     _features.Add(feature as LeapGuiFeatureBase);
@@ -100,7 +100,7 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
   public void SetRenderer(Type rendererType) {
     AssertHelper.AssertEditorOnly();
-    _gui.ScheduleFullUpdate();
+    _gui.ScheduleEditorUpdate();
 
     UnityEditor.Undo.RecordObject(this, "Changed Gui Renderer");
     UnityEditor.EditorUtility.SetDirty(this);

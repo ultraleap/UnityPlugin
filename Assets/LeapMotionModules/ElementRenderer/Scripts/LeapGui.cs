@@ -106,14 +106,14 @@ public class LeapGui : MonoBehaviour {
 
   //Begin editor-only private api
 #if UNITY_EDITOR
-  public void ScheduleFullUpdate() {
+  public void ScheduleEditorUpdate() {
     //Dirty the hash by changing it to something else
     _previousHierarchyHash++;
   }
 
   public void SetSpace(Type spaceType) {
     AssertHelper.AssertEditorOnly();
-    ScheduleFullUpdate();
+    ScheduleEditorUpdate();
 
     UnityEditor.Undo.RecordObject(this, "Change Gui Space");
     UnityEditor.EditorUtility.SetDirty(this);
