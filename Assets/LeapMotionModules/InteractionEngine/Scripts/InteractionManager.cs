@@ -372,6 +372,11 @@ namespace Leap.Unity.Interaction {
             if (_graspingEnabled) {
             }
             interactionHand.ReleaseObject();
+
+            InteractionBrushHand ibHand;
+            if ((ibHand = _handPool.GetHandModel<InteractionBrushHand>(interactionHand.hand.Id)) != null) {
+              ibHand.enableSoftContact();
+            }
           }
         }
       }
@@ -398,6 +403,12 @@ namespace Leap.Unity.Interaction {
       }
 
       interactionHand.ReleaseObject();
+
+      InteractionBrushHand ibHand;
+      if ((ibHand = _handPool.GetHandModel<InteractionBrushHand>(interactionHand.hand.Id)) != null){
+        ibHand.enableSoftContact();
+      }
+
       return true;
     }
 

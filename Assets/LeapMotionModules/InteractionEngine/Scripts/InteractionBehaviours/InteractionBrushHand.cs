@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using Leap.Unity.RuntimeGizmos;
 
@@ -50,10 +51,10 @@ namespace Leap.Unity.Interaction {
 
     [HideInInspector]
     public bool _softContactMode = true;
-    private List<SoftContact> softContacts = new List<SoftContact>(N_FINGERS * N_ACTIVE_BONES);
+    private List<SoftContact> softContacts = new List<SoftContact>(20);
     private Collider[] tempColliderArray = new Collider[10];
-    private Vector3[] previousBoneCenters = new Vector3[N_FINGERS * N_ACTIVE_BONES];
-    private int softContactTimer = 0;
+    private Vector3[] previousBoneCenters = new Vector3[20];
+    private int softContactHysteresisTimer = 0;
     private float softContactBoneRadius = 0.02f;
 
     /** The collision detection mode to use for this hand model when running physics simulations. */
@@ -227,28 +228,27 @@ namespace Leap.Unity.Interaction {
             Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
             int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
             UpdateBone(bone, boneArrayIndex, deadzone);
-            previousBoneCenters[boneArrayIndex] = bone.Center.ToVector3();
           }
         }
 
         //Update Palm
         UpdateBone(_hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL), N_FINGERS * N_ACTIVE_BONES, deadzone);
-        softContactTimer++;
+        softContactHysteresisTimer++;
       } else {
         //SOFT CONTACT COLLISIONS
         softContacts.Clear();
 
         //Generate Contacts
-        for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
-          for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
-            Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
-            int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
+        for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++) {
+          for (int jointIndex = 0; jointIndex < 4; jointIndex++) {
+            Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+            int boneArrayIndex = fingerIndex * 4 + jointIndex;
             Vector3 boneCenter = bone.Center.ToVector3();
 
             Array.Clear(tempColliderArray, 0, tempColliderArray.Length);
             Physics.OverlapSphereNonAlloc(boneCenter, softContactBoneRadius, tempColliderArray, 1 << _manager.InteractionLayer);
 
-            foreach(Collider col in tempColliderArray) {
+            foreach (Collider col in tempColliderArray) {
               if (col != null && col.attachedRigidbody != null && !col.attachedRigidbody.isKinematic) {
                 SoftContact contact = new SoftContact();
                 contact.col = col;
@@ -256,7 +256,7 @@ namespace Leap.Unity.Interaction {
 
                 if (col is MeshCollider) {
                   contact.normal = (contact.body.worldCenterOfMass - boneCenter).normalized;
-                }else {
+                } else {
                   Vector3 objectLocalBoneCenter = col.transform.InverseTransformPoint(boneCenter);
                   Vector3 objectPoint = col.transform.TransformPoint(col.ClosestPointOnSurface(objectLocalBoneCenter));
                   contact.normal = (objectPoint - boneCenter).normalized * (col.IsInsideCollider(objectLocalBoneCenter) ? -1f : 1f);
@@ -267,20 +267,12 @@ namespace Leap.Unity.Interaction {
                 softContacts.Add(contact);
               }
             }
-            previousBoneCenters[boneArrayIndex] = boneCenter;
           }
         }
 
         if (softContacts.Count == 0) {
           //If there are no detected Contacts, exit soft contact mode
-          _softContactMode = false;
-          for (int i = _brushBones.Length; i-- != 0;) {
-            _brushBones[i].gameObject.SetActive(true);
-            _brushBones[i].transform.position = _brushBones[i].lastTarget + (_hand.PalmPosition.ToVector3() - _brushBones[_brushBones.Length-1].lastTarget);
-            _brushBones[i].body.velocity = Vector3.zero;
-          }
-          _handParent.SetActive(true);
-          softContactTimer = 0;
+          disableSoftContact();
         } else {
           //Otherwise, Resolve Contacts
           for (int i = 0; i < 10; i++) {
@@ -288,6 +280,15 @@ namespace Leap.Unity.Interaction {
               applySoftContact(contact.body, contact.position, contact.velocity, -contact.normal);
             }
           }
+        }
+      }
+
+      //Update the last positions of the bones with this frame
+      for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++) {
+        for (int jointIndex = 0; jointIndex < 4; jointIndex++) {
+          Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+          int boneArrayIndex = fingerIndex * 4 + jointIndex;
+          previousBoneCenters[boneArrayIndex] = bone.Center.ToVector3();
         }
       }
     }
@@ -328,14 +329,9 @@ namespace Leap.Unity.Interaction {
           float massScale = Mathf.Clamp(1.0f - (targetingError * 2.0f), 0.1f, 1.0f) * Mathf.Clamp(_hand.PalmVelocity.Magnitude * 10f, 1f, 10f);
           body.mass = _perBoneMass * massScale;
 
-          Debug.DrawLine(brushBone.lastTarget, body.position);
-          if (softContactTimer > 4 && targetingError >= DISLOCATION_FRACTION && _hand.PalmVelocity.Magnitude < 1.5f && boneArrayIndex != N_ACTIVE_BONES * N_FINGERS) {
-            _softContactMode = true;
-            for (int i = _brushBones.Length; i-- != 0;) {
-              _brushBones[i].gameObject.SetActive(false);
-              _brushBones[i].body.velocity = Vector3.zero;
-            }
-            _handParent.SetActive(false);
+          //If these conditions are met, stop using brush hands to contact objects and switch to "Soft Contact"
+          if (softContactHysteresisTimer > 4 && targetingError >= DISLOCATION_FRACTION && _hand.PalmVelocity.Magnitude < 1.5f && boneArrayIndex != N_ACTIVE_BONES * N_FINGERS) {
+            enableSoftContact();
             return;
           }
         }
@@ -381,6 +377,29 @@ namespace Leap.Unity.Interaction {
       public Vector3 normal;
       public Vector3 velocity;
       public Vector3 bodyPointVelocity;
+    }
+
+    public void disableSoftContact() {
+      _softContactMode = false;
+      for (int i = _brushBones.Length; i-- != 0;) {
+        _brushBones[i].gameObject.SetActive(true);
+        _brushBones[i].transform.position = _brushBones[i].lastTarget + (_hand.PalmPosition.ToVector3() - _brushBones[_brushBones.Length - 1].lastTarget);
+        _brushBones[i].body.velocity = Vector3.zero;
+      }
+      _handParent.SetActive(true);
+      for (int i = _brushBones.Length; i-- != 0;) {
+        _brushBones[i].DisableColliderTemporarily(0.3f);
+      }
+      softContactHysteresisTimer = 0;
+    }
+
+    public void enableSoftContact() {
+      _softContactMode = true;
+      for (int i = _brushBones.Length; i-- != 0;) {
+        _brushBones[i].gameObject.SetActive(false);
+        _brushBones[i].body.velocity = Vector3.zero;
+      }
+      _handParent.SetActive(false);
     }
 
     static void applySoftContact(Rigidbody thisObject, Vector3 handContactPoint, Vector3 handVelocityAtContactPoint, Vector3 normal) {
