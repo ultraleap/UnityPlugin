@@ -1,6 +1,4 @@
 ﻿using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
@@ -105,7 +103,7 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
     EditorGUI.BeginDisabledGroup(target.features.Count == 0);
     if (GUI.Button(middle, "-", EditorStyles.miniButtonMid) && _featureList.index >= 0) {
       target.features.RemoveAt(_featureList.index);
-      //target.ScheduleEditorUpdate();
+      target.gui.ScheduleEditorUpdate();
       EditorUtility.SetDirty(target);
     }
     EditorGUI.EndDisabledGroup();
@@ -183,7 +181,7 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
     EditorGUI.BeginChangeCheck();
     feature.DrawFeatureEditor(rect.NextLine().Indent(), isActive, isFocused);
     if (EditorGUI.EndChangeCheck()) {
-      //gui.ScheduleEditorUpdate();
+      target.gui.ScheduleEditorUpdate();
       EditorUtility.SetDirty(feature);
     }
   }

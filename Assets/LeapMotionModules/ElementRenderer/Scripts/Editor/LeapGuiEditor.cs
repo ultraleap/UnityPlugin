@@ -111,17 +111,6 @@ public class LeapGuiEditor : CustomEditorBase {
 
     EditorGUILayout.EndHorizontal();
 
-    /*
-    Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
-    Rect left, right;
-    rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH * 2);
-
-    EditorGUI.LabelField(left, "Space", EditorStyles.miniButtonLeft);
-    if (GUI.Button(right, "v", EditorStyles.miniButtonRight)) {
-      _addSpaceMenu.ShowAsContext();
-    }
-    */
-
     if (_spaceEditor != null) {
       _spaceEditor.OnInspectorGUI();
     }
