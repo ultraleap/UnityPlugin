@@ -14,8 +14,10 @@ public class DefaultFeatureDataEditor : CustomEditorBase {
 }
 
 [CanEditMultipleObjects]
-[CustomEditor(typeof(LeapGuiElement), editorForChildClasses: true)]
-public class LeapGuiElementEditor : CustomEditorBase {
+[CustomEditor(typeof(LeapGuiElement), editorForChildClasses: true, isFallback = true)]
+public class LeapGuiElementEditor : LeapGuiElementEditorBase<LeapGuiElement> { }
+
+public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T : Object {
   List<LeapGuiElement> elements = new List<LeapGuiElement>();
   List<Editor> editorCache = new List<Editor>();
 

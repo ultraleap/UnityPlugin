@@ -7,8 +7,8 @@ using Leap.Unity.Query;
 
 [CanEditMultipleObjects]
 [CustomEditor(typeof(LeapGuiProceduralPanel))]
-public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPanel> {
-  /*
+public class LeapGuiProceduralPanelEditor : LeapGuiElementEditorBase<LeapGuiProceduralPanel> {
+
   protected override void OnEnable() {
     base.OnEnable();
 
@@ -39,27 +39,22 @@ public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPa
   private void drawSourceData(SerializedProperty property) {
     serializedObject.ApplyModifiedProperties();
 
-    var mainGui = targets.Query().
-                          Select(t => t.GetComponent<LeapGuiElement>()).
-                          Where(e => e != null).
-                          Select(e => e.attachedGui).
-                          FirstOrDefault(g => g != null);
+    var mainGroup = targets.Query().
+                            Select(t => t.attachedGroup).
+                            FirstOrDefault(g => g != null);
 
     //If no element is connected to a gui, we can't draw anything
-    if (mainGui == null) {
+    if (mainGroup == null) {
       return;
     }
 
-    //If all the elements are not connected to the same gui, we can't draw anything
-    if (!targets.Query().All(t => {
-      var element = t.GetComponent<LeapGuiElement>();
-      return element != null && element.attachedGui == mainGui;
-    })) {
+    //If any of the elements are not connected to the same gui, we can't draw anything
+    if (targets.Query().Any(p => p.attachedGroup != mainGroup)) {
       return;
     }
 
     var features = new List<LeapGuiFeatureBase>();
-    foreach (var feature in mainGui.features) {
+    foreach (var feature in mainGroup.features) {
       if (feature is LeapGuiTextureFeature || feature is LeapGuiSpriteFeature) {
         features.Add(feature);
       }
@@ -106,8 +101,7 @@ public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPa
 
     if (EditorGUI.EndChangeCheck()) {
       foreach (var target in targets) {
-        var element = target.GetComponent<LeapGuiElement>();
-        List<LeapGuiElementData> data = element.data.Query().Where(f => f is LeapGuiTextureData || f is LeapGuiSpriteData).ToList();
+        List<LeapGuiElementData> data = target.data.Query().Where(f => f is LeapGuiTextureData || f is LeapGuiSpriteData).ToList();
 
         Undo.RecordObject(target, "Setting source data");
         EditorUtility.SetDirty(target);
@@ -180,5 +174,4 @@ public class LeapGuiProceduralPanelEditor : CustomEditorBase<LeapGuiProceduralPa
       }
     }
   }
-  */
 }

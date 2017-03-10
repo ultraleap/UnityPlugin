@@ -8,13 +8,13 @@ public abstract class LeapGuiElement : MonoBehaviour {
 
   #region INSPECTOR FIELDS
   [SerializeField, HideInInspector]
-  private Transform _anchor;
+  protected Transform _anchor;
 
   [SerializeField, HideInInspector]
-  private List<LeapGuiElementData> _data = new List<LeapGuiElementData>();
+  protected List<LeapGuiElementData> _data = new List<LeapGuiElementData>();
 
   [SerializeField, HideInInspector]
-  private LeapGuiGroup _attachedGroup;
+  protected LeapGuiGroup _attachedGroup;
   #endregion
 
   #region PRIVATE VARIABLES
@@ -25,7 +25,7 @@ public abstract class LeapGuiElement : MonoBehaviour {
   /// </summary>
 #if UNITY_EDITOR
   [NonSerialized]
-  private Mesh _pickingMesh;
+  protected Mesh _pickingMesh;
 #endif
   #endregion
 
@@ -83,7 +83,7 @@ public abstract class LeapGuiElement : MonoBehaviour {
   #endregion
 
   #region UNITY CALLBACKS
-  protected void OnValidate() {
+  protected virtual void OnValidate() {
     //Delete any null references
     for (int i = _data.Count; i-- != 0;) {
       if (_data[i] == null) {
@@ -124,13 +124,13 @@ public abstract class LeapGuiElement : MonoBehaviour {
     }
   }
 
-  void OnDestroy() {
+  protected virtual void OnDestroy() {
     foreach (var dataObj in _data) {
       if (dataObj != null) InternalUtility.Destroy(dataObj);
     }
   }
 
-  void OnEnable() {
+  protected virtual void OnEnable() {
 #if UNITY_EDITOR
     if (Application.isPlaying) {
 #endif
@@ -142,7 +142,7 @@ public abstract class LeapGuiElement : MonoBehaviour {
 #endif
   }
 
-  void OnDisable() {
+  protected virtual void OnDisable() {
 #if UNITY_EDITOR
     if (Application.isPlaying) {
 #endif
@@ -155,7 +155,7 @@ public abstract class LeapGuiElement : MonoBehaviour {
   }
 
 #if UNITY_EDITOR
-  void OnDrawGizmos() {
+  protected virtual void OnDrawGizmos() {
     if (_pickingMesh != null && _pickingMesh.vertexCount != 0) {
       Gizmos.color = new Color(1, 0, 0, 0);
       Gizmos.DrawMesh(_pickingMesh);

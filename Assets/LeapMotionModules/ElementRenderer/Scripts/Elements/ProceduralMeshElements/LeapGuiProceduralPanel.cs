@@ -7,11 +7,6 @@ using System;
 
 public class LeapGuiProceduralPanel : LeapGuiMeshElementBase {
 
-  public override void RefreshMeshData() {
-    throw new NotImplementedException();
-  }
-
-  /*
   public const int MAX_VERTS = 128;
 
   [SerializeField]
@@ -112,7 +107,9 @@ public class LeapGuiProceduralPanel : LeapGuiMeshElementBase {
     setSourceFeatureDirty();
   }
 
-  public void OnValidate() {
+  protected override void OnValidate() {
+    base.OnValidate();
+
     if (_sourceData == null) {
       assignDefaultSourceValue();
     }
@@ -131,10 +128,8 @@ public class LeapGuiProceduralPanel : LeapGuiMeshElementBase {
 
     setSourceFeatureDirty();
   }
-
-  public override bool TryGenerateMesh(LeapGuiMeshData meshFeature,
-                                   out Mesh mesh,
-                                   out UVChannelFlags remappableChannels) {
+  
+  public override void RefreshMeshData() {
     if (_sourceData == null) {
       assignDefaultSourceValue();
     }
@@ -156,7 +151,7 @@ public class LeapGuiProceduralPanel : LeapGuiMeshElementBase {
       if (spriteData.sprite == null) {
         mesh = null;
         remappableChannels = 0;
-        return false;
+        return;
       }
 
       var sprite = spriteData.sprite;
@@ -227,8 +222,6 @@ public class LeapGuiProceduralPanel : LeapGuiMeshElementBase {
     mesh.RecalculateBounds();
 
     remappableChannels = UVChannelFlags.UV0;
-
-    return true;
   }
 
   private float calculateVertAxis(int dv, int vertCount, float size, float border0, float border1) {
@@ -250,10 +243,7 @@ public class LeapGuiProceduralPanel : LeapGuiMeshElementBase {
   }
 
   private void assignDefaultSourceValue() {
-    var element = GetComponent<LeapGuiElement>();
-    if (element != null) {
-      _sourceData = element.data.Query().FirstOrDefault(IsValidDataSource);
-    }
+    _sourceData = data.Query().FirstOrDefault(IsValidDataSource);
   }
 
   private void setSourceFeatureDirty() {
@@ -269,5 +259,4 @@ public class LeapGuiProceduralPanel : LeapGuiMeshElementBase {
     Vertices,
     VerticesPerRectilinearMeter
   }
-  */
 }
