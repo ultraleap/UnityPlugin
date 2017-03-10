@@ -17,7 +17,7 @@ public class DefaultFeatureDataEditor : CustomEditorBase {
 [CustomEditor(typeof(LeapGuiElement), editorForChildClasses: true, isFallback = true)]
 public class LeapGuiElementEditor : LeapGuiElementEditorBase<LeapGuiElement> { }
 
-public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T : Object {
+public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T : LeapGuiElement {
   List<LeapGuiElement> elements = new List<LeapGuiElement>();
   List<Editor> editorCache = new List<Editor>();
 
@@ -163,14 +163,12 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
     }
   }
 
-  private bool HasFrameBounds() {
+  protected bool HasFrameBounds() {
     return true;
   }
 
-  private Bounds OnGetFrameBounds() {
+  protected Bounds OnGetFrameBounds() {
     Bounds[] allBounds = targets.Query().
-                                 Where(e => e != null).
-                                 OfType<LeapGuiElement>().
                                  Select(e => e.pickingMesh).
                                  Where(m => m != null).
                                  Select(m => m.bounds).
