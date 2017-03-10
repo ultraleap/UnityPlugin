@@ -113,6 +113,10 @@ public abstract class LeapGuiElement : MonoBehaviour {
         }
       }
     }
+
+    if (attachedGroup != null) {
+      attachedGroup.gui.ScheduleEditorUpdate();
+    }
 #endif
 
     foreach (var dataObj in _data) {

@@ -363,11 +363,39 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   }
 
   private void OnDestroy() {
+#if UNITY_EDITOR
+    if (!Application.isPlaying) {
+      if (_renderer != null) {
+        _renderer.OnDisableRendererEditor();
+      }
+    }
+#endif
+
     if (_renderer != null) DestroyImmediate(_renderer);
 
     foreach (var feature in _features) {
       DestroyImmediate(feature);
     }
+  }
+
+  private void OnEnable() {
+#if UNITY_EDITOR
+    if (!Application.isPlaying) {
+      return;
+    }
+#endif
+
+    _renderer.OnEnableRenderer();
+  }
+
+  private void OnDisable() {
+#if UNITY_EDITOR
+    if (!Application.isPlaying) {
+      return;
+    }
+#endif
+
+    _renderer.OnDisableRenderer();
   }
 
   #endregion

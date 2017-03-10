@@ -74,6 +74,15 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     }
   }
 
+  public override void OnDisableRendererEditor() {
+    base.OnDisableRendererEditor();
+
+    foreach (var renderer in _renderers) {
+      renderer.Destroy();
+    }
+    _renderers.Clear();
+  }
+
   public override void OnUpdateRenderer() {
     base.OnUpdateRenderer();
 
