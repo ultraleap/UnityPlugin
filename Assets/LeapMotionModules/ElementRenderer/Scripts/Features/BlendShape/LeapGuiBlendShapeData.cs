@@ -45,14 +45,14 @@ public class LeapGuiBlendShapeData : LeapGuiElementData {
   private Mesh _cachedBlendShape;
   public Mesh blendShape {
     get {
-      /*
-      var meshData = element.Mesh();
-      if (meshData == null) {
+      if (!(element is LeapGuiMeshElementBase)) {
         return null;
       }
 
-      meshData.RefreshMeshData();
-      Mesh mesh = meshData.mesh;
+      var meshElement = element as LeapGuiMeshElementBase;
+      meshElement.RefreshMeshData();
+
+      var mesh = meshElement.mesh;
       if (mesh == null) {
         return null;
       }
@@ -95,9 +95,6 @@ public class LeapGuiBlendShapeData : LeapGuiElementData {
 
         return _cachedBlendShape;
       }
-      */
-      //TODO
-      return null;
     }
   }
 

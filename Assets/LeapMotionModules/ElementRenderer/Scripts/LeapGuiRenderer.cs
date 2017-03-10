@@ -63,12 +63,17 @@ public abstract class LeapGuiRendererBase : LeapGuiComponentBase<LeapGui> {
     this.isHeavyUpdate = isHeavyUpdate;
   }
 
+  public abstract bool IsValidElement<Type>();
   public abstract bool IsValidElement(LeapGuiElement element);
 
   public abstract LeapGuiElement GetValidElementOnObject(GameObject obj);
 }
 
 public abstract class LeapGuiRenderer<ElementType> : LeapGuiRendererBase where ElementType : LeapGuiElement {
+
+  public override bool IsValidElement<Type>() {
+    return typeof(Type).IsSubclassOf(typeof(ElementType));
+  }
 
   public override bool IsValidElement(LeapGuiElement element) {
     return element is ElementType;

@@ -17,7 +17,7 @@ public class LeapGuiBlendShapeFeature : LeapGuiFeature<LeapGuiBlendShapeData> {
       return _space;
     }
     set {
-      //TODO: dirty flags!
+      isDirty = true;
       _space = value;
     }
   }
@@ -28,15 +28,11 @@ public class LeapGuiBlendShapeFeature : LeapGuiFeature<LeapGuiBlendShapeData> {
   }
 
   public override SupportInfo GetSupportInfo(LeapGuiGroup group) {
-    //TODO 
-    /*
-    if (group.features.Query().Any(f => f is LeapGuiMeshFeature)) {
-      return SupportInfo.FullSupport();
+    if (!group.renderer.IsValidElement<LeapGuiMeshElementBase>()) {
+      return SupportInfo.Error("Blend shapes a renderer that supports mesh elements.");
     } else {
-      return SupportInfo.Error("Blend Shapes require a Mesh feature.");
+      return SupportInfo.FullSupport();
     }
-    */
-    return SupportInfo.FullSupport();
   }
 
 #if UNITY_EDITOR

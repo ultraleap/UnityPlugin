@@ -15,7 +15,6 @@ public abstract class LeapGuiFeatureBase : LeapGuiComponentBase<LeapGui> {
     }
   }
 
-  //TODO: add logic in LeapGUI to use this method
   public virtual SupportInfo GetSupportInfo(LeapGuiGroup group) {
     return SupportInfo.FullSupport();
   }
