@@ -53,6 +53,7 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
                                  target.ChangeRenderer(renderer);
                                  serializedObject.Update();
                                  CreateCachedEditor(target.renderer, null, ref _rendererEditor);
+                                 target.gui.ScheduleEditorUpdate();
                                });
     }
 
