@@ -74,13 +74,16 @@ public class LeapGui : MonoBehaviour {
   }
 
   public bool TryAddElement(LeapGuiElement element) {
+
     //First try to attatch to a group that is preferred
-    foreach (var group in groups) {
-      Type rendererType = group.renderer.GetType();
-      Type preferredType = element.preferredRendererType;
-      if (preferredType == rendererType || rendererType.IsSubclassOf(preferredType)) {
-        if (group.TryAddElement(element)) {
-          return true;
+    Type preferredType = element.preferredRendererType;
+    if (preferredType != null) {
+      foreach (var group in groups) {
+        Type rendererType = group.renderer.GetType();
+        if (preferredType == rendererType || rendererType.IsSubclassOf(preferredType)) {
+          if (group.TryAddElement(element)) {
+            return true;
+          }
         }
       }
     }
