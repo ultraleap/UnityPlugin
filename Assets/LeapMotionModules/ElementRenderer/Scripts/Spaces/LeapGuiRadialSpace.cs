@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -8,7 +9,7 @@ public interface IRadialTransformer : ITransformer {
 
 public abstract class LeapGuiRadialSpaceBase : LeapGuiSpace {
   public const string RADIUS_PROPERTY = LeapGui.PROPERTY_PREFIX + "RadialSpace_Radius";
-  
+
   [SerializeField]
   public float radius = 1;
 }
@@ -38,7 +39,14 @@ public abstract class LeapGuiRadialSpace<TType> : LeapGuiRadialSpaceBase, ISuppo
   }
 
   public override ITransformer GetTransformer(Transform anchor) {
-    return _transformerData[anchor];
+    TType transformer;
+    if (!_transformerData.TryGetValue(anchor, out transformer)) {
+      throw new InvalidOperationException("Could not find an anchor reference for " + anchor +
+                                          ".  Remember that is is not legal to add or enabled anchors " +
+                                          "at runtime, or otherwise change the hierarchy structure.");
+    }
+
+    return transformer;
   }
 
   public override void RefreshElementData(Transform root, int index, int count) {
@@ -59,7 +67,7 @@ public abstract class LeapGuiRadialSpace<TType> : LeapGuiRadialSpaceBase, ISuppo
       SetTransformerRelativeTo(curr, parentTransformer, delta);
     }
   }
-  
+
   protected abstract TType ConstructTransformer(Transform anchor);
   protected abstract void SetTransformerRelativeTo(TType tartet, TType parent, Vector3 guiSpaceDelta);
 }
