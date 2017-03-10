@@ -32,13 +32,16 @@ public class LeapGui : MonoBehaviour {
   private List<Transform> _anchorParents = new List<Transform>();
 
   [NonSerialized]
+  private List<LeapGuiElement> _tempElementList = new List<LeapGuiElement>();
+  [NonSerialized]
   private bool _hasFinishedSetup = false;
   [NonSerialized]
   private int _previousHierarchyHash;
+
   private DelayedAction _delayedHeavyRebuild;
   #endregion
 
-  #region PUBLIC API
+  #region PUBLIC RUNTIME API
 
   public LeapGuiSpace space {
     get {
@@ -69,6 +72,31 @@ public class LeapGui : MonoBehaviour {
       return _hasFinishedSetup;
     }
   }
+
+  public bool TryAddElement(LeapGuiElement element) {
+    //First try to attatch to a group that is preferred
+    foreach (var group in groups) {
+      Type rendererType = group.renderer.GetType();
+      Type preferredType = element.preferredRendererType;
+      if (preferredType == rendererType || rendererType.IsSubclassOf(preferredType)) {
+        if (group.TryAddElement(element)) {
+          return true;
+        }
+      }
+    }
+
+    //If we failed, try to attach to a group that will take us
+    foreach (var group in groups) {
+      if (group.renderer.IsValidElement(element)) {
+        if (group.TryAddElement(element)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   #endregion
 
   #region PUBLIC EDITOR API
@@ -243,9 +271,9 @@ public class LeapGui : MonoBehaviour {
       _anchorParents.Clear();
       rebuildAnchorInfo(transform, transform);
       _space.BuildElementData(transform);
+      collectUnattachedElements();
 
       foreach (var group in _groups) {
-        group.CollectUnattachedElements();
         group.RebuildFeatureData();
         group.RebuildFeatureSupportInfo();
         group.UpdateRendererEditor(heavyRebuild);
@@ -280,6 +308,30 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
+  private void collectUnattachedElements() {
+    GetComponentsInChildren(_tempElementList);
+
+    foreach (var element in _tempElementList) {
+      if (element.IsAttachedToGroup) {
+        //procede to validate
+
+        if (!element.attachedGroup.elements.Contains(element)) {
+          var group = element.attachedGroup;
+          element.OnDetachedFromGui();
+          group.TryAddElement(element); //if this fails, handled by later clause
+        }
+
+        if (!element.enabled) {
+          element.attachedGroup.TryRemoveElement(element);
+        }
+      }
+
+      if (!element.IsAttachedToGroup && element.enabled) {
+        TryAddElement(element);
+      }
+    }
+  }
+
   private void doLateUpdateRuntime() {
     if (_space == null) return;
 
@@ -287,7 +339,7 @@ public class LeapGui : MonoBehaviour {
     using (new ProfilerSample("Refresh space data")) {
       _space.RefreshElementData(transform, 0, _anchors.Count);
     }
-    
+
     foreach (var group in _groups) {
       group.UpdateRenderer();
     }

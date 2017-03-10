@@ -17,7 +17,7 @@ public abstract class LeapGuiElement : MonoBehaviour {
   protected LeapGuiGroup _attachedGroup;
 
   [SerializeField, HideInInspector]
-  protected SerializableType _preferredRenderingType;
+  protected SerializableType _preferredRendererType;
   #endregion
 
   #region PRIVATE VARIABLES
@@ -57,6 +57,12 @@ public abstract class LeapGuiElement : MonoBehaviour {
     }
   }
 
+  public Type preferredRendererType {
+    get {
+      return _preferredRendererType;
+    }
+  }
+
 #if UNITY_EDITOR
   public Mesh pickingMesh {
     get {
@@ -71,7 +77,7 @@ public abstract class LeapGuiElement : MonoBehaviour {
   public virtual void OnAttachedToGui(LeapGuiGroup group, Transform anchor) {
 #if UNITY_EDITOR
     if (!Application.isPlaying) {
-      _preferredRenderingType = group.renderer.GetType();
+      _preferredRendererType = group.renderer.GetType();
     }
 #endif
 
@@ -126,7 +132,7 @@ public abstract class LeapGuiElement : MonoBehaviour {
     if (!Application.isPlaying) {
       if (_attachedGroup != null) {
         _attachedGroup.gui.ScheduleEditorUpdate();
-        _preferredRenderingType = _attachedGroup.renderer.GetType();
+        _preferredRendererType = _attachedGroup.renderer.GetType();
       }
     }
 #endif
@@ -152,7 +158,7 @@ public abstract class LeapGuiElement : MonoBehaviour {
 
           //First try to attatch to a group that is preferred
           foreach (var group in parentGui.groups) {
-            if (group.renderer.GetType().IsSubclassOf(_preferredRenderingType)) {
+            if (group.renderer.GetType().IsSubclassOf(_preferredRendererType)) {
               if (group.TryAddElement(this)) {
                 break;
               }

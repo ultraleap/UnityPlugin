@@ -213,33 +213,6 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     _gui.ScheduleEditorUpdate();
   }
 
-  public void CollectUnattachedElements() {
-    AssertHelper.AssertEditorOnly();
-
-    using (new ProfilerSample("Rebuild Element List")) {
-      for (int i = _elements.Count; i-- != 0;) {
-        var element = _elements[i];
-        if (element == null) {
-          _elements.RemoveAt(i);
-          continue;
-        }
-
-        if (!element.enabled) {
-          _elements.RemoveAt(i);
-          element.OnDetachedFromGui();
-          continue;
-        }
-
-        if (element.attachedGroup != this) {
-          _elements.RemoveAt(i);
-          continue;
-        }
-      }
-
-      collectUnattachedElementsRecursively(_gui.transform, _gui.transform);
-    }
-  }
-
   public void RebuildFeatureData() {
     AssertHelper.AssertEditorOnly();
 
@@ -341,6 +314,12 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   public void UpdateRendererEditor(bool heavyRebuild) {
     AssertHelper.AssertEditorOnly();
 
+    for (int i = _elements.Count; i-- != 0;) {
+      if (_elements[i] == null) {
+        _elements.RemoveAt(i);
+      }
+    }
+
     _renderer.OnUpdateRendererEditor(heavyRebuild);
   }
 
@@ -430,38 +409,6 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   #endregion
 
   #region PRIVATE IMPLEMENTATION
-  private void collectUnattachedElementsRecursively(Transform root, Transform currAnchor) {
-    int count = root.childCount;
-    for (int i = 0; i < count; i++) {
-      Transform child = root.GetChild(i);
-      if (!child.gameObject.activeSelf) continue;
-
-      var childAnchor = currAnchor;
-
-      var anchorComponent = child.GetComponent<AnchorOfConstantSize>();
-      if (anchorComponent != null && anchorComponent.enabled) {
-        childAnchor = anchorComponent.transform;
-      }
-
-      var element = _renderer.GetValidElementOnObject(child.gameObject);
-
-      if (element != null) {
-        //If element claims to be attached, but actually isn't detatch it
-        if (element.attachedGroup == this && !_elements.Contains(element)) {
-          element.OnDetachedFromGui();
-        }
-
-        if (!element.IsAttachedToGroup && element.enabled) {
-          Assert.IsFalse(_elements.Contains(element));
-
-          element.OnAttachedToGui(this, childAnchor);
-          _elements.Add(element);
-        }
-      }
-
-      collectUnattachedElementsRecursively(child, childAnchor);
-    }
-  }
 
   private bool addRemoveSupportedOrEditTime() {
 #if UNITY_EDITOR
