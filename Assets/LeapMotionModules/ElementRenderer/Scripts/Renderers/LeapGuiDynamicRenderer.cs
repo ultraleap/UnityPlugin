@@ -5,8 +5,7 @@ using Leap.Unity;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Dynamic")]
-public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
-  ISupportsAddRemove {
+public class LeapGuiDynamicRenderer : LeapGuiMesherBase, ISupportsAddRemove {
 
   #region PRIVATE VARIABLES
 
@@ -17,12 +16,12 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase,
   private List<Vector4> _curved_elementParameters = new List<Vector4>();
   #endregion
 
-  public void OnAddElements(List<LeapGuiElement> elements, List<int> indexes) {
+  public void OnAddElement() {
     //TODO, this is super slow and sad
     OnUpdateRendererEditor(isHeavyUpdate: false);
   }
 
-  public void OnRemoveElements(List<int> toRemove) {
+  public void OnRemoveElement() {
     //TODO, this is super slow and sad
     OnUpdateRendererEditor(isHeavyUpdate: false);
   }

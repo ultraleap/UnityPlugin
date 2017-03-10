@@ -103,8 +103,12 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     }
 
 #if UNITY_EDITOR
-    _gui.ScheduleEditorUpdate();
+    if (!Application.isPlaying) {
+      _gui.ScheduleEditorUpdate();
+    }
 #endif
+
+    (_renderer as ISupportsAddRemove).OnAddElement();
 
     return true;
   }
@@ -120,8 +124,12 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     _elements.Remove(element);
 
 #if UNITY_EDITOR
-    _gui.ScheduleEditorUpdate();
+    if (!Application.isPlaying) {
+      _gui.ScheduleEditorUpdate();
+    }
 #endif
+
+    (_renderer as ISupportsAddRemove).OnRemoveElement();
 
     return true;
   }
@@ -141,6 +149,10 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
   public void UpdateRenderer() {
     _renderer.OnUpdateRenderer();
+
+    foreach (var feature in _features) {
+      feature.isDirty = false;
+    }
   }
 
   #endregion
@@ -316,8 +328,6 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   }
 
   public void RebuildEditorPickingMeshes() {
-    AssertHelper.AssertEditorOnly();
-
     if (gui.space == null) {
       return;
     }
@@ -371,10 +381,12 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     }
 #endif
 
-    if (_renderer != null) DestroyImmediate(_renderer);
+    if (_renderer != null) {
+      InternalUtility.Destroy(_renderer);
+    }
 
     foreach (var feature in _features) {
-      DestroyImmediate(feature);
+      InternalUtility.Destroy(feature);
     }
   }
 

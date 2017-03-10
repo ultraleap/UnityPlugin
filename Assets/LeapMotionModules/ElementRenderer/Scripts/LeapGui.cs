@@ -124,8 +124,6 @@ public class LeapGui : MonoBehaviour {
   }
 
   public void RebuildEditorPickingMeshes() {
-    AssertHelper.AssertEditorOnly();
-
     if (_space == null) {
       return;
     }
@@ -287,10 +285,12 @@ public class LeapGui : MonoBehaviour {
 
     //TODO, optimize this!  Don't do it every frame for the whole thing!
     using (new ProfilerSample("Refresh space data")) {
-      //_space.RefreshElementData(transform, 0, anchors.Count);
+      _space.RefreshElementData(transform, 0, _anchors.Count);
     }
-
-    //TODO: update groups and reset feature dirty flags
+    
+    foreach (var group in _groups) {
+      group.UpdateRenderer();
+    }
 
     _hasFinishedSetup = true;
   }

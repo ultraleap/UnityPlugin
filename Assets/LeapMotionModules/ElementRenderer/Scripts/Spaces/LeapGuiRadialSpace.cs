@@ -18,11 +18,11 @@ public abstract class LeapGuiRadialSpace<TType> : LeapGuiRadialSpaceBase, ISuppo
 
   protected Dictionary<Transform, TType> _transformerData = new Dictionary<Transform, TType>();
 
-  public virtual void OnAddElements(List<LeapGuiElement> element, List<int> indexes) {
+  public virtual void OnAddElement() {
     BuildElementData(transform); //TODO, optimize
   }
 
-  public virtual void OnRemoveElements(List<int> toRemove) {
+  public virtual void OnRemoveElement() {
     BuildElementData(transform); //TODO, optimize
   }
 

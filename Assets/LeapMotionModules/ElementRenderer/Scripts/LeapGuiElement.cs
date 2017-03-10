@@ -114,8 +114,10 @@ public abstract class LeapGuiElement : MonoBehaviour {
       }
     }
 
-    if (attachedGroup != null) {
-      attachedGroup.gui.ScheduleEditorUpdate();
+    if (!Application.isPlaying) {
+      if (attachedGroup != null) {
+        attachedGroup.gui.ScheduleEditorUpdate();
+      }
     }
 #endif
 
