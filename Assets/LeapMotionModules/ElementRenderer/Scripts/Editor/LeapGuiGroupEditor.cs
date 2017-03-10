@@ -40,6 +40,22 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
 
     var allTypes = Assembly.GetAssembly(typeof(LeapGui)).GetTypes();
 
+    var allRenderers = allTypes.Query().
+                                Where(t => !t.IsAbstract).
+                                Where(t => !t.IsGenericType).
+                                Where(t => t.IsSubclassOf(typeof(LeapGuiRendererBase)));
+
+    _addRendererMenu = new GenericMenu();
+    foreach (var renderer in allRenderers) {
+      _addRendererMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(renderer)),
+                               false,
+                               () => {
+                                 target.ChangeRenderer(renderer);
+                                 serializedObject.Update();
+                                 CreateCachedEditor(target.renderer, null, ref _rendererEditor);
+                               });
+    }
+
     var allFeatures = allTypes.Query().
                                Where(t => !t.IsAbstract).
                                Where(t => !t.IsGenericType).

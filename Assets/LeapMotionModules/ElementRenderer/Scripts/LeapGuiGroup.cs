@@ -173,6 +173,19 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     Assert.IsNotNull(rendererType);
     _gui = gui;
 
+    ChangeRenderer(rendererType);
+  }
+
+  public void ChangeRenderer(Type rendererType) {
+    AssertHelper.AssertEditorOnly();
+    Assert.IsNotNull(rendererType);
+
+    if (_renderer != null) {
+      _renderer.OnDisableRendererEditor();
+      InternalUtility.Destroy(_renderer);
+      _renderer = null;
+    }
+
     _renderer = gameObject.AddComponent(rendererType) as LeapGuiRendererBase;
     Assert.IsNotNull(_renderer);
     _renderer.gui = _gui;
