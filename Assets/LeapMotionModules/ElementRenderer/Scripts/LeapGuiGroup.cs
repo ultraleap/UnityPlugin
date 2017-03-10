@@ -88,21 +88,10 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
     _elements.Add(element);
 
-    Transform t = element.transform;
-    while (true) {
-      var anchor = t.GetComponent<AnchorOfConstantSize>();
-      if (anchor != null && anchor.enabled) {
-        element.OnAttachedToGui(this, t);
-        break;
-      }
+    Transform anchor = AnchorOfConstantSize.GetParentAnchorOrGui(element.transform);
+    Assert.IsNotNull(anchor);
 
-      t = t.parent;
-
-      if (t = transform) {
-        element.OnAttachedToGui(this, transform);
-        break;
-      }
-    }
+    element.OnAttachedToGui(this, anchor);
 
     //TODO: this is gonna need to be optimized
     RebuildFeatureData();

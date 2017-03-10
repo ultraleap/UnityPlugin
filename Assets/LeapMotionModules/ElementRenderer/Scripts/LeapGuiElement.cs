@@ -7,7 +7,7 @@ using UnityEngine;
 public abstract class LeapGuiElement : MonoBehaviour {
 
   #region INSPECTOR FIELDS
-  [SerializeField, HideInInspector]
+  [SerializeField]
   protected Transform _anchor;
 
   [SerializeField, HideInInspector]
@@ -155,26 +155,22 @@ public abstract class LeapGuiElement : MonoBehaviour {
       if (!IsAttachedToGroup) {
         var parentGui = GetComponentInParent<LeapGui>();
         if (parentGui != null) {
+          parentGui.TryAddElement(this);
+        }
+      }
+#if UNITY_EDITOR
+    }
+#endif
+  }
 
-          //First try to attatch to a group that is preferred
-          foreach (var group in parentGui.groups) {
-            if (group.renderer.GetType().IsSubclassOf(_preferredRendererType)) {
-              if (group.TryAddElement(this)) {
-                break;
-              }
-            }
-          }
-
-          //If we failed, try to attach to a group that will take us
-          if (!IsAttachedToGroup) {
-            foreach (var group in parentGui.groups) {
-              if (group.renderer.IsValidElement(this)) {
-                if (group.TryAddElement(this)) {
-                  break;
-                }
-              }
-            }
-          }
+  protected virtual void Start() {
+#if UNITY_EDITOR
+    if (Application.isPlaying) {
+#endif
+      if (!IsAttachedToGroup) {
+        var parentGui = GetComponentInParent<LeapGui>();
+        if (parentGui != null) {
+          parentGui.TryAddElement(this);
         }
       }
 #if UNITY_EDITOR

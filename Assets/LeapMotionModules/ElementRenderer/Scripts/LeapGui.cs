@@ -316,6 +316,14 @@ public class LeapGui : MonoBehaviour {
       if (element.IsAttachedToGroup) {
         //procede to validate
 
+        //If the element is anchored to the wrong anchor, detach and reattach
+        var anchor = AnchorOfConstantSize.GetParentAnchorOrGui(element.transform);
+        if (element.anchor != anchor) {
+          var group = element.attachedGroup;
+          element.OnDetachedFromGui();
+          group.TryAddElement(element);
+        }
+
         if (!element.attachedGroup.elements.Contains(element)) {
           var group = element.attachedGroup;
           element.OnDetachedFromGui();
