@@ -119,6 +119,12 @@ public class LeapGuiEditor : CustomEditorBase {
       }
     }
 
+    GUI.color = Color.white;
+    GUILayout.FlexibleSpace();
+    Rect r = GUILayoutUtility.GetLastRect();
+    GUI.Label(r, "", EditorStyles.toolbarButton);
+    GUI.color = BUTTON_COLOR;
+
     if (_groupEditor != null || !(_gui.space is LeapGuiRectSpace)) {
       if (GUILayout.Button("Warp Space", EditorStyles.toolbarButton)) {
         _addSpaceMenu.ShowAsContext();
@@ -126,11 +132,6 @@ public class LeapGuiEditor : CustomEditorBase {
     }
 
     GUI.color = Color.white;
-
-    GUILayout.FlexibleSpace();
-
-    Rect r = GUILayoutUtility.GetLastRect();
-    GUI.Label(r, "", EditorStyles.toolbarButton);
 
     EditorGUILayout.EndHorizontal();
   }
