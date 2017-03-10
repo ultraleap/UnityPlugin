@@ -47,9 +47,9 @@ void ApplyElementMotion(inout float4 vert, int elementId) {
 float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
 
 #ifdef LEAP_GUI_VERTEX_NORMALS
-void ApplyGuiWarping(inout float4 vert, inout float4 normal, int elementId) {
+void ApplyGuiWarping(inout float4 vert, inout float3 normal, int elementId) {
   float4 elementParams = _LeapGuiCurved_ElementParameters[elementId];
-  Cylindrical_LocalToWorld(vert.xyz, normal.xyz, elementParams);
+  Cylindrical_LocalToWorld(vert.xyz, normal, elementParams);
 }
 #else
 void ApplyGuiWarping(inout float4 vert, int elementId) {
@@ -66,9 +66,9 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
 
 #ifdef LEAP_GUI_VERTEX_NORMALS
-void ApplyGuiWarping(inout float4 vert, inout float4 normal, int elementId) {
+void ApplyGuiWarping(inout float4 vert, inout float3 normal, int elementId) {
   float4 elementParams = _LeapGuiCurved_ElementParameters[elementId];
-  Spherical_LocalToWorld(vert.xyz, normal.xyz, elementParams);
+  Spherical_LocalToWorld(vert.xyz, normal, elementParams);
 }
 #else
 void ApplyGuiWarping(inout float4 vert, int elementId) {
@@ -83,9 +83,16 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 #define LEAP_GUI_WARPING
 float3 _LeapGuiRect_ElementPositions[ELEMENT_MAX];
 
+#ifdef LEAP_GUI_VERTEX_NORMALS
+void ApplyGuiWarping(inout float4 vert, inout float3 normal, int elementId) {
+  vert.xyz += _LeapGuiRect_ElementPositions[elementId];
+}
+#else
 void ApplyGuiWarping(inout float4 vert, int elementId) {
   vert.xyz += _LeapGuiRect_ElementPositions[elementId];
 }
+#endif
+
 #endif
 
 #ifdef LEAP_GUI_WARPING
@@ -149,19 +156,19 @@ struct appdata_gui_baked {
   float4 vertex : POSITION;
 
 #ifdef LEAP_GUI_VERTEX_NORMALS
-  float4 normal : NORMAL;
+  float3 normal : NORMAL;
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_0
-  float2 uv0 : TEXCOORD0;
+  float2 texcoord : TEXCOORD0;
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_1
-  float2 uv1 : TEXCOORD1;
+  float2 texcoord1 : TEXCOORD1;
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_2
-  float2 uv2 : TEXCOORD2;
+  float2 texcoord2 : TEXCOORD2;
 #endif
 
 #ifdef GUI_ELEMENTS_HAVE_ID
@@ -207,7 +214,7 @@ v2f_gui_baked ApplyBakedGui(appdata_gui_baked v) {
 #endif
 
 #ifdef LEAP_GUI_WARPING
-#if LEAP_GUI_VERTEX_NORMALS
+#ifdef LEAP_GUI_VERTEX_NORMALS
   ApplyGuiWarping(v.vertex, v.normal, elementId);
 #else
   ApplyGuiWarping(v.vertex, elementId);
@@ -222,7 +229,7 @@ v2f_gui_baked ApplyBakedGui(appdata_gui_baked v) {
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_0
-  o.uv0 = v.uv0;
+  o.uv0 = v.texcoord;
 #endif
 
 #ifdef LEAP_GUI_TINTING
