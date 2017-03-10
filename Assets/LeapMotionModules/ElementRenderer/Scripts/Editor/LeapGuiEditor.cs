@@ -191,4 +191,25 @@ public class LeapGuiEditor : CustomEditorBase {
       CreateCachedEditor(_gui.groups[_selectedGroup.intValue], null, ref _groupEditor);
     }
   }
+
+  private bool HasFrameBounds() {
+    return true;
+  }
+
+  private Bounds OnGetFrameBounds() {
+    _gui.RebuildEditorPickingMeshes();
+
+    Bounds[] allBounds = _gui.groups.Query().
+                              SelectMany(g => g.elements.Query()).
+                              Select(e => e.pickingMesh).
+                              Where(m => m != null).
+                              Select(m => m.bounds).
+                              ToArray();
+
+    Bounds bounds = allBounds[0];
+    for (int i = 1; i < allBounds.Length; i++) {
+      bounds.Encapsulate(allBounds[i]);
+    }
+    return bounds;
+  }
 }
