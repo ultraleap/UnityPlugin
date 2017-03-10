@@ -498,7 +498,6 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
          (_currElement.remappableChannels & channel) != 0) {
         var atlasedUvs = _packedRects[channel.Index()];
         if (atlasedUvs != null) {
-          Debug.Log(atlasedUvs.Length + " : " + group.elements.Count);
           MeshUtil.RemapUvs(targetList, atlasedUvs[_currIndex], uvs.Count);
         }
       }

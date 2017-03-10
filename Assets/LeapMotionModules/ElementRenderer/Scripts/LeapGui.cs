@@ -274,6 +274,7 @@ public class LeapGui : MonoBehaviour {
       collectUnattachedElements();
 
       foreach (var group in _groups) {
+        group.ValidateElementList();
         group.RebuildFeatureData();
         group.RebuildFeatureSupportInfo();
         group.UpdateRendererEditor(heavyRebuild);

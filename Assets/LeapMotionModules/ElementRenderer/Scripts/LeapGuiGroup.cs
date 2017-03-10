@@ -102,6 +102,10 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
       }
     }
 
+    //TODO: this is gonna need to be optimized
+    RebuildFeatureData();
+    RebuildFeatureSupportInfo();
+
 #if UNITY_EDITOR
     if (!Application.isPlaying) {
       _gui.ScheduleEditorUpdate();
@@ -126,6 +130,10 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
     element.OnDetachedFromGui();
     _elements.Remove(element);
+
+    //TODO: this is gonna need to be optimized
+    RebuildFeatureData();
+    RebuildFeatureSupportInfo();
 
 #if UNITY_EDITOR
     if (!Application.isPlaying) {
@@ -211,6 +219,14 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     _features.Remove(feature);
     InternalUtility.Destroy(feature);
     _gui.ScheduleEditorUpdate();
+  }
+
+  public void ValidateElementList() {
+    for (int i = _elements.Count; i-- != 0;) {
+      if (_elements[i] == null) {
+        _elements.RemoveAt(i);
+      }
+    }
   }
 
   public void RebuildFeatureData() {
@@ -313,12 +329,6 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
   public void UpdateRendererEditor(bool heavyRebuild) {
     AssertHelper.AssertEditorOnly();
-
-    for (int i = _elements.Count; i-- != 0;) {
-      if (_elements[i] == null) {
-        _elements.RemoveAt(i);
-      }
-    }
 
     _renderer.OnUpdateRendererEditor(heavyRebuild);
   }
