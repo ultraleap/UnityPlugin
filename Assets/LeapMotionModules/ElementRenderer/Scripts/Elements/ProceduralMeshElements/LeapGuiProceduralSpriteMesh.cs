@@ -1,24 +1,14 @@
 ﻿using UnityEngine;
-using UnityEngine.Rendering;
 using Leap.Unity.Query;
-using System;
 
 public class LeapGuiProceduralSpriteMesh : LeapGuiMeshElementBase {
 
   public override void RefreshMeshData() {
-    throw new NotImplementedException();
-  }
-
-  /*
-  public override bool TryGenerateMesh(LeapGuiMeshData meshFeature,
-                                   out Mesh mesh,
-                                   out UVChannelFlags remappableChannels) {
-
-    var spriteData = meshFeature.element.Sprite();
+    var spriteData = this.Sprite();
     if (spriteData == null || spriteData.sprite == null) {
       mesh = null;
       remappableChannels = 0;
-      return false;
+      return;
     }
 
     var sprite = spriteData.sprite;
@@ -33,8 +23,5 @@ public class LeapGuiProceduralSpriteMesh : LeapGuiMeshElementBase {
 
     //We are using atlas uvs, so no remapping allowed!
     remappableChannels = 0;
-
-    return true;
   }
-  */
 }
