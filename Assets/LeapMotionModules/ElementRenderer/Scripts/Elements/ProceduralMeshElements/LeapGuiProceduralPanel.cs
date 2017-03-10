@@ -3,15 +3,16 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
-using System;
 
 public class LeapGuiProceduralPanel : LeapGuiMeshElementBase {
 
   public const int MAX_VERTS = 128;
 
+  [EditTimeOnly]
   [SerializeField]
   private LeapGuiElementData _sourceData;
 
+  [EditTimeOnly]
   [SerializeField]
   private ResolutionType _resolutionType = ResolutionType.Vertices;
 
@@ -19,14 +20,17 @@ public class LeapGuiProceduralPanel : LeapGuiMeshElementBase {
   [SerializeField]
   private int _resolution_vert_x, _resolution_vert_y;
 
+  [EditTimeOnly]
   [SerializeField]
   private Vector2 _resolution_verts_per_meter = new Vector2(20, 20);
 
   [MinValue(0)]
+  [EditTimeOnly]
   [SerializeField]
   private Vector2 _size = new Vector2(0.1f, 0.1f);
 
   [Tooltip("Uses sprite data to generate a nine sliced panel.")]
+  [EditTimeOnly]
   [SerializeField]
   private bool _nineSliced = false;
 
@@ -128,7 +132,7 @@ public class LeapGuiProceduralPanel : LeapGuiMeshElementBase {
 
     setSourceFeatureDirty();
   }
-  
+
   public override void RefreshMeshData() {
     if (_sourceData == null) {
       assignDefaultSourceValue();
