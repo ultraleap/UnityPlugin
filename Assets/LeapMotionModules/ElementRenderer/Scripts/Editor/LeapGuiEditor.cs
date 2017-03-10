@@ -78,14 +78,18 @@ public class LeapGuiEditor : CustomEditorBase {
   public override void OnInspectorGUI() {
     drawScriptField();
 
-    EditorGUILayout.Space();
-    EditorGUILayout.LabelField("Gui Space", EditorStyles.boldLabel);
+    drawToolbar();
 
-    drawSpaceHeader();
-
-    drawGroupHeader();
+    if (_spaceEditor != null && !(_gui.space is LeapGuiRectSpace)) {
+      GUILayout.BeginVertical(EditorStyles.helpBox);
+      EditorGUILayout.LabelField("Global Warping", EditorStyles.miniButton);
+      _spaceEditor.OnInspectorGUI();
+      GUILayout.EndVertical();
+    }
 
     if (_groupEditor != null) {
+      drawGroupHeader();
+
       GUILayout.BeginVertical(EditorStyles.helpBox);
 
       _groupEditor.serializedObject.Update();
@@ -93,9 +97,42 @@ public class LeapGuiEditor : CustomEditorBase {
       _groupEditor.serializedObject.ApplyModifiedProperties();
 
       GUILayout.EndVertical();
+    } else {
+      EditorGUILayout.HelpBox("To get started, create a new rendering group!", MessageType.Info);
     }
 
     serializedObject.ApplyModifiedProperties();
+  }
+
+  private void drawToolbar() {
+    EditorGUILayout.BeginHorizontal();
+
+    GUI.color = BUTTON_COLOR;
+    if (GUILayout.Button("New Group", EditorStyles.toolbarDropDown)) {
+      _addGroupMenu.ShowAsContext();
+    }
+
+    if (_groupEditor != null) {
+      if (GUILayout.Button("Delete Group", EditorStyles.toolbarButton)) {
+        _gui.DestroySelectedGroup();
+        updateGroupEditor();
+      }
+    }
+
+    if (_groupEditor != null || !(_gui.space is LeapGuiRectSpace)) {
+      if (GUILayout.Button("Warp Space", EditorStyles.toolbarButton)) {
+        _addSpaceMenu.ShowAsContext();
+      }
+    }
+
+    GUI.color = Color.white;
+
+    GUILayout.FlexibleSpace();
+
+    Rect r = GUILayoutUtility.GetLastRect();
+    GUI.Label(r, "", EditorStyles.toolbarButton);
+
+    EditorGUILayout.EndHorizontal();
   }
 
   private void drawSpaceHeader() {
@@ -114,14 +151,9 @@ public class LeapGuiEditor : CustomEditorBase {
     if (_spaceEditor != null) {
       _spaceEditor.OnInspectorGUI();
     }
-
-    EditorGUILayout.Space();
   }
 
   private void drawGroupHeader() {
-    EditorGUILayout.Space();
-    EditorGUILayout.LabelField("Renderer Groups", EditorStyles.boldLabel);
-
     EditorGUILayout.BeginHorizontal();
 
     for (int i = 0; i < _gui.groups.Count; i++) {
@@ -143,18 +175,6 @@ public class LeapGuiEditor : CustomEditorBase {
     GUILayout.FlexibleSpace();
     Rect rect = GUILayoutUtility.GetLastRect();
     GUI.Label(rect, "", EditorStyles.toolbarButton);
-
-    GUI.color = BUTTON_COLOR;
-
-    if (GUILayout.Button("Destroy", EditorStyles.toolbarButton, GUILayout.MaxWidth(60))) {
-      _gui.DestroySelectedGroup();
-      updateGroupEditor();
-    }
-
-    if (GUILayout.Button("Create", EditorStyles.toolbarDropDown, GUILayout.MaxWidth(60))) {
-      _addGroupMenu.ShowAsContext();
-    }
-    GUI.color = Color.white;
 
     EditorGUILayout.EndHorizontal();
   }
