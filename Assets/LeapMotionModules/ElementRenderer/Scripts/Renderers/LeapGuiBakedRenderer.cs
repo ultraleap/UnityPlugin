@@ -33,8 +33,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   [EditTimeOnly]
   [SerializeField]
   private MaterialGlobalIlluminationFlags _giFlags = MaterialGlobalIlluminationFlags.None;
-
-  [EditTimeOnly]
+  
   [SerializeField]
   private LightmapUnwrapSettings _lightmapUnwrapSettings;
   #endregion
