@@ -7,7 +7,7 @@ using UnityEngine;
 public abstract class LeapGuiElement : MonoBehaviour {
 
   #region INSPECTOR FIELDS
-  [SerializeField]
+  [SerializeField, HideInInspector]
   protected Transform _anchor;
 
   [SerializeField, HideInInspector]
