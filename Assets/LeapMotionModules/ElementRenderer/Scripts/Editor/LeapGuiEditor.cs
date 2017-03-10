@@ -126,7 +126,7 @@ public class LeapGuiEditor : CustomEditorBase {
     GUI.color = BUTTON_COLOR;
 
     if (_groupEditor != null || !(_gui.space is LeapGuiRectSpace)) {
-      if (GUILayout.Button("Warp Space", EditorStyles.toolbarButton)) {
+      if (GUILayout.Button("Warp Space", EditorStyles.toolbarDropDown)) {
         _addSpaceMenu.ShowAsContext();
       }
     }
