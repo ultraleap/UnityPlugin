@@ -106,9 +106,13 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     if (!Application.isPlaying) {
       _gui.ScheduleEditorUpdate();
     }
-#endif
 
+    if (_renderer is ISupportsAddRemove) {
+      (_renderer as ISupportsAddRemove).OnAddElement();
+    }
+#else
     (_renderer as ISupportsAddRemove).OnAddElement();
+#endif
 
     return true;
   }
@@ -127,9 +131,13 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     if (!Application.isPlaying) {
       _gui.ScheduleEditorUpdate();
     }
-#endif
 
+    if (_renderer is ISupportsAddRemove) {
+      (_renderer as ISupportsAddRemove).OnRemoveElement();
+    }
+#else
     (_renderer as ISupportsAddRemove).OnRemoveElement();
+#endif
 
     return true;
   }
@@ -448,7 +456,7 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
   private bool addRemoveSupportedOrEditTime() {
 #if UNITY_EDITOR
-    if (Application.isPlaying) {
+    if (!Application.isPlaying) {
       return true;
     }
 #endif
