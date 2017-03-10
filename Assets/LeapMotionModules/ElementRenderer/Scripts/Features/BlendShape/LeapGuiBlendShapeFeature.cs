@@ -2,13 +2,14 @@
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using Leap.Unity.Query;
+using Leap.Unity.Attributes;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Blend Shape")]
 public class LeapGuiBlendShapeFeature : LeapGuiFeature<LeapGuiBlendShapeData> {
   public const string FEATURE_NAME = LeapGui.FEATURE_PREFIX + "BLEND_SHAPES";
 
+  [EditTimeOnly]
   [SerializeField]
   private BlendShapeSpace _space;
 

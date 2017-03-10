@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Leap.Unity.Attributes;
 
 public interface IRadialTransformer : ITransformer {
   Vector4 GetVectorRepresentation(LeapGuiElement element);
@@ -10,6 +11,7 @@ public interface IRadialTransformer : ITransformer {
 public abstract class LeapGuiRadialSpaceBase : LeapGuiSpace {
   public const string RADIUS_PROPERTY = LeapGui.PROPERTY_PREFIX + "RadialSpace_Radius";
 
+  [EditTimeOnly]
   [SerializeField]
   public float radius = 1;
 }

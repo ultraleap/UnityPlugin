@@ -9,6 +9,7 @@ using UnityEditor.Sprites;
 #endif
 using Leap.Unity;
 using Leap.Unity.Query;
+using Leap.Unity.Attributes;
 
 public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase>,
   ISupportsFeature<LeapGuiTextureFeature>,
@@ -40,31 +41,38 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
 
   #region INSPECTOR FIELDS
   //BEGIN MESH SETTINGS
+  [EditTimeOnly]
   [SerializeField]
   private bool _useUv0 = true;
 
+  [EditTimeOnly]
   [SerializeField]
   private bool _useUv1 = false;
 
+  [EditTimeOnly]
   [SerializeField]
   private bool _useUv2 = false;
 
+  [EditTimeOnly]
   [SerializeField]
   private bool _useUv3 = false;
 
+  [EditTimeOnly]
   [SerializeField]
   private bool _useColors = false;
 
+  [EditTimeOnly]
   [SerializeField]
   private Color _globalTint = Color.white;
 
+  [EditTimeOnly]
   [SerializeField]
   private bool _useNormals = false;
 
   //BEGIN RENDERING SETTINGS
   [SerializeField]
   protected Shader _shader;
-
+  
   [SerializeField]
   private PackUtil.Settings _atlasSettings = new PackUtil.Settings();
 

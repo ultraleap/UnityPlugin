@@ -6,6 +6,7 @@ using UnityEditor;
 #endif
 using Leap.Unity;
 using Leap.Unity.Query;
+using Leap.Unity.Attributes;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Baked")]
@@ -13,21 +14,27 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
   #region INSPECTOR FIELDS
 
+  [EditTimeOnly]
   [SerializeField]
   private SingleLayer _layer = 0;
 
+  [EditTimeOnly]
   [SerializeField]
   private MotionType _motionType = MotionType.Translation;
 
+  [EditTimeOnly]
   [SerializeField]
   private bool _createMeshRenderers;
 
+  [EditTimeOnly]
   [SerializeField]
   private bool _enableLightmapping;
 
+  [EditTimeOnly]
   [SerializeField]
   private MaterialGlobalIlluminationFlags _giFlags = MaterialGlobalIlluminationFlags.None;
 
+  [EditTimeOnly]
   [SerializeField]
   private LightmapUnwrapSettings _lightmapUnwrapSettings;
   #endregion
