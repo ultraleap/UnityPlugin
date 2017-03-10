@@ -78,8 +78,10 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
             foreach (var element in elements) {
               Undo.RecordObject(element, "Change element group");
               EditorUtility.SetDirty(element);
-              mainGroup.TryRemoveElement(element);
-              group.TryAddElement(element);
+
+              if (element.attachedGroup.TryRemoveElement(element)) {
+                group.TryAddElement(element);
+              }
             }
 
             mainGui.ScheduleEditorUpdate();
