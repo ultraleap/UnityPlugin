@@ -84,8 +84,10 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
     rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH * 2);
 
     EditorGUI.LabelField(left, "Renderer", EditorStyles.miniButtonLeft);
-    if (GUI.Button(right, "v", EditorStyles.miniButtonRight)) {
-      _addRendererMenu.ShowAsContext();
+    using (new EditorGUI.DisabledGroupScope(EditorApplication.isPlaying)) {
+      if (GUI.Button(right, "v", EditorStyles.miniButtonRight)) {
+        _addRendererMenu.ShowAsContext();
+      }
     }
 
     if (_rendererEditor != null) {
@@ -117,16 +119,18 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
 
     EditorGUI.LabelField(left, "Element Features", EditorStyles.miniButtonLeft);
 
-    EditorGUI.BeginDisabledGroup(target.features.Count == 0);
-    if (GUI.Button(middle, "-", EditorStyles.miniButtonMid) && _featureList.index >= 0) {
-      target.RemoveFeature(target.features[_featureList.index]);
-      EditorUtility.SetDirty(target);
-    }
-    EditorGUI.EndDisabledGroup();
+    using (new EditorGUI.DisabledGroupScope(EditorApplication.isPlaying)) {
+      EditorGUI.BeginDisabledGroup(target.features.Count == 0);
+      if (GUI.Button(middle, "-", EditorStyles.miniButtonMid) && _featureList.index >= 0) {
+        target.RemoveFeature(target.features[_featureList.index]);
+        EditorUtility.SetDirty(target);
+      }
+      EditorGUI.EndDisabledGroup();
 
-    if (GUI.Button(right, "+", EditorStyles.miniButtonRight)) {
-      _addFeatureMenu.ShowAsContext();
-      EditorUtility.SetDirty(target);
+      if (GUI.Button(right, "+", EditorStyles.miniButtonRight)) {
+        _addFeatureMenu.ShowAsContext();
+        EditorUtility.SetDirty(target);
+      }
     }
 
     EditorGUI.BeginChangeCheck();

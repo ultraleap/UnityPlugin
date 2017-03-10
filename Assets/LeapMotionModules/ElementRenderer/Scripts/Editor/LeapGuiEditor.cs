@@ -107,15 +107,17 @@ public class LeapGuiEditor : CustomEditorBase {
   private void drawToolbar() {
     EditorGUILayout.BeginHorizontal();
 
-    GUI.color = BUTTON_COLOR;
-    if (GUILayout.Button("New Group", EditorStyles.toolbarDropDown)) {
-      _addGroupMenu.ShowAsContext();
-    }
+    using (new EditorGUI.DisabledGroupScope(EditorApplication.isPlaying)) {
+      GUI.color = BUTTON_COLOR;
+      if (GUILayout.Button("New Group", EditorStyles.toolbarDropDown)) {
+        _addGroupMenu.ShowAsContext();
+      }
 
-    if (_groupEditor != null) {
-      if (GUILayout.Button("Delete Group", EditorStyles.toolbarButton)) {
-        _gui.DestroySelectedGroup();
-        updateGroupEditor();
+      if (_groupEditor != null) {
+        if (GUILayout.Button("Delete Group", EditorStyles.toolbarButton)) {
+          _gui.DestroySelectedGroup();
+          updateGroupEditor();
+        }
       }
     }
 
@@ -125,33 +127,17 @@ public class LeapGuiEditor : CustomEditorBase {
     GUI.Label(r, "", EditorStyles.toolbarButton);
     GUI.color = BUTTON_COLOR;
 
-    if (_groupEditor != null || !(_gui.space is LeapGuiRectSpace)) {
-      if (GUILayout.Button("Warp Space", EditorStyles.toolbarDropDown)) {
-        _addSpaceMenu.ShowAsContext();
+    using (new EditorGUI.DisabledGroupScope(EditorApplication.isPlaying)) {
+      if (_groupEditor != null || !(_gui.space is LeapGuiRectSpace)) {
+        if (GUILayout.Button("Warp Space", EditorStyles.toolbarDropDown)) {
+          _addSpaceMenu.ShowAsContext();
+        }
       }
     }
 
     GUI.color = Color.white;
 
     EditorGUILayout.EndHorizontal();
-  }
-
-  private void drawSpaceHeader() {
-    EditorGUILayout.BeginHorizontal();
-
-    GUILayout.FlexibleSpace();
-    Rect rect = GUILayoutUtility.GetLastRect();
-    GUI.Label(rect, "", EditorStyles.toolbarButton);
-
-    if (GUILayout.Button("Change", EditorStyles.toolbarDropDown, GUILayout.Width(BUTTON_WIDTH))) {
-      _addSpaceMenu.ShowAsContext();
-    }
-
-    EditorGUILayout.EndHorizontal();
-
-    if (_spaceEditor != null) {
-      _spaceEditor.OnInspectorGUI();
-    }
   }
 
   private void drawGroupHeader() {
