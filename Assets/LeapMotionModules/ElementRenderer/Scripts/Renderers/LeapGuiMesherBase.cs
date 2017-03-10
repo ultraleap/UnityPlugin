@@ -448,7 +448,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
       _currElement.RefreshMeshData();
     }
   }
-  
+
   protected virtual void buildTopology() {
     using (new ProfilerSample("Build Topology")) {
       var topology = MeshCache.GetTopology(_currElement.mesh);

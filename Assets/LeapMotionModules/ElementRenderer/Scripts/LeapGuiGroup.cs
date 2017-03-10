@@ -329,10 +329,6 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     AssertHelper.AssertEditorOnly();
 
     _renderer.OnUpdateRendererEditor(heavyRebuild);
-
-    foreach (var feature in _features) {
-      feature.isDirty = false;
-    }
   }
 
   public void RebuildEditorPickingMeshes() {
