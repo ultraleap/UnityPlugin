@@ -12,14 +12,16 @@ using Leap.Unity.Query;
 public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
   #region INSPECTOR FIELDS
-  [SerializeField, HideInInspector]
-  private LeapGui _gui;
-
   [SerializeField]
   private LeapGuiRendererBase _renderer;
 
   [SerializeField]
   private List<LeapGuiFeatureBase> _features = new List<LeapGuiFeatureBase>();
+  #endregion
+
+  #region PRIVATE VARIABLES
+  [SerializeField, HideInInspector]
+  private LeapGui _gui;
 
   [SerializeField, HideInInspector]
   private List<LeapGuiElement> _elements = new List<LeapGuiElement>();
@@ -230,8 +232,6 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   }
 
   public void RebuildFeatureData() {
-    AssertHelper.AssertEditorOnly();
-
     using (new ProfilerSample("Rebuild Feature Data")) {
       foreach (var feature in _features) {
         feature.ClearDataObjectReferences();
@@ -268,8 +268,6 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   }
 
   public void RebuildFeatureSupportInfo() {
-    AssertHelper.AssertEditorOnly();
-
     using (new ProfilerSample("Rebuild Support Info")) {
       var typeToFeatures = new Dictionary<Type, List<LeapGuiFeatureBase>>();
       foreach (var feature in _features) {
