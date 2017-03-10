@@ -15,6 +15,9 @@ public abstract class LeapGuiElement : MonoBehaviour {
 
   [SerializeField, HideInInspector]
   protected LeapGuiGroup _attachedGroup;
+
+  [SerializeField, HideInInspector]
+  protected SerializableType _preferredRenderingType;
   #endregion
 
   #region PRIVATE VARIABLES
@@ -66,6 +69,12 @@ public abstract class LeapGuiElement : MonoBehaviour {
 #endif
 
   public virtual void OnAttachedToGui(LeapGuiGroup group, Transform anchor) {
+#if UNITY_EDITOR
+    if (!Application.isPlaying) {
+      _preferredRenderingType = group.renderer.GetType();
+    }
+#endif
+
     _attachedGroup = group;
     _anchor = anchor;
   }
@@ -115,8 +124,9 @@ public abstract class LeapGuiElement : MonoBehaviour {
     }
 
     if (!Application.isPlaying) {
-      if (attachedGroup != null) {
-        attachedGroup.gui.ScheduleEditorUpdate();
+      if (_attachedGroup != null) {
+        _attachedGroup.gui.ScheduleEditorUpdate();
+        _preferredRenderingType = _attachedGroup.renderer.GetType();
       }
     }
 #endif
@@ -137,7 +147,29 @@ public abstract class LeapGuiElement : MonoBehaviour {
     if (Application.isPlaying) {
 #endif
       if (!IsAttachedToGroup) {
-        //TRY connect at runtime, TODO!
+        var parentGui = GetComponentInParent<LeapGui>();
+        if (parentGui != null) {
+
+          //First try to attatch to a group that is preferred
+          foreach (var group in parentGui.groups) {
+            if (group.renderer.GetType().IsSubclassOf(_preferredRenderingType)) {
+              if (group.TryAddElement(this)) {
+                break;
+              }
+            }
+          }
+
+          //If we failed, try to attach to a group that will take us
+          if (!IsAttachedToGroup) {
+            foreach (var group in parentGui.groups) {
+              if (group.renderer.IsValidElement(this)) {
+                if (group.TryAddElement(this)) {
+                  break;
+                }
+              }
+            }
+          }
+        }
       }
 #if UNITY_EDITOR
     }

@@ -17,7 +17,7 @@ public struct SerializableType : ISerializationCallbackReceiver {
       if (_cachedAssembly == null) {
         _cachedAssembly = Assembly.GetAssembly(typeof(LeapGui));
       }
-      return _assembly;
+      return _cachedAssembly;
     }
   }
 
@@ -33,5 +33,15 @@ public struct SerializableType : ISerializationCallbackReceiver {
     if (_type != null) {
       _fullName = _type.FullName;
     }
+  }
+
+  public static implicit operator Type(SerializableType serializableType) {
+    return serializableType._type;
+  }
+
+  public static implicit operator SerializableType(Type type) {
+    return new SerializableType() {
+      _type = type
+    };
   }
 }
