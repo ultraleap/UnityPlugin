@@ -531,21 +531,6 @@ namespace Leap.Unity.RuntimeGizmos {
       PopMatrix();
     }
 
-    private void DrawLineWireCircle(Vector3 center, Vector3 normal, float radius) {
-      DrawWireArc(center, normal, radius, 26, 26);
-    }
-
-    private void DrawWireArc(Vector3 center, Vector3 normal, float radius, int numCircleSegments = 26, int numSegmentsToDraw = 26) {
-      normal = normal.normalized;
-      Vector3 radiusVector = Vector3.Slerp(normal, -normal, 0.5F) * radius;
-      Vector3 nextVector;
-      for (int i = 0; i < numSegmentsToDraw; i++) {
-        nextVector = Quaternion.AngleAxis(360F / numCircleSegments, normal) * radiusVector;
-        DrawLine(center + radiusVector, center + nextVector);
-        radiusVector = nextVector;
-      }
-    }
-
     /// <summary>
     /// Draws a wire gizmo capsule at the given position, with the given start and end points and radius.
     /// </summary>
@@ -555,37 +540,42 @@ namespace Leap.Unity.RuntimeGizmos {
       Vector3 right = Vector3.Cross(up, forward).normalized * radius;
 
       float height = (start - end).magnitude;
-      float sideLength = Mathf.Max(0, (height * 0.5F) - radius);
+      float distToCap = Mathf.Max(0, (height * 0.5F) - radius);
       Vector3 middle = (end + start) * 0.5F;
 
-      start = middle + ((start - middle).normalized * sideLength);
-      end = middle + ((end - middle).normalized * sideLength);
+      start = middle + ((start - middle).normalized * distToCap);
+      end = middle + ((end - middle).normalized * distToCap);
 
       // Radial circles
       DrawLineWireCircle(start, up, radius);
       DrawLineWireCircle(end, -up, radius);
 
-      //Side lines
+      // Sides
       DrawLine(start + right, end + right);
       DrawLine(start - right, end - right);
-
       DrawLine(start + forward, end + forward);
       DrawLine(start - forward, end - forward);
 
-      // this draws the end-cap arcs, but ew. I will replace it with my DrawArc method --Nick
-		  for(int i = 1; i < 26; i++) {
-			  //Start endcap
-			  DrawLine(Vector3.Slerp(right, -up, i/25.0f)+start, Vector3.Slerp(right, -up, (i-1)/25.0f)+start);
-			  DrawLine(Vector3.Slerp(-right, -up, i/25.0f)+start, Vector3.Slerp(-right, -up, (i-1)/25.0f)+start);
-			  DrawLine(Vector3.Slerp(forward, -up, i/25.0f)+start, Vector3.Slerp(forward, -up, (i-1)/25.0f)+start);
-			  DrawLine(Vector3.Slerp(-forward, -up, i/25.0f)+start, Vector3.Slerp(-forward, -up, (i-1)/25.0f)+start);
-			
-			  //End endcap
-			  DrawLine(Vector3.Slerp(right, up, i/25.0f)+end, Vector3.Slerp(right, up, (i-1)/25.0f)+end);
-			  DrawLine(Vector3.Slerp(-right, up, i/25.0f)+end, Vector3.Slerp(-right, up, (i-1)/25.0f)+end);
-			  DrawLine(Vector3.Slerp(forward, up, i/25.0f)+end, Vector3.Slerp(forward, up, (i-1)/25.0f)+end);
-			  DrawLine(Vector3.Slerp(-forward, up, i/25.0f)+end, Vector3.Slerp(-forward, up, (i-1)/25.0f)+end);
-		  }
+      // Endcaps
+      DrawWireArc(start, right, forward, radius, 26, 13);
+      DrawWireArc(start, forward, -right, radius, 26, 13);
+      DrawWireArc(end, right, -forward, radius, 26, 13);
+      DrawWireArc(end, forward, right, radius, 26, 13);
+    }
+
+    private void DrawLineWireCircle(Vector3 center, Vector3 normal, float radius) {
+      DrawWireArc(center, normal, Vector3.Slerp(normal, -normal, 0.5F), radius, 26, 26);
+    }
+
+    private void DrawWireArc(Vector3 center, Vector3 normal, Vector3 radialStartDirection, float radius, int numCircleSegments = 26, int numSegmentsToDraw = 26) {
+      normal = normal.normalized;
+      Vector3 radiusVector = radialStartDirection.normalized * radius;
+      Vector3 nextVector;
+      for (int i = 0; i < numSegmentsToDraw; i++) {
+        nextVector = Quaternion.AngleAxis(360F / numCircleSegments, normal) * radiusVector;
+        DrawLine(center + radiusVector, center + nextVector);
+        radiusVector = nextVector;
+      }
     }
 
     private List<Collider> _colliderList = new List<Collider>();
