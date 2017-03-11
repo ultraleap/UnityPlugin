@@ -54,19 +54,28 @@ public class LeapGuiCylindricalSpace : LeapGuiRadialSpace<LeapGuiCylindricalSpac
       throw new NotImplementedException();
     }
 
-    public Quaternion TransformRotation(Quaternion localRectRot) {
+    public Quaternion TransformRotation(Vector3 localRectPos, Quaternion localRectRot) {
+      Vector3 anchorDelta;
+
+      Vector3 anchorGuiPos = space.gui.transform.InverseTransformPoint(anchor.position);
+      anchorDelta = localRectPos - anchorGuiPos;
+
+      float angle = angleOffset + anchorDelta.x / radiusOffset;
+
+      Quaternion rotation = Quaternion.Euler(0, angle * Mathf.Rad2Deg, 0);
+
+      return rotation * localRectRot;
+    }
+
+    public Quaternion InverseTransformRotation(Vector3 localGuiPos, Quaternion localGuiRot) {
       throw new NotImplementedException();
     }
 
-    public Quaternion InverseTransformRotation(Quaternion localGuiRot) {
+    public Vector3 TransformDirection(Vector3 localRectPos, Vector3 localRectDirection) {
       throw new NotImplementedException();
     }
 
-    public Vector3 TransformDirection(Vector3 direction) {
-      throw new NotImplementedException();
-    }
-
-    public Vector3 InverseTransformDirection(Vector3 direction) {
+    public Vector3 InverseTransformDirection(Vector3 localGuiPos, Vector3 localGuiDirection) {
       throw new NotImplementedException();
     }
 

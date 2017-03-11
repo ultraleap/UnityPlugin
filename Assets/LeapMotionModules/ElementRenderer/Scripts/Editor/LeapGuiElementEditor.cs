@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Leap.Unity;
@@ -23,6 +22,13 @@ public class LeapGuiElementEditor : Editor {
 
   Object[] tempArray = new Object[0];
   List<Object> tempList = new List<Object>();
+
+  protected void OnDisable() {
+    foreach (var editor in editorCache) {
+      DestroyImmediate(editor);
+    }
+    editorCache.Clear();
+  }
 
   public override void OnInspectorGUI() {
     using (new ProfilerSample("Draw Leap Gui Element Editor")) {

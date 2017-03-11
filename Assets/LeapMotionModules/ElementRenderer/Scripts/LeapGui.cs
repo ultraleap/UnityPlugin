@@ -46,6 +46,12 @@ public class LeapGui : MonoBehaviour {
 
   private List<LeapGuiElement> _tempElementList = new List<LeapGuiElement>();
   private List<int> _tempIndexList = new List<int>();
+
+  [NonSerialized]
+  private bool _hasFinishedSetup = false;
+  [NonSerialized]
+  private int _previousHierarchyHash;
+  private DelayedAction _delayedHeavyRebuild;
   #endregion
 
   #region PUBLIC API
@@ -101,6 +107,12 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
+  public bool hasFinishedSetup {
+    get {
+      return _hasFinishedSetup;
+    }
+  }
+
   /// <summary>
   /// Tries to add a new gui element to this gui at runtime.
   /// Element is not actually added until the next gui cycle.
@@ -146,8 +158,14 @@ public class LeapGui : MonoBehaviour {
 
   //Begin editor-only private api
 #if UNITY_EDITOR
+  public void ScheduleEditorUpdate() {
+    //Dirty the hash by changing it to something else
+    _previousHierarchyHash++;
+  }
+
   public void SetSpace(Type spaceType) {
     AssertHelper.AssertEditorOnly();
+    ScheduleEditorUpdate();
 
     UnityEditor.Undo.RecordObject(this, "Change Gui Space");
     UnityEditor.EditorUtility.SetDirty(this);
@@ -166,6 +184,7 @@ public class LeapGui : MonoBehaviour {
 
   public void AddFeature(Type featureType) {
     AssertHelper.AssertEditorOnly();
+    ScheduleEditorUpdate();
 
     var feature = gameObject.AddComponent(featureType);
     _features.Add(feature as LeapGuiFeatureBase);
@@ -173,6 +192,7 @@ public class LeapGui : MonoBehaviour {
 
   public void SetRenderer(Type rendererType) {
     AssertHelper.AssertEditorOnly();
+    ScheduleEditorUpdate();
 
     UnityEditor.Undo.RecordObject(this, "Changed Gui Renderer");
     UnityEditor.EditorUtility.SetDirty(this);
@@ -298,8 +318,15 @@ public class LeapGui : MonoBehaviour {
     }
 #endif
 
-    if (_space != null) _space.gui = this;
-    if (_renderer != null) _renderer.gui = this;
+    _space = _space ?? GetComponent<LeapGuiSpace>() ?? gameObject.AddComponent<LeapGuiRectSpace>();
+    _renderer = _renderer ?? GetComponent<LeapGuiRenderer>() ?? gameObject.AddComponent<LeapGuiDynamicRenderer>();
+
+    _space.gui = this;
+    _renderer.gui = this;
+  }
+
+  private void Reset() {
+    OnValidate();
   }
 
   void OnDestroy() {
@@ -351,20 +378,58 @@ public class LeapGui : MonoBehaviour {
 
   #region PRIVATE IMPLEMENTATION
 
+  private LeapGui() {
+#if UNITY_EDITOR
+    _delayedHeavyRebuild = new DelayedAction(() => doEditorUpdateLogic(fullRebuild: true, heavyRebuild: true));
+#endif
+  }
+
 #if UNITY_EDITOR
   private void doLateUpdateEditor() {
-    rebuildElementList();
-    rebuildFeatureData();
-    rebuildFeatureSupportInfo();
+    bool needsRebuild = false;
 
-    if (_space != null) {
-      _space.BuildElementData(transform);
+    using (new ProfilerSample("Calculate Should Rebuild")) {
+      foreach (var feature in _features) {
+        if (feature.isDirty) {
+          needsRebuild = true;
+        }
+      }
+
+      int hierarchyHash = HashUtil.GetHierarchyHash(transform);
+      if (_previousHierarchyHash != hierarchyHash) {
+        _previousHierarchyHash = hierarchyHash;
+        needsRebuild = true;
+      }
     }
 
-    if (_renderer != null && _elements.Count != 0) {
-      using (new ProfilerSample("Update Renderer")) {
-        _renderer.OnUpdateRendererEditor();
+    if (needsRebuild) {
+      _delayedHeavyRebuild.Reset();
+    }
+
+    doEditorUpdateLogic(needsRebuild, heavyRebuild: false);
+  }
+
+  private void doEditorUpdateLogic(bool fullRebuild, bool heavyRebuild) {
+    if (_renderer != null && _space != null) {
+      if (fullRebuild) {
+        rebuildElementList();
+        rebuildFeatureData();
+        rebuildFeatureSupportInfo();
+
+        _space.BuildElementData(transform);
+
+        using (new ProfilerSample("Update Renderer")) {
+          _renderer.OnUpdateRendererEditor(heavyRebuild);
+        }
+
+        foreach (var feature in _features) {
+          feature.isDirty = false;
+        }
+
+        _hasFinishedSetup = true;
       }
+
+      _renderer.OnUpdateRenderer();
     }
   }
 #endif
@@ -386,15 +451,15 @@ public class LeapGui : MonoBehaviour {
       _space.RefreshElementData(transform, 0, anchors.Count);
     }
 
-    if (_elements.Count != 0) {
-      using (new ProfilerSample("Update Renderer")) {
-        _renderer.OnUpdateRenderer();
-      }
+    using (new ProfilerSample("Update Renderer")) {
+      _renderer.OnUpdateRenderer();
     }
 
     foreach (var feature in _features) {
       feature.isDirty = false;
     }
+
+    _hasFinishedSetup = true;
   }
 
   private void performElementRemoval() {
