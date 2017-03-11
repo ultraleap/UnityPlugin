@@ -146,6 +146,21 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
+    public void GetGraspingFingertips(InteractionBehaviourBase interactionObj,
+                                      Vector3[] fingertipPositionsToWrite, out int numPositionsWritten) {
+      GrabClassifier objGrabClassifier;
+      if (classifiers.TryGetValue(interactionObj, out objGrabClassifier)) {
+        int writeIdx = 0;
+        for (int probeIdx = 0; probeIdx < objGrabClassifier.probes.Length; probeIdx++) {
+            fingertipPositionsToWrite[writeIdx++] = _hand.Fingers[probeIdx].TipPosition.ToVector3();
+        }
+        numPositionsWritten = writeIdx;
+      }
+      else {
+        numPositionsWritten = 0;
+      }
+    }
+
     //Per-Object Per-Hand Classifier
     public class GrabClassifier {
       public bool isGrabbing;

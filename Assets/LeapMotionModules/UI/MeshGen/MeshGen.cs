@@ -5,21 +5,29 @@ namespace Leap.Unity.UI {
 
   public static partial class MeshGen {
 
-    public static void GenerateRoundedRectPrism(Vector3 extents, float cornerRadius, int cornerDivisions, List<Vector3> outVerts, List<int> outIndices, bool withBack = true) {
+    public static void GenerateRoundedRectPrism(Vector3 extents, float cornerRadius, int cornerDivisions,
+                                                List<Vector3> outVerts, List<int> outIndices, List<Vector3> outNormals,
+                                                bool withBack = true) {
       RoundedRectPrismSupport.AddFrontIndices(outIndices, outVerts.Count, cornerDivisions);
-      RoundedRectPrismSupport.AddFrontVerts(outVerts, extents, cornerRadius, cornerDivisions);
+      RoundedRectPrismSupport.AddFrontVerts(outVerts, outNormals, extents, cornerRadius, cornerDivisions);
       //RoundedRectPrism.AddFrontUVs(); // NYI
 
       RoundedRectPrismSupport.AddSideIndices(outIndices, outVerts.Count, cornerDivisions);
-      RoundedRectPrismSupport.AddSideVerts(outVerts, extents, cornerRadius, cornerDivisions);
+      RoundedRectPrismSupport.AddSideVerts(outVerts, outNormals, extents, cornerRadius, cornerDivisions);
       //RoundedRectPrism.AddSideUVs(); // NYI
 
       if (withBack) {
         Vector3 extentsForBack = new Vector3(extents.x, extents.y, 0F);
         RoundedRectPrismSupport.AddFrontIndices(outIndices, outVerts.Count, cornerDivisions, flipFacing: true);
-        RoundedRectPrismSupport.AddFrontVerts(outVerts, extentsForBack, cornerRadius, cornerDivisions);
+        RoundedRectPrismSupport.AddFrontVerts(outVerts, outNormals, extentsForBack, cornerRadius, cornerDivisions, flipNormal: true);
         //RoundedRectPrism.AddBackUVs(); // NYI
       }
+    }
+
+    public static void GenerateTorus(float majorRadius, int numMajorSegments, float minorRadius, int numMinorSegments,
+                                     List<Vector3> outVerts, List<int> outIndices, List<Vector3> outNormals) {
+      TorusSupport.AddIndices(outIndices, outVerts.Count, numMajorSegments, numMinorSegments);
+      TorusSupport.AddVerts(outVerts, outNormals, majorRadius, numMajorSegments, minorRadius, numMinorSegments);
     }
 
   }

@@ -58,11 +58,13 @@ namespace Leap.Unity.UI {
         }
       }
 
-      public static void AddFrontVerts(List<Vector3> outVerts, Vector3 extents, float cornerRadius, int cornerDivisions) {
+      public static void AddFrontVerts(List<Vector3> outVerts, List<Vector3> outNormals, Vector3 extents, float cornerRadius, int cornerDivisions, bool flipNormal = false) {
         List<Vector3> v = outVerts;
 
         float x = extents.x / 2F, y = extents.y / 2F, z = -extents.z;
         float r = cornerRadius;
+
+        int startVertCount = outVerts.Count; // counting verts added for normals (all will point up).
 
         // Center Quad
         v.AddVert(-(x - r), -(y - r), z);
@@ -118,6 +120,11 @@ namespace Leap.Unity.UI {
           radialVector = rotation * radialVector;
           v.Add(center + radialVector);
         }
+
+        for (int i = 0; i < outVerts.Count - startVertCount; i++) {
+          outNormals.Add((flipNormal ? -1F : 1F) * new Vector3(0, 0, -1));
+        }
+
       }
 
       public static void AddSideIndices(List<int> outIndices, int startingVertCount, int cornerDivisions) {
@@ -173,8 +180,9 @@ namespace Leap.Unity.UI {
         }
       }
 
-      public static void AddSideVerts(List<Vector3> outVerts, Vector3 extents, float cornerRadius, int cornerDivisions) {
+      public static void AddSideVerts(List<Vector3> outVerts, List<Vector3> outNormals, Vector3 extents, float cornerRadius, int cornerDivisions) {
         List<Vector3> v = outVerts;
+        List<Vector3> n = outNormals;
         float x = extents.x / 2F, y = extents.y / 2F, zFront = 0F, zBack = -extents.z;
         float r = cornerRadius;
 
@@ -183,6 +191,7 @@ namespace Leap.Unity.UI {
         v.AddVert(-(x - r), y, zBack);
         v.AddVert((x - r), y, zFront);
         v.AddVert((x - r), y, zBack);
+        for (int i = 0; i < 4; i++) n.Add(Vector3.up);
 
         // Upper Right Corner
         Vector3 center = new Vector3((x - r), (y - r), zFront);
@@ -192,6 +201,8 @@ namespace Leap.Unity.UI {
           radial = rotation * radial;
           v.Add(center + radial);
           v.Add(center + radial + Vector3.back * (zFront - zBack));
+          n.Add(radial);
+          n.Add(radial);
         }
 
         // Right Quad
@@ -199,6 +210,7 @@ namespace Leap.Unity.UI {
         v.AddVert(x, (y - r), zBack);
         v.AddVert(x, -(y - r), zFront);
         v.AddVert(x, -(y - r), zBack);
+        for (int i = 0; i < 4; i++) n.Add(Vector3.right);
 
         // Lower Right Corner
         center = new Vector3((x - r), -(y - r), zFront);
@@ -207,6 +219,8 @@ namespace Leap.Unity.UI {
           radial = rotation * radial;
           v.Add(center + radial);
           v.Add(center + radial + Vector3.back * (zFront - zBack));
+          n.Add(radial);
+          n.Add(radial);
         }
 
         // Bottom Quad
@@ -214,6 +228,7 @@ namespace Leap.Unity.UI {
         v.AddVert((x - r), -y, zBack);
         v.AddVert(-(x - r), -y, zFront);
         v.AddVert(-(x - r), -y, zBack);
+        for (int i = 0; i < 4; i++) n.Add(Vector3.down);
 
         // Lower Left Corner
         center = new Vector3(-(x - r), -(y - r), zFront);
@@ -222,6 +237,8 @@ namespace Leap.Unity.UI {
           radial = rotation * radial;
           v.Add(center + radial);
           v.Add(center + radial + Vector3.back * (zFront - zBack));
+          n.Add(radial);
+          n.Add(radial);
         }
 
         // Left Quad
@@ -229,6 +246,7 @@ namespace Leap.Unity.UI {
         v.AddVert(-x, -(y - r), zBack);
         v.AddVert(-x, (y - r), zFront);
         v.AddVert(-x, (y - r), zBack);
+        for (int i = 0; i < 4; i++) n.Add(Vector3.left);
 
         // Upper Left Corner
         center = new Vector3(-(x - r), (y - r), zFront);
@@ -237,6 +255,8 @@ namespace Leap.Unity.UI {
           radial = rotation * radial;
           v.Add(center + radial);
           v.Add(center + radial + Vector3.back * (zFront - zBack));
+          n.Add(radial);
+          n.Add(radial);
         }
       }
 

@@ -559,6 +559,30 @@ namespace Leap.Unity.UI.Interaction {
       return _graspedObject;
     }
 
+    private Vector3[] _graspingFingertipsCache = new Vector3[5];
+    /// <summary> Returns approximately where the hand is grasping
+    /// the currently grasped InteractionBehaviour.
+    /// (Specifically, the centroid of the grasping fingers.)
+    /// This method will print an error if the hand is not currently
+    /// grasping an object. </summary>
+    public Vector3 GetGraspPoint() {
+      if (_graspedObject == null) {
+        Debug.LogError("Cannot compute grasp point: This hand is not grasping an object.");
+        return Vector3.zero;
+      }
+      int numGraspingFingertips;
+      Vector3 sum = Vector3.zero; ;
+      _grabClassifier.GetGraspingFingertips(_graspedObject, _graspingFingertipsCache, out numGraspingFingertips);
+      if (numGraspingFingertips == 0) {
+        Debug.LogError("Cannot compute grasp point: The hand has a grasped object, but this object is not classified as grasped by the classifier.");
+      }
+      for (int i = 0; i < numGraspingFingertips; i++) {
+        sum += _graspingFingertipsCache[i];
+      }
+      sum /= numGraspingFingertips;
+      return sum;
+    }
+
     public HashSet<InteractionBehaviourBase> GetGraspCandidates() {
       return _touchActivityManager.ActiveBehaviours;
     }

@@ -1,4 +1,5 @@
 ﻿using Leap.Unity.Attributes;
+using Leap.Unity.Query;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -51,6 +52,8 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Grasping API
 
+    public override bool isGrasped { get { return _graspCount > 0; } }
+
     /// <summary> Called directly after the grasped object's Rigidbody has had its position and rotation set
     /// by the GraspedPoseController (which moves the object realistically with the hand). Subscribe to this
     /// callback if you'd like to override the default behaviour for grasping. 
@@ -79,6 +82,19 @@ namespace Leap.Unity.UI.Interaction {
     public Action<List<Hand>> OnMultiGraspBegin = (hands) => { };
     public Action<List<Hand>> OnMultiGraspHold  = (hands) => { };
     public Action<List<Hand>> OnMultiGraspEnd   = (hands) => { };
+
+    /// <summary> Returns (approximately) where the argument hand is grasping this object.
+    /// If the hand is not currently grasping this object, returns Vector3.zero. </summary>
+    public Vector3 GetGraspPoint(Hand hand) {
+      InteractionHand intHand = interactionManager.GetInteractionHand(hand);
+      if (intHand.IsGrasping(this)) {
+        return intHand.GetGraspPoint();
+      }
+      else {
+        Debug.LogError("Cannot get this object's grasp point: It is not currently grasped by an InteractionHand.");
+        return Vector3.zero;
+      }
+    }
 
     #endregion
 
@@ -421,6 +437,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private int _graspCountLastFrame = 0;
+    private List<InteractionHand> _graspingIntHandsCache = new List<InteractionHand>(4);
     private List<Hand> _graspingHandsCache = new List<Hand>(4);
     private List<Hand> _lastFrameGraspingHandsCache = new List<Hand>(4); // for OnMultiGraspEnd
 
@@ -429,6 +446,11 @@ namespace Leap.Unity.UI.Interaction {
         GraspedPoseController.ClearHands();
       }
       _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
+
+      _graspingHandsCache.Clear();
+      foreach (var hand in _graspingIntHandsCache.Query().Select(intHand => intHand.GetLeapHand())) {
+        _graspingHandsCache.Add(hand);
+      }
 
       if (_graspCount > 0) {
         if (_graspCountLastFrame == 0) {
@@ -462,22 +484,24 @@ namespace Leap.Unity.UI.Interaction {
       _lastFrameGraspingHandsCache.Clear();
       foreach (var hand in _graspingHandsCache) {
         _lastFrameGraspingHandsCache.Add(hand);
-
       }
-      _graspingHandsCache.Clear();
-    }
-
-    public override bool isGrasped {
-      get { return _graspCount > 0; }
     }
 
     public override void GraspBegin(Hand hand) {
       if (isGrasped && !allowMultiGrasp) {
         interactionManager.ReleaseObjectFromGrasp(this);
       }
-      _graspingHandsCache.Add(hand);
+
+      InteractionHand graspingIntHand = interactionManager.GetInteractionHand(hand);
+      _graspingIntHandsCache.Add(graspingIntHand);
       _graspCount++;
-      
+
+      // SnapToHand(hand); // TODO: When you grasp an object, snap the object into a good holding position.
+
+      if (moveObjectWhenGrasped) {
+        GraspedPoseController.AddHand(graspingIntHand);
+      }
+
       // Set kinematic state based on grasping hold movement type
       if (_graspCount == 1) {
         _wasKinematicBeforeGrab = Rigidbody.isKinematic;
@@ -488,12 +512,6 @@ namespace Leap.Unity.UI.Interaction {
           case GraspedMovementType.Nonkinematic:
             Rigidbody.isKinematic = false; break;
         }
-      }
-
-      // SnapToHand(hand); // TODO: When you grasp an object, snap the object into a good holding position.
-
-      if (moveObjectWhenGrasped) {
-        GraspedPoseController.AddHand(interactionManager.GetInteractionHand(hand));
       }
 
       OnGraspBegin(hand);
@@ -513,21 +531,22 @@ namespace Leap.Unity.UI.Interaction {
         OnGraspedMovement(origPosition, origRotation, newPosition, newRotation, hand);
       }
 
-      _graspingHandsCache.Add(hand);
-
       OnGraspHold(hand);
     }
 
     public override void GraspEnd(Hand hand) {
       _graspCount--;
 
+      InteractionHand graspingIntHand = interactionManager.GetInteractionHand(hand);
+      _graspingIntHandsCache.Remove(graspingIntHand);
+
+      if (moveObjectWhenGrasped) {
+        GraspedPoseController.RemoveHand(graspingIntHand);
+      }
+
       // Revert kinematic state if the grasp has ended
       if (_graspCount == 0) {
         Rigidbody.isKinematic = _wasKinematicBeforeGrab;
-      }
-
-      if (moveObjectWhenGrasped) {
-        GraspedPoseController.RemoveHand(interactionManager.GetInteractionHand(hand));
       }
 
       OnGraspEnd(hand);

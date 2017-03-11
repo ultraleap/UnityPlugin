@@ -118,7 +118,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     void Awake() {
-
+      if (InteractionManager.singleton == null) singleton = this;
 
       Provider = Hands.Provider;
 
