@@ -608,13 +608,14 @@ namespace Leap.Unity.RuntimeGizmos {
           }
         } else if (collider is CapsuleCollider) {
           CapsuleCollider capsule = collider as CapsuleCollider;
-          Vector3 capsuleDir;
-          switch (capsule.direction) {
-            case 0: capsuleDir = Vector3.right; break;
-            case 1: capsuleDir = Vector3.up; break;
-            case 2: default: capsuleDir = Vector3.forward; break;
-          }
           if (useWireframe) {
+            Vector3 capsuleDir;
+            switch (capsule.direction) {
+              case 0: capsuleDir = Vector3.right; break;
+              case 1: capsuleDir = Vector3.up; break;
+              case 2:
+              default: capsuleDir = Vector3.forward; break;
+            }
             DrawWireCapsule(capsule.center + capsuleDir * capsule.height / 2F,
                             capsule.center - capsuleDir * capsule.height / 2F, capsule.radius);
           }
