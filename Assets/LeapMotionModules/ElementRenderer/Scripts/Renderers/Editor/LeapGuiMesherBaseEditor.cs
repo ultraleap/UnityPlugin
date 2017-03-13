@@ -6,17 +6,23 @@ using Leap.Unity;
 
 [CustomEditor(typeof(LeapGuiMesherBase), editorForChildClasses: true, isFallback = true)]
 public class LeapGuiMesherBaseEditor : CustomEditorBase {
+  private const float MESH_LABEL_WIDTH = 100.0f;
+  private SerializedProperty _uv0, _uv1, _uv2, _uv3, _colors, _globalTint, _normals;
 
   protected override void OnEnable() {
     base.OnEnable();
 
-    createHorizonalSection("_useUv0", "_useUv1");
-    createHorizonalSection("_useUv2", "_useUv3");
-    createHorizonalSection("_useColors", "_globalTint");
+    _uv0 = serializedObject.FindProperty("_useUv0");
+    _uv1 = serializedObject.FindProperty("_useUv1");
+    _uv2 = serializedObject.FindProperty("_useUv2");
+    _uv3 = serializedObject.FindProperty("_useUv3");
+    _colors = serializedObject.FindProperty("_useColors");
+    _globalTint = serializedObject.FindProperty("_globalTint");
+    _normals = serializedObject.FindProperty("_useNormals");
 
+    specifyCustomDecorator("_shader", drawMeshSettings);
     specifyConditionalDrawing("_useColors", "_globalTint");
-
-    specifyCustomDecorator("_useUv0", meshSettingsHeader);
+    
     specifyCustomDecorator("_shader", renderingSettingsHeader);
   }
 
@@ -26,10 +32,39 @@ public class LeapGuiMesherBaseEditor : CustomEditorBase {
     EditorGUI.indentLevel--;
   }
 
-  private void meshSettingsHeader(SerializedProperty property) {
+  private void drawMeshSettings(SerializedProperty property) {
+    float defaultLabelWidth = EditorGUIUtility.labelWidth;
+    EditorGUIUtility.labelWidth = MESH_LABEL_WIDTH;
+
     EditorGUILayout.Space();
     EditorGUILayout.LabelField("Mesh Settings", EditorStyles.boldLabel);
     EditorGUI.indentLevel++;
+
+    Rect left, right;
+
+    Rect r0 = EditorGUILayout.GetControlRect();
+
+    r0.SplitHorizontally(out left, out right);
+    EditorGUI.PropertyField(left, _uv0);
+    EditorGUI.PropertyField(right, _uv1);
+
+    Rect r1 = EditorGUILayout.GetControlRect();
+    r1.SplitHorizontally(out left, out right);
+    EditorGUI.PropertyField(left, _uv2);
+    EditorGUI.PropertyField(right, _uv3);
+
+    Rect r2 = EditorGUILayout.GetControlRect();
+    r2.SplitHorizontally(out left, out right);
+    EditorGUI.PropertyField(left, _colors);
+    if (_colors.boolValue) {
+      EditorGUI.PropertyField(right, _globalTint);
+    }
+
+    Rect r3 = EditorGUILayout.GetControlRect();
+    r3.SplitHorizontally(out left, out right);
+    EditorGUI.PropertyField(left, _normals);
+
+    EditorGUIUtility.labelWidth = defaultLabelWidth;
   }
 
   private void renderingSettingsHeader(SerializedProperty property) {

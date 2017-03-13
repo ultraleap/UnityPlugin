@@ -41,32 +41,25 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
 
   #region INSPECTOR FIELDS
   //BEGIN MESH SETTINGS
-  [EditTimeOnly]
-  [SerializeField]
+  [EditTimeOnly, SerializeField, HideInInspector]
   private bool _useUv0 = true;
 
-  [EditTimeOnly]
-  [SerializeField]
+  [EditTimeOnly, SerializeField, HideInInspector]
   private bool _useUv1 = false;
 
-  [EditTimeOnly]
-  [SerializeField]
+  [EditTimeOnly, SerializeField, HideInInspector]
   private bool _useUv2 = false;
 
-  [EditTimeOnly]
-  [SerializeField]
+  [EditTimeOnly, SerializeField, HideInInspector]
   private bool _useUv3 = false;
 
-  [EditTimeOnly]
-  [SerializeField]
+  [EditTimeOnly, SerializeField, HideInInspector]
   private bool _useColors = false;
 
-  [EditTimeOnly]
-  [SerializeField]
+  [EditTimeOnly, SerializeField, HideInInspector]
   private Color _globalTint = Color.white;
-
-  [EditTimeOnly]
-  [SerializeField]
+  
+  [EditTimeOnly, SerializeField, HideInInspector]
   private bool _useNormals = false;
 
   //BEGIN RENDERING SETTINGS
