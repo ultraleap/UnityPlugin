@@ -86,6 +86,10 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
       return false;
     }
 
+    if (_elements.Contains(element)) {
+      return false;
+    }
+
     _elements.Add(element);
 
     Transform anchor = AnchorOfConstantSize.GetParentAnchorOrGui(element.transform);
@@ -116,6 +120,10 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     Assert.IsNotNull(element);
 
     if (!addRemoveSupportedOrEditTime()) {
+      return false;
+    }
+
+    if (!_elements.Contains(element)) {
       return false;
     }
 
