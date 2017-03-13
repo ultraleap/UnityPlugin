@@ -252,7 +252,7 @@ namespace Leap.Unity.Interaction {
             Vector3 boneCenter = bone.Center.ToVector3();
 
             Array.Clear(tempColliderArray, 0, tempColliderArray.Length);
-            Physics.OverlapSphereNonAlloc(boneCenter, softContactBoneRadius, tempColliderArray, (_manager != null) ? 1 << _manager.InteractionLayer : ~(1 << 2));
+            Physics.OverlapSphereNonAlloc(boneCenter, softContactBoneRadius, tempColliderArray, (_manager != null) ? 1 << _manager.InteractionLayer : ~(1<<2));
 
             foreach (Collider col in tempColliderArray) {
               if (col != null && col.attachedRigidbody != null && !col.attachedRigidbody.isKinematic) {
@@ -284,39 +284,10 @@ namespace Leap.Unity.Interaction {
           }
 
           //Otherwise, Resolve Contacts
-          bool m_iterateForwards = true;
           for (int i = 0; i < 10; i++) {
-            // Pick a random partition.
-            int partition = UnityEngine.Random.Range(0, softContacts.Count);
-            if (m_iterateForwards = !m_iterateForwards) {
-              for (int it = partition; it < softContacts.Count; it++) {
-                applySoftContact(softContacts[it].body, softContacts[it].position, softContacts[it].velocity, softContacts[it].normal);
-              }
-              for (int it = 0; it < partition; it++) {
-                applySoftContact(softContacts[it].body, softContacts[it].position, softContacts[it].velocity, softContacts[it].normal);
-              }
-            } else {
-              for (int it = partition; 0 <= it; it--) {
-                applySoftContact(softContacts[it].body, softContacts[it].position, softContacts[it].velocity, softContacts[it].normal);
-              }
-              for (int it = softContacts.Count - 1; partition <= it; it--) {
-                applySoftContact(softContacts[it].body, softContacts[it].position, softContacts[it].velocity, softContacts[it].normal);
-              }
-            }
-            /*
             foreach (SoftContact contact in softContacts) {
               applySoftContact(contact.body, contact.position, contact.velocity, -contact.normal);
             }
-
-            //Shuffle the list of Contacts
-            int n = softContacts.Count;
-            while (n > 1) {
-              n--;
-              int k = UnityEngine.Random.Range(0, n + 1);
-              SoftContact value = softContacts[k];
-              softContacts[k] = softContacts[n];
-              softContacts[n] = value;
-            }*/
           }
         }
       }
@@ -450,7 +421,7 @@ namespace Leap.Unity.Interaction {
       Vector3 objectVelocityAtContactPoint = thisObject.GetPointVelocity(handContactPoint);
       Vector3 velocityDifference = objectVelocityAtContactPoint - handVelocityAtContactPoint;
       float relativeVelocity = Vector3.Dot(normal, velocityDifference);
-      if (relativeVelocity > float.Epsilon)
+      if (relativeVelocity < float.Epsilon)
         return;
 
       // Define a cone of friction where the direction of velocity relative to the surface
@@ -461,50 +432,30 @@ namespace Leap.Unity.Interaction {
 
       Vector3 vel_dir = velocityDifference.normalized;
       float t = -relativeVelocity / velocityDifference.magnitude;
-      Vector3 bentNormal = t * -vel_dir + (1.0f - t) * normal;
+      normal = t * -vel_dir + (1.0f - t) * normal;
 
-      if (bentNormal.magnitude > float.Epsilon) { bentNormal = bentNormal.normalized; }
-      relativeVelocity = Vector3.Dot(bentNormal, velocityDifference);
+      if (normal.magnitude > float.Epsilon) { normal = normal.normalized; }
+      relativeVelocity = Vector3.Dot(normal, velocityDifference);
 
       // Apply impulse along calculated normal.  Note this is slightly unusual.  Instead of
       // handling perpendicular movement as a separate constraint this calculates a "bent normal"
       // to blend it in.
 
       float velocityError = -relativeVelocity;
-      float denom0 = computeImpulseDenominator(thisObject, handContactPoint, bentNormal);
+      float denom0 = computeImpulseDenominator(thisObject, handContactPoint, normal);
       float jacDiagABInv = 1.0f / denom0;
       float velocityImpulse = velocityError * jacDiagABInv * 0.95f;
       Vector3 gravityFudge = -Physics.gravity * thisObject.mass * Time.fixedDeltaTime * 0.015f;
 
-      thisObject.AddForceAtPosition(bentNormal * velocityImpulse * 0.03f + gravityFudge, handContactPoint, ForceMode.Impulse);
+      thisObject.AddForceAtPosition(normal * velocityImpulse * 0.03f + gravityFudge, handContactPoint, ForceMode.Impulse);
       //thisObject.AddForceAtPosition(((handVelocityAtContactPoint - thisObject.GetPointVelocity(handContactPoint))*50f) * relativeVelocity, handContactPoint, ForceMode.Acceleration);
     }
 
     static float computeImpulseDenominator(Rigidbody thisObject, Vector3 pos, Vector3 normal) {
       Vector3 r0 = pos - thisObject.worldCenterOfMass;
       Vector3 c0 = Vector3.Cross(r0, normal);
-      Vector3 vec = Vector3.Cross(getInvInertiaTensorWorld(thisObject) * c0, r0);
-      return (1f / thisObject.mass) + Vector3.Dot(normal, vec);
-    }
-
-    static Matrix4x4 getInvInertiaTensorWorld(Rigidbody thisObject) {
-      Vector3 localInteriaTensor = thisObject.inertiaTensor;
-      Quaternion bodyRotation = thisObject.rotation;
-      Quaternion tensorRotation = thisObject.inertiaTensorRotation;
-
-      Vector3 xAxis = bodyRotation * (tensorRotation * (localInteriaTensor.x * Vector3.right));
-      Vector3 yAxis = bodyRotation * (tensorRotation * (localInteriaTensor.y * Vector3.up));
-      Vector3 zAxis = bodyRotation * (tensorRotation * (localInteriaTensor.z * Vector3.forward));
-
-      Debug.DrawLine(thisObject.position, thisObject.position + (xAxis), Color.red);
-      Debug.DrawLine(thisObject.position, thisObject.position + (yAxis), Color.green);
-      Debug.DrawLine(thisObject.position, thisObject.position + (zAxis), Color.blue);
-
-      Matrix4x4 inertiaTensorWorld = new Matrix4x4();
-      inertiaTensorWorld.SetColumn(0, xAxis);
-      inertiaTensorWorld.SetColumn(1, yAxis);
-      inertiaTensorWorld.SetColumn(2, zAxis);
-      return inertiaTensorWorld.inverse;
+      Vector3 vec = Vector3.Cross(c0 /* *thisObject.getInvInertiaTensorWorld()*/, r0);
+      return 1f / thisObject.mass + Vector3.Dot(normal, vec);
     }
   }
 }
