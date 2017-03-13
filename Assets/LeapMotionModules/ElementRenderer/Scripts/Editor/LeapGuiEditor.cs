@@ -78,14 +78,9 @@ public class LeapGuiEditor : CustomEditorBase {
   public override void OnInspectorGUI() {
     drawScriptField();
 
-    drawToolbar();
+    drawSpace();
 
-    if (_spaceEditor != null && !(_gui.space is LeapGuiRectSpace)) {
-      GUILayout.BeginVertical(EditorStyles.helpBox);
-      EditorGUILayout.LabelField("Global Warping", EditorStyles.miniButton);
-      _spaceEditor.OnInspectorGUI();
-      GUILayout.EndVertical();
-    }
+    drawToolbar();
 
     if (_groupEditor != null) {
       drawGroupHeader();
@@ -102,6 +97,25 @@ public class LeapGuiEditor : CustomEditorBase {
     }
 
     serializedObject.ApplyModifiedProperties();
+  }
+
+  private void drawSpace() {
+    using (new GUILayout.VerticalScope(EditorStyles.helpBox)) {
+
+      Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
+      Rect left, right;
+      rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH);
+
+      EditorGUI.LabelField(left, "Space", EditorStyles.miniButtonLeft);
+
+      using (new EditorGUI.DisabledGroupScope(EditorApplication.isPlaying)) {
+        if (GUI.Button(right, "v", EditorStyles.miniButtonRight)) {
+          _addSpaceMenu.ShowAsContext();
+        }
+      }
+
+      _spaceEditor.OnInspectorGUI();
+    }
   }
 
   private void drawToolbar() {
@@ -125,17 +139,6 @@ public class LeapGuiEditor : CustomEditorBase {
     GUILayout.FlexibleSpace();
     Rect r = GUILayoutUtility.GetLastRect();
     GUI.Label(r, "", EditorStyles.toolbarButton);
-    GUI.color = BUTTON_COLOR;
-
-    using (new EditorGUI.DisabledGroupScope(EditorApplication.isPlaying)) {
-      if (_groupEditor != null || !(_gui.space is LeapGuiRectSpace)) {
-        if (GUILayout.Button("Warp Space", EditorStyles.toolbarDropDown)) {
-          _addSpaceMenu.ShowAsContext();
-        }
-      }
-    }
-
-    GUI.color = Color.white;
 
     EditorGUILayout.EndHorizontal();
   }
