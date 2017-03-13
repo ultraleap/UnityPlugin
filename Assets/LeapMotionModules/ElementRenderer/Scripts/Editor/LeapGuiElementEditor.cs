@@ -72,9 +72,10 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
 
       if (GUILayout.Button(buttonText, EditorStyles.miniButton, GUILayout.Width(60))) {
         GenericMenu groupMenu = new GenericMenu();
+        int index = 0;
         foreach (var group in mainGui.groups.Query().Where(g => g.renderer.IsValidElement(elements[0]))) {
           string tag = LeapGuiTagAttribute.GetTag(group.renderer.GetType());
-          groupMenu.AddItem(new GUIContent(tag), false, () => {
+          groupMenu.AddItem(new GUIContent(index.ToString() + ": " + tag), false, () => {
             foreach (var element in elements) {
               Undo.RecordObject(element, "Change element group");
               EditorUtility.SetDirty(element);
@@ -86,6 +87,7 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
 
             mainGui.ScheduleEditorUpdate();
           });
+          index++;
         }
         groupMenu.ShowAsContext();
       }

@@ -227,7 +227,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
 
       using (new ProfilerSample("Update Tinting")) {
         tintFeature.data.Query().Select(d => d.tint).FillList(_tintColors);
-        _material.SetColorArray(TINTS_PROPERTY, _tintColors);
+        _material.SetColorArraySafe(TINTS_PROPERTY, _tintColors);
       }
     }
   }
