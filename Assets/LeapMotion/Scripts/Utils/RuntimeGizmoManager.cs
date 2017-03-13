@@ -555,21 +555,21 @@ namespace Leap.Unity.RuntimeGizmos {
       DrawLine(start - forward, end - forward);
 
       // Endcaps
-      DrawWireArc(start, right, forward, radius, 26, 0.5F);
-      DrawWireArc(start, forward, -right, radius, 26, 0.5F);
-      DrawWireArc(end, right, -forward, radius, 26, 0.5F);
-      DrawWireArc(end, forward, right, radius, 26, 0.5F);
+      DrawWireArc(start, right, forward, radius, 0.5F, 26);
+      DrawWireArc(start, forward, -right, radius, 0.5F, 26);
+      DrawWireArc(end, right, -forward, radius, 0.5F, 26);
+      DrawWireArc(end, forward, right, radius, 0.5F, 26);
     }
 
     private void DrawLineWireCircle(Vector3 center, Vector3 normal, float radius) {
-      DrawWireArc(center, normal, Vector3.Slerp(normal, -normal, 0.5F), radius, 26, 1.0F);
+      DrawWireArc(center, normal, Vector3.Slerp(normal, -normal, 0.5F), radius, 1.0F, 26);
     }
 
-    private void DrawWireArc(Vector3 center, Vector3 normal, Vector3 radialStartDirection, float radius, int numCircleSegments = 32, float fractionOfSegmentsToDraw = 1.0F) {
+    public void DrawWireArc(Vector3 center, Vector3 normal, Vector3 radialStartDirection, float radius, float fractionOfCircleToDraw, int numCircleSegments = 32) {
       normal = normal.normalized;
       Vector3 radiusVector = radialStartDirection.normalized * radius;
       Vector3 nextVector;
-      int numSegmentsToDraw = (int)(numCircleSegments * fractionOfSegmentsToDraw);
+      int numSegmentsToDraw = (int)(numCircleSegments * fractionOfCircleToDraw);
       for (int i = 0; i < numSegmentsToDraw; i++) {
         nextVector = Quaternion.AngleAxis(360F / numCircleSegments, normal) * radiusVector;
         DrawLine(center + radiusVector, center + nextVector);
