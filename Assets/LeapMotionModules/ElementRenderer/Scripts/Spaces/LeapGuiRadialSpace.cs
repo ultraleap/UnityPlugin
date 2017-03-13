@@ -43,9 +43,18 @@ public abstract class LeapGuiRadialSpace<TType> : LeapGuiRadialSpaceBase, ISuppo
   public override ITransformer GetTransformer(Transform anchor) {
     TType transformer;
     if (!_transformerData.TryGetValue(anchor, out transformer)) {
-      throw new InvalidOperationException("Could not find an anchor reference for " + anchor +
-                                          ".  Remember that is is not legal to add or enabled anchors " +
-                                          "at runtime, or otherwise change the hierarchy structure.");
+      string message;
+      if (Application.isPlaying) {
+        message = "Could not find an anchor reference for " + anchor +
+                  ".  Remember that is is not legal to add or enabled anchors " +
+                  "at runtime, or otherwise change the hierarchy structure.";
+      } else {
+        message = "Could not find an anchor reference for " + anchor +
+                  ".  Make sure to pass in a transform with an enabled AnchorOfConstantSize " +
+                  "or the LeapGui component itself.";
+      }
+
+      throw new InvalidOperationException(message);
     }
 
     return transformer;
