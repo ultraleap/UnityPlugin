@@ -195,6 +195,10 @@ public class LeapGui : MonoBehaviour {
       DestroyImmediate(group);
     }
 
+    foreach (var space in GetComponents<LeapGuiSpace>()) {
+      DestroyImmediate(space);
+    }
+
     //Then do normal validation
     OnValidate();
   }

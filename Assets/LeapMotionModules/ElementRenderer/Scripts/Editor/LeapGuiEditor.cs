@@ -76,6 +76,8 @@ public class LeapGuiEditor : CustomEditorBase {
   }
 
   public override void OnInspectorGUI() {
+    validateEditors();
+
     drawScriptField();
 
     drawSpace();
@@ -97,6 +99,22 @@ public class LeapGuiEditor : CustomEditorBase {
     }
 
     serializedObject.ApplyModifiedProperties();
+  }
+
+  private void validateEditors() {
+    if (_spaceEditor != null && _spaceEditor.serializedObject.targetObjects.Query().Any(o => o == null)) {
+      _spaceEditor = null;
+
+      if (_gui.space != null) {
+        CreateCachedEditor(_gui.space, null, ref _spaceEditor);
+      }
+    }
+
+    if (_groupEditor != null && _groupEditor.serializedObject.targetObjects.Query().Any(o => o == null)) {
+      _groupEditor = null;
+
+      updateGroupEditor();
+    }
   }
 
   private void drawSpace() {
