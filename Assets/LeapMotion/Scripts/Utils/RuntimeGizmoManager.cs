@@ -526,7 +526,9 @@ namespace Leap.Unity.RuntimeGizmos {
     /// </summary>
     public void DrawWireCircle(Vector3 center, Vector3 direction, float radius) {
       PushMatrix();
-      matrix = Matrix4x4.TRS(center, Quaternion.LookRotation(direction), new Vector3(1, 1, 0)) * matrix;
+      matrix = Matrix4x4.TRS(center, Quaternion.LookRotation(direction), Vector3.one) *
+               matrix *
+               Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1, 1, 0));
       DrawWireSphere(Vector3.zero, radius);
       PopMatrix();
     }
@@ -540,11 +542,11 @@ namespace Leap.Unity.RuntimeGizmos {
       Vector3 right = Vector3.Cross(up, forward).normalized * radius;
 
       float height = (start - end).magnitude;
-      float distToCap = Mathf.Max(0, (height * 0.5F) - radius);
+      //float distToCap = Mathf.Max(0, (height * 0.5F) - radius);
       Vector3 middle = (end + start) * 0.5F;
 
-      start = middle + ((start - middle).normalized * distToCap);
-      end = middle + ((end - middle).normalized * distToCap);
+      //start = middle + ((start - middle).normalized * distToCap);
+      //end = middle + ((end - middle).normalized * distToCap);
 
       // Radial circles
       DrawLineWireCircle(start, up, radius);
@@ -557,20 +559,21 @@ namespace Leap.Unity.RuntimeGizmos {
       DrawLine(start - forward, end - forward);
 
       // Endcaps
-      DrawWireArc(start, right, forward, radius, 26, 13);
-      DrawWireArc(start, forward, -right, radius, 26, 13);
-      DrawWireArc(end, right, -forward, radius, 26, 13);
-      DrawWireArc(end, forward, right, radius, 26, 13);
+      DrawWireArc(start, right, forward, radius, 26, 0.5F);
+      DrawWireArc(start, forward, -right, radius, 26, 0.5F);
+      DrawWireArc(end, right, -forward, radius, 26, 0.5F);
+      DrawWireArc(end, forward, right, radius, 26, 0.5F);
     }
 
     private void DrawLineWireCircle(Vector3 center, Vector3 normal, float radius) {
-      DrawWireArc(center, normal, Vector3.Slerp(normal, -normal, 0.5F), radius, 26, 26);
+      DrawWireArc(center, normal, Vector3.Slerp(normal, -normal, 0.5F), radius, 26, 1.0F);
     }
 
-    private void DrawWireArc(Vector3 center, Vector3 normal, Vector3 radialStartDirection, float radius, int numCircleSegments = 26, int numSegmentsToDraw = 26) {
+    private void DrawWireArc(Vector3 center, Vector3 normal, Vector3 radialStartDirection, float radius, int numCircleSegments = 32, float fractionOfSegmentsToDraw = 1.0F) {
       normal = normal.normalized;
       Vector3 radiusVector = radialStartDirection.normalized * radius;
       Vector3 nextVector;
+      int numSegmentsToDraw = (int)(numCircleSegments * fractionOfSegmentsToDraw);
       for (int i = 0; i < numSegmentsToDraw; i++) {
         nextVector = Quaternion.AngleAxis(360F / numCircleSegments, normal) * radiusVector;
         DrawLine(center + radiusVector, center + nextVector);
@@ -613,11 +616,10 @@ namespace Leap.Unity.RuntimeGizmos {
             switch (capsule.direction) {
               case 0: capsuleDir = Vector3.right; break;
               case 1: capsuleDir = Vector3.up; break;
-              case 2:
-              default: capsuleDir = Vector3.forward; break;
+              case 2: default: capsuleDir = Vector3.forward; break;
             }
-            DrawWireCapsule(capsule.center + capsuleDir * capsule.height / 2F,
-                            capsule.center - capsuleDir * capsule.height / 2F, capsule.radius);
+            DrawWireCapsule(capsule.center + capsuleDir * (capsule.height / 2F - capsule.radius),
+                            capsule.center - capsuleDir * (capsule.height / 2F - capsule.radius), capsule.radius);
           }
           else {
             Vector3 size = Vector3.zero;
