@@ -167,7 +167,7 @@ public class LeapGui : MonoBehaviour {
   #endregion
 
   #region UNITY CALLBACKS
-  void OnValidate() {
+  private void OnValidate() {
 
 #if UNITY_EDITOR
     //TODO, handle drag-drop of leap gui for groups!
@@ -190,10 +190,16 @@ public class LeapGui : MonoBehaviour {
   }
 
   private void Reset() {
+    //First destroy all groups on this object
+    foreach (var group in GetComponents<LeapGuiGroup>()) {
+      DestroyImmediate(group);
+    }
+
+    //Then do normal validation
     OnValidate();
   }
 
-  void OnDestroy() {
+  private void OnDestroy() {
     if (_space != null) InternalUtility.Destroy(space);
     foreach (var group in _groups) {
       InternalUtility.Destroy(group);
@@ -201,27 +207,27 @@ public class LeapGui : MonoBehaviour {
     _delayedHeavyRebuild.Dispose();
   }
 
-  void Awake() {
+  private void Awake() {
     if (_space != null) {
       _space.gui = this;
     }
     //TODO: assign references 
   }
 
-  void OnEnable() {
+  private void OnEnable() {
     if (Application.isPlaying) {
       //TODO: enable each group too
       if (_space != null) _space.BuildElementData(transform);
     }
   }
 
-  void OnDisable() {
+  private void OnDisable() {
     if (Application.isPlaying) {
       //TODO: disable all groups
     }
   }
 
-  void LateUpdate() {
+  private void LateUpdate() {
 #if UNITY_EDITOR
     if (Application.isPlaying) {
       doLateUpdateRuntime();
