@@ -31,13 +31,16 @@ public class GuiSpaceTransformWarper : MonoBehaviour {
     }
 
     if (_spaceWarper != null && toWarp != null) {
+
+      var localPosInRectSpace = _attachedGui.transform.InverseTransformPoint(this.transform.position);
+
       toWarp.transform.position = _attachedGui.transform.TransformPoint(
                                     _spaceWarper.TransformPoint(
-                                      _attachedGui.transform.InverseTransformPoint(
-                                        this.transform.position)));
+                                      localPosInRectSpace));
 
       toWarp.transform.rotation = _attachedGui.transform.TransformRotation(
                                     _spaceWarper.TransformRotation(
+                                      localPosInRectSpace,
                                       _attachedGui.transform.InverseTransformRotation(
                                         this.transform.rotation)));
     }

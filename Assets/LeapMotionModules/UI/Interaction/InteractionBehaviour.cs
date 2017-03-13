@@ -202,6 +202,10 @@ namespace Leap.Unity.UI.Interaction {
 
     private Hand _publicClosestHoveringHand = null;
 
+    // TODO DELETEME
+    private int _count = 0;
+    private float _leftHandDist = 0F, _rightHandDist = 0F;
+
     // Runs after InteractionHands have done FixedUpdateHand.
     private void FixedUpdateHovering() {
       if (_hoveringHandsCount > 0) {
@@ -217,11 +221,57 @@ namespace Leap.Unity.UI.Interaction {
       else if (_hoveringHandsCountLastFrame > 0) {
         _closestHoveringHand = null;
         OnObjectHoverEnd(_closestJustStoppedHoveringHand);
+        _publicClosestHoveringHand = null;
       }
 
       _hoveringHandsCountLastFrame = _hoveringHandsCount;
       _closestHoveringHand = null;
       _closestHoveringHandDistance = float.PositiveInfinity;
+    }
+
+    public override float GetDistance(Vector3 worldPosition) {
+      // TODO: Need to get distance from the InteractionBehaviour's colliders. Probably has to wait until 5.6 (Physics.ClosestPoint)
+      return GetInteractionDistanceToPoint(worldPosition);
+    }
+
+    public override void HoverBegin(Hand hand) {
+      _hoveringHandsCount++;
+      EvaluateHoverCloseness(hand);
+
+      OnHoverBegin(hand);
+    }
+
+    public override void HoverStay(Hand hand) {
+      EvaluateHoverCloseness(hand);
+
+      OnHoverStay(hand);
+    }
+
+    private void EvaluateHoverCloseness(Hand hand) {
+      float handDistance = GetInteractionDistanceToPoint(hand.PalmPosition.ToVector3());
+
+      if (hand.IsLeft) _leftHandDist = handDistance;
+      else _rightHandDist = handDistance;
+
+      if (_closestHoveringHand == null) {
+        _closestHoveringHand = hand;
+        _closestHoveringHandDistance = handDistance;
+      }
+      else {
+        if (handDistance < _closestHoveringHandDistance) {
+          _closestHoveringHand = hand;
+          _closestHoveringHandDistance = handDistance;
+        }
+      }
+    }
+
+    public override void HoverEnd(Hand hand) {
+      _hoveringHandsCount--;
+      if (_hoveringHandsCount == 0) {
+        _closestJustStoppedHoveringHand = hand;
+      }
+
+      OnHoverEnd(hand);
     }
 
     private Hand _closestPrimaryHoveringHand = null;
@@ -251,47 +301,6 @@ namespace Leap.Unity.UI.Interaction {
       _primaryHoveringHandsCountLastFrame = _primaryHoveringHandsCount;
       _closestPrimaryHoveringHand = null;
       _closestPrimaryHoveringHandDistance = float.PositiveInfinity;
-    }
-
-    public override float GetDistance(Vector3 worldPosition) {
-      // TODO: Need to get distance from the InteractionBehaviour's colliders. Probably has to wait until 5.6 (Physics.ClosestPoint)
-      return GetInteractionDistanceToPoint(worldPosition);
-    }
-
-    public override void HoverBegin(Hand hand) {
-      EvaluateHoverCloseness(hand);
-      _hoveringHandsCount++;
-
-      OnHoverBegin(hand);
-    }
-
-    public override void HoverStay(Hand hand) {
-      EvaluateHoverCloseness(hand);
-
-      OnHoverStay(hand);
-    }
-
-    private void EvaluateHoverCloseness(Hand hand) {
-      float handDistance = GetInteractionDistanceToPoint(hand.PalmPosition.ToVector3());
-      if (_hoveringHandsCount == 0 || _closestHoveringHand == null) {
-        _closestHoveringHand = hand;
-        _closestHoveringHandDistance = handDistance;
-      }
-      else {
-        if (handDistance < _closestHoveringHandDistance) {
-          _closestHoveringHand = hand;
-          _closestHoveringHandDistance = handDistance;
-        }
-      }
-    }
-
-    public override void HoverEnd(Hand hand) {
-      _hoveringHandsCount--;
-      if (_hoveringHandsCount == 0) {
-        _closestJustStoppedHoveringHand = hand;
-      }
-
-      OnHoverEnd(hand);
     }
 
     public override void PrimaryHoverBegin(Hand hand) {

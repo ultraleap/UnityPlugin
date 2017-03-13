@@ -116,8 +116,8 @@ MonoBehaviour:
   lockToAnchor: 0
   lockToAnchorWhenAttached: 1
   anchorLerpCoeffPerSec: 20
-  interactionBehaviour: {fileID: 0}
-  _isInteractionBehaviourNull: 1
+  interactionBehaviour: {fileID: 114384841930028340}
+  _isInteractionBehaviourNull: 0
   isAttractedByHand: 1
   maxHoverReach: 0.1
   hoverReachFromDistance:
@@ -130,7 +130,7 @@ MonoBehaviour:
       outSlope: 0
       tangentMode: 0
     - serializedVersion: 2
-      time: 1
+      time: 0.49861127
       value: 0
       inSlope: 0
       outSlope: 0

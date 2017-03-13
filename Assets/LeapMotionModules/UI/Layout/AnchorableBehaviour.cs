@@ -121,7 +121,7 @@ namespace Leap.Unity.UI.Layout {
             return false;
           }
         case AnchorType.AnchorGroup: default:
-          Anchor toProvide = anchorGroup.FindClosestEnabledAnchor(this.transform.position);
+          Anchor toProvide = anchorGroup.FindClosestAnchor(this.transform.position, requireAnchorIsEnabled: true);
           if (toProvide != null) {
             this.enabled = true;
             anchor = toProvide;
@@ -170,6 +170,7 @@ namespace Leap.Unity.UI.Layout {
         if (isAttractedByHand) {
           if (interactionBehaviour.isHovered) {
             Hand hoveringHand = interactionBehaviour.closestHoveringHand;
+
             reachTargetAmount = Mathf.Clamp01(hoverReachFromDistance.Evaluate(
                                   Vector3.Distance(hoveringHand.PalmPosition.ToVector3(), anchor.transform.position)
                                 ));
@@ -198,6 +199,7 @@ namespace Leap.Unity.UI.Layout {
           this.transform.position = targetPosition + _offsetTowardsHand;
         }
         else {
+          this.transform.position -= _offsetTowardsHand;
           this.transform.position = Vector3.Lerp(this.transform.position, targetPosition, anchorLerpCoeffPerSec * Time.deltaTime);
           if (Vector3.Distance(this.transform.position, targetPosition) < 0.001F) {
             _attachedToAnchor = true;

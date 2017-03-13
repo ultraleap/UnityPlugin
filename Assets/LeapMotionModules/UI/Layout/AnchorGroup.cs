@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Leap.Unity.Attributes;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,14 +7,27 @@ namespace Leap.Unity.UI.Layout {
 
   public class AnchorGroup : MonoBehaviour {
 
-    // TODO: Implement anchor groups!
+    public List<Anchor> anchors;
 
-    public bool ContainsAnchor(Anchor value) {
-      return true;
+    /// <summary> Warning: Search time is O(N). </summary>
+    public bool ContainsAnchor(Anchor anchor) {
+      return anchors.Contains(anchor);
     }
 
-    public Anchor FindClosestEnabledAnchor(Vector3 vector3) {
-      return null;
+    /// <summary> Returns the closest anchor to the argument position. By default, this method will
+    /// only return anchors that are enabled. </summary>
+    public Anchor FindClosestAnchor(Vector3 fromPosition, bool requireAnchorIsEnabled = true) {
+      Anchor closestAnchor = null;
+      float closestDistSqrd = float.PositiveInfinity;
+      foreach (Anchor anchor in anchors) {
+        if (requireAnchorIsEnabled && !anchor.enabled) continue;
+        float anchorDistSqrd = anchor.GetDistanceSqrd(fromPosition);
+        if (closestAnchor == null || anchorDistSqrd < closestDistSqrd) {
+          closestAnchor = anchor;
+          closestDistSqrd = anchorDistSqrd;
+        }
+      }
+      return closestAnchor;
     }
 
   }
