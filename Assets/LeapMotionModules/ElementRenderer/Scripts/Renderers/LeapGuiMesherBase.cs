@@ -238,7 +238,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
 
       using (new ProfilerSample("Update Blend Shapes")) {
         blendShapeFeature.data.Query().Select(d => d.amount).FillList(_blendShapeAmounts);
-        _material.SetFloatArray(BLEND_SHAPE_AMOUNTS_PROPERTY, _blendShapeAmounts);
+        _material.SetFloatArraySafe(BLEND_SHAPE_AMOUNTS_PROPERTY, _blendShapeAmounts);
       }
     }
   }
