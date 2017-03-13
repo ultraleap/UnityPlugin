@@ -542,11 +542,7 @@ namespace Leap.Unity.RuntimeGizmos {
       Vector3 right = Vector3.Cross(up, forward).normalized * radius;
 
       float height = (start - end).magnitude;
-      //float distToCap = Mathf.Max(0, (height * 0.5F) - radius);
       Vector3 middle = (end + start) * 0.5F;
-
-      //start = middle + ((start - middle).normalized * distToCap);
-      //end = middle + ((end - middle).normalized * distToCap);
 
       // Radial circles
       DrawLineWireCircle(start, up, radius);
