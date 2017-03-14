@@ -49,11 +49,10 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     private float _perBoneMass = 1.0f;
 
-    private bool _softContactEnabled = true;
-    private bool _updateBrushHand = true;
-    private Collider[] tempColliderArray = new Collider[1];
+    private bool _softContactEnabled = false;
+    private bool disableSoftContactEnqueued = false;
+    private Collider[] tempColliderArray = new Collider[2];
     private Vector3[] previousBoneCenters = new Vector3[20];
-    private int softContactHysteresisTimer = 0;
     private float softContactBoneRadius = 0.015f;
     private List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(40);
     private Dictionary<Rigidbody, PhysicsUtility.Velocities> originalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>();
@@ -101,6 +100,7 @@ namespace Leap.Unity.Interaction {
           _brushBones[i].transform.position = _hand.PalmPosition.ToVector3();
         }
         _handParent.SetActive(true);
+        enableSoftContact();
         return;
       }
 
@@ -193,7 +193,6 @@ namespace Leap.Unity.Interaction {
 
       InteractionBrushBone brushBone = brushGameObject.GetComponent<InteractionBrushBone>();
       brushBone.col = collider_;
-      //enableSoftContact();
       if (_manager != null) { brushBone.manager = _manager; }
       _brushBones[boneArrayIndex] = brushBone;
 
@@ -225,7 +224,6 @@ namespace Leap.Unity.Interaction {
       }
 #endif
 
-      if (_updateBrushHand) {
         float deadzone = DEAD_ZONE_FRACTION * _hand.Fingers[1].Bone((Bone.BoneType)1).Width;
 
         for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
@@ -238,8 +236,6 @@ namespace Leap.Unity.Interaction {
 
         //Update Palm
         UpdateBone(_hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL), N_FINGERS * N_ACTIVE_BONES, deadzone);
-        softContactHysteresisTimer++;
-      }
 
       if (_softContactEnabled) {
         //SOFT CONTACT COLLISIONS
@@ -267,14 +263,11 @@ namespace Leap.Unity.Interaction {
 
 
         if (softlyContacting) {
-          if (_updateBrushHand) {
-            enableSoftContact();
-          }
-
           //(if we have a manager, it will handle resolving the contacts of both hands in one unified solve)
           if (_manager == null) {
             PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
           }
+          disableSoftContactEnqueued = false;
         } else {
           //If there are no detected Contacts, exit soft contact mode
           disableSoftContact();
@@ -315,37 +308,35 @@ namespace Leap.Unity.Interaction {
     }
 
     private void UpdateBone(Bone bone, int boneArrayIndex, float deadzone) {
-      if (_updateBrushHand) {
-        InteractionBrushBone brushBone = _brushBones[boneArrayIndex];
-        Rigidbody body = brushBone.body;
+      InteractionBrushBone brushBone = _brushBones[boneArrayIndex];
+      Rigidbody body = brushBone.body;
 
-        // This hack works best when we set a fixed rotation for bones.  Otherwise
-        // most friction is lost as the bones roll on contact.
-        body.MoveRotation(bone.Rotation.ToQuaternion());
+      // This hack works best when we set a fixed rotation for bones.  Otherwise
+      // most friction is lost as the bones roll on contact.
+      body.MoveRotation(bone.Rotation.ToQuaternion());
 
-        // Calculate how far off the mark the brushes are.
-        float targetingError = Vector3.Distance(brushBone.lastTarget, body.position) / bone.Width;
-        float massScale = Mathf.Clamp(1.0f - (targetingError * 2.0f), 0.1f, 1.0f) * Mathf.Clamp(_hand.PalmVelocity.Magnitude * 10f, 1f, 10f);
-        body.mass = _perBoneMass * massScale;
+      // Calculate how far off the mark the brushes are.
+      float targetingError = Vector3.Distance(brushBone.lastTarget, body.position) / bone.Width;
+      float massScale = Mathf.Clamp(1.0f - (targetingError * 2.0f), 0.1f, 1.0f) * Mathf.Clamp(_hand.PalmVelocity.Magnitude * 10f, 1f, 10f);
+      body.mass = _perBoneMass * massScale;
 
-        //If these conditions are met, stop using brush hands to contact objects and switch to "Soft Contact"
-        if (softContactHysteresisTimer > 4 && targetingError >= DISLOCATION_FRACTION && _hand.PalmVelocity.Magnitude < 1.5f && boneArrayIndex != N_ACTIVE_BONES * N_FINGERS) {
-          enableSoftContact();
-          return;
-        }
+      //If these conditions are met, stop using brush hands to contact objects and switch to "Soft Contact"
+      if (targetingError >= DISLOCATION_FRACTION && _hand.PalmVelocity.Magnitude < 1.5f && boneArrayIndex != N_ACTIVE_BONES * N_FINGERS) {
+        enableSoftContact();
+        return;
+      }
 
-        // Add a deadzone to avoid vibration.
-        Vector3 delta = bone.Center.ToVector3() - body.position;
-        float deltaLen = delta.magnitude;
-        if (deltaLen <= deadzone) {
-          body.velocity = Vector3.zero;
-          brushBone.lastTarget = body.position;
-        } else {
-          delta *= (deltaLen - deadzone) / deltaLen;
-          brushBone.lastTarget = body.position + delta;
-          delta /= Time.fixedDeltaTime;
-          body.velocity = (delta / delta.magnitude) * Mathf.Clamp(delta.magnitude, 0f, 7f);
-        }
+      // Add a deadzone to avoid vibration.
+      Vector3 delta = bone.Center.ToVector3() - body.position;
+      float deltaLen = delta.magnitude;
+      if (deltaLen <= deadzone) {
+        body.velocity = Vector3.zero;
+        brushBone.lastTarget = body.position;
+      } else {
+        delta *= (deltaLen - deadzone) / deltaLen;
+        brushBone.lastTarget = body.position + delta;
+        delta /= Time.fixedDeltaTime;
+        body.velocity = (delta / delta.magnitude) * Mathf.Clamp(delta.magnitude, 0f, 6f);
       }
     }
 
@@ -369,37 +360,41 @@ namespace Leap.Unity.Interaction {
     }
 
     public void disableSoftContact() {
-      if (!_updateBrushHand) {
-        _updateBrushHand = true;
-        for (int i = _brushBones.Length; i-- != 0;) {
-          _brushBones[i].gameObject.SetActive(true);
-          _brushBones[i].transform.position = _brushBones[i].lastTarget + (_hand.PalmPosition.ToVector3() - _brushBones[_brushBones.Length - 1].lastTarget);
-          _brushBones[i].body.velocity = Vector3.zero;
-        }
-        _handParent.SetActive(true);
-        for (int i = _brushBones.Length; i-- != 0;) {
-          _brushBones[i].DisableColliderTemporarily(0.3f);
-        }
-        softContactHysteresisTimer = 0;
-        StartCoroutine(delayedDisableSoftContact(0.3f));
+      if (!disableSoftContactEnqueued) {
+        StartCoroutine("delayedDisableSoftContact");
+        disableSoftContactEnqueued = true;
       }
     }
 
-    IEnumerator delayedDisableSoftContact(float seconds) {
-      yield return new WaitForSecondsRealtime(seconds);
-      if (_updateBrushHand) {
+    IEnumerator delayedDisableSoftContact() {
+      if (disableSoftContactEnqueued) { yield break; }
+      yield return new WaitForSecondsRealtime(0.3f);
+      if (disableSoftContactEnqueued) {
         _softContactEnabled = false;
+        for (int i = _brushBones.Length; i-- != 0;) {
+          _brushBones[i].col.isTrigger = false;
+        }
       }
     }
 
     public void enableSoftContact() {
-      _updateBrushHand = false;
-      _softContactEnabled = true;
-      for (int i = _brushBones.Length; i-- != 0;) {
-        _brushBones[i].gameObject.SetActive(false);
-        _brushBones[i].body.velocity = Vector3.zero;
+      disableSoftContactEnqueued = false;
+      if (!_softContactEnabled) {
+        _softContactEnabled = true;
+        StopCoroutine("delayedDisableSoftContact");
+        for (int i = _brushBones.Length; i-- != 0;) {
+          _brushBones[i].col.isTrigger = true;
+        }
+
+        //Update the last positions of the bones with this frame
+        for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++) {
+          for (int jointIndex = 0; jointIndex < 4; jointIndex++) {
+            Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+            int boneArrayIndex = fingerIndex * 4 + jointIndex;
+            previousBoneCenters[boneArrayIndex] = bone.Center.ToVector3();
+          }
+        }
       }
-      _handParent.SetActive(false);
     }
   }
 }
