@@ -51,7 +51,7 @@ namespace Leap.Unity.Interaction {
 
     private bool _softContactEnabled = true;
     private bool _updateBrushHand = true;
-    private List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(25);
+    private List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(20);
     private Collider[] tempColliderArray = new Collider[1];
     private Vector3[] previousBoneCenters = new Vector3[20];
     private int softContactHysteresisTimer = 0;
@@ -251,35 +251,9 @@ namespace Leap.Unity.Interaction {
             int boneArrayIndex = fingerIndex * 4 + jointIndex;
             Vector3 boneCenter = bone.Center.ToVector3();
 
-            Array.Clear(tempColliderArray, 0, tempColliderArray.Length);
-            Physics.OverlapSphereNonAlloc(boneCenter, softContactBoneRadius, tempColliderArray, (_manager != null) ? 1 << _manager.InteractionLayer : ~(1<<2));
-
-            foreach (Collider col in tempColliderArray) {
-              if (col != null && col.attachedRigidbody != null && !col.attachedRigidbody.isKinematic) {
-                PhysicsUtility.SoftContact contact = new PhysicsUtility.SoftContact();
-                contact.body = col.attachedRigidbody;
-
-                if (col is MeshCollider) {
-                  contact.normal = (contact.body.worldCenterOfMass - boneCenter).normalized;
-                } else {
-                  Vector3 objectLocalBoneCenter = col.transform.InverseTransformPoint(boneCenter);
-                  Vector3 objectPoint = col.transform.TransformPoint(col.ClosestPointOnSurface(objectLocalBoneCenter));
-                  contact.normal = (objectPoint - boneCenter).normalized * (col.IsPointInside(objectLocalBoneCenter) ? -1f : 1f);
-                }
-                contact.position = boneCenter + (contact.normal * softContactBoneRadius);
-                contact.velocity = (boneCenter - previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime;
-
-                softContacts.Add(contact);
-
-                //Store this rigidbody's pre-contact velocities
-                if (!originalVelocities.ContainsKey(contact.body)) {
-                  PhysicsUtility.Velocities originalBodyVelocities;
-                  originalBodyVelocities.velocity = contact.body.velocity;
-                  originalBodyVelocities.angularVelocity = contact.body.angularVelocity;
-                  originalVelocities.Add(contact.body, originalBodyVelocities);
-                }
-              }
-            }
+            ////Generate and Fill softContacts with SoftContacts that are intersecting a sphere at boneCenter, with radius softContactBoneRadius
+            PhysicsUtility.generateSphereContacts(boneCenter, softContactBoneRadius, (boneCenter - previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime, 
+                                                 (_manager != null) ? 1 << _manager.InteractionLayer : ~(1 << 2), ref softContacts, ref originalVelocities, ref tempColliderArray);
           }
         }
 

@@ -1,9 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System;
 using System.Collections.Generic;
-using Leap;
-using Leap.Unity;
-using Leap.Unity.Graphing;
 
 namespace Leap.Unity.Interaction {
 
@@ -14,11 +11,13 @@ namespace Leap.Unity.Interaction {
       public Vector3 position;
       public Vector3 normal;
       public Vector3 velocity;
+      public Matrix4x4 invWorldInertiaTensor;
     }
 
     public struct Velocities {
       public Vector3 velocity;
       public Vector3 angularVelocity;
+      public Matrix4x4 invWorldInertiaTensor;
     }
 
     public static Vector3 ToLinearVelocity(Vector3 deltaPosition, float deltaTime) {
@@ -66,7 +65,45 @@ namespace Leap.Unity.Interaction {
       return !IsNaN(v) && !IsInfinity(v);
     }
 
-    static void applySoftContact(Rigidbody thisObject, Vector3 handContactPoint, Vector3 handVelocityAtContactPoint, Vector3 normal, float maxImpulse = 5f) {
+    public static void generateSphereContacts(Vector3 spherePosition, float sphereRadius, Vector3 sphereVelocity, int layerMask, ref List<SoftContact> softContacts, ref Dictionary<Rigidbody, Velocities> originalVelocities, ref Collider[] temporaryColliderSwapSpace) {
+      Array.Clear(temporaryColliderSwapSpace, 0, temporaryColliderSwapSpace.Length);
+      Physics.OverlapSphereNonAlloc(spherePosition, sphereRadius, temporaryColliderSwapSpace, layerMask);
+
+      foreach (Collider col in temporaryColliderSwapSpace) {
+        if (col != null && col.attachedRigidbody != null && !col.attachedRigidbody.isKinematic) {
+          SoftContact contact = new SoftContact();
+          contact.body = col.attachedRigidbody;
+
+          //Store this rigidbody's pre-contact velocities and inverse world inertia tensor
+          Velocities originalBodyVelocities;
+          if (!originalVelocities.TryGetValue(contact.body, out originalBodyVelocities)) {
+            originalBodyVelocities = new Velocities();
+            originalBodyVelocities.velocity = contact.body.velocity;
+            originalBodyVelocities.angularVelocity = contact.body.angularVelocity;
+
+            Matrix4x4 tensorRotation = Matrix4x4.TRS(Vector3.zero, contact.body.rotation * contact.body.inertiaTensorRotation, Vector3.one);
+            originalBodyVelocities.invWorldInertiaTensor = (tensorRotation * Matrix4x4.Scale(contact.body.inertiaTensor) * tensorRotation.inverse).inverse;
+
+            originalVelocities.Add(contact.body, originalBodyVelocities);
+          }
+
+          if (col is MeshCollider) {
+            contact.normal = (contact.body.worldCenterOfMass - spherePosition).normalized;
+          } else {
+            Vector3 objectLocalBoneCenter = col.transform.InverseTransformPoint(spherePosition);
+            Vector3 objectPoint = col.transform.TransformPoint(col.ClosestPointOnSurface(objectLocalBoneCenter));
+            contact.normal = (objectPoint - spherePosition).normalized * (col.IsPointInside(objectLocalBoneCenter) ? -1f : 1f);
+          }
+          contact.position = spherePosition + (contact.normal * sphereRadius);
+          contact.velocity = sphereVelocity;
+          contact.invWorldInertiaTensor = originalBodyVelocities.invWorldInertiaTensor;
+
+          softContacts.Add(contact);
+        }
+      }
+    }
+
+    static void applySoftContact(Rigidbody thisObject, Vector3 handContactPoint, Vector3 handVelocityAtContactPoint, Vector3 normal, Matrix4x4 invWorldInertiaTensor) {
       //Determine the relative velocity between the soft contactor and the object at the contact point
       Vector3 objectVelocityAtContactPoint = thisObject.GetPointVelocity(handContactPoint);
       Vector3 velocityDifference = objectVelocityAtContactPoint - handVelocityAtContactPoint;
@@ -80,24 +117,23 @@ namespace Leap.Unity.Interaction {
       // solver is iterating.
       // Interpolation parameter 0..1: -handContactNormal.dot(vel_dir).
 
-      Vector3 vel_dir = velocityDifference.normalized;
-      float t = -relativeVelocity / velocityDifference.magnitude;
+      float invVelocityDifferenceMagnitude = 1f / velocityDifference.magnitude;
+      Vector3 vel_dir = velocityDifference * invVelocityDifferenceMagnitude;
+      float t = -relativeVelocity * invVelocityDifferenceMagnitude;
 
       normal = t * vel_dir + (1.0f - t) * normal;
 
-      if (normal.magnitude > float.Epsilon) { normal = normal.normalized; }
+      if (normal.sqrMagnitude > float.Epsilon) { normal = normal.normalized; }
       relativeVelocity = Vector3.Dot(normal, velocityDifference);
 
       // Apply impulse along calculated normal.  Note this is slightly unusual.  Instead of
       // handling perpendicular movement as a separate constraint this calculates a "bent normal"
       // to blend it in.
 
-      float velocityError = -relativeVelocity;
-      float denom0 = computeImpulseDenominator(thisObject, handContactPoint, normal);
-      float jacDiagABInv = 1.0f / denom0;
-      float velocityImpulse = velocityError * jacDiagABInv;
+      float jacDiagABInv = 1.0f / computeImpulseDenominator(thisObject, handContactPoint, normal, invWorldInertiaTensor);
+      float velocityImpulse = -relativeVelocity * jacDiagABInv;
 
-      applyImpulseNow(thisObject, normal * velocityImpulse, handContactPoint, maxImpulse);
+      applyImpulseNow(thisObject, normal * velocityImpulse, handContactPoint, invWorldInertiaTensor);
     }
 
     public static void applySoftContacts(List<SoftContact> softContacts, Dictionary<Rigidbody, Velocities> originalVelocities) {
@@ -106,20 +142,20 @@ namespace Leap.Unity.Interaction {
         bool m_iterateForwards = true;
         for (int i = 0; i < 10; i++) {
           // Pick a random partition.
-          int partition = Random.Range(0, softContacts.Count);
+          int partition = UnityEngine.Random.Range(0, softContacts.Count);
           if (m_iterateForwards = !m_iterateForwards) {
             for (int it = partition; it < softContacts.Count; it++) {
-              applySoftContact(softContacts[it].body, softContacts[it].position, softContacts[it].velocity, softContacts[it].normal);
+              applySoftContact(softContacts[it].body, softContacts[it].position, softContacts[it].velocity, softContacts[it].normal, softContacts[it].invWorldInertiaTensor);
             }
             for (int it = 0; it < partition; it++) {
-              applySoftContact(softContacts[it].body, softContacts[it].position, softContacts[it].velocity, softContacts[it].normal);
+              applySoftContact(softContacts[it].body, softContacts[it].position, softContacts[it].velocity, softContacts[it].normal, softContacts[it].invWorldInertiaTensor);
             }
           } else {
             for (int it = partition; 0 <= it; it--) {
-              applySoftContact(softContacts[it].body, softContacts[it].position, softContacts[it].velocity, softContacts[it].normal);
+              applySoftContact(softContacts[it].body, softContacts[it].position, softContacts[it].velocity, softContacts[it].normal, softContacts[it].invWorldInertiaTensor);
             }
             for (int it = softContacts.Count - 1; partition <= it; it--) {
-              applySoftContact(softContacts[it].body, softContacts[it].position, softContacts[it].velocity, softContacts[it].normal);
+              applySoftContact(softContacts[it].body, softContacts[it].position, softContacts[it].velocity, softContacts[it].normal, softContacts[it].invWorldInertiaTensor);
             }
           }
         }
@@ -134,7 +170,7 @@ namespace Leap.Unity.Interaction {
 
           //Physics translates objects downward every physics update; preemptively translate them back
           if (RigidbodyVelocity.Key.useGravity) {
-            RigidbodyVelocity.Key.MovePosition(RigidbodyVelocity.Key.position - ((Physics.gravity * Time.fixedDeltaTime * Time.fixedDeltaTime * 0.95f)));
+            RigidbodyVelocity.Key.MovePosition(RigidbodyVelocity.Key.position - (Physics.gravity * Time.fixedDeltaTime * Time.fixedDeltaTime * 0.95f));
           }
         }
 
@@ -143,32 +179,17 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    static float computeImpulseDenominator(Rigidbody thisObject, Vector3 pos, Vector3 normal) {
+    static float computeImpulseDenominator(Rigidbody thisObject, Vector3 pos, Vector3 normal, Matrix4x4 invWorldInertiaTensor) {
       Vector3 r0 = pos - thisObject.worldCenterOfMass;
       Vector3 c0 = Vector3.Cross(r0, normal);
-
-      Quaternion q = thisObject.transform.rotation * thisObject.inertiaTensorRotation;
-      c0 = Quaternion.Inverse(q) * c0;
-      c0 = Vector3.Scale(c0, thisObject.inertiaTensor.Reciprocal());
-      c0 = q * c0;
-
-      Vector3 vec = Vector3.Cross(c0, r0);
+      Vector3 vec = Vector3.Cross(invWorldInertiaTensor * c0, r0);
       return 1f / thisObject.mass + Vector3.Dot(normal, vec);
     }
 
-    public static void applyImpulseNow(Rigidbody thisObject, Vector3 impulse, Vector3 worldPos, float maxImpulse = 5f) {
+    public static void applyImpulseNow(Rigidbody thisObject, Vector3 impulse, Vector3 worldPos, Matrix4x4 invWorldInertiaTensor) {
       if (thisObject.mass != 0f && 1f / thisObject.mass != 0f && impulse.IsValid() && impulse != Vector3.zero) {
-        impulse = impulse.normalized * Mathf.Clamp(impulse.magnitude, 0f, maxImpulse);
-
         thisObject.velocity += impulse / thisObject.mass;
-
-        Vector3 angularImpulse = impulse;
-        Quaternion q = thisObject.transform.rotation * thisObject.inertiaTensorRotation;
-        angularImpulse = Quaternion.Inverse(q) * angularImpulse;
-        angularImpulse = Vector3.Scale(angularImpulse, thisObject.inertiaTensor.Reciprocal());
-        angularImpulse = q * angularImpulse;
-
-        thisObject.angularVelocity += Vector3.Cross(worldPos - thisObject.worldCenterOfMass, angularImpulse);
+        thisObject.angularVelocity += Vector3.Cross(worldPos - thisObject.worldCenterOfMass, invWorldInertiaTensor * impulse);
       }
     }
 
