@@ -4,11 +4,15 @@ using UnityEngine.Rendering;
 using UnityEditor;
 using UnityEditor.Sprites;
 #endif
+using Leap.Unity.Attributes;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Sprite")]
 public class LeapGuiSpriteFeature : LeapGuiFeature<LeapGuiSpriteData> {
+  [EditTimeOnly]
   public string propertyName = "_MainTex";
+
+  [EditTimeOnly]
   public UVChannelFlags channel = UVChannelFlags.UV0;
 
 #if UNITY_EDITOR

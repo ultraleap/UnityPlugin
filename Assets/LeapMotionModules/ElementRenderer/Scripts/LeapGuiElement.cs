@@ -4,20 +4,20 @@ using UnityEngine;
 
 [ExecuteInEditMode]
 [DisallowMultipleComponent]
-public class LeapGuiElement : MonoBehaviour {
+public abstract class LeapGuiElement : MonoBehaviour {
 
   #region INSPECTOR FIELDS
   [SerializeField, HideInInspector]
-  private int _elementId;
+  protected Transform _anchor;
 
   [SerializeField, HideInInspector]
-  private Transform _anchor;
+  protected List<LeapGuiElementData> _data = new List<LeapGuiElementData>();
 
   [SerializeField, HideInInspector]
-  private List<LeapGuiElementData> _data = new List<LeapGuiElementData>();
+  protected LeapGuiGroup _attachedGroup;
 
   [SerializeField, HideInInspector]
-  private LeapGui _attachedGui;
+  protected SerializableType _preferredRendererType;
   #endregion
 
   #region PRIVATE VARIABLES
@@ -28,17 +28,11 @@ public class LeapGuiElement : MonoBehaviour {
   /// </summary>
 #if UNITY_EDITOR
   [NonSerialized]
-  private Mesh _pickingMesh;
+  protected Mesh _pickingMesh;
 #endif
   #endregion
 
   #region PUBLIC API
-  public int elementId {
-    get {
-      return _elementId;
-    }
-  }
-
   public Transform anchor {
     get {
       return _anchor;
@@ -51,15 +45,21 @@ public class LeapGuiElement : MonoBehaviour {
     }
   }
 
-  public LeapGui attachedGui {
+  public LeapGuiGroup attachedGroup {
     get {
-      return _attachedGui;
+      return _attachedGroup;
     }
   }
 
-  public bool IsAttachedToGui {
+  public bool IsAttachedToGroup {
     get {
-      return _attachedGui != null;
+      return _attachedGroup != null;
+    }
+  }
+
+  public Type preferredRendererType {
+    get {
+      return _preferredRendererType;
     }
   }
 
@@ -74,25 +74,31 @@ public class LeapGuiElement : MonoBehaviour {
   }
 #endif
 
-  public virtual void OnAttachedToGui(LeapGui gui, Transform anchor, int elementId) {
-    _attachedGui = gui;
+  public virtual void OnAttachedToGui(LeapGuiGroup group, Transform anchor) {
+#if UNITY_EDITOR
+    if (!Application.isPlaying) {
+      _preferredRendererType = group.renderer.GetType();
+    }
+#endif
+
+    _attachedGroup = group;
     _anchor = anchor;
-    _elementId = elementId;
   }
 
   public virtual void OnDetachedFromGui() {
-    _attachedGui = null;
+    _attachedGroup = null;
     _anchor = null;
-    _elementId = -1;
   }
 
   public virtual void OnAssignFeatureData(List<LeapGuiElementData> data) {
     _data = data;
   }
+
+  public virtual void RebuildEditorPickingMesh() { }
   #endregion
 
   #region UNITY CALLBACKS
-  protected void OnValidate() {
+  protected virtual void OnValidate() {
     //Delete any null references
     for (int i = _data.Count; i-- != 0;) {
       if (_data[i] == null) {
@@ -122,6 +128,13 @@ public class LeapGuiElement : MonoBehaviour {
         }
       }
     }
+
+    if (!Application.isPlaying) {
+      if (_attachedGroup != null) {
+        _attachedGroup.gui.ScheduleEditorUpdate();
+        _preferredRendererType = _attachedGroup.renderer.GetType();
+      }
+    }
 #endif
 
     foreach (var dataObj in _data) {
@@ -129,30 +142,48 @@ public class LeapGuiElement : MonoBehaviour {
     }
   }
 
-  void OnDestroy() {
+  protected virtual void OnDestroy() {
     foreach (var dataObj in _data) {
       if (dataObj != null) InternalUtility.Destroy(dataObj);
     }
   }
 
-  void OnEnable() {
+  protected virtual void OnEnable() {
 #if UNITY_EDITOR
     if (Application.isPlaying) {
 #endif
-      if (!IsAttachedToGui) {
-        GetComponentInParent<LeapGui>().TryAddElement(this);
+      if (!IsAttachedToGroup) {
+        var parentGui = GetComponentInParent<LeapGui>();
+        if (parentGui != null) {
+          parentGui.TryAddElement(this);
+        }
       }
 #if UNITY_EDITOR
     }
 #endif
   }
 
-  void OnDisable() {
+  protected virtual void Start() {
 #if UNITY_EDITOR
     if (Application.isPlaying) {
 #endif
-      if (IsAttachedToGui) {
-        _attachedGui.TryRemoveElement(this);
+      if (!IsAttachedToGroup) {
+        var parentGui = GetComponentInParent<LeapGui>();
+        if (parentGui != null) {
+          parentGui.TryAddElement(this);
+        }
+      }
+#if UNITY_EDITOR
+    }
+#endif
+  }
+
+  protected virtual void OnDisable() {
+#if UNITY_EDITOR
+    if (Application.isPlaying) {
+#endif
+      if (IsAttachedToGroup) {
+        _attachedGroup.TryRemoveElement(this);
       }
 #if UNITY_EDITOR
     }
@@ -160,7 +191,7 @@ public class LeapGuiElement : MonoBehaviour {
   }
 
 #if UNITY_EDITOR
-  void OnDrawGizmos() {
+  protected virtual void OnDrawGizmos() {
     if (_pickingMesh != null && _pickingMesh.vertexCount != 0) {
       Gizmos.color = new Color(1, 0, 0, 0);
       Gizmos.DrawMesh(_pickingMesh);

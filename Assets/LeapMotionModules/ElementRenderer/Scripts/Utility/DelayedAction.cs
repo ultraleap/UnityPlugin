@@ -4,7 +4,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-public class DelayedAction {
+public class DelayedAction : IDisposable {
   private Action _action;
   private float _delay;
   private double _actionTime;
@@ -30,6 +30,13 @@ public class DelayedAction {
       _action();
       _actionTime = double.MaxValue;
     }
+  }
+
+  public void Dispose() {
+#if UNITY_EDITOR
+    EditorApplication.update -= update;
+#endif
+    _action = null;
   }
 
   private double currTime {

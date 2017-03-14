@@ -2,7 +2,7 @@
 using Leap.Unity;
 
 [CustomEditor(typeof(LeapGuiBakedRenderer))]
-public class LeapGuiBakedRendererEditor : CustomEditorBase {
+public class LeapGuiBakedRendererEditor : LeapGuiMesherBaseEditor {
 
   protected override void OnEnable() {
     base.OnEnable();

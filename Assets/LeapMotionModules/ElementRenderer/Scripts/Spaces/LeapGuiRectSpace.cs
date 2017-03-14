@@ -7,8 +7,8 @@ using UnityEngine;
 public class LeapGuiRectSpace : LeapGuiSpace, ISupportsAddRemove {
   private Transformer _transformer = new Transformer();
 
-  public void OnAddElements(List<LeapGuiElement> element, List<int> indexes) { }
-  public void OnRemoveElements(List<int> toRemove) { }
+  public void OnAddElement() { }
+  public void OnRemoveElement() { }
 
   public override void BuildElementData(Transform root) { }
   public override void RefreshElementData(Transform root, int index, int count) { }
@@ -44,7 +44,7 @@ public class LeapGuiRectSpace : LeapGuiSpace, ISupportsAddRemove {
     }
 
     public Matrix4x4 GetTransformationMatrix(Vector3 localRectPos) {
-      return Matrix4x4.identity;
+      return Matrix4x4.TRS(localRectPos, Quaternion.identity, Vector3.one);
     }
   }
 }

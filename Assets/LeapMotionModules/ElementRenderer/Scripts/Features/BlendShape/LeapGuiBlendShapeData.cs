@@ -16,20 +16,24 @@ public class LeapGuiBlendShapeData : LeapGuiElementData {
   [SerializeField]
   private float _amount = 0;
 
+  [EditTimeOnly]
   [SerializeField]
   private BlendShapeType _type = BlendShapeType.Scale;
 
+  [EditTimeOnly]
   [MinValue(0)]
   [SerializeField]
   private float _scale = 1.1f;
 
+  [EditTimeOnly]
   [SerializeField]
   private Vector3 _translation = new Vector3(0, 0, 0.1f);
 
+  [EditTimeOnly]
   [SerializeField]
   private Vector3 _rotation = new Vector3(0, 0, 5);
 
-  [SerializeField]
+  [SerializeField, HideInInspector]
   private Mesh _mesh;
 
   public float amount {
@@ -45,13 +49,14 @@ public class LeapGuiBlendShapeData : LeapGuiElementData {
   private Mesh _cachedBlendShape;
   public Mesh blendShape {
     get {
-      var meshData = element.Mesh();
-      if (meshData == null) {
+      if (!(element is LeapGuiMeshElementBase)) {
         return null;
       }
 
-      meshData.RefreshMeshData();
-      Mesh mesh = meshData.mesh;
+      var meshElement = element as LeapGuiMeshElementBase;
+      meshElement.RefreshMeshData();
+
+      var mesh = meshElement.mesh;
       if (mesh == null) {
         return null;
       }

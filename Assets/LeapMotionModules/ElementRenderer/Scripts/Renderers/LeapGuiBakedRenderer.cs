@@ -6,6 +6,7 @@ using UnityEditor;
 #endif
 using Leap.Unity;
 using Leap.Unity.Query;
+using Leap.Unity.Attributes;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Baked")]
@@ -13,21 +14,26 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
   #region INSPECTOR FIELDS
 
+  [EditTimeOnly]
   [SerializeField]
   private SingleLayer _layer = 0;
 
+  [EditTimeOnly]
   [SerializeField]
   private MotionType _motionType = MotionType.Translation;
 
+  [EditTimeOnly]
   [SerializeField]
   private bool _createMeshRenderers;
 
+  [EditTimeOnly]
   [SerializeField]
   private bool _enableLightmapping;
 
+  [EditTimeOnly]
   [SerializeField]
   private MaterialGlobalIlluminationFlags _giFlags = MaterialGlobalIlluminationFlags.None;
-
+  
   [SerializeField]
   private LightmapUnwrapSettings _lightmapUnwrapSettings;
   #endregion
@@ -65,18 +71,6 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     }
   }
 
-  public override void GetSupportInfo(List<LeapGuiMeshFeature> features, List<SupportInfo> info) {
-    base.GetSupportInfo(features, info);
-
-    for (int i = 0; i < features.Count; i++) {
-      var feature = features[i];
-
-      if (_enableLightmapping && !feature.uv1) {
-        info[i] = info[i].OrWorse(SupportInfo.Warning("Lightmap uvs are being generated, but the lightmap channel is not enabled!"));
-      }
-    }
-  }
-
   public override SupportInfo GetSpaceSupportInfo(LeapGuiSpace space) {
     if (space is LeapGuiRectSpace ||
         space is LeapGuiCylindricalSpace) {
@@ -86,13 +80,22 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     }
   }
 
+  public override void OnDisableRendererEditor() {
+    base.OnDisableRendererEditor();
+
+    foreach (var renderer in _renderers) {
+      renderer.Destroy();
+    }
+    _renderers.Clear();
+  }
+
   public override void OnUpdateRenderer() {
     base.OnUpdateRenderer();
 
     if (gui.space is LeapGuiRectSpace) {
       using (new ProfilerSample("Build Material Data")) {
         _rect_elementPositions.Clear();
-        foreach (var element in gui.elements) {
+        foreach (var element in group.elements) {
           var guiSpace = transform.InverseTransformPoint(element.transform.position);
           _rect_elementPositions.Add(guiSpace);
         }
@@ -106,7 +109,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
       using (new ProfilerSample("Build Material Data")) {
         _curved_elementParameters.Clear();
-        foreach (var element in gui.elements) {
+        foreach (var element in group.elements) {
           var t = radialSpace.GetTransformer(element.anchor) as IRadialTransformer;
           _curved_elementParameters.Add(t.GetVectorRepresentation(element));
         }
@@ -144,6 +147,9 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
       for (int i = 0; i < _meshes.Count; i++) {
         _renderers[i].MakeValid(transform, i, _meshes[i], _material);
+        if (_enableLightmapping) {
+          GameObjectUtility.SetStaticEditorFlags(_renderers[i].obj, StaticEditorFlags.LightmapStatic | StaticEditorFlags.ReflectionProbeStatic);
+        }
       }
     } else {
       while (_renderers.Count > 0) {
@@ -182,10 +188,10 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     }
   }
 
-  protected override void buildTopology(LeapGuiMeshData meshData) {
+  protected override void buildTopology() {
     //If the next element is going to put us over the limit, finish the current mesh
     //and start a new one.
-    if (_verts.Count + meshData.mesh.vertexCount > MeshUtil.MAX_VERT_COUNT) {
+    if (_verts.Count + _currElement.mesh.vertexCount > MeshUtil.MAX_VERT_COUNT) {
       finishMesh();
       beginMesh();
     }
@@ -193,7 +199,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     switch (_motionType) {
       case MotionType.None:
         _noMotion_transformer = gui.space.GetTransformer(_currElement.anchor);
-        _noMotion_elementVertToGuiVert = gui.transform.worldToLocalMatrix * 
+        _noMotion_elementVertToGuiVert = gui.transform.worldToLocalMatrix *
                                          _currElement.transform.localToWorldMatrix;
         break;
       case MotionType.Translation:
@@ -208,7 +214,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
         throw new NotImplementedException();
     }
 
-    base.buildTopology(meshData);
+    base.buildTopology();
   }
 
   protected override void postProcessMesh() {

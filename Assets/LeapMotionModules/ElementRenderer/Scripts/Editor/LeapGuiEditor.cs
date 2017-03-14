@@ -7,17 +7,18 @@ using Leap.Unity.Query;
 
 [CustomEditor(typeof(LeapGui))]
 public class LeapGuiEditor : CustomEditorBase {
-  private const int BUTTON_WIDTH = 30;
+  private const int BUTTON_WIDTH = 60;
+  private static Color BUTTON_COLOR = Color.white * 0.95f;
+  private static Color BUTTON_HIGHLIGHTED_COLOR = Color.white * 0.6f;
 
-  private LeapGui gui;
-  private ReorderableList _featureList;
-  private GenericMenu _addFeatureMenu;
+  private LeapGui _gui;
+  private SerializedProperty _selectedGroup;
 
   private GenericMenu _addSpaceMenu;
   private Editor _spaceEditor;
 
-  private GenericMenu _addRendererMenu;
-  private Editor _rendererEditor;
+  private GenericMenu _addGroupMenu;
+  private Editor _groupEditor;
 
   protected override void OnEnable() {
     base.OnEnable();
@@ -26,35 +27,10 @@ public class LeapGuiEditor : CustomEditorBase {
       return;
     }
 
-    gui = target as LeapGui;
-
-    _featureList = new ReorderableList(gui.features,
-                                       typeof(LeapGuiFeatureBase),
-                                       draggable: true,
-                                       displayHeader: false,
-                                       displayAddButton: false,
-                                       displayRemoveButton: false);
-
-    _featureList.showDefaultBackground = false;
-    _featureList.headerHeight = 0;
-    _featureList.elementHeight = EditorGUIUtility.singleLineHeight;
-    _featureList.elementHeightCallback = featureHeightCallback;
-    _featureList.drawElementCallback = drawFeatureCallback;
-    _featureList.onReorderCallback = onReorderFeaturesCallback;
+    _gui = target as LeapGui;
+    _selectedGroup = serializedObject.FindProperty("_selectedGroup");
 
     var allTypes = Assembly.GetAssembly(typeof(LeapGui)).GetTypes();
-
-    var allFeatures = allTypes.Query().
-                               Where(t => !t.IsAbstract).
-                               Where(t => !t.IsGenericType).
-                               Where(t => t.IsSubclassOf(typeof(LeapGuiFeatureBase)));
-
-    _addFeatureMenu = new GenericMenu();
-    foreach (var feature in allFeatures) {
-      _addFeatureMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(feature)),
-                              false,
-                              () => gui.AddFeature(feature));
-    }
 
     var allSpaces = allTypes.Query().
                              Where(t => !t.IsAbstract).
@@ -66,8 +42,8 @@ public class LeapGuiEditor : CustomEditorBase {
       _addSpaceMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(space)),
                             false,
                             () => {
-                              gui.SetSpace(space);
-                              CreateCachedEditor(gui.space, null, ref _spaceEditor);
+                              _gui.SetSpace(space);
+                              CreateCachedEditor(_gui.space, null, ref _spaceEditor);
                               serializedObject.Update();
                             });
     }
@@ -75,177 +51,152 @@ public class LeapGuiEditor : CustomEditorBase {
     var allRenderers = allTypes.Query().
                                 Where(t => !t.IsAbstract).
                                 Where(t => !t.IsGenericType).
-                                Where(t => t.IsSubclassOf(typeof(LeapGuiRenderer)));
+                                Where(t => t.IsSubclassOf(typeof(LeapGuiRendererBase)));
 
-    _addRendererMenu = new GenericMenu();
+    _addGroupMenu = new GenericMenu();
     foreach (var renderer in allRenderers) {
-      _addRendererMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(renderer)),
-                               false,
-                               () => {
-                                 gui.SetRenderer(renderer);
-                                 CreateCachedEditor(gui.renderer, null, ref _rendererEditor);
-                                 serializedObject.Update();
-                               });
+      _addGroupMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(renderer)),
+                            false,
+                            () => {
+                              _gui.CreateGroup(renderer);
+                              updateGroupEditor();
+                            });
     }
 
-    if (gui.renderer != null) {//
-      CreateCachedEditor(gui.renderer, null, ref _rendererEditor);
+    if (_gui.space != null) {
+      CreateCachedEditor(_gui.space, null, ref _spaceEditor);
     }
 
-    if (gui.space != null) {
-      CreateCachedEditor(gui.space, null, ref _spaceEditor);
-    }
-
-    specifyCustomDecorator("_features", featureDecorator);
-    specifyCustomDrawer("_features", drawFeatures);
-    specifyCustomDrawer("_space", drawSpace);
-    specifyCustomDrawer("_renderer", drawRenderer);
+    updateGroupEditor();
   }
 
   private void OnDisable() {
-    if (_rendererEditor != null) DestroyImmediate(_rendererEditor);
     if (_spaceEditor != null) DestroyImmediate(_spaceEditor);
+    if (_groupEditor != null) DestroyImmediate(_groupEditor);
   }
 
-  private void featureDecorator(SerializedProperty property) {
-    int elementMax = LeapGuiPreferences.elementMax;
+  public override void OnInspectorGUI() {
+    validateEditors();
 
-    if (gui.elements.Count > elementMax) {
-      EditorGUILayout.HelpBox("This gui currently has " + gui.elements.Count.ToString() +
-                              " elements, which is greater than the maximum of " +
-                              elementMax + ".  Visit Edit->Preferences to change the maximum element count.",
-                              MessageType.Warning);
-      return;
+    drawScriptField();
+
+    drawSpace();
+
+    drawToolbar();
+
+    if (_groupEditor != null) {
+      drawGroupHeader();
+
+      GUILayout.BeginVertical(EditorStyles.helpBox);
+
+      _groupEditor.serializedObject.Update();
+      _groupEditor.OnInspectorGUI();
+      _groupEditor.serializedObject.ApplyModifiedProperties();
+
+      GUILayout.EndVertical();
+    } else {
+      EditorGUILayout.HelpBox("To get started, create a new rendering group!", MessageType.Info);
     }
+
+    serializedObject.ApplyModifiedProperties();
   }
 
-  private void drawFeatures(SerializedProperty property) {
-    Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
-    Rect left, middle, right;
-    rect.SplitHorizontallyWithRight(out middle, out right, BUTTON_WIDTH);
-    middle.SplitHorizontallyWithRight(out left, out middle, BUTTON_WIDTH);
+  private void validateEditors() {
+    if (_spaceEditor != null && _spaceEditor.serializedObject.targetObjects.Query().Any(o => o == null)) {
+      _spaceEditor = null;
 
-    EditorGUI.LabelField(left, "Element Features", EditorStyles.miniButtonLeft);
-
-    EditorGUI.BeginDisabledGroup(gui.features.Count == 0);
-    if (GUI.Button(middle, "-", EditorStyles.miniButtonMid) && _featureList.index >= 0) {
-      gui.features.RemoveAt(_featureList.index);
-      gui.ScheduleEditorUpdate();
-      EditorUtility.SetDirty(gui);
-    }
-    EditorGUI.EndDisabledGroup();
-
-    if (GUI.Button(right, "+", EditorStyles.miniButtonRight)) {
-      _addFeatureMenu.ShowAsContext();
-      EditorUtility.SetDirty(gui);
-    }
-
-    EditorGUI.BeginChangeCheck();
-
-    Undo.RecordObject(target, "Changed feature list.");
-    _featureList.DoLayoutList();
-
-    if (EditorGUI.EndChangeCheck()) {
-      EditorUtility.SetDirty(gui);
-    }
-  }
-
-  private void drawSpace(SerializedProperty property) {
-    Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
-    Rect left, right;
-    rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH * 2);
-
-    EditorGUI.LabelField(left, "Space", EditorStyles.miniButtonLeft);
-    if (GUI.Button(right, "v", EditorStyles.miniButtonRight)) {
-      _addSpaceMenu.ShowAsContext();
-    }
-
-    if (_spaceEditor != null) {
-      _spaceEditor.OnInspectorGUI();
-    }
-
-    EditorGUILayout.Space();
-  }
-
-  private void drawRenderer(SerializedProperty property) {
-    Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
-    Rect left, right;
-    rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH * 2);
-
-    EditorGUI.LabelField(left, "Renderer", EditorStyles.miniButtonLeft);
-    if (GUI.Button(right, "v", EditorStyles.miniButtonRight)) {
-      _addRendererMenu.ShowAsContext();
-    }
-
-    if (_rendererEditor != null) {
-      _rendererEditor.serializedObject.Update();
-      _rendererEditor.OnInspectorGUI();
-      _rendererEditor.serializedObject.ApplyModifiedProperties();
-    }
-  }
-
-  // Feature list callbacks
-
-  private void drawFeatureHeaderCallback(Rect rect) {
-    Rect left, right;
-    rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH);
-
-    EditorGUI.LabelField(left, "Gui Element Features", EditorStyles.miniButtonLeft);
-
-    if (GUI.Button(right, "+", EditorStyles.miniButtonRight)) {
-      _addFeatureMenu.ShowAsContext();
-    }
-  }
-
-  private float featureHeightCallback(int index) {
-    return gui.features[index].GetEditorHeight() + EditorGUIUtility.singleLineHeight;
-  }
-
-  private void drawFeatureCallback(Rect rect, int index, bool isActive, bool isFocused) {
-    rect = rect.SingleLine();
-    var feature = gui.features[index];
-
-    string featureName = LeapGuiTagAttribute.GetTag(gui.features[index].GetType());
-    GUIContent featureLabel = new GUIContent(featureName);
-
-    Color originalColor = GUI.color;
-
-    if (!EditorApplication.isPlaying && gui.supportInfo != null) {
-      var supportInfo = gui.supportInfo[index];
-      switch (supportInfo.support) {
-        case SupportType.Warning:
-          GUI.color = Color.yellow;
-          featureLabel.tooltip = supportInfo.message;
-          break;
-        case SupportType.Error:
-          GUI.color = Color.red;
-          featureLabel.tooltip = supportInfo.message;
-          break;
+      if (_gui.space != null) {
+        CreateCachedEditor(_gui.space, null, ref _spaceEditor);
       }
     }
 
-    Vector2 size = EditorStyles.label.CalcSize(featureLabel);
+    if (_groupEditor != null && _groupEditor.serializedObject.targetObjects.Query().Any(o => o == null)) {
+      _groupEditor = null;
 
-    Rect labelRect = rect;
-    labelRect.width = size.x;
-
-    GUI.Box(labelRect, "");
-    EditorGUI.LabelField(labelRect, featureLabel);
-    GUI.color = originalColor;
-
-    Undo.RecordObject(feature, "Modified Gui Feature");
-
-    EditorGUI.BeginChangeCheck();
-    feature.DrawFeatureEditor(rect.NextLine().Indent(), isActive, isFocused);
-    if (EditorGUI.EndChangeCheck()) {
-      gui.ScheduleEditorUpdate();
-      EditorUtility.SetDirty(feature);
+      updateGroupEditor();
     }
   }
 
-  private void onReorderFeaturesCallback(ReorderableList list) {
-    EditorUtility.SetDirty(target);
+  private void drawSpace() {
+    using (new GUILayout.VerticalScope(EditorStyles.helpBox)) {
+
+      Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
+      Rect left, right;
+      rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH);
+
+      EditorGUI.LabelField(left, "Space", EditorStyles.miniButtonLeft);
+
+      using (new EditorGUI.DisabledGroupScope(EditorApplication.isPlaying)) {
+        if (GUI.Button(right, "v", EditorStyles.miniButtonRight)) {
+          _addSpaceMenu.ShowAsContext();
+        }
+      }
+
+      _spaceEditor.OnInspectorGUI();
+    }
+  }
+
+  private void drawToolbar() {
+    EditorGUILayout.BeginHorizontal();
+
+    using (new EditorGUI.DisabledGroupScope(EditorApplication.isPlaying)) {
+      GUI.color = BUTTON_COLOR;
+      if (GUILayout.Button("New Group", EditorStyles.toolbarDropDown)) {
+        _addGroupMenu.ShowAsContext();
+      }
+
+      if (_groupEditor != null) {
+        if (GUILayout.Button("Delete Group", EditorStyles.toolbarButton)) {
+          _gui.DestroySelectedGroup();
+          updateGroupEditor();
+        }
+      }
+    }
+
+    GUI.color = Color.white;
+    GUILayout.FlexibleSpace();
+    Rect r = GUILayoutUtility.GetLastRect();
+    GUI.Label(r, "", EditorStyles.toolbarButton);
+
+    EditorGUILayout.EndHorizontal();
+  }
+
+  private void drawGroupHeader() {
+    EditorGUILayout.BeginHorizontal();
+
+    for (int i = 0; i < _gui.groups.Count; i++) {
+      if (i == _selectedGroup.intValue) {
+        GUI.color = BUTTON_HIGHLIGHTED_COLOR;
+      } else {
+        GUI.color = BUTTON_COLOR;
+      }
+
+      var group = _gui.groups[i];
+      string tag = LeapGuiTagAttribute.GetTag(group.renderer.GetType());
+      if (GUILayout.Button(tag, EditorStyles.toolbarButton, GUILayout.MaxWidth(60))) {
+        _selectedGroup.intValue = i;
+        CreateCachedEditor(_gui.groups[i], null, ref _groupEditor);
+      }
+    }
+    GUI.color = Color.white;
+
+    GUILayout.FlexibleSpace();
+    Rect rect = GUILayoutUtility.GetLastRect();
+    GUI.Label(rect, "", EditorStyles.toolbarButton);
+
+    EditorGUILayout.EndHorizontal();
+  }
+
+  private void updateGroupEditor() {
     serializedObject.Update();
+    if (_gui.groups.Count == 0) {
+      if (_groupEditor != null) {
+
+        DestroyImmediate(_groupEditor);
+      }
+    } else {
+      CreateCachedEditor(_gui.groups[_selectedGroup.intValue], null, ref _groupEditor);
+    }
   }
 
   private bool HasFrameBounds() {
@@ -253,13 +204,14 @@ public class LeapGuiEditor : CustomEditorBase {
   }
 
   private Bounds OnGetFrameBounds() {
-    gui.RebuildEditorPickingMeshes();
+    _gui.RebuildEditorPickingMeshes();
 
-    Bounds[] allBounds = gui.elements.Query().
-                             Select(e => e.pickingMesh).
-                             Where(m => m != null).
-                             Select(m => m.bounds).
-                             ToArray();
+    Bounds[] allBounds = _gui.groups.Query().
+                              SelectMany(g => g.elements.Query()).
+                              Select(e => e.pickingMesh).
+                              Where(m => m != null).
+                              Select(m => m.bounds).
+                              ToArray();
 
     Bounds bounds = allBounds[0];
     for (int i = 1; i < allBounds.Length; i++) {
@@ -268,4 +220,3 @@ public class LeapGuiEditor : CustomEditorBase {
     return bounds;
   }
 }
-

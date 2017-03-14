@@ -25,8 +25,6 @@ namespace Leap.Unity {
     protected Dictionary<string, Action<SerializedProperty>> _specifiedDrawers;
     protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedDecorators;
     protected Dictionary<string, List<Func<bool>>> _conditionalProperties;
-    protected HashSet<string> _beginHorizontalProperties;
-    protected HashSet<string> _endHorizontalProperties;
     protected bool _showScriptField = true;
 
     protected List<SerializedProperty> _modifiedProperties = new List<SerializedProperty>();
@@ -120,11 +118,11 @@ namespace Leap.Unity {
       }
     }
 
-    protected void createHorizonalSection(string beginProperty, string endProperty) {
-      validateProperty(beginProperty);
-      validateProperty(endProperty);
-      _beginHorizontalProperties.Add(beginProperty);
-      _endHorizontalProperties.Add(endProperty);
+    protected void drawScriptField(bool disable = true) {
+      var scriptProp = serializedObject.FindProperty("m_Script");
+      EditorGUI.BeginDisabledGroup(disable);
+      EditorGUILayout.PropertyField(scriptProp);
+      EditorGUI.EndDisabledGroup();
     }
 
     protected virtual void OnEnable() {
@@ -138,8 +136,6 @@ namespace Leap.Unity {
       _specifiedDrawers = new Dictionary<string, Action<SerializedProperty>>();
       _specifiedDecorators = new Dictionary<string, List<Action<SerializedProperty>>>();
       _conditionalProperties = new Dictionary<string, List<Func<bool>>>();
-      _beginHorizontalProperties = new HashSet<string>();
-      _endHorizontalProperties = new HashSet<string>();
     }
 
     protected bool validateProperty(string propertyName) {
@@ -176,10 +172,6 @@ namespace Leap.Unity {
           }
         }
 
-        if (_beginHorizontalProperties.Contains(iterator.name)) {
-          EditorGUILayout.BeginHorizontal();
-        }
-
         Action<SerializedProperty> customDrawer;
 
         List<Action<SerializedProperty>> decoratorList;
@@ -201,10 +193,6 @@ namespace Leap.Unity {
 
         if (EditorGUI.EndChangeCheck()) {
           _modifiedProperties.Add(iterator.Copy());
-        }
-
-        if (_endHorizontalProperties.Contains(iterator.name)) {
-          EditorGUILayout.EndHorizontal();
         }
 
         isFirst = false;
