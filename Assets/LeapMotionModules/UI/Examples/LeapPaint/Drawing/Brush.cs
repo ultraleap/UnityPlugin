@@ -10,17 +10,18 @@ namespace Leap.Paint {
   public class Brush : MonoBehaviour {
 
     [Header("Configuration")]
-    [Tooltip("The transform to use to set StrokePoints from this Brush. If no transform is specified, this transform will be used.")]
-    public Transform brushTip;
-    [Tooltip("Scale each piece of the output mesh by this value. (Cross sections will only scale by X and Y.)")]
-    public Vector3 scalingVector = Vector3.one;
+    [Tooltip("The StrokeRenderer to use to render this Brush's strokes. If no StrokeRenderer is specified, a simple default will be set.")]
+    public StrokeRendererBase strokeRendererPrefab;
     [Tooltip("If set to null, new StrokeRenderer objects will have the root of the hierarchy as their parent.")]
     public Transform outputParent;
+    [Tooltip("Scale each piece of the output mesh by this value. (Cross sections will only scale by X and Y.)")]
+    public Vector3 scalingVector = Vector3.one;
     [Tooltip("The minimum distance between two StrokePoints.")]
     [MinValue(0.005F)]
     public float minSegmentDistance = 0.005F;
-    [Tooltip("The StrokeRenderer to use to render this Brush's strokes. If no StrokeRenderer is specified, a simple default will be set.")]
-    public StrokeRendererBase strokeRendererPrefab;
+    [Header("Additional Configuration (optional)")]
+    [Tooltip("The transform to use to set StrokePoints from this Brush. If no transform is specified, this transform will be used.")]
+    public Transform brushTip;
 
     private bool              _isBrushing;
     private Stroke            _curStroke;

@@ -202,10 +202,6 @@ namespace Leap.Unity.UI.Interaction {
 
     private Hand _publicClosestHoveringHand = null;
 
-    // TODO DELETEME
-    private int _count = 0;
-    private float _leftHandDist = 0F, _rightHandDist = 0F;
-
     // Runs after InteractionHands have done FixedUpdateHand.
     private void FixedUpdateHovering() {
       if (_hoveringHandsCount > 0) {
@@ -249,9 +245,6 @@ namespace Leap.Unity.UI.Interaction {
 
     private void EvaluateHoverCloseness(Hand hand) {
       float handDistance = GetInteractionDistanceToPoint(hand.PalmPosition.ToVector3());
-
-      if (hand.IsLeft) _leftHandDist = handDistance;
-      else _rightHandDist = handDistance;
 
       if (_closestHoveringHand == null) {
         _closestHoveringHand = hand;
