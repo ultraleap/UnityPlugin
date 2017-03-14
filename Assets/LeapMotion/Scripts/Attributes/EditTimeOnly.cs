@@ -10,6 +10,6 @@ namespace Leap.Unity.Attributes {
     public bool ShouldDisable(SerializedProperty property) {
       return EditorApplication.isPlaying;
     }
-  }
 #endif
+  }
 }
