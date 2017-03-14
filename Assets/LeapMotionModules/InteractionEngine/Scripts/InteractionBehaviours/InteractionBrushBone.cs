@@ -20,9 +20,13 @@ namespace Leap.Unity.Interaction {
     public InteractionManager manager;
     /** This InteractiveBrushBone's RigidBody. */
     public Rigidbody body;
-    /** This InteractiveBrushBone's Collider. */
+    /** This InteractionBrushBone's Collider. */
     public Collider col;
-    /** This InteractiveBrushBone's target position. */
+    /** This InteractionBrushBone's FixedJoint. */
+    public FixedJoint joint;
+    /** This InteractionBrushBone's Metacarpal FixedJoint. */
+    public FixedJoint metacarpalJoint;
+    /** This InteractionBrushBone's target position. */
     public Vector3 lastTarget;
 
     public void DisableColliderTemporarily(float seconds) {

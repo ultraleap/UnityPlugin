@@ -147,8 +147,8 @@ namespace Leap.Unity.Interaction {
         }
       }
 
+      // Palm is attached to the third metacarpal and derived from it.
       {
-        // Palm is attached to the third metacarpal and derived from it.
         Bone bone = _hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL);
         int boneArrayIndex = N_FINGERS * N_ACTIVE_BONES;
         GameObject brushGameObject = new GameObject(gameObject.name, typeof(BoxCollider), typeof(Rigidbody), typeof(InteractionBrushBone));
@@ -163,26 +163,8 @@ namespace Leap.Unity.Interaction {
         BeginBone(null, brushGameObject, boneArrayIndex, box);
       }
 
-      //Constrain the bones to eachother to prevent separation
-      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
-        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
-          Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
-          int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
-
-          FixedJoint joint = _brushBones[boneArrayIndex].gameObject.AddComponent<FixedJoint>();
-          joint.autoConfigureConnectedAnchor = false;
-          if (jointIndex != 0) {
-            Bone prevBone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
-            joint.connectedBody = _brushBones[boneArrayIndex - 1].body;
-            joint.anchor = Vector3.back * bone.Length / 2f;
-            joint.connectedAnchor = Vector3.forward * prevBone.Length / 2f;
-          } else {
-            joint.connectedBody = _brushBones[N_FINGERS * N_ACTIVE_BONES].body;
-            joint.anchor = Vector3.back * bone.Length / 2f;
-            joint.connectedAnchor = _brushBones[N_FINGERS * N_ACTIVE_BONES].transform.InverseTransformPoint(bone.PrevJoint.ToVector3());
-          }
-        }
-      }
+      //Add joints between each of the hand's rigidbodies to ensure they do not separate
+      addHandJoints();
 
       handBegun = true;
     }
@@ -321,7 +303,7 @@ namespace Leap.Unity.Interaction {
       body.mass = _perBoneMass * massScale;
 
       //If these conditions are met, stop using brush hands to contact objects and switch to "Soft Contact"
-      if (targetingError >= DISLOCATION_FRACTION && _hand.PalmVelocity.Magnitude < 1.5f && boneArrayIndex != N_ACTIVE_BONES * N_FINGERS) {
+      if (!_softContactEnabled && targetingError >= DISLOCATION_FRACTION && _hand.PalmVelocity.Magnitude < 1.5f && boneArrayIndex != N_ACTIVE_BONES * N_FINGERS) {
         enableSoftContact();
         return;
       }
@@ -359,6 +341,55 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    //Constrain the bones to eachother to prevent separation during interactions
+    void addHandJoints() {
+      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
+        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
+          Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
+          int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
+
+          FixedJoint joint = _brushBones[boneArrayIndex].gameObject.AddComponent<FixedJoint>();
+          joint.autoConfigureConnectedAnchor = false;
+          if (jointIndex != 0) {
+            Bone prevBone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+            joint.connectedBody = _brushBones[boneArrayIndex - 1].body;
+            joint.anchor = Vector3.back * bone.Length / 2f;
+            joint.connectedAnchor = Vector3.forward * prevBone.Length / 2f;
+            _brushBones[boneArrayIndex].joint = joint;
+          } else {
+            joint.connectedBody = _brushBones[N_FINGERS * N_ACTIVE_BONES].body;
+            joint.anchor = Vector3.back * bone.Length / 2f;
+            joint.connectedAnchor = _brushBones[N_FINGERS * N_ACTIVE_BONES].transform.InverseTransformPoint(bone.PrevJoint.ToVector3());
+            _brushBones[boneArrayIndex].metacarpalJoint = joint;
+          }
+
+        }
+      }
+    }
+
+    //Reconnect and Reset all the joints in the hand
+    void resetHandJoints() {
+      _brushBones[N_FINGERS * N_ACTIVE_BONES].transform.position = _hand.PalmPosition.ToVector3();
+      _brushBones[N_FINGERS * N_ACTIVE_BONES].transform.rotation = _hand.Rotation.ToQuaternion();
+      for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
+        for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
+          Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
+          int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
+
+          if (jointIndex != 0 && _brushBones[boneArrayIndex].joint != null) {
+            Bone prevBone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+            _brushBones[boneArrayIndex].joint.connectedBody = _brushBones[boneArrayIndex - 1].body;
+            _brushBones[boneArrayIndex].joint.anchor = Vector3.back * bone.Length / 2f;
+            _brushBones[boneArrayIndex].joint.connectedAnchor = Vector3.forward * prevBone.Length / 2f;
+          } else if (_brushBones[boneArrayIndex].metacarpalJoint != null) {
+            _brushBones[boneArrayIndex].metacarpalJoint.connectedBody = _brushBones[N_FINGERS * N_ACTIVE_BONES].body;
+            _brushBones[boneArrayIndex].metacarpalJoint.anchor = Vector3.back * bone.Length / 2f;
+            _brushBones[boneArrayIndex].metacarpalJoint.connectedAnchor = _brushBones[N_FINGERS * N_ACTIVE_BONES].transform.InverseTransformPoint(bone.PrevJoint.ToVector3());
+          }
+        }
+      }
+    }
+
     public void disableSoftContact() {
       if (!disableSoftContactEnqueued) {
         StartCoroutine("delayedDisableSoftContact");
@@ -374,6 +405,7 @@ namespace Leap.Unity.Interaction {
         for (int i = _brushBones.Length; i-- != 0;) {
           _brushBones[i].col.isTrigger = false;
         }
+        resetHandJoints();
       }
     }
 
@@ -381,6 +413,7 @@ namespace Leap.Unity.Interaction {
       disableSoftContactEnqueued = false;
       if (!_softContactEnabled) {
         _softContactEnabled = true;
+        resetHandJoints();
         StopCoroutine("delayedDisableSoftContact");
         for (int i = _brushBones.Length; i-- != 0;) {
           _brushBones[i].col.isTrigger = true;
