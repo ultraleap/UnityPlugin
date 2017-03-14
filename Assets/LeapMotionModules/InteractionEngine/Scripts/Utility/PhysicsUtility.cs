@@ -49,20 +49,8 @@ namespace Leap.Unity.Interaction {
       return ToAngularVelocity(destinationRotation * Quaternion.Inverse(startRotation), deltaTime);
     }
 
-    public static Vector3 Reciprocal(this Vector3 v) {
-      return new Vector3(1f / v.x, 1f / v.y, 1f / v.z);
-    }
-
-    public static bool IsNaN(this Vector3 v) {
-      return float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z);
-    }
-
-    public static bool IsInfinity(this Vector3 v) {
-      return float.IsInfinity(v.x) || float.IsInfinity(v.y) || float.IsInfinity(v.z);
-    }
-
     public static bool IsValid(this Vector3 v) {
-      return !IsNaN(v) && !IsInfinity(v);
+      return !(float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z)) && !(float.IsInfinity(v.x) || float.IsInfinity(v.y) || float.IsInfinity(v.z));
     }
 
     public static bool generateSphereContacts(Vector3 spherePosition, float sphereRadius, Vector3 sphereVelocity, int layerMask, ref List<SoftContact> softContacts, ref Dictionary<Rigidbody, Velocities> originalVelocities, ref Collider[] temporaryColliderSwapSpace) {
