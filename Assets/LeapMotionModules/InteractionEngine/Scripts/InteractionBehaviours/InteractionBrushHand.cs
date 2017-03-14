@@ -51,11 +51,12 @@ namespace Leap.Unity.Interaction {
 
     private bool _softContactEnabled = true;
     private bool _updateBrushHand = true;
-    private List<SoftContact> softContacts = new List<SoftContact>(20);
+    private List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(25);
     private Collider[] tempColliderArray = new Collider[1];
     private Vector3[] previousBoneCenters = new Vector3[20];
     private int softContactHysteresisTimer = 0;
-    private float softContactBoneRadius = 0.02f;
+    private float softContactBoneRadius = 0.015f;
+    private Dictionary<Rigidbody, PhysicsUtility.Velocities> originalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>();
 
     /** The collision detection mode to use for this hand model when running physics simulations. */
     [SerializeField]
@@ -242,7 +243,6 @@ namespace Leap.Unity.Interaction {
 
       if (_softContactEnabled) {
         //SOFT CONTACT COLLISIONS
-        softContacts.Clear();
 
         //Generate Contacts
         for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++) {
@@ -256,7 +256,7 @@ namespace Leap.Unity.Interaction {
 
             foreach (Collider col in tempColliderArray) {
               if (col != null && col.attachedRigidbody != null && !col.attachedRigidbody.isKinematic) {
-                SoftContact contact = new SoftContact();
+                PhysicsUtility.SoftContact contact = new PhysicsUtility.SoftContact();
                 contact.body = col.attachedRigidbody;
 
                 if (col is MeshCollider) {
@@ -270,6 +270,14 @@ namespace Leap.Unity.Interaction {
                 contact.velocity = (boneCenter - previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime;
 
                 softContacts.Add(contact);
+
+                //Store this rigidbody's pre-contact velocities
+                if (!originalVelocities.ContainsKey(contact.body)) {
+                  PhysicsUtility.Velocities originalBodyVelocities;
+                  originalBodyVelocities.velocity = contact.body.velocity;
+                  originalBodyVelocities.angularVelocity = contact.body.angularVelocity;
+                  originalVelocities.Add(contact.body, originalBodyVelocities);
+                }
               }
             }
           }
@@ -283,12 +291,8 @@ namespace Leap.Unity.Interaction {
             enableSoftContact();
           }
 
-          //Otherwise, Resolve Contacts
-          for (int i = 0; i < 10; i++) {
-            foreach (SoftContact contact in softContacts) {
-              applySoftContact(contact.body, contact.position, contact.velocity, -contact.normal);
-            }
-          }
+          //Otherwise, Resolve Contacts (this will clear softContacts and originalVelocities as well) 
+          PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
         }
       }
 
@@ -302,7 +306,9 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    //Constructs a hand object from this BrushHand
     public void fillBones(Hand inHand) {
+      if(_softContactEnabled) { return; }
       if (Application.isPlaying && _brushBones.Length == N_FINGERS * N_ACTIVE_BONES + 1) {
         Vector elbowPos = inHand.Arm.ElbowPosition;
         inHand.SetTransform(_brushBones[N_FINGERS * N_ACTIVE_BONES].body.position, _brushBones[N_FINGERS * N_ACTIVE_BONES].body.rotation);
@@ -377,13 +383,6 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    struct SoftContact {
-      public Rigidbody body;
-      public Vector3 position;
-      public Vector3 normal;
-      public Vector3 velocity;
-    }
-
     public void disableSoftContact() {
       if (!_updateBrushHand) {
         _updateBrushHand = true;
@@ -400,6 +399,7 @@ namespace Leap.Unity.Interaction {
         StartCoroutine(delayedDisableSoftContact(0.3f));
       }
     }
+
     IEnumerator delayedDisableSoftContact(float seconds) {
       yield return new WaitForSecondsRealtime(seconds);
       if (_updateBrushHand) {
@@ -415,47 +415,6 @@ namespace Leap.Unity.Interaction {
         _brushBones[i].body.velocity = Vector3.zero;
       }
       _handParent.SetActive(false);
-    }
-
-    static void applySoftContact(Rigidbody thisObject, Vector3 handContactPoint, Vector3 handVelocityAtContactPoint, Vector3 normal) {
-      Vector3 objectVelocityAtContactPoint = thisObject.GetPointVelocity(handContactPoint);
-      Vector3 velocityDifference = objectVelocityAtContactPoint - handVelocityAtContactPoint;
-      float relativeVelocity = Vector3.Dot(normal, velocityDifference);
-      if (relativeVelocity < float.Epsilon)
-        return;
-
-      // Define a cone of friction where the direction of velocity relative to the surface
-      // controls the degree to which perpendicular movement (relative to the surface) is
-      // resisted.  Smoothly blending in friction prevents vibration while the impulse
-      // solver is iterating.
-      // Interpolation parameter 0..1: -handContactNormal.dot(vel_dir).
-
-      Vector3 vel_dir = velocityDifference.normalized;
-      float t = -relativeVelocity / velocityDifference.magnitude;
-      normal = t * -vel_dir + (1.0f - t) * normal;
-
-      if (normal.magnitude > float.Epsilon) { normal = normal.normalized; }
-      relativeVelocity = Vector3.Dot(normal, velocityDifference);
-
-      // Apply impulse along calculated normal.  Note this is slightly unusual.  Instead of
-      // handling perpendicular movement as a separate constraint this calculates a "bent normal"
-      // to blend it in.
-
-      float velocityError = -relativeVelocity;
-      float denom0 = computeImpulseDenominator(thisObject, handContactPoint, normal);
-      float jacDiagABInv = 1.0f / denom0;
-      float velocityImpulse = velocityError * jacDiagABInv * 0.95f;
-      Vector3 gravityFudge = -Physics.gravity * thisObject.mass * Time.fixedDeltaTime * 0.015f;
-
-      thisObject.AddForceAtPosition(normal * velocityImpulse * 0.03f + gravityFudge, handContactPoint, ForceMode.Impulse);
-      //thisObject.AddForceAtPosition(((handVelocityAtContactPoint - thisObject.GetPointVelocity(handContactPoint))*50f) * relativeVelocity, handContactPoint, ForceMode.Acceleration);
-    }
-
-    static float computeImpulseDenominator(Rigidbody thisObject, Vector3 pos, Vector3 normal) {
-      Vector3 r0 = pos - thisObject.worldCenterOfMass;
-      Vector3 c0 = Vector3.Cross(r0, normal);
-      Vector3 vec = Vector3.Cross(c0 /* *thisObject.getInvInertiaTensorWorld()*/, r0);
-      return 1f / thisObject.mass + Vector3.Dot(normal, vec);
     }
   }
 }

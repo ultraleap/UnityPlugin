@@ -55,7 +55,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>();
+    private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>(64);
 
     /** Samples the current velocity and adds it to the rolling average. */
     public override void OnHold(ReadonlyList<Hand> hands) {
