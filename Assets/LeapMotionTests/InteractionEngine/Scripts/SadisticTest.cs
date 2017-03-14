@@ -65,8 +65,6 @@ namespace Leap.Unity.Interaction.Testing {
       _provider = FindObjectOfType<InteractionTestProvider>();
 
       _manager.MaxActivationDepth = activationDepth;
-      _manager.ShowDebugLines = true;
-      _manager.ShowDebugOutput = true;
       _manager.ContactEnabled = contactEnabled;
       _manager.GraspingEnabled = graspEnabled;
       _manager.UpdateSceneInfo();

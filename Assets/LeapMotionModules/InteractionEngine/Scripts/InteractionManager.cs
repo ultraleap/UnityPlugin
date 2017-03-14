@@ -99,18 +99,6 @@ namespace Leap.Unity.Interaction {
     [Tooltip("Automatically validate integrity of simulation state each frame.  Can cause slowdown, but is always compiled out for release builds.")]
     [SerializeField]
     protected bool _automaticValidation = false;
-
-    [Tooltip("Shows the debug visualization coming from the internal Interaction plugin.")]
-    [SerializeField]
-    protected bool _showDebugLines = false;
-
-    [Tooltip("Shows the debug messages coming from the internal Interaction plugin.")]
-    [SerializeField]
-    protected bool _showDebugOutput = false;
-
-    [Tooltip("Will display the debug messages if assigned.")]
-    [SerializeField]
-    protected Text _debugTextView;
     #endregion
 
     #region INTERNAL FIELDS
@@ -137,8 +125,6 @@ namespace Leap.Unity.Interaction {
     private List<int> _handIdsToRemove = new List<int>();
     //A temp list that is recycled.  Used as the argument to OnHandsHold.
     private List<Hand> _holdingHands = new List<Hand>();
-    //A temp list that is recycled.  Used to recieve debug logs from InteractionC.
-    private List<string> _debugOutput = new List<string>();
     #endregion
 
     #region PUBLIC METHODS
@@ -303,30 +289,6 @@ namespace Leap.Unity.Interaction {
       set {
         _maxActivationDepth = value;
         _activityManager.MaxDepth = value;
-      }
-    }
-
-    /// <summary>
-    /// Enables the display of proximity information from the library.
-    /// </summary>
-    public bool ShowDebugLines {
-      get {
-        return _showDebugLines;
-      }
-      set {
-        _showDebugLines = value;
-      }
-    }
-
-    /// <summary>
-    /// Enables the display of debug text from the library.
-    /// </summary>
-    public bool ShowDebugOutput {
-      get {
-        return _showDebugOutput;
-      }
-      set {
-        _showDebugOutput = value;
       }
     }
 
@@ -589,27 +551,8 @@ namespace Leap.Unity.Interaction {
         OnGraphicalUpdate();
       }
 
-      if (_showDebugOutput && _debugTextView != null) {
-        string text = "";
-        for (int i = 0; i < _debugOutput.Count; i++) {
-          text += _debugOutput[i];
-          if (i != _debugOutput.Count - 1) {
-            text += "\n";
-          }
-        }
-        _debugTextView.text = text;
-      }
-
       if (_automaticValidation) {
         Validate();
-      }
-    }
-
-    protected virtual void OnGUI() {
-      if (_showDebugOutput) {
-        for (int i = 0; i < _debugOutput.Count; i++) {
-          GUILayout.Label(_debugOutput[i]);
-        }
       }
     }
     #endregion
