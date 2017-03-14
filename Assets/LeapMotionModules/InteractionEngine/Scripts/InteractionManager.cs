@@ -127,6 +127,10 @@ namespace Leap.Unity.Interaction {
     protected Dictionary<int, InteractionHand> _idToInteractionHand = new Dictionary<int, InteractionHand>();
     protected List<IInteractionBehaviour> _graspedBehaviours = new List<IInteractionBehaviour>();
     protected HeuristicGrabClassifier _grabClassifier;
+    [NonSerialized]
+    public List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(80);
+    [NonSerialized]
+    public Dictionary<Rigidbody, PhysicsUtility.Velocities> originalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
 
     private float _cachedSimulationScale = -1;
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
@@ -666,7 +670,11 @@ namespace Leap.Unity.Interaction {
 
       dispatchOnHandsHoldingAll(frame, isPhysics: true);
 
-      //Simulation went here
+      //Apply soft contacts from both hands in unified solve
+      //(this will clear softContacts and originalVelocities as well)
+      if (softContacts.Count > 0) {
+        PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
+      }
 
       updateInteractionStateChanges(frame);
 

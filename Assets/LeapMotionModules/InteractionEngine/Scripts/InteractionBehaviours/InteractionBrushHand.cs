@@ -51,11 +51,11 @@ namespace Leap.Unity.Interaction {
 
     private bool _softContactEnabled = true;
     private bool _updateBrushHand = true;
-    private List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(20);
     private Collider[] tempColliderArray = new Collider[1];
     private Vector3[] previousBoneCenters = new Vector3[20];
     private int softContactHysteresisTimer = 0;
     private float softContactBoneRadius = 0.015f;
+    private List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(40);
     private Dictionary<Rigidbody, PhysicsUtility.Velocities> originalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>();
 
     /** The collision detection mode to use for this hand model when running physics simulations. */
@@ -245,6 +245,7 @@ namespace Leap.Unity.Interaction {
         //SOFT CONTACT COLLISIONS
 
         //Generate Contacts
+        bool softlyContacting = false;
         for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++) {
           for (int jointIndex = 0; jointIndex < 4; jointIndex++) {
             Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
@@ -252,21 +253,31 @@ namespace Leap.Unity.Interaction {
             Vector3 boneCenter = bone.Center.ToVector3();
 
             ////Generate and Fill softContacts with SoftContacts that are intersecting a sphere at boneCenter, with radius softContactBoneRadius
-            PhysicsUtility.generateSphereContacts(boneCenter, softContactBoneRadius, (boneCenter - previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime, 
-                                                 (_manager != null) ? 1 << _manager.InteractionLayer : ~(1 << 2), ref softContacts, ref originalVelocities, ref tempColliderArray);
+            bool sphereIntersecting;
+            if (_manager != null) {
+              sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, softContactBoneRadius, (boneCenter - previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime,
+                                                    1 << _manager.InteractionLayer, ref _manager.softContacts, ref _manager.originalVelocities, ref tempColliderArray);
+            } else {
+              sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, softContactBoneRadius, (boneCenter - previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime,
+                                                    ~(1 << 2), ref softContacts, ref originalVelocities, ref tempColliderArray);
+            }
+            softlyContacting = sphereIntersecting ? true : softlyContacting;
           }
         }
 
-        if (softContacts.Count == 0) {
-          //If there are no detected Contacts, exit soft contact mode
-          disableSoftContact();
-        } else {
+
+        if (softlyContacting) {
           if (_updateBrushHand) {
             enableSoftContact();
           }
 
-          //Otherwise, Resolve Contacts (this will clear softContacts and originalVelocities as well) 
-          PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
+          //(if we have a manager, it will handle resolving the contacts of both hands in one unified solve)
+          if (_manager == null) {
+            PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
+          }
+        } else {
+          //If there are no detected Contacts, exit soft contact mode
+          disableSoftContact();
         }
       }
 

@@ -65,10 +65,11 @@ namespace Leap.Unity.Interaction {
       return !IsNaN(v) && !IsInfinity(v);
     }
 
-    public static void generateSphereContacts(Vector3 spherePosition, float sphereRadius, Vector3 sphereVelocity, int layerMask, ref List<SoftContact> softContacts, ref Dictionary<Rigidbody, Velocities> originalVelocities, ref Collider[] temporaryColliderSwapSpace) {
+    public static bool generateSphereContacts(Vector3 spherePosition, float sphereRadius, Vector3 sphereVelocity, int layerMask, ref List<SoftContact> softContacts, ref Dictionary<Rigidbody, Velocities> originalVelocities, ref Collider[] temporaryColliderSwapSpace) {
       Array.Clear(temporaryColliderSwapSpace, 0, temporaryColliderSwapSpace.Length);
       Physics.OverlapSphereNonAlloc(spherePosition, sphereRadius, temporaryColliderSwapSpace, layerMask);
 
+      bool contacting = false;
       foreach (Collider col in temporaryColliderSwapSpace) {
         if (col != null && col.attachedRigidbody != null && !col.attachedRigidbody.isKinematic) {
           SoftContact contact = new SoftContact();
@@ -99,8 +100,10 @@ namespace Leap.Unity.Interaction {
           contact.invWorldInertiaTensor = originalBodyVelocities.invWorldInertiaTensor;
 
           softContacts.Add(contact);
+          contacting = true;
         }
       }
+      return contacting;
     }
 
     static void applySoftContact(Rigidbody thisObject, Vector3 handContactPoint, Vector3 handVelocityAtContactPoint, Vector3 normal, Matrix4x4 invWorldInertiaTensor) {
