@@ -524,11 +524,56 @@ namespace Leap.Unity.RuntimeGizmos {
     /// <summary>
     /// Draws a wire gizmo circle at the given position, with the given normal and radius.
     /// </summary>
-    public void DrawWireCirlce(Vector3 center, Vector3 direction, float radius) {
+    public void DrawWireCircle(Vector3 center, Vector3 direction, float radius) {
       PushMatrix();
-      matrix = Matrix4x4.TRS(center, Quaternion.LookRotation(direction), new Vector3(1, 1, 0)) * matrix;
+      matrix = Matrix4x4.TRS(center, Quaternion.LookRotation(direction), Vector3.one) *
+               matrix *
+               Matrix4x4.TRS(Vector3.zero, Quaternion.identity, new Vector3(1, 1, 0));
       DrawWireSphere(Vector3.zero, radius);
       PopMatrix();
+    }
+
+    /// <summary>
+    /// Draws a wire gizmo capsule at the given position, with the given start and end points and radius.
+    /// </summary>
+    public void DrawWireCapsule(Vector3 start, Vector3 end, float radius) {
+      Vector3 up = (end - start).normalized * radius;
+      Vector3 forward = Vector3.Slerp(up, -up, 0.5F);
+      Vector3 right = Vector3.Cross(up, forward).normalized * radius;
+
+      float height = (start - end).magnitude;
+
+      // Radial circles
+      DrawLineWireCircle(start, up, radius);
+      DrawLineWireCircle(end, -up, radius);
+
+      // Sides
+      DrawLine(start + right, end + right);
+      DrawLine(start - right, end - right);
+      DrawLine(start + forward, end + forward);
+      DrawLine(start - forward, end - forward);
+
+      // Endcaps
+      DrawWireArc(start, right, forward, radius, 0.5F, 26);
+      DrawWireArc(start, forward, -right, radius, 0.5F, 26);
+      DrawWireArc(end, right, -forward, radius, 0.5F, 26);
+      DrawWireArc(end, forward, right, radius, 0.5F, 26);
+    }
+
+    private void DrawLineWireCircle(Vector3 center, Vector3 normal, float radius) {
+      DrawWireArc(center, normal, Vector3.Slerp(normal, -normal, 0.5F), radius, 1.0F, 26);
+    }
+
+    public void DrawWireArc(Vector3 center, Vector3 normal, Vector3 radialStartDirection, float radius, float fractionOfCircleToDraw, int numCircleSegments = 32) {
+      normal = normal.normalized;
+      Vector3 radiusVector = radialStartDirection.normalized * radius;
+      Vector3 nextVector;
+      int numSegmentsToDraw = (int)(numCircleSegments * fractionOfCircleToDraw);
+      for (int i = 0; i < numSegmentsToDraw; i++) {
+        nextVector = Quaternion.AngleAxis(360F / numCircleSegments, normal) * radiusVector;
+        DrawLine(center + radiusVector, center + nextVector);
+        radiusVector = nextVector;
+      }
     }
 
     private List<Collider> _colliderList = new List<Collider>();
@@ -563,14 +608,22 @@ namespace Leap.Unity.RuntimeGizmos {
           }
         } else if (collider is CapsuleCollider) {
           CapsuleCollider capsule = collider as CapsuleCollider;
-          Vector3 size = Vector3.zero;
-          size += Vector3.one * capsule.radius * 2;
-          size += new Vector3(capsule.direction == 0 ? 1 : 0,
-                              capsule.direction == 1 ? 1 : 0,
-                              capsule.direction == 2 ? 1 : 0) * (capsule.height - capsule.radius * 2);
           if (useWireframe) {
-            DrawWireCube(capsule.center, size);
-          } else {
+            Vector3 capsuleDir;
+            switch (capsule.direction) {
+              case 0: capsuleDir = Vector3.right; break;
+              case 1: capsuleDir = Vector3.up; break;
+              case 2: default: capsuleDir = Vector3.forward; break;
+            }
+            DrawWireCapsule(capsule.center + capsuleDir * (capsule.height / 2F - capsule.radius),
+                            capsule.center - capsuleDir * (capsule.height / 2F - capsule.radius), capsule.radius);
+          }
+          else {
+            Vector3 size = Vector3.zero;
+            size += Vector3.one * capsule.radius * 2;
+            size += new Vector3(capsule.direction == 0 ? 1 : 0,
+                                capsule.direction == 1 ? 1 : 0,
+                                capsule.direction == 2 ? 1 : 0) * (capsule.height - capsule.radius * 2);
             DrawCube(capsule.center, size);
           }
         } else if (collider is MeshCollider) {
