@@ -81,7 +81,7 @@ public class CurvedSpace : MonoBehaviour, IRuntimeGizmoComponent {
   public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
     if (_showGizmos) {
       for (float r = 0.1f; r <= 1; r += 0.25f) {
-        drawer.DrawWireCirlce(transform.position, transform.up, r);
+        drawer.DrawWireCircle(transform.position, transform.up, r);
       }
     }
   }

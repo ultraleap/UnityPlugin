@@ -9,6 +9,7 @@ namespace Leap.Unity.Halfedge {
     public InteractiveMesh intMesh;
 
     private List<Vertex> _commonVertices = new List<Vertex>();
+    public List<Vertex> commonVertices { get { return _commonVertices; } }
 
     public static InteractiveVertex Create(InteractiveMesh forMesh, List<Vertex> commonVerts, GameObject basePrefab = null) {
       GameObject intVertObj;
@@ -20,7 +21,6 @@ namespace Leap.Unity.Halfedge {
       }
 
       intVertObj.transform.parent = forMesh.transform;
-      intVertObj.transform.localPosition = commonVerts[0].position;
       var intVert = intVertObj.GetComponent<InteractiveVertex>() ?? intVertObj.AddComponent<InteractiveVertex>();
       intVert.intMesh = forMesh;
       intVert.SetCommonVertices(commonVerts);

@@ -1,10 +1,12 @@
 ﻿using Leap.Unity.Query;
+using Leap.Unity.UI.Interaction;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Halfedge {
 
+  [RequireComponent(typeof(InteractionBehaviour))]
   public class InteractiveFace : MonoBehaviour {
 
     public InteractiveMesh intMesh;
@@ -14,7 +16,7 @@ namespace Leap.Unity.Halfedge {
     public static InteractiveFace Create(InteractiveMesh forMesh, Face face, GameObject basePrefab = null) {
       GameObject intFaceObj;
       if (basePrefab == null) {
-        intFaceObj = new GameObject("Interactive Vertex");
+        intFaceObj = new GameObject("Interactive Face");
       }
       else {
         intFaceObj = Instantiate<GameObject>(basePrefab);
@@ -23,32 +25,43 @@ namespace Leap.Unity.Halfedge {
       intFaceObj.transform.parent = forMesh.transform;
       int count = 0;
       Vector3 pos = Vector3.zero;
-      face.vertices.Query().Select(v => { pos += v.position; count++; });
-      intFaceObj.transform.localPosition = 
-      
-      var intVert = intFaceObj.GetComponent<InteractiveVertex>() ?? intFaceObj.AddComponent<InteractiveVertex>();
-      intVert.intMesh = forMesh;
-      intVert.SetCommonVertices(commonVerts);
-      return intVert;
+      foreach (var v in face.vertices) { pos += v.position; count++; }
+      intFaceObj.transform.localPosition = pos / count;
+
+      var intFace = intFaceObj.GetComponent<InteractiveFace>() ?? intFaceObj.AddComponent<InteractiveFace>();
+      intFace.intMesh = forMesh;
+      intFace.face = face;
+      return intFace;
     }
 
-    public void SetCommonVertices(List<Vertex> commonVerts) {
-      _commonVertices.Clear();
-      foreach (var vert in commonVerts) {
-        _commonVertices.Add(vert);
+    private InteractionBehaviour _intObj;
+
+    void Start() {
+      _intObj = GetComponent<InteractionBehaviour>();
+      _intObj.OnGraspBegin += OnGraspBegin;
+      _intObj.OnGraspEnd   += OnGraspEnd;
+    }
+
+    private Transform _originalParent;
+    private List<InteractiveVertex> _intVertsGrabbed = new List<InteractiveVertex>();
+
+    private void OnGraspBegin(Hand hand) {
+      _intVertsGrabbed.Clear();
+      List<InteractiveVertex> tempIntVertsGrabbed = null;
+      foreach (var v in face.vertices) {
+        tempIntVertsGrabbed = intMesh.GetInteractiveVertices(face);
+        break;
       }
-      if (_commonVertices.Count > 0) {
-        this.transform.position = intMesh.transform.TransformPoint(commonVerts[0].position);
+      foreach (var intV in tempIntVertsGrabbed) {
+        _intVertsGrabbed.Add(intV);
+        _originalParent = intV.transform.parent;
+        intV.transform.parent = this.transform;
       }
     }
 
-    void Update() {
-      if (this.transform.hasChanged) {
-        foreach (var vert in _commonVertices) {
-          vert.position = intMesh.transform.InverseTransformPoint(this.transform.position);
-        }
-        intMesh.RebuildUnityMeshData();
-        this.transform.hasChanged = false;
+    private void OnGraspEnd(Hand hand) {
+      foreach (var intV in _intVertsGrabbed) {
+        intV.transform.parent = _originalParent;
       }
     }
 

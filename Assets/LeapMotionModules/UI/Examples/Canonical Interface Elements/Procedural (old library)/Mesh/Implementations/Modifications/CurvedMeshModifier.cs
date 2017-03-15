@@ -8,7 +8,7 @@ public class CurvedMeshModifier : ModifierBehaviour<CurvedMeshMod>, IRuntimeGizm
 
   public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
     if (_modifier.useReferenceRadius) {
-      drawer.DrawWireCirlce(transform.position, transform.up, _modifier.referenceRadius);
+      drawer.DrawWireCircle(transform.position, transform.up, _modifier.referenceRadius);
     }
   }
 }

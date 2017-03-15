@@ -22,7 +22,7 @@ namespace Leap.Unity.Halfedge {
       public bool MoveNext() {
         if (h0 == null) {
           h0 = h = face.halfedge;
-          return true;
+          return h != null;
         }
         else {
           h = h.next;

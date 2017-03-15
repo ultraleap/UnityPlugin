@@ -42,8 +42,7 @@ namespace Leap.Unity.Halfedge {
     }
     public class FaceEnumerator : IEnumerator<Face> {
       private Halfedge halfedge;
-      private Face curFace;
-      private bool needsFirstFace = true;
+      private Face curFace = null;
 
       private HashSet<Face> _facesVisitedCache = new HashSet<Face>();
 
@@ -53,7 +52,6 @@ namespace Leap.Unity.Halfedge {
 
       public FaceEnumerator(Halfedge halfedgeStructure) {
         this.halfedge = halfedgeStructure;
-        curFace = halfedgeStructure.face;
         _facesVisitedCache.Clear();
       }
 
@@ -84,8 +82,8 @@ namespace Leap.Unity.Halfedge {
       }
 
       public bool MoveNext() {
-        if (needsFirstFace) {
-          needsFirstFace = false;
+        if (curFace == null) {
+          curFace = halfedge.face;
         }
         else {
           curFace = FindNewFace(curFace);
@@ -94,7 +92,7 @@ namespace Leap.Unity.Halfedge {
       }
 
       public void Reset() {
-        curFace = halfedge.face;
+        curFace = null;
         _facesVisitedCache.Clear();
       }
 

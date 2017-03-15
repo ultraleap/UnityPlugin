@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Leap.Unity.Query;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Halfedge {
@@ -9,12 +10,14 @@ namespace Leap.Unity.Halfedge {
     public PrimitiveType startingMeshType = PrimitiveType.Tetrahedron;
 
     public GameObject interactiveVertexPrefab;
+    public GameObject interactiveFacePrefab;
 
     private Halfedge _halfedgeMesh;
     private MeshFilter _filter;
     private Mesh _mesh;
 
     private List<InteractiveVertex> _interactiveVertices = new List<InteractiveVertex>();
+    private List<InteractiveFace> _interactiveFaces = new List<InteractiveFace>();
 
     void Start() {
       _filter = GetComponent<MeshFilter>();
@@ -30,8 +33,38 @@ namespace Leap.Unity.Halfedge {
         _interactiveVertices.Add(InteractiveVertex.Create(this, verts, interactiveVertexPrefab));
       });
 
+      // Loop faces, construct InteractiveFace objects
+      _interactiveFaces.Clear();
+      foreach (var face in _halfedgeMesh.faces) {
+        _interactiveFaces.Add(InteractiveFace.Create(this, face, interactiveFacePrefab));
+      }
+
       // Construct Unity mesh data by traversing faces and upload.
       RebuildUnityMeshData();
+    }
+
+    private static List<InteractiveVertex> s_intVertCache = new List<InteractiveVertex>();
+    public List<InteractiveVertex> GetInteractiveVertices(Face face) {
+      s_intVertCache.Clear();
+      //foreach (var intVert in _interactiveVertices.Query()
+      //                          .Where((qIntVert) => {
+      //                            return qIntVert.commonVertices.Query()
+      //                              .Any((vert) => { return vert.halfedge.face == face; });
+      //                          })) {
+      foreach (var intVert in _interactiveVertices.Query()
+                                .Where((qIntVert) => {
+                                  return qIntVert.commonVertices.Query()
+                                    .Any((vert) => { return vert.halfedge.face != null; });
+                                })) {
+        Debug.Log(intVert.commonVertices.Count);
+        for (int i = 0; i < intVert.commonVertices.Count; i++) {
+          if (intVert.commonVertices[i].halfedge.face == face) {
+            s_intVertCache.Add(intVert);
+            break;
+          }
+        }
+      }
+      return s_intVertCache;
     }
 
     private static List<Vector3> s_vertPosCache = new List<Vector3>();
@@ -74,7 +107,6 @@ namespace Leap.Unity.Halfedge {
         curVertIdx += 3;
       }
     }
-
   }
 
   public static class UnityMeshExtensions {

@@ -29,7 +29,7 @@ namespace Leap.Unity.Halfedge {
       Halfedge ac = new Halfedge();
       Halfedge cd = new Halfedge();
       Halfedge da = new Halfedge();
-      Vertex ACDa = Vertex.Copy(a), ACDc = Vertex.Copy(c), ACDd = Vertex.Copy(d);
+      Vertex ACDa = Vertex.Copy(a), ACDc = Vertex.Copy(c), ACDd = d;
 
       Face ADB = new Face();
       Halfedge ad = new Halfedge();
