@@ -5,9 +5,15 @@ namespace Leap.Unity.Halfedge {
 
   public static class Primitives {
 
-    private static List<Face> s_faceCache = new List<Face>();
+    public static Halfedge CreatePrimitive(PrimitiveType primitiveType) {
+      switch (primitiveType) {
+        case PrimitiveType.Tetrahedron:
+        default:
+          return Primitives.CreateTetrahedron();
+      }
+    }
 
-    public static void AddTetrahedron(HalfedgeMesh mesh) {
+    public static Halfedge CreateTetrahedron() {
       Vertex a = new Vertex(-1F, 0F, -1 / Mathf.Sqrt(2));
       Vertex b = new Vertex(1F, 0F, -1 / Mathf.Sqrt(2));
       Vertex c = new Vertex(0F, 1F, 1 / Mathf.Sqrt(2));
@@ -45,14 +51,17 @@ namespace Leap.Unity.Halfedge {
       ab.face = ABC;
       ab.opposite = ba;
       ab.next = bc;
+      ab.prev = ca;
       bc.vertex = c;
       bc.face = ABC;
       bc.opposite = cb;
       bc.next = ca;
+      bc.prev = ab;
       ca.vertex = a;
       ca.face = ABC;
       ca.opposite = ac;
       ca.next = ab;
+      ca.prev = bc;
 
       ACD.halfedge = ac;
       ACDa.halfedge = da;
@@ -62,14 +71,17 @@ namespace Leap.Unity.Halfedge {
       ac.face = ACD;
       ac.opposite = ca;
       ac.next = cd;
+      ac.prev = da;
       cd.vertex = d;
       cd.face = ACD;
       cd.opposite = dc;
       cd.next = da;
+      cd.prev = ac;
       da.vertex = a;
       da.face = ACD;
       da.opposite = ad;
       da.next = ac;
+      da.prev = cd;
 
       ADB.halfedge = ad;
       ADBa.halfedge = ba;
@@ -79,14 +91,17 @@ namespace Leap.Unity.Halfedge {
       ad.face = ADB;
       ad.opposite = da;
       ad.next = db;
+      ad.prev = ba;
       db.vertex = b;
       db.face = ADB;
       db.opposite = bd;
       db.next = ba;
+      db.prev = ad;
       ba.vertex = a;
       ba.face = ADB;
       ba.opposite = ab;
       ba.next = ad;
+      ba.prev = db;
 
       BDC.halfedge = bd;
       BDCb.halfedge = cb;
@@ -96,21 +111,19 @@ namespace Leap.Unity.Halfedge {
       bd.face = BDC;
       bd.opposite = db;
       bd.next = dc;
+      bd.prev = cb;
       dc.vertex = c;
       dc.face = BDC;
       dc.opposite = cd;
       dc.next = cb;
+      dc.prev = bd;
       cb.vertex = b;
       cb.face = BDC;
       cb.opposite = bc;
       cb.next = bd;
+      cb.prev = dc;
 
-      s_faceCache.Clear();
-      s_faceCache.Add(ABC);
-      s_faceCache.Add(ACD);
-      s_faceCache.Add(ADB);
-      s_faceCache.Add(BDC);
-      mesh.AddHalfedgeStructure(ABC.halfedge);
+      return ABC.halfedge;
     }
 
   }

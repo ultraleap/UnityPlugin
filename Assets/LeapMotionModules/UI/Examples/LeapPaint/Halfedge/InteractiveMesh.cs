@@ -4,91 +4,89 @@ using UnityEngine;
 namespace Leap.Unity.Halfedge {
 
   [RequireComponent(typeof(MeshFilter))]
-  public class InteractiveMesh : MonoBehaviour, IMeshChangeSubscriber {
+  public class InteractiveMesh : MonoBehaviour {
 
-    public PrimitiveType startingMesh = PrimitiveType.Tetrahedron;
+    public PrimitiveType startingMeshType = PrimitiveType.Tetrahedron;
 
-    private HalfedgeMesh _hMesh;
+    public GameObject interactiveVertexPrefab;
+
+    private Halfedge _halfedgeMesh;
     private MeshFilter _filter;
     private Mesh _mesh;
+
+    private List<InteractiveVertex> _interactiveVertices = new List<InteractiveVertex>();
 
     void Start() {
       _filter = GetComponent<MeshFilter>();
       _mesh = new Mesh();
-      _mesh.name = startingMesh.ToString();
+      _mesh.name = startingMeshType.ToString();
       _filter.mesh = _mesh;
 
-      _hMesh = new HalfedgeMesh();
-      _hMesh.Subscribe(this);
-      HalfedgeMesh.AddPrimitive(_hMesh, startingMesh);
+      _halfedgeMesh = Primitives.CreatePrimitive(startingMeshType);
+
+      // Loop common vertices, construct InteractiveVertex objects
+      _interactiveVertices.Clear();
+      Ops.TraverseCommonVertices(_halfedgeMesh, (verts) => {
+        _interactiveVertices.Add(InteractiveVertex.Create(this, verts, interactiveVertexPrefab));
+      });
+
+      // Construct Unity mesh data by traversing faces and upload.
+      RebuildUnityMeshData();
     }
 
     private static List<Vector3> s_vertPosCache = new List<Vector3>();
     private static List<int> s_vertIdxCache = new List<int>();
-
-    private static HashSet<Face> s_facesVisitedCache = new HashSet<Face>();
-    private static List<Vertex> s_curFaceVertsCache = new List<Vertex>();
-    public void OnHalfedgeStructureAdded(Halfedge fullyConnectedHalfedgeStructure) {
-
+    public void RebuildUnityMeshData() {
+      _mesh.Clear();
       s_vertPosCache.Clear();
       s_vertIdxCache.Clear();
-      s_facesVisitedCache.Clear();
 
-      int startingMeshVertCount = _mesh.vertices.Length;
+      GetUnityMeshData(_halfedgeMesh, s_vertPosCache, s_vertIdxCache);
 
-      // Iterate through all faces in the fully connected halfedge structure.
-      Face curFace = fullyConnectedHalfedgeStructure.face;
-      Halfedge curHalfedge = curFace.halfedge;
-      int curIdx = 0;
-      do {
-        // Loop face for verts.
-        s_curFaceVertsCache.Clear();
-        curHalfedge = curFace.halfedge;
-        do {
-          s_curFaceVertsCache.Add(curHalfedge.vertex);
-          curHalfedge = curHalfedge.next;
-        } while (curHalfedge != curFace.halfedge);
-
-        // Add verts to unity mesh, add triangle to unity mesh.
-        foreach (var vert in s_curFaceVertsCache) {
-          AddVert(vert);
-        }
-        AddTri(curIdx, curIdx+1, curIdx+2, startingMeshVertCount);
-        curIdx += 3;
-
-        // Mark face as visited, find another face and keep going.
-        s_facesVisitedCache.Add(curFace);
-        curFace = FindNewFace(curFace);
-      } while (curFace != null);
-
-      // Finally, upload mesh data.
       _mesh.SetVertices(s_vertPosCache);
       _mesh.SetTriangles(s_vertIdxCache, 0, true);
       _mesh.RecalculateNormals();
     }
 
-    private void AddVert(Vertex v) {
-      s_vertPosCache.Add(v.position);
-    }
+    private static List<Vertex> s_curFaceVertsCache = new List<Vertex>();
+    private void GetUnityMeshData(Halfedge halfedgeStructure, List<Vector3> outVerts, List<int> outIndices) {
+      int v0 = outVerts.Count;
+      outVerts.Clear();
+      outIndices.Clear();
 
-    private void AddTri(int a, int b, int c, int offset = 0) {
-      s_vertIdxCache.Add(a + offset);
-      s_vertIdxCache.Add(c + offset);
-      s_vertIdxCache.Add(b + offset);
-    }
+      // Iterate through all faces in the fully connected halfedge structure.
+      Halfedge h, h0;
+      int curVertIdx = 0;
+      foreach (var face in halfedgeStructure.faces) {
+        // Loop face for verts.
+        s_curFaceVertsCache.Clear();
+        h = h0 = face.halfedge;
+        do {
+          s_curFaceVertsCache.Add(h.vertex);
+          h = h.next;
+        } while (h != h0);
 
-    private Face FindNewFace(Face face) {
-      Halfedge curHalfedge = face.halfedge;
-      Face newFace = null;
-      do {
-        Face testFace = curHalfedge.opposite.face;
-        if (!s_facesVisitedCache.Contains(testFace)) {
-          return testFace;
+        // Add verts to unity mesh, add triangle to unity mesh.
+        foreach (var vert in s_curFaceVertsCache) {
+          outVerts.AddVert(vert);
         }
-        curHalfedge = curHalfedge.next;
-      } while (curHalfedge != face.halfedge);
+        outIndices.AddTri(curVertIdx, curVertIdx + 1, curVertIdx + 2, v0);
+        curVertIdx += 3;
+      }
+    }
 
-      return newFace;
+  }
+
+  public static class UnityMeshExtensions {
+
+    public static void AddVert(this List<Vector3> verts, Vertex v) {
+      verts.Add(v.position);
+    }
+
+    public static void AddTri(this List<int> idxs, int a, int b, int c, int offset = 0) {
+      idxs.Add(a + offset);
+      idxs.Add(c + offset);
+      idxs.Add(b + offset);
     }
 
   }
