@@ -20,8 +20,8 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
   ISupportsFeature<LeapGuiBlendShapeFeature> {
 
   [Serializable]
-  private class JaggetRects : JaggedArray<Rect> {
-    public JaggetRects(int length) : base(length) { }
+  private class JaggedRects : JaggedArray<Rect> {
+    public JaggedRects(int length) : base(length) { }
   }
 
   public const string UV_0_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_UV_0";
@@ -116,7 +116,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
 
   //#### Sprite/Texture Remapping ####
   [SerializeField, HideInInspector]
-  private JaggetRects _channelMapping = new JaggetRects(4);
+  private JaggedRects _channelMapping = new JaggedRects(4);
 
   //#### Tinting ####
   protected const string TINTS_PROPERTY = LeapGui.PROPERTY_PREFIX + "Tints";
@@ -352,14 +352,14 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
     _material.name = "Procedural Gui Material";
 
     if (_channelMapping == null) {
-      _channelMapping = new JaggetRects(4);
+      _channelMapping = new JaggedRects(4);
     }
   }
 
   protected virtual void extractSpriteRects() {
     using (new ProfilerSample("Extract Sprite Rects")) {
       if (_channelMapping == null) {
-        _channelMapping = new JaggetRects(4);
+        _channelMapping = new JaggedRects(4);
       }
 
       foreach (var spriteFeature in _spriteFeatures) {
