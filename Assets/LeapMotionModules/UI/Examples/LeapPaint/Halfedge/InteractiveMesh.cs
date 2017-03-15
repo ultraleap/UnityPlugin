@@ -1,4 +1,5 @@
 ﻿using Leap.Unity.Query;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ namespace Leap.Unity.Halfedge {
     private Mesh _mesh;
 
     private List<InteractiveVertex> _interactiveVertices = new List<InteractiveVertex>();
-    private List<InteractiveFace> _interactiveFaces = new List<InteractiveFace>();
+    private Dictionary<Face, InteractiveFace> _interactiveFaceMapping = new Dictionary<Face, InteractiveFace>();
 
     void Start() {
       _filter = GetComponent<MeshFilter>();
@@ -34,37 +35,41 @@ namespace Leap.Unity.Halfedge {
       });
 
       // Loop faces, construct InteractiveFace objects
-      _interactiveFaces.Clear();
+      _interactiveFaceMapping.Clear();
       foreach (var face in _halfedgeMesh.faces) {
-        _interactiveFaces.Add(InteractiveFace.Create(this, face, interactiveFacePrefab));
+        _interactiveFaceMapping[face] = InteractiveFace.Create(this, face, interactiveFacePrefab);
       }
 
       // Construct Unity mesh data by traversing faces and upload.
       RebuildUnityMeshData();
     }
 
+    [ThreadStatic]
     private static List<InteractiveVertex> s_intVertCache = new List<InteractiveVertex>();
     public List<InteractiveVertex> GetInteractiveVertices(Face face) {
       s_intVertCache.Clear();
-      //foreach (var intVert in _interactiveVertices.Query()
-      //                          .Where((qIntVert) => {
-      //                            return qIntVert.commonVertices.Query()
-      //                              .Any((vert) => { return vert.halfedge.face == face; });
-      //                          })) {
       foreach (var intVert in _interactiveVertices.Query()
                                 .Where((qIntVert) => {
                                   return qIntVert.commonVertices.Query()
-                                    .Any((vert) => { return vert.halfedge.face != null; });
+                                    .Any((vert) => { return vert.halfedge.face == face; });
                                 })) {
-        Debug.Log(intVert.commonVertices.Count);
-        for (int i = 0; i < intVert.commonVertices.Count; i++) {
-          if (intVert.commonVertices[i].halfedge.face == face) {
-            s_intVertCache.Add(intVert);
-            break;
-          }
-        }
+        s_intVertCache.Add(intVert);
       }
       return s_intVertCache;
+    }
+
+    [ThreadStatic]
+    private static List<Face> s_faceCache = new List<Face>();
+    public List<Face> GetNeighboringFaces(Face face) {
+      s_faceCache.Clear();
+      foreach (var halfedge in face.halfedges) {
+        s_faceCache.Add(halfedge.opposite.face);
+      }
+      return s_faceCache;
+    }
+
+    public InteractiveFace GetInteractiveFace(Face face) {
+      return _interactiveFaceMapping[face];
     }
 
     private static List<Vector3> s_vertPosCache = new List<Vector3>();

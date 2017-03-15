@@ -23,10 +23,7 @@ namespace Leap.Unity.Halfedge {
       }
 
       intFaceObj.transform.parent = forMesh.transform;
-      int count = 0;
-      Vector3 pos = Vector3.zero;
-      foreach (var v in face.vertices) { pos += v.position; count++; }
-      intFaceObj.transform.localPosition = pos / count;
+      intFaceObj.transform.localPosition = GetLocalFaceCenter(face);
 
       var intFace = intFaceObj.GetComponent<InteractiveFace>() ?? intFaceObj.AddComponent<InteractiveFace>();
       intFace.intMesh = forMesh;
@@ -34,12 +31,24 @@ namespace Leap.Unity.Halfedge {
       return intFace;
     }
 
+    private static Vector3 GetLocalFaceCenter(Face face) {
+      int count = 0;
+      Vector3 pos = Vector3.zero;
+      foreach (var v in face.vertices) { pos += v.position; count++; }
+      return pos / count;
+    }
+
     private InteractionBehaviour _intObj;
 
     void Start() {
       _intObj = GetComponent<InteractionBehaviour>();
       _intObj.OnGraspBegin += OnGraspBegin;
+      _intObj.OnGraspHold  += OnGraspHold;
       _intObj.OnGraspEnd   += OnGraspEnd;
+    }
+
+    public void RefreshLocation() {
+      this.transform.localPosition = GetLocalFaceCenter(face);
     }
 
     private Transform _originalParent;
@@ -56,6 +65,12 @@ namespace Leap.Unity.Halfedge {
         _intVertsGrabbed.Add(intV);
         _originalParent = intV.transform.parent;
         intV.transform.parent = this.transform;
+      }
+    }
+
+    private void OnGraspHold(Hand hand) {
+      foreach (var neighborIntFace in intMesh.GetNeighboringFaces(this.face).Query().Select((face) => { return intMesh.GetInteractiveFace(face); })) {
+        neighborIntFace.RefreshLocation();
       }
     }
 

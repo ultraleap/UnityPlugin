@@ -5,6 +5,8 @@ namespace Leap.Unity.Halfedge {
   public class Vertex {
 
     public Vector3 position;
+    
+    //public string name; // Useful for debugging.
 
     public Vertex(float x, float y, float z) {
       this.position = new Vector3(x, y, z);
