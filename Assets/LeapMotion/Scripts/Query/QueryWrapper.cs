@@ -73,6 +73,10 @@ namespace Leap.Unity.Query {
       return new QueryWrapper<T, IEnumerator<T>>(enumerable.GetEnumerator());
     }
 
+    public static QueryWrapper<T, IEnumerator<T>> Query<T>(this IEnumerator<T> enumerator) {
+      return new QueryWrapper<T, IEnumerator<T>>(enumerator);
+    }
+
     public static QueryWrapper<T, List<T>.Enumerator> Query<T>(this List<T> list) {
       return new QueryWrapper<T, List<T>.Enumerator>(list.GetEnumerator());
     }
