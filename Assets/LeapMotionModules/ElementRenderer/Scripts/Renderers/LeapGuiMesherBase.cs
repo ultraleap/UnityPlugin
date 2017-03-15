@@ -11,11 +11,18 @@ using Leap.Unity;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
+
+
 public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase>,
   ISupportsFeature<LeapGuiTextureFeature>,
   ISupportsFeature<LeapGuiSpriteFeature>,
   ISupportsFeature<LeapGuiTintFeature>,
   ISupportsFeature<LeapGuiBlendShapeFeature> {
+
+  [Serializable]
+  private class JaggetRects : JaggedArray<Rect> {
+    public JaggetRects(int length) : base(length) { }
+  }
 
   public const string UV_0_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_UV_0";
   public const string UV_1_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_UV_1";
@@ -58,24 +65,17 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
 
   [EditTimeOnly, SerializeField, HideInInspector]
   private Color _globalTint = Color.white;
-  
+
   [EditTimeOnly, SerializeField, HideInInspector]
   private bool _useNormals = false;
 
   //BEGIN RENDERING SETTINGS
   [SerializeField]
   protected Shader _shader;
-  
+
   [SerializeField]
-  private PackUtil.Settings _atlasSettings = new PackUtil.Settings();
-
+  private AtlasBuilder _atlas = new AtlasBuilder();
   #endregion
-
-  //Generated data
-  [SerializeField, HideInInspector]
-  protected List<Mesh> _meshes = new List<Mesh>();
-  [SerializeField, HideInInspector]
-  protected Material _material;
 
   //Current state of builder
   protected LeapGuiMeshElementBase _currElement;
@@ -106,9 +106,17 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
   protected List<LeapGuiTintFeature> _tintFeatures = new List<LeapGuiTintFeature>();
   protected List<LeapGuiBlendShapeFeature> _blendShapeFeatures = new List<LeapGuiBlendShapeFeature>();
 
-  //#### Textures ####
-  private List<Texture2D> _packedTextures = new List<Texture2D>();
-  private Rect[][] _packedRects;
+  //### Generated Data ###
+  [SerializeField, HideInInspector]
+  protected Material _material;
+  [SerializeField, HideInInspector]
+  protected RendererMeshData _meshes;
+  [SerializeField, HideInInspector]
+  protected RendererTextureData _packedTextures;
+
+  //#### Sprite/Texture Remapping ####
+  [SerializeField, HideInInspector]
+  private JaggetRects _channelMapping = new JaggetRects(4);
 
   //#### Tinting ####
   protected const string TINTS_PROPERTY = LeapGui.PROPERTY_PREFIX + "Tints";
@@ -118,23 +126,43 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
   protected const string BLEND_SHAPE_AMOUNTS_PROPERTY = LeapGui.PROPERTY_PREFIX + "BlendShapeAmounts";
   protected List<float> _blendShapeAmounts = new List<float>();
 
-  public virtual void GetSupportInfo(List<LeapGuiTextureFeature> features, List<SupportInfo> info) {
-    SupportUtil.OnlySupportFirstFeature(features, info);
-
-    if (_atlasSettings.border > 0) {
-      for (int i = 0; i < features.Count; i++) {
-        var feature = features[i];
-        foreach (var dataObj in feature.data) {
-          var tex = dataObj.texture;
-          if (tex == null) continue;
-
-          if (!Texture2DUtility.readWriteFormats.Contains(tex.format)) {
-            info[i] = info[i].OrWorse(SupportInfo.Error("Textures must use a format that supports writing (a non-compressed format) when using a non-zero-border."));
-          }
-        }
-      }
+  public virtual bool IsAtlasDirty {
+    get {
+      return _atlas.isDirty;
     }
+  }
 
+  public virtual void RebuildAtlas(ProgressBar progress) {
+    progress.Begin(2, "Rebuilding Atlas", "", () => {
+      Texture2D[] packedTextures;
+      Rect[][] channelMapping;
+      _atlas.RebuildAtlas(progress, out packedTextures, out channelMapping);
+
+      //Copy mapping into local array
+      //Local array is used for both textures and sprites
+      for (int i = 0; i < 4; i++) {
+        var mapping = channelMapping[i];
+        if (mapping != null) {
+          mapping = mapping.Clone() as Rect[];
+        }
+        _channelMapping[i] = mapping;
+      }
+
+      progress.Begin(2, "", "", () => {
+        progress.Step("Saving To Asset");
+        _packedTextures.AssignTextures(packedTextures);
+
+        progress.Begin(_textureFeatures.Count, "", "Loading Into Scene", () => {
+          for (int i = 0; i < _textureFeatures.Count; i++) {
+            progress.Step();
+            _material.SetTexture(_textureFeatures[i].propertyName, _packedTextures[i]);
+          }
+        });
+      });
+    });
+  }
+
+  public virtual void GetSupportInfo(List<LeapGuiTextureFeature> features, List<SupportInfo> info) {
     for (int i = 0; i < features.Count; i++) {
       var feature = features[i];
       if (group.features.Query().OfType<LeapGuiSpriteFeature>().Any(s => s.channel == feature.channel)) {
@@ -190,23 +218,23 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
 
   public override void OnDisableRenderer() { }
 
+  public override void OnEnableRendererEditor() { }
+
+  public override void OnDisableRendererEditor() {
+    DeleteAsset(ref _meshes);
+    DeleteAsset(ref _packedTextures);
+  }
+
   public override void OnUpdateRenderer() {
     updateTinting();
     updateBlendShapes();
   }
 
-  public override void OnEnableRendererEditor() { }
-
-  public override void OnDisableRendererEditor() {
-    foreach (var mesh in _meshes) {
-      DestroyImmediate(mesh);
-    }
-
-    DestroyImmediate(_material);
-  }
-
   public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
     base.OnUpdateRendererEditor(isHeavyUpdate);
+
+    EnsureAssetSaved(ref _meshes, "Mesh Data");
+    EnsureAssetSaved(ref _packedTextures, "Texture Data");
 
     setupForBuilding();
     buildMesh();
@@ -258,7 +286,11 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
       }
 
       if (_textureFeatures.Count != 0) {
-        packTextures();
+        _atlas.UpdateTextureList(_textureFeatures);
+
+        for (int i = 0; i < _packedTextures.Count; i++) {
+          _material.SetTexture(_textureFeatures[i].propertyName, _packedTextures[i]);
+        }
       }
 
       if (_spriteFeatures.Count != 0) {
@@ -302,53 +334,37 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
   }
 
   protected virtual void prepareMeshes() {
-    foreach (var mesh in _meshes) {
-      DestroyImmediate(mesh);
-    }
     _meshes.Clear();
     _currMesh = null;
   }
 
   protected virtual void prepareMaterial() {
-    foreach (var texture in _packedTextures) {
-      DestroyImmediate(texture);
-    }
-    _packedTextures.Clear();
-
+    Material newMaterial;
     if (_material != null) {
+      newMaterial = new Material(_material);
       DestroyImmediate(_material);
+    } else {
+      newMaterial = new Material(_shader);
     }
 
-    _material = new Material(_shader);
+    _material = newMaterial;
+    _material.shader = _shader;
     _material.name = "Procedural Gui Material";
 
-    _packedRects = null;
-  }
-
-  protected virtual void packTextures() {
-    using (new ProfilerSample("Pack Textures")) {
-      Texture2D[] packedTextures;
-      PackUtil.DoPack(_textureFeatures, _atlasSettings,
-                  out packedTextures,
-                  out _packedRects);
-
-      _packedTextures.AddRange(packedTextures);
-
-      for (int i = 0; i < _textureFeatures.Count; i++) {
-        _material.SetTexture(_textureFeatures[i].propertyName, packedTextures[i]);
-      }
+    if (_channelMapping == null) {
+      _channelMapping = new JaggetRects(4);
     }
   }
 
   protected virtual void extractSpriteRects() {
     using (new ProfilerSample("Extract Sprite Rects")) {
-      if (_packedRects == null) {
-        _packedRects = new Rect[4][];
+      if (_channelMapping == null) {
+        _channelMapping = new JaggetRects(4);
       }
 
       foreach (var spriteFeature in _spriteFeatures) {
         var rects = new Rect[group.elements.Count];
-        _packedRects[spriteFeature.channel.Index()] = rects;
+        _channelMapping[spriteFeature.channel.Index()] = rects;
 
         for (int i = 0; i < spriteFeature.data.Count; i++) {
           var dataObj = spriteFeature.data[i];
@@ -495,10 +511,10 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
 
       targetList.AddRange(uvs);
 
-      if (_packedRects != null &&
+      if (_channelMapping != null &&
          (_currElement.remappableChannels & channel) != 0) {
-        var atlasedUvs = _packedRects[channel.Index()];
-        if (atlasedUvs != null) {
+        var atlasedUvs = _channelMapping[channel.Index()];
+        if (atlasedUvs != null && _currIndex < atlasedUvs.Length) {
           MeshUtil.RemapUvs(targetList, atlasedUvs[_currIndex], uvs.Count);
         }
       }
@@ -581,7 +597,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
 
       postProcessMesh();
 
-      _meshes.Add(_currMesh);
+      _meshes.AddMesh(_currMesh);
       _currMesh = null;
     }
   }

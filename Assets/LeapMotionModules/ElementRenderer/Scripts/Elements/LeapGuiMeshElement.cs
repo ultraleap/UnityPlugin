@@ -66,6 +66,10 @@ public class LeapGuiMeshElement : LeapGuiMeshElementBase {
                                                UVChannelFlags.UV2 |
                                                UVChannelFlags.UV3;
 
+  public void SetMesh(Mesh mesh) {
+    _mesh = mesh;
+  }
+
   public override void RefreshMeshData() {
     mesh = _mesh;
     remappableChannels = _remappableChannels;

@@ -1,6 +1,7 @@
 ﻿Shader "LeapGui/Defaults/Baked" {
   Properties {
     _MainTex ("Texture", 2D) = "white" {}
+    _MainTex2 ("Texture", 2D) = "white" {}
   }
   SubShader {
     Tags {"Queue"="Geometry" "RenderType"="Opaque" }
@@ -23,28 +24,28 @@
       #include "UnityCG.cginc"
 
       sampler2D _MainTex;
+      sampler2D _MainTex2;
       
       v2f_gui_baked vert (appdata_gui_baked v) {
         return ApplyBakedGui(v);
       }
       
       fixed4 frag (v2f_gui_baked i) : SV_Target {
-#ifdef LEAP_GUI_VERTEX_NORMALS
-        return dot(normalize(i.normal.xyz), float3(0, 0, 1));
+        fixed4 color = fixed4(1,1,1,1);
+
+#if LEAP_GUI_VERTEX_UV_0
+        color *= tex2D(_MainTex, i.uv0);
 #endif
 
-#ifdef LEAP_GUI_VERTEX_UV_0
-        fixed4 color = tex2D(_MainTex, i.uv0);
+#if LEAP_GUI_VERTEX_UV_0
+        color *= tex2D(_MainTex2, i.uv0);
+#endif
+
 #ifdef GUI_ELEMENTS_HAVE_COLOR
         color *= i.color;
 #endif
+
         return color;
-#else
-#ifdef GUI_ELEMENTS_HAVE_COLOR
-        return i.color;
-#endif
-#endif
-        return fixed4(1,1,1,1);
       }
       ENDCG
     }

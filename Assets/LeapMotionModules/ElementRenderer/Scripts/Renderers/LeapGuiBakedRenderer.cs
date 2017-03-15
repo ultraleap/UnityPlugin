@@ -14,7 +14,6 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
   #region INSPECTOR FIELDS
 
-  [EditTimeOnly]
   [SerializeField]
   private SingleLayer _layer = 0;
 
@@ -33,7 +32,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   [EditTimeOnly]
   [SerializeField]
   private MaterialGlobalIlluminationFlags _giFlags = MaterialGlobalIlluminationFlags.None;
-  
+
   [SerializeField]
   private LightmapUnwrapSettings _lightmapUnwrapSettings;
   #endregion
@@ -123,8 +122,8 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
     if (!_createMeshRenderers) {
       using (new ProfilerSample("Draw Meshes")) {
-        foreach (var mesh in _meshes) {
-          Graphics.DrawMesh(mesh, gui.transform.localToWorldMatrix, _material, _layer);
+        for (int i = 0; i < _meshes.Count; i++) {
+          Graphics.DrawMesh(_meshes[i], gui.transform.localToWorldMatrix, _material, _layer);
         }
       }
     }

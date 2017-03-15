@@ -8,7 +8,9 @@ public static class MeshCache {
 
   public static void Clear() {
     _topologyCache.Clear();
+    _normalCache.Clear();
     _colorCache.Clear();
+    _uvCache.Clear();
   }
 
   private static Dictionary<Mesh, CachedTopology> _topologyCache = new Dictionary<Mesh, CachedTopology>();
