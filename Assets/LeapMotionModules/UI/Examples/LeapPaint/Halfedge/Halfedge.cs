@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Halfedge {
 
@@ -19,12 +20,28 @@ namespace Leap.Unity.Halfedge {
     /// <summary> The previous halfedge around the face. </summary>
     public Halfedge prev;
 
-    /// <summary> Returns an enumerator that traverses all of the faces in the halfedge mesh. </summary>
+    [ThreadStatic]
+    private static FaceEnumerator _faceEnum;
+    /// <summary> Gets an enumerator that will traverse all of the faces in the halfedge mesh.
+    /// As an optimization, only one backing Enumerator is constructed (per accessing thread).
+    /// If the getter is called twice on one thread, the second call will return the same object
+    /// as the first, but the object will also be reset back to its original state.
+    /// 
+    /// In other words, foreach will just work, but call this once and store a reference if you
+    /// want to do fancy manual MoveNext stuff. </summary>
     public FaceEnumerator faces {
-      get { return new FaceEnumerator(this); }
+      get {
+        if (_faceEnum == null) {
+          _faceEnum = new FaceEnumerator(this);
+        }
+        else {
+          _faceEnum.ResetWithNewHalfedge(this);
+        }
+        return _faceEnum;
+      }
     }
     public class FaceEnumerator : IEnumerator<Face> {
-      private Halfedge halfedgeStructure;
+      private Halfedge halfedge;
       private Face curFace;
       private bool needsFirstFace = true;
 
@@ -35,7 +52,7 @@ namespace Leap.Unity.Halfedge {
       }
 
       public FaceEnumerator(Halfedge halfedgeStructure) {
-        this.halfedgeStructure = halfedgeStructure;
+        this.halfedge = halfedgeStructure;
         curFace = halfedgeStructure.face;
         _facesVisitedCache.Clear();
       }
@@ -77,8 +94,13 @@ namespace Leap.Unity.Halfedge {
       }
 
       public void Reset() {
-        curFace = halfedgeStructure.face;
+        curFace = halfedge.face;
         _facesVisitedCache.Clear();
+      }
+
+      public void ResetWithNewHalfedge(Halfedge halfedge) {
+        this.halfedge = halfedge;
+        Reset();
       }
 
       public void Dispose() { }

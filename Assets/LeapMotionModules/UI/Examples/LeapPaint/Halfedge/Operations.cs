@@ -67,7 +67,7 @@ namespace Leap.Unity.Halfedge {
     /// <summary> "Pokes" a face, replacing an N-gon face with N triangular faces
     /// that meet at a new Vertex at the center of the original face. </summary>
     public static Vertex Poke(this Face face) {
-      return null;
+
     }
 
     #endregion
