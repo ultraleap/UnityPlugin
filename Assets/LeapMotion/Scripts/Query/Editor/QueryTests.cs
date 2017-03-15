@@ -1,5 +1,8 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
 using NUnit.Framework;
+using System;
+using System.Collections;
 
 namespace Leap.Unity.Query.Test {
 
@@ -147,6 +150,29 @@ namespace Leap.Unity.Query.Test {
     public void IndexOfTests() {
       Assert.AreEqual(LIST_0.Query().IndexOf(3), 2);
       Assert.AreEqual(LIST_0.Query().IndexOf(100), -1);
+    }
+
+    public void EnumeratorTest() {
+      Assert.AreEqual(new TestEnumerator().Query().IndexOf(3), 3);
+    }
+
+    public class TestEnumerator : IEnumerator<int> {
+      private int _curr;
+
+      public int Current {
+        get {
+          return _curr;
+        }
+      }
+
+      public bool MoveNext() {
+        _curr++;
+        return (_curr != 10);
+      }
+
+      object IEnumerator.Current { get { return null; } }
+      public void Dispose() { }
+      public void Reset() { }
     }
   }
 }
