@@ -57,8 +57,6 @@ public static class MeshRendererConversion {
       elements.Add(element);
     }
 
-    Debug.Log(elements.Count);
-
     foreach (var element in elements) {
       var renderer = element.GetComponent<MeshRenderer>();
       var filter = element.GetComponent<MeshFilter>();
@@ -66,28 +64,22 @@ public static class MeshRendererConversion {
 
       element.SetMesh(filter.sharedMesh);
 
-      Debug.Log(element.data.Count);
-
       foreach (var dataObj in element.data) {
         var textureData = dataObj as LeapGuiTextureData;
         if (textureData == null) {
-          Debug.Log("A");
           continue;
         }
 
         var feature = textureData.feature as LeapGuiTextureFeature;
         if (!material.HasProperty(feature.propertyName)) {
-          Debug.Log("B");
           continue;
         }
 
         Texture2D tex2d = material.GetTexture(feature.propertyName) as Texture2D;
         if (tex2d == null) {
-          Debug.Log("C");
           continue;
         }
-
-        Debug.Log(feature.propertyName);
+        
         textureData.texture = tex2d;
       }
 
