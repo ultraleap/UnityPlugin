@@ -53,7 +53,7 @@ namespace Leap.Unity.Interaction {
       return !(float.IsNaN(v.x) || float.IsNaN(v.y) || float.IsNaN(v.z)) && !(float.IsInfinity(v.x) || float.IsInfinity(v.y) || float.IsInfinity(v.z));
     }
 
-    public static bool generateSphereContacts(Vector3 spherePosition, float sphereRadius, Vector3 sphereVelocity, int layerMask, ref List<SoftContact> softContacts, ref Dictionary<Rigidbody, Velocities> originalVelocities, ref Collider[] temporaryColliderSwapSpace) {
+    public static bool generateSphereContacts(Vector3 spherePosition, float sphereRadius, Vector3 sphereVelocity, int layerMask, ref List<SoftContact> softContacts, ref Dictionary<Rigidbody, Velocities> originalVelocities, ref Collider[] temporaryColliderSwapSpace, bool interpretAsEllipsoid = true) {
       Array.Clear(temporaryColliderSwapSpace, 0, temporaryColliderSwapSpace.Length);
       Physics.OverlapSphereNonAlloc(spherePosition, sphereRadius, temporaryColliderSwapSpace, layerMask);
 
@@ -71,18 +71,32 @@ namespace Leap.Unity.Interaction {
             originalBodyVelocities.angularVelocity = contact.body.angularVelocity;
 
             Matrix4x4 tensorRotation = Matrix4x4.TRS(Vector3.zero, contact.body.rotation * contact.body.inertiaTensorRotation, Vector3.one);
-            originalBodyVelocities.invWorldInertiaTensor = (tensorRotation * Matrix4x4.Scale(contact.body.inertiaTensor) * tensorRotation.inverse).inverse;
+            Matrix4x4 worldInertiaTensor = (tensorRotation * Matrix4x4.Scale(contact.body.inertiaTensor) * tensorRotation.inverse);
+            originalBodyVelocities.invWorldInertiaTensor = worldInertiaTensor.inverse;
 
             originalVelocities.Add(contact.body, originalBodyVelocities);
+
+            //Premptively apply the force due to gravity BEFORE soft contact
+            //so soft contact can factor it in during the collision solve
+            if (contact.body.useGravity) {
+              contact.body.AddForce(-Physics.gravity, ForceMode.Acceleration);
+              contact.body.velocity += Physics.gravity * Time.fixedDeltaTime;
+            }
           }
 
-          if (col is MeshCollider) {
-            contact.normal = (contact.body.worldCenterOfMass - spherePosition).normalized;
+          if (interpretAsEllipsoid || col is MeshCollider) {
+            //First get the world spherical normal
+            contact.normal = (col.bounds.center - spherePosition).normalized;
+            //Then divide by the world extends squared to get the world ellipsoidal normal
+            Vector3 colliderExtentsSquared = col.bounds.extents.CompMul(col.bounds.extents);
+            contact.normal = contact.normal.CompDiv(colliderExtentsSquared).normalized;
           } else {
+            //Else, use the analytic support functions that we have for boxes and capsules to generate the normal
             Vector3 objectLocalBoneCenter = col.transform.InverseTransformPoint(spherePosition);
             Vector3 objectPoint = col.transform.TransformPoint(col.ClosestPointOnSurface(objectLocalBoneCenter));
             contact.normal = (objectPoint - spherePosition).normalized * (col.IsPointInside(objectLocalBoneCenter) ? -1f : 1f);
           }
+
           contact.position = spherePosition + (contact.normal * sphereRadius);
           contact.velocity = sphereVelocity;
           contact.invWorldInertiaTensor = originalBodyVelocities.invWorldInertiaTensor;
@@ -151,18 +165,12 @@ namespace Leap.Unity.Interaction {
           }
         }
 
-        //Now iterate through the list of Rigidbodies
+        //Apply these changes in velocity as forces, so the PhysX solver can resolve them (optional)
         foreach (KeyValuePair<Rigidbody, Velocities> RigidbodyVelocity in originalVelocities) {
-          //Apply these changes in velocity as forces, so the PhysX solver can resolve them (optional)
           RigidbodyVelocity.Key.AddForce(RigidbodyVelocity.Key.velocity - RigidbodyVelocity.Value.velocity, ForceMode.VelocityChange);
           RigidbodyVelocity.Key.AddTorque(RigidbodyVelocity.Key.angularVelocity - RigidbodyVelocity.Value.angularVelocity, ForceMode.VelocityChange);
           RigidbodyVelocity.Key.velocity = RigidbodyVelocity.Value.velocity;
           RigidbodyVelocity.Key.angularVelocity = RigidbodyVelocity.Value.angularVelocity;
-
-          //Physics translates objects downward every physics update; preemptively translate them back
-          if (RigidbodyVelocity.Key.useGravity) {
-            RigidbodyVelocity.Key.MovePosition(RigidbodyVelocity.Key.position - (Physics.gravity * Time.fixedDeltaTime * Time.fixedDeltaTime * 0.95f));
-          }
         }
 
         softContacts.Clear();
@@ -179,8 +187,12 @@ namespace Leap.Unity.Interaction {
 
     public static void applyImpulseNow(Rigidbody thisObject, Vector3 impulse, Vector3 worldPos, Matrix4x4 invWorldInertiaTensor) {
       if (thisObject.mass != 0f && 1f / thisObject.mass != 0f && impulse.IsValid() && impulse != Vector3.zero) {
+        impulse = impulse.normalized * Mathf.Clamp(impulse.magnitude, 0f, 6f);
         thisObject.velocity += impulse / thisObject.mass;
-        thisObject.angularVelocity += Vector3.Cross(worldPos - thisObject.worldCenterOfMass, invWorldInertiaTensor * impulse);
+        Vector3 angularImpulse = Vector3.Cross(worldPos - thisObject.worldCenterOfMass, invWorldInertiaTensor * impulse);
+        if (angularImpulse.magnitude < 4f) {
+          thisObject.angularVelocity += angularImpulse;
+        }
       }
     }
 

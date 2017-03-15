@@ -245,7 +245,7 @@ namespace Leap.Unity.Interaction {
 
 
         if (softlyContacting) {
-          //(if we have a manager, it will handle resolving the contacts of both hands in one unified solve)
+          //(If we have a manager, let it handle resolving the contacts of both hands in one unified solve)
           if (_manager == null) {
             PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
           }
@@ -267,6 +267,7 @@ namespace Leap.Unity.Interaction {
     }
 
     //Constructs a hand object from this BrushHand
+    //Can be used to Display a Graphical hand that matches the Physical one
     public void fillBones(Hand inHand) {
       if(_softContactEnabled) { return; }
       if (Application.isPlaying && _brushBones.Length == N_FINGERS * N_ACTIVE_BONES + 1) {
@@ -341,7 +342,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    //Constrain the bones to eachother to prevent separation during interactions
+    //Constrain the bones to each other to prevent separation during interactions
     void addHandJoints() {
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
@@ -420,6 +421,7 @@ namespace Leap.Unity.Interaction {
         }
 
         //Update the last positions of the bones with this frame
+        //This prevents spurious velocities from freshly initialized hands
         for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++) {
           for (int jointIndex = 0; jointIndex < 4; jointIndex++) {
             Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
