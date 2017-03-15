@@ -14,9 +14,8 @@ namespace Leap.Unity {
 
     /// <summary>
     /// Returns a vector that is perpendicular to this vector.
-    /// The returned vector is not guaranteed to be a unit vector,
-    /// nor is it's length guaranteed to be the same as the source
-    /// vector.
+    /// The returned vector will have the same length as the
+    /// input vector.
     /// </summary>
     public static Vector2 Perpendicular(this Vector2 vector) {
       return new Vector2(vector.y, -vector.x);
