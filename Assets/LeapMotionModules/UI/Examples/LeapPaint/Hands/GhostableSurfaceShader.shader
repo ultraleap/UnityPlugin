@@ -21,7 +21,8 @@
 		
 		CGPROGRAM
 		// Physically based Standard lighting model, and enable shadows on all light types
-		#pragma surface surf Standard fullforwardshadows alpha:blend
+    // fullforwardshadows
+		#pragma surface surf Standard noforwardadd alpha:blend
 
 		// Use shader model 3.0 target, to get nicer looking lighting -- NOPE 2.0 for cheapness
 		#pragma target 2.0

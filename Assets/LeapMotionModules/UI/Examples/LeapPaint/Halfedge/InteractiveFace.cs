@@ -43,7 +43,7 @@ namespace Leap.Unity.Halfedge {
     void Start() {
       _intObj = GetComponent<InteractionBehaviour>();
       _intObj.OnGraspBegin += OnGraspBegin;
-      _intObj.OnGraspHold  += OnGraspHold;
+      _intObj.OnGraspedMovement += OnGraspedMovement;
       _intObj.OnGraspEnd   += OnGraspEnd;
     }
 
@@ -52,7 +52,7 @@ namespace Leap.Unity.Halfedge {
     }
 
     private Transform _originalParent;
-    private List<InteractiveVertex> _intVertsGrabbed = new List<InteractiveVertex>();
+    private HashSet<InteractiveVertex> _intVertsGrabbed = new HashSet<InteractiveVertex>();
 
     private void OnGraspBegin(Hand hand) {
       _intVertsGrabbed.Clear();
@@ -68,8 +68,9 @@ namespace Leap.Unity.Halfedge {
       }
     }
 
-    private void OnGraspHold(Hand hand) {
-      foreach (var neighborIntFace in intMesh.GetNeighboringFaces(this.face).Query().Select((face) => { return intMesh.GetInteractiveFace(face); })) {
+    private void OnGraspedMovement(Vector3 origPos, Quaternion origRot, Vector3 newPos, Quaternion newRot, Hand hand) {
+      foreach (var neighborIntFace in intMesh.GetNeighboringFaces(this.face).Query()
+                                      .Select((face) => { return intMesh.GetInteractiveFace(face); })) {
         neighborIntFace.RefreshLocation();
       }
     }
