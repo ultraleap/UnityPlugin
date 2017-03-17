@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Leap.Unity.Query;
+using Leap.Unity.Attributes;
 
 public static class LeapGuiSpriteExtensions {
   public static LeapGuiSpriteData Sprite(this LeapGuiElement element) {
@@ -9,5 +10,7 @@ public static class LeapGuiSpriteExtensions {
 
 [AddComponentMenu("")]
 public class LeapGuiSpriteData : LeapGuiElementData {
+
+  [EditTimeOnly]
   public Sprite sprite;
 }

@@ -10,16 +10,20 @@ public static class PackUtil {
 
   [Serializable]
   public class Settings {
+    [EditTimeOnly]
     [MinValue(0)]
     public int border = 1;
 
+    [EditTimeOnly]
     [MinValue(0)]
     public int padding = 0;
 
+    [EditTimeOnly]
     [MinValue(16)]
     [MaxValue(8192)]
     public int maxAtlasSize = 4096;
 
+    [EditTimeOnly]
     public FilterMode filterMode = FilterMode.Bilinear;
   }
 

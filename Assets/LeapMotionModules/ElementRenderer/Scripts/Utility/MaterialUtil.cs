@@ -13,6 +13,11 @@ public static class MaterialUtil {
     material.SetVectorArray(property, list);
   }
 
+  public static void SetColorArraySafe(this Material material, string property, List<Color> list) {
+    if (list.Count == 0) return;
+    material.SetColorArray(property, list);
+  }
+
   public static void SetMatrixArraySafe(this Material material, string property, List<Matrix4x4> list) {
     if (list.Count == 0) return;
     material.SetMatrixArray(property, list);

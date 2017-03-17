@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Leap.Unity.Attributes;
 
 public interface IRadialTransformer : ITransformer {
   Vector4 GetVectorRepresentation(LeapGuiElement element);
@@ -8,7 +10,8 @@ public interface IRadialTransformer : ITransformer {
 
 public abstract class LeapGuiRadialSpaceBase : LeapGuiSpace {
   public const string RADIUS_PROPERTY = LeapGui.PROPERTY_PREFIX + "RadialSpace_Radius";
-  
+
+  [EditTimeOnly]
   [SerializeField]
   public float radius = 1;
 }
@@ -18,11 +21,11 @@ public abstract class LeapGuiRadialSpace<TType> : LeapGuiRadialSpaceBase, ISuppo
 
   protected Dictionary<Transform, TType> _transformerData = new Dictionary<Transform, TType>();
 
-  public virtual void OnAddElements(List<LeapGuiElement> element, List<int> indexes) {
+  public virtual void OnAddElement() {
     BuildElementData(transform); //TODO, optimize
   }
 
-  public virtual void OnRemoveElements(List<int> toRemove) {
+  public virtual void OnRemoveElement() {
     BuildElementData(transform); //TODO, optimize
   }
 
@@ -38,7 +41,23 @@ public abstract class LeapGuiRadialSpace<TType> : LeapGuiRadialSpaceBase, ISuppo
   }
 
   public override ITransformer GetTransformer(Transform anchor) {
-    return _transformerData[anchor];
+    TType transformer;
+    if (!_transformerData.TryGetValue(anchor, out transformer)) {
+      string message;
+      if (Application.isPlaying) {
+        message = "Could not find an anchor reference for " + anchor +
+                  ".  Remember that is is not legal to add or enabled anchors " +
+                  "at runtime, or otherwise change the hierarchy structure.";
+      } else {
+        message = "Could not find an anchor reference for " + anchor +
+                  ".  Make sure to pass in a transform with an enabled AnchorOfConstantSize " +
+                  "or the LeapGui component itself.";
+      }
+
+      throw new InvalidOperationException(message);
+    }
+
+    return transformer;
   }
 
   public override void RefreshElementData(Transform root, int index, int count) {
@@ -59,7 +78,7 @@ public abstract class LeapGuiRadialSpace<TType> : LeapGuiRadialSpaceBase, ISuppo
       SetTransformerRelativeTo(curr, parentTransformer, delta);
     }
   }
-  
+
   protected abstract TType ConstructTransformer(Transform anchor);
   protected abstract void SetTransformerRelativeTo(TType tartet, TType parent, Vector3 guiSpaceDelta);
 }

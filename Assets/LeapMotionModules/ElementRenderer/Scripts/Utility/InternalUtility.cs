@@ -55,8 +55,11 @@ public static class InternalUtility {
 
   private static void destroyLoop() {
     if (toDestroy.Count != 0) {
-      foreach (var obj in toDestroy) {
-        Object.DestroyImmediate(obj);
+      for (int i = 0; i < toDestroy.Count; i++) {
+        var obj = toDestroy[i];
+        if (obj != null) {
+          Object.DestroyImmediate(obj);
+        }
       }
       toDestroy.Clear();
     }

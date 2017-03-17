@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Leap.Unity;
-using Leap.Unity.Query;
 
 [ExecuteInEditMode]
 public class LeapGui : MonoBehaviour {
@@ -16,50 +14,34 @@ public class LeapGui : MonoBehaviour {
 
   #region INSPECTOR FIELDS
   [SerializeField]
-  private List<LeapGuiFeatureBase> _features = new List<LeapGuiFeatureBase>();
-
-  [SerializeField]
   private LeapGuiSpace _space;
 
   [SerializeField]
-  private LeapGuiRenderer _renderer;
+  private List<LeapGuiGroup> _groups = new List<LeapGuiGroup>();
   #endregion
 
   #region PRIVATE VARIABLES
-  [SerializeField, HideInInspector]
-  private List<LeapGuiElement> _elements = new List<LeapGuiElement>();
+  //We serialize just for ease of use
+  [SerializeField]
+  private int _selectedGroup = 0;
 
-  [SerializeField, HideInInspector]
+  [SerializeField]
   private List<AnchorOfConstantSize> _anchors = new List<AnchorOfConstantSize>();
 
-  [SerializeField, HideInInspector]
+  [SerializeField]
   private List<Transform> _anchorParents = new List<Transform>();
 
-  [SerializeField, HideInInspector]
-  private List<SupportInfo> _supportInfo = new List<SupportInfo>();
-
-  [SerializeField, HideInInspector]
-  private bool _addRemoveSupported;
-
-  private List<LeapGuiElement> _toAdd = new List<LeapGuiElement>();
-  private List<LeapGuiElement> _toRemove = new List<LeapGuiElement>();
-
+  [NonSerialized]
   private List<LeapGuiElement> _tempElementList = new List<LeapGuiElement>();
-  private List<int> _tempIndexList = new List<int>();
-
   [NonSerialized]
   private bool _hasFinishedSetup = false;
   [NonSerialized]
   private int _previousHierarchyHash;
+
   private DelayedAction _delayedHeavyRebuild;
   #endregion
 
-  #region PUBLIC API
-  public List<LeapGuiFeatureBase> features {
-    get {
-      return _features;
-    }
-  }
+  #region PUBLIC RUNTIME API
 
   public LeapGuiSpace space {
     get {
@@ -67,19 +49,9 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
-#if UNITY_EDITOR
-  public new LeapGuiRenderer renderer {
-#else
-  public LeapGuiRenderer renderer {
-#endif
+  public List<LeapGuiGroup> groups {
     get {
-      return _renderer;
-    }
-  }
-
-  public List<LeapGuiElement> elements {
-    get {
-      return _elements;
+      return _groups;
     }
   }
 
@@ -95,70 +67,70 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
-  public List<SupportInfo> supportInfo {
-    get {
-      return _supportInfo;
-    }
-  }
-
-  public bool addRemoveSupported {
-    get {
-      return _addRemoveSupported;
-    }
-  }
-
   public bool hasFinishedSetup {
     get {
       return _hasFinishedSetup;
     }
   }
 
-  /// <summary>
-  /// Tries to add a new gui element to this gui at runtime.
-  /// Element is not actually added until the next gui cycle.
-  /// </summary>
   public bool TryAddElement(LeapGuiElement element) {
-    AssertHelper.AssertRuntimeOnly();
-    Assert.IsNotNull(element);
-    if (!_addRemoveSupported) {
-      return false;
+
+    //First try to attatch to a group that is preferred
+    Type preferredType = element.preferredRendererType;
+    if (preferredType != null) {
+      foreach (var group in groups) {
+        Type rendererType = group.renderer.GetType();
+        if (preferredType == rendererType || rendererType.IsSubclassOf(preferredType)) {
+          if (group.TryAddElement(element)) {
+            return true;
+          }
+        }
+      }
     }
 
-    _toAdd.Add(element);
-    return true;
-  }
-
-  /// <summary>
-  /// Tries to remove a gui element from this gui at runtime.
-  /// Element is not actually removed until the next gui cycle.
-  /// </summary>
-  public bool TryRemoveElement(LeapGuiElement element) {
-    AssertHelper.AssertRuntimeOnly();
-    Assert.IsNotNull(element);
-    if (!_addRemoveSupported) {
-      return false;
+    //If we failed, try to attach to a group that will take us
+    foreach (var group in groups) {
+      if (group.renderer.IsValidElement(element)) {
+        if (group.TryAddElement(element)) {
+          return true;
+        }
+      }
     }
 
-    _toRemove.Add(element);
-    return true;
+    return false;
   }
 
-  public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGuiFeatureBase {
-    features.Clear();
-    for (int i = 0; i < _features.Count; i++) {
-      var feature = _features[i];
-      if (!(feature is T)) continue;
-      if (_supportInfo[i].support == SupportType.Error) continue;
+  #endregion
 
-      features.Add(feature as T);
-    }
-
-    return features.Count != 0;
-  }
-
-  //Begin editor-only private api
+  #region PUBLIC EDITOR API
 #if UNITY_EDITOR
+  public void CreateGroup(Type rendererType) {
+    AssertHelper.AssertEditorOnly();
+    Assert.IsNotNull(rendererType);
+
+    var group = gameObject.AddComponent<LeapGuiGroup>();
+    group.Init(this, rendererType);
+
+    _selectedGroup = _groups.Count;
+    _groups.Add(group);
+  }
+
+  public void DestroySelectedGroup() {
+    AssertHelper.AssertEditorOnly();
+
+    var toDestroy = _groups[_selectedGroup];
+    _groups.RemoveAt(_selectedGroup);
+
+    if (_selectedGroup >= _groups.Count && _selectedGroup != 0) {
+      _selectedGroup--;
+    }
+
+    InternalUtility.Destroy(toDestroy);
+  }
+
   public void ScheduleEditorUpdate() {
+    AssertHelper.AssertEditorOnly();
+
     //Dirty the hash by changing it to something else
     _previousHierarchyHash++;
   }
@@ -182,120 +154,23 @@ public class LeapGui : MonoBehaviour {
     }
   }
 
-  public void AddFeature(Type featureType) {
-    AssertHelper.AssertEditorOnly();
-    ScheduleEditorUpdate();
-
-    var feature = gameObject.AddComponent(featureType);
-    _features.Add(feature as LeapGuiFeatureBase);
-  }
-
-  public void SetRenderer(Type rendererType) {
-    AssertHelper.AssertEditorOnly();
-    ScheduleEditorUpdate();
-
-    UnityEditor.Undo.RecordObject(this, "Changed Gui Renderer");
-    UnityEditor.EditorUtility.SetDirty(this);
-
-    if (_renderer != null) {
-      _renderer.OnDisableRendererEditor();
-      DestroyImmediate(_renderer);
-      _renderer = null;
-    }
-
-    _renderer = gameObject.AddComponent(rendererType) as LeapGuiRenderer;
-
-    if (_renderer != null) {
-      _renderer.gui = this;
-      _renderer.OnEnableRendererEditor();
-    }
-  }
-
   public void RebuildEditorPickingMeshes() {
     if (_space == null) {
       return;
     }
 
-    using (new ProfilerSample("Rebuild Picking Meshes")) {
-      List<Vector3> pickingVerts = new List<Vector3>();
-      List<int> pickingTris = new List<int>();
-
-      foreach (var element in _elements) {
-        pickingVerts.Clear();
-        pickingTris.Clear();
-
-        Mesh pickingMesh = element.pickingMesh;
-        if (pickingMesh == null) {
-          pickingMesh = new Mesh();
-          pickingMesh.MarkDynamic();
-          pickingMesh.hideFlags = HideFlags.HideAndDontSave;
-          pickingMesh.name = "Gui Element Picking Mesh";
-          element.pickingMesh = pickingMesh;
-        }
-        pickingMesh.Clear();
-
-        foreach (var dataObj in element.data) {
-          if (dataObj is LeapGuiMeshData) {
-            var meshData = dataObj as LeapGuiMeshData;
-            meshData.RefreshMeshData();
-
-            Mesh mesh = meshData.mesh;
-            if (mesh == null) continue;
-
-            var topology = MeshCache.GetTopology(mesh);
-            for (int i = 0; i < topology.tris.Length; i++) {
-              pickingTris.Add(topology.tris[i] + pickingVerts.Count);
-            }
-
-            ITransformer transformer = _space.GetTransformer(element.anchor);
-            for (int i = 0; i < topology.verts.Length; i++) {
-              Vector3 localRectVert = transform.InverseTransformPoint(element.transform.TransformPoint(topology.verts[i]));
-              pickingVerts.Add(transformer.TransformPoint(localRectVert));
-            }
-          }
-        }
-
-        pickingMesh.SetVertices(pickingVerts);
-        pickingMesh.SetTriangles(pickingTris, 0, calculateBounds: true);
-        pickingMesh.RecalculateNormals();
-      }
+    foreach (var group in _groups) {
+      group.RebuildEditorPickingMeshes();
     }
   }
 #endif
   #endregion
 
   #region UNITY CALLBACKS
-  void OnValidate() {
-    if (!Application.isPlaying) {
-      _addRemoveSupported = true;
-      if (_renderer != null) {
-        _addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(renderer.GetType());
-      }
-      if (_space != null) {
-        _addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(space.GetType());
-      }
-    }
-
-    for (int i = _features.Count; i-- != 0;) {
-      if (_features[i] == null) {
-        _features.RemoveAt(i);
-      }
-    }
+  private void OnValidate() {
 
 #if UNITY_EDITOR
-    for (int i = _features.Count; i-- != 0;) {
-      var feature = _features[i];
-      if (feature.gameObject != gameObject) {
-        LeapGuiFeatureBase movedFeature;
-        if (InternalUtility.TryMoveComponent(feature, gameObject, out movedFeature)) {
-          _features[i] = movedFeature;
-        } else {
-          Debug.LogWarning("Could not move feature component " + feature + "!");
-          InternalUtility.Destroy(feature);
-          _features.RemoveAt(i);
-        }
-      }
-    }
+    //TODO, handle drag-drop of leap gui for groups!
 
     if (_space != null && _space.gameObject != gameObject) {
       LeapGuiSpace movedSpace;
@@ -306,64 +181,57 @@ public class LeapGui : MonoBehaviour {
         InternalUtility.Destroy(_space);
       }
     }
-
-    if (_renderer != null && _renderer.gameObject != gameObject) {
-      LeapGuiRenderer movedRenderer;
-      if (InternalUtility.TryMoveComponent(_renderer, gameObject, out movedRenderer)) {
-        _renderer = movedRenderer;
-      } else {
-        Debug.LogWarning("Could not move renderer component " + _renderer + "!");
-        InternalUtility.Destroy(_renderer);
-      }
-    }
 #endif
 
     _space = _space ?? GetComponent<LeapGuiSpace>() ?? gameObject.AddComponent<LeapGuiRectSpace>();
-    _renderer = _renderer ?? GetComponent<LeapGuiRenderer>() ?? gameObject.AddComponent<LeapGuiDynamicRenderer>();
-
     _space.gui = this;
-    _renderer.gui = this;
+
+    //TODO: assign groups automatically
   }
 
   private void Reset() {
+    //First destroy all groups on this object
+    foreach (var group in GetComponents<LeapGuiGroup>()) {
+      DestroyImmediate(group);
+    }
+
+    foreach (var space in GetComponents<LeapGuiSpace>()) {
+      DestroyImmediate(space);
+    }
+
+    //Then do normal validation
     OnValidate();
   }
 
-  void OnDestroy() {
-    if (_renderer != null) InternalUtility.Destroy(_renderer);
+  private void OnDestroy() {
     if (_space != null) InternalUtility.Destroy(space);
-    foreach (var feature in _features) {
-      if (feature != null) InternalUtility.Destroy(feature);
+    foreach (var group in _groups) {
+      InternalUtility.Destroy(group);
     }
+    _delayedHeavyRebuild.Dispose();
   }
 
-  void Awake() {
+  private void Awake() {
     if (_space != null) {
       _space.gui = this;
     }
-    if (_renderer != null) {
-      _renderer.gui = this;
-    }
-
-    foreach (var feature in _features) {
-      feature.AssignFeatureReferences();
-    }
+    //TODO: assign references 
   }
 
-  void OnEnable() {
+  private void OnEnable() {
     if (Application.isPlaying) {
-      _renderer.OnEnableRenderer();
+      //TODO: enable each group too
       if (_space != null) _space.BuildElementData(transform);
     }
   }
 
-  void OnDisable() {
+  private void OnDisable() {
     if (Application.isPlaying) {
-      _renderer.OnDisableRenderer();
+      //TODO: disable all groups
     }
   }
 
-  void LateUpdate() {
+  private void LateUpdate() {
 #if UNITY_EDITOR
     if (Application.isPlaying) {
       doLateUpdateRuntime();
@@ -379,9 +247,7 @@ public class LeapGui : MonoBehaviour {
   #region PRIVATE IMPLEMENTATION
 
   private LeapGui() {
-#if UNITY_EDITOR
     _delayedHeavyRebuild = new DelayedAction(() => doEditorUpdateLogic(fullRebuild: true, heavyRebuild: true));
-#endif
   }
 
 #if UNITY_EDITOR
@@ -389,9 +255,12 @@ public class LeapGui : MonoBehaviour {
     bool needsRebuild = false;
 
     using (new ProfilerSample("Calculate Should Rebuild")) {
-      foreach (var feature in _features) {
-        if (feature.isDirty) {
-          needsRebuild = true;
+      foreach (var group in _groups) {
+        foreach (var feature in group.features) {
+          if (feature.isDirty) {
+            needsRebuild = true;
+            break;
+          }
         }
       }
 
@@ -410,129 +279,30 @@ public class LeapGui : MonoBehaviour {
   }
 
   private void doEditorUpdateLogic(bool fullRebuild, bool heavyRebuild) {
-    if (_renderer != null && _space != null) {
-      if (fullRebuild) {
-        rebuildElementList();
-        rebuildFeatureData();
-        rebuildFeatureSupportInfo();
-
-        _space.BuildElementData(transform);
-
-        using (new ProfilerSample("Update Renderer")) {
-          _renderer.OnUpdateRendererEditor(heavyRebuild);
-        }
-
-        foreach (var feature in _features) {
-          feature.isDirty = false;
-        }
-
-        _hasFinishedSetup = true;
-      }
-
-      _renderer.OnUpdateRenderer();
-    }
-  }
-#endif
-
-  private void doLateUpdateRuntime() {
-    if (_renderer == null) return;
-    if (_space == null) return;
-
-    if (_toRemove.Count != 0) {
-      performElementRemoval();
-    }
-
-    if (_toAdd.Count != 0) {
-      performElementAddition();
-    }
-
-    //TODO, optimize this!  Don't do it every frame for the whole thing!
-    using (new ProfilerSample("Refresh space data")) {
-      _space.RefreshElementData(transform, 0, anchors.Count);
-    }
-
-    using (new ProfilerSample("Update Renderer")) {
-      _renderer.OnUpdateRenderer();
-    }
-
-    foreach (var feature in _features) {
-      feature.isDirty = false;
-    }
-
-    _hasFinishedSetup = true;
-  }
-
-  private void performElementRemoval() {
-    using (new ProfilerSample("Remove Elements")) {
-      for (int i = 0; i < _elements.Count; i++) {
-        var element = _elements[i];
-        if (_toRemove.RemoveUnordered(element)) {
-          element.OnDetachedFromGui();
-          _tempIndexList.Add(i);
-        }
-      }
-
-      _elements.RemoveAtMany(_tempIndexList);
-
-      foreach (var feature in _features) {
-        feature.RemoveDataObjectReferences(_tempIndexList);
-      }
-
-      (_space as ISupportsAddRemove).OnRemoveElements(_tempIndexList);
-      (_renderer as ISupportsAddRemove).OnRemoveElements(_tempIndexList);
-
-      foreach (var notRemoved in _toRemove) {
-        Debug.LogWarning("The element " + notRemoved + " was not removed because it was not part of the gui.");
-      }
-
-      _tempIndexList.Clear();
-      _toRemove.Clear();
-    }
-  }
-
-  private void performElementAddition() {
-    using (new ProfilerSample("Add Elements")) {
-
-      //TODO, both of these rebuild operations can probably be optimized a ton
-      rebuildElementList();
-      rebuildFeatureData();
-
-      for (int i = 0; i < _elements.Count; i++) {
-        var element = _elements[i];
-        if (_toAdd.Remove(element)) {
-          _tempElementList.Add(element);
-          _tempIndexList.Add(i);
-        }
-      }
-
-      (_space as ISupportsAddRemove).OnAddElements(_tempElementList, _tempIndexList);
-      (_renderer as ISupportsAddRemove).OnAddElements(_tempElementList, _tempIndexList);
-
-      _tempElementList.Clear();
-      _tempIndexList.Clear();
-      _toAdd.Clear();
-    }
-  }
-
-  private void rebuildElementList() {
-    using (new ProfilerSample("Rebuild Element List")) {
-#if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        foreach (var element in _elements) {
-          element.OnDetachedFromGui();
-        }
-      }
-#endif
-
-      _elements.Clear();
+    if (fullRebuild) {
       _anchors.Clear();
       _anchorParents.Clear();
+      rebuildAnchorInfo(transform, transform);
+      _space.BuildElementData(transform);
+      collectUnattachedElements();
 
-      rebuildElementListRecursively(transform, transform);
+      foreach (var group in _groups) {
+        group.ValidateElementList();
+        group.RebuildFeatureData();
+        group.RebuildFeatureSupportInfo();
+        group.UpdateRendererEditor(heavyRebuild);
+      }
+
+      _hasFinishedSetup = true;
+    }
+
+    foreach (var group in _groups) {
+      group.UpdateRenderer();
     }
   }
+#endif
 
-  private void rebuildElementListRecursively(Transform root, Transform currAnchor) {
+  private void rebuildAnchorInfo(Transform root, Transform currAnchor) {
     int count = root.childCount;
     for (int i = 0; i < count; i++) {
       Transform child = root.GetChild(i);
@@ -542,113 +312,63 @@ public class LeapGui : MonoBehaviour {
 
       var anchorComponent = child.GetComponent<AnchorOfConstantSize>();
       if (anchorComponent != null && anchorComponent.enabled) {
-        _anchorParents.Add(currAnchor);
-        childAnchor = anchorComponent.transform;
         _anchors.Add(anchorComponent);
+        _anchorParents.Add(currAnchor);
+
+        childAnchor = anchorComponent.transform;
       }
 
-      var element = child.GetComponent<LeapGuiElement>();
-      if (element != null && element.enabled) {
-        element.OnAttachedToGui(this, childAnchor, _elements.Count);
-        _elements.Add(element);
-      }
-
-      rebuildElementListRecursively(child, childAnchor);
+      rebuildAnchorInfo(child, childAnchor);
     }
   }
 
-  private void rebuildFeatureData() {
-    using (new ProfilerSample("Rebuild Feature Data")) {
-      foreach (var feature in _features) {
-        feature.ClearDataObjectReferences();
-        feature.isDirty = true;
-      }
+  private void collectUnattachedElements() {
+    GetComponentsInChildren(_tempElementList);
 
-      for (int i = 0; i < _elements.Count; i++) {
-        var element = _elements[i];
+    foreach (var element in _tempElementList) {
+      if (element.IsAttachedToGroup) {
+        //procede to validate
 
-        List<LeapGuiElementData> dataList = new List<LeapGuiElementData>();
-        foreach (var feature in _features) {
-          var dataObj = element.data.Query().OfType(feature.GetDataObjectType()).FirstOrDefault();
-          if (dataObj != null) {
-            element.data.Remove(dataObj);
-          } else {
-            dataObj = feature.CreateDataObject(element);
+        //If the element is anchored to the wrong anchor, detach and reattach
+        var anchor = AnchorOfConstantSize.GetParentAnchorOrGui(element.transform);
+        if (element.anchor != anchor) {
+          var group = element.attachedGroup;
+
+          if (group.TryRemoveElement(element)) {
+            group.TryAddElement(element);
           }
-          feature.AddDataObjectReference(dataObj);
-          dataList.Add(dataObj);
         }
 
-        foreach (var dataObj in element.data) {
-          DestroyImmediate(dataObj);
+        if (!element.attachedGroup.elements.Contains(element)) {
+          var group = element.attachedGroup;
+          element.OnDetachedFromGui();
+          group.TryAddElement(element); //if this fails, handled by later clause
         }
 
-        element.OnAssignFeatureData(dataList);
+        if (!element.enabled) {
+          element.attachedGroup.TryRemoveElement(element);
+        }
       }
 
-      //Could be more efficient
-      foreach (var feature in _features) {
-        feature.AssignFeatureReferences();
+      if (!element.IsAttachedToGroup && element.enabled) {
+        TryAddElement(element);
       }
     }
   }
 
-  private void rebuildFeatureSupportInfo() {
-    using (new ProfilerSample("Rebuild Support Info")) {
-      var typeToFeatures = new Dictionary<Type, List<LeapGuiFeatureBase>>();
-      foreach (var feature in _features) {
-        Type featureType = feature.GetType();
-        List<LeapGuiFeatureBase> list;
-        if (!typeToFeatures.TryGetValue(featureType, out list)) {
-          list = new List<LeapGuiFeatureBase>();
-          typeToFeatures[featureType] = list;
-        }
+  private void doLateUpdateRuntime() {
+    if (_space == null) return;
 
-        list.Add(feature);
-      }
-
-
-      var featureToInfo = new Dictionary<LeapGuiFeatureBase, SupportInfo>();
-
-      foreach (var pair in typeToFeatures) {
-        var featureType = pair.Key;
-        var featureList = pair.Value;
-        var infoList = new List<SupportInfo>().FillEach(featureList.Count, () => SupportInfo.FullSupport());
-
-        var castList = Activator.CreateInstance(typeof(List<>).MakeGenericType(featureType)) as IList;
-        foreach (var feature in featureList) {
-          castList.Add(feature);
-        }
-
-        try {
-          if (_renderer == null) continue;
-
-          var interfaceType = typeof(ISupportsFeature<>).MakeGenericType(featureType);
-          if (!interfaceType.IsAssignableFrom(_renderer.GetType())) {
-            infoList.FillEach(() => SupportInfo.Error("This renderer does not support this feature."));
-            continue;
-          }
-
-          var supportDelegate = interfaceType.GetMethod("GetSupportInfo");
-
-          if (supportDelegate == null) {
-            Debug.LogError("Could not find support delegate.");
-            continue;
-          }
-
-          supportDelegate.Invoke(_renderer, new object[] { castList, infoList });
-        } finally {
-          for (int i = 0; i < featureList.Count; i++) {
-            featureToInfo[featureList[i]] = infoList[i];
-          }
-        }
-      }
-
-      _supportInfo = new List<SupportInfo>();
-      foreach (var feature in _features) {
-        _supportInfo.Add(feature.GetSupportInfo(this).OrWorse(featureToInfo[feature]));
-      }
+    //TODO, optimize this!  Don't do it every frame for the whole thing!
+    using (new ProfilerSample("Refresh space data")) {
+      _space.RefreshElementData(transform, 0, _anchors.Count);
     }
+
+    foreach (var group in _groups) {
+      group.UpdateRenderer();
+    }
+
+    _hasFinishedSetup = true;
   }
   #endregion
 }
