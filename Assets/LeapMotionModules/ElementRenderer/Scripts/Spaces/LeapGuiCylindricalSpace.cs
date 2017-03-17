@@ -51,7 +51,17 @@ public class LeapGuiCylindricalSpace : LeapGuiRadialSpace<LeapGuiCylindricalSpac
     }
 
     public Vector3 InverseTransformPoint(Vector3 localGuiPos) {
-      throw new NotImplementedException();
+      Vector3 result;
+
+      Vector3 anchorRectPos = space.gui.transform.InverseTransformPoint(anchor.position);
+
+      float angle = Mathf.Atan2(localGuiPos.x, localGuiPos.z);
+
+      result.x = angle + anchorRectPos.x;
+      result.y = localGuiPos.y;
+      result.z = new Vector2(localGuiPos.x, localGuiPos.z).magnitude;
+
+      return result;
     }
 
     public Quaternion TransformRotation(Vector3 localRectPos, Quaternion localRectRot) {
