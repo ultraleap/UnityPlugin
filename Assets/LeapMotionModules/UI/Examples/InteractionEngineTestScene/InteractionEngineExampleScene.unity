@@ -209,6 +209,10 @@ Prefab:
       propertyPath: _graspingEnabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 115536, guid: a2e4c6a003fcd1a43b91889103145982, type: 2}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: a2e4c6a003fcd1a43b91889103145982, type: 2}
   m_IsPrefabParent: 0
@@ -364,9 +368,9 @@ MonoBehaviour:
   ignoreHover: 0
   ignoreContact: 0
   ignoreGrasping: 0
-  allowsTwoHandedGrasp__curIgnored: 0
+  allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
+  graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &97302243
 Rigidbody:
@@ -639,9 +643,9 @@ MonoBehaviour:
   ignoreHover: 0
   ignoreContact: 0
   ignoreGrasping: 0
-  allowsTwoHandedGrasp__curIgnored: 0
+  allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
+  graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!1001 &267303580
 Prefab:
@@ -992,6 +996,30 @@ Light:
   m_BounceIntensity: 1
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!1 &428164967 stripped
+GameObject:
+  m_PrefabParentObject: {fileID: 134782, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
+  m_PrefabInternal: {fileID: 1563060436}
+--- !u!114 &428164968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 428164967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionManager: {fileID: 2021263763}
+  _interactionManagerIsNull: 0
+  ignoreHover: 0
+  ignoreContact: 0
+  ignoreGrasping: 0
+  allowMultiGrasp: 0
+  moveObjectWhenGrasped: 1
+  graspedMovementType: 0
+  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!1 &454600551
 GameObject:
   m_ObjectHideFlags: 0
@@ -2010,9 +2038,9 @@ MonoBehaviour:
   ignoreHover: 0
   ignoreContact: 0
   ignoreGrasping: 0
-  allowsTwoHandedGrasp__curIgnored: 0
+  allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
+  graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!1 &1102362655
 GameObject:
@@ -2749,6 +2777,10 @@ Prefab:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: c0c18ef181a780b43b7bf810b462055d, type: 2}
+    - target: {fileID: 5484986, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_Mass
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -2777,9 +2809,9 @@ MonoBehaviour:
   ignoreHover: 0
   ignoreContact: 0
   ignoreGrasping: 0
-  allowsTwoHandedGrasp__curIgnored: 0
+  allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
+  graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!1 &1401854405
 GameObject:
@@ -3149,7 +3181,8 @@ Prefab:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: c18fc270fa13e7b4f9f22eb4a672125b, type: 2}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11455500, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: d9a3036c5a2d06a418ecd71935d95c67, type: 2}
   m_IsPrefabParent: 0
 --- !u!4 &1563060437 stripped
@@ -3313,8 +3346,8 @@ MonoBehaviour:
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.HandPool+ModelGroup+HandEvent, Assembly-CSharp, Version=0.0.0.0,
-        Culture=neutral, PublicKeyToken=null
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
   - GroupName: BrushHands
     _handPool: {fileID: 0}
     LeftModel: {fileID: 1196371278}
@@ -3323,13 +3356,13 @@ MonoBehaviour:
     IsRightToBeSpawned: 0
     modelList: []
     modelsCheckedOut: []
-    IsEnabled: 1
+    IsEnabled: 0
     CanDuplicate: 0
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls: []
-      m_TypeName: Leap.Unity.HandPool+ModelGroup+HandEvent, Assembly-CSharp, Version=0.0.0.0,
-        Culture=neutral, PublicKeyToken=null
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
 --- !u!114 &1571656285
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3755,9 +3788,9 @@ MonoBehaviour:
   ignoreHover: 0
   ignoreContact: 0
   ignoreGrasping: 0
-  allowsTwoHandedGrasp__curIgnored: 0
+  allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
-  graspedHoldMovementType: 0
+  graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!64 &1905773859
 MeshCollider:
@@ -3918,8 +3951,17 @@ MonoBehaviour:
   enableGrasping: 1
   hoverActivationRadius: 0.5
   touchActivationRadius: 0.15
-  _showDebugOptions: 0
-  _debugDrawInteractionHands: 0
+  _autoGenerateLayers: 1
+  _templateLayer:
+    layerIndex: 0
+  _interactionLayer:
+    layerIndex: 8
+  _graspedObjectLayer:
+    layerIndex: 9
+  _contactBoneLayer:
+    layerIndex: 10
+  _showDebugOptions: 1
+  _debugDrawHandGizmos: 1
   contactOrGraspingEnabled: 1
 --- !u!4 &2021263764
 Transform:

@@ -37,7 +37,7 @@ namespace Leap.Unity.UI.Interaction {
 
     // TODO: Document OnObjectHover callbacks and how they differ from OnHover callbacks
     public Action<Hand> OnObjectHoverBegin = (closestHand) => { };
-    public Action<Hand> OnObjectHoverStay  = (closestHand) => { };
+    public Action<Hand> OnObjectHoverStay = (closestHand) => { };
     public Action<Hand> OnObjectHoverEnd = (closestHand) => { };
 
     public Action<Hand> OnPrimaryHoverBegin = (hand) => { };
@@ -141,6 +141,7 @@ namespace Leap.Unity.UI.Interaction {
 
     /// <summary> The RigidbodyWarper manipulates the graphical (but not physical) position
     /// of grasped objects based on the movement of the Leap hand so they appear move with less latency. </summary>
+    /// TODO: This is not actually implemented.
     [HideInInspector]
     public RigidbodyWarper rigidbodyWarper;
 
@@ -226,7 +227,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public override float GetDistance(Vector3 worldPosition) {
-      // TODO: Need to get distance from the InteractionBehaviour's colliders. Probably has to wait until 5.6 (Physics.ClosestPoint)
+      // TODO: Should probably get distance from the InteractionBehaviour's colliders. Probably has to wait until 5.6 (Physics.ClosestPoint)
       return GetInteractionDistanceToPoint(worldPosition);
     }
 

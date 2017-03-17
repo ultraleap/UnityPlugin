@@ -50,10 +50,10 @@ namespace Leap.Unity.Interaction {
     private float _perBoneMass = 1.0f;
 
     private bool _softContactEnabled = false;
-    private bool disableSoftContactEnqueued = false;
-    private Collider[] tempColliderArray = new Collider[2];
-    private Vector3[] previousBoneCenters = new Vector3[20];
-    private float softContactBoneRadius = 0.015f;
+    private bool _disableSoftContactEnqueued = false;
+    private Collider[] _tempColliderArray = new Collider[2];
+    private Vector3[] _previousBoneCenters = new Vector3[20];
+    private float _softContactBoneRadius = 0.015f;
     private List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(40);
     private Dictionary<Rigidbody, PhysicsUtility.Velocities> originalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>();
 
@@ -233,11 +233,11 @@ namespace Leap.Unity.Interaction {
             ////Generate and Fill softContacts with SoftContacts that are intersecting a sphere at boneCenter, with radius softContactBoneRadius
             bool sphereIntersecting;
             if (_manager != null) {
-              sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, softContactBoneRadius, (boneCenter - previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime,
-                                                    1 << _manager.InteractionLayer, ref _manager.softContacts, ref _manager.originalVelocities, ref tempColliderArray);
+              sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, _softContactBoneRadius, (boneCenter - _previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime,
+                                                    1 << _manager.InteractionLayer, ref _manager.softContacts, ref _manager.originalVelocities, ref _tempColliderArray);
             } else {
-              sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, softContactBoneRadius, (boneCenter - previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime,
-                                                    ~(1 << 2), ref softContacts, ref originalVelocities, ref tempColliderArray);
+              sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, _softContactBoneRadius, (boneCenter - _previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime,
+                                                    ~(1 << 2), ref softContacts, ref originalVelocities, ref _tempColliderArray);
             }
             softlyContacting = sphereIntersecting ? true : softlyContacting;
           }
@@ -249,19 +249,19 @@ namespace Leap.Unity.Interaction {
           if (_manager == null) {
             PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
           }
-          disableSoftContactEnqueued = false;
+          _disableSoftContactEnqueued = false;
         } else {
           //If there are no detected Contacts, exit soft contact mode
           disableSoftContact();
         }
       }
 
-      //Update the last positions of the bones with this frame
+      // Update the last positions of the bones with this frame.
       for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < 4; jointIndex++) {
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
           int boneArrayIndex = fingerIndex * 4 + jointIndex;
-          previousBoneCenters[boneArrayIndex] = bone.Center.ToVector3();
+          _previousBoneCenters[boneArrayIndex] = bone.Center.ToVector3();
         }
       }
     }
@@ -392,16 +392,16 @@ namespace Leap.Unity.Interaction {
     }
 
     public void disableSoftContact() {
-      if (!disableSoftContactEnqueued) {
+      if (!_disableSoftContactEnqueued) {
         StartCoroutine("delayedDisableSoftContact");
-        disableSoftContactEnqueued = true;
+        _disableSoftContactEnqueued = true;
       }
     }
 
     IEnumerator delayedDisableSoftContact() {
-      if (disableSoftContactEnqueued) { yield break; }
+      if (_disableSoftContactEnqueued) { yield break; }
       yield return new WaitForSecondsRealtime(0.3f);
-      if (disableSoftContactEnqueued) {
+      if (_disableSoftContactEnqueued) {
         _softContactEnabled = false;
         for (int i = _brushBones.Length; i-- != 0;) {
           _brushBones[i].col.isTrigger = false;
@@ -411,7 +411,7 @@ namespace Leap.Unity.Interaction {
     }
 
     public void enableSoftContact() {
-      disableSoftContactEnqueued = false;
+      _disableSoftContactEnqueued = false;
       if (!_softContactEnabled) {
         _softContactEnabled = true;
         resetHandJoints();
@@ -426,7 +426,7 @@ namespace Leap.Unity.Interaction {
           for (int jointIndex = 0; jointIndex < 4; jointIndex++) {
             Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
             int boneArrayIndex = fingerIndex * 4 + jointIndex;
-            previousBoneCenters[boneArrayIndex] = bone.Center.ToVector3();
+            _previousBoneCenters[boneArrayIndex] = bone.Center.ToVector3();
           }
         }
       }

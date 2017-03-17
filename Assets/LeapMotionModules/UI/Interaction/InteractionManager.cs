@@ -9,23 +9,6 @@ namespace Leap.Unity.UI.Interaction {
 
   public partial class InteractionManager : MonoBehaviour, IRuntimeGizmoComponent {
 
-    /// <summary>
-    /// Usually, only one InteractionManager is necessary per Unity scene. This property
-    /// will contain that InteractionManager as soon as its Awake() method is called.
-    /// </summary>
-    /// 
-    /// <details>
-    /// By default, this property contains the first InteractionManager that has had
-    /// its Awake() method called in the current scene. If an InteractionBehaviourBase
-    /// does not have a non-null interactionManager by the time has Start() called,
-    /// it will default to using the InteractionManager referenced here.
-    /// 
-    /// If for some reason you have multiple InteractionManagers in your scene and you
-    /// desire to instantiate an InteractionBehaviour at runtime, you should assign its
-    /// InteractionManager appropriately as soon as you instantiate it.
-    /// </details>
-    public static InteractionManager singleton { get; set; }
-
     [Header("Interactions")]
     public bool enableHovering = true;
     public bool enableContact  = true;
@@ -109,6 +92,13 @@ namespace Leap.Unity.UI.Interaction {
     private Dictionary<Rigidbody, InteractionBehaviourBase> _rigidbodyRegistry = new Dictionary<Rigidbody, InteractionBehaviourBase>();
     public Dictionary<Rigidbody, InteractionBehaviourBase> RigidbodyRegistry { get { return _rigidbodyRegistry; } }
 
+    /// <summary> Stores data for implementing Soft Contact for InteractionHands. </summary>
+    [NonSerialized]
+    public List<PhysicsUtility.SoftContact> _softContacts = new List<PhysicsUtility.SoftContact>(80);
+    /// <summary> Stores data for implementing Soft Contact for InteractionHands. </summary>
+    [NonSerialized]
+    public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
+
     void OnValidate() {
       contactOrGraspingEnabled = enableContact || enableGrasping;
 
@@ -116,6 +106,24 @@ namespace Leap.Unity.UI.Interaction {
         AutoGenerateLayers();
       }
     }
+
+    /// <summary> Often, only one InteractionManager is necessary per Unity scene.
+    /// This property will contain that InteractionManager as soon as its Awake()
+    /// method is called. Using more than one InteractionManager is valid, but be
+    /// sure to assign the InteractionBehaviour's desired manager appropriately.
+    /// </summary>
+    /// 
+    /// <remarks> By default, this static property contains the first InteractionManager
+    /// that has had its Awake() method called in the current scene. If an
+    /// InteractionBehaviourBase does not have a non-null interactionManager by the
+    /// time it has Start() called, it will default to using the InteractionManager
+    /// referenced here.
+    /// 
+    /// If you have multiple InteractionManagers in your scene, you should be sure to
+    /// assign InteractionBehaviours' managers appropriately. If you instantiate an
+    /// InteractionBehaviour at runtime, you should assign its InteractionManager
+    /// right after you instantiate it. </remarks>
+    public static InteractionManager singleton { get; set; }
 
     void Awake() {
       if (InteractionManager.singleton == null) singleton = this;
@@ -142,6 +150,12 @@ namespace Leap.Unity.UI.Interaction {
 
       foreach (var interactionHand in _interactionHands) {
         interactionHand.FixedUpdateHand(enableHovering, enableContact, enableGrasping);
+      }
+
+      // Apply soft contacts from both hands in unified solve.
+      // (This will clear softContacts and originalVelocities as well.)
+      if (_softContacts.Count > 0) {
+        PhysicsUtility.ApplySoftContacts(_softContacts, _softContactOriginalVelocities);
       }
 
       foreach (var interactionObj in _interactionBehaviours) {
