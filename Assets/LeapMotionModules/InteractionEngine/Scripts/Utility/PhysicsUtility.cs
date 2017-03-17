@@ -54,14 +54,11 @@ namespace Leap.Unity.Interaction {
     }
 
     public static bool generateSphereContacts(Vector3 spherePosition, float sphereRadius, Vector3 sphereVelocity, int layerMask, ref List<SoftContact> softContacts, ref Dictionary<Rigidbody, Velocities> originalVelocities, ref Collider[] temporaryColliderSwapSpace, bool interpretAsEllipsoid = true) {
-      Array.Clear(temporaryColliderSwapSpace, 0, temporaryColliderSwapSpace.Length);
-      Physics.OverlapSphereNonAlloc(spherePosition, sphereRadius, temporaryColliderSwapSpace, layerMask);
-
-      bool contacting = false;
-      foreach (Collider col in temporaryColliderSwapSpace) {
-        if (col != null && col.attachedRigidbody != null && !col.attachedRigidbody.isKinematic) {
+      int numberOfColliders = Physics.OverlapSphereNonAlloc(spherePosition, sphereRadius, temporaryColliderSwapSpace, layerMask);
+      for (int i = 0; i < numberOfColliders; i++) {
+        if (temporaryColliderSwapSpace[i].attachedRigidbody != null && !temporaryColliderSwapSpace[i].attachedRigidbody.isKinematic) {
           SoftContact contact = new SoftContact();
-          contact.body = col.attachedRigidbody;
+          contact.body = temporaryColliderSwapSpace[i].attachedRigidbody;
 
           //Store this rigidbody's pre-contact velocities and inverse world inertia tensor
           Velocities originalBodyVelocities;
@@ -84,17 +81,17 @@ namespace Leap.Unity.Interaction {
             }
           }
 
-          if (interpretAsEllipsoid || col is MeshCollider) {
+          if (interpretAsEllipsoid || temporaryColliderSwapSpace[i] is MeshCollider) {
             //First get the world spherical normal
-            contact.normal = (col.bounds.center - spherePosition).normalized;
+            contact.normal = (temporaryColliderSwapSpace[i].bounds.center - spherePosition).normalized;
             //Then divide by the world extends squared to get the world ellipsoidal normal
-            Vector3 colliderExtentsSquared = col.bounds.extents.CompMul(col.bounds.extents);
+            Vector3 colliderExtentsSquared = temporaryColliderSwapSpace[i].bounds.extents.CompMul(temporaryColliderSwapSpace[i].bounds.extents);
             contact.normal = contact.normal.CompDiv(colliderExtentsSquared).normalized;
           } else {
             //Else, use the analytic support functions that we have for boxes and capsules to generate the normal
-            Vector3 objectLocalBoneCenter = col.transform.InverseTransformPoint(spherePosition);
-            Vector3 objectPoint = col.transform.TransformPoint(col.ClosestPointOnSurface(objectLocalBoneCenter));
-            contact.normal = (objectPoint - spherePosition).normalized * (col.IsPointInside(objectLocalBoneCenter) ? -1f : 1f);
+            Vector3 objectLocalBoneCenter = temporaryColliderSwapSpace[i].transform.InverseTransformPoint(spherePosition);
+            Vector3 objectPoint = temporaryColliderSwapSpace[i].transform.TransformPoint(temporaryColliderSwapSpace[i].ClosestPointOnSurface(objectLocalBoneCenter));
+            contact.normal = (objectPoint - spherePosition).normalized * (temporaryColliderSwapSpace[i].IsPointInside(objectLocalBoneCenter) ? -1f : 1f);
           }
 
           contact.position = spherePosition + (contact.normal * sphereRadius);
@@ -102,10 +99,9 @@ namespace Leap.Unity.Interaction {
           contact.invWorldInertiaTensor = originalBodyVelocities.invWorldInertiaTensor;
 
           softContacts.Add(contact);
-          contacting = true;
         }
       }
-      return contacting;
+      return numberOfColliders > 0;
     }
 
     static void applySoftContact(Rigidbody thisObject, Vector3 handContactPoint, Vector3 handVelocityAtContactPoint, Vector3 normal, Matrix4x4 invWorldInertiaTensor) {
