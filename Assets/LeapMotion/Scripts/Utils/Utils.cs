@@ -15,6 +15,46 @@ namespace Leap.Unity {
       int r = x % m;
       return r < 0 ? r + m : r;
     }
+
+    /// <summary>
+    /// Returns a vector that is perpendicular to this vector.
+    /// The returned vector will have the same length as the
+    /// input vector.
+    /// </summary>
+    public static Vector2 Perpendicular(this Vector2 vector) {
+      return new Vector2(vector.y, -vector.x);
+    }
+
+    /// <summary>
+    /// Returns a vector that is perpendicular to this vector.
+    /// The returned vector is not guaranteed to be a unit vector,
+    /// nor is its length guaranteed to be the same as the source
+    /// vector's.
+    /// </summary>
+    public static Vector3 Perpendicular(this Vector3 vector) {
+      float x2 = vector.x * vector.x;
+      float y2 = vector.y * vector.y;
+      float z2 = vector.z * vector.z;
+
+      float mag0 = z2 + x2;
+      float mag1 = y2 + x2;
+      float mag2 = z2 + y2;
+
+      if (mag0 > mag1) {
+        if (mag0 > mag2) {
+          return new Vector3(-vector.z, 0, vector.x);
+        } else {
+          return new Vector3(0, vector.z, -vector.y);
+        }
+      } else {
+        if (mag1 > mag2) {
+          return new Vector3(vector.y, -vector.x, 0);
+        } else {
+          return new Vector3(0, vector.z, -vector.y);
+        }
+      }
+    }
+    
     #endregion
 
     #region Orientation Utils
