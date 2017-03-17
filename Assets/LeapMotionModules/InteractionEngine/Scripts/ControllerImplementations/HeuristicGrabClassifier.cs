@@ -1,17 +1,25 @@
 ﻿using UnityEngine;
-using System;
 using System.Collections.Generic;
-using Leap.Unity.RuntimeGizmos;
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace Leap.Unity.Interaction {
   public class HeuristicGrabClassifier {
+    //Grab Heuristic Tuning Parameters
+    //-----
+    //Adds hysteresis to the thumb to make it hold better
+    private const float FINGER_STICKINESS = 0f;
+    private const float THUMB_STICKINESS = 0.05f;
+    //The minimum and maximum curl values fingers are allowed to "Grab" within
+    private const float MAXIMUM_CURL = 0.65f;
+    private const float MINIMUM_CURL = -0.1f;
+    //The radius considered for intersection around the fingertips
+    private const float FINGERTIP_RADIUS = 0.01f;
+    private const float THUMBTIP_RADIUS = 0.015f;
+    //The minimum amount of time between repeated grabs of a single object
+    private const float GRAB_COOLDOWN = 0.2f;
+    //-----
+
     Collider[] collidingCandidates = new Collider[10];
     public InteractionManager _manager;
-    private Hand _hand;
 
     Dictionary<IInteractionBehaviour, GrabClassifier> leftGrabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifier>();
     Dictionary<IInteractionBehaviour, GrabClassifier> rightGrabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifier>();
@@ -21,7 +29,7 @@ namespace Leap.Unity.Interaction {
     }
 
     //Grab Classifier Logic
-    public void UpdateClassifier(GrabClassifier classifier) {
+    public void UpdateClassifier(GrabClassifier classifier, Hand _hand) {
       classifier.warpTrans = Matrix4x4.TRS(classifier.warper.RigidbodyPosition, classifier.warper.RigidbodyRotation, classifier.transform.localScale);
       
       //For each probe (fingertip)
@@ -30,25 +38,25 @@ namespace Leap.Unity.Interaction {
         float tempCurl = Vector3.Dot(_hand.Fingers[j].Direction.ToVector3(), (j != 0) ? _hand.Direction.ToVector3() : (_hand.IsLeft ? 1f : -1f) * _hand.Basis.xBasis.ToVector3());
 
         //Determine if this probe is intersecting an object
-        Array.Clear(collidingCandidates, 0, 10);
-        Physics.OverlapSphereNonAlloc(_hand.Fingers[j].TipPosition.ToVector3(), j == 0 ? 0.015f : 0.01f, collidingCandidates);
         bool collidingWithObject = false;
-        foreach(Collider col in collidingCandidates) {
-          if (col!=null && col.attachedRigidbody != null) {
-            collidingWithObject = (col.attachedRigidbody == classifier.body) ? true : collidingWithObject;
+        int numberOfColliders = Physics.OverlapSphereNonAlloc(_hand.Fingers[j].TipPosition.ToVector3(), j == 0 ? THUMBTIP_RADIUS : FINGERTIP_RADIUS, collidingCandidates);
+        for(int i = 0; i < numberOfColliders; i++) {
+          if (collidingCandidates[i].attachedRigidbody != null && collidingCandidates[i].attachedRigidbody == classifier.body) {
+            collidingWithObject = true;
+            break;
           }
         }
 
         //Nullify above findings if fingers are extended
-        bool tempIsInside = collidingWithObject && (tempCurl < 0.65f) && (tempCurl > -0.1f);
+        collidingWithObject = collidingWithObject && (tempCurl < MAXIMUM_CURL) && (tempCurl > MINIMUM_CURL);
 
         //Probes go inside when they intersect, probes come out when they uncurl
         if (!classifier.probes[j].isInside) {
-          classifier.probes[j].isInside = tempIsInside;
-          classifier.probes[j].curl = tempCurl + (j==0?0.15f:0f);
+          classifier.probes[j].isInside = collidingWithObject;
+          classifier.probes[j].curl = tempCurl + (j==0 ? THUMB_STICKINESS : FINGER_STICKINESS);
         } else {
           if (tempCurl > classifier.probes[j].curl) {
-            classifier.probes[j].isInside = tempIsInside;
+            classifier.probes[j].isInside = collidingWithObject;
           }
         }
       }
@@ -60,23 +68,24 @@ namespace Leap.Unity.Interaction {
                                                                  classifier.probes[4].isInside));
       //If grabbing within 10 frames of releasing, discard grab.
       //Suppresses spurious regrabs and makes throws work better.
-      if (classifier.coolDown <= 10) {
+      if (classifier.coolDownProgress <= GRAB_COOLDOWN) {
         if (classifier.isGrabbing) {
           classifier.isGrabbing = false;
         }
-        classifier.coolDown++;
+        classifier.coolDownProgress += Time.fixedDeltaTime;
       }
     }
 
-    public void UpdateBehaviour(IInteractionBehaviour behaviour) {
+    public void UpdateBehaviour(IInteractionBehaviour behaviour, Hand _hand) {
       GrabClassifier classifier;
-      if (!(_hand.IsLeft?leftGrabClassifiers: rightGrabClassifiers).TryGetValue(behaviour, out classifier)) {
+      Dictionary<IInteractionBehaviour, GrabClassifier> classifiers = (_hand.IsLeft ? leftGrabClassifiers : rightGrabClassifiers);
+      if (!classifiers.TryGetValue(behaviour, out classifier)) {
         classifier = new GrabClassifier(behaviour);
-        (_hand.IsLeft ? leftGrabClassifiers : rightGrabClassifiers).Add(behaviour, classifier);
+        classifiers.Add(behaviour, classifier);
       }
 
       //Do the actual grab classification logic
-      UpdateClassifier(classifier);
+      UpdateClassifier(classifier, _hand);
 
       if (classifier.isGrabbing != classifier.prevGrabbing) {
         if (classifier.isGrabbing) {
@@ -84,7 +93,7 @@ namespace Leap.Unity.Interaction {
           _manager.GraspWithHand(_hand, behaviour);
         } else if (!classifier.isGrabbing || behaviour.IsBeingGraspedByHand(_hand.Id)) {
           _manager.ReleaseHand(_hand.Id);
-          classifier.coolDown = 0;
+          classifier.coolDownProgress = 0f;
         }
       }
       classifier.prevGrabbing = classifier.isGrabbing;
@@ -93,14 +102,13 @@ namespace Leap.Unity.Interaction {
     //Classifier bookkeeping
     public void UpdateHeuristicClassifier(Hand hand) {
       if (hand != null) {
-        _hand = hand;
 
         //First check if already holding an object and only process that one
         bool alreadyGrasping = false;
         var graspedBehaviours = _manager.GraspedObjects;
         for (int i = 0; i < graspedBehaviours.Count; i++) {
-          if (graspedBehaviours[i].IsBeingGraspedByHand(_hand.Id)) {
-            UpdateBehaviour(graspedBehaviours[i]);
+          if (graspedBehaviours[i].IsBeingGraspedByHand(hand.Id)) {
+            UpdateBehaviour(graspedBehaviours[i], hand);
             alreadyGrasping = true;
             break;
           }
@@ -110,7 +118,7 @@ namespace Leap.Unity.Interaction {
         if (!alreadyGrasping) {
           var activeBehaviours = _manager._activityManager.ActiveBehaviours;
           for (int i = 0; i < activeBehaviours.Count; i++) {
-            UpdateBehaviour(activeBehaviours[i]);
+            UpdateBehaviour(activeBehaviours[i], hand);
           }
         }
       }
@@ -125,14 +133,14 @@ namespace Leap.Unity.Interaction {
       public Rigidbody body;
       public RigidbodyWarper warper;
       public Matrix4x4 warpTrans;
-      public int coolDown;
+      public float coolDownProgress;
 
       public GrabClassifier(IInteractionBehaviour behaviour) {
         probes = new GrabProbe[5];
         transform = behaviour.transform;
         body = behaviour.GetComponent<Rigidbody>();
         warper = (behaviour as InteractionBehaviour).warper;
-        coolDown = 0;
+        coolDownProgress = 0;
       }
     }
 

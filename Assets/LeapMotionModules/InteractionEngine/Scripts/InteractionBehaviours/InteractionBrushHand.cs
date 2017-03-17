@@ -156,7 +156,7 @@ namespace Leap.Unity.Interaction {
         brushGameObject.transform.position = _hand.PalmPosition.ToVector3();
         brushGameObject.transform.rotation = _hand.Rotation.ToQuaternion();
         BoxCollider box = brushGameObject.GetComponent<BoxCollider>();
-        box.center = new Vector3(_hand.IsLeft ? -0.005f : 0.005f, bone.Width * -0.3f, -0.01f);
+        box.center = new Vector3(_hand.IsLeft ? -0.005f : 0.005f, bone.Width * -0.1f, -0.015f);
         box.size = new Vector3(bone.Length, bone.Width, bone.Length);
         box.material = _material;
 
@@ -370,8 +370,8 @@ namespace Leap.Unity.Interaction {
 
     //Reconnect and Reset all the joints in the hand
     void resetHandJoints() {
-      _brushBones[N_FINGERS * N_ACTIVE_BONES].transform.position = _hand.PalmPosition.ToVector3();
-      _brushBones[N_FINGERS * N_ACTIVE_BONES].transform.rotation = _hand.Rotation.ToQuaternion();
+      _brushBones[N_FINGERS * N_ACTIVE_BONES].transform.position = _brushBones[N_FINGERS * N_ACTIVE_BONES].body.position = _hand.PalmPosition.ToVector3();
+      _brushBones[N_FINGERS * N_ACTIVE_BONES].transform.rotation = _brushBones[N_FINGERS * N_ACTIVE_BONES].body.rotation = _hand.Rotation.ToQuaternion();
       for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
           Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.

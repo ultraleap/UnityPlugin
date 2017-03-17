@@ -29,7 +29,7 @@ namespace Leap.Unity.Interaction {
     /** This InteractionBrushBone's target position. */
     public Vector3 lastTarget;
     /** The mass of the last object this InteractionBrushBone touched. */
-    public float massOfLastTouchedObject;
+    public float massOfLastTouchedObject = 1f;
 
     public void DisableColliderTemporarily(float seconds) {
       StartCoroutine(TemporaryDisable(seconds));
