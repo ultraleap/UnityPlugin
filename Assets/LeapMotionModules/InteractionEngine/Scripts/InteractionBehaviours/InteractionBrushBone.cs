@@ -28,14 +28,21 @@ namespace Leap.Unity.Interaction {
     public FixedJoint metacarpalJoint;
     /** This InteractionBrushBone's target position. */
     public Vector3 lastTarget;
+    /** The mass of the last object this InteractionBrushBone touched. */
+    public float massOfLastTouchedObject;
 
     public void DisableColliderTemporarily(float seconds) {
       StartCoroutine(TemporaryDisable(seconds));
     }
+
     private IEnumerator TemporaryDisable(float seconds) {
       col.isTrigger = true;
       yield return new WaitForSecondsRealtime(seconds);
       col.isTrigger = false;
+    }
+
+    private void OnCollisionEnter(Collision collision) {
+      massOfLastTouchedObject = collision.collider.attachedRigidbody.mass;
     }
 
 #if UNITY_EDITOR

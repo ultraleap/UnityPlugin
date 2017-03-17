@@ -47,7 +47,7 @@ namespace Leap.Unity.Interaction {
 
     /** The physics mass value used for each bone in the hand when running the interaction simulation. */
     [SerializeField]
-    private float _perBoneMass = 1.0f;
+    private float _perBoneMass = 0.2f;
 
     private bool _softContactEnabled = false;
     private bool disableSoftContactEnqueued = false;
@@ -301,7 +301,7 @@ namespace Leap.Unity.Interaction {
       // Calculate how far off the mark the brushes are.
       float targetingError = Vector3.Distance(brushBone.lastTarget, body.position) / bone.Width;
       float massScale = Mathf.Clamp(1.0f - (targetingError * 2.0f), 0.1f, 1.0f) * Mathf.Clamp(_hand.PalmVelocity.Magnitude * 10f, 1f, 10f);
-      body.mass = _perBoneMass * massScale;
+      body.mass = _perBoneMass * massScale * brushBone.massOfLastTouchedObject;
 
       //If these conditions are met, stop using brush hands to contact objects and switch to "Soft Contact"
       if (!_softContactEnabled && targetingError >= DISLOCATION_FRACTION && _hand.PalmVelocity.Magnitude < 1.5f && boneArrayIndex != N_ACTIVE_BONES * N_FINGERS) {
