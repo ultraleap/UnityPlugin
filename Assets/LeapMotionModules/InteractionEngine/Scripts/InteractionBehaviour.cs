@@ -32,9 +32,8 @@ namespace Leap.Unity.Interaction {
   [RequireComponent(typeof(Rigidbody))]
   public partial class InteractionBehaviour : InteractionBehaviourBase {
     protected enum ContactMode {
-      NORMAL = 0,  // Influenced by brushes and not by soft contact.
-      SOFT = 1,    // Influenced by soft contact and not by brushes.  Will not return to NORMAL until no brush or soft contact remains.
-      GRASPED = 2, // Not infuenced by either brushes or soft contact.  Returns to SOFT not NORMAL.
+      NORMAL = 0,  // Influenced by brushes and by soft contact.
+      GRASPED = 1, // Not infuenced by either brushes or soft contact.
     };
 
     [Tooltip("The InteractionMaterial defining interaction behaviors.")]
@@ -52,8 +51,6 @@ namespace Leap.Unity.Interaction {
     protected float _angularDrag;
 
     // Try to allow brushes to exit gracefully when passing fingers between objects.
-    private const int DISLOCATED_BRUSH_COOLDOWN = 30;
-    protected uint _dislocatedBrushCounter = DISLOCATED_BRUSH_COOLDOWN;
     protected ContactMode _contactMode = ContactMode.NORMAL;
 
     protected bool _recievedVelocityUpdate = false;
@@ -204,7 +201,7 @@ namespace Leap.Unity.Interaction {
       Assert.IsTrue(UntrackedHandCount == 0);
 
       // Ditch this object in the layer that doesn't collide with brushes in case they are still embedded.
-      _contactMode = ContactMode.SOFT;
+      _contactMode = ContactMode.GRASPED;
       updateLayer();
 
       _warper.Dispose();
@@ -216,21 +213,13 @@ namespace Leap.Unity.Interaction {
     protected override void OnPreSolve() {
       base.OnPreSolve();
       _recievedVelocityUpdate = false;
-      
-      ++_dislocatedBrushCounter;
-      _minHandDistance = float.MaxValue;
 
-      if (_dislocatedBrushCounter == DISLOCATED_BRUSH_COOLDOWN) {
-        updateContactMode();
-      }
-
-#if UNITY_EDITOR
       if (_contactMode == ContactMode.GRASPED && UntrackedHandCount == 0 &&
-          //Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale ||
+          _solvedPosition != Vector3.zero &&
+          Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale ||
           Quaternion.Angle(_solvedRotation, _warper.RigidbodyRotation) > _material.ReleaseAngle) {
         _manager.ReleaseObject(this);
       }
-#endif
     }
 
     protected override void OnPostSolve() {
@@ -322,6 +311,7 @@ namespace Leap.Unity.Interaction {
       base.OnHandReleased(hand);
 
       _controllers.HoldingPoseController.RemoveHand(hand);
+      _solvedPosition = Vector3.zero;
     }
 
     protected override void OnHandLostTracking(Hand oldHand, out float maxSuspensionTime) {
@@ -383,11 +373,6 @@ namespace Leap.Unity.Interaction {
 
       // Transition to soft contact when exiting grasp.  This is because the fingers
       // are probably embedded.
-      if (lastHand != null && lastHand.PalmNormal.Dot(Vector.Up) < 0.2) {
-        _dislocatedBrushCounter = 0;
-      }else {
-        _dislocatedBrushCounter = DISLOCATED_BRUSH_COOLDOWN - 7;
-      }
       updateContactMode();
     }
     #endregion
@@ -395,7 +380,6 @@ namespace Leap.Unity.Interaction {
     #region BRUSH CALLBACKS
 
     public override void NotifyBrushDislocated() {
-      _dislocatedBrushCounter = 0;
       updateContactMode();
     }
 
@@ -458,8 +442,6 @@ namespace Leap.Unity.Interaction {
       ContactMode desiredContactMode = ContactMode.NORMAL;
       if (base.IsBeingGrasped) {
         desiredContactMode = ContactMode.GRASPED;
-      } else if (_dislocatedBrushCounter < DISLOCATED_BRUSH_COOLDOWN || (_contactMode != ContactMode.NORMAL && _minHandDistance <= 0.0f)) {
-        desiredContactMode = ContactMode.SOFT;
       }
 
       if (_contactMode != desiredContactMode) {

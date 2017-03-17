@@ -590,6 +590,8 @@ namespace Leap.Unity.RuntimeGizmos {
         Collider collider = _colliderList[i];
         RelativeTo(collider.transform);
 
+        if (collider.isTrigger) { continue; }
+
         if (collider is BoxCollider) {
           BoxCollider box = collider as BoxCollider;
           if (useWireframe) {

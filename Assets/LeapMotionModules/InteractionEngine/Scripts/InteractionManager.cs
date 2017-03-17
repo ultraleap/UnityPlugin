@@ -99,18 +99,6 @@ namespace Leap.Unity.Interaction {
     [Tooltip("Automatically validate integrity of simulation state each frame.  Can cause slowdown, but is always compiled out for release builds.")]
     [SerializeField]
     protected bool _automaticValidation = false;
-
-    [Tooltip("Shows the debug visualization coming from the internal Interaction plugin.")]
-    [SerializeField]
-    protected bool _showDebugLines = false;
-
-    [Tooltip("Shows the debug messages coming from the internal Interaction plugin.")]
-    [SerializeField]
-    protected bool _showDebugOutput = false;
-
-    [Tooltip("Will display the debug messages if assigned.")]
-    [SerializeField]
-    protected Text _debugTextView;
     #endregion
 
     #region INTERNAL FIELDS
@@ -127,14 +115,16 @@ namespace Leap.Unity.Interaction {
     protected Dictionary<int, InteractionHand> _idToInteractionHand = new Dictionary<int, InteractionHand>();
     protected List<IInteractionBehaviour> _graspedBehaviours = new List<IInteractionBehaviour>();
     protected HeuristicGrabClassifier _grabClassifier;
+    [NonSerialized]
+    public List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(80);
+    [NonSerialized]
+    public Dictionary<Rigidbody, PhysicsUtility.Velocities> originalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
 
     private float _cachedSimulationScale = -1;
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
     private List<int> _handIdsToRemove = new List<int>();
     //A temp list that is recycled.  Used as the argument to OnHandsHold.
     private List<Hand> _holdingHands = new List<Hand>();
-    //A temp list that is recycled.  Used to recieve debug logs from InteractionC.
-    private List<string> _debugOutput = new List<string>();
     #endregion
 
     #region PUBLIC METHODS
@@ -302,30 +292,6 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    /// <summary>
-    /// Enables the display of proximity information from the library.
-    /// </summary>
-    public bool ShowDebugLines {
-      get {
-        return _showDebugLines;
-      }
-      set {
-        _showDebugLines = value;
-      }
-    }
-
-    /// <summary>
-    /// Enables the display of debug text from the library.
-    /// </summary>
-    public bool ShowDebugOutput {
-      get {
-        return _showDebugOutput;
-      }
-      set {
-        _showDebugOutput = value;
-      }
-    }
-
     /// Force an update of the internal scene info.  This should be called if gravity has changed.
     /// </summary>
     public void UpdateSceneInfo() {
@@ -372,6 +338,11 @@ namespace Leap.Unity.Interaction {
             if (_graspingEnabled) {
             }
             interactionHand.ReleaseObject();
+
+            InteractionBrushHand ibHand;
+            if ((ibHand = _handPool.GetHandModel<InteractionBrushHand>(interactionHand.hand.Id)) != null) {
+              ibHand.enableSoftContact();
+            }
           }
         }
       }
@@ -398,6 +369,12 @@ namespace Leap.Unity.Interaction {
       }
 
       interactionHand.ReleaseObject();
+
+      InteractionBrushHand ibHand;
+      if ((ibHand = _handPool.GetHandModel<InteractionBrushHand>(interactionHand.hand.Id)) != null){
+        ibHand.enableSoftContact();
+      }
+
       return true;
     }
 
@@ -574,27 +551,8 @@ namespace Leap.Unity.Interaction {
         OnGraphicalUpdate();
       }
 
-      if (_showDebugOutput && _debugTextView != null) {
-        string text = "";
-        for (int i = 0; i < _debugOutput.Count; i++) {
-          text += _debugOutput[i];
-          if (i != _debugOutput.Count - 1) {
-            text += "\n";
-          }
-        }
-        _debugTextView.text = text;
-      }
-
       if (_automaticValidation) {
         Validate();
-      }
-    }
-
-    protected virtual void OnGUI() {
-      if (_showDebugOutput) {
-        for (int i = 0; i < _debugOutput.Count; i++) {
-          GUILayout.Label(_debugOutput[i]);
-        }
       }
     }
     #endregion
@@ -655,7 +613,11 @@ namespace Leap.Unity.Interaction {
 
       dispatchOnHandsHoldingAll(frame, isPhysics: true);
 
-      //Simulation went here
+      //Apply soft contacts from both hands in unified solve
+      //(this will clear softContacts and originalVelocities as well)
+      if (softContacts.Count > 0) {
+        PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
+      }
 
       updateInteractionStateChanges(frame);
 

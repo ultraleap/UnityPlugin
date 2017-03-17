@@ -25,6 +25,7 @@ Shader "LeapMotion/LeapPaint/OpaqueWhite" {
 			
 			v2f vert (appdata v) {
         v2f o;
+        UNITY_SETUP_INSTANCE_ID (v);
         o.vertex = UnityObjectToClipPos(v.vertex);
         return o;
       }

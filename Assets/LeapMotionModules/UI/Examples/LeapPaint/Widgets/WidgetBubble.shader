@@ -16,6 +16,14 @@
 		#pragma surface surf Standard noshadow alpha:blend vertex:vert
 		#pragma target 3.0
 
+    // TODO: To reduce the passes needed to render, add "noforwardadd"
+    // and use a simple cubemap to reproduce the reflection effect
+
+    // TODO: Remove liquid distortion and checkering effects to
+    // simplify the shader
+    
+    // TODO: Try to simplify the fragment shader
+
 		struct Input {
       float3 viewDir;
 			float3 worldNormal;

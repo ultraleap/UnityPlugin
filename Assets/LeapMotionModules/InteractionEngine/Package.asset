@@ -15,10 +15,5 @@ MonoBehaviour:
   _generateBuildDropdown: 1
   _dependantFolders:
   - Assets\LeapMotionModules\InteractionEngine
-  _dependantFiles:
-  - Assets\Plugins\x86\LeapInteractionEngine.dll
-  - Assets\Plugins\x86_64\LeapInteractionEngine.dll
-  - Assets\StreamingAssets\InteractionEngine\IE.ldat
-  - Assets\Plugins\Android\libLeapInteractionEngine.so
-  - Assets\Plugins\Android\libLeapInteractionEngine.so
+  _dependantFiles: []
   _dependantPackages: []
