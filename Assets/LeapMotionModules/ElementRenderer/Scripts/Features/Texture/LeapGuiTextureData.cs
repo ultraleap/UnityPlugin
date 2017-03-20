@@ -8,6 +8,7 @@ public static class LeapGuiTextureExtensions {
   }
 }
 
+[LeapGuiTag("Texture")]
 [AddComponentMenu("")]
 public class LeapGuiTextureData : LeapGuiElementData {
 

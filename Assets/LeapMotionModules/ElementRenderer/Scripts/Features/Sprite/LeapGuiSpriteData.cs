@@ -8,6 +8,7 @@ public static class LeapGuiSpriteExtensions {
   }
 }
 
+[LeapGuiTag("Sprite")]
 [AddComponentMenu("")]
 public class LeapGuiSpriteData : LeapGuiElementData {
 

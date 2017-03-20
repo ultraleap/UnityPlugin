@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Leap.Unity;
+using Leap.Unity.Query;
 
 [CustomEditor(typeof(LeapGuiMesherBase), editorForChildClasses: true, isFallback = true)]
 public class LeapGuiMesherBaseEditor : CustomEditorBase {
@@ -22,7 +23,8 @@ public class LeapGuiMesherBaseEditor : CustomEditorBase {
 
     specifyCustomDecorator("_shader", drawMeshSettings);
     specifyConditionalDrawing("_useColors", "_globalTint");
-    
+    specifyConditionalDrawing(hasTextureFeature, "_atlas");
+
     specifyCustomDecorator("_shader", renderingSettingsHeader);
   }
 
@@ -70,7 +72,34 @@ public class LeapGuiMesherBaseEditor : CustomEditorBase {
   private void renderingSettingsHeader(SerializedProperty property) {
     EditorGUI.indentLevel--;
     EditorGUILayout.Space();
-    EditorGUILayout.LabelField("Rendering Settings", EditorStyles.boldLabel);
+
+    using (new EditorGUILayout.HorizontalScope()) {
+      EditorGUILayout.LabelField("Rendering Settings", EditorStyles.boldLabel);
+
+      if (hasTextureFeature()) {
+        var mesher = target as LeapGuiMesherBase;
+        if (mesher.IsAtlasDirty) {
+          GUI.color = Color.yellow;
+        }
+
+        if (GUILayout.Button("Refresh Atlas")) {
+          try {
+            mesher.RebuildAtlas(new ProgressBar());
+            mesher.gui.ScheduleEditorUpdate();
+          } finally {
+            EditorUtility.ClearProgressBar();
+          }
+        }
+
+        GUI.color = Color.white;
+      }
+    }
+
     EditorGUI.indentLevel++;
+  }
+
+  private bool hasTextureFeature() {
+    var mesher = target as LeapGuiMesherBase;
+    return mesher.group.features.Query().OfType<LeapGuiTextureFeature>().Any();
   }
 }

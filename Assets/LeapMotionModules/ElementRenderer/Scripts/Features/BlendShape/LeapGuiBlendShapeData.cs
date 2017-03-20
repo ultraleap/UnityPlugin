@@ -9,6 +9,7 @@ public static class LeapGuiBlendShapeExtensions {
   }
 }
 
+[LeapGuiTag("Blend Shape")]
 [AddComponentMenu("")]
 public class LeapGuiBlendShapeData : LeapGuiElementData {
 

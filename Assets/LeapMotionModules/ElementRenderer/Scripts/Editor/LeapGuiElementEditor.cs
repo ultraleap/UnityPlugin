@@ -40,29 +40,34 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
   public override void OnInspectorGUI() {
     targets.Query().Where(e => e != null).Select(e => e as LeapGuiElement).FillList(elements);
 
-    drawScriptAndGroupGui();
+    LeapGuiGroup mainGroup = null;
+    LeapGuiGroup sharedGroup = null;
+
+    if (elements.Query().All(e => e.IsAttachedToGroup)) {
+      var mainGui = elements[0].attachedGroup.gui;
+      if (elements.Query().All(e => e.attachedGroup.gui == mainGui)) {
+        mainGroup = elements[0].attachedGroup;
+        if (elements.Query().All(e => e.attachedGroup == mainGroup)) {
+          sharedGroup = mainGroup;
+        }
+      }
+    }
+
+    drawScriptAndGroupGui(mainGroup);
 
     base.OnInspectorGUI();
 
-    drawFeatureData();
+    drawFeatureData(sharedGroup);
   }
 
-  protected void drawScriptAndGroupGui() {
+  protected void drawScriptAndGroupGui(LeapGuiGroup mainGroup) {
     using (new GUILayout.HorizontalScope()) {
       drawScriptField();
 
-      //Bail if any of the elements is not attached
-      if (elements.Query().Any(e => !e.IsAttachedToGroup)) {
+      if (mainGroup == null) {
         return;
       }
 
-      //Bail if all of the elements are not part of the same gui
-      var mainGui = elements[0].attachedGroup.gui;
-      if (!elements.Query().All(e => e.attachedGroup.gui == mainGui)) {
-        return;
-      }
-
-      var mainGroup = elements[0].attachedGroup;
       string buttonText;
       if (!elements.Query().All(e => e.attachedGroup == mainGroup)) {
         buttonText = "-";
@@ -73,7 +78,7 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
       if (GUILayout.Button(buttonText, EditorStyles.miniButton, GUILayout.Width(60))) {
         GenericMenu groupMenu = new GenericMenu();
         int index = 0;
-        foreach (var group in mainGui.groups.Query().Where(g => g.renderer.IsValidElement(elements[0]))) {
+        foreach (var group in mainGroup.gui.groups.Query().Where(g => g.renderer.IsValidElement(elements[0]))) {
           string tag = LeapGuiTagAttribute.GetTag(group.renderer.GetType());
           groupMenu.AddItem(new GUIContent(index.ToString() + ": " + tag), false, () => {
             foreach (var element in elements) {
@@ -85,7 +90,7 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
               }
             }
 
-            mainGui.ScheduleEditorUpdate();
+            mainGroup.gui.ScheduleEditorUpdate();
           });
           index++;
         }
@@ -94,7 +99,7 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
     }
   }
 
-  protected void drawFeatureData() {
+  protected void drawFeatureData(LeapGuiGroup sharedGroup) {
     using (new ProfilerSample("Draw Leap Gui Element Editor")) {
       if (elements.Count == 0) return;
       var mainElement = elements[0];
@@ -121,7 +126,20 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
       }
 
       EditorGUILayout.Space();
-      EditorGUILayout.LabelField("Feature Data: ", EditorStyles.boldLabel);
+
+      using (new GUILayout.HorizontalScope()) {
+        EditorGUILayout.LabelField("Feature Data: ", EditorStyles.boldLabel);
+
+        if (sharedGroup != null) {
+          var bakedRenderer = sharedGroup.renderer as LeapGuiBakedRenderer;
+          if (bakedRenderer != null && bakedRenderer.IsAtlasDirty) {
+            if (GUILayout.Button("Refresh Atlas", GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight))) {
+              bakedRenderer.RebuildAtlas(new ProgressBar());
+              sharedGroup.gui.ScheduleEditorUpdate();
+            }
+          }
+        }
+      }
 
       for (int i = 0; i < mainElement.data.Count; i++) {
         var mainDataObj = mainElement.data[i];

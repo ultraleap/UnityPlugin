@@ -60,7 +60,11 @@ public static class HashUtil {
   }
 
   public static void Combine<T>(ref int hash, T combineWith) {
-    hash = hash * 31 + combineWith.GetHashCode();
+    if (combineWith != null) {
+      hash = hash * 31 + combineWith.GetHashCode();
+    } else {
+      hash = hash * 31 + 0x2692d0f9;
+    }
   }
 
   public static void CombineSequence<T>(ref int hash, List<T> sequence) {

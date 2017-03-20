@@ -7,6 +7,7 @@ public static class LeapGuiTintExtensions {
   }
 }
 
+[LeapGuiTag("Tint")]
 [AddComponentMenu("")]
 public class LeapGuiTintData : LeapGuiElementData {
 
