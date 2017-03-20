@@ -4,38 +4,44 @@ using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using Leap.Unity.Query;
 
 public class RendererTextureData : ScriptableObject {
   [SerializeField]
-  private List<Texture2D> packedTextures = new List<Texture2D>();
+  private List<NamedTexture> packedTextures = new List<NamedTexture>();
 
   private void OnDestroy() {
     foreach (var tex in packedTextures) {
-      DestroyImmediate(tex, allowDestroyingAssets: true);
+      DestroyImmediate(tex.texture, allowDestroyingAssets: true);
     }
   }
 
 #if UNITY_EDITOR
   public void Clear() {
-    foreach (var texture in packedTextures) {
-      DestroyImmediate(texture, allowDestroyingAssets: true);
+    foreach (var tex in packedTextures) {
+      DestroyImmediate(tex.texture, allowDestroyingAssets: true);
     }
     packedTextures.Clear();
   }
 
-  public void AssignTextures(Texture2D[] textures) {
-    List<Texture2D> newList = new List<Texture2D>();
-    newList.AddRange(textures);
+  public void AssignTextures(Texture2D[] textures, string[] propertyNames) {
+    List<NamedTexture> newList = new List<NamedTexture>();
+    for (int i = 0; i < textures.Length; i++) {
+      newList.Add(new NamedTexture() {
+        propertyName = propertyNames[i],
+        texture = textures[i]
+      });
+    }
 
     foreach (var tex in packedTextures) {
-      if (!newList.Contains(tex)) {
-        DestroyImmediate(tex, allowDestroyingAssets: true);
+      if (!newList.Query().Any(p => p.texture == tex.texture)) {
+        DestroyImmediate(tex.texture, allowDestroyingAssets: true);
       }
     }
 
-    foreach (var tex in newList) {
-      if (!packedTextures.Contains(tex)) {
-        AssetDatabase.AddObjectToAsset(tex, this);
+    foreach (var pair in newList) {
+      if (!packedTextures.Contains(pair)) {
+        AssetDatabase.AddObjectToAsset(pair.texture, this);
       }
     }
 
@@ -44,15 +50,19 @@ public class RendererTextureData : ScriptableObject {
   }
 #endif
 
+  public Texture2D GetTexture(string propertyName) {
+    return packedTextures.Query().
+                          FirstOrDefault(p => p.propertyName == propertyName).texture;
+  }
+
   public int Count {
     get {
       return packedTextures.Count;
     }
   }
 
-  public Texture2D this[int index] {
-    get {
-      return packedTextures[index];
-    }
+  public struct NamedTexture {
+    public string propertyName;
+    public Texture2D texture;
   }
 }

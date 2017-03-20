@@ -150,12 +150,11 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
 
       progress.Begin(2, "", "", () => {
         progress.Step("Saving To Asset");
-        _packedTextures.AssignTextures(packedTextures);
+        _packedTextures.AssignTextures(packedTextures, _textureFeatures.Query().Select(f => f.propertyName).ToArray());
 
         progress.Begin(_textureFeatures.Count, "", "Loading Into Scene", () => {
-          for (int i = 0; i < _textureFeatures.Count; i++) {
-            progress.Step();
-            _material.SetTexture(_textureFeatures[i].propertyName, _packedTextures[i]);
+          foreach (var feature in _textureFeatures) {
+            _material.SetTexture(feature.propertyName, _packedTextures.GetTexture(feature.propertyName));
           }
         });
       });
@@ -288,8 +287,8 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
       if (_textureFeatures.Count != 0) {
         _atlas.UpdateTextureList(_textureFeatures);
 
-        for (int i = 0; i < _packedTextures.Count; i++) {
-          _material.SetTexture(_textureFeatures[i].propertyName, _packedTextures[i]);
+        foreach (var feature in _textureFeatures) {
+          _material.SetTexture(feature.propertyName, _packedTextures.GetTexture(feature.propertyName));
         }
       }
 
