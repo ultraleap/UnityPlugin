@@ -1,6 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+using Leap.Unity.Attributes;
 
 public abstract class LeapGuiRendererBase : LeapGuiComponentBase<LeapGui> {
 
@@ -69,7 +74,9 @@ public abstract class LeapGuiRendererBase : LeapGuiComponentBase<LeapGui> {
   public abstract LeapGuiElement GetValidElementOnObject(GameObject obj);
 }
 
-public abstract class LeapGuiRenderer<ElementType> : LeapGuiRendererBase where ElementType : LeapGuiElement {
+public abstract class LeapGuiRenderer<ElementType> : LeapGuiRendererBase
+  where ElementType : LeapGuiElement {
+  public const string ASSET_PATH = "Assets/Generated/RendererData/";
 
   public override bool IsValidElement<T>() {
     Type t = typeof(T);
@@ -84,5 +91,51 @@ public abstract class LeapGuiRenderer<ElementType> : LeapGuiRendererBase where E
 
   public override LeapGuiElement GetValidElementOnObject(GameObject obj) {
     return obj.GetComponent<ElementType>();
+  }
+
+  protected bool EnsureAssetSaved<T>(ref T asset, string name) where T : ScriptableObject {
+    if (asset != null) {
+      return true;
+    }
+
+    var scene = gameObject.scene;
+    if (!scene.IsValid()) {
+      return false;
+    }
+
+    var path = scene.path;
+    if (string.IsNullOrEmpty(path)) {
+      return false;
+    }
+
+    string directory = Path.GetDirectoryName(path);
+    string folderName = Path.GetFileNameWithoutExtension(path) + "_ElementData";
+    string fullDir = Path.Combine(directory, folderName);
+    string fullPath = Path.Combine(fullDir, name);
+
+    Directory.CreateDirectory(fullDir);
+
+    int index = 1;
+    string finalPath;
+    do {
+      finalPath = fullPath + " " + index + ".asset";
+      index++;
+    } while (File.Exists(finalPath));
+    
+    Undo.RecordObject(this, "Created renderer asset");
+    asset = ScriptableObject.CreateInstance<T>();
+    AssetDatabase.CreateAsset(asset, finalPath);
+    AssetDatabase.SaveAssets();
+    EditorUtility.SetDirty(this);
+
+    return true;
+  }
+
+  protected void DeleteAsset<T>(ref T asset) where T : ScriptableObject {
+    string path = AssetDatabase.GetAssetPath(asset);
+
+    DestroyImmediate(asset, allowDestroyingAssets: true);
+
+    AssetDatabase.DeleteAsset(path);
   }
 }

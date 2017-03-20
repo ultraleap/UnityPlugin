@@ -200,15 +200,17 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     _renderer.OnEnableRendererEditor();
   }
 
-  public void AddFeature(Type featureType) {
+  public LeapGuiFeatureBase AddFeature(Type featureType) {
     AssertHelper.AssertEditorOnly();
     _gui.ScheduleEditorUpdate();
 
-    var feature = gameObject.AddComponent(featureType);
-    _features.Add(feature as LeapGuiFeatureBase);
+    var feature = gameObject.AddComponent(featureType) as LeapGuiFeatureBase;
+    _features.Add(feature);
 
     EditorUtility.SetDirty(this);
     _gui.ScheduleEditorUpdate();
+
+    return feature;
   }
 
   public void RemoveFeature(LeapGuiFeatureBase feature) {
@@ -373,16 +375,12 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     }
   }
 
-  private void OnDestroy() {
 #if UNITY_EDITOR
-    if (!Application.isPlaying) {
-      if (_renderer != null) {
-        _renderer.OnDisableRendererEditor();
-      }
-    }
-#endif
+  protected override void OnDestroyedByUser() {
+    base.OnDestroyedByUser();
 
     if (_renderer != null) {
+      _renderer.OnDisableRendererEditor();
       InternalUtility.Destroy(_renderer);
     }
 
@@ -390,6 +388,7 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
       InternalUtility.Destroy(feature);
     }
   }
+#endif
 
   private void OnEnable() {
 #if UNITY_EDITOR

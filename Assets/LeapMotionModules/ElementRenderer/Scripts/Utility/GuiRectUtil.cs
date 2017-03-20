@@ -5,6 +5,22 @@ using UnityEditor;
 
 public static class GuiRectUtil {
 
+  public static Vector3 Corner00(this Rect rect) {
+    return new Vector3(rect.x, rect.y);
+  }
+
+  public static Vector3 Corner10(this Rect rect) {
+    return new Vector3(rect.x + rect.width, rect.y);
+  }
+
+  public static Vector3 Corner01(this Rect rect) {
+    return new Vector3(rect.x, rect.y + rect.height);
+  }
+
+  public static Vector3 Corner11(this Rect rect) {
+    return new Vector3(rect.x + rect.width, rect.y + rect.height);
+  }
+
   public static void SplitHorizontally(this Rect rect, out Rect left, out Rect right) {
     left = rect;
     left.width /= 2;
