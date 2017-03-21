@@ -91,32 +91,34 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   public override void OnUpdateRenderer() {
     base.OnUpdateRenderer();
 
-    if (gui.space is LeapGuiRectSpace) {
-      using (new ProfilerSample("Build Material Data")) {
-        _rect_elementPositions.Clear();
-        foreach (var element in group.elements) {
-          var guiSpace = transform.InverseTransformPoint(element.transform.position);
-          _rect_elementPositions.Add(guiSpace);
+    if (_motionType != MotionType.None) {
+      if (gui.space is LeapGuiRectSpace) {
+        using (new ProfilerSample("Build Material Data")) {
+          _rect_elementPositions.Clear();
+          foreach (var element in group.elements) {
+            var guiSpace = transform.InverseTransformPoint(element.transform.position);
+            _rect_elementPositions.Add(guiSpace);
+          }
         }
-      }
 
-      using (new ProfilerSample("Upload Material Data")) {
-        _material.SetVectorArraySafe(RECT_POSITIONS, _rect_elementPositions);
-      }
-    } else if (gui.space is LeapGuiRadialSpaceBase) {
-      var radialSpace = gui.space as LeapGuiRadialSpaceBase;
-
-      using (new ProfilerSample("Build Material Data")) {
-        _curved_elementParameters.Clear();
-        foreach (var element in group.elements) {
-          var t = radialSpace.GetTransformer(element.anchor) as IRadialTransformer;
-          _curved_elementParameters.Add(t.GetVectorRepresentation(element));
+        using (new ProfilerSample("Upload Material Data")) {
+          _material.SetVectorArraySafe(RECT_POSITIONS, _rect_elementPositions);
         }
-      }
+      } else if (gui.space is LeapGuiRadialSpaceBase) {
+        var radialSpace = gui.space as LeapGuiRadialSpaceBase;
 
-      using (new ProfilerSample("Upload Material Data")) {
-        _material.SetFloat(LeapGuiRadialSpaceBase.RADIUS_PROPERTY, radialSpace.radius);
-        _material.SetVectorArraySafe(CURVED_PARAMETERS, _curved_elementParameters);
+        using (new ProfilerSample("Build Material Data")) {
+          _curved_elementParameters.Clear();
+          foreach (var element in group.elements) {
+            var t = radialSpace.GetTransformer(element.anchor) as IRadialTransformer;
+            _curved_elementParameters.Add(t.GetVectorRepresentation(element));
+          }
+        }
+
+        using (new ProfilerSample("Upload Material Data")) {
+          _material.SetFloat(LeapGuiRadialSpaceBase.RADIUS_PROPERTY, radialSpace.radius);
+          _material.SetVectorArraySafe(CURVED_PARAMETERS, _curved_elementParameters);
+        }
       }
     }
 
@@ -181,6 +183,10 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
   protected override void prepareMaterial() {
     base.prepareMaterial();
+
+    foreach (var keyword in _material.shaderKeywords) {
+      _material.DisableKeyword(keyword);
+    }
 
     if (_enableLightmapping) {
       _material.globalIlluminationFlags = _giFlags;
