@@ -88,6 +88,10 @@ public abstract class LeapGuiElement : MonoBehaviour {
   public virtual void OnDetachedFromGui() {
     _attachedGroup = null;
     _anchor = null;
+
+    foreach (var dataObj in data) {
+      dataObj.feature = null;
+    }
   }
 
   public virtual void OnAssignFeatureData(List<LeapGuiElementData> data) {

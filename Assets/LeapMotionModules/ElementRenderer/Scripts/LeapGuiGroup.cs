@@ -227,6 +227,12 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     for (int i = _elements.Count; i-- != 0;) {
       if (_elements[i] == null) {
         _elements.RemoveAt(i);
+        continue;
+      }
+
+      if (!_elements[i].transform.IsChildOf(transform)) {
+        TryRemoveElement(_elements[i]);
+        continue;
       }
     }
   }
