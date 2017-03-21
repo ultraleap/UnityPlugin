@@ -21,7 +21,7 @@ public class LeapGuiCylindricalSpace : LeapGuiRadialSpace<LeapGuiCylindricalSpac
     target.angleOffset = parent.angleOffset + guiSpaceDelta.x / parent.radiusOffset;
     target.heightOffset = parent.heightOffset + guiSpaceDelta.y;
     target.radiusOffset = parent.radiusOffset + guiSpaceDelta.z;
-    target.radiansPerMeter = 1.0f / (target.radiansPerMeter);
+    target.radiansPerMeter = 1.0f / (target.radiusOffset);
   }
 
   public class Transformer : IRadialTransformer {
@@ -51,7 +51,21 @@ public class LeapGuiCylindricalSpace : LeapGuiRadialSpace<LeapGuiCylindricalSpac
     }
 
     public Vector3 InverseTransformPoint(Vector3 localGuiPos) {
-      throw new NotImplementedException();
+      localGuiPos.z += space.radius;
+
+      float angle = Mathf.Atan2(localGuiPos.x, localGuiPos.z);
+      float height = localGuiPos.y;
+      float radius = new Vector2(localGuiPos.x, localGuiPos.z).magnitude;
+
+      Vector3 anchorDelta;
+      anchorDelta.x = (angle - angleOffset) * radiusOffset;
+      anchorDelta.y = height - heightOffset;
+      anchorDelta.z = radius - radiusOffset;
+
+      Vector3 anchorGuiPos = space.gui.transform.InverseTransformPoint(anchor.position);
+      Vector3 localRectPos = anchorGuiPos + anchorDelta;
+
+      return localRectPos;
     }
 
     public Quaternion TransformRotation(Vector3 localRectPos, Quaternion localRectRot) {
@@ -68,15 +82,32 @@ public class LeapGuiCylindricalSpace : LeapGuiRadialSpace<LeapGuiCylindricalSpac
     }
 
     public Quaternion InverseTransformRotation(Vector3 localGuiPos, Quaternion localGuiRot) {
-      throw new NotImplementedException();
+      localGuiPos.z += space.radius;
+
+      float angle = Mathf.Atan2(localGuiPos.x, localGuiPos.z);
+
+      return Quaternion.Euler(0, -angle * Mathf.Rad2Deg, 0) * localGuiRot;
     }
 
     public Vector3 TransformDirection(Vector3 localRectPos, Vector3 localRectDirection) {
-      throw new NotImplementedException();
+      Vector3 anchorDelta;
+
+      Vector3 anchorGuiPos = space.gui.transform.InverseTransformPoint(anchor.position);
+      anchorDelta = localRectPos - anchorGuiPos;
+
+      float angle = angleOffset + anchorDelta.x / radiusOffset;
+
+      Quaternion rotation = Quaternion.Euler(0, angle * Mathf.Rad2Deg, 0);
+
+      return rotation * localRectDirection;
     }
 
     public Vector3 InverseTransformDirection(Vector3 localGuiPos, Vector3 localGuiDirection) {
-      throw new NotImplementedException();
+      localGuiPos.z += space.radius;
+
+      float angle = Mathf.Atan2(localGuiPos.x, localGuiPos.z);
+
+      return Quaternion.Euler(0, -angle * Mathf.Rad2Deg, 0) * localGuiDirection;
     }
 
     public Matrix4x4 GetTransformationMatrix(Vector3 localRectPos) {
