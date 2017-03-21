@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
@@ -61,6 +61,7 @@ public class RendererTextureData : ScriptableObject {
     }
   }
 
+  [Serializable]
   public struct NamedTexture {
     public string propertyName;
     public Texture2D texture;
