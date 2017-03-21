@@ -9,6 +9,7 @@ using UnityEditor;
 using Leap.Unity;
 using Leap.Unity.Query;
 
+[AddComponentMenu("")]
 public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
   #region INSPECTOR FIELDS
