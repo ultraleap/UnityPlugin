@@ -18,12 +18,12 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase, ISupportsAddRemove {
 
   public void OnAddElement() {
     //TODO, this is super slow and sad
-    OnUpdateRendererEditor(isHeavyUpdate: false);
+    throw new NotImplementedException();
   }
 
   public void OnRemoveElement() {
     //TODO, this is super slow and sad
-    OnUpdateRendererEditor(isHeavyUpdate: false);
+    throw new NotImplementedException();
   }
 
   public override SupportInfo GetSpaceSupportInfo(LeapGuiSpace space) {
@@ -113,8 +113,8 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase, ISupportsAddRemove {
     return vertex;
   }
 
-  protected override void elementVertNormalToMeshVertNormal(Vector3 vertex, 
-                                                            Vector3 normal, 
+  protected override void elementVertNormalToMeshVertNormal(Vector3 vertex,
+                                                            Vector3 normal,
                                                         out Vector3 meshVert,
                                                         out Vector3 meshNormal) {
     meshVert = vertex;

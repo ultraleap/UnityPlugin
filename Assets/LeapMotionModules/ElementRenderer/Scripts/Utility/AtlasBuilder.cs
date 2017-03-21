@@ -251,7 +251,9 @@ public class AtlasBuilder {
           tex = convertToTexture2D(rt, _mipMap);
 
           progress.Step("Compressing Texture");
+#if UNITY_EDITOR
           UnityEditor.EditorUtility.CompressTexture(tex, _format, TextureCompressionQuality.Best);
+#endif
           tex.filterMode = _filterMode;
 
           progress.Step("Updating Texture");

@@ -18,6 +18,7 @@ public static class InternalUtility {
   }
 #endif
 
+#if UNITY_EDITOR
   /// <summary>
   /// Call this method from within OnDestroy.  The action will only be invoked if
   /// the object was deleted during EDIT MODE, and that destruction was not caused
@@ -33,6 +34,7 @@ public static class InternalUtility {
 
     _invokeList.Add(new InvokeStruct(action));
   }
+#endif
 
 #if UNITY_EDITOR
   private static List<Component> _cachedComponentList0 = new List<Component>();
@@ -68,10 +70,11 @@ public static class InternalUtility {
       toDestroy.Add(obj);
     }
 #else
-    Object.Destroy(obj);
+    UnityEngine.Object.Destroy(obj);
 #endif
   }
 
+#if UNITY_EDITOR
   private static void destroyLoop() {
     if (_invokeList.Count != 0) {
       var scene = SceneManager.GetActiveScene();
@@ -107,4 +110,5 @@ public static class InternalUtility {
       scene = SceneManager.GetActiveScene();
     }
   }
+#endif
 }

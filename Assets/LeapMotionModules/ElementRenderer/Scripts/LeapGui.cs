@@ -247,7 +247,9 @@ public class LeapGui : MonoBehaviour {
   #region PRIVATE IMPLEMENTATION
 
   private LeapGui() {
+#if UNITY_EDITOR
     _delayedHeavyRebuild = new DelayedAction(() => doEditorUpdateLogic(fullRebuild: true, heavyRebuild: true));
+#endif
   }
 
 #if UNITY_EDITOR
@@ -370,5 +372,5 @@ public class LeapGui : MonoBehaviour {
 
     _hasFinishedSetup = true;
   }
-  #endregion
+#endregion
 }

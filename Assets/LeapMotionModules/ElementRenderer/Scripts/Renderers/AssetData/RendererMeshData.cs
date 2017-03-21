@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -15,7 +14,6 @@ public class RendererMeshData : ScriptableObject {
     }
   }
 
-#if UNITY_EDITOR
   public void Clear() {
     foreach (var mesh in meshes) {
       DestroyImmediate(mesh, allowDestroyingAssets: true);
@@ -25,9 +23,10 @@ public class RendererMeshData : ScriptableObject {
 
   public void AddMesh(Mesh mesh) {
     meshes.Add(mesh);
+#if UNITY_EDITOR
     AssetDatabase.AddObjectToAsset(mesh, this);
-  }
 #endif
+  }
 
   public int Count {
     get {
