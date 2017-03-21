@@ -1,5 +1,6 @@
 #include "Assets/LeapMotionModules/ElementRenderer/Resources/LeapGui.cginc"
 
+
 /************************************************************************* 
  * Movement name:
  *  _ (none)
@@ -11,17 +12,15 @@
  *************************************************************************/
 
 #ifdef LEAP_GUI_MOVEMENT_TRANSLATION
+#ifndef LEAP_GUI_MOVEMENT
 #define LEAP_GUI_MOVEMENT
-void ApplyElementMotion(inout float4 vert, int elementId) { }
+#endif
 #endif
 
 #ifdef LEAP_GUI_MOVEMENT_FULL
+#ifndef LEAP_GUI_MOVEMENT
 #define LEAP_GUI_MOVEMENT
-float4x4 _GuiElementMovement_Transform[ELEMENT_MAX];
-
-void ApplyElementMotion(inout float4 vert, int elementId) {
-  vert = mul(_GuiElementMovement_Transform[elementId], vert);
-}
+#endif
 #endif
 
 #ifdef LEAP_GUI_MOVEMENT
@@ -39,7 +38,7 @@ void ApplyElementMotion(inout float4 vert, int elementId) {
  *  LEAP_GUI_SPHERICAL
  *    spherical space
  ***********************************/
-
+#ifdef LEAP_GUI_MOVEMENT
 #ifdef LEAP_GUI_CYLINDRICAL
 #define LEAP_GUI_WARPING
 #include "Assets/LeapMotionModules/ElementRenderer/Resources/CylindricalSpace.cginc"
@@ -58,7 +57,9 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 }
 #endif
 #endif
+#endif
 
+#ifdef LEAP_GUI_MOVEMENT
 #ifdef LEAP_GUI_SPHERICAL
 #define LEAP_GUI_WARPING
 #include "Assets/LeapMotionModules/ElementRenderer/Resources/SphericalSpace.cginc"
@@ -77,8 +78,10 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 }
 #endif
 #endif
+#endif
 
 //Base-case fallback, rect transformations
+#ifdef LEAP_GUI_MOVEMENT
 #ifndef LEAP_GUI_WARPING
 #define LEAP_GUI_WARPING
 float3 _LeapGuiRect_ElementPositions[ELEMENT_MAX];
@@ -92,7 +95,7 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
   vert.xyz += _LeapGuiRect_ElementPositions[elementId];
 }
 #endif
-
+#endif
 #endif
 
 #ifdef LEAP_GUI_WARPING

@@ -25,7 +25,12 @@ public class LeapGuiTextureDataEditor : CustomEditorBase<LeapGuiTextureData> {
     if (mainFeature != null) {
       EditorGUILayout.PropertyField(property, new GUIContent(mainFeature.propertyName, property.tooltip));
     } else {
-      EditorGUILayout.PropertyField(property);
+      int mainIndex = mainData.element.data.IndexOf(mainData);
+      if (targets.Query().Any(t => t.element.data.IndexOf(t) != mainIndex)) {
+        EditorGUILayout.PropertyField(property);
+      } else {
+        EditorGUILayout.PropertyField(property, new GUIContent("Channel " + mainIndex, property.tooltip));
+      }
     }
   }
 }
