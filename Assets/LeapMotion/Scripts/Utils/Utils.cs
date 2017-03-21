@@ -5,10 +5,54 @@
 \******************************************************************************/
 
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Leap.Unity {
 
   public static class Utils {
+
+    #region Generic Utils
+
+    /// <summary>
+    /// Swaps the references of a and b.  Note that you can pass
+    /// in references to array elements if you want!
+    /// </summary>
+    public static void Swap<T>(ref T a, ref T b) {
+      T temp = a;
+      a = b;
+      b = temp;
+    }
+
+    /// <summary>
+    /// Utility extension to swap the elements at index a and index b.
+    /// </summary>
+    public static void Swap<T>(this List<T> list, int a, int b) {
+      T temp = list[a];
+      list[a] = list[b];
+      list[b] = temp;
+    }
+
+    /// <summary>
+    /// Utility extension to swap the elements at index a and index b.
+    /// </summary>
+    public static void Swap<T>(this T[] array, int a, int b) {
+      Swap(ref array[a], ref array[b]);
+    }
+
+    /// <summary>
+    /// System.Array.Reverse is actually suprisingly complex / slow.  This
+    /// is a basic generic implementation of the reverse algorithm.
+    /// </summary>
+    public static void Reverse<T>(this T[] array) {
+      int mid = array.Length / 2;
+      int i = 0;
+      int j = array.Length;
+      while (i < mid) {
+        array.Swap(i++, --j);
+      }
+    }
+
+    #endregion
 
     #region Math Utils
     public static int Repeat(int x, int m) {
