@@ -5,7 +5,7 @@ using UnityEngine.Assertions;
 using Leap.Unity;
 
 [ExecuteInEditMode]
-public class LeapGui : MonoBehaviour {
+public partial class LeapGui : MonoBehaviour {
   public const string FEATURE_PREFIX = "LEAP_GUI_";
   public const string PROPERTY_PREFIX = "_LeapGui";
 
@@ -21,9 +21,6 @@ public class LeapGui : MonoBehaviour {
   #endregion
 
   #region PRIVATE VARIABLES
-  //We serialize just for ease of use
-  [SerializeField]
-  private int _selectedGroup = 0;
 
   [SerializeField]
   private List<AnchorOfConstantSize> _anchors = new List<AnchorOfConstantSize>();
@@ -35,10 +32,7 @@ public class LeapGui : MonoBehaviour {
   private List<LeapGuiElement> _tempElementList = new List<LeapGuiElement>();
   [NonSerialized]
   private bool _hasFinishedSetup = false;
-  [NonSerialized]
-  private int _previousHierarchyHash;
 
-  private DelayedAction _delayedHeavyRebuild;
   #endregion
 
   #region PUBLIC RUNTIME API
@@ -74,7 +68,6 @@ public class LeapGui : MonoBehaviour {
   }
 
   public bool TryAddElement(LeapGuiElement element) {
-
     //First try to attatch to a group that is preferred
     Type preferredType = element.preferredRendererType;
     if (preferredType != null) {
@@ -102,91 +95,14 @@ public class LeapGui : MonoBehaviour {
 
   #endregion
 
-  #region PUBLIC EDITOR API
-#if UNITY_EDITOR
-  public void CreateGroup(Type rendererType) {
-    AssertHelper.AssertEditorOnly();
-    Assert.IsNotNull(rendererType);
-
-    var group = gameObject.AddComponent<LeapGuiGroup>();
-    group.Init(this, rendererType);
-
-    _selectedGroup = _groups.Count;
-    _groups.Add(group);
-  }
-
-  public void DestroySelectedGroup() {
-    AssertHelper.AssertEditorOnly();
-
-    var toDestroy = _groups[_selectedGroup];
-    _groups.RemoveAt(_selectedGroup);
-
-    if (_selectedGroup >= _groups.Count && _selectedGroup != 0) {
-      _selectedGroup--;
-    }
-
-    InternalUtility.Destroy(toDestroy);
-  }
-
-  public void ScheduleEditorUpdate() {
-    AssertHelper.AssertEditorOnly();
-
-    //Dirty the hash by changing it to something else
-    _previousHierarchyHash++;
-  }
-
-  public void SetSpace(Type spaceType) {
-    AssertHelper.AssertEditorOnly();
-    ScheduleEditorUpdate();
-
-    UnityEditor.Undo.RecordObject(this, "Change Gui Space");
-    UnityEditor.EditorUtility.SetDirty(this);
-
-    if (_space != null) {
-      DestroyImmediate(_space);
-      _space = null;
-    }
-
-    _space = gameObject.AddComponent(spaceType) as LeapGuiSpace;
-
-    if (_space != null) {
-      _space.gui = this;
-    }
-  }
-
-  public void RebuildEditorPickingMeshes() {
-    if (_space == null) {
-      return;
-    }
-
-    foreach (var group in _groups) {
-      group.RebuildEditorPickingMeshes();
-    }
-  }
-#endif
-  #endregion
-
   #region UNITY CALLBACKS
   private void OnValidate() {
-
-#if UNITY_EDITOR
-    //TODO, handle drag-drop of leap gui for groups!
-
-    if (_space != null && _space.gameObject != gameObject) {
-      LeapGuiSpace movedSpace;
-      if (InternalUtility.TryMoveComponent(_space, gameObject, out movedSpace)) {
-        _space = movedSpace;
-      } else {
-        Debug.LogWarning("Could not move space component " + _space + "!");
-        InternalUtility.Destroy(_space);
-      }
-    }
-#endif
-
     _space = _space ?? GetComponent<LeapGuiSpace>() ?? gameObject.AddComponent<LeapGuiRectSpace>();
     _space.gui = this;
 
-    //TODO: assign groups automatically
+#if UNITY_EDITOR
+    editor.OnValidate();
+#endif
   }
 
   private void Reset() {
@@ -208,7 +124,10 @@ public class LeapGui : MonoBehaviour {
     foreach (var group in _groups) {
       InternalUtility.Destroy(group);
     }
-    _delayedHeavyRebuild.Dispose();
+
+#if UNITY_EDITOR
+    editor.OnDestroy();
+#endif
   }
 
   private void Awake() {
@@ -236,7 +155,7 @@ public class LeapGui : MonoBehaviour {
     if (Application.isPlaying) {
       doLateUpdateRuntime();
     } else {
-      doLateUpdateEditor();
+      editor.DoLateUpdateEditor();
     }
 #else
     doLateUpdateRuntime();
@@ -248,61 +167,9 @@ public class LeapGui : MonoBehaviour {
 
   private LeapGui() {
 #if UNITY_EDITOR
-    _delayedHeavyRebuild = new DelayedAction(() => doEditorUpdateLogic(fullRebuild: true, heavyRebuild: true));
+    editor = new EditorApi(this);
 #endif
   }
-
-#if UNITY_EDITOR
-  private void doLateUpdateEditor() {
-    bool needsRebuild = false;
-
-    using (new ProfilerSample("Calculate Should Rebuild")) {
-      foreach (var group in _groups) {
-        foreach (var feature in group.features) {
-          if (feature.isDirty) {
-            needsRebuild = true;
-            break;
-          }
-        }
-      }
-
-      int hierarchyHash = HashUtil.GetHierarchyHash(transform);
-      if (_previousHierarchyHash != hierarchyHash) {
-        _previousHierarchyHash = hierarchyHash;
-        needsRebuild = true;
-      }
-    }
-
-    if (needsRebuild) {
-      _delayedHeavyRebuild.Reset();
-    }
-
-    doEditorUpdateLogic(needsRebuild, heavyRebuild: false);
-  }
-
-  private void doEditorUpdateLogic(bool fullRebuild, bool heavyRebuild) {
-    if (fullRebuild) {
-      _anchors.Clear();
-      _anchorParents.Clear();
-      rebuildAnchorInfo(transform, transform);
-      _space.BuildElementData(transform);
-      collectUnattachedElements();
-
-      foreach (var group in _groups) {
-        group.ValidateElementList();
-        group.RebuildFeatureData();
-        group.RebuildFeatureSupportInfo();
-        group.UpdateRendererEditor(heavyRebuild);
-      }
-
-      _hasFinishedSetup = true;
-    }
-
-    foreach (var group in _groups) {
-      group.UpdateRenderer();
-    }
-  }
-#endif
 
   private void rebuildAnchorInfo(Transform root, Transform currAnchor) {
     int count = root.childCount;
@@ -372,5 +239,5 @@ public class LeapGui : MonoBehaviour {
 
     _hasFinishedSetup = true;
   }
-#endregion
+  #endregion
 }

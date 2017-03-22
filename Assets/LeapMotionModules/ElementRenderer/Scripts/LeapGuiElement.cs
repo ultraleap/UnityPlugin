@@ -4,7 +4,7 @@ using UnityEngine;
 
 [ExecuteInEditMode]
 [DisallowMultipleComponent]
-public abstract class LeapGuiElement : MonoBehaviour {
+public abstract partial class LeapGuiElement : MonoBehaviour {
 
   #region INSPECTOR FIELDS
   [SerializeField, HideInInspector]
@@ -63,22 +63,9 @@ public abstract class LeapGuiElement : MonoBehaviour {
     }
   }
 
-#if UNITY_EDITOR
-  public Mesh pickingMesh {
-    get {
-      return _pickingMesh;
-    }
-    set {
-      _pickingMesh = value;
-    }
-  }
-#endif
-
   public virtual void OnAttachedToGui(LeapGuiGroup group, Transform anchor) {
 #if UNITY_EDITOR
-    if (!Application.isPlaying) {
-      _preferredRendererType = group.renderer.GetType();
-    }
+    editor.OnAttachedToGui(group, anchor);
 #endif
 
     _attachedGroup = group;
@@ -97,8 +84,6 @@ public abstract class LeapGuiElement : MonoBehaviour {
   public virtual void OnAssignFeatureData(List<LeapGuiElementData> data) {
     _data = data;
   }
-
-  public virtual void RebuildEditorPickingMesh() { }
   #endregion
 
   #region UNITY CALLBACKS
@@ -118,32 +103,13 @@ public abstract class LeapGuiElement : MonoBehaviour {
       }
     }
 
-#if UNITY_EDITOR
-    for (int i = _data.Count; i-- != 0;) {
-      var component = _data[i];
-      if (component.gameObject != gameObject) {
-        LeapGuiElementData movedData;
-        if (InternalUtility.TryMoveComponent(component, gameObject, out movedData)) {
-          _data[i] = movedData;
-        } else {
-          Debug.LogWarning("Could not move component " + component + "!");
-          InternalUtility.Destroy(component);
-          _data.RemoveAt(i);
-        }
-      }
-    }
-
-    if (!Application.isPlaying) {
-      if (_attachedGroup != null) {
-        _attachedGroup.gui.ScheduleEditorUpdate();
-        _preferredRendererType = _attachedGroup.renderer.GetType();
-      }
-    }
-#endif
-
     foreach (var dataObj in _data) {
       dataObj.element = this;
     }
+
+#if UNITY_EDITOR
+    editor.OnValidate();
+#endif
   }
 
   protected virtual void OnDestroy() {
@@ -194,13 +160,24 @@ public abstract class LeapGuiElement : MonoBehaviour {
 #endif
   }
 
-#if UNITY_EDITOR
   protected virtual void OnDrawGizmos() {
-    if (_pickingMesh != null && _pickingMesh.vertexCount != 0) {
-      Gizmos.color = new Color(1, 0, 0, 0);
-      Gizmos.DrawMesh(_pickingMesh);
-    }
+#if UNITY_EDITOR
+    editor.OnDrawGizmos();
+#endif
+  }
+  #endregion
+
+  #region PRIVATE IMPLEMENTATION
+
+#if UNITY_EDITOR
+  protected LeapGuiElement() {
+    editor = new EditorApi(this);
+  }
+
+  protected LeapGuiElement(EditorApi editor) {
+    this.editor = editor;
   }
 #endif
+
   #endregion
 }

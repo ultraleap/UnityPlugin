@@ -23,7 +23,7 @@ public abstract class LeapGuiRendererBase : LeapGuiComponentBase<LeapGui> {
 #if UNITY_EDITOR
     if (!Application.isPlaying) {
       if (gui != null) {
-        gui.ScheduleEditorUpdate();
+        gui.editor.ScheduleEditorUpdate();
       }
     }
 #endif

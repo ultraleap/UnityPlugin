@@ -42,7 +42,7 @@ public class LeapGuiEditor : CustomEditorBase {
       _addSpaceMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(space)),
                             false,
                             () => {
-                              _gui.SetSpace(space);
+                              _gui.editor.SetSpace(space);
                               CreateCachedEditor(_gui.space, null, ref _spaceEditor);
                               serializedObject.Update();
                             });
@@ -58,7 +58,7 @@ public class LeapGuiEditor : CustomEditorBase {
       _addGroupMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(renderer)),
                             false,
                             () => {
-                              _gui.CreateGroup(renderer);
+                              _gui.editor.CreateGroup(renderer);
                               updateGroupEditor();
                             });
     }
@@ -147,7 +147,7 @@ public class LeapGuiEditor : CustomEditorBase {
 
       if (_groupEditor != null) {
         if (GUILayout.Button("Delete Group", EditorStyles.toolbarButton)) {
-          _gui.DestroySelectedGroup();
+          _gui.editor.DestroySelectedGroup();
           updateGroupEditor();
         }
       }
@@ -200,23 +200,25 @@ public class LeapGuiEditor : CustomEditorBase {
   }
 
   private bool HasFrameBounds() {
-    return true;
+    _gui.editor.RebuildEditorPickingMeshes();
+
+    return _gui.groups.Query().
+                       SelectMany(g => g.elements.Query()).
+                       Select(e => e.editor.pickingMesh).
+                       Any(m => m != null);
   }
 
   private Bounds OnGetFrameBounds() {
-    _gui.RebuildEditorPickingMeshes();
+    _gui.editor.RebuildEditorPickingMeshes();
 
-    Bounds[] allBounds = _gui.groups.Query().
-                              SelectMany(g => g.elements.Query()).
-                              Select(e => e.pickingMesh).
-                              Where(m => m != null).
-                              Select(m => m.bounds).
-                              ToArray();
-
-    Bounds bounds = allBounds[0];
-    for (int i = 1; i < allBounds.Length; i++) {
-      bounds.Encapsulate(allBounds[i]);
-    }
-    return bounds;
+    return _gui.groups.Query().
+                       SelectMany(g => g.elements.Query()).
+                       Select(e => e.editor.pickingMesh).
+                       Where(m => m != null).
+                       Select(m => m.bounds).
+                       Fold((a, b) => {
+                         a.Encapsulate(b);
+                         return a;
+                       });
   }
 }

@@ -50,10 +50,10 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
       _addRendererMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(renderer)),
                                false,
                                () => {
-                                 target.ChangeRenderer(renderer);
+                                 target.editor.ChangeRenderer(renderer);
                                  serializedObject.Update();
                                  CreateCachedEditor(target.renderer, null, ref _rendererEditor);
-                                 target.gui.ScheduleEditorUpdate();
+                                 target.gui.editor.ScheduleEditorUpdate();
                                });
     }
 
@@ -66,7 +66,7 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
     foreach (var feature in allFeatures) {
       _addFeatureMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(feature)),
                               false,
-                              () => target.AddFeature(feature));
+                              () => target.editor.AddFeature(feature));
     }
 
     specifyCustomDecorator("_features", featureDecorator);
@@ -122,7 +122,7 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
     using (new EditorGUI.DisabledGroupScope(EditorApplication.isPlaying)) {
       EditorGUI.BeginDisabledGroup(target.features.Count == 0);
       if (GUI.Button(middle, "-", EditorStyles.miniButtonMid) && _featureList.index >= 0) {
-        target.RemoveFeature(target.features[_featureList.index]);
+        target.editor.RemoveFeature(target.features[_featureList.index]);
         EditorUtility.SetDirty(target);
       }
       EditorGUI.EndDisabledGroup();
@@ -201,7 +201,7 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
     EditorGUI.BeginChangeCheck();
     feature.DrawFeatureEditor(rect.NextLine().Indent(), isActive, isFocused);
     if (EditorGUI.EndChangeCheck()) {
-      target.gui.ScheduleEditorUpdate();
+      target.gui.editor.ScheduleEditorUpdate();
       EditorUtility.SetDirty(feature);
     }
   }
