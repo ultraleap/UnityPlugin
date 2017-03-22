@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
 using Leap.Unity;
 using Leap.Unity.Attachments;
 

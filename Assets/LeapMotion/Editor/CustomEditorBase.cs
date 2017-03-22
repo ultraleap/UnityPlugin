@@ -2,15 +2,38 @@
 using UnityEditor;
 using System;
 using System.Collections.Generic;
+using Leap.Unity.Query;
 
 namespace Leap.Unity {
+
+  public class CustomEditorBase<T> : CustomEditorBase where T : UnityEngine.Object {
+    protected new T target;
+    protected new T[] targets;
+
+    protected override void OnEnable() {
+      base.OnEnable();
+
+      target = base.target as T;
+      targets = base.targets.Query().
+                             Where(t => t != null).
+                             OfType<T>().
+                             ToArray();
+    }
+  }
 
   public class CustomEditorBase : Editor {
     protected Dictionary<string, Action<SerializedProperty>> _specifiedDrawers;
     protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedDecorators;
     protected Dictionary<string, List<Func<bool>>> _conditionalProperties;
+    protected HashSet<string> _beginHorizontalProperties;
+    protected HashSet<string> _endHorizontalProperties;
+    protected bool _showScriptField = true;
 
     protected List<SerializedProperty> _modifiedProperties = new List<SerializedProperty>();
+
+    protected void dontShowScriptField() {
+      _showScriptField = false;
+    }
 
     /// <summary>
     /// Specify a callback to be used to draw a specific named property.  Should be called in OnEnable.
@@ -56,7 +79,28 @@ namespace Leap.Unity {
       }
 
       SerializedProperty conditionalProp = serializedObject.FindProperty(conditionalName);
-      specifyConditionalDrawing(() => conditionalProp.boolValue, dependantProperties);
+      specifyConditionalDrawing(() => {
+        if (conditionalProp.hasMultipleDifferentValues) {
+          return false;
+        } else {
+          return conditionalProp.boolValue;
+        }
+      }, dependantProperties);
+    }
+
+    protected void specifyConditionalDrawing(string enumName, int enumValue, params string[] dependantProperties) {
+      if (!validateProperty(enumName)) {
+        return;
+      }
+
+      SerializedProperty enumProp = serializedObject.FindProperty(enumName);
+      specifyConditionalDrawing(() => {
+        if (enumProp.hasMultipleDifferentValues) {
+          return false;
+        } else {
+          return enumProp.intValue == enumValue;
+        }
+      }, dependantProperties);
     }
 
     protected void specifyConditionalDrawing(Func<bool> conditional, params string[] dependantProperties) {
@@ -76,10 +120,19 @@ namespace Leap.Unity {
       }
     }
 
+    protected void createHorizonalSection(string beginProperty, string endProperty) {
+      validateProperty(beginProperty);
+      validateProperty(endProperty);
+      _beginHorizontalProperties.Add(beginProperty);
+      _endHorizontalProperties.Add(endProperty);
+    }
+
     protected virtual void OnEnable() {
       _specifiedDrawers = new Dictionary<string, Action<SerializedProperty>>();
       _specifiedDecorators = new Dictionary<string, List<Action<SerializedProperty>>>();
       _conditionalProperties = new Dictionary<string, List<Func<bool>>>();
+      _beginHorizontalProperties = new HashSet<string>();
+      _endHorizontalProperties = new HashSet<string>();
     }
 
     protected bool validateProperty(string propertyName) {
@@ -100,6 +153,11 @@ namespace Leap.Unity {
       bool isFirst = true;
 
       while (iterator.NextVisible(isFirst)) {
+        if (isFirst && !_showScriptField) {
+          isFirst = false;
+          continue;
+        }
+
         List<Func<bool>> conditionalList;
         if (_conditionalProperties.TryGetValue(iterator.name, out conditionalList)) {
           bool allTrue = true;
@@ -109,6 +167,10 @@ namespace Leap.Unity {
           if (!allTrue) {
             continue;
           }
+        }
+
+        if (_beginHorizontalProperties.Contains(iterator.name)) {
+          EditorGUILayout.BeginHorizontal();
         }
 
         Action<SerializedProperty> customDrawer;
@@ -132,6 +194,10 @@ namespace Leap.Unity {
 
         if (EditorGUI.EndChangeCheck()) {
           _modifiedProperties.Add(iterator.Copy());
+        }
+
+        if (_endHorizontalProperties.Contains(iterator.name)) {
+          EditorGUILayout.EndHorizontal();
         }
 
         isFirst = false;
