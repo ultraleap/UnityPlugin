@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.Assertions;
 using System.Collections.Generic;
-using System;
+using InteractionEngineUtility;
 
 namespace Leap.Unity.Interaction {
 

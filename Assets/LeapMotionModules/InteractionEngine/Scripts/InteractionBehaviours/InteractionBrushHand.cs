@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Leap.Unity.RuntimeGizmos;
+using InteractionEngineUtility;
 
 #if UNITY_EDITOR
 using UnityEditor;

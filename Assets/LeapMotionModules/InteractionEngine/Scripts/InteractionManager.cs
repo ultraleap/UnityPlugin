@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Leap.Unity.Attributes;
+using InteractionEngineUtility;
 
 namespace Leap.Unity.Interaction {
 

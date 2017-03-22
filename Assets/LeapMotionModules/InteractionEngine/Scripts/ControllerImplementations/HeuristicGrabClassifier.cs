@@ -1,98 +1,33 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using InteractionEngineUtility;
 
 namespace Leap.Unity.Interaction {
   public class HeuristicGrabClassifier {
-    //Grab Heuristic Tuning Parameters
-    //-----
-    //Adds hysteresis to the thumb to make it hold better
-    private float FINGER_STICKINESS = 0f;
-    private float THUMB_STICKINESS = 0.05f;
-    //The minimum and maximum curl values fingers are allowed to "Grab" within
-    private float MAXIMUM_CURL = 0.65f;
-    private float MINIMUM_CURL = -0.1f;
-    //The radius considered for intersection around the fingertips
-    private float FINGERTIP_RADIUS = 0.01f;
-    private float THUMBTIP_RADIUS = 0.015f;
-    //The minimum amount of time between repeated grabs of a single object
-    private float GRAB_COOLDOWN = 0.2f;
-    //-----
-
     Collider[] collidingCandidates = new Collider[10];
     public InteractionManager _manager;
 
-    Dictionary<IInteractionBehaviour, GrabClassifier> leftGrabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifier>();
-    Dictionary<IInteractionBehaviour, GrabClassifier> rightGrabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifier>();
+    Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier> leftGrabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier>();
+    Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier> rightGrabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier>();
+    GrabClassifierHeuristics.ClassifierParameters grabParams;
+
 
     public HeuristicGrabClassifier(InteractionManager manager, float fingerStickiness = 0f, float thumbStickiness = 0.05f, float maxCurl = 0.65f, float minCurl = -0.1f, float fingerRadius = 0.01f, float thumbRadius = 0.015f, float grabCooldown = 0.2f) {
       _manager = manager;
-      FINGER_STICKINESS = fingerStickiness;
-      THUMB_STICKINESS = thumbStickiness;
-      MAXIMUM_CURL = maxCurl;
-      MINIMUM_CURL = minCurl;
-      FINGERTIP_RADIUS = fingerRadius;
-      THUMBTIP_RADIUS = thumbRadius;
-      GRAB_COOLDOWN = grabCooldown;
-    }
-
-    //Grab Classifier Logic
-    public void UpdateClassifier(GrabClassifier classifier, Hand _hand) {
-      classifier.warpTrans = Matrix4x4.TRS(classifier.warper.RigidbodyPosition, classifier.warper.RigidbodyRotation, classifier.transform.localScale);
-      
-      //For each probe (fingertip)
-      for (int j = 0; j < classifier.probes.Length; j++) {
-        //Calculate how extended the finger is
-        float tempCurl = Vector3.Dot(_hand.Fingers[j].Direction.ToVector3(), (j != 0) ? _hand.Direction.ToVector3() : (_hand.IsLeft ? 1f : -1f) * _hand.Basis.xBasis.ToVector3());
-
-        //Determine if this probe is intersecting an object
-        bool collidingWithObject = false;
-        int numberOfColliders = Physics.OverlapSphereNonAlloc(_hand.Fingers[j].TipPosition.ToVector3(), j == 0 ? THUMBTIP_RADIUS : FINGERTIP_RADIUS, collidingCandidates);
-        for(int i = 0; i < numberOfColliders; i++) {
-          if (collidingCandidates[i].attachedRigidbody != null && collidingCandidates[i].attachedRigidbody == classifier.body) {
-            collidingWithObject = true;
-            break;
-          }
-        }
-
-        //Nullify above findings if fingers are extended
-        collidingWithObject = collidingWithObject && (tempCurl < MAXIMUM_CURL) && (tempCurl > MINIMUM_CURL);
-
-        //Probes go inside when they intersect, probes come out when they uncurl
-        if (!classifier.probes[j].isInside) {
-          classifier.probes[j].isInside = collidingWithObject;
-          classifier.probes[j].curl = tempCurl + (j==0 ? THUMB_STICKINESS : FINGER_STICKINESS);
-        } else {
-          if (tempCurl > classifier.probes[j].curl) {
-            classifier.probes[j].isInside = collidingWithObject;
-          }
-        }
-      }
-
-      //If thumb and one other finger is "inside" the object, it's a grab!
-      classifier.isGrabbing = (classifier.probes[0].isInside && (classifier.probes[1].isInside ||
-                                                                 classifier.probes[2].isInside ||
-                                                                 classifier.probes[3].isInside ||
-                                                                 classifier.probes[4].isInside));
-      //If grabbing within 10 frames of releasing, discard grab.
-      //Suppresses spurious regrabs and makes throws work better.
-      if (classifier.coolDownProgress <= GRAB_COOLDOWN) {
-        if (classifier.isGrabbing) {
-          classifier.isGrabbing = false;
-        }
-        classifier.coolDownProgress += Time.fixedDeltaTime;
-      }
+      grabParams = new GrabClassifierHeuristics.ClassifierParameters(fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius, thumbRadius, grabCooldown);
     }
 
     public void UpdateBehaviour(IInteractionBehaviour behaviour, Hand _hand) {
-      GrabClassifier classifier;
-      Dictionary<IInteractionBehaviour, GrabClassifier> classifiers = (_hand.IsLeft ? leftGrabClassifiers : rightGrabClassifiers);
+      GrabClassifierHeuristics.GrabClassifier classifier;
+      Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier> classifiers = (_hand.IsLeft ? leftGrabClassifiers : rightGrabClassifiers);
       if (!classifiers.TryGetValue(behaviour, out classifier)) {
-        classifier = new GrabClassifier(behaviour);
+        classifier = new GrabClassifierHeuristics.GrabClassifier(behaviour.gameObject);
         classifiers.Add(behaviour, classifier);
       }
 
       //Do the actual grab classification logic
-      UpdateClassifier(classifier, _hand);
+      fillClassifier(_hand, ref classifier);
+      GrabClassifierHeuristics.UpdateClassifier(classifier, collidingCandidates, grabParams);
 
       if (classifier.isGrabbing != classifier.prevGrabbing) {
         if (classifier.isGrabbing) {
@@ -131,27 +66,15 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    //Per-Object Per-Hand Classifier
-    public class GrabClassifier {
-      public bool isGrabbing;
-      public bool prevGrabbing;
-      public GrabProbe[] probes = new GrabProbe[5];
-      public Transform transform;
-      public Rigidbody body;
-      public RigidbodyWarper warper;
-      public Matrix4x4 warpTrans;
-      public float coolDownProgress;
-
-      public GrabClassifier(IInteractionBehaviour behaviour) {
-        probes = new GrabProbe[5];
-        transform = behaviour.transform;
-        body = behaviour.GetComponent<Rigidbody>();
-        warper = (behaviour as InteractionBehaviour).warper;
-        coolDownProgress = 0;
+    protected void fillClassifier(Hand _hand, ref GrabClassifierHeuristics.GrabClassifier classifier) {
+      classifier.handChirality = _hand.IsLeft;
+      classifier.handDirection = _hand.Direction.ToVector3();
+      classifier.handXBasis = _hand.Basis.xBasis.ToVector3();
+      for(int i = 0; i<_hand.Fingers.Count; i++) {
+        classifier.probes[i].direction = _hand.Fingers[i].Direction.ToVector3();
+        classifier.probes[i].position = _hand.Fingers[i].TipPosition.ToVector3();
+        classifier.probes[i].direction = _hand.Fingers[i].Direction.ToVector3();
       }
     }
-
-    //Per-Finger Per-Object Probe
-    public struct GrabProbe { public bool isInside; public float curl; };
   }
 }
