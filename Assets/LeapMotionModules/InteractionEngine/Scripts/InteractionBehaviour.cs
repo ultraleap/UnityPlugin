@@ -220,6 +220,21 @@ namespace Leap.Unity.Interaction {
           Quaternion.Angle(_solvedRotation, _warper.RigidbodyRotation) > _material.ReleaseAngle) {
         _manager.ReleaseObject(this);
       }
+
+      if(_contactMode != ContactMode.GRASPED) {
+        //Only apply if non-zero to prevent waking up the body
+        if (_accumulatedLinearAcceleration != Vector3.zero) {
+          _rigidbody.velocity += _accumulatedLinearAcceleration * Time.fixedDeltaTime;
+        }
+
+        if (_accumulatedAngularAcceleration != Vector3.zero) {
+          _rigidbody.angularVelocity += _accumulatedAngularAcceleration * Time.fixedDeltaTime;
+        }
+
+        //Reset so we can accumulate for the next frame
+        _accumulatedLinearAcceleration = Vector3.zero;
+        _accumulatedAngularAcceleration = Vector3.zero;
+      }
     }
 
     protected override void OnPostSolve() {
@@ -239,15 +254,6 @@ namespace Leap.Unity.Interaction {
           if (_rigidbody.useGravity != _useGravity) {
             _rigidbody.useGravity = _useGravity;
           }
-
-          //Only apply if non-zero to prevent waking up the body
-          if (_accumulatedLinearAcceleration != Vector3.zero) {
-            _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
-          }
-
-          if (_accumulatedAngularAcceleration != Vector3.zero) {
-            _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
-          }
         }
 
         if (_recievedVelocityUpdate || _minHandDistance <= 0.0f) {
@@ -259,9 +265,6 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      //Reset so we can accumulate for the next frame
-      _accumulatedLinearAcceleration = Vector3.zero;
-      _accumulatedAngularAcceleration = Vector3.zero;
       _minHandDistance = float.MaxValue;
       _notifiedOfTeleport = false;
     }
