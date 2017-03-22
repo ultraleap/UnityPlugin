@@ -13,6 +13,7 @@ public abstract class LeapGuiMeshElementBase : LeapGuiElement {
 
   public abstract void RefreshMeshData();
 
+#if UNITY_EDITOR
   public override void RebuildEditorPickingMesh() {
     base.RebuildEditorPickingMesh();
 
@@ -49,6 +50,7 @@ public abstract class LeapGuiMeshElementBase : LeapGuiElement {
     pickingMesh.SetTriangles(pickingTris, 0, calculateBounds: true);
     pickingMesh.RecalculateNormals();
   }
+#endif
 }
 
 public class LeapGuiMeshElement : LeapGuiMeshElementBase {

@@ -47,6 +47,7 @@ public abstract class LeapGuiRendererBase : LeapGuiComponentBase<LeapGui> {
   /// </summary>
   public abstract void OnUpdateRenderer();
 
+#if UNITY_EDITOR
   /// <summary>
   /// Called curing edit time when this renderer becomes a renderer for a 
   /// leap gui.  Use this for any edit-time construction you need.
@@ -67,6 +68,7 @@ public abstract class LeapGuiRendererBase : LeapGuiComponentBase<LeapGui> {
   public virtual void OnUpdateRendererEditor(bool isHeavyUpdate) {
     this.isHeavyUpdate = isHeavyUpdate;
   }
+#endif
 
   public abstract bool IsValidElement<T>();
   public abstract bool IsValidElement(LeapGuiElement element);
@@ -93,6 +95,7 @@ public abstract class LeapGuiRenderer<ElementType> : LeapGuiRendererBase
     return obj.GetComponent<ElementType>();
   }
 
+#if UNITY_EDITOR
   protected bool EnsureAssetSaved<T>(ref T asset, string name) where T : ScriptableObject {
     if (asset != null) {
       return true;
@@ -121,7 +124,7 @@ public abstract class LeapGuiRenderer<ElementType> : LeapGuiRendererBase
       finalPath = fullPath + " " + index + ".asset";
       index++;
     } while (File.Exists(finalPath));
-    
+
     Undo.RecordObject(this, "Created renderer asset");
     asset = ScriptableObject.CreateInstance<T>();
     AssetDatabase.CreateAsset(asset, finalPath);
@@ -138,4 +141,5 @@ public abstract class LeapGuiRenderer<ElementType> : LeapGuiRendererBase
 
     AssetDatabase.DeleteAsset(path);
   }
+#endif
 }

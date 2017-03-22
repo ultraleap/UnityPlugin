@@ -174,69 +174,6 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
   #endregion
 
   #region PUBLIC EDITOR API
-#if UNITY_EDITOR
-  public void Init(LeapGui gui, Type rendererType) {
-    AssertHelper.AssertEditorOnly();
-    Assert.IsNotNull(gui);
-    Assert.IsNotNull(rendererType);
-    _gui = gui;
-
-    ChangeRenderer(rendererType);
-  }
-
-  public void ChangeRenderer(Type rendererType) {
-    AssertHelper.AssertEditorOnly();
-    Assert.IsNotNull(rendererType);
-
-    if (_renderer != null) {
-      _renderer.OnDisableRendererEditor();
-      InternalUtility.Destroy(_renderer);
-      _renderer = null;
-    }
-
-    _renderer = gameObject.AddComponent(rendererType) as LeapGuiRendererBase;
-    Assert.IsNotNull(_renderer);
-    _renderer.gui = _gui;
-    _renderer.group = this;
-    _renderer.OnEnableRendererEditor();
-  }
-
-  public LeapGuiFeatureBase AddFeature(Type featureType) {
-    AssertHelper.AssertEditorOnly();
-    _gui.ScheduleEditorUpdate();
-
-    var feature = gameObject.AddComponent(featureType) as LeapGuiFeatureBase;
-    _features.Add(feature);
-
-    EditorUtility.SetDirty(this);
-    _gui.ScheduleEditorUpdate();
-
-    return feature;
-  }
-
-  public void RemoveFeature(LeapGuiFeatureBase feature) {
-    AssertHelper.AssertEditorOnly();
-    Assert.IsTrue(_features.Contains(feature));
-
-    _features.Remove(feature);
-    InternalUtility.Destroy(feature);
-    _gui.ScheduleEditorUpdate();
-  }
-
-  public void ValidateElementList() {
-    for (int i = _elements.Count; i-- != 0;) {
-      if (_elements[i] == null) {
-        _elements.RemoveAt(i);
-        continue;
-      }
-
-      if (!_elements[i].transform.IsChildOf(transform)) {
-        TryRemoveElement(_elements[i]);
-        continue;
-      }
-    }
-  }
-
   public void RebuildFeatureData() {
     using (new ProfilerSample("Rebuild Feature Data")) {
       foreach (var feature in _features) {
@@ -327,6 +264,69 @@ public class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
       _supportInfo = new List<SupportInfo>();
       foreach (var feature in _features) {
         _supportInfo.Add(feature.GetSupportInfo(this).OrWorse(featureToInfo[feature]));
+      }
+    }
+  }
+
+#if UNITY_EDITOR
+  public void Init(LeapGui gui, Type rendererType) {
+    AssertHelper.AssertEditorOnly();
+    Assert.IsNotNull(gui);
+    Assert.IsNotNull(rendererType);
+    _gui = gui;
+
+    ChangeRenderer(rendererType);
+  }
+
+  public void ChangeRenderer(Type rendererType) {
+    AssertHelper.AssertEditorOnly();
+    Assert.IsNotNull(rendererType);
+
+    if (_renderer != null) {
+      _renderer.OnDisableRendererEditor();
+      InternalUtility.Destroy(_renderer);
+      _renderer = null;
+    }
+
+    _renderer = gameObject.AddComponent(rendererType) as LeapGuiRendererBase;
+    Assert.IsNotNull(_renderer);
+    _renderer.gui = _gui;
+    _renderer.group = this;
+    _renderer.OnEnableRendererEditor();
+  }
+
+  public LeapGuiFeatureBase AddFeature(Type featureType) {
+    AssertHelper.AssertEditorOnly();
+    _gui.ScheduleEditorUpdate();
+
+    var feature = gameObject.AddComponent(featureType) as LeapGuiFeatureBase;
+    _features.Add(feature);
+
+    EditorUtility.SetDirty(this);
+    _gui.ScheduleEditorUpdate();
+
+    return feature;
+  }
+
+  public void RemoveFeature(LeapGuiFeatureBase feature) {
+    AssertHelper.AssertEditorOnly();
+    Assert.IsTrue(_features.Contains(feature));
+
+    _features.Remove(feature);
+    InternalUtility.Destroy(feature);
+    _gui.ScheduleEditorUpdate();
+  }
+
+  public void ValidateElementList() {
+    for (int i = _elements.Count; i-- != 0;) {
+      if (_elements[i] == null) {
+        _elements.RemoveAt(i);
+        continue;
+      }
+
+      if (!_elements[i].transform.IsChildOf(transform)) {
+        TryRemoveElement(_elements[i]);
+        continue;
       }
     }
   }

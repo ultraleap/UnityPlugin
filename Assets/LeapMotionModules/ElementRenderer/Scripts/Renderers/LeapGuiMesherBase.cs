@@ -126,6 +126,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
   protected const string BLEND_SHAPE_AMOUNTS_PROPERTY = LeapGui.PROPERTY_PREFIX + "BlendShapeAmounts";
   protected List<float> _blendShapeAmounts = new List<float>();
 
+#if UNITY_EDITOR
   public virtual bool IsAtlasDirty {
     get {
       return _atlas.isDirty;
@@ -160,6 +161,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
       });
     });
   }
+#endif
 
   public virtual void GetSupportInfo(List<LeapGuiTextureFeature> features, List<SupportInfo> info) {
     for (int i = 0; i < features.Count; i++) {
@@ -217,16 +219,17 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
 
   public override void OnDisableRenderer() { }
 
+  public override void OnUpdateRenderer() {
+    updateTinting();
+    updateBlendShapes();
+  }
+
+#if UNITY_EDITOR
   public override void OnEnableRendererEditor() { }
 
   public override void OnDisableRendererEditor() {
     DeleteAsset(ref _meshes);
     DeleteAsset(ref _packedTextures);
-  }
-
-  public override void OnUpdateRenderer() {
-    updateTinting();
-    updateBlendShapes();
   }
 
   public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
@@ -238,6 +241,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
     setupForBuilding();
     buildMesh();
   }
+#endif
 
   #region UPDATE
   protected virtual void updateTinting() {

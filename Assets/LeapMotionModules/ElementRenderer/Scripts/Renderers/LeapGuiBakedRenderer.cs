@@ -79,15 +79,6 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     }
   }
 
-  public override void OnDisableRendererEditor() {
-    base.OnDisableRendererEditor();
-
-    foreach (var renderer in _renderers) {
-      renderer.Destroy();
-    }
-    _renderers.Clear();
-  }
-
   public override void OnUpdateRenderer() {
     base.OnUpdateRenderer();
 
@@ -131,6 +122,16 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     }
   }
 
+#if UNITY_EDITOR
+  public override void OnDisableRendererEditor() {
+    base.OnDisableRendererEditor();
+
+    foreach (var renderer in _renderers) {
+      renderer.Destroy();
+    }
+    _renderers.Clear();
+  }
+
   public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
     base.OnUpdateRendererEditor(isHeavyUpdate);
 
@@ -158,6 +159,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
       }
     }
   }
+#endif
 
   protected override void setupForBuilding() {
     if (_shader == null) {

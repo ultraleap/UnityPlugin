@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,6 +10,7 @@ public interface IProgressView {
   void DisplayProgress(string title, string info, float progress);
 }
 
+#if UNITY_EDITOR
 public class EditorProgressView : IProgressView {
   public static readonly EditorProgressView Single = new EditorProgressView();
 
@@ -20,6 +22,7 @@ public class EditorProgressView : IProgressView {
     EditorUtility.DisplayProgressBar(title, info, progress);
   }
 }
+#endif
 
 public class ProgressBar {
   private List<int> chunks = new List<int>();
@@ -30,7 +33,9 @@ public class ProgressBar {
 
   private IProgressView _view;
 
+#if UNITY_EDITOR
   public ProgressBar() : this(EditorProgressView.Single) { }
+#endif
 
   public ProgressBar(IProgressView view) {
     _view = view;
@@ -94,7 +99,7 @@ public class ProgressBar {
     }
 
     infoString += info;
-    
+
     _view.DisplayProgress(titleString, infoString, percent);
   }
 }

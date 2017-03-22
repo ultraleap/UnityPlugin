@@ -19,8 +19,12 @@ public class LeapGuiComponentBase<AttachedComponent> : MonoBehaviour
   }
 
   protected virtual void OnDestroy() {
+#if UNITY_EDITOR
     InternalUtility.InvokeIfUserDestroyed(OnDestroyedByUser);
+#endif
   }
 
+#if UNITY_EDITOR
   protected virtual void OnDestroyedByUser() { }
+#endif
 }
