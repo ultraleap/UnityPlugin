@@ -4,7 +4,7 @@ using UnityEngine;
 
 [ExecuteInEditMode]
 [DisallowMultipleComponent]
-public abstract class LeapGuiElement : MonoBehaviour {
+public abstract partial class LeapGuiElement : MonoBehaviour {
 
   #region INSPECTOR FIELDS
   [SerializeField, HideInInspector]
@@ -63,22 +63,9 @@ public abstract class LeapGuiElement : MonoBehaviour {
     }
   }
 
-#if UNITY_EDITOR
-  public Mesh pickingMesh {
-    get {
-      return _pickingMesh;
-    }
-    set {
-      _pickingMesh = value;
-    }
-  }
-#endif
-
   public virtual void OnAttachedToGui(LeapGuiGroup group, Transform anchor) {
 #if UNITY_EDITOR
-    if (!Application.isPlaying) {
-      _preferredRendererType = group.renderer.GetType();
-    }
+    editor.OnAttachedToGui();
 #endif
 
     _attachedGroup = group;
