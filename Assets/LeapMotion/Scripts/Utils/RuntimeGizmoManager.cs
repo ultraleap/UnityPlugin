@@ -544,8 +544,8 @@ namespace Leap.Unity.RuntimeGizmos {
       float height = (start - end).magnitude;
 
       // Radial circles
-      DrawLineWireCircle(start, up, radius);
-      DrawLineWireCircle(end, -up, radius);
+      DrawLineWireCircle(start, up, radius, 8);
+      DrawLineWireCircle(end, -up, radius, 8);
 
       // Sides
       DrawLine(start + right, end + right);
@@ -554,17 +554,17 @@ namespace Leap.Unity.RuntimeGizmos {
       DrawLine(start - forward, end - forward);
 
       // Endcaps
-      DrawWireArc(start, right, forward, radius, 0.5F, 26);
-      DrawWireArc(start, forward, -right, radius, 0.5F, 26);
-      DrawWireArc(end, right, -forward, radius, 0.5F, 26);
-      DrawWireArc(end, forward, right, radius, 0.5F, 26);
+      DrawWireArc(start, right, forward, radius, 0.5F, 8);
+      DrawWireArc(start, forward, -right, radius, 0.5F, 8);
+      DrawWireArc(end, right, -forward, radius, 0.5F, 8);
+      DrawWireArc(end, forward, right, radius, 0.5F, 8);
     }
 
-    private void DrawLineWireCircle(Vector3 center, Vector3 normal, float radius) {
-      DrawWireArc(center, normal, Vector3.Slerp(normal, -normal, 0.5F), radius, 1.0F, 26);
+    private void DrawLineWireCircle(Vector3 center, Vector3 normal, float radius, int numCircleSegments = 16) {
+      DrawWireArc(center, normal, Vector3.Slerp(normal, -normal, 0.5F), radius, 1.0F, numCircleSegments);
     }
 
-    public void DrawWireArc(Vector3 center, Vector3 normal, Vector3 radialStartDirection, float radius, float fractionOfCircleToDraw, int numCircleSegments = 32) {
+    public void DrawWireArc(Vector3 center, Vector3 normal, Vector3 radialStartDirection, float radius, float fractionOfCircleToDraw, int numCircleSegments = 16) {
       normal = normal.normalized;
       Vector3 radiusVector = radialStartDirection.normalized * radius;
       Vector3 nextVector;
