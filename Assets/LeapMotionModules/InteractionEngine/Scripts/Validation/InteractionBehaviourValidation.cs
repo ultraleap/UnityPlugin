@@ -14,11 +14,6 @@ namespace Leap.Unity.Interaction {
         shouldShadowStateMatch = false;
       }
 
-      //If in soft contact mode, actual state might be different than shadow state.
-      if (_contactMode == ContactMode.SOFT) {
-        shouldShadowStateMatch = false;
-      }
-
       if (shouldShadowStateMatch) {
         Assert.AreEqual(_rigidbody.isKinematic, _isKinematic,
                         "Kinematic shadow state must match actual kinematic state.");
