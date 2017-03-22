@@ -71,7 +71,6 @@ namespace Leap.Unity {
     public static Hand Left {
       get {
         if (Provider == null) return null;
-        if (Provider.CurrentFrame == null) return null;
         return Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand => hand.IsLeft);
       }
     }
@@ -81,8 +80,45 @@ namespace Leap.Unity {
     public static Hand Right {
       get {
         if (Provider == null) return null;
-        if (Provider.CurrentFrame == null) return null;
         else return Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand => hand.IsRight);
+      }
+    }
+
+    /// <summary> Returns the first left hand found by Leap in the current
+    /// FIXED frame (as in FixedUpdate), otherwise returns null if no such hand is found. </summary>
+    public static Hand FixedLeft {
+      get {
+        if (Provider == null) return null;
+        return Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand => hand.IsLeft);
+      }
+    }
+
+    /// <summary> Returns the first right hand found by Leap in the current
+    /// FIXED frame (as in FixedUpdate), otherwise returns null if no such hand is found. </summary>
+    public static Hand FixedRight {
+      get {
+        if (Provider == null) return null;
+        return Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand => hand.IsRight);
+      }
+    }
+
+    public static Chirality Handedness(this Hand hand) {
+      return hand.IsLeft ? Chirality.Left : Chirality.Right;
+    }
+
+    public static void FromFrame(Frame frame, out Hand leftHand, out Hand rightHand) {
+      bool assignedLeft = false, assignedRight = false;
+      leftHand = rightHand = null;
+      foreach (Hand hand in frame.Hands) {
+        if (hand.IsLeft && !assignedLeft) {
+          leftHand = hand;
+          assignedLeft = true;
+        }
+        if (hand.IsRight && !assignedRight) {
+          rightHand = hand;
+          assignedRight = true;
+        }
+        if (assignedLeft && assignedRight) break;
       }
     }
 

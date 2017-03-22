@@ -244,7 +244,7 @@ namespace Leap.Unity.Interaction {
 
         IInteractionBehaviour behaviour = collider.attachedRigidbody.GetComponent<IInteractionBehaviour>();
         if (behaviour == null) {
-          Assert.IsNotNull(behaviour, "Only interaction behaviours are allowed to collide with the brush layer.");
+          //Assert.IsNotNull(behaviour, "Only interaction behaviours are allowed to collide with the brush layer.");
           continue;
         }
 

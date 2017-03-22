@@ -4,7 +4,6 @@ using UnityEngine.Assertions;
 using System;
 using System.Collections.Generic;
 using Leap.Unity.RuntimeGizmos;
-using Leap.Unity.Interaction.CApi;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction {
@@ -63,6 +62,10 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected bool _graspingEnabled = true;
 
+    [Tooltip("When grasping is enabled, allow two hands to grasp the same object simultaneously.")]
+    [SerializeField]
+    protected bool _twoHandedGrasping = false;
+
     [Tooltip("Objects within this radius of a hand will be considered for interaction.")]
     [SerializeField]
     protected float _activationRadius = 0.15f;
@@ -80,15 +83,15 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     protected SingleLayer _templateLayer = 0;
 
-    [Tooltip("Default layer that interaction objects")]
+    [Tooltip("The layer containing interaction objects.")]
     [SerializeField]
     protected SingleLayer _interactionLayer = 0;
 
-    [Tooltip("Default layer that interaction objects when they become grasped.")]
+    [Tooltip("The layer containing interaction objects when they become grasped.")]
     [SerializeField]
     protected SingleLayer _interactionNoClipLayer = 0;
 
-    [Tooltip("Layer that interaction brushes will be on normally.")]
+    [Tooltip("The layer containing the colliders for the bones of the hand.")]
     [SerializeField]
     protected SingleLayer _brushLayer = 0;
 
@@ -96,18 +99,6 @@ namespace Leap.Unity.Interaction {
     [Tooltip("Automatically validate integrity of simulation state each frame.  Can cause slowdown, but is always compiled out for release builds.")]
     [SerializeField]
     protected bool _automaticValidation = false;
-
-    [Tooltip("Shows the debug visualization coming from the internal Interaction plugin.")]
-    [SerializeField]
-    protected bool _showDebugLines = false;
-
-    [Tooltip("Shows the debug messages coming from the internal Interaction plugin.")]
-    [SerializeField]
-    protected bool _showDebugOutput = false;
-
-    [Tooltip("Will display the debug messages if assigned.")]
-    [SerializeField]
-    protected Text _debugTextView;
     #endregion
 
     #region INTERNAL FIELDS
@@ -118,54 +109,28 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected INTERACTION_SCENE _scene;
     private bool _hasSceneBeenCreated = false;
-    private bool _enableGraspingLast = false;
 
-    protected ActivityManager _activityManager = new ActivityManager();
-    protected ShapeDescriptionPool _shapeDescriptionPool;
-
-    //Maps the Interaction instance handle to the behaviour
-    //A mapping only exists if a shape instance has been created
-    protected Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, IInteractionBehaviour> _instanceHandleToBehaviour = new Dictionary<INTERACTION_SHAPE_INSTANCE_HANDLE, IInteractionBehaviour>();
-
+    public ActivityManager _activityManager = new ActivityManager();
     protected Dictionary<int, InteractionHand> _idToInteractionHand = new Dictionary<int, InteractionHand>();
     protected List<IInteractionBehaviour> _graspedBehaviours = new List<IInteractionBehaviour>();
+    protected HeuristicGrabClassifier _grabClassifier;
+    [NonSerialized]
+    public List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(80);
+    [NonSerialized]
+    public Dictionary<Rigidbody, PhysicsUtility.Velocities> originalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
 
     private float _cachedSimulationScale = -1;
     //A temp list that is recycled.  Used to remove items from _handIdToIeHand.
     private List<int> _handIdsToRemove = new List<int>();
     //A temp list that is recycled.  Used as the argument to OnHandsHold.
     private List<Hand> _holdingHands = new List<Hand>();
-    //A temp list that is recycled.  Used to recieve results from InteractionC.
-    private List<INTERACTION_SHAPE_INSTANCE_RESULTS> _resultList = new List<INTERACTION_SHAPE_INSTANCE_RESULTS>();
-    //A temp list that is recycled.  Used to recieve debug lines from InteractionC.
-    private List<INTERACTION_DEBUG_LINE> _debugLines = new List<INTERACTION_DEBUG_LINE>();
-    //A temp list that is recycled.  Used to recieve debug logs from InteractionC.
-    private List<string> _debugOutput = new List<string>();
     #endregion
 
     #region PUBLIC METHODS
     public Action OnGraphicalUpdate;
     public Action OnPrePhysicalUpdate;
     public Action OnPostPhysicalUpdate;
-
-    /// <summary>
-    /// Gets the current set of debug flags for this manager.
-    /// </summary>
-    public virtual DebugFlags DebugFlags {
-      get {
-        DebugFlags flags = DebugFlags.None;
-        if (_showDebugLines) {
-          flags |= DebugFlags.Lines;
-        }
-        if (_showDebugOutput) {
-          flags |= DebugFlags.Strings;
-          flags |= DebugFlags.Logging;
-        }
-        return flags;
-      }
-    }
 
     public float SimulationScale {
       get {
@@ -182,24 +147,6 @@ namespace Leap.Unity.Interaction {
 #else
         return _cachedSimulationScale;
 #endif
-      }
-    }
-
-    public INTERACTION_SCENE Scene {
-      get {
-        return _scene;
-      }
-    }
-
-    /// <summary>
-    /// Returns a ShapeDescriptionPool that can be used to allocate shape descriptions
-    /// for this manager.  Using the pool can be more efficient since identical shapes
-    /// can be automatically combined to save memory.  Shape descriptions aquired from this
-    /// pool will be destroyed when this manager is disabled.
-    /// </summary>
-    public ShapeDescriptionPool ShapePool {
-      get {
-        return _shapeDescriptionPool;
       }
     }
 
@@ -283,6 +230,20 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
+    /// Gets or sets whether or not the Interaction Engine can modify object positions by grasping with two hands simultaneously.
+    /// </summary>
+    public bool TwoHandedGrasping {
+      get {
+        return _twoHandedGrasping;
+      }
+      set {
+        if (_twoHandedGrasping != value) {
+          _twoHandedGrasping = value;
+        }
+      }
+    }
+
+    /// <summary>
     /// Gets the layer that interaction objects should be on by default.
     /// </summary>
     public int InteractionLayer {
@@ -331,49 +292,12 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    /// <summary>
-    /// Enables the display of proximity information from the library.
-    /// </summary>
-    public bool ShowDebugLines {
-      get {
-        return _showDebugLines;
-      }
-      set {
-        _showDebugLines = value;
-        applyDebugSettings();
-      }
-    }
-
-    /// <summary>
-    /// Enables the display of debug text from the library.
-    /// </summary>
-    public bool ShowDebugOutput {
-      get {
-        return _showDebugOutput;
-      }
-      set {
-        _showDebugOutput = value;
-        applyDebugSettings();
-      }
-    }
-
     /// Force an update of the internal scene info.  This should be called if gravity has changed.
     /// </summary>
     public void UpdateSceneInfo() {
       if (!_hasSceneBeenCreated) {
         return; // UpdateSceneInfo is a side effect of a lot of changes.
       }
-
-      INTERACTION_SCENE_INFO info = getSceneInfo();
-
-      if (_graspingEnabled && !_enableGraspingLast) {
-        using (LdatLoader.LoadLdat(ref info, _ldatPath)) {
-          InteractionC.UpdateSceneInfo(ref _scene, ref info);
-        }
-      } else {
-        InteractionC.UpdateSceneInfo(ref _scene, ref info);
-      }
-      _enableGraspingLast = _graspingEnabled;
 
       _cachedSimulationScale = _leapProvider.transform.lossyScale.x;
       _activityManager.OverlapRadius = _activationRadius * _cachedSimulationScale;
@@ -412,13 +336,13 @@ namespace Leap.Unity.Interaction {
             interactionHand.MarkTimeout();
           } else {
             if (_graspingEnabled) {
-              INTERACTION_HAND_RESULT result = new INTERACTION_HAND_RESULT();
-              result.classification = ManipulatorMode.Contact;
-              result.handFlags = HandResultFlags.ManipulatorMode;
-              result.instanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
-              InteractionC.OverrideHandResult(ref _scene, (uint)interactionHand.hand.Id, ref result);
             }
             interactionHand.ReleaseObject();
+
+            InteractionBrushHand ibHand;
+            if ((ibHand = _handPool.GetHandModel<InteractionBrushHand>(interactionHand.hand.Id)) != null) {
+              ibHand.enableSoftContact();
+            }
           }
         }
       }
@@ -445,6 +369,12 @@ namespace Leap.Unity.Interaction {
       }
 
       interactionHand.ReleaseObject();
+
+      InteractionBrushHand ibHand;
+      if ((ibHand = _handPool.GetHandModel<InteractionBrushHand>(interactionHand.hand.Id)) != null){
+        ibHand.enableSoftContact();
+      }
+
       return true;
     }
 
@@ -536,8 +466,6 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void OnValidate() {
       if (Application.isPlaying && _hasSceneBeenCreated) {
-        //Allow the debug lines to be toggled while the scene is playing
-        applyDebugSettings();
         //Allow scene info to be updated while the scene is playing
         UpdateSceneInfo();
       }
@@ -560,6 +488,7 @@ namespace Leap.Unity.Interaction {
         autoGenerateLayers();
         autoSetupCollisionLayers();
       }
+      _grabClassifier = new HeuristicGrabClassifier(this);
     }
 
     protected virtual void OnEnable() {
@@ -569,22 +498,11 @@ namespace Leap.Unity.Interaction {
         return;
       }
 
-      Assert.IsFalse(_hasSceneBeenCreated, "Scene should not have been created yet");
-
-      createScene();
-      applyDebugSettings();
-
-      _shapeDescriptionPool = new ShapeDescriptionPool(_scene);
-
-      Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "There should not be any instances before the creation step.");
-
       _cachedSimulationScale = _leapProvider.transform.lossyScale.x;
 
       _activityManager.BrushLayer = InteractionBrushLayer;
       _activityManager.OverlapRadius = _activationRadius * _cachedSimulationScale;
       _activityManager.MaxDepth = _maxActivationDepth;
-      _activityManager.OnActivate += createInteractionShape;
-      _activityManager.OnDeactivate += destroyInteractionShape;
 
       if (_handPool != null) {
         if (_contactEnabled) {
@@ -606,19 +524,6 @@ namespace Leap.Unity.Interaction {
       _graspedBehaviours.Clear();
 
       _activityManager.DeactivateAll();
-      _activityManager.OnActivate -= createInteractionShape;
-      _activityManager.OnDeactivate -= destroyInteractionShape;
-
-      Assert.AreEqual(_instanceHandleToBehaviour.Count, 0, "All instances should have been destroyed.");
-
-      if (_shapeDescriptionPool != null) {
-        _shapeDescriptionPool.RemoveAllShapes();
-        _shapeDescriptionPool = null;
-      }
-
-      if (_hasSceneBeenCreated) {
-        destroyScene();
-      }
     }
 
     protected virtual void FixedUpdate() {
@@ -633,22 +538,6 @@ namespace Leap.Unity.Interaction {
       if (OnPostPhysicalUpdate != null) {
         OnPostPhysicalUpdate();
       }
-
-      if (_showDebugLines) {
-        RuntimeGizmoDrawer gizmoDrawer;
-        if (RuntimeGizmoManager.TryGetGizmoDrawer(gameObject, out gizmoDrawer)) {
-          InteractionC.GetDebugLines(ref _scene, _debugLines);
-          for (int i = 0; i < _debugLines.Count; i++) {
-            var line = _debugLines[i];
-            gizmoDrawer.color = line.color.ToUnityColor();
-            gizmoDrawer.DrawLine(line.start.ToVector3(), line.end.ToVector3());
-          }
-        }
-      }
-
-      if (_showDebugOutput) {
-        InteractionC.GetDebugStrings(ref _scene, _debugOutput);
-      }
     }
 
     protected virtual void LateUpdate() {
@@ -662,27 +551,8 @@ namespace Leap.Unity.Interaction {
         OnGraphicalUpdate();
       }
 
-      if (_showDebugOutput && _debugTextView != null) {
-        string text = "";
-        for (int i = 0; i < _debugOutput.Count; i++) {
-          text += _debugOutput[i];
-          if (i != _debugOutput.Count - 1) {
-            text += "\n";
-          }
-        }
-        _debugTextView.text = text;
-      }
-
       if (_automaticValidation) {
         Validate();
-      }
-    }
-
-    protected virtual void OnGUI() {
-      if (_showDebugOutput) {
-        for (int i = 0; i < _debugOutput.Count; i++) {
-          GUILayout.Label(_debugOutput[i]);
-        }
       }
     }
     #endregion
@@ -743,41 +613,17 @@ namespace Leap.Unity.Interaction {
 
       dispatchOnHandsHoldingAll(frame, isPhysics: true);
 
-      updateInteractionRepresentations();
-
-      updateTracking(frame);
-
-      simulateInteraction();
+      //Apply soft contacts from both hands in unified solve
+      //(this will clear softContacts and originalVelocities as well)
+      if (softContacts.Count > 0) {
+        PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
+      }
 
       updateInteractionStateChanges(frame);
 
-      dispatchSimulationResults();
 
       for (int i = 0; i < active.Count; i++) {
         active[i].NotifyPostSolve();
-      }
-    }
-
-    protected virtual void applyDebugSettings() {
-      InteractionC.EnableDebugFlags(ref _scene, (uint)DebugFlags);
-    }
-
-    protected virtual void updateInteractionRepresentations() {
-      var active = _activityManager.ActiveBehaviours;
-      for (int i = 0; i < active.Count; i++) {
-        IInteractionBehaviour interactionBehaviour = active[i];
-        try {
-          INTERACTION_SHAPE_INSTANCE_HANDLE shapeInstanceHandle = interactionBehaviour.ShapeInstanceHandle;
-
-          INTERACTION_UPDATE_SHAPE_INFO updateInfo;
-          INTERACTION_TRANSFORM updateTransform;
-          interactionBehaviour.GetInteractionShapeUpdateInfo(out updateInfo, out updateTransform);
-
-          InteractionC.UpdateShapeInstance(ref _scene, ref updateTransform, ref updateInfo, ref shapeInstanceHandle);
-        } catch (Exception e) {
-          _activityManager.NotifyMisbehaving(interactionBehaviour);
-          Debug.LogException(e);
-        }
       }
     }
 
@@ -801,10 +647,12 @@ namespace Leap.Unity.Interaction {
       }
 
       try {
-        if (isPhysics) {
-          interactionBehaviour.NotifyHandsHoldPhysics(_holdingHands);
-        } else {
-          interactionBehaviour.NotifyHandsHoldGraphics(_holdingHands);
+        if (_holdingHands.Count > 0) {
+          if (isPhysics) {
+            interactionBehaviour.NotifyHandsHoldPhysics(_holdingHands);
+          } else {
+            interactionBehaviour.NotifyHandsHoldGraphics(_holdingHands);
+          }
         }
       } catch (Exception e) {
         _activityManager.NotifyMisbehaving(interactionBehaviour);
@@ -814,32 +662,12 @@ namespace Leap.Unity.Interaction {
       _holdingHands.Clear();
     }
 
-    protected virtual void updateTracking(Frame frame) {
-      int handCount = frame.Hands.Count;
-      IntPtr ptr = HandArrayBuilder.CreateHandArray(frame);
-      InteractionC.UpdateHands(ref _scene, (uint)handCount, ptr);
-      StructAllocator.CleanupAllocations();
-    }
-
-    protected virtual void simulateInteraction() {
-      var _controllerTransform = new INTERACTION_TRANSFORM();
-      _controllerTransform.position = _leapProvider.transform.position.ToCVector();
-      _controllerTransform.rotation = _leapProvider.transform.rotation.ToCQuaternion();
-      _controllerTransform.wallTime = Time.fixedTime;
-
-      InteractionC.UpdateController(ref _scene, ref _controllerTransform);
-    }
-
     protected virtual void updateInteractionStateChanges(Frame frame) {
       var hands = frame.Hands;
-
-      INTERACTION_HAND_RESULT handResult = new INTERACTION_HAND_RESULT();
 
       //First loop through all the hands and get their classifications from the engine
       for (int i = 0; i < hands.Count; i++) {
         Hand hand = hands[i];
-
-        bool handResultForced = false;
 
         //Get the InteractionHand associated with this hand id
         InteractionHand interactionHand;
@@ -878,16 +706,6 @@ namespace Leap.Unity.Interaction {
               Debug.LogException(e);
               continue;
             }
-
-            //Override the existing classification to force the hand to grab the old object
-            handResultForced = true;
-            handResult.classification = ManipulatorMode.Grasp;
-            handResult.handFlags = HandResultFlags.ManipulatorMode;
-            handResult.instanceHandle = interactionHand.graspedObject.ShapeInstanceHandle;
-
-            if (_graspingEnabled) {
-              InteractionC.OverrideHandResult(ref _scene, (uint)hand.Id, ref handResult);
-            }
           } else {
             //Otherwise just create a new one
             interactionHand = new InteractionHand(hand);
@@ -895,62 +713,9 @@ namespace Leap.Unity.Interaction {
           }
         }
 
-        if (!handResultForced) {
-          handResult = getHandResults(interactionHand);
-        }
-
         interactionHand.UpdateHand(hand);
-
-        if (!interactionHand.isUserGrasp) {
-          switch (handResult.classification) {
-            case ManipulatorMode.Grasp:
-              {
-                IInteractionBehaviour interactionBehaviour;
-                if (_instanceHandleToBehaviour.TryGetValue(handResult.instanceHandle, out interactionBehaviour)) {
-                  if (interactionHand.graspedObject == null) {
-                    if (!interactionBehaviour.IsBeingGrasped) {
-                      _graspedBehaviours.Add(interactionBehaviour);
-                    }
-
-                    try {
-                      interactionHand.GraspObject(interactionBehaviour, isUserGrasp: false);
-
-                      //the grasp callback might have caused the object to become ungrasped
-                      //the component might have also destroyed itself!
-                      if (interactionHand.graspedObject == interactionBehaviour && interactionBehaviour != null) {
-                        dispatchOnHandsHolding(hands, interactionBehaviour, isPhysics: true);
-                      }
-                    } catch (Exception e) {
-                      _activityManager.NotifyMisbehaving(interactionBehaviour);
-                      Debug.LogException(e);
-                      continue;
-                    }
-                  }
-                } else {
-                  Debug.LogError("Recieved a hand result with an unkown handle " + handResult.instanceHandle.handle);
-                }
-                break;
-              }
-            case ManipulatorMode.Contact:
-              {
-                if (interactionHand.graspedObject != null) {
-                  if (interactionHand.graspedObject.GraspingHandCount == 1) {
-                    _graspedBehaviours.Remove(interactionHand.graspedObject);
-                  }
-
-                  try {
-                    interactionHand.ReleaseObject();
-                  } catch (Exception e) {
-                    _activityManager.NotifyMisbehaving(interactionHand.graspedObject);
-                    Debug.LogException(e);
-                    continue;
-                  }
-                }
-                break;
-              }
-            default:
-              throw new InvalidOperationException("Unexpected classification " + handResult.classification);
-          }
+        if (_graspingEnabled) {
+          _grabClassifier.UpdateHeuristicClassifier(interactionHand.hand);
         }
       }
 
@@ -1005,110 +770,6 @@ namespace Leap.Unity.Interaction {
         _idToInteractionHand.Remove(_handIdsToRemove[i]);
       }
       _handIdsToRemove.Clear();
-    }
-
-    protected virtual INTERACTION_HAND_RESULT getHandResults(InteractionHand hand) {
-      if (!_graspingEnabled) {
-        INTERACTION_HAND_RESULT result = new INTERACTION_HAND_RESULT();
-        result.classification = ManipulatorMode.Contact;
-        result.handFlags = HandResultFlags.ManipulatorMode;
-        result.instanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
-        return result;
-      }
-
-      INTERACTION_HAND_RESULT handResult;
-      InteractionC.GetHandResult(ref _scene,
-                                     (uint)hand.hand.Id,
-                                 out handResult);
-      return handResult;
-    }
-
-    protected virtual void dispatchSimulationResults() {
-      InteractionC.GetShapeInstanceResults(ref _scene, _resultList);
-
-      for (int i = 0; i < _resultList.Count; ++i) {
-        INTERACTION_SHAPE_INSTANCE_RESULTS result = _resultList[i];
-
-        //Behaviour might have already been unregistered during an earlier callback for this simulation step
-        IInteractionBehaviour interactionBehaviour;
-        if (_instanceHandleToBehaviour.TryGetValue(result.handle, out interactionBehaviour)) {
-          try {
-            // ShapeInstanceResultFlags.None may be returned if requested when hands are not touching.
-            interactionBehaviour.NotifyRecievedSimulationResults(result);
-          } catch (Exception e) {
-            _activityManager.NotifyMisbehaving(interactionBehaviour);
-            Debug.LogException(e);
-          }
-        }
-      }
-    }
-
-    protected virtual void createInteractionShape(IInteractionBehaviour interactionBehaviour) {
-      INTERACTION_SHAPE_DESCRIPTION_HANDLE descriptionHandle = interactionBehaviour.ShapeDescriptionHandle;
-      INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
-
-      INTERACTION_CREATE_SHAPE_INFO createInfo;
-      INTERACTION_TRANSFORM createTransform;
-      interactionBehaviour.GetInteractionShapeCreationInfo(out createInfo, out createTransform);
-
-      InteractionC.CreateShapeInstance(ref _scene, ref descriptionHandle, ref createTransform, ref createInfo, out instanceHandle);
-
-      _instanceHandleToBehaviour[instanceHandle] = interactionBehaviour;
-
-      interactionBehaviour.NotifyInteractionShapeCreated(instanceHandle);
-    }
-
-    protected virtual void destroyInteractionShape(IInteractionBehaviour interactionBehaviour) {
-      INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle = interactionBehaviour.ShapeInstanceHandle;
-
-      _instanceHandleToBehaviour.Remove(instanceHandle);
-
-      InteractionC.DestroyShapeInstance(ref _scene, ref instanceHandle);
-
-      interactionBehaviour.NotifyInteractionShapeDestroyed();
-    }
-
-    protected virtual void createScene() {
-      _scene.pScene = (IntPtr)0;
-
-      UInt32 libraryVersion = InteractionC.GetLibraryVersion();
-      UInt32 expectedVersion = InteractionC.GetExpectedVersion();
-      if (libraryVersion != expectedVersion) {
-        Debug.LogError("Leap Interaction dll version expected: " + expectedVersion + " got version: " + libraryVersion);
-        throw new Exception("Leap Interaction library version wrong");
-      }
-
-      InteractionC.CreateScene(ref _scene);
-      _hasSceneBeenCreated = true;
-
-      UpdateSceneInfo();
-    }
-
-    protected virtual void destroyScene() {
-      InteractionC.DestroyScene(ref _scene);
-      _hasSceneBeenCreated = false;
-    }
-
-    protected virtual INTERACTION_SCENE_INFO getSceneInfo() {
-      INTERACTION_SCENE_INFO info = new INTERACTION_SCENE_INFO();
-      info.sceneFlags = SceneInfoFlags.None;
-
-      if (Physics.gravity.sqrMagnitude != 0.0f) {
-        info.sceneFlags |= SceneInfoFlags.HasGravity;
-        info.gravity = Physics.gravity.ToCVector();
-      }
-
-      if (_contactEnabled) {
-        info.sceneFlags |= SceneInfoFlags.ContactEnabled;
-      }
-
-      // _enableGraspingLast gaurds against expensive file IO.  Only load the ldat
-      // data when grasping is being enabled.
-      if (_graspingEnabled) {
-        info.sceneFlags |= SceneInfoFlags.GraspEnabled;
-      }
-
-      return info;
     }
 
     //A persistant structure for storing useful data about a hand as it interacts with objects

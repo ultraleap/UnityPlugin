@@ -13,12 +13,7 @@ namespace Leap.Unity.Interaction {
       AssertHelper.Implies("_hasSceneBeenCreated", _hasSceneBeenCreated,
                            "isActiveAndEnabled", isActiveAndEnabled);
 
-      AssertHelper.Implies(_scene.pScene != IntPtr.Zero, isActiveAndEnabled,
-                           "Scene ptr should always be non-null when manager is active.");
-
       assertNonNullWhenActive(_activityManager, "Activity Manager");
-      assertNonNullWhenActive(_shapeDescriptionPool, "Shape Description Pool");
-      assertNonNullWhenActive(_instanceHandleToBehaviour, "Instance Handle mapping");
       assertNonNullWhenActive(_idToInteractionHand, "Id To Hand mapping");
       assertNonNullWhenActive(_graspedBehaviours, "Grasped behaviour list");
 
@@ -34,10 +29,6 @@ namespace Leap.Unity.Interaction {
         }
 
         interactionHand.Validate();
-      }
-
-      foreach (var interactionObj in _instanceHandleToBehaviour.Values) {
-        assertIsRegisteredWithThisManager(interactionObj);
       }
 
       foreach (var graspedObj in _graspedBehaviours) {
@@ -118,6 +109,5 @@ namespace Leap.Unity.Interaction {
         }
       }
     }
-
   }
 }

@@ -20,6 +20,7 @@ ExportedObj/
 Temp/
 
 .vscode/
+omnisharp.json
 
 *~
 *.swp
