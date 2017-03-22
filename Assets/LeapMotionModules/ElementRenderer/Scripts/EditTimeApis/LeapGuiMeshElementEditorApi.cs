@@ -3,6 +3,7 @@ using UnityEngine;
 
 public abstract partial class LeapGuiMeshElementBase : LeapGuiElement {
 
+#if UNITY_EDITOR
   public class MeshEditorApi : EditorApi {
     protected readonly LeapGuiMeshElementBase _meshElement;
 
@@ -47,4 +48,5 @@ public abstract partial class LeapGuiMeshElementBase : LeapGuiElement {
       pickingMesh.RecalculateNormals();
     }
   }
+#endif
 }

@@ -169,6 +169,7 @@ public abstract partial class LeapGuiElement : MonoBehaviour {
 
   #region PRIVATE IMPLEMENTATION
 
+#if UNITY_EDITOR
   protected LeapGuiElement() {
     editor = new EditorApi(this);
   }
@@ -176,6 +177,7 @@ public abstract partial class LeapGuiElement : MonoBehaviour {
   protected LeapGuiElement(EditorApi editor) {
     this.editor = editor;
   }
+#endif
 
   #endregion
 }

@@ -324,9 +324,11 @@ public partial class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
   #region PRIVATE IMPLEMENTATION
 
+#if UNITY_EDITOR
   private LeapGuiGroup() {
     editor = new EditorApi(this);
   }
+#endif
 
   private bool addRemoveSupportedOrEditTime() {
 #if UNITY_EDITOR
