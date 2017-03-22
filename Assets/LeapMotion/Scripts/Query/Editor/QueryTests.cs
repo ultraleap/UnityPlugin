@@ -147,6 +147,12 @@ namespace Leap.Unity.Query.Test {
     }
 
     [Test]
+    public void FoldTest() {
+      Assert.AreEqual(LIST_0.Query().Fold((a, b) => a + b),
+                      LIST_0.Sum());
+    }
+
+    [Test]
     public void IndexOfTests() {
       Assert.AreEqual(LIST_0.Query().IndexOf(3), 2);
       Assert.AreEqual(LIST_0.Query().IndexOf(100), -1);

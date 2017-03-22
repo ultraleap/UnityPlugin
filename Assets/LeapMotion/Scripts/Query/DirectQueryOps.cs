@@ -122,6 +122,21 @@ namespace Leap.Unity.Query {
       }
     }
 
+    public QueryType Fold(Func<QueryType, QueryType, QueryType> foldFunc) {
+      using (thisAndConsume) {
+        if (!_op.MoveNext()) {
+          throw new InvalidOperationException();
+        }
+        QueryType value = _op.Current;
+
+        while (_op.MoveNext()) {
+          value = foldFunc(value, _op.Current);
+        }
+
+        return value;
+      }
+    }
+
     public int IndexOf(QueryType value) {
       using (thisAndConsume) {
         int index = 0;
