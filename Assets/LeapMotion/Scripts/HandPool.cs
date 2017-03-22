@@ -271,16 +271,6 @@ namespace Leap.Unity {
         }
       }
     }
-    public T GetHandModel<T>(int handId) where T : IHandModel {
-      foreach (ModelGroup group in ModelPool) {
-        foreach (IHandModel handModel in group.modelsCheckedOut) {
-          if(handModel.GetLeapHand().Id == handId && handModel is T) {
-            return handModel as T;
-          }
-        }
-      }
-      return null;
-    }
 
 #if UNITY_EDITOR
     /**In the Unity Editor, Validate that the IHandModel is an instance of a prefab from the scene vs. a prefab from the project. */
