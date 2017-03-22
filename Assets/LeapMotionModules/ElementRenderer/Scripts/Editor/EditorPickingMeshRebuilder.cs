@@ -14,7 +14,7 @@ public static class EditorPickingMeshRebuilder {
     }
 
     foreach (var gui in UnityEngine.Object.FindObjectsOfType<LeapGui>()) {
-      gui.RebuildEditorPickingMeshes();
+      gui.editor.RebuildEditorPickingMeshes();
     }
   }
 }

@@ -51,7 +51,7 @@ public partial class LeapGui : MonoBehaviour {
       Assert.IsNotNull(rendererType);
 
       var group = _gui.gameObject.AddComponent<LeapGuiGroup>();
-      group.Init(_gui, rendererType);
+      group.editor.Init(_gui, rendererType);
 
       _gui._selectedGroup = _gui._groups.Count;
       _gui._groups.Add(group);
@@ -102,7 +102,7 @@ public partial class LeapGui : MonoBehaviour {
       }
 
       foreach (var group in _gui._groups) {
-        group.RebuildEditorPickingMeshes();
+        group.editor.RebuildEditorPickingMeshes();
       }
     }
 
@@ -142,10 +142,10 @@ public partial class LeapGui : MonoBehaviour {
         _gui.collectUnattachedElements();
 
         foreach (var group in _gui._groups) {
-          group.ValidateElementList();
+          group.editor.ValidateElementList();
           group.RebuildFeatureData();
           group.RebuildFeatureSupportInfo();
-          group.UpdateRendererEditor(heavyRebuild);
+          group.editor.UpdateRendererEditor(heavyRebuild);
         }
 
         _gui._hasFinishedSetup = true;

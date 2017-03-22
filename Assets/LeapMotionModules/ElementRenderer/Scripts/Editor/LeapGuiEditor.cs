@@ -42,7 +42,7 @@ public class LeapGuiEditor : CustomEditorBase {
       _addSpaceMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(space)),
                             false,
                             () => {
-                              _gui.SetSpace(space);
+                              _gui.editor.SetSpace(space);
                               CreateCachedEditor(_gui.space, null, ref _spaceEditor);
                               serializedObject.Update();
                             });
@@ -58,7 +58,7 @@ public class LeapGuiEditor : CustomEditorBase {
       _addGroupMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(renderer)),
                             false,
                             () => {
-                              _gui.CreateGroup(renderer);
+                              _gui.editor.CreateGroup(renderer);
                               updateGroupEditor();
                             });
     }
@@ -147,7 +147,7 @@ public class LeapGuiEditor : CustomEditorBase {
 
       if (_groupEditor != null) {
         if (GUILayout.Button("Delete Group", EditorStyles.toolbarButton)) {
-          _gui.DestroySelectedGroup();
+          _gui.editor.DestroySelectedGroup();
           updateGroupEditor();
         }
       }
@@ -204,11 +204,11 @@ public class LeapGuiEditor : CustomEditorBase {
   }
 
   private Bounds OnGetFrameBounds() {
-    _gui.RebuildEditorPickingMeshes();
+    _gui.editor.RebuildEditorPickingMeshes();
 
     Bounds[] allBounds = _gui.groups.Query().
                               SelectMany(g => g.elements.Query()).
-                              Select(e => e.pickingMesh).
+                              Select(e => e.editor.pickingMesh).
                               Where(m => m != null).
                               Select(m => m.bounds).
                               ToArray();

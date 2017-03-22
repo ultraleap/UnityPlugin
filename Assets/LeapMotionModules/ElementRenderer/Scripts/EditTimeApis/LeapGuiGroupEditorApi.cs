@@ -103,7 +103,7 @@ public partial class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
 
       using (new ProfilerSample("Rebuild Picking Meshes")) {
         foreach (var element in _group._elements) {
-          element.RebuildEditorPickingMesh();
+          element.editor.RebuildEditorPickingMesh();
         }
       }
     }

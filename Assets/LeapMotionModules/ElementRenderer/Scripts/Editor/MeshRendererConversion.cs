@@ -11,7 +11,7 @@ public static class MeshRendererConversion {
     var gui = (command.context as MeshRenderer).GetComponentInParent<LeapGui>();
 
     if (gui.groups.Count == 0) {
-      gui.CreateGroup(typeof(LeapGuiBakedRenderer));
+      gui.editor.CreateGroup(typeof(LeapGuiBakedRenderer));
     }
 
     var group = gui.groups[0];
@@ -43,7 +43,7 @@ public static class MeshRendererConversion {
                                        FirstOrDefault(f => f.propertyName == propName);
 
           if (feature == null) {
-            feature = group.AddFeature(typeof(LeapGuiTextureFeature)) as LeapGuiTextureFeature;
+            feature = group.editor.AddFeature(typeof(LeapGuiTextureFeature)) as LeapGuiTextureFeature;
             feature.channel = UnityEngine.Rendering.UVChannelFlags.UV0;
             feature.propertyName = propName;
           }
@@ -87,7 +87,7 @@ public static class MeshRendererConversion {
       Undo.DestroyObjectImmediate(filter);
     }
 
-    group.gui.ScheduleEditorUpdate();
+    group.gui.editor.ScheduleEditorUpdate();
   }
 
   [MenuItem(CONTEXT_PATH, validate = true)]

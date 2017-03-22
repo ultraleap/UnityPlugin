@@ -90,7 +90,7 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
               }
             }
 
-            mainGroup.gui.ScheduleEditorUpdate();
+            mainGroup.gui.editor.ScheduleEditorUpdate();
           });
           index++;
         }
@@ -135,7 +135,7 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
           if (bakedRenderer != null && bakedRenderer.IsAtlasDirty) {
             if (GUILayout.Button("Refresh Atlas", GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight))) {
               bakedRenderer.RebuildAtlas(new ProgressBar());
-              sharedGroup.gui.ScheduleEditorUpdate();
+              sharedGroup.gui.editor.ScheduleEditorUpdate();
             }
           }
         }
@@ -191,7 +191,7 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
 
   protected Bounds OnGetFrameBounds() {
     Bounds[] allBounds = targets.Query().
-                                 Select(e => e.pickingMesh).
+                                 Select(e => e.editor.pickingMesh).
                                  Where(m => m != null).
                                  Select(m => m.bounds).
                                  ToArray();

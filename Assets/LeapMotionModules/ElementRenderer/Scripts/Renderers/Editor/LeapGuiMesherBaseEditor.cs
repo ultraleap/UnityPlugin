@@ -85,7 +85,7 @@ public class LeapGuiMesherBaseEditor : CustomEditorBase {
         if (GUILayout.Button("Refresh Atlas")) {
           try {
             mesher.RebuildAtlas(new ProgressBar());
-            mesher.gui.ScheduleEditorUpdate();
+            mesher.gui.editor.ScheduleEditorUpdate();
           } finally {
             EditorUtility.ClearProgressBar();
           }
