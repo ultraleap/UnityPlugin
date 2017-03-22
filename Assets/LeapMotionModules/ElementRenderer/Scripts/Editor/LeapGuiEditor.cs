@@ -200,23 +200,25 @@ public class LeapGuiEditor : CustomEditorBase {
   }
 
   private bool HasFrameBounds() {
-    return true;
+    _gui.editor.RebuildEditorPickingMeshes();
+
+    return _gui.groups.Query().
+                       SelectMany(g => g.elements.Query()).
+                       Select(e => e.editor.pickingMesh).
+                       Any(m => m != null);
   }
 
   private Bounds OnGetFrameBounds() {
     _gui.editor.RebuildEditorPickingMeshes();
 
-    Bounds[] allBounds = _gui.groups.Query().
-                              SelectMany(g => g.elements.Query()).
-                              Select(e => e.editor.pickingMesh).
-                              Where(m => m != null).
-                              Select(m => m.bounds).
-                              ToArray();
-
-    Bounds bounds = allBounds[0];
-    for (int i = 1; i < allBounds.Length; i++) {
-      bounds.Encapsulate(allBounds[i]);
-    }
-    return bounds;
+    return _gui.groups.Query().
+                       SelectMany(g => g.elements.Query()).
+                       Select(e => e.editor.pickingMesh).
+                       Where(m => m != null).
+                       Select(m => m.bounds).
+                       Fold((a, b) => {
+                         a.Encapsulate(b);
+                         return a;
+                       });
   }
 }
