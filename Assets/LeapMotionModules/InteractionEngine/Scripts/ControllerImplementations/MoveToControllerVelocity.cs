@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
+using InteractionEngineUtility;
 
 namespace Leap.Unity.Interaction {
 
