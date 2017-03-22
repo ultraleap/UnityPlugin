@@ -6,16 +6,16 @@ namespace Leap.Unity.Interaction {
     //Grab Heuristic Tuning Parameters
     //-----
     //Adds hysteresis to the thumb to make it hold better
-    private const float FINGER_STICKINESS = 0f;
-    private const float THUMB_STICKINESS = 0.05f;
+    private float FINGER_STICKINESS = 0f;
+    private float THUMB_STICKINESS = 0.05f;
     //The minimum and maximum curl values fingers are allowed to "Grab" within
-    private const float MAXIMUM_CURL = 0.65f;
-    private const float MINIMUM_CURL = -0.1f;
+    private float MAXIMUM_CURL = 0.65f;
+    private float MINIMUM_CURL = -0.1f;
     //The radius considered for intersection around the fingertips
-    private const float FINGERTIP_RADIUS = 0.01f;
-    private const float THUMBTIP_RADIUS = 0.015f;
+    private float FINGERTIP_RADIUS = 0.01f;
+    private float THUMBTIP_RADIUS = 0.015f;
     //The minimum amount of time between repeated grabs of a single object
-    private const float GRAB_COOLDOWN = 0.2f;
+    private float GRAB_COOLDOWN = 0.2f;
     //-----
 
     Collider[] collidingCandidates = new Collider[10];
@@ -24,8 +24,15 @@ namespace Leap.Unity.Interaction {
     Dictionary<IInteractionBehaviour, GrabClassifier> leftGrabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifier>();
     Dictionary<IInteractionBehaviour, GrabClassifier> rightGrabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifier>();
 
-    public HeuristicGrabClassifier(InteractionManager manager) {
+    public HeuristicGrabClassifier(InteractionManager manager, float fingerStickiness = 0f, float thumbStickiness = 0.05f, float maxCurl = 0.65f, float minCurl = -0.1f, float fingerRadius = 0.01f, float thumbRadius = 0.015f, float grabCooldown = 0.2f) {
       _manager = manager;
+      FINGER_STICKINESS = fingerStickiness;
+      THUMB_STICKINESS = thumbStickiness;
+      MAXIMUM_CURL = maxCurl;
+      MINIMUM_CURL = minCurl;
+      FINGERTIP_RADIUS = fingerRadius;
+      THUMBTIP_RADIUS = thumbRadius;
+      GRAB_COOLDOWN = grabCooldown;
     }
 
     //Grab Classifier Logic
