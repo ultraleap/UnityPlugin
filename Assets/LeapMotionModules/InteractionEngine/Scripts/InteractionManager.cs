@@ -445,6 +445,7 @@ namespace Leap.Unity.Interaction {
       }
 
       _activityManager.Unregister(interactionBehaviour);
+      _grabClassifier.UnregisterInteractionBehaviour(interactionBehaviour);
     }
 
     public void EnsureActive(IInteractionBehaviour interactionBehaviour) {

@@ -33,7 +33,7 @@ namespace Leap.Unity.Interaction {
         if (classifier.isGrabbing) {
           if (!_manager.TwoHandedGrasping) { _manager.ReleaseObject(behaviour); }
           _manager.GraspWithHand(_hand, behaviour);
-        } else if (!classifier.isGrabbing || behaviour.IsBeingGraspedByHand(_hand.Id)) {
+        } else if (behaviour.IsBeingGraspedByHand(_hand.Id)) {
           _manager.ReleaseHand(_hand.Id);
           classifier.coolDownProgress = 0f;
         }
@@ -46,24 +46,25 @@ namespace Leap.Unity.Interaction {
       if (hand != null) {
 
         //First check if already holding an object and only process that one
-        bool alreadyGrasping = false;
         var graspedBehaviours = _manager.GraspedObjects;
         for (int i = 0; i < graspedBehaviours.Count; i++) {
           if (graspedBehaviours[i].IsBeingGraspedByHand(hand.Id)) {
             UpdateBehaviour(graspedBehaviours[i], hand);
-            alreadyGrasping = true;
-            break;
+            return;
           }
         }
 
         //If not, process all objects
-        if (!alreadyGrasping) {
-          var activeBehaviours = _manager._activityManager.ActiveBehaviours;
-          for (int i = 0; i < activeBehaviours.Count; i++) {
-            UpdateBehaviour(activeBehaviours[i], hand);
-          }
+        var activeBehaviours = _manager._activityManager.ActiveBehaviours;
+        for (int i = 0; i < activeBehaviours.Count; i++) {
+          UpdateBehaviour(activeBehaviours[i], hand);
         }
       }
+    }
+
+    public void UnregisterInteractionBehaviour(IInteractionBehaviour behaviour) {
+      leftGrabClassifiers.Remove(behaviour);
+      rightGrabClassifiers.Remove(behaviour);
     }
 
     protected void fillClassifier(Hand _hand, ref GrabClassifierHeuristics.GrabClassifier classifier) {
