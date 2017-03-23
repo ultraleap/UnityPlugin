@@ -8,28 +8,34 @@ namespace Leap.Unity.Interaction {
     Vector3[] DataCovariance = new Vector3[3];
     Quaternion OptimalRotation = Quaternion.identity;
     public Matrix4x4 SolveKabsch(List<Vector3> inPoints, List<Vector3> refPoints) {
-      if (inPoints.Count != refPoints.Count) { return Matrix4x4.identity; }
+      using (new ProfilerSample("Solve Kabsch Transform")) {
+        if (inPoints.Count != refPoints.Count) { return Matrix4x4.identity; }
 
-      //Calculate the centroid offset and construct the centroid-shifted point matrices
-      Vector3 inCentroid = Vector3.zero; Vector3 refCentroid = Vector3.zero;
-      for (int i = 0; i < inPoints.Count; i++) {
-        inCentroid += inPoints[i];
-        refCentroid += refPoints[i];
+        //Calculate the centroid offset and construct the centroid-shifted point matrices
+        Vector3 inCentroid = Vector3.zero; Vector3 refCentroid = Vector3.zero;
+        using (new ProfilerSample("Calculate Kabsch Centroid")) {
+          for (int i = 0; i < inPoints.Count; i++) {
+            inCentroid += inPoints[i];
+            refCentroid += refPoints[i];
+          }
+          inCentroid /= inPoints.Count;
+          refCentroid /= refPoints.Count;
+          for (int i = 0; i < inPoints.Count; i++) {
+            inPoints[i] -= inCentroid;
+            refPoints[i] -= refCentroid;
+          }
+        }
+
+        //Calculate the covariance matrix, is a 3x3 Matrix and Calculate the optimal rotation
+        using (new ProfilerSample("Solve Optimal Rotation")) {
+          extractRotation(TransposeMult(inPoints, refPoints, DataCovariance), ref OptimalRotation);
+        }
+
+        return
+        Matrix4x4.TRS(refCentroid, Quaternion.identity, Vector3.one) *
+        Matrix4x4.TRS(Vector3.zero, OptimalRotation, Vector3.one) *
+        Matrix4x4.TRS(-inCentroid, Quaternion.identity, Vector3.one);
       }
-      inCentroid /= inPoints.Count;
-      refCentroid /= refPoints.Count;
-      for (int i = 0; i < inPoints.Count; i++) {
-        inPoints[i] -= inCentroid;
-        refPoints[i] -= refCentroid;
-      }
-
-      //Calculate the covariance matrix, is a 3x3 Matrix and Calculate the optimal rotation
-      extractRotation(TransposeMult(inPoints, refPoints, DataCovariance), ref OptimalRotation);
-
-      return
-      Matrix4x4.TRS(refCentroid, Quaternion.identity, Vector3.one) *
-      Matrix4x4.TRS(Vector3.zero, OptimalRotation, Vector3.one) *
-      Matrix4x4.TRS(-inCentroid, Quaternion.identity, Vector3.one);
     }
 
     //https://animation.rwth-aachen.de/media/papers/2016-MIG-StableRotation.pdf

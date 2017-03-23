@@ -205,63 +205,73 @@ namespace Leap.Unity.Interaction {
         return;
       }
 #endif
+      using (new ProfilerSample("Update InteractionBrushHand", this)) {
+        using (new ProfilerSample("Update InteractionBrushBones", this)) {
+          float deadzone = DEAD_ZONE_FRACTION * _hand.Fingers[1].Bone((Bone.BoneType)1).Width;
+          for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
+            for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
+              Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
+              int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
+              UpdateBone(bone, boneArrayIndex, deadzone);
+            }
+          }
 
-        float deadzone = DEAD_ZONE_FRACTION * _hand.Fingers[1].Bone((Bone.BoneType)1).Width;
+          //Update Palm
+          UpdateBone(_hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL), N_FINGERS * N_ACTIVE_BONES, deadzone);
+        }
 
-        for (int fingerIndex = 0; fingerIndex < N_FINGERS; fingerIndex++) {
-          for (int jointIndex = 0; jointIndex < N_ACTIVE_BONES; jointIndex++) {
-            Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
-            int boneArrayIndex = fingerIndex * N_ACTIVE_BONES + jointIndex;
-            UpdateBone(bone, boneArrayIndex, deadzone);
+        if (_softContactEnabled) {
+          //SOFT CONTACT COLLISIONS
+          using (new ProfilerSample("Update Soft Contact", this)) {
+
+            //Generate Contacts
+            bool softlyContacting = false;
+            using (new ProfilerSample("Generate Soft Contacts", this)) {
+              for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++) {
+                for (int jointIndex = 0; jointIndex < 4; jointIndex++) {
+                  Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+                  int boneArrayIndex = fingerIndex * 4 + jointIndex;
+                  Vector3 boneCenter = bone.Center.ToVector3();
+
+                  ////Generate and Fill softContacts with SoftContacts that are intersecting a sphere at boneCenter, with radius softContactBoneRadius
+                  bool sphereIntersecting;
+                  using (new ProfilerSample("Generate Soft Contact", this)) {
+                    if (_manager != null) {
+                      sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, softContactBoneRadius, (boneCenter - previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime,
+                                                            1 << _manager.InteractionLayer, ref _manager.softContacts, ref _manager.originalVelocities, ref tempColliderArray);
+                    } else {
+                      sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, softContactBoneRadius, (boneCenter - previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime,
+                                                            ~(1 << 2), ref softContacts, ref originalVelocities, ref tempColliderArray);
+                    }
+                  }
+                  softlyContacting = sphereIntersecting ? true : softlyContacting;
+                }
+              }
+            }
+
+
+            if (softlyContacting) {
+              //(If we have a manager, let it handle resolving the contacts of both hands in one unified solve)
+              if (_manager == null) {
+                using (new ProfilerSample("Apply Per Hand Soft Contacts", this)) {
+                  PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
+                }
+              }
+              disableSoftContactEnqueued = false;
+            } else {
+              //If there are no detected Contacts, exit soft contact mode
+              disableSoftContact();
+            }
           }
         }
 
-        //Update Palm
-        UpdateBone(_hand.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL), N_FINGERS * N_ACTIVE_BONES, deadzone);
-
-      if (_softContactEnabled) {
-        //SOFT CONTACT COLLISIONS
-
-        //Generate Contacts
-        bool softlyContacting = false;
+        //Update the last positions of the bones with this frame
         for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++) {
           for (int jointIndex = 0; jointIndex < 4; jointIndex++) {
             Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
             int boneArrayIndex = fingerIndex * 4 + jointIndex;
-            Vector3 boneCenter = bone.Center.ToVector3();
-
-            ////Generate and Fill softContacts with SoftContacts that are intersecting a sphere at boneCenter, with radius softContactBoneRadius
-            bool sphereIntersecting;
-            if (_manager != null) {
-              sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, softContactBoneRadius, (boneCenter - previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime,
-                                                    1 << _manager.InteractionLayer, ref _manager.softContacts, ref _manager.originalVelocities, ref tempColliderArray);
-            } else {
-              sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, softContactBoneRadius, (boneCenter - previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime,
-                                                    ~(1 << 2), ref softContacts, ref originalVelocities, ref tempColliderArray);
-            }
-            softlyContacting = sphereIntersecting ? true : softlyContacting;
+            previousBoneCenters[boneArrayIndex] = bone.Center.ToVector3();
           }
-        }
-
-
-        if (softlyContacting) {
-          //(If we have a manager, let it handle resolving the contacts of both hands in one unified solve)
-          if (_manager == null) {
-            PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
-          }
-          disableSoftContactEnqueued = false;
-        } else {
-          //If there are no detected Contacts, exit soft contact mode
-          disableSoftContact();
-        }
-      }
-
-      //Update the last positions of the bones with this frame
-      for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++) {
-        for (int jointIndex = 0; jointIndex < 4; jointIndex++) {
-          Bone bone = _hand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
-          int boneArrayIndex = fingerIndex * 4 + jointIndex;
-          previousBoneCenters[boneArrayIndex] = bone.Center.ToVector3();
         }
       }
     }

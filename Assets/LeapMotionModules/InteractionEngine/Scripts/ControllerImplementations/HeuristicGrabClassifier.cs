@@ -18,46 +18,49 @@ namespace Leap.Unity.Interaction {
     }
 
     public void UpdateBehaviour(IInteractionBehaviour behaviour, Hand _hand) {
-      GrabClassifierHeuristics.GrabClassifier classifier;
-      Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier> classifiers = (_hand.IsLeft ? leftGrabClassifiers : rightGrabClassifiers);
-      if (!classifiers.TryGetValue(behaviour, out classifier)) {
-        classifier = new GrabClassifierHeuristics.GrabClassifier(behaviour.gameObject);
-        classifiers.Add(behaviour, classifier);
-      }
-
-      //Do the actual grab classification logic
-      fillClassifier(_hand, ref classifier);
-      GrabClassifierHeuristics.UpdateClassifier(classifier, collidingCandidates, grabParams);
-
-      if (classifier.isGrabbing != classifier.prevGrabbing) {
-        if (classifier.isGrabbing) {
-          if (!_manager.TwoHandedGrasping) { _manager.ReleaseObject(behaviour); }
-          _manager.GraspWithHand(_hand, behaviour);
-        } else if (behaviour.IsBeingGraspedByHand(_hand.Id)) {
-          _manager.ReleaseHand(_hand.Id);
-          classifier.coolDownProgress = 0f;
+      using (new ProfilerSample("Update Individual Classifier", behaviour.gameObject)) {
+        GrabClassifierHeuristics.GrabClassifier classifier;
+        Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier> classifiers = (_hand.IsLeft ? leftGrabClassifiers : rightGrabClassifiers);
+        if (!classifiers.TryGetValue(behaviour, out classifier)) {
+          classifier = new GrabClassifierHeuristics.GrabClassifier(behaviour.gameObject);
+          classifiers.Add(behaviour, classifier);
         }
+
+        //Do the actual grab classification logic
+        fillClassifier(_hand, ref classifier);
+        GrabClassifierHeuristics.UpdateClassifier(classifier, collidingCandidates, grabParams);
+
+        if (classifier.isGrabbing != classifier.prevGrabbing) {
+          if (classifier.isGrabbing) {
+            if (!_manager.TwoHandedGrasping) { _manager.ReleaseObject(behaviour); }
+            _manager.GraspWithHand(_hand, behaviour);
+          } else if (behaviour.IsBeingGraspedByHand(_hand.Id)) {
+            _manager.ReleaseHand(_hand.Id);
+            classifier.coolDownProgress = 0f;
+          }
+        }
+        classifier.prevGrabbing = classifier.isGrabbing;
       }
-      classifier.prevGrabbing = classifier.isGrabbing;
     }
 
     //Classifier bookkeeping
     public void UpdateHeuristicClassifier(Hand hand) {
       if (hand != null) {
-
-        //First check if already holding an object and only process that one
-        var graspedBehaviours = _manager.GraspedObjects;
-        for (int i = 0; i < graspedBehaviours.Count; i++) {
-          if (graspedBehaviours[i].IsBeingGraspedByHand(hand.Id)) {
-            UpdateBehaviour(graspedBehaviours[i], hand);
-            return;
+        using (new ProfilerSample("Update All Grab Classifiers", _manager)) {
+          //First check if already holding an object and only process that one
+          var graspedBehaviours = _manager.GraspedObjects;
+          for (int i = 0; i < graspedBehaviours.Count; i++) {
+            if (graspedBehaviours[i].IsBeingGraspedByHand(hand.Id)) {
+              UpdateBehaviour(graspedBehaviours[i], hand);
+              return;
+            }
           }
-        }
 
-        //If not, process all objects
-        var activeBehaviours = _manager._activityManager.ActiveBehaviours;
-        for (int i = 0; i < activeBehaviours.Count; i++) {
-          UpdateBehaviour(activeBehaviours[i], hand);
+          //If not, process all objects
+          var activeBehaviours = _manager._activityManager.ActiveBehaviours;
+          for (int i = 0; i < activeBehaviours.Count; i++) {
+            UpdateBehaviour(activeBehaviours[i], hand);
+          }
         }
       }
     }

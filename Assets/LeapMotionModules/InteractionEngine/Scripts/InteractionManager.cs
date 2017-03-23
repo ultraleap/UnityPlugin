@@ -532,7 +532,9 @@ namespace Leap.Unity.Interaction {
         OnPrePhysicalUpdate();
       }
 
-      simulateFrame(frame);
+      using (new ProfilerSample("Simulate Frame", this)) {
+        simulateFrame(frame);
+      }
 
       if (OnPostPhysicalUpdate != null) {
         OnPostPhysicalUpdate();
@@ -615,7 +617,9 @@ namespace Leap.Unity.Interaction {
       //Apply soft contacts from both hands in unified solve
       //(this will clear softContacts and originalVelocities as well)
       if (softContacts.Count > 0) {
-        PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
+        using (new ProfilerSample("Apply Soft Contacts", this)) {
+          PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
+        }
       }
 
       updateInteractionStateChanges(frame);
