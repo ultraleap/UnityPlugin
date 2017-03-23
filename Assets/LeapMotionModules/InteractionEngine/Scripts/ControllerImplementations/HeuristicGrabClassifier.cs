@@ -12,9 +12,9 @@ namespace Leap.Unity.Interaction {
     GrabClassifierHeuristics.ClassifierParameters grabParams;
 
 
-    public HeuristicGrabClassifier(InteractionManager manager, float fingerStickiness = 0f, float thumbStickiness = 0.05f, float maxCurl = 0.65f, float minCurl = -0.1f, float fingerRadius = 0.01f, float thumbRadius = 0.015f, float grabCooldown = 0.2f, float maxCurlVel = 0.0f) {
+    public HeuristicGrabClassifier(InteractionManager manager, float fingerStickiness = 0f, float thumbStickiness = 0.035f, float maxCurl = 0.65f, float minCurl = -0.1f, float fingerRadius = 0.012f, float thumbRadius = 0.017f, float grabCooldown = 0.2f, float maxCurlVel = 0.0f) {
       _manager = manager;
-      grabParams = new GrabClassifierHeuristics.ClassifierParameters(fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius, thumbRadius, grabCooldown, maxCurlVel);
+      grabParams = new GrabClassifierHeuristics.ClassifierParameters(fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius * _manager.SimulationScale, thumbRadius * _manager.SimulationScale, grabCooldown, maxCurlVel);
     }
 
     public void UpdateBehaviour(IInteractionBehaviour behaviour, Hand _hand) {
