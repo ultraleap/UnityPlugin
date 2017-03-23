@@ -12,9 +12,9 @@ namespace Leap.Unity.Interaction {
     GrabClassifierHeuristics.ClassifierParameters grabParams;
 
 
-    public HeuristicGrabClassifier(InteractionManager manager, float fingerStickiness = 0f, float thumbStickiness = 0.035f, float maxCurl = 0.65f, float minCurl = -0.1f, float fingerRadius = 0.012f, float thumbRadius = 0.017f, float grabCooldown = 0.2f, float maxCurlVel = 0.0f) {
+    public HeuristicGrabClassifier(InteractionManager manager, float fingerStickiness = 0f, float thumbStickiness = 0.04f, float maxCurl = 0.65f, float minCurl = -0.1f, float fingerRadius = 0.012f, float thumbRadius = 0.017f, float grabCooldown = 0.2f, float maxCurlVel = 0.0f, float maxGrabDistance = 0.04f) {
       _manager = manager;
-      grabParams = new GrabClassifierHeuristics.ClassifierParameters(fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius * _manager.SimulationScale, thumbRadius * _manager.SimulationScale, grabCooldown, maxCurlVel);
+      grabParams = new GrabClassifierHeuristics.ClassifierParameters(fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius * _manager.SimulationScale, thumbRadius * _manager.SimulationScale, grabCooldown, maxCurlVel, maxGrabDistance * _manager.SimulationScale);
     }
 
     public void UpdateBehaviour(IInteractionBehaviour behaviour, Hand _hand) {
@@ -74,6 +74,7 @@ namespace Leap.Unity.Interaction {
       classifier.handChirality = _hand.IsLeft;
       classifier.handDirection = _hand.Direction.ToVector3();
       classifier.handXBasis = _hand.Basis.xBasis.ToVector3();
+      classifier.handGrabCenter = (_hand.PalmPosition + (_hand.Direction * 0.05f * _manager.SimulationScale) + (_hand.PalmNormal * 0.01f * _manager.SimulationScale)).ToVector3();
       for(int i = 0; i<_hand.Fingers.Count; i++) {
         classifier.probes[i].direction = _hand.Fingers[i].Direction.ToVector3();
         classifier.probes[i].position = _hand.Fingers[i].TipPosition.ToVector3();
