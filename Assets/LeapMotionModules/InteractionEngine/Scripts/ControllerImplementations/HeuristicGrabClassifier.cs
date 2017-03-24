@@ -46,6 +46,11 @@ namespace Leap.Unity.Interaction {
     //Classifier bookkeeping
     public void UpdateHeuristicClassifier(Hand hand) {
       if (hand != null) {
+        //Ensure that all scale dependent variables are properly set
+        grabParams.FINGERTIP_RADIUS = 0.12f * _manager.SimulationScale;
+        grabParams.THUMBTIP_RADIUS = 0.017f * _manager.SimulationScale;
+        grabParams.MAXIMUM_DISTANCE_FROM_HAND = 0.04f * _manager.SimulationScale;
+
         using (new ProfilerSample("Update All Grab Classifiers", _manager)) {
           //First check if already holding an object and only process that one
           var graspedBehaviours = _manager.GraspedObjects;
