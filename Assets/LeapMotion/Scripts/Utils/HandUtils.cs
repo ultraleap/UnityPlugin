@@ -61,15 +61,19 @@ namespace Leap.Unity {
     [System.Serializable]
     public class HandEvent : UnityEvent<Hand> { }
 
-    /// <summary> Returns the first hand of the argument Chirality in the
-    /// current frame, otherwise returns null if no such hand is found. </summary>
+    /// <summary>
+    /// Returns the first hand of the argument Chirality in the current frame,
+    /// otherwise returns null if no such hand is found.
+    /// </summary>
     public static Hand Get(Chirality chirality) {
       if (chirality == Chirality.Left) return Left;
       else return Right;
     }
 
-    /// <summary> Returns the first left hand found by Leap in the current
-    /// frame, otherwise returns null if no such hand is found. </summary>
+    /// <summary>
+    /// Returns the first left hand found by Leap in the current frame, otherwise
+    /// returns null if no such hand is found.
+    /// </summary>
     public static Hand Left {
       get {
         if (Provider == null) return null;
@@ -78,8 +82,10 @@ namespace Leap.Unity {
       }
     }
 
-    /// <summary> Returns the first right hand found by Leap in the current
-    /// frame, otherwise returns null if no such hand is found. </summary>
+    /// <summary>
+    /// Returns the first right hand found by Leap in the current frame, otherwise
+    /// returns null if no such hand is found.
+    /// </summary>
     public static Hand Right {
       get {
         if (Provider == null) return null;
@@ -128,17 +134,22 @@ namespace Leap.Unity {
       return hand.Fingers[(int)Leap.Finger.FingerType.TYPE_PINKY];
     }
 
-    /// <summary> Returns the direction the Hand's palm is facing. For the 
-    /// other two palm-basis directions, see RadialAxis and DistalAxis.
-    /// The direction out of the back of the hand would be called the dorsal axis. </summary>
+    /// <summary>
+    /// Returns the direction the Hand's palm is facing. For the  other two palm-basis
+    /// directions, see RadialAxis and DistalAxis.
+    /// 
+    /// The direction out of the back of the hand would be called the dorsal axis.
+    /// </summary>
     public static Vector3 PalmarAxis(this Hand hand) {
       return -hand.Basis.yBasis.ToVector3();
     }
 
-    /// <summary> Returns the the direction towards the thumb
-    /// that is perpendicular to the palmar and distal axes.
-    /// Left and right hands will return opposing directions.
-    /// The direction away from the thumb would be called the ulnar axis. </summary>
+    /// <summary>
+    /// Returns the the direction towards the thumb that is perpendicular to the palmar
+    /// and distal axes. Left and right hands will return opposing directions.
+    /// 
+    /// The direction away from the thumb would be called the ulnar axis.
+    /// </summary>
     public static Vector3 RadialAxis(this Hand hand) {
       if (hand.IsRight) {
         return -hand.Basis.xBasis.ToVector3();
@@ -148,9 +159,12 @@ namespace Leap.Unity {
       }
     }
 
-    /// <summary> Returns the direction towards the fingers that is
-    /// perpendicular to the palmar and radial axes.
-    /// The direction towards the wrist would be called the proximal axis. </summary>
+    /// <summary>
+    /// Returns the direction towards the fingers that is perpendicular to the palmar
+    /// and radial axes.
+    /// 
+    /// The direction towards the wrist would be called the proximal axis.
+    /// </summary>
     public static Vector3 DistalAxis (this Hand hand) {
       return hand.Basis.zBasis.ToVector3();
     }
@@ -173,6 +187,32 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// Returns a decent approximation of where the hand is pinching, or where it will pinch,
+    /// even if the index and thumb tips are far apart.
+    /// 
+    /// In general, this will be more stable than GetPinchPosition().
+    /// </summary>
+    public static Vector3 GetPredictedPinchPosition(this Hand hand) {
+      Vector3 indexTip = hand.GetIndex().TipPosition.ToVector3();
+      Vector3 thumbTip = hand.GetThumb().TipPosition.ToVector3();
+
+      // The predicted pinch point is a rigid point in hand-space linearly offset by the
+      // index finger knuckle position, scaled by the index finger's length, and lightly
+      // influenced by the actual thumb and index tip positions.
+      Vector3 indexKnuckle = hand.Fingers[1].bones[1].PrevJoint.ToVector3();
+      float indexLength = hand.Fingers[1].Length;
+      Vector3 radialAxis = hand.RadialAxis();
+      float thumbInfluence = Vector3.Dot((thumbTip - indexKnuckle).normalized, radialAxis).Map(0F, 1F, 0.5F, 0F);
+      Vector3 predictedPinchPoint = indexKnuckle + hand.PalmarAxis() * indexLength * 0.85F
+                                                 + hand.DistalAxis() * indexLength * 0.20F
+                                                 + radialAxis        * indexLength * 0.20F;
+      predictedPinchPoint = Vector3.Lerp(predictedPinchPoint, thumbTip, thumbInfluence);
+      predictedPinchPoint = Vector3.Lerp(predictedPinchPoint, indexTip, 0.15F);
+
+      return predictedPinchPoint;
+    }
+
+    /// <summary>
     /// Returns whether this vector faces from a given world position towards another world position within a maximum angle of error.
     /// </summary>
     public static bool IsFacing(this Vector3 facingVector, Vector3 fromWorldPosition, Vector3 towardsWorldPosition, float maxOffsetAngleAllowed) {
@@ -183,7 +223,7 @@ namespace Leap.Unity {
     /// <summary>
     /// Returns a confidence value from 0 to 1 indicating how strongly the Hand is making a fist.
     /// </summary>
-    public static float FistStrength(this Hand hand) {
+    public static float GetFistStrength(this Hand hand) {
       return (Vector3.Dot(hand.Fingers[1].Direction.ToVector3(), -hand.DistalAxis() )
             + Vector3.Dot(hand.Fingers[2].Direction.ToVector3(), -hand.DistalAxis() )
             + Vector3.Dot(hand.Fingers[3].Direction.ToVector3(), -hand.DistalAxis() )
