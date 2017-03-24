@@ -164,7 +164,7 @@ namespace Leap.Unity {
     }
 
     /// <summary>
-    /// Returns approximately whether the thumb and index finger will be if they are pinched together.
+    /// Returns approximately where the thumb and index finger will be if they are pinched together.
     /// </summary>
     public static Vector3 GetPinchPosition(this Hand hand) {
       Vector indexPosition = hand.Fingers[(int)Finger.FingerType.TYPE_INDEX].TipPosition;
