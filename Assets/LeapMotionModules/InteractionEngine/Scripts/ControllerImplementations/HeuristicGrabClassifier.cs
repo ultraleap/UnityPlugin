@@ -9,12 +9,13 @@ namespace Leap.Unity.Interaction {
 
     Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier> leftGrabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier>();
     Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier> rightGrabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier>();
-    GrabClassifierHeuristics.ClassifierParameters grabParams;
+    GrabClassifierHeuristics.ClassifierParameters defaultGrabParams, scaledGrabParams;
 
 
-    public HeuristicGrabClassifier(InteractionManager manager, float fingerStickiness = 0f, float thumbStickiness = 0.04f, float maxCurl = 0.65f, float minCurl = -0.1f, float fingerRadius = 0.012f, float thumbRadius = 0.017f, float grabCooldown = 0.2f, float maxCurlVel = 0.0f, float maxGrabDistance = 0.04f) {
+    public HeuristicGrabClassifier(InteractionManager manager, float fingerStickiness = 0f, float thumbStickiness = 0.04f, float maxCurl = 0.65f, float minCurl = -0.1f, float fingerRadius = 0.012f, float thumbRadius = 0.017f, float grabCooldown = 0.2f, float maxCurlVel = 0.0f, float maxGrabDistance = 0.05f) {
       _manager = manager;
-      grabParams = new GrabClassifierHeuristics.ClassifierParameters(fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius * _manager.SimulationScale, thumbRadius * _manager.SimulationScale, grabCooldown, maxCurlVel, maxGrabDistance * _manager.SimulationScale);
+      defaultGrabParams = new GrabClassifierHeuristics.ClassifierParameters(fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius, thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance);
+      scaledGrabParams = new GrabClassifierHeuristics.ClassifierParameters(fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius, thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance);
     }
 
     public void UpdateBehaviour(IInteractionBehaviour behaviour, Hand _hand) {
@@ -28,7 +29,7 @@ namespace Leap.Unity.Interaction {
 
         //Do the actual grab classification logic
         fillClassifier(_hand, ref classifier);
-        GrabClassifierHeuristics.UpdateClassifier(classifier, collidingCandidates, grabParams);
+        GrabClassifierHeuristics.UpdateClassifier(classifier, collidingCandidates, scaledGrabParams);
 
         if (classifier.isGrabbing != classifier.prevGrabbing) {
           if (classifier.isGrabbing) {
@@ -47,9 +48,9 @@ namespace Leap.Unity.Interaction {
     public void UpdateHeuristicClassifier(Hand hand) {
       if (hand != null) {
         //Ensure that all scale dependent variables are properly set
-        grabParams.FINGERTIP_RADIUS = 0.12f * _manager.SimulationScale;
-        grabParams.THUMBTIP_RADIUS = 0.017f * _manager.SimulationScale;
-        grabParams.MAXIMUM_DISTANCE_FROM_HAND = 0.04f * _manager.SimulationScale;
+        scaledGrabParams.FINGERTIP_RADIUS = defaultGrabParams.FINGERTIP_RADIUS * _manager.SimulationScale;
+        scaledGrabParams.THUMBTIP_RADIUS = defaultGrabParams.THUMBTIP_RADIUS * _manager.SimulationScale;
+        scaledGrabParams.MAXIMUM_DISTANCE_FROM_HAND = defaultGrabParams.MAXIMUM_DISTANCE_FROM_HAND * _manager.SimulationScale;
 
         using (new ProfilerSample("Update All Grab Classifiers", _manager)) {
           //First check if already holding an object and only process that one
