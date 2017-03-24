@@ -61,6 +61,8 @@ namespace Leap.Unity {
     [System.Serializable]
     public class HandEvent : UnityEvent<Hand> { }
 
+    /// <summary> Returns the first hand of the argument Chirality in the
+    /// current frame, otherwise returns null if no such hand is found. </summary>
     public static Hand Get(Chirality chirality) {
       if (chirality == Chirality.Left) return Left;
       else return Right;
@@ -86,23 +88,43 @@ namespace Leap.Unity {
       }
     }
 
-    public static Finger Thumb(this Hand hand) {
+    /// <summary>
+    /// Shorthand for hand.Fingers[(int)Leap.Finger.FingerType.TYPE_THUMB],
+    /// or, alternatively, hand.Fingers[0].
+    /// </summary>
+    public static Finger GetThumb(this Hand hand) {
       return hand.Fingers[(int)Leap.Finger.FingerType.TYPE_THUMB];
     }
 
-    public static Finger Index(this Hand hand) {
+    /// <summary>
+    /// Shorthand for hand.Fingers[(int)Leap.Finger.FingerType.TYPE_INDEX],
+    /// or, alternatively, hand.Fingers[1].
+    /// </summary>
+    public static Finger GetIndex(this Hand hand) {
       return hand.Fingers[(int)Leap.Finger.FingerType.TYPE_INDEX];
     }
 
-    public static Finger Middle(this Hand hand) {
+    /// <summary>
+    /// Shorthand for hand.Fingers[(int)Leap.Finger.FingerType.TYPE_MIDDLE],
+    /// or, alternatively, hand.Fingers[2].
+    /// </summary>
+    public static Finger GetMiddle(this Hand hand) {
       return hand.Fingers[(int)Leap.Finger.FingerType.TYPE_MIDDLE];
     }
 
-    public static Finger Ring(this Hand hand) {
+    /// <summary>
+    /// Shorthand for hand.Fingers[(int)Leap.Finger.FingerType.TYPE_RING],
+    /// or, alternatively, hand.Fingers[3].
+    /// </summary>
+    public static Finger GetRing(this Hand hand) {
       return hand.Fingers[(int)Leap.Finger.FingerType.TYPE_RING];
     }
 
-    public static Finger Pinky(this Hand hand) {
+    /// <summary>
+    /// Shorthand for hand.Fingers[(int)Leap.Finger.FingerType.TYPE_PINKY],
+    /// or, alternatively, hand.Fingers[4].
+    /// </summary>
+    public static Finger GetPinky(this Hand hand) {
       return hand.Fingers[(int)Leap.Finger.FingerType.TYPE_PINKY];
     }
 
@@ -135,17 +157,19 @@ namespace Leap.Unity {
 
     /// <summary>
     /// Returns whether the pinch strength for the hand is greater than 0.8.
-    /// For more reliable pinch behavior, consider applying hysteresis to the Hand.PinchStrength property.
+    /// For more reliable pinch behavior, try applying hysteresis to the PinchStrength property.
     /// </summary>
     public static bool IsPinching(this Hand hand) {
       return hand.PinchStrength > 0.8F;
     }
 
     /// <summary>
-    /// Returns the average of the index finger and thumb tip positions.
+    /// Returns approximately whether the thumb and index finger will be if they are pinched together.
     /// </summary>
     public static Vector3 GetPinchPosition(this Hand hand) {
-      return (hand.Fingers[(int)Finger.FingerType.TYPE_INDEX].TipPosition + hand.Fingers[(int)Finger.FingerType.TYPE_THUMB].TipPosition).ToVector3() * 0.5F;
+      Vector indexPosition = hand.Fingers[(int)Finger.FingerType.TYPE_INDEX].TipPosition;
+      Vector thumbPosition = hand.Fingers[(int)Finger.FingerType.TYPE_THUMB].TipPosition;
+      return (2 * thumbPosition + indexPosition).ToVector3() * 0.333333F;
     }
 
     /// <summary>

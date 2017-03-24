@@ -226,6 +226,46 @@ MonoBehaviour:
 Transform:
   m_PrefabParentObject: {fileID: 476458, guid: a2e4c6a003fcd1a43b91889103145982, type: 2}
   m_PrefabInternal: {fileID: 42874258}
+--- !u!1 &203272715
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 203272717}
+  - component: {fileID: 203272716}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &203272716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 203272715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93267ad92bccfbc4fb080dd33dbbe50c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &203272717
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 203272715}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -5.7742634, y: -2.8165445, z: 7.1632695}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &226926147
 Prefab:
   m_ObjectHideFlags: 0
@@ -1232,6 +1272,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  group:
+    GroupName: 
+    _handPool: {fileID: 0}
+    LeftModel: {fileID: 0}
+    IsLeftToBeSpawned: 0
+    RightModel: {fileID: 0}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 0
+    HandPostProcesses:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
   handedness: 0
   _showArm: 1
   _material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
@@ -2845,6 +2901,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  group:
+    GroupName: 
+    _handPool: {fileID: 0}
+    LeftModel: {fileID: 0}
+    IsLeftToBeSpawned: 0
+    RightModel: {fileID: 0}
+    IsRightToBeSpawned: 0
+    modelList: []
+    modelsCheckedOut: []
+    IsEnabled: 1
+    CanDuplicate: 0
+    HandPostProcesses:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
   handedness: 1
   _showArm: 1
   _material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
