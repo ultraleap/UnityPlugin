@@ -38,8 +38,8 @@ public static class AwesomeHandExtensions {
     Vector3 indexTip = hand.GetIndex().TipPosition.ToVector3();
     Vector3 thumbTip = hand.GetThumb().TipPosition.ToVector3();
 
-    // The so-called "naive" pinch point is the point a little past halfway to the thumb from the
-    // tip of the index finger.
+    // The so-called "naive" pinch point is the point halfway to the thumb from the tip
+    // of the index finger.
     Vector3 naivePinchPoint = Vector3.Lerp(indexTip, thumbTip, 0.5F);
 
     // The heuristic pinch point is a rigid point in hand-space linearly offset and scaled by
@@ -51,11 +51,12 @@ public static class AwesomeHandExtensions {
                                              .Select(f => f.Length)
                                              .Fold((lengthSoFar, length) => lengthSoFar + length);
     Vector3 radialAxis = hand.RadialAxis();
-    heuristicPinchPoint += hand.PalmarAxis() * indexLength * 0.80F
-                         + hand.DistalAxis() * indexLength * 0.10F
+    heuristicPinchPoint += hand.PalmarAxis() * indexLength * 0.85F
+                         + hand.DistalAxis() * indexLength * 0.20F
                          +      radialAxis   * indexLength * 0.20F;
-    float naiveInfluence = Vector3.Dot((thumbTip - indexKnuckle).normalized, radialAxis).Map(0F, 1F, 0.5F, 0F);
-    heuristicPinchPoint = Vector3.Lerp(heuristicPinchPoint, naivePinchPoint, naiveInfluence);
+    float thumbInfluence = Vector3.Dot((thumbTip - indexKnuckle).normalized, radialAxis).Map(0F, 1F, 0.5F, 0F);
+    heuristicPinchPoint = Vector3.Lerp(heuristicPinchPoint, thumbTip, thumbInfluence);
+    heuristicPinchPoint = Vector3.Lerp(heuristicPinchPoint, indexTip, 0.15F);
 
     // The heuristic pinch point is more accurate when the fingers are far away from pinching;
     // the naive pinch point is more accurate when the fingers are close to pinching.
