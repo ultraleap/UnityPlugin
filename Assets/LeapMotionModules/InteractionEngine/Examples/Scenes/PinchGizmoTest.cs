@@ -28,7 +28,6 @@ public class PinchGizmoTest : MonoBehaviour, IRuntimeGizmoComponent {
 
 public static class AwesomeHandExtensions {
 
-  private const float PINCH_STRENGTH_HEURISTIC_CUTOFF = 0.2F;
   /// <summary> Returns an approximation of the index-thumb pinch position of the hand.
   /// If the hand is not pinching, this will return an estimate of where the hand will pinch.
   /// As the hand pinches, the position this method returns will move to match the actual pinch
@@ -55,8 +54,8 @@ public static class AwesomeHandExtensions {
     heuristicPinchPoint += hand.PalmarAxis() * indexLength * 0.80F
                          + hand.DistalAxis() * indexLength * 0.10F
                          +      radialAxis   * indexLength * 0.20F;
-    float thumbInfluence = Vector3.Dot((thumbTip - indexKnuckle).normalized, radialAxis).Map(0F, 1F, 0.5F, 0F);
-    heuristicPinchPoint = Vector3.Lerp(heuristicPinchPoint, thumbTip, thumbInfluence);
+    float naiveInfluence = Vector3.Dot((thumbTip - indexKnuckle).normalized, radialAxis).Map(0F, 1F, 0.5F, 0F);
+    heuristicPinchPoint = Vector3.Lerp(heuristicPinchPoint, naivePinchPoint, naiveInfluence);
 
     // The heuristic pinch point is more accurate when the fingers are far away from pinching;
     // the naive pinch point is more accurate when the fingers are close to pinching.
@@ -65,7 +64,7 @@ public static class AwesomeHandExtensions {
     }
     else {
       float pinchDistance = Vector3.Distance(indexTip, thumbTip) / indexLength;
-      float pinchCloseness = pinchDistance.Map(PINCH_STRENGTH_HEURISTIC_CUTOFF, 1F, 1F, 0F);
+      float pinchCloseness = pinchDistance.Map(0F, 0.5F, 1F, 0F);
       return Vector3.Lerp(heuristicPinchPoint, naivePinchPoint, Ease.Cubic.InOut(pinchCloseness));
     }
   }
