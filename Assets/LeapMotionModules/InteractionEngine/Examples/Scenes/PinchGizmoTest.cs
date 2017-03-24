@@ -28,7 +28,8 @@ public class PinchGizmoTest : MonoBehaviour, IRuntimeGizmoComponent {
 
 public static class AwesomeHandExtensions {
 
-  /// <summary> Returns an approximation of the index-thumb pinch position of the hand. </summary>
+  /// <summary> Returns a decent approximation of where the hand is pinching,
+  /// or where it will pinch, even if the index and thumb tips are far apart. </summary>
   public static Vector3 AwesomePinchPosition(this Hand hand) {
     Vector3 indexTip = hand.GetIndex().TipPosition.ToVector3();
     Vector3 thumbTip = hand.GetThumb().TipPosition.ToVector3();
