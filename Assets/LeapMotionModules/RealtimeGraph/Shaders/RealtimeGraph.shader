@@ -22,7 +22,7 @@
 
   frag_in vert(appdata v){
     frag_in o;
-    o.position = mul(UNITY_MATRIX_MVP, v.vertex);
+    o.position = UnityObjectToClipPos(v.vertex);
     o.uv = v.uv;
     return o;
   }

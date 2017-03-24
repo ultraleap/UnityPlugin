@@ -118,7 +118,7 @@ namespace Leap.Unity.Graphing {
     protected Dictionary<string, Graph> _graphs;
     protected Stack<Graph> _currentGraphStack = new Stack<Graph>();
 
-    protected RingBuffer<GraphKey> _keyBuffer = new RingBuffer<GraphKey>();
+    protected Deque<GraphKey> _keyBuffer = new Deque<GraphKey>();
 
     //Custom sample timers
     protected long _preCullTicks, _renderTicks, _fixedTicks = -1;
@@ -272,7 +272,15 @@ namespace Leap.Unity.Graphing {
         endOfFrameTicks = newTicks;
 
         AddSample("Render Delta", GraphUnits.Miliseconds, _renderTicks);
-        AddSample("GPU Time", GraphUnits.Miliseconds, UnityEngine.VR.VRStats.gpuTimeLastFrame);
+
+        float gpuTime;
+#if UNITY_5_6_OR_NEWER
+        UnityEngine.VR.VRStats.TryGetGPUTimeLastFrame(out gpuTime);
+#else
+        gpuTime = UnityEngine.VR.VRStats.gpuTimeLastFrame;
+#endif
+
+        AddSample("GPU Time", GraphUnits.Miliseconds, gpuTime);
 
         if (_provider != null) {
           AddSample("Tracking Latency", GraphUnits.Miliseconds, (_provider.GetLeapController().Now() - _provider.CurrentFrame.Timestamp) * 0.001f);
@@ -316,7 +324,7 @@ namespace Leap.Unity.Graphing {
     private void UpdateTexture() {
       float max = _smoothedMax.value * 1.5f;
 
-      RingBuffer<float> history;
+      Deque<float> history;
       switch (_graphMode) {
         case GraphMode.Exclusive:
           history = _currentGraph.exclusive;
@@ -403,8 +411,8 @@ namespace Leap.Unity.Graphing {
     protected class Graph {
       public string name;
       public GraphUnits units;
-      public RingBuffer<float> exclusive;
-      public RingBuffer<float> inclusive;
+      public Deque<float> exclusive;
+      public Deque<float> inclusive;
       public SlidingMax exclusiveMax, inclusiveMax;
 
       private int maxHistory;
@@ -416,8 +424,8 @@ namespace Leap.Unity.Graphing {
         this.name = name;
         this.units = units;
         this.maxHistory = maxHistory;
-        exclusive = new RingBuffer<float>(maxHistory);
-        inclusive = new RingBuffer<float>(maxHistory);
+        exclusive = new Deque<float>(maxHistory);
+        inclusive = new Deque<float>(maxHistory);
         exclusiveMax = new SlidingMax(maxHistory);
         inclusiveMax = new SlidingMax(maxHistory);
       }

@@ -334,7 +334,7 @@ namespace UnityTest
             k_ResultRenderer.Draw();
         }
 
-        protected virtual void StartNewTest()
+        private void StartNewTest()
         {
             m_TestMessages = "";
             m_Stacktrace = "";
