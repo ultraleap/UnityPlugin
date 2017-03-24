@@ -22,7 +22,7 @@ namespace Leap.Unity.Interaction {
     private const int N_FINGERS = 5;
     private const int N_ACTIVE_BONES = 3;
     private const float DEAD_ZONE_FRACTION = 0.1f;
-    private const float DISLOCATION_FRACTION = 3.0f;
+    private const float DISLOCATION_FRACTION = 2.5f;
 
     private InteractionBrushBone[] _brushBones;
     private Hand _hand;
@@ -47,7 +47,7 @@ namespace Leap.Unity.Interaction {
 
     /** The physics mass value used for each bone in the hand when running the interaction simulation. */
     [SerializeField]
-    private float _perBoneMass = 0.2f;
+    private float _perBoneMass = 0.1f;
 
     private bool _softContactEnabled = false;
     private bool disableSoftContactEnqueued = false;
