@@ -45,14 +45,18 @@ public static class AwesomeHandExtensions {
 
     // The heuristic pinch point is a rigid point in hand-space linearly offset and scaled by
     // the index finger knuckle position and index finger length.
-    Vector3 heuristicPinchPoint = hand.Fingers[1].bones[1].PrevJoint.ToVector3(); // index knuckle position
+    Vector3 indexKnuckle = hand.Fingers[1].bones[1].PrevJoint.ToVector3();
+    Vector3 heuristicPinchPoint = indexKnuckle; 
     float indexLength = hand.Fingers[1].bones.Query()
                                              .Skip(1) // skip metacarpal
                                              .Select(f => f.Length)
                                              .Fold((lengthSoFar, length) => lengthSoFar + length);
+    Vector3 radialAxis = hand.RadialAxis();
     heuristicPinchPoint += hand.PalmarAxis() * indexLength * 0.80F
                          + hand.DistalAxis() * indexLength * 0.10F
-                         + hand.RadialAxis() * indexLength * 0.20F;
+                         +      radialAxis   * indexLength * 0.20F;
+    float thumbInfluence = Vector3.Dot((thumbTip - indexKnuckle).normalized, radialAxis).Map(0F, 1F, 0.5F, 0F);
+    heuristicPinchPoint = Vector3.Lerp(heuristicPinchPoint, thumbTip, thumbInfluence);
 
     // The heuristic pinch point is more accurate when the fingers are far away from pinching;
     // the naive pinch point is more accurate when the fingers are close to pinching.
