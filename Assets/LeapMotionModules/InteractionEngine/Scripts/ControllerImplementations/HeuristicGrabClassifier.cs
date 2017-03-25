@@ -11,7 +11,6 @@ namespace Leap.Unity.Interaction {
     Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier> rightGrabClassifiers = new Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier>();
     GrabClassifierHeuristics.ClassifierParameters defaultGrabParams, scaledGrabParams;
 
-
     public HeuristicGrabClassifier(InteractionManager manager, float fingerStickiness = 0f, float thumbStickiness = 0.04f, float maxCurl = 0.65f, float minCurl = -0.1f, float fingerRadius = 0.012f, float thumbRadius = 0.017f, float grabCooldown = 0.2f, float maxCurlVel = 0.0f, float maxGrabDistance = 0.05f) {
       _manager = manager;
       defaultGrabParams = new GrabClassifierHeuristics.ClassifierParameters(fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius, thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance);

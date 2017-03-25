@@ -66,6 +66,14 @@ namespace Leap.Unity {
       else return Right;
     }
 
+    /// <summary>
+    /// As Get, but returns the FixedUpdate (physics timestep) hand as opposed to the Update hand.
+    /// </summary>
+    public static Hand GetFixed(Chirality chirality) {
+      if (chirality == Chirality.Left) return FixedLeft;
+      else return FixedRight;
+    }
+
     /// <summary> Returns the first left hand found by Leap in the current
     /// frame, otherwise returns null if no such hand is found. </summary>
     public static Hand Left {
@@ -83,6 +91,30 @@ namespace Leap.Unity {
         if (Provider == null) return null;
         if (Provider.CurrentFrame == null) return null;
         else return Provider.CurrentFrame.Hands.Query().FirstOrDefault(hand => hand.IsRight);
+      }
+    }
+
+    /// <summary>
+    /// Returns the first left hand found by Leap in the current fixed frame, otherwise
+    /// returns null if no such hand is found. The fixed frame is aligned with the physics timestep.
+    /// </summary>
+    public static Hand FixedLeft {
+      get {
+        if (Provider == null) return null;
+        if (Provider.CurrentFixedFrame == null) return null;
+        return Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand => hand.IsLeft);
+      }
+    }
+
+    /// <summary> 
+    /// Returns the first right hand found by Leap in the current fixed frame, otherwise
+    /// returns null if no such hand is found. The fixed frame is aligned with the physics timestep.
+    /// </summary>
+    public static Hand FixedRight {
+      get {
+        if (Provider == null) return null;
+        if (Provider.CurrentFixedFrame == null) return null;
+        else return Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand => hand.IsRight);
       }
     }
 
