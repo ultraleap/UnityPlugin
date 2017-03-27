@@ -33,9 +33,13 @@ namespace Leap.Unity {
         }
       }
 
-      label.tooltip = fieldInfo.GetCustomAttributes(typeof(TooltipAttribute), true).
-                                Cast<TooltipAttribute>().
-                                FirstOrDefault().tooltip;
+      var tooltipAttribute = fieldInfo.GetCustomAttributes(typeof(TooltipAttribute), true).
+                                       Cast<TooltipAttribute>().
+                                       FirstOrDefault();
+
+      if (tooltipAttribute != null) {
+        label.tooltip = tooltipAttribute.tooltip;
+      }
 
       index = EditorGUI.Popup(position, label, index, _layerNames);
       layerProperty.intValue = _layerValues[index];
