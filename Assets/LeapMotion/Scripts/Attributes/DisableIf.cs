@@ -48,10 +48,14 @@ namespace Leap.Unity.Attributes {
         var prop = property.serializedObject.FindProperty(name);
 
         bool result = shouldDisable(prop);
-        if (isAndOperation && !result) {
-          return false;
-        } else if (result) {
-          return true;
+        if (isAndOperation) {
+          if (!result) {
+            return false;
+          }
+        } else {
+          if (result) {
+            return true;
+          }
         }
       }
 
