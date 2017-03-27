@@ -7,7 +7,7 @@ namespace Leap.Unity {
 
   [CustomPropertyDrawer(typeof(SingleLayer))]
   public class SingleLayerEditor : PropertyDrawer {
-    private string[] _layerNames;
+    private GUIContent[] _layerNames;
     private List<int> _layerValues;
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
@@ -33,17 +33,25 @@ namespace Leap.Unity {
         }
       }
 
-      index = EditorGUI.Popup(position, property.displayName, index, _layerNames);
+      var tooltipAttribute = fieldInfo.GetCustomAttributes(typeof(TooltipAttribute), true).
+                                       Cast<TooltipAttribute>().
+                                       FirstOrDefault();
+
+      if (tooltipAttribute != null) {
+        label.tooltip = tooltipAttribute.tooltip;
+      }
+
+      index = EditorGUI.Popup(position, label, index, _layerNames);
       layerProperty.intValue = _layerValues[index];
     }
 
     private void ensureLayersInitialized() {
       if (_layerNames == null) {
-        Dictionary<int, string> valueToLayer = new Dictionary<int, string>();
+        Dictionary<int, GUIContent> valueToLayer = new Dictionary<int, GUIContent>();
         for (int i = 0; i < 32; i++) {
           string layerName = LayerMask.LayerToName(i);
           if (!string.IsNullOrEmpty(layerName)) {
-            valueToLayer[i] = layerName;
+            valueToLayer[i] = new GUIContent(layerName);
           }
         }
 
