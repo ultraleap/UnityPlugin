@@ -662,20 +662,19 @@ MonoBehaviour:
   enableHovering: 1
   enableContact: 1
   enableGrasping: 1
+  _showAdvancedSettings: 1
   hoverActivationRadius: 0.5
   touchActivationRadius: 0.15
-  _autoGenerateLayers: 1
+  _autoGenerateLayers: 0
   _templateLayer:
     layerIndex: 0
   _interactionLayer:
-    layerIndex: 8
+    layerIndex: 0
   _graspedObjectLayer:
-    layerIndex: 9
+    layerIndex: 0
   _contactBoneLayer:
-    layerIndex: 10
-  _showDebugOptions: 0
-  _debugDrawHandGizmos: 0
-  contactOrGraspingEnabled: 1
+    layerIndex: 0
+  _drawHandRuntimeGizmos: 0
 --- !u!4 &289258608
 Transform:
   m_ObjectHideFlags: 0

@@ -10,52 +10,54 @@ namespace Leap.Unity.UI.Interaction {
 
   public partial class InteractionManager : MonoBehaviour, IRuntimeGizmoComponent {
 
-    [Header("Interactions")]
+    [Header("Interaction Types")]
+    [Tooltip("Hovering provides callbacks to Interaction Behaviours when hands are nearby.")]
     public bool enableHovering = true;
+    [Tooltip("Contact allows hands to collide with Interaction Behaviours in an intuitive way, and enables contact callbacks to Interaction Behaviours.")]
     public bool enableContact  = true;
+    [Tooltip("With grasping enabled, hands can pick up, place, pass, or throw Interaction Behaviours. Grasping also provides grasp-related callbacks to Interaction Behaviours for specifying custom behavior.")]
     public bool enableGrasping = true;
 
-    // TODO: Hide these settings behind a dropdown, they probably don't really ever need to be changed
+    [Header("Advanced Settings")]
+    [SerializeField]
+    #pragma warning disable 0414
+    private bool _showAdvancedSettings = false;
+    #pragma warning restore 0414
+    
     [Header("Interaction Settings")]
+    [SerializeField]
     [DisableIf("enableHovering", isEqualTo: false)]
+    [Tooltip("Beyond this radius, an interaction object will not receive hover callbacks from a hand. (Smaller values are cheaper.) This value is automatically scaled under the hood by the Leap Service Provider's localScale.x.")]
     public float hoverActivationRadius = 0.5F;
-    [DisableIf("contactOrGraspingEnabled", isEqualTo: false)]
+    [DisableIfAll("enableContact", "enableGrasping", areEqualTo: false)]
+    [Tooltip("Beyond this radius, an interaction object will not be considered for contact or grasping logic. The radius should be small as an optimization but certainly not smaller than a hand and not too tight around the hand to allow good behavior when the hand is moving quickly through space. This value is automatically scaled under the hood by the Leap Service Provider's localScale.x.")]
     public float touchActivationRadius = 0.15F;
 
     [Header("Layer Settings")]
-    [Tooltip("Whether or not to create the layers used for interaction when the scene runs.")]
+    [Tooltip("Whether or not to create the layers used for interaction when the scene runs. Hand interactions require an interaction layer (for objects), a grasped object layer, and a contact bone layer (for hand bones). Keep this checked to have these layers created for you, but be aware that the layers will have blank names due to Unity limitations.")]
     [SerializeField]
     protected bool _autoGenerateLayers = true;
 
-    [Tooltip("Layer to use for auto-generation. The generated interaction layers will have the same collision settings as this layer.")]
+    [Tooltip("When automatically generating layers, the Interaction layer (for interactable objects) will use the same physics collision flags as the layer specified here.")]
     [SerializeField]
     protected SingleLayer _templateLayer = 0;
 
-    [Tooltip("The layer containing interaction objects.")]
+    [Tooltip("The layer for interaction objects. Usually this would have the same collision flags as the Default layer, but it should be its own layer for optimization purposes.")]
     [SerializeField]
     protected SingleLayer _interactionLayer = 0;
 
-    [Tooltip("The layer containing interaction objects when they become grasped.")]
     [SerializeField]
+    [Tooltip("The layer objects are moved to when they become grasped. This layer should not collide with the hand bone layer, but usually should collide with everything else that the interaction layer collides with.")]
     protected SingleLayer _graspedObjectLayer = 0;
 
-    [Tooltip("The layer containing the colliders for the bones of the hand.")]
+    [Tooltip("The layer containing the collider bones of the hand. This layer should collide with anything you'd like to be able to touch, but it should not collide with the grasped object layer.")]
     [SerializeField]
     protected SingleLayer _contactBoneLayer = 0;
 
+    [Header("Debug Settings")]
     [SerializeField]
-    #pragma warning disable 0414
-    private bool _showDebugOptions = false;
-    #pragma warning restore 0414
-    [SerializeField]
-    private bool _debugDrawHandGizmos = false;
-
-    #pragma warning disable 0414
-    [HideInInspector]
-    [SerializeField]
-    // Editor-only utility variable for touchActivationRadius property drawing.
-    private bool contactOrGraspingEnabled = true;
-    #pragma warning restore 0414
+    [Tooltip("Rendering runtime gizmos requires having a Runtime Gizmo Manager somewhere in the scene.")]
+    private bool _drawHandRuntimeGizmos = false;
 
     /// <summary>
     /// Provides Frame objects consisting of any and all Hands in the scene. 
@@ -88,6 +90,12 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     public float SimulationScale { get { return _providerScale; } }
 
+    void OnValidate() {
+      if (!Application.isPlaying && _autoGenerateLayers) {
+        AutoGenerateLayers();
+      }
+    }
+
     private InteractionHand[] _interactionHands = new InteractionHand[2];
     private HashSet<InteractionBehaviourBase> _interactionBehaviours = new HashSet<InteractionBehaviourBase>();
     private Dictionary<Rigidbody, InteractionBehaviourBase> _rigidbodyRegistry = new Dictionary<Rigidbody, InteractionBehaviourBase>();
@@ -100,18 +108,11 @@ namespace Leap.Unity.UI.Interaction {
     [NonSerialized]
     public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
 
-    void OnValidate() {
-      contactOrGraspingEnabled = enableContact || enableGrasping;
-
-      if (!Application.isPlaying && _autoGenerateLayers) {
-        AutoGenerateLayers();
-      }
-    }
-
+    private static InteractionManager s_singleton;
     /// <summary> Often, only one InteractionManager is necessary per Unity scene.
     /// This property will contain that InteractionManager as soon as its Awake()
     /// method is called. Using more than one InteractionManager is valid, but be
-    /// sure to assign the InteractionBehaviour's desired manager appropriately.
+    /// sure to assign any InteractionBehaviour's desired manager appropriately.
     /// </summary>
     /// 
     /// <remarks> By default, this static property contains the first InteractionManager
@@ -124,13 +125,19 @@ namespace Leap.Unity.UI.Interaction {
     /// assign InteractionBehaviours' managers appropriately. If you instantiate an
     /// InteractionBehaviour at runtime, you should assign its InteractionManager
     /// right after you instantiate it. </remarks>
-    public static InteractionManager singleton { get; set; }
+    public static InteractionManager singleton {
+      get {
+        if (s_singleton == null) { s_singleton = FindObjectOfType<InteractionManager>(); }
+        return s_singleton;
+      }
+      set { s_singleton = value; }
+    }
 
     private Func<Hand> GetFixedLeftHand  = new Func<Hand>(() => Hands.FixedLeft);
     private Func<Hand> GetFixedRightHand = new Func<Hand>(() => Hands.FixedRight);
 
     void Awake() {
-      if (InteractionManager.singleton == null) singleton = this;
+      if (s_singleton == null) s_singleton = this;
 
       Provider = Hands.Provider;
 
@@ -152,6 +159,17 @@ namespace Leap.Unity.UI.Interaction {
     void FixedUpdate() {
       OnPrePhysicalUpdate();
 
+      // Ensure hover and touch query radii are up-to-date.
+      if (Provider != null) {
+        _providerScale = Provider.transform.lossyScale.x;
+
+        foreach (var interactionHand in _interactionHands) {
+          interactionHand.HoverActivationRadius = WorldHoverActivationRadius;
+          interactionHand.TouchActivationRadius = WorldTouchActivationRadius;
+        }
+      }
+
+      // Perform each hand's FixedUpdateHand.
       foreach (var interactionHand in _interactionHands) {
         interactionHand.FixedUpdateHand(enableHovering, enableContact, enableGrasping);
       }
@@ -162,22 +180,12 @@ namespace Leap.Unity.UI.Interaction {
         PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
       }
 
+      // Perform each interaction object's FixedUpdateObject.
       foreach (var interactionObj in _interactionBehaviours) {
         interactionObj.FixedUpdateObject();
       }
 
       OnPostPhysicalUpdate();
-    }
-
-    void Update() {
-      if (Provider != null) {
-        _providerScale = Provider.transform.lossyScale.x;
-
-        foreach (var interactionHand in _interactionHands) {
-          interactionHand.HoverActivationRadius = WorldHoverActivationRadius;
-          interactionHand.TouchActivationRadius = WorldTouchActivationRadius;
-        }
-      }
     }
 
     void LateUpdate() {
@@ -281,7 +289,7 @@ namespace Leap.Unity.UI.Interaction {
     #region Runtime Gizmos
 
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      if (_debugDrawHandGizmos) {
+      if (_drawHandRuntimeGizmos) {
         foreach (var hand in _interactionHands) {
           if (hand != null) {
             hand.OnDrawRuntimeGizmos(drawer);
