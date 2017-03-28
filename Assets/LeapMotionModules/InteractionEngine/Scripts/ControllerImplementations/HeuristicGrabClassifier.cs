@@ -14,10 +14,10 @@ namespace Leap.Unity.Interaction {
     Vector3[] fingerTipPositions = new Vector3[5];
 
 
-    public HeuristicGrabClassifier(InteractionManager manager, float fingerStickiness = 0f, float thumbStickiness = 0.04f, float maxCurl = 0.65f, float minCurl = -0.1f, float fingerRadius = 0.012f, float thumbRadius = 0.017f, float grabCooldown = 0.2f, float maxCurlVel = 0.0f, float maxGrabDistance = 0.05f) {
+    public HeuristicGrabClassifier(InteractionManager manager, float fingerStickiness = 0f, float thumbStickiness = 0.04f, float maxCurl = 0.65f, float minCurl = -0.1f, float fingerRadius = 0.012f, float thumbRadius = 0.017f, float grabCooldown = 0.2f, float maxCurlVel = 0.0f, float maxGrabDistance = 0.05f, int layerMask = 0, QueryTriggerInteraction queryTriggers = QueryTriggerInteraction.UseGlobal) {
       _manager = manager;
-      defaultGrabParams = new GrabClassifierHeuristics.ClassifierParameters(fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius, thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance, manager.InteractionLayer);
-      scaledGrabParams = new GrabClassifierHeuristics.ClassifierParameters(fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius, thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance, manager.InteractionLayer);
+      defaultGrabParams = new GrabClassifierHeuristics.ClassifierParameters(fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius, thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance, layerMask == 0 ? (1 << manager.InteractionLayer | 1 << manager.InteractionNoClipLayer) : layerMask, queryTriggers);
+      scaledGrabParams = new GrabClassifierHeuristics.ClassifierParameters(fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius, thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance, layerMask == 0 ? (1 << manager.InteractionLayer | 1 << manager.InteractionNoClipLayer) : layerMask, queryTriggers);
       for (int i = 0; i < 6; i++) { collidingCandidates[i] = new Collider[5]; }
     }
 
@@ -56,7 +56,7 @@ namespace Leap.Unity.Interaction {
         scaledGrabParams.MAXIMUM_DISTANCE_FROM_HAND = defaultGrabParams.MAXIMUM_DISTANCE_FROM_HAND * _manager.SimulationScale;
 
         //Ensure that the temporally variant variables are updated
-        scaledGrabParams.LAYER = _manager.InteractionLayer;
+        //scaledGrabParams.LAYER_MASK = 1<<_manager.InteractionLayer;
         for (int i = 0; i < hand.Fingers.Count; i++) {
           fingerTipPositions[i] = hand.Fingers[i].TipPosition.ToVector3();
         }
