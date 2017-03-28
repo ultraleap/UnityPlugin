@@ -16,10 +16,10 @@ namespace Leap.Unity.Attributes {
   ///  - A property matching the type of the field 
   ///      (the setter is called with the new value)
   /// </summary>
-  public class OnChangeAttribute : CombinablePropertyAttribute {
+  public class OnEditorChangeAttribute : CombinablePropertyAttribute {
     public readonly string methodName;
 
-    public OnChangeAttribute(string methodName) {
+    public OnEditorChangeAttribute(string methodName) {
       this.methodName = methodName;
     }
 
