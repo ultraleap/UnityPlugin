@@ -98,7 +98,16 @@ namespace Leap.Unity.UI.Interaction {
 
     private InteractionHand[] _interactionHands = new InteractionHand[2];
     private HashSet<InteractionBehaviourBase> _interactionBehaviours = new HashSet<InteractionBehaviourBase>();
-    public Dictionary<Rigidbody, InteractionBehaviourBase> rigidbodyRegistry { get; private set; }
+
+    private Dictionary<Rigidbody, InteractionBehaviourBase> _rigidbodyRegistry;
+    public Dictionary<Rigidbody, InteractionBehaviourBase> rigidbodyRegistry {
+      get {
+        if (_rigidbodyRegistry == null) {
+          _rigidbodyRegistry = new Dictionary<Rigidbody, InteractionBehaviourBase>();
+        }
+        return _rigidbodyRegistry;
+      }
+    }
 
     /// <summary> Stores data for implementing Soft Contact for InteractionHands. </summary>
     [NonSerialized]
@@ -142,8 +151,6 @@ namespace Leap.Unity.UI.Interaction {
 
       _interactionHands[0] = new InteractionHand(this, _getFixedLeftHand);
       _interactionHands[1] = new InteractionHand(this, _getFixedRightHand);
-
-      rigidbodyRegistry = new Dictionary<Rigidbody, InteractionBehaviourBase>();
 
       if (_autoGenerateLayers) {
         AutoGenerateLayers();
@@ -242,6 +249,7 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Internal
 
+    public SingleLayer TemplateLayer { get { return _templateLayer; } }
     public SingleLayer InteractionLayer { get { return _interactionLayer; } }
     public SingleLayer GraspedObjectLayer { get { return _graspedObjectLayer; } }
     public SingleLayer ContactBoneLayer { get { return _contactBoneLayer; } }

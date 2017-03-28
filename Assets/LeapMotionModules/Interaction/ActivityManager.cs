@@ -46,7 +46,7 @@ namespace Leap.Unity.UI.Interaction {
         overlapCount = Physics.OverlapSphereNonAlloc(hand.PalmPosition.ToVector3(),
                                                          activationRadius,
                                                          resultsBuffer,
-                                                         manager.InteractionLayer.layerMask,
+                                                         manager.InteractionLayer.layerMask | manager.GraspedObjectLayer.layerMask,
                                                          QueryTriggerInteraction.Collide);
         if (overlapCount < resultsBuffer.Length) {
           break;

@@ -15,9 +15,15 @@ namespace Leap.Unity.UI.Interaction {
     protected Rigidbody _body;
     public new Rigidbody rigidbody { get { return _body; } }
 
-    [Header("Interaction Settings")]
-    public bool allowHover = true;
-    public bool allowGrasping = true;
+    [Header("Interaction Overrides")]
+    [Tooltip("This object will no longer receive hover callbacks if this property is checked.")]
+    public bool ignoreHover = true;
+    [Tooltip("Hands will not be able to touch this object if this property is checked.")]
+    public bool ignoreContact = true;
+    [Tooltip("Hands will not be able to grasp this object if this property is checked.")]
+    public bool ignoreGrasping = true;
+
+    [Header("Grasp Settings")]
     /// <summary> Can this object be grasped with two or more hands? </summary>
     public bool allowMultiGrasp = false;
 
@@ -32,10 +38,6 @@ namespace Leap.Unity.UI.Interaction {
     protected virtual void Awake() {
       _body = GetComponent<Rigidbody>();
       _body.maxAngularVelocity = MAX_ANGULAR_VELOCITY;
-
-      if (interactionManager != null) {
-        interactionManager.RegisterInteractionBehaviour(this);
-      }
     }
 
     protected virtual void OnEnable() {
@@ -46,9 +48,10 @@ namespace Leap.Unity.UI.Interaction {
           Debug.LogError("Interaction Behaviours require an Interaction Manager. Please ensure you have an InteractionManager in your scene.");
           this.enabled = false;
         }
-        else {
-          interactionManager.RegisterInteractionBehaviour(this);
-        }
+      }
+
+      if (interactionManager != null && !interactionManager.IsBehaviourRegistered(this)) {
+        interactionManager.RegisterInteractionBehaviour(this);
       }
     }
 

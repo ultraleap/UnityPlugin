@@ -87,7 +87,7 @@ namespace Leap.Unity.UI.Interaction {
       };
 
       foreach (var interactionObj in hoverCandidates) {
-        if (!interactionObj.allowHover) continue;
+        if (interactionObj.ignoreHover) continue;
         CheckHoverForElement(hand, interactionObj, ref results);
       }
 
@@ -694,7 +694,7 @@ namespace Leap.Unity.UI.Interaction {
       _grabClassifier.FixedUpdateHeuristicClassifier(_hand);
 
       if (_graspedObject != null) {
-        if (!_graspedObject.allowGrasping) {
+        if (_graspedObject.ignoreGrasping) {
           ReleaseGrasp();
         }
         _graspedObject.GraspHold(_hand);
@@ -702,8 +702,6 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public void Grasp(InteractionBehaviourBase interactionObj) {
-      if (!interactionObj.allowGrasping) return;
-
       if (_graspedObject != null) {
         Debug.LogError("Grasp was called, but the hand was already grasping an object.");
         ReleaseGrasp();
@@ -772,7 +770,7 @@ namespace Leap.Unity.UI.Interaction {
     public HashSet<InteractionBehaviourBase> GetGraspCandidates() {
       _graspCandidatesBuffer.Clear();
       foreach (var intObj in _touchActivityManager.ActiveBehaviours) {
-        if (intObj.allowGrasping) {
+        if (!intObj.ignoreGrasping) {
           _graspCandidatesBuffer.Add(intObj);
         }
       }

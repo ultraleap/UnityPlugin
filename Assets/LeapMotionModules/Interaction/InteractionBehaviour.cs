@@ -452,7 +452,7 @@ namespace Leap.Unity.UI.Interaction {
       _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
 
       _graspingHandsBuffer.Clear();
-      foreach (var hand in _graspingIntHands.Query().Select(intHand => intHand.GetLeapHand())) {
+      foreach (var hand in _graspingIntHands.Query().Select(intHand => intHand.GetLastTrackedLeapHand())) {
         _graspingHandsBuffer.Add(hand);
       }
 
@@ -688,14 +688,19 @@ namespace Leap.Unity.UI.Interaction {
 
     protected void FixedUpdateLayer() {
       int layer;
-      switch (_collisionMode) {
-        case CollisionMode.Normal:
-          layer = interactionManager.InteractionLayer; break;
-        case CollisionMode.Grasped:
-          layer = interactionManager.GraspedObjectLayer; break;
-        default:
-          Debug.LogError("Invalid collision mode, can't update layer.");
-          return;
+      if (ignoreContact) {
+        layer = interactionManager.TemplateLayer;
+      }
+      else {
+        switch (_collisionMode) {
+          case CollisionMode.Normal:
+            layer = interactionManager.InteractionLayer; break;
+          case CollisionMode.Grasped:
+            layer = interactionManager.GraspedObjectLayer; break;
+          default:
+            Debug.LogError("Invalid collision mode, can't update layer.");
+            return;
+        }
       }
 
       if (gameObject.layer != layer) {
