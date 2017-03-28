@@ -37,6 +37,8 @@ namespace Leap.Unity.UI.Interaction {
     [Tooltip("Whether or not to create the layers used for interaction when the scene runs. Hand interactions require an interaction layer (for objects), a grasped object layer, and a contact bone layer (for hand bones). Keep this checked to have these layers created for you, but be aware that the layers will have blank names due to Unity limitations.")]
     [SerializeField]
     protected bool _autoGenerateLayers = true;
+    /// <summary> Gets whether auto-generate layers was enabled for this Interaction Manager. </summary>
+    public bool autoGenerateLayers { get { return _autoGenerateLayers; } }
 
     [Tooltip("When automatically generating layers, the Interaction layer (for interactable objects) will use the same physics collision flags as the layer specified here.")]
     [SerializeField]

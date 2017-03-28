@@ -674,22 +674,23 @@ namespace Leap.Unity.UI.Interaction {
       if (isGrasped) {
         desiredCollisionMode = CollisionMode.Grasped;
       }
-      //else if (_dislocatedBrushCounter < DISLOCATED_BRUSH_COOLDOWN || (_CollisionMode != CollisionMode.Normal && _minHandDistance <= 0.0f)) {
-      //  desiredCollisionMode = CollisionMode.SOFT;
-      //}
 
-      if (_collisionMode != desiredCollisionMode) {
-        _collisionMode = desiredCollisionMode;
-        FixedUpdateLayer();
-      }
+      _collisionMode = desiredCollisionMode;
+      FixedUpdateLayer();
 
       Assert.IsTrue((_collisionMode == CollisionMode.Grasped) == isGrasped);
+    }
+
+    protected SingleLayer _initialLayer;
+
+    protected void InitLayers() {
+      _initialLayer = gameObject.layer;
     }
 
     protected void FixedUpdateLayer() {
       int layer;
       if (ignoreContact) {
-        layer = interactionManager.TemplateLayer;
+        layer = interactionManager.autoGenerateLayers ? interactionManager.TemplateLayer : _initialLayer;
       }
       else {
         switch (_collisionMode) {

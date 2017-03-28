@@ -697,7 +697,9 @@ namespace Leap.Unity.UI.Interaction {
         if (_graspedObject.ignoreGrasping) {
           ReleaseGrasp();
         }
-        _graspedObject.GraspHold(_hand);
+        else {
+          _graspedObject.GraspHold(_hand);
+        }
       }
     }
 
