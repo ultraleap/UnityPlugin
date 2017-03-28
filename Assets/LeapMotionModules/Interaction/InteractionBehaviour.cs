@@ -588,6 +588,7 @@ namespace Leap.Unity.UI.Interaction {
     protected void InitInternal() {
       _childrenArray = GetComponentsInChildren<Transform>(true);
 
+      InitLayer();
       FixedUpdateLayer();
     }
 
@@ -683,7 +684,7 @@ namespace Leap.Unity.UI.Interaction {
 
     protected SingleLayer _initialLayer;
 
-    protected void InitLayers() {
+    protected void InitLayer() {
       _initialLayer = gameObject.layer;
     }
 
