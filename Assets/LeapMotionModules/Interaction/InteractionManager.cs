@@ -42,7 +42,7 @@ namespace Leap.Unity.UI.Interaction {
     [SerializeField]
     protected SingleLayer _templateLayer = 0;
 
-    [Tooltip("The layer for interaction objects. Usually this would have the same collision flags as the Default layer, but it should be its own layer for optimization purposes.")]
+    [Tooltip("The layer for interactable objects (i.e. InteractionBehaviours). Usually this would have the same collision flags as the Default layer, but it should be its own layer so hands don't have to check collision against all physics objects in the scene.")]
     [SerializeField]
     protected SingleLayer _interactionLayer = 0;
 
@@ -133,16 +133,16 @@ namespace Leap.Unity.UI.Interaction {
       set { s_singleton = value; }
     }
 
-    private Func<Hand> GetFixedLeftHand  = new Func<Hand>(() => Hands.FixedLeft);
-    private Func<Hand> GetFixedRightHand = new Func<Hand>(() => Hands.FixedRight);
+    private Func<Hand> _getFixedLeftHand  = new Func<Hand>(() => Hands.FixedLeft);
+    private Func<Hand> _getFixedRightHand = new Func<Hand>(() => Hands.FixedRight);
 
     void Awake() {
       if (s_singleton == null) s_singleton = this;
 
       Provider = Hands.Provider;
 
-      _interactionHands[0] = new InteractionHand(this, GetFixedLeftHand,  Chirality.Left,  WorldHoverActivationRadius, WorldTouchActivationRadius);
-      _interactionHands[1] = new InteractionHand(this, GetFixedRightHand, Chirality.Right, WorldHoverActivationRadius, WorldTouchActivationRadius);
+      _interactionHands[0] = new InteractionHand(this, _getFixedLeftHand);
+      _interactionHands[1] = new InteractionHand(this, _getFixedRightHand);
 
       if (_autoGenerateLayers) {
         AutoGenerateLayers();
@@ -150,23 +150,21 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
+    // TODO: Do correct thing in OnEnable / OnDisable for whole Managers
+
     void Start() {
       if (Provider == null) {
         Debug.LogError("[InteractionManager] No LeapServiceProvider found.");
+        this.enabled = false;
       }
     }
 
     void FixedUpdate() {
       OnPrePhysicalUpdate();
 
-      // Ensure hover and touch query radii are up-to-date.
+      // Ensure provider scale information is up-to-date.
       if (Provider != null) {
         _providerScale = Provider.transform.lossyScale.x;
-
-        foreach (var interactionHand in _interactionHands) {
-          interactionHand.HoverActivationRadius = WorldHoverActivationRadius;
-          interactionHand.TouchActivationRadius = WorldTouchActivationRadius;
-        }
       }
 
       // Perform each hand's FixedUpdateHand.
@@ -197,8 +195,15 @@ namespace Leap.Unity.UI.Interaction {
 
     public void RegisterInteractionBehaviour(InteractionBehaviourBase interactionObj) {
       _interactionBehaviours.Add(interactionObj);
-      _rigidbodyRegistry[interactionObj.Rigidbody] = interactionObj;
+      _rigidbodyRegistry[interactionObj.rigidbody] = interactionObj;
     }
+
+    public bool IsBehaviourRegistered(InteractionBehaviourBase interactionObj) {
+      return _interactionBehaviours.Contains(interactionObj);
+    }
+
+    // TODO: Allow InteractionBehaviours to be unregistered; this should call out to hands and
+    // handle their grasped object state appropriately if their grasped object was just unregistered.
 
     #endregion
 

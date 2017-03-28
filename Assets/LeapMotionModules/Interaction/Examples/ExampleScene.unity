@@ -42,7 +42,7 @@ RenderSettings:
 LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 7
-  m_GIWorkflowMode: 0
+  m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -71,7 +71,8 @@ LightmapSettings:
     m_FinalGatherFiltering: 1
     m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000006, guid: 46c2b13a42bdca74bae8c07ed69b96a1,
+    type: 2}
   m_RuntimeCPUUsage: 25
 --- !u!196 &4
 NavMeshSettings:
@@ -202,10 +203,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 289258607}
-  _interactionManagerIsNull: 0
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
+  allowHover: 1
+  allowGrasping: 1
   allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
   graspedMovementType: 0
@@ -411,14 +410,67 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 289258607}
-  _interactionManagerIsNull: 0
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
+  allowHover: 1
+  allowGrasping: 1
   allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+--- !u!114 &215492407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 215492405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &237495162
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 237495164}
+  - component: {fileID: 237495163}
+  m_Layer: 0
+  m_Name: Runtime Gizmo Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &237495163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 237495162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81dc33a21758b384586807f3656587d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _displayInGameView: 1
+  _enabledForBuild: 1
+  _sphereMesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  _gizmoShader: {fileID: 4800000, guid: 309635e4933310a4d98f0e016c806769, type: 3}
+--- !u!4 &237495164
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 237495162}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.07498428, y: -3.0063097, z: 3.7218971}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &255649379
 GameObject:
   m_ObjectHideFlags: 0
@@ -465,10 +517,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 289258607}
-  _interactionManagerIsNull: 0
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
+  allowHover: 1
+  allowGrasping: 1
   allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
   graspedMovementType: 0
@@ -662,19 +712,19 @@ MonoBehaviour:
   enableHovering: 1
   enableContact: 1
   enableGrasping: 1
-  _showAdvancedSettings: 1
+  _showAdvancedSettings: 0
   hoverActivationRadius: 0.5
   touchActivationRadius: 0.15
-  _autoGenerateLayers: 0
+  _autoGenerateLayers: 1
   _templateLayer:
     layerIndex: 0
   _interactionLayer:
-    layerIndex: 0
+    layerIndex: 8
   _graspedObjectLayer:
-    layerIndex: 0
+    layerIndex: 9
   _contactBoneLayer:
-    layerIndex: 0
-  _drawHandRuntimeGizmos: 0
+    layerIndex: 10
+  _drawHandRuntimeGizmos: 1
 --- !u!4 &289258608
 Transform:
   m_ObjectHideFlags: 0
@@ -686,7 +736,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &363896903
 Prefab:
@@ -799,10 +849,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 289258607}
-  _interactionManagerIsNull: 0
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
+  allowHover: 1
+  allowGrasping: 1
   allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
   graspedMovementType: 0
@@ -1074,10 +1122,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 652376167}
-  - component: {fileID: 652376166}
   - component: {fileID: 652376165}
   m_Layer: 0
-  m_Name: Scene
+  m_Name: Stage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1103,26 +1150,6 @@ MonoBehaviour:
   _sleepThreshold:
     Override: 1
     Value: 0.005
---- !u!114 &652376166
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 652376164}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2d53554227124ca485c87bdfa387665, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetRenderRate: 0
-  targetRenderRateStep: 1
-  fixedPhysicsRate: 100
-  fixedPhysicsRateStep: 1
-  unlockRender: 0
-  unlockPhysics: 0
-  decrease: 0
-  increase: 0
-  resetRate: 0
 --- !u!4 &652376167
 Transform:
   m_ObjectHideFlags: 0
@@ -1145,7 +1172,7 @@ Transform:
   - {fileID: 368970012}
   - {fileID: 1041846419}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &673266634
 GameObject:
@@ -1279,6 +1306,14 @@ Prefab:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6517682, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5484986, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
@@ -1303,14 +1338,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 289258607}
-  _interactionManagerIsNull: 0
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
+  allowHover: 1
+  allowGrasping: 1
   allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+--- !u!114 &759419770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 759419768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &825171183
 GameObject:
   m_ObjectHideFlags: 0
@@ -1581,10 +1625,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 289258607}
-  _interactionManagerIsNull: 0
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
+  allowHover: 1
+  allowGrasping: 1
   allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
   graspedMovementType: 0
@@ -1804,14 +1846,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 289258607}
-  _interactionManagerIsNull: 0
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
+  allowHover: 1
+  allowGrasping: 1
   allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+--- !u!114 &961068725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 961068723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1020742380
 GameObject:
   m_ObjectHideFlags: 0
@@ -1850,7 +1901,7 @@ Transform:
   - {fileID: 1225568924}
   - {fileID: 1381133781}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1041846418
 GameObject:
@@ -2103,10 +2154,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 289258607}
-  _interactionManagerIsNull: 0
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
+  allowHover: 1
+  allowGrasping: 1
   allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
   graspedMovementType: 0
@@ -2418,10 +2467,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 289258607}
-  _interactionManagerIsNull: 0
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
+  allowHover: 1
+  allowGrasping: 1
   allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
   graspedMovementType: 0
@@ -2551,10 +2598,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 289258607}
-  _interactionManagerIsNull: 0
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
+  allowHover: 1
+  allowGrasping: 1
   allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
   graspedMovementType: 0
@@ -2899,10 +2944,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 289258607}
-  _interactionManagerIsNull: 0
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
+  allowHover: 1
+  allowGrasping: 1
   allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
   graspedMovementType: 0
@@ -2952,10 +2995,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionManager: {fileID: 289258607}
-  _interactionManagerIsNull: 0
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
+  allowHover: 1
+  allowGrasping: 1
   allowMultiGrasp: 0
   moveObjectWhenGrasped: 1
   graspedMovementType: 0

@@ -22,16 +22,16 @@ namespace Leap.Unity.UI.Interaction {
       specifyConditionalDrawing("_showAdvancedSettings", "_drawHandRuntimeGizmos");
 
       // Layers
-      //SerializedProperty showAdvancedSettingsProperty = serializedObject.FindProperty("_showAdvancedSettings");
-      //SerializedProperty autoGenerateLayerProperty = serializedObject.FindProperty("_autoGenerateLayers");
-      //specifyConditionalDrawing(() => autoGenerateLayerProperty.boolValue
-      //                             && showAdvancedSettingsProperty.boolValue,
-      //                          "_templateLayer");
-      //specifyConditionalDrawing(() => !autoGenerateLayerProperty.boolValue
-      //                             && showAdvancedSettingsProperty.boolValue,
-      //                          "_interactionLayer",
-      //                          "_graspedObjectLayer",
-      //                          "_contactBoneLayer");
+      SerializedProperty showAdvancedSettingsProperty = serializedObject.FindProperty("_showAdvancedSettings");
+      SerializedProperty autoGenerateLayerProperty = serializedObject.FindProperty("_autoGenerateLayers");
+      specifyConditionalDrawing(() => autoGenerateLayerProperty.boolValue
+                                   && showAdvancedSettingsProperty.boolValue,
+                                "_templateLayer");
+      specifyConditionalDrawing(() => !autoGenerateLayerProperty.boolValue
+                                   && showAdvancedSettingsProperty.boolValue,
+                                "_interactionLayer",
+                                "_graspedObjectLayer",
+                                "_contactBoneLayer");
     }
 
   }

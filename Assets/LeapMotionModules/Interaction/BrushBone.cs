@@ -16,10 +16,13 @@ namespace Leap.Unity.UI.Interaction {
 
     public float _lastObjectTouchedMass;
 
-    #region Collision Callbacks
-
     void OnCollisionEnter(Collision collision) {
       InteractionBehaviourBase interactionObj;
+      if (collision.rigidbody == null) {
+        Debug.LogError("Brush Bone collided with non-rigidbody collider: " + collision.collider.name + "."
+                     + "Please enable automatic layer generation in the Interaction Manager, "
+                     + "or ensure the Interaction layer only contains Interaction Behaviours.");
+      }
       if (interactionHand.interactionManager.RigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
         _lastObjectTouchedMass = collision.rigidbody.mass;
         interactionHand.ContactBoneCollisionEnter(this, interactionObj);
@@ -43,8 +46,6 @@ namespace Leap.Unity.UI.Interaction {
         interactionHand.ContactBoneCollisionExit(this, interactionObj);
       }
     }
-
-    #endregion
 
   }
 

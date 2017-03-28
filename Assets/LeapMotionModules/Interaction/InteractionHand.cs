@@ -12,30 +12,25 @@ namespace Leap.Unity.UI.Interaction {
     public InteractionManager interactionManager;
 
     private Func<Hand> _handAccessor;
-    private Hand _hand;
-    private bool _isLeft;
+    private Hand _handData; // copy of latest tracked hand data, never null
+    private Hand _hand;     // null when not tracked, otherwise _handData
 
     public InteractionHand(InteractionManager interactionManager,
-                           Func<Hand> handAccessor,
-                           Chirality handedness,
-                           float hoverActivationRadius,
-                           float touchActivationRadius) {
+                           Func<Hand> handAccessor) {
       this.interactionManager = interactionManager;
       _handAccessor = handAccessor;
-      _isLeft = handedness == Chirality.Left;
-
-      InitHovering(hoverActivationRadius);
-      InitTouch(touchActivationRadius);
-      InitContact();
-      InitGrasping();
+      _handData = new Hand();
+      RefreshHandState();
     }
 
-    public Hand GetLeapHand() {
-      return _hand;
+    private void RefreshHandState() {
+      var hand = _handAccessor();
+      if (hand != null) { _hand = _handData.CopyFrom(hand); }
+      else { _hand = null; }
     }
 
     public void FixedUpdateHand(bool doHovering, bool doContact, bool doGrasping) {
-      _hand = _handAccessor();
+      RefreshHandState();
 
       if (doHovering) FixedUpdateHovering();
       if (doContact || doGrasping) FixedUpdateTouch();
@@ -43,33 +38,32 @@ namespace Leap.Unity.UI.Interaction {
       if (doGrasping) FixedUpdateGrasping();
     }
 
+    public Hand GetLeapHand() {
+      return _hand;
+    }
+
+    public Hand GetLastTrackedLeapHand() {
+      return _handData;
+    }
+
     #region Hovering
 
-    private void InitHovering(float hoverActivationRadius) {
-      // Standard Hover
-      _hoverActivityManager = new ActivityManager(interactionManager, hoverActivationRadius);
+    private ActivityManager _hoverActivityManager;
+    public ActivityManager hoverActivityManager {
+      get {
+        if (_hoverActivityManager == null) { _hoverActivityManager = new ActivityManager(interactionManager); }
+        return _hoverActivityManager;
+      }
     }
 
     private void FixedUpdateHovering() {
-      _hoverActivityManager.FixedUpdateHand(_hand);
+      hoverActivityManager.activationRadius = interactionManager.WorldHoverActivationRadius;
+
+      hoverActivityManager.FixedUpdateHand(_hand);
       CalculateIntentionPosition();
       HoverCheckResults hoverResults = CheckHoverForHand(_hand, _hoverActivityManager.ActiveBehaviours);
       ProcessHoverCheckResults(hoverResults);
       ProcessPrimaryHoverCheckResults(hoverResults);
-    }
-
-    /// <summary>
-    /// Encapsulates tracking Hand <-> InteractionBehaviour hover candidates
-    /// (broad-phase) via PhysX sphere queries.
-    /// </summary>
-    private ActivityManager _hoverActivityManager;
-    public float HoverActivationRadius {
-      get {
-        return _hoverActivityManager.activationRadius;
-      }
-      set {
-        _hoverActivityManager.activationRadius = value;
-      }
     }
 
     private struct HoverCheckResults {
@@ -93,13 +87,14 @@ namespace Leap.Unity.UI.Interaction {
       };
 
       foreach (var interactionObj in hoverCandidates) {
-        results = CheckHoverForElement(hand, interactionObj, results);
+        if (!interactionObj.allowHover) continue;
+        CheckHoverForElement(hand, interactionObj, ref results);
       }
 
       return results;
     }
 
-    private HoverCheckResults CheckHoverForElement(Hand hand, InteractionBehaviourBase hoverable, HoverCheckResults curResults) {
+    private void CheckHoverForElement(Hand hand, InteractionBehaviourBase hoverable, ref HoverCheckResults curResults) {
       float distance = hoverable.GetDistance(_intentionPosition);
       if (distance > 0F) {
         curResults.hovered.Add(hoverable);
@@ -108,7 +103,6 @@ namespace Leap.Unity.UI.Interaction {
         curResults.primaryHovered = hoverable;
         curResults.primaryHoveredDistance = distance;
       }
-      return curResults;
     }
 
     private List<InteractionBehaviourBase> _removalCache = new List<InteractionBehaviourBase>();
@@ -214,25 +208,17 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Touch (common logic for Contact and Grasping)
 
-    /// <summary>
-    /// Encapsulates tracking Hand <-> InteractionBehaviour contact and grasping candidates
-    /// (broad-phase) via PhysX sphere queries.
-    /// </summary>
-    private ActivityManager _touchActivityManager;
-    public float TouchActivationRadius {
+    private ActivityManager __touchActivityManager;
+    private ActivityManager _touchActivityManager {
       get {
-        return _touchActivityManager.activationRadius;
+        if (__touchActivityManager == null) { __touchActivityManager = new ActivityManager(interactionManager); }
+        return __touchActivityManager;
       }
-      set {
-        _touchActivityManager.activationRadius = value;
-      }
-    }
-
-    private void InitTouch(float touchActivationRadius) {
-      _touchActivityManager = new ActivityManager(interactionManager, touchActivationRadius);
     }
 
     private void FixedUpdateTouch() {
+      _touchActivityManager.activationRadius = interactionManager.WorldTouchActivationRadius;
+
       _touchActivityManager.FixedUpdateHand(_hand);
     }
 
@@ -288,7 +274,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private void InitBrushBoneContainer() {
-      _brushBoneParent = new GameObject((_isLeft ? "Left" : "Right") + " Interaction Hand Contact Bones");
+      _brushBoneParent = new GameObject((_hand.IsLeft ? "Left" : "Right") + " Interaction Hand Contact Bones");
       _brushBoneParent.transform.parent = interactionManager.transform;
       _brushBoneParent.layer = interactionManager.ContactBoneLayer;
     }
@@ -559,6 +545,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public void EnableSoftContact() {
+      if (_hand == null) return;
       _disableSoftContactEnqueued = false;
       if (!_softContactEnabled) {
         _softContactEnabled = true;
@@ -598,7 +585,7 @@ namespace Leap.Unity.UI.Interaction {
         for (int i = _brushBones.Length; i-- != 0;) {
           _brushBones[i].collider.isTrigger = false;
         }
-        ResetBrushBoneJoints();
+        if (_hand != null) ResetBrushBoneJoints();
       }
     }
 
@@ -663,7 +650,8 @@ namespace Leap.Unity.UI.Interaction {
 
     private void FixedUpdateContactCallbacks() {
       foreach (var interactionObj in _contactBehavioursLastFrame) {
-        if (!_contactBehaviours.ContainsKey(interactionObj)) {
+        if (!_contactBehaviours.ContainsKey(interactionObj)
+          || !_brushBoneParent.gameObject.activeSelf) {
           interactionObj.ContactEnd(_hand);
           _contactBehaviourRemovalCache.Add(interactionObj);
         }
@@ -672,14 +660,16 @@ namespace Leap.Unity.UI.Interaction {
         _contactBehavioursLastFrame.Remove(interactionObj);
       }
       _contactBehaviourRemovalCache.Clear();
-      foreach (var intObjCountPair in _contactBehaviours) {
-        var interactionObj = intObjCountPair.Key;
-        if (_contactBehavioursLastFrame.Contains(interactionObj)) {
-          interactionObj.ContactStay(_hand);
-        }
-        else {
-          interactionObj.ContactBegin(_hand);
-          _contactBehavioursLastFrame.Add(interactionObj);
+      if (_brushBoneParent.gameObject.activeSelf) {
+        foreach (var intObjCountPair in _contactBehaviours) {
+          var interactionObj = intObjCountPair.Key;
+          if (_contactBehavioursLastFrame.Contains(interactionObj)) {
+            interactionObj.ContactStay(_hand);
+          }
+          else {
+            interactionObj.ContactBegin(_hand);
+            _contactBehavioursLastFrame.Add(interactionObj);
+          }
         }
       }
     }
@@ -690,32 +680,48 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Grasping
 
-    private HeuristicGrabClassifier _grabClassifier;
-    private InteractionBehaviourBase _graspedObject;
-
-    private void InitGrasping() {
-      _grabClassifier = new HeuristicGrabClassifier(this);
+    private HeuristicGrabClassifier __grabClassifier;
+    private HeuristicGrabClassifier _grabClassifier {
+      get {
+        if (__grabClassifier == null) __grabClassifier = new HeuristicGrabClassifier(this);
+        return __grabClassifier;
+      }
     }
+
+    private InteractionBehaviourBase _graspedObject;
 
     private void FixedUpdateGrasping() {
       _grabClassifier.FixedUpdateHeuristicClassifier(_hand);
 
       if (_graspedObject != null) {
+        if (!_graspedObject.allowGrasping) {
+          ReleaseGrasp();
+        }
         _graspedObject.GraspHold(_hand);
       }
     }
 
     public void Grasp(InteractionBehaviourBase interactionObj) {
+      if (!interactionObj.allowGrasping) return;
+
+      if (_graspedObject != null) {
+        Debug.LogError("Grasp was called, but the hand was already grasping an object.");
+        ReleaseGrasp();
+      }
+
       interactionObj.GraspBegin(_hand);
       _graspedObject = interactionObj;
     }
 
     public void ReleaseGrasp() {
-      if (_graspedObject == null) return; // Nothing to release.
+      if (_graspedObject == null) {
+        Debug.LogWarning("ReleaseGrasp() was called, but there is no held object to release.");
+        return; // Nothing to release.
+      }
 
       // Enable Soft Contact if contact in general is enabled to prevent objects
       // popping right out of the hand.
-      if (_contactInitialized) {
+      if (_contactInitialized && interactionManager.enableContact) {
         EnableSoftContact();
       }
 
@@ -762,8 +768,15 @@ namespace Leap.Unity.UI.Interaction {
       return sum;
     }
 
+    private HashSet<InteractionBehaviourBase> _graspCandidatesBuffer = new HashSet<InteractionBehaviourBase>();
     public HashSet<InteractionBehaviourBase> GetGraspCandidates() {
-      return _touchActivityManager.ActiveBehaviours;
+      _graspCandidatesBuffer.Clear();
+      foreach (var intObj in _touchActivityManager.ActiveBehaviours) {
+        if (intObj.allowGrasping) {
+          _graspCandidatesBuffer.Add(intObj);
+        }
+      }
+      return _graspCandidatesBuffer;
     }
 
     public bool IsGrasping(InteractionBehaviourBase interactionObj) {
