@@ -5,6 +5,7 @@
 \******************************************************************************/
 
 using UnityEngine;
+using System;
 using System.Collections.Generic;
 
 namespace Leap.Unity {
@@ -50,6 +51,12 @@ namespace Leap.Unity {
       while (i < mid) {
         array.Swap(i++, --j);
       }
+    }
+
+    public static void DoubleCapacity<T>(ref T[] array) {
+      T[] newArray = new T[array.Length * 2];
+      Array.Copy(array, newArray, array.Length);
+      array = newArray;
     }
 
     #endregion
