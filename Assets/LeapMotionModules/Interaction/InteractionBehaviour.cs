@@ -197,7 +197,7 @@ namespace Leap.Unity.UI.Interaction {
     // Logistics for providing per-object (instead of per-hand) Hover callbacks.
     private Hand  _closestHoveringHand = null;
     private float _closestHoveringHandDistance = float.PositiveInfinity;
-    private Hand  _closestJustStoppedHoveringHand = null; // Provided for OnObjectHoverEnd.
+    private Hand  _justStoppedHoveringHand = null; // Provided for OnObjectHoverEnd.
     private int   _hoveringHandsCountLastFrame = 0;
     private int   _hoveringHandsCount = 0;
 
@@ -217,7 +217,7 @@ namespace Leap.Unity.UI.Interaction {
       }
       else if (_hoveringHandsCountLastFrame > 0) {
         _closestHoveringHand = null;
-        OnObjectHoverEnd(_closestJustStoppedHoveringHand);
+        OnObjectHoverEnd(_justStoppedHoveringHand);
         _publicClosestHoveringHand = null;
       }
 
@@ -262,7 +262,7 @@ namespace Leap.Unity.UI.Interaction {
     public override void HoverEnd(Hand hand) {
       _hoveringHandsCount--;
       if (_hoveringHandsCount == 0) {
-        _closestJustStoppedHoveringHand = hand;
+        _justStoppedHoveringHand = hand;
       }
 
       OnHoverEnd(hand);
@@ -507,7 +507,7 @@ namespace Leap.Unity.UI.Interaction {
 
     public override void GraspBegin(Hand hand) {
       if (isGrasped && !allowMultiGrasp) {
-        interactionManager.ReleaseObjectFromGrasp(this);
+        interactionManager.TryReleaseObjectFromGrasp(this);
       }
 
       InteractionHand graspingIntHand = interactionManager.GetInteractionHand(hand);
@@ -688,11 +688,14 @@ namespace Leap.Unity.UI.Interaction {
 
     protected void FixedUpdateLayer() {
       int layer;
-      if (_collisionMode != CollisionMode.Normal) {
-        layer = interactionManager.GraspedObjectLayer;
-      }
-      else {
-        layer = interactionManager.InteractionLayer;
+      switch (_collisionMode) {
+        case CollisionMode.Normal:
+          layer = interactionManager.InteractionLayer; break;
+        case CollisionMode.Grasped:
+          layer = interactionManager.GraspedObjectLayer; break;
+        default:
+          Debug.LogError("Invalid collision mode, can't update layer.");
+          return;
       }
 
       if (gameObject.layer != layer) {

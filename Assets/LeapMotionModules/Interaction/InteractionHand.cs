@@ -730,7 +730,7 @@ namespace Leap.Unity.UI.Interaction {
       _graspedObject = null;
     }
 
-    public bool ReleaseObject(InteractionBehaviourBase interactionObj) {
+    public bool TryReleaseObject(InteractionBehaviourBase interactionObj) {
       if (interactionObj == _graspedObject) {
         ReleaseGrasp();
         return true;

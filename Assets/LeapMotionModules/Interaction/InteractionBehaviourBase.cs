@@ -8,6 +8,8 @@ namespace Leap.Unity.UI.Interaction {
 
   public abstract class InteractionBehaviourBase : MonoBehaviour {
 
+    public const float MAX_ANGULAR_VELOCITY = 100F;
+
     public InteractionManager interactionManager;
 
     protected Rigidbody _body;
@@ -29,7 +31,7 @@ namespace Leap.Unity.UI.Interaction {
 
     protected virtual void Awake() {
       _body = GetComponent<Rigidbody>();
-      _body.maxAngularVelocity = 100F;
+      _body.maxAngularVelocity = MAX_ANGULAR_VELOCITY;
 
       if (interactionManager != null) {
         interactionManager.RegisterInteractionBehaviour(this);

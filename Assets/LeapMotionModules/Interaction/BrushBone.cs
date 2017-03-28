@@ -23,26 +23,26 @@ namespace Leap.Unity.UI.Interaction {
                      + "Please enable automatic layer generation in the Interaction Manager, "
                      + "or ensure the Interaction layer only contains Interaction Behaviours.");
       }
-      if (interactionHand.interactionManager.RigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
+      if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
         _lastObjectTouchedMass = collision.rigidbody.mass;
         interactionHand.ContactBoneCollisionEnter(this, interactionObj);
       }
     }
     void OnCollisionExit(Collision collision) {
       InteractionBehaviourBase interactionObj;
-      if (interactionHand.interactionManager.RigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
+      if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
         interactionHand.ContactBoneCollisionExit(this, interactionObj);
       }
     }
     void OnTriggerEnter(Collider collider) {
       InteractionBehaviourBase interactionObj;
-      if (interactionHand.interactionManager.RigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
+      if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
         interactionHand.ContactBoneCollisionEnter(this, interactionObj);
       }
     }
     void OnTriggerExit(Collider collider) {
       InteractionBehaviourBase interactionObj;
-      if (interactionHand.interactionManager.RigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
+      if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
         interactionHand.ContactBoneCollisionExit(this, interactionObj);
       }
     }

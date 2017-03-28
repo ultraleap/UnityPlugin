@@ -98,8 +98,7 @@ namespace Leap.Unity.UI.Interaction {
 
     private InteractionHand[] _interactionHands = new InteractionHand[2];
     private HashSet<InteractionBehaviourBase> _interactionBehaviours = new HashSet<InteractionBehaviourBase>();
-    private Dictionary<Rigidbody, InteractionBehaviourBase> _rigidbodyRegistry = new Dictionary<Rigidbody, InteractionBehaviourBase>();
-    public Dictionary<Rigidbody, InteractionBehaviourBase> RigidbodyRegistry { get { return _rigidbodyRegistry; } }
+    public Dictionary<Rigidbody, InteractionBehaviourBase> rigidbodyRegistry { get; private set; }
 
     /// <summary> Stores data for implementing Soft Contact for InteractionHands. </summary>
     [NonSerialized]
@@ -143,6 +142,8 @@ namespace Leap.Unity.UI.Interaction {
 
       _interactionHands[0] = new InteractionHand(this, _getFixedLeftHand);
       _interactionHands[1] = new InteractionHand(this, _getFixedRightHand);
+
+      rigidbodyRegistry = new Dictionary<Rigidbody, InteractionBehaviourBase>();
 
       if (_autoGenerateLayers) {
         AutoGenerateLayers();
@@ -195,7 +196,7 @@ namespace Leap.Unity.UI.Interaction {
 
     public void RegisterInteractionBehaviour(InteractionBehaviourBase interactionObj) {
       _interactionBehaviours.Add(interactionObj);
-      _rigidbodyRegistry[interactionObj.rigidbody] = interactionObj;
+      rigidbodyRegistry[interactionObj.rigidbody] = interactionObj;
     }
 
     public bool IsBehaviourRegistered(InteractionBehaviourBase interactionObj) {
@@ -222,20 +223,21 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     /// <summary> Returns true if the object was released from a grasped hand, or false if the object was not held in the first place. </summary>
-    public bool ReleaseObjectFromGrasp(InteractionBehaviourBase interactionObj) {
+    public bool TryReleaseObjectFromGrasp(InteractionBehaviourBase interactionObj) {
       if (!_interactionBehaviours.Contains(interactionObj)) {
         Debug.LogError("ReleaseObjectFromGrasp was called, but the interaction object " + interactionObj.transform.name + " is not registered"
           + " with this InteractionManager.");
         return false;
       }
 
+      var didRelease = false;
       foreach (var hand in _interactionHands) {
         if (hand.IsGrasping(interactionObj)) {
           hand.ReleaseGrasp();
-          return true;
+          didRelease = true;
         }
       }
-      return false;
+      return didRelease;
     }
 
     #region Internal

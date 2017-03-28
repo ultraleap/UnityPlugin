@@ -53,7 +53,7 @@ namespace Leap.Unity.UI.Interaction {
         if (classifier.isGrabbing != classifier.prevGrabbing) {
           if (classifier.isGrabbing) {
             if (!behaviour.allowMultiGrasp) {
-              interactionHand.interactionManager.ReleaseObjectFromGrasp(behaviour);
+              interactionHand.interactionManager.TryReleaseObjectFromGrasp(behaviour);
             }
             interactionHand.Grasp(behaviour);
           }
