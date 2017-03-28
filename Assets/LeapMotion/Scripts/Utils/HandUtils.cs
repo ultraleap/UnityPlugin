@@ -237,6 +237,14 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// Transforms a finger to a position and rotation by its fingertip.
+    /// </summary>
+    public static void SetTipTransform(this Finger finger, Vector3 position, Quaternion rotation) {
+      finger.Transform(Vector3.zero, (rotation * Quaternion.Inverse(finger.bones[3].Rotation.ToQuaternion())));
+      finger.Transform(position - finger.bones[3].NextJoint.ToVector3(), Quaternion.identity);
+    }
+
+    /// <summary>
     /// Transforms a hand to a position and rotation.
     /// </summary>
     public static void SetTransform(this Hand hand, Vector3 position, Quaternion rotation) {
