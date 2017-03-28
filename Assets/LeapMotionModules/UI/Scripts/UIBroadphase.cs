@@ -2,7 +2,7 @@
 using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
-  public class UIBroadphase : MonoBehaviour {
+  public class UIBroadphase {
     public float activationRadius = 0.2f;
     public InteractionManager manager;
     public UnifiedUIElement[] perFingerClosestElement = new UnifiedUIElement[3];
@@ -19,22 +19,13 @@ namespace Leap.Unity.UI.Interaction {
     private Collider[] _colliderResultsBuffer = new Collider[128];
     private HashSet<UnifiedUIElement> _activeBehaviours = new HashSet<UnifiedUIElement>();
     private Hand originalHand = new Hand();
-    private LeapGui[] guis;
-
-    /*
+    
     public UIBroadphase(InteractionManager manager, float activationRadius = 0.2f) {
       this.manager = manager;
       this.activationRadius = activationRadius;
-    }*/
-
-    void Start() {
-      if (manager == null) {
-        manager = InteractionManager.singleton;
-      }
-      guis = FindObjectsOfType<LeapGui>();
     }
 
-    public void FixedUpdateHand(Hand hand) {
+    public void FixedUpdateHand(Hand hand, LeapGui[] guis) {
       originalHand.CopyFrom(hand);
       _activeBehaviours.Clear();
 
@@ -43,10 +34,10 @@ namespace Leap.Unity.UI.Interaction {
         UpdateActiveList(count, _colliderResultsBuffer);
       }
 
-      float leastHandDistance = 1000f;
+      float leastHandDistance = float.PositiveInfinity;
       for (int i = 0; i < perFingerClosestElement.Length; i++) {
         if (!hand.Fingers[i].IsExtended) { continue; }
-        float leastFingerDistance = 1000f;
+        float leastFingerDistance = float.PositiveInfinity;
         Vector3 fingerTip = hand.Fingers[i].TipPosition.ToVector3();
         foreach (UnifiedUIElement elem in _activeBehaviours) {
           if (elem.element != null) {

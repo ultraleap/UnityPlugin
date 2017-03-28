@@ -64,14 +64,14 @@ LightmapSettings:
     m_CompAOExponentDirect: 2.16
     m_Padding: 2
     m_LightmapParameters: {fileID: 0}
-    m_LightmapsBakeMode: 1
+    m_LightmapsBakeMode: 0
     m_TextureCompression: 1
     m_DirectLightInLightProbes: 1
     m_FinalGather: 0
     m_FinalGatherFiltering: 1
     m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
-  m_LightingDataAsset: {fileID: 112000001, guid: 267d6f576b1f2aa4e8ff27191964ec78,
+  m_LightingDataAsset: {fileID: 112000001, guid: 00591bdd85a26924a885d31fd5737859,
     type: 2}
   m_RuntimeCPUUsage: 25
 --- !u!196 &4
@@ -1997,6 +1997,37 @@ MonoBehaviour:
   element: {fileID: 552256749}
   feature: {fileID: 1776547492}
   _tint: {r: 1, g: 1, b: 1, a: 1}
+--- !u!21 &564290571
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Gui Material
+  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  m_ShaderKeywords: LEAP_GUI_CYLINDRICAL LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_TINTING
+    LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+    - first:
+        name: _MainTex
+      second:
+        m_Texture: {fileID: 28773605067016734, guid: 4050818e5c6400e428fa8d639f88000d,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _MainTex2
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &564590845
 GameObject:
   m_ObjectHideFlags: 0
@@ -4932,7 +4963,7 @@ MonoBehaviour:
     HandPostProcesses:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1776547491}
+        - m_Target: {fileID: 0}
           m_MethodName: FixedUpdateHand
           m_Mode: 0
           m_Arguments:
@@ -7663,7 +7694,6 @@ GameObject:
   - component: {fileID: 1776547490}
   - component: {fileID: 1776547484}
   - component: {fileID: 1776547489}
-  - component: {fileID: 1776547491}
   - component: {fileID: 1776547485}
   - component: {fileID: 1776547492}
   m_Layer: 0
@@ -7767,7 +7797,7 @@ MonoBehaviour:
     _filterMode: 1
     _format: 5
     _maxAtlasSize: 4096
-  _material: {fileID: 1891418441}
+  _material: {fileID: 564290571}
   _meshes: {fileID: 11400000, guid: a70310458eb484e4d950a0a2edab68f5, type: 2}
   _packedTextures: {fileID: 11400000, guid: 4050818e5c6400e428fa8d639f88000d, type: 2}
   _channelMapping:
@@ -8271,7 +8301,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gui: {fileID: 1776547487}
-  radius: 1
+  radius: 0.3
 --- !u!114 &1776547490
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -8338,19 +8368,6 @@ MonoBehaviour:
   - {fileID: 1849518349}
   propertyName: _MainTex
   channel: 1
---- !u!114 &1776547491
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1776547483}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04aebcfcb1c8bdc479d1b8859d65ddfd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  activationRadius: 0.2
-  manager: {fileID: 440484287}
 --- !u!114 &1776547492
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -9319,37 +9336,6 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 181990465}
   m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
---- !u!21 &1891418441
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Gui Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: LEAP_GUI_CYLINDRICAL LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_TINTING
-    LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
-  m_LightmapFlags: 5
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  m_SavedProperties:
-    serializedVersion: 2
-    m_TexEnvs:
-    - first:
-        name: _MainTex
-      second:
-        m_Texture: {fileID: 28478880209380164, guid: 4050818e5c6400e428fa8d639f88000d,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - first:
-        name: _MainTex2
-      second:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &1952176545
 GameObject:
   m_ObjectHideFlags: 0
