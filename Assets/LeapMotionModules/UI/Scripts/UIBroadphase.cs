@@ -1,23 +1,25 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Leap.Unity.RuntimeGizmos;
 
 namespace Leap.Unity.UI.Interaction {
-  public class UIBroadphase : MonoBehaviour, IRuntimeGizmoComponent {
+  public class UIBroadphase : MonoBehaviour {
     public float activationRadius = 0.2f;
     public InteractionManager manager;
+    public UnifiedUIElement[] perFingerClosestElement = new UnifiedUIElement[3];
+    public UnifiedUIElement perHandClosestElement = new UnifiedUIElement();
+    public struct UnifiedUIElement {
+      public LeapGuiMeshElement element;
+      public InteractionBehaviourBase behaviour;
+      //This shouldn't be necessary but my unified struct generates lots of garbage if I don't override GetHashCode()
+      public override int GetHashCode() {
+        return behaviour.GetHashCode();
+      }
+    }
 
     private Collider[] _colliderResultsBuffer = new Collider[128];
     private HashSet<UnifiedUIElement> _activeBehaviours = new HashSet<UnifiedUIElement>();
-    //private Hand warpedHand = new Hand();
+    private Hand originalHand = new Hand();
     private LeapGui[] guis;
-    private struct UnifiedUIElement {
-      public LeapGuiMeshElement element;
-      public InteractionBehaviourBase behaviour;
-    }
-    private UnifiedUIElement tempElement = new UnifiedUIElement();
-    private UnifiedUIElement curElement = new UnifiedUIElement();
-
 
     /*
     public UIBroadphase(InteractionManager manager, float activationRadius = 0.2f) {
@@ -33,8 +35,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public void FixedUpdateHand(Hand hand) {
-      //warpedHand.CopyFrom(hand);
-
+      originalHand.CopyFrom(hand);
       _activeBehaviours.Clear();
 
       foreach (LeapGui gui in guis) {
@@ -42,44 +43,45 @@ namespace Leap.Unity.UI.Interaction {
         UpdateActiveList(count, _colliderResultsBuffer);
       }
 
-      float leastTotalDistance = 1000f;
-
-      for (int i = 0; i < 5; i++) {
+      float leastHandDistance = 1000f;
+      for (int i = 0; i < perFingerClosestElement.Length; i++) {
         if (!hand.Fingers[i].IsExtended) { continue; }
-        float leastDistance = 1000f;
+        float leastFingerDistance = 1000f;
         Vector3 fingerTip = hand.Fingers[i].TipPosition.ToVector3();
         foreach (UnifiedUIElement elem in _activeBehaviours) {
           if (elem.element != null) {
-            //NEED BETTER DISTANCE FUNCTION GRAH
+
+            //NEED BETTER DISTANCE FUNCTION
             float dist = Vector3.SqrMagnitude(elem.element.transform.position - transformPoint(fingerTip, elem.element));
-            if (dist < leastDistance) {
-              tempElement = elem;
-              leastDistance = dist;
+
+            if (dist < leastFingerDistance) {
+              perFingerClosestElement[i] = elem;
+              leastFingerDistance = dist;
+              if (leastFingerDistance < leastHandDistance) {
+                leastHandDistance = leastFingerDistance;
+                perHandClosestElement = perFingerClosestElement[i];
+              }
             }
           }
         }
+      }
 
-        if (leastDistance != 1000f) {
-          //Warp finger to element space
+      if (perHandClosestElement.element != null) {
+        //Transform bulk hand to the closest element's warped space
+        coarseInverseTransformHand(hand, perFingerClosestElement[1].element.attachedGroup.gui);
+
+        //(Eventually) Activate element's collision
+        perHandClosestElement.element.Tint().tint = Color.red;
+      }
+
+      //Warp finger to respective closest element spaces
+      for (int i = 0; i < perFingerClosestElement.Length; i++) {
+        if (perFingerClosestElement[i].element != null) {
           Vector3 newPos; Quaternion newRot;
-          transformTransform(hand.Fingers[i].bones[3].NextJoint.ToVector3(), hand.Fingers[i].bones[3].Rotation.ToQuaternion(), curElement.element, out newPos, out newRot);
+          transformTransform(originalHand.Fingers[i].bones[3].NextJoint.ToVector3(), originalHand.Fingers[i].bones[3].Rotation.ToQuaternion(), perFingerClosestElement[i].element, out newPos, out newRot);
           hand.Fingers[i].SetTipTransform(newPos, newRot);
-
-          if(leastDistance < leastTotalDistance) {
-            leastTotalDistance = leastDistance;
-            curElement = tempElement;
-          }
         }
       }
-
-      if(leastTotalDistance != 1000f) {
-        //Activate element's collision
-        curElement.element.Tint().tint = Color.red;
-      }
-    }
-
-    public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      drawer.DrawSphere(curElement.element.transform.position, 0.1f);
     }
 
     private void UpdateActiveList(int numResults, Collider[] results) {
@@ -123,8 +125,6 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public void coarseInverseTransformHand(Hand inHand, LeapGui gui) {
-      //warpedHand.CopyFrom(inHand);
-
       ITransformer space = gui.space.GetTransformer(gui.transform);
       Vector3 localPalmPos = gui.transform.InverseTransformPoint(inHand.PalmPosition.ToVector3());
       Quaternion localPalmRot = gui.transform.InverseTransformRotation(inHand.Rotation.ToQuaternion());

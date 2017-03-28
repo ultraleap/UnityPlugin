@@ -39,7 +39,7 @@ public abstract class LeapGuiElementData : LeapGuiComponentBase<LeapGuiElement> 
   [HideInInspector]
   public LeapGuiElement element;
 
-  [NonSerialized]
+  [HideInInspector]
   public LeapGuiFeatureBase feature;
 
   protected override void OnValidate() {

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Name: Mesh Data 1
   m_EditorClassIdentifier: 
   meshes:
-  - {fileID: 43794350840225622}
---- !u!43 &43794350840225622
+  - {fileID: 43694129202443722}
+--- !u!43 &43694129202443722
 Mesh:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}

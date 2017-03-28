@@ -13,10 +13,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   packedTextures:
   - propertyName: _MainTex
-    texture: {fileID: 28478880209380164}
+    texture: {fileID: 28035810954655842}
   - propertyName: _BumpMap
-    texture: {fileID: 28815450490325102}
---- !u!28 &28478880209380164
+    texture: {fileID: 28143085601097456}
+--- !u!28 &28035810954655842
 Texture2D:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -48,7 +48,7 @@ Texture2D:
     offset: 0
     size: 0
     path: 
---- !u!28 &28815450490325102
+--- !u!28 &28143085601097456
 Texture2D:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
