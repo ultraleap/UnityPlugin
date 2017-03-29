@@ -45,25 +45,21 @@ namespace Leap.Unity.UI.Interaction {
 
     [Tooltip("When automatically generating layers, the Interaction layer (for interactable objects) will use the same physics collision flags as the layer specified here.")]
     [SerializeField]
-    [EditTimeOnly]
     protected SingleLayer _templateLayer = 0;
     public SingleLayer templateLayer { get { return _templateLayer; } }
 
     [Tooltip("The layer for interactable objects (i.e. InteractionBehaviours). Usually this would have the same collision flags as the Default layer, but it should be its own layer so hands don't have to check collision against all physics objects in the scene.")]
     [SerializeField]
-    [EditTimeOnly]
     protected SingleLayer _interactionLayer = 0;
     public SingleLayer interactionLayer { get { return _interactionLayer; } }
 
     [Tooltip("The layer objects are moved to when they become grasped, or if they are otherwise ignoring hand contact. This layer should not collide with the hand bone layer, but should collide with everything else that the interaction layer collides with.")]
     [SerializeField]
-    [EditTimeOnly]
     protected SingleLayer _interactionNoContactLayer = 0;
     public SingleLayer interactionNoContactLayer { get { return _interactionNoContactLayer; } }
 
     [Tooltip("The layer containing the collider bones of the hand. This layer should collide with anything you'd like to be able to touch, but it should not collide with the grasped object layer.")]
     [SerializeField]
-    [EditTimeOnly]
     protected SingleLayer _contactBoneLayer = 0;
     public SingleLayer ContactBoneLayer { get { return _contactBoneLayer; } }
 
