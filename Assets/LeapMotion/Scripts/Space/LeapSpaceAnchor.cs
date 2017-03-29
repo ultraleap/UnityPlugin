@@ -9,6 +9,9 @@ namespace Leap.Unity.Space {
     [HideInInspector]
     public LeapSpaceAnchor parent;
 
+    [HideInInspector]
+    public LeapSpace space;
+
     public ITransformer transformer;
 
     protected virtual void OnEnable() { }
