@@ -111,13 +111,17 @@ namespace Leap.Unity.UI.Interaction {
 
     public abstract void GraspHold(Hand hand);
 
-    public abstract void GraspEnd(Hand hand);
+    public abstract void GraspEnd(InteractionHand intHand);
 
-    /// <summary> Called when the hand grasping an object stops tracking and is going to disappear. </summary>
-    public abstract void GraspSuspendObject(Hand hand);
+    protected bool _isSuspended = false;
+    /// <summary> Gets whether the hand grasping this object is currently untracked. </summary>
+    public bool isSuspended { get { return _isSuspended; } }
 
-    /// <summary> Called when the hand grasping an object resumes tracking and is going to re-appear. </summary>
-    public abstract void GraspResumeObject(Hand hand);
+    /// <summary> Called when the hand grasping an object stops tracking. </summary>
+    public abstract void GraspSuspendObject();
+
+    /// <summary> Called when the hand grasping an object resumes tracking. </summary>
+    public abstract void GraspResumeObject();
 
     #endregion
 
