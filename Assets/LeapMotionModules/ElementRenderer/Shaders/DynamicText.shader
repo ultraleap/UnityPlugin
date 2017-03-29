@@ -7,7 +7,7 @@
 		LOD 100
 
     ZWrite Off
-    ZTest Off
+    ZTest On
     Blend SrcAlpha OneMinusSrcAlpha
 
 		Pass {
