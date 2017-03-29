@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Space;
 
 [ExecuteInEditMode]
 [DisallowMultipleComponent]
-public abstract partial class LeapGuiElement : MonoBehaviour {
+public abstract partial class LeapGuiElement : MonoBehaviour, ISpaceComponent {
 
   #region INSPECTOR FIELDS
   [SerializeField, HideInInspector]
-  protected Transform _anchor;
+  protected LeapSpaceAnchor _anchor;
 
   [SerializeField, HideInInspector]
   protected List<LeapGuiElementData> _data = new List<LeapGuiElementData>();
@@ -20,22 +21,39 @@ public abstract partial class LeapGuiElement : MonoBehaviour {
   protected SerializableType _preferredRendererType;
   #endregion
 
-  #region PRIVATE VARIABLES
-  /// <summary>
-  /// At edit time a special mesh is set to each element so that they can be
-  /// correctly picked in the scene view, even though their graphical 
-  /// representation might be part of a different object.
-  /// </summary>
-#if UNITY_EDITOR
-  [NonSerialized]
-  protected Mesh _pickingMesh;
-#endif
-  #endregion
-
   #region PUBLIC API
-  public Transform anchor {
+
+  // Used only by the renderer, gets set to true if the graphical representation
+  // of this element might change.  Should get reset to false by the renderer
+  // once the representation is up to date.
+  [NonSerialized]
+  private bool _isRepresentationDirty = true;
+  public bool isRepresentationDirty {
+    get {
+#if UNITY_EDITOR
+      if (Application.isPlaying) {
+#endif
+        return _isRepresentationDirty;
+#if UNITY_EDITOR
+      } else {
+        return true;
+      }
+#endif
+    }
+    set {
+      _isRepresentationDirty = value;
+    }
+  }
+
+  public LeapSpaceAnchor anchor {
     get {
       return _anchor;
+    }
+  }
+
+  public ITransformer transformer {
+    get {
+      return _anchor == null ? IdentityTransformer.single : _anchor.transformer;
     }
   }
 
@@ -63,7 +81,7 @@ public abstract partial class LeapGuiElement : MonoBehaviour {
     }
   }
 
-  public virtual void OnAttachedToGui(LeapGuiGroup group, Transform anchor) {
+  public virtual void OnAttachedToGui(LeapGuiGroup group, LeapSpaceAnchor anchor) {
 #if UNITY_EDITOR
     editor.OnAttachedToGui(group, anchor);
 #endif
@@ -88,6 +106,8 @@ public abstract partial class LeapGuiElement : MonoBehaviour {
 
   #region UNITY CALLBACKS
   protected virtual void OnValidate() {
+    isRepresentationDirty = true;
+
     //Delete any null references
     for (int i = _data.Count; i-- != 0;) {
       if (_data[i] == null) {

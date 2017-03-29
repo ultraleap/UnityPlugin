@@ -11,8 +11,6 @@ using Leap.Unity;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
-
-
 public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase>,
   ISupportsFeature<LeapGuiTextureFeature>,
   ISupportsFeature<LeapGuiSpriteFeature>,
@@ -23,6 +21,9 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
   private class JaggedRects : JaggedArray<Rect> {
     public JaggedRects(int length) : base(length) { }
   }
+
+  public const string MESH_ASSET_NAME = "Mesh Data";
+  public const string TEXTURE_ASSET_NAME = "Texture Data";
 
   public const string UV_0_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_UV_0";
   public const string UV_1_FEATURE = LeapGui.FEATURE_PREFIX + "VERTEX_UV_1";
@@ -135,6 +136,8 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
 
   public virtual void RebuildAtlas(ProgressBar progress) {
     progress.Begin(2, "Rebuilding Atlas", "", () => {
+      CreateOrSave(ref _packedTextures, TEXTURE_ASSET_NAME);
+
       Texture2D[] packedTextures;
       Rect[][] channelMapping;
       _atlas.RebuildAtlas(progress, out packedTextures, out channelMapping);
@@ -228,15 +231,15 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
   public override void OnEnableRendererEditor() { }
 
   public override void OnDisableRendererEditor() {
-    DeleteAsset(ref _meshes);
-    DeleteAsset(ref _packedTextures);
+    SceneTiedAsset.Delete(ref _meshes);
+    SceneTiedAsset.Delete(ref _packedTextures);
   }
 
   public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
     base.OnUpdateRendererEditor(isHeavyUpdate);
 
-    EnsureAssetSaved(ref _meshes, "Mesh Data");
-    EnsureAssetSaved(ref _packedTextures, "Texture Data");
+    CreateOrSave(ref _meshes, MESH_ASSET_NAME);
+    CreateOrSave(ref _packedTextures, TEXTURE_ASSET_NAME);
 
     setupForBuilding();
     buildMesh();
@@ -353,6 +356,10 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
     _material = newMaterial;
     _material.shader = _shader;
     _material.name = "Procedural Gui Material";
+
+    foreach (var keyword in _material.shaderKeywords) {
+      _material.DisableKeyword(keyword);
+    }
 
     if (_channelMapping == null) {
       _channelMapping = new JaggedRects(4);

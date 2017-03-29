@@ -43,6 +43,7 @@ namespace Leap.Unity.Attributes {
       }
     }
 
+#if UNITY_EDITOR
     public bool ShouldDisable(SerializedProperty property) {
       foreach (var name in propertyNames) {
         var prop = property.serializedObject.FindProperty(name);
@@ -76,11 +77,7 @@ namespace Leap.Unity.Attributes {
         return false;
       }
     }
-
-    public enum Operation {
-      And,
-      Or
-    }
+#endif
   }
 
   public class DisableIf : DisableIfBase {

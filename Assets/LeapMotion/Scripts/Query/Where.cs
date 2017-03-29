@@ -52,5 +52,9 @@ namespace Leap.Unity.Query {
     public QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>> Where(Func<QueryType, bool> predicate) {
       return new QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>>(new WhereOp<QueryType, QueryOp>(_op, predicate));
     }
+
+    public QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>> NonNull() {
+      return Where(o => o != null);
+    }
   }
 }

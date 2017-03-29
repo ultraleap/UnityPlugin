@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
+using Leap.Unity.Space;
 
 public abstract partial class LeapGuiMeshElementBase : LeapGuiElement {
 
@@ -13,6 +15,8 @@ public abstract partial class LeapGuiMeshElementBase : LeapGuiElement {
 
     public override void RebuildEditorPickingMesh() {
       base.RebuildEditorPickingMesh();
+
+      Assert.IsNotNull(_meshElement);
 
       _meshElement.RefreshMeshData();
 
@@ -37,10 +41,21 @@ public abstract partial class LeapGuiMeshElementBase : LeapGuiElement {
         pickingTris.Add(topology.tris[i] + pickingVerts.Count);
       }
 
-      ITransformer transformer = _meshElement.attachedGroup.gui.space.GetTransformer(_meshElement.anchor);
+      ITransformer transformer = null;
+      if (_meshElement.anchor != null) {
+        transformer = _meshElement.anchor.transformer;
+      }
+
       for (int i = 0; i < topology.verts.Length; i++) {
         Vector3 localRectVert = _meshElement.attachedGroup.transform.InverseTransformPoint(_meshElement.transform.TransformPoint(topology.verts[i]));
-        pickingVerts.Add(transformer.TransformPoint(localRectVert));
+
+        if (transformer != null) {
+          localRectVert = transformer.TransformPoint(localRectVert);
+        }
+
+        localRectVert = _meshElement.attachedGroup.transform.TransformPoint(localRectVert);
+
+        pickingVerts.Add(localRectVert);
       }
 
       pickingMesh.SetVertices(pickingVerts);

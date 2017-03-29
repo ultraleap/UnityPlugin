@@ -134,6 +134,12 @@ namespace Leap.Unity.Attributes {
         }
       }
 
+      if (didChange) {
+        foreach (var a in attributes) {
+          a.OnPropertyChanged(property);
+        }
+      }
+
       EditorGUIUtility.labelWidth = defaultLabelWidth;
     }
 
