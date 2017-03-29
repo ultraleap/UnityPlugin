@@ -60,8 +60,9 @@ public class SceneTiedAsset : ScriptableObject {
         t = CreateInstance<T>();
         t.name = assetName;
         t.hideFlags = HideFlags.HideAndDontSave;
-        didCreate = true;
       }
+
+      didCreate = true;
     }
 
     if (assetFolder != null && !t.isSavedAsset) {
