@@ -5,6 +5,7 @@ using Leap.Unity.Space;
 using Leap.Unity.Query;
 
 [LeapGuiTag("Text")]
+[AddComponentMenu("")]
 public class LeapGuiTextRenderer : LeapGuiRenderer<LeapGuiTextElement>,
   ISupportsFeature<LeapGuiTintFeature> {
 

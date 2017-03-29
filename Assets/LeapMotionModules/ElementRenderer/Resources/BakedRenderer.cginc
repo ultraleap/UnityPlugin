@@ -1,6 +1,5 @@
 #include "Assets/LeapMotionModules/ElementRenderer/Resources/LeapGui.cginc"
 
-
 /************************************************************************* 
  * Movement name:
  *  _ (none)
@@ -183,68 +182,119 @@ struct appdata_gui_baked {
 #endif
 };
 
-struct v2f_gui_baked {
-  float4 vertex : SV_POSITION;
-
 #ifdef LEAP_GUI_VERTEX_NORMALS
-  float3 normal : NORMAL;
+#define __V2F_NORMALS float3 normal : NORMAL;
+#else
+#define __V2F_NORMALS
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_0
-  float2 uv0 : TEXCOORD0;
+#define __V2F_UV0 float2 uv0 : TEXCOORD0;
+#else
+#define __V2F_UV0
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_1
-  float2 uv1 : TEXCOORD2;
+#define __V2F_UV1 float2 uv1 : TEXCOORD1;
+#else
+#define __V2F_UV1
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_2
-  float2 uv2 : TEXCOORD3;
+#define __V2F_UV2 float2 uv2 : TEXCOORD2;
+#else
+#define __V2F_UV2
 #endif
 
 #ifdef GUI_ELEMENTS_HAVE_COLOR
-  float4 color : COLOR;
+#define __V2F_COLOR float4 color : COLOR;
+#else
+#define __V2F_COLOR
 #endif
+
+#define V2F_GRAPHICAL           \
+  float4 vertex : SV_POSITION;  \
+  __V2F_NORMALS                 \
+  __V2F_UV0                     \
+  __V2F_UV1                     \
+  __V2F_UV2                     \
+  __V2F_COLOR
+
+struct v2f_gui_baked {
+  V2F_GRAPHICAL
 };
 
-v2f_gui_baked ApplyBakedGui(appdata_gui_baked v) {
 #ifdef GUI_ELEMENTS_HAVE_ID
-  int elementId = v.vertInfo.w;
+#define BEGIN_V2F(v) int elementId = v.vertInfo.w;
+#else
+#define BEGIN_V2F(v)
 #endif
 
 #ifdef LEAP_GUI_BLEND_SHAPES
-  ApplyBlendShapes(v.vertex, v.vertInfo, elementId);
+#define __APPLY_BLEND_SHAPES(v,o) ApplyBlendShapes(v.vertex, v.vertInfo, elementId);
+#else
+#define __APPLY_BLEND_SHAPES(v,o)
 #endif
 
 #ifdef LEAP_GUI_WARPING
 #ifdef LEAP_GUI_VERTEX_NORMALS
-  ApplyGuiWarping(v.vertex, v.normal, elementId);
+#define __APPLY_WARPING(v,o) ApplyGuiWarping(v.vertex, v.normal, elementId); \
+                             o.normal = UnityObjectToWorldNormal(v.normal);
 #else
-  ApplyGuiWarping(v.vertex, elementId);
+#define __APPLY_WARPING(v,o) ApplyGuiWarping(v.vertex, elementId);
 #endif
-#endif
-
-  v2f_gui_baked o;
-  o.vertex = UnityObjectToClipPos(v.vertex);
-
-#ifdef LEAP_GUI_VERTEX_NORMALS
-  o.normal = UnityObjectToWorldNormal(v.normal); //TODO object to clip??
+#else
+#define __APPLY_WARPING(v,o)
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_0
-  o.uv0 = v.texcoord;
+#define __COPY_UV0(v,o) o.uv0 = v.texcoord;
+#else
+#define __COPY_UV0(v,o)
+#endif
+
+#ifdef LEAP_GUI_VERTEX_UV_1
+#define __COPY_UV1(v,o) o.uv1 = v.texcoord1;
+#else
+#define __COPY_UV1(v,o)
+#endif
+
+#ifdef LEAP_GUI_VERTEX_UV_2
+#define __COPY_UV2(v,o) o.uv2 = v.texcoord2;
+#else
+#define __COPY_UV2(v,o)
+#endif
+
+#ifdef LEAP_GUI_VERTEX_COLORS
+#define __COPY_COLORS(v,o) o.color = v.color;
+#else
+#define __COPY_COLORS(v,o)
 #endif
 
 #ifdef LEAP_GUI_TINTING
-  o.color = GetElementTint(elementId);
-#ifdef LEAP_GUI_VERTEX_COLORS
-  o.color *= v.color;
-#endif
+#define __APPLY_TINT(v,o) o.color *= GetElementTint(elementId);
 #else
-#ifdef LEAP_GUI_VERTEX_COLORS
-  o.color = v.color;
-#endif
+#define __APPLY_TINT(v,o)
 #endif
 
-  return o;
+#define APPLY_BAKED_GUI(v,o)                  \
+{                                             \
+  __APPLY_BLEND_SHAPES(v,o)                   \
+  __APPLY_WARPING(v,o)                        \
+  o.vertex = UnityObjectToClipPos(v.vertex);  \
+  __COPY_UV0(v,o)                             \
+  __COPY_UV1(v,o)                             \
+  __COPY_UV2(v,o)                             \
+  __COPY_COLORS(v,o)                          \
+  __APPLY_TINT(v,o)                           \
 }
+
+#define DEFINE_FLOAT_CHANNEL(name) float name[ELEMENT_MAX]
+#define DEFINE_FLOAT4_CHANNEL(name) float4 name[ELEMENT_MAX]
+#define DEFINE_FLOAT4x4_CHANNEL(name) float4x4 name[ELEMENT_MAX]
+
+#ifdef GUI_ELEMENTS_HAVE_ID
+#define getChannel(name) (name[elementId])
+#else
+#define getChannel(name) 0
+#endif

@@ -15,7 +15,11 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
   ISupportsFeature<LeapGuiTextureFeature>,
   ISupportsFeature<LeapGuiSpriteFeature>,
   ISupportsFeature<LeapGuiTintFeature>,
-  ISupportsFeature<LeapGuiBlendShapeFeature> {
+  ISupportsFeature<LeapGuiBlendShapeFeature>,
+  ISupportsFeature<CustomFloatChannelFeature>,
+  ISupportsFeature<CustomVectorChannelFeature>,
+  ISupportsFeature<CustomColorChannelFeature>,
+  ISupportsFeature<CustomMatrixChannelFeature> {
 
   [Serializable]
   private class JaggedRects : JaggedArray<Rect> {
@@ -106,6 +110,10 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
   protected List<LeapGuiSpriteFeature> _spriteFeatures = new List<LeapGuiSpriteFeature>();
   protected List<LeapGuiTintFeature> _tintFeatures = new List<LeapGuiTintFeature>();
   protected List<LeapGuiBlendShapeFeature> _blendShapeFeatures = new List<LeapGuiBlendShapeFeature>();
+  protected List<CustomFloatChannelFeature> _floatChannelFeatures = new List<CustomFloatChannelFeature>();
+  protected List<CustomVectorChannelFeature> _vectorChannelFeatures = new List<CustomVectorChannelFeature>();
+  protected List<CustomColorChannelFeature> _colorChannelFeatures = new List<CustomColorChannelFeature>();
+  protected List<CustomMatrixChannelFeature> _matrixChannelFeatures = new List<CustomMatrixChannelFeature>();
 
   //### Generated Data ###
   [SerializeField, HideInInspector]
@@ -126,6 +134,12 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
   //#### Blend Shapes ####
   protected const string BLEND_SHAPE_AMOUNTS_PROPERTY = LeapGui.PROPERTY_PREFIX + "BlendShapeAmounts";
   protected List<float> _blendShapeAmounts = new List<float>();
+
+  //#### Custom Channels ####
+  protected List<float> _customFloatChannelData = new List<float>();
+  protected List<Vector4> _customVectorChannelData = new List<Vector4>();
+  protected List<Color> _customColorChannelData = new List<Color>();
+  protected List<Matrix4x4> _customMatrixChannelData = new List<Matrix4x4>();
 
 #if UNITY_EDITOR
   public virtual bool IsAtlasDirty {
@@ -210,6 +224,12 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
     SupportUtil.OnlySupportFirstFeature(features, info);
   }
 
+  //Full unconditional support for all custom channels
+  public virtual void GetSupportInfo(List<CustomFloatChannelFeature> features, List<SupportInfo> info) { }
+  public virtual void GetSupportInfo(List<CustomVectorChannelFeature> features, List<SupportInfo> info) { }
+  public virtual void GetSupportInfo(List<CustomColorChannelFeature> features, List<SupportInfo> info) { }
+  public virtual void GetSupportInfo(List<CustomMatrixChannelFeature> features, List<SupportInfo> info) { }
+
   public override void OnEnableRenderer() {
     loadAllSupportedFeatures();
 
@@ -225,6 +245,7 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
   public override void OnUpdateRenderer() {
     updateTinting();
     updateBlendShapes();
+    updateCustomChannels();
   }
 
 #if UNITY_EDITOR
@@ -266,6 +287,38 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
       using (new ProfilerSample("Update Blend Shapes")) {
         blendShapeFeature.data.Query().Select(d => d.amount).FillList(_blendShapeAmounts);
         _material.SetFloatArraySafe(BLEND_SHAPE_AMOUNTS_PROPERTY, _blendShapeAmounts);
+      }
+    }
+  }
+
+  protected virtual void updateCustomChannels() {
+    using (new ProfilerSample("Update Custom Channels")) {
+      foreach (var floatChannelFeature in _floatChannelFeatures) {
+        if (!floatChannelFeature.isDirty) continue;
+
+        floatChannelFeature.data.Query().Select(d => d.value).FillList(_customFloatChannelData);
+        _material.SetFloatArraySafe(floatChannelFeature.channelName, _customFloatChannelData);
+      }
+
+      foreach (var vectorChannelFeature in _vectorChannelFeatures) {
+        if (!vectorChannelFeature.isDirty) continue;
+
+        vectorChannelFeature.data.Query().Select(d => d.value).FillList(_customVectorChannelData);
+        _material.SetVectorArraySafe(vectorChannelFeature.channelName, _customVectorChannelData);
+      }
+
+      foreach (var colorChannelFeature in _colorChannelFeatures) {
+        if (!colorChannelFeature.isDirty) continue;
+
+        colorChannelFeature.data.Query().Select(d => d.value).FillList(_customColorChannelData);
+        _material.SetColorArraySafe(colorChannelFeature.channelName, _customColorChannelData);
+      }
+
+      foreach (var matrixChannelFeature in _matrixChannelFeatures) {
+        if (!matrixChannelFeature.isDirty) continue;
+
+        matrixChannelFeature.data.Query().Select(d => d.value).FillList(_customMatrixChannelData);
+        _material.SetMatrixArraySafe(matrixChannelFeature.channelName, _customMatrixChannelData);
       }
     }
   }
@@ -323,6 +376,11 @@ public abstract class LeapGuiMesherBase : LeapGuiRenderer<LeapGuiMeshElementBase
       group.GetSupportedFeatures(_spriteFeatures);
       group.GetSupportedFeatures(_tintFeatures);
       group.GetSupportedFeatures(_blendShapeFeatures);
+
+      group.GetSupportedFeatures(_floatChannelFeatures);
+      group.GetSupportedFeatures(_vectorChannelFeatures);
+      group.GetSupportedFeatures(_colorChannelFeatures);
+      group.GetSupportedFeatures(_matrixChannelFeatures);
 
       _doesRequireColors = doesRequireMeshColors();
       _doesRequireNormals = doesRequireMeshNormals();

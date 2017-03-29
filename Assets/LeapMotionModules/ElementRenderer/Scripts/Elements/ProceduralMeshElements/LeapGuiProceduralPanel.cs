@@ -252,10 +252,7 @@ public class LeapGuiProceduralPanel : LeapGuiMeshElementBase {
 
   private void setSourceFeatureDirty() {
     if (_sourceData != null) {
-      var feature = _sourceData.feature;
-      if (feature != null) {
-        feature.isDirty = true;
-      }
+      _sourceData.MarkFeatureDirty();
     }
   }
 

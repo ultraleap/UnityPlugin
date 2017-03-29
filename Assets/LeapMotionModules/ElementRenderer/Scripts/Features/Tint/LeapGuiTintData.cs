@@ -19,7 +19,7 @@ public class LeapGuiTintData : LeapGuiElementData {
       return _tint;
     }
     set {
-      feature.isDirty = true;
+      MarkFeatureDirty();
       _tint = value;
     }
   }
