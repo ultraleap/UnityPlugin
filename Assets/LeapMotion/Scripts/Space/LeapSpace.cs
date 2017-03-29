@@ -37,6 +37,7 @@ namespace Leap.Unity.Space {
       _enabledSpaces.Remove(this);
 
       for (int i = 0; i < _anchors.Count; i++) {
+        _anchors[i].space = null;
         _anchors[i].transformer = null;
       }
     }
@@ -103,6 +104,7 @@ namespace Leap.Unity.Space {
     private void rebuildHierarchyRecursively(Transform root) {
       var anchor = root.GetComponent<LeapSpaceAnchor>();
       if (anchor != null && anchor.enabled) {
+        anchor.space = this;
         anchor.RecalculateParentAnchor();
         anchor.transformer = ConstructTransformer(anchor);
 
