@@ -13,6 +13,7 @@ namespace Leap.Unity.UI.Interaction {
     public InteractionManager interactionManager;
 
     protected Rigidbody _body;
+    /// <summary> The rigidbody associated with this interaction object. </summary>
     public new Rigidbody rigidbody { get { return _body; } }
 
     [Header("Interaction Overrides")]

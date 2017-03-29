@@ -167,12 +167,17 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    // TODO: Do correct thing in OnEnable / OnDisable for whole Managers
-
-    void Start() {
+    void OnEnable() {
       if (Provider == null) {
         Debug.LogError("[InteractionManager] No LeapServiceProvider found.");
         this.enabled = false;
+      }
+    }
+
+    void OnDisable() {
+      foreach (var intHand in _interactionHands) {
+        intHand.EnableSoftContact();
+        if (intHand.isGraspingObject) intHand.ReleaseGrasp();
       }
     }
 
@@ -209,10 +214,20 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Object Registration
 
-
     public void RegisterInteractionBehaviour(InteractionBehaviourBase interactionObj) {
       _interactionBehaviours.Add(interactionObj);
       rigidbodyRegistry[interactionObj.rigidbody] = interactionObj;
+    }
+
+    /// <summary> Returns true if the Interaction Behaviour was registered with this manager; otherwise returns false. 
+    /// The manager is guaranteed not to have the Interaction Behaviour registered after calling this method. </summary>
+    public bool UnregisterInteractionBehaviour(InteractionBehaviourBase interactionObj) {
+      bool wasRemovalSuccessful = _interactionBehaviours.Remove(interactionObj);
+      if (wasRemovalSuccessful) {
+        foreach (var intHand in _interactionHands) { intHand.TryReleaseObject(interactionObj); }
+        rigidbodyRegistry.Remove(interactionObj.rigidbody);
+      }
+      return wasRemovalSuccessful;
     }
 
     public bool IsBehaviourRegistered(InteractionBehaviourBase interactionObj) {

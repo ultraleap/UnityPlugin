@@ -793,6 +793,8 @@ namespace Leap.Unity.UI.Interaction {
       return _graspCandidatesBuffer;
     }
 
+    public bool isGraspingObject { get { return _graspedObject != null; } }
+
     public bool IsGrasping(InteractionBehaviourBase interactionObj) {
       return _graspedObject == interactionObj;
     }

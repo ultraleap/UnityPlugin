@@ -194,6 +194,10 @@ namespace Leap.Unity.UI.Interaction {
       return Vector3.Distance(point, this.transform.position);
     }
 
+    void OnDestroy() {
+      interactionManager.UnregisterInteractionBehaviour(this);
+    }
+
     #region Hovering
 
     // Logistics for providing per-object (instead of per-hand) Hover callbacks.
