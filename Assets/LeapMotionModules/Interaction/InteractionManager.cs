@@ -194,15 +194,15 @@ namespace Leap.Unity.UI.Interaction {
         interactionHand.FixedUpdateHand(enableHovering, enableContact, enableGrasping);
       }
 
+      // Perform each interaction object's FixedUpdateObject.
+      foreach (var interactionObj in _interactionBehaviours) {
+        interactionObj.FixedUpdateObject();
+      }
+
       // Apply soft contacts from both hands in unified solve.
       // (This will clear softContacts and originalVelocities as well.)
       if (_softContacts.Count > 0) {
         PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
-      }
-
-      // Perform each interaction object's FixedUpdateObject.
-      foreach (var interactionObj in _interactionBehaviours) {
-        interactionObj.FixedUpdateObject();
       }
 
       OnPostPhysicalUpdate();

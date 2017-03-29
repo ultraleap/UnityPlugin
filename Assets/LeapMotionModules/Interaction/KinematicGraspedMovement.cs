@@ -8,8 +8,8 @@ namespace Leap.Unity.UI.Interaction {
 
     public void MoveTo(Vector3 solvedPosition, Quaternion solvedRotation,
                        InteractionBehaviourBase interactionObj) {
-      //interactionObj.Rigidbody.MovePosition(solvedPosition);
-      //interactionObj.Rigidbody.MoveRotation(solvedRotation);
+      //interactionObj.rigidbody.MovePosition(solvedPosition);
+      //interactionObj.rigidbody.MoveRotation(solvedRotation);
       interactionObj.rigidbody.transform.position = solvedPosition;
       interactionObj.rigidbody.transform.rotation = solvedRotation;
       interactionObj.rigidbody.position = solvedPosition;

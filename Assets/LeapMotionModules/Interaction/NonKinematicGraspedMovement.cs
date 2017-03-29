@@ -19,13 +19,13 @@ namespace Leap.Unity.UI.Interaction {
       Vector3 targetAngularVelocity = PhysicsUtility.ToAngularVelocity(
         interactionObj.rigidbody.rotation, solvedRotation, Time.fixedDeltaTime);
 
-      //float maxScaledVelocity = _maxVelocity * interactionObj.interactionManager.SimulationScale;
-      //float targetSpeedSqrd = targetVelocity.sqrMagnitude;
-      //if (targetSpeedSqrd > maxScaledVelocity * maxScaledVelocity) {
-      //  float targetPercent = maxScaledVelocity / Mathf.Sqrt(targetSpeedSqrd);
-      //  targetVelocity *= targetPercent;
-      //  targetAngularVelocity *= targetPercent;
-      //}
+      float maxScaledVelocity = _maxVelocity * interactionObj.interactionManager.SimulationScale;
+      float targetSpeedSqrd = targetVelocity.sqrMagnitude;
+      if (targetSpeedSqrd > maxScaledVelocity * maxScaledVelocity) {
+        float targetPercent = maxScaledVelocity / Mathf.Sqrt(targetSpeedSqrd);
+        targetVelocity *= targetPercent;
+        targetAngularVelocity *= targetPercent;
+      }
 
       // TODO: Investigate whether followStrength needs to be re-implemented here.
       // Requires a pretty unclean passing of the distance to target position on a one-frame delay.
