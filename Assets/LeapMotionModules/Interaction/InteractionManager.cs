@@ -190,8 +190,8 @@ namespace Leap.Unity.UI.Interaction {
       }
 
       // Perform each hand's FixedUpdateHand.
-      foreach (var interactionHand in _interactionHands) {
-        interactionHand.FixedUpdateHand(enableHovering, enableContact, enableGrasping);
+      for (int i = 0; i < _interactionHands.Length; i++) {
+        _interactionHands[i].FixedUpdateHand(enableHovering, enableContact, enableGrasping);
       }
 
       // Perform each interaction object's FixedUpdateObject.
