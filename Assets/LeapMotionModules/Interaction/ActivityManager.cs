@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Leap.Unity.Query;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
@@ -28,22 +26,35 @@ namespace Leap.Unity.UI.Interaction {
       this.activationRadius = activationRadius;
     }
 
-    public void FixedUpdateHand(Hand hand) {
-      int count = GetSphereColliderResults(hand, _colliderResultsBuffer, out _colliderResultsBuffer);
-      UpdateActiveList(count, _colliderResultsBuffer);
+    public void FixedUpdateHand(Vector3 palmPosition, LeapGui[] guis = null) {
+      _activeBehaviours.Clear();
+
+      if (palmPosition != Vector3.zero) {
+        int count = GetSphereColliderResults(palmPosition, _colliderResultsBuffer, out _colliderResultsBuffer);
+        UpdateActiveList(count, _colliderResultsBuffer);
+
+        if (guis != null) {
+          //Check once in each of the GUI's subspaces
+          foreach (LeapGui gui in guis) {
+            if (!(gui.space.GetType() == typeof(LeapGuiRectSpace))) {
+              count = GetSphereColliderResults(transformPoint(palmPosition, gui), _colliderResultsBuffer, out _colliderResultsBuffer);
+              UpdateActiveList(count, _colliderResultsBuffer);
+            }
+          }
+        }
+      }
     }
 
-    private int GetSphereColliderResults(Hand hand, Collider[] resultsBuffer_in, out Collider[] resultsBuffer_out) {
+    private int GetSphereColliderResults(Vector3 position, Collider[] resultsBuffer_in, out Collider[] resultsBuffer_out) {
       resultsBuffer_out = resultsBuffer_in;
-      if (hand == null) return 0;
 
       int overlapCount = 0;
       while (true) {
-        overlapCount = Physics.OverlapSphereNonAlloc(hand.PalmPosition.ToVector3(),
-                                                         activationRadius * 100,
-                                                         resultsBuffer_in,
-                                                         ~0,
-                                                         QueryTriggerInteraction.Collide);
+        overlapCount = Physics.OverlapSphereNonAlloc(position,
+                                                     activationRadius * 100,
+                                                     resultsBuffer_in,
+                                                     ~0,
+                                                     QueryTriggerInteraction.Collide);
         if (overlapCount < resultsBuffer_out.Length) {
           break;
         }
@@ -60,8 +71,6 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private void UpdateActiveList(int numResults, Collider[] results) {
-      _activeBehaviours.Clear();
-
       for (int i = 0; i < numResults; i++) {
         if (results[i].attachedRigidbody != null) {
           Rigidbody body = results[i].attachedRigidbody;
@@ -71,6 +80,12 @@ namespace Leap.Unity.UI.Interaction {
           }
         }
       }
+    }
+
+    private Vector3 transformPoint(Vector3 worldPoint, LeapGui gui) {
+      ITransformer space = gui.space.GetTransformer(gui.transform);
+      Vector3 localPalmPos = gui.transform.InverseTransformPoint(worldPoint);
+      return gui.transform.TransformPoint(space.InverseTransformPoint(localPalmPos));
     }
 
   }

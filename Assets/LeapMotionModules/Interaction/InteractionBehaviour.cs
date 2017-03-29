@@ -304,11 +304,15 @@ namespace Leap.Unity.UI.Interaction {
       EvaluatePrimaryHoverCloseness(hand);
       _primaryHoveringHandsCount++;
 
+      //GetComponent<LeapGuiElement>().Tint().tint = Color.red;
+
       OnPrimaryHoverBegin(hand);
     }
 
     public override void PrimaryHoverStay(Hand hand) {
       EvaluatePrimaryHoverCloseness(hand);
+
+      //GetComponent<LeapGuiElement>().Tint().tint = Color.red;
 
       OnPrimaryHoverStay(hand);
     }
@@ -331,7 +335,10 @@ namespace Leap.Unity.UI.Interaction {
       _primaryHoveringHandsCount--;
       if (_primaryHoveringHandsCount == 0) {
         _closestJustStoppedPrimaryHoveringHand = hand;
-      }      
+      }
+
+
+      //GetComponent<LeapGuiElement>().Tint().tint = Color.white;
 
       OnPrimaryHoverEnd(hand);
     }
@@ -347,7 +354,7 @@ namespace Leap.Unity.UI.Interaction {
     int _contactingHandsCountLastFrame = 0;
 
     private void FixedUpdateContact() {
-      if (_contactingHandsCount > 0) {
+      if (_contactingHandsCount > 0 && _closestContactingHand != null) {
         if (_contactingHandsCountLastFrame == 0) {
           ObjectContactBegin(_closestContactingHand);
         }
@@ -392,11 +399,11 @@ namespace Leap.Unity.UI.Interaction {
 
     public override void ContactEnd(Hand hand) {
       _contactingHandsCount -= 1;
-      if (_contactingHandsCount == 0) {
+      if (_contactingHandsCount == 0 && hand!=null) {
         _closestJustStoppedContactingHand = hand;
       }
 
-      OnContactEnd(hand);
+      OnContactEnd(_closestJustStoppedContactingHand);
     }
 
     public void ObjectContactBegin(Hand hand) {

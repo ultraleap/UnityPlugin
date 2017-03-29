@@ -13,6 +13,7 @@ namespace Leap.Unity.UI.Interaction {
 
     private Func<Hand> _handAccessor;
     private Hand _hand;
+    private Hand _tempHand = new Hand();
     private bool _isLeft;
 
     public InteractionHand(InteractionManager interactionManager,
@@ -35,7 +36,12 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public void FixedUpdateHand(bool doHovering, bool doContact, bool doGrasping) {
-      _hand = _handAccessor();
+      if (_handAccessor() != null) {
+        _tempHand.CopyFrom(_handAccessor());
+        _hand = _tempHand;
+      } else {
+        _hand = null;
+      }
 
       if (doHovering) FixedUpdateHovering();
       if (doContact || doGrasping) FixedUpdateTouch();
@@ -51,11 +57,15 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private void FixedUpdateHovering() {
-      _hoverActivityManager.FixedUpdateHand(_hand);
-      CalculateIntentionPosition();
+      _hoverActivityManager.FixedUpdateHand((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, InteractionManager.FindObjectsOfType<LeapGui>());
       HoverCheckResults hoverResults = CheckHoverForHand(_hand, _hoverActivityManager.ActiveBehaviours);
       ProcessHoverCheckResults(hoverResults);
       ProcessPrimaryHoverCheckResults(hoverResults);
+
+      if (hoverResults.primaryHovered != null && hoverResults.primaryHovered.GetComponent<LeapGuiElement>()!=null) {
+        //Transform bulk hand to the closest element's warped space
+        coarseInverseTransformHand(_hand, hoverResults.primaryHovered.GetComponent<LeapGuiElement>().attachedGroup.gui);
+      }
     }
 
     /// <summary>
@@ -74,6 +84,7 @@ namespace Leap.Unity.UI.Interaction {
 
     private struct HoverCheckResults {
       public HashSet<InteractionBehaviourBase> hovered;
+      public InteractionBehaviourBase[] perFingerHovered;
       public InteractionBehaviourBase primaryHovered;
       public float primaryHoveredDistance;
       public Hand checkedHand;
@@ -82,25 +93,74 @@ namespace Leap.Unity.UI.Interaction {
     private HashSet<InteractionBehaviourBase> _hoveredLastFrame = new HashSet<InteractionBehaviourBase>();
 
     private HashSet<InteractionBehaviourBase> _hoverableCache = new HashSet<InteractionBehaviourBase>();
+    public InteractionBehaviourBase[] tempPerFingerHovered = new InteractionBehaviourBase[3];
+
     private HoverCheckResults CheckHoverForHand(Hand hand, HashSet<InteractionBehaviourBase> hoverCandidates) {
       _hoverableCache.Clear();
+      Array.Clear(tempPerFingerHovered, 0, tempPerFingerHovered.Length);
 
       HoverCheckResults results = new HoverCheckResults() {
         hovered = _hoverableCache,
+        perFingerHovered = tempPerFingerHovered,
         primaryHovered = null,
         primaryHoveredDistance = float.PositiveInfinity,
         checkedHand = hand
       };
 
-      foreach (var interactionObj in hoverCandidates) {
-        results = CheckHoverForElement(hand, interactionObj, results);
+      //Loop through all the fingers (that we care about)
+      if (hand != null) {
+        float leastHandDistance = float.PositiveInfinity;
+        for (int i = 0; i < 3; i++) {
+          if (!hand.Fingers[i].IsExtended) { continue; }
+          float leastFingerDistance = float.PositiveInfinity;
+          Vector3 fingerTip = hand.Fingers[i].TipPosition.ToVector3();
+
+          //Loop through all the candidates
+          foreach (InteractionBehaviourBase elem in hoverCandidates) {
+            LeapGuiElement element = elem.GetComponent<LeapGuiElement>();
+            if (element != null) {
+              CheckHoverForElement(fingerTip, elem, element, i, leastFingerDistance, leastHandDistance, ref results);
+            } else {
+              CheckHoverForBehavior(fingerTip, elem, ref results);
+            }
+          }
+        }
       }
 
       return results;
     }
 
-    private HoverCheckResults CheckHoverForElement(Hand hand, InteractionBehaviourBase hoverable, HoverCheckResults curResults) {
-      float distance = hoverable.GetDistance(_intentionPosition);
+    public Vector3 transformPoint(Vector3 worldPoint, LeapGuiElement elem) {
+      Vector3 localPalmPos = elem.attachedGroup.gui.transform.InverseTransformPoint(worldPoint);
+      ITransformer space = elem.attachedGroup.gui.space.GetTransformer(elem.anchor);
+      return elem.attachedGroup.gui.transform.TransformPoint(space.InverseTransformPoint(localPalmPos));
+    }
+
+    public void coarseInverseTransformHand(Hand inHand, LeapGui gui) {
+      ITransformer space = gui.space.GetTransformer(gui.transform);
+      Vector3 localPalmPos = gui.transform.InverseTransformPoint(inHand.PalmPosition.ToVector3());
+      Quaternion localPalmRot = gui.transform.InverseTransformRotation(inHand.Rotation.ToQuaternion());
+
+      inHand.SetTransform(gui.transform.TransformPoint(space.InverseTransformPoint(localPalmPos)),
+                          gui.transform.TransformRotation(space.InverseTransformRotation(localPalmPos, localPalmRot)));
+    }
+
+    private void CheckHoverForElement(Vector3 position, InteractionBehaviourBase behaviour, LeapGuiElement element, int whichFinger, float leastFingerDistance, float leastHandDistance, ref HoverCheckResults curResults) {
+      //NEED BETTER DISTANCE FUNCTION
+      float dist = Vector3.SqrMagnitude(element.transform.position - transformPoint(position, element));
+
+      if (dist < leastFingerDistance) {
+        curResults.perFingerHovered[whichFinger] = behaviour;
+        leastFingerDistance = dist;
+        if (leastFingerDistance < curResults.primaryHoveredDistance) {
+          curResults.primaryHoveredDistance = leastFingerDistance;
+          curResults.primaryHovered = curResults.perFingerHovered[whichFinger];
+        }
+      }
+    }
+
+    private void CheckHoverForBehavior(Vector3 position, InteractionBehaviourBase hoverable, ref HoverCheckResults curResults) {
+      float distance = hoverable.GetDistance(position);
       if (distance > 0F) {
         curResults.hovered.Add(hoverable);
       }
@@ -108,7 +168,6 @@ namespace Leap.Unity.UI.Interaction {
         curResults.primaryHovered = hoverable;
         curResults.primaryHoveredDistance = distance;
       }
-      return curResults;
     }
 
     private List<InteractionBehaviourBase> _removalCache = new List<InteractionBehaviourBase>();
@@ -162,53 +221,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private const float MAX_PRIMARY_HOVER_DISTANCE = 0.1F;
-    private Vector3 _intentionPosition;
     private InteractionBehaviourBase _primaryHoveredLastFrame = null;
-    private float[] _intentionFingerWeights = new float[NUM_FINGERS] { 0F, 1F, 0.6F, 0.4F, 0.1F };
-
-    // Note. This is used as the hover sphere-check origin, but distance data is not calculated from it.
-    // If it's worthwhile, it should be used to provide distance in hover callbacks... otherwise it should just be cut.
-    private void CalculateIntentionPosition() {
-      if (_hand == null) return;
-
-      // Weighted average of medial finger bone positions
-      float usageSum = 0F;
-      Leap.Vector averagePosition = Leap.Vector.Zero;
-      //Leap.Vector averageDirection = Leap.Vector.Zero;
-      for (int i = 1; i < 5; i++) {
-        Leap.Vector distalFingerBoneTip = _hand.Fingers[i].bones[3].NextJoint;
-        Leap.Vector medialFingerBoneDirection = _hand.Fingers[i].bones[2].Direction;
-        Leap.Vector distalDirection = _hand.Basis.zBasis;
-        var fingerUsage = (((medialFingerBoneDirection.x * distalDirection.x)
-                         + (medialFingerBoneDirection.y * distalDirection.y)
-                         + (medialFingerBoneDirection.z * distalDirection.z))
-                         * _intentionFingerWeights[i])
-                         .Map(-0.3F, 0.9F, 0, 1);
-        usageSum += fingerUsage;
-        averagePosition = new Leap.Vector(averagePosition.x + distalFingerBoneTip.x * fingerUsage,
-                                          averagePosition.y + distalFingerBoneTip.y * fingerUsage,
-                                          averagePosition.z + distalFingerBoneTip.z * fingerUsage);
-        //averageDirection = new Leap.Vector(averageDirection.x + medialFingerBoneDirection.x * fingerUsage,
-        //                                   averageDirection.y + medialFingerBoneDirection.y * fingerUsage,
-        //                                   averageDirection.z + medialFingerBoneDirection.z * fingerUsage);
-      }
-
-      // Distal Intention Ray: Add punch vector for when finger usage is low (closed fist).
-      // Vector3 distalAxis = _hand.DistalAxis();
-      float punchWeight = usageSum.Map(0F, 1F, 1F, 0F);
-      averagePosition = new Leap.Vector(averagePosition.x + _hand.Fingers[2].bones[1].PrevJoint.x * punchWeight,
-                                         averagePosition.y + _hand.Fingers[2].bones[1].PrevJoint.y * punchWeight,
-                                         averagePosition.z + _hand.Fingers[2].bones[1].PrevJoint.z * punchWeight);
-      //averageDirection = new Leap.Vector(averageDirection.x + distalAxis.x * punchWeight,
-      //                                   averageDirection.y + distalAxis.y * punchWeight,
-      //                                   averageDirection.z + distalAxis.z * punchWeight);
-      usageSum += punchWeight;
-
-      // Finalize weighted average for Distal Intention Ray
-      _intentionPosition = new Vector3(averagePosition.x / usageSum,
-                                        averagePosition.y / usageSum,
-                                        averagePosition.z / usageSum);
-    }
 
     #endregion
 
@@ -233,7 +246,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private void FixedUpdateTouch() {
-      _touchActivityManager.FixedUpdateHand(_hand);
+      _touchActivityManager.FixedUpdateHand((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero);
     }
 
     #endregion
