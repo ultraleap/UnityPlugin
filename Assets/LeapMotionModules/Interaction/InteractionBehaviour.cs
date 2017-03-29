@@ -423,7 +423,8 @@ namespace Leap.Unity.UI.Interaction {
     private bool _wasKinematicBeforeGrab;
 
     private IGraspedPoseController _graspedPositionController;
-    private IGraspedPoseController GraspedPoseController {
+    /// <summary> Gets or sets the grasped pose controller for this Interaction object. </summary>
+    public IGraspedPoseController graspedPoseController {
       get {
         if (_graspedPositionController == null) {
           _graspedPositionController = new KabschGraspedPose(this);
@@ -437,6 +438,20 @@ namespace Leap.Unity.UI.Interaction {
 
     private KinematicGraspedMovement    _kinematicHoldingMovement;
     private NonKinematicGraspedMovement _nonKinematicHoldingMovement;
+
+    private IThrowController _throwController;
+    /// <summary> Gets or sets the throw controller for this Interaction object. </summary>
+    public IThrowController throwController {
+      get {
+        if (_throwController == null) {
+          _throwController = new SlidingWindowThrow();
+        }
+        return _throwController;
+      }
+      set {
+        _throwController = value;
+      }
+    }
 
     private int _graspCountLastFrame = 0;
     private List<InteractionHand> _graspingIntHands = new List<InteractionHand>(4);
@@ -453,7 +468,7 @@ namespace Leap.Unity.UI.Interaction {
 
     private void FixedUpdateGrasping() {
       if (!moveObjectWhenGrasped && _moveObjectWhenGrasped__WasEnabledLastFrame) {
-        GraspedPoseController.ClearHands();
+        graspedPoseController.ClearHands();
       }
       _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
 
@@ -491,6 +506,7 @@ namespace Leap.Unity.UI.Interaction {
       }
 
       _graspCountLastFrame = _graspCount;
+
       // Keep track of grasping hands from last frame; these must be independent
       // Hand objects due to pooling by the service provider, but care must be taken
       // to not allocate garbage every frame!
@@ -523,7 +539,7 @@ namespace Leap.Unity.UI.Interaction {
       // SnapToHand(hand); // TODO: When you grasp an object, snap the object into a good holding position.
 
       if (moveObjectWhenGrasped) {
-        GraspedPoseController.AddHand(graspingIntHand);
+        graspedPoseController.AddHand(graspingIntHand);
       }
 
       // Set kinematic state based on grasping hold movement type
@@ -541,11 +557,12 @@ namespace Leap.Unity.UI.Interaction {
       OnGraspBegin(hand);
     }
 
+    private List<Hand> _graspedHandBuffer = new List<Hand>();
     public override void GraspHold(Hand hand) {
       if (moveObjectWhenGrasped) {
         Vector3 origPosition = rigidbody.position; Quaternion origRotation = rigidbody.rotation;
         Vector3 newPosition; Quaternion newRotation;
-        GraspedPoseController.GetGraspedPosition(out newPosition, out newRotation);
+        graspedPoseController.GetGraspedPosition(out newPosition, out newRotation);
 
         IGraspedMovementController holdingMovementController = rigidbody.isKinematic ?
                                                                  (IGraspedMovementController)_kinematicHoldingMovement
@@ -553,6 +570,11 @@ namespace Leap.Unity.UI.Interaction {
         holdingMovementController.MoveTo(newPosition, newRotation, this);
 
         OnGraspedMovement(origPosition, origRotation, newPosition, newRotation, hand);
+
+        // TODO: Support providing multiple hands to the throw controller
+        _graspedHandBuffer.Clear();
+        _graspedHandBuffer.Add(hand);
+        throwController.OnHold(this, _graspedHandBuffer);
       }
 
       OnGraspHold(hand);
@@ -565,13 +587,15 @@ namespace Leap.Unity.UI.Interaction {
       _graspingIntHands.Remove(graspingIntHand);
 
       if (moveObjectWhenGrasped) {
-        GraspedPoseController.RemoveHand(graspingIntHand);
+        graspedPoseController.RemoveHand(graspingIntHand);
       }
 
       // Revert kinematic state if the grasp has ended
       if (_graspCount == 0) {
         rigidbody.isKinematic = _wasKinematicBeforeGrab;
       }
+
+      throwController.OnThrow(this, hand);
 
       OnGraspEnd(hand);
     }
