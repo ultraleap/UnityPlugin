@@ -17,7 +17,7 @@ namespace Leap.Unity.UI.Interaction {
       specifyConditionalDrawing("_showAdvancedSettings", "_autoGenerateLayers");
       specifyConditionalDrawing("_showAdvancedSettings", "_templateLayer");
       specifyConditionalDrawing("_showAdvancedSettings", "_interactionLayer");
-      specifyConditionalDrawing("_showAdvancedSettings", "_graspedObjectLayer");
+      specifyConditionalDrawing("_showAdvancedSettings", "_interactionNoContactLayer");
       specifyConditionalDrawing("_showAdvancedSettings", "_contactBoneLayer");
       specifyConditionalDrawing("_showAdvancedSettings", "_drawHandRuntimeGizmos");
 
@@ -30,7 +30,7 @@ namespace Leap.Unity.UI.Interaction {
       specifyConditionalDrawing(() => !autoGenerateLayerProperty.boolValue
                                    && showAdvancedSettingsProperty.boolValue,
                                 "_interactionLayer",
-                                "_graspedObjectLayer",
+                                "_interactionNoContactLayer",
                                 "_contactBoneLayer");
     }
 

@@ -25,25 +25,25 @@ namespace Leap.Unity.UI.Interaction {
       }
       if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
         _lastObjectTouchedMass = collision.rigidbody.mass;
-        interactionHand.ContactBoneCollisionEnter(this, interactionObj);
+        interactionHand.ContactBoneCollisionEnter(this, interactionObj, false);
       }
     }
     void OnCollisionExit(Collision collision) {
       InteractionBehaviourBase interactionObj;
       if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
-        interactionHand.ContactBoneCollisionExit(this, interactionObj);
+        interactionHand.ContactBoneCollisionExit(this, interactionObj, false);
       }
     }
     void OnTriggerEnter(Collider collider) {
       InteractionBehaviourBase interactionObj;
       if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
-        interactionHand.ContactBoneCollisionEnter(this, interactionObj);
+        interactionHand.ContactBoneCollisionEnter(this, interactionObj, true);
       }
     }
     void OnTriggerExit(Collider collider) {
       InteractionBehaviourBase interactionObj;
       if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
-        interactionHand.ContactBoneCollisionExit(this, interactionObj);
+        interactionHand.ContactBoneCollisionExit(this, interactionObj, true);
       }
     }
 

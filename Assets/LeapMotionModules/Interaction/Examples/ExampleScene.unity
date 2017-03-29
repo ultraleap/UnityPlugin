@@ -715,15 +715,15 @@ MonoBehaviour:
   enableHovering: 1
   enableContact: 1
   enableGrasping: 1
-  _showAdvancedSettings: 0
+  _showAdvancedSettings: 1
   hoverActivationRadius: 0.5
   touchActivationRadius: 0.15
-  _autoGenerateLayers: 1
+  _autoGenerateLayers: 0
   _templateLayer:
     layerIndex: 0
   _interactionLayer:
     layerIndex: 8
-  _graspedObjectLayer:
+  _interactionNoContactLayer:
     layerIndex: 9
   _contactBoneLayer:
     layerIndex: 10
@@ -1312,10 +1312,14 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 6517682, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_IsTrigger
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5484986, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_UseGravity
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5484986, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_Drag
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents:

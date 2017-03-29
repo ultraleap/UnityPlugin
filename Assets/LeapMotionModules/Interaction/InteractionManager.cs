@@ -13,9 +13,12 @@ namespace Leap.Unity.UI.Interaction {
     [Header("Interaction Types")]
     [Tooltip("Hovering provides callbacks to Interaction Behaviours when hands are nearby.")]
     public bool enableHovering = true;
-    [Tooltip("Contact allows hands to collide with Interaction Behaviours in an intuitive way, and enables contact callbacks to Interaction Behaviours.")]
+    [Tooltip("Contact allows hands to collide with Interaction Behaviours in an intuitive way, "
+           + "and enables contact callbacks to Interaction Behaviours.")]
     public bool enableContact  = true;
-    [Tooltip("With grasping enabled, hands can pick up, place, pass, or throw Interaction Behaviours. Grasping also provides grasp-related callbacks to Interaction Behaviours for specifying custom behavior.")]
+    [Tooltip("With grasping enabled, hands can pick up, place, pass, or throw Interaction "
+           + "Behaviours. Grasping also provides grasp-related callbacks to Interaction "
+           + "Behaviours for specifying custom behavior.")]
     public bool enableGrasping = true;
 
     [Header("Advanced Settings")]
@@ -42,19 +45,27 @@ namespace Leap.Unity.UI.Interaction {
 
     [Tooltip("When automatically generating layers, the Interaction layer (for interactable objects) will use the same physics collision flags as the layer specified here.")]
     [SerializeField]
+    [EditTimeOnly]
     protected SingleLayer _templateLayer = 0;
+    public SingleLayer templateLayer { get { return _templateLayer; } }
 
     [Tooltip("The layer for interactable objects (i.e. InteractionBehaviours). Usually this would have the same collision flags as the Default layer, but it should be its own layer so hands don't have to check collision against all physics objects in the scene.")]
     [SerializeField]
+    [EditTimeOnly]
     protected SingleLayer _interactionLayer = 0;
+    public SingleLayer interactionLayer { get { return _interactionLayer; } }
 
+    [Tooltip("The layer objects are moved to when they become grasped, or if they are otherwise ignoring hand contact. This layer should not collide with the hand bone layer, but should collide with everything else that the interaction layer collides with.")]
     [SerializeField]
-    [Tooltip("The layer objects are moved to when they become grasped. This layer should not collide with the hand bone layer, but usually should collide with everything else that the interaction layer collides with.")]
-    protected SingleLayer _graspedObjectLayer = 0;
+    [EditTimeOnly]
+    protected SingleLayer _interactionNoContactLayer = 0;
+    public SingleLayer interactionNoContactLayer { get { return _interactionNoContactLayer; } }
 
     [Tooltip("The layer containing the collider bones of the hand. This layer should collide with anything you'd like to be able to touch, but it should not collide with the grasped object layer.")]
     [SerializeField]
+    [EditTimeOnly]
     protected SingleLayer _contactBoneLayer = 0;
+    public SingleLayer ContactBoneLayer { get { return _contactBoneLayer; } }
 
     [Header("Debug Settings")]
     [SerializeField]
@@ -251,14 +262,9 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Internal
 
-    public SingleLayer TemplateLayer { get { return _templateLayer; } }
-    public SingleLayer InteractionLayer { get { return _interactionLayer; } }
-    public SingleLayer GraspedObjectLayer { get { return _graspedObjectLayer; } }
-    public SingleLayer ContactBoneLayer { get { return _contactBoneLayer; } }
-
     protected void AutoGenerateLayers() {
       _interactionLayer = -1;
-      _graspedObjectLayer = -1;
+      _interactionNoContactLayer = -1;
       _contactBoneLayer = -1;
       for (int i = 8; i < 32; i++) {
         string layerName = LayerMask.LayerToName(i);
@@ -266,8 +272,8 @@ namespace Leap.Unity.UI.Interaction {
           if (_interactionLayer == -1) {
             _interactionLayer = i;
           }
-          else if (_graspedObjectLayer == -1) {
-            _graspedObjectLayer = i;
+          else if (_interactionNoContactLayer == -1) {
+            _interactionNoContactLayer = i;
           }
           else if (_contactBoneLayer == -1) {
             _contactBoneLayer = i;
@@ -276,7 +282,7 @@ namespace Leap.Unity.UI.Interaction {
         }
       }
 
-      if (_interactionLayer == -1 || _graspedObjectLayer == -1 || _contactBoneLayer == -1) {
+      if (_interactionLayer == -1 || _interactionNoContactLayer == -1 || _contactBoneLayer == -1) {
         if (Application.isPlaying) {
           enabled = false;
         }
@@ -291,7 +297,7 @@ namespace Leap.Unity.UI.Interaction {
         // Copy ignore settings from template layer
         bool shouldIgnore = Physics.GetIgnoreLayerCollision(_templateLayer, i);
         Physics.IgnoreLayerCollision(_interactionLayer, i, shouldIgnore);
-        Physics.IgnoreLayerCollision(_graspedObjectLayer, i, shouldIgnore);
+        Physics.IgnoreLayerCollision(_interactionNoContactLayer, i, shouldIgnore);
 
         // Set brush layer to collide with nothing
         Physics.IgnoreLayerCollision(_contactBoneLayer, i, true);

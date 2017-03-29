@@ -36,14 +36,14 @@ namespace Leap.Unity.UI.Interaction {
       _defaultGrabParams = new GrabClassifierHeuristics.ClassifierParameters(
         fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius,
         thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance,
-        layerMask == 0 ? (interactionHand.interactionManager.InteractionLayer.layerMask
-                          | interactionHand.interactionManager.GraspedObjectLayer.layerMask) : layerMask,
+        layerMask == 0 ? (interactionHand.interactionManager.interactionLayer.layerMask
+                          | interactionHand.interactionManager.interactionNoContactLayer.layerMask) : layerMask,
         queryTriggers);
       _scaledGrabParams = new GrabClassifierHeuristics.ClassifierParameters(
         fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius,
         thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance,
-        layerMask == 0 ? (interactionHand.interactionManager.InteractionLayer.layerMask
-                          | interactionHand.interactionManager.GraspedObjectLayer.layerMask) : layerMask,
+        layerMask == 0 ? (interactionHand.interactionManager.interactionLayer.layerMask
+                          | interactionHand.interactionManager.interactionNoContactLayer.layerMask) : layerMask,
         queryTriggers);
 
         for (int i = 0; i < 6; i++) {

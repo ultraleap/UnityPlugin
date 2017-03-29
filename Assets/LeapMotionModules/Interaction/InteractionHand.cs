@@ -105,7 +105,7 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    private List<InteractionBehaviourBase> _removalCache = new List<InteractionBehaviourBase>();
+    private List<InteractionBehaviourBase> _hoverRemovalCache = new List<InteractionBehaviourBase>();
     private void ProcessHoverCheckResults(HoverCheckResults hoverResults) {
       var trackedBehaviours = _hoverActivityManager.ActiveBehaviours;
       foreach (var hoverable in trackedBehaviours) {
@@ -133,13 +133,13 @@ namespace Leap.Unity.UI.Interaction {
       foreach (var hoverable in _hoveredLastFrame) {
         if (!trackedBehaviours.Contains(hoverable)) {
           hoverable.HoverEnd(hoverResults.checkedHand);
-          _removalCache.Add(hoverable);
+          _hoverRemovalCache.Add(hoverable);
         }
       }
-      foreach (var hoverable in _removalCache) {
+      foreach (var hoverable in _hoverRemovalCache) {
         _hoveredLastFrame.Remove(hoverable);
       }
-      _removalCache.Clear();
+      _hoverRemovalCache.Clear();
     }
 
     private void ProcessPrimaryHoverCheckResults(HoverCheckResults hoverResults) {
@@ -434,6 +434,7 @@ namespace Leap.Unity.UI.Interaction {
     //private List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(40);
     //private Dictionary<Rigidbody, PhysicsUtility.Velocities> originalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>();
 
+    //private List<int> _softContactIdxRemovalBuffer = new List<int>();
     private void FixedUpdateSoftContact() {
       if (_hand == null) return;
 
@@ -453,29 +454,34 @@ namespace Leap.Unity.UI.Interaction {
             sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, _softContactBoneRadius,
                                                                        (boneCenter - _previousBoneCenters[boneArrayIndex])
                                                                          / Time.fixedDeltaTime,
-                                                                       1 << interactionManager.InteractionLayer,
+                                                                       1 << interactionManager.interactionLayer,
                                                                        ref interactionManager._softContacts,
                                                                        ref interactionManager._softContactOriginalVelocities,
                                                                        ref _tempColliderArray);
-            // (This code was for when Interaction Managers were optional.)
-            //if (interactionManager != null) {
+
+            // Support allowing individual Interaction Behaviours to choose whether they are influenced by soft contact at trigger colliders
+            // NOPE nevermind
+            //_softContactIdxRemovalBuffer.Clear();
+            //for (int i = 0; i < interactionManager._softContacts.Count; i++) {
+            //  var softContact = interactionManager._softContacts[i];
+            //  InteractionBehaviourBase intObj;
+            //  if (interactionManager.rigidbodyRegistry.TryGetValue(softContact.body, out intObj)) {
+            //    if (softContact.touchingTrigger && !intObj.allowContactOnTriggers) {
+            //      _softContactIdxRemovalBuffer.Add(i);
+            //    }
+            //  }
             //}
-            //else {
-            //  sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, _softContactBoneRadius,
-            //                                                             (boneCenter - _previousBoneCenters[boneArrayIndex]) / Time.fixedDeltaTime,
-            //                                                             ~(1 << 2), ref softContacts, ref originalVelocities, ref _tempColliderArray);
+            //// TODO: Consider making the soft contact list a HashSet instead to support O(1) removal
+            //for (int i = _softContactIdxRemovalBuffer.Count - 1; i >= 0; i++) {
+            //  interactionManager._softContacts.RemoveAt(_softContactIdxRemovalBuffer[i]);
             //}
+
             softlyContacting = sphereIntersecting ? true : softlyContacting;
           }
         }
 
 
         if (softlyContacting) {
-          // Below code disabled because Interaction Managers are not currently optional.
-          // (If we have a manager, let it handle resolving the contacts of both hands in one unified solve.)
-          // if (interactionManager == null) {
-          //    PhysicsUtility.applySoftContacts(softContacts, originalVelocities);
-          // }
           _disableSoftContactEnqueued = false;
         }
         else {
@@ -621,7 +627,7 @@ namespace Leap.Unity.UI.Interaction {
     private HashSet<InteractionBehaviourBase> _contactBehavioursLastFrame = new HashSet<InteractionBehaviourBase>();
     private List<InteractionBehaviourBase>    _contactBehaviourRemovalCache = new List<InteractionBehaviourBase>();
 
-    internal void ContactBoneCollisionEnter(BrushBone contactBone, InteractionBehaviourBase interactionObj) {
+    internal void ContactBoneCollisionEnter(BrushBone contactBone, InteractionBehaviourBase interactionObj, bool wasTrigger) {
       int count;
       if (_contactBehaviours.TryGetValue(interactionObj, out count)) {
         _contactBehaviours[interactionObj] = count + 1;
@@ -631,7 +637,7 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    internal void ContactBoneCollisionExit(BrushBone contactBone, InteractionBehaviourBase interactionObj) {
+    internal void ContactBoneCollisionExit(BrushBone contactBone, InteractionBehaviourBase interactionObj, bool wasTrigger) {
       int count = _contactBehaviours[interactionObj];
       if (count == 1) {
         _contactBehaviours.Remove(interactionObj);

@@ -17,15 +17,19 @@ namespace Leap.Unity.UI.Interaction {
 
     [Header("Interaction Overrides")]
     [Tooltip("This object will no longer receive hover callbacks if this property is checked.")]
-    public bool ignoreHover = true;
+    public bool ignoreHover = false;
     [Tooltip("Hands will not be able to touch this object if this property is checked.")]
-    public bool ignoreContact = true;
+    public bool ignoreContact = false;
     [Tooltip("Hands will not be able to grasp this object if this property is checked.")]
-    public bool ignoreGrasping = true;
+    public bool ignoreGrasping = false;
 
     [Header("Grasp Settings")]
-    /// <summary> Can this object be grasped with two or more hands? </summary>
+    [Tooltip("Can this object be grasped with two or more hands?")]
     public bool allowMultiGrasp = false;
+
+    //[Tooltip("Trigger colliders on InteractionBehaviours can only be poked or pushed by hands "
+    //       + "if this property is enabled.")]
+    //public bool allowContactOnTriggers = true;
 
     /// <summary>
     /// Called by the InteractionManager every FixedUpdate, after
@@ -70,8 +74,7 @@ namespace Leap.Unity.UI.Interaction {
     /// <summary> Called per-hand every frame after the first when that hand is nearby this object. </summary>
     public abstract void HoverStay(Hand hand);
 
-    /// <summary> Called per-hand when that hand is no longer near this object.
-    /// The hand object may be null. This will occur if the hand stopped hovering due to a loss of tracking. </summary>
+    /// <summary> Called per-hand when that hand is no longer near this object. </summary>
     public abstract void HoverEnd(Hand hand);
 
     /// <summary> As HoverBegin, but only for the hand that is closest to this object.
@@ -82,8 +85,7 @@ namespace Leap.Unity.UI.Interaction {
     /// <summary> As HoverStay, but only for the hand that is closest to this object. </summary>
     public abstract void PrimaryHoverStay(Hand hand);
 
-    /// <summary> As HoverEnd, but only for the hand that was closest to this object.
-    /// The hand object may be null. This will occur if the hand stopped hovering due to a loss of tracking. </summary>
+    /// <summary> As HoverEnd, but only for the hand that was closest to this object.  </summary>
     public abstract void PrimaryHoverEnd(Hand hand);
 
     #endregion

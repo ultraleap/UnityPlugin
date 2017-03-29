@@ -23,14 +23,18 @@ namespace Leap.Unity.UI.Interaction {
     /// <summary> Gets the closest hand to this object, or null if no hand is nearby. </summary>
     public Hand closestHoveringHand   { get { return _publicClosestHoveringHand; } }
 
-    /// <summary> Gets this object's primary hovering hand, or null if no hand is primarily
-    /// hovering over this interaction object. (That is, closer to this object than to any other object.) </summary>
+    /// <summary>
+    /// Gets this object's primary hovering hand, or null if no hand is primarily
+    /// hovering over this interaction object. (That is, closer to this object than to any other object.)
+    /// </summary>
     public bool isPrimaryHovered      { get { return _primaryHoveringHandsCount > 0; } }
 
-    /// <summary> Returns the primary hovering hand for this interaction object, if it has one.
+    /// <summary>
+    /// Returns the primary hovering hand for this interaction object, if it has one.
     /// A hand is the primary hover for an interaction object only if it is closer to that object
     /// than any other interaction object. If there are multiple such hands, this returns the hand
-    /// closest to this object. </summary>
+    /// closest to this object.
+    /// </summary>
     public Hand primaryHoveringHand   { get { return _publicClosestPrimaryHoveringHand; } }
 
     public Action<Hand> OnHoverBegin = (hand) => { };
@@ -115,13 +119,12 @@ namespace Leap.Unity.UI.Interaction {
     #endregion
 
     [Tooltip("Should hands move the object as if it is held when the object is grasped? "
-           + "Use OnPostHoldingMovement to constrain the object's motion while held, or "
-           + "set this property to false to specify your own behavior entirely in "
-           + "OnGraspHold or OnObjectGraspHold.")]
+           + "Without this property checked, objects will still receive grasp callbacks, "
+           + "but you must move them manually via script.")]
     public bool moveObjectWhenGrasped = true;
 
     /// <summary>
-    /// When the object is moved by the FollowHand behavior, how should it move to its
+    /// When the object is held by an Interaction Hand, how should it move to its
     /// new position? Nonkinematic bodies will collide with other Rigidbodies, so they
     /// might not reach the target position. Kinematic rigidbodies will always move to the
     /// target position, ignoring collisions. Inherit will simply use the isKinematic
@@ -133,7 +136,7 @@ namespace Leap.Unity.UI.Interaction {
       Nonkinematic
     }
     [DisableIf("moveObjectWhenGrasped", isEqualTo: false)]
-    [Tooltip("When the object is moved by a holding InteractionHand, how should it move to its "
+    [Tooltip("When the object is held by an Interaction Hand, how should it move to its "
            + "new position? Nonkinematic bodies will collide with other Rigidbodies, so they "
            + "might not reach the target position. Kinematic rigidbodies will always move to the "
            + "target position, ignoring collisions. Inherit will simply use the isKinematic "
@@ -174,7 +177,7 @@ namespace Leap.Unity.UI.Interaction {
     /// Grasping uses its update to provide per-object (as opposed to per-hand)
     /// grasp callbacks, e.g. OnObjectGraspBegin(), similarly. It will also
     /// fire multi-grasp callbacks, e.g. OnMultiGraspBegin(), but only if
-    /// multiHandGrasping is enabled.
+    /// allowMultiGrasp is enabled.
     /// </summary>
     public override void FixedUpdateObject() {
       FixedUpdateHovering();
@@ -689,15 +692,16 @@ namespace Leap.Unity.UI.Interaction {
 
     protected void FixedUpdateLayer() {
       int layer;
+
       if (ignoreContact) {
-        layer = interactionManager.autoGenerateLayers ? interactionManager.TemplateLayer : _initialLayer;
+        layer = interactionManager.interactionNoContactLayer;
       }
       else {
         switch (_collisionMode) {
           case CollisionMode.Normal:
-            layer = interactionManager.InteractionLayer; break;
+            layer = interactionManager.interactionLayer; break;
           case CollisionMode.Grasped:
-            layer = interactionManager.GraspedObjectLayer; break;
+            layer = interactionManager.interactionNoContactLayer; break;
           default:
             Debug.LogError("Invalid collision mode, can't update layer.");
             return;
