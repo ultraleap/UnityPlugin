@@ -215,6 +215,17 @@ namespace Leap.Unity.UI.Interaction {
       rigidbodyRegistry[interactionObj.rigidbody] = interactionObj;
     }
 
+    /// <summary> Returns true if the Interaction Behaviour was registered with this manager; otherwise returns false. 
+    /// The manager is guaranteed not to have the Interaction Behaviour registered after calling this method. </summary>
+    public bool UnregisterInteractionBehaviour(InteractionBehaviourBase interactionObj) {
+      bool wasRemovalSuccessful = _interactionBehaviours.Remove(interactionObj);
+      if (wasRemovalSuccessful) {
+        foreach (var intHand in _interactionHands) { intHand.TryReleaseObject(interactionObj); }
+        rigidbodyRegistry.Remove(interactionObj.rigidbody);
+      }
+      return wasRemovalSuccessful;
+    }
+
     public bool IsBehaviourRegistered(InteractionBehaviourBase interactionObj) {
       return _interactionBehaviours.Contains(interactionObj);
     }

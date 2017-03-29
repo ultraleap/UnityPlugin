@@ -1312,15 +1312,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 6517682, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
       propertyPath: m_IsTrigger
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5484986, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_UseGravity
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5484986, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
-      propertyPath: m_Drag
+      propertyPath: m_UseGravity
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5484986, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
+      propertyPath: m_Drag
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 11483346, guid: 79ca92ca2850488418cefdb0f66d02e3, type: 2}
