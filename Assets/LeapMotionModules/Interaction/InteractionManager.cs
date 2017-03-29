@@ -167,12 +167,17 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    // TODO: Do correct thing in OnEnable / OnDisable for whole Managers
-
-    void Start() {
+    void OnEnable() {
       if (Provider == null) {
         Debug.LogError("[InteractionManager] No LeapServiceProvider found.");
         this.enabled = false;
+      }
+    }
+
+    void OnDisable() {
+      foreach (var intHand in _interactionHands) {
+        intHand.EnableSoftContact();
+        if (intHand.isGraspingObject) intHand.ReleaseGrasp();
       }
     }
 
@@ -208,7 +213,6 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     #region Object Registration
-
 
     public void RegisterInteractionBehaviour(InteractionBehaviourBase interactionObj) {
       _interactionBehaviours.Add(interactionObj);
