@@ -27,12 +27,12 @@
 
     void surf (Input IN, inout SurfaceOutputStandard o) {
       o.Albedo = tex2D (_MainTex, IN.uv_MainTex);
-      o.Normal = UnpackScaleNormal(tex2D(_BumpMap, IN.uv_MainTex), _BumpScale);
+      //o.Normal = UnpackScaleNormal(tex2D(_BumpMap, IN.uv_MainTex), _BumpScale);
 
       float2 ms = tex2D(_MetallicGlossMap, IN.uv_MainTex).ra;
 
-      o.Smoothness = ms.y * _Smoothness;
-      o.Metallic = ms.x;
+      //o.Smoothness = ms.y * _Smoothness;
+      //o.Metallic = ms.x;
     }
     ENDCG
   }
