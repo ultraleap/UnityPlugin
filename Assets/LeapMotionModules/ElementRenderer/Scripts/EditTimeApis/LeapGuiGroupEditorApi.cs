@@ -97,10 +97,6 @@ public partial class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     }
 
     public void RebuildEditorPickingMeshes() {
-      if (_group.gui.space == null) {
-        return;
-      }
-
       using (new ProfilerSample("Rebuild Picking Meshes")) {
         foreach (var element in _group._elements) {
           element.editor.RebuildEditorPickingMesh();

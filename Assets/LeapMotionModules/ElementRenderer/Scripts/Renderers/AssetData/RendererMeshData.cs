@@ -4,9 +4,22 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-public class RendererMeshData : ScriptableObject {
+public class RendererMeshData : SceneTiedAsset {
   [SerializeField]
   private List<Mesh> meshes = new List<Mesh>();
+
+#if UNITY_EDITOR
+  protected override void OnAssetSaved() {
+    base.OnAssetSaved();
+
+    //Make sure all our meshes are saved too!
+    foreach (var mesh in meshes) {
+      if (!AssetDatabase.IsSubAsset(mesh)) {
+        AssetDatabase.AddObjectToAsset(mesh, this);
+      }
+    }
+  }
+#endif
 
   private void OnDestroy() {
     foreach (var mesh in meshes) {
@@ -24,7 +37,9 @@ public class RendererMeshData : ScriptableObject {
   public void AddMesh(Mesh mesh) {
     meshes.Add(mesh);
 #if UNITY_EDITOR
-    AssetDatabase.AddObjectToAsset(mesh, this);
+    if (isSavedAsset) {
+      AssetDatabase.AddObjectToAsset(mesh, this);
+    }
 #endif
   }
 

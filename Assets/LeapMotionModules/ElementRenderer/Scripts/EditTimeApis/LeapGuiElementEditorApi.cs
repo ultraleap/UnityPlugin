@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using Leap.Unity.Space;
 
 public abstract partial class LeapGuiElement : MonoBehaviour {
 
 #if UNITY_EDITOR
-  public readonly EditorApi editor;
+  public EditorApi editor { get; protected set; }
 
   public class EditorApi {
     private readonly LeapGuiElement _element;
@@ -48,7 +47,7 @@ public abstract partial class LeapGuiElement : MonoBehaviour {
 
     public virtual void RebuildEditorPickingMesh() { }
 
-    public virtual void OnAttachedToGui(LeapGuiGroup group, Transform anchor) {
+    public virtual void OnAttachedToGui(LeapGuiGroup group, LeapSpaceAnchor anchor) {
       if (!Application.isPlaying) {
         _element._preferredRendererType = group.renderer.GetType();
       }

@@ -12,6 +12,10 @@ public abstract partial class LeapGuiMeshElementBase : LeapGuiElement {
   public UVChannelFlags remappableChannels { get; protected set; }
 
   public abstract void RefreshMeshData();
+
+  public LeapGuiMeshElementBase() {
+    editor = new MeshEditorApi(this);
+  }
 }
 
 public class LeapGuiMeshElement : LeapGuiMeshElementBase {

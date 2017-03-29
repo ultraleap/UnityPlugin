@@ -186,20 +186,18 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
   }
 
   protected bool HasFrameBounds() {
-    return true;
+    return targets.Query().
+                   Any(t => t.editor.pickingMesh != null);
   }
 
   protected Bounds OnGetFrameBounds() {
-    Bounds[] allBounds = targets.Query().
-                                 Select(e => e.editor.pickingMesh).
-                                 Where(m => m != null).
-                                 Select(m => m.bounds).
-                                 ToArray();
-
-    Bounds bounds = allBounds[0];
-    for (int i = 1; i < allBounds.Length; i++) {
-      bounds.Encapsulate(allBounds[i]);
-    }
-    return bounds;
+    return targets.Query().
+                   Select(e => e.editor.pickingMesh).
+                   NonNull().
+                   Select(m => m.bounds).
+                   Fold((a, b) => {
+                     a.Encapsulate(b);
+                     return a;
+                   });
   }
 }
