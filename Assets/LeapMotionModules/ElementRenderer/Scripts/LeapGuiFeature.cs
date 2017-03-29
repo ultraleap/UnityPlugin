@@ -52,6 +52,12 @@ public abstract class LeapGuiElementData : LeapGuiComponentBase<LeapGuiElement> 
       feature.isDirty = true;
     }
   }
+
+  public void MarkFeatureDirty() {
+    if (feature != null) {
+      feature.isDirty = true;
+    }
+  }
 }
 
 public abstract class LeapGuiFeature<DataType> : LeapGuiFeatureBase

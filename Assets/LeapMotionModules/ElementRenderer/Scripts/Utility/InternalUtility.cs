@@ -16,6 +16,21 @@ public static class InternalUtility {
   static InternalUtility() {
     EditorApplication.update += destroyLoop;
   }
+
+  public static Action OnAnySave;
+
+  public class SaveWatcher : UnityEditor.AssetModificationProcessor {
+    static string[] OnWillSaveAssets(string[] paths) {
+      EditorApplication.delayCall += dispatchOnAnySave;
+      return paths;
+    }
+  }
+
+  private static void dispatchOnAnySave() {
+    if (OnAnySave != null) {
+      OnAnySave();
+    }
+  }
 #endif
 
 #if UNITY_EDITOR

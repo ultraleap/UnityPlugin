@@ -27,6 +27,7 @@ public partial class LeapGui : MonoBehaviour {
       _gui = gui;
 
       _delayedHeavyRebuild = new DelayedAction(() => DoEditorUpdateLogic(fullRebuild: true, heavyRebuild: true));
+      InternalUtility.OnAnySave += onAnySave;
     }
 
     public void OnValidate() {
@@ -34,6 +35,7 @@ public partial class LeapGui : MonoBehaviour {
     }
 
     public void OnDestroy() {
+      InternalUtility.OnAnySave -= onAnySave;
       _delayedHeavyRebuild.Dispose();
     }
 
@@ -142,6 +144,10 @@ public partial class LeapGui : MonoBehaviour {
       foreach (var group in _gui._groups) {
         group.UpdateRenderer();
       }
+    }
+
+    private void onAnySave() {
+      DoEditorUpdateLogic(fullRebuild: true, heavyRebuild: false);
     }
 
     private void validateSpaceComponent() {

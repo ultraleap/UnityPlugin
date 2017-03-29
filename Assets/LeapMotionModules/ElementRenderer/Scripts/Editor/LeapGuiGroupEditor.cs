@@ -167,6 +167,12 @@ public class LeapGuiGroupEditor : CustomEditorBase<LeapGuiGroup> {
     var feature = target.features[index];
 
     string featureName = LeapGuiTagAttribute.GetTag(target.features[index].GetType());
+
+    int lastIndexOf = featureName.LastIndexOf('/');
+    if (lastIndexOf >= 0) {
+      featureName = featureName.Substring(lastIndexOf + 1);
+    }
+
     GUIContent featureLabel = new GUIContent(featureName);
 
     Color originalColor = GUI.color;
