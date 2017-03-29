@@ -718,7 +718,7 @@ MonoBehaviour:
   _showAdvancedSettings: 1
   hoverActivationRadius: 0.5
   touchActivationRadius: 0.15
-  _autoGenerateLayers: 0
+  _autoGenerateLayers: 1
   _templateLayer:
     layerIndex: 0
   _interactionLayer:

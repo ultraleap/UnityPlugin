@@ -35,6 +35,11 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
     void OnTriggerEnter(Collider collider) {
+      if (collider.attachedRigidbody == null) {
+        Debug.LogError("Brush Bone collided with non-rigidbody collider trigger: " + collider.name + "."
+                     + "Please enable automatic layer generation in the Interaction Manager, "
+                     + "or ensure the Interaction layer only contains Interaction Behaviours.");
+      }
       InteractionBehaviourBase interactionObj;
       if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
         interactionHand.ContactBoneCollisionEnter(this, interactionObj, true);
