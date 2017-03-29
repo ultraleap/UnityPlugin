@@ -186,6 +186,8 @@ namespace Leap.Unity.UI.Interaction {
       FixedUpdateGrasping();
 
       FixedUpdateCollisionMode();
+
+      FixedUpdateForces();
     }
 
     // TODO: Currently this gets the distance from the point to this transform, but this should
@@ -197,6 +199,47 @@ namespace Leap.Unity.UI.Interaction {
     void OnDestroy() {
       interactionManager.UnregisterInteractionBehaviour(this);
     }
+
+    #region Forces
+
+    protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
+    protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
+
+    /// <summary>
+    /// Adds a linear acceleration to the center of mass of this object. 
+    /// Use this instead of Rigidbody.AddForce() to accelerate an Interaction object.
+    /// </summary>
+    public void AddLinearAcceleration(Vector3 acceleration) {
+      _accumulatedLinearAcceleration += acceleration;
+    }
+
+    /// <summary>
+    /// Adds an angular acceleration to the center of mass of this object. 
+    /// Use this instead of Rigidbody.AddTorque() to add angular acceleration 
+    /// to an Interaction object.
+    /// </summary>
+    public void AddAngularAcceleration(Vector3 acceleration) {
+      _accumulatedAngularAcceleration += acceleration;
+    }
+
+    public void FixedUpdateForces() {
+      if (!isGrasped) {
+        //Only apply if non-zero to prevent waking up the body
+        if (_accumulatedLinearAcceleration != Vector3.zero) {
+          rigidbody.velocity += _accumulatedLinearAcceleration * Time.fixedDeltaTime;
+        }
+
+        if (_accumulatedAngularAcceleration != Vector3.zero) {
+          rigidbody.angularVelocity += _accumulatedAngularAcceleration * Time.fixedDeltaTime;
+        }
+
+        //Reset so we can accumulate for the next frame
+        _accumulatedLinearAcceleration = Vector3.zero;
+        _accumulatedAngularAcceleration = Vector3.zero;
+      }
+    }
+
+    #endregion
 
     #region Hovering
 
