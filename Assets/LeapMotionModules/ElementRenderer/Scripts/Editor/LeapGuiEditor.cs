@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
 using Leap.Unity;
+using Leap.Unity.Space;
 using Leap.Unity.Query;
 
 [CustomEditor(typeof(LeapGui))]
@@ -13,9 +14,6 @@ public class LeapGuiEditor : CustomEditorBase {
 
   private LeapGui _gui;
   private SerializedProperty _selectedGroup;
-
-  private GenericMenu _addSpaceMenu;
-  private Editor _spaceEditor;
 
   private GenericMenu _addGroupMenu;
   private Editor _groupEditor;
@@ -32,22 +30,6 @@ public class LeapGuiEditor : CustomEditorBase {
 
     var allTypes = Assembly.GetAssembly(typeof(LeapGui)).GetTypes();
 
-    var allSpaces = allTypes.Query().
-                             Where(t => !t.IsAbstract).
-                             Where(t => !t.IsGenericType).
-                             Where(t => t.IsSubclassOf(typeof(LeapGuiSpace)));
-
-    _addSpaceMenu = new GenericMenu();
-    foreach (var space in allSpaces) {
-      _addSpaceMenu.AddItem(new GUIContent(LeapGuiTagAttribute.GetTag(space)),
-                            false,
-                            () => {
-                              _gui.editor.SetSpace(space);
-                              CreateCachedEditor(_gui.space, null, ref _spaceEditor);
-                              serializedObject.Update();
-                            });
-    }
-
     var allRenderers = allTypes.Query().
                                 Where(t => !t.IsAbstract).
                                 Where(t => !t.IsGenericType).
@@ -63,15 +45,10 @@ public class LeapGuiEditor : CustomEditorBase {
                             });
     }
 
-    if (_gui.space != null) {
-      CreateCachedEditor(_gui.space, null, ref _spaceEditor);
-    }
-
     updateGroupEditor();
   }
 
   private void OnDisable() {
-    if (_spaceEditor != null) DestroyImmediate(_spaceEditor);
     if (_groupEditor != null) DestroyImmediate(_groupEditor);
   }
 
@@ -79,8 +56,6 @@ public class LeapGuiEditor : CustomEditorBase {
     validateEditors();
 
     drawScriptField();
-
-    drawSpace();
 
     drawToolbar();
 
@@ -102,37 +77,10 @@ public class LeapGuiEditor : CustomEditorBase {
   }
 
   private void validateEditors() {
-    if (_spaceEditor != null && _spaceEditor.serializedObject.targetObjects.Query().Any(o => o == null)) {
-      _spaceEditor = null;
-
-      if (_gui.space != null) {
-        CreateCachedEditor(_gui.space, null, ref _spaceEditor);
-      }
-    }
-
     if (_groupEditor != null && _groupEditor.serializedObject.targetObjects.Query().Any(o => o == null)) {
       _groupEditor = null;
 
       updateGroupEditor();
-    }
-  }
-
-  private void drawSpace() {
-    using (new GUILayout.VerticalScope(EditorStyles.helpBox)) {
-
-      Rect rect = EditorGUILayout.GetControlRect(GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight));
-      Rect left, right;
-      rect.SplitHorizontallyWithRight(out left, out right, BUTTON_WIDTH);
-
-      EditorGUI.LabelField(left, "Space", EditorStyles.miniButtonLeft);
-
-      using (new EditorGUI.DisabledGroupScope(EditorApplication.isPlaying)) {
-        if (GUI.Button(right, "v", EditorStyles.miniButtonRight)) {
-          _addSpaceMenu.ShowAsContext();
-        }
-      }
-
-      _spaceEditor.OnInspectorGUI();
     }
   }
 
@@ -214,7 +162,7 @@ public class LeapGuiEditor : CustomEditorBase {
     return _gui.groups.Query().
                        SelectMany(g => g.elements.Query()).
                        Select(e => e.editor.pickingMesh).
-                       Where(m => m != null).
+                       NonNull().
                        Select(m => m.bounds).
                        Fold((a, b) => {
                          a.Encapsulate(b);

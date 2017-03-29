@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Space;
 
 namespace Leap.Unity.UI.Interaction {
 
@@ -21,41 +22,42 @@ namespace Leap.Unity.UI.Interaction {
       get { return _activeBehaviours; }
     }
 
+    public ActivityManager(InteractionManager manager) {
+      this.manager = manager;
+      this.activationRadius = 1F;
+    }
+
     public ActivityManager(InteractionManager manager, float activationRadius) {
       this.manager = manager;
       this.activationRadius = activationRadius;
     }
 
-    public void FixedUpdateHand(Vector3 palmPosition, LeapGui[] guis = null) {
+    public void FixedUpdateHand(Vector3 palmPosition, List<LeapSpace> spaces = null) {
       _activeBehaviours.Clear();
 
       if (palmPosition != Vector3.zero) {
-        int count = GetSphereColliderResults(palmPosition, _colliderResultsBuffer, out _colliderResultsBuffer);
+        int count = GetSphereColliderResults(palmPosition, ref _colliderResultsBuffer);
         UpdateActiveList(count, _colliderResultsBuffer);
 
-        if (guis != null) {
+        if (spaces != null) {
           //Check once in each of the GUI's subspaces
-          foreach (LeapGui gui in guis) {
-            if (!(gui.space.GetType() == typeof(LeapGuiRectSpace))) {
-              count = GetSphereColliderResults(transformPoint(palmPosition, gui), _colliderResultsBuffer, out _colliderResultsBuffer);
-              UpdateActiveList(count, _colliderResultsBuffer);
-            }
+          foreach (LeapSpace space in spaces) {
+            count = GetSphereColliderResults(transformPoint(palmPosition, space), ref _colliderResultsBuffer);
+            UpdateActiveList(count, _colliderResultsBuffer);
           }
         }
       }
     }
 
-    private int GetSphereColliderResults(Vector3 position, Collider[] resultsBuffer_in, out Collider[] resultsBuffer_out) {
-      resultsBuffer_out = resultsBuffer_in;
-
+    private int GetSphereColliderResults(Vector3 position, ref Collider[] resultsBuffer) {
       int overlapCount = 0;
       while (true) {
         overlapCount = Physics.OverlapSphereNonAlloc(position,
-                                                     activationRadius * 100,
-                                                     resultsBuffer_in,
-                                                     ~0,
+                                                     activationRadius,
+                                                     resultsBuffer,
+                                                     manager.interactionLayer.layerMask | manager.interactionNoContactLayer.layerMask,
                                                      QueryTriggerInteraction.Collide);
-        if (overlapCount < resultsBuffer_out.Length) {
+        if (overlapCount < resultsBuffer.Length) {
           break;
         }
         else {
@@ -63,8 +65,7 @@ namespace Leap.Unity.UI.Interaction {
           // If the output overlapCount is equal to the array's length, there might be more collision results
           // that couldn't be returned because the array wasn't large enough, so try again with increased length.
           // The _in, _out argument setup allows allocating a new array from within this function.
-          resultsBuffer_out = new Collider[resultsBuffer_out.Length * 2];
-          resultsBuffer_in = resultsBuffer_out;
+          resultsBuffer = new Collider[resultsBuffer.Length * 2];
         }
       }
       return overlapCount;
@@ -75,19 +76,16 @@ namespace Leap.Unity.UI.Interaction {
         if (results[i].attachedRigidbody != null) {
           Rigidbody body = results[i].attachedRigidbody;
           InteractionBehaviourBase interactionObj;
-          if (body != null && manager.RigidbodyRegistry.TryGetValue(body, out interactionObj)) {
+          if (body != null && manager.rigidbodyRegistry.TryGetValue(body, out interactionObj)) {
             _activeBehaviours.Add(interactionObj);
           }
         }
       }
     }
 
-    private Vector3 transformPoint(Vector3 worldPoint, LeapGui gui) {
-      ITransformer space = gui.space.GetTransformer(gui.transform);
-      Vector3 localPalmPos = gui.transform.InverseTransformPoint(worldPoint);
-      return gui.transform.TransformPoint(space.InverseTransformPoint(localPalmPos));
+    private Vector3 transformPoint(Vector3 worldPoint, LeapSpace space) {
+      Vector3 localPalmPos = space.transform.InverseTransformPoint(worldPoint);
+      return space.transform.TransformPoint(space.transformer.InverseTransformPoint(localPalmPos));
     }
-
   }
-
 }

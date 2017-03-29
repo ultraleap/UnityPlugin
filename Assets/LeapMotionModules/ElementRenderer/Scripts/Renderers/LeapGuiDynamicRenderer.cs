@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity;
+using Leap.Unity.Space;
 
 [AddComponentMenu("")]
 [LeapGuiTag("Dynamic")]
@@ -17,19 +18,23 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase, ISupportsAddRemove {
   #endregion
 
   public void OnAddElement() {
-    //TODO, this is super slow and sad
-    throw new NotImplementedException();
+    //TODO
+    if (Application.isPlaying) {
+      throw new NotImplementedException();
+    }
   }
 
   public void OnRemoveElement() {
-    //TODO, this is super slow and sad
-    throw new NotImplementedException();
+    //TODO
+    if (Application.isPlaying) {
+      throw new NotImplementedException();
+    }
   }
 
-  public override SupportInfo GetSpaceSupportInfo(LeapGuiSpace space) {
-    if (space is LeapGuiRectSpace ||
-        space is LeapGuiCylindricalSpace ||
-        space is LeapGuiSphericalSpace) {
+  public override SupportInfo GetSpaceSupportInfo(LeapSpace space) {
+    if (space == null ||
+        space is LeapCylindricalSpace ||
+        space is LeapSphericalSpace) {
       return SupportInfo.FullSupport();
     } else {
       return SupportInfo.Error("Dynamic Renderer does not support " + space.GetType().Name);
@@ -39,14 +44,14 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase, ISupportsAddRemove {
   public override void OnUpdateRenderer() {
     base.OnUpdateRenderer();
 
-    if (gui.space is LeapGuiRectSpace) {
+    if (gui.space == null) {
       using (new ProfilerSample("Draw Meshes")) {
         for (int i = 0; i < group.elements.Count; i++) {
           Graphics.DrawMesh(_meshes[i], group.elements[i].transform.localToWorldMatrix, _material, 0);
         }
       }
-    } else if (gui.space is LeapGuiRadialSpaceBase) {
-      var curvedSpace = gui.space as LeapGuiRadialSpaceBase;
+    } else if (gui.space is LeapRadialSpace) {
+      var curvedSpace = gui.space as LeapRadialSpace;
 
       using (new ProfilerSample("Build Material Data")) {
         _curved_worldToAnchor.Clear();
@@ -54,7 +59,7 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase, ISupportsAddRemove {
         _curved_elementParameters.Clear();
         for (int i = 0; i < _meshes.Count; i++) {
           var element = group.elements[i];
-          var transformer = curvedSpace.GetTransformer(element.anchor);
+          var transformer = element.anchor.transformer;
 
           Vector3 guiLocalPos = gui.transform.InverseTransformPoint(element.transform.position);
 
@@ -62,14 +67,14 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase, ISupportsAddRemove {
           Matrix4x4 deform = transform.worldToLocalMatrix * Matrix4x4.TRS(transform.position - element.transform.position, Quaternion.identity, Vector3.one) * element.transform.localToWorldMatrix;
           Matrix4x4 total = guiTransform * deform;
 
-          _curved_elementParameters.Add((transformer as IRadialTransformer).GetVectorRepresentation(element));
+          _curved_elementParameters.Add((transformer as IRadialTransformer).GetVectorRepresentation(element.transform));
           _curved_meshTransforms.Add(total);
           _curved_worldToAnchor.Add(guiTransform.inverse);
         }
       }
 
       using (new ProfilerSample("Upload Material Data")) {
-        _material.SetFloat(LeapGuiRadialSpaceBase.RADIUS_PROPERTY, curvedSpace.radius);
+        _material.SetFloat(SpaceProperties.RADIAL_SPACE_RADIUS, curvedSpace.radius);
         _material.SetMatrixArraySafe("_LeapGuiCurved_WorldToAnchor", _curved_worldToAnchor);
         _material.SetMatrix("_LeapGui_LocalToWorld", transform.localToWorldMatrix);
         _material.SetVectorArraySafe("_LeapGuiCurved_ElementParameters", _curved_elementParameters);
@@ -90,10 +95,12 @@ public class LeapGuiDynamicRenderer : LeapGuiMesherBase, ISupportsAddRemove {
 
     base.setupForBuilding();
 
-    if (gui.space is LeapGuiCylindricalSpace) {
-      _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);
-    } else if (gui.space is LeapGuiSphericalSpace) {
-      _material.EnableKeyword(LeapGuiSphericalSpace.FEATURE_NAME);
+    if (gui.space != null) {
+      if (gui.space is LeapCylindricalSpace) {
+        _material.EnableKeyword(SpaceProperties.CYLINDRICAL_FEATURE);
+      } else if (gui.space is LeapSphericalSpace) {
+        _material.EnableKeyword(SpaceProperties.SPHERICAL_FEATURE);
+      }
     }
   }
 

@@ -13,10 +13,12 @@ namespace Leap.Unity.UI.Interaction {
 
     public InteractionHand interactionHand;
 
-    private Collider[] _collidingCandidates = new Collider[10];
-    Dictionary<InteractionBehaviourBase, GrabClassifierHeuristics.GrabClassifier> _classifiers
+    private Dictionary<InteractionBehaviourBase, GrabClassifierHeuristics.GrabClassifier> _classifiers
       = new Dictionary<InteractionBehaviourBase, GrabClassifierHeuristics.GrabClassifier>();
-    GrabClassifierHeuristics.ClassifierParameters _defaultGrabParams, _scaledGrabParams;
+    private GrabClassifierHeuristics.ClassifierParameters _defaultGrabParams, _scaledGrabParams;
+    private Collider[][] _collidingCandidates = new Collider[6][];
+    private int[] _numberOfColliders = new int[6];
+    private Vector3[] _fingerTipPositions = new Vector3[5];
 
     public HeuristicGrabClassifier(InteractionHand intHand,
                                    float fingerStickiness = 0F,
@@ -27,14 +29,26 @@ namespace Leap.Unity.UI.Interaction {
                                    float thumbRadius = 0.017F,
                                    float grabCooldown = 0.2F,
                                    float maxCurlVel = 0.0F,
-                                   float maxGrabDistance = 0.05F) {
+                                   float maxGrabDistance = 0.05F,
+                                   int layerMask = 0,
+                                   QueryTriggerInteraction queryTriggers = QueryTriggerInteraction.UseGlobal) {
       interactionHand = intHand;
       _defaultGrabParams = new GrabClassifierHeuristics.ClassifierParameters(
         fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius,
-        thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance);
+        thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance,
+        layerMask == 0 ? (interactionHand.interactionManager.interactionLayer.layerMask
+                          | interactionHand.interactionManager.interactionNoContactLayer.layerMask) : layerMask,
+        queryTriggers);
       _scaledGrabParams = new GrabClassifierHeuristics.ClassifierParameters(
         fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius,
-        thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance);
+        thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance,
+        layerMask == 0 ? (interactionHand.interactionManager.interactionLayer.layerMask
+                          | interactionHand.interactionManager.interactionNoContactLayer.layerMask) : layerMask,
+        queryTriggers);
+
+        for (int i = 0; i < 6; i++) {
+          _collidingCandidates[i] = new Collider[5];
+        }
     }
 
     private void UpdateBehaviour(InteractionBehaviourBase behaviour, Hand hand) {
@@ -48,14 +62,16 @@ namespace Leap.Unity.UI.Interaction {
 
         // Do the actual grab classification logic.
         FillClassifier(hand, ref classifier);
-        GrabClassifierHeuristics.UpdateClassifier(classifier, _collidingCandidates, _scaledGrabParams);
+        GrabClassifierHeuristics.UpdateClassifier(classifier, _collidingCandidates, _numberOfColliders, _scaledGrabParams);
 
         if (classifier.isGrabbing != classifier.prevGrabbing) {
           if (classifier.isGrabbing) {
-            if (!behaviour.allowMultiGrasp) {
-              interactionHand.interactionManager.ReleaseObjectFromGrasp(behaviour);
+            if (!behaviour.ignoreGrasping) {
+              if (behaviour.isGrasped && !behaviour.allowMultiGrasp) {
+                interactionHand.interactionManager.TryReleaseObjectFromGrasp(behaviour);
+              }
+              interactionHand.Grasp(behaviour);
             }
-            interactionHand.Grasp(behaviour);
           }
           else if (interactionHand.IsGrasping(behaviour)) {
             interactionHand.ReleaseGrasp();
@@ -77,7 +93,15 @@ namespace Leap.Unity.UI.Interaction {
         _scaledGrabParams.MAXIMUM_DISTANCE_FROM_HAND = _defaultGrabParams.MAXIMUM_DISTANCE_FROM_HAND
                                                      * interactionHand.interactionManager.SimulationScale;
 
+        // Ensure that the temporally variant variables are updated
+        // scaledGrabParams.LAYER_MASK = 1 << _manager.InteractionLayer;
+        for (int i = 0; i < hand.Fingers.Count; i++) {
+          _fingerTipPositions[i] = hand.Fingers[i].TipPosition.ToVector3();
+        }
+
         using (new ProfilerSample("Update Hand Grab Classifiers", interactionHand.interactionManager)) {
+          GrabClassifierHeuristics.UpdateAllProbeColliders(_fingerTipPositions, ref _collidingCandidates, ref _numberOfColliders, _scaledGrabParams);
+
           // First check if already holding an object and only process that one.
           var graspedObject = interactionHand.GetGraspedObject();
           if (graspedObject != null) {
@@ -114,7 +138,9 @@ namespace Leap.Unity.UI.Interaction {
       if (_classifiers.TryGetValue(behaviour, out classifier)) {
         int writeIdx = 0;
         for (int probeIdx = 0; probeIdx < classifier.probes.Length; probeIdx++) {
-          fingertipPositionsBuffer[writeIdx++] = classifier.probes[probeIdx].position;
+          if (classifier.probes[probeIdx].isInside) {
+            fingertipPositionsBuffer[writeIdx++] = _fingerTipPositions[probeIdx];
+          }
         }
         numGraspingFingertips = writeIdx;
       }
@@ -132,8 +158,6 @@ namespace Leap.Unity.UI.Interaction {
                                    + (hand.Direction * 0.05f * simScale)
                                    + (hand.PalmNormal * 0.01f * simScale)).ToVector3();
       for (int i = 0; i < hand.Fingers.Count; i++) {
-        classifier.probes[i].direction = hand.Fingers[i].Direction.ToVector3();
-        classifier.probes[i].position = hand.Fingers[i].TipPosition.ToVector3();
         classifier.probes[i].direction = hand.Fingers[i].Direction.ToVector3();
       }
     }

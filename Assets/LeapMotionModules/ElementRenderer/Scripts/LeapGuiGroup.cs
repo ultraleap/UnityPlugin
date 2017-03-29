@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Leap.Unity;
+using Leap.Unity.Space;
 using Leap.Unity.Query;
 
 [AddComponentMenu("")]
@@ -85,13 +86,18 @@ public partial class LeapGuiGroup : LeapGuiComponentBase<LeapGui> {
     }
 
     if (_elements.Contains(element)) {
-      return false;
+      if (element.attachedGroup == null) {
+        //detatch and re-add, it forgot it was attached!
+        //This can easily happen at edit time due to prefab shenanigans 
+        element.OnDetachedFromGui();
+      } else {
+        return false;
+      }
     }
 
     _elements.Add(element);
 
-    Transform anchor = AnchorOfConstantSize.GetParentAnchorOrGui(element.transform);
-    Assert.IsNotNull(anchor);
+    LeapSpaceAnchor anchor = _gui.space == null ? null : LeapSpaceAnchor.GetAnchor(element.transform);
 
     element.OnAttachedToGui(this, anchor);
 

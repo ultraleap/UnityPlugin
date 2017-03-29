@@ -10,10 +10,10 @@ namespace Leap.Unity.UI.Interaction {
                        InteractionBehaviourBase interactionObj) {
       //interactionObj.Rigidbody.MovePosition(solvedPosition);
       //interactionObj.Rigidbody.MoveRotation(solvedRotation);
-      interactionObj.Rigidbody.transform.position = solvedPosition;
-      interactionObj.Rigidbody.transform.rotation = solvedRotation;
-      interactionObj.Rigidbody.position = solvedPosition;
-      interactionObj.Rigidbody.rotation = solvedRotation;
+      interactionObj.rigidbody.transform.position = solvedPosition;
+      interactionObj.rigidbody.transform.rotation = solvedRotation;
+      interactionObj.rigidbody.position = solvedPosition;
+      interactionObj.rigidbody.rotation = solvedRotation;
     }
 
   }
