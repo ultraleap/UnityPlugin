@@ -202,6 +202,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &64192847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -430,6 +431,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &85754737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -612,6 +614,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &107997313
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -794,6 +797,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &123467809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -976,6 +980,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &179600838
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1204,6 +1209,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &256333727
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1386,6 +1392,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &296849250
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1568,6 +1575,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &375145579
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1750,6 +1758,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &376263676
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2006,6 +2015,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &495407668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2188,6 +2198,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &552256749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2370,6 +2381,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &564590852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2552,6 +2564,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &593503976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2734,6 +2747,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &596105439
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2999,6 +3013,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &675884441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3181,6 +3196,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &698303318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3363,6 +3379,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &711919877
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3545,6 +3562,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &722891437
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3727,6 +3745,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &736659829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3909,6 +3928,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &753687252
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4091,6 +4111,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &758070970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4248,6 +4269,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1776547489}
+  space: {fileID: 1776547489}
 --- !u!114 &766838818
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4410,6 +4432,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &775541603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4592,6 +4615,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &1030474432
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4774,6 +4798,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1044150509
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4956,6 +4981,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1052163720
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5146,6 +5172,37 @@ MonoBehaviour:
   unlockHold: 0
   moreRewind: 276
   lessRewind: 275
+--- !u!21 &1088520789
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Gui Material
+  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  m_ShaderKeywords: LEAP_GUI_CYLINDRICAL LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_TINTING
+    LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+    - first:
+        name: _MainTex
+      second:
+        m_Texture: {fileID: 28999619041352164, guid: d715cfef32f2e8d4aa73d7bcf5374c1b,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _MainTex2
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &1093556436
 GameObject:
   m_ObjectHideFlags: 0
@@ -5256,6 +5313,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &1093556443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5438,6 +5496,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1122126694
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5582,18 +5641,7 @@ MonoBehaviour:
     CanDuplicate: 0
     HandPostProcesses:
       m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_MethodName: FixedUpdateHand
-          m_Mode: 0
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
+        m_Calls: []
       m_TypeName: Leap.Unity.Hands+HandEvent, Assembly-CSharp, Version=0.0.0.0, Culture=neutral,
         PublicKeyToken=null
 --- !u!114 &1137952027
@@ -5611,8 +5659,8 @@ MonoBehaviour:
   _isHeadMounted: 1
   _temporalWarping: {fileID: 1086618714}
   _frameOptimization: 0
-  _overrideDeviceType: 1
-  _overrideDeviceTypeWith: 1
+  _overrideDeviceType: 0
+  _overrideDeviceTypeWith: 0
   _updateHandInPrecull: 0
 --- !u!114 &1137952028
 MonoBehaviour:
@@ -5736,6 +5784,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1280019405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5918,6 +5967,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &1294748681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6100,6 +6150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &1319104140
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6257,6 +6308,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1776547489}
+  space: {fileID: 1776547489}
 --- !u!114 &1369518620
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6451,6 +6503,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1403298038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6633,6 +6686,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &1404855188
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6815,6 +6869,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1415579351
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6997,6 +7052,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1419064053
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7179,6 +7235,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1459435855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7371,6 +7428,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1564342059
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7553,6 +7611,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1571047529
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7735,6 +7794,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1593125183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7917,6 +7977,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &1625780164
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8229,6 +8290,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &1650869440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8411,6 +8473,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1660757708
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8593,6 +8656,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &1715286123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8783,7 +8847,7 @@ MonoBehaviour:
     _filterMode: 1
     _format: 5
     _maxAtlasSize: 4096
-  _material: {fileID: 2043844577}
+  _material: {fileID: 1088520789}
   _meshes: {fileID: 11400000, guid: 336dd8449b760be458d8e0710f0b687f, type: 2}
   _packedTextures: {fileID: 11400000, guid: d715cfef32f2e8d4aa73d7bcf5374c1b, type: 2}
   _channelMapping:
@@ -9175,6 +9239,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1776547489}
+  space: {fileID: 1776547489}
   _radius: 0.5
 --- !u!114 &1776547490
 MonoBehaviour:
@@ -9418,6 +9483,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &1776885065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9600,6 +9666,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &1776897088
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9886,6 +9953,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1800289356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10068,6 +10136,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &1821969824
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10287,6 +10356,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &1849518355
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -10572,6 +10642,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
 --- !u!114 &2037860244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10644,37 +10715,6 @@ SpringJoint:
   m_BreakTorque: Infinity
   m_EnableCollision: 0
   m_EnablePreprocessing: 1
---- !u!21 &2043844577
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Gui Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: LEAP_GUI_CYLINDRICAL LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_TINTING
-    LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
-  m_LightmapFlags: 5
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  m_SavedProperties:
-    serializedVersion: 2
-    m_TexEnvs:
-    - first:
-        name: _MainTex
-      second:
-        m_Texture: {fileID: 28464397313471844, guid: d715cfef32f2e8d4aa73d7bcf5374c1b,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - first:
-        name: _MainTex2
-      second:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &2101149217
 GameObject:
   m_ObjectHideFlags: 0
@@ -10785,6 +10825,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &2101149224
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11004,6 +11045,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 1369518619}
+  space: {fileID: 1776547489}
 --- !u!114 &2118264955
 MonoBehaviour:
   m_ObjectHideFlags: 3

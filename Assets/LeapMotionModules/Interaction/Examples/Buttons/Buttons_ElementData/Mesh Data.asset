@@ -13,8 +13,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _referenceId: 2016004962
   meshes:
-  - {fileID: 43164609196624478}
---- !u!43 &43164609196624478
+  - {fileID: 43303512715175952}
+--- !u!43 &43303512715175952
 Mesh:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}

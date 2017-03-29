@@ -107,7 +107,7 @@ namespace Leap.Unity.UI.Interaction {
           //Loop through all the candidates
           foreach (InteractionBehaviourBase elem in hoverCandidates) {
             if (elem.ignoreHover) continue;
-            LeapGuiElement element = elem.GetComponent<LeapGuiElement>();
+            ISpaceComponent element = elem.GetComponent<ISpaceComponent>();
             if (element != null) {
               CheckHoverForElement(fingerTip, elem, element, i, leastFingerDistance, leastHandDistance, ref results);
             } else {
@@ -121,23 +121,21 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public Vector3 transformPoint(Vector3 worldPoint, ISpaceComponent element) {
-      LeapSpace rootSpace = element.anchor.GetComponentInParent<LeapSpace>();
-      Vector3 localPos = rootSpace.transform.InverseTransformPoint(worldPoint);
-      return rootSpace.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPos));
+      Vector3 localPos = element.anchor.space.transform.InverseTransformPoint(worldPoint);
+      return element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPos));
     }
 
     public void coarseInverseTransformHand(Hand inHand, ISpaceComponent element) {
-      LeapSpace rootSpace = element.anchor.GetComponentInParent<LeapSpace>();
-      Vector3 localPalmPos = rootSpace.transform.InverseTransformPoint(inHand.PalmPosition.ToVector3());
-      Quaternion localPalmRot = rootSpace.transform.InverseTransformRotation(inHand.Rotation.ToQuaternion());
+      Vector3 localPalmPos = element.anchor.space.transform.InverseTransformPoint(inHand.PalmPosition.ToVector3());
+      Quaternion localPalmRot = element.anchor.space.transform.InverseTransformRotation(inHand.Rotation.ToQuaternion());
 
-      inHand.SetTransform(rootSpace.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPalmPos)),
-                          rootSpace.transform.TransformRotation(element.anchor.transformer.InverseTransformRotation(localPalmPos, localPalmRot)));
+      inHand.SetTransform(element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPalmPos)),
+                          element.anchor.space.transform.TransformRotation(element.anchor.transformer.InverseTransformRotation(localPalmPos, localPalmRot)));
     }
 
-    private void CheckHoverForElement(Vector3 position, InteractionBehaviourBase behaviour, LeapGuiElement element, int whichFinger, float leastFingerDistance, float leastHandDistance, ref HoverCheckResults curResults) {
+    private void CheckHoverForElement(Vector3 position, InteractionBehaviourBase behaviour, ISpaceComponent element, int whichFinger, float leastFingerDistance, float leastHandDistance, ref HoverCheckResults curResults) {
       //NEED BETTER DISTANCE FUNCTION
-      float dist = Vector3.SqrMagnitude(element.transform.position - transformPoint(position, element));
+      float dist = Vector3.SqrMagnitude(((Component)element).transform.position - transformPoint(position, element));
 
       if (dist < leastFingerDistance) {
         curResults.perFingerHovered[whichFinger] = behaviour;
