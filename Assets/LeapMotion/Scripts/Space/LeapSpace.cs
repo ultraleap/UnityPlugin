@@ -59,9 +59,12 @@ namespace Leap.Unity.Space {
     ///  - The relative position in the hierarchy of any two anchors changes.
     /// </summary>
     public void RebuildHierarchy() {
+      Assert.IsTrue(enabled, "Should never call RebuildHierarchy on a disabled space.");
+
       _anchors.Clear();
       rebuildHierarchyRecursively(transform);
 
+      Assert.IsTrue(_anchors.Count > 0, "There should always be at least a single anchor (this one).");
       Assert.AreEqual(_anchors[0], this, "A space should always be the first element in the anchor list.");
     }
 
@@ -70,6 +73,8 @@ namespace Leap.Unity.Space {
     /// anchor or parent of an anchor changes it's transform.
     /// </summary>
     public void RecalculateTransformers() {
+      Assert.IsTrue(enabled, "Should never call RecalculateTransformers on a disabled space.");
+
       transformer = CosntructBaseTransformer();
 
       //Depth-first pre-order ensures that a parent already has it's transformer up-to-date

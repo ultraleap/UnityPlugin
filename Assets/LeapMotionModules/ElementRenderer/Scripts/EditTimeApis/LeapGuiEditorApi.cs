@@ -85,20 +85,9 @@ public partial class LeapGui : MonoBehaviour {
     }
 
     public void DoLateUpdateEditor() {
+      validateSpaceComponent();
+
       bool needsRebuild = false;
-
-      if (_gui._space != null && !_gui._space.enabled) {
-        _gui._space = null;
-        needsRebuild = true;
-      }
-
-      if (_gui._space == null) {
-        var potentialSpace = _gui.GetComponent<LeapSpace>();
-        if (potentialSpace != null && potentialSpace.enabled) {
-          _gui._space = potentialSpace;
-          needsRebuild = true;
-        }
-      }
 
       using (new ProfilerSample("Calculate Should Rebuild")) {
         foreach (var group in _gui._groups) {
@@ -130,6 +119,8 @@ public partial class LeapGui : MonoBehaviour {
     }
 
     public void DoEditorUpdateLogic(bool fullRebuild, bool heavyRebuild) {
+      validateSpaceComponent();
+
       if (fullRebuild) {
         if (_gui._space != null) {
           _gui._space.RebuildHierarchy();
@@ -150,6 +141,19 @@ public partial class LeapGui : MonoBehaviour {
 
       foreach (var group in _gui._groups) {
         group.UpdateRenderer();
+      }
+    }
+
+    private void validateSpaceComponent() {
+      if (_gui._space != null && !_gui._space.enabled) {
+        _gui._space = null;
+      }
+
+      if (_gui._space == null) {
+        var potentialSpace = _gui.GetComponent<LeapSpace>();
+        if (potentialSpace != null && potentialSpace.enabled) {
+          _gui._space = potentialSpace;
+        }
       }
     }
   }
