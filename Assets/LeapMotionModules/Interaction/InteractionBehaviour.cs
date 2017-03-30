@@ -350,15 +350,11 @@ namespace Leap.Unity.UI.Interaction {
       EvaluatePrimaryHoverCloseness(hand);
       _primaryHoveringHandsCount++;
 
-      //GetComponent<LeapGuiElement>().Tint().tint = Color.red;
-
       OnPrimaryHoverBegin(hand);
     }
 
     public override void PrimaryHoverStay(Hand hand) {
       EvaluatePrimaryHoverCloseness(hand);
-
-      //GetComponent<LeapGuiElement>().Tint().tint = Color.red;
 
       OnPrimaryHoverStay(hand);
     }
@@ -382,9 +378,6 @@ namespace Leap.Unity.UI.Interaction {
       if (_primaryHoveringHandsCount == 0) {
         _closestJustStoppedPrimaryHoveringHand = hand;
       }
-
-
-      //GetComponent<LeapGuiElement>().Tint().tint = Color.white;
 
       OnPrimaryHoverEnd(hand);
     }
