@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using Leap.Unity.Attributes;
@@ -16,12 +17,9 @@ namespace Leap.Unity.UI.Interaction {
     public UnityEvent OnPress = new UnityEvent();
     public UnityEvent OnUnpress = new UnityEvent();
 
-    [HideInInspector]
-    public bool isDepressed = false;
-    [HideInInspector]
-    public bool depressedThisFrame = false;
-    [HideInInspector]
-    public bool unDepressedThisFrame = false;
+    public bool isDepressed { get; protected set; }
+    public bool depressedThisFrame { get; protected set; }
+    public bool unDepressedThisFrame { get; protected set; }
 
     private InteractionBehaviour behaviour;
     private Rigidbody body;
@@ -29,7 +27,6 @@ namespace Leap.Unity.UI.Interaction {
     private Vector3 PhysicsPosition = Vector3.zero;
     private Vector3 PhysicsVelocity = Vector3.zero;
     private bool physicsOccurred = false;
-    private bool prevDepressed = false;
     private PointerEventData pointerEvent;
     private LeapGuiElement element;
     private Color hoverTint = Color.white;
@@ -82,6 +79,8 @@ namespace Leap.Unity.UI.Interaction {
         Vector3 newWorldPhysicsVelocity = transform.parent.TransformDirection(localPhysicsVelocity);
         PhysicsVelocity = newWorldPhysicsVelocity.normalized * Mathf.Clamp(newWorldPhysicsVelocity.magnitude, -1f, 1f);
 
+        bool oldDepressed = isDepressed;
+
         if (localPhysicsPosition.z > InitialLocalPosition.z - MinMaxHeight.x) {
           transform.localPosition = new Vector3(InitialLocalPosition.x, InitialLocalPosition.y, InitialLocalPosition.z - MinMaxHeight.x);
           PhysicsVelocity = PhysicsVelocity / 2f;
@@ -97,21 +96,19 @@ namespace Leap.Unity.UI.Interaction {
           transform.localPosition = localPhysicsPosition;
           isDepressed = false;
         }
-      }
 
-      if (isDepressed && !prevDepressed) {
-        prevDepressed = true;
-        depressedThisFrame = true;
-        ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerEnterHandler);
-        ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerDownHandler);
-        OnPress.Invoke();
-      } else if (!isDepressed && prevDepressed) {
-        prevDepressed = false;
-        unDepressedThisFrame = true;
-        ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerExitHandler);
-        ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerClickHandler);
-        ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerUpHandler);
-        OnUnpress.Invoke();
+        if (isDepressed && !oldDepressed) {
+          depressedThisFrame = true;
+          ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerEnterHandler);
+          ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerDownHandler);
+          OnPress.Invoke();
+        } else if (!isDepressed && oldDepressed) {
+          unDepressedThisFrame = true;
+          ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerExitHandler);
+          ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerClickHandler);
+          ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerUpHandler);
+          OnUnpress.Invoke();
+        }
       }
 
       if (element != null) {

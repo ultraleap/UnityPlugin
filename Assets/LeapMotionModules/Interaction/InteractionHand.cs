@@ -68,9 +68,10 @@ namespace Leap.Unity.UI.Interaction {
         ProcessPrimaryHoverCheckResults(hoverResults);
       }
 
-      if (_hand != null && hoverResults.primaryHovered != null && hoverResults.primaryHovered.GetComponent<LeapGuiElement>()!=null) {
+      ISpaceComponent space;
+      if (_hand != null && hoverResults.primaryHovered != null && (space = hoverResults.primaryHovered.GetComponent<ISpaceComponent>()) != null) {
         //Transform bulk hand to the closest element's warped space
-        coarseInverseTransformHand(_hand, hoverResults.primaryHovered.GetComponent<ISpaceComponent>());
+        coarseInverseTransformHand(_hand, space);
       }
     }
 
