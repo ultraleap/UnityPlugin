@@ -190,8 +190,8 @@ namespace Leap.Unity.UI.Interaction {
       }
 
       // Perform each hand's FixedUpdateHand.
-      foreach (var interactionHand in _interactionHands) {
-        interactionHand.FixedUpdateHand(enableHovering, enableContact, enableGrasping);
+      for (int i = 0; i < _interactionHands.Length; i++) {
+        _interactionHands[i].FixedUpdateHand(enableHovering, enableContact, enableGrasping);
       }
 
       // Perform each interaction object's FixedUpdateObject.
@@ -253,7 +253,11 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    /// <summary> Returns true if the object was released from a grasped hand, or false if the object was not held in the first place. </summary>
+    /// <summary>
+    /// Returns true if the object was released from a grasped hand, or false
+    /// if the object was not held in the first place. This method will fail and return
+    /// false if the argument interaction object is not registered with this manager.
+    /// </summary>
     public bool TryReleaseObjectFromGrasp(InteractionBehaviourBase interactionObj) {
       if (!_interactionBehaviours.Contains(interactionObj)) {
         Debug.LogError("ReleaseObjectFromGrasp was called, but the interaction object " + interactionObj.transform.name + " is not registered"

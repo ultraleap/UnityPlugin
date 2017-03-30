@@ -695,19 +695,33 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Grasping
 
-    private HeuristicGrabClassifier __grabClassifier;
-    private HeuristicGrabClassifier _grabClassifier {
+    private HeuristicGrabClassifier _grabClassifier;
+    private HeuristicGrabClassifier grabClassifier {
       get {
-        if (__grabClassifier == null) __grabClassifier = new HeuristicGrabClassifier(this);
-        return __grabClassifier;
+        if (_grabClassifier == null) _grabClassifier = new HeuristicGrabClassifier(this);
+        return _grabClassifier;
       }
     }
 
     private InteractionBehaviourBase _graspedObject;
 
     private void FixedUpdateGrasping() {
-      _grabClassifier.FixedUpdateHeuristicClassifier(_hand);
+      // Suspension / Resume
+      if (_graspedObject != null) {
+        if (_hand == null && !_graspedObject.isSuspended) {
+          _graspedObject.GraspSuspendObject();
+        }
+        else if (_hand != null && _graspedObject.isSuspended) {
+          _graspedObject.GraspResumeObject();
+        }
+      }
 
+      // Grab classifier update
+      if (_graspedObject == null || !_graspedObject.isSuspended) {
+        grabClassifier.FixedUpdateHeuristicClassifier(_hand);
+      }
+
+      // Call GraspHold if still grasping the object
       if (_graspedObject != null) {
         if (_graspedObject.ignoreGrasping) {
           ReleaseGrasp();
@@ -719,11 +733,6 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public void Grasp(InteractionBehaviourBase interactionObj) {
-      if (_graspedObject != null) {
-        Debug.LogError("Grasp was called, but the hand was already grasping an object.");
-        ReleaseGrasp();
-      }
-
       interactionObj.GraspBegin(_hand);
       _graspedObject = interactionObj;
     }
@@ -740,8 +749,8 @@ namespace Leap.Unity.UI.Interaction {
         EnableSoftContact();
       }
 
-      _grabClassifier.NotifyGraspReleased(_graspedObject);
-      _graspedObject.GraspEnd(_hand);
+      grabClassifier.NotifyGraspReleased(_graspedObject);
+      _graspedObject.GraspEnd(this);
       _graspedObject = null;
     }
 
@@ -772,7 +781,7 @@ namespace Leap.Unity.UI.Interaction {
       }
       int numGraspingFingertips;
       Vector3 sum = Vector3.zero; ;
-      _grabClassifier.GetGraspingFingertipPositions(_graspedObject, _graspingFingertipsCache, out numGraspingFingertips);
+      grabClassifier.GetGraspingFingertipPositions(_graspedObject, _graspingFingertipsCache, out numGraspingFingertips);
       if (numGraspingFingertips == 0) {
         Debug.LogError("Cannot compute grasp point: The hand has a grasped object, but this object is not classified as grasped by the classifier.");
       }

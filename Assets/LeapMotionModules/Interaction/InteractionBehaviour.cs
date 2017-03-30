@@ -60,6 +60,29 @@ namespace Leap.Unity.UI.Interaction {
 
     public override bool isGrasped { get { return _graspCount > 0; } }
 
+    /// <summary>
+    /// Releases this object from the hand currently grasping it, if it is grasped, and
+    /// returns true. If the object was not grasped, this method returns false. The object
+    /// is guaranteed not to be held directly after calling this method.
+    /// </summary>
+    public bool ReleaseFromGrasp() {
+      return interactionManager.TryReleaseObjectFromGrasp(this);
+    }
+
+    /// <summary>
+    /// Called when the hand that is grasping this interaction object loses tracking. This can occur if
+    /// the hand leaves the device's field of view, or is fully occluded by another (real-world) object.
+    /// 
+    /// By default, grasped objects will hang in the air until the hand grasping them resumes tracking.
+    /// Subscribe to this message to implement, e.g., the object disappearing and re-appearing.
+    /// </summary>
+    public Action<InteractionBehaviour> OnSuspend = (intObj) => { };
+
+    /// <summary>
+    /// Called when the hand grasping this interaction object resume tracking after having been suspended.
+    /// </summary>
+    public Action<InteractionBehaviour> OnResume = (intObj) => { };
+
     /// <summary> Called directly after the grasped object's Rigidbody has had its position and rotation set
     /// by the GraspedPoseController (which moves the object realistically with the hand). Subscribe to this
     /// callback if you'd like to override the default behaviour for grasping. 
@@ -116,6 +139,27 @@ namespace Leap.Unity.UI.Interaction {
 
     #endregion
 
+    #region Forces API
+
+    /// <summary>
+    /// Adds a linear acceleration to the center of mass of this object. 
+    /// Use this instead of Rigidbody.AddForce() to accelerate an Interaction object.
+    /// </summary>
+    public void AddLinearAcceleration(Vector3 acceleration) {
+      _accumulatedLinearAcceleration += acceleration;
+    }
+
+    /// <summary>
+    /// Adds an angular acceleration to the center of mass of this object. 
+    /// Use this instead of Rigidbody.AddTorque() to add angular acceleration 
+    /// to an Interaction object.
+    /// </summary>
+    public void AddAngularAcceleration(Vector3 acceleration) {
+      _accumulatedAngularAcceleration += acceleration;
+    }
+
+    #endregion
+
     #endregion
 
     [Tooltip("Should hands move the object as if it is held when the object is grasped? "
@@ -168,7 +212,7 @@ namespace Leap.Unity.UI.Interaction {
 
     /// <summary>
     /// InteractionManager manually calls this directly
-    /// after all InteractionHands are updated (in FixedUpdate).
+    /// after all InteractionHands are updated (in its own FixedUpdate).
     /// 
     /// Hovering uses its update to provide per-object (as opposed to per-hand)
     /// hover callbacks, e.g. OnObjectHoverStay(), which fires once per frame
@@ -199,47 +243,6 @@ namespace Leap.Unity.UI.Interaction {
     void OnDestroy() {
       interactionManager.UnregisterInteractionBehaviour(this);
     }
-
-    #region Forces
-
-    protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
-    protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
-
-    /// <summary>
-    /// Adds a linear acceleration to the center of mass of this object. 
-    /// Use this instead of Rigidbody.AddForce() to accelerate an Interaction object.
-    /// </summary>
-    public void AddLinearAcceleration(Vector3 acceleration) {
-      _accumulatedLinearAcceleration += acceleration;
-    }
-
-    /// <summary>
-    /// Adds an angular acceleration to the center of mass of this object. 
-    /// Use this instead of Rigidbody.AddTorque() to add angular acceleration 
-    /// to an Interaction object.
-    /// </summary>
-    public void AddAngularAcceleration(Vector3 acceleration) {
-      _accumulatedAngularAcceleration += acceleration;
-    }
-
-    public void FixedUpdateForces() {
-      if (!isGrasped) {
-        //Only apply if non-zero to prevent waking up the body
-        if (_accumulatedLinearAcceleration != Vector3.zero) {
-          rigidbody.velocity += _accumulatedLinearAcceleration * Time.fixedDeltaTime;
-        }
-
-        if (_accumulatedAngularAcceleration != Vector3.zero) {
-          rigidbody.angularVelocity += _accumulatedAngularAcceleration * Time.fixedDeltaTime;
-        }
-
-        //Reset so we can accumulate for the next frame
-        _accumulatedLinearAcceleration = Vector3.zero;
-        _accumulatedAngularAcceleration = Vector3.zero;
-      }
-    }
-
-    #endregion
 
     #region Hovering
 
@@ -623,14 +626,13 @@ namespace Leap.Unity.UI.Interaction {
       OnGraspHold(hand);
     }
 
-    public override void GraspEnd(Hand hand) {
+    public override void GraspEnd(InteractionHand intHand) {
       _graspCount--;
 
-      InteractionHand graspingIntHand = interactionManager.GetInteractionHand(hand);
-      _graspingIntHands.Remove(graspingIntHand);
+      _graspingIntHands.Remove(intHand);
 
       if (moveObjectWhenGrasped) {
-        graspedPoseController.RemoveHand(graspingIntHand);
+        graspedPoseController.RemoveHand(intHand);
       }
 
       // Revert kinematic state if the grasp has ended
@@ -638,18 +640,50 @@ namespace Leap.Unity.UI.Interaction {
         rigidbody.isKinematic = _wasKinematicBeforeGrab;
       }
 
-      throwController.OnThrow(this, hand);
+      // If the grasp was causing the object to be suspended, stop being suspended.
+      if (intHand.GetLeapHand() == null && this.isSuspended) {
+        this.GraspResumeObject();
+      }
 
-      OnGraspEnd(hand);
+      throwController.OnThrow(this, intHand.GetLastTrackedLeapHand());
+
+      OnGraspEnd(intHand.GetLastTrackedLeapHand());
     }
 
-    // TODO: Implement suspend/resume callbacks and example behavior.
-    public override void GraspSuspendObject(Hand hand) {
-      throw new System.NotImplementedException();
+    // Suspension / Resume
+
+    public override void GraspSuspendObject() {
+      _isSuspended = true;
+      OnSuspend(this);
     }
 
-    public override void GraspResumeObject(Hand hand) {
-      throw new System.NotImplementedException();
+    public override void GraspResumeObject() {
+      _isSuspended = false;
+      OnResume(this);
+    }
+
+    #endregion
+
+    #region Forces
+
+    protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
+    protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
+
+    public void FixedUpdateForces() {
+      if (!isGrasped) {
+        //Only apply if non-zero to prevent waking up the body
+        if (_accumulatedLinearAcceleration != Vector3.zero) {
+          rigidbody.velocity += _accumulatedLinearAcceleration * Time.fixedDeltaTime;
+        }
+
+        if (_accumulatedAngularAcceleration != Vector3.zero) {
+          rigidbody.angularVelocity += _accumulatedAngularAcceleration * Time.fixedDeltaTime;
+        }
+
+        //Reset so we can accumulate for the next frame
+        _accumulatedLinearAcceleration = Vector3.zero;
+        _accumulatedAngularAcceleration = Vector3.zero;
+      }
     }
 
     #endregion
