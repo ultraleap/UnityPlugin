@@ -22,6 +22,7 @@ namespace Leap.Unity.UI.Interaction {
     private bool prevDepressed = false;
     private PointerEventData pointerEvent;
     private LeapGuiElement element;
+    private Color hoverTint = Color.white;
 
     //Reset the Positions of the UI Elements on both Start and Quit
     void Start() {
@@ -95,11 +96,11 @@ namespace Leap.Unity.UI.Interaction {
       }
 
       if (element != null) {
-        Color hoverTint = Color.white;
         if (behaviour.isPrimaryHovered) {
           hoverTint = Color.red;
           behaviour.ignoreContact = false;
         } else {
+          hoverTint = Color.Lerp(hoverTint, Color.white, 0.1f);
           behaviour.ignoreContact = true;
         }
         element.Tint().tint = hoverTint;
