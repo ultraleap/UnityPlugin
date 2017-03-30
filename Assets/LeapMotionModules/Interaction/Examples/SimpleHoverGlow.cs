@@ -35,6 +35,12 @@ public class SimpleHoverGlow : MonoBehaviour {
         _material.SetColor(_emissionPropertyId, new Color(glow, glow, glow, 1F));
       }
     }
+
+    if (Input.GetKeyDown(KeyCode.Space)) {
+      if (_intObj.isSuspended) {
+        _intObj.ReleaseFromGrasp();
+      }
+    }
   }
 
 }

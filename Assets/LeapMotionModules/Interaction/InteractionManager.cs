@@ -253,7 +253,11 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    /// <summary> Returns true if the object was released from a grasped hand, or false if the object was not held in the first place. </summary>
+    /// <summary>
+    /// Returns true if the object was released from a grasped hand, or false
+    /// if the object was not held in the first place. This method will fail and return
+    /// false if the argument interaction object is not registered with this manager.
+    /// </summary>
     public bool TryReleaseObjectFromGrasp(InteractionBehaviourBase interactionObj) {
       if (!_interactionBehaviours.Contains(interactionObj)) {
         Debug.LogError("ReleaseObjectFromGrasp was called, but the interaction object " + interactionObj.transform.name + " is not registered"

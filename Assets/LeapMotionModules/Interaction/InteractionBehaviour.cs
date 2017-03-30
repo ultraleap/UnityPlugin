@@ -61,6 +61,15 @@ namespace Leap.Unity.UI.Interaction {
     public override bool isGrasped { get { return _graspCount > 0; } }
 
     /// <summary>
+    /// Releases this object from the hand currently grasping it, if it is grasped, and
+    /// returns true. If the object was not grasped, this method returns false. The object
+    /// is guaranteed not to be held directly after calling this method.
+    /// </summary>
+    public bool ReleaseFromGrasp() {
+      return interactionManager.TryReleaseObjectFromGrasp(this);
+    }
+
+    /// <summary>
     /// Called when the hand that is grasping this interaction object loses tracking. This can occur if
     /// the hand leaves the device's field of view, or is fully occluded by another (real-world) object.
     /// 
@@ -629,6 +638,11 @@ namespace Leap.Unity.UI.Interaction {
       // Revert kinematic state if the grasp has ended
       if (_graspCount == 0) {
         rigidbody.isKinematic = _wasKinematicBeforeGrab;
+      }
+
+      // If the grasp was causing the object to be suspended, stop being suspended.
+      if (intHand.GetLeapHand() == null && this.isSuspended) {
+        this.GraspResumeObject();
       }
 
       throwController.OnThrow(this, intHand.GetLastTrackedLeapHand());
