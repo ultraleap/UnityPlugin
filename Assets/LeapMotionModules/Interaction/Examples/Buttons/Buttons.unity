@@ -268,6 +268,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1001 &71697668
 Prefab:
   m_ObjectHideFlags: 0
@@ -490,6 +503,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &107997306
 GameObject:
   m_ObjectHideFlags: 0
@@ -666,6 +692,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &123467802
 GameObject:
   m_ObjectHideFlags: 0
@@ -842,6 +881,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &179600831
 GameObject:
   m_ObjectHideFlags: 0
@@ -1018,6 +1070,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1001 &181990465
 Prefab:
   m_ObjectHideFlags: 0
@@ -1240,6 +1305,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &296849243
 GameObject:
   m_ObjectHideFlags: 0
@@ -1416,6 +1494,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &375145572
 GameObject:
   m_ObjectHideFlags: 0
@@ -1592,6 +1683,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &376263669
 GameObject:
   m_ObjectHideFlags: 0
@@ -1768,6 +1872,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &440484284
 GameObject:
   m_ObjectHideFlags: 0
@@ -1831,8 +1948,8 @@ MonoBehaviour:
   enableContact: 1
   enableGrasping: 1
   _showAdvancedSettings: 1
-  hoverActivationRadius: 0.5
-  touchActivationRadius: 0.15
+  hoverActivationRadius: 0.2
+  touchActivationRadius: 0.07
   _autoGenerateLayers: 1
   _templateLayer:
     layerIndex: 0
@@ -2034,6 +2151,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &552256742
 GameObject:
   m_ObjectHideFlags: 0
@@ -2210,6 +2340,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &564590845
 GameObject:
   m_ObjectHideFlags: 0
@@ -2386,6 +2529,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &593503969
 GameObject:
   m_ObjectHideFlags: 0
@@ -2562,6 +2718,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &596105432
 GameObject:
   m_ObjectHideFlags: 0
@@ -2738,6 +2907,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
+--- !u!21 &627296491
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Gui Material
+  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  m_ShaderKeywords: LEAP_GUI_CYLINDRICAL LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_TINTING
+    LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+    - first:
+        name: _MainTex
+      second:
+        m_Texture: {fileID: 28243838908581564, guid: d715cfef32f2e8d4aa73d7bcf5374c1b,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _MainTex2
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &658088851
 GameObject:
   m_ObjectHideFlags: 0
@@ -2997,6 +3210,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &698303311
 GameObject:
   m_ObjectHideFlags: 0
@@ -3173,6 +3399,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &711919870
 GameObject:
   m_ObjectHideFlags: 0
@@ -3349,6 +3588,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &722891430
 GameObject:
   m_ObjectHideFlags: 0
@@ -3525,6 +3777,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &736659822
 GameObject:
   m_ObjectHideFlags: 0
@@ -3701,6 +3966,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &753687245
 GameObject:
   m_ObjectHideFlags: 0
@@ -3877,6 +4155,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &758070963
 GameObject:
   m_ObjectHideFlags: 0
@@ -4053,6 +4344,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &766838814
 GameObject:
   m_ObjectHideFlags: 0
@@ -4367,6 +4671,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1030474425
 GameObject:
   m_ObjectHideFlags: 0
@@ -4543,6 +4860,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1044150502
 GameObject:
   m_ObjectHideFlags: 0
@@ -4719,6 +5049,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1052163713
 GameObject:
   m_ObjectHideFlags: 0
@@ -4895,6 +5238,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1076425313
 GameObject:
   m_ObjectHideFlags: 0
@@ -5189,6 +5545,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1122126687
 GameObject:
   m_ObjectHideFlags: 0
@@ -5365,6 +5734,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1137952024
 GameObject:
   m_ObjectHideFlags: 0
@@ -5646,6 +6028,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1294748674
 GameObject:
   m_ObjectHideFlags: 0
@@ -5822,6 +6217,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1319104133
 GameObject:
   m_ObjectHideFlags: 0
@@ -5998,6 +6406,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1369518616
 GameObject:
   m_ObjectHideFlags: 0
@@ -6344,6 +6765,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1404855181
 GameObject:
   m_ObjectHideFlags: 0
@@ -6520,6 +6954,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1415579344
 GameObject:
   m_ObjectHideFlags: 0
@@ -6696,6 +7143,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1419064046
 GameObject:
   m_ObjectHideFlags: 0
@@ -6872,6 +7332,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1459435848
 GameObject:
   m_ObjectHideFlags: 0
@@ -7048,6 +7521,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!4 &1511341752 stripped
 Transform:
   m_PrefabParentObject: {fileID: 464466, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
@@ -7234,6 +7720,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1571047522
 GameObject:
   m_ObjectHideFlags: 0
@@ -7410,6 +7909,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1593125176
 GameObject:
   m_ObjectHideFlags: 0
@@ -7586,6 +8098,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1625780157
 GameObject:
   m_ObjectHideFlags: 0
@@ -7762,6 +8287,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1643924751
 GameObject:
   m_ObjectHideFlags: 0
@@ -8068,6 +8606,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1660757701
 GameObject:
   m_ObjectHideFlags: 0
@@ -8244,6 +8795,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1715286116
 GameObject:
   m_ObjectHideFlags: 0
@@ -8420,6 +8984,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1776547483
 GameObject:
   m_ObjectHideFlags: 0
@@ -8538,7 +9115,7 @@ MonoBehaviour:
     _filterMode: 1
     _format: 5
     _maxAtlasSize: 4096
-  _material: {fileID: 1931851635}
+  _material: {fileID: 627296491}
   _meshes: {fileID: 11400000, guid: 336dd8449b760be458d8e0710f0b687f, type: 2}
   _packedTextures: {fileID: 11400000, guid: d715cfef32f2e8d4aa73d7bcf5374c1b, type: 2}
   _channelMapping:
@@ -9240,6 +9817,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1776897081
 GameObject:
   m_ObjectHideFlags: 0
@@ -9416,6 +10006,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1794650928
 GameObject:
   m_ObjectHideFlags: 0
@@ -9696,6 +10299,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1821969817
 GameObject:
   m_ObjectHideFlags: 0
@@ -9872,6 +10488,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &1849518346
 GameObject:
   m_ObjectHideFlags: 0
@@ -10048,6 +10677,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!4 &1850703573 stripped
 Transform:
   m_PrefabParentObject: {fileID: 464466, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
@@ -10058,37 +10700,6 @@ MonoBehaviour:
     type: 2}
   m_PrefabInternal: {fileID: 181990465}
   m_Script: {fileID: 11500000, guid: a04122797dd84ca43a07055f12d91e0f, type: 3}
---- !u!21 &1931851635
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Gui Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: LEAP_GUI_CYLINDRICAL LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_TINTING
-    LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
-  m_LightmapFlags: 5
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  m_SavedProperties:
-    serializedVersion: 2
-    m_TexEnvs:
-    - first:
-        name: _MainTex
-      second:
-        m_Texture: {fileID: 28243838908581564, guid: d715cfef32f2e8d4aa73d7bcf5374c1b,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - first:
-        name: _MainTex2
-      second:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &1952176545
 GameObject:
   m_ObjectHideFlags: 0
@@ -10395,6 +11006,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &2101149217
 GameObject:
   m_ObjectHideFlags: 0
@@ -10571,6 +11195,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
 --- !u!1 &2118264946
 GameObject:
   m_ObjectHideFlags: 0
@@ -10747,3 +11384,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  isDepressed: 0
+  depressedThisFrame: 0
+  unDepressedThisFrame: 0
