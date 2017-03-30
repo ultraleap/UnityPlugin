@@ -32,43 +32,46 @@ namespace Leap.Unity.UI.Interaction {
       this.activationRadius = activationRadius;
     }
 
-    public void FixedUpdateHand(Vector3 palmPosition, List<LeapSpace> spaces = null) {
-      _activeBehaviours.Clear();
+    public void FixedUpdatePosition(Vector3 palmPosition, List<LeapSpace> spaces = null) {
+      using (new ProfilerSample("Update "+ (spaces==null?"Touch" : "Hover") + " Actvity Manager")) {
+        _activeBehaviours.Clear();
 
-      if (palmPosition != Vector3.zero) {
-        int count = GetSphereColliderResults(palmPosition, ref _colliderResultsBuffer);
-        UpdateActiveList(count, _colliderResultsBuffer);
+        if (palmPosition != Vector3.zero) {
+          int count = GetSphereColliderResults(palmPosition, ref _colliderResultsBuffer);
+          UpdateActiveList(count, _colliderResultsBuffer);
 
-        if (spaces != null) {
-          //Check once in each of the GUI's subspaces
-          foreach (LeapSpace space in spaces) {
-            count = GetSphereColliderResults(transformPoint(palmPosition, space), ref _colliderResultsBuffer);
-            UpdateActiveList(count, _colliderResultsBuffer);
+          if (spaces != null) {
+            //Check once in each of the GUI's subspaces
+            foreach (LeapSpace space in spaces) {
+              count = GetSphereColliderResults(transformPoint(palmPosition, space), ref _colliderResultsBuffer);
+              UpdateActiveList(count, _colliderResultsBuffer);
+            }
           }
         }
       }
     }
 
     private int GetSphereColliderResults(Vector3 position, ref Collider[] resultsBuffer) {
-      int overlapCount = 0;
-      while (true) {
-        overlapCount = Physics.OverlapSphereNonAlloc(position,
-                                                     activationRadius,
-                                                     resultsBuffer,
-                                                     manager.interactionLayer.layerMask | manager.interactionNoContactLayer.layerMask,
-                                                     QueryTriggerInteraction.Collide);
-        if (overlapCount < resultsBuffer.Length) {
-          break;
+      using (new ProfilerSample("GetSphereColliderResults()")) {
+        int overlapCount = 0;
+        while (true) {
+          overlapCount = Physics.OverlapSphereNonAlloc(position,
+                                                       activationRadius,
+                                                       resultsBuffer,
+                                                       manager.interactionLayer.layerMask | manager.interactionNoContactLayer.layerMask,
+                                                       QueryTriggerInteraction.Collide);
+          if (overlapCount < resultsBuffer.Length) {
+            break;
+          } else {
+            // Non-allocating sphere-overlap fills the existing _resultsBuffer array.
+            // If the output overlapCount is equal to the array's length, there might be more collision results
+            // that couldn't be returned because the array wasn't large enough, so try again with increased length.
+            // The _in, _out argument setup allows allocating a new array from within this function.
+            resultsBuffer = new Collider[resultsBuffer.Length * 2];
+          }
         }
-        else {
-          // Non-allocating sphere-overlap fills the existing _resultsBuffer array.
-          // If the output overlapCount is equal to the array's length, there might be more collision results
-          // that couldn't be returned because the array wasn't large enough, so try again with increased length.
-          // The _in, _out argument setup allows allocating a new array from within this function.
-          resultsBuffer = new Collider[resultsBuffer.Length * 2];
-        }
+        return overlapCount;
       }
-      return overlapCount;
     }
 
     private void UpdateActiveList(int numResults, Collider[] results) {

@@ -42,7 +42,7 @@ namespace Leap.Unity.UI.Interaction {
       _handToPoints[hand] = newPoints;
 
       for (int f = 0; f < NUM_FINGERS; f++) {
-        Finger finger = hand.GetLeapHand().Fingers[f];
+        Finger finger = hand.GetLastTrackedLeapHand().Fingers[f];
         Finger.FingerType fingerType = finger.Type;
 
         for (int j = 0; j < NUM_BONES; j++) {
