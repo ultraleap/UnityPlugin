@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using Leap.Unity.Attributes;
 
@@ -6,11 +7,21 @@ namespace Leap.Unity.UI.Interaction {
   /** A physics-enabled button. Activation is triggered by physically pushing the button back to its unsprung position. */
   [RequireComponent(typeof(InteractionBehaviour))]
   public class InteractionButton : MonoBehaviour {
-
     //[MinMax(0f, 0.1f)]
+    [Tooltip("The minimum and maximum heights the button can exist at.")]
     public Vector2 MinMaxHeight = new Vector2(0f, 0.02f);
-
+    [Tooltip("The height that this button rests at; this value is a lerp in between the min and max height.")]
     public float RestingHeight = 0.5f;
+
+    public UnityEvent OnPress = new UnityEvent();
+    public UnityEvent OnUnpress = new UnityEvent();
+
+    [HideInInspector]
+    public bool isDepressed = false;
+    [HideInInspector]
+    public bool depressedThisFrame = false;
+    [HideInInspector]
+    public bool unDepressedThisFrame = false;
 
     private InteractionBehaviour behaviour;
     private Rigidbody body;
@@ -18,7 +29,6 @@ namespace Leap.Unity.UI.Interaction {
     private Vector3 PhysicsPosition = Vector3.zero;
     private Vector3 PhysicsVelocity = Vector3.zero;
     private bool physicsOccurred = false;
-    private bool isDepressed = false;
     private bool prevDepressed = false;
     private PointerEventData pointerEvent;
     private LeapGuiElement element;
@@ -49,12 +59,13 @@ namespace Leap.Unity.UI.Interaction {
       if (!physicsOccurred) {
         physicsOccurred = true;
         body.position = PhysicsPosition;
-        //Apply the spring force here
-        body.velocity = PhysicsVelocity + new Vector3(0f, 0f, ((InitialLocalPosition.z - Mathf.Lerp(MinMaxHeight.x, MinMaxHeight.y, RestingHeight) - transform.parent.InverseTransformPoint(body.position).z)* transform.parent.lossyScale.z) * 1000f * Time.fixedDeltaTime);
+        body.velocity = PhysicsVelocity;
       }
     }
 
     void Update() {
+      depressedThisFrame = false;
+      unDepressedThisFrame = false;
       pointerEvent.position = Camera.main.WorldToScreenPoint(transform.transform.position);
 
       if (physicsOccurred) {
@@ -66,13 +77,17 @@ namespace Leap.Unity.UI.Interaction {
         PhysicsPosition = newWorldPhysicsPosition;
 
         Vector3 localPhysicsVelocity = transform.parent.InverseTransformDirection(body.velocity);
-        localPhysicsVelocity = new Vector3(0f, 0f, localPhysicsVelocity.z);
+        float springDeltaV = (((InitialLocalPosition.z - Mathf.Lerp(MinMaxHeight.x, MinMaxHeight.y, RestingHeight) - localPhysicsPosition.z) * transform.parent.lossyScale.z)) * 20f;
+        localPhysicsVelocity = new Vector3(0f, 0f, localPhysicsVelocity.z + springDeltaV);
         Vector3 newWorldPhysicsVelocity = transform.parent.TransformDirection(localPhysicsVelocity);
-        PhysicsVelocity = newWorldPhysicsVelocity;
-        
+        PhysicsVelocity = newWorldPhysicsVelocity.normalized * Mathf.Clamp(newWorldPhysicsVelocity.magnitude, -1f, 1f);
+
         if (localPhysicsPosition.z > InitialLocalPosition.z - MinMaxHeight.x) {
           transform.localPosition = new Vector3(InitialLocalPosition.x, InitialLocalPosition.y, InitialLocalPosition.z - MinMaxHeight.x);
           PhysicsVelocity = PhysicsVelocity / 2f;
+          if (!behaviour.isPrimaryHovered) {
+            PhysicsPosition = transform.parent.TransformPoint(InitialLocalPosition);
+          }
           isDepressed = true;
         } else if (localPhysicsPosition.z < InitialLocalPosition.z - MinMaxHeight.y) {
           transform.localPosition = new Vector3(InitialLocalPosition.x, InitialLocalPosition.y, InitialLocalPosition.z - MinMaxHeight.y);
@@ -83,21 +98,25 @@ namespace Leap.Unity.UI.Interaction {
           isDepressed = false;
         }
       }
-      
+
       if (isDepressed && !prevDepressed) {
         prevDepressed = true;
+        depressedThisFrame = true;
         ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerEnterHandler);
         ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerDownHandler);
+        OnPress.Invoke();
       } else if (!isDepressed && prevDepressed) {
         prevDepressed = false;
+        unDepressedThisFrame = true;
         ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerExitHandler);
         ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerClickHandler);
         ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerUpHandler);
+        OnUnpress.Invoke();
       }
 
       if (element != null) {
         if (behaviour.isPrimaryHovered) {
-          hoverTint = Color.red;
+          hoverTint = isDepressed ? Color.red : Color.Lerp(Color.white, Color.red, 0.5f);
           behaviour.ignoreContact = false;
         } else {
           hoverTint = Color.Lerp(hoverTint, Color.white, 0.1f);
