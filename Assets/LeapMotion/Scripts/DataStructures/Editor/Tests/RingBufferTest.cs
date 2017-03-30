@@ -4,11 +4,11 @@ using NUnit.Framework;
 namespace Leap.Unity.Graphing.Tests {
   public class RingBufferTest {
 
-    private RingBuffer<int> _buffer;
+    private Deque<int> _buffer;
 
     [SetUp]
     public void Setup() {
-      _buffer = new RingBuffer<int>();
+      _buffer = new Deque<int>();
     }
 
     [TearDown]
@@ -18,9 +18,10 @@ namespace Leap.Unity.Graphing.Tests {
     }
 
     [Test]
-    [ExpectedException(typeof(ArgumentException))]
     public void InvalidCapacity([Values(int.MinValue, -1, 0)] int minCapacity) {
-      new RingBuffer<int>(minCapacity);
+      Assert.That(() => {
+        new Deque<int>(minCapacity);
+      }, Throws.ArgumentException);
     }
 
     [Test]
@@ -33,28 +34,32 @@ namespace Leap.Unity.Graphing.Tests {
     }
 
     [Test]
-    [ExpectedException(typeof(InvalidOperationException))]
     public void AccessEmptyBack() {
-      int value = _buffer.Front;
-      Assert.NotNull(value);  //Just to remove unused value warning
+      Assert.That(() => {
+        int value = _buffer.Front;
+        Assert.NotNull(value);  //Just to remove unused value warning
+      }, Throws.InstanceOf<InvalidOperationException>());
+
     }
 
     [Test]
-    [ExpectedException(typeof(InvalidOperationException))]
     public void AccessEmptyFront() {
-      int value = _buffer.Front;
-      Assert.NotNull(value);  //Just to remove unused value warning
+      Assert.That(() => {
+        int value = _buffer.Front;
+        Assert.NotNull(value);  //Just to remove unused value warning
+      }, Throws.InstanceOf<InvalidOperationException>());
     }
 
     [Test]
-    [ExpectedException(typeof(IndexOutOfRangeException))]
     public void InvalidIndex([Values(int.MinValue, -1, 5, int.MaxValue)] int index) {
-      for (int i = 0; i < 5; i++) {
-        _buffer.PushBack(0);
-      }
+      Assert.That(() => {
+        for (int i = 0; i < 5; i++) {
+          _buffer.PushBack(0);
+        }
 
-      int value = _buffer[index];
-      Assert.NotNull(value); //Just to remove unused value warning
+        int value = _buffer[index];
+        Assert.NotNull(value); //Just to remove unused value warning
+      }, Throws.InstanceOf<IndexOutOfRangeException>());
     }
 
     [Test]
@@ -94,7 +99,5 @@ namespace Leap.Unity.Graphing.Tests {
         Assert.That(i, Is.EqualTo(value));
       }
     }
-
-
   }
 }

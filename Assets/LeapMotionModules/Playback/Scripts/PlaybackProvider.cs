@@ -17,12 +17,6 @@ namespace Leap.Unity.Playback {
       }
     }
 
-    public override Image CurrentImage {
-      get {
-        return null;
-      }
-    }
-
     [SerializeField]
     protected Recording _recording;
 
@@ -87,6 +81,12 @@ namespace Leap.Unity.Playback {
       }
 
       _currentFrameIndex = newFrameIndex;
+
+      var f = _recording.frames[_currentFrameIndex];
+      foreach(var hand in f.Hands) {
+        hand.Rotation = LeapQuaternion.Identity;
+      }
+
       _transformedFrame.CopyFrom(_recording.frames[_currentFrameIndex]).Transform(new LeapTransform(transform.position.ToVector(), transform.rotation.ToLeapQuaternion(), transform.lossyScale.ToVector()));
     }
 

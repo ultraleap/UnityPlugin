@@ -49,13 +49,13 @@ namespace UnityTest
             {
                 text = GetTextFromTempFile(previousScenes);
             }
-
+                
             if(text != null)
             {
                 var serializer = new System.Xml.Serialization.XmlSerializer(typeof(UnityEditor.EditorBuildSettingsScene[]));
                 using(var textReader = new StringReader(text))
                 {
-                    try
+                    try 
                     {
                         return (UnityEditor.EditorBuildSettingsScene[] )serializer.Deserialize(textReader);
                     }
@@ -65,7 +65,7 @@ namespace UnityTest
                     }
                 }
             }
-
+                
             return null;
         }
 #endif
@@ -154,7 +154,7 @@ namespace UnityTest
         public static List<string> GetAvailableNetworkIPs()
         {
 #if UTT_SOCKETS_SUPPORTED
-            if (!NetworkInterface.GetIsNetworkAvailable())
+            if (!NetworkInterface.GetIsNetworkAvailable()) 
                 return new List<String>{IPAddress.Loopback.ToString()};
 
             var ipList = new List<UnicastIPAddressInformation>();

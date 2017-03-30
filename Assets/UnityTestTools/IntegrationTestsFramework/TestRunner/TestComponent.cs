@@ -57,16 +57,16 @@ namespace UnityTest
         }
 
         public bool IsExceptionExpected(string exception)
-		{
-			exception = exception.Trim();
+        {
+            exception = exception.Trim();
             if (!expectException) 
-				return false;
-			if(string.IsNullOrEmpty(expectedExceptionList.Trim())) 
-				return true;
+                return false;
+            if(string.IsNullOrEmpty(expectedExceptionList.Trim())) 
+                return true;
             foreach (var expectedException in expectedExceptionList.Split(',').Select(e => e.Trim()))
             {
                 if (exception == expectedException) 
-					return true;
+                    return true;
                 var exceptionType = Type.GetType(exception) ?? GetTypeByName(exception);
                 var expectedExceptionType = Type.GetType(expectedException) ?? GetTypeByName(expectedException);
                 if (exceptionType != null && expectedExceptionType != null && IsAssignableFrom(expectedExceptionType, exceptionType))
@@ -104,7 +104,7 @@ namespace UnityTest
 #endif
         }
 
-        public virtual void OnValidate()
+        public void OnValidate()
         {
             if (timeout < 0.01f) timeout = 0.01f;
         }
