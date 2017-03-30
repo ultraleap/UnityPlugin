@@ -58,14 +58,17 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
+    private HoverCheckResults hoverResults = new HoverCheckResults();
     private void FixedUpdateHovering() {
-      hoverActivityManager.activationRadius = interactionManager.WorldHoverActivationRadius;
-      _hoverActivityManager.FixedUpdateHand((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
-      HoverCheckResults hoverResults = CheckHoverForHand(_hand, _hoverActivityManager.ActiveBehaviours);
-      ProcessHoverCheckResults(hoverResults);
-      ProcessPrimaryHoverCheckResults(hoverResults);
+      if (_contactBehaviours.Count == 0) {
+        hoverActivityManager.activationRadius = interactionManager.WorldHoverActivationRadius;
+        _hoverActivityManager.FixedUpdateHand((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
+        hoverResults = CheckHoverForHand(_hand, _hoverActivityManager.ActiveBehaviours);
+        ProcessHoverCheckResults(hoverResults);
+        ProcessPrimaryHoverCheckResults(hoverResults);
+      }
 
-      if (hoverResults.primaryHovered != null && hoverResults.primaryHovered.GetComponent<LeapGuiElement>()!=null) {
+      if (_hand != null && hoverResults.primaryHovered != null && hoverResults.primaryHovered.GetComponent<LeapGuiElement>()!=null) {
         //Transform bulk hand to the closest element's warped space
         coarseInverseTransformHand(_hand, hoverResults.primaryHovered.GetComponent<ISpaceComponent>());
       }
@@ -663,7 +666,7 @@ namespace Leap.Unity.UI.Interaction {
     private void FixedUpdateContactCallbacks() {
       foreach (var interactionObj in _contactBehavioursLastFrame) {
         if (!_contactBehaviours.ContainsKey(interactionObj)
-          || !_brushBoneParent.gameObject.activeSelf) {
+         || !_brushBoneParent.gameObject.activeSelf) {
           interactionObj.ContactEnd(_hand);
           _contactBehaviourRemovalCache.Add(interactionObj);
         }
