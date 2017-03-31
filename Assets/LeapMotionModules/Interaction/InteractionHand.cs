@@ -76,13 +76,14 @@ namespace Leap.Unity.UI.Interaction {
 
     private HoverCheckResults hoverResults = new HoverCheckResults();
     private void FixedUpdateHovering() {
-      if (_interactionHoverOverride || _contactBehaviours.Count == 0) {
+      if (_contactBehaviours.Count == 0 && !_interactionHoverOverride) {
         hoverActivityManager.activationRadius = interactionManager.WorldHoverActivationRadius;
         _hoverActivityManager.FixedUpdatePosition((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
         using (new ProfilerSample("Check for Closest Elements")) { CheckHoverForHand(_hand, _hoverActivityManager.ActiveBehaviours); }
-        ProcessHoverCheckResults();
-        ProcessPrimaryHoverCheckResults();
       }
+      
+      ProcessHoverCheckResults();
+      ProcessPrimaryHoverCheckResults();
 
       ISpaceComponent space;
       if (_hand != null) {
