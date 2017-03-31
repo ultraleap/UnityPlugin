@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace Leap.Unity.Query {
 
-  public class SkipWhileOp<SourceType, SourceOp> : IEnumerator<SourceType>
-    where SourceOp : IEnumerator<SourceType> {
+  public struct SkipWhileOp<SourceType, SourceOp> : IQueryOp<SourceType>
+    where SourceOp : IQueryOp<SourceType> {
 
     private SourceOp _source;
     private Func<SourceType, bool> _predicate;
@@ -18,44 +15,29 @@ namespace Leap.Unity.Query {
       _finishedSkipping = false;
     }
 
-    public bool MoveNext() {
+    public bool TryGetNext(out SourceType t) {
       while (!_finishedSkipping) {
-        if (!_source.MoveNext()) {
+        if (!_source.TryGetNext(out t)) {
           _finishedSkipping = true;
           return false;
         }
 
-        if (!_predicate(_source.Current)) {
+        if (!_predicate(t)) {
           _finishedSkipping = true;
           return true;
         }
       }
 
-      return _source.MoveNext();
-    }
-
-    public SourceType Current {
-      get {
-        return _source.Current;
-      }
-    }
-
-    object IEnumerator.Current {
-      get {
-        throw new InvalidOperationException();
-      }
+      return _source.TryGetNext(out t);
     }
 
     public void Reset() {
-      throw new InvalidOperationException();
-    }
-
-    public void Dispose() {
-      _source.Dispose();
+      _source.Reset();
+      _finishedSkipping = false;
     }
   }
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
     public QueryWrapper<QueryType, SkipWhileOp<QueryType, QueryOp>> SkipWhile(Func<QueryType, bool> predicate) {
       return new QueryWrapper<QueryType, SkipWhileOp<QueryType, QueryOp>>(new SkipWhileOp<QueryType, QueryOp>(_op, predicate));
     }

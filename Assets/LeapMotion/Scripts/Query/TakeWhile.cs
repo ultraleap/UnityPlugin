@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Leap.Unity.Query {
 
-  public struct TakeWhileOp<SourceType, SourceOp> : IEnumerator<SourceType>
-  where SourceOp : IEnumerator<SourceType> {
+  public struct TakeWhileOp<SourceType, SourceOp> : IQueryOp<SourceType>
+  where SourceOp : IQueryOp<SourceType> {
     private SourceOp _source;
     private Func<SourceType, bool> _predicate;
     private bool _hasPredicateFailed;
@@ -16,47 +14,31 @@ namespace Leap.Unity.Query {
       _hasPredicateFailed = false;
     }
 
-    public bool MoveNext() {
+    public bool TryGetNext(out SourceType t) {
       if (_hasPredicateFailed) {
+        t = default(SourceType);
         return false;
       }
 
-      while (true) {
-        if (!_source.MoveNext()) {
-          return false;
-        }
-
-        if (!_predicate(_source.Current)) {
-          _hasPredicateFailed = true;
-          return false;
-        } else {
-          return true;
-        }
+      if (!_source.TryGetNext(out t)) {
+        return false;
       }
-    }
 
-    public SourceType Current {
-      get {
-        return _source.Current;
+      if (!_predicate(t)) {
+        _hasPredicateFailed = true;
+        return false;
       }
-    }
 
-    object IEnumerator.Current {
-      get {
-        throw new InvalidOperationException();
-      }
+      return true;
     }
 
     public void Reset() {
-      throw new InvalidOperationException();
-    }
-
-    public void Dispose() {
-      _source.Dispose();
+      _hasPredicateFailed = false;
+      _source.Reset();
     }
   }
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
     public QueryWrapper<QueryType, TakeWhileOp<QueryType, QueryOp>> TakeWhile(Func<QueryType, bool> predicate) {
       return new QueryWrapper<QueryType, TakeWhileOp<QueryType, QueryOp>>(new TakeWhileOp<QueryType, QueryOp>(_op, predicate));
     }

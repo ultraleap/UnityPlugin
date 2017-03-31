@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Leap.Unity.Query {
 
@@ -24,73 +23,126 @@ namespace Leap.Unity.Query {
   /// All of these limitations and changes are made in the name of performance and to reduce garbage allocated to zero, while
   /// hopefully not impacting the productivity of the user too much.
   /// </summary>
-  public partial struct QueryWrapper<QueryType, QueryOp> : IDisposable where QueryOp : IEnumerator<QueryType> {
-
-    private enum State : byte {
-      Ready,
-      ReturnedEnumerator,
-      AlreadyDisposed
-    }
-
+  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
     private QueryOp _op;
-    private State _state;
+
+    public QueryOp op {
+      get {
+        return _op;
+      }
+    }
 
     public QueryWrapper(QueryOp op) {
       _op = op;
-      _state = State.Ready;
     }
 
-    public QueryOp GetEnumerator() {
-      return thisAndConsume._op;
+    public Enumerator GetEnumerator() {
+      return new Enumerator();
     }
 
-    public void Dispose() {
-      if (_state == State.AlreadyDisposed) {
-        throw new InvalidOperationException("This QueryWrapper has already been disposed");
+    public struct Enumerator {
+      private QueryOp _op;
+      private QueryType _current;
+
+      public Enumerator(QueryOp op) {
+        _op = op;
+        _current = default(QueryType);
       }
 
-      _state = State.AlreadyDisposed;
-      _op.Dispose();
-    }
+      public bool MoveNext() {
+        return _op.TryGetNext(out _current);
+      }
 
-    private QueryWrapper<QueryType, QueryOp> thisAndConsume {
-      get {
-        switch (_state) {
-          case State.AlreadyDisposed:
-            throw new InvalidOperationException("This QueryWrapper has already been disposed.");
-          case State.ReturnedEnumerator:
-            throw new InvalidOperationException("Get Enumerator has already been called for this QueryWrapper.");
+      public QueryType Current {
+        get {
+          return _current;
         }
-
-        _state = State.ReturnedEnumerator;
-        return this;
       }
     }
   }
 
+  public interface IQueryOp<T> {
+    bool TryGetNext(out T t);
+    void Reset();
+  }
+
   public static class QueryConversionExtensions {
-    public static QueryWrapper<T, IEnumerator<T>> Query<T>(this IEnumerable<T> enumerable) {
-      return new QueryWrapper<T, IEnumerator<T>>(enumerable.GetEnumerator());
+
+    public static QueryWrapper<T, ListQueryOp<T>> Query<T>(this IList<T> list) {
+      return new QueryWrapper<T, ListQueryOp<T>>(new ListQueryOp<T>(list));
     }
 
-    public static QueryWrapper<T, IEnumerator<T>> Query<T>(this IEnumerator<T> enumerator) {
-      return new QueryWrapper<T, IEnumerator<T>>(enumerator);
+    public static QueryWrapper<KeyValuePair<K, V>, EnumerableQueryOp<KeyValuePair<K, V>, Dictionary<K, V>.Enumerator>> Query<T, K, V>(this Dictionary<K, V> dictionary) {
+      return new QueryWrapper<KeyValuePair<K, V>, EnumerableQueryOp<KeyValuePair<K, V>, Dictionary<K, V>.Enumerator>>(new EnumerableQueryOp<KeyValuePair<K, V>, Dictionary<K, V>.Enumerator>(dictionary.GetEnumerator()));
     }
 
-    public static QueryWrapper<T, List<T>.Enumerator> Query<T>(this List<T> list) {
-      return new QueryWrapper<T, List<T>.Enumerator>(list.GetEnumerator());
+    public static QueryWrapper<T, EnumerableQueryOp<T, HashSet<T>.Enumerator>> Query<T>(this HashSet<T> hashSet) {
+      return new QueryWrapper<T, EnumerableQueryOp<T, HashSet<T>.Enumerator>>(new EnumerableQueryOp<T, HashSet<T>.Enumerator>(hashSet.GetEnumerator()));
     }
 
-    public static QueryWrapper<KeyValuePair<K, V>, Dictionary<K, V>.Enumerator> Query<T, K, V>(this Dictionary<K, V> dictionary) {
-      return new QueryWrapper<KeyValuePair<K, V>, Dictionary<K, V>.Enumerator>(dictionary.GetEnumerator());
+    public static QueryWrapper<T, EnumerableQueryOp<T, Queue<T>.Enumerator>> Query<T>(this Queue<T> queue) {
+      return new QueryWrapper<T, EnumerableQueryOp<T, Queue<T>.Enumerator>>(new EnumerableQueryOp<T, Queue<T>.Enumerator>(queue.GetEnumerator()));
     }
 
-    public static QueryWrapper<T, HashSet<T>.Enumerator> Query<T>(this HashSet<T> hashSet) {
-      return new QueryWrapper<T, HashSet<T>.Enumerator>(hashSet.GetEnumerator());
+    public static QueryWrapper<T, EnumerableQueryOp<T, IEnumerator<T>>> Query<T>(this IEnumerator<T> enumerator) {
+      return new QueryWrapper<T, EnumerableQueryOp<T, IEnumerator<T>>>(new EnumerableQueryOp<T, IEnumerator<T>>(enumerator));
     }
 
-    public static QueryWrapper<T, Queue<T>.Enumerator> Query<T>(this Queue<T> queue) {
-      return new QueryWrapper<T, Queue<T>.Enumerator>(queue.GetEnumerator());
+    /// <summary>
+    /// Generic fallback for calling Query on any IEnumerable.
+    /// 
+    /// IMPORTANT!  Since this uses the IEnumerable interface, it MUST create a small allocation
+    /// during the call to GetEnumerator that cannot be avoided.
+    /// </summary>
+    public static QueryWrapper<T, EnumerableQueryOp<T, IEnumerator<T>>> Query<T>(this IEnumerable<T> enumerable) {
+      return new QueryWrapper<T, EnumerableQueryOp<T, IEnumerator<T>>>(new EnumerableQueryOp<T, IEnumerator<T>>(enumerable.GetEnumerator()));
+    }
+
+    public struct ListQueryOp<T> : IQueryOp<T> {
+      private IList<T> _list;
+      private int _index;
+
+      public ListQueryOp(IList<T> list) {
+        _list = list;
+        _index = 0;
+      }
+
+      public bool TryGetNext(out T t) {
+        if (_index >= _list.Count) {
+          t = default(T);
+          return false;
+        } else {
+          t = _list[_index++];
+          return true;
+        }
+      }
+
+      public void Reset() {
+        _index = 0;
+      }
+    }
+
+    public struct EnumerableQueryOp<T, Enumerable> : IQueryOp<T>
+      where Enumerable : IEnumerator<T> {
+      private Enumerable _source;
+
+      public EnumerableQueryOp(Enumerable source) {
+        _source = source;
+      }
+
+      public bool TryGetNext(out T t) {
+        if (_source.MoveNext()) {
+          t = _source.Current;
+          return true;
+        } else {
+          t = default(T);
+          return false;
+        }
+      }
+
+      public void Reset() {
+        _source.Reset();
+      }
     }
   }
 }
