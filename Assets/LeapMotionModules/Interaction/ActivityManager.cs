@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Leap.Unity.Query;
-using UnityEngine;
+﻿using Leap.Unity.Space;
 using Leap.Unity.UI.Interaction.Internal;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
@@ -34,38 +33,49 @@ namespace Leap.Unity.UI.Interaction {
       this.activationRadius = activationRadius;
     }
 
-    public void FixedUpdateHand(Hand hand) {
-      int count = GetSphereColliderResults(hand, ref _colliderResultsBuffer);
-      UpdateActiveList(count, _colliderResultsBuffer);
-    }
+    public void FixedUpdatePosition(Vector3 palmPosition, List<LeapSpace> spaces = null) {
+      using (new ProfilerSample("Update "+ (spaces==null?"Touch" : "Hover") + " Actvity Manager")) {
+        _activeBehaviours.Clear();
 
-    private int GetSphereColliderResults(Hand hand, ref Collider[] resultsBuffer) {
-      if (hand == null) return 0;
+        if (palmPosition != Vector3.zero) {
+          int count = GetSphereColliderResults(palmPosition, ref _colliderResultsBuffer);
+          UpdateActiveList(count, _colliderResultsBuffer);
 
-      int overlapCount = 0;
-      while (true) {
-        overlapCount = Physics.OverlapSphereNonAlloc(hand.PalmPosition.ToVector3(),
-                                                         activationRadius,
-                                                         resultsBuffer,
-                                                         manager.interactionLayer.layerMask | manager.interactionNoContactLayer.layerMask,
-                                                         QueryTriggerInteraction.Collide);
-        if (overlapCount < resultsBuffer.Length) {
-          break;
-        }
-        else {
-          // Non-allocating sphere-overlap fills the existing _resultsBuffer array.
-          // If the output overlapCount is equal to the array's length, there might be more collision results
-          // that couldn't be returned because the array wasn't large enough, so try again with increased length.
-          // The _in, _out argument setup allows allocating a new array from within this function.
-          resultsBuffer = new Collider[resultsBuffer.Length * 2];
+          if (spaces != null) {
+            //Check once in each of the GUI's subspaces
+            foreach (LeapSpace space in spaces) {
+              count = GetSphereColliderResults(transformPoint(palmPosition, space), ref _colliderResultsBuffer);
+              UpdateActiveList(count, _colliderResultsBuffer);
+            }
+          }
         }
       }
-      return overlapCount;
+    }
+
+    private int GetSphereColliderResults(Vector3 position, ref Collider[] resultsBuffer) {
+      using (new ProfilerSample("GetSphereColliderResults()")) {
+        int overlapCount = 0;
+        while (true) {
+          overlapCount = Physics.OverlapSphereNonAlloc(position,
+                                                       activationRadius,
+                                                       resultsBuffer,
+                                                       manager.interactionLayer.layerMask | manager.interactionNoContactLayer.layerMask,
+                                                       QueryTriggerInteraction.Collide);
+          if (overlapCount < resultsBuffer.Length) {
+            break;
+          } else {
+            // Non-allocating sphere-overlap fills the existing _resultsBuffer array.
+            // If the output overlapCount is equal to the array's length, there might be more collision results
+            // that couldn't be returned because the array wasn't large enough, so try again with increased length.
+            // The _in, _out argument setup allows allocating a new array from within this function.
+            resultsBuffer = new Collider[resultsBuffer.Length * 2];
+          }
+        }
+        return overlapCount;
+      }
     }
 
     private void UpdateActiveList(int numResults, Collider[] results) {
-      _activeBehaviours.Clear();
-
       for (int i = 0; i < numResults; i++) {
         if (results[i].attachedRigidbody != null) {
           Rigidbody body = results[i].attachedRigidbody;
@@ -77,6 +87,9 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
+    private Vector3 transformPoint(Vector3 worldPoint, LeapSpace space) {
+      Vector3 localPalmPos = space.transform.InverseTransformPoint(worldPoint);
+      return space.transform.TransformPoint(space.transformer.InverseTransformPoint(localPalmPos));
+    }
   }
-
 }

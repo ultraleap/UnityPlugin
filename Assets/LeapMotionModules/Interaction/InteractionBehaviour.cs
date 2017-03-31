@@ -570,7 +570,6 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Contact
 
-
     public void BeginContact(InteractionHand hand) {
       _contactingHandsSet.Add(hand);
     }

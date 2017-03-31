@@ -32,10 +32,10 @@ namespace Leap.Unity.UI.Interaction {
     [SerializeField]
     [DisableIf("enableHovering", isEqualTo: false)]
     [Tooltip("Beyond this radius, an interaction object will not receive hover callbacks from a hand. (Smaller values are cheaper.) This value is automatically scaled under the hood by the Leap Service Provider's localScale.x.")]
-    public float hoverActivationRadius = 0.5F;
+    public float hoverActivationRadius = 0.2F;
     [DisableIfAll("enableContact", "enableGrasping", areEqualTo: false)]
     [Tooltip("Beyond this radius, an interaction object will not be considered for contact or grasping logic. The radius should be small as an optimization but certainly not smaller than a hand and not too tight around the hand to allow good behavior when the hand is moving quickly through space. This value is automatically scaled under the hood by the Leap Service Provider's localScale.x.")]
-    public float touchActivationRadius = 0.15F;
+    public float touchActivationRadius = 0.075F;
 
     [Header("Layer Settings")]
     [Tooltip("Whether or not to create the layers used for interaction when the scene runs. Hand interactions require an interaction layer (for objects), a grasped object layer, and a contact bone layer (for hand bones). Keep this checked to have these layers created for you, but be aware that the layers will have blank names due to Unity limitations.")]
