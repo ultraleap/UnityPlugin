@@ -19,7 +19,7 @@
       #pragma shader_feature _ LEAP_GUI_VERTEX_COLORS
       #define LEAP_GUI_VERTEX_UV_0
       #define GUI_ELEMENT_ID_FROM_UV0
-      #include "Assets/LeapMotionModules/ElementRenderer/Resources/DynamicRenderer.cginc"
+      #include "Assets/LeapMotionModules/GraphicRenderer/Resources/DynamicRenderer.cginc"
 			#include "UnityCG.cginc"
 
 			sampler2D _MainTex;

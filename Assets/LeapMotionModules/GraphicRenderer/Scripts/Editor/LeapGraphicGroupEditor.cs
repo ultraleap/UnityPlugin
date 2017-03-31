@@ -72,7 +72,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
       specifyCustomDecorator("_features", featureDecorator);
       specifyCustomDrawer("_features", drawFeatures);
-      specifyCustomDrawer("_renderer", drawRenderer);
+      specifyCustomDrawer("_renderingMethod", drawRenderer);
     }
 
     private void OnDisable() {

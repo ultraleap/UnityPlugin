@@ -67,10 +67,10 @@ namespace Leap.Unity.GraphicalRenderer {
     private bool _useUv3 = false;
 
     [EditTimeOnly, SerializeField, HideInInspector]
-    private bool _useVertexColors = false;
+    private bool _useColors = false;
 
     [EditTimeOnly, SerializeField, HideInInspector]
-    private Color _vertexColorTint = Color.white;
+    private Color _bakedTint = Color.white;
 
     [EditTimeOnly, SerializeField, HideInInspector]
     private bool _useNormals = false;
@@ -564,7 +564,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void buildColors() {
       using (new ProfilerSample("Build Colors")) {
-        Color totalTint = _vertexColorTint * _currGraphic.vertexColor;
+        Color totalTint = _bakedTint * _currGraphic.vertexColor;
 
         var colors = MeshCache.GetColors(_currGraphic.mesh);
         for (int i = 0; i < colors.Length; i++) {
@@ -686,7 +686,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     protected virtual bool doesRequireMeshColors() {
-      return _useVertexColors;
+      return _useColors;
     }
 
     protected virtual bool doesRequireMeshNormals() {

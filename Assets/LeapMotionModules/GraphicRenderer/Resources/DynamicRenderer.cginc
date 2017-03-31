@@ -1,6 +1,4 @@
-// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
-#include "Assets/LeapMotionModules/ElementRenderer/Resources/LeapGui.cginc"
+#include "Assets/LeapMotionModules/GraphicRenderer/Resources/LeapGui.cginc"
 
 /***********************************
  * Space name:
@@ -15,7 +13,7 @@ float4x4 _LeapGui_GuiToWorld;
 
 #ifdef LEAP_GUI_CYLINDRICAL
 #define LEAP_GUI_WARPING
-#include "Assets/LeapMotionModules/ElementRenderer/Resources/CylindricalSpace.cginc"
+#include "Assets/LeapMotionModules/GraphicRenderer/Resources/CylindricalSpace.cginc"
 
 float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
 float4x4 _LeapGui_LocalToWorld;
@@ -42,7 +40,7 @@ void ApplyGuiWarping(inout float4 anchorSpaceVert, int elementId) {
 
 #ifdef LEAP_GUI_SPHERICAL
 #define LEAP_GUI_WARPING
-#include "Assets/LeapMotionModules/ElementRenderer/Resources/SphericalSpace.cginc"
+#include "Assets/LeapMotionModules/GraphicRenderer/Resources/SphericalSpace.cginc"
 
 float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
 float4x4 _LeapGui_LocalToWorld;

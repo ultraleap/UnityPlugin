@@ -1,4 +1,4 @@
-#include "Assets/LeapMotionModules/ElementRenderer/Resources/LeapGui.cginc"
+#include "Assets/LeapMotionModules/GraphicRenderer/Resources/LeapGui.cginc"
 
 /************************************************************************* 
  * Movement name:
@@ -40,7 +40,7 @@
 #ifdef LEAP_GUI_MOVEMENT
 #ifdef LEAP_GUI_CYLINDRICAL
 #define LEAP_GUI_WARPING
-#include "Assets/LeapMotionModules/ElementRenderer/Resources/CylindricalSpace.cginc"
+#include "Assets/LeapMotionModules/GraphicRenderer/Resources/CylindricalSpace.cginc"
 
 float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
 
@@ -61,7 +61,7 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 #ifdef LEAP_GUI_MOVEMENT
 #ifdef LEAP_GUI_SPHERICAL
 #define LEAP_GUI_WARPING
-#include "Assets/LeapMotionModules/ElementRenderer/Resources/SphericalSpace.cginc"
+#include "Assets/LeapMotionModules/GraphicRenderer/Resources/SphericalSpace.cginc"
 
 float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
 

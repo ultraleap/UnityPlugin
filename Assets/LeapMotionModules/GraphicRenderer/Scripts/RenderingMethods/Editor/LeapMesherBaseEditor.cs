@@ -9,7 +9,7 @@ namespace Leap.Unity.GraphicalRenderer {
   [CustomEditor(typeof(LeapMesherBase), editorForChildClasses: true, isFallback = true)]
   public class LeapMesherBaseEditor : CustomEditorBase {
     private const float MESH_LABEL_WIDTH = 100.0f;
-    private SerializedProperty _uv0, _uv1, _uv2, _uv3, _colors, _globalTint, _normals;
+    private SerializedProperty _uv0, _uv1, _uv2, _uv3, _colors, _bakedTint, _normals;
 
     protected override void OnEnable() {
       base.OnEnable();
@@ -18,12 +18,12 @@ namespace Leap.Unity.GraphicalRenderer {
       _uv1 = serializedObject.FindProperty("_useUv1");
       _uv2 = serializedObject.FindProperty("_useUv2");
       _uv3 = serializedObject.FindProperty("_useUv3");
-      _colors = serializedObject.FindProperty("_useVertexColors");
-      _globalTint = serializedObject.FindProperty("_vertexColorTint");
+      _colors = serializedObject.FindProperty("_useColors");
+      _bakedTint = serializedObject.FindProperty("_bakedTint");
       _normals = serializedObject.FindProperty("_useNormals");
 
       specifyCustomDecorator("_shader", drawMeshSettings);
-      specifyConditionalDrawing("_useVertexColors", "_vertexColorTint");
+      specifyConditionalDrawing("_useColors", "_bakedTint");
       specifyConditionalDrawing(hasTextureFeature, "_atlas");
 
       specifyCustomDecorator("_shader", renderingSettingsHeader);
@@ -60,7 +60,7 @@ namespace Leap.Unity.GraphicalRenderer {
       r2.SplitHorizontally(out left, out right);
       EditorGUI.PropertyField(left, _colors);
       if (_colors.boolValue) {
-        EditorGUI.PropertyField(right, _globalTint);
+        EditorGUI.PropertyField(right, _bakedTint);
       }
 
       Rect r3 = EditorGUILayout.GetControlRect();
