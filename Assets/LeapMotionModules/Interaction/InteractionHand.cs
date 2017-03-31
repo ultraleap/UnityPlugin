@@ -61,6 +61,14 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
+    private struct HoverCheckResults {
+      public HashSet<InteractionBehaviourBase> hovered;
+      public InteractionBehaviourBase[] perFingerHovered;
+      public InteractionBehaviourBase primaryHovered;
+      public float primaryHoveredDistance;
+      public Hand checkedHand;
+    }
+
     private HoverCheckResults hoverResults = new HoverCheckResults();
     private void FixedUpdateHovering() {
       if (_contactBehaviours.Count == 0) {
@@ -81,18 +89,9 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    private struct HoverCheckResults {
-      public HashSet<InteractionBehaviourBase> hovered;
-      public InteractionBehaviourBase[] perFingerHovered;
-      public InteractionBehaviourBase primaryHovered;
-      public float primaryHoveredDistance;
-      public Hand checkedHand;
-    }
-
     private HashSet<InteractionBehaviourBase> _hoveredLastFrame = new HashSet<InteractionBehaviourBase>();
-
     private HashSet<InteractionBehaviourBase> _hoverableCache = new HashSet<InteractionBehaviourBase>();
-    public InteractionBehaviourBase[] tempPerFingerHovered = new InteractionBehaviourBase[3];
+    private InteractionBehaviourBase[] tempPerFingerHovered = new InteractionBehaviourBase[3];
 
     private void CheckHoverForHand(Hand hand, HashSet<InteractionBehaviourBase> hoverCandidates) {
       _hoverableCache.Clear();

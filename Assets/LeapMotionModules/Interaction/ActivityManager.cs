@@ -33,7 +33,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public void FixedUpdatePosition(Vector3 palmPosition, List<LeapSpace> spaces = null) {
-      using (new ProfilerSample("Update "+ (spaces==null?"Touch" : "Hover") + " Actvity Manager")) {
+      using (new ProfilerSample("Update Actvity Manager")) {
         _activeBehaviours.Clear();
 
         if (palmPosition != Vector3.zero) {

@@ -74,10 +74,10 @@ namespace Leap.Unity.UI.Interaction {
         PhysicsPosition = newWorldPhysicsPosition;
 
         Vector3 localPhysicsVelocity = transform.parent.InverseTransformDirection(body.velocity);
-        float springDeltaV = (((InitialLocalPosition.z - Mathf.Lerp(MinMaxHeight.x, MinMaxHeight.y, RestingHeight) - localPhysicsPosition.z) * transform.parent.lossyScale.z)) * 20f;
+        float springDeltaV = Mathf.Clamp((((InitialLocalPosition.z - Mathf.Lerp(MinMaxHeight.x, MinMaxHeight.y, RestingHeight) - localPhysicsPosition.z) * transform.parent.lossyScale.z))*8f, -0.2f, 0.2f);
         localPhysicsVelocity = new Vector3(0f, 0f, localPhysicsVelocity.z + springDeltaV);
         Vector3 newWorldPhysicsVelocity = transform.parent.TransformDirection(localPhysicsVelocity);
-        PhysicsVelocity = newWorldPhysicsVelocity.normalized * Mathf.Clamp(newWorldPhysicsVelocity.magnitude, -1f, 1f);
+        PhysicsVelocity = newWorldPhysicsVelocity;
 
         bool oldDepressed = isDepressed;
 
@@ -86,6 +86,7 @@ namespace Leap.Unity.UI.Interaction {
           PhysicsVelocity = PhysicsVelocity / 2f;
           if (!behaviour.isPrimaryHovered) {
             PhysicsPosition = transform.parent.TransformPoint(InitialLocalPosition);
+            PhysicsVelocity = Vector3.zero;
           }
           isDepressed = true;
         } else if (localPhysicsPosition.z < InitialLocalPosition.z - MinMaxHeight.y) {
