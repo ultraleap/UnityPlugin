@@ -1,6 +1,7 @@
 ﻿using InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.RuntimeGizmos;
+using Leap.Unity.UI.Interaction.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -106,13 +107,13 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private InteractionHand[] _interactionHands = new InteractionHand[2];
-    private HashSet<InteractionBehaviourBase> _interactionBehaviours = new HashSet<InteractionBehaviourBase>();
+    private HashSet<IInteractionBehaviour> _interactionBehaviours = new HashSet<IInteractionBehaviour>();
 
-    private Dictionary<Rigidbody, InteractionBehaviourBase> _rigidbodyRegistry;
-    public Dictionary<Rigidbody, InteractionBehaviourBase> rigidbodyRegistry {
+    private Dictionary<Rigidbody, IInteractionBehaviour> _rigidbodyRegistry;
+    public Dictionary<Rigidbody, IInteractionBehaviour> rigidbodyRegistry {
       get {
         if (_rigidbodyRegistry == null) {
-          _rigidbodyRegistry = new Dictionary<Rigidbody, InteractionBehaviourBase>();
+          _rigidbodyRegistry = new Dictionary<Rigidbody, IInteractionBehaviour>();
         }
         return _rigidbodyRegistry;
       }
@@ -214,14 +215,14 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Object Registration
 
-    public void RegisterInteractionBehaviour(InteractionBehaviourBase interactionObj) {
+    public void RegisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
       _interactionBehaviours.Add(interactionObj);
       rigidbodyRegistry[interactionObj.rigidbody] = interactionObj;
     }
 
     /// <summary> Returns true if the Interaction Behaviour was registered with this manager; otherwise returns false. 
     /// The manager is guaranteed not to have the Interaction Behaviour registered after calling this method. </summary>
-    public bool UnregisterInteractionBehaviour(InteractionBehaviourBase interactionObj) {
+    public bool UnregisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
       bool wasRemovalSuccessful = _interactionBehaviours.Remove(interactionObj);
       if (wasRemovalSuccessful) {
         foreach (var intHand in _interactionHands) { intHand.TryReleaseObject(interactionObj); }
@@ -230,7 +231,7 @@ namespace Leap.Unity.UI.Interaction {
       return wasRemovalSuccessful;
     }
 
-    public bool IsBehaviourRegistered(InteractionBehaviourBase interactionObj) {
+    public bool IsBehaviourRegistered(IInteractionBehaviour interactionObj) {
       return _interactionBehaviours.Contains(interactionObj);
     }
 
@@ -258,7 +259,7 @@ namespace Leap.Unity.UI.Interaction {
     /// if the object was not held in the first place. This method will fail and return
     /// false if the argument interaction object is not registered with this manager.
     /// </summary>
-    public bool TryReleaseObjectFromGrasp(InteractionBehaviourBase interactionObj) {
+    public bool TryReleaseObjectFromGrasp(IInteractionBehaviour interactionObj) {
       if (!_interactionBehaviours.Contains(interactionObj)) {
         Debug.LogError("ReleaseObjectFromGrasp was called, but the interaction object " + interactionObj.transform.name + " is not registered"
           + " with this InteractionManager.");

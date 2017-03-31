@@ -1,5 +1,6 @@
 ﻿using InteractionEngineUtility;
 using Leap.Unity.RuntimeGizmos;
+using Leap.Unity.UI.Interaction.Internal;
 using System;
 using System.Collections.Generic;
 #if UNITY_EDITOR
@@ -13,8 +14,8 @@ namespace Leap.Unity.UI.Interaction {
 
     public InteractionHand interactionHand;
 
-    private Dictionary<InteractionBehaviourBase, GrabClassifierHeuristics.GrabClassifier> _classifiers
-      = new Dictionary<InteractionBehaviourBase, GrabClassifierHeuristics.GrabClassifier>();
+    private Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier> _classifiers
+      = new Dictionary<IInteractionBehaviour, GrabClassifierHeuristics.GrabClassifier>();
     private GrabClassifierHeuristics.ClassifierParameters _defaultGrabParams, _scaledGrabParams;
     private Collider[][] _collidingCandidates = new Collider[6][];
     private int[] _numberOfColliders = new int[6];
@@ -51,7 +52,7 @@ namespace Leap.Unity.UI.Interaction {
         }
     }
 
-    private void UpdateBehaviour(InteractionBehaviourBase behaviour, Hand hand) {
+    private void UpdateBehaviour(IInteractionBehaviour behaviour, Hand hand) {
       using (new ProfilerSample("Update Individual Grab Classifier",
              behaviour.gameObject)) {
         GrabClassifierHeuristics.GrabClassifier classifier;
@@ -118,11 +119,11 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     // TODO: Make sure the InteractionManager calls this method!! (Currently it does NOT.)
-    public void UnregisterInteractionBehaviour(InteractionBehaviourBase behaviour) {
+    public void UnregisterInteractionBehaviour(IInteractionBehaviour behaviour) {
       _classifiers.Remove(behaviour);
     }
 
-    public void NotifyGraspReleased(InteractionBehaviourBase behaviour) {
+    public void NotifyGraspReleased(IInteractionBehaviour behaviour) {
       GrabClassifierHeuristics.GrabClassifier classifier;
       if (_classifiers.TryGetValue(behaviour, out classifier)) {
         classifier.isGrabbing = false;
@@ -133,7 +134,7 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public void GetGraspingFingertipPositions(InteractionBehaviourBase behaviour, Vector3[] fingertipPositionsBuffer, out int numGraspingFingertips) {
+    public void GetGraspingFingertipPositions(IInteractionBehaviour behaviour, Vector3[] fingertipPositionsBuffer, out int numGraspingFingertips) {
       GrabClassifierHeuristics.GrabClassifier classifier;
       if (_classifiers.TryGetValue(behaviour, out classifier)) {
         int writeIdx = 0;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Leap.Unity.Query;
 using UnityEngine;
+using Leap.Unity.UI.Interaction.Internal;
 
 namespace Leap.Unity.UI.Interaction {
 
@@ -17,9 +18,9 @@ namespace Leap.Unity.UI.Interaction {
     public InteractionManager manager;
 
     private Collider[] _colliderResultsBuffer = new Collider[32];
-    private HashSet<InteractionBehaviourBase> _activeBehaviours = new HashSet<InteractionBehaviourBase>();
+    private HashSet<IInteractionBehaviour> _activeBehaviours = new HashSet<IInteractionBehaviour>();
 
-    public HashSet<InteractionBehaviourBase> ActiveBehaviours {
+    public HashSet<IInteractionBehaviour> ActiveBehaviours {
       get { return _activeBehaviours; }
     }
 
@@ -68,7 +69,7 @@ namespace Leap.Unity.UI.Interaction {
       for (int i = 0; i < numResults; i++) {
         if (results[i].attachedRigidbody != null) {
           Rigidbody body = results[i].attachedRigidbody;
-          InteractionBehaviourBase interactionObj;
+          IInteractionBehaviour interactionObj;
           if (body != null && manager.rigidbodyRegistry.TryGetValue(body, out interactionObj)) {
             _activeBehaviours.Add(interactionObj);
           }
