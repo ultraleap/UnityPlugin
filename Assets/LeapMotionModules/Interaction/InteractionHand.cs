@@ -131,16 +131,22 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public Vector3 transformPoint(Vector3 worldPoint, ISpaceComponent element) {
-      Vector3 localPos = element.anchor.space.transform.InverseTransformPoint(worldPoint);
-      return element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPos));
+      if (element.anchor != null && element.anchor.space != null) {
+        Vector3 localPos = element.anchor.space.transform.InverseTransformPoint(worldPoint);
+        return element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPos));
+      }else {
+        return worldPoint;
+      }
     }
 
     public void coarseInverseTransformHand(Hand inHand, ISpaceComponent element) {
-      Vector3 localPalmPos = element.anchor.space.transform.InverseTransformPoint(inHand.PalmPosition.ToVector3());
-      Quaternion localPalmRot = element.anchor.space.transform.InverseTransformRotation(inHand.Rotation.ToQuaternion());
+      if (element.anchor != null && element.anchor.space != null) {
+        Vector3 localPalmPos = element.anchor.space.transform.InverseTransformPoint(inHand.PalmPosition.ToVector3());
+        Quaternion localPalmRot = element.anchor.space.transform.InverseTransformRotation(inHand.Rotation.ToQuaternion());
 
-      inHand.SetTransform(element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPalmPos)),
-                          element.anchor.space.transform.TransformRotation(element.anchor.transformer.InverseTransformRotation(localPalmPos, localPalmRot)));
+        inHand.SetTransform(element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPalmPos)),
+                            element.anchor.space.transform.TransformRotation(element.anchor.transformer.InverseTransformRotation(localPalmPos, localPalmRot)));
+      }
     }
 
     private void CheckHoverForElement(Vector3 position, InteractionBehaviourBase behaviour, ISpaceComponent element, int whichFinger, ref float leastFingerDistance, ref HoverCheckResults curResults) {
