@@ -32,6 +32,7 @@ namespace Leap.Unity.UI.Interaction {
     private Color hoverTint = Color.white;
     private Rigidbody lastDepressor;
     private Vector3 localDepressor;
+    private bool isLeftInteracting = false; 
 
     //Reset the Positions of the UI Elements on both Start and Quit
     void Start() {
@@ -116,14 +117,15 @@ namespace Leap.Unity.UI.Interaction {
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerEnterHandler);
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerDownHandler);
           OnPress.Invoke();
-          behaviour.interactionManager.GetInteractionHand(behaviour.primaryHoveringHand).SetInteractionHoverOverride(true);
+          isLeftInteracting = behaviour.primaryHoveringHand.IsLeft;
+          behaviour.interactionManager.GetInteractionHand(isLeftInteracting).SetInteractionHoverOverride(true);
         } else if (!isDepressed && oldDepressed) {
           unDepressedThisFrame = true;
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerExitHandler);
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerClickHandler);
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerUpHandler);
           OnUnpress.Invoke();
-          behaviour.interactionManager.GetInteractionHand(behaviour.primaryHoveringHand).SetInteractionHoverOverride(false);
+          behaviour.interactionManager.GetInteractionHand(isLeftInteracting).SetInteractionHoverOverride(false);
         }
       }
 
