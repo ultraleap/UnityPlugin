@@ -36,7 +36,7 @@ namespace Leap.Unity.UI.Interaction {
 
     public void FixedUpdateHand(bool doHovering, bool doContact, bool doGrasping) {
       RefreshHandState();
-      using (new ProfilerSample("Fixed Update InteractionHand")) {
+      using (new ProfilerSample("Fixed Update InteractionHand", _brushBoneParent)) {
         if (doHovering) using (new ProfilerSample("Update Hovering")) { FixedUpdateHovering(); }
         if (doContact) using (new ProfilerSample("Update Contact")) { FixedUpdateContact(); }
         if (doGrasping) using (new ProfilerSample("Update Grasping")) { FixedUpdateGrasping(); }

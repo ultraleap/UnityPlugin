@@ -195,6 +195,9 @@ namespace Leap.Unity.UI.Interaction {
         _interactionHands[i].FixedUpdateHand(enableHovering, enableContact, enableGrasping);
       }
 
+      // Update object state and send callbacks in strict order.
+      // for (int i = 0; i < )
+
       // Perform each interaction object's FixedUpdateObject.
       foreach (var interactionObj in _interactionBehaviours) {
         interactionObj.FixedUpdateObject();

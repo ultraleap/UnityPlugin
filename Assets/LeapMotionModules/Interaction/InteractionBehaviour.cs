@@ -538,13 +538,14 @@ namespace Leap.Unity.UI.Interaction {
     /// are updated (via InteractionManager.FixedUpdate).
     /// </summary>
     public override void FixedUpdateObject() {
-      FixedUpdateCallbacks();
       FixedUpdateCollisionMode();
       FixedUpdateForces();
     }
 
     #region Hovering
 
+    private HashSet<InteractionHand> _hoveringHandsSet = new HashSet<InteractionHand>();
+    private HashSet<InteractionHand> _primaryHoveringHandsSet = new HashSet<InteractionHand>();
 
     public float GetDistance(Vector3 worldPosition) {
       return Vector3.Distance(worldPosition, this.transform.position);
@@ -570,6 +571,8 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Contact
 
+    private HashSet<InteractionHand> _contactingHandsSet = new HashSet<InteractionHand>();
+
     public void BeginContact(InteractionHand hand) {
       _contactingHandsSet.Add(hand);
     }
@@ -582,6 +585,8 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Grasping
 
+    private HashSet<InteractionHand> _graspingHandsSet = new HashSet<InteractionHand>();
+    private bool _isSuspended;
 
     public void BeginGrasp(InteractionHand hand) {
       _graspingHandsSet.Add(hand);
@@ -605,89 +610,85 @@ namespace Leap.Unity.UI.Interaction {
 
     #endregion
 
-    #region Callbacks
+    // TODO: DELETEME
+    //#region Callbacks
 
-    // BeginX / EndX implementations called by InteractionHand modify these sets directly.
-    private HashSet<InteractionHand> _hoveringHandsSet = new HashSet<InteractionHand>();
-    private HashSet<InteractionHand> _primaryHoveringHandsSet = new HashSet<InteractionHand>();
-    private HashSet<InteractionHand> _contactingHandsSet = new HashSet<InteractionHand>();
-    private HashSet<InteractionHand> _graspingHandsSet = new HashSet<InteractionHand>();
-    private bool _isSuspended;
+    //// BeginX / EndX implementations called by InteractionHand modify these sets directly.
 
-    // These lists are used to provide the data to callbacks, and are used when checking the state of the InteractionBehaviour
-    private List<InteractionHand> _handsBuffer = new List<InteractionHand>(); // for End and Begin callbacks
-    private List<InteractionHand> _hoverStayHands = new List<InteractionHand>();
-    private List<InteractionHand> _primaryHoverStayHands = new List<InteractionHand>();
-    private List<InteractionHand> _contactStayHands = new List<InteractionHand>();
-    private List<InteractionHand> _graspHoldHands = new List<InteractionHand>();
+    //// These lists are used to provide the data to callbacks, and are used when checking the state of the InteractionBehaviour
+    //private List<InteractionHand> _handsBuffer = new List<InteractionHand>(); // for End and Begin callbacks
+    //private List<InteractionHand> _hoverStayHands = new List<InteractionHand>();
+    //private List<InteractionHand> _primaryHoverStayHands = new List<InteractionHand>();
+    //private List<InteractionHand> _contactStayHands = new List<InteractionHand>();
+    //private List<InteractionHand> _graspHoldHands = new List<InteractionHand>();
 
-    // These sets are used to detect changes frame-to-frame
-    private HashSet<InteractionHand> _hoveredLastFrameSet = new HashSet<InteractionHand>();
-    private HashSet<InteractionHand> _primaryHoveredLastFrameSet = new HashSet<InteractionHand>();
-    private HashSet<InteractionHand> _contactingLastFrameSet = new HashSet<InteractionHand>();
-    private HashSet<InteractionHand> _graspingLastFrameSet = new HashSet<InteractionHand>();
+    //// These sets are used to detect changes frame-to-frame
+    //private HashSet<InteractionHand> _hoveredLastFrameSet = new HashSet<InteractionHand>();
+    //private HashSet<InteractionHand> _primaryHoveredLastFrameSet = new HashSet<InteractionHand>();
+    //private HashSet<InteractionHand> _contactingLastFrameSet = new HashSet<InteractionHand>();
+    //private HashSet<InteractionHand> _graspingLastFrameSet = new HashSet<InteractionHand>();
 
-    // TODO: Groooooss. Can I simplify this..??
+    //// TODO: Groooooss. Can I simplify this..??
 
-    private void FixedUpdateCallbacks() {
+    //private void FixedUpdateCallbacks() {
 
-      //_hoverStayHands.Clear();
-      //_primaryHoverStayHands.Clear();
-      //_contactStayHands.Clear();
-      //_graspHoldHands.Clear();
+    //  //_hoverStayHands.Clear();
+    //  //_primaryHoverStayHands.Clear();
+    //  //_contactStayHands.Clear();
+    //  //_graspHoldHands.Clear();
 
-      //// e.g. preparing grasp stay callback, can call grasp end right away
-      //_handsBuffer.Clear();
-      //foreach (var hand in _graspingHandsSet) {
-      //  if (_graspingLastFrameSet.Contains(hand) {
-      //    _graspHoldHands.Add(hand);
-      //  }
-      //  else {
-      //    _handsBuffer.Add(hand);
-      //  }
-      //}
-      //if (_handsBuffer.Count > 0) { OnGraspEnd(_handsBuffer); }
+    //  //// e.g. preparing grasp stay callback, can call grasp end right away
+    //  //_handsBuffer.Clear();
+    //  //foreach (var hand in _graspingHandsSet) {
+    //  //  if (_graspingLastFrameSet.Contains(hand) {
+    //  //    _graspHoldHands.Add(hand);
+    //  //  }
+    //  //  else {
+    //  //    _handsBuffer.Add(hand);
+    //  //  }
+    //  //}
+    //  //if (_handsBuffer.Count > 0) { OnGraspEnd(_handsBuffer); }
 
-      //// e.g. preparing hover stay callback, can call hover end right away
-      //_handsBuffer.Clear();
-      //foreach (var hand in _hoveringHandsSet) {
-      //  if (_hoveredLastFrameSet.Contains(hand)) {
-      //    _hoverStayHands.Add(hand);
-      //  }
-      //  else {
-      //    _handsBuffer.Add(hand);
-      //  }
-      //}
-      //if (_handsBuffer.Count > 0) { OnHoverEnd(_handsBuffer); }
+    //  //// e.g. preparing hover stay callback, can call hover end right away
+    //  //_handsBuffer.Clear();
+    //  //foreach (var hand in _hoveringHandsSet) {
+    //  //  if (_hoveredLastFrameSet.Contains(hand)) {
+    //  //    _hoverStayHands.Add(hand);
+    //  //  }
+    //  //  else {
+    //  //    _handsBuffer.Add(hand);
+    //  //  }
+    //  //}
+    //  //if (_handsBuffer.Count > 0) { OnHoverEnd(_handsBuffer); }
 
-      //// But note how I have to wait and traverse _graspingHandsSet AGAIN
-      //// in order to get the necessary hands for OnGraspBegin, because I'm
-      //// not allowed to call OnGraspBegin until after e.g. HoverEnd and ContactEnd
-      //// have been taken care of.
-      //// I _COULD_ solve this problem easily by having completely separate lists
-      //// for graspEnd, graspBegin, contactEnd, contactBegin, etc. etc. etc.
-      //// but good lord we already have so many of these per-object
+    //  //// But note how I have to wait and traverse _graspingHandsSet AGAIN
+    //  //// in order to get the necessary hands for OnGraspBegin, because I'm
+    //  //// not allowed to call OnGraspBegin until after e.g. HoverEnd and ContactEnd
+    //  //// have been taken care of.
+    //  //// I _COULD_ solve this problem easily by having completely separate lists
+    //  //// for graspEnd, graspBegin, contactEnd, contactBegin, etc. etc. etc.
+    //  //// but good lord we already have so many of these per-object
 
-      //// Update last-frame state
-      //_hoveredLastFrameSet.Clear();
-      //_primaryHoveredLastFrameSet.Clear();
-      //_contactingLastFrameSet.Clear();
-      //_graspingLastFrameSet.Clear();
-      //foreach (var hand in _hoveredLastFrameSet) {
-      //  _hoveringHandsSet.Add(hand);
-      //}
-      //foreach (var hand in _primaryHoveredLastFrameSet) {
-      //  _primaryHoveredLastFrameSet.Add(hand);
-      //}
-      //foreach (var hand in _graspingHandsSet) {
-      //  _graspingLastFrameSet.Add(hand);
-      //}
-      //foreach (var hand in _contactingHandsSet) {
-      //  _contactingLastFrameSet.Add(hand);
-      //}
-    }
+    //  //// Update last-frame state
+    //  //_hoveredLastFrameSet.Clear();
+    //  //_primaryHoveredLastFrameSet.Clear();
+    //  //_contactingLastFrameSet.Clear();
+    //  //_graspingLastFrameSet.Clear();
+    //  //foreach (var hand in _hoveredLastFrameSet) {
+    //  //  _hoveringHandsSet.Add(hand);
+    //  //}
+    //  //foreach (var hand in _primaryHoveredLastFrameSet) {
+    //  //  _primaryHoveredLastFrameSet.Add(hand);
+    //  //}
+    //  //foreach (var hand in _graspingHandsSet) {
+    //  //  _graspingLastFrameSet.Add(hand);
+    //  //}
+    //  //foreach (var hand in _contactingHandsSet) {
+    //  //  _contactingLastFrameSet.Add(hand);
+    //  //}
+    //}
 
-    #endregion
+    //#endregion
 
     #region OLD interaction code
 
