@@ -66,9 +66,9 @@ namespace Leap.Unity.UI.Interaction {
       if (_contactBehaviours.Count == 0) {
         hoverActivityManager.activationRadius = interactionManager.WorldHoverActivationRadius;
         _hoverActivityManager.FixedUpdatePosition((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
-        using (new ProfilerSample("Check for Closest Elements")) { hoverResults = CheckHoverForHand(_hand, _hoverActivityManager.ActiveBehaviours); }
-        ProcessHoverCheckResults(hoverResults);
-        ProcessPrimaryHoverCheckResults(hoverResults);
+        using (new ProfilerSample("Check for Closest Elements")) { CheckHoverForHand(_hand, _hoverActivityManager.ActiveBehaviours); }
+        ProcessHoverCheckResults();
+        ProcessPrimaryHoverCheckResults();
       }
 
       ISpaceComponent space;
@@ -94,17 +94,15 @@ namespace Leap.Unity.UI.Interaction {
     private HashSet<InteractionBehaviourBase> _hoverableCache = new HashSet<InteractionBehaviourBase>();
     public InteractionBehaviourBase[] tempPerFingerHovered = new InteractionBehaviourBase[3];
 
-    private HoverCheckResults CheckHoverForHand(Hand hand, HashSet<InteractionBehaviourBase> hoverCandidates) {
+    private void CheckHoverForHand(Hand hand, HashSet<InteractionBehaviourBase> hoverCandidates) {
       _hoverableCache.Clear();
       Array.Clear(tempPerFingerHovered, 0, tempPerFingerHovered.Length);
 
-      HoverCheckResults results = new HoverCheckResults() {
-        hovered = _hoverableCache,
-        perFingerHovered = tempPerFingerHovered,
-        primaryHovered = null,
-        primaryHoveredDistance = float.PositiveInfinity,
-        checkedHand = hand
-      };
+      hoverResults.hovered = _hoverableCache;
+      hoverResults.perFingerHovered = tempPerFingerHovered;
+      hoverResults.primaryHovered = null;
+      hoverResults.primaryHoveredDistance = float.PositiveInfinity;
+      hoverResults.checkedHand = hand;
 
       //Loop through all the fingers (that we care about)
       if (hand != null) {
@@ -118,15 +116,13 @@ namespace Leap.Unity.UI.Interaction {
             if (elem.ignoreHover) continue;
             ISpaceComponent element = elem.GetComponent<ISpaceComponent>();
             if (element != null) {
-              CheckHoverForElement(fingerTip, elem, element, i, ref leastFingerDistance, ref results);
+              CheckHoverForElement(fingerTip, elem, element, i, ref leastFingerDistance, ref hoverResults);
             } else {
-              CheckHoverForBehavior(fingerTip, elem, ref results);
+              CheckHoverForBehavior(fingerTip, elem, ref hoverResults);
             }
           }
         }
       }
-
-      return results;
     }
 
     public Vector3 transformPoint(Vector3 worldPoint, ISpaceComponent element) {
@@ -168,7 +164,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private List<InteractionBehaviourBase> _hoverRemovalCache = new List<InteractionBehaviourBase>();
-    private void ProcessHoverCheckResults(HoverCheckResults hoverResults) {
+    private void ProcessHoverCheckResults() {
       var trackedBehaviours = _hoverActivityManager.ActiveBehaviours;
       foreach (var hoverable in trackedBehaviours) {
         bool inLastFrame = false, inCurFrame = false;
@@ -204,7 +200,7 @@ namespace Leap.Unity.UI.Interaction {
       _hoverRemovalCache.Clear();
     }
 
-    private void ProcessPrimaryHoverCheckResults(HoverCheckResults hoverResults) {
+    private void ProcessPrimaryHoverCheckResults() {
       if (hoverResults.primaryHovered == _primaryHoveredLastFrame) {
         if (hoverResults.primaryHovered != null) hoverResults.primaryHovered.PrimaryHoverStay(hoverResults.checkedHand);
       }
@@ -268,19 +264,23 @@ namespace Leap.Unity.UI.Interaction {
 
     private bool _contactInitialized = false;
 
-    private void InitContact() {
-      if (_hand == null) return;
+    private bool InitContact() {
+      if (_hand == null) return false;
       InitBrushBoneContainer();
       InitBrushBones();
       _contactInitialized = true;
+      return _contactInitialized;
     }
 
     private void FixedUpdateContact() {
       if (!_contactInitialized) {
-        InitContact();
+        if (!InitContact()) {
+          return;
+        }
       }
-      if (!_contactInitialized) {
-        return;
+
+      if (_hand == null && _contactBehaviours.Count > 0) {
+        _contactBehaviours.Clear();
       }
 
       using (new ProfilerSample("Update BrushBones")) { FixedUpdateBrushBones(); }
