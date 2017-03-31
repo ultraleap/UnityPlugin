@@ -1,27 +1,28 @@
-﻿using System;
-using UnityEngine;
-using Leap.Unity.Query;
+﻿using UnityEngine;
 
-public static class LeapRuntimeTintExtension {
-  public static LeapRuntimeTintData GetRuntimeTint(this LeapGraphic graphic) {
-    return graphic.GetFirstFeatureData<LeapRuntimeTintData>();
-  }
-}
+namespace Leap.Unity.GraphicalRenderer {
 
-[LeapGraphicTag("Runtime Tint")]
-[AddComponentMenu("")]
-public class LeapRuntimeTintData : LeapFeatureData {
-
-  [SerializeField]
-  private Color _color = Color.white;
-
-  public Color color {
-    get {
-      return _color;
+  public static class LeapRuntimeTintExtension {
+    public static LeapRuntimeTintData GetRuntimeTint(this LeapGraphic graphic) {
+      return graphic.GetFirstFeatureData<LeapRuntimeTintData>();
     }
-    set {
-      MarkFeatureDirty();
-      _color = value;
+  }
+
+  [LeapGraphicTag("Runtime Tint")]
+  [AddComponentMenu("")]
+  public class LeapRuntimeTintData : LeapFeatureData {
+
+    [SerializeField]
+    private Color _color = Color.white;
+
+    public Color color {
+      get {
+        return _color;
+      }
+      set {
+        MarkFeatureDirty();
+        _color = value;
+      }
     }
   }
 }

@@ -4,54 +4,57 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-public class RendererMeshData : SceneTiedAsset {
-  [SerializeField]
-  private List<Mesh> meshes = new List<Mesh>();
+namespace Leap.Unity.GraphicalRenderer {
+
+  public class RendererMeshData : SceneTiedAsset {
+    [SerializeField]
+    private List<Mesh> meshes = new List<Mesh>();
 
 #if UNITY_EDITOR
-  protected override void OnAssetSaved() {
-    base.OnAssetSaved();
+    protected override void OnAssetSaved() {
+      base.OnAssetSaved();
 
-    //Make sure all our meshes are saved too!
-    foreach (var mesh in meshes) {
-      if (!AssetDatabase.IsSubAsset(mesh)) {
-        AssetDatabase.AddObjectToAsset(mesh, this);
+      //Make sure all our meshes are saved too!
+      foreach (var mesh in meshes) {
+        if (!AssetDatabase.IsSubAsset(mesh)) {
+          AssetDatabase.AddObjectToAsset(mesh, this);
+        }
       }
     }
-  }
 #endif
 
-  private void OnDestroy() {
-    foreach (var mesh in meshes) {
-      DestroyImmediate(mesh, allowDestroyingAssets: true);
+    private void OnDestroy() {
+      foreach (var mesh in meshes) {
+        DestroyImmediate(mesh, allowDestroyingAssets: true);
+      }
     }
-  }
 
-  public void Clear() {
-    foreach (var mesh in meshes) {
-      DestroyImmediate(mesh, allowDestroyingAssets: true);
+    public void Clear() {
+      foreach (var mesh in meshes) {
+        DestroyImmediate(mesh, allowDestroyingAssets: true);
+      }
+      meshes.Clear();
     }
-    meshes.Clear();
-  }
 
-  public void AddMesh(Mesh mesh) {
-    meshes.Add(mesh);
+    public void AddMesh(Mesh mesh) {
+      meshes.Add(mesh);
 #if UNITY_EDITOR
-    if (isSavedAsset) {
-      AssetDatabase.AddObjectToAsset(mesh, this);
-    }
+      if (isSavedAsset) {
+        AssetDatabase.AddObjectToAsset(mesh, this);
+      }
 #endif
-  }
-
-  public int Count {
-    get {
-      return meshes.Count;
     }
-  }
 
-  public Mesh this[int index] {
-    get {
-      return meshes[index];
+    public int Count {
+      get {
+        return meshes.Count;
+      }
+    }
+
+    public Mesh this[int index] {
+      get {
+        return meshes[index];
+      }
     }
   }
 }

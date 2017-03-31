@@ -1,84 +1,87 @@
 ﻿using System;
 using UnityEngine;
 
-public class JaggedArray<T> : ISerializationCallbackReceiver {
+namespace Leap.Unity.GraphicalRenderer {
 
-  [NonSerialized]
-  private T[][] _array;
+  public class JaggedArray<T> : ISerializationCallbackReceiver {
 
-  [SerializeField]
-  private T[] _data;
-  [SerializeField]
-  private int[] _lengths;
+    [NonSerialized]
+    private T[][] _array;
 
-  public JaggedArray() { }
+    [SerializeField]
+    private T[] _data;
+    [SerializeField]
+    private int[] _lengths;
 
-  public JaggedArray(int length) {
-    _array = new T[length][];
-  }
+    public JaggedArray() { }
 
-  public JaggedArray(T[][] array) {
-    _array = array;
-  }
+    public JaggedArray(int length) {
+      _array = new T[length][];
+    }
 
-  public void OnAfterDeserialize() {
-    _array = new T[_lengths.Length][];
-    int offset = 0;
-    for (int i = 0; i < _lengths.Length; i++) {
-      int length = _lengths[i];
-      if (length == -1) {
-        _array[i] = null;
-      } else {
-        _array[i] = new T[length];
-        Array.Copy(_data, offset, _array[i], 0, length);
-        offset += length;
+    public JaggedArray(T[][] array) {
+      _array = array;
+    }
+
+    public void OnAfterDeserialize() {
+      _array = new T[_lengths.Length][];
+      int offset = 0;
+      for (int i = 0; i < _lengths.Length; i++) {
+        int length = _lengths[i];
+        if (length == -1) {
+          _array[i] = null;
+        } else {
+          _array[i] = new T[length];
+          Array.Copy(_data, offset, _array[i], 0, length);
+          offset += length;
+        }
       }
     }
-  }
 
-  public void OnBeforeSerialize() {
-    if (_array == null) {
-      _data = new T[0];
-      _lengths = new int[0];
-      return;
-    }
+    public void OnBeforeSerialize() {
+      if (_array == null) {
+        _data = new T[0];
+        _lengths = new int[0];
+        return;
+      }
 
-    int count = 0;
-    foreach (var child in _array) {
-      if (child == null) continue;
-      count += child.Length;
-    }
+      int count = 0;
+      foreach (var child in _array) {
+        if (child == null) continue;
+        count += child.Length;
+      }
 
-    _data = new T[count];
-    _lengths = new int[_array.Length];
-    int offset = 0;
-    for (int i = 0; i < _array.Length; i++) {
-      var child = _array[i];
+      _data = new T[count];
+      _lengths = new int[_array.Length];
+      int offset = 0;
+      for (int i = 0; i < _array.Length; i++) {
+        var child = _array[i];
 
-      if (child == null) {
-        _lengths[i] = -1;
-      } else {
-        Array.Copy(child, 0, _data, offset, child.Length);
-        _lengths[i] = child.Length;
-        offset += child.Length;
+        if (child == null) {
+          _lengths[i] = -1;
+        } else {
+          Array.Copy(child, 0, _data, offset, child.Length);
+          _lengths[i] = child.Length;
+          offset += child.Length;
+        }
       }
     }
-  }
 
-  public T[] this[int index] {
-    get {
-      return _array[index];
+    public T[] this[int index] {
+      get {
+        return _array[index];
+      }
+      set {
+        _array[index] = value;
+      }
     }
-    set {
-      _array[index] = value;
+
+    public static implicit operator T[][] (JaggedArray<T> jaggedArray) {
+      return jaggedArray._array;
     }
-  }
 
-  public static implicit operator T[][] (JaggedArray<T> jaggedArray) {
-    return jaggedArray._array;
-  }
-
-  public static implicit operator JaggedArray<T>(T[][] array) {
-    return new JaggedArray<T>(array);
+    public static implicit operator JaggedArray<T>(T[][] array) {
+      return new JaggedArray<T>(array);
+    }
   }
 }

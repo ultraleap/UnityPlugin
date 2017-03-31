@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
-[AddComponentMenu("")]
-[LeapGraphicTag("Vector Channel")]
-public class CustomVectorChannelData : CustomChannelDataBase<Vector4> { }
+namespace Leap.Unity.GraphicalRenderer {
+
+  [AddComponentMenu("")]
+  [LeapGraphicTag("Vector Channel")]
+  public class CustomVectorChannelData : CustomChannelDataBase<Vector4> { }
+}

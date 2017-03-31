@@ -3,42 +3,45 @@ using UnityEngine.Rendering;
 using System.Collections.Generic;
 using Leap.Unity.Attributes;
 
-public abstract partial class LeapMeshGraphicBase : LeapGraphic {
+namespace Leap.Unity.GraphicalRenderer {
 
-  [EditTimeOnly]
-  public Color vertexColor = Color.white;
+  public abstract partial class LeapMeshGraphicBase : LeapGraphic {
 
-  public Mesh mesh { get; protected set; }
-  public UVChannelFlags remappableChannels { get; protected set; }
+    [EditTimeOnly]
+    public Color vertexColor = Color.white;
 
-  public abstract void RefreshMeshData();
+    public Mesh mesh { get; protected set; }
+    public UVChannelFlags remappableChannels { get; protected set; }
 
-  public LeapMeshGraphicBase() {
-    editor = new MeshEditorApi(this);
-  }
-}
+    public abstract void RefreshMeshData();
 
-public class LeapMeshGraphic : LeapMeshGraphicBase {
-
-  [EditTimeOnly]
-  [SerializeField]
-  private Mesh _mesh;
-
-  [Tooltip("All channels that are allowed to be remapped into atlas coordinates.")]
-  [EditTimeOnly]
-  [EnumFlags]
-  [SerializeField]
-  private UVChannelFlags _remappableChannels = UVChannelFlags.UV0 |
-                                               UVChannelFlags.UV1 |
-                                               UVChannelFlags.UV2 |
-                                               UVChannelFlags.UV3;
-
-  public void SetMesh(Mesh mesh) {
-    _mesh = mesh;
+    public LeapMeshGraphicBase() {
+      editor = new MeshEditorApi(this);
+    }
   }
 
-  public override void RefreshMeshData() {
-    mesh = _mesh;
-    remappableChannels = _remappableChannels;
+  public class LeapMeshGraphic : LeapMeshGraphicBase {
+
+    [EditTimeOnly]
+    [SerializeField]
+    private Mesh _mesh;
+
+    [Tooltip("All channels that are allowed to be remapped into atlas coordinates.")]
+    [EditTimeOnly]
+    [EnumFlags]
+    [SerializeField]
+    private UVChannelFlags _remappableChannels = UVChannelFlags.UV0 |
+                                                 UVChannelFlags.UV1 |
+                                                 UVChannelFlags.UV2 |
+                                                 UVChannelFlags.UV3;
+
+    public void SetMesh(Mesh mesh) {
+      _mesh = mesh;
+    }
+
+    public override void RefreshMeshData() {
+      mesh = _mesh;
+      remappableChannels = _remappableChannels;
+    }
   }
 }

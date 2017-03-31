@@ -3,33 +3,36 @@ using UnityEditor;
 using Leap.Unity;
 using Leap.Unity.Query;
 
-[CanEditMultipleObjects]
-[CustomEditor(typeof(LeapTextureData))]
-public class LeapTextureDataEditor : CustomEditorBase<LeapTextureData> {
+namespace Leap.Unity.GraphicalRenderer {
 
-  protected override void OnEnable() {
-    base.OnEnable();
-    dontShowScriptField();
+  [CanEditMultipleObjects]
+  [CustomEditor(typeof(LeapTextureData))]
+  public class LeapTextureDataEditor : CustomEditorBase<LeapTextureData> {
 
-    specifyCustomDrawer("texture", drawTexture);
-  }
+    protected override void OnEnable() {
+      base.OnEnable();
+      dontShowScriptField();
 
-  private void drawTexture(SerializedProperty property) {
-    var mainData = targets[0];
-    var mainFeature = mainData.feature as LeapTextureFeature;
-
-    if (targets.Query().Any(t => t.feature != mainData.feature)) {
-      mainFeature = null;
+      specifyCustomDrawer("texture", drawTexture);
     }
 
-    if (mainFeature != null) {
-      EditorGUILayout.PropertyField(property, new GUIContent(mainFeature.propertyName, property.tooltip));
-    } else {
-      int mainIndex = mainData.graphic.featureData.IndexOf(mainData);
-      if (targets.Query().Any(t => t.graphic.featureData.IndexOf(t) != mainIndex)) {
-        EditorGUILayout.PropertyField(property);
+    private void drawTexture(SerializedProperty property) {
+      var mainData = targets[0];
+      var mainFeature = mainData.feature as LeapTextureFeature;
+
+      if (targets.Query().Any(t => t.feature != mainData.feature)) {
+        mainFeature = null;
+      }
+
+      if (mainFeature != null) {
+        EditorGUILayout.PropertyField(property, new GUIContent(mainFeature.propertyName, property.tooltip));
       } else {
-        EditorGUILayout.PropertyField(property, new GUIContent("Channel " + mainIndex, property.tooltip));
+        int mainIndex = mainData.graphic.featureData.IndexOf(mainData);
+        if (targets.Query().Any(t => t.graphic.featureData.IndexOf(t) != mainIndex)) {
+          EditorGUILayout.PropertyField(property);
+        } else {
+          EditorGUILayout.PropertyField(property, new GUIContent("Channel " + mainIndex, property.tooltip));
+        }
       }
     }
   }

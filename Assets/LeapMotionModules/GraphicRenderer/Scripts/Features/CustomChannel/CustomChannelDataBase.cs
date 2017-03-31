@@ -1,19 +1,22 @@
 ﻿using UnityEngine;
 
-public abstract class CustomChannelDataBase : LeapFeatureData { }
+namespace Leap.Unity.GraphicalRenderer {
 
-public abstract class CustomChannelDataBase<T> : CustomChannelDataBase {
+  public abstract class CustomChannelDataBase : LeapFeatureData { }
 
-  [SerializeField]
-  private T _value;
+  public abstract class CustomChannelDataBase<T> : CustomChannelDataBase {
 
-  public T value {
-    get {
-      return _value;
-    }
-    set {
-      MarkFeatureDirty();
-      _value = value;
+    [SerializeField]
+    private T _value;
+
+    public T value {
+      get {
+        return _value;
+      }
+      set {
+        MarkFeatureDirty();
+        _value = value;
+      }
     }
   }
 }

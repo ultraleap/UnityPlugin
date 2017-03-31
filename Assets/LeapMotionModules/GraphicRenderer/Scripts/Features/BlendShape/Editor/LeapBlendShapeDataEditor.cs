@@ -1,19 +1,21 @@
 ﻿using UnityEditor;
-using Leap.Unity;
 
-[CanEditMultipleObjects]
-[CustomEditor(typeof(LeapBlendShapeData))]
-public class LeapBlendShapeDataEditor : CustomEditorBase {
-  protected override void OnEnable() {
-    base.OnEnable();
+namespace Leap.Unity.GraphicalRenderer {
 
-    if (target == null) return;
+  [CanEditMultipleObjects]
+  [CustomEditor(typeof(LeapBlendShapeData))]
+  public class LeapBlendShapeDataEditor : CustomEditorBase {
+    protected override void OnEnable() {
+      base.OnEnable();
 
-    dontShowScriptField();
+      if (target == null) return;
 
-    specifyConditionalDrawing("_type", (int)LeapBlendShapeData.BlendShapeType.Translation, "_translation");
-    specifyConditionalDrawing("_type", (int)LeapBlendShapeData.BlendShapeType.Rotation, "_rotation");
-    specifyConditionalDrawing("_type", (int)LeapBlendShapeData.BlendShapeType.Scale, "_scale");
-    specifyConditionalDrawing("_type", (int)LeapBlendShapeData.BlendShapeType.Mesh, "_mesh");
+      dontShowScriptField();
+
+      specifyConditionalDrawing("_type", (int)LeapBlendShapeData.BlendShapeType.Translation, "_translation");
+      specifyConditionalDrawing("_type", (int)LeapBlendShapeData.BlendShapeType.Rotation, "_rotation");
+      specifyConditionalDrawing("_type", (int)LeapBlendShapeData.BlendShapeType.Scale, "_scale");
+      specifyConditionalDrawing("_type", (int)LeapBlendShapeData.BlendShapeType.Mesh, "_mesh");
+    }
   }
 }

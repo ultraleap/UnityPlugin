@@ -1,16 +1,19 @@
 ﻿using UnityEngine;
 using Leap.Unity.Attributes;
 
-public static class LeapSpriteFeatureExtension {
-  public static LeapSpriteData Sprite(this LeapGraphic graphic) {
-    return graphic.GetFirstFeatureData<LeapSpriteData>();
+namespace Leap.Unity.GraphicalRenderer {
+
+  public static class LeapSpriteFeatureExtension {
+    public static LeapSpriteData Sprite(this LeapGraphic graphic) {
+      return graphic.GetFirstFeatureData<LeapSpriteData>();
+    }
   }
-}
 
-[LeapGraphicTag("Sprite")]
-[AddComponentMenu("")]
-public class LeapSpriteData : LeapFeatureData {
+  [LeapGraphicTag("Sprite")]
+  [AddComponentMenu("")]
+  public class LeapSpriteData : LeapFeatureData {
 
-  [EditTimeOnly]
-  public Sprite sprite;
+    [EditTimeOnly]
+    public Sprite sprite;
+  }
 }

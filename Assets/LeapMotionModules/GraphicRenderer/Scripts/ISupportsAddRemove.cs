@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using Leap.Unity;
+﻿
+namespace Leap.Unity.GraphicalRenderer {
 
-public interface ISupportsAddRemove {
-  void OnAddGraphic();
-  void OnRemoveGraphic();
+  public interface ISupportsAddRemove {
+    void OnAddGraphic();
+    void OnRemoveGraphic();
+  }
 }

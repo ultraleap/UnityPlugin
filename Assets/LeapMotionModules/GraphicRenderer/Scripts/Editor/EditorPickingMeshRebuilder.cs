@@ -1,20 +1,23 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-public static class EditorPickingMeshRebuilder {
+namespace Leap.Unity.GraphicalRenderer {
 
-  [InitializeOnLoadMethod]
-  private static void initManager() {
-    SceneView.onSceneGUIDelegate += onSceneGui;
-  }
+  public static class EditorPickingMeshRebuilder {
 
-  private static void onSceneGui(SceneView view) {
-    if (Event.current.type != EventType.MouseDown) {
-      return;
+    [InitializeOnLoadMethod]
+    private static void initManager() {
+      SceneView.onSceneGUIDelegate += onSceneGui;
     }
 
-    foreach (var graphicRenderer in Object.FindObjectsOfType<LeapGraphicRenderer>()) {
-      graphicRenderer.editor.RebuildEditorPickingMeshes();
+    private static void onSceneGui(SceneView view) {
+      if (Event.current.type != EventType.MouseDown) {
+        return;
+      }
+
+      foreach (var graphicRenderer in Object.FindObjectsOfType<LeapGraphicRenderer>()) {
+        graphicRenderer.editor.RebuildEditorPickingMeshes();
+      }
     }
   }
 }

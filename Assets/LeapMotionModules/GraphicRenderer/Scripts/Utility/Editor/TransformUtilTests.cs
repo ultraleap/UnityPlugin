@@ -1,43 +1,46 @@
 ﻿using UnityEngine;
 using NUnit.Framework;
 
-public class TransformUtilTests {
+namespace Leap.Unity.GraphicalRenderer {
 
-  private GameObject _gameObject;
-  private GameObject _child;
+  public class TransformUtilTests {
 
-  [SetUp]
-  public void Setup() {
-    _gameObject = new GameObject("__TEST OBJECT__");
-    _child = new GameObject("__CHILD OBJECT__");
-    _child.transform.SetParent(_gameObject.transform);
-    _gameObject.transform.rotation = Quaternion.Euler(45, 123, 888);
-    _child.transform.rotation = Quaternion.Euler(2, 44, 99);
-  }
+    private GameObject _gameObject;
+    private GameObject _child;
 
-  [TearDown]
-  public void Teardown() {
-    Object.DestroyImmediate(_child);
-    Object.DestroyImmediate(_gameObject);
-    _child = null;
-    _gameObject = null;
-  }
+    [SetUp]
+    public void Setup() {
+      _gameObject = new GameObject("__TEST OBJECT__");
+      _child = new GameObject("__CHILD OBJECT__");
+      _child.transform.SetParent(_gameObject.transform);
+      _gameObject.transform.rotation = Quaternion.Euler(45, 123, 888);
+      _child.transform.rotation = Quaternion.Euler(2, 44, 99);
+    }
 
-  [Test]
-  public void TransformRotationTest() {
-    AssertAlmostEqual(_gameObject.transform.TransformRotation(_child.transform.localRotation),
-                      _child.transform.rotation);
-  }
+    [TearDown]
+    public void Teardown() {
+      Object.DestroyImmediate(_child);
+      Object.DestroyImmediate(_gameObject);
+      _child = null;
+      _gameObject = null;
+    }
 
-  [Test]
-  public void InverseTransformRotationTest() {
-    AssertAlmostEqual(_gameObject.transform.InverseTransformRotation(_child.transform.rotation),
-                      _child.transform.localRotation);
-  }
+    [Test]
+    public void TransformRotationTest() {
+      AssertAlmostEqual(_gameObject.transform.TransformRotation(_child.transform.localRotation),
+                        _child.transform.rotation);
+    }
 
-  private static void AssertAlmostEqual(Quaternion a, Quaternion b) {
-    for (int i = 0; i < 4; i++) {
-      Assert.That(a[i], Is.EqualTo(b[i]).Within(10).Ulps);
+    [Test]
+    public void InverseTransformRotationTest() {
+      AssertAlmostEqual(_gameObject.transform.InverseTransformRotation(_child.transform.rotation),
+                        _child.transform.localRotation);
+    }
+
+    private static void AssertAlmostEqual(Quaternion a, Quaternion b) {
+      for (int i = 0; i < 4; i++) {
+        Assert.That(a[i], Is.EqualTo(b[i]).Within(10).Ulps);
+      }
     }
   }
 }

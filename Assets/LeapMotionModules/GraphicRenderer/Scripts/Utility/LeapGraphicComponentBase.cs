@@ -1,20 +1,21 @@
 ﻿using UnityEngine;
-using Leap.Unity;
 
-[ExecuteInEditMode]
-public class LeapGraphicComponentBase<AttachedComponent> : MonoBehaviour
+namespace Leap.Unity.GraphicalRenderer {
+
+  [ExecuteInEditMode]
+  public class LeapGraphicComponentBase<AttachedComponent> : MonoBehaviour
   where AttachedComponent : Component {
 
-  [SerializeField, HideInInspector]
-  protected int _persistentId;
+    [SerializeField, HideInInspector]
+    protected int _persistentId;
 
-  protected virtual void Awake() {
-    OnValidate();
-  }
+    protected virtual void Awake() {
+      OnValidate();
+    }
 
-  protected virtual void OnValidate() {
-    if (_persistentId == 0) {
-      _persistentId = new Hash() {
+    protected virtual void OnValidate() {
+      if (_persistentId == 0) {
+        _persistentId = new Hash() {
         this,
         gameObject,
         name,
@@ -23,24 +24,25 @@ public class LeapGraphicComponentBase<AttachedComponent> : MonoBehaviour
         transform.localScale,
         Random.Range(int.MinValue, int.MaxValue),
       };
+      }
+
+      var attatched = GetComponent<AttachedComponent>();
+      if (attatched == null) {
+        InternalUtility.Destroy(this);
+      }
+
+      //hideFlags = HideFlags.None;
+      hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
     }
 
-    var attatched = GetComponent<AttachedComponent>();
-    if (attatched == null) {
-      InternalUtility.Destroy(this);
+    protected virtual void OnDestroy() {
+#if UNITY_EDITOR
+      InternalUtility.InvokeIfUserDestroyed(OnDestroyedByUser);
+#endif
     }
 
-    //hideFlags = HideFlags.None;
-    hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
-  }
-
-  protected virtual void OnDestroy() {
 #if UNITY_EDITOR
-    InternalUtility.InvokeIfUserDestroyed(OnDestroyedByUser);
+    protected virtual void OnDestroyedByUser() { }
 #endif
   }
-
-#if UNITY_EDITOR
-  protected virtual void OnDestroyedByUser() { }
-#endif
 }

@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
-[AddComponentMenu("")]
-[LeapGraphicTag("Custom Channel/Color")]
-public class CustomColorChannelFeature : CustomChannelFeatureBase<CustomColorChannelData> { }
+namespace Leap.Unity.GraphicalRenderer {
+
+  [AddComponentMenu("")]
+  [LeapGraphicTag("Custom Channel/Color")]
+  public class CustomColorChannelFeature : CustomChannelFeatureBase<CustomColorChannelData> { }
+}

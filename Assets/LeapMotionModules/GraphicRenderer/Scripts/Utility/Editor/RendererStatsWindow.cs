@@ -4,54 +4,57 @@ using UnityEngine;
 using UnityEditor;
 using Leap.Unity.Query;
 
-public class RendererStatsWindow : EditorWindow {
+namespace Leap.Unity.GraphicalRenderer {
 
-  [MenuItem("Window/Renderer Stats")]
-  static void Init() {
-    EditorWindow.GetWindow<RendererStatsWindow>().Show();
-  }
+  public class RendererStatsWindow : EditorWindow {
 
-  private void OnEnable() {
-    Selection.selectionChanged += Repaint;
-  }
-
-  private void OnDisable() {
-    Selection.selectionChanged -= Repaint;
-  }
-
-  private void OnGUI() {
-    var renderers = Selection.gameObjects.Query().
-                                          Select(g => g.GetComponent<Renderer>()).
-                                          Where(r => r != null).
-                                          ToList();
-
-    if (renderers.Count == 0) {
-      EditorGUILayout.HelpBox("Select a renderer to see statistics!", MessageType.Info);
-      return;
+    [MenuItem("Window/Renderer Stats")]
+    static void Init() {
+      EditorWindow.GetWindow<RendererStatsWindow>().Show();
     }
 
-    foreach (var renderer in renderers) {
-      using (new EditorGUI.DisabledGroupScope(true)) {
-        EditorGUILayout.ObjectField(renderer, typeof(Renderer), allowSceneObjects: true);
+    private void OnEnable() {
+      Selection.selectionChanged += Repaint;
+    }
+
+    private void OnDisable() {
+      Selection.selectionChanged -= Repaint;
+    }
+
+    private void OnGUI() {
+      var renderers = Selection.gameObjects.Query().
+                                            Select(g => g.GetComponent<Renderer>()).
+                                            Where(r => r != null).
+                                            ToList();
+
+      if (renderers.Count == 0) {
+        EditorGUILayout.HelpBox("Select a renderer to see statistics!", MessageType.Info);
+        return;
       }
 
-      EditorGUILayout.LabelField("Variant keywords:", EditorStyles.boldLabel);
-      EditorGUI.indentLevel++;
-
-      foreach (var material in renderer.sharedMaterials) {
-        if (material == null) continue;
-
+      foreach (var renderer in renderers) {
         using (new EditorGUI.DisabledGroupScope(true)) {
-          EditorGUILayout.ObjectField(material, typeof(Material), allowSceneObjects: true);
+          EditorGUILayout.ObjectField(renderer, typeof(Renderer), allowSceneObjects: true);
         }
-        
-        foreach (var keyword in material.shaderKeywords) {
-          EditorGUILayout.LabelField(keyword);
-        }
-      }
 
-      EditorGUI.indentLevel--;
-      EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Variant keywords:", EditorStyles.boldLabel);
+        EditorGUI.indentLevel++;
+
+        foreach (var material in renderer.sharedMaterials) {
+          if (material == null) continue;
+
+          using (new EditorGUI.DisabledGroupScope(true)) {
+            EditorGUILayout.ObjectField(material, typeof(Material), allowSceneObjects: true);
+          }
+
+          foreach (var keyword in material.shaderKeywords) {
+            EditorGUILayout.LabelField(keyword);
+          }
+        }
+
+        EditorGUI.indentLevel--;
+        EditorGUILayout.Space();
+      }
     }
   }
 }

@@ -3,96 +3,99 @@ using UnityEngine;
 using UnityEditor;
 using Leap.Unity.Query;
 
-public static class MeshRendererConversion {
-  private const string CONTEXT_PATH = "CONTEXT/MeshRenderer/Convert To Leap Graphic Mesh";
+namespace Leap.Unity.GraphicalRenderer {
 
-  [MenuItem(CONTEXT_PATH)]
-  public static void convert(MenuCommand command) {
-    var graphicRenderer = (command.context as MeshRenderer).GetComponentInParent<LeapGraphicRenderer>();
+  public static class MeshRendererConversion {
+    private const string CONTEXT_PATH = "CONTEXT/MeshRenderer/Convert To Leap Graphic Mesh";
 
-    if (graphicRenderer.groups.Count == 0) {
-      graphicRenderer.editor.CreateGroup(typeof(LeapBakedRenderer));
-    }
+    [MenuItem(CONTEXT_PATH)]
+    public static void convert(MenuCommand command) {
+      var graphicRenderer = (command.context as MeshRenderer).GetComponentInParent<LeapGraphicRenderer>();
 
-    var group = graphicRenderer.groups[0];
+      if (graphicRenderer.groups.Count == 0) {
+        graphicRenderer.editor.CreateGroup(typeof(LeapBakedRenderer));
+      }
 
-    var graphics = new List<LeapMeshGraphic>();
-    var meshRenderers = (command.context as MeshRenderer).GetComponentsInChildren<MeshRenderer>();
-    foreach (var meshRenderer in meshRenderers) {
-      var material = meshRenderer.sharedMaterial;
-      if (material == null) continue;
+      var group = graphicRenderer.groups[0];
 
-      var shader = material.shader;
-      if (shader == null) continue;
+      var graphics = new List<LeapMeshGraphic>();
+      var meshRenderers = (command.context as MeshRenderer).GetComponentsInChildren<MeshRenderer>();
+      foreach (var meshRenderer in meshRenderers) {
+        var material = meshRenderer.sharedMaterial;
+        if (material == null) continue;
 
-      var filter = meshRenderer.GetComponent<MeshFilter>();
-      if (filter == null) continue;
+        var shader = material.shader;
+        if (shader == null) continue;
 
-      var mesh = filter.sharedMesh;
-      if (mesh == null) continue;
+        var filter = meshRenderer.GetComponent<MeshFilter>();
+        if (filter == null) continue;
 
-      int propCount = ShaderUtil.GetPropertyCount(shader);
-      for (int i = 0; i < propCount; i++) {
-        if (ShaderUtil.GetPropertyType(shader, i) == ShaderUtil.ShaderPropertyType.TexEnv) {
-          string propName = ShaderUtil.GetPropertyName(shader, i);
+        var mesh = filter.sharedMesh;
+        if (mesh == null) continue;
 
-          if (material.GetTexture(propName) == null) continue;
+        int propCount = ShaderUtil.GetPropertyCount(shader);
+        for (int i = 0; i < propCount; i++) {
+          if (ShaderUtil.GetPropertyType(shader, i) == ShaderUtil.ShaderPropertyType.TexEnv) {
+            string propName = ShaderUtil.GetPropertyName(shader, i);
 
-          var feature = group.features.Query().
-                                       OfType<LeapTextureFeature>().
-                                       FirstOrDefault(f => f.propertyName == propName);
+            if (material.GetTexture(propName) == null) continue;
 
-          if (feature == null) {
-            feature = group.editor.AddFeature(typeof(LeapTextureFeature)) as LeapTextureFeature;
-            feature.channel = UnityEngine.Rendering.UVChannelFlags.UV0;
-            feature.propertyName = propName;
+            var feature = group.features.Query().
+                                         OfType<LeapTextureFeature>().
+                                         FirstOrDefault(f => f.propertyName == propName);
+
+            if (feature == null) {
+              feature = group.editor.AddFeature(typeof(LeapTextureFeature)) as LeapTextureFeature;
+              feature.channel = UnityEngine.Rendering.UVChannelFlags.UV0;
+              feature.propertyName = propName;
+            }
           }
         }
+
+        var graphic = meshRenderer.gameObject.AddComponent<LeapMeshGraphic>();
+        Undo.RegisterCreatedObjectUndo(graphic, "Create Leap Mesh Graphic");
+
+        group.TryAddGraphic(graphic);
+        graphics.Add(graphic);
       }
 
-      var graphic = meshRenderer.gameObject.AddComponent<LeapMeshGraphic>();
-      Undo.RegisterCreatedObjectUndo(graphic, "Create Leap Mesh Graphic");
+      foreach (var graphic in graphics) {
+        var meshRenderer = graphic.GetComponent<MeshRenderer>();
+        var meshFilter = graphic.GetComponent<MeshFilter>();
+        var material = meshRenderer.sharedMaterial;
 
-      group.TryAddGraphic(graphic);
-      graphics.Add(graphic);
-    }
+        graphic.SetMesh(meshFilter.sharedMesh);
 
-    foreach (var graphic in graphics) {
-      var meshRenderer = graphic.GetComponent<MeshRenderer>();
-      var meshFilter = graphic.GetComponent<MeshFilter>();
-      var material = meshRenderer.sharedMaterial;
+        foreach (var dataObj in graphic.featureData) {
+          var textureData = dataObj as LeapTextureData;
+          if (textureData == null) {
+            continue;
+          }
 
-      graphic.SetMesh(meshFilter.sharedMesh);
+          var feature = textureData.feature as LeapTextureFeature;
+          if (!material.HasProperty(feature.propertyName)) {
+            continue;
+          }
 
-      foreach (var dataObj in graphic.featureData) {
-        var textureData = dataObj as LeapTextureData;
-        if (textureData == null) {
-          continue;
+          Texture2D tex2d = material.GetTexture(feature.propertyName) as Texture2D;
+          if (tex2d == null) {
+            continue;
+          }
+
+          textureData.texture = tex2d;
         }
 
-        var feature = textureData.feature as LeapTextureFeature;
-        if (!material.HasProperty(feature.propertyName)) {
-          continue;
-        }
-
-        Texture2D tex2d = material.GetTexture(feature.propertyName) as Texture2D;
-        if (tex2d == null) {
-          continue;
-        }
-
-        textureData.texture = tex2d;
+        Undo.DestroyObjectImmediate(meshRenderer);
+        Undo.DestroyObjectImmediate(meshFilter);
       }
 
-      Undo.DestroyObjectImmediate(meshRenderer);
-      Undo.DestroyObjectImmediate(meshFilter);
+      group.renderer.editor.ScheduleEditorUpdate();
     }
 
-    group.renderer.editor.ScheduleEditorUpdate();
-  }
-
-  [MenuItem(CONTEXT_PATH, validate = true)]
-  public static bool convertValidate(MenuCommand command) {
-    var graphicRenderer = (command.context as MeshRenderer).GetComponentInParent<LeapGraphicRenderer>();
-    return graphicRenderer != null;
+    [MenuItem(CONTEXT_PATH, validate = true)]
+    public static bool convertValidate(MenuCommand command) {
+      var graphicRenderer = (command.context as MeshRenderer).GetComponentInParent<LeapGraphicRenderer>();
+      return graphicRenderer != null;
+    }
   }
 }
