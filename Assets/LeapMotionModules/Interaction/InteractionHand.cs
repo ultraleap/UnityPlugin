@@ -52,6 +52,11 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     #region Hovering
+    //Disables broadphase checks if an object is currently interacting with this hand
+    private bool _interactionHoverOverride = false;
+    public void SetInteractionHoverOverride(bool value) {
+      _interactionHoverOverride = value;
+    }
 
     private ActivityManager _hoverActivityManager;
     public ActivityManager hoverActivityManager {
@@ -71,7 +76,7 @@ namespace Leap.Unity.UI.Interaction {
 
     private HoverCheckResults hoverResults = new HoverCheckResults();
     private void FixedUpdateHovering() {
-      if (_contactBehaviours.Count == 0) {
+      if (_interactionHoverOverride || _contactBehaviours.Count == 0) {
         hoverActivityManager.activationRadius = interactionManager.WorldHoverActivationRadius;
         _hoverActivityManager.FixedUpdatePosition((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
         using (new ProfilerSample("Check for Closest Elements")) { CheckHoverForHand(_hand, _hoverActivityManager.ActiveBehaviours); }
