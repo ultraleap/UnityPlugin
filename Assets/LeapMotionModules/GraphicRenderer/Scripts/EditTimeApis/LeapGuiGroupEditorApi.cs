@@ -75,7 +75,7 @@ public partial class LeapGraphicGroup : LeapGraphicComponentBase<LeapGraphicRend
       _group._renderer.editor.ScheduleEditorUpdate();
     }
 
-    public void ValidateElementList() {
+    public void ValidateGraphicList() {
       for (int i = _group._graphics.Count; i-- != 0;) {
         if (_group._graphics[i] == null) {
           _group._graphics.RemoveAt(i);
@@ -98,8 +98,8 @@ public partial class LeapGraphicGroup : LeapGraphicComponentBase<LeapGraphicRend
 
     public void RebuildEditorPickingMeshes() {
       using (new ProfilerSample("Rebuild Picking Meshes")) {
-        foreach (var element in _group._graphics) {
-          element.editor.RebuildEditorPickingMesh();
+        foreach (var graphic in _group._graphics) {
+          graphic.editor.RebuildEditorPickingMesh();
         }
       }
     }

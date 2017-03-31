@@ -92,7 +92,7 @@ public abstract partial class LeapGraphic : MonoBehaviour, ISpaceComponent {
 
   public virtual void OnAttachedToGroup(LeapGraphicGroup group, LeapSpaceAnchor anchor) {
 #if UNITY_EDITOR
-    editor.OnAttachedToGui(group, anchor);
+    editor.OnAttachedToGroup(group, anchor);
 #endif
 
     _attachedGroup = group;

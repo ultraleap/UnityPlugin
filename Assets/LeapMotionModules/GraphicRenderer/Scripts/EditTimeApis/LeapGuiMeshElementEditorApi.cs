@@ -7,18 +7,18 @@ public abstract partial class LeapMeshGraphicBase : LeapGraphic {
 
 #if UNITY_EDITOR
   public class MeshEditorApi : EditorApi {
-    protected readonly LeapMeshGraphicBase _meshElement;
+    protected readonly LeapMeshGraphicBase _meshGraphic;
 
-    public MeshEditorApi(LeapMeshGraphicBase meshElement) : base(meshElement) {
-      _meshElement = meshElement;
+    public MeshEditorApi(LeapMeshGraphicBase meshGraphic) : base(meshGraphic) {
+      _meshGraphic = meshGraphic;
     }
 
     public override void RebuildEditorPickingMesh() {
       base.RebuildEditorPickingMesh();
 
-      Assert.IsNotNull(_meshElement);
+      Assert.IsNotNull(_meshGraphic);
 
-      _meshElement.RefreshMeshData();
+      _meshGraphic.RefreshMeshData();
 
       List<Vector3> pickingVerts = new List<Vector3>();
       List<int> pickingTris = new List<int>();
@@ -30,30 +30,30 @@ public abstract partial class LeapMeshGraphicBase : LeapGraphic {
         pickingMesh = new Mesh();
         pickingMesh.MarkDynamic();
         pickingMesh.hideFlags = HideFlags.HideAndDontSave;
-        pickingMesh.name = "Gui Element Picking Mesh";
+        pickingMesh.name = "Graphic Picking Mesh";
       }
       pickingMesh.Clear();
 
-      if (_meshElement.mesh == null) return;
+      if (_meshGraphic.mesh == null) return;
 
-      var topology = MeshCache.GetTopology(_meshElement.mesh);
+      var topology = MeshCache.GetTopology(_meshGraphic.mesh);
       for (int i = 0; i < topology.tris.Length; i++) {
         pickingTris.Add(topology.tris[i] + pickingVerts.Count);
       }
 
       ITransformer transformer = null;
-      if (_meshElement.anchor != null) {
-        transformer = _meshElement.anchor.transformer;
+      if (_meshGraphic.anchor != null) {
+        transformer = _meshGraphic.anchor.transformer;
       }
 
       for (int i = 0; i < topology.verts.Length; i++) {
-        Vector3 localRectVert = _meshElement.attachedGroup.transform.InverseTransformPoint(_meshElement.transform.TransformPoint(topology.verts[i]));
+        Vector3 localRectVert = _meshGraphic.attachedGroup.transform.InverseTransformPoint(_meshGraphic.transform.TransformPoint(topology.verts[i]));
 
         if (transformer != null) {
           localRectVert = transformer.TransformPoint(localRectVert);
         }
 
-        localRectVert = _meshElement.attachedGroup.transform.TransformPoint(localRectVert);
+        localRectVert = _meshGraphic.attachedGroup.transform.TransformPoint(localRectVert);
 
         pickingVerts.Add(localRectVert);
       }

@@ -7,7 +7,7 @@ using Leap.Unity.Query;
 
 [CanEditMultipleObjects]
 [CustomEditor(typeof(LeapPanelGraphic))]
-public class LeapGuiProceduralPanelEditor : LeapGuiElementEditorBase<LeapPanelGraphic> {
+public class LeapGuiProceduralPanelEditor : LeapGraphicEditorBase<LeapPanelGraphic> {
 
   protected override void OnEnable() {
     base.OnEnable();

@@ -16,22 +16,22 @@ public partial class LeapGraphicRenderer : MonoBehaviour {
   public readonly EditorApi editor;
 
   public class EditorApi {
-    private LeapGraphicRenderer _gui;
+    private LeapGraphicRenderer _renderer;
 
     [NonSerialized]
     private Hash _previousHierarchyHash;
 
     private DelayedAction _delayedHeavyRebuild;
 
-    public EditorApi(LeapGraphicRenderer gui) {
-      _gui = gui;
+    public EditorApi(LeapGraphicRenderer renderer) {
+      _renderer = renderer;
 
       _delayedHeavyRebuild = new DelayedAction(() => DoEditorUpdateLogic(fullRebuild: true, heavyRebuild: true));
       InternalUtility.OnAnySave += onAnySave;
     }
 
     public void OnValidate() {
-      //TODO, handle drag-drop of leap gui for groups!
+      //TODO, handle drag-drop for groups!
     }
 
     public void OnDestroy() {
@@ -43,21 +43,21 @@ public partial class LeapGraphicRenderer : MonoBehaviour {
       AssertHelper.AssertEditorOnly();
       Assert.IsNotNull(rendererType);
 
-      var group = _gui.gameObject.AddComponent<LeapGraphicGroup>();
-      group.editor.Init(_gui, rendererType);
+      var group = _renderer.gameObject.AddComponent<LeapGraphicGroup>();
+      group.editor.Init(_renderer, rendererType);
 
-      _gui._selectedGroup = _gui._groups.Count;
-      _gui._groups.Add(group);
+      _renderer._selectedGroup = _renderer._groups.Count;
+      _renderer._groups.Add(group);
     }
 
     public void DestroySelectedGroup() {
       AssertHelper.AssertEditorOnly();
 
-      var toDestroy = _gui._groups[_gui._selectedGroup];
-      _gui._groups.RemoveAt(_gui._selectedGroup);
+      var toDestroy = _renderer._groups[_renderer._selectedGroup];
+      _renderer._groups.RemoveAt(_renderer._selectedGroup);
 
-      if (_gui._selectedGroup >= _gui._groups.Count && _gui._selectedGroup != 0) {
-        _gui._selectedGroup--;
+      if (_renderer._selectedGroup >= _renderer._groups.Count && _renderer._selectedGroup != 0) {
+        _renderer._selectedGroup--;
       }
 
       InternalUtility.Destroy(toDestroy);
@@ -71,15 +71,15 @@ public partial class LeapGraphicRenderer : MonoBehaviour {
     }
 
     public void RebuildEditorPickingMeshes() {
-      if (_gui._space != null) {
-        _gui._space.RebuildHierarchy();
-        _gui._space.RecalculateTransformers();
+      if (_renderer._space != null) {
+        _renderer._space.RebuildHierarchy();
+        _renderer._space.RecalculateTransformers();
       }
 
-      _gui.validateGraphics();
+      _renderer.validateGraphics();
 
-      foreach (var group in _gui._groups) {
-        group.editor.ValidateElementList();
+      foreach (var group in _renderer._groups) {
+        group.editor.ValidateGraphicList();
         group.RebuildFeatureData();
         group.RebuildFeatureSupportInfo();
         group.editor.RebuildEditorPickingMeshes();
@@ -92,7 +92,7 @@ public partial class LeapGraphicRenderer : MonoBehaviour {
       bool needsRebuild = false;
 
       using (new ProfilerSample("Calculate Should Rebuild")) {
-        foreach (var group in _gui._groups) {
+        foreach (var group in _renderer._groups) {
           foreach (var feature in group.features) {
             if (feature.isDirty) {
               needsRebuild = true;
@@ -101,10 +101,10 @@ public partial class LeapGraphicRenderer : MonoBehaviour {
           }
         }
 
-        Hash hierarchyHash = Hash.GetHierarchyHash(_gui.transform);
+        Hash hierarchyHash = Hash.GetHierarchyHash(_renderer.transform);
 
-        if (_gui._space != null) {
-          hierarchyHash.Add(_gui._space.GetSettingHash());
+        if (_renderer._space != null) {
+          hierarchyHash.Add(_renderer._space.GetSettingHash());
         }
 
         if (_previousHierarchyHash != hierarchyHash) {
@@ -124,24 +124,24 @@ public partial class LeapGraphicRenderer : MonoBehaviour {
       validateSpaceComponent();
 
       if (fullRebuild) {
-        if (_gui._space != null) {
-          _gui._space.RebuildHierarchy();
-          _gui._space.RecalculateTransformers();
+        if (_renderer._space != null) {
+          _renderer._space.RebuildHierarchy();
+          _renderer._space.RecalculateTransformers();
         }
 
-        _gui.validateGraphics();
+        _renderer.validateGraphics();
 
-        foreach (var group in _gui._groups) {
-          group.editor.ValidateElementList();
+        foreach (var group in _renderer._groups) {
+          group.editor.ValidateGraphicList();
           group.RebuildFeatureData();
           group.RebuildFeatureSupportInfo();
           group.editor.UpdateRendererEditor(heavyRebuild);
         }
 
-        _gui._hasFinishedSetup = true;
+        _renderer._hasFinishedSetup = true;
       }
 
-      foreach (var group in _gui._groups) {
+      foreach (var group in _renderer._groups) {
         group.UpdateRenderer();
       }
     }
@@ -151,14 +151,14 @@ public partial class LeapGraphicRenderer : MonoBehaviour {
     }
 
     private void validateSpaceComponent() {
-      if (_gui._space != null && !_gui._space.enabled) {
-        _gui._space = null;
+      if (_renderer._space != null && !_renderer._space.enabled) {
+        _renderer._space = null;
       }
 
-      if (_gui._space == null) {
-        var potentialSpace = _gui.GetComponent<LeapSpace>();
+      if (_renderer._space == null) {
+        var potentialSpace = _renderer.GetComponent<LeapSpace>();
         if (potentialSpace != null && potentialSpace.enabled) {
-          _gui._space = potentialSpace;
+          _renderer._space = potentialSpace;
         }
       }
     }

@@ -30,7 +30,7 @@ public class LeapBlendShapeFeature : LeapGraphicFeature<LeapBlendShapeData> {
 
   public override SupportInfo GetSupportInfo(LeapGraphicGroup group) {
     if (!group.renderingMethod.IsValidGraphic<LeapMeshGraphicBase>()) {
-      return SupportInfo.Error("Blend shapes a renderer that supports mesh elements.");
+      return SupportInfo.Error("Blend shapes require a renderer that supports mesh graphics.");
     } else {
       return SupportInfo.FullSupport();
     }

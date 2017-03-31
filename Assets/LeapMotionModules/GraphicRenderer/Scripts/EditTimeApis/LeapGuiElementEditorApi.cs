@@ -47,7 +47,7 @@ public abstract partial class LeapGraphic : MonoBehaviour {
 
     public virtual void RebuildEditorPickingMesh() { }
 
-    public virtual void OnAttachedToGui(LeapGraphicGroup group, LeapSpaceAnchor anchor) {
+    public virtual void OnAttachedToGroup(LeapGraphicGroup group, LeapSpaceAnchor anchor) {
       if (!Application.isPlaying) {
         _graphic._preferredRendererType = group.renderingMethod.GetType();
       }

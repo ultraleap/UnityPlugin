@@ -15,9 +15,9 @@ public class DefaultFeatureDataEditor : CustomEditorBase {
 
 [CanEditMultipleObjects]
 [CustomEditor(typeof(LeapGraphic), editorForChildClasses: true, isFallback = true)]
-public class LeapGraphicEditor : LeapGuiElementEditorBase<LeapGraphic> { }
+public class LeapGraphicEditor : LeapGraphicEditorBase<LeapGraphic> { }
 
-public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T : LeapGraphic {
+public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : LeapGraphic {
   List<Editor> editorCache = new List<Editor>();
 
   Object[] tempArray = new Object[0];
@@ -79,7 +79,7 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
           string tag = LeapGraphicTagAttribute.GetTag(group.renderingMethod.GetType());
           groupMenu.AddItem(new GUIContent(index.ToString() + ": " + tag), false, () => {
             foreach (var graphic in targets) {
-              Undo.RecordObject(graphic, "Change element group");
+              Undo.RecordObject(graphic, "Change graphic group");
               EditorUtility.SetDirty(graphic);
 
               if (graphic.attachedGroup.TryRemoveGraphic(graphic)) {
@@ -97,7 +97,7 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
   }
 
   protected void drawFeatureData(LeapGraphicGroup sharedGroup) {
-    using (new ProfilerSample("Draw Leap Gui Element Editor")) {
+    using (new ProfilerSample("Draw Leap Gui Graphic Editor")) {
       if (targets.Length == 0) return;
       var mainGraphic = targets[0];
 
@@ -156,7 +156,7 @@ public abstract class LeapGuiElementEditorBase<T> : CustomEditorBase<T> where T 
                 AppendList(tempList);
 
         if (tempList.Count != targets.Length) {
-          //Not all elements had a matching data object, so we don't display
+          //Not all graphics had a matching data object, so we don't display
           continue;
         }
 
