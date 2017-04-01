@@ -130,7 +130,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     //#### Tinting ####
     protected const string TINTS_PROPERTY = LeapGraphicRenderer.PROPERTY_PREFIX + "Tints";
-    protected List<Color> _tintColors = new List<Color>();
+    protected List<Vector4> _tintColors = new List<Vector4>();
 
     //#### Blend Shapes ####
     protected const string BLEND_SHAPE_AMOUNTS_PROPERTY = LeapGraphicRenderer.PROPERTY_PREFIX + "BlendShapeAmounts";
@@ -273,10 +273,9 @@ namespace Leap.Unity.GraphicalRenderer {
       foreach (var tintFeature in _tintFeatures) {
         if (!tintFeature.isDirty) continue;
 
-
         using (new ProfilerSample("Update Tinting")) {
-          tintFeature.featureData.Query().Select(d => d.color).FillList(_tintColors);
-          _material.SetColorArraySafe(TINTS_PROPERTY, _tintColors);
+          tintFeature.featureData.Query().Select(d => (Vector4)d.color).FillList(_tintColors);
+          _material.SetVectorArraySafe(TINTS_PROPERTY, _tintColors);
         }
       }
     }

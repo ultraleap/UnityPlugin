@@ -268,7 +268,11 @@ struct v2f_graphic_baked {
 #ifdef GRAPHIC_RENDERER_VERTEX_COLORS
 #define __COPY_COLORS(v,o) o.color = v.color;
 #else
+#ifdef GRAPHICS_HAVE_COLOR
+#define __COPY_COLORS(v,o) o.color = 1;
+#else
 #define __COPY_COLORS(v,o)
+#endif
 #endif
 
 #ifdef GRAPHIC_RENDERER_TINTING
