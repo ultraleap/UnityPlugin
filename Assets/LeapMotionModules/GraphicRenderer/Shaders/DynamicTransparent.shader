@@ -33,22 +33,21 @@
       }
       
       fixed4 frag (v2f_graphic_dynamic i) : SV_Target {
+        fixed4 color = fixed4(1,1,1,1);
+
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-        return dot(normalize(i.normal.xyz), float3(0, 0, 1));
+        color *= dot(normalize(i.normal.xyz), float3(0, 0, 1));
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_0
-        fixed4 color = tex2D(_MainTex, i.uv0);
+        color *= tex2D(_MainTex, i.uv0);
+#endif
+
 #ifdef GRAPHICS_HAVE_COLOR
         color *= i.color;
 #endif
+
         return color;
-#else
-#ifdef GRAPHICS_HAVE_COLOR
-        return i.color;
-#endif
-#endif
-        return fixed4(1,1,1,1);
       }
       ENDCG
     }

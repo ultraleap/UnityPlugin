@@ -129,10 +129,10 @@ namespace Leap.Unity.GraphicalRenderer {
           EditorGUILayout.LabelField("Feature Data: ", EditorStyles.boldLabel);
 
           if (sharedGroup != null) {
-            var bakedRendering = sharedGroup.renderingMethod as LeapBakedRenderer;
-            if (bakedRendering != null && bakedRendering.IsAtlasDirty) {
+            var meshRendering = sharedGroup.renderingMethod as LeapMesherBase;
+            if (meshRendering.IsAtlasDirty) {
               if (GUILayout.Button("Refresh Atlas", GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight))) {
-                bakedRendering.RebuildAtlas(new ProgressBar());
+                meshRendering.RebuildAtlas(new ProgressBar());
                 sharedGroup.renderer.editor.ScheduleEditorUpdate();
               }
             }

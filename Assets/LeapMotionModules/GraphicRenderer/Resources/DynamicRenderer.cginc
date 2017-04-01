@@ -86,8 +86,8 @@ void ApplyGraphicWarping(inout float4 anchorSpaceVert, int graphicId) {
 #ifndef GRAPHICS_HAVE_ID
 #define GRAPHICS_HAVE_ID
 #endif
-#ifndef GRAPHICS_HAND_COLOR
-#define GRAPHICS_HAND_COLOR
+#ifndef GRAPHICS_HAVE_COLOR
+#define GRAPHICS_HAVE_COLOR
 #endif
 
 float4 _GraphicRendererTints[GRAPHIC_MAX];
@@ -121,8 +121,8 @@ void ApplyBlendShapes(inout float4 vert, float4 uv3, int graphicId) {
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_COLORS
-#ifndef GRAPHICS_HAND_COLOR
-#define GRAPHICS_HAND_COLOR
+#ifndef GRAPHICS_HAVE_COLOR
+#define GRAPHICS_HAVE_COLOR
 #endif
 #endif
 
@@ -177,7 +177,7 @@ struct v2f_graphic_dynamic {
   float4 uv2 : TEXCOORD3;
 #endif
 
-#ifdef GRAPHICS_HAND_COLOR
+#ifdef GRAPHICS_HAVE_COLOR
   float4 color : COLOR;
 #endif
 };
