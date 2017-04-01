@@ -1,4 +1,4 @@
-﻿Shader "LeapGui/Defaults/DynamicTransparent" {
+﻿Shader "Leap Motion/Graphic Renderer/Defaults/DynamicTransparent" {
   Properties {
     _MainTex ("Texture", 2D) = "white" {}
   }
@@ -14,37 +14,37 @@
       #pragma vertex vert
       #pragma fragment frag
 
-      #pragma shader_feature _ LEAP_GUI_CYLINDRICAL LEAP_GUI_SPHERICAL
-      #pragma shader_feature _ LEAP_GUI_VERTEX_NORMALS
-      #pragma shader_feature _ LEAP_GUI_VERTEX_UV_0
-      #pragma shader_feature _ LEAP_GUI_VERTEX_UV_1
-      #pragma shader_feature _ LEAP_GUI_VERTEX_UV_2
-      #pragma shader_feature _ LEAP_GUI_VERTEX_COLORS
-      #pragma shader_feature _ LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_MOVEMENT_FULL
-      #pragma shader_feature _ LEAP_GUI_TINTING
-      #pragma shader_feature _ LEAP_GUI_BLEND_SHAPES
+      #pragma shader_feature _ GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_SPHERICAL
+      #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_NORMALS
+      #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_0
+      #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_1
+      #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_2
+      #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
+      #pragma shader_feature _ GRAPHIC_RENDERER_MOVEMENT_TRANSLATION GRAPHIC_RENDERER_MOVEMENT_FULL
+      #pragma shader_feature _ GRAPHIC_RENDERER_TINTING
+      #pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
       #include "Assets/LeapMotionModules/GraphicRenderer/Resources/DynamicRenderer.cginc"
       #include "UnityCG.cginc"
 
       sampler2D _MainTex;
       
-      v2f_gui_dynamic vert (appdata_gui_dynamic v) {
-        return ApplyDynamicGui(v);
+      v2f_graphic_dynamic vert (appdata_graphic_dynamic v) {
+        return ApplyDynamicGraphics(v);
       }
       
-      fixed4 frag (v2f_gui_dynamic i) : SV_Target {
-#ifdef LEAP_GUI_VERTEX_NORMALS
+      fixed4 frag (v2f_graphic_dynamic i) : SV_Target {
+#ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
         return dot(normalize(i.normal.xyz), float3(0, 0, 1));
 #endif
 
-#ifdef LEAP_GUI_VERTEX_UV_0
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_0
         fixed4 color = tex2D(_MainTex, i.uv0);
-#ifdef GUI_ELEMENTS_HAVE_COLOR
+#ifdef GRAPHICS_HAVE_COLOR
         color *= i.color;
 #endif
         return color;
 #else
-#ifdef GUI_ELEMENTS_HAVE_COLOR
+#ifdef GRAPHICS_HAVE_COLOR
         return i.color;
 #endif
 #endif

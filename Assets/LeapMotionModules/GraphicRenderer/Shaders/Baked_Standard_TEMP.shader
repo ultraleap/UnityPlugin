@@ -1,4 +1,4 @@
-﻿Shader "Custom/Baked_Standard_TEMP" {
+﻿Shader "Leap Motion/Graphic Renderer/Defaults/Baked_Standard_TEMP" {
   Properties {
     _MainTex ("Albedo (RGB)", 2D) = "white" {}
     _Smoothness ("Smoothness", Range(0, 1)) = 1

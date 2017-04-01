@@ -12,7 +12,7 @@ namespace Leap.Unity.GraphicalRenderer {
     #region PRIVATE VARIABLES
 
     //Curved space
-    private const string CURVED_PARAMETERS = LeapGraphicRenderer.PROPERTY_PREFIX + "Curved_ElementParameters";
+    private const string CURVED_PARAMETERS = LeapGraphicRenderer.PROPERTY_PREFIX + "Curved_GraphicParameters";
     private List<Matrix4x4> _curved_worldToAnchor = new List<Matrix4x4>();
     private List<Matrix4x4> _curved_meshTransforms = new List<Matrix4x4>();
     private List<Vector4> _curved_graphicParameters = new List<Vector4>();
@@ -76,9 +76,9 @@ namespace Leap.Unity.GraphicalRenderer {
 
         using (new ProfilerSample("Upload Material Data")) {
           _material.SetFloat(SpaceProperties.RADIAL_SPACE_RADIUS, curvedSpace.radius);
-          _material.SetMatrixArraySafe("_LeapGuiCurved_WorldToAnchor", _curved_worldToAnchor);
-          _material.SetMatrix("_LeapGui_LocalToWorld", transform.localToWorldMatrix);
-          _material.SetVectorArraySafe("_LeapGuiCurved_ElementParameters", _curved_graphicParameters);
+          _material.SetMatrixArraySafe("_GraphicRendererCurved_WorldToAnchor", _curved_worldToAnchor);
+          _material.SetMatrix("_GraphicRenderer_LocalToWorld", transform.localToWorldMatrix);
+          _material.SetVectorArraySafe("_GraphicRendererCurved_GraphicParameters", _curved_graphicParameters);
         }
 
         using (new ProfilerSample("Draw Meshes")) {
@@ -91,7 +91,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected override void setupForBuilding() {
       if (_shader == null) {
-        _shader = Shader.Find("LeapGui/Defaults/Dynamic");
+        _shader = Shader.Find("Leap Motion/Graphic Renderer/Defaults/Dynamic");
       }
 
       base.setupForBuilding();

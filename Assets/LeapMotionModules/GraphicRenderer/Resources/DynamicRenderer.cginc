@@ -4,73 +4,73 @@
  * Space name:
  *  _ (none)
  *    rect space, with no distortion
- *  LEAP_GUI_CYLINDRICAL
+ *  GRAPHIC_RENDERER_CYLINDRICAL
  *    cylindrical space
  ***********************************/
 
-float4x4 _LeapGui_WorldToGui;
-float4x4 _LeapGui_GuiToWorld;
+float4x4 _GraphicRenderer_WorldToLocal;
+float4x4 _GraphicRenderer_LocalToWorld;
 
-#ifdef LEAP_GUI_CYLINDRICAL
-#define LEAP_GUI_WARPING
+#ifdef GRAPHIC_RENDERER_CYLINDRICAL
+#define GRAPHIC_RENDERER_WARPING
 #include "Assets/LeapMotionModules/GraphicRenderer/Resources/CylindricalSpace.cginc"
 
-float4 _LeapGuiCurved_ElementParameters[GRAPHIC_MAX];
-float4x4 _LeapGui_LocalToWorld;
+float4 _GraphicRendererCurved_GraphicParameters[GRAPHIC_MAX];
+float4x4 _GraphicRenderer_LocalToWorld;
 
-#ifdef LEAP_GUI_VERTEX_NORMALS
-void ApplyGuiWarping(inout float4 anchorSpaceVert, inout float4 anchorSpaceNormal, int elementId) {
-  float4 parameters = _LeapGuiCurved_ElementParameters[elementId];
+#ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
+void ApplyGraphicWarping(inout float4 anchorSpaceVert, inout float4 anchorSpaceNormal, int graphicId) {
+  float4 parameters = _GraphicRendererCurved_GraphicParameters[graphicId];
 
   Cylindrical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal.xyz, parameters);
 
-  anchorSpaceVert = mul(_LeapGui_LocalToWorld, anchorSpaceVert);
-  anchorSpaceNormal = mul(_LeapGui_LocalToWorld, float4(anchorSpaceNormal.xyz, 0));
+  anchorSpaceVert = mul(_GraphicRenderer_LocalToWorld, anchorSpaceVert);
+  anchorSpaceNormal = mul(_GraphicRenderer_LocalToWorld, float4(anchorSpaceNormal.xyz, 0));
 }
 #else
-void ApplyGuiWarping(inout float4 anchorSpaceVert, int elementId) {
-  float4 parameters = _LeapGuiCurved_ElementParameters[elementId];
+void ApplyGraphicWarping(inout float4 anchorSpaceVert, int graphicId) {
+  float4 parameters = _GraphicRendererCurved_GraphicParameters[graphicId];
 
   Cylindrical_LocalToWorld(anchorSpaceVert.xyz, parameters);
 
-  anchorSpaceVert = mul(_LeapGui_LocalToWorld, anchorSpaceVert);
+  anchorSpaceVert = mul(_GraphicRenderer_LocalToWorld, anchorSpaceVert);
 }
 #endif
 #endif
 
-#ifdef LEAP_GUI_SPHERICAL
-#define LEAP_GUI_WARPING
+#ifdef GRAPHIC_RENDERER_SPHERICAL
+#define GRAPHIC_RENDERER_WARPING
 #include "Assets/LeapMotionModules/GraphicRenderer/Resources/SphericalSpace.cginc"
 
-float4 _LeapGuiCurved_ElementParameters[GRAPHIC_MAX];
-float4x4 _LeapGui_LocalToWorld;
+float4 _GraphicRendererCurved_GraphicParameters[GRAPHIC_MAX];
+float4x4 _GraphicRenderer_LocalToWorld;
 
-#ifdef LEAP_GUI_VERTEX_NORMALS
-void ApplyGuiWarping(inout float4 anchorSpaceVert, inout float4 anchorSpaceNormal, int elementId) {
-  float4 parameters = _LeapGuiCurved_ElementParameters[elementId];
+#ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
+void ApplyGraphicWarping(inout float4 anchorSpaceVert, inout float4 anchorSpaceNormal, int graphicId) {
+  float4 parameters = _GraphicRendererCurved_GraphicParameters[graphicId];
 
   Spherical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal.xyz, parameters);
 
-  anchorSpaceVert = mul(_LeapGui_LocalToWorld, anchorSpaceVert);
-  anchorSpaceNormal = mul(_LeapGui_LocalToWorld, float4(anchorSpaceNormal.xyz, 0));
+  anchorSpaceVert = mul(_GraphicRenderer_LocalToWorld, anchorSpaceVert);
+  anchorSpaceNormal = mul(_GraphicRenderer_LocalToWorld, float4(anchorSpaceNormal.xyz, 0));
 }
 #else
-void ApplyGuiWarping(inout float4 anchorSpaceVert, int elementId) {
-  float4 parameters = _LeapGuiCurved_ElementParameters[elementId];
+void ApplyGraphicWarping(inout float4 anchorSpaceVert, int graphicId) {
+  float4 parameters = _GraphicRendererCurved_GraphicParameters[graphicId];
 
   Spherical_LocalToWorld(anchorSpaceVert.xyz, parameters);
 
-  anchorSpaceVert = mul(_LeapGui_LocalToWorld, anchorSpaceVert);
+  anchorSpaceVert = mul(_GraphicRenderer_LocalToWorld, anchorSpaceVert);
 }
 #endif
 #endif
 
-#ifdef LEAP_GUI_WARPING
-#ifndef GUI_ELEMENTS_HAVE_ID
-#define GUI_ELEMENTS_HAVE_ID
+#ifdef GRAPHIC_RENDERER_WARPING
+#ifndef GRAPHICS_HAVE_ID
+#define GRAPHICS_HAVE_ID
 #endif
-#ifndef GUI_ELEMENTS_NEED_ANCHOR_SPACE
-#define GUI_ELEMENTS_NEED_ANCHOR_SPACE
+#ifndef GRAPHICS_NEED_ANCHOR_SPACE
+#define GRAPHICS_NEED_ANCHOR_SPACE
 #endif
 #endif
 
@@ -78,22 +78,22 @@ void ApplyGuiWarping(inout float4 anchorSpaceVert, int elementId) {
  * Feature name:
  *  _ (none)
  *    no runtime tinting, base color only
- *  LEAP_GUI_TINTING
- *    runtime tinting on a per-element basis
+ *  GRAPHIC_RENDERER_TINTING
+ *    runtime tinting on a per-graphic basis
  ***********************************/
 
-#ifdef LEAP_GUI_TINTING
-#ifndef GUI_ELEMENTS_HAVE_ID
-#define GUI_ELEMENTS_HAVE_ID
+#ifdef GRAPHIC_RENDERER_TINTING
+#ifndef GRAPHICS_HAVE_ID
+#define GRAPHICS_HAVE_ID
 #endif
-#ifndef GUI_ELEMENTS_HAVE_COLOR
-#define GUI_ELEMENTS_HAVE_COLOR
+#ifndef GRAPHICS_HAND_COLOR
+#define GRAPHICS_HAND_COLOR
 #endif
 
-float4 _LeapGuiTints[GRAPHIC_MAX];
+float4 _GraphicRendererTints[GRAPHIC_MAX];
 
-float4 GetElementTint(int elementId) {
-  return _LeapGuiTints[elementId];
+float4 GetGraphicTint(int graphicId) {
+  return _GraphicRendererTints[graphicId];
 }
 #endif
 
@@ -101,141 +101,141 @@ float4 GetElementTint(int elementId) {
  * Feature name:
  *  _ (none)
  *    no runtime blend shapes
- *  LEAP_GUI_BLEND_SHAPES
- *    runtime application of blend shapes on a per-element basis
+ *  GRAPHIC_RENDERER_BLEND_SHAPES
+ *    runtime application of blend shapes on a per-graphic basis
  ***********************************/
 
-#ifdef LEAP_GUI_BLEND_SHAPES
-#ifndef GUI_ELEMENTS_HAVE_ID
-#define GUI_ELEMENTS_HAVE_ID
+#ifdef GRAPHIC_RENDERER_BLEND_SHAPES
+#ifndef GRAPHICS_HAVE_ID
+#define GRAPHICS_HAVE_ID
 #endif
-#ifndef GUI_ELEMENTS_NEED_ANCHOR_SPACE
-#define GUI_ELEMENTS_NEED_ANCHOR_SPACE
+#ifndef GRAPHICS_NEED_ANCHOR_SPACE
+#define GRAPHICS_NEED_ANCHOR_SPACE
 #endif
 
-float _LeapGuiBlendShapeAmounts[GRAPHIC_MAX];
+float _GraphicRendererBlendShapeAmounts[GRAPHIC_MAX];
 
-void ApplyBlendShapes(inout float4 vert, float4 uv3, int elementId) {
-  vert.xyz += uv3.xyz * _LeapGuiBlendShapeAmounts[elementId];
+void ApplyBlendShapes(inout float4 vert, float4 uv3, int graphicId) {
+  vert.xyz += uv3.xyz * _GraphicRendererBlendShapeAmounts[graphicId];
 }
 #endif
 
-#ifdef LEAP_GUI_VERTEX_COLORS
-#ifndef GUI_ELEMENTS_HAVE_COLOR
-#define GUI_ELEMENTS_HAVE_COLOR
+#ifdef GRAPHIC_RENDERER_VERTEX_COLORS
+#ifndef GRAPHICS_HAND_COLOR
+#define GRAPHICS_HAND_COLOR
 #endif
 #endif
 
-#ifdef GUI_ELEMENTS_NEED_ANCHOR_SPACE
-float4x4 _LeapGuiCurved_WorldToAnchor[GRAPHIC_MAX];
+#ifdef GRAPHICS_NEED_ANCHOR_SPACE
+float4x4 _GraphicRendererCurved_WorldToAnchor[GRAPHIC_MAX];
 #endif
 
-struct appdata_gui_dynamic {
+struct appdata_graphic_dynamic {
   float4 vertex : POSITION;
 
-#ifdef LEAP_GUI_VERTEX_NORMALS
+#ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
   float4 normal : NORMAL;
 #endif
 
-#ifdef LEAP_GUI_VERTEX_UV_0
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_0
   float4 uv0 : TEXCOORD0;
 #endif
 
-#ifdef LEAP_GUI_VERTEX_UV_1
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_1
   float4 uv1 : TEXCOORD1;
 #endif
 
-#ifdef LEAP_GUI_VERTEX_UV_2
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_2
   float4 uv2 : TEXCOORD2;
 #endif
 
-#ifdef GUI_ELEMENTS_HAVE_ID
+#ifdef GRAPHICS_HAVE_ID
   float4 vertInfo : TEXCOORD3;
 #endif
 
-#ifdef LEAP_GUI_VERTEX_COLORS
+#ifdef GRAPHIC_RENDERER_VERTEX_COLORS
   float4 color : COLOR;
 #endif
 };
 
-struct v2f_gui_dynamic {
+struct v2f_graphic_dynamic {
   float4 vertex : SV_POSITION;
 
-#ifdef LEAP_GUI_VERTEX_NORMALS
+#ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
   float4 normal : NORMAL;
 #endif
 
-#ifdef LEAP_GUI_VERTEX_UV_0
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_0
   float4 uv0 : TEXCOORD0;
 #endif
 
-#ifdef LEAP_GUI_VERTEX_UV_1
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_1
   float4 uv1 : TEXCOORD2;
 #endif
 
-#ifdef LEAP_GUI_VERTEX_UV_2
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_2
   float4 uv2 : TEXCOORD3;
 #endif
 
-#ifdef GUI_ELEMENTS_HAVE_COLOR
+#ifdef GRAPHICS_HAND_COLOR
   float4 color : COLOR;
 #endif
 };
 
-v2f_gui_dynamic ApplyDynamicGui(appdata_gui_dynamic v) {
-#ifdef GUI_ELEMENTS_HAVE_ID
-#ifdef GUI_ELEMENT_ID_FROM_UV0
-  int elementId = v.uv0.w;
+v2f_graphic_dynamic ApplyDynamicGraphics(appdata_graphic_dynamic v) {
+#ifdef GRAPHICS_HAVE_ID
+#ifdef GRAPHIC_ID_FROM_UV0
+  int graphicId = v.uv0.w;
 #else
-  int elementId = v.vertInfo.w;
+  int graphicId = v.vertInfo.w;
 #endif
 #endif
 
-#ifdef GUI_ELEMENTS_NEED_ANCHOR_SPACE
+#ifdef GRAPHICS_NEED_ANCHOR_SPACE
   v.vertex = mul(unity_ObjectToWorld, v.vertex);
-  v.vertex = mul(_LeapGuiCurved_WorldToAnchor[elementId], v.vertex);
-#ifdef LEAP_GUI_VERTEX_NORMALS
+  v.vertex = mul(_GraphicRendererCurved_WorldToAnchor[graphicId], v.vertex);
+#ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
   v.normal = mul(unity_ObjectToWorld, float4(v.normal.xyz, 0));
-  v.normal = mul(_LeapGuiCurved_WorldToAnchor[elementId], float4(v.normal.xyz, 0));
+  v.normal = mul(_GraphicRendererCurved_WorldToAnchor[graphicId], float4(v.normal.xyz, 0));
 #endif
 #endif
 
-#ifdef LEAP_GUI_BLEND_SHAPES
-  ApplyBlendShapes(v.vertex, v.vertInfo, elementId);
+#ifdef GRAPHIC_RENDERER_BLEND_SHAPES
+  ApplyBlendShapes(v.vertex, v.vertInfo, graphicId);
 #endif
 
-#ifdef LEAP_GUI_WARPING
-#ifdef LEAP_GUI_VERTEX_NORMALS
-  ApplyGuiWarping(v.vertex, v.normal, elementId);
+#ifdef GRAPHIC_RENDERER_WARPING
+#ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
+  ApplyGraphicWarping(v.vertex, v.normal, graphicId);
 #else
-  ApplyGuiWarping(v.vertex, elementId);
+  ApplyGraphicWarping(v.vertex, graphicId);
 #endif
 #endif
 
-  v2f_gui_dynamic o;
-#ifdef GUI_ELEMENTS_NEED_ANCHOR_SPACE
+  v2f_graphic_dynamic o;
+#ifdef GRAPHICS_NEED_ANCHOR_SPACE
   o.vertex = mul(UNITY_MATRIX_VP, v.vertex);
-#if LEAP_GUI_VERTEX_NORMALS
+#if GRAPHIC_RENDERER_VERTEX_NORMALS
   o.normal = v.normal;
 #endif
 #else
   o.vertex = UnityObjectToClipPos(v.vertex);
-#if LEAP_GUI_VERTEX_NORMALS
+#if GRAPHIC_RENDERER_VERTEX_NORMALS
   o.normal = UnityObjectToWorldNormal(v.normal);
 #endif
 #endif
 
-#ifdef LEAP_GUI_VERTEX_UV_0
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_0
   o.uv0 = v.uv0;
 #endif
 
-#ifdef LEAP_GUI_TINTING
-  o.color = GetElementTint(elementId);
-#ifdef LEAP_GUI_VERTEX_COLORS
+#ifdef GRAPHIC_RENDERER_TINTING
+  o.color = GetGraphicTint(graphicId);
+#ifdef GRAPHIC_RENDERER_VERTEX_COLORS
   o.color *= v.color;
 #endif
 #else
-#ifdef LEAP_GUI_VERTEX_COLORS
+#ifdef GRAPHIC_RENDERER_VERTEX_COLORS
   o.color = v.color;
 #endif
 #endif
