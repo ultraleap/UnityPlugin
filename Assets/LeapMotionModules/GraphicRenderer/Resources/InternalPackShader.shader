@@ -1,4 +1,4 @@
-﻿Shader "Hidden/LeapGui/InternalPack" {
+﻿Shader "Hidden/Leap Motion/Graphic Renderer/InternalPack" {
   Properties {
     _MainTex ("Texture", 2D) = "white" {}
   }

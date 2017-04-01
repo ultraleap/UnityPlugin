@@ -1,4 +1,4 @@
-#include "Assets/LeapMotionModules/GraphicRenderer/Resources/LeapGui.cginc"
+#include "Assets/LeapMotionModules/GraphicRenderer/Resources/GraphicRenderer.cginc"
 
 /***********************************
  * Space name:
@@ -15,7 +15,7 @@ float4x4 _LeapGui_GuiToWorld;
 #define LEAP_GUI_WARPING
 #include "Assets/LeapMotionModules/GraphicRenderer/Resources/CylindricalSpace.cginc"
 
-float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
+float4 _LeapGuiCurved_ElementParameters[GRAPHIC_MAX];
 float4x4 _LeapGui_LocalToWorld;
 
 #ifdef LEAP_GUI_VERTEX_NORMALS
@@ -42,7 +42,7 @@ void ApplyGuiWarping(inout float4 anchorSpaceVert, int elementId) {
 #define LEAP_GUI_WARPING
 #include "Assets/LeapMotionModules/GraphicRenderer/Resources/SphericalSpace.cginc"
 
-float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
+float4 _LeapGuiCurved_ElementParameters[GRAPHIC_MAX];
 float4x4 _LeapGui_LocalToWorld;
 
 #ifdef LEAP_GUI_VERTEX_NORMALS
@@ -90,7 +90,7 @@ void ApplyGuiWarping(inout float4 anchorSpaceVert, int elementId) {
 #define GUI_ELEMENTS_HAVE_COLOR
 #endif
 
-float4 _LeapGuiTints[ELEMENT_MAX];
+float4 _LeapGuiTints[GRAPHIC_MAX];
 
 float4 GetElementTint(int elementId) {
   return _LeapGuiTints[elementId];
@@ -113,7 +113,7 @@ float4 GetElementTint(int elementId) {
 #define GUI_ELEMENTS_NEED_ANCHOR_SPACE
 #endif
 
-float _LeapGuiBlendShapeAmounts[ELEMENT_MAX];
+float _LeapGuiBlendShapeAmounts[GRAPHIC_MAX];
 
 void ApplyBlendShapes(inout float4 vert, float4 uv3, int elementId) {
   vert.xyz += uv3.xyz * _LeapGuiBlendShapeAmounts[elementId];
@@ -127,7 +127,7 @@ void ApplyBlendShapes(inout float4 vert, float4 uv3, int elementId) {
 #endif
 
 #ifdef GUI_ELEMENTS_NEED_ANCHOR_SPACE
-float4x4 _LeapGuiCurved_WorldToAnchor[ELEMENT_MAX];
+float4x4 _LeapGuiCurved_WorldToAnchor[GRAPHIC_MAX];
 #endif
 
 struct appdata_gui_dynamic {

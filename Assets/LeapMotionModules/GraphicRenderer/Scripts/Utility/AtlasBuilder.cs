@@ -89,7 +89,7 @@ namespace Leap.Unity.GraphicalRenderer {
     private static Material _cachedBlitMaterial = null;
     private static void enableBlitPass(Texture tex) {
       if (_cachedBlitMaterial == null) {
-        _cachedBlitMaterial = new Material(Shader.Find("Hidden/LeapGui/InternalPack"));
+        _cachedBlitMaterial = new Material(Shader.Find("Hidden/Leap Motion/Graphic Renderer/InternalPack"));
         _cachedBlitMaterial.hideFlags = HideFlags.HideAndDontSave;
       }
       _cachedBlitMaterial.mainTexture = tex;

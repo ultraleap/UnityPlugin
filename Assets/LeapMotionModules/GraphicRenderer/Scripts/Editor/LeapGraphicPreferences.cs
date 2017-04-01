@@ -8,9 +8,9 @@ using System.Text.RegularExpressions;
 namespace Leap.Unity.GraphicalRenderer {
 
   public class LeapGraphicPreferences : MonoBehaviour {
-    public const string LEAP_GRAPHIC_CGINC_PATH = "LeapMotionModules/GraphicRenderer/Resources/LeapGui.cginc";
+    public const string LEAP_GRAPHIC_CGINC_PATH = "LeapMotionModules/GraphicRenderer/Resources/GraphicRenderer.cginc";
     public const string LEAP_GRAPHIC_SHADER_FOLDER = "Assets/LeapMotionModules/GraphicRenderer/Shaders/";
-    private static Regex _graphicMaxRegex = new Regex(@"^#define\s+ELEMENT_MAX\s+(\d+)\s*$");
+    private static Regex _graphicMaxRegex = new Regex(@"^#define\s+GRAPHIC_MAX\s+(\d+)\s*$");
 
     private static int _cachedGraphicMax = -1; //-1 signals dirty
     public static int graphicMax {

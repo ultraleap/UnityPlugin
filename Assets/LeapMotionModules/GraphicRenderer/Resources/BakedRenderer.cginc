@@ -1,4 +1,4 @@
-#include "Assets/LeapMotionModules/GraphicRenderer/Resources/LeapGui.cginc"
+#include "Assets/LeapMotionModules/GraphicRenderer/Resources/GraphicRenderer.cginc"
 
 /************************************************************************* 
  * Movement name:
@@ -42,7 +42,7 @@
 #define LEAP_GUI_WARPING
 #include "Assets/LeapMotionModules/GraphicRenderer/Resources/CylindricalSpace.cginc"
 
-float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
+float4 _LeapGuiCurved_ElementParameters[GRAPHIC_MAX];
 
 #ifdef LEAP_GUI_VERTEX_NORMALS
 void ApplyGuiWarping(inout float4 vert, inout float3 normal, int elementId) {
@@ -63,7 +63,7 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 #define LEAP_GUI_WARPING
 #include "Assets/LeapMotionModules/GraphicRenderer/Resources/SphericalSpace.cginc"
 
-float4 _LeapGuiCurved_ElementParameters[ELEMENT_MAX];
+float4 _LeapGuiCurved_ElementParameters[GRAPHIC_MAX];
 
 #ifdef LEAP_GUI_VERTEX_NORMALS
 void ApplyGuiWarping(inout float4 vert, inout float3 normal, int elementId) {
@@ -83,7 +83,7 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 #ifdef LEAP_GUI_MOVEMENT
 #ifndef LEAP_GUI_WARPING
 #define LEAP_GUI_WARPING
-float3 _LeapGuiRect_ElementPositions[ELEMENT_MAX];
+float3 _LeapGuiRect_ElementPositions[GRAPHIC_MAX];
 
 #ifdef LEAP_GUI_VERTEX_NORMALS
 void ApplyGuiWarping(inout float4 vert, inout float3 normal, int elementId) {
@@ -121,7 +121,7 @@ void ApplyGuiWarping(inout float4 vert, int elementId) {
 #define GUI_ELEMENTS_HAVE_COLOR
 #endif
 
-float4 _LeapGuiTints[ELEMENT_MAX];
+float4 _LeapGuiTints[GRAPHIC_MAX];
 
 float4 GetElementTint(int elementId) {
   return _LeapGuiTints[elementId];
@@ -141,7 +141,7 @@ float4 GetElementTint(int elementId) {
 #define GUI_ELEMENTS_HAVE_ID
 #endif
 
-float _LeapGuiBlendShapeAmounts[ELEMENT_MAX];
+float _LeapGuiBlendShapeAmounts[GRAPHIC_MAX];
 
 void ApplyBlendShapes(inout float4 vert, float4 uv3, int elementId) {
   vert.xyz += uv3.xyz * _LeapGuiBlendShapeAmounts[elementId];
@@ -289,9 +289,9 @@ struct v2f_gui_baked {
   __APPLY_TINT(v,o)                           \
 }
 
-#define DEFINE_FLOAT_CHANNEL(name) float name[ELEMENT_MAX]
-#define DEFINE_FLOAT4_CHANNEL(name) float4 name[ELEMENT_MAX]
-#define DEFINE_FLOAT4x4_CHANNEL(name) float4x4 name[ELEMENT_MAX]
+#define DEFINE_FLOAT_CHANNEL(name) float name[GRAPHIC_MAX]
+#define DEFINE_FLOAT4_CHANNEL(name) float4 name[GRAPHIC_MAX]
+#define DEFINE_FLOAT4x4_CHANNEL(name) float4x4 name[GRAPHIC_MAX]
 
 #ifdef GUI_ELEMENTS_HAVE_ID
 #define getChannel(name) (name[elementId])
