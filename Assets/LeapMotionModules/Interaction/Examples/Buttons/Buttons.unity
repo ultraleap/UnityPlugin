@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44608885, g: 0.49058884, b: 0.546173, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -263,11 +263,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 64192840}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -278,9 +280,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1001 &71697668
 Prefab:
   m_ObjectHideFlags: 0
@@ -498,11 +497,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 85754730}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -513,9 +514,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &107997306
 GameObject:
   m_ObjectHideFlags: 0
@@ -687,11 +685,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 107997306}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -702,9 +702,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &123467802
 GameObject:
   m_ObjectHideFlags: 0
@@ -876,11 +873,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 123467802}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -891,9 +890,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &179600831
 GameObject:
   m_ObjectHideFlags: 0
@@ -1065,11 +1061,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 179600831}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -1080,9 +1078,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1001 &181990465
 Prefab:
   m_ObjectHideFlags: 0
@@ -1300,11 +1295,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 256333720}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -1315,9 +1312,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &296849243
 GameObject:
   m_ObjectHideFlags: 0
@@ -1489,11 +1483,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 296849243}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -1504,9 +1500,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &375145572
 GameObject:
   m_ObjectHideFlags: 0
@@ -1678,11 +1671,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 375145572}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -1693,9 +1688,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &376263669
 GameObject:
   m_ObjectHideFlags: 0
@@ -1867,11 +1859,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 376263669}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -1882,9 +1876,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &440484284
 GameObject:
   m_ObjectHideFlags: 0
@@ -2146,11 +2137,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 495407661}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -2161,9 +2154,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &552256742
 GameObject:
   m_ObjectHideFlags: 0
@@ -2335,11 +2325,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 552256742}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -2350,9 +2342,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &564590845
 GameObject:
   m_ObjectHideFlags: 0
@@ -2524,11 +2513,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 564590845}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -2539,9 +2530,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &593503969
 GameObject:
   m_ObjectHideFlags: 0
@@ -2713,11 +2701,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 593503969}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -2728,9 +2718,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &596105432
 GameObject:
   m_ObjectHideFlags: 0
@@ -2902,11 +2889,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 596105432}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -2917,40 +2906,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
---- !u!21 &627296491
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Gui Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: LEAP_GUI_CYLINDRICAL LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_TINTING
-    LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
-  m_LightmapFlags: 5
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  m_SavedProperties:
-    serializedVersion: 2
-    m_TexEnvs:
-    - first:
-        name: _MainTex
-      second:
-        m_Texture: {fileID: 28243838908581564, guid: d715cfef32f2e8d4aa73d7bcf5374c1b,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - first:
-        name: _MainTex2
-      second:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &658088851
 GameObject:
   m_ObjectHideFlags: 0
@@ -3205,11 +3160,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 675884434}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -3220,9 +3177,37 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
+--- !u!21 &697358801
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Gui Material
+  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  m_ShaderKeywords: LEAP_GUI_CYLINDRICAL LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_TINTING
+    LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+    - first:
+        name: _MainTex
+      second:
+        m_Texture: {fileID: 28690624559154018, guid: 05aec2bedab24184989a8a0ed5701aa5,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _MainTex2
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &698303311
 GameObject:
   m_ObjectHideFlags: 0
@@ -3394,11 +3379,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 698303311}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -3409,9 +3396,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &711919870
 GameObject:
   m_ObjectHideFlags: 0
@@ -3583,11 +3567,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 711919870}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -3598,9 +3584,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &722891430
 GameObject:
   m_ObjectHideFlags: 0
@@ -3772,11 +3755,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 722891430}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -3787,198 +3772,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
---- !u!1 &736659822
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 736659823}
-  - component: {fileID: 736659829}
-  - component: {fileID: 736659828}
-  - component: {fileID: 736659827}
-  - component: {fileID: 736659830}
-  - component: {fileID: 736659826}
-  - component: {fileID: 736659825}
-  - component: {fileID: 736659824}
-  - component: {fileID: 736659831}
-  - component: {fileID: 736659832}
-  m_Layer: 0
-  m_Name: Button
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &736659823
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 736659822}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.65207016, y: 0.7250001, z: -1}
-  m_LocalScale: {x: 0.13595082, y: 0.1359508, z: 0.6797541}
-  m_Children: []
-  m_Father: {fileID: 766838815}
-  m_RootOrder: 20
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &736659824
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 736659822}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
---- !u!54 &736659825
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 736659822}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 20
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 1
-  m_Constraints: 112
-  m_CollisionDetection: 0
---- !u!65 &736659826
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 736659822}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &736659827
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 736659822}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: 464661907
-  element: {fileID: 736659829}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
---- !u!114 &736659828
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 736659822}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b7dca36e8e5c88459b2626007befebc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parent: {fileID: 766838817}
-  space: {fileID: 1776547489}
---- !u!114 &736659829
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 736659822}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fb726b2ea51dd94d8601fa443872ec2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _anchor: {fileID: 736659828}
-  _data:
-  - {fileID: 736659827}
-  - {fileID: 736659830}
-  - {fileID: 736659831}
-  _attachedGroup: {fileID: 1776547486}
-  _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
-  _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
-  _remappableChannels: -1
---- !u!114 &736659830
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 736659822}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: 802916709
-  element: {fileID: 736659829}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
---- !u!114 &736659831
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 736659822}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: -1476852831
-  element: {fileID: 736659829}
-  feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
---- !u!114 &736659832
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 736659822}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
-  OnPress:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnUnpress:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &753687245
 GameObject:
   m_ObjectHideFlags: 0
@@ -4150,11 +3943,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 753687245}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -4165,9 +3960,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &758070963
 GameObject:
   m_ObjectHideFlags: 0
@@ -4339,11 +4131,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 758070963}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -4354,9 +4148,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &766838814
 GameObject:
   m_ObjectHideFlags: 0
@@ -4407,11 +4198,7 @@ Transform:
   - {fileID: 1280019399}
   - {fileID: 1459435849}
   - {fileID: 1564342053}
-  - {fileID: 736659823}
-  - {fileID: 1800289350}
-  - {fileID: 1660757702}
-  - {fileID: 1403298032}
-  - {fileID: 1849518350}
+  - {fileID: 982384010}
   m_Father: {fileID: 1776547488}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4666,11 +4453,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 775541596}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -4681,9 +4470,194 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
+--- !u!1 &982384004
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 982384010}
+  - component: {fileID: 982384006}
+  - component: {fileID: 982384009}
+  - component: {fileID: 982384008}
+  - component: {fileID: 982384007}
+  - component: {fileID: 982384014}
+  - component: {fileID: 982384013}
+  - component: {fileID: 982384012}
+  - component: {fileID: 982384005}
+  - component: {fileID: 982384011}
+  m_Layer: 0
+  m_Name: Slider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &982384005
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 982384004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _persistentId: 898270773
+  element: {fileID: 982384006}
+  feature: {fileID: 1776547492}
+  _tint: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &982384006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 982384004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fb726b2ea51dd94d8601fa443872ec2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _anchor: {fileID: 982384009}
+  _data:
+  - {fileID: 982384008}
+  - {fileID: 982384007}
+  - {fileID: 982384005}
+  _attachedGroup: {fileID: 1776547486}
+  _preferredRendererType:
+    _fullName: LeapGuiBakedRenderer
+  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+  _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
+  _remappableChannels: -1
+--- !u!114 &982384007
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 982384004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _persistentId: 1981619120
+  element: {fileID: 982384006}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
+--- !u!114 &982384008
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 982384004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _persistentId: -2079863947
+  element: {fileID: 982384006}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+--- !u!114 &982384009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 982384004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b7dca36e8e5c88459b2626007befebc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parent: {fileID: 766838817}
+  space: {fileID: 1776547489}
+--- !u!4 &982384010
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 982384004}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.8250001, y: 0.05476307, z: -1}
+  m_LocalScale: {x: 0.13595001, y: 0.13600002, z: 0.6800002}
+  m_Children: []
+  m_Father: {fileID: 766838815}
+  m_RootOrder: 20
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &982384011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 982384004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MinMaxHeight: {x: 0, y: 0.02}
+  RestingHeight: 0.5
+  HorizontalSlideLimits: {x: -0.03, y: 0.5}
+  VerticalSlideLimits: {x: 0, y: 0}
+  OnPress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+  OnUnpress:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
+--- !u!114 &982384012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 982384004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionManager: {fileID: 0}
+  ignoreHover: 0
+  ignoreContact: 0
+  ignoreGrasping: 0
+  allowMultiGrasp: 0
+  moveObjectWhenGrasped: 1
+  graspedMovementType: 0
+  graspHoldWarpingEnabled__curIgnored: 1
+--- !u!54 &982384013
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 982384004}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 20
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 0
+--- !u!65 &982384014
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 982384004}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1030474425
 GameObject:
   m_ObjectHideFlags: 0
@@ -4855,11 +4829,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1030474425}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -4870,9 +4846,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1044150502
 GameObject:
   m_ObjectHideFlags: 0
@@ -5044,11 +5017,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1044150502}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -5059,9 +5034,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1052163713
 GameObject:
   m_ObjectHideFlags: 0
@@ -5233,11 +5205,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1052163713}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -5248,9 +5222,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1076425313
 GameObject:
   m_ObjectHideFlags: 0
@@ -5540,11 +5511,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1093556436}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -5555,9 +5528,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1122126687
 GameObject:
   m_ObjectHideFlags: 0
@@ -5729,11 +5699,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1122126687}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -5744,9 +5716,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1137952024
 GameObject:
   m_ObjectHideFlags: 0
@@ -6023,11 +5992,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1280019398}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -6038,9 +6009,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1294748674
 GameObject:
   m_ObjectHideFlags: 0
@@ -6212,11 +6180,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1294748674}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -6227,9 +6197,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1319104133
 GameObject:
   m_ObjectHideFlags: 0
@@ -6401,11 +6368,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1319104133}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -6416,9 +6385,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1369518616
 GameObject:
   m_ObjectHideFlags: 0
@@ -6589,195 +6555,6 @@ Transform:
   m_Father: {fileID: 440484286}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1403298031
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 1403298032}
-  - component: {fileID: 1403298038}
-  - component: {fileID: 1403298037}
-  - component: {fileID: 1403298036}
-  - component: {fileID: 1403298039}
-  - component: {fileID: 1403298035}
-  - component: {fileID: 1403298034}
-  - component: {fileID: 1403298033}
-  - component: {fileID: 1403298040}
-  - component: {fileID: 1403298041}
-  m_Layer: 0
-  m_Name: Button
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1403298032
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1403298031}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.65207016, y: -0.33133727, z: -1}
-  m_LocalScale: {x: 0.13595082, y: 0.1359508, z: 0.6797541}
-  m_Children: []
-  m_Father: {fileID: 766838815}
-  m_RootOrder: 23
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1403298033
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1403298031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
---- !u!54 &1403298034
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1403298031}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 20
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 1
-  m_Constraints: 112
-  m_CollisionDetection: 0
---- !u!65 &1403298035
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1403298031}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1403298036
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1403298031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: 510206418
-  element: {fileID: 1403298038}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
---- !u!114 &1403298037
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1403298031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b7dca36e8e5c88459b2626007befebc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parent: {fileID: 766838817}
-  space: {fileID: 1776547489}
---- !u!114 &1403298038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1403298031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fb726b2ea51dd94d8601fa443872ec2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _anchor: {fileID: 1403298037}
-  _data:
-  - {fileID: 1403298036}
-  - {fileID: 1403298039}
-  - {fileID: 1403298040}
-  _attachedGroup: {fileID: 1776547486}
-  _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
-  _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
-  _remappableChannels: -1
---- !u!114 &1403298039
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1403298031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: -1260172647
-  element: {fileID: 1403298038}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
---- !u!114 &1403298040
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1403298031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: -660320486
-  element: {fileID: 1403298038}
-  feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
---- !u!114 &1403298041
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1403298031}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
-  OnPress:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnUnpress:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1404855181
 GameObject:
   m_ObjectHideFlags: 0
@@ -6949,11 +6726,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1404855181}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -6964,9 +6743,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1415579344
 GameObject:
   m_ObjectHideFlags: 0
@@ -7138,11 +6914,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1415579344}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -7153,9 +6931,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1419064046
 GameObject:
   m_ObjectHideFlags: 0
@@ -7327,11 +7102,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1419064046}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -7342,9 +7119,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1459435848
 GameObject:
   m_ObjectHideFlags: 0
@@ -7516,11 +7290,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1459435848}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -7531,9 +7307,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!4 &1511341752 stripped
 Transform:
   m_PrefabParentObject: {fileID: 464466, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
@@ -7715,11 +7488,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1564342052}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -7730,9 +7505,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1571047522
 GameObject:
   m_ObjectHideFlags: 0
@@ -7904,11 +7676,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1571047522}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -7919,9 +7693,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1593125176
 GameObject:
   m_ObjectHideFlags: 0
@@ -8093,11 +7864,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1593125176}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -8108,9 +7881,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1625780157
 GameObject:
   m_ObjectHideFlags: 0
@@ -8282,11 +8052,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1625780157}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -8297,9 +8069,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1643924751
 GameObject:
   m_ObjectHideFlags: 0
@@ -8601,11 +8370,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1650869433}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -8616,198 +8387,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
---- !u!1 &1660757701
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 1660757702}
-  - component: {fileID: 1660757708}
-  - component: {fileID: 1660757707}
-  - component: {fileID: 1660757706}
-  - component: {fileID: 1660757709}
-  - component: {fileID: 1660757705}
-  - component: {fileID: 1660757704}
-  - component: {fileID: 1660757703}
-  - component: {fileID: 1660757710}
-  - component: {fileID: 1660757711}
-  m_Layer: 0
-  m_Name: Button
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1660757702
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1660757701}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.65207016, y: 0.054763068, z: -1}
-  m_LocalScale: {x: 0.13595082, y: 0.1359508, z: 0.6797541}
-  m_Children: []
-  m_Father: {fileID: 766838815}
-  m_RootOrder: 22
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1660757703
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1660757701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
---- !u!54 &1660757704
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1660757701}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 20
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 1
-  m_Constraints: 112
-  m_CollisionDetection: 0
---- !u!65 &1660757705
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1660757701}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1660757706
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1660757701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: 1333530241
-  element: {fileID: 1660757708}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
---- !u!114 &1660757707
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1660757701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b7dca36e8e5c88459b2626007befebc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parent: {fileID: 766838817}
-  space: {fileID: 1776547489}
---- !u!114 &1660757708
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1660757701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fb726b2ea51dd94d8601fa443872ec2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _anchor: {fileID: 1660757707}
-  _data:
-  - {fileID: 1660757706}
-  - {fileID: 1660757709}
-  - {fileID: 1660757710}
-  _attachedGroup: {fileID: 1776547486}
-  _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
-  _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
-  _remappableChannels: -1
---- !u!114 &1660757709
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1660757701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: 1676350602
-  element: {fileID: 1660757708}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
---- !u!114 &1660757710
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1660757701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: -1706127113
-  element: {fileID: 1660757708}
-  feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
---- !u!114 &1660757711
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1660757701}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
-  OnPress:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnUnpress:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1715286116
 GameObject:
   m_ObjectHideFlags: 0
@@ -8979,11 +8558,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1715286116}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -8994,9 +8575,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1776547483
 GameObject:
   m_ObjectHideFlags: 0
@@ -9077,13 +8655,9 @@ MonoBehaviour:
   - {fileID: 1280019406}
   - {fileID: 1459435856}
   - {fileID: 1564342060}
-  - {fileID: 736659830}
-  - {fileID: 1800289357}
-  - {fileID: 1660757709}
-  - {fileID: 1403298039}
-  - {fileID: 1849518347}
   - {fileID: 1369518621}
   - {fileID: 766838819}
+  - {fileID: 982384007}
   propertyName: _BumpMap
   channel: 1
 --- !u!114 &1776547485
@@ -9115,9 +8689,9 @@ MonoBehaviour:
     _filterMode: 1
     _format: 5
     _maxAtlasSize: 4096
-  _material: {fileID: 627296491}
-  _meshes: {fileID: 11400000, guid: 336dd8449b760be458d8e0710f0b687f, type: 2}
-  _packedTextures: {fileID: 11400000, guid: d715cfef32f2e8d4aa73d7bcf5374c1b, type: 2}
+  _material: {fileID: 697358801}
+  _meshes: {fileID: 11400000, guid: a00f7e14dc910704b9ee070a0ba3a3b1, type: 2}
+  _packedTextures: {fileID: 11400000, guid: 05aec2bedab24184989a8a0ed5701aa5, type: 2}
   _channelMapping:
     _data:
     - serializedVersion: 2
@@ -9450,13 +9024,9 @@ MonoBehaviour:
   - {fileID: 1280019405}
   - {fileID: 1459435855}
   - {fileID: 1564342059}
-  - {fileID: 736659829}
-  - {fileID: 1800289356}
-  - {fileID: 1660757708}
-  - {fileID: 1403298038}
-  - {fileID: 1849518348}
   - {fileID: 1369518620}
   - {fileID: 766838818}
+  - {fileID: 982384006}
   _supportInfo:
   - support: 0
     message: 
@@ -9567,13 +9137,9 @@ MonoBehaviour:
   - {fileID: 1280019403}
   - {fileID: 1459435853}
   - {fileID: 1564342057}
-  - {fileID: 736659827}
-  - {fileID: 1800289354}
-  - {fileID: 1660757706}
-  - {fileID: 1403298036}
-  - {fileID: 1849518349}
   - {fileID: 1369518618}
   - {fileID: 766838816}
+  - {fileID: 982384008}
   propertyName: _MainTex
   channel: 1
 --- !u!114 &1776547492
@@ -9634,13 +9200,9 @@ MonoBehaviour:
   - {fileID: 1280019407}
   - {fileID: 1459435857}
   - {fileID: 1564342061}
-  - {fileID: 736659831}
-  - {fileID: 1800289358}
-  - {fileID: 1660757710}
-  - {fileID: 1403298040}
-  - {fileID: 1849518355}
   - {fileID: 1369518622}
   - {fileID: 766838820}
+  - {fileID: 982384005}
 --- !u!1 &1776885058
 GameObject:
   m_ObjectHideFlags: 0
@@ -9812,11 +9374,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1776885058}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -9827,9 +9391,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1776897081
 GameObject:
   m_ObjectHideFlags: 0
@@ -10001,11 +9562,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1776897081}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -10016,9 +9579,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1794650928
 GameObject:
   m_ObjectHideFlags: 0
@@ -10123,195 +9683,6 @@ AudioListener:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1794650928}
   m_Enabled: 1
---- !u!1 &1800289349
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 1800289350}
-  - component: {fileID: 1800289356}
-  - component: {fileID: 1800289355}
-  - component: {fileID: 1800289354}
-  - component: {fileID: 1800289357}
-  - component: {fileID: 1800289353}
-  - component: {fileID: 1800289352}
-  - component: {fileID: 1800289351}
-  - component: {fileID: 1800289358}
-  - component: {fileID: 1800289359}
-  m_Layer: 0
-  m_Name: Button
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1800289350
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1800289349}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.65207016, y: 0.4000777, z: -1}
-  m_LocalScale: {x: 0.13595082, y: 0.1359508, z: 0.6797541}
-  m_Children: []
-  m_Father: {fileID: 766838815}
-  m_RootOrder: 21
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1800289351
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1800289349}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
---- !u!54 &1800289352
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1800289349}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 20
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 1
-  m_Constraints: 112
-  m_CollisionDetection: 0
---- !u!65 &1800289353
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1800289349}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1800289354
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1800289349}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: -1730097331
-  element: {fileID: 1800289356}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
---- !u!114 &1800289355
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1800289349}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b7dca36e8e5c88459b2626007befebc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parent: {fileID: 766838817}
-  space: {fileID: 1776547489}
---- !u!114 &1800289356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1800289349}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fb726b2ea51dd94d8601fa443872ec2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _anchor: {fileID: 1800289355}
-  _data:
-  - {fileID: 1800289354}
-  - {fileID: 1800289357}
-  - {fileID: 1800289358}
-  _attachedGroup: {fileID: 1776547486}
-  _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
-  _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
-  _remappableChannels: -1
---- !u!114 &1800289357
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1800289349}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: -859433904
-  element: {fileID: 1800289356}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
---- !u!114 &1800289358
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1800289349}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: -1710853411
-  element: {fileID: 1800289356}
-  feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
---- !u!114 &1800289359
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1800289349}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
-  OnPress:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnUnpress:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &1821969817
 GameObject:
   m_ObjectHideFlags: 0
@@ -10483,11 +9854,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1821969817}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -10498,198 +9871,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
---- !u!1 &1849518346
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 1849518350}
-  - component: {fileID: 1849518348}
-  - component: {fileID: 1849518354}
-  - component: {fileID: 1849518349}
-  - component: {fileID: 1849518347}
-  - component: {fileID: 1849518353}
-  - component: {fileID: 1849518352}
-  - component: {fileID: 1849518351}
-  - component: {fileID: 1849518355}
-  - component: {fileID: 1849518356}
-  m_Layer: 0
-  m_Name: Button
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1849518347
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1849518346}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: -1964827038
-  element: {fileID: 1849518348}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
---- !u!114 &1849518348
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1849518346}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fb726b2ea51dd94d8601fa443872ec2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _anchor: {fileID: 1849518354}
-  _data:
-  - {fileID: 1849518349}
-  - {fileID: 1849518347}
-  - {fileID: 1849518355}
-  _attachedGroup: {fileID: 1776547486}
-  _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
-  _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
-  _remappableChannels: -1
---- !u!114 &1849518349
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1849518346}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: 1500430701
-  element: {fileID: 1849518348}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
---- !u!4 &1849518350
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1849518346}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.65207016, y: -0.6888884, z: -1}
-  m_LocalScale: {x: 0.13595082, y: 0.1359508, z: 0.6797541}
-  m_Children: []
-  m_Father: {fileID: 766838815}
-  m_RootOrder: 24
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1849518351
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1849518346}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
---- !u!54 &1849518352
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1849518346}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 20
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 1
-  m_Constraints: 112
-  m_CollisionDetection: 0
---- !u!65 &1849518353
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1849518346}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1849518354
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1849518346}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b7dca36e8e5c88459b2626007befebc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  parent: {fileID: 766838817}
-  space: {fileID: 1776547489}
---- !u!114 &1849518355
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1849518346}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _persistentId: 1904456396
-  element: {fileID: 1849518348}
-  feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
---- !u!114 &1849518356
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1849518346}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
-  OnPress:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnUnpress:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!4 &1850703573 stripped
 Transform:
   m_PrefabParentObject: {fileID: 464466, guid: 869d20cdda15af24aab9e72b5f2eec78, type: 2}
@@ -11001,11 +10182,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2037860237}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -11016,9 +10199,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &2101149217
 GameObject:
   m_ObjectHideFlags: 0
@@ -11190,11 +10370,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2101149217}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -11205,9 +10387,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
 --- !u!1 &2118264946
 GameObject:
   m_ObjectHideFlags: 0
@@ -11379,11 +10558,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2118264946}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a158185b8b808c8429602e146d3a0943, type: 3}
+  m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   MinMaxHeight: {x: 0, y: 0.02}
   RestingHeight: 0.5
+  HorizontalSlideLimits: {x: 0, y: 0}
+  VerticalSlideLimits: {x: 0, y: 0}
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -11394,6 +10575,3 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
-  isDepressed: 0
-  depressedThisFrame: 0
-  unDepressedThisFrame: 0
