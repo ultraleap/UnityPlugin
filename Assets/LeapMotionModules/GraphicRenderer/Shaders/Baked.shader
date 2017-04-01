@@ -11,15 +11,15 @@
       #pragma vertex vert
       #pragma fragment frag
 
-      #pragma shader_feature _ LEAP_GUI_CYLINDRICAL LEAP_GUI_SPHERICAL
-      #pragma shader_feature _ LEAP_GUI_VERTEX_NORMALS
-      #pragma shader_feature _ LEAP_GUI_VERTEX_UV_0
-      #pragma shader_feature _ LEAP_GUI_VERTEX_UV_1
-      #pragma shader_feature _ LEAP_GUI_VERTEX_UV_2
-      #pragma shader_feature _ LEAP_GUI_VERTEX_COLORS
-      #pragma shader_feature _ LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_MOVEMENT_FULL
-      #pragma shader_feature _ LEAP_GUI_TINTING
-      #pragma shader_feature _ LEAP_GUI_BLEND_SHAPES
+      #pragma shader_feature _ GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_SPHERICAL
+      #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_NORMALS
+      #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_0
+      #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_1
+      #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_2
+      #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
+      #pragma shader_feature _ GRAPHIC_RENDERER_MOVEMENT_TRANSLATION GRAPHIC_RENDERER_MOVEMENT_FULL
+      #pragma shader_feature _ GRAPHIC_RENDERER_TINTING
+      #pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
       #include "Assets/LeapMotionModules/GraphicRenderer/Resources/BakedRenderer.cginc"
       #include "UnityCG.cginc"
 
@@ -28,25 +28,25 @@
 
       DEFINE_FLOAT_CHANNEL(_Wiggle);
       
-      v2f_gui_baked vert (appdata_gui_baked v) {
+      v2f_graphic_baked vert (appdata_graphic_baked v) {
         BEGIN_V2F(v);
 
         v.vertex.x += getChannel(_Wiggle) * sin(_Time.z * 7 + v.vertex.y);
 
-        v2f_gui_baked o;
-        APPLY_BAKED_GUI(v,o);
+        v2f_graphic_baked o;
+        APPLY_BAKED_GRAPHICS(v,o);
 
         return o;
       }
       
-      fixed4 frag (v2f_gui_baked i) : SV_Target {
+      fixed4 frag (v2f_graphic_baked i) : SV_Target {
         fixed4 color = fixed4(1,1,1,1);
 
-#if LEAP_GUI_VERTEX_UV_0
+#if GRAPHIC_RENDERER_VERTEX_UV_0
         color *= tex2D(_MainTex, i.uv0);
 #endif
 
-#if LEAP_GUI_VERTEX_UV_0
+#if GRAPHIC_RENDERER_VERTEX_UV_0
         color *= tex2D(_MainTex2, i.uv0);
 #endif
 

@@ -31,11 +31,11 @@ namespace Leap.Unity.GraphicalRenderer {
     private List<MeshRendererContainer> _renderers;
 
     //## Rect space
-    private const string RECT_POSITIONS = LeapGraphicRenderer.PROPERTY_PREFIX + "Rect_ElementPositions";
+    private const string RECT_POSITIONS = LeapGraphicRenderer.PROPERTY_PREFIX + "Rect_GraphicPositions";
     private List<Vector4> _rect_graphicPositions = new List<Vector4>();
 
     //## Cylindrical/Spherical spaces
-    private const string CURVED_PARAMETERS = LeapGraphicRenderer.PROPERTY_PREFIX + "Curved_ElementParameters";
+    private const string CURVED_PARAMETERS = LeapGraphicRenderer.PROPERTY_PREFIX + "Curved_GraphicParameters";
     private List<Vector4> _curved_graphicParameters = new List<Vector4>();
 
     //## Cache data to be used inside of graphicVertToMeshVert

@@ -7,8 +7,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
   [ExecuteInEditMode]
   public partial class LeapGraphicRenderer : MonoBehaviour {
-    public const string FEATURE_PREFIX = "LEAP_GUI_";
-    public const string PROPERTY_PREFIX = "_LeapGui";
+    public const string FEATURE_PREFIX = "GRAPHIC_RENDERER_";
+    public const string PROPERTY_PREFIX = "_GraphicRenderer";
 
     public const string FEATURE_MOVEMENT_TRANSLATION = FEATURE_PREFIX + "MOVEMENT_TRANSLATION";
     public const string FEATURE_MOVEMENT_FULL = FEATURE_PREFIX + "MOVEMENT_FULL";
