@@ -35,23 +35,23 @@ namespace Leap.Unity.UI.Interaction.Internal {
 
     // Hover
     float GetDistance(Vector3 worldPosition);
-    void BeginHover(InteractionHand hand);
-    void EndHover(InteractionHand hand);
-    void BeginPrimaryHover(InteractionHand hand);
-    void EndPrimaryHover(InteractionHand hand);
+    void BeginHover(List<InteractionHand> hands);
+    void EndHover(List<InteractionHand> hands);
+    void BeginPrimaryHover(List<InteractionHand> hands);
+    void EndPrimaryHover(List<InteractionHand> hands);
 
     // Contact
-    void BeginContact(InteractionHand hand);
-    void EndContact(InteractionHand hand);
+    void BeginContact(List<InteractionHand> hands);
+    void EndContact(List<InteractionHand> hands);
 
     // Grasping
     bool isGrasped { get; }
-    void BeginGrasp(InteractionHand hand);
-    void EndGrasp(InteractionHand hand);
+    void BeginGrasp(List<InteractionHand> hands);
+    void EndGrasp(List<InteractionHand> hands);
 
     bool isSuspended { get; }
-    void SuspendGraspedObject(InteractionHand hand);
-    void ResumeGraspedObject(InteractionHand hand);
+    void SuspendGraspedObject(List<InteractionHand> hands);
+    void ResumeGraspedObject(List<InteractionHand> hands);
 
   }
 

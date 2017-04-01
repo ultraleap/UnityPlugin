@@ -23,6 +23,18 @@ namespace Leap.Unity.UI.Interaction {
       get { return _activeBehaviours; }
     }
 
+    /// <summary> If set to true, BeganActive and EndedActive will be calculated and populated. </summary>
+    public bool trackStateChanges = true;
+    private HashSet<IInteractionBehaviour> _activeBehavioursLastFrame = new HashSet<IInteractionBehaviour>();
+    private HashSet<IInteractionBehaviour> _beganActiveBehaviours = new HashSet<IInteractionBehaviour>();
+    public HashSet<IInteractionBehaviour> BeganActive {
+      get { return _beganActiveBehaviours; }
+    }
+    private HashSet<IInteractionBehaviour> _endedActiveBehaviours = new HashSet<IInteractionBehaviour>();
+    public HashSet<IInteractionBehaviour> EndedActive {
+      get { return _endedActiveBehaviours; }
+    }
+
     public ActivityManager(InteractionManager manager) {
       this.manager = manager;
       this.activationRadius = 1F;
@@ -47,6 +59,28 @@ namespace Leap.Unity.UI.Interaction {
               count = GetSphereColliderResults(transformPoint(palmPosition, space), ref _colliderResultsBuffer);
               UpdateActiveList(count, _colliderResultsBuffer);
             }
+          }
+        }
+
+        if (trackStateChanges) {
+          _endedActiveBehaviours.Clear();
+          _beganActiveBehaviours.Clear();
+
+          foreach (var behaviour in _activeBehaviours) {
+            if (!_activeBehavioursLastFrame.Contains(behaviour)) {
+              _beganActiveBehaviours.Add(behaviour);
+            }
+          }
+
+          foreach (var behaviour in _activeBehavioursLastFrame) {
+            if (!_activeBehaviours.Contains(behaviour)) {
+              _endedActiveBehaviours.Add(behaviour);
+            }
+          }
+
+          _activeBehavioursLastFrame.Clear();
+          foreach (var behaviour in _activeBehaviours) {
+            _activeBehavioursLastFrame.Add(behaviour);
           }
         }
       }

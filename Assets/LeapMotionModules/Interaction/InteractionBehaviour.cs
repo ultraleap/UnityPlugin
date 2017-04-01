@@ -211,7 +211,7 @@ namespace Leap.Unity.UI.Interaction {
     #region Grasping API
 
     /// <summary> Gets whether this object is grasped by any hand. </summary>
-    public override bool isGrasped { get { return _graspCount > 0; } }
+    public bool isGrasped { get { return _graspCount > 0; } }
 
     /// <summary> Gets a list of all hands currently grasping this object. </summary>
     public List<InteractionHand> graspingHands { get { return _graspingHandsSet; } }
@@ -537,7 +537,7 @@ namespace Leap.Unity.UI.Interaction {
     /// InteractionManager manually calls method this after all InteractionHands
     /// are updated (via InteractionManager.FixedUpdate).
     /// </summary>
-    public override void FixedUpdateObject() {
+    public void FixedUpdateObject() {
       FixedUpdateCollisionMode();
       FixedUpdateForces();
     }
@@ -551,19 +551,19 @@ namespace Leap.Unity.UI.Interaction {
       return Vector3.Distance(worldPosition, this.transform.position);
     }
 
-    public void BeginHover(InteractionHand hand) {
+    public void BeginHover(List<InteractionHand> hands) {
       _hoveringHandsSet.Add(hand);
     }
 
-    public void EndHover(InteractionHand hand) {
+    public void EndHover(List<InteractionHand> hands) {
       _hoveringHandsSet.Remove(hand);
     }
 
-    public void BeginPrimaryHover(InteractionHand hand) {
+    public void BeginPrimaryHover(List<InteractionHand> hands) {
       _primaryHoveringHandsSet.Add(hand);
     }
 
-    public void EndPrimaryHover(InteractionHand hand) {
+    public void EndPrimaryHover(List<InteractionHand> hands) {
       _primaryHoveringHandsSet.Remove(hand);
     }
 
@@ -573,11 +573,11 @@ namespace Leap.Unity.UI.Interaction {
 
     private HashSet<InteractionHand> _contactingHandsSet = new HashSet<InteractionHand>();
 
-    public void BeginContact(InteractionHand hand) {
+    public void BeginContact(List<InteractionHand> hands) {
       _contactingHandsSet.Add(hand);
     }
 
-    public void EndContact(InteractionHand hand) {
+    public void EndContact(List<InteractionHand> hands) {
       _contactingHandsSet.Remove(hand);
     }
 
@@ -588,11 +588,11 @@ namespace Leap.Unity.UI.Interaction {
     private HashSet<InteractionHand> _graspingHandsSet = new HashSet<InteractionHand>();
     private bool _isSuspended;
 
-    public void BeginGrasp(InteractionHand hand) {
+    public void BeginGrasp(List<InteractionHand> hands) {
       _graspingHandsSet.Add(hand);
     }
 
-    public void EndGrasp(InteractionHand hand) {
+    public void EndGrasp(List<InteractionHand> hands) {
       _graspingHandsSet.Remove(hand);
     }
 
@@ -600,11 +600,11 @@ namespace Leap.Unity.UI.Interaction {
       get { return _isSuspended; }
     }
 
-    public void SuspendGraspedObject(InteractionHand hand) {
+    public void SuspendGraspedObject(List<InteractionHand> hands) {
       _isSuspended = true;
     }
 
-    public void ResumeGraspedObject(InteractionHand hand) {
+    public void ResumeGraspedObject(List<InteractionHand> hands) {
       _isSuspended = false;
     }
 

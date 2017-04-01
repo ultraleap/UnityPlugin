@@ -52,9 +52,74 @@ namespace Leap.Unity.UI.Interaction {
         }
     }
 
-    private void UpdateBehaviour(IInteractionBehaviour behaviour, Hand hand) {
-      using (new ProfilerSample("Update Individual Grab Classifier",
-             behaviour.gameObject)) {
+    public void FixedUpdateClassifierHandState() {
+      using (new ProfilerSample("Update Classifier Hand State")) {
+        var hand = interactionHand.GetLeapHand();
+        if (hand != null) {
+          // Ensure that all scale dependent variables are properly set.
+          _scaledGrabParams.FINGERTIP_RADIUS = _defaultGrabParams.FINGERTIP_RADIUS
+                                             * interactionHand.interactionManager.SimulationScale;
+          _scaledGrabParams.THUMBTIP_RADIUS = _defaultGrabParams.THUMBTIP_RADIUS
+                                            * interactionHand.interactionManager.SimulationScale;
+          _scaledGrabParams.MAXIMUM_DISTANCE_FROM_HAND = _defaultGrabParams.MAXIMUM_DISTANCE_FROM_HAND
+                                                       * interactionHand.interactionManager.SimulationScale;
+      
+          // Ensure that the temporally variant variables are updated.
+          // scaledGrabParams.LAYER_MASK = 1 << _manager.InteractionLayer;
+          for (int i = 0; i < hand.Fingers.Count; i++) {
+            _fingerTipPositions[i] = hand.Fingers[i].TipPosition.ToVector3();
+          }
+        }
+      }
+    }
+
+    public bool FixedUpdateClassifierGrasp(out IInteractionBehaviour graspedObject) {
+      using (new ProfilerSample("Update Grab Classifier - Grasp", interactionHand.interactionManager)) {
+        graspedObject = null;
+        if (interactionHand.isGraspingObject || interactionHand.GetLeapHand() == null) {
+          // Cannot grasp another object with an untracked hand or while the hand is already grasping an object.
+          return false;
+        }
+        
+        foreach (var interactionObj in interactionHand.graspCandidates) {
+          IInteractionBehaviour _;
+          if (UpdateBehaviour(interactionObj, interactionHand.GetLeapHand(), out graspedObject, out _)) {
+            return true;
+          }
+        }
+
+        return false;
+      }
+    }
+
+    public bool FixedUpdateClassifierRelease(out IInteractionBehaviour releasedObject) {
+      using (new ProfilerSample("Update Grab Classifier - Release", interactionHand.interactionManager)) {
+        releasedObject = null;
+        if (!interactionHand.isGraspingObject) {
+          // Can't release an object if the hand is already not grasping one.
+          return false;
+        }
+
+        IInteractionBehaviour _;
+        if (UpdateBehaviour(interactionHand.graspedObject, interactionHand.GetLastTrackedLeapHand(), out _, out releasedObject)) {
+          return true;
+        }
+
+        return false;
+      }
+    }
+
+    /// <summary>
+    /// Returns true if this update resulted in a grasp state change, false otherwise.
+    /// 
+    /// Only one of graspedObject or releasedObject will be non-null per call to this method.
+    /// </summary>
+    private bool UpdateBehaviour(IInteractionBehaviour behaviour, Hand hand, out IInteractionBehaviour graspedObject, out IInteractionBehaviour releasedObject) {
+      using (new ProfilerSample("Update Individual Grab Classifier", behaviour.gameObject)) {
+        graspedObject = null;
+        releasedObject = null;
+
+        // Ensure a classifier exists for this Interaction Behaviour.
         GrabClassifierHeuristics.GrabClassifier classifier;
         if (!_classifiers.TryGetValue(behaviour, out classifier)) {
           classifier = new GrabClassifierHeuristics.GrabClassifier(behaviour.gameObject);
@@ -63,62 +128,29 @@ namespace Leap.Unity.UI.Interaction {
 
         // Do the actual grab classification logic.
         FillClassifier(hand, ref classifier);
-        GrabClassifierHeuristics.UpdateClassifier(classifier, _collidingCandidates, _numberOfColliders, _scaledGrabParams);
+        GrabClassifierHeuristics.UpdateClassifier(classifier, _collidingCandidates,
+                                                              _numberOfColliders,
+                                                              _scaledGrabParams);
 
+        // Determine whether there was a state change.
+        bool didStateChange = false;
         if (classifier.isGrabbing != classifier.prevGrabbing) {
+          didStateChange = true;
           if (classifier.isGrabbing) {
             if (!behaviour.ignoreGrasping && !interactionHand.isGraspingObject) {
-              if (behaviour.isGrasped && !behaviour.allowMultiGrasp) {
-                interactionHand.interactionManager.TryReleaseObjectFromGrasp(behaviour);
-              }
-              interactionHand.Grasp(behaviour);
+              graspedObject = behaviour;
             }
           }
-          else if (interactionHand.IsGrasping(behaviour)) {
-            interactionHand.ReleaseGrasp();
+          else if (interactionHand.graspedObject == behaviour) {
+            releasedObject = behaviour;
             classifier.coolDownProgress = 0f;
           }
         }
         classifier.prevGrabbing = classifier.isGrabbing;
+        return didStateChange;
       }
     }
 
-    // Classifier bookkeeping
-    public void FixedUpdateHeuristicClassifier(Hand hand) {
-      if (hand != null) {
-        //Ensure that all scale dependent variables are properly set
-        _scaledGrabParams.FINGERTIP_RADIUS = _defaultGrabParams.FINGERTIP_RADIUS
-                                           * interactionHand.interactionManager.SimulationScale;
-        _scaledGrabParams.THUMBTIP_RADIUS = _defaultGrabParams.THUMBTIP_RADIUS
-                                          * interactionHand.interactionManager.SimulationScale;
-        _scaledGrabParams.MAXIMUM_DISTANCE_FROM_HAND = _defaultGrabParams.MAXIMUM_DISTANCE_FROM_HAND
-                                                     * interactionHand.interactionManager.SimulationScale;
-
-        // Ensure that the temporally variant variables are updated
-        // scaledGrabParams.LAYER_MASK = 1 << _manager.InteractionLayer;
-        for (int i = 0; i < hand.Fingers.Count; i++) {
-          _fingerTipPositions[i] = hand.Fingers[i].TipPosition.ToVector3();
-        }
-
-        using (new ProfilerSample("Update Hand Grab Classifiers", interactionHand.interactionManager)) {
-          GrabClassifierHeuristics.UpdateAllProbeColliders(_fingerTipPositions, ref _collidingCandidates, ref _numberOfColliders, _scaledGrabParams);
-
-          // First check if already holding an object and only process that one.
-          var graspedObject = interactionHand.GetGraspedObject();
-          if (graspedObject != null) {
-            UpdateBehaviour(graspedObject, hand);
-          }
-
-          // Otherwise, process all objects.
-          var activeObjects = interactionHand.GetGraspCandidates();
-          foreach (var interactionObj in activeObjects) {
-            UpdateBehaviour(interactionObj, hand);
-          }
-        }
-      }
-    }
-
-    // TODO: Make sure the InteractionManager calls this method!! (Currently it does NOT.)
     public void UnregisterInteractionBehaviour(IInteractionBehaviour behaviour) {
       _classifiers.Remove(behaviour);
     }

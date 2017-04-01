@@ -1,6 +1,7 @@
 ﻿using InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.RuntimeGizmos;
+using Leap.Unity.Query;
 using Leap.Unity.UI.Interaction.Internal;
 using System;
 using System.Collections;
@@ -185,28 +186,25 @@ namespace Leap.Unity.UI.Interaction {
     void FixedUpdate() {
       OnPrePhysicalUpdate();
 
-      // Ensure provider scale information is up-to-date.
-      if (Provider != null) {
-        _providerScale = Provider.transform.lossyScale.x;
-      }
+      using (new ProfilerSample("Interaction Manager FixedUpdate", this.gameObject)) {
+        // Ensure provider scale information is up-to-date.
+        if (Provider != null) {
+          _providerScale = Provider.transform.lossyScale.x;
+        }
 
-      // Perform each hand's FixedUpdateHand.
-      for (int i = 0; i < _interactionHands.Length; i++) {
-        _interactionHands[i].FixedUpdateHand(enableHovering, enableContact, enableGrasping);
-      }
+        // Update each hand's interactions.
+        FixedUpdateHands();
 
-      // Update object state and send callbacks in strict order.
-      // for (int i = 0; i < )
+        // Perform each interaction object's FixedUpdateObject.
+        foreach (var interactionObj in _interactionBehaviours) {
+          interactionObj.FixedUpdateObject();
+        }
 
-      // Perform each interaction object's FixedUpdateObject.
-      foreach (var interactionObj in _interactionBehaviours) {
-        interactionObj.FixedUpdateObject();
-      }
-
-      // Apply soft contacts from both hands in unified solve.
-      // (This will clear softContacts and originalVelocities as well.)
-      if (_softContacts.Count > 0) {
-        PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
+        // Apply soft contacts from both hands in unified solve.
+        // (This will clear softContacts and originalVelocities as well.)
+        if (_softContacts.Count > 0) {
+          PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
+        }
       }
 
       OnPostPhysicalUpdate();
@@ -216,32 +214,7 @@ namespace Leap.Unity.UI.Interaction {
       OnGraphicalUpdate();
     }
 
-    #region Object Registration
-
-    public void RegisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
-      _interactionBehaviours.Add(interactionObj);
-      rigidbodyRegistry[interactionObj.rigidbody] = interactionObj;
-    }
-
-    /// <summary> Returns true if the Interaction Behaviour was registered with this manager; otherwise returns false. 
-    /// The manager is guaranteed not to have the Interaction Behaviour registered after calling this method. </summary>
-    public bool UnregisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
-      bool wasRemovalSuccessful = _interactionBehaviours.Remove(interactionObj);
-      if (wasRemovalSuccessful) {
-        foreach (var intHand in _interactionHands) { intHand.TryReleaseObject(interactionObj); }
-        rigidbodyRegistry.Remove(interactionObj.rigidbody);
-      }
-      return wasRemovalSuccessful;
-    }
-
-    public bool IsBehaviourRegistered(IInteractionBehaviour interactionObj) {
-      return _interactionBehaviours.Contains(interactionObj);
-    }
-
-    // TODO: Allow InteractionBehaviours to be unregistered; this should call out to hands and
-    // handle their grasped object state appropriately if their grasped object was just unregistered.
-
-    #endregion
+    #region Public Methods
 
     /// <summary>
     /// Returns the InteractionHand object that corresponds to the given Hand object.
@@ -264,8 +237,8 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     public bool TryReleaseObjectFromGrasp(IInteractionBehaviour interactionObj) {
       if (!_interactionBehaviours.Contains(interactionObj)) {
-        Debug.LogError("ReleaseObjectFromGrasp was called, but the interaction object " + interactionObj.transform.name + " is not registered"
-          + " with this InteractionManager.");
+        Debug.LogError("ReleaseObjectFromGrasp was called, but the interaction object " + interactionObj.transform.name + " is not registered "
+                     + "with this InteractionManager.");
         return false;
       }
 
@@ -278,6 +251,198 @@ namespace Leap.Unity.UI.Interaction {
       }
       return didRelease;
     }
+
+    #endregion
+
+    #region Hand Interactions State & Callbacks Update
+
+    private void FixedUpdateHands() {
+      using (new ProfilerSample("Fixed Update Hands (Hand Representations)")) {
+        // Perform general hand update, for hand representations
+        for (int i = 0; i < _interactionHands.Length; i++) { _interactionHands[i].FixedUpdateHand(enableHovering, enableContact, enableGrasping); }
+      }
+
+      using (new ProfilerSample("Fixed Update Hands (Interaction State and Callbacks")) {
+
+        /* 
+         * Interactions are checked here in a very specific manner so that interaction
+         * callbacks always occur in a strict order and interaction object state is
+         * always updated directly before the relevant callbacks occur.
+         * 
+         * Interaction callbacks will only occur outside this order if a script
+         * manually forces interaction state-changes; for example, calling
+         * interactionHand.ReleaseGrasp() will immediately call interactionObject.OnGraspEnd()
+         * on the formerly grasped object.
+         * 
+         * Callback order:
+         * - Suspension (when a grasped object's grasping hand loses tracking)
+         * - Just-Ended Interactions (Grasps, then Contacts, then Hovers)
+         * - Just-Begun Interactions (Hovers, then Contacts, then Grasps)
+         * - Sustained Interactions (Hovers, then Contacts, then Grasps)
+         */
+
+        // Suspension
+        for (int i = 0; i < _interactionHands.Length; i++) { _interactionHands[i].FixedUpdateSuspension(); }
+
+        // Ending Interactions //
+
+        // Check ending grasps.
+        FixedUpdateInteractionBehaviourStateChange(_interactionHands,
+          (InteractionHand maybeReleasingHand, out IInteractionBehaviour maybeReleasedObject) => {
+            return maybeReleasingHand.FixedUpdateDidGraspEnd(out maybeReleasedObject);
+          },
+          (releasedObject, releasingIntHands) => {
+            releasedObject.EndGrasp(releasingIntHands);
+          });
+
+        // Check ending contacts.
+        FixedUpdateMultiInteractionBehaviourStateChange(_interactionHands,
+          (InteractionHand maybeEndedContactingHand, out HashSet<IInteractionBehaviour> endContactedObjects) => {
+            return maybeEndedContactingHand.FixedUpdateDidContactEnd(out endContactedObjects);
+          },
+          (endContactedObject, endContactedIntHands) => {
+            endContactedObject.EndGrasp(endContactedIntHands);
+          });
+
+        // Check ending hovers.
+        FixedUpdateMultiInteractionBehaviourStateChange(_interactionHands,
+          (InteractionHand maybeEndedHoveringHand, out HashSet<IInteractionBehaviour> endHoveredObjects) => {
+            return maybeEndedHoveringHand.FixedUpdateDidHoverEnd(out endHoveredObjects);
+          },
+          (endHoveredObject, endHoveringIntHands) => {
+            endHoveredObject.EndGrasp(endHoveringIntHands);
+          });
+
+        // Beginning Interactions //
+
+        // Check beginning hovers.
+        if (enableHovering) {
+          FixedUpdateMultiInteractionBehaviourStateChange(_interactionHands,
+            (InteractionHand maybeBeganHoveringHand, out HashSet<IInteractionBehaviour> beganHoveredObjects) => {
+              return maybeBeganHoveringHand.FixedUpdateDidHoverBegin(out beganHoveredObjects);
+            },
+            (beganHoveredObject, beganHoveringIntHands) => { beganHoveredObject.BeginHover(beganHoveringIntHands); });
+        }
+
+        // Check beginning contacts.
+        if (enableContact) {
+          FixedUpdateMultiInteractionBehaviourStateChange(_interactionHands,
+            (InteractionHand maybeBeganContactingHand, out HashSet<IInteractionBehaviour> beganContactedObjects) => {
+              return maybeBeganContactingHand.FixedUpdateDidContactBegin(out beganContactedObjects);
+            },
+            (beganContactedObject, beganContactingIntHands) => { beganContactedObject.BeginContact(beganContactingIntHands); });
+        }
+
+        // Check beginning grasps.
+        if (enableGrasping) {
+          FixedUpdateInteractionBehaviourStateChange(_interactionHands,
+            (InteractionHand maybeBeganGraspingHand, out IInteractionBehaviour graspedObject) => {
+              return maybeBeganGraspingHand.FixedUpdateDidGraspBegin(out graspedObject);
+            },
+            (newlyGraspedObject, beganGraspingIntHands) => { newlyGraspedObject.BeginContact(beganGraspingIntHands); });
+        }
+
+        // Sustained interactions
+
+        // Check sustaining hover.
+        if (enableHover) for (int i = 0; i < _interactionHands.Length; i++) { _interactionHands[i].FixedUpdateHoverStay(); }
+        if (enableContact) for (int i = 0; i < _interactionHands.Length; i++) { _interactionHands[i].FixedUpdateContactStay(); }
+        if (enableGrasping) for (int i = 0; i < _interactionHands.Length; i++) { _interactionHands[i].FixedUpdateGraspHold(); }
+      }
+    }
+    
+    private delegate V StateChangeCheckFunc<H, T, V>(H hand, out T obj);
+    private delegate V MultiStateChangeCheckFunc<H, T, V>(H hand, out HashSet<T> objs);
+    
+    private static Pool<List<InteractionHand>> s_intHandsListPool = new Pool<List<InteractionHand>>();
+    private static Dictionary<IInteractionBehaviour, List<InteractionHand>> s_objHandsMap = new Dictionary<IInteractionBehaviour, List<InteractionHand>>();
+
+    private static void FixedUpdateInteractionBehaviourStateChange(InteractionHand[] interactionHands,
+        StateChangeCheckFunc<InteractionHand, IInteractionBehaviour, bool> interactionStateChangeCheckFunc,
+        Action<IInteractionBehaviour, List<InteractionHand>> actionPerStateChangedObjectAndAffectingHands) {
+      // Ensure the object->hands buffer is clean.
+      s_objHandsMap.Clear();
+
+      // In a nutshell, this remaps methods per-hand that output an interaction object if the hand changed that
+      // object's state, to methods per-object with all of the hands for which the check produced a state-change for that object.
+      foreach (var hand in interactionHands) {
+        IInteractionBehaviour stateChangedObject;
+        if (interactionStateChangeCheckFunc(hand, out stateChangedObject)) {
+          if (!s_objHandsMap.ContainsKey(stateChangedObject)) {
+            s_objHandsMap[stateChangedObject] = s_intHandsListPool.Take();
+          }
+          s_objHandsMap[stateChangedObject].Add(hand);
+        }
+      }
+      // Finally, iterate through each (object, hands) pair and call the action for each pair
+      foreach (var objHandsPair in s_objHandsMap) {
+        actionPerStateChangedObjectAndAffectingHands(objHandsPair.Key, objHandsPair.Value);
+
+        // Clear each hands list and return it to the list pool.
+        objHandsPair.Value.Clear();
+        s_intHandsListPool.Return(objHandsPair.Value);
+      }
+    }
+
+    private static void FixedUpdateMultiInteractionBehaviourStateChange(InteractionHand[] interactionHands,
+        MultiStateChangeCheckFunc<InteractionHand, IInteractionBehaviour, bool> interactionStateChangeCheckFunc,
+        Action<IInteractionBehaviour, List<InteractionHand>> actionPerStateChangedObjectAndAffectingHands) {
+      // Ensure object<->hands buffer is clean.
+      s_objHandsMap.Clear();
+
+      // In a nutshell, this remaps methods per-hand that output multiple interaction objects if the hand changed
+      // those objects' states, to methods per-object with all of the hands for which the check produced a state-change.
+      foreach (var hand in interactionHands) {
+        HashSet<IInteractionBehaviour> stateChangedObjects;
+        if (interactionStateChangeCheckFunc(hand, out stateChangedObjects)) {
+          foreach (var stateChangedObject in stateChangedObjects) {
+            if (!s_objHandsMap.ContainsKey(stateChangedObject)) {
+              s_objHandsMap[stateChangedObject] = s_intHandsListPool.Take();
+            }
+            s_objHandsMap[stateChangedObject].Add(hand);
+          }
+        }
+      }
+      // Finally, iterate through each (object, hands) pair and call the action for each pair
+      foreach (var objHandsPair in s_objHandsMap) {
+        actionPerStateChangedObjectAndAffectingHands(objHandsPair.Key, objHandsPair.Value);
+
+        // Clear each hands list and return it to the list pool.
+        objHandsPair.Value.Clear();
+        s_intHandsListPool.Return(objHandsPair.Value);
+      }
+    }
+
+    #endregion
+
+    #region Object Registration
+
+    public void RegisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
+      _interactionBehaviours.Add(interactionObj);
+      rigidbodyRegistry[interactionObj.rigidbody] = interactionObj;
+    }
+
+    /// <summary> Returns true if the Interaction Behaviour was registered with this manager; otherwise returns false. 
+    /// The manager is guaranteed not to have the Interaction Behaviour registered after calling this method. </summary>
+    public bool UnregisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
+      bool wasRemovalSuccessful = _interactionBehaviours.Remove(interactionObj);
+      if (wasRemovalSuccessful) {
+        foreach (var intHand in _interactionHands) {
+          intHand.ReleaseObject(interactionObj);
+          intHand.grabClassifier.UnregisterInteractionBehaviour(interactionObj);
+        }
+        rigidbodyRegistry.Remove(interactionObj.rigidbody);      }
+      return wasRemovalSuccessful;
+    }
+
+    public bool IsBehaviourRegistered(IInteractionBehaviour interactionObj) {
+      return _interactionBehaviours.Contains(interactionObj);
+    }
+
+    // TODO: Allow InteractionBehaviours to be unregistered; this should call out to hands and
+    // handle their grasped object state appropriately if their grasped object was just unregistered.
+
+    #endregion
 
     #region Internal
 
@@ -324,6 +489,33 @@ namespace Leap.Unity.UI.Interaction {
 
       //After copy and set we enable the interaction between the brushes and interaction objects
       Physics.IgnoreLayerCollision(_contactBoneLayer, _interactionLayer, false);
+    }
+
+    private class Pool<T> where T : new() {
+
+      private Queue<T> _pool = new Queue<T>();
+
+      public Pool(int initSize = 4) {
+        for (int i = 0; i < initSize; i++) {
+          MakeNew();
+        }
+      }
+
+      public T Take() {
+        if (_pool.Count == 0) {
+          MakeNew();
+        }
+        return _pool.Dequeue();
+      }
+
+      private void MakeNew() {
+        Return(new T());
+      }
+
+      public void Return(T t) {
+        _pool.Enqueue(t);
+      }
+
     }
 
     #endregion

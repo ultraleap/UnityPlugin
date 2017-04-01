@@ -28,20 +28,28 @@ namespace Leap.Unity.UI.Interaction {
       RefreshHandState();
     }
 
-    private void RefreshHandState() {
+    /// <summary>
+    /// Called by the InteractionManager every fixed (physics) frame to populate the
+    /// Interaction Hand with state from the Leap hand.
+    /// </summary>
+    public void RefreshHandState() {
       var hand = _handAccessor();
       if (hand != null) { _hand = _handData.CopyFrom(hand); }
       else { _hand = null; }
     }
 
     public void FixedUpdateHand(bool doHovering, bool doContact, bool doGrasping) {
-      RefreshHandState();
       using (new ProfilerSample("Fixed Update InteractionHand", _brushBoneParent)) {
-        if (doHovering) using (new ProfilerSample("Update Hovering")) { FixedUpdateHovering(); }
-        if (doContact) using (new ProfilerSample("Update Contact")) { FixedUpdateContact(); }
-        if (doGrasping) using (new ProfilerSample("Update Grasping")) { FixedUpdateGrasping(); }
+        RefreshHandState();
+        if (doGrasping) { grabClassifier.FixedUpdateClassifierHandState(); }
+        FixedUpdateContactState(); // even if doContact is disabled, need to check in case it was previously enabled
       }
     }
+    //  using (new ProfilerSample("Fixed Update InteractionHand", _brushBoneParent)) {
+    //    if (doHovering) using (new ProfilerSample("Update Hovering")) { FixedUpdateHovering(); }
+    //    if (doContact) using (new ProfilerSample("Update Contact")) { FixedUpdateContact(); }
+    //    if (doGrasping) using (new ProfilerSample("Update Grasping")) { FixedUpdateGrasping(); }
+    //  }
 
     public Hand GetLeapHand() {
       return _hand;
@@ -119,7 +127,8 @@ namespace Leap.Unity.UI.Interaction {
             ISpaceComponent element = elem.space;
             if (element != null) {
               CheckHoverForElement(fingerTip, elem, element, i, ref leastFingerDistance, ref _hoverResults);
-            } else {
+            }
+            else {
               CheckHoverForBehavior(fingerTip, elem, ref _hoverResults);
             }
           }
@@ -167,6 +176,9 @@ namespace Leap.Unity.UI.Interaction {
 
     private List<IInteractionBehaviour> _hoverRemovalCache = new List<IInteractionBehaviour>();
     private void ProcessHoverCheckResults() {
+      _hoverBeganBuffer.Clear();
+      _hoverEndedBuffer.Clear();
+
       var trackedBehaviours = _hoverActivityManager.ActiveBehaviours;
       foreach (var hoverable in trackedBehaviours) {
         bool inLastFrame = false, inCurFrame = false;
@@ -178,18 +190,18 @@ namespace Leap.Unity.UI.Interaction {
         }
 
         if (inCurFrame && !inLastFrame) {
-          hoverable.BeginHover(this);
+          _hoverBeganBuffer.Add(hoverable);
           _hoveredLastFrame.Add(hoverable);
         }
         if (!inCurFrame && inLastFrame) {
-          hoverable.EndHover(this);
+          _hoverEndedBuffer.Add(hoverable);
           _hoveredLastFrame.Remove(hoverable);
         }
       }
 
       foreach (var hoverable in _hoveredLastFrame) {
         if (!trackedBehaviours.Contains(hoverable)) {
-          hoverable.EndHover(this);
+          _hoverEndedBuffer.Add(hoverable);
           _hoverRemovalCache.Add(hoverable);
         }
       }
@@ -199,32 +211,60 @@ namespace Leap.Unity.UI.Interaction {
       _hoverRemovalCache.Clear();
     }
 
+    private HashSet<IInteractionBehaviour> _hoverEndedBuffer = new HashSet<IInteractionBehaviour>();
+    private HashSet<IInteractionBehaviour> _hoverBeganBuffer = new HashSet<IInteractionBehaviour>();
+
+    /// <summary>
+    /// Called by the Interaction Manager every fixed frame.
+    /// Outputs objects that stopped being hovered by this hand this frame into hoverEndedObjects and returns whether
+    /// the output set is empty.
+    /// </summary>
+    public bool FixedUpdateDidHoverEnd(out HashSet<IInteractionBehaviour> hoverEndedObjects) {
+      // Hover checks via the activity manager are robust to destroyed or made-invalid objects,
+      // so no additional validity checking is required.
+      hoverEndedObjects = _hoverEndedBuffer;
+      return _hoverEndedBuffer.Count > 0;
+    }
+
+    /// <summary>
+    /// Called by the Interaction Manager every fixed frame.
+    /// Outputs objects that began being hovered by this hand this frame into hoverBeganObjects and returns whether
+    /// the output set is empty.
+    /// </summary>
+    public bool FixedUpdateDidHoverBegin(out HashSet<IInteractionBehaviour> hoverBeganObjects) {
+      hoverBeganObjects = _hoverBeganBuffer;
+      return _hoverBeganBuffer.Count > 0;
+    }
+
     private void ProcessPrimaryHoverCheckResults() {
       if (_hoverResults.primaryHovered != _primaryHoveredLastFrame) {
         if (_primaryHoveredLastFrame != null) {
-          _primaryHoveredLastFrame.EndPrimaryHover(this);
+          _primaryHoverEndedObject = _primaryHoveredLastFrame;
         }
         _primaryHoveredLastFrame = _hoverResults.primaryHovered;
-        if (_primaryHoveredLastFrame != null) _primaryHoveredLastFrame.BeginPrimaryHover(this);
+        if (_primaryHoveredLastFrame != null) _primaryHoverBeganObject = _primaryHoveredLastFrame;
       }
     }
+
+    private IInteractionBehaviour _primaryHoverEndedObject = null;
+    private IInteractionBehaviour _primaryHoverBeganObject = null;
+
+    public bool FixedUpdateDidPrimaryHoverEnd(out IInteractionBehaviour hoverEndedObjects) {
+    }
+
+    public bool FixedUpdateDidPrimaryHoverBegin(out IInteractionBehaviour hoverEndedObjects) {
+
+    }
+
     #endregion
 
     #region Contact
-
-    private ActivityManager _contactActivityManager;
-    private ActivityManager contactActivityManager {
-      get {
-        if (_contactActivityManager == null) { _contactActivityManager = new ActivityManager(interactionManager); }
-        return _contactActivityManager;
-      }
-    }
 
     #region Brush Bones & Soft Contact
 
     private const int NUM_FINGERS = 5;
     private const int BONES_PER_FINGER = 3;
-    public  const float PER_BONE_MASS_MULTIPLIER = 0.2F;
+    public const float PER_BONE_MASS_MULTIPLIER = 0.2F;
     private const float DEAD_ZONE_FRACTION = 0.1F;
     private const float DISLOCATION_FRACTION = 3.0F;
 
@@ -256,8 +296,6 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private void FixedUpdateContact() {
-      contactActivityManager.activationRadius = interactionManager.WorldTouchActivationRadius;
-      contactActivityManager.FixedUpdatePosition((_hand != null) ? _warpedHandData.PalmPosition.ToVector3() : Vector3.zero);
 
       if (!_contactInitialized) {
         if (!InitContact()) {
@@ -271,7 +309,7 @@ namespace Leap.Unity.UI.Interaction {
 
       using (new ProfilerSample("Update BrushBones")) { FixedUpdateBrushBones(); }
       using (new ProfilerSample("Update SoftContacts")) { FixedUpdateSoftContact(); }
-      using (new ProfilerSample("Update ContactCallbacks")) { FixedUpdateContactCallbacks(); }
+      using (new ProfilerSample("Update ContactCallbacks")) { FixedUpdateContactState(); }
     }
 
     private void InitBrushBoneContainer() {
@@ -370,7 +408,7 @@ namespace Leap.Unity.UI.Interaction {
       }
 
       float deadzone = DEAD_ZONE_FRACTION * _warpedHandData.Fingers[1].Bone((Bone.BoneType)1).Width;
-      
+
       // Update finger contact bones
       for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
         for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
@@ -563,7 +601,7 @@ namespace Leap.Unity.UI.Interaction {
           if (_delayedDisableSoftContactCoroutine != null) {
             interactionManager.StopCoroutine(_delayedDisableSoftContactCoroutine);
           }
-          for (int i = _brushBones.Length; i-- != 0;) {
+          for (int i = _brushBones.Length; i-- != 0; ) {
             _brushBones[i].collider.isTrigger = true;
           }
 
@@ -596,7 +634,7 @@ namespace Leap.Unity.UI.Interaction {
       if (_disableSoftContactEnqueued) {
         using (new ProfilerSample("Disable Soft Contact")) {
           _softContactEnabled = false;
-          for (int i = _brushBones.Length; i-- != 0;) {
+          for (int i = _brushBones.Length; i-- != 0; ) {
             _brushBones[i].collider.isTrigger = false;
           }
           if (_hand != null) ResetBrushBoneJoints();
@@ -636,7 +674,10 @@ namespace Leap.Unity.UI.Interaction {
 
     private Dictionary<IInteractionBehaviour, int> _contactBehaviours = new Dictionary<IInteractionBehaviour, int>();
     private HashSet<IInteractionBehaviour> _contactBehavioursLastFrame = new HashSet<IInteractionBehaviour>();
-    private List<IInteractionBehaviour>    _contactBehaviourRemovalCache = new List<IInteractionBehaviour>();
+    private List<IInteractionBehaviour> _contactBehaviourRemovalCache = new List<IInteractionBehaviour>();
+
+    private HashSet<IInteractionBehaviour> _contactEndedBuffer = new HashSet<IInteractionBehaviour>();
+    private HashSet<IInteractionBehaviour> _contactBeganBuffer = new HashSet<IInteractionBehaviour>();
 
     internal void ContactBoneCollisionEnter(BrushBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
       int count;
@@ -658,18 +699,18 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    // TODO: Is there a need for separate methods for Triggers?
-    //internal void ContactBoneTriggerEnter(ContactBone contactBone, IInteractionBehaviour interactionObjr) {
-    //}
+    /// <summary>
+    /// Called as a part of the Interaction Hand's general fixed frame update,
+    /// before any specific-callback-related updates.
+    /// </summary>
+    private void FixedUpdateContactState() {
+      _contactEndedBuffer.Clear();
+      _contactBeganBuffer.Clear();
 
-    //internal void ContactBoneTriggerExit(ContactBone contactBone, IInteractionBehaviour interactionObj) {
-    //}
-
-    private void FixedUpdateContactCallbacks() {
       foreach (var interactionObj in _contactBehavioursLastFrame) {
         if (!_contactBehaviours.ContainsKey(interactionObj)
          || !_brushBoneParent.gameObject.activeInHierarchy) {
-          interactionObj.EndContact(this);
+           _contactEndedBuffer.Add(interactionObj);
           _contactBehaviourRemovalCache.Add(interactionObj);
         }
       }
@@ -681,11 +722,48 @@ namespace Leap.Unity.UI.Interaction {
         foreach (var intObjCountPair in _contactBehaviours) {
           var interactionObj = intObjCountPair.Key;
           if (!_contactBehavioursLastFrame.Contains(interactionObj)) {
-            interactionObj.BeginContact(this);
+            _contactBeganBuffer.Add(interactionObj);
             _contactBehavioursLastFrame.Add(interactionObj);
           }
         }
       }
+    }
+
+    private List<IInteractionBehaviour> _removeContactObjsBuffer = new List<IInteractionBehaviour>();
+    /// <summary>
+    /// Called by the Interaction Manager every fixed frame.
+    /// Outputs interaction objects that stopped being touched by this hand this frame into contactEndedObjects
+    /// and returns whether the output set is empty.
+    /// </summary>
+    public bool FixedUpdateDidContactEnd(out HashSet<IInteractionBehaviour> contactEndedObjects) {
+      // Ensure contact objects haven't been destroyed or set to ignore contact
+      _removeContactObjsBuffer.Clear();
+      foreach (var objTouchCountPair in _contactBehaviours) {
+        if (objTouchCountPair.Key.gameObject == null
+            || objTouchCountPair.Key.rigidbody == null
+            || objTouchCountPair.Key.ignoreContact) {
+          _removeContactObjsBuffer.Add(objTouchCountPair.Key);
+        }
+      }
+
+      // Clean out removed, invalid, or ignoring-contact objects
+      foreach (var intObj in _removeContactObjsBuffer) {
+        _contactBehaviours.Remove(intObj);
+        _contactEndedBuffer.Add(intObj);
+      }
+
+      contactEndedObjects = _contactEndedBuffer;
+      return _contactEndedBuffer.Count > 0;
+    }
+
+    /// <summary>
+    /// Called by the Interaction Manager every fixed frame.
+    /// Outputs interaction objects that started being touched by this hand this frame into contactBeganObjects
+    /// and returns whether the output set is empty.
+    /// </summary>
+    public bool FixedUpdateDidContactBegin(out HashSet<IInteractionBehaviour> contactBeganObjects) {
+      contactBeganObjects = _contactBeganBuffer;
+      return _contactBeganBuffer.Count > 0;
     }
 
     #endregion
@@ -694,124 +772,692 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Grasping
 
+    /// <summary> Gets whether this hand is currently grasping an object. </summary>
+    public bool isGraspingObject { get { return _graspedObject != null; } }
+
+    /// <summary> Gets the object this hand is currently grasping, or null if there is no such object. </summary>
+    public IInteractionBehaviour graspedObject { get { return _graspedObject; } }
+
+    /// <summary> Gets the set of objects currently considered graspable. </summary>
+    public HashSet<IInteractionBehaviour> graspCandidates { get { return _graspActivityManager.ActiveBehaviours; } }
+
+    private ActivityManager _graspActivityManager;
+    /// <summary> Determines which objects are graspable any given frame. </summary>
+    private ActivityManager graspActivityManager {
+      get {
+        if (_graspActivityManager == null) _graspActivityManager = new ActivityManager(interactionManager);
+        return _graspActivityManager;
+      }
+    }
+
     private HeuristicGrabClassifier _grabClassifier;
-    private HeuristicGrabClassifier grabClassifier {
+    /// <summary> Handles logic determining whether a hand has grabbed or released an interaction object. </summary>
+    public HeuristicGrabClassifier grabClassifier {
       get {
         if (_grabClassifier == null) _grabClassifier = new HeuristicGrabClassifier(this);
         return _grabClassifier;
       }
     }
 
-    private IInteractionBehaviour _graspedObject;
+    private IInteractionBehaviour _graspedObject = null;
 
-    private void FixedUpdateGrasping() {
-      // Suspension / Resume
-      if (_graspedObject != null) {
-        if (_hand == null && !_graspedObject.isSuspended) {
-          _graspedObject.SuspendGraspedObject(this);
-        }
-        else if (_hand != null && _graspedObject.isSuspended) {
-          _graspedObject.ResumeGraspedObject(this);
-        }
-      }
+    /// <summary>
+    /// Called by the Interaction Manager every fixed frame.
+    /// Returns true if the hand just released an object and outputs the released object into releasedObject.
+    /// </summary>
+    public bool FixedUpdateDidGraspEnd(out IInteractionBehaviour releasedObject) {
+      releasedObject = null;
 
-      // Grab classifier update
-      if (_graspedObject == null || !_graspedObject.isSuspended) {
-        grabClassifier.FixedUpdateHeuristicClassifier(_warpedHandData);
-      }
-
-      // Check ignoreGrasping state
-      if (_graspedObject != null && _graspedObject.ignoreGrasping) {
-        ReleaseGrasp();
-      }
-    }
-
-    public void Grasp(IInteractionBehaviour interactionObj) {
-      if (_graspedObject != null) {
-        Debug.LogError("Grasp() was called, but this hand is already holding " + _graspedObject.name);
-      }
-
-      interactionObj.BeginGrasp(this);
-      _graspedObject = interactionObj;
-    }
-
-    public void ReleaseGrasp() {
+      // Check releasing against interaction state.
       if (_graspedObject == null) {
-        Debug.LogWarning("ReleaseGrasp() was called, but there is no held object to release.");
-        return; // Nothing to release.
-      }
-
-      using (new ProfilerSample("Release Grasp")) {
-        // Enable Soft Contact if contact in general is enabled to prevent objects
-        // popping out of the hand upon release.
-        if (_contactInitialized && interactionManager.enableContact) {
-          EnableSoftContact();
-        }
-
-        grabClassifier.NotifyGraspReleased(_graspedObject);
-        _graspedObject.EndGrasp(this);
-        _graspedObject = null;
-      }
-    }
-
-    public bool TryReleaseObject(IInteractionBehaviour interactionObj) {
-      if (interactionObj == _graspedObject) {
-        ReleaseGrasp();
-        return true;
-      }
-      else {
         return false;
       }
-    }
-
-    public IInteractionBehaviour GetGraspedObject() {
-      return _graspedObject;
-    }
-
-    private Vector3[] _graspingFingertipsCache = new Vector3[5];
-    /// <summary> Returns approximately where the hand is grasping
-    /// the currently grasped InteractionBehaviour.
-    /// (Specifically, the centroid of the grasping fingers.)
-    /// This method will print an error if the hand is not currently
-    /// grasping an object. </summary>
-    public Vector3 GetGraspPoint() {
-      if (_graspedObject == null) {
-        Debug.LogError("Cannot compute grasp point: This hand is not grasping an object.");
-        return Vector3.zero;
+      else if (_graspedObject.ignoreGrasping) {
+        grabClassifier.NotifyGraspReleased(_graspedObject);
+        releasedObject = _graspedObject;
+        return true;
       }
-      using (new ProfilerSample("Compute Grasp Location")) {
-        int numGraspingFingertips;
-        Vector3 sum = Vector3.zero; ;
-        grabClassifier.GetGraspingFingertipPositions(_graspedObject, _graspingFingertipsCache, out numGraspingFingertips);
-        if (numGraspingFingertips == 0) {
-          Debug.LogError("Cannot compute grasp point: The hand has a grasped object, but this object is not classified as grasped by the classifier.");
-        }
-        for (int i = 0; i < numGraspingFingertips; i++) {
-          sum += _graspingFingertipsCache[i];
-        }
-        sum /= numGraspingFingertips;
-        return sum;
+
+      // Update the grab classifier to determine if we should release the grasped object.
+      bool shouldReleaseObject = grabClassifier.FixedUpdateClassifierRelease(out releasedObject);
+      if (shouldReleaseObject) {
+        _graspedObject = null;
+        return true;
       }
+
+      return false;
     }
 
-    private HashSet<IInteractionBehaviour> _graspCandidatesBuffer = new HashSet<IInteractionBehaviour>();
-    public HashSet<IInteractionBehaviour> GetGraspCandidates() {
-      _graspCandidatesBuffer.Clear();
-      foreach (var intObj in contactActivityManager.ActiveBehaviours) {
-        if (!intObj.ignoreGrasping) {
-          _graspCandidatesBuffer.Add(intObj);
-        }
+    /// <summary>
+    /// Called by the Interaction Manager every fixed frame.
+    /// Returns true if the hand just grasped an object and outputs the grasped object into graspedObject.
+    /// </summary>
+    public bool FixedUpdateDidGraspBegin(out IInteractionBehaviour graspedObject) {
+      graspedObject = null;
+
+      // Check grasping against interaction state.
+      if (_graspedObject != null) {
+        // Can't grasp any object if we're already grasping one
+        return false;
       }
-      return _graspCandidatesBuffer;
-    }
 
-    public bool isGraspingObject { get { return _graspedObject != null; } }
+      // Update the grab classifier to determine if we should grasp an object.
+      bool shouldGraspObject = grabClassifier.FixedUpdateClassifierGrasp(out graspedObject);
+      if (shouldGraspObject) {
+        _graspedObject = graspedObject;
+        return true;
+      }
 
-    public bool IsGrasping(IInteractionBehaviour interactionObj) {
-      return _graspedObject == interactionObj;
+      return false;
     }
 
     #endregion
+
+    //#region Contact
+
+    //private ActivityManager _contactActivityManager;
+    //private ActivityManager contactActivityManager {
+    //  get {
+    //    if (_contactActivityManager == null) {
+    //      _contactActivityManager = new ActivityManager(interactionManager);
+    //      _contactActivityManager.trackStateChanges = false; // optimization; don't need state for contact activity
+    //    }
+    //    return _contactActivityManager;
+    //  }
+    //}
+
+    //#region Brush Bones & Soft Contact
+
+    //private const int NUM_FINGERS = 5;
+    //private const int BONES_PER_FINGER = 3;
+    //public  const float PER_BONE_MASS_MULTIPLIER = 0.2F;
+    //private const float DEAD_ZONE_FRACTION = 0.1F;
+    //private const float DISLOCATION_FRACTION = 3.0F;
+
+    //private BrushBone[] _brushBones;
+    //private GameObject _brushBoneParent;
+
+    //private PhysicMaterial _material;
+    //protected PhysicMaterial ContactMaterial {
+    //  get { if (_material == null) { InitContactMaterial(); } return _material; }
+    //}
+    ///// <summary> ContactBones must have PhysicMaterials with a
+    ///// Bounciness of zero and Bounce Combine set to Minimum. </summary>
+    //private void InitContactMaterial() {
+    //  _material = new PhysicMaterial();
+    //  _material.hideFlags = HideFlags.HideAndDontSave;
+    //  _material.bounceCombine = PhysicMaterialCombine.Minimum;
+    //  _material.bounciness = 0F;
+    //  // TODO: Ensure there aren't other optimal PhysicMaterial defaults to set here.
+    //}
+
+    //private bool _contactInitialized = false;
+
+    //private bool InitContact() {
+    //  if (_hand == null) return false;
+    //  InitBrushBoneContainer();
+    //  InitBrushBones();
+    //  _contactInitialized = true;
+    //  return _contactInitialized;
+    //}
+
+    //private void FixedUpdateContact() {
+    //  contactActivityManager.activationRadius = interactionManager.WorldTouchActivationRadius;
+    //  contactActivityManager.FixedUpdatePosition((_hand != null) ? _warpedHandData.PalmPosition.ToVector3() : Vector3.zero);
+
+    //  if (!_contactInitialized) {
+    //    if (!InitContact()) {
+    //      return;
+    //    }
+    //  }
+
+    //  if (_hand == null && _contactBehaviours.Count > 0) {
+    //    _contactBehaviours.Clear();
+    //  }
+
+    //  using (new ProfilerSample("Update BrushBones")) { FixedUpdateBrushBones(); }
+    //  using (new ProfilerSample("Update SoftContacts")) { FixedUpdateSoftContact(); }
+    //  using (new ProfilerSample("Update ContactCallbacks")) { FixedUpdateContactCallbacks(); }
+    //}
+
+    //private void InitBrushBoneContainer() {
+    //  _brushBoneParent = new GameObject((_warpedHandData.IsLeft ? "Left" : "Right") + " Interaction Hand Contact Bones");
+    //  _brushBoneParent.transform.parent = interactionManager.transform;
+    //  _brushBoneParent.layer = interactionManager.ContactBoneLayer;
+    //}
+
+    //private void InitBrushBones() {
+    //  _brushBones = new BrushBone[NUM_FINGERS * BONES_PER_FINGER + 1];
+
+    //  // Finger bones
+    //  for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
+    //    for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
+    //      Bone bone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
+    //      int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
+
+    //      GameObject contactBoneObj = new GameObject("Contact Fingerbone", typeof(CapsuleCollider), typeof(Rigidbody), typeof(BrushBone));
+    //      contactBoneObj.layer = interactionManager.ContactBoneLayer;
+
+    //      contactBoneObj.transform.position = bone.Center.ToVector3();
+    //      contactBoneObj.transform.rotation = bone.Rotation.ToQuaternion();
+    //      CapsuleCollider capsule = contactBoneObj.GetComponent<CapsuleCollider>();
+    //      capsule.direction = 2;
+    //      capsule.radius = bone.Width * 0.5f;
+    //      capsule.height = bone.Length + bone.Width;
+    //      capsule.material = ContactMaterial;
+
+    //      BrushBone contactBone = InitBrushBone(bone, contactBoneObj, boneArrayIndex, capsule);
+
+    //      contactBone.lastTarget = bone.Center.ToVector3();
+    //    }
+    //  }
+
+    //  // Palm bone
+    //  {
+    //    // Palm is attached to the third metacarpal and derived from it.
+    //    Bone bone = _warpedHandData.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL);
+    //    int boneArrayIndex = NUM_FINGERS * BONES_PER_FINGER;
+    //    GameObject contactBoneObj = new GameObject("Contact Palm Bone", typeof(BoxCollider), typeof(Rigidbody), typeof(BrushBone));
+
+    //    contactBoneObj.transform.position = _warpedHandData.PalmPosition.ToVector3();
+    //    contactBoneObj.transform.rotation = _warpedHandData.Rotation.ToQuaternion();
+    //    BoxCollider box = contactBoneObj.GetComponent<BoxCollider>();
+    //    box.center = new Vector3(_warpedHandData.IsLeft ? -0.005f : 0.005f, bone.Width * -0.3f, -0.01f);
+    //    box.size = new Vector3(bone.Length, bone.Width, bone.Length);
+    //    box.material = _material;
+
+    //    InitBrushBone(null, contactBoneObj, boneArrayIndex, box);
+    //  }
+
+    //  // Constrain the bones to each other to prevent separation
+    //  AddBrushBoneJoints();
+
+    //}
+
+    //private BrushBone InitBrushBone(Bone bone, GameObject contactBoneObj, int boneArrayIndex, Collider boneCollider) {
+    //  contactBoneObj.layer = _brushBoneParent.layer;
+    //  // TODO: _contactBoneParent will need its layer set appropriately once interaction layers are implemented.
+    //  contactBoneObj.transform.localScale = Vector3.one;
+
+    //  BrushBone contactBone = contactBoneObj.GetComponent<BrushBone>();
+    //  contactBone.collider = boneCollider;
+    //  contactBone.interactionHand = this;
+    //  _brushBones[boneArrayIndex] = contactBone;
+
+    //  Transform capsuleTransform = contactBoneObj.transform;
+    //  capsuleTransform.SetParent(_brushBoneParent.transform, false);
+
+    //  Rigidbody body = contactBoneObj.GetComponent<Rigidbody>();
+    //  body.freezeRotation = true;
+    //  contactBone.body = body;
+    //  body.useGravity = false;
+    //  body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic; // TODO: Allow different collision detection modes as an optimization.
+    //  if (boneCollider is BoxCollider) {
+    //    body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+    //  }
+
+    //  body.mass = PER_BONE_MASS_MULTIPLIER;
+    //  body.position = bone != null ? bone.Center.ToVector3() : _warpedHandData.PalmPosition.ToVector3();
+    //  body.rotation = bone != null ? bone.Rotation.ToQuaternion() : _warpedHandData.Rotation.ToQuaternion();
+    //  contactBone.lastTarget = bone != null ? bone.Center.ToVector3() : _warpedHandData.PalmPosition.ToVector3();
+
+    //  return contactBone;
+    //}
+
+    //private void FixedUpdateBrushBones() {
+    //  if (_hand == null) {
+    //    _brushBoneParent.gameObject.SetActive(false);
+    //    return;
+    //  }
+    //  else {
+    //    if (!_brushBoneParent.gameObject.activeSelf) {
+    //      _brushBoneParent.gameObject.SetActive(true);
+    //    }
+    //  }
+
+    //  float deadzone = DEAD_ZONE_FRACTION * _warpedHandData.Fingers[1].Bone((Bone.BoneType)1).Width;
+      
+    //  // Update finger contact bones
+    //  for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
+    //    for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
+    //      Bone bone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
+    //      int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
+    //      FixedUpdateBrushBone(bone, boneArrayIndex, deadzone);
+    //    }
+    //  }
+
+    //  // Update palm contact bone
+    //  {
+    //    Bone bone = _warpedHandData.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL);
+    //    int boneArrayIndex = NUM_FINGERS * BONES_PER_FINGER;
+    //    FixedUpdateBrushBone(bone, boneArrayIndex, deadzone);
+    //  }
+    //}
+
+    //private void FixedUpdateBrushBone(Bone bone, int boneArrayIndex, float deadzone) {
+    //  BrushBone brushBone = _brushBones[boneArrayIndex];
+    //  Rigidbody body = brushBone.body;
+
+    //  // This hack works best when we set a fixed rotation for bones.  Otherwise
+    //  // most friction is lost as the bones roll on contact.
+    //  body.MoveRotation(bone.Rotation.ToQuaternion());
+
+    //  // Calculate how far off the mark the brushes are.
+    //  float targetingError = Vector3.Distance(brushBone.lastTarget, body.position) / bone.Width;
+    //  float massScale = Mathf.Clamp(1.0f - (targetingError * 2.0f), 0.1f, 1.0f)
+    //                  * Mathf.Clamp(_warpedHandData.PalmVelocity.Magnitude * 10f, 1f, 10f);
+    //  body.mass = PER_BONE_MASS_MULTIPLIER * massScale * brushBone._lastObjectTouchedMass;
+
+    //  //If these conditions are met, stop using brush hands to contact objects and switch to "Soft Contact"
+    //  if (!_softContactEnabled && targetingError >= DISLOCATION_FRACTION
+    //    && _warpedHandData.PalmVelocity.Magnitude < 1.5f && boneArrayIndex != NUM_FINGERS * BONES_PER_FINGER) {
+    //    EnableSoftContact();
+    //    return;
+    //  }
+
+    //  // Add a deadzone to avoid vibration.
+    //  Vector3 delta = bone.Center.ToVector3() - body.position;
+    //  float deltaLen = delta.magnitude;
+    //  if (deltaLen <= deadzone) {
+    //    body.velocity = Vector3.zero;
+    //    brushBone.lastTarget = body.position;
+    //  }
+    //  else {
+    //    delta *= (deltaLen - deadzone) / deltaLen;
+    //    brushBone.lastTarget = body.position + delta;
+    //    delta /= Time.fixedDeltaTime;
+    //    body.velocity = (delta / delta.magnitude) * Mathf.Clamp(delta.magnitude, 0f, 100f);
+    //  }
+    //}
+
+    //private bool _softContactEnabled = false;
+    //private bool _disableSoftContactEnqueued = false;
+    //private IEnumerator _delayedDisableSoftContactCoroutine;
+    //private Collider[] _tempColliderArray = new Collider[2];
+    //private Vector3[] _previousBoneCenters = new Vector3[20];
+    //private float _softContactBoneRadius = 0.015f;
+
+    //// Vars removed because Interaction Managers are currently non-optional.
+    ////private List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(40);
+    ////private Dictionary<Rigidbody, PhysicsUtility.Velocities> originalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>();
+
+    ////private List<int> _softContactIdxRemovalBuffer = new List<int>();
+    //private void FixedUpdateSoftContact() {
+    //  if (_hand == null) return;
+
+    //  if (_softContactEnabled) {
+
+    //    // Generate contacts.
+    //    bool softlyContacting = false;
+    //    for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++) {
+    //      for (int jointIndex = 0; jointIndex < 4; jointIndex++) {
+    //        Bone bone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+    //        int boneArrayIndex = fingerIndex * 4 + jointIndex;
+    //        Vector3 boneCenter = bone.Center.ToVector3();
+
+    //        // Generate and fill softContacts with SoftContacts that are intersecting a sphere
+    //        // at boneCenter, with radius softContactBoneRadius.
+    //        bool sphereIntersecting;
+    //        using (new ProfilerSample("Generate Soft Contacts")) {
+    //          sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, _softContactBoneRadius,
+    //                                                                   (boneCenter - _previousBoneCenters[boneArrayIndex])
+    //                                                                     / Time.fixedDeltaTime,
+    //                                                                   1 << interactionManager.interactionLayer,
+    //                                                                   ref interactionManager._softContacts,
+    //                                                                   ref interactionManager._softContactOriginalVelocities,
+    //                                                                   ref _tempColliderArray);
+    //        }
+
+    //        // Support allowing individual Interaction Behaviours to choose whether they are influenced by soft contact at trigger colliders
+    //        // NOPE nevermind
+    //        //_softContactIdxRemovalBuffer.Clear();
+    //        //for (int i = 0; i < interactionManager._softContacts.Count; i++) {
+    //        //  var softContact = interactionManager._softContacts[i];
+    //        //  IInteractionBehaviour intObj;
+    //        //  if (interactionManager.rigidbodyRegistry.TryGetValue(softContact.body, out intObj)) {
+    //        //    if (softContact.touchingTrigger && !intObj.allowContactOnTriggers) {
+    //        //      _softContactIdxRemovalBuffer.Add(i);
+    //        //    }
+    //        //  }
+    //        //}
+    //        //// TODO: Consider making the soft contact list a HashSet instead to support O(1) removal
+    //        //for (int i = _softContactIdxRemovalBuffer.Count - 1; i >= 0; i++) {
+    //        //  interactionManager._softContacts.RemoveAt(_softContactIdxRemovalBuffer[i]);
+    //        //}
+
+    //        softlyContacting = sphereIntersecting ? true : softlyContacting;
+    //      }
+    //    }
+
+
+    //    if (softlyContacting) {
+    //      _disableSoftContactEnqueued = false;
+    //    }
+    //    else {
+    //      // If there are no detected Contacts, exit soft contact mode.
+    //      DisableSoftContact();
+    //    }
+    //  }
+
+    //  // Update the last positions of the bones with this frame.
+    //  for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++) {
+    //    for (int jointIndex = 0; jointIndex < 4; jointIndex++) {
+    //      Bone bone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+    //      int boneArrayIndex = fingerIndex * 4 + jointIndex;
+    //      _previousBoneCenters[boneArrayIndex] = bone.Center.ToVector3();
+    //    }
+    //  }
+    //}
+
+    //private void AddBrushBoneJoints() {
+    //  for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
+    //    for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
+    //      Bone bone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
+    //      int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
+
+    //      FixedJoint joint = _brushBones[boneArrayIndex].gameObject.AddComponent<FixedJoint>();
+    //      joint.autoConfigureConnectedAnchor = false;
+    //      if (jointIndex != 0) {
+    //        Bone prevBone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+    //        joint.connectedBody = _brushBones[boneArrayIndex - 1].body;
+    //        joint.anchor = Vector3.back * bone.Length / 2f;
+    //        joint.connectedAnchor = Vector3.forward * prevBone.Length / 2f;
+    //        _brushBones[boneArrayIndex].joint = joint;
+    //      }
+    //      else {
+    //        joint.connectedBody = _brushBones[NUM_FINGERS * BONES_PER_FINGER].body;
+    //        joint.anchor = Vector3.back * bone.Length / 2f;
+    //        joint.connectedAnchor = _brushBones[NUM_FINGERS * BONES_PER_FINGER].transform.InverseTransformPoint(bone.PrevJoint.ToVector3());
+    //        _brushBones[boneArrayIndex].metacarpalJoint = joint;
+    //      }
+    //    }
+    //  }
+    //}
+
+    ///// <summary> Reconnects and resets all the joints in the hand. </summary>
+    //private void ResetBrushBoneJoints() {
+    //  _brushBones[NUM_FINGERS * BONES_PER_FINGER].transform.position = _warpedHandData.PalmPosition.ToVector3();
+    //  _brushBones[NUM_FINGERS * BONES_PER_FINGER].transform.rotation = _warpedHandData.Rotation.ToQuaternion();
+    //  for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
+    //    for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
+    //      Bone bone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
+    //      int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
+
+    //      if (jointIndex != 0 && _brushBones[boneArrayIndex].joint != null) {
+    //        Bone prevBone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+    //        _brushBones[boneArrayIndex].joint.connectedBody = _brushBones[boneArrayIndex - 1].body;
+    //        _brushBones[boneArrayIndex].joint.anchor = Vector3.back * bone.Length / 2f;
+    //        _brushBones[boneArrayIndex].joint.connectedAnchor = Vector3.forward * prevBone.Length / 2f;
+    //      }
+    //      else if (_brushBones[boneArrayIndex].metacarpalJoint != null) {
+    //        _brushBones[boneArrayIndex].metacarpalJoint.connectedBody = _brushBones[NUM_FINGERS * BONES_PER_FINGER].body;
+    //        _brushBones[boneArrayIndex].metacarpalJoint.anchor = Vector3.back * bone.Length / 2f;
+    //        _brushBones[boneArrayIndex].metacarpalJoint.connectedAnchor = _brushBones[NUM_FINGERS * BONES_PER_FINGER].transform
+    //                                                                        .InverseTransformPoint(bone.PrevJoint.ToVector3());
+    //      }
+    //    }
+    //  }
+    //}
+
+    //public void EnableSoftContact() {
+    //  if (_hand == null) return;
+    //  using (new ProfilerSample("Enable Soft Contact")) {
+    //    _disableSoftContactEnqueued = false;
+    //    if (!_softContactEnabled) {
+    //      _softContactEnabled = true;
+    //      ResetBrushBoneJoints();
+    //      if (_delayedDisableSoftContactCoroutine != null) {
+    //        interactionManager.StopCoroutine(_delayedDisableSoftContactCoroutine);
+    //      }
+    //      for (int i = _brushBones.Length; i-- != 0;) {
+    //        _brushBones[i].collider.isTrigger = true;
+    //      }
+
+    //      // Update the last positions of the bones with this frame.
+    //      // This prevents spurious velocities from freshly initialized hands.
+    //      for (int fingerIndex = 0; fingerIndex < 5; fingerIndex++) {
+    //        for (int jointIndex = 0; jointIndex < 4; jointIndex++) {
+    //          Bone bone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
+    //          int boneArrayIndex = fingerIndex * 4 + jointIndex;
+    //          _previousBoneCenters[boneArrayIndex] = bone.Center.ToVector3();
+    //        }
+    //      }
+    //    }
+    //  }
+    //}
+
+    //public void DisableSoftContact() {
+    //  using (new ProfilerSample("Enqueue Disable Soft Contact")) {
+    //    if (!_disableSoftContactEnqueued) {
+    //      _delayedDisableSoftContactCoroutine = DelayedDisableSoftContact();
+    //      interactionManager.StartCoroutine(_delayedDisableSoftContactCoroutine);
+    //      _disableSoftContactEnqueued = true;
+    //    }
+    //  }
+    //}
+
+    //private IEnumerator DelayedDisableSoftContact() {
+    //  if (_disableSoftContactEnqueued) { yield break; }
+    //  yield return new WaitForSecondsRealtime(0.3f);
+    //  if (_disableSoftContactEnqueued) {
+    //    using (new ProfilerSample("Disable Soft Contact")) {
+    //      _softContactEnabled = false;
+    //      for (int i = _brushBones.Length; i-- != 0;) {
+    //        _brushBones[i].collider.isTrigger = false;
+    //      }
+    //      if (_hand != null) ResetBrushBoneJoints();
+    //    }
+    //  }
+    //}
+
+    ///// <summary> Constructs a Hand object from this InteractionHand. Optional utility/debug function.
+    ///// Can be used to display a graphical hand that matches the physical one. </summary>
+    //public void FillBones(Hand inHand) {
+    //  if (_softContactEnabled) { return; }
+    //  if (Application.isPlaying && _brushBones.Length == NUM_FINGERS * BONES_PER_FINGER + 1) {
+    //    Vector elbowPos = inHand.Arm.ElbowPosition;
+    //    inHand.SetTransform(_brushBones[NUM_FINGERS * BONES_PER_FINGER].body.position, _brushBones[NUM_FINGERS * BONES_PER_FINGER].body.rotation);
+
+    //    for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
+    //      for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
+    //        Bone bone = inHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
+    //        int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
+    //        Vector displacement = _brushBones[boneArrayIndex].body.position.ToVector() - bone.Center;
+    //        bone.Center += displacement;
+    //        bone.PrevJoint += displacement;
+    //        bone.NextJoint += displacement;
+    //        bone.Rotation = _brushBones[boneArrayIndex].body.rotation.ToLeapQuaternion();
+    //      }
+    //    }
+
+    //    inHand.Arm.PrevJoint = elbowPos;
+    //    inHand.Arm.Direction = (inHand.Arm.PrevJoint - inHand.Arm.NextJoint).Normalized;
+    //    inHand.Arm.Center = (inHand.Arm.PrevJoint + inHand.Arm.NextJoint) * 0.5f;
+    //  }
+    //}
+
+    //#endregion
+
+    //#region Contact Callbacks
+
+    //private Dictionary<IInteractionBehaviour, int> _contactBehaviours = new Dictionary<IInteractionBehaviour, int>();
+    //private HashSet<IInteractionBehaviour> _contactBehavioursLastFrame = new HashSet<IInteractionBehaviour>();
+    //private List<IInteractionBehaviour>    _contactBehaviourRemovalCache = new List<IInteractionBehaviour>();
+
+    //internal void ContactBoneCollisionEnter(BrushBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
+    //  int count;
+    //  if (_contactBehaviours.TryGetValue(interactionObj, out count)) {
+    //    _contactBehaviours[interactionObj] = count + 1;
+    //  }
+    //  else {
+    //    _contactBehaviours[interactionObj] = 1;
+    //  }
+    //}
+
+    //internal void ContactBoneCollisionExit(BrushBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
+    //  int count = _contactBehaviours[interactionObj];
+    //  if (count == 1) {
+    //    _contactBehaviours.Remove(interactionObj);
+    //  }
+    //  else {
+    //    _contactBehaviours[interactionObj] = count - 1;
+    //  }
+    //}
+
+    //// TODO: Is there a need for separate methods for Triggers?
+    ////internal void ContactBoneTriggerEnter(ContactBone contactBone, IInteractionBehaviour interactionObjr) {
+    ////}
+
+    ////internal void ContactBoneTriggerExit(ContactBone contactBone, IInteractionBehaviour interactionObj) {
+    ////}
+
+    //private void FixedUpdateContactCallbacks() {
+    //  foreach (var interactionObj in _contactBehavioursLastFrame) {
+    //    if (!_contactBehaviours.ContainsKey(interactionObj)
+    //     || !_brushBoneParent.gameObject.activeInHierarchy) {
+    //      interactionObj.EndContact(this);
+    //      _contactBehaviourRemovalCache.Add(interactionObj);
+    //    }
+    //  }
+    //  foreach (var interactionObj in _contactBehaviourRemovalCache) {
+    //    _contactBehavioursLastFrame.Remove(interactionObj);
+    //  }
+    //  _contactBehaviourRemovalCache.Clear();
+    //  if (_brushBoneParent.gameObject.activeInHierarchy) {
+    //    foreach (var intObjCountPair in _contactBehaviours) {
+    //      var interactionObj = intObjCountPair.Key;
+    //      if (!_contactBehavioursLastFrame.Contains(interactionObj)) {
+    //        interactionObj.BeginContact(this);
+    //        _contactBehavioursLastFrame.Add(interactionObj);
+    //      }
+    //    }
+    //  }
+    //}
+
+    //#endregion
+
+    //#endregion
+
+    //#region Grasping
+
+    //private HeuristicGrabClassifier _grabClassifier;
+    //private HeuristicGrabClassifier grabClassifier {
+    //  get {
+    //    if (_grabClassifier == null) _grabClassifier = new HeuristicGrabClassifier(this);
+    //    return _grabClassifier;
+    //  }
+    //}
+
+    //private IInteractionBehaviour _graspedObject;
+
+    //private void FixedUpdateGrasping() {
+    //  // Suspension / Resume
+    //  if (_graspedObject != null) {
+    //    if (_hand == null && !_graspedObject.isSuspended) {
+    //      _graspedObject.SuspendGraspedObject(this);
+    //    }
+    //    else if (_hand != null && _graspedObject.isSuspended) {
+    //      _graspedObject.ResumeGraspedObject(this);
+    //    }
+    //  }
+
+    //  // Grab classifier update
+    //  if (_graspedObject == null || !_graspedObject.isSuspended) {
+    //    grabClassifier.FixedUpdateHeuristicClassifier(_warpedHandData);
+    //  }
+
+    //  // Check ignoreGrasping state
+    //  if (_graspedObject != null && _graspedObject.ignoreGrasping) {
+    //    ReleaseGrasp();
+    //  }
+    //}
+
+    //public void Grasp(IInteractionBehaviour interactionObj) {
+    //  if (_graspedObject != null) {
+    //    Debug.LogError("Grasp() was called, but this hand is already holding " + _graspedObject.name);
+    //  }
+
+    //  interactionObj.BeginGrasp(this);
+    //  _graspedObject = interactionObj;
+    //}
+
+    //public void ReleaseGrasp() {
+    //  if (_graspedObject == null) {
+    //    Debug.LogWarning("ReleaseGrasp() was called, but there is no held object to release.");
+    //    return; // Nothing to release.
+    //  }
+
+    //  using (new ProfilerSample("Release Grasp")) {
+    //    // Enable Soft Contact if contact in general is enabled to prevent objects
+    //    // popping out of the hand upon release.
+    //    if (_contactInitialized && interactionManager.enableContact) {
+    //      EnableSoftContact();
+    //    }
+
+    //    grabClassifier.NotifyGraspReleased(_graspedObject);
+    //    _graspedObject.EndGrasp(this);
+    //    _graspedObject = null;
+    //  }
+    //}
+
+    //public bool TryReleaseObject(IInteractionBehaviour interactionObj) {
+    //  if (interactionObj == _graspedObject) {
+    //    ReleaseGrasp();
+    //    return true;
+    //  }
+    //  else {
+    //    return false;
+    //  }
+    //}
+
+    //public IInteractionBehaviour GetGraspedObject() {
+    //  return _graspedObject;
+    //}
+
+    //private Vector3[] _graspingFingertipsCache = new Vector3[5];
+    ///// <summary> Returns approximately where the hand is grasping
+    ///// the currently grasped InteractionBehaviour.
+    ///// (Specifically, the centroid of the grasping fingers.)
+    ///// This method will print an error if the hand is not currently
+    ///// grasping an object. </summary>
+    //public Vector3 GetGraspPoint() {
+    //  if (_graspedObject == null) {
+    //    Debug.LogError("Cannot compute grasp point: This hand is not grasping an object.");
+    //    return Vector3.zero;
+    //  }
+    //  using (new ProfilerSample("Compute Grasp Location")) {
+    //    int numGraspingFingertips;
+    //    Vector3 sum = Vector3.zero; ;
+    //    grabClassifier.GetGraspingFingertipPositions(_graspedObject, _graspingFingertipsCache, out numGraspingFingertips);
+    //    if (numGraspingFingertips == 0) {
+    //      Debug.LogError("Cannot compute grasp point: The hand has a grasped object, but this object is not classified as grasped by the classifier.");
+    //    }
+    //    for (int i = 0; i < numGraspingFingertips; i++) {
+    //      sum += _graspingFingertipsCache[i];
+    //    }
+    //    sum /= numGraspingFingertips;
+    //    return sum;
+    //  }
+    //}
+
+    //private HashSet<IInteractionBehaviour> _graspCandidatesBuffer = new HashSet<IInteractionBehaviour>();
+    //public HashSet<IInteractionBehaviour> GetGraspCandidates() {
+    //  _graspCandidatesBuffer.Clear();
+    //  foreach (var intObj in contactActivityManager.ActiveBehaviours) {
+    //    if (!intObj.ignoreGrasping) {
+    //      _graspCandidatesBuffer.Add(intObj);
+    //    }
+    //  }
+    //  return _graspCandidatesBuffer;
+    //}
+
+    //public bool isGraspingObject { get { return _graspedObject != null; } }
+
+    //public bool IsGrasping(IInteractionBehaviour interactionObj) {
+    //  return _graspedObject == interactionObj;
+    //}
+
+    //#endregion
 
     #region Gizmos
 
