@@ -50,7 +50,7 @@
         color *= tex2D(_MainTex2, i.uv0);
 #endif
 
-#ifdef GUI_ELEMENTS_HAVE_COLOR
+#ifdef GRAPHICS_HAVE_COLOR
         color *= i.color;
 #endif
 
