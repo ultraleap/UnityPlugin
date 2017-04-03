@@ -8,9 +8,6 @@
  *    cylindrical space
  ***********************************/
 
-float4x4 _GraphicRenderer_WorldToLocal;
-float4x4 _GraphicRenderer_LocalToWorld;
-
 #ifdef GRAPHIC_RENDERER_CYLINDRICAL
 #define GRAPHIC_RENDERER_WARPING
 #include "Assets/LeapMotionModules/GraphicRenderer/Resources/CylindricalSpace.cginc"
