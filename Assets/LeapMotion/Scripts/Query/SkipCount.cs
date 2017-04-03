@@ -1,51 +1,39 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿
 namespace Leap.Unity.Query {
 
-  public class SkipCountOp<SourceType, SourceOp> : IEnumerator<SourceType>
-    where SourceOp : IEnumerator<SourceType> {
+  public struct SkipCountOp<SourceType, SourceOp> : IQueryOp<SourceType>
+    where SourceOp : IQueryOp<SourceType> {
 
     private SourceOp _source;
     private int _toSkip;
+    private int _skipLeft;
 
     public SkipCountOp(SourceOp source, int toSkip) {
       _source = source;
       _toSkip = toSkip;
+      _skipLeft = _toSkip;
     }
 
-    public bool MoveNext() {
-      while (_toSkip != 0 && _source.MoveNext()) {
-        _toSkip--;
-      }
+    public bool TryGetNext(out SourceType t) {
+      while (true) {
+        if (!_source.TryGetNext(out t)) {
+          return false;
+        }
 
-      return _source.MoveNext();
-    }
-
-    public SourceType Current {
-      get {
-        return _source.Current;
-      }
-    }
-
-    object IEnumerator.Current {
-      get {
-        throw new InvalidOperationException();
+        if (_skipLeft == 0) {
+          return true;
+        }
+        _skipLeft--;
       }
     }
 
     public void Reset() {
-      throw new InvalidOperationException();
-    }
-
-    public void Dispose() {
-      _source.Dispose();
+      _skipLeft = _toSkip;
+      _source.Reset();
     }
   }
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
     public QueryWrapper<QueryType, SkipCountOp<QueryType, QueryOp>> Skip(int toSkip) {
       return new QueryWrapper<QueryType, SkipCountOp<QueryType, QueryOp>>(new SkipCountOp<QueryType, QueryOp>(_op, toSkip));
     }

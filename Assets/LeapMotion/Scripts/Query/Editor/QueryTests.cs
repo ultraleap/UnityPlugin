@@ -1,8 +1,7 @@
 ﻿using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
-using System;
-using System.Collections;
 
 namespace Leap.Unity.Query.Test {
 
@@ -45,6 +44,11 @@ namespace Leap.Unity.Query.Test {
     public void SelectManyTest() {
       Assert.That(LIST_0.SelectMany(i => LIST_1.Select(j => j * i)).SequenceEqual(
                   LIST_0.Query().SelectMany(i => LIST_1.Query().Select(j => j * i)).ToList()));
+    }
+
+    [Test]
+    public void SelectManyEmptyTest() {
+      new int[] { }.Query().SelectMany(i => new int[] { }.Query()).ToList();
     }
 
     [Test]
@@ -158,12 +162,13 @@ namespace Leap.Unity.Query.Test {
       Assert.AreEqual(LIST_0.Query().IndexOf(100), -1);
     }
 
+    [Test]
     public void EnumeratorTest() {
       Assert.AreEqual(new TestEnumerator().Query().IndexOf(3), 3);
     }
 
     public class TestEnumerator : IEnumerator<int> {
-      private int _curr;
+      private int _curr = -1;
 
       public int Current {
         get {

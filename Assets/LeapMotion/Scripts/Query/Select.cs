@@ -1,53 +1,34 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Leap.Unity.Query {
 
-  public struct SelectOp<SourceType, ResultType, SourceOp> : IEnumerator<ResultType>
-    where SourceOp : IEnumerator<SourceType> {
+  public struct SelectOp<SourceType, ResultType, SourceOp> : IQueryOp<ResultType>
+    where SourceOp : IQueryOp<SourceType> {
     private SourceOp _source;
     private Func<SourceType, ResultType> _mapping;
-    private ResultType _current;
 
     public SelectOp(SourceOp enumerator, Func<SourceType, ResultType> mapping) {
       _source = enumerator;
       _mapping = mapping;
-      _current = default(ResultType);
     }
 
-    public bool MoveNext() {
-      if (_source.MoveNext()) {
-        _current = _mapping(_source.Current);
+    public bool TryGetNext(out ResultType t) {
+      SourceType sourceObj;
+      if (_source.TryGetNext(out sourceObj)) {
+        t = _mapping(sourceObj);
         return true;
       } else {
+        t = default(ResultType);
         return false;
       }
     }
 
-    public ResultType Current {
-      get {
-        return _current;
-      }
-    }
-
-    object IEnumerator.Current {
-      get {
-        throw new InvalidOperationException();
-      }
-    }
-
     public void Reset() {
-      throw new InvalidOperationException();
-    }
-
-    public void Dispose() {
-      _source.Dispose();
-      _mapping = null;
+      _source.Reset();
     }
   }
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
     public QueryWrapper<NewType, SelectOp<QueryType, NewType, QueryOp>> Select<NewType>(Func<QueryType, NewType> mapping) {
       return new QueryWrapper<NewType, SelectOp<QueryType, NewType, QueryOp>>(new SelectOp<QueryType, NewType, QueryOp>(_op, mapping));
     }

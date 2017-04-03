@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace Leap.Unity.Query {
 
-  public class ZipOp<ResultType, SourceAType, SourceBType, SourceAOp, SourceBOp> : IEnumerator<ResultType>
-    where SourceAOp : IEnumerator<SourceAType>
-    where SourceBOp : IEnumerator<SourceBType> {
+  public struct ZipOp<ResultType, SourceAType, SourceBType, SourceAOp, SourceBOp> : IQueryOp<ResultType>
+    where SourceAOp : IQueryOp<SourceAType>
+    where SourceBOp : IQueryOp<SourceBType> {
 
     private SourceAOp _sourceA;
     private SourceBOp _sourceB;
@@ -19,35 +16,27 @@ namespace Leap.Unity.Query {
       _resultSelector = resultSelector;
     }
 
-    public bool MoveNext() {
-      return (_sourceA.MoveNext() && _sourceB.MoveNext());
-    }
-
-    public ResultType Current {
-      get {
-        return _resultSelector(_sourceA.Current, _sourceB.Current);
-      }
-    }
-
-    object IEnumerator.Current {
-      get {
-        throw new InvalidOperationException();
+    public bool TryGetNext(out ResultType t) {
+      SourceAType a;
+      SourceBType b;
+      if (_sourceA.TryGetNext(out a) && _sourceB.TryGetNext(out b)) {
+        t = _resultSelector(a, b);
+        return true;
+      } else {
+        t = default(ResultType);
+        return false;
       }
     }
 
     public void Reset() {
-      throw new InvalidOperationException();
-    }
-
-    public void Dispose() {
-      _sourceA.Dispose();
-      _sourceB.Dispose();
+      _sourceA.Reset();
+      _sourceB.Reset();
     }
   }
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
     public QueryWrapper<NewType, ZipOp<NewType, QueryType, OtherType, QueryOp, OtherOp>> Zip<NewType, OtherType, OtherOp>(QueryWrapper<OtherType, OtherOp> sourceB, Func<QueryType, OtherType, NewType> resultSelector)
-      where OtherOp : IEnumerator<OtherType> {
+      where OtherOp : IQueryOp<OtherType> {
       return new QueryWrapper<NewType, ZipOp<NewType, QueryType, OtherType, QueryOp, OtherOp>>(new ZipOp<NewType, QueryType, OtherType, QueryOp, OtherOp>(_op, sourceB._op, resultSelector));
     }
   }
