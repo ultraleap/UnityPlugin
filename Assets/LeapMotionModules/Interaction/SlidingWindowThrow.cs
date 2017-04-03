@@ -48,7 +48,7 @@ namespace Leap.Unity.UI.Interaction {
     private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>(64);
 
     /// <summary> Samples the current velocity and adds it to a rolling average. </summary>
-    public void OnHold(InteractionBehaviour intObj, ReadonlyList<Hand> hands) {
+    public void OnHold(InteractionBehaviour intObj, ReadonlyList<InteractionHand> hands) {
       _velocityQueue.Enqueue(new VelocitySample(
         intObj.rigidbody.position, intObj.rigidbody.rotation, Time.fixedTime));
 
@@ -67,7 +67,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     /// <summary> Transfers the averaged velocity to the released object. </summary>
-    public void OnThrow(InteractionBehaviour intObj, Hand throwingHand) {
+    public void OnThrow(InteractionBehaviour intObj, InteractionHand throwingHand) {
       if (_velocityQueue.Count < 2) {
         intObj.rigidbody.velocity = Vector3.zero;
         intObj.rigidbody.angularVelocity = Vector3.zero;
@@ -110,9 +110,9 @@ namespace Leap.Unity.UI.Interaction {
       Vector3 interpolatedVelocity = PhysicsUtility.ToLinearVelocity(start.position, end.position, _windowLength);
 
       //If trying to throw the object backwards into the hand
-      Vector3 relativeVelocity = interpolatedVelocity - throwingHand.PalmVelocity.ToVector3();
-      if (Vector3.Dot(relativeVelocity, throwingHand.PalmNormal.ToVector3()) < 0) {
-        interpolatedVelocity -= Vector3.Project(relativeVelocity, throwingHand.PalmNormal.ToVector3());
+      Vector3 relativeVelocity = interpolatedVelocity - throwingHand.GetLastTrackedLeapHand().PalmVelocity.ToVector3();
+      if (Vector3.Dot(relativeVelocity, throwingHand.GetLastTrackedLeapHand().PalmNormal.ToVector3()) < 0) {
+        interpolatedVelocity -= Vector3.Project(relativeVelocity, throwingHand.GetLastTrackedLeapHand().PalmNormal.ToVector3());
       }
 
       intObj.rigidbody.velocity = interpolatedVelocity;

@@ -135,11 +135,11 @@ namespace Leap.Unity.UI.Interaction {
         if (isDepressed && !oldDepressed) {
           depressedThisFrame = true;
           OnPress.Invoke();
-          behaviour.interactionManager.GetInteractionHand(behaviour.primaryHoveringHand).SetInteractionHoverOverride(true);
+          behaviour.manager.GetInteractionHand(behaviour.primaryHoveringHand).SetInteractionHoverOverride(true);
         } else if (!isDepressed && oldDepressed) {
           unDepressedThisFrame = true;
           OnUnpress.Invoke();
-          behaviour.interactionManager.GetInteractionHand(behaviour.primaryHoveringHand).SetInteractionHoverOverride(false);
+          behaviour.manager.GetInteractionHand(behaviour.primaryHoveringHand).SetInteractionHoverOverride(false);
         }
       }
 

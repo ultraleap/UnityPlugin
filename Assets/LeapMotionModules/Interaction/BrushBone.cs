@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Leap.Unity.UI.Interaction.Internal;
+using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
@@ -17,7 +18,7 @@ namespace Leap.Unity.UI.Interaction {
     public float _lastObjectTouchedMass;
 
     void OnCollisionEnter(Collision collision) {
-      InteractionBehaviourBase interactionObj;
+      IInteractionBehaviour interactionObj;
       if (collision.rigidbody == null) {
         Debug.LogError("Brush Bone collided with non-rigidbody collider: " + collision.collider.name + "."
                      + "Please enable automatic layer generation in the Interaction Manager, "
@@ -29,7 +30,7 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
     void OnCollisionExit(Collision collision) {
-      InteractionBehaviourBase interactionObj;
+      IInteractionBehaviour interactionObj;
       if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
         interactionHand.ContactBoneCollisionExit(this, interactionObj, false);
       }
@@ -40,13 +41,13 @@ namespace Leap.Unity.UI.Interaction {
                      + "Please enable automatic layer generation in the Interaction Manager, "
                      + "or ensure the Interaction layer only contains Interaction Behaviours.");
       }
-      InteractionBehaviourBase interactionObj;
+      IInteractionBehaviour interactionObj;
       if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
         interactionHand.ContactBoneCollisionEnter(this, interactionObj, true);
       }
     }
     void OnTriggerExit(Collider collider) {
-      InteractionBehaviourBase interactionObj;
+      IInteractionBehaviour interactionObj;
       if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
         interactionHand.ContactBoneCollisionExit(this, interactionObj, true);
       }

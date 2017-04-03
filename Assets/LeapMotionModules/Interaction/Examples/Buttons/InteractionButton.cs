@@ -118,14 +118,14 @@ namespace Leap.Unity.UI.Interaction {
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerDownHandler);
           OnPress.Invoke();
           isLeftInteracting = behaviour.primaryHoveringHand.IsLeft;
-          behaviour.interactionManager.GetInteractionHand(isLeftInteracting).SetInteractionHoverOverride(true);
+          behaviour.manager.GetInteractionHand(isLeftInteracting).SetInteractionHoverOverride(true);
         } else if (!isDepressed && oldDepressed) {
           unDepressedThisFrame = true;
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerExitHandler);
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerClickHandler);
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerUpHandler);
           OnUnpress.Invoke();
-          behaviour.interactionManager.GetInteractionHand(isLeftInteracting).SetInteractionHoverOverride(false);
+          behaviour.manager.GetInteractionHand(isLeftInteracting).SetInteractionHoverOverride(false);
         }
       }
 
