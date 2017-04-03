@@ -1,5 +1,5 @@
 
-float _LeapGuiRadialSpace_Radius;
+float _GraphicRendererRadialSpace_Radius;
 
 void Cylindrical_LocalToWorld(inout float3 localVert, float3 elementPos) {
   float3 worldPos = elementPos;
@@ -8,7 +8,7 @@ void Cylindrical_LocalToWorld(inout float3 localVert, float3 elementPos) {
 
   localVert.x = sin(worldPos.x) * worldPos.z;
   localVert.y = worldPos.y;
-  localVert.z = cos(worldPos.x) * worldPos.z - _LeapGuiRadialSpace_Radius;
+  localVert.z = cos(worldPos.x) * worldPos.z - _GraphicRendererRadialSpace_Radius;
 }
 
 //Cylindrical parameters:
@@ -23,7 +23,7 @@ void Cylindrical_LocalToWorld(inout float3 localVert, float4 parameters) {
 
   localVert.x = sin(angle) * radius;
   localVert.y = height;
-  localVert.z = cos(angle) * radius - _LeapGuiRadialSpace_Radius;
+  localVert.z = cos(angle) * radius - _GraphicRendererRadialSpace_Radius;
 }
 
 void Cylindrical_LocalToWorld(inout float3 localVert, inout float3 localNormal, float4 parameters) {
@@ -36,7 +36,7 @@ void Cylindrical_LocalToWorld(inout float3 localVert, inout float3 localNormal, 
 
   localVert.x = s * radius;
   localVert.y = height;
-  localVert.z = c * radius - _LeapGuiRadialSpace_Radius;
+  localVert.z = c * radius - _GraphicRendererRadialSpace_Radius;
   
   float tX = c * localNormal.x + s * localNormal.z;
   localNormal.z = c * localNormal.z - s * localNormal.x;

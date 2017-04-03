@@ -1,5 +1,5 @@
 
-float _LeapGuiRadialSpace_Radius;
+float _GraphicRendererRadialSpace_Radius;
 
 //Parameter format:
 // x : degree X offset
@@ -18,7 +18,7 @@ void Spherical_LocalToWorld(inout float3 localVert, float4 parameters) {
 
   localVert.x = sin(angleX) * temp.z;
   localVert.y = temp.y;
-  localVert.z = cos(angleX) * temp.z - _LeapGuiRadialSpace_Radius;
+  localVert.z = cos(angleX) * temp.z - _GraphicRendererRadialSpace_Radius;
 }
 
 void Spherical_LocalToWorld(inout float3 localVert, inout float3 localNorm, float4 parameters) {
@@ -38,7 +38,7 @@ void Spherical_LocalToWorld(inout float3 localVert, inout float3 localNorm, floa
 
   localVert.x = ax_s * temp.z;
   localVert.y = temp.y;
-  localVert.z = ax_c * temp.z - _LeapGuiRadialSpace_Radius;
+  localVert.z = ax_c * temp.z - _GraphicRendererRadialSpace_Radius;
 
   temp.x = localNorm.x;
   temp.y = localNorm.y * ay_c + localNorm.z * ay_s;
