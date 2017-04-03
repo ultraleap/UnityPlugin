@@ -47,7 +47,7 @@ namespace Leap.Unity.UI.Interaction {
                           | interactionHand.interactionManager.interactionNoContactLayer.layerMask) : layerMask,
         queryTriggers);
 
-        for (int i = 0; i < 6; i++) {
+      for (int i = 0; i < _collidingCandidates.Length; i++) {
           _collidingCandidates[i] = new Collider[5];
         }
     }
@@ -69,6 +69,8 @@ namespace Leap.Unity.UI.Interaction {
           for (int i = 0; i < hand.Fingers.Count; i++) {
             _fingerTipPositions[i] = hand.Fingers[i].TipPosition.ToVector3();
           }
+
+          GrabClassifierHeuristics.UpdateAllProbeColliders(_fingerTipPositions, ref _collidingCandidates, ref _numberOfColliders, _scaledGrabParams);
         }
       }
     }
@@ -80,10 +82,10 @@ namespace Leap.Unity.UI.Interaction {
           // Cannot grasp another object with an untracked hand or while the hand is already grasping an object.
           return false;
         }
-        
+
         foreach (var interactionObj in interactionHand.graspCandidates) {
           IInteractionBehaviour _;
-          if (UpdateBehaviour(interactionObj, interactionHand.GetLeapHand(), out graspedObject, out _)) {
+          if (UpdateBehaviour(interactionObj, interactionHand.GetLastTrackedLeapHand(), out graspedObject, out _)) {
             return true;
           }
         }
@@ -128,25 +130,25 @@ namespace Leap.Unity.UI.Interaction {
 
         // Do the actual grab classification logic.
         FillClassifier(hand, ref classifier);
-        GrabClassifierHeuristics.UpdateClassifier(classifier, _collidingCandidates,
-                                                              _numberOfColliders,
-                                                              _scaledGrabParams);
+        GrabClassifierHeuristics.UpdateClassifier(classifier, _scaledGrabParams,
+                                                              ref _collidingCandidates,
+                                                              ref _numberOfColliders);
 
         // Determine whether there was a state change.
         bool didStateChange = false;
         if (classifier.isGrabbing != classifier.prevGrabbing) {
           didStateChange = true;
+
           if (classifier.isGrabbing) {
-            if (!behaviour.ignoreGrasping && !interactionHand.isGraspingObject) {
-              graspedObject = behaviour;
-            }
+            graspedObject = behaviour;
           }
           else if (interactionHand.graspedObject == behaviour) {
             releasedObject = behaviour;
             classifier.coolDownProgress = 0f;
           }
+
+          classifier.prevGrabbing = classifier.isGrabbing;
         }
-        classifier.prevGrabbing = classifier.isGrabbing;
         return didStateChange;
       }
     }

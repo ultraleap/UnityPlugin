@@ -864,6 +864,7 @@ namespace Leap.Unity.UI.Interaction {
     private IInteractionBehaviour _graspedObject = null;
 
     private void FixedUpdateGrasping() {
+      graspActivityManager.FixedUpdatePosition(GetLastTrackedLeapHand().PalmPosition.ToVector3(), LeapSpace.allEnabled);
       grabClassifier.FixedUpdateClassifierHandState();
     }
 
@@ -979,8 +980,8 @@ namespace Leap.Unity.UI.Interaction {
     /// Called by the Interaction Manager every fixed frame.
     /// Returns true if the hand just grasped an object and outputs the grasped object into graspedObject.
     /// </summary>
-    public bool CheckGraspBegin(out IInteractionBehaviour graspedObject) {
-      graspedObject = null;
+    public bool CheckGraspBegin(out IInteractionBehaviour newlyGraspedObject) {
+      newlyGraspedObject = null;
 
       // Check grasping against interaction state.
       if (_graspedObject != null) {
@@ -989,9 +990,9 @@ namespace Leap.Unity.UI.Interaction {
       }
 
       // Update the grab classifier to determine if we should grasp an object.
-      bool shouldGraspObject = grabClassifier.FixedUpdateClassifierGrasp(out graspedObject);
+      bool shouldGraspObject = grabClassifier.FixedUpdateClassifierGrasp(out newlyGraspedObject);
       if (shouldGraspObject) {
-        _graspedObject = graspedObject;
+        _graspedObject = newlyGraspedObject;
         return true;
       }
 

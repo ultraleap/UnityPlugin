@@ -548,6 +548,7 @@ namespace Leap.Unity.UI.Interaction {
     /// are updated (via InteractionManager.FixedUpdate).
     /// </summary>
     public void FixedUpdateObject() {
+      FixedUpdateGrasping();
       FixedUpdateCollisionMode();
       FixedUpdateForces();
     }
@@ -694,7 +695,7 @@ namespace Leap.Unity.UI.Interaction {
 
     private HashSet<InteractionHand> _graspingHands = new HashSet<InteractionHand>();
 
-    private bool _graspingInitialized;
+    private bool _graspingInitialized = false;
     private bool _moveObjectWhenGrasped__WasEnabledLastFrame;
     private bool _wasKinematicBeforeGrab;
 

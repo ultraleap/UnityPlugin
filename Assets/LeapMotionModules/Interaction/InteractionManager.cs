@@ -330,7 +330,7 @@ namespace Leap.Unity.UI.Interaction {
             return maybeEndedPrimaryHoveringHand.CheckPrimaryHoverEnd(out endPrimaryHoveredObject);
           },
           actionPerInteractionObject: (endPrimaryHoveredObject, noLongerPrimaryHoveringHands) => {
-            endPrimaryHoveredObject.EndHover(noLongerPrimaryHoveringHands);
+            endPrimaryHoveredObject.EndPrimaryHover(noLongerPrimaryHoveringHands);
           });
 
         // Check ending hovers.
@@ -365,7 +365,7 @@ namespace Leap.Unity.UI.Interaction {
               return maybeBeganPrimaryHoveringHand.CheckPrimaryHoverBegin(out primaryHoveredObject);
             },
             actionPerInteractionObject: (newlyPrimaryHoveredObject, beganPrimaryHoveringHands) => {
-              newlyPrimaryHoveredObject.BeginGrasp(beganPrimaryHoveringHands);
+              newlyPrimaryHoveredObject.BeginPrimaryHover(beganPrimaryHoveringHands);
             });
         }
 
@@ -415,7 +415,7 @@ namespace Leap.Unity.UI.Interaction {
               return maybeSustainedPrimaryHoveringHand.CheckPrimaryHoverStay(out primaryHoveredObject);
             },
             actionPerInteractionObject: (primaryHoveredObject, primaryHoveringHands) => {
-              primaryHoveredObject.BeginGrasp(primaryHoveringHands);
+              primaryHoveredObject.StayPrimaryHovered(primaryHoveringHands);
             });
         }
 
