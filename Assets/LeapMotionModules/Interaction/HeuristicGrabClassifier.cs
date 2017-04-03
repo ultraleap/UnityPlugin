@@ -54,8 +54,8 @@ namespace Leap.Unity.UI.Interaction {
 
     public void FixedUpdateClassifierHandState() {
       using (new ProfilerSample("Update Classifier Hand State")) {
-        var hand = interactionHand.GetLeapHand();
-        if (hand != null) {
+        var hand = interactionHand.GetLastTrackedLeapHand();
+        if (interactionHand.isTracked) {
           // Ensure that all scale dependent variables are properly set.
           _scaledGrabParams.FINGERTIP_RADIUS = _defaultGrabParams.FINGERTIP_RADIUS
                                              * interactionHand.interactionManager.SimulationScale;

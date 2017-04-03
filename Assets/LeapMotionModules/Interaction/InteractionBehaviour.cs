@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Leap.Unity.Space;
 
 namespace Leap.Unity.UI.Interaction {
 
@@ -28,23 +29,25 @@ namespace Leap.Unity.UI.Interaction {
     #region Hovering API
 
     /// <summary> Gets whether any hand is nearby. </summary>
-    public bool isHovered             { get { return _hoveringHandsCount > 0; } }
+    public bool isHovered             { get { return _hoveringHands.Count > 0; } }
 
     /// <summary> Gets the closest hand to this object, or null if no hand is nearby. </summary>
-    public Hand closestHoveringHand   { get { return _publicClosestHoveringHand; } }
+    public Hand closestHoveringHand   { get { return _closestHoveringHand == null ?
+                                                     null : _closestHoveringHand.GetLastTrackedLeapHand(); } }
 
     /// <summary>
     /// Gets whether this object is the primary hover for any Interaction Hand.
     /// </summary>
-    public bool isPrimaryHovered      { get { return _primaryHoveringHandsCount > 0; } }
+    public bool isPrimaryHovered      { get { return _primaryHoveringHands.Count > 0; } }
 
     /// <summary>
     /// Gets the primary hovering hand for this interaction object, if it has one.
     /// A hand is the primary hover for an interaction object only if it is closer to that object
-    /// than any other interaction object. If there are multiple such hands, this returns the hand
+    /// than any other interaction object. If there are multiple such hands, returns the hand
     /// closest to this object.
     /// </summary>
-    public Hand primaryHoveringHand   { get { return _publicClosestPrimaryHoveringHand; } }
+    public Hand primaryHoveringHand   { get { return _closestPrimaryHoveringHand == null ?
+                                                     null : _closestPrimaryHoveringHand.GetLastTrackedLeapHand(); } }
 
     /// <summary>
     /// Called whenever one or more hands have entered the hover activity radius around this
@@ -211,10 +214,10 @@ namespace Leap.Unity.UI.Interaction {
     #region Grasping API
 
     /// <summary> Gets whether this object is grasped by any hand. </summary>
-    public bool isGrasped { get { return _graspCount > 0; } }
+    public bool isGrasped { get { return _graspingHands.Count > 0; } }
 
-    /// <summary> Gets a list of all hands currently grasping this object. </summary>
-    public List<InteractionHand> graspingHands { get { return _graspingHandsSet; } }
+    /// <summary> Gets a set of all hands currently grasping this object. </summary>
+    public HashSet<InteractionHand> graspingHands { get { return _graspingHands; } }
 
     /// <summary>
     /// Releases this object from the hand currently grasping it, if it is grasped, and returns true.
@@ -224,28 +227,6 @@ namespace Leap.Unity.UI.Interaction {
     public bool ReleaseFromGrasp() {
       return manager.TryReleaseObjectFromGrasp(this);
     }
-
-    /// <summary>
-    /// Called when the hand that is grasping this interaction object loses tracking. This can occur if
-    /// the hand leaves the device's field of view, or is fully occluded by another (real-world) object.
-    /// 
-    /// An object is "suspended" if it is currently grasped by an untracked hand.
-    /// 
-    /// By default, suspended objects will hang in the air until the hand grasping them resumes tracking.
-    /// Subscribe to this callback and OnResume to implement, e.g., the object disappearing and
-    /// re-appearing.
-    /// 
-    /// Grasping a suspended object with a different hand will cease suspension of the object, and will
-    /// invoke OnResume, although the input to OnResume will be the newly grasping hand, not the hand that
-    /// suspended the object. OnGraspEnd will also be called for the hand that was formerly causing suspension.
-    /// </summary>
-    public Action<InteractionHand> OnObjectSuspended = (hand) => { };
-
-    /// <summary>
-    /// Called when an object ceases being suspended. An object is suspended if it is currently grasped by
-    /// an untracked hand. This occurs when the hand grasping an object ceases being tracked.
-    /// </summary>
-    public Action<InteractionHand> OnObjectResumed = (hand) => { };
 
     /// <summary>
     /// Called directly after this grasped object's Rigidbody has had its position and rotation set
@@ -319,13 +300,35 @@ namespace Leap.Unity.UI.Interaction {
     public Action<List<InteractionHand>> OnObjectGraspEnd   = (hands) => { };
 
     /// <summary>
+    /// Called when the hand that is grasping this interaction object loses tracking. This can occur if
+    /// the hand leaves the device's field of view, or is fully occluded by another (real-world) object.
+    /// 
+    /// An object is "suspended" if it is currently grasped by an untracked hand.
+    /// 
+    /// By default, suspended objects will hang in the air until the hand grasping them resumes tracking.
+    /// Subscribe to this callback and OnResume to implement, e.g., the object disappearing and
+    /// re-appearing.
+    /// 
+    /// Grasping a suspended object with a different hand will cease suspension of the object, and will
+    /// invoke OnResume, although the input to OnResume will be the newly grasping hand, not the hand that
+    /// suspended the object. OnGraspEnd will also be called for the hand that was formerly causing suspension.
+    /// </summary>
+    public Action<InteractionHand> OnSuspensionBegin = (hand) => { };
+
+    /// <summary>
+    /// Called when an object ceases being suspended. An object is suspended if it is currently grasped by
+    /// an untracked hand. This occurs when the hand grasping an object ceases being tracked.
+    /// </summary>
+    public Action<InteractionHand> OnSuspensionEnd = (hand) => { };
+
+    /// <summary>
     /// Returns (approximately) where the argument hand is grasping this object.
     /// If the hand is not currently grasping this object, returns Vector3.zero.
     /// 
     /// This method will log an error if the argument hand is not grasping this object.
     /// </summary>
     public Vector3 GetGraspPoint(InteractionHand intHand) {
-      if (intHand.IsGrasping(this)) {
+      if (intHand.graspedObject == intHand) {
         return intHand.GetGraspPoint();
       }
       else {
@@ -346,12 +349,12 @@ namespace Leap.Unity.UI.Interaction {
     /// touching this object. For a list of all hands currently touching
     /// this object, refer to OnContactStay.
     /// </remarks>
-    public Action<List<Hand>> OnContactBegin = (hands) => { };
+    public Action<List<InteractionHand>> OnContactBegin = (hands) => { };
 
     /// <summary>
     /// Called every frame during which one or more hands is touching this object.
     /// </summary>
-    public Action<List<Hand>> OnContactStay = (hands) => { };
+    public Action<List<InteractionHand>> OnContactStay = (hands) => { };
 
     /// <summary>
     /// Called when one or more hands stops touching this object.
@@ -361,18 +364,18 @@ namespace Leap.Unity.UI.Interaction {
     /// touching this object. For a list of all hands currently touching
     /// this object, refer to OnContactStay.
     /// </remarks>
-    public Action<List<Hand>> OnContactEnd = (hands) => { };
+    public Action<List<InteractionHand>> OnContactEnd = (hands) => { };
 
     /// <summary>
     /// Called when this object starts being touched by one or more hands, but was
     /// not touched by any hands during the previous frame.
     /// </summary>
-    public Action<List<Hand>> OnObjectContactBegin = (hands) => { };
+    public Action<List<InteractionHand>> OnObjectContactBegin = (hands) => { };
 
     /// <summary>
     /// Called when this object stops being touched by any hands.
     /// </summary>
-    public Action<List<Hand>> OnObjectContactEnd = (hands) => { };
+    public Action<List<InteractionHand>> OnObjectContactEnd = (hands) => { };
 
     #endregion
 
@@ -428,6 +431,12 @@ namespace Leap.Unity.UI.Interaction {
     private Rigidbody _rigidbody;
     /// <summary> The Rigidbody associated with this interation object. </summary>
     public new Rigidbody rigidbody { get { return _rigidbody; } protected set { _rigidbody = value; } }
+
+    public ISpaceComponent space {
+      get {
+        throw new NotImplementedException();
+      }
+    }
 
     [Header("Interaction Overrides")]
 
@@ -544,567 +553,281 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Hovering
 
-    private HashSet<InteractionHand> _hoveringHandsSet = new HashSet<InteractionHand>();
-    private HashSet<InteractionHand> _primaryHoveringHandsSet = new HashSet<InteractionHand>();
+    private HashSet<InteractionHand> _hoveringHands = new HashSet<InteractionHand>();
+
+    private InteractionHand _closestHoveringHand = null;
 
     public float GetDistance(Vector3 worldPosition) {
-      return Vector3.Distance(worldPosition, this.transform.position);
+      throw new NotImplementedException();
     }
 
     public void BeginHover(List<InteractionHand> hands) {
-      _hoveringHandsSet.Add(hand);
+      foreach (var hand in hands) {
+        _hoveringHands.Add(hand);
+      }
+
+      RefreshClosestHoveringHand();
+
+      OnHoverBegin(hands);
+
+      if (_hoveringHands.Count == hands.Count) {
+        OnObjectHoverBegin(hands);
+      }
     }
 
     public void EndHover(List<InteractionHand> hands) {
-      _hoveringHandsSet.Remove(hand);
+      foreach (var hand in hands) {
+        _hoveringHands.Remove(hand);
+      }
+
+      RefreshClosestHoveringHand();
+
+      OnHoverEnd(hands);
+
+      if (_hoveringHands.Count == 0) {
+        OnObjectHoverEnd(hands);
+      }
     }
 
+    public void StayHovered(List<InteractionHand> hands) {
+      RefreshClosestHoveringHand();
+      OnHoverStay(hands);
+    }
+
+    private void RefreshClosestHoveringHand() {
+      _closestHoveringHand = GetClosestHand(_hoveringHands, GetDistance);
+    }
+
+    private HashSet<InteractionHand> _primaryHoveringHands = new HashSet<InteractionHand>();
+
+    private InteractionHand _closestPrimaryHoveringHand = null;
+
     public void BeginPrimaryHover(List<InteractionHand> hands) {
-      _primaryHoveringHandsSet.Add(hand);
+      foreach (var hand in hands) {
+        _primaryHoveringHands.Add(hand);
+      }
+
+      RefreshClosestPrimaryHoveringHand();
+
+      OnPrimaryHoverBegin(hands);
+
+      if (_primaryHoveringHands.Count == hands.Count) {
+        OnObjectPrimaryHoverBegin(hands);
+      }
     }
 
     public void EndPrimaryHover(List<InteractionHand> hands) {
-      _primaryHoveringHandsSet.Remove(hand);
+      foreach (var hand in hands) {
+        _primaryHoveringHands.Remove(hand);
+      }
+
+      RefreshClosestPrimaryHoveringHand();
+
+      OnPrimaryHoverEnd(hands);
+
+      if (_primaryHoveringHands.Count == 0) {
+        OnObjectPrimaryHoverEnd(hands);
+      }
+    }
+
+    public void StayPrimaryHovered(List<InteractionHand> hands) {
+      RefreshClosestPrimaryHoveringHand();
+      OnPrimaryHoverStay(hands);
+    }
+
+    private void RefreshClosestPrimaryHoveringHand() {
+      _closestPrimaryHoveringHand = GetClosestHand(_primaryHoveringHands, GetDistance);
+    }
+
+    private static InteractionHand GetClosestHand(IEnumerable<InteractionHand> hands, Func<Vector3, float> distanceFunc) {
+      InteractionHand closestHoveringHand = null;
+      float closestHoveringHandDist = float.PositiveInfinity;
+      foreach (var hand in hands) {
+        float distance = distanceFunc(hand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
+        if (closestHoveringHand == null
+            || distance < closestHoveringHandDist) {
+          closestHoveringHand = hand;
+          closestHoveringHandDist = distance;
+        }
+      }
+      return closestHoveringHand;
     }
 
     #endregion
 
     #region Contact
 
-    private HashSet<InteractionHand> _contactingHandsSet = new HashSet<InteractionHand>();
+    private HashSet<InteractionHand> _contactingHands = new HashSet<InteractionHand>();
 
     public void BeginContact(List<InteractionHand> hands) {
-      _contactingHandsSet.Add(hand);
+      foreach (var hand in hands) {
+        _contactingHands.Add(hand);
+      }
+
+      OnContactBegin(hands);
+
+      if (_contactingHands.Count == hands.Count) {
+        OnObjectContactBegin(hands);
+      }
     }
 
     public void EndContact(List<InteractionHand> hands) {
-      _contactingHandsSet.Remove(hand);
+      foreach (var hand in hands) {
+        _contactingHands.Remove(hand);
+      }
+
+      OnContactEnd(hands);
+
+      if (_contactingHands.Count == 0) {
+        OnObjectContactEnd(hands);
+      }
+    }
+
+    public void StayContacted(List<InteractionHand> hands) {
+      OnContactStay(hands);
     }
 
     #endregion
 
     #region Grasping
 
-    private HashSet<InteractionHand> _graspingHandsSet = new HashSet<InteractionHand>();
-    private bool _isSuspended;
+    private HashSet<InteractionHand> _graspingHands = new HashSet<InteractionHand>();
+
+    private bool _graspingInitialized;
+    private bool _moveObjectWhenGrasped__WasEnabledLastFrame;
+    private bool _wasKinematicBeforeGrab;
+
+    private IGraspedPoseController _graspedPositionController;
+    /// <summary> Gets or sets the grasped pose controller for this Interaction object. </summary>
+    public IGraspedPoseController graspedPoseController {
+      get {
+        if (_graspedPositionController == null) {
+          _graspedPositionController = new KabschGraspedPose(this);
+        }
+        return _graspedPositionController;
+      }
+      set {
+        _graspedPositionController = value;
+      }
+    }
+
+    private KinematicGraspedMovement    _kinematicHoldingMovement;
+    private NonKinematicGraspedMovement _nonKinematicHoldingMovement;
+
+    private IThrowController _throwController;
+    /// <summary> Gets or sets the throw controller for this Interaction object. </summary>
+    public IThrowController throwController {
+      get {
+        if (_throwController == null) {
+          _throwController = new SlidingWindowThrow();
+        }
+        return _throwController;
+      }
+      set {
+        _throwController = value;
+      }
+    }
+
+    private void InitGrasping() {
+      _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
+
+      _kinematicHoldingMovement = new KinematicGraspedMovement();
+      _nonKinematicHoldingMovement = new NonKinematicGraspedMovement();
+
+      _graspingInitialized = true;
+    }
+
+    private void FixedUpdateGrasping() {
+      if (!_graspingInitialized) {
+        InitGrasping();
+      }
+
+      if (!moveObjectWhenGrasped && _moveObjectWhenGrasped__WasEnabledLastFrame) {
+        graspedPoseController.ClearHands();
+      }
+      _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
+    }
 
     public void BeginGrasp(List<InteractionHand> hands) {
-      _graspingHandsSet.Add(hand);
+      foreach (var hand in hands) {
+        _graspingHands.Add(hand);
+
+        if (moveObjectWhenGrasped) {
+          // Add each hand to grasped pose solver.
+          graspedPoseController.AddHand(hand);
+        }
+      }
+
+      OnGraspBegin(hands);
+
+      if (_graspingHands.Count == hands.Count) { // Object wasn't grasped before.
+
+        _wasKinematicBeforeGrab = rigidbody.isKinematic;
+        switch (graspedMovementType) {
+          case GraspedMovementType.Inherit: break; // no change
+          case GraspedMovementType.Kinematic:
+            rigidbody.isKinematic = true; break;
+          case GraspedMovementType.Nonkinematic:
+            rigidbody.isKinematic = false; break;
+        }
+
+        OnObjectGraspBegin(hands);
+      }
     }
 
     public void EndGrasp(List<InteractionHand> hands) {
-      _graspingHandsSet.Remove(hand);
+      foreach (var hand in hands) {
+        _graspingHands.Remove(hand);
+
+        if (moveObjectWhenGrasped) {
+          // Remove each hand from the pose solver.
+          graspedPoseController.RemoveHand(hand);
+        }
+      }
+
+      OnGraspEnd(hands);
+
+      if (_graspingHands.Count == 0) { // Object is no longer grasped by any hands.
+        // Revert kinematic state.
+        rigidbody.isKinematic = _wasKinematicBeforeGrab;
+
+        OnObjectGraspEnd(hands);
+      }
     }
 
-    public bool isSuspended {
-      get { return _isSuspended; }
+    public void StayGrasped(List<InteractionHand> hands) {
+      if (moveObjectWhenGrasped) {
+        Vector3 origPosition = rigidbody.position; Quaternion origRotation = rigidbody.rotation;
+        Vector3 newPosition; Quaternion newRotation;
+        graspedPoseController.GetGraspedPosition(out newPosition, out newRotation);
+
+        IGraspedMovementController holdingMovementController = rigidbody.isKinematic ?
+                                                                 (IGraspedMovementController)_kinematicHoldingMovement
+                                                               : (IGraspedMovementController)_nonKinematicHoldingMovement;
+        holdingMovementController.MoveTo(newPosition, newRotation, this);
+
+        OnGraspedMovement(origPosition, origRotation, newPosition, newRotation, hands);
+        
+        throwController.OnHold(this, hands);
+      }
+
+      OnGraspHold(hands);
     }
 
-    public void SuspendGraspedObject(List<InteractionHand> hands) {
+    private bool _isSuspended = false;
+    public bool isSuspended { get { return _isSuspended; } }
+
+    public void BeginSuspension(InteractionHand hand) {
       _isSuspended = true;
+
+      OnSuspensionBegin(hand);
     }
 
-    public void ResumeGraspedObject(List<InteractionHand> hands) {
+    public void EndSuspension(InteractionHand hand) {
       _isSuspended = false;
+
+      OnSuspensionEnd(hand);
     }
-
-    #endregion
-
-    // TODO: DELETEME
-    //#region Callbacks
-
-    //// BeginX / EndX implementations called by InteractionHand modify these sets directly.
-
-    //// These lists are used to provide the data to callbacks, and are used when checking the state of the InteractionBehaviour
-    //private List<InteractionHand> _handsBuffer = new List<InteractionHand>(); // for End and Begin callbacks
-    //private List<InteractionHand> _hoverStayHands = new List<InteractionHand>();
-    //private List<InteractionHand> _primaryHoverStayHands = new List<InteractionHand>();
-    //private List<InteractionHand> _contactStayHands = new List<InteractionHand>();
-    //private List<InteractionHand> _graspHoldHands = new List<InteractionHand>();
-
-    //// These sets are used to detect changes frame-to-frame
-    //private HashSet<InteractionHand> _hoveredLastFrameSet = new HashSet<InteractionHand>();
-    //private HashSet<InteractionHand> _primaryHoveredLastFrameSet = new HashSet<InteractionHand>();
-    //private HashSet<InteractionHand> _contactingLastFrameSet = new HashSet<InteractionHand>();
-    //private HashSet<InteractionHand> _graspingLastFrameSet = new HashSet<InteractionHand>();
-
-    //// TODO: Groooooss. Can I simplify this..??
-
-    //private void FixedUpdateCallbacks() {
-
-    //  //_hoverStayHands.Clear();
-    //  //_primaryHoverStayHands.Clear();
-    //  //_contactStayHands.Clear();
-    //  //_graspHoldHands.Clear();
-
-    //  //// e.g. preparing grasp stay callback, can call grasp end right away
-    //  //_handsBuffer.Clear();
-    //  //foreach (var hand in _graspingHandsSet) {
-    //  //  if (_graspingLastFrameSet.Contains(hand) {
-    //  //    _graspHoldHands.Add(hand);
-    //  //  }
-    //  //  else {
-    //  //    _handsBuffer.Add(hand);
-    //  //  }
-    //  //}
-    //  //if (_handsBuffer.Count > 0) { OnGraspEnd(_handsBuffer); }
-
-    //  //// e.g. preparing hover stay callback, can call hover end right away
-    //  //_handsBuffer.Clear();
-    //  //foreach (var hand in _hoveringHandsSet) {
-    //  //  if (_hoveredLastFrameSet.Contains(hand)) {
-    //  //    _hoverStayHands.Add(hand);
-    //  //  }
-    //  //  else {
-    //  //    _handsBuffer.Add(hand);
-    //  //  }
-    //  //}
-    //  //if (_handsBuffer.Count > 0) { OnHoverEnd(_handsBuffer); }
-
-    //  //// But note how I have to wait and traverse _graspingHandsSet AGAIN
-    //  //// in order to get the necessary hands for OnGraspBegin, because I'm
-    //  //// not allowed to call OnGraspBegin until after e.g. HoverEnd and ContactEnd
-    //  //// have been taken care of.
-    //  //// I _COULD_ solve this problem easily by having completely separate lists
-    //  //// for graspEnd, graspBegin, contactEnd, contactBegin, etc. etc. etc.
-    //  //// but good lord we already have so many of these per-object
-
-    //  //// Update last-frame state
-    //  //_hoveredLastFrameSet.Clear();
-    //  //_primaryHoveredLastFrameSet.Clear();
-    //  //_contactingLastFrameSet.Clear();
-    //  //_graspingLastFrameSet.Clear();
-    //  //foreach (var hand in _hoveredLastFrameSet) {
-    //  //  _hoveringHandsSet.Add(hand);
-    //  //}
-    //  //foreach (var hand in _primaryHoveredLastFrameSet) {
-    //  //  _primaryHoveredLastFrameSet.Add(hand);
-    //  //}
-    //  //foreach (var hand in _graspingHandsSet) {
-    //  //  _graspingLastFrameSet.Add(hand);
-    //  //}
-    //  //foreach (var hand in _contactingHandsSet) {
-    //  //  _contactingLastFrameSet.Add(hand);
-    //  //}
-    //}
-
-    //#endregion
-
-    #region OLD interaction code
-
-    #region Hovering
-
-    //// Logistics for providing per-object (instead of per-hand) Hover callbacks.
-    //private Hand  _closestHoveringHand = null;
-    //private float _closestHoveringHandDistance = float.PositiveInfinity;
-    //private Hand  _justStoppedHoveringHand = null; // Provided for OnObjectHoverEnd.
-    //private int   _hoveringHandsCountLastFrame = 0;
-    //private int   _hoveringHandsCount = 0;
-
-    //private Hand _publicClosestHoveringHand = null;
-
-    //// Runs after InteractionHands have done FixedUpdateHand.
-    //private void FixedUpdateHovering() {
-    //  if (_hoveringHandsCount > 0) {
-    //    if (_hoveringHandsCountLastFrame == 0) {
-    //      _publicClosestHoveringHand = _closestHoveringHand;
-    //      OnObjectHoverBegin(_closestHoveringHand);
-    //    }
-    //    else {
-    //      _publicClosestHoveringHand = _closestHoveringHand;
-    //      OnObjectHoverStay(_closestHoveringHand);
-    //    }
-    //  }
-    //  else if (_hoveringHandsCountLastFrame > 0) {
-    //    _closestHoveringHand = null;
-    //    OnObjectHoverEnd(_justStoppedHoveringHand);
-    //    _publicClosestHoveringHand = null;
-    //  }
-
-    //  _hoveringHandsCountLastFrame = _hoveringHandsCount;
-    //  _closestHoveringHand = null;
-    //  _closestHoveringHandDistance = float.PositiveInfinity;
-    //}
-
-    //public override float GetDistance(Vector3 worldPosition) {
-    //  // TODO: Should probably get distance from the InteractionBehaviour's colliders. Probably has to wait until 5.6 (Physics.ClosestPoint)
-    //  return GetInteractionDistanceToPoint(worldPosition);
-    //}
-
-    //public override void HoverBegin(InteractionHand intHand) {
-    //  _hoveringHandsCount++;
-    //  EvaluateHoverCloseness(hand);
-
-    //  OnHoverBegin(hand);
-    //}
-
-    //private void EvaluateHoverCloseness(Hand hand) {
-    //  float handDistance = GetInteractionDistanceToPoint(hand.PalmPosition.ToVector3());
-
-    //  if (_closestHoveringHand == null) {
-    //    _closestHoveringHand = hand;
-    //    _closestHoveringHandDistance = handDistance;
-    //  }
-    //  else {
-    //    if (handDistance < _closestHoveringHandDistance) {
-    //      _closestHoveringHand = hand;
-    //      _closestHoveringHandDistance = handDistance;
-    //    }
-    //  }
-    //}
-
-    //public override void HoverEnd(Hand hand) {
-    //  _hoveringHandsCount--;
-    //  if (_hoveringHandsCount == 0) {
-    //    _justStoppedHoveringHand = hand;
-    //  }
-
-    //  OnHoverEnd(hand);
-    //}
-
-    //private Hand _closestPrimaryHoveringHand = null;
-    //private float _closestPrimaryHoveringHandDistance = float.PositiveInfinity;
-    //private Hand _closestJustStoppedPrimaryHoveringHand = null; // Provided for OnObjectPrimaryHoverEnd.
-    //private int _primaryHoveringHandsCountLastFrame = 0;
-    //private int _primaryHoveringHandsCount = 0;
-
-    //private Hand _publicClosestPrimaryHoveringHand = null;
-
-    //private void FixedUpdatePrimaryHovering() {
-    //  if (_primaryHoveringHandsCount > 0) {
-    //    if (_primaryHoveringHandsCountLastFrame == 0) {
-    //      _publicClosestPrimaryHoveringHand = _closestPrimaryHoveringHand;
-    //      OnObjectPrimaryHoverBegin(_closestPrimaryHoveringHand);
-    //    }
-    //    else {
-    //      _publicClosestPrimaryHoveringHand = _closestPrimaryHoveringHand;
-    //      OnObjectPrimaryHoverStay(_closestPrimaryHoveringHand);
-    //    }
-    //  }
-    //  else if (_primaryHoveringHandsCountLastFrame > 0) {
-    //    _publicClosestPrimaryHoveringHand = null;
-    //    OnObjectPrimaryHoverEnd(_closestJustStoppedPrimaryHoveringHand);
-    //  }
-
-    //  _primaryHoveringHandsCountLastFrame = _primaryHoveringHandsCount;
-    //  _closestPrimaryHoveringHand = null;
-    //  _closestPrimaryHoveringHandDistance = float.PositiveInfinity;
-    //}
-
-    //public override void PrimaryHoverBegin(Hand hand) {
-    //  EvaluatePrimaryHoverCloseness(hand);
-    //  _primaryHoveringHandsCount++;
-
-    //  OnPrimaryHoverBegin(hand);
-    //}
-
-    //public override void PrimaryHoverStay(Hand hand) {
-    //  EvaluatePrimaryHoverCloseness(hand);
-
-    //  OnPrimaryHoverStay(hand);
-    //}
-
-    //private void EvaluatePrimaryHoverCloseness(Hand hand) {
-    //  float handDistance = GetInteractionDistanceToPoint(hand.PalmPosition.ToVector3());
-    //  if (_primaryHoveringHandsCount == 0 || _closestPrimaryHoveringHand == null) {
-    //    _closestPrimaryHoveringHand = hand;
-    //    _closestPrimaryHoveringHandDistance = handDistance;
-    //  }
-    //  else {
-    //    if (handDistance < _closestPrimaryHoveringHandDistance) {
-    //      _closestPrimaryHoveringHand = hand;
-    //      _closestPrimaryHoveringHandDistance = handDistance;
-    //    }
-    //  }
-    //}
-
-    //public override void PrimaryHoverEnd(Hand hand) {
-    //  _primaryHoveringHandsCount--;
-    //  if (_primaryHoveringHandsCount == 0) {
-    //    _closestJustStoppedPrimaryHoveringHand = hand;
-    //  }      
-
-    //  OnPrimaryHoverEnd(hand);
-    //}
-
-    #endregion
-
-    #region Contact
-
-    //private Hand _closestContactingHand = null;
-    //private float _closestContactingHandDistance = float.PositiveInfinity;
-    //private Hand _closestJustStoppedContactingHand = null; // Provided for OnObjectContactEnd.
-    //int _contactingHandsCount = 0;
-    //int _contactingHandsCountLastFrame = 0;
-
-    //private void FixedUpdateContact() {
-    //  if (_contactingHandsCount > 0) {
-    //    if (_contactingHandsCountLastFrame == 0) {
-    //      ObjectContactBegin(_closestContactingHand);
-    //    }
-    //    else {
-    //      ObjectContactStay(_closestContactingHand);
-    //    }
-    //  }
-    //  else if (_contactingHandsCountLastFrame > 0) {
-    //    ObjectContactEnd(_closestJustStoppedContactingHand);
-    //  }
-    //  _contactingHandsCountLastFrame = _contactingHandsCount;
-    //  _closestContactingHand = null;
-    //  _closestContactingHandDistance = float.PositiveInfinity;
-    //}
-
-    //public override void ContactBegin(Hand hand) {
-    //  EvaluateContactCloseness(hand);
-    //  _contactingHandsCount += 1;
-
-    //  OnContactBegin(hand);
-    //}
-
-    //public override void ContactStay(Hand hand) {
-    //  EvaluateContactCloseness(hand);
-
-    //  OnContactStay(hand);
-    //}
-
-    //private void EvaluateContactCloseness(Hand hand) {
-    //  float handDistance = GetInteractionDistanceToPoint(hand.PalmPosition.ToVector3());
-    //  if (_contactingHandsCount == 0 || _closestContactingHand == null) {
-    //    _closestContactingHand = hand;
-    //    _closestContactingHandDistance = handDistance;
-    //  }
-    //  else {
-    //    if (handDistance < _closestContactingHandDistance) {
-    //      _closestContactingHand = hand;
-    //      _closestContactingHandDistance = handDistance;
-    //    }
-    //  }
-    //}
-
-    //public override void ContactEnd(Hand hand) {
-    //  _contactingHandsCount -= 1;
-    //  if (_contactingHandsCount == 0) {
-    //    _closestJustStoppedContactingHand = hand;
-    //  }
-
-    //  OnContactEnd(hand);
-    //}
-
-    //public void ObjectContactBegin(Hand hand) {
-    //  OnObjectContactBegin(hand);
-    //}
-
-    //public void ObjectContactStay(Hand hand) {
-    //  OnObjectContactStay(hand);
-    //}
-
-    //public void ObjectContactEnd(Hand hand) {
-    //  OnObjectContactEnd(hand);
-    //}
-
-    #endregion
-
-    #region Grasping
-
-    //private int _graspCount = 0;
-    //private bool _moveObjectWhenGrasped__WasEnabledLastFrame;
-    //private bool _wasKinematicBeforeGrab;
-
-    //private IGraspedPoseController _graspedPositionController;
-    ///// <summary> Gets or sets the grasped pose controller for this Interaction object. </summary>
-    //public IGraspedPoseController graspedPoseController {
-    //  get {
-    //    if (_graspedPositionController == null) {
-    //      _graspedPositionController = new KabschGraspedPose(this);
-    //    }
-    //    return _graspedPositionController;
-    //  }
-    //  set {
-    //    _graspedPositionController = value;
-    //  }
-    //}
-
-    //private KinematicGraspedMovement    _kinematicHoldingMovement;
-    //private NonKinematicGraspedMovement _nonKinematicHoldingMovement;
-
-    //private IThrowController _throwController;
-    ///// <summary> Gets or sets the throw controller for this Interaction object. </summary>
-    //public IThrowController throwController {
-    //  get {
-    //    if (_throwController == null) {
-    //      _throwController = new SlidingWindowThrow();
-    //    }
-    //    return _throwController;
-    //  }
-    //  set {
-    //    _throwController = value;
-    //  }
-    //}
-
-    //private int _graspCountLastFrame = 0;
-    //private List<InteractionHand> _graspingIntHands = new List<InteractionHand>(4);
-    //private List<Hand> _graspingHandsBuffer = new List<Hand>(4);
-    //private List<Hand> _lastFrameGraspingHands = new List<Hand>(4); // for OnMultiGraspEnd
-    //private Stack<Hand> _lastFrameGraspingHandObjectStorage = new Stack<Hand>(4); // for OnMultiGraspEnd
-
-    //private void InitGrasping() {
-    //  _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
-
-    //  _kinematicHoldingMovement = new KinematicGraspedMovement();
-    //  _nonKinematicHoldingMovement = new NonKinematicGraspedMovement();
-    //}
-
-    //private void FixedUpdateGrasping() {
-    //  if (!moveObjectWhenGrasped && _moveObjectWhenGrasped__WasEnabledLastFrame) {
-    //    graspedPoseController.ClearHands();
-    //  }
-    //  _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
-
-    //  _graspingHandsBuffer.Clear();
-    //  foreach (var hand in _graspingIntHands.Query().Select(intHand => intHand.GetLastTrackedLeapHand())) {
-    //    _graspingHandsBuffer.Add(hand);
-    //  }
-
-    //  if (_graspCount > 0) {
-    //    if (_graspCountLastFrame == 0) {
-    //      OnObjectGraspBegin();
-    //    }
-    //    else {
-    //      OnObjectGraspHold();
-    //    }
-
-    //    if (_graspCount > 1) {
-    //      if (_graspCountLastFrame <= 1) {
-    //        OnMultiGraspBegin(_graspingHandsBuffer);
-    //      }
-    //      else {
-    //        OnMultiGraspHold(_graspingHandsBuffer);
-    //      }
-    //    }
-    //  }
-    //  if (_graspCount == 0) {
-    //    if (_graspCountLastFrame > 0) {
-    //      OnObjectGraspEnd();
-    //    }
-    //  }
-    //  if (_graspCount <= 1) {
-    //    if (_graspCountLastFrame > 1) {
-    //      OnMultiGraspEnd(_lastFrameGraspingHands);
-    //    }
-    //  }
-
-    //  _graspCountLastFrame = _graspCount;
-
-    //  // Keep track of grasping hands from last frame; these must be independent
-    //  // Hand objects due to pooling by the service provider, but care must be taken
-    //  // to not allocate garbage every frame!
-    //  while (_lastFrameGraspingHands.Count < _graspingHandsBuffer.Count) {
-    //    if (_lastFrameGraspingHandObjectStorage.Count > 0) {
-    //      _lastFrameGraspingHands.Add(_lastFrameGraspingHandObjectStorage.Pop());
-    //    }
-    //    else {
-    //      _lastFrameGraspingHandObjectStorage.Push(new Hand());
-    //    }
-    //  }
-    //  while (_lastFrameGraspingHands.Count > _graspingHandsBuffer.Count) {
-    //    _lastFrameGraspingHandObjectStorage.Push(_lastFrameGraspingHands[_lastFrameGraspingHands.Count - 1]);
-    //    _lastFrameGraspingHands.RemoveAt(_lastFrameGraspingHands.Count - 1);
-    //  }
-    //  for (int i = 0; i < _graspingHandsBuffer.Count; i++) {
-    //    _lastFrameGraspingHands[i].CopyFrom(_graspingHandsBuffer[i]);
-    //  }
-    //}
-
-    //public override void GraspBegin(Hand hand) {
-    //  if (isGrasped && !allowMultiGrasp) {
-    //    interactionManager.TryReleaseObjectFromGrasp(this);
-    //  }
-
-    //  InteractionHand graspingIntHand = interactionManager.GetInteractionHand(hand);
-    //  _graspingIntHands.Add(graspingIntHand);
-    //  _graspCount++;
-
-    //  // SnapToHand(hand); // TODO: When you grasp an object, snap the object into a good holding position.
-
-    //  if (moveObjectWhenGrasped) {
-    //    graspedPoseController.AddHand(graspingIntHand);
-    //  }
-
-    //  // Set kinematic state based on grasping hold movement type
-    //  if (_graspCount == 1) {
-    //    _wasKinematicBeforeGrab = rigidbody.isKinematic;
-    //    switch (graspedMovementType) {
-    //      case GraspedMovementType.Inherit: break; // no change
-    //      case GraspedMovementType.Kinematic:
-    //        rigidbody.isKinematic = true; break;
-    //      case GraspedMovementType.Nonkinematic:
-    //        rigidbody.isKinematic = false; break;
-    //    }
-    //  }
-
-    //  OnGraspBegin(hand);
-    //}
-
-    //private List<Hand> _graspedHandBuffer = new List<Hand>();
-    //public override void GraspHold(Hand hand) {
-    //  if (moveObjectWhenGrasped) {
-    //    Vector3 origPosition = rigidbody.position; Quaternion origRotation = rigidbody.rotation;
-    //    Vector3 newPosition; Quaternion newRotation;
-    //    graspedPoseController.GetGraspedPosition(out newPosition, out newRotation);
-
-    //    IGraspedMovementController holdingMovementController = rigidbody.isKinematic ?
-    //                                                             (IGraspedMovementController)_kinematicHoldingMovement
-    //                                                           : (IGraspedMovementController)_nonKinematicHoldingMovement;
-    //    holdingMovementController.MoveTo(newPosition, newRotation, this);
-
-    //    OnGraspedMovement(origPosition, origRotation, newPosition, newRotation, hand);
-
-    //    // TODO: Support providing multiple hands to the throw controller
-    //    _graspedHandBuffer.Clear();
-    //    _graspedHandBuffer.Add(hand);
-    //    throwController.OnHold(this, _graspedHandBuffer);
-    //  }
-
-    //  OnGraspHold(hand);
-    //}
-
-    //public override void GraspEnd(InteractionHand intHand) {
-    //  _graspCount--;
-
-    //  _graspingIntHands.Remove(intHand);
-
-    //  if (moveObjectWhenGrasped) {
-    //    graspedPoseController.RemoveHand(intHand);
-    //  }
-
-    //  // Revert kinematic state if the grasp has ended
-    //  if (_graspCount == 0) {
-    //    rigidbody.isKinematic = _wasKinematicBeforeGrab;
-    //  }
-
-    //  // If the grasp was causing the object to be suspended, stop being suspended.
-    //  if (intHand.GetLeapHand() == null && this.isSuspended) {
-    //    this.GraspResumeObject();
-    //  }
-
-    //  throwController.OnThrow(this, intHand.GetLastTrackedLeapHand());
-
-    //  OnGraspEnd(intHand.GetLastTrackedLeapHand());
-    //}
-
-    //// Suspension / Resume
-
-    //public override void GraspSuspendObject() {
-    //  _isSuspended = true;
-    //  OnSuspend(this);
-    //}
-
-    //public override void GraspResumeObject() {
-    //  _isSuspended = false;
-    //  OnResume(this);
-    //}
-
-    #endregion
 
     #endregion
 

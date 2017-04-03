@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Leap.Unity.UI.Interaction.Internal;
+using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
@@ -15,12 +16,12 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     /// <param name="intObj">The interaction object being held.</param>
     /// <param name="hands">A list of the hands currently holding the object.</param>
-    void OnHold(InteractionBehaviour intObj, ReadonlyList<Hand> hands);
+    void OnHold(InteractionBehaviour intObj, ReadonlyList<InteractionHand> hands);
 
     /// <summary>
     /// Called when an Interaction object is released by the last hand holding it.
     /// </summary>
-    void OnThrow(InteractionBehaviour intObj, Hand hand);
+    void OnThrow(InteractionBehaviour intObj, InteractionHand hand);
 
   }
 
