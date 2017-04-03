@@ -841,7 +841,7 @@ namespace Leap.Unity.UI.Interaction {
     public IInteractionBehaviour graspedObject { get { return _graspedObject; } }
 
     /// <summary> Gets the set of objects currently considered graspable. </summary>
-    public HashSet<IInteractionBehaviour> graspCandidates { get { return _graspActivityManager.ActiveBehaviours; } }
+    public HashSet<IInteractionBehaviour> graspCandidates { get { return graspActivityManager.ActiveBehaviours; } }
 
     private ActivityManager _graspActivityManager;
     /// <summary> Determines which objects are graspable any given frame. </summary>

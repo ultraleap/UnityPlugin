@@ -418,11 +418,11 @@ namespace Leap.Unity.UI.Interaction {
     public InteractionManager manager {
       get { return _manager; }
       protected set {
-        if (_manager.IsBehaviourRegistered(this)) {
+        if (_manager != null && _manager.IsBehaviourRegistered(this)) {
           _manager.UnregisterInteractionBehaviour(this);
         }
         _manager = value;
-        if (!manager.IsBehaviourRegistered(this)) {
+        if (_manager != null && !manager.IsBehaviourRegistered(this)) {
           _manager.RegisterInteractionBehaviour(this);
         }
       }
@@ -432,9 +432,10 @@ namespace Leap.Unity.UI.Interaction {
     /// <summary> The Rigidbody associated with this interation object. </summary>
     public new Rigidbody rigidbody { get { return _rigidbody; } protected set { _rigidbody = value; } }
 
+    //private ISpaceComponent _space = Space.IdentityTransformer;
     public ISpaceComponent space {
       get {
-        throw new NotImplementedException();
+        return null;
       }
     }
 
@@ -558,7 +559,7 @@ namespace Leap.Unity.UI.Interaction {
     private InteractionHand _closestHoveringHand = null;
 
     public float GetDistance(Vector3 worldPosition) {
-      throw new NotImplementedException();
+      return Vector3.Distance(this.transform.position, worldPosition);
     }
 
     public void BeginHover(List<InteractionHand> hands) {
