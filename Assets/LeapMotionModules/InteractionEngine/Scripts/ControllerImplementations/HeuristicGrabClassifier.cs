@@ -32,7 +32,7 @@ namespace Leap.Unity.Interaction {
 
         //Do the actual grab classification logic
         fillClassifier(_hand, ref classifier);
-        GrabClassifierHeuristics.UpdateClassifier(classifier, collidingCandidates, numberOfColliders, scaledGrabParams);
+        GrabClassifierHeuristics.UpdateClassifier(classifier, scaledGrabParams, ref collidingCandidates, ref numberOfColliders);
 
         if (classifier.isGrabbing != classifier.prevGrabbing) {
           if (classifier.isGrabbing) {
