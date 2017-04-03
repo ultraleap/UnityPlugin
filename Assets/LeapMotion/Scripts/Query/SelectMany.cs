@@ -1,64 +1,65 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
 namespace Leap.Unity.Query {
 
-  public class SelectManyOp<SourceType, ResultType, SourceOp, ResultOp> : IEnumerator<ResultType>
-    where SourceOp : IEnumerator<SourceType>
-    where ResultOp : IEnumerator<ResultType> {
+  public struct SelectManyOp<SourceType, ResultType, SourceOp, ResultOp> : IQueryOp<ResultType>
+    where SourceOp : IQueryOp<SourceType>
+    where ResultOp : IQueryOp<ResultType> {
 
     private SourceOp _source;
     private Func<SourceType, QueryWrapper<ResultType, ResultOp>> _selector;
 
+    private bool _hasInner;
     private ResultOp _innerSource;
 
     public SelectManyOp(SourceOp source, Func<SourceType, QueryWrapper<ResultType, ResultOp>> selector) {
       _source = source;
       _selector = selector;
 
-      if (_source.MoveNext()) {
-        _innerSource = _selector(_source.Current).GetEnumerator();
+      SourceType st;
+      if (_source.TryGetNext(out st)) {
+        _innerSource = _selector(st).op;
+        _hasInner = true;
+      } else {
+        _innerSource = default(ResultOp);
+        _hasInner = false;
       }
     }
 
-    public bool MoveNext() {
-      while (!_innerSource.MoveNext()) {
-        if (!_source.MoveNext()) {
+    public bool TryGetNext(out ResultType t) {
+      if (!_hasInner) {
+        t = default(ResultType);
+        return false;
+      }
+
+      while (!_innerSource.TryGetNext(out t)) {
+        SourceType st;
+        if (!_source.TryGetNext(out st)) {
+          _hasInner = false;
           return false;
         }
-        _innerSource = _selector(_source.Current).GetEnumerator();
+        _innerSource = _selector(st).op;
       }
       return true;
     }
 
-    public ResultType Current {
-      get {
-        return _innerSource.Current;
-      }
-    }
-
-    object IEnumerator.Current {
-      get {
-        throw new InvalidOperationException();
-      }
-    }
-
     public void Reset() {
-      throw new InvalidOperationException();
-    }
+      _source.Reset();
 
-    public void Dispose() {
-      _source.Dispose();
-      _innerSource.Dispose();
-      _selector = null;
+      SourceType st;
+      if (_source.TryGetNext(out st)) {
+        _innerSource = _selector(st).op;
+        _hasInner = true;
+      } else {
+        _innerSource = default(ResultOp);
+        _hasInner = false;
+      }
     }
   }
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
     public QueryWrapper<NewType, SelectManyOp<QueryType, NewType, QueryOp, NewOp>> SelectMany<NewType, NewOp>(Func<QueryType, QueryWrapper<NewType, NewOp>> selector)
-      where NewOp : IEnumerator<NewType> {
+      where NewOp : IQueryOp<NewType> {
       return new QueryWrapper<NewType, SelectManyOp<QueryType, NewType, QueryOp, NewOp>>(new SelectManyOp<QueryType, NewType, QueryOp, NewOp>(_op, selector));
     }
   }

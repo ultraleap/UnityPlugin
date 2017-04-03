@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-
+﻿
 namespace Leap.Unity.Query {
 
-  public struct ConcatOp<SourceType, SourceOpA, SourceOpB> : IEnumerator<SourceType>
-  where SourceOpA : IEnumerator<SourceType>
-  where SourceOpB : IEnumerator<SourceType> {
+  public struct ConcatOp<SourceType, SourceOpA, SourceOpB> : IQueryOp<SourceType>
+  where SourceOpA : IQueryOp<SourceType>
+  where SourceOpB : IQueryOp<SourceType> {
 
     private SourceOpA _sourceA;
     private SourceOpB _sourceB;
@@ -18,47 +15,28 @@ namespace Leap.Unity.Query {
       _isOnA = true;
     }
 
-    public bool MoveNext() {
+    public bool TryGetNext(out SourceType t) {
       if (_isOnA) {
-        if (_sourceA.MoveNext()) {
+        if (_sourceA.TryGetNext(out t)) {
           return true;
         } else {
           _isOnA = false;
         }
       }
 
-      return _sourceB.MoveNext();
-    }
-
-    public SourceType Current {
-      get {
-        if (_isOnA) {
-          return _sourceA.Current;
-        } else {
-          return _sourceB.Current;
-        }
-      }
-    }
-
-    object IEnumerator.Current {
-      get {
-        throw new InvalidOperationException();
-      }
+      return _sourceB.TryGetNext(out t);
     }
 
     public void Reset() {
-      throw new InvalidOperationException();
-    }
-
-    public void Dispose() {
-      _sourceA.Dispose();
-      _sourceB.Dispose();
+      _isOnA = true;
+      _sourceA.Reset();
+      _sourceB.Reset();
     }
   }
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
     public QueryWrapper<QueryType, ConcatOp<QueryType, QueryOp, SourceBOp>> Concat<SourceBOp>(QueryWrapper<QueryType, SourceBOp> sourceB)
-      where SourceBOp : IEnumerator<QueryType> {
+      where SourceBOp : IQueryOp<QueryType> {
       return new QueryWrapper<QueryType, ConcatOp<QueryType, QueryOp, SourceBOp>>(new ConcatOp<QueryType, QueryOp, SourceBOp>(_op, sourceB._op));
     }
   }

@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace Leap.Unity.Query {
 
-  public struct WhereOp<SourceType, SourceOp> : IEnumerator<SourceType>
-    where SourceOp : IEnumerator<SourceType> {
+  public struct WhereOp<SourceType, SourceOp> : IQueryOp<SourceType>
+    where SourceOp : IQueryOp<SourceType> {
     private SourceOp _source;
     private Func<SourceType, bool> _predicate;
 
@@ -14,43 +12,29 @@ namespace Leap.Unity.Query {
       _predicate = predicate;
     }
 
-    public bool MoveNext() {
+    public bool TryGetNext(out SourceType t) {
       while (true) {
-        if (!_source.MoveNext()) {
+        if (!_source.TryGetNext(out t)) {
           return false;
         }
-
-        if (_predicate(_source.Current)) {
+        if (_predicate(t)) {
           return true;
         }
       }
     }
 
-    public SourceType Current {
-      get {
-        return _source.Current;
-      }
-    }
-
-    object IEnumerator.Current {
-      get {
-        throw new InvalidOperationException();
-      }
-    }
-
     public void Reset() {
-      throw new InvalidOperationException();
-    }
-
-    public void Dispose() {
-      _source.Dispose();
-      _predicate = null;
+      _source.Reset();
     }
   }
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
     public QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>> Where(Func<QueryType, bool> predicate) {
       return new QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>>(new WhereOp<QueryType, QueryOp>(_op, predicate));
+    }
+
+    public QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>> NonNull() {
+      return Where(obj => obj != null);
     }
   }
 }

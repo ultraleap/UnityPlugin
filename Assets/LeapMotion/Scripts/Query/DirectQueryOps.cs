@@ -3,67 +3,48 @@ using System.Collections.Generic;
 
 namespace Leap.Unity.Query {
 
-  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IEnumerator<QueryType> {
+  public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
 
     public bool Any() {
-      using (thisAndConsume) {
-        return _op.MoveNext();
-      }
+      QueryType obj;
+      return _op.TryGetNext(out obj);
     }
 
     public bool Any(Func<QueryType, bool> predicate) {
-      using (thisAndConsume) {
-        while (_op.MoveNext()) {
-          if (predicate(_op.Current)) {
-            return true;
-          }
-        }
-        return false;
-      }
+      return Where(predicate).Any();
     }
 
     public bool All(Func<QueryType, bool> predicate) {
-      using (thisAndConsume) {
-        while (_op.MoveNext()) {
-          if (!predicate(_op.Current)) {
-            return false;
-          }
+      QueryType obj;
+      while (_op.TryGetNext(out obj)) {
+        if (!predicate(obj)) {
+          return false;
         }
-        return true;
       }
+      return true;
     }
 
     public bool Contains(QueryType instance) {
-      using (thisAndConsume) {
-        while (_op.MoveNext()) {
-          if (_op.Current.Equals(instance)) {
-            return true;
-          }
+      QueryType obj;
+      while (_op.TryGetNext(out obj)) {
+        if (obj.Equals(instance)) {
+          return true;
         }
-        return false;
       }
+      return false;
     }
 
     public int Count() {
-      using (thisAndConsume) {
-        int count = 0;
-        while (_op.MoveNext()) {
-          count++;
-        }
-        return count;
+      QueryType obj;
+      int count = 0;
+      while (_op.TryGetNext(out obj)) {
+        count++;
       }
+      return count;
     }
 
     public int Count(Func<QueryType, bool> predicate) {
-      using (thisAndConsume) {
-        int count = 0;
-        while (_op.MoveNext()) {
-          if (predicate(_op.Current)) {
-            count++;
-          }
-        }
-        return count;
-      }
+      return Where(predicate).Count();
     }
 
     public QueryType ElementAt(int index) {
@@ -75,90 +56,62 @@ namespace Leap.Unity.Query {
     }
 
     public QueryType First() {
-      using (thisAndConsume) {
-        if (!_op.MoveNext()) {
-          throw new InvalidOperationException("The source query is empty.");
-        }
-
-        return _op.Current;
+      QueryType obj;
+      if (!_op.TryGetNext(out obj)) {
+        throw new InvalidOperationException("The source query is empty.");
       }
+
+      return obj;
     }
 
     public QueryType First(Func<QueryType, bool> predicate) {
-      using (thisAndConsume) {
-        while (true) {
-          if (!_op.MoveNext()) {
-            throw new InvalidOperationException("The source query did not have any elements that satisfied the predicate.");
-          }
-
-          if (predicate(_op.Current)) {
-            return _op.Current;
-          }
-        }
-      }
+      return Where(predicate).First();
     }
 
     public QueryType FirstOrDefault() {
-      using (thisAndConsume) {
-        if (!_op.MoveNext()) {
-          return default(QueryType);
-        }
-
-        return _op.Current;
-      }
+      QueryType obj;
+      _op.TryGetNext(out obj);
+      return obj;
     }
 
     public QueryType FirstOrDefault(Func<QueryType, bool> predicate) {
-      using (thisAndConsume) {
-        while (true) {
-          if (!_op.MoveNext()) {
-            return default(QueryType);
-          }
-
-          if (predicate(_op.Current)) {
-            return _op.Current;
-          }
-        }
-      }
+      return Where(predicate).FirstOrDefault();
     }
 
     public QueryType Fold(Func<QueryType, QueryType, QueryType> foldFunc) {
-      using (thisAndConsume) {
-        if (!_op.MoveNext()) {
-          throw new InvalidOperationException();
-        }
-        QueryType value = _op.Current;
-
-        while (_op.MoveNext()) {
-          value = foldFunc(value, _op.Current);
-        }
-
-        return value;
+      QueryType value;
+      if (!_op.TryGetNext(out value)) {
+        throw new InvalidOperationException();
       }
+
+      QueryType next;
+      while (_op.TryGetNext(out next)) {
+        value = foldFunc(value, next);
+      }
+
+      return value;
     }
 
     public int IndexOf(QueryType value) {
-      using (thisAndConsume) {
-        int index = 0;
-        while (_op.MoveNext()) {
-          if (_op.Current.Equals(value)) {
-            return index;
-          }
-          index++;
+      QueryType obj;
+      int index = 0;
+      while (_op.TryGetNext(out obj)) {
+        if (obj.Equals(value)) {
+          return index;
         }
+        index++;
       }
       return -1;
     }
 
     public int IndexOf(Func<QueryType, bool> predicate) {
-      using (thisAndConsume) {
-        int index = 0;
-        while (_op.MoveNext()) {
-          if (predicate(_op.Current)) {
-            return index;
-          }
-          index++;
+      QueryType obj;
+      int index = 0;
+      while (_op.TryGetNext(out obj)) {
+        if (predicate(obj)) {
+          return index;
         }
+        index++;
       }
       return -1;
     }
@@ -174,37 +127,27 @@ namespace Leap.Unity.Query {
     }
 
     public void FillArray(QueryType[] array, int offset = 0) {
-      using (thisAndConsume) {
-        while (_op.MoveNext()) {
-          array[offset++] = _op.Current;
-        }
+      QueryType obj;
+      while (_op.TryGetNext(out obj)) {
+        array[offset++] = obj;
       }
     }
 
     public List<QueryType> ToList() {
       List<QueryType> list = new List<QueryType>();
-      using (thisAndConsume) {
-        while (_op.MoveNext()) {
-          list.Add(_op.Current);
-        }
-      }
+      AppendList(list);
       return list;
     }
 
     public void FillList(List<QueryType> list) {
-      using (thisAndConsume) {
-        list.Clear();
-        while (_op.MoveNext()) {
-          list.Add(_op.Current);
-        }
-      }
+      list.Clear();
+      AppendList(list);
     }
 
     public void AppendList(List<QueryType> list) {
-      using (thisAndConsume) {
-        while (_op.MoveNext()) {
-          list.Add(_op.Current);
-        }
+      QueryType obj;
+      while (_op.TryGetNext(out obj)) {
+        list.Add(obj);
       }
     }
   }
