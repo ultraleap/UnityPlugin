@@ -229,6 +229,13 @@ namespace Leap.Unity.UI.Interaction {
         return _interactionHands[1];
       }
     }
+    public InteractionHand GetInteractionHand(bool isLeft) {
+      if (isLeft) {
+        return _interactionHands[0];
+      } else {
+        return _interactionHands[1];
+      }
+    }
 
     /// <summary>
     /// Returns true if the object was released from a grasped hand, or false

@@ -30,6 +30,9 @@ namespace Leap.Unity.UI.Interaction {
     private PointerEventData pointerEvent;
     private LeapGuiElement element;
     private Color hoverTint = Color.white;
+    private Rigidbody lastDepressor;
+    private Vector3 localDepressor;
+    private bool isLeftInteracting = false; 
 
     //Reset the Positions of the UI Elements on both Start and Quit
     void Start() {
@@ -55,8 +58,10 @@ namespace Leap.Unity.UI.Interaction {
     void FixedUpdate() {
       if (!physicsOccurred) {
         physicsOccurred = true;
-        body.position = PhysicsPosition;
-        body.velocity = PhysicsVelocity;
+        if (!body.IsSleeping()) {
+          body.position = PhysicsPosition;
+          body.velocity = PhysicsVelocity;
+        }
       }
     }
 
@@ -73,27 +78,37 @@ namespace Leap.Unity.UI.Interaction {
         Vector3 newWorldPhysicsPosition = transform.parent.TransformPoint(localPhysicsPosition);
         PhysicsPosition = newWorldPhysicsPosition;
 
-        Vector3 localPhysicsVelocity = transform.parent.InverseTransformDirection(body.velocity);
-        float springDeltaV = (((InitialLocalPosition.z - Mathf.Lerp(MinMaxHeight.x, MinMaxHeight.y, RestingHeight) - localPhysicsPosition.z) * transform.parent.lossyScale.z)) * 20f;
-        localPhysicsVelocity = new Vector3(0f, 0f, localPhysicsVelocity.z + springDeltaV);
-        Vector3 newWorldPhysicsVelocity = transform.parent.TransformDirection(localPhysicsVelocity);
-        PhysicsVelocity = newWorldPhysicsVelocity.normalized * Mathf.Clamp(newWorldPhysicsVelocity.magnitude, -1f, 1f);
+        Vector3 localPhysicsVelocity = transform.parent.InverseTransformVector(body.velocity);
+        if (isDepressed && behaviour.isPrimaryHovered && lastDepressor != null) {
+          Vector3 curLocalDepressor = transform.InverseTransformPoint(lastDepressor.position);
+          localPhysicsVelocity = new Vector3(0f, 0f, ((curLocalDepressor - localDepressor).z) / Time.fixedDeltaTime);
+        } else {
+          localPhysicsVelocity = new Vector3(0f, 0f, localPhysicsVelocity.z + Mathf.Clamp(((InitialLocalPosition.z - Mathf.Lerp(MinMaxHeight.x, MinMaxHeight.y, RestingHeight) - localPhysicsPosition.z) / transform.parent.lossyScale.z)*0.2f, -20f, 20f));
+        }
+        Vector3 newWorldPhysicsVelocity = transform.parent.TransformVector(localPhysicsVelocity);
+        PhysicsVelocity = newWorldPhysicsVelocity;
 
         bool oldDepressed = isDepressed;
 
         if (localPhysicsPosition.z > InitialLocalPosition.z - MinMaxHeight.x) {
           transform.localPosition = new Vector3(InitialLocalPosition.x, InitialLocalPosition.y, InitialLocalPosition.z - MinMaxHeight.x);
-          PhysicsVelocity = PhysicsVelocity / 2f;
-          if (!behaviour.isPrimaryHovered) {
+
+          if (behaviour.isPrimaryHovered) {
+            isDepressed = true;
+          } else {
             PhysicsPosition = transform.parent.TransformPoint(InitialLocalPosition);
+            PhysicsVelocity = PhysicsVelocity*0.1f;
+            lastDepressor = null;
+            isDepressed = false;
           }
-          isDepressed = true;
         } else if (localPhysicsPosition.z < InitialLocalPosition.z - MinMaxHeight.y) {
           transform.localPosition = new Vector3(InitialLocalPosition.x, InitialLocalPosition.y, InitialLocalPosition.z - MinMaxHeight.y);
           PhysicsPosition = transform.position;
+          lastDepressor = null;
           isDepressed = false;
         } else {
           transform.localPosition = localPhysicsPosition;
+          lastDepressor = null;
           isDepressed = false;
         }
 
@@ -102,12 +117,15 @@ namespace Leap.Unity.UI.Interaction {
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerEnterHandler);
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerDownHandler);
           OnPress.Invoke();
+          isLeftInteracting = behaviour.primaryHoveringHand.IsLeft;
+          behaviour.manager.GetInteractionHand(isLeftInteracting).SetInteractionHoverOverride(true);
         } else if (!isDepressed && oldDepressed) {
           unDepressedThisFrame = true;
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerExitHandler);
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerClickHandler);
           ExecuteEvents.Execute(gameObject, pointerEvent, ExecuteEvents.pointerUpHandler);
           OnUnpress.Invoke();
+          behaviour.manager.GetInteractionHand(isLeftInteracting).SetInteractionHoverOverride(false);
         }
       }
 
@@ -120,6 +138,20 @@ namespace Leap.Unity.UI.Interaction {
           behaviour.ignoreContact = true;
         }
         element.Tint().tint = hoverTint;
+      }
+    }
+
+    void OnCollisionEnter(Collision collision) {
+      if(collision.rigidbody != null && lastDepressor == null && isDepressed) {
+        lastDepressor = collision.rigidbody;
+        localDepressor = transform.InverseTransformPoint(collision.rigidbody.position);
+      }
+    }
+
+    void OnCollisionStay(Collision collision) {
+      if (collision.rigidbody != null && lastDepressor == null && isDepressed) {
+        lastDepressor = collision.rigidbody;
+        localDepressor = transform.InverseTransformPoint(collision.rigidbody.position);
       }
     }
   }
