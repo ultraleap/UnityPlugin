@@ -92,10 +92,10 @@ namespace Leap.Unity.UI.Interaction {
         if (isDepressed && behaviour.isPrimaryHovered && lastDepressor != null) {
           Vector3 curLocalDepressor = transform.parent.InverseTransformPoint(lastDepressor.position);
           Vector3 origLocalDepressor = transform.parent.InverseTransformPoint(transform.TransformPoint(localDepressor));
-          localPhysicsVelocity = new Vector3(0f, 0f, (curLocalDepressor - origLocalDepressor).z) / Time.fixedDeltaTime;
-          localPhysicsPosition = new Vector3(Mathf.Clamp((localPhysicsPosition.x + (curLocalDepressor - origLocalDepressor).x), InitialLocalPosition.x + HorizontalSlideLimits.x, InitialLocalPosition.x + HorizontalSlideLimits.y),
-                                             Mathf.Clamp((localPhysicsPosition.y + (curLocalDepressor - origLocalDepressor).y), InitialLocalPosition.y + VerticalSlideLimits.x, InitialLocalPosition.y + VerticalSlideLimits.y),
-                                             (localPhysicsPosition.z + (curLocalDepressor - origLocalDepressor).z));
+          localPhysicsVelocity = Vector3.back*5f; //new Vector3(0f, 0f, (curLocalDepressor - origLocalDepressor).z * 10f) / Time.fixedDeltaTime;
+          localPhysicsPosition = new Vector3(Mathf.Clamp((localPhysicsPosition.x + (curLocalDepressor - origLocalDepressor).x * 0.25f), InitialLocalPosition.x + HorizontalSlideLimits.x, InitialLocalPosition.x + HorizontalSlideLimits.y),
+                                             Mathf.Clamp((localPhysicsPosition.y + (curLocalDepressor - origLocalDepressor).y * 0.25f), InitialLocalPosition.y + VerticalSlideLimits.x, InitialLocalPosition.y + VerticalSlideLimits.y),
+                                             (localPhysicsPosition.z + ((curLocalDepressor - origLocalDepressor).z)));
         } else {
           localPhysicsVelocity += Vector3.forward * Mathf.Clamp(((InitialLocalPosition.z - Mathf.Lerp(MinMaxHeight.x, MinMaxHeight.y, RestingHeight) - localPhysicsPosition.z) / transform.parent.lossyScale.z), -5f, 5f);
         }
