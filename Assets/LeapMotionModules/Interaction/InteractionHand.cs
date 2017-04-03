@@ -94,6 +94,8 @@ namespace Leap.Unity.UI.Interaction {
     private HoverCheckResults _hoverResults = new HoverCheckResults();
 
     private void FixedUpdateHovering() {
+      if(_hand == null && _interactionHoverOverride) { _interactionHoverOverride = false; }
+
       if (_contactBehaviours.Count == 0 && !_interactionHoverOverride) {
         hoverActivityManager.activationRadius = interactionManager.WorldHoverActivationRadius;
         _hoverActivityManager.FixedUpdatePosition((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
@@ -359,6 +361,10 @@ namespace Leap.Unity.UI.Interaction {
         if (!InitContact()) {
           return;
         }
+      }
+
+      if (_hand == null && _contactBehaviours.Count > 0) {
+        _contactBehaviours.Clear();
       }
 
       using (new ProfilerSample("Update BrushBones")) { FixedUpdateBrushBones(); }
