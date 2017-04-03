@@ -12,7 +12,7 @@ namespace Leap.Unity.UI.Interaction {
     [Tooltip("The height that this button rests at; this value is a lerp in between the min and max height.")]
     public float RestingHeight = 0.5f;
     [Tooltip("The minimum and maximum horizontal extents that the slider can slide to.")]
-    public Vector2 HorizontalSlideLimits = new Vector2(-0.05f, 0.05f);
+    public Vector2 HorizontalSlideLimits = new Vector2(0f, 0f);
     [Tooltip("The minimum and maximum vertical extents that the slider can slide to.")]
     public Vector2 VerticalSlideLimits = new Vector2(0f, 0f);
 
@@ -90,11 +90,12 @@ namespace Leap.Unity.UI.Interaction {
         //Calculate the physical kinematics of the button in local space
         Vector3 localPhysicsVelocity = transform.parent.InverseTransformVector(body.velocity);
         if (isDepressed && behaviour.isPrimaryHovered && lastDepressor != null) {
-          Vector3 curLocalDepressor = transform.InverseTransformPoint(lastDepressor.position);
-          localPhysicsVelocity = new Vector3(0f, 0f, (curLocalDepressor - localDepressor).z) / Time.fixedDeltaTime;
-          localPhysicsPosition = new Vector3(Mathf.Clamp((localPhysicsPosition.x + (curLocalDepressor - localDepressor).x * 0.1f), InitialLocalPosition.x + HorizontalSlideLimits.x, InitialLocalPosition.x + HorizontalSlideLimits.y),
-                                             Mathf.Clamp((localPhysicsPosition.y + (curLocalDepressor - localDepressor).y * 0.1f), InitialLocalPosition.y + VerticalSlideLimits.x, InitialLocalPosition.y + VerticalSlideLimits.y),
-                                             (localPhysicsPosition.z + (curLocalDepressor - localDepressor).z * 0.1f));
+          Vector3 curLocalDepressor = transform.parent.InverseTransformPoint(lastDepressor.position);
+          Vector3 origLocalDepressor = transform.parent.InverseTransformPoint(transform.TransformPoint(localDepressor));
+          localPhysicsVelocity = new Vector3(0f, 0f, (curLocalDepressor - origLocalDepressor).z) / Time.fixedDeltaTime;
+          localPhysicsPosition = new Vector3(Mathf.Clamp((localPhysicsPosition.x + (curLocalDepressor - origLocalDepressor).x), InitialLocalPosition.x + HorizontalSlideLimits.x, InitialLocalPosition.x + HorizontalSlideLimits.y),
+                                             Mathf.Clamp((localPhysicsPosition.y + (curLocalDepressor - origLocalDepressor).y), InitialLocalPosition.y + VerticalSlideLimits.x, InitialLocalPosition.y + VerticalSlideLimits.y),
+                                             (localPhysicsPosition.z + (curLocalDepressor - origLocalDepressor).z));
         } else {
           localPhysicsVelocity += Vector3.forward * Mathf.Clamp(((InitialLocalPosition.z - Mathf.Lerp(MinMaxHeight.x, MinMaxHeight.y, RestingHeight) - localPhysicsPosition.z) / transform.parent.lossyScale.z), -5f, 5f);
         }
