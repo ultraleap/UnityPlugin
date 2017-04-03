@@ -1,4 +1,5 @@
 ﻿using InteractionEngineUtility;
+using Leap.Unity.UI.Interaction.Internal;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,13 +14,13 @@ namespace Leap.Unity.UI.Interaction {
     //                                                                  new Keyframe(0.02f, 0.3f, 0.0f, 0.0f));
 
     public void MoveTo(Vector3 solvedPosition, Quaternion solvedRotation,
-                       InteractionBehaviourBase interactionObj) {
+                       IInteractionBehaviour interactionObj) {
       Vector3 targetVelocity = PhysicsUtility.ToLinearVelocity(
         interactionObj.rigidbody.position, solvedPosition, Time.fixedDeltaTime);
       Vector3 targetAngularVelocity = PhysicsUtility.ToAngularVelocity(
         interactionObj.rigidbody.rotation, solvedRotation, Time.fixedDeltaTime);
 
-      float maxScaledVelocity = _maxVelocity * interactionObj.interactionManager.SimulationScale;
+      float maxScaledVelocity = _maxVelocity * interactionObj.manager.SimulationScale;
       float targetSpeedSqrd = targetVelocity.sqrMagnitude;
       if (targetSpeedSqrd > maxScaledVelocity * maxScaledVelocity) {
         float targetPercent = maxScaledVelocity / Mathf.Sqrt(targetSpeedSqrd);
