@@ -36,6 +36,7 @@ namespace Leap.Unity.UI.Interaction {
     private Vector3 PhysicsVelocity = Vector3.back;
     private Vector3 localPhysicsPosition;
     private bool physicsOccurred = false;
+    private bool handChirality = false;
 
     void Start() {
       //Initialize Elements
@@ -136,11 +137,12 @@ namespace Leap.Unity.UI.Interaction {
         if (isDepressed && !oldDepressed) {
           depressedThisFrame = true;
           OnPress.Invoke();
-          behaviour.manager.GetInteractionHand(behaviour.primaryHoveringHand).SetInteractionHoverOverride(true);
+          handChirality = behaviour.primaryHoveringHand.IsLeft;
+          behaviour.manager.GetInteractionHand(handChirality).SetInteractionHoverOverride(true);
         } else if (!isDepressed && oldDepressed) {
           unDepressedThisFrame = true;
           OnUnpress.Invoke();
-          behaviour.manager.GetInteractionHand(behaviour.primaryHoveringHand).SetInteractionHoverOverride(false);
+          behaviour.manager.GetInteractionHand(handChirality).SetInteractionHoverOverride(false);
         }
       }
 
