@@ -361,10 +361,6 @@ namespace Leap.Unity.UI.Interaction {
         }
       }
 
-      if (_hand == null && _contactBehaviours.Count > 0) {
-        _contactBehaviours.Clear();
-      }
-
       using (new ProfilerSample("Update BrushBones")) { FixedUpdateBrushBones(); }
       using (new ProfilerSample("Update SoftContacts")) { FixedUpdateSoftContact(); }
       using (new ProfilerSample("Update ContactCallbacks")) { FixedUpdateContactState(contactEnabled); }
@@ -748,6 +744,11 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     internal void ContactBoneCollisionExit(BrushBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
+      if (interactionObj.ignoreContact) {
+        if (_contactBehaviours.ContainsKey(interactionObj)) _contactBehaviours.Remove(interactionObj);
+        return;
+      }
+
       int count = _contactBehaviours[interactionObj];
       if (count == 1) {
         _contactBehaviours.Remove(interactionObj);
@@ -800,7 +801,8 @@ namespace Leap.Unity.UI.Interaction {
       foreach (var objTouchCountPair in _contactBehaviours) {
         if (objTouchCountPair.Key.gameObject == null
             || objTouchCountPair.Key.rigidbody == null
-            || objTouchCountPair.Key.ignoreContact) {
+            || objTouchCountPair.Key.ignoreContact
+            || _hand == null) {
           _removeContactObjsBuffer.Add(objTouchCountPair.Key);
         }
       }

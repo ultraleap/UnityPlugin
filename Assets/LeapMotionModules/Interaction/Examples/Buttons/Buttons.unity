@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.44608885, g: 0.49058884, b: 0.546173, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -71,7 +71,7 @@ LightmapSettings:
     m_FinalGatherFiltering: 1
     m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
-  m_LightingDataAsset: {fileID: 112000001, guid: 00591bdd85a26924a885d31fd5737859,
+  m_LightingDataAsset: {fileID: 112000001, guid: 6a02e83b894aae142a3a074c1d2353f7,
     type: 2}
   m_RuntimeCPUUsage: 25
 --- !u!196 &4
@@ -140,12 +140,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &64192843
@@ -374,12 +374,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &85754733
@@ -562,12 +562,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &107997309
@@ -750,12 +750,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &123467805
@@ -938,12 +938,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &179600834
@@ -1172,12 +1172,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &256333723
@@ -1360,12 +1360,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &296849246
@@ -1548,12 +1548,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &375145575
@@ -1736,12 +1736,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &376263672
@@ -1908,7 +1908,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _deviceOffsets:
   - DeviceName: oculus
-    HeightOffset: 1
+    HeightOffset: 0
+  - DeviceName: openvr
+    HeightOffset: -1.5
 --- !u!4 &440484286
 Transform:
   m_ObjectHideFlags: 0
@@ -1916,7 +1918,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 440484284}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1.038, z: -0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1794650929}
@@ -2014,12 +2016,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &495407664
@@ -2202,12 +2204,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &552256745
@@ -2390,12 +2392,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &564590848
@@ -2578,12 +2580,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &593503972
@@ -2766,12 +2768,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &596105435
@@ -2983,7 +2985,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 658088851}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.295, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -3037,12 +3039,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &675884437
@@ -3177,37 +3179,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
---- !u!21 &697358801
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Gui Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: LEAP_GUI_CYLINDRICAL LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_TINTING
-    LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
-  m_LightmapFlags: 5
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  m_SavedProperties:
-    serializedVersion: 2
-    m_TexEnvs:
-    - first:
-        name: _MainTex
-      second:
-        m_Texture: {fileID: 28690624559154018, guid: 05aec2bedab24184989a8a0ed5701aa5,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - first:
-        name: _MainTex2
-      second:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &698303311
 GameObject:
   m_ObjectHideFlags: 0
@@ -3256,12 +3227,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &698303314
@@ -3444,12 +3415,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &711919873
@@ -3632,12 +3603,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &722891433
@@ -3820,12 +3791,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &753687248
@@ -4008,12 +3979,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &758070966
@@ -4330,12 +4301,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &775541599
@@ -4623,12 +4594,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &982384013
@@ -4706,12 +4677,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1030474428
@@ -4894,12 +4865,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1044150505
@@ -5082,12 +5053,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1052163716
@@ -5388,12 +5359,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1093556439
@@ -5576,12 +5547,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1122126690
@@ -5869,12 +5840,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1280019401
@@ -6057,12 +6028,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1294748677
@@ -6197,6 +6168,36 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+--- !u!21 &1308893648
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Gui Material
+  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  m_ShaderKeywords: LEAP_GUI_CYLINDRICAL LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_TINTING
+    LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+    - first:
+        name: _MainTex
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _MainTex2
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &1319104133
 GameObject:
   m_ObjectHideFlags: 0
@@ -6245,12 +6246,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1319104136
@@ -6603,12 +6604,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1404855184
@@ -6791,12 +6792,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1415579347
@@ -6979,12 +6980,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1419064049
@@ -7167,12 +7168,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1459435851
@@ -7365,12 +7366,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1564342055
@@ -7553,12 +7554,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1571047525
@@ -7741,12 +7742,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1593125179
@@ -7929,12 +7930,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1625780160
@@ -8247,12 +8248,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1650869436
@@ -8435,12 +8436,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1715286119
@@ -8689,9 +8690,9 @@ MonoBehaviour:
     _filterMode: 1
     _format: 5
     _maxAtlasSize: 4096
-  _material: {fileID: 697358801}
-  _meshes: {fileID: 11400000, guid: a00f7e14dc910704b9ee070a0ba3a3b1, type: 2}
-  _packedTextures: {fileID: 11400000, guid: 05aec2bedab24184989a8a0ed5701aa5, type: 2}
+  _material: {fileID: 1308893648}
+  _meshes: {fileID: 11400000, guid: 0eb28be7f0f220f45aa8d5934e1f57b1, type: 2}
+  _packedTextures: {fileID: 11400000, guid: 8d97dcbbdea256842b66c6519388dbcb, type: 2}
   _channelMapping:
     _data:
     - serializedVersion: 2
@@ -9251,12 +9252,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1776885061
@@ -9439,12 +9440,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1776897084
@@ -9731,12 +9732,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1821969820
@@ -10059,12 +10060,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &2037860240
@@ -10247,12 +10248,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &2101149220
@@ -10487,12 +10488,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 0}
-  ignoreHover: 0
-  ignoreContact: 0
-  ignoreGrasping: 0
-  allowMultiGrasp: 0
-  moveObjectWhenGrasped: 1
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &2118264952

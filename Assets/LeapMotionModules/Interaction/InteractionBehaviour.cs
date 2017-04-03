@@ -432,12 +432,7 @@ namespace Leap.Unity.UI.Interaction {
     /// <summary> The Rigidbody associated with this interation object. </summary>
     public new Rigidbody rigidbody { get { return _rigidbody; } protected set { _rigidbody = value; } }
 
-    //private ISpaceComponent _space = Space.IdentityTransformer;
-    public ISpaceComponent space {
-      get {
-        return null;
-      }
-    }
+    public ISpaceComponent space { get; protected set; }
 
     [Header("Interaction Overrides")]
 
@@ -529,6 +524,8 @@ namespace Leap.Unity.UI.Interaction {
       if (manager != null && !manager.IsBehaviourRegistered(this)) {
         manager.RegisterInteractionBehaviour(this);
       }
+
+      space = GetComponent<ISpaceComponent>();
     }
 
     protected virtual void Start() {
