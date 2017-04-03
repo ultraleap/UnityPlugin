@@ -77,24 +77,10 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    private HoverCheckResults _hoverResults = new HoverCheckResults();
-    private void FixedUpdateHovering() {
-      if (_contactBehaviours.Count == 0) {
-        hoverActivityManager.activationRadius = interactionManager.WorldHoverActivationRadius;
-        _hoverActivityManager.FixedUpdatePosition((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
-        using (new ProfilerSample("Check for Closest Elements")) { CheckHoverForHand(_hand, _hoverActivityManager.ActiveBehaviours); }
-        ProcessHoverCheckResults();
-        ProcessPrimaryHoverCheckResults();
-      }
-
-      ISpaceComponent space;
-      if (_hand != null) {
-        _warpedHandData.CopyFrom(_handData);
-        if (_hoverResults.primaryHovered != null && (space = _hoverResults.primaryHovered.space) != null) {
-          //Transform bulk hand to the closest element's warped space
-          coarseInverseTransformHand(_warpedHandData, space);
-        }
-      }
+    // Disables broadphase checks if an object is currently interacting with this hand.
+    private bool _interactionHoverOverride = false;
+    public void SetInteractionHoverOverride(bool value) {
+      _interactionHoverOverride = value;
     }
 
     private struct HoverCheckResults {
@@ -105,9 +91,30 @@ namespace Leap.Unity.UI.Interaction {
       public Hand checkedHand;
     }
 
+    private HoverCheckResults _hoverResults = new HoverCheckResults();
+
+    private void FixedUpdateHovering() {
+      if (_contactBehaviours.Count == 0 && !_interactionHoverOverride) {
+        hoverActivityManager.activationRadius = interactionManager.WorldHoverActivationRadius;
+        _hoverActivityManager.FixedUpdatePosition((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
+        using (new ProfilerSample("Check for Closest Elements")) { CheckHoverForHand(_hand, _hoverActivityManager.ActiveBehaviours); }
+      }
+      
+      ProcessHoverCheckResults();
+      ProcessPrimaryHoverCheckResults();
+
+      ISpaceComponent space;
+      if (_hand != null) {
+        _warpedHandData.CopyFrom(_handData);
+        if (_hoverResults.primaryHovered != null && (space = _hoverResults.primaryHovered.space) != null) {
+          //Transform bulk hand to the closest element's warped space
+          coarseInverseTransformHand(_warpedHandData, space);
+        }
+      }
+    }
     private HashSet<IInteractionBehaviour> _hoveredLastFrame = new HashSet<IInteractionBehaviour>();
     private HashSet<IInteractionBehaviour> _hoverableCache = new HashSet<IInteractionBehaviour>();
-    public IInteractionBehaviour[] tempPerFingerHovered = new IInteractionBehaviour[3];
+    private IInteractionBehaviour[] tempPerFingerHovered = new IInteractionBehaviour[3];
 
     private void CheckHoverForHand(Hand hand, HashSet<IInteractionBehaviour> hoverCandidates) {
       _hoverableCache.Clear();
@@ -142,16 +149,22 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public Vector3 transformPoint(Vector3 worldPoint, ISpaceComponent element) {
-      Vector3 localPos = element.anchor.space.transform.InverseTransformPoint(worldPoint);
-      return element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPos));
+      if (element.anchor != null && element.anchor.space != null) {
+        Vector3 localPos = element.anchor.space.transform.InverseTransformPoint(worldPoint);
+        return element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPos));
+      }else {
+        return worldPoint;
+      }
     }
 
     public void coarseInverseTransformHand(Hand inHand, ISpaceComponent element) {
-      Vector3 localPalmPos = element.anchor.space.transform.InverseTransformPoint(inHand.PalmPosition.ToVector3());
-      Quaternion localPalmRot = element.anchor.space.transform.InverseTransformRotation(inHand.Rotation.ToQuaternion());
+      if (element.anchor != null && element.anchor.space != null) {
+        Vector3 localPalmPos = element.anchor.space.transform.InverseTransformPoint(inHand.PalmPosition.ToVector3());
+        Quaternion localPalmRot = element.anchor.space.transform.InverseTransformRotation(inHand.Rotation.ToQuaternion());
 
-      inHand.SetTransform(element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPalmPos)),
-                          element.anchor.space.transform.TransformRotation(element.anchor.transformer.InverseTransformRotation(localPalmPos, localPalmRot)));
+        inHand.SetTransform(element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPalmPos)),
+                            element.anchor.space.transform.TransformRotation(element.anchor.transformer.InverseTransformRotation(localPalmPos, localPalmRot)));
+      }
     }
 
     private void CheckHoverForElement(Vector3 position, IInteractionBehaviour behaviour, ISpaceComponent element, int whichFinger, ref float leastFingerDistance, ref HoverCheckResults curResults) {
