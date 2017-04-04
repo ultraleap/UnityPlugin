@@ -374,7 +374,6 @@ namespace Leap.Unity.GraphicalRenderer {
     protected virtual void prepareMeshes() {
       _meshes.Clear();
       _generation.Reset();
-      _atlasUvs = new AtlasUvs();
     }
 
     protected virtual void prepareMaterial() {
@@ -413,11 +412,9 @@ namespace Leap.Unity.GraphicalRenderer {
               minY = Mathf.Min(minY, uvs[j].y);
               maxX = Mathf.Max(maxX, uvs[j].x);
               maxY = Mathf.Max(maxY, uvs[j].y);
-              Debug.Log(uvs[j]);
             }
 
             Rect rect = Rect.MinMaxRect(minX, minY, maxX, maxY);
-            Debug.Log(rect);
             _atlasUvs.SetRect(spriteFeature.channel.Index(), sprite, rect);
           }
         }

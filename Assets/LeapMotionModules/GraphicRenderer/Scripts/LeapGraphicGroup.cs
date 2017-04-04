@@ -138,9 +138,7 @@ namespace Leap.Unity.GraphicalRenderer {
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
         _renderer.editor.ScheduleEditorUpdate();
-      }
-
-      if (_renderingMethod is ISupportsAddRemove)
+      } else
 #endif
       {
         (_renderingMethod as ISupportsAddRemove).OnAddGraphic(graphic, newIndex);
@@ -171,9 +169,7 @@ namespace Leap.Unity.GraphicalRenderer {
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
         _renderer.editor.ScheduleEditorUpdate();
-      }
-
-      if (_renderingMethod is ISupportsAddRemove)
+      } else
 #endif
       {
         (_renderingMethod as ISupportsAddRemove).OnRemoveGraphic(graphic, graphicIndex);
