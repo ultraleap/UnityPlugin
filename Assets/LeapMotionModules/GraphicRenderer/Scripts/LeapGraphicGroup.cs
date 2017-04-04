@@ -139,12 +139,11 @@ namespace Leap.Unity.GraphicalRenderer {
         _renderer.editor.ScheduleEditorUpdate();
       }
 
-      if (_renderingMethod is ISupportsAddRemove) {
-        (_renderingMethod as ISupportsAddRemove).OnAddGraphic();
-      }
-#else
-    (_renderer as ISupportsAddRemove).OnAddGraphic();
+      if (_renderingMethod is ISupportsAddRemove)
 #endif
+      {
+        (_renderingMethod as ISupportsAddRemove).OnAddGraphic(graphic);
+      }
 
       return true;
     }
@@ -156,12 +155,13 @@ namespace Leap.Unity.GraphicalRenderer {
         return false;
       }
 
-      if (!_graphics.Contains(graphic)) {
+      int graphicIndex = _graphics.IndexOf(graphic);
+      if (graphicIndex < 0) {
         return false;
       }
 
       graphic.OnDetachedFromGroup();
-      _graphics.Remove(graphic);
+      _graphics.RemoveAt(graphicIndex);
 
       //TODO: this is gonna need to be optimized
       RebuildFeatureData();
@@ -172,12 +172,11 @@ namespace Leap.Unity.GraphicalRenderer {
         _renderer.editor.ScheduleEditorUpdate();
       }
 
-      if (_renderingMethod is ISupportsAddRemove) {
-        (_renderingMethod as ISupportsAddRemove).OnRemoveGraphic();
-      }
-#else
-    (_renderer as ISupportsAddRemove).OnRemoveGraphic();
+      if (_renderingMethod is ISupportsAddRemove)
 #endif
+      {
+        (_renderingMethod as ISupportsAddRemove).OnRemoveGraphic(graphic, graphicIndex);
+      }
 
       return true;
     }

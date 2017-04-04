@@ -18,18 +18,15 @@ namespace Leap.Unity.GraphicalRenderer {
     private List<Vector4> _curved_graphicParameters = new List<Vector4>();
     #endregion
 
-    public void OnAddGraphic() {
-      //TODO
-      if (Application.isPlaying) {
-        throw new NotImplementedException();
-      }
+    public void OnAddGraphic(LeapGraphic graphic) {
+      beginMesh();
+      _currGraphic = graphic as LeapMeshGraphicBase;
+      _currIndex = _meshes.Count;
+      finishMesh();
     }
 
-    public void OnRemoveGraphic() {
-      //TODO
-      if (Application.isPlaying) {
-        throw new NotImplementedException();
-      }
+    public void OnRemoveGraphic(LeapGraphic graphic, int graphicIndex) {
+      _meshes.RemoveMesh(graphicIndex);
     }
 
     public override SupportInfo GetSpaceSupportInfo(LeapSpace space) {
