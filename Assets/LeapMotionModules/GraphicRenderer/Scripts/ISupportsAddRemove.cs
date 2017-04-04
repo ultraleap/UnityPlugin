@@ -6,7 +6,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// The graphic to add.  It is always added to the end of
     /// a list.
     /// </summary>
-    void OnAddGraphic(LeapGraphic graphic);
+    void OnAddGraphic(LeapGraphic graphic, int index);
 
     /// <summary>
     /// The graphic to remove, in addition to it's previous index.

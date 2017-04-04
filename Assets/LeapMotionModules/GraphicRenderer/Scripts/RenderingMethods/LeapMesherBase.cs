@@ -83,22 +83,7 @@ namespace Leap.Unity.GraphicalRenderer {
     private AtlasBuilder _atlas = new AtlasBuilder();
     #endregion
 
-    //Current state of builder
-    protected LeapMeshGraphicBase _currGraphic;
-    protected int _currIndex;
-    protected Mesh _currMesh;
-
-    //Current mesh data being written to
-    protected List<Vector3> _verts = new List<Vector3>();
-    protected List<Vector3> _normals = new List<Vector3>();
-    protected List<int> _tris = new List<int>();
-    protected List<Color> _colors = new List<Color>();
-    protected List<Vector4>[] _uvs = new List<Vector4>[4] {
-    new List<Vector4>(),
-    new List<Vector4>(),
-    new List<Vector4>(),
-    new List<Vector4>()
-  };
+    protected GenerationState _generation = GenerationState.GetGenerationState();
 
     //Internal cache of requirements 
     protected bool _doesRequireColors;
@@ -125,8 +110,8 @@ namespace Leap.Unity.GraphicalRenderer {
     protected RendererTextureData _packedTextures;
 
     //#### Sprite/Texture Remapping ####
-    [SerializeField, HideInInspector]
-    private JaggedRects _channelMapping = new JaggedRects(4);
+    [SerializeField]
+    private AtlasUvs _atlasUvs;
 
     //#### Tinting ####
     protected const string TINTS_PROPERTY = LeapGraphicRenderer.PROPERTY_PREFIX + "Tints";
@@ -154,18 +139,7 @@ namespace Leap.Unity.GraphicalRenderer {
         CreateOrSave(ref _packedTextures, TEXTURE_ASSET_NAME);
 
         Texture2D[] packedTextures;
-        Rect[][] channelMapping;
-        _atlas.RebuildAtlas(progress, out packedTextures, out channelMapping);
-
-        //Copy mapping into local array
-        //Local array is used for both textures and sprites
-        for (int i = 0; i < 4; i++) {
-          var mapping = channelMapping[i];
-          if (mapping != null) {
-            mapping = mapping.Clone() as Rect[];
-          }
-          _channelMapping[i] = mapping;
-        }
+        _atlas.RebuildAtlas(progress, out packedTextures, out _atlasUvs);
 
         progress.Begin(2, "", "", () => {
           progress.Step("Saving To Asset");
@@ -399,7 +373,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void prepareMeshes() {
       _meshes.Clear();
-      _currMesh = null;
+      _generation.Reset();
+      _atlasUvs = new AtlasUvs();
     }
 
     protected virtual void prepareMaterial() {
@@ -418,22 +393,11 @@ namespace Leap.Unity.GraphicalRenderer {
       foreach (var keyword in _material.shaderKeywords) {
         _material.DisableKeyword(keyword);
       }
-
-      if (_channelMapping == null) {
-        _channelMapping = new JaggedRects(4);
-      }
     }
 
     protected virtual void extractSpriteRects() {
       using (new ProfilerSample("Extract Sprite Rects")) {
-        if (_channelMapping == null) {
-          _channelMapping = new JaggedRects(4);
-        }
-
         foreach (var spriteFeature in _spriteFeatures) {
-          var rects = new Rect[group.graphics.Count];
-          _channelMapping[spriteFeature.channel.Index()] = rects;
-
           for (int i = 0; i < spriteFeature.featureData.Count; i++) {
             var dataObj = spriteFeature.featureData[i];
             var sprite = dataObj.sprite;
@@ -449,9 +413,12 @@ namespace Leap.Unity.GraphicalRenderer {
               minY = Mathf.Min(minY, uvs[j].y);
               maxX = Mathf.Max(maxX, uvs[j].x);
               maxY = Mathf.Max(maxY, uvs[j].y);
+              Debug.Log(uvs[j]);
             }
 
-            rects[i] = Rect.MinMaxRect(minX, minY, maxX, maxY);
+            Rect rect = Rect.MinMaxRect(minX, minY, maxX, maxY);
+            Debug.Log(rect);
+            _atlasUvs.SetRect(spriteFeature.channel.Index(), sprite, rect);
           }
         }
       }
@@ -494,8 +461,12 @@ namespace Leap.Unity.GraphicalRenderer {
     protected virtual void buildMesh() {
       using (new ProfilerSample("Build Mesh")) {
         beginMesh();
-        for (_currIndex = 0; _currIndex < group.graphics.Count; _currIndex++) {
-          _currGraphic = group.graphics[_currIndex] as LeapMeshGraphicBase;
+        for (_generation.graphicIndex = 0;
+             _generation.graphicIndex < group.graphics.Count;
+             _generation.graphicIndex++) {
+          //For re-generation of everything, graphicIndex == graphicId
+          _generation.graphicId = _generation.graphicIndex;
+          _generation.graphic = group.graphics[_generation.graphicIndex] as LeapMeshGraphicBase;
           buildGraphic();
         }
         finishMesh();
@@ -506,7 +477,7 @@ namespace Leap.Unity.GraphicalRenderer {
       using (new ProfilerSample("Build Graphic")) {
 
         refreshMeshData();
-        if (_currGraphic.mesh == null) return;
+        if (_generation.graphic.mesh == null) return;
 
         buildTopology();
 
@@ -523,39 +494,39 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         foreach (var blendShapeFeature in _blendShapeFeatures) {
-          buildBlendShapes(blendShapeFeature.featureData[_currIndex]);
+          buildBlendShapes(blendShapeFeature.featureData[_generation.graphicIndex]);
         }
       }
     }
 
     protected virtual void refreshMeshData() {
       using (new ProfilerSample("Refresh Mesh Data")) {
-        _currGraphic.RefreshMeshData();
+        _generation.graphic.RefreshMeshData();
       }
     }
 
     protected virtual void buildTopology() {
       using (new ProfilerSample("Build Topology")) {
-        var topology = MeshCache.GetTopology(_currGraphic.mesh);
+        var topology = MeshCache.GetTopology(_generation.graphic.mesh);
 
-        int vertOffset = _verts.Count;
+        int vertOffset = _generation.verts.Count;
         for (int i = 0; i < topology.tris.Length; i++) {
-          _tris.Add(topology.tris[i] + vertOffset);
+          _generation.tris.Add(topology.tris[i] + vertOffset);
         }
 
         if (_doesRequireNormals) {
-          var normals = MeshCache.GetNormals(_currGraphic.mesh);
+          var normals = MeshCache.GetNormals(_generation.graphic.mesh);
           for (int i = 0; i < topology.verts.Length; i++) {
             Vector3 meshVert;
             Vector3 meshNormal;
             graphicVertNormalToMeshVertNormal(topology.verts[i], normals[i], out meshVert, out meshNormal);
 
-            _verts.Add(meshVert);
-            _normals.Add(meshNormal);
+            _generation.verts.Add(meshVert);
+            _generation.normals.Add(meshNormal);
           }
         } else {
           for (int i = 0; i < topology.verts.Length; i++) {
-            _verts.Add(graphicVertToMeshVert(topology.verts[i]));
+            _generation.verts.Add(graphicVertToMeshVert(topology.verts[i]));
           }
         }
       }
@@ -563,35 +534,45 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void buildColors() {
       using (new ProfilerSample("Build Colors")) {
-        Color totalTint = _bakedTint * _currGraphic.vertexColor;
+        Color totalTint = _bakedTint * _generation.graphic.vertexColor;
 
-        var colors = MeshCache.GetColors(_currGraphic.mesh);
+        var colors = MeshCache.GetColors(_generation.graphic.mesh);
         for (int i = 0; i < colors.Length; i++) {
-          _colors.Add(colors[i] * totalTint);
+          _generation.colors.Add(colors[i] * totalTint);
         }
       }
     }
 
     protected virtual void buildUvs(UVChannelFlags channel) {
       using (new ProfilerSample("Build Uvs")) {
-        var uvs = MeshCache.GetUvs(_currGraphic.mesh, channel);
-        var targetList = _uvs[channel.Index()];
+        var uvs = MeshCache.GetUvs(_generation.graphic.mesh, channel);
+        var targetList = _generation.uvs[channel.Index()];
 
         targetList.AddRange(uvs);
 
-        if (_channelMapping != null &&
-           (_currGraphic.remappableChannels & channel) != 0) {
-          var atlasedUvs = _channelMapping[channel.Index()];
-          if (atlasedUvs != null && _currIndex < atlasedUvs.Length) {
-            MeshUtil.RemapUvs(targetList, atlasedUvs[_currIndex], uvs.Count);
-          }
+        //If we cannot remap this channel, just return
+        if ((_generation.graphic.remappableChannels & channel) == 0) {
+          return;
         }
+
+        UnityEngine.Object key;
+        if (_textureFeatures.Count > 0) {
+          key = _textureFeatures[0].featureData[_generation.graphicIndex].texture;
+        } else if (_spriteFeatures.Count > 0) {
+          key = _spriteFeatures[0].featureData[_generation.graphicIndex].sprite;
+        } else {
+          return;
+        }
+
+        Rect rect = _atlasUvs.GetRect(channel.Index(), key);
+        MeshUtil.RemapUvs(targetList, rect, uvs.Count);
       }
     }
 
     protected virtual void buildSpecialUv3() {
       using (new ProfilerSample("Build Special Uv3")) {
-        _uvs[3].Append(_currGraphic.mesh.vertexCount, new Vector4(0, 0, 0, _currIndex));
+        _generation.uvs[3].Append(_generation.graphic.mesh.vertexCount,
+                                  new Vector4(0, 0, 0, _generation.graphicId));
       }
     }
 
@@ -599,18 +580,18 @@ namespace Leap.Unity.GraphicalRenderer {
       using (new ProfilerSample("Build Blend Shapes")) {
         var shape = blendShapeData.blendShape;
 
-        int offset = _verts.Count - shape.vertexCount;
+        int offset = _generation.verts.Count - shape.vertexCount;
 
         var verts = shape.vertices;
         for (int i = 0; i < verts.Length; i++) {
           Vector3 shapeVert = verts[i];
-          Vector3 delta = blendShapeDelta(shapeVert, _verts[i + offset]);
+          Vector3 delta = blendShapeDelta(shapeVert, _generation.verts[i + offset]);
 
-          Vector4 currUv = _uvs[3][i + offset];
+          Vector4 currUv = _generation.uvs[3][i + offset];
           currUv.x = delta.x;
           currUv.y = delta.y;
           currUv.z = delta.z;
-          _uvs[3][i + offset] = currUv;
+          _generation.uvs[3][i + offset] = currUv;
         }
       }
     }
@@ -620,57 +601,91 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     protected virtual void beginMesh() {
-      Assert.IsNull(_currMesh, "Cannot begin a new mesh without finishing the current mesh.");
+      Assert.IsNull(_generation.mesh, "Cannot begin a new mesh without finishing the current mesh.");
 
-      _currMesh = new Mesh();
-      _currMesh.name = "Procedural Graphic Mesh";
-      _currMesh.hideFlags = HideFlags.None;
+      _generation.Reset();
 
-      _verts.Clear();
-      _normals.Clear();
-      _tris.Clear();
-      _colors.Clear();
-      for (int i = 0; i < 4; i++) {
-        _uvs[i].Clear();
-      }
+      _generation.mesh = new Mesh();
+      _generation.mesh.name = "Procedural Graphic Mesh";
+      _generation.mesh.hideFlags = HideFlags.None;
     }
 
     protected virtual void finishMesh() {
       using (new ProfilerSample("Finish Mesh")) {
         //If there is no data, don't actually do anything
-        if (_verts.Count == 0) {
-          DestroyImmediate(_currMesh);
-          _currMesh = null;
+        if (_generation.verts.Count == 0) {
+          DestroyImmediate(_generation.mesh);
+          _generation.mesh = null;
           return;
         }
 
-        _currMesh.SetVertices(_verts);
-        _currMesh.SetTriangles(_tris, 0);
+        _generation.mesh.SetVertices(_generation.verts);
+        _generation.mesh.SetTriangles(_generation.tris, 0);
 
-        if (_normals.Count == _verts.Count) {
-          _currMesh.SetNormals(_normals);
+        if (_generation.normals.Count == _generation.verts.Count) {
+          _generation.mesh.SetNormals(_generation.normals);
         }
 
-        if (_colors.Count == _verts.Count) {
-          _currMesh.SetColors(_colors);
+        if (_generation.colors.Count == _generation.verts.Count) {
+          _generation.mesh.SetColors(_generation.colors);
         }
 
         foreach (var channel in _requiredUvChannels) {
-          _currMesh.SetUVs(channel.Index(), _uvs[channel.Index()]);
+          _generation.mesh.SetUVs(channel.Index(), _generation.uvs[channel.Index()]);
         }
 
         if (_doesRequireSpecialUv3) {
-          _currMesh.SetUVs(3, _uvs[3]);
+          _generation.mesh.SetUVs(3, _generation.uvs[3]);
         }
 
         postProcessMesh();
 
-        _meshes.AddMesh(_currMesh);
-        _currMesh = null;
+        _meshes.AddMesh(_generation.mesh);
+        _generation.mesh = null;
       }
     }
 
     protected virtual void postProcessMesh() { }
+
+    protected struct GenerationState {
+      public LeapMeshGraphicBase graphic;
+      public int graphicIndex;
+      public int graphicId;
+      public Mesh mesh;
+
+      public List<Vector3> verts;
+      public List<Vector3> normals;
+      public List<int> tris;
+      public List<Color> colors;
+      public List<Vector4>[] uvs;
+
+      public static GenerationState GetGenerationState() {
+        GenerationState state = new GenerationState();
+
+        state.verts = new List<Vector3>();
+        state.normals = new List<Vector3>();
+        state.tris = new List<int>();
+        state.colors = new List<Color>();
+        state.uvs = new List<Vector4>[4] {
+          new List<Vector4>(),
+          new List<Vector4>(),
+          new List<Vector4>(),
+          new List<Vector4>()
+        };
+
+        return state;
+      }
+
+      public void Reset() {
+        verts.Clear();
+        normals.Clear();
+        tris.Clear();
+        colors.Clear();
+        for (int i = 0; i < 4; i++) {
+          uvs[i].Clear();
+        }
+      }
+    }
     #endregion
 
     #region UTILITY

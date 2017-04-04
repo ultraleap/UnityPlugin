@@ -124,6 +124,7 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
 
+      int newIndex = _graphics.Count;
       _graphics.Add(graphic);
 
       LeapSpaceAnchor anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(graphic.transform);
@@ -142,7 +143,7 @@ namespace Leap.Unity.GraphicalRenderer {
       if (_renderingMethod is ISupportsAddRemove)
 #endif
       {
-        (_renderingMethod as ISupportsAddRemove).OnAddGraphic(graphic);
+        (_renderingMethod as ISupportsAddRemove).OnAddGraphic(graphic, newIndex);
       }
 
       return true;
