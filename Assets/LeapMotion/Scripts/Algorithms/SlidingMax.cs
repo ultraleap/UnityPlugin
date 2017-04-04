@@ -1,5 +1,5 @@
 ﻿
-namespace Leap.Unity.Graphing {
+namespace Leap.Unity {
 
   public class SlidingMax {
 

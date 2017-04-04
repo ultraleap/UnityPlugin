@@ -1,8 +1,8 @@
 ﻿using System;
 using NUnit.Framework;
 
-namespace Leap.Unity.Graphing.Tests {
-  public class RingBufferTest {
+namespace Leap.Unity {
+  public class DequeTests {
 
     private Deque<int> _buffer;
 
