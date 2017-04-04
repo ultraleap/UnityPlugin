@@ -271,7 +271,7 @@ namespace Leap.Unity.UI.Interaction {
         }
       }
 
-      using (new ProfilerSample("Fixed Update Hands (Interaction State and Callbacks")) {
+      using (new ProfilerSample("Fixed Update Hands (Interaction State and Callbacks)")) {
 
         /* 
          * Interactions are checked here in a very specific manner so that interaction

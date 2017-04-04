@@ -638,7 +638,7 @@ namespace Leap.Unity.UI.Interaction {
       _closestPrimaryHoveringHand = GetClosestHand(_primaryHoveringHands);
     }
 
-    private InteractionHand GetClosestHand(IEnumerable<InteractionHand> hands) {
+    private InteractionHand GetClosestHand(HashSet<InteractionHand> hands) {
       InteractionHand closestHoveringHand = null;
       float closestHoveringHandDist = float.PositiveInfinity;
       foreach (var hand in hands) {
