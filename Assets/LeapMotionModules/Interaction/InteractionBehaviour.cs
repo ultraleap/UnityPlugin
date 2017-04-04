@@ -560,7 +560,7 @@ namespace Leap.Unity.UI.Interaction {
       return Vector3.Distance(this.transform.position, worldPosition);
     }
 
-    public void BeginHover(List<InteractionHand> hands) {
+    public virtual void BeginHover(List<InteractionHand> hands) {
       foreach (var hand in hands) {
         _hoveringHands.Add(hand);
       }
@@ -574,7 +574,7 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public void EndHover(List<InteractionHand> hands) {
+    public virtual void EndHover(List<InteractionHand> hands) {
       foreach (var hand in hands) {
         _hoveringHands.Remove(hand);
       }
@@ -588,20 +588,20 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public void StayHovered(List<InteractionHand> hands) {
+    public virtual void StayHovered(List<InteractionHand> hands) {
       RefreshClosestHoveringHand();
       OnHoverStay(hands);
     }
 
     private void RefreshClosestHoveringHand() {
-      _closestHoveringHand = GetClosestHand(_hoveringHands, GetDistance);
+      _closestHoveringHand = GetClosestHand(_hoveringHands);
     }
 
     private HashSet<InteractionHand> _primaryHoveringHands = new HashSet<InteractionHand>();
 
     private InteractionHand _closestPrimaryHoveringHand = null;
 
-    public void BeginPrimaryHover(List<InteractionHand> hands) {
+    public virtual void BeginPrimaryHover(List<InteractionHand> hands) {
       foreach (var hand in hands) {
         _primaryHoveringHands.Add(hand);
       }
@@ -615,7 +615,7 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public void EndPrimaryHover(List<InteractionHand> hands) {
+    public virtual void EndPrimaryHover(List<InteractionHand> hands) {
       foreach (var hand in hands) {
         _primaryHoveringHands.Remove(hand);
       }
@@ -629,20 +629,20 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public void StayPrimaryHovered(List<InteractionHand> hands) {
+    public virtual void StayPrimaryHovered(List<InteractionHand> hands) {
       RefreshClosestPrimaryHoveringHand();
       OnPrimaryHoverStay(hands);
     }
 
     private void RefreshClosestPrimaryHoveringHand() {
-      _closestPrimaryHoveringHand = GetClosestHand(_primaryHoveringHands, GetDistance);
+      _closestPrimaryHoveringHand = GetClosestHand(_primaryHoveringHands);
     }
 
-    private static InteractionHand GetClosestHand(IEnumerable<InteractionHand> hands, Func<Vector3, float> distanceFunc) {
+    private InteractionHand GetClosestHand(IEnumerable<InteractionHand> hands) {
       InteractionHand closestHoveringHand = null;
       float closestHoveringHandDist = float.PositiveInfinity;
       foreach (var hand in hands) {
-        float distance = distanceFunc(hand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
+        float distance = GetDistance(hand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
         if (closestHoveringHand == null
             || distance < closestHoveringHandDist) {
           closestHoveringHand = hand;
@@ -658,7 +658,7 @@ namespace Leap.Unity.UI.Interaction {
 
     private HashSet<InteractionHand> _contactingHands = new HashSet<InteractionHand>();
 
-    public void BeginContact(List<InteractionHand> hands) {
+    public virtual void BeginContact(List<InteractionHand> hands) {
       foreach (var hand in hands) {
         _contactingHands.Add(hand);
       }
@@ -670,7 +670,7 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public void EndContact(List<InteractionHand> hands) {
+    public virtual void EndContact(List<InteractionHand> hands) {
       foreach (var hand in hands) {
         _contactingHands.Remove(hand);
       }
@@ -682,7 +682,7 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public void StayContacted(List<InteractionHand> hands) {
+    public virtual void StayContacted(List<InteractionHand> hands) {
       OnContactStay(hands);
     }
 
@@ -747,7 +747,13 @@ namespace Leap.Unity.UI.Interaction {
       _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
     }
 
-    public void BeginGrasp(List<InteractionHand> hands) {
+    public virtual void BeginGrasp(List<InteractionHand> hands) {
+      if (isSuspended) {
+        // End suspension by ending the grasp on the suspending hand,
+        // calling EndGrasp immediately.
+        _suspendingHand.ReleaseGrasp();
+      }
+
       foreach (var hand in hands) {
         _graspingHands.Add(hand);
 
@@ -774,7 +780,7 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public void EndGrasp(List<InteractionHand> hands) {
+    public virtual void EndGrasp(List<InteractionHand> hands) {
       foreach (var hand in hands) {
         _graspingHands.Remove(hand);
 
@@ -782,6 +788,12 @@ namespace Leap.Unity.UI.Interaction {
           // Remove each hand from the pose solver.
           graspedPoseController.RemoveHand(hand);
         }
+      }
+
+      if (_graspingHands.Count == 0 && isSuspended) {
+        // No grasped hands: Should not be suspended any more;
+        // having been suspended also means we were only grasped by one hand
+        EndSuspension(hands[0]);
       }
 
       OnGraspEnd(hands);
@@ -794,7 +806,7 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public void StayGrasped(List<InteractionHand> hands) {
+    public virtual void StayGrasped(List<InteractionHand> hands) {
       if (moveObjectWhenGrasped) {
         Vector3 origPosition = rigidbody.position; Quaternion origRotation = rigidbody.rotation;
         Vector3 newPosition; Quaternion newRotation;
@@ -813,17 +825,17 @@ namespace Leap.Unity.UI.Interaction {
       OnGraspHold(hands);
     }
 
-    private bool _isSuspended = false;
-    public bool isSuspended { get { return _isSuspended; } }
+    protected InteractionHand _suspendingHand = null;
+    public bool isSuspended { get { return _suspendingHand != null; } }
 
-    public void BeginSuspension(InteractionHand hand) {
-      _isSuspended = true;
+    public virtual void BeginSuspension(InteractionHand hand) {
+      _suspendingHand = hand;
 
       OnSuspensionBegin(hand);
     }
 
-    public void EndSuspension(InteractionHand hand) {
-      _isSuspended = false;
+    public virtual void EndSuspension(InteractionHand hand) {
+      _suspendingHand = null;
 
       OnSuspensionEnd(hand);
     }

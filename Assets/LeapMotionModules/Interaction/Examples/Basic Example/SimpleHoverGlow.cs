@@ -30,7 +30,11 @@ public class SimpleHoverGlow : MonoBehaviour {
       if (_intObj.isSuspended) {
         _material.SetColor(_emissionPropertyId, new Color(0.7F, 0F, 0F, 1F));
       }
-      else if (_intObj.isHovered) {
+      else {
+        _material.SetColor(_emissionPropertyId, new Color(0.4F, 0.4F, 0.4F, 1F));
+      }
+      
+      if (_intObj.isHovered) {
         float glow = Vector3.Distance(_intObj.closestHoveringHand.PalmPosition.ToVector3(), this.transform.position).Map(0F, 0.2F, 1F, 0.4F);
         _material.SetColor(_emissionPropertyId, new Color(glow, glow, glow, 1F));
       }

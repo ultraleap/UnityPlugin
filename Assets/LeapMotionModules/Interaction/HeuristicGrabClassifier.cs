@@ -84,8 +84,8 @@ namespace Leap.Unity.UI.Interaction {
         }
 
         foreach (var interactionObj in interactionHand.graspCandidates) {
-          IInteractionBehaviour _;
-          if (UpdateBehaviour(interactionObj, interactionHand.GetLastTrackedLeapHand(), out graspedObject, out _)) {
+          if (UpdateBehaviour(interactionObj, interactionHand.GetLastTrackedLeapHand(), graspMode: GraspUpdateMode.BeginGrasp)) {
+            graspedObject = interactionObj;
             return true;
           }
         }
@@ -102,8 +102,8 @@ namespace Leap.Unity.UI.Interaction {
           return false;
         }
 
-        IInteractionBehaviour _;
-        if (UpdateBehaviour(interactionHand.graspedObject, interactionHand.GetLastTrackedLeapHand(), out _, out releasedObject)) {
+        if (UpdateBehaviour(interactionHand.graspedObject, interactionHand.GetLastTrackedLeapHand(), graspMode: GraspUpdateMode.ReleaseGrasp)) {
+          releasedObject = interactionHand.graspedObject;
           return true;
         }
 
@@ -111,16 +111,17 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    /// <summary>
-    /// Returns true if this update resulted in a grasp state change, false otherwise.
-    /// 
-    /// Only one of graspedObject or releasedObject will be non-null per call to this method.
-    /// </summary>
-    private bool UpdateBehaviour(IInteractionBehaviour behaviour, Hand hand, out IInteractionBehaviour graspedObject, out IInteractionBehaviour releasedObject) {
-      using (new ProfilerSample("Update Individual Grab Classifier", behaviour.gameObject)) {
-        graspedObject = null;
-        releasedObject = null;
+    private enum GraspUpdateMode {
+      BeginGrasp,
+      ReleaseGrasp
+    }
 
+    /// <summary>
+    /// Returns true if the behaviour reflects the state-change (grasped or released) as specified by
+    /// the graspMode.
+    /// </summary>
+    private bool UpdateBehaviour(IInteractionBehaviour behaviour, Hand hand, GraspUpdateMode graspMode) {
+      using (new ProfilerSample("Update Individual Grab Classifier", behaviour.gameObject)) {
         // Ensure a classifier exists for this Interaction Behaviour.
         GrabClassifierHeuristics.GrabClassifier classifier;
         if (!_classifiers.TryGetValue(behaviour, out classifier)) {
@@ -136,16 +137,16 @@ namespace Leap.Unity.UI.Interaction {
 
         // Determine whether there was a state change.
         bool didStateChange = false;
-        if (classifier.isGrabbing != classifier.prevGrabbing) {
+        if (!classifier.prevGrabbing && classifier.isGrabbing && graspMode == GraspUpdateMode.BeginGrasp) {
           didStateChange = true;
 
-          if (classifier.isGrabbing) {
-            graspedObject = behaviour;
-          }
-          else if (interactionHand.graspedObject == behaviour) {
-            releasedObject = behaviour;
-            classifier.coolDownProgress = 0f;
-          }
+          classifier.prevGrabbing = classifier.isGrabbing;
+        }
+        else if (classifier.prevGrabbing && !classifier.isGrabbing
+                 && interactionHand.graspedObject == behaviour && graspMode == GraspUpdateMode.ReleaseGrasp) {
+          didStateChange = true;
+
+          classifier.coolDownProgress = 0f;
 
           classifier.prevGrabbing = classifier.isGrabbing;
         }
@@ -160,6 +161,7 @@ namespace Leap.Unity.UI.Interaction {
     public void NotifyGraspReleased(IInteractionBehaviour behaviour) {
       GrabClassifierHeuristics.GrabClassifier classifier;
       if (_classifiers.TryGetValue(behaviour, out classifier)) {
+        classifier.prevGrabbing = false;
         classifier.isGrabbing = false;
         classifier.coolDownProgress = 0F;
         //for (int i = 0; i < classifier.probes.Length; i++) {
