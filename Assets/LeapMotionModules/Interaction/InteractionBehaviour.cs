@@ -754,6 +754,10 @@ namespace Leap.Unity.UI.Interaction {
         _suspendingHand.ReleaseGrasp();
       }
 
+      if (!allowMultiGrasp && isGrasped) {
+        _graspingHands.Query().First().ReleaseGrasp();
+      }
+
       foreach (var hand in hands) {
         _graspingHands.Add(hand);
 

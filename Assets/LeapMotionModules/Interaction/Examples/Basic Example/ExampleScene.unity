@@ -1857,7 +1857,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHover: 0
-  _ignoreContact: 1
+  _ignoreContact: 0
   _ignoreGrasping: 0
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1

@@ -977,6 +977,8 @@ namespace Leap.Unity.UI.Interaction {
     public bool CheckGraspEnd(out IInteractionBehaviour releasedObject) {
       releasedObject = null;
 
+      bool shouldReleaseObject = false;
+
       // Check releasing against interaction state.
       if (_graspedObject == null) {
         return false;
@@ -984,13 +986,16 @@ namespace Leap.Unity.UI.Interaction {
       else if (_graspedObject.ignoreGrasping) {
         grabClassifier.NotifyGraspReleased(_graspedObject);
         releasedObject = _graspedObject;
-        return true;
+
+        shouldReleaseObject = true;
       }
 
       // Update the grab classifier to determine if we should release the grasped object.
-      bool shouldReleaseObject = grabClassifier.FixedUpdateClassifierRelease(out releasedObject);
+      if (!shouldReleaseObject) shouldReleaseObject = grabClassifier.FixedUpdateClassifierRelease(out releasedObject);
+
       if (shouldReleaseObject) {
         _graspedObject = null;
+        EnableSoftContact(); // prevent objects popping out of the hand on release
         return true;
       }
 
@@ -1014,6 +1019,7 @@ namespace Leap.Unity.UI.Interaction {
       bool shouldGraspObject = grabClassifier.FixedUpdateClassifierGrasp(out newlyGraspedObject);
       if (shouldGraspObject) {
         _graspedObject = newlyGraspedObject;
+
         return true;
       }
 
