@@ -34,8 +34,7 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     public void RefreshHandState() {
       var hand = _handAccessor();
-      if (hand != null) { _hand = _handData.CopyFrom(hand); }
-      else { _hand = null; }
+      if (hand != null) { _hand = _handData.CopyFrom(hand); } else { _hand = null; }
     }
 
     private bool _didHoveringLastFrame, _didContactLastFrame, _didGraspingLastFrame;
@@ -45,7 +44,7 @@ namespace Leap.Unity.UI.Interaction {
         if (doHovering || _didHoveringLastFrame) { FixedUpdateHovering(); }
         if (doContact  || _didContactLastFrame)  { FixedUpdateContact(doContact); }
         if (doGrasping || _didGraspingLastFrame) { FixedUpdateGrasping(); }
-        
+
         // To support checking for interaction-ends e.g. if grasping is disabled, need to update an extra
         // frame beyond the frame in which the feature was disabled
         _didHoveringLastFrame = doHovering;
@@ -105,7 +104,7 @@ namespace Leap.Unity.UI.Interaction {
           _hoverActivityManager.FixedUpdatePosition((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
           using (new ProfilerSample("Check for Closest Elements")) { CheckHoverForHand(_hand, _hoverActivityManager.ActiveBehaviours); }
         }
-      
+
         ProcessHoverCheckResults();
         ProcessPrimaryHoverCheckResults();
 
@@ -136,20 +135,13 @@ namespace Leap.Unity.UI.Interaction {
       //Loop through all the fingers (that we care about)
       if (hand != null) {
         for (int i = 0; i < 3; i++) {
-          if (!hand.Fingers[i].IsExtended) { continue; }
+          if (!hand.Fingers[i].IsExtended && i != 1) { continue; }
           float leastFingerDistance = float.PositiveInfinity;
           Vector3 fingerTip = hand.Fingers[i].TipPosition.ToVector3();
 
           //Loop through all the candidates
-          foreach (IInteractionBehaviour elem in hoverCandidates) {
-            if (elem.ignoreHover) continue;
-            ISpaceComponent element = elem.space;
-            if (element != null) {
-              CheckHoverForElement(fingerTip, elem, element, i, ref leastFingerDistance, ref _hoverResults);
-            }
-            else {
-              CheckHoverForBehavior(fingerTip, elem, ref _hoverResults);
-            }
+          foreach (IInteractionBehaviour behaviour in hoverCandidates) {
+            CheckHoverForBehaviour(fingerTip, behaviour, behaviour.space, i, ref leastFingerDistance, ref _hoverResults);
           }
         }
       }
@@ -159,7 +151,7 @@ namespace Leap.Unity.UI.Interaction {
       if (element.anchor != null && element.anchor.space != null) {
         Vector3 localPos = element.anchor.space.transform.InverseTransformPoint(worldPoint);
         return element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPos));
-      }else {
+      } else {
         return worldPoint;
       }
     }
@@ -174,28 +166,26 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    private void CheckHoverForElement(Vector3 position, IInteractionBehaviour behaviour, ISpaceComponent element, int whichFinger, ref float leastFingerDistance, ref HoverCheckResults curResults) {
+    private void CheckHoverForBehaviour(Vector3 position, IInteractionBehaviour behaviour, ISpaceComponent spaceComponent, int whichFinger, ref float leastFingerDistance, ref HoverCheckResults curResults) {
       // TODO: NEED BETTER DISTANCE FUNCTION
-      float dist = Vector3.SqrMagnitude(((Component)element).transform.position - transformPoint(position, element));
+      float distance = float.MaxValue;
+      if (spaceComponent == null) {
+        distance = Vector3.SqrMagnitude(behaviour.transform.position - position);
+      } else {
+        distance = Vector3.SqrMagnitude(((Component)spaceComponent).transform.position - transformPoint(position, spaceComponent));
+      }
 
-      if (dist < leastFingerDistance) {
+      if (distance > 0f) {
+        curResults.hovered.Add(behaviour);
+      }
+
+      if (distance < leastFingerDistance) {
         curResults.perFingerHovered[whichFinger] = behaviour;
-        leastFingerDistance = dist;
-        if (leastFingerDistance < curResults.primaryHoveredDistance) {
+        leastFingerDistance = distance;
+        if (leastFingerDistance < curResults.primaryHoveredDistance && distance < MAX_PRIMARY_HOVER_DISTANCE * MAX_PRIMARY_HOVER_DISTANCE) {
           curResults.primaryHoveredDistance = leastFingerDistance;
           curResults.primaryHovered = curResults.perFingerHovered[whichFinger];
         }
-      }
-    }
-
-    private void CheckHoverForBehavior(Vector3 position, IInteractionBehaviour hoverable, ref HoverCheckResults curResults) {
-      float distance = hoverable.GetDistance(position);
-      if (distance > 0F) {
-        curResults.hovered.Add(hoverable);
-      }
-      if (distance < MAX_PRIMARY_HOVER_DISTANCE && distance < curResults.primaryHoveredDistance) {
-        curResults.primaryHovered = hoverable;
-        curResults.primaryHoveredDistance = distance;
       }
     }
 
@@ -282,8 +272,7 @@ namespace Leap.Unity.UI.Interaction {
 
         if (_primaryHoveredLastFrame != null) _primaryHoverBeganObject = _primaryHoveredLastFrame;
         else _primaryHoverBeganObject = null;
-      }
-      else {
+      } else {
         _primaryHoverEndedObject = null;
         _primaryHoverBeganObject = null;
       }
@@ -465,8 +454,7 @@ namespace Leap.Unity.UI.Interaction {
       if (_hand == null) {
         _brushBoneParent.gameObject.SetActive(false);
         return;
-      }
-      else {
+      } else {
         if (!_brushBoneParent.gameObject.activeSelf) {
           _brushBoneParent.gameObject.SetActive(true);
         }
@@ -518,8 +506,7 @@ namespace Leap.Unity.UI.Interaction {
       if (deltaLen <= deadzone) {
         body.velocity = Vector3.zero;
         brushBone.lastTarget = body.position;
-      }
-      else {
+      } else {
         delta *= (deltaLen - deadzone) / deltaLen;
         brushBone.lastTarget = body.position + delta;
         delta /= Time.fixedDeltaTime;
@@ -589,8 +576,7 @@ namespace Leap.Unity.UI.Interaction {
 
         if (softlyContacting) {
           _disableSoftContactEnqueued = false;
-        }
-        else {
+        } else {
           // If there are no detected Contacts, exit soft contact mode.
           DisableSoftContact();
         }
@@ -620,8 +606,7 @@ namespace Leap.Unity.UI.Interaction {
             joint.anchor = Vector3.back * bone.Length / 2f;
             joint.connectedAnchor = Vector3.forward * prevBone.Length / 2f;
             _brushBones[boneArrayIndex].joint = joint;
-          }
-          else {
+          } else {
             joint.connectedBody = _brushBones[NUM_FINGERS * BONES_PER_FINGER].body;
             joint.anchor = Vector3.back * bone.Length / 2f;
             joint.connectedAnchor = _brushBones[NUM_FINGERS * BONES_PER_FINGER].transform.InverseTransformPoint(bone.PrevJoint.ToVector3());
@@ -645,8 +630,7 @@ namespace Leap.Unity.UI.Interaction {
             _brushBones[boneArrayIndex].joint.connectedBody = _brushBones[boneArrayIndex - 1].body;
             _brushBones[boneArrayIndex].joint.anchor = Vector3.back * bone.Length / 2f;
             _brushBones[boneArrayIndex].joint.connectedAnchor = Vector3.forward * prevBone.Length / 2f;
-          }
-          else if (_brushBones[boneArrayIndex].metacarpalJoint != null) {
+          } else if (_brushBones[boneArrayIndex].metacarpalJoint != null) {
             _brushBones[boneArrayIndex].metacarpalJoint.connectedBody = _brushBones[NUM_FINGERS * BONES_PER_FINGER].body;
             _brushBones[boneArrayIndex].metacarpalJoint.anchor = Vector3.back * bone.Length / 2f;
             _brushBones[boneArrayIndex].metacarpalJoint.connectedAnchor = _brushBones[NUM_FINGERS * BONES_PER_FINGER].transform
@@ -666,7 +650,7 @@ namespace Leap.Unity.UI.Interaction {
           if (_delayedDisableSoftContactCoroutine != null) {
             interactionManager.StopCoroutine(_delayedDisableSoftContactCoroutine);
           }
-          for (int i = _brushBones.Length; i-- != 0; ) {
+          for (int i = _brushBones.Length; i-- != 0;) {
             _brushBones[i].collider.isTrigger = true;
           }
 
@@ -699,7 +683,7 @@ namespace Leap.Unity.UI.Interaction {
       if (_disableSoftContactEnqueued) {
         using (new ProfilerSample("Disable Soft Contact")) {
           _softContactEnabled = false;
-          for (int i = _brushBones.Length; i-- != 0; ) {
+          for (int i = _brushBones.Length; i-- != 0;) {
             _brushBones[i].collider.isTrigger = false;
           }
           if (_hand != null) ResetBrushBoneJoints();
@@ -748,8 +732,7 @@ namespace Leap.Unity.UI.Interaction {
       int count;
       if (_contactBehaviours.TryGetValue(interactionObj, out count)) {
         _contactBehaviours[interactionObj] = count + 1;
-      }
-      else {
+      } else {
         _contactBehaviours[interactionObj] = 1;
       }
     }
@@ -763,8 +746,7 @@ namespace Leap.Unity.UI.Interaction {
       int count = _contactBehaviours[interactionObj];
       if (count == 1) {
         _contactBehaviours.Remove(interactionObj);
-      }
-      else {
+      } else {
         _contactBehaviours[interactionObj] = count - 1;
       }
     }
@@ -781,7 +763,7 @@ namespace Leap.Unity.UI.Interaction {
         if (!_contactBehaviours.ContainsKey(interactionObj)
          || !_brushBoneParent.gameObject.activeInHierarchy
          || !contactEnabled) {
-           _contactEndedBuffer.Add(interactionObj);
+          _contactEndedBuffer.Add(interactionObj);
           _contactBehaviourRemovalCache.Add(interactionObj);
         }
       }
@@ -935,8 +917,7 @@ namespace Leap.Unity.UI.Interaction {
     public bool ReleaseGrasp() {
       if (_graspedObject == null) {
         return false;
-      }
-      else {
+      } else {
         _releasingHandListBuffer.Clear();
         _releasingHandListBuffer.Add(this);
 
@@ -974,8 +955,7 @@ namespace Leap.Unity.UI.Interaction {
       if (_graspedObject == toRelease) {
         ReleaseGrasp();
         return true;
-      }
-      else {
+      } else {
         return false;
       }
     }
@@ -992,8 +972,7 @@ namespace Leap.Unity.UI.Interaction {
       // Check releasing against interaction state.
       if (_graspedObject == null) {
         return false;
-      }
-      else if (_graspedObject.ignoreGrasping) {
+      } else if (_graspedObject.ignoreGrasping) {
         grabClassifier.NotifyGraspReleased(_graspedObject);
         releasedObject = _graspedObject;
 
