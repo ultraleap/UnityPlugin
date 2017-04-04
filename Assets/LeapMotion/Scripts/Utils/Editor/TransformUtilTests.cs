@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using NUnit.Framework;
 
-namespace Leap.Unity.GraphicalRenderer {
+namespace Leap.Unity {
 
   public class TransformUtilTests {
 
