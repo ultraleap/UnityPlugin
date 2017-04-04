@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Leap.Unity.Graphing {
+namespace Leap.Unity {
 
   public class Deque<T> {
     private T[] _array;
