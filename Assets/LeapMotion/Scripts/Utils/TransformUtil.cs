@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Leap.Unity.GraphicalRenderer {
+namespace Leap.Unity {
 
   public static class TransformUtil {
 
@@ -30,4 +30,5 @@ namespace Leap.Unity.GraphicalRenderer {
       transform.localPosition = local;
     }
   }
+
 }
