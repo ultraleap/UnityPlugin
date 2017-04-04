@@ -10,6 +10,15 @@ namespace Leap.Unity.Query.Test {
     public int[] LIST_1 = { 6, 7, 8, 9, 10 };
 
     [Test]
+    public void ForeachTest() {
+      List<int> found = new List<int>();
+      foreach (var item in LIST_0.Query().Concat(LIST_1.Query())) {
+        found.Add(item);
+      }
+      Assert.That(LIST_0.Concat(LIST_1).SequenceEqual(found));
+    }
+
+    [Test]
     public void CastTest() {
       object[] objs = new object[] { "Hello", "World", "These", "Are", "All", "Strings" };
 
