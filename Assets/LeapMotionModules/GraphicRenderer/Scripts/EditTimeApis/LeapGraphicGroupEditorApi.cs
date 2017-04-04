@@ -62,6 +62,9 @@ namespace Leap.Unity.GraphicalRenderer {
         var feature = _group.gameObject.AddComponent(featureType) as LeapGraphicFeatureBase;
         _group._features.Add(feature);
 
+        _group.RebuildFeatureData();
+        _group.RebuildFeatureSupportInfo();
+
         EditorUtility.SetDirty(_group);
 
         return feature;
@@ -73,6 +76,10 @@ namespace Leap.Unity.GraphicalRenderer {
 
         _group._features.Remove(feature);
         InternalUtility.Destroy(feature);
+
+        _group.RebuildFeatureData();
+        _group.RebuildFeatureSupportInfo();
+
         _group._renderer.editor.ScheduleEditorUpdate();
       }
 
