@@ -32,13 +32,14 @@ namespace Leap.Unity.Interaction {
 
         //Do the actual grab classification logic
         fillClassifier(_hand, ref classifier);
-        GrabClassifierHeuristics.UpdateClassifier(classifier, collidingCandidates, numberOfColliders, scaledGrabParams);
+        GrabClassifierHeuristics.UpdateClassifier(classifier, scaledGrabParams, ref collidingCandidates, ref numberOfColliders);
 
         if (classifier.isGrabbing != classifier.prevGrabbing) {
           if (classifier.isGrabbing) {
             if (!_manager.TwoHandedGrasping) { _manager.ReleaseObject(behaviour); }
             _manager.GraspWithHand(_hand, behaviour);
-          } else if (behaviour.IsBeingGraspedByHand(_hand.Id)) {
+          }
+          else if (behaviour.IsBeingGraspedByHand(_hand.Id)) {
             _manager.ReleaseHand(_hand.Id);
             classifier.coolDownProgress = 0f;
           }
@@ -92,7 +93,7 @@ namespace Leap.Unity.Interaction {
       classifier.handDirection = _hand.Direction.ToVector3();
       classifier.handXBasis = _hand.Basis.xBasis.ToVector3();
       classifier.handGrabCenter = (_hand.PalmPosition + (_hand.Direction * 0.05f * _manager.SimulationScale) + (_hand.PalmNormal * 0.01f * _manager.SimulationScale)).ToVector3();
-      for(int i = 0; i<_hand.Fingers.Count; i++) {
+      for (int i = 0; i < _hand.Fingers.Count; i++) {
         classifier.probes[i].direction = _hand.Fingers[i].Direction.ToVector3();
       }
     }

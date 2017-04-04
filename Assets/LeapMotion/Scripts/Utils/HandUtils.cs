@@ -71,6 +71,14 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// As Get, but returns the FixedUpdate (physics timestep) hand as opposed to the Update hand.
+    /// </summary>
+    public static Hand GetFixed(Chirality chirality) {
+      if (chirality == Chirality.Left) return FixedLeft;
+      else return FixedRight;
+    }
+
+    /// <summary>
     /// Returns the first left hand found by Leap in the current frame, otherwise
     /// returns null if no such hand is found.
     /// </summary>
@@ -95,6 +103,29 @@ namespace Leap.Unity {
     }
 
     /// <summary>
+    /// Returns the first left hand found by Leap in the current fixed frame, otherwise
+    /// returns null if no such hand is found. The fixed frame is aligned with the physics timestep.
+    /// </summary>
+    public static Hand FixedLeft {
+      get {
+        if (Provider == null) return null;
+        if (Provider.CurrentFixedFrame == null) return null;
+        return Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand => hand.IsLeft);
+      }
+    }
+
+    /// <summary> 
+    /// Returns the first right hand found by Leap in the current fixed frame, otherwise
+    /// returns null if no such hand is found. The fixed frame is aligned with the physics timestep.
+    /// </summary>
+    public static Hand FixedRight {
+      get {
+        if (Provider == null) return null;
+        if (Provider.CurrentFixedFrame == null) return null;
+        else return Provider.CurrentFixedFrame.Hands.Query().FirstOrDefault(hand => hand.IsRight);
+      }
+    }
+
     /// Shorthand for hand.Fingers[(int)Leap.Finger.FingerType.TYPE_THUMB],
     /// or, alternatively, hand.Fingers[0].
     /// </summary>
@@ -266,6 +297,14 @@ namespace Leap.Unity {
     public static void SetTransform(this Bone bone, Vector3 position, Quaternion rotation) {
       bone.Transform(Vector3.zero, (rotation * Quaternion.Inverse(bone.Rotation.ToQuaternion())));
       bone.Transform(position - bone.PrevJoint.ToVector3(), Quaternion.identity);
+    }
+
+    /// <summary>
+    /// Transforms a finger to a position and rotation by its fingertip.
+    /// </summary>
+    public static void SetTipTransform(this Finger finger, Vector3 position, Quaternion rotation) {
+      finger.Transform(Vector3.zero, (rotation * Quaternion.Inverse(finger.bones[3].Rotation.ToQuaternion())));
+      finger.Transform(position - finger.bones[3].NextJoint.ToVector3(), Quaternion.identity);
     }
 
     /// <summary>
