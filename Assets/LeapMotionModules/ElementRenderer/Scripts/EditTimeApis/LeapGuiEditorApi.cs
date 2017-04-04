@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Leap.Unity;
+using Leap.Unity.Space;
 
 public partial class LeapGui : MonoBehaviour {
 
@@ -18,7 +19,7 @@ public partial class LeapGui : MonoBehaviour {
     private LeapGui _gui;
 
     [NonSerialized]
-    private int _previousHierarchyHash;
+    private Hash _previousHierarchyHash;
 
     private DelayedAction _delayedHeavyRebuild;
 
@@ -30,16 +31,6 @@ public partial class LeapGui : MonoBehaviour {
 
     public void OnValidate() {
       //TODO, handle drag-drop of leap gui for groups!
-
-      if (_gui._space != null && _gui._space.gameObject != _gui.gameObject) {
-        LeapGuiSpace movedSpace;
-        if (InternalUtility.TryMoveComponent(_gui._space, _gui.gameObject, out movedSpace)) {
-          _gui._space = movedSpace;
-        } else {
-          Debug.LogWarning("Could not move space component " + _gui._space + "!");
-          InternalUtility.Destroy(_gui._space);
-        }
-      }
     }
 
     public void OnDestroy() {
@@ -77,36 +68,25 @@ public partial class LeapGui : MonoBehaviour {
       _previousHierarchyHash++;
     }
 
-    public void SetSpace(Type spaceType) {
-      AssertHelper.AssertEditorOnly();
-      ScheduleEditorUpdate();
-
-      UnityEditor.Undo.RecordObject(_gui, "Change Gui Space");
-      UnityEditor.EditorUtility.SetDirty(_gui);
-
-      if (_gui._space != null) {
-        DestroyImmediate(_gui._space);
-        _gui._space = null;
-      }
-
-      _gui._space = _gui.gameObject.AddComponent(spaceType) as LeapGuiSpace;
-
-      if (_gui._space != null) {
-        _gui._space.gui = _gui;
-      }
-    }
-
     public void RebuildEditorPickingMeshes() {
-      if (_gui._space == null) {
-        return;
+      if (_gui._space != null) {
+        _gui._space.RebuildHierarchy();
+        _gui._space.RecalculateTransformers();
       }
+
+      _gui.validateElements();
 
       foreach (var group in _gui._groups) {
+        group.editor.ValidateElementList();
+        group.RebuildFeatureData();
+        group.RebuildFeatureSupportInfo();
         group.editor.RebuildEditorPickingMeshes();
       }
     }
 
     public void DoLateUpdateEditor() {
+      validateSpaceComponent();
+
       bool needsRebuild = false;
 
       using (new ProfilerSample("Calculate Should Rebuild")) {
@@ -119,7 +99,12 @@ public partial class LeapGui : MonoBehaviour {
           }
         }
 
-        int hierarchyHash = HashUtil.GetHierarchyHash(_gui.transform);
+        Hash hierarchyHash = Hash.GetHierarchyHash(_gui.transform);
+
+        if (_gui._space != null) {
+          hierarchyHash.Add(_gui._space.GetSettingHash());
+        }
+
         if (_previousHierarchyHash != hierarchyHash) {
           _previousHierarchyHash = hierarchyHash;
           needsRebuild = true;
@@ -134,12 +119,15 @@ public partial class LeapGui : MonoBehaviour {
     }
 
     public void DoEditorUpdateLogic(bool fullRebuild, bool heavyRebuild) {
+      validateSpaceComponent();
+
       if (fullRebuild) {
-        _gui._anchors.Clear();
-        _gui._anchorParents.Clear();
-        _gui.rebuildAnchorInfo(_gui.transform, _gui.transform);
-        _gui._space.BuildElementData(_gui.transform);
-        _gui.collectUnattachedElements();
+        if (_gui._space != null) {
+          _gui._space.RebuildHierarchy();
+          _gui._space.RecalculateTransformers();
+        }
+
+        _gui.validateElements();
 
         foreach (var group in _gui._groups) {
           group.editor.ValidateElementList();
@@ -153,6 +141,19 @@ public partial class LeapGui : MonoBehaviour {
 
       foreach (var group in _gui._groups) {
         group.UpdateRenderer();
+      }
+    }
+
+    private void validateSpaceComponent() {
+      if (_gui._space != null && !_gui._space.enabled) {
+        _gui._space = null;
+      }
+
+      if (_gui._space == null) {
+        var potentialSpace = _gui.GetComponent<LeapSpace>();
+        if (potentialSpace != null && potentialSpace.enabled) {
+          _gui._space = potentialSpace;
+        }
       }
     }
   }

@@ -97,8 +97,8 @@ public class AtlasBuilder {
 
   private List<LeapGuiTextureFeature> _features = new List<LeapGuiTextureFeature>();
   private Texture2D[] _textureArray;
-  private int _atlasHash = 1;
-  private int _currHash = 0;
+  private Hash _atlasHash = 1;
+  private Hash _currHash = 0;
 
   public void UpdateTextureList(List<LeapGuiTextureFeature> textureFeatures) {
     _features.Clear();
@@ -106,20 +106,21 @@ public class AtlasBuilder {
 
     _textureArray = new Texture2D[_features[0].data.Count];
 
-    _currHash = 17;
+    _currHash = new Hash() {
+      _border,
+      _padding,
+      _mipMap,
+      _filterMode,
+      _format,
+      _maxAtlasSize
+    };
+
     foreach (var feature in _features) {
-      HashUtil.Combine(ref _currHash, feature.channel);
+      _currHash.Add(feature.channel);
       foreach (var dataObj in feature.data) {
-        HashUtil.Combine(ref _currHash, dataObj.texture);
+        _currHash.Add(dataObj.texture);
       }
     }
-
-    HashUtil.Combine(ref _currHash, _border);
-    HashUtil.Combine(ref _currHash, _padding);
-    HashUtil.Combine(ref _currHash, _mipMap);
-    HashUtil.Combine(ref _currHash, _filterMode);
-    HashUtil.Combine(ref _currHash, _format);
-    HashUtil.Combine(ref _currHash, _maxAtlasSize);
   }
 
   public void RebuildAtlas(ProgressBar progress, out Texture2D[] packedTextures, out Rect[][] channelMapping) {

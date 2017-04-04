@@ -12,7 +12,7 @@ namespace Leap.Unity.UI.Interaction {
       SixDegreeSolve,
       PivotAroundOrigin
     }
-    public SolveMethod _solveMethod;
+    private SolveMethod _solveMethod;
 
     private InteractionBehaviour _interactionObj;
     private KabschSolver _kabsch;
@@ -37,12 +37,12 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public void AddHand(InteractionHand hand) {
-      var newPoints = HandPointCollection.Create(_interactionObj.Rigidbody.position,
-                                                 _interactionObj.Rigidbody.rotation);
+      var newPoints = HandPointCollection.Create(_interactionObj.rigidbody.position,
+                                                 _interactionObj.rigidbody.rotation);
       _handToPoints[hand] = newPoints;
 
       for (int f = 0; f < NUM_FINGERS; f++) {
-        Finger finger = hand.GetLeapHand().Fingers[f];
+        Finger finger = hand.GetLastTrackedLeapHand().Fingers[f];
         Finger.FingerType fingerType = finger.Type;
 
         for (int j = 0; j < NUM_BONES; j++) {
@@ -74,15 +74,15 @@ namespace Leap.Unity.UI.Interaction {
 
     public void GetGraspedPosition(out Vector3 newPosition, out Quaternion newRotation) {
       _points.Clear(); _refPoints.Clear();
-      Vector3 bodyPosition = _interactionObj.Rigidbody.position;
-      Quaternion bodyRotation = _interactionObj.Rigidbody.rotation;
+      Vector3 bodyPosition = _interactionObj.rigidbody.position;
+      Quaternion bodyRotation = _interactionObj.rigidbody.rotation;
       Matrix4x4 it = Matrix4x4.TRS(bodyPosition, bodyRotation, Vector3.one);
 
       _handCentroid = Vector3.zero; _objectCentroid = Vector3.zero; _boneCount = 0f;
 
       foreach (var handPointPair in _handToPoints) {
         InteractionHand hand = handPointPair.Key;
-        Leap.Hand leapHand = hand.GetLeapHand();
+        Leap.Hand leapHand = hand.GetLastTrackedLeapHand();
         HandPointCollection points = _handToPoints[hand];
 
         for (int f = 0; f < NUM_FINGERS; f++) {

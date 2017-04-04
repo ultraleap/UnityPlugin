@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Leap.Unity.UI.Interaction.Internal;
+using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
@@ -16,35 +17,41 @@ namespace Leap.Unity.UI.Interaction {
 
     public float _lastObjectTouchedMass;
 
-    #region Collision Callbacks
-
     void OnCollisionEnter(Collision collision) {
-      InteractionBehaviourBase interactionObj;
-      if (interactionHand.interactionManager.RigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
+      IInteractionBehaviour interactionObj;
+      if (collision.rigidbody == null) {
+        Debug.LogError("Brush Bone collided with non-rigidbody collider: " + collision.collider.name + "."
+                     + "Please enable automatic layer generation in the Interaction Manager, "
+                     + "or ensure the Interaction layer only contains Interaction Behaviours.");
+      }
+      if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
         _lastObjectTouchedMass = collision.rigidbody.mass;
-        interactionHand.ContactBoneCollisionEnter(this, interactionObj);
+        interactionHand.ContactBoneCollisionEnter(this, interactionObj, false);
       }
     }
     void OnCollisionExit(Collision collision) {
-      InteractionBehaviourBase interactionObj;
-      if (interactionHand.interactionManager.RigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
-        interactionHand.ContactBoneCollisionExit(this, interactionObj);
+      IInteractionBehaviour interactionObj;
+      if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
+        interactionHand.ContactBoneCollisionExit(this, interactionObj, false);
       }
     }
     void OnTriggerEnter(Collider collider) {
-      InteractionBehaviourBase interactionObj;
-      if (interactionHand.interactionManager.RigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
-        interactionHand.ContactBoneCollisionEnter(this, interactionObj);
+      if (collider.attachedRigidbody == null) {
+        Debug.LogError("Brush Bone collided with non-rigidbody collider trigger: " + collider.name + "."
+                     + "Please enable automatic layer generation in the Interaction Manager, "
+                     + "or ensure the Interaction layer only contains Interaction Behaviours.");
+      }
+      IInteractionBehaviour interactionObj;
+      if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
+        interactionHand.ContactBoneCollisionEnter(this, interactionObj, true);
       }
     }
     void OnTriggerExit(Collider collider) {
-      InteractionBehaviourBase interactionObj;
-      if (interactionHand.interactionManager.RigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
-        interactionHand.ContactBoneCollisionExit(this, interactionObj);
+      IInteractionBehaviour interactionObj;
+      if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
+        interactionHand.ContactBoneCollisionExit(this, interactionObj, true);
       }
     }
-
-    #endregion
 
   }
 

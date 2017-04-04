@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Leap.Unity;
+using Leap.Unity.Space;
 
 [ExecuteInEditMode]
 public partial class LeapGui : MonoBehaviour {
@@ -14,20 +15,13 @@ public partial class LeapGui : MonoBehaviour {
 
   #region INSPECTOR FIELDS
   [SerializeField]
-  private LeapGuiSpace _space;
+  private LeapSpace _space;
 
   [SerializeField]
   private List<LeapGuiGroup> _groups = new List<LeapGuiGroup>();
   #endregion
 
   #region PRIVATE VARIABLES
-
-  [SerializeField]
-  private List<AnchorOfConstantSize> _anchors = new List<AnchorOfConstantSize>();
-
-  [SerializeField]
-  private List<Transform> _anchorParents = new List<Transform>();
-
   [NonSerialized]
   private List<LeapGuiElement> _tempElementList = new List<LeapGuiElement>();
   [NonSerialized]
@@ -37,7 +31,7 @@ public partial class LeapGui : MonoBehaviour {
 
   #region PUBLIC RUNTIME API
 
-  public LeapGuiSpace space {
+  public LeapSpace space {
     get {
       return _space;
     }
@@ -46,18 +40,6 @@ public partial class LeapGui : MonoBehaviour {
   public List<LeapGuiGroup> groups {
     get {
       return _groups;
-    }
-  }
-
-  public List<AnchorOfConstantSize> anchors {
-    get {
-      return _anchors;
-    }
-  }
-
-  public List<Transform> anchorParents {
-    get {
-      return _anchorParents;
     }
   }
 
@@ -97,8 +79,9 @@ public partial class LeapGui : MonoBehaviour {
 
   #region UNITY CALLBACKS
   private void OnValidate() {
-    _space = _space ?? GetComponent<LeapGuiSpace>() ?? gameObject.AddComponent<LeapGuiRectSpace>();
-    _space.gui = this;
+    if (_space == null) {
+      _space = GetComponent<LeapSpace>();
+    }
 
 #if UNITY_EDITOR
     editor.OnValidate();
@@ -111,16 +94,11 @@ public partial class LeapGui : MonoBehaviour {
       DestroyImmediate(group);
     }
 
-    foreach (var space in GetComponents<LeapGuiSpace>()) {
-      DestroyImmediate(space);
-    }
-
     //Then do normal validation
     OnValidate();
   }
 
   private void OnDestroy() {
-    if (_space != null) InternalUtility.Destroy(space);
     foreach (var group in _groups) {
       InternalUtility.Destroy(group);
     }
@@ -131,16 +109,16 @@ public partial class LeapGui : MonoBehaviour {
   }
 
   private void Awake() {
-    if (_space != null) {
-      _space.gui = this;
-    }
     //TODO: assign references 
   }
 
   private void OnEnable() {
     if (Application.isPlaying) {
       //TODO: enable each group too
-      if (_space != null) _space.BuildElementData(transform);
+      if (_space != null) {
+        _space.RebuildHierarchy();
+        _space.RecalculateTransformers();
+      }
     }
   }
 
@@ -171,27 +149,7 @@ public partial class LeapGui : MonoBehaviour {
 #endif
   }
 
-  private void rebuildAnchorInfo(Transform root, Transform currAnchor) {
-    int count = root.childCount;
-    for (int i = 0; i < count; i++) {
-      Transform child = root.GetChild(i);
-      if (!child.gameObject.activeSelf) continue;
-
-      var childAnchor = currAnchor;
-
-      var anchorComponent = child.GetComponent<AnchorOfConstantSize>();
-      if (anchorComponent != null && anchorComponent.enabled) {
-        _anchors.Add(anchorComponent);
-        _anchorParents.Add(currAnchor);
-
-        childAnchor = anchorComponent.transform;
-      }
-
-      rebuildAnchorInfo(child, childAnchor);
-    }
-  }
-
-  private void collectUnattachedElements() {
+  private void validateElements() {
     GetComponentsInChildren(_tempElementList);
 
     foreach (var element in _tempElementList) {
@@ -199,7 +157,7 @@ public partial class LeapGui : MonoBehaviour {
         //procede to validate
 
         //If the element is anchored to the wrong anchor, detach and reattach
-        var anchor = AnchorOfConstantSize.GetParentAnchorOrGui(element.transform);
+        var anchor = _space == null ? null : LeapSpaceAnchor.GetAnchor(element.transform);
         if (element.anchor != anchor) {
           var group = element.attachedGroup;
 
@@ -226,11 +184,11 @@ public partial class LeapGui : MonoBehaviour {
   }
 
   private void doLateUpdateRuntime() {
-    if (_space == null) return;
-
-    //TODO, optimize this!  Don't do it every frame for the whole thing!
-    using (new ProfilerSample("Refresh space data")) {
-      _space.RefreshElementData(transform, 0, _anchors.Count);
+    if (_space != null) {
+      //TODO, optimize this!  Don't do it every frame for the whole thing!
+      using (new ProfilerSample("Refresh space data")) {
+        _space.RecalculateTransformers();
+      }
     }
 
     foreach (var group in _groups) {

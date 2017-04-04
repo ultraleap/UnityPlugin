@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 using Leap.Unity;
+using Leap.Unity.Space;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
@@ -24,17 +25,6 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
   [EditTimeOnly]
   [SerializeField]
   private bool _createMeshRenderers;
-
-  [EditTimeOnly]
-  [SerializeField]
-  private bool _enableLightmapping;
-
-  [EditTimeOnly]
-  [SerializeField]
-  private MaterialGlobalIlluminationFlags _giFlags = MaterialGlobalIlluminationFlags.None;
-
-  [SerializeField]
-  private LightmapUnwrapSettings _lightmapUnwrapSettings;
   #endregion
 
   #region PRIVATE VARIABLES
@@ -62,17 +52,10 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     Translation
   }
 
-  protected override void OnValidate() {
-    base.OnValidate();
-
-    if (!_createMeshRenderers) {
-      _enableLightmapping = false;
-    }
-  }
-
-  public override SupportInfo GetSpaceSupportInfo(LeapGuiSpace space) {
-    if (space is LeapGuiRectSpace ||
-        space is LeapGuiCylindricalSpace) {
+  public override SupportInfo GetSpaceSupportInfo(LeapSpace space) {
+    if (space == null ||
+        space is LeapCylindricalSpace ||
+        space is LeapSphericalSpace) {
       return SupportInfo.FullSupport();
     } else {
       return SupportInfo.Error("Baked Renderer does not support " + space.GetType().Name);
@@ -83,7 +66,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     base.OnUpdateRenderer();
 
     if (_motionType != MotionType.None) {
-      if (gui.space is LeapGuiRectSpace) {
+      if (gui.space == null) {
         using (new ProfilerSample("Build Material Data")) {
           _rect_elementPositions.Clear();
           foreach (var element in group.elements) {
@@ -95,19 +78,19 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
         using (new ProfilerSample("Upload Material Data")) {
           _material.SetVectorArraySafe(RECT_POSITIONS, _rect_elementPositions);
         }
-      } else if (gui.space is LeapGuiRadialSpaceBase) {
-        var radialSpace = gui.space as LeapGuiRadialSpaceBase;
+      } else if (gui.space is LeapRadialSpace) {
+        var radialSpace = gui.space as LeapRadialSpace;
 
         using (new ProfilerSample("Build Material Data")) {
           _curved_elementParameters.Clear();
           foreach (var element in group.elements) {
-            var t = radialSpace.GetTransformer(element.anchor) as IRadialTransformer;
-            _curved_elementParameters.Add(t.GetVectorRepresentation(element));
+            var t = element.anchor.transformer as IRadialTransformer;
+            _curved_elementParameters.Add(t.GetVectorRepresentation(element.transform));
           }
         }
 
         using (new ProfilerSample("Upload Material Data")) {
-          _material.SetFloat(LeapGuiRadialSpaceBase.RADIUS_PROPERTY, radialSpace.radius);
+          _material.SetFloat(SpaceProperties.RADIAL_SPACE_RADIUS, radialSpace.radius);
           _material.SetVectorArraySafe(CURVED_PARAMETERS, _curved_elementParameters);
         }
       }
@@ -149,9 +132,6 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
       for (int i = 0; i < _meshes.Count; i++) {
         _renderers[i].MakeValid(transform, i, _meshes[i], _material);
-        if (_enableLightmapping) {
-          GameObjectUtility.SetStaticEditorFlags(_renderers[i].obj, StaticEditorFlags.LightmapStatic | StaticEditorFlags.ReflectionProbeStatic);
-        }
       }
     } else {
       while (_renderers.Count > 0) {
@@ -175,23 +155,11 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     }
 
     if (_motionType != MotionType.None) {
-      if (gui.space is LeapGuiCylindricalSpace) {
-        _material.EnableKeyword(LeapGuiCylindricalSpace.FEATURE_NAME);
-      } else if (gui.space is LeapGuiSphericalSpace) {
-        _material.EnableKeyword(LeapGuiSphericalSpace.FEATURE_NAME);
+      if (gui.space is LeapCylindricalSpace) {
+        _material.EnableKeyword(SpaceProperties.CYLINDRICAL_FEATURE);
+      } else if (gui.space is LeapSphericalSpace) {
+        _material.EnableKeyword(SpaceProperties.SPHERICAL_FEATURE);
       }
-    }
-  }
-
-  protected override void prepareMaterial() {
-    base.prepareMaterial();
-
-    foreach (var keyword in _material.shaderKeywords) {
-      _material.DisableKeyword(keyword);
-    }
-
-    if (_enableLightmapping) {
-      _material.globalIlluminationFlags = _giFlags;
     }
   }
 
@@ -205,7 +173,7 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
 
     switch (_motionType) {
       case MotionType.None:
-        _noMotion_transformer = gui.space.GetTransformer(_currElement.anchor);
+        _noMotion_transformer = _currElement.transformer;
         _noMotion_elementVertToGuiVert = gui.transform.worldToLocalMatrix *
                                          _currElement.transform.localToWorldMatrix;
         break;
@@ -230,14 +198,6 @@ public class LeapGuiBakedRenderer : LeapGuiMesherBase {
     //For the baked renderer, the mesh really never accurately represents it's visual position 
     //or size, so just disable culling entirely by making the bound gigantic.
     _currMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000);
-
-    //No solution right now for baking lightmap uvs at runtime
-    //But, that wasn't important anyway :P
-#if UNITY_EDITOR
-    if (_enableLightmapping && isHeavyUpdate) {
-      _lightmapUnwrapSettings.GenerateLightmapUvs(_currMesh);
-    }
-#endif
   }
 
   protected override bool doesRequireSpecialUv3() {

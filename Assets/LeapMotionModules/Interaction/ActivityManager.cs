@@ -1,6 +1,6 @@
-﻿using System.Collections;
+﻿using Leap.Unity.Space;
+using Leap.Unity.UI.Interaction.Internal;
 using System.Collections.Generic;
-using Leap.Unity.Query;
 using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
@@ -17,10 +17,27 @@ namespace Leap.Unity.UI.Interaction {
     public InteractionManager manager;
 
     private Collider[] _colliderResultsBuffer = new Collider[32];
-    private HashSet<InteractionBehaviourBase> _activeBehaviours = new HashSet<InteractionBehaviourBase>();
+    private HashSet<IInteractionBehaviour> _activeBehaviours = new HashSet<IInteractionBehaviour>();
 
-    public HashSet<InteractionBehaviourBase> ActiveBehaviours {
+    public HashSet<IInteractionBehaviour> ActiveBehaviours {
       get { return _activeBehaviours; }
+    }
+
+    /// <summary> If set to true, BeganActive and EndedActive will be calculated and populated. </summary>
+    public bool trackStateChanges = true;
+    private HashSet<IInteractionBehaviour> _activeBehavioursLastFrame = new HashSet<IInteractionBehaviour>();
+    private HashSet<IInteractionBehaviour> _beganActiveBehaviours = new HashSet<IInteractionBehaviour>();
+    public HashSet<IInteractionBehaviour> BeganActive {
+      get { return _beganActiveBehaviours; }
+    }
+    private HashSet<IInteractionBehaviour> _endedActiveBehaviours = new HashSet<IInteractionBehaviour>();
+    public HashSet<IInteractionBehaviour> EndedActive {
+      get { return _endedActiveBehaviours; }
+    }
+
+    public ActivityManager(InteractionManager manager) {
+      this.manager = manager;
+      this.activationRadius = 1F;
     }
 
     public ActivityManager(InteractionManager manager, float activationRadius) {
@@ -28,51 +45,85 @@ namespace Leap.Unity.UI.Interaction {
       this.activationRadius = activationRadius;
     }
 
-    public void FixedUpdateHand(Hand hand) {
-      int count = GetSphereColliderResults(hand, _colliderResultsBuffer, out _colliderResultsBuffer);
-      UpdateActiveList(count, _colliderResultsBuffer);
-    }
+    public void FixedUpdatePosition(Vector3 palmPosition, List<LeapSpace> spaces = null) {
+      using (new ProfilerSample("Update Actvity Manager")) {
+        _activeBehaviours.Clear();
 
-    private int GetSphereColliderResults(Hand hand, Collider[] resultsBuffer_in, out Collider[] resultsBuffer_out) {
-      resultsBuffer_out = resultsBuffer_in;
-      if (hand == null) return 0;
+        if (palmPosition != Vector3.zero) {
+          int count = GetSphereColliderResults(palmPosition, ref _colliderResultsBuffer);
+          UpdateActiveList(count, _colliderResultsBuffer);
 
-      int overlapCount = 0;
-      while (true) {
-        overlapCount = Physics.OverlapSphereNonAlloc(hand.PalmPosition.ToVector3(),
-                                                         activationRadius * 100,
-                                                         resultsBuffer_in,
-                                                         ~0,
-                                                         QueryTriggerInteraction.Collide);
-        if (overlapCount < resultsBuffer_out.Length) {
-          break;
+          if (spaces != null) {
+            //Check once in each of the GUI's subspaces
+            foreach (LeapSpace space in spaces) {
+              count = GetSphereColliderResults(transformPoint(palmPosition, space), ref _colliderResultsBuffer);
+              UpdateActiveList(count, _colliderResultsBuffer);
+            }
+          }
         }
-        else {
-          // Non-allocating sphere-overlap fills the existing _resultsBuffer array.
-          // If the output overlapCount is equal to the array's length, there might be more collision results
-          // that couldn't be returned because the array wasn't large enough, so try again with increased length.
-          // The _in, _out argument setup allows allocating a new array from within this function.
-          resultsBuffer_out = new Collider[resultsBuffer_out.Length * 2];
-          resultsBuffer_in = resultsBuffer_out;
+
+        if (trackStateChanges) {
+          _endedActiveBehaviours.Clear();
+          _beganActiveBehaviours.Clear();
+
+          foreach (var behaviour in _activeBehaviours) {
+            if (!_activeBehavioursLastFrame.Contains(behaviour)) {
+              _beganActiveBehaviours.Add(behaviour);
+            }
+          }
+
+          foreach (var behaviour in _activeBehavioursLastFrame) {
+            if (!_activeBehaviours.Contains(behaviour)) {
+              _endedActiveBehaviours.Add(behaviour);
+            }
+          }
+
+          _activeBehavioursLastFrame.Clear();
+          foreach (var behaviour in _activeBehaviours) {
+            _activeBehavioursLastFrame.Add(behaviour);
+          }
         }
       }
-      return overlapCount;
+    }
+
+    private int GetSphereColliderResults(Vector3 position, ref Collider[] resultsBuffer) {
+      using (new ProfilerSample("GetSphereColliderResults()")) {
+        int overlapCount = 0;
+        while (true) {
+          overlapCount = Physics.OverlapSphereNonAlloc(position,
+                                                       activationRadius,
+                                                       resultsBuffer,
+                                                       manager.interactionLayer.layerMask | manager.interactionNoContactLayer.layerMask,
+                                                       QueryTriggerInteraction.Collide);
+          if (overlapCount < resultsBuffer.Length) {
+            break;
+          } else {
+            // Non-allocating sphere-overlap fills the existing _resultsBuffer array.
+            // If the output overlapCount is equal to the array's length, there might be more collision results
+            // that couldn't be returned because the array wasn't large enough, so try again with increased length.
+            // The _in, _out argument setup allows allocating a new array from within this function.
+            resultsBuffer = new Collider[resultsBuffer.Length * 2];
+          }
+        }
+        return overlapCount;
+      }
     }
 
     private void UpdateActiveList(int numResults, Collider[] results) {
-      _activeBehaviours.Clear();
-
       for (int i = 0; i < numResults; i++) {
         if (results[i].attachedRigidbody != null) {
           Rigidbody body = results[i].attachedRigidbody;
-          InteractionBehaviourBase interactionObj;
-          if (body != null && manager.RigidbodyRegistry.TryGetValue(body, out interactionObj)) {
+          IInteractionBehaviour interactionObj;
+          if (body != null && manager.rigidbodyRegistry.TryGetValue(body, out interactionObj)) {
             _activeBehaviours.Add(interactionObj);
           }
         }
       }
     }
 
+    private Vector3 transformPoint(Vector3 worldPoint, LeapSpace space) {
+      Vector3 localPalmPos = space.transform.InverseTransformPoint(worldPoint);
+      return space.transform.TransformPoint(space.transformer.InverseTransformPoint(localPalmPos));
+    }
   }
-
 }

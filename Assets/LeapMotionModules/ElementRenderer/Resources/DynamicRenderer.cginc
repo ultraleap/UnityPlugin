@@ -140,15 +140,15 @@ struct appdata_gui_dynamic {
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_0
-  float2 uv0 : TEXCOORD0;
+  float4 uv0 : TEXCOORD0;
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_1
-  float2 uv1 : TEXCOORD1;
+  float4 uv1 : TEXCOORD1;
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_2
-  float2 uv2 : TEXCOORD2;
+  float4 uv2 : TEXCOORD2;
 #endif
 
 #ifdef GUI_ELEMENTS_HAVE_ID
@@ -168,15 +168,15 @@ struct v2f_gui_dynamic {
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_0
-  float2 uv0 : TEXCOORD0;
+  float4 uv0 : TEXCOORD0;
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_1
-  float2 uv1 : TEXCOORD2;
+  float4 uv1 : TEXCOORD2;
 #endif
 
 #ifdef LEAP_GUI_VERTEX_UV_2
-  float2 uv2 : TEXCOORD3;
+  float4 uv2 : TEXCOORD3;
 #endif
 
 #ifdef GUI_ELEMENTS_HAVE_COLOR
@@ -186,7 +186,11 @@ struct v2f_gui_dynamic {
 
 v2f_gui_dynamic ApplyDynamicGui(appdata_gui_dynamic v) {
 #ifdef GUI_ELEMENTS_HAVE_ID
+#ifdef GUI_ELEMENT_ID_FROM_UV0
+  int elementId = v.uv0.w;
+#else
   int elementId = v.vertInfo.w;
+#endif
 #endif
 
 #ifdef GUI_ELEMENTS_NEED_ANCHOR_SPACE
