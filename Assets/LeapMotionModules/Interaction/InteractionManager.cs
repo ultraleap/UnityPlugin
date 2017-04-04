@@ -455,8 +455,7 @@ namespace Leap.Unity.UI.Interaction {
     
     private delegate V StateChangeCheckFunc<H, T, V>(H hand, out T obj);
     private delegate V MultiStateChangeCheckFunc<H, T, V>(H hand, out HashSet<T> objs);
-    
-    private static Pool<List<InteractionHand>> s_intHandsListPool = new Pool<List<InteractionHand>>();
+
     private static Dictionary<IInteractionBehaviour, List<InteractionHand>> s_objHandsMap = new Dictionary<IInteractionBehaviour, List<InteractionHand>>();
 
     /// <summary>
@@ -476,7 +475,7 @@ namespace Leap.Unity.UI.Interaction {
         IInteractionBehaviour objectWhoseStateChanged;
         if (stateCheckFunc(hand, out objectWhoseStateChanged)) {
           if (!s_objHandsMap.ContainsKey(objectWhoseStateChanged)) {
-            s_objHandsMap[objectWhoseStateChanged] = s_intHandsListPool.Take();
+            s_objHandsMap[objectWhoseStateChanged] = Pool<List<InteractionHand>>.Spawn();
           }
           s_objHandsMap[objectWhoseStateChanged].Add(hand);
         }
@@ -487,7 +486,7 @@ namespace Leap.Unity.UI.Interaction {
 
         // Clear each hands list and return it to the list pool.
         objHandsPair.Value.Clear();
-        s_intHandsListPool.Return(objHandsPair.Value);
+        Pool<List<InteractionHand>>.Recycle(objHandsPair.Value);
       }
     }
 
@@ -508,7 +507,7 @@ namespace Leap.Unity.UI.Interaction {
         if (multiObjectStateCheckFunc(hand, out stateChangedObjects)) {
           foreach (var stateChangedObject in stateChangedObjects) {
             if (!s_objHandsMap.ContainsKey(stateChangedObject)) {
-              s_objHandsMap[stateChangedObject] = s_intHandsListPool.Take();
+              s_objHandsMap[stateChangedObject] = Pool<List<InteractionHand>>.Spawn();
             }
             s_objHandsMap[stateChangedObject].Add(hand);
           }
@@ -520,7 +519,7 @@ namespace Leap.Unity.UI.Interaction {
 
         // Clear each hands list and return it to the list pool.
         objHandsPair.Value.Clear();
-        s_intHandsListPool.Return(objHandsPair.Value);
+        Pool<List<InteractionHand>>.Recycle(objHandsPair.Value);
       }
     }
 
@@ -600,33 +599,6 @@ namespace Leap.Unity.UI.Interaction {
 
       //After copy and set we enable the interaction between the brushes and interaction objects
       Physics.IgnoreLayerCollision(_contactBoneLayer, _interactionLayer, false);
-    }
-
-    private class Pool<T> where T : new() {
-
-      private Queue<T> _pool = new Queue<T>();
-
-      public Pool(int initSize = 4) {
-        for (int i = 0; i < initSize; i++) {
-          MakeNew();
-        }
-      }
-
-      public T Take() {
-        if (_pool.Count == 0) {
-          MakeNew();
-        }
-        return _pool.Dequeue();
-      }
-
-      private void MakeNew() {
-        Return(new T());
-      }
-
-      public void Return(T t) {
-        _pool.Enqueue(t);
-      }
-
     }
 
     #endregion
