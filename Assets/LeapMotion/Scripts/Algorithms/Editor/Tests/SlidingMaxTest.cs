@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 
-namespace Leap.Unity.Graphing.Tests {
+namespace Leap.Unity {
 
   public class SlidingMaxTest {
     public const int MAX_HISTORY = 64;
