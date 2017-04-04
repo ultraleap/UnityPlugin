@@ -72,7 +72,10 @@ namespace Leap.Unity.UI.Interaction {
     private ActivityManager _hoverActivityManager;
     public ActivityManager hoverActivityManager {
       get {
-        if (_hoverActivityManager == null) { _hoverActivityManager = new ActivityManager(interactionManager); }
+        if (_hoverActivityManager == null) {
+          _hoverActivityManager = new ActivityManager(interactionManager);
+          _hoverActivityManager.filter = (intObj) => { return !intObj.ignoreHover; };
+        }
         return _hoverActivityManager;
       }
     }
@@ -870,7 +873,10 @@ namespace Leap.Unity.UI.Interaction {
     /// <summary> Determines which objects are graspable any given frame. </summary>
     private ActivityManager graspActivityManager {
       get {
-        if (_graspActivityManager == null) _graspActivityManager = new ActivityManager(interactionManager);
+        if (_graspActivityManager == null) {
+          _graspActivityManager = new ActivityManager(interactionManager);
+          _graspActivityManager.filter = (intObj) => { return !intObj.ignoreGrasping; };
+        }
         return _graspActivityManager;
       }
     }

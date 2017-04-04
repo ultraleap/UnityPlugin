@@ -1,5 +1,6 @@
 ﻿using Leap.Unity.Space;
 using Leap.Unity.UI.Interaction.Internal;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,6 +16,10 @@ namespace Leap.Unity.UI.Interaction {
 
     public float activationRadius;
     public InteractionManager manager;
+
+    /// <summary> If non-null, only IInteractionBehaviours for which this function returns true
+    /// will be added to the active behaviours list. </summary>
+    public Func<IInteractionBehaviour, bool> filter = null;
 
     private Collider[] _colliderResultsBuffer = new Collider[32];
     private HashSet<IInteractionBehaviour> _activeBehaviours = new HashSet<IInteractionBehaviour>();
@@ -114,7 +119,8 @@ namespace Leap.Unity.UI.Interaction {
         if (results[i].attachedRigidbody != null) {
           Rigidbody body = results[i].attachedRigidbody;
           IInteractionBehaviour interactionObj;
-          if (body != null && manager.rigidbodyRegistry.TryGetValue(body, out interactionObj)) {
+          if (body != null && manager.rigidbodyRegistry.TryGetValue(body, out interactionObj)
+              && filter != null && filter(interactionObj)) {
             _activeBehaviours.Add(interactionObj);
           }
         }
