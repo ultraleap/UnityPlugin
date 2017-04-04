@@ -16,14 +16,14 @@ namespace Leap.Unity.GraphicalRenderer {
     protected virtual void OnValidate() {
       if (_persistentId == 0) {
         _persistentId = new Hash() {
-        this,
-        gameObject,
-        name,
-        transform.position,
-        transform.rotation,
-        transform.localScale,
-        Random.Range(int.MinValue, int.MaxValue),
-      };
+          this,
+          gameObject,
+          name,
+          transform.position,
+          transform.rotation,
+          transform.localScale,
+          Random.Range(int.MinValue, int.MaxValue),
+        };
       }
 
       var attatched = GetComponent<AttachedComponent>();
