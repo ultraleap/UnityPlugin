@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44608885, g: 0.49058884, b: 0.546173, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -102,13 +102,13 @@ GameObject:
   - component: {fileID: 64192841}
   - component: {fileID: 64192847}
   - component: {fileID: 64192846}
-  - component: {fileID: 64192845}
-  - component: {fileID: 64192848}
   - component: {fileID: 64192844}
   - component: {fileID: 64192843}
   - component: {fileID: 64192842}
-  - component: {fileID: 64192849}
   - component: {fileID: 64192850}
+  - component: {fileID: 64192848}
+  - component: {fileID: 64192845}
+  - component: {fileID: 64192849}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -186,10 +186,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1647244062
-  element: {fileID: 64192847}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -1531927343
+  graphic: {fileID: 64192847}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &64192846
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -215,14 +215,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 64192846}
-  _data:
-  - {fileID: 64192845}
+  _featureData:
   - {fileID: 64192848}
+  - {fileID: 64192845}
   - {fileID: 64192849}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &64192848
@@ -236,10 +236,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -239968229
-  element: {fileID: 64192847}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -700619328
+  graphic: {fileID: 64192847}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &64192849
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -251,10 +251,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1375968865
-  element: {fileID: 64192847}
+  _persistentId: -2010749972
+  graphic: {fileID: 64192847}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &64192850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -326,6 +326,37 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
   m_IsPrefabParent: 0
+--- !u!21 &73545932
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Graphic Material
+  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  m_ShaderKeywords: GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
+    GRAPHIC_RENDERER_TINTING GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_UV_0
+  m_LightmapFlags: 5
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  m_SavedProperties:
+    serializedVersion: 2
+    m_TexEnvs:
+    - first:
+        name: _MainTex
+      second:
+        m_Texture: {fileID: 28916055646574168, guid: ac324197ba553b6429bcaf4a85d359d0,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - first:
+        name: _MainTex2
+      second:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &85754730
 GameObject:
   m_ObjectHideFlags: 0
@@ -336,13 +367,13 @@ GameObject:
   - component: {fileID: 85754731}
   - component: {fileID: 85754737}
   - component: {fileID: 85754736}
-  - component: {fileID: 85754735}
-  - component: {fileID: 85754738}
   - component: {fileID: 85754734}
   - component: {fileID: 85754733}
   - component: {fileID: 85754732}
-  - component: {fileID: 85754739}
   - component: {fileID: 85754740}
+  - component: {fileID: 85754738}
+  - component: {fileID: 85754735}
+  - component: {fileID: 85754739}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -420,10 +451,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 762346813
-  element: {fileID: 85754737}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -1463026430
+  graphic: {fileID: 85754737}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &85754736
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -449,14 +480,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 85754736}
-  _data:
-  - {fileID: 85754735}
+  _featureData:
   - {fileID: 85754738}
+  - {fileID: 85754735}
   - {fileID: 85754739}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &85754738
@@ -470,10 +501,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1810888128
-  element: {fileID: 85754737}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -933068358
+  graphic: {fileID: 85754737}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &85754739
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -485,10 +516,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -228490132
-  element: {fileID: 85754737}
+  _persistentId: -1511723207
+  graphic: {fileID: 85754737}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &85754740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -524,13 +555,13 @@ GameObject:
   - component: {fileID: 107997307}
   - component: {fileID: 107997313}
   - component: {fileID: 107997312}
-  - component: {fileID: 107997311}
-  - component: {fileID: 107997314}
   - component: {fileID: 107997310}
   - component: {fileID: 107997309}
   - component: {fileID: 107997308}
-  - component: {fileID: 107997315}
   - component: {fileID: 107997316}
+  - component: {fileID: 107997314}
+  - component: {fileID: 107997311}
+  - component: {fileID: 107997315}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -608,10 +639,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -850026469
-  element: {fileID: 107997313}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 101199474
+  graphic: {fileID: 107997313}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &107997312
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -637,14 +668,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 107997312}
-  _data:
-  - {fileID: 107997311}
+  _featureData:
   - {fileID: 107997314}
+  - {fileID: 107997311}
   - {fileID: 107997315}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &107997314
@@ -658,10 +689,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1028530138
-  element: {fileID: 107997313}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -1337573561
+  graphic: {fileID: 107997313}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &107997315
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -673,10 +704,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -679621232
-  element: {fileID: 107997313}
+  _persistentId: 463471467
+  graphic: {fileID: 107997313}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &107997316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -712,13 +743,13 @@ GameObject:
   - component: {fileID: 123467803}
   - component: {fileID: 123467809}
   - component: {fileID: 123467808}
-  - component: {fileID: 123467807}
-  - component: {fileID: 123467810}
   - component: {fileID: 123467806}
   - component: {fileID: 123467805}
   - component: {fileID: 123467804}
-  - component: {fileID: 123467811}
   - component: {fileID: 123467812}
+  - component: {fileID: 123467810}
+  - component: {fileID: 123467807}
+  - component: {fileID: 123467811}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -796,10 +827,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 748033989
-  element: {fileID: 123467809}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -1459300468
+  graphic: {fileID: 123467809}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &123467808
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -825,14 +856,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 123467808}
-  _data:
-  - {fileID: 123467807}
+  _featureData:
   - {fileID: 123467810}
+  - {fileID: 123467807}
   - {fileID: 123467811}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &123467810
@@ -846,10 +877,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1081148312
-  element: {fileID: 123467809}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -990434310
+  graphic: {fileID: 123467809}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &123467811
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -861,10 +892,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1547040677
-  element: {fileID: 123467809}
+  _persistentId: -223977792
+  graphic: {fileID: 123467809}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &123467812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -900,13 +931,13 @@ GameObject:
   - component: {fileID: 179600832}
   - component: {fileID: 179600838}
   - component: {fileID: 179600837}
-  - component: {fileID: 179600836}
-  - component: {fileID: 179600839}
   - component: {fileID: 179600835}
   - component: {fileID: 179600834}
   - component: {fileID: 179600833}
-  - component: {fileID: 179600840}
   - component: {fileID: 179600841}
+  - component: {fileID: 179600839}
+  - component: {fileID: 179600836}
+  - component: {fileID: 179600840}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -984,10 +1015,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1360061999
-  element: {fileID: 179600838}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 1640561010
+  graphic: {fileID: 179600838}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &179600837
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1013,14 +1044,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 179600837}
-  _data:
-  - {fileID: 179600836}
+  _featureData:
   - {fileID: 179600839}
+  - {fileID: 179600836}
   - {fileID: 179600840}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &179600839
@@ -1034,10 +1065,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -600688239
-  element: {fileID: 179600838}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -2133239840
+  graphic: {fileID: 179600838}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &179600840
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1049,10 +1080,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1276087247
-  element: {fileID: 179600838}
+  _persistentId: 176154101
+  graphic: {fileID: 179600838}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &179600841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1134,13 +1165,13 @@ GameObject:
   - component: {fileID: 256333721}
   - component: {fileID: 256333727}
   - component: {fileID: 256333726}
-  - component: {fileID: 256333725}
-  - component: {fileID: 256333728}
   - component: {fileID: 256333724}
   - component: {fileID: 256333723}
   - component: {fileID: 256333722}
-  - component: {fileID: 256333729}
   - component: {fileID: 256333730}
+  - component: {fileID: 256333728}
+  - component: {fileID: 256333725}
+  - component: {fileID: 256333729}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -1218,10 +1249,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -705603260
-  element: {fileID: 256333727}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -689991249
+  graphic: {fileID: 256333727}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &256333726
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1247,14 +1278,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 256333726}
-  _data:
-  - {fileID: 256333725}
+  _featureData:
   - {fileID: 256333728}
+  - {fileID: 256333725}
   - {fileID: 256333729}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &256333728
@@ -1268,10 +1299,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1459447910
-  element: {fileID: 256333727}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -993393777
+  graphic: {fileID: 256333727}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &256333729
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1283,10 +1314,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1263491883
-  element: {fileID: 256333727}
+  _persistentId: -1449564836
+  graphic: {fileID: 256333727}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &256333730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1322,13 +1353,13 @@ GameObject:
   - component: {fileID: 296849244}
   - component: {fileID: 296849250}
   - component: {fileID: 296849249}
-  - component: {fileID: 296849248}
-  - component: {fileID: 296849251}
   - component: {fileID: 296849247}
   - component: {fileID: 296849246}
   - component: {fileID: 296849245}
-  - component: {fileID: 296849252}
   - component: {fileID: 296849253}
+  - component: {fileID: 296849251}
+  - component: {fileID: 296849248}
+  - component: {fileID: 296849252}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -1406,10 +1437,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1998819348
-  element: {fileID: 296849250}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -2033549681
+  graphic: {fileID: 296849250}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &296849249
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1435,14 +1466,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 296849249}
-  _data:
-  - {fileID: 296849248}
+  _featureData:
   - {fileID: 296849251}
+  - {fileID: 296849248}
   - {fileID: 296849252}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &296849251
@@ -1456,10 +1487,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -90254075
-  element: {fileID: 296849250}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1174847714
+  graphic: {fileID: 296849250}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &296849252
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1471,10 +1502,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1951130302
-  element: {fileID: 296849250}
+  _persistentId: 1202149882
+  graphic: {fileID: 296849250}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &296849253
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1510,13 +1541,13 @@ GameObject:
   - component: {fileID: 375145573}
   - component: {fileID: 375145579}
   - component: {fileID: 375145578}
-  - component: {fileID: 375145577}
-  - component: {fileID: 375145580}
   - component: {fileID: 375145576}
   - component: {fileID: 375145575}
   - component: {fileID: 375145574}
-  - component: {fileID: 375145581}
   - component: {fileID: 375145582}
+  - component: {fileID: 375145580}
+  - component: {fileID: 375145577}
+  - component: {fileID: 375145581}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -1594,10 +1625,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -328765156
-  element: {fileID: 375145579}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 866140787
+  graphic: {fileID: 375145579}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &375145578
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1623,14 +1654,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 375145578}
-  _data:
-  - {fileID: 375145577}
+  _featureData:
   - {fileID: 375145580}
+  - {fileID: 375145577}
   - {fileID: 375145581}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &375145580
@@ -1644,10 +1675,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1127229534
-  element: {fileID: 375145579}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1733891147
+  graphic: {fileID: 375145579}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &375145581
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1659,10 +1690,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1057479881
-  element: {fileID: 375145579}
+  _persistentId: 130388870
+  graphic: {fileID: 375145579}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &375145582
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1698,13 +1729,13 @@ GameObject:
   - component: {fileID: 376263670}
   - component: {fileID: 376263676}
   - component: {fileID: 376263675}
-  - component: {fileID: 376263674}
-  - component: {fileID: 376263677}
   - component: {fileID: 376263673}
   - component: {fileID: 376263672}
   - component: {fileID: 376263671}
-  - component: {fileID: 376263678}
   - component: {fileID: 376263679}
+  - component: {fileID: 376263677}
+  - component: {fileID: 376263674}
+  - component: {fileID: 376263678}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -1782,10 +1813,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -290360967
-  element: {fileID: 376263676}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 1874525969
+  graphic: {fileID: 376263676}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &376263675
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1811,14 +1842,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 376263675}
-  _data:
-  - {fileID: 376263674}
+  _featureData:
   - {fileID: 376263677}
+  - {fileID: 376263674}
   - {fileID: 376263678}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &376263677
@@ -1832,10 +1863,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1082012366
-  element: {fileID: 376263676}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1620780556
+  graphic: {fileID: 376263676}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &376263678
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1847,10 +1878,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1904726610
-  element: {fileID: 376263676}
+  _persistentId: -583808377
+  graphic: {fileID: 376263676}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &376263679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1978,13 +2009,13 @@ GameObject:
   - component: {fileID: 495407662}
   - component: {fileID: 495407668}
   - component: {fileID: 495407667}
-  - component: {fileID: 495407666}
-  - component: {fileID: 495407669}
   - component: {fileID: 495407665}
   - component: {fileID: 495407664}
   - component: {fileID: 495407663}
-  - component: {fileID: 495407670}
   - component: {fileID: 495407671}
+  - component: {fileID: 495407669}
+  - component: {fileID: 495407666}
+  - component: {fileID: 495407670}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -2062,10 +2093,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 773565954
-  element: {fileID: 495407668}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -332950632
+  graphic: {fileID: 495407668}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &495407667
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2091,14 +2122,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 495407667}
-  _data:
-  - {fileID: 495407666}
+  _featureData:
   - {fileID: 495407669}
+  - {fileID: 495407666}
   - {fileID: 495407670}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &495407669
@@ -2112,10 +2143,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 893967756
-  element: {fileID: 495407668}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -1078493905
+  graphic: {fileID: 495407668}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &495407670
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -2127,10 +2158,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -677102625
-  element: {fileID: 495407668}
+  _persistentId: -1404214299
+  graphic: {fileID: 495407668}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &495407671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2166,13 +2197,13 @@ GameObject:
   - component: {fileID: 552256743}
   - component: {fileID: 552256749}
   - component: {fileID: 552256748}
-  - component: {fileID: 552256747}
-  - component: {fileID: 552256750}
   - component: {fileID: 552256746}
   - component: {fileID: 552256745}
   - component: {fileID: 552256744}
-  - component: {fileID: 552256751}
   - component: {fileID: 552256752}
+  - component: {fileID: 552256750}
+  - component: {fileID: 552256747}
+  - component: {fileID: 552256751}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -2250,10 +2281,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 553958401
-  element: {fileID: 552256749}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -1099954993
+  graphic: {fileID: 552256749}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &552256748
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2279,14 +2310,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 552256748}
-  _data:
-  - {fileID: 552256747}
+  _featureData:
   - {fileID: 552256750}
+  - {fileID: 552256747}
   - {fileID: 552256751}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &552256750
@@ -2300,10 +2331,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 988502195
-  element: {fileID: 552256749}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 541078329
+  graphic: {fileID: 552256749}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &552256751
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -2315,10 +2346,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1283361293
-  element: {fileID: 552256749}
+  _persistentId: -681484967
+  graphic: {fileID: 552256749}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &552256752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2354,13 +2385,13 @@ GameObject:
   - component: {fileID: 564590846}
   - component: {fileID: 564590852}
   - component: {fileID: 564590851}
-  - component: {fileID: 564590850}
-  - component: {fileID: 564590853}
   - component: {fileID: 564590849}
   - component: {fileID: 564590848}
   - component: {fileID: 564590847}
-  - component: {fileID: 564590854}
   - component: {fileID: 564590855}
+  - component: {fileID: 564590853}
+  - component: {fileID: 564590850}
+  - component: {fileID: 564590854}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -2438,10 +2469,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -265759134
-  element: {fileID: 564590852}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -663453263
+  graphic: {fileID: 564590852}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &564590851
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2467,14 +2498,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 564590851}
-  _data:
-  - {fileID: 564590850}
+  _featureData:
   - {fileID: 564590853}
+  - {fileID: 564590850}
   - {fileID: 564590854}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &564590853
@@ -2488,10 +2519,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -422785388
-  element: {fileID: 564590852}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -891386700
+  graphic: {fileID: 564590852}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &564590854
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -2503,10 +2534,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -146593750
-  element: {fileID: 564590852}
+  _persistentId: 815203776
+  graphic: {fileID: 564590852}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &564590855
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2542,13 +2573,13 @@ GameObject:
   - component: {fileID: 593503970}
   - component: {fileID: 593503976}
   - component: {fileID: 593503975}
-  - component: {fileID: 593503974}
-  - component: {fileID: 593503977}
   - component: {fileID: 593503973}
   - component: {fileID: 593503972}
   - component: {fileID: 593503971}
-  - component: {fileID: 593503978}
   - component: {fileID: 593503979}
+  - component: {fileID: 593503977}
+  - component: {fileID: 593503974}
+  - component: {fileID: 593503978}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -2626,10 +2657,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1532979718
-  element: {fileID: 593503976}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -175570665
+  graphic: {fileID: 593503976}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &593503975
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2655,14 +2686,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 593503975}
-  _data:
-  - {fileID: 593503974}
+  _featureData:
   - {fileID: 593503977}
+  - {fileID: 593503974}
   - {fileID: 593503978}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &593503977
@@ -2676,10 +2707,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -450054566
-  element: {fileID: 593503976}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -1193146070
+  graphic: {fileID: 593503976}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &593503978
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -2691,10 +2722,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1654518560
-  element: {fileID: 593503976}
+  _persistentId: 965189356
+  graphic: {fileID: 593503976}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &593503979
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2730,13 +2761,13 @@ GameObject:
   - component: {fileID: 596105433}
   - component: {fileID: 596105439}
   - component: {fileID: 596105438}
-  - component: {fileID: 596105437}
-  - component: {fileID: 596105440}
   - component: {fileID: 596105436}
   - component: {fileID: 596105435}
   - component: {fileID: 596105434}
-  - component: {fileID: 596105441}
   - component: {fileID: 596105442}
+  - component: {fileID: 596105440}
+  - component: {fileID: 596105437}
+  - component: {fileID: 596105441}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -2814,10 +2845,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1188497905
-  element: {fileID: 596105439}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 1006679318
+  graphic: {fileID: 596105439}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &596105438
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2843,14 +2874,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 596105438}
-  _data:
-  - {fileID: 596105437}
+  _featureData:
   - {fileID: 596105440}
+  - {fileID: 596105437}
   - {fileID: 596105441}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &596105440
@@ -2864,10 +2895,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1734567066
-  element: {fileID: 596105439}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -582500193
+  graphic: {fileID: 596105439}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &596105441
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -2879,10 +2910,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 557614562
-  element: {fileID: 596105439}
+  _persistentId: 2099616874
+  graphic: {fileID: 596105439}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &596105442
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3001,13 +3032,13 @@ GameObject:
   - component: {fileID: 675884435}
   - component: {fileID: 675884441}
   - component: {fileID: 675884440}
-  - component: {fileID: 675884439}
-  - component: {fileID: 675884442}
   - component: {fileID: 675884438}
   - component: {fileID: 675884437}
   - component: {fileID: 675884436}
-  - component: {fileID: 675884443}
   - component: {fileID: 675884444}
+  - component: {fileID: 675884442}
+  - component: {fileID: 675884439}
+  - component: {fileID: 675884443}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -3085,10 +3116,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -614127567
-  element: {fileID: 675884441}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 413803407
+  graphic: {fileID: 675884441}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &675884440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3114,14 +3145,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 675884440}
-  _data:
-  - {fileID: 675884439}
+  _featureData:
   - {fileID: 675884442}
+  - {fileID: 675884439}
   - {fileID: 675884443}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &675884442
@@ -3135,10 +3166,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 827120344
-  element: {fileID: 675884441}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1164547104
+  graphic: {fileID: 675884441}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &675884443
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -3150,10 +3181,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1828517476
-  element: {fileID: 675884441}
+  _persistentId: -1497087627
+  graphic: {fileID: 675884441}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &675884444
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3189,13 +3220,13 @@ GameObject:
   - component: {fileID: 698303312}
   - component: {fileID: 698303318}
   - component: {fileID: 698303317}
-  - component: {fileID: 698303316}
-  - component: {fileID: 698303319}
   - component: {fileID: 698303315}
   - component: {fileID: 698303314}
   - component: {fileID: 698303313}
-  - component: {fileID: 698303320}
   - component: {fileID: 698303321}
+  - component: {fileID: 698303319}
+  - component: {fileID: 698303316}
+  - component: {fileID: 698303320}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -3273,10 +3304,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 454653170
-  element: {fileID: 698303318}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 944014163
+  graphic: {fileID: 698303318}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &698303317
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3302,14 +3333,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 698303317}
-  _data:
-  - {fileID: 698303316}
+  _featureData:
   - {fileID: 698303319}
+  - {fileID: 698303316}
   - {fileID: 698303320}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &698303319
@@ -3323,10 +3354,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1011042978
-  element: {fileID: 698303318}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -59994913
+  graphic: {fileID: 698303318}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &698303320
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -3338,10 +3369,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1040174346
-  element: {fileID: 698303318}
+  _persistentId: 1106564421
+  graphic: {fileID: 698303318}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &698303321
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3377,13 +3408,13 @@ GameObject:
   - component: {fileID: 711919871}
   - component: {fileID: 711919877}
   - component: {fileID: 711919876}
-  - component: {fileID: 711919875}
-  - component: {fileID: 711919878}
   - component: {fileID: 711919874}
   - component: {fileID: 711919873}
   - component: {fileID: 711919872}
-  - component: {fileID: 711919879}
   - component: {fileID: 711919880}
+  - component: {fileID: 711919878}
+  - component: {fileID: 711919875}
+  - component: {fileID: 711919879}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -3461,10 +3492,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1500445899
-  element: {fileID: 711919877}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -552546357
+  graphic: {fileID: 711919877}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &711919876
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3490,14 +3521,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 711919876}
-  _data:
-  - {fileID: 711919875}
+  _featureData:
   - {fileID: 711919878}
+  - {fileID: 711919875}
   - {fileID: 711919879}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &711919878
@@ -3511,10 +3542,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1314131663
-  element: {fileID: 711919877}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -483961016
+  graphic: {fileID: 711919877}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &711919879
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -3526,10 +3557,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1697128552
-  element: {fileID: 711919877}
+  _persistentId: 325585740
+  graphic: {fileID: 711919877}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &711919880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3565,13 +3596,13 @@ GameObject:
   - component: {fileID: 722891431}
   - component: {fileID: 722891437}
   - component: {fileID: 722891436}
-  - component: {fileID: 722891435}
-  - component: {fileID: 722891438}
   - component: {fileID: 722891434}
   - component: {fileID: 722891433}
   - component: {fileID: 722891432}
-  - component: {fileID: 722891439}
   - component: {fileID: 722891440}
+  - component: {fileID: 722891438}
+  - component: {fileID: 722891435}
+  - component: {fileID: 722891439}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -3649,10 +3680,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1199015755
-  element: {fileID: 722891437}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 1809987011
+  graphic: {fileID: 722891437}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &722891436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3678,14 +3709,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 722891436}
-  _data:
-  - {fileID: 722891435}
+  _featureData:
   - {fileID: 722891438}
+  - {fileID: 722891435}
   - {fileID: 722891439}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &722891438
@@ -3699,10 +3730,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1438963798
-  element: {fileID: 722891437}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 507130010
+  graphic: {fileID: 722891437}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &722891439
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -3714,10 +3745,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1626255328
-  element: {fileID: 722891437}
+  _persistentId: 511536609
+  graphic: {fileID: 722891437}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &722891440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3753,13 +3784,13 @@ GameObject:
   - component: {fileID: 753687246}
   - component: {fileID: 753687252}
   - component: {fileID: 753687251}
-  - component: {fileID: 753687250}
-  - component: {fileID: 753687253}
   - component: {fileID: 753687249}
   - component: {fileID: 753687248}
   - component: {fileID: 753687247}
-  - component: {fileID: 753687254}
   - component: {fileID: 753687255}
+  - component: {fileID: 753687253}
+  - component: {fileID: 753687250}
+  - component: {fileID: 753687254}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -3837,10 +3868,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1469999559
-  element: {fileID: 753687252}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 332928349
+  graphic: {fileID: 753687252}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &753687251
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3866,14 +3897,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 753687251}
-  _data:
-  - {fileID: 753687250}
+  _featureData:
   - {fileID: 753687253}
+  - {fileID: 753687250}
   - {fileID: 753687254}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &753687253
@@ -3887,10 +3918,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1065825166
-  element: {fileID: 753687252}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -1919103261
+  graphic: {fileID: 753687252}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &753687254
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -3902,10 +3933,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 951090578
-  element: {fileID: 753687252}
+  _persistentId: 40252516
+  graphic: {fileID: 753687252}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &753687255
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3941,13 +3972,13 @@ GameObject:
   - component: {fileID: 758070964}
   - component: {fileID: 758070970}
   - component: {fileID: 758070969}
-  - component: {fileID: 758070968}
-  - component: {fileID: 758070971}
   - component: {fileID: 758070967}
   - component: {fileID: 758070966}
   - component: {fileID: 758070965}
-  - component: {fileID: 758070972}
   - component: {fileID: 758070973}
+  - component: {fileID: 758070971}
+  - component: {fileID: 758070968}
+  - component: {fileID: 758070972}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -4025,10 +4056,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1162603887
-  element: {fileID: 758070970}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 1275913768
+  graphic: {fileID: 758070970}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &758070969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4054,14 +4085,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 758070969}
-  _data:
-  - {fileID: 758070968}
+  _featureData:
   - {fileID: 758070971}
+  - {fileID: 758070968}
   - {fileID: 758070972}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &758070971
@@ -4075,10 +4106,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1427847222
-  element: {fileID: 758070970}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 254840224
+  graphic: {fileID: 758070970}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &758070972
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -4090,10 +4121,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -353040971
-  element: {fileID: 758070970}
+  _persistentId: 281486995
+  graphic: {fileID: 758070970}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &758070973
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4129,8 +4160,8 @@ GameObject:
   - component: {fileID: 766838815}
   - component: {fileID: 766838818}
   - component: {fileID: 766838817}
-  - component: {fileID: 766838816}
   - component: {fileID: 766838819}
+  - component: {fileID: 766838816}
   - component: {fileID: 766838820}
   m_Layer: 0
   m_Name: Panel
@@ -4184,10 +4215,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 850003976
-  element: {fileID: 766838818}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 106651628
+  graphic: {fileID: 766838818}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &766838817
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4213,14 +4244,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 766838817}
-  _data:
-  - {fileID: 766838816}
+  _featureData:
   - {fileID: 766838819}
+  - {fileID: 766838816}
   - {fileID: 766838820}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 1, g: 1, b: 1, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &766838819
@@ -4234,9 +4265,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1666788287
-  element: {fileID: 766838818}
-  feature: {fileID: 1776547484}
+  _persistentId: 226284521
+  graphic: {fileID: 766838818}
+  feature: {fileID: 1776547490}
   texture: {fileID: 0}
 --- !u!114 &766838820
 MonoBehaviour:
@@ -4249,10 +4280,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 913956985
-  element: {fileID: 766838818}
+  _persistentId: 310609156
+  graphic: {fileID: 766838818}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &775541596
 GameObject:
   m_ObjectHideFlags: 0
@@ -4263,13 +4294,13 @@ GameObject:
   - component: {fileID: 775541597}
   - component: {fileID: 775541603}
   - component: {fileID: 775541602}
-  - component: {fileID: 775541601}
-  - component: {fileID: 775541604}
   - component: {fileID: 775541600}
   - component: {fileID: 775541599}
   - component: {fileID: 775541598}
-  - component: {fileID: 775541605}
   - component: {fileID: 775541606}
+  - component: {fileID: 775541604}
+  - component: {fileID: 775541601}
+  - component: {fileID: 775541605}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -4347,10 +4378,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1127073254
-  element: {fileID: 775541603}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -1113269770
+  graphic: {fileID: 775541603}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &775541602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4376,14 +4407,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 775541602}
-  _data:
-  - {fileID: 775541601}
+  _featureData:
   - {fileID: 775541604}
+  - {fileID: 775541601}
   - {fileID: 775541605}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &775541604
@@ -4397,10 +4428,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1181613757
-  element: {fileID: 775541603}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -89074251
+  graphic: {fileID: 775541603}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &775541605
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -4412,10 +4443,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1217091468
-  element: {fileID: 775541603}
+  _persistentId: 1844549309
+  graphic: {fileID: 775541603}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &775541606
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4451,13 +4482,13 @@ GameObject:
   - component: {fileID: 982384010}
   - component: {fileID: 982384006}
   - component: {fileID: 982384009}
-  - component: {fileID: 982384008}
-  - component: {fileID: 982384007}
   - component: {fileID: 982384014}
   - component: {fileID: 982384013}
   - component: {fileID: 982384012}
-  - component: {fileID: 982384005}
   - component: {fileID: 982384011}
+  - component: {fileID: 982384008}
+  - component: {fileID: 982384007}
+  - component: {fileID: 982384005}
   m_Layer: 0
   m_Name: Slider
   m_TagString: Untagged
@@ -4476,10 +4507,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 898270773
-  element: {fileID: 982384006}
+  _persistentId: 1527696756
+  graphic: {fileID: 982384006}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &982384006
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4492,14 +4523,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 982384009}
-  _data:
+  _featureData:
   - {fileID: 982384008}
   - {fileID: 982384007}
   - {fileID: 982384005}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &982384007
@@ -4513,8 +4544,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1981619120
-  element: {fileID: 982384006}
+  _persistentId: -965655394
+  graphic: {fileID: 982384006}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
 --- !u!114 &982384008
@@ -4528,10 +4559,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -2079863947
-  element: {fileID: 982384006}
+  _persistentId: -210155532
+  graphic: {fileID: 982384006}
   feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &982384009
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4639,13 +4670,13 @@ GameObject:
   - component: {fileID: 1030474426}
   - component: {fileID: 1030474432}
   - component: {fileID: 1030474431}
-  - component: {fileID: 1030474430}
-  - component: {fileID: 1030474433}
   - component: {fileID: 1030474429}
   - component: {fileID: 1030474428}
   - component: {fileID: 1030474427}
-  - component: {fileID: 1030474434}
   - component: {fileID: 1030474435}
+  - component: {fileID: 1030474433}
+  - component: {fileID: 1030474430}
+  - component: {fileID: 1030474434}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -4723,10 +4754,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 808640794
-  element: {fileID: 1030474432}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 1550047077
+  graphic: {fileID: 1030474432}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1030474431
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4752,14 +4783,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1030474431}
-  _data:
-  - {fileID: 1030474430}
+  _featureData:
   - {fileID: 1030474433}
+  - {fileID: 1030474430}
   - {fileID: 1030474434}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1030474433
@@ -4773,10 +4804,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 783521032
-  element: {fileID: 1030474432}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 631488456
+  graphic: {fileID: 1030474432}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1030474434
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -4788,10 +4819,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 795691892
-  element: {fileID: 1030474432}
+  _persistentId: -1133764347
+  graphic: {fileID: 1030474432}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1030474435
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4827,13 +4858,13 @@ GameObject:
   - component: {fileID: 1044150503}
   - component: {fileID: 1044150509}
   - component: {fileID: 1044150508}
-  - component: {fileID: 1044150507}
-  - component: {fileID: 1044150510}
   - component: {fileID: 1044150506}
   - component: {fileID: 1044150505}
   - component: {fileID: 1044150504}
-  - component: {fileID: 1044150511}
   - component: {fileID: 1044150512}
+  - component: {fileID: 1044150510}
+  - component: {fileID: 1044150507}
+  - component: {fileID: 1044150511}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -4911,10 +4942,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 50678673
-  element: {fileID: 1044150509}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -640241479
+  graphic: {fileID: 1044150509}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1044150508
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4940,14 +4971,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1044150508}
-  _data:
-  - {fileID: 1044150507}
+  _featureData:
   - {fileID: 1044150510}
+  - {fileID: 1044150507}
   - {fileID: 1044150511}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1044150510
@@ -4961,10 +4992,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -10952860
-  element: {fileID: 1044150509}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -1055770137
+  graphic: {fileID: 1044150509}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1044150511
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -4976,10 +5007,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -844045569
-  element: {fileID: 1044150509}
+  _persistentId: -1123713839
+  graphic: {fileID: 1044150509}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1044150512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5015,13 +5046,13 @@ GameObject:
   - component: {fileID: 1052163714}
   - component: {fileID: 1052163720}
   - component: {fileID: 1052163719}
-  - component: {fileID: 1052163718}
-  - component: {fileID: 1052163721}
   - component: {fileID: 1052163717}
   - component: {fileID: 1052163716}
   - component: {fileID: 1052163715}
-  - component: {fileID: 1052163722}
   - component: {fileID: 1052163723}
+  - component: {fileID: 1052163721}
+  - component: {fileID: 1052163718}
+  - component: {fileID: 1052163722}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -5099,10 +5130,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1035064428
-  element: {fileID: 1052163720}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 292681521
+  graphic: {fileID: 1052163720}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1052163719
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5128,14 +5159,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1052163719}
-  _data:
-  - {fileID: 1052163718}
+  _featureData:
   - {fileID: 1052163721}
+  - {fileID: 1052163718}
   - {fileID: 1052163722}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1052163721
@@ -5149,10 +5180,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1970479380
-  element: {fileID: 1052163720}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 2126814049
+  graphic: {fileID: 1052163720}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1052163722
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -5164,10 +5195,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -429580860
-  element: {fileID: 1052163720}
+  _persistentId: 27297971
+  graphic: {fileID: 1052163720}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1052163723
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5321,13 +5352,13 @@ GameObject:
   - component: {fileID: 1093556437}
   - component: {fileID: 1093556443}
   - component: {fileID: 1093556442}
-  - component: {fileID: 1093556441}
-  - component: {fileID: 1093556444}
   - component: {fileID: 1093556440}
   - component: {fileID: 1093556439}
   - component: {fileID: 1093556438}
-  - component: {fileID: 1093556445}
   - component: {fileID: 1093556446}
+  - component: {fileID: 1093556444}
+  - component: {fileID: 1093556441}
+  - component: {fileID: 1093556445}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -5405,10 +5436,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1302161768
-  element: {fileID: 1093556443}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 1772692050
+  graphic: {fileID: 1093556443}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1093556442
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5434,14 +5465,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1093556442}
-  _data:
-  - {fileID: 1093556441}
+  _featureData:
   - {fileID: 1093556444}
+  - {fileID: 1093556441}
   - {fileID: 1093556445}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1093556444
@@ -5455,10 +5486,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1564292843
-  element: {fileID: 1093556443}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1385388700
+  graphic: {fileID: 1093556443}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1093556445
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -5470,10 +5501,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1423847473
-  element: {fileID: 1093556443}
+  _persistentId: -545633947
+  graphic: {fileID: 1093556443}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1093556446
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5509,13 +5540,13 @@ GameObject:
   - component: {fileID: 1122126688}
   - component: {fileID: 1122126694}
   - component: {fileID: 1122126693}
-  - component: {fileID: 1122126692}
-  - component: {fileID: 1122126695}
   - component: {fileID: 1122126691}
   - component: {fileID: 1122126690}
   - component: {fileID: 1122126689}
-  - component: {fileID: 1122126696}
   - component: {fileID: 1122126697}
+  - component: {fileID: 1122126695}
+  - component: {fileID: 1122126692}
+  - component: {fileID: 1122126696}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -5593,10 +5624,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1381350754
-  element: {fileID: 1122126694}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -169053
+  graphic: {fileID: 1122126694}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1122126693
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5622,14 +5653,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1122126693}
-  _data:
-  - {fileID: 1122126692}
+  _featureData:
   - {fileID: 1122126695}
+  - {fileID: 1122126692}
   - {fileID: 1122126696}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1122126695
@@ -5643,10 +5674,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1582713536
-  element: {fileID: 1122126694}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 473818855
+  graphic: {fileID: 1122126694}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1122126696
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -5658,10 +5689,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -792408667
-  element: {fileID: 1122126694}
+  _persistentId: -108201062
+  graphic: {fileID: 1122126694}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1122126697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5802,13 +5833,13 @@ GameObject:
   - component: {fileID: 1280019399}
   - component: {fileID: 1280019405}
   - component: {fileID: 1280019404}
-  - component: {fileID: 1280019403}
-  - component: {fileID: 1280019406}
   - component: {fileID: 1280019402}
   - component: {fileID: 1280019401}
   - component: {fileID: 1280019400}
-  - component: {fileID: 1280019407}
   - component: {fileID: 1280019408}
+  - component: {fileID: 1280019406}
+  - component: {fileID: 1280019403}
+  - component: {fileID: 1280019407}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -5886,10 +5917,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 912760185
-  element: {fileID: 1280019405}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 214252904
+  graphic: {fileID: 1280019405}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1280019404
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5915,14 +5946,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1280019404}
-  _data:
-  - {fileID: 1280019403}
+  _featureData:
   - {fileID: 1280019406}
+  - {fileID: 1280019403}
   - {fileID: 1280019407}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1280019406
@@ -5936,10 +5967,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -349919880
-  element: {fileID: 1280019405}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 495609940
+  graphic: {fileID: 1280019405}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1280019407
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -5951,10 +5982,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 2111448064
-  element: {fileID: 1280019405}
+  _persistentId: 109114420
+  graphic: {fileID: 1280019405}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1280019408
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5990,13 +6021,13 @@ GameObject:
   - component: {fileID: 1294748675}
   - component: {fileID: 1294748681}
   - component: {fileID: 1294748680}
-  - component: {fileID: 1294748679}
-  - component: {fileID: 1294748682}
   - component: {fileID: 1294748678}
   - component: {fileID: 1294748677}
   - component: {fileID: 1294748676}
-  - component: {fileID: 1294748683}
   - component: {fileID: 1294748684}
+  - component: {fileID: 1294748682}
+  - component: {fileID: 1294748679}
+  - component: {fileID: 1294748683}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -6074,10 +6105,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -308972461
-  element: {fileID: 1294748681}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -1199080916
+  graphic: {fileID: 1294748681}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1294748680
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6103,14 +6134,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1294748680}
-  _data:
-  - {fileID: 1294748679}
+  _featureData:
   - {fileID: 1294748682}
+  - {fileID: 1294748679}
   - {fileID: 1294748683}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1294748682
@@ -6124,10 +6155,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -2048713428
-  element: {fileID: 1294748681}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1000500520
+  graphic: {fileID: 1294748681}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1294748683
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -6139,10 +6170,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -461183264
-  element: {fileID: 1294748681}
+  _persistentId: 263647955
+  graphic: {fileID: 1294748681}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1294748684
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6168,36 +6199,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
---- !u!21 &1308893648
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Gui Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: LEAP_GUI_CYLINDRICAL LEAP_GUI_MOVEMENT_TRANSLATION LEAP_GUI_TINTING
-    LEAP_GUI_VERTEX_COLORS LEAP_GUI_VERTEX_UV_0
-  m_LightmapFlags: 5
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  m_SavedProperties:
-    serializedVersion: 2
-    m_TexEnvs:
-    - first:
-        name: _MainTex
-      second:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - first:
-        name: _MainTex2
-      second:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &1319104133
 GameObject:
   m_ObjectHideFlags: 0
@@ -6208,13 +6209,13 @@ GameObject:
   - component: {fileID: 1319104134}
   - component: {fileID: 1319104140}
   - component: {fileID: 1319104139}
-  - component: {fileID: 1319104138}
-  - component: {fileID: 1319104141}
   - component: {fileID: 1319104137}
   - component: {fileID: 1319104136}
   - component: {fileID: 1319104135}
-  - component: {fileID: 1319104142}
   - component: {fileID: 1319104143}
+  - component: {fileID: 1319104141}
+  - component: {fileID: 1319104138}
+  - component: {fileID: 1319104142}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -6292,10 +6293,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1679043911
-  element: {fileID: 1319104140}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 1625856788
+  graphic: {fileID: 1319104140}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1319104139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6321,14 +6322,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1319104139}
-  _data:
-  - {fileID: 1319104138}
+  _featureData:
   - {fileID: 1319104141}
+  - {fileID: 1319104138}
   - {fileID: 1319104142}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1319104141
@@ -6342,10 +6343,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -396674478
-  element: {fileID: 1319104140}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1643276909
+  graphic: {fileID: 1319104140}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1319104142
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -6357,10 +6358,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 347863953
-  element: {fileID: 1319104140}
+  _persistentId: -1603262369
+  graphic: {fileID: 1319104140}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1319104143
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6396,8 +6397,8 @@ GameObject:
   - component: {fileID: 1369518617}
   - component: {fileID: 1369518620}
   - component: {fileID: 1369518619}
-  - component: {fileID: 1369518618}
   - component: {fileID: 1369518621}
+  - component: {fileID: 1369518618}
   - component: {fileID: 1369518622}
   m_Layer: 0
   m_Name: Panel (1)
@@ -6455,10 +6456,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1380885441
-  element: {fileID: 1369518620}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 334545837
+  graphic: {fileID: 1369518620}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1369518619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6484,14 +6485,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1369518619}
-  _data:
-  - {fileID: 1369518618}
+  _featureData:
   - {fileID: 1369518621}
+  - {fileID: 1369518618}
   - {fileID: 1369518622}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 1, g: 1, b: 1, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1369518621
@@ -6505,9 +6506,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1573511790
-  element: {fileID: 1369518620}
-  feature: {fileID: 1776547484}
+  _persistentId: -1826044812
+  graphic: {fileID: 1369518620}
+  feature: {fileID: 1776547490}
   texture: {fileID: 0}
 --- !u!114 &1369518622
 MonoBehaviour:
@@ -6520,10 +6521,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1484934099
-  element: {fileID: 1369518620}
+  _persistentId: 98063651
+  graphic: {fileID: 1369518620}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1401893492
 GameObject:
   m_ObjectHideFlags: 0
@@ -6566,13 +6567,13 @@ GameObject:
   - component: {fileID: 1404855182}
   - component: {fileID: 1404855188}
   - component: {fileID: 1404855187}
-  - component: {fileID: 1404855186}
-  - component: {fileID: 1404855189}
   - component: {fileID: 1404855185}
   - component: {fileID: 1404855184}
   - component: {fileID: 1404855183}
-  - component: {fileID: 1404855190}
   - component: {fileID: 1404855191}
+  - component: {fileID: 1404855189}
+  - component: {fileID: 1404855186}
+  - component: {fileID: 1404855190}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -6650,10 +6651,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1532971906
-  element: {fileID: 1404855188}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 601581775
+  graphic: {fileID: 1404855188}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1404855187
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6679,14 +6680,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1404855187}
-  _data:
-  - {fileID: 1404855186}
+  _featureData:
   - {fileID: 1404855189}
+  - {fileID: 1404855186}
   - {fileID: 1404855190}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1404855189
@@ -6700,10 +6701,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 959563188
-  element: {fileID: 1404855188}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 944384856
+  graphic: {fileID: 1404855188}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1404855190
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -6715,10 +6716,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 727050929
-  element: {fileID: 1404855188}
+  _persistentId: 1876614013
+  graphic: {fileID: 1404855188}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1404855191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6754,13 +6755,13 @@ GameObject:
   - component: {fileID: 1415579345}
   - component: {fileID: 1415579351}
   - component: {fileID: 1415579350}
-  - component: {fileID: 1415579349}
-  - component: {fileID: 1415579352}
   - component: {fileID: 1415579348}
   - component: {fileID: 1415579347}
   - component: {fileID: 1415579346}
-  - component: {fileID: 1415579353}
   - component: {fileID: 1415579354}
+  - component: {fileID: 1415579352}
+  - component: {fileID: 1415579349}
+  - component: {fileID: 1415579353}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -6838,10 +6839,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -2079863947
-  element: {fileID: 1415579351}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 931383907
+  graphic: {fileID: 1415579351}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1415579350
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6867,14 +6868,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1415579350}
-  _data:
-  - {fileID: 1415579349}
+  _featureData:
   - {fileID: 1415579352}
+  - {fileID: 1415579349}
   - {fileID: 1415579353}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1415579352
@@ -6888,10 +6889,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1981619120
-  element: {fileID: 1415579351}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -2048579299
+  graphic: {fileID: 1415579351}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1415579353
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -6903,10 +6904,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 898270773
-  element: {fileID: 1415579351}
+  _persistentId: -1485127959
+  graphic: {fileID: 1415579351}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1415579354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6942,13 +6943,13 @@ GameObject:
   - component: {fileID: 1419064047}
   - component: {fileID: 1419064053}
   - component: {fileID: 1419064052}
-  - component: {fileID: 1419064051}
-  - component: {fileID: 1419064054}
   - component: {fileID: 1419064050}
   - component: {fileID: 1419064049}
   - component: {fileID: 1419064048}
-  - component: {fileID: 1419064055}
   - component: {fileID: 1419064056}
+  - component: {fileID: 1419064054}
+  - component: {fileID: 1419064051}
+  - component: {fileID: 1419064055}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -7026,10 +7027,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 2055748740
-  element: {fileID: 1419064053}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 798531160
+  graphic: {fileID: 1419064053}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1419064052
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7055,14 +7056,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1419064052}
-  _data:
-  - {fileID: 1419064051}
+  _featureData:
   - {fileID: 1419064054}
+  - {fileID: 1419064051}
   - {fileID: 1419064055}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1419064054
@@ -7076,10 +7077,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 599684377
-  element: {fileID: 1419064053}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -714422491
+  graphic: {fileID: 1419064053}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1419064055
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -7091,10 +7092,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 197839861
-  element: {fileID: 1419064053}
+  _persistentId: -1379183082
+  graphic: {fileID: 1419064053}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1419064056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7130,13 +7131,13 @@ GameObject:
   - component: {fileID: 1459435849}
   - component: {fileID: 1459435855}
   - component: {fileID: 1459435854}
-  - component: {fileID: 1459435853}
-  - component: {fileID: 1459435856}
   - component: {fileID: 1459435852}
   - component: {fileID: 1459435851}
   - component: {fileID: 1459435850}
-  - component: {fileID: 1459435857}
   - component: {fileID: 1459435858}
+  - component: {fileID: 1459435856}
+  - component: {fileID: 1459435853}
+  - component: {fileID: 1459435857}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -7214,10 +7215,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -369372754
-  element: {fileID: 1459435855}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -2063068276
+  graphic: {fileID: 1459435855}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1459435854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7243,14 +7244,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1459435854}
-  _data:
-  - {fileID: 1459435853}
+  _featureData:
   - {fileID: 1459435856}
+  - {fileID: 1459435853}
   - {fileID: 1459435857}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1459435856
@@ -7264,10 +7265,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 641482758
-  element: {fileID: 1459435855}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -221028215
+  graphic: {fileID: 1459435855}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1459435857
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -7279,10 +7280,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -936005045
-  element: {fileID: 1459435855}
+  _persistentId: 2018154041
+  graphic: {fileID: 1459435855}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1459435858
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7328,13 +7329,13 @@ GameObject:
   - component: {fileID: 1564342053}
   - component: {fileID: 1564342059}
   - component: {fileID: 1564342058}
-  - component: {fileID: 1564342057}
-  - component: {fileID: 1564342060}
   - component: {fileID: 1564342056}
   - component: {fileID: 1564342055}
   - component: {fileID: 1564342054}
-  - component: {fileID: 1564342061}
   - component: {fileID: 1564342062}
+  - component: {fileID: 1564342060}
+  - component: {fileID: 1564342057}
+  - component: {fileID: 1564342061}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -7412,10 +7413,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1701335718
-  element: {fileID: 1564342059}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -580526646
+  graphic: {fileID: 1564342059}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1564342058
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7441,14 +7442,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1564342058}
-  _data:
-  - {fileID: 1564342057}
+  _featureData:
   - {fileID: 1564342060}
+  - {fileID: 1564342057}
   - {fileID: 1564342061}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1564342060
@@ -7462,10 +7463,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1946685835
-  element: {fileID: 1564342059}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 152005040
+  graphic: {fileID: 1564342059}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1564342061
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -7477,10 +7478,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 881241715
-  element: {fileID: 1564342059}
+  _persistentId: -145418311
+  graphic: {fileID: 1564342059}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1564342062
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7516,13 +7517,13 @@ GameObject:
   - component: {fileID: 1571047523}
   - component: {fileID: 1571047529}
   - component: {fileID: 1571047528}
-  - component: {fileID: 1571047527}
-  - component: {fileID: 1571047530}
   - component: {fileID: 1571047526}
   - component: {fileID: 1571047525}
   - component: {fileID: 1571047524}
-  - component: {fileID: 1571047531}
   - component: {fileID: 1571047532}
+  - component: {fileID: 1571047530}
+  - component: {fileID: 1571047527}
+  - component: {fileID: 1571047531}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -7600,10 +7601,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 565831559
-  element: {fileID: 1571047529}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 1625541090
+  graphic: {fileID: 1571047529}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1571047528
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7629,14 +7630,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1571047528}
-  _data:
-  - {fileID: 1571047527}
+  _featureData:
   - {fileID: 1571047530}
+  - {fileID: 1571047527}
   - {fileID: 1571047531}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1571047530
@@ -7650,10 +7651,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -932323899
-  element: {fileID: 1571047529}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -138533396
+  graphic: {fileID: 1571047529}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1571047531
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -7665,10 +7666,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -740893304
-  element: {fileID: 1571047529}
+  _persistentId: -2108897885
+  graphic: {fileID: 1571047529}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1571047532
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7704,13 +7705,13 @@ GameObject:
   - component: {fileID: 1593125177}
   - component: {fileID: 1593125183}
   - component: {fileID: 1593125182}
-  - component: {fileID: 1593125181}
-  - component: {fileID: 1593125184}
   - component: {fileID: 1593125180}
   - component: {fileID: 1593125179}
   - component: {fileID: 1593125178}
-  - component: {fileID: 1593125185}
   - component: {fileID: 1593125186}
+  - component: {fileID: 1593125184}
+  - component: {fileID: 1593125181}
+  - component: {fileID: 1593125185}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -7788,10 +7789,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1508525080
-  element: {fileID: 1593125183}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -1302600344
+  graphic: {fileID: 1593125183}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1593125182
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7817,14 +7818,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1593125182}
-  _data:
-  - {fileID: 1593125181}
+  _featureData:
   - {fileID: 1593125184}
+  - {fileID: 1593125181}
   - {fileID: 1593125185}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1593125184
@@ -7838,10 +7839,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -626150987
-  element: {fileID: 1593125183}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1367074199
+  graphic: {fileID: 1593125183}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1593125185
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -7853,10 +7854,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 961410821
-  element: {fileID: 1593125183}
+  _persistentId: -1696336045
+  graphic: {fileID: 1593125183}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1593125186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7892,13 +7893,13 @@ GameObject:
   - component: {fileID: 1625780158}
   - component: {fileID: 1625780164}
   - component: {fileID: 1625780163}
-  - component: {fileID: 1625780162}
-  - component: {fileID: 1625780165}
   - component: {fileID: 1625780161}
   - component: {fileID: 1625780160}
   - component: {fileID: 1625780159}
-  - component: {fileID: 1625780166}
   - component: {fileID: 1625780167}
+  - component: {fileID: 1625780165}
+  - component: {fileID: 1625780162}
+  - component: {fileID: 1625780166}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -7976,10 +7977,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -616766283
-  element: {fileID: 1625780164}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -2097440985
+  graphic: {fileID: 1625780164}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1625780163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8005,14 +8006,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1625780163}
-  _data:
-  - {fileID: 1625780162}
+  _featureData:
   - {fileID: 1625780165}
+  - {fileID: 1625780162}
   - {fileID: 1625780166}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1625780165
@@ -8026,10 +8027,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1254202280
-  element: {fileID: 1625780164}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 735385297
+  graphic: {fileID: 1625780164}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1625780166
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -8041,10 +8042,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1002279473
-  element: {fileID: 1625780164}
+  _persistentId: -1126234416
+  graphic: {fileID: 1625780164}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1625780167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8210,13 +8211,13 @@ GameObject:
   - component: {fileID: 1650869434}
   - component: {fileID: 1650869440}
   - component: {fileID: 1650869439}
-  - component: {fileID: 1650869438}
-  - component: {fileID: 1650869441}
   - component: {fileID: 1650869437}
   - component: {fileID: 1650869436}
   - component: {fileID: 1650869435}
-  - component: {fileID: 1650869442}
   - component: {fileID: 1650869443}
+  - component: {fileID: 1650869441}
+  - component: {fileID: 1650869438}
+  - component: {fileID: 1650869442}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -8294,10 +8295,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -792697554
-  element: {fileID: 1650869440}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 1103324394
+  graphic: {fileID: 1650869440}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1650869439
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8323,14 +8324,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1650869439}
-  _data:
-  - {fileID: 1650869438}
+  _featureData:
   - {fileID: 1650869441}
+  - {fileID: 1650869438}
   - {fileID: 1650869442}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1650869441
@@ -8344,10 +8345,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1673898301
-  element: {fileID: 1650869440}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1943746585
+  graphic: {fileID: 1650869440}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1650869442
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -8359,10 +8360,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 81086100
-  element: {fileID: 1650869440}
+  _persistentId: -1056456477
+  graphic: {fileID: 1650869440}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1650869443
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8398,13 +8399,13 @@ GameObject:
   - component: {fileID: 1715286117}
   - component: {fileID: 1715286123}
   - component: {fileID: 1715286122}
-  - component: {fileID: 1715286121}
-  - component: {fileID: 1715286124}
   - component: {fileID: 1715286120}
   - component: {fileID: 1715286119}
   - component: {fileID: 1715286118}
-  - component: {fileID: 1715286125}
   - component: {fileID: 1715286126}
+  - component: {fileID: 1715286124}
+  - component: {fileID: 1715286121}
+  - component: {fileID: 1715286125}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -8482,10 +8483,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1566840615
-  element: {fileID: 1715286123}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -1084656739
+  graphic: {fileID: 1715286123}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1715286122
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8511,14 +8512,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1715286122}
-  _data:
-  - {fileID: 1715286121}
+  _featureData:
   - {fileID: 1715286124}
+  - {fileID: 1715286121}
   - {fileID: 1715286125}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1715286124
@@ -8532,10 +8533,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -2139367798
-  element: {fileID: 1715286123}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1900283771
+  graphic: {fileID: 1715286123}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1715286125
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -8547,10 +8548,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1336646642
-  element: {fileID: 1715286123}
+  _persistentId: -1687948686
+  graphic: {fileID: 1715286123}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1715286126
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8610,55 +8611,55 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _persistentId: -1998494557
-  data:
-  - {fileID: 758070971}
-  - {fileID: 2101149225}
-  - {fileID: 1294748682}
-  - {fileID: 376263677}
-  - {fileID: 1650869441}
-  - {fileID: 1404855189}
-  - {fileID: 1625780165}
-  - {fileID: 375145580}
-  - {fileID: 1319104141}
-  - {fileID: 1093556444}
-  - {fileID: 552256750}
-  - {fileID: 123467810}
-  - {fileID: 1715286124}
-  - {fileID: 675884442}
-  - {fileID: 495407669}
-  - {fileID: 85754738}
-  - {fileID: 753687253}
-  - {fileID: 256333728}
-  - {fileID: 722891438}
-  - {fileID: 179600839}
-  - {fileID: 1776897089}
-  - {fileID: 1821969825}
-  - {fileID: 1776885066}
-  - {fileID: 1030474433}
-  - {fileID: 2118264947}
-  - {fileID: 1415579352}
-  - {fileID: 698303319}
-  - {fileID: 2037860245}
-  - {fileID: 107997314}
-  - {fileID: 1419064054}
-  - {fileID: 1122126695}
-  - {fileID: 1571047530}
-  - {fileID: 711919878}
-  - {fileID: 564590853}
-  - {fileID: 64192848}
-  - {fileID: 1593125184}
-  - {fileID: 1052163721}
-  - {fileID: 593503977}
-  - {fileID: 1044150510}
-  - {fileID: 775541604}
-  - {fileID: 296849251}
-  - {fileID: 596105440}
-  - {fileID: 1280019406}
-  - {fileID: 1459435856}
-  - {fileID: 1564342060}
-  - {fileID: 1369518621}
-  - {fileID: 766838819}
+  featureData:
+  - {fileID: 766838816}
+  - {fileID: 1415579349}
+  - {fileID: 698303316}
+  - {fileID: 2037860242}
+  - {fileID: 107997311}
+  - {fileID: 1419064051}
+  - {fileID: 1122126692}
+  - {fileID: 1571047527}
+  - {fileID: 711919875}
+  - {fileID: 564590850}
+  - {fileID: 64192845}
+  - {fileID: 1593125181}
+  - {fileID: 1052163718}
+  - {fileID: 593503974}
+  - {fileID: 1044150507}
+  - {fileID: 775541601}
+  - {fileID: 296849248}
+  - {fileID: 596105437}
+  - {fileID: 1280019403}
+  - {fileID: 1459435853}
+  - {fileID: 1564342057}
   - {fileID: 982384007}
+  - {fileID: 1369518618}
+  - {fileID: 758070968}
+  - {fileID: 2101149222}
+  - {fileID: 1294748679}
+  - {fileID: 376263674}
+  - {fileID: 1650869438}
+  - {fileID: 1404855186}
+  - {fileID: 1625780162}
+  - {fileID: 375145577}
+  - {fileID: 1319104138}
+  - {fileID: 1093556441}
+  - {fileID: 552256747}
+  - {fileID: 123467807}
+  - {fileID: 1715286121}
+  - {fileID: 675884439}
+  - {fileID: 495407666}
+  - {fileID: 85754735}
+  - {fileID: 753687250}
+  - {fileID: 256333725}
+  - {fileID: 722891435}
+  - {fileID: 179600836}
+  - {fileID: 1776897086}
+  - {fileID: 1821969822}
+  - {fileID: 1776885063}
+  - {fileID: 1030474430}
+  - {fileID: 2118264949}
   propertyName: _BumpMap
   channel: 1
 --- !u!114 &1776547485
@@ -8673,14 +8674,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _persistentId: 2016004962
-  gui: {fileID: 1776547487}
+  renderer: {fileID: 1776547487}
   group: {fileID: 1776547486}
   _useUv0: 1
   _useUv1: 0
   _useUv2: 0
   _useUv3: 0
   _useColors: 1
-  _globalTint: {r: 1, g: 1, b: 1, a: 1}
+  _bakedTint: {r: 1, g: 1, b: 1, a: 1}
   _useNormals: 0
   _shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
   _atlas:
@@ -8690,272 +8691,252 @@ MonoBehaviour:
     _filterMode: 1
     _format: 5
     _maxAtlasSize: 4096
-  _material: {fileID: 1308893648}
-  _meshes: {fileID: 11400000, guid: 0eb28be7f0f220f45aa8d5934e1f57b1, type: 2}
-  _packedTextures: {fileID: 11400000, guid: 8d97dcbbdea256842b66c6519388dbcb, type: 2}
+  _material: {fileID: 73545932}
+  _meshes: {fileID: 11400000, guid: f8bd3876e8c7d614080165a7b5305521, type: 2}
+  _packedTextures: {fileID: 11400000, guid: ac324197ba553b6429bcaf4a85d359d0, type: 2}
   _channelMapping:
     _data:
     - serializedVersion: 2
-      x: 0.015625
+      x: 0.546875
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.015625
+      height: 0.015625
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
+    - serializedVersion: 2
+      x: 0.546875
+      y: 0.015625
+      width: 0.015625
+      height: 0.015625
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
+      width: 0.5
+      height: 0.5
     - serializedVersion: 2
       x: 0.015625
       y: 0.015625
-      width: 0.53125
-      height: 0.53125
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.53125
-      height: 0.53125
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.53125
-      height: 0.53125
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.53125
-      height: 0.53125
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.53125
-      height: 0.53125
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.53125
-      height: 0.53125
-    _lengths: 34000000ffffffffffffffffffffffff
+      width: 0.5
+      height: 0.5
+    _lengths: 30000000ffffffffffffffffffffffff
   _layer:
     layerIndex: 0
   _motionType: 1
@@ -8973,13 +8954,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _persistentId: -1012419110
-  _renderer: {fileID: 1776547485}
+  _renderingMethod: {fileID: 1776547485}
   _features:
   - {fileID: 1776547490}
   - {fileID: 1776547484}
   - {fileID: 1776547492}
-  _gui: {fileID: 1776547487}
-  _elements:
+  _renderer: {fileID: 1776547487}
+  _graphics:
+  - {fileID: 766838818}
+  - {fileID: 1415579351}
+  - {fileID: 698303318}
+  - {fileID: 2037860244}
+  - {fileID: 107997313}
+  - {fileID: 1419064053}
+  - {fileID: 1122126694}
+  - {fileID: 1571047529}
+  - {fileID: 711919877}
+  - {fileID: 564590852}
+  - {fileID: 64192847}
+  - {fileID: 1593125183}
+  - {fileID: 1052163720}
+  - {fileID: 593503976}
+  - {fileID: 1044150509}
+  - {fileID: 775541603}
+  - {fileID: 296849250}
+  - {fileID: 596105439}
+  - {fileID: 1280019405}
+  - {fileID: 1459435855}
+  - {fileID: 1564342059}
+  - {fileID: 982384006}
+  - {fileID: 1369518620}
   - {fileID: 758070970}
   - {fileID: 2101149224}
   - {fileID: 1294748681}
@@ -9005,29 +9009,6 @@ MonoBehaviour:
   - {fileID: 1776885065}
   - {fileID: 1030474432}
   - {fileID: 2118264948}
-  - {fileID: 1415579351}
-  - {fileID: 698303318}
-  - {fileID: 2037860244}
-  - {fileID: 107997313}
-  - {fileID: 1419064053}
-  - {fileID: 1122126694}
-  - {fileID: 1571047529}
-  - {fileID: 711919877}
-  - {fileID: 564590852}
-  - {fileID: 64192847}
-  - {fileID: 1593125183}
-  - {fileID: 1052163720}
-  - {fileID: 593503976}
-  - {fileID: 1044150509}
-  - {fileID: 775541603}
-  - {fileID: 296849250}
-  - {fileID: 596105439}
-  - {fileID: 1280019405}
-  - {fileID: 1459435855}
-  - {fileID: 1564342059}
-  - {fileID: 1369518620}
-  - {fileID: 766838818}
-  - {fileID: 982384006}
   _supportInfo:
   - support: 0
     message: 
@@ -9092,55 +9073,55 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _persistentId: -1498945634
-  data:
-  - {fileID: 758070968}
-  - {fileID: 2101149222}
-  - {fileID: 1294748679}
-  - {fileID: 376263674}
-  - {fileID: 1650869438}
-  - {fileID: 1404855186}
-  - {fileID: 1625780162}
-  - {fileID: 375145577}
-  - {fileID: 1319104138}
-  - {fileID: 1093556441}
-  - {fileID: 552256747}
-  - {fileID: 123467807}
-  - {fileID: 1715286121}
-  - {fileID: 675884439}
-  - {fileID: 495407666}
-  - {fileID: 85754735}
-  - {fileID: 753687250}
-  - {fileID: 256333725}
-  - {fileID: 722891435}
-  - {fileID: 179600836}
-  - {fileID: 1776897086}
-  - {fileID: 1821969822}
-  - {fileID: 1776885063}
-  - {fileID: 1030474430}
-  - {fileID: 2118264949}
-  - {fileID: 1415579349}
-  - {fileID: 698303316}
-  - {fileID: 2037860242}
-  - {fileID: 107997311}
-  - {fileID: 1419064051}
-  - {fileID: 1122126692}
-  - {fileID: 1571047527}
-  - {fileID: 711919875}
-  - {fileID: 564590850}
-  - {fileID: 64192845}
-  - {fileID: 1593125181}
-  - {fileID: 1052163718}
-  - {fileID: 593503974}
-  - {fileID: 1044150507}
-  - {fileID: 775541601}
-  - {fileID: 296849248}
-  - {fileID: 596105437}
-  - {fileID: 1280019403}
-  - {fileID: 1459435853}
-  - {fileID: 1564342057}
-  - {fileID: 1369518618}
-  - {fileID: 766838816}
+  featureData:
+  - {fileID: 766838819}
+  - {fileID: 1415579352}
+  - {fileID: 698303319}
+  - {fileID: 2037860245}
+  - {fileID: 107997314}
+  - {fileID: 1419064054}
+  - {fileID: 1122126695}
+  - {fileID: 1571047530}
+  - {fileID: 711919878}
+  - {fileID: 564590853}
+  - {fileID: 64192848}
+  - {fileID: 1593125184}
+  - {fileID: 1052163721}
+  - {fileID: 593503977}
+  - {fileID: 1044150510}
+  - {fileID: 775541604}
+  - {fileID: 296849251}
+  - {fileID: 596105440}
+  - {fileID: 1280019406}
+  - {fileID: 1459435856}
+  - {fileID: 1564342060}
   - {fileID: 982384008}
+  - {fileID: 1369518621}
+  - {fileID: 758070971}
+  - {fileID: 2101149225}
+  - {fileID: 1294748682}
+  - {fileID: 376263677}
+  - {fileID: 1650869441}
+  - {fileID: 1404855189}
+  - {fileID: 1625780165}
+  - {fileID: 375145580}
+  - {fileID: 1319104141}
+  - {fileID: 1093556444}
+  - {fileID: 552256750}
+  - {fileID: 123467810}
+  - {fileID: 1715286124}
+  - {fileID: 675884442}
+  - {fileID: 495407669}
+  - {fileID: 85754738}
+  - {fileID: 753687253}
+  - {fileID: 256333728}
+  - {fileID: 722891438}
+  - {fileID: 179600839}
+  - {fileID: 1776897089}
+  - {fileID: 1821969825}
+  - {fileID: 1776885066}
+  - {fileID: 1030474433}
+  - {fileID: 2118264955}
   propertyName: _MainTex
   channel: 1
 --- !u!114 &1776547492
@@ -9155,7 +9136,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _persistentId: 232852102
-  data:
+  featureData:
+  - {fileID: 766838820}
+  - {fileID: 1415579353}
+  - {fileID: 698303320}
+  - {fileID: 2037860246}
+  - {fileID: 107997315}
+  - {fileID: 1419064055}
+  - {fileID: 1122126696}
+  - {fileID: 1571047531}
+  - {fileID: 711919879}
+  - {fileID: 564590854}
+  - {fileID: 64192849}
+  - {fileID: 1593125185}
+  - {fileID: 1052163722}
+  - {fileID: 593503978}
+  - {fileID: 1044150511}
+  - {fileID: 775541605}
+  - {fileID: 296849252}
+  - {fileID: 596105441}
+  - {fileID: 1280019407}
+  - {fileID: 1459435857}
+  - {fileID: 1564342061}
+  - {fileID: 982384005}
+  - {fileID: 1369518622}
   - {fileID: 758070972}
   - {fileID: 2101149226}
   - {fileID: 1294748683}
@@ -9180,30 +9184,7 @@ MonoBehaviour:
   - {fileID: 1821969826}
   - {fileID: 1776885067}
   - {fileID: 1030474434}
-  - {fileID: 2118264955}
-  - {fileID: 1415579353}
-  - {fileID: 698303320}
-  - {fileID: 2037860246}
-  - {fileID: 107997315}
-  - {fileID: 1419064055}
-  - {fileID: 1122126696}
-  - {fileID: 1571047531}
-  - {fileID: 711919879}
-  - {fileID: 564590854}
-  - {fileID: 64192849}
-  - {fileID: 1593125185}
-  - {fileID: 1052163722}
-  - {fileID: 593503978}
-  - {fileID: 1044150511}
-  - {fileID: 775541605}
-  - {fileID: 296849252}
-  - {fileID: 596105441}
-  - {fileID: 1280019407}
-  - {fileID: 1459435857}
-  - {fileID: 1564342061}
-  - {fileID: 1369518622}
-  - {fileID: 766838820}
-  - {fileID: 982384005}
+  - {fileID: 2118264947}
 --- !u!1 &1776885058
 GameObject:
   m_ObjectHideFlags: 0
@@ -9214,13 +9195,13 @@ GameObject:
   - component: {fileID: 1776885059}
   - component: {fileID: 1776885065}
   - component: {fileID: 1776885064}
-  - component: {fileID: 1776885063}
-  - component: {fileID: 1776885066}
   - component: {fileID: 1776885062}
   - component: {fileID: 1776885061}
   - component: {fileID: 1776885060}
-  - component: {fileID: 1776885067}
   - component: {fileID: 1776885068}
+  - component: {fileID: 1776885066}
+  - component: {fileID: 1776885063}
+  - component: {fileID: 1776885067}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -9298,10 +9279,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 792089242
-  element: {fileID: 1776885065}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -10882470
+  graphic: {fileID: 1776885065}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1776885064
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9327,14 +9308,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1776885064}
-  _data:
-  - {fileID: 1776885063}
+  _featureData:
   - {fileID: 1776885066}
+  - {fileID: 1776885063}
   - {fileID: 1776885067}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1776885066
@@ -9348,10 +9329,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -117569868
-  element: {fileID: 1776885065}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1561920005
+  graphic: {fileID: 1776885065}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1776885067
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -9363,10 +9344,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1103401601
-  element: {fileID: 1776885065}
+  _persistentId: -1958635216
+  graphic: {fileID: 1776885065}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1776885068
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9402,13 +9383,13 @@ GameObject:
   - component: {fileID: 1776897082}
   - component: {fileID: 1776897088}
   - component: {fileID: 1776897087}
-  - component: {fileID: 1776897086}
-  - component: {fileID: 1776897089}
   - component: {fileID: 1776897085}
   - component: {fileID: 1776897084}
   - component: {fileID: 1776897083}
-  - component: {fileID: 1776897090}
   - component: {fileID: 1776897091}
+  - component: {fileID: 1776897089}
+  - component: {fileID: 1776897086}
+  - component: {fileID: 1776897090}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -9486,10 +9467,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1509209174
-  element: {fileID: 1776897088}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -49525563
+  graphic: {fileID: 1776897088}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1776897087
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9515,14 +9496,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1776897087}
-  _data:
-  - {fileID: 1776897086}
+  _featureData:
   - {fileID: 1776897089}
+  - {fileID: 1776897086}
   - {fileID: 1776897090}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1776897089
@@ -9536,10 +9517,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -726539719
-  element: {fileID: 1776897088}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1343448026
+  graphic: {fileID: 1776897088}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1776897090
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -9551,10 +9532,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1833345672
-  element: {fileID: 1776897088}
+  _persistentId: 1899224322
+  graphic: {fileID: 1776897088}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1776897091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9694,13 +9675,13 @@ GameObject:
   - component: {fileID: 1821969818}
   - component: {fileID: 1821969824}
   - component: {fileID: 1821969823}
-  - component: {fileID: 1821969822}
-  - component: {fileID: 1821969825}
   - component: {fileID: 1821969821}
   - component: {fileID: 1821969820}
   - component: {fileID: 1821969819}
-  - component: {fileID: 1821969826}
   - component: {fileID: 1821969827}
+  - component: {fileID: 1821969825}
+  - component: {fileID: 1821969822}
+  - component: {fileID: 1821969826}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -9778,10 +9759,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -184240779
-  element: {fileID: 1821969824}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 35925644
+  graphic: {fileID: 1821969824}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &1821969823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9807,14 +9788,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 1821969823}
-  _data:
-  - {fileID: 1821969822}
+  _featureData:
   - {fileID: 1821969825}
+  - {fileID: 1821969822}
   - {fileID: 1821969826}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &1821969825
@@ -9828,10 +9809,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1997119195
-  element: {fileID: 1821969824}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -2036890728
+  graphic: {fileID: 1821969824}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &1821969826
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -9843,10 +9824,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 159217611
-  element: {fileID: 1821969824}
+  _persistentId: -917602914
+  graphic: {fileID: 1821969824}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1821969827
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10022,13 +10003,13 @@ GameObject:
   - component: {fileID: 2037860238}
   - component: {fileID: 2037860244}
   - component: {fileID: 2037860243}
-  - component: {fileID: 2037860242}
-  - component: {fileID: 2037860245}
   - component: {fileID: 2037860241}
   - component: {fileID: 2037860240}
   - component: {fileID: 2037860239}
-  - component: {fileID: 2037860246}
   - component: {fileID: 2037860247}
+  - component: {fileID: 2037860245}
+  - component: {fileID: 2037860242}
+  - component: {fileID: 2037860246}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -10106,10 +10087,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1657669024
-  element: {fileID: 2037860244}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 1041910100
+  graphic: {fileID: 2037860244}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &2037860243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10135,14 +10116,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 2037860243}
-  _data:
-  - {fileID: 2037860242}
+  _featureData:
   - {fileID: 2037860245}
+  - {fileID: 2037860242}
   - {fileID: 2037860246}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &2037860245
@@ -10156,10 +10137,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 311986679
-  element: {fileID: 2037860244}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1477407793
+  graphic: {fileID: 2037860244}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &2037860246
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -10171,10 +10152,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1130847180
-  element: {fileID: 2037860244}
+  _persistentId: -1171486726
+  graphic: {fileID: 2037860244}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &2037860247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10210,13 +10191,13 @@ GameObject:
   - component: {fileID: 2101149218}
   - component: {fileID: 2101149224}
   - component: {fileID: 2101149223}
-  - component: {fileID: 2101149222}
-  - component: {fileID: 2101149225}
   - component: {fileID: 2101149221}
   - component: {fileID: 2101149220}
   - component: {fileID: 2101149219}
-  - component: {fileID: 2101149226}
   - component: {fileID: 2101149227}
+  - component: {fileID: 2101149225}
+  - component: {fileID: 2101149222}
+  - component: {fileID: 2101149226}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -10294,10 +10275,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1535556767
-  element: {fileID: 2101149224}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: -1972640784
+  graphic: {fileID: 2101149224}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!114 &2101149223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10323,14 +10304,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 2101149223}
-  _data:
-  - {fileID: 2101149222}
+  _featureData:
   - {fileID: 2101149225}
+  - {fileID: 2101149222}
   - {fileID: 2101149226}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &2101149225
@@ -10344,10 +10325,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -592217434
-  element: {fileID: 2101149224}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: -1066103082
+  graphic: {fileID: 2101149224}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &2101149226
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -10359,10 +10340,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1808631247
-  element: {fileID: 2101149224}
+  _persistentId: -9088055
+  graphic: {fileID: 2101149224}
   feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &2101149227
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10398,13 +10379,13 @@ GameObject:
   - component: {fileID: 2118264950}
   - component: {fileID: 2118264948}
   - component: {fileID: 2118264954}
-  - component: {fileID: 2118264949}
-  - component: {fileID: 2118264947}
   - component: {fileID: 2118264953}
   - component: {fileID: 2118264952}
   - component: {fileID: 2118264951}
-  - component: {fileID: 2118264955}
   - component: {fileID: 2118264956}
+  - component: {fileID: 2118264955}
+  - component: {fileID: 2118264949}
+  - component: {fileID: 2118264947}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -10420,13 +10401,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2118264946}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
+  m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1143635238
-  element: {fileID: 2118264948}
-  feature: {fileID: 1776547484}
-  texture: {fileID: 0}
+  _persistentId: 1212893478
+  graphic: {fileID: 2118264948}
+  feature: {fileID: 1776547492}
+  _color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &2118264948
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10439,14 +10420,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _anchor: {fileID: 2118264954}
-  _data:
+  _featureData:
+  - {fileID: 2118264955}
   - {fileID: 2118264949}
   - {fileID: 2118264947}
-  - {fileID: 2118264955}
   _attachedGroup: {fileID: 1776547486}
   _preferredRendererType:
-    _fullName: LeapGuiBakedRenderer
-  tint: {r: 0.72794116, g: 0.72794116, b: 0.72794116, a: 1}
+    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+  vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
 --- !u!114 &2118264949
@@ -10460,10 +10441,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1825669053
-  element: {fileID: 2118264948}
-  feature: {fileID: 1776547490}
-  texture: {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+  _persistentId: 705293824
+  graphic: {fileID: 2118264948}
+  feature: {fileID: 1776547484}
+  texture: {fileID: 0}
 --- !u!4 &2118264950
 Transform:
   m_ObjectHideFlags: 0
@@ -10544,13 +10525,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 2118264946}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
+  m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -229237123
-  element: {fileID: 2118264948}
-  feature: {fileID: 1776547492}
-  _tint: {r: 1, g: 1, b: 1, a: 1}
+  _persistentId: -1488225740
+  graphic: {fileID: 2118264948}
+  feature: {fileID: 1776547490}
+  texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &2118264956
 MonoBehaviour:
   m_ObjectHideFlags: 0

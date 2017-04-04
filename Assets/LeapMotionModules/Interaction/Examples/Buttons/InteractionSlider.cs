@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Leap.Unity.GraphicalRenderer;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Leap.Unity.UI.Interaction {
@@ -27,7 +28,7 @@ namespace Leap.Unity.UI.Interaction {
 
     //Private State Variables
     private InteractionBehaviour behaviour;
-    private LeapGuiElement element;
+    private LeapGraphic element;
     private Rigidbody body;
     private Rigidbody lastDepressor;
     private Vector3 localDepressor;
@@ -41,7 +42,7 @@ namespace Leap.Unity.UI.Interaction {
     void Start() {
       //Initialize Elements
       behaviour = GetComponent<InteractionBehaviour>();
-      element = GetComponent<LeapGuiElement>();
+      element = GetComponent<LeapGraphic>();
       body = behaviour.rigidbody;
 
       //Initialize Positions
@@ -149,10 +150,10 @@ namespace Leap.Unity.UI.Interaction {
       //Disable collision on this button if it is not the primary hover
       if (element != null) {
         if (behaviour.isPrimaryHovered) {
-          element.Tint().tint = isDepressed ? Color.red : Color.Lerp(Color.white, Color.red, 0.5f);
+          element.GetRuntimeTint().color = isDepressed ? Color.red : Color.Lerp(Color.white, Color.red, 0.5f);
           behaviour.ignoreContact = false;
         } else {
-          element.Tint().tint = Color.white;
+          element.GetRuntimeTint().color = Color.white;
           behaviour.ignoreContact = true;
         }
       }
