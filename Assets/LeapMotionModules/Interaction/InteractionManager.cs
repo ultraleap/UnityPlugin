@@ -312,7 +312,6 @@ namespace Leap.Unity.UI.Interaction {
 
         // Check ending grasps.
         RemapInteractionObjectStateChecks(
-          hands: _interactionHands,
           stateCheckFunc: (InteractionHand maybeReleasingHand, out IInteractionBehaviour maybeReleasedObject) => {
             return maybeReleasingHand.CheckGraspEnd(out maybeReleasedObject);
           },
@@ -322,7 +321,6 @@ namespace Leap.Unity.UI.Interaction {
 
         // Check ending contacts.
         RemapMultiInteractionObjectStateChecks(
-          hands: _interactionHands,
           multiObjectStateCheckFunc: (InteractionHand maybeEndedContactingHand, out HashSet<IInteractionBehaviour> endContactedObjects) => {
             return maybeEndedContactingHand.CheckContactEnd(out endContactedObjects);
           },
@@ -332,7 +330,6 @@ namespace Leap.Unity.UI.Interaction {
 
         // Check ending primary hovers.
         RemapInteractionObjectStateChecks(
-          hands: _interactionHands,
           stateCheckFunc: (InteractionHand maybeEndedPrimaryHoveringHand, out IInteractionBehaviour endPrimaryHoveredObject) => {
             return maybeEndedPrimaryHoveringHand.CheckPrimaryHoverEnd(out endPrimaryHoveredObject);
           },
@@ -342,7 +339,6 @@ namespace Leap.Unity.UI.Interaction {
 
         // Check ending hovers.
         RemapMultiInteractionObjectStateChecks(
-          hands: _interactionHands,
           multiObjectStateCheckFunc: (InteractionHand maybeEndedHoveringHand, out HashSet<IInteractionBehaviour> endHoveredObjects) => {
             return maybeEndedHoveringHand.CheckHoverEnd(out endHoveredObjects);
           },
@@ -355,7 +351,6 @@ namespace Leap.Unity.UI.Interaction {
         // Check beginning hovers.
         if (enableHovering) {
           RemapMultiInteractionObjectStateChecks(
-            hands: _interactionHands,
             multiObjectStateCheckFunc: (InteractionHand maybeBeganHoveringHand, out HashSet<IInteractionBehaviour> beganHoveredObjects) => {
               return maybeBeganHoveringHand.CheckHoverBegin(out beganHoveredObjects);
             },
@@ -367,7 +362,6 @@ namespace Leap.Unity.UI.Interaction {
         // Check beginning primary hovers.
         if (enableHovering) {
           RemapInteractionObjectStateChecks(
-            hands: _interactionHands,
             stateCheckFunc: (InteractionHand maybeBeganPrimaryHoveringHand, out IInteractionBehaviour primaryHoveredObject) => {
               return maybeBeganPrimaryHoveringHand.CheckPrimaryHoverBegin(out primaryHoveredObject);
             },
@@ -379,7 +373,6 @@ namespace Leap.Unity.UI.Interaction {
         // Check beginning contacts.
         if (enableContact) {
           RemapMultiInteractionObjectStateChecks(
-            hands: _interactionHands,
             multiObjectStateCheckFunc: (InteractionHand maybeBeganContactingHand, out HashSet<IInteractionBehaviour> beganContactedObjects) => {
               return maybeBeganContactingHand.CheckContactBegin(out beganContactedObjects);
             },
@@ -391,7 +384,6 @@ namespace Leap.Unity.UI.Interaction {
         // Check beginning grasps.
         if (enableGrasping) {
           RemapInteractionObjectStateChecks(
-            hands: _interactionHands,
             stateCheckFunc: (InteractionHand maybeBeganGraspingHand, out IInteractionBehaviour graspedObject) => {
               return maybeBeganGraspingHand.CheckGraspBegin(out graspedObject);
             },
@@ -405,7 +397,6 @@ namespace Leap.Unity.UI.Interaction {
         // Check sustaining hover.
         if (enableHovering) {
           RemapMultiInteractionObjectStateChecks(
-            hands: _interactionHands,
             multiObjectStateCheckFunc: (InteractionHand maybeSustainedHoveringHand, out HashSet<IInteractionBehaviour> hoveredObjects) => {
               return maybeSustainedHoveringHand.CheckHoverStay(out hoveredObjects);
             },
@@ -417,7 +408,6 @@ namespace Leap.Unity.UI.Interaction {
         // Check sustaining primary hovers.
         if (enableHovering) {
           RemapInteractionObjectStateChecks(
-            hands: _interactionHands,
             stateCheckFunc: (InteractionHand maybeSustainedPrimaryHoveringHand, out IInteractionBehaviour primaryHoveredObject) => {
               return maybeSustainedPrimaryHoveringHand.CheckPrimaryHoverStay(out primaryHoveredObject);
             },
@@ -429,7 +419,6 @@ namespace Leap.Unity.UI.Interaction {
         // Check sustained contact.
         if (enableContact) {
           RemapMultiInteractionObjectStateChecks(
-            hands: _interactionHands,
             multiObjectStateCheckFunc: (InteractionHand maybeSustainedContactingHand, out HashSet<IInteractionBehaviour> contactedObjects) => {
               return maybeSustainedContactingHand.CheckContactStay(out contactedObjects);
             },
@@ -441,7 +430,6 @@ namespace Leap.Unity.UI.Interaction {
         // Check sustained grasping.
         if (enableContact) {
           RemapInteractionObjectStateChecks(
-            hands: _interactionHands,
             stateCheckFunc: (InteractionHand maybeSustainedGraspingHand, out IInteractionBehaviour graspedObject) => {
               return maybeSustainedGraspingHand.CheckGraspHold(out graspedObject);
             },
@@ -453,25 +441,24 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
     
-    private delegate V StateChangeCheckFunc<H, T, V>(H hand, out T obj);
-    private delegate V MultiStateChangeCheckFunc<H, T, V>(H hand, out HashSet<T> objs);
+    private delegate bool StateChangeCheckFunc(InteractionHand hand, out IInteractionBehaviour obj);
+    private delegate bool MultiStateChangeCheckFunc(InteractionHand hand, out HashSet<IInteractionBehaviour> objs);
 
+    [ThreadStatic]
     private static Dictionary<IInteractionBehaviour, List<InteractionHand>> s_objHandsMap = new Dictionary<IInteractionBehaviour, List<InteractionHand>>();
 
     /// <summary>
     /// Checks object state per-hand, then calls an action per-object with all hand checks that reported back an object.
     /// </summary>
-    private static void RemapInteractionObjectStateChecks(
-        InteractionHand[]                                                   hands,
-        StateChangeCheckFunc<InteractionHand, IInteractionBehaviour, bool>  stateCheckFunc,
-        Action<IInteractionBehaviour, List<InteractionHand>>                actionPerInteractionObject) {
+    private void RemapInteractionObjectStateChecks(StateChangeCheckFunc stateCheckFunc,
+                                                   Action<IInteractionBehaviour, List<InteractionHand>> actionPerInteractionObject) {
 
       // Ensure the object->hands buffer is clean.
       s_objHandsMap.Clear();
 
       // In a nutshell, this remaps methods per-hand that output an interaction object if the hand changed that object's state
       // to methods per-object with all of the hands for which the check produced a state-change.
-      foreach (var hand in hands) {
+      foreach (var hand in _interactionHands) {
         IInteractionBehaviour objectWhoseStateChanged;
         if (stateCheckFunc(hand, out objectWhoseStateChanged)) {
           if (!s_objHandsMap.ContainsKey(objectWhoseStateChanged)) {
@@ -493,16 +480,14 @@ namespace Leap.Unity.UI.Interaction {
     /// <summary>
     /// Checks object state per-hand, then calls an action per-object with all hand checks that reported back objects.
     /// </summary>
-    private static void RemapMultiInteractionObjectStateChecks(
-        InteractionHand[]                                                        hands,
-        MultiStateChangeCheckFunc<InteractionHand, IInteractionBehaviour, bool>  multiObjectStateCheckFunc,
-        Action<IInteractionBehaviour, List<InteractionHand>>                     actionPerInteractionObject) {
+    private void RemapMultiInteractionObjectStateChecks(MultiStateChangeCheckFunc multiObjectStateCheckFunc,
+                                                        Action<IInteractionBehaviour, List<InteractionHand>> actionPerInteractionObject) {
       // Ensure object<->hands buffer is clean.
       s_objHandsMap.Clear();
 
       // In a nutshell, this remaps methods per-hand that output multiple interaction objects if the hand changed those objects' states
       // to methods per-object with all of the hands for which the check produced a state-change.
-      foreach (var hand in hands) {
+      foreach (var hand in _interactionHands) {
         HashSet<IInteractionBehaviour> stateChangedObjects;
         if (multiObjectStateCheckFunc(hand, out stateChangedObjects)) {
           foreach (var stateChangedObject in stateChangedObjects) {
