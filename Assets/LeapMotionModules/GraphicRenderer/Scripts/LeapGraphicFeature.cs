@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity.Query;
@@ -92,5 +93,17 @@ namespace Leap.Unity.GraphicalRenderer {
         feature.isDirty = true;
       }
     }
+
+#if UNITY_EDITOR
+    public static Type GetFeatureType(Type dataObjType) {
+      var allTypes = Assembly.GetAssembly(dataObjType).GetTypes();
+      return allTypes.Query().
+                      Where(t => t.IsSubclassOf(typeof(LeapGraphicFeatureBase)) &&
+                                 t != typeof(LeapGraphicFeatureBase) &&
+                                !t.IsAbstract &&
+                                 t.BaseType.GetGenericArguments()[0] == dataObjType).
+                      FirstOrDefault();
+    }
+#endif
   }
 }

@@ -51,7 +51,7 @@ namespace Leap.Unity.GraphicalRenderer {
         _addRenderingMethodMenu.AddItem(new GUIContent(LeapGraphicTagAttribute.GetTag(renderingMethod)),
                                         false,
                                         () => {
-                                          target.editor.ChangeRenderingMethod(renderingMethod);
+                                          target.editor.ChangeRenderingMethod(renderingMethod, addFeatures: false);
                                           serializedObject.Update();
                                           CreateCachedEditor(target.renderingMethod, null, ref _rendererEditor);
                                           target.renderer.editor.ScheduleEditorUpdate();
