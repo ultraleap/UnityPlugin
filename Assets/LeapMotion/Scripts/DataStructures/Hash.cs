@@ -43,7 +43,13 @@ namespace Leap.Unity {
 
       root.GetComponents(_behaviourCache);
       for (int i = 0; i < _behaviourCache.Count; i++) {
-        hash.Add(_behaviourCache[i].enabled);
+        var behaviour = _behaviourCache[i];
+
+        //A behaviour returned from GetComponents can be null if it is an invalid
+        //script object or due to a compile error >.>
+        if (behaviour != null) {
+          hash.Add(behaviour.enabled);
+        }
       }
 
       return hash;

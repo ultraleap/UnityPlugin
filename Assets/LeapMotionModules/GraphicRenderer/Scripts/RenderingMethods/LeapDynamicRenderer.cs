@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Query;
 using Leap.Unity.Space;
 
 namespace Leap.Unity.GraphicalRenderer {
@@ -11,6 +12,9 @@ namespace Leap.Unity.GraphicalRenderer {
 
     #region PRIVATE VARIABLES
 
+    private Dictionary<LeapGraphic, int> _graphicToId = new Dictionary<LeapGraphic, int>();
+    private Stack<int> _freeIds = new Stack<int>();
+
     //Curved space
     private const string CURVED_PARAMETERS = LeapGraphicRenderer.PROPERTY_PREFIX + "Curved_GraphicParameters";
     private List<Matrix4x4> _curved_worldToAnchor = new List<Matrix4x4>();
@@ -18,18 +22,31 @@ namespace Leap.Unity.GraphicalRenderer {
     private List<Vector4> _curved_graphicParameters = new List<Vector4>();
     #endregion
 
-    public void OnAddGraphic() {
-      //TODO
-      if (Application.isPlaying) {
-        throw new NotImplementedException();
+    public void OnAddGraphic(LeapGraphic graphic, int newIndex) {
+      int id;
+      if (_freeIds.Count > 0) {
+        id = _freeIds.Pop();
+      } else {
+        id = newIndex;
       }
+
+      beginMesh();
+      _generation.graphic = graphic as LeapMeshGraphicBase;
+      _generation.graphicIndex = newIndex;
+      _generation.graphicId = id;
+      buildGraphic();
+      finishMesh();
+
+      _graphicToId[graphic] = id;
     }
 
-    public void OnRemoveGraphic() {
-      //TODO
-      if (Application.isPlaying) {
-        throw new NotImplementedException();
-      }
+    public void OnRemoveGraphic(LeapGraphic graphic, int graphicIndex) {
+      int id = _graphicToId[graphic];
+      _freeIds.Push(id);
+
+      _graphicToId.Remove(graphic);
+
+      _meshes.RemoveMesh(graphicIndex);
     }
 
     public override SupportInfo GetSpaceSupportInfo(LeapSpace space) {
@@ -40,6 +57,22 @@ namespace Leap.Unity.GraphicalRenderer {
       } else {
         return SupportInfo.Error("Dynamic Renderer does not support " + space.GetType().Name);
       }
+    }
+
+    public override void OnEnableRenderer() {
+      for (int i = 0; i < group.graphics.Count; i++) {
+        _graphicToId[group.graphics[i]] = i;
+      }
+
+      base.OnEnableRenderer();
+    }
+
+    public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
+      for (int i = 0; i < group.graphics.Count; i++) {
+        _graphicToId[group.graphics[i]] = i;
+      }
+
+      base.OnUpdateRendererEditor(isHeavyUpdate);
     }
 
     public override void OnUpdateRenderer() {
@@ -131,13 +164,13 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected override Vector3 blendShapeDelta(Vector3 shapeVert, Vector3 originalVert) {
       //TODO, optimize this, i'm sure it could be optimized.
-      Vector3 worldVert = _currGraphic.transform.TransformPoint(shapeVert);
+      Vector3 worldVert = _generation.graphic.transform.TransformPoint(shapeVert);
       Vector3 localVert = renderer.transform.InverseTransformPoint(worldVert);
-      shapeVert = localVert - renderer.transform.InverseTransformPoint(_currGraphic.transform.position);
+      shapeVert = localVert - renderer.transform.InverseTransformPoint(_generation.graphic.transform.position);
 
-      Vector3 worldVert2 = _currGraphic.transform.TransformPoint(originalVert);
+      Vector3 worldVert2 = _generation.graphic.transform.TransformPoint(originalVert);
       Vector3 localVert2 = renderer.transform.InverseTransformPoint(worldVert2);
-      originalVert = localVert2 - renderer.transform.InverseTransformPoint(_currGraphic.transform.position);
+      originalVert = localVert2 - renderer.transform.InverseTransformPoint(_generation.graphic.transform.position);
 
       return shapeVert - originalVert;
     }

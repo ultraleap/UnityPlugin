@@ -97,7 +97,10 @@ namespace Leap.Unity.GraphicalRenderer {
       if (!_createMeshRenderers) {
         using (new ProfilerSample("Draw Meshes")) {
           for (int i = 0; i < _meshes.Count; i++) {
-            Graphics.DrawMesh(_meshes[i], renderer.transform.localToWorldMatrix, _material, _layer);
+            Mesh mesh = _meshes[i];
+            if (mesh != null) {
+              Graphics.DrawMesh(_meshes[i], renderer.transform.localToWorldMatrix, _material, _layer);
+            }
           }
         }
       }
@@ -124,6 +127,7 @@ namespace Leap.Unity.GraphicalRenderer {
         while (_renderers.Count > _meshes.Count) {
           _renderers.RemoveLast().Destroy();
         }
+
         while (_renderers.Count < _meshes.Count) {
           _renderers.Add(new MeshRendererContainer(transform));
         }
@@ -164,23 +168,23 @@ namespace Leap.Unity.GraphicalRenderer {
     protected override void buildTopology() {
       //If the next graphic is going to put us over the limit, finish the current mesh
       //and start a new one.
-      if (_verts.Count + _currGraphic.mesh.vertexCount > MeshUtil.MAX_VERT_COUNT) {
+      if (_generation.verts.Count + _generation.graphic.mesh.vertexCount > MeshUtil.MAX_VERT_COUNT) {
         finishMesh();
         beginMesh();
       }
 
       switch (_motionType) {
         case MotionType.None:
-          _noMotion_transformer = _currGraphic.transformer;
+          _noMotion_transformer = _generation.graphic.transformer;
           _noMotion_graphicVertToLocalVert = renderer.transform.worldToLocalMatrix *
-                                             _currGraphic.transform.localToWorldMatrix;
+                                             _generation.graphic.transform.localToWorldMatrix;
           break;
         case MotionType.Translation:
-          _translation_graphicVertToMeshVert = Matrix4x4.TRS(-renderer.transform.InverseTransformPoint(_currGraphic.transform.position),
+          _translation_graphicVertToMeshVert = Matrix4x4.TRS(-renderer.transform.InverseTransformPoint(_generation.graphic.transform.position),
                                                              Quaternion.identity,
                                                              Vector3.one) *
                                                renderer.transform.worldToLocalMatrix *
-                                               _currGraphic.transform.localToWorldMatrix;
+                                               _generation.graphic.transform.localToWorldMatrix;
 
           break;
         default:
@@ -195,7 +199,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
       //For the baked renderer, the mesh really never accurately represents it's visual position 
       //or size, so just disable culling entirely by making the bound gigantic.
-      _currMesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000);
+      _generation.mesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000);
     }
 
     protected override bool doesRequireSpecialUv3() {
