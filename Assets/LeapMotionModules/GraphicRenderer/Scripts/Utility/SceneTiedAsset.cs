@@ -29,23 +29,7 @@ namespace Leap.Unity.GraphicalRenderer {
     protected virtual void OnAssetSaved() { }
 
     private static class AssetRef<T> {
-      private static Dictionary<Object, T> _to = new Dictionary<Object, T>();
-      private static Dictionary<T, Object> _from = new Dictionary<T, Object>();
-
-      public static bool TryGet(Object key, out T value) {
-        return _to.TryGetValue(key, out value);
-      }
-
-      public static bool TryGet(T key, out Object value) {
-        return _from.TryGetValue(key, out value);
-      }
-
-      public static void Put(Object key, T value) {
-        Assert.IsTrue(key != null);
-        Assert.IsTrue(value != null);
-        _to[key] = value;
-        _from[value] = key;
-      }
+      public static Dictionary<T, Object> map = new Dictionary<T, Object>();
     }
 
 #if UNITY_EDITOR
@@ -65,30 +49,33 @@ namespace Leap.Unity.GraphicalRenderer {
 
       if (t == null) {
         //Try to get the asset from the asset ref map
-        AssetRef<T>.TryGet(holder, out t);
+        foreach (var pair in AssetRef<T>.map) {
+          if (pair.Value == holder) {
+            t = pair.Key;
+          }
+        }
 
         //If t is still null, just create it!
         if (t == null) {
           t = CreateInstance<T>();
           t.name = assetName;
           t.hideFlags = HideFlags.HideAndDontSave;
-
-          AssetRef<T>.Put(holder, t);
         }
 
         didChange = true;
       } else {
         Object otherHolder;
-        if (AssetRef<T>.TryGet(t, out otherHolder)) {
+        if (AssetRef<T>.map.TryGetValue(t, out otherHolder)) {
           if (otherHolder != holder) {
-            t = Instantiate(t);
-            t._isSavedAsset = false;
+            t = CreateInstance<T>();
+            t.name = assetName;
+            t.hideFlags = HideFlags.HideAndDontSave;
             didChange = true;
-
-            AssetRef<T>.Put(holder, t);
           }
         }
       }
+
+      AssetRef<T>.map[t] = holder;
 
       if (assetFolder != null && !t.isSavedAsset) {
         if (!AssetDatabase.IsValidFolder(assetFolder)) {
