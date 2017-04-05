@@ -37,7 +37,7 @@ namespace Leap.Unity.Query {
     }
 
     public Enumerator GetEnumerator() {
-      return new Enumerator(op);
+      return new Enumerator(_op);
     }
 
     public struct Enumerator {
