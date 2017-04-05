@@ -82,7 +82,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected void CreateOrSave<T>(ref T t, string assetName) where T : SceneTiedAsset {
       T newT = t;
-      if (SceneTiedAsset.CreateOrSave(gameObject, 
+      if (SceneTiedAsset.CreateOrSave(this, 
                                       ref newT,
                                       DATA_FOLDER_NAME,
                                       assetName)) {

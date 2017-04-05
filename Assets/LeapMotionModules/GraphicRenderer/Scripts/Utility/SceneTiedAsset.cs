@@ -33,13 +33,13 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
 #if UNITY_EDITOR
-    public static bool CreateOrSave<T>(GameObject holder,
+    public static bool CreateOrSave<T>(Component holder,
                                        ref T t,
                                        string folderSuffix,
                                        string assetName) where T : SceneTiedAsset {
       bool didChange = false;
       string assetFolder = null;
-      var scene = holder.scene;
+      var scene = holder.gameObject.scene;
 
       if (scene.IsValid() && !string.IsNullOrEmpty(scene.path)) {
         string sceneDirectory = Path.GetDirectoryName(scene.path);
