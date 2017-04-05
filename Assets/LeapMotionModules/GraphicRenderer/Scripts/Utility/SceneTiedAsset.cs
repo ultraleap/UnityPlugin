@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
@@ -9,15 +10,16 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
+
   public class SceneTiedAsset : ScriptableObject {
 
     [SerializeField]
-    private int _referenceId;
+    private bool _isSavedAsset;
 
 #if UNITY_EDITOR
     public bool isSavedAsset {
       get {
-        return _referenceId != 0;
+        return _isSavedAsset;
       }
     }
 #endif
@@ -26,16 +28,34 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void OnAssetSaved() { }
 
-#if UNITY_EDITOR
-    public static bool CreateOrSave<T>(ref T t,
-                                       Scene scene,
-                                       string folderSuffix,
-                                       string assetName,
-                                       int referenceId) where T : SceneTiedAsset {
-      bool didCreate = false;
-      string assetFolder = null;
+    private static class AssetRef<T> {
+      private static Dictionary<Object, T> _to = new Dictionary<Object, T>();
+      private static Dictionary<T, Object> _from = new Dictionary<T, Object>();
 
-      Assert.AreNotEqual(referenceId, 0);
+      public static bool TryGet(Object key, out T value) {
+        return _to.TryGetValue(key, out value);
+      }
+
+      public static bool TryGet(T key, out Object value) {
+        return _from.TryGetValue(key, out value);
+      }
+
+      public static void Put(Object key, T value) {
+        Assert.IsTrue(key != null);
+        Assert.IsTrue(value != null);
+        _to[key] = value;
+        _from[value] = key;
+      }
+    }
+
+#if UNITY_EDITOR
+    public static bool CreateOrSave<T>(GameObject holder,
+                                       ref T t,
+                                       string folderSuffix,
+                                       string assetName) where T : SceneTiedAsset {
+      bool didChange = false;
+      string assetFolder = null;
+      var scene = holder.scene;
 
       if (scene.IsValid() && !string.IsNullOrEmpty(scene.path)) {
         string sceneDirectory = Path.GetDirectoryName(scene.path);
@@ -44,27 +64,30 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       if (t == null) {
-        if (assetFolder != null && AssetDatabase.IsValidFolder(assetFolder)) {
-          string filter = assetName + " t:" + typeof(T).Name;
-          string[] folder = new string[] { assetFolder };
-          string[] guids = AssetDatabase.FindAssets(filter, folder);
-
-          //Use the first asset that has a matching asset id
-          t = guids.Query().Select(g => AssetDatabase.GUIDToAssetPath(g)).
-                            Where(p => !string.IsNullOrEmpty(p)).
-                            Select(p => AssetDatabase.LoadAssetAtPath<T>(p)).
-                            NonNull().
-                            FirstOrDefault(a => a._referenceId == referenceId);
-        }
+        //Try to get the asset from the asset ref map
+        AssetRef<T>.TryGet(holder, out t);
 
         //If t is still null, just create it!
         if (t == null) {
           t = CreateInstance<T>();
           t.name = assetName;
           t.hideFlags = HideFlags.HideAndDontSave;
+
+          AssetRef<T>.Put(holder, t);
         }
 
-        didCreate = true;
+        didChange = true;
+      } else {
+        Object otherHolder;
+        if (AssetRef<T>.TryGet(t, out otherHolder)) {
+          if (otherHolder != holder) {
+            t = Instantiate(t);
+            t._isSavedAsset = false;
+            didChange = true;
+
+            AssetRef<T>.Put(holder, t);
+          }
+        }
       }
 
       if (assetFolder != null && !t.isSavedAsset) {
@@ -76,13 +99,13 @@ namespace Leap.Unity.GraphicalRenderer {
         assetPath = AssetDatabase.GenerateUniqueAssetPath(assetPath);
 
         t.hideFlags = HideFlags.None;
-        t._referenceId = referenceId;
+        t._isSavedAsset = true;
         AssetDatabase.CreateAsset(t, assetPath);
         t.OnAssetSaved();
         AssetDatabase.SaveAssets();
       }
 
-      return didCreate;
+      return didChange;
     }
 
     public static void Delete<T>(ref T t) where T : SceneTiedAsset {
