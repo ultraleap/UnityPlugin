@@ -9,37 +9,24 @@ namespace Leap.Unity.UI.Interaction {
 
   public static class TransformExtensions {
 
-    [ThreadStatic]
-    private static ChildrenEnumerator s_childEnum = new ChildrenEnumerator();
-    public static ChildrenEnumerator GetChildEnumerator(this Transform t) {
-      s_childEnum.ResetWithNewTransform(t);
-      return s_childEnum;
+    public static ChildrenEnumerator GetChildren(this Transform t) {
+      return new ChildrenEnumerator(t);
     }
 
   }
 
-  public class ChildrenEnumerator : IEnumerator<Transform> {
+  public struct ChildrenEnumerator {
     private Transform _t;
     private int _idx;
     private int _count;
 
-    public IEnumerator<Transform> GetEnumerator() { return this; }
-
-    /// <summary>
-    /// If the parameterless constructor is called, be sure to call
-    /// ResetWithNewTransform(t) before attempting to enumerate.
-    /// </summary>
-    public ChildrenEnumerator() { }
-
     public ChildrenEnumerator(Transform t) {
-      ResetWithNewTransform(t);
-    }
-
-    public void ResetWithNewTransform(Transform t) {
       _t = t;
       _idx = -1;
-      _count = t == null ? 0 : t.childCount;
+      _count = t.childCount;
     }
+
+    public ChildrenEnumerator GetEnumerator() { return this; }
 
     public bool MoveNext() {
       if (_idx < _count) _idx += 1;
@@ -53,8 +40,6 @@ namespace Leap.Unity.UI.Interaction {
       _idx = -1;
       _count = _t.childCount;
     }
-
-    object IEnumerator.Current { get { return Current; } }
     public void Dispose() { }
   }
 

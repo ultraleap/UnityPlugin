@@ -1143,7 +1143,7 @@ namespace Leap.Unity.UI.Interaction {
         curT = _toVisit.Pop();
 
         // Recursively search children and children's children
-        foreach (var child in curT.GetChildEnumerator()) {
+        foreach (var child in curT.GetChildren()) {
           // Ignore children with Rigidbodies of their own; its own Rigidbody
           // owns its own colliders and the colliders of its children
           if (child.GetComponent<Rigidbody>() == null) {
