@@ -242,7 +242,7 @@ GameObject:
   - component: {fileID: 124275131}
   - component: {fileID: 124275137}
   m_Layer: 0
-  m_Name: Oblong Cube
+  m_Name: Oblong Cube - Checks Primary Hover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -339,13 +339,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 124275130}
-  m_LocalRotation: {x: -0, y: -0, z: -0.34573534, w: 0.9383321}
-  m_LocalPosition: {x: 0.051, y: 0.005, z: 0.337}
+  m_LocalRotation: {x: -0.114937946, y: 0.31194377, z: -0.32607096, w: 0.8849622}
+  m_LocalPosition: {x: 0.46, y: 0.056, z: 0.5089519}
   m_LocalScale: {x: 0.02915555, y: 0.46267548, z: 0.02915555}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -40.453003}
+  m_LocalEulerAnglesHint: {x: 0, y: 38.834003, z: -40.453003}
 --- !u!114 &124275137
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -357,8 +357,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2ab645ef544b964ba23f6369a70d9e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _intObj: {fileID: 0}
-  _matInstance: {fileID: 0}
 --- !u!1 &129172182
 GameObject:
   m_ObjectHideFlags: 0
@@ -1157,7 +1155,7 @@ GameObject:
   - component: {fileID: 445421614}
   - component: {fileID: 445421613}
   m_Layer: 0
-  m_Name: Oblong Cube (1)
+  m_Name: Oblong Cube 2 - Checks Primary Hover
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1174,8 +1172,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2ab645ef544b964ba23f6369a70d9e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _intObj: {fileID: 0}
-  _matInstance: {fileID: 0}
 --- !u!114 &445421614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1267,13 +1263,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 445421612}
-  m_LocalRotation: {x: -0, y: -0, z: 0.46012032, w: 0.8878566}
-  m_LocalPosition: {x: 0.051, y: 0.005, z: 0.418}
+  m_LocalRotation: {x: 0.15296471, y: 0.2951635, z: 0.43394983, w: 0.8373577}
+  m_LocalPosition: {x: 0.51, y: 0.056, z: 0.57204807}
   m_LocalScale: {x: 0.02915555, y: 0.46267548, z: 0.02915555}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 54.79}
+  m_LocalEulerAnglesHint: {x: 0, y: 38.834003, z: 54.79}
 --- !u!1 &517190134
 GameObject:
   m_ObjectHideFlags: 0
@@ -2149,7 +2145,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1020742381
 Transform:
   m_ObjectHideFlags: 0

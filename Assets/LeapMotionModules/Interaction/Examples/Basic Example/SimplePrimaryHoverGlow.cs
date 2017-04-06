@@ -20,36 +20,20 @@ public class SimplePrimaryHoverGlow : MonoBehaviour, IRuntimeGizmoComponent {
 
   void Update() {
     if (_intObj.isGrasped) {
-      Turn(Color.red);
+      Turn(Color.blue);
     }
     else {
       if (_intObj.isPrimaryHovered) {
         // var hand = _intObj.primaryHoveringHand;
-        TurnWhite();
+        Turn(Color.white);
       }
       else {
-        TurnBlack();
+        Turn(Color.black);
       }
     }
   }
 
   private Material _matInstance;
-
-  private void TurnWhite() {
-    var renderer = GetComponent<Renderer>();
-    if (_matInstance == null) _matInstance = renderer.material;
-    else {
-      _matInstance.color = Color.white;
-    }
-  }
-
-  private void TurnBlack() {
-    var renderer = GetComponent<Renderer>();
-    if (_matInstance == null) _matInstance = renderer.material;
-    else {
-      _matInstance.color = Color.black;
-    }
-  }
 
   private void Turn(Color c) {
     var renderer = GetComponent<Renderer>();
