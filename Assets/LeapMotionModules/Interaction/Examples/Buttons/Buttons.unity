@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44608885, g: 0.49058884, b: 0.546173, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -329,8 +329,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
+  minMaxHeight: {x: 0, y: 0.02}
+  restingHeight: 0.5
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -765,8 +765,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
+  minMaxHeight: {x: 0, y: 0.02}
+  restingHeight: 0.5
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -905,8 +905,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ebbb41b110e5794ab82d986ca172460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
+  minMaxHeight: {x: 0, y: 0.02}
+  restingHeight: 0.5
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -921,8 +921,6 @@ MonoBehaviour:
   VerticalValueRange: {x: 0, y: 1}
   HorizontalSlideLimits: {x: 0, y: 0}
   VerticalSlideLimits: {x: -0.05, y: 0.05}
-  HorizontalSliderValue: 0
-  VerticalSliderValue: 0
 --- !u!114 &604444918
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1053,6 +1051,35 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!21 &700977347
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Graphic Material
+  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  m_ShaderKeywords: GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
+    GRAPHIC_RENDERER_TINTING GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_UV_0
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 28639850224448658, guid: feb724c3e122ef34c9fb69ae51771ac9,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &722891430
 GameObject:
   m_ObjectHideFlags: 0
@@ -1227,8 +1254,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ebbb41b110e5794ab82d986ca172460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
+  minMaxHeight: {x: 0, y: 0.02}
+  restingHeight: 0.5
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -1243,8 +1270,6 @@ MonoBehaviour:
   VerticalValueRange: {x: 0, y: 1}
   HorizontalSlideLimits: {x: -0.05, y: 0.05}
   VerticalSlideLimits: {x: -0.05, y: 0.05}
-  HorizontalSliderValue: 0
-  VerticalSliderValue: 0
 --- !u!1 &758070963
 GameObject:
   m_ObjectHideFlags: 0
@@ -1419,8 +1444,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
+  minMaxHeight: {x: 0, y: 0.02}
+  restingHeight: 0.5
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -1725,8 +1750,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
+  minMaxHeight: {x: 0, y: 0.02}
+  restingHeight: 0.5
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -1957,35 +1982,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 215a4d49fc705b74a9d3c5cbfa2c9601, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!21 &1271475505
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Graphic Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
-    GRAPHIC_RENDERER_TINTING GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_UV_0
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 28494564970337086, guid: 31550b46fd625e24bb28c0cf6df52974,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex2:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &1369518616
 GameObject:
   m_ObjectHideFlags: 0
@@ -2324,8 +2320,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
+  minMaxHeight: {x: 0, y: 0.02}
+  restingHeight: 0.5
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -2544,8 +2540,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
+  minMaxHeight: {x: 0, y: 0.02}
+  restingHeight: 0.5
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -2826,8 +2822,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
+  minMaxHeight: {x: 0, y: 0.02}
+  restingHeight: 0.5
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -2918,9 +2914,9 @@ MonoBehaviour:
     _filterMode: 1
     _format: 5
     _maxAtlasSize: 4096
-  _material: {fileID: 1271475505}
-  _meshes: {fileID: 11400000, guid: 26ae80b321bcc2346a8c7eebd40c772c, type: 2}
-  _packedTextures: {fileID: 11400000, guid: 31550b46fd625e24bb28c0cf6df52974, type: 2}
+  _material: {fileID: 700977347}
+  _meshes: {fileID: 11400000, guid: 960f36893e1670c4caaa634d19a93d0b, type: 2}
+  _packedTextures: {fileID: 11400000, guid: feb724c3e122ef34c9fb69ae51771ac9, type: 2}
   _channelMapping:
     _data:
     - serializedVersion: 2
@@ -3314,8 +3310,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
+  minMaxHeight: {x: 0, y: 0.02}
+  restingHeight: 0.5
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -3428,8 +3424,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ebbb41b110e5794ab82d986ca172460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MinMaxHeight: {x: 0, y: 0.02}
-  RestingHeight: 0.5
+  minMaxHeight: {x: 0, y: 0.02}
+  restingHeight: 0.5
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -3444,8 +3440,6 @@ MonoBehaviour:
   VerticalValueRange: {x: 0, y: 1}
   HorizontalSlideLimits: {x: -0.05, y: 0.05}
   VerticalSlideLimits: {x: 0, y: 0}
-  HorizontalSliderValue: 0
-  VerticalSliderValue: 0
 --- !u!114 &1793302181
 MonoBehaviour:
   m_ObjectHideFlags: 0
