@@ -51,6 +51,19 @@ namespace Leap.Unity.UI.Interaction {
                                                      null : _closestPrimaryHoveringHand.GetLastTrackedLeapHand(); } }
 
     /// <summary>
+    /// Gets the finger that is currently primarily hovering over this object, of the closest
+    /// primarily hovering hand. Will return null if this object is not currently any hand's
+    /// primary hover.
+    /// </summary>
+    public Finger primaryHoveringFinger {
+      get {
+        if (!isPrimaryHovered) return null;
+        return _closestPrimaryHoveringHand.GetLastTrackedLeapHand()
+                  .Fingers[primaryHoveringInteractionHand.hoverCheckResults.primaryHoveringFingerIdx];
+      }
+    }
+
+    /// <summary>
     /// Gets the primary hovering Interaction Hand for this interaction object, if it has one.
     /// If there is no hand primarily hovering over this object, returns null.
     /// 
@@ -593,16 +606,16 @@ namespace Leap.Unity.UI.Interaction {
 
         float testDistance;
         if (collider is SphereCollider) {
-          testDistance = GetComparativeSqrDistanceForCollider((SphereCollider)collider, colliderTransform, worldPosition);
+          testDistance = GetComparativeCenterSqrDistance((SphereCollider)collider, colliderTransform, worldPosition);
         }
         else if (collider is CapsuleCollider) {
-          testDistance = GetComparativeSqrDistanceForCollider((CapsuleCollider)collider, colliderTransform, worldPosition);
+          testDistance = GetComparativeCenterSqrDistance((CapsuleCollider)collider, colliderTransform, worldPosition);
         }
         else if (collider is BoxCollider) {
-          testDistance = GetComparativeSqrDistanceForCollider((BoxCollider)collider, colliderTransform, worldPosition);
+          testDistance = GetComparativeCenterSqrDistance((BoxCollider)collider, colliderTransform, worldPosition);
         }
         else if (collider is MeshCollider) {
-          testDistance = GetComparativeSqrDistanceForCollider((MeshCollider)collider, colliderTransform, worldPosition);
+          testDistance = GetComparativeCenterSqrDistance((MeshCollider)collider, colliderTransform, worldPosition);
         }
         else {
           testDistance = (this.transform.position - worldPosition).sqrMagnitude;
@@ -614,8 +627,7 @@ namespace Leap.Unity.UI.Interaction {
       }
 
       if (!hasColliders) {
-        Vector3 delta = this.transform.position - worldPosition;
-        return delta.sqrMagnitude;
+        return (this.transform.position - worldPosition).sqrMagnitude;
       }
       else {
         return closestComparativeColliderDistance;
@@ -625,14 +637,14 @@ namespace Leap.Unity.UI.Interaction {
     /// <summary>
     /// Returns the squared distance to the center of the argument SphereCollider.
     /// </summary>
-    protected static float GetComparativeSqrDistanceForCollider(SphereCollider sphere, Transform sphereTransform, Vector3 worldPosition) {
+    protected static float GetComparativeCenterSqrDistance(SphereCollider sphere, Transform sphereTransform, Vector3 worldPosition) {
       return (sphereTransform.TransformPoint(sphere.center) - worldPosition).sqrMagnitude;
     }
 
     /// <summary>
     /// Returns the squared distance to the line segment at the center of the CapsuleCollider.
     /// </summary>
-    protected static float GetComparativeSqrDistanceForCollider(CapsuleCollider capsule, Transform capsuleTransform, Vector3 worldPosition) {
+    protected static float GetComparativeCenterSqrDistance(CapsuleCollider capsule, Transform capsuleTransform, Vector3 worldPosition) {
       // https://docs.unity3d.com/ScriptReference/CapsuleCollider-direction.html
       Vector3 dir = capsule.direction == 0 ? Vector3.right : capsule.direction == 1 ? Vector3.up : Vector3.forward;
 
@@ -648,7 +660,7 @@ namespace Leap.Unity.UI.Interaction {
     /// If the BoxCollider is not a cube, returns the squared distance to the line segment at the center
     /// of the box aligned with the longest component of the box.
     /// </summary>
-    protected static float GetComparativeSqrDistanceForCollider(BoxCollider box, Transform boxTransform, Vector3 worldPosition) {
+    protected static float GetComparativeCenterSqrDistance(BoxCollider box, Transform boxTransform, Vector3 worldPosition) {
       Vector3 size = box.size;
       Vector3 largestCompDir, middleCompDir, smallestCompDir;
       GetComponentSizeOrder(box.size, out largestCompDir, out middleCompDir, out smallestCompDir);
@@ -703,7 +715,7 @@ namespace Leap.Unity.UI.Interaction {
     /// <summary>
     /// Gets a comparative squared distance from the center of the MeshCollider's axis-aligned bounding box.
     /// </summary>
-    protected static float GetComparativeSqrDistanceForCollider(MeshCollider mesh, Transform meshTransform, Vector3 worldPosition) {
+    protected static float GetComparativeCenterSqrDistance(MeshCollider mesh, Transform meshTransform, Vector3 worldPosition) {
       return (meshTransform.TransformPoint(mesh.bounds.center) - worldPosition).sqrMagnitude;
     }
 

@@ -65,7 +65,7 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Hovering
 
-    private const float MAX_PRIMARY_HOVER_DISTANCE = 0.1F * 1000000F;
+    private const float MAX_PRIMARY_HOVER_DISTANCE = 0.25F;
     private IInteractionBehaviour _primaryHoveredLastFrame = null;
 
     private ActivityManager _hoverActivityManager;
@@ -85,15 +85,22 @@ namespace Leap.Unity.UI.Interaction {
       _interactionHoverOverride = value;
     }
 
-    private struct HoverCheckResults {
+    public struct HoverCheckResults {
       public HashSet<IInteractionBehaviour> hovered;
       public IInteractionBehaviour[] perFingerHovered;
       public IInteractionBehaviour primaryHovered;
+      public int primaryHoveringFingerIdx;
       public float primaryHoveredDistance;
       public Hand checkedHand;
     }
 
     private HoverCheckResults _hoverResults = new HoverCheckResults();
+
+    /// <summary>
+    /// Returns the information used to calculate hover and primary hover callbacks from
+    /// the latest fixed frame.
+    /// </summary>
+    public HoverCheckResults hoverCheckResults { get { return _hoverResults; } }
 
     private void FixedUpdateHovering() {
       using (new ProfilerSample("Fixed Update InteractionHand Hovering")) {
@@ -167,10 +174,9 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private void CheckHoverForBehaviour(Vector3 position, IInteractionBehaviour behaviour, ISpaceComponent spaceComponent, int whichFinger, ref float leastFingerDistance, ref HoverCheckResults curResults) {
-      // TODO: NEED BETTER DISTANCE FUNCTION
-      float distance = float.MaxValue;
+
+      float distance = float.PositiveInfinity;
       if (spaceComponent == null) {
-        //distance = Vector3.SqrMagnitude(behaviour.transform.position - position);
         distance = behaviour.GetComparativeHoverDistance(position);
       } else {
         distance = behaviour.GetComparativeHoverDistance(transformPoint(position, spaceComponent));
@@ -186,6 +192,7 @@ namespace Leap.Unity.UI.Interaction {
         if (leastFingerDistance < curResults.primaryHoveredDistance && distance < MAX_PRIMARY_HOVER_DISTANCE * MAX_PRIMARY_HOVER_DISTANCE) {
           curResults.primaryHoveredDistance = leastFingerDistance;
           curResults.primaryHovered = curResults.perFingerHovered[whichFinger];
+          curResults.primaryHoveringFingerIdx = whichFinger;
         }
       }
     }
