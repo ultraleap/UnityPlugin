@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Leap.Unity.Space;
+using InteractionEngineUtility;
 
 namespace Leap.Unity.UI.Interaction {
 
@@ -48,6 +49,18 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     public Hand primaryHoveringHand   { get { return _closestPrimaryHoveringHand == null ?
                                                      null : _closestPrimaryHoveringHand.GetLastTrackedLeapHand(); } }
+
+    /// <summary>
+    /// Gets the primary hovering Interaction Hand for this interaction object, if it has one.
+    /// If there is no hand primarily hovering over this object, returns null.
+    /// 
+    /// Interaction Hands can access the underlying Leap Hand via GetLeapHand() or GetLastTrackedLeapHand(),
+    /// but they can also perform interaction-related actions, such as ReleaseGrasp().
+    /// </summary>
+    public InteractionHand primaryHoveringInteractionHand { get { return _closestPrimaryHoveringHand == null ?
+                                                                         null : _closestPrimaryHoveringHand; } }
+
+
 
     /// <summary>
     /// Called whenever one or more hands have entered the hover activity radius around this
@@ -218,6 +231,12 @@ namespace Leap.Unity.UI.Interaction {
 
     /// <summary> Gets a set of all hands currently grasping this object. </summary>
     public HashSet<InteractionHand> graspingHands { get { return _graspingHands; } }
+
+    /// <summary>
+    /// Gets whether the object is currently suspended. An object is "suspended" if it
+    /// is currently grasped by an untracked hand. For more details, refer to OnSuspensionBegin.
+    /// </summary>
+    public bool isSuspended { get { return _suspendingHand != null; } }
 
     /// <summary>
     /// Releases this object from the hand currently grasping it, if it is grasped, and returns true.
@@ -529,8 +548,13 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     protected virtual void Start() {
-      RefreshPositionLockedState();
+      // Make sure we have a list of all of this object's colliders.
+      RefreshColliderState();
 
+      // Check any Joint attachments to automatically be able to choose Kabsch pivot setting (grasping).
+      RefreshPositionLockedState();
+      
+      // Ensure physics layers are set up properly.
       InitInternal();
     }
 
@@ -556,8 +580,131 @@ namespace Leap.Unity.UI.Interaction {
 
     private InteractionHand _closestHoveringHand = null;
 
-    public float GetDistance(Vector3 worldPosition) {
-      return Vector3.Distance(this.transform.position, worldPosition);
+    public virtual float GetComparativeHoverDistance(Vector3 worldPosition) {
+      float closestComparativeColliderDistance = float.PositiveInfinity;
+      bool hasColliders = false;
+      Collider collider;
+      Transform colliderTransform;
+      foreach (var colliderTransformPair in _colliderTransformPairs) {
+        if (!hasColliders) hasColliders = true;
+
+        collider = colliderTransformPair.collider;
+        colliderTransform = colliderTransformPair.transform;
+
+        float testDistance;
+        if (collider is SphereCollider) {
+          testDistance = GetComparativeSqrDistanceForCollider((SphereCollider)collider, colliderTransform, worldPosition);
+        }
+        else if (collider is CapsuleCollider) {
+          testDistance = GetComparativeSqrDistanceForCollider((CapsuleCollider)collider, colliderTransform, worldPosition);
+        }
+        else if (collider is BoxCollider) {
+          testDistance = GetComparativeSqrDistanceForCollider((BoxCollider)collider, colliderTransform, worldPosition);
+        }
+        else if (collider is MeshCollider) {
+          testDistance = GetComparativeSqrDistanceForCollider((MeshCollider)collider, colliderTransform, worldPosition);
+        }
+        else {
+          testDistance = (this.transform.position - worldPosition).sqrMagnitude;
+        }
+
+        if (testDistance < closestComparativeColliderDistance) {
+          closestComparativeColliderDistance = testDistance;
+        }
+      }
+
+      if (!hasColliders) {
+        Vector3 delta = this.transform.position - worldPosition;
+        return delta.sqrMagnitude;
+      }
+      else {
+        return closestComparativeColliderDistance;
+      }
+    }
+
+    /// <summary>
+    /// Returns the squared distance to the center of the argument SphereCollider.
+    /// </summary>
+    protected static float GetComparativeSqrDistanceForCollider(SphereCollider sphere, Transform sphereTransform, Vector3 worldPosition) {
+      return (sphereTransform.TransformPoint(sphere.center) - worldPosition).sqrMagnitude;
+    }
+
+    /// <summary>
+    /// Returns the squared distance to the line segment at the center of the CapsuleCollider.
+    /// </summary>
+    protected static float GetComparativeSqrDistanceForCollider(CapsuleCollider capsule, Transform capsuleTransform, Vector3 worldPosition) {
+      // https://docs.unity3d.com/ScriptReference/CapsuleCollider-direction.html
+      Vector3 dir = capsule.direction == 0 ? Vector3.right : capsule.direction == 1 ? Vector3.up : Vector3.forward;
+
+      Vector3 a = capsule.center + dir * (capsule.height / 2F - capsule.radius);
+      Vector3 b = capsule.center - dir * (capsule.height / 2F - capsule.radius);
+      return (worldPosition.ConstrainToSegment(capsuleTransform.TransformPoint(a), capsuleTransform.TransformPoint(b)) - worldPosition)
+               .sqrMagnitude;
+    }
+
+    /// <summary>
+    /// Returns a squared distance to the "center" of the BoxCollider, suitable for distance comparisons.
+    /// If the BoxCollider is a cube, returns the squared distance to the center point of the cube.
+    /// If the BoxCollider is not a cube, returns the squared distance to the line segment at the center
+    /// of the box aligned with the longest component of the box.
+    /// </summary>
+    protected static float GetComparativeSqrDistanceForCollider(BoxCollider box, Transform boxTransform, Vector3 worldPosition) {
+      Vector3 size = box.size;
+      Vector3 largestCompDir, middleCompDir, smallestCompDir;
+      GetComponentSizeOrder(box.size, out largestCompDir, out middleCompDir, out smallestCompDir);
+      float largestCompLength = Vector3.Dot(largestCompDir, size);
+      float middleCompLength = Vector3.Dot(middleCompDir, size);
+
+      Vector3 dir = largestCompDir;
+      Vector3 a = box.center + dir * (largestCompLength / 2F - middleCompLength);
+      Vector3 b = box.center - dir * (largestCompLength / 2F - middleCompLength);
+      return (worldPosition.ConstrainToSegment(boxTransform.TransformPoint(a), boxTransform.TransformPoint(b)) - worldPosition)
+                .sqrMagnitude;
+    }
+
+    /// <summary>
+    /// Outputs the largest, middle, and smallest components of the "components" vector as normalized directions;
+    /// e.g. use Vector3.Scale(components, smallestCompDir) to access a Vector3 with the other components zeroed out,
+    /// or use Vector3.Dot(components, smallestCompDir) to access the float value of the smallest component of the vector.
+    /// </summary>
+    private static void GetComponentSizeOrder(Vector3 components, out Vector3 largestCompDir, out Vector3 middleCompDir, out Vector3 smallestCompDir) {
+      Vector3 c = components;
+      Vector3 xDir = Vector3.right, yDir = Vector3.up, zDir = Vector3.forward;
+      if (c.x > c.y) {
+        if (c.z > c.x) {
+          largestCompDir = zDir; middleCompDir = xDir; smallestCompDir = yDir;
+        }
+        else {
+          largestCompDir = xDir;
+          if (c.y > c.z) {
+            middleCompDir = yDir; smallestCompDir = zDir;
+          }
+          else {
+            middleCompDir = zDir; smallestCompDir = yDir;
+          }
+        }
+      }
+      else {
+        if (c.z > c.x) {
+          smallestCompDir = xDir;
+          if (c.y > c.z) {
+            largestCompDir = yDir; middleCompDir = zDir;
+          }
+          else {
+            largestCompDir = zDir; middleCompDir = yDir;
+          }
+        }
+        else {
+          largestCompDir = yDir; middleCompDir = xDir; smallestCompDir = zDir;
+        }
+      }
+    }
+
+    /// <summary>
+    /// Gets a comparative squared distance from the center of the MeshCollider's axis-aligned bounding box.
+    /// </summary>
+    protected static float GetComparativeSqrDistanceForCollider(MeshCollider mesh, Transform meshTransform, Vector3 worldPosition) {
+      return (meshTransform.TransformPoint(mesh.bounds.center) - worldPosition).sqrMagnitude;
     }
 
     public virtual void BeginHover(List<InteractionHand> hands) {
@@ -642,7 +789,7 @@ namespace Leap.Unity.UI.Interaction {
       InteractionHand closestHoveringHand = null;
       float closestHoveringHandDist = float.PositiveInfinity;
       foreach (var hand in hands) {
-        float distance = GetDistance(hand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
+        float distance = GetComparativeHoverDistance(hand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
         if (closestHoveringHand == null
             || distance < closestHoveringHandDist) {
           closestHoveringHand = hand;
@@ -806,6 +953,10 @@ namespace Leap.Unity.UI.Interaction {
         // Revert kinematic state.
         rigidbody.isKinematic = _wasKinematicBeforeGrab;
 
+        if (hands.Count == 1) {
+          throwController.OnThrow(this, hands.Query().First());
+        }
+
         OnObjectGraspEnd(hands);
       }
     }
@@ -830,7 +981,6 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     protected InteractionHand _suspendingHand = null;
-    public bool isSuspended { get { return _suspendingHand != null; } }
 
     public virtual void BeginSuspension(InteractionHand hand) {
       _suspendingHand = hand;
@@ -881,7 +1031,125 @@ namespace Leap.Unity.UI.Interaction {
       FixedUpdateLayer();
     }
 
-    #region Locked Position Checking
+    #region Interaction Layers
+
+    protected enum CollisionMode {
+      Normal,
+      Grasped
+    }
+    protected CollisionMode _collisionMode;
+
+    protected void FixedUpdateCollisionMode() {
+      CollisionMode desiredCollisionMode = CollisionMode.Normal;
+      if (isGrasped) {
+        desiredCollisionMode = CollisionMode.Grasped;
+      }
+
+      _collisionMode = desiredCollisionMode;
+      FixedUpdateLayer();
+
+      Assert.IsTrue((_collisionMode == CollisionMode.Grasped) == isGrasped);
+    }
+
+    protected SingleLayer _initialLayer;
+
+    protected void InitLayer() {
+      _initialLayer = gameObject.layer;
+    }
+
+    protected void FixedUpdateLayer() {
+      int layer;
+
+      if (ignoreContact) {
+        layer = manager.interactionNoContactLayer;
+      }
+      else {
+        switch (_collisionMode) {
+          case CollisionMode.Normal:
+            layer = manager.interactionLayer; break;
+          case CollisionMode.Grasped:
+            layer = manager.interactionNoContactLayer; break;
+          default:
+            Debug.LogError("Invalid collision mode, can't update layer.");
+            return;
+        }
+      }
+
+      if (gameObject.layer != layer) {
+        for (int i = 0; i < _childrenArray.Length; i++) {
+          _childrenArray[i].gameObject.layer = layer;
+        }
+      }
+    }
+
+    #endregion
+
+    #region Collider Checking
+
+    public struct ColliderTransformPair {
+      public Collider collider;
+      public Transform transform;
+    }
+
+    private List<ColliderTransformPair> _colliderTransformPairs = new List<ColliderTransformPair>();
+
+    /// <summary>
+    /// Gets the List of ColliderTransformPairs for this Interaction object.
+    /// 
+    /// Hover distance for this Interaction object, including the distance used for
+    /// primary hover candidacy, is checked using all of the colliders in this List;
+    /// the associated Transforms are the Transforms of the GameObjects that contain
+    /// those Collider components, so the InteractionBehaviour knows where the Colliders
+    /// are in world space.
+    /// 
+    /// RefreshColliderState() will automatically populate the colliders List with
+    /// the appropriate Colliders, but is only called once on Start(). If you change
+    /// Colliders for this object at runtime, you should call RefreshColliderState()
+    /// to keep the Colliders list up-to-date. (Or, if you're feeling brave, you can
+    /// manually modify the List yourself.)
+    /// </summary>
+    public List<ColliderTransformPair> colliders {
+      get { return _colliderTransformPairs; }
+    }
+
+    private Stack<Transform> _toVisit = new Stack<Transform>();
+    /// <summary>
+    /// Recursively searches the hierarchy of this Interaction object to
+    /// find all of the Colliders that are attached to its Rigidbody.
+    /// 
+    /// Call this method manually if you change an Interaction object's colliders
+    /// after its Start() method has been called! (Called automatically on Start().)
+    /// </summary>
+    public void RefreshColliderState() {
+      _colliderTransformPairs.Clear();
+
+      // Traverse the hierarchy of this object's transform to find
+      // all of its Colliders.
+      _toVisit.Push(this.transform);
+      Transform curT;
+      while (_toVisit.Count > 0) {
+        curT = _toVisit.Pop();
+
+        // Recursively search children and children's children
+        foreach (var child in curT.GetChildEnumerator()) {
+          // Ignore children with Rigidbodies of their own; its own Rigidbody
+          // owns its own colliders and the colliders of its children
+          if (child.GetComponent<Rigidbody>() == null) {
+            _toVisit.Push(child);
+          }
+        }
+
+        // Since we'll visit every child, all we need to do is add the colliders
+        // of every transform we visit.
+        foreach (var collider in curT.GetComponents<Collider>()) {
+          _colliderTransformPairs.Add(new ColliderTransformPair { collider = collider, transform = curT });
+        }
+      }
+    }
+
+    #endregion
+
+    #region Locked Position (Joint) Checking
 
     private bool _isPositionLocked = false;
 
@@ -945,59 +1213,6 @@ namespace Leap.Unity.UI.Interaction {
             _isPositionLocked = true;
             return;
           }
-        }
-      }
-    }
-
-    #endregion
-
-    #region Interaction Layers 
-
-    protected enum CollisionMode {
-      Normal,
-      Grasped
-    }
-    protected CollisionMode _collisionMode;
-
-    protected void FixedUpdateCollisionMode() {
-      CollisionMode desiredCollisionMode = CollisionMode.Normal;
-      if (isGrasped) {
-        desiredCollisionMode = CollisionMode.Grasped;
-      }
-
-      _collisionMode = desiredCollisionMode;
-      FixedUpdateLayer();
-
-      Assert.IsTrue((_collisionMode == CollisionMode.Grasped) == isGrasped);
-    }
-
-    protected SingleLayer _initialLayer;
-
-    protected void InitLayer() {
-      _initialLayer = gameObject.layer;
-    }
-
-    protected void FixedUpdateLayer() {
-      int layer;
-
-      if (ignoreContact) {
-        layer = manager.interactionNoContactLayer;
-      }
-      else {
-        switch (_collisionMode) {
-          case CollisionMode.Normal:
-            layer = manager.interactionLayer; break;
-          case CollisionMode.Grasped:
-            layer = manager.interactionNoContactLayer; break;
-          default:
-            Debug.LogError("Invalid collision mode, can't update layer.");
-            return;
-        }
-      }
-
-      if (gameObject.layer != layer) {
-        for (int i = 0; i < _childrenArray.Length; i++) {
-          _childrenArray[i].gameObject.layer = layer;
         }
       }
     }

@@ -65,7 +65,7 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Hovering
 
-    private const float MAX_PRIMARY_HOVER_DISTANCE = 0.1F;
+    private const float MAX_PRIMARY_HOVER_DISTANCE = 0.1F * 1000000F;
     private IInteractionBehaviour _primaryHoveredLastFrame = null;
 
     private ActivityManager _hoverActivityManager;
@@ -120,14 +120,14 @@ namespace Leap.Unity.UI.Interaction {
     }
     private HashSet<IInteractionBehaviour> _hoveredLastFrame = new HashSet<IInteractionBehaviour>();
     private HashSet<IInteractionBehaviour> _hoverableCache = new HashSet<IInteractionBehaviour>();
-    private IInteractionBehaviour[] tempPerFingerHovered = new IInteractionBehaviour[3];
+    private IInteractionBehaviour[] _tempPerFingerHovered = new IInteractionBehaviour[3];
 
     private void CheckHoverForHand(Hand hand, HashSet<IInteractionBehaviour> hoverCandidates) {
       _hoverableCache.Clear();
-      Array.Clear(tempPerFingerHovered, 0, tempPerFingerHovered.Length);
+      Array.Clear(_tempPerFingerHovered, 0, _tempPerFingerHovered.Length);
 
       _hoverResults.hovered = _hoverableCache;
-      _hoverResults.perFingerHovered = tempPerFingerHovered;
+      _hoverResults.perFingerHovered = _tempPerFingerHovered;
       _hoverResults.primaryHovered = null;
       _hoverResults.primaryHoveredDistance = float.PositiveInfinity;
       _hoverResults.checkedHand = hand;
@@ -170,9 +170,10 @@ namespace Leap.Unity.UI.Interaction {
       // TODO: NEED BETTER DISTANCE FUNCTION
       float distance = float.MaxValue;
       if (spaceComponent == null) {
-        distance = Vector3.SqrMagnitude(behaviour.transform.position - position);
+        //distance = Vector3.SqrMagnitude(behaviour.transform.position - position);
+        distance = behaviour.GetComparativeHoverDistance(position);
       } else {
-        distance = Vector3.SqrMagnitude(((Component)spaceComponent).transform.position - transformPoint(position, spaceComponent));
+        distance = behaviour.GetComparativeHoverDistance(transformPoint(position, spaceComponent));
       }
 
       if (distance > 0f) {
