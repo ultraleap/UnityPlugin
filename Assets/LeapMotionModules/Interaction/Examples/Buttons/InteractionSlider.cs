@@ -5,7 +5,8 @@ namespace Leap.Unity.UI.Interaction {
   *  Increasing the horizontal and vertical slide limits allows it to act as either a 1D or 2D slider
   */
   public class InteractionSlider : InteractionButton {
-    [Space][Space]
+    [Space]
+    [Space]
 
     [Tooltip("The minimum and maximum values that the slider reports on the horizontal axis.")]
     public Vector2 HorizontalValueRange = new Vector2(0f, 1f);
@@ -21,10 +22,31 @@ namespace Leap.Unity.UI.Interaction {
     [Tooltip("The minimum and maximum vertical extents that the slider can slide to in world space.")]
     public Vector2 VerticalSlideLimits = new Vector2(0f, 0f);
 
-    [HideInInspector]
-    public float HorizontalSliderValue;
-    [HideInInspector]
-    public float VerticalSliderValue;
+    //Reset the slider positions when the slider values are set
+    public float HorizontalSliderValue {
+      get { return _HorizontalSliderValue; }
+      set {
+        if (_HorizontalSlideLimits.x != _HorizontalSlideLimits.y) {
+          float alpha = Mathf.InverseLerp(HorizontalValueRange.x, HorizontalValueRange.y, value);
+          _localPhysicsPosition.x = Mathf.Lerp(_InitialLocalPosition.x + _HorizontalSlideLimits.x, _InitialLocalPosition.x + _HorizontalSlideLimits.y, alpha);
+          _HorizontalSliderValue = value;
+        }
+      }
+    }
+    public float VerticalSliderValue {
+      get { return _VerticalSliderValue; }
+      set {
+        if (_VerticalSlideLimits.x != _VerticalSlideLimits.y) {
+          float alpha = Mathf.InverseLerp(VerticalValueRange.x, VerticalValueRange.y, value);
+          _localPhysicsPosition.y = Mathf.Lerp(_InitialLocalPosition.y + _VerticalSlideLimits.x, _InitialLocalPosition.y + _VerticalSlideLimits.y, alpha);
+          _VerticalSliderValue = value;
+        }
+      }
+    }
+
+    //Slider Values
+    protected float _HorizontalSliderValue;
+    protected float _VerticalSliderValue;
 
     //Slide limits normalized to local space
     protected Vector2 _HorizontalSlideLimits;
@@ -43,13 +65,13 @@ namespace Leap.Unity.UI.Interaction {
 
       //Calculate the Normalized Slider Values
       if (_HorizontalSlideLimits.x != _HorizontalSlideLimits.y) {
-        HorizontalSliderValue = Mathf.InverseLerp(_InitialLocalPosition.x + _HorizontalSlideLimits.x, _InitialLocalPosition.x + _HorizontalSlideLimits.y, _localPhysicsPosition.x);
-        HorizontalSliderValue = Mathf.Lerp(HorizontalValueRange.x, HorizontalValueRange.y, HorizontalSliderValue);
+        _HorizontalSliderValue = Mathf.InverseLerp(_InitialLocalPosition.x + _HorizontalSlideLimits.x, _InitialLocalPosition.x + _HorizontalSlideLimits.y, _localPhysicsPosition.x);
+        _HorizontalSliderValue = Mathf.Lerp(HorizontalValueRange.x, HorizontalValueRange.y, _HorizontalSliderValue);
       }
 
       if (_VerticalSlideLimits.x != _VerticalSlideLimits.y) {
-        VerticalSliderValue = Mathf.InverseLerp(_InitialLocalPosition.y + _VerticalSlideLimits.x, _InitialLocalPosition.y + _VerticalSlideLimits.y, _localPhysicsPosition.y);
-        VerticalSliderValue = Mathf.Lerp(VerticalValueRange.x, VerticalValueRange.y, VerticalSliderValue);
+        _VerticalSliderValue = Mathf.InverseLerp(_InitialLocalPosition.y + _VerticalSlideLimits.x, _InitialLocalPosition.y + _VerticalSlideLimits.y, _localPhysicsPosition.y);
+        _VerticalSliderValue = Mathf.Lerp(VerticalValueRange.x, VerticalValueRange.y, _VerticalSliderValue);
       }
     }
 
