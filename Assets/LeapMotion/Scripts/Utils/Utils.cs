@@ -59,6 +59,55 @@ namespace Leap.Unity {
       array = newArray;
     }
 
+    /// <summary>
+    /// Returns whether or not two lists contain the same elements ignoring order.
+    /// </summary>
+    public static bool AreEqualUnordered<T>(IList<T> a, IList<T> b) {
+      var _count = Pool<Dictionary<T, int>>.Spawn();
+      try {
+        int _nullCount = 0;
+
+        foreach (var i in a) {
+          if (i == null) {
+            _nullCount++;
+          } else {
+            int count;
+            if (!_count.TryGetValue(i, out count)) {
+              count = 0;
+            }
+            _count[i] = count + 1;
+          }
+        }
+
+        foreach (var i in b) {
+          if (i == null) {
+            _nullCount--;
+          } else {
+            int count;
+            if (!_count.TryGetValue(i, out count)) {
+              return false;
+            }
+            _count[i] = count - 1;
+          }
+        }
+
+        if (_nullCount != 0) {
+          return false;
+        }
+
+        foreach (var pair in _count) {
+          if (pair.Value != 0) {
+            return false;
+          }
+        }
+
+        return true;
+      } finally {
+        _count.Clear();
+        Pool<Dictionary<T, int>>.Recycle(_count);
+      }
+    }
+
     #endregion
 
     #region Math Utils
@@ -105,7 +154,7 @@ namespace Leap.Unity {
         }
       }
     }
-    
+
     #endregion
 
     #region Orientation Utils

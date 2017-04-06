@@ -12,6 +12,8 @@ namespace Leap.Unity.GraphicalRenderer {
     public const string LEAP_GRAPHIC_SHADER_FOLDER = "Assets/LeapMotionModules/GraphicRenderer/Shaders/";
     private static Regex _graphicMaxRegex = new Regex(@"^#define\s+GRAPHIC_MAX\s+(\d+)\s*$");
 
+    public const string PROMPT_WHEN_GROUP_CHANGE_KEY = "LeapGraphicRenderer_ShouldPromptWhenGroupChange";
+
     private static int _cachedGraphicMax = -1; //-1 signals dirty
     public static int graphicMax {
       get {
@@ -32,8 +34,27 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    public static bool promptWhenGroupChange {
+      get {
+        return EditorPrefs.GetBool(PROMPT_WHEN_GROUP_CHANGE_KEY, true);
+      }
+      set {
+        EditorPrefs.SetBool(PROMPT_WHEN_GROUP_CHANGE_KEY, value);
+      }
+    }
+
     [PreferenceItem("Leap Graphics")]
     private static void preferencesGUI() {
+      drawGraphicMaxField();
+
+      GUIContent prompContent = new GUIContent("Prompt When Group Changed", "Should the system prompt the user when they change the group of a graphic to a group with different features.");
+      bool newPromptValue = EditorGUILayout.Toggle(prompContent, promptWhenGroupChange);
+      if (promptWhenGroupChange != newPromptValue) {
+        promptWhenGroupChange = newPromptValue;
+      }
+    }
+
+    private static void drawGraphicMaxField() {
       int graphicMax;
       string errorMessage;
       string path;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using Leap.Unity.Query;
@@ -21,8 +22,8 @@ namespace Leap.Unity.GraphicalRenderer {
   public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : LeapGraphic {
     List<Editor> editorCache = new List<Editor>();
 
-    Object[] tempArray = new Object[0];
-    List<Object> tempList = new List<Object>();
+    UnityEngine.Object[] tempArray = new UnityEngine.Object[0];
+    List<UnityEngine.Object> tempList = new List<UnityEngine.Object>();
 
     protected override void OnEnable() {
       base.OnEnable();
@@ -79,6 +80,27 @@ namespace Leap.Unity.GraphicalRenderer {
           foreach (var group in mainGroup.renderer.groups.Query().Where(g => g.renderingMethod.IsValidGraphic(targets[0]))) {
             string tag = LeapGraphicTagAttribute.GetTag(group.renderingMethod.GetType());
             groupMenu.AddItem(new GUIContent(index.ToString() + ": " + tag), false, () => {
+
+              bool areFeaturesUnequal = false;
+              var typesA = group.features.Query().Select(f => f.GetType()).ToList();
+              foreach (var graphic in targets) {
+                var typesB = graphic.attachedGroup.features.Query().Select(f => f.GetType()).ToList();
+                if (!Utils.AreEqualUnordered(typesA, typesB)) {
+                  areFeaturesUnequal = true;
+                  break;
+                }
+              }
+
+              if (areFeaturesUnequal && LeapGraphicPreferences.promptWhenGroupChange) {
+                if (!EditorUtility.DisplayDialog("Features Are Different!",
+                                                 "The group you are moving to has a different feature set than the current group, " +
+                                                 "this can result in data loss!  Are you sure you want to change group?",
+                                                 "Continue",
+                                                 "Cancel")) {
+                  return;
+                }
+              }
+
               foreach (var graphic in targets) {
                 Undo.RecordObject(graphic, "Change graphic group");
                 EditorUtility.SetDirty(graphic);
@@ -107,7 +129,7 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         if (tempArray.Length != targets.Length) {
-          tempArray = new Object[targets.Length];
+          tempArray = new UnityEngine.Object[targets.Length];
         }
 
         int maxGraphics = LeapGraphicPreferences.graphicMax;
@@ -153,7 +175,7 @@ namespace Leap.Unity.GraphicalRenderer {
                                             OfType(mainDataType).
                                             ElementAtOrDefault(typeIndex)).
                   NonNull().
-                  Cast<Object>().
+                  Cast<UnityEngine.Object>().
                   AppendList(tempList);
 
           if (tempList.Count != targets.Length) {

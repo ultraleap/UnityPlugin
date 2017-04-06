@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine.Assertions;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
@@ -35,10 +37,10 @@ namespace Leap.Unity.GraphicalRenderer {
         Assert.IsNotNull(renderingMethodType);
         _group._renderer = renderer;
 
-        ChangeRenderingMethod(renderingMethodType);
+        ChangeRenderingMethod(renderingMethodType, addFeatures: true);
       }
 
-      public void ChangeRenderingMethod(Type renderingMethodType) {
+      public void ChangeRenderingMethod(Type renderingMethodType, bool addFeatures) {
         AssertHelper.AssertEditorOnly();
         Assert.IsNotNull(renderingMethodType);
 
@@ -52,6 +54,37 @@ namespace Leap.Unity.GraphicalRenderer {
         Assert.IsNotNull(_group._renderingMethod);
         _group._renderingMethod.renderer = _group._renderer;
         _group._renderingMethod.group = _group;
+
+        if (addFeatures) {
+          List<Type> dataObjTypes = new List<Type>();
+          var allGraphics = _group.GetComponentsInChildren<LeapGraphic>();
+          foreach (var graphic in allGraphics) {
+            if (_group._renderingMethod.IsValidGraphic(graphic)) {
+
+              List<Type> types = new List<Type>();
+              foreach (var dataObj in graphic.featureData) {
+                var dataType = dataObj.GetType();
+                if (!dataObjTypes.Contains(dataType)) {
+                  types.Add(dataType);
+                }
+              }
+
+              foreach (var type in types) {
+                if (dataObjTypes.Query().Count(t => t == type) < types.Query().Count(t => t == type)) {
+                  dataObjTypes.Add(type);
+                }
+              }
+            }
+          }
+
+          foreach (var type in dataObjTypes) {
+            var featureType = LeapFeatureData.GetFeatureType(type);
+            if (featureType != null) {
+              AddFeature(featureType);
+            }
+          }
+        }
+
         _group._renderingMethod.OnEnableRendererEditor();
       }
 
