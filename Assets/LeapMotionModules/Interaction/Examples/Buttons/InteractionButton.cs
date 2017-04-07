@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
-
 namespace Leap.Unity.UI.Interaction {
 
   ///<summary>
