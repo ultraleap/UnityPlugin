@@ -71,8 +71,7 @@ namespace Leap.Unity.UI.Interaction {
     /// Interaction Hands can access the underlying Leap Hand via GetLeapHand() or GetLastTrackedLeapHand(),
     /// but they can also perform interaction-related actions, such as ReleaseGrasp().
     /// </summary>
-    public InteractionHand primaryHoveringInteractionHand { get { return _closestPrimaryHoveringHand == null ?
-                                                                         null : _closestPrimaryHoveringHand; } }
+    public InteractionHand primaryHoveringInteractionHand { get { return _closestPrimaryHoveringHand; } }
 
 
 
