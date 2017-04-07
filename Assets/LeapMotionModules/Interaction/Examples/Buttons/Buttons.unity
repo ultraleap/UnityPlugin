@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 7
+  serializedVersion: 8
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -25,6 +25,7 @@ RenderSettings:
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1.73
   m_AmbientMode: 0
+  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
@@ -41,7 +42,7 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 7
+  serializedVersion: 9
   m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
@@ -53,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 1
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
-    serializedVersion: 4
+    serializedVersion: 8
     m_Resolution: 2
     m_BakeResolution: 10
     m_TextureWidth: 1024
@@ -66,14 +67,28 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 0
     m_TextureCompression: 1
-    m_DirectLightInLightProbes: 1
     m_FinalGather: 0
     m_FinalGatherFiltering: 1
     m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
+    m_MixedBakeMode: 1
+    m_BakeBackend: 0
+    m_PVRSampling: 1
+    m_PVRDirectSampleCount: 32
+    m_PVRSampleCount: 500
+    m_PVRBounces: 2
+    m_PVRFiltering: 0
+    m_PVRFilteringMode: 1
+    m_PVRCulling: 1
+    m_PVRFilteringGaussRadiusDirect: 1
+    m_PVRFilteringGaussRadiusIndirect: 5
+    m_PVRFilteringGaussRadiusAO: 2
+    m_PVRFilteringAtrousColorSigma: 1
+    m_PVRFilteringAtrousNormalSigma: 1
+    m_PVRFilteringAtrousPositionSigma: 1
   m_LightingDataAsset: {fileID: 112000001, guid: 6a02e83b894aae142a3a074c1d2353f7,
     type: 2}
-  m_RuntimeCPUUsage: 25
+  m_ShadowMaskMode: 2
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -90,6 +105,8 @@ NavMeshSettings:
     minRegionArea: 2
     manualCellSize: 0
     cellSize: 0.16666667
+    manualTileSize: 0
+    tileSize: 256
     accuratePlacement: 0
   m_NavMeshData: {fileID: 0}
 --- !u!1 &64192840
@@ -186,7 +203,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1531927343
   graphic: {fileID: 64192847}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -236,7 +252,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -700619328
   graphic: {fileID: 64192847}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -251,7 +266,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -2010749972
   graphic: {fileID: 64192847}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -326,37 +340,6 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 39d18871c11b53c4082d8202e3db68a3, type: 2}
   m_IsPrefabParent: 0
---- !u!21 &73545932
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Graphic Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
-    GRAPHIC_RENDERER_TINTING GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_UV_0
-  m_LightmapFlags: 5
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  m_SavedProperties:
-    serializedVersion: 2
-    m_TexEnvs:
-    - first:
-        name: _MainTex
-      second:
-        m_Texture: {fileID: 28916055646574168, guid: ac324197ba553b6429bcaf4a85d359d0,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - first:
-        name: _MainTex2
-      second:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &85754730
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,7 +434,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1463026430
   graphic: {fileID: 85754737}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -501,7 +483,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -933068358
   graphic: {fileID: 85754737}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -516,7 +497,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1511723207
   graphic: {fileID: 85754737}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -639,7 +619,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 101199474
   graphic: {fileID: 107997313}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -689,7 +668,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1337573561
   graphic: {fileID: 107997313}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -704,7 +682,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 463471467
   graphic: {fileID: 107997313}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -827,7 +804,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1459300468
   graphic: {fileID: 123467809}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -877,7 +853,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -990434310
   graphic: {fileID: 123467809}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -892,7 +867,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -223977792
   graphic: {fileID: 123467809}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -1015,7 +989,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1640561010
   graphic: {fileID: 179600838}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -1065,7 +1038,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -2133239840
   graphic: {fileID: 179600838}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -1080,7 +1052,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 176154101
   graphic: {fileID: 179600838}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -1249,7 +1220,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -689991249
   graphic: {fileID: 256333727}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -1299,7 +1269,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -993393777
   graphic: {fileID: 256333727}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -1314,7 +1283,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1449564836
   graphic: {fileID: 256333727}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -1437,7 +1405,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -2033549681
   graphic: {fileID: 296849250}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -1487,7 +1454,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1174847714
   graphic: {fileID: 296849250}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -1502,7 +1468,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1202149882
   graphic: {fileID: 296849250}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -1625,7 +1590,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 866140787
   graphic: {fileID: 375145579}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -1675,7 +1639,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1733891147
   graphic: {fileID: 375145579}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -1690,7 +1653,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 130388870
   graphic: {fileID: 375145579}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -1813,7 +1775,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1874525969
   graphic: {fileID: 376263676}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -1863,7 +1824,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1620780556
   graphic: {fileID: 376263676}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -1878,7 +1838,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -583808377
   graphic: {fileID: 376263676}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -2093,7 +2052,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -332950632
   graphic: {fileID: 495407668}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -2143,7 +2101,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1078493905
   graphic: {fileID: 495407668}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -2158,7 +2115,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1404214299
   graphic: {fileID: 495407668}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -2281,7 +2237,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1099954993
   graphic: {fileID: 552256749}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -2331,7 +2286,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 541078329
   graphic: {fileID: 552256749}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -2346,7 +2300,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -681484967
   graphic: {fileID: 552256749}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -2469,7 +2422,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -663453263
   graphic: {fileID: 564590852}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -2519,7 +2471,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -891386700
   graphic: {fileID: 564590852}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -2534,7 +2485,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 815203776
   graphic: {fileID: 564590852}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -2657,7 +2607,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -175570665
   graphic: {fileID: 593503976}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -2707,7 +2656,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1193146070
   graphic: {fileID: 593503976}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -2722,7 +2670,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 965189356
   graphic: {fileID: 593503976}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -2845,7 +2792,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1006679318
   graphic: {fileID: 596105439}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -2895,7 +2841,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -582500193
   graphic: {fileID: 596105439}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -2910,7 +2855,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 2099616874
   graphic: {fileID: 596105439}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -2987,6 +2931,7 @@ MeshRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
 --- !u!64 &658088853
 MeshCollider:
@@ -3116,7 +3061,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 413803407
   graphic: {fileID: 675884441}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -3166,7 +3110,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1164547104
   graphic: {fileID: 675884441}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -3181,7 +3124,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1497087627
   graphic: {fileID: 675884441}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -3304,7 +3246,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 944014163
   graphic: {fileID: 698303318}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -3354,7 +3295,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -59994913
   graphic: {fileID: 698303318}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -3369,7 +3309,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1106564421
   graphic: {fileID: 698303318}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -3492,7 +3431,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -552546357
   graphic: {fileID: 711919877}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -3542,7 +3480,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -483961016
   graphic: {fileID: 711919877}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -3557,7 +3494,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 325585740
   graphic: {fileID: 711919877}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -3680,7 +3616,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1809987011
   graphic: {fileID: 722891437}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -3730,7 +3665,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 507130010
   graphic: {fileID: 722891437}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -3745,7 +3679,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 511536609
   graphic: {fileID: 722891437}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -3868,7 +3801,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 332928349
   graphic: {fileID: 753687252}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -3918,7 +3850,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1919103261
   graphic: {fileID: 753687252}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -3933,7 +3864,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 40252516
   graphic: {fileID: 753687252}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -4056,7 +3986,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1275913768
   graphic: {fileID: 758070970}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -4106,7 +4035,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 254840224
   graphic: {fileID: 758070970}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -4121,7 +4049,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 281486995
   graphic: {fileID: 758070970}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -4215,7 +4142,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 106651628
   graphic: {fileID: 766838818}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -4265,7 +4191,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 226284521
   graphic: {fileID: 766838818}
   feature: {fileID: 1776547490}
   texture: {fileID: 0}
@@ -4280,7 +4205,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 310609156
   graphic: {fileID: 766838818}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -4378,7 +4302,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1113269770
   graphic: {fileID: 775541603}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -4428,7 +4351,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -89074251
   graphic: {fileID: 775541603}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -4443,7 +4365,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1844549309
   graphic: {fileID: 775541603}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -4507,7 +4428,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1527696756
   graphic: {fileID: 982384006}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -4544,7 +4464,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -965655394
   graphic: {fileID: 982384006}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -4559,7 +4478,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -210155532
   graphic: {fileID: 982384006}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -4754,7 +4672,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1550047077
   graphic: {fileID: 1030474432}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -4804,7 +4721,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 631488456
   graphic: {fileID: 1030474432}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -4819,7 +4735,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1133764347
   graphic: {fileID: 1030474432}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -4848,6 +4763,35 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
+--- !u!21 &1032934779
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Graphic Material
+  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  m_ShaderKeywords: GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
+    GRAPHIC_RENDERER_TINTING GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_UV_0
+  m_LightmapFlags: 5
+  m_EnableInstancingVariants: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 28300385032972688, guid: f600a2309d120db4e9a71b94638e4e95,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &1044150502
 GameObject:
   m_ObjectHideFlags: 0
@@ -4942,7 +4886,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -640241479
   graphic: {fileID: 1044150509}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -4992,7 +4935,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1055770137
   graphic: {fileID: 1044150509}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -5007,7 +4949,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1123713839
   graphic: {fileID: 1044150509}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -5130,7 +5071,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 292681521
   graphic: {fileID: 1052163720}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -5180,7 +5120,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 2126814049
   graphic: {fileID: 1052163720}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -5195,7 +5134,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 27297971
   graphic: {fileID: 1052163720}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -5247,7 +5185,7 @@ Light:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1076425313}
   m_Enabled: 1
-  serializedVersion: 7
+  serializedVersion: 8
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
   m_Intensity: 3.75
@@ -5272,6 +5210,8 @@ Light:
   m_Lightmapping: 4
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
 --- !u!4 &1076425315
@@ -5436,7 +5376,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1772692050
   graphic: {fileID: 1093556443}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -5486,7 +5425,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1385388700
   graphic: {fileID: 1093556443}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -5501,7 +5439,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -545633947
   graphic: {fileID: 1093556443}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -5624,7 +5561,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -169053
   graphic: {fileID: 1122126694}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -5674,7 +5610,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 473818855
   graphic: {fileID: 1122126694}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -5689,7 +5624,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -108201062
   graphic: {fileID: 1122126694}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -5917,7 +5851,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 214252904
   graphic: {fileID: 1280019405}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -5967,7 +5900,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 495609940
   graphic: {fileID: 1280019405}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -5982,7 +5914,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 109114420
   graphic: {fileID: 1280019405}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -6105,7 +6036,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1199080916
   graphic: {fileID: 1294748681}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -6155,7 +6085,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1000500520
   graphic: {fileID: 1294748681}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -6170,7 +6099,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 263647955
   graphic: {fileID: 1294748681}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -6293,7 +6221,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1625856788
   graphic: {fileID: 1319104140}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -6343,7 +6270,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1643276909
   graphic: {fileID: 1319104140}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -6358,7 +6284,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1603262369
   graphic: {fileID: 1319104140}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -6456,7 +6381,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 334545837
   graphic: {fileID: 1369518620}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -6506,7 +6430,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1826044812
   graphic: {fileID: 1369518620}
   feature: {fileID: 1776547490}
   texture: {fileID: 0}
@@ -6521,7 +6444,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 98063651
   graphic: {fileID: 1369518620}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -6651,7 +6573,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 601581775
   graphic: {fileID: 1404855188}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -6701,7 +6622,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 944384856
   graphic: {fileID: 1404855188}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -6716,7 +6636,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1876614013
   graphic: {fileID: 1404855188}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -6839,7 +6758,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 931383907
   graphic: {fileID: 1415579351}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -6889,7 +6807,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -2048579299
   graphic: {fileID: 1415579351}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -6904,7 +6821,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1485127959
   graphic: {fileID: 1415579351}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -7027,7 +6943,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 798531160
   graphic: {fileID: 1419064053}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -7077,7 +6992,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -714422491
   graphic: {fileID: 1419064053}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -7092,7 +7006,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1379183082
   graphic: {fileID: 1419064053}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -7215,7 +7128,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -2063068276
   graphic: {fileID: 1459435855}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -7265,7 +7177,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -221028215
   graphic: {fileID: 1459435855}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -7280,7 +7191,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 2018154041
   graphic: {fileID: 1459435855}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -7413,7 +7323,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -580526646
   graphic: {fileID: 1564342059}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -7463,7 +7372,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 152005040
   graphic: {fileID: 1564342059}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -7478,7 +7386,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -145418311
   graphic: {fileID: 1564342059}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -7601,7 +7508,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1625541090
   graphic: {fileID: 1571047529}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -7651,7 +7557,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -138533396
   graphic: {fileID: 1571047529}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -7666,7 +7571,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -2108897885
   graphic: {fileID: 1571047529}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -7789,7 +7693,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1302600344
   graphic: {fileID: 1593125183}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -7839,7 +7742,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1367074199
   graphic: {fileID: 1593125183}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -7854,7 +7756,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1696336045
   graphic: {fileID: 1593125183}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -7977,7 +7878,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -2097440985
   graphic: {fileID: 1625780164}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -8027,7 +7927,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 735385297
   graphic: {fileID: 1625780164}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -8042,7 +7941,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1126234416
   graphic: {fileID: 1625780164}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -8295,7 +8193,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1103324394
   graphic: {fileID: 1650869440}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -8345,7 +8242,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1943746585
   graphic: {fileID: 1650869440}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -8360,7 +8256,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1056456477
   graphic: {fileID: 1650869440}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -8483,7 +8378,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1084656739
   graphic: {fileID: 1715286123}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -8533,7 +8427,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1900283771
   graphic: {fileID: 1715286123}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -8548,7 +8441,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1687948686
   graphic: {fileID: 1715286123}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -8610,7 +8502,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36ae2dc675d304041af3c95461f228e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1998494557
   featureData:
   - {fileID: 766838816}
   - {fileID: 1415579349}
@@ -8673,7 +8564,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00bb44340bd430d44a098a5e36f4de2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 2016004962
   renderer: {fileID: 1776547487}
   group: {fileID: 1776547486}
   _useUv0: 1
@@ -8691,252 +8581,49 @@ MonoBehaviour:
     _filterMode: 1
     _format: 5
     _maxAtlasSize: 4096
-  _material: {fileID: 73545932}
-  _meshes: {fileID: 11400000, guid: f8bd3876e8c7d614080165a7b5305521, type: 2}
-  _packedTextures: {fileID: 11400000, guid: ac324197ba553b6429bcaf4a85d359d0, type: 2}
-  _channelMapping:
-    _data:
+  _material: {fileID: 1032934779}
+  _meshes: {fileID: 11400000, guid: 7b6998d338f48144790ba554e7defd95, type: 2}
+  _packedTextures: {fileID: 11400000, guid: f600a2309d120db4e9a71b94638e4e95, type: 2}
+  _atlasUvs:
+    _channel0:
+      _keys:
+      - {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
+      _values:
+      - serializedVersion: 2
+        x: 0.015625
+        y: 0.015625
+        width: 0.5
+        height: 0.5
+    _channel1:
+      _keys: []
+      _values: []
+    _channel2:
+      _keys: []
+      _values: []
+    _channel3:
+      _keys: []
+      _values: []
+    _nullRects:
     - serializedVersion: 2
       x: 0.546875
       y: 0.015625
       width: 0.015625
       height: 0.015625
     - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
+      x: 0
+      y: 0
+      width: 0
+      height: 0
     - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
+      x: 0
+      y: 0
+      width: 0
+      height: 0
     - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.546875
-      y: 0.015625
-      width: 0.015625
-      height: 0.015625
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    - serializedVersion: 2
-      x: 0.015625
-      y: 0.015625
-      width: 0.5
-      height: 0.5
-    _lengths: 30000000ffffffffffffffffffffffff
+      x: 0
+      y: 0
+      width: 0
+      height: 0
   _layer:
     layerIndex: 0
   _motionType: 1
@@ -8953,7 +8640,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b32d8e323bfd9df4d82051c22f44d792, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1012419110
   _renderingMethod: {fileID: 1776547485}
   _features:
   - {fileID: 1776547490}
@@ -9072,7 +8758,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 36ae2dc675d304041af3c95461f228e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1498945634
   featureData:
   - {fileID: 766838819}
   - {fileID: 1415579352}
@@ -9135,7 +8820,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f6ba66cc9da35149bbfcd9cac71cc62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 232852102
   featureData:
   - {fileID: 766838820}
   - {fileID: 1415579353}
@@ -9279,7 +8963,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -10882470
   graphic: {fileID: 1776885065}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -9329,7 +9012,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1561920005
   graphic: {fileID: 1776885065}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -9344,7 +9026,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1958635216
   graphic: {fileID: 1776885065}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -9467,7 +9148,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -49525563
   graphic: {fileID: 1776897088}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -9517,7 +9197,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1343448026
   graphic: {fileID: 1776897088}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -9532,7 +9211,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1899224322
   graphic: {fileID: 1776897088}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -9653,6 +9331,8 @@ Camera:
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 0
+  m_AllowMSAA: 1
+  m_ForceIntoRT: 0
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
@@ -9759,7 +9439,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 35925644
   graphic: {fileID: 1821969824}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -9809,7 +9488,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -2036890728
   graphic: {fileID: 1821969824}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -9824,7 +9502,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -917602914
   graphic: {fileID: 1821969824}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -10087,7 +9764,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1041910100
   graphic: {fileID: 2037860244}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -10137,7 +9813,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1477407793
   graphic: {fileID: 2037860244}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -10152,7 +9827,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1171486726
   graphic: {fileID: 2037860244}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -10275,7 +9949,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1972640784
   graphic: {fileID: 2101149224}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -10325,7 +9998,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1066103082
   graphic: {fileID: 2101149224}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
@@ -10340,7 +10012,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -9088055
   graphic: {fileID: 2101149224}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -10404,7 +10075,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2088ff06a92b2d4590f9803e38f508e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 1212893478
   graphic: {fileID: 2118264948}
   feature: {fileID: 1776547492}
   _color: {r: 1, g: 1, b: 1, a: 1}
@@ -10441,7 +10111,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: 705293824
   graphic: {fileID: 2118264948}
   feature: {fileID: 1776547484}
   texture: {fileID: 0}
@@ -10528,7 +10197,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2c8779b1bdf86c4dbcbe18f17e44e53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _persistentId: -1488225740
   graphic: {fileID: 2118264948}
   feature: {fileID: 1776547490}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
