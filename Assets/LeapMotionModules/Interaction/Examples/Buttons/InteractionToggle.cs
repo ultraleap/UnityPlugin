@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
+using Leap.Unity.GraphicalRenderer;
 namespace Leap.Unity.UI.Interaction {
 
   /// <summary>
@@ -11,17 +12,11 @@ namespace Leap.Unity.UI.Interaction {
     [Tooltip("The height that this button rests at; this value is a lerp in between the min and max height.")]
     [Range(0f, 1f)]
     ///<summary> The height that this toggle rests at when it is toggled. </summary>
-    public float toggledRestingHeight = 0.5f;
+    public float toggledRestingHeight = 0.25f;
 
     [Space]
     ///<summary> Whether or not this toggle is currently toggled. </summary>
     public bool toggled = false;
-    ///<summary> Whether or not this toggle is currently toggled. </summary>
-    [NonSerialized]
-    public bool toggledOnThisFrame = false;
-    ///<summary> Whether or not this toggle is currently toggled. </summary>
-    [NonSerialized]
-    public bool toggledOffThisFrame = false;
 
     public class BoolEvent : UnityEvent<bool> { }
     ///<summary> Triggered when this toggle is togggled. </summary>
@@ -33,24 +28,20 @@ namespace Leap.Unity.UI.Interaction {
     protected override void Start() {
       base.Start();
       _originalRestingHeight = restingHeight;
+
+      OnPress.AddListener(OnPressed);
     }
 
-    protected override void Update() {
-      base.Update();
-      toggledOnThisFrame = false;
-      toggledOffThisFrame = false;
-
-      if (depressedThisFrame) {
-        toggled = !toggled;
-        toggleEvent.Invoke(toggled);
-        if (toggled) {
-          toggledOnThisFrame = true;
-        } else {
-          toggledOffThisFrame = false;
-        }
-      }
-
+    void OnPressed() {
+      toggled = !toggled;
+      toggleEvent.Invoke(toggled);
       restingHeight = toggled ? toggledRestingHeight : _originalRestingHeight;
+
+      GetComponent<LeapMeshGraphic>().GetRuntimeTint().color = toggled?Color.red:Color.white;
+    }
+
+    void OnDestroy() {
+      OnPress.RemoveAllListeners();
     }
   }
 }

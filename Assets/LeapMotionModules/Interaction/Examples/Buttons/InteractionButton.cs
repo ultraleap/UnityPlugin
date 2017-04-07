@@ -30,12 +30,6 @@ namespace Leap.Unity.UI.Interaction {
     ///<summary> Gets whether the button is currently held down. </summary>
     public bool isDepressed { get; protected set; }
 
-    ///<summary> Gets whether the button was pressed during this Update frame. </summary>
-    public bool depressedThisFrame { get; protected set; }
-
-    ///<summary> Gets whether the button was unpressed during this Update frame. </summary>
-    public bool unDepressedThisFrame { get; protected set; }
-
     // Protected State Variables
 
     ///<summary> The interaction object driving interactions for this UI element. </summary>
@@ -74,6 +68,13 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private void OnPrePhysics() {
+      // Disable collision on this button if it is not the primary hover
+      if (behaviour.isPrimaryHovered) {
+        behaviour.ignoreContact = false;
+      } else {
+        behaviour.ignoreContact = true;
+      }
+
       if (!_body.IsSleeping()) {
         // Sleep the rigidbody if it's not really moving...
         if (_body.position == _physicsPosition && _physicsVelocity == Vector3.zero) {
@@ -137,27 +138,12 @@ namespace Leap.Unity.UI.Interaction {
 
       // If our depression state has changed since last time...
       if (isDepressed && !oldDepressed) {
-        depressedThisFrame = true;
         OnPress.Invoke();
         _handIsLeft = behaviour.primaryHoveringHand.IsLeft;
         behaviour.manager.GetInteractionHand(_handIsLeft).SetInteractionHoverOverride(true);
       } else if (!isDepressed && oldDepressed) {
-        unDepressedThisFrame = true;
         OnUnpress.Invoke();
         behaviour.manager.GetInteractionHand(_handIsLeft).SetInteractionHoverOverride(false);
-      }
-    }
-
-    protected virtual void Update() {
-      // Reset our convenience state variables...
-      depressedThisFrame = false;
-      unDepressedThisFrame = false;
-
-      // Disable collision on this button if it is not the primary hover
-      if (behaviour.isPrimaryHovered) {
-        behaviour.ignoreContact = false;
-      } else {
-        behaviour.ignoreContact = true;
       }
     }
 

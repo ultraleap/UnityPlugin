@@ -18,7 +18,7 @@ namespace Leap.Unity.UI.Interaction {
     [Space]
     [Tooltip("The minimum and maximum horizontal extents that the slider can slide to in world space.")]
     [MinMax(-0.25f, 0.25f)]
-    public Vector2 horizontalSlideLimits = new Vector2(0f, 0f);
+    public Vector2 horizontalSlideLimits = new Vector2(-0.05f, 0.05f);
     [MinMax(-0.25f, 0.25f)]
     [Tooltip("The minimum and maximum vertical extents that the slider can slide to in world space.")]
     public Vector2 verticalSlideLimits = new Vector2(0f, 0f);
@@ -70,9 +70,7 @@ namespace Leap.Unity.UI.Interaction {
       CalculateSliderValues();
     }
 
-    protected override void Update() {
-      base.Update();
-
+    protected void Update() {
       if (isDepressed) {
         CalculateSliderValues();
       }
