@@ -79,10 +79,6 @@ namespace Leap.Unity.GraphicalRenderer {
 
     #region UNITY CALLBACKS
     private void OnValidate() {
-      if (_space == null) {
-        _space = GetComponent<LeapSpace>();
-      }
-
 #if UNITY_EDITOR
       editor.OnValidate();
 #endif

@@ -45,6 +45,12 @@ namespace Leap.Unity.GraphicalRenderer {
 #endif
     }
 
+    public void RemoveMesh(int index) {
+      Mesh mesh = meshes[index];
+      meshes.RemoveAt(index);
+      DestroyImmediate(mesh, allowDestroyingAssets: true);
+    }
+
     public int Count {
       get {
         return meshes.Count;

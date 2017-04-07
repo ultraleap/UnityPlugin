@@ -8,6 +8,58 @@ using Leap.Unity.Attributes;
 namespace Leap.Unity.GraphicalRenderer {
 
   [Serializable]
+  public class AtlasUvs {
+
+    [Serializable]
+    public class TextureToRect : SerializableDictionary<UnityEngine.Object, Rect> { }
+
+    [SerializeField]
+    private TextureToRect _channel0 = new TextureToRect();
+    [SerializeField]
+    private TextureToRect _channel1 = new TextureToRect();
+    [SerializeField]
+    private TextureToRect _channel2 = new TextureToRect();
+    [SerializeField]
+    private TextureToRect _channel3 = new TextureToRect();
+
+    [SerializeField]
+    private Rect[] _nullRects = new Rect[4];
+
+    public Rect GetRect(int channel, UnityEngine.Object key) {
+      if (key == null) {
+        return _nullRects[channel];
+      } else {
+        Rect r;
+        getChannel(channel).TryGetValue(key, out r);
+        return r;
+      }
+    }
+
+    public void SetRect(int channel, UnityEngine.Object key, Rect rect) {
+      if (key == null) {
+        _nullRects[channel] = rect;
+      } else {
+        getChannel(channel)[key] = rect;
+      }
+    }
+
+    private TextureToRect getChannel(int channel) {
+      switch (channel) {
+        case 0:
+          return _channel0;
+        case 1:
+          return _channel1;
+        case 2:
+          return _channel2;
+        case 3:
+          return _channel3;
+        default:
+          throw new Exception();
+      }
+    }
+  }
+
+  [Serializable]
   public class AtlasBuilder {
 
     [MinValue(0)]
@@ -108,13 +160,13 @@ namespace Leap.Unity.GraphicalRenderer {
       _textureArray = new Texture2D[_features[0].featureData.Count];
 
       _currHash = new Hash() {
-      _border,
-      _padding,
-      _mipMap,
-      _filterMode,
-      _format,
-      _maxAtlasSize
-    };
+        _border,
+        _padding,
+        _mipMap,
+        _filterMode,
+        _format,
+        _maxAtlasSize
+      };
 
       foreach (var feature in _features) {
         _currHash.Add(feature.channel);
@@ -124,11 +176,11 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    public void RebuildAtlas(ProgressBar progress, out Texture2D[] packedTextures, out Rect[][] channelMapping) {
+    public void RebuildAtlas(ProgressBar progress, out Texture2D[] packedTextures, out AtlasUvs channelMapping) {
       _atlasHash = _currHash;
 
       packedTextures = new Texture2D[_features.Count];
-      channelMapping = new Rect[4][];
+      channelMapping = new AtlasUvs();
 
       mainProgressLoop(progress, packedTextures, channelMapping);
 
@@ -144,7 +196,7 @@ namespace Leap.Unity.GraphicalRenderer {
       _cachedDefaultTextures.Clear();
     }
 
-    private void mainProgressLoop(ProgressBar progress, Texture2D[] packedTextures, Rect[][] channelMapping) {
+    private void mainProgressLoop(ProgressBar progress, Texture2D[] packedTextures, AtlasUvs channelMapping) {
       progress.Begin(5, "", "", () => {
         foreach (var channel in MeshUtil.allUvChannels) {
           progress.Begin(1, "", channel + ": ", () => {
@@ -156,7 +208,7 @@ namespace Leap.Unity.GraphicalRenderer {
       });
     }
 
-    private void doPerChannelPack(ProgressBar progress, UVChannelFlags channel, Texture2D[] packedTextures, Rect[][] channelMapping) {
+    private void doPerChannelPack(ProgressBar progress, UVChannelFlags channel, Texture2D[] packedTextures, AtlasUvs channelMapping) {
       var mainTextureFeature = _features.Query().FirstOrDefault(f => f.channel == channel);
       if (mainTextureFeature == null) return;
 
@@ -172,7 +224,6 @@ namespace Leap.Unity.GraphicalRenderer {
 
       packedTexture.Apply(updateMipmaps: true, makeNoLongerReadable: true);
       packedTextures[_features.IndexOf(mainTextureFeature)] = packedTexture;
-      channelMapping[channel.Index()] = packedRects;
 
       packSecondaryTextures(progress, channel, mainTextureFeature, packedTexture, packedRects, packedTextures);
 
@@ -192,6 +243,10 @@ namespace Leap.Unity.GraphicalRenderer {
         r.width -= dx * 2;
         r.height -= dy * 2;
         packedRects[i] = r;
+      }
+
+      for (int i = 0; i < _textureArray.Length; i++) {
+        channelMapping.SetRect(channel.Index(), mainTextureFeature.featureData[i].texture, packedRects[i]);
       }
     }
 
@@ -226,6 +281,7 @@ namespace Leap.Unity.GraphicalRenderer {
               progress.Step(secondaryTexture.name);
 
               Rect rect = packedRects[i];
+
               //Use mainTexture instead of secondaryTexture here to calculate correct border to line up with main texture
               float borderDX = _border / (float)mainTexture.width;
               float borderDY = _border / (float)mainTexture.height;

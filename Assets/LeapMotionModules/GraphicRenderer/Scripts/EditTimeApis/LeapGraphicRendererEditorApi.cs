@@ -31,7 +31,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       public void OnValidate() {
-        //TODO, handle drag-drop for groups!
+        validateSpaceComponent();
       }
 
       public void OnDestroy() {
