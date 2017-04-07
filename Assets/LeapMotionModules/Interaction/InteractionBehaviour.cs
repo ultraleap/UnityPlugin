@@ -589,13 +589,13 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     #region Hovering
-
+    
     private HashSet<InteractionHand> _hoveringHands = new HashSet<InteractionHand>();
 
     private InteractionHand _closestHoveringHand = null;
 
     /// <summary>
-    /// Returns the squared distance to this interaction object. Calculated by finding the
+    /// Returns a comparative distance to this interaction object. Calculated by finding the
     /// smallest distance to each of the object's colliders.
     /// 
     /// Any MeshColliders, however, will not have their distances calculated precisely; the squared
@@ -609,7 +609,8 @@ namespace Leap.Unity.UI.Interaction {
       foreach (var collider in _primaryHoverColliders) {
         if (!hasColliders) hasColliders = true;
 
-        testDistance = DistanceUtil.GetSqrDistanceToSurface(collider, worldPosition);
+        testDistance = (Physics.ClosestPoint(worldPosition, collider, collider.transform.position, collider.transform.rotation)
+                        - worldPosition).magnitude;
 
         if (testDistance < closestComparativeColliderDistance) {
           closestComparativeColliderDistance = testDistance;

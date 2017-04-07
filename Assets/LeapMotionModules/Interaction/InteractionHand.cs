@@ -183,9 +183,7 @@ namespace Leap.Unity.UI.Interaction {
         distance = behaviour.GetComparativeHoverDistance(transformPoint(position, spaceComponent));
       }
 
-      if (distance > 0f) {
-        curResults.hovered.Add(behaviour);
-      }
+      curResults.hovered.Add(behaviour);
 
       if (distance < leastFingerDistance) {
         curResults.perFingerHovered[whichFinger] = behaviour;
