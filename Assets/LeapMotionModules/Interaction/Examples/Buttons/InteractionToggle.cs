@@ -8,15 +8,18 @@ namespace Leap.Unity.UI.Interaction {
 
     [Tooltip("The height that this button rests at; this value is a lerp in between the min and max height.")]
     [Range(0f, 1f)]
+    ///<summary> The height that this toggle rests at when it is toggled. </summary>
     public float ToggledRestingHeight = 0.5f;
     [Space]
+    ///<summary> Whether or not this toggle is currently toggled. </summary>
     public bool Toggled = false;
 
-    protected float originalRestingHeight;
+    ///<summary> The minimum and maximum heights the button can exist at. </summary>
+    private float _originalRestingHeight;
 
     protected override void Start() {
       base.Start();
-      originalRestingHeight = restingHeight;
+      _originalRestingHeight = restingHeight;
     }
 
     protected override void Update() {
@@ -26,7 +29,7 @@ namespace Leap.Unity.UI.Interaction {
         Toggled = !Toggled;
       }
 
-      restingHeight = Toggled ? ToggledRestingHeight : originalRestingHeight;
+      restingHeight = Toggled ? ToggledRestingHeight : _originalRestingHeight;
     }
   }
 }

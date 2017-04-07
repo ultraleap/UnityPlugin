@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using Leap.Unity.Attributes;
 namespace Leap.Unity.UI.Interaction {
-  
-  /// <summary>
+
+  ///<summary>
   /// A physics-enabled slider. Sliding is triggered by physically pushing the slider to its compressed position. 
   /// Increasing the horizontal and vertical slide limits allows it to act as either a 1D or 2D slider.
-  /// </summary>
+  ///</summary>
   public class InteractionSlider : InteractionButton {
 
     [Space, Space]
@@ -22,7 +22,7 @@ namespace Leap.Unity.UI.Interaction {
     [Tooltip("The minimum and maximum vertical extents that the slider can slide to in world space.")]
     public Vector2 VerticalSlideLimits = new Vector2(0f, 0f);
 
-    //Reset the slider positions when the slider values are set
+    ///<summary> This slider's horizontal slider value, mapped between the values in the HorizontalValueRange. </summary>
     public float HorizontalSliderValue {
       get { return _HorizontalSliderValue; }
       set {
@@ -33,6 +33,8 @@ namespace Leap.Unity.UI.Interaction {
         }
       }
     }
+
+    ///<summary> This slider's current vertical slider value, mapped between the values in the VerticalValueRange. </summary>
     public float VerticalSliderValue {
       get { return _VerticalSliderValue; }
       set {
@@ -44,13 +46,13 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    //Slider Values
-    protected float _HorizontalSliderValue;
-    protected float _VerticalSliderValue;
-
     //Slide limits normalized to local space
-    protected Vector2 _HorizontalSlideLimits;
-    protected Vector2 _VerticalSlideLimits;
+    private Vector2 _HorizontalSlideLimits;
+    private Vector2 _VerticalSlideLimits;
+
+    //Internal Slider Values
+    private float _HorizontalSliderValue;
+    private float _VerticalSliderValue;
 
     protected override void Start() {
       base.Start();
