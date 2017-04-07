@@ -7,11 +7,20 @@ using Leap.Unity.Query;
 namespace Leap.Unity.GraphicalRenderer {
 
   public abstract class LeapGraphicFeatureBase : LeapGraphicComponentBase<LeapGraphicRenderer> {
+
+    [NonSerialized]
     private bool _isDirty = true; //everything defaults dirty at the start!
 
     public bool isDirty {
       get {
-        return _isDirty;
+#if UNITY_EDITOR
+        if (!Application.isPlaying) {
+          return true;
+        } else
+#endif
+        {
+          return _isDirty;
+        }
       }
       set {
         _isDirty = value;
