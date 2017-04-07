@@ -54,6 +54,24 @@ namespace Leap.Unity.UI.Interaction {
       return Vector3.Lerp(a, b, Vector3.Dot(position - a, ba) / ba.sqrMagnitude);
     }
 
+    public static float LargestComp(this Vector3 v) {
+      return Mathf.Max(Mathf.Max(v.x, v.y), v.z);
+    }
+
+    public static int LargestCompIdx(this Vector3 v) {
+      return v.x > v.y ?
+               v.x > v.z ?
+                 0 // x > y, x > z
+               : 2 // x > y, z > x
+             : v.y > v.z ?
+               1   // y > x, y > z
+             : 2;  // y > x, z > y
+    }
+
+    public static Vector3 Abs(this Vector3 v) {
+      return new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
+    }
+
   }
 
   #endregion

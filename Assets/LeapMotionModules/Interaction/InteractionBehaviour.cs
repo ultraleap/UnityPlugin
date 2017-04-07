@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using Leap.Unity.Space;
 using InteractionEngineUtility;
+using Leap.Unity.RuntimeGizmos;
 
 namespace Leap.Unity.UI.Interaction {
 
@@ -562,7 +563,7 @@ namespace Leap.Unity.UI.Interaction {
 
     protected virtual void Start() {
       // Make sure we have a list of all of this object's colliders.
-      RefreshColliderState();
+      RefreshPrimaryHoverColliderState();
 
       // Check any Joint attachments to automatically be able to choose Kabsch pivot setting (grasping).
       RefreshPositionLockedState();
@@ -593,33 +594,22 @@ namespace Leap.Unity.UI.Interaction {
 
     private InteractionHand _closestHoveringHand = null;
 
+    /// <summary>
+    /// Returns the squared distance to this interaction object. Calculated by finding the
+    /// smallest distance to each of the object's colliders.
+    /// 
+    /// Any MeshColliders, however, will not have their distances calculated precisely; the squared
+    /// distance to their bounding box is calculated instead. It is possible to use a custom
+    /// set of colliders against which to test primary hover calculations: see primaryHoverColliders.
+    /// <summary>
     public virtual float GetComparativeHoverDistance(Vector3 worldPosition) {
       float closestComparativeColliderDistance = float.PositiveInfinity;
       bool hasColliders = false;
-      Collider collider;
-      Transform colliderTransform;
-      foreach (var colliderTransformPair in _colliderTransformPairs) {
+      float testDistance = float.PositiveInfinity;
+      foreach (var collider in _primaryHoverColliders) {
         if (!hasColliders) hasColliders = true;
 
-        collider = colliderTransformPair.collider;
-        colliderTransform = colliderTransformPair.transform;
-
-        float testDistance;
-        if (collider is SphereCollider) {
-          testDistance = GetComparativeCenterSqrDistance((SphereCollider)collider, colliderTransform, worldPosition);
-        }
-        else if (collider is CapsuleCollider) {
-          testDistance = GetComparativeCenterSqrDistance((CapsuleCollider)collider, colliderTransform, worldPosition);
-        }
-        else if (collider is BoxCollider) {
-          testDistance = GetComparativeCenterSqrDistance((BoxCollider)collider, colliderTransform, worldPosition);
-        }
-        else if (collider is MeshCollider) {
-          testDistance = GetComparativeCenterSqrDistance((MeshCollider)collider, colliderTransform, worldPosition);
-        }
-        else {
-          testDistance = (this.transform.position - worldPosition).sqrMagnitude;
-        }
+        testDistance = DistanceUtil.GetSqrDistanceToSurface(collider, worldPosition);
 
         if (testDistance < closestComparativeColliderDistance) {
           closestComparativeColliderDistance = testDistance;
@@ -634,90 +624,75 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
+    #region Hover Colliders
+
+    private List<Collider> _primaryHoverColliders = new List<Collider>();
+
     /// <summary>
-    /// Returns the squared distance to the center of the argument SphereCollider.
+    /// Gets the List of Colliders used for hover distance checking for this Interaction
+    /// object. Hover distancing checking will affect which object is chosen for a hand's
+    /// primary hover, as well as for determining this object's closest hovering hand.
+    /// 
+    /// RefreshColliderState() will automatically populate the colliders List with
+    /// the this rigidbody's colliders, but is only called once on Start(). If you change
+    /// the colliders for this object at runtime, you should call RefreshColliderState()
+    /// to keep the _hoverColliders list up-to-date.
     /// </summary>
-    protected static float GetComparativeCenterSqrDistance(SphereCollider sphere, Transform sphereTransform, Vector3 worldPosition) {
-      return (sphereTransform.TransformPoint(sphere.center) - worldPosition).sqrMagnitude;
+    /// <remarks>
+    /// If you're feeling brave, you can manually modify this list yourself.
+    /// 
+    /// Hover candidacy is determined by a hand-centric PhysX sphere-check against the
+    /// Interaction object's rigidbody's attached colliders. This behavior cannot be changed,
+    /// even if you modify the contents of primaryHoverColliders.
+    /// 
+    /// However, primary hover is determined by performing distance checks against the
+    /// colliders in the primaryHoverColliders list, so it IS possible to use different
+    /// collider(s) for primary hover checks than are used for hover candidacy, by modifying
+    /// the collider contents of this list. This will also affect which hand is chosen by
+    /// this object as its closestHoveringHand.
+    /// </remarks>
+    public List<Collider> primaryHoverColliders {
+      get { return _primaryHoverColliders; }
     }
 
+    private Stack<Transform> _toVisit = new Stack<Transform>();
     /// <summary>
-    /// Returns the squared distance to the line segment at the center of the CapsuleCollider.
+    /// Recursively searches the hierarchy of this Interaction object to
+    /// find all of the Colliders that are attached to its Rigidbody. These will
+    /// be the colliders used to calculate distance from the hand to determine
+    /// which object will become the primary hover.
+    /// 
+    /// Call this method manually if you change an Interaction object's colliders
+    /// after its Start() method has been called! (Called automatically on Start().)
     /// </summary>
-    protected static float GetComparativeCenterSqrDistance(CapsuleCollider capsule, Transform capsuleTransform, Vector3 worldPosition) {
-      // https://docs.unity3d.com/ScriptReference/CapsuleCollider-direction.html
-      Vector3 dir = capsule.direction == 0 ? Vector3.right : capsule.direction == 1 ? Vector3.up : Vector3.forward;
+    public void RefreshPrimaryHoverColliderState() {
+      _primaryHoverColliders.Clear();
 
-      Vector3 a = capsule.center + dir * (capsule.height / 2F - capsule.radius);
-      Vector3 b = capsule.center - dir * (capsule.height / 2F - capsule.radius);
-      return (worldPosition.ConstrainToSegment(capsuleTransform.TransformPoint(a), capsuleTransform.TransformPoint(b)) - worldPosition)
-               .sqrMagnitude;
-    }
+      // Traverse the hierarchy of this object's transform to find
+      // all of its Colliders.
+      _toVisit.Push(this.transform);
+      Transform curT;
+      while (_toVisit.Count > 0) {
+        curT = _toVisit.Pop();
 
-    /// <summary>
-    /// Returns a squared distance to the "center" of the BoxCollider, suitable for distance comparisons.
-    /// If the BoxCollider is a cube, returns the squared distance to the center point of the cube.
-    /// If the BoxCollider is not a cube, returns the squared distance to the line segment at the center
-    /// of the box aligned with the longest component of the box.
-    /// </summary>
-    protected static float GetComparativeCenterSqrDistance(BoxCollider box, Transform boxTransform, Vector3 worldPosition) {
-      Vector3 size = box.size;
-      Vector3 largestCompDir, middleCompDir, smallestCompDir;
-      GetComponentSizeOrder(box.size, out largestCompDir, out middleCompDir, out smallestCompDir);
-      float largestCompLength = Vector3.Dot(largestCompDir, size);
-      float middleCompLength = Vector3.Dot(middleCompDir, size);
-
-      Vector3 dir = largestCompDir;
-      Vector3 a = box.center + dir * (largestCompLength / 2F - middleCompLength);
-      Vector3 b = box.center - dir * (largestCompLength / 2F - middleCompLength);
-      return (worldPosition.ConstrainToSegment(boxTransform.TransformPoint(a), boxTransform.TransformPoint(b)) - worldPosition)
-                .sqrMagnitude;
-    }
-
-    /// <summary>
-    /// Outputs the largest, middle, and smallest components of the "components" vector as normalized directions;
-    /// e.g. use Vector3.Scale(components, smallestCompDir) to access a Vector3 with the other components zeroed out,
-    /// or use Vector3.Dot(components, smallestCompDir) to access the float value of the smallest component of the vector.
-    /// </summary>
-    private static void GetComponentSizeOrder(Vector3 components, out Vector3 largestCompDir, out Vector3 middleCompDir, out Vector3 smallestCompDir) {
-      Vector3 c = components;
-      Vector3 xDir = Vector3.right, yDir = Vector3.up, zDir = Vector3.forward;
-      if (c.x > c.y) {
-        if (c.z > c.x) {
-          largestCompDir = zDir; middleCompDir = xDir; smallestCompDir = yDir;
-        }
-        else {
-          largestCompDir = xDir;
-          if (c.y > c.z) {
-            middleCompDir = yDir; smallestCompDir = zDir;
-          }
-          else {
-            middleCompDir = zDir; smallestCompDir = yDir;
+        // Recursively search children and children's children
+        foreach (var child in curT.GetChildren()) {
+          // Ignore children with Rigidbodies of their own; its own Rigidbody
+          // owns its own colliders and the colliders of its children
+          if (child.GetComponent<Rigidbody>() == null) {
+            _toVisit.Push(child);
           }
         }
-      }
-      else {
-        if (c.z > c.x) {
-          smallestCompDir = xDir;
-          if (c.y > c.z) {
-            largestCompDir = yDir; middleCompDir = zDir;
-          }
-          else {
-            largestCompDir = zDir; middleCompDir = yDir;
-          }
-        }
-        else {
-          largestCompDir = yDir; middleCompDir = xDir; smallestCompDir = zDir;
+
+        // Since we'll visit every child, all we need to do is add the colliders
+        // of every transform we visit.
+        foreach (var collider in curT.GetComponents<Collider>()) {
+          _primaryHoverColliders.Add(collider);
         }
       }
     }
 
-    /// <summary>
-    /// Gets a comparative squared distance from the center of the MeshCollider's axis-aligned bounding box.
-    /// </summary>
-    protected static float GetComparativeCenterSqrDistance(MeshCollider mesh, Transform meshTransform, Vector3 worldPosition) {
-      return (meshTransform.TransformPoint(mesh.bounds.center) - worldPosition).sqrMagnitude;
-    }
+    #endregion
 
     public virtual void BeginHover(List<InteractionHand> hands) {
       foreach (var hand in hands) {
@@ -754,6 +729,20 @@ namespace Leap.Unity.UI.Interaction {
 
     private void RefreshClosestHoveringHand() {
       _closestHoveringHand = GetClosestHand(_hoveringHands);
+    }
+
+    private InteractionHand GetClosestHand(HashSet<InteractionHand> hands) {
+      InteractionHand closestHoveringHand = null;
+      float closestHoveringHandDist = float.PositiveInfinity;
+      foreach (var hand in hands) {
+        float distance = GetComparativeHoverDistance(hand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
+        if (closestHoveringHand == null
+            || distance < closestHoveringHandDist) {
+          closestHoveringHand = hand;
+          closestHoveringHandDist = distance;
+        }
+      }
+      return closestHoveringHand;
     }
 
     private HashSet<InteractionHand> _primaryHoveringHands = new HashSet<InteractionHand>();
@@ -794,21 +783,15 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private void RefreshClosestPrimaryHoveringHand() {
-      _closestPrimaryHoveringHand = GetClosestHand(_primaryHoveringHands);
-    }
-
-    private InteractionHand GetClosestHand(HashSet<InteractionHand> hands) {
-      InteractionHand closestHoveringHand = null;
-      float closestHoveringHandDist = float.PositiveInfinity;
-      foreach (var hand in hands) {
-        float distance = GetComparativeHoverDistance(hand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
-        if (closestHoveringHand == null
-            || distance < closestHoveringHandDist) {
-          closestHoveringHand = hand;
-          closestHoveringHandDist = distance;
+      InteractionHand closestHand = null;
+      float closestDist = float.PositiveInfinity;
+      foreach (var hand in _primaryHoveringHands) {
+        if (closestHand == null || hand.hoverCheckResults.primaryHoveredDistance < closestDist) {
+          closestHand = hand;
+          closestDist = hand.hoverCheckResults.primaryHoveredDistance;
         }
       }
-      return closestHoveringHand;
+      _closestPrimaryHoveringHand = closestHand;
     }
 
     #endregion
@@ -1090,71 +1073,6 @@ namespace Leap.Unity.UI.Interaction {
       if (gameObject.layer != layer) {
         for (int i = 0; i < _childrenArray.Length; i++) {
           _childrenArray[i].gameObject.layer = layer;
-        }
-      }
-    }
-
-    #endregion
-
-    #region Collider Checking
-
-    public struct ColliderTransformPair {
-      public Collider collider;
-      public Transform transform;
-    }
-
-    private List<ColliderTransformPair> _colliderTransformPairs = new List<ColliderTransformPair>();
-
-    /// <summary>
-    /// Gets the List of ColliderTransformPairs for this Interaction object.
-    /// 
-    /// Hover distance for this Interaction object, including the distance used for
-    /// primary hover candidacy, is checked using all of the colliders in this List;
-    /// the associated Transforms are the Transforms of the GameObjects that contain
-    /// those Collider components, so the InteractionBehaviour knows where the Colliders
-    /// are in world space.
-    /// 
-    /// RefreshColliderState() will automatically populate the colliders List with
-    /// the appropriate Colliders, but is only called once on Start(). If you change
-    /// Colliders for this object at runtime, you should call RefreshColliderState()
-    /// to keep the Colliders list up-to-date. (Or, if you're feeling brave, you can
-    /// manually modify the List yourself.)
-    /// </summary>
-    public List<ColliderTransformPair> colliders {
-      get { return _colliderTransformPairs; }
-    }
-
-    private Stack<Transform> _toVisit = new Stack<Transform>();
-    /// <summary>
-    /// Recursively searches the hierarchy of this Interaction object to
-    /// find all of the Colliders that are attached to its Rigidbody.
-    /// 
-    /// Call this method manually if you change an Interaction object's colliders
-    /// after its Start() method has been called! (Called automatically on Start().)
-    /// </summary>
-    public void RefreshColliderState() {
-      _colliderTransformPairs.Clear();
-
-      // Traverse the hierarchy of this object's transform to find
-      // all of its Colliders.
-      _toVisit.Push(this.transform);
-      Transform curT;
-      while (_toVisit.Count > 0) {
-        curT = _toVisit.Pop();
-
-        // Recursively search children and children's children
-        foreach (var child in curT.GetChildren()) {
-          // Ignore children with Rigidbodies of their own; its own Rigidbody
-          // owns its own colliders and the colliders of its children
-          if (child.GetComponent<Rigidbody>() == null) {
-            _toVisit.Push(child);
-          }
-        }
-
-        // Since we'll visit every child, all we need to do is add the colliders
-        // of every transform we visit.
-        foreach (var collider in curT.GetComponents<Collider>()) {
-          _colliderTransformPairs.Add(new ColliderTransformPair { collider = collider, transform = curT });
         }
       }
     }

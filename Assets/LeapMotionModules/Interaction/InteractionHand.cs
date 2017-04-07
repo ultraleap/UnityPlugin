@@ -65,7 +65,7 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Hovering
 
-    private const float MAX_PRIMARY_HOVER_DISTANCE = 0.25F;
+    private const float MAX_PRIMARY_HOVER_DISTANCE = 0.5F;
     private IInteractionBehaviour _primaryHoveredLastFrame = null;
 
     private ActivityManager _hoverActivityManager;
@@ -137,6 +137,7 @@ namespace Leap.Unity.UI.Interaction {
       _hoverResults.perFingerHovered = _tempPerFingerHovered;
       _hoverResults.primaryHovered = null;
       _hoverResults.primaryHoveredDistance = float.PositiveInfinity;
+      _hoverResults.primaryHoveringFingerIdx = -1;
       _hoverResults.checkedHand = hand;
 
       //Loop through all the fingers (that we care about)
@@ -146,7 +147,7 @@ namespace Leap.Unity.UI.Interaction {
           float leastFingerDistance = float.PositiveInfinity;
           Vector3 fingerTip = hand.Fingers[i].TipPosition.ToVector3();
 
-          //Loop through all the candidates
+          // Loop through all the candidates
           foreach (IInteractionBehaviour behaviour in hoverCandidates) {
             CheckHoverForBehaviour(fingerTip, behaviour, behaviour.space, i, ref leastFingerDistance, ref _hoverResults);
           }
@@ -189,7 +190,7 @@ namespace Leap.Unity.UI.Interaction {
       if (distance < leastFingerDistance) {
         curResults.perFingerHovered[whichFinger] = behaviour;
         leastFingerDistance = distance;
-        if (leastFingerDistance < curResults.primaryHoveredDistance && distance < MAX_PRIMARY_HOVER_DISTANCE * MAX_PRIMARY_HOVER_DISTANCE) {
+        if (leastFingerDistance < curResults.primaryHoveredDistance) {
           curResults.primaryHoveredDistance = leastFingerDistance;
           curResults.primaryHovered = curResults.perFingerHovered[whichFinger];
           curResults.primaryHoveringFingerIdx = whichFinger;

@@ -10,12 +10,12 @@ public class SimplePrimaryHoverGlow : MonoBehaviour, IRuntimeGizmoComponent {
 
   private InteractionBehaviour _intObj;
 
-  private BoxCollider _collider;
+  private Collider _collider;
 
   void Start() {
     _intObj = GetComponent<InteractionBehaviour>();
 
-    _collider = GetComponent<BoxCollider>();
+    _collider = GetComponent<Collider>();
   }
 
   void Update() {
@@ -24,7 +24,6 @@ public class SimplePrimaryHoverGlow : MonoBehaviour, IRuntimeGizmoComponent {
     }
     else {
       if (_intObj.isPrimaryHovered) {
-        // var hand = _intObj.primaryHoveringHand;
         Turn(Color.white);
       }
       else {
@@ -47,7 +46,7 @@ public class SimplePrimaryHoverGlow : MonoBehaviour, IRuntimeGizmoComponent {
     drawer.color = Color.blue;
     if (_intObj != null && _collider != null && _intObj.isPrimaryHovered) {
       Vector3 primaryTipPos = _intObj.primaryHoveringFinger.TipPosition.ToVector3();
-      drawer.DrawLine(primaryTipPos, Physics.ClosestPoint(primaryTipPos, _collider, this.transform.position, this.transform.rotation));
+      drawer.DrawLine(primaryTipPos, this.transform.position);
     }
   }
 
