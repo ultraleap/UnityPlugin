@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Leap.Unity.Space;
+using InteractionEngineUtility;
+using Leap.Unity.RuntimeGizmos;
 
 namespace Leap.Unity.UI.Interaction {
 
@@ -48,6 +50,30 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     public Hand primaryHoveringHand   { get { return _closestPrimaryHoveringHand == null ?
                                                      null : _closestPrimaryHoveringHand.GetLastTrackedLeapHand(); } }
+
+    /// <summary>
+    /// Gets the finger that is currently primarily hovering over this object, of the closest
+    /// primarily hovering hand. Will return null if this object is not currently any hand's
+    /// primary hover.
+    /// </summary>
+    public Finger primaryHoveringFinger {
+      get {
+        if (!isPrimaryHovered) return null;
+        return _closestPrimaryHoveringHand.GetLastTrackedLeapHand()
+                  .Fingers[primaryHoveringInteractionHand.hoverCheckResults.primaryHoveringFingerIdx];
+      }
+    }
+
+    /// <summary>
+    /// Gets the primary hovering Interaction Hand for this interaction object, if it has one.
+    /// If there is no hand primarily hovering over this object, returns null.
+    /// 
+    /// Interaction Hands can access the underlying Leap Hand via GetLeapHand() or GetLastTrackedLeapHand(),
+    /// but they can also perform interaction-related actions, such as ReleaseGrasp().
+    /// </summary>
+    public InteractionHand primaryHoveringInteractionHand { get { return _closestPrimaryHoveringHand; } }
+
+
 
     /// <summary>
     /// Called whenever one or more hands have entered the hover activity radius around this
@@ -218,6 +244,12 @@ namespace Leap.Unity.UI.Interaction {
 
     /// <summary> Gets a set of all hands currently grasping this object. </summary>
     public HashSet<InteractionHand> graspingHands { get { return _graspingHands; } }
+
+    /// <summary>
+    /// Gets whether the object is currently suspended. An object is "suspended" if it
+    /// is currently grasped by an untracked hand. For more details, refer to OnSuspensionBegin.
+    /// </summary>
+    public bool isSuspended { get { return _suspendingHand != null; } }
 
     /// <summary>
     /// Releases this object from the hand currently grasping it, if it is grasped, and returns true.
@@ -529,8 +561,13 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     protected virtual void Start() {
-      RefreshPositionLockedState();
+      // Make sure we have a list of all of this object's colliders.
+      RefreshPrimaryHoverColliderState();
 
+      // Check any Joint attachments to automatically be able to choose Kabsch pivot setting (grasping).
+      RefreshPositionLockedState();
+      
+      // Ensure physics layers are set up properly.
       InitInternal();
     }
 
@@ -551,14 +588,111 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     #region Hovering
-
+    
     private HashSet<InteractionHand> _hoveringHands = new HashSet<InteractionHand>();
 
     private InteractionHand _closestHoveringHand = null;
 
-    public float GetDistance(Vector3 worldPosition) {
-      return Vector3.Distance(this.transform.position, worldPosition);
+    /// <summary>
+    /// Returns a comparative distance to this interaction object. Calculated by finding the
+    /// smallest distance to each of the object's colliders.
+    /// 
+    /// Any MeshColliders, however, will not have their distances calculated precisely; the squared
+    /// distance to their bounding box is calculated instead. It is possible to use a custom
+    /// set of colliders against which to test primary hover calculations: see primaryHoverColliders.
+    /// <summary>
+    public virtual float GetComparativeHoverDistance(Vector3 worldPosition) {
+      float closestComparativeColliderDistance = float.PositiveInfinity;
+      bool hasColliders = false;
+      float testDistance = float.PositiveInfinity;
+      foreach (var collider in _primaryHoverColliders) {
+        if (!hasColliders) hasColliders = true;
+
+        testDistance = (Physics.ClosestPoint(worldPosition, collider, collider.transform.position, collider.transform.rotation)
+                        - worldPosition).magnitude;
+
+        if (testDistance < closestComparativeColliderDistance) {
+          closestComparativeColliderDistance = testDistance;
+        }
+      }
+
+      if (!hasColliders) {
+        return (this.transform.position - worldPosition).sqrMagnitude;
+      }
+      else {
+        return closestComparativeColliderDistance;
+      }
     }
+
+    #region Hover Colliders
+
+    private List<Collider> _primaryHoverColliders = new List<Collider>();
+
+    /// <summary>
+    /// Gets the List of Colliders used for hover distance checking for this Interaction
+    /// object. Hover distancing checking will affect which object is chosen for a hand's
+    /// primary hover, as well as for determining this object's closest hovering hand.
+    /// 
+    /// RefreshColliderState() will automatically populate the colliders List with
+    /// the this rigidbody's colliders, but is only called once on Start(). If you change
+    /// the colliders for this object at runtime, you should call RefreshColliderState()
+    /// to keep the _hoverColliders list up-to-date.
+    /// </summary>
+    /// <remarks>
+    /// If you're feeling brave, you can manually modify this list yourself.
+    /// 
+    /// Hover candidacy is determined by a hand-centric PhysX sphere-check against the
+    /// Interaction object's rigidbody's attached colliders. This behavior cannot be changed,
+    /// even if you modify the contents of primaryHoverColliders.
+    /// 
+    /// However, primary hover is determined by performing distance checks against the
+    /// colliders in the primaryHoverColliders list, so it IS possible to use different
+    /// collider(s) for primary hover checks than are used for hover candidacy, by modifying
+    /// the collider contents of this list. This will also affect which hand is chosen by
+    /// this object as its closestHoveringHand.
+    /// </remarks>
+    public List<Collider> primaryHoverColliders {
+      get { return _primaryHoverColliders; }
+    }
+
+    private Stack<Transform> _toVisit = new Stack<Transform>();
+    /// <summary>
+    /// Recursively searches the hierarchy of this Interaction object to
+    /// find all of the Colliders that are attached to its Rigidbody. These will
+    /// be the colliders used to calculate distance from the hand to determine
+    /// which object will become the primary hover.
+    /// 
+    /// Call this method manually if you change an Interaction object's colliders
+    /// after its Start() method has been called! (Called automatically on Start().)
+    /// </summary>
+    public void RefreshPrimaryHoverColliderState() {
+      _primaryHoverColliders.Clear();
+
+      // Traverse the hierarchy of this object's transform to find
+      // all of its Colliders.
+      _toVisit.Push(this.transform);
+      Transform curT;
+      while (_toVisit.Count > 0) {
+        curT = _toVisit.Pop();
+
+        // Recursively search children and children's children
+        foreach (var child in curT.GetChildren()) {
+          // Ignore children with Rigidbodies of their own; its own Rigidbody
+          // owns its own colliders and the colliders of its children
+          if (child.GetComponent<Rigidbody>() == null) {
+            _toVisit.Push(child);
+          }
+        }
+
+        // Since we'll visit every child, all we need to do is add the colliders
+        // of every transform we visit.
+        foreach (var collider in curT.GetComponents<Collider>()) {
+          _primaryHoverColliders.Add(collider);
+        }
+      }
+    }
+
+    #endregion
 
     public virtual void BeginHover(List<InteractionHand> hands) {
       foreach (var hand in hands) {
@@ -595,6 +729,20 @@ namespace Leap.Unity.UI.Interaction {
 
     private void RefreshClosestHoveringHand() {
       _closestHoveringHand = GetClosestHand(_hoveringHands);
+    }
+
+    private InteractionHand GetClosestHand(HashSet<InteractionHand> hands) {
+      InteractionHand closestHoveringHand = null;
+      float closestHoveringHandDist = float.PositiveInfinity;
+      foreach (var hand in hands) {
+        float distance = GetComparativeHoverDistance(hand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
+        if (closestHoveringHand == null
+            || distance < closestHoveringHandDist) {
+          closestHoveringHand = hand;
+          closestHoveringHandDist = distance;
+        }
+      }
+      return closestHoveringHand;
     }
 
     private HashSet<InteractionHand> _primaryHoveringHands = new HashSet<InteractionHand>();
@@ -635,21 +783,15 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private void RefreshClosestPrimaryHoveringHand() {
-      _closestPrimaryHoveringHand = GetClosestHand(_primaryHoveringHands);
-    }
-
-    private InteractionHand GetClosestHand(HashSet<InteractionHand> hands) {
-      InteractionHand closestHoveringHand = null;
-      float closestHoveringHandDist = float.PositiveInfinity;
-      foreach (var hand in hands) {
-        float distance = GetDistance(hand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
-        if (closestHoveringHand == null
-            || distance < closestHoveringHandDist) {
-          closestHoveringHand = hand;
-          closestHoveringHandDist = distance;
+      InteractionHand closestHand = null;
+      float closestDist = float.PositiveInfinity;
+      foreach (var hand in _primaryHoveringHands) {
+        if (closestHand == null || hand.hoverCheckResults.primaryHoveredDistance < closestDist) {
+          closestHand = hand;
+          closestDist = hand.hoverCheckResults.primaryHoveredDistance;
         }
       }
-      return closestHoveringHand;
+      _closestPrimaryHoveringHand = closestHand;
     }
 
     #endregion
@@ -806,6 +948,10 @@ namespace Leap.Unity.UI.Interaction {
         // Revert kinematic state.
         rigidbody.isKinematic = _wasKinematicBeforeGrab;
 
+        if (hands.Count == 1) {
+          throwController.OnThrow(this, hands.Query().First());
+        }
+
         OnObjectGraspEnd(hands);
       }
     }
@@ -830,7 +976,6 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     protected InteractionHand _suspendingHand = null;
-    public bool isSuspended { get { return _suspendingHand != null; } }
 
     public virtual void BeginSuspension(InteractionHand hand) {
       _suspendingHand = hand;
@@ -881,7 +1026,60 @@ namespace Leap.Unity.UI.Interaction {
       FixedUpdateLayer();
     }
 
-    #region Locked Position Checking
+    #region Interaction Layers
+
+    protected enum CollisionMode {
+      Normal,
+      Grasped
+    }
+    protected CollisionMode _collisionMode;
+
+    protected void FixedUpdateCollisionMode() {
+      CollisionMode desiredCollisionMode = CollisionMode.Normal;
+      if (isGrasped) {
+        desiredCollisionMode = CollisionMode.Grasped;
+      }
+
+      _collisionMode = desiredCollisionMode;
+      FixedUpdateLayer();
+
+      Assert.IsTrue((_collisionMode == CollisionMode.Grasped) == isGrasped);
+    }
+
+    protected SingleLayer _initialLayer;
+
+    protected void InitLayer() {
+      _initialLayer = gameObject.layer;
+    }
+
+    protected void FixedUpdateLayer() {
+      int layer;
+
+      if (ignoreContact) {
+        layer = manager.interactionNoContactLayer;
+      }
+      else {
+        switch (_collisionMode) {
+          case CollisionMode.Normal:
+            layer = manager.interactionLayer; break;
+          case CollisionMode.Grasped:
+            layer = manager.interactionNoContactLayer; break;
+          default:
+            Debug.LogError("Invalid collision mode, can't update layer.");
+            return;
+        }
+      }
+
+      if (gameObject.layer != layer) {
+        for (int i = 0; i < _childrenArray.Length; i++) {
+          _childrenArray[i].gameObject.layer = layer;
+        }
+      }
+    }
+
+    #endregion
+
+    #region Locked Position (Joint) Checking
 
     private bool _isPositionLocked = false;
 
@@ -945,59 +1143,6 @@ namespace Leap.Unity.UI.Interaction {
             _isPositionLocked = true;
             return;
           }
-        }
-      }
-    }
-
-    #endregion
-
-    #region Interaction Layers 
-
-    protected enum CollisionMode {
-      Normal,
-      Grasped
-    }
-    protected CollisionMode _collisionMode;
-
-    protected void FixedUpdateCollisionMode() {
-      CollisionMode desiredCollisionMode = CollisionMode.Normal;
-      if (isGrasped) {
-        desiredCollisionMode = CollisionMode.Grasped;
-      }
-
-      _collisionMode = desiredCollisionMode;
-      FixedUpdateLayer();
-
-      Assert.IsTrue((_collisionMode == CollisionMode.Grasped) == isGrasped);
-    }
-
-    protected SingleLayer _initialLayer;
-
-    protected void InitLayer() {
-      _initialLayer = gameObject.layer;
-    }
-
-    protected void FixedUpdateLayer() {
-      int layer;
-
-      if (ignoreContact) {
-        layer = manager.interactionNoContactLayer;
-      }
-      else {
-        switch (_collisionMode) {
-          case CollisionMode.Normal:
-            layer = manager.interactionLayer; break;
-          case CollisionMode.Grasped:
-            layer = manager.interactionNoContactLayer; break;
-          default:
-            Debug.LogError("Invalid collision mode, can't update layer.");
-            return;
-        }
-      }
-
-      if (gameObject.layer != layer) {
-        for (int i = 0; i < _childrenArray.Length; i++) {
-          _childrenArray[i].gameObject.layer = layer;
         }
       }
     }

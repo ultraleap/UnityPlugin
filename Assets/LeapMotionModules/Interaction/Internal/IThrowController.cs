@@ -19,7 +19,7 @@ namespace Leap.Unity.UI.Interaction {
     void OnHold(InteractionBehaviour intObj, ReadonlyList<InteractionHand> hands);
 
     /// <summary>
-    /// Called when an Interaction object is released by the last hand holding it.
+    /// Called when an Interaction object is released by the last hands holding it.
     /// </summary>
     void OnThrow(InteractionBehaviour intObj, InteractionHand hand);
 
