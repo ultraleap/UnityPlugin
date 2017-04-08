@@ -36,8 +36,6 @@ namespace Leap.Unity.UI.Interaction {
       toggled = !toggled;
       toggleEvent.Invoke(toggled);
       restingHeight = toggled ? toggledRestingHeight : _originalRestingHeight;
-
-      GetComponent<LeapMeshGraphic>().GetRuntimeTint().color = toggled?Color.red:Color.white;
     }
 
     void OnDestroy() {

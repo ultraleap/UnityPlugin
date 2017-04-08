@@ -70,7 +70,8 @@ namespace Leap.Unity.UI.Interaction {
       CalculateSliderValues();
     }
 
-    protected void Update() {
+    protected override void Update() {
+      base.Update();
       if (isDepressed) {
         CalculateSliderValues();
       }
