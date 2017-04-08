@@ -1,173 +1,101 @@
-﻿using Leap.Unity.GraphicalRenderer;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
-
+using Leap.Unity.Attributes;
 namespace Leap.Unity.UI.Interaction {
-  /** A physics-enabled button. Activation is triggered by physically pushing the button back to its compressed position. 
-   *  Increasing the horizontal and vertical slide limits allows it to act as a 1D or 2D slider
-   */
-  [RequireComponent(typeof(InteractionBehaviour))]
-  public class InteractionSlider : MonoBehaviour {
-    [Tooltip("The minimum and maximum heights the button can exist at.")]
-    public Vector2 MinMaxHeight = new Vector2(0f, 0.02f);
-    [Tooltip("The height that this button rests at; this value is a lerp in between the min and max height.")]
-    public float RestingHeight = 0.5f;
-    [Tooltip("The minimum and maximum horizontal extents that the slider can slide to.")]
-    public Vector2 HorizontalSlideLimits = new Vector2(0f, 0f);
-    [Tooltip("The minimum and maximum vertical extents that the slider can slide to.")]
-    public Vector2 VerticalSlideLimits = new Vector2(0f, 0f);
 
-    //State Events
-    public UnityEvent OnPress = new UnityEvent();
-    public UnityEvent OnUnpress = new UnityEvent();
+  ///<summary>
+  /// A physics-enabled slider. Sliding is triggered by physically pushing the slider to its compressed position. 
+  /// Increasing the horizontal and vertical slide limits allows it to act as either a 1D or 2D slider.
+  ///</summary>
+  public class InteractionSlider : InteractionButton {
 
-    //Public State variables
-    public bool isDepressed { get; protected set; }
-    public bool depressedThisFrame { get; protected set; }
-    public bool unDepressedThisFrame { get; protected set; }
+    [Space, Space]
+    [Tooltip("The minimum and maximum values that the slider reports on the horizontal axis.")]
+    public Vector2 horizontalValueRange = new Vector2(0f, 1f);
+    [Tooltip("The minimum and maximum values that the slider reports on the horizontal axis.")]
+    public Vector2 verticalValueRange = new Vector2(0f, 1f);
 
-    //Private State Variables
-    private InteractionBehaviour behaviour;
-    private LeapGraphic element;
-    private Rigidbody body;
-    private Rigidbody lastDepressor;
-    private Vector3 localDepressor;
-    private Vector3 InitialLocalPosition;
-    private Vector3 PhysicsPosition = Vector3.zero;
-    private Vector3 PhysicsVelocity = Vector3.back;
-    private Vector3 localPhysicsPosition;
-    private bool physicsOccurred = false;
-    private bool handChirality = false;
+    [Space]
+    [Tooltip("The minimum and maximum horizontal extents that the slider can slide to in world space.")]
+    [MinMax(-0.25f, 0.25f)]
+    public Vector2 horizontalSlideLimits = new Vector2(-0.05f, 0.05f);
+    [MinMax(-0.25f, 0.25f)]
+    [Tooltip("The minimum and maximum vertical extents that the slider can slide to in world space.")]
+    public Vector2 verticalSlideLimits = new Vector2(0f, 0f);
 
-    void Start() {
-      //Initialize Elements
-      behaviour = GetComponent<InteractionBehaviour>();
-      element = GetComponent<LeapGraphic>();
-      body = behaviour.rigidbody;
+    public class FloatEvent : UnityEvent<float> { }
+    ///<summary> Triggered while this slider is depressed. </summary>
+    public FloatEvent horizontalSlideEvent = new FloatEvent();
+    ///<summary> Triggered while this slider is depressed. </summary>
+    public FloatEvent verticalSlideEvent = new FloatEvent();
 
-      //Initialize Positions
-      InitialLocalPosition = transform.localPosition;
-      transform.localPosition = InitialLocalPosition;
-      localPhysicsPosition = InitialLocalPosition;
-      PhysicsPosition = transform.position;
-      body.position = PhysicsPosition;
-
-      //Initialize Limits
-      MinMaxHeight /= transform.parent.lossyScale.z;
-      HorizontalSlideLimits /= transform.parent.lossyScale.x;
-      VerticalSlideLimits /= transform.parent.lossyScale.y;
-    }
-
-    void FixedUpdate() {
-      if (!physicsOccurred) {
-        physicsOccurred = true;
-
-        if (!body.IsSleeping()) {
-          //Sleep the rigidbody if it's not really moving...
-          if (body.position == PhysicsPosition && PhysicsVelocity == Vector3.zero) {
-            body.Sleep();
-          //Else, reset the body's position to where it was last time PhysX looked at it...
-          } else {
-            body.position = PhysicsPosition;
-            body.velocity = PhysicsVelocity;
-          }
+    ///<summary> This slider's horizontal slider value, mapped between the values in the HorizontalValueRange. </summary>
+    public float HorizontalSliderValue {
+      get { return _HorizontalSliderValue; }
+      set {
+        if (_HorizontalSlideLimits.x != _HorizontalSlideLimits.y) {
+          float alpha = Mathf.InverseLerp(horizontalValueRange.x, horizontalValueRange.y, value);
+          localPhysicsPosition.x = Mathf.Lerp(initialLocalPosition.x + _HorizontalSlideLimits.x, initialLocalPosition.x + _HorizontalSlideLimits.y, alpha);
+          _HorizontalSliderValue = value;
         }
       }
     }
 
-    void Update() {
-      //Reset our convenience state variables...
-      depressedThisFrame = false;
-      unDepressedThisFrame = false;
-
-      //Apply physical corrections only if PhysX has modified our positions
-      if (physicsOccurred) {
-        physicsOccurred = false;
-
-        //Record and enforce the sliding state from the previous frame
-        Vector2 localSlidePosition = new Vector2(localPhysicsPosition.x, localPhysicsPosition.y);
-        localPhysicsPosition = transform.parent.InverseTransformPoint(body.position);
-        localPhysicsPosition = new Vector3(localSlidePosition.x, localSlidePosition.y, localPhysicsPosition.z);
-
-        //Calculate the physical kinematics of the button in local space
-        Vector3 localPhysicsVelocity = transform.parent.InverseTransformVector(body.velocity);
-        if (isDepressed && behaviour.isPrimaryHovered && lastDepressor != null) {
-          Vector3 curLocalDepressor = transform.parent.InverseTransformPoint(lastDepressor.position);
-          Vector3 origLocalDepressor = transform.parent.InverseTransformPoint(transform.TransformPoint(localDepressor));
-          localPhysicsVelocity = Vector3.back*5f; //new Vector3(0f, 0f, (curLocalDepressor - origLocalDepressor).z * 10f) / Time.fixedDeltaTime;
-          localPhysicsPosition = new Vector3(Mathf.Clamp((localPhysicsPosition.x + (curLocalDepressor - origLocalDepressor).x * 0.25f), InitialLocalPosition.x + HorizontalSlideLimits.x, InitialLocalPosition.x + HorizontalSlideLimits.y),
-                                             Mathf.Clamp((localPhysicsPosition.y + (curLocalDepressor - origLocalDepressor).y * 0.25f), InitialLocalPosition.y + VerticalSlideLimits.x, InitialLocalPosition.y + VerticalSlideLimits.y),
-                                             (localPhysicsPosition.z + ((curLocalDepressor - origLocalDepressor).z)));
-        } else {
-          localPhysicsVelocity += Vector3.forward * Mathf.Clamp(((InitialLocalPosition.z - Mathf.Lerp(MinMaxHeight.x, MinMaxHeight.y, RestingHeight) - localPhysicsPosition.z) / transform.parent.lossyScale.z), -5f, 5f);
-        }
-
-        //Transform the local physics back into world space
-        PhysicsPosition = transform.parent.TransformPoint(localPhysicsPosition);
-        PhysicsVelocity = transform.parent.TransformVector(localPhysicsVelocity);
-
-        //Calculate the Depression State of the Button from its Physical Position
-        //Set its Graphical Position to be Constrained Physically
-        bool oldDepressed = isDepressed;
-
-        //If the button is depressed past its limit...
-        if (localPhysicsPosition.z > InitialLocalPosition.z - MinMaxHeight.x) {
-          transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, InitialLocalPosition.z - MinMaxHeight.x);
-          if (behaviour.isPrimaryHovered) {
-            isDepressed = true;
-          } else {
-            PhysicsPosition = transform.parent.TransformPoint(InitialLocalPosition);
-            PhysicsVelocity = PhysicsVelocity * 0.1f;
-            isDepressed = false;
-            lastDepressor = null;
-          }
-        //Else if the button is extended past its limit...
-        } else if (localPhysicsPosition.z < InitialLocalPosition.z - MinMaxHeight.y) {
-          transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, InitialLocalPosition.z - MinMaxHeight.y);
-          PhysicsPosition = transform.position;
-          isDepressed = false;
-          lastDepressor = null;
-        } else {
-        //Else, just make the physical and graphical motion of the button match
-          transform.localPosition = localPhysicsPosition;
-          isDepressed = false;
-          lastDepressor = null;
-        }
-
-        //If our depression state has changed since last time...
-        if (isDepressed && !oldDepressed) {
-          depressedThisFrame = true;
-          OnPress.Invoke();
-          handChirality = behaviour.primaryHoveringHand.IsLeft;
-          behaviour.manager.GetInteractionHand(handChirality).SetInteractionHoverOverride(true);
-        } else if (!isDepressed && oldDepressed) {
-          unDepressedThisFrame = true;
-          OnUnpress.Invoke();
-          behaviour.manager.GetInteractionHand(handChirality).SetInteractionHoverOverride(false);
-        }
-      }
-
-      //Disable collision on this button if it is not the primary hover
-      if (element != null) {
-        if (behaviour.isPrimaryHovered) {
-          element.GetRuntimeTint().color = isDepressed ? Color.red : Color.Lerp(Color.white, Color.red, 0.5f);
-          behaviour.ignoreContact = false;
-        } else {
-          element.GetRuntimeTint().color = Color.white;
-          behaviour.ignoreContact = true;
+    ///<summary> This slider's current vertical slider value, mapped between the values in the VerticalValueRange. </summary>
+    public float VerticalSliderValue {
+      get { return _VerticalSliderValue; }
+      set {
+        if (_VerticalSlideLimits.x != _VerticalSlideLimits.y) {
+          float alpha = Mathf.InverseLerp(verticalValueRange.x, verticalValueRange.y, value);
+          localPhysicsPosition.y = Mathf.Lerp(initialLocalPosition.y + _VerticalSlideLimits.x, initialLocalPosition.y + _VerticalSlideLimits.y, alpha);
+          _VerticalSliderValue = value;
         }
       }
     }
 
-    //Try grabbing the offset between the fingertip and this object...
-    void trySetDepressor(Collision collision) {
-      if (collision.rigidbody != null && lastDepressor == null && isDepressed) {
-        lastDepressor = collision.rigidbody;
-        localDepressor = transform.InverseTransformPoint(collision.rigidbody.position);
+    //Slide limits normalized to local space
+    private Vector2 _HorizontalSlideLimits;
+    private Vector2 _VerticalSlideLimits;
+
+    //Internal Slider Values
+    private float _HorizontalSliderValue;
+    private float _VerticalSliderValue;
+
+    protected override void Start() {
+      base.Start();
+
+      //Conversion of limits to local space
+      _HorizontalSlideLimits = horizontalSlideLimits / transform.parent.lossyScale.x;
+      _VerticalSlideLimits = verticalSlideLimits / transform.parent.lossyScale.y;
+      CalculateSliderValues();
+    }
+
+    protected override void Update() {
+      base.Update();
+      if (isDepressed) {
+        CalculateSliderValues();
       }
     }
 
-    void OnCollisionEnter(Collision collision) { trySetDepressor(collision); }
-    void OnCollisionStay(Collision collision) { trySetDepressor(collision); }
+    private void CalculateSliderValues() {
+      //Calculate the Renormalized Slider Values
+      if (_HorizontalSlideLimits.x != _HorizontalSlideLimits.y) {
+        _HorizontalSliderValue = Mathf.InverseLerp(initialLocalPosition.x + _HorizontalSlideLimits.x, initialLocalPosition.x + _HorizontalSlideLimits.y, localPhysicsPosition.x);
+        _HorizontalSliderValue = Mathf.Lerp(horizontalValueRange.x, horizontalValueRange.y, _HorizontalSliderValue);
+        horizontalSlideEvent.Invoke(_HorizontalSliderValue);
+      }
+
+      if (_VerticalSlideLimits.x != _VerticalSlideLimits.y) {
+        _VerticalSliderValue = Mathf.InverseLerp(initialLocalPosition.y + _VerticalSlideLimits.x, initialLocalPosition.y + _VerticalSlideLimits.y, localPhysicsPosition.y);
+        _VerticalSliderValue = Mathf.Lerp(verticalValueRange.x, verticalValueRange.y, _VerticalSliderValue);
+        verticalSlideEvent.Invoke(_VerticalSliderValue);
+      }
+    }
+
+    protected override Vector3 GetDepressedConstrainedLocalPosition(Vector3 desiredOffset) {
+      return new Vector3(Mathf.Clamp((localPhysicsPosition.x + desiredOffset.x * 0.25f), initialLocalPosition.x + _HorizontalSlideLimits.x, initialLocalPosition.x + _HorizontalSlideLimits.y),
+                         Mathf.Clamp((localPhysicsPosition.y + desiredOffset.y * 0.25f), initialLocalPosition.y + _VerticalSlideLimits.x, initialLocalPosition.y + _VerticalSlideLimits.y),
+                                     (localPhysicsPosition.z + desiredOffset.z));
+    }
   }
 }
