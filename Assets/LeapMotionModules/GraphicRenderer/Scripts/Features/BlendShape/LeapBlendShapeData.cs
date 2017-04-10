@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
@@ -36,8 +37,9 @@ namespace Leap.Unity.GraphicalRenderer {
     [SerializeField]
     private Vector3 _rotation = new Vector3(0, 0, 5);
 
-    [SerializeField, HideInInspector]
-    private Mesh _mesh;
+    [EditTimeOnly]
+    [SerializeField]
+    private Transform _transform;
 
     public float amount {
       get {
@@ -49,59 +51,56 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    private Mesh _cachedBlendShape;
-    public Mesh blendShape {
-      get {
-        if (!(graphic is LeapMeshGraphicBase)) {
-          return null;
+    public bool TryGetBlendShape(List<Vector3> blendVerts) {
+      if (!(graphic is LeapMeshGraphicBase)) {
+        return false;
+      }
+
+      var meshGraphic = graphic as LeapMeshGraphicBase;
+      meshGraphic.RefreshMeshData();
+
+      var mesh = meshGraphic.mesh;
+      if (mesh == null) {
+        return false;
+      }
+
+      if (_type == BlendShapeType.Mesh) {
+        if (mesh.blendShapeCount <= 0) {
+          return false;
         }
 
-        var meshGraphic = graphic as LeapMeshGraphicBase;
-        meshGraphic.RefreshMeshData();
+        Vector3[] deltaVerts = new Vector3[mesh.vertexCount];
+        Vector3[] deltaNormals = new Vector3[mesh.vertexCount];
+        Vector3[] deltaTangents = new Vector3[mesh.vertexCount];
+        mesh.GetBlendShapeFrameVertices(0, 0, deltaVerts, deltaNormals, deltaTangents);
 
-        var mesh = meshGraphic.mesh;
-        if (mesh == null) {
-          return null;
+        mesh.vertices.Query().Zip(deltaVerts.Query(), (a, b) => a + b).FillList(blendVerts);
+        return true;
+      } else {
+        Matrix4x4 transformation;
+
+        switch (_type) {
+          case BlendShapeType.Translation:
+            transformation = Matrix4x4.TRS(_translation, Quaternion.identity, Vector3.one);
+            break;
+          case BlendShapeType.Rotation:
+            transformation = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(_rotation), Vector3.one);
+            break;
+          case BlendShapeType.Scale:
+            transformation = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one * _scale);
+            break;
+          case BlendShapeType.Transform:
+            if (_transform == null) {
+              return false;
+            }
+            transformation = transform.worldToLocalMatrix * _transform.localToWorldMatrix;
+            break;
+          default:
+            throw new InvalidOperationException();
         }
 
-        if (_type == BlendShapeType.Mesh) {
-          //If the vert count is different, we are in trouble
-          if (_mesh == null || _mesh.vertexCount != mesh.vertexCount) {
-            return null;
-          }
-
-          return _mesh;
-        } else {
-          Matrix4x4 transformation;
-
-          switch (_type) {
-            case BlendShapeType.Translation:
-              transformation = Matrix4x4.TRS(_translation, Quaternion.identity, Vector3.one);
-              break;
-            case BlendShapeType.Rotation:
-              transformation = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(_rotation), Vector3.one);
-              break;
-            case BlendShapeType.Scale:
-              transformation = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one * _scale);
-              break;
-            default:
-              throw new InvalidOperationException();
-          }
-
-          if (_cachedBlendShape == null) {
-            _cachedBlendShape = Instantiate(mesh);
-            _cachedBlendShape.hideFlags = HideFlags.HideAndDontSave;
-            _cachedBlendShape.name = "Generated Blend Shape Mesh";
-          }
-
-          _cachedBlendShape.Clear();
-          _cachedBlendShape.vertices = mesh.vertices.Query().
-                                       Select(v => transformation.MultiplyPoint3x4(v)).
-                                       ToArray();
-          _cachedBlendShape.triangles = mesh.triangles;
-
-          return _cachedBlendShape;
-        }
+        mesh.vertices.Query().Select(transformation.MultiplyPoint).FillList(blendVerts);
+        return true;
       }
     }
 
@@ -109,6 +108,7 @@ namespace Leap.Unity.GraphicalRenderer {
       Translation,
       Rotation,
       Scale,
+      Transform,
       Mesh
     }
   }

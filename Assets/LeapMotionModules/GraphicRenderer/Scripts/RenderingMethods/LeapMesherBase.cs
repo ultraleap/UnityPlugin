@@ -120,6 +120,7 @@ namespace Leap.Unity.GraphicalRenderer {
     //#### Blend Shapes ####
     protected const string BLEND_SHAPE_AMOUNTS_PROPERTY = LeapGraphicRenderer.PROPERTY_PREFIX + "BlendShapeAmounts";
     protected List<float> _blendShapeAmounts = new List<float>();
+    private List<Vector3> _blendVertsContainer = new List<Vector3>();
 
     //#### Custom Channels ####
     protected List<float> _customFloatChannelData = new List<float>();
@@ -575,13 +576,13 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void buildBlendShapes(LeapBlendShapeData blendShapeData) {
       using (new ProfilerSample("Build Blend Shapes")) {
-        var shape = blendShapeData.blendShape;
+        if (!blendShapeData.TryGetBlendShape(_blendVertsContainer)) {
+          return;
+        }
 
-        int offset = _generation.verts.Count - shape.vertexCount;
-
-        var verts = shape.vertices;
-        for (int i = 0; i < verts.Length; i++) {
-          Vector3 shapeVert = verts[i];
+        int offset = _generation.verts.Count - _blendVertsContainer.Count;
+        for (int i = 0; i < _blendVertsContainer.Count; i++) {
+          Vector3 shapeVert = _blendVertsContainer[i];
           Vector3 delta = blendShapeDelta(shapeVert, _generation.verts[i + offset]);
 
           Vector4 currUv = _generation.uvs[3][i + offset];
