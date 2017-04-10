@@ -332,30 +332,6 @@ Transform:
   m_Father: {fileID: 658088855}
   m_RootOrder: 27
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &305168912
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Graphic Material
-  m_Shader: {fileID: 4800000, guid: a770bdf1a8aeb824aa92fc5d9e2ffb55, type: 3}
-  m_ShaderKeywords: GRAPHIC_RENDERER_BLEND_SHAPES GRAPHIC_RENDERER_VERTEX_UV_0
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 28532659129785562, guid: 3f0b80242a817fa4ab5b6ecd2af44663,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &333114170
 GameObject:
   m_ObjectHideFlags: 0
@@ -539,6 +515,30 @@ MonoBehaviour:
   vertexColor: {r: 0.6911765, g: 0.6911765, b: 0.6911765, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
+--- !u!21 &492436909
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Graphic Material
+  m_Shader: {fileID: 4800000, guid: a770bdf1a8aeb824aa92fc5d9e2ffb55, type: 3}
+  m_ShaderKeywords: GRAPHIC_RENDERER_BLEND_SHAPES GRAPHIC_RENDERER_VERTEX_UV_0
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 28532659129785562, guid: 3f0b80242a817fa4ab5b6ecd2af44663,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &635359835
 GameObject:
   m_ObjectHideFlags: 0
@@ -891,7 +891,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   graphic: {fileID: 747764345}
   feature: {fileID: 1535910911}
-  _amount: 1
+  _amount: 0
   _type: 4
   _scale: 1.1
   _translation: {x: 0, y: 0, z: 0.1}
@@ -1800,7 +1800,7 @@ MonoBehaviour:
     _filterMode: 1
     _format: 5
     _maxAtlasSize: 4096
-  _material: {fileID: 305168912}
+  _material: {fileID: 492436909}
   _meshes: {fileID: 11400000, guid: d6cad02ffc0d5c74caaf4c31779749dc, type: 2}
   _packedTextures: {fileID: 11400000, guid: 3f0b80242a817fa4ab5b6ecd2af44663, type: 2}
   _atlasUvs:
