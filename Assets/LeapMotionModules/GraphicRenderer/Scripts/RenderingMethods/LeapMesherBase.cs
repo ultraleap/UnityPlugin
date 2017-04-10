@@ -120,7 +120,6 @@ namespace Leap.Unity.GraphicalRenderer {
     //#### Blend Shapes ####
     protected const string BLEND_SHAPE_AMOUNTS_PROPERTY = LeapGraphicRenderer.PROPERTY_PREFIX + "BlendShapeAmounts";
     protected List<float> _blendShapeAmounts = new List<float>();
-    private List<Vector3> _blendVertsContainer = new List<Vector3>();
 
     //#### Custom Channels ####
     protected List<float> _customFloatChannelData = new List<float>();
@@ -576,20 +575,27 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void buildBlendShapes(LeapBlendShapeData blendShapeData) {
       using (new ProfilerSample("Build Blend Shapes")) {
-        if (!blendShapeData.TryGetBlendShape(_blendVertsContainer)) {
-          return;
-        }
+        List<Vector3> blendVerts = Pool<List<Vector3>>.Spawn();
 
-        int offset = _generation.verts.Count - _blendVertsContainer.Count;
-        for (int i = 0; i < _blendVertsContainer.Count; i++) {
-          Vector3 shapeVert = _blendVertsContainer[i];
-          Vector3 delta = blendShapeDelta(shapeVert, _generation.verts[i + offset]);
+        try {
+          if (!blendShapeData.TryGetBlendShape(blendVerts)) {
+            return;
+          }
 
-          Vector4 currUv = _generation.uvs[3][i + offset];
-          currUv.x = delta.x;
-          currUv.y = delta.y;
-          currUv.z = delta.z;
-          _generation.uvs[3][i + offset] = currUv;
+          int offset = _generation.verts.Count - blendVerts.Count;
+          for (int i = 0; i < blendVerts.Count; i++) {
+            Vector3 shapeVert = blendVerts[i];
+            Vector3 delta = blendShapeDelta(shapeVert, _generation.verts[i + offset]);
+
+            Vector4 currUv = _generation.uvs[3][i + offset];
+            currUv.x = delta.x;
+            currUv.y = delta.y;
+            currUv.z = delta.z;
+            _generation.uvs[3][i + offset] = currUv;
+          }
+        } finally {
+          blendVerts.Clear();
+          Pool<List<Vector3>>.Recycle(blendVerts);
         }
       }
     }
