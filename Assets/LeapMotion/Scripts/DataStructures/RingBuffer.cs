@@ -6,7 +6,7 @@ public class RingBuffer<T> {
 
   private T[] arr;
   private int firstIdx = 0;
-  private int lastIdx = 0;
+  private int lastIdx = -1;
 
   public RingBuffer(int bufferSize) {
     arr = new T[bufferSize];
