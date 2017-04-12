@@ -15,7 +15,7 @@ namespace Leap.Unity.GraphicalRenderer {
       specifyConditionalDrawing("_type", (int)LeapBlendShapeData.BlendShapeType.Translation, "_translation");
       specifyConditionalDrawing("_type", (int)LeapBlendShapeData.BlendShapeType.Rotation, "_rotation");
       specifyConditionalDrawing("_type", (int)LeapBlendShapeData.BlendShapeType.Scale, "_scale");
-      specifyConditionalDrawing("_type", (int)LeapBlendShapeData.BlendShapeType.Mesh, "_mesh");
+      specifyConditionalDrawing("_type", (int)LeapBlendShapeData.BlendShapeType.Transform, "_transform");
     }
   }
 }

@@ -575,20 +575,27 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void buildBlendShapes(LeapBlendShapeData blendShapeData) {
       using (new ProfilerSample("Build Blend Shapes")) {
-        var shape = blendShapeData.blendShape;
+        List<Vector3> blendVerts = Pool<List<Vector3>>.Spawn();
 
-        int offset = _generation.verts.Count - shape.vertexCount;
+        try {
+          if (!blendShapeData.TryGetBlendShape(blendVerts)) {
+            return;
+          }
 
-        var verts = shape.vertices;
-        for (int i = 0; i < verts.Length; i++) {
-          Vector3 shapeVert = verts[i];
-          Vector3 delta = blendShapeDelta(shapeVert, _generation.verts[i + offset]);
+          int offset = _generation.verts.Count - blendVerts.Count;
+          for (int i = 0; i < blendVerts.Count; i++) {
+            Vector3 shapeVert = blendVerts[i];
+            Vector3 delta = blendShapeDelta(shapeVert, _generation.verts[i + offset]);
 
-          Vector4 currUv = _generation.uvs[3][i + offset];
-          currUv.x = delta.x;
-          currUv.y = delta.y;
-          currUv.z = delta.z;
-          _generation.uvs[3][i + offset] = currUv;
+            Vector4 currUv = _generation.uvs[3][i + offset];
+            currUv.x = delta.x;
+            currUv.y = delta.y;
+            currUv.z = delta.z;
+            _generation.uvs[3][i + offset] = currUv;
+          }
+        } finally {
+          blendVerts.Clear();
+          Pool<List<Vector3>>.Recycle(blendVerts);
         }
       }
     }
