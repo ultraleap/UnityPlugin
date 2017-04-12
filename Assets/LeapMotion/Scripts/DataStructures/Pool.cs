@@ -22,25 +22,39 @@ namespace Leap.Unity {
   /// It is not required to implement the IPoolable interface to use the Pool
   /// class, which allows you to pool types such as List or Dictionary, types
   /// which you have no control over.  But make sure that you clean up these
-  /// objects before you recycle them! 
-  /// 
-  /// Example workflow for types you DO NOT have control over:
-  ///   var obj = Pool<T>.Spawn();
-  ///   obj.Init(stuff);
-  /// 
-  ///   //Do something with obj
-  /// 
-  ///   obj.Clear();
-  ///   Pool<T>.Recycle(obj);
-  ///   
-  /// Example workflow for types you DO have control over:
-  ///   var obj = Pool<T>.Spawn();
-  ///   obj.Init(stuff);
-  ///   
-  ///   //Do something with obj
-  ///   
-  ///   obj.Dispose(); // e.g. call Recycle(this) in the Dispose() implementation
+  /// objects before you recycle them!
   /// </summary>
+  /// <example>
+  ///   Example workflow for types you DO NOT have control over:
+  ///   <code>
+  ///     // <![CDATA[" // (XML fix for Visual Studio)
+  ///     
+  ///     var obj = Pool<T>.Spawn();
+  ///     obj.Init(stuff);
+  ///   
+  ///     //Do something with obj
+  ///   
+  ///     obj.Clear();
+  ///     Pool<T>.Recycle(obj);
+  ///     
+  ///     // "]]> // (Close XML fix for Visual Studio)
+  ///   </code>
+  /// </example>
+  /// <example>
+  ///   Example workflow for types you DO have control over:
+  ///   <code>
+  ///     // <![CDATA[" // (XML fix for Visual Studio)
+  ///     
+  ///     var obj = Pool<T>.Spawn();
+  ///     obj.Init(stuff);
+  ///    
+  ///     // Do something with obj
+  ///    
+  ///     obj.Dispose(); // e.g. call Recycle(this) in the Dispose() implementation
+  ///     
+  ///     // "]]> // (Close XML fix for Visual Studio)
+  ///   </code>
+  /// </example>
   public static class Pool<T> where T : new() {
     [ThreadStatic]
     private static Stack<T> _pool = new Stack<T>();
