@@ -59,6 +59,21 @@ namespace Leap.Unity {
       array = newArray;
     }
 
+    // http://stackoverflow.com/a/19317229/2471635
+    /// <summary>
+    /// Returns whether this type implements the argument interface type.
+    /// If the argument type is not an interface, returns false.
+    /// </summary>
+    public static bool ImplementsInterface(this Type type, Type ifaceType) {
+      Type[] intf = type.GetInterfaces();
+      for (int i = 0; i < intf.Length; i++) {
+        if (intf[i] == ifaceType) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     #endregion
 
     #region Math Utils
