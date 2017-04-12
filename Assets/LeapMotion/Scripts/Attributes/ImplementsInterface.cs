@@ -12,13 +12,16 @@ namespace Leap.Unity.Attributes {
     private Type type;
 
     public ImplementsInterfaceAttribute(Type type) {
+      if (!type.IsInterface) {
+        throw new System.Exception(type.Name + " is not an interface.");
+      }
       this.type = type;
     }
 
 #if UNITY_EDITOR
     public void ConstrainValue(SerializedProperty property) {
       if (property.objectReferenceValue != null) {
-        if (!type.ImplementsInterface(property.objectReferenceValue.GetType())) {
+        if (!property.objectReferenceValue.GetType().ImplementsInterface(type)) {
           Debug.LogError(property.objectReferenceValue.GetType().Name + " does not implement " + type.Name);
           property.objectReferenceValue = null;
         }
