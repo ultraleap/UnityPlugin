@@ -167,6 +167,38 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region Collider Utils
+
+    public static Vector3 GetDirection(this CapsuleCollider capsule) {
+      switch (capsule.direction) {
+        case 0: return Vector3.right;
+        case 1: return Vector3.up;
+        case 2: default: return Vector3.forward;
+      }
+    }
+
+    /// <summary>
+    /// Manipulates capsule.transform.position, capsule.transform.rotation, and capsule.height
+    /// so that the line segment defined by the capsule connects world-space points a and b.
+    /// </summary>
+    public static void SetCapsulePoints(this CapsuleCollider capsule, Vector3 a, Vector3 b) {
+      capsule.center = Vector3.zero;
+
+      capsule.transform.position = (a + b) / 2F;
+
+      Vector3 capsuleDirection = capsule.GetDirection();
+
+      Vector3 capsuleDirWorldSpace = capsule.transform.TransformDirection(capsuleDirection);
+      Quaternion necessaryRotation = Quaternion.FromToRotation(capsuleDirWorldSpace, a - capsule.transform.position);
+      capsule.transform.rotation = necessaryRotation * capsule.transform.rotation;
+
+      Vector3 aCapsuleSpace = capsule.transform.InverseTransformPoint(a);
+      float capsuleSpaceDistToA = aCapsuleSpace.magnitude;
+      capsule.height = (capsuleSpaceDistToA + capsule.radius) * 2;
+    }
+
+    #endregion
+
     #region Gizmo Utils
 
     public static void DrawCircle(Vector3 center,
