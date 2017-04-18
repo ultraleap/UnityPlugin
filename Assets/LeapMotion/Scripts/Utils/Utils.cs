@@ -170,7 +170,11 @@ namespace Leap.Unity {
     #region Collider Utils
 
     public static Vector3 GetDirection(this CapsuleCollider capsule) {
-      return capsule.direction == 0 ? Vector3.right : capsule.direction == 1 ? Vector3.up : Vector3.forward;
+      switch (capsule.direction) {
+        case 0: return Vector3.right;
+        case 1: return Vector3.up;
+        case 2: default: return Vector3.forward;
+      }
     }
 
     /// <summary>
@@ -188,8 +192,8 @@ namespace Leap.Unity {
       Quaternion necessaryRotation = Quaternion.FromToRotation(capsuleDirWorldSpace, a - capsule.transform.position);
       capsule.transform.rotation = necessaryRotation * capsule.transform.rotation;
 
-      Vector3 aWorldSpace = capsule.transform.InverseTransformPoint(a);
-      float capsuleSpaceDistToA = aWorldSpace.magnitude;
+      Vector3 aCapsuleSpace = capsule.transform.InverseTransformPoint(a);
+      float capsuleSpaceDistToA = aCapsuleSpace.magnitude;
       capsule.height = (capsuleSpaceDistToA + capsule.radius) * 2;
     }
 
