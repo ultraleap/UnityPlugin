@@ -1,4 +1,4 @@
-﻿#if UNITY_5_6
+﻿#if UNITY_5_6 && UNITY_EDITOR
 using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
