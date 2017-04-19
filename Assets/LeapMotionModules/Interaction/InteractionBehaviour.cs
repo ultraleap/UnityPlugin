@@ -40,7 +40,7 @@ namespace Leap.Unity.UI.Interaction {
       ObjectPrimaryHoverBegin = 130,
       ObjectPrimaryHoverEnd = 132,
       GraspBegin = 140,
-      GraspStay = 141,
+      GraspHold = 141,
       GraspEnd = 142,
       ObjectGraspBegin = 150,
       ObjectGraspEnd = 152,
@@ -584,7 +584,7 @@ namespace Leap.Unity.UI.Interaction {
       setupCallback(ref OnObjectPrimaryHoverBegin, EventType.ObjectPrimaryHoverBegin);
       setupCallback(ref OnObjectPrimaryHoverEnd, EventType.ObjectPrimaryHoverEnd);
       setupCallback(ref OnGraspBegin, EventType.GraspBegin);
-      setupCallback(ref OnGraspBegin, EventType.GraspStay);
+      setupCallback(ref OnGraspHold, EventType.GraspHold);
       setupCallback(ref OnGraspEnd, EventType.GraspEnd);
       setupCallback(ref OnObjectGraspBegin, EventType.ObjectGraspBegin);
       setupCallback(ref OnObjectGraspEnd, EventType.ObjectGraspEnd);
