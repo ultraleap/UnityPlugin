@@ -43,11 +43,11 @@
         fixed4 color = fixed4(1,1,1,1);
 
 #if GRAPHIC_RENDERER_VERTEX_UV_0
-        color *= tex2D(_MainTex, i.uv0);
+        color *= tex2D(_MainTex, i.uv_0);
 #endif
 
 #if GRAPHIC_RENDERER_VERTEX_UV_0
-        color *= tex2D(_MainTex2, i.uv0);
+        color *= tex2D(_MainTex2, i.uv_0);
 #endif
 
 #ifdef GRAPHICS_HAVE_COLOR
