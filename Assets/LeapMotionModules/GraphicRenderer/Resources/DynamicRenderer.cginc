@@ -203,7 +203,7 @@ struct v2f_graphic_dynamic {
 
 #ifdef GRAPHICS_HAVE_ID
 #ifdef GRAPHIC_ID_FROM_UV0
-#define BEGIN_V2F(v) in graphicId = v.texcoord.w;
+#define BEGIN_V2F(v) int graphicId = v.texcoord.w;
 #else
 #define BEGIN_V2F(v) int graphicId = v.vertInfo.w;
 #endif
