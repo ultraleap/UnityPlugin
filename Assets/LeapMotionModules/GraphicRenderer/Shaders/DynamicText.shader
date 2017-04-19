@@ -8,6 +8,7 @@
 
     ZWrite Off
     ZTest On
+    Offset -1, -90000 //text should appear in front of things that it is aligned with
     Blend SrcAlpha OneMinusSrcAlpha
 
 		Pass {

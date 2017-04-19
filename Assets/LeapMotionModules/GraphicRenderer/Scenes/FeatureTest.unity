@@ -483,17 +483,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 465469645}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 438437f012b34d043919ad395e42c066, type: 3}
+  m_Script: {fileID: 11500000, guid: 3ce983157aaaa4e4eaa39f366f2a7479, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 465469650}
-  feature: {fileID: 1535910911}
-  _amount: 0
-  _type: 2
-  _scale: 1.1
-  _translation: {x: 0, y: 0, z: 0.1}
-  _rotation: {x: 0, y: 0, z: 5}
-  _transform: {fileID: 0}
+  feature: {fileID: 1535910905}
+  _value: 0
 --- !u!114 &465469650
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -515,30 +510,6 @@ MonoBehaviour:
   vertexColor: {r: 0.6911765, g: 0.6911765, b: 0.6911765, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
---- !u!21 &492436909
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Graphic Material
-  m_Shader: {fileID: 4800000, guid: a770bdf1a8aeb824aa92fc5d9e2ffb55, type: 3}
-  m_ShaderKeywords: GRAPHIC_RENDERER_BLEND_SHAPES GRAPHIC_RENDERER_VERTEX_UV_0
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 28532659129785562, guid: 3f0b80242a817fa4ab5b6ecd2af44663,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &635359835
 GameObject:
   m_ObjectHideFlags: 0
@@ -886,17 +857,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 747764343}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 438437f012b34d043919ad395e42c066, type: 3}
+  m_Script: {fileID: 11500000, guid: 3ce983157aaaa4e4eaa39f366f2a7479, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 747764345}
-  feature: {fileID: 1535910911}
-  _amount: 0
-  _type: 4
-  _scale: 1.1
-  _translation: {x: 0, y: 0, z: 0.1}
-  _rotation: {x: 0, y: 0, z: 5}
-  _transform: {fileID: 0}
+  feature: {fileID: 1535910905}
+  _value: 3.95
 --- !u!1 &751201669
 GameObject:
   m_ObjectHideFlags: 0
@@ -1447,17 +1413,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1365773555}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 438437f012b34d043919ad395e42c066, type: 3}
+  m_Script: {fileID: 11500000, guid: 3ce983157aaaa4e4eaa39f366f2a7479, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 1365773557}
-  feature: {fileID: 1535910911}
-  _amount: 0
-  _type: 2
-  _scale: 1.1
-  _translation: {x: 0, y: 0, z: 0.1}
-  _rotation: {x: 0, y: 0, z: 5}
-  _transform: {fileID: 0}
+  feature: {fileID: 1535910905}
+  _value: 0
 --- !u!1 &1366916390
 GameObject:
   m_ObjectHideFlags: 0
@@ -1525,17 +1486,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1366916390}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 438437f012b34d043919ad395e42c066, type: 3}
+  m_Script: {fileID: 11500000, guid: 3ce983157aaaa4e4eaa39f366f2a7479, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 1366916395}
-  feature: {fileID: 1535910911}
-  _amount: 0
-  _type: 2
-  _scale: 1.1
-  _translation: {x: 0, y: 0, z: 0.1}
-  _rotation: {x: 0, y: 0, z: 5}
-  _transform: {fileID: 0}
+  feature: {fileID: 1535910905}
+  _value: 0
 --- !u!114 &1366916395
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1619,17 +1575,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1520670167}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 438437f012b34d043919ad395e42c066, type: 3}
+  m_Script: {fileID: 11500000, guid: 3ce983157aaaa4e4eaa39f366f2a7479, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 1520670169}
-  feature: {fileID: 1535910911}
-  _amount: 0
-  _type: 2
-  _scale: 1.1
-  _translation: {x: 0, y: 0, z: 0.1}
-  _rotation: {x: 0, y: 0, z: 5}
-  _transform: {fileID: 0}
+  feature: {fileID: 1535910905}
+  _value: 0
 --- !u!114 &1520670172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1670,9 +1621,9 @@ GameObject:
   - component: {fileID: 1535910912}
   - component: {fileID: 1535910908}
   - component: {fileID: 1535910909}
-  - component: {fileID: 1535910905}
   - component: {fileID: 1535910903}
   - component: {fileID: 1535910911}
+  - component: {fileID: 1535910905}
   m_Layer: 0
   m_Name: GUI
   m_TagString: Untagged
@@ -1780,75 +1731,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1535910902}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4e826f61fa76194f87130a5030b287d, type: 3}
+  m_Script: {fileID: 11500000, guid: 28d3e4c1bf9ce08498e5dc2cb7345d71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  renderer: {fileID: 1535910906}
-  group: {fileID: 1535910909}
-  _useUv0: 1
-  _useUv1: 0
-  _useUv2: 0
-  _useUv3: 0
-  _useColors: 0
-  _bakedTint: {r: 1, g: 1, b: 1, a: 1}
-  _useNormals: 0
-  _shader: {fileID: 4800000, guid: a770bdf1a8aeb824aa92fc5d9e2ffb55, type: 3}
-  _atlas:
-    _border: 1
-    _padding: 0
-    _mipMap: 1
-    _filterMode: 1
-    _format: 5
-    _maxAtlasSize: 4096
-  _material: {fileID: 492436909}
-  _meshes: {fileID: 11400000, guid: d6cad02ffc0d5c74caaf4c31779749dc, type: 2}
-  _packedTextures: {fileID: 11400000, guid: 3f0b80242a817fa4ab5b6ecd2af44663, type: 2}
-  _atlasUvs:
-    _channel0:
-      _keys:
-      - {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
-      - {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
-      _values:
-      - serializedVersion: 2
-        x: 0.015625
-        y: 0.0078125
-        width: 0.53125
-        height: 0.265625
-      - serializedVersion: 2
-        x: 0.015625
-        y: 0.2890625
-        width: 0.5
-        height: 0.25
-    _channel1:
-      _keys: []
-      _values: []
-    _channel2:
-      _keys: []
-      _values: []
-    _channel3:
-      _keys: []
-      _values: []
-    _nullRects:
-    - serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-    - serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-    - serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
-    - serializedVersion: 2
-      x: 0
-      y: 0
-      width: 0
-      height: 0
+  featureData:
+  - {fileID: 747764348}
+  - {fileID: 1365773560}
+  - {fileID: 465469649}
+  - {fileID: 1366916394}
+  - {fileID: 1520670170}
+  _channelName: _Wiggle
 --- !u!114 &1535910906
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1903,10 +1795,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b32d8e323bfd9df4d82051c22f44d792, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _renderingMethod: {fileID: 1535910905}
+  _renderingMethod: {fileID: 1535910911}
   _features:
   - {fileID: 1535910903}
-  - {fileID: 1535910911}
+  - {fileID: 1535910905}
   _renderer: {fileID: 1535910906}
   _graphics:
   - {fileID: 747764345}
@@ -1919,7 +1811,7 @@ MonoBehaviour:
     message: 
   - support: 0
     message: 
-  _addRemoveSupported: 1
+  _addRemoveSupported: 0
 --- !u!114 &1535910910
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1993,15 +1885,75 @@ MonoBehaviour:
   m_GameObject: {fileID: 1535910902}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9ff0cf669bd50964a915784dbb766181, type: 3}
+  m_Script: {fileID: 11500000, guid: e4e826f61fa76194f87130a5030b287d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  featureData:
-  - {fileID: 747764348}
-  - {fileID: 1365773560}
-  - {fileID: 465469649}
-  - {fileID: 1366916394}
-  - {fileID: 1520670170}
+  renderer: {fileID: 1535910906}
+  group: {fileID: 1535910909}
+  _useUv0: 1
+  _useUv1: 0
+  _useUv2: 0
+  _useUv3: 0
+  _useColors: 0
+  _bakedTint: {r: 1, g: 1, b: 1, a: 1}
+  _useNormals: 0
+  _shader: {fileID: 4800000, guid: a770bdf1a8aeb824aa92fc5d9e2ffb55, type: 3}
+  _atlas:
+    _border: 0
+    _padding: 0
+    _mipMap: 1
+    _filterMode: 1
+    _format: 5
+    _maxAtlasSize: 4096
+  _material: {fileID: 1900924348}
+  _meshes: {fileID: 11400000, guid: 4e1bdb5cd2cf95f4bad1555b60576e8d, type: 2}
+  _packedTextures: {fileID: 11400000, guid: 0dcdeddbab9894b4cb05b62d35d29b0b, type: 2}
+  _atlasUvs:
+    _channel0:
+      _keys:
+      - {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
+      - {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
+      _values:
+      - serializedVersion: 2
+        x: 0
+        y: 0
+        width: 0.53125
+        height: 0.265625
+      - serializedVersion: 2
+        x: 0
+        y: 0.265625
+        width: 0.5
+        height: 0.25
+    _channel1:
+      _keys: []
+      _values: []
+    _channel2:
+      _keys: []
+      _values: []
+    _channel3:
+      _keys: []
+      _values: []
+    _nullRects:
+    - serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    - serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    - serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    - serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
 --- !u!114 &1535910912
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -2021,6 +1973,7 @@ MonoBehaviour:
   _globalTint: {r: 1, g: 1, b: 1, a: 1}
   _shader: {fileID: 4800000, guid: 45c3e855355db4d409f06f94b19ed52f, type: 3}
   _meshData: {fileID: 0}
+  scale: 0.1
 --- !u!1 &1557105950
 GameObject:
   m_ObjectHideFlags: 0
@@ -2268,6 +2221,30 @@ Material:
     m_Floats:
     - _BumpScale: 1
     - _Smoothness: 1
+    m_Colors: []
+--- !u!21 &1900924348
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Graphic Material
+  m_Shader: {fileID: 4800000, guid: a770bdf1a8aeb824aa92fc5d9e2ffb55, type: 3}
+  m_ShaderKeywords: GRAPHIC_RENDERER_VERTEX_UV_0
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 28838020834809266, guid: 0dcdeddbab9894b4cb05b62d35d29b0b,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
     m_Colors: []
 --- !u!1 &2020924587
 GameObject:

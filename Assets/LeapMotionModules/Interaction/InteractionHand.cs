@@ -326,7 +326,7 @@ namespace Leap.Unity.UI.Interaction {
 
     private const int NUM_FINGERS = 5;
     private const int BONES_PER_FINGER = 3;
-    public const float PER_BONE_MASS_MULTIPLIER = 0.2F;
+    public const float PER_BONE_MASS_MULTIPLIER = 10F;
     private const float DEAD_ZONE_FRACTION = 0.1F;
     private const float DISLOCATION_FRACTION = 3.0F;
 

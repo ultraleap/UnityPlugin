@@ -81,6 +81,7 @@ namespace Leap.Unity.GraphicalRenderer {
     public abstract LeapGraphic GetValidGraphicOnObject(GameObject obj);
 
     protected void CreateOrSave<T>(ref T t, string assetName) where T : SceneTiedAsset {
+#if UNITY_EDITOR
       T newT = t;
       if (SceneTiedAsset.CreateOrSave(this, 
                                       ref newT,
@@ -90,6 +91,7 @@ namespace Leap.Unity.GraphicalRenderer {
         t = newT;
         EditorUtility.SetDirty(this);
       }
+#endif
     }
   }
 

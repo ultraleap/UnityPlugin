@@ -64,7 +64,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     [MinValue(0)]
     [EditTimeOnly, SerializeField]
-    private int _border = 1;
+    private int _border = 0;
 
     [MinValue(0)]
     [EditTimeOnly, SerializeField]
@@ -315,7 +315,8 @@ namespace Leap.Unity.GraphicalRenderer {
             tex.filterMode = _filterMode;
 
             progress.Step("Updating Texture");
-            tex.Apply(updateMipmaps: true, makeNoLongerReadable: true);
+            //keep the texture as readable because the user might want to do things with the texture!
+            tex.Apply(updateMipmaps: true, makeNoLongerReadable: false);
 
             packedTextures[i] = tex;
           });

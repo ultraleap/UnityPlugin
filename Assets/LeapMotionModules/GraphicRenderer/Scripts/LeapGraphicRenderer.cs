@@ -148,35 +148,56 @@ namespace Leap.Unity.GraphicalRenderer {
     private void validateGraphics() {
       GetComponentsInChildren(_tempGraphicList);
 
+      HashSet<LeapGraphic> set = Pool<HashSet<LeapGraphic>>.Spawn();
+      foreach (var group in _groups) {
+        foreach (var graphic in group.graphics) {
+          set.Add(graphic);
+        }
+
+        foreach (var graphic in _tempGraphicList) {
+          //If the graphic claims it is attached to this group, but it really isn't, remove
+          //it and re-add it.
+          if (graphic.attachedGroup == group && !set.Contains(graphic)) {
+            group.TryRemoveGraphic(graphic);
+            group.TryAddGraphic(graphic);
+          }
+        }
+
+        set.Clear();
+      }
+      Pool<HashSet<LeapGraphic>>.Recycle(set);
+
       foreach (var graphic in _tempGraphicList) {
         if (graphic.isAttachedToGroup) {
           //procede to validate
 
-          //If the graphic is anchored to the wrong anchor, detach and reattach
-          var anchor = _space == null ? null : LeapSpaceAnchor.GetAnchor(graphic.transform);
-          if (graphic.anchor != anchor) {
-            var group = graphic.attachedGroup;
+          using (new ProfilerSample("1")) {
+            //If the graphic is anchored to the wrong anchor, detach and reattach
+            var anchor = _space == null ? null : LeapSpaceAnchor.GetAnchor(graphic.transform);
+            if (graphic.anchor != anchor) {
+              var group = graphic.attachedGroup;
 
-            if (group.TryRemoveGraphic(graphic)) {
-              group.TryAddGraphic(graphic);
+              if (group.TryRemoveGraphic(graphic)) {
+                group.TryAddGraphic(graphic);
+              }
             }
           }
 
-          if (!graphic.attachedGroup.graphics.Contains(graphic)) {
-            var group = graphic.attachedGroup;
-            graphic.OnDetachedFromGroup();
-            group.TryAddGraphic(graphic); //if this fails, handled by later clause
-          }
-
-          if (!graphic.enabled) {
-            graphic.attachedGroup.TryRemoveGraphic(graphic);
+          using (new ProfilerSample("3")) {
+            if (!graphic.enabled) {
+              graphic.attachedGroup.TryRemoveGraphic(graphic);
+            }
           }
         }
 
-        if (!graphic.isAttachedToGroup && graphic.enabled) {
-          TryAddGraphic(graphic);
+        using (new ProfilerSample("4")) {
+          if (!graphic.isAttachedToGroup && graphic.enabled) {
+            TryAddGraphic(graphic);
+          }
         }
       }
+
+
     }
 
     private void doLateUpdateRuntime() {

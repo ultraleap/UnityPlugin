@@ -27,20 +27,49 @@ namespace Leap.Unity.UI.Interaction {
     public const float MAX_ANGULAR_VELOCITY = 100F;
 
     #region Public API
+    
+    public enum EventType {
+      HoverBegin = 100,
+      HoverStay = 101,
+      HoverEnd = 102,
+      ObjectHoverBegin = 110,
+      ObjectHoverEnd = 111,
+      PrimaryHoverBegin = 120,
+      PrimaryHoverStay = 121,
+      PrimaryHoverEnd = 122,
+      ObjectPrimaryHoverBegin = 130,
+      ObjectPrimaryHoverEnd = 132,
+      GraspBegin = 140,
+      GraspStay = 141,
+      GraspEnd = 142,
+      ObjectGraspBegin = 150,
+      ObjectGraspEnd = 152,
+      SuspensionBegin = 160,
+      SuspensionEnd = 161,
+      ContactBegin = 170,
+      ContactStay = 171,
+      ContactEnd = 172,
+      ObjectContactBegin = 180,
+      ObjectContactEnd = 181
+    }
 
     #region Hovering API
 
     /// <summary> Gets whether any hand is nearby. </summary>
-    public bool isHovered             { get { return _hoveringHands.Count > 0; } }
+    public bool isHovered { get { return _hoveringHands.Count > 0; } }
 
     /// <summary> Gets the closest hand to this object, or null if no hand is nearby. </summary>
-    public Hand closestHoveringHand   { get { return _closestHoveringHand == null ?
-                                                     null : _closestHoveringHand.GetLastTrackedLeapHand(); } }
+    public Hand closestHoveringHand {
+      get {
+        return _closestHoveringHand == null ?
+               null : _closestHoveringHand.GetLastTrackedLeapHand();
+      }
+    }
 
     /// <summary>
     /// Gets whether this object is the primary hover for any Interaction Hand.
     /// </summary>
-    public bool isPrimaryHovered      { get { return _primaryHoveringHands.Count > 0; } }
+    public bool isPrimaryHovered { get { return _primaryHoveringHands.Count > 0; } }
 
     /// <summary>
     /// Gets the primary hovering hand for this interaction object, if it has one.
@@ -48,8 +77,12 @@ namespace Leap.Unity.UI.Interaction {
     /// than any other interaction object. If there are multiple such hands, returns the hand
     /// closest to this object.
     /// </summary>
-    public Hand primaryHoveringHand   { get { return _closestPrimaryHoveringHand == null ?
-                                                     null : _closestPrimaryHoveringHand.GetLastTrackedLeapHand(); } }
+    public Hand primaryHoveringHand {
+      get {
+        return _closestPrimaryHoveringHand == null ?
+               null : _closestPrimaryHoveringHand.GetLastTrackedLeapHand();
+      }
+    }
 
     /// <summary>
     /// Gets the finger that is currently primarily hovering over this object, of the closest
@@ -90,7 +123,7 @@ namespace Leap.Unity.UI.Interaction {
     /// If this method is to be called on a given frame, it will be called after OnHoverEnd
     /// and before OnHoverStay.
     /// </remarks>
-    public Action<List<InteractionHand>> OnHoverBegin = (hands) => { };
+    public Action<List<InteractionHand>> OnHoverBegin;
 
     /// <summary>
     /// Called during every fixed (physics) frame wherein one or more hands is within the hover
@@ -103,7 +136,7 @@ namespace Leap.Unity.UI.Interaction {
     /// If this method is to be called on a given frame, it will be called after both
     /// OnHoverEnd and OnHoverBegin.
     /// </remarks>
-    public Action<List<InteractionHand>> OnHoverStay = (hands) => { };
+    public Action<List<InteractionHand>> OnHoverStay;
 
     /// <summary>
     /// Called when one or more hands have left the hover activity radius around this
@@ -120,7 +153,7 @@ namespace Leap.Unity.UI.Interaction {
     /// If this method is to be called on a given frame, it will be called before OnHoverBegin and
     /// before OnHoverStay.
     /// </remarks>
-    public Action<List<InteractionHand>> OnHoverEnd = (hands) => { };
+    public Action<List<InteractionHand>> OnHoverEnd;
 
     /// <summary>
     /// Called when the object transitions from having no hands nearby to having one or more
@@ -138,7 +171,7 @@ namespace Leap.Unity.UI.Interaction {
     /// If this method is to be called on a given frame, it will be called before OnHoverStay,
     /// OnHoverEnd, and OnObjectHoverEnd, and it will be called after OnHoverBegin.
     /// </remarks>
-    public Action<List<InteractionHand>> OnObjectHoverBegin = (hands) => { };
+    public Action<List<InteractionHand>> OnObjectHoverBegin;
 
     /// <summary>
     /// Called when the object transitions from having one or more hands nearby to having no
@@ -156,7 +189,7 @@ namespace Leap.Unity.UI.Interaction {
     /// If this method is to be called on a given frame, it will be called before OnHoverBegin,
     /// OnObjectHoverBegin, and OnHoverStay, and it will be called after OnHoverEnd.
     /// </remarks>
-    public Action<List<InteractionHand>> OnObjectHoverEnd = (hands) => { };
+    public Action<List<InteractionHand>> OnObjectHoverEnd;
 
     /// <summary>
     /// Called when the object has become the primary hovered object for one or more
@@ -174,7 +207,7 @@ namespace Leap.Unity.UI.Interaction {
     /// If this method is to be called on a given frame, it will be called before OnPrimaryHoverStay,
     /// and it will be called after OnPrimaryHoverEnd.
     /// </remarks>
-    public Action<List<InteractionHand>> OnPrimaryHoverBegin = (hands) => { };
+    public Action<List<InteractionHand>> OnPrimaryHoverBegin;
 
     /// <summary>
     /// Called during every fixed (physics) frame in which one or more hands is primarily hovering
@@ -188,7 +221,7 @@ namespace Leap.Unity.UI.Interaction {
     /// If this method is to be called on a given frame, it will be called after OnPrimaryHoverStay and
     /// OnPrimaryHoverEnd.
     /// </remarks>
-    public Action<List<InteractionHand>> OnPrimaryHoverStay = (hands) => { };
+    public Action<List<InteractionHand>> OnPrimaryHoverStay;
 
     /// <summary>
     /// Called when the object has ceased being the primary hovered object for one or
@@ -206,7 +239,7 @@ namespace Leap.Unity.UI.Interaction {
     /// If this method is to be called on a given frame, it will be called before OnPrimaryHoverBegin
     /// and OnPrimaryHoverStay.
     /// </remarks>
-    public Action<List<InteractionHand>> OnPrimaryHoverEnd = (hands) => { };
+    public Action<List<InteractionHand>> OnPrimaryHoverEnd;
 
     /// <summary>
     /// Called when the object begins being the primary hover of one or more hands, if the object
@@ -220,7 +253,7 @@ namespace Leap.Unity.UI.Interaction {
     /// If this method is called on a given frame, it will be called before OnPrimaryHoverStay, and it
     /// will be called after OnPrimaryHoverEnd, OnObjectPrimaryHoverEnd, and OnPrimaryHoverBegin.
     /// </remarks>
-    public Action<List<InteractionHand>> OnObjectPrimaryHoverBegin = (hands) => { };
+    public Action<List<InteractionHand>> OnObjectPrimaryHoverBegin;
 
     /// <summary>
     /// Called when the object ceases being the primary hover of any hands.
@@ -233,7 +266,7 @@ namespace Leap.Unity.UI.Interaction {
     /// If this method is called on a given frame, it will be called before OnPrimaryHoverStay,
     /// OnPrimaryHoverBegin, OnObjectPrimaryHoverBegin, and it will be called after OnPrimaryHoverEnd.
     /// </remarks>
-    public Action<List<InteractionHand>> OnObjectPrimaryHoverEnd = (hands) => { };
+    public Action<List<InteractionHand>> OnObjectPrimaryHoverEnd;
 
     #endregion
 
@@ -287,7 +320,7 @@ namespace Leap.Unity.UI.Interaction {
     /// 
     /// If this method is called on a given frame, it will be called after OnGraspEnd and before OnGraspHold.
     /// </remarks>
-    public Action<List<InteractionHand>> OnGraspBegin = (hands) => { };
+    public Action<List<InteractionHand>> OnGraspBegin;
 
     /// <summary>
     /// Called every frame during which this object is grasped by one or more hands.
@@ -298,7 +331,7 @@ namespace Leap.Unity.UI.Interaction {
     /// <remarks>
     /// If this method is called on a given frame, it will be called after all other grasping callbacks.
     /// </remarks>
-    public Action<List<InteractionHand>> OnGraspHold = (hands) => { };
+    public Action<List<InteractionHand>> OnGraspHold;
 
     /// <summary>
     /// Called when one of more hands release this object during a given frame.
@@ -312,7 +345,7 @@ namespace Leap.Unity.UI.Interaction {
     /// 
     /// If this method is called on a given frame, it will be before all other grasping callbacks.
     /// </remarks>
-    public Action<List<InteractionHand>> OnGraspEnd = (hands) => { };
+    public Action<List<InteractionHand>> OnGraspEnd;
 
     /// <summary>
     /// Called when the object is grasped by one or more hands, if the object was not grasped by any
@@ -321,7 +354,7 @@ namespace Leap.Unity.UI.Interaction {
     /// <remarks>
     /// If this method is called on a given frame, it will be called directly after OnGraspBegin.
     /// </remarks>
-    public Action<List<InteractionHand>> OnObjectGraspBegin = (hands) => { };
+    public Action<List<InteractionHand>> OnObjectGraspBegin;
 
     /// <summary>
     /// Called when the object is no longer grasped by any hands.
@@ -329,7 +362,7 @@ namespace Leap.Unity.UI.Interaction {
     /// <remarks>
     /// If this method is called on a given frame, it will be called directly after OnGraspEnd.
     /// </remarks>
-    public Action<List<InteractionHand>> OnObjectGraspEnd   = (hands) => { };
+    public Action<List<InteractionHand>> OnObjectGraspEnd;
 
     /// <summary>
     /// Called when the hand that is grasping this interaction object loses tracking. This can occur if
@@ -345,13 +378,13 @@ namespace Leap.Unity.UI.Interaction {
     /// invoke OnResume, although the input to OnResume will be the newly grasping hand, not the hand that
     /// suspended the object. OnGraspEnd will also be called for the hand that was formerly causing suspension.
     /// </summary>
-    public Action<InteractionHand> OnSuspensionBegin = (hand) => { };
+    public Action<InteractionHand> OnSuspensionBegin;
 
     /// <summary>
     /// Called when an object ceases being suspended. An object is suspended if it is currently grasped by
     /// an untracked hand. This occurs when the hand grasping an object ceases being tracked.
     /// </summary>
-    public Action<InteractionHand> OnSuspensionEnd = (hand) => { };
+    public Action<InteractionHand> OnSuspensionEnd;
 
     /// <summary>
     /// Returns (approximately) where the argument hand is grasping this object.
@@ -362,8 +395,7 @@ namespace Leap.Unity.UI.Interaction {
     public Vector3 GetGraspPoint(InteractionHand intHand) {
       if (intHand.graspedObject == intHand) {
         return intHand.GetGraspPoint();
-      }
-      else {
+      } else {
         Debug.LogError("Cannot get this object's grasp point: It is not currently grasped by an InteractionHand.");
         return Vector3.zero;
       }
@@ -381,12 +413,12 @@ namespace Leap.Unity.UI.Interaction {
     /// touching this object. For a list of all hands currently touching
     /// this object, refer to OnContactStay.
     /// </remarks>
-    public Action<List<InteractionHand>> OnContactBegin = (hands) => { };
+    public Action<List<InteractionHand>> OnContactBegin;
 
     /// <summary>
     /// Called every frame during which one or more hands is touching this object.
     /// </summary>
-    public Action<List<InteractionHand>> OnContactStay = (hands) => { };
+    public Action<List<InteractionHand>> OnContactStay;
 
     /// <summary>
     /// Called when one or more hands stops touching this object.
@@ -396,18 +428,18 @@ namespace Leap.Unity.UI.Interaction {
     /// touching this object. For a list of all hands currently touching
     /// this object, refer to OnContactStay.
     /// </remarks>
-    public Action<List<InteractionHand>> OnContactEnd = (hands) => { };
+    public Action<List<InteractionHand>> OnContactEnd;
 
     /// <summary>
     /// Called when this object starts being touched by one or more hands, but was
     /// not touched by any hands during the previous frame.
     /// </summary>
-    public Action<List<InteractionHand>> OnObjectContactBegin = (hands) => { };
+    public Action<List<InteractionHand>> OnObjectContactBegin;
 
     /// <summary>
     /// Called when this object stops being touched by any hands.
     /// </summary>
-    public Action<List<InteractionHand>> OnObjectContactEnd = (hands) => { };
+    public Action<List<InteractionHand>> OnObjectContactEnd;
 
     #endregion
 
@@ -487,7 +519,7 @@ namespace Leap.Unity.UI.Interaction {
 
     [Tooltip("Can this object be grasped simultaneously with two or more hands?")]
     [SerializeField]
-    [DisableIf("_ignoreGrasping", isEqualTo: true)]
+    //[DisableIf("_ignoreGrasping", isEqualTo: true)]
     private bool _allowMultiGrasp = false;
     public bool allowMultiGrasp { get { return _allowMultiGrasp; } set { _allowMultiGrasp = value; } }
 
@@ -495,9 +527,12 @@ namespace Leap.Unity.UI.Interaction {
            + "Without this property checked, objects will still receive grasp callbacks, "
            + "but you must move them manually via script.")]
     [SerializeField]
-    [DisableIf("_ignoreGrasping", isEqualTo: true)]
+    //[DisableIf("_ignoreGrasping", isEqualTo: true)]
     private bool _moveObjectWhenGrasped = true;
     public bool moveObjectWhenGrasped { get { return _moveObjectWhenGrasped; } set { _moveObjectWhenGrasped = value; } }
+
+    [SerializeField]
+    private EnumEventTable _eventTable;
 
     /// <summary>
     /// When the object is held by an Interaction Hand, how should it move to its
@@ -538,6 +573,29 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     protected virtual void Awake() {
+      setupCallback(ref OnHoverBegin, EventType.HoverBegin);
+      setupCallback(ref OnHoverStay, EventType.HoverStay);
+      setupCallback(ref OnHoverEnd, EventType.HoverEnd);
+      setupCallback(ref OnObjectHoverBegin, EventType.ObjectHoverBegin);
+      setupCallback(ref OnObjectHoverEnd, EventType.ObjectHoverEnd);
+      setupCallback(ref OnPrimaryHoverBegin, EventType.PrimaryHoverBegin);
+      setupCallback(ref OnPrimaryHoverStay, EventType.PrimaryHoverStay);
+      setupCallback(ref OnPrimaryHoverEnd, EventType.PrimaryHoverEnd);
+      setupCallback(ref OnObjectPrimaryHoverBegin, EventType.ObjectPrimaryHoverBegin);
+      setupCallback(ref OnObjectPrimaryHoverEnd, EventType.ObjectPrimaryHoverEnd);
+      setupCallback(ref OnGraspBegin, EventType.GraspBegin);
+      setupCallback(ref OnGraspBegin, EventType.GraspStay);
+      setupCallback(ref OnGraspEnd, EventType.GraspEnd);
+      setupCallback(ref OnObjectGraspBegin, EventType.ObjectGraspBegin);
+      setupCallback(ref OnObjectGraspEnd, EventType.ObjectGraspEnd);
+      setupCallback(ref OnSuspensionBegin, EventType.SuspensionBegin);
+      setupCallback(ref OnSuspensionEnd, EventType.SuspensionEnd);
+      setupCallback(ref OnContactBegin, EventType.ContactBegin);
+      setupCallback(ref OnContactStay, EventType.ContactStay);
+      setupCallback(ref OnContactEnd, EventType.ContactEnd);
+      setupCallback(ref OnObjectContactBegin, EventType.ObjectContactBegin);
+      setupCallback(ref OnObjectContactEnd, EventType.ObjectContactEnd);
+
       rigidbody = GetComponent<Rigidbody>();
       rigidbody.maxAngularVelocity = MAX_ANGULAR_VELOCITY;
       rigidbodyWarper = new RigidbodyWarper(manager, this.transform, rigidbody, 0.25F);
@@ -566,7 +624,7 @@ namespace Leap.Unity.UI.Interaction {
 
       // Check any Joint attachments to automatically be able to choose Kabsch pivot setting (grasping).
       RefreshPositionLockedState();
-      
+
       // Ensure physics layers are set up properly.
       InitInternal();
     }
@@ -588,7 +646,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     #region Hovering
-    
+
     private HashSet<InteractionHand> _hoveringHands = new HashSet<InteractionHand>();
 
     private InteractionHand _closestHoveringHand = null;
@@ -618,8 +676,7 @@ namespace Leap.Unity.UI.Interaction {
 
       if (!hasColliders) {
         return (this.transform.position - worldPosition).sqrMagnitude;
-      }
-      else {
+      } else {
         return closestComparativeColliderDistance;
       }
     }
@@ -852,7 +909,7 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    private KinematicGraspedMovement    _kinematicHoldingMovement;
+    private KinematicGraspedMovement _kinematicHoldingMovement;
     private NonKinematicGraspedMovement _nonKinematicHoldingMovement;
 
     private IThrowController _throwController;
@@ -968,7 +1025,7 @@ namespace Leap.Unity.UI.Interaction {
         holdingMovementController.MoveTo(newPosition, newRotation, this);
 
         OnGraspedMovement(origPosition, origRotation, newPosition, newRotation, hands);
-        
+
         throwController.OnHold(this, hands);
       }
 
@@ -1026,6 +1083,10 @@ namespace Leap.Unity.UI.Interaction {
       FixedUpdateLayer();
     }
 
+    private void setupCallback<T>(ref Action<T> action, EventType type) {
+      action += h => _eventTable.Invoke((int)type);
+    }
+
     #region Interaction Layers
 
     protected enum CollisionMode {
@@ -1057,8 +1118,7 @@ namespace Leap.Unity.UI.Interaction {
 
       if (ignoreContact) {
         layer = manager.interactionNoContactLayer;
-      }
-      else {
+      } else {
         switch (_collisionMode) {
           case CollisionMode.Normal:
             layer = manager.interactionLayer; break;
@@ -1108,8 +1168,7 @@ namespace Leap.Unity.UI.Interaction {
        && (rigidbody.constraints & RigidbodyConstraints.FreezePositionZ) > 0) {
         _isPositionLocked = true;
         return;
-      }
-      else {
+      } else {
         _isPositionLocked = false;
 
         Joint[] joints = rigidbody.GetComponents<Joint>();
@@ -1123,7 +1182,7 @@ namespace Leap.Unity.UI.Interaction {
             return;
           }
           // if (joint is SpringJoint) {
-            // no check required; spring joints never fully lock position.
+          // no check required; spring joints never fully lock position.
           // }
           if (joint is CharacterJoint) {
             _isPositionLocked = true;

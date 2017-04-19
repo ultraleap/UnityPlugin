@@ -147,6 +147,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &124275132
@@ -459,6 +461,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &224207162
@@ -589,6 +593,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &236842559
@@ -752,6 +758,8 @@ MonoBehaviour:
   _ignoreGrasping: 0
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!153 &255649382
@@ -1032,6 +1040,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &307306922
@@ -1162,6 +1172,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &309724706
@@ -1531,6 +1543,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &412698728
@@ -1760,6 +1774,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &444300108
@@ -1877,6 +1893,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &445421615
@@ -2020,6 +2038,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &458127872
@@ -2320,6 +2340,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &618037988
@@ -2575,6 +2597,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &660863412
@@ -2732,6 +2756,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 1020742381}
     m_Modifications:
+    - target: {fileID: 114726310233506268, guid: 8998b2da307be7f419e285784a8495a6,
+        type: 2}
+      propertyPath: _eventTable._entries.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
       propertyPath: m_LocalPosition.x
       value: -0.3281
@@ -2799,6 +2828,28 @@ Prefab:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 95c889baf756fd84ba2f1ab36adf3687, type: 2}
+    - target: {fileID: 114726310233506268, guid: 8998b2da307be7f419e285784a8495a6,
+        type: 2}
+      propertyPath: _eventTable._entries.Array.data[0].callback.m_TypeName
+      value: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      objectReference: {fileID: 0}
+    - target: {fileID: 114726310233506268, guid: 8998b2da307be7f419e285784a8495a6,
+        type: 2}
+      propertyPath: _eventTable._entries.Array.data[1].enumValue
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114726310233506268, guid: 8998b2da307be7f419e285784a8495a6,
+        type: 2}
+      propertyPath: _eventTable._entries.Array.data[1].callback.m_TypeName
+      value: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+        PublicKeyToken=null
+      objectReference: {fileID: 0}
+    - target: {fileID: 114726310233506268, guid: 8998b2da307be7f419e285784a8495a6,
+        type: 2}
+      propertyPath: _eventTable._entries.Array.data[0].enumValue
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
   m_IsPrefabParent: 0
@@ -2869,6 +2920,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &793958698
@@ -2999,6 +3052,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &811384333
@@ -3288,6 +3343,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &912334416
@@ -3524,6 +3581,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &960290469
@@ -3654,6 +3713,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &990935693
@@ -3865,6 +3926,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1066024315
@@ -3995,6 +4058,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1087592057
@@ -4126,6 +4191,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1130429105
@@ -4707,6 +4774,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1306528555
@@ -4894,6 +4963,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1404154279
@@ -5024,6 +5095,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1436522781
@@ -5282,6 +5355,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1493018504
@@ -5633,6 +5708,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1604363486
@@ -5856,6 +5933,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1803602553
@@ -5935,6 +6014,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1815998825
@@ -6065,6 +6146,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1844324949
@@ -6247,6 +6330,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1903639706
@@ -6412,6 +6497,8 @@ MonoBehaviour:
   _ignoreGrasping: 0
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!59 &2035962587
@@ -6605,6 +6692,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &2048856380
@@ -6735,6 +6824,8 @@ MonoBehaviour:
   _ignoreGrasping: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &2071343630

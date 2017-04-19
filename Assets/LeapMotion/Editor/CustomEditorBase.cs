@@ -25,6 +25,7 @@ namespace Leap.Unity {
     protected Dictionary<string, Action<SerializedProperty>> _specifiedDrawers;
     protected Dictionary<string, List<Action<SerializedProperty>>> _specifiedDecorators;
     protected Dictionary<string, List<Func<bool>>> _conditionalProperties;
+    protected List<string> _deferredProperties;
     protected bool _showScriptField = true;
 
     protected List<SerializedProperty> _modifiedProperties = new List<SerializedProperty>();
@@ -118,6 +119,19 @@ namespace Leap.Unity {
       }
     }
 
+    /// <summary>
+    /// Defer rendering of a property until the end of the inspector.  Deferred properties
+    /// are drawn in the REVERSE order they are deferred!  NOT by the order they appear in the 
+    /// serialized object!
+    /// </summary>
+    protected void deferProperty(string propertyName) {
+      if (!validateProperty(propertyName)) {
+        return;
+      }
+
+      _deferredProperties.Insert(0, propertyName);
+    }
+
     protected void drawScriptField(bool disable = true) {
       var scriptProp = serializedObject.FindProperty("m_Script");
       EditorGUI.BeginDisabledGroup(disable);
@@ -136,6 +150,7 @@ namespace Leap.Unity {
       _specifiedDrawers = new Dictionary<string, Action<SerializedProperty>>();
       _specifiedDecorators = new Dictionary<string, List<Action<SerializedProperty>>>();
       _conditionalProperties = new Dictionary<string, List<Func<bool>>>();
+      _deferredProperties = new List<string>();
     }
 
     protected bool validateProperty(string propertyName) {
@@ -161,44 +176,56 @@ namespace Leap.Unity {
           continue;
         }
 
-        List<Func<bool>> conditionalList;
-        if (_conditionalProperties.TryGetValue(iterator.name, out conditionalList)) {
-          bool allTrue = true;
-          for (int i = 0; i < conditionalList.Count; i++) {
-            allTrue &= conditionalList[i]();
-          }
-          if (!allTrue) {
-            continue;
-          }
+        if (_deferredProperties.Contains(iterator.name)) {
+          continue;
         }
 
-        Action<SerializedProperty> customDrawer;
-
-        List<Action<SerializedProperty>> decoratorList;
-        if (_specifiedDecorators.TryGetValue(iterator.name, out decoratorList)) {
-          for (int i = 0; i < decoratorList.Count; i++) {
-            decoratorList[i](iterator);
-          }
-        }
-
-        EditorGUI.BeginChangeCheck();
-
-        if (_specifiedDrawers.TryGetValue(iterator.name, out customDrawer)) {
-          customDrawer(iterator);
-        } else {
-          using (new EditorGUI.DisabledGroupScope(isFirst)) {
-            EditorGUILayout.PropertyField(iterator, true);
-          }
-        }
-
-        if (EditorGUI.EndChangeCheck()) {
-          _modifiedProperties.Add(iterator.Copy());
+        using (new EditorGUI.DisabledGroupScope(isFirst)) {
+          drawProperty(iterator);
         }
 
         isFirst = false;
       }
 
+      foreach (var deferredProperty in _deferredProperties) {
+        drawProperty(serializedObject.FindProperty(deferredProperty));
+      }
+
       serializedObject.ApplyModifiedProperties();
+    }
+
+    private void drawProperty(SerializedProperty property) {
+      List<Func<bool>> conditionalList;
+      if (_conditionalProperties.TryGetValue(property.name, out conditionalList)) {
+        bool allTrue = true;
+        for (int i = 0; i < conditionalList.Count; i++) {
+          allTrue &= conditionalList[i]();
+        }
+        if (!allTrue) {
+          return;
+        }
+      }
+
+      Action<SerializedProperty> customDrawer;
+
+      List<Action<SerializedProperty>> decoratorList;
+      if (_specifiedDecorators.TryGetValue(property.name, out decoratorList)) {
+        for (int i = 0; i < decoratorList.Count; i++) {
+          decoratorList[i](property);
+        }
+      }
+
+      EditorGUI.BeginChangeCheck();
+
+      if (_specifiedDrawers.TryGetValue(property.name, out customDrawer)) {
+        customDrawer(property);
+      } else {
+        EditorGUILayout.PropertyField(property, true);
+      }
+
+      if (EditorGUI.EndChangeCheck()) {
+        _modifiedProperties.Add(property.Copy());
+      }
     }
   }
 }

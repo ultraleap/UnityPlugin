@@ -121,32 +121,58 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       public void DoEditorUpdateLogic(bool fullRebuild, bool heavyRebuild) {
-        validateSpaceComponent();
-
-        if (fullRebuild) {
-          if (_renderer._space != null) {
-            _renderer._space.RebuildHierarchy();
-            _renderer._space.RecalculateTransformers();
+        using (new ProfilerSample("A")) {
+          using (new ProfilerSample("Validate Space Component")) {
+            validateSpaceComponent();
           }
 
-          _renderer.validateGraphics();
+          if (fullRebuild) {
+            if (_renderer._space != null) {
+              using (new ProfilerSample("Rebuild Space")) {
+                _renderer._space.RebuildHierarchy();
+                _renderer._space.RecalculateTransformers();
+              }
+            }
 
-          foreach (var group in _renderer._groups) {
-            group.editor.ValidateGraphicList();
-            group.RebuildFeatureData();
-            group.RebuildFeatureSupportInfo();
-            group.editor.UpdateRendererEditor(heavyRebuild);
+            using (new ProfilerSample("Validate graphics")) {
+              _renderer.validateGraphics();
+            }
+
+            foreach (var group in _renderer._groups) {
+              using (new ProfilerSample("Validate Graphic List")) {
+                group.editor.ValidateGraphicList();
+              }
+
+              using (new ProfilerSample("Rebuild Feature Data")) {
+                group.RebuildFeatureData();
+              }
+
+              using (new ProfilerSample("Rebuild Feature Support Info")) {
+                group.RebuildFeatureSupportInfo();
+              }
+
+              using (new ProfilerSample("Update Renderer Editor")) {
+                group.editor.UpdateRendererEditor(heavyRebuild);
+              }
+            }
+
+            _renderer._hasFinishedSetup = true;
           }
 
-          _renderer._hasFinishedSetup = true;
-        }
-
-        foreach (var group in _renderer._groups) {
-          group.UpdateRenderer();
+          using (new ProfilerSample("Update Renderer")) {
+            foreach (var group in _renderer._groups) {
+              group.UpdateRenderer();
+            }
+          }
         }
       }
 
       private void onAnySave() {
+        if (_renderer == null) {
+          InternalUtility.OnAnySave -= onAnySave;
+          return;
+        }
+
         DoEditorUpdateLogic(fullRebuild: true, heavyRebuild: false);
       }
 
