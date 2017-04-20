@@ -453,7 +453,8 @@ namespace Leap.Unity.UI.Interaction {
     private void RemapInteractionObjectStateChecks(StateChangeCheckFunc stateCheckFunc,
                                                    Action<IInteractionBehaviour, List<InteractionHand>> actionPerInteractionObject) {
 
-      // Ensure the object->hands buffer is clean.
+      // Ensure the object->hands buffer is non-null (ThreadStatic quirk) and clean.
+      if (s_objHandsMap == null) s_objHandsMap = new Dictionary<IInteractionBehaviour,List<InteractionHand>>();
       s_objHandsMap.Clear();
 
       // In a nutshell, this remaps methods per-hand that output an interaction object if the hand changed that object's state
@@ -482,7 +483,8 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     private void RemapMultiInteractionObjectStateChecks(MultiStateChangeCheckFunc multiObjectStateCheckFunc,
                                                         Action<IInteractionBehaviour, List<InteractionHand>> actionPerInteractionObject) {
-      // Ensure object<->hands buffer is clean.
+      // Ensure object<->hands buffer is non-null (ThreadStatic quirk) and clean.
+      if (s_objHandsMap == null) s_objHandsMap = new Dictionary<IInteractionBehaviour, List<InteractionHand>>();
       s_objHandsMap.Clear();
 
       // In a nutshell, this remaps methods per-hand that output multiple interaction objects if the hand changed those objects' states
