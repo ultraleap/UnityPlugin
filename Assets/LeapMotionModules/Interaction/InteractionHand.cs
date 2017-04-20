@@ -326,7 +326,6 @@ namespace Leap.Unity.UI.Interaction {
 
     private const int NUM_FINGERS = 5;
     private const int BONES_PER_FINGER = 3;
-    public const float PER_BONE_MASS_MULTIPLIER = 10F;
     private const float DEAD_ZONE_FRACTION = 0.1F;
     private const float DISLOCATION_FRACTION = 3.0F;
 
@@ -449,7 +448,7 @@ namespace Leap.Unity.UI.Interaction {
         body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
       }
 
-      body.mass = PER_BONE_MASS_MULTIPLIER;
+      body.mass = 0.1f;
       body.position = bone != null ? bone.Center.ToVector3() : _warpedHandData.PalmPosition.ToVector3();
       body.rotation = bone != null ? bone.Rotation.ToQuaternion() : _warpedHandData.Rotation.ToQuaternion();
       contactBone.lastTarget = bone != null ? bone.Center.ToVector3() : _warpedHandData.PalmPosition.ToVector3();
@@ -498,7 +497,7 @@ namespace Leap.Unity.UI.Interaction {
       float targetingError = Vector3.Distance(brushBone.lastTarget, body.position) / bone.Width;
       float massScale = Mathf.Clamp(1.0f - (targetingError * 2.0f), 0.1f, 1.0f)
                       * Mathf.Clamp(_warpedHandData.PalmVelocity.Magnitude * 10f, 1f, 10f);
-      body.mass = PER_BONE_MASS_MULTIPLIER * massScale * brushBone._lastObjectTouchedMass;
+      body.mass = massScale * brushBone._lastObjectTouchedAdjustedMass;
 
       //If these conditions are met, stop using brush hands to contact objects and switch to "Soft Contact"
       if (!_softContactEnabled && targetingError >= DISLOCATION_FRACTION

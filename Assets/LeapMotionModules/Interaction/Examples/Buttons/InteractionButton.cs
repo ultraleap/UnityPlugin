@@ -190,5 +190,9 @@ namespace Leap.Unity.UI.Interaction {
     public void setMaxHeight(float maxHeight) {
       minMaxHeight = new Vector2(minMaxHeight.x, maxHeight / transform.parent.lossyScale.z);
     }
+
+    void Reset() {
+      contactForceMode = ContactForceModes.UI;
+    }
   }
 }

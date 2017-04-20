@@ -14,6 +14,9 @@ namespace Leap.Unity.UI.Interaction {
       deferProperty("_eventTable");
       specifyCustomDrawer("_eventTable", drawEventTable);
 
+      specifyConditionalDrawing(() => !target.ignoreContact,
+             "_contactForceMode");
+
       specifyConditionalDrawing(() => !target.ignoreGrasping,
                    "_allowMultiGrasp",
                    "_moveObjectWhenGrasped",

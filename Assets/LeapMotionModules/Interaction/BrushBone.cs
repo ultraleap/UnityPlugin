@@ -15,7 +15,7 @@ namespace Leap.Unity.UI.Interaction {
     public Vector3 desiredPosition;
     public Quaternion desiredRotation;
 
-    public float _lastObjectTouchedMass;
+    public float _lastObjectTouchedAdjustedMass;
 
     void OnCollisionEnter(Collision collision) {
       IInteractionBehaviour interactionObj;
@@ -24,8 +24,23 @@ namespace Leap.Unity.UI.Interaction {
                      + "Please enable automatic layer generation in the Interaction Manager, "
                      + "or ensure the Interaction layer only contains Interaction Behaviours.");
       }
+
       if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
-        _lastObjectTouchedMass = collision.rigidbody.mass;
+        _lastObjectTouchedAdjustedMass = collision.rigidbody.mass;
+        if (interactionObj is InteractionBehaviour) {
+          switch ((interactionObj as InteractionBehaviour).contactForceMode) {
+            case InteractionBehaviour.ContactForceModes.Object:
+              _lastObjectTouchedAdjustedMass *= 0.1f;
+              break;
+            case InteractionBehaviour.ContactForceModes.UI:
+              _lastObjectTouchedAdjustedMass *= 100f;
+              break;
+            default:
+              _lastObjectTouchedAdjustedMass *= 0.1f;
+              break;
+          }
+        }
+
         interactionHand.ContactBoneCollisionEnter(this, interactionObj, false);
       }
     }
