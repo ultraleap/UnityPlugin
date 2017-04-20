@@ -73,7 +73,7 @@ namespace Leap.Unity.Space {
         preRotatedPos.y = localWarpedPos.y;
         preRotatedPos.z = new Vector2(localWarpedPos.x, localWarpedPos.z).magnitude;
 
-        float angleX = Mathf.Atan2(localWarpedPos.x, localWarpedPos.y);
+        float angleX = Mathf.Atan2(localWarpedPos.x, localWarpedPos.z);
         float angleY = Mathf.Atan2(preRotatedPos.y, preRotatedPos.z);
         float radius = new Vector2(preRotatedPos.z, preRotatedPos.y).magnitude;
 
@@ -112,12 +112,15 @@ namespace Leap.Unity.Space {
         preRotatedPos.y = localWarpedPos.y;
         preRotatedPos.z = new Vector2(localWarpedPos.x, localWarpedPos.z).magnitude;
 
-        float angleX = Mathf.Atan2(localWarpedPos.x, localWarpedPos.y);
+        float angleX = Mathf.Atan2(localWarpedPos.x, localWarpedPos.z);
         float angleY = Mathf.Atan2(preRotatedPos.y, preRotatedPos.z);
 
-        return Quaternion.Euler(angleY * Mathf.Rad2Deg,
-                                -angleX * Mathf.Rad2Deg,
-                                0) * localWarpedRot;
+        Quaternion baseRot = Quaternion.Euler(-angleY * Mathf.Rad2Deg,
+                                      angleX * Mathf.Rad2Deg,
+                                      0);
+        Quaternion invRot = Quaternion.Inverse(baseRot);
+
+        return invRot * localWarpedRot;
       }
 
       public Vector3 TransformDirection(Vector3 localRectPos, Vector3 localRectDirection) {
@@ -144,12 +147,14 @@ namespace Leap.Unity.Space {
         preRotatedPos.y = localWarpedPos.y;
         preRotatedPos.z = new Vector2(localWarpedPos.x, localWarpedPos.z).magnitude;
 
-        float angleX = Mathf.Atan2(localWarpedPos.x, localWarpedPos.y);
+        float angleX = Mathf.Atan2(localWarpedPos.x, localWarpedPos.z);
         float angleY = Mathf.Atan2(preRotatedPos.y, preRotatedPos.z);
 
-        return Quaternion.Euler(angleY * Mathf.Rad2Deg,
-                                -angleX * Mathf.Rad2Deg,
-                                0) * localWarpedDirection;
+        Quaternion baseRot = Quaternion.Euler(-angleY * Mathf.Rad2Deg,
+                                              angleX * Mathf.Rad2Deg,
+                                              0);
+        Quaternion invRot = Quaternion.Inverse(baseRot);
+        return invRot * localWarpedDirection;
       }
 
       public Matrix4x4 GetTransformationMatrix(Vector3 localRectPos) {
