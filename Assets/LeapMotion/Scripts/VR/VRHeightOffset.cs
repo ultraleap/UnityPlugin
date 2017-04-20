@@ -18,6 +18,10 @@ public class VRHeightOffset : MonoBehaviour {
 
   public DeviceHeightPair[] _deviceOffsets;
 
+  public KeyCode moveUpKey = KeyCode.None;
+  public KeyCode moveDownKey = KeyCode.None;
+  public float stepSize = 0.1f;
+
   void Reset() {
     _deviceOffsets = new DeviceHeightPair[1];
     _deviceOffsets[0] = new DeviceHeightPair("oculus", 1f);
@@ -38,12 +42,12 @@ public class VRHeightOffset : MonoBehaviour {
   }
 
   private void Update() {
-    if (Input.GetKeyDown(KeyCode.UpArrow)) {
-      transform.Translate(Vector3.up * 0.1f);
+    if (Input.GetKeyDown(moveUpKey)) {
+      transform.Translate(Vector3.up * stepSize);
     }
 
-    if (Input.GetKeyDown(KeyCode.DownArrow)) {
-      transform.Translate(Vector3.down * 0.1f);
+    if (Input.GetKeyDown(moveDownKey)) {
+      transform.Translate(Vector3.down * stepSize);
     }
   }
 }
