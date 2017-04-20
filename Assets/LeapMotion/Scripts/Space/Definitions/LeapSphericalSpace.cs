@@ -121,11 +121,35 @@ namespace Leap.Unity.Space {
       }
 
       public Vector3 TransformDirection(Vector3 localRectPos, Vector3 localRectDirection) {
-        throw new NotImplementedException();
+        Vector3 anchorDelta;
+
+        Vector3 anchorRectPos = space.transform.InverseTransformPoint(anchor.transform.position);
+        anchorDelta = localRectPos - anchorRectPos;
+
+        float angleX = angleXOffset + anchorDelta.x / radiusOffset;
+        float angleY = angleYOffset + anchorDelta.y / radiusOffset;
+
+        Quaternion rotation = Quaternion.Euler(-angleY * Mathf.Rad2Deg,
+                                                angleX * Mathf.Rad2Deg,
+                                                0);
+
+        return rotation * localRectDirection;
       }
 
       public Vector3 InverseTransformDirection(Vector3 localWarpedPos, Vector3 localWarpedDirection) {
-        throw new NotImplementedException();
+        localWarpedPos.z += space.radius;
+
+        Vector3 preRotatedPos;
+        preRotatedPos.x = 0;
+        preRotatedPos.y = localWarpedPos.y;
+        preRotatedPos.z = new Vector2(localWarpedPos.x, localWarpedPos.z).magnitude;
+
+        float angleX = Mathf.Atan2(localWarpedPos.x, localWarpedPos.y);
+        float angleY = Mathf.Atan2(preRotatedPos.y, preRotatedPos.z);
+
+        return Quaternion.Euler(angleY * Mathf.Rad2Deg,
+                                -angleX * Mathf.Rad2Deg,
+                                0) * localWarpedDirection;
       }
 
       public Matrix4x4 GetTransformationMatrix(Vector3 localRectPos) {
