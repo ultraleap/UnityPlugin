@@ -26,15 +26,8 @@ namespace Leap.Unity.GraphicalRenderer {
             _graphic._featureData.RemoveAt(i);
           }
         }
-
-        //Validation is also triggered by undo operations, and undo operations
-        //can trigger validation :(  This can result in weird loops, so we delay
-        //this particular call one frame to prevent weirdness.
-        UnityEditor.EditorApplication.delayCall += () => {
-          if (_graphic != null) {
-            AttachedObjectHandler.Validate(_graphic, _graphic._featureData);
-          }
-        };
+        
+        AttachedObjectHandler.Validate(_graphic, _graphic._featureData);
 
         if (!Application.isPlaying) {
           if (_graphic._attachedGroup != null) {

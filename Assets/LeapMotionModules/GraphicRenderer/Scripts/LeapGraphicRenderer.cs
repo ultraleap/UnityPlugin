@@ -150,8 +150,12 @@ namespace Leap.Unity.GraphicalRenderer {
 
       HashSet<LeapGraphic> set = Pool<HashSet<LeapGraphic>>.Spawn();
       foreach (var group in _groups) {
-        foreach (var graphic in group.graphics) {
-          set.Add(graphic);
+        for (int i = group.graphics.Count; i-- != 0;) {
+          if (group.graphics[i] == null) {
+            group.graphics.RemoveAt(i);
+          } else {
+            set.Add(group.graphics[i]);
+          }
         }
 
         foreach (var graphic in _tempGraphicList) {
