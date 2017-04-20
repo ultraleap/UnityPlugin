@@ -6,6 +6,7 @@ using Leap.Unity.Attributes;
 namespace Leap.Unity {
   /** A basic Leap hand model constructed dynamically vs. using pre-existing geometry*/
   public class CapsuleHand : IHandModel {
+    private const int TOTAL_JOINT_COUNT = 4 * 5;
     private const float CYLINDER_MESH_RESOLUTION = 0.1f; //in centimeters, meshes within this resolution will be re-used
     private const int THUMB_BASE_INDEX = (int)Finger.FingerType.TYPE_THUMB * 4;
     private const int PINKY_BASE_INDEX = (int)Finger.FingerType.TYPE_PINKY * 4;
@@ -88,8 +89,8 @@ namespace Leap.Unity {
     }
 
     public override void UpdateHand() {
-      if (_spherePositions == null) {
-        _spherePositions = new Vector3[4 * 5];
+      if (_spherePositions == null || _spherePositions.Length != TOTAL_JOINT_COUNT) {
+        _spherePositions = new Vector3[TOTAL_JOINT_COUNT];
       }
 
       if (_sphereMat == null) {

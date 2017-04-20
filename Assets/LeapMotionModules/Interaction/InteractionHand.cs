@@ -528,13 +528,27 @@ namespace Leap.Unity.UI.Interaction {
     private Vector3[] _previousBoneCenters = new Vector3[20];
     private float _softContactBoneRadius = 0.015f;
 
+    private bool _handWasNullLastFrame = true;
+
     // Vars removed because Interaction Managers are currently non-optional.
     //private List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(40);
     //private Dictionary<Rigidbody, PhysicsUtility.Velocities> originalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>();
 
     //private List<int> _softContactIdxRemovalBuffer = new List<int>();
+    
     private void FixedUpdateSoftContact() {
-      if (_hand == null) return;
+      if (_hand == null) {
+        _handWasNullLastFrame = true;
+        return;
+      }
+      else {
+        // If the hand was just initialized, initialize with soft contact.
+        if (_handWasNullLastFrame) {
+          EnableSoftContact();
+        }
+
+        _handWasNullLastFrame = false;
+      }
 
       if (_softContactEnabled) {
 
