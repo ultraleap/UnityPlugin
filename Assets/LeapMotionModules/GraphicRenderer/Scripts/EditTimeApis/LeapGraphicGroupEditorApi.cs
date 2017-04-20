@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Assertions;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -18,6 +19,30 @@ namespace Leap.Unity.GraphicalRenderer {
 
       public EditorApi(LeapGraphicGroup group) {
         _group = group;
+      }
+
+      public void OnValidate() {
+        if (_group._renderer == null) {
+          _group._renderer = _group.GetComponent<LeapGraphicRenderer>();
+        }
+
+        if (!Application.isPlaying) {
+          _group._addRemoveSupported = true;
+          if (_group._renderingMethod != null) {
+            _group._addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(_group._renderingMethod.GetType());
+          }
+          if (_group._renderer.space != null) {
+            _group._addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(_group._renderer.space.GetType());
+          }
+        }
+
+        AttachedObjectHandler.Validate(_group, ref _group._renderingMethod);
+        AttachedObjectHandler.Validate(_group, _group._features);
+
+        if (_group._renderingMethod != null) {
+          _group._renderingMethod.renderer = _group._renderer;
+          _group._renderingMethod.group = _group;
+        }
       }
 
       public void OnDestroyedByUser() {

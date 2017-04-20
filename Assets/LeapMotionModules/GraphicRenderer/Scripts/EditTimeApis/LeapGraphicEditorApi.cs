@@ -18,19 +18,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       public virtual void OnValidate() {
-        for (int i = _graphic._featureData.Count; i-- != 0;) {
-          var component = _graphic._featureData[i];
-          if (component.gameObject != _graphic.gameObject) {
-            LeapFeatureData movedData;
-            if (InternalUtility.TryMoveComponent(component, _graphic.gameObject, out movedData)) {
-              _graphic._featureData[i] = movedData;
-            } else {
-              Debug.LogWarning("Could not move component " + component + "!");
-              InternalUtility.Destroy(component);
-              _graphic._featureData.RemoveAt(i);
-            }
-          }
-        }
+        AttachedObjectHandler.Validate(_graphic, _graphic._featureData);
 
         if (!Application.isPlaying) {
           if (_graphic._attachedGroup != null) {

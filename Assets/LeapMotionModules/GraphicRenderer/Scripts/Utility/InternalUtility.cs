@@ -33,9 +33,7 @@ namespace Leap.Unity.GraphicalRenderer {
         OnAnySave();
       }
     }
-#endif
 
-#if UNITY_EDITOR
     /// <summary>
     /// Call this method from within OnDestroy.  The action will only be invoked if
     /// the object was deleted during EDIT MODE, and that destruction was not caused

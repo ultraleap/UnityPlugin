@@ -118,6 +118,14 @@ namespace Leap.Unity.GraphicalRenderer {
     public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
       base.OnUpdateRendererEditor(isHeavyUpdate);
 
+      if (_font == null) {
+        return;
+      }
+
+      if (_shader == null) {
+        return;
+      }
+
       CreateOrSave(ref _meshData, "Text Mesh Data");
 
       //Make sure we have enough meshes to render all our graphics

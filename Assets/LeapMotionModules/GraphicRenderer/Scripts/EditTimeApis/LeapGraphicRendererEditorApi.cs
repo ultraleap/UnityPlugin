@@ -31,7 +31,15 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       public void OnValidate() {
+        for (int i = _renderer._groups.Count; i-- > 0;) {
+          if (_renderer._groups[i] == null) {
+            _renderer._groups.RemoveAt(i);
+          }
+        }
+
         validateSpaceComponent();
+
+        AttachedObjectHandler.Validate(_renderer, _renderer._groups);
       }
 
       public void OnDestroy() {
