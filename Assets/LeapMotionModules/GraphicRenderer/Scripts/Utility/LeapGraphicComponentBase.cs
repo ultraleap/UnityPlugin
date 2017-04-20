@@ -16,8 +16,8 @@ namespace Leap.Unity.GraphicalRenderer {
         InternalUtility.Destroy(this);
       }
 
-      hideFlags = HideFlags.None;
-      //hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
+      //hideFlags = HideFlags.None;
+      hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
     }
 
     protected virtual void OnDestroy() {
