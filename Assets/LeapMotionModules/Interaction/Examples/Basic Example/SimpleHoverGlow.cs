@@ -8,7 +8,6 @@ using UnityEngine;
 public class SimpleHoverGlow : MonoBehaviour {
 
   private Material _material;
-  private int _emissionPropertyId;
 
   private InteractionBehaviour _intObj;
 
@@ -21,7 +20,6 @@ public class SimpleHoverGlow : MonoBehaviour {
     }
     if (renderer != null) {
       _material = renderer.material;
-      _emissionPropertyId = Shader.PropertyToID("_EmissionColor");
     }
   }
 
