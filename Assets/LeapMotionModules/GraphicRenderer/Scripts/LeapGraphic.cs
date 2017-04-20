@@ -119,8 +119,6 @@ namespace Leap.Unity.GraphicalRenderer {
     }
     #endregion
 
-    public bool disableThatShit = false;
-
     #region UNITY CALLBACKS
     protected virtual void OnValidate() {
 #if UNITY_EDITOR
