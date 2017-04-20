@@ -224,6 +224,11 @@ MonoBehaviour:
     modelsCheckedOut: []
     IsEnabled: 1
     CanDuplicate: 0
+    HandPostProcesses:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: Leap.Unity.HandPool+ModelGroup+HandEvent, Assembly-CSharp, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
   - GroupName: Capsule_Hands
     _handPool: {fileID: 0}
     LeftModel: {fileID: 1143435159}
@@ -234,6 +239,11 @@ MonoBehaviour:
     modelsCheckedOut: []
     IsEnabled: 0
     CanDuplicate: 0
+    HandPostProcesses:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: Leap.Unity.HandPool+ModelGroup+HandEvent, Assembly-CSharp, Version=0.0.0.0,
+        Culture=neutral, PublicKeyToken=null
 --- !u!114 &72891527
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -985,10 +995,10 @@ MonoBehaviour:
   setEditorLeapPose: 0
   DeformPositionsInFingers: 1
   deformPositionsState: 1
-  ModelPalmAtLeapWrist: 1
-  UseMetaCarpals: 0
   modelFingerPointing: {x: 1, y: -0, z: -0}
   modelPalmFacing: {x: 0, y: 1, z: 0}
+  ModelPalmAtLeapWrist: 1
+  UseMetaCarpalsOnSetup: 1
   jointList:
   - {fileID: 804537339}
   - {fileID: 606466261}
@@ -1508,7 +1518,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AnimatorForMapping: {fileID: 868500652}
   ModelGroupName: LeapBodyExperiment_00
-  UseMetaCarpals: 1
+  ModelHasMetaCarpals: 0
   RiggedHand_L: {fileID: 1321566666}
   RiggedHand_R: {fileID: 606466260}
   HandTransitionBehavior_L: {fileID: 1321566667}
@@ -1550,18 +1560,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LMRig: {fileID: 0}
-  LMRigToFollowAnimator: 0
   Target: {fileID: 0}
-  standWalkStateText: {fileID: 0}
-  m_AnimatorStateText: {fileID: 0}
-  CenteringText: {fileID: 0}
-  DistanceText: {fileID: 0}
-  SpeedText: {fileID: 0}
-  AnimatorRoot: {fileID: 868500653}
-  CameraOnGround: {fileID: 952481519}
   IsCentering: 1
   WalkingEnabled: 0
   crouchEnabled: 1
+  AnimatorRoot: {fileID: 868500653}
+  CameraOnGround: {fileID: 952481519}
 --- !u!4 &908200045 stripped
 Transform:
   m_PrefabParentObject: {fileID: 400084, guid: 17192e084745a744892bf6839b75c774, type: 3}
@@ -2325,10 +2329,10 @@ MonoBehaviour:
   setEditorLeapPose: 0
   DeformPositionsInFingers: 1
   deformPositionsState: 1
-  ModelPalmAtLeapWrist: 1
-  UseMetaCarpals: 0
   modelFingerPointing: {x: -1, y: -0, z: -0}
   modelPalmFacing: {x: 0, y: -1, z: 0}
+  ModelPalmAtLeapWrist: 1
+  UseMetaCarpalsOnSetup: 1
   jointList:
   - {fileID: 1751798225}
   - {fileID: 1321566665}
