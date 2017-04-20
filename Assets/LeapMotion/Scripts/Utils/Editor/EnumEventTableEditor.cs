@@ -11,7 +11,7 @@ namespace Leap.Unity {
 
     private GUIContent _iconToolbarMinus;
     private GUIContent _eventIDName;
-    private GUIContent _addButonContent;
+    private GUIContent _addButtonContent;
 
     private GUIContent[] _enumNames;
     private int[] _enumValues;
@@ -25,7 +25,7 @@ namespace Leap.Unity {
     public EnumEventTableEditor(SerializedProperty tableProperty, Type enumType) {
       _entries = tableProperty.FindPropertyRelative("_entries");
 
-      _addButonContent = new GUIContent("Add New Event Type");
+      _addButtonContent = new GUIContent("Add New Event Type");
       _eventIDName = new GUIContent("");
       // Have to create a copy since otherwise the tooltip will be overwritten.
       _iconToolbarMinus = new GUIContent(EditorGUIUtility.IconContent("Toolbar Minus"));
@@ -73,11 +73,11 @@ namespace Leap.Unity {
         RemoveEntry(toBeRemovedEntry);
       }
 
-      Rect btPosition = GUILayoutUtility.GetRect(_addButonContent, GUI.skin.button);
+      Rect btPosition = GUILayoutUtility.GetRect(_addButtonContent, GUI.skin.button);
       const float addButonWidth = 200f;
       btPosition.x = btPosition.x + (btPosition.width - addButonWidth) / 2;
       btPosition.width = addButonWidth;
-      if (GUI.Button(btPosition, _addButonContent)) {
+      if (GUI.Button(btPosition, _addButtonContent)) {
         showAddEventMenu();
       }
 
