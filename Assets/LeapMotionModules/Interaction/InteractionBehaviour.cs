@@ -405,6 +405,8 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Contact API
 
+    public enum ContactForceModes { Object, UI };
+
     /// <summary>
     /// Called when one or more hands begins touching this object.
     /// </summary>
@@ -515,11 +517,17 @@ namespace Leap.Unity.UI.Interaction {
     private bool _ignoreGrasping = false;
     public bool ignoreGrasping { get { return _ignoreGrasping; } set { _ignoreGrasping = value; } }
 
+    [Header("Contact Settings")]
+
+    [Tooltip("Determines how much force the hand should apply to different kinds of objects.")]
+    [SerializeField]
+    private ContactForceModes _contactForceMode = ContactForceModes.Object;
+    public ContactForceModes contactForceMode { get { return _contactForceMode; } set { _contactForceMode = value; } }
+
     [Header("Grasp Settings")]
 
     [Tooltip("Can this object be grasped simultaneously with two or more hands?")]
     [SerializeField]
-    //[DisableIf("_ignoreGrasping", isEqualTo: true)]
     private bool _allowMultiGrasp = false;
     public bool allowMultiGrasp { get { return _allowMultiGrasp; } set { _allowMultiGrasp = value; } }
 
@@ -527,7 +535,6 @@ namespace Leap.Unity.UI.Interaction {
            + "Without this property checked, objects will still receive grasp callbacks, "
            + "but you must move them manually via script.")]
     [SerializeField]
-    //[DisableIf("_ignoreGrasping", isEqualTo: true)]
     private bool _moveObjectWhenGrasped = true;
     public bool moveObjectWhenGrasped { get { return _moveObjectWhenGrasped; } set { _moveObjectWhenGrasped = value; } }
 
