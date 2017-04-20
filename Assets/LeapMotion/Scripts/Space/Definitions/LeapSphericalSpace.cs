@@ -66,7 +66,26 @@ namespace Leap.Unity.Space {
       }
 
       public Vector3 InverseTransformPoint(Vector3 localWarpedPos) {
-        throw new NotImplementedException();
+        localWarpedPos.z += space.radius;
+
+        Vector3 preRotatedPos;
+        preRotatedPos.x = 0;
+        preRotatedPos.y = localWarpedPos.y;
+        preRotatedPos.z = new Vector2(localWarpedPos.x, localWarpedPos.z).magnitude;
+
+        float angleX = Mathf.Atan2(localWarpedPos.x, localWarpedPos.y);
+        float angleY = Mathf.Atan2(preRotatedPos.y, preRotatedPos.z);
+        float radius = new Vector2(preRotatedPos.z, preRotatedPos.y).magnitude;
+
+        Vector3 anchorDelta;
+        anchorDelta.x = (angleX - angleXOffset) * radiusOffset;
+        anchorDelta.y = (angleY - angleYOffset) * radiusOffset;
+        anchorDelta.z = radius - radiusOffset;
+
+        Vector3 anchorRectPos = space.transform.InverseTransformPoint(anchor.transform.position);
+        Vector3 localRectPos = anchorRectPos + anchorDelta;
+
+        return localRectPos;
       }
 
       public Quaternion TransformRotation(Vector3 localRectPos, Quaternion localRectRot) {
@@ -86,7 +105,19 @@ namespace Leap.Unity.Space {
       }
 
       public Quaternion InverseTransformRotation(Vector3 localWarpedPos, Quaternion localWarpedRot) {
-        throw new NotImplementedException();
+        localWarpedPos.z += space.radius;
+
+        Vector3 preRotatedPos;
+        preRotatedPos.x = 0;
+        preRotatedPos.y = localWarpedPos.y;
+        preRotatedPos.z = new Vector2(localWarpedPos.x, localWarpedPos.z).magnitude;
+
+        float angleX = Mathf.Atan2(localWarpedPos.x, localWarpedPos.y);
+        float angleY = Mathf.Atan2(preRotatedPos.y, preRotatedPos.z);
+
+        return Quaternion.Euler(angleY * Mathf.Rad2Deg,
+                                -angleX * Mathf.Rad2Deg,
+                                0) * localWarpedRot;
       }
 
       public Vector3 TransformDirection(Vector3 localRectPos, Vector3 localRectDirection) {
