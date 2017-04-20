@@ -13,6 +13,15 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public bool isDirty {
       get {
+        return _isDirty;
+      }
+      set {
+        _isDirty = value;
+      }
+    }
+
+    public bool isDirtyOrEditTime {
+      get {
 #if UNITY_EDITOR
         if (!Application.isPlaying) {
           return true;
@@ -21,9 +30,6 @@ namespace Leap.Unity.GraphicalRenderer {
         {
           return _isDirty;
         }
-      }
-      set {
-        _isDirty = value;
       }
     }
 

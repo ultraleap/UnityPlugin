@@ -16,7 +16,9 @@ namespace Leap.Unity.GraphicalRenderer {
     public abstract void RefreshMeshData();
 
     public LeapMeshGraphicBase() {
+#if UNITY_EDITOR
       editor = new MeshEditorApi(this);
+#endif
     }
   }
 

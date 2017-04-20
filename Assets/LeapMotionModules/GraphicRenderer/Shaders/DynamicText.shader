@@ -8,6 +8,7 @@
 
     ZWrite Off
     ZTest On
+    Offset -1, -90000 //text should appear in front of things that it is aligned with
     Blend SrcAlpha OneMinusSrcAlpha
 
 		Pass {
@@ -25,11 +26,16 @@
 			sampler2D _MainTex;
 			
       v2f_graphic_dynamic vert(appdata_graphic_dynamic v) {
-        return ApplyDynamicGraphics(v);
+        BEGIN_V2F(v);
+
+        v2f_graphic_dynamic o;
+        APPLY_DYNAMIC_GRAPHICS(v,o);
+
+        return o;
       }
 			
 			fixed4 frag (v2f_graphic_dynamic i) : SV_Target {
-				fixed4 col = tex2D(_MainTex, i.uv0);
+				fixed4 col = tex2D(_MainTex, i.uv_0);
 
 #ifdef GRAPHIC_RENDERER_VERTEX_COLORS
         return fixed4(i.color.rgb, col.a * i.color.a);

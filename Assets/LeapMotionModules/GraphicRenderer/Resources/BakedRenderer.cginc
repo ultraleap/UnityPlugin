@@ -189,19 +189,19 @@ struct appdata_graphic_baked {
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_0
-#define __V2F_UV0 float2 uv0 : TEXCOORD0;
+#define __V2F_UV0 float2 uv_0 : TEXCOORD0;
 #else
 #define __V2F_UV0
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_1
-#define __V2F_UV1 float2 uv1 : TEXCOORD1;
+#define __V2F_UV1 float2 uv_1 : TEXCOORD1;
 #else
 #define __V2F_UV1
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_2
-#define __V2F_UV2 float2 uv2 : TEXCOORD2;
+#define __V2F_UV2 float2 uv_2 : TEXCOORD2;
 #else
 #define __V2F_UV2
 #endif
@@ -220,6 +220,9 @@ struct appdata_graphic_baked {
   __V2F_UV2                     \
   __V2F_COLOR
 
+#define SURF_INPUT_GRAPHICAL    \
+  __V2F_COLOR
+
 struct v2f_graphic_baked {
   V2F_GRAPHICAL
 };
@@ -231,36 +234,41 @@ struct v2f_graphic_baked {
 #endif
 
 #ifdef GRAPHIC_RENDERER_BLEND_SHAPES
-#define __APPLY_BLEND_SHAPES(v,o) ApplyBlendShapes(v.vertex, v.vertInfo, graphicId);
+#define __APPLY_BLEND_SHAPES(v) ApplyBlendShapes(v.vertex, v.vertInfo, graphicId);
 #else
-#define __APPLY_BLEND_SHAPES(v,o)
+#define __APPLY_BLEND_SHAPES(v)
 #endif
 
 #ifdef GRAPHIC_RENDERER_WARPING
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-#define __APPLY_WARPING(v,o) ApplyGraphicWarping(v.vertex, v.normal, graphicId); \
-                             o.normal = UnityObjectToWorldNormal(v.normal);
+#define __APPLY_WARPING(v) ApplyGraphicWarping(v.vertex, v.normal, graphicId);          
 #else
-#define __APPLY_WARPING(v,o) ApplyGraphicWarping(v.vertex, graphicId);
+#define __APPLY_WARPING(v) ApplyGraphicWarping(v.vertex, graphicId);
 #endif
 #else
-#define __APPLY_WARPING(v,o)
+#define __APPLY_WARPING(v)
+#endif
+
+#ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
+#define __COPY_NORMALS(v,o) o.normal = UnityObjectToWorldNormal(v.normal);
+#else
+#define __COPY_NORMALS(v,o)
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_0
-#define __COPY_UV0(v,o) o.uv0 = v.texcoord;
+#define __COPY_UV0(v,o) o.uv_0 = v.texcoord;
 #else
 #define __COPY_UV0(v,o)
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_1
-#define __COPY_UV1(v,o) o.uv1 = v.texcoord1;
+#define __COPY_UV1(v,o) o.uv_1 = v.texcoord1;
 #else
 #define __COPY_UV1(v,o)
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_2
-#define __COPY_UV2(v,o) o.uv2 = v.texcoord2;
+#define __COPY_UV2(v,o) o.uv_2 = v.texcoord2;
 #else
 #define __COPY_UV2(v,o)
 #endif
@@ -281,16 +289,24 @@ struct v2f_graphic_baked {
 #define __APPLY_TINT(v,o)
 #endif
 
-#define APPLY_BAKED_GRAPHICS(v,o)             \
-{                                             \
-  __APPLY_BLEND_SHAPES(v,o)                   \
-  __APPLY_WARPING(v,o)                        \
-  o.vertex = UnityObjectToClipPos(v.vertex);  \
-  __COPY_UV0(v,o)                             \
-  __COPY_UV1(v,o)                             \
-  __COPY_UV2(v,o)                             \
-  __COPY_COLORS(v,o)                          \
-  __APPLY_TINT(v,o)                           \
+#define APPLY_BAKED_GRAPHICS(v,o)                \
+{                                                \
+  __APPLY_BLEND_SHAPES(v)                        \
+  __APPLY_WARPING(v)                             \
+  o.vertex = UnityObjectToClipPos(v.vertex);     \
+  __COPY_NORMALS(v,o)                            \
+  __COPY_UV0(v,o)                                \
+  __COPY_UV1(v,o)                                \
+  __COPY_UV2(v,o)                                \
+  __COPY_COLORS(v,o)                             \
+  __APPLY_TINT(v,o)                              \
+}
+
+#define APPLY_BAKED_GRAPHICS_STANDARD(v,o) \
+{                                          \
+  __APPLY_BLEND_SHAPES(v);                 \
+  __APPLY_WARPING(v);                      \
+  __APPLY_TINT(v,o)                        \
 }
 
 #define DEFINE_FLOAT_CHANNEL(name) float name[GRAPHIC_MAX]

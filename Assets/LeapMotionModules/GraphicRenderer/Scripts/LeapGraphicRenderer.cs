@@ -148,6 +148,25 @@ namespace Leap.Unity.GraphicalRenderer {
     private void validateGraphics() {
       GetComponentsInChildren(_tempGraphicList);
 
+      HashSet<LeapGraphic> set = Pool<HashSet<LeapGraphic>>.Spawn();
+      foreach (var group in _groups) {
+        foreach (var graphic in group.graphics) {
+          set.Add(graphic);
+        }
+
+        foreach (var graphic in _tempGraphicList) {
+          //If the graphic claims it is attached to this group, but it really isn't, remove
+          //it and re-add it.
+          if (graphic.attachedGroup == group && !set.Contains(graphic)) {
+            group.TryRemoveGraphic(graphic);
+            group.TryAddGraphic(graphic);
+          }
+        }
+
+        set.Clear();
+      }
+      Pool<HashSet<LeapGraphic>>.Recycle(set);
+
       foreach (var graphic in _tempGraphicList) {
         if (graphic.isAttachedToGroup) {
           //procede to validate
@@ -162,12 +181,6 @@ namespace Leap.Unity.GraphicalRenderer {
             }
           }
 
-          if (!graphic.attachedGroup.graphics.Contains(graphic)) {
-            var group = graphic.attachedGroup;
-            graphic.OnDetachedFromGroup();
-            group.TryAddGraphic(graphic); //if this fails, handled by later clause
-          }
-
           if (!graphic.enabled) {
             graphic.attachedGroup.TryRemoveGraphic(graphic);
           }
@@ -177,6 +190,8 @@ namespace Leap.Unity.GraphicalRenderer {
           TryAddGraphic(graphic);
         }
       }
+
+
     }
 
     private void doLateUpdateRuntime() {

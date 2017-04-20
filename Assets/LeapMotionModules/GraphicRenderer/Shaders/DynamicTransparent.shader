@@ -27,9 +27,18 @@
       #include "UnityCG.cginc"
 
       sampler2D _MainTex;
+
+      DEFINE_FLOAT_CHANNEL(_Wiggle);
       
       v2f_graphic_dynamic vert (appdata_graphic_dynamic v) {
-        return ApplyDynamicGraphics(v);
+        BEGIN_V2F(v);
+
+        v.vertex.x += getChannel(_Wiggle) * sin(_Time.z * 7 + v.vertex.y);
+
+        v2f_graphic_dynamic o;
+        APPLY_DYNAMIC_GRAPHICS(v,o);
+
+        return o;
       }
       
       fixed4 frag (v2f_graphic_dynamic i) : SV_Target {
@@ -40,7 +49,7 @@
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_0
-        color *= tex2D(_MainTex, i.uv0);
+        color *= tex2D(_MainTex, i.uv_0);
 #endif
 
 #ifdef GRAPHICS_HAVE_COLOR

@@ -8,7 +8,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
   [ExecuteInEditMode]
   [DisallowMultipleComponent]
-  public abstract partial class LeapGraphic : MonoBehaviour, ISpaceComponent {
+  public abstract partial class LeapGraphic : MonoBehaviour, ISpaceComponent, IEquatable<LeapGraphic> {
 
     #region INSPECTOR FIELDS
     [SerializeField, HideInInspector]
@@ -112,6 +112,10 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public virtual void OnAssignFeatureData(List<LeapFeatureData> data) {
       _featureData = data;
+    }
+
+    public bool Equals(LeapGraphic other) {
+      return GetInstanceID() == other.GetInstanceID();
     }
     #endregion
 

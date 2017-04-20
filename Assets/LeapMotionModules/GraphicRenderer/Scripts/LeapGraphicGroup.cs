@@ -46,9 +46,9 @@ namespace Leap.Unity.GraphicalRenderer {
           _renderer = GetComponent<LeapGraphicRenderer>();
 
           if (_renderer == null) {
-            Debug.LogError("The graphic group " + this + " still exists but isn't connected to any renderer!");
+            Debug.LogError("The graphic group still exists but isn't connected to any renderer!", this);
           } else {
-            Debug.LogWarning("The _renderer field of the graphic group " + this + " became null!");
+            Debug.LogWarning("The _renderer field of the graphic group became null!", this);
           }
         }
 #endif
@@ -64,9 +64,9 @@ namespace Leap.Unity.GraphicalRenderer {
           _renderingMethod = GetComponent<LeapRenderingMethod>();
 
           if (_renderingMethod == null) {
-            Debug.LogError("The graphic group " + this + " still exists but isn't connected to any rendering method!");
+            Debug.LogError("The graphic group still exists but isn't connected to any rendering method!", this);
           } else {
-            Debug.LogWarning("The _renderingMethod field of the graphic group " + this + " became null!");
+            Debug.LogWarning("The _renderingMethod field of the graphic group became null!", this);
           }
         }
 #endif
@@ -77,14 +77,14 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public List<LeapGraphicFeatureBase> features {
       get {
-        Assert.IsNotNull(_features, "The feature list of graphic group " + this + " was null!");
+        Assert.IsNotNull(_features, "The feature list of graphic group was null!");
         return _features;
       }
     }
 
     public List<LeapGraphic> graphics {
       get {
-        Assert.IsNotNull(_graphics, "The graphic list of graphic group " + this + " was null!");
+        Assert.IsNotNull(_graphics, "The graphic list of graphic group was null!");
         return _graphics;
       }
     }
@@ -95,7 +95,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// </summary>
     public List<SupportInfo> supportInfo {
       get {
-        Assert.IsNotNull(_supportInfo, "The support info list of graphic group " + this + " was null!");
+        Assert.IsNotNull(_supportInfo, "The support info list of graphic group was null!");
         Assert.AreEqual(_features.Count, _supportInfo.Count, "The support info list should have the same length as the feature list.");
         return _supportInfo;
       }
