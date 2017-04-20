@@ -171,29 +171,23 @@ namespace Leap.Unity.GraphicalRenderer {
         if (graphic.isAttachedToGroup) {
           //procede to validate
 
-          using (new ProfilerSample("1")) {
-            //If the graphic is anchored to the wrong anchor, detach and reattach
-            var anchor = _space == null ? null : LeapSpaceAnchor.GetAnchor(graphic.transform);
-            if (graphic.anchor != anchor) {
-              var group = graphic.attachedGroup;
+          //If the graphic is anchored to the wrong anchor, detach and reattach
+          var anchor = _space == null ? null : LeapSpaceAnchor.GetAnchor(graphic.transform);
+          if (graphic.anchor != anchor) {
+            var group = graphic.attachedGroup;
 
-              if (group.TryRemoveGraphic(graphic)) {
-                group.TryAddGraphic(graphic);
-              }
+            if (group.TryRemoveGraphic(graphic)) {
+              group.TryAddGraphic(graphic);
             }
           }
 
-          using (new ProfilerSample("3")) {
-            if (!graphic.enabled) {
-              graphic.attachedGroup.TryRemoveGraphic(graphic);
-            }
+          if (!graphic.enabled) {
+            graphic.attachedGroup.TryRemoveGraphic(graphic);
           }
         }
 
-        using (new ProfilerSample("4")) {
-          if (!graphic.isAttachedToGroup && graphic.enabled) {
-            TryAddGraphic(graphic);
-          }
+        if (!graphic.isAttachedToGroup && graphic.enabled) {
+          TryAddGraphic(graphic);
         }
       }
 

@@ -121,48 +121,46 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       public void DoEditorUpdateLogic(bool fullRebuild, bool heavyRebuild) {
-        using (new ProfilerSample("A")) {
-          using (new ProfilerSample("Validate Space Component")) {
-            validateSpaceComponent();
+        using (new ProfilerSample("Validate Space Component")) {
+          validateSpaceComponent();
+        }
+
+        if (fullRebuild) {
+          if (_renderer._space != null) {
+            using (new ProfilerSample("Rebuild Space")) {
+              _renderer._space.RebuildHierarchy();
+              _renderer._space.RecalculateTransformers();
+            }
           }
 
-          if (fullRebuild) {
-            if (_renderer._space != null) {
-              using (new ProfilerSample("Rebuild Space")) {
-                _renderer._space.RebuildHierarchy();
-                _renderer._space.RecalculateTransformers();
-              }
-            }
-
-            using (new ProfilerSample("Validate graphics")) {
-              _renderer.validateGraphics();
-            }
-
-            foreach (var group in _renderer._groups) {
-              using (new ProfilerSample("Validate Graphic List")) {
-                group.editor.ValidateGraphicList();
-              }
-
-              using (new ProfilerSample("Rebuild Feature Data")) {
-                group.RebuildFeatureData();
-              }
-
-              using (new ProfilerSample("Rebuild Feature Support Info")) {
-                group.RebuildFeatureSupportInfo();
-              }
-
-              using (new ProfilerSample("Update Renderer Editor")) {
-                group.editor.UpdateRendererEditor(heavyRebuild);
-              }
-            }
-
-            _renderer._hasFinishedSetup = true;
+          using (new ProfilerSample("Validate graphics")) {
+            _renderer.validateGraphics();
           }
 
-          using (new ProfilerSample("Update Renderer")) {
-            foreach (var group in _renderer._groups) {
-              group.UpdateRenderer();
+          foreach (var group in _renderer._groups) {
+            using (new ProfilerSample("Validate Graphic List")) {
+              group.editor.ValidateGraphicList();
             }
+
+            using (new ProfilerSample("Rebuild Feature Data")) {
+              group.RebuildFeatureData();
+            }
+
+            using (new ProfilerSample("Rebuild Feature Support Info")) {
+              group.RebuildFeatureSupportInfo();
+            }
+
+            using (new ProfilerSample("Update Renderer Editor")) {
+              group.editor.UpdateRendererEditor(heavyRebuild);
+            }
+          }
+
+          _renderer._hasFinishedSetup = true;
+        }
+
+        using (new ProfilerSample("Update Renderer")) {
+          foreach (var group in _renderer._groups) {
+            group.UpdateRenderer();
           }
         }
       }
