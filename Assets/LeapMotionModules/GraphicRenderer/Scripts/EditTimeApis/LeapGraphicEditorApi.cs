@@ -18,13 +18,41 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       public virtual void OnValidate() {
-        AttachedObjectHandler.Validate(_graphic, _graphic._featureData);
+        _graphic.isRepresentationDirty = true;
+
+        //Delete any null references
+        for (int i = _graphic._featureData.Count; i-- != 0;) {
+          if (_graphic._featureData[i] == null) {
+            _graphic._featureData.RemoveAt(i);
+          }
+        }
+
+        //Validation is also triggered by undo operations, and undo operations
+        //can trigger validation :(  This can result in weird loops, so we delay
+        //this particular call one frame to prevent weirdness.
+        UnityEditor.EditorApplication.delayCall += () => {
+          if (_graphic != null) {
+            AttachedObjectHandler.Validate(_graphic, _graphic._featureData);
+          }
+        };
 
         if (!Application.isPlaying) {
           if (_graphic._attachedGroup != null) {
             _graphic._attachedGroup.renderer.editor.ScheduleEditorUpdate();
             _graphic._preferredRendererType = _graphic._attachedGroup.renderingMethod.GetType();
           }
+        }
+
+        //Destroy any components that are not referenced by me
+        var allComponents = _graphic.GetComponents<LeapFeatureData>();
+        foreach (var component in allComponents) {
+          if (!_graphic._featureData.Contains(component)) {
+            InternalUtility.Destroy(component);
+          }
+        }
+
+        foreach (var dataObj in _graphic._featureData) {
+          dataObj.graphic = _graphic;
         }
       }
 

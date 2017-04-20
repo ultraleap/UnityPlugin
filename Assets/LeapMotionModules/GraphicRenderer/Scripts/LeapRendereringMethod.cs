@@ -83,13 +83,12 @@ namespace Leap.Unity.GraphicalRenderer {
     protected void CreateOrSave<T>(ref T t, string assetName) where T : SceneTiedAsset {
 #if UNITY_EDITOR
       T newT = t;
-      if (SceneTiedAsset.CreateOrSave(this, 
+      if (SceneTiedAsset.CreateOrSave(this,
                                       ref newT,
                                       DATA_FOLDER_NAME,
                                       assetName)) {
         Undo.RecordObject(this, "Updated graphic data");
         t = newT;
-        EditorUtility.SetDirty(this);
       }
 #endif
     }

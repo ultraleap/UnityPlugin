@@ -269,12 +269,12 @@ namespace Leap.Unity.GraphicalRenderer {
         obj.transform.localScale = Vector3.one;
 
         if (filter == null) {
-          filter = obj.AddComponent<MeshFilter>();
+          filter = InternalUtility.AddComponent<MeshFilter>(obj);
         }
         filter.sharedMesh = mesh;
 
         if (renderer == null) {
-          renderer = obj.AddComponent<MeshRenderer>();
+          renderer = InternalUtility.AddComponent<MeshRenderer>(obj);
         }
         renderer.enabled = true;
         renderer.sharedMaterial = material;

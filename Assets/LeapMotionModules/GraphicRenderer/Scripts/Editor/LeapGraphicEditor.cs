@@ -103,7 +103,6 @@ namespace Leap.Unity.GraphicalRenderer {
 
               foreach (var graphic in targets) {
                 Undo.RecordObject(graphic, "Change graphic group");
-                EditorUtility.SetDirty(graphic);
 
                 if (graphic.attachedGroup.TryRemoveGraphic(graphic)) {
                   group.TryAddGraphic(graphic);

@@ -119,29 +119,10 @@ namespace Leap.Unity.GraphicalRenderer {
     }
     #endregion
 
+    public bool disableThatShit = false;
+
     #region UNITY CALLBACKS
     protected virtual void OnValidate() {
-      isRepresentationDirty = true;
-
-      //Delete any null references
-      for (int i = _featureData.Count; i-- != 0;) {
-        if (_featureData[i] == null) {
-          _featureData.RemoveAt(i);
-        }
-      }
-
-      //Destroy any components that are not referenced by me
-      var allComponents = GetComponents<LeapFeatureData>();
-      foreach (var component in allComponents) {
-        if (!_featureData.Contains(component)) {
-          InternalUtility.Destroy(component);
-        }
-      }
-
-      foreach (var dataObj in _featureData) {
-        dataObj.graphic = this;
-      }
-
 #if UNITY_EDITOR
       editor.OnValidate();
 #endif

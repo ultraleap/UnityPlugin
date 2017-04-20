@@ -76,6 +76,28 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 #endif
 
+    public static T AddComponent<T>(GameObject obj) where T : Component {
+#if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        return Undo.AddComponent<T>(obj);
+      } else
+#endif
+      {
+        return obj.AddComponent<T>();
+      }
+    }
+
+    public static Component AddComponent(GameObject obj, Type type) {
+#if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        return Undo.AddComponent(obj, type);
+      } else
+#endif
+      {
+        return obj.AddComponent(type);
+      }
+    }
+
     private static List<UnityEngine.Object> toDestroy = new List<UnityEngine.Object>();
     public static void Destroy(UnityEngine.Object obj) {
 #if UNITY_EDITOR
@@ -109,7 +131,7 @@ namespace Leap.Unity.GraphicalRenderer {
         for (int i = 0; i < toDestroy.Count; i++) {
           var obj = toDestroy[i];
           if (obj != null) {
-            UnityEngine.Object.DestroyImmediate(obj);
+            Undo.DestroyObjectImmediate(obj);
           }
         }
         toDestroy.Clear();

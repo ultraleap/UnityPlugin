@@ -49,10 +49,12 @@ namespace Leap.Unity.GraphicalRenderer {
         newK = unreferencedKs[0];
         unreferencedKs.RemoveAt(0);
       } else {
-        newK = t.gameObject.AddComponent(k.GetType()) as K;
+        newK = InternalUtility.AddComponent(t.gameObject, k.GetType()) as K;
       }
 
+      Undo.RecordObject(newK, "Updated serialized data on " + newK.name);
       EditorUtility.CopySerialized(k, newK);
+      Undo.RecordObject(newK, "uddd");
 
       //If we moved the T, destroy the original K
       if (didMoveT) {
@@ -62,6 +64,8 @@ namespace Leap.Unity.GraphicalRenderer {
       foreach (var unreferencedK in unreferencedKs) {
         InternalUtility.Destroy(unreferencedK);
       }
+      
+      Undo.RecordObject(t, "Changed attached value on " + t.name);
 
       k = newK;
     }
@@ -96,15 +100,26 @@ namespace Leap.Unity.GraphicalRenderer {
 
       List<K> newKs = new List<K>();
       foreach (var oldK in ks) {
-        K newK;
-        if (unreferencedKs.Count != 0) {
-          newK = unreferencedKs[0];
-          unreferencedKs.RemoveAt(0);
-        } else {
-          newK = t.gameObject.AddComponent(oldK.GetType()) as K;
+        K newK = null;
+
+        //Try to get a new K from the list of unreferenced Ks
+        for (int i = 0; i < unreferencedKs.Count; i++) {
+          //Type must match exactly
+          if (unreferencedKs[i].GetType() == oldK.GetType()) {
+            newK = unreferencedKs[i];
+            unreferencedKs.RemoveAt(i);
+            break;
+          }
         }
 
+        if (newK == null) {
+          newK = InternalUtility.AddComponent(t.gameObject, oldK.GetType()) as K;
+        }
+
+        Undo.RecordObject(newK, "Updated serialized data on " + newK.name);
         EditorUtility.CopySerialized(oldK, newK);
+        Undo.RecordObject(newK, "uhhhh");
+
         newKs.Add(newK);
       }
 
@@ -117,6 +132,8 @@ namespace Leap.Unity.GraphicalRenderer {
       foreach (var unreferencedK in unreferencedKs) {
         InternalUtility.Destroy(unreferencedK);
       }
+
+      Undo.RecordObject(t, "Changed attached value on " + t.name);
 
       ks.Clear();
       ks.AddRange(newKs);
@@ -135,12 +152,7 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
 
-      foreach (var bla in existingsKs) {
-        Debug.Log(bla);
-      }
-
       return existingsKs;
     }
-
   }
 }

@@ -105,7 +105,6 @@ namespace Leap.Unity.GraphicalRenderer {
           List<LeapFeatureData> data = target.featureData.Query().Where(f => f is LeapTextureData || f is LeapSpriteData).ToList();
 
           Undo.RecordObject(target, "Setting source data");
-          EditorUtility.SetDirty(target);
           target.sourceData = data[newIndex];
         }
       }
