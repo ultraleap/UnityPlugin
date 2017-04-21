@@ -216,7 +216,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &85754735
 MonoBehaviour:
@@ -641,7 +641,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &552256747
 MonoBehaviour:
@@ -942,7 +942,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &658088851
 GameObject:
@@ -961,7 +961,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &658088852
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1089,7 +1089,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &722891435
 MonoBehaviour:
@@ -1278,7 +1278,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &758070968
 MonoBehaviour:
@@ -1392,34 +1392,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
---- !u!21 &984310125
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Graphic Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
-    GRAPHIC_RENDERER_TINTING GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_UV_0
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex2:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &1076425313
 GameObject:
   m_ObjectHideFlags: 0
@@ -1601,7 +1573,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1093556441
 MonoBehaviour:
@@ -1827,6 +1799,35 @@ Transform:
   m_Father: {fileID: 1369518617}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!21 &1115971560
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Graphic Material
+  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  m_ShaderKeywords: GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
+    GRAPHIC_RENDERER_TINTING GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_UV_0
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 28318554562836564, guid: 8e6649ce3d437db45abe11cc8cce09e8,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &1137952024
 GameObject:
   m_ObjectHideFlags: 0
@@ -2154,7 +2155,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1625780162
 MonoBehaviour:
@@ -2247,7 +2248,7 @@ MonoBehaviour:
   _manager: {fileID: 0}
   _ignoreHover: 0
   _ignoreContact: 0
-  _ignoreGrasping: 1
+  _ignoreGrasping: 0
   _contactForceMode: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
@@ -2256,7 +2257,7 @@ MonoBehaviour:
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
   minMaxHeight: {x: 0, y: 0.02}
-  restingHeight: 0.75
+  restingHeight: 0.5
   _springForce: 0.1
   OnPress:
     m_PersistentCalls:
@@ -2476,7 +2477,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1676575084
 MonoBehaviour:
@@ -2588,7 +2589,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1715286121
 MonoBehaviour:
@@ -2721,9 +2722,9 @@ GameObject:
   - component: {fileID: 1776547486}
   - component: {fileID: 1776547490}
   - component: {fileID: 1776547484}
-  - component: {fileID: 1776547489}
   - component: {fileID: 1776547485}
   - component: {fileID: 1776547492}
+  - component: {fileID: 1776547489}
   m_Layer: 0
   m_Name: GUI
   m_TagString: Untagged
@@ -2745,18 +2746,18 @@ MonoBehaviour:
   featureData:
   - {fileID: 1369518618}
   - {fileID: 758070968}
-  - {fileID: 1625780162}
   - {fileID: 1093556441}
   - {fileID: 552256747}
-  - {fileID: 1715286121}
   - {fileID: 85754735}
   - {fileID: 1776897086}
-  - {fileID: 1793302178}
-  - {fileID: 118534873}
-  - {fileID: 1676575078}
+  - {fileID: 1625780162}
+  - {fileID: 1715286121}
   - {fileID: 1107131076}
   - {fileID: 722891435}
   - {fileID: 604444913}
+  - {fileID: 1793302178}
+  - {fileID: 118534873}
+  - {fileID: 1676575078}
   propertyName: _BumpMap
   channel: 1
 --- !u!114 &1776547485
@@ -2787,7 +2788,7 @@ MonoBehaviour:
     _filterMode: 1
     _format: 5
     _maxAtlasSize: 4096
-  _material: {fileID: 984310125}
+  _material: {fileID: 1115971560}
   _meshes: {fileID: 11400000, guid: 53d9098edacf0e6478ea21c987788306, type: 2}
   _packedTextures: {fileID: 11400000, guid: 8e6649ce3d437db45abe11cc8cce09e8, type: 2}
   _atlasUvs:
@@ -2867,18 +2868,18 @@ MonoBehaviour:
   _graphics:
   - {fileID: 1369518620}
   - {fileID: 758070970}
-  - {fileID: 1625780164}
   - {fileID: 1093556443}
   - {fileID: 552256749}
-  - {fileID: 1715286123}
   - {fileID: 85754737}
   - {fileID: 1776897088}
-  - {fileID: 1793302177}
-  - {fileID: 118534875}
-  - {fileID: 1676575085}
+  - {fileID: 1625780164}
+  - {fileID: 1715286123}
   - {fileID: 1107131075}
   - {fileID: 722891437}
   - {fileID: 604444912}
+  - {fileID: 1793302177}
+  - {fileID: 118534875}
+  - {fileID: 1676575085}
   _supportInfo:
   - support: 0
     message: 
@@ -2930,7 +2931,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parent: {fileID: 1776547489}
   space: {fileID: 1776547489}
-  _radius: 0.4
+  _radius: 0.5
 --- !u!114 &1776547490
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -2945,18 +2946,18 @@ MonoBehaviour:
   featureData:
   - {fileID: 1369518621}
   - {fileID: 758070971}
-  - {fileID: 1625780165}
   - {fileID: 1093556444}
   - {fileID: 552256750}
-  - {fileID: 1715286124}
   - {fileID: 85754738}
   - {fileID: 1776897089}
-  - {fileID: 1793302179}
-  - {fileID: 118534874}
-  - {fileID: 1676575079}
+  - {fileID: 1625780165}
+  - {fileID: 1715286124}
   - {fileID: 1107131077}
   - {fileID: 722891438}
   - {fileID: 604444914}
+  - {fileID: 1793302179}
+  - {fileID: 118534874}
+  - {fileID: 1676575079}
   propertyName: _MainTex
   channel: 1
 --- !u!114 &1776547492
@@ -2973,18 +2974,18 @@ MonoBehaviour:
   featureData:
   - {fileID: 1369518622}
   - {fileID: 758070972}
-  - {fileID: 1625780166}
   - {fileID: 1093556445}
   - {fileID: 552256751}
-  - {fileID: 1715286125}
   - {fileID: 85754739}
   - {fileID: 1776897090}
-  - {fileID: 1793302176}
-  - {fileID: 118534877}
-  - {fileID: 1676575086}
+  - {fileID: 1625780166}
+  - {fileID: 1715286125}
   - {fileID: 1107131074}
   - {fileID: 722891439}
   - {fileID: 604444911}
+  - {fileID: 1793302176}
+  - {fileID: 118534877}
+  - {fileID: 1676575086}
 --- !u!1 &1776897081
 GameObject:
   m_ObjectHideFlags: 0
@@ -3046,7 +3047,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1776897086
 MonoBehaviour:
@@ -3321,7 +3322,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1793302184
 MonoBehaviour:
