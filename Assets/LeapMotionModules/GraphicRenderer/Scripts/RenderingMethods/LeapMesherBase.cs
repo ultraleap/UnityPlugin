@@ -124,6 +124,7 @@ namespace Leap.Unity.GraphicalRenderer {
     protected List<float> _blendShapeAmounts = new List<float>();
 
     //#### Custom Channels ####
+    public const string CUSTOM_CHANNEL_KEYWORD = LeapGraphicRenderer.FEATURE_PREFIX + "ENABLE_CUSTOM_CHANNELS";
     protected List<float> _customFloatChannelData = new List<float>();
     protected List<Vector4> _customVectorChannelData = new List<Vector4>();
     protected List<Color> _customColorChannelData = new List<Color>();
@@ -337,6 +338,13 @@ namespace Leap.Unity.GraphicalRenderer {
 
         foreach (var channel in _requiredUvChannels) {
           _material.EnableKeyword(GetUvFeature(channel));
+        }
+
+        if(_customColorChannelData.Count > 0 || 
+           _customFloatChannelData.Count > 0 ||
+           _customVectorChannelData.Count > 0 ||
+           _customMatrixChannelData.Count > 0) {
+          _material.EnableKeyword(CUSTOM_CHANNEL_KEYWORD);
         }
 
         if (_textureFeatures.Count != 0) {

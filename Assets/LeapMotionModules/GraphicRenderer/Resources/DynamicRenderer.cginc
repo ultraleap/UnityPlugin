@@ -1,5 +1,9 @@
 #include "Assets/LeapMotionModules/GraphicRenderer/Resources/GraphicRenderer.cginc"
 
+#ifdef GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS
+#define GRAPHICS_HAVE_ID
+#endif
+
 /***********************************
  * Space name:
  *  _ (none)
@@ -16,10 +20,10 @@ float4 _GraphicRendererCurved_GraphicParameters[GRAPHIC_MAX];
 float4x4 _GraphicRenderer_LocalToWorld;
 
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-void ApplyGraphicWarping(inout float4 anchorSpaceVert, inout float4 anchorSpaceNormal, int graphicId) {
+void ApplyGraphicWarping(inout float4 anchorSpaceVert, inout float3 anchorSpaceNormal, int graphicId) {
   float4 parameters = _GraphicRendererCurved_GraphicParameters[graphicId];
 
-  Cylindrical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal.xyz, parameters);
+  Cylindrical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal, parameters);
 
   anchorSpaceVert = mul(_GraphicRenderer_LocalToWorld, anchorSpaceVert);
   anchorSpaceNormal = mul(_GraphicRenderer_LocalToWorld, float4(anchorSpaceNormal.xyz, 0));
@@ -43,13 +47,13 @@ float4 _GraphicRendererCurved_GraphicParameters[GRAPHIC_MAX];
 float4x4 _GraphicRenderer_LocalToWorld;
 
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-void ApplyGraphicWarping(inout float4 anchorSpaceVert, inout float4 anchorSpaceNormal, int graphicId) {
+void ApplyGraphicWarping(inout float4 anchorSpaceVert, inout float3 anchorSpaceNormal, int graphicId) {
   float4 parameters = _GraphicRendererCurved_GraphicParameters[graphicId];
 
-  Spherical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal.xyz, parameters);
+  Spherical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal, parameters);
 
   anchorSpaceVert = mul(_GraphicRenderer_LocalToWorld, anchorSpaceVert);
-  anchorSpaceNormal = mul(_GraphicRenderer_LocalToWorld, float4(anchorSpaceNormal.xyz, 0));
+  anchorSpaceNormal = mul(_GraphicRenderer_LocalToWorld, float4(anchorSpaceNormal, 0));
 }
 #else
 void ApplyGraphicWarping(inout float4 anchorSpaceVert, int graphicId) {
@@ -131,7 +135,7 @@ struct appdata_graphic_dynamic {
   float4 vertex : POSITION;
 
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-  float4 normal : NORMAL;
+  float3 normal : NORMAL;
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_0
@@ -302,13 +306,13 @@ struct v2f_graphic_dynamic {
   __APPLY_TINT(v,o)                 \
 }
 
-#define APPLY_BAKED_GRAPHICS_STANDARD(v,o) \
-{                                          \
-  __POS_TO_ANCHOR_SPACE(v)                 \
-  __NORMAL_TO_ANCHOR_SPACE(v)              \
-  __APPLY_BLEND_SHAPES(v);                 \
-  __APPLY_WARPING(v);                      \
-  __APPLY_TINT(v,o)                        \
+#define APPLY_DYNAMIC_GRAPHICS_STANDARD(v,o) \
+{                                            \
+  __POS_TO_ANCHOR_SPACE(v)                   \
+  __NORMAL_TO_ANCHOR_SPACE(v)                \
+  __APPLY_BLEND_SHAPES(v);                   \
+  __APPLY_WARPING(v);                        \
+  __APPLY_TINT(v,o)                          \
 }
 
 #define DEFINE_FLOAT_CHANNEL(name) float name[GRAPHIC_MAX]
