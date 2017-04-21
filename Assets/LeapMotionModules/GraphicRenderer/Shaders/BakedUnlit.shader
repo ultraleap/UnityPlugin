@@ -1,4 +1,4 @@
-﻿Shader "Leap Motion/Graphic Renderer/Defaults/Baked" {
+﻿Shader "Leap Motion/Graphic Renderer/Unlit/Baked" {
   Properties {
     _MainTex ("Texture", 2D) = "white" {}
     _MainTex2 ("Texture", 2D) = "white" {}

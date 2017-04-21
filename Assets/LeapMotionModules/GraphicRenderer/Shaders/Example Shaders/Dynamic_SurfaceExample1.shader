@@ -1,4 +1,4 @@
-﻿Shader "Custom/CustomGuiShader_Surface_2" {
+﻿Shader "Leap Motion/Graphic Renderer/Examples/Dynamic 1" {
   Properties {
     _MainTex ("Albedo (RGB)", 2D) = "white" {}
   }

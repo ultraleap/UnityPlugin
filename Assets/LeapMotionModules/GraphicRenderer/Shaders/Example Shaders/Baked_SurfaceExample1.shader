@@ -1,4 +1,4 @@
-﻿Shader "Custom/CustomGuiShader_Surface" {
+﻿Shader "Leap Motion/Graphic Renderer/Examples/Bake 1" {
   Properties {
     _MainTex ("Albedo (RGB)", 2D) = "white" {}
   }
