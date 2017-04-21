@@ -24,9 +24,13 @@ namespace Leap.Unity.GraphicalRenderer {
 
     UnityEngine.Object[] tempArray = new UnityEngine.Object[0];
     List<UnityEngine.Object> tempList = new List<UnityEngine.Object>();
+    GUIContent dragContent;
 
     protected override void OnEnable() {
       base.OnEnable();
+
+      dragContent = new GUIContent(EditorGUIUtility.IconContent("ListIcon"));
+      dragContent.tooltip = "Drag a reference to this feature data";
 
       dontShowScriptField();
     }
@@ -191,11 +195,19 @@ namespace Leap.Unity.GraphicalRenderer {
           editor.serializedObject.Update();
 
           EditorGUI.BeginChangeCheck();
+          
           EditorGUILayout.LabelField(LeapGraphicTagAttribute.GetTag(mainDataType));
 
           if (targets.Length == 1) {
-            Rect dragRect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.MouseDrag && dragRect.Contains(Event.current.mousePosition)) {
+            Rect rect = GUILayoutUtility.GetLastRect();
+            rect.width = 24;
+            rect.height = 24;
+            rect.x -= 13;
+            rect.y -= 1;
+            
+            GUI.Label(rect, dragContent);
+            
+            if (Event.current.type == EventType.MouseDrag && rect.Contains(Event.current.mousePosition)) {
               DragAndDrop.PrepareStartDrag();
               DragAndDrop.objectReferences = new UnityEngine.Object[] { mainDataObj };
               DragAndDrop.StartDrag("Component");
