@@ -22,7 +22,7 @@ namespace Leap.Unity.UI.Interaction {
   /// are called interaction objects.
   /// </summary>
   [RequireComponent(typeof(Rigidbody))]
-  public class InteractionBehaviour : MonoBehaviour, IInteractionBehaviour, IRuntimeGizmoComponent {
+  public class InteractionBehaviour : MonoBehaviour, IInteractionBehaviour {
 
     public const float MAX_ANGULAR_VELOCITY = 100F;
 
@@ -658,8 +658,6 @@ namespace Leap.Unity.UI.Interaction {
 
     private InteractionHand _closestHoveringHand = null;
 
-    private Vector3 _mostRecentClosestPoint;
-
     /// <summary>
     /// Returns a comparative distance to this interaction object. Calculated by finding the
     /// smallest distance to each of the object's colliders.
@@ -675,7 +673,7 @@ namespace Leap.Unity.UI.Interaction {
       foreach (var collider in _primaryHoverColliders) {
         if (!hasColliders) hasColliders = true;
 
-        if (true || ((collider is SphereCollider) && (collider as SphereCollider).center != Vector3.zero)
+        if (((collider is SphereCollider) && (collider as SphereCollider).center != Vector3.zero)
             || ((collider is BoxCollider) && (collider as BoxCollider).center != Vector3.zero)
             || ((collider is CapsuleCollider) && (collider as CapsuleCollider).center != Vector3.zero)) {
 
@@ -697,7 +695,7 @@ namespace Leap.Unity.UI.Interaction {
       }
 
       if (!hasColliders) {
-        return (this.transform.position - worldPosition).sqrMagnitude;
+        return (this.transform.position - worldPosition).magnitude;
       } else {
         return closestComparativeColliderDistance;
       }
@@ -1232,14 +1230,6 @@ namespace Leap.Unity.UI.Interaction {
 
     #endregion
 
-
-    public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      if (isPrimaryHovered) {
-        drawer.color = Color.red;
-        drawer.DrawLine(primaryHoveringHand.Fingers[primaryHoveringInteractionHand.hoverCheckResults.primaryHoveringFingerIdx].TipPosition.ToVector3(), _mostRecentClosestPoint);
-        drawer.DrawSphere(_mostRecentClosestPoint, 0.005F);
-      }
-    }
   }
 
 }
