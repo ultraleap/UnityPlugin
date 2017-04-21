@@ -5,6 +5,7 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
 
+  [DisallowMultipleComponent]
   public abstract partial class LeapMeshGraphicBase : LeapGraphic {
 
     [EditTimeOnly]

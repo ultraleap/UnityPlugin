@@ -7,17 +7,11 @@ namespace Leap.Unity.GraphicalRenderer {
   where AttachedComponent : Component {
 
     protected virtual void Awake() {
-
+      validateState();
     }
 
     protected virtual void OnValidate() {
-      var attatched = GetComponent<AttachedComponent>();
-      if (attatched == null) {
-        InternalUtility.Destroy(this);
-      }
-
-      //hideFlags = HideFlags.None;
-      hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
+      validateState();
     }
 
     protected virtual void OnDestroy() {
@@ -29,5 +23,15 @@ namespace Leap.Unity.GraphicalRenderer {
 #if UNITY_EDITOR
     protected virtual void OnDestroyedByUser() { }
 #endif
+
+    private void validateState() {
+      var attatched = GetComponent<AttachedComponent>();
+      if (attatched == null) {
+        InternalUtility.Destroy(this);
+      }
+      
+      hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
+      hideFlags = HideFlags.None;
+    }
   }
 }
