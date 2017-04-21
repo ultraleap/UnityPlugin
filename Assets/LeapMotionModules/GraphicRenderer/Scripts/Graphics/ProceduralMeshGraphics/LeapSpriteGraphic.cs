@@ -3,6 +3,7 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
+  [DisallowMultipleComponent]
   public class LeapSpriteGraphic : LeapMeshGraphicBase {
 
     public override void RefreshMeshData() {
