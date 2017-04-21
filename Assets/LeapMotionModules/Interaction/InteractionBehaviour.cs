@@ -27,31 +27,6 @@ namespace Leap.Unity.UI.Interaction {
     public const float MAX_ANGULAR_VELOCITY = 100F;
 
     #region Public API
-    
-    public enum EventType {
-      HoverBegin = 100,
-      HoverStay = 101,
-      HoverEnd = 102,
-      ObjectHoverBegin = 110,
-      ObjectHoverEnd = 111,
-      PrimaryHoverBegin = 120,
-      PrimaryHoverStay = 121,
-      PrimaryHoverEnd = 122,
-      ObjectPrimaryHoverBegin = 130,
-      ObjectPrimaryHoverEnd = 132,
-      GraspBegin = 140,
-      GraspHold = 141,
-      GraspEnd = 142,
-      ObjectGraspBegin = 150,
-      ObjectGraspEnd = 152,
-      SuspensionBegin = 160,
-      SuspensionEnd = 161,
-      ContactBegin = 170,
-      ContactStay = 171,
-      ContactEnd = 172,
-      ObjectContactBegin = 180,
-      ObjectContactEnd = 181
-    }
 
     #region Hovering API
 
@@ -98,6 +73,29 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     /// <summary>
+    /// Returns the primary hovering fingertip position of the finger that is primarily
+    /// hoveirng over this object. If this object is not the primary hover of any hand,
+    /// returns Vector3.zero.
+    /// </summary>
+    public Vector3 primaryHoveringFingertip {
+      get {
+        if (!isPrimaryHovered) return Vector3.zero;
+        return primaryHoveringFinger.TipPosition.ToVector3();
+      }
+    }
+
+    /// <summary>
+    /// Returns the distance to the fingertip that is primarily hovering over this object.
+    /// If this object is not the primary hover of any hand, returns positive infinity.
+    /// </summary>
+    public float primaryHoverDistance {
+      get {
+        if (!isPrimaryHovered) return float.PositiveInfinity;
+        return primaryHoveringInteractionHand.hoverCheckResults.primaryHoveredDistance;
+      }
+    }
+
+    /// <summary>
     /// Gets the primary hovering Interaction Hand for this interaction object, if it has one.
     /// If there is no hand primarily hovering over this object, returns null.
     /// 
@@ -105,8 +103,6 @@ namespace Leap.Unity.UI.Interaction {
     /// but they can also perform interaction-related actions, such as ReleaseGrasp().
     /// </summary>
     public InteractionHand primaryHoveringInteractionHand { get { return _closestPrimaryHoveringHand; } }
-
-
 
     /// <summary>
     /// Called whenever one or more hands have entered the hover activity radius around this
@@ -476,6 +472,35 @@ namespace Leap.Unity.UI.Interaction {
 
     #endregion
 
+    #region Event Types
+
+    public enum EventType {
+      HoverBegin = 100,
+      HoverStay = 101,
+      HoverEnd = 102,
+      ObjectHoverBegin = 110,
+      ObjectHoverEnd = 111,
+      PrimaryHoverBegin = 120,
+      PrimaryHoverStay = 121,
+      PrimaryHoverEnd = 122,
+      ObjectPrimaryHoverBegin = 130,
+      ObjectPrimaryHoverEnd = 132,
+      GraspBegin = 140,
+      GraspHold = 141,
+      GraspEnd = 142,
+      ObjectGraspBegin = 150,
+      ObjectGraspEnd = 152,
+      SuspensionBegin = 160,
+      SuspensionEnd = 161,
+      ContactBegin = 170,
+      ContactStay = 171,
+      ContactEnd = 172,
+      ObjectContactBegin = 180,
+      ObjectContactEnd = 181
+    }
+
+    #endregion
+
     #endregion
 
     [Tooltip("The Interaction Manager responsible for this interaction object.")]
@@ -661,12 +686,8 @@ namespace Leap.Unity.UI.Interaction {
     /// <summary>
     /// Returns a comparative distance to this interaction object. Calculated by finding the
     /// smallest distance to each of the object's colliders.
-    /// 
-    /// Any MeshColliders, however, will not have their distances calculated precisely; the squared
-    /// distance to their bounding box is calculated instead. It is possible to use a custom
-    /// set of colliders against which to test primary hover calculations: see primaryHoverColliders.
     /// <summary>
-    public virtual float GetComparativeHoverDistance(Vector3 worldPosition) {
+    public virtual float GetHoverDistance(Vector3 worldPosition) {
       float closestComparativeColliderDistance = float.PositiveInfinity;
       bool hasColliders = false;
       float testDistance = float.PositiveInfinity;
@@ -682,7 +703,7 @@ namespace Leap.Unity.UI.Interaction {
       }
 
       if (!hasColliders) {
-        return (this.transform.position - worldPosition).sqrMagnitude;
+        return (this.transform.position - worldPosition).magnitude;
       } else {
         return closestComparativeColliderDistance;
       }
@@ -799,7 +820,7 @@ namespace Leap.Unity.UI.Interaction {
       InteractionHand closestHoveringHand = null;
       float closestHoveringHandDist = float.PositiveInfinity;
       foreach (var hand in hands) {
-        float distance = GetComparativeHoverDistance(hand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
+        float distance = GetHoverDistance(hand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
         if (closestHoveringHand == null
             || distance < closestHoveringHandDist) {
           closestHoveringHand = hand;

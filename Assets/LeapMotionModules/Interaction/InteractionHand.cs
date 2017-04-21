@@ -182,9 +182,9 @@ namespace Leap.Unity.UI.Interaction {
 
       float distance = float.PositiveInfinity;
       if (spaceComponent == null) {
-        distance = behaviour.GetComparativeHoverDistance(position);
+        distance = behaviour.GetHoverDistance(position);
       } else {
-        distance = behaviour.GetComparativeHoverDistance(transformPoint(position, spaceComponent));
+        distance = behaviour.GetHoverDistance(transformPoint(position, spaceComponent));
       }
 
       curResults.hovered.Add(behaviour);
