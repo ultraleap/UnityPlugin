@@ -31,7 +31,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
       
       hideFlags = HideFlags.HideInInspector | HideFlags.HideInHierarchy;
-      hideFlags = HideFlags.None;
+      //hideFlags = HideFlags.None;
     }
   }
 }

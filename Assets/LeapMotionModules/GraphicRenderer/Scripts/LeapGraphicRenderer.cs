@@ -159,16 +159,18 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         foreach (var graphic in _tempGraphicList) {
-          //If the graphic claims it is attached to this group, but it really isn't, remove
-          //it and re-add it.
-          bool graphicThinksItsInGroup = graphic.attachedGroup == group;
-          bool isActuallyInGroup = set.Contains(graphic);
+          if (graphic.isAttachedToGroup) {
+            //If the graphic claims it is attached to this group, but it really isn't, remove
+            //it and re-add it.
+            bool graphicThinksItsInGroup = graphic.attachedGroup == group;
+            bool isActuallyInGroup = set.Contains(graphic);
 
-          //Also re add it if it is attached to a completely different renderer!
-          if (graphicThinksItsInGroup != isActuallyInGroup ||
-              graphic.attachedGroup.renderer != this) {
-            group.TryRemoveGraphic(graphic);
-            group.TryAddGraphic(graphic);
+            //Also re add it if it is attached to a completely different renderer!
+            if (graphicThinksItsInGroup != isActuallyInGroup ||
+                graphic.attachedGroup.renderer != this) {
+              group.TryRemoveGraphic(graphic);
+              group.TryAddGraphic(graphic);
+            }
           }
         }
 
