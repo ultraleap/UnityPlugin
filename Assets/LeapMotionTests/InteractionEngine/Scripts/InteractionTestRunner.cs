@@ -30,6 +30,5 @@ namespace Leap.Unity.Interaction.Testing {
       DestroyImmediate(_spawned);
       _spawned = null;
     }
-
   }
 }

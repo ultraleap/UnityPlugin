@@ -27,7 +27,7 @@
       
     v2f_shaded vert_shaded (appdata_shaded v) {
       v2f_shaded o;
-      o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+      o.vertex = UnityObjectToClipPos(v.vertex);
       float3 viewDir = normalize(ObjSpaceViewDir(v.vertex));
       o.fresnelValue = lerp(0.39, 0.66, saturate(dot(v.normal, viewDir)));
       return o;
@@ -35,7 +35,7 @@
 
     v2f_unlit vert_unlit (appdata_unlit v) {
       v2f_unlit o;
-      o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
+      o.vertex = UnityObjectToClipPos(v.vertex);
       return o;
     }
 

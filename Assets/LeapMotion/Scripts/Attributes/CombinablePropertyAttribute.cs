@@ -48,6 +48,8 @@ namespace Leap.Unity.Attributes {
         yield break;
       }
     }
+
+    public virtual void OnPropertyChanged(SerializedProperty property) { }
 #endif
   }
 }

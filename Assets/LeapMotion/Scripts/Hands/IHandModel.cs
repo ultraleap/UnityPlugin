@@ -47,6 +47,8 @@ namespace Leap.Unity {
       return false;
     }
 
+    public HandPool.ModelGroup group;
+
 #if UNITY_EDITOR
     void Update() {
       if (!EditorApplication.isPlaying && SupportsEditorPersistence()) {

@@ -132,6 +132,7 @@ namespace Leap.Unity.Interaction.Testing {
         Undo.RegisterCreatedObjectUndo(test, "Created autoamtic test component");
 
         Undo.RecordObject(test, "Set test settings");
+
         test.timeout = timeout;
         test.ignored = ignored;
         test.succeedAfterAllAssertionsAreExecuted = succeedAfterAllAssertionsAreExecuted;

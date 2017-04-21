@@ -149,7 +149,6 @@ namespace Leap.Unity.DetectionExamples {
       }
 
       public void FinishLine() {
-        _mesh.Optimize();
         _mesh.UploadMeshData(true);
       }
 

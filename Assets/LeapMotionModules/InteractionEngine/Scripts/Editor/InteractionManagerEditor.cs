@@ -5,7 +5,7 @@ using System.Linq;
 namespace Leap.Unity.Interaction {
 
   [CustomEditor(typeof(InteractionManager), true)]
-  public class InteractionManagerEditor : CustomEditorBase {
+  public class InteractionManagerEditor : CustomEditorBase<InteractionManager> {
 
     private IInteractionBehaviour[] _interactionBehaviours;
 
@@ -29,6 +29,8 @@ namespace Leap.Unity.Interaction {
                                 "_interactionNoClipLayer",
                                 "_brushLayer");
 
+      specifyConditionalDrawing("_graspingEnabled", "_twoHandedGrasping");
+
       specifyCustomDecorator("_interactionLayer", collisionLayerHelper);
 
       _interactionBehaviours = FindObjectsOfType<IInteractionBehaviour>();
@@ -47,38 +49,36 @@ namespace Leap.Unity.Interaction {
     }
 
     private void collisionLayerHelper(SerializedProperty prop) {
-      InteractionManager manager = target as InteractionManager;
-
-      if (manager.InteractionBrushLayer == manager.InteractionLayer) {
+      if (target.InteractionBrushLayer == target.InteractionLayer) {
         EditorGUILayout.HelpBox("Brush Layer cannot be the same as Interaction Layer", MessageType.Error);
         return;
       }
 
-      if (manager.InteractionBrushLayer == manager.InteractionNoClipLayer) {
+      if (target.InteractionBrushLayer == target.InteractionNoClipLayer) {
         EditorGUILayout.HelpBox("Brush Layer cannot be the same as No-Clip Layer", MessageType.Error);
         return;
       }
 
-      if (manager.InteractionLayer == manager.InteractionNoClipLayer) {
+      if (target.InteractionLayer == target.InteractionNoClipLayer) {
         EditorGUILayout.HelpBox("Interaction Layer cannot be the same as No-Clip Layer", MessageType.Error);
         return;
       }
 
       if (!serializedObject.FindProperty("_autoGenerateLayers").boolValue) {
-        if (Physics.GetIgnoreLayerCollision(manager.InteractionBrushLayer, manager.InteractionLayer)) {
+        if (Physics.GetIgnoreLayerCollision(target.InteractionBrushLayer, target.InteractionLayer)) {
           using (new GUILayout.HorizontalScope()) {
             EditorGUILayout.HelpBox("Brush Layer should collide with Interaction Layer", MessageType.Warning);
             if (GUILayout.Button("Auto-fix")) {
-              Physics.IgnoreLayerCollision(manager.InteractionBrushLayer, manager.InteractionLayer, false);
+              Physics.IgnoreLayerCollision(target.InteractionBrushLayer, target.InteractionLayer, false);
             }
           }
         }
 
-        if (!Physics.GetIgnoreLayerCollision(manager.InteractionBrushLayer, manager.InteractionNoClipLayer)) {
+        if (!Physics.GetIgnoreLayerCollision(target.InteractionBrushLayer, target.InteractionNoClipLayer)) {
           using (new GUILayout.HorizontalScope()) {
             EditorGUILayout.HelpBox("Brush Layer should not collide with No-Clip Layer", MessageType.Warning);
             if (GUILayout.Button("Auto-fix")) {
-              Physics.IgnoreLayerCollision(manager.InteractionBrushLayer, manager.InteractionNoClipLayer, true);
+              Physics.IgnoreLayerCollision(target.InteractionBrushLayer, target.InteractionNoClipLayer, true);
             }
           }
         }
@@ -86,13 +86,11 @@ namespace Leap.Unity.Interaction {
     }
 
     private void providerDectorator(SerializedProperty prop) {
-      var manager = target as InteractionManager;
-
-      if (Physics.defaultContactOffset > manager.RecommendedContactOffsetMaximum) {
+      if (Physics.defaultContactOffset > target.RecommendedContactOffsetMaximum) {
         GUILayout.BeginHorizontal();
-        EditorGUILayout.HelpBox("The current default contact offset is " + Physics.defaultContactOffset + ", which is greater than the recomended value " + manager.RecommendedContactOffsetMaximum, MessageType.Warning);
+        EditorGUILayout.HelpBox("The current default contact offset is " + Physics.defaultContactOffset + ", which is greater than the recomended value " + target.RecommendedContactOffsetMaximum, MessageType.Warning);
         if (GUILayout.Button("Auto-fix")) {
-          Physics.defaultContactOffset = manager.RecommendedContactOffsetMaximum;
+          Physics.defaultContactOffset = target.RecommendedContactOffsetMaximum;
         }
         GUILayout.EndHorizontal();
       }
@@ -104,7 +102,7 @@ namespace Leap.Unity.Interaction {
           for (int i = 0; i < _interactionBehaviours.Length; i++) {
             var behaviour = _interactionBehaviours[i];
             if (behaviour.Manager == null) {
-              behaviour.Manager = target as InteractionManager;
+              behaviour.Manager = target;
               EditorUtility.SetDirty(behaviour);
             }
           }
@@ -119,12 +117,10 @@ namespace Leap.Unity.Interaction {
 
       if (Application.isPlaying) {
         EditorGUILayout.Space();
-        InteractionManager manager = target as InteractionManager;
-
         EditorGUILayout.LabelField("Info", EditorStyles.boldLabel);
         using (new EditorGUI.DisabledGroupScope(true)) {
-          EditorGUILayout.IntField("Registered Count", manager.RegisteredObjects.Count());
-          EditorGUILayout.IntField("Grasped Count", manager.GraspedObjects.Count);
+          EditorGUILayout.IntField("Registered Count", target.RegisteredObjects.Count());
+          EditorGUILayout.IntField("Grasped Count", target.GraspedObjects.Count);
         }
       }
     }

@@ -109,8 +109,6 @@ namespace UnityTest.IntegrationTests
             {
                 case BuildTargetGroup.Android:
                     return BuildTarget.Android;
-                case BuildTargetGroup.WebGL:
-                    return BuildTarget.WebGL;
                 default:
                 {
                     switch (Application.platform)
