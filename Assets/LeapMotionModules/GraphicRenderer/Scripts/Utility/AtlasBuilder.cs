@@ -84,6 +84,7 @@ namespace Leap.Unity.GraphicalRenderer {
     [EditTimeOnly, SerializeField]
     private int _maxAtlasSize = 4096;
 
+    [Tooltip("Add textures to this array to ensure that they are always present in the atlas.")]
     [SerializeField]
     private TextureReference[] _extraTextures;
 
