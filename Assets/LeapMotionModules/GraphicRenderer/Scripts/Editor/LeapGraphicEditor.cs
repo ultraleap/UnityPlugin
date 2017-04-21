@@ -162,7 +162,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
 
         if (sharedGroup != null) {
           var meshRendering = sharedGroup.renderingMethod as LeapMesherBase;
-          if (meshRendering.IsAtlasDirty) {
+          if (meshRendering.IsAtlasDirty && !EditorApplication.isPlaying) {
             if (GUILayout.Button("Refresh Atlas", GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight))) {
               meshRendering.RebuildAtlas(new ProgressBar());
               sharedGroup.renderer.editor.ScheduleEditorUpdate();

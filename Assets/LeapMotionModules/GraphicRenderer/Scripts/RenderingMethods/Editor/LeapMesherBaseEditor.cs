@@ -77,7 +77,7 @@ namespace Leap.Unity.GraphicalRenderer {
       using (new EditorGUILayout.HorizontalScope()) {
         EditorGUILayout.LabelField("Rendering Settings", EditorStyles.boldLabel);
 
-        if (hasTextureFeature()) {
+        if (hasTextureFeature() && !EditorApplication.isPlaying) {
           var mesher = target as LeapMesherBase;
           if (mesher.IsAtlasDirty) {
             GUI.color = Color.yellow;
