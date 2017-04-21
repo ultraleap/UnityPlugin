@@ -38,7 +38,7 @@ namespace Leap.Unity.UI.Interaction.Internal {
     // Hand interactions
 
     // Hover
-    float GetComparativeHoverDistance(Vector3 worldPosition);
+    float GetHoverDistance(Vector3 worldPosition);
     void BeginHover(List<InteractionHand> hands);
     void StayHovered(List<InteractionHand> hands);
     void EndHover(List<InteractionHand> hands);
