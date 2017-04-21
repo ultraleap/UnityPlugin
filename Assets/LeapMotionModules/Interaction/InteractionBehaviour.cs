@@ -22,7 +22,7 @@ namespace Leap.Unity.UI.Interaction {
   /// are called interaction objects.
   /// </summary>
   [RequireComponent(typeof(Rigidbody))]
-  public class InteractionBehaviour : MonoBehaviour, IInteractionBehaviour {
+  public class InteractionBehaviour : MonoBehaviour, IInteractionBehaviour, IRuntimeGizmoComponent {
 
     public const float MAX_ANGULAR_VELOCITY = 100F;
 
@@ -658,6 +658,8 @@ namespace Leap.Unity.UI.Interaction {
 
     private InteractionHand _closestHoveringHand = null;
 
+    private Vector3 _mostRecentClosestPoint;
+
     /// <summary>
     /// Returns a comparative distance to this interaction object. Calculated by finding the
     /// smallest distance to each of the object's colliders.
@@ -673,8 +675,21 @@ namespace Leap.Unity.UI.Interaction {
       foreach (var collider in _primaryHoverColliders) {
         if (!hasColliders) hasColliders = true;
 
-        testDistance = (Physics.ClosestPoint(worldPosition, collider, collider.transform.position, collider.transform.rotation)
-                        - worldPosition).magnitude;
+        if (true || ((collider is SphereCollider) && (collider as SphereCollider).center != Vector3.zero)
+            || ((collider is BoxCollider) && (collider as BoxCollider).center != Vector3.zero)
+            || ((collider is CapsuleCollider) && (collider as CapsuleCollider).center != Vector3.zero)) {
+
+          _mostRecentClosestPoint = collider.transform.TransformPoint(collider.ClosestPointOnSurface(collider.transform.InverseTransformPoint(worldPosition)));
+
+          // Custom, slower ClosestPoint
+          testDistance = (collider.transform.TransformPoint(collider.ClosestPointOnSurface(collider.transform.InverseTransformPoint(worldPosition)))
+                          - worldPosition).magnitude;
+        }
+        else {
+          // Native, faster ClosestPoint (no support for off-center colliders)
+          testDistance = (Physics.ClosestPoint(worldPosition, collider, collider.transform.position, collider.transform.rotation)
+                          - worldPosition).magnitude;
+        }
 
         if (testDistance < closestComparativeColliderDistance) {
           closestComparativeColliderDistance = testDistance;
@@ -1217,6 +1232,14 @@ namespace Leap.Unity.UI.Interaction {
 
     #endregion
 
+
+    public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
+      if (isPrimaryHovered) {
+        drawer.color = Color.red;
+        drawer.DrawLine(primaryHoveringHand.Fingers[primaryHoveringInteractionHand.hoverCheckResults.primaryHoveringFingerIdx].TipPosition.ToVector3(), _mostRecentClosestPoint);
+        drawer.DrawSphere(_mostRecentClosestPoint, 0.005F);
+      }
+    }
   }
 
 }
