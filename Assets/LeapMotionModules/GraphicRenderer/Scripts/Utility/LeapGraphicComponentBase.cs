@@ -7,7 +7,7 @@ namespace Leap.Unity.GraphicalRenderer {
   where AttachedComponent : Component {
 
     protected virtual void Awake() {
-      OnValidate();
+
     }
 
     protected virtual void OnValidate() {
