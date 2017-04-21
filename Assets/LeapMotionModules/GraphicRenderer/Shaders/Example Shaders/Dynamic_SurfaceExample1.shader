@@ -3,16 +3,20 @@
     _MainTex ("Albedo (RGB)", 2D) = "white" {}
   }
   SubShader {
-    Tags { "RenderType"="Opaque" }
+    Tags { "Queue"="Transparent" "RenderType"="Transparent" }
     LOD 200
     
+    ZWrite Off
+    ZTest On
+
     CGPROGRAM
-    #pragma surface surf Standard fullforwardshadows vertex:vert addshadow 
+    #pragma surface surf Standard alpha:blend fullforwardshadows vertex:vert addshadow 
     #pragma target 3.0
 
     //Our graphics always has the following features
     #define GRAPHICS_HAVE_ID
     #define GRAPHIC_RENDERER_VERTEX_UV_0
+    #define GRAPHIC_RENDERER_VERTEX_COLORS
     #define GRAPHIC_RENDERER_VERTEX_NORMALS
     #define GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS
 
@@ -21,12 +25,12 @@
     #include "UnityCG.cginc"
 
     struct Input {
+      SURF_INPUT_GRAPHICAL
       float2 uv_MainTex;
-      float2 metalAndGloss;
+      float4 maskColor;
     };
 
-    DEFINE_FLOAT_CHANNEL(_Metallic);
-    DEFINE_FLOAT_CHANNEL(_Glossiness);
+    DEFINE_FLOAT4_CHANNEL(_MaskColor);
     sampler2D _MainTex;
 
     void vert(inout appdata_graphic_dynamic v, out Input o) {
@@ -35,15 +39,16 @@
 
       APPLY_DYNAMIC_GRAPHICS_STANDARD(v, o);
 
-      o.metalAndGloss.x = getChannel(_Metallic);
-      o.metalAndGloss.y = getChannel(_Glossiness);
+      o.color = v.color;
+      o.maskColor = getChannel(_MaskColor);
     }
 
     void surf(Input IN, inout SurfaceOutputStandard o) {
-      o.Albedo = tex2D(_MainTex, IN.uv_MainTex).rgb;
-      o.Metallic = IN.metalAndGloss.x;
-      o.Smoothness = IN.metalAndGloss.y;
-      o.Alpha = 1;
+      fixed4 color = tex2D(_MainTex, IN.uv_MainTex) * IN.color;
+      color = lerp(IN.maskColor, float4(color.rgb, 1), color.a);
+
+      o.Albedo = color.rgb;
+      o.Alpha = color.a;
     }
     ENDCG
   }

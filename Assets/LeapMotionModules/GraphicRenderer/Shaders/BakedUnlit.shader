@@ -25,13 +25,9 @@
 
       sampler2D _MainTex;
       sampler2D _MainTex2;
-
-      DEFINE_FLOAT_CHANNEL(_Wiggle);
       
       v2f_graphic_baked vert (appdata_graphic_baked v) {
         BEGIN_V2F(v);
-
-        v.vertex.x += getChannel(_Wiggle) * sin(_Time.z * 7 + v.vertex.y);
 
         v2f_graphic_baked o;
         APPLY_BAKED_GRAPHICS(v,o);

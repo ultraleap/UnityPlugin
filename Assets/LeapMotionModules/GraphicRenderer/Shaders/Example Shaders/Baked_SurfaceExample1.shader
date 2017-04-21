@@ -7,7 +7,7 @@
     LOD 200
     
     CGPROGRAM
-    #pragma surface surf Standard fullforwardshadows vertex:vert addshadow 
+    #pragma surface surf StandardSpecular fullforwardshadows vertex:vert addshadow 
     #pragma target 3.0
 
     #define GRAPHIC_RENDERER_VERTEX_UV_0
@@ -20,14 +20,15 @@
     #include "UnityCG.cginc"
 
     struct Input {
+      SURF_INPUT_GRAPHICAL
       float2 uv_MainTex;
       float2 metalAndGloss;
-      float4 emissionColor;
+      float4 specularColor;
     };
 
     DEFINE_FLOAT_CHANNEL(_Metallic);
     DEFINE_FLOAT_CHANNEL(_Glossiness);
-    DEFINE_FLOAT4_CHANNEL(_EmissionColor);
+    DEFINE_FLOAT4_CHANNEL(_SpecularColor);
     sampler2D _MainTex;
 
     void vert(inout appdata_graphic_baked v, out Input o) {
@@ -38,7 +39,7 @@
 
       o.metalAndGloss.x = getChannel(_Metallic);
       o.metalAndGloss.y = getChannel(_Glossiness);
-      o.emissionColor = getChannel(_EmissionColor);
+      o.specularColor = getChannel(_SpecularColor);
     }
 
     float3 hsv2rgb(float3 c) {
@@ -47,10 +48,9 @@
       return c.z * lerp(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
     }
 
-    void surf (Input IN, inout SurfaceOutputStandard o) {
+    void surf (Input IN, inout SurfaceOutputStandardSpecular o) {
       o.Albedo = tex2D(_MainTex, IN.uv_MainTex).rgb;
-      o.Emission = IN.emissionColor;
-      o.Metallic = IN.metalAndGloss.x;
+      o.Specular = IN.specularColor;
       o.Smoothness = IN.metalAndGloss.y;
     }
     ENDCG
