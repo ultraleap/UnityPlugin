@@ -104,7 +104,7 @@ namespace Leap.Unity.GraphicalRenderer {
     protected List<CustomMatrixChannelFeature> _matrixChannelFeatures = new List<CustomMatrixChannelFeature>();
 
     //### Generated Data ###
-    [SerializeField]
+    [SerializeField, HideInInspector]
     protected Material _material;
     [SerializeField, HideInInspector]
     protected RendererMeshData _meshes;
