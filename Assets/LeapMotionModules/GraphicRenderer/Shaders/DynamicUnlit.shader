@@ -39,7 +39,7 @@
         fixed4 color = fixed4(1,1,1,1);
 
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-        color *= dot(normalize(i.normal.xyz), float3(0, 0, 1));
+        color *= abs(dot(normalize(i.normal.xyz), float3(0, 0, 1)));
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_0

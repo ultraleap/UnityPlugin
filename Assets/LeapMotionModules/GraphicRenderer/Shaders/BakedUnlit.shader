@@ -38,11 +38,11 @@
       fixed4 frag (v2f_graphic_baked i) : SV_Target {
         fixed4 color = fixed4(1,1,1,1);
 
-#if GRAPHIC_RENDERER_VERTEX_UV_0
-        color *= tex2D(_MainTex, i.uv_0);
+#ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
+        color *= abs(dot(normalize(i.normal.xyz), float3(0, 0, 1)));
 #endif
 
-#if GRAPHIC_RENDERER_VERTEX_UV_0
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_0
         color *= tex2D(_MainTex2, i.uv_0);
 #endif
 
