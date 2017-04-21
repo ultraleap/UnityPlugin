@@ -168,6 +168,23 @@ namespace Leap.Unity.GraphicalRenderer {
         _maxAtlasSize
       };
 
+      if (_extraTextures == null) {
+        _extraTextures = new TextureReference[0];
+      }
+
+      for (int i = 0; i < _extraTextures.Length; i++) {
+        switch (_extraTextures[i].channel) {
+          case UVChannelFlags.UV0:
+          case UVChannelFlags.UV1:
+          case UVChannelFlags.UV2:
+          case UVChannelFlags.UV3:
+            break;
+          default:
+            _extraTextures[i].channel = UVChannelFlags.UV0;
+            break;
+        }
+      }
+
       foreach (var extra in _extraTextures) {
         _currHash.Add(extra.texture);
         _currHash.Add(extra.channel);
