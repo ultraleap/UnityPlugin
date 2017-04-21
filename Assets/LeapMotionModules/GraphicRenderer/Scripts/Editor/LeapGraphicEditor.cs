@@ -192,6 +192,17 @@ namespace Leap.Unity.GraphicalRenderer {
 
           EditorGUI.BeginChangeCheck();
           EditorGUILayout.LabelField(LeapGraphicTagAttribute.GetTag(mainDataType));
+
+          if (targets.Length == 1) {
+            Rect dragRect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.MouseDrag && dragRect.Contains(Event.current.mousePosition)) {
+              DragAndDrop.PrepareStartDrag();
+              DragAndDrop.objectReferences = new UnityEngine.Object[] { mainDataObj };
+              DragAndDrop.StartDrag("Component");
+              Event.current.Use();
+            }
+          }
+
           EditorGUI.indentLevel++;
 
           editor.OnInspectorGUI();
