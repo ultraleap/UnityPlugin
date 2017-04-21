@@ -2,7 +2,7 @@ using InteractionEngineUtility;
 using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Space;
 using Leap.Unity.UI.Interaction.Internal;
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -120,7 +120,7 @@ namespace Leap.Unity.UI.Interaction {
           _warpedHandData.CopyFrom(_handData);
           if (_hoverResults.primaryHovered != null && (space = _hoverResults.primaryHovered.space) != null) {
             //Transform bulk hand to the closest element's warped space
-            coarseInverseTransformHand(_warpedHandData, space);
+            inverseTransformHand(_warpedHandData, space);
           }
         }
       }
@@ -164,13 +164,17 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public void coarseInverseTransformHand(Hand inHand, ISpaceComponent element) {
+    private void inverseTransformHand(Hand inHand, ISpaceComponent element) {
       if (element.anchor != null && element.anchor.space != null) {
-        Vector3 localPalmPos = element.anchor.space.transform.InverseTransformPoint(inHand.PalmPosition.ToVector3());
-        Quaternion localPalmRot = element.anchor.space.transform.InverseTransformRotation(inHand.Rotation.ToQuaternion());
+        Vector3 originalPosition = inHand.Fingers[hoverCheckResults.primaryHoveringFingerIdx].bones[3].NextJoint.ToVector3();
+        Quaternion originalRotation = inHand.Fingers[hoverCheckResults.primaryHoveringFingerIdx].bones[3].Rotation.ToQuaternion();
 
-        inHand.SetTransform(element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPalmPos)),
-                            element.anchor.space.transform.TransformRotation(element.anchor.transformer.InverseTransformRotation(localPalmPos, localPalmRot)));
+        Vector3 localTipPos = element.anchor.space.transform.InverseTransformPoint(originalPosition);
+        Quaternion localTipRot = element.anchor.space.transform.InverseTransformRotation(originalRotation);
+
+        inHand.Transform(-originalPosition, Quaternion.identity);
+        inHand.Transform(element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localTipPos)),
+                         element.anchor.space.transform.TransformRotation(element.anchor.transformer.InverseTransformRotation(localTipPos, localTipRot)) * Quaternion.Inverse(originalRotation));
       }
     }
 
@@ -534,13 +538,12 @@ namespace Leap.Unity.UI.Interaction {
     //private Dictionary<Rigidbody, PhysicsUtility.Velocities> originalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>();
 
     //private List<int> _softContactIdxRemovalBuffer = new List<int>();
-    
+
     private void FixedUpdateSoftContact() {
       if (_hand == null) {
         _handWasNullLastFrame = true;
         return;
-      }
-      else {
+      } else {
         // If the hand was just initialized, initialize with soft contact.
         if (_handWasNullLastFrame) {
           EnableSoftContact();
