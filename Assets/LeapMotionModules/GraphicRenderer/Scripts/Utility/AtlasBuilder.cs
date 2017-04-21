@@ -84,6 +84,9 @@ namespace Leap.Unity.GraphicalRenderer {
     [EditTimeOnly, SerializeField]
     private int _maxAtlasSize = 4096;
 
+    [SerializeField]
+    private TextureReference[] _extraTextures;
+
     public int border {
       get {
         return _border;
@@ -149,15 +152,12 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     private List<LeapTextureFeature> _features = new List<LeapTextureFeature>();
-    private Texture2D[] _textureArray;
     private Hash _atlasHash = 1;
     private Hash _currHash = 0;
 
     public void UpdateTextureList(List<LeapTextureFeature> textureFeatures) {
       _features.Clear();
       _features.AddRange(textureFeatures);
-
-      _textureArray = new Texture2D[_features[0].featureData.Count];
 
       _currHash = new Hash() {
         _border,
@@ -167,6 +167,11 @@ namespace Leap.Unity.GraphicalRenderer {
         _format,
         _maxAtlasSize
       };
+
+      foreach (var extra in _extraTextures) {
+        _currHash.Add(extra.texture);
+        _currHash.Add(extra.channel);
+      }
 
       foreach (var feature in _features) {
         _currHash.Add(feature.channel);
@@ -213,11 +218,16 @@ namespace Leap.Unity.GraphicalRenderer {
       if (mainTextureFeature == null) return;
 
       Texture2D defaultTexture, packedTexture;
+      Texture2D[] rawTextureArray, processedTextureArray;
+
       progress.Step("Prepare " + channel);
-      prepareForPacking(mainTextureFeature, out defaultTexture, out packedTexture);
+      prepareForPacking(mainTextureFeature, out defaultTexture,
+                                            out packedTexture,
+                                            out rawTextureArray,
+                                            out processedTextureArray);
 
       progress.Step("Pack " + channel);
-      var packedRects = packedTexture.PackTextures(_textureArray,
+      var packedRects = packedTexture.PackTextures(processedTextureArray,
                                                     _padding,
                                                     _maxAtlasSize,
                                                     makeNoLongerReadable: false);
@@ -233,7 +243,7 @@ namespace Leap.Unity.GraphicalRenderer {
         float dy = 1.0f / packedTexture.height;
         Rect r = packedRects[i];
 
-        if (_textureArray[i] != defaultTexture) {
+        if (processedTextureArray[i] != defaultTexture) {
           dx *= _border;
           dy *= _border;
         }
@@ -245,8 +255,8 @@ namespace Leap.Unity.GraphicalRenderer {
         packedRects[i] = r;
       }
 
-      for (int i = 0; i < _textureArray.Length; i++) {
-        channelMapping.SetRect(channel.Index(), mainTextureFeature.featureData[i].texture, packedRects[i]);
+      for (int i = 0; i < rawTextureArray.Length; i++) {
+        channelMapping.SetRect(channel.Index(), rawTextureArray[i], packedRects[i]);
       }
     }
 
@@ -326,13 +336,28 @@ namespace Leap.Unity.GraphicalRenderer {
 
     private void prepareForPacking(LeapTextureFeature feature,
                                       out Texture2D defaultTexture,
-                                      out Texture2D packedTexture) {
-      feature.featureData.Query().Select(dataObj => processTexture(dataObj.texture)).FillArray(_textureArray);
+                                      out Texture2D packedTexture,
+                                      out Texture2D[] rawTextureArray,
+                                      out Texture2D[] processedTextureArray) {
+      if (_extraTextures == null) {
+        _extraTextures = new TextureReference[0];
+      }
+
+      rawTextureArray = feature.featureData.Query().
+                                            Select(dataObj => dataObj.texture).
+                                            Concat(_extraTextures.Query().
+                                                                  Where(p => p.channel == feature.channel).
+                                                                  Select(p => p.texture)).
+                                            ToArray();
+
+      processedTextureArray = rawTextureArray.Query().
+                                              Select(t => processTexture(t)).
+                                              ToArray();
 
       defaultTexture = getDefaultTexture(Color.white); //TODO, pull color from feature data
-      for (int i = 0; i < _textureArray.Length; i++) {
-        if (_textureArray[i] == null) {
-          _textureArray[i] = defaultTexture;
+      for (int i = 0; i < processedTextureArray.Length; i++) {
+        if (processedTextureArray[i] == null) {
+          processedTextureArray[i] = defaultTexture;
         }
       }
 
@@ -402,6 +427,12 @@ namespace Leap.Unity.GraphicalRenderer {
         _cachedDefaultTextures[color] = texture;
       }
       return texture;
+    }
+
+    [Serializable]
+    public class TextureReference {
+      public Texture2D texture;
+      public UVChannelFlags channel = UVChannelFlags.UV0;
     }
   }
 }
