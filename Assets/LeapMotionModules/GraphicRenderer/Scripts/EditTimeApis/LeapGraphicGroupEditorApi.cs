@@ -22,9 +22,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       public void OnValidate() {
-        if (_group._renderer == null) {
-          _group._renderer = _group.GetComponent<LeapGraphicRenderer>();
-        }
+        _group._renderer = _group.GetComponent<LeapGraphicRenderer>();
 
         if (!Application.isPlaying) {
           _group._addRemoveSupported = true;
@@ -44,6 +42,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
         AttachedObjectHandler.Validate(_group, ref _group._renderingMethod);
         AttachedObjectHandler.Validate(_group, _group._features);
+
+        Assert.IsNotNull(_group._renderingMethod, "Rendering method of a group should never be null.");
 
         if (_group._renderingMethod != null) {
           _group._renderingMethod.renderer = _group._renderer;

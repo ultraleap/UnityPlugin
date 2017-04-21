@@ -42,6 +42,10 @@ namespace Leap.Unity.GraphicalRenderer {
 
         AttachedObjectHandler.Validate(_renderer, _renderer._groups);
 
+        foreach (var group in _renderer._groups) {
+          group.editor.OnValidate();
+        }
+
         UnityEditor.EditorApplication.delayCall += () => {
           //Destroy any features that are not referenced by a group
           var referenced = Pool<HashSet<LeapGraphicFeatureBase>>.Spawn();

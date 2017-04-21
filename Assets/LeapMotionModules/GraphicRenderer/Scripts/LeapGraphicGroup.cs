@@ -20,10 +20,10 @@ namespace Leap.Unity.GraphicalRenderer {
     #endregion
 
     #region PRIVATE VARIABLES
-    [SerializeField, HideInInspector]
+    [SerializeField]
     private LeapGraphicRenderer _renderer;
 
-    [SerializeField, HideInInspector]
+    [SerializeField]
     private List<LeapGraphic> _graphics = new List<LeapGraphic>();
 
     [SerializeField, HideInInspector]

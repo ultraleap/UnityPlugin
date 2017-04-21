@@ -194,8 +194,6 @@ namespace Leap.Unity.GraphicalRenderer {
           TryAddGraphic(graphic);
         }
       }
-
-
     }
 
     private void doLateUpdateRuntime() {
