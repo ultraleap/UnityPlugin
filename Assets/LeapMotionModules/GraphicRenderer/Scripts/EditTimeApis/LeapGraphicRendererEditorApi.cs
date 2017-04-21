@@ -47,6 +47,10 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         UnityEditor.EditorApplication.delayCall += () => {
+          if (_renderer == null) {
+            return;
+          }
+
           //Destroy any features that are not referenced by a group
           var referenced = Pool<HashSet<LeapGraphicFeatureBase>>.Spawn();
           var attached = Pool<List<LeapGraphicFeatureBase>>.Spawn();
