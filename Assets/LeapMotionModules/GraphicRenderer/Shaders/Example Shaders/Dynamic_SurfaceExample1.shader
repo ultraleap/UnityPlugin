@@ -14,7 +14,6 @@
     #pragma target 3.0
 
     //Our graphics always has the following features
-    #define GRAPHICS_HAVE_ID
     #define GRAPHIC_RENDERER_VERTEX_UV_0
     #define GRAPHIC_RENDERER_VERTEX_COLORS
     #define GRAPHIC_RENDERER_VERTEX_NORMALS
