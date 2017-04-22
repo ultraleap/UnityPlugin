@@ -1,5 +1,9 @@
 #include "Assets/LeapMotionModules/GraphicRenderer/Resources/GraphicRenderer.cginc"
 
+#ifdef GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS
+#define GRAPHICS_HAVE_ID
+#endif
+
 /*************************************************************************
  * Movement name:
  *  _ (none)
