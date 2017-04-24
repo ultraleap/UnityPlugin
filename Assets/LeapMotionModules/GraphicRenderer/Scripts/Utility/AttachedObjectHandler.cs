@@ -7,6 +7,7 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
+#if UNITY_EDITOR
   public static class SerializedObjectExtensions {
 
     /// <summary>
@@ -64,7 +65,7 @@ namespace Leap.Unity.GraphicalRenderer {
       foreach (var unreferencedK in unreferencedKs) {
         InternalUtility.Destroy(unreferencedK);
       }
-      
+
       Undo.RecordObject(t, "Changed attached value on " + t.name);
 
       k = newK;
@@ -118,7 +119,6 @@ namespace Leap.Unity.GraphicalRenderer {
 
         Undo.RecordObject(newK, "Updated serialized data on " + newK.name);
         EditorUtility.CopySerialized(oldK, newK);
-        Undo.RecordObject(newK, "uhhhh");
 
         newKs.Add(newK);
       }
@@ -155,4 +155,5 @@ namespace Leap.Unity.GraphicalRenderer {
       return existingsKs;
     }
   }
+#endif
 }
