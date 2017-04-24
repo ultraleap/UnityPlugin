@@ -42,6 +42,17 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     /// <summary>
+    /// Gets the distance from this object to the palm of the closest hand to this object,
+    /// or float.PositiveInfinity of no hand is nearby.
+    /// </summary>
+    public float closestHoveringHandDistance {
+      get {
+        return _closestHoveringHand == null ?
+               float.PositiveInfinity : GetComparativeHoverDistance(_closestHoveringHand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
+      }
+    }
+
+    /// <summary>
     /// Gets whether this object is the primary hover for any Interaction Hand.
     /// </summary>
     public bool isPrimaryHovered { get { return _primaryHoveringHands.Count > 0; } }
