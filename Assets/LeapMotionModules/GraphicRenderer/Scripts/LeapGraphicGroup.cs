@@ -299,30 +299,15 @@ namespace Leap.Unity.GraphicalRenderer {
     protected override void OnValidate() {
       base.OnValidate();
 
-      if (_renderer == null) {
-        _renderer = GetComponent<LeapGraphicRenderer>();
-      }
-
-      if (!Application.isPlaying) {
-        _addRemoveSupported = true;
-        if (_renderingMethod != null) {
-          _addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(renderingMethod.GetType());
-        }
-        if (_renderer.space != null) {
-          _addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(_renderer.space.GetType());
-        }
-      }
-
       for (int i = _features.Count; i-- != 0;) {
         if (_features[i] == null) {
           _features.RemoveAt(i);
         }
       }
 
-      if (_renderingMethod != null) {
-        _renderingMethod.renderer = _renderer;
-        _renderingMethod.group = this;
-      }
+#if UNITY_EDITOR
+      editor.OnValidate();
+#endif
     }
 
 #if UNITY_EDITOR

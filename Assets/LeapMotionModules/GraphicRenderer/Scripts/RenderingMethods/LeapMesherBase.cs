@@ -240,6 +240,10 @@ namespace Leap.Unity.GraphicalRenderer {
     public override void OnDisableRenderer() { }
 
     public override void OnUpdateRenderer() {
+      if (_material == null) {
+        prepareMaterial();
+      }
+
       updateTinting();
       updateBlendShapes();
       updateCustomChannels();

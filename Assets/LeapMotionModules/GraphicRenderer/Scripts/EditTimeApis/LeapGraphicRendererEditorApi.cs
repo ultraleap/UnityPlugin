@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Leap.Unity.Space;
@@ -31,7 +32,46 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       public void OnValidate() {
+        for (int i = _renderer._groups.Count; i-- > 0;) {
+          if (_renderer._groups[i] == null) {
+            _renderer._groups.RemoveAt(i);
+          }
+        }
+
         validateSpaceComponent();
+
+        AttachedObjectHandler.Validate(_renderer, _renderer._groups);
+
+        foreach (var group in _renderer._groups) {
+          group.editor.OnValidate();
+        }
+
+        UnityEditor.EditorApplication.delayCall += () => {
+          if (_renderer == null) {
+            return;
+          }
+
+          //Destroy any features that are not referenced by a group
+          var referenced = Pool<HashSet<LeapGraphicFeatureBase>>.Spawn();
+          var attached = Pool<List<LeapGraphicFeatureBase>>.Spawn();
+          try {
+            foreach (var group in _renderer._groups) {
+              referenced.UnionWith(group.features);
+            }
+
+            _renderer.GetComponents(attached);
+            for (int i = attached.Count; i-- != 0;) {
+              if (!referenced.Contains(attached[i])) {
+                InternalUtility.Destroy(attached[i]);
+              }
+            }
+          } finally {
+            referenced.Clear();
+            attached.Clear();
+            Pool<HashSet<LeapGraphicFeatureBase>>.Recycle(referenced);
+            Pool<List<LeapGraphicFeatureBase>>.Recycle(attached);
+          }
+        };
       }
 
       public void OnDestroy() {
@@ -43,7 +83,7 @@ namespace Leap.Unity.GraphicalRenderer {
         AssertHelper.AssertEditorOnly();
         Assert.IsNotNull(rendererType);
 
-        var group = _renderer.gameObject.AddComponent<LeapGraphicGroup>();
+        var group = InternalUtility.AddComponent<LeapGraphicGroup>(_renderer.gameObject);
         group.editor.Init(_renderer, rendererType);
 
         _renderer._selectedGroup = _renderer._groups.Count;

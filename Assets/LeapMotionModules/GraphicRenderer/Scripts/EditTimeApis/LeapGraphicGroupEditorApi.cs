@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Assertions;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -18,6 +19,36 @@ namespace Leap.Unity.GraphicalRenderer {
 
       public EditorApi(LeapGraphicGroup group) {
         _group = group;
+      }
+
+      public void OnValidate() {
+        _group._renderer = _group.GetComponent<LeapGraphicRenderer>();
+
+        if (!Application.isPlaying) {
+          _group._addRemoveSupported = true;
+          if (_group._renderingMethod != null) {
+            _group._addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(_group._renderingMethod.GetType());
+          }
+          if (_group._renderer.space != null) {
+            _group._addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(_group._renderer.space.GetType());
+          }
+        }
+
+        for (int i = _group._features.Count; i-- != 0;) {
+          if (_group._features[i] == null) {
+            _group._features.RemoveAt(i);
+          }
+        }
+
+        AttachedObjectHandler.Validate(_group, ref _group._renderingMethod);
+        AttachedObjectHandler.Validate(_group, _group._features);
+
+        Assert.IsNotNull(_group._renderingMethod, "Rendering method of a group should never be null.");
+
+        if (_group._renderingMethod != null) {
+          _group._renderingMethod.renderer = _group._renderer;
+          _group._renderingMethod.group = _group;
+        }
       }
 
       public void OnDestroyedByUser() {
@@ -50,7 +81,7 @@ namespace Leap.Unity.GraphicalRenderer {
           _group._renderingMethod = null;
         }
 
-        _group._renderingMethod = _group.gameObject.AddComponent(renderingMethodType) as LeapRenderingMethod;
+        _group._renderingMethod = InternalUtility.AddComponent(_group.gameObject, renderingMethodType) as LeapRenderingMethod;
         Assert.IsNotNull(_group._renderingMethod);
         _group._renderingMethod.renderer = _group._renderer;
         _group._renderingMethod.group = _group;
@@ -92,13 +123,13 @@ namespace Leap.Unity.GraphicalRenderer {
         AssertHelper.AssertEditorOnly();
         _group._renderer.editor.ScheduleEditorUpdate();
 
-        var feature = _group.gameObject.AddComponent(featureType) as LeapGraphicFeatureBase;
+        Undo.RecordObject(_group, "Added feature");
+
+        var feature = InternalUtility.AddComponent(_group.gameObject, featureType) as LeapGraphicFeatureBase;
         _group._features.Add(feature);
 
         _group.RebuildFeatureData();
         _group.RebuildFeatureSupportInfo();
-
-        EditorUtility.SetDirty(_group);
 
         return feature;
       }
@@ -106,6 +137,8 @@ namespace Leap.Unity.GraphicalRenderer {
       public void RemoveFeature(LeapGraphicFeatureBase feature) {
         AssertHelper.AssertEditorOnly();
         Assert.IsTrue(_group._features.Contains(feature));
+
+        Undo.RecordObject(_group, "Removed feature " + feature.name);
 
         _group._features.Remove(feature);
         InternalUtility.Destroy(feature);

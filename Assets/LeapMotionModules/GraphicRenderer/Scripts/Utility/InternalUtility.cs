@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
-using UnityEditorInternal;
 #endif
 
 namespace Leap.Unity.GraphicalRenderer {
@@ -15,27 +14,15 @@ namespace Leap.Unity.GraphicalRenderer {
   public static class InternalUtility {
 
 #if UNITY_EDITOR
+    public static Action OnAnySave;
+
+    private static List<UnityEngine.Object> toDestroy = new List<UnityEngine.Object>();
+    private static List<InvokeStruct> _invokeList = new List<InvokeStruct>();
+
     static InternalUtility() {
       EditorApplication.update += destroyLoop;
     }
 
-    public static Action OnAnySave;
-
-    public class SaveWatcher : UnityEditor.AssetModificationProcessor {
-      static string[] OnWillSaveAssets(string[] paths) {
-        EditorApplication.delayCall += dispatchOnAnySave;
-        return paths;
-      }
-    }
-
-    private static void dispatchOnAnySave() {
-      if (OnAnySave != null) {
-        OnAnySave();
-      }
-    }
-#endif
-
-#if UNITY_EDITOR
     /// <summary>
     /// Call this method from within OnDestroy.  The action will only be invoked if
     /// the object was deleted during EDIT MODE, and that destruction was not caused
@@ -53,32 +40,44 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 #endif
 
+    /// <summary>
+    /// This method functions in the same was as gameObject.AddComponent, except it
+    /// includes Undo functionality by default when running in the editor.
+    /// </summary>
+    public static T AddComponent<T>(GameObject obj) where T : Component {
 #if UNITY_EDITOR
-    private static List<Component> _cachedComponentList0 = new List<Component>();
-    private static List<Component> _cachedComponentList1 = new List<Component>();
-    private static List<InvokeStruct> _invokeList = new List<InvokeStruct>();
-    public static bool TryMoveComponent<T>(T source, GameObject toGameObject, out T result)
-      where T : Component {
-      ComponentUtility.CopyComponent(source);
-
-      toGameObject.GetComponents(_cachedComponentList0);
-      ComponentUtility.PasteComponentAsNew(toGameObject);
-      toGameObject.GetComponents(_cachedComponentList1);
-
-      foreach (var component in _cachedComponentList1) {
-        if (!_cachedComponentList0.Contains(component) && component is T) {
-          Destroy(source);
-          result = component as T;
-          return true;
-        }
-      }
-
-      result = null;
-      return false;
-    }
+      if (!Application.isPlaying) {
+        return Undo.AddComponent<T>(obj);
+      } else
 #endif
+      {
+        return obj.AddComponent<T>();
+      }
+    }
 
-    private static List<UnityEngine.Object> toDestroy = new List<UnityEngine.Object>();
+    /// <summary>
+    /// This method functions in the same was as gameObject.AddComponent, except it
+    /// includes Undo functionality by default when running in the editor.
+    /// </summary>
+    public static Component AddComponent(GameObject obj, Type type) {
+#if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        return Undo.AddComponent(obj, type);
+      } else
+#endif
+      {
+        return obj.AddComponent(type);
+      }
+    }
+
+    /// <summary>
+    /// This method functions in the same way as Object.Destroy(), except it
+    /// includes Undo functionality by default when running in the editor, and
+    /// is safe to call from within 'forbidden' callbacks like OnValidate.  
+    /// 
+    /// Like Object.Destroy this method doesn't actually destroy the object 
+    /// right away, but instead destroys it at a slightly later point in time.
+    /// </summary>
     public static void Destroy(UnityEngine.Object obj) {
 #if UNITY_EDITOR
       if (Application.isPlaying) {
@@ -111,10 +110,16 @@ namespace Leap.Unity.GraphicalRenderer {
         for (int i = 0; i < toDestroy.Count; i++) {
           var obj = toDestroy[i];
           if (obj != null) {
-            UnityEngine.Object.DestroyImmediate(obj);
+            Undo.DestroyObjectImmediate(obj);
           }
         }
         toDestroy.Clear();
+      }
+    }
+
+    private static void dispatchOnAnySave() {
+      if (OnAnySave != null) {
+        OnAnySave();
       }
     }
 
@@ -125,6 +130,13 @@ namespace Leap.Unity.GraphicalRenderer {
       public InvokeStruct(Action action) {
         this.action = action;
         scene = SceneManager.GetActiveScene();
+      }
+    }
+
+    public class SaveWatcher : UnityEditor.AssetModificationProcessor {
+      static string[] OnWillSaveAssets(string[] paths) {
+        EditorApplication.delayCall += dispatchOnAnySave;
+        return paths;
       }
     }
 #endif

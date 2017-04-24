@@ -59,7 +59,6 @@ namespace Leap.Unity.GraphicalRenderer {
         if (t == null) {
           t = CreateInstance<T>();
           t.name = assetName;
-          t.hideFlags = HideFlags.HideAndDontSave;
         }
 
         didChange = true;
@@ -69,7 +68,6 @@ namespace Leap.Unity.GraphicalRenderer {
           if (otherHolder != holder) {
             t = CreateInstance<T>();
             t.name = assetName;
-            t.hideFlags = HideFlags.HideAndDontSave;
             didChange = true;
           }
         }

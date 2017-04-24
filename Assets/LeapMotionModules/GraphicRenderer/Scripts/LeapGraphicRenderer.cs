@@ -150,16 +150,27 @@ namespace Leap.Unity.GraphicalRenderer {
 
       HashSet<LeapGraphic> set = Pool<HashSet<LeapGraphic>>.Spawn();
       foreach (var group in _groups) {
-        foreach (var graphic in group.graphics) {
-          set.Add(graphic);
+        for (int i = group.graphics.Count; i-- != 0;) {
+          if (group.graphics[i] == null) {
+            group.graphics.RemoveAt(i);
+          } else {
+            set.Add(group.graphics[i]);
+          }
         }
 
         foreach (var graphic in _tempGraphicList) {
-          //If the graphic claims it is attached to this group, but it really isn't, remove
-          //it and re-add it.
-          if (graphic.attachedGroup == group && !set.Contains(graphic)) {
-            group.TryRemoveGraphic(graphic);
-            group.TryAddGraphic(graphic);
+          if (graphic.isAttachedToGroup) {
+            //If the graphic claims it is attached to this group, but it really isn't, remove
+            //it and re-add it.
+            bool graphicThinksItsInGroup = graphic.attachedGroup == group;
+            bool isActuallyInGroup = set.Contains(graphic);
+
+            //Also re add it if it is attached to a completely different renderer!
+            if (graphicThinksItsInGroup != isActuallyInGroup ||
+                graphic.attachedGroup.renderer != this) {
+              group.TryRemoveGraphic(graphic);
+              group.TryAddGraphic(graphic);
+            }
           }
         }
 
@@ -190,8 +201,6 @@ namespace Leap.Unity.GraphicalRenderer {
           TryAddGraphic(graphic);
         }
       }
-
-
     }
 
     private void doLateUpdateRuntime() {
