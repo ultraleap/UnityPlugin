@@ -705,8 +705,21 @@ namespace Leap.Unity.UI.Interaction {
       foreach (var collider in _primaryHoverColliders) {
         if (!hasColliders) hasColliders = true;
 
-        testDistance = (Physics.ClosestPoint(worldPosition, collider, collider.transform.position, collider.transform.rotation)
-                        - worldPosition).magnitude;
+        if (((collider is SphereCollider) && (collider as SphereCollider).center != Vector3.zero)
+            || ((collider is BoxCollider) && (collider as BoxCollider).center != Vector3.zero)
+            || ((collider is CapsuleCollider) && (collider as CapsuleCollider).center != Vector3.zero)) {
+
+          _mostRecentClosestPoint = collider.transform.TransformPoint(collider.ClosestPointOnSurface(collider.transform.InverseTransformPoint(worldPosition)));
+
+          // Custom, slower ClosestPoint
+          testDistance = (collider.transform.TransformPoint(collider.ClosestPointOnSurface(collider.transform.InverseTransformPoint(worldPosition)))
+                          - worldPosition).magnitude;
+        }
+        else {
+          // Native, faster ClosestPoint (no support for off-center colliders)
+          testDistance = (Physics.ClosestPoint(worldPosition, collider, collider.transform.position, collider.transform.rotation)
+                          - worldPosition).magnitude;
+        }
 
         if (testDistance < closestComparativeColliderDistance) {
           closestComparativeColliderDistance = testDistance;
