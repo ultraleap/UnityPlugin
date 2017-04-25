@@ -45,10 +45,6 @@ namespace Leap.Unity.Examples.TransformHandles {
       }
     }
 
-    void Update() {
-
-    }
-
     private struct PositionRotationOffset {
       public Vector3 pos; public Quaternion rot;
     }
