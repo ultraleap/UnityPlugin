@@ -6,15 +6,21 @@ using UnityEngine;
 
 namespace Leap.Unity.Examples.TransformHandles {
 
+  [AddComponentMenu("")]
   public class RotationHandle : InteractionTransformHandle {
 
-    protected override void Start() {
-      base.Start();
-      
+    protected virtual void OnEnable() {
       // Parent class stores the InteractionBehaviour component in _intObj.
       _intObj.OnGraspBegin += onGraspBegin;
       _intObj.OnGraspedMovement += onGraspedMovement;
       _intObj.OnGraspEnd += onGraspEnd;
+    }
+
+    protected virtual void OnDisable() {
+      // Parent class stores the InteractionBehaviour component in _intObj.
+      _intObj.OnGraspBegin -= onGraspBegin;
+      _intObj.OnGraspedMovement -= onGraspedMovement;
+      _intObj.OnGraspEnd -= onGraspEnd;
     }
 
     private void onGraspBegin(List<InteractionHand> hands) {

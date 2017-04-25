@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Examples.TransformHandles {
 
+  [AddComponentMenu("")]
   [RequireComponent(typeof(InteractionBehaviour))]
   public class ColorOnGrab : MonoBehaviour {
 
@@ -13,7 +14,7 @@ namespace Leap.Unity.Examples.TransformHandles {
     public string materialEmissionProperty = "_EmissionColor";
     public Color grabbedEmission = Color.white;
 
-    private InteractionBehaviour _interaction;
+    private InteractionBehaviour _intObj;
 
     private Material _materialInstance;
     private Color _defaultColor;
@@ -21,34 +22,43 @@ namespace Leap.Unity.Examples.TransformHandles {
     private int _materialColorPropertyId;
     private int _materialEmissionPropertyId;
 
-    void OnValidate() {
-      _materialColorPropertyId = Shader.PropertyToID(materialColorProperty);
-      _materialEmissionPropertyId = Shader.PropertyToID(materialEmissionProperty);
-    }
-
-    void Start() {
-      _interaction = GetComponent<InteractionBehaviour>();
-      _interaction.OnGraspBegin += onGraspBegin;
-      _interaction.OnGraspEnd += onGraspEnd;
+    void Awake() {
+      _intObj = GetComponent<InteractionBehaviour>();
 
       MeshRenderer renderer = GetComponentInChildren<MeshRenderer>();
       if (renderer != null) {
         _materialInstance = renderer.material;
+
         _materialColorPropertyId = Shader.PropertyToID(materialColorProperty);
         _materialEmissionPropertyId = Shader.PropertyToID(materialEmissionProperty);
+
         _defaultColor = _materialInstance.GetColor(_materialColorPropertyId);
         _defaultEmission = _materialInstance.GetColor(_materialEmissionPropertyId);
       }
     }
 
-    private void onGraspBegin(List<InteractionHand> hands) {
-      _materialInstance.SetColor(_materialColorPropertyId, grabbedColor);
-      _materialInstance.SetColor(_materialEmissionPropertyId, grabbedEmission);
+    void OnEnable() {
+      _intObj.OnObjectGraspBegin += onObjectGraspBegin;
+      _intObj.OnObjectGraspEnd += onObjectGraspEnd;
     }
 
-    private void onGraspEnd(List<InteractionHand> hands) {
-      _materialInstance.SetColor(_materialColorPropertyId, _defaultColor);
-      _materialInstance.SetColor(_materialEmissionPropertyId, _defaultEmission);
+    void OnDisable() {
+      _intObj.OnObjectGraspBegin -= onObjectGraspBegin;
+      _intObj.OnObjectGraspEnd -= onObjectGraspEnd;
+    }
+
+    private void onObjectGraspBegin(List<InteractionHand> hands) {
+      if (_materialInstance != null) {
+        _materialInstance.SetColor(_materialColorPropertyId, grabbedColor);
+        _materialInstance.SetColor(_materialEmissionPropertyId, grabbedEmission);
+      }
+    }
+
+    private void onObjectGraspEnd(List<InteractionHand> hands) {
+      if (_materialInstance != null) {
+        _materialInstance.SetColor(_materialColorPropertyId, _defaultColor);
+        _materialInstance.SetColor(_materialEmissionPropertyId, _defaultEmission);
+      }
     }
 
   }

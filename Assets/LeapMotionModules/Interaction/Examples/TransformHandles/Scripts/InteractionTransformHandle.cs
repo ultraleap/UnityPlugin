@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Examples.TransformHandles {
 
+  [AddComponentMenu("")]
   [RequireComponent(typeof(InteractionBehaviour))]
   public abstract class InteractionTransformHandle : MonoBehaviour {
 
@@ -19,8 +20,13 @@ namespace Leap.Unity.Examples.TransformHandles {
     public Action<InteractionTransformHandle> onHandleActivated = (handle) => { };
     public Action<InteractionTransformHandle> onHandleDeactivated = (handle) => { };
 
-    protected virtual void Start() {
+    protected virtual void Awake() {
       _tool = GetComponentInParent<TransformTool>();
+
+      if (_tool == null) {
+        Debug.LogError("Couldn't find a TransformTool in one of an InteractionTransformHandle's parent transforms.", this.gameObject);
+      }
+
       _intObj = GetComponent<InteractionBehaviour>();
       _meshRenderer = GetComponent<MeshRenderer>();
     }
@@ -29,10 +35,10 @@ namespace Leap.Unity.Examples.TransformHandles {
       if (_intObj.isHovered && Vector3.Distance(this.transform.position,
                                                _intObj.closestHoveringHand.PalmPosition.ToVector3())
                                                   < MIN_RENDER_DISTANCE) {
-        _meshRenderer.enabled = true;
+        if (_meshRenderer != null) _meshRenderer.enabled = true;
       }
       else {
-        _meshRenderer.enabled = false;
+        if (_meshRenderer != null) _meshRenderer.enabled = false;
       }
     }
 

@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Examples.TransformHandles {
 
+  [AddComponentMenu("")]
   public class SimpleScaleOnHover : MonoBehaviour {
 
     private InteractionBehaviour _intObj;

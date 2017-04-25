@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Examples.TransformHandles {
 
+  [AddComponentMenu("")]
   public class TransformTool : MonoBehaviour {
 
     public GameObject targetObject;
@@ -16,6 +17,11 @@ namespace Leap.Unity.Examples.TransformHandles {
     void Start() {
       foreach (InteractionTransformHandle handle in GetComponentsInChildren<InteractionTransformHandle>()) {
         _transformHandles.Add(handle);
+
+        // Prevent duplicate subscriptions -- no-op if already subscribed
+        handle.onHandleActivated -= onHandleActivated;
+        handle.onHandleDeactivated -= onHandleDeactivated;
+
         handle.onHandleActivated += onHandleActivated;
         handle.onHandleDeactivated += onHandleDeactivated;
       }
