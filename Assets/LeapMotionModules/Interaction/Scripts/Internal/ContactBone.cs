@@ -1,9 +1,15 @@
-﻿using Leap.Unity.UI.Interaction.Internal;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.UI.Interaction.Internal {
 
-  public class BrushBone : MonoBehaviour {
+  /// <summary>
+  /// Contact Bones store data for the colliders and rigidbodies in each
+  /// bone of the contact-related representation of an InteractionHand.
+  /// They also notify the InteractionHand of collisions for further
+  /// processing.
+  /// </summary>
+  [AddComponentMenu("")]
+  public class ContactBone : MonoBehaviour {
 
     public InteractionHand interactionHand;
     public Rigidbody body;

@@ -333,7 +333,7 @@ namespace Leap.Unity.UI.Interaction {
     private const float DEAD_ZONE_FRACTION = 0.1F;
     private const float DISLOCATION_FRACTION = 3.0F;
 
-    private BrushBone[] _brushBones;
+    private ContactBone[] _brushBones;
     private GameObject _brushBoneParent;
 
     private PhysicMaterial _material;
@@ -383,7 +383,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private void InitBrushBones() {
-      _brushBones = new BrushBone[NUM_FINGERS * BONES_PER_FINGER + 1];
+      _brushBones = new ContactBone[NUM_FINGERS * BONES_PER_FINGER + 1];
 
       // Finger bones
       for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
@@ -391,7 +391,7 @@ namespace Leap.Unity.UI.Interaction {
           Bone bone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
           int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
 
-          GameObject contactBoneObj = new GameObject("Contact Fingerbone", typeof(CapsuleCollider), typeof(Rigidbody), typeof(BrushBone));
+          GameObject contactBoneObj = new GameObject("Contact Fingerbone", typeof(CapsuleCollider), typeof(Rigidbody), typeof(ContactBone));
           contactBoneObj.layer = interactionManager.ContactBoneLayer;
 
           contactBoneObj.transform.position = bone.Center.ToVector3();
@@ -402,7 +402,7 @@ namespace Leap.Unity.UI.Interaction {
           capsule.height = bone.Length + bone.Width;
           capsule.material = ContactMaterial;
 
-          BrushBone contactBone = InitBrushBone(bone, contactBoneObj, boneArrayIndex, capsule);
+          ContactBone contactBone = InitBrushBone(bone, contactBoneObj, boneArrayIndex, capsule);
 
           contactBone.lastTarget = bone.Center.ToVector3();
         }
@@ -413,7 +413,7 @@ namespace Leap.Unity.UI.Interaction {
         // Palm is attached to the third metacarpal and derived from it.
         Bone bone = _warpedHandData.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL);
         int boneArrayIndex = NUM_FINGERS * BONES_PER_FINGER;
-        GameObject contactBoneObj = new GameObject("Contact Palm Bone", typeof(BoxCollider), typeof(Rigidbody), typeof(BrushBone));
+        GameObject contactBoneObj = new GameObject("Contact Palm Bone", typeof(BoxCollider), typeof(Rigidbody), typeof(ContactBone));
 
         contactBoneObj.transform.position = _warpedHandData.PalmPosition.ToVector3();
         contactBoneObj.transform.rotation = _warpedHandData.Rotation.ToQuaternion();
@@ -430,12 +430,12 @@ namespace Leap.Unity.UI.Interaction {
 
     }
 
-    private BrushBone InitBrushBone(Bone bone, GameObject contactBoneObj, int boneArrayIndex, Collider boneCollider) {
+    private ContactBone InitBrushBone(Bone bone, GameObject contactBoneObj, int boneArrayIndex, Collider boneCollider) {
       contactBoneObj.layer = _brushBoneParent.layer;
       // TODO: _contactBoneParent will need its layer set appropriately once interaction layers are implemented.
       contactBoneObj.transform.localScale = Vector3.one;
 
-      BrushBone contactBone = contactBoneObj.GetComponent<BrushBone>();
+      ContactBone contactBone = contactBoneObj.GetComponent<ContactBone>();
       contactBone.collider = boneCollider;
       contactBone.interactionHand = this;
       _brushBones[boneArrayIndex] = contactBone;
@@ -490,7 +490,7 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private void FixedUpdateBrushBone(Bone bone, int boneArrayIndex, float deadzone) {
-      BrushBone brushBone = _brushBones[boneArrayIndex];
+      ContactBone brushBone = _brushBones[boneArrayIndex];
       Rigidbody body = brushBone.body;
 
       // This hack works best when we set a fixed rotation for bones.  Otherwise
@@ -751,7 +751,7 @@ namespace Leap.Unity.UI.Interaction {
     private HashSet<IInteractionBehaviour> _contactEndedBuffer = new HashSet<IInteractionBehaviour>();
     private HashSet<IInteractionBehaviour> _contactBeganBuffer = new HashSet<IInteractionBehaviour>();
 
-    internal void ContactBoneCollisionEnter(BrushBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
+    internal void ContactBoneCollisionEnter(ContactBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
       int count;
       if (_contactBehaviours.TryGetValue(interactionObj, out count)) {
         _contactBehaviours[interactionObj] = count + 1;
@@ -760,7 +760,7 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    internal void ContactBoneCollisionExit(BrushBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
+    internal void ContactBoneCollisionExit(ContactBone contactBone, IInteractionBehaviour interactionObj, bool wasTrigger) {
       if (interactionObj.ignoreContact) {
         if (_contactBehaviours.ContainsKey(interactionObj)) _contactBehaviours.Remove(interactionObj);
         return;

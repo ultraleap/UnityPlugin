@@ -1,6 +1,5 @@
 ﻿using InteractionEngineUtility;
 using Leap.Unity.RuntimeGizmos;
-using Leap.Unity.UI.Interaction.Internal;
 using System;
 using System.Collections.Generic;
 #if UNITY_EDITOR
@@ -8,7 +7,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.UI.Interaction.Internal {
 
   public class HeuristicGrabClassifier {
 
