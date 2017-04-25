@@ -146,7 +146,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     private void validateGraphics() {
-      GetComponentsInChildren(_tempGraphicList);
+      GetComponentsInChildren(includeInactive: true, result: _tempGraphicList);
 
       HashSet<LeapGraphic> set = Pool<HashSet<LeapGraphic>>.Spawn();
       foreach (var group in _groups) {
@@ -192,12 +192,13 @@ namespace Leap.Unity.GraphicalRenderer {
             }
           }
 
-          if (!graphic.enabled) {
+          //Debug.Log(graphic.gameObject.activeInHierarchy + " : " + graphic.gameObject.activeSelf);
+          if (!graphic.enabled || !graphic.gameObject.activeInHierarchy) {
             graphic.attachedGroup.TryRemoveGraphic(graphic);
           }
         }
 
-        if (!graphic.isAttachedToGroup && graphic.enabled) {
+        if (!graphic.isAttachedToGroup && graphic.enabled && graphic.gameObject.activeInHierarchy) {
           TryAddGraphic(graphic);
         }
       }

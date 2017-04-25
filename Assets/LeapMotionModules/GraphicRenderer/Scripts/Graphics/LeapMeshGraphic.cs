@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
-using System.Collections.Generic;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
