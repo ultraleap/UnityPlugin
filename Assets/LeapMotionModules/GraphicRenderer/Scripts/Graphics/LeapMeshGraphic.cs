@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
-using System.Collections.Generic;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
@@ -39,6 +38,11 @@ namespace Leap.Unity.GraphicalRenderer {
                                                  UVChannelFlags.UV3;
 
     public void SetMesh(Mesh mesh) {
+      if (isAttachedToGroup) {
+        Debug.LogError("Cannot set mesh while attached to group, detach it first.");
+        return;
+      }
+
       _mesh = mesh;
     }
 

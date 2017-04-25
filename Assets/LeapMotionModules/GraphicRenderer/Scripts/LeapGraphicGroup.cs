@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using Leap.Unity.Space;
 using Leap.Unity.Query;
 
@@ -114,6 +117,13 @@ namespace Leap.Unity.GraphicalRenderer {
         return false;
       }
 
+#if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        Undo.RecordObject(graphic, "Added graphic to group");
+        Undo.RecordObject(this, "Added graphic to group");
+      }
+#endif
+
       if (_graphics.Contains(graphic)) {
         if (graphic.attachedGroup == null) {
           //detatch and re-add, it forgot it was attached!
@@ -158,6 +168,13 @@ namespace Leap.Unity.GraphicalRenderer {
       if (graphicIndex < 0) {
         return false;
       }
+
+#if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        Undo.RecordObject(graphic, "Removed graphic from group");
+        Undo.RecordObject(this, "Removed graphic from group");
+      }
+#endif
 
       graphic.OnDetachedFromGroup();
       _graphics.RemoveAt(graphicIndex);
@@ -306,7 +323,9 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
 #if UNITY_EDITOR
-      editor.OnValidate();
+      if (!InternalUtility.IsPrefab(this)) {
+        editor.OnValidate();
+      }
 #endif
     }
 
