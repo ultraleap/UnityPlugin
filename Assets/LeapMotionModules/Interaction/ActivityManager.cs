@@ -6,86 +6,104 @@ using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
-  /// <summary> The Activity Manager encapsulates the logic that determines which
-  /// InteractionBehaviours are within an interactible distance and which interactions
-  /// they should be considered for (hovering/contact/grasping).
-  /// 
-  /// Essentially, the ActivityManager is a wrapper around PhysX sphere queries around
-  /// Hands for InteractionBehaviours.</summary>
-  public class ActivityManager {
+  /// <summary>
+  /// ActivityManager is a wrapper around PhysX sphere queries for InteractionBehaviours.
+  /// "Active" objects are objects found in the latest query. It's also possible to get the
+  /// sets of objects that just began or stopped being active since the last query.
+  /// </summary>
+  public class ActivityManager<T> {
 
+    /// <summary> The radius of the query in world-space. </summary>
     public float activationRadius;
-    public InteractionManager manager;
 
-    /// <summary> If non-null, only IInteractionBehaviours for which this function returns true
-    /// will be added to the active behaviours list. </summary>
-    public Func<IInteractionBehaviour, bool> filter = null;
+    /// <summary>
+    /// The layer mask against which to query for active objects. The ActivityManager will only
+    /// find objects in these layers. By default, the ActivityManager will query all layers, but
+    /// this is highly inefficient.
+    /// 
+    /// See SingleLayer and use bitwise operations on their layerMasks for a convenient way to
+    /// express layer masks.
+    /// <see cref="SingleLayer"/>
+    /// </summary>
+    public int activationLayerMask = ~0;
 
-    private Collider[] _colliderResultsBuffer = new Collider[32];
-    private HashSet<IInteractionBehaviour> _activeBehaviours = new HashSet<IInteractionBehaviour>();
+    /// <summary> If non-null, only objects with at least one Collider for which this function
+    /// returns a non-null T will be added to the active behaviours list. </summary>
+    public Func<Collider, T> filter = null;
 
-    public HashSet<IInteractionBehaviour> ActiveBehaviours {
-      get { return _activeBehaviours; }
-    }
+    private HashSet<T> _activeObjects = new HashSet<T>();
+    /// <summary>
+    /// Returns the currently "active" objects -- objects that were within the latest sphere query.
+    /// </summary>
+    public HashSet<T> ActiveObjects { get { return _activeObjects; } }
 
     /// <summary> If set to true, BeganActive and EndedActive will be calculated and populated. </summary>
     public bool trackStateChanges = true;
-    private HashSet<IInteractionBehaviour> _activeBehavioursLastFrame = new HashSet<IInteractionBehaviour>();
-    private HashSet<IInteractionBehaviour> _beganActiveBehaviours = new HashSet<IInteractionBehaviour>();
-    public HashSet<IInteractionBehaviour> BeganActive {
-      get { return _beganActiveBehaviours; }
+    private HashSet<T> _activeObjectsLastFrame = new HashSet<T>();
+    private HashSet<T> _beganActiveObjects = new HashSet<T>();
+    /// <summary>
+    /// If trackStateChanges is enabled (on by default), contains the objects that just started being active since
+    /// the last query.
+    /// </summary>
+    public HashSet<T> BeganActive {
+      get { return _beganActiveObjects; }
     }
-    private HashSet<IInteractionBehaviour> _endedActiveBehaviours = new HashSet<IInteractionBehaviour>();
-    public HashSet<IInteractionBehaviour> EndedActive {
-      get { return _endedActiveBehaviours; }
+    private HashSet<T> _endedActiveObjects = new HashSet<T>();
+    /// <summary>
+    /// If trackStateChanges is enabled (on by default), contains the objects that just stopped being active since
+    /// the last query.
+    /// </summary>
+    public HashSet<T> EndedActive {
+      get { return _endedActiveObjects; }
     }
 
-    public ActivityManager(InteractionManager manager) {
-      this.manager = manager;
-      this.activationRadius = 1F;
-    }
-
-    public ActivityManager(InteractionManager manager, float activationRadius) {
-      this.manager = manager;
+    public ActivityManager(float activationRadius) {
       this.activationRadius = activationRadius;
     }
 
-    public void FixedUpdatePosition(Vector3 palmPosition, List<LeapSpace> spaces = null) {
-      using (new ProfilerSample("Update Actvity Manager")) {
-        _activeBehaviours.Clear();
+    [ThreadStatic]
+    private static Collider[] s_colliderResultsBuffer = new Collider[32];
+    public void FixedUpdateQueryPosition(Vector3 palmPosition, List<LeapSpace> spaces = null) {
+      using (new ProfilerSample("Update Activity Manager")) {
+        _activeObjects.Clear();
+        
+        // Make sure collider results buffer exists (for other threads; see ThreadStatic)
+        if (s_colliderResultsBuffer == null || s_colliderResultsBuffer.Length < 32) {
+          s_colliderResultsBuffer = new Collider[32];
+        }
 
         if (palmPosition != Vector3.zero) {
-          int count = GetSphereColliderResults(palmPosition, ref _colliderResultsBuffer);
-          UpdateActiveList(count, _colliderResultsBuffer);
+          int count = GetSphereColliderResults(palmPosition, ref s_colliderResultsBuffer);
+          UpdateActiveList(count, s_colliderResultsBuffer);
 
           if (spaces != null) {
             //Check once in each of the GUI's subspaces
             foreach (LeapSpace space in spaces) {
-              count = GetSphereColliderResults(transformPoint(palmPosition, space), ref _colliderResultsBuffer);
-              UpdateActiveList(count, _colliderResultsBuffer);
+              count = GetSphereColliderResults(transformPoint(palmPosition, space), ref s_colliderResultsBuffer);
+              UpdateActiveList(count, s_colliderResultsBuffer);
             }
           }
         }
 
         if (trackStateChanges) {
-          _endedActiveBehaviours.Clear();
-          _beganActiveBehaviours.Clear();
+          _endedActiveObjects.Clear();
+          _beganActiveObjects.Clear();
 
-          foreach (var behaviour in _activeBehaviours) {
-            if (!_activeBehavioursLastFrame.Contains(behaviour)) {
-              _beganActiveBehaviours.Add(behaviour);
+          foreach (var behaviour in _activeObjects) {
+            if (!_activeObjectsLastFrame.Contains(behaviour)) {
+              _beganActiveObjects.Add(behaviour);
             }
           }
 
-          foreach (var behaviour in _activeBehavioursLastFrame) {
-            if (!_activeBehaviours.Contains(behaviour)) {
-              _endedActiveBehaviours.Add(behaviour);
+          foreach (var behaviour in _activeObjectsLastFrame) {
+            if (!_activeObjects.Contains(behaviour)) {
+              _endedActiveObjects.Add(behaviour);
             }
           }
 
-          _activeBehavioursLastFrame.Clear();
-          foreach (var behaviour in _activeBehaviours) {
-            _activeBehavioursLastFrame.Add(behaviour);
+          _activeObjectsLastFrame.Clear();
+          foreach (var behaviour in _activeObjects) {
+            _activeObjectsLastFrame.Add(behaviour);
           }
         }
       }
@@ -93,12 +111,13 @@ namespace Leap.Unity.UI.Interaction {
 
     private int GetSphereColliderResults(Vector3 position, ref Collider[] resultsBuffer) {
       using (new ProfilerSample("GetSphereColliderResults()")) {
+
         int overlapCount = 0;
         while (true) {
           overlapCount = Physics.OverlapSphereNonAlloc(position,
                                                        activationRadius,
                                                        resultsBuffer,
-                                                       manager.interactionLayer.layerMask | manager.interactionNoContactLayer.layerMask,
+                                                       activationLayerMask,
                                                        QueryTriggerInteraction.Collide);
           if (overlapCount < resultsBuffer.Length) {
             break;
@@ -116,13 +135,9 @@ namespace Leap.Unity.UI.Interaction {
 
     private void UpdateActiveList(int numResults, Collider[] results) {
       for (int i = 0; i < numResults; i++) {
-        if (results[i].attachedRigidbody != null) {
-          Rigidbody body = results[i].attachedRigidbody;
-          IInteractionBehaviour interactionObj;
-          if (body != null && manager.rigidbodyRegistry.TryGetValue(body, out interactionObj)
-              && filter != null && filter(interactionObj)) {
-            _activeBehaviours.Add(interactionObj);
-          }
+        T obj = filter(results[i]);
+        if (obj != null) {
+          _activeObjects.Add(obj);
         }
       }
     }

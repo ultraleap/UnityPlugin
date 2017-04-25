@@ -101,12 +101,6 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     public float SimulationScale { get { return _providerScale; } }
 
-    void OnValidate() {
-      if (!Application.isPlaying && _autoGenerateLayers) {
-        AutoGenerateLayers();
-      }
-    }
-
     private InteractionHand[] _interactionHands = new InteractionHand[2];
     private HashSet<IInteractionBehaviour> _interactionBehaviours = new HashSet<IInteractionBehaviour>();
 
@@ -127,7 +121,7 @@ namespace Leap.Unity.UI.Interaction {
     [NonSerialized]
     public Dictionary<Rigidbody, PhysicsUtility.Velocities> _softContactOriginalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>(5);
 
-    private static InteractionManager s_singleton;
+    private static InteractionManager s_instance;
     /// <summary> Often, only one InteractionManager is necessary per Unity scene.
     /// This property will contain that InteractionManager as soon as its Awake()
     /// method is called. Using more than one InteractionManager is valid, but be
@@ -144,29 +138,65 @@ namespace Leap.Unity.UI.Interaction {
     /// assign InteractionBehaviours' managers appropriately. If you instantiate an
     /// InteractionBehaviour at runtime, you should assign its InteractionManager
     /// right after you instantiate it. </remarks>
-    public static InteractionManager singleton {
+    public static InteractionManager instance {
       get {
-        if (s_singleton == null) { s_singleton = FindObjectOfType<InteractionManager>(); }
-        return s_singleton;
+        if (s_instance == null) { s_instance = FindObjectOfType<InteractionManager>(); }
+        return s_instance;
       }
-      set { s_singleton = value; }
+      set { s_instance = value; }
     }
 
-    private Func<Hand> _getFixedLeftHand  = new Func<Hand>(() => Hands.FixedLeft);
-    private Func<Hand> _getFixedRightHand = new Func<Hand>(() => Hands.FixedRight);
+    void OnValidate() {
+      if (!Application.isPlaying && _autoGenerateLayers) {
+        AutoGenerateLayers();
+      }
+
+      RefreshInteractionHands();
+    }
 
     void Awake() {
-      if (s_singleton == null) s_singleton = this;
+      if (s_instance == null) s_instance = this;
 
       Provider = Hands.Provider;
 
-      _interactionHands[0] = new InteractionHand(this, _getFixedLeftHand);
-      _interactionHands[1] = new InteractionHand(this, _getFixedRightHand);
+      RefreshInteractionHands();
 
       if (_autoGenerateLayers) {
         AutoGenerateLayers();
         AutoSetupCollisionLayers();
       }
+    }
+
+    private Func<Hand> _getFixedLeftHand = new Func<Hand>(() => Hands.FixedLeft);
+    private Func<Hand> _getFixedRightHand = new Func<Hand>(() => Hands.FixedRight);
+
+    private void RefreshInteractionHands() {
+      int handsIdx = 0;
+      foreach (var child in this.transform.GetChildren()) {
+        InteractionHand intHand = child.GetComponent<InteractionHand>();
+        if (intHand != null) {
+          _interactionHands[handsIdx++] = intHand;
+        }
+        if (handsIdx == 2) break;
+      }
+
+      if (_interactionHands[0] == null) {
+        GameObject obj = new GameObject();
+        _interactionHands[0] = obj.AddComponent<InteractionHand>();
+      }
+      _interactionHands[0].gameObject.name = "Interaction Hand (Left)";
+      _interactionHands[0].interactionManager = this;
+      _interactionHands[0].handAccessor = _getFixedLeftHand;
+      _interactionHands[0].transform.parent = this.transform;
+
+      if (_interactionHands[1] == null) {
+        GameObject obj = new GameObject();
+        _interactionHands[1] = obj.AddComponent<InteractionHand>();
+      }
+      _interactionHands[1].gameObject.name = "Interaction Hand (Right)";
+      _interactionHands[1].interactionManager = this;
+      _interactionHands[1].handAccessor = _getFixedRightHand;
+      _interactionHands[1].transform.parent = this.transform;
     }
 
     void OnEnable() {
@@ -178,7 +208,7 @@ namespace Leap.Unity.UI.Interaction {
 
     void OnDisable() {
       foreach (var intHand in _interactionHands) {
-        intHand.EnableSoftContact();
+        intHand.EnableSoftContact(); // disables the colliders in the InteractionHand; soft contact won't be applied if the hand is not updating.
         if (intHand.isGraspingObject) intHand.ReleaseGrasp();
       }
     }
