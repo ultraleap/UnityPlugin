@@ -134,6 +134,12 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     private void UpdateActiveList(int numResults, Collider[] results) {
+      if (filter == null) {
+        Debug.LogWarning("[ActivityManager] No filter provided for this ActivityManager; no objects will ever be returned."
+                       + "Please make sure you specify the filter property of any ActivityManagers you wish to use.");
+        return;
+      }
+
       for (int i = 0; i < numResults; i++) {
         T obj = filter(results[i]);
         if (obj != null) {
