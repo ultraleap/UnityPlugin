@@ -48,7 +48,7 @@ namespace Leap.Unity.UI.Interaction {
     public float closestHoveringHandDistance {
       get {
         return _closestHoveringHand == null ?
-               float.PositiveInfinity : GetComparativeHoverDistance(_closestHoveringHand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
+               float.PositiveInfinity : GetHoverDistance(_closestHoveringHand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
       }
     }
 
@@ -708,8 +708,6 @@ namespace Leap.Unity.UI.Interaction {
         if (((collider is SphereCollider) && (collider as SphereCollider).center != Vector3.zero)
             || ((collider is BoxCollider) && (collider as BoxCollider).center != Vector3.zero)
             || ((collider is CapsuleCollider) && (collider as CapsuleCollider).center != Vector3.zero)) {
-
-          _mostRecentClosestPoint = collider.transform.TransformPoint(collider.ClosestPointOnSurface(collider.transform.InverseTransformPoint(worldPosition)));
 
           // Custom, slower ClosestPoint
           testDistance = (collider.transform.TransformPoint(collider.ClosestPointOnSurface(collider.transform.InverseTransformPoint(worldPosition)))
