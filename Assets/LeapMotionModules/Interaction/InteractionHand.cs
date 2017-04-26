@@ -218,13 +218,13 @@ namespace Leap.Unity.UI.Interaction {
     public ActivityManager<IInteractionBehaviour> hoverActivityManager {
       get {
         if (_hoverActivityManager == null) {
-          _hoverActivityManager = new ActivityManager<IInteractionBehaviour>(interactionManager.hoverActivationRadius);
+          if (hoverActivityFilter == null) hoverActivityFilter = hoverFilterFunc;
+
+          _hoverActivityManager = new ActivityManager<IInteractionBehaviour>(interactionManager.hoverActivationRadius,
+                                                                             hoverActivityFilter);
 
           _hoverActivityManager.activationLayerMask = interactionManager.interactionLayer.layerMask
                                                     | interactionManager.interactionNoContactLayer.layerMask;
-
-          if (hoverActivityFilter == null) hoverActivityFilter = hoverFilterFunc;
-          _hoverActivityManager.filter = hoverActivityFilter;
         }
         return _hoverActivityManager;
       }
@@ -1051,13 +1051,12 @@ namespace Leap.Unity.UI.Interaction {
     private ActivityManager<IInteractionBehaviour> graspActivityManager {
       get {
         if (_graspActivityManager == null) {
-          _graspActivityManager = new ActivityManager<IInteractionBehaviour>(1F);
+          if (graspActivityFilter == null) graspActivityFilter = graspFilterFunc;
+
+          _graspActivityManager = new ActivityManager<IInteractionBehaviour>(1F, graspActivityFilter);
 
           _graspActivityManager.activationLayerMask = interactionManager.interactionLayer.layerMask
                                                     | interactionManager.interactionNoContactLayer.layerMask;
-
-          if (graspActivityFilter == null) graspActivityFilter = graspFilterFunc;
-          _graspActivityManager.filter = graspActivityFilter;
         }
         return _graspActivityManager;
       }

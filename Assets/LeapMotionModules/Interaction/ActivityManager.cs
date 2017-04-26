@@ -27,8 +27,13 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     public int activationLayerMask = ~0;
 
-    /// <summary> If non-null, only objects with at least one Collider for which this function
-    /// returns a non-null T will be added to the active behaviours list. </summary>
+    /// <summary>
+    /// This is the function by which the ActivityManager converts the Colliders it finds
+    /// through PhysX queries into Ts to be placed in the ActiveObjects set.
+    /// 
+    /// Only objects with at least one Collider for which this function returns a non-null T
+    /// will be added to the ActiveObjects set.
+    /// </summary>
     public Func<Collider, T> filter = null;
 
     private HashSet<T> _activeObjects = new HashSet<T>();
@@ -57,8 +62,9 @@ namespace Leap.Unity.UI.Interaction {
       get { return _endedActiveObjects; }
     }
 
-    public ActivityManager(float activationRadius) {
+    public ActivityManager(float activationRadius, Func<Collider, T> filter) {
       this.activationRadius = activationRadius;
+      this.filter = filter;
     }
 
     [ThreadStatic]
@@ -136,7 +142,7 @@ namespace Leap.Unity.UI.Interaction {
     private void UpdateActiveList(int numResults, Collider[] results) {
       if (filter == null) {
         Debug.LogWarning("[ActivityManager] No filter provided for this ActivityManager; no objects will ever be returned."
-                       + "Please make sure you specify the filter property of any ActivityManagers you wish to use.");
+                       + "Please make sure you specify a non-null filter property of any ActivityManagers you wish to use.");
         return;
       }
 
