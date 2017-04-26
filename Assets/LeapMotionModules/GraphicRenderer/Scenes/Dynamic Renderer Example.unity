@@ -119,7 +119,7 @@ GameObject:
   - component: {fileID: 10200335}
   - component: {fileID: 10200334}
   m_Layer: 0
-  m_Name: Mesh (9)
+  m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -137,7 +137,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 10200335}
-  feature: {fileID: 1561875134}
+  feature: {fileID: 0}
   texture: {fileID: 2800000, guid: 0467ce16a96a3ef4a9a42e489db144d6, type: 3}
 --- !u!114 &10200335
 MonoBehaviour:
@@ -153,7 +153,7 @@ MonoBehaviour:
   _anchor: {fileID: 0}
   _featureData:
   - {fileID: 10200334}
-  _attachedGroup: {fileID: 1561875136}
+  _attachedGroup: {fileID: 0}
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 0, g: 0.21379304, b: 1, a: 1}
@@ -169,8 +169,8 @@ Transform:
   m_LocalPosition: {x: -2.2, y: 2.1, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1561875138}
-  m_RootOrder: 9
+  m_Father: {fileID: 771443010}
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &30115971
 GameObject:
@@ -183,7 +183,7 @@ GameObject:
   - component: {fileID: 30115973}
   - component: {fileID: 30115972}
   m_Layer: 0
-  m_Name: Mesh (1)
+  m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -336,7 +336,7 @@ GameObject:
   - component: {fileID: 346163379}
   - component: {fileID: 346163378}
   m_Layer: 0
-  m_Name: Mesh (2)
+  m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -354,7 +354,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 346163379}
-  feature: {fileID: 1561875134}
+  feature: {fileID: 0}
   texture: {fileID: 2800000, guid: 7941f01ab879cfa4495b7e425293ddad, type: 3}
 --- !u!114 &346163379
 MonoBehaviour:
@@ -370,7 +370,7 @@ MonoBehaviour:
   _anchor: {fileID: 0}
   _featureData:
   - {fileID: 346163378}
-  _attachedGroup: {fileID: 1561875136}
+  _attachedGroup: {fileID: 0}
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 1, g: 0, b: 0, a: 1}
@@ -386,8 +386,8 @@ Transform:
   m_LocalPosition: {x: 2.1, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1561875138}
-  m_RootOrder: 2
+  m_Father: {fileID: 1730885671}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -90.435005, z: 0}
 --- !u!1 &426001188
 GameObject:
@@ -400,7 +400,7 @@ GameObject:
   - component: {fileID: 426001190}
   - component: {fileID: 426001189}
   m_Layer: 0
-  m_Name: Mesh (6)
+  m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -418,7 +418,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 426001190}
-  feature: {fileID: 1561875134}
+  feature: {fileID: 0}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &426001190
 MonoBehaviour:
@@ -434,7 +434,7 @@ MonoBehaviour:
   _anchor: {fileID: 0}
   _featureData:
   - {fileID: 426001189}
-  _attachedGroup: {fileID: 1561875136}
+  _attachedGroup: {fileID: 0}
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 0.32413793, g: 1, b: 0, a: 1}
@@ -450,8 +450,8 @@ Transform:
   m_LocalPosition: {x: 0, y: -2.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1561875138}
-  m_RootOrder: 6
+  m_Father: {fileID: 935967825}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -45.000004}
 --- !u!1 &428175856
 GameObject:
@@ -464,7 +464,7 @@ GameObject:
   - component: {fileID: 428175858}
   - component: {fileID: 428175857}
   m_Layer: 0
-  m_Name: Mesh (4)
+  m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -482,7 +482,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 428175858}
-  feature: {fileID: 1561875134}
+  feature: {fileID: 0}
   texture: {fileID: 2800000, guid: 0467ce16a96a3ef4a9a42e489db144d6, type: 3}
 --- !u!114 &428175858
 MonoBehaviour:
@@ -498,7 +498,7 @@ MonoBehaviour:
   _anchor: {fileID: 0}
   _featureData:
   - {fileID: 428175857}
-  _attachedGroup: {fileID: 1561875136}
+  _attachedGroup: {fileID: 0}
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 0, g: 0.21379304, b: 1, a: 1}
@@ -514,8 +514,8 @@ Transform:
   m_LocalPosition: {x: -2.2, y: -2.1, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1561875138}
-  m_RootOrder: 4
+  m_Father: {fileID: 771443010}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &439917145
 GameObject:
@@ -593,7 +593,7 @@ GameObject:
   - component: {fileID: 587199934}
   - component: {fileID: 587199933}
   m_Layer: 0
-  m_Name: Mesh (8)
+  m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -611,7 +611,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 587199934}
-  feature: {fileID: 1561875134}
+  feature: {fileID: 0}
   texture: {fileID: 2800000, guid: 0467ce16a96a3ef4a9a42e489db144d6, type: 3}
 --- !u!114 &587199934
 MonoBehaviour:
@@ -627,7 +627,7 @@ MonoBehaviour:
   _anchor: {fileID: 0}
   _featureData:
   - {fileID: 587199933}
-  _attachedGroup: {fileID: 1561875136}
+  _attachedGroup: {fileID: 0}
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 0, g: 0.21379304, b: 1, a: 1}
@@ -643,8 +643,40 @@ Transform:
   m_LocalPosition: {x: 2.1, y: 2.1, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
+  m_Father: {fileID: 771443010}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &771443009
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 771443010}
+  m_Layer: 0
+  m_Name: BlueGroup
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &771443010
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 771443009}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 428175859}
+  - {fileID: 1149906635}
+  - {fileID: 587199935}
+  - {fileID: 10200336}
   m_Father: {fileID: 1561875138}
-  m_RootOrder: 8
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &795087642
 GameObject:
@@ -657,7 +689,7 @@ GameObject:
   - component: {fileID: 795087644}
   - component: {fileID: 795087643}
   m_Layer: 0
-  m_Name: Mesh (3)
+  m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -675,7 +707,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 795087644}
-  feature: {fileID: 1561875134}
+  feature: {fileID: 0}
   texture: {fileID: 2800000, guid: 7941f01ab879cfa4495b7e425293ddad, type: 3}
 --- !u!114 &795087644
 MonoBehaviour:
@@ -691,7 +723,7 @@ MonoBehaviour:
   _anchor: {fileID: 0}
   _featureData:
   - {fileID: 795087643}
-  _attachedGroup: {fileID: 1561875136}
+  _attachedGroup: {fileID: 0}
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 1, g: 0, b: 0, a: 1}
@@ -707,8 +739,8 @@ Transform:
   m_LocalPosition: {x: -2.2, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1561875138}
-  m_RootOrder: 3
+  m_Father: {fileID: 1730885671}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: -90.435005, z: 0}
 --- !u!1 &811648764
 GameObject:
@@ -721,7 +753,7 @@ GameObject:
   - component: {fileID: 811648766}
   - component: {fileID: 811648765}
   m_Layer: 0
-  m_Name: Mesh (7)
+  m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -739,7 +771,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 811648766}
-  feature: {fileID: 1561875134}
+  feature: {fileID: 0}
   texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
 --- !u!114 &811648766
 MonoBehaviour:
@@ -755,7 +787,7 @@ MonoBehaviour:
   _anchor: {fileID: 0}
   _featureData:
   - {fileID: 811648765}
-  _attachedGroup: {fileID: 1561875136}
+  _attachedGroup: {fileID: 0}
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 0.32413793, g: 1, b: 0, a: 1}
@@ -771,9 +803,39 @@ Transform:
   m_LocalPosition: {x: 0, y: 2.1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1561875138}
-  m_RootOrder: 7
+  m_Father: {fileID: 935967825}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -45.000004}
+--- !u!1 &935967824
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 935967825}
+  m_Layer: 0
+  m_Name: GreenGroup
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &935967825
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 935967824}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 426001191}
+  - {fileID: 811648767}
+  m_Father: {fileID: 1561875138}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!21 &947005088
 Material:
   serializedVersion: 6
@@ -792,7 +854,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 28624105386192372, guid: 5de2c3f92c6614f4db2f4fe2660b32a4,
+        m_Texture: {fileID: 28190866521902972, guid: 5de2c3f92c6614f4db2f4fe2660b32a4,
           type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -830,9 +892,12 @@ MonoBehaviour:
   _attachedGroup: {fileID: 1561875140}
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapTextRenderer
-  _text: This is an example of using the Dynamic Renderer.  Each graphic can have
-    a different mesh, a different texture, and a different color!  All meshes are
-    automatically baked into a single mesh and rendered in a single draw call!
+  _text: 'This is an example of using the Dynamic Renderer.  One big advantage the
+    Dynamic Renderer has over the Baked Renderer is that you can add and remove graphics
+    at runtime!
+
+
+    Press the 1, 2, and 3 keys on your keyboard to add and remove different graphics!'
   _fontStyle: 0
   _fontSize: 14
   _lineSpacing: 1
@@ -868,7 +933,7 @@ GameObject:
   - component: {fileID: 1149906634}
   - component: {fileID: 1149906633}
   m_Layer: 0
-  m_Name: Mesh (5)
+  m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -886,7 +951,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   graphic: {fileID: 1149906634}
-  feature: {fileID: 1561875134}
+  feature: {fileID: 0}
   texture: {fileID: 2800000, guid: 0467ce16a96a3ef4a9a42e489db144d6, type: 3}
 --- !u!114 &1149906634
 MonoBehaviour:
@@ -902,7 +967,7 @@ MonoBehaviour:
   _anchor: {fileID: 0}
   _featureData:
   - {fileID: 1149906633}
-  _attachedGroup: {fileID: 1561875136}
+  _attachedGroup: {fileID: 0}
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 0, g: 0.21379304, b: 1, a: 1}
@@ -918,8 +983,8 @@ Transform:
   m_LocalPosition: {x: 2.1, y: -2.1, z: 1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 1561875138}
-  m_RootOrder: 5
+  m_Father: {fileID: 771443010}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1561875133
 GameObject:
@@ -935,6 +1000,9 @@ GameObject:
   - component: {fileID: 1561875140}
   - component: {fileID: 1561875139}
   - component: {fileID: 1561875135}
+  - component: {fileID: 1561875141}
+  - component: {fileID: 1561875142}
+  - component: {fileID: 1561875143}
   m_Layer: 0
   m_Name: Renderer
   m_TagString: Untagged
@@ -955,14 +1023,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   featureData:
   - {fileID: 30115972}
-  - {fileID: 346163378}
-  - {fileID: 795087643}
-  - {fileID: 428175857}
-  - {fileID: 1149906633}
-  - {fileID: 426001189}
-  - {fileID: 811648765}
-  - {fileID: 10200334}
-  - {fileID: 587199933}
   propertyName: _MainTex
   channel: 1
 --- !u!114 &1561875135
@@ -993,7 +1053,13 @@ MonoBehaviour:
     _filterMode: 1
     _format: 5
     _maxAtlasSize: 4096
-    _extraTextures: []
+    _extraTextures:
+    - texture: {fileID: 2800000, guid: 0467ce16a96a3ef4a9a42e489db144d6, type: 3}
+      channel: 1
+    - texture: {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
+      channel: 1
+    - texture: {fileID: 2800000, guid: 7941f01ab879cfa4495b7e425293ddad, type: 3}
+      channel: 1
   _material: {fileID: 947005088}
   _meshes: {fileID: 11400000, guid: 1878a71664f40e944a852acc8d18828d, type: 2}
   _packedTextures: {fileID: 11400000, guid: 5de2c3f92c6614f4db2f4fe2660b32a4, type: 2}
@@ -1001,9 +1067,9 @@ MonoBehaviour:
     _channel0:
       _keys:
       - {fileID: 2800000, guid: c0aa9a7cf40cebd4dabb357d3ff4c976, type: 3}
-      - {fileID: 2800000, guid: 7941f01ab879cfa4495b7e425293ddad, type: 3}
       - {fileID: 2800000, guid: 0467ce16a96a3ef4a9a42e489db144d6, type: 3}
       - {fileID: 2800000, guid: 93f4f81256c947642a93d907d828ee98, type: 3}
+      - {fileID: 2800000, guid: 7941f01ab879cfa4495b7e425293ddad, type: 3}
       _values:
       - serializedVersion: 2
         x: 0
@@ -1072,14 +1138,6 @@ MonoBehaviour:
   _renderer: {fileID: 1561875137}
   _graphics:
   - {fileID: 30115973}
-  - {fileID: 346163379}
-  - {fileID: 795087644}
-  - {fileID: 428175858}
-  - {fileID: 1149906634}
-  - {fileID: 426001190}
-  - {fileID: 811648766}
-  - {fileID: 10200335}
-  - {fileID: 587199934}
   _supportInfo:
   - support: 0
     message: 
@@ -1095,7 +1153,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb71699a7372344cb4e7a163c6c6922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _selectedGroup: 1
+  _selectedGroup: 0
   _space: {fileID: 0}
   _groups:
   - {fileID: 1561875136}
@@ -1112,14 +1170,9 @@ Transform:
   m_Children:
   - {fileID: 1027488251}
   - {fileID: 30115974}
-  - {fileID: 346163380}
-  - {fileID: 795087645}
-  - {fileID: 428175859}
-  - {fileID: 1149906635}
-  - {fileID: 426001191}
-  - {fileID: 811648767}
-  - {fileID: 587199935}
-  - {fileID: 10200336}
+  - {fileID: 771443010}
+  - {fileID: 935967825}
+  - {fileID: 1730885671}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1161,3 +1214,78 @@ MonoBehaviour:
   - {fileID: 1027488250}
   _supportInfo: []
   _addRemoveSupported: 0
+--- !u!114 &1561875141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1561875133}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d973ee6740f0f4059a390dabaecb19b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targets:
+  - {fileID: 771443009}
+  unlockHold: 0
+  toggle: 49
+--- !u!114 &1561875142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1561875133}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d973ee6740f0f4059a390dabaecb19b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targets:
+  - {fileID: 935967824}
+  unlockHold: 0
+  toggle: 50
+--- !u!114 &1561875143
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1561875133}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d973ee6740f0f4059a390dabaecb19b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targets:
+  - {fileID: 1730885670}
+  unlockHold: 0
+  toggle: 51
+--- !u!1 &1730885670
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1730885671}
+  m_Layer: 0
+  m_Name: RedGroup
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1730885671
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1730885670}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 346163380}
+  - {fileID: 795087645}
+  m_Father: {fileID: 1561875138}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
