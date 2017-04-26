@@ -24,7 +24,6 @@ GameObject:
   - component: {fileID: 65521548597448220}
   - component: {fileID: 54989536721116318}
   - component: {fileID: 114726310233506268}
-  - component: {fileID: 114374370160440398}
   m_Layer: 0
   m_Name: InteractionCube
   m_TagString: Untagged
@@ -111,17 +110,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &114374370160440398
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1580682090112394}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114726310233506268
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -137,7 +125,10 @@ MonoBehaviour:
   _ignoreHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 0
+  _contactForceMode: 0
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
