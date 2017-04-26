@@ -11,7 +11,7 @@ namespace Leap.Unity.Attachments {
 
     public bool IsWithinRange(Vector3 position) {
       Vector3 delta = this.transform.position - position;
-      return delta.x * delta.x + delta.y * delta.y + delta.z * delta.z < anchorRange * anchorRange;
+      return delta.sqrMagnitude < anchorRange * anchorRange;
     }
 
     /// <summary> Returns the squared distance to the target. AnchorGroups use this to avoid

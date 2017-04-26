@@ -20,7 +20,7 @@ namespace Leap.Unity.Attachments {
       Anchor closestAnchor = null;
       float closestDistSqrd = float.PositiveInfinity;
       foreach (Anchor anchor in anchors) {
-        if (requireAnchorIsEnabled && !anchor.enabled) continue;
+        if (anchor == null || requireAnchorIsEnabled && !anchor.enabled) continue;
         float anchorDistSqrd = anchor.GetDistanceSqrd(fromPosition);
         if (closestAnchor == null || anchorDistSqrd < closestDistSqrd) {
           closestAnchor = anchor;

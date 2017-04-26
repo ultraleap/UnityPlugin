@@ -10,13 +10,22 @@ namespace Leap.Unity.Attachments {
 
     /// <summary> Does the object have a specific anchor, or can it fit in any anchor of a certain type? </summary>
     public enum AnchorType { SingleAnchor, AnchorGroup }
-    public AnchorType anchorType;
-
-    [DisableIf("anchorType", isEqualTo: AnchorType.AnchorGroup)]
-    public Anchor anchor;
+    [Tooltip("If set to AnchorGroup, only Anchors inside the provided AnchorGroup "
+           + "will be valid anchors for this AnchorableBehaviour.")]
+    [OnEditorChange("anchorType"), SerializeField]
+    private AnchorType _anchorType;
     
-    [DisableIf("anchorType", isEqualTo: AnchorType.SingleAnchor)]
-    public AnchorGroup anchorGroup;
+    [Tooltip("The anchor group for this AnchorableBehaviour. In the Anchor Group mode, only "
+           + "anchors within the provided AnchorGroup are valid anchors for this object.")]
+    [OnEditorChange("anchorGroup"), SerializeField]
+    private AnchorGroup _anchorGroup;
+
+    [Tooltip("The current anchor of this AnchorableBehaviour. If the Anchor Type is set to "
+           + "Anchor Group, the current anchor must be within the assigned Anchor Group. To "
+           + "remove the anchoring behaviour for this object, either disable this behaviour "
+           + "or set the anchor to null.")]
+    [OnEditorChange("currentAnchor"), SerializeField]
+    private Anchor _anchor;
 
     [Header("Motion")]
     [Tooltip("Should the object move instantly to the anchor position?")]
@@ -52,11 +61,46 @@ namespace Leap.Unity.Attachments {
     [DisableIf("_isInteractionBehaviourNull", isEqualTo: true)]
     public AnimationCurve attractionReachByDistance;
 
-    private Anchor _currentAnchorInGroup = null;
+    /// <summary>
+    /// Gets or sets the anchor type for this AnchorableBehaviour.
+    /// </summary>
+    public AnchorType anchorType {
+      get {
+        return _anchorType;
+      }
+      set {
+        _anchorType = value;
+        currentAnchor = currentAnchor;
+      }
+    }
+
+    public AnchorGroup anchorGroup {
+      get {
+        return _anchorGroup;
+      }
+      set {
+        _anchorGroup = value;
+        if (_anchorGroup != null && currentAnchor != null && !_anchorGroup.ContainsAnchor(currentAnchor) && this.enabled) {
+          Debug.LogWarning("Current anchor is not a member of this object's AnchorGroup. (Setting it to null.)");
+          currentAnchor = null;
+        }
+      }
+    }
+
+    // Note: This state duplicate is a bugfix.
+    // It is unfortunate to have duplicate storage between this field and
+    // the _anchor field, but it's necessary to fix a subtle bug where
+    // Update() occurs before the currentAnchor property is able to set
+    // the AnchorableBehaviour's state appropriately. (Otherwise, it sets
+    // _attachedToAnchor to false after the Update() has already moved the
+    // object to its new anchor.)
+    private Anchor _currentAnchor;
+
     /// <summary>
     /// Gets or sets the current target anchor. Setting this value to null will
     /// disable the AnchorableBehaviour component (i.e. disable anchoring).
-    /// 
+    /// </summary>
+    /// <remarks>
     /// If the anchor type is set to SingleAnchor, getting this property will always
     /// return this component's public anchor field. Setting this property will change
     /// the public anchor field.
@@ -65,33 +109,79 @@ namespace Leap.Unity.Attachments {
     /// the current anchor inside the AnchorGroup, or null if the object is not currently
     /// anchored. Setting this property will set the current anchor only if the given
     /// anchor is a member of the AnchorGroup.
-    /// </summary>
+    /// </remarks>
     public Anchor currentAnchor {
       get {
-        switch (anchorType) {
-          case AnchorType.SingleAnchor:
-            return anchor;
-          case AnchorType.AnchorGroup: default:
-            return _currentAnchorInGroup;
-        }
+        return _currentAnchor;
       }
       set {
         switch (anchorType) {
           case AnchorType.SingleAnchor:
-            anchor = value;
+            if (_currentAnchor != value) {
+              _anchor = value;
+              _currentAnchor = value;
+              _attachedToAnchor = false;
+            }
             break;
-          case AnchorType.AnchorGroup: default:
-            if (anchorGroup.ContainsAnchor(value)) {
-              _currentAnchorInGroup = anchor;
+          case AnchorType.AnchorGroup:
+          default:
+            if (anchorGroup == null) return;
+
+            if (value == null) {
+              _anchor = null;
+              _currentAnchor = null;
+              _attachedToAnchor = false;
             }
             else {
-              Debug.LogError("Attempted to set " + this.name + "'s anchor, but the argument anchor is not in "
-                           + "this AnchorableBehaviour's anchor group.");
-              _currentAnchorInGroup = null;
+              if (anchorGroup.ContainsAnchor(value)) {
+                if (_currentAnchor != value) {
+                  _anchor = value;
+                  _currentAnchor = value;
+                  _attachedToAnchor = false;
+                }
+              }
+              else {
+                // Clear the inspector field for the anchor; if it is
+                // non-null, the user tried to set the field with an
+                // invalid (out-of-group) anchor.
+                if (_anchor != null) {
+                  Debug.LogError("The anchor \"" + _anchor.name + "\" is not a member of this object's anchor group.", this.gameObject);
+                  _anchor = null;
+                }
+
+                // But if the current anchor is inside the current anchorGroup,
+                // we don't want to lose that information after dropping in
+                // an invalid (out-of-group) anchor, so re-set the _anchor
+                // inspector field.
+                if (anchorGroup.ContainsAnchor(currentAnchor)) {
+                  if (_anchor != currentAnchor) _anchor = currentAnchor;
+                }
+              }
             }
+
             break;
         }
       }
+    }
+
+    private bool _attachedToAnchor = false;
+
+    void OnValidate() {
+      _isInteractionBehaviourNull = interactionBehaviour == null;
+    }
+
+    void Awake() {
+      currentAnchor = _anchor;
+    }
+
+    void OnDisable() {
+      _attachedToAnchor = false;
+    }
+
+    void Update() {
+      if (interactionBehaviour != null && isAttractedByHand) UpdateAttractionToHand();
+      else if (_offsetTowardsHand != Vector3.zero) _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, Vector3.zero, 5F * Time.deltaTime);
+      UpdateAnchorAttachment();
     }
 
     /// <summary>
@@ -109,7 +199,7 @@ namespace Leap.Unity.Attachments {
     public bool TryToAnchor(out Anchor anchor) {
       switch (anchorType) {
         case AnchorType.SingleAnchor:
-          anchor = this.anchor;
+          anchor = currentAnchor;
           if (this.enabled) {
             return true;
           }
@@ -125,6 +215,7 @@ namespace Leap.Unity.Attachments {
           if (toProvide != null) {
             this.enabled = true;
             anchor = toProvide;
+            _currentAnchor = anchor;
             return true;
           }
           else {
@@ -132,31 +223,6 @@ namespace Leap.Unity.Attachments {
             return false;
           }
       }
-    }
-
-    private bool _attachedToAnchor = false;
-
-    void OnValidate() {
-      _isInteractionBehaviourNull = interactionBehaviour == null;
-    }
-
-    void OnEnable() {
-      if (anchorType == AnchorType.SingleAnchor && anchor == null) {
-        this.enabled = false;
-      }
-      else if (anchorType == AnchorType.AnchorGroup && _currentAnchorInGroup == null) {
-        this.enabled = false;
-      }
-    }
-
-    void OnDisable() {
-      _attachedToAnchor = false;
-    }
-
-    void Update() {
-      if (interactionBehaviour != null && isAttractedByHand) UpdateAttractionToHand();
-      else if (_offsetTowardsHand != Vector3.zero) _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, Vector3.zero, 5F * Time.deltaTime);
-      UpdateAnchorAttachment();
     }
 
     #region Attraction To Hands
@@ -172,9 +238,9 @@ namespace Leap.Unity.Attachments {
             Hand hoveringHand = interactionBehaviour.closestHoveringHand;
 
             reachTargetAmount = Mathf.Clamp01(attractionReachByDistance.Evaluate(
-                                  Vector3.Distance(hoveringHand.PalmPosition.ToVector3(), anchor.transform.position)
+                                  Vector3.Distance(hoveringHand.PalmPosition.ToVector3(), currentAnchor.transform.position)
                                 ));
-            towardsHand = hoveringHand.PalmPosition.ToVector3() - anchor.transform.position;
+            towardsHand = hoveringHand.PalmPosition.ToVector3() - currentAnchor.transform.position;
           }
 
           Vector3 targetOffsetTowardsHand = towardsHand * maxAttractionReach * reachTargetAmount;
@@ -189,7 +255,9 @@ namespace Leap.Unity.Attachments {
     #region Anchor Attachment
 
     private void UpdateAnchorAttachment() {
-      Vector3 targetPosition = anchor.transform.position;
+      if (currentAnchor == null) return;
+
+      Vector3 targetPosition = currentAnchor.transform.position;
 
       if (lockToAnchor) {
         this.transform.position = targetPosition + _offsetTowardsHand;

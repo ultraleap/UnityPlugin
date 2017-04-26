@@ -12,6 +12,10 @@ namespace Leap.Unity.Attachments {
     protected override void OnEnable() {
       base.OnEnable();
 
+      specifyConditionalDrawing("_anchorType",
+                                (int)AnchorableBehaviour.AnchorType.AnchorGroup,
+                                "_anchorGroup");
+
       specifyConditionalDrawing("isAttractedByHand",
                                 "maxAttractionReach",
                                 "attractionReachByDistance");
