@@ -18,25 +18,34 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       public virtual void OnValidate() {
+        _graphic.isRepresentationDirty = true;
+
+        //Delete any null references
         for (int i = _graphic._featureData.Count; i-- != 0;) {
-          var component = _graphic._featureData[i];
-          if (component.gameObject != _graphic.gameObject) {
-            LeapFeatureData movedData;
-            if (InternalUtility.TryMoveComponent(component, _graphic.gameObject, out movedData)) {
-              _graphic._featureData[i] = movedData;
-            } else {
-              Debug.LogWarning("Could not move component " + component + "!");
-              InternalUtility.Destroy(component);
-              _graphic._featureData.RemoveAt(i);
-            }
+          if (_graphic._featureData[i] == null) {
+            _graphic._featureData.RemoveAt(i);
           }
         }
+        
+        AttachedObjectHandler.Validate(_graphic, _graphic._featureData);
 
         if (!Application.isPlaying) {
           if (_graphic._attachedGroup != null) {
             _graphic._attachedGroup.renderer.editor.ScheduleEditorUpdate();
             _graphic._preferredRendererType = _graphic._attachedGroup.renderingMethod.GetType();
           }
+        }
+
+        //Destroy any components that are not referenced by me
+        var allComponents = _graphic.GetComponents<LeapFeatureData>();
+        foreach (var component in allComponents) {
+          if (!_graphic._featureData.Contains(component)) {
+            InternalUtility.Destroy(component);
+          }
+        }
+
+        foreach (var dataObj in _graphic._featureData) {
+          dataObj.graphic = _graphic;
         }
       }
 

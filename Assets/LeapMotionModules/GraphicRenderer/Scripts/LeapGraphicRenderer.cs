@@ -23,8 +23,6 @@ namespace Leap.Unity.GraphicalRenderer {
 
     #region PRIVATE VARIABLES
     [NonSerialized]
-    private List<LeapGraphic> _tempGraphicList = new List<LeapGraphic>();
-    [NonSerialized]
     private bool _hasFinishedSetup = false;
 
     #endregion
@@ -80,7 +78,9 @@ namespace Leap.Unity.GraphicalRenderer {
     #region UNITY CALLBACKS
     private void OnValidate() {
 #if UNITY_EDITOR
-      editor.OnValidate();
+      if (!InternalUtility.IsPrefab(this)) {
+        editor.OnValidate();
+      }
 #endif
     }
 
@@ -104,13 +104,8 @@ namespace Leap.Unity.GraphicalRenderer {
 #endif
     }
 
-    private void Awake() {
-      //TODO: assign references 
-    }
-
     private void OnEnable() {
       if (Application.isPlaying) {
-        //TODO: enable each group too
         if (_space != null) {
           _space.RebuildHierarchy();
           _space.RecalculateTransformers();
@@ -118,22 +113,20 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    private void OnDisable() {
-      if (Application.isPlaying) {
-        //TODO: disable all groups
-      }
-    }
-
     private void LateUpdate() {
 #if UNITY_EDITOR
-      if (Application.isPlaying) {
-        doLateUpdateRuntime();
-      } else {
-        editor.DoLateUpdateEditor();
+      //No updates for prefabs!
+      if (InternalUtility.IsPrefab(this)) {
+        return;
       }
-#else
-    doLateUpdateRuntime();
+
+      if (!Application.isPlaying) {
+        editor.DoLateUpdateEditor();
+      } else
 #endif
+      {
+        doLateUpdateRuntime();
+      }
     }
     #endregion
 
@@ -143,40 +136,6 @@ namespace Leap.Unity.GraphicalRenderer {
 #if UNITY_EDITOR
       editor = new EditorApi(this);
 #endif
-    }
-
-    private void validateGraphics() {
-      GetComponentsInChildren(_tempGraphicList);
-
-      foreach (var graphic in _tempGraphicList) {
-        if (graphic.isAttachedToGroup) {
-          //procede to validate
-
-          //If the graphic is anchored to the wrong anchor, detach and reattach
-          var anchor = _space == null ? null : LeapSpaceAnchor.GetAnchor(graphic.transform);
-          if (graphic.anchor != anchor) {
-            var group = graphic.attachedGroup;
-
-            if (group.TryRemoveGraphic(graphic)) {
-              group.TryAddGraphic(graphic);
-            }
-          }
-
-          if (!graphic.attachedGroup.graphics.Contains(graphic)) {
-            var group = graphic.attachedGroup;
-            graphic.OnDetachedFromGroup();
-            group.TryAddGraphic(graphic); //if this fails, handled by later clause
-          }
-
-          if (!graphic.enabled) {
-            graphic.attachedGroup.TryRemoveGraphic(graphic);
-          }
-        }
-
-        if (!graphic.isAttachedToGroup && graphic.enabled) {
-          TryAddGraphic(graphic);
-        }
-      }
     }
 
     private void doLateUpdateRuntime() {

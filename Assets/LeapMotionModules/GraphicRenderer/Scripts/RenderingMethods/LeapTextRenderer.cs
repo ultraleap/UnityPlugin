@@ -2,6 +2,7 @@
 using UnityEngine;
 using Leap.Unity.Space;
 using Leap.Unity.Query;
+using System;
 
 namespace Leap.Unity.GraphicalRenderer {
 
@@ -31,7 +32,7 @@ namespace Leap.Unity.GraphicalRenderer {
     private Material _material;
 
     //Curved space
-    private const string CURVED_PARAMETERS = LeapGraphicRenderer.PROPERTY_PREFIX + "Curved_ElementParameters";
+    private const string CURVED_PARAMETERS = LeapGraphicRenderer.PROPERTY_PREFIX + "Curved_GraphicParameters";
     private List<Matrix4x4> _curved_worldToAnchor = new List<Matrix4x4>();
     private List<Matrix4x4> _curved_meshTransforms = new List<Matrix4x4>();
     private List<Vector4> _curved_graphicParameters = new List<Vector4>();
@@ -96,9 +97,9 @@ namespace Leap.Unity.GraphicalRenderer {
 
         using (new ProfilerSample("Upload Material Data")) {
           _material.SetFloat(SpaceProperties.RADIAL_SPACE_RADIUS, curvedSpace.radius);
-          _material.SetMatrixArraySafe("_LeapGuiCurved_WorldToAnchor", _curved_worldToAnchor);
-          _material.SetMatrix("_LeapGui_LocalToWorld", transform.localToWorldMatrix);
-          _material.SetVectorArraySafe("_LeapGuiCurved_ElementParameters", _curved_graphicParameters);
+          _material.SetMatrixArraySafe("_GraphicRendererCurved_WorldToAnchor", _curved_worldToAnchor);
+          _material.SetMatrix("_GraphicRenderer_LocalToWorld", transform.localToWorldMatrix);
+          _material.SetVectorArraySafe("_GraphicRendererCurved_GraphicParameters", _curved_graphicParameters);
         }
 
         using (new ProfilerSample("Draw Meshes")) {
@@ -109,12 +110,17 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    public override void OnEnableRendererEditor() { }
-
-    public override void OnDisableRendererEditor() { }
-
+#if UNITY_EDITOR
     public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
       base.OnUpdateRendererEditor(isHeavyUpdate);
+
+      if (_font == null) {
+        return;
+      }
+
+      if (_shader == null) {
+        return;
+      }
 
       CreateOrSave(ref _meshData, "Text Mesh Data");
 
@@ -126,6 +132,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
       generateMaterial();
     }
+#endif
 
     private void generateMaterial() {
       _material = Instantiate(_font.material);
@@ -150,6 +157,8 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    public float scale = 0.1f;
+
     private List<TextWrapper.Line> _tempLines = new List<TextWrapper.Line>();
     private List<Vector3> _verts = new List<Vector3>();
     private List<Vector4> _uvs = new List<Vector4>();
@@ -167,7 +176,7 @@ namespace Leap.Unity.GraphicalRenderer {
       var textGraphic = graphic as LeapTextGraphic;
       var text = textGraphic.text;
 
-      float _charScale = 0.1f / _dynamicPixelsPerUnit;
+      float _charScale = scale / _dynamicPixelsPerUnit;
       float _scale = _charScale * graphic.fontSize / _font.fontSize;
       float lineHeight = _scale * textGraphic.lineSpacing * _font.lineHeight * _dynamicPixelsPerUnit;
 

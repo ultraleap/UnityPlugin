@@ -57,13 +57,17 @@ namespace Leap.Unity.GraphicalRenderer {
     /// Called curing edit time when this renderering method is created.  
     /// Use this for any edit-time construction you need.
     /// </summary>
-    public abstract void OnEnableRendererEditor();
+    public virtual void OnEnableRendererEditor() {
+      Undo.RecordObject(this, "Enabled renderer");
+    }
 
     /// <summary>
     /// Called during edit time when this rendering method is destroyed.
     /// Use this for edit-time clean up.
     /// </summary>
-    public abstract void OnDisableRendererEditor();
+    public virtual void OnDisableRendererEditor() {
+      Undo.RecordObject(this, "Disabled Renderer");
+    }
 
     /// <summary>
     /// Called during edit time to update the renderer status.  This is 
@@ -71,6 +75,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// not called all the time!
     /// </summary>
     public virtual void OnUpdateRendererEditor(bool isHeavyUpdate) {
+      Undo.RecordObject(this, "Updated Renderer");
       this.isHeavyUpdate = isHeavyUpdate;
     }
 #endif
@@ -81,15 +86,16 @@ namespace Leap.Unity.GraphicalRenderer {
     public abstract LeapGraphic GetValidGraphicOnObject(GameObject obj);
 
     protected void CreateOrSave<T>(ref T t, string assetName) where T : SceneTiedAsset {
+#if UNITY_EDITOR
       T newT = t;
-      if (SceneTiedAsset.CreateOrSave(this, 
+      if (SceneTiedAsset.CreateOrSave(this,
                                       ref newT,
                                       DATA_FOLDER_NAME,
                                       assetName)) {
         Undo.RecordObject(this, "Updated graphic data");
         t = newT;
-        EditorUtility.SetDirty(this);
       }
+#endif
     }
   }
 

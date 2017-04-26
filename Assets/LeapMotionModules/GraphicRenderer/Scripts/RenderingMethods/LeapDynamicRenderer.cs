@@ -67,6 +67,7 @@ namespace Leap.Unity.GraphicalRenderer {
       base.OnEnableRenderer();
     }
 
+#if UNITY_EDITOR
     public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
       for (int i = 0; i < group.graphics.Count; i++) {
         _graphicToId[group.graphics[i]] = i;
@@ -74,6 +75,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
       base.OnUpdateRendererEditor(isHeavyUpdate);
     }
+#endif
 
     public override void OnUpdateRenderer() {
       base.OnUpdateRenderer();

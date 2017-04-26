@@ -1,13 +1,11 @@
-﻿Shader "Leap Motion/Graphic Renderer/Defaults/DynamicTransparent" {
+﻿Shader "Leap Motion/Graphic Renderer/Unlit/Dynamic" {
   Properties {
     _MainTex ("Texture", 2D) = "white" {}
   }
   SubShader {
-    Tags {"Queue"="Transparent" "RenderType"="Transparent" }
+    Tags {"Queue"="Geometry" "RenderType"="Opaque" }
 
-    Blend SrcAlpha OneMinusSrcAlpha
-    ZTest On
-    ZWrite Off
+    Cull Off
 
     Pass {
       CGPROGRAM
@@ -29,18 +27,23 @@
       sampler2D _MainTex;
       
       v2f_graphic_dynamic vert (appdata_graphic_dynamic v) {
-        return ApplyDynamicGraphics(v);
+        BEGIN_V2F(v);
+
+        v2f_graphic_dynamic o;
+        APPLY_DYNAMIC_GRAPHICS(v, o);
+
+        return o;
       }
       
       fixed4 frag (v2f_graphic_dynamic i) : SV_Target {
         fixed4 color = fixed4(1,1,1,1);
 
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-        color *= dot(normalize(i.normal.xyz), float3(0, 0, 1));
+        color *= abs(dot(normalize(i.normal.xyz), float3(0, 0, 1)));
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_0
-        color *= tex2D(_MainTex, i.uv0);
+        color *= tex2D(_MainTex, i.uv_0);
 #endif
 
 #ifdef GRAPHICS_HAVE_COLOR

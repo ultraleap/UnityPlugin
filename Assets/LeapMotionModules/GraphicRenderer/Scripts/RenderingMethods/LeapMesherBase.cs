@@ -52,6 +52,8 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    public Action<Texture2D, AtlasUvs> OnPostProcessAtlas;
+
     #region INSPECTOR FIELDS
     //BEGIN MESH SETTINGS
     [EditTimeOnly, SerializeField, HideInInspector]
@@ -110,7 +112,7 @@ namespace Leap.Unity.GraphicalRenderer {
     protected RendererTextureData _packedTextures;
 
     //#### Sprite/Texture Remapping ####
-    [SerializeField]
+    [SerializeField, HideInInspector]
     private AtlasUvs _atlasUvs;
 
     //#### Tinting ####
@@ -122,6 +124,7 @@ namespace Leap.Unity.GraphicalRenderer {
     protected List<float> _blendShapeAmounts = new List<float>();
 
     //#### Custom Channels ####
+    public const string CUSTOM_CHANNEL_KEYWORD = LeapGraphicRenderer.FEATURE_PREFIX + "ENABLE_CUSTOM_CHANNELS";
     protected List<float> _customFloatChannelData = new List<float>();
     protected List<Vector4> _customVectorChannelData = new List<Vector4>();
     protected List<Color> _customColorChannelData = new List<Color>();
@@ -141,8 +144,27 @@ namespace Leap.Unity.GraphicalRenderer {
         Texture2D[] packedTextures;
         _atlas.RebuildAtlas(progress, out packedTextures, out _atlasUvs);
 
-        progress.Begin(2, "", "", () => {
+
+
+        progress.Begin(3, "", "", () => {
+          progress.Step("Post-Process Atlas");
+          if (OnPostProcessAtlas != null) {
+            for (int i = 0; i < packedTextures.Length; i++) {
+              try {
+                OnPostProcessAtlas(packedTextures[i], _atlasUvs);
+              } catch (Exception e) {
+                Debug.LogException(e);
+              }
+            }
+          }
           progress.Step("Saving To Asset");
+
+          //Now that all post-process has finished, finally mark no longer readable
+          //Don't change the mipmaps because a post process might have uploaded custom data
+          for (int i = 0; i < packedTextures.Length; i++) {
+            packedTextures[i].Apply(updateMipmaps: false, makeNoLongerReadable: true);
+          }
+
           _packedTextures.AssignTextures(packedTextures, _textureFeatures.Query().Select(f => f.propertyName).ToArray());
 
           progress.Begin(_textureFeatures.Count, "", "Loading Into Scene", () => {
@@ -218,15 +240,19 @@ namespace Leap.Unity.GraphicalRenderer {
     public override void OnDisableRenderer() { }
 
     public override void OnUpdateRenderer() {
+      if (_material == null) {
+        prepareMaterial();
+      }
+
       updateTinting();
       updateBlendShapes();
       updateCustomChannels();
     }
 
 #if UNITY_EDITOR
-    public override void OnEnableRendererEditor() { }
-
     public override void OnDisableRendererEditor() {
+      base.OnDisableRendererEditor();
+
       SceneTiedAsset.Delete(ref _meshes);
       SceneTiedAsset.Delete(ref _packedTextures);
     }
@@ -245,7 +271,7 @@ namespace Leap.Unity.GraphicalRenderer {
     #region UPDATE
     protected virtual void updateTinting() {
       foreach (var tintFeature in _tintFeatures) {
-        if (!tintFeature.isDirty) continue;
+        if (!tintFeature.isDirtyOrEditTime) continue;
 
         using (new ProfilerSample("Update Tinting")) {
           tintFeature.featureData.Query().Select(d => (Vector4)d.color).FillList(_tintColors);
@@ -256,7 +282,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void updateBlendShapes() {
       foreach (var blendShapeFeature in _blendShapeFeatures) {
-        if (!blendShapeFeature.isDirty) continue;
+        if (!blendShapeFeature.isDirtyOrEditTime) continue;
 
         using (new ProfilerSample("Update Blend Shapes")) {
           blendShapeFeature.featureData.Query().Select(d => d.amount).FillList(_blendShapeAmounts);
@@ -268,21 +294,21 @@ namespace Leap.Unity.GraphicalRenderer {
     protected virtual void updateCustomChannels() {
       using (new ProfilerSample("Update Custom Channels")) {
         foreach (var floatChannelFeature in _floatChannelFeatures) {
-          if (!floatChannelFeature.isDirty) continue;
+          if (!floatChannelFeature.isDirtyOrEditTime) continue;
 
           floatChannelFeature.featureData.Query().Select(d => d.value).FillList(_customFloatChannelData);
           _material.SetFloatArraySafe(floatChannelFeature.channelName, _customFloatChannelData);
         }
 
         foreach (var vectorChannelFeature in _vectorChannelFeatures) {
-          if (!vectorChannelFeature.isDirty) continue;
+          if (!vectorChannelFeature.isDirtyOrEditTime) continue;
 
           vectorChannelFeature.featureData.Query().Select(d => d.value).FillList(_customVectorChannelData);
           _material.SetVectorArraySafe(vectorChannelFeature.channelName, _customVectorChannelData);
         }
 
         foreach (var colorChannelFeature in _colorChannelFeatures) {
-          if (!colorChannelFeature.isDirty) continue;
+          if (!colorChannelFeature.isDirtyOrEditTime) continue;
 
           colorChannelFeature.featureData.Query().Select(d => d.value).FillList(_customColorChannelData);
           _material.SetColorArraySafe(colorChannelFeature.channelName, _customColorChannelData);
@@ -316,6 +342,13 @@ namespace Leap.Unity.GraphicalRenderer {
 
         foreach (var channel in _requiredUvChannels) {
           _material.EnableKeyword(GetUvFeature(channel));
+        }
+
+        if (_customColorChannelData.Count > 0 ||
+           _customFloatChannelData.Count > 0 ||
+           _customVectorChannelData.Count > 0 ||
+           _customMatrixChannelData.Count > 0) {
+          _material.EnableKeyword(CUSTOM_CHANNEL_KEYWORD);
         }
 
         if (_textureFeatures.Count != 0) {
@@ -728,7 +761,11 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual bool doesRequireSpecialUv3() {
       return _tintFeatures.Count != 0 ||
-             _blendShapeFeatures.Count != 0;
+             _blendShapeFeatures.Count != 0 ||
+             _customFloatChannelData.Count != 0 ||
+             _customVectorChannelData.Count != 0 ||
+             _customMatrixChannelData.Count != 0 ||
+             _customColorChannelData.Count != 0;
     }
 
     protected abstract Vector3 graphicVertToMeshVert(Vector3 vertex);

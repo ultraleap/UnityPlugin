@@ -123,25 +123,17 @@ namespace Leap.Unity.GraphicalRenderer {
       using (new EditorGUI.DisabledGroupScope(EditorApplication.isPlaying)) {
         EditorGUI.BeginDisabledGroup(target.features.Count == 0);
         if (GUI.Button(middle, "-", EditorStyles.miniButtonMid) && _featureList.index >= 0) {
+          Undo.RecordObject(target, "Removed feature");
           target.editor.RemoveFeature(target.features[_featureList.index]);
-          EditorUtility.SetDirty(target);
         }
         EditorGUI.EndDisabledGroup();
 
         if (GUI.Button(right, "+", EditorStyles.miniButtonRight)) {
           _addFeatureMenu.ShowAsContext();
-          EditorUtility.SetDirty(target);
         }
       }
 
-      EditorGUI.BeginChangeCheck();
-
-      Undo.RecordObject(target, "Changed feature list.");
       _featureList.DoLayoutList();
-
-      if (EditorGUI.EndChangeCheck()) {
-        EditorUtility.SetDirty(target);
-      }
     }
 
     // Feature list callbacks
@@ -166,6 +158,9 @@ namespace Leap.Unity.GraphicalRenderer {
     private void drawFeatureCallback(Rect rect, int index, bool isActive, bool isFocused) {
       rect = rect.SingleLine();
       var feature = target.features[index];
+      if (feature == null) {
+        return;
+      }
 
       string featureName = LeapGraphicTagAttribute.GetTag(target.features[index].GetType());
 
@@ -209,12 +204,11 @@ namespace Leap.Unity.GraphicalRenderer {
       feature.DrawFeatureEditor(rect.NextLine().Indent(), isActive, isFocused);
       if (EditorGUI.EndChangeCheck()) {
         target.renderer.editor.ScheduleEditorUpdate();
-        EditorUtility.SetDirty(feature);
       }
     }
 
     private void onReorderFeaturesCallback(ReorderableList list) {
-      EditorUtility.SetDirty(target);
+      Undo.RecordObject(target, "Reordered feature list");
       serializedObject.Update();
     }
   }

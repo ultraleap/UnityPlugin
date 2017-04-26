@@ -97,6 +97,15 @@ namespace Leap.Unity{
     }
 
     protected void UpdateMesh() {
+
+      if (joint_vertices_ == null || joint_vertices_.Length != sides) {
+        InitJointVertices();
+      }
+      if (normals_ == null || normals_.Length != VERTICES_PER_QUAD * sides * NUM_BONES
+          || vertices_ == null || vertices_.Length != VERTICES_PER_QUAD * sides * NUM_BONES) {
+        InitMesh();
+      }
+
       int vertex_index = 0;
 
       for (int i = 0; i < NUM_BONES; ++i) {
@@ -138,6 +147,10 @@ namespace Leap.Unity{
       Quaternion base_rotation = Quaternion.Inverse(transform.rotation) * GetJointRotation(0);
       Quaternion tip_rotation = Quaternion.Inverse(transform.rotation) *
                                 GetJointRotation(NUM_JOINTS - 1);
+
+      if (cap_vertices_ == null || cap_vertices_.Length != 2 * sides) {
+        InitCapsMesh();
+      }
 
       for (int s = 0; s < sides; ++s) {
         cap_vertices_[s] = base_position + base_rotation * (widths[0] * joint_vertices_[s]);

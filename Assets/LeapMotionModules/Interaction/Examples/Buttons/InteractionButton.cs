@@ -6,8 +6,7 @@ namespace Leap.Unity.UI.Interaction {
   /// A physics-enabled button. Activation is triggered by physically pushing the button
   /// back to its compressed position.
   ///</summary>
-  [RequireComponent(typeof(InteractionBehaviour))]
-  public class InteractionButton : MonoBehaviour {
+  public class InteractionButton : InteractionBehaviour {
 
     [Header("Motion Configuration")]
 
@@ -20,11 +19,22 @@ namespace Leap.Unity.UI.Interaction {
     [Range(0f, 1f)]
     public float restingHeight = 0.5f;
 
+    [Range(0, 1)]
+    [SerializeField]
+    private float _springForce = 0.1f;
+
     // State Events
-    [HideInInspector]
     public UnityEvent OnPress = new UnityEvent();
-    [HideInInspector]
     public UnityEvent OnUnpress = new UnityEvent();
+
+    public float springForce {
+      get {
+        return _springForce;
+      }
+      set {
+        _springForce = value;
+      }
+    }
 
     //Public State variables
     ///<summary> Gets whether the button is currently held down. </summary>
@@ -38,16 +48,12 @@ namespace Leap.Unity.UI.Interaction {
 
     // Protected State Variables
 
-    ///<summary> The interaction object driving interactions for this UI element. </summary>
-    protected InteractionBehaviour behaviour;
-
     ///<summary> The initial position of this element in local space, stored upon Start() </summary>
     protected Vector3 initialLocalPosition;
 
     ///<summary> The physical position of this element in local space; may diverge from the graphical position. </summary>
     protected Vector3 localPhysicsPosition;
 
-    private Rigidbody _body;
     private Rigidbody _lastDepressor;
     private Vector3 _localDepressorPosition;
     private Vector3 _physicsPosition = Vector3.zero;
@@ -55,34 +61,34 @@ namespace Leap.Unity.UI.Interaction {
     private bool _handIsLeft = false;
     private bool _physicsOccurred;
 
-    protected virtual void Start() {
-      // Initialize Elements
-      behaviour = GetComponent<InteractionBehaviour>();
-      _body = behaviour.rigidbody;
-
+    protected override void Start() {
       // Initialize Positions
       initialLocalPosition = transform.localPosition;
       transform.localPosition = initialLocalPosition;
       localPhysicsPosition = initialLocalPosition;
       _physicsPosition = transform.position;
-      _body.position = _physicsPosition;
+      rigidbody.position = _physicsPosition;
 
       // Initialize Limits
       minMaxHeight /= transform.parent.lossyScale.z;
+
+      base.Start();
     }
 
     protected virtual void FixedUpdate() {
       if (!_physicsOccurred) {
         _physicsOccurred = true;
 
-        if (!_body.IsSleeping()) {
+        if (!rigidbody.IsSleeping()) {
           //Sleep the rigidbody if it's not really moving...
-          if (_body.position == _physicsPosition && _physicsVelocity == Vector3.zero) {
-            _body.Sleep();
+
+          float localPhysicsDisplacementPercentage = Mathf.InverseLerp(minMaxHeight.x, minMaxHeight.y, initialLocalPosition.z - localPhysicsPosition.z);
+          if (rigidbody.position == _physicsPosition && _physicsVelocity == Vector3.zero && Mathf.Abs(localPhysicsDisplacementPercentage - restingHeight) < 0.01f) {
+            rigidbody.Sleep();
             //Else, reset the body's position to where it was last time PhysX looked at it...
           } else {
-            _body.position = _physicsPosition;
-            _body.velocity = _physicsVelocity;
+            rigidbody.position = _physicsPosition;
+            rigidbody.velocity = _physicsVelocity;
           }
         }
       }
@@ -99,18 +105,18 @@ namespace Leap.Unity.UI.Interaction {
 
         //Record and enforce the sliding state from the previous frame
         Vector2 localSlidePosition = new Vector2(localPhysicsPosition.x, localPhysicsPosition.y);
-        localPhysicsPosition = transform.parent.InverseTransformPoint(_body.position);
+        localPhysicsPosition = transform.parent.InverseTransformPoint(rigidbody.position);
         localPhysicsPosition = new Vector3(localSlidePosition.x, localSlidePosition.y, localPhysicsPosition.z);
 
         // Calculate the physical kinematics of the button in local space
-        Vector3 localPhysicsVelocity = transform.parent.InverseTransformVector(_body.velocity);
-        if (isDepressed && behaviour.isPrimaryHovered && _lastDepressor != null) {
+        Vector3 localPhysicsVelocity = transform.parent.InverseTransformVector(rigidbody.velocity);
+        if (isDepressed && isPrimaryHovered && _lastDepressor != null) {
           Vector3 curLocalDepressorPos = transform.parent.InverseTransformPoint(_lastDepressor.position);
           Vector3 origLocalDepressorPos = transform.parent.InverseTransformPoint(transform.TransformPoint(_localDepressorPosition));
-          localPhysicsVelocity = Vector3.back * 5f;
+          localPhysicsVelocity = Vector3.back * 0.05f / transform.parent.lossyScale.z;
           localPhysicsPosition = GetDepressedConstrainedLocalPosition(curLocalDepressorPos - origLocalDepressorPos);
         } else {
-          localPhysicsVelocity += Vector3.forward * Mathf.Clamp(((initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z) / transform.parent.lossyScale.z), -5f, 5f);
+          localPhysicsVelocity += _springForce * Vector3.forward * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z) / Time.fixedDeltaTime;
         }
 
         // Transform the local physics back into world space
@@ -124,7 +130,7 @@ namespace Leap.Unity.UI.Interaction {
         // If the button is depressed past its limit...
         if (localPhysicsPosition.z > initialLocalPosition.z - minMaxHeight.x) {
           transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.x);
-          if (behaviour.isPrimaryHovered) {
+          if (isPrimaryHovered) {
             isDepressed = true;
           } else {
             _physicsPosition = transform.parent.TransformPoint(initialLocalPosition);
@@ -149,21 +155,17 @@ namespace Leap.Unity.UI.Interaction {
         if (isDepressed && !oldDepressed) {
           OnPress.Invoke();
           depressedThisFrame = true;
-          _handIsLeft = behaviour.primaryHoveringHand.IsLeft;
-          behaviour.manager.GetInteractionHand(_handIsLeft).SetInteractionHoverOverride(true);
+          _handIsLeft = primaryHoveringHand.IsLeft;
+          manager.GetInteractionHand(_handIsLeft).SetInteractionHoverOverride(true);
         } else if (!isDepressed && oldDepressed) {
           unDepressedThisFrame = true;
           OnUnpress.Invoke();
-          behaviour.manager.GetInteractionHand(_handIsLeft).SetInteractionHoverOverride(false);
+          manager.GetInteractionHand(_handIsLeft).SetInteractionHoverOverride(false);
         }
       }
 
       //Disable collision on this button if it is not the primary hover
-      if (behaviour.isPrimaryHovered) {
-        behaviour.ignoreContact = false;
-      } else {
-        behaviour.ignoreContact = true;
-      }
+      ignoreContact = !isPrimaryHovered;
     }
 
     // How the button should behave when it is depressed
@@ -180,6 +182,17 @@ namespace Leap.Unity.UI.Interaction {
         _lastDepressor = collision.rigidbody;
         _localDepressorPosition = transform.InverseTransformPoint(collision.rigidbody.position);
       }
+    }
+
+    public void setMinHeight(float minHeight) {
+      minMaxHeight = new Vector2(minHeight / transform.parent.lossyScale.z, minMaxHeight.y);
+    }
+    public void setMaxHeight(float maxHeight) {
+      minMaxHeight = new Vector2(minMaxHeight.x, maxHeight / transform.parent.lossyScale.z);
+    }
+
+    void Reset() {
+      contactForceMode = ContactForceModes.UI;
     }
   }
 }

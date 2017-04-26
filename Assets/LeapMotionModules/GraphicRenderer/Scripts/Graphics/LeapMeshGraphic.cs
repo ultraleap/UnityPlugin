@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
-using System.Collections.Generic;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
 
+  [DisallowMultipleComponent]
   public abstract partial class LeapMeshGraphicBase : LeapGraphic {
 
     [EditTimeOnly]
@@ -16,7 +16,9 @@ namespace Leap.Unity.GraphicalRenderer {
     public abstract void RefreshMeshData();
 
     public LeapMeshGraphicBase() {
+#if UNITY_EDITOR
       editor = new MeshEditorApi(this);
+#endif
     }
   }
 
@@ -36,6 +38,11 @@ namespace Leap.Unity.GraphicalRenderer {
                                                  UVChannelFlags.UV3;
 
     public void SetMesh(Mesh mesh) {
+      if (isAttachedToGroup) {
+        Debug.LogError("Cannot set mesh while attached to group, detach it first.");
+        return;
+      }
+
       _mesh = mesh;
     }
 

@@ -6,6 +6,7 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
 
+  [DisallowMultipleComponent]
   public class LeapPanelGraphic : LeapMeshGraphicBase {
 
     public const int MAX_VERTS = 128;

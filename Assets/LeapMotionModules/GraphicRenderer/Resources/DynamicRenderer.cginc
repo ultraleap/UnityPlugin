@@ -1,5 +1,9 @@
 #include "Assets/LeapMotionModules/GraphicRenderer/Resources/GraphicRenderer.cginc"
 
+#ifdef GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS
+#define GRAPHICS_HAVE_ID
+#endif
+
 /***********************************
  * Space name:
  *  _ (none)
@@ -16,10 +20,10 @@ float4 _GraphicRendererCurved_GraphicParameters[GRAPHIC_MAX];
 float4x4 _GraphicRenderer_LocalToWorld;
 
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-void ApplyGraphicWarping(inout float4 anchorSpaceVert, inout float4 anchorSpaceNormal, int graphicId) {
+void ApplyGraphicWarping(inout float4 anchorSpaceVert, inout float3 anchorSpaceNormal, int graphicId) {
   float4 parameters = _GraphicRendererCurved_GraphicParameters[graphicId];
 
-  Cylindrical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal.xyz, parameters);
+  Cylindrical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal, parameters);
 
   anchorSpaceVert = mul(_GraphicRenderer_LocalToWorld, anchorSpaceVert);
   anchorSpaceNormal = mul(_GraphicRenderer_LocalToWorld, float4(anchorSpaceNormal.xyz, 0));
@@ -43,13 +47,13 @@ float4 _GraphicRendererCurved_GraphicParameters[GRAPHIC_MAX];
 float4x4 _GraphicRenderer_LocalToWorld;
 
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-void ApplyGraphicWarping(inout float4 anchorSpaceVert, inout float4 anchorSpaceNormal, int graphicId) {
+void ApplyGraphicWarping(inout float4 anchorSpaceVert, inout float3 anchorSpaceNormal, int graphicId) {
   float4 parameters = _GraphicRendererCurved_GraphicParameters[graphicId];
 
-  Spherical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal.xyz, parameters);
+  Spherical_LocalToWorld(anchorSpaceVert.xyz, anchorSpaceNormal, parameters);
 
   anchorSpaceVert = mul(_GraphicRenderer_LocalToWorld, anchorSpaceVert);
-  anchorSpaceNormal = mul(_GraphicRenderer_LocalToWorld, float4(anchorSpaceNormal.xyz, 0));
+  anchorSpaceNormal = mul(_GraphicRenderer_LocalToWorld, float4(anchorSpaceNormal, 0));
 }
 #else
 void ApplyGraphicWarping(inout float4 anchorSpaceVert, int graphicId) {
@@ -131,19 +135,19 @@ struct appdata_graphic_dynamic {
   float4 vertex : POSITION;
 
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-  float4 normal : NORMAL;
+  float3 normal : NORMAL;
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_0
-  float4 uv0 : TEXCOORD0;
+  float4 texcoord : TEXCOORD0;
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_1
-  float4 uv1 : TEXCOORD1;
+  float4 texcoord1 : TEXCOORD1;
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_2
-  float4 uv2 : TEXCOORD2;
+  float4 texcoord2 : TEXCOORD2;
 #endif
 
 #ifdef GRAPHICS_HAVE_ID
@@ -155,87 +159,168 @@ struct appdata_graphic_dynamic {
 #endif
 };
 
-struct v2f_graphic_dynamic {
-  float4 vertex : SV_POSITION;
-
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-  float4 normal : NORMAL;
+#define __V2F_NORMALS float3 normal : NORMAL;
+#else
+#define __V2F_NORMALS
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_0
-  float4 uv0 : TEXCOORD0;
+#define __V2F_UV0 float2 uv_0 : TEXCOORD0;
+#else
+#define __V2F_UV0
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_1
-  float4 uv1 : TEXCOORD2;
+#define __V2F_UV1 float2 uv_1 : TEXCOORD1;
+#else
+#define __V2F_UV1
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_2
-  float4 uv2 : TEXCOORD3;
+#define __V2F_UV2 float2 uv_2 : TEXCOORD2;
+#else
+#define __V2F_UV2
 #endif
 
 #ifdef GRAPHICS_HAVE_COLOR
-  float4 color : COLOR;
+#define __V2F_COLOR float4 color : COLOR;
+#else
+#define __V2F_COLOR
 #endif
+
+#define V2F_GRAPHICAL           \
+  float4 vertex : SV_POSITION;  \
+  __V2F_NORMALS                 \
+  __V2F_UV0                     \
+  __V2F_UV1                     \
+  __V2F_UV2                     \
+  __V2F_COLOR
+
+#define SURF_INPUT_GRAPHICAL    \
+  __V2F_COLOR
+
+struct v2f_graphic_dynamic {
+  V2F_GRAPHICAL
 };
 
-v2f_graphic_dynamic ApplyDynamicGraphics(appdata_graphic_dynamic v) {
+
 #ifdef GRAPHICS_HAVE_ID
 #ifdef GRAPHIC_ID_FROM_UV0
-  int graphicId = v.uv0.w;
+#define BEGIN_V2F(v) int graphicId = v.texcoord.w;
 #else
-  int graphicId = v.vertInfo.w;
+#define BEGIN_V2F(v) int graphicId = v.vertInfo.w;
 #endif
+#else
+#define BEGIN_V2F(v)
 #endif
 
 #ifdef GRAPHICS_NEED_ANCHOR_SPACE
-  v.vertex = mul(unity_ObjectToWorld, v.vertex);
-  v.vertex = mul(_GraphicRendererCurved_WorldToAnchor[graphicId], v.vertex);
+#define __POS_TO_ANCHOR_SPACE(v) v.vertex = mul(unity_ObjectToWorld, v.vertex); \
+                                 v.vertex = mul(_GraphicRendererCurved_WorldToAnchor[graphicId], v.vertex);  
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-  v.normal = mul(unity_ObjectToWorld, float4(v.normal.xyz, 0));
-  v.normal = mul(_GraphicRendererCurved_WorldToAnchor[graphicId], float4(v.normal.xyz, 0));
+#define __NORMAL_TO_ANCHOR_SPACE(v) v.normal = mul(unity_ObjectToWorld, float4(v.normal.xyz, 0)); \
+                                    v.normal = mul(_GraphicRendererCurved_WorldToAnchor[graphicId], float4(v.normal.xyz, 0));
+#else
+#define __NORMAL_TO_ANCHOR_SPACE(v)       
 #endif
+#else
+#define __POS_TO_ANCHOR_SPACE(v)
+#define __NORMAL_TO_ANCHOR_SPACE(v)
 #endif
 
 #ifdef GRAPHIC_RENDERER_BLEND_SHAPES
-  ApplyBlendShapes(v.vertex, v.vertInfo, graphicId);
+#define __APPLY_BLEND_SHAPES(v) ApplyBlendShapes(v.vertex, v.vertInfo, graphicId);
+#else
+#define __APPLY_BLEND_SHAPES(v)
 #endif
 
 #ifdef GRAPHIC_RENDERER_WARPING
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-  ApplyGraphicWarping(v.vertex, v.normal, graphicId);
+#define __APPLY_WARPING(v) ApplyGraphicWarping(v.vertex, v.normal, graphicId);          
 #else
-  ApplyGraphicWarping(v.vertex, graphicId);
+#define __APPLY_WARPING(v) ApplyGraphicWarping(v.vertex, graphicId);
 #endif
+#else
+#define __APPLY_WARPING(v)
 #endif
 
-  v2f_graphic_dynamic o;
 #ifdef GRAPHICS_NEED_ANCHOR_SPACE
-  o.vertex = mul(UNITY_MATRIX_VP, v.vertex);
-#if GRAPHIC_RENDERER_VERTEX_NORMALS
-  o.normal = v.normal;
-#endif
+#define __COPY_POSITION(v,o) o.vertex = mul(UNITY_MATRIX_VP, v.vertex);
 #else
-  o.vertex = UnityObjectToClipPos(v.vertex);
-#if GRAPHIC_RENDERER_VERTEX_NORMALS
-  o.normal = UnityObjectToWorldNormal(v.normal);
+#define __COPY_POSITION(v,o) o.vertex = UnityObjectToClipPos(v.vertex);
 #endif
+
+#ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
+#define __COPY_NORMALS(v,o) o.normal = UnityObjectToWorldNormal(v.normal);
+#else
+#define __COPY_NORMALS(v,o)
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_0
-  o.uv0 = v.uv0;
+#define __COPY_UV0(v,o) o.uv_0 = v.texcoord;
+#else
+#define __COPY_UV0(v,o)
+#endif
+
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_1
+#define __COPY_UV1(v,o) o.uv_1 = v.texcoord1;
+#else
+#define __COPY_UV1(v,o)
+#endif
+
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_2
+#define __COPY_UV2(v,o) o.uv_2 = v.texcoord2;
+#else
+#define __COPY_UV2(v,o)
+#endif
+
+#ifdef GRAPHIC_RENDERER_VERTEX_COLORS
+#define __COPY_COLORS(v,o) o.color = v.color;
+#else
+#ifdef GRAPHICS_HAVE_COLOR
+#define __COPY_COLORS(v,o) o.color = 1;
+#else
+#define __COPY_COLORS(v,o)
+#endif
 #endif
 
 #ifdef GRAPHIC_RENDERER_TINTING
-  o.color = GetGraphicTint(graphicId);
-#ifdef GRAPHIC_RENDERER_VERTEX_COLORS
-  o.color *= v.color;
-#endif
+#define __APPLY_TINT(v,o) o.color *= GetGraphicTint(graphicId);
 #else
-#ifdef GRAPHIC_RENDERER_VERTEX_COLORS
-  o.color = v.color;
-#endif
+#define __APPLY_TINT(v,o)
 #endif
 
-  return o;
+#define APPLY_DYNAMIC_GRAPHICS(v,o) \
+{                                   \
+  __POS_TO_ANCHOR_SPACE(v)          \
+  __NORMAL_TO_ANCHOR_SPACE(v)       \
+  __APPLY_BLEND_SHAPES(v)           \
+  __APPLY_WARPING(v)                \
+  __COPY_POSITION(v,o)              \
+  __COPY_NORMALS(v,o)               \
+  __COPY_UV0(v,o)                   \
+  __COPY_UV1(v,o)                   \
+  __COPY_UV2(v,o)                   \
+  __COPY_COLORS(v,o)                \
+  __APPLY_TINT(v,o)                 \
 }
+
+#define APPLY_DYNAMIC_GRAPHICS_STANDARD(v,o) \
+{                                            \
+  __POS_TO_ANCHOR_SPACE(v)                   \
+  __NORMAL_TO_ANCHOR_SPACE(v)                \
+  __APPLY_BLEND_SHAPES(v);                   \
+  __APPLY_WARPING(v);                        \
+  __APPLY_TINT(v,o)                          \
+}
+
+#define DEFINE_FLOAT_CHANNEL(name) float name[GRAPHIC_MAX]
+#define DEFINE_FLOAT4_CHANNEL(name) float4 name[GRAPHIC_MAX]
+#define DEFINE_FLOAT4x4_CHANNEL(name) float4x4 name[GRAPHIC_MAX]
+
+#ifdef GRAPHICS_HAVE_ID
+#define getChannel(name) (name[graphicId])
+#else
+#define getChannel(name) 0
+#endif

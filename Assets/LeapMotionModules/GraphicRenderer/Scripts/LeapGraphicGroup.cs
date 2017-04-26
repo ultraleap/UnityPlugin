@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using Leap.Unity.Space;
 using Leap.Unity.Query;
 
@@ -46,9 +49,9 @@ namespace Leap.Unity.GraphicalRenderer {
           _renderer = GetComponent<LeapGraphicRenderer>();
 
           if (_renderer == null) {
-            Debug.LogError("The graphic group " + this + " still exists but isn't connected to any renderer!");
+            Debug.LogError("The graphic group still exists but isn't connected to any renderer!", this);
           } else {
-            Debug.LogWarning("The _renderer field of the graphic group " + this + " became null!");
+            Debug.LogWarning("The _renderer field of the graphic group became null!", this);
           }
         }
 #endif
@@ -64,9 +67,9 @@ namespace Leap.Unity.GraphicalRenderer {
           _renderingMethod = GetComponent<LeapRenderingMethod>();
 
           if (_renderingMethod == null) {
-            Debug.LogError("The graphic group " + this + " still exists but isn't connected to any rendering method!");
+            Debug.LogError("The graphic group still exists but isn't connected to any rendering method!", this);
           } else {
-            Debug.LogWarning("The _renderingMethod field of the graphic group " + this + " became null!");
+            Debug.LogWarning("The _renderingMethod field of the graphic group became null!", this);
           }
         }
 #endif
@@ -77,14 +80,14 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public List<LeapGraphicFeatureBase> features {
       get {
-        Assert.IsNotNull(_features, "The feature list of graphic group " + this + " was null!");
+        Assert.IsNotNull(_features, "The feature list of graphic group was null!");
         return _features;
       }
     }
 
     public List<LeapGraphic> graphics {
       get {
-        Assert.IsNotNull(_graphics, "The graphic list of graphic group " + this + " was null!");
+        Assert.IsNotNull(_graphics, "The graphic list of graphic group was null!");
         return _graphics;
       }
     }
@@ -95,7 +98,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// </summary>
     public List<SupportInfo> supportInfo {
       get {
-        Assert.IsNotNull(_supportInfo, "The support info list of graphic group " + this + " was null!");
+        Assert.IsNotNull(_supportInfo, "The support info list of graphic group was null!");
         Assert.AreEqual(_features.Count, _supportInfo.Count, "The support info list should have the same length as the feature list.");
         return _supportInfo;
       }
@@ -113,6 +116,13 @@ namespace Leap.Unity.GraphicalRenderer {
       if (!addRemoveSupportedOrEditTime()) {
         return false;
       }
+
+#if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        Undo.RecordObject(graphic, "Added graphic to group");
+        Undo.RecordObject(this, "Added graphic to group");
+      }
+#endif
 
       if (_graphics.Contains(graphic)) {
         if (graphic.attachedGroup == null) {
@@ -158,6 +168,13 @@ namespace Leap.Unity.GraphicalRenderer {
       if (graphicIndex < 0) {
         return false;
       }
+
+#if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        Undo.RecordObject(graphic, "Removed graphic from group");
+        Undo.RecordObject(this, "Removed graphic from group");
+      }
+#endif
 
       graphic.OnDetachedFromGroup();
       _graphics.RemoveAt(graphicIndex);
@@ -299,30 +316,17 @@ namespace Leap.Unity.GraphicalRenderer {
     protected override void OnValidate() {
       base.OnValidate();
 
-      if (_renderer == null) {
-        _renderer = GetComponent<LeapGraphicRenderer>();
-      }
-
-      if (!Application.isPlaying) {
-        _addRemoveSupported = true;
-        if (_renderingMethod != null) {
-          _addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(renderingMethod.GetType());
-        }
-        if (_renderer.space != null) {
-          _addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(_renderer.space.GetType());
-        }
-      }
-
       for (int i = _features.Count; i-- != 0;) {
         if (_features[i] == null) {
           _features.RemoveAt(i);
         }
       }
 
-      if (_renderingMethod != null) {
-        _renderingMethod.renderer = _renderer;
-        _renderingMethod.group = this;
+#if UNITY_EDITOR
+      if (!InternalUtility.IsPrefab(this)) {
+        editor.OnValidate();
       }
+#endif
     }
 
 #if UNITY_EDITOR

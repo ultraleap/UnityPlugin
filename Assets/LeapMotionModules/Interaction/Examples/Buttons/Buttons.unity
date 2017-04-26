@@ -167,7 +167,6 @@ GameObject:
   - component: {fileID: 85754736}
   - component: {fileID: 85754734}
   - component: {fileID: 85754733}
-  - component: {fileID: 85754732}
   - component: {fileID: 85754740}
   - component: {fileID: 85754738}
   - component: {fileID: 85754735}
@@ -190,27 +189,8 @@ Transform:
   m_LocalScale: {x: 0.13595082, y: 0.1359508, z: 0.6797541}
   m_Children: []
   m_Father: {fileID: 1369518617}
-  m_RootOrder: 5
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &85754732
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 85754730}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
-  _ignoreHover: 0
-  _ignoreContact: 0
-  _ignoreGrasping: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &85754733
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -236,7 +216,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &85754735
 MonoBehaviour:
@@ -326,8 +306,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 1
+  _contactForceMode: 1
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
+  graspedMovementType: 0
+  graspHoldWarpingEnabled__curIgnored: 1
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
+  _springForce: 0.1
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -528,6 +520,9 @@ MonoBehaviour:
   _deviceOffsets:
   - DeviceName: oculus
     HeightOffset: 1
+  moveUpKey: 0
+  moveDownKey: 0
+  stepSize: 0.1
 --- !u!4 &440484286
 Transform:
   m_ObjectHideFlags: 0
@@ -597,7 +592,6 @@ GameObject:
   - component: {fileID: 552256748}
   - component: {fileID: 552256746}
   - component: {fileID: 552256745}
-  - component: {fileID: 552256744}
   - component: {fileID: 552256752}
   - component: {fileID: 552256750}
   - component: {fileID: 552256747}
@@ -620,27 +614,8 @@ Transform:
   m_LocalScale: {x: 0.13595082, y: 0.1359508, z: 0.6797541}
   m_Children: []
   m_Father: {fileID: 1369518617}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &552256744
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 552256742}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
-  _ignoreHover: 0
-  _ignoreContact: 0
-  _ignoreGrasping: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &552256745
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -666,7 +641,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &552256747
 MonoBehaviour:
@@ -756,8 +731,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 1
+  _contactForceMode: 1
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
+  graspedMovementType: 0
+  graspHoldWarpingEnabled__curIgnored: 1
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
+  _springForce: 0.1
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -780,7 +767,6 @@ GameObject:
   - component: {fileID: 604444915}
   - component: {fileID: 604444920}
   - component: {fileID: 604444919}
-  - component: {fileID: 604444918}
   - component: {fileID: 604444914}
   - component: {fileID: 604444913}
   - component: {fileID: 604444911}
@@ -893,8 +879,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ebbb41b110e5794ab82d986ca172460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 1
+  _contactForceMode: 1
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
+  graspedMovementType: 0
+  graspHoldWarpingEnabled__curIgnored: 1
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
+  _springForce: 0.1
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -909,25 +907,16 @@ MonoBehaviour:
   verticalValueRange: {x: 0, y: 1}
   horizontalSlideLimits: {x: 0, y: 0}
   verticalSlideLimits: {x: -0.05, y: 0.05}
---- !u!114 &604444918
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 604444910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
-  _ignoreHover: 0
-  _ignoreContact: 0
-  _ignoreGrasping: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
+  horizontalSlideEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Leap.Unity.UI.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  verticalSlideEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Leap.Unity.UI.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 --- !u!54 &604444919
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -953,37 +942,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!21 &653511517
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Graphic Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
-    GRAPHIC_RENDERER_TINTING GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_UV_0
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 28318323675752204, guid: 4460571d6e5ebf1469047bb1c112efde,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex2:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &658088851
 GameObject:
   m_ObjectHideFlags: 0
@@ -1001,7 +961,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &658088852
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1080,7 +1040,6 @@ GameObject:
   - component: {fileID: 722891436}
   - component: {fileID: 722891434}
   - component: {fileID: 722891433}
-  - component: {fileID: 722891432}
   - component: {fileID: 722891438}
   - component: {fileID: 722891435}
   - component: {fileID: 722891439}
@@ -1105,25 +1064,6 @@ Transform:
   m_Father: {fileID: 1107131079}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &722891432
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 722891430}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
-  _ignoreHover: 0
-  _ignoreContact: 0
-  _ignoreGrasping: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &722891433
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1149,7 +1089,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &722891435
 MonoBehaviour:
@@ -1239,8 +1179,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ebbb41b110e5794ab82d986ca172460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 1
+  _contactForceMode: 1
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
+  graspedMovementType: 0
+  graspHoldWarpingEnabled__curIgnored: 1
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
+  _springForce: 0.1
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -1255,6 +1207,16 @@ MonoBehaviour:
   verticalValueRange: {x: 0, y: 1}
   horizontalSlideLimits: {x: -0.05, y: 0.05}
   verticalSlideLimits: {x: -0.05, y: 0.05}
+  horizontalSlideEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Leap.Unity.UI.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  verticalSlideEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Leap.Unity.UI.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 --- !u!1 &758070963
 GameObject:
   m_ObjectHideFlags: 0
@@ -1267,7 +1229,6 @@ GameObject:
   - component: {fileID: 758070969}
   - component: {fileID: 758070967}
   - component: {fileID: 758070966}
-  - component: {fileID: 758070965}
   - component: {fileID: 758070973}
   - component: {fileID: 758070971}
   - component: {fileID: 758070968}
@@ -1292,25 +1253,6 @@ Transform:
   m_Father: {fileID: 1369518617}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &758070965
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 758070963}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
-  _ignoreHover: 0
-  _ignoreContact: 0
-  _ignoreGrasping: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &758070966
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1336,7 +1278,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &758070968
 MonoBehaviour:
@@ -1426,8 +1368,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 1
+  _contactForceMode: 1
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
+  graspedMovementType: 0
+  graspHoldWarpingEnabled__curIgnored: 1
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
+  _springForce: 0.1
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -1570,7 +1524,6 @@ GameObject:
   - component: {fileID: 1093556442}
   - component: {fileID: 1093556440}
   - component: {fileID: 1093556439}
-  - component: {fileID: 1093556438}
   - component: {fileID: 1093556446}
   - component: {fileID: 1093556444}
   - component: {fileID: 1093556441}
@@ -1593,27 +1546,8 @@ Transform:
   m_LocalScale: {x: 0.13595082, y: 0.1359508, z: 0.6797541}
   m_Children: []
   m_Father: {fileID: 1369518617}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1093556438
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1093556436}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
-  _ignoreHover: 0
-  _ignoreContact: 0
-  _ignoreGrasping: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1093556439
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1639,7 +1573,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1093556441
 MonoBehaviour:
@@ -1729,8 +1663,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 1
+  _contactForceMode: 1
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
+  graspedMovementType: 0
+  graspHoldWarpingEnabled__curIgnored: 1
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
+  _springForce: 0.1
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -1853,6 +1799,35 @@ Transform:
   m_Father: {fileID: 1369518617}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!21 &1115971560
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Graphic Material
+  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  m_ShaderKeywords: GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
+    GRAPHIC_RENDERER_TINTING GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_UV_0
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 28318554562836564, guid: 8e6649ce3d437db45abe11cc8cce09e8,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &1137952024
 GameObject:
   m_ObjectHideFlags: 0
@@ -1989,12 +1964,12 @@ Transform:
   m_LocalScale: {x: 0.19999999, y: 0.10000001, z: 0.01}
   m_Children:
   - {fileID: 758070964}
-  - {fileID: 1625780158}
   - {fileID: 1093556437}
   - {fileID: 552256743}
-  - {fileID: 1715286117}
   - {fileID: 85754731}
   - {fileID: 1776897082}
+  - {fileID: 1625780158}
+  - {fileID: 1715286117}
   - {fileID: 1107131079}
   - {fileID: 1793302185}
   m_Father: {fileID: 1776547488}
@@ -2131,7 +2106,6 @@ GameObject:
   - component: {fileID: 1625780163}
   - component: {fileID: 1625780161}
   - component: {fileID: 1625780160}
-  - component: {fileID: 1625780159}
   - component: {fileID: 1625780165}
   - component: {fileID: 1625780162}
   - component: {fileID: 1625780166}
@@ -2154,27 +2128,8 @@ Transform:
   m_LocalScale: {x: 0.13595082, y: 0.1359508, z: 0.6797541}
   m_Children: []
   m_Father: {fileID: 1369518617}
-  m_RootOrder: 1
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1625780159
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1625780157}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
-  _ignoreHover: 0
-  _ignoreContact: 0
-  _ignoreGrasping: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1625780160
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2200,7 +2155,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1625780162
 MonoBehaviour:
@@ -2290,8 +2245,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce6f8855d2b9df243a0325d7900b7330, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 0
+  _contactForceMode: 1
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
+  graspedMovementType: 0
+  graspHoldWarpingEnabled__curIgnored: 1
   minMaxHeight: {x: 0, y: 0.02}
-  restingHeight: 0.75
+  restingHeight: 0.5
+  _springForce: 0.1
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -2303,7 +2270,12 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   toggledRestingHeight: 0.25
-  toggled: 0
+  _toggled: 0
+  toggleEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
 --- !u!1 &1643924751
 GameObject:
   m_ObjectHideFlags: 0
@@ -2381,59 +2353,6 @@ MonoBehaviour:
   _material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   _sphereMesh: {fileID: 4300002, guid: 2f496b1b1bec86743b418551f859020c, type: 3}
   _cylinderResolution: 5
-  _serializedTransforms:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!1 &1676575076
 GameObject:
   m_ObjectHideFlags: 0
@@ -2446,7 +2365,6 @@ GameObject:
   - component: {fileID: 1676575084}
   - component: {fileID: 1676575083}
   - component: {fileID: 1676575082}
-  - component: {fileID: 1676575081}
   - component: {fileID: 1676575080}
   - component: {fileID: 1676575079}
   - component: {fileID: 1676575078}
@@ -2510,8 +2428,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 1
+  _contactForceMode: 1
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
+  graspedMovementType: 0
+  graspHoldWarpingEnabled__curIgnored: 1
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
+  _springForce: 0.1
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -2522,25 +2452,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
---- !u!114 &1676575081
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1676575076}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
-  _ignoreHover: 0
-  _ignoreContact: 0
-  _ignoreGrasping: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1676575082
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2566,7 +2477,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1676575084
 MonoBehaviour:
@@ -2629,7 +2540,6 @@ GameObject:
   - component: {fileID: 1715286122}
   - component: {fileID: 1715286120}
   - component: {fileID: 1715286119}
-  - component: {fileID: 1715286118}
   - component: {fileID: 1715286124}
   - component: {fileID: 1715286121}
   - component: {fileID: 1715286125}
@@ -2652,27 +2562,8 @@ Transform:
   m_LocalScale: {x: 0.13595082, y: 0.1359508, z: 0.6797541}
   m_Children: []
   m_Father: {fileID: 1369518617}
-  m_RootOrder: 4
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1715286118
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1715286116}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
-  _ignoreHover: 0
-  _ignoreContact: 0
-  _ignoreGrasping: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1715286119
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2698,7 +2589,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1715286121
 MonoBehaviour:
@@ -2788,8 +2679,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce6f8855d2b9df243a0325d7900b7330, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 1
+  _contactForceMode: 1
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
+  graspedMovementType: 0
+  graspHoldWarpingEnabled__curIgnored: 1
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.75
+  _springForce: 0.1
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -2801,7 +2704,12 @@ MonoBehaviour:
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
   toggledRestingHeight: 0.25
-  toggled: 0
+  _toggled: 0
+  toggleEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
+      PublicKeyToken=null
 --- !u!1 &1776547483
 GameObject:
   m_ObjectHideFlags: 0
@@ -2814,9 +2722,9 @@ GameObject:
   - component: {fileID: 1776547486}
   - component: {fileID: 1776547490}
   - component: {fileID: 1776547484}
-  - component: {fileID: 1776547489}
   - component: {fileID: 1776547485}
   - component: {fileID: 1776547492}
+  - component: {fileID: 1776547489}
   m_Layer: 0
   m_Name: GUI
   m_TagString: Untagged
@@ -2838,18 +2746,18 @@ MonoBehaviour:
   featureData:
   - {fileID: 1369518618}
   - {fileID: 758070968}
-  - {fileID: 1625780162}
   - {fileID: 1093556441}
   - {fileID: 552256747}
-  - {fileID: 1715286121}
   - {fileID: 85754735}
   - {fileID: 1776897086}
-  - {fileID: 1793302178}
-  - {fileID: 118534873}
-  - {fileID: 1676575078}
+  - {fileID: 1625780162}
+  - {fileID: 1715286121}
   - {fileID: 1107131076}
   - {fileID: 722891435}
   - {fileID: 604444913}
+  - {fileID: 1793302178}
+  - {fileID: 118534873}
+  - {fileID: 1676575078}
   propertyName: _BumpMap
   channel: 1
 --- !u!114 &1776547485
@@ -2880,9 +2788,9 @@ MonoBehaviour:
     _filterMode: 1
     _format: 5
     _maxAtlasSize: 4096
-  _material: {fileID: 653511517}
-  _meshes: {fileID: 11400000, guid: 98bc3a57c3b2529419fdd08a69b19091, type: 2}
-  _packedTextures: {fileID: 11400000, guid: 4460571d6e5ebf1469047bb1c112efde, type: 2}
+  _material: {fileID: 1115971560}
+  _meshes: {fileID: 11400000, guid: 53d9098edacf0e6478ea21c987788306, type: 2}
+  _packedTextures: {fileID: 11400000, guid: 8e6649ce3d437db45abe11cc8cce09e8, type: 2}
   _atlasUvs:
     _channel0:
       _keys:
@@ -2960,18 +2868,18 @@ MonoBehaviour:
   _graphics:
   - {fileID: 1369518620}
   - {fileID: 758070970}
-  - {fileID: 1625780164}
   - {fileID: 1093556443}
   - {fileID: 552256749}
-  - {fileID: 1715286123}
   - {fileID: 85754737}
   - {fileID: 1776897088}
-  - {fileID: 1793302177}
-  - {fileID: 118534875}
-  - {fileID: 1676575085}
+  - {fileID: 1625780164}
+  - {fileID: 1715286123}
   - {fileID: 1107131075}
   - {fileID: 722891437}
   - {fileID: 604444912}
+  - {fileID: 1793302177}
+  - {fileID: 118534875}
+  - {fileID: 1676575085}
   _supportInfo:
   - support: 0
     message: 
@@ -3023,7 +2931,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   parent: {fileID: 1776547489}
   space: {fileID: 1776547489}
-  _radius: 0.4
+  _radius: 0.5
 --- !u!114 &1776547490
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -3038,18 +2946,18 @@ MonoBehaviour:
   featureData:
   - {fileID: 1369518621}
   - {fileID: 758070971}
-  - {fileID: 1625780165}
   - {fileID: 1093556444}
   - {fileID: 552256750}
-  - {fileID: 1715286124}
   - {fileID: 85754738}
   - {fileID: 1776897089}
-  - {fileID: 1793302179}
-  - {fileID: 118534874}
-  - {fileID: 1676575079}
+  - {fileID: 1625780165}
+  - {fileID: 1715286124}
   - {fileID: 1107131077}
   - {fileID: 722891438}
   - {fileID: 604444914}
+  - {fileID: 1793302179}
+  - {fileID: 118534874}
+  - {fileID: 1676575079}
   propertyName: _MainTex
   channel: 1
 --- !u!114 &1776547492
@@ -3066,18 +2974,18 @@ MonoBehaviour:
   featureData:
   - {fileID: 1369518622}
   - {fileID: 758070972}
-  - {fileID: 1625780166}
   - {fileID: 1093556445}
   - {fileID: 552256751}
-  - {fileID: 1715286125}
   - {fileID: 85754739}
   - {fileID: 1776897090}
-  - {fileID: 1793302176}
-  - {fileID: 118534877}
-  - {fileID: 1676575086}
+  - {fileID: 1625780166}
+  - {fileID: 1715286125}
   - {fileID: 1107131074}
   - {fileID: 722891439}
   - {fileID: 604444911}
+  - {fileID: 1793302176}
+  - {fileID: 118534877}
+  - {fileID: 1676575086}
 --- !u!1 &1776897081
 GameObject:
   m_ObjectHideFlags: 0
@@ -3090,7 +2998,6 @@ GameObject:
   - component: {fileID: 1776897087}
   - component: {fileID: 1776897085}
   - component: {fileID: 1776897084}
-  - component: {fileID: 1776897083}
   - component: {fileID: 1776897091}
   - component: {fileID: 1776897089}
   - component: {fileID: 1776897086}
@@ -3113,27 +3020,8 @@ Transform:
   m_LocalScale: {x: 0.13595082, y: 0.1359508, z: 0.6797541}
   m_Children: []
   m_Father: {fileID: 1369518617}
-  m_RootOrder: 6
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1776897083
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1776897081}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
-  _ignoreHover: 0
-  _ignoreContact: 0
-  _ignoreGrasping: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
 --- !u!54 &1776897084
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3159,7 +3047,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1776897086
 MonoBehaviour:
@@ -3249,8 +3137,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cba520a60e47274cb1e5afbb57aae0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 1
+  _contactForceMode: 1
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
+  graspedMovementType: 0
+  graspHoldWarpingEnabled__curIgnored: 1
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
+  _springForce: 0.1
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -3273,7 +3173,6 @@ GameObject:
   - component: {fileID: 1793302184}
   - component: {fileID: 1793302183}
   - component: {fileID: 1793302182}
-  - component: {fileID: 1793302181}
   - component: {fileID: 1793302179}
   - component: {fileID: 1793302178}
   - component: {fileID: 1793302176}
@@ -3360,8 +3259,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ebbb41b110e5794ab82d986ca172460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _manager: {fileID: 0}
+  _ignoreHover: 0
+  _ignoreContact: 0
+  _ignoreGrasping: 1
+  _contactForceMode: 1
+  _allowMultiGrasp: 0
+  _moveObjectWhenGrasped: 1
+  _eventTable:
+    _entries: []
+  graspedMovementType: 0
+  graspHoldWarpingEnabled__curIgnored: 1
   minMaxHeight: {x: 0, y: 0.02}
   restingHeight: 0.5
+  _springForce: 0.1
   OnPress:
     m_PersistentCalls:
       m_Calls: []
@@ -3376,25 +3287,16 @@ MonoBehaviour:
   verticalValueRange: {x: 0, y: 1}
   horizontalSlideLimits: {x: -0.05, y: 0.05}
   verticalSlideLimits: {x: 0, y: 0}
---- !u!114 &1793302181
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1793302175}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _manager: {fileID: 0}
-  _ignoreHover: 0
-  _ignoreContact: 0
-  _ignoreGrasping: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
+  horizontalSlideEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Leap.Unity.UI.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+  verticalSlideEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: Leap.Unity.UI.Interaction.InteractionSlider+FloatEvent, Assembly-CSharp,
+      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
 --- !u!54 &1793302182
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3420,7 +3322,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 2, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &1793302184
 MonoBehaviour:
@@ -3641,56 +3543,3 @@ MonoBehaviour:
   _material: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   _sphereMesh: {fileID: 4300002, guid: 2f496b1b1bec86743b418551f859020c, type: 3}
   _cylinderResolution: 5
-  _serializedTransforms:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}

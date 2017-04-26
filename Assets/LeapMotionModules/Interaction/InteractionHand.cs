@@ -2,42 +2,197 @@ using InteractionEngineUtility;
 using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Space;
 using Leap.Unity.UI.Interaction.Internal;
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.UI.Interaction {
 
-  public class InteractionHand {
+  public class InteractionHand : MonoBehaviour {
+
+    #region Public API
+
+    #region Hand State
+
+    public bool isTracked { get { return _hand != null; } }
+
+    public Hand GetLeapHand() {
+      return _hand;
+    }
+
+    public Hand GetLastTrackedLeapHand() {
+      return _warpedHandData;
+    }
+
+    #endregion
+
+    #region Hovering
+
+    /// <summary>
+    /// Gets whether the InteractionHand is currently primarily hovering over any interaction object.
+    /// </summary>
+    public bool isPrimaryHovering { get { return hoverCheckResults.primaryHovered as InteractionBehaviour != null; } }
+
+    /// <summary>
+    /// Gets the InteractionBehaviour that is currently this InteractionHand's primary hovered object,
+    /// if there is one.
+    /// </summary>
+    public InteractionBehaviour primaryHoveredObject { get { return hoverCheckResults.primaryHovered as InteractionBehaviour; } }
+
+    /// <summary>
+    /// Called when this InteractionHand begins primarily hovering over an InteractionBehaviour.
+    /// If the hand has transitioned from one object to another, OnEndPrimaryHoveringObject will
+    /// first be called on the old object, then OnBeginPrimaryHoveringObject will be called for
+    /// the new object.
+    /// </summary>
+    public Action<InteractionBehaviour> OnBeginPrimaryHoveringObject = (intObj) => { };
+
+    /// <summary>
+    /// Called every (fixed) frame this InteractionHand is primarily hovering over an InteractionBehaviour.
+    /// If the hand has transitioned from one object to another, OnEndPrimaryHoveringObject will
+    /// first be called on the old object, then OnBeginPrimaryHoveringObject will be called for
+    /// the new object.
+    /// </summary>
+    public Action<InteractionBehaviour> OnStayPrimaryHoveringObject = (intObj) => { };
+
+    /// <summary>
+    /// Called when this InteractionHand stops primarily hovering over an InteractionBehaviour.
+    /// If the hand has transitioned from one object to another, OnEndPrimaryHoveringObject will
+    /// first be called on the old object, then OnBeginPrimaryHoveringObject will be called for
+    /// the new object.
+    /// </summary>
+    public Action<InteractionBehaviour> OnEndPrimaryHoveringObject = (intObj) => { };
+
+    /// <summary>
+    /// When set to true, locks the current primarily hovered object, even if the hand gets closer to
+    /// a different object.
+    /// </summary>
+    public void SetInteractionHoverOverride(bool value) {
+      _interactionHoverOverride = value;
+    }
+
+    #endregion
+
+    #region Grasping
+
+    /// <summary> Gets whether this hand is currently grasping an object. </summary>
+    public bool isGraspingObject { get { return _graspedObject != null; } }
+
+    /// <summary> Gets the object this hand is currently grasping, or null if there is no such object. </summary>
+    public IInteractionBehaviour graspedObject { get { return _graspedObject; } }
+
+    /// <summary> Gets the set of objects currently considered graspable. </summary>
+    public HashSet<IInteractionBehaviour> graspCandidates { get { return graspActivityManager.ActiveObjects; } }
+
+    private Vector3[] _graspingFingertipsCache = new Vector3[5];
+    /// <summary>
+    /// Returns approximately where the hand is grasping the currently grasped InteractionBehaviour.
+    /// (Specifically, the centroid of the grasping fingers.) This method will print an error if the
+    /// hand is not currently grasping an object. </summary>
+    public Vector3 GetGraspPoint() {
+      if (_graspedObject == null) {
+        Debug.LogError("Cannot compute grasp point: This hand is not grasping an object.");
+        return Vector3.zero;
+      }
+      using (new ProfilerSample("Compute Grasp Location")) {
+        int numGraspingFingertips;
+        Vector3 sum = Vector3.zero; ;
+        grabClassifier.GetGraspingFingertipPositions(_graspedObject, _graspingFingertipsCache, out numGraspingFingertips);
+        if (numGraspingFingertips == 0) {
+          Debug.LogError("Cannot compute grasp point: The hand has a grasped object, but this object is not classified as grasped by the classifier.");
+        }
+        for (int i = 0; i < numGraspingFingertips; i++) {
+          sum += _graspingFingertipsCache[i];
+        }
+        sum /= numGraspingFingertips;
+        return sum;
+      }
+    }
+
+    private List<InteractionHand> _releasingHandListBuffer = new List<InteractionHand>();
+    /// <summary>
+    /// Releases the object this hand is holding and returns true if the hand was holding an object,
+    /// or false if there was no object to release. The released object will dispatch OnGraspEnd()
+    /// immediately. The hand is guaranteed not to be holding an object directly after this method
+    /// is called.
+    /// </summary>
+    public bool ReleaseGrasp() {
+      if (_graspedObject == null) {
+        return false;
+      }
+      else {
+        _releasingHandListBuffer.Clear();
+        _releasingHandListBuffer.Add(this);
+
+        grabClassifier.NotifyGraspReleased(_graspedObject);
+
+        _graspedObject.EndGrasp(_releasingHandListBuffer);
+        _graspedObject = null;
+
+        return true;
+      }
+    }
+
+    /// <summary>
+    /// As ReleaseGrasp(), but also outputs the released object into releasedObject if the hand
+    /// successfully released an object.
+    /// </summary>
+    public bool ReleaseGrasp(out IInteractionBehaviour releasedObject) {
+      releasedObject = _graspedObject;
+
+      if (ReleaseGrasp()) {
+        // releasedObject will be non-null
+        return true;
+      }
+
+      // releasedObject will be null
+      return false;
+    }
+
+    /// <summary>
+    /// Attempts to release this hand's object, but only if the argument object is the object currently
+    /// grasped by this hand. If the hand was holding the argument object, returns true, otherwise returns false.
+    /// </summary>
+    public bool ReleaseObject(IInteractionBehaviour toRelease) {
+      if (_graspedObject == toRelease) {
+        ReleaseGrasp();
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+
+    #endregion
+
+    #endregion
 
     public InteractionManager interactionManager;
-
-    private Func<Hand> _handAccessor;
+    public Func<Hand> handAccessor;
 
     private Hand _handData;       // copy of latest tracked hand data; never null, never warped
     private Hand _warpedHandData; // a warped copy of _handData (if warping is necessary, otherwise same as above)
     private Hand _hand;           // null when not tracked, otherwise _handData
 
-    public InteractionHand(InteractionManager interactionManager,
-                           Func<Hand> handAccessor) {
-      this.interactionManager = interactionManager;
-      _handAccessor = handAccessor;
+    void Start() {
+      if (interactionManager == null) interactionManager = InteractionManager.instance;
+      if (handAccessor == null) handAccessor = () => { return null; };
       _handData = new Hand();
       _warpedHandData = new Hand();
       RefreshHandState();
     }
 
-    /// <summary>
-    /// Called by the InteractionManager every fixed (physics) frame to populate the
-    /// Interaction Hand with state from the Leap hand.
-    /// </summary>
-    public void RefreshHandState() {
-      var hand = _handAccessor();
+    private void RefreshHandState() {
+      var hand = handAccessor();
       if (hand != null) { _hand = _handData.CopyFrom(hand); } else { _hand = null; }
     }
 
     private bool _didHoveringLastFrame, _didContactLastFrame, _didGraspingLastFrame;
+    /// <summary>
+    /// Called by the InteractionManager every fixed (physics) frame to populate the
+    /// Interaction Hand with state from the Leap hand and perform bookkeeping operations.
+    /// </summary>
     public void FixedUpdateHand(bool doHovering, bool doContact, bool doGrasping) {
       using (new ProfilerSample("Fixed Update InteractionHand", _brushBoneParent)) {
         RefreshHandState();
@@ -53,37 +208,44 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public bool isTracked { get { return _hand != null; } }
-
-    public Hand GetLeapHand() {
-      return _hand;
-    }
-
-    public Hand GetLastTrackedLeapHand() {
-      return _warpedHandData;
-    }
-
     #region Hovering
 
     private const float MAX_PRIMARY_HOVER_DISTANCE = 0.5F;
     private IInteractionBehaviour _primaryHoveredLastFrame = null;
 
-    private ActivityManager _hoverActivityManager;
-    public ActivityManager hoverActivityManager {
+    // Hover Activity Manager
+    private ActivityManager<IInteractionBehaviour> _hoverActivityManager;
+    public ActivityManager<IInteractionBehaviour> hoverActivityManager {
       get {
         if (_hoverActivityManager == null) {
-          _hoverActivityManager = new ActivityManager(interactionManager);
-          _hoverActivityManager.filter = (intObj) => { return !intObj.ignoreHover; };
+          if (hoverActivityFilter == null) hoverActivityFilter = hoverFilterFunc;
+
+          _hoverActivityManager = new ActivityManager<IInteractionBehaviour>(interactionManager.hoverActivationRadius,
+                                                                             hoverActivityFilter);
+
+          _hoverActivityManager.activationLayerMask = interactionManager.interactionLayer.layerMask
+                                                    | interactionManager.interactionNoContactLayer.layerMask;
         }
         return _hoverActivityManager;
       }
     }
 
+    private Func<Collider, IInteractionBehaviour> hoverActivityFilter;
+    private IInteractionBehaviour hoverFilterFunc(Collider collider) {
+      if (collider.attachedRigidbody != null) {
+        Rigidbody body = collider.attachedRigidbody;
+        IInteractionBehaviour intObj;
+        if (body != null && interactionManager.rigidbodyRegistry.TryGetValue(body, out intObj)
+            && !intObj.ignoreHover) {
+          return intObj;
+        }
+      }
+
+      return null;
+    }
+
     // Disables broadphase checks if an object is currently interacting with this hand.
     private bool _interactionHoverOverride = false;
-    public void SetInteractionHoverOverride(bool value) {
-      _interactionHoverOverride = value;
-    }
 
     public struct HoverCheckResults {
       public HashSet<IInteractionBehaviour> hovered;
@@ -108,8 +270,8 @@ namespace Leap.Unity.UI.Interaction {
 
         if (_contactBehaviours.Count == 0 && !_interactionHoverOverride) {
           hoverActivityManager.activationRadius = interactionManager.WorldHoverActivationRadius;
-          _hoverActivityManager.FixedUpdatePosition((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
-          using (new ProfilerSample("Check for Closest Elements")) { CheckHoverForHand(_hand, _hoverActivityManager.ActiveBehaviours); }
+          _hoverActivityManager.FixedUpdateQueryPosition((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
+          using (new ProfilerSample("Check for Closest Elements")) { CheckHoverForHand(_hand, _hoverActivityManager.ActiveObjects); }
         }
 
         ProcessHoverCheckResults();
@@ -120,7 +282,7 @@ namespace Leap.Unity.UI.Interaction {
           _warpedHandData.CopyFrom(_handData);
           if (_hoverResults.primaryHovered != null && (space = _hoverResults.primaryHovered.space) != null) {
             //Transform bulk hand to the closest element's warped space
-            coarseInverseTransformHand(_warpedHandData, space);
+            inverseTransformHand(_warpedHandData, space);
           }
         }
       }
@@ -164,13 +326,17 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    public void coarseInverseTransformHand(Hand inHand, ISpaceComponent element) {
+    private void inverseTransformHand(Hand inHand, ISpaceComponent element) {
       if (element.anchor != null && element.anchor.space != null) {
-        Vector3 localPalmPos = element.anchor.space.transform.InverseTransformPoint(inHand.PalmPosition.ToVector3());
-        Quaternion localPalmRot = element.anchor.space.transform.InverseTransformRotation(inHand.Rotation.ToQuaternion());
+        Vector3 originalPosition = inHand.Fingers[hoverCheckResults.primaryHoveringFingerIdx].bones[3].NextJoint.ToVector3();
+        Quaternion originalRotation = inHand.Fingers[hoverCheckResults.primaryHoveringFingerIdx].bones[3].Rotation.ToQuaternion();
 
-        inHand.SetTransform(element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPalmPos)),
-                            element.anchor.space.transform.TransformRotation(element.anchor.transformer.InverseTransformRotation(localPalmPos, localPalmRot)));
+        Vector3 localTipPos = element.anchor.space.transform.InverseTransformPoint(originalPosition);
+        Quaternion localTipRot = element.anchor.space.transform.InverseTransformRotation(originalRotation);
+
+        inHand.Transform(-originalPosition, Quaternion.identity);
+        inHand.Transform(element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localTipPos)),
+                         element.anchor.space.transform.TransformRotation(element.anchor.transformer.InverseTransformRotation(localTipPos, localTipRot)) * Quaternion.Inverse(originalRotation));
       }
     }
 
@@ -178,9 +344,9 @@ namespace Leap.Unity.UI.Interaction {
 
       float distance = float.PositiveInfinity;
       if (spaceComponent == null) {
-        distance = behaviour.GetComparativeHoverDistance(position);
+        distance = behaviour.GetHoverDistance(position);
       } else {
-        distance = behaviour.GetComparativeHoverDistance(transformPoint(position, spaceComponent));
+        distance = behaviour.GetHoverDistance(transformPoint(position, spaceComponent));
       }
 
       curResults.hovered.Add(behaviour);
@@ -201,7 +367,7 @@ namespace Leap.Unity.UI.Interaction {
       _hoverBeganBuffer.Clear();
       _hoverEndedBuffer.Clear();
 
-      var trackedBehaviours = _hoverActivityManager.ActiveBehaviours;
+      var trackedBehaviours = _hoverActivityManager.ActiveObjects;
       foreach (var hoverable in trackedBehaviours) {
         bool inLastFrame = false, inCurFrame = false;
         if (_hoverResults.hovered.Contains(hoverable)) {
@@ -264,7 +430,7 @@ namespace Leap.Unity.UI.Interaction {
     /// output set is empty.
     /// </summary>
     public bool CheckHoverStay(out HashSet<IInteractionBehaviour> hoveredObjects) {
-      hoveredObjects = hoverActivityManager.ActiveBehaviours;
+      hoveredObjects = hoverActivityManager.ActiveObjects;
       return hoveredObjects.Count > 0;
     }
 
@@ -295,7 +461,13 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     public bool CheckPrimaryHoverEnd(out IInteractionBehaviour primaryHoverEndedObject) {
       primaryHoverEndedObject = _primaryHoverEndedObject;
-      return primaryHoverEndedObject != null;
+      bool primaryHoverEnded = primaryHoverEndedObject != null;
+
+      if (primaryHoverEnded && _primaryHoverEndedObject is InteractionBehaviour) {
+        OnEndPrimaryHoveringObject(_primaryHoverEndedObject as InteractionBehaviour);
+      }
+
+      return primaryHoverEnded;
     }
 
     /// <summary>
@@ -305,7 +477,13 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     public bool CheckPrimaryHoverBegin(out IInteractionBehaviour primaryHoverBeganObject) {
       primaryHoverBeganObject = _primaryHoverBeganObject;
-      return primaryHoverBeganObject != null;
+      bool primaryHoverBegan = primaryHoverBeganObject != null;
+
+      if (primaryHoverBegan && _primaryHoverBeganObject is InteractionBehaviour) {
+        OnBeginPrimaryHoveringObject(_primaryHoverBeganObject as InteractionBehaviour);
+      }
+
+      return primaryHoverBegan;
     }
 
     /// <summary>
@@ -315,7 +493,13 @@ namespace Leap.Unity.UI.Interaction {
     /// </summary>
     public bool CheckPrimaryHoverStay(out IInteractionBehaviour primaryHoveredObject) {
       primaryHoveredObject = _hoverResults.primaryHovered;
-      return primaryHoveredObject != null;
+      bool primaryHoverStayed = primaryHoveredObject != null;
+
+      if (primaryHoverStayed && primaryHoveredObject is InteractionBehaviour) {
+        OnStayPrimaryHoveringObject(primaryHoveredObject as InteractionBehaviour);
+      }
+
+      return primaryHoverStayed;
     }
 
     #endregion
@@ -326,7 +510,6 @@ namespace Leap.Unity.UI.Interaction {
 
     private const int NUM_FINGERS = 5;
     private const int BONES_PER_FINGER = 3;
-    public const float PER_BONE_MASS_MULTIPLIER = 0.2F;
     private const float DEAD_ZONE_FRACTION = 0.1F;
     private const float DISLOCATION_FRACTION = 3.0F;
 
@@ -449,7 +632,7 @@ namespace Leap.Unity.UI.Interaction {
         body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
       }
 
-      body.mass = PER_BONE_MASS_MULTIPLIER;
+      body.mass = 0.1f;
       body.position = bone != null ? bone.Center.ToVector3() : _warpedHandData.PalmPosition.ToVector3();
       body.rotation = bone != null ? bone.Rotation.ToQuaternion() : _warpedHandData.Rotation.ToQuaternion();
       contactBone.lastTarget = bone != null ? bone.Center.ToVector3() : _warpedHandData.PalmPosition.ToVector3();
@@ -498,7 +681,7 @@ namespace Leap.Unity.UI.Interaction {
       float targetingError = Vector3.Distance(brushBone.lastTarget, body.position) / bone.Width;
       float massScale = Mathf.Clamp(1.0f - (targetingError * 2.0f), 0.1f, 1.0f)
                       * Mathf.Clamp(_warpedHandData.PalmVelocity.Magnitude * 10f, 1f, 10f);
-      body.mass = PER_BONE_MASS_MULTIPLIER * massScale * brushBone._lastObjectTouchedMass;
+      body.mass = massScale * brushBone._lastObjectTouchedAdjustedMass;
 
       //If these conditions are met, stop using brush hands to contact objects and switch to "Soft Contact"
       if (!_softContactEnabled && targetingError >= DISLOCATION_FRACTION
@@ -535,13 +718,12 @@ namespace Leap.Unity.UI.Interaction {
     //private Dictionary<Rigidbody, PhysicsUtility.Velocities> originalVelocities = new Dictionary<Rigidbody, PhysicsUtility.Velocities>();
 
     //private List<int> _softContactIdxRemovalBuffer = new List<int>();
-    
+
     private void FixedUpdateSoftContact() {
       if (_hand == null) {
         _handWasNullLastFrame = true;
         return;
-      }
-      else {
+      } else {
         // If the hand was just initialized, initialize with soft contact.
         if (_handWasNullLastFrame) {
           EnableSoftContact();
@@ -863,25 +1045,35 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Grasping
 
-    /// <summary> Gets whether this hand is currently grasping an object. </summary>
-    public bool isGraspingObject { get { return _graspedObject != null; } }
-
-    /// <summary> Gets the object this hand is currently grasping, or null if there is no such object. </summary>
-    public IInteractionBehaviour graspedObject { get { return _graspedObject; } }
-
-    /// <summary> Gets the set of objects currently considered graspable. </summary>
-    public HashSet<IInteractionBehaviour> graspCandidates { get { return graspActivityManager.ActiveBehaviours; } }
-
-    private ActivityManager _graspActivityManager;
+    // Grasp Activity Manager
+    private ActivityManager<IInteractionBehaviour> _graspActivityManager;
     /// <summary> Determines which objects are graspable any given frame. </summary>
-    private ActivityManager graspActivityManager {
+    private ActivityManager<IInteractionBehaviour> graspActivityManager {
       get {
         if (_graspActivityManager == null) {
-          _graspActivityManager = new ActivityManager(interactionManager);
-          _graspActivityManager.filter = (intObj) => { return !intObj.ignoreGrasping; };
+          if (graspActivityFilter == null) graspActivityFilter = graspFilterFunc;
+
+          _graspActivityManager = new ActivityManager<IInteractionBehaviour>(1F, graspActivityFilter);
+
+          _graspActivityManager.activationLayerMask = interactionManager.interactionLayer.layerMask
+                                                    | interactionManager.interactionNoContactLayer.layerMask;
         }
         return _graspActivityManager;
       }
+    }
+
+    private Func<Collider, IInteractionBehaviour> graspActivityFilter;
+    private IInteractionBehaviour graspFilterFunc(Collider collider) {
+      if (collider.attachedRigidbody != null) {
+        Rigidbody body = collider.attachedRigidbody;
+        IInteractionBehaviour intObj;
+        if (body != null && interactionManager.rigidbodyRegistry.TryGetValue(body, out intObj)
+            && !intObj.ignoreGrasping) {
+          return intObj;
+        }
+      }
+
+      return null;
     }
 
     private HeuristicGrabClassifier _grabClassifier;
@@ -897,87 +1089,8 @@ namespace Leap.Unity.UI.Interaction {
 
     private void FixedUpdateGrasping() {
       using (new ProfilerSample("Fixed Update InteractionHand Grasping")) {
-        graspActivityManager.FixedUpdatePosition(GetLastTrackedLeapHand().PalmPosition.ToVector3(), LeapSpace.allEnabled);
+        graspActivityManager.FixedUpdateQueryPosition(GetLastTrackedLeapHand().PalmPosition.ToVector3(), LeapSpace.allEnabled);
         grabClassifier.FixedUpdateClassifierHandState();
-      }
-    }
-
-    private Vector3[] _graspingFingertipsCache = new Vector3[5];
-    /// <summary> Returns approximately where the hand is grasping
-    /// the currently grasped InteractionBehaviour.
-    /// (Specifically, the centroid of the grasping fingers.)
-    /// This method will print an error if the hand is not currently
-    /// grasping an object. </summary>
-    public Vector3 GetGraspPoint() {
-      if (_graspedObject == null) {
-        Debug.LogError("Cannot compute grasp point: This hand is not grasping an object.");
-        return Vector3.zero;
-      }
-      using (new ProfilerSample("Compute Grasp Location")) {
-        int numGraspingFingertips;
-        Vector3 sum = Vector3.zero; ;
-        grabClassifier.GetGraspingFingertipPositions(_graspedObject, _graspingFingertipsCache, out numGraspingFingertips);
-        if (numGraspingFingertips == 0) {
-          Debug.LogError("Cannot compute grasp point: The hand has a grasped object, but this object is not classified as grasped by the classifier.");
-        }
-        for (int i = 0; i < numGraspingFingertips; i++) {
-          sum += _graspingFingertipsCache[i];
-        }
-        sum /= numGraspingFingertips;
-        return sum;
-      }
-    }
-
-    private List<InteractionHand> _releasingHandListBuffer = new List<InteractionHand>();
-    /// <summary>
-    /// Releases the object this hand is holding and returns true if the hand was holding an object,
-    /// or false if there was no object to release. The released object will dispatch OnGraspEnd()
-    /// immediately. The hand is guaranteed not to be holding an object directly after this method
-    /// is called.
-    /// </summary>
-    public bool ReleaseGrasp() {
-      if (_graspedObject == null) {
-        return false;
-      } else {
-        _releasingHandListBuffer.Clear();
-        _releasingHandListBuffer.Add(this);
-
-        grabClassifier.NotifyGraspReleased(_graspedObject);
-
-        _graspedObject.EndGrasp(_releasingHandListBuffer);
-        _graspedObject = null;
-
-        return true;
-      }
-    }
-
-
-    /// <summary>
-    /// As ReleaseGrasp(), but also outputs the released object into releasedObject if the hand
-    /// successfully released an object.
-    /// </summary>
-    public bool ReleaseGrasp(out IInteractionBehaviour releasedObject) {
-      releasedObject = _graspedObject;
-
-      if (ReleaseGrasp()) {
-        // releasedObject will be non-null
-        return true;
-      }
-
-      // releasedObject will be null
-      return false;
-    }
-
-    /// <summary>
-    /// Attempts to release this hand's object, but only if the argument object is the object currently
-    /// grasped by this hand. If the hand was holding the argument object, returns true, otherwise returns false.
-    /// </summary>
-    public bool ReleaseObject(IInteractionBehaviour toRelease) {
-      if (_graspedObject == toRelease) {
-        ReleaseGrasp();
-        return true;
-      } else {
-        return false;
       }
     }
 

@@ -46,7 +46,11 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public string text {
       get {
-        return _text;
+        if (_text == null) {
+          return "";
+        } else {
+          return _text;
+        }
       }
       set {
         _tokensDirty = true;

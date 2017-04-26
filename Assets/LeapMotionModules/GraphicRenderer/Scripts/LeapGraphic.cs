@@ -8,7 +8,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
   [ExecuteInEditMode]
   [DisallowMultipleComponent]
-  public abstract partial class LeapGraphic : MonoBehaviour, ISpaceComponent {
+  public abstract partial class LeapGraphic : MonoBehaviour, ISpaceComponent, IEquatable<LeapGraphic> {
 
     #region INSPECTOR FIELDS
     [SerializeField, HideInInspector]
@@ -113,31 +113,14 @@ namespace Leap.Unity.GraphicalRenderer {
     public virtual void OnAssignFeatureData(List<LeapFeatureData> data) {
       _featureData = data;
     }
+
+    public bool Equals(LeapGraphic other) {
+      return GetInstanceID() == other.GetInstanceID();
+    }
     #endregion
 
     #region UNITY CALLBACKS
     protected virtual void OnValidate() {
-      isRepresentationDirty = true;
-
-      //Delete any null references
-      for (int i = _featureData.Count; i-- != 0;) {
-        if (_featureData[i] == null) {
-          _featureData.RemoveAt(i);
-        }
-      }
-
-      //Destroy any components that are not referenced by me
-      var allComponents = GetComponents<LeapFeatureData>();
-      foreach (var component in allComponents) {
-        if (!_featureData.Contains(component)) {
-          InternalUtility.Destroy(component);
-        }
-      }
-
-      foreach (var dataObj in _featureData) {
-        dataObj.graphic = this;
-      }
-
 #if UNITY_EDITOR
       editor.OnValidate();
 #endif
@@ -151,6 +134,10 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void OnEnable() {
 #if UNITY_EDITOR
+      if (InternalUtility.IsPrefab(this)) {
+        return;
+      }
+
       if (Application.isPlaying) {
 #endif
         if (!isAttachedToGroup) {
@@ -166,6 +153,10 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void Start() {
 #if UNITY_EDITOR
+      if (InternalUtility.IsPrefab(this)) {
+        return;
+      }
+
       if (Application.isPlaying) {
 #endif
         if (!isAttachedToGroup) {
@@ -181,6 +172,10 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void OnDisable() {
 #if UNITY_EDITOR
+      if (InternalUtility.IsPrefab(this)) {
+        return;
+      }
+
       if (Application.isPlaying) {
 #endif
         if (isAttachedToGroup) {

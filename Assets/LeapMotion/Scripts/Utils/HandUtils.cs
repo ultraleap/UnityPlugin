@@ -20,6 +20,7 @@ namespace Leap.Unity {
     }
     private static void InitStatic() {
       s_provider = GameObject.FindObjectOfType<LeapServiceProvider>();
+      if (s_provider == null) return;
       Camera providerCamera = s_provider.GetComponentInParent<Camera>();
       if (providerCamera == null) return;
       if (providerCamera.transform.parent == null) return;
