@@ -410,15 +410,10 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     protected virtual void prepareMaterial() {
-      Material newMaterial;
-      if (_material != null) {
-        newMaterial = new Material(_material);
-        DestroyImmediate(_material);
-      } else {
-        newMaterial = new Material(_shader);
+      if (_material == null) {
+        _material = new Material(_shader);
       }
 
-      _material = newMaterial;
       _material.shader = _shader;
       _material.name = "Procedural Graphic Material";
 
