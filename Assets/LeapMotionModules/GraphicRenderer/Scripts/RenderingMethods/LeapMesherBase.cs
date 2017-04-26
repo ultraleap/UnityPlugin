@@ -250,9 +250,9 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
 #if UNITY_EDITOR
-    public override void OnEnableRendererEditor() { }
-
     public override void OnDisableRendererEditor() {
+      base.OnDisableRendererEditor();
+
       SceneTiedAsset.Delete(ref _meshes);
       SceneTiedAsset.Delete(ref _packedTextures);
     }
@@ -344,7 +344,7 @@ namespace Leap.Unity.GraphicalRenderer {
           _material.EnableKeyword(GetUvFeature(channel));
         }
 
-        if(_customColorChannelData.Count > 0 || 
+        if (_customColorChannelData.Count > 0 ||
            _customFloatChannelData.Count > 0 ||
            _customVectorChannelData.Count > 0 ||
            _customMatrixChannelData.Count > 0) {

@@ -134,6 +134,10 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void OnEnable() {
 #if UNITY_EDITOR
+      if (InternalUtility.IsPrefab(this)) {
+        return;
+      }
+
       if (Application.isPlaying) {
 #endif
         if (!isAttachedToGroup) {
@@ -149,6 +153,10 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void Start() {
 #if UNITY_EDITOR
+      if (InternalUtility.IsPrefab(this)) {
+        return;
+      }
+
       if (Application.isPlaying) {
 #endif
         if (!isAttachedToGroup) {
@@ -164,6 +172,10 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void OnDisable() {
 #if UNITY_EDITOR
+      if (InternalUtility.IsPrefab(this)) {
+        return;
+      }
+
       if (Application.isPlaying) {
 #endif
         if (isAttachedToGroup) {

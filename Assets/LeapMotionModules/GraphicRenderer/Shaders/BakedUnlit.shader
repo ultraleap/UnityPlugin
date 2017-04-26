@@ -43,7 +43,7 @@
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_0
-        color *= tex2D(_MainTex2, i.uv_0);
+        color *= tex2D(_MainTex, i.uv_0);
 #endif
 
 #ifdef GRAPHICS_HAVE_COLOR
