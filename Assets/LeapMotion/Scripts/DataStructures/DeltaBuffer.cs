@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/// <summary> Allows you to add to a capped-size ring buffer of Ts and,
+/// <summary>
+/// Allows you to add to a capped-size ring buffer of Ts and,
 /// when full, compute the buffer's average change over time.
 /// DeltaBuffer without type parameters supports Vector3s;
 /// DeltaFloatBuffer supports floats. To support other types,
-/// subclass DeltaBuffer<YourType> and implement its Delta() averaging function.</summary>
+/// subclass DeltaBuffer with your type as the generic type
+/// argument and implement its Delta() averaging function.
+/// </summary>
 public abstract class DeltaBuffer<T> {
 
   protected struct ValueTimePair {
@@ -47,7 +50,8 @@ public abstract class DeltaBuffer<T> {
   }
 
   public void SetLatest(T sample, float sampleTime) {
-    Set(Length - 1, sample, sampleTime);
+    if (Length == 0) Set(0, sample, sampleTime);
+    else Set(Length - 1, sample, sampleTime);
   }
 
   public float GetTime(int idx) {

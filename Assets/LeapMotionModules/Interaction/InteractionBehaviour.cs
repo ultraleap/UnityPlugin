@@ -400,10 +400,11 @@ namespace Leap.Unity.UI.Interaction {
     /// This method will log an error if the argument hand is not grasping this object.
     /// </summary>
     public Vector3 GetGraspPoint(InteractionHand intHand) {
-      if (intHand.graspedObject == intHand) {
+      if (intHand.graspedObject == this as IInteractionBehaviour) {
         return intHand.GetGraspPoint();
-      } else {
-        Debug.LogError("Cannot get this object's grasp point: It is not currently grasped by an InteractionHand.");
+      }
+      else {
+        Debug.LogError("Cannot get this object's grasp point: It is not currently grasped by the argument InteractionHand", intHand);
         return Vector3.zero;
       }
     }
@@ -646,7 +647,7 @@ namespace Leap.Unity.UI.Interaction {
 
     protected virtual void OnEnable() {
       if (manager == null) {
-        manager = InteractionManager.singleton;
+        manager = InteractionManager.instance;
 
         if (manager == null) {
           Debug.LogError("Interaction Behaviours require an Interaction Manager. Please ensure you have an InteractionManager in your scene.");
@@ -663,7 +664,7 @@ namespace Leap.Unity.UI.Interaction {
 
     protected virtual void Start() {
       // Make sure we have a list of all of this object's colliders.
-      RefreshPrimaryHoverColliderState();
+      RefreshInteractionColliders();
 
       // Check any Joint attachments to automatically be able to choose Kabsch pivot setting (grasping).
       RefreshPositionLockedState();
@@ -697,12 +698,16 @@ namespace Leap.Unity.UI.Interaction {
     /// <summary>
     /// Returns a comparative distance to this interaction object. Calculated by finding the
     /// smallest distance to each of the object's colliders.
-    /// <summary>
+    /// 
+    /// Any MeshColliders, however, will not have their distances calculated precisely; the squared
+    /// distance to their bounding box is calculated instead. It is possible to use a custom
+    /// set of colliders against which to test primary hover calculations: see primaryHoverColliders.
+    /// </summary>
     public virtual float GetHoverDistance(Vector3 worldPosition) {
       float closestComparativeColliderDistance = float.PositiveInfinity;
       bool hasColliders = false;
       float testDistance = float.PositiveInfinity;
-      foreach (var collider in _primaryHoverColliders) {
+      foreach (var collider in _interactionColliders) {
         if (!hasColliders) hasColliders = true;
 
         if (((collider is SphereCollider) && (collider as SphereCollider).center != Vector3.zero)
@@ -726,80 +731,11 @@ namespace Leap.Unity.UI.Interaction {
 
       if (!hasColliders) {
         return (this.transform.position - worldPosition).magnitude;
-      } else {
+      }
+      else {
         return closestComparativeColliderDistance;
       }
     }
-
-    #region Hover Colliders
-
-    private List<Collider> _primaryHoverColliders = new List<Collider>();
-
-    /// <summary>
-    /// Gets the List of Colliders used for hover distance checking for this Interaction
-    /// object. Hover distancing checking will affect which object is chosen for a hand's
-    /// primary hover, as well as for determining this object's closest hovering hand.
-    /// 
-    /// RefreshColliderState() will automatically populate the colliders List with
-    /// the this rigidbody's colliders, but is only called once on Start(). If you change
-    /// the colliders for this object at runtime, you should call RefreshColliderState()
-    /// to keep the _hoverColliders list up-to-date.
-    /// </summary>
-    /// <remarks>
-    /// If you're feeling brave, you can manually modify this list yourself.
-    /// 
-    /// Hover candidacy is determined by a hand-centric PhysX sphere-check against the
-    /// Interaction object's rigidbody's attached colliders. This behavior cannot be changed,
-    /// even if you modify the contents of primaryHoverColliders.
-    /// 
-    /// However, primary hover is determined by performing distance checks against the
-    /// colliders in the primaryHoverColliders list, so it IS possible to use different
-    /// collider(s) for primary hover checks than are used for hover candidacy, by modifying
-    /// the collider contents of this list. This will also affect which hand is chosen by
-    /// this object as its closestHoveringHand.
-    /// </remarks>
-    public List<Collider> primaryHoverColliders {
-      get { return _primaryHoverColliders; }
-    }
-
-    private Stack<Transform> _toVisit = new Stack<Transform>();
-    /// <summary>
-    /// Recursively searches the hierarchy of this Interaction object to
-    /// find all of the Colliders that are attached to its Rigidbody. These will
-    /// be the colliders used to calculate distance from the hand to determine
-    /// which object will become the primary hover.
-    /// 
-    /// Call this method manually if you change an Interaction object's colliders
-    /// after its Start() method has been called! (Called automatically on Start().)
-    /// </summary>
-    public void RefreshPrimaryHoverColliderState() {
-      _primaryHoverColliders.Clear();
-
-      // Traverse the hierarchy of this object's transform to find
-      // all of its Colliders.
-      _toVisit.Push(this.transform);
-      Transform curT;
-      while (_toVisit.Count > 0) {
-        curT = _toVisit.Pop();
-
-        // Recursively search children and children's children
-        foreach (var child in curT.GetChildren()) {
-          // Ignore children with Rigidbodies of their own; its own Rigidbody
-          // owns its own colliders and the colliders of its children
-          if (child.GetComponent<Rigidbody>() == null) {
-            _toVisit.Push(child);
-          }
-        }
-
-        // Since we'll visit every child, all we need to do is add the colliders
-        // of every transform we visit.
-        foreach (var collider in curT.GetComponents<Collider>()) {
-          _primaryHoverColliders.Add(collider);
-        }
-      }
-    }
-
-    #endregion
 
     public virtual void BeginHover(List<InteractionHand> hands) {
       foreach (var hand in hands) {
@@ -899,6 +835,33 @@ namespace Leap.Unity.UI.Interaction {
         }
       }
       _closestPrimaryHoveringHand = closestHand;
+    }
+
+    /// <summary>
+    /// Gets the List of Colliders used for hover distance checking for this Interaction
+    /// object. Hover distancing checking will affect which object is chosen for a hand's
+    /// primary hover, as well as for determining this object's closest hovering hand.
+    /// 
+    /// RefreshColliderState() will automatically populate the colliders List with
+    /// the this rigidbody's colliders, but is only called once on Start(). If you change
+    /// the colliders for this object at runtime, you should call RefreshColliderState()
+    /// to keep the _hoverColliders list up-to-date.
+    /// </summary>
+    /// <remarks>
+    /// If you're feeling brave, you can manually modify this list yourself.
+    /// 
+    /// Hover candidacy is determined by a hand-centric PhysX sphere-check against the
+    /// Interaction object's rigidbody's attached colliders. This behavior cannot be changed,
+    /// even if you modify the contents of primaryHoverColliders.
+    /// 
+    /// However, primary hover is determined by performing distance checks against the
+    /// colliders in the primaryHoverColliders list, so it IS possible to use different
+    /// collider(s) for primary hover checks than are used for hover candidacy, by modifying
+    /// the collider contents of this list. This will also affect which hand is chosen by
+    /// this object as its closestHoveringHand.
+    /// </remarks>
+    public List<Collider> primaryHoverColliders {
+      get { return _interactionColliders; }
     }
 
     #endregion
@@ -1124,11 +1087,9 @@ namespace Leap.Unity.UI.Interaction {
 
     #region Internal
 
-    protected Transform[] _childrenArray;
+    private List<Collider> _interactionColliders = new List<Collider>();
 
     protected void InitInternal() {
-      _childrenArray = GetComponentsInChildren<Transform>(true);
-
       InitLayer();
       FixedUpdateLayer();
     }
@@ -1163,6 +1124,43 @@ namespace Leap.Unity.UI.Interaction {
       _initialLayer = gameObject.layer;
     }
 
+    private Stack<Transform> _toVisit = new Stack<Transform>();
+    /// <summary>
+    /// Recursively searches the hierarchy of this Interaction object to
+    /// find all of the Colliders that are attached to its Rigidbody. These will
+    /// be the colliders used to calculate distance from the hand to determine
+    /// which object will become the primary hover.
+    /// 
+    /// Call this method manually if you change an Interaction object's colliders
+    /// after its Start() method has been called! (Called automatically on Start().)
+    /// </summary>
+    public void RefreshInteractionColliders() {
+      _interactionColliders.Clear();
+
+      // Traverse the hierarchy of this object's transform to find
+      // all of its Colliders.
+      _toVisit.Push(this.transform);
+      Transform curT;
+      while (_toVisit.Count > 0) {
+        curT = _toVisit.Pop();
+
+        // Recursively search children and children's children
+        foreach (var child in curT.GetChildren()) {
+          // Ignore children with Rigidbodies of their own; its own Rigidbody
+          // owns its own colliders and the colliders of its children
+          if (child.GetComponent<Rigidbody>() == null) {
+            _toVisit.Push(child);
+          }
+        }
+
+        // Since we'll visit every child, all we need to do is add the colliders
+        // of every transform we visit.
+        foreach (var collider in curT.GetComponents<Collider>()) {
+          _interactionColliders.Add(collider);
+        }
+      }
+    }
+
     protected void FixedUpdateLayer() {
       int layer;
 
@@ -1180,10 +1178,9 @@ namespace Leap.Unity.UI.Interaction {
         }
       }
 
-      if (gameObject.layer != layer) {
-        for (int i = 0; i < _childrenArray.Length; i++) {
-          _childrenArray[i].gameObject.layer = layer;
-        }
+      this.gameObject.layer = layer;
+      for (int i = 0; i < _interactionColliders.Count; i++) {
+        if (_interactionColliders[i].gameObject.layer != layer) _interactionColliders[i].gameObject.layer = layer;
       }
     }
 
