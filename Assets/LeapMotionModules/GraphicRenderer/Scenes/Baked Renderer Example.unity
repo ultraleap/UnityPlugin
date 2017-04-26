@@ -344,8 +344,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 28080913931359268, guid: 82af2abcd4d16f44c82e471f6c58e7ea,
-          type: 2}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex2:
@@ -1000,8 +999,8 @@ MonoBehaviour:
     _maxAtlasSize: 4096
     _extraTextures: []
   _material: {fileID: 287173087}
-  _meshes: {fileID: 11400000, guid: ed9716de5ab98e34692dda7705dfed7b, type: 2}
-  _packedTextures: {fileID: 11400000, guid: 82af2abcd4d16f44c82e471f6c58e7ea, type: 2}
+  _meshes: {fileID: 11400000, guid: fbf30c19eeeba4245b76efc2fa340a65, type: 2}
+  _packedTextures: {fileID: 11400000, guid: b1c5a786e98b104409ceba46440dad21, type: 2}
   _atlasUvs:
     _channel0:
       _keys:
@@ -1105,7 +1104,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb71699a7372344cb4e7a163c6c6922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _selectedGroup: 1
+  _selectedGroup: 0
   _space: {fileID: 0}
   _groups:
   - {fileID: 1561875136}
@@ -1151,7 +1150,7 @@ MonoBehaviour:
   _useColor: 1
   _globalTint: {r: 1, g: 1, b: 1, a: 1}
   _shader: {fileID: 4800000, guid: 109077dfbfcd5f3469886d8b9ae4b056, type: 3}
-  _meshData: {fileID: 11400000, guid: 17131a7f45c1c664daa40f0a9de4a2e2, type: 2}
+  _meshData: {fileID: 11400000, guid: c7ada96892a10764c9ed983fd13a1bbc, type: 2}
   scale: 0.03
 --- !u!114 &1561875140
 MonoBehaviour:

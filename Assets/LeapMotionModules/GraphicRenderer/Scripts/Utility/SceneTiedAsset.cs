@@ -65,7 +65,7 @@ namespace Leap.Unity.GraphicalRenderer {
       } else {
         Object otherHolder;
         if (AssetRef<T>.map.TryGetValue(t, out otherHolder)) {
-          if (otherHolder != holder) {
+          if (otherHolder != holder && otherHolder != null) {
             t = CreateInstance<T>();
             t.name = assetName;
             didChange = true;
