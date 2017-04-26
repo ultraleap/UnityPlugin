@@ -1163,16 +1163,16 @@ Transform:
   m_Father: {fileID: 115189574}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: -73.94, y: 263.141, z: -261.897}
---- !u!21 &1186497785
+--- !u!21 &1170503476
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Procedural Graphic Material
-  m_Shader: {fileID: 4800000, guid: d975a2f94ef2a594188407da17883414, type: 3}
-  m_ShaderKeywords: GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS GRAPHIC_RENDERER_VERTEX_COLORS
-    GRAPHIC_RENDERER_VERTEX_NORMALS GRAPHIC_RENDERER_VERTEX_UV_0
+  m_Shader: {fileID: 4800000, guid: 57570c3b474214d4d8db6369e534062b, type: 3}
+  m_ShaderKeywords: GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
+    GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_NORMALS GRAPHIC_RENDERER_VERTEX_UV_0
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_CustomRenderQueue: -1
@@ -1182,8 +1182,12 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 28773865051297002, guid: 0b62fc99ebac9be4fb641da4ea9c414c,
+        m_Texture: {fileID: 28569741466160984, guid: 4c25017d14e7d8b40a8177a53b5f805e,
           type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex2:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats: []
@@ -1613,6 +1617,31 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!21 &1515495626
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Graphic Material
+  m_Shader: {fileID: 4800000, guid: d975a2f94ef2a594188407da17883414, type: 3}
+  m_ShaderKeywords: GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS GRAPHIC_RENDERER_VERTEX_COLORS
+    GRAPHIC_RENDERER_VERTEX_NORMALS GRAPHIC_RENDERER_VERTEX_UV_0
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 28773865051297002, guid: 0b62fc99ebac9be4fb641da4ea9c414c,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &1819810250
 GameObject:
   m_ObjectHideFlags: 0
@@ -1863,35 +1892,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 2.53}
   m_SizeDelta: {x: 3.35, y: 1.87}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!21 &1974486912
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Graphic Material
-  m_Shader: {fileID: 4800000, guid: 57570c3b474214d4d8db6369e534062b, type: 3}
-  m_ShaderKeywords: GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
-    GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_NORMALS GRAPHIC_RENDERER_VERTEX_UV_0
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 28569741466160984, guid: 4c25017d14e7d8b40a8177a53b5f805e,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex2:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &1985179167
 GameObject:
   m_ObjectHideFlags: 0
@@ -2011,7 +2011,7 @@ MonoBehaviour:
     _format: 5
     _maxAtlasSize: 4096
     _extraTextures: []
-  _material: {fileID: 1186497785}
+  _material: {fileID: 1515495626}
   _meshes: {fileID: 11400000, guid: a1c7c230a5d9866479fa7909a4046a58, type: 2}
   _packedTextures: {fileID: 11400000, guid: 0b62fc99ebac9be4fb641da4ea9c414c, type: 2}
   _atlasUvs:
@@ -2237,7 +2237,7 @@ MonoBehaviour:
     _format: 5
     _maxAtlasSize: 4096
     _extraTextures: []
-  _material: {fileID: 1974486912}
+  _material: {fileID: 1170503476}
   _meshes: {fileID: 11400000, guid: 92aee42e0b47aa94ea1c70a0b0f7ee9c, type: 2}
   _packedTextures: {fileID: 11400000, guid: 4c25017d14e7d8b40a8177a53b5f805e, type: 2}
   _atlasUvs:
