@@ -191,14 +191,12 @@ namespace Leap.Unity.UI.Interaction {
       minMaxHeight = new Vector2(minMaxHeight.x, Mathf.Max(minMaxHeight.x, maxHeight / transform.parent.lossyScale.z));
     }
 
-    protected override void OnDisable() {
+    protected virtual void OnDisable() {
       if (isDepressed) {
         unDepressedThisFrame = true;
         OnUnpress.Invoke();
         manager.GetInteractionHand(_handIsLeft).SetInteractionHoverOverride(false);
       }
-
-      base.OnDisable();
     }
 
     void Reset() {
