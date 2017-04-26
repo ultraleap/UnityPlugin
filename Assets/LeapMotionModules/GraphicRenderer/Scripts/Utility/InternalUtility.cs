@@ -23,6 +23,10 @@ namespace Leap.Unity.GraphicalRenderer {
       EditorApplication.update += destroyLoop;
     }
 
+    public static bool IsPrefab(Component component) {
+      return PrefabUtility.GetPrefabType(component.gameObject) == PrefabType.Prefab;
+    }
+
     /// <summary>
     /// Call this method from within OnDestroy.  The action will only be invoked if
     /// the object was deleted during EDIT MODE, and that destruction was not caused

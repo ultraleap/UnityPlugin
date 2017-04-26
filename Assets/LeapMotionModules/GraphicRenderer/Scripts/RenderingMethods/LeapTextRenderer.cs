@@ -111,10 +111,6 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
 #if UNITY_EDITOR
-    public override void OnEnableRendererEditor() { }
-
-    public override void OnDisableRendererEditor() { }
-
     public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
       base.OnUpdateRendererEditor(isHeavyUpdate);
 

@@ -57,13 +57,17 @@ namespace Leap.Unity.GraphicalRenderer {
     /// Called curing edit time when this renderering method is created.  
     /// Use this for any edit-time construction you need.
     /// </summary>
-    public abstract void OnEnableRendererEditor();
+    public virtual void OnEnableRendererEditor() {
+      Undo.RecordObject(this, "Enabled renderer");
+    }
 
     /// <summary>
     /// Called during edit time when this rendering method is destroyed.
     /// Use this for edit-time clean up.
     /// </summary>
-    public abstract void OnDisableRendererEditor();
+    public virtual void OnDisableRendererEditor() {
+      Undo.RecordObject(this, "Disabled Renderer");
+    }
 
     /// <summary>
     /// Called during edit time to update the renderer status.  This is 
@@ -71,6 +75,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// not called all the time!
     /// </summary>
     public virtual void OnUpdateRendererEditor(bool isHeavyUpdate) {
+      Undo.RecordObject(this, "Updated Renderer");
       this.isHeavyUpdate = isHeavyUpdate;
     }
 #endif
