@@ -155,7 +155,7 @@ MonoBehaviour:
   - {fileID: 10200334}
   _attachedGroup: {fileID: 1561875136}
   _preferredRendererType:
-    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+    _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 0, g: 0.21379304, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: e590ddc42aeb70e44809d8cd89f0255d, type: 3}
   _remappableChannels: -1
@@ -219,7 +219,7 @@ MonoBehaviour:
   - {fileID: 30115972}
   _attachedGroup: {fileID: 1561875136}
   _preferredRendererType:
-    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+    _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 1, g: 1, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: 14e47e6e841b85146813b9d552dc3d37, type: 3}
   _remappableChannels: -1
@@ -325,35 +325,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &287173087
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Graphic Material
-  m_Shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
-  m_ShaderKeywords: GRAPHIC_RENDERER_MOVEMENT_TRANSLATION GRAPHIC_RENDERER_VERTEX_COLORS
-    GRAPHIC_RENDERER_VERTEX_UV_0
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 28434836930433854, guid: 897790b6ff693d642ad9ed82f43e7c1f,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex2:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &346163377
 GameObject:
   m_ObjectHideFlags: 0
@@ -401,7 +372,7 @@ MonoBehaviour:
   - {fileID: 346163378}
   _attachedGroup: {fileID: 1561875136}
   _preferredRendererType:
-    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+    _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 1, g: 0, b: 0, a: 1}
   _mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
   _remappableChannels: -1
@@ -465,7 +436,7 @@ MonoBehaviour:
   - {fileID: 426001189}
   _attachedGroup: {fileID: 1561875136}
   _preferredRendererType:
-    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+    _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 0.32413793, g: 1, b: 0, a: 1}
   _mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   _remappableChannels: -1
@@ -529,7 +500,7 @@ MonoBehaviour:
   - {fileID: 428175857}
   _attachedGroup: {fileID: 1561875136}
   _preferredRendererType:
-    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+    _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 0, g: 0.21379304, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: e590ddc42aeb70e44809d8cd89f0255d, type: 3}
   _remappableChannels: -1
@@ -658,7 +629,7 @@ MonoBehaviour:
   - {fileID: 587199933}
   _attachedGroup: {fileID: 1561875136}
   _preferredRendererType:
-    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+    _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 0, g: 0.21379304, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: e590ddc42aeb70e44809d8cd89f0255d, type: 3}
   _remappableChannels: -1
@@ -722,7 +693,7 @@ MonoBehaviour:
   - {fileID: 795087643}
   _attachedGroup: {fileID: 1561875136}
   _preferredRendererType:
-    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+    _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 1, g: 0, b: 0, a: 1}
   _mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
   _remappableChannels: -1
@@ -786,7 +757,7 @@ MonoBehaviour:
   - {fileID: 811648765}
   _attachedGroup: {fileID: 1561875136}
   _preferredRendererType:
-    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+    _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 0.32413793, g: 1, b: 0, a: 1}
   _mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
   _remappableChannels: -1
@@ -803,6 +774,30 @@ Transform:
   m_Father: {fileID: 1561875138}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -45.000004}
+--- !u!21 &947005088
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Graphic Material
+  m_Shader: {fileID: 4800000, guid: 474347a7dd23a1743b7bdfa349be986b, type: 3}
+  m_ShaderKeywords: GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_UV_0
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 28624105386192372, guid: 5de2c3f92c6614f4db2f4fe2660b32a4,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors: []
 --- !u!1 &1027488249
 GameObject:
   m_ObjectHideFlags: 0
@@ -835,9 +830,9 @@ MonoBehaviour:
   _attachedGroup: {fileID: 1561875140}
   _preferredRendererType:
     _fullName: Leap.Unity.GraphicalRenderer.LeapTextRenderer
-  _text: This is an example of using the Baked Renderer.  Each graphic can have a
-    different mesh, a different texture, and a different color!  All meshes are automatically
-    baked into a single mesh and rendered in a single draw call!
+  _text: This is an example of using the Dynamic Renderer.  Each graphic can have
+    a different mesh, a different texture, and a different color!  All meshes are
+    automatically baked into a single mesh and rendered in a single draw call!
   _fontStyle: 0
   _fontSize: 14
   _lineSpacing: 1
@@ -909,7 +904,7 @@ MonoBehaviour:
   - {fileID: 1149906633}
   _attachedGroup: {fileID: 1561875136}
   _preferredRendererType:
-    _fullName: Leap.Unity.GraphicalRenderer.LeapBakedRenderer
+    _fullName: Leap.Unity.GraphicalRenderer.LeapDynamicRenderer
   vertexColor: {r: 0, g: 0.21379304, b: 1, a: 1}
   _mesh: {fileID: 4300000, guid: e590ddc42aeb70e44809d8cd89f0255d, type: 3}
   _remappableChannels: -1
@@ -936,10 +931,10 @@ GameObject:
   - component: {fileID: 1561875138}
   - component: {fileID: 1561875137}
   - component: {fileID: 1561875136}
-  - component: {fileID: 1561875135}
   - component: {fileID: 1561875134}
   - component: {fileID: 1561875140}
   - component: {fileID: 1561875139}
+  - component: {fileID: 1561875135}
   m_Layer: 0
   m_Name: Renderer
   m_TagString: Untagged
@@ -978,7 +973,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1561875133}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00bb44340bd430d44a098a5e36f4de2d, type: 3}
+  m_Script: {fileID: 11500000, guid: e4e826f61fa76194f87130a5030b287d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   renderer: {fileID: 1561875137}
@@ -990,7 +985,7 @@ MonoBehaviour:
   _useColors: 1
   _bakedTint: {r: 1, g: 1, b: 1, a: 1}
   _useNormals: 0
-  _shader: {fileID: 4800000, guid: 692ffa38f03db184d8b27b0661d5bf0d, type: 3}
+  _shader: {fileID: 4800000, guid: 474347a7dd23a1743b7bdfa349be986b, type: 3}
   _atlas:
     _border: 0
     _padding: 0
@@ -999,9 +994,9 @@ MonoBehaviour:
     _format: 5
     _maxAtlasSize: 4096
     _extraTextures: []
-  _material: {fileID: 287173087}
-  _meshes: {fileID: 11400000, guid: 38eceeabb4470ee4ba3a22e957757554, type: 2}
-  _packedTextures: {fileID: 11400000, guid: 897790b6ff693d642ad9ed82f43e7c1f, type: 2}
+  _material: {fileID: 947005088}
+  _meshes: {fileID: 11400000, guid: 1878a71664f40e944a852acc8d18828d, type: 2}
+  _packedTextures: {fileID: 11400000, guid: 5de2c3f92c6614f4db2f4fe2660b32a4, type: 2}
   _atlasUvs:
     _channel0:
       _keys:
@@ -1060,11 +1055,6 @@ MonoBehaviour:
       y: 0
       width: 0
       height: 0
-  _layer:
-    layerIndex: 0
-  _motionType: 1
-  _createMeshRenderers: 0
-  _renderers: []
 --- !u!114 &1561875136
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -1093,7 +1083,7 @@ MonoBehaviour:
   _supportInfo:
   - support: 0
     message: 
-  _addRemoveSupported: 0
+  _addRemoveSupported: 1
 --- !u!114 &1561875137
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1105,7 +1095,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adb71699a7372344cb4e7a163c6c6922, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _selectedGroup: 0
+  _selectedGroup: 1
   _space: {fileID: 0}
   _groups:
   - {fileID: 1561875136}

@@ -126,7 +126,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected override void setupForBuilding() {
       if (_shader == null) {
-        _shader = Shader.Find("Leap Motion/Graphic Renderer/Defaults/Dynamic");
+        _shader = Shader.Find("Leap Motion/Graphic Renderer/Unlit/Dynamic");
       }
 
       base.setupForBuilding();
