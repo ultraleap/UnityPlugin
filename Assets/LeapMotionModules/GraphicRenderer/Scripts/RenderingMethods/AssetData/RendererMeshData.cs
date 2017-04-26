@@ -37,6 +37,8 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public void AddMesh(Mesh mesh) {
+      mesh.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+
       meshes.Add(mesh);
 #if UNITY_EDITOR
       if (isSavedAsset) {

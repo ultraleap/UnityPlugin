@@ -2131,9 +2131,9 @@ MonoBehaviour:
   _features: []
   _renderer: {fileID: 1985179172}
   _graphics:
-  - {fileID: 70394506}
   - {fileID: 1894030331}
   - {fileID: 157199032}
+  - {fileID: 70394506}
   _supportInfo: []
   _addRemoveSupported: 0
 --- !u!114 &1985179178
