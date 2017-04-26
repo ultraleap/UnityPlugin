@@ -1,5 +1,6 @@
 ﻿Shader "Leap Motion/Graphic Renderer/Unlit/Dynamic" {
   Properties {
+    _Color   ("Color", Color) = (1,1,1,1)
     _MainTex ("Texture", 2D) = "white" {}
   }
   SubShader {
