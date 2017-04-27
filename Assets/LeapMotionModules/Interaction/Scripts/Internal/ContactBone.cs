@@ -42,7 +42,7 @@ namespace Leap.Unity.UI.Interaction.Internal {
               _lastObjectTouchedAdjustedMass *= 0.1f;
               break;
             case InteractionBehaviour.ContactForceModes.UI:
-              _lastObjectTouchedAdjustedMass *= 100f;
+              _lastObjectTouchedAdjustedMass *= 10f;
               break;
             default:
               _lastObjectTouchedAdjustedMass *= 0.1f;

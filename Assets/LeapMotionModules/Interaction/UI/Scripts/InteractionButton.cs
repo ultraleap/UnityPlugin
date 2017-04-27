@@ -185,10 +185,18 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     public void setMinHeight(float minHeight) {
-      minMaxHeight = new Vector2(minHeight / transform.parent.lossyScale.z, minMaxHeight.y);
+      minMaxHeight = new Vector2(Mathf.Min(minMaxHeight.y, minHeight / transform.parent.lossyScale.z), minMaxHeight.y);
     }
     public void setMaxHeight(float maxHeight) {
-      minMaxHeight = new Vector2(minMaxHeight.x, maxHeight / transform.parent.lossyScale.z);
+      minMaxHeight = new Vector2(minMaxHeight.x, Mathf.Max(minMaxHeight.x, maxHeight / transform.parent.lossyScale.z));
+    }
+
+    protected virtual void OnDisable() {
+      if (isDepressed) {
+        unDepressedThisFrame = true;
+        OnUnpress.Invoke();
+        manager.GetInteractionHand(_handIsLeft).SetInteractionHoverOverride(false);
+      }
     }
 
     void Reset() {

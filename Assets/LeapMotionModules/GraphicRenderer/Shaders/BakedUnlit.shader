@@ -1,7 +1,7 @@
 ﻿Shader "Leap Motion/Graphic Renderer/Unlit/Baked" {
   Properties {
+    _Color("Color", Color) = (1,1,1,1)
     _MainTex ("Texture", 2D) = "white" {}
-    _MainTex2 ("Texture", 2D) = "white" {}
   }
   SubShader {
     Tags {"Queue"="Geometry" "RenderType"="Opaque" }

@@ -145,7 +145,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected override void setupForBuilding() {
       if (_shader == null) {
-        _shader = Shader.Find("LeapGui/Defaults/Baked");
+        _shader = Shader.Find("Leap Motion/Graphic Renderer/Unlit/Baked");
       }
 
       base.setupForBuilding();

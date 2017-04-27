@@ -12,7 +12,7 @@ namespace Leap.Unity.UI.Interaction {
     [Range(0f, 1f)]
     ///<summary> The height that this toggle rests at when it is toggled. </summary>
     public float toggledRestingHeight = 0.25f;
-    
+
     [SerializeField]
     private bool _toggled = false;
 
@@ -26,6 +26,8 @@ namespace Leap.Unity.UI.Interaction {
           _toggled = value;
           if (_toggled) {
             toggleEvent.Invoke();
+          } else {
+            unToggleEvent.Invoke();
           }
           restingHeight = toggled ? toggledRestingHeight : _originalRestingHeight;
           rigidbody.WakeUp();
@@ -35,10 +37,10 @@ namespace Leap.Unity.UI.Interaction {
       }
     }
 
-    [System.Serializable]
-    public class BoolEvent : UnityEvent<bool> { }
     ///<summary> Triggered when this toggle is togggled. </summary>
     public UnityEvent toggleEvent = new UnityEvent();
+    ///<summary> Triggered when this toggle is untogggled. </summary>
+    public UnityEvent unToggleEvent = new UnityEvent();
 
     ///<summary> The minimum and maximum heights the button can exist at. </summary>
     private float _originalRestingHeight;
@@ -57,7 +59,8 @@ namespace Leap.Unity.UI.Interaction {
       base.OnEnable();
     }
 
-    protected virtual void OnDisable() {
+    protected override void OnDisable() {
+      base.OnDisable();
       OnPress.RemoveListener(OnPressed);
     }
 

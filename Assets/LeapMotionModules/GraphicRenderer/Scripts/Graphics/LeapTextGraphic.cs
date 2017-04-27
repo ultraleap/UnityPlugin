@@ -37,7 +37,7 @@ namespace Leap.Unity.GraphicalRenderer {
       get {
         if (_tokensDirty) {
           _cachedTokens.Clear();
-          TextWrapper.Tokenize(_text, _cachedTokens);
+          TextWrapper.Tokenize(text, _cachedTokens);
           _tokensDirty = false;
         }
         return _cachedTokens;
