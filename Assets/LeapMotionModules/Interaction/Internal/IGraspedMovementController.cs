@@ -18,7 +18,7 @@ namespace Leap.Unity.UI.Interaction {
     /// to move the InteractionBehaviourBase to match that pose.
     /// </summary>
     void MoveTo(Vector3 solvedPosition, Quaternion solvedRotation,
-                IInteractionBehaviour interactionObj);
+                InteractionBehaviour interactionObj, bool justGrasped);
 
   }
 

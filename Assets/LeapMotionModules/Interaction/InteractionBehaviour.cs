@@ -533,7 +533,7 @@ namespace Leap.Unity.UI.Interaction {
 
     private Rigidbody _rigidbody;
     /// <summary> The Rigidbody associated with this interation object. </summary>
-    public new Rigidbody rigidbody { get { return _rigidbody; } protected set { _rigidbody = value; } }
+    public Rigidbody rigidbody { get { return _rigidbody; } protected set { _rigidbody = value; } }
 
     public ISpaceComponent space { get; protected set; }
 
@@ -907,6 +907,7 @@ namespace Leap.Unity.UI.Interaction {
     private bool _graspingInitialized = false;
     private bool _moveObjectWhenGrasped__WasEnabledLastFrame;
     private bool _wasKinematicBeforeGrab;
+    private bool _justGrasped = false;
 
     private IGraspedPoseController _graspedPositionController;
     /// <summary> Gets or sets the grasped pose controller for this Interaction object. </summary>
@@ -966,6 +967,8 @@ namespace Leap.Unity.UI.Interaction {
         _suspendingHand.ReleaseGrasp();
       }
 
+      _justGrasped = true;
+
       if (!allowMultiGrasp && isGrasped) {
         _graspingHands.Query().First().ReleaseGrasp();
       }
@@ -1023,6 +1026,8 @@ namespace Leap.Unity.UI.Interaction {
         }
 
         OnObjectGraspEnd(hands);
+
+        if (_justGrasped) _justGrasped = false;
       }
     }
 
@@ -1035,7 +1040,7 @@ namespace Leap.Unity.UI.Interaction {
         IGraspedMovementController holdingMovementController = rigidbody.isKinematic ?
                                                                  (IGraspedMovementController)_kinematicHoldingMovement
                                                                : (IGraspedMovementController)_nonKinematicHoldingMovement;
-        holdingMovementController.MoveTo(newPosition, newRotation, this);
+        holdingMovementController.MoveTo(newPosition, newRotation, this, _justGrasped);
 
         OnGraspedMovement(origPosition, origRotation, newPosition, newRotation, hands);
 
@@ -1043,6 +1048,8 @@ namespace Leap.Unity.UI.Interaction {
       }
 
       OnGraspHold(hands);
+
+      _justGrasped = false;
     }
 
     protected InteractionHand _suspendingHand = null;
