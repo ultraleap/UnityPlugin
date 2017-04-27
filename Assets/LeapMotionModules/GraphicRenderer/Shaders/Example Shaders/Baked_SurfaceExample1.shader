@@ -1,5 +1,6 @@
 ﻿Shader "Leap Motion/Graphic Renderer/Examples/Bake 1" {
   Properties {
+    _Color("Color", Color) = (1,1,1,1)
     _MainTex ("Albedo (RGB)", 2D) = "white" {}
   }
   SubShader {
@@ -22,12 +23,11 @@
     struct Input {
       SURF_INPUT_GRAPHICAL
       float2 uv_MainTex;
-      float2 metalAndGloss;
+      float2 smoothness;
       float4 specularColor;
     };
 
-    DEFINE_FLOAT_CHANNEL(_Metallic);
-    DEFINE_FLOAT_CHANNEL(_Glossiness);
+    DEFINE_FLOAT_CHANNEL(_Smoothness);
     DEFINE_FLOAT4_CHANNEL(_SpecularColor);
     sampler2D _MainTex;
 
@@ -37,8 +37,7 @@
 
       APPLY_BAKED_GRAPHICS_STANDARD(v, o);   
 
-      o.metalAndGloss.x = getChannel(_Metallic);
-      o.metalAndGloss.y = getChannel(_Glossiness);
+      o.smoothness = getChannel(_Smoothness);
       o.specularColor = getChannel(_SpecularColor);
     }
 
@@ -51,7 +50,7 @@
     void surf (Input IN, inout SurfaceOutputStandardSpecular o) {
       o.Albedo = tex2D(_MainTex, IN.uv_MainTex).rgb;
       o.Specular = IN.specularColor;
-      o.Smoothness = IN.metalAndGloss.y;
+      o.Smoothness = IN.smoothness;
     }
     ENDCG
   }

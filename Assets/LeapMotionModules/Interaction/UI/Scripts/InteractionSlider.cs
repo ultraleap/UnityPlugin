@@ -75,12 +75,12 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     //Slide limits normalized to local space
-    private Vector2 _horizontalSlideLimits;
-    private Vector2 _verticalSlideLimits;
+    protected Vector2 _horizontalSlideLimits;
+    protected Vector2 _verticalSlideLimits;
 
     //Internal Slider Values
-    private float _horizontalSliderPercent;
-    private float _verticalSliderPercent;
+    protected float _horizontalSliderPercent;
+    protected float _verticalSliderPercent;
 
     private bool _started = false;
 
@@ -118,8 +118,8 @@ namespace Leap.Unity.UI.Interaction {
     }
 
     protected override Vector3 GetDepressedConstrainedLocalPosition(Vector3 desiredOffset) {
-      return new Vector3(Mathf.Clamp((localPhysicsPosition.x + desiredOffset.x * 0.25f), initialLocalPosition.x + _horizontalSlideLimits.x, initialLocalPosition.x + _horizontalSlideLimits.y),
-                         Mathf.Clamp((localPhysicsPosition.y + desiredOffset.y * 0.25f), initialLocalPosition.y + _verticalSlideLimits.x, initialLocalPosition.y + _verticalSlideLimits.y),
+      return new Vector3(Mathf.Clamp((localPhysicsPosition.x + desiredOffset.x), initialLocalPosition.x + _horizontalSlideLimits.x, initialLocalPosition.x + _horizontalSlideLimits.y),
+                         Mathf.Clamp((localPhysicsPosition.y + desiredOffset.y), initialLocalPosition.y + _verticalSlideLimits.x, initialLocalPosition.y + _verticalSlideLimits.y),
                                      (localPhysicsPosition.z + desiredOffset.z));
     }
   }
