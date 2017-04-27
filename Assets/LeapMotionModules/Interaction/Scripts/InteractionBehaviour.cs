@@ -533,7 +533,7 @@ namespace Leap.Unity.UI.Interaction {
 
     private Rigidbody _rigidbody;
     /// <summary> The Rigidbody associated with this interation object. </summary>
-    public Rigidbody rigidbody { get { return _rigidbody; } protected set { _rigidbody = value; } }
+    public new Rigidbody rigidbody { get { return _rigidbody; } protected set { _rigidbody = value; } }
 
     public ISpaceComponent space { get; protected set; }
 
