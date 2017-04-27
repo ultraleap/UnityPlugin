@@ -13,7 +13,10 @@ namespace Leap.Unity.UI.Interaction.Internal {
 
     public InteractionHand interactionHand;
     public Rigidbody body;
-    public new Collider collider;
+    #if UNITY_EDITOR
+    new 
+    #endif
+    public Collider collider;
     public FixedJoint joint;
     public FixedJoint metacarpalJoint;
     public Vector3 lastTarget;
