@@ -410,7 +410,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     protected virtual void prepareMaterial() {
-      if (_material == null) {
+      if (_material == null || isHeavyUpdate) {
         _material = new Material(_shader);
       }
 
