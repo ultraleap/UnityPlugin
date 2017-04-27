@@ -14,7 +14,9 @@ namespace Leap.Unity.GraphicalRenderer {
     //Need to keep this outside of the #if guards or else Unity will throw a fit
     //about the serialized format changing between editor and build
     [SerializeField]
+#pragma warning disable 0414
     private int _selectedGroup = 0;
+#pragma warning restore 0414
 
 #if UNITY_EDITOR
     public readonly EditorApi editor;

@@ -9,7 +9,7 @@
 *.booproj
 *.unitypackage
 
-/Library
+/Library/*
 /Library/FailedAssetImports.txt
 /Library/cache/
 /Library/previews/

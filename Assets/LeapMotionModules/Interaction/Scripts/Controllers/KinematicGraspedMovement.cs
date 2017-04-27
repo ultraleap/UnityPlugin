@@ -8,7 +8,7 @@ namespace Leap.Unity.UI.Interaction {
   public class KinematicGraspedMovement : IGraspedMovementController {
 
     public void MoveTo(Vector3 solvedPosition, Quaternion solvedRotation,
-                       IInteractionBehaviour interactionObj) {
+                       InteractionBehaviour interactionObj, bool justGrasped) {
       //interactionObj.rigidbody.MovePosition(solvedPosition);
       //interactionObj.rigidbody.MoveRotation(solvedRotation);
       interactionObj.rigidbody.transform.position = solvedPosition;
