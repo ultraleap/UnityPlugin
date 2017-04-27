@@ -1607,12 +1607,12 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 28549311730435358, guid: 2d24c2ee4df80934c8b4ea3bcbc6ea2c,
-          type: 2}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats: []
-    m_Colors: []
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1819810250
 GameObject:
   m_ObjectHideFlags: 0
@@ -1929,7 +1929,7 @@ MonoBehaviour:
   _useColor: 1
   _globalTint: {r: 1, g: 1, b: 1, a: 1}
   _shader: {fileID: 4800000, guid: 109077dfbfcd5f3469886d8b9ae4b056, type: 3}
-  _meshData: {fileID: 11400000, guid: 84afbb7dee28c1947becff779c4d480e, type: 2}
+  _meshData: {fileID: 11400000, guid: 9d5e7b2ae4a6c1542ac3c4b5b23a2315, type: 2}
   scale: 0.015
 --- !u!114 &1985179170
 MonoBehaviour:
@@ -1983,8 +1983,8 @@ MonoBehaviour:
     _maxAtlasSize: 4096
     _extraTextures: []
   _material: {fileID: 1680639321}
-  _meshes: {fileID: 11400000, guid: 5f64e76ca966f2648aea4f7f53d1b8c6, type: 2}
-  _packedTextures: {fileID: 11400000, guid: 2d24c2ee4df80934c8b4ea3bcbc6ea2c, type: 2}
+  _meshes: {fileID: 11400000, guid: 31a7f34045425ed488a5d4ee019e18a1, type: 2}
+  _packedTextures: {fileID: 11400000, guid: 88c3465d516f70c47a802e47f751d4bd, type: 2}
   _atlasUvs:
     _channel0:
       _keys:
@@ -2156,7 +2156,7 @@ MonoBehaviour:
   - {fileID: 634078603}
   - {fileID: 1819810251}
   - {fileID: 785706452}
-  _channelName: _Glossiness
+  _channelName: _Smoothness
 --- !u!114 &1985179181
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -2209,8 +2209,8 @@ MonoBehaviour:
     _maxAtlasSize: 4096
     _extraTextures: []
   _material: {fileID: 1993401699}
-  _meshes: {fileID: 11400000, guid: af825852ce43b9c44ad66571f7329af8, type: 2}
-  _packedTextures: {fileID: 11400000, guid: aefc48970a310934ea6efaa6a2cc0c52, type: 2}
+  _meshes: {fileID: 11400000, guid: 9cda3561f67e3bf4ca6531f4fbbfa352, type: 2}
+  _packedTextures: {fileID: 11400000, guid: 39008675608f9f244be1ef97ac570eb9, type: 2}
   _atlasUvs:
     _channel0:
       _keys:
@@ -2327,7 +2327,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 28643639833991140, guid: aefc48970a310934ea6efaa6a2cc0c52,
+        m_Texture: {fileID: 28671576554361086, guid: 39008675608f9f244be1ef97ac570eb9,
           type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -2336,7 +2336,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats: []
-    m_Colors: []
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2014846562
 GameObject:
   m_ObjectHideFlags: 0
