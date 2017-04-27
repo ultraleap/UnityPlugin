@@ -4,8 +4,4 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes:
-  - enabled: 1
-    path: Assets/LeapMotionModules/Interaction/Examples/1. Interaction Objects/Interaction
-      Objects.unity
-    guid: 017ace9491c55584a93fb1551e5b4db9
+  m_Scenes: []
