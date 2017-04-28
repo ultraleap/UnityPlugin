@@ -1,4 +1,4 @@
-/****************************************************************************** 
+﻿/****************************************************************************** 
  * Copyright (C) Leap Motion, Inc. 2011-2017.                                 * 
  * Leap Motion proprietary and  confidential.                                 * 
  *                                                                            * 
@@ -10,6 +10,7 @@
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -34,18 +35,25 @@ public static class AutoCopywriteHeader {
                                              " * between Leap Motion and you, your company or other organization.           * ",
                                              " ******************************************************************************/"};
 
+  private static string[] searchFolders = { "LeapMotion",
+                                            "LeapMotionModules" };
+
   [MenuItem("Assets/Update Copywrite Headers")]
   public static void PopulateAutoHeaders() {
-    var files = Directory.GetFiles("Assets", "*.cs", SearchOption.AllDirectories);
+    List<string> files = new List<string>();
+    foreach (var folder in searchFolders) {
+      files.AddRange(Directory.GetFiles(Path.Combine("Assets", folder), "*.cs", SearchOption.AllDirectories));
+    }
+
     StringBuilder builder = new StringBuilder();
 
     try {
-      for (int i = 0; i < files.Length; i++) {
+      for (int i = 0; i < files.Count; i++) {
         string filename = files[i];
 
         if (EditorUtility.DisplayCancelableProgressBar("Updating copywrite notices",
                                                        "Updating " + Path.GetDirectoryName(filename) + "...",
-                                                       i / (files.Length - 1.0f))) {
+                                                       i / (files.Count - 1.0f))) {
           return;
         }
 
