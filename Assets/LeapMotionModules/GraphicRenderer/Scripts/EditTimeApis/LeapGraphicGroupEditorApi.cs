@@ -114,6 +114,8 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         _group._renderingMethod.OnEnableRendererEditor();
+
+        OnValidate();
       }
 
       public LeapGraphicFeatureBase AddFeature(Type featureType) {

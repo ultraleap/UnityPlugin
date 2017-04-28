@@ -114,7 +114,6 @@ namespace Leap.Unity.GraphicalRenderer {
       Assert.IsNotNull(graphic);
 
       if (!addRemoveSupportedOrEditTime()) {
-        Debug.LogWarning("Adding graphics at runtime is not supported by this rendering method.");
         return false;
       }
 
@@ -169,13 +168,11 @@ namespace Leap.Unity.GraphicalRenderer {
       Assert.IsNotNull(graphic);
 
       if (!addRemoveSupportedOrEditTime()) {
-        Debug.LogWarning("Removing graphics at runtime is not supported by this rendering method.");
         return false;
       }
 
       int graphicIndex = _graphics.IndexOf(graphic);
       if (graphicIndex < 0) {
-        Debug.LogWarning("Could note remove this graphic because it was not part of the group.");
         return false;
       }
 
