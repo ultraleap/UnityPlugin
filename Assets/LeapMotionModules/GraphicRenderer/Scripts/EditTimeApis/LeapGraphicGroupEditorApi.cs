@@ -29,9 +29,6 @@ namespace Leap.Unity.GraphicalRenderer {
           if (_group._renderingMethod != null) {
             _group._addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(_group._renderingMethod.GetType());
           }
-          if (_group._renderer.space != null) {
-            _group._addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(_group._renderer.space.GetType());
-          }
         }
 
         for (int i = _group._features.Count; i-- != 0;) {
