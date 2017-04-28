@@ -2,7 +2,7 @@
 using Leap.Unity.Attributes;
 using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Query;
-using Leap.Unity.UI.Interaction.Internal;
+using Leap.Unity.Interaction.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
 
   public partial class InteractionManager : MonoBehaviour, IRuntimeGizmoComponent {
 

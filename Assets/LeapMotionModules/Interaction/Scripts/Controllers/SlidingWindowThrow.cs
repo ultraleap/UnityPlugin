@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
 
   /// <summary>
   /// The sliding window throw controller implementation offers a simple heuristic

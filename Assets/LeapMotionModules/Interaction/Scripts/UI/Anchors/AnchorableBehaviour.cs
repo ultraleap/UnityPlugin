@@ -1,10 +1,9 @@
 ﻿using Leap.Unity.Attributes;
-using Leap.Unity.UI.Interaction;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Attachments {
+namespace Leap.Unity.Interaction {
 
   /// <summary>
   /// AnchorableBehaviours mix well with InteractionBehaviours you'd like

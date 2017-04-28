@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
-namespace Leap.Unity.UI.Interaction {
+
+namespace Leap.Unity.Interaction {
 
   ///<summary>
   /// A physics-enabled button. Activation is triggered by physically pushing the button

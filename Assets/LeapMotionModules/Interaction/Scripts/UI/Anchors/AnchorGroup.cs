@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Attachments {
+namespace Leap.Unity.Interaction {
 
   public class AnchorGroup : MonoBehaviour {
 

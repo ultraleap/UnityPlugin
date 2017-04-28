@@ -24,7 +24,7 @@ namespace Leap.Unity {
     private void drawAttachmentPointsEditor(SerializedProperty property) {
       // Set up the draw rect space based on the image and available editor space.
       EditorGUILayout.Space();
-      EditorGUILayout.LabelField("Attachment Transform Points", EditorStyles.boldLabel);
+      EditorGUILayout.LabelField("Attachment Transforms", EditorStyles.boldLabel);
       _handTexRect = EditorGUILayout.BeginVertical(GUILayout.MinWidth(EditorGUIUtility.currentViewWidth),
                                                    GUILayout.MinHeight(EditorGUIUtility.currentViewWidth * (_handTex.height / (float)_handTex.width)),
                                                    GUILayout.MaxWidth(_handTex.width),
@@ -50,31 +50,31 @@ namespace Leap.Unity {
       // Draw the toggles for the attachment points.
 
       makeAttachmentPointsToggle("palm", new Vector2(0.09F, 0.15F));
-      makeAttachmentPointsToggle("wrist", new Vector2(0.04F, 0.42F));
+      makeAttachmentPointsToggle("wrist", new Vector2(0.07F, 0.42F));
 
       makeAttachmentPointsToggle("thumbProximalJoint", new Vector2(-0.20F, 0.25F));
       makeAttachmentPointsToggle("thumbDistalJoint", new Vector2(-0.32F, 0.16F));
-      makeAttachmentPointsToggle("thumbTip", new Vector2(-0.3F, 0.1F));
+      makeAttachmentPointsToggle("thumbTip", new Vector2(-0.4F, 0.1F));
 
-      makeAttachmentPointsToggle("indexKnuckle", new Vector2(-0.1F, -0.1F));
-      makeAttachmentPointsToggle("indexMiddleJoint", new Vector2(-0.1F, -0.2F));
-      makeAttachmentPointsToggle("indexDistalJoint", new Vector2(-0.1F, -0.3F));
-      makeAttachmentPointsToggle("indexTip", new Vector2(-0.1F, -0.4F));
+      makeAttachmentPointsToggle("indexKnuckle", new Vector2(-0.05F, -0.05F));
+      makeAttachmentPointsToggle("indexMiddleJoint", new Vector2(-0.07F, -0.18F));
+      makeAttachmentPointsToggle("indexDistalJoint", new Vector2(-0.085F, -0.29F));
+      makeAttachmentPointsToggle("indexTip", new Vector2(-0.09F, -0.39F));
 
-      makeAttachmentPointsToggle("middleKnuckle", new Vector2(0.1F, -0.1F));
-      makeAttachmentPointsToggle("middleMiddleJoint", new Vector2(0.1F, -0.2F));
-      makeAttachmentPointsToggle("middleDistalJoint", new Vector2(0.1F, -0.3F));
-      makeAttachmentPointsToggle("middleTip", new Vector2(0.1F, -0.4F));
+      makeAttachmentPointsToggle("middleKnuckle", new Vector2(0.07F, -0.06F));
+      makeAttachmentPointsToggle("middleMiddleJoint", new Vector2(0.07F, -0.2F));
+      makeAttachmentPointsToggle("middleDistalJoint", new Vector2(0.07F, -0.32F));
+      makeAttachmentPointsToggle("middleTip", new Vector2(0.08F, -0.43F));
 
-      makeAttachmentPointsToggle("ringKnuckle", new Vector2(0.2F, -0.1F));
-      makeAttachmentPointsToggle("ringMiddleJoint", new Vector2(0.2F, -0.2F));
-      makeAttachmentPointsToggle("ringDistalJoint", new Vector2(0.2F, -0.3F));
-      makeAttachmentPointsToggle("ringTip", new Vector2(0.2F, -0.4F));
+      makeAttachmentPointsToggle("ringKnuckle", new Vector2(0.185F, -0.03F));
+      makeAttachmentPointsToggle("ringMiddleJoint", new Vector2(0.21F, -0.16F));
+      makeAttachmentPointsToggle("ringDistalJoint", new Vector2(0.22F, -0.28F));
+      makeAttachmentPointsToggle("ringTip", new Vector2(0.235F, -0.39F));
 
-      makeAttachmentPointsToggle("pinkyKnuckle", new Vector2(0.3F, -0.1F));
-      makeAttachmentPointsToggle("pinkyMiddleJoint", new Vector2(0.3F, -0.2F));
-      makeAttachmentPointsToggle("pinkyDistalJoint", new Vector2(0.3F, -0.3F));
-      makeAttachmentPointsToggle("pinkyTip", new Vector2(0.3F, -0.4F));
+      makeAttachmentPointsToggle("pinkyKnuckle", new Vector2(0.285F, 0.03F));
+      makeAttachmentPointsToggle("pinkyMiddleJoint", new Vector2(0.33F, -0.06F));
+      makeAttachmentPointsToggle("pinkyDistalJoint", new Vector2(0.37F, -0.14F));
+      makeAttachmentPointsToggle("pinkyTip", new Vector2(0.39F, -0.22F));
 
       EditorGUILayout.EndVertical();
     }

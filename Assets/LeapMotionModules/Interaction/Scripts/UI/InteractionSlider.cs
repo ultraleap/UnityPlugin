@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 using Leap.Unity.Attributes;
-namespace Leap.Unity.UI.Interaction {
+
+namespace Leap.Unity.Interaction {
 
   ///<summary>
   /// A physics-enabled slider. Sliding is triggered by physically pushing the slider to its compressed position. 

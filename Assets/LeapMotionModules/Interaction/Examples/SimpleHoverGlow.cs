@@ -1,5 +1,5 @@
 ﻿using Leap.Unity;
-using Leap.Unity.UI.Interaction;
+using Leap.Unity.Interaction;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

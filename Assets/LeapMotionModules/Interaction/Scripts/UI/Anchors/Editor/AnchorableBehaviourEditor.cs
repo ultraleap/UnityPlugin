@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace Leap.Unity.Attachments {
+namespace Leap.Unity.Interaction {
 
   [CustomEditor(typeof(AnchorableBehaviour))]
   public class AnchorableBehaviourEditor : CustomEditorBase {

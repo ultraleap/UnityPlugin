@@ -1,7 +1,7 @@
-﻿using Leap.Unity.UI.Interaction.Internal;
+﻿using Leap.Unity.Interaction.Internal;
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
 
   /// <summary>
   /// Interaction Behaviours feed their throw controllers callbacks when they are

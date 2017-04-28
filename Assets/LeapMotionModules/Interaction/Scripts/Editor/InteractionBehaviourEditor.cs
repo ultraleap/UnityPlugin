@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
 
   [CanEditMultipleObjects]
   [CustomEditor(typeof(InteractionBehaviour), editorForChildClasses: true)]

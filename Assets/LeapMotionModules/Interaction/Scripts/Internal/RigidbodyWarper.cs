@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System;
 
-namespace Leap.Unity.UI.Interaction.Internal {
+namespace Leap.Unity.Interaction.Internal {
 
   public class RigidbodyWarper : IDisposable {
     protected enum CallbackState {

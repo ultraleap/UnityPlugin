@@ -7,7 +7,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction.Internal {
+namespace Leap.Unity.Interaction.Internal {
 
   public class HeuristicGrabClassifier {
 

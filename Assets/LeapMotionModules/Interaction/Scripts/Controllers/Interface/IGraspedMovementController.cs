@@ -1,9 +1,9 @@
-﻿using Leap.Unity.UI.Interaction.Internal;
+﻿using Leap.Unity.Interaction.Internal;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
 
   /// <summary>
   /// IGraspedMovementControllers take in a target position and rotation (a "pose")

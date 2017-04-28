@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction.Internal {
+namespace Leap.Unity.Interaction.Internal {
 
   /// <summary>
   /// Contact Bones store data for the colliders and rigidbodies in each

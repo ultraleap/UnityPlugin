@@ -1,6 +1,6 @@
 ﻿using Leap.Unity.Attributes;
 using Leap.Unity.Query;
-using Leap.Unity.UI.Interaction.Internal;
+using Leap.Unity.Interaction.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using Leap.Unity.Space;
 using InteractionEngineUtility;
 using Leap.Unity.RuntimeGizmos;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
 
   /// <summary>
   /// InteractionBehaviours are components that enable GameObjects to interact with Leap

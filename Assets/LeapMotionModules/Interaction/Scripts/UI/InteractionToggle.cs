@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
 
   /// <summary>
   /// A physics-enabled toggle. Toggling is triggered by physically pushing the toggle to its compressed position. 

@@ -308,27 +308,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _attachmentPoints:
-    wrist: 0
+    wrist: 1
     palm: 1
     thumbProximalJoint: 0
     thumbDistalJoint: 0
-    thumbTip: 0
-    indexKnuckle: 1
+    thumbTip: 1
+    indexKnuckle: 0
     indexMiddleJoint: 0
     indexDistalJoint: 0
-    indexTip: 0
+    indexTip: 1
     middleKnuckle: 0
     middleMiddleJoint: 0
     middleDistalJoint: 0
-    middleTip: 0
+    middleTip: 1
     ringKnuckle: 0
     ringMiddleJoint: 0
     ringDistalJoint: 0
-    ringTip: 0
+    ringTip: 1
     pinkyKnuckle: 0
     pinkyMiddleJoint: 0
     pinkyDistalJoint: 0
-    pinkyTip: 0
+    pinkyTip: 1
 --- !u!1 &487834284
 GameObject:
   m_ObjectHideFlags: 0

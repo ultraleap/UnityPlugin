@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction.Internal {
+namespace Leap.Unity.Interaction.Internal {
 
   /// <summary>
   /// IInteractionBehaviour is the interface that defines all Interaction objects,
