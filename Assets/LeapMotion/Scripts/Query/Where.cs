@@ -36,5 +36,9 @@ namespace Leap.Unity.Query {
     public QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>> NonNull() {
       return Where(obj => obj != null);
     }
+
+    public QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>> ValidUnityObjs() {
+      return Where(obj => (obj as UnityEngine.Object) != null);
+    }
   }
 }

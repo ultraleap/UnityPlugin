@@ -188,7 +188,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
                 Select(e => e.featureData.Query().
                                           OfType(mainDataType).
                                           ElementAtOrDefault(typeIndex)).
-                NonNull().
+                ValidUnityObjs().
                 Cast<UnityEngine.Object>().
                 AppendList(tempList);
 
@@ -245,7 +245,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
   protected Bounds OnGetFrameBounds() {
     return targets.Query().
                    Select(e => e.editor.pickingMesh).
-                   NonNull().
+                   ValidUnityObjs().
                    Select(m => m.bounds).
                    Fold((a, b) => {
                      a.Encapsulate(b);

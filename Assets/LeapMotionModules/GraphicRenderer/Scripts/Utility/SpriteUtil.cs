@@ -15,9 +15,9 @@ namespace Leap.Unity.GraphicalRenderer {
       var anyRectsInvalid = features.Query().
                                      OfType<LeapSpriteFeature>().
                                      SelectMany(f => f.featureData.Query().
-                                                                   Select(d => d.sprite).
-                                                                   NonNull()).
-                                     Select(s => SpriteAtlasUtil.GetAtlasedRect(s)).
+                                                                   Select(d => d.sprite)).
+                                     ValidUnityObjs().
+                                     Select(s => GetAtlasedRect(s)).
                                      Any(r => r.Area() == 0);
 
       if (anyRectsInvalid) {
