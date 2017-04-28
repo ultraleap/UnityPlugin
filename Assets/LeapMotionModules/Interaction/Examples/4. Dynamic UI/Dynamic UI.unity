@@ -313,7 +313,7 @@ MonoBehaviour:
     thumbProximalJoint: 0
     thumbDistalJoint: 0
     thumbTip: 0
-    indexKnuckle: 0
+    indexKnuckle: 1
     indexMiddleJoint: 0
     indexDistalJoint: 0
     indexTip: 0

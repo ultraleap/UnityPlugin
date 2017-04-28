@@ -16,7 +16,7 @@ namespace Leap.Unity {
     protected override void OnEnable() {
       base.OnEnable();
 
-      _handTex = AssetDatabase.LoadAssetAtPath<Texture>("Assets/LeapMotion/Textures/HandTex.png");
+      _handTex = EditorResources.Load<Texture2D>("HandTex");
 
       this.specifyCustomDrawer("_attachmentPoints", drawAttachmentPointsEditor);
     }
@@ -25,14 +25,24 @@ namespace Leap.Unity {
       // Set up the draw rect space based on the image and available editor space.
       EditorGUILayout.Space();
       EditorGUILayout.LabelField("Attachment Transform Points", EditorStyles.boldLabel);
-      EditorGUILayout.Space();
       _handTexRect = EditorGUILayout.BeginVertical(GUILayout.MinWidth(EditorGUIUtility.currentViewWidth),
-                                    GUILayout.MinHeight(EditorGUIUtility.currentViewWidth * (_handTex.height / (float)_handTex.width)),
-                                    GUILayout.MaxWidth(_handTex.width),
-                                    GUILayout.MaxHeight(_handTex.height));
-      //Rect imageContainerRect = _handTexRect; imageContainerRect.width = EditorGUIUtility.currentViewWidth;
-      //EditorGUI.DrawRect(imageContainerRect, Color.black);
+                                                   GUILayout.MinHeight(EditorGUIUtility.currentViewWidth * (_handTex.height / (float)_handTex.width)),
+                                                   GUILayout.MaxWidth(_handTex.width),
+                                                   GUILayout.MaxHeight(_handTex.height));
+      
+      Rect imageContainerRect = _handTexRect; imageContainerRect.width = EditorGUIUtility.currentViewWidth - 30F;
+      EditorGUI.DrawRect(imageContainerRect, new Color(0.2F, 0.2F, 0.2F));
+      imageContainerRect.x += 1; imageContainerRect.y += 1; imageContainerRect.width -= 2; imageContainerRect.height -= 2;
+      EditorGUI.DrawRect(imageContainerRect, new Color(0.6F, 0.6F, 0.6F));
+      imageContainerRect.x += 1; imageContainerRect.y += 1; imageContainerRect.width -= 2; imageContainerRect.height -= 2;
+      EditorGUI.DrawRect(imageContainerRect, new Color(0.2F, 0.2F, 0.2F));
+
+      _handTexRect = new Rect(_handTexRect.x + (imageContainerRect.center.x - _handTexRect.center.x),
+                              _handTexRect.y,
+                              _handTexRect.width,
+                              _handTexRect.height);
       EditorGUI.DrawTextureTransparent(_handTexRect, _handTex);
+      EditorGUILayout.Space();
 
       _attachmentPointsProperty = property;
 
