@@ -26,13 +26,13 @@ public static class AutoCopywriteHeader {
   ///  - the first line of the notice contains the comment block begin token /*
   ///  - the last and ONLY the last line of the notice contains the comment block end token */
   /// </summary>
-  private static string[] copywriteNotice = {"/****************************************************************************** ",
-                                             " * Copyright (C) Leap Motion, Inc. 2011-2017.                                 * ",
-                                             " * Leap Motion proprietary and  confidential.                                 * ",
-                                             " *                                                                            * ",
-                                             " * Use subject to the terms of the Leap Motion SDK Agreement available at     * ",
-                                             " * https://developer.leapmotion.com/sdk_agreement, or another agreement       * ",
-                                             " * between Leap Motion and you, your company or other organization.           * ",
+  private static string[] copywriteNotice = {"/******************************************************************************",
+                                             " * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *",
+                                             " * Leap Motion proprietary and  confidential.                                 *",
+                                             " *                                                                            *",
+                                             " * Use subject to the terms of the Leap Motion SDK Agreement available at     *",
+                                             " * https://developer.leapmotion.com/sdk_agreement, or another agreement       *",
+                                             " * between Leap Motion and you, your company or other organization.           *",
                                              " ******************************************************************************/"};
 
   private static string[] searchFolders = { "LeapMotion",
