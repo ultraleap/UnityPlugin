@@ -101,18 +101,7 @@ namespace Leap.Unity.GraphicalRenderer {
     private void featureDecorator(SerializedProperty property) {
       int graphicMax = LeapGraphicPreferences.graphicMax;
 
-      var anyRectsInvalid = target.features.Query().
-                                            OfType<LeapSpriteFeature>().
-                                            SelectMany(f => f.featureData.Query().
-                                                                          Select(d => d.sprite).
-                                                                          NonNull()).
-                                            Select(s => SpriteAtlasUtil.GetAtlasedRect(s)).
-                                            Any(r => r.Area() == 0);
-
-      if (anyRectsInvalid) {
-        EditorGUILayout.HelpBox("Due to a Unity bug, packed sprites may be invalid until " +
-                                "PlayMode has been entered at least once.", MessageType.Warning);
-      }
+      SpriteAtlasUtil.ShowInvalidSpriteWarning(target.features);
 
       if (target.graphics.Count > graphicMax) {
         EditorGUILayout.HelpBox("This gui currently has " + target.graphics.Count.ToString() +

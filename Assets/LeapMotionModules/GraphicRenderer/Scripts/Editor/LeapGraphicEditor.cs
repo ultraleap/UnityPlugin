@@ -142,6 +142,10 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
         tempArray = new UnityEngine.Object[targets.Length];
       }
 
+      if (mainGraphic.attachedGroup != null) {
+        SpriteAtlasUtil.ShowInvalidSpriteWarning(mainGraphic.attachedGroup.features);
+      }
+
       int maxGraphics = LeapGraphicPreferences.graphicMax;
       if (targets.Query().Any(e => e.attachedGroup != null && e.attachedGroup.graphics.IndexOf(e) >= maxGraphics)) {
         string noun = targets.Length == 1 ? "This graphic" : "Some of these graphics";
