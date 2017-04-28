@@ -1,4 +1,5 @@
 ﻿using InteractionEngineUtility;
+using Leap.Unity.Query;
 using Leap.Unity.UI.Interaction.Internal;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,17 +11,24 @@ namespace Leap.Unity.UI.Interaction {
 
     protected float _maxVelocity = 6F;
 
-    //protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
-    //                                                                  new Keyframe(0.02f, 0.3f, 0.0f, 0.0f));
+    //protected float _maxVelocityHandSpace = 2F;
+
+    private bool _useLastSolvedPosition = false;
+    private Vector3 _lastSolvedPosition = Vector3.zero;
+    protected AnimationCurve _strengthByDistance = new AnimationCurve(new Keyframe(0.0f, 1.0f, 0.0f, 0.0f),
+                                                                      new Keyframe(0.02f, 0.3f, 0.0f, 0.0f));
 
     public void MoveTo(Vector3 solvedPosition, Quaternion solvedRotation,
-                       IInteractionBehaviour interactionObj) {
-      Vector3 targetVelocity = PhysicsUtility.ToLinearVelocity(
-        interactionObj.rigidbody.position, solvedPosition, Time.fixedDeltaTime);
-      Vector3 targetAngularVelocity = PhysicsUtility.ToAngularVelocity(
-        interactionObj.rigidbody.rotation, solvedRotation, Time.fixedDeltaTime);
+                       InteractionBehaviour intObj, bool justGrasped) {
+      Vector3 targetVelocity = PhysicsUtility.ToLinearVelocity(intObj.rigidbody.position, solvedPosition, Time.fixedDeltaTime);
+      Vector3 targetAngularVelocity = PhysicsUtility.ToAngularVelocity(intObj.rigidbody.rotation, solvedRotation, Time.fixedDeltaTime);
 
-      float maxScaledVelocity = _maxVelocity * interactionObj.manager.SimulationScale;
+      // Clamp in hand space
+      //Vector3 graspingHandVelocity = interactionObj.graspingHands.Query().First().GetLastTrackedLeapHand().PalmVelocity.ToVector3();
+      //targetVelocity -= graspingHandVelocity;
+
+      // Clamp by _maxVelocityHandSpace
+      float maxScaledVelocity = _maxVelocity * intObj.manager.SimulationScale;
       float targetSpeedSqrd = targetVelocity.sqrMagnitude;
       if (targetSpeedSqrd > maxScaledVelocity * maxScaledVelocity) {
         float targetPercent = maxScaledVelocity / Mathf.Sqrt(targetSpeedSqrd);
@@ -28,13 +36,24 @@ namespace Leap.Unity.UI.Interaction {
         targetAngularVelocity *= targetPercent;
       }
 
-      // TODO: Investigate whether followStrength needs to be re-implemented here.
-      // Requires a pretty unclean passing of the distance to target position on a one-frame delay.
-      // Could just be done via internal state here.
+      // Back to world space from hand space
+      //targetVelocity += graspingHandVelocity;
 
-      Vector3 centerOfMassOffset = interactionObj.rigidbody.rotation * interactionObj.rigidbody.centerOfMass;
-      interactionObj.rigidbody.velocity = targetVelocity + Vector3.Cross(targetAngularVelocity, centerOfMassOffset);
-      interactionObj.rigidbody.angularVelocity = targetAngularVelocity;
+      _useLastSolvedPosition = !justGrasped;
+      float followStrength = 1F;
+      if (_useLastSolvedPosition) {
+        float remainingDistanceLastFrame = Vector3.Distance(_lastSolvedPosition, intObj.rigidbody.position);
+        followStrength = _strengthByDistance.Evaluate(remainingDistanceLastFrame / intObj.manager.SimulationScale);
+      }
+
+      Vector3 lerpedVelocity = Vector3.Lerp(intObj.rigidbody.velocity, targetVelocity, followStrength);
+      Vector3 lerpedAngularVelocity = Vector3.Lerp(intObj.rigidbody.angularVelocity, targetAngularVelocity, followStrength);
+
+      Vector3 centerOfMassOffset = intObj.rigidbody.rotation * intObj.rigidbody.centerOfMass;
+      intObj.rigidbody.velocity = lerpedVelocity + Vector3.Cross(lerpedAngularVelocity, centerOfMassOffset);
+      intObj.rigidbody.angularVelocity = lerpedAngularVelocity;
+
+      _lastSolvedPosition = solvedPosition;
     }
   }
 
