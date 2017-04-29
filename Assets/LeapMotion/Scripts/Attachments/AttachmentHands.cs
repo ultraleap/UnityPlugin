@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Leap.Unity.Attributes;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 #if UNITY_EDITOR
@@ -6,24 +7,56 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace Leap.Unity {
+namespace Leap.Unity.Attachments {
 
   [ExecuteInEditMode]
   public class AttachmentHands : MonoBehaviour {
 
-    public Func<Hand> leftHandAccessor;
-    public Func<Hand> rightHandAccessor;
+    public Func<Hand>[] handAccessors = new Func<Hand>[2];
 
     [SerializeField]
-    private AttachmentPoints _attachmentPoints = new AttachmentPoints();
+    [OnEditorChange("attachmentPoints")]
+    private AttachmentPointFlags _attachmentPoints = AttachmentPointFlags.Palm | AttachmentPointFlags.Wrist;
+    public AttachmentPointFlags attachmentPoints {
+      get {
+        return _attachmentPoints;
+      }
+      set {
+        _attachmentPoints = value;
+        refreshAttachmentHandTransforms();
+      }
+    }
 
     private AttachmentHand[] _attachmentHands = new AttachmentHand[2];
 
     void OnValidate() {
-      if (leftHandAccessor == null) leftHandAccessor = new Func<Hand>(() => { return Hands.Left; });
-      if (rightHandAccessor == null) rightHandAccessor = new Func<Hand>(() => { return Hands.Right; });
+      if (handAccessors[0] == null) handAccessors[0] = new Func<Hand>(() => { return Hands.Left; });
+      if (handAccessors[1] == null) handAccessors[1] = new Func<Hand>(() => { return Hands.Right; });
 
       refreshAttachmentHands();
+    }
+
+    void Update() {
+      using (new ProfilerSample("Attachment Hands Update", this.gameObject)) {
+        for (int i = 0; i < _attachmentHands.Length; i++) {
+          var attachmentHand = _attachmentHands[i];
+          var leapHand = handAccessors[i]();
+
+#if UNITY_EDITOR
+          if (Hands.Provider != null) {
+            if (leapHand == null && !Application.isPlaying) {
+              leapHand = TestHandFactory.MakeTestHand(0, i, i == 0).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(Hands.Provider.transform));
+            }
+          }
+#endif
+
+          using (new ProfilerSample(attachmentHand.gameObject.name + " Update Points")) {
+            foreach (var point in attachmentHand.points) {
+              point.SetTransformUsingHand(leapHand);
+            }
+          }
+        }
+      }
     }
 
     private void refreshAttachmentHands() {
@@ -48,63 +81,22 @@ namespace Leap.Unity {
         _attachmentHands[0] = obj.AddComponent<AttachmentHand>();
       }
       _attachmentHands[0].gameObject.name = "Attachment Hand (Left)";
-      _attachmentHands[0].handAccessor = leftHandAccessor;
       _attachmentHands[0].transform.parent = this.transform;
+      _attachmentHands[0].transform.SetSiblingIndex(0);
 
       if (_attachmentHands[1] == null) {
         GameObject obj = new GameObject();
         _attachmentHands[1] = obj.AddComponent<AttachmentHand>();
       }
       _attachmentHands[1].gameObject.name = "Attachment Hand (Right)";
-      _attachmentHands[1].handAccessor = leftHandAccessor;
       _attachmentHands[1].transform.parent = this.transform;
+      _attachmentHands[1].transform.SetSiblingIndex(1);
     }
 
-
-    [System.Serializable]
-    public struct AttachmentPoints {
-      public bool wrist;
-      public bool palm;
-
-      // Thumb, Finger 0
-      public bool thumbProximalJoint;
-      public bool thumbDistalJoint;
-      public bool thumbTip;
-
-      // Index, Finger 1
-      public bool indexKnuckle;
-      public bool indexMiddleJoint;
-      public bool indexDistalJoint;
-      public bool indexTip;
-
-      // Middle, Finger 2
-      public bool middleKnuckle;
-      public bool middleMiddleJoint;
-      public bool middleDistalJoint;
-      public bool middleTip;
-
-      // Ring, Finger 3
-      public bool ringKnuckle;
-      public bool ringMiddleJoint;
-      public bool ringDistalJoint;
-      public bool ringTip;
-
-      // Pinky, Finger 4
-      public bool pinkyKnuckle;
-      public bool pinkyMiddleJoint;
-      public bool pinkyDistalJoint;
-      public bool pinkyTip;
-
-      //public AttachmentPoints() {
-      //  this.palm = true;
-
-      //  this.wrist = false;
-      //  this.thumbProximalJoint = false; this.thumbDistalJoint = false; this.thumbTip = false;
-      //  this.indexKnuckle = false; this.indexMiddleJoint = false; this.indexDistalJoint = false; this.indexTip = false;
-      //  this.middleKnuckle = false; this.middleMiddleJoint = false; this.middleDistalJoint = false; this.middleTip = false;
-      //  this.ringKnuckle = false; this.ringMiddleJoint = false; this.ringDistalJoint = false; this.ringTip = false;
-      //  this.pinkyKnuckle = false; this.pinkyMiddleJoint = false; this.pinkyDistalJoint = false; this.pinkyTip = false;
-      //}
+    private void refreshAttachmentHandTransforms() {
+      foreach (var hand in _attachmentHands) {
+        hand.refreshAttachmentTransforms(_attachmentPoints);
+      }
     }
 
   }

@@ -1,19 +1,12 @@
 fileFormatVersion: 2
-guid: 788acd8ba3c3dc74b8f73bcb83447f45
-timeCreated: 1484599122
+guid: 8d8e7adc356aad1499e9fde6618b1858
+timeCreated: 1493415025
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
-  fileIDToRecycleName:
-    100000: //RootNode
-    400000: //RootNode
-    2300000: //RootNode
-    3300000: //RootNode
-    4300000: Plane
-    7400000: Default Take
-    9500000: //RootNode
+  fileIDToRecycleName: {}
   materials:
-    importMaterials: 0
+    importMaterials: 1
     materialName: 0
     materialSearch: 1
   animations:
@@ -22,6 +15,8 @@ ModelImporter:
     resampleCurves: 1
     optimizeGameObjects: 0
     motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -55,7 +50,7 @@ ModelImporter:
     normalSmoothAngle: 60
     normalImportMode: 0
     tangentImportMode: 3
-  importAnimation: 0
+  importAnimation: 1
   copyAvatar: 0
   humanDescription:
     serializedVersion: 2
@@ -74,7 +69,7 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 0
+  animationType: 2
   humanoidOversampling: 1
   additionalBone: 0
   userData: 

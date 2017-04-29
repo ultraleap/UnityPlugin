@@ -687,9 +687,15 @@ namespace Leap.Unity.Interaction {
     /// are updated (via InteractionManager.FixedUpdate).
     /// </summary>
     public void FixedUpdateObject() {
-      FixedUpdateGrasping();
-      FixedUpdateCollisionMode();
-      FixedUpdateForces();
+      using (new ProfilerSample("FixedUpdateGrasping", this.gameObject)) {
+        FixedUpdateGrasping();
+      }
+      using (new ProfilerSample("FixedUpdateCollisionMode", this.gameObject)) {
+        FixedUpdateCollisionMode();
+      }
+      using (new ProfilerSample("FixedUpdateForces", this.gameObject)) {
+        FixedUpdateForces();
+      }
     }
 
     #region Hovering
