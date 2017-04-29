@@ -14,6 +14,8 @@ namespace Leap.Unity.Attachments {
   [AddComponentMenu("")]
   public class AttachmentHand : MonoBehaviour {
 
+    public Action OnHandsChanged = () => { };
+
     [HideInInspector]
     public AttachmentPointBehaviour wrist;
     [HideInInspector]
@@ -84,6 +86,7 @@ namespace Leap.Unity.Attachments {
       }
     }
 
+    private bool _dirty = false;
     public void refreshAttachmentTransforms(AttachmentPointFlags points) {
       foreach (AttachmentPointFlags flag in _attachmentPointFlagConstants) {
         if (flag == AttachmentPointFlags.None) continue;
@@ -97,6 +100,11 @@ namespace Leap.Unity.Attachments {
       }
 
       organizeAttachmentTransforms();
+
+      if (_dirty) {
+        OnHandsChanged();
+        _dirty = false;
+      }
     }
 
     private AttachmentPointBehaviour getBehaviourForPoint(AttachmentPointFlags singlePoint) {
@@ -182,6 +190,8 @@ namespace Leap.Unity.Attachments {
         newPointBehaviour.transform.parent = this.transform;
 
         setBehaviourForPoint(singlePoint, newPointBehaviour);
+
+        _dirty = true;
       }
     }
 
@@ -195,6 +205,8 @@ namespace Leap.Unity.Attachments {
       if (pointBehaviour != null) {
         DestroyImmediate(pointBehaviour.gameObject);
         pointBehaviour = null;
+
+        _dirty = true;
       }
     }
 

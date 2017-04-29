@@ -14,7 +14,15 @@ namespace Leap.Unity.Examples {
 
     private Dictionary<AttachmentPointBehaviour, GameObject> _instances = new Dictionary<AttachmentPointBehaviour, GameObject>();
 
-    void Start() {
+    void OnValidate() {
+      attachmentHand.OnHandsChanged -= refreshAttachmentPrefabs;
+      attachmentHand.OnHandsChanged += refreshAttachmentPrefabs;
+    }
+
+    private HashSet<AttachmentPointBehaviour> _pointsLastRefresh = new HashSet<AttachmentPointBehaviour>();
+    private List<AttachmentPointBehaviour> _pointsRemovalBuffer = new List<AttachmentPointBehaviour>();
+
+    private void refreshAttachmentPrefabs() {
       if (attachmentHand != null && prefab != null) {
         foreach (var point in attachmentHand.points) {
           if (!_instances.ContainsKey(point)) {
@@ -24,6 +32,23 @@ namespace Leap.Unity.Examples {
             obj.transform.localRotation = Quaternion.identity;
             _instances[point] = obj;
           }
+        }
+
+        _pointsRemovalBuffer.Clear();
+        foreach (var point in _pointsLastRefresh) {
+          if (!_instances.ContainsKey(point)) {
+            _pointsRemovalBuffer.Add(point);
+          }
+        }
+
+        foreach (var point in _pointsRemovalBuffer) {
+          _pointsLastRefresh.Remove(point);
+        }
+
+        _pointsLastRefresh.Clear();
+
+        foreach (var pointObjPair in _instances) {
+          _pointsLastRefresh.Add(pointObjPair.Key);
         }
       }
     }
