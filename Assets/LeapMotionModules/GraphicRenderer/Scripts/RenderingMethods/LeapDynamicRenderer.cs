@@ -29,7 +29,7 @@ namespace Leap.Unity.GraphicalRenderer {
         _generation.graphic = group.graphics[_meshes.Count] as LeapMeshGraphicBase;
         _generation.graphicIndex = _meshes.Count;
         _generation.graphicId = _meshes.Count;
-        buildGraphic();
+        base.buildGraphic();
         finishAndAddMesh();
       }
 
@@ -38,7 +38,7 @@ namespace Leap.Unity.GraphicalRenderer {
         _generation.graphic = group.graphics[dirtyIndex] as LeapMeshGraphicBase;
         _generation.graphicIndex = dirtyIndex;
         _generation.graphicId = dirtyIndex;
-        buildGraphic();
+        base.buildGraphic();
         finishMesh();
         _generation.mesh = null;
       }
