@@ -14,6 +14,8 @@ namespace Leap.Unity {
     public class G : BaseClass { }
     public class H : BaseClass { }
 
+    public class InvalidClass : BaseClass { }
+
     private class ListClass : MultiTypedList<BaseClass, A, B, C, D, E, F, G, H> { }
 
     private ListClass _list;
@@ -96,6 +98,13 @@ namespace Leap.Unity {
       Assert.That(_list[5], Is.EqualTo(a));
       Assert.That(_list[6], Is.TypeOf<G>());
       Assert.That(_list[7], Is.TypeOf<H>());
+    }
+
+    [Test]
+    public void AddInvalidObjectTest() {
+      Assert.That(() => {
+        _list.Add(new InvalidClass());
+      }, Throws.ArgumentException);
     }
 
     private void addOneOfEach() {

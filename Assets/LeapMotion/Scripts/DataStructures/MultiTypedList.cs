@@ -89,7 +89,7 @@ namespace Leap.Unity {
       } else if (obj is B) {
         return addHelper(_b, obj, 1);
       } else {
-        throw new Exception("This multi typed list does not support type " + obj.GetType().Name);
+        throw new ArgumentException("This multi typed list does not support type " + obj.GetType().Name);
       }
     }
 
