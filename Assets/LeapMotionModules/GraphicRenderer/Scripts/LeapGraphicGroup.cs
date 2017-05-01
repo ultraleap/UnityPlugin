@@ -124,8 +124,18 @@ namespace Leap.Unity.GraphicalRenderer {
       if (!Application.isPlaying) {
         Undo.RecordObject(graphic, "Added graphic to group");
         Undo.RecordObject(this, "Added graphic to group");
-      }
+      } else
 #endif
+      {
+        if (_toAttach.Contains(graphic)) {
+          return false;
+        }
+        if (_toDetach.Contains(graphic)) {
+          graphic.isRepresentationDirty = true;
+          _toDetach.Remove(graphic);
+          return true;
+        }
+      }
 
       if (_graphics.Contains(graphic)) {
         if (graphic.attachedGroup == null) {
@@ -149,7 +159,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
         RebuildFeatureData();
         RebuildFeatureSupportInfo();
-        
+
         if (_renderer.space != null) {
           _renderer.space.RebuildHierarchy();
           _renderer.space.RecalculateTransformers();
@@ -176,6 +186,20 @@ namespace Leap.Unity.GraphicalRenderer {
         return false;
       }
 
+#if UNITY_EDITOR
+      if (Application.isPlaying)
+#endif
+      {
+        if (_toDetach.Contains(graphic)) {
+          return false;
+        }
+        if (_toAttach.Contains(graphic)) {
+          graphic.isRepresentationDirty = true;
+          _toAttach.Remove(graphic);
+          return true;
+        }
+      }
+
       int graphicIndex = _graphics.IndexOf(graphic);
       if (graphicIndex < 0) {
         return false;
@@ -188,7 +212,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
         graphic.OnDetachedFromGroup();
         _graphics.RemoveAt(graphicIndex);
-        
+
         RebuildFeatureData();
         RebuildFeatureSupportInfo();
 

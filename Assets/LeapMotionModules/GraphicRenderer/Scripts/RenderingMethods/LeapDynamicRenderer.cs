@@ -57,6 +57,19 @@ namespace Leap.Unity.GraphicalRenderer {
     public override void OnUpdateRenderer() {
       base.OnUpdateRenderer();
 
+      for (int i = 0; i < group.graphics.Count; i++) {
+        var graphic = group.graphics[i];
+        if (graphic.isRepresentationDirty) {
+          beginMesh(_meshes[i]);
+          _generation.graphic = graphic as LeapMeshGraphic;
+          _generation.graphicIndex = i;
+          _generation.graphicId = i;
+          base.buildGraphic();
+          finishMesh();
+          _generation.mesh = null;
+        }
+      }
+
       if (renderer.space == null) {
         using (new ProfilerSample("Draw Meshes")) {
           for (int i = 0; i < group.graphics.Count; i++) {
