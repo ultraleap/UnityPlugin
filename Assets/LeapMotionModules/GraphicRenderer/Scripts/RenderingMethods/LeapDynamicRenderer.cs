@@ -124,6 +124,21 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    protected override void updateTinting() {
+      foreach (var tintFeature in _tintFeatures) {
+        var graphicList = group.graphics;
+        for (int i = 0; i < graphicList.Count; i++) {
+          int index = _graphicToId[graphicList[i]];
+          if (_tintColors.Count <= index) {
+            _tintColors.Append(index - _tintColors.Count + 1, Vector4.zero);
+          }
+          _tintColors[index] = tintFeature.featureData[i].color;
+        }
+      }
+
+      _material.SetVectorArraySafe(TINTS_PROPERTY, _tintColors);
+    }
+
     protected override void setupForBuilding() {
       if (_shader == null) {
         _shader = Shader.Find("Leap Motion/Graphic Renderer/Unlit/Dynamic");
