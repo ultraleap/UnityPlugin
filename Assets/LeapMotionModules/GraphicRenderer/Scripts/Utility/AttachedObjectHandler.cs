@@ -72,14 +72,14 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public static void Validate<T, K>(T t, List<K> ks) where T : Component where K : Component {
-      K mainK = ks.Query().NonNull().FirstOrDefault();
+      K mainK = ks.Query().ValidUnityObjs().FirstOrDefault();
 
       if (mainK == null) {
         return;
       }
 
       GameObject mainKObj = mainK.gameObject;
-      if (ks.Query().NonNull().Any(k => k.gameObject != mainKObj)) {
+      if (ks.Query().ValidUnityObjs().Any(k => k.gameObject != mainKObj)) {
         Debug.LogError("Could not validate attached objects because they were on different gameObjects");
         return;
       }

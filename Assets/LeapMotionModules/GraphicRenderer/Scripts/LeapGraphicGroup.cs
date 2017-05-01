@@ -133,6 +133,7 @@ namespace Leap.Unity.GraphicalRenderer {
           //This can easily happen at edit time due to prefab shenanigans 
           graphic.OnDetachedFromGroup();
         } else {
+          Debug.LogWarning("Could not add graphic because it was already a part of this group.");
           return false;
         }
       }
@@ -148,6 +149,11 @@ namespace Leap.Unity.GraphicalRenderer {
 
         RebuildFeatureData();
         RebuildFeatureSupportInfo();
+        
+        if (_renderer.space != null) {
+          _renderer.space.RebuildHierarchy();
+          _renderer.space.RecalculateTransformers();
+        }
 
         _renderer.editor.ScheduleEditorUpdate();
       } else
@@ -182,10 +188,14 @@ namespace Leap.Unity.GraphicalRenderer {
 
         graphic.OnDetachedFromGroup();
         _graphics.RemoveAt(graphicIndex);
-
-        //TODO: this is gonna need to be optimized
+        
         RebuildFeatureData();
         RebuildFeatureSupportInfo();
+
+        if (_renderer.space != null) {
+          _renderer.space.RebuildHierarchy();
+          _renderer.space.RecalculateTransformers();
+        }
 
         _renderer.editor.ScheduleEditorUpdate();
       } else

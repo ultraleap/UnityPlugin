@@ -161,7 +161,7 @@ namespace Leap.Unity.GraphicalRenderer {
       return _renderer.groups.Query().
                          SelectMany(g => g.graphics.Query()).
                          Select(e => e.editor.pickingMesh).
-                         NonNull().
+                         ValidUnityObjs().
                          Select(m => m.bounds).
                          Fold((a, b) => {
                            a.Encapsulate(b);

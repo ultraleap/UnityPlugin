@@ -101,6 +101,8 @@ namespace Leap.Unity.GraphicalRenderer {
     private void featureDecorator(SerializedProperty property) {
       int graphicMax = LeapGraphicPreferences.graphicMax;
 
+      SpriteAtlasUtil.ShowInvalidSpriteWarning(target.features);
+
       if (target.graphics.Count > graphicMax) {
         EditorGUILayout.HelpBox("This gui currently has " + target.graphics.Count.ToString() +
                                 " graphics, which is greater than the maximum of " +

@@ -75,7 +75,8 @@ namespace Leap.Unity.GraphicalRenderer {
     /// not called all the time!
     /// </summary>
     public virtual void OnUpdateRendererEditor(bool isHeavyUpdate) {
-      Undo.RecordObject(this, "Updated Renderer");
+      Undo.RecordObject(this, "Updated Renderer " + isHeavyUpdate);
+      Undo.CollapseUndoOperations(Undo.GetCurrentGroup());
       this.isHeavyUpdate = isHeavyUpdate;
     }
 #endif
