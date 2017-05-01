@@ -496,6 +496,8 @@ namespace Leap.Unity.GraphicalRenderer {
         }
         finishAndAddMesh();
       }
+
+      _meshes.ClearPool();
     }
 
     protected virtual void buildGraphic() {
@@ -638,7 +640,7 @@ namespace Leap.Unity.GraphicalRenderer {
       _generation.Reset();
 
       if (mesh == null) {
-        mesh = new Mesh();
+        mesh = _meshes.GetMeshFromPoolOrNew();
       }
 
       mesh.name = "Procedural Graphic Mesh";
@@ -652,7 +654,7 @@ namespace Leap.Unity.GraphicalRenderer {
         //If there is no data, don't actually do anything
         if (_generation.verts.Count == 0) {
           if (!Application.isPlaying) {
-            DestroyImmediate(_generation.mesh);
+            DestroyImmediate(_generation.mesh, allowDestroyingAssets: true);
           }
           _generation.mesh = null;
           return;
