@@ -56,6 +56,18 @@ namespace Leap.Unity.GraphicalRenderer {
 
       drawScriptField();
 
+      bool anyVertexLit = false;
+      foreach (var camera in FindObjectsOfType<Camera>()) {
+        if (camera.actualRenderingPath == RenderingPath.VertexLit) {
+          anyVertexLit = true;
+          break;
+        }
+      }
+
+      if (anyVertexLit) {
+        EditorGUILayout.HelpBox("The vertex lit rendering path is not supported.", MessageType.Error);
+      }
+
       drawToolbar();
 
       if (_groupEditor != null) {
