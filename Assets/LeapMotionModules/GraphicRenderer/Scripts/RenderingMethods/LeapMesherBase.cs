@@ -494,7 +494,7 @@ namespace Leap.Unity.GraphicalRenderer {
           _generation.graphic = group.graphics[_generation.graphicIndex] as LeapMeshGraphicBase;
           buildGraphic();
         }
-        finishMesh();
+        finishAndAddMesh();
       }
     }
 
@@ -632,14 +632,19 @@ namespace Leap.Unity.GraphicalRenderer {
       return graphicVertToMeshVert(shapeVert) - originalVert;
     }
 
-    protected virtual void beginMesh() {
+    protected virtual void beginMesh(Mesh mesh = null) {
       Assert.IsNull(_generation.mesh, "Cannot begin a new mesh without finishing the current mesh.");
 
       _generation.Reset();
 
-      _generation.mesh = new Mesh();
-      _generation.mesh.name = "Procedural Graphic Mesh";
-      _generation.mesh.hideFlags = HideFlags.None;
+      if (mesh == null) {
+        mesh = new Mesh();
+      }
+
+      mesh.name = "Procedural Graphic Mesh";
+      mesh.hideFlags = HideFlags.None;
+
+      _generation.mesh = mesh;
     }
 
     protected virtual void finishMesh() {
@@ -671,7 +676,13 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         postProcessMesh();
+      }
+    }
 
+    protected virtual void finishAndAddMesh() {
+      finishMesh();
+
+      if (_generation.mesh != null) {
         _meshes.AddMesh(_generation.mesh);
         _generation.mesh = null;
       }

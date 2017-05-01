@@ -35,8 +35,8 @@ namespace Leap.Unity.GraphicalRenderer {
     [SerializeField, HideInInspector]
     private bool _addRemoveSupported;
 
-    private HashSet<LeapGraphic> _toAdd = new HashSet<LeapGraphic>();
-    private HashSet<LeapGraphic> _toRemove = new HashSet<LeapGraphic>();
+    private HashSet<LeapGraphic> _toAttach = new HashSet<LeapGraphic>();
+    private HashSet<LeapGraphic> _toDetach = new HashSet<LeapGraphic>();
     #endregion
 
     #region PUBLIC RUNTIME API
@@ -153,11 +153,11 @@ namespace Leap.Unity.GraphicalRenderer {
       } else
 #endif
       {
-        if (_toAdd.Contains(graphic)) {
+        if (_toAttach.Contains(graphic)) {
           return false;
         }
 
-        _toAdd.Add(graphic);
+        _toAttach.Add(graphic);
       }
 
       return true;
@@ -191,11 +191,11 @@ namespace Leap.Unity.GraphicalRenderer {
       } else
 #endif
       {
-        if (_toRemove.Contains(graphic)) {
+        if (_toDetach.Contains(graphic)) {
           return false;
         }
 
-        _toRemove.Add(graphic);
+        _toDetach.Add(graphic);
       }
 
       return true;
@@ -215,6 +215,13 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public void UpdateRenderer() {
+#if UNITY_EDITOR
+      if (Application.isPlaying)
+#endif
+      {
+        handleRuntimeAddRemove();
+      }
+
       _renderingMethod.OnUpdateRenderer();
 
       foreach (var feature in _features) {
@@ -370,6 +377,65 @@ namespace Leap.Unity.GraphicalRenderer {
       editor = new EditorApi(this);
     }
 #endif
+
+    private void handleRuntimeAddRemove() {
+      if (_toAttach.Count == 0 && _toDetach.Count == 0) {
+        return;
+      }
+
+      List<int> dirtyIndexes = Pool<List<int>>.Spawn();
+
+      try {
+        while (_toAttach.Count != 0 && _toDetach.Count != 0) {
+          var toDetach = _toDetach.Query().First();
+          var toAttach = _toAttach.Query().First();
+
+          int toDetatchIndex = _graphics.IndexOf(toDetach);
+          _graphics[toDetatchIndex] = toAttach;
+
+          var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(toAttach.transform);
+
+          toDetach.OnDetachedFromGroup();
+          toAttach.OnAttachedToGroup(this, anchor);
+
+          dirtyIndexes.Add(toDetatchIndex);
+        }
+
+        if (_toAttach.Count != 0) {
+          foreach (var toAttach in _toAttach) {
+            _graphics.Add(toAttach);
+
+            var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(toAttach.transform);
+            toAttach.OnAttachedToGroup(this, anchor);
+          }
+          _toAttach.Clear();
+        }
+
+        if (_toDetach.Count != 0) {
+          foreach (var toDetach in _toDetach) {
+            int toDetachIndex = _graphics.IndexOf(toDetach);
+            _graphics.RemoveAtUnordered(toDetachIndex);
+            dirtyIndexes.Add(toDetachIndex);
+
+            toDetach.OnDetachedFromGroup();
+          }
+          _toDetach.Clear();
+        }
+
+        //TODO: this is gonna need to be optimized
+        RebuildFeatureData();
+        RebuildFeatureSupportInfo();
+        if (renderer.space != null) {
+          renderer.space.RebuildHierarchy();
+          renderer.space.RecalculateTransformers();
+        }
+
+        (_renderingMethod as ISupportsAddRemove).OnAddRemoveGraphics(dirtyIndexes);
+      } finally {
+        dirtyIndexes.Clear();
+        Pool<List<int>>.Recycle(dirtyIndexes);
+      }
+    }
 
     private bool addRemoveSupportedOrEditTime() {
 #if UNITY_EDITOR
