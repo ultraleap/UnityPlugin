@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Leap.Unity {
 
@@ -31,41 +32,45 @@ namespace Leap.Unity {
     where A : BaseType
     where B : BaseType {
 
-    public List<Key> table = new List<Key>();
+    [SerializeField]
+    private List<Key> _table = new List<Key>();
 
-    public List<A> a = new List<A>();
-    public List<B> b = new List<B>();
+    [SerializeField]
+    private List<A> _a = new List<A>();
+
+    [SerializeField]
+    private List<B> _b = new List<B>();
 
     private Dictionary<int, IList> _idToList;
 
     public override int Count {
       get {
-        return table.Count;
+        return _table.Count;
       }
     }
 
     public override void Add(BaseType obj) {
-      table.Add(addInternal(obj));
+      _table.Add(addInternal(obj));
     }
 
     public override void RemoveAt(int index) {
-      var key = table[index];
-      table.RemoveAt(index);
+      var key = _table[index];
+      _table.RemoveAt(index);
 
       getList(key.id).RemoveAt(key.index);
     }
 
     public override BaseType this[int index] {
       get {
-        Key key = table[index];
+        Key key = _table[index];
         return (BaseType)getList(key.id)[key.index];
       }
       set {
-        Key oldKey = table[index];
+        Key oldKey = _table[index];
         getList(oldKey.id).RemoveAt(oldKey.index);
 
         Key newKey = addInternal(value);
-        table[index] = newKey;
+        _table[index] = newKey;
       }
     }
 
@@ -80,9 +85,9 @@ namespace Leap.Unity {
 
     protected virtual Key addInternal(BaseType obj) {
       if (obj is A) {
-        return addHelper(a, obj, 0);
+        return addHelper(_a, obj, 0);
       } else if (obj is B) {
-        return addHelper(b, obj, 1);
+        return addHelper(_b, obj, 1);
       } else {
         throw new Exception("This multi typed list does not support type " + obj.GetType().Name);
       }
@@ -90,9 +95,9 @@ namespace Leap.Unity {
 
     protected virtual IList getList(int id) {
       if (id == 0) {
-        return a;
+        return _a;
       } else if (id == 1) {
-        return b;
+        return _b;
       } else {
         throw new Exception("This multi typed list does not have a list with id " + id);
       }
@@ -104,14 +109,15 @@ namespace Leap.Unity {
     where B : BaseType
     where C : BaseType {
 
-    public List<C> c = new List<C>();
+    [SerializeField]
+    private List<C> _c = new List<C>();
 
     protected override Key addInternal(BaseType obj) {
-      return obj is C ? addHelper(c, obj, 2) : base.addInternal(obj);
+      return obj is C ? addHelper(_c, obj, 2) : base.addInternal(obj);
     }
 
     protected override IList getList(int id) {
-      return id == 2 ? c : base.getList(id);
+      return id == 2 ? _c : base.getList(id);
     }
   }
 
@@ -121,14 +127,15 @@ namespace Leap.Unity {
     where C : BaseType
     where D : BaseType {
 
-    public List<D> d = new List<D>();
+    [SerializeField]
+    private List<D> _d = new List<D>();
 
     protected override Key addInternal(BaseType obj) {
-      return obj is D ? addHelper(d, obj, 3) : base.addInternal(obj);
+      return obj is D ? addHelper(_d, obj, 3) : base.addInternal(obj);
     }
 
     protected override IList getList(int id) {
-      return id == 3 ? c : base.getList(id);
+      return id == 3 ? _d : base.getList(id);
     }
   }
 
@@ -139,14 +146,15 @@ namespace Leap.Unity {
     where D : BaseType
     where E : BaseType {
 
-    public List<E> e = new List<E>();
+    [SerializeField]
+    private List<E> _e = new List<E>();
 
     protected override Key addInternal(BaseType obj) {
-      return obj is E ? addHelper(e, obj, 4) : base.addInternal(obj);
+      return obj is E ? addHelper(_e, obj, 4) : base.addInternal(obj);
     }
 
     protected override IList getList(int id) {
-      return id == 4 ? c : base.getList(id);
+      return id == 4 ? _e : base.getList(id);
     }
   }
 
@@ -158,14 +166,15 @@ namespace Leap.Unity {
     where E : BaseType
     where F : BaseType {
 
-    public List<F> f = new List<F>();
+    [SerializeField]
+    private List<F> _f = new List<F>();
 
     protected override Key addInternal(BaseType obj) {
-      return obj is F ? addHelper(f, obj, 5) : base.addInternal(obj);
+      return obj is F ? addHelper(_f, obj, 5) : base.addInternal(obj);
     }
 
     protected override IList getList(int id) {
-      return id == 5 ? c : base.getList(id);
+      return id == 5 ? _f : base.getList(id);
     }
   }
 
@@ -178,14 +187,15 @@ namespace Leap.Unity {
     where F : BaseType
     where G : BaseType {
 
-    public List<G> g = new List<G>();
+    [SerializeField]
+    private List<G> _g = new List<G>();
 
     protected override Key addInternal(BaseType obj) {
-      return obj is G ? addHelper(g, obj, 6) : base.addInternal(obj);
+      return obj is G ? addHelper(_g, obj, 6) : base.addInternal(obj);
     }
 
     protected override IList getList(int id) {
-      return id == 6 ? c : base.getList(id);
+      return id == 6 ? _g : base.getList(id);
     }
   }
 
@@ -199,14 +209,15 @@ namespace Leap.Unity {
     where G : BaseType
     where H : BaseType {
 
-    public List<H> h = new List<H>();
+    [SerializeField]
+    private List<H> _h = new List<H>();
 
     protected override Key addInternal(BaseType obj) {
-      return obj is H ? addHelper(h, obj, 7) : base.addInternal(obj);
+      return obj is H ? addHelper(_h, obj, 7) : base.addInternal(obj);
     }
 
     protected override IList getList(int id) {
-      return id == 7 ? c : base.getList(id);
+      return id == 7 ? _h : base.getList(id);
     }
   }
 }
