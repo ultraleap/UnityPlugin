@@ -24,15 +24,6 @@ namespace Leap.Unity.GraphicalRenderer {
         _meshes.RemoveMesh(_meshes.Count - 1);
       }
 
-      foreach (var dirtyIndex in dirtyIndexes) {
-        beginMesh(_meshes[dirtyIndex]);
-        _generation.graphic = group.graphics[dirtyIndex] as LeapMeshGraphicBase;
-        _generation.graphicIndex = dirtyIndex;
-        _generation.graphicId = dirtyIndex;
-        buildGraphic();
-        finishMesh();
-      }
-
       while (_meshes.Count < group.graphics.Count) {
         beginMesh();
         _generation.graphic = group.graphics[_meshes.Count] as LeapMeshGraphicBase;
@@ -40,6 +31,16 @@ namespace Leap.Unity.GraphicalRenderer {
         _generation.graphicId = _meshes.Count;
         buildGraphic();
         finishAndAddMesh();
+      }
+
+      foreach (var dirtyIndex in dirtyIndexes) {
+        beginMesh(_meshes[dirtyIndex]);
+        _generation.graphic = group.graphics[dirtyIndex] as LeapMeshGraphicBase;
+        _generation.graphicIndex = dirtyIndex;
+        _generation.graphicId = dirtyIndex;
+        buildGraphic();
+        finishMesh();
+        _generation.mesh = null;
       }
     }
 

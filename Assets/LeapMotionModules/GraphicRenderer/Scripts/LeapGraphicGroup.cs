@@ -383,57 +383,84 @@ namespace Leap.Unity.GraphicalRenderer {
         return;
       }
 
-      List<int> dirtyIndexes = Pool<List<int>>.Spawn();
+      using (new ProfilerSample("Handle Runtime Add/Remove")) {
+        List<int> dirtyIndexes = Pool<List<int>>.Spawn();
 
-      try {
-        while (_toAttach.Count != 0 && _toDetach.Count != 0) {
-          var toDetach = _toDetach.Query().First();
-          var toAttach = _toAttach.Query().First();
+        try {
+          var attachEnum = _toAttach.GetEnumerator();
+          var detachEnum = _toDetach.GetEnumerator();
+          bool canAttach = attachEnum.MoveNext();
+          bool canDetach = detachEnum.MoveNext();
 
-          int toDetatchIndex = _graphics.IndexOf(toDetach);
-          _graphics[toDetatchIndex] = toAttach;
+          //First, we can handle pairs of adds/removes easily by simply placing
+          //the new graphic in the same place the old graphic was.
+          while (canAttach && canDetach) {
+            int toDetatchIndex = _graphics.IndexOf(detachEnum.Current);
+            _graphics[toDetatchIndex] = attachEnum.Current;
 
-          var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(toAttach.transform);
+            var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(attachEnum.Current.transform);
 
-          toDetach.OnDetachedFromGroup();
-          toAttach.OnAttachedToGroup(this, anchor);
+            detachEnum.Current.OnDetachedFromGroup();
+            attachEnum.Current.OnAttachedToGroup(this, anchor);
 
-          dirtyIndexes.Add(toDetatchIndex);
-        }
+            dirtyIndexes.Add(toDetatchIndex);
 
-        if (_toAttach.Count != 0) {
-          foreach (var toAttach in _toAttach) {
-            _graphics.Add(toAttach);
-
-            var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(toAttach.transform);
-            toAttach.OnAttachedToGroup(this, anchor);
+            canAttach = attachEnum.MoveNext();
+            canDetach = detachEnum.MoveNext();
           }
-          _toAttach.Clear();
-        }
 
-        if (_toDetach.Count != 0) {
-          foreach (var toDetach in _toDetach) {
-            int toDetachIndex = _graphics.IndexOf(toDetach);
-            _graphics.RemoveAtUnordered(toDetachIndex);
+          //Then we append all the new graphics if there are any left.  This
+          //only happens if more graphics were added than were remove this
+          //frame.
+          while (canAttach) {
+            _graphics.Add(attachEnum.Current);
+
+            var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(attachEnum.Current.transform);
+            attachEnum.Current.OnAttachedToGroup(this, anchor);
+
+            canAttach = attachEnum.MoveNext();
+          }
+
+          //Or remove any graphics that did not have a matching add.  This 
+          //only happens if more graphics were removed than were added this
+          //frame.
+          while (canDetach) {
+            int toDetachIndex = _graphics.IndexOf(detachEnum.Current);
             dirtyIndexes.Add(toDetachIndex);
 
-            toDetach.OnDetachedFromGroup();
+            _graphics.RemoveAtUnordered(toDetachIndex);
+
+            detachEnum.Current.OnDetachedFromGroup();
+
+            canDetach = detachEnum.MoveNext();
           }
+
+          attachEnum.Dispose();
+          detachEnum.Dispose();
+          _toAttach.Clear();
           _toDetach.Clear();
-        }
 
-        //TODO: this is gonna need to be optimized
-        RebuildFeatureData();
-        RebuildFeatureSupportInfo();
-        if (renderer.space != null) {
-          renderer.space.RebuildHierarchy();
-          renderer.space.RecalculateTransformers();
-        }
+          //Make sure the dirty indexes only point to valid graphics areas.
+          //Could potentially be optimized, but hasnt been a bottleneck.
+          for (int i = dirtyIndexes.Count; i-- != 0;) {
+            if (dirtyIndexes[i] >= _graphics.Count) {
+              dirtyIndexes.RemoveAt(i);
+            }
+          }
 
-        (_renderingMethod as ISupportsAddRemove).OnAddRemoveGraphics(dirtyIndexes);
-      } finally {
-        dirtyIndexes.Clear();
-        Pool<List<int>>.Recycle(dirtyIndexes);
+          //TODO: this is gonna need to be optimized
+          RebuildFeatureData();
+          RebuildFeatureSupportInfo();
+          if (renderer.space != null) {
+            renderer.space.RebuildHierarchy();
+            renderer.space.RecalculateTransformers();
+          }
+
+          (_renderingMethod as ISupportsAddRemove).OnAddRemoveGraphics(dirtyIndexes);
+        } finally {
+          dirtyIndexes.Clear();
+          Pool<List<int>>.Recycle(dirtyIndexes);
+        }
       }
     }
 

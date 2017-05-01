@@ -651,7 +651,9 @@ namespace Leap.Unity.GraphicalRenderer {
       using (new ProfilerSample("Finish Mesh")) {
         //If there is no data, don't actually do anything
         if (_generation.verts.Count == 0) {
-          DestroyImmediate(_generation.mesh);
+          if (!Application.isPlaying) {
+            DestroyImmediate(_generation.mesh);
+          }
           _generation.mesh = null;
           return;
         }
