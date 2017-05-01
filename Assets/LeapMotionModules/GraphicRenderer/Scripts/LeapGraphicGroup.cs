@@ -34,6 +34,9 @@ namespace Leap.Unity.GraphicalRenderer {
 
     [SerializeField, HideInInspector]
     private bool _addRemoveSupported;
+
+    private HashSet<LeapGraphic> _toAdd = new HashSet<LeapGraphic>();
+    private HashSet<LeapGraphic> _toRemove = new HashSet<LeapGraphic>();
     #endregion
 
     #region PUBLIC RUNTIME API
@@ -134,24 +137,27 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
 
-      int newIndex = _graphics.Count;
-      _graphics.Add(graphic);
-
-      LeapSpaceAnchor anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(graphic.transform);
-
-      graphic.OnAttachedToGroup(this, anchor);
-
-      //TODO: this is gonna need to be optimized
-      RebuildFeatureData();
-      RebuildFeatureSupportInfo();
-
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
+        int newIndex = _graphics.Count;
+        _graphics.Add(graphic);
+
+        LeapSpaceAnchor anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(graphic.transform);
+
+        graphic.OnAttachedToGroup(this, anchor);
+
+        RebuildFeatureData();
+        RebuildFeatureSupportInfo();
+
         _renderer.editor.ScheduleEditorUpdate();
       } else
 #endif
       {
-        (_renderingMethod as ISupportsAddRemove).OnAddGraphic(graphic, newIndex);
+        if (_toAdd.Contains(graphic)) {
+          return false;
+        }
+
+        _toAdd.Add(graphic);
       }
 
       return true;
@@ -173,23 +179,23 @@ namespace Leap.Unity.GraphicalRenderer {
       if (!Application.isPlaying) {
         Undo.RecordObject(graphic, "Removed graphic from group");
         Undo.RecordObject(this, "Removed graphic from group");
-      }
-#endif
 
-      graphic.OnDetachedFromGroup();
-      _graphics.RemoveAt(graphicIndex);
+        graphic.OnDetachedFromGroup();
+        _graphics.RemoveAt(graphicIndex);
 
-      //TODO: this is gonna need to be optimized
-      RebuildFeatureData();
-      RebuildFeatureSupportInfo();
+        //TODO: this is gonna need to be optimized
+        RebuildFeatureData();
+        RebuildFeatureSupportInfo();
 
-#if UNITY_EDITOR
-      if (!Application.isPlaying) {
         _renderer.editor.ScheduleEditorUpdate();
       } else
 #endif
       {
-        (_renderingMethod as ISupportsAddRemove).OnRemoveGraphic(graphic, graphicIndex);
+        if (_toRemove.Contains(graphic)) {
+          return false;
+        }
+
+        _toRemove.Add(graphic);
       }
 
       return true;
