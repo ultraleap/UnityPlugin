@@ -693,6 +693,31 @@ Transform:
   m_Father: {fileID: 115189574}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: -28.761002, y: 345.618, z: -292.208}
+--- !u!21 &763400881
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Graphic Material
+  m_Shader: {fileID: 4800000, guid: 57570c3b474214d4d8db6369e534062b, type: 3}
+  m_ShaderKeywords: GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
+    GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_NORMALS GRAPHIC_RENDERER_VERTEX_UV_0
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &785706449
 GameObject:
   m_ObjectHideFlags: 0
@@ -1323,6 +1348,31 @@ MonoBehaviour:
   vertexColor: {r: 1, g: 0, b: 0, a: 1}
   _mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   _remappableChannels: -1
+--- !u!21 &1410199942
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Graphic Material
+  m_Shader: {fileID: 4800000, guid: d975a2f94ef2a594188407da17883414, type: 3}
+  m_ShaderKeywords: GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS GRAPHIC_RENDERER_VERTEX_COLORS
+    GRAPHIC_RENDERER_VERTEX_NORMALS GRAPHIC_RENDERER_VERTEX_UV_0
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1481871105
 GameObject:
   m_ObjectHideFlags: 0
@@ -1564,7 +1614,7 @@ Camera:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_RenderingPath: -1
+  m_RenderingPath: 1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
@@ -1588,31 +1638,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &1680639321
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Graphic Material
-  m_Shader: {fileID: 4800000, guid: d975a2f94ef2a594188407da17883414, type: 3}
-  m_ShaderKeywords: GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS GRAPHIC_RENDERER_VERTEX_COLORS
-    GRAPHIC_RENDERER_VERTEX_NORMALS GRAPHIC_RENDERER_VERTEX_UV_0
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1819810250
 GameObject:
   m_ObjectHideFlags: 0
@@ -1929,7 +1954,7 @@ MonoBehaviour:
   _useColor: 1
   _globalTint: {r: 1, g: 1, b: 1, a: 1}
   _shader: {fileID: 4800000, guid: 109077dfbfcd5f3469886d8b9ae4b056, type: 3}
-  _meshData: {fileID: 11400000, guid: 9d5e7b2ae4a6c1542ac3c4b5b23a2315, type: 2}
+  _meshData: {fileID: 11400000, guid: e744a1ee51887fb40b9f8ac45ab2b6c2, type: 2}
   scale: 0.015
 --- !u!114 &1985179170
 MonoBehaviour:
@@ -1982,9 +2007,9 @@ MonoBehaviour:
     _format: 5
     _maxAtlasSize: 4096
     _extraTextures: []
-  _material: {fileID: 1680639321}
-  _meshes: {fileID: 11400000, guid: 31a7f34045425ed488a5d4ee019e18a1, type: 2}
-  _packedTextures: {fileID: 11400000, guid: 88c3465d516f70c47a802e47f751d4bd, type: 2}
+  _material: {fileID: 1410199942}
+  _meshes: {fileID: 11400000, guid: 95b42cb540f56f142a11a35d14da6a21, type: 2}
+  _packedTextures: {fileID: 11400000, guid: 6e0532813411df04cb41ff5030cf775b, type: 2}
   _atlasUvs:
     _channel0:
       _keys:
@@ -2208,9 +2233,9 @@ MonoBehaviour:
     _format: 5
     _maxAtlasSize: 4096
     _extraTextures: []
-  _material: {fileID: 1993401699}
-  _meshes: {fileID: 11400000, guid: 9cda3561f67e3bf4ca6531f4fbbfa352, type: 2}
-  _packedTextures: {fileID: 11400000, guid: 39008675608f9f244be1ef97ac570eb9, type: 2}
+  _material: {fileID: 763400881}
+  _meshes: {fileID: 11400000, guid: 020ac44ca82033f4c946624a8b22e0ba, type: 2}
+  _packedTextures: {fileID: 11400000, guid: 29e201659d4baf9408a7bb136c37a90e, type: 2}
   _atlasUvs:
     _channel0:
       _keys:
@@ -2308,36 +2333,6 @@ MonoBehaviour:
   - support: 0
     message: 
   _addRemoveSupported: 0
---- !u!21 &1993401699
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Graphic Material
-  m_Shader: {fileID: 4800000, guid: 57570c3b474214d4d8db6369e534062b, type: 3}
-  m_ShaderKeywords: GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
-    GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_NORMALS GRAPHIC_RENDERER_VERTEX_UV_0
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 28671576554361086, guid: 39008675608f9f244be1ef97ac570eb9,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex2:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2014846562
 GameObject:
   m_ObjectHideFlags: 0
