@@ -38,7 +38,7 @@ namespace Leap.Unity.GraphicalRenderer {
                                                  UVChannelFlags.UV3;
 
     public void SetMesh(Mesh mesh) {
-      if (!_attachedGroup.addRemoveSupported) {
+      if (_attachedGroup != null && !_attachedGroup.addRemoveSupported) {
         Debug.LogWarning("Changing the representation of the graphic is not supported by this rendering type");
       }
 
