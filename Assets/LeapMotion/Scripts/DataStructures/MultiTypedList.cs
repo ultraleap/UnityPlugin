@@ -41,8 +41,6 @@ namespace Leap.Unity {
     [SerializeField]
     private List<B> _b = new List<B>();
 
-    private Dictionary<int, IList> _idToList;
-
     public override int Count {
       get {
         return _table.Count;
