@@ -1,4 +1,13 @@
-﻿namespace Leap.Unity.Animation {
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+namespace Leap.Unity.Animation {
 
   /// <summary> Utility functions for producing smooth motion. </summary>
   public static class Ease {
