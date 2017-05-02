@@ -9,6 +9,14 @@ using UnityEngine;
 
 namespace Leap.Unity.Attachments {
 
+  /// <summary>
+  /// Add an GameObject with this script to your scene if you would like to have a
+  /// Transform hierarchy that will follow various important points on a hand, whether
+  /// for visuals or for logic. The AttachmentHands object will maintain two child
+  /// objects, one for each of the player's hands. Use the Inspector to customize
+  /// which points you'd like to see in the hierarchy beneath the individual
+  /// AttachmentHand objects.
+  /// </summary>
   [ExecuteInEditMode]
   public class AttachmentHands : MonoBehaviour {
 

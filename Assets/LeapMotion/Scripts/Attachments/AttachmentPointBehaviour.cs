@@ -8,9 +8,11 @@ namespace Leap.Unity.Attachments {
 
   /// <summary>
   /// Simple container class for storing a reference to the attachment point this
-  /// transform corresponds to within an AttachmentHand.
+  /// transform corresponds to within an AttachmentHand. Also contains mappings from
+  /// a single AttachmentPointFlags flag constant to the relevant bone on a Leap.Hand;
+  /// these mappings can be accessed statically via GetLeapHandPointData().
   /// 
-  /// Can be used implicitly as a reference to a single AttachmentPointFlags flag constant.
+  /// Can also be used to refer to a single AttachmentPointFlags flag constant (implicit conversion).
   /// </summary>
   [AddComponentMenu("")]
   public class AttachmentPointBehaviour : MonoBehaviour, IEquatable<AttachmentPointBehaviour> {
@@ -42,7 +44,22 @@ namespace Leap.Unity.Attachments {
       Vector3 position = Vector3.zero;
       Quaternion rotation = Quaternion.identity;
 
-      switch (attachmentPoint) {
+      GetLeapHandPointData(hand, this.attachmentPoint, out position, out rotation);
+
+      this.transform.position = position;
+      this.transform.rotation = rotation;
+    }
+
+    public static void GetLeapHandPointData(Leap.Hand hand, AttachmentPointFlags singlePoint, out Vector3 position, out Quaternion rotation) {
+      position = Vector3.zero;
+      rotation = Quaternion.identity;
+
+      if (!singlePoint.IsSinglePoint()) {
+        Debug.LogError("Cannot get attachment point data for an AttachmentPointFlags argument consisting of more than one set flag.");
+        return;
+      }
+
+      switch (singlePoint) {
         case AttachmentPointFlags.None:
           Debug.LogError("Unable to set transform; this AttachmentPointBehaviour does not have its attachment point flag set.");
           return;
@@ -137,9 +154,6 @@ namespace Leap.Unity.Attachments {
           rotation = hand.Fingers[4].bones[3].Rotation.ToQuaternion();
           break;
       }
-
-      this.transform.position = position;
-      this.transform.rotation = rotation;
     }
 
   }

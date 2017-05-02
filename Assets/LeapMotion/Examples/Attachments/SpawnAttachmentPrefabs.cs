@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace Leap.Unity.Examples {
 
+  /// <summary>
+  /// This example script allows you to specify a prefab to be spawned at every
+  /// attachment point Transform on an AttachmentHand.
+  /// </summary>
   [AddComponentMenu("")]
   [ExecuteInEditMode]
   public class SpawnAttachmentPrefabs : MonoBehaviour {
@@ -15,8 +19,8 @@ namespace Leap.Unity.Examples {
     private Dictionary<AttachmentPointBehaviour, GameObject> _instances = new Dictionary<AttachmentPointBehaviour, GameObject>();
 
     void OnValidate() {
-      attachmentHand.OnHandsChanged -= refreshAttachmentPrefabs;
-      attachmentHand.OnHandsChanged += refreshAttachmentPrefabs;
+      attachmentHand.OnAttachmentPointsModified -= refreshAttachmentPrefabs;
+      attachmentHand.OnAttachmentPointsModified += refreshAttachmentPrefabs;
     }
 
     private HashSet<AttachmentPointBehaviour> _pointsLastRefresh = new HashSet<AttachmentPointBehaviour>();

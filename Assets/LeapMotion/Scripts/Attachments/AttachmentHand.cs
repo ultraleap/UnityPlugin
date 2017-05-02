@@ -9,12 +9,23 @@ namespace Leap.Unity.Attachments {
   /// <summary>
   /// This MonoBehaviour is managed by an AttachmentHands component on a parent MonoBehaviour.
   /// Instead of adding AttachmentHand directly to a GameObject, add an AttachmentHands component
-  /// to a parent GameObject to manage the construction and updating of attachment hands.
+  /// to a parent GameObject to manage the construction and updating of AttachmentHand objects.
   /// </summary>
   [AddComponentMenu("")]
   public class AttachmentHand : MonoBehaviour {
 
-    public Action OnHandsChanged = () => { };
+    /// <summary>
+    /// Called when the AttachmentHand refreshes its AttachmentPointBehaviour transforms. If the
+    /// user unchecks an attachment point in the AttachmentHands inspector, those Transforms will
+    /// be destroyed; otherwise, existing Transforms will persist, so be careful not to unnecessarily
+    /// duplicate any objects or components you may want to attach via this callback.
+    /// 
+    /// Also, you can use AttachmentHand.points for an enumerator of all existing AttachmentPointBehaviour
+    /// transforms on a given AttachmentHand object.
+    /// </summary>
+    public Action OnAttachmentPointsModified = () => { };
+
+    #region AttachmentPointBehaviours
 
     [HideInInspector]
     public AttachmentPointBehaviour wrist;
@@ -64,7 +75,14 @@ namespace Leap.Unity.Attachments {
     [HideInInspector]
     public AttachmentPointBehaviour pinkyTip;
 
+    #endregion
+
+    /// <summary>
+    /// Gets an enumerator that traverses all of the AttachmentPoints beneath this AttachmentHand.
+    /// </summary>
     public AttachmentPointsEnumerator points { get { return new AttachmentPointsEnumerator(this); } }
+
+    private bool _attachmentPointsDirty = false;
 
     void OnValidate() {
       initializeAttachmentPointFlagConstants();
@@ -86,7 +104,6 @@ namespace Leap.Unity.Attachments {
       }
     }
 
-    private bool _dirty = false;
     public void refreshAttachmentTransforms(AttachmentPointFlags points) {
       foreach (AttachmentPointFlags flag in _attachmentPointFlagConstants) {
         if (flag == AttachmentPointFlags.None) continue;
@@ -101,11 +118,13 @@ namespace Leap.Unity.Attachments {
 
       organizeAttachmentTransforms();
 
-      if (_dirty) {
-        OnHandsChanged();
-        _dirty = false;
+      if (_attachmentPointsDirty) {
+        OnAttachmentPointsModified();
+        _attachmentPointsDirty = false;
       }
     }
+
+    #region Internal
 
     private AttachmentPointBehaviour getBehaviourForPoint(AttachmentPointFlags singlePoint) {
       AttachmentPointBehaviour behaviour = null;
@@ -191,7 +210,7 @@ namespace Leap.Unity.Attachments {
 
         setBehaviourForPoint(singlePoint, newPointBehaviour);
 
-        _dirty = true;
+        _attachmentPointsDirty = true;
       }
     }
 
@@ -206,7 +225,7 @@ namespace Leap.Unity.Attachments {
         DestroyImmediate(pointBehaviour.gameObject);
         pointBehaviour = null;
 
-        _dirty = true;
+        _attachmentPointsDirty = true;
       }
     }
 
@@ -312,8 +331,12 @@ namespace Leap.Unity.Attachments {
     }
 
     [ThreadStatic]
-    private static AttachmentPointBehaviour[] s_attachmentPoints = new AttachmentPointBehaviour[32];
+    private static AttachmentPointBehaviour[] s_attachmentPointsBuffer = new AttachmentPointBehaviour[32];
 
+    /// <summary>
+    /// An enumerator that traverses all of the existing AttachmentPointBehaviours beneath an
+    /// AttachmentHand.
+    /// </summary>
     public struct AttachmentPointsEnumerator {
       private int _curIdx;
 
@@ -322,47 +345,52 @@ namespace Leap.Unity.Attachments {
       public AttachmentPointsEnumerator(AttachmentHand hand) {
         _curIdx = -1;
 
-        if (s_attachmentPoints == null || s_attachmentPoints.Length != 32) s_attachmentPoints = new AttachmentPointBehaviour[32];
+        // New threads will have to construct their own attachment points buffer.
+        if (s_attachmentPointsBuffer == null || s_attachmentPointsBuffer.Length != 32) s_attachmentPointsBuffer = new AttachmentPointBehaviour[32];
 
+        // Just construct the buffer we'll be enumerating across. The enumeration
+        // will automatically skip any null indices.
         int pointIdx = 0;
-        s_attachmentPoints[pointIdx++] = hand.wrist;
-        s_attachmentPoints[pointIdx++] = hand.palm;
+        s_attachmentPointsBuffer[pointIdx++] = hand.wrist;
+        s_attachmentPointsBuffer[pointIdx++] = hand.palm;
 
-        s_attachmentPoints[pointIdx++] = hand.thumbProximalJoint;
-        s_attachmentPoints[pointIdx++] = hand.thumbDistalJoint;
-        s_attachmentPoints[pointIdx++] = hand.thumbTip;
+        s_attachmentPointsBuffer[pointIdx++] = hand.thumbProximalJoint;
+        s_attachmentPointsBuffer[pointIdx++] = hand.thumbDistalJoint;
+        s_attachmentPointsBuffer[pointIdx++] = hand.thumbTip;
 
-        s_attachmentPoints[pointIdx++] = hand.indexKnuckle;
-        s_attachmentPoints[pointIdx++] = hand.indexMiddleJoint;
-        s_attachmentPoints[pointIdx++] = hand.indexDistalJoint;
-        s_attachmentPoints[pointIdx++] = hand.indexTip;
+        s_attachmentPointsBuffer[pointIdx++] = hand.indexKnuckle;
+        s_attachmentPointsBuffer[pointIdx++] = hand.indexMiddleJoint;
+        s_attachmentPointsBuffer[pointIdx++] = hand.indexDistalJoint;
+        s_attachmentPointsBuffer[pointIdx++] = hand.indexTip;
 
-        s_attachmentPoints[pointIdx++] = hand.middleKnuckle;
-        s_attachmentPoints[pointIdx++] = hand.middleMiddleJoint;
-        s_attachmentPoints[pointIdx++] = hand.middleDistalJoint;
-        s_attachmentPoints[pointIdx++] = hand.middleTip;
+        s_attachmentPointsBuffer[pointIdx++] = hand.middleKnuckle;
+        s_attachmentPointsBuffer[pointIdx++] = hand.middleMiddleJoint;
+        s_attachmentPointsBuffer[pointIdx++] = hand.middleDistalJoint;
+        s_attachmentPointsBuffer[pointIdx++] = hand.middleTip;
 
-        s_attachmentPoints[pointIdx++] = hand.ringKnuckle;
-        s_attachmentPoints[pointIdx++] = hand.ringMiddleJoint;
-        s_attachmentPoints[pointIdx++] = hand.ringDistalJoint;
-        s_attachmentPoints[pointIdx++] = hand.ringTip;
+        s_attachmentPointsBuffer[pointIdx++] = hand.ringKnuckle;
+        s_attachmentPointsBuffer[pointIdx++] = hand.ringMiddleJoint;
+        s_attachmentPointsBuffer[pointIdx++] = hand.ringDistalJoint;
+        s_attachmentPointsBuffer[pointIdx++] = hand.ringTip;
 
-        s_attachmentPoints[pointIdx++] = hand.pinkyKnuckle;
-        s_attachmentPoints[pointIdx++] = hand.pinkyMiddleJoint;
-        s_attachmentPoints[pointIdx++] = hand.pinkyDistalJoint;
-        s_attachmentPoints[pointIdx++] = hand.pinkyTip;
+        s_attachmentPointsBuffer[pointIdx++] = hand.pinkyKnuckle;
+        s_attachmentPointsBuffer[pointIdx++] = hand.pinkyMiddleJoint;
+        s_attachmentPointsBuffer[pointIdx++] = hand.pinkyDistalJoint;
+        s_attachmentPointsBuffer[pointIdx++] = hand.pinkyTip;
       }
 
-      public AttachmentPointBehaviour Current { get { return s_attachmentPoints[_curIdx]; } }
+      public AttachmentPointBehaviour Current { get { return s_attachmentPointsBuffer[_curIdx]; } }
 
       public bool MoveNext() {
         do {
           _curIdx++;
-        } while (_curIdx < s_attachmentPoints.Length && s_attachmentPoints[_curIdx] == null);
+        } while (_curIdx < s_attachmentPointsBuffer.Length && s_attachmentPointsBuffer[_curIdx] == null);
 
-        return _curIdx < s_attachmentPoints.Length;
+        return _curIdx < s_attachmentPointsBuffer.Length;
       }
     }
+
+    #endregion
 
   }
 
