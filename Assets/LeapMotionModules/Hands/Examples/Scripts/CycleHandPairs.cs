@@ -32,7 +32,6 @@ public class CycleHandPairs : MonoBehaviour {
          KeyCode.Alpha6,
          KeyCode.Alpha7,
          KeyCode.Alpha8,
-         KeyCode.Alpha9,
      };
 
   // Use this for initialization
