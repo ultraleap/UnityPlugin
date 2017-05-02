@@ -15,16 +15,18 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary> Returns the closest anchor to the argument position. By default, this method will
-    /// only return anchors that are enabled. </summary>
-    public Anchor FindClosestAnchor(Vector3 fromPosition, bool requireAnchorIsEnabled = true) {
+    /// only return anchors that are enabled and whose distance from the argument falls within
+    /// that anchor's range. </summary>
+    public Anchor FindClosestAnchor(Vector3 fromPosition, bool requireWithinAnchorRange = true, bool requireAnchorIsEnabled = true) {
       Anchor closestAnchor = null;
-      float closestDistSqrd = float.PositiveInfinity;
+      float closestAnchorDistanceSqrd = float.PositiveInfinity;
       foreach (Anchor anchor in anchors) {
         if (anchor == null || requireAnchorIsEnabled && !anchor.enabled) continue;
         float anchorDistSqrd = anchor.GetDistanceSqrd(fromPosition);
-        if (closestAnchor == null || anchorDistSqrd < closestDistSqrd) {
+        if (anchorDistSqrd < closestAnchorDistanceSqrd
+            && (!requireWithinAnchorRange || anchorDistSqrd < anchor.anchorRange * anchor.anchorRange)) {
           closestAnchor = anchor;
-          closestDistSqrd = anchorDistSqrd;
+          closestAnchorDistanceSqrd = anchorDistSqrd;
         }
       }
       return closestAnchor;

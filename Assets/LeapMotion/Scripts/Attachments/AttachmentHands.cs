@@ -20,8 +20,6 @@ namespace Leap.Unity.Attachments {
   [ExecuteInEditMode]
   public class AttachmentHands : MonoBehaviour {
 
-    public Func<Hand>[] handAccessors = new Func<Hand>[2];
-
     [SerializeField]
     [OnEditorChange("attachmentPoints")]
     private AttachmentPointFlags _attachmentPoints = AttachmentPointFlags.Palm | AttachmentPointFlags.Wrist;
@@ -35,19 +33,51 @@ namespace Leap.Unity.Attachments {
       }
     }
 
-    private AttachmentHand[] _attachmentHands = new AttachmentHand[2];
+    private Func<Hand>[] _handAccessors;
+    /// <summary>
+    /// Gets or sets the functions used to get the latest Leap.Hand data for the corresponding
+    /// AttachmentHand objects in the attachmentHands array. Modify this if you'd like to customize
+    /// how hand data is sent to AttachmentHands; e.g. a networked multiplayer game receiving
+    /// serialized hand data for a networked player representation.
+    /// 
+    /// This array is automatically populated if it is null or empty during OnValidate() in the editor,
+    /// but it can be modified freely afterwards.
+    /// </summary>
+    public Func<Hand>[] handAccessors { get { return _handAccessors; } set { _handAccessors = value; } }
+
+    private AttachmentHand[] _attachmentHands;
+    /// <summary>
+    /// Gets or sets the array of AttachmentHand objects that this component manages. The length of this
+    /// array should match the handAccessors array; corresponding-index slots in handAccessors will be
+    /// used to assign transform data to the AttachmentHand objects in this component's Update().
+    /// 
+    /// This array is automatically populated if it is null or empty during OnValidate() in the editor,
+    /// but can be modified freely afterwards.
+    /// </summary>
+    public AttachmentHand[] attachmentHands { get { return _attachmentHands; } set { _attachmentHands = value; } }
 
     void OnValidate() {
-      if (handAccessors[0] == null) handAccessors[0] = new Func<Hand>(() => { return Hands.Left; });
-      if (handAccessors[1] == null) handAccessors[1] = new Func<Hand>(() => { return Hands.Right; });
+      reinitialize();
+    }
 
+    private void reinitialize() {
+      refreshHandAccessors();
       refreshAttachmentHands();
+      refreshAttachmentHandTransforms();
     }
 
     void Update() {
+      bool requiresReinitialization = false;
+
       using (new ProfilerSample("Attachment Hands Update", this.gameObject)) {
         for (int i = 0; i < _attachmentHands.Length; i++) {
-          var attachmentHand = _attachmentHands[i];
+          var attachmentHand = attachmentHands[i];
+
+          if (attachmentHand == null) {
+            requiresReinitialization = true;
+            break;
+          }
+
           var leapHand = handAccessors[i]();
 
 #if UNITY_EDITOR
@@ -64,46 +94,82 @@ namespace Leap.Unity.Attachments {
             }
           }
         }
+
+        if (requiresReinitialization) {
+          reinitialize();
+        }
+      }
+    }
+
+    private void refreshHandAccessors() {
+      // If necessary, generate a left-hand and right-hand set of accessors.
+      if (_handAccessors == null || _handAccessors.Length == 0) {
+        _handAccessors = new Func<Hand>[2];
+
+        _handAccessors[0] = new Func<Hand>(() => { return Hands.Left; });
+        _handAccessors[1] = new Func<Hand>(() => { return Hands.Right; });
       }
     }
 
     private void refreshAttachmentHands() {
-      int handsIdx = 0;
-      foreach (Transform child in this.transform) {
-        var attachmentHand = child.GetComponent<AttachmentHand>();
-        if (attachmentHand != null) {
-          _attachmentHands[handsIdx++] = attachmentHand;
-        }
-        if (handsIdx == 2) break;
-      }
-
-#if UNITY_EDITOR
+      #if UNITY_EDITOR
+      // Don't do anything if we're a prefab.
       PrefabType prefabType = PrefabUtility.GetPrefabType(this.gameObject);
       if (prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab) {
         return;
       }
-#endif
+      #endif
 
-      if (_attachmentHands[0] == null) {
-        GameObject obj = new GameObject();
-        _attachmentHands[0] = obj.AddComponent<AttachmentHand>();
-      }
-      _attachmentHands[0].gameObject.name = "Attachment Hand (Left)";
-      _attachmentHands[0].transform.parent = this.transform;
-      _attachmentHands[0].transform.SetSiblingIndex(0);
+      // If necessary, generate a left and right AttachmentHand.
+      if (_attachmentHands == null || _attachmentHands.Length == 0 || (_attachmentHands[0] == null || _attachmentHands[1] == null)) {
+        _attachmentHands = new AttachmentHand[2];
 
-      if (_attachmentHands[1] == null) {
-        GameObject obj = new GameObject();
-        _attachmentHands[1] = obj.AddComponent<AttachmentHand>();
+        // Try to use existing AttachmentHand objects first.
+        foreach (Transform child in this.transform.GetChildren()) {
+          var attachmentHand = child.GetComponent<AttachmentHand>();
+          if (attachmentHand != null) {
+            _attachmentHands[attachmentHand.chirality == Chirality.Left ? 0 : 1] = attachmentHand;
+          }
+        }
+
+        // Construct any missing AttachmentHand objects.
+        if (_attachmentHands[0] == null) {
+          GameObject obj = new GameObject();
+          _attachmentHands[0] = obj.AddComponent<AttachmentHand>();
+          _attachmentHands[0].chirality = Chirality.Left;
+        }
+        _attachmentHands[0].gameObject.name = "Attachment Hand (Left)";
+        _attachmentHands[0].transform.parent = this.transform;
+
+        if (_attachmentHands[1] == null) {
+          GameObject obj = new GameObject();
+          _attachmentHands[1] = obj.AddComponent<AttachmentHand>();
+          _attachmentHands[1].chirality = Chirality.Right;
+        }
+        _attachmentHands[1].gameObject.name = "Attachment Hand (Right)";
+        _attachmentHands[1].transform.parent = this.transform;
+
+        // Organize left hand first in sibling order.
+        _attachmentHands[0].transform.SetSiblingIndex(0);
+        _attachmentHands[1].transform.SetSiblingIndex(1);
       }
-      _attachmentHands[1].gameObject.name = "Attachment Hand (Right)";
-      _attachmentHands[1].transform.parent = this.transform;
-      _attachmentHands[1].transform.SetSiblingIndex(1);
     }
 
     private void refreshAttachmentHandTransforms() {
+      bool requiresReinitialization = false;
+
       foreach (var hand in _attachmentHands) {
+        if (hand == null) {
+          // AttachmentHand must have been destroyed
+          requiresReinitialization = true;
+          break;
+        }
+
         hand.refreshAttachmentTransforms(_attachmentPoints);
+      }
+
+      if (requiresReinitialization) {
+        reinitialize();
       }
     }
 

@@ -84,6 +84,19 @@ namespace Leap.Unity.Attachments {
 
     private bool _attachmentPointsDirty = false;
 
+    /// <summary>
+    /// Used by AttachmentHands as a hint to help prevent mixing up hand chiralities
+    /// when refreshing its AttachmentHand references.
+    /// </summary>
+    [SerializeField, HideInInspector]
+    private Chirality _chirality;
+
+    /// <summary>
+    /// Gets the chirality of this AttachmentHand. This is set automatically by the
+    /// AttachmentHands parent object of this AttachmentHand.
+    /// </summary>
+    public Chirality chirality { get { return _chirality; } set { _chirality = value; } }
+
     void OnValidate() {
       initializeAttachmentPointFlagConstants();
     }
@@ -105,6 +118,10 @@ namespace Leap.Unity.Attachments {
     }
 
     public void refreshAttachmentTransforms(AttachmentPointFlags points) {
+      if (_attachmentPointFlagConstants == null || _attachmentPointFlagConstants.Length == 0) {
+        initializeAttachmentPointFlagConstants();
+      }
+
       foreach (AttachmentPointFlags flag in _attachmentPointFlagConstants) {
         if (flag == AttachmentPointFlags.None) continue;
 
@@ -234,12 +251,12 @@ namespace Leap.Unity.Attachments {
 
       // Wrist
       if (wrist != null) {
-        this.transform.SetSiblingIndex(siblingIdx++);
+        wrist.transform.SetSiblingIndex(siblingIdx++);
       }
 
       // Palm
       if (palm != null) {
-        this.transform.SetSiblingIndex(siblingIdx++);
+        palm.transform.SetSiblingIndex(siblingIdx++);
       }
 
       Transform topLevelTransform;

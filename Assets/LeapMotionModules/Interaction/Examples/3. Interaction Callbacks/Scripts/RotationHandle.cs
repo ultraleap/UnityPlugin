@@ -11,16 +11,16 @@ namespace Leap.Unity.Examples.TransformHandles {
 
     protected virtual void OnEnable() {
       // Parent class stores the InteractionBehaviour component in _intObj.
-      _intObj.OnGraspBegin += onGraspBegin;
+      _intObj.OnHandGraspBegin += onGraspBegin;
       _intObj.OnGraspedMovement += onGraspedMovement;
-      _intObj.OnGraspEnd += onGraspEnd;
+      _intObj.OnHandGraspEnd += onGraspEnd;
     }
 
     protected virtual void OnDisable() {
       // Parent class stores the InteractionBehaviour component in _intObj.
-      _intObj.OnGraspBegin -= onGraspBegin;
+      _intObj.OnHandGraspBegin -= onGraspBegin;
       _intObj.OnGraspedMovement -= onGraspedMovement;
-      _intObj.OnGraspEnd -= onGraspEnd;
+      _intObj.OnHandGraspEnd -= onGraspEnd;
     }
 
     private void onGraspBegin(List<InteractionHand> hands) {

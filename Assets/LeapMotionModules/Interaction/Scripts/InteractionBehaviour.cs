@@ -130,20 +130,7 @@ namespace Leap.Unity.Interaction {
     /// If this method is to be called on a given frame, it will be called after OnHoverEnd
     /// and before OnHoverStay.
     /// </remarks>
-    public Action<List<InteractionHand>> OnHoverBegin;
-
-    /// <summary>
-    /// Called during every fixed (physics) frame wherein one or more hands is within the hover
-    /// activity radius around the Interaction Behaviour.
-    /// </summary>
-    /// <remarks>
-    /// The provided list will contain all Interaction Hands that are within the hover radius for
-    /// this Interaction object.
-    /// 
-    /// If this method is to be called on a given frame, it will be called after both
-    /// OnHoverEnd and OnHoverBegin.
-    /// </remarks>
-    public Action<List<InteractionHand>> OnHoverStay;
+    public Action<List<InteractionHand>> OnHandHoverBegin;
 
     /// <summary>
     /// Called when one or more hands have left the hover activity radius around this
@@ -160,7 +147,20 @@ namespace Leap.Unity.Interaction {
     /// If this method is to be called on a given frame, it will be called before OnHoverBegin and
     /// before OnHoverStay.
     /// </remarks>
-    public Action<List<InteractionHand>> OnHoverEnd;
+    public Action<List<InteractionHand>> OnHandHoverEnd;
+
+    /// <summary>
+    /// Called during every fixed (physics) frame wherein one or more hands is within the hover
+    /// activity radius around the Interaction Behaviour.
+    /// </summary>
+    /// <remarks>
+    /// The provided list will contain all Interaction Hands that are within the hover radius for
+    /// this Interaction object.
+    /// 
+    /// If this method is to be called on a given frame, it will be called after both
+    /// OnHoverEnd and OnHoverBegin.
+    /// </remarks>
+    public Action<List<InteractionHand>> OnHoverStay;
 
     /// <summary>
     /// Called when the object transitions from having no hands nearby to having one or more
@@ -214,7 +214,7 @@ namespace Leap.Unity.Interaction {
     /// If this method is to be called on a given frame, it will be called before OnPrimaryHoverStay,
     /// and it will be called after OnPrimaryHoverEnd.
     /// </remarks>
-    public Action<List<InteractionHand>> OnPrimaryHoverBegin;
+    public Action<List<InteractionHand>> OnHandPrimaryHoverBegin;
 
     /// <summary>
     /// Called during every fixed (physics) frame in which one or more hands is primarily hovering
@@ -246,7 +246,7 @@ namespace Leap.Unity.Interaction {
     /// If this method is to be called on a given frame, it will be called before OnPrimaryHoverBegin
     /// and OnPrimaryHoverStay.
     /// </remarks>
-    public Action<List<InteractionHand>> OnPrimaryHoverEnd;
+    public Action<List<InteractionHand>> OnHandPrimaryHoverEnd;
 
     /// <summary>
     /// Called when the object begins being the primary hover of one or more hands, if the object
@@ -327,18 +327,7 @@ namespace Leap.Unity.Interaction {
     /// 
     /// If this method is called on a given frame, it will be called after OnGraspEnd and before OnGraspHold.
     /// </remarks>
-    public Action<List<InteractionHand>> OnGraspBegin;
-
-    /// <summary>
-    /// Called every frame during which this object is grasped by one or more hands.
-    /// 
-    /// Unless allowMultigrasp is set to true, only one hand will ever be grasping an object at any given
-    /// time, so the hands list will always be of length one.
-    /// </summary>
-    /// <remarks>
-    /// If this method is called on a given frame, it will be called after all other grasping callbacks.
-    /// </remarks>
-    public Action<List<InteractionHand>> OnGraspHold;
+    public Action<List<InteractionHand>> OnHandGraspBegin;
 
     /// <summary>
     /// Called when one of more hands release this object during a given frame.
@@ -352,7 +341,18 @@ namespace Leap.Unity.Interaction {
     /// 
     /// If this method is called on a given frame, it will be before all other grasping callbacks.
     /// </remarks>
-    public Action<List<InteractionHand>> OnGraspEnd;
+    public Action<List<InteractionHand>> OnHandGraspEnd;
+
+    /// <summary>
+    /// Called every frame during which this object is grasped by one or more hands.
+    /// 
+    /// Unless allowMultigrasp is set to true, only one hand will ever be grasping an object at any given
+    /// time, so the hands list will always be of length one.
+    /// </summary>
+    /// <remarks>
+    /// If this method is called on a given frame, it will be called after all other grasping callbacks.
+    /// </remarks>
+    public Action<List<InteractionHand>> OnGraspStay;
 
     /// <summary>
     /// Called when the object is grasped by one or more hands, if the object was not grasped by any
@@ -423,7 +423,7 @@ namespace Leap.Unity.Interaction {
     /// touching this object. For a list of all hands currently touching
     /// this object, refer to OnContactStay.
     /// </remarks>
-    public Action<List<InteractionHand>> OnContactBegin;
+    public Action<List<InteractionHand>> OnHandContactBegin;
 
     /// <summary>
     /// Called every frame during which one or more hands is touching this object.
@@ -438,7 +438,7 @@ namespace Leap.Unity.Interaction {
     /// touching this object. For a list of all hands currently touching
     /// this object, refer to OnContactStay.
     /// </remarks>
-    public Action<List<InteractionHand>> OnContactEnd;
+    public Action<List<InteractionHand>> OnHandContactEnd;
 
     /// <summary>
     /// Called when this object starts being touched by one or more hands, but was
@@ -480,35 +480,6 @@ namespace Leap.Unity.Interaction {
     /// </remarks>
     public void AddAngularAcceleration(Vector3 acceleration) {
       _accumulatedAngularAcceleration += acceleration;
-    }
-
-    #endregion
-
-    #region Event Types
-
-    public enum EventType {
-      HoverBegin = 100,
-      HoverStay = 101,
-      HoverEnd = 102,
-      ObjectHoverBegin = 110,
-      ObjectHoverEnd = 111,
-      PrimaryHoverBegin = 120,
-      PrimaryHoverStay = 121,
-      PrimaryHoverEnd = 122,
-      ObjectPrimaryHoverBegin = 130,
-      ObjectPrimaryHoverEnd = 132,
-      GraspBegin = 140,
-      GraspHold = 141,
-      GraspEnd = 142,
-      ObjectGraspBegin = 150,
-      ObjectGraspEnd = 152,
-      SuspensionBegin = 160,
-      SuspensionEnd = 161,
-      ContactBegin = 170,
-      ContactStay = 171,
-      ContactEnd = 172,
-      ObjectContactBegin = 180,
-      ObjectContactEnd = 181
     }
 
     #endregion
@@ -578,9 +549,6 @@ namespace Leap.Unity.Interaction {
     private bool _moveObjectWhenGrasped = true;
     public bool moveObjectWhenGrasped { get { return _moveObjectWhenGrasped; } set { _moveObjectWhenGrasped = value; } }
 
-    [SerializeField]
-    private EnumEventTable _eventTable;
-
     /// <summary>
     /// When the object is held by an Interaction Hand, how should it move to its
     /// new position? Nonkinematic bodies will collide with other Rigidbodies, so they
@@ -620,28 +588,7 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void Awake() {
-      setupCallback(ref OnHoverBegin, EventType.HoverBegin);
-      setupCallback(ref OnHoverStay, EventType.HoverStay);
-      setupCallback(ref OnHoverEnd, EventType.HoverEnd);
-      setupCallback(ref OnObjectHoverBegin, EventType.ObjectHoverBegin);
-      setupCallback(ref OnObjectHoverEnd, EventType.ObjectHoverEnd);
-      setupCallback(ref OnPrimaryHoverBegin, EventType.PrimaryHoverBegin);
-      setupCallback(ref OnPrimaryHoverStay, EventType.PrimaryHoverStay);
-      setupCallback(ref OnPrimaryHoverEnd, EventType.PrimaryHoverEnd);
-      setupCallback(ref OnObjectPrimaryHoverBegin, EventType.ObjectPrimaryHoverBegin);
-      setupCallback(ref OnObjectPrimaryHoverEnd, EventType.ObjectPrimaryHoverEnd);
-      setupCallback(ref OnGraspBegin, EventType.GraspBegin);
-      setupCallback(ref OnGraspHold, EventType.GraspHold);
-      setupCallback(ref OnGraspEnd, EventType.GraspEnd);
-      setupCallback(ref OnObjectGraspBegin, EventType.ObjectGraspBegin);
-      setupCallback(ref OnObjectGraspEnd, EventType.ObjectGraspEnd);
-      setupCallback(ref OnSuspensionBegin, EventType.SuspensionBegin);
-      setupCallback(ref OnSuspensionEnd, EventType.SuspensionEnd);
-      setupCallback(ref OnContactBegin, EventType.ContactBegin);
-      setupCallback(ref OnContactStay, EventType.ContactStay);
-      setupCallback(ref OnContactEnd, EventType.ContactEnd);
-      setupCallback(ref OnObjectContactBegin, EventType.ObjectContactBegin);
-      setupCallback(ref OnObjectContactEnd, EventType.ObjectContactEnd);
+      InitUnityEvents();
 
       rigidbody = GetComponent<Rigidbody>();
       rigidbody.maxAngularVelocity = MAX_ANGULAR_VELOCITY;
@@ -753,7 +700,7 @@ namespace Leap.Unity.Interaction {
 
       RefreshClosestHoveringHand();
 
-      OnHoverBegin(hands);
+      OnHandHoverBegin(hands);
 
       if (_hoveringHands.Count == hands.Count) {
         OnObjectHoverBegin(hands);
@@ -767,7 +714,7 @@ namespace Leap.Unity.Interaction {
 
       RefreshClosestHoveringHand();
 
-      OnHoverEnd(hands);
+      OnHandHoverEnd(hands);
 
       if (_hoveringHands.Count == 0) {
         OnObjectHoverEnd(hands);
@@ -808,7 +755,7 @@ namespace Leap.Unity.Interaction {
 
       RefreshClosestPrimaryHoveringHand();
 
-      OnPrimaryHoverBegin(hands);
+      OnHandPrimaryHoverBegin(hands);
 
       if (_primaryHoveringHands.Count == hands.Count) {
         OnObjectPrimaryHoverBegin(hands);
@@ -822,7 +769,7 @@ namespace Leap.Unity.Interaction {
 
       RefreshClosestPrimaryHoveringHand();
 
-      OnPrimaryHoverEnd(hands);
+      OnHandPrimaryHoverEnd(hands);
 
       if (_primaryHoveringHands.Count == 0) {
         OnObjectPrimaryHoverEnd(hands);
@@ -884,7 +831,7 @@ namespace Leap.Unity.Interaction {
         _contactingHands.Add(hand);
       }
 
-      OnContactBegin(hands);
+      OnHandContactBegin(hands);
 
       if (_contactingHands.Count == hands.Count) {
         OnObjectContactBegin(hands);
@@ -896,7 +843,7 @@ namespace Leap.Unity.Interaction {
         _contactingHands.Remove(hand);
       }
 
-      OnContactEnd(hands);
+      OnHandContactEnd(hands);
 
       if (_contactingHands.Count == 0) {
         OnObjectContactEnd(hands);
@@ -915,8 +862,11 @@ namespace Leap.Unity.Interaction {
 
     private bool _graspingInitialized = false;
     private bool _moveObjectWhenGrasped__WasEnabledLastFrame;
-    private bool _wasKinematicBeforeGrab;
+    private bool _wasKinematicBeforeGrasp;
     private bool _justGrasped = false;
+
+    private float _dragBeforeGrasp = 0F;
+    private float _angularDragBeforeGrasp = 0.05F;
 
     private IGraspedPoseController _graspedPositionController;
     /// <summary> Gets or sets the grasped pose controller for this Interaction object. </summary>
@@ -970,32 +920,41 @@ namespace Leap.Unity.Interaction {
     }
 
     public virtual void BeginGrasp(List<InteractionHand> hands) {
+      _justGrasped = true;
+
+      // End suspension by ending the grasp on the suspending hand,
+      // calling EndGrasp immediately.
       if (isSuspended) {
-        // End suspension by ending the grasp on the suspending hand,
-        // calling EndGrasp immediately.
         _suspendingHand.ReleaseGrasp();
       }
 
-      _justGrasped = true;
-
+      // If multi-grasp is not allowed, release the old grasp.
       if (!allowMultiGrasp && isGrasped) {
         _graspingHands.Query().First().ReleaseGrasp();
       }
 
+      // Add each newly grasping hand to internal reference and pose solver.
       foreach (var hand in hands) {
         _graspingHands.Add(hand);
 
         if (moveObjectWhenGrasped) {
-          // Add each hand to grasped pose solver.
           graspedPoseController.AddHand(hand);
         }
       }
 
-      OnGraspBegin(hands);
+      // Fire interaction callback.
+      OnHandGraspBegin(hands);
 
-      if (_graspingHands.Count == hands.Count) { // Object wasn't grasped before.
+      // If object wasn't grasped before, store rigidbody settings and
+      // fire object interaction callback.
+      if (_graspingHands.Count == hands.Count) {
 
-        _wasKinematicBeforeGrab = rigidbody.isKinematic;
+        // Remember drag settings pre-grasp, to be restored on release.
+        _dragBeforeGrasp = rigidbody.drag;
+        _angularDragBeforeGrasp = rigidbody.angularDrag;
+
+        // Remember kinematic state.
+        _wasKinematicBeforeGrasp = rigidbody.isKinematic;
         switch (graspedMovementType) {
           case GraspedMovementType.Inherit: break; // no change
           case GraspedMovementType.Kinematic:
@@ -1003,6 +962,10 @@ namespace Leap.Unity.Interaction {
           case GraspedMovementType.Nonkinematic:
             rigidbody.isKinematic = false; break;
         }
+
+        // Set rigidbody drag/angular drag to zero.
+        rigidbody.drag = 0F;
+        rigidbody.angularDrag = 0F;
 
         OnObjectGraspBegin(hands);
       }
@@ -1024,11 +987,17 @@ namespace Leap.Unity.Interaction {
         EndSuspension(hands[0]);
       }
 
-      OnGraspEnd(hands);
+      OnHandGraspEnd(hands);
 
-      if (_graspingHands.Count == 0) { // Object is no longer grasped by any hands.
+      // If the object is no longer grasped by any hands, restore state and
+      // activate throw controller.
+      if (_graspingHands.Count == 0) {
+        // Restore drag settings from prior to the grasp.
+        rigidbody.drag = _dragBeforeGrasp;
+        rigidbody.angularDrag = _angularDragBeforeGrasp;
+
         // Revert kinematic state.
-        rigidbody.isKinematic = _wasKinematicBeforeGrab;
+        rigidbody.isKinematic = _wasKinematicBeforeGrasp;
 
         if (hands.Count == 1) {
           throwController.OnThrow(this, hands.Query().First());
@@ -1056,7 +1025,7 @@ namespace Leap.Unity.Interaction {
         throwController.OnHold(this, hands);
       }
 
-      OnGraspHold(hands);
+      OnGraspStay(hands);
 
       _justGrasped = false;
     }
@@ -1108,10 +1077,6 @@ namespace Leap.Unity.Interaction {
     protected void InitInternal() {
       InitLayer();
       FixedUpdateLayer();
-    }
-
-    private void setupCallback<T>(ref Action<T> action, EventType type) {
-      action += h => _eventTable.Invoke((int)type);
     }
 
     #region Interaction Layers
@@ -1270,6 +1235,75 @@ namespace Leap.Unity.Interaction {
     }
 
     #endregion
+
+    #endregion
+
+    #region Unity Events
+
+    [SerializeField]
+    private EnumEventTable _eventTable;
+
+    public enum EventType {
+      HandHoverBegin = 100,
+      HandHoverEnd = 101,
+      HoverStay = 102,
+      ObjectHoverBegin = 110,
+      ObjectHoverEnd = 111,
+
+      HandPrimaryHoverBegin = 120,
+      HandPrimaryHoverEnd = 121,
+      PrimaryHoverStay = 122,
+      ObjectPrimaryHoverBegin = 130,
+      ObjectPrimaryHoverEnd = 132,
+
+      HandGraspBegin = 140,
+      HandGraspEnd = 141,
+      GraspStay = 142,
+      ObjectGraspBegin = 150,
+      ObjectGraspEnd = 152,
+
+      SuspensionBegin = 160,
+      SuspensionEnd = 161,
+
+      HandContactBegin = 170,
+      HandContactEnd = 171,
+      ContactStay = 172,
+      ObjectContactBegin = 180,
+      ObjectContactEnd = 181
+    }
+
+    private void InitUnityEvents() {
+      setupCallback(ref OnHandHoverBegin,           EventType.HandHoverBegin);
+      setupCallback(ref OnHandHoverEnd,             EventType.HandHoverEnd);
+      setupCallback(ref OnHoverStay,                EventType.HoverStay);
+      setupCallback(ref OnObjectHoverBegin,         EventType.ObjectHoverBegin);
+      setupCallback(ref OnObjectHoverEnd,           EventType.ObjectHoverEnd);
+
+      setupCallback(ref OnHandPrimaryHoverBegin,    EventType.HandPrimaryHoverBegin);
+      setupCallback(ref OnHandPrimaryHoverEnd,      EventType.HandPrimaryHoverEnd);
+      setupCallback(ref OnPrimaryHoverStay,         EventType.PrimaryHoverStay);
+      setupCallback(ref OnObjectPrimaryHoverBegin,  EventType.ObjectPrimaryHoverBegin);
+      setupCallback(ref OnObjectPrimaryHoverEnd,    EventType.ObjectPrimaryHoverEnd);
+
+      setupCallback(ref OnHandGraspBegin,           EventType.HandGraspBegin);
+      setupCallback(ref OnHandGraspEnd,             EventType.HandGraspEnd);
+      setupCallback(ref OnGraspStay,                EventType.GraspStay);
+      setupCallback(ref OnObjectGraspBegin,         EventType.ObjectGraspBegin);
+      setupCallback(ref OnObjectGraspEnd,           EventType.ObjectGraspEnd);
+
+      setupCallback(ref OnSuspensionBegin,          EventType.SuspensionBegin);
+      setupCallback(ref OnSuspensionEnd,            EventType.SuspensionEnd);
+
+      setupCallback(ref OnHandContactBegin,         EventType.HandContactBegin);
+      setupCallback(ref OnHandContactEnd,           EventType.HandContactEnd);
+      setupCallback(ref OnContactStay,              EventType.ContactStay);
+      setupCallback(ref OnObjectContactBegin,       EventType.ObjectContactBegin);
+      setupCallback(ref OnObjectContactEnd,         EventType.ObjectContactEnd);
+    }
+
+    private void setupCallback<T>(ref Action<T> action, EventType type) {
+      action += h => _eventTable.Invoke((int)type);
+    }
 
     #endregion
 

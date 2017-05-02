@@ -17,8 +17,7 @@ namespace Leap.Unity.Interaction {
     /// <summary> Returns the squared distance to the target. AnchorGroups use this to avoid
     /// square roots while determining the closest anchor to a given position. </summary>
     internal float GetDistanceSqrd(Vector3 position) {
-      Vector3 delta = this.transform.position - position;
-      return delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
+      return (this.transform.position - position).sqrMagnitude;
     }
 
     public bool drawRangeGizmo = false;
