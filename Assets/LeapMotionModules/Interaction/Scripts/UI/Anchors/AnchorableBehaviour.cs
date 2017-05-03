@@ -53,7 +53,8 @@ namespace Leap.Unity.Interaction {
     public float anchorLerpCoeffPerSec = 20F;
 
     [Header("Interaction")]
-    [EditTimeOnly]
+    [Tooltip("Additional features are enabled when this GameObject also has an InteractionBehaviour component.")]
+    [Disable]
     public InteractionBehaviour interactionBehaviour;
 
     [Tooltip("If the InteractionBehaviour is set, objects will automatically detach from their anchor when grasped.")]
@@ -132,16 +133,23 @@ namespace Leap.Unity.Interaction {
         switch (anchorType) {
           case AnchorType.SingleAnchor:
             if (_currentAnchor != value) {
+              if (value != null && !value.allowMultipleObjects && value.anchoredObjects.Count > 0) break;
+
+              if (_currentAnchor != null) _currentAnchor.NotifyUnanchored(this);
+
               _anchor = value;
               _currentAnchor = value;
               _attachedToAnchor = false;
+
+              if (_currentAnchor != null) _currentAnchor.NotifyAnchored(this);
             }
             break;
-          case AnchorType.AnchorGroup:
-          default:
+          case AnchorType.AnchorGroup: default:
             if (anchorGroup == null) return;
 
             if (value == null) {
+              if (_currentAnchor != null) _currentAnchor.NotifyUnanchored(this);
+
               _anchor = null;
               _currentAnchor = null;
               _attachedToAnchor = false;
@@ -149,23 +157,27 @@ namespace Leap.Unity.Interaction {
             else {
               if (anchorGroup.ContainsAnchor(value)) {
                 if (_currentAnchor != value) {
+                  if (_currentAnchor != null) _currentAnchor.NotifyUnanchored(this);
+
                   _anchor = value;
                   _currentAnchor = value;
                   _attachedToAnchor = false;
+
+                  _currentAnchor.NotifyAnchored(this);
                 }
               }
               else {
-                // Clear the inspector field for the anchor; if it is
-                // non-null, the user tried to set the field with an
-                // invalid (out-of-group) anchor.
+                // Tried to set this behaviour's anchor to an anchor outside of the assigned anchor group.
+
+                // Clear the inspector field for the anchor; if it is non-null, the user tried to set
+                // the field with an invalid (out-of-group) anchor.
                 if (_anchor != null) {
                   Debug.LogError("The anchor \"" + _anchor.name + "\" is not a member of this object's anchor group.", this.gameObject);
                   _anchor = null;
                 }
 
-                // But if the current anchor is inside the current anchorGroup,
-                // we don't want to lose that information after dropping in
-                // an invalid (out-of-group) anchor, so re-set the _anchor
+                // But if the current anchor is inside the current anchorGroup, we don't want to lose that
+                // information after dropping in an invalid (out-of-group) anchor, so re-set the _anchor
                 // inspector field.
                 if (anchorGroup.ContainsAnchor(currentAnchor)) {
                   if (_anchor != currentAnchor) _anchor = currentAnchor;
@@ -181,11 +193,15 @@ namespace Leap.Unity.Interaction {
     private bool _attachedToAnchor = false;
 
     void OnValidate() {
+      interactionBehaviour = GetComponent<InteractionBehaviour>();
+
       detachWhenGrasped = interactionBehaviour != null;
     }
 
     void Awake() {
       currentAnchor = _anchor;
+
+      interactionBehaviour = GetComponent<InteractionBehaviour>();
 
       if (interactionBehaviour != null) {
         interactionBehaviour.OnObjectGraspBegin += detachAnchorOnObjectGraspBegin;
@@ -246,8 +262,8 @@ namespace Leap.Unity.Interaction {
           Anchor closestValidAnchor = anchorGroup.FindClosestAnchor(this.transform.position, requireWithinAnchorRange: true, requireAnchorIsEnabled: true);
           if (closestValidAnchor != null) {
             this.enabled = true;
-            anchor = closestValidAnchor;
-            _currentAnchor = anchor;
+            currentAnchor = closestValidAnchor;
+            anchor = currentAnchor;
             return true;
           }
           else {
@@ -270,14 +286,11 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Detaches the AnchorableBehaviour from its current anchor by disabling the AnchorableBehaviour
-    /// component.
+    /// Detaches the AnchorableBehaviour from its current anchor by setting the current anchor
+    /// to null.
     /// </summary>
     public void DetachFromAnchor() {
-      if (this.enabled) {
-        _attachedToAnchor = false;
-        this.enabled = false;
-      }
+      currentAnchor = null;
 
       // Reset anchor position storage; it can't be updated from this state.
       _hasTargetPositionLastUpdate = false;

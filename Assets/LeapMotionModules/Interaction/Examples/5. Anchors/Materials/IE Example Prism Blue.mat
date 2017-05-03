@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: IE Example Prism Red Inner
+  m_Name: IE Example Prism Blue
   m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
   m_ShaderKeywords: _ALPHAPREMULTIPLY_ON
   m_LightmapFlags: 4
@@ -60,9 +60,9 @@ Material:
     - _DetailNormalMapScale: 1
     - _DstBlend: 10
     - _GlossMapScale: 1
-    - _Glossiness: 0.935
+    - _Glossiness: 0.898
     - _GlossyReflections: 1
-    - _Metallic: 0
+    - _Metallic: 0.222
     - _Mode: 3
     - _OcclusionStrength: 1
     - _Parallax: 0.02
@@ -72,5 +72,5 @@ Material:
     - _UVSec: 0
     - _ZWrite: 0
     m_Colors:
-    - _Color: {r: 1, g: 0.21323532, b: 0.21323532, a: 0.391}
+    - _Color: {r: 0.08088237, g: 0.50557774, b: 1, a: 0.616}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
