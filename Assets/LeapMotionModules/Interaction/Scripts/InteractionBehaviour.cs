@@ -413,7 +413,7 @@ namespace Leap.Unity.Interaction {
 
     #region Contact API
 
-    public enum ContactForceModes { Object, UI };
+    public enum ContactForceMode { Object, UI };
 
     /// <summary>
     /// Called when one or more hands begins touching this object.
@@ -512,28 +512,50 @@ namespace Leap.Unity.Interaction {
     public ISpaceComponent space { get; protected set; }
 
     [Header("Interaction Overrides")]
-
-    [Tooltip("This object will no longer receive hover callbacks if this property is checked.")]
+    
+    [Tooltip("This object will not receive callbacks from left hands, right hands, or either hand "
+           + "if this mode is set to anything other than None.")]
     [SerializeField]
-    private bool _ignoreHover = false;
-    public bool ignoreHover { get { return _ignoreHover; } set { _ignoreHover = value; } }
+    private IgnoreHoverMode _ignoreHoverMode = IgnoreHoverMode.None;
+    public IgnoreHoverMode ignoreHoverMode {
+      get { return _ignoreHoverMode; }
+      set {
+        _ignoreHoverMode = value;
+        // TODO: If _ignoreHover is set to anything other than None, need to fire
+        // appropriate EndHover events immediately.
+      }
+    }
 
     [Tooltip("Hands will not be able to touch this object if this property is checked.")]
     [SerializeField]
     private bool _ignoreContact = false;
-    public bool ignoreContact { get { return _ignoreContact; } set { _ignoreContact = value; } }
+    public bool ignoreContact {
+      get { return _ignoreContact; }
+      set {
+        _ignoreContact = value;
+        // TODO: If _ignoreContact is set to false, need to fire
+        // appropriate EndContact events immediately.
+      }
+    }
 
     [Tooltip("Hands will not be able to grasp this object if this property is checked.")]
     [SerializeField]
     private bool _ignoreGrasping = false;
-    public bool ignoreGrasping { get { return _ignoreGrasping; } set { _ignoreGrasping = value; } }
+    public bool ignoreGrasping {
+      get { return _ignoreGrasping; }
+      set {
+        _ignoreGrasping = value;
+        // TODO: If _ignoreGrasping is set to false, need to fire
+        // appropriate EndGrasp events immediately.
+      } 
+    }
 
     [Header("Contact Settings")]
 
     [Tooltip("Determines how much force the hand should apply to different kinds of objects.")]
     [SerializeField]
-    private ContactForceModes _contactForceMode = ContactForceModes.Object;
-    public ContactForceModes contactForceMode { get { return _contactForceMode; } set { _contactForceMode = value; } }
+    private ContactForceMode _contactForceMode = ContactForceMode.Object;
+    public ContactForceMode contactForceMode { get { return _contactForceMode; } set { _contactForceMode = value; } }
 
     [Header("Grasp Settings")]
 
@@ -612,6 +634,12 @@ namespace Leap.Unity.Interaction {
       space = GetComponent<ISpaceComponent>();
     }
 
+    protected virtual void OnDisable() {
+      if (manager != null && manager.IsBehaviourRegistered(this)) {
+        manager.UnregisterInteractionBehaviour(this);
+      }
+    }
+
     protected virtual void Start() {
       // Make sure we have a list of all of this object's colliders.
       RefreshInteractionColliders();
@@ -663,10 +691,14 @@ namespace Leap.Unity.Interaction {
       float closestComparativeColliderDistance = float.PositiveInfinity;
       bool hasColliders = false;
       float testDistance = float.PositiveInfinity;
+
+      Collider closestCollider = null;
+
       foreach (var collider in _interactionColliders) {
         if (!hasColliders) hasColliders = true;
 
-        if (((collider is SphereCollider) && (collider as SphereCollider).center != Vector3.zero)
+        // TODO: Physics.ClosestPoint causes nothin' but trouble. Get rid of it!!
+        if (true || ((collider is SphereCollider) && (collider as SphereCollider).center != Vector3.zero)
             || ((collider is BoxCollider) && (collider as BoxCollider).center != Vector3.zero)
             || ((collider is CapsuleCollider) && (collider as CapsuleCollider).center != Vector3.zero)) {
 
@@ -682,6 +714,8 @@ namespace Leap.Unity.Interaction {
 
         if (testDistance < closestComparativeColliderDistance) {
           closestComparativeColliderDistance = testDistance;
+
+          closestCollider = collider;
         }
       }
 

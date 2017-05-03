@@ -24,7 +24,7 @@ namespace Leap.Unity.Interaction.Internal {
     ISpaceComponent     space      { get; } // OK to return null if this object is not in curved space.
 
     // Interaction overrides
-    bool ignoreHover     { get; }
+    IgnoreHoverMode ignoreHoverMode { get; }
     bool ignoreContact   { get; }
     bool ignoreGrasping  { get; }
 

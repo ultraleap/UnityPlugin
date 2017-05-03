@@ -1,9 +1,28 @@
-﻿using System;
+﻿using Leap.Unity.Interaction.Internal;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Leap.Unity.Interaction {
+
+  #region IInteractionBehaviour
+
+  public static class IInteractionBehaviourExtensions {
+
+    public static bool ShouldIgnore(this IInteractionBehaviour intObj, InteractionHand hand) {
+      Leap.Hand leapHand = hand.GetLastTrackedLeapHand();
+      switch (intObj.ignoreHoverMode) {
+        case IgnoreHoverMode.None: return false;
+        case IgnoreHoverMode.Left: return leapHand == null || leapHand.IsLeft;
+        case IgnoreHoverMode.Right: return leapHand == null || leapHand.IsRight;
+        case IgnoreHoverMode.Both: default: return true;
+      }
+    }
+
+  }
+
+  #endregion
 
   #region Vector3
 

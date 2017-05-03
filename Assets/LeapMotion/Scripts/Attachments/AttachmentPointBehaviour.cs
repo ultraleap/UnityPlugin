@@ -17,6 +17,8 @@ namespace Leap.Unity.Attachments {
   [AddComponentMenu("")]
   public class AttachmentPointBehaviour : MonoBehaviour, IEquatable<AttachmentPointBehaviour> {
 
+    [Tooltip("To change which attachment points are available on an AttachmentHand, refer to the "
+           + "inspector for the parent AttachmentHands object.")]
     [Disable]
     public AttachmentPointFlags attachmentPoint;
 

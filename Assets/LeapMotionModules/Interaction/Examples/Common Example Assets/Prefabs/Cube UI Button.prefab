@@ -40,7 +40,6 @@ GameObject:
   - component: {fileID: 54104857292544158}
   - component: {fileID: 114193398573130750}
   - component: {fileID: 114700673106479202}
-  - component: {fileID: 114540185667484594}
   m_Layer: 0
   m_Name: Cube UI Button
   m_TagString: Untagged
@@ -73,7 +72,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1329088948137194}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.06999999, y: 0, z: 0}
+  m_LocalPosition: {x: 0.07000001, y: 0.059999984, z: -0.000000011175871}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4637465780437336}
@@ -236,16 +235,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
-  _ignoreHover: 0
+  _ignoreHoverMode: 0
   _ignoreContact: 0
   _ignoreGrasping: 1
   _contactForceMode: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
-  _eventTable:
-    _entries: []
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
+  _eventTable:
+    _entries: []
   minMaxHeight: {x: 0, y: 0.03}
   restingHeight: 0.5
   _springForce: 0.1
@@ -259,18 +258,6 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
       PublicKeyToken=null
---- !u!114 &114540185667484594
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1329088948137194}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  listenForPrimaryHover: 1
 --- !u!114 &114700673106479202
 MonoBehaviour:
   m_ObjectHideFlags: 1

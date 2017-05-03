@@ -60,6 +60,10 @@ public class SimpleHoverGlow : MonoBehaviour {
           _material.color = new Color(glow, glow, glow, 1F);
         }
       }
+
+      if (_intObj is InteractionButton && (_intObj as InteractionButton).isDepressed) {
+        _material.color = Color.blue;
+      }
     }
   }
 

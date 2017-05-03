@@ -15,13 +15,13 @@ namespace Leap.Unity.Interaction {
       specifyCustomDrawer("_eventTable", drawEventTable);
 
       specifyConditionalDrawing(() => !target.ignoreContact,
-             "_contactForceMode");
+                                "_contactForceMode");
 
       specifyConditionalDrawing(() => !target.ignoreGrasping,
-                   "_allowMultiGrasp",
-                   "_moveObjectWhenGrasped",
-                   "graspedMovementType",
-                   "graspHoldWarpingEnabled__curIgnored");
+                                "_allowMultiGrasp",
+                                "_moveObjectWhenGrasped",
+                                "graspedMovementType",
+                                "graspHoldWarpingEnabled__curIgnored");
     }
 
     private void drawEventTable(SerializedProperty property) {
