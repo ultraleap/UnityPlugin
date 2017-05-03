@@ -107,13 +107,23 @@ namespace Leap.Unity.Interaction {
     private InteractionHand[] _interactionHands = new InteractionHand[2];
     private HashSet<IInteractionBehaviour> _interactionBehaviours = new HashSet<IInteractionBehaviour>();
 
-    private Dictionary<Rigidbody, IInteractionBehaviour> _rigidbodyRegistry;
-    public Dictionary<Rigidbody, IInteractionBehaviour> rigidbodyRegistry {
+    private Dictionary<Rigidbody, IInteractionBehaviour> _interactionObjectBodies;
+    public Dictionary<Rigidbody, IInteractionBehaviour> interactionObjectBodies {
       get {
-        if (_rigidbodyRegistry == null) {
-          _rigidbodyRegistry = new Dictionary<Rigidbody, IInteractionBehaviour>();
+        if (_interactionObjectBodies == null) {
+          _interactionObjectBodies = new Dictionary<Rigidbody, IInteractionBehaviour>();
         }
-        return _rigidbodyRegistry;
+        return _interactionObjectBodies;
+      }
+    }
+
+    private Dictionary<Rigidbody, ContactBone> _contactBoneBodies;
+    public Dictionary<Rigidbody, ContactBone> contactBoneBodies {
+      get {
+        if (_contactBoneBodies == null) {
+          _contactBoneBodies = new Dictionary<Rigidbody, ContactBone>();
+        }
+        return _contactBoneBodies;
       }
     }
 
@@ -524,7 +534,7 @@ namespace Leap.Unity.Interaction {
 
     public void RegisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
       _interactionBehaviours.Add(interactionObj);
-      rigidbodyRegistry[interactionObj.rigidbody] = interactionObj;
+      interactionObjectBodies[interactionObj.rigidbody] = interactionObj;
     }
 
     /// <summary> Returns true if the Interaction Behaviour was registered with this manager; otherwise returns false. 
@@ -536,7 +546,7 @@ namespace Leap.Unity.Interaction {
           intHand.ReleaseObject(interactionObj);
           intHand.grabClassifier.UnregisterInteractionBehaviour(interactionObj);
         }
-        rigidbodyRegistry.Remove(interactionObj.rigidbody);      }
+        interactionObjectBodies.Remove(interactionObj.rigidbody);      }
       return wasRemovalSuccessful;
     }
 

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Leap.Unity.Interaction.Internal;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace Leap.Unity.Interaction {
@@ -80,18 +81,18 @@ namespace Leap.Unity.Interaction {
       if (!_physicsOccurred) {
         _physicsOccurred = true;
 
-        //if (!rigidbody.IsSleeping()) {
+        if (!rigidbody.IsSleeping()) {
           //Sleep the rigidbody if it's not really moving...
 
           float localPhysicsDisplacementPercentage = Mathf.InverseLerp(minMaxHeight.x, minMaxHeight.y, initialLocalPosition.z - localPhysicsPosition.z);
           if (rigidbody.position == _physicsPosition && _physicsVelocity == Vector3.zero && Mathf.Abs(localPhysicsDisplacementPercentage - restingHeight) < 0.01f) {
-            //rigidbody.Sleep();
+            rigidbody.Sleep();
             //Else, reset the body's position to where it was last time PhysX looked at it...
           } else {
             rigidbody.position = _physicsPosition;
             rigidbody.velocity = _physicsVelocity;
           }
-        //}
+        }
       }
     }
 
@@ -118,7 +119,7 @@ namespace Leap.Unity.Interaction {
           localPhysicsPosition = GetDepressedConstrainedLocalPosition(curLocalDepressorPos - origLocalDepressorPos);
         } else {
           localPhysicsVelocity += _springForce * Vector3.forward * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z) / Time.fixedDeltaTime;
-          //localPhysicsVelocity *= 0.5f;
+          localPhysicsVelocity *= 0.5f;
         }
 
         // Transform the local physics back into world space
@@ -131,7 +132,7 @@ namespace Leap.Unity.Interaction {
 
         // If the button is depressed past its limit...
         if (localPhysicsPosition.z > initialLocalPosition.z - minMaxHeight.x) {
-          //transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.x);
+          transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.x);
           if (isPrimaryHovered) {
             isDepressed = true;
           } else {
@@ -142,17 +143,16 @@ namespace Leap.Unity.Interaction {
           }
           // Else if the button is extended past its limit...
         } else if (localPhysicsPosition.z < initialLocalPosition.z - minMaxHeight.y) {
-          //transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.y);
+          transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.y);
           _physicsPosition = transform.position;
           isDepressed = false;
           _lastDepressor = null;
         } else {
           // Else, just make the physical and graphical motion of the button match
-          //transform.localPosition = localPhysicsPosition;
+          transform.localPosition = localPhysicsPosition;
           isDepressed = false;
           _lastDepressor = null;
         }
-        transform.localPosition = localPhysicsPosition;
 
         // If our depression state has changed since last time...
         if (isDepressed && !oldDepressed) {
@@ -181,7 +181,9 @@ namespace Leap.Unity.Interaction {
 
     // Try grabbing the offset between the fingertip and this object...
     private void trySetDepressor(Collision collision) {
-      if (collision.rigidbody != null && _lastDepressor == null && isDepressed) {
+      if (collision.rigidbody != null && _lastDepressor == null && isDepressed
+        && (manager.contactBoneBodies.ContainsKey(collision.collider.attachedRigidbody)
+            && !this.ShouldIgnoreHover(manager.contactBoneBodies[collision.collider.attachedRigidbody].interactionHand))) {
         _lastDepressor = collision.rigidbody;
         _localDepressorPosition = transform.InverseTransformPoint(collision.rigidbody.position);
       }
@@ -204,7 +206,7 @@ namespace Leap.Unity.Interaction {
       base.OnDisable();
     }
 
-    protected virtual void Reset() {
+    void Reset() {
       contactForceMode = ContactForceMode.UI;
     }
   }

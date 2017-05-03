@@ -867,7 +867,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 223249509}
   m_LocalRotation: {x: -0, y: 0.0000000018626449, z: 0.0000000018626449, w: 1}
-  m_LocalPosition: {x: -0.0621, y: 0.0329, z: -0.0005}
+  m_LocalPosition: {x: -0.0621, y: 0.0329, z: 0.005}
   m_LocalScale: {x: 1, y: 1.0000007, z: 1.0000004}
   m_Children:
   - {fileID: 250868755}
@@ -1522,16 +1522,16 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 840095404}
-  m_LocalRotation: {x: 0.20057169, y: 0.00000008716935, z: -0.9796791, w: -0.000000020045103}
-  m_LocalPosition: {x: -0.2567, y: -0.0026, z: 0.2987}
+  m_LocalRotation: {x: -0.7012986, y: -0.09044535, z: 0.09044535, w: 0.7012986}
+  m_LocalPosition: {x: -0.1039, y: -0.0188, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 223249510}
   - {fileID: 1190244645}
   - {fileID: 1199672162}
-  m_Father: {fileID: 0}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: -180, y: 156.859, z: 0}
+  m_Father: {fileID: 1896594345}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -104.698, y: 89.99999, z: -90}
 --- !u!1 &846275013
 GameObject:
   m_ObjectHideFlags: 0
@@ -1927,7 +1927,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 651409189}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.0041, y: 0.0329, z: -0.0005}
+  m_LocalPosition: {x: 0.0041, y: 0.0329, z: 0.005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 932288162}
@@ -1948,7 +1948,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1199672162
 Transform:
   m_ObjectHideFlags: 0
@@ -1977,7 +1977,7 @@ GameObject:
   - component: {fileID: 1327835190}
   - component: {fileID: 1327835189}
   m_Layer: 0
-  m_Name: Cube UI 2D Slider
+  m_Name: Cube UI Slider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2048,7 +2048,7 @@ MonoBehaviour:
       PublicKeyToken=null
   horizontalValueRange: {x: 0, y: 1}
   verticalValueRange: {x: 0, y: 1}
-  horizontalSlideLimits: {x: -0.05, y: 0.05}
+  horizontalSlideLimits: {x: -0.042, y: 0.042}
   verticalSlideLimits: {x: 0, y: 0}
   horizontalSlideEvent:
     m_PersistentCalls:
@@ -3148,7 +3148,8 @@ Transform:
   m_LocalRotation: {x: 0.7071067, y: 0.00000014611093, z: 0.00000014611093, w: -0.7071068}
   m_LocalPosition: {x: -0.08000005, y: -0.000000028610229, z: 0.11999997}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 840095405}
   m_Father: {fileID: 1089287142}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

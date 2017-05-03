@@ -241,8 +241,8 @@ namespace Leap.Unity.Interaction {
       if (collider.attachedRigidbody != null) {
         Rigidbody body = collider.attachedRigidbody;
         IInteractionBehaviour intObj;
-        if (body != null && interactionManager.rigidbodyRegistry.TryGetValue(body, out intObj)
-            && !intObj.ShouldIgnore(this)) {
+        if (body != null && interactionManager.interactionObjectBodies.TryGetValue(body, out intObj)
+            && !intObj.ShouldIgnoreHover(this)) {
           return intObj;
         }
       }
@@ -1073,7 +1073,7 @@ namespace Leap.Unity.Interaction {
       if (collider.attachedRigidbody != null) {
         Rigidbody body = collider.attachedRigidbody;
         IInteractionBehaviour intObj;
-        if (body != null && interactionManager.rigidbodyRegistry.TryGetValue(body, out intObj)
+        if (body != null && interactionManager.interactionObjectBodies.TryGetValue(body, out intObj)
             && !intObj.ignoreGrasping) {
           return intObj;
         }

@@ -692,30 +692,27 @@ namespace Leap.Unity.Interaction {
       bool hasColliders = false;
       float testDistance = float.PositiveInfinity;
 
-      Collider closestCollider = null;
-
       foreach (var collider in _interactionColliders) {
         if (!hasColliders) hasColliders = true;
 
-        // TODO: Physics.ClosestPoint causes nothin' but trouble. Get rid of it!!
-        if (true || ((collider is SphereCollider) && (collider as SphereCollider).center != Vector3.zero)
-            || ((collider is BoxCollider) && (collider as BoxCollider).center != Vector3.zero)
-            || ((collider is CapsuleCollider) && (collider as CapsuleCollider).center != Vector3.zero)) {
+        // Custom, slower ClosestPoint
+        testDistance = (collider.transform.TransformPoint(collider.ClosestPointOnSurface(collider.transform.InverseTransformPoint(worldPosition)))
+                        - worldPosition).magnitude;
 
-          // Custom, slower ClosestPoint
-          testDistance = (collider.transform.TransformPoint(collider.ClosestPointOnSurface(collider.transform.InverseTransformPoint(worldPosition)))
-                          - worldPosition).magnitude;
-        }
-        else {
-          // Native, faster ClosestPoint (no support for off-center colliders)
-          testDistance = (Physics.ClosestPoint(worldPosition, collider, collider.transform.position, collider.transform.rotation)
-                          - worldPosition).magnitude;
-        }
+        // TODO: Physics.ClosestPoint causes nothin' but trouble. Get rid of it!!
+        //if (((collider is SphereCollider) && (collider as SphereCollider).center != Vector3.zero)
+        //    || ((collider is BoxCollider) && (collider as BoxCollider).center != Vector3.zero)
+        //    || ((collider is CapsuleCollider) && (collider as CapsuleCollider).center != Vector3.zero)) {
+           // testDistance using custom ClosestPoint, above
+        //}
+        //else {
+        //  // Native, faster ClosestPoint (no support for off-center colliders)
+        //  testDistance = (Physics.ClosestPoint(worldPosition, collider, collider.transform.position, collider.transform.rotation)
+        //                  - worldPosition).magnitude;
+        //}
 
         if (testDistance < closestComparativeColliderDistance) {
           closestComparativeColliderDistance = testDistance;
-
-          closestCollider = collider;
         }
       }
 

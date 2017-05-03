@@ -10,7 +10,7 @@ namespace Leap.Unity.Interaction {
 
   public static class IInteractionBehaviourExtensions {
 
-    public static bool ShouldIgnore(this IInteractionBehaviour intObj, InteractionHand hand) {
+    public static bool ShouldIgnoreHover(this IInteractionBehaviour intObj, InteractionHand hand) {
       Leap.Hand leapHand = hand.GetLastTrackedLeapHand();
       switch (intObj.ignoreHoverMode) {
         case IgnoreHoverMode.None: return false;
