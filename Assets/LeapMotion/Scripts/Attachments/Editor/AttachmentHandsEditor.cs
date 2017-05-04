@@ -20,7 +20,9 @@ namespace Leap.Unity.Attachments {
     }
 
     private void drawAttachmentPointsEditor(SerializedProperty property) {
+
       // Set up the draw rect space based on the image and available editor space.
+
       EditorGUILayout.Space();
       EditorGUILayout.LabelField("Attachment Transforms", EditorStyles.boldLabel);
       _handTexRect = EditorGUILayout.BeginVertical(GUILayout.MinWidth(EditorGUIUtility.currentViewWidth),
@@ -45,32 +47,33 @@ namespace Leap.Unity.Attachments {
 
       // Draw the toggles for the attachment points.
 
-      makeAttachmentPointsToggle("Palm", new Vector2(0.09F, 0.15F));
-      makeAttachmentPointsToggle("Wrist", new Vector2(0.07F, 0.42F));
+      makeAttachmentPointsToggle("Palm",                new Vector2( 0.100F,  0.160F));
+      makeAttachmentPointsToggle("Wrist",               new Vector2( 0.080F,  0.430F));
 
-      makeAttachmentPointsToggle("ThumbProximalJoint", new Vector2(-0.20F, 0.25F));
-      makeAttachmentPointsToggle("ThumbDistalJoint", new Vector2(-0.32F, 0.16F));
-      makeAttachmentPointsToggle("ThumbTip", new Vector2(-0.4F, 0.1F));
+      makeAttachmentPointsToggle("ThumbProximalJoint",  new Vector2(-0.190F,  0.260F));
+      makeAttachmentPointsToggle("ThumbDistalJoint",    new Vector2(-0.310F,  0.170F));
+      makeAttachmentPointsToggle("ThumbTip",            new Vector2(-0.390F,  0.110F));
 
-      makeAttachmentPointsToggle("IndexKnuckle", new Vector2(-0.05F, -0.05F));
-      makeAttachmentPointsToggle("IndexMiddleJoint", new Vector2(-0.07F, -0.18F));
-      makeAttachmentPointsToggle("IndexDistalJoint", new Vector2(-0.085F, -0.29F));
-      makeAttachmentPointsToggle("IndexTip", new Vector2(-0.09F, -0.39F));
+      makeAttachmentPointsToggle("IndexKnuckle",        new Vector2(-0.040F, -0.040F));
+      makeAttachmentPointsToggle("IndexMiddleJoint",    new Vector2(-0.060F, -0.170F));
+      makeAttachmentPointsToggle("IndexDistalJoint",    new Vector2(-0.075F, -0.280F));
+      makeAttachmentPointsToggle("IndexTip",            new Vector2(-0.080F, -0.380F));
 
-      makeAttachmentPointsToggle("MiddleKnuckle", new Vector2(0.07F, -0.06F));
-      makeAttachmentPointsToggle("MiddleMiddleJoint", new Vector2(0.07F, -0.2F));
-      makeAttachmentPointsToggle("MiddleDistalJoint", new Vector2(0.07F, -0.32F));
-      makeAttachmentPointsToggle("MiddleTip", new Vector2(0.08F, -0.43F));
+      makeAttachmentPointsToggle("MiddleKnuckle",       new Vector2( 0.080F, -0.050F));
+      makeAttachmentPointsToggle("MiddleMiddleJoint",   new Vector2( 0.080F, -0.190F));
+      makeAttachmentPointsToggle("MiddleDistalJoint",   new Vector2( 0.080F, -0.310F));
+      makeAttachmentPointsToggle("MiddleTip",           new Vector2( 0.090F, -0.420F));
 
-      makeAttachmentPointsToggle("RingKnuckle", new Vector2(0.185F, -0.03F));
-      makeAttachmentPointsToggle("RingMiddleJoint", new Vector2(0.21F, -0.16F));
-      makeAttachmentPointsToggle("RingDistalJoint", new Vector2(0.22F, -0.28F));
-      makeAttachmentPointsToggle("RingTip", new Vector2(0.235F, -0.39F));
+      makeAttachmentPointsToggle("RingKnuckle",         new Vector2( 0.195F, -0.020F));
+      makeAttachmentPointsToggle("RingMiddleJoint",     new Vector2( 0.220F, -0.150F));
+      makeAttachmentPointsToggle("RingDistalJoint",     new Vector2( 0.230F, -0.270F));
+      makeAttachmentPointsToggle("RingTip",             new Vector2( 0.245F, -0.380F));
 
-      makeAttachmentPointsToggle("PinkyKnuckle", new Vector2(0.285F, 0.03F));
-      makeAttachmentPointsToggle("PinkyMiddleJoint", new Vector2(0.33F, -0.06F));
-      makeAttachmentPointsToggle("PinkyDistalJoint", new Vector2(0.37F, -0.14F));
-      makeAttachmentPointsToggle("PinkyTip", new Vector2(0.39F, -0.22F));
+      makeAttachmentPointsToggle("PinkyKnuckle",        new Vector2( 0.295F,  0.040F));
+      makeAttachmentPointsToggle("PinkyMiddleJoint",    new Vector2( 0.340F, -0.050F));
+      makeAttachmentPointsToggle("PinkyDistalJoint",    new Vector2( 0.380F, -0.130F));
+      makeAttachmentPointsToggle("PinkyTip",            new Vector2( 0.410F, -0.210F));
+
 
       EditorGUILayout.EndVertical();
     }
@@ -100,7 +103,7 @@ namespace Leap.Unity.Attachments {
       }
     }
 
-    private const float TOGGLE_SIZE = 10.0F;
+    private const float TOGGLE_SIZE = 15.0F;
     private Rect makeToggleRect(Vector2 centerPos) {
       return new Rect(centerPos.x - TOGGLE_SIZE / 2F, centerPos.y - TOGGLE_SIZE / 2F, TOGGLE_SIZE, TOGGLE_SIZE);
     }

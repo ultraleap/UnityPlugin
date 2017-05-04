@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction {
 
+  [CanEditMultipleObjects]
   [CustomEditor(typeof(AnchorableBehaviour))]
   public class AnchorableBehaviourEditor : CustomEditorBase<AnchorableBehaviour> {
 

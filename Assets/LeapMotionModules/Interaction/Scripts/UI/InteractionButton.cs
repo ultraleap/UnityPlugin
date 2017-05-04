@@ -119,7 +119,7 @@ namespace Leap.Unity.Interaction {
           localPhysicsPosition = GetDepressedConstrainedLocalPosition(curLocalDepressorPos - origLocalDepressorPos);
         } else {
           localPhysicsVelocity += _springForce * Vector3.forward * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z) / Time.fixedDeltaTime;
-          localPhysicsVelocity *= 0.5f;
+          localPhysicsVelocity *= Mathf.Pow(0.0000000001f, Time.fixedDeltaTime);
         }
 
         // Transform the local physics back into world space

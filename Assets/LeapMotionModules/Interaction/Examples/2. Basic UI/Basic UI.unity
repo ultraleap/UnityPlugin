@@ -143,7 +143,7 @@ MonoBehaviour:
   _manager: {fileID: 0}
   _ignoreHoverMode: 0
   _ignoreContact: 0
-  _ignoreGrasping: 0
+  _ignoreGrasping: 1
   _contactForceMode: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
@@ -1666,6 +1666,34 @@ Prefab:
       propertyPath: m_LocalScale.z
       value: 0.42352635
       objectReference: {fileID: 0}
+    - target: {fileID: 4918707043880540, guid: d53bbce24b78fb742ba7b93ce8a36f86, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: -0.012
+      objectReference: {fileID: 0}
+    - target: {fileID: 4918707043880540, guid: d53bbce24b78fb742ba7b93ce8a36f86, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0.001
+      objectReference: {fileID: 0}
+    - target: {fileID: 4918707043880540, guid: d53bbce24b78fb742ba7b93ce8a36f86, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4918707043880540, guid: d53bbce24b78fb742ba7b93ce8a36f86, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4918707043880540, guid: d53bbce24b78fb742ba7b93ce8a36f86, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4918707043880540, guid: d53bbce24b78fb742ba7b93ce8a36f86, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4918707043880540, guid: d53bbce24b78fb742ba7b93ce8a36f86, type: 2}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d53bbce24b78fb742ba7b93ce8a36f86, type: 2}
   m_IsPrefabParent: 0
@@ -1759,7 +1787,7 @@ MonoBehaviour:
   _manager: {fileID: 0}
   _ignoreHoverMode: 0
   _ignoreContact: 0
-  _ignoreGrasping: 0
+  _ignoreGrasping: 1
   _contactForceMode: 1
   _allowMultiGrasp: 0
   _moveObjectWhenGrasped: 1
