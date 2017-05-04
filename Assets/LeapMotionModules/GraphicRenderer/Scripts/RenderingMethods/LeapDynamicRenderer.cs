@@ -77,6 +77,8 @@ namespace Leap.Unity.GraphicalRenderer {
           base.buildGraphic();
           finishMesh();
           _generation.mesh = null;
+
+          graphic.isRepresentationDirty = false;
         }
       }
 
