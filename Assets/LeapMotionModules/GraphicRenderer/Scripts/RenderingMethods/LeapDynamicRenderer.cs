@@ -127,11 +127,13 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+#if UNITY_EDITOR
     public override void OnEnableRendererEditor() {
       base.OnEnableRendererEditor();
 
       _shader = Shader.Find(DEFAULT_SHADER);
     }
+#endif
 
     protected override void setupForBuilding() {
       if (_shader == null) {

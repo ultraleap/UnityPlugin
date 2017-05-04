@@ -279,14 +279,23 @@ namespace Leap.Unity.GraphicalRenderer {
 
       public MeshRendererContainer(Transform root) {
         obj = new GameObject("Graphic Renderer");
+#if UNITY_EDITOR
         Undo.RegisterCreatedObjectUndo(obj, "Created graphic renderer");
+#endif
 
         filter = null;
         renderer = null;
       }
 
       public void Destroy() {
-        Undo.DestroyObjectImmediate(obj);
+#if UNITY_EDITOR
+        if (!Application.isPlaying) {
+          Undo.DestroyObjectImmediate(obj);
+        } else
+#endif
+        {
+          UnityEngine.Object.Destroy(obj);
+        }
       }
 
       public void MakeValid(Transform root, int index, Mesh mesh, Material material, MaterialPropertyBlock block) {

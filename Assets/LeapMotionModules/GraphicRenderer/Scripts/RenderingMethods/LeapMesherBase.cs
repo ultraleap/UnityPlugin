@@ -428,7 +428,10 @@ namespace Leap.Unity.GraphicalRenderer {
         _material = new Material(_shader);
       }
 
+#if UNITY_EDITOR
       Undo.RecordObject(_material, "Touched material");
+#endif
+
       _material.shader = _shader;
       _material.name = "Procedural Graphic Material";
 
