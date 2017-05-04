@@ -341,11 +341,20 @@ namespace Leap.Unity.Interaction {
     private void UpdateAnchorAttachment() {
       if (currentAnchor == null) return;
 
-      Vector3 targetPosition = currentAnchor.transform.position;
+      // Initialize position.
+      Vector3 finalPosition;
+      if (interactionBehaviour != null) {
+        finalPosition = interactionBehaviour.rigidbody.position;
+      }
+      else {
+        finalPosition = this.transform.position;
+      }
 
+      // Update position based on anchor state.
+      Vector3 targetPosition = currentAnchor.transform.position;
       if (lockToAnchor) {
         // In this state, we are simply locked directly to the anchor.
-        this.transform.position = targetPosition + _offsetTowardsHand;
+        finalPosition = targetPosition + _offsetTowardsHand;
 
         // Reset anchor position storage; it can't be updated from this state.
         _hasTargetPositionLastUpdate = false;
@@ -353,19 +362,19 @@ namespace Leap.Unity.Interaction {
       else if (lockToAnchorWhenAttached) {
         if (_attachedToAnchor) {
           // In this state, we are already attached to the anchor.
-          this.transform.position = targetPosition + _offsetTowardsHand;
+          finalPosition = targetPosition + _offsetTowardsHand;
 
           // Reset anchor position storage; it can't be updated from this state.
           _hasTargetPositionLastUpdate = false;
         }
         else {
           // Undo any "reach towards hand" offset.
-          this.transform.position -= _offsetTowardsHand;
+          finalPosition -= _offsetTowardsHand;
 
           // If desired, automatically correct for the anchor itself moving while attempting to return to it.
           if (matchAnchorMotionWhileReturning) {
             if (_hasTargetPositionLastUpdate) {
-              this.transform.position += (targetPosition - _targetPositionLastUpdate);
+              finalPosition += (targetPosition - _targetPositionLastUpdate);
             }
 
             _targetPositionLastUpdate = targetPosition;
@@ -373,14 +382,23 @@ namespace Leap.Unity.Interaction {
           }
 
           // Lerp towards the anchor.
-          this.transform.position = Vector3.Lerp(this.transform.position, targetPosition, anchorLerpCoeffPerSec * Time.deltaTime);
-          if (Vector3.Distance(this.transform.position, targetPosition) < 0.001F) {
+          finalPosition = Vector3.Lerp(finalPosition, targetPosition, anchorLerpCoeffPerSec * Time.deltaTime);
+          if (Vector3.Distance(finalPosition, targetPosition) < 0.001F) {
             _attachedToAnchor = true;
           }
 
           // Redo any "reach toward hand" offset.
-          this.transform.position += _offsetTowardsHand;
+          finalPosition += _offsetTowardsHand;
         }
+      }
+
+      // Set final position.
+      if (interactionBehaviour != null) {
+        interactionBehaviour.rigidbody.position = finalPosition;
+        this.transform.position = finalPosition;
+      }
+      else {
+        this.transform.position = finalPosition;
       }
     }
 
