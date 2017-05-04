@@ -1,4 +1,13 @@
-﻿using UnityEngine;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
 using System.Collections;
 using Leap.Unity;
 
@@ -23,7 +32,6 @@ public class CycleHandPairs : MonoBehaviour {
          KeyCode.Alpha6,
          KeyCode.Alpha7,
          KeyCode.Alpha8,
-         KeyCode.Alpha9,
      };
 
   // Use this for initialization
