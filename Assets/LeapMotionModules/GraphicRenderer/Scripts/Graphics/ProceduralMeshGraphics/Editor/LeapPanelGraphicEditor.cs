@@ -13,7 +13,7 @@ namespace Leap.Unity.GraphicalRenderer {
     protected override void OnEnable() {
       base.OnEnable();
 
-      specifyCustomDrawer("_sourceData", drawSourceData);
+      specifyCustomDrawer("_sourceDataIndex", drawSourceData);
 
       specifyCustomDrawer("_resolution_verts_per_meter", drawResolution);
 

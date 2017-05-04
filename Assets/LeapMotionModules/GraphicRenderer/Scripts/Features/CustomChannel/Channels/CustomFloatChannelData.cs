@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  [AddComponentMenu("")]
   [LeapGraphicTag("Float Channel")]
+  [Serializable]
   public class CustomFloatChannelData : CustomChannelDataBase<float> { }
 }

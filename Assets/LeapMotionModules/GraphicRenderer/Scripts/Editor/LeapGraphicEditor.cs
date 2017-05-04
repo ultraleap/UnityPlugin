@@ -12,41 +12,30 @@ using Leap.Unity.GraphicalRenderer;
 /// so currently these editors are going to be in the empty namespace.
 /// </summary>
 
-
-[CanEditMultipleObjects]
-[CustomEditor(typeof(LeapFeatureData), editorForChildClasses: true, isFallback = true)]
-public class DefaultFeatureDataEditor : CustomEditorBase {
-  protected override void OnEnable() {
-    base.OnEnable();
-    dontShowScriptField();
-  }
-}
-
 [CanEditMultipleObjects]
 [CustomEditor(typeof(LeapGraphic), editorForChildClasses: true, isFallback = true)]
 public class LeapGraphicEditor : LeapGraphicEditorBase<LeapGraphic> { }
 
 public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : LeapGraphic {
-  List<Editor> editorCache = new List<Editor>();
+  //Used ONLY for feature data drawers
+  public static LeapGraphicFeatureBase currentFeature { get; private set; }
 
-  UnityEngine.Object[] tempArray = new UnityEngine.Object[0];
-  List<UnityEngine.Object> tempList = new List<UnityEngine.Object>();
-  GUIContent dragContent;
+  private SerializedProperty _featureList;
+  private SerializedProperty _featureTable;
 
   protected override void OnEnable() {
     base.OnEnable();
 
-    dragContent = new GUIContent(EditorGUIUtility.IconContent("ListIcon"));
-    dragContent.tooltip = "Drag a reference to this feature data";
+    hideField("_anchor");
+    hideField("_featureData");
+    hideField("_attachedRenderer");
+    hideField("_attachedGroupIndex");
+    hideField("_preferredRendererType");
+
+    _featureList = serializedObject.FindProperty("_featureData");
+    _featureTable = MultiTypedListUtil.GetTableProperty(_featureList);
 
     dontShowScriptField();
-  }
-
-  protected void OnDisable() {
-    foreach (var editor in editorCache) {
-      DestroyImmediate(editor);
-    }
-    editorCache.Clear();
   }
 
   public override void OnInspectorGUI() {
@@ -113,11 +102,16 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
             }
 
             foreach (var graphic in targets) {
-              Undo.RecordObject(graphic, "Change graphic group");
-
+              serializedObject.ApplyModifiedProperties();
               if (graphic.attachedGroup.TryRemoveGraphic(graphic)) {
                 group.TryAddGraphic(graphic);
               }
+
+              EditorUtility.SetDirty(graphic);
+              EditorUtility.SetDirty(group.renderer);
+
+              serializedObject.SetIsDifferentCacheDirty();
+              serializedObject.Update();
             }
 
             mainGroup.renderer.editor.ScheduleEditorUpdate();
@@ -138,8 +132,8 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
         return;
       }
 
-      if (tempArray.Length != targets.Length) {
-        tempArray = new UnityEngine.Object[targets.Length];
+      if (mainGraphic.attachedGroup != null) {
+        SpriteAtlasUtil.ShowInvalidSpriteWarning(mainGraphic.attachedGroup.features);
       }
 
       int maxGraphics = LeapGraphicPreferences.graphicMax;
@@ -151,8 +145,9 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
                                 "Edit->Preferences.", MessageType.Warning);
       }
 
-      while (editorCache.Count < mainGraphic.featureData.Count) {
-        editorCache.Add(null);
+      //If we are not all attached to the same group we cannot show features
+      if (!targets.Query().Select(g => g.attachedGroup).AllEqual()) {
+        return;
       }
 
       EditorGUILayout.Space();
@@ -171,65 +166,25 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
         }
       }
 
-      for (int i = 0; i < mainGraphic.featureData.Count; i++) {
-        var mainDataObj = mainGraphic.featureData[i];
-        var mainDataType = mainDataObj.GetType();
-        var typeIndex = mainGraphic.featureData.Query().Where(d => d.GetType() == mainDataObj.GetType()).IndexOf(mainDataObj);
+      for (int i = 0; i < _featureTable.arraySize; i++) {
+        var idIndex = _featureTable.GetArrayElementAtIndex(i);
+        var dataProp = MultiTypedListUtil.GetReferenceProperty(_featureList, idIndex);
+        EditorGUILayout.LabelField(LeapGraphicTagAttribute.GetTag(dataProp.type));
 
-        tempList.Clear();
-        tempList.Add(mainDataObj);
-
-        targets.Query().
-                Skip(1).
-                Select(e => e.featureData.Query().
-                                          OfType(mainDataType).
-                                          ElementAtOrDefault(typeIndex)).
-                NonNull().
-                Cast<UnityEngine.Object>().
-                AppendList(tempList);
-
-        if (tempList.Count != targets.Length) {
-          //Not all graphics had a matching data object, so we don't display
-          continue;
-        }
-
-        tempList.CopyTo(tempArray);
-
-        Editor editor = editorCache[i];
-        CreateCachedEditor(tempArray, null, ref editor);
-        editorCache[i] = editor;
-        editor.serializedObject.Update();
-
-        EditorGUI.BeginChangeCheck();
-
-        EditorGUILayout.LabelField(LeapGraphicTagAttribute.GetTag(mainDataType));
-
-        if (targets.Length == 1) {
-          Rect rect = GUILayoutUtility.GetLastRect();
-          rect.width = 24;
-          rect.height = 24;
-          rect.x -= 13;
-          rect.y -= 1;
-
-          GUI.Label(rect, dragContent);
-
-          if (Event.current.type == EventType.MouseDrag && rect.Contains(Event.current.mousePosition)) {
-            DragAndDrop.PrepareStartDrag();
-            DragAndDrop.objectReferences = new UnityEngine.Object[] { mainDataObj };
-            DragAndDrop.StartDrag("Component");
-            Event.current.Use();
-          }
+        if (mainGraphic.attachedGroup != null) {
+          currentFeature = mainGraphic.attachedGroup.features[i];
         }
 
         EditorGUI.indentLevel++;
 
-        editor.OnInspectorGUI();
+        EditorGUILayout.PropertyField(dataProp, includeChildren: true);
 
         EditorGUI.indentLevel--;
-        if (EditorGUI.EndChangeCheck()) {
-          editor.serializedObject.ApplyModifiedProperties();
-        }
+
+        currentFeature = null;
       }
+
+      serializedObject.ApplyModifiedProperties();
     }
   }
 
@@ -241,7 +196,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
   protected Bounds OnGetFrameBounds() {
     return targets.Query().
                    Select(e => e.editor.pickingMesh).
-                   NonNull().
+                   ValidUnityObjs().
                    Select(m => m.bounds).
                    Fold((a, b) => {
                      a.Encapsulate(b);

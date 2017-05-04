@@ -6,20 +6,21 @@ using UnityEngine.Assertions;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
+using Leap.Unity;
 using Leap.Unity.Space;
 using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  [AddComponentMenu("")]
-  public partial class LeapGraphicGroup : LeapGraphicComponentBase<LeapGraphicRenderer> {
+  [Serializable]
+  public partial class LeapGraphicGroup : ISerializationCallbackReceiver {
 
     #region INSPECTOR FIELDS
     [SerializeField]
-    private LeapRenderingMethod _renderingMethod;
+    private RenderingMethodReference _renderingMethod = new RenderingMethodReference();
 
     [SerializeField]
-    private List<LeapGraphicFeatureBase> _features = new List<LeapGraphicFeatureBase>();
+    private FeatureList _features = new FeatureList();
     #endregion
 
     #region PRIVATE VARIABLES
@@ -34,51 +35,29 @@ namespace Leap.Unity.GraphicalRenderer {
 
     [SerializeField, HideInInspector]
     private bool _addRemoveSupported;
+
+    private HashSet<LeapGraphic> _toAttach = new HashSet<LeapGraphic>();
+    private HashSet<LeapGraphic> _toDetach = new HashSet<LeapGraphic>();
     #endregion
 
     #region PUBLIC RUNTIME API
 
-    public
-#if UNITY_EDITOR
-  new
-#endif
-  LeapGraphicRenderer renderer {
+    public LeapGraphicRenderer renderer {
       get {
-#if UNITY_EDITOR
-        if (_renderer == null) {
-          _renderer = GetComponent<LeapGraphicRenderer>();
-
-          if (_renderer == null) {
-            Debug.LogError("The graphic group still exists but isn't connected to any renderer!", this);
-          } else {
-            Debug.LogWarning("The _renderer field of the graphic group became null!", this);
-          }
-        }
-#endif
-
         return _renderer;
+      }
+      set {
+        _renderer = value;
       }
     }
 
     public LeapRenderingMethod renderingMethod {
       get {
-#if UNITY_EDITOR
-        if (_renderingMethod == null) {
-          _renderingMethod = GetComponent<LeapRenderingMethod>();
-
-          if (_renderingMethod == null) {
-            Debug.LogError("The graphic group still exists but isn't connected to any rendering method!", this);
-          } else {
-            Debug.LogWarning("The _renderingMethod field of the graphic group became null!", this);
-          }
-        }
-#endif
-
-        return _renderingMethod;
+        return _renderingMethod.Value;
       }
     }
 
-    public List<LeapGraphicFeatureBase> features {
+    public FeatureList features {
       get {
         Assert.IsNotNull(_features, "The feature list of graphic group was null!");
         return _features;
@@ -120,38 +99,59 @@ namespace Leap.Unity.GraphicalRenderer {
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
         Undo.RecordObject(graphic, "Added graphic to group");
-        Undo.RecordObject(this, "Added graphic to group");
-      }
+      } else
 #endif
+      {
+        if (_toAttach.Contains(graphic)) {
+          return false;
+        }
+        if (_toDetach.Contains(graphic)) {
+          graphic.CancelWillBeDetached();
+          graphic.isRepresentationDirty = true;
+          _toDetach.Remove(graphic);
+          return true;
+        }
+      }
 
       if (_graphics.Contains(graphic)) {
         if (graphic.attachedGroup == null) {
           //detatch and re-add, it forgot it was attached!
           //This can easily happen at edit time due to prefab shenanigans 
           graphic.OnDetachedFromGroup();
+          _graphics.Remove(graphic);
         } else {
+          Debug.LogWarning("Could not add graphic because it was already a part of this group.");
           return false;
         }
       }
 
-      int newIndex = _graphics.Count;
-      _graphics.Add(graphic);
-
-      LeapSpaceAnchor anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(graphic.transform);
-
-      graphic.OnAttachedToGroup(this, anchor);
-
-      //TODO: this is gonna need to be optimized
-      RebuildFeatureData();
-      RebuildFeatureSupportInfo();
-
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
+        int newIndex = _graphics.Count;
+        _graphics.Add(graphic);
+
+        LeapSpaceAnchor anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(graphic.transform);
+
+        RebuildFeatureData();
+        RebuildFeatureSupportInfo();
+
+        graphic.OnAttachedToGroup(this, anchor);
+
+        if (_renderer.space != null) {
+          _renderer.space.RebuildHierarchy();
+          _renderer.space.RecalculateTransformers();
+        }
+
         _renderer.editor.ScheduleEditorUpdate();
       } else
 #endif
       {
-        (_renderingMethod as ISupportsAddRemove).OnAddGraphic(graphic, newIndex);
+        if (_toAttach.Contains(graphic)) {
+          return false;
+        }
+
+        graphic.NotifyWillbeAttached(this);
+        _toAttach.Add(graphic);
       }
 
       return true;
@@ -164,6 +164,21 @@ namespace Leap.Unity.GraphicalRenderer {
         return false;
       }
 
+#if UNITY_EDITOR
+      if (Application.isPlaying)
+#endif
+      {
+        if (_toDetach.Contains(graphic)) {
+          return false;
+        }
+        if (_toAttach.Contains(graphic)) {
+          graphic.CancelWillbeAttached();
+          graphic.isRepresentationDirty = true;
+          _toAttach.Remove(graphic);
+          return true;
+        }
+      }
+
       int graphicIndex = _graphics.IndexOf(graphic);
       if (graphicIndex < 0) {
         return false;
@@ -172,24 +187,29 @@ namespace Leap.Unity.GraphicalRenderer {
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
         Undo.RecordObject(graphic, "Removed graphic from group");
-        Undo.RecordObject(this, "Removed graphic from group");
-      }
-#endif
+        Undo.RecordObject(_renderer, "Removed graphic from group");
 
-      graphic.OnDetachedFromGroup();
-      _graphics.RemoveAt(graphicIndex);
+        graphic.OnDetachedFromGroup();
+        _graphics.RemoveAt(graphicIndex);
 
-      //TODO: this is gonna need to be optimized
-      RebuildFeatureData();
-      RebuildFeatureSupportInfo();
+        RebuildFeatureData();
+        RebuildFeatureSupportInfo();
 
-#if UNITY_EDITOR
-      if (!Application.isPlaying) {
+        if (_renderer.space != null) {
+          _renderer.space.RebuildHierarchy();
+          _renderer.space.RecalculateTransformers();
+        }
+
         _renderer.editor.ScheduleEditorUpdate();
       } else
 #endif
       {
-        (_renderingMethod as ISupportsAddRemove).OnRemoveGraphic(graphic, graphicIndex);
+        if (_toDetach.Contains(graphic)) {
+          return false;
+        }
+
+        graphic.NotifyWillBeDetached(this);
+        _toDetach.Add(graphic);
       }
 
       return true;
@@ -209,7 +229,14 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public void UpdateRenderer() {
-      _renderingMethod.OnUpdateRenderer();
+#if UNITY_EDITOR
+      if (Application.isPlaying)
+#endif
+      {
+        handleRuntimeAddRemove();
+      }
+
+      _renderingMethod.Value.OnUpdateRenderer();
 
       foreach (var feature in _features) {
         feature.isDirty = false;
@@ -236,10 +263,6 @@ namespace Leap.Unity.GraphicalRenderer {
             }
             feature.AddFeatureData(dataObj);
             dataList.Add(dataObj);
-          }
-
-          foreach (var dataObj in graphic.featureData) {
-            DestroyImmediate(dataObj);
           }
 
           graphic.OnAssignFeatureData(dataList);
@@ -280,10 +303,10 @@ namespace Leap.Unity.GraphicalRenderer {
           }
 
           try {
-            if (_renderingMethod == null) continue;
+            if (_renderingMethod.Value == null) continue;
 
             var interfaceType = typeof(ISupportsFeature<>).MakeGenericType(featureType);
-            if (!interfaceType.IsAssignableFrom(_renderingMethod.GetType())) {
+            if (!interfaceType.IsAssignableFrom(_renderingMethod.Value.GetType())) {
               infoList.FillEach(() => SupportInfo.Error("This renderer does not support this feature."));
               continue;
             }
@@ -295,7 +318,7 @@ namespace Leap.Unity.GraphicalRenderer {
               continue;
             }
 
-            supportDelegate.Invoke(_renderingMethod, new object[] { castList, infoList });
+            supportDelegate.Invoke(_renderingMethod.Value, new object[] { castList, infoList });
           } finally {
             for (int i = 0; i < featureList.Count; i++) {
               featureToInfo[featureList[i]] = infoList[i];
@@ -311,48 +334,20 @@ namespace Leap.Unity.GraphicalRenderer {
     }
     #endregion
 
-    #region UNITY CALLBACKS
+    #region LIFECYCLE CALLBACKS
 
-    protected override void OnValidate() {
-      base.OnValidate();
-
-      for (int i = _features.Count; i-- != 0;) {
-        if (_features[i] == null) {
-          _features.RemoveAt(i);
-        }
-      }
-
-#if UNITY_EDITOR
-      if (!InternalUtility.IsPrefab(this)) {
-        editor.OnValidate();
-      }
-#endif
+    /// <summary>
+    /// Specifically called during the OnEnable callback during RUNTIME ONLY
+    /// </summary>
+    public void OnEnable() {
+      _renderingMethod.Value.OnEnableRenderer();
     }
 
-#if UNITY_EDITOR
-    protected override void OnDestroyedByUser() {
-      editor.OnDestroyedByUser();
-    }
-#endif
-
-    private void OnEnable() {
-#if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        return;
-      }
-#endif
-
-      _renderingMethod.OnEnableRenderer();
-    }
-
-    private void OnDisable() {
-#if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        return;
-      }
-#endif
-
-      _renderingMethod.OnDisableRenderer();
+    /// <summary>
+    /// Specifically called during the OnDisable callback during RUNTIME ONLY
+    /// </summary>
+    public void OnDisable() {
+      _renderingMethod.Value.OnDisableRenderer();
     }
 
     #endregion
@@ -360,10 +355,96 @@ namespace Leap.Unity.GraphicalRenderer {
     #region PRIVATE IMPLEMENTATION
 
 #if UNITY_EDITOR
-    private LeapGraphicGroup() {
+    public LeapGraphicGroup() {
       editor = new EditorApi(this);
     }
 #endif
+
+    private void handleRuntimeAddRemove() {
+      if (_toAttach.Count == 0 && _toDetach.Count == 0) {
+        return;
+      }
+
+      using (new ProfilerSample("Handle Runtime Add/Remove")) {
+        List<int> dirtyIndexes = Pool<List<int>>.Spawn();
+
+        try {
+          var attachEnum = _toAttach.GetEnumerator();
+          var detachEnum = _toDetach.GetEnumerator();
+          bool canAttach = attachEnum.MoveNext();
+          bool canDetach = detachEnum.MoveNext();
+
+          //First, we can handle pairs of adds/removes easily by simply placing
+          //the new graphic in the same place the old graphic was.
+          while (canAttach && canDetach) {
+            int toDetatchIndex = _graphics.IndexOf(detachEnum.Current);
+            _graphics[toDetatchIndex] = attachEnum.Current;
+
+            var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(attachEnum.Current.transform);
+
+            detachEnum.Current.OnDetachedFromGroup();
+            attachEnum.Current.OnAttachedToGroup(this, anchor);
+
+            dirtyIndexes.Add(toDetatchIndex);
+
+            canAttach = attachEnum.MoveNext();
+            canDetach = detachEnum.MoveNext();
+          }
+
+          //Then we append all the new graphics if there are any left.  This
+          //only happens if more graphics were added than were remove this
+          //frame.
+          while (canAttach) {
+            _graphics.Add(attachEnum.Current);
+
+            var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(attachEnum.Current.transform);
+            attachEnum.Current.OnAttachedToGroup(this, anchor);
+
+            canAttach = attachEnum.MoveNext();
+          }
+
+          //Or remove any graphics that did not have a matching add.  This 
+          //only happens if more graphics were removed than were added this
+          //frame.
+          while (canDetach) {
+            int toDetachIndex = _graphics.IndexOf(detachEnum.Current);
+            dirtyIndexes.Add(toDetachIndex);
+
+            _graphics.RemoveAtUnordered(toDetachIndex);
+
+            detachEnum.Current.OnDetachedFromGroup();
+
+            canDetach = detachEnum.MoveNext();
+          }
+
+          attachEnum.Dispose();
+          detachEnum.Dispose();
+          _toAttach.Clear();
+          _toDetach.Clear();
+
+          //Make sure the dirty indexes only point to valid graphics areas.
+          //Could potentially be optimized, but hasnt been a bottleneck.
+          for (int i = dirtyIndexes.Count; i-- != 0;) {
+            if (dirtyIndexes[i] >= _graphics.Count) {
+              dirtyIndexes.RemoveAt(i);
+            }
+          }
+
+          //TODO: this is gonna need to be optimized
+          RebuildFeatureData();
+          RebuildFeatureSupportInfo();
+          if (renderer.space != null) {
+            renderer.space.RebuildHierarchy();
+            renderer.space.RecalculateTransformers();
+          }
+
+          (_renderingMethod.Value as ISupportsAddRemove).OnAddRemoveGraphics(dirtyIndexes);
+        } finally {
+          dirtyIndexes.Clear();
+          Pool<List<int>>.Recycle(dirtyIndexes);
+        }
+      }
+    }
 
     private bool addRemoveSupportedOrEditTime() {
 #if UNITY_EDITOR
@@ -374,6 +455,28 @@ namespace Leap.Unity.GraphicalRenderer {
 
       return _addRemoveSupported;
     }
+
+    public void OnBeforeSerialize() { }
+
+    public void OnAfterDeserialize() {
+      _renderingMethod.Value.group = this;
+      _renderingMethod.Value.renderer = renderer;
+    }
+
+    [Serializable]
+    public class FeatureList : MultiTypedList<LeapGraphicFeatureBase, LeapTextureFeature,
+                                                                      LeapSpriteFeature,
+                                                                      LeapRuntimeTintFeature,
+                                                                      LeapBlendShapeFeature,
+                                                                      CustomFloatChannelFeature,
+                                                                      CustomVectorChannelFeature,
+                                                                      CustomColorChannelFeature,
+                                                                      CustomMatrixChannelFeature> { }
+
+    [Serializable]
+    public class RenderingMethodReference : MultiTypedReference<LeapRenderingMethod, LeapBakedRenderer,
+                                                                                     LeapDynamicRenderer,
+                                                                                     LeapTextRenderer> { }
     #endregion
   }
 }

@@ -1,13 +1,10 @@
-﻿using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-using Leap.Unity.Attributes;
+﻿using System;
+using UnityEngine;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  [AddComponentMenu("")]
   [LeapGraphicTag("Blend Shape")]
+  [Serializable]
   public class LeapBlendShapeFeature : LeapGraphicFeature<LeapBlendShapeData> {
     public const string FEATURE_NAME = LeapGraphicRenderer.FEATURE_PREFIX + "BLEND_SHAPES";
 
@@ -18,13 +15,5 @@ namespace Leap.Unity.GraphicalRenderer {
         return SupportInfo.FullSupport();
       }
     }
-
-#if UNITY_EDITOR
-    public override void DrawFeatureEditor(Rect rect, bool isActive, bool isFocused) { }
-
-    public override float GetEditorHeight() {
-      return 0;
-    }
-#endif
   }
 }

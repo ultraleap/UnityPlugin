@@ -20,32 +20,19 @@ namespace Leap.Unity.GraphicalRenderer {
       public virtual void OnValidate() {
         _graphic.isRepresentationDirty = true;
 
-        //Delete any null references
-        for (int i = _graphic._featureData.Count; i-- != 0;) {
-          if (_graphic._featureData[i] == null) {
-            _graphic._featureData.RemoveAt(i);
-          }
+        foreach (var data in _graphic._featureData) {
+          data.MarkFeatureDirty();
         }
-        
-        AttachedObjectHandler.Validate(_graphic, _graphic._featureData);
 
         if (!Application.isPlaying) {
-          if (_graphic._attachedGroup != null) {
-            _graphic._attachedGroup.renderer.editor.ScheduleEditorUpdate();
-            _graphic._preferredRendererType = _graphic._attachedGroup.renderingMethod.GetType();
+          if (_graphic.isAttachedToGroup && !_graphic.transform.IsChildOf(_graphic._attachedRenderer.transform)) {
+            _graphic.OnDetachedFromGroup();
           }
-        }
 
-        //Destroy any components that are not referenced by me
-        var allComponents = _graphic.GetComponents<LeapFeatureData>();
-        foreach (var component in allComponents) {
-          if (!_graphic._featureData.Contains(component)) {
-            InternalUtility.Destroy(component);
+          if (_graphic.isAttachedToGroup) {
+            _graphic._attachedRenderer.editor.ScheduleEditorUpdate();
+            _graphic._preferredRendererType = _graphic.attachedGroup.renderingMethod.GetType();
           }
-        }
-
-        foreach (var dataObj in _graphic._featureData) {
-          dataObj.graphic = _graphic;
         }
       }
 

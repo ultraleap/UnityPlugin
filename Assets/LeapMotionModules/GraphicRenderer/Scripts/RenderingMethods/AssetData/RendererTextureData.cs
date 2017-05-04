@@ -1,45 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using UnityEngine.Assertions;
 using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  public class RendererTextureData : SceneTiedAsset {
+  [Serializable]
+  public class RendererTextureData {
     [SerializeField]
     private List<NamedTexture> packedTextures = new List<NamedTexture>();
 
-#if UNITY_EDITOR
-    protected override void OnAssetSaved() {
-      base.OnAssetSaved();
-
-      foreach (var pair in packedTextures) {
-        if (!AssetDatabase.IsSubAsset(pair.texture)) {
-          AssetDatabase.AddObjectToAsset(pair.texture, this);
-        }
-      }
-    }
-#endif
-
-    private void OnDestroy() {
-      foreach (var tex in packedTextures) {
-        DestroyImmediate(tex.texture, allowDestroyingAssets: true);
-      }
-    }
-
-#if UNITY_EDITOR
     public void Clear() {
       foreach (var tex in packedTextures) {
-        DestroyImmediate(tex.texture, allowDestroyingAssets: true);
+        UnityEngine.Object.DestroyImmediate(tex.texture);
       }
       packedTextures.Clear();
     }
 
     public void AssignTextures(Texture2D[] textures, string[] propertyNames) {
       List<NamedTexture> newList = new List<NamedTexture>();
+      Assert.AreEqual(textures.Length, propertyNames.Length);
+
       for (int i = 0; i < textures.Length; i++) {
         newList.Add(new NamedTexture() {
           propertyName = propertyNames[i],
@@ -49,23 +31,12 @@ namespace Leap.Unity.GraphicalRenderer {
 
       foreach (var tex in packedTextures) {
         if (!newList.Query().Any(p => p.texture == tex.texture)) {
-          DestroyImmediate(tex.texture, allowDestroyingAssets: true);
-        }
-      }
-
-      foreach (var pair in newList) {
-        if (!packedTextures.Contains(pair) && isSavedAsset) {
-          AssetDatabase.AddObjectToAsset(pair.texture, this);
+          UnityEngine.Object.DestroyImmediate(tex.texture);
         }
       }
 
       packedTextures = newList;
-
-      if (isSavedAsset) {
-        AssetDatabase.SaveAssets();
-      }
     }
-#endif
 
     public Texture2D GetTexture(string propertyName) {
       return packedTextures.Query().
@@ -75,6 +46,21 @@ namespace Leap.Unity.GraphicalRenderer {
     public int Count {
       get {
         return packedTextures.Count;
+      }
+    }
+
+    public void Validate(LeapRenderingMethod renderingMethod) {
+      for (int i = packedTextures.Count; i-- != 0;) {
+        NamedTexture nt = packedTextures[i];
+        Texture2D tex = nt.texture;
+        if (tex == null) {
+          packedTextures.RemoveAt(i);
+          continue;
+        }
+
+        renderingMethod.PreventDuplication(ref tex);
+        nt.texture = tex;
+        packedTextures[i] = nt;
       }
     }
 

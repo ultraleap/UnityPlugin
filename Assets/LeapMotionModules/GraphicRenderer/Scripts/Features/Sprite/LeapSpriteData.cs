@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
@@ -10,7 +11,7 @@ namespace Leap.Unity.GraphicalRenderer {
   }
 
   [LeapGraphicTag("Sprite")]
-  [AddComponentMenu("")]
+  [Serializable]
   public class LeapSpriteData : LeapFeatureData {
 
     [EditTimeOnly]

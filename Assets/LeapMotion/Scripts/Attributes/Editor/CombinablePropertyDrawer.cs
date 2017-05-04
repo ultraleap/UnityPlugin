@@ -10,6 +10,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
+using System.Reflection;
 using System.Collections.Generic;
 
 namespace Leap.Unity.Attributes {
@@ -17,21 +18,28 @@ namespace Leap.Unity.Attributes {
   [CustomPropertyDrawer(typeof(CombinablePropertyAttribute), true)]
   public class CombinablePropertyDrawer : PropertyDrawer {
 
+    private static Dictionary<FieldInfo, List<CombinablePropertyAttribute>> _cachedAttributes = new Dictionary<FieldInfo, List<CombinablePropertyAttribute>>();
+
     private List<CombinablePropertyAttribute> attributes = new List<CombinablePropertyAttribute>();
     private void getAtrributes(SerializedProperty property) {
-      attributes.Clear();
-      foreach (object o in fieldInfo.GetCustomAttributes(typeof(CombinablePropertyAttribute), true)) {
-        CombinablePropertyAttribute combinableProperty = o as CombinablePropertyAttribute;
-        if (combinableProperty != null) {
-          if (combinableProperty.SupportedTypes.Count() != 0 && !combinableProperty.SupportedTypes.Contains(property.propertyType)) {
-            Debug.LogError("Property attribute " +
-                           combinableProperty.GetType().Name +
-                           " does not support property type " +
-                           property.propertyType + ".");
-            continue;
+      if (!_cachedAttributes.TryGetValue(fieldInfo, out attributes)) {
+        attributes = new List<CombinablePropertyAttribute>();
+
+        foreach (object o in fieldInfo.GetCustomAttributes(typeof(CombinablePropertyAttribute), true)) {
+          CombinablePropertyAttribute combinableProperty = o as CombinablePropertyAttribute;
+          if (combinableProperty != null) {
+            if (combinableProperty.SupportedTypes.Count() != 0 && !combinableProperty.SupportedTypes.Contains(property.propertyType)) {
+              Debug.LogError("Property attribute " +
+                             combinableProperty.GetType().Name +
+                             " does not support property type " +
+                             property.propertyType + ".");
+              continue;
+            }
+            attributes.Add(combinableProperty);
           }
-          attributes.Add(combinableProperty);
         }
+
+        _cachedAttributes[fieldInfo] = attributes;
       }
     }
 

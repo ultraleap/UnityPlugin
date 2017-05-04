@@ -110,7 +110,11 @@ namespace Leap.Unity.Query {
     }
 
     public static void RemoveAtUnordered<T>(this List<T> list, int index) {
-      list[index] = list.RemoveLast();
+      if (list.Count - 1 == index) {
+        list.RemoveLast();
+      } else {
+        list[index] = list.RemoveLast();
+      }
     }
 
     public static void InsertUnordered<T>(this List<T> list, int index, T element) {

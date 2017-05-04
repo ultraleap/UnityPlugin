@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Leap.Unity.GraphicalRenderer {
 
@@ -9,7 +10,7 @@ namespace Leap.Unity.GraphicalRenderer {
   }
 
   [LeapGraphicTag("Runtime Tint")]
-  [AddComponentMenu("")]
+  [Serializable]
   public class LeapRuntimeTintData : LeapFeatureData {
 
     [SerializeField]

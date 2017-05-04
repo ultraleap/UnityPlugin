@@ -6,7 +6,7 @@ using Leap.Unity.Space;
 namespace Leap.Unity.GraphicalRenderer {
 
   [ExecuteInEditMode]
-  public partial class LeapGraphicRenderer : MonoBehaviour {
+  public partial class LeapGraphicRenderer : MonoBehaviour, ISerializationCallbackReceiver {
     public const string FEATURE_PREFIX = "GRAPHIC_RENDERER_";
     public const string PROPERTY_PREFIX = "_GraphicRenderer";
 
@@ -79,36 +79,51 @@ namespace Leap.Unity.GraphicalRenderer {
     private void OnValidate() {
 #if UNITY_EDITOR
       if (!InternalUtility.IsPrefab(this)) {
+        if (!Application.isPlaying) {
+          editor.ScheduleEditorUpdate();
+        }
         editor.OnValidate();
       }
 #endif
     }
 
-    private void Reset() {
-      //First destroy all groups on this object
-      foreach (var group in GetComponents<LeapGraphicGroup>()) {
-        DestroyImmediate(group);
-      }
-
-      //Then do normal validation
-      OnValidate();
-    }
-
     private void OnDestroy() {
-      foreach (var group in _groups) {
-        InternalUtility.Destroy(group);
-      }
-
 #if UNITY_EDITOR
       editor.OnDestroy();
 #endif
     }
 
     private void OnEnable() {
+#if UNITY_EDITOR
+      Vector2[] uv = null;
+      foreach (var group in _groups) {
+        foreach (var feature in group.features) {
+          LeapSpriteFeature spriteFeature = feature as LeapSpriteFeature;
+          if (spriteFeature != null) {
+            foreach (var data in spriteFeature.featureData) {
+              uv = data.sprite.uv;
+            }
+          }
+        }
+      }
+#endif
+
       if (Application.isPlaying) {
         if (_space != null) {
           _space.RebuildHierarchy();
           _space.RecalculateTransformers();
+        }
+
+        foreach (var group in _groups) {
+          group.OnEnable();
+        }
+      }
+    }
+
+    private void OnDisable() {
+      if (Application.isPlaying) {
+        foreach (var group in _groups) {
+          group.OnDisable();
         }
       }
     }
@@ -151,6 +166,14 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       _hasFinishedSetup = true;
+    }
+
+    public void OnBeforeSerialize() { }
+
+    public void OnAfterDeserialize() {
+      foreach (var group in _groups) {
+        group.renderer = this;
+      }
     }
     #endregion
   }

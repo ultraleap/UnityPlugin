@@ -13,7 +13,7 @@ namespace Leap.Unity.GraphicalRenderer {
   }
 
   [LeapGraphicTag("Blend Shape")]
-  [AddComponentMenu("")]
+  [Serializable]
   public class LeapBlendShapeData : LeapFeatureData {
 
     [Range(0, 1)]
@@ -93,7 +93,7 @@ namespace Leap.Unity.GraphicalRenderer {
             if (_transform == null) {
               return false;
             }
-            transformation = transform.worldToLocalMatrix * _transform.localToWorldMatrix;
+            transformation = graphic.transform.worldToLocalMatrix * _transform.localToWorldMatrix;
             break;
           default:
             throw new InvalidOperationException();

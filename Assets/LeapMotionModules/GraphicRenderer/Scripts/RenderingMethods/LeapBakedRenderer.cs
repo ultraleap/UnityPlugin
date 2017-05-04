@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using Leap.Unity.Space;
 using Leap.Unity.Query;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  [AddComponentMenu("")]
   [LeapGraphicTag("Baked")]
+  [Serializable]
   public class LeapBakedRenderer : LeapMesherBase {
 
-    #region INSPECTOR FIELDS
+    public const string DEFAULT_SHADER = "Leap Motion/Graphic Renderer/Unlit/Baked";
 
-    [SerializeField]
-    private SingleLayer _layer = 0;
+    #region INSPECTOR FIELDS
 
     [EditTimeOnly]
     [SerializeField]
@@ -28,7 +30,7 @@ namespace Leap.Unity.GraphicalRenderer {
     #region PRIVATE VARIABLES
 
     [SerializeField, HideInInspector]
-    private List<MeshRendererContainer> _renderers;
+    private List<MeshRendererContainer> _renderers = new List<MeshRendererContainer>();
 
     //## Rect space
     private const string RECT_POSITIONS = LeapGraphicRenderer.PROPERTY_PREFIX + "Rect_GraphicPositions";
@@ -60,6 +62,14 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    public override void OnEnableRenderer() {
+      base.OnEnableRenderer();
+
+      foreach (var renderer in _renderers) {
+        renderer.ClearPropertyBlock();
+      }
+    }
+
     public override void OnUpdateRenderer() {
       base.OnUpdateRenderer();
 
@@ -68,7 +78,7 @@ namespace Leap.Unity.GraphicalRenderer {
           using (new ProfilerSample("Build Material Data")) {
             _rect_graphicPositions.Clear();
             foreach (var graphic in group.graphics) {
-              var localSpace = transform.InverseTransformPoint(graphic.transform.position);
+              var localSpace = renderer.transform.InverseTransformPoint(graphic.transform.position);
               _rect_graphicPositions.Add(localSpace);
             }
           }
@@ -97,16 +107,19 @@ namespace Leap.Unity.GraphicalRenderer {
       if (!_createMeshRenderers) {
         using (new ProfilerSample("Draw Meshes")) {
           for (int i = 0; i < _meshes.Count; i++) {
-            Mesh mesh = _meshes[i];
-            if (mesh != null) {
-              Graphics.DrawMesh(_meshes[i], renderer.transform.localToWorldMatrix, _material, _layer);
-            }
+            drawMesh(_meshes[i], renderer.transform.localToWorldMatrix);
           }
         }
       }
     }
 
 #if UNITY_EDITOR
+    public override void OnEnableRendererEditor() {
+      base.OnEnableRendererEditor();
+
+      _shader = Shader.Find(DEFAULT_SHADER);
+    }
+
     public override void OnDisableRendererEditor() {
       base.OnDisableRendererEditor();
 
@@ -116,24 +129,30 @@ namespace Leap.Unity.GraphicalRenderer {
       _renderers.Clear();
     }
 
-    public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
-      base.OnUpdateRendererEditor(isHeavyUpdate);
+    public override void OnUpdateRendererEditor() {
+      base.OnUpdateRendererEditor();
 
       if (_renderers == null) {
         _renderers = new List<MeshRendererContainer>();
       }
 
       if (_createMeshRenderers) {
+        for (int i = _renderers.Count; i-- != 0;) {
+          if (_renderers[i].obj == null) {
+            _renderers.RemoveAt(i);
+          }
+        }
+
         while (_renderers.Count > _meshes.Count) {
           _renderers.RemoveLast().Destroy();
         }
 
         while (_renderers.Count < _meshes.Count) {
-          _renderers.Add(new MeshRendererContainer(transform));
+          _renderers.Add(new MeshRendererContainer(renderer.transform));
         }
 
         for (int i = 0; i < _meshes.Count; i++) {
-          _renderers[i].MakeValid(transform, i, _meshes[i], _material);
+          _renderers[i].MakeValid(renderer.transform, i, _meshes[i], _material, _spriteTextureBlock);
         }
       } else {
         while (_renderers.Count > 0) {
@@ -145,7 +164,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected override void setupForBuilding() {
       if (_shader == null) {
-        _shader = Shader.Find("Leap Motion/Graphic Renderer/Unlit/Baked");
+        _shader = Shader.Find(DEFAULT_SHADER);
       }
 
       base.setupForBuilding();
@@ -169,7 +188,7 @@ namespace Leap.Unity.GraphicalRenderer {
       //If the next graphic is going to put us over the limit, finish the current mesh
       //and start a new one.
       if (_generation.verts.Count + _generation.graphic.mesh.vertexCount > MeshUtil.MAX_VERT_COUNT) {
-        finishMesh();
+        finishAndAddMesh();
         beginMesh();
       }
 
@@ -251,15 +270,17 @@ namespace Leap.Unity.GraphicalRenderer {
 
       public MeshRendererContainer(Transform root) {
         obj = new GameObject("Graphic Renderer");
+        Undo.RegisterCreatedObjectUndo(obj, "Created graphic renderer");
+
         filter = null;
         renderer = null;
       }
 
       public void Destroy() {
-        DestroyImmediate(obj);
+        Undo.DestroyObjectImmediate(obj);
       }
 
-      public void MakeValid(Transform root, int index, Mesh mesh, Material material) {
+      public void MakeValid(Transform root, int index, Mesh mesh, Material material, MaterialPropertyBlock block) {
         obj.transform.SetParent(root);
         obj.transform.SetSiblingIndex(index);
         obj.SetActive(true);
@@ -278,6 +299,11 @@ namespace Leap.Unity.GraphicalRenderer {
         }
         renderer.enabled = true;
         renderer.sharedMaterial = material;
+        renderer.SetPropertyBlock(block);
+      }
+
+      public void ClearPropertyBlock() {
+        renderer.SetPropertyBlock(new MaterialPropertyBlock());
       }
     }
   }

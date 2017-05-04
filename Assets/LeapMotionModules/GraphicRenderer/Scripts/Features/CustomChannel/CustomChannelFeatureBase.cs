@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -10,8 +11,9 @@ namespace Leap.Unity.GraphicalRenderer {
     string channelName { get; }
   }
 
+  [Serializable]
   public abstract class CustomChannelFeatureBase<T> : LeapGraphicFeature<T>, ICustomChannelFeature
-    where T : LeapFeatureData {
+    where T : LeapFeatureData, new() {
 
     [EditTimeOnly]
     [SerializeField]
@@ -35,15 +37,5 @@ namespace Leap.Unity.GraphicalRenderer {
 
       return SupportInfo.FullSupport();
     }
-
-#if UNITY_EDITOR
-    public override void DrawFeatureEditor(Rect rect, bool isActive, bool isFocused) {
-      _channelName = EditorGUI.TextField(rect, "Channel name", _channelName);
-    }
-
-    public override float GetEditorHeight() {
-      return EditorGUIUtility.singleLineHeight;
-    }
-#endif
   }
 }

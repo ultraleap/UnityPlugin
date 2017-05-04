@@ -6,7 +6,7 @@ using Leap.Unity.Query;
 namespace Leap.Unity.GraphicalRenderer {
 
   [CustomEditor(typeof(LeapGraphicRenderer))]
-  public class LeapGraphicRendererEditor : CustomEditorBase {
+  public class LeapGraphicRendererEditor : CustomEditorBase<LeapGraphicRenderer> {
     private const int BUTTON_WIDTH = 60;
     private static Color BUTTON_COLOR = Color.white * 0.95f;
     private static Color BUTTON_HIGHLIGHTED_COLOR = Color.white * 0.6f;
@@ -15,7 +15,8 @@ namespace Leap.Unity.GraphicalRenderer {
     private SerializedProperty _selectedGroup;
 
     private GenericMenu _addGroupMenu;
-    private Editor _groupEditor;
+    private SerializedProperty _groupProperty;
+    private LeapGuiGroupEditor _groupEditor;
 
     protected override void OnEnable() {
       base.OnEnable();
@@ -39,47 +40,51 @@ namespace Leap.Unity.GraphicalRenderer {
         _addGroupMenu.AddItem(new GUIContent(LeapGraphicTagAttribute.GetTag(renderingMethod)),
                               false,
                               () => {
+                                serializedObject.ApplyModifiedProperties();
+                                Undo.RecordObject(_renderer, "Created group");
+                                EditorUtility.SetDirty(_renderer);
                                 _renderer.editor.CreateGroup(renderingMethod);
-                                updateGroupEditor();
+                                serializedObject.Update();
+                                updateGroupProperty();
                               });
       }
 
-      updateGroupEditor();
-    }
-
-    private void OnDisable() {
-      if (_groupEditor != null) DestroyImmediate(_groupEditor);
+      _groupEditor = new LeapGuiGroupEditor(target, serializedObject);
     }
 
     public override void OnInspectorGUI() {
-      validateEditors();
+      using (new ProfilerSample("Draw Graphic Renderer Editor")) {
+        updateGroupProperty();
 
-      drawScriptField();
+        drawScriptField();
 
-      drawToolbar();
+        bool anyVertexLit = false;
+        foreach (var camera in FindObjectsOfType<Camera>()) {
+          if (camera.actualRenderingPath == RenderingPath.VertexLit) {
+            anyVertexLit = true;
+            break;
+          }
+        }
 
-      if (_groupEditor != null) {
-        drawGroupHeader();
+        if (anyVertexLit) {
+          EditorGUILayout.HelpBox("The vertex lit rendering path is not supported.", MessageType.Error);
+        }
 
-        GUILayout.BeginVertical(EditorStyles.helpBox);
+        drawToolbar();
 
-        _groupEditor.serializedObject.Update();
-        _groupEditor.OnInspectorGUI();
-        _groupEditor.serializedObject.ApplyModifiedProperties();
+        if (_groupProperty != null) {
+          drawGroupHeader();
 
-        GUILayout.EndVertical();
-      } else {
-        EditorGUILayout.HelpBox("To get started, create a new rendering group!", MessageType.Info);
-      }
+          GUILayout.BeginVertical(EditorStyles.helpBox);
 
-      serializedObject.ApplyModifiedProperties();
-    }
+          _groupEditor.DoGuiLayout(_groupProperty);
 
-    private void validateEditors() {
-      if (_groupEditor != null && _groupEditor.serializedObject.targetObjects.Query().Any(o => o == null)) {
-        _groupEditor = null;
+          GUILayout.EndVertical();
+        } else {
+          EditorGUILayout.HelpBox("To get started, create a new rendering group!", MessageType.Info);
+        }
 
-        updateGroupEditor();
+        serializedObject.ApplyModifiedProperties();
       }
     }
 
@@ -87,20 +92,25 @@ namespace Leap.Unity.GraphicalRenderer {
       EditorGUILayout.BeginHorizontal();
 
       using (new EditorGUI.DisabledGroupScope(EditorApplication.isPlaying)) {
-        GUI.color = BUTTON_COLOR;
+        var prevColor = GUI.color;
         if (GUILayout.Button("New Group", EditorStyles.toolbarDropDown)) {
           _addGroupMenu.ShowAsContext();
         }
 
-        if (_groupEditor != null) {
+        if (_groupProperty != null) {
           if (GUILayout.Button("Delete Group", EditorStyles.toolbarButton)) {
+            serializedObject.ApplyModifiedProperties();
+            Undo.RecordObject(_renderer, "Deleted group");
+            EditorUtility.SetDirty(_renderer);
             _renderer.editor.DestroySelectedGroup();
-            updateGroupEditor();
+            serializedObject.Update();
+            _groupEditor.Invalidate();
+            updateGroupProperty();
           }
         }
+        GUI.color = prevColor;
       }
 
-      GUI.color = Color.white;
       GUILayout.FlexibleSpace();
       Rect r = GUILayoutUtility.GetLastRect();
       GUI.Label(r, "", EditorStyles.toolbarButton);
@@ -111,6 +121,7 @@ namespace Leap.Unity.GraphicalRenderer {
     private void drawGroupHeader() {
       EditorGUILayout.BeginHorizontal();
 
+      var prevColor = GUI.color;
       for (int i = 0; i < _renderer.groups.Count; i++) {
         if (i == _selectedGroup.intValue) {
           GUI.color = BUTTON_HIGHLIGHTED_COLOR;
@@ -122,11 +133,12 @@ namespace Leap.Unity.GraphicalRenderer {
         string tag = LeapGraphicTagAttribute.GetTag(group.renderingMethod.GetType());
         if (GUILayout.Button(tag, EditorStyles.toolbarButton, GUILayout.MaxWidth(60))) {
           _selectedGroup.intValue = i;
-          CreateCachedEditor(_renderer.groups[i], null, ref _groupEditor);
+          _groupEditor.Invalidate();
+          updateGroupProperty();
         }
       }
-      GUI.color = Color.white;
 
+      GUI.color = prevColor;
       GUILayout.FlexibleSpace();
       Rect rect = GUILayoutUtility.GetLastRect();
       GUI.Label(rect, "", EditorStyles.toolbarButton);
@@ -134,16 +146,20 @@ namespace Leap.Unity.GraphicalRenderer {
       EditorGUILayout.EndHorizontal();
     }
 
-    private void updateGroupEditor() {
-      serializedObject.Update();
-      if (_renderer.groups.Count == 0) {
-        if (_groupEditor != null) {
-
-          DestroyImmediate(_groupEditor);
-        }
-      } else {
-        CreateCachedEditor(_renderer.groups[_selectedGroup.intValue], null, ref _groupEditor);
+    private void updateGroupProperty() {
+      var groupArray = serializedObject.FindProperty("_groups");
+      if (groupArray.arraySize == 0) {
+        _groupProperty = null;
+        return;
       }
+
+      int selectedGroupIndex = _selectedGroup.intValue;
+      if (selectedGroupIndex < 0 || selectedGroupIndex >= groupArray.arraySize) {
+        _selectedGroup.intValue = 0;
+        selectedGroupIndex = 0;
+      }
+
+      _groupProperty = groupArray.GetArrayElementAtIndex(selectedGroupIndex);
     }
 
     private bool HasFrameBounds() {
@@ -161,7 +177,7 @@ namespace Leap.Unity.GraphicalRenderer {
       return _renderer.groups.Query().
                          SelectMany(g => g.graphics.Query()).
                          Select(e => e.editor.pickingMesh).
-                         NonNull().
+                         ValidUnityObjs().
                          Select(m => m.bounds).
                          Fold((a, b) => {
                            a.Encapsulate(b);

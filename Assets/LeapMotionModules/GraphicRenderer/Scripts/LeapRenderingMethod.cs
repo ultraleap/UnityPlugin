@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
+using UnityObject = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -7,34 +10,17 @@ using Leap.Unity.Space;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  public abstract class LeapRenderingMethod : LeapGraphicComponentBase<LeapGraphicRenderer> {
+  [Serializable]
+  public abstract class LeapRenderingMethod {
     public const string DATA_FOLDER_NAME = "_ElementData";
 
-    [HideInInspector]
-    public
-#if UNITY_EDITOR
-  new
-#endif
-  LeapGraphicRenderer renderer;
+    [NonSerialized]
+    public LeapGraphicRenderer renderer;
 
-    [HideInInspector]
+    [NonSerialized]
     public LeapGraphicGroup group;
 
     public abstract SupportInfo GetSpaceSupportInfo(LeapSpace space);
-
-    protected override void OnValidate() {
-      base.OnValidate();
-
-#if UNITY_EDITOR
-      if (!Application.isPlaying) {
-        if (renderer != null) {
-          renderer.editor.ScheduleEditorUpdate();
-        }
-      }
-#endif
-    }
-
-    protected bool isHeavyUpdate { get; private set; }
 
     /// <summary>
     /// Called when the renderer is enabled at runtime.
@@ -58,7 +44,6 @@ namespace Leap.Unity.GraphicalRenderer {
     /// Use this for any edit-time construction you need.
     /// </summary>
     public virtual void OnEnableRendererEditor() {
-      Undo.RecordObject(this, "Enabled renderer");
     }
 
     /// <summary>
@@ -66,7 +51,6 @@ namespace Leap.Unity.GraphicalRenderer {
     /// Use this for edit-time clean up.
     /// </summary>
     public virtual void OnDisableRendererEditor() {
-      Undo.RecordObject(this, "Disabled Renderer");
     }
 
     /// <summary>
@@ -74,10 +58,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// called every time a change is performed, but it is
     /// not called all the time!
     /// </summary>
-    public virtual void OnUpdateRendererEditor(bool isHeavyUpdate) {
-      Undo.RecordObject(this, "Updated Renderer");
-      this.isHeavyUpdate = isHeavyUpdate;
-    }
+    public virtual void OnUpdateRendererEditor() { }
 #endif
 
     public abstract bool IsValidGraphic<T>();
@@ -85,17 +66,36 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public abstract LeapGraphic GetValidGraphicOnObject(GameObject obj);
 
-    protected void CreateOrSave<T>(ref T t, string assetName) where T : SceneTiedAsset {
-#if UNITY_EDITOR
-      T newT = t;
-      if (SceneTiedAsset.CreateOrSave(this,
-                                      ref newT,
-                                      DATA_FOLDER_NAME,
-                                      assetName)) {
-        Undo.RecordObject(this, "Updated graphic data");
-        t = newT;
+    private static Dictionary<UnityObject, object> _assetToOwner = new Dictionary<UnityObject, object>();
+    public void PreventDuplication<T>(ref T t) where T : UnityObject {
+      Assert.IsNotNull(t);
+
+      object owner;
+      if (_assetToOwner.TryGetValue(t, out owner)) {
+        if (owner.Equals(this)) {
+          return;
+        }
+
+        if (t is Texture2D) {
+          Texture2D tex = t as Texture2D;
+
+          RenderTexture rt = new RenderTexture(tex.width, tex.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+          Graphics.Blit(tex, rt);
+
+          Texture2D newTex = new Texture2D(tex.width, tex.height, TextureFormat.ARGB32, tex.mipmapCount > 1, true);
+          RenderTexture.active = rt;
+          newTex.ReadPixels(new Rect(0, 0, tex.width, tex.height), 0, 0);
+          newTex.Apply();
+          RenderTexture.active = null;
+          rt.Release();
+          UnityObject.DestroyImmediate(rt);
+
+          t = newTex as T;
+        } else {
+          t = UnityObject.Instantiate(t);
+        }
       }
-#endif
+      _assetToOwner[t] = this;
     }
   }
 

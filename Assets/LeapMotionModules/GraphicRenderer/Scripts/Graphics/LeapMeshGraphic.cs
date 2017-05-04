@@ -38,11 +38,11 @@ namespace Leap.Unity.GraphicalRenderer {
                                                  UVChannelFlags.UV3;
 
     public void SetMesh(Mesh mesh) {
-      if (isAttachedToGroup) {
-        Debug.LogError("Cannot set mesh while attached to group, detach it first.");
-        return;
+      if (isAttachedToGroup && !attachedGroup.addRemoveSupported) {
+        Debug.LogWarning("Changing the representation of the graphic is not supported by this rendering type");
       }
 
+      isRepresentationDirty = true;
       _mesh = mesh;
     }
 
