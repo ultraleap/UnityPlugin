@@ -80,17 +80,54 @@ namespace Leap.Unity.Attachments {
 
       AttachmentPointFlags flag = (AttachmentPointFlags)System.Enum.Parse(typeof(AttachmentPointFlags), attachmentFlagName, true);
 
-      target.attachmentPoints = EditorGUI.Toggle(makeToggleRect(_handTexRect.center
-                                                 + new Vector2(offCenterPosImgSpace.x * _handTexRect.width,
-                                                               offCenterPosImgSpace.y * _handTexRect.height)),
-                                                 (attachmentPoints & flag) == flag) ?
-                                  attachmentPoints | flag    // set flag bit to 1
-                                : attachmentPoints & (~flag);  // set flag bit to 0
+      if (EditorGUI.Toggle(makeToggleRect(_handTexRect.center
+                                          + new Vector2(offCenterPosImgSpace.x * _handTexRect.width,
+                                                        offCenterPosImgSpace.y * _handTexRect.height)),
+                           (attachmentPoints & flag) == flag)) {
+
+        target.attachmentPoints = attachmentPoints | flag; // Set flag bit to 1.
+      }
+      else {
+        if (!wouldFlagDeletionDestroyData(target, flag)
+            || EditorUtility.DisplayDialog("Delete " + flag + " Attachment Point?",
+                                           "Deleting the " + flag + " attachment point will destroy "
+                                         + "its GameObject and any of its non-Attachment-Point children, "
+                                         + "and will remove any components attached to it.",
+                                           "Delete " + flag + " Attachment Point", "Cancel")) {
+
+          target.attachmentPoints = attachmentPoints & (~flag); // Set flag bit to 0.
+        }
+      }
     }
 
     private const float TOGGLE_SIZE = 10.0F;
     private Rect makeToggleRect(Vector2 centerPos) {
       return new Rect(centerPos.x - TOGGLE_SIZE / 2F, centerPos.y - TOGGLE_SIZE / 2F, TOGGLE_SIZE, TOGGLE_SIZE);
+    }
+
+    private static bool wouldFlagDeletionDestroyData(AttachmentHands target, AttachmentPointFlags flag) {
+      foreach (var attachmentHand in target.attachmentHands) {
+        var point = attachmentHand.GetBehaviourForPoint(flag);
+
+        if (point == null) return false;
+        else {
+          // Data will be destroyed if this AttachmentPointBehaviour's Transform contains any children
+          // that are not themselves AttachmentPointBehaviours.
+          foreach (var child in point.transform.GetChildren()) {
+            if (child.GetComponent<AttachmentPointBehaviour>() == null) return true;
+          }
+
+          // Data will be destroyed if this AttachmentPointBehaviour contains any components
+          // that aren't constructed automatically.
+          foreach (var component in point.gameObject.GetComponents<Component>()) {
+            if (component is Transform)                continue;
+            if (component is AttachmentPointBehaviour) continue;
+
+            return true;
+          }
+        }
+      }
+      return false;
     }
 
   }

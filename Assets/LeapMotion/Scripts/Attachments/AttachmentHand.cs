@@ -122,6 +122,10 @@ namespace Leap.Unity.Attachments {
         initializeAttachmentPointFlagConstants();
       }
 
+      // Remove parent-child relationships so deleting parent Transforms doesn't annihilate
+      // child Transforms that don't need to be deleted themselves.
+      flattenAttachmentTransformHierarchy();
+
       foreach (AttachmentPointFlags flag in _attachmentPointFlagConstants) {
         if (flag == AttachmentPointFlags.None) continue;
 
@@ -133,6 +137,7 @@ namespace Leap.Unity.Attachments {
         }
       }
 
+      // Organize transforms, restoring parent-child relationships.
       organizeAttachmentTransforms();
 
       if (_attachmentPointsDirty) {
@@ -141,9 +146,11 @@ namespace Leap.Unity.Attachments {
       }
     }
 
-    #region Internal
-
-    private AttachmentPointBehaviour getBehaviourForPoint(AttachmentPointFlags singlePoint) {
+    /// <summary>
+    /// Returns the AttachmentPointBehaviour child object of this AttachmentHand given a
+    /// reference to a single AttachmentPointFlags flag, or null if there is no such child object.
+    /// </summary>
+    public AttachmentPointBehaviour GetBehaviourForPoint(AttachmentPointFlags singlePoint) {
       AttachmentPointBehaviour behaviour = null;
 
       switch (singlePoint) {
@@ -179,6 +186,8 @@ namespace Leap.Unity.Attachments {
 
       return behaviour;
     }
+
+    #region Internal
 
     private void setBehaviourForPoint(AttachmentPointFlags singlePoint, AttachmentPointBehaviour behaviour) {
       switch (singlePoint) {
@@ -219,7 +228,7 @@ namespace Leap.Unity.Attachments {
         return;
       }
 
-      if (getBehaviourForPoint(singlePoint) == null) {
+      if (GetBehaviourForPoint(singlePoint) == null) {
         GameObject obj = new GameObject(Enum.GetName(typeof(AttachmentPointFlags), singlePoint));
         AttachmentPointBehaviour newPointBehaviour = obj.AddComponent<AttachmentPointBehaviour>();
         newPointBehaviour.attachmentPoint = singlePoint;
@@ -237,12 +246,18 @@ namespace Leap.Unity.Attachments {
         return;
       }
 
-      var pointBehaviour = getBehaviourForPoint(singlePoint);
+      var pointBehaviour = GetBehaviourForPoint(singlePoint);
       if (pointBehaviour != null) {
         DestroyImmediate(pointBehaviour.gameObject);
         pointBehaviour = null;
 
         _attachmentPointsDirty = true;
+      }
+    }
+
+    private void flattenAttachmentTransformHierarchy() {
+      foreach (var point in this.points) {
+        point.transform.parent = this.transform;
       }
     }
 
