@@ -10,7 +10,7 @@ namespace Leap.Unity.Space {
   public abstract class LeapRadialSpace : LeapSpace {
 
     [MinValue(0.001f)]
-    [EditTimeOnly, SerializeField]
+    [SerializeField]
     private float _radius = 1;
 
     public float radius {
