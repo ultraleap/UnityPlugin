@@ -178,9 +178,7 @@ namespace Leap.Unity.GraphicalRenderer {
       _attachedGroupIndex = _attachedRenderer.groups.IndexOf(group);
       _anchor = anchor;
 
-      for (int i = 0; i < _featureData.Count; i++) {
-        _featureData[i].feature = group.features[i];
-      }
+      patchReferences();
     }
 
     public virtual void OnDetachedFromGroup() {
@@ -212,6 +210,7 @@ namespace Leap.Unity.GraphicalRenderer {
 #if UNITY_EDITOR
       editor.OnValidate();
 #endif
+      patchReferences();
     }
 
     protected virtual void OnEnable() {
@@ -229,6 +228,8 @@ namespace Leap.Unity.GraphicalRenderer {
             parentRenderer.TryAddGraphic(this);
           }
         }
+
+        patchReferences();
 #if UNITY_EDITOR
       }
 #endif
@@ -299,7 +300,9 @@ namespace Leap.Unity.GraphicalRenderer {
       for (int i = 0; i < _featureData.Count; i++) {
         _featureData[i].graphic = this;
       }
+    }
 
+    private void patchReferences() {
       if (isAttachedToGroup) {
         var group = _attachedRenderer.groups[_attachedGroupIndex];
         for (int i = 0; i < _featureData.Count; i++) {
