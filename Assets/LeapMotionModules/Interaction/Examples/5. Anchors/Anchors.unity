@@ -11996,8 +11996,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1297749049}
-  - {fileID: 476617762}
   - {fileID: 1770611133}
+  - {fileID: 476617762}
   m_Father: {fileID: 1198337721}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -16798,7 +16798,7 @@ GameObject:
   - component: {fileID: 1420400432}
   - component: {fileID: 1420400431}
   m_Layer: 0
-  m_Name: Dynamic UI Anchor Group
+  m_Name: Anchor Group
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20903,7 +20903,7 @@ GameObject:
   - component: {fileID: 1680547685}
   - component: {fileID: 1680547684}
   m_Layer: 0
-  m_Name: Dynamic UI Object (Magenta)
+  m_Name: Anchorable Object (Magenta)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22446,7 +22446,7 @@ GameObject:
   - component: {fileID: 1817611767}
   - component: {fileID: 1817611769}
   m_Layer: 0
-  m_Name: Dynamic UI Object (Red)
+  m_Name: Anchorable Object (Red)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -27048,7 +27048,7 @@ GameObject:
   - component: {fileID: 2122011965}
   - component: {fileID: 2122011964}
   m_Layer: 0
-  m_Name: Dynamic UI Object (Blue)
+  m_Name: Anchorable Object (Blue)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

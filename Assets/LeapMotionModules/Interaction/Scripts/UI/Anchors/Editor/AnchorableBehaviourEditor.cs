@@ -36,6 +36,22 @@ namespace Leap.Unity.Interaction {
                                 "attractionReachByDistance");
     }
 
+    public override void OnInspectorGUI() {
+      if (target.anchorType == AnchorableBehaviour.AnchorType.SingleAnchor
+          && target.currentAnchor != null
+          && target.enabled
+          && Vector3.Distance(target.transform.position, target.currentAnchor.transform.position) > 0.0001F) {
+        if (GUILayout.Button(new GUIContent("Move Object To Anchor Position",
+                                            "Detected that the object is not currently at its anchor, but upon pressing play, "
+                                          + "the object will move to its anchor. If you'd like the object to move to its anchor now, "
+                                          + "click this button."))) {
+          target.transform.position = target.currentAnchor.transform.position;
+        }
+      }
+
+      base.OnInspectorGUI();
+    }
+
   }
 
 }
