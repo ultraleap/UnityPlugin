@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 namespace Leap.Unity.GraphicalRenderer {
 
   public class LeapGraphicPreferences : MonoBehaviour {
+    public const int GRAPHIC_COUNT_CEILING = 1023;
     public const string LEAP_GRAPHIC_CGINC_PATH = "LeapMotionModules/GraphicRenderer/Resources/GraphicRenderer.cginc";
     public const string LEAP_GRAPHIC_SHADER_FOLDER = "Assets/LeapMotionModules/GraphicRenderer/Shaders/";
     private static Regex _graphicMaxRegex = new Regex(@"^#define\s+GRAPHIC_MAX\s+(\d+)\s*$");
@@ -79,7 +80,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       int newGraphicMax = EditorGUILayout.DelayedIntField("Maximum Graphics", graphicMax);
-      newGraphicMax = Mathf.Clamp(newGraphicMax, 1, 1024);
+      newGraphicMax = Mathf.Clamp(newGraphicMax, 1, GRAPHIC_COUNT_CEILING);
 
       if (newGraphicMax == graphicMax) {
         return; //Work here is done!  Nothing to change!
