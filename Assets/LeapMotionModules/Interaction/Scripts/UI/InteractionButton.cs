@@ -1,6 +1,7 @@
 ﻿using Leap.Unity.Interaction.Internal;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction {
 
@@ -74,6 +75,9 @@ namespace Leap.Unity.Interaction {
       // Initialize Limits
       minMaxHeight /= transform.parent.lossyScale.z;
 
+      //Add a custom grasp controller
+      OnGraspedMovement += Grasping;
+
       base.Start();
     }
 
@@ -106,9 +110,7 @@ namespace Leap.Unity.Interaction {
         _physicsOccurred = false;
 
         //Record and enforce the sliding state from the previous frame
-        Vector2 localSlidePosition = new Vector2(localPhysicsPosition.x, localPhysicsPosition.y);
-        localPhysicsPosition = transform.parent.InverseTransformPoint(rigidbody.position);
-        localPhysicsPosition = new Vector3(localSlidePosition.x, localSlidePosition.y, localPhysicsPosition.z);
+        localPhysicsPosition = GetDepressedConstrainedLocalPosition(transform.parent.InverseTransformPoint(rigidbody.position)-localPhysicsPosition);
 
         // Calculate the physical kinematics of the button in local space
         Vector3 localPhysicsVelocity = transform.parent.InverseTransformVector(rigidbody.velocity);
@@ -168,12 +170,18 @@ namespace Leap.Unity.Interaction {
       }
 
       //Disable collision on this button if it is not the primary hover
-      ignoreContact = !isPrimaryHovered;
+      ignoreContact = !isPrimaryHovered || isGrasped;
     }
 
     // How the button should behave when it is depressed
     protected virtual Vector3 GetDepressedConstrainedLocalPosition(Vector3 desiredOffset) {
-      return new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, localPhysicsPosition.z + desiredOffset.z);
+      return new Vector3(initialLocalPosition.x, initialLocalPosition.y, localPhysicsPosition.z + desiredOffset.z);
+    }
+
+    protected virtual void Grasping(Vector3 preSolvedPosition, Quaternion preSolvedRotation, Vector3 postSolvedPosition, Quaternion postSolvedRotation, List<InteractionHand> hand) {
+      Vector3 newLocalPosition = GetDepressedConstrainedLocalPosition(transform.parent.InverseTransformPoint(postSolvedPosition) - transform.parent.InverseTransformPoint(preSolvedPosition));
+      _physicsVelocity = 0.5f * (transform.parent.TransformPoint(newLocalPosition) - rigidbody.position) / Time.deltaTime;
+      rigidbody.velocity = _physicsVelocity;
     }
 
     protected virtual void OnCollisionEnter(Collision collision) { trySetDepressor(collision); }
