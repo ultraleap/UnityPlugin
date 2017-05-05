@@ -190,7 +190,9 @@ namespace Leap.Unity.GraphicalRenderer {
       SupportUtil.OnlySupportFirstFeature(features, info);
 
 #if UNITY_EDITOR
-      Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+      if (!Application.isPlaying) {
+        Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+      }
 
       for (int i = 0; i < features.Count; i++) {
         var feature = features[i];
@@ -410,7 +412,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     protected virtual void prepareMaterial() {
-      if (_material == null) {
+      if (_material == null || isHeavyUpdate) {
         _material = new Material(_shader);
       }
 
@@ -430,19 +432,7 @@ namespace Leap.Unity.GraphicalRenderer {
             var sprite = dataObj.sprite;
             if (sprite == null) continue;
 
-            Vector2[] uvs = SpriteAtlasUtil.GetAtlasedUvs(sprite);
-            float minX, minY, maxX, maxY;
-            minX = maxX = uvs[0].x;
-            minY = maxY = uvs[0].y;
-
-            for (int j = 1; j < uvs.Length; j++) {
-              minX = Mathf.Min(minX, uvs[j].x);
-              minY = Mathf.Min(minY, uvs[j].y);
-              maxX = Mathf.Max(maxX, uvs[j].x);
-              maxY = Mathf.Max(maxY, uvs[j].y);
-            }
-
-            Rect rect = Rect.MinMaxRect(minX, minY, maxX, maxY);
+            Rect rect = SpriteAtlasUtil.GetAtlasedRect(sprite);
             _atlasUvs.SetRect(spriteFeature.channel.Index(), sprite, rect);
           }
         }

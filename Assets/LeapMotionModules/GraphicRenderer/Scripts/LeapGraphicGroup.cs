@@ -130,6 +130,7 @@ namespace Leap.Unity.GraphicalRenderer {
           //This can easily happen at edit time due to prefab shenanigans 
           graphic.OnDetachedFromGroup();
         } else {
+          Debug.LogWarning("Could not add graphic because it was already a part of this group.");
           return false;
         }
       }
@@ -144,6 +145,12 @@ namespace Leap.Unity.GraphicalRenderer {
       //TODO: this is gonna need to be optimized
       RebuildFeatureData();
       RebuildFeatureSupportInfo();
+
+      //TODO: this is gonna need to be optimized too
+      if (_renderer.space != null) {
+        _renderer.space.RebuildHierarchy();
+        _renderer.space.RecalculateTransformers();
+      }
 
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
