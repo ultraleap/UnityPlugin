@@ -98,7 +98,7 @@ namespace Leap.Unity {
       });
     }
 
-    protected void drawProperty(string name, bool includeChildren = true) {
+    protected void drawProperty(string name, bool includeChildren = true, bool disable = false) {
       SerializedProperty property;
       if (!tryGetProperty(name, out property)) {
         return;
@@ -106,7 +106,11 @@ namespace Leap.Unity {
 
       GUIContent content = new GUIContent(property.displayName, property.tooltip);
       _drawables.Add(new PropertyContainer() {
-        draw = rect => EditorGUI.PropertyField(rect, property, content, includeChildren),
+        draw = rect => {
+          EditorGUI.BeginDisabledGroup(disable);
+          EditorGUI.PropertyField(rect, property, content, includeChildren);
+          EditorGUI.EndDisabledGroup();
+        },
         getHeight = () => EditorGUI.GetPropertyHeight(property, GUIContent.none, includeChildren)
       });
     }

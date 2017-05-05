@@ -113,8 +113,8 @@ namespace Leap.Unity.GraphicalRenderer {
       });
 
       drawProperty("_shader");
-      drawProperty("_layer");
-      drawProperty("_atlas");
+      drawProperty("_visualLayer", includeChildren: true, disable: EditorApplication.isPlaying);
+      drawProperty("_atlas", includeChildren: true, disable: EditorApplication.isPlaying);
     }
   }
 }

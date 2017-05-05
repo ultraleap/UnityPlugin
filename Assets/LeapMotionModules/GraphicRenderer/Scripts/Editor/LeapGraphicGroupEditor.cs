@@ -61,9 +61,11 @@ namespace Leap.Unity.GraphicalRenderer {
                                         () => {
                                           serializedObject.ApplyModifiedProperties();
                                           Undo.RecordObject(_renderer, "Changed rendering method");
+                                          EditorUtility.SetDirty(_renderer);
                                           _renderer.editor.ChangeRenderingMethod(renderingMethod, addFeatures: false);
                                           serializedObject.Update();
                                           _renderer.editor.ScheduleEditorUpdate();
+                                          _serializedObject.SetIsDifferentCacheDirty();
                                         });
       }
 
@@ -79,8 +81,10 @@ namespace Leap.Unity.GraphicalRenderer {
                                 () => {
                                   serializedObject.ApplyModifiedProperties();
                                   Undo.RecordObject(_renderer, "Added feature");
+                                  EditorUtility.SetDirty(_renderer);
                                   _renderer.editor.AddFeature(feature);
                                   _serializedObject.Update();
+                                  _serializedObject.SetIsDifferentCacheDirty();
                                 });
       }
     }
@@ -99,6 +103,8 @@ namespace Leap.Unity.GraphicalRenderer {
         drawMonoScript();
 
         drawStatsArea();
+
+        drawSpriteWarning();
 
         EditorGUILayout.PropertyField(_renderingMethod, includeChildren: true);
 
@@ -206,6 +212,20 @@ namespace Leap.Unity.GraphicalRenderer {
         var graphicList = _groupProperty.FindPropertyRelative("_graphics");
         int count = graphicList.arraySize;
         EditorGUILayout.IntField("Attached Graphic Count", count);
+      }
+    }
+
+    private void drawSpriteWarning() {
+      var list = Pool<List<LeapGraphicFeatureBase>>.Spawn();
+
+      try {
+        foreach (var group in _renderer.groups) {
+          list.AddRange(group.features);
+        }
+        SpriteAtlasUtil.ShowInvalidSpriteWarning(list);
+      } finally {
+        list.Clear();
+        Pool<List<LeapGraphicFeatureBase>>.Recycle(list);
       }
     }
 

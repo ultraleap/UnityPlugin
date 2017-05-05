@@ -42,6 +42,15 @@ namespace Leap.Unity.GraphicalRenderer {
             _graphic._attachedRenderer.editor.ScheduleEditorUpdate();
             _graphic._preferredRendererType = _graphic.attachedGroup.renderingMethod.GetType();
           }
+        } else {
+          var group = _graphic.attachedGroup;
+          if (group != null) {
+            if (!group.graphics.Contains(_graphic)) {
+              _graphic.OnDetachedFromGroup();
+              group.TryAddGraphic(_graphic);
+            }
+            group = _graphic.attachedGroup;
+          }
         }
       }
 

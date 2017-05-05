@@ -87,11 +87,12 @@ namespace Leap.Unity.GraphicalRenderer {
     private bool _useNormals = false;
 
     //BEGIN RENDERING SETTINGS
-    [SerializeField]
+    [EditTimeOnly, SerializeField]
     protected Shader _shader;
 
+    [Tooltip("The layer that the visual representation of the graphics.  It is independent from the layer the graphics occupy.")]
     [SerializeField]
-    private SingleLayer _layer = 0;
+    private SingleLayer _visualLayer = 0;
 
     [SerializeField]
     private AtlasBuilder _atlas = new AtlasBuilder();
@@ -790,11 +791,11 @@ namespace Leap.Unity.GraphicalRenderer {
     protected void drawMesh(Mesh mesh, Matrix4x4 transform) {
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
-        Graphics.DrawMesh(mesh, transform, _material, _layer, null, 0, _spriteTextureBlock);
+        Graphics.DrawMesh(mesh, transform, _material, _visualLayer, null, 0, _spriteTextureBlock);
       } else
 #endif
       {
-        Graphics.DrawMesh(mesh, transform, _material, _layer);
+        Graphics.DrawMesh(mesh, transform, _material, _visualLayer);
       }
     }
 
