@@ -37,7 +37,7 @@ namespace Leap.Unity.GraphicalRenderer {
     private VerticalAlignment _verticalAlignment;
 
     [EditTimeOnly, SerializeField]
-    private Color _color = Color.white;
+    private Color _color = Color.black;
 
     private bool _tokensDirty = true;
     private List<TextWrapper.Token> _cachedTokens = new List<TextWrapper.Token>();
