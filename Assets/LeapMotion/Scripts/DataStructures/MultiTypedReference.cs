@@ -57,6 +57,8 @@ namespace Leap.Unity {
     protected BaseType _cachedValue;
 
     public virtual void Clear() {
+      _cachedValue = null;
+
       if (_index == 0) {
         _a.Clear();
       } else if (_index == 1) {
@@ -139,6 +141,42 @@ namespace Leap.Unity {
       if (obj is C) {
         _c.Add((C)obj);
         _index = 2;
+      } else {
+        base.internalSetAfterClear(obj);
+      }
+    }
+  }
+
+  public class MultiTypedReference<BaseType, A, B, C, D> : MultiTypedReference<BaseType, A, B, C>
+    where BaseType : class
+    where A : BaseType
+    where B : BaseType
+    where C : BaseType
+    where D : BaseType {
+
+    [SerializeField]
+    private List<D> _d = new List<D>();
+
+    public override void Clear() {
+      if (_index == 3) {
+        _d.Clear();
+      }
+
+      base.Clear();
+    }
+
+    protected override BaseType internalGet() {
+      if (_index == 3) {
+        return _d[0];
+      } else {
+        return base.internalGet();
+      }
+    }
+
+    protected override void internalSetAfterClear(BaseType obj) {
+      if (obj is D) {
+        _d.Add((D)obj);
+        _index = 3;
       } else {
         base.internalSetAfterClear(obj);
       }

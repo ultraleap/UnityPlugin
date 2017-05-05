@@ -9,6 +9,7 @@
 
 using System.Collections.Generic;
 using NUnit.Framework;
+
 namespace Leap.Unity {
 
   public class MultiTypedListTests {
