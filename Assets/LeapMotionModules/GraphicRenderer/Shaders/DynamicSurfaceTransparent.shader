@@ -13,18 +13,18 @@
     CGPROGRAM
     #pragma surface surf Standard alpha:auto fullforwardshadows vertex:vert addshadow 
     #pragma target 3.0
-
     
     #define GRAPHIC_RENDERER_VERTEX_NORMALS //surface shaders always need normals
     #define GRAPHIC_RENDERER_VERTEX_UV_0    //surface shaders always need uv0
 
-    #pragma shader_feature _ GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_SPHERICAL
-    #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_1
-    #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_2
-    #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
-    #pragma shader_feature _ GRAPHIC_RENDERER_MOVEMENT_TRANSLATION GRAPHIC_RENDERER_MOVEMENT_FULL
-    #pragma shader_feature _ GRAPHIC_RENDERER_TINTING
-    #pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
+    //#pragma shader_feature _ GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_SPHERICAL
+    //#pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_1
+    //#pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_2
+    //#pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
+    //#pragma shader_feature _ GRAPHIC_RENDERER_MOVEMENT_TRANSLATION GRAPHIC_RENDERER_MOVEMENT_FULL
+    //#pragma shader_feature _ GRAPHIC_RENDERER_TINTING
+    //#pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
+
     #include "Assets/LeapMotionModules/GraphicRenderer/Resources/BakedRenderer.cginc"
     #include "UnityCG.cginc"
 

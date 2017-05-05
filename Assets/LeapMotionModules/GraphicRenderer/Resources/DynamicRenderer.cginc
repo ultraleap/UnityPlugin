@@ -197,9 +197,6 @@ struct appdata_graphic_dynamic {
   __V2F_UV2                     \
   __V2F_COLOR
 
-#define SURF_INPUT_GRAPHICAL    \
-  __V2F_COLOR
-
 #ifdef GRAPHIC_RENDERER_VERTEX_COLORS
 #define SURF_INPUT_GRAPHICAL float4 color : COLOR;
 #else

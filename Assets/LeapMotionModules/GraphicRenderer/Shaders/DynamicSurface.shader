@@ -14,12 +14,13 @@
     #define GRAPHIC_RENDERER_VERTEX_NORMALS //surface shaders always need normals
     #define GRAPHIC_RENDERER_VERTEX_UV_0    //surface shaders always need uv0
 
-    #pragma shader_feature _ GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_SPHERICAL
-    #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_1
-    #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_2
-    #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
-    #pragma shader_feature _ GRAPHIC_RENDERER_TINTING
-    #pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
+    //#pragma shader_feature _ GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_SPHERICAL
+    //#pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_1
+    //#pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_2
+    //#pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
+    //#pragma shader_feature _ GRAPHIC_RENDERER_TINTING
+    //#pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
+
     #include "Assets/LeapMotionModules/GraphicRenderer/Resources/DynamicRenderer.cginc"
     #include "UnityCG.cginc"
 
@@ -28,13 +29,13 @@
       float2 uv_MainTex;
     };
 
-    sampler2D _MainTex;
-
     void vert(inout appdata_graphic_dynamic v, out Input o) {
       UNITY_INITIALIZE_OUTPUT(Input, o);
       BEGIN_V2F(v);
       APPLY_DYNAMIC_GRAPHICS_STANDARD(v, o);   
     }
+
+    sampler2D _MainTex;
 
     void surf (Input IN, inout SurfaceOutputStandard o) {
       fixed4 color = tex2D(_MainTex, IN.uv_MainTex);
@@ -43,7 +44,7 @@
 #endif
 
       o.Albedo = color.rgb;
-	  o.Alpha = color.a;
+	    o.Alpha = color.a;
     }
     ENDCG
   }
