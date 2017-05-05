@@ -105,6 +105,11 @@ namespace Leap.Unity.Interaction {
     public float SimulationScale { get { return _providerScale; } }
 
     private InteractionHand[] _interactionHands = new InteractionHand[2];
+    /// <summary>
+    /// Gets the array of InteractionHands managed by this InteractionManager.
+    /// </summary>
+    public InteractionHand[] interactionHands { get { return _interactionHands; } }
+
     private HashSet<IInteractionBehaviour> _interactionBehaviours = new HashSet<IInteractionBehaviour>();
 
     private Dictionary<Rigidbody, IInteractionBehaviour> _interactionObjectBodies;

@@ -11,9 +11,23 @@ using UnityEngine;
 /// </summary>
 [AddComponentMenu("")]
 [RequireComponent(typeof(InteractionBehaviour))]
-public class SimpleHoverGlow : MonoBehaviour {
+public class SimpleInteractionGlow : MonoBehaviour {
 
-  public bool listenForPrimaryHover = false;
+  [Tooltip("If enabled, the object will lerp to its hoverColor when a hand is nearby.")]
+  public bool useHover = true;
+
+  [Tooltip("If enabled, the object will use its primaryHoverColor when the primary hover of an InteractionHand.")]
+  public bool usePrimaryHover = false;
+
+  //[Header("InteractionBehaviour Colors")]
+  private Color defaultColor = Color.Lerp(Color.black, Color.white, 0.1F);
+  private Color suspendedColor = Color.red;
+  private Color hoverColor = Color.Lerp(Color.black, Color.white, 0.7F);
+  private Color primaryHoverColor = Color.Lerp(Color.black, Color.white, 0.5F);
+
+  //[Header("InteractionButton Colors")]
+  //[Tooltip("This color only applies if the object is an InteractionButton or InteractionSlider.")]
+  private Color pressedColor = Color.white;
 
   private Material _material;
 
@@ -34,42 +48,41 @@ public class SimpleHoverGlow : MonoBehaviour {
   void Update() {
     if (_material != null) {
 
-      Color targetColor;
-
-      if (_intObj.isSuspended) {
-        // If the object is held by only one hand and that holding hand stops tracking, the
-        // object is "suspended." InteractionBehaviour provides suspension callbacks if you'd
-        // like the object to, for example, disappear, when the object is suspended.
-        // Alternatively you can check "isSuspended" at any time.
-        targetColor = Color.red;
-      }
-      else {
-        targetColor = Color.black;
-      }
+      // The target color for the Interaction object will be determined by various simple state checks.
+      Color targetColor = defaultColor;
 
       // "Primary hover" is a special kind of hover state that an InteractionBehaviour can
       // only have if an InteractionHand's thumb, index, or middle finger is closer to it
       // than any other interaction object.
-      if (_intObj.isPrimaryHovered && listenForPrimaryHover) {
-        targetColor = Color.white;
+      if (_intObj.isPrimaryHovered && usePrimaryHover) {
+        targetColor = primaryHoverColor;
       }
       else {
         // Of course, any number of objects can be hovered by any number of InteractionHands.
         // InteractionBehaviour provides an API for accessing various interaction-related
         // state information such as the closest hand that is hovering nearby, if the object
         // is hovered at all.
-        if (_intObj.isHovered) {
+        if (_intObj.isHovered && useHover) {
           float glow = Vector3.Distance(_intObj.closestHoveringHand.PalmPosition.ToVector3(), this.transform.position).Map(0F, 0.2F, 1F, 0.0F);
-          targetColor = new Color(glow, glow, glow, 1F);
+          targetColor = Color.Lerp(defaultColor, hoverColor, glow);
         }
+      }
+
+      if (_intObj.isSuspended) {
+        // If the object is held by only one hand and that holding hand stops tracking, the
+        // object is "suspended." InteractionBehaviour provides suspension callbacks if you'd
+        // like the object to, for example, disappear, when the object is suspended.
+        // Alternatively you can check "isSuspended" at any time.
+        targetColor = suspendedColor;
       }
 
       // We can also check the depressed-or-not-depressed state of InteractionButton objects
       // and assign them a unique color in that case.
       if (_intObj is InteractionButton && (_intObj as InteractionButton).isDepressed) {
-        targetColor = Color.blue;
+        targetColor = pressedColor;
       }
 
+      // Lerp actual material color to the target color.
       _material.color = Color.Lerp(_material.color, targetColor, 30F * Time.deltaTime);
     }
   }

@@ -1042,8 +1042,11 @@ namespace Leap.Unity.Interaction {
 
     public virtual void StayGrasped(List<InteractionHand> hands) {
       if (moveObjectWhenGrasped) {
-        Vector3 origPosition = rigidbody.position; Quaternion origRotation = rigidbody.rotation;
-        Vector3 newPosition; Quaternion newRotation;
+        Vector3    origPosition = rigidbody.position;
+        Quaternion origRotation = rigidbody.rotation;
+        Vector3    newPosition;
+        Quaternion newRotation;
+
         graspedPoseController.GetGraspedPosition(out newPosition, out newRotation);
 
         IGraspedMovementController holdingMovementController = rigidbody.isKinematic ?

@@ -47,6 +47,12 @@ namespace Leap.Unity.Interaction {
     public InteractionBehaviour primaryHoveredObject { get { return hoverCheckResults.primaryHovered as InteractionBehaviour; } }
 
     /// <summary>
+    /// Gets the distance from the closest fingertip on this hand to its primary hovered object, if there is one,
+    /// else returns float.PositiveInfinity.
+    /// </summary>
+    public float primaryHoveredDistance { get { return isPrimaryHovering ? hoverCheckResults.primaryHoveredDistance : float.PositiveInfinity; } }
+
+    /// <summary>
     /// Called when this InteractionHand begins primarily hovering over an InteractionBehaviour.
     /// If the hand has transitioned from one object to another, OnEndPrimaryHoveringObject will
     /// first be called on the old object, then OnBeginPrimaryHoveringObject will be called for
