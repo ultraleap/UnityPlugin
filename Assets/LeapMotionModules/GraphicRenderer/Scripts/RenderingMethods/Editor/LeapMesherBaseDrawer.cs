@@ -81,7 +81,7 @@ namespace Leap.Unity.GraphicalRenderer {
       increaseIndent();
 
       drawProperty("_shader");
-      drawProperty("_layer");
+      drawProperty("_layer", includeChildren: true, disable: EditorApplication.isPlaying);
       drawProperty("_atlas");
     }
   }

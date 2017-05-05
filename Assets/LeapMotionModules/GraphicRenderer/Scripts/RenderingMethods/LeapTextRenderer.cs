@@ -15,6 +15,7 @@ using UnityEditor;
 #endif
 using Leap.Unity.Space;
 using Leap.Unity.Query;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
 
@@ -27,21 +28,23 @@ namespace Leap.Unity.GraphicalRenderer {
     public const float SCALE_CONSTANT = 0.001f;
 
     [Header("Text Settings")]
-    [SerializeField]
+    [EditTimeOnly, SerializeField]
     private Font _font;
 
-    [SerializeField]
+    [EditTimeOnly, SerializeField]
     private float _dynamicPixelsPerUnit = 1.0f;
 
+    [EditTimeOnly, SerializeField]
     public bool _useColor = true;
 
+    [EditTimeOnly, SerializeField]
     public Color _globalTint = Color.white;
 
     [Header("Rendering Settings")]
-    [SerializeField]
+    [EditTimeOnly, SerializeField]
     private Shader _shader;
 
-    [SerializeField]
+    [EditTimeOnly, SerializeField]
     private float _scale = 1f;
 
     [SerializeField]
