@@ -135,6 +135,13 @@ namespace Leap.Unity {
       });
     }
 
+    protected void drawCustom(Action<Rect> drawFunc, Func<float> heightFunc) {
+      _drawables.Add(new PropertyContainer() {
+        draw = drawFunc,
+        getHeight = heightFunc
+      });
+    }
+
     protected void increaseIndent() {
       _drawables.Add(new IndentDrawable() {
         indent = INDENT_AMOUNT

@@ -21,6 +21,9 @@ namespace Leap.Unity.GraphicalRenderer {
     private const float MESH_LABEL_WIDTH = 100.0f;
     private const float REFRESH_BUTTON_WIDTH = 100;
 
+    private static float SHADER_WARNING_HEIGHT = 40;
+    private static float SHADER_WARNING_FIX_WIDTH = 50;
+
     private SerializedProperty _uv0, _uv1, _uv2, _uv3, _colors, _bakedTint, _normals;
 
     protected override void init(SerializedProperty property) {
@@ -79,6 +82,35 @@ namespace Leap.Unity.GraphicalRenderer {
       }, HEADER_HEADROOM + EditorGUIUtility.singleLineHeight);
 
       increaseIndent();
+
+      SerializedProperty shaderProp;
+      tryGetProperty("_shader", out shaderProp);
+
+      drawCustom(rect => {
+        if (!shaderProp.hasMultipleDifferentValues) {
+          Shader shader = shaderProp.objectReferenceValue as Shader;
+          if (VariantEnabler.DoesShaderHaveVariantsDisabled(shader)) {
+            Rect left, right;
+            rect.SplitHorizontallyWithRight(out left, out right, SHADER_WARNING_FIX_WIDTH);
+
+            EditorGUI.HelpBox(left, "This shader has disabled variants, and will not function until they are enabled.", MessageType.Warning);
+            if (GUI.Button(right, "Enable")) {
+              if (EditorUtility.DisplayDialog("Import Time Warning!", "The import time for this surface shader can take up to 2-3 minutes!  Are you sure you want to enable?", "Enable", "Not right now")) {
+                VariantEnabler.SetShaderVariantsEnabled(shader, enable: true);
+                AssetDatabase.Refresh();
+              }
+            }
+          }
+        }
+      },
+      () => {
+        Shader shader = shaderProp.objectReferenceValue as Shader;
+        if (VariantEnabler.DoesShaderHaveVariantsDisabled(shader)) {
+          return SHADER_WARNING_HEIGHT;
+        } else {
+          return 0;
+        }
+      });
 
       drawProperty("_shader");
       drawProperty("_layer");

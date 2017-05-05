@@ -207,6 +207,10 @@ struct appdata_graphic_dynamic {
 #endif
 #endif
 
+struct v2f_graphic_dynamic {
+  V2F_GRAPHICAL
+};
+
 
 #ifdef GRAPHICS_HAVE_ID
 #ifdef GRAPHIC_ID_FROM_UV0
