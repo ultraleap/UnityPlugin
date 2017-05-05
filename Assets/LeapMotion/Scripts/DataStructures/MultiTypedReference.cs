@@ -16,7 +16,17 @@ using UnityEditor;
 
 namespace Leap.Unity {
 
+  /// <summary>
+  /// Represents a single reference to a value of type BaseType.
+  /// 
+  /// Unlike a normal reference, when MultiTypedReference is serialized
+  /// it is able to support a certain amount of polymorphism.  To use 
+  /// MultiTypedReference you must specify exactly which types could possibly
+  /// be referenced.  To must also pre-declare a non-generic version of the
+  /// chosen class, mucgh in the same style as UnityEvent.
+  /// </summary>
   public abstract class MultiTypedReference<BaseType> where BaseType : class {
+    public abstract void Clear();
     public abstract BaseType Value { get; set; }
   }
 
@@ -56,7 +66,7 @@ namespace Leap.Unity {
     [NonSerialized]
     protected BaseType _cachedValue;
 
-    public virtual void Clear() {
+    public override void Clear() {
       _cachedValue = null;
 
       if (_index == 0) {
