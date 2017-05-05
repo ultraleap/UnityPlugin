@@ -1,4 +1,4 @@
-Shader "Leap Motion/Graphic Renderer/Examples/Bake 1" {
+﻿Shader "Leap Motion/Graphic Renderer/Examples/Bake 1" {
   Properties {
     _Color("Color", Color) = (1,1,1,1)
     _MainTex ("Albedo (RGB)", 2D) = "white" {}
@@ -17,14 +17,14 @@ Shader "Leap Motion/Graphic Renderer/Examples/Bake 1" {
     #define GRAPHIC_RENDERER_VERTEX_NORMALS //surface shaders always need normals
     #define GRAPHIC_RENDERER_VERTEX_UV_0    //surface shaders always need uv0
 
-    #pragma shader_feature _ GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_SPHERICAL
-    #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_1
-    #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_2
-    #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
-    #pragma shader_feature _ GRAPHIC_RENDERER_MOVEMENT_TRANSLATION GRAPHIC_RENDERER_MOVEMENT_FULL
-    #pragma shader_feature _ GRAPHIC_RENDERER_TINTING
-    #pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
-    asdasd
+  //#pragma shader_feature _ GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_SPHERICAL
+  //#pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_1
+  //#pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_2
+  //#pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
+  //#pragma shader_feature _ GRAPHIC_RENDERER_MOVEMENT_TRANSLATION GRAPHIC_RENDERER_MOVEMENT_FULL
+  //#pragma shader_feature _ GRAPHIC_RENDERER_TINTING
+  //#pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
+    
     #include "Assets/LeapMotionModules/GraphicRenderer/Resources/BakedRenderer.cginc"
     #include "UnityCG.cginc"
 
@@ -48,7 +48,7 @@ Shader "Leap Motion/Graphic Renderer/Examples/Bake 1" {
 #endif
 
       o.Albedo = color.rgb;
-	  o.Alpha = color.a;
+    o.Alpha = color.a;
     }
     ENDCG
   }
