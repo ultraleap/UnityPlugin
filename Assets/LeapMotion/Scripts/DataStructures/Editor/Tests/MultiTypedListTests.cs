@@ -7,7 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 namespace Leap.Unity {
 
@@ -37,6 +37,42 @@ namespace Leap.Unity {
     [TearDown]
     public void Teardown() {
       _list = null;
+    }
+
+    [Test]
+    public void InsertTests() {
+      addOneOfEach();
+
+      int countBefore = _list.Count;
+
+      _list.Insert(0, new A());
+
+      int countAfter = _list.Count;
+
+      Assert.That(countAfter, Is.EqualTo(countBefore + 1));
+
+      Assert.That(_list[0], Is.TypeOf<A>());
+      Assert.That(_list[1], Is.TypeOf<A>());
+      Assert.That(_list[2], Is.TypeOf<B>());
+    }
+
+    [Test]
+    public void EnumerableTest() {
+      addOneOfEach();
+
+      List<BaseClass> objs = new List<BaseClass>();
+      foreach (var obj in _list) {
+        objs.Add(obj);
+      }
+
+      Assert.That(objs[0], Is.TypeOf<A>());
+      Assert.That(objs[1], Is.TypeOf<B>());
+      Assert.That(objs[2], Is.TypeOf<C>());
+      Assert.That(objs[3], Is.TypeOf<D>());
+      Assert.That(objs[4], Is.TypeOf<E>());
+      Assert.That(objs[5], Is.TypeOf<F>());
+      Assert.That(objs[6], Is.TypeOf<G>());
+      Assert.That(objs[7], Is.TypeOf<H>());
     }
 
     [Test]
