@@ -20,6 +20,12 @@ namespace Leap.Unity.GraphicalRenderer {
     [NonSerialized]
     private bool _isDirty = true; //everything defaults dirty at the start!
 
+    //Unity cannot serialize lists of objects that have no serializable fields
+    //when it is set to text-serialization.  A feature might have no specific
+    //data, so we add this dummy bool to ensure it gets serialized anyway
+    [SerializeField]
+    private bool _dummyBool;
+
     public bool isDirty {
       get {
         return _isDirty;
