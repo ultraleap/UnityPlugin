@@ -34,6 +34,9 @@ namespace Leap.Unity.GraphicalRenderer {
 
     [SerializeField, HideInInspector]
     private bool _addRemoveSupported;
+
+    private HashSet<LeapGraphic> _toAttach = new HashSet<LeapGraphic>();
+    private HashSet<LeapGraphic> _toDetach = new HashSet<LeapGraphic>();
     #endregion
 
     #region PUBLIC RUNTIME API
@@ -134,24 +137,27 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
 
-      int newIndex = _graphics.Count;
-      _graphics.Add(graphic);
-
-      LeapSpaceAnchor anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(graphic.transform);
-
-      graphic.OnAttachedToGroup(this, anchor);
-
-      //TODO: this is gonna need to be optimized
-      RebuildFeatureData();
-      RebuildFeatureSupportInfo();
-
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
+        int newIndex = _graphics.Count;
+        _graphics.Add(graphic);
+
+        LeapSpaceAnchor anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(graphic.transform);
+
+        graphic.OnAttachedToGroup(this, anchor);
+
+        RebuildFeatureData();
+        RebuildFeatureSupportInfo();
+
         _renderer.editor.ScheduleEditorUpdate();
       } else
 #endif
       {
-        (_renderingMethod as ISupportsAddRemove).OnAddGraphic(graphic, newIndex);
+        if (_toAttach.Contains(graphic)) {
+          return false;
+        }
+
+        _toAttach.Add(graphic);
       }
 
       return true;
@@ -173,23 +179,23 @@ namespace Leap.Unity.GraphicalRenderer {
       if (!Application.isPlaying) {
         Undo.RecordObject(graphic, "Removed graphic from group");
         Undo.RecordObject(this, "Removed graphic from group");
-      }
-#endif
 
-      graphic.OnDetachedFromGroup();
-      _graphics.RemoveAt(graphicIndex);
+        graphic.OnDetachedFromGroup();
+        _graphics.RemoveAt(graphicIndex);
 
-      //TODO: this is gonna need to be optimized
-      RebuildFeatureData();
-      RebuildFeatureSupportInfo();
+        //TODO: this is gonna need to be optimized
+        RebuildFeatureData();
+        RebuildFeatureSupportInfo();
 
-#if UNITY_EDITOR
-      if (!Application.isPlaying) {
         _renderer.editor.ScheduleEditorUpdate();
       } else
 #endif
       {
-        (_renderingMethod as ISupportsAddRemove).OnRemoveGraphic(graphic, graphicIndex);
+        if (_toDetach.Contains(graphic)) {
+          return false;
+        }
+
+        _toDetach.Add(graphic);
       }
 
       return true;
@@ -209,6 +215,13 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public void UpdateRenderer() {
+#if UNITY_EDITOR
+      if (Application.isPlaying)
+#endif
+      {
+        handleRuntimeAddRemove();
+      }
+
       _renderingMethod.OnUpdateRenderer();
 
       foreach (var feature in _features) {
@@ -364,6 +377,92 @@ namespace Leap.Unity.GraphicalRenderer {
       editor = new EditorApi(this);
     }
 #endif
+
+    private void handleRuntimeAddRemove() {
+      if (_toAttach.Count == 0 && _toDetach.Count == 0) {
+        return;
+      }
+
+      using (new ProfilerSample("Handle Runtime Add/Remove")) {
+        List<int> dirtyIndexes = Pool<List<int>>.Spawn();
+
+        try {
+          var attachEnum = _toAttach.GetEnumerator();
+          var detachEnum = _toDetach.GetEnumerator();
+          bool canAttach = attachEnum.MoveNext();
+          bool canDetach = detachEnum.MoveNext();
+
+          //First, we can handle pairs of adds/removes easily by simply placing
+          //the new graphic in the same place the old graphic was.
+          while (canAttach && canDetach) {
+            int toDetatchIndex = _graphics.IndexOf(detachEnum.Current);
+            _graphics[toDetatchIndex] = attachEnum.Current;
+
+            var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(attachEnum.Current.transform);
+
+            detachEnum.Current.OnDetachedFromGroup();
+            attachEnum.Current.OnAttachedToGroup(this, anchor);
+
+            dirtyIndexes.Add(toDetatchIndex);
+
+            canAttach = attachEnum.MoveNext();
+            canDetach = detachEnum.MoveNext();
+          }
+
+          //Then we append all the new graphics if there are any left.  This
+          //only happens if more graphics were added than were remove this
+          //frame.
+          while (canAttach) {
+            _graphics.Add(attachEnum.Current);
+
+            var anchor = _renderer.space == null ? null : LeapSpaceAnchor.GetAnchor(attachEnum.Current.transform);
+            attachEnum.Current.OnAttachedToGroup(this, anchor);
+
+            canAttach = attachEnum.MoveNext();
+          }
+
+          //Or remove any graphics that did not have a matching add.  This 
+          //only happens if more graphics were removed than were added this
+          //frame.
+          while (canDetach) {
+            int toDetachIndex = _graphics.IndexOf(detachEnum.Current);
+            dirtyIndexes.Add(toDetachIndex);
+
+            _graphics.RemoveAtUnordered(toDetachIndex);
+
+            detachEnum.Current.OnDetachedFromGroup();
+
+            canDetach = detachEnum.MoveNext();
+          }
+
+          attachEnum.Dispose();
+          detachEnum.Dispose();
+          _toAttach.Clear();
+          _toDetach.Clear();
+
+          //Make sure the dirty indexes only point to valid graphics areas.
+          //Could potentially be optimized, but hasnt been a bottleneck.
+          for (int i = dirtyIndexes.Count; i-- != 0;) {
+            if (dirtyIndexes[i] >= _graphics.Count) {
+              dirtyIndexes.RemoveAt(i);
+            }
+          }
+
+          //TODO: this is gonna need to be optimized
+          RebuildFeatureData();
+          RebuildFeatureSupportInfo();
+          if (renderer.space != null) {
+            renderer.space.RebuildHierarchy();
+            renderer.space.RecalculateTransformers();
+          }
+
+          (_renderingMethod as ISupportsAddRemove).OnAddRemoveGraphics(dirtyIndexes);
+        } finally {
+          dirtyIndexes.Clear();
+          Pool<List<int>>.Recycle(dirtyIndexes);
+        }
+      }
+    }
 
     private bool addRemoveSupportedOrEditTime() {
 #if UNITY_EDITOR

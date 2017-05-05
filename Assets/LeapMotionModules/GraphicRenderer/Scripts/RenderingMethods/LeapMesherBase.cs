@@ -494,8 +494,10 @@ namespace Leap.Unity.GraphicalRenderer {
           _generation.graphic = group.graphics[_generation.graphicIndex] as LeapMeshGraphicBase;
           buildGraphic();
         }
-        finishMesh();
+        finishAndAddMesh();
       }
+
+      _meshes.ClearPool();
     }
 
     protected virtual void buildGraphic() {
@@ -632,21 +634,28 @@ namespace Leap.Unity.GraphicalRenderer {
       return graphicVertToMeshVert(shapeVert) - originalVert;
     }
 
-    protected virtual void beginMesh() {
+    protected virtual void beginMesh(Mesh mesh = null) {
       Assert.IsNull(_generation.mesh, "Cannot begin a new mesh without finishing the current mesh.");
 
       _generation.Reset();
 
-      _generation.mesh = new Mesh();
-      _generation.mesh.name = "Procedural Graphic Mesh";
-      _generation.mesh.hideFlags = HideFlags.None;
+      if (mesh == null) {
+        mesh = _meshes.GetMeshFromPoolOrNew();
+      }
+
+      mesh.name = "Procedural Graphic Mesh";
+      mesh.hideFlags = HideFlags.None;
+
+      _generation.mesh = mesh;
     }
 
     protected virtual void finishMesh() {
       using (new ProfilerSample("Finish Mesh")) {
         //If there is no data, don't actually do anything
         if (_generation.verts.Count == 0) {
-          DestroyImmediate(_generation.mesh);
+          if (!Application.isPlaying) {
+            DestroyImmediate(_generation.mesh, allowDestroyingAssets: true);
+          }
           _generation.mesh = null;
           return;
         }
@@ -671,7 +680,13 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         postProcessMesh();
+      }
+    }
 
+    protected virtual void finishAndAddMesh() {
+      finishMesh();
+
+      if (_generation.mesh != null) {
         _meshes.AddMesh(_generation.mesh);
         _generation.mesh = null;
       }
