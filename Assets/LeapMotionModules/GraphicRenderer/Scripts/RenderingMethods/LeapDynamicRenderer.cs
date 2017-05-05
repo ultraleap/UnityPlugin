@@ -108,6 +108,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
             _curved_graphicParameters.Add((transformer as IRadialTransformer).GetVectorRepresentation(graphic.transform));
             _curved_meshTransforms.Add(total);
+            
             _curved_worldToAnchor.Add(mainTransform.inverse);
           }
         }
@@ -179,15 +180,6 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     protected override Vector3 blendShapeDelta(Vector3 shapeVert, Vector3 originalVert) {
-      //TODO, optimize this, i'm sure it could be optimized.
-      Vector3 worldVert = _generation.graphic.transform.TransformPoint(shapeVert);
-      Vector3 localVert = renderer.transform.InverseTransformPoint(worldVert);
-      shapeVert = localVert - renderer.transform.InverseTransformPoint(_generation.graphic.transform.position);
-
-      Vector3 worldVert2 = _generation.graphic.transform.TransformPoint(originalVert);
-      Vector3 localVert2 = renderer.transform.InverseTransformPoint(worldVert2);
-      originalVert = localVert2 - renderer.transform.InverseTransformPoint(_generation.graphic.transform.position);
-
       return shapeVert - originalVert;
     }
   }

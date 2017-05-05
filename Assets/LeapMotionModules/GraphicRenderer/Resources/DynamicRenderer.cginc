@@ -225,13 +225,23 @@ struct v2f_graphic_dynamic {
 #ifdef GRAPHICS_NEED_ANCHOR_SPACE
 #define __POS_TO_ANCHOR_SPACE(v) v.vertex = mul(unity_ObjectToWorld, v.vertex); \
                                  v.vertex = mul(_GraphicRendererCurved_WorldToAnchor[graphicId], v.vertex);  
+
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
 #define __NORMAL_TO_ANCHOR_SPACE(v) v.normal = mul(unity_ObjectToWorld, float4(v.normal.xyz, 0)); \
                                     v.normal = mul(_GraphicRendererCurved_WorldToAnchor[graphicId], float4(v.normal.xyz, 0));
 #else
 #define __NORMAL_TO_ANCHOR_SPACE(v)       
 #endif
+
+#ifdef GRAPHIC_RENDERER_BLEND_SHAPES
+#define __BLEND_TO_ANCHOR_SPACE(v) v.vertInfo.xyz = mul(unity_ObjectToWorld, v.vertInfo.xyz); \
+                                   v.vertInfo.xyz = mul(_GraphicRendererCurved_WorldToAnchor[graphicId], v.vertInfo.xyz);  
 #else
+#define __BLEND_TO_ANCHOR_SPACE(v)
+#endif
+
+#else
+#define __BLEND_TO_ANCHOR_SPACE(v)
 #define __POS_TO_ANCHOR_SPACE(v)
 #define __NORMAL_TO_ANCHOR_SPACE(v)
 #endif
@@ -310,6 +320,7 @@ struct v2f_graphic_dynamic {
 {                                   \
   __POS_TO_ANCHOR_SPACE(v)          \
   __NORMAL_TO_ANCHOR_SPACE(v)       \
+  __BLEND_TO_ANCHOR_SPACE(v)        \
   __APPLY_BLEND_SHAPES(v)           \
   __APPLY_WARPING(v)                \
   __COPY_POSITION(v,o)              \
@@ -325,6 +336,7 @@ struct v2f_graphic_dynamic {
 {                                            \
   __POS_TO_ANCHOR_SPACE(v)                   \
   __NORMAL_TO_ANCHOR_SPACE(v)                \
+  __BLEND_TO_ANCHOR_SPACE(v)                 \
   __APPLY_BLEND_SHAPES(v);                   \
   __APPLY_WARPING(v);                        \
   __APPLY_SURF_TINT(v,o)                     \
