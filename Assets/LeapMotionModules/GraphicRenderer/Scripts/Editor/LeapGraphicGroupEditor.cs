@@ -61,9 +61,11 @@ namespace Leap.Unity.GraphicalRenderer {
                                         () => {
                                           serializedObject.ApplyModifiedProperties();
                                           Undo.RecordObject(_renderer, "Changed rendering method");
+                                          EditorUtility.SetDirty(_renderer);
                                           _renderer.editor.ChangeRenderingMethod(renderingMethod, addFeatures: false);
                                           serializedObject.Update();
                                           _renderer.editor.ScheduleEditorUpdate();
+                                          _serializedObject.SetIsDifferentCacheDirty();
                                         });
       }
 
@@ -79,8 +81,10 @@ namespace Leap.Unity.GraphicalRenderer {
                                 () => {
                                   serializedObject.ApplyModifiedProperties();
                                   Undo.RecordObject(_renderer, "Added feature");
+                                  EditorUtility.SetDirty(_renderer);
                                   _renderer.editor.AddFeature(feature);
                                   _serializedObject.Update();
+                                  _serializedObject.SetIsDifferentCacheDirty();
                                 });
       }
     }
