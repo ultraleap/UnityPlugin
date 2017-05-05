@@ -159,7 +159,7 @@ namespace Leap.Unity.GraphicalRenderer {
           return false;
         }
 
-        graphic.NotifyWillbeAttached(this);
+        graphic.NotifyWillBeAttached(this);
         _toAttach.Add(graphic);
       }
 
@@ -181,7 +181,7 @@ namespace Leap.Unity.GraphicalRenderer {
           return false;
         }
         if (_toAttach.Contains(graphic)) {
-          graphic.CancelWillbeAttached();
+          graphic.CancelWillBeAttached();
           graphic.isRepresentationDirty = true;
           _toAttach.Remove(graphic);
           return true;
