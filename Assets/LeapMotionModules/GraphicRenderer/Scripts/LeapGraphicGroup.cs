@@ -351,6 +351,14 @@ namespace Leap.Unity.GraphicalRenderer {
     /// Specifically called during the OnEnable callback during RUNTIME ONLY
     /// </summary>
     public void OnEnable() {
+      for (int i = 0; i < _features.Count; i++) {
+        _features[i].AssignFeatureReferences();
+        _features[i].ClearDataObjectReferences();
+        foreach (var graphic in _graphics) {
+          _features[i].AddFeatureData(graphic.featureData[i]);
+        }
+      }
+
       _renderingMethod.Value.OnEnableRenderer();
     }
 
