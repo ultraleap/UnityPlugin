@@ -100,6 +100,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
         drawStatsArea();
 
+        drawSpriteWarning();
+
         EditorGUILayout.PropertyField(_renderingMethod, includeChildren: true);
 
         EditorGUILayout.Space();
@@ -206,6 +208,20 @@ namespace Leap.Unity.GraphicalRenderer {
         var graphicList = _groupProperty.FindPropertyRelative("_graphics");
         int count = graphicList.arraySize;
         EditorGUILayout.IntField("Attached Graphic Count", count);
+      }
+    }
+
+    private void drawSpriteWarning() {
+      var list = Pool<List<LeapGraphicFeatureBase>>.Spawn();
+
+      try {
+        foreach (var group in _renderer.groups) {
+          list.AddRange(group.features);
+        }
+        SpriteAtlasUtil.ShowInvalidSpriteWarning(list);
+      } finally {
+        list.Clear();
+        Pool<List<LeapGraphicFeatureBase>>.Recycle(list);
       }
     }
 
