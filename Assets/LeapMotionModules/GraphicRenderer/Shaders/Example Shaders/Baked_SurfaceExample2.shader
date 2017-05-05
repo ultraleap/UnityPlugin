@@ -16,9 +16,10 @@
     #define GRAPHIC_RENDERER_VERTEX_COLORS
     #define GRAPHIC_RENDERER_TINTING
     #define GRAPHIC_RENDERER_BLEND_SHAPES
-    #define GRAPHIC_RENDERER_MOVEMENT_FULL
+    #define GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
     #define GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS
 
+    #pragma shader_feature _ GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_SPHERICAL
     #include "Assets/LeapMotionModules/GraphicRenderer/Resources/BakedRenderer.cginc"
     #include "UnityCG.cginc"
 

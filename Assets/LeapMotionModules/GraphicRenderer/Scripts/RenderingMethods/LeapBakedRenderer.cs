@@ -43,9 +43,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     //## Rect space
     private const string RECT_POSITIONS = LeapGraphicRenderer.PROPERTY_PREFIX + "Rect_GraphicPositions";
-    private const string FULL_TRANSFORMS = LeapGraphicRenderer.PROPERTY_PREFIX + "_FullMotionTransforms";
     private List<Vector4> _rect_graphicPositions = new List<Vector4>();
-    private List<Matrix4x4> _full_graphicTransforms = new List<Matrix4x4>();
 
     //## Cylindrical/Spherical spaces
     private const string CURVED_PARAMETERS = LeapGraphicRenderer.PROPERTY_PREFIX + "Curved_GraphicParameters";
@@ -60,8 +58,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public enum MotionType {
       None,
-      Translation,
-      Full
+      Translation
     }
 
     public override SupportInfo GetSpaceSupportInfo(LeapSpace space) {
@@ -85,27 +82,18 @@ namespace Leap.Unity.GraphicalRenderer {
     public override void OnUpdateRenderer() {
       base.OnUpdateRenderer();
 
-      using (new ProfilerSample("Build Material Data")) {
+      if (_motionType != MotionType.None) {
         if (renderer.space == null) {
-          switch (_motionType) {
-            case MotionType.Translation:
-              _rect_graphicPositions.Clear();
-              foreach (var graphic in group.graphics) {
-                var localSpace = renderer.transform.InverseTransformPoint(graphic.transform.position);
-                _rect_graphicPositions.Add(localSpace);
-              }
+          using (new ProfilerSample("Build Material Data")) {
+            _rect_graphicPositions.Clear();
+            foreach (var graphic in group.graphics) {
+              var localSpace = renderer.transform.InverseTransformPoint(graphic.transform.position);
+              _rect_graphicPositions.Add(localSpace);
+            }
+          }
 
-              _material.SetVectorArraySafe(RECT_POSITIONS, _rect_graphicPositions);
-              break;
-            case MotionType.Full:
-              _full_graphicTransforms.Clear();
-              foreach (var graphic in group.graphics) {
-                var transform = renderer.transform.worldToLocalMatrix * graphic.transform.localToWorldMatrix;
-                _full_graphicTransforms.Add(transform);
-              }
-
-              _material.SetMatrixArraySafe(FULL_TRANSFORMS, _full_graphicTransforms);
-              break;
+          using (new ProfilerSample("Upload Material Data")) {
+            _material.SetVectorArraySafe(RECT_POSITIONS, _rect_graphicPositions);
           }
         } else if (renderer.space is LeapRadialSpace) {
           var radialSpace = renderer.space as LeapRadialSpace;
@@ -225,9 +213,7 @@ namespace Leap.Unity.GraphicalRenderer {
                                                              Vector3.one) *
                                                renderer.transform.worldToLocalMatrix *
                                                _generation.graphic.transform.localToWorldMatrix;
-          break;
-        case MotionType.Full:
-          _translation_graphicVertToMeshVert = Matrix4x4.identity;
+
           break;
         default:
           throw new NotImplementedException();
@@ -258,7 +244,6 @@ namespace Leap.Unity.GraphicalRenderer {
           var localVert = _noMotion_graphicVertToLocalVert.MultiplyPoint3x4(vertex);
           return _noMotion_transformer.TransformPoint(localVert);
         case MotionType.Translation:
-        case MotionType.Full:
           return _translation_graphicVertToMeshVert.MultiplyPoint3x4(vertex);
       }
 
@@ -278,7 +263,6 @@ namespace Leap.Unity.GraphicalRenderer {
           meshNormal = matrix.MultiplyVector(localNormal);
           return;
         case MotionType.Translation:
-        case MotionType.Full:
           meshVert = _translation_graphicVertToMeshVert.MultiplyPoint3x4(vertex);
           meshNormal = _translation_graphicVertToMeshVert.MultiplyVector(normal);
           return;

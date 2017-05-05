@@ -30,16 +30,18 @@ public class ExampleArrayController : MonoBehaviour {
   private void Update() {
     Random.InitState(0);
 
-    for (int i = 0; i < _graphics.Count; i++) {
-      float d = 10 * noise(_graphics[i].transform.localPosition, 42.0f, 0.8f);
-      float s = Mathf.Sin(d);
+    float fade = Mathf.Clamp01(Time.time - 0.5f);
 
-      float n = noise(_graphics[i].transform.position * 3, 23, 0.35f);
-      float bn = _blendShapeCurve.Evaluate(n);
+    for (int i = 0; i < _graphics.Count; i++) {
+      _graphics[i].transform.localPosition = _originalPositions[i];
+
+      float d = fade * 10 * noise(_graphics[i].transform.position, 42.0f, 0.8f);
+      float n = noise(_graphics[i].transform.position * 2, 23, 0.35f);
+      float bn = fade * _blendShapeCurve.Evaluate(n);
 
       _blendShapeData[i].amount = bn;
-      _graphics[i].transform.localPosition = _originalPositions[i] + Vector3.up * (bn * _cubeRise + d * (bn * 0.03f + 0.01f));
-      _tintData[i].color = _gradient.Evaluate(n);
+      _graphics[i].transform.localPosition += Vector3.up * (bn * _cubeRise + d * (bn * 0.03f + 0.01f));
+      _tintData[i].color = fade * _gradient.Evaluate(n);
     }
   }
 

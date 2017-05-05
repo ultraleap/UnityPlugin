@@ -20,24 +20,9 @@
 #endif
 #endif
 
-#ifdef GRAPHIC_RENDERER_MOVEMENT_FULL
+#ifdef GRAPHIC_RENDERMOVEMENT_FULL
 #ifndef GRAPHIC_MOVEMENT
 #define GRAPHIC_MOVEMENT
-#endif
-
-float4x4 _GraphicRenderer_FullMotionTransforms[GRAPHIC_MAX];
-
-#ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-void ApplyGraphicPreTransform(inout float4 vert, inout float3 normal, int graphicId) {
-  float4x4 transform = _GraphicRenderer_FullMotionTransforms[graphicId];
-  vert = mul(transform, vert);
-  normal = mul(transform, normal);
-}
-#else
-void ApplyGraphicPreTransform(inout float4 vert, int graphicId) {
-  float4x4 transform = _GraphicRenderer_FullMotionTransforms[graphicId];
-  vert = mul(transform, vert);
-}
 #endif
 #endif
 
@@ -121,6 +106,8 @@ void ApplyGraphicWarping(inout float4 vert, int graphicId) {
 #define GRAPHICS_HAVE_ID
 #endif
 #endif
+
+
 
 /***********************************
  * Feature name:
@@ -256,16 +243,6 @@ struct v2f_graphic_baked {
 #define __APPLY_BLEND_SHAPES(v)
 #endif
 
-#ifdef GRAPHIC_RENDERER_MOVEMENT_FULL
-#ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
-#define __APPLY_PRE_TRANSFORM(v) ApplyGraphicPreTransform(v.vertex, v.normal, graphicId);
-#else
-#define __APPLY_PRE_TRANSFORM(v) ApplyGraphicPreTransform(v.vertex, graphicId);
-#endif
-#else
-#define __APPLY_PRE_TRANSFORM(v)
-#endif
-
 #ifdef GRAPHIC_RENDERER_WARPING
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
 #define __APPLY_WARPING(v) ApplyGraphicWarping(v.vertex, v.normal, graphicId);          
@@ -321,7 +298,6 @@ struct v2f_graphic_baked {
 #define APPLY_BAKED_GRAPHICS(v,o)                \
 {                                                \
   __APPLY_BLEND_SHAPES(v)                        \
-  __APPLY_PRE_TRANSFORM(v)                       \
   __APPLY_WARPING(v)                             \
   o.vertex = UnityObjectToClipPos(v.vertex);     \
   __COPY_NORMALS(v,o)                            \
@@ -335,7 +311,6 @@ struct v2f_graphic_baked {
 #define APPLY_BAKED_GRAPHICS_STANDARD(v,o) \
 {                                          \
   __APPLY_BLEND_SHAPES(v);                 \
-  __APPLY_PRE_TRANSFORM(v);                \
   __APPLY_WARPING(v);                      \
   __APPLY_SURF_TINT(v,o)                   \
 }
