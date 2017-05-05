@@ -214,6 +214,15 @@ namespace Leap.Unity.Interaction {
       base.OnDisable();
     }
 
+    protected virtual void OnDrawGizmosSelected() {
+      Gizmos.matrix = transform.parent.localToWorldMatrix;
+      Vector2 heights = (minMaxHeight / transform.parent.lossyScale.z);
+      Gizmos.color = Color.red;
+      Gizmos.DrawLine(transform.localPosition + (Vector3.back * heights.x), transform.localPosition + (Vector3.back * heights.y));
+      Gizmos.color = Color.green;
+      Gizmos.DrawLine(transform.localPosition + (Vector3.back * heights.x), transform.localPosition + (Vector3.back * Mathf.Lerp(heights.x,heights.y, restingHeight)));
+    }
+
     void Reset() {
       contactForceMode = ContactForceMode.UI;
     }
