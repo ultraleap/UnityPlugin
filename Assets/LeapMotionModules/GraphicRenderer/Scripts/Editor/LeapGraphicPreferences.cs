@@ -66,7 +66,7 @@ namespace Leap.Unity.GraphicalRenderer {
       EditorGUILayout.Space();
       GUILayout.Label("Surface-shader variant options", EditorStyles.boldLabel);
 
-      EditorGUILayout.HelpBox("Using surface-shader variants can drastically increase import time!", MessageType.Info);
+      EditorGUILayout.HelpBox("Using surface-shader variants can drastically increase import time!  Only enable variants if you are using surface shaders with the graphic renderer.", MessageType.Info);
 
       using (new EditorGUILayout.HorizontalScope()) {
         if (GUILayout.Button("Enable all variants")) {
