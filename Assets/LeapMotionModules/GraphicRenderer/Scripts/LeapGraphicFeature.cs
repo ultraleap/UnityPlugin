@@ -60,7 +60,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// <summary>
     /// A list of all feature data.
     /// </summary>
-    [HideInInspector]
+    [NonSerialized]
     public List<DataType> featureData = new List<DataType>();
 
     public override void AssignFeatureReferences() {
