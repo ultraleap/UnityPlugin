@@ -16,7 +16,17 @@ using UnityEditor;
 
 namespace Leap.Unity {
 
+  /// <summary>
+  /// Represents a single reference to a value of type BaseType.
+  /// 
+  /// Unlike a normal reference, when MultiTypedReference is serialized
+  /// it is able to support a certain amount of polymorphism.  To use 
+  /// MultiTypedReference you must specify exactly which types could possibly
+  /// be referenced.  To must also pre-declare a non-generic version of the
+  /// chosen class, mucgh in the same style as UnityEvent.
+  /// </summary>
   public abstract class MultiTypedReference<BaseType> where BaseType : class {
+    public abstract void Clear();
     public abstract BaseType Value { get; set; }
   }
 
@@ -56,7 +66,9 @@ namespace Leap.Unity {
     [NonSerialized]
     protected BaseType _cachedValue;
 
-    public virtual void Clear() {
+    public override void Clear() {
+      _cachedValue = null;
+
       if (_index == 0) {
         _a.Clear();
       } else if (_index == 1) {
@@ -139,6 +151,42 @@ namespace Leap.Unity {
       if (obj is C) {
         _c.Add((C)obj);
         _index = 2;
+      } else {
+        base.internalSetAfterClear(obj);
+      }
+    }
+  }
+
+  public class MultiTypedReference<BaseType, A, B, C, D> : MultiTypedReference<BaseType, A, B, C>
+    where BaseType : class
+    where A : BaseType
+    where B : BaseType
+    where C : BaseType
+    where D : BaseType {
+
+    [SerializeField]
+    private List<D> _d = new List<D>();
+
+    public override void Clear() {
+      if (_index == 3) {
+        _d.Clear();
+      }
+
+      base.Clear();
+    }
+
+    protected override BaseType internalGet() {
+      if (_index == 3) {
+        return _d[0];
+      } else {
+        return base.internalGet();
+      }
+    }
+
+    protected override void internalSetAfterClear(BaseType obj) {
+      if (obj is D) {
+        _d.Add((D)obj);
+        _index = 3;
       } else {
         base.internalSetAfterClear(obj);
       }
