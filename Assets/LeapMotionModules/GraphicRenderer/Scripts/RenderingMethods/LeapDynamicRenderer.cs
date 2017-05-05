@@ -12,9 +12,6 @@ namespace Leap.Unity.GraphicalRenderer {
 
     #region PRIVATE VARIABLES
 
-    private Dictionary<LeapGraphic, int> _graphicToId = new Dictionary<LeapGraphic, int>();
-    private Stack<int> _freeIds = new Stack<int>();
-
     //Curved space
     private const string CURVED_PARAMETERS = LeapGraphicRenderer.PROPERTY_PREFIX + "Curved_GraphicParameters";
     private List<Matrix4x4> _curved_worldToAnchor = new List<Matrix4x4>();
@@ -22,31 +19,29 @@ namespace Leap.Unity.GraphicalRenderer {
     private List<Vector4> _curved_graphicParameters = new List<Vector4>();
     #endregion
 
-    public void OnAddGraphic(LeapGraphic graphic, int newIndex) {
-      int id;
-      if (_freeIds.Count > 0) {
-        id = _freeIds.Pop();
-      } else {
-        id = newIndex;
+    public void OnAddRemoveGraphics(List<int> dirtyIndexes) {
+      while (_meshes.Count > group.graphics.Count) {
+        _meshes.RemoveMesh(_meshes.Count - 1);
       }
 
-      beginMesh();
-      _generation.graphic = graphic as LeapMeshGraphicBase;
-      _generation.graphicIndex = newIndex;
-      _generation.graphicId = id;
-      buildGraphic();
-      finishMesh();
+      while (_meshes.Count < group.graphics.Count) {
+        beginMesh();
+        _generation.graphic = group.graphics[_meshes.Count] as LeapMeshGraphicBase;
+        _generation.graphicIndex = _meshes.Count;
+        _generation.graphicId = _meshes.Count;
+        base.buildGraphic();
+        finishAndAddMesh();
+      }
 
-      _graphicToId[graphic] = id;
-    }
-
-    public void OnRemoveGraphic(LeapGraphic graphic, int graphicIndex) {
-      int id = _graphicToId[graphic];
-      _freeIds.Push(id);
-
-      _graphicToId.Remove(graphic);
-
-      _meshes.RemoveMesh(graphicIndex);
+      foreach (var dirtyIndex in dirtyIndexes) {
+        beginMesh(_meshes[dirtyIndex]);
+        _generation.graphic = group.graphics[dirtyIndex] as LeapMeshGraphicBase;
+        _generation.graphicIndex = dirtyIndex;
+        _generation.graphicId = dirtyIndex;
+        base.buildGraphic();
+        finishMesh();
+        _generation.mesh = null;
+      }
     }
 
     public override SupportInfo GetSpaceSupportInfo(LeapSpace space) {
@@ -59,26 +54,21 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    public override void OnEnableRenderer() {
-      for (int i = 0; i < group.graphics.Count; i++) {
-        _graphicToId[group.graphics[i]] = i;
-      }
-
-      base.OnEnableRenderer();
-    }
-
-#if UNITY_EDITOR
-    public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
-      for (int i = 0; i < group.graphics.Count; i++) {
-        _graphicToId[group.graphics[i]] = i;
-      }
-
-      base.OnUpdateRendererEditor(isHeavyUpdate);
-    }
-#endif
-
     public override void OnUpdateRenderer() {
       base.OnUpdateRenderer();
+
+      for (int i = 0; i < group.graphics.Count; i++) {
+        var graphic = group.graphics[i];
+        if (graphic.isRepresentationDirty) {
+          beginMesh(_meshes[i]);
+          _generation.graphic = graphic as LeapMeshGraphic;
+          _generation.graphicIndex = i;
+          _generation.graphicId = i;
+          base.buildGraphic();
+          finishMesh();
+          _generation.mesh = null;
+        }
+      }
 
       if (renderer.space == null) {
         using (new ProfilerSample("Draw Meshes")) {
@@ -142,7 +132,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected override void buildGraphic() {
       //Always start a new mesh for each graphic
-      finishMesh();
+      finishAndAddMesh();
       beginMesh();
 
       base.buildGraphic();

@@ -119,7 +119,7 @@ GameObject:
   - component: {fileID: 10200335}
   - component: {fileID: 10200334}
   m_Layer: 0
-  m_Name: Mesh
+  m_Name: Blue Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -301,7 +301,7 @@ Camera:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_RenderingPath: -1
+  m_RenderingPath: 1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
@@ -336,7 +336,7 @@ GameObject:
   - component: {fileID: 346163379}
   - component: {fileID: 346163378}
   m_Layer: 0
-  m_Name: Mesh
+  m_Name: Red Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -400,7 +400,7 @@ GameObject:
   - component: {fileID: 426001190}
   - component: {fileID: 426001189}
   m_Layer: 0
-  m_Name: Mesh
+  m_Name: Green Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -464,7 +464,7 @@ GameObject:
   - component: {fileID: 428175858}
   - component: {fileID: 428175857}
   m_Layer: 0
-  m_Name: Mesh
+  m_Name: Blue Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -593,7 +593,7 @@ GameObject:
   - component: {fileID: 587199934}
   - component: {fileID: 587199933}
   m_Layer: 0
-  m_Name: Mesh
+  m_Name: Blue Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -689,7 +689,7 @@ GameObject:
   - component: {fileID: 795087644}
   - component: {fileID: 795087643}
   m_Layer: 0
-  m_Name: Mesh
+  m_Name: Red Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -753,7 +753,7 @@ GameObject:
   - component: {fileID: 811648766}
   - component: {fileID: 811648765}
   m_Layer: 0
-  m_Name: Mesh
+  m_Name: Green Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -836,30 +836,6 @@ Transform:
   m_Father: {fileID: 1561875138}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &947005088
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: Procedural Graphic Material
-  m_Shader: {fileID: 4800000, guid: 474347a7dd23a1743b7bdfa349be986b, type: 3}
-  m_ShaderKeywords: GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_UV_0
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 28190866521902972, guid: 5de2c3f92c6614f4db2f4fe2660b32a4,
-          type: 2}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors: []
 --- !u!1 &1027488249
 GameObject:
   m_ObjectHideFlags: 0
@@ -922,6 +898,31 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 5.200001}
   m_SizeDelta: {x: 6.25, y: 3.74}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!21 &1117729748
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: Procedural Graphic Material
+  m_Shader: {fileID: 4800000, guid: 474347a7dd23a1743b7bdfa349be986b, type: 3}
+  m_ShaderKeywords: GRAPHIC_RENDERER_VERTEX_COLORS GRAPHIC_RENDERER_VERTEX_UV_0
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 28923817835943730, guid: 866b01c69fb16794993b65e77d5ed3f1,
+          type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1149906632
 GameObject:
   m_ObjectHideFlags: 0
@@ -933,7 +934,7 @@ GameObject:
   - component: {fileID: 1149906634}
   - component: {fileID: 1149906633}
   m_Layer: 0
-  m_Name: Mesh
+  m_Name: Blue Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1060,9 +1061,9 @@ MonoBehaviour:
       channel: 1
     - texture: {fileID: 2800000, guid: 7941f01ab879cfa4495b7e425293ddad, type: 3}
       channel: 1
-  _material: {fileID: 947005088}
-  _meshes: {fileID: 11400000, guid: 1878a71664f40e944a852acc8d18828d, type: 2}
-  _packedTextures: {fileID: 11400000, guid: 5de2c3f92c6614f4db2f4fe2660b32a4, type: 2}
+  _material: {fileID: 1117729748}
+  _meshes: {fileID: 11400000, guid: 8e9fc89bc6fe1c84cbb357be42f17766, type: 2}
+  _packedTextures: {fileID: 11400000, guid: 866b01c69fb16794993b65e77d5ed3f1, type: 2}
   _atlasUvs:
     _channel0:
       _keys:
@@ -1194,7 +1195,7 @@ MonoBehaviour:
   _useColor: 1
   _globalTint: {r: 1, g: 1, b: 1, a: 1}
   _shader: {fileID: 4800000, guid: 109077dfbfcd5f3469886d8b9ae4b056, type: 3}
-  _meshData: {fileID: 11400000, guid: c7ada96892a10764c9ed983fd13a1bbc, type: 2}
+  _meshData: {fileID: 11400000, guid: dca3f5db4bafedf4098607decf8dbcbd, type: 2}
   scale: 0.03
 --- !u!114 &1561875140
 MonoBehaviour:

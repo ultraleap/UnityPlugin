@@ -169,7 +169,7 @@ namespace Leap.Unity.GraphicalRenderer {
       //If the next graphic is going to put us over the limit, finish the current mesh
       //and start a new one.
       if (_generation.verts.Count + _generation.graphic.mesh.vertexCount > MeshUtil.MAX_VERT_COUNT) {
-        finishMesh();
+        finishAndAddMesh();
         beginMesh();
       }
 

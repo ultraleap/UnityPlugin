@@ -289,8 +289,10 @@ struct v2f_graphic_baked {
 
 #ifdef GRAPHIC_RENDERER_TINTING
 #define __APPLY_TINT(v,o) o.color *= GetGraphicTint(graphicId);
+#define __APPLY_SURF_TINT(v,o) v.color *= GetGraphicTint(graphicId);
 #else
 #define __APPLY_TINT(v,o)
+#define __APPLY_SURF_TINT(v,o)
 #endif
 
 #define APPLY_BAKED_GRAPHICS(v,o)                \
@@ -310,7 +312,7 @@ struct v2f_graphic_baked {
 {                                          \
   __APPLY_BLEND_SHAPES(v);                 \
   __APPLY_WARPING(v);                      \
-  __APPLY_TINT(v,o)                        \
+  __APPLY_SURF_TINT(v,o)                   \
 }
 
 #define DEFINE_FLOAT_CHANNEL(name) float name[GRAPHIC_MAX]

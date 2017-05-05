@@ -10,6 +10,9 @@ namespace Leap.Unity.GraphicalRenderer {
     [SerializeField]
     private List<Mesh> meshes = new List<Mesh>();
 
+    [System.NonSerialized]
+    private Queue<Mesh> _tempMeshPool = new Queue<Mesh>();
+
 #if UNITY_EDITOR
     protected override void OnAssetSaved() {
       base.OnAssetSaved();
@@ -31,9 +34,26 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public void Clear() {
       foreach (var mesh in meshes) {
-        DestroyImmediate(mesh, allowDestroyingAssets: true);
+        if (mesh != null) {
+          mesh.Clear();
+          _tempMeshPool.Enqueue(mesh);
+        }
       }
       meshes.Clear();
+    }
+
+    public Mesh GetMeshFromPoolOrNew() {
+      if (_tempMeshPool.Count > 0) {
+        return _tempMeshPool.Dequeue();
+      } else {
+        return new Mesh();
+      }
+    }
+
+    public void ClearPool() {
+      while (_tempMeshPool.Count > 0) {
+        DestroyImmediate(_tempMeshPool.Dequeue(), allowDestroyingAssets: true);
+      }
     }
 
     public void AddMesh(Mesh mesh) {
@@ -41,7 +61,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
       meshes.Add(mesh);
 #if UNITY_EDITOR
-      if (isSavedAsset) {
+      if (isSavedAsset && string.IsNullOrEmpty(AssetDatabase.GetAssetPath(mesh))) {
         AssetDatabase.AddObjectToAsset(mesh, this);
       }
 #endif

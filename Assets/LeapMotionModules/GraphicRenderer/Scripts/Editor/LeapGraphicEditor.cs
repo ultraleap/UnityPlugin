@@ -142,6 +142,10 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
         tempArray = new UnityEngine.Object[targets.Length];
       }
 
+      if (mainGraphic.attachedGroup != null) {
+        SpriteAtlasUtil.ShowInvalidSpriteWarning(mainGraphic.attachedGroup.features);
+      }
+
       int maxGraphics = LeapGraphicPreferences.graphicMax;
       if (targets.Query().Any(e => e.attachedGroup != null && e.attachedGroup.graphics.IndexOf(e) >= maxGraphics)) {
         string noun = targets.Length == 1 ? "This graphic" : "Some of these graphics";
@@ -184,7 +188,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
                 Select(e => e.featureData.Query().
                                           OfType(mainDataType).
                                           ElementAtOrDefault(typeIndex)).
-                NonNull().
+                ValidUnityObjs().
                 Cast<UnityEngine.Object>().
                 AppendList(tempList);
 
@@ -241,7 +245,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
   protected Bounds OnGetFrameBounds() {
     return targets.Query().
                    Select(e => e.editor.pickingMesh).
-                   NonNull().
+                   ValidUnityObjs().
                    Select(m => m.bounds).
                    Fold((a, b) => {
                      a.Encapsulate(b);

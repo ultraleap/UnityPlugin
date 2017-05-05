@@ -190,7 +190,9 @@ namespace Leap.Unity.GraphicalRenderer {
       SupportUtil.OnlySupportFirstFeature(features, info);
 
 #if UNITY_EDITOR
-      Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+      if (!Application.isPlaying) {
+        Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+      }
 
       for (int i = 0; i < features.Count; i++) {
         var feature = features[i];
@@ -410,7 +412,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     protected virtual void prepareMaterial() {
-      if (_material == null) {
+      if (_material == null || isHeavyUpdate) {
         _material = new Material(_shader);
       }
 
@@ -430,19 +432,7 @@ namespace Leap.Unity.GraphicalRenderer {
             var sprite = dataObj.sprite;
             if (sprite == null) continue;
 
-            Vector2[] uvs = SpriteAtlasUtil.GetAtlasedUvs(sprite);
-            float minX, minY, maxX, maxY;
-            minX = maxX = uvs[0].x;
-            minY = maxY = uvs[0].y;
-
-            for (int j = 1; j < uvs.Length; j++) {
-              minX = Mathf.Min(minX, uvs[j].x);
-              minY = Mathf.Min(minY, uvs[j].y);
-              maxX = Mathf.Max(maxX, uvs[j].x);
-              maxY = Mathf.Max(maxY, uvs[j].y);
-            }
-
-            Rect rect = Rect.MinMaxRect(minX, minY, maxX, maxY);
+            Rect rect = SpriteAtlasUtil.GetAtlasedRect(sprite);
             _atlasUvs.SetRect(spriteFeature.channel.Index(), sprite, rect);
           }
         }
@@ -494,8 +484,10 @@ namespace Leap.Unity.GraphicalRenderer {
           _generation.graphic = group.graphics[_generation.graphicIndex] as LeapMeshGraphicBase;
           buildGraphic();
         }
-        finishMesh();
+        finishAndAddMesh();
       }
+
+      _meshes.ClearPool();
     }
 
     protected virtual void buildGraphic() {
@@ -632,21 +624,30 @@ namespace Leap.Unity.GraphicalRenderer {
       return graphicVertToMeshVert(shapeVert) - originalVert;
     }
 
-    protected virtual void beginMesh() {
+    protected virtual void beginMesh(Mesh mesh = null) {
       Assert.IsNull(_generation.mesh, "Cannot begin a new mesh without finishing the current mesh.");
 
       _generation.Reset();
 
-      _generation.mesh = new Mesh();
-      _generation.mesh.name = "Procedural Graphic Mesh";
-      _generation.mesh.hideFlags = HideFlags.None;
+      if (mesh == null) {
+        mesh = _meshes.GetMeshFromPoolOrNew();
+      } else {
+        mesh.Clear();
+      }
+
+      mesh.name = "Procedural Graphic Mesh";
+      mesh.hideFlags = HideFlags.None;
+
+      _generation.mesh = mesh;
     }
 
     protected virtual void finishMesh() {
       using (new ProfilerSample("Finish Mesh")) {
         //If there is no data, don't actually do anything
         if (_generation.verts.Count == 0) {
-          DestroyImmediate(_generation.mesh);
+          if (!Application.isPlaying) {
+            DestroyImmediate(_generation.mesh, allowDestroyingAssets: true);
+          }
           _generation.mesh = null;
           return;
         }
@@ -671,7 +672,13 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         postProcessMesh();
+      }
+    }
 
+    protected virtual void finishAndAddMesh() {
+      finishMesh();
+
+      if (_generation.mesh != null) {
         _meshes.AddMesh(_generation.mesh);
         _generation.mesh = null;
       }

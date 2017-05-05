@@ -9,12 +9,18 @@ namespace Leap.Unity.GraphicalRenderer {
   public class DelayedAction : IDisposable {
     private Action _action;
     private float _delay;
-    private double _actionTime;
+    private int _minFrameDelay;
 
-    public DelayedAction(Action action, float delay = 0.15f) {
+    private double _actionTime;
+    private int _framesLeft;
+
+    public DelayedAction(Action action, float delay = 0.15f, int minFrameDelay = 3) {
       _action = action;
       _delay = delay;
+      _minFrameDelay = minFrameDelay;
+
       _actionTime = double.MaxValue;
+      _framesLeft = int.MaxValue;
 
       //TODO: make this class work at runtime too, will probably need to spawn monobehaviors
       //      so we can get update callbacks since there is no other way >_>
@@ -25,10 +31,13 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public void Reset() {
       _actionTime = currTime + _delay;
+      _framesLeft = _minFrameDelay;
     }
 
     private void update() {
-      if (currTime > _actionTime) {
+      _framesLeft--;
+
+      if (currTime > _actionTime && _framesLeft <= 0) {
         _action();
         _actionTime = double.MaxValue;
       }

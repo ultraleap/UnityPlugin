@@ -56,6 +56,18 @@ namespace Leap.Unity.GraphicalRenderer {
 
       drawScriptField();
 
+      bool anyVertexLit = false;
+      foreach (var camera in FindObjectsOfType<Camera>()) {
+        if (camera.actualRenderingPath == RenderingPath.VertexLit) {
+          anyVertexLit = true;
+          break;
+        }
+      }
+
+      if (anyVertexLit) {
+        EditorGUILayout.HelpBox("The vertex lit rendering path is not supported.", MessageType.Error);
+      }
+
       drawToolbar();
 
       if (_groupEditor != null) {
@@ -161,7 +173,7 @@ namespace Leap.Unity.GraphicalRenderer {
       return _renderer.groups.Query().
                          SelectMany(g => g.graphics.Query()).
                          Select(e => e.editor.pickingMesh).
-                         NonNull().
+                         ValidUnityObjs().
                          Select(m => m.bounds).
                          Fold((a, b) => {
                            a.Encapsulate(b);
