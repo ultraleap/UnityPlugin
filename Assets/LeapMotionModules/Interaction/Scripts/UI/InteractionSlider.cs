@@ -123,5 +123,12 @@ namespace Leap.Unity.Interaction {
                          Mathf.Clamp((localPhysicsPosition.y + desiredOffset.y), initialLocalPosition.y + _verticalSlideLimits.x, initialLocalPosition.y + _verticalSlideLimits.y),
                                      (localPhysicsPosition.z + desiredOffset.z));
     }
+
+    protected override void OnDrawGizmosSelected() {
+      base.OnDrawGizmosSelected();
+      Vector2 limits = (horizontalSlideLimits / transform.parent.lossyScale.x);
+      Gizmos.color = Color.blue;
+      Gizmos.DrawLine(transform.localPosition + (Vector3.right* limits.x), transform.localPosition + (Vector3.right * limits.y));
+    }
   }
 }

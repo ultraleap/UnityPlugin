@@ -287,7 +287,9 @@ namespace Leap.Unity.Interaction {
         }
 
         ProcessHoverCheckResults();
-        ProcessPrimaryHoverCheckResults();
+        if (_contactBehaviours.Count == 0) {
+          ProcessPrimaryHoverCheckResults();
+        }
 
         ISpaceComponent space;
         if (_hand != null) {
