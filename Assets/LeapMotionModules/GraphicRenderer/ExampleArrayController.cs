@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity.Query;
 using Leap.Unity.GraphicalRenderer;
@@ -7,10 +6,7 @@ using Leap.Unity.GraphicalRenderer;
 public class ExampleArrayController : MonoBehaviour {
 
   [SerializeField]
-  private AnimationCurve _blendShapeCurve;
-
-  [SerializeField]
-  private float _cubeRise = 0.1f;
+  private AnimationCurve _motionCurve;
 
   [SerializeField]
   private Gradient _gradient;
@@ -30,23 +26,23 @@ public class ExampleArrayController : MonoBehaviour {
   private void Update() {
     Random.InitState(0);
 
-    float fade = Mathf.Clamp01(Time.time - 0.5f);
+    float fade = Mathf.Clamp01(Time.time * 0.5f - 0.5f);
 
     for (int i = 0; i < _graphics.Count; i++) {
       _graphics[i].transform.localPosition = _originalPositions[i];
 
-      float d = fade * 10 * noise(_graphics[i].transform.position, 42.0f, 0.8f);
-      float n = noise(_graphics[i].transform.position * 2, 23, 0.35f);
-      float bn = fade * _blendShapeCurve.Evaluate(n);
+      float a = fade * 10 * noise(_graphics[i].transform.position, 42.0f, 0.8f);
+      float b = noise(_graphics[i].transform.position * 1.7f, 23, 0.35f);
+      float c = fade * _motionCurve.Evaluate(b);
+      float d = fade * (c * 0.1f + a * (c * 0.03f + 0.01f) + _graphics[i].transform.position.z * 0.14f);
 
-      _blendShapeData[i].amount = bn;
-      _graphics[i].transform.localPosition += Vector3.up * (bn * _cubeRise + d * (bn * 0.03f + 0.01f));
-      _tintData[i].color = fade * _gradient.Evaluate(n);
+      _blendShapeData[i].amount = c;
+      _graphics[i].transform.localPosition += Vector3.up * d;
+      _tintData[i].color = fade * _gradient.Evaluate(b);
     }
   }
 
   private float noise(Vector3 offset, float seed, float speed) {
-
     float x1 = seed * 23.1239879f;
     float y1 = seed * 82.1239812f;
     x1 -= (int)x1;
@@ -64,6 +60,4 @@ public class ExampleArrayController : MonoBehaviour {
     return Mathf.PerlinNoise(offset.x + x1 + Time.time * speed, offset.z + y1 + Time.time * speed) * 0.5f +
            Mathf.PerlinNoise(offset.x + x2 - Time.time * speed, offset.z + y2 - Time.time * speed) * 0.5f;
   }
-
-
 }
