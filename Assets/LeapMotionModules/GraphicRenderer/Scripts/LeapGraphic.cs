@@ -129,7 +129,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// Called to notify that this graphic will be attached within the next frame.
     /// This is only called at runtime.
     /// </summary>
-    public virtual void NotifyWillbeAttached(LeapGraphicGroup toBeAttachedTo) {
+    public virtual void NotifyWillBeAttached(LeapGraphicGroup toBeAttachedTo) {
       Assert.AreEqual(_notificationState, NotificationState.None);
       Assert.IsNull(_groupToBeAttachedTo);
 
@@ -141,7 +141,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// Called to notify that a previous notification that this graphic would be
     /// attached has been canceled due to a call to TryRemoveGraphic.
     /// </summary>
-    public virtual void CancelWillbeAttached() {
+    public virtual void CancelWillBeAttached() {
       Assert.AreEqual(_notificationState, NotificationState.WillBeAttached);
       Assert.IsNotNull(_groupToBeAttachedTo);
 
