@@ -37,10 +37,11 @@
       }
       
       fixed4 frag (v2f_graphic_dynamic i) : SV_Target {
-        fixed4 color = tex2D(_MainTex, i.uv_0);
-
 #ifdef GRAPHICS_HAVE_COLOR
-        color *= i.color;
+        fixed4 color = i.color;
+        color.a *= tex2D(_MainTex, i.uv_0).a;
+#else
+        fixed4 color = tex2D(_MainTex, i.uv_0);
 #endif
 
         return color;

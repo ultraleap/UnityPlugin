@@ -24,6 +24,7 @@ namespace Leap.Unity.GraphicalRenderer {
   ISupportsFeature<LeapRuntimeTintFeature> {
     public const string DEFAULT_FONT = "Arial.ttf";
     public const string DEFAULT_SHADER = "Leap Motion/Graphic Renderer/Text/Dynamic";
+    public const float SCALE_CONSTANT = 0.001f;
 
     [Header("Text Settings")]
     [SerializeField]
@@ -41,7 +42,7 @@ namespace Leap.Unity.GraphicalRenderer {
     private Shader _shader;
 
     [SerializeField]
-    private float _scale = 0.1f;
+    private float _scale = 1f;
 
     [SerializeField]
     private RendererMeshData _meshData;
@@ -210,7 +211,7 @@ namespace Leap.Unity.GraphicalRenderer {
       var textGraphic = graphic as LeapTextGraphic;
       var text = textGraphic.text;
 
-      float _charScale = this._scale / _dynamicPixelsPerUnit;
+      float _charScale = this._scale * SCALE_CONSTANT / _dynamicPixelsPerUnit;
       float _scale = _charScale * graphic.fontSize / _font.fontSize;
       float lineHeight = _scale * textGraphic.lineSpacing * _font.lineHeight * _dynamicPixelsPerUnit;
 
