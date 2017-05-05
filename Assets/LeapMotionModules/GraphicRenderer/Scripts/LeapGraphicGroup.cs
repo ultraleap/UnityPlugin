@@ -261,6 +261,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
         for (int i = 0; i < _graphics.Count; i++) {
           var graphic = _graphics[i];
+          EditorUtility.SetDirty(graphic);
+          Undo.RecordObject(graphic, "modified feature data on graphic.");
 
           List<LeapFeatureData> dataList = new List<LeapFeatureData>();
           foreach (var feature in _features) {
