@@ -200,9 +200,15 @@ struct appdata_graphic_dynamic {
 #define SURF_INPUT_GRAPHICAL    \
   __V2F_COLOR
 
-struct v2f_graphic_dynamic {
-  V2F_GRAPHICAL
-};
+#ifdef GRAPHIC_RENDERER_VERTEX_COLORS
+#define SURF_INPUT_GRAPHICAL float4 color : COLOR;
+#else
+#ifdef GRAPHICS_HAVE_COLOR
+#define SURF_INPUT_GRAPHICAL float4 color;
+#else
+#define SURF_INPUT_GRAPHICAL
+#endif
+#endif
 
 
 #ifdef GRAPHICS_HAVE_ID
@@ -287,7 +293,13 @@ struct v2f_graphic_dynamic {
 
 #ifdef GRAPHIC_RENDERER_TINTING
 #define __APPLY_TINT(v,o) o.color *= GetGraphicTint(graphicId);
+
+#ifdef GRAPHIC_RENDERER_VERTEX_COLORS
 #define __APPLY_SURF_TINT(v,o) v.color *= GetGraphicTint(graphicId);
+#else
+#define __APPLY_SURF_TINT(v,o) o.color = GetGraphicTint(graphicId);
+#endif
+
 #else
 #define __APPLY_TINT(v,o)
 #define __APPLY_SURF_TINT(v,o)

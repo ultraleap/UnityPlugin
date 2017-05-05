@@ -1,4 +1,6 @@
 #include "Assets/LeapMotionModules/GraphicRenderer/Resources/GraphicRenderer.cginc"
+// Upgrade NOTE: excluded shader from DX11; has structs without semantics (struct v2f_graphic_baked members color)
+#pragma exclude_renderers d3d11
 
 #ifdef GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS
 #define GRAPHICS_HAVE_ID
@@ -224,8 +226,15 @@ struct appdata_graphic_baked {
   __V2F_UV2                     \
   __V2F_COLOR
 
-#define SURF_INPUT_GRAPHICAL    \
-  __V2F_COLOR
+#ifdef GRAPHIC_RENDERER_VERTEX_COLORS
+#define SURF_INPUT_GRAPHICAL float4 color : COLOR;
+#else
+#ifdef GRAPHICS_HAVE_COLOR
+#define SURF_INPUT_GRAPHICAL float4 color;
+#else
+#define SURF_INPUT_GRAPHICAL
+#endif
+#endif
 
 struct v2f_graphic_baked {
   V2F_GRAPHICAL
@@ -289,7 +298,13 @@ struct v2f_graphic_baked {
 
 #ifdef GRAPHIC_RENDERER_TINTING
 #define __APPLY_TINT(v,o) o.color *= GetGraphicTint(graphicId);
+
+#ifdef GRAPHIC_RENDERER_VERTEX_COLORS
 #define __APPLY_SURF_TINT(v,o) v.color *= GetGraphicTint(graphicId);
+#else
+#define __APPLY_SURF_TINT(v,o) o.color = GetGraphicTint(graphicId);
+#endif
+
 #else
 #define __APPLY_TINT(v,o)
 #define __APPLY_SURF_TINT(v,o)

@@ -11,11 +11,17 @@
     #pragma surface surf Standard fullforwardshadows vertex:vert addshadow 
     #pragma target 3.0
 
-    #define GRAPHIC_RENDERER_VERTEX_UV_0
-    #define GRAPHIC_RENDERER_VERTEX_NORMALS
-    #define GRAPHIC_RENDERER_MOVEMENT_TRANSLATION
+    
+    #define GRAPHIC_RENDERER_VERTEX_NORMALS //surface shaders always need normals
+    #define GRAPHIC_RENDERER_VERTEX_UV_0    //surface shaders always need uv0
 
     #pragma shader_feature _ GRAPHIC_RENDERER_CYLINDRICAL GRAPHIC_RENDERER_SPHERICAL
+    #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_1
+    #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_2
+    #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
+    #pragma shader_feature _ GRAPHIC_RENDERER_MOVEMENT_TRANSLATION GRAPHIC_RENDERER_MOVEMENT_FULL
+    #pragma shader_feature _ GRAPHIC_RENDERER_TINTING
+    #pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
     #include "Assets/LeapMotionModules/GraphicRenderer/Resources/BakedRenderer.cginc"
     #include "UnityCG.cginc"
 
@@ -33,7 +39,12 @@
     }
 
     void surf (Input IN, inout SurfaceOutputStandard o) {
-      o.Albedo = tex2D(_MainTex, IN.uv_MainTex).rgb;
+      fixed4 color = tex2D(_MainTex, IN.uv_MainTex);
+#ifdef GRAPHICS_HAVE_COLOR
+      color *= IN.color;
+#endif
+
+      o.Albedo = color.rgb;
     }
     ENDCG
   }
