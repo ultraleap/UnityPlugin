@@ -15,7 +15,7 @@ public class ExampleArray : MonoBehaviour {
       return;
     }
 
-    if (update) {
+    if (!update) {
       return;
     }
     update = false;
@@ -42,6 +42,15 @@ public class ExampleArray : MonoBehaviour {
     }
   }
 
+  private List<Vector3> _originalPositions = new List<Vector3>();
+
+  private void Start() {
+    for (int i = 0; i < transform.childCount; i++) {
+      var graphic = transform.GetChild(i).GetComponent<LeapGraphic>();
+      _originalPositions.Add(graphic.transform.localPosition);
+    }
+  }
+
   private void Update() {
     Random.InitState(0);
     for (int i = 0; i < transform.childCount; i++) {
@@ -49,8 +58,8 @@ public class ExampleArray : MonoBehaviour {
 
       float offset = graphic.transform.localPosition.magnitude;
 
-      Vector3 axis = Random.onUnitSphere;
-      graphic.transform.localRotation = Quaternion.AngleAxis(720 * Mathf.PerlinNoise(offset * Time.time, offset * 2 * Time.time), axis);
+      Vector3 axis = _originalPositions[i].normalized;
+      graphic.transform.localPosition = _originalPositions[i] + axis * Mathf.PerlinNoise(offset * 1.235f + Time.time * 0.01f, offset * 2.1231234f + Time.time * 0.01f) * 0.5f;
     }
   }
 
