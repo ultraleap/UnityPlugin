@@ -73,7 +73,7 @@ namespace Leap.Unity.Interaction {
       rigidbody.position = _physicsPosition;
 
       // Initialize Limits
-      minMaxHeight /= transform.parent.lossyScale.z;
+      //minMaxHeight /= transform.parent.lossyScale.z;
 
       //Add a custom grasp controller
       OnGraspedMovement += Grasping;
@@ -117,7 +117,7 @@ namespace Leap.Unity.Interaction {
         if (isDepressed && isPrimaryHovered && _lastDepressor != null) {
           Vector3 curLocalDepressorPos = transform.parent.InverseTransformPoint(_lastDepressor.position);
           Vector3 origLocalDepressorPos = transform.parent.InverseTransformPoint(transform.TransformPoint(_localDepressorPosition));
-          localPhysicsVelocity = Vector3.back * 0.05f / transform.parent.lossyScale.z;
+          localPhysicsVelocity = Vector3.back * 0.05f;
           localPhysicsPosition = GetDepressedConstrainedLocalPosition(curLocalDepressorPos - origLocalDepressorPos);
         } else {
           localPhysicsVelocity += _springForce * Vector3.forward * (initialLocalPosition.z - Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight) - localPhysicsPosition.z) / Time.fixedDeltaTime;
@@ -198,10 +198,10 @@ namespace Leap.Unity.Interaction {
     }
 
     public void setMinHeight(float minHeight) {
-      minMaxHeight = new Vector2(Mathf.Min(minMaxHeight.y, minHeight / transform.parent.lossyScale.z), minMaxHeight.y);
+      minMaxHeight = new Vector2(Mathf.Min(minMaxHeight.y, minHeight), minMaxHeight.y);
     }
     public void setMaxHeight(float maxHeight) {
-      minMaxHeight = new Vector2(minMaxHeight.x, Mathf.Max(minMaxHeight.x, maxHeight / transform.parent.lossyScale.z));
+      minMaxHeight = new Vector2(minMaxHeight.x, Mathf.Max(minMaxHeight.x, maxHeight));
     }
 
     protected override void OnDisable() {
@@ -216,15 +216,22 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void OnDrawGizmosSelected() {
       Gizmos.matrix = transform.parent.localToWorldMatrix;
-      Vector2 heights = (minMaxHeight / transform.parent.lossyScale.z);
+      Vector2 heights = minMaxHeight;
+      Vector3 originPosition = Application.isPlaying ? initialLocalPosition : transform.localPosition;
+
       Gizmos.color = Color.red;
-      Gizmos.DrawLine(transform.localPosition + (Vector3.back * heights.x), transform.localPosition + (Vector3.back * heights.y));
+      Gizmos.DrawLine(originPosition + (Vector3.back * heights.x), originPosition + (Vector3.back * heights.y));
       Gizmos.color = Color.green;
-      Gizmos.DrawLine(transform.localPosition + (Vector3.back * heights.x), transform.localPosition + (Vector3.back * Mathf.Lerp(heights.x,heights.y, restingHeight)));
+      Gizmos.DrawLine(originPosition + (Vector3.back * heights.x), originPosition + (Vector3.back * Mathf.Lerp(heights.x,heights.y, restingHeight)));
     }
 
     void Reset() {
       contactForceMode = ContactForceMode.UI;
+    }
+
+    Vector3 EvaluateTrajectory(Vector3 initialPosition, Vector3 initialVelocity, float initialTime, float timeToEvaluate) {
+      float t = timeToEvaluate - initialTime;
+      return initialPosition + (initialVelocity * t) + (0.5f * Physics.gravity * t * t);
     }
   }
 }
