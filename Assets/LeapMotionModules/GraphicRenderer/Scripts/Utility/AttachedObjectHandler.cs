@@ -1,4 +1,13 @@
-﻿using System.Collections.Generic;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -72,14 +81,14 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public static void Validate<T, K>(T t, List<K> ks) where T : Component where K : Component {
-      K mainK = ks.Query().NonNull().FirstOrDefault();
+      K mainK = ks.Query().ValidUnityObjs().FirstOrDefault();
 
       if (mainK == null) {
         return;
       }
 
       GameObject mainKObj = mainK.gameObject;
-      if (ks.Query().NonNull().Any(k => k.gameObject != mainKObj)) {
+      if (ks.Query().ValidUnityObjs().Any(k => k.gameObject != mainKObj)) {
         Debug.LogError("Could not validate attached objects because they were on different gameObjects");
         return;
       }

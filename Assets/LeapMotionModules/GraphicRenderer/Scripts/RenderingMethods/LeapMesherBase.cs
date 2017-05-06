@@ -1,4 +1,13 @@
-﻿using System;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -78,8 +87,12 @@ namespace Leap.Unity.GraphicalRenderer {
     private bool _useNormals = false;
 
     //BEGIN RENDERING SETTINGS
-    [SerializeField]
+    [EditTimeOnly, SerializeField]
     protected Shader _shader;
+
+    [Tooltip("The layer that the visual representation of the graphics.  It is independent from the layer the graphics occupy.")]
+    [SerializeField]
+    private SingleLayer _visualLayer = 0;
 
     [SerializeField]
     private AtlasBuilder _atlas = new AtlasBuilder();
@@ -114,6 +127,8 @@ namespace Leap.Unity.GraphicalRenderer {
     //#### Sprite/Texture Remapping ####
     [SerializeField, HideInInspector]
     private AtlasUvs _atlasUvs;
+    [NonSerialized]
+    protected MaterialPropertyBlock _spriteTextureBlock;
 
     //#### Tinting ####
     protected const string TINTS_PROPERTY = LeapGraphicRenderer.PROPERTY_PREFIX + "Tints";
@@ -138,13 +153,11 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public virtual void RebuildAtlas(ProgressBar progress) {
-      progress.Begin(2, "Rebuilding Atlas", "", () => {
-        CreateOrSave(ref _packedTextures, TEXTURE_ASSET_NAME);
+      Undo.RecordObject(renderer, "Rebuilt atlas");
 
+      progress.Begin(2, "Rebuilding Atlas", "", () => {
         Texture2D[] packedTextures;
         _atlas.RebuildAtlas(progress, out packedTextures, out _atlasUvs);
-
-
 
         progress.Begin(3, "", "", () => {
           progress.Step("Post-Process Atlas");
@@ -190,7 +203,9 @@ namespace Leap.Unity.GraphicalRenderer {
       SupportUtil.OnlySupportFirstFeature(features, info);
 
 #if UNITY_EDITOR
-      Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+      if (!Application.isPlaying) {
+        Packer.RebuildAtlasCacheIfNeeded(EditorUserBuildSettings.activeBuildTarget);
+      }
 
       for (int i = 0; i < features.Count; i++) {
         var feature = features[i];
@@ -252,18 +267,18 @@ namespace Leap.Unity.GraphicalRenderer {
 #if UNITY_EDITOR
     public override void OnDisableRendererEditor() {
       base.OnDisableRendererEditor();
-
-      SceneTiedAsset.Delete(ref _meshes);
-      SceneTiedAsset.Delete(ref _packedTextures);
     }
 
-    public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
-      base.OnUpdateRendererEditor(isHeavyUpdate);
+    public override void OnUpdateRendererEditor() {
+      base.OnUpdateRendererEditor();
 
-      CreateOrSave(ref _meshes, MESH_ASSET_NAME);
-      CreateOrSave(ref _packedTextures, TEXTURE_ASSET_NAME);
+      _meshes.Validate(this);
+      _packedTextures.Validate(this);
 
       setupForBuilding();
+
+      PreventDuplication(ref _material);
+
       buildMesh();
     }
 #endif
@@ -414,12 +429,21 @@ namespace Leap.Unity.GraphicalRenderer {
         _material = new Material(_shader);
       }
 
+#if UNITY_EDITOR
+      Undo.RecordObject(_material, "Touched material");
+#endif
+
       _material.shader = _shader;
       _material.name = "Procedural Graphic Material";
 
       foreach (var keyword in _material.shaderKeywords) {
         _material.DisableKeyword(keyword);
       }
+
+      if (_spriteTextureBlock == null) {
+        _spriteTextureBlock = new MaterialPropertyBlock();
+      }
+      _spriteTextureBlock.Clear();
     }
 
     protected virtual void extractSpriteRects() {
@@ -430,19 +454,7 @@ namespace Leap.Unity.GraphicalRenderer {
             var sprite = dataObj.sprite;
             if (sprite == null) continue;
 
-            Vector2[] uvs = SpriteAtlasUtil.GetAtlasedUvs(sprite);
-            float minX, minY, maxX, maxY;
-            minX = maxX = uvs[0].x;
-            minY = maxY = uvs[0].y;
-
-            for (int j = 1; j < uvs.Length; j++) {
-              minX = Mathf.Min(minX, uvs[j].x);
-              minY = Mathf.Min(minY, uvs[j].y);
-              maxX = Mathf.Max(maxX, uvs[j].x);
-              maxY = Mathf.Max(maxY, uvs[j].y);
-            }
-
-            Rect rect = Rect.MinMaxRect(minX, minY, maxX, maxY);
+            Rect rect = SpriteAtlasUtil.GetAtlasedRect(sprite);
             _atlasUvs.SetRect(spriteFeature.channel.Index(), sprite, rect);
           }
         }
@@ -455,27 +467,22 @@ namespace Leap.Unity.GraphicalRenderer {
           var tex = spriteFeature.featureData.Query().
                                        Select(d => d.sprite).
                                        Where(s => s != null).
-                                       Select(s => {
 #if UNITY_EDITOR
-                                         var atlas = SpriteUtility.GetSpriteTexture(s, getAtlasData: true);
-
-                                         //Cannot reference atlas texture in material at runtime because it doesn't
-                                         //actually exist as an asset, so we create a direct copy of the atlas
-                                         //instead for preview.  We don't save it, then load the correct atlas 
-                                         //at runtime.
-                                         var safeAtlas = new Texture2D(atlas.width, atlas.height, atlas.format, atlas.mipmapCount > 1);
-                                         safeAtlas.name = "Temp atlas texture";
-                                         safeAtlas.hideFlags = HideFlags.HideAndDontSave;
-                                         Graphics.CopyTexture(atlas, safeAtlas);
-                                         return safeAtlas;
+                                       Select(s => SpriteUtility.GetSpriteTexture(s, getAtlasData: true)).
 #else
-                                         return s.texture;
+                                       Select(s => s.texture).
 #endif
-                                       }).
                                        FirstOrDefault();
 
           if (tex != null) {
-            _material.SetTexture(spriteFeature.propertyName, tex);
+#if UNITY_EDITOR
+            if (!Application.isPlaying) {
+              _spriteTextureBlock.SetTexture(spriteFeature.propertyName, tex);
+            } else
+#endif
+            {
+              _material.SetTexture(spriteFeature.propertyName, tex);
+            }
           }
         }
       }
@@ -486,6 +493,7 @@ namespace Leap.Unity.GraphicalRenderer {
     protected virtual void buildMesh() {
       using (new ProfilerSample("Build Mesh")) {
         beginMesh();
+
         for (_generation.graphicIndex = 0;
              _generation.graphicIndex < group.graphics.Count;
              _generation.graphicIndex++) {
@@ -494,8 +502,13 @@ namespace Leap.Unity.GraphicalRenderer {
           _generation.graphic = group.graphics[_generation.graphicIndex] as LeapMeshGraphicBase;
           buildGraphic();
         }
-        finishMesh();
+
+        if (_generation.isGenerating) {
+          finishAndAddMesh();
+        }
       }
+
+      _meshes.ClearPool();
     }
 
     protected virtual void buildGraphic() {
@@ -632,21 +645,30 @@ namespace Leap.Unity.GraphicalRenderer {
       return graphicVertToMeshVert(shapeVert) - originalVert;
     }
 
-    protected virtual void beginMesh() {
+    protected virtual void beginMesh(Mesh mesh = null) {
       Assert.IsNull(_generation.mesh, "Cannot begin a new mesh without finishing the current mesh.");
 
       _generation.Reset();
 
-      _generation.mesh = new Mesh();
-      _generation.mesh.name = "Procedural Graphic Mesh";
-      _generation.mesh.hideFlags = HideFlags.None;
+      if (mesh == null) {
+        mesh = _meshes.GetMeshFromPoolOrNew();
+      } else {
+        mesh.Clear();
+      }
+
+      mesh.name = "Procedural Graphic Mesh";
+      mesh.hideFlags = HideFlags.None;
+
+      _generation.mesh = mesh;
     }
 
-    protected virtual void finishMesh() {
+    protected virtual void finishMesh(bool deleteEmptyMeshes = true) {
       using (new ProfilerSample("Finish Mesh")) {
-        //If there is no data, don't actually do anything
-        if (_generation.verts.Count == 0) {
-          DestroyImmediate(_generation.mesh);
+
+        if (_generation.verts.Count == 0 && deleteEmptyMeshes) {
+          if (!Application.isPlaying) {
+            UnityEngine.Object.DestroyImmediate(_generation.mesh, allowDestroyingAssets: true);
+          }
           _generation.mesh = null;
           return;
         }
@@ -671,7 +693,13 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         postProcessMesh();
+      }
+    }
 
+    protected virtual void finishAndAddMesh(bool deleteEmptyMeshes = true) {
+      finishMesh(deleteEmptyMeshes);
+
+      if (_generation.mesh != null) {
         _meshes.AddMesh(_generation.mesh);
         _generation.mesh = null;
       }
@@ -690,6 +718,12 @@ namespace Leap.Unity.GraphicalRenderer {
       public List<int> tris;
       public List<Color> colors;
       public List<Vector4>[] uvs;
+
+      public bool isGenerating {
+        get {
+          return mesh != null;
+        }
+      }
 
       public static GenerationState GetGenerationState() {
         GenerationState state = new GenerationState();
@@ -751,6 +785,17 @@ namespace Leap.Unity.GraphicalRenderer {
           return _useUv3;
         default:
           throw new ArgumentException("Invalid channel argument.");
+      }
+    }
+
+    protected void drawMesh(Mesh mesh, Matrix4x4 transform) {
+#if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        Graphics.DrawMesh(mesh, transform, _material, _visualLayer, null, 0, _spriteTextureBlock);
+      } else
+#endif
+      {
+        Graphics.DrawMesh(mesh, transform, _material, _visualLayer);
       }
     }
 

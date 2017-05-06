@@ -1,4 +1,13 @@
-﻿using System.Collections.Generic;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Leap.Unity.Space;
@@ -49,13 +58,13 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         for (int i = 0; i < topology.verts.Length; i++) {
-          Vector3 localRectVert = _meshGraphic.attachedGroup.transform.InverseTransformPoint(_meshGraphic.transform.TransformPoint(topology.verts[i]));
+          Vector3 localRectVert = _meshGraphic.attachedGroup.renderer.transform.InverseTransformPoint(_meshGraphic.transform.TransformPoint(topology.verts[i]));
 
           if (transformer != null) {
             localRectVert = transformer.TransformPoint(localRectVert);
           }
 
-          localRectVert = _meshGraphic.attachedGroup.transform.TransformPoint(localRectVert);
+          localRectVert = _meshGraphic.attachedGroup.renderer.transform.TransformPoint(localRectVert);
 
           pickingVerts.Add(localRectVert);
         }

@@ -1,34 +1,56 @@
-﻿using System.Collections.Generic;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using Leap.Unity.Space;
 using Leap.Unity.Query;
-using System;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
 
   [LeapGraphicTag("Text")]
-  [AddComponentMenu("")]
+  [Serializable]
   public class LeapTextRenderer : LeapRenderingMethod<LeapTextGraphic>,
   ISupportsFeature<LeapRuntimeTintFeature> {
+    public const string DEFAULT_FONT = "Arial.ttf";
+    public const string DEFAULT_SHADER = "Leap Motion/Graphic Renderer/Text/Dynamic";
+    public const float SCALE_CONSTANT = 0.001f;
 
     [Header("Text Settings")]
-    [SerializeField]
+    [EditTimeOnly, SerializeField]
     private Font _font;
 
-    [SerializeField]
+    [EditTimeOnly, SerializeField]
     private float _dynamicPixelsPerUnit = 1.0f;
 
+    [EditTimeOnly, SerializeField]
     public bool _useColor = true;
 
+    [EditTimeOnly, SerializeField]
     public Color _globalTint = Color.white;
 
     [Header("Rendering Settings")]
-    [SerializeField]
+    [EditTimeOnly, SerializeField]
     private Shader _shader;
 
-    [SerializeField, HideInInspector]
+    [EditTimeOnly, SerializeField]
+    private float _scale = 1f;
+
+    [SerializeField]
     private RendererMeshData _meshData;
 
+    [SerializeField]
     private Material _material;
 
     //Curved space
@@ -85,8 +107,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
             Vector3 localPos = renderer.transform.InverseTransformPoint(graphic.transform.position);
 
-            Matrix4x4 mainTransform = transform.localToWorldMatrix * transformer.GetTransformationMatrix(localPos);
-            Matrix4x4 deform = transform.worldToLocalMatrix * Matrix4x4.TRS(transform.position - graphic.transform.position, Quaternion.identity, Vector3.one) * graphic.transform.localToWorldMatrix;
+            Matrix4x4 mainTransform = renderer.transform.localToWorldMatrix * transformer.GetTransformationMatrix(localPos);
+            Matrix4x4 deform = renderer.transform.worldToLocalMatrix * Matrix4x4.TRS(renderer.transform.position - graphic.transform.position, Quaternion.identity, Vector3.one) * graphic.transform.localToWorldMatrix;
             Matrix4x4 total = mainTransform * deform;
 
             _curved_graphicParameters.Add((transformer as IRadialTransformer).GetVectorRepresentation(graphic.transform));
@@ -98,7 +120,7 @@ namespace Leap.Unity.GraphicalRenderer {
         using (new ProfilerSample("Upload Material Data")) {
           _material.SetFloat(SpaceProperties.RADIAL_SPACE_RADIUS, curvedSpace.radius);
           _material.SetMatrixArraySafe("_GraphicRendererCurved_WorldToAnchor", _curved_worldToAnchor);
-          _material.SetMatrix("_GraphicRenderer_LocalToWorld", transform.localToWorldMatrix);
+          _material.SetMatrix("_GraphicRenderer_LocalToWorld", renderer.transform.localToWorldMatrix);
           _material.SetVectorArraySafe("_GraphicRendererCurved_GraphicParameters", _curved_graphicParameters);
         }
 
@@ -111,21 +133,32 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
 #if UNITY_EDITOR
-    public override void OnUpdateRendererEditor(bool isHeavyUpdate) {
-      base.OnUpdateRendererEditor(isHeavyUpdate);
+    public override void OnEnableRendererEditor() {
+      base.OnEnableRendererEditor();
+
+      _font = Resources.GetBuiltinResource<Font>(DEFAULT_FONT);
+      _shader = Shader.Find(DEFAULT_SHADER);
+    }
+
+    public override void OnUpdateRendererEditor() {
+      base.OnUpdateRendererEditor();
 
       if (_font == null) {
-        return;
+        _font = Resources.GetBuiltinResource<Font>(DEFAULT_FONT);
       }
 
       if (_shader == null) {
-        return;
+        _shader = Shader.Find(DEFAULT_SHADER);
       }
 
-      CreateOrSave(ref _meshData, "Text Mesh Data");
+      _meshData.Validate(this);
 
       //Make sure we have enough meshes to render all our graphics
-      _meshData.Clear();
+      while (_meshData.Count > group.graphics.Count) {
+        UnityEngine.Object.DestroyImmediate(_meshData[_meshData.Count - 1]);
+        _meshData.RemoveMesh(_meshData.Count - 1);
+      }
+
       while (_meshData.Count < group.graphics.Count) {
         _meshData.AddMesh(new Mesh());
       }
@@ -135,8 +168,15 @@ namespace Leap.Unity.GraphicalRenderer {
 #endif
 
     private void generateMaterial() {
-      _material = Instantiate(_font.material);
-      _material.hideFlags = HideFlags.HideAndDontSave;
+      if (_material == null) {
+        _material = new Material(_font.material);
+      }
+
+#if UNITY_EDITOR
+      Undo.RecordObject(_material, "Touched material");
+#endif
+
+      //_material.mainTexture = _font.material.mainTexture;
       _material.name = "Font material";
       _material.shader = _shader;
 
@@ -157,8 +197,6 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    public float scale = 0.1f;
-
     private List<TextWrapper.Line> _tempLines = new List<TextWrapper.Line>();
     private List<Vector3> _verts = new List<Vector3>();
     private List<Vector4> _uvs = new List<Vector4>();
@@ -176,7 +214,7 @@ namespace Leap.Unity.GraphicalRenderer {
       var textGraphic = graphic as LeapTextGraphic;
       var text = textGraphic.text;
 
-      float _charScale = scale / _dynamicPixelsPerUnit;
+      float _charScale = this._scale * SCALE_CONSTANT / _dynamicPixelsPerUnit;
       float _scale = _charScale * graphic.fontSize / _font.fontSize;
       float lineHeight = _scale * textGraphic.lineSpacing * _font.lineHeight * _dynamicPixelsPerUnit;
 

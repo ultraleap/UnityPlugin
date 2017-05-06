@@ -1,4 +1,13 @@
-﻿using UnityEngine;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
 using UnityEngine.Rendering;
 using Leap.Unity.Attributes;
 
@@ -38,11 +47,11 @@ namespace Leap.Unity.GraphicalRenderer {
                                                  UVChannelFlags.UV3;
 
     public void SetMesh(Mesh mesh) {
-      if (isAttachedToGroup) {
-        Debug.LogError("Cannot set mesh while attached to group, detach it first.");
-        return;
+      if (isAttachedToGroup && !attachedGroup.addRemoveSupported) {
+        Debug.LogWarning("Changing the representation of the graphic is not supported by this rendering type");
       }
 
+      isRepresentationDirty = true;
       _mesh = mesh;
     }
 

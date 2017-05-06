@@ -1,4 +1,13 @@
-﻿using System;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -21,22 +30,21 @@ namespace Leap.Unity.GraphicalRenderer {
 #if UNITY_EDITOR
     public readonly EditorApi editor;
 
+    [ContextMenu("Show all hidden objects (INTERNAL)")]
+    private void showAllHiddenObjects() {
+      foreach (var obj in FindObjectsOfType<UnityEngine.Object>()) {
+        obj.hideFlags = HideFlags.None;
+      }
+    }
+
     public class EditorApi {
       private LeapGraphicRenderer _renderer;
 
       [NonSerialized]
       private Hash _previousHierarchyHash;
 
-      private DelayedAction _delayedHeavyRebuild;
-
       public EditorApi(LeapGraphicRenderer renderer) {
         _renderer = renderer;
-
-        _delayedHeavyRebuild = new DelayedAction(() => {
-          if (!InternalUtility.IsPrefab(_renderer)) {
-            DoEditorUpdateLogic(fullRebuild: true, heavyRebuild: true);
-          }
-        });
         InternalUtility.OnAnySave += onAnySave;
       }
 
@@ -51,51 +59,24 @@ namespace Leap.Unity.GraphicalRenderer {
 
         validateSpaceComponent();
 
-        AttachedObjectHandler.Validate(_renderer, _renderer._groups);
-
         foreach (var group in _renderer._groups) {
           group.editor.OnValidate();
         }
-
-        UnityEditor.EditorApplication.delayCall += () => {
-          if (_renderer == null) {
-            return;
-          }
-
-          //Destroy any features that are not referenced by a group
-          var referenced = Pool<HashSet<LeapGraphicFeatureBase>>.Spawn();
-          var attached = Pool<List<LeapGraphicFeatureBase>>.Spawn();
-          try {
-            foreach (var group in _renderer._groups) {
-              referenced.UnionWith(group.features);
-            }
-
-            _renderer.GetComponents(attached);
-            for (int i = attached.Count; i-- != 0;) {
-              if (!referenced.Contains(attached[i])) {
-                InternalUtility.Destroy(attached[i]);
-              }
-            }
-          } finally {
-            referenced.Clear();
-            attached.Clear();
-            Pool<HashSet<LeapGraphicFeatureBase>>.Recycle(referenced);
-            Pool<List<LeapGraphicFeatureBase>>.Recycle(attached);
-          }
-        };
       }
 
       public void OnDestroy() {
         InternalUtility.OnAnySave -= onAnySave;
-        _delayedHeavyRebuild.Dispose();
+
+        foreach (var group in _renderer._groups) {
+          group.editor.OnDestroy();
+        }
       }
 
       public void CreateGroup(Type rendererType) {
         AssertHelper.AssertEditorOnly();
         Assert.IsNotNull(rendererType);
 
-        var group = InternalUtility.AddComponent<LeapGraphicGroup>(_renderer.gameObject);
-        group.editor.Init(_renderer, rendererType);
+        var group = new LeapGraphicGroup(_renderer, rendererType);
 
         _renderer._selectedGroup = _renderer._groups.Count;
         _renderer._groups.Add(group);
@@ -107,11 +88,15 @@ namespace Leap.Unity.GraphicalRenderer {
         var toDestroy = _renderer._groups[_renderer._selectedGroup];
         _renderer._groups.RemoveAt(_renderer._selectedGroup);
 
+        toDestroy.editor.OnDestroy();
+
         if (_renderer._selectedGroup >= _renderer._groups.Count && _renderer._selectedGroup != 0) {
           _renderer._selectedGroup--;
         }
+      }
 
-        InternalUtility.Destroy(toDestroy);
+      public LeapRenderingMethod GetSelectedRenderingMethod() {
+        return _renderer._groups[_renderer._selectedGroup].renderingMethod;
       }
 
       public void ScheduleEditorUpdate() {
@@ -148,7 +133,20 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
 
+      public void ChangeRenderingMethod(Type renderingMethod, bool addFeatures) {
+        _renderer._groups[_renderer._selectedGroup].editor.ChangeRenderingMethod(renderingMethod, addFeatures);
+      }
+
+      public void AddFeature(Type featureType) {
+        _renderer._groups[_renderer._selectedGroup].editor.AddFeature(featureType);
+      }
+
+      public void RemoveFeature(int featureIndex) {
+        _renderer._groups[_renderer._selectedGroup].editor.RemoveFeature(featureIndex);
+      }
+
       public void DoLateUpdateEditor() {
+        Undo.RecordObject(_renderer, "bha");
         Assert.IsFalse(InternalUtility.IsPrefab(_renderer), "Should never do editor updates for prefabs");
 
         validateSpaceComponent();
@@ -157,6 +155,13 @@ namespace Leap.Unity.GraphicalRenderer {
 
         using (new ProfilerSample("Calculate Should Rebuild")) {
           foreach (var group in _renderer._groups) {
+            foreach (var graphic in group.graphics) {
+              if (graphic.isRepresentationDirty) {
+                needsRebuild = true;
+                break;
+              }
+            }
+
             foreach (var feature in group.features) {
               if (feature.isDirty) {
                 needsRebuild = true;
@@ -177,14 +182,12 @@ namespace Leap.Unity.GraphicalRenderer {
           }
         }
 
-        if (needsRebuild) {
-          _delayedHeavyRebuild.Reset();
-        }
-
-        DoEditorUpdateLogic(needsRebuild, heavyRebuild: false);
+        DoEditorUpdateLogic(needsRebuild);
       }
 
-      public void DoEditorUpdateLogic(bool fullRebuild, bool heavyRebuild) {
+      public void DoEditorUpdateLogic(bool fullRebuild) {
+        Undo.RecordObject(_renderer, "Do Editor Update Logic");
+
         Assert.IsFalse(InternalUtility.IsPrefab(_renderer), "Should never do editor updates for prefabs");
 
         using (new ProfilerSample("Validate Space Component")) {
@@ -217,7 +220,7 @@ namespace Leap.Unity.GraphicalRenderer {
             }
 
             using (new ProfilerSample("Update Renderer Editor")) {
-              group.editor.UpdateRendererEditor(heavyRebuild);
+              group.editor.UpdateRendererEditor();
             }
           }
 
@@ -229,6 +232,8 @@ namespace Leap.Unity.GraphicalRenderer {
             group.UpdateRenderer();
           }
         }
+
+        Undo.CollapseUndoOperations(Undo.GetCurrentGroup());
       }
 
       private void onAnySave() {
@@ -237,7 +242,7 @@ namespace Leap.Unity.GraphicalRenderer {
           return;
         }
 
-        DoEditorUpdateLogic(fullRebuild: true, heavyRebuild: false);
+        DoEditorUpdateLogic(fullRebuild: true);
       }
 
       private void validateSpaceComponent() {
@@ -258,12 +263,10 @@ namespace Leap.Unity.GraphicalRenderer {
       private void validateGraphics() {
         Assert.IsFalse(InternalUtility.IsPrefab(_renderer), "Should never validate graphics for prefabs");
 
-        Undo.RecordObject(_renderer, "Validated renderer data");
         _renderer.GetComponentsInChildren(includeInactive: true, result: _tempGraphicList);
 
         HashSet<LeapGraphic> set = Pool<HashSet<LeapGraphic>>.Spawn();
         foreach (var group in _renderer._groups) {
-          Undo.RecordObject(group, "Modified group fields");
 
           for (int i = group.graphics.Count; i-- != 0;) {
             if (group.graphics[i] == null) {

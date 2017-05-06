@@ -1,16 +1,17 @@
-﻿
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using System.Collections.Generic;
+
 namespace Leap.Unity.GraphicalRenderer {
 
   public interface ISupportsAddRemove {
-    /// <summary>
-    /// The graphic to add.  It is always added to the end of
-    /// a list.
-    /// </summary>
-    void OnAddGraphic(LeapGraphic graphic, int index);
-
-    /// <summary>
-    /// The graphic to remove, in addition to it's previous index.
-    /// </summary>
-    void OnRemoveGraphic(LeapGraphic graphic, int index);
+    void OnAddRemoveGraphics(List<int> dirtyIndexes);
   }
 }

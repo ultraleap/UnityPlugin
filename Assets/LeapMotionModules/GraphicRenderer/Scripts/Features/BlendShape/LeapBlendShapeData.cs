@@ -1,4 +1,13 @@
-﻿using System;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity.Query;
@@ -13,7 +22,7 @@ namespace Leap.Unity.GraphicalRenderer {
   }
 
   [LeapGraphicTag("Blend Shape")]
-  [AddComponentMenu("")]
+  [Serializable]
   public class LeapBlendShapeData : LeapFeatureData {
 
     [Range(0, 1)]
@@ -93,7 +102,7 @@ namespace Leap.Unity.GraphicalRenderer {
             if (_transform == null) {
               return false;
             }
-            transformation = transform.worldToLocalMatrix * _transform.localToWorldMatrix;
+            transformation = graphic.transform.worldToLocalMatrix * _transform.localToWorldMatrix;
             break;
           default:
             throw new InvalidOperationException();
