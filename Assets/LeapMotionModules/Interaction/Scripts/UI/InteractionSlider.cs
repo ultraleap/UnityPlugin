@@ -91,8 +91,8 @@ namespace Leap.Unity.Interaction {
       _started = true;
 
       //Conversion of limits to local space
-      _horizontalSlideLimits = horizontalSlideLimits / transform.parent.lossyScale.x;
-      _verticalSlideLimits = verticalSlideLimits / transform.parent.lossyScale.y;
+      _horizontalSlideLimits = horizontalSlideLimits;
+      _verticalSlideLimits = verticalSlideLimits;
 
       base.Start();
     }
@@ -126,9 +126,11 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnDrawGizmosSelected() {
       base.OnDrawGizmosSelected();
-      Vector2 limits = (horizontalSlideLimits / transform.parent.lossyScale.x);
+      Vector3 originPosition = Application.isPlaying ? initialLocalPosition : transform.localPosition;
+      Vector2 limits = (horizontalSlideLimits);
+
       Gizmos.color = Color.blue;
-      Gizmos.DrawLine(transform.localPosition + (Vector3.right* limits.x), transform.localPosition + (Vector3.right * limits.y));
+      Gizmos.DrawLine(originPosition + (Vector3.right* limits.x), originPosition + (Vector3.right * limits.y));
     }
   }
 }
