@@ -108,6 +108,14 @@ namespace Leap.Unity.Animation {
     public void PlayTween(Direction tweenDirection = Direction.Forward) {
       tween.Play(tweenDirection);
     }
+
+    public void PlayForward() {
+      PlayTween();
+    }
+
+    public void PlayBackward() {
+      PlayTween(Direction.Backward);
+    }
     
     /// <summary>
     /// Stops the underlying tween and resets it to the starting state.
