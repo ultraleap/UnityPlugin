@@ -1,4 +1,4 @@
-Shader "Leap Motion/Graphic Renderer/Examples/Bake 1" {
+Shader "Hidden/LeapMotion/Graphic Renderer/Examples/Bake 1" {
   Properties {
     _Color("Color", Color) = (1,1,1,1)
     _MainTex ("Albedo (RGB)", 2D) = "white" {}
