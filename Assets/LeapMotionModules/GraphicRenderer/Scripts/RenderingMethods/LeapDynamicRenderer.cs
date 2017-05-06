@@ -18,7 +18,7 @@ namespace Leap.Unity.GraphicalRenderer {
   [LeapGraphicTag("Dynamic")]
   [Serializable]
   public class LeapDynamicRenderer : LeapMesherBase, ISupportsAddRemove {
-    public const string DEFAULT_SHADER = "Leap Motion/Graphic Renderer/Unlit/Dynamic";
+    public const string DEFAULT_SHADER = "LeapMotion/GraphicRenderer/Unlit/Dynamic";
 
     #region PRIVATE VARIABLES
 
@@ -108,7 +108,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
             _curved_graphicParameters.Add((transformer as IRadialTransformer).GetVectorRepresentation(graphic.transform));
             _curved_meshTransforms.Add(total);
-            
+
             _curved_worldToAnchor.Add(mainTransform.inverse);
           }
         }
@@ -163,7 +163,7 @@ namespace Leap.Unity.GraphicalRenderer {
       finishAndAddMesh(deleteEmptyMeshes: false);
     }
 
-    protected override bool doesRequireSpecialUv3() {
+    protected override bool doesRequireVertInfo() {
       return true;
     }
 

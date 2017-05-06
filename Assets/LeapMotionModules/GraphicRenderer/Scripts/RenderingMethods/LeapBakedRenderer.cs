@@ -23,7 +23,7 @@ namespace Leap.Unity.GraphicalRenderer {
   [Serializable]
   public class LeapBakedRenderer : LeapMesherBase {
 
-    public const string DEFAULT_SHADER = "Leap Motion/Graphic Renderer/Unlit/Baked";
+    public const string DEFAULT_SHADER = "LeapMotion/GraphicRenderer/Unlit/Baked";
 
     #region INSPECTOR FIELDS
 
@@ -230,12 +230,12 @@ namespace Leap.Unity.GraphicalRenderer {
       _generation.mesh.bounds = new Bounds(Vector3.zero, Vector3.one * 100000);
     }
 
-    protected override bool doesRequireSpecialUv3() {
+    protected override bool doesRequireVertInfo() {
       if (_motionType != MotionType.None) {
         return true;
       }
 
-      return base.doesRequireSpecialUv3();
+      return base.doesRequireVertInfo();
     }
 
     protected override Vector3 graphicVertToMeshVert(Vector3 vertex) {

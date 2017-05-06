@@ -1,4 +1,4 @@
-Shader "LeapMotion/Graphic Renderer/Surface/Baked" {
+Shader "LeapMotion/GraphicRenderer/Surface/Baked" {
   Properties {
     _Color("Color", Color) = (1,1,1,1)
     _MainTex ("Albedo (RGB)", 2D) = "white" {}

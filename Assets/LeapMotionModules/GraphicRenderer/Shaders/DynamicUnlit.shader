@@ -1,4 +1,4 @@
-﻿Shader "LeapMotion/Graphic Renderer/Unlit/Dynamic" {
+﻿Shader "LeapMotion/GraphicRenderer/Unlit/Dynamic" {
   Properties {
     _Color   ("Color", Color) = (1,1,1,1)
     _MainTex ("Texture", 2D) = "white" {}

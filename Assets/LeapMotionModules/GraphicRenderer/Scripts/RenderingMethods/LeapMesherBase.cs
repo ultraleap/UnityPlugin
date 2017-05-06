@@ -103,7 +103,7 @@ namespace Leap.Unity.GraphicalRenderer {
     //Internal cache of requirements 
     protected bool _doesRequireColors;
     protected bool _doesRequireNormals;
-    protected bool _doesRequireSpecialUv3;
+    protected bool _doesRequireVertInfo;
     protected List<UVChannelFlags> _requiredUvChannels = new List<UVChannelFlags>();
 
     //Feature lists
@@ -406,11 +406,11 @@ namespace Leap.Unity.GraphicalRenderer {
 
         _doesRequireColors = doesRequireMeshColors();
         _doesRequireNormals = doesRequireMeshNormals();
-        _doesRequireSpecialUv3 = doesRequireSpecialUv3();
+        _doesRequireVertInfo = doesRequireVertInfo();
 
         _requiredUvChannels.Clear();
         foreach (var channel in MeshUtil.allUvChannels) {
-          if (channel == UVChannelFlags.UV3 && _doesRequireSpecialUv3) continue;
+          if (channel == UVChannelFlags.UV3 && _doesRequireVertInfo) continue;
 
           if (doesRequireUvChannel(channel)) {
             _requiredUvChannels.Add(channel);
@@ -527,8 +527,8 @@ namespace Leap.Unity.GraphicalRenderer {
           buildUvs(channel);
         }
 
-        if (_doesRequireSpecialUv3) {
-          buildSpecialUv3();
+        if (_doesRequireVertInfo) {
+          buildVertInfo();
         }
 
         foreach (var blendShapeFeature in _blendShapeFeatures) {
@@ -607,10 +607,10 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    protected virtual void buildSpecialUv3() {
+    protected virtual void buildVertInfo() {
       using (new ProfilerSample("Build Special Uv3")) {
-        _generation.uvs[3].Append(_generation.graphic.mesh.vertexCount,
-                                  new Vector4(0, 0, 0, _generation.graphicId));
+        _generation.vertInfo.Append(_generation.graphic.mesh.vertexCount,
+                                    new Vector4(0, 0, 0, _generation.graphicId));
       }
     }
 
@@ -628,11 +628,11 @@ namespace Leap.Unity.GraphicalRenderer {
             Vector3 shapeVert = blendVerts[i];
             Vector3 delta = blendShapeDelta(shapeVert, _generation.verts[i + offset]);
 
-            Vector4 currUv = _generation.uvs[3][i + offset];
-            currUv.x = delta.x;
-            currUv.y = delta.y;
-            currUv.z = delta.z;
-            _generation.uvs[3][i + offset] = currUv;
+            Vector4 currVertInfo = _generation.vertInfo[i + offset];
+            currVertInfo.x = delta.x;
+            currVertInfo.y = delta.y;
+            currVertInfo.z = delta.z;
+            _generation.vertInfo[i + offset] = currVertInfo;
           }
         } finally {
           blendVerts.Clear();
@@ -680,16 +680,16 @@ namespace Leap.Unity.GraphicalRenderer {
           _generation.mesh.SetNormals(_generation.normals);
         }
 
+        if (_generation.vertInfo.Count == _generation.verts.Count) {
+          _generation.mesh.SetTangents(_generation.vertInfo);
+        }
+
         if (_generation.colors.Count == _generation.verts.Count) {
           _generation.mesh.SetColors(_generation.colors);
         }
 
         foreach (var channel in _requiredUvChannels) {
           _generation.mesh.SetUVs(channel.Index(), _generation.uvs[channel.Index()]);
-        }
-
-        if (_doesRequireSpecialUv3) {
-          _generation.mesh.SetUVs(3, _generation.uvs[3]);
         }
 
         postProcessMesh();
@@ -715,6 +715,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
       public List<Vector3> verts;
       public List<Vector3> normals;
+      public List<Vector4> vertInfo;
       public List<int> tris;
       public List<Color> colors;
       public List<Vector4>[] uvs;
@@ -730,6 +731,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
         state.verts = new List<Vector3>();
         state.normals = new List<Vector3>();
+        state.vertInfo = new List<Vector4>();
         state.tris = new List<int>();
         state.colors = new List<Color>();
         state.uvs = new List<Vector4>[4] {
@@ -745,6 +747,7 @@ namespace Leap.Unity.GraphicalRenderer {
       public void Reset() {
         verts.Clear();
         normals.Clear();
+        vertInfo.Clear();
         tris.Clear();
         colors.Clear();
         for (int i = 0; i < 4; i++) {
@@ -799,7 +802,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    protected virtual bool doesRequireSpecialUv3() {
+    protected virtual bool doesRequireVertInfo() {
       return _tintFeatures.Count != 0 ||
              _blendShapeFeatures.Count != 0 ||
              _customFloatChannelData.Count != 0 ||

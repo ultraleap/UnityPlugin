@@ -1,6 +1,4 @@
 #include "Assets/LeapMotionModules/GraphicRenderer/Resources/GraphicRenderer.cginc"
-// Upgrade NOTE: excluded shader from DX11; has structs without semantics (struct v2f_graphic_baked members color)
-#pragma exclude_renderers d3d11
 
 #ifdef GRAPHIC_RENDERER_ENABLE_CUSTOM_CHANNELS
 #define GRAPHICS_HAVE_ID
@@ -149,8 +147,8 @@ float4 GetGraphicTint(int graphicId) {
 
 float _GraphicRendererBlendShapeAmounts[GRAPHIC_MAX];
 
-void ApplyBlendShapes(inout float4 vert, float4 uv3, int graphicId) {
-  vert.xyz += uv3.xyz * _GraphicRendererBlendShapeAmounts[graphicId];
+void ApplyBlendShapes(inout float4 vert, float3 delta, int graphicId) {
+  vert.xyz += delta * _GraphicRendererBlendShapeAmounts[graphicId];
 }
 #endif
 
@@ -167,6 +165,10 @@ struct appdata_graphic_baked {
   float3 normal : NORMAL;
 #endif
 
+#ifdef GRAPHICS_HAVE_ID
+  float4 vertInfo : TANGENT;
+#endif
+
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_0
   float2 texcoord : TEXCOORD0;
 #endif
@@ -179,8 +181,8 @@ struct appdata_graphic_baked {
   float2 texcoord2 : TEXCOORD2;
 #endif
 
-#ifdef GRAPHICS_HAVE_ID
-  float4 vertInfo : TEXCOORD3;
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_3
+  float2 texcoord3 : TEXCOORD3;
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_COLORS
@@ -212,6 +214,12 @@ struct appdata_graphic_baked {
 #define __V2F_UV2
 #endif
 
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_3
+#define __V2F_UV3 float2 uv_3 : TEXCOORD3;
+#else
+#define __V2F_UV3
+#endif
+
 #ifdef GRAPHICS_HAVE_COLOR
 #define __V2F_COLOR float4 color : COLOR;
 #else
@@ -224,6 +232,7 @@ struct appdata_graphic_baked {
   __V2F_UV0                     \
   __V2F_UV1                     \
   __V2F_UV2                     \
+  __V2F_UV3                     \
   __V2F_COLOR
 
 #ifdef GRAPHIC_RENDERER_VERTEX_COLORS
@@ -247,7 +256,7 @@ struct v2f_graphic_baked {
 #endif
 
 #ifdef GRAPHIC_RENDERER_BLEND_SHAPES
-#define __APPLY_BLEND_SHAPES(v) ApplyBlendShapes(v.vertex, v.vertInfo, graphicId);
+#define __APPLY_BLEND_SHAPES(v) ApplyBlendShapes(v.vertex, v.vertInfo.xyz, graphicId);
 #else
 #define __APPLY_BLEND_SHAPES(v)
 #endif
@@ -286,6 +295,12 @@ struct v2f_graphic_baked {
 #define __COPY_UV2(v,o)
 #endif
 
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_3
+#define __COPY_UV3(v,o) o.uv_3 = v.texcoord3;
+#else
+#define __COPY_UV3(v,o)
+#endif
+
 #ifdef GRAPHIC_RENDERER_VERTEX_COLORS
 #define __COPY_COLORS(v,o) o.color = v.color;
 #else
@@ -319,6 +334,7 @@ struct v2f_graphic_baked {
   __COPY_UV0(v,o)                                \
   __COPY_UV1(v,o)                                \
   __COPY_UV2(v,o)                                \
+  __COPY_UV3(v,o)                                \
   __COPY_COLORS(v,o)                             \
   __APPLY_TINT(v,o)                              \
 }

@@ -116,8 +116,8 @@ float4 GetGraphicTint(int graphicId) {
 
 float _GraphicRendererBlendShapeAmounts[GRAPHIC_MAX];
 
-void ApplyBlendShapes(inout float4 vert, float4 uv3, int graphicId) {
-  vert.xyz += uv3.xyz * _GraphicRendererBlendShapeAmounts[graphicId];
+void ApplyBlendShapes(inout float4 vert, float3 delta, int graphicId) {
+  vert.xyz += delta * _GraphicRendererBlendShapeAmounts[graphicId];
 }
 #endif
 
@@ -138,6 +138,10 @@ struct appdata_graphic_dynamic {
   float3 normal : NORMAL;
 #endif
 
+#ifdef GRAPHICS_HAVE_ID
+  float4 vertInfo : TANGENT;
+#endif
+
 #ifdef GRAPHIC_RENDERER_VERTEX_UV_0
   float4 texcoord : TEXCOORD0;
 #endif
@@ -150,8 +154,8 @@ struct appdata_graphic_dynamic {
   float4 texcoord2 : TEXCOORD2;
 #endif
 
-#ifdef GRAPHICS_HAVE_ID
-  float4 vertInfo : TEXCOORD3;
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_3
+  float4 texcoord3 : TEXCOORD3;
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_COLORS
@@ -183,6 +187,12 @@ struct appdata_graphic_dynamic {
 #define __V2F_UV2
 #endif
 
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_3
+#define __V2F_UV3 float2 uv_3 : TEXCOORD3;
+#else
+#define __V2F_UV3
+#endif
+
 #ifdef GRAPHICS_HAVE_COLOR
 #define __V2F_COLOR float4 color : COLOR;
 #else
@@ -195,6 +205,7 @@ struct appdata_graphic_dynamic {
   __V2F_UV0                     \
   __V2F_UV1                     \
   __V2F_UV2                     \
+  __V2F_UV3                     \
   __V2F_COLOR
 
 #ifdef GRAPHIC_RENDERER_VERTEX_COLORS
@@ -211,7 +222,6 @@ struct v2f_graphic_dynamic {
   V2F_GRAPHICAL
 };
 
-
 #ifdef GRAPHICS_HAVE_ID
 #ifdef GRAPHIC_ID_FROM_UV0
 #define BEGIN_V2F(v) int graphicId = v.texcoord.w;
@@ -220,6 +230,12 @@ struct v2f_graphic_dynamic {
 #endif
 #else
 #define BEGIN_V2F(v)
+#endif
+
+#ifdef GRAPHIC_RENDERER_BLEND_SHAPES
+#define __APPLY_BLEND_SHAPES(v) ApplyBlendShapes(v.vertex, v.vertInfo.xyz, graphicId);
+#else
+#define __APPLY_BLEND_SHAPES(v)
 #endif
 
 #ifdef GRAPHICS_NEED_ANCHOR_SPACE
@@ -233,23 +249,9 @@ struct v2f_graphic_dynamic {
 #define __NORMAL_TO_ANCHOR_SPACE(v)       
 #endif
 
-#ifdef GRAPHIC_RENDERER_BLEND_SHAPES
-#define __BLEND_TO_ANCHOR_SPACE(v) v.vertInfo.xyz = mul(unity_ObjectToWorld, v.vertInfo.xyz); \
-                                   v.vertInfo.xyz = mul(_GraphicRendererCurved_WorldToAnchor[graphicId], v.vertInfo.xyz);  
 #else
-#define __BLEND_TO_ANCHOR_SPACE(v)
-#endif
-
-#else
-#define __BLEND_TO_ANCHOR_SPACE(v)
 #define __POS_TO_ANCHOR_SPACE(v)
 #define __NORMAL_TO_ANCHOR_SPACE(v)
-#endif
-
-#ifdef GRAPHIC_RENDERER_BLEND_SHAPES
-#define __APPLY_BLEND_SHAPES(v) ApplyBlendShapes(v.vertex, v.vertInfo, graphicId);
-#else
-#define __APPLY_BLEND_SHAPES(v)
 #endif
 
 #ifdef GRAPHIC_RENDERER_WARPING
@@ -264,8 +266,16 @@ struct v2f_graphic_dynamic {
 
 #ifdef GRAPHICS_NEED_ANCHOR_SPACE
 #define __COPY_POSITION(v,o) o.vertex = mul(UNITY_MATRIX_VP, v.vertex);
+#define __CORRECT_POS_FOR_SURF(v) v.vertex = mul(unity_WorldToObject, v.vertex);
+#ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
+#define __CORRECT_NORMALS_FOR_SURF(V) v.normal = mul(unity_WorldToObject, v.normal);
+#else
+#define __CORRECT_NORMALS_FOR_SURF(V)
+#endif
 #else
 #define __COPY_POSITION(v,o) o.vertex = UnityObjectToClipPos(v.vertex);
+#define __CORRECT_POS_FOR_SURF(v)
+#define __CORRECT_NORMALS_FOR_SURF(V)
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_NORMALS
@@ -290,6 +300,12 @@ struct v2f_graphic_dynamic {
 #define __COPY_UV2(v,o) o.uv_2 = v.texcoord2;
 #else
 #define __COPY_UV2(v,o)
+#endif
+
+#ifdef GRAPHIC_RENDERER_VERTEX_UV_3
+#define __COPY_UV3(v,o) o.uv_3 = v.texcoord3;
+#else
+#define __COPY_UV3(v,o)
 #endif
 
 #ifdef GRAPHIC_RENDERER_VERTEX_COLORS
@@ -318,27 +334,28 @@ struct v2f_graphic_dynamic {
 
 #define APPLY_DYNAMIC_GRAPHICS(v,o) \
 {                                   \
+  __APPLY_BLEND_SHAPES(v)           \
   __POS_TO_ANCHOR_SPACE(v)          \
   __NORMAL_TO_ANCHOR_SPACE(v)       \
-  __BLEND_TO_ANCHOR_SPACE(v)        \
-  __APPLY_BLEND_SHAPES(v)           \
   __APPLY_WARPING(v)                \
   __COPY_POSITION(v,o)              \
   __COPY_NORMALS(v,o)               \
   __COPY_UV0(v,o)                   \
   __COPY_UV1(v,o)                   \
   __COPY_UV2(v,o)                   \
+  __COPY_UV3(v,o)                   \
   __COPY_COLORS(v,o)                \
   __APPLY_TINT(v,o)                 \
 }
 
 #define APPLY_DYNAMIC_GRAPHICS_STANDARD(v,o) \
 {                                            \
+  __APPLY_BLEND_SHAPES(v);                   \
   __POS_TO_ANCHOR_SPACE(v)                   \
   __NORMAL_TO_ANCHOR_SPACE(v)                \
-  __BLEND_TO_ANCHOR_SPACE(v)                 \
-  __APPLY_BLEND_SHAPES(v);                   \
   __APPLY_WARPING(v);                        \
+  __CORRECT_POS_FOR_SURF(v)                  \
+  __CORRECT_NORMALS_FOR_SURF(v)              \
   __APPLY_SURF_TINT(v,o)                     \
 }
 
