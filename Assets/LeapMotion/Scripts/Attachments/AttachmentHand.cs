@@ -248,7 +248,7 @@ namespace Leap.Unity.Attachments {
 
       var pointBehaviour = GetBehaviourForPoint(singlePoint);
       if (pointBehaviour != null) {
-        DestroyImmediate(pointBehaviour.gameObject);
+        InternalUtility.Destroy(pointBehaviour.gameObject);
         pointBehaviour = null;
 
         _attachmentPointsDirty = true;
