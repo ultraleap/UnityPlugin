@@ -5951,7 +5951,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4411376810883292, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a, type: 2}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1012008993008466, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a, type: 2}
       propertyPath: m_Name
@@ -17247,13 +17247,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aceea2f5c70da64e893474302ff53e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _anchorType: 0
-  _anchorGroup: {fileID: 0}
+  _isAnchored: 0
   _anchor: {fileID: 0}
+  _anchorGroup: {fileID: 0}
   lockToAnchor: 0
   lockToAnchorWhenAttached: 1
   matchAnchorMotionWhileReturning: 1
   anchorLerpCoeffPerSec: 20
+  anchorRotation: 0
   interactionBehaviour: {fileID: 0}
   detachWhenGrasped: 0
   tryAnchorOnGraspEnd: 0
@@ -17265,6 +17266,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _eventTable:
+    _entries: []
 --- !u!1 &1448770149
 GameObject:
   m_ObjectHideFlags: 0
@@ -20920,13 +20923,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aceea2f5c70da64e893474302ff53e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _anchorType: 1
-  _anchorGroup: {fileID: 1420400431}
+  _isAnchored: 0
   _anchor: {fileID: 0}
+  _anchorGroup: {fileID: 1420400431}
   lockToAnchor: 0
   lockToAnchorWhenAttached: 1
   matchAnchorMotionWhileReturning: 1
   anchorLerpCoeffPerSec: 10
+  anchorRotation: 0
   interactionBehaviour: {fileID: 1680547685}
   detachWhenGrasped: 1
   tryAnchorOnGraspEnd: 1
@@ -20938,6 +20942,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _eventTable:
+    _entries: []
 --- !u!114 &1680547685
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22088,7 +22094,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4411376810883292, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a, type: 2}
       propertyPath: m_RootOrder
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1012008993008466, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a, type: 2}
       propertyPath: m_Name
@@ -22514,13 +22520,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aceea2f5c70da64e893474302ff53e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _anchorType: 1
-  _anchorGroup: {fileID: 1420400431}
+  _isAnchored: 0
   _anchor: {fileID: 0}
+  _anchorGroup: {fileID: 1420400431}
   lockToAnchor: 0
   lockToAnchorWhenAttached: 1
   matchAnchorMotionWhileReturning: 1
   anchorLerpCoeffPerSec: 10
+  anchorRotation: 0
   interactionBehaviour: {fileID: 1817611767}
   detachWhenGrasped: 1
   tryAnchorOnGraspEnd: 1
@@ -22532,6 +22539,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _eventTable:
+    _entries: []
 --- !u!1 &1828702421
 GameObject:
   m_ObjectHideFlags: 0
@@ -27065,13 +27074,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aceea2f5c70da64e893474302ff53e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _anchorType: 1
-  _anchorGroup: {fileID: 1420400431}
+  _isAnchored: 0
   _anchor: {fileID: 0}
+  _anchorGroup: {fileID: 1420400431}
   lockToAnchor: 0
   lockToAnchorWhenAttached: 1
   matchAnchorMotionWhileReturning: 1
   anchorLerpCoeffPerSec: 10
+  anchorRotation: 0
   interactionBehaviour: {fileID: 2122011965}
   detachWhenGrasped: 1
   tryAnchorOnGraspEnd: 1
@@ -27083,6 +27093,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _eventTable:
+    _entries: []
 --- !u!114 &2122011965
 MonoBehaviour:
   m_ObjectHideFlags: 0

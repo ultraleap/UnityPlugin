@@ -28,19 +28,21 @@ namespace Leap.Unity.Interaction {
 
     [Disable]
     [SerializeField]
+    [Tooltip("Whether or not this AnchorableBehaviour is actively attached to its anchor.")]
     private bool _isAnchored;
-    public bool isAnchored { get { return _anchor != null; } }
+    public bool isAnchored { get { return _isAnchored; } }
 
-    [Tooltip("The current anchor of this AnchorableBehaviour, or null if the AnchorableBehaviour is "
-           + "not currently attached to any Anchor. To set this value, call the TrySetAnchor or SetAnchor method.")]
+    [Tooltip("The current anchor of this AnchorableBehaviour.")]
     [OnEditorChange("anchor"), SerializeField]
     private Anchor _anchor;
     public Anchor anchor {
       get { return _anchor; }
       set {
         if (_anchor != value) {
-          _attachedToAnchor = false;
-          _anchor = value;
+          if (isValidAnchor(value)) {
+            _lockedToAnchor = false;
+            _anchor = value;
+          }
         }
       }
     }
@@ -53,7 +55,18 @@ namespace Leap.Unity.Interaction {
       get { return _anchorGroup; }
       set {
         _anchorGroup = value;
+        validateAnchor();
       }
+    }
+
+    // TODO: Fixme
+    private bool isValidAnchor(Anchor anchor) {
+      return true;
+    }
+
+    // TODO: Fixme
+    private void validateAnchor() {
+      return;
     }
 
     #region Events
@@ -220,7 +233,7 @@ namespace Leap.Unity.Interaction {
     //}
     // END CURRENTANCHOR REMOVAL COMMENT.
 
-    private bool _attachedToAnchor = false;
+    private bool _lockedToAnchor = false;
 
     void OnValidate() {
       interactionBehaviour = GetComponent<InteractionBehaviour>();
@@ -243,7 +256,7 @@ namespace Leap.Unity.Interaction {
     }
 
     void OnDisable() {
-      _attachedToAnchor = false;
+      _lockedToAnchor = false;
 
       // Reset anchor position storage; it can't be updated from this state.
       _hasTargetPositionLastUpdate = false;
@@ -427,7 +440,7 @@ namespace Leap.Unity.Interaction {
         _hasTargetPositionLastUpdate = false;
       }
       else if (lockToAnchorWhenAttached) {
-        if (_attachedToAnchor) {
+        if (_lockedToAnchor) {
           // In this state, we are already attached to the anchor.
           finalPosition = targetPosition + _offsetTowardsHand;
 
@@ -451,7 +464,7 @@ namespace Leap.Unity.Interaction {
           // Lerp towards the anchor.
           finalPosition = Vector3.Lerp(finalPosition, targetPosition, anchorLerpCoeffPerSec * Time.deltaTime);
           if (Vector3.Distance(finalPosition, targetPosition) < 0.001F) {
-            _attachedToAnchor = true;
+            _lockedToAnchor = true;
           }
 
           // Redo any "reach toward hand" offset.
