@@ -36,7 +36,17 @@ namespace Leap.Unity.Attributes {
 #if UNITY_EDITOR
     public void ConstrainValue(SerializedProperty property) {
       if (property.objectReferenceValue != null) return;
-      if (component == null) return;
+
+      //Only support auto-find for single selection
+      if (targets.Length != 1) {
+        return;
+      }
+
+      //Only support auto-find for components
+      Component component = targets[0] as Component;
+      if (component == null) {
+        return;
+      }
 
       if (search(property, AutoFindLocations.Object, component.GetComponent)) return;
       if (search(property, AutoFindLocations.Parents, component.GetComponentInParent)) return;
@@ -92,7 +102,7 @@ namespace Leap.Unity.Attributes {
 
           if (attribute != null) {
             wasConstrained = true;
-            attribute.component = script;
+            attribute.targets = new UnityEngine.Object[] { script };
             attribute.fieldInfo = info.Value;
             attribute.ConstrainValue(it);
           }
