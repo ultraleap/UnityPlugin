@@ -513,7 +513,6 @@ namespace Leap.Unity.GraphicalRenderer {
 
     protected virtual void buildGraphic() {
       using (new ProfilerSample("Build Graphic")) {
-
         refreshMeshData();
         if (_generation.graphic.mesh == null) return;
 
@@ -534,6 +533,8 @@ namespace Leap.Unity.GraphicalRenderer {
         foreach (var blendShapeFeature in _blendShapeFeatures) {
           buildBlendShapes(blendShapeFeature.featureData[_generation.graphicIndex]);
         }
+
+        _generation.graphic.isRepresentationDirty = false;
       }
     }
 
