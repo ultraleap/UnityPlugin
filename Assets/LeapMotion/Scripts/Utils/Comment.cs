@@ -9,10 +9,10 @@ namespace Leap.Unity {
 
     [TextArea]
     [SerializeField]
-    private string _comment;
+    protected string _comment;
 
     [SerializeField, HideInInspector]
-    private bool _isEditing = true;
+    protected bool _isEditing = true;
 
 #if UNITY_EDITOR
     [ContextMenu("Edit")]
