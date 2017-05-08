@@ -163,6 +163,11 @@ namespace Leap.Unity.GraphicalRenderer {
         _meshData.AddMesh(new Mesh());
       }
 
+      foreach (var graphic in group.graphics) {
+        var textGraphic = graphic as LeapTextGraphic;
+        _font.RequestCharactersInTexture(textGraphic.text, textGraphic.fontSize);
+      }
+
       generateMaterial();
     }
 #endif
@@ -204,6 +209,8 @@ namespace Leap.Unity.GraphicalRenderer {
     private List<int> _tris = new List<int>();
     private void generateTextMesh(int index, LeapTextGraphic graphic, Mesh mesh) {
       mesh.Clear();
+
+      graphic.isRepresentationDirty = false;
 
       int scaledFontSize = Mathf.RoundToInt(graphic.fontSize * _dynamicPixelsPerUnit);
 
