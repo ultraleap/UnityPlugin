@@ -3,8 +3,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Leap.Unity.Interaction {
+
+  [System.Serializable]
+  public class AnchorableBehaviourEvent : UnityEvent<AnchorableBehaviour> { }
 
   /// <summary>
   /// AnchorableBehaviours mix well with InteractionBehaviours you'd like
@@ -227,8 +231,10 @@ namespace Leap.Unity.Interaction {
     }
 
     void Update() {
-      if (interactionBehaviour != null && isAttractedByHand) UpdateAttractionToHand();
-      else if (_offsetTowardsHand != Vector3.zero) _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, Vector3.zero, 5F * Time.deltaTime);
+      UpdatePreferredAnchor();
+
+      UpdateAttractionToHand();
+
       UpdateAnchorAttachment();
     }
 
@@ -306,11 +312,27 @@ namespace Leap.Unity.Interaction {
       TryToAnchor();
     }
 
+    #region Preferred Anchor
+
+    private void UpdatePreferredAnchor() {
+
+    }
+
+    #endregion
+
     #region Attraction To Hands
 
     private Vector3 _offsetTowardsHand = Vector3.zero;
 
     private void UpdateAttractionToHand() {
+      if (interactionBehaviour == null || !isAttractedByHand) {
+        if (_offsetTowardsHand != Vector3.zero) {
+          _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, Vector3.zero, 5F * Time.deltaTime);
+        }
+
+        return;
+      }
+
       float reachTargetAmount = 0F;
       Vector3 towardsHand = Vector3.zero;
       if (interactionBehaviour != null) {
