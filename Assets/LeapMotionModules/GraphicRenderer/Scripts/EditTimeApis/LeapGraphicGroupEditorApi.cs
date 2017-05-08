@@ -1,4 +1,13 @@
-﻿using System;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -9,10 +18,20 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  public partial class LeapGraphicGroup : LeapGraphicComponentBase<LeapGraphicRenderer> {
+  public partial class LeapGraphicGroup {
 
 #if UNITY_EDITOR
     public readonly EditorApi editor;
+
+    public LeapGraphicGroup(LeapGraphicRenderer renderer, Type renderingMethodType) {
+      AssertHelper.AssertEditorOnly();
+      Assert.IsNotNull(renderer);
+      Assert.IsNotNull(renderingMethodType);
+      _renderer = renderer;
+
+      editor = new EditorApi(this);
+      editor.ChangeRenderingMethod(renderingMethodType, addFeatures: true);
+    }
 
     public class EditorApi {
       private readonly LeapGraphicGroup _group;
@@ -22,15 +41,10 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       public void OnValidate() {
-        _group._renderer = _group.GetComponent<LeapGraphicRenderer>();
-
         if (!Application.isPlaying) {
           _group._addRemoveSupported = true;
-          if (_group._renderingMethod != null) {
-            _group._addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(_group._renderingMethod.GetType());
-          }
-          if (_group._renderer.space != null) {
-            _group._addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(_group._renderer.space.GetType());
+          if (_group._renderingMethod.Value != null) {
+            _group._addRemoveSupported &= typeof(ISupportsAddRemove).IsAssignableFrom(_group._renderingMethod.Value.GetType());
           }
         }
 
@@ -40,60 +54,38 @@ namespace Leap.Unity.GraphicalRenderer {
           }
         }
 
-        AttachedObjectHandler.Validate(_group, ref _group._renderingMethod);
-        AttachedObjectHandler.Validate(_group, _group._features);
-
-        Assert.IsNotNull(_group._renderingMethod, "Rendering method of a group should never be null.");
-
-        if (_group._renderingMethod != null) {
-          _group._renderingMethod.renderer = _group._renderer;
-          _group._renderingMethod.group = _group;
-        }
+        Assert.IsNotNull(_group._renderingMethod.Value, "Rendering method of a group should never be null.");
       }
 
-      public void OnDestroyedByUser() {
-        if (_group._renderingMethod != null) {
-          _group._renderingMethod.OnDisableRendererEditor();
-          InternalUtility.Destroy(_group._renderingMethod);
+      public void OnDestroy() {
+        if (_group._renderingMethod.Value != null) {
+          _group._renderingMethod.Value.OnDisableRendererEditor();
         }
-
-        foreach (var feature in _group._features) {
-          InternalUtility.Destroy(feature);
-        }
-      }
-
-      public void Init(LeapGraphicRenderer renderer, Type renderingMethodType) {
-        AssertHelper.AssertEditorOnly();
-        Assert.IsNotNull(renderer);
-        Assert.IsNotNull(renderingMethodType);
-        _group._renderer = renderer;
-
-        ChangeRenderingMethod(renderingMethodType, addFeatures: true);
       }
 
       public void ChangeRenderingMethod(Type renderingMethodType, bool addFeatures) {
         AssertHelper.AssertEditorOnly();
         Assert.IsNotNull(renderingMethodType);
 
-        if (_group._renderingMethod != null) {
-          _group._renderingMethod.OnDisableRendererEditor();
-          InternalUtility.Destroy(_group._renderingMethod);
-          _group._renderingMethod = null;
+        if (_group._renderingMethod.Value != null) {
+          _group._renderingMethod.Value.OnDisableRendererEditor();
+          _group._renderingMethod.Value = null;
         }
 
-        _group._renderingMethod = InternalUtility.AddComponent(_group.gameObject, renderingMethodType) as LeapRenderingMethod;
-        Assert.IsNotNull(_group._renderingMethod);
-        _group._renderingMethod.renderer = _group._renderer;
-        _group._renderingMethod.group = _group;
+        _group._renderingMethod.Value = Activator.CreateInstance(renderingMethodType) as LeapRenderingMethod;
+        Assert.IsNotNull(_group._renderingMethod.Value);
+        _group._renderingMethod.Value.renderer = _group._renderer;
+        _group._renderingMethod.Value.group = _group;
 
         if (addFeatures) {
           List<Type> dataObjTypes = new List<Type>();
-          var allGraphics = _group.GetComponentsInChildren<LeapGraphic>();
+          var allGraphics = _group.renderer.GetComponentsInChildren<LeapGraphic>();
           foreach (var graphic in allGraphics) {
-            if (_group._renderingMethod.IsValidGraphic(graphic)) {
+            if (_group._renderingMethod.Value.IsValidGraphic(graphic)) {
 
               List<Type> types = new List<Type>();
-              foreach (var dataObj in graphic.featureData) {
+              for (int i = 0; i < graphic.featureData.Count; i++) {
+                var dataObj = graphic.featureData[i];
                 var dataType = dataObj.GetType();
                 if (!dataObjTypes.Contains(dataType)) {
                   types.Add(dataType);
@@ -116,16 +108,18 @@ namespace Leap.Unity.GraphicalRenderer {
           }
         }
 
-        _group._renderingMethod.OnEnableRendererEditor();
+        _group._renderingMethod.Value.OnEnableRendererEditor();
+
+        OnValidate();
       }
 
       public LeapGraphicFeatureBase AddFeature(Type featureType) {
         AssertHelper.AssertEditorOnly();
         _group._renderer.editor.ScheduleEditorUpdate();
 
-        Undo.RecordObject(_group, "Added feature");
+        Undo.RecordObject(_group.renderer, "Added feature");
 
-        var feature = InternalUtility.AddComponent(_group.gameObject, featureType) as LeapGraphicFeatureBase;
+        var feature = Activator.CreateInstance(featureType) as LeapGraphicFeatureBase;
         _group._features.Add(feature);
 
         _group.RebuildFeatureData();
@@ -134,14 +128,12 @@ namespace Leap.Unity.GraphicalRenderer {
         return feature;
       }
 
-      public void RemoveFeature(LeapGraphicFeatureBase feature) {
+      public void RemoveFeature(int featureIndex) {
         AssertHelper.AssertEditorOnly();
-        Assert.IsTrue(_group._features.Contains(feature));
 
-        Undo.RecordObject(_group, "Removed feature " + feature.name);
+        Undo.RecordObject(_group.renderer, "Removed feature");
 
-        _group._features.Remove(feature);
-        InternalUtility.Destroy(feature);
+        _group._features.RemoveAt(featureIndex);
 
         _group.RebuildFeatureData();
         _group.RebuildFeatureSupportInfo();
@@ -150,13 +142,30 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       public void ValidateGraphicList() {
+        //Make sure there are no duplicates, that is not allowed!
+        var set = Pool<HashSet<LeapGraphic>>.Spawn();
+        try {
+          for (int i = _group._graphics.Count; i-- != 0;) {
+            var graphic = _group._graphics[i];
+            if (set.Contains(graphic)) {
+              Debug.LogWarning("Removing duplicate graphic " + graphic);
+              _group._graphics.RemoveAt(i);
+            } else {
+              set.Add(graphic);
+            }
+          }
+        } finally {
+          set.Clear();
+          Pool<HashSet<LeapGraphic>>.Recycle(set);
+        }
+
         for (int i = _group._graphics.Count; i-- != 0;) {
           if (_group._graphics[i] == null) {
             _group._graphics.RemoveAt(i);
             continue;
           }
 
-          if (!_group._graphics[i].transform.IsChildOf(_group.transform)) {
+          if (!_group._graphics[i].transform.IsChildOf(_group.renderer.transform)) {
             _group.TryRemoveGraphic(_group._graphics[i]);
             continue;
           }
@@ -164,10 +173,10 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
 
-      public void UpdateRendererEditor(bool heavyRebuild) {
+      public void UpdateRendererEditor() {
         AssertHelper.AssertEditorOnly();
 
-        _group._renderingMethod.OnUpdateRendererEditor(heavyRebuild);
+        _group._renderingMethod.Value.OnUpdateRendererEditor();
       }
 
       public void RebuildEditorPickingMeshes() {

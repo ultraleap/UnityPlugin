@@ -111,6 +111,10 @@ namespace Leap.Unity {
       }, dependantProperties);
     }
 
+    protected void hideField(string propertyName) {
+      specifyConditionalDrawing(() => false, propertyName);
+    }
+
     protected void specifyConditionalDrawing(Func<bool> conditional, params string[] dependantProperties) {
       for (int i = 0; i < dependantProperties.Length; i++) {
         string dependant = dependantProperties[i];

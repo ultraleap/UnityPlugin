@@ -1,4 +1,4 @@
-﻿Shader "Leap Motion/Graphic Renderer/Unlit/Dynamic" {
+﻿Shader "Leap Motion/Graphic Renderer/Text/Dynamic" {
   Properties {
     _Color("Color", Color) = (1,1,1,1)
     _MainTex ("Texture", 2D) = "white" {}
@@ -37,10 +37,11 @@
       }
       
       fixed4 frag (v2f_graphic_dynamic i) : SV_Target {
-        fixed4 color = tex2D(_MainTex, i.uv_0);
-
 #ifdef GRAPHICS_HAVE_COLOR
-        color *= i.color;
+        fixed4 color = i.color;
+        color.a *= tex2D(_MainTex, i.uv_0).a;
+#else
+        fixed4 color = tex2D(_MainTex, i.uv_0);
 #endif
 
         return color;

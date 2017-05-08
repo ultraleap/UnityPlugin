@@ -1,4 +1,13 @@
-﻿using System.Collections.Generic;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Leap.Unity.Query;
@@ -13,7 +22,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     [EditTimeOnly]
     [SerializeField]
-    private LeapFeatureData _sourceData;
+    private int _sourceDataIndex = -1;
 
     [EditTimeOnly]
     [SerializeField]
@@ -44,14 +53,14 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public LeapFeatureData sourceData {
       get {
-        if (_sourceData == null) {
+        if (_sourceDataIndex == -1) {
           assignDefaultSourceValue();
         }
-        return _sourceData;
+        return featureData[_sourceDataIndex];
       }
 #if UNITY_EDITOR
       set {
-        _sourceData = value;
+        _sourceDataIndex = _featureData.IndexOf(value);
         setSourceFeatureDirty();
       }
 #endif
@@ -87,18 +96,18 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public bool canNineSlice {
       get {
-        var spriteData = _sourceData as LeapSpriteData;
+        var spriteData = sourceData as LeapSpriteData;
         return spriteData != null && spriteData.sprite != null;
       }
     }
 
     public UVChannelFlags uvChannel {
       get {
-        if (_sourceData == null) {
+        if (sourceData == null) {
           return UVChannelFlags.UV0;
         }
 
-        var feature = _sourceData.feature;
+        var feature = sourceData.feature;
         if (feature is LeapTextureFeature) {
           return (feature as LeapTextureFeature).channel;
         } else if (feature is LeapSpriteFeature) {
@@ -117,7 +126,7 @@ namespace Leap.Unity.GraphicalRenderer {
     protected override void OnValidate() {
       base.OnValidate();
 
-      if (_sourceData == null) {
+      if (sourceData == null) {
         assignDefaultSourceValue();
       }
 
@@ -137,8 +146,13 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public override void RefreshMeshData() {
-      if (_sourceData == null) {
+      if (sourceData == null) {
         assignDefaultSourceValue();
+      }
+
+      //No valid source was found :(
+      if (_sourceDataIndex == -1) {
+        return;
       }
 
       Vector4 borderSize = Vector4.zero;
@@ -153,8 +167,8 @@ namespace Leap.Unity.GraphicalRenderer {
         rect = new Rect(-_size / 2, _size);
       }
 
-      if (_nineSliced && _sourceData is LeapSpriteData) {
-        var spriteData = _sourceData as LeapSpriteData;
+      if (_nineSliced && sourceData is LeapSpriteData) {
+        var spriteData = sourceData as LeapSpriteData;
         if (spriteData.sprite == null) {
           mesh = null;
           remappableChannels = 0;
@@ -250,12 +264,12 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     private void assignDefaultSourceValue() {
-      _sourceData = featureData.Query().FirstOrDefault(IsValidDataSource);
+      _sourceDataIndex = featureData.Query().IndexOf(IsValidDataSource);
     }
 
     private void setSourceFeatureDirty() {
-      if (_sourceData != null) {
-        _sourceData.MarkFeatureDirty();
+      if (sourceData != null) {
+        sourceData.MarkFeatureDirty();
       }
     }
 

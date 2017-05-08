@@ -1,13 +1,19 @@
-﻿using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-using Leap.Unity.Attributes;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using System;
+using UnityEngine;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  [AddComponentMenu("")]
   [LeapGraphicTag("Blend Shape")]
+  [Serializable]
   public class LeapBlendShapeFeature : LeapGraphicFeature<LeapBlendShapeData> {
     public const string FEATURE_NAME = LeapGraphicRenderer.FEATURE_PREFIX + "BLEND_SHAPES";
 
@@ -18,13 +24,5 @@ namespace Leap.Unity.GraphicalRenderer {
         return SupportInfo.FullSupport();
       }
     }
-
-#if UNITY_EDITOR
-    public override void DrawFeatureEditor(Rect rect, bool isActive, bool isFocused) { }
-
-    public override float GetEditorHeight() {
-      return 0;
-    }
-#endif
   }
 }

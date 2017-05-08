@@ -1,4 +1,13 @@
-﻿using System;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using System;
 using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,10 +15,16 @@ using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  public abstract class LeapGraphicFeatureBase : LeapGraphicComponentBase<LeapGraphicRenderer> {
+  public abstract class LeapGraphicFeatureBase {
 
     [NonSerialized]
     private bool _isDirty = true; //everything defaults dirty at the start!
+
+    //Unity cannot serialize lists of objects that have no serializable fields
+    //when it is set to text-serialization.  A feature might have no specific
+    //data, so we add this dummy bool to ensure it gets serialized anyway
+    [SerializeField]
+    private bool _dummyBool;
 
     public bool isDirty {
       get {
@@ -43,20 +58,15 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public abstract Type GetDataObjectType();
     public abstract LeapFeatureData CreateFeatureDataForGraphic(LeapGraphic graphic);
-
-#if UNITY_EDITOR
-    public abstract void DrawFeatureEditor(Rect rect, bool isActive, bool isFocused);
-    public abstract float GetEditorHeight();
-#endif
   }
 
   public abstract class LeapGraphicFeature<DataType> : LeapGraphicFeatureBase
-    where DataType : LeapFeatureData {
+    where DataType : LeapFeatureData, new() {
 
     /// <summary>
     /// A list of all feature data.
     /// </summary>
-    [HideInInspector]
+    [NonSerialized]
     public List<DataType> featureData = new List<DataType>();
 
     public override void AssignFeatureReferences() {
@@ -78,31 +88,17 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public override LeapFeatureData CreateFeatureDataForGraphic(LeapGraphic graphic) {
-      DataType dataObj = InternalUtility.AddComponent<DataType>(graphic.gameObject);
-
-      dataObj.graphic = graphic;
-      return dataObj;
+      return new DataType();
     }
   }
 
-  [ExecuteInEditMode]
-  public abstract class LeapFeatureData : LeapGraphicComponentBase<LeapGraphic> {
-    [HideInInspector]
+  [Serializable]
+  public abstract class LeapFeatureData {
+    [NonSerialized]
     public LeapGraphic graphic;
 
-    [HideInInspector]
+    [NonSerialized]
     public LeapGraphicFeatureBase feature;
-
-    protected override void OnValidate() {
-      base.OnValidate();
-
-      //Feature is not serialized, so could totally be null in the editor right as
-      //the game starts.  Not an issue at runtime because OnValidate is not called
-      //at runtime.
-      if (feature != null) {
-        feature.isDirty = true;
-      }
-    }
 
     public void MarkFeatureDirty() {
       if (feature != null) {

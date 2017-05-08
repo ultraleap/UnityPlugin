@@ -126,6 +126,10 @@ namespace Leap.Unity {
       return false;
     }
 
+    public static float Area(this Rect rect) {
+      return rect.width * rect.height;
+    }
+
     #endregion
 
     #region Math Utils
