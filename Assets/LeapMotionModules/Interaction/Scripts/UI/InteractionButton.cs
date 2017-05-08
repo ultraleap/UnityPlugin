@@ -60,15 +60,15 @@ namespace Leap.Unity.Interaction {
     private Rigidbody _lastDepressor;
     private Vector3 _localDepressorPosition;
     private Vector3 _physicsPosition = Vector3.zero;
-    private Vector3 _physicsVelocity = Vector3.back;
+    private Vector3 _physicsVelocity = Vector3.zero;
     private bool _handIsLeft = false;
     private bool _physicsOccurred;
 
     protected override void Start() {
       // Initialize Positions
       initialLocalPosition = transform.localPosition;
-      transform.localPosition = initialLocalPosition;
-      localPhysicsPosition = initialLocalPosition;
+      transform.localPosition = initialLocalPosition + Vector3.back * Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight);
+      localPhysicsPosition = transform.localPosition;
       _physicsPosition = transform.position;
       rigidbody.position = _physicsPosition;
 
