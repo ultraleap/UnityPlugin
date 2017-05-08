@@ -60,6 +60,10 @@ namespace Leap.Unity.Attachments {
       reinitialize();
     }
 
+    void Awake() {
+      reinitialize();
+    }
+
     private void reinitialize() {
       refreshHandAccessors();
       refreshAttachmentHands();
