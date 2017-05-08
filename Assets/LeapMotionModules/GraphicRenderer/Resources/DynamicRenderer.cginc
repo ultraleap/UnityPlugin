@@ -110,9 +110,6 @@ float4 GetGraphicTint(int graphicId) {
 #ifndef GRAPHICS_HAVE_ID
 #define GRAPHICS_HAVE_ID
 #endif
-#ifndef GRAPHICS_NEED_ANCHOR_SPACE
-#define GRAPHICS_NEED_ANCHOR_SPACE
-#endif
 
 float _GraphicRendererBlendShapeAmounts[GRAPHIC_MAX];
 
