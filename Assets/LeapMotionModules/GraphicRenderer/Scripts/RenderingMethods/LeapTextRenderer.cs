@@ -82,7 +82,7 @@ namespace Leap.Unity.GraphicalRenderer {
       for (int i = 0; i < group.graphics.Count; i++) {
         var graphic = group.graphics[i] as LeapTextGraphic;
 
-        if (graphic.isRepresentationDirty) {
+        if (graphic.isRepresentationDirtyOrEditTime || graphic.HasRectChanged()) {
           generateTextMesh(i, graphic, _meshData[i]);
         }
       }
@@ -161,11 +161,6 @@ namespace Leap.Unity.GraphicalRenderer {
 
       while (_meshData.Count < group.graphics.Count) {
         _meshData.AddMesh(new Mesh());
-      }
-
-      foreach (var graphic in group.graphics) {
-        var textGraphic = graphic as LeapTextGraphic;
-        _font.RequestCharactersInTexture(textGraphic.text, textGraphic.fontSize);
       }
 
       generateMaterial();

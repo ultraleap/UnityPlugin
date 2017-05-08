@@ -59,6 +59,17 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    public bool isRepresentationDirtyOrEditTime {
+      get {
+#if UNITY_EDITOR
+        if (!Application.isPlaying) {
+          return true;
+        }
+#endif
+        return _isRepresentationDirty;
+      }
+    }
+
     public LeapSpaceAnchor anchor {
       get {
         return _anchor;

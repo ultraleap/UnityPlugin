@@ -134,6 +134,22 @@ namespace Leap.Unity.GraphicalRenderer {
       _tokensDirty = true;
     }
 
+    private Rect _prevRect;
+    public bool HasRectChanged() {
+      RectTransform rectTransform = transform as RectTransform;
+      if (rectTransform == null) {
+        return false;
+      }
+
+      Rect newRect = rectTransform.rect;
+      if (newRect != _prevRect) {
+        _prevRect = newRect;
+        return true;
+      }
+
+      return false;
+    }
+
     public enum HorizontalAlignment {
       Left,
       Center,
