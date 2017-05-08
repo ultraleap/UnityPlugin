@@ -114,12 +114,21 @@ namespace Leap.Unity.Interaction {
       depressedThisFrame = false;
       unDepressedThisFrame = false;
 
+      //Disable collision on this button if it is not the primary hover
+      ignoreContact = !isPrimaryHovered || isGrasped;
+
       //Apply physical corrections only if PhysX has modified our positions
       if (_physicsOccurred) {
         _physicsOccurred = false;
 
         //Record and enforce the sliding state from the previous frame
-        localPhysicsPosition = GetDepressedConstrainedLocalPosition(transform.parent.InverseTransformPoint(rigidbody.position)-localPhysicsPosition);
+        if (!ignoreContact) {
+          localPhysicsPosition = GetDepressedConstrainedLocalPosition(transform.parent.InverseTransformPoint(rigidbody.position) - localPhysicsPosition);
+        } else {
+          Vector2 localSlidePosition = new Vector2(localPhysicsPosition.x, localPhysicsPosition.y);
+          localPhysicsPosition = transform.parent.InverseTransformPoint(rigidbody.position);
+          localPhysicsPosition = new Vector3(localSlidePosition.x, localSlidePosition.y, localPhysicsPosition.z);
+        }
 
         // Calculate the physical kinematics of the button in local space
         Vector3 localPhysicsVelocity = transform.parent.InverseTransformVector(rigidbody.velocity);
@@ -177,9 +186,6 @@ namespace Leap.Unity.Interaction {
           manager.GetInteractionHand(_handIsLeft).SetInteractionHoverOverride(false);
         }
       }
-
-      //Disable collision on this button if it is not the primary hover
-      ignoreContact = !isPrimaryHovered || isGrasped;
     }
 
     // How the button should behave when it is depressed
