@@ -256,7 +256,6 @@ namespace Leap.Unity.GraphicalRenderer {
       using (new ProfilerSample("Rebuild Feature Data")) {
         foreach (var feature in _features) {
           feature.ClearDataObjectReferences();
-          feature.isDirty = true;
         }
 
         for (int i = 0; i < _graphics.Count; i++) {
