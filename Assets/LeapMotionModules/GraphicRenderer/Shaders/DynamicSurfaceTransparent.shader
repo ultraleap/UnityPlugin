@@ -24,7 +24,7 @@
   //#pragma shader_feature _ GRAPHIC_RENDERER_TINTING
   //#pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
     
-    #include "Assets/LeapMotionModules/GraphicRenderer/Resources/BakedRenderer.cginc"
+#include "Assets/LeapMotionModules/GraphicRenderer/Resources/DynamicRenderer.cginc"
     #include "UnityCG.cginc"
 
     struct Input {
@@ -34,10 +34,10 @@
 
     sampler2D _MainTex;
 
-    void vert(inout appdata_graphic_baked v, out Input o) {
+    void vert(inout appdata_graphic_dynamic v, out Input o) {
       UNITY_INITIALIZE_OUTPUT(Input, o);
       BEGIN_V2F(v);
-      APPLY_BAKED_GRAPHICS_STANDARD(v, o);   
+      APPLY_DYNAMIC_GRAPHICS_STANDARD(v, o);
     }
 
     void surf (Input IN, inout SurfaceOutputStandard o) {
@@ -47,7 +47,7 @@
 #endif
 
       o.Albedo = color.rgb;
-    o.Alpha = color.a;
+      o.Alpha = color.a;
     }
     ENDCG
   }

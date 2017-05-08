@@ -6,6 +6,9 @@ Shader "LeapMotion/Graphic Renderer/Surface/Dynamic" {
   SubShader {
     Tags { "Queue"="Geometry" "RenderType"="Opaque" }
     LOD 200
+
+    Cull Back
+    ZWrite On
     
     CGPROGRAM
     #pragma surface surf Standard fullforwardshadows vertex:vert addshadow 
