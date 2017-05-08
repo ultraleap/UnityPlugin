@@ -32,19 +32,19 @@ namespace Leap.Unity.Interaction {
     /// attached to this anchor if it made an anchor attempt. (In other words, this event may
     /// not be called if all anchorable objects within range prefer other nearby anchors.)
     /// </summary>
-    public UnityEvent WhenAnchorableWithinRange;
+    //public UnityEvent WhenAnchorableWithinRange;
 
     /// <summary>
     /// Called when all nearby anchorable objects have left the range of this anchor, or if
     /// all nearby anchorable objects would prefer other anchors if this Anchor is within an
     /// AnchorGroup.
     /// </summary>
-    public UnityEvent WhenNoAnchorableWithinRange;
+    //public UnityEvent WhenNoAnchorableWithinRange;
 
     /// <summary>
     /// Called every Update() that an AnchorableBehaviour within range prefers this anchor.
     /// </summary>
-    public AnchorableBehaviourEvent WhileAnchorableWithinRange;
+    //public AnchorableBehaviourEvent WhileAnchorableWithinRange;
 
     #endregion
 
