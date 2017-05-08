@@ -49,7 +49,7 @@ namespace Leap.Unity.Attributes {
 
   public abstract class CombinablePropertyAttribute : PropertyAttribute {
     public FieldInfo fieldInfo;
-    public Component component;
+    public UnityEngine.Object[] targets;
 
 #if UNITY_EDITOR
     public virtual IEnumerable<SerializedPropertyType> SupportedTypes {
