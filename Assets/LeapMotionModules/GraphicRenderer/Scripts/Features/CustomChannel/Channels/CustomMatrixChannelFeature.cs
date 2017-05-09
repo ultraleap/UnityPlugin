@@ -10,8 +10,8 @@
 using System;
 
 namespace Leap.Unity.GraphicalRenderer {
-  
-  [LeapGraphicTag("Custom Channel/Matrix")]
+
+  [LeapGraphicTag("Custom Channel/Matrix", 140)]
   [Serializable]
   public class CustomMatrixChannelFeature : CustomChannelFeatureBase<CustomMatrixChannelData> { }
 }

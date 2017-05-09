@@ -11,7 +11,7 @@ using System;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  [LeapGraphicTag("Runtime Tint")]
+  [LeapGraphicTag("Runtime Tint", 30)]
   [Serializable]
   public class LeapRuntimeTintFeature : LeapGraphicFeature<LeapRuntimeTintData> {
     public const string FEATURE_NAME = LeapGraphicRenderer.FEATURE_PREFIX + "TINTING";

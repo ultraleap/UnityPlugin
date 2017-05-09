@@ -5,10 +5,12 @@ namespace Leap.Unity.Query {
     where SourceOp : IQueryOp<SourceType> {
     private SourceOp _op;
     private SourceType _prev;
+    private bool _isFirst;
 
     public WithPreviousOp(SourceOp op) {
       _op = op;
       _prev = default(SourceType);
+      _isFirst = true;
     }
 
     public bool TryGetNext(out PrevPair<SourceType> t) {
@@ -16,8 +18,10 @@ namespace Leap.Unity.Query {
       if (_op.TryGetNext(out value)) {
         t = new PrevPair<SourceType>() {
           value = value,
-          prev = _prev
+          prev = _prev,
+          isFirst = _isFirst
         };
+        _isFirst = false;
         _prev = value;
         return true;
       } else {
@@ -29,6 +33,7 @@ namespace Leap.Unity.Query {
     public void Reset() {
       _op.Reset();
       _prev = default(SourceType);
+      _isFirst = true;
     }
   }
 
@@ -41,5 +46,6 @@ namespace Leap.Unity.Query {
   public struct PrevPair<T> {
     public T value;
     public T prev;
+    public bool isFirst;
   }
 }

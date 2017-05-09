@@ -17,7 +17,7 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  [LeapGraphicTag("Texture")]
+  [LeapGraphicTag("Texture", 10)]
   [Serializable]
   public class LeapTextureFeature : LeapGraphicFeature<LeapTextureData> {
 

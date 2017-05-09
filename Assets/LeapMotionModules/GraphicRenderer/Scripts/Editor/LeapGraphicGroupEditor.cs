@@ -83,14 +83,25 @@ namespace Leap.Unity.GraphicalRenderer {
       });
 
       _addFeatureMenu = new GenericMenu();
-      foreach (var feature in allFeatures) {
-        _addFeatureMenu.AddItem(new GUIContent(LeapGraphicTagAttribute.GetTagName(feature)),
+      foreach (var item in allFeatures.Query().WithPrevious()) {
+        var tag = LeapGraphicTagAttribute.GetTag(item.value);
+        var order = tag == null ? 0 : tag.order;
+
+        if (!item.isFirst) {
+          var prevTag = LeapGraphicTagAttribute.GetTag(item.prev);
+          var prevOrder = prevTag == null ? 0 : prevTag.order;
+          if ((prevOrder / 100) != (order / 100)) {
+            _addFeatureMenu.AddSeparator("");
+          }
+        }
+
+        _addFeatureMenu.AddItem(new GUIContent(LeapGraphicTagAttribute.GetTagName(item.value)),
                                 false,
                                 () => {
                                   serializedObject.ApplyModifiedProperties();
                                   Undo.RecordObject(_renderer, "Added feature");
                                   EditorUtility.SetDirty(_renderer);
-                                  _renderer.editor.AddFeature(feature);
+                                  _renderer.editor.AddFeature(item.value);
                                   _serializedObject.Update();
                                   _serializedObject.SetIsDifferentCacheDirty();
                                 });
