@@ -1175,12 +1175,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4411376810883292, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
     type: 2}
   m_PrefabInternal: {fileID: 114977712}
---- !u!114 &114977714 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114569391702026776, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
-    type: 2}
-  m_PrefabInternal: {fileID: 114977712}
-  m_Script: {fileID: 11500000, guid: 4a517469c92f76f4ebdf8193e696d038, type: 3}
 --- !u!1 &116834467
 GameObject:
   m_ObjectHideFlags: 0
@@ -5973,12 +5967,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4411376810883292, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
     type: 2}
   m_PrefabInternal: {fileID: 476617761}
---- !u!114 &476617763 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114569391702026776, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
-    type: 2}
-  m_PrefabInternal: {fileID: 476617761}
-  m_Script: {fileID: 11500000, guid: 4a517469c92f76f4ebdf8193e696d038, type: 3}
 --- !u!1 &480538293
 GameObject:
   m_ObjectHideFlags: 0
@@ -12121,12 +12109,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4411376810883292, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
     type: 2}
   m_PrefabInternal: {fileID: 1007406350}
---- !u!114 &1007406352 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114569391702026776, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
-    type: 2}
-  m_PrefabInternal: {fileID: 1007406350}
-  m_Script: {fileID: 11500000, guid: 4a517469c92f76f4ebdf8193e696d038, type: 3}
 --- !u!1 &1007418395
 GameObject:
   m_ObjectHideFlags: 0
@@ -13675,12 +13657,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4411376810883292, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
     type: 2}
   m_PrefabInternal: {fileID: 1094300978}
---- !u!114 &1094300980 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114569391702026776, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
-    type: 2}
-  m_PrefabInternal: {fileID: 1094300978}
-  m_Script: {fileID: 11500000, guid: 4a517469c92f76f4ebdf8193e696d038, type: 3}
 --- !u!1 &1107710529
 GameObject:
   m_ObjectHideFlags: 0
@@ -15379,12 +15355,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4411376810883292, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
     type: 2}
   m_PrefabInternal: {fileID: 2105320696}
---- !u!114 &1297749050 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114569391702026776, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
-    type: 2}
-  m_PrefabInternal: {fileID: 2105320696}
-  m_Script: {fileID: 11500000, guid: 4a517469c92f76f4ebdf8193e696d038, type: 3}
 --- !u!1 &1299123903
 GameObject:
   m_ObjectHideFlags: 0
@@ -16817,13 +16787,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   anchors:
-  - {fileID: 1297749050}
-  - {fileID: 476617763}
-  - {fileID: 1770611134}
-  - {fileID: 1007406352}
-  - {fileID: 2063850415}
-  - {fileID: 114977714}
-  - {fileID: 1094300980}
+    _values: []
 --- !u!4 &1420400432
 Transform:
   m_ObjectHideFlags: 0
@@ -17251,12 +17215,16 @@ MonoBehaviour:
   _isAnchored: 0
   _anchor: {fileID: 0}
   _anchorGroup: {fileID: 0}
+  maxAnchorRange: 0.3
+  useTrajectory: 0
+  _maxAttachmentAngle: 66
   lockToAnchor: 0
-  lockToAnchorWhenAttached: 1
-  matchAnchorMotionWhileReturning: 1
+  lockWhenAttached: 1
+  matchAnchorMotionWhileAttaching: 1
   anchorLerpCoeffPerSec: 20
   anchorRotation: 0
   interactionBehaviour: {fileID: 0}
+  _interactionBehaviourIsNull: 1
   detachWhenGrasped: 0
   tryAnchorOnGraspEnd: 0
   isAttractedByHand: 0
@@ -20926,13 +20894,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isAnchored: 0
   _anchor: {fileID: 0}
-  _anchorGroup: {fileID: 1420400431}
+  _anchorGroup: {fileID: 0}
+  maxAnchorRange: 0.3
+  useTrajectory: 1
+  _maxAttachmentAngle: 66
   lockToAnchor: 0
-  lockToAnchorWhenAttached: 1
-  matchAnchorMotionWhileReturning: 1
-  anchorLerpCoeffPerSec: 10
+  lockWhenAttached: 1
+  matchAnchorMotionWhileAttaching: 1
+  anchorLerpCoeffPerSec: 20
   anchorRotation: 0
   interactionBehaviour: {fileID: 1680547685}
+  _interactionBehaviourIsNull: 0
   detachWhenGrasped: 1
   tryAnchorOnGraspEnd: 1
   isAttractedByHand: 0
@@ -20966,24 +20938,7 @@ MonoBehaviour:
   graspedMovementType: 0
   graspHoldWarpingEnabled__curIgnored: 1
   _eventTable:
-    _entries:
-    - enumValue: 152
-      callback:
-        m_PersistentCalls:
-          m_Calls:
-          - m_Target: {fileID: 0}
-            m_MethodName: DebugPrint
-            m_Mode: 5
-            m_Arguments:
-              m_ObjectArgument: {fileID: 0}
-              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-              m_IntArgument: 0
-              m_FloatArgument: 0
-              m_StringArgument: Got ObjectGraspEnd!
-              m_BoolArgument: 0
-            m_CallState: 2
-        m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-          PublicKeyToken=null
+    _entries: []
 --- !u!54 &1680547686
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -22118,12 +22073,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4411376810883292, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
     type: 2}
   m_PrefabInternal: {fileID: 1770611132}
---- !u!114 &1770611134 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114569391702026776, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
-    type: 2}
-  m_PrefabInternal: {fileID: 1770611132}
-  m_Script: {fileID: 11500000, guid: 4a517469c92f76f4ebdf8193e696d038, type: 3}
 --- !u!1 &1784983679
 GameObject:
   m_ObjectHideFlags: 0
@@ -22525,12 +22474,16 @@ MonoBehaviour:
   _isAnchored: 0
   _anchor: {fileID: 0}
   _anchorGroup: {fileID: 1420400431}
+  maxAnchorRange: 0.3
+  useTrajectory: 1
+  _maxAttachmentAngle: 66
   lockToAnchor: 0
-  lockToAnchorWhenAttached: 1
-  matchAnchorMotionWhileReturning: 1
+  lockWhenAttached: 1
+  matchAnchorMotionWhileAttaching: 1
   anchorLerpCoeffPerSec: 10
   anchorRotation: 0
   interactionBehaviour: {fileID: 1817611767}
+  _interactionBehaviourIsNull: 0
   detachWhenGrasped: 1
   tryAnchorOnGraspEnd: 1
   isAttractedByHand: 0
@@ -25557,12 +25510,6 @@ Transform:
   m_PrefabParentObject: {fileID: 4411376810883292, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
     type: 2}
   m_PrefabInternal: {fileID: 2063850413}
---- !u!114 &2063850415 stripped
-MonoBehaviour:
-  m_PrefabParentObject: {fileID: 114569391702026776, guid: 0ec3b9195e40d4f4e9ca839839bfbf6a,
-    type: 2}
-  m_PrefabInternal: {fileID: 2063850413}
-  m_Script: {fileID: 11500000, guid: 4a517469c92f76f4ebdf8193e696d038, type: 3}
 --- !u!1 &2071999083
 GameObject:
   m_ObjectHideFlags: 0
@@ -27079,12 +27026,16 @@ MonoBehaviour:
   _isAnchored: 0
   _anchor: {fileID: 0}
   _anchorGroup: {fileID: 1420400431}
+  maxAnchorRange: 0.3
+  useTrajectory: 1
+  _maxAttachmentAngle: 66
   lockToAnchor: 0
-  lockToAnchorWhenAttached: 1
-  matchAnchorMotionWhileReturning: 1
+  lockWhenAttached: 1
+  matchAnchorMotionWhileAttaching: 1
   anchorLerpCoeffPerSec: 10
   anchorRotation: 0
   interactionBehaviour: {fileID: 2122011965}
+  _interactionBehaviourIsNull: 0
   detachWhenGrasped: 1
   tryAnchorOnGraspEnd: 1
   isAttractedByHand: 0

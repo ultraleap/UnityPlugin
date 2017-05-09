@@ -44,7 +44,7 @@ namespace Leap.Unity.Interaction {
             _anchor = value;
           }
           else {
-            Debug.LogWarning("The '" + value.name + "' anchor is not in " + this.name + "'s anchor group.");
+            Debug.LogWarning("The '" + value.name + "' anchor is not in " + this.name + "'s anchor group.", this.gameObject);
           }
         }
       }
@@ -58,7 +58,10 @@ namespace Leap.Unity.Interaction {
       get { return _anchorGroup; }
       set {
         _anchorGroup = value;
-        validateAnchor();
+        if (anchor != null && !_anchorGroup.Contains(anchor)) {
+          anchor = null;
+          Debug.LogWarning(this.name + "'s anchor is not within its anchorGroup (setting it to null).", this.gameObject);
+        }
       }
     }
 
@@ -70,18 +73,19 @@ namespace Leap.Unity.Interaction {
     //public bool requireAnchorWithinRange = true;
 
     [Tooltip("Anchors beyond this range are ignored as possible anchors for this object.")]
-    public float maximumAnchorableRange = 0.3F;
+    public float maxAnchorRange = 0.3F;
 
     [Tooltip("Only allowed when an InteractionBehaviour is attached to this object. If enabled, this "
            + "object's Attach() method or its variants will weigh its velocity towards an anchor along "
            + "with its proximity when seeking an anchor to attach to.")]
-    public bool useObjectTrajectory = true;
+    [DisableIf("_interactionBehaviourIsNull", true)]
+    public bool useTrajectory = true;
 
     [Tooltip("The maximum angle this object's trajectory can be away from an anchor to consider it as "
            + "an anchor to attach to.")]
     [SerializeField]
     [Range(20F, 90F)]
-    private float _maxAttachmentAngle = 66F;
+    private float _maxAttachmentAngle = 60F;
     /// <summary> Calculated via _trajectoryAttachmentAngle. </summary>
     private float _minAttachmentDotProduct;
 
@@ -94,13 +98,13 @@ namespace Leap.Unity.Interaction {
            + "Note: Disabling the AnchorableBehaviour will stop the object from moving towards its anchor, and will "
            + "'release' it from the anchor, so that on re-enable the object will smoothly move to the anchor again.")]
     [DisableIf("lockToAnchor", isEqualTo: true)]
-    public bool lockToAnchorWhenAttached = true;
+    public bool lockWhenAttached = true;
 
     [Tooltip("While this object is moving smoothly towards its anchor, should it also inherit the motion of the "
            + "anchor itself if the anchor is not stationary? Otherwise, the anchor might be able to run away from this "
            + "AnchorableBehaviour and prevent it from actually getting to the anchor.")]
     [DisableIf("lockToAnchor", isEqualTo: true)]
-    public bool matchAnchorMotionWhileReturning = true;
+    public bool matchAnchorMotionWhileAttaching = true;
 
     [Tooltip("How fast should the object move towards its target position? Higher values are faster.")]
     [DisableIf("lockToAnchor", isEqualTo: true)]
@@ -118,14 +122,18 @@ namespace Leap.Unity.Interaction {
     [Tooltip("Additional features are enabled when this GameObject also has an InteractionBehaviour component.")]
     [Disable]
     public InteractionBehaviour interactionBehaviour;
+    [SerializeField, HideInInspector]
+    private bool _interactionBehaviourIsNull = true;
 
     [Tooltip("If the InteractionBehaviour is set, objects will automatically detach from their anchor when grasped.")]
     [Disable]
     public bool detachWhenGrasped = true;
 
-    [Tooltip("Should the AnchorableBehaviour automatically try to anchor itself when a grasp ends?")]
+    [Tooltip("Should the AnchorableBehaviour automatically try to anchor itself when a grasp ends? If useTrajectory is enabled, "
+           + "this object will automatically attempt to attach to the nearest valid anchor that is in the direction of its trajectory, "
+           + "otherwise it will simply attempt to attach to its nearest valid anchor.")]
     [EditTimeOnly]
-    public bool tryAnchorOnGraspEnd = true;
+    public bool tryAnchorNearestOnGraspEnd = true;
 
     [Tooltip("Should the object pull away from its anchor and reach towards the user's hand when the user's hand is nearby?")]
     public bool isAttractedByHand = false;
@@ -252,23 +260,33 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     void OnValidate() {
-      interactionBehaviour = GetComponent<InteractionBehaviour>();
-
-      detachWhenGrasped = interactionBehaviour != null;
+      refreshInteractionBehaviour();
     }
 
     void Awake() {
-      interactionBehaviour = GetComponent<InteractionBehaviour>();
+      refreshInteractionBehaviour();
 
       if (interactionBehaviour != null) {
         interactionBehaviour.OnObjectGraspBegin += detachAnchorOnObjectGraspBegin;
 
-        if (tryAnchorOnGraspEnd) {
+        if (tryAnchorNearestOnGraspEnd) {
           interactionBehaviour.OnObjectGraspEnd += tryToAnchorOnObjectGraspEnd;
         }
       }
 
       InitUnityEvents();
+    }
+
+    void Reset() {
+      refreshInteractionBehaviour();
+    }
+
+    private void refreshInteractionBehaviour() {
+      interactionBehaviour = GetComponent<InteractionBehaviour>();
+      _interactionBehaviourIsNull = interactionBehaviour == null;
+
+      detachWhenGrasped = !_interactionBehaviourIsNull;
+      if (_interactionBehaviourIsNull) useTrajectory = false;
     }
 
     void OnDisable() {
@@ -288,7 +306,17 @@ namespace Leap.Unity.Interaction {
     void Update() {
       updateAttractionToHand();
 
-      if (anchor != null && isAnchored) updateAnchorAttachment();
+      if (anchor != null && isAnchored) {
+        updateAnchorAttachment();
+      }
+    }
+
+    /// <summary>
+    /// Detaches this Anchorable object from its anchor. The anchor reference
+    /// remains unchanged. Call TryAttach() to re-attach to this object's assigned anchor.
+    /// </summary>
+    public void Detach() {
+      _isAnchored = false;
     }
 
     /// <summary>
@@ -306,19 +334,18 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Detaches this Anchorable object from its anchor. The anchor reference
-    /// remains unchanged. Call TryAttach() to re-attach to this object's assigned anchor.
+    /// Returns whether the specified anchor is within attachment range of this Anchorable object.
     /// </summary>
-    public void Detach() {
-      _isAnchored = false;
+    public bool IsWithinRange(Anchor anchor) {
+      return (this.transform.position - anchor.transform.position).sqrMagnitude < maxAnchorRange * maxAnchorRange;
     }
 
     /// <summary>
-    /// Attaches this Anchorable object to its currently assigned anchor. By default, the
-    /// attempt will fail if the anchor is 
+    /// Attempts to attach to this Anchorable object's currently specified anchor.
+    /// The attempt may fail if this anchor is out of range.
     /// </summary>
     public bool TryAttach() {
-      if (anchor != null) {
+      if (anchor != null && IsWithinRange(anchor)) {
         _isAnchored = true;
         return true;
       }
@@ -327,33 +354,54 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    ///
-    public bool TryAttachTo(Anchor anchor) {
+    public bool TryAttachToNearestAnchor() {
+      //if (!useTrajectory) {
+      //  // Simply try to attach to the nearest valid anchor.
+      //  Anchor nearestValidAnchor = GetNearestValidAnchor();
+
+      //  if (nearestValidAnchor != null) {
+      //    anchor = nearestValidAnchor;
+      //    _isAnchored = true;
+      //    return true;
+      //  }
+      //}
+      //else {
+      //  // Pick the nearby valid anchor with the highest score, based on proximity and trajectory.
+      //  Anchor optimalAnchor = null;
+      //  float optimalScore = 0F;
+      //  Anchor testAnchor = null;
+      //  float testScore = 0F;
+      //  foreach (var anchor in GetNearbyValidAnchors()) {
+      //    testAnchor = anchor;
+      //    testScore = getAnchorScore(anchor);
+
+      //    // Scores of 0 mark ineligible anchors.
+      //    if (testScore == 0F) continue;
+
+      //    if (testScore > optimalAnchorScore) {
+      //      optimalAnchor = testAnchor;
+      //      optimalScore = testScore;
+      //    }
+      //  }
+
+      //  if (optimalAnchor != null) {
+      //    anchor = optimalAnchor;
+      //    _isAnchored = true;
+      //    return true;
+      //  }
+      //}
+
       return false;
     }
 
-    public bool TryAttachToAnchor() {
-      Anchor anchor;
-      return TryAttachToAnchor(out anchor);
-    }
+    /// <summary> Score an anchor based on its proximity and this object's trajectory relative to it. </summary>
+    private float getAnchorScore(Anchor anchor) {
+      return 0F;
+      //float distanceScore = 
 
-    public bool TryAttachToAnchor(out Anchor anchor) {
-      anchor = FindPreferredAnchor(this);
+      //float angleScore;
 
-      if (anchor != null) {
-        this.anchor = anchor;
-        return true;
-      }
-
-      return false;
-    }
-
-    public static Anchor FindPreferredAnchor(AnchorableBehaviour anchObj) {
-      return null;
-    }
-
-    private void validateAnchor() {
-
+      //return distanceScore * angleScore;
     }
 
     private void updateAttractionToHand() {
@@ -404,7 +452,7 @@ namespace Leap.Unity.Interaction {
         // Reset anchor position storage; it can't be updated from this state.
         _hasTargetPositionLastUpdate = false;
       }
-      else if (lockToAnchorWhenAttached) {
+      else if (lockWhenAttached) {
         if (_isLockedToAnchor) {
           // In this state, we are already attached to the anchor.
           finalPosition = targetPosition + _offsetTowardsHand;
@@ -417,7 +465,7 @@ namespace Leap.Unity.Interaction {
           finalPosition -= _offsetTowardsHand;
 
           // If desired, automatically correct for the anchor itself moving while attempting to return to it.
-          if (matchAnchorMotionWhileReturning) {
+          if (matchAnchorMotionWhileAttaching) {
             if (_hasTargetPositionLastUpdate) {
               finalPosition += (targetPosition - _targetPositionLastUpdate);
             }
@@ -454,7 +502,7 @@ namespace Leap.Unity.Interaction {
 
     /// <summary> Wrapper method to match OnObjectGraspEnd method signature. </summary>
     private void tryToAnchorOnObjectGraspEnd(List<InteractionHand> hands) {
-      TryAttachToAnchor();
+      TryAttachToNearestAnchor();
     }
 
     #region DELETEME // OLD TryToAnchor

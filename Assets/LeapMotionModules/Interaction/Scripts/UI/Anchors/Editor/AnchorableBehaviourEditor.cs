@@ -16,19 +16,19 @@ namespace Leap.Unity.Interaction {
       deferProperty("_eventTable");
       specifyCustomDrawer("_eventTable", drawEventTable);
 
-      // Only draw matchAnchorMotionWhileReturning when lockToAnchorWhenAttached is enabled
-      specifyConditionalDrawing("lockToAnchorWhenAttached",
-                                "matchAnchorMotionWhileReturning");
+      specifyConditionalDrawing("lockWhenAttached",
+                                "matchAnchorMotionWhileAttaching");
 
-      // Only draw Interaction settings when assigned an InteractionBehaviour.
+      specifyConditionalDrawing("useTrajectory",
+                                "_maxAttachmentAngle");
+
       specifyConditionalDrawing(() => { return target.interactionBehaviour != null; },
                                 "detachWhenGrasped",
-                                "tryAnchorOnGraspEnd",
+                                "tryAnchorNearestOnGraspEnd",
                                 "isAttractedByHand",
                                 "maxAttractionReach",
                                 "attractionReachByDistance");
 
-      // Only draw hand attraction settings when it is enabled.
       specifyConditionalDrawing("isAttractedByHand",
                                 "maxAttractionReach",
                                 "attractionReachByDistance");
