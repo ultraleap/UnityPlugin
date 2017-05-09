@@ -15,7 +15,7 @@ using UnityEngine.SceneManagement;
 using UnityEditor;
 #endif
 
-namespace Leap.Unity.GraphicalRenderer {
+namespace Leap.Unity {
 
 #if UNITY_EDITOR
   [InitializeOnLoad]

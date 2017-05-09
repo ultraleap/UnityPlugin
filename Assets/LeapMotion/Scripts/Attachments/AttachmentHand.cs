@@ -2,6 +2,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace Leap.Unity.Attachments {
@@ -220,24 +223,62 @@ namespace Leap.Unity.Attachments {
         case AttachmentPointFlags.PinkyDistalJoint:     pinkyDistalJoint = behaviour; break;
         case AttachmentPointFlags.PinkyTip:             pinkyTip = behaviour; break;
       }
+
+      #if UNITY_EDITOR
+      EditorUtility.SetDirty(this);
+      #endif
     }
 
     private void ensureTransformExists(AttachmentPointFlags singlePoint) {
       if (!singlePoint.IsSinglePoint()) {
-        Debug.LogError("Tried to ensure transform exists for singlePoint, but it contains more than one set flag");
+        Debug.LogError("Tried to ensure transform exists for singlePoint, but it contains more than one set flag.");
         return;
       }
 
-      if (GetBehaviourForPoint(singlePoint) == null) {
-        GameObject obj = new GameObject(Enum.GetName(typeof(AttachmentPointFlags), singlePoint));
-        AttachmentPointBehaviour newPointBehaviour = obj.AddComponent<AttachmentPointBehaviour>();
-        newPointBehaviour.attachmentPoint = singlePoint;
-        newPointBehaviour.transform.parent = this.transform;
+      AttachmentPointBehaviour pointBehaviour = GetBehaviourForPoint(singlePoint);
 
-        setBehaviourForPoint(singlePoint, newPointBehaviour);
+      if (pointBehaviour == null) {
+        // First, see if there's already one in the hierarchy! Might exist due to, e.g. an Undo operation
+        var existingPointBehaviour = this.gameObject.GetComponentsInChildren<AttachmentPointBehaviour>()
+                                                    .Query()
+                                                    .FirstOrDefault(p => p.attachmentPoint == singlePoint);
+
+        // Only make a new object if the transform really doesn't exist.
+        if (existingPointBehaviour == AttachmentPointFlags.None) {
+          GameObject obj = new GameObject(Enum.GetName(typeof(AttachmentPointFlags), singlePoint));
+          #if UNITY_EDITOR
+          Undo.RegisterCreatedObjectUndo(obj, "Created Object");
+          pointBehaviour = Undo.AddComponent<AttachmentPointBehaviour>(obj);
+          #else
+          pointBehaviour = obj.AddComponent<AttachmentPointBehaviour>();
+          #endif
+        }
+        else {
+          pointBehaviour = existingPointBehaviour;
+        }
+
+        #if UNITY_EDITOR
+        Undo.RecordObject(pointBehaviour, "Set Attachment Point");
+        #endif
+        pointBehaviour.attachmentPoint = singlePoint;
+        setBehaviourForPoint(singlePoint, pointBehaviour);
+
+        SetTransformParent(pointBehaviour.transform, this.transform);
 
         _attachmentPointsDirty = true;
+
+        #if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+        #endif
       }
+    }
+
+    private static void SetTransformParent(Transform t, Transform parent) {
+      #if UNITY_EDITOR
+      Undo.SetTransformParent(t, parent, "Set Transform Parent");
+      #else
+      t.parent = parent;
+      #endif
     }
 
     private void ensureTransformDoesNotExist(AttachmentPointFlags singlePoint) {
@@ -248,16 +289,20 @@ namespace Leap.Unity.Attachments {
 
       var pointBehaviour = GetBehaviourForPoint(singlePoint);
       if (pointBehaviour != null) {
-        DestroyImmediate(pointBehaviour.gameObject);
+        InternalUtility.Destroy(pointBehaviour.gameObject);
         pointBehaviour = null;
 
         _attachmentPointsDirty = true;
+
+        #if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+        #endif
       }
     }
 
     private void flattenAttachmentTransformHierarchy() {
       foreach (var point in this.points) {
-        point.transform.parent = this.transform;
+        SetTransformParent(point.transform, this.transform);
       }
     }
 
@@ -338,7 +383,7 @@ namespace Leap.Unity.Attachments {
       }
 
       for (int i = hierarchyCount - 1; i > 0; i--) {
-        s_hierarchyTransformsBuffer[i].parent = s_hierarchyTransformsBuffer[i - 1];
+        SetTransformParent(s_hierarchyTransformsBuffer[i], s_hierarchyTransformsBuffer[i - 1]);
       }
 
       if (hierarchyCount > 0) {

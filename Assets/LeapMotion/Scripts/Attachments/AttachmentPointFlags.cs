@@ -39,9 +39,13 @@ namespace Leap.Unity.Attachments {
 
   public static class AttachmentPointFlagsExtensions {
 
+    // Takes advantage of two's complement representation for negative integers
+    // to check whether the bit field has a single bit set.
+    // https://en.wikipedia.org/wiki/Two%27s_complement
     public static bool IsSinglePoint(this AttachmentPointFlags points) {
-      // If the log-base-2 of singlePoint is not an integer, there's more than one bit set in the AttachmentPoints bit field.
-      return points != AttachmentPointFlags.None && Mathf.Abs(Mathf.Log((int)points, 2) % 1F) < 0.00001F;
+      int mask = (int)points;
+      bool isSingleBitSet = mask != 0 && mask == (mask & -mask); 
+      return isSingleBitSet;
     }
 
     /// <summary>

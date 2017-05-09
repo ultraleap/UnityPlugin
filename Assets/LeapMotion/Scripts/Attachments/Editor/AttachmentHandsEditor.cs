@@ -25,6 +25,15 @@ namespace Leap.Unity.Attachments {
 
       EditorGUILayout.Space();
       EditorGUILayout.LabelField("Attachment Transforms", EditorStyles.boldLabel);
+
+      // Determine whether the target object is a prefab. AttachmentPoints cannot be edited on prefabs.
+      PrefabType prefabType = PrefabUtility.GetPrefabType(target.gameObject);
+      bool isTargetPrefab = prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab;
+
+      if (isTargetPrefab) {
+        EditorGUILayout.HelpBox("Drag the prefab into the scene to make changes to attachment points.", MessageType.Info, true);
+      }
+
       _handTexRect = EditorGUILayout.BeginVertical(GUILayout.MinWidth(EditorGUIUtility.currentViewWidth),
                                                    GUILayout.MinHeight(EditorGUIUtility.currentViewWidth * (_handTex.height / (float)_handTex.width)),
                                                    GUILayout.MaxWidth(_handTex.width),
@@ -46,6 +55,8 @@ namespace Leap.Unity.Attachments {
 
 
       // Draw the toggles for the attachment points.
+
+      EditorGUI.BeginDisabledGroup(isTargetPrefab);
 
       makeAttachmentPointsToggle("Palm",                new Vector2( 0.100F,  0.160F));
       makeAttachmentPointsToggle("Wrist",               new Vector2( 0.080F,  0.430F));
@@ -74,6 +85,7 @@ namespace Leap.Unity.Attachments {
       makeAttachmentPointsToggle("PinkyDistalJoint",    new Vector2( 0.380F, -0.130F));
       makeAttachmentPointsToggle("PinkyTip",            new Vector2( 0.410F, -0.210F));
 
+      EditorGUI.EndDisabledGroup();
 
       EditorGUILayout.EndVertical();
     }
@@ -109,6 +121,8 @@ namespace Leap.Unity.Attachments {
     }
 
     private static bool wouldFlagDeletionDestroyData(AttachmentHands target, AttachmentPointFlags flag) {
+      if (target.attachmentHands == null) return false;
+
       foreach (var attachmentHand in target.attachmentHands) {
         var point = attachmentHand.GetBehaviourForPoint(flag);
 
@@ -123,7 +137,7 @@ namespace Leap.Unity.Attachments {
           // Data will be destroyed if this AttachmentPointBehaviour contains any components
           // that aren't constructed automatically.
           foreach (var component in point.gameObject.GetComponents<Component>()) {
-            if (component is Transform)                continue;
+            if (component is Transform) continue;
             if (component is AttachmentPointBehaviour) continue;
 
             return true;

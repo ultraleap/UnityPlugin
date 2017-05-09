@@ -15,7 +15,7 @@ namespace Leap.Unity.Attachments {
   /// Can also be used to refer to a single AttachmentPointFlags flag constant (implicit conversion).
   /// </summary>
   [AddComponentMenu("")]
-  public class AttachmentPointBehaviour : MonoBehaviour, IEquatable<AttachmentPointBehaviour> {
+  public class AttachmentPointBehaviour : MonoBehaviour {
 
     [Tooltip("To change which attachment points are available on an AttachmentHand, refer to the "
            + "inspector for the parent AttachmentHands object.")]
@@ -29,11 +29,8 @@ namespace Leap.Unity.Attachments {
       }
     }
 
-    public bool Equals(AttachmentPointBehaviour other) {
-      return this.attachmentPoint == other.attachmentPoint;
-    }
-
     public static implicit operator AttachmentPointFlags(AttachmentPointBehaviour p) {
+      if (p == null) return AttachmentPointFlags.None;
       return p.attachmentPoint;
     }
 

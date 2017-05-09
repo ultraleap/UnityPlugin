@@ -28,8 +28,21 @@ namespace Leap.Unity.Attachments {
         return _attachmentPoints;
       }
       set {
-        _attachmentPoints = value;
-        refreshAttachmentHandTransforms();
+        if (_attachmentPoints != value) {
+          #if UNITY_EDITOR
+          Undo.IncrementCurrentGroup();
+          Undo.SetCurrentGroupName("Modify Attachment Points");
+
+          Undo.RecordObject(this, "Modify AttachmentHands Points");
+          #endif
+
+          _attachmentPoints = value;
+          refreshAttachmentHandTransforms();
+
+          #if UNITY_EDITOR
+
+          #endif
+        }
       }
     }
 
@@ -116,11 +129,12 @@ namespace Leap.Unity.Attachments {
     }
 
     private void refreshAttachmentHands() {
+      // If we're a prefab, we'll be unable to set parent transforms, so we shouldn't create new objects in general.
+      bool isPrefab = false;
       #if UNITY_EDITOR
-      // Don't do anything if we're a prefab.
       PrefabType prefabType = PrefabUtility.GetPrefabType(this.gameObject);
       if (prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab) {
-        return;
+        isPrefab = true;
       }
       #endif
 
@@ -136,6 +150,14 @@ namespace Leap.Unity.Attachments {
           }
         }
 
+        // If we are a prefab and there are missing AttachmentHands, we have to return early.
+        // We can't set parent transforms while a prefab. We're only OK if we already have attachmentHand
+        // objects and their parents are properly set.
+        if (isPrefab && (_attachmentHands[0] == null || _attachmentHands[0].transform.parent != this.transform
+                      || _attachmentHands[1] == null || _attachmentHands[1].transform.parent != this.transform)) {
+          return;
+        }
+
         // Construct any missing AttachmentHand objects.
         if (_attachmentHands[0] == null) {
           GameObject obj = new GameObject();
@@ -143,7 +165,7 @@ namespace Leap.Unity.Attachments {
           _attachmentHands[0].chirality = Chirality.Left;
         }
         _attachmentHands[0].gameObject.name = "Attachment Hand (Left)";
-        _attachmentHands[0].transform.parent = this.transform;
+        if (_attachmentHands[0].transform.parent != this.transform) _attachmentHands[0].transform.parent = this.transform;
 
         if (_attachmentHands[1] == null) {
           GameObject obj = new GameObject();
@@ -151,7 +173,7 @@ namespace Leap.Unity.Attachments {
           _attachmentHands[1].chirality = Chirality.Right;
         }
         _attachmentHands[1].gameObject.name = "Attachment Hand (Right)";
-        _attachmentHands[1].transform.parent = this.transform;
+        if (_attachmentHands[1].transform.parent != this.transform) _attachmentHands[1].transform.parent = this.transform;
 
         // Organize left hand first in sibling order.
         _attachmentHands[0].transform.SetSiblingIndex(0);
@@ -160,16 +182,26 @@ namespace Leap.Unity.Attachments {
     }
 
     private void refreshAttachmentHandTransforms() {
+
       bool requiresReinitialization = false;
 
-      foreach (var hand in _attachmentHands) {
-        if (hand == null) {
-          // AttachmentHand must have been destroyed
-          requiresReinitialization = true;
-          break;
+      if (_attachmentHands == null) {
+        requiresReinitialization = true;
+      }
+      else {
+        foreach (var hand in _attachmentHands) {
+          if (hand == null) {
+            // AttachmentHand must have been destroyed
+            requiresReinitialization = true;
+            break;
+          }
+
+          hand.refreshAttachmentTransforms(_attachmentPoints);
         }
 
-        hand.refreshAttachmentTransforms(_attachmentPoints);
+        #if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+        #endif
       }
 
       if (requiresReinitialization) {
