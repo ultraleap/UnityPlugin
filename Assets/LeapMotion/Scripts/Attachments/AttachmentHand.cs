@@ -15,6 +15,7 @@ namespace Leap.Unity.Attachments {
   /// to a parent GameObject to manage the construction and updating of AttachmentHand objects.
   /// </summary>
   [AddComponentMenu("")]
+  [ExecuteInEditMode]
   public class AttachmentHand : MonoBehaviour {
 
     /// <summary>
@@ -108,61 +109,6 @@ namespace Leap.Unity.Attachments {
       initializeAttachmentPointFlagConstants();
     }
 
-
-    private AttachmentPointFlags[] _attachmentPointFlagConstants;
-    private void initializeAttachmentPointFlagConstants() {
-      Array flagConstants = Enum.GetValues(typeof(AttachmentPointFlags));
-      if (_attachmentPointFlagConstants == null || _attachmentPointFlagConstants.Length == 0) {
-        _attachmentPointFlagConstants = new AttachmentPointFlags[flagConstants.Length];
-      }
-      int i = 0;
-      foreach (int f in flagConstants) {
-        _attachmentPointFlagConstants[i++] = (AttachmentPointFlags)f;
-      }
-    }
-
-    public void refreshAttachmentTransforms(AttachmentPointFlags points) {
-      if (_attachmentPointFlagConstants == null || _attachmentPointFlagConstants.Length == 0) {
-        initializeAttachmentPointFlagConstants();
-      }
-
-      // First just _check_ whether we'll need to do any destruction
-      bool requiresDestruction = false;
-      foreach (var flag in _attachmentPointFlagConstants) {
-        if (flag == AttachmentPointFlags.None) continue;
-
-        if (!points.Contains(flag) && GetBehaviourForPoint(flag) != null) {
-          requiresDestruction = true;
-        }
-      }
-
-      // Go through the work of flattening and rebuilding if it is necessary.
-      if (requiresDestruction) {
-        // Remove parent-child relationships so deleting parent Transforms doesn't annihilate
-        // child Transforms that don't need to be deleted themselves.
-        flattenAttachmentTransformHierarchy();
-
-        foreach (AttachmentPointFlags flag in _attachmentPointFlagConstants) {
-          if (flag == AttachmentPointFlags.None) continue;
-
-          if (points.Contains(flag)) {
-            ensureTransformExists(flag);
-          }
-          else {
-            ensureTransformDoesNotExist(flag);
-          }
-        }
-
-        // Organize transforms, restoring parent-child relationships.
-        organizeAttachmentTransforms();
-      }
-
-      if (_attachmentPointsDirty) {
-        OnAttachmentPointsModified();
-        _attachmentPointsDirty = false;
-      }
-    }
-
     /// <summary>
     /// Returns the AttachmentPointBehaviour child object of this AttachmentHand given a
     /// reference to a single AttachmentPointFlags flag, or null if there is no such child object.
@@ -204,7 +150,71 @@ namespace Leap.Unity.Attachments {
       return behaviour;
     }
 
+    public void refreshAttachmentTransforms(AttachmentPointFlags points) {
+      if (_attachmentPointFlagConstants == null || _attachmentPointFlagConstants.Length == 0) {
+        initializeAttachmentPointFlagConstants();
+      }
+
+      // First just _check_ whether we'll need to do any destruction or creation
+      bool requiresDestructionOrCreation = false;
+      foreach (var flag in _attachmentPointFlagConstants) {
+        if (flag == AttachmentPointFlags.None) continue;
+
+        if ((!points.Contains(flag) && GetBehaviourForPoint(flag) != null)
+             || (points.Contains(flag) && GetBehaviourForPoint(flag) == null)) {
+          requiresDestructionOrCreation = true;
+        }
+      }
+
+      // Go through the work of flattening and rebuilding if it is necessary.
+      if (requiresDestructionOrCreation) {
+        // Remove parent-child relationships so deleting parent Transforms doesn't annihilate
+        // child Transforms that don't need to be deleted themselves.
+        flattenAttachmentTransformHierarchy();
+
+        foreach (AttachmentPointFlags flag in _attachmentPointFlagConstants) {
+          if (flag == AttachmentPointFlags.None) continue;
+
+          if (points.Contains(flag)) {
+            ensureTransformExists(flag);
+          }
+          else {
+            ensureTransformDoesNotExist(flag);
+          }
+        }
+
+        // Organize transforms, restoring parent-child relationships.
+        organizeAttachmentTransforms();
+      }
+
+      if (_attachmentPointsDirty) {
+        OnAttachmentPointsModified();
+        _attachmentPointsDirty = false;
+      }
+    }
+
+    public void notifyPointBehaviourDeleted(AttachmentPointBehaviour point) {
+      // Refresh this hand's attachment transforms on a slight delay.
+      // Only AttachmentHands can _truly_ remove attachment points!
+      AttachmentHands attachHands = GetComponentInParent<AttachmentHands>();
+      if (attachHands != null) {
+        EditorApplication.delayCall += () => { refreshAttachmentTransforms(attachHands.attachmentPoints); };
+      }
+    }
+
     #region Internal
+
+    private AttachmentPointFlags[] _attachmentPointFlagConstants;
+    private void initializeAttachmentPointFlagConstants() {
+      Array flagConstants = Enum.GetValues(typeof(AttachmentPointFlags));
+      if (_attachmentPointFlagConstants == null || _attachmentPointFlagConstants.Length == 0) {
+        _attachmentPointFlagConstants = new AttachmentPointFlags[flagConstants.Length];
+      }
+      int i = 0;
+      foreach (int f in flagConstants) {
+        _attachmentPointFlagConstants[i++] = (AttachmentPointFlags)f;
+      }
+    }
 
     private void setBehaviourForPoint(AttachmentPointFlags singlePoint, AttachmentPointBehaviour behaviour) {
       switch (singlePoint) {
@@ -275,6 +285,7 @@ namespace Leap.Unity.Attachments {
         Undo.RecordObject(pointBehaviour, "Set Attachment Point");
         #endif
         pointBehaviour.attachmentPoint = singlePoint;
+        pointBehaviour.attachmentHand = this;
         setBehaviourForPoint(singlePoint, pointBehaviour);
 
         SetTransformParent(pointBehaviour.transform, this.transform);

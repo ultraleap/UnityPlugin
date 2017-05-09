@@ -15,7 +15,13 @@ namespace Leap.Unity.Attachments {
   /// Can also be used to refer to a single AttachmentPointFlags flag constant (implicit conversion).
   /// </summary>
   [AddComponentMenu("")]
+  [ExecuteInEditMode]
   public class AttachmentPointBehaviour : MonoBehaviour {
+
+    [Tooltip("The AttachmentHand associated with this AttachmentPointBehaviour. AttachmentPointBehaviours "
+           + "should be beneath their AttachmentHand object in the hierarchy.")]
+    [Disable]
+    public AttachmentHand attachmentHand;
 
     [Tooltip("To change which attachment points are available on an AttachmentHand, refer to the "
            + "inspector for the parent AttachmentHands object.")]
@@ -26,6 +32,12 @@ namespace Leap.Unity.Attachments {
       if (!attachmentPoint.IsSinglePoint() && attachmentPoint != AttachmentPointFlags.None) {
         Debug.LogError("AttachmentPointBehaviours should refer to a single attachmentPoint flag.", this.gameObject);
         attachmentPoint = AttachmentPointFlags.None;
+      }
+    }
+
+    void OnDestroy() {
+      if (attachmentHand != null) {
+        attachmentHand.notifyPointBehaviourDeleted(this);
       }
     }
 

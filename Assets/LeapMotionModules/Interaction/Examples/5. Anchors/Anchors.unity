@@ -14249,6 +14249,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12011a4b27c58f4f8969e87c61ab8d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attachmentHand: {fileID: 0}
   attachmentPoint: 4
 --- !u!1 &1211786261
 GameObject:
@@ -21046,6 +21047,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12011a4b27c58f4f8969e87c61ab8d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attachmentHand: {fileID: 0}
   attachmentPoint: 4
 --- !u!1 &1682488289
 GameObject:
