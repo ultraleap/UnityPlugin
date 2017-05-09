@@ -29,8 +29,19 @@ namespace Leap.Unity.Attachments {
       }
       set {
         if (_attachmentPoints != value) {
+          #if UNITY_EDITOR
+          Undo.IncrementCurrentGroup();
+          Undo.SetCurrentGroupName("Modify Attachment Points");
+
+          Undo.RecordObject(this, "Modify AttachmentHands Points");
+          #endif
+
           _attachmentPoints = value;
           refreshAttachmentHandTransforms();
+
+          #if UNITY_EDITOR
+
+          #endif
         }
       }
     }
@@ -171,13 +182,6 @@ namespace Leap.Unity.Attachments {
     }
 
     private void refreshAttachmentHandTransforms() {
-      //#if UNITY_EDITOR
-      //// Don't do anything if we're a prefab.
-      //PrefabType prefabType = PrefabUtility.GetPrefabType(this.gameObject);
-      //if (prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab) {
-      //  return;
-      //}
-      //#endif
 
       bool requiresReinitialization = false;
 
@@ -194,6 +198,10 @@ namespace Leap.Unity.Attachments {
 
           hand.refreshAttachmentTransforms(_attachmentPoints);
         }
+
+        #if UNITY_EDITOR
+        EditorUtility.SetDirty(this);
+        #endif
       }
 
       if (requiresReinitialization) {
