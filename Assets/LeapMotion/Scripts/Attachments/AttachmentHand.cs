@@ -108,6 +108,7 @@ namespace Leap.Unity.Attachments {
       initializeAttachmentPointFlagConstants();
     }
 
+
     private AttachmentPointFlags[] _attachmentPointFlagConstants;
     private void initializeAttachmentPointFlagConstants() {
       Array flagConstants = Enum.GetValues(typeof(AttachmentPointFlags));
@@ -369,7 +370,8 @@ namespace Leap.Unity.Attachments {
     private static Transform[] s_hierarchyTransformsBuffer = new Transform[4];
     /// <summary>
     /// Tries to build a parent-child stack (index 0 is the first parent) of the argument
-    /// transforms (they might be null) and returns the number of transforms that were non-null.
+    /// transforms (they might be null) and returns the top-level parent transform (or null
+    /// if there is none).
     /// </summary>
     private Transform tryStackTransformHierarchy(params Transform[] transforms) {
       for (int i = 0; i < s_hierarchyTransformsBuffer.Length; i++) {
@@ -407,64 +409,40 @@ namespace Leap.Unity.Attachments {
       return tryStackTransformHierarchy(s_transformsBuffer);
     }
 
-    [ThreadStatic]
-    private static AttachmentPointBehaviour[] s_attachmentPointsBuffer = new AttachmentPointBehaviour[32];
-
     /// <summary>
     /// An enumerator that traverses all of the existing AttachmentPointBehaviours beneath an
     /// AttachmentHand.
     /// </summary>
     public struct AttachmentPointsEnumerator {
       private int _curIdx;
+      private AttachmentHand _hand;
+      private int _flagsCount;
 
       public AttachmentPointsEnumerator GetEnumerator() { return this; }
 
       public AttachmentPointsEnumerator(AttachmentHand hand) {
         _curIdx = -1;
-
-        // New threads will have to construct their own attachment points buffer.
-        if (s_attachmentPointsBuffer == null || s_attachmentPointsBuffer.Length != 32) s_attachmentPointsBuffer = new AttachmentPointBehaviour[32];
-
-        // Just construct the buffer we'll be enumerating across. The enumeration
-        // will automatically skip any null indices.
-        int pointIdx = 0;
-        s_attachmentPointsBuffer[pointIdx++] = hand.wrist;
-        s_attachmentPointsBuffer[pointIdx++] = hand.palm;
-
-        s_attachmentPointsBuffer[pointIdx++] = hand.thumbProximalJoint;
-        s_attachmentPointsBuffer[pointIdx++] = hand.thumbDistalJoint;
-        s_attachmentPointsBuffer[pointIdx++] = hand.thumbTip;
-
-        s_attachmentPointsBuffer[pointIdx++] = hand.indexKnuckle;
-        s_attachmentPointsBuffer[pointIdx++] = hand.indexMiddleJoint;
-        s_attachmentPointsBuffer[pointIdx++] = hand.indexDistalJoint;
-        s_attachmentPointsBuffer[pointIdx++] = hand.indexTip;
-
-        s_attachmentPointsBuffer[pointIdx++] = hand.middleKnuckle;
-        s_attachmentPointsBuffer[pointIdx++] = hand.middleMiddleJoint;
-        s_attachmentPointsBuffer[pointIdx++] = hand.middleDistalJoint;
-        s_attachmentPointsBuffer[pointIdx++] = hand.middleTip;
-
-        s_attachmentPointsBuffer[pointIdx++] = hand.ringKnuckle;
-        s_attachmentPointsBuffer[pointIdx++] = hand.ringMiddleJoint;
-        s_attachmentPointsBuffer[pointIdx++] = hand.ringDistalJoint;
-        s_attachmentPointsBuffer[pointIdx++] = hand.ringTip;
-
-        s_attachmentPointsBuffer[pointIdx++] = hand.pinkyKnuckle;
-        s_attachmentPointsBuffer[pointIdx++] = hand.pinkyMiddleJoint;
-        s_attachmentPointsBuffer[pointIdx++] = hand.pinkyDistalJoint;
-        s_attachmentPointsBuffer[pointIdx++] = hand.pinkyTip;
+        _hand = hand;
+        _flagsCount = hand._attachmentPointFlagConstants.Length;
       }
 
-      public AttachmentPointBehaviour Current { get { return s_attachmentPointsBuffer[_curIdx]; } }
+      public AttachmentPointBehaviour Current {
+        get {
+          return _hand.GetBehaviourForPoint(GetFlagFromFlagIdx(_curIdx + 1));
+        }
+      }
 
       public bool MoveNext() {
         do {
           _curIdx++;
-        } while (_curIdx < s_attachmentPointsBuffer.Length && s_attachmentPointsBuffer[_curIdx] == null);
+        } while (_curIdx < _flagsCount && _hand.GetBehaviourForPoint(GetFlagFromFlagIdx(_curIdx + 1)) == null);
 
-        return _curIdx < s_attachmentPointsBuffer.Length;
+        return _curIdx < _flagsCount;
       }
+    }
+
+    private static AttachmentPointFlags GetFlagFromFlagIdx(int pointIdx) {
+      return (AttachmentPointFlags)(1 << pointIdx);
     }
 
     #endregion

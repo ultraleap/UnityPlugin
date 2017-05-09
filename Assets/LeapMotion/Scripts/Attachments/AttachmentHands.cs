@@ -38,10 +38,6 @@ namespace Leap.Unity.Attachments {
 
           _attachmentPoints = value;
           refreshAttachmentHandTransforms();
-
-          #if UNITY_EDITOR
-
-          #endif
         }
       }
     }
