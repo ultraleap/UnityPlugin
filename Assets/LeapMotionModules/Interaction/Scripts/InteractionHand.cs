@@ -10,13 +10,19 @@
 using InteractionEngineUtility;
 using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Space;
-using Leap.Unity.UI.Interaction.Internal;
+using Leap.Unity.Interaction.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
+
+  /// <summary>
+  /// Specified on a per-object basis to allow Interaction objects
+  /// to ignore hover for the left hand, right hand, or both hands.
+  /// </summary>
+  public enum IgnoreHoverMode { None, Left, Right, Both }
 
   public class InteractionHand : MonoBehaviour {
 
@@ -48,6 +54,12 @@ namespace Leap.Unity.UI.Interaction {
     /// if there is one.
     /// </summary>
     public InteractionBehaviour primaryHoveredObject { get { return hoverCheckResults.primaryHovered as InteractionBehaviour; } }
+
+    /// <summary>
+    /// Gets the distance from the closest fingertip on this hand to its primary hovered object, if there is one,
+    /// else returns float.PositiveInfinity.
+    /// </summary>
+    public float primaryHoveredDistance { get { return isPrimaryHovering ? hoverCheckResults.primaryHoveredDistance : float.PositiveInfinity; } }
 
     /// <summary>
     /// Called when this InteractionHand begins primarily hovering over an InteractionBehaviour.
@@ -244,8 +256,8 @@ namespace Leap.Unity.UI.Interaction {
       if (collider.attachedRigidbody != null) {
         Rigidbody body = collider.attachedRigidbody;
         IInteractionBehaviour intObj;
-        if (body != null && interactionManager.rigidbodyRegistry.TryGetValue(body, out intObj)
-            && !intObj.ignoreHover) {
+        if (body != null && interactionManager.interactionObjectBodies.TryGetValue(body, out intObj)
+            && !intObj.ShouldIgnoreHover(this)) {
           return intObj;
         }
       }
@@ -277,14 +289,16 @@ namespace Leap.Unity.UI.Interaction {
       using (new ProfilerSample("Fixed Update InteractionHand Hovering")) {
         if (_hand == null && _interactionHoverOverride) { _interactionHoverOverride = false; }
 
-        if (_contactBehaviours.Count == 0 && !_interactionHoverOverride) {
+        if (!_interactionHoverOverride) {
           hoverActivityManager.activationRadius = interactionManager.WorldHoverActivationRadius;
           _hoverActivityManager.FixedUpdateQueryPosition((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
           using (new ProfilerSample("Check for Closest Elements")) { CheckHoverForHand(_hand, _hoverActivityManager.ActiveObjects); }
         }
 
         ProcessHoverCheckResults();
-        ProcessPrimaryHoverCheckResults();
+        if (_contactBehaviours.Count == 0) {
+          ProcessPrimaryHoverCheckResults();
+        }
 
         ISpaceComponent space;
         if (_hand != null) {
@@ -1076,7 +1090,7 @@ namespace Leap.Unity.UI.Interaction {
       if (collider.attachedRigidbody != null) {
         Rigidbody body = collider.attachedRigidbody;
         IInteractionBehaviour intObj;
-        if (body != null && interactionManager.rigidbodyRegistry.TryGetValue(body, out intObj)
+        if (body != null && interactionManager.interactionObjectBodies.TryGetValue(body, out intObj)
             && !intObj.ignoreGrasping) {
           return intObj;
         }

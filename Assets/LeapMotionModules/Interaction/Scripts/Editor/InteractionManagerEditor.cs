@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
 
   [CustomEditor(typeof(InteractionManager))]
   public class InteractionManagerEditor : CustomEditorBase<InteractionManager> {
