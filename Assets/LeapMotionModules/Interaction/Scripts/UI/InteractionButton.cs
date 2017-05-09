@@ -81,11 +81,9 @@ namespace Leap.Unity.Interaction {
       _physicsPosition = transform.position;
       rigidbody.position = _physicsPosition;
 
-      // Initialize Limits
-      //minMaxHeight /= transform.parent.lossyScale.z;
-
       //Add a custom grasp controller
       OnGraspedMovement += Grasping;
+      OnHandGraspEnd += Ungrasped;
 
       base.Start();
     }
@@ -122,7 +120,7 @@ namespace Leap.Unity.Interaction {
         _physicsOccurred = false;
 
         //Record and enforce the sliding state from the previous frame
-        if (!ignoreContact) {
+        if (isPrimaryHovered || isGrasped) {
           localPhysicsPosition = GetDepressedConstrainedLocalPosition(transform.parent.InverseTransformPoint(rigidbody.position) - localPhysicsPosition);
         } else {
           Vector2 localSlidePosition = new Vector2(localPhysicsPosition.x, localPhysicsPosition.y);
@@ -153,10 +151,10 @@ namespace Leap.Unity.Interaction {
         // If the button is depressed past its limit...
         if (localPhysicsPosition.z > initialLocalPosition.z - minMaxHeight.x) {
           transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.x);
-          if (isPrimaryHovered) {
+          if (isPrimaryHovered || isGrasped) {
             isDepressed = true;
           } else {
-            _physicsPosition = transform.parent.TransformPoint(initialLocalPosition);
+            _physicsPosition = transform.parent.TransformPoint(new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z));
             _physicsVelocity = _physicsVelocity * 0.1f;
             isDepressed = false;
             _lastDepressor = null;
@@ -194,9 +192,15 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void Grasping(Vector3 preSolvedPosition, Quaternion preSolvedRotation, Vector3 postSolvedPosition, Quaternion postSolvedRotation, List<InteractionHand> hand) {
-      Vector3 newLocalPosition = GetDepressedConstrainedLocalPosition(transform.parent.InverseTransformPoint(postSolvedPosition) - transform.parent.InverseTransformPoint(preSolvedPosition));
-      _physicsVelocity = 0.5f * (transform.parent.TransformPoint(newLocalPosition) - rigidbody.position) / Time.deltaTime;
-      rigidbody.velocity = _physicsVelocity;
+      Vector3 newLocalPosition = GetDepressedConstrainedLocalPosition(transform.parent.InverseTransformVector(postSolvedPosition - preSolvedPosition));
+      _physicsVelocity = 0.5f * (transform.parent.TransformPoint(newLocalPosition) - _physicsPosition) / Time.fixedDeltaTime;
+    }
+
+    protected virtual void Ungrasped(List<InteractionHand> hand) {
+      if (localPhysicsPosition.z > initialLocalPosition.z - minMaxHeight.x) {
+        transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.x);
+        _physicsVelocity = _physicsVelocity * 0.1f;
+      }
     }
 
     protected virtual void OnCollisionEnter(Collision collision) { trySetDepressor(collision); }
@@ -242,11 +246,7 @@ namespace Leap.Unity.Interaction {
 
     void Reset() {
       contactForceMode = ContactForceMode.UI;
-    }
-
-    Vector3 EvaluateTrajectory(Vector3 initialPosition, Vector3 initialVelocity, float initialTime, float timeToEvaluate) {
-      float t = timeToEvaluate - initialTime;
-      return initialPosition + (initialVelocity * t) + (0.5f * Physics.gravity * t * t);
+      graspedMovementType = GraspedMovementType.Nonkinematic;
     }
   }
 }
