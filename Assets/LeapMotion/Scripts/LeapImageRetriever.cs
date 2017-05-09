@@ -27,8 +27,7 @@ namespace Leap.Unity {
     public const int LEFT_IMAGE_INDEX = 0;
     public const int RIGHT_IMAGE_INDEX = 1;
     public const float IMAGE_SETTING_POLL_RATE = 2.0f;
-
-    [AutoFind]
+    
     [SerializeField]
     LeapServiceProvider _provider;
 

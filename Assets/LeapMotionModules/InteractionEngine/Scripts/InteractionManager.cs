@@ -40,11 +40,9 @@ namespace Leap.Unity.Interaction {
   /// </remarks>
   public partial class InteractionManager : MonoBehaviour {
     #region SERIALIZED FIELDS
-    [AutoFind]
     [SerializeField]
     protected LeapProvider _leapProvider;
-
-    [AutoFind]
+    
     [SerializeField]
     protected HandPool _handPool;
 

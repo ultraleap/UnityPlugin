@@ -35,8 +35,7 @@ namespace Leap.Unity {
     [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
     [SerializeField]
     protected bool _isHeadMounted = false;
-
-    [AutoFind]
+    
     [SerializeField]
     protected LeapVRTemporalWarping _temporalWarping;
 
