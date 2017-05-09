@@ -356,6 +356,14 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    private T getFeatureDataOrThrow<T>() where T : LeapFeatureData {
+      var data = _featureData.Query().OfType<T>().FirstOrDefault();
+      if (data == null) {
+        throw new Exception("There is not a feature data object of type " + typeof(T).Name + " attached to this graphic.");
+      }
+      return data;
+    }
+
     [Serializable]
     public class FeatureDataList : MultiTypedList<LeapFeatureData, LeapTextureData,
                                                                    LeapSpriteData,

@@ -15,9 +15,16 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  public static class LeapBlendShapeFeatureExtension {
-    public static LeapBlendShapeData BlendShape(this LeapGraphic graphic) {
-      return graphic.GetFeatureData<LeapBlendShapeData>();
+  public partial class LeapGraphic {
+
+    /// <summary>
+    /// Helper method to set the blend shape amount for a blend shape
+    /// data object attached to this graphic.  This method will throw
+    /// an exception if there is no blend shape data obj attached to
+    /// this graphic.
+    /// </summary>
+    public void SetBlendShapeAmount(float amount) {
+      getFeatureDataOrThrow<LeapBlendShapeData>().amount = amount;
     }
   }
 
@@ -50,6 +57,11 @@ namespace Leap.Unity.GraphicalRenderer {
     [SerializeField]
     private Transform _transform;
 
+    /// <summary>
+    /// Gets or sets the amount of strength for this blend shape.
+    /// The value should be in the 0-1 range, where 0 is no strength,
+    /// and 1 is complete strength.
+    /// </summary>
     public float amount {
       get {
         return _amount;

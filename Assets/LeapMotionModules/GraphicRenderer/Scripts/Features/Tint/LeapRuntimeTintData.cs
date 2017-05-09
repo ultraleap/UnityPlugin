@@ -12,9 +12,16 @@ using UnityEngine;
 
 namespace Leap.Unity.GraphicalRenderer {
 
-  public static class LeapRuntimeTintExtension {
-    public static LeapRuntimeTintData GetRuntimeTint(this LeapGraphic graphic) {
-      return graphic.GetFeatureData<LeapRuntimeTintData>();
+  public partial class LeapGraphic {
+
+    /// <summary>
+    /// Helper method to set the runtime tint color for a runtime
+    /// tint data object attached to this graphic.  This methof will
+    /// throw an exception if there is no blend shape data obj attached
+    /// to this graphic.
+    /// </summary>
+    public void SetRuntimeTint(Color color) {
+      getFeatureDataOrThrow<LeapRuntimeTintData>().color = color;
     }
   }
 
@@ -25,6 +32,11 @@ namespace Leap.Unity.GraphicalRenderer {
     [SerializeField]
     private Color _color = Color.white;
 
+    /// <summary>
+    /// The runtime tint color for this tint data object.  This
+    /// represents a multiplicative tint of the graphic representation
+    /// of this graphic.
+    /// </summary>
     public Color color {
       get {
         return _color;
