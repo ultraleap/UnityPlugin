@@ -126,23 +126,36 @@ namespace Leap.Unity.Attachments {
         initializeAttachmentPointFlagConstants();
       }
 
-      // Remove parent-child relationships so deleting parent Transforms doesn't annihilate
-      // child Transforms that don't need to be deleted themselves.
-      flattenAttachmentTransformHierarchy();
-
-      foreach (AttachmentPointFlags flag in _attachmentPointFlagConstants) {
+      // First just _check_ whether we'll need to do any destruction
+      bool requiresDestruction = false;
+      foreach (var flag in _attachmentPointFlagConstants) {
         if (flag == AttachmentPointFlags.None) continue;
 
-        if (points.Contains(flag)) {
-          ensureTransformExists(flag);
-        }
-        else {
-          ensureTransformDoesNotExist(flag);
+        if (!points.Contains(flag) && GetBehaviourForPoint(flag) != null) {
+          requiresDestruction = true;
         }
       }
 
-      // Organize transforms, restoring parent-child relationships.
-      organizeAttachmentTransforms();
+      // Go through the work of flattening and rebuilding if it is necessary.
+      if (requiresDestruction) {
+        // Remove parent-child relationships so deleting parent Transforms doesn't annihilate
+        // child Transforms that don't need to be deleted themselves.
+        flattenAttachmentTransformHierarchy();
+
+        foreach (AttachmentPointFlags flag in _attachmentPointFlagConstants) {
+          if (flag == AttachmentPointFlags.None) continue;
+
+          if (points.Contains(flag)) {
+            ensureTransformExists(flag);
+          }
+          else {
+            ensureTransformDoesNotExist(flag);
+          }
+        }
+
+        // Organize transforms, restoring parent-child relationships.
+        organizeAttachmentTransforms();
+      }
 
       if (_attachmentPointsDirty) {
         OnAttachmentPointsModified();
@@ -291,6 +304,8 @@ namespace Leap.Unity.Attachments {
       var pointBehaviour = GetBehaviourForPoint(singlePoint);
       if (pointBehaviour != null) {
         InternalUtility.Destroy(pointBehaviour.gameObject);
+        setBehaviourForPoint(singlePoint, null);
+
         pointBehaviour = null;
 
         _attachmentPointsDirty = true;
@@ -332,8 +347,8 @@ namespace Leap.Unity.Attachments {
 
       // Index
       topLevelTransform = tryStackTransformHierarchy(indexKnuckle,
-                                                     indexDistalJoint,
                                                      indexMiddleJoint,
+                                                     indexDistalJoint,
                                                      indexTip);
       if (topLevelTransform != null) {
         topLevelTransform.SetSiblingIndex(siblingIdx++);
@@ -341,8 +356,8 @@ namespace Leap.Unity.Attachments {
 
       // Middle
       topLevelTransform = tryStackTransformHierarchy(middleKnuckle,
-                                                     middleDistalJoint,
                                                      middleMiddleJoint,
+                                                     middleDistalJoint,
                                                      middleTip);
       if (topLevelTransform != null) {
         topLevelTransform.SetSiblingIndex(siblingIdx++);
@@ -350,8 +365,8 @@ namespace Leap.Unity.Attachments {
 
       // Ring
       topLevelTransform = tryStackTransformHierarchy(ringKnuckle,
-                                                     ringDistalJoint,
                                                      ringMiddleJoint,
+                                                     ringDistalJoint,
                                                      ringTip);
       if (topLevelTransform != null) {
         topLevelTransform.SetSiblingIndex(siblingIdx++);
@@ -359,8 +374,8 @@ namespace Leap.Unity.Attachments {
 
       // Pinky
       topLevelTransform = tryStackTransformHierarchy(pinkyKnuckle,
-                                                     pinkyDistalJoint,
                                                      pinkyMiddleJoint,
+                                                     pinkyDistalJoint,
                                                      pinkyTip);
       if (topLevelTransform != null) {
         topLevelTransform.SetSiblingIndex(siblingIdx++);
@@ -428,21 +443,21 @@ namespace Leap.Unity.Attachments {
 
       public AttachmentPointBehaviour Current {
         get {
-          return _hand.GetBehaviourForPoint(GetFlagFromFlagIdx(_curIdx + 1));
+          return _hand.GetBehaviourForPoint(GetFlagFromFlagIdx(_curIdx));
         }
       }
 
       public bool MoveNext() {
         do {
           _curIdx++;
-        } while (_curIdx < _flagsCount && _hand.GetBehaviourForPoint(GetFlagFromFlagIdx(_curIdx + 1)) == null);
+        } while (_curIdx < _flagsCount && _hand.GetBehaviourForPoint(GetFlagFromFlagIdx(_curIdx)) == null);
 
         return _curIdx < _flagsCount;
       }
     }
 
     private static AttachmentPointFlags GetFlagFromFlagIdx(int pointIdx) {
-      return (AttachmentPointFlags)(1 << pointIdx);
+      return (AttachmentPointFlags)(1 << pointIdx + 1);
     }
 
     #endregion
