@@ -24,8 +24,6 @@ namespace Leap.Unity.Interaction {
   /// </summary>
   public class AnchorableBehaviour : MonoBehaviour {
 
-    // "Attach to Nearby Anchor" / "Detach from Anchor" Button
-
     [Disable]
     [SerializeField]
     [Tooltip("Whether or not this AnchorableBehaviour is actively attached to its anchor.")]
@@ -36,19 +34,24 @@ namespace Leap.Unity.Interaction {
     [OnEditorChange("anchor"), SerializeField]
     private Anchor _anchor;
     public Anchor anchor {
-      get { return _anchor; }
+      get {
+        return _anchor;
+      }
       set {
         if (_anchor != value) {
-          if (isValidAnchor(value)) {
-            _lockedToAnchor = false;
+          if (IsValidAnchor(value)) {
+            _isLockedToAnchor = false;
             _anchor = value;
+          }
+          else {
+            Debug.LogWarning("The '" + value.name + "' anchor is not in " + this.name + "'s anchor group.");
           }
         }
       }
     }
 
     [Tooltip("The anchor group for this AnchorableBehaviour. If set to null, all Anchors "
-           + "that aren't in any anchor group will be valid anchors for this object.")]
+           + "will be valid anchors for this object.")]
     [OnEditorChange("anchorGroup"), SerializeField]
     private AnchorGroup _anchorGroup;
     public AnchorGroup anchorGroup {
@@ -59,27 +62,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    // TODO: Fixme
-    private bool isValidAnchor(Anchor anchor) {
-      return true;
-    }
-
-    // TODO: Fixme
-    private void validateAnchor() {
-      return;
-    }
-
-    #region Events
-
-    public Action<AnchorableBehaviour, Anchor> OnAttachedToAnchor    = (anchObj, anchor) => { };
-    public Action<AnchorableBehaviour, Anchor> OnDetachedFromAnchor  = (anchObj, anchor) => { };
-    public Action<AnchorableBehaviour, Anchor> WhileAttachedToAnchor = (anchObj, anchor) => { };
-
-    #endregion
-
-    #region Motion Configuration
-
     [Header("Motion")]
+
     [Tooltip("Should the object move instantly to the anchor position?")]
     public bool lockToAnchor = false;
 
@@ -100,20 +84,14 @@ namespace Leap.Unity.Interaction {
     [Range(0, 100F)]
     public float anchorLerpCoeffPerSec = 20F;
 
-    #endregion
-
-    #region Rotation Configuration
-
     [Header("Rotation")]
+
     [Tooltip("Should the object also rotate to match its anchor's rotation? If checked, motion settings applied "
            + "to how the anchor translates will also apply to how it rotates.")]
     public bool anchorRotation = false;
 
-    #endregion
-
-    #region Interaction Configuration
-
     [Header("Interaction")]
+
     [Tooltip("Additional features are enabled when this GameObject also has an InteractionBehaviour component.")]
     [Disable]
     public InteractionBehaviour interactionBehaviour;
@@ -137,7 +115,22 @@ namespace Leap.Unity.Interaction {
            + "The evaluated value is clamped between 0 and 1, and then scaled by maxAttractionReach.")]
     public AnimationCurve attractionReachByDistance;
 
+    #region Events
+
+    public Action<AnchorableBehaviour, Anchor> OnAttachedToAnchor = (anchObj, anchor) => { };
+    public Action<AnchorableBehaviour, Anchor> OnDetachedFromAnchor = (anchObj, anchor) => { };
+    public Action<AnchorableBehaviour, Anchor> WhileAttachedToAnchor = (anchObj, anchor) => { };
+
     #endregion
+
+    private bool _isLockedToAnchor = false;
+
+    private Vector3 _offsetTowardsHand = Vector3.zero;
+
+    private Vector3 _targetPositionLastUpdate = Vector3.zero;
+    private bool _hasTargetPositionLastUpdate = false;
+
+    #region DELETEME // OLD STUFF
 
     //public AnchorGroup anchorGroup {
     //  get {
@@ -233,7 +226,7 @@ namespace Leap.Unity.Interaction {
     //}
     // END CURRENTANCHOR REMOVAL COMMENT.
 
-    private bool _lockedToAnchor = false;
+    #endregion
 
     void OnValidate() {
       interactionBehaviour = GetComponent<InteractionBehaviour>();
@@ -256,7 +249,7 @@ namespace Leap.Unity.Interaction {
     }
 
     void OnDisable() {
-      _lockedToAnchor = false;
+      _isLockedToAnchor = false;
 
       // Reset anchor position storage; it can't be updated from this state.
       _hasTargetPositionLastUpdate = false;
@@ -269,24 +262,61 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    /// <summary> Wrapper method to match OnObjectGraspBegin method signature. </summary>
-    private void detachAnchorOnObjectGraspBegin(List<InteractionHand> hands) {
-      DetachFromAnchor();
-    }
-
-    /// <summary> Wrapper method to match OnObjectGraspEnd method signature. </summary>
-    private void tryToAnchorOnObjectGraspEnd(List<InteractionHand> hands) {
-      TryAttachToAnchor();
-    }
-
     void Update() {
-      UpdateAttractionToHand();
+      updateAttractionToHand();
 
-      UpdateAnchorAttachment();
+      if (anchor != null && isAnchored) updateAnchorAttachment();
     }
 
-    public void DetachFromAnchor() {
-      anchor = null;
+    /// <summary>
+    /// Returns whether the argument anchor is an acceptable anchor for this anchorable
+    /// object; that is, whether the argument Anchor is within this behaviour's AnchorGroup
+    /// if it has one, or if this behaviour has no AnchorGroup, returns true.
+    /// </summary>
+    public bool IsValidAnchor(Anchor anchor) {
+      if (this.anchorGroup != null) {
+        return this.anchorGroup.Contains(anchor);
+      }
+      else {
+        return true;
+      }
+    }
+
+    /// <summary>
+    /// Detaches this Anchorable object from its anchor. The anchor reference
+    /// remains unchanged. Call TryAttach() to re-attach to this object's assigned anchor.
+    /// </summary>
+    public void Detach() {
+      _isAnchored = false;
+    }
+
+    public struct AnchorAttachmentSettings {
+      bool requireWithinRange;
+
+      bool useObjectVelocity;
+      float minVelocityDotProduct;
+      float maxRangeBeyondAnchor;
+
+
+    }
+
+    /// <summary>
+    /// Attaches this Anchorable object to its currently assigned anchor. By default, the
+    /// attempt will fail if the anchor is 
+    /// </summary>
+    public bool TryAttach(AnchorAttachmentSettings attachmentSettings) {
+      if (anchor != null) {
+        _isAnchored = true;
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+
+    ///
+    public bool TryAttachTo(Anchor anchor) {
+      return false;
     }
 
     public bool TryAttachToAnchor() {
@@ -308,6 +338,113 @@ namespace Leap.Unity.Interaction {
     public static Anchor FindPreferredAnchor(AnchorableBehaviour anchObj) {
       return null;
     }
+
+    private void validateAnchor() {
+
+    }
+
+    private void updateAttractionToHand() {
+      if (interactionBehaviour == null || !isAttractedByHand) {
+        if (_offsetTowardsHand != Vector3.zero) {
+          _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, Vector3.zero, 5F * Time.deltaTime);
+        }
+
+        return;
+      }
+
+      float reachTargetAmount = 0F;
+      Vector3 towardsHand = Vector3.zero;
+      if (interactionBehaviour != null) {
+        if (isAttractedByHand) {
+          if (interactionBehaviour.isHovered) {
+            Hand hoveringHand = interactionBehaviour.closestHoveringHand;
+
+            reachTargetAmount = Mathf.Clamp01(attractionReachByDistance.Evaluate(
+                                  Vector3.Distance(hoveringHand.PalmPosition.ToVector3(), anchor.transform.position)
+                                ));
+            towardsHand = hoveringHand.PalmPosition.ToVector3() - anchor.transform.position;
+          }
+
+          Vector3 targetOffsetTowardsHand = towardsHand * maxAttractionReach * reachTargetAmount;
+
+          _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, targetOffsetTowardsHand, 5 * Time.deltaTime);
+        }
+      }
+    }
+
+    private void updateAnchorAttachment() {
+      // Initialize position.
+      Vector3 finalPosition;
+      if (interactionBehaviour != null) {
+        finalPosition = interactionBehaviour.rigidbody.position;
+      }
+      else {
+        finalPosition = this.transform.position;
+      }
+
+      // Update position based on anchor state.
+      Vector3 targetPosition = anchor.transform.position;
+      if (lockToAnchor) {
+        // In this state, we are simply locked directly to the anchor.
+        finalPosition = targetPosition + _offsetTowardsHand;
+
+        // Reset anchor position storage; it can't be updated from this state.
+        _hasTargetPositionLastUpdate = false;
+      }
+      else if (lockToAnchorWhenAttached) {
+        if (_isLockedToAnchor) {
+          // In this state, we are already attached to the anchor.
+          finalPosition = targetPosition + _offsetTowardsHand;
+
+          // Reset anchor position storage; it can't be updated from this state.
+          _hasTargetPositionLastUpdate = false;
+        }
+        else {
+          // Undo any "reach towards hand" offset.
+          finalPosition -= _offsetTowardsHand;
+
+          // If desired, automatically correct for the anchor itself moving while attempting to return to it.
+          if (matchAnchorMotionWhileReturning) {
+            if (_hasTargetPositionLastUpdate) {
+              finalPosition += (targetPosition - _targetPositionLastUpdate);
+            }
+
+            _targetPositionLastUpdate = targetPosition;
+            _hasTargetPositionLastUpdate = true;
+          }
+
+          // Lerp towards the anchor.
+          finalPosition = Vector3.Lerp(finalPosition, targetPosition, anchorLerpCoeffPerSec * Time.deltaTime);
+          if (Vector3.Distance(finalPosition, targetPosition) < 0.001F) {
+            _isLockedToAnchor = true;
+          }
+
+          // Redo any "reach toward hand" offset.
+          finalPosition += _offsetTowardsHand;
+        }
+      }
+
+      // Set final position.
+      if (interactionBehaviour != null) {
+        interactionBehaviour.rigidbody.position = finalPosition;
+        this.transform.position = finalPosition;
+      }
+      else {
+        this.transform.position = finalPosition;
+      }
+    }
+
+    /// <summary> Wrapper method to match OnObjectGraspBegin method signature. </summary>
+    private void detachAnchorOnObjectGraspBegin(List<InteractionHand> hands) {
+      DetachFromAnchor();
+    }
+
+    /// <summary> Wrapper method to match OnObjectGraspEnd method signature. </summary>
+    private void tryToAnchorOnObjectGraspEnd(List<InteractionHand> hands) {
+      TryAttachToAnchor();
+    }
+
+    #region DELETEME // OLD TryToAnchor
 
     // OLD TRYTOANCHOR METHODS
     ///// <summary>
@@ -377,110 +514,6 @@ namespace Leap.Unity.Interaction {
     //  _hasTargetPositionLastUpdate = false;
     //}
     // END OLD DETACHFROMANCHOR METHOD
-
-    #region Attraction To Hands
-
-    private Vector3 _offsetTowardsHand = Vector3.zero;
-
-    private void UpdateAttractionToHand() {
-      if (interactionBehaviour == null || !isAttractedByHand) {
-        if (_offsetTowardsHand != Vector3.zero) {
-          _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, Vector3.zero, 5F * Time.deltaTime);
-        }
-
-        return;
-      }
-
-      float reachTargetAmount = 0F;
-      Vector3 towardsHand = Vector3.zero;
-      if (interactionBehaviour != null) {
-        if (isAttractedByHand) {
-          if (interactionBehaviour.isHovered) {
-            Hand hoveringHand = interactionBehaviour.closestHoveringHand;
-
-            reachTargetAmount = Mathf.Clamp01(attractionReachByDistance.Evaluate(
-                                  Vector3.Distance(hoveringHand.PalmPosition.ToVector3(), anchor.transform.position)
-                                ));
-            towardsHand = hoveringHand.PalmPosition.ToVector3() - anchor.transform.position;
-          }
-
-          Vector3 targetOffsetTowardsHand = towardsHand * maxAttractionReach * reachTargetAmount;
-
-          _offsetTowardsHand = Vector3.Lerp(_offsetTowardsHand, targetOffsetTowardsHand, 5 * Time.deltaTime);
-        }
-      }
-    }
-
-    #endregion
-
-    #region Anchor Attachment
-
-    private Vector3 _targetPositionLastUpdate = Vector3.zero;
-    private bool _hasTargetPositionLastUpdate = false;
-
-    private void UpdateAnchorAttachment() {
-      if (anchor == null) return;
-
-      // Initialize position.
-      Vector3 finalPosition;
-      if (interactionBehaviour != null) {
-        finalPosition = interactionBehaviour.rigidbody.position;
-      }
-      else {
-        finalPosition = this.transform.position;
-      }
-
-      // Update position based on anchor state.
-      Vector3 targetPosition = anchor.transform.position;
-      if (lockToAnchor) {
-        // In this state, we are simply locked directly to the anchor.
-        finalPosition = targetPosition + _offsetTowardsHand;
-
-        // Reset anchor position storage; it can't be updated from this state.
-        _hasTargetPositionLastUpdate = false;
-      }
-      else if (lockToAnchorWhenAttached) {
-        if (_lockedToAnchor) {
-          // In this state, we are already attached to the anchor.
-          finalPosition = targetPosition + _offsetTowardsHand;
-
-          // Reset anchor position storage; it can't be updated from this state.
-          _hasTargetPositionLastUpdate = false;
-        }
-        else {
-          // Undo any "reach towards hand" offset.
-          finalPosition -= _offsetTowardsHand;
-
-          // If desired, automatically correct for the anchor itself moving while attempting to return to it.
-          if (matchAnchorMotionWhileReturning) {
-            if (_hasTargetPositionLastUpdate) {
-              finalPosition += (targetPosition - _targetPositionLastUpdate);
-            }
-
-            _targetPositionLastUpdate = targetPosition;
-            _hasTargetPositionLastUpdate = true;
-          }
-
-          // Lerp towards the anchor.
-          finalPosition = Vector3.Lerp(finalPosition, targetPosition, anchorLerpCoeffPerSec * Time.deltaTime);
-          if (Vector3.Distance(finalPosition, targetPosition) < 0.001F) {
-            _lockedToAnchor = true;
-          }
-
-          // Redo any "reach toward hand" offset.
-          finalPosition += _offsetTowardsHand;
-        }
-      }
-
-      // Set final position.
-      if (interactionBehaviour != null) {
-        interactionBehaviour.rigidbody.position = finalPosition;
-        this.transform.position = finalPosition;
-      }
-      else {
-        this.transform.position = finalPosition;
-      }
-    }
 
     #endregion
 

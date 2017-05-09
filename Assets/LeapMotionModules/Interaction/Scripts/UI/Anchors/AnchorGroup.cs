@@ -5,12 +5,17 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction {
 
+  [System.Serializable]
+  public class AnchorSet : SerializableHashSet<Anchor> { }
+
   public class AnchorGroup : MonoBehaviour {
 
-    public List<Anchor> anchors;
+    [SerializeField, SHashSet]
+    [Tooltip("The anchors that are within this AnchorGroup. Anchorable objects associated "
+           + "this AnchorGroup can only be placed in anchors within this group.")]
+    public AnchorSet anchors;
 
-    /// <summary> Warning: Search time is O(N). </summary>
-    public bool ContainsAnchor(Anchor anchor) {
+    public bool Contains(Anchor anchor) {
       return anchors.Contains(anchor);
     }
 
