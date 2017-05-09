@@ -726,7 +726,7 @@ namespace Leap.Unity.Interaction {
       }
 
       if (!hasColliders) {
-        return (this.transform.position - worldPosition).magnitude;
+        return (this.rigidbody.position - worldPosition).magnitude;
       }
       else {
         return closestComparativeColliderDistance;

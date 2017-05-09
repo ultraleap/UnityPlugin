@@ -8,6 +8,8 @@ namespace Leap.Unity.Interaction {
   public class InteractionButtonEditor : InteractionBehaviourEditor {
 
     public override void OnInspectorGUI() {
+      specifyConditionalDrawing(() => false, "graspedMovementType");
+
       InteractionButton button = target as InteractionButton;
 
       EditorGUILayout.BeginHorizontal();

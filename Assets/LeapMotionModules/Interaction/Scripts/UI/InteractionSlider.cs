@@ -109,7 +109,7 @@ namespace Leap.Unity.Interaction {
     protected override void Update() {
       base.Update();
 
-      if (isDepressed) {
+      if (isDepressed || isGrasped) {
         CalculateSliderValues();
       }
     }
