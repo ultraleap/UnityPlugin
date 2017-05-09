@@ -79,7 +79,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// changed at edit time using either the inspector interface, or the editor
     /// methods AddFeature and RemoveFeature.
     /// </summary>
-    public FeatureList features {
+    public IList<LeapGraphicFeatureBase> features {
       get {
         Assert.IsNotNull(_features, "The feature list of graphic group was null!");
         return _features;

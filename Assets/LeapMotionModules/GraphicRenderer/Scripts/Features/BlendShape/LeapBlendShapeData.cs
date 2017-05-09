@@ -17,7 +17,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
   public static class LeapBlendShapeFeatureExtension {
     public static LeapBlendShapeData BlendShape(this LeapGraphic graphic) {
-      return graphic.GetFirstFeatureData<LeapBlendShapeData>();
+      return graphic.GetFeatureData<LeapBlendShapeData>();
     }
   }
 

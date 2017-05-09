@@ -15,7 +15,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
   public static class LeapTextureFeatureExtension {
     public static LeapTextureData Texture(this LeapGraphic graphic) {
-      return graphic.GetFirstFeatureData<LeapTextureData>();
+      return graphic.GetFeatureData<LeapTextureData>();
     }
   }
 

@@ -19,7 +19,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
   [ExecuteInEditMode]
   [DisallowMultipleComponent]
-  public abstract partial class LeapGraphic : MonoBehaviour, ISpaceComponent, IEquatable<LeapGraphic>, ISerializationCallbackReceiver {
+  public abstract partial class LeapGraphic : MonoBehaviour, ISpaceComponent, ISerializationCallbackReceiver {
 
     #region INSPECTOR FIELDS
     [SerializeField]
@@ -44,12 +44,16 @@ namespace Leap.Unity.GraphicalRenderer {
     private NotificationState _notificationState = NotificationState.None;
     [NonSerialized]
     private LeapGraphicGroup _groupToBeAttachedTo = null;
-
-    // Used only by the renderer, gets set to true if the representation
-    // of this graphic might change.  Should get reset to false by the renderer
-    // once the representation is up to date.
     [NonSerialized]
     private bool _isRepresentationDirty = true;
+
+    /// <summary>
+    /// An internal flag that returns true if the visual representation of
+    /// this graphic needs to be updated.  You can set this to true to request
+    /// a regeneration of the graphic during the next update cycle of the
+    /// renderer.  Note however, than not all renderers support updating the
+    /// representation at runtime.
+    /// </summary>
     public bool isRepresentationDirty {
       get {
         return _isRepresentationDirty;
@@ -59,6 +63,10 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// A simple utility getter that returns true if isRepresentationDirty
+    /// is true, OR it is currently edit time.
+    /// </summary>
     public bool isRepresentationDirtyOrEditTime {
       get {
 #if UNITY_EDITOR
@@ -70,24 +78,43 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// Returns the space anchor for this graphic.  This will be null if
+    /// the graphic is not currently part of a space.  The anchor cannot
+    /// be changed dynamically at runtime.
+    /// </summary>
     public LeapSpaceAnchor anchor {
       get {
         return _anchor;
       }
     }
 
+    /// <summary>
+    /// A utility getter that returns a transformer for this graphic.  Even
+    /// if the space anchor for this graphic is null, this will still return
+    /// a valid transformer.  In the null case, the transformer is always the 
+    /// identity transformer.
+    /// </summary>
     public ITransformer transformer {
       get {
         return _anchor == null ? IdentityTransformer.single : _anchor.transformer;
       }
     }
 
-    public MultiTypedList<LeapFeatureData> featureData {
+    /// <summary>
+    /// Returns a list of feature data attached to this graphic.  If this graphic
+    /// is attached to a group, this feature data matches 1-to-1 with the features
+    /// attached to this group.
+    /// </summary>
+    public IList<LeapFeatureData> featureData {
       get {
         return _featureData;
       }
     }
 
+    /// <summary>
+    /// Returns the group this graphic is attached to.
+    /// </summary>
     public LeapGraphicGroup attachedGroup {
       get {
         if (_attachedRenderer == null) {
@@ -105,32 +132,39 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// Returns whether or not this graphic is attached to any group.  Can still
+    /// return false at runtime even if TryAddGraphic has just completed successfully
+    /// due to the runtime delay for addition/removal of graphics.
+    /// </summary>
     public bool isAttachedToGroup {
       get {
         return attachedGroup != null;
       }
     }
 
+    /// <summary>
+    /// Returns the type this graphic prefers to be attached to.  When calling
+    /// LeapGraphicRenderer.TryAddGraphic it will prioritize being attached to 
+    /// groups with this renderer type if possible.
+    /// </summary>
     public Type preferredRendererType {
       get {
         return _preferredRendererType;
       }
     }
 
-    public T GetFirstFeatureData<T>() where T : LeapFeatureData {
-      for (int i = 0; i < _featureData.Count; i++) {
-        var data = _featureData[i];
-        if (data is T) {
-          return data as T;
-        }
-      }
-
-      throw new InvalidOperationException("The graphic " + this + " does not have a feature " + typeof(T).Name + ".");
+    /// <summary>
+    /// Gets a single feature data object of a given type T.  This will return
+    /// null if there is no feature data object attached to this graphic of type T.
+    /// </summary>>
+    public T GetFeatureData<T>() where T : LeapFeatureData {
+      return _featureData.Query().OfType<T>().FirstOrDefault();
     }
 
     /// <summary>
-    /// Called to notify that this graphic will be attached within the next frame.
-    /// This is only called at runtime.
+    /// Called by the system to notify that this graphic will be attached within 
+    /// the next frame. This is only called at runtime.
     /// </summary>
     public virtual void NotifyWillBeAttached(LeapGraphicGroup toBeAttachedTo) {
       Assert.AreEqual(_notificationState, NotificationState.None);
@@ -141,8 +175,8 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     /// <summary>
-    /// Called to notify that a previous notification that this graphic would be
-    /// attached has been canceled due to a call to TryRemoveGraphic.
+    /// Called by the system to notify that a previous notification that this 
+    /// graphic would be attached has been canceled due to a call to TryRemoveGraphic.
     /// </summary>
     public virtual void CancelWillBeAttached() {
       Assert.AreEqual(_notificationState, NotificationState.WillBeAttached);
@@ -153,8 +187,8 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     /// <summary>
-    /// Called to notify that this graphic will be detached within the next frame.
-    /// This is only called at runtime.
+    /// Called by the system to notify that this graphic will be detached within 
+    /// the next frame. This is only called at runtime.
     /// </summary>
     public virtual void NotifyWillBeDetached(LeapGraphicGroup toBeDetachedFrom) {
       Assert.AreEqual(_notificationState, NotificationState.None);
@@ -162,14 +196,18 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     /// <summary>
-    /// Called to notify that a previous notification that this graphic would be
-    /// detached has been canceled due to a call to TryAddGraphic.
+    /// Called by the system to notify that a previous notification that this 
+    /// graphic would be detached has been canceled due to a call to TryAddGraphic.
     /// </summary>
     public virtual void CancelWillBeDetached() {
       Assert.AreEqual(_notificationState, NotificationState.WillBeDetached);
       _notificationState = NotificationState.None;
     }
 
+    /// <summary>
+    /// Called by the system when this graphic is attached to a group.  This method is
+    /// invoked both at runtime and at edit time.
+    /// </summary>
     public virtual void OnAttachedToGroup(LeapGraphicGroup group, LeapSpaceAnchor anchor) {
 #if UNITY_EDITOR
       editor.OnAttachedToGroup(group, anchor);
@@ -184,6 +222,10 @@ namespace Leap.Unity.GraphicalRenderer {
       patchReferences();
     }
 
+    /// <summary>
+    /// Called by the system when this graphic is detached from a group.  This method
+    /// is invoked both at runtime and at edit time.
+    /// </summary>
     public virtual void OnDetachedFromGroup() {
       _notificationState = NotificationState.None;
 
@@ -196,15 +238,15 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// Called by the system whenever feature data is re-assigned to this graphic.  This
+    /// is only called at edit time.
+    /// </summary>
     public virtual void OnAssignFeatureData(List<LeapFeatureData> data) {
       _featureData.Clear();
       foreach (var dataObj in data) {
         _featureData.Add(dataObj);
       }
-    }
-
-    public bool Equals(LeapGraphic other) {
-      return GetInstanceID() == other.GetInstanceID();
     }
     #endregion
 

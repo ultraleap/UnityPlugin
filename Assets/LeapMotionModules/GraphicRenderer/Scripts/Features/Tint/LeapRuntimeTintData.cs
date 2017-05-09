@@ -14,7 +14,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
   public static class LeapRuntimeTintExtension {
     public static LeapRuntimeTintData GetRuntimeTint(this LeapGraphic graphic) {
-      return graphic.GetFirstFeatureData<LeapRuntimeTintData>();
+      return graphic.GetFeatureData<LeapRuntimeTintData>();
     }
   }
 
