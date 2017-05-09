@@ -9,7 +9,7 @@
 
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction.Internal {
+namespace Leap.Unity.Interaction.Internal {
 
   /// <summary>
   /// Contact Bones store data for the colliders and rigidbodies in each
@@ -35,6 +35,14 @@ namespace Leap.Unity.UI.Interaction.Internal {
 
     public float _lastObjectTouchedAdjustedMass;
 
+    void Start() {
+      interactionHand.interactionManager.contactBoneBodies[body] = this;
+    }
+
+    void OnDestroy() {
+      interactionHand.interactionManager.contactBoneBodies.Remove(body);
+    }
+
     void OnCollisionEnter(Collision collision) {
       IInteractionBehaviour interactionObj;
       if (collision.rigidbody == null) {
@@ -43,14 +51,14 @@ namespace Leap.Unity.UI.Interaction.Internal {
                      + "or ensure the Interaction layer only contains Interaction Behaviours.");
       }
 
-      if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
+      if (interactionHand.interactionManager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
         _lastObjectTouchedAdjustedMass = collision.rigidbody.mass;
         if (interactionObj is InteractionBehaviour) {
           switch ((interactionObj as InteractionBehaviour).contactForceMode) {
-            case InteractionBehaviour.ContactForceModes.Object:
+            case InteractionBehaviour.ContactForceMode.Object:
               _lastObjectTouchedAdjustedMass *= 0.1f;
               break;
-            case InteractionBehaviour.ContactForceModes.UI:
+            case InteractionBehaviour.ContactForceMode.UI:
               _lastObjectTouchedAdjustedMass *= 10f;
               break;
             default:
@@ -64,7 +72,7 @@ namespace Leap.Unity.UI.Interaction.Internal {
     }
     void OnCollisionExit(Collision collision) {
       IInteractionBehaviour interactionObj;
-      if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collision.rigidbody, out interactionObj)) {
+      if (interactionHand.interactionManager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
         interactionHand.ContactBoneCollisionExit(this, interactionObj, false);
       }
     }
@@ -75,13 +83,13 @@ namespace Leap.Unity.UI.Interaction.Internal {
                      + "or ensure the Interaction layer only contains Interaction Behaviours.");
       }
       IInteractionBehaviour interactionObj;
-      if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
+      if (interactionHand.interactionManager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
         interactionHand.ContactBoneCollisionEnter(this, interactionObj, true);
       }
     }
     void OnTriggerExit(Collider collider) {
       IInteractionBehaviour interactionObj;
-      if (interactionHand.interactionManager.rigidbodyRegistry.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
+      if (interactionHand.interactionManager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
         interactionHand.ContactBoneCollisionExit(this, interactionObj, true);
       }
     }

@@ -11,7 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
 
   public class KabschGraspedPose : IGraspedPoseController {
     public const int NUM_FINGERS = 5;

@@ -7,12 +7,12 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
-using Leap.Unity.UI.Interaction.Internal;
+using Leap.Unity.Interaction.Internal;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
 
   public class KinematicGraspedMovement : IGraspedMovementController {
 

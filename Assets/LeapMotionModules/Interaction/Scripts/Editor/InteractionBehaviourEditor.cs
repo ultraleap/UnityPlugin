@@ -9,7 +9,7 @@
 
 using UnityEditor;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
 
   [CanEditMultipleObjects]
   [CustomEditor(typeof(InteractionBehaviour), editorForChildClasses: true)]
@@ -24,13 +24,13 @@ namespace Leap.Unity.UI.Interaction {
       specifyCustomDrawer("_eventTable", drawEventTable);
 
       specifyConditionalDrawing(() => !target.ignoreContact,
-             "_contactForceMode");
+                                "_contactForceMode");
 
       specifyConditionalDrawing(() => !target.ignoreGrasping,
-                   "_allowMultiGrasp",
-                   "_moveObjectWhenGrasped",
-                   "graspedMovementType",
-                   "graspHoldWarpingEnabled__curIgnored");
+                                "_allowMultiGrasp",
+                                "_moveObjectWhenGrasped",
+                                "graspedMovementType",
+                                "graspHoldWarpingEnabled__curIgnored");
     }
 
     private void drawEventTable(SerializedProperty property) {

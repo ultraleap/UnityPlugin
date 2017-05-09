@@ -14,7 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction.Internal {
+namespace Leap.Unity.Interaction.Internal {
 
   /// <summary>
   /// IInteractionBehaviour is the interface that defines all Interaction objects,
@@ -33,7 +33,7 @@ namespace Leap.Unity.UI.Interaction.Internal {
     ISpaceComponent     space      { get; } // OK to return null if this object is not in curved space.
 
     // Interaction overrides
-    bool ignoreHover     { get; }
+    IgnoreHoverMode ignoreHoverMode { get; }
     bool ignoreContact   { get; }
     bool ignoreGrasping  { get; }
 

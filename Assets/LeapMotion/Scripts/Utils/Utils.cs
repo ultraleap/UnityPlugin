@@ -133,6 +133,7 @@ namespace Leap.Unity {
     #endregion
 
     #region Math Utils
+
     public static int Repeat(int x, int m) {
       int r = x % m;
       return r < 0 ? r + m : r;
@@ -179,6 +180,175 @@ namespace Leap.Unity {
 
     #endregion
 
+    #region Value Mapping Utils
+
+    /// <summary>
+    /// Maps the value between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
+    /// The input value is clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
+    /// </summary>
+    public static float Map(this float value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      if (valueMin == valueMax) return resultMin;
+      return Mathf.Lerp(resultMin, resultMax, ((value - valueMin) / (valueMax - valueMin)));
+    }
+
+    /// <summary>
+    /// Maps the value between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
+    /// without clamping the result value between resultMin and resultMax.
+    /// </summary>
+    public static float MapUnclamped(this float value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      if (valueMin == valueMax) return resultMin;
+      return Mathf.LerpUnclamped(resultMin, resultMax, ((value - valueMin) / (valueMax - valueMin)));
+    }
+
+    /// <summary>
+    /// Maps each Vector2 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
+    /// The input values are clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
+    /// </summary>
+    public static Vector2 Map(this Vector2 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector2(value.x.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.y.Map(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector2 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
+    /// without clamping the result value between resultMin and resultMax.
+    /// </summary>
+    public static Vector2 MapUnclamped(this Vector2 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector2(value.x.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.y.MapUnclamped(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector3 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
+    /// The input values are clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
+    /// </summary>
+    public static Vector3 Map(this Vector3 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector3(value.x.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.y.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.z.Map(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector3 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
+    /// without clamping the result value between resultMin and resultMax.
+    /// </summary>
+    public static Vector3 MapUnclamped(this Vector3 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector3(value.x.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.y.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.z.MapUnclamped(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector4 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax.
+    /// The input values are clamped between valueMin and valueMax; if this is not desired, see MapUnclamped.
+    /// </summary>
+    public static Vector4 Map(this Vector4 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector4(value.x.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.y.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.z.Map(valueMin, valueMax, resultMin, resultMax),
+                        value.w.Map(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Maps each Vector4 component between valueMin and valueMax to its linearly proportional equivalent between resultMin and resultMax,
+    /// without clamping the result value between resultMin and resultMax.
+    /// </summary>
+    public static Vector4 MapUnclamped(this Vector4 value, float valueMin, float valueMax, float resultMin, float resultMax) {
+      return new Vector4(value.x.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.y.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.z.MapUnclamped(valueMin, valueMax, resultMin, resultMax),
+                        value.w.MapUnclamped(valueMin, valueMax, resultMin, resultMax));
+    }
+
+    /// <summary>
+    /// Returns a new Vector2 via component-wise multiplication.
+    /// This operation is equivalent to Vector3.Scale(A, B).
+    /// </summary>
+    public static Vector2 CompMul(this Vector2 A, Vector2 B) {
+      return new Vector2(A.x * B.x, A.y * B.y);
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via component-wise multiplication.
+    /// This operation is equivalent to Vector3.Scale(A, B).
+    /// </summary>
+    public static Vector3 CompMul(this Vector3 A, Vector3 B) {
+      return new Vector3(A.x * B.x, A.y * B.y, A.z * B.z);
+    }
+
+    /// <summary>
+    /// Returns a new Vector4 via component-wise multiplication.
+    /// This operation is equivalent to Vector3.Scale(A, B).
+    /// </summary>
+    public static Vector4 CompMul(this Vector4 A, Vector4 B) {
+      return new Vector4(A.x * B.x, A.y * B.y, A.z * B.z, A.w * B.w);
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via component-wise division.
+    /// This operation is the inverse of A.CompMul(B).
+    /// </summary>
+    public static Vector2 CompDiv(this Vector2 A, Vector2 B) {
+      return new Vector2(A.x / B.x, A.y / B.y);
+    }
+
+    /// <summary>
+    /// Returns a new Vector3 via component-wise division.
+    /// This operation is the inverse of A.CompMul(B).
+    /// </summary>
+    public static Vector3 CompDiv(this Vector3 A, Vector3 B) {
+      return new Vector3(A.x / B.x, A.y / B.y, A.z / B.z);
+    }
+
+    /// <summary>
+    /// Returns a new Vector4 via component-wise division.
+    /// This operation is the inverse of A.CompMul(B).
+    /// </summary>
+    public static Vector4 CompDiv(this Vector4 A, Vector4 B) {
+      return new Vector4(A.x / B.x, A.y / B.y, A.z / B.z, A.w / B.w);
+    }
+
+    #endregion
+
+    #region Transform Utils
+
+    /// <summary>
+    /// Returns the children of this Transform in sibling index order.
+    /// </summary>
+    public static ChildrenEnumerator GetChildren(this Transform t) {
+      return new ChildrenEnumerator(t);
+    }
+
+    public struct ChildrenEnumerator {
+      private Transform _t;
+      private int _idx;
+      private int _count;
+
+      public ChildrenEnumerator(Transform t) {
+        _t = t;
+        _idx = -1;
+        _count = t.childCount;
+      }
+
+      public ChildrenEnumerator GetEnumerator() { return this; }
+
+      public bool MoveNext() {
+        if (_idx < _count) _idx += 1;
+        if (_idx == _count) { return false; }
+        else { return true; }
+      }
+      public Transform Current {
+        get { return _t == null ? null : _t.GetChild(_idx); }
+      }
+      public void Reset() {
+        _idx = -1;
+        _count = _t.childCount;
+      }
+      public void Dispose() { }
+    }
+
+    #endregion
+
     #region Orientation Utils
 
     /// <summary>
@@ -186,7 +356,10 @@ namespace Leap.Unity {
     /// Transform to point away from the argument Transform.
     /// 
     /// Useful for billboarding Quads and UI elements whose forward vectors should match
-    /// rather than oppose the Main Camera.
+    /// rather than oppose the Main Camera's forward vector.
+    /// 
+    /// Optionally, you may also pass an upwards vector, which will be provided to the underlying
+    /// Quaternion.LookRotation. Vector3.up will be used by default.
     /// </summary>
     public static void LookAwayFrom(this Transform thisTransform, Transform transform) {
       thisTransform.rotation = Quaternion.LookRotation(thisTransform.position - transform.position, Vector3.up);

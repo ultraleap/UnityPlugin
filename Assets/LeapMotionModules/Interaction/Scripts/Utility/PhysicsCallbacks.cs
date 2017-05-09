@@ -12,7 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.UI {
+namespace Leap.Unity.Interaction {
 
   public class PhysicsCallbacks : MonoBehaviour {
 
