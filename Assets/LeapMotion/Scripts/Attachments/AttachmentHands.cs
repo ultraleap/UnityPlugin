@@ -188,6 +188,8 @@ namespace Leap.Unity.Attachments {
     }
 
     private void refreshAttachmentHandTransforms() {
+      if (this == null) return;
+
       #if UNITY_EDITOR
       PrefabType prefabType = PrefabUtility.GetPrefabType(this.gameObject);
       if (prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab) {

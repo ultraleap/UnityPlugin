@@ -194,12 +194,14 @@ namespace Leap.Unity.Attachments {
     }
 
     public void notifyPointBehaviourDeleted(AttachmentPointBehaviour point) {
+      #if UNITY_EDITOR
       // Refresh this hand's attachment transforms on a slight delay.
       // Only AttachmentHands can _truly_ remove attachment points!
       AttachmentHands attachHands = GetComponentInParent<AttachmentHands>();
       if (attachHands != null) {
         EditorApplication.delayCall += () => { refreshAttachmentTransforms(attachHands.attachmentPoints); };
       }
+      #endif
     }
 
     #region Internal
