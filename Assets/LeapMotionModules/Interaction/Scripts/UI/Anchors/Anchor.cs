@@ -7,9 +7,7 @@ using UnityEngine.Events;
 
 namespace Leap.Unity.Interaction {
 
-  public class Anchor : MonoBehaviour, IRuntimeGizmoComponent {
-
-    public float anchorRange = 0.1F;
+  public class Anchor : MonoBehaviour {
 
     [Tooltip("Should this anchor allow multiple objects to be attached to it at the same time? "
            + "This property is enforced by AnchorGroups and AnchorableBehaviours.")]
@@ -52,8 +50,11 @@ namespace Leap.Unity.Interaction {
     /// Returns whether the target position is within the range of this anchor.
     /// </summary>
     public bool IsWithinRange(Vector3 position) {
-      Vector3 delta = this.transform.position - position;
-      return delta.sqrMagnitude < anchorRange * anchorRange;
+      //Vector3 delta = this.transform.position - position;
+      //return delta.sqrMagnitude < anchorRange * anchorRange;
+
+      // TODO: FIXME
+      return false;
     }
 
     /// <summary>
@@ -72,13 +73,33 @@ namespace Leap.Unity.Interaction {
       _anchoredObjects.Remove(anchObj);
     }
 
-    #region Runtime Gizmos
+    #region Gizmos
 
-    public bool drawRangeGizmo = false;
-    public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      if (!drawRangeGizmo) return;
-      drawer.color = new Color(0.4F, 0.5F, 0.15F);
-      drawer.DrawWireSphere(this.transform.position, anchorRange);
+    public static Color anchorGizmoColor = new Color(0.6F, 0.2F, 0.8F);
+
+    void OnDrawGizmos() {
+      Matrix4x4 origMatrix = Gizmos.matrix;
+      Gizmos.matrix = this.transform.localToWorldMatrix;
+      Gizmos.color = anchorGizmoColor;
+      float radius = 0.02F;
+
+      drawWireSphereGizmo(Vector3.zero, radius);
+
+      drawSphereCirclesGizmo(8, Vector3.zero, radius, Vector3.up);
+
+      Gizmos.matrix = origMatrix;
+    }
+
+    private static Vector3[] worldDirs = new Vector3[] { Vector3.right, Vector3.up, Vector3.forward };
+
+    private void drawWireSphereGizmo(Vector3 pos, float radius) {
+      foreach (var dir in worldDirs) {
+        return;
+      }
+    }
+
+    private void drawSphereCirclesGizmo(int numCircles, Vector3 pos, float radius, Vector3 poleDir) {
+      return;
     }
 
     #endregion

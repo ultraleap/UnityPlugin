@@ -62,6 +62,29 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    [Header("Attachment")]
+
+    // TODO: Delete me
+    //[Tooltip("If disabled, this anchorable object will disregard an anchor's range when seeking "
+    //       + "an anchor to attach to.")]
+    //public bool requireAnchorWithinRange = true;
+
+    [Tooltip("Anchors beyond this range are ignored as possible anchors for this object.")]
+    public float maximumAnchorableRange = 0.3F;
+
+    [Tooltip("Only allowed when an InteractionBehaviour is attached to this object. If enabled, this "
+           + "object's Attach() method or its variants will weigh its velocity towards an anchor along "
+           + "with its proximity when seeking an anchor to attach to.")]
+    public bool useObjectTrajectory = true;
+
+    [Tooltip("The maximum angle this object's trajectory can be away from an anchor to consider it as "
+           + "an anchor to attach to.")]
+    [SerializeField]
+    [Range(20F, 90F)]
+    private float _maxAttachmentAngle = 66F;
+    /// <summary> Calculated via _trajectoryAttachmentAngle. </summary>
+    private float _minAttachmentDotProduct;
+
     [Header("Motion")]
 
     [Tooltip("Should the object move instantly to the anchor position?")]
@@ -290,21 +313,11 @@ namespace Leap.Unity.Interaction {
       _isAnchored = false;
     }
 
-    public struct AnchorAttachmentSettings {
-      bool requireWithinRange;
-
-      bool useObjectVelocity;
-      float minVelocityDotProduct;
-      float maxRangeBeyondAnchor;
-
-
-    }
-
     /// <summary>
     /// Attaches this Anchorable object to its currently assigned anchor. By default, the
     /// attempt will fail if the anchor is 
     /// </summary>
-    public bool TryAttach(AnchorAttachmentSettings attachmentSettings) {
+    public bool TryAttach() {
       if (anchor != null) {
         _isAnchored = true;
         return true;
@@ -436,7 +449,7 @@ namespace Leap.Unity.Interaction {
 
     /// <summary> Wrapper method to match OnObjectGraspBegin method signature. </summary>
     private void detachAnchorOnObjectGraspBegin(List<InteractionHand> hands) {
-      DetachFromAnchor();
+      Detach();
     }
 
     /// <summary> Wrapper method to match OnObjectGraspEnd method signature. </summary>

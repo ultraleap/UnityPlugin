@@ -35,7 +35,7 @@ namespace Leap.Unity.Interaction {
             || (requireAnchorHasSpace && anchor.anchoredObjects.Count > 0)) continue;
         float anchorDistSqrd = anchor.GetDistanceSqrd(fromPosition);
         if (anchorDistSqrd < closestAnchorDistanceSqrd
-            && (!requireWithinAnchorRange || anchorDistSqrd < anchor.anchorRange * anchor.anchorRange)) {
+            && (!requireWithinAnchorRange || false /*anchorDistSqrd < anchor.anchorRange * anchor.anchorRange TODO FIXME */)) {
           closestAnchor = anchor;
           closestAnchorDistanceSqrd = anchorDistSqrd;
         }
