@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using Leap.Unity.Attributes;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -34,6 +35,7 @@ namespace Leap.Unity.Animation {
     public bool tweenLocalPosition = true;
     public bool tweenLocalRotation = true;
     public bool tweenLocalScale    = true;
+    [MinValue(0.001F)]
     public float tweenDuration = 0.33F;
     public SmoothType tweenSmoothType = SmoothType.Smooth;
 
