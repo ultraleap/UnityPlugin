@@ -11,7 +11,7 @@ using InteractionEngineUtility;
 using Leap.Unity.Attributes;
 using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Query;
-using Leap.Unity.UI.Interaction.Internal;
+using Leap.Unity.Interaction.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ using UnityEditor;
 #endif
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
 
   public partial class InteractionManager : MonoBehaviour, IRuntimeGizmoComponent {
 
@@ -114,15 +114,30 @@ namespace Leap.Unity.UI.Interaction {
     public float SimulationScale { get { return _providerScale; } }
 
     private InteractionHand[] _interactionHands = new InteractionHand[2];
+    /// <summary>
+    /// Gets the array of InteractionHands managed by this InteractionManager.
+    /// </summary>
+    public InteractionHand[] interactionHands { get { return _interactionHands; } }
+
     private HashSet<IInteractionBehaviour> _interactionBehaviours = new HashSet<IInteractionBehaviour>();
 
-    private Dictionary<Rigidbody, IInteractionBehaviour> _rigidbodyRegistry;
-    public Dictionary<Rigidbody, IInteractionBehaviour> rigidbodyRegistry {
+    private Dictionary<Rigidbody, IInteractionBehaviour> _interactionObjectBodies;
+    public Dictionary<Rigidbody, IInteractionBehaviour> interactionObjectBodies {
       get {
-        if (_rigidbodyRegistry == null) {
-          _rigidbodyRegistry = new Dictionary<Rigidbody, IInteractionBehaviour>();
+        if (_interactionObjectBodies == null) {
+          _interactionObjectBodies = new Dictionary<Rigidbody, IInteractionBehaviour>();
         }
-        return _rigidbodyRegistry;
+        return _interactionObjectBodies;
+      }
+    }
+
+    private Dictionary<Rigidbody, ContactBone> _contactBoneBodies;
+    public Dictionary<Rigidbody, ContactBone> contactBoneBodies {
+      get {
+        if (_contactBoneBodies == null) {
+          _contactBoneBodies = new Dictionary<Rigidbody, ContactBone>();
+        }
+        return _contactBoneBodies;
       }
     }
 
@@ -209,14 +224,18 @@ namespace Leap.Unity.UI.Interaction {
         fixedUpdateHands();
 
         // Perform each interaction object's FixedUpdateObject.
-        foreach (var interactionObj in _interactionBehaviours) {
-          interactionObj.FixedUpdateObject();
+        using (new ProfilerSample("FixedUpdateObject per-InteractionBehaviour")) {
+          foreach (var interactionObj in _interactionBehaviours) {
+            interactionObj.FixedUpdateObject();
+          }
         }
 
         // Apply soft contacts from both hands in unified solve.
         // (This will clear softContacts and originalVelocities as well.)
-        if (_softContacts.Count > 0) {
-          PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
+        using (new ProfilerSample("Apply Soft Contacts")) {
+          if (_softContacts.Count > 0 && enableContact) {
+            PhysicsUtility.applySoftContacts(_softContacts, _softContactOriginalVelocities);
+          }
         }
       }
 
@@ -529,7 +548,7 @@ namespace Leap.Unity.UI.Interaction {
 
     public void RegisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
       _interactionBehaviours.Add(interactionObj);
-      rigidbodyRegistry[interactionObj.rigidbody] = interactionObj;
+      interactionObjectBodies[interactionObj.rigidbody] = interactionObj;
     }
 
     /// <summary> Returns true if the Interaction Behaviour was registered with this manager; otherwise returns false. 
@@ -541,7 +560,7 @@ namespace Leap.Unity.UI.Interaction {
           intHand.ReleaseObject(interactionObj);
           intHand.grabClassifier.UnregisterInteractionBehaviour(interactionObj);
         }
-        rigidbodyRegistry.Remove(interactionObj.rigidbody);      }
+        interactionObjectBodies.Remove(interactionObj.rigidbody);      }
       return wasRemovalSuccessful;
     }
 

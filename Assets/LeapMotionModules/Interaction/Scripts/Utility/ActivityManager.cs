@@ -7,13 +7,13 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using Leap.Unity.Interaction.Internal;
 using Leap.Unity.Space;
-using Leap.Unity.UI.Interaction.Internal;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.UI.Interaction {
+namespace Leap.Unity.Interaction {
 
   /// <summary>
   /// ActivityManager is a wrapper around PhysX sphere queries for InteractionBehaviours.
