@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace Leap.Unity.Query {
 
   public struct WithPreviousOp<SourceType, SourceOp> : IQueryOp<PrevPair<SourceType>>
@@ -11,6 +13,10 @@ namespace Leap.Unity.Query {
     private int _offset;
 
     public WithPreviousOp(SourceOp op, int offset, bool includeStart) {
+      if (offset <= 0) {
+        throw new ArgumentException("Offset must be larger than zero.");
+      }
+
       _mainOp = op;
       _delayedOp = op;
 
@@ -59,6 +65,7 @@ namespace Leap.Unity.Query {
   }
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+
     public QueryWrapper<PrevPair<QueryType>, WithPreviousOp<QueryType, QueryOp>> WithPrevious(int offset = 1) {
       return new QueryWrapper<PrevPair<QueryType>, WithPreviousOp<QueryType, QueryOp>>(new WithPreviousOp<QueryType, QueryOp>(_op, offset, includeStart: false));
     }
