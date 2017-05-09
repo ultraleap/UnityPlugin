@@ -30,32 +30,36 @@ namespace Leap.Unity.GraphicalRenderer {
     private List<LeapGraphicGroup> _groups = new List<LeapGraphicGroup>();
     #endregion
 
-    #region PRIVATE VARIABLES
-    [NonSerialized]
-    private bool _hasFinishedSetup = false;
-
-    #endregion
-
     #region PUBLIC RUNTIME API
 
+    /// <summary>
+    /// Returns the leap space that is currently attached to this graphic renderer.  The only
+    /// way to attach a space to a graphic renderer is by adding the space component onto the
+    /// same gameObject at edit time.  There is no support for adding or removing spaces at
+    /// runtime.
+    /// </summary>
     public LeapSpace space {
       get {
         return _space;
       }
     }
 
+    /// <summary>
+    /// Returns a list of all graphic groups contained withinin this renderer.  This getter
+    /// returns a regular List object for simplicity and speed, but it is still not allowed
+    /// to mutate this list in any way.
+    /// </summary>
     public List<LeapGraphicGroup> groups {
       get {
         return _groups;
       }
     }
 
-    public bool hasFinishedSetup {
-      get {
-        return _hasFinishedSetup;
-      }
-    }
-
+    /// <summary>
+    /// Tries to add the given graphic to any group attached to this graphic.  A graphic will
+    /// be attached to a group that has its preferred renderer type first, but if none are 
+    /// preferred, it will be attached to the first compatible group found. 
+    /// </summary>
     public bool TryAddGraphic(LeapGraphic graphic) {
       //First try to attatch to a group that is preferred
       Type preferredType = graphic.preferredRendererType;
@@ -173,8 +177,6 @@ namespace Leap.Unity.GraphicalRenderer {
       foreach (var group in _groups) {
         group.UpdateRenderer();
       }
-
-      _hasFinishedSetup = true;
     }
 
     public void OnBeforeSerialize() { }

@@ -223,8 +223,6 @@ namespace Leap.Unity.GraphicalRenderer {
               group.editor.UpdateRendererEditor();
             }
           }
-
-          _renderer._hasFinishedSetup = true;
         }
 
         using (new ProfilerSample("Update Renderer")) {

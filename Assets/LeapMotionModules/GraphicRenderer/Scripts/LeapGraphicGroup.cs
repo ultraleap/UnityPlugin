@@ -15,7 +15,6 @@ using UnityEngine.Assertions;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using Leap.Unity;
 using Leap.Unity.Space;
 using Leap.Unity.Query;
 
@@ -51,6 +50,10 @@ namespace Leap.Unity.GraphicalRenderer {
 
     #region PUBLIC RUNTIME API
 
+    /// <summary>
+    /// Gets the renderer this group is attached to.  The set method is 
+    /// for internal use only and should not be used.
+    /// </summary>
     public LeapGraphicRenderer renderer {
       get {
         return _renderer;
@@ -60,12 +63,22 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// Gets the rendering method used for this group.  This can only be changed
+    /// at edit time using either the inspector interface, or the editor method
+    /// ChangeRenderingMethod.
+    /// </summary>
     public LeapRenderingMethod renderingMethod {
       get {
         return _renderingMethod.Value;
       }
     }
 
+    /// <summary>
+    /// Returns the list of features attached to this group.  This can only be 
+    /// changed at edit time using either the inspector interface, or the editor
+    /// methods AddFeature and RemoveFeature.
+    /// </summary>
     public FeatureList features {
       get {
         Assert.IsNotNull(_features, "The feature list of graphic group was null!");
@@ -73,6 +86,11 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// Returns the list of graphics attached to this group.  This getter returns
+    /// a regular mutable list for simplicity and efficiency, but the user is 
+    /// still not allowed to mutate this list in any way.
+    /// </summary>
     public List<LeapGraphic> graphics {
       get {
         Assert.IsNotNull(_graphics, "The graphic list of graphic group was null!");
@@ -81,7 +99,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     /// <summary>
-    /// Maps 1-to-1 with the feature list, where each graphic represents the
+    /// Maps 1-to-1 with the feature list, where each element represents the
     /// support that feature currently has.
     /// </summary>
     public List<SupportInfo> supportInfo {
@@ -92,12 +110,29 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// Returns whether or not add/remove operations are supported at runtime by
+    /// this group.  If this returns false, TryAddGraphic and TryRemoveGraphic will
+    /// always fail at runtime.
+    /// </summary>
     public bool addRemoveSupported {
       get {
         return _addRemoveSupported;
       }
     }
 
+    /// <summary>
+    /// Tries to add the given graphic to this group.  This can safely be called
+    /// during runtime or edit time.  This method can fail under the following 
+    /// conditions:
+    ///    - The graphic is already attached to this group.
+    ///    - The graphic is already attached to a different group.
+    ///    - It is runtime and add/remove is not supported by this group.
+    ///    
+    /// At runtime the actual attachment is delayed until LateUpdate for efficiency
+    /// reasons.  Expect that even if this method returns true that the graphic will
+    /// not actually be attached until the end of LateUpdate.
+    /// </summary>
     public bool TryAddGraphic(LeapGraphic graphic) {
       Assert.IsNotNull(graphic);
 
@@ -166,6 +201,17 @@ namespace Leap.Unity.GraphicalRenderer {
       return true;
     }
 
+    /// <summary>
+    /// Tries to remove the given graphic from this group.  This can safely be called
+    /// during runtime or edit time.  This method can fail under the following 
+    /// conditions:
+    ///    - The graphic is not attached to this group.
+    ///    - It is runtime and add/remove is not supported by this group.
+    ///    
+    /// At runtime the actual detachment is delayed until LateUpdate for efficiency
+    /// reasons.  Expect that even if this method returns true that the graphic will
+    /// not actually be detached until the end of LateUpdate.
+    /// </summary>
     public bool TryRemoveGraphic(LeapGraphic graphic) {
       Assert.IsNotNull(graphic);
 
@@ -224,6 +270,11 @@ namespace Leap.Unity.GraphicalRenderer {
       return true;
     }
 
+    /// <summary>
+    /// Fills the argument list with all of the currently supported features 
+    /// of type T.  Returns true if there are any supported features, and 
+    /// returns false if there are no supported features.
+    /// </summary>
     public bool GetSupportedFeatures<T>(List<T> features) where T : LeapGraphicFeatureBase {
       features.Clear();
       for (int i = 0; i < _features.Count; i++) {
@@ -300,7 +351,6 @@ namespace Leap.Unity.GraphicalRenderer {
 
           list.Add(feature);
         }
-
 
         var featureToInfo = new Dictionary<LeapGraphicFeatureBase, SupportInfo>();
 
