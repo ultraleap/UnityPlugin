@@ -21,7 +21,6 @@ namespace Leap.Unity.Attachments {
   public class AttachmentHands : MonoBehaviour {
 
     [SerializeField]
-    [OnEditorChange("attachmentPoints")]
     private AttachmentPointFlags _attachmentPoints = AttachmentPointFlags.Palm | AttachmentPointFlags.Wrist;
     public AttachmentPointFlags attachmentPoints {
       get {
@@ -157,6 +156,9 @@ namespace Leap.Unity.Attachments {
         // Construct any missing AttachmentHand objects.
         if (_attachmentHands[0] == null) {
           GameObject obj = new GameObject();
+          #if UNITY_EDITOR
+          Undo.RegisterCreatedObjectUndo(obj, "Created GameObject");
+          #endif
           _attachmentHands[0] = obj.AddComponent<AttachmentHand>();
           _attachmentHands[0].chirality = Chirality.Left;
         }
@@ -165,6 +167,9 @@ namespace Leap.Unity.Attachments {
 
         if (_attachmentHands[1] == null) {
           GameObject obj = new GameObject();
+          #if UNITY_EDITOR
+          Undo.RegisterCreatedObjectUndo(obj, "Created GameObject");
+          #endif
           _attachmentHands[1] = obj.AddComponent<AttachmentHand>();
           _attachmentHands[1].chirality = Chirality.Right;
         }
@@ -178,6 +183,12 @@ namespace Leap.Unity.Attachments {
     }
 
     private void refreshAttachmentHandTransforms() {
+      #if UNITY_EDITOR
+      PrefabType prefabType = PrefabUtility.GetPrefabType(this.gameObject);
+      if (prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab) {
+        return;
+      }
+      #endif
 
       bool requiresReinitialization = false;
 
