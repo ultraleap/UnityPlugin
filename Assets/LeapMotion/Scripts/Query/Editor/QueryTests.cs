@@ -95,14 +95,26 @@ namespace Leap.Unity.Query.Test {
 
     [Test]
     public void WithPreviousTest() {
-      Assert.That(LIST_0.Query().WithPrevious().Count(p => p.isFirst), Is.EqualTo(1));
-      Assert.That(LIST_0.Query().WithPrevious().Count(p => !p.isFirst), Is.EqualTo(LIST_0.Length - 1));
+      Assert.That(LIST_0.Query().WithPrevious().Count(p => p.hasPrev), Is.EqualTo(LIST_0.Length - 1));
+      Assert.That(LIST_0.Query().WithPrevious(includeStart: true).Count(p => !p.hasPrev), Is.EqualTo(1));
+      Assert.That(LIST_0.Query().WithPrevious(includeStart: true).Count(p => p.hasPrev), Is.EqualTo(LIST_0.Length - 1));
 
       foreach (var pair in LIST_0.Query().WithPrevious()) {
-        if (!pair.isFirst) {
-          Assert.That(pair.value, Is.EqualTo(pair.prev + 1));
-        }
+        Assert.That(pair.value, Is.EqualTo(pair.prev + 1));
       }
+    }
+
+    [Test]
+    public void WithPreviousOffsetTest() {
+      Assert.That(LIST_0.Query().WithPrevious(offset: 4).Count(), Is.EqualTo(1));
+      Assert.That(LIST_0.Query().WithPrevious(offset: 5).Count(), Is.EqualTo(0));
+      Assert.That(LIST_0.Query().WithPrevious(offset: int.MaxValue).Count(), Is.EqualTo(0));
+
+      var item = LIST_0.Query().WithPrevious(offset: 4).First();
+      Assert.That(item.value, Is.EqualTo(5));
+      Assert.That(item.prev, Is.EqualTo(1));
+
+      Assert.That(LIST_0.Query().WithPrevious(offset: 2).All(i => i.value - i.prev == 2));
     }
 
     [Test]

@@ -83,11 +83,11 @@ namespace Leap.Unity.GraphicalRenderer {
       });
 
       _addFeatureMenu = new GenericMenu();
-      foreach (var item in allFeatures.Query().WithPrevious()) {
+      foreach (var item in allFeatures.Query().WithPrevious(includeStart: true)) {
         var tag = LeapGraphicTagAttribute.GetTag(item.value);
         var order = tag == null ? 0 : tag.order;
 
-        if (!item.isFirst) {
+        if (item.hasPrev) {
           var prevTag = LeapGraphicTagAttribute.GetTag(item.prev);
           var prevOrder = prevTag == null ? 0 : prevTag.order;
           if ((prevOrder / 100) != (order / 100)) {
