@@ -15,31 +15,41 @@ namespace Leap.Unity.GraphicalRenderer {
 
   [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
   public class LeapGraphicTagAttribute : Attribute {
-    private static Dictionary<Type, string> _tagNameCache = new Dictionary<Type, string>();
+    private static Dictionary<Type, LeapGraphicTagAttribute> _tagCache = new Dictionary<Type, LeapGraphicTagAttribute>();
     private static Dictionary<string, Type> _stringTypeCache = new Dictionary<string, Type>();
 
-    public readonly string tagName;
+    public readonly string name;
+    public readonly int order;
 
-    public LeapGraphicTagAttribute(string tagName) {
-      this.tagName = tagName;
+    public LeapGraphicTagAttribute(string name, int order = 0) {
+      this.name = name;
+      this.order = order;
     }
 
-    public static string GetTag(Type type) {
-      string tagName;
-      if (!_tagNameCache.TryGetValue(type, out tagName)) {
+    public static string GetTagName(Type type) {
+      var tag = GetTag(type);
+      return tag == null ? type.Name : tag.name;
+    }
+
+    public static string GetTagName(string typeName) {
+      var tag = GetTag(typeName);
+      return tag == null ? typeName : tag.name;
+    }
+
+    public static LeapGraphicTagAttribute GetTag(Type type) {
+      LeapGraphicTagAttribute tag;
+      if (!_tagCache.TryGetValue(type, out tag)) {
         object[] attributes = type.GetCustomAttributes(typeof(LeapGraphicTagAttribute), inherit: true);
         if (attributes.Length == 1) {
-          tagName = (attributes[0] as LeapGraphicTagAttribute).tagName;
-        } else {
-          tagName = type.Name;
+          tag = attributes[0] as LeapGraphicTagAttribute;
         }
-        _tagNameCache[type] = tagName;
+        _tagCache[type] = tag;
       }
 
-      return tagName;
+      return tag;
     }
 
-    public static string GetTag(string typeName) {
+    public static LeapGraphicTagAttribute GetTag(string typeName) {
       Type type;
       if (!_stringTypeCache.TryGetValue(typeName, out type)) {
         type = typeof(LeapGraphicTagAttribute).Assembly.GetTypes().FirstOrDefault(t => t.Name == typeName);
@@ -47,7 +57,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       if (type == null) {
-        return typeName;
+        return null;
       } else {
         return GetTag(type);
       }

@@ -56,7 +56,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
       _addRenderingMethodMenu = new GenericMenu();
       foreach (var renderingMethod in allRenderingMethods) {
-        _addRenderingMethodMenu.AddItem(new GUIContent(LeapGraphicTagAttribute.GetTag(renderingMethod)),
+        _addRenderingMethodMenu.AddItem(new GUIContent(LeapGraphicTagAttribute.GetTagName(renderingMethod)),
                                         false,
                                         () => {
                                           serializedObject.ApplyModifiedProperties();
@@ -72,11 +72,19 @@ namespace Leap.Unity.GraphicalRenderer {
       var allFeatures = allTypes.Query().
                                  Where(t => !t.IsAbstract &&
                                             !t.IsGenericType &&
-                                             t.IsSubclassOf(typeof(LeapGraphicFeatureBase)));
+                                             t.IsSubclassOf(typeof(LeapGraphicFeatureBase))).ToList();
+
+      allFeatures.Sort((a, b) => {
+        var tagA = LeapGraphicTagAttribute.GetTag(a);
+        var tagB = LeapGraphicTagAttribute.GetTag(b);
+        var orderA = tagA == null ? 0 : tagA.order;
+        var orderB = tagB == null ? 0 : tagB.order;
+        return orderA - orderB;
+      });
 
       _addFeatureMenu = new GenericMenu();
       foreach (var feature in allFeatures) {
-        _addFeatureMenu.AddItem(new GUIContent(LeapGraphicTagAttribute.GetTag(feature)),
+        _addFeatureMenu.AddItem(new GUIContent(LeapGraphicTagAttribute.GetTagName(feature)),
                                 false,
                                 () => {
                                   serializedObject.ApplyModifiedProperties();
@@ -287,7 +295,7 @@ namespace Leap.Unity.GraphicalRenderer {
       var featureProperty = _cachedPropertyList[index];
 
       rect = rect.SingleLine();
-      string featureName = LeapGraphicTagAttribute.GetTag(featureProperty.type);
+      string featureName = LeapGraphicTagAttribute.GetTagName(featureProperty.type);
 
       int lastIndexOf = featureName.LastIndexOf('/');
       if (lastIndexOf >= 0) {

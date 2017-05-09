@@ -49,7 +49,7 @@ namespace Leap.Unity.GraphicalRenderer {
       where T : LeapGraphicFeatureBase {
       for (int i = 1; i < features.Count; i++) {
         info[i] = SupportInfo.Error("This renderer only supports a single " +
-                                            LeapGraphicTagAttribute.GetTag(typeof(T)) +
+                                            LeapGraphicTagAttribute.GetTagName(typeof(T)) +
                                             " feature.");
       }
     }

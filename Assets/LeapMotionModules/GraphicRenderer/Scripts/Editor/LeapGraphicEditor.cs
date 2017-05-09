@@ -80,14 +80,14 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
       if (!targets.Query().All(g => g.attachedGroup == mainGroup)) {
         buttonText = "-";
       } else {
-        buttonText = LeapGraphicTagAttribute.GetTag(mainGroup.renderingMethod.GetType());
+        buttonText = LeapGraphicTagAttribute.GetTagName(mainGroup.renderingMethod.GetType());
       }
 
       if (GUILayout.Button(buttonText, EditorStyles.miniButton, GUILayout.Width(60))) {
         GenericMenu groupMenu = new GenericMenu();
         int index = 0;
         foreach (var group in mainGroup.renderer.groups.Query().Where(g => g.renderingMethod.IsValidGraphic(targets[0]))) {
-          string tag = LeapGraphicTagAttribute.GetTag(group.renderingMethod.GetType());
+          string tag = LeapGraphicTagAttribute.GetTagName(group.renderingMethod.GetType());
           groupMenu.AddItem(new GUIContent(index.ToString() + ": " + tag), false, () => {
 
             bool areFeaturesUnequal = false;
@@ -178,7 +178,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
       for (int i = 0; i < _featureTable.arraySize; i++) {
         var idIndex = _featureTable.GetArrayElementAtIndex(i);
         var dataProp = MultiTypedListUtil.GetReferenceProperty(_featureList, idIndex);
-        EditorGUILayout.LabelField(LeapGraphicTagAttribute.GetTag(dataProp.type));
+        EditorGUILayout.LabelField(LeapGraphicTagAttribute.GetTagName(dataProp.type));
 
         if (mainGraphic.attachedGroup != null) {
           currentFeature = mainGraphic.attachedGroup.features[i];

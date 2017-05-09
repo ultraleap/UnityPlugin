@@ -46,7 +46,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
       _addGroupMenu = new GenericMenu();
       foreach (var renderingMethod in allRenderingMethods) {
-        _addGroupMenu.AddItem(new GUIContent(LeapGraphicTagAttribute.GetTag(renderingMethod)),
+        _addGroupMenu.AddItem(new GUIContent(LeapGraphicTagAttribute.GetTagName(renderingMethod)),
                               false,
                               () => {
                                 serializedObject.ApplyModifiedProperties();
@@ -139,7 +139,7 @@ namespace Leap.Unity.GraphicalRenderer {
         }
 
         var group = _renderer.groups[i];
-        string tag = LeapGraphicTagAttribute.GetTag(group.renderingMethod.GetType());
+        string tag = LeapGraphicTagAttribute.GetTagName(group.renderingMethod.GetType());
         if (GUILayout.Button(tag, EditorStyles.toolbarButton, GUILayout.MaxWidth(60))) {
           _selectedGroup.intValue = i;
           _groupEditor.Invalidate();
