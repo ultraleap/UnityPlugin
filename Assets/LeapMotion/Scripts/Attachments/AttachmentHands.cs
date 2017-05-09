@@ -75,7 +75,12 @@ namespace Leap.Unity.Attachments {
     private void reinitialize() {
       refreshHandAccessors();
       refreshAttachmentHands();
+
+      #if UNITY_EDITOR
+      EditorApplication.delayCall += refreshAttachmentHandTransforms;
+      #else
       refreshAttachmentHandTransforms();
+      #endif
     }
 
     void Update() {
