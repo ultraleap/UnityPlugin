@@ -33,6 +33,30 @@ namespace Leap.Unity.Query {
       return true;
     }
 
+    public bool AllEqual() {
+      QueryType a;
+      if (!_op.TryGetNext(out a)) {
+        return true;
+      }
+
+      QueryType b;
+      while (_op.TryGetNext(out b)) {
+        if ((a == null) != (b == null)) {
+          return false;
+        }
+
+        if (a == null && b == null) {
+          continue;
+        }
+
+        if (!a.Equals(b)) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
     public bool Contains(QueryType instance) {
       QueryType obj;
       while (_op.TryGetNext(out obj)) {
@@ -125,28 +149,47 @@ namespace Leap.Unity.Query {
       return -1;
     }
 
-    public bool AllEqual() {
-      QueryType a;
-      if (!_op.TryGetNext(out a)) {
-        return true;
+    public QueryType Last() {
+      QueryType obj;
+      if (!_op.TryGetNext(out obj)) {
+        throw new InvalidOperationException("The source query is empty!");
       }
 
-      QueryType b;
-      while (_op.TryGetNext(out b)) {
-        if ((a == null) != (b == null)) {
-          return false;
-        }
+      while (_op.TryGetNext(out obj)) { }
 
-        if (a == null && b == null) {
-          continue;
-        }
+      return obj;
+    }
 
-        if (!a.Equals(b)) {
-          return false;
-        }
+    public QueryType Last(Func<QueryType, bool> predicate) {
+      return Where(predicate).Last();
+    }
+
+    public QueryType LastOrDefault() {
+      QueryType obj = default(QueryType);
+      while (_op.TryGetNext(out obj)) { }
+      return obj;
+    }
+
+    public QueryType LastOrDefault(Func<QueryType, bool> predicate) {
+      return Where(predicate).LastOrDefault();
+    }
+
+    public QueryType Single() {
+      QueryType obj;
+      if (!_op.TryGetNext(out obj)) {
+        throw new InvalidOperationException("The source query is empty!");
       }
 
-      return true;
+      QueryType dummy;
+      if (_op.TryGetNext(out dummy)) {
+        throw new InvalidOperationException("The source query had more than a single elemeny!");
+      }
+
+      return obj;
+    }
+
+    public QueryType Single(Func<QueryType, bool> predicate) {
+      return Where(predicate).Single();
     }
 
     private static List<QueryType> _utilityList = new List<QueryType>();
