@@ -125,6 +125,30 @@ namespace Leap.Unity.Query {
       return -1;
     }
 
+    public bool AllEqual() {
+      QueryType a;
+      if (!_op.TryGetNext(out a)) {
+        return true;
+      }
+
+      QueryType b;
+      while (_op.TryGetNext(out b)) {
+        if ((a == null) != (b == null)) {
+          return false;
+        }
+
+        if (a == null && b == null) {
+          continue;
+        }
+
+        if (!a.Equals(b)) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
     private static List<QueryType> _utilityList = new List<QueryType>();
     public QueryType[] ToArray() {
       try {
