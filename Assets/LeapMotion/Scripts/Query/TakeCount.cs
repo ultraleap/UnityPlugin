@@ -39,7 +39,7 @@ namespace Leap.Unity.Query {
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
     public QueryWrapper<QueryType, TakeCountOp<QueryType, QueryOp>> Take(int count) {
-      return new QueryWrapper<QueryType, TakeCountOp<QueryType, QueryOp>>(new TakeCountOp<QueryType, QueryOp>(_op, count));
+      return new QueryWrapper<QueryType, TakeCountOp<QueryType, QueryOp>>(new TakeCountOp<QueryType, QueryOp>(op, count));
     }
   }
 }

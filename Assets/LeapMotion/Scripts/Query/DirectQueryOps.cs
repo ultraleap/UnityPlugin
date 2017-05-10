@@ -14,18 +14,11 @@ namespace Leap.Unity.Query {
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
 
-    public bool Any() {
-      QueryType obj;
-      return _op.TryGetNext(out obj);
-    }
-
-    public bool Any(Func<QueryType, bool> predicate) {
-      return Where(predicate).Any();
-    }
-
     public bool All(Func<QueryType, bool> predicate) {
+      var op = this.op;
+
       QueryType obj;
-      while (_op.TryGetNext(out obj)) {
+      while (op.TryGetNext(out obj)) {
         if (!predicate(obj)) {
           return false;
         }
@@ -34,13 +27,15 @@ namespace Leap.Unity.Query {
     }
 
     public bool AllEqual() {
+      var op = this.op;
+
       QueryType a;
-      if (!_op.TryGetNext(out a)) {
+      if (!op.TryGetNext(out a)) {
         return true;
       }
 
       QueryType b;
-      while (_op.TryGetNext(out b)) {
+      while (op.TryGetNext(out b)) {
         if ((a == null) != (b == null)) {
           return false;
         }
@@ -57,9 +52,22 @@ namespace Leap.Unity.Query {
       return true;
     }
 
-    public bool Contains(QueryType instance) {
+    public bool Any() {
+      var op = this.op;
+
       QueryType obj;
-      while (_op.TryGetNext(out obj)) {
+      return op.TryGetNext(out obj);
+    }
+
+    public bool Any(Func<QueryType, bool> predicate) {
+      return Where(predicate).Any();
+    }
+
+    public bool Contains(QueryType instance) {
+      var op = this.op;
+
+      QueryType obj;
+      while (op.TryGetNext(out obj)) {
         if (obj.Equals(instance)) {
           return true;
         }
@@ -68,9 +76,11 @@ namespace Leap.Unity.Query {
     }
 
     public int Count() {
+      var op = this.op;
+
       QueryType obj;
       int count = 0;
-      while (_op.TryGetNext(out obj)) {
+      while (op.TryGetNext(out obj)) {
         count++;
       }
       return count;
@@ -89,8 +99,10 @@ namespace Leap.Unity.Query {
     }
 
     public QueryType First() {
+      var op = this.op;
+
       QueryType obj;
-      if (!_op.TryGetNext(out obj)) {
+      if (!op.TryGetNext(out obj)) {
         throw new InvalidOperationException("The source query is empty.");
       }
 
@@ -102,8 +114,10 @@ namespace Leap.Unity.Query {
     }
 
     public QueryType FirstOrDefault() {
+      var op = this.op;
+
       QueryType obj;
-      _op.TryGetNext(out obj);
+      op.TryGetNext(out obj);
       return obj;
     }
 
@@ -112,13 +126,15 @@ namespace Leap.Unity.Query {
     }
 
     public QueryType Fold(Func<QueryType, QueryType, QueryType> foldFunc) {
+      var op = this.op;
+
       QueryType value;
-      if (!_op.TryGetNext(out value)) {
+      if (!op.TryGetNext(out value)) {
         throw new InvalidOperationException();
       }
 
       QueryType next;
-      while (_op.TryGetNext(out next)) {
+      while (op.TryGetNext(out next)) {
         value = foldFunc(value, next);
       }
 
@@ -126,9 +142,11 @@ namespace Leap.Unity.Query {
     }
 
     public int IndexOf(QueryType value) {
+      var op = this.op;
+
       QueryType obj;
       int index = 0;
-      while (_op.TryGetNext(out obj)) {
+      while (op.TryGetNext(out obj)) {
         if (obj.Equals(value)) {
           return index;
         }
@@ -138,9 +156,11 @@ namespace Leap.Unity.Query {
     }
 
     public int IndexOf(Func<QueryType, bool> predicate) {
+      var op = this.op;
+
       QueryType obj;
       int index = 0;
-      while (_op.TryGetNext(out obj)) {
+      while (op.TryGetNext(out obj)) {
         if (predicate(obj)) {
           return index;
         }
@@ -150,12 +170,14 @@ namespace Leap.Unity.Query {
     }
 
     public QueryType Last() {
+      var op = this.op;
+
       QueryType obj;
-      if (!_op.TryGetNext(out obj)) {
+      if (!op.TryGetNext(out obj)) {
         throw new InvalidOperationException("The source query is empty!");
       }
 
-      while (_op.TryGetNext(out obj)) { }
+      while (op.TryGetNext(out obj)) { }
 
       return obj;
     }
@@ -165,8 +187,10 @@ namespace Leap.Unity.Query {
     }
 
     public QueryType LastOrDefault() {
+      var op = this.op;
+
       QueryType obj = default(QueryType);
-      while (_op.TryGetNext(out obj)) { }
+      while (op.TryGetNext(out obj)) { }
       return obj;
     }
 
@@ -175,13 +199,15 @@ namespace Leap.Unity.Query {
     }
 
     public QueryType Single() {
+      var op = this.op;
+
       QueryType obj;
-      if (!_op.TryGetNext(out obj)) {
+      if (!op.TryGetNext(out obj)) {
         throw new InvalidOperationException("The source query is empty!");
       }
 
       QueryType dummy;
-      if (_op.TryGetNext(out dummy)) {
+      if (op.TryGetNext(out dummy)) {
         throw new InvalidOperationException("The source query had more than a single elemeny!");
       }
 
@@ -203,8 +229,10 @@ namespace Leap.Unity.Query {
     }
 
     public void FillArray(QueryType[] array, int offset = 0) {
+      var op = this.op;
+
       QueryType obj;
-      while (_op.TryGetNext(out obj)) {
+      while (op.TryGetNext(out obj)) {
         array[offset++] = obj;
       }
     }
@@ -221,8 +249,10 @@ namespace Leap.Unity.Query {
     }
 
     public void AppendList(List<QueryType> list) {
+      var op = this.op;
+
       QueryType obj;
-      while (_op.TryGetNext(out obj)) {
+      while (op.TryGetNext(out obj)) {
         list.Add(obj);
       }
     }
