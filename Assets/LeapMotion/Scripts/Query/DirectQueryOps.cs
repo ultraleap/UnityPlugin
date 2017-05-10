@@ -172,12 +172,14 @@ namespace Leap.Unity.Query {
     public QueryType Last() {
       var op = _op;
 
-      QueryType obj;
+      QueryType obj, temp;
       if (!op.TryGetNext(out obj)) {
         throw new InvalidOperationException("The source query is empty!");
       }
 
-      while (op.TryGetNext(out obj)) { }
+      while (op.TryGetNext(out temp)) {
+        obj = temp;
+      }
 
       return obj;
     }

@@ -123,6 +123,19 @@ namespace Leap.Unity.Query.Test {
     }
 
     [Test]
+    public void LastTests() {
+      Assert.That(LIST_0.Query().Last(), Is.EqualTo(LIST_0.Last()));
+
+      var empty = new int[] { };
+
+      Assert.That(() => {
+        empty.Query().Last();
+      }, Throws.InvalidOperationException);
+
+      Assert.That(empty.Query().LastOrDefault(), Is.EqualTo(empty.LastOrDefault()));
+    }
+
+    [Test]
     public void MultiFirstTest() {
       var q = LIST_0.Query();
       var a = q.First();
