@@ -17,7 +17,7 @@ using System.Text.RegularExpressions;
 namespace Leap.Unity.GraphicalRenderer {
 
   public class LeapGraphicPreferences : MonoBehaviour {
-    public const int GRAPHIC_COUNT_CEILING = 1023;
+    public const int GRAPHIC_COUNT_CEILING = 800;
     public const string LEAP_GRAPHIC_CGINC_PATH = "LeapMotionModules/GraphicRenderer/Resources/GraphicRenderer.cginc";
     public const string LEAP_GRAPHIC_SHADER_FOLDER = "Assets/LeapMotionModules/GraphicRenderer/Shaders/";
     private static Regex _graphicMaxRegex = new Regex(@"^#define\s+GRAPHIC_MAX\s+(\d+)\s*$");
@@ -62,6 +62,33 @@ namespace Leap.Unity.GraphicalRenderer {
       if (promptWhenGroupChange != newPromptValue) {
         promptWhenGroupChange = newPromptValue;
       }
+
+      EditorGUILayout.Space();
+      GUILayout.Label("Surface-shader variant options", EditorStyles.boldLabel);
+
+      EditorGUILayout.HelpBox("Using surface-shader variants can drastically increase import time!  Only enable variants if you are using surface shaders with the graphic renderer.", MessageType.Info);
+
+      using (new EditorGUILayout.HorizontalScope()) {
+        if (GUILayout.Button("Enable all variants")) {
+          setVariantsEnabledForSurfaceShaders(enable: true);
+        }
+
+        if (GUILayout.Button("Disable all variants")) {
+          setVariantsEnabledForSurfaceShaders(enable: false);
+        }
+      }
+    }
+
+    private static void setVariantsEnabledForSurfaceShaders(bool enable) {
+      foreach (var path in Directory.GetFiles(LEAP_GRAPHIC_SHADER_FOLDER, "*.shader", SearchOption.AllDirectories)) {
+        var shader = AssetDatabase.LoadAssetAtPath<Shader>(path);
+        if (shader == null) continue;
+
+        if (VariantEnabler.IsSurfaceShader(shader)) {
+          VariantEnabler.SetShaderVariantsEnabled(shader, enable);
+        }
+      }
+      AssetDatabase.Refresh();
     }
 
     private static void drawGraphicMaxField() {

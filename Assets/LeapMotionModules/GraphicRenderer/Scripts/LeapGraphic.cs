@@ -52,18 +52,21 @@ namespace Leap.Unity.GraphicalRenderer {
     private bool _isRepresentationDirty = true;
     public bool isRepresentationDirty {
       get {
-#if UNITY_EDITOR
-        if (Application.isPlaying) {
-#endif
-          return _isRepresentationDirty;
-#if UNITY_EDITOR
-        } else {
-          return true;
-        }
-#endif
+        return _isRepresentationDirty;
       }
       set {
         _isRepresentationDirty = value;
+      }
+    }
+
+    public bool isRepresentationDirtyOrEditTime {
+      get {
+#if UNITY_EDITOR
+        if (!Application.isPlaying) {
+          return true;
+        }
+#endif
+        return _isRepresentationDirty;
       }
     }
 
