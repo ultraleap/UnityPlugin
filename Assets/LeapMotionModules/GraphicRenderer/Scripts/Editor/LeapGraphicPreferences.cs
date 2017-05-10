@@ -17,7 +17,7 @@ using System.Text.RegularExpressions;
 namespace Leap.Unity.GraphicalRenderer {
 
   public class LeapGraphicPreferences : MonoBehaviour {
-    public const int GRAPHIC_COUNT_CEILING = 800;
+    public const int GRAPHIC_COUNT_SOFT_CEILING = 144;
     public const string LEAP_GRAPHIC_CGINC_PATH = "LeapMotionModules/GraphicRenderer/Resources/GraphicRenderer.cginc";
     public const string LEAP_GRAPHIC_SHADER_FOLDER = "Assets/LeapMotionModules/GraphicRenderer/Shaders/";
     private static Regex _graphicMaxRegex = new Regex(@"^#define\s+GRAPHIC_MAX\s+(\d+)\s*$");
@@ -123,8 +123,17 @@ namespace Leap.Unity.GraphicalRenderer {
         return;
       }
 
-      int newGraphicMax = EditorGUILayout.DelayedIntField("Maximum Graphics", graphicMax);
-      newGraphicMax = Mathf.Clamp(newGraphicMax, 1, GRAPHIC_COUNT_CEILING);
+      int newGraphicMax = EditorGUILayout.DelayedIntField("Max Graphics Per-Group", graphicMax);
+      newGraphicMax = Mathf.Min(newGraphicMax, 1023); //maximum array length for Unity shaders is 1023
+
+      if (newGraphicMax > GRAPHIC_COUNT_SOFT_CEILING) {
+        if (!EditorUtility.DisplayDialog("Large Graphic Count",
+                                        "Setting the graphic count larger than 144 can cause incorrect rendering " +
+                                        "or shader compilation failure on certain systems, are you sure you want " +
+                                        "to continue?", "Yes", "Cancel")) {
+          return;
+        }
+      }
 
       if (newGraphicMax == graphicMax) {
         return; //Work here is done!  Nothing to change!
