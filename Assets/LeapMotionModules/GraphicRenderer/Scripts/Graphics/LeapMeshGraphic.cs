@@ -14,15 +14,7 @@ using Leap.Unity.Attributes;
 namespace Leap.Unity.GraphicalRenderer {
 
   /// <summary>
-  /// This class is a base class for all graphics that can be represented by a mesh object. 
-  /// All mesh graphics contain 3 concepts, exposed directly through three properties.
-  ///  - A mesh.
-  ///     The mesh property returns the mesh that represents this graphic.  I
-  ///  - Vertex color.
-  ///     A mesh-wide tint of the vertex colors (if any) present in the mesh.  This is a simple way to
-  ///     add a zero-cost tint to a graphic if you are already using vertex colors to tint your object.
-  ///     Vertex colors are baked into the mesh, and cannot change at runtime.
-  ///  - Remappable channels, which uv channels are allowed to be remapped when textures are atlased.
+  /// This class is a base class for all graphics that can be represented by a mesh object.
   /// </summary>
   [DisallowMultipleComponent]
   public abstract partial class LeapMeshGraphicBase : LeapGraphic {
@@ -66,7 +58,9 @@ namespace Leap.Unity.GraphicalRenderer {
   }
 
   /// <summary>
-  /// 
+  /// This class is the trivial implementation of LeapMeshGraphicBase.  It references a mesh asset
+  /// directly to represent this graphic, and allows the user to directly specify which channels 
+  /// are allowed to be remapped.
   /// </summary>
   public class LeapMeshGraphic : LeapMeshGraphicBase {
 
