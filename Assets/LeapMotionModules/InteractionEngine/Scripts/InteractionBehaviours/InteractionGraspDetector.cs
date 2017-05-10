@@ -38,7 +38,6 @@ namespace Leap.Unity.Interaction {
     * targets must be managed by this manager.
     * @since 4.1.5
     */
-    [AutoFind(AutoFindLocations.Scene)]
     [Tooltip("The Interaction Manager.")]
     public InteractionManager interactionManager = null;
 
@@ -47,7 +46,6 @@ namespace Leap.Unity.Interaction {
      * Set automatically if not explicitly set in the editor.
      * @since 4.1.5
      */
-    [AutoFind(AutoFindLocations.Parents)]
     [Tooltip("The hand model to watch. Set automatically if detector is on a hand.")]
     public IHandModel HandModel = null;
 
