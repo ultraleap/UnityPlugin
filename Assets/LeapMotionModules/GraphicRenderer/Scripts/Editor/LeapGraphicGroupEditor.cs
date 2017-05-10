@@ -132,6 +132,8 @@ namespace Leap.Unity.GraphicalRenderer {
         drawFeatureHeader();
 
         _featureList.DoLayoutList();
+
+        drawWarningDialogs();
       }
     }
 
@@ -255,6 +257,37 @@ namespace Leap.Unity.GraphicalRenderer {
                                     typeof(MonoScript),
                                     allowSceneObjects: false);
       }
+    }
+
+    private void drawWarningDialogs() {
+      HashSet<string> shownMessages = Pool<HashSet<string>>.Spawn();
+      try {
+        for (int i = 0; i < _cachedPropertyList.Count; i++) {
+          if (!EditorApplication.isPlaying) {
+            var supportInfo = _supportInfo.GetArrayElementAtIndex(i);
+            var supportProperty = supportInfo.FindPropertyRelative("support");
+            var messageProperty = supportInfo.FindPropertyRelative("message");
+
+            if (shownMessages.Contains(messageProperty.stringValue)) {
+              continue;
+            }
+            shownMessages.Add(messageProperty.stringValue);
+
+            switch ((SupportType)supportProperty.intValue) {
+              case SupportType.Warning:
+                EditorGUILayout.HelpBox(messageProperty.stringValue, MessageType.Warning);
+                break;
+              case SupportType.Error:
+                EditorGUILayout.HelpBox(messageProperty.stringValue, MessageType.Error);
+                break;
+            }
+          }
+        }
+      } finally {
+        shownMessages.Clear();
+        Pool<HashSet<string>>.Recycle(shownMessages);
+      }
+
     }
 
     private void drawFeatureHeader() {
