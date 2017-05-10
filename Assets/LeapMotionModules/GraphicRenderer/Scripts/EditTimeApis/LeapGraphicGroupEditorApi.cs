@@ -63,6 +63,13 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
 
+      /// <summary>
+      /// This method changes the rendering method used for this group.  You must provide the type
+      /// of the rendering method to switch to, as well as if features should be added to match
+      /// the existing feature data objects present in the graphics that are attached.
+      /// 
+      /// This is an editor only method, as rendering types cannot be changed at runtime!
+      /// </summary>
       public void ChangeRenderingMethod(Type renderingMethodType, bool addFeatures) {
         AssertHelper.AssertEditorOnly();
         Assert.IsNotNull(renderingMethodType);
@@ -113,9 +120,16 @@ namespace Leap.Unity.GraphicalRenderer {
         OnValidate();
       }
 
+      /// <summary>
+      /// Adds a feature of a specific type to this group.  Even if the feature is not
+      /// a supported feature it will still be added, it will just not be supported and
+      /// will show up in red in the inspector.
+      /// 
+      /// This is an editor only api, as features cannot be added/removed at runtime.
+      /// </summary>
       public LeapGraphicFeatureBase AddFeature(Type featureType) {
         AssertHelper.AssertEditorOnly();
-        _group._renderer.editor.ScheduleEditorUpdate();
+        _group._renderer.editor.ScheduleRebuild();
 
         Undo.RecordObject(_group.renderer, "Added feature");
 
@@ -128,6 +142,10 @@ namespace Leap.Unity.GraphicalRenderer {
         return feature;
       }
 
+      /// <summary>
+      /// Removes the feature at the given index.  This is an editor only api, as features
+      /// cannot be added/removed at runtime.
+      /// </summary>
       public void RemoveFeature(int featureIndex) {
         AssertHelper.AssertEditorOnly();
 
@@ -138,7 +156,20 @@ namespace Leap.Unity.GraphicalRenderer {
         _group.RebuildFeatureData();
         _group.RebuildFeatureSupportInfo();
 
-        _group._renderer.editor.ScheduleEditorUpdate();
+        _group._renderer.editor.ScheduleRebuild();
+      }
+
+      /// <summary>
+      /// Forces a rebuild of all the picking meshes for all attached graphics.
+      /// The picking meshes are used to allow graphics to be accurately picked
+      /// even though they might be inside of warped spaces.
+      /// </summary>
+      public void RebuildEditorPickingMeshes() {
+        using (new ProfilerSample("Rebuild Picking Meshes")) {
+          foreach (var graphic in _group._graphics) {
+            graphic.editor.RebuildEditorPickingMesh();
+          }
+        }
       }
 
       public void ValidateGraphicList() {
@@ -172,19 +203,10 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       }
 
-
       public void UpdateRendererEditor() {
         AssertHelper.AssertEditorOnly();
 
         _group._renderingMethod.Value.OnUpdateRendererEditor();
-      }
-
-      public void RebuildEditorPickingMeshes() {
-        using (new ProfilerSample("Rebuild Picking Meshes")) {
-          foreach (var graphic in _group._graphics) {
-            graphic.editor.RebuildEditorPickingMesh();
-          }
-        }
       }
     }
 #endif

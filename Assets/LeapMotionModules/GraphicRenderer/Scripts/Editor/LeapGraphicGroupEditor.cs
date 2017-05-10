@@ -62,9 +62,9 @@ namespace Leap.Unity.GraphicalRenderer {
                                           serializedObject.ApplyModifiedProperties();
                                           Undo.RecordObject(_renderer, "Changed rendering method");
                                           EditorUtility.SetDirty(_renderer);
-                                          _renderer.editor.ChangeRenderingMethod(renderingMethod, addFeatures: false);
+                                          _renderer.editor.ChangeRenderingMethodOfSelectedGroup(renderingMethod, addFeatures: false);
                                           serializedObject.Update();
-                                          _renderer.editor.ScheduleEditorUpdate();
+                                          _renderer.editor.ScheduleRebuild();
                                           _serializedObject.SetIsDifferentCacheDirty();
                                         });
       }
@@ -101,7 +101,7 @@ namespace Leap.Unity.GraphicalRenderer {
                                   serializedObject.ApplyModifiedProperties();
                                   Undo.RecordObject(_renderer, "Added feature");
                                   EditorUtility.SetDirty(_renderer);
-                                  _renderer.editor.AddFeature(item.value);
+                                  _renderer.editor.AddFeatureToSelectedGroup(item.value);
                                   _serializedObject.Update();
                                   _serializedObject.SetIsDifferentCacheDirty();
                                 });
@@ -210,7 +210,7 @@ namespace Leap.Unity.GraphicalRenderer {
             Undo.RecordObject(_renderer, "Refreshed atlas");
             EditorUtility.SetDirty(_renderer);
             mesher.RebuildAtlas(new ProgressBar());
-            _renderer.editor.ScheduleEditorUpdate();
+            _renderer.editor.ScheduleRebuild();
             _serializedObject.Update();
           }
 
@@ -271,7 +271,7 @@ namespace Leap.Unity.GraphicalRenderer {
           _serializedObject.ApplyModifiedProperties();
           Undo.RecordObject(_renderer, "Removed Feature");
           EditorUtility.SetDirty(_renderer);
-          _renderer.editor.RemoveFeature(_featureList.index);
+          _renderer.editor.RemoveFeatureFromSelectedGroup(_featureList.index);
           _serializedObject.Update();
           init(_groupProperty);
         }
@@ -349,7 +349,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     private void onReorderFeaturesCallback(ReorderableList list) {
-      _renderer.editor.ScheduleEditorUpdate();
+      _renderer.editor.ScheduleRebuild();
     }
   }
 }

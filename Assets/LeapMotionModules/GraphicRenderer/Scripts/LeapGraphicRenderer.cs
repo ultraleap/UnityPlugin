@@ -93,7 +93,7 @@ namespace Leap.Unity.GraphicalRenderer {
 #if UNITY_EDITOR
       if (!InternalUtility.IsPrefab(this)) {
         if (!Application.isPlaying) {
-          editor.ScheduleEditorUpdate();
+          editor.ScheduleRebuild();
         }
         editor.OnValidate();
       }

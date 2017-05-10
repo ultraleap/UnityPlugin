@@ -186,7 +186,7 @@ namespace Leap.Unity.GraphicalRenderer {
           _renderer.space.RecalculateTransformers();
         }
 
-        _renderer.editor.ScheduleEditorUpdate();
+        _renderer.editor.ScheduleRebuild();
       } else
 #endif
       {
@@ -255,7 +255,7 @@ namespace Leap.Unity.GraphicalRenderer {
           _renderer.space.RecalculateTransformers();
         }
 
-        _renderer.editor.ScheduleEditorUpdate();
+        _renderer.editor.ScheduleRebuild();
       } else
 #endif
       {

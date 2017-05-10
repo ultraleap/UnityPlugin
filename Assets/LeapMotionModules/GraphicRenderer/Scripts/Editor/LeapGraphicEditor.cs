@@ -123,7 +123,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
               serializedObject.Update();
             }
 
-            mainGroup.renderer.editor.ScheduleEditorUpdate();
+            mainGroup.renderer.editor.ScheduleRebuild();
           });
           index++;
         }
@@ -169,7 +169,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
           if (meshRendering.IsAtlasDirty && !EditorApplication.isPlaying) {
             if (GUILayout.Button("Refresh Atlas", GUILayout.MaxHeight(EditorGUIUtility.singleLineHeight))) {
               meshRendering.RebuildAtlas(new ProgressBar());
-              sharedGroup.renderer.editor.ScheduleEditorUpdate();
+              sharedGroup.renderer.editor.ScheduleRebuild();
             }
           }
         }
