@@ -24,6 +24,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public const string PROMPT_WHEN_GROUP_CHANGE_KEY = "LeapGraphicRenderer_ShouldPromptWhenGroupChange";
 
+    public const string PROMP_WHEN_ADD_CUSTOM_CHANNEL_LEY = "LeapGraphicRenderer_ShouldPrompWhenAddCustomChannel";
+
     private static int _cachedGraphicMax = -1; //-1 signals dirty
     public static int graphicMax {
       get {
@@ -53,14 +55,29 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    public static bool promptWhenAddCustomChannel {
+      get {
+        return EditorPrefs.GetBool(PROMP_WHEN_ADD_CUSTOM_CHANNEL_LEY, true);
+      }
+      set {
+        EditorPrefs.SetBool(PROMP_WHEN_ADD_CUSTOM_CHANNEL_LEY, value);
+      }
+    }
+
     [PreferenceItem("Leap Graphics")]
     private static void preferencesGUI() {
       drawGraphicMaxField();
 
-      GUIContent prompContent = new GUIContent("Prompt When Group Changed", "Should the system prompt the user when they change the group of a graphic to a group with different features.");
-      bool newPromptValue = EditorGUILayout.Toggle(prompContent, promptWhenGroupChange);
+      GUIContent groupChangedContent = new GUIContent("Prompt When Group Changed", "Should the system prompt the user when they change the group of a graphic to a group with different features.");
+      bool newPromptValue = EditorGUILayout.Toggle(groupChangedContent, promptWhenGroupChange);
       if (promptWhenGroupChange != newPromptValue) {
         promptWhenGroupChange = newPromptValue;
+      }
+
+      GUIContent addChannelContent = new GUIContent("Prompt For Custom Channel", "Should the system warn the user about writing custom shaders when they try to add a Custom Channel feature?");
+      bool newPromptWhenAddCustomChannelValue = EditorGUILayout.Toggle(addChannelContent, promptWhenAddCustomChannel);
+      if (newPromptWhenAddCustomChannelValue != promptWhenAddCustomChannel) {
+        promptWhenAddCustomChannel = newPromptWhenAddCustomChannelValue;
       }
 
       EditorGUILayout.Space();
