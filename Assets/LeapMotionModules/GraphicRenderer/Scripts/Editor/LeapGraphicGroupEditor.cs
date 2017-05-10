@@ -98,16 +98,16 @@ namespace Leap.Unity.GraphicalRenderer {
         _addFeatureMenu.AddItem(new GUIContent(tag.name),
                                 false,
                                 () => {
-                                  if (item.value.IsSubclassOf(typeof(ICustomChannelFeature)) && LeapGraphicPreferences.promptWhenAddCustomChannel) {
+                                  if (item.value.ImplementsInterface(typeof(ICustomChannelFeature)) && LeapGraphicPreferences.promptWhenAddCustomChannel) {
                                     int result = EditorUtility.DisplayDialogComplex("Adding Custom Channel", "Custom channels can only be utilized by writing custom shaders, are you sure you want to continue?", "Add it", "Cancel", "Add it from now on");
                                     switch (result) {
                                       case 0:
                                         break;
                                       case 1:
+                                        return;
+                                      case 2:
                                         LeapGraphicPreferences.promptWhenAddCustomChannel = false;
                                         break;
-                                      case 2:
-                                        return;
                                     }
                                   }
 
