@@ -13,36 +13,52 @@ namespace Leap.Unity.Interaction {
     [SerializeField, SHashSet]
     [Tooltip("The anchors that are within this AnchorGroup. Anchorable objects associated "
            + "this AnchorGroup can only be placed in anchors within this group.")]
-    public AnchorSet anchors;
+    private AnchorSet _anchors;
+    public AnchorSet anchors { get { return _anchors; } }
 
-    public bool Contains(Anchor anchor) {
-      return anchors.Contains(anchor);
+    private HashSet<AnchorableBehaviour> _anchorableObjects = new HashSet<AnchorableBehaviour>();
+    /// <summary>
+    /// Gets the AnchorableBehaviours that are set to this AnchorGroup.
+    /// </summary>
+    public HashSet<AnchorableBehaviour> anchorableObjects { get { return _anchorableObjects; } }
+
+    void Awake() {
+      foreach (var anchor in anchors) {
+        Add(anchor);
+      }
     }
 
-    // TODO: Maaaybe delete me?
-    ///// <summary>
-    ///// Returns the closest anchor to the argument position. By default, this method will
-    ///// only return anchors that are enabled, whose distance from the argument falls within
-    ///// that anchor's range, and that isn't occupied by an AnchorableBehaviour already.
-    ///// </summary>
-    //public Anchor FindClosestAnchor(Vector3 fromPosition, bool requireWithinAnchorRange = true,
-    //                                                      bool requireAnchorIsEnabled = true,
-    //                                                      bool requireAnchorHasSpace = true) {
-    //  Anchor closestAnchor = null;
-    //  float closestAnchorDistanceSqrd = float.PositiveInfinity;
-    //  foreach (Anchor anchor in anchors) {
-    //    if (anchor == null
-    //        || (requireAnchorIsEnabled && !anchor.enabled)
-    //        || (requireAnchorHasSpace && anchor.anchoredObjects.Count > 0)) continue;
-    //    float anchorDistSqrd = anchor.GetDistanceSqrd(fromPosition);
-    //    if (anchorDistSqrd < closestAnchorDistanceSqrd
-    //        && (!requireWithinAnchorRange || false /*anchorDistSqrd < anchor.anchorRange * anchor.anchorRange TODO FIXME */)) {
-    //      closestAnchor = anchor;
-    //      closestAnchorDistanceSqrd = anchorDistSqrd;
-    //    }
-    //  }
-    //  return closestAnchor;
-    //}
+    public bool Contains(Anchor anchor) {
+      return _anchors.Contains(anchor);
+    }
+
+    public bool Add(Anchor anchor) {
+      if (_anchors.Add(anchor)) {
+        anchor.groups.Add(this);
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+
+    public bool Remove(Anchor anchor) {
+      if (_anchors.Remove(anchor)) {
+        anchor.groups.Remove(this);
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+
+    public void NotifyAnchorableObjectAdded(AnchorableBehaviour anchObj) {
+      anchorableObjects.Add(anchObj);
+    }
+
+    public void NotifyAnchorableObjectRemoved(AnchorableBehaviour anchObj) {
+      anchorableObjects.Add(anchObj);
+    }
 
   }
 

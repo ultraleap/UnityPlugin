@@ -1,5 +1,6 @@
 ﻿using Leap.Unity.Attributes;
 using Leap.Unity.RuntimeGizmos;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,6 +24,9 @@ namespace Leap.Unity.Interaction {
            + "This property is enforced by AnchorGroups and AnchorableBehaviours.")]
     public bool allowMultipleObjects = false;
 
+    private HashSet<AnchorGroup> _groups = new HashSet<AnchorGroup>();
+    public HashSet<AnchorGroup> groups { get { return _groups; } }
+
     private HashSet<AnchorableBehaviour> _anchoredObjects = new HashSet<AnchorableBehaviour>();
     /// <summary>
     /// Gets the set of AnchorableBehaviours currently attached to this anchor.
@@ -31,28 +35,21 @@ namespace Leap.Unity.Interaction {
 
     #region Events
 
-    // TODO: These events are not yet complete. Work on implementing them is going to
-    // come with changes to Anchor/AnchorableBehaviour/AnchorGroup coming in another PR.
+    /// <summary>
+    /// Called as soon as any anchorable objects prefer this anchor if they were to try to
+    /// attach to an anchor.
+    /// </summary>
+    public Action OnAnchorPreferred = () => { };
 
     /// <summary>
-    /// Called as soon as any anchorable objects come within range of this anchor. If the anchor
-    /// is part of an anchor group, this will only be called when an anchorable object would be
-    /// attached to this anchor if it made an anchor attempt. (In other words, this event may
-    /// not be called if all anchorable objects within range prefer other nearby anchors.)
+    /// Called when no anchorable objects prefer this anchor any more.
     /// </summary>
-    //public UnityEvent WhenAnchorableWithinRange;
+    public Action OnAnchorNotPreferred = () => { };
 
     /// <summary>
-    /// Called when all nearby anchorable objects have left the range of this anchor, or if
-    /// all nearby anchorable objects would prefer other anchors if this Anchor is within an
-    /// AnchorGroup.
+    /// Called every Update() that an AnchorableBehaviour prefers this anchor.
     /// </summary>
-    //public UnityEvent WhenNoAnchorableWithinRange;
-
-    /// <summary>
-    /// Called every Update() that an AnchorableBehaviour within range prefers this anchor.
-    /// </summary>
-    //public AnchorableBehaviourEvent WhileAnchorableWithinRange;
+    public Action WhileAnchorPreferred = () => { };
 
     #endregion
 
@@ -64,6 +61,14 @@ namespace Leap.Unity.Interaction {
       allAnchors.Remove(this);
     }
 
+    void Start() {
+      initUnityEvents();
+    }
+
+    void Update() {
+      updateAnchorCallbacks();
+    }
+
     public void NotifyAnchored(AnchorableBehaviour anchObj) {
       _anchoredObjects.Add(anchObj);
     }
@@ -71,6 +76,32 @@ namespace Leap.Unity.Interaction {
     public void NotifyUnanchored(AnchorableBehaviour anchObj) {
       _anchoredObjects.Remove(anchObj);
     }
+
+    #region Anchor Callbacks
+
+    private HashSet<AnchorableBehaviour> _preferringAnchorables = new HashSet<AnchorableBehaviour>();
+
+    private void updateAnchorCallbacks() {
+      WhileAnchorPreferred();
+    }
+
+    public void NotifyAnchorPreference(AnchorableBehaviour anchObj) {
+      _preferringAnchorables.Add(anchObj);
+
+      if (_preferringAnchorables.Count == 1) {
+        OnAnchorPreferred();
+      }
+    }
+
+    public void NotifyEndAnchorPreference(AnchorableBehaviour anchObj) {
+      _preferringAnchorables.Remove(anchObj);
+
+      if (_preferringAnchorables.Count == 0) {
+        OnAnchorNotPreferred();
+      }
+    }
+
+    #endregion
 
     #region Gizmos
 
@@ -99,6 +130,29 @@ namespace Leap.Unity.Interaction {
 
     private void drawSphereCirclesGizmo(int numCircles, Vector3 pos, float radius, Vector3 poleDir) {
       return;
+    }
+
+    #endregion
+
+    #region Unity Events (Internal)
+
+    [SerializeField]
+    private EnumEventTable _eventTable;
+
+    public enum EventType {
+      OnAnchorPreferred = 100,
+      OnAnchorNotPreferred = 110,
+      WhileAnchorPreferred = 120
+    }
+
+    private void initUnityEvents() {
+      setupCallback(ref OnAnchorPreferred,    EventType.OnAnchorPreferred);
+      setupCallback(ref OnAnchorNotPreferred, EventType.OnAnchorNotPreferred);
+      setupCallback(ref WhileAnchorPreferred, EventType.WhileAnchorPreferred);
+    }
+
+    private void setupCallback(ref Action action, EventType type) {
+      action += () => _eventTable.Invoke((int)type);
     }
 
     #endregion

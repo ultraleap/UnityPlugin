@@ -12,7 +12,9 @@ namespace Leap.Unity {
     private string _comment;
 
     [SerializeField, HideInInspector]
+#pragma warning disable 0414
     private bool _isEditing = true;
+#pragma warning restore 0414
 
 #if UNITY_EDITOR
     [ContextMenu("Edit")]
