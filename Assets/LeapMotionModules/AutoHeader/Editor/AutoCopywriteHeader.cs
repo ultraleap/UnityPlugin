@@ -7,6 +7,7 @@
  * between Leap Motion and you, your company or other organization.           *
  ******************************************************************************/
 
+using System;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -43,7 +44,11 @@ public static class AutoCopywriteHeader {
   public static void PopulateAutoHeaders() {
     List<string> files = new List<string>();
     foreach (var folder in searchFolders) {
-      files.AddRange(Directory.GetFiles(Path.Combine("Assets", folder), "*.cs", SearchOption.AllDirectories));
+      try {
+        files.AddRange(Directory.GetFiles(Path.Combine("Assets", folder), "*.cs", SearchOption.AllDirectories));
+      } catch (Exception e) {
+        Debug.LogException(e);
+      }
     }
 
     StringBuilder builder = new StringBuilder();
