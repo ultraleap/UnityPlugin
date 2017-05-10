@@ -33,14 +33,20 @@ namespace Leap.Unity.Query {
   /// hopefully not impacting the productivity of the user too much.
   /// </summary>
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
-    public readonly QueryOp op;
+    private QueryOp _op;
+
+    public QueryOp op {
+      get {
+        return _op;
+      }
+    }
 
     public QueryWrapper(QueryOp op) {
-      this.op = op;
+      _op = op;
     }
 
     public Enumerator GetEnumerator() {
-      return new Enumerator(op);
+      return new Enumerator(_op);
     }
 
     public struct Enumerator {
