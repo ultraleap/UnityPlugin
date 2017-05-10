@@ -17226,7 +17226,7 @@ MonoBehaviour:
   interactionBehaviour: {fileID: 0}
   _interactionBehaviourIsNull: 1
   detachWhenGrasped: 0
-  tryAnchorOnGraspEnd: 0
+  tryAnchorNearestOnGraspEnd: 1
   isAttractedByHand: 0
   maxAttractionReach: 0.1
   attractionReachByDistance:
@@ -20906,7 +20906,7 @@ MonoBehaviour:
   interactionBehaviour: {fileID: 1680547685}
   _interactionBehaviourIsNull: 0
   detachWhenGrasped: 1
-  tryAnchorOnGraspEnd: 1
+  tryAnchorNearestOnGraspEnd: 1
   isAttractedByHand: 0
   maxAttractionReach: 0.1
   attractionReachByDistance:
@@ -22485,7 +22485,7 @@ MonoBehaviour:
   interactionBehaviour: {fileID: 1817611767}
   _interactionBehaviourIsNull: 0
   detachWhenGrasped: 1
-  tryAnchorOnGraspEnd: 1
+  tryAnchorNearestOnGraspEnd: 1
   isAttractedByHand: 0
   maxAttractionReach: 0.1
   attractionReachByDistance:
@@ -27037,7 +27037,7 @@ MonoBehaviour:
   interactionBehaviour: {fileID: 2122011965}
   _interactionBehaviourIsNull: 0
   detachWhenGrasped: 1
-  tryAnchorOnGraspEnd: 1
+  tryAnchorNearestOnGraspEnd: 1
   isAttractedByHand: 0
   maxAttractionReach: 0.1
   attractionReachByDistance:

@@ -9,6 +9,16 @@ namespace Leap.Unity.Interaction {
 
   public class Anchor : MonoBehaviour {
 
+    private static HashSet<Anchor> _allAnchors; 
+    public static HashSet<Anchor> allAnchors {
+      get {
+        if (_allAnchors == null) {
+          _allAnchors = new HashSet<Anchor>();
+        }
+        return _allAnchors;
+      }
+    }
+
     [Tooltip("Should this anchor allow multiple objects to be attached to it at the same time? "
            + "This property is enforced by AnchorGroups and AnchorableBehaviours.")]
     public bool allowMultipleObjects = false;
@@ -46,23 +56,12 @@ namespace Leap.Unity.Interaction {
 
     #endregion
 
-    /// <summary>
-    /// Returns whether the target position is within the range of this anchor.
-    /// </summary>
-    public bool IsWithinRange(Vector3 position) {
-      //Vector3 delta = this.transform.position - position;
-      //return delta.sqrMagnitude < anchorRange * anchorRange;
-
-      // TODO: FIXME
-      return false;
+    void OnEnable() {
+      allAnchors.Add(this);
     }
 
-    /// <summary>
-    /// Returns the squared distance to the target position. AnchorGroups use this to avoid
-    /// square roots while determining the closest anchor to a given position.
-    /// </summary>
-    public virtual float GetDistanceSqrd(Vector3 position) {
-      return (this.transform.position - position).sqrMagnitude;
+    void OnDisable() {
+      allAnchors.Remove(this);
     }
 
     public void NotifyAnchored(AnchorableBehaviour anchObj) {

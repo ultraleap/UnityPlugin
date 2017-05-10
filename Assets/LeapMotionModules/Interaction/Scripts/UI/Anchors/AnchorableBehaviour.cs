@@ -27,8 +27,8 @@ namespace Leap.Unity.Interaction {
     [Disable]
     [SerializeField]
     [Tooltip("Whether or not this AnchorableBehaviour is actively attached to its anchor.")]
-    private bool _isAnchored;
-    public bool isAnchored { get { return _isAnchored; } }
+    private bool _isAttached;
+    public bool isAttached { get { return _isAttached; } }
 
     [Tooltip("The current anchor of this AnchorableBehaviour.")]
     [OnEditorChange("anchor"), SerializeField]
@@ -40,8 +40,18 @@ namespace Leap.Unity.Interaction {
       set {
         if (_anchor != value) {
           if (IsValidAnchor(value)) {
+            if (_anchor != null) {
+              OnDetachedFromAnchor.Invoke(this, _anchor);
+              _anchor.NotifyUnanchored(this);
+            }
+
             _isLockedToAnchor = false;
             _anchor = value;
+
+            if (_anchor != null) {
+              _anchor.NotifyAnchored(this);
+              OnAttachedToAnchor.Invoke(this, _anchor);
+            }
           }
           else {
             Debug.LogWarning("The '" + value.name + "' anchor is not in " + this.name + "'s anchor group.", this.gameObject);
@@ -148,123 +158,38 @@ namespace Leap.Unity.Interaction {
 
     #region Events
 
+    /// <summary>
+    /// Called when this AnchorableBehaviour attaches to an Anchor.
+    /// </summary>
     public Action<AnchorableBehaviour, Anchor> OnAttachedToAnchor = (anchObj, anchor) => { };
+
+    /// <summary>
+    /// Called when this AnchorableBehaviour detaches from an Anchor.
+    /// </summary>
     public Action<AnchorableBehaviour, Anchor> OnDetachedFromAnchor = (anchObj, anchor) => { };
+
+    /// <summary>
+    /// Called during every Update() in which this AnchorableBehaviour is attached to an Anchor.
+    /// </summary>
     public Action<AnchorableBehaviour, Anchor> WhileAttachedToAnchor = (anchObj, anchor) => { };
 
     #endregion
 
     private bool _isLockedToAnchor = false;
-
     private Vector3 _offsetTowardsHand = Vector3.zero;
-
     private Vector3 _targetPositionLastUpdate = Vector3.zero;
     private bool _hasTargetPositionLastUpdate = false;
 
-    #region DELETEME // OLD STUFF
-
-    //public AnchorGroup anchorGroup {
-    //  get {
-    //    return _anchorGroup;
-    //  }
-    //  set {
-    //    _anchorGroup = value;
-    //    if (_anchorGroup != null && _anchor != null && !_anchorGroup.ContainsAnchor(_anchor) && this.enabled) {
-    //      Debug.LogWarning("Current anchor is not a member of this object's AnchorGroup. (Setting it to null.)");
-    //      anchor = null;
-    //    }
-    //  }
-    //}
-
-    // BEGIN CURRENTANCHOR REMOVAL COMMENT.
-    ///// <summary>
-    ///// Gets or sets the current target anchor. Setting this value to null will
-    ///// disable the AnchorableBehaviour component (i.e. disable anchoring).
-    ///// </summary>
-    ///// <remarks>
-    ///// If the anchor type is set to SingleAnchor, getting this property will always
-    ///// return this component's public anchor field. Setting this property will change
-    ///// the public anchor field.
-    ///// 
-    ///// If the anchor type is set to AnchorGroup, getting this property will return
-    ///// the current anchor inside the AnchorGroup, or null if the object is not currently
-    ///// anchored. Setting this property will set the current anchor only if the given
-    ///// anchor is a member of the AnchorGroup.
-    ///// </remarks>
-    //public Anchor currentAnchor {
-    //  get {
-    //    return _currentAnchor;
-    //  }
-    //  set {
-    //    switch (anchorType) {
-    //      case AnchorType.SingleAnchor:
-    //        if (_currentAnchor != value) {
-    //          if (value != null && !value.allowMultipleObjects && value.anchoredObjects.Count > 0) break;
-
-    //          if (_currentAnchor != null) _currentAnchor.NotifyUnanchored(this);
-
-    //          _anchor = value;
-    //          _currentAnchor = value;
-    //          _attachedToAnchor = false;
-
-    //          if (_currentAnchor != null) _currentAnchor.NotifyAnchored(this);
-    //        }
-    //        break;
-    //      case AnchorType.AnchorGroup: default:
-    //        if (anchorGroup == null) return;
-
-    //        if (value == null) {
-    //          if (_currentAnchor != null) _currentAnchor.NotifyUnanchored(this);
-
-    //          _anchor = null;
-    //          _currentAnchor = null;
-    //          _attachedToAnchor = false;
-    //        }
-    //        else {
-    //          if (anchorGroup.ContainsAnchor(value)) {
-    //            if (_currentAnchor != value) {
-    //              if (_currentAnchor != null) _currentAnchor.NotifyUnanchored(this);
-
-    //              _anchor = value;
-    //              _currentAnchor = value;
-    //              _attachedToAnchor = false;
-
-    //              _currentAnchor.NotifyAnchored(this);
-    //            }
-    //          }
-    //          else {
-    //            // Tried to set this behaviour's anchor to an anchor outside of the assigned anchor group.
-
-    //            // Clear the inspector field for the anchor; if it is non-null, the user tried to set
-    //            // the field with an invalid (out-of-group) anchor.
-    //            if (_anchor != null) {
-    //              Debug.LogError("The anchor \"" + _anchor.name + "\" is not a member of this object's anchor group.", this.gameObject);
-    //              _anchor = null;
-    //            }
-
-    //            // But if the current anchor is inside the current anchorGroup, we don't want to lose that
-    //            // information after dropping in an invalid (out-of-group) anchor, so re-set the _anchor
-    //            // inspector field.
-    //            if (anchorGroup.ContainsAnchor(currentAnchor)) {
-    //              if (_anchor != currentAnchor) _anchor = currentAnchor;
-    //            }
-    //          }
-    //        }
-
-    //        break;
-    //    }
-    //  }
-    //}
-    // END CURRENTANCHOR REMOVAL COMMENT.
-
-    #endregion
-
     void OnValidate() {
       refreshInteractionBehaviour();
+
+      _minAttachmentDotProduct = Mathf.Cos(_maxAttachmentAngle * Mathf.Deg2Rad);
     }
 
     void Awake() {
       refreshInteractionBehaviour();
+
+      _minAttachmentDotProduct = Mathf.Cos(_maxAttachmentAngle * Mathf.Deg2Rad);
 
       if (interactionBehaviour != null) {
         interactionBehaviour.OnObjectGraspBegin += detachAnchorOnObjectGraspBegin;
@@ -306,8 +231,10 @@ namespace Leap.Unity.Interaction {
     void Update() {
       updateAttractionToHand();
 
-      if (anchor != null && isAnchored) {
+      if (anchor != null && isAttached) {
         updateAnchorAttachment();
+
+        WhileAttachedToAnchor.Invoke(this, anchor);
       }
     }
 
@@ -316,7 +243,10 @@ namespace Leap.Unity.Interaction {
     /// remains unchanged. Call TryAttach() to re-attach to this object's assigned anchor.
     /// </summary>
     public void Detach() {
-      _isAnchored = false;
+      _isAttached = false;
+
+      anchor.NotifyUnanchored(this);
+      OnDetachedFromAnchor.Invoke(this, anchor);
     }
 
     /// <summary>
@@ -346,7 +276,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public bool TryAttach() {
       if (anchor != null && IsWithinRange(anchor)) {
-        _isAnchored = true;
+        _isAttached = true;
         return true;
       }
       else {
@@ -354,54 +284,154 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    private List<Anchor> _nearbyAnchorsBuffer = new List<Anchor>();
+    /// <summary>
+    /// Returns all anchors within the max anchor range of this anchorable object. If this
+    /// anchorable object has its anchorGroup property set, only anchors within that AnchorGroup
+    /// will be returned. By default, this method will only return anchors that have space for
+    /// an object to attach to it.
+    /// 
+    /// Warning: This method checks squared-distance for all anchors in teh scene if this
+    /// AnchorableBehaviour has no AnchorGroup.
+    /// </summary>
+    public List<Anchor> GetNearbyValidAnchors(bool requireAnchorHasSpace = true) {
+      HashSet<Anchor> anchorsToCheck;
+
+      if (this.anchorGroup == null) {
+        anchorsToCheck = Anchor.allAnchors;
+      }
+      else {
+        anchorsToCheck = this.anchorGroup.anchors;
+      }
+
+      _nearbyAnchorsBuffer.Clear();
+      foreach (var anchor in anchorsToCheck) {
+        if (requireAnchorHasSpace && (!anchor.allowMultipleObjects || anchor.anchoredObjects.Count == 0)) continue;
+
+        if ((anchor.transform.position - this.transform.position).sqrMagnitude <= maxAnchorRange * maxAnchorRange) {
+          _nearbyAnchorsBuffer.Add(anchor);
+        }
+      }
+
+      return _nearbyAnchorsBuffer;
+    }
+
+    /// <summary>
+    /// Returns the nearest valid anchor to this Anchorable object. If this anchorable object has its
+    /// anchorGroup property set, all anchors within that AnchorGroup are valid to be this object's
+    /// anchor. If there is no valid anchor within range, returns null. By default, this method will
+    /// only return anchors that are within the max anchor range of this object and that have space for
+    /// an object to attach to it.
+    /// 
+    /// Warning: This method checks squared-distance for all anchors in the scene if this AnchorableBehaviour
+    /// has no AnchorGroup.
+    /// </summary>
+    public Anchor GetNearestValidAnchor(bool requireWithinRange = true, bool requireAnchorHasSpace = true) {
+      HashSet<Anchor> anchorsToCheck;
+
+      if (this.anchorGroup == null) {
+        anchorsToCheck = Anchor.allAnchors;
+      }
+      else {
+        anchorsToCheck = this.anchorGroup.anchors;
+      }
+
+      Anchor closestAnchor = null;
+      float closestDistSqrd = float.PositiveInfinity;
+      foreach (var testAnchor in anchorsToCheck) {
+        if (requireAnchorHasSpace && (!anchor.allowMultipleObjects || anchor.anchoredObjects.Count == 0)) continue;
+
+        float testDistanceSqrd = (testAnchor.transform.position - this.transform.position).sqrMagnitude;
+        if (testDistanceSqrd < closestDistSqrd) {
+          closestAnchor = testAnchor;
+          closestDistSqrd = testDistanceSqrd;
+        }
+      }
+
+      if (!requireWithinRange || closestDistSqrd < maxAnchorRange * maxAnchorRange) {
+        return closestAnchor;
+      }
+      else {
+        return null;
+      }
+    }
+
+    /// <summary>
+    /// Attempts to find and attach this anchorable object to the nearest valid anchor, or the
+    /// most optimal nearby anchor based on proximity and the object's trajectory if useTrajectory
+    /// is enabled.
+    /// </summary>
     public bool TryAttachToNearestAnchor() {
-      //if (!useTrajectory) {
-      //  // Simply try to attach to the nearest valid anchor.
-      //  Anchor nearestValidAnchor = GetNearestValidAnchor();
+      if (!useTrajectory) {
+        // Simply try to attach to the nearest valid anchor.
+        Anchor nearestValidAnchor = GetNearestValidAnchor();
 
-      //  if (nearestValidAnchor != null) {
-      //    anchor = nearestValidAnchor;
-      //    _isAnchored = true;
-      //    return true;
-      //  }
-      //}
-      //else {
-      //  // Pick the nearby valid anchor with the highest score, based on proximity and trajectory.
-      //  Anchor optimalAnchor = null;
-      //  float optimalScore = 0F;
-      //  Anchor testAnchor = null;
-      //  float testScore = 0F;
-      //  foreach (var anchor in GetNearbyValidAnchors()) {
-      //    testAnchor = anchor;
-      //    testScore = getAnchorScore(anchor);
+        if (nearestValidAnchor != null) {
+          anchor = nearestValidAnchor;
+          _isAttached = true;
+          return true;
+        }
+      }
+      else {
+        // Pick the nearby valid anchor with the highest score, based on proximity and trajectory.
+        Anchor optimalAnchor = null;
+        float optimalScore = 0F;
+        Anchor testAnchor = null;
+        float testScore = 0F;
+        foreach (var anchor in GetNearbyValidAnchors()) {
+          testAnchor = anchor;
+          testScore = getAnchorScore(anchor);
 
-      //    // Scores of 0 mark ineligible anchors.
-      //    if (testScore == 0F) continue;
+          // Scores of 0 mark ineligible anchors.
+          if (testScore == 0F) continue;
 
-      //    if (testScore > optimalAnchorScore) {
-      //      optimalAnchor = testAnchor;
-      //      optimalScore = testScore;
-      //    }
-      //  }
+          if (testScore > optimalScore) {
+            optimalAnchor = testAnchor;
+            optimalScore = testScore;
+          }
+        }
 
-      //  if (optimalAnchor != null) {
-      //    anchor = optimalAnchor;
-      //    _isAnchored = true;
-      //    return true;
-      //  }
-      //}
+        if (optimalAnchor != null) {
+          anchor = optimalAnchor;
+          _isAttached = true;
+          return true;
+        }
+      }
 
       return false;
     }
 
     /// <summary> Score an anchor based on its proximity and this object's trajectory relative to it. </summary>
     private float getAnchorScore(Anchor anchor) {
-      return 0F;
-      //float distanceScore = 
+      return getAnchorScore(this.interactionBehaviour.rigidbody.position, this.interactionBehaviour.rigidbody.velocity, anchor.transform.position, maxAnchorRange, _minAttachmentDotProduct);
+    }
 
-      //float angleScore;
+    public static float getAnchorScore(Vector3 anchObjPos, Vector3 anchObjVel, Vector3 anchorPos, float maxDistance, float minAngleProduct) {
+      float distanceScore;
+      float distanceSqrd = (anchorPos - anchObjPos).sqrMagnitude;
+      if (distanceSqrd > maxDistance * maxDistance) {
+        distanceScore = 0F;
+      }
+      else {
+        distanceScore = distanceSqrd.Map(0F, maxDistance * maxDistance, 1F, 0F);
+      }
 
-      //return distanceScore * angleScore;
+      float directedness = anchObjVel.magnitude.Map(0.03F, 0.7F, 0F, 1F);
+
+      float angleScore;
+      float dotProduct = Vector3.Dot(anchObjVel.normalized, (anchorPos - anchObjPos).normalized);
+
+      dotProduct = Mathf.Lerp(1F, dotProduct, directedness);
+
+      if (dotProduct < minAngleProduct) {
+        angleScore = 0F;
+      }
+      else {
+        angleScore = dotProduct.Map(minAngleProduct, 1F, 0F, 1F);
+        angleScore *= angleScore;
+      }
+
+      return distanceScore * angleScore;
     }
 
     private void updateAttractionToHand() {
@@ -505,79 +535,6 @@ namespace Leap.Unity.Interaction {
       TryAttachToNearestAnchor();
     }
 
-    #region DELETEME // OLD TryToAnchor
-
-    // OLD TRYTOANCHOR METHODS
-    ///// <summary>
-    ///// Attempts to re-anchor the object if it is not anchored (i.e. the AnchorableBehaviour
-    ///// was disabled).
-    ///// 
-    ///// If the anchor type is SingleAnchor, the attempt will succeed only if the anchor is
-    ///// within its specified range and the anchor is enabled. If the attempt fails, the method
-    ///// will return false, although the output anchor will still be provided.
-    ///// 
-    ///// If the anchor type is AnchorGroup, the attempt will succeed only if there is an
-    ///// anchor in the anchorGroup field that is within range and is enabled, otherwise
-    ///// the method will return false, and the output anchor will be null.
-    ///// </summary>
-    //public bool TryToAnchor(out Anchor anchor) {
-    //  switch (anchorType) {
-    //    case AnchorType.SingleAnchor:
-    //      anchor = currentAnchor;
-    //      if (this.enabled) {
-    //        return true;
-    //      }
-    //      else if (anchor.IsWithinRange(this.transform.position)) {
-    //        this.enabled = true;
-    //        return true;
-    //      }
-    //      else {
-    //        return false;
-    //      }
-    //    case AnchorType.AnchorGroup: default:
-    //      Anchor closestValidAnchor = anchorGroup.FindClosestAnchor(this.transform.position, requireWithinAnchorRange: true, requireAnchorIsEnabled: true);
-    //      if (closestValidAnchor != null) {
-    //        this.enabled = true;
-    //        currentAnchor = closestValidAnchor;
-    //        anchor = currentAnchor;
-    //        return true;
-    //      }
-    //      else {
-    //        anchor = null;
-    //        return false;
-    //      }
-    //  }
-    //}
-    //
-    ///// <summary>
-    ///// Attempts to re-anchor the object if it is not anchored (i.e. the AnchorableBehaviour
-    ///// was disabled). This method is a convenience for when the actual anchor chosen is not
-    ///// needed. (In the SingleAnchor case, the only possible anchor is the one already assigned
-    ///// to this AnchorableBehaviour, in which case the component will simply enable itself if
-    ///// the anchor is within range.)
-    ///// </summary>
-    //public bool TryToAnchor() {
-    //  Anchor anchor;
-    //  return TryToAnchor(out anchor);
-    //}
-    // END OLD TRYTOANCHOR METHODS
-
-
-    // BEGIN OLD DETACHFROMANCHOR METHOD
-    ///// <summary>
-    ///// Detaches the AnchorableBehaviour from its current anchor by setting the current anchor
-    ///// to null.
-    ///// </summary>
-    //public void DetachFromAnchor() {
-    //  currentAnchor = null;
-
-    //  // Reset anchor position storage; it can't be updated from this state.
-    //  _hasTargetPositionLastUpdate = false;
-    //}
-    // END OLD DETACHFROMANCHOR METHOD
-
-    #endregion
-
     #region Unity Events (Internal)
 
     [SerializeField]
@@ -590,7 +547,7 @@ namespace Leap.Unity.Interaction {
     }
 
     private void InitUnityEvents() {
-      setupCallback(ref WhileAttachedToAnchor, EventType.OnAttachedToAnchor);
+      setupCallback(ref OnAttachedToAnchor,    EventType.OnAttachedToAnchor);
       setupCallback(ref OnDetachedFromAnchor,  EventType.OnDetachedFromAnchor);
       setupCallback(ref WhileAttachedToAnchor, EventType.WhileAttachedToAnchor);
     }
