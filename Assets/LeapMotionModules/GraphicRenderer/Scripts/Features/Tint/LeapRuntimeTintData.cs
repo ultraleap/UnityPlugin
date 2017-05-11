@@ -16,12 +16,22 @@ namespace Leap.Unity.GraphicalRenderer {
 
     /// <summary>
     /// Helper method to set the runtime tint color for a runtime
-    /// tint data object attached to this graphic.  This methof will
-    /// throw an exception if there is no blend shape data obj attached
+    /// tint data object attached to this graphic.  This method will
+    /// throw an exception if there is no tint data obj attached
     /// to this graphic.
     /// </summary>
     public void SetRuntimeTint(Color color) {
       getFeatureDataOrThrow<LeapRuntimeTintData>().color = color;
+    }
+
+    /// <summary>
+    /// Helper method to get the runtime tint color for a runtime 
+    /// tint data object attached to this graphic.  This method will
+    /// throw an exception if there is no tint data obj attached to 
+    /// this graphic.
+    /// </summary>
+    public Color GetRuntimeTint() {
+      return getFeatureDataOrThrow<LeapRuntimeTintData>().color;
     }
   }
 

@@ -26,6 +26,16 @@ namespace Leap.Unity.GraphicalRenderer {
     public void SetBlendShapeAmount(float amount) {
       getFeatureDataOrThrow<LeapBlendShapeData>().amount = amount;
     }
+
+    /// <summary>
+    /// Helper method to get the blend shape amount for a blend shape
+    /// data object attached to this graphic.  This method will throw
+    /// an exception if there is no blend shape data obj attached to
+    /// this graphic.
+    /// </summary>
+    public float GetBlendShapeAmount() {
+      return getFeatureDataOrThrow<LeapBlendShapeData>().amount;
+    }
   }
 
   [LeapGraphicTag("Blend Shape")]
