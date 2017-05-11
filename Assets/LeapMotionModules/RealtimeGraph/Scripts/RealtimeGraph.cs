@@ -9,9 +9,11 @@
 
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Profiling;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.Graphing {
 
@@ -51,6 +53,9 @@ namespace Leap.Unity.Graphing {
 
     [SerializeField]
     protected string _defaultGraph = "Framerate";
+
+    [SerializeField]
+    protected string[] _unitySamplerNames = new string[0];
 
     [SerializeField]
     protected GraphMode _graphMode = GraphMode.Exclusive;
@@ -129,6 +134,8 @@ namespace Leap.Unity.Graphing {
 
     protected Deque<GraphKey> _keyBuffer = new Deque<GraphKey>();
 
+    protected List<Recorder> _unityRecorders = new List<Recorder>();
+
     //Custom sample timers
     protected long _preCullTicks, _renderTicks, _fixedTicks = -1;
 
@@ -190,6 +197,11 @@ namespace Leap.Unity.Graphing {
 
       _graphRenderer.material.SetTexture("_GraphTexture", _texture);
 
+      _unitySamplerNames.Query().Select(n => {
+        getGraph(n, GraphUnits.Miliseconds);
+        return Recorder.Get(n);
+      }).FillList(_unityRecorders);
+
       _stopwatch.Start();
     }
 
@@ -215,6 +227,11 @@ namespace Leap.Unity.Graphing {
 
       if (_provider != null) {
         AddSample("Tracking Framerate", GraphUnits.Framerate, 1000.0f / _provider.CurrentFrame.CurrentFramesPerSecond);
+      }
+
+      for (int i = 0; i < _unityRecorders.Count; i++) {
+        var recorder = _unityRecorders[i];
+        AddSample(_unitySamplerNames[i], GraphUnits.Miliseconds, recorder.elapsedNanoseconds / 1000000.0f);
       }
 
       if (_currentGraph == null) {
