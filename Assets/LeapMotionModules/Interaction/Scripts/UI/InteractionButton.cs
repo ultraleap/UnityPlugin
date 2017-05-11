@@ -74,6 +74,7 @@ namespace Leap.Unity.Interaction {
     private bool _handIsLeft = false;
     private bool _physicsOccurred;
     private bool initialIgnoreGrasping = false;
+    private Quaternion initialLocalRotation;
 
     protected override void Start() {
       if(transform == transform.root) {
@@ -88,6 +89,7 @@ namespace Leap.Unity.Interaction {
       _physicsPosition = transform.position;
       rigidbody.position = _physicsPosition;
       initialIgnoreGrasping = ignoreGrasping;
+      initialLocalRotation = transform.localRotation;
 
       //Add a custom grasp controller
       OnGraspedMovement += Grasping;
@@ -123,6 +125,9 @@ namespace Leap.Unity.Interaction {
       //Disable collision on this button if it is not the primary hover
       ignoreGrasping = initialIgnoreGrasping ? true : !isPrimaryHovered && !isGrasped;
       ignoreContact = !isPrimaryHovered || isGrasped;
+
+      //Enforce local rotation (if button is child of non-kinematic rigidbody, this is necessary)
+      transform.localRotation = initialLocalRotation; 
 
       //Apply physical corrections only if PhysX has modified our positions
       if (_physicsOccurred) {
