@@ -231,6 +231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12011a4b27c58f4f8969e87c61ab8d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attachmentHand: {fileID: 0}
   attachmentPoint: 2
 --- !u!114 &114479301565299396
 MonoBehaviour:
@@ -243,6 +244,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12011a4b27c58f4f8969e87c61ab8d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attachmentHand: {fileID: 0}
   attachmentPoint: 4
 --- !u!114 &114517128394862370
 MonoBehaviour:
@@ -288,6 +290,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12011a4b27c58f4f8969e87c61ab8d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attachmentHand: {fileID: 0}
   attachmentPoint: 2
 --- !u!114 &114805386573115904
 MonoBehaviour:
@@ -345,4 +348,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12011a4b27c58f4f8969e87c61ab8d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attachmentHand: {fileID: 0}
   attachmentPoint: 4
