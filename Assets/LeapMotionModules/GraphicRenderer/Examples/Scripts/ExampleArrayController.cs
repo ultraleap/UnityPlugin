@@ -24,8 +24,6 @@ public class ExampleArrayController : MonoBehaviour {
   }
 
   private void Update() {
-    Random.InitState(0);
-
     float fade = Mathf.Clamp01(Time.time * 0.5f - 0.5f);
 
     for (int i = 0; i < _graphics.Count; i++) {
