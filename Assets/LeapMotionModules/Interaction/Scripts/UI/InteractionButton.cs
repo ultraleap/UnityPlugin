@@ -11,6 +11,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using System.Collections.Generic;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.Interaction {
 
@@ -72,14 +73,23 @@ namespace Leap.Unity.Interaction {
     private Vector3 _physicsVelocity = Vector3.zero;
     private bool _handIsLeft = false;
     private bool _physicsOccurred;
+    private bool initialIgnoreGrasping = false;
+    private Quaternion initialLocalRotation;
 
     protected override void Start() {
+      if(transform == transform.root) {
+        Debug.LogError("This button has no parent!  Please ensure that it is parented to something!", this);
+        enabled = false;
+      }
+
       // Initialize Positions
       initialLocalPosition = transform.localPosition;
       transform.localPosition = initialLocalPosition + Vector3.back * Mathf.Lerp(minMaxHeight.x, minMaxHeight.y, restingHeight);
       localPhysicsPosition = transform.localPosition;
       _physicsPosition = transform.position;
       rigidbody.position = _physicsPosition;
+      initialIgnoreGrasping = ignoreGrasping;
+      initialLocalRotation = transform.localRotation;
 
       //Add a custom grasp controller
       OnGraspedMovement += Grasping;
@@ -113,7 +123,11 @@ namespace Leap.Unity.Interaction {
       unDepressedThisFrame = false;
 
       //Disable collision on this button if it is not the primary hover
+      ignoreGrasping = initialIgnoreGrasping ? true : !isPrimaryHovered && !isGrasped;
       ignoreContact = !isPrimaryHovered || isGrasped;
+
+      //Enforce local rotation (if button is child of non-kinematic rigidbody, this is necessary)
+      transform.localRotation = initialLocalRotation; 
 
       //Apply physical corrections only if PhysX has modified our positions
       if (_physicsOccurred) {
@@ -176,7 +190,11 @@ namespace Leap.Unity.Interaction {
         if (isDepressed && !oldDepressed) {
           OnPress.Invoke();
           depressedThisFrame = true;
-          _handIsLeft = primaryHoveringHand.IsLeft;
+          if (primaryHoveringHand != null) {
+            _handIsLeft = primaryHoveringHand.IsLeft;
+          } else if (graspingHands.Count > 0) {
+            _handIsLeft = graspingHands.Query().First().GetLeapHand().IsLeft;
+          }
           manager.GetInteractionHand(_handIsLeft).SetInteractionHoverOverride(true);
         } else if (!isDepressed && oldDepressed) {
           unDepressedThisFrame = true;
@@ -235,14 +253,16 @@ namespace Leap.Unity.Interaction {
     }
 
     protected virtual void OnDrawGizmosSelected() {
-      Gizmos.matrix = transform.parent.localToWorldMatrix;
-      Vector2 heights = minMaxHeight;
-      Vector3 originPosition = Application.isPlaying ? initialLocalPosition : transform.localPosition;
+      if (transform.parent != null) {
+        Gizmos.matrix = transform.parent.localToWorldMatrix;
+        Vector2 heights = minMaxHeight;
+        Vector3 originPosition = Application.isPlaying ? initialLocalPosition : transform.localPosition;
 
-      Gizmos.color = Color.red;
-      Gizmos.DrawLine(originPosition + (Vector3.back * heights.x), originPosition + (Vector3.back * heights.y));
-      Gizmos.color = Color.green;
-      Gizmos.DrawLine(originPosition + (Vector3.back * heights.x), originPosition + (Vector3.back * Mathf.Lerp(heights.x,heights.y, restingHeight)));
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(originPosition + (Vector3.back * heights.x), originPosition + (Vector3.back * heights.y));
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(originPosition + (Vector3.back * heights.x), originPosition + (Vector3.back * Mathf.Lerp(heights.x, heights.y, restingHeight)));
+      }
     }
 
     void Reset() {

@@ -54,8 +54,7 @@ namespace Leap.Unity {
         };
       }
     }
-
-    [AutoFind]
+    
     [SerializeField]
     private LeapServiceProvider provider;
 
