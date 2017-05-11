@@ -135,11 +135,13 @@ namespace Leap.Unity.Interaction {
 
     protected override void OnDrawGizmosSelected() {
       base.OnDrawGizmosSelected();
-      Vector3 originPosition = Application.isPlaying ? initialLocalPosition : transform.localPosition;
-      Vector2 limits = (horizontalSlideLimits);
+      if (transform.parent != null) {
+        Vector3 originPosition = Application.isPlaying ? initialLocalPosition : transform.localPosition;
+        Vector2 limits = (horizontalSlideLimits);
 
-      Gizmos.color = Color.blue;
-      Gizmos.DrawLine(originPosition + (Vector3.right* limits.x), originPosition + (Vector3.right * limits.y));
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(originPosition + (Vector3.right * limits.x), originPosition + (Vector3.right * limits.y));
+      }
     }
   }
 }
