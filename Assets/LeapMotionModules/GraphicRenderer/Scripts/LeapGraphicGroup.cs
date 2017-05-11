@@ -529,8 +529,14 @@ namespace Leap.Unity.GraphicalRenderer {
     public void OnBeforeSerialize() { }
 
     public void OnAfterDeserialize() {
-      _renderingMethod.Value.group = this;
-      _renderingMethod.Value.renderer = renderer;
+      if (_renderingMethod.Value == null || renderer == null) {
+        Debug.LogWarning("The rendering group did not find the needed data!  If you have a variable of type " +
+                         "LeapGraphicGroup make sure to annotate it with a [NonSerialized] attribute, or else " +
+                         "Unity will automatically create invalid instances of the class.");
+      } else {
+        _renderingMethod.Value.group = this;
+        _renderingMethod.Value.renderer = renderer;
+      }
     }
 
     [Serializable]
