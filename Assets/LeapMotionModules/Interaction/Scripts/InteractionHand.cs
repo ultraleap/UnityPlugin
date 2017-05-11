@@ -232,7 +232,6 @@ namespace Leap.Unity.Interaction {
     #region Hovering
 
     private const float MAX_PRIMARY_HOVER_DISTANCE = 0.5F;
-    private IInteractionBehaviour _primaryHoveredLastFrame = null;
 
     // Hover Activity Manager
     private ActivityManager<IInteractionBehaviour> _hoverActivityManager;
@@ -270,10 +269,11 @@ namespace Leap.Unity.Interaction {
 
     public struct HoverCheckResults {
       public HashSet<IInteractionBehaviour> hovered;
-      public IInteractionBehaviour[] perFingerHovered;
       public IInteractionBehaviour primaryHovered;
       public int primaryHoveringFingerIdx;
       public float primaryHoveredDistance;
+      public IInteractionBehaviour[] perFingerHovered;
+      public float[] perFingerDistance;
       public Hand checkedHand;
     }
 
@@ -291,15 +291,18 @@ namespace Leap.Unity.Interaction {
 
         if (!_interactionHoverOverride) {
           hoverActivityManager.activationRadius = interactionManager.WorldHoverActivationRadius;
-          _hoverActivityManager.FixedUpdateQueryPosition((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
-          using (new ProfilerSample("Check for Closest Elements")) { CheckHoverForHand(_hand, _hoverActivityManager.ActiveObjects); }
+          hoverActivityManager.FixedUpdateQueryPosition((_hand != null) ? _hand.PalmPosition.ToVector3() : Vector3.zero, LeapSpace.allEnabled);
+
+          using (new ProfilerSample("Check for Closest Elements")) {
+            CheckHoverForHand(_hand, _hoverActivityManager.ActiveObjects);
+          }
         }
 
         ProcessHoverCheckResults();
 
         // Prevents being able to depress two buttons at once by rapidly alternating
         // primary hover.
-        //if (_contactBehaviours.Count == 0) {
+        //if (_primaryHoveredLastFrame == null || !_contactBehaviours.ContainsKey(_primaryHoveredLastFrame)) {
           ProcessPrimaryHoverCheckResults();
         //}
 
@@ -313,16 +316,25 @@ namespace Leap.Unity.Interaction {
         }
       }
     }
+
+    private IInteractionBehaviour _primaryHoveredLastFrame = null;
     private HashSet<IInteractionBehaviour> _hoveredLastFrame = new HashSet<IInteractionBehaviour>();
     private HashSet<IInteractionBehaviour> _hoverableCache = new HashSet<IInteractionBehaviour>();
     private IInteractionBehaviour[] _tempPerFingerHovered = new IInteractionBehaviour[3];
+    private float[] _tempPerFingerDistance = new float[3];
+
+    private float _minDistanceToBeat = float.PositiveInfinity;
 
     private void CheckHoverForHand(Hand hand, HashSet<IInteractionBehaviour> hoverCandidates) {
       _hoverableCache.Clear();
       Array.Clear(_tempPerFingerHovered, 0, _tempPerFingerHovered.Length);
+      Array.Clear(_tempPerFingerDistance, 0, _tempPerFingerDistance.Length);
+
+      int primaryHoveringFingerIdxLastFrame = _primaryHoveredLastFrame != null ? _hoverResults.primaryHoveringFingerIdx : -1;
 
       _hoverResults.hovered = _hoverableCache;
       _hoverResults.perFingerHovered = _tempPerFingerHovered;
+      _hoverResults.perFingerDistance = _tempPerFingerDistance;
       _hoverResults.primaryHovered = null;
       _hoverResults.primaryHoveredDistance = float.PositiveInfinity;
       _hoverResults.primaryHoveringFingerIdx = -1;
@@ -330,14 +342,25 @@ namespace Leap.Unity.Interaction {
 
       //Loop through all the fingers (that we care about)
       if (hand != null) {
+
+        // Calculate hysteresis to being able to change primary hover.
+        if (_primaryHoveredLastFrame != null && primaryHoveringFingerIdxLastFrame != -1) {
+          float _distanceToLastPrimaryHover = _primaryHoveredLastFrame.GetHoverDistance(hand.Fingers[primaryHoveringFingerIdxLastFrame].TipPosition.ToVector3());
+          _minDistanceToBeat = _distanceToLastPrimaryHover * _distanceToLastPrimaryHover.Map(0.009F, 0.018F, 0.4F, 0.95F); // hysteresis!
+          if (_minDistanceToBeat < 0.008F) _minDistanceToBeat = 0F;
+        }
+        else {
+          _minDistanceToBeat = float.PositiveInfinity;
+        }
+
         for (int i = 0; i < 3; i++) {
-          if (!hand.Fingers[i].IsExtended && i != 1) { continue; }
           float leastFingerDistance = float.PositiveInfinity;
           Vector3 fingerTip = hand.Fingers[i].TipPosition.ToVector3();
 
           // Loop through all the candidates
           foreach (IInteractionBehaviour behaviour in hoverCandidates) {
-            CheckHoverForBehaviour(fingerTip, behaviour, behaviour.space, i, ref leastFingerDistance, ref _hoverResults);
+            CheckHoverForBehaviour(fingerTip, behaviour, behaviour.space, i, ref leastFingerDistance, ref _hoverResults,
+                                   minDistanceToBeat: _minDistanceToBeat, minDistanceBasedOn: _primaryHoveredLastFrame);
           }
         }
       }
@@ -366,7 +389,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private void CheckHoverForBehaviour(Vector3 position, IInteractionBehaviour behaviour, ISpaceComponent spaceComponent, int whichFinger, ref float leastFingerDistance, ref HoverCheckResults curResults) {
+    private void CheckHoverForBehaviour(Vector3 position, IInteractionBehaviour behaviour, ISpaceComponent spaceComponent, int whichFinger, ref float leastFingerDistance, ref HoverCheckResults curResults, float minDistanceToBeat = float.PositiveInfinity, IInteractionBehaviour minDistanceBasedOn = null) {
 
       float distance = float.PositiveInfinity;
       if (spaceComponent == null) {
@@ -379,8 +402,10 @@ namespace Leap.Unity.Interaction {
 
       if (distance < leastFingerDistance) {
         curResults.perFingerHovered[whichFinger] = behaviour;
+        curResults.perFingerDistance[whichFinger] = distance;
         leastFingerDistance = distance;
-        if (leastFingerDistance < curResults.primaryHoveredDistance) {
+
+        if (leastFingerDistance < curResults.primaryHoveredDistance && (behaviour == minDistanceBasedOn || distance < minDistanceToBeat)) {
           curResults.primaryHoveredDistance = leastFingerDistance;
           curResults.primaryHovered = curResults.perFingerHovered[whichFinger];
           curResults.primaryHoveringFingerIdx = whichFinger;
