@@ -56,7 +56,7 @@ namespace Leap.Unity {
     }
     
     [SerializeField]
-    private LeapServiceProvider provider;
+    private LeapVRServiceProvider provider;
 
     [Tooltip("The transform that represents the head object.")]
     [SerializeField]

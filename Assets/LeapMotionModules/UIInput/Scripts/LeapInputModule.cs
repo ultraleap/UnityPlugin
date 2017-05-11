@@ -341,7 +341,7 @@ namespace Leap.Unity.InputModule {
     //Process is called by UI system to process events
     public override void Process() {
       if (MovingReferenceFrame) {
-        (LeapDataProvider as LeapServiceProvider).ReTransformFrames();
+        (LeapDataProvider as LeapServiceProvider).RetransformFrames();
       }
 
       OldCameraPos = Camera.main.transform.position;
