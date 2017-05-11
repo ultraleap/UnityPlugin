@@ -155,6 +155,21 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     /// <summary>
+    /// This method tries to detach this graphic from whatever group it is 
+    /// currently attached to.  It can fail if the graphic is not attached
+    /// to any group, or if the group it is attached to does not support
+    /// adding/removing graphics at runtime.
+    /// </summary>
+    public bool TryDetach() {
+      var attachedGroup = this.attachedGroup;
+      if (attachedGroup == null) {
+        return false;
+      } else {
+        return attachedGroup.TryRemoveGraphic(this);
+      }
+    }
+
+    /// <summary>
     /// Gets a single feature data object of a given type T.  This will return
     /// null if there is no feature data object attached to this graphic of type T.
     /// </summary>>
