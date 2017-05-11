@@ -21,7 +21,6 @@ namespace Leap.Unity {
   [RequireComponent(typeof(SpriteRenderer))]
   public class ConnectionMonitor : MonoBehaviour {
     /** The LeapServiceProvider in the scene. */
-    [AutoFind]
     [Tooltip("The scene LeapServiceProvider.")]
     public LeapServiceProvider provider;
     /** The speed to fade the sprite alpha from 0 to 1. */
