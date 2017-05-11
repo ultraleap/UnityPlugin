@@ -152,5 +152,31 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
 
       Assert.That(oneGraphic.attachedGroup, Is.EqualTo(secondGroup));
     }
+
+    /// <summary>
+    /// Validate that when we add a single graphic to two different groups
+    /// on the same frame that things don't break.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator AddToTwoGroupsSameFrame() {
+      InitTest("TwoEmptyDynamicGroups");
+      yield return null;
+
+      CreateGraphic("DisabledMeshGraphic");
+
+      bool didAddToFirst = firstGroup.TryAddGraphic(oneGraphic);
+      bool didAddToSecond = secondGroup.TryAddGraphic(oneGraphic);
+
+      Assert.IsTrue(didAddToFirst);
+      Assert.IsFalse(didAddToSecond);
+
+      yield return null;
+
+      Assert.That(oneGraphic.isAttachedToGroup);
+      Assert.That(oneGraphic.attachedGroup, Is.EqualTo(firstGroup));
+
+      Assert.That(firstGroup.graphics, Contains.Item(oneGraphic));
+      Assert.That(secondGroup.graphics, Is.Empty);
+    }
   }
 }

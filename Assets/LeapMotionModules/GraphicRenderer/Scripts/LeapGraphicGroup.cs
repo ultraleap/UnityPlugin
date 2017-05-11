@@ -147,6 +147,10 @@ namespace Leap.Unity.GraphicalRenderer {
     public bool TryAddGraphic(LeapGraphic graphic) {
       Assert.IsNotNull(graphic);
 
+      if (graphic.willbeAttached) {
+        return false;
+      }
+
       if (!addRemoveSupportedOrEditTime()) {
         return false;
       }
