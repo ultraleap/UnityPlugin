@@ -99,6 +99,17 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     /// <summary>
+    /// Returns the total number of graphics that will be part of this group after
+    /// the next update cycle.  Since attachments are delayed, this number can be
+    /// larger than graphics.Count.
+    /// </summary>
+    public int toBeAttachedCount {
+      get {
+        return _graphics.Count + _toAttach.Count;
+      }
+    }
+
+    /// <summary>
     /// Maps 1-to-1 with the feature list, where each element represents the
     /// support that feature currently has.
     /// </summary>

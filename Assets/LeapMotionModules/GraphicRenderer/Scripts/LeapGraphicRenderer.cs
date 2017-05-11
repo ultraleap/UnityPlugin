@@ -56,31 +56,48 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     /// <summary>
-    /// Tries to add the given graphic to any group attached to this graphic.  A graphic will
-    /// be attached to a group that has its preferred renderer type first, but if none are 
-    /// preferred, it will be attached to the first compatible group found. 
+    /// Tries to add the given graphic to any group attached to this graphic.  First, it
+    /// will try to be attached to a group that has its preferred renderer type, and if 
+    /// there are multiple such groups it will choose the group with the smallest graphic
+    /// count.
+    /// 
+    /// If no group has the preferred renderer type, it will try to attach to a group
+    /// that supports this type of graphic, again choosing the group with the smallest
+    /// graphic count.
+    /// 
+    /// If no such group is found, the attach will fail and this method will return false.
     /// </summary>
     public bool TryAddGraphic(LeapGraphic graphic) {
+      LeapGraphicGroup targetGroup = null;
+
       //First try to attatch to a group that is preferred
       Type preferredType = graphic.preferredRendererType;
       if (preferredType != null) {
         foreach (var group in groups) {
           Type rendererType = group.renderingMethod.GetType();
           if (preferredType == rendererType || rendererType.IsSubclassOf(preferredType)) {
-            if (group.TryAddGraphic(graphic)) {
-              return true;
+            if (targetGroup == null || group.toBeAttachedCount < targetGroup.toBeAttachedCount) {
+              targetGroup = group;
             }
           }
         }
       }
 
+      if (targetGroup != null && targetGroup.TryAddGraphic(graphic)) {
+        return true;
+      }
+
       //If we failed, try to attach to a group that will take us
       foreach (var group in groups) {
         if (group.renderingMethod.IsValidGraphic(graphic)) {
-          if (group.TryAddGraphic(graphic)) {
-            return true;
+          if (targetGroup == null || group.toBeAttachedCount < targetGroup.toBeAttachedCount) {
+            targetGroup = group;
           }
         }
+      }
+
+      if (targetGroup != null && targetGroup.TryAddGraphic(graphic)) {
+        return true;
       }
 
       return false;
