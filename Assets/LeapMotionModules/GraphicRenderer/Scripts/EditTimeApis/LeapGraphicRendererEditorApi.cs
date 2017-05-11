@@ -146,7 +146,7 @@ namespace Leap.Unity.GraphicalRenderer {
       }
 
       public void DoLateUpdateEditor() {
-        Undo.RecordObject(_renderer, "bha");
+        Undo.RecordObject(_renderer, "Update graphic renderer.");
         Assert.IsFalse(InternalUtility.IsPrefab(_renderer), "Should never do editor updates for prefabs");
 
         validateSpaceComponent();

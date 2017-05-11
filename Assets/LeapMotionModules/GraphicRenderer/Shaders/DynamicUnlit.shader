@@ -1,4 +1,4 @@
-﻿Shader "Leap Motion/Graphic Renderer/Unlit/Dynamic" {
+﻿Shader "LeapMotion/GraphicRenderer/Unlit/Dynamic" {
   Properties {
     _Color   ("Color", Color) = (1,1,1,1)
     _MainTex ("Texture", 2D) = "white" {}
@@ -19,7 +19,6 @@
       #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_1
       #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_UV_2
       #pragma shader_feature _ GRAPHIC_RENDERER_VERTEX_COLORS
-      #pragma shader_feature _ GRAPHIC_RENDERER_MOVEMENT_TRANSLATION GRAPHIC_RENDERER_MOVEMENT_FULL
       #pragma shader_feature _ GRAPHIC_RENDERER_TINTING
       #pragma shader_feature _ GRAPHIC_RENDERER_BLEND_SHAPES
       #include "Assets/LeapMotionModules/GraphicRenderer/Resources/DynamicRenderer.cginc"

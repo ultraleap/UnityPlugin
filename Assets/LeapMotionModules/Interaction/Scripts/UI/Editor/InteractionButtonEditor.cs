@@ -12,11 +12,18 @@ namespace Leap.Unity.Interaction {
 
       InteractionButton button = target as InteractionButton;
 
-      EditorGUILayout.BeginHorizontal();
-      if (button.transform.localRotation != Quaternion.identity) {
-        EditorGUILayout.HelpBox("It looks like this button's local rotation is non-zero; would you like to add a base transform so it depresses along its z-axis?", MessageType.Warning);
-        if (GUILayout.Button("Add Button\nBase Transform")) {
+      bool nonzeroRotation = button.transform.localRotation != Quaternion.identity;
+      bool isRoot = button.transform == button.transform.root;
 
+      EditorGUILayout.BeginHorizontal();
+      if (nonzeroRotation || isRoot) {
+        if (isRoot) {
+          EditorGUILayout.HelpBox("This button has no parent!  Buttons do not work without a parent transform.", MessageType.Warning);
+        } else if (nonzeroRotation) {
+          EditorGUILayout.HelpBox("It looks like this button's local rotation is non-zero; would you like to add a parent transform so it depresses along its z-axis?", MessageType.Warning);
+        }
+
+        if (GUILayout.Button("Add Button\nParent Transform")) {
           GameObject buttonBaseTransform = new GameObject(button.gameObject.name + " Base");
           Undo.RegisterCreatedObjectUndo(buttonBaseTransform, "Created Button Base for "+ button.gameObject.name);
           Undo.SetTransformParent(buttonBaseTransform.transform, button.transform.parent, "Child "+ button.gameObject.name+ "'s Base to " + button.gameObject.name + "'s Parent");
