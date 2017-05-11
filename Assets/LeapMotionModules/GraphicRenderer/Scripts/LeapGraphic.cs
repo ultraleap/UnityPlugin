@@ -41,7 +41,9 @@ namespace Leap.Unity.GraphicalRenderer {
     #region PUBLIC API
 
     [NonSerialized]
-    private NotificationState _notificationState = NotificationState.None;
+    private bool _willBeAttached = false;
+    [NonSerialized]
+    private bool _willBeDetached = false;
     [NonSerialized]
     private LeapGraphicGroup _groupToBeAttachedTo = null;
     [NonSerialized]
@@ -182,10 +184,10 @@ namespace Leap.Unity.GraphicalRenderer {
     /// the next frame. This is only called at runtime.
     /// </summary>
     public virtual void NotifyWillBeAttached(LeapGraphicGroup toBeAttachedTo) {
-      Assert.AreEqual(_notificationState, NotificationState.None);
+      Assert.IsFalse(_willBeAttached);
       Assert.IsNull(_groupToBeAttachedTo);
 
-      _notificationState = NotificationState.WillBeAttached;
+      _willBeAttached = true;
       _groupToBeAttachedTo = toBeAttachedTo;
     }
 
@@ -194,10 +196,10 @@ namespace Leap.Unity.GraphicalRenderer {
     /// graphic would be attached has been canceled due to a call to TryRemoveGraphic.
     /// </summary>
     public virtual void CancelWillBeAttached() {
-      Assert.AreEqual(_notificationState, NotificationState.WillBeAttached);
+      Assert.IsTrue(_willBeAttached);
       Assert.IsNotNull(_groupToBeAttachedTo);
 
-      _notificationState = NotificationState.None;
+      _willBeAttached = false;
       _groupToBeAttachedTo = null;
     }
 
@@ -206,8 +208,9 @@ namespace Leap.Unity.GraphicalRenderer {
     /// the next frame. This is only called at runtime.
     /// </summary>
     public virtual void NotifyWillBeDetached(LeapGraphicGroup toBeDetachedFrom) {
-      Assert.AreEqual(_notificationState, NotificationState.None);
-      _notificationState = NotificationState.WillBeDetached;
+      Assert.IsFalse(_willBeDetached);
+
+      _willBeDetached = true;
     }
 
     /// <summary>
@@ -215,8 +218,9 @@ namespace Leap.Unity.GraphicalRenderer {
     /// graphic would be detached has been canceled due to a call to TryAddGraphic.
     /// </summary>
     public virtual void CancelWillBeDetached() {
-      Assert.AreEqual(_notificationState, NotificationState.WillBeDetached);
-      _notificationState = NotificationState.None;
+      Assert.IsTrue(_willBeDetached);
+
+      _willBeDetached = false;
     }
 
     /// <summary>
@@ -227,7 +231,7 @@ namespace Leap.Unity.GraphicalRenderer {
 #if UNITY_EDITOR
       editor.OnAttachedToGroup(group, anchor);
 #endif
-      _notificationState = NotificationState.None;
+      _willBeAttached = false;
       _groupToBeAttachedTo = null;
 
       _attachedRenderer = group.renderer;
@@ -242,7 +246,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// is invoked both at runtime and at edit time.
     /// </summary>
     public virtual void OnDetachedFromGroup() {
-      _notificationState = NotificationState.None;
+      _willBeDetached = false;
 
       _attachedRenderer = null;
       _attachedGroupIndex = -1;
@@ -281,8 +285,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
       if (Application.isPlaying) {
 #endif
-        //If we are not attached, or if we are about to become detached
-        if (!isAttachedToGroup || _notificationState == NotificationState.WillBeDetached) {
+        //If we are not attached, and if we are about not about to become attached
+        if (!isAttachedToGroup && !_willBeAttached) {
           var parentRenderer = GetComponentInParent<LeapGraphicRenderer>();
           if (parentRenderer != null) {
             parentRenderer.TryAddGraphic(this);
@@ -303,8 +307,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
       if (Application.isPlaying) {
 #endif
-        //If we are not attached, or if we are about to become detached
-        if (!isAttachedToGroup || _notificationState == NotificationState.WillBeDetached) {
+        //If we are not attached, and if we are about not about to become attached
+        if (!isAttachedToGroup && !_willBeAttached) {
           var parentRenderer = GetComponentInParent<LeapGraphicRenderer>();
           if (parentRenderer != null) {
             parentRenderer.TryAddGraphic(this);
@@ -325,7 +329,7 @@ namespace Leap.Unity.GraphicalRenderer {
 #endif
         if (isAttachedToGroup) {
           attachedGroup.TryRemoveGraphic(this);
-        } else if (_notificationState == NotificationState.WillBeAttached) {
+        } else if (_willBeAttached) {
           _groupToBeAttachedTo.TryRemoveGraphic(this);
         }
 #if UNITY_EDITOR
@@ -388,13 +392,6 @@ namespace Leap.Unity.GraphicalRenderer {
                                                                    CustomVectorChannelData,
                                                                    CustomColorChannelData,
                                                                    CustomMatrixChannelData> { }
-
-    private enum NotificationState {
-      None,
-      WillBeAttached,
-      WillBeDetached
-    }
-
     #endregion
   }
 }
