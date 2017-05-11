@@ -39,12 +39,12 @@ namespace Leap.Unity {
       drawControllerEdge(origin, local_bottom_left, local_bottom_right);
       drawControllerEdge(origin, local_bottom_right, local_top_right);
 
-      drawControllerArc(origin, local_top_left, local_bottom_left, local_top_right, local_bottom_right, -Vector3.forward);
+      drawControllerArc(origin, local_top_left, local_bottom_left, local_top_right, local_bottom_right, Vector3.up);
       drawControllerArc(origin, local_top_left, local_top_right, local_bottom_left, local_bottom_right, -Vector3.right);
     }
 
     private void getLocalGlobalPoint(int x, int y, int z, out Vector3 local, out Vector3 global) {
-      local = new Vector3(x * BOX_WIDTH, y * BOX_RADIUS, z * BOX_DEPTH);
+      local = Quaternion.Euler(90f, 0f, 0f) * new Vector3(x * BOX_WIDTH, y * BOX_RADIUS, z * BOX_DEPTH);
       global = target.transform.TransformPoint(BOX_RADIUS * local.normalized);
     }
 

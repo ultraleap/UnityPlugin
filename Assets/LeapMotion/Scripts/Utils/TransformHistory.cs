@@ -1,0 +1,67 @@
+﻿/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
+namespace Leap.Unity {
+  /// <summary>
+  /// Implements a resample-able transform history.
+  /// </summary>
+  public class TransformHistory {
+    public RingBuffer<TransformData> history;
+    public TransformHistory(int capacity = 32) {
+      history = new RingBuffer<TransformData>(capacity);
+    }
+
+    //Store current Transform in History
+    public void UpdateDelay(Vector3 curPos, Quaternion curRot, long timestamp) {
+      TransformData currentTransform =
+        new TransformData() {
+          time = timestamp,
+          position = curPos,
+          rotation = curRot,
+        };
+
+      history.Add(currentTransform);
+    }
+
+    //Calculate delayed Transform
+    public void SampleTransform(long timestamp, out Vector3 delayedPos, out Quaternion delayedRot) {
+      TransformData desiredTransform = TransformData.GetTransformAtTime(history, timestamp);
+      delayedPos = desiredTransform.position;
+      delayedRot = desiredTransform.rotation;
+    }
+
+    public struct TransformData {
+      public long time; // microseconds
+      public Vector3 position; //meters
+      public Quaternion rotation; //magic
+
+      public static TransformData Lerp(TransformData from, TransformData to, long time) {
+        if (from.time == to.time) {
+          return from;
+        }
+        float fraction = (time - from.time) / (to.time - from.time);
+        return new TransformData() {
+          time = time,
+          position = Vector3.Lerp(from.position, to.position, fraction),
+          rotation = Quaternion.Slerp(from.rotation, to.rotation, fraction)
+        };
+      }
+
+      public static TransformData GetTransformAtTime(RingBuffer<TransformData> history, long desiredTime) {
+        for (int i = history.Length - 1; i > 0; i--) {
+          if (history.Get(i).time >= desiredTime && history.Get(i - 1).time < desiredTime) {
+            return Lerp(history.Get(i - 1), history.Get(i), desiredTime);
+          }
+        }
+        return history.GetLatest();
+      }
+    }
+  }
+}

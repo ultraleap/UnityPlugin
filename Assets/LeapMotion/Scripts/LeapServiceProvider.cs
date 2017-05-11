@@ -8,13 +8,11 @@
  ******************************************************************************/
 
 using UnityEngine;
+using UnityEngine.VR;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 using System;
-using System.Collections;
-using Leap.Unity.Attributes;
-//using Leap.Unity.Graphing;
 
 namespace Leap.Unity {
   /**LeapServiceProvider creates a Controller and supplies Leap Hands and images */
@@ -35,9 +33,6 @@ namespace Leap.Unity {
     [Tooltip("Set true if the Leap Motion hardware is mounted on an HMD; otherwise, leave false.")]
     [SerializeField]
     protected bool _isHeadMounted = false;
-    
-    [SerializeField]
-    protected LeapVRTemporalWarping _temporalWarping;
 
     [Tooltip("When enabled, the provider will only calculate one leap frame instead of two.")]
     [SerializeField]
@@ -69,9 +64,10 @@ namespace Leap.Unity {
 
     protected Controller leap_controller_;
 
+    protected TransformHistory transformHistory = new TransformHistory();
     protected bool manualUpdateHasBeenCalledSinceUpdate;
-    protected Vector3 warpedPosition;
-    protected Quaternion warpedRotation;
+    protected Vector3 warpedPosition = Vector3.zero;
+    protected Quaternion warpedRotation = Quaternion.identity;
     protected SmoothedFloat _fixedOffset = new SmoothedFloat();
     protected SmoothedFloat _smoothedTrackingLatency = new SmoothedFloat();
 
@@ -263,6 +259,19 @@ namespace Leap.Unity {
 #endif
     }
 
+    void OnPreCull() {
+#if UNITY_EDITOR
+      if (!Application.isPlaying) {
+        return;
+      }
+#endif
+
+      transformHistory.UpdateDelay(
+        InputTracking.GetLocalPosition(VRNode.CenterEye), 
+        InputTracking.GetLocalRotation(VRNode.CenterEye), 
+        leap_controller_.Now());
+    }
+
     protected virtual void OnDestroy() {
       destroyController();
     }
@@ -348,32 +357,35 @@ namespace Leap.Unity {
       leap_controller_.Device -= onHandControllerConnect;
     }
 
-    protected void transformFrame(Frame source, Frame dest, bool resampleTemporalWarping = true) {
+    protected LeapTransform GetWarpedMatrix(long timestamp, bool updateTemporalCompensation = true) {
       LeapTransform leapTransform;
-      if (_temporalWarping != null) {
-        if (resampleTemporalWarping) {
-          _temporalWarping.TryGetWarpedTransform(LeapVRTemporalWarping.WarpedAnchor.CENTER, out warpedPosition, out warpedRotation, source.Timestamp);
-          warpedRotation = warpedRotation * transform.localRotation;
+      if (VRSettings.enabled && VRDevice.isPresent && transformHistory != null) {
+        if (updateTemporalCompensation && transformHistory.history.IsFull) {
+          transformHistory.SampleTransform(timestamp- (long)_smoothedTrackingLatency.value, out warpedPosition, out warpedRotation);
         }
 
-        leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), transform.lossyScale.ToVector() * 1e-3f);
+        warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
+        warpedPosition += warpedRotation * Vector3.up * 0.07f; //Should be replaced with a device info focal plane, but it looks like the provider just shits out a new device info every time you request one.
+
+        if (transform.parent != null) {
+          leapTransform = new LeapTransform(transform.parent.TransformPoint(warpedPosition).ToVector(), (transform.parent.rotation * warpedRotation).ToLeapQuaternion(), transform.lossyScale.ToVector() * 1e-3f);
+        } else {
+          leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), transform.lossyScale.ToVector() * 1e-3f);
+        }
         leapTransform.MirrorZ();
       } else {
         leapTransform = transform.GetLeapMatrix();
       }
+      return leapTransform;
+    }
 
+    protected void transformFrame(Frame source, Frame dest, bool resampleTemporalWarping = true) {
+      LeapTransform leapTransform = GetWarpedMatrix(source.Timestamp, resampleTemporalWarping);
       dest.CopyFrom(source).Transform(leapTransform);
     }
 
     protected void transformHands(ref LeapTransform LeftHand, ref LeapTransform RightHand) {
-      LeapTransform leapTransform;
-      if (_temporalWarping != null) {
-        leapTransform = new LeapTransform(warpedPosition.ToVector(), warpedRotation.ToLeapQuaternion(), transform.lossyScale.ToVector() * 1e-3f);
-        leapTransform.MirrorZ();
-      } else {
-        leapTransform = transform.GetLeapMatrix();
-      }
-
+      LeapTransform leapTransform = GetWarpedMatrix(0, false);
       LeftHand = new LeapTransform(leapTransform.TransformPoint(LeftHand.translation), leapTransform.TransformQuaternion(LeftHand.rotation));
       RightHand = new LeapTransform(leapTransform.TransformPoint(RightHand.translation), leapTransform.TransformQuaternion(RightHand.rotation));
     }
