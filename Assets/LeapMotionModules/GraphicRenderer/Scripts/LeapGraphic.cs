@@ -156,6 +156,12 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    public bool willbeDetached {
+      get {
+        return _willBeDetached;
+      }
+    }
+
     /// <summary>
     /// Returns the type this graphic prefers to be attached to.  When calling
     /// LeapGraphicRenderer.TryAddGraphic it will prioritize being attached to 

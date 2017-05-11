@@ -147,7 +147,7 @@ namespace Leap.Unity.GraphicalRenderer {
     public bool TryAddGraphic(LeapGraphic graphic) {
       Assert.IsNotNull(graphic);
 
-      if (graphic.willbeAttached) {
+      if (graphic.willbeAttached || (graphic.isAttachedToGroup && !graphic.willbeDetached)) {
         return false;
       }
 
