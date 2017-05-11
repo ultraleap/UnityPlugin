@@ -296,9 +296,12 @@ namespace Leap.Unity.Interaction {
         }
 
         ProcessHoverCheckResults();
-        if (_contactBehaviours.Count == 0) {
+
+        // Prevents being able to depress two buttons at once by rapidly alternating
+        // primary hover.
+        //if (_contactBehaviours.Count == 0) {
           ProcessPrimaryHoverCheckResults();
-        }
+        //}
 
         ISpaceComponent space;
         if (_hand != null) {
