@@ -8,11 +8,12 @@
  ******************************************************************************/
 
 using UnityEditor;
+using UnityEngine;
 
 namespace Leap.Unity {
 
   [CustomEditor(typeof(LeapServiceProvider))]
-  public class LeapServiceProviderEditor : CustomEditorBase {
+  public class LeapServiceProviderEditor : CustomEditorBase<LeapServiceProvider> {
     protected override void OnEnable() {
       base.OnEnable();
 
@@ -38,6 +39,17 @@ namespace Leap.Unity {
       }
 
       EditorGUILayout.HelpBox(warningText, MessageType.Warning);
+    }
+
+    public override void OnInspectorGUI() {
+      if (UnityEditor.PlayerSettings.virtualRealitySupported) {
+        EditorGUILayout.HelpBox("VR support is enabled. If your Leap is mounted to your headset, you should be using "
+                              + "LeapVRServiceProvider instead of LeapServiceProvider. (If your Leap is not "
+                              + "mounted to your headset, you can safely ignore this warning.)",
+                                MessageType.Warning);
+      }
+
+      base.OnInspectorGUI();
     }
   }
 }
