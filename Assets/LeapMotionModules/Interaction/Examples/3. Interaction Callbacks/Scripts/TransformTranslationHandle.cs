@@ -8,6 +8,11 @@ namespace Leap.Unity.Examples {
   [AddComponentMenu("")]
   public class TransformTranslationHandle : TransformHandle {
 
+    public enum TranslationAxis {
+      X, Y, Z
+    }
+    public TranslationAxis axis;
+
     protected override void Start() {
       // Populates _intObj with the InteractionBehaviour, and _tool with the TransformTool.
       base.Start();

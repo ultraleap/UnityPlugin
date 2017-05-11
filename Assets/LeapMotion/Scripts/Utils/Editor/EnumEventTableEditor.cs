@@ -93,6 +93,18 @@ namespace Leap.Unity {
       _entries.serializedObject.ApplyModifiedProperties();
     }
 
+    public bool HasAnyCallbacks(int enumValue) {
+      if (_entries == null) return false;
+      for (int i = 0; i < _entries.arraySize; i++) {
+        var entryProperty = _entries.GetArrayElementAtIndex(i);
+        var enumValueProperty = entryProperty.FindPropertyRelative("enumValue");
+        if (enumValueProperty.intValue == enumValue) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     private void RemoveEntry(int toBeRemovedEntry) {
       _entries.DeleteArrayElementAtIndex(toBeRemovedEntry);
     }

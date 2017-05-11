@@ -59,7 +59,7 @@ namespace Leap.Unity.Interaction {
                            + (dir1 * i * widthPerPixel - (dir1 * center))
                            + (dir2 * j * widthPerPixel - (dir2 * center));
 
-        float score = AnchorableBehaviour.getAnchorScore(anchObjPos, anchObjVel, anchorPos, maxRange, maxRange / 2F, Mathf.Cos(maxAngle * Mathf.Deg2Rad));
+        float score = AnchorableBehaviour.GetAnchorScore(anchObjPos, anchObjVel, anchorPos, maxRange, maxRange / 2F, Mathf.Cos(maxAngle * Mathf.Deg2Rad));
         Color pixel = Color.HSVToRGB(Mathf.Lerp(1F, 0F, score), Mathf.Lerp(0F, 1F, score), Mathf.Lerp(0F, 1F, score));
         _pixels[i + j * tex.width] = pixel;
       }

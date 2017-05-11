@@ -28,6 +28,12 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    void OnDestroy() {
+      foreach (var anchor in anchors) {
+        anchor.groups.Remove(this);
+      }
+    }
+
     public bool Contains(Anchor anchor) {
       return _anchors.Contains(anchor);
     }

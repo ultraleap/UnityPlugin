@@ -20,11 +20,13 @@ namespace Leap.Unity.Interaction {
                                 "matchAnchorMotionWhileAttaching");
 
       specifyConditionalDrawing("useTrajectory",
+                                "_motionlessRangeFraction",
+                                "_maxMotionlessRange",
                                 "_maxAttachmentAngle");
 
       specifyConditionalDrawing(() => { return target.interactionBehaviour != null; },
                                 "detachWhenGrasped",
-                                "tryAnchorNearestOnGraspEnd",
+                                "_tryAnchorNearestOnGraspEnd",
                                 "isAttractedByHand",
                                 "maxAttractionReach",
                                 "attractionReachByDistance");
@@ -44,19 +46,67 @@ namespace Leap.Unity.Interaction {
     }
 
     public override void OnInspectorGUI() {
-      //if (target.anchorType == AnchorableBehaviour.AnchorType.SingleAnchor
-      //    && target.currentAnchor != null
-      //    && target.enabled
-      //    && Vector3.Distance(target.transform.position, target.currentAnchor.transform.position) > 0.0001F) {
-      //  if (GUILayout.Button(new GUIContent("Move Object To Anchor Position",
-      //                                      "Detected that the object is not currently at its anchor, but upon pressing play, "
-      //                                    + "the object will move to its anchor. If you'd like the object to move to its anchor now, "
-      //                                    + "click this button."))) {
-      //    target.transform.position = target.currentAnchor.transform.position;
-      //  }
-      //}
+      drawWarningMessages();
+
+      drawAttachmentHelperButtons();
 
       base.OnInspectorGUI();
+    }
+
+    private void drawWarningMessages() {
+      // While the editor application is playing, we expect there to be at least the empty lambda that initializes the Action
+      // and the UnityEvent subscription.
+      // While in edit-mode, we only expect there to be the empty lambda that initializes the Action.
+      int expectedMinimumActionListeners = EditorApplication.isPlaying ? 2 : 1;
+
+      bool hasInvalidPostGraspEndCallback = !target.tryAnchorNearestOnGraspEnd
+                                         && (target.OnPostTryAnchorOnGraspEnd.GetInvocationList().Length > expectedMinimumActionListeners
+                                             || (_tableEditor != null &&
+                                                 _tableEditor.HasAnyCallbacks((int)AnchorableBehaviour.EventType.OnPostTryAnchorOnGraspEnd)));
+      if (hasInvalidPostGraspEndCallback) {
+        EditorGUILayout.HelpBox("This object's OnPostObjectGraspEnd is subscribed to, but the event will never "
+                              + "fire because tryAnchorNearestOnGraspEnd is disabled.",
+                                MessageType.Warning);
+      }
+    }
+
+    private void drawAttachmentHelperButtons() {
+      if (!EditorApplication.isPlaying) {
+        // Attach / Detach Object
+        EditorGUILayout.BeginHorizontal();
+
+        EditorGUI.BeginDisabledGroup(target.anchor == null || target.isAttached);
+        if (GUILayout.Button(new GUIContent("Attach",
+                                            "Will attach the object to its anchor. If the object is not currently at its anchor, "
+                                          + "currently at its anchor, it will begin move to it when play mode begins."))) {
+          target.TryAttach(ignoreRange: true);
+        }
+        EditorGUI.EndDisabledGroup();
+
+        EditorGUI.BeginDisabledGroup(!target.isAttached);
+        if (GUILayout.Button(new GUIContent("Detach",
+                                            "Will detach the object from its anchor. AnchorableBehaviours won't seek out an anchor "
+                                          + "until they are specifically told to attach to one."))) {
+          target.Detach();
+        }
+        EditorGUI.EndDisabledGroup();
+
+        EditorGUILayout.EndHorizontal();
+
+        // Move Object to Anchor
+        bool translatedFromAnchor = target.anchor != null && Vector3.Distance(target.transform.position, target.anchor.transform.position) > 0.0001F;
+        bool rotatedFromAnchor = target.anchor != null && target.anchorRotation && Quaternion.Angle(target.transform.rotation, target.anchor.transform.rotation) > 0.1F;
+
+        if (target.anchor != null && target.isAttached && (translatedFromAnchor || rotatedFromAnchor)) {
+          if (GUILayout.Button(new GUIContent("Move Object To Anchor",
+                                              "Detected that the object is not currently at its anchor, but upon pressing play, "
+                                            + "the object will move to to match its anchor. If you'd like the object to move to "
+                                            + "its anchor now, click this button."))) {
+            if (translatedFromAnchor) target.transform.position = target.anchor.transform.position;
+            if (rotatedFromAnchor) target.transform.rotation = target.anchor.transform.rotation;
+          }
+        }
+      }
     }
 
   }

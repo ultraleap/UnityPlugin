@@ -27,11 +27,17 @@ namespace Leap.Unity.Interaction {
     private HashSet<AnchorGroup> _groups = new HashSet<AnchorGroup>();
     public HashSet<AnchorGroup> groups { get { return _groups; } }
 
+    private HashSet<AnchorableBehaviour> _preferringAnchorables = new HashSet<AnchorableBehaviour>();
+
     private HashSet<AnchorableBehaviour> _anchoredObjects = new HashSet<AnchorableBehaviour>();
     /// <summary>
     /// Gets the set of AnchorableBehaviours currently attached to this anchor.
     /// </summary>
     public HashSet<AnchorableBehaviour> anchoredObjects { get { return _anchoredObjects; } }
+
+    public bool isPreferred { get { return _preferringAnchorables.Count > 0; } }
+
+    public bool hasAnchoredObjects { get { return _anchoredObjects.Count > 0; } }
 
     #region Events
 
@@ -51,14 +57,25 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public Action WhileAnchorPreferred = () => { };
 
+    /// <summary>
+    /// Called as soon as any anchorables become attached to this anchor.
+    /// </summary>
+    public Action OnAnchorablesAttached = () => { };
+
+    /// <summary>
+    /// Called when there are no anchorables attached to this anchor.
+    /// </summary>
+    public Action OnNoAnchorablesAttached = () => { };
+
+    /// <summary>
+    /// Called every Update() that one or more AnchorableBehaviours is attached to this anchor.
+    /// </summary>
+    public Action WhileAnchorablesAttached = () => { };
+
     #endregion
 
-    void OnEnable() {
+    void Awake() {
       allAnchors.Add(this);
-    }
-
-    void OnDisable() {
-      allAnchors.Remove(this);
     }
 
     void Start() {
@@ -69,20 +86,35 @@ namespace Leap.Unity.Interaction {
       updateAnchorCallbacks();
     }
 
-    public void NotifyAnchored(AnchorableBehaviour anchObj) {
-      _anchoredObjects.Add(anchObj);
-    }
+    void OnDestroy() {
+      foreach (var group in groups) {
+        group.Remove(this);
+      }
 
-    public void NotifyUnanchored(AnchorableBehaviour anchObj) {
-      _anchoredObjects.Remove(anchObj);
+      allAnchors.Remove(this);
     }
 
     #region Anchor Callbacks
 
-    private HashSet<AnchorableBehaviour> _preferringAnchorables = new HashSet<AnchorableBehaviour>();
+    public void NotifyAttached(AnchorableBehaviour anchObj) {
+      _anchoredObjects.Add(anchObj);
+
+      if (_anchoredObjects.Count == 1) {
+        OnAnchorablesAttached();
+      }
+    }
+
+    public void NotifyDetached(AnchorableBehaviour anchObj) {
+      _anchoredObjects.Remove(anchObj);
+
+      if (_anchoredObjects.Count == 0) {
+        OnNoAnchorablesAttached();
+      }
+    }
 
     private void updateAnchorCallbacks() {
       WhileAnchorPreferred();
+      WhileAnchorablesAttached();
     }
 
     public void NotifyAnchorPreference(AnchorableBehaviour anchObj) {
@@ -124,11 +156,13 @@ namespace Leap.Unity.Interaction {
 
     private void drawWireSphereGizmo(Vector3 pos, float radius) {
       foreach (var dir in worldDirs) {
+        // TODO: Implement anchor gizmos
         return;
       }
     }
 
     private void drawSphereCirclesGizmo(int numCircles, Vector3 pos, float radius, Vector3 poleDir) {
+      // TODO: Implement anchor gizmos
       return;
     }
 
@@ -142,13 +176,19 @@ namespace Leap.Unity.Interaction {
     public enum EventType {
       OnAnchorPreferred = 100,
       OnAnchorNotPreferred = 110,
-      WhileAnchorPreferred = 120
+      WhileAnchorPreferred = 120,
+      OnAnchorablesAttached = 130,
+      OnNoAnchorablesAttached = 140,
+      WhileAnchorablesAttached = 150
     }
 
     private void initUnityEvents() {
-      setupCallback(ref OnAnchorPreferred,    EventType.OnAnchorPreferred);
-      setupCallback(ref OnAnchorNotPreferred, EventType.OnAnchorNotPreferred);
-      setupCallback(ref WhileAnchorPreferred, EventType.WhileAnchorPreferred);
+      setupCallback(ref OnAnchorPreferred,        EventType.OnAnchorPreferred);
+      setupCallback(ref OnAnchorNotPreferred,     EventType.OnAnchorNotPreferred);
+      setupCallback(ref WhileAnchorPreferred,     EventType.WhileAnchorPreferred);
+      setupCallback(ref OnAnchorablesAttached,    EventType.OnAnchorablesAttached);
+      setupCallback(ref OnNoAnchorablesAttached,  EventType.OnNoAnchorablesAttached);
+      setupCallback(ref WhileAnchorablesAttached, EventType.WhileAnchorablesAttached);
     }
 
     private void setupCallback(ref Action action, EventType type) {
