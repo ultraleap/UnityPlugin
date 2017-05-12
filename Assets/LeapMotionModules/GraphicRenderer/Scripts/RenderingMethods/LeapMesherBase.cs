@@ -145,6 +145,12 @@ namespace Leap.Unity.GraphicalRenderer {
     protected List<Color> _customColorChannelData = new List<Color>();
     protected List<Matrix4x4> _customMatrixChannelData = new List<Matrix4x4>();
 
+    public Material material {
+      get {
+        return _material;
+      }
+    }
+
 #if UNITY_EDITOR
     public virtual bool IsAtlasDirty {
       get {
@@ -244,6 +250,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
     public override void OnEnableRenderer() {
       loadAllSupportedFeatures();
+      prepareMaterial();
 
       //Sprite textures cannot be accessed at edit time, so we need to make sure
       //to upload them to the material right as the renderer is enabled
@@ -347,31 +354,8 @@ namespace Leap.Unity.GraphicalRenderer {
         prepareMeshes();
         prepareMaterial();
 
-        if (_doesRequireColors) {
-          _material.EnableKeyword(COLORS_FEATURE);
-        }
-
-        if (_doesRequireNormals) {
-          _material.EnableKeyword(NORMALS_FEATURE);
-        }
-
-        foreach (var channel in _requiredUvChannels) {
-          _material.EnableKeyword(GetUvFeature(channel));
-        }
-
-        if (_customColorChannelData.Count > 0 ||
-           _customFloatChannelData.Count > 0 ||
-           _customVectorChannelData.Count > 0 ||
-           _customMatrixChannelData.Count > 0) {
-          _material.EnableKeyword(CUSTOM_CHANNEL_KEYWORD);
-        }
-
         if (_textureFeatures.Count != 0) {
           _atlas.UpdateTextureList(_textureFeatures);
-
-          foreach (var feature in _textureFeatures) {
-            _material.SetTexture(feature.propertyName, _packedTextures.GetTexture(feature.propertyName));
-          }
         }
 
         if (_spriteFeatures.Count != 0) {
@@ -380,14 +364,6 @@ namespace Leap.Unity.GraphicalRenderer {
 #endif
           extractSpriteRects();
           uploadSpriteTextures();
-        }
-
-        if (_tintFeatures.Count != 0) {
-          _material.EnableKeyword(LeapRuntimeTintFeature.FEATURE_NAME);
-        }
-
-        if (_blendShapeFeatures.Count != 0) {
-          _material.EnableKeyword(LeapBlendShapeFeature.FEATURE_NAME);
         }
       }
     }
@@ -444,6 +420,39 @@ namespace Leap.Unity.GraphicalRenderer {
         _spriteTextureBlock = new MaterialPropertyBlock();
       }
       _spriteTextureBlock.Clear();
+
+      if (_doesRequireColors) {
+        _material.EnableKeyword(COLORS_FEATURE);
+      }
+
+      if (_doesRequireNormals) {
+        _material.EnableKeyword(NORMALS_FEATURE);
+      }
+
+      foreach (var channel in _requiredUvChannels) {
+        _material.EnableKeyword(GetUvFeature(channel));
+      }
+
+      if (_customColorChannelData.Count > 0 ||
+         _customFloatChannelData.Count > 0 ||
+         _customVectorChannelData.Count > 0 ||
+         _customMatrixChannelData.Count > 0) {
+        _material.EnableKeyword(CUSTOM_CHANNEL_KEYWORD);
+      }
+
+      if (_textureFeatures.Count != 0) {
+        foreach (var feature in _textureFeatures) {
+          _material.SetTexture(feature.propertyName, _packedTextures.GetTexture(feature.propertyName));
+        }
+      }
+
+      if (_tintFeatures.Count != 0) {
+        _material.EnableKeyword(LeapRuntimeTintFeature.FEATURE_NAME);
+      }
+
+      if (_blendShapeFeatures.Count != 0) {
+        _material.EnableKeyword(LeapBlendShapeFeature.FEATURE_NAME);
+      }
     }
 
     protected virtual void extractSpriteRects() {

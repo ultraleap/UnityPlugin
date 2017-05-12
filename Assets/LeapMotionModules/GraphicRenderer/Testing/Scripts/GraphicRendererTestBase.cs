@@ -15,6 +15,11 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
 
     protected LeapGraphicGroup secondGroup { get; private set; }
 
+    [TearDown]
+    protected virtual void Teardown() {
+      UnityEngine.Object.DestroyImmediate(renderer.gameObject);
+    }
+
     /// <summary>
     /// Should be called at the start of the test.  The argument is 
     /// the name of the prefab to spawn.  This prefab should have a
