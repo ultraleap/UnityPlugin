@@ -12,39 +12,45 @@ using System.Collections.Generic;
 namespace Leap.Unity.Query {
 
   /// <summary>
-  /// The wrapper for all leap queries.  These queries are meant to mirror the queries present in the System.Linq.Enumerable
-  /// class.  These queries are meant to be functionaly identical, but allocate zero garbage, both during the generation of
-  /// the query, as well as the execution.  The speed is also aimed to be as fast or faster.
+  /// The wrapper for all leap queries.  These queries are meant to mirror the queries present in the 
+  /// System.Linq.Enumerable class.  These queries are meant to be functionaly identical, but allocate 
+  /// zero garbage, both during the generation of the query, as well as the execution.  The speed is 
+  /// also aimed to be as fast or faster.
   ///
-  /// There is some difference between using Linq and using Leap queries. One is that is you must prefix your query with
-  /// a call to a Query() method if you are starting with an external data structure.  So for example if you want to query a
-  /// list, your method call would look something like this:
+  /// There is one big difference between using Linq and using Leap queries.You must prefix your query 
+  /// with a call to a Query() method if you are starting with an external data structure.  So for 
+  /// example if you want to query a list, your method call would look something like this:
   ///
   /// myList.Query().Where(someCondition).First();
-  ///
-  /// The other major difference is that you can only use a query once.  So the following will not work:
-  ///
-  /// var myQuery = myList.Query().Where(someCondition);
-  ///
-  /// foreach(var item in myQuery) { }
-  /// foreach(var item in myQuery) { } // will not work, query has already been used!
-  ///
-  /// All of these limitations and changes are made in the name of performance and to reduce garbage allocated to zero, while
-  /// hopefully not impacting the productivity of the user too much.
   /// </summary>
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
     private QueryOp _op;
 
+    /// <summary>
+    /// Returns the actual query operation wrapped by this wrapper.  This operation always
+    /// implements IQueryOp, which is an interface similar to IEnumerator.  You usually
+    /// do not need to access this op directly to use the query.  Instead you can simply
+    /// foreach over this wrapper, or use one of the direct query operations like First,
+    /// ToList, Any, ect...
+    /// </summary>
     public QueryOp op {
       get {
         return _op;
       }
     }
 
+    /// <summary>
+    /// Constructs a new wrapper given a specific query operation.
+    /// </summary>
     public QueryWrapper(QueryOp op) {
       _op = op;
     }
 
+    /// <summary>
+    /// Returns an enumerator object that is able to enumerate through the query operation
+    /// wrapped by this wrapper.  You can call this directly and step through the result 
+    /// by using MoveNext/Current, or use it indirectly by using the foreach construct.
+    /// </summary>
     public Enumerator GetEnumerator() {
       return new Enumerator(_op);
     }
@@ -70,29 +76,76 @@ namespace Leap.Unity.Query {
     }
   }
 
+  /// <summary>
+  /// The interface all query operations must follow.  It is a modified version of the 
+  /// IEnumerator interface, optimized for speed and conciseness.
+  /// </summary>
   public interface IQueryOp<T> {
+
+    /// <summary>
+    /// Tries to get the next value in the sequence.  If this method returns true,
+    /// the next value will be placed into the out parameter t.  If this method
+    /// returns false, the sequence is at an end and t will be the default value
+    /// of T.
+    /// 
+    /// Once TryGetNext returns false, it can NEVER return true again until the
+    /// Reset operator is called.
+    /// </summary>
     bool TryGetNext(out T t);
+
+    /// <summary>
+    /// Resets the internal state of this query operation to the begining of
+    /// the sequence.
+    /// </summary>
     void Reset();
   }
 
+  /// <summary>
+  /// Data structures require special conversion operations to turn them into 
+  /// objects that implement IQueryOp.  These conversions can unfortunately not
+  /// be done automatically, which is the reason for the call to Query().  All
+  /// Query() calls are housed in this class for ease of use.
+  /// </summary>
   public static class QueryConversionExtensions {
 
+    /// <summary>
+    /// Converts an IList object into a query operation, and returns a query wrapper
+    /// that wraps this new operation.
+    /// </summary>
     public static QueryWrapper<T, ListQueryOp<T>> Query<T>(this IList<T> list) {
       return new QueryWrapper<T, ListQueryOp<T>>(new ListQueryOp<T>(list));
     }
 
+    /// <summary>
+    /// Converts a Dictionary object into a query operation, and returns a query wrapper
+    /// that wraps this new operation.
+    /// </summary>
     public static QueryWrapper<KeyValuePair<K, V>, EnumerableQueryOp<KeyValuePair<K, V>, Dictionary<K, V>.Enumerator>> Query<T, K, V>(this Dictionary<K, V> dictionary) {
       return new QueryWrapper<KeyValuePair<K, V>, EnumerableQueryOp<KeyValuePair<K, V>, Dictionary<K, V>.Enumerator>>(new EnumerableQueryOp<KeyValuePair<K, V>, Dictionary<K, V>.Enumerator>(dictionary.GetEnumerator()));
     }
 
+    /// <summary>
+    /// Converts a HashSet object into a query operation, and returns a query wrapper
+    /// that wraps this new operation.
+    /// </summary>
     public static QueryWrapper<T, EnumerableQueryOp<T, HashSet<T>.Enumerator>> Query<T>(this HashSet<T> hashSet) {
       return new QueryWrapper<T, EnumerableQueryOp<T, HashSet<T>.Enumerator>>(new EnumerableQueryOp<T, HashSet<T>.Enumerator>(hashSet.GetEnumerator()));
     }
 
+    /// <summary>
+    /// Converts a Queue object into a query operation, and returns a query wrapper
+    /// that wraps this new operation.
+    /// </summary>
     public static QueryWrapper<T, EnumerableQueryOp<T, Queue<T>.Enumerator>> Query<T>(this Queue<T> queue) {
       return new QueryWrapper<T, EnumerableQueryOp<T, Queue<T>.Enumerator>>(new EnumerableQueryOp<T, Queue<T>.Enumerator>(queue.GetEnumerator()));
     }
 
+    /// <summary>
+    /// Generic fallback for calling Query on any IEnumerator.
+    /// 
+    /// IMPORTANT!  Since this uses the IEnumerator interface, it MUST create a small allocation
+    /// during the call to GetEnumerator that cannot be avoided.
+    /// </summary>
     public static QueryWrapper<T, EnumerableQueryOp<T, IEnumerator<T>>> Query<T>(this IEnumerator<T> enumerator) {
       return new QueryWrapper<T, EnumerableQueryOp<T, IEnumerator<T>>>(new EnumerableQueryOp<T, IEnumerator<T>>(enumerator));
     }

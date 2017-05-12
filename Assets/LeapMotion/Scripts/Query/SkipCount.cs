@@ -42,6 +42,12 @@ namespace Leap.Unity.Query {
   }
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+
+    /// <summary>
+    /// Returns a new query operation representing the current query operation but without a
+    /// certain number of the elements at the start.  This method is safe to call with a skip
+    /// amount that is larger than the number of elements in the sequence.
+    /// </summary>
     public QueryWrapper<QueryType, SkipCountOp<QueryType, QueryOp>> Skip(int toSkip) {
       return new QueryWrapper<QueryType, SkipCountOp<QueryType, QueryOp>>(new SkipCountOp<QueryType, QueryOp>(_op, toSkip));
     }

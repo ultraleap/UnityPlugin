@@ -47,6 +47,12 @@ namespace Leap.Unity.Query {
   }
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+
+    /// <summary>
+    /// Returns a new query operation that skips values while the predicate returns true.  As soon
+    /// as the predicate returns false, the operation returns the remainder of the sequence.  Even
+    /// if the predicate becomes true again, the elements are still returned.
+    /// </summary>
     public QueryWrapper<QueryType, SkipWhileOp<QueryType, QueryOp>> SkipWhile(Func<QueryType, bool> predicate) {
       return new QueryWrapper<QueryType, SkipWhileOp<QueryType, QueryOp>>(new SkipWhileOp<QueryType, QueryOp>(_op, predicate));
     }

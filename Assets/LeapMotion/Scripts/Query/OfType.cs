@@ -41,10 +41,19 @@ namespace Leap.Unity.Query {
   }
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+
+    /// <summary>
+    /// Returns a new query operation representing only the items of the current sequence that
+    /// are of a specific type.
+    /// </summary>
     public QueryWrapper<CastType, OfTypeOp<QueryType, CastType, QueryOp>> OfType<CastType>() where CastType : class {
       return new QueryWrapper<CastType, OfTypeOp<QueryType, CastType, QueryOp>>(new OfTypeOp<QueryType, CastType, QueryOp>(_op));
     }
 
+    /// <summary>
+    /// Returns a new query operation representing only the items of the current sequence that
+    /// are of a specific type.
+    /// </summary>
     public QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>> OfType(Type type) {
       return new QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>>(new WhereOp<QueryType, QueryOp>(_op, element => element != null && type.IsAssignableFrom(element.GetType())));
     }

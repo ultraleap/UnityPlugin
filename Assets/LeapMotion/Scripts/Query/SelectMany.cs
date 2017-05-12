@@ -67,6 +67,12 @@ namespace Leap.Unity.Query {
   }
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+
+    /// <summary>
+    /// Returns a new query operation representing the current query sequence where each element has been
+    /// mapped onto an entire query sequence, and then all sequences are concatenated into a single long 
+    /// sequence.
+    /// </summary>
     public QueryWrapper<NewType, SelectManyOp<QueryType, NewType, QueryOp, NewOp>> SelectMany<NewType, NewOp>(Func<QueryType, QueryWrapper<NewType, NewOp>> selector)
       where NewOp : IQueryOp<NewType> {
       return new QueryWrapper<NewType, SelectManyOp<QueryType, NewType, QueryOp, NewOp>>(new SelectManyOp<QueryType, NewType, QueryOp, NewOp>(_op, selector));

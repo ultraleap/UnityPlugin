@@ -38,10 +38,19 @@ namespace Leap.Unity.Query {
   }
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+
+    /// <summary>
+    /// Returns a new query operation representing the current query sequence mapped element-by-element
+    /// into a new query sequence by a mapping operation.
+    /// </summary>
     public QueryWrapper<NewType, SelectOp<QueryType, NewType, QueryOp>> Select<NewType>(Func<QueryType, NewType> mapping) {
       return new QueryWrapper<NewType, SelectOp<QueryType, NewType, QueryOp>>(new SelectOp<QueryType, NewType, QueryOp>(_op, mapping));
     }
 
+    /// <summary>
+    /// Returns a new query operation representing the current query sequence where each element is cast
+    /// to a new type.
+    /// </summary>
     public QueryWrapper<NewType, SelectOp<QueryType, NewType, QueryOp>> Cast<NewType>() where NewType : class {
       return Select(obj => obj as NewType);
     }

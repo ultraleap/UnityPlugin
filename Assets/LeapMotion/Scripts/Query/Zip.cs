@@ -44,6 +44,12 @@ namespace Leap.Unity.Query {
   }
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+
+    /// <summary>
+    /// Returns a new query operation that represents the combination of this query sequence with another
+    /// query sequence.  The two sequences are combined element-by-element using a selector function.
+    /// The resulting sequence has a length equal to the smaller of the two sequences.
+    /// </summary>
     public QueryWrapper<NewType, ZipOp<NewType, QueryType, OtherType, QueryOp, OtherOp>> Zip<NewType, OtherType, OtherOp>(QueryWrapper<OtherType, OtherOp> sourceB, Func<QueryType, OtherType, NewType> resultSelector)
       where OtherOp : IQueryOp<OtherType> {
       return new QueryWrapper<NewType, ZipOp<NewType, QueryType, OtherType, QueryOp, OtherOp>>(new ZipOp<NewType, QueryType, OtherType, QueryOp, OtherOp>(_op, sourceB._op, resultSelector));

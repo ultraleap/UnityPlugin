@@ -38,6 +38,12 @@ namespace Leap.Unity.Query {
   }
 
   public partial struct QueryWrapper<QueryType, QueryOp> where QueryOp : IQueryOp<QueryType> {
+
+    /// <summary>
+    /// Returns a new query operation representing only the first few elements of the current sequence.
+    /// This method is safe to call even with a count that is larger than the number of elements in
+    /// the sequence.
+    /// </summary>
     public QueryWrapper<QueryType, TakeCountOp<QueryType, QueryOp>> Take(int count) {
       return new QueryWrapper<QueryType, TakeCountOp<QueryType, QueryOp>>(new TakeCountOp<QueryType, QueryOp>(_op, count));
     }
