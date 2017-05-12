@@ -76,6 +76,11 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       secondGroup = renderer.groups.Count > 1 ? renderer.groups[1] : null;
     }
 
+    /// <summary>
+    /// Loads a scene with a given name.  This allows you to use InitTest
+    /// to enable game objects that exist within that scene.  This also
+    /// allows the scene to be automatically unloaded when the test ends.
+    /// </summary>
     protected void LoadScene(string sceneName) {
       _sceneToUnload = sceneName;
       SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
