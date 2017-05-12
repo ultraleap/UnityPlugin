@@ -48,7 +48,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
                                                               "OneSphericalBakedGroup",
                                                               "OneBakedGroupWithBlendShapes",
                                                               "OneCylindricalBakedGroupWithBlendShapes",
-                                                              "OneSphericalbakedGroupWithBlendShapes")]
+                                                              "OneSphericalBakedGroupWithBlendShapes")]
                                                         string rendererName) {
       LoadScene("BakedRendererShaderTestScene");
       yield return null;
@@ -61,7 +61,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       yield return null;
 
       renderer.BeginCollectingVertData();
-
+      
       yield return null;
 
       assertVertsAreEqual();

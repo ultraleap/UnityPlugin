@@ -25,6 +25,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
 
       if (!string.IsNullOrEmpty(_sceneToUnload)) {
         SceneManager.UnloadSceneAsync(_sceneToUnload);
+        _sceneToUnload = null;
       }
     }
 
@@ -58,6 +59,11 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
 
       if (obj == null) {
         var prefab = Resources.Load<GameObject>(objectName);
+
+        if (prefab == null) {
+          throw new Exception("Could not find an object or prefab with the name " + objectName);
+        }
+
         obj = UnityEngine.Object.Instantiate(prefab);
       }
 
