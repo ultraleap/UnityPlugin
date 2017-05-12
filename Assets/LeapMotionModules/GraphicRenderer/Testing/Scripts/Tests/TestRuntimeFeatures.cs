@@ -70,6 +70,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
 
       yield return null;
 
+#if UNITY_EDITOR
       for (int i = 0; i < firstGroup.features.Count; i++) {
         var feature = firstGroup.features[i];
         var dataObj = oneGraphic.featureData[i];
@@ -79,6 +80,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
 
         Assert.That(dataFeatureType, Is.EqualTo(featureType));
       }
+#endif
     }
   }
 }

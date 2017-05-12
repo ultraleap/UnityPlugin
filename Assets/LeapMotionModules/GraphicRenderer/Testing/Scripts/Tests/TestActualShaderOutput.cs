@@ -43,14 +43,14 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     /// the vertices of a graphic in all situations.
     /// </summary>
     [UnityTest]
-    public IEnumerator DoesCorrectlyRenderBakedOutput([Values("OneBakedGroup",
-                                                              "OneCylindricalBakedGroup",
-                                                              "OneSphericalBakedGroup",
-                                                              "OneBakedGroupWithBlendShapes",
-                                                              "OneCylindricalBakedGroupWithBlendShapes",
-                                                              "OneSphericalBakedGroupWithBlendShapes")]
-                                                        string rendererName) {
-      LoadScene("BakedRendererShaderTestScene");
+    public IEnumerator DoesCorrectlyRenderStationaryBakedOutput([Values("OneBakedGroup",
+                                                                        "OneCylindricalBakedGroup",
+                                                                        "OneSphericalBakedGroup",
+                                                                        "OneBakedGroupWithBlendShapes",
+                                                                        "OneCylindricalBakedGroupWithBlendShapes",
+                                                                        "OneSphericalBakedGroupWithBlendShapes")]
+                                                                string rendererName) {
+      LoadScene("StationaryBakedRendererShaderTestScene");
       yield return null;
       InitTest(rendererName);
       yield return null;
@@ -61,13 +61,47 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       yield return null;
 
       renderer.BeginCollectingVertData();
-      
+
+      yield return null;
+
+      assertVertsAreEqual();
+    }
+
+    /// <summary>
+    /// Test to verify that baked renderers correctly distort
+    /// the vertices of a graphic in all situations.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator DoesCorrectlyRenderTranslationBakedOutput([Values("OneBakedGroup",
+                                                                         "OneCylindricalBakedGroup",
+                                                                         "OneSphericalBakedGroup",
+                                                                         "OneBakedGroupWithBlendShapes",
+                                                                         "OneCylindricalBakedGroupWithBlendShapes",
+                                                                         "OneSphericalBakedGroupWithBlendShapes")]
+                                                                 string rendererName) {
+      LoadScene("TranslationBakedRendererShaderTestScene");
+      yield return null;
+      InitTest(rendererName);
+      yield return null;
+
+      randomizeGraphicPosition();
+      randomizeRendererTransform();
+      initRendererAndGraphic();
+
+      yield return null;
+
+      renderer.BeginCollectingVertData();
+
       yield return null;
 
       assertVertsAreEqual();
     }
 
     private Vector3[] verts;
+
+    private void randomizeGraphicPosition() {
+      oneGraphic.transform.localPosition = Random.onUnitSphere;
+    }
 
     private void randomizeGraphicTransform() {
       oneGraphic.transform.localPosition = Random.onUnitSphere;
