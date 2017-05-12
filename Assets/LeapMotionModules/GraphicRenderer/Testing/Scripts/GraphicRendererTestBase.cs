@@ -2,6 +2,8 @@
 using NUnit.Framework;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer.Tests {
 
@@ -15,15 +17,22 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
 
     protected LeapGraphicGroup secondGroup { get; private set; }
 
+    private string _sceneToUnload;
+
     [TearDown]
     protected virtual void Teardown() {
       UnityEngine.Object.DestroyImmediate(renderer.gameObject);
+
+      if (!string.IsNullOrEmpty(_sceneToUnload)) {
+        SceneManager.UnloadSceneAsync(_sceneToUnload);
+      }
     }
 
     /// <summary>
     /// Should be called at the start of the test.  The argument is 
-    /// the name of the prefab to spawn.  This prefab should have a
-    /// graphic renderer component attached to the root of the prefab.
+    /// the name of the prefab to spawn, or the name of a gameobject
+    /// in the current scene to load.  This object should have a
+    /// graphic renderer component attached to the root.
     /// 
     /// This method will automatically populate the following fields:
     ///  - renderer : with the reference to the renderer on the base of the prefab
@@ -31,9 +40,26 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     ///  - firstGroup : the first group attached to the renderer
     ///  - secondGroup : the second group attached to the renderer, if any
     /// </summary>
-    protected void InitTest(string prefabName) {
-      var prefab = Resources.Load<GameObject>(prefabName);
-      var obj = UnityEngine.Object.Instantiate(prefab);
+    protected void InitTest(string objectName) {
+      GameObject obj = null;
+
+      for (int i = 0; i < SceneManager.sceneCount; i++) {
+        var scene = SceneManager.GetSceneAt(i);
+
+        obj = scene.GetRootGameObjects().
+                    Query().
+                    FirstOrDefault(g => g.name == objectName);
+
+        if (obj != null) {
+          obj.SetActive(true);
+          break;
+        }
+      }
+
+      if (obj == null) {
+        var prefab = Resources.Load<GameObject>(objectName);
+        obj = UnityEngine.Object.Instantiate(prefab);
+      }
 
       renderer = obj.GetComponent<LeapGraphicRenderer>();
 
@@ -42,6 +68,11 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       firstGroup = renderer.groups[0];
 
       secondGroup = renderer.groups.Count > 1 ? renderer.groups[1] : null;
+    }
+
+    protected void LoadScene(string sceneName) {
+      _sceneToUnload = sceneName;
+      SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
     }
 
     /// <summary>

@@ -29,7 +29,7 @@ Shader "LeapMotion/GraphicRenderer/Testing/Unlit/Baked" {
       sampler2D _MainTex;
       sampler2D _MainTex2;
 
-      RWStructuredBuffer<float3> _FinalVertexPositions;
+      RWStructuredBuffer<float3> _FinalVertexPositions : register(u1);
       
       struct appdata_graphic_baked_test {
         float4 vertex : POSITION;

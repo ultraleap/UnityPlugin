@@ -117,15 +117,15 @@ namespace Leap.Unity.GraphicalRenderer {
     protected List<CustomMatrixChannelFeature> _matrixChannelFeatures = new List<CustomMatrixChannelFeature>();
 
     //### Generated Data ###
-    [SerializeField, HideInInspector]
+    [SerializeField]
     protected Material _material;
-    [SerializeField, HideInInspector]
+    [SerializeField]
     protected RendererMeshData _meshes;
-    [SerializeField, HideInInspector]
+    [SerializeField]
     protected RendererTextureData _packedTextures;
 
     //#### Sprite/Texture Remapping ####
-    [SerializeField, HideInInspector]
+    [SerializeField]
     private AtlasUvs _atlasUvs;
     [NonSerialized]
     protected MaterialPropertyBlock _spriteTextureBlock;

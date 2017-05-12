@@ -8,6 +8,7 @@
  ******************************************************************************/
 
 using UnityEngine;
+using UnityEngine.Assertions;
 using System;
 using System.Collections.Generic;
 
@@ -128,6 +129,20 @@ namespace Leap.Unity {
 
     public static float Area(this Rect rect) {
       return rect.width * rect.height;
+    }
+
+    public static bool IsActiveRelativeToParent(this GameObject obj, GameObject parent) {
+      Assert.IsTrue(obj.transform.IsChildOf(parent.transform));
+
+      if (!obj.activeSelf) {
+        return false;
+      } else {
+        if (obj.transform.parent == parent.transform) {
+          return true;
+        } else {
+          return obj.transform.gameObject.IsActiveRelativeToParent(parent);
+        }
+      }
     }
 
     #endregion
@@ -334,8 +349,7 @@ namespace Leap.Unity {
 
       public bool MoveNext() {
         if (_idx < _count) _idx += 1;
-        if (_idx == _count) { return false; }
-        else { return true; }
+        if (_idx == _count) { return false; } else { return true; }
       }
       public Transform Current {
         get { return _t == null ? null : _t.GetChild(_idx); }

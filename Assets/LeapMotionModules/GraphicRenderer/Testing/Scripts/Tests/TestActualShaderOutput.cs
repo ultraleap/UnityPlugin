@@ -11,43 +11,23 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     public const string FOLDER_NAME = "ShaderOutputTestPrefabs";
 
     /// <summary>
-    /// Just a basic test to verify that the system for reading back
-    /// shader values from the GPU actually works.  Applies a small
-    /// translation of the graphic itself. 
+    /// Test to verify that dynamic renderers correctly distort
+    /// the vertices of a graphic in all situations.
     /// </summary>
-    /// <returns></returns>
     [UnityTest]
-    public IEnumerator DoesCorrectlyRenderOutput([Values("OneDynamicGroup",
-                                                         "OneCylindricalDynamicGroup",
-                                                         "OneSphericalDynamicGroup",
-                                                         "OneDynamicGroupWithBlendShapes",
-                                                         "OneCylindricalDynamicGroupWithBlendShapes",
-                                                         "OneSphericalDynamicGroupWithBlendShapes")]
-                                                 string rendererPrefab) {
+    public IEnumerator DoesCorrectlyRenderDynamicOutput([Values("OneDynamicGroup",
+                                                                "OneCylindricalDynamicGroup",
+                                                                "OneSphericalDynamicGroup",
+                                                                "OneDynamicGroupWithBlendShapes",
+                                                                "OneCylindricalDynamicGroupWithBlendShapes",
+                                                                "OneSphericalDynamicGroupWithBlendShapes")]
+                                                        string rendererPrefab) {
       InitTest(Path.Combine(FOLDER_NAME, rendererPrefab));
       yield return null;
 
-      //To get around gpu values holding over from previous tests
-      Vector3 randomOffset = Random.onUnitSphere;
-
-      oneGraphic.transform.localPosition = Random.onUnitSphere;
-      oneGraphic.transform.localRotation = Quaternion.LookRotation(Random.onUnitSphere);
-      oneGraphic.transform.localScale = Random.onUnitSphere;
-
-      renderer.transform.position = Random.onUnitSphere;
-      renderer.transform.rotation = Quaternion.LookRotation(Random.onUnitSphere);
-      renderer.transform.localScale = Random.onUnitSphere;
-
-      var oneMeshGraphic = oneGraphic as LeapMeshGraphicBase;
-      oneMeshGraphic.RefreshMeshData();
-      var verts = oneMeshGraphic.mesh.vertices;
-
-      Vector3[] deltaVerts = new Vector3[verts.Length];
-      Vector3[] deltaNormals = new Vector3[verts.Length];
-      Vector3[] deltaTangents = new Vector3[verts.Length];
-      if (oneMeshGraphic.mesh.blendShapeCount > 0 && oneGraphic.featureData.Query().OfType<LeapBlendShapeData>().Any()) {
-        oneMeshGraphic.mesh.GetBlendShapeFrameVertices(0, 0, deltaVerts, deltaNormals, deltaTangents);
-      }
+      randomizeGraphicTransform();
+      randomizeRendererTransform();
+      initRendererAndGraphic();
 
       yield return null;
 
@@ -55,10 +35,74 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
 
       yield return null;
 
+      assertVertsAreEqual();
+    }
+
+    /// <summary>
+    /// Test to verify that baked renderers correctly distort
+    /// the vertices of a graphic in all situations.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator DoesCorrectlyRenderBakedOutput([Values("OneBakedGroup",
+                                                              "OneCylindricalBakedGroup",
+                                                              "OneSphericalBakedGroup",
+                                                              "OneBakedGroupWithBlendShapes",
+                                                              "OneCylindricalBakedGroupWithBlendShapes",
+                                                              "OneSphericalbakedGroupWithBlendShapes")]
+                                                        string rendererName) {
+      LoadScene("BakedRendererShaderTestScene");
+      yield return null;
+      InitTest(rendererName);
+      yield return null;
+
+      randomizeRendererTransform();
+      initRendererAndGraphic();
+
+      yield return null;
+
+      renderer.BeginCollectingVertData();
+
+      yield return null;
+
+      assertVertsAreEqual();
+    }
+
+    private Vector3[] verts;
+
+    private void randomizeGraphicTransform() {
+      oneGraphic.transform.localPosition = Random.onUnitSphere;
+      oneGraphic.transform.localRotation = Quaternion.LookRotation(Random.onUnitSphere);
+      oneGraphic.transform.localScale = Random.onUnitSphere;
+    }
+
+    private void randomizeRendererTransform() {
+      renderer.transform.position = Random.onUnitSphere;
+      renderer.transform.rotation = Quaternion.LookRotation(Random.onUnitSphere);
+      renderer.transform.localScale = Random.onUnitSphere;
+    }
+
+    private void initRendererAndGraphic() {
+      var oneMeshGraphic = oneGraphic as LeapMeshGraphicBase;
+      oneMeshGraphic.RefreshMeshData();
+      verts = oneMeshGraphic.mesh.vertices;
+
+      Vector3[] deltaVerts = new Vector3[verts.Length];
+      Vector3[] deltaNormals = new Vector3[verts.Length];
+      Vector3[] deltaTangents = new Vector3[verts.Length];
+      if (oneMeshGraphic.mesh.blendShapeCount > 0 && oneGraphic.featureData.Query().OfType<LeapBlendShapeData>().Any()) {
+        oneMeshGraphic.mesh.GetBlendShapeFrameVertices(0, 0, deltaVerts, deltaNormals, deltaTangents);
+
+        for (int i = 0; i < verts.Length; i++) {
+          verts[i] += deltaVerts[i];
+        }
+      }
+    }
+
+    private void assertVertsAreEqual() {
       var renderedVerts = renderer.FinishCollectingVertData();
 
       for (int i = 0; i < verts.Length; i++) {
-        Vector3 vert = verts[i] + deltaVerts[i];
+        Vector3 vert = verts[i];
         Vector3 rendererLocalVert = renderer.transform.InverseTransformPoint(oneGraphic.transform.TransformPoint(vert));
         Vector3 warpedLocalVert = oneGraphic.transformer.TransformPoint(rendererLocalVert);
         Vector3 warpedWorldVert = renderer.transform.TransformPoint(warpedLocalVert);

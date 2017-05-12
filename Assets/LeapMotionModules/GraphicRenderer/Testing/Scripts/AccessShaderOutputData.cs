@@ -40,6 +40,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       Graphics.ClearRandomWriteTargets();
 
       _buffer.Release();
+      targetCamera.enabled = false;
 
       return array;
     }
