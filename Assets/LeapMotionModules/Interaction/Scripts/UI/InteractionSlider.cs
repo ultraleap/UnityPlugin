@@ -10,6 +10,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using Leap.Unity.Attributes;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction {
 
@@ -114,7 +115,17 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private void CalculateSliderValues() {
+    protected override void OnEnable() {
+      base.OnEnable();
+      OnContactStay += CalculateSliderValues;
+    }
+
+    protected override void OnDisable() {
+      OnContactStay -= CalculateSliderValues;
+      base.OnDisable();
+    }
+
+    private void CalculateSliderValues(List<InteractionHand> hands = null) {
       //Calculate the Renormalized Slider Values
       if (_horizontalSlideLimits.x != _horizontalSlideLimits.y) {
         _horizontalSliderPercent = Mathf.InverseLerp(initialLocalPosition.x + _horizontalSlideLimits.x, initialLocalPosition.x + _horizontalSlideLimits.y, localPhysicsPosition.x);
