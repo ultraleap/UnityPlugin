@@ -148,7 +148,7 @@ MonoBehaviour:
         _useColors: 0
         _bakedTint: {r: 1, g: 1, b: 1, a: 1}
         _useNormals: 0
-        _shader: {fileID: 4800000, guid: 96ab3ac584521be48aebc8d3fc852ab4, type: 3}
+        _shader: {fileID: 4800000, guid: 474347a7dd23a1743b7bdfa349be986b, type: 3}
         _visualLayer:
           layerIndex: 0
         _atlas:

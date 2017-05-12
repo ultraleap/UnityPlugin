@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
+using System.IO;
 using System.Collections;
 
 namespace Leap.Unity.GraphicalRenderer.Tests {
 
   public class TestActualShaderOutput : GraphicRendererTestBase {
+    public const string FOLDER_NAME = "ShaderOutputTestPrefabs";
 
     /// <summary>
     /// Just a basic test to verify that the system for reading back
@@ -15,7 +17,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     /// <returns></returns>
     [UnityTest]
     public IEnumerator DoesCorrectlyRenderOutput([Values("OneDynamicGroup", "OneCylindricalDynamicGroup", "OneSphericalDynamicGroup")] string rendererPrefab) {
-      InitTest(rendererPrefab);
+      InitTest(Path.Combine(FOLDER_NAME, rendererPrefab));
       yield return null;
 
       //To get around gpu values holding over from previous tests
