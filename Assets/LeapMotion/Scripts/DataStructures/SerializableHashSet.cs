@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
@@ -91,8 +92,14 @@ namespace Leap.Unity {
 
       //Add any values not accounted for
       foreach (var value in this) {
-        if (!_values.Contains(value)) {
-          _values.Add(value);
+        if (isNull(value)) {
+          if (!_values.Query().Any(obj => isNull(obj))) {
+            _values.Add(value);
+          }
+        } else {
+          if (!_values.Contains(value)) {
+            _values.Add(value);
+          }
         }
       }
 #else
@@ -100,6 +107,18 @@ namespace Leap.Unity {
       _values.Clear();
       _values.AddRange(this);
 #endif
+    }
+
+    private bool isNull(object obj) {
+      if (obj == null) {
+        return true;
+      }
+
+      if (obj is Object) {
+        return (obj as Object) == null;
+      }
+
+      return false;
     }
   }
 }
