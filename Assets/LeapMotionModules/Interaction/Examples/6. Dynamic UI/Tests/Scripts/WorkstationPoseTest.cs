@@ -24,9 +24,6 @@ namespace Leap.Unity.Examples {
     [Disable]
     public List<float> otherOpenStationRadii = new List<float>();
 
-    private Vector3 _targetPosition;
-    private Quaternion _targetRotation;
-
     void Update() {
       if (userCamera == null) return;
       if (stationObj == null) return;
@@ -36,13 +33,14 @@ namespace Leap.Unity.Examples {
       refreshLists();
       refreshRadius();
 
-      WorkstationBehaviour.DetermineWorkstationPose(userCamera.position, userCamera.rotation,
-                                                    stationObj.position, (stationObjOneSecLater.transform.position - stationObj.position),
-                                                    otherOpenStationPositions, otherOpenStationRadii,
-                                                    out _targetPosition, out _targetRotation);
+      Vector3 targetPosition = WorkstationBehaviour.DefaultDetermineWorkstationPosition(userCamera.position, userCamera.rotation,
+                                                               stationObj.position, (stationObjOneSecLater.position - stationObj.position),
+                                                               otherOpenStationPositions, otherOpenStationRadii);
 
-      this.transform.position = _targetPosition;
-      this.transform.rotation = _targetRotation;
+      Quaternion targetRotation = WorkstationBehaviour.DefaultDetermineWorkstationRotation(userCamera.position, targetPosition);
+
+      this.transform.position = targetPosition;
+      this.transform.rotation = targetRotation;
     }
 
     private void refreshLists() {

@@ -5,29 +5,47 @@ using UnityEngine;
 
 namespace Leap.Unity.Interaction {
 
+  /// <summary>
+  /// This example script constructs behavior for a very specific kind of UI object that can
+  /// animate out a "workstation" panel when thrown or placed outside of an anchor.
+  /// 
+  /// Workstation objects exhibit the following behaviors:
+  /// - Play a tween forwards or backwards when entering or exiting "workstation mode",
+  ///   to open or close an arbitrary transform containing other UI elements.
+  /// - Smoothly fly to a "good" target location and orientation and enter workstation mode
+  ///   when the user throws the anchorable object.
+  /// - Set the anchorable object to kinematic when in workstation mode.
+  /// - Allow the user to adjust the anchorable object's position and rotation in a constrained
+  ///   way while in workstation mode. If the user moves the anchorable object quickly, exit
+  ///   workstation mode.
+  /// 
+  /// It is a more complicated example that demonstrates using InteractionBehaviours and
+  /// AnchorableBehaviours to create novel UI behavior.
+  /// </summary>
   [RequireComponent(typeof(InteractionBehaviour))]
   [RequireComponent(typeof(AnchorableBehaviour))]
+  [AddComponentMenu("")]
   public class WorkstationBehaviour : MonoBehaviour {
 
     /// <summary>
     /// If the rigidbody of this object moves faster than this speed and the object
     /// is in workstation mode, it will exit workstation mode.
     /// </summary>
-    public const float MAX_SPEED_AS_WORKSTATION = 0.2F;
+    public const float MAX_SPEED_AS_WORKSTATION = 1.5F;
 
     /// <summary>
     /// If the rigidbody of this object moves slower than this speed and the object
     /// wants to enter workstation mode, it will first pick a target position and
     /// travel there. (Otherwise, it will open its workstation in-place.)
     /// </summary>
-    public const float MIN_SPEED_TO_ACTIVATE_TRAVELING = 0.2F;
+    public const float MIN_SPEED_TO_ACTIVATE_TRAVELING = 0.5F;
 
     public TransformTweenBehaviour workstationModeTween;
 
-    public float workstationPositionTravelTime = 0.33F;
-
     private InteractionBehaviour _intObj;
     private AnchorableBehaviour _anchObj;
+
+    private bool _wasKinematicBeforeActivation = false;
 
     /// <summary>
     /// Gets whether the workstation is currently traveling to a target position to open
@@ -65,6 +83,10 @@ namespace Leap.Unity.Interaction {
       refreshRequiredComponents();
     }
 
+    void Awake() {
+      initWorkstationPoseFunctions();
+    }
+
     void Start() {
       refreshRequiredComponents();
 
@@ -80,10 +102,17 @@ namespace Leap.Unity.Interaction {
     }
 
     public void ActivateWorkstation() {
+      if (workstationState != WorkstationState.Open) {
+        _wasKinematicBeforeActivation = _intObj.rigidbody.isKinematic;
+        _intObj.rigidbody.isKinematic = true;
+      }
+
       workstationModeTween.PlayForward();
     }
 
     public void DeactivateWorkstation() {
+      _intObj.rigidbody.isKinematic = _wasKinematicBeforeActivation;
+
       workstationModeTween.PlayBackward();
     }
 
@@ -102,33 +131,37 @@ namespace Leap.Unity.Interaction {
         DeactivateWorkstation();
       }
 
-      // If the velocity of the object while grasped is even slightly large, exit workstation mode.
-      if (_intObj.rigidbody.velocity.magnitude > MAX_SPEED_AS_WORKSTATION) {
+      // If the velocity of the object while grasped is too large, exit workstation mode.
+      if (_intObj.rigidbody.velocity.magnitude > MAX_SPEED_AS_WORKSTATION
+          || (_intObj.rigidbody.isKinematic && ((preSolvePos - curPos).magnitude / Time.fixedDeltaTime) > MAX_SPEED_AS_WORKSTATION)) {
         DeactivateWorkstation();
       }
 
-      // Lock our rotation while in workstation mode.
+      // Lock our upward axis while workstation mode is open.
       if (workstationState == WorkstationState.Open) {
-        _intObj.rigidbody.rotation = preSolveRot;
+        _intObj.rigidbody.rotation = (Quaternion.FromToRotation(_intObj.rigidbody.rotation * Vector3.up, Vector3.up)) * _intObj.rigidbody.rotation;
+        _intObj.transform.rotation = _intObj.rigidbody.rotation;
       }
     }
 
     private void onPostObjectGraspEnd(AnchorableBehaviour anchObj) {
       if (_anchObj.preferredAnchor == null) {
-        // Enter workstation mode immediately if our velocity is small.
-        if ( _intObj.rigidbody.velocity.magnitude < MIN_SPEED_TO_ACTIVATE_TRAVELING) {
-          ActivateWorkstation();
+        // Choose a good position and rotation for workstation mode and begin traveling there.
+        Vector3 targetPosition;
+
+        // Choose the current position if our velocity is small.
+        if (_intObj.rigidbody.velocity.magnitude < MIN_SPEED_TO_ACTIVATE_TRAVELING) {
+          targetPosition = _intObj.rigidbody.position;
         }
         else {
-          // Choose a good workstation position and rotation and begin traveling there.
-          Vector3 targetPosition;
-          Quaternion targetRotation;
-          determineWorkstationPose(out targetPosition, out targetRotation);
-
-          beginTraveling(_intObj.rigidbody.position, _intObj.rigidbody.velocity,
-                         _intObj.rigidbody.rotation, _intObj.rigidbody.angularVelocity,
-                         targetPosition, targetRotation);
+          targetPosition = determineWorkstationPosition();
         }
+
+        Quaternion targetRotation = determineWorkstationRotation(targetPosition);
+
+        beginTraveling(_intObj.rigidbody.position, _intObj.rigidbody.velocity,
+                       _intObj.rigidbody.rotation, _intObj.rigidbody.angularVelocity,
+                       targetPosition, targetRotation);
       }
       else {
         // Ensure the workstation is not active or being deactivated if
@@ -150,6 +183,9 @@ namespace Leap.Unity.Interaction {
     private Vector3    _travelTargetPosition;
     private Quaternion _travelTargetRotation;
 
+    private Vector2 _minMaxWorkstationTravelTime    = new Vector2(0.02F, 0.50F);
+    private Vector2 _minMaxTravelTimeFromThrowSpeed = new Vector2(0.40F, 1.50F);
+
     private void beginTraveling(Vector3 initPosition, Vector3 initVelocity,
                                 Quaternion initRotation, Vector3 initAngVelocity,
                                 Vector3 targetPosition, Quaternion targetRotation) {
@@ -166,9 +202,11 @@ namespace Leap.Unity.Interaction {
       // and specify a custom callback as it progresses to update the
       // object's position and rotation.
       _travelTween = Tween.Single()
-                          .OverTime(workstationPositionTravelTime)
+                          .OverTime(_initTravelVelocity.magnitude.Map(_minMaxTravelTimeFromThrowSpeed.x, _minMaxTravelTimeFromThrowSpeed.y,
+                                                                      _minMaxWorkstationTravelTime.x, _minMaxWorkstationTravelTime.y))
                           .OnProgress(onTravelTweenProgress)
-                          .OnReachEnd(ActivateWorkstation); // When the tween is finished, open workstation mode.
+                          .OnReachEnd(ActivateWorkstation) // When the tween is finished, open workstation mode.
+                          .Play();
     }
 
     private void onTravelTweenProgress(float progress) {
@@ -208,23 +246,79 @@ namespace Leap.Unity.Interaction {
 
     #region Workstation Pose
 
-    private void determineWorkstationPose(out Vector3 position, out Quaternion rotation) {
-      position = Vector3.zero;
-      rotation = Quaternion.identity;
+    public delegate Vector3 WorkstationPositionFunc(Vector3 userEyePosition, Quaternion userEyeRotation,
+                                                 Vector3 workstationObjInitPosition, Vector3 workstationObjInitVelocity,
+                                                 List<Vector3> otherWorkstationPositions, List<float> otherWorkstationRadii);
+
+    public delegate Quaternion WorkstationRotationFunc(Vector3 userEyePosition, Vector3 targetWorkstationPosition);
+
+    /// <summary>
+    /// The function used to calculate this workstation's target position. By default, will attempt to choose
+    /// a nearby position approximately in front of the user and in the direction the workstation object is currently
+    /// traveling, and a position that doesn't overlap with other workstations. The default method is set on Awake(),
+    /// so it can be overridden in OnEnable() or Start().
+    /// </summary>
+    public WorkstationPositionFunc workstationPositionFunc;
+
+    /// <summary>
+    /// The function used to calculate this workstation's target rotation. By default, will make the workstation's
+    /// forward vector face the camera while aligning its upward vector against gravity.
+    /// </summary>
+    public WorkstationRotationFunc workstationRotationFunc;
+
+    private List<Vector3> _otherStationObjPositions = new List<Vector3>();
+    private List<float> _otherStationObjRadii = new List<float>();
+
+    // Called on Awake(); possible to override the default functions in a MonoBehaviour's Start().
+    private void initWorkstationPoseFunctions() {
+      workstationPositionFunc = DefaultDetermineWorkstationPosition;
+      workstationRotationFunc = DefaultDetermineWorkstationRotation;
     }
 
-    public static void DetermineWorkstationPose(Vector3 userEyePos, Quaternion userEyeRot,
-                                                Vector3 stationObjPos, Vector3 stationObjVel,
-                                                List<Vector3> otherStationPositions, List<float> otherStationRadii,
-                                                out Vector3 stationPos, out Quaternion stationRot) {
-      Vector3 groundPlaneVelocity = Vector3.ProjectOnPlane(stationObjVel, Vector3.up);
-      
-      float minPlacementDistance = 0.40F;
-      float maxPlacementDistance = 0.60F;
-      float minDotProductFromFacing = 0.17F;
+    private Vector3 determineWorkstationPosition() {
+      return workstationPositionFunc(Camera.main.transform.position, Camera.main.transform.rotation,
+                                     _intObj.rigidbody.position, _intObj.rigidbody.velocity,
+                                     _otherStationObjPositions, _otherStationObjRadii);
+    }
 
-      stationPos = stationObjPos;
-      stationRot = userEyeRot;
+    private Quaternion determineWorkstationRotation(Vector3 workstationPosition) {
+      return workstationRotationFunc(Camera.main.transform.position, workstationPosition);
+    }
+
+    public static Vector3 DefaultDetermineWorkstationPosition(Vector3 userEyePosition, Quaternion userEyeRotation,
+                                                Vector3 workstationObjInitPosition, Vector3 workstationObjInitVelocity,
+                                                List<Vector3> otherWorkstationPositions, List<float> otherWorkstationRadii) {
+      Vector3 groundPlaneVelocity = Vector3.ProjectOnPlane(workstationObjInitVelocity, Vector3.up);
+      float groundPlaneDirectedness = groundPlaneVelocity.magnitude.Map(0.003F, 0.02F, 0F, 1F);
+      Vector3 groundPlaneDirection = groundPlaneVelocity.normalized;
+
+      Vector3 cameraGroundPlaneForward = Vector3.ProjectOnPlane(userEyeRotation * Vector3.forward, Vector3.up);
+      float cameraGroundPlaneDirectedness = cameraGroundPlaneForward.magnitude.Map(0.001F, 0.01F, 0F, 1F);
+      Vector3 alternateCameraDirection = (userEyeRotation * Vector3.forward).y > 0F ? userEyeRotation * Vector3.down : userEyeRotation * Vector3.up;
+      cameraGroundPlaneForward = Vector3.Slerp(alternateCameraDirection, cameraGroundPlaneForward, cameraGroundPlaneDirectedness);
+      cameraGroundPlaneForward = cameraGroundPlaneForward.normalized;
+
+      //float minDotProductFromFacing = -0.57F;
+      Vector3 placementDirection = Vector3.Slerp(cameraGroundPlaneForward, groundPlaneDirection, groundPlaneDirectedness);
+      
+      float minPlacementDistance = 0.25F;
+      float maxPlacementDistance = 0.55F;
+      Vector3 placementPosition = userEyePosition + placementDirection * Mathf.Lerp(minPlacementDistance, maxPlacementDistance,
+                                                                                    (groundPlaneDirectedness * workstationObjInitVelocity.magnitude)
+                                                                                    .Map(0F, 1.50F, 0F, 1F));
+      
+      float placementHeightFromCamera = -0.30F;
+      placementPosition.y = userEyePosition.y + placementHeightFromCamera;
+
+      return placementPosition;
+    }
+
+    public static Quaternion DefaultDetermineWorkstationRotation(Vector3 userEyePos, Vector3 workstationPosition) {
+      Vector3 toCamera = userEyePos - workstationPosition;
+      toCamera.y = 0F;
+      Quaternion placementRotation = Quaternion.LookRotation(toCamera.normalized, Vector3.up);
+
+      return placementRotation;
     }
 
     #endregion

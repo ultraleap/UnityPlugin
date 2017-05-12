@@ -28,14 +28,14 @@ public class SimpleInteractionGlow : MonoBehaviour {
   [Tooltip("If enabled, the object will use its primaryHoverColor when the primary hover of an InteractionHand.")]
   public bool usePrimaryHover = false;
 
-  //[Header("InteractionBehaviour Colors")]
-  private Color defaultColor = Color.Lerp(Color.black, Color.white, 0.1F);
-  private Color suspendedColor = Color.red;
-  private Color hoverColor = Color.Lerp(Color.black, Color.white, 0.7F);
-  private Color primaryHoverColor = Color.Lerp(Color.black, Color.white, 0.5F);
+  [Header("InteractionBehaviour Colors")]
+  public Color defaultColor = Color.Lerp(Color.black, Color.white, 0.1F);
+  public Color suspendedColor = Color.red;
+  public Color hoverColor = Color.Lerp(Color.black, Color.white, 0.7F);
+  public Color primaryHoverColor = Color.Lerp(Color.black, Color.white, 0.5F);
 
-  //[Header("InteractionButton Colors")]
-  //[Tooltip("This color only applies if the object is an InteractionButton or InteractionSlider.")]
+  [Header("InteractionButton Colors")]
+  [Tooltip("This color only applies if the object is an InteractionButton or InteractionSlider.")]
   private Color pressedColor = Color.white;
 
   private Material _material;
