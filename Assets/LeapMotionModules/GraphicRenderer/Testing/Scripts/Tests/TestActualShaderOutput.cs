@@ -3,6 +3,7 @@ using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.IO;
 using System.Collections;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer.Tests {
 
@@ -44,7 +45,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       Vector3[] deltaVerts = new Vector3[verts.Length];
       Vector3[] deltaNormals = new Vector3[verts.Length];
       Vector3[] deltaTangents = new Vector3[verts.Length];
-      if (oneMeshGraphic.mesh.blendShapeCount > 0) {
+      if (oneMeshGraphic.mesh.blendShapeCount > 0 && oneGraphic.featureData.Query().OfType<LeapBlendShapeData>().Any()) {
         oneMeshGraphic.mesh.GetBlendShapeFrameVertices(0, 0, deltaVerts, deltaNormals, deltaTangents);
       }
 
