@@ -49,6 +49,13 @@ namespace Leap.Unity.Query {
     /// Returns a new query operation that represents the combination of this query sequence with another
     /// query sequence.  The two sequences are combined element-by-element using a selector function.
     /// The resulting sequence has a length equal to the smaller of the two sequences.
+    /// 
+    /// For example:
+    ///   sequenceA = (A, B, C, D)
+    ///   sequenceB = (E, F, G, H)
+    ///   sequenceA.Query().Zip(sequenceB.Query(), (a, b) => a + b)
+    /// Would result in:
+    ///   (AE, BF, CG, DH)
     /// </summary>
     public QueryWrapper<NewType, ZipOp<NewType, QueryType, OtherType, QueryOp, OtherOp>> Zip<NewType, OtherType, OtherOp>(QueryWrapper<OtherType, OtherOp> sourceB, Func<QueryType, OtherType, NewType> resultSelector)
       where OtherOp : IQueryOp<OtherType> {

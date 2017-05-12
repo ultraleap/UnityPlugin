@@ -53,6 +53,11 @@ namespace Leap.Unity.Query {
     /// Returns a new query operation that takes values while the predicate returns true.  As soon
     /// as the predicate returns false, the sequence will return no more elements.  Even if the
     /// predicate becomes true again, the sequence will still halt.
+    /// 
+    /// For example:
+    ///   (1, 3, 9, -1, 5, -4, 9).Query().TakeWhile(isPositive)
+    /// Would result in:
+    ///   (1, 3, 9)
     /// </summary>
     public QueryWrapper<QueryType, TakeWhileOp<QueryType, QueryOp>> TakeWhile(Func<QueryType, bool> predicate) {
       return new QueryWrapper<QueryType, TakeWhileOp<QueryType, QueryOp>>(new TakeWhileOp<QueryType, QueryOp>(_op, predicate));

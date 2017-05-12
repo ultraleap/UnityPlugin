@@ -72,6 +72,11 @@ namespace Leap.Unity.Query {
     /// Returns a new query operation representing the current query sequence where each element has been
     /// mapped onto an entire query sequence, and then all sequences are concatenated into a single long 
     /// sequence.
+    /// 
+    /// For example:
+    ///   (1, 2, 3, 4).Query().SelectMany(count => new List().Fill(count, count.ToString()).Query())
+    /// Would result in:
+    ///   ("1", "2", "2", "3", "3", "3", "4", "4", "4", "4")
     /// </summary>
     public QueryWrapper<NewType, SelectManyOp<QueryType, NewType, QueryOp, NewOp>> SelectMany<NewType, NewOp>(Func<QueryType, QueryWrapper<NewType, NewOp>> selector)
       where NewOp : IQueryOp<NewType> {

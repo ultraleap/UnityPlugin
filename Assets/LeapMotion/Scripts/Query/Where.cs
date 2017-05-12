@@ -42,6 +42,11 @@ namespace Leap.Unity.Query {
     /// <summary>
     /// Returns a new query operation representing only the elements of the sequence for which
     /// the predicate returns true.
+    /// 
+    /// For example:
+    ///   (1, 2, 3, 4, 5, 6, 7).Query().Where(isEven)
+    /// Would result in:
+    ///   (2, 4, 6)
     /// </summary>
     public QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>> Where(Func<QueryType, bool> predicate) {
       return new QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>>(new WhereOp<QueryType, QueryOp>(_op, predicate));

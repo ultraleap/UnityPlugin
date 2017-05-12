@@ -47,6 +47,11 @@ namespace Leap.Unity.Query {
     /// <summary>
     /// Returns a new query operation representing the concatenation of the current query sequence to
     /// the argument query sequence.
+    /// 
+    /// For example
+    ///   (A, B, C, D).Query().Concat((E, F, G, H))
+    ///  would result in
+    ///   (A, B, C, D, E, F, G, H)
     /// </summary>
     public QueryWrapper<QueryType, ConcatOp<QueryType, QueryOp, SourceBOp>> Concat<SourceBOp>(QueryWrapper<QueryType, SourceBOp> sourceB)
       where SourceBOp : IQueryOp<QueryType> {

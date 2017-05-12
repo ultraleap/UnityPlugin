@@ -45,6 +45,11 @@ namespace Leap.Unity.Query {
     /// <summary>
     /// Returns a new query operation representing only the items of the current sequence that
     /// are of a specific type.
+    /// 
+    /// For example
+    ///   ("A", 1, null, 5.0f, 900, "hello").Query().OfType<string>()
+    /// would result in
+    ///   ("A", "hello")
     /// </summary>
     public QueryWrapper<CastType, OfTypeOp<QueryType, CastType, QueryOp>> OfType<CastType>() where CastType : class {
       return new QueryWrapper<CastType, OfTypeOp<QueryType, CastType, QueryOp>>(new OfTypeOp<QueryType, CastType, QueryOp>(_op));
@@ -53,6 +58,11 @@ namespace Leap.Unity.Query {
     /// <summary>
     /// Returns a new query operation representing only the items of the current sequence that
     /// are of a specific type.
+    /// 
+    /// For example
+    ///   ("A", 1, null, 5.0f, 900, "hello").Query().OfType(typeof(int))
+    /// would result in
+    ///   (1, 900)
     /// </summary>
     public QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>> OfType(Type type) {
       return new QueryWrapper<QueryType, WhereOp<QueryType, QueryOp>>(new WhereOp<QueryType, QueryOp>(_op, element => element != null && type.IsAssignableFrom(element.GetType())));

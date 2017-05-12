@@ -42,6 +42,11 @@ namespace Leap.Unity.Query {
     /// <summary>
     /// Returns a new query operation representing the current query sequence mapped element-by-element
     /// into a new query sequence by a mapping operation.
+    /// 
+    /// For example:
+    ///   (1, 2, 3, 4).Query().Select(num => (num * 2).ToString())
+    /// Would result in:
+    ///   ("2", "4", "6", "8")
     /// </summary>
     public QueryWrapper<NewType, SelectOp<QueryType, NewType, QueryOp>> Select<NewType>(Func<QueryType, NewType> mapping) {
       return new QueryWrapper<NewType, SelectOp<QueryType, NewType, QueryOp>>(new SelectOp<QueryType, NewType, QueryOp>(_op, mapping));
