@@ -16,7 +16,13 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     /// </summary>
     /// <returns></returns>
     [UnityTest]
-    public IEnumerator DoesCorrectlyRenderOutput([Values("OneDynamicGroup", "OneCylindricalDynamicGroup", "OneSphericalDynamicGroup")] string rendererPrefab) {
+    public IEnumerator DoesCorrectlyRenderOutput([Values("OneDynamicGroup",
+                                                         "OneCylindricalDynamicGroup",
+                                                         "OneSphericalDynamicGroup",
+                                                         "OneDynamicGroupWithBlendShapes",
+                                                         "OneCylindricalDynamicGroupWithBlendShapes",
+                                                         "OneSphericalDynamicGroupWithBlendShapes")]
+                                                 string rendererPrefab) {
       InitTest(Path.Combine(FOLDER_NAME, rendererPrefab));
       yield return null;
 
@@ -35,6 +41,13 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       oneMeshGraphic.RefreshMeshData();
       var verts = oneMeshGraphic.mesh.vertices;
 
+      Vector3[] deltaVerts = new Vector3[verts.Length];
+      Vector3[] deltaNormals = new Vector3[verts.Length];
+      Vector3[] deltaTangents = new Vector3[verts.Length];
+      if (oneMeshGraphic.mesh.blendShapeCount > 0) {
+        oneMeshGraphic.mesh.GetBlendShapeFrameVertices(0, 0, deltaVerts, deltaNormals, deltaTangents);
+      }
+
       yield return null;
 
       renderer.BeginCollectingVertData();
@@ -44,7 +57,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       var renderedVerts = renderer.FinishCollectingVertData();
 
       for (int i = 0; i < verts.Length; i++) {
-        Vector3 vert = verts[i];
+        Vector3 vert = verts[i] + deltaVerts[i];
         Vector3 rendererLocalVert = renderer.transform.InverseTransformPoint(oneGraphic.transform.TransformPoint(vert));
         Vector3 warpedLocalVert = oneGraphic.transformer.TransformPoint(rendererLocalVert);
         Vector3 warpedWorldVert = renderer.transform.TransformPoint(warpedLocalVert);
