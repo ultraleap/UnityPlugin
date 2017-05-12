@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using NUnit.Framework;
+using System.Reflection;
+using UnityEngine;
 
 namespace Leap.Unity.GraphicalRenderer.Tests {
 
@@ -25,7 +28,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     /// </summary>
     protected void InitTest(string prefabName) {
       var prefab = Resources.Load<GameObject>(prefabName);
-      var obj = Object.Instantiate(prefab);
+      var obj = UnityEngine.Object.Instantiate(prefab);
 
       renderer = obj.GetComponent<LeapGraphicRenderer>();
 
@@ -43,7 +46,7 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
     /// </summary>
     protected LeapGraphic CreateGraphic(string prefabName) {
       var prefab = Resources.Load<GameObject>(prefabName);
-      var obj = Object.Instantiate(prefab);
+      var obj = UnityEngine.Object.Instantiate(prefab);
       obj.transform.SetParent(renderer.transform);
 
       var graphic = obj.GetComponent<LeapGraphic>();
@@ -53,6 +56,43 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       }
 
       return graphic;
+    }
+
+    /// <summary>
+    /// Makes a shallow copy of the object by copying the values of each instance field
+    /// to a newly constructed object of the same type.
+    /// </summary>
+    protected object shallowCopy(object obj) {
+      Assert.That(obj, Is.Not.Null);
+
+      var copy = Activator.CreateInstance(obj.GetType());
+
+      foreach (var field in copy.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
+        field.SetValue(copy, field.GetValue(obj));
+      }
+
+      return copy;
+    }
+
+    /// <summary>
+    /// Asserts that the two objects have equal values for all of their fields that
+    /// are value types.  This method ignored variables that are reference types.
+    /// </summary>
+    protected void assertValueFieldsEqual(object a, object b) {
+      Assert.That(a, Is.Not.Null);
+      Assert.That(b, Is.Not.Null);
+
+      Assert.That(a.GetType(), Is.EqualTo(b.GetType()));
+
+      foreach (var field in a.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)) {
+        if (!field.FieldType.IsValueType) {
+          continue;
+        }
+
+        var valueA = field.GetValue(a);
+        var valueB = field.GetValue(b);
+        Assert.That(valueA, Is.EqualTo(valueB), "Field " + field.Name + " did not match");
+      }
     }
   }
 }

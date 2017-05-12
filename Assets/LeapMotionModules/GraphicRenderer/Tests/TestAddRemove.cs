@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace Leap.Unity.GraphicalRenderer.Tests {
 
-  public class AddRemoveTests : GraphicRendererTestBase {
+  public class TestAddRemove : GraphicRendererTestBase {
 
     /// <summary>
     /// Validate that a pre-added graphic reports itself as being
