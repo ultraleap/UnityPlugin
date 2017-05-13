@@ -123,8 +123,8 @@ GameObject:
   - component: {fileID: 266907297}
   - component: {fileID: 266907296}
   - component: {fileID: 266907295}
-  - component: {fileID: 266907294}
   - component: {fileID: 266907293}
+  - component: {fileID: 266907294}
   m_Layer: 0
   m_Name: CenterEyeAnchor
   m_TagString: MainCamera
@@ -196,12 +196,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 266907291}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 025cc0fa7b46aa541aba29d28d35ac09, type: 3}
+  m_Script: {fileID: 11500000, guid: 4bd4101d67c8f544986fc8551d1a0d4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isHeadMounted: 1
   _frameOptimization: 0
-  _overrideDeviceType: 1
+  _overrideDeviceType: 0
   _overrideDeviceTypeWith: 1
   _updateHandInPrecull: 0
 --- !u!114 &266907295

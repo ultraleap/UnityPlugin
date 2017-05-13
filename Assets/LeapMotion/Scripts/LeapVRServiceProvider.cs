@@ -14,6 +14,9 @@ using System;
 namespace Leap.Unity {
   /**LeapServiceProvider creates a Controller and supplies Leap Hands and images */
   public class LeapVRServiceProvider : LeapServiceProvider {
+    public static event Action<Camera> OnLeftPreRender;
+    public static event Action<Camera> OnRightPreRender;
+
     [Header("[Experimental]")]
     [Tooltip("Pass updated transform matrices to objects with materials using the VertexOffsetShader.")]
     [SerializeField]
@@ -23,8 +26,14 @@ namespace Leap.Unity {
     protected bool manualUpdateHasBeenCalledSinceUpdate;
     protected Vector3 warpedPosition = Vector3.zero;
     protected Quaternion warpedRotation = Quaternion.identity;
-
     protected Matrix4x4[] _transformArray = new Matrix4x4[2];
+
+    private Camera _cachedCamera;
+    public const string GLOBAL_EYE_UV_OFFSET_NAME = "_LeapGlobalStereoUVOffset";
+    private static Vector2 LEFT_EYE_UV_OFFSET = new Vector2(0, 0);
+    private static Vector2 RIGHT_EYE_UV_OFFSET = new Vector2(0, 0.5f);
+    private Matrix4x4 _projectionMatrix;
+    private bool IsLeftEye = true;
 
     [NonSerialized]
     public long imageTimeStamp = 0;
@@ -37,6 +46,11 @@ namespace Leap.Unity {
         resetTransforms();
         _updateHandInPrecull = value;
       }
+    }
+
+    protected override void Start() {
+      base.Start();
+      _cachedCamera = GetComponent<Camera>();
     }
 
     protected override void Update() {
@@ -69,7 +83,31 @@ namespace Leap.Unity {
         InputTracking.GetLocalRotation(VRNode.CenterEye),
         leap_controller_.Now());
 
-      LateUpdateHandTransforms(Camera.main);
+      LateUpdateHandTransforms(_cachedCamera);
+      
+      _projectionMatrix = _cachedCamera.projectionMatrix;
+      
+      switch (SystemInfo.graphicsDeviceType) {
+        case UnityEngine.Rendering.GraphicsDeviceType.Direct3D9:
+        case UnityEngine.Rendering.GraphicsDeviceType.Direct3D11:
+        case UnityEngine.Rendering.GraphicsDeviceType.Direct3D12:
+          for (int i = 0; i < 4; i++) {
+            _projectionMatrix[1, i] = -_projectionMatrix[1, i];
+          }
+          // Scale and bias from OpenGL -> D3D depth range
+          for (int i = 0; i < 4; i++) {
+            _projectionMatrix[2, i] = _projectionMatrix[2, i] * 0.5f + _projectionMatrix[3, i] * 0.5f;
+          }
+          break;
+      }
+
+      //Update Image Warping
+      Vector3 position; Quaternion rotation;
+      transformHistory.SampleTransform(imageTimeStamp /*- ((long)_smoothedTrackingLatency.value+20000)*/, out position, out rotation);
+      Quaternion imageQuatWarp = Quaternion.Inverse(InputTracking.GetLocalRotation(VRNode.CenterEye)) * rotation;
+      imageQuatWarp = Quaternion.Euler(imageQuatWarp.eulerAngles.x, imageQuatWarp.eulerAngles.y, -imageQuatWarp.eulerAngles.z);
+      Matrix4x4 imageMatWarp = _projectionMatrix * Matrix4x4.TRS(Vector3.zero, imageQuatWarp, Vector3.one) * _projectionMatrix.inverse;
+      Shader.SetGlobalMatrix("_LeapGlobalWarpedOffset", imageMatWarp);
     }
 
     protected virtual void OnEnable() {
@@ -105,7 +143,7 @@ namespace Leap.Unity {
       LeapTransform leapTransform;
       if (VRSettings.enabled && VRDevice.isPresent && transformHistory != null) {
         if (updateTemporalCompensation && transformHistory.history.IsFull) {
-          transformHistory.SampleTransform(timestamp - (long)_smoothedTrackingLatency.value, out warpedPosition, out warpedRotation);
+          transformHistory.SampleTransform(timestamp - ((long)_smoothedTrackingLatency.value), out warpedPosition, out warpedRotation);
         }
 
         warpedRotation *= Quaternion.Euler(-90f, 180f, 0f);
