@@ -12,7 +12,7 @@ namespace Leap.Unity.Examples {
     public Color color = Color.red;
 
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      if (!gameObject.active) return;
+      if (!gameObject.activeInHierarchy) return;
 
       drawer.color = color;
       drawer.DrawWireSphere(this.transform.position, radius);

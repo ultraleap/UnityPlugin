@@ -33,11 +33,11 @@ namespace Leap.Unity.Examples {
       refreshLists();
       refreshRadius();
 
-      Vector3 targetPosition = WorkstationBehaviour.DefaultDetermineWorkstationPosition(userCamera.position, userCamera.rotation,
-                                                               stationObj.position, (stationObjOneSecLater.position - stationObj.position),
+      Vector3 targetPosition = WorkstationBehaviourExample.DefaultDetermineWorkstationPosition(userCamera.position, userCamera.rotation,
+                                                               stationObj.position, (stationObjOneSecLater.position - stationObj.position), myRadius,
                                                                otherOpenStationPositions, otherOpenStationRadii);
 
-      Quaternion targetRotation = WorkstationBehaviour.DefaultDetermineWorkstationRotation(userCamera.position, targetPosition);
+      Quaternion targetRotation = WorkstationBehaviourExample.DefaultDetermineWorkstationRotation(userCamera.position, targetPosition);
 
       this.transform.position = targetPosition;
       this.transform.rotation = targetRotation;

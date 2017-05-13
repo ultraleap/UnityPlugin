@@ -36,7 +36,7 @@ public class SimpleInteractionGlow : MonoBehaviour {
 
   [Header("InteractionButton Colors")]
   [Tooltip("This color only applies if the object is an InteractionButton or InteractionSlider.")]
-  private Color pressedColor = Color.white;
+  public Color pressedColor = Color.white;
 
   private Material _material;
 

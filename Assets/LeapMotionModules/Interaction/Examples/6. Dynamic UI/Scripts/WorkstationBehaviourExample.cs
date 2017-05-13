@@ -1,9 +1,10 @@
 ﻿using Leap.Unity.Animation;
+using Leap.Unity.Interaction;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Leap.Unity.Interaction {
+namespace Leap.Unity.Examples {
 
   /// <summary>
   /// This example script constructs behavior for a very specific kind of UI object that can
@@ -25,13 +26,13 @@ namespace Leap.Unity.Interaction {
   [RequireComponent(typeof(InteractionBehaviour))]
   [RequireComponent(typeof(AnchorableBehaviour))]
   [AddComponentMenu("")]
-  public class WorkstationBehaviour : MonoBehaviour {
+  public class WorkstationBehaviourExample : MonoBehaviour {
 
     /// <summary>
     /// If the rigidbody of this object moves faster than this speed and the object
     /// is in workstation mode, it will exit workstation mode.
     /// </summary>
-    public const float MAX_SPEED_AS_WORKSTATION = 1.5F;
+    public const float MAX_SPEED_AS_WORKSTATION = 0.005F;
 
     /// <summary>
     /// If the rigidbody of this object moves slower than this speed and the object
@@ -172,6 +173,8 @@ namespace Leap.Unity.Interaction {
 
     #region Traveling
 
+    private const float MAX_TRAVEL_SPEED = 4.00F;
+
     private Tween _travelTween;
 
     private float      _initTravelTime = 0F;
@@ -179,21 +182,32 @@ namespace Leap.Unity.Interaction {
     private Vector3    _initTravelVelocity = Vector3.zero;
     private Quaternion _initTravelRotation = Quaternion.identity;
     private Vector3    _initTravelAngVelocity = Vector3.zero;
+    private Vector3    _effGravity = Vector3.zero;
 
     private Vector3    _travelTargetPosition;
     private Quaternion _travelTargetRotation;
 
-    private Vector2 _minMaxWorkstationTravelTime    = new Vector2(0.02F, 0.50F);
-    private Vector2 _minMaxTravelTimeFromThrowSpeed = new Vector2(0.40F, 1.50F);
+    private Vector2 _minMaxWorkstationTravelTime    = new Vector2(0.05F, 1.00F);
+    private Vector2 _minMaxTravelTimeFromThrowSpeed = new Vector2(0.30F, 8.00F);
 
     private void beginTraveling(Vector3 initPosition, Vector3 initVelocity,
                                 Quaternion initRotation, Vector3 initAngVelocity,
                                 Vector3 targetPosition, Quaternion targetRotation) {
+      _initTravelTime        = Time.time;
       _initTravelPosition    = initPosition;
       _initTravelVelocity    = initVelocity;
       _initTravelRotation    = initRotation;
       _initTravelAngVelocity = initAngVelocity;
-      _initTravelTime        = Time.time;
+
+      float velMagnitude = _initTravelVelocity.magnitude;
+      if (velMagnitude > MAX_TRAVEL_SPEED) {
+        float capSpeedMultiplier = MAX_TRAVEL_SPEED / velMagnitude;
+        _initTravelVelocity *= capSpeedMultiplier;
+      }
+
+      _effGravity            = Vector3.Lerp(Vector3.zero, Physics.gravity, initVelocity.magnitude.Map(0.80F, 3F, 0F, 0.70F));
+
+
 
       _travelTargetPosition = targetPosition;
       _travelTargetRotation = targetRotation;
@@ -211,7 +225,7 @@ namespace Leap.Unity.Interaction {
 
     private void onTravelTweenProgress(float progress) {
       float      curTime = Time.time;
-      Vector3    extrapolatedPosition = evaluatePosition(_initTravelPosition, _initTravelVelocity,    _initTravelTime, curTime);
+      Vector3    extrapolatedPosition = evaluatePosition(_initTravelPosition, _initTravelVelocity, _effGravity, _initTravelTime, curTime);
       Quaternion extrapolatedRotation = evaluateRotation(_initTravelRotation, _initTravelAngVelocity, _initTravelTime, curTime);
       
       // Interpolate from the position and rotation that the object would naturally have over time
@@ -229,9 +243,9 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Evaluates the position of a body over time with initial velocity and acceleration due to gravity.
     /// </summary>
-    private Vector3 evaluatePosition(Vector3 initialPosition, Vector3 initialVelocity, float initialTime, float timeToEvaluate) {
+    private Vector3 evaluatePosition(Vector3 initialPosition, Vector3 initialVelocity, Vector3 gravity, float initialTime, float timeToEvaluate) {
       float t = timeToEvaluate - initialTime;
-      return initialPosition + (initialVelocity * t) + (0.5f * Physics.gravity * t * t);
+      return initialPosition + (initialVelocity * t) + (0.5f * gravity * t * t);
     }
 
     /// <summary>
@@ -247,7 +261,7 @@ namespace Leap.Unity.Interaction {
     #region Workstation Pose
 
     public delegate Vector3 WorkstationPositionFunc(Vector3 userEyePosition, Quaternion userEyeRotation,
-                                                 Vector3 workstationObjInitPosition, Vector3 workstationObjInitVelocity,
+                                                 Vector3 workstationObjInitPosition, Vector3 workstationObjInitVelocity, float workstationObjRadius,
                                                  List<Vector3> otherWorkstationPositions, List<float> otherWorkstationRadii);
 
     public delegate Quaternion WorkstationRotationFunc(Vector3 userEyePosition, Vector3 targetWorkstationPosition);
@@ -277,7 +291,7 @@ namespace Leap.Unity.Interaction {
 
     private Vector3 determineWorkstationPosition() {
       return workstationPositionFunc(Camera.main.transform.position, Camera.main.transform.rotation,
-                                     _intObj.rigidbody.position, _intObj.rigidbody.velocity,
+                                     _intObj.rigidbody.position, _intObj.rigidbody.velocity, 0.30F,
                                      _otherStationObjPositions, _otherStationObjRadii);
     }
 
@@ -286,29 +300,52 @@ namespace Leap.Unity.Interaction {
     }
 
     public static Vector3 DefaultDetermineWorkstationPosition(Vector3 userEyePosition, Quaternion userEyeRotation,
-                                                Vector3 workstationObjInitPosition, Vector3 workstationObjInitVelocity,
+                                                Vector3 workstationObjInitPosition, Vector3 workstationObjInitVelocity, float workstationObjRadius,
                                                 List<Vector3> otherWorkstationPositions, List<float> otherWorkstationRadii) {
+      // Push velocity away from the camera if necessary.
+      Vector3 towardsCamera = (userEyePosition - workstationObjInitPosition).normalized;
+      float towardsCameraness = Mathf.Clamp01(Vector3.Dot(towardsCamera, workstationObjInitVelocity.normalized));
+      workstationObjInitVelocity = workstationObjInitVelocity + Vector3.Lerp(Vector3.zero, -towardsCamera * 2.00F, towardsCameraness);
+
+      // Calculate velocity direction on the XZ plane.
       Vector3 groundPlaneVelocity = Vector3.ProjectOnPlane(workstationObjInitVelocity, Vector3.up);
-      float groundPlaneDirectedness = groundPlaneVelocity.magnitude.Map(0.003F, 0.02F, 0F, 1F);
+      float groundPlaneDirectedness = groundPlaneVelocity.magnitude.Map(0.003F, 0.40F, 0F, 1F);
       Vector3 groundPlaneDirection = groundPlaneVelocity.normalized;
 
+      // Calculate camera "forward" direction on the XZ plane.
       Vector3 cameraGroundPlaneForward = Vector3.ProjectOnPlane(userEyeRotation * Vector3.forward, Vector3.up);
       float cameraGroundPlaneDirectedness = cameraGroundPlaneForward.magnitude.Map(0.001F, 0.01F, 0F, 1F);
       Vector3 alternateCameraDirection = (userEyeRotation * Vector3.forward).y > 0F ? userEyeRotation * Vector3.down : userEyeRotation * Vector3.up;
       cameraGroundPlaneForward = Vector3.Slerp(alternateCameraDirection, cameraGroundPlaneForward, cameraGroundPlaneDirectedness);
       cameraGroundPlaneForward = cameraGroundPlaneForward.normalized;
 
-      //float minDotProductFromFacing = -0.57F;
+      // Calculate a placement direction based on the camera and throw directions on the XZ plane.
       Vector3 placementDirection = Vector3.Slerp(cameraGroundPlaneForward, groundPlaneDirection, groundPlaneDirectedness);
-      
+
+      // Calculate a placement position along the placement direction between min and max placement distances.
       float minPlacementDistance = 0.25F;
       float maxPlacementDistance = 0.55F;
       Vector3 placementPosition = userEyePosition + placementDirection * Mathf.Lerp(minPlacementDistance, maxPlacementDistance,
                                                                                     (groundPlaneDirectedness * workstationObjInitVelocity.magnitude)
                                                                                     .Map(0F, 1.50F, 0F, 1F));
+
+      // Don't move far if the initial velocity is small.
+      float overallDirectedness = workstationObjInitVelocity.magnitude.Map(0.00F, 3.00F, 0F, 1F);
+      placementPosition = Vector3.Lerp(workstationObjInitPosition, placementPosition, overallDirectedness * overallDirectedness);
       
+      // Enforce placement height.
       float placementHeightFromCamera = -0.30F;
       placementPosition.y = userEyePosition.y + placementHeightFromCamera;
+
+      // Enforce minimum placement away from user.
+      Vector2 cameraXZ = new Vector2(userEyePosition.x, userEyePosition.z);
+      Vector2 stationXZ = new Vector2(placementPosition.x, placementPosition.z);
+      float placementDist = Vector2.Distance(cameraXZ, stationXZ);
+      if (placementDist < minPlacementDistance) {
+        float distanceLeft = (minPlacementDistance - placementDist) + workstationObjRadius;
+        Vector2 xzDisplacement = (stationXZ - cameraXZ).normalized * distanceLeft;
+        placementPosition += new Vector3(xzDisplacement[0], 0F, xzDisplacement[1]);
+      }
 
       return placementPosition;
     }

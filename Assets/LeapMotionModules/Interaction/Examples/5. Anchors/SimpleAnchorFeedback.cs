@@ -9,8 +9,7 @@ namespace Leap.Unity.Examples {
   [AddComponentMenu("")]
   public class SimpleAnchorFeedback : MonoBehaviour {
 
-    //public float preferenceScale = 1.3F;
-    //public float anchoredScale = 1.5F;
+    public Transform scaleTarget;
 
     private Anchor _anchor;
 
@@ -20,7 +19,7 @@ namespace Leap.Unity.Examples {
     void Start() {
       _anchor = GetComponent<Anchor>();
 
-      _initScaleVector = this.transform.localScale;
+      _initScaleVector = scaleTarget.transform.localScale;
     }
 
     void Update() {
@@ -36,7 +35,7 @@ namespace Leap.Unity.Examples {
 
       _curScale = Mathf.Lerp(_curScale, _targetScale, 20F * Time.deltaTime);
 
-      this.transform.localScale = _curScale * _initScaleVector;
+      scaleTarget.transform.localScale = _curScale * _initScaleVector;
     }
 
   }

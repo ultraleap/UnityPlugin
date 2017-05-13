@@ -24,6 +24,12 @@ namespace Leap.Unity.Interaction {
            + "This property is enforced by AnchorGroups and AnchorableBehaviours.")]
     public bool allowMultipleObjects = false;
 
+    [Tooltip("Should this anchor attempt to enable and disable the GameObjects of attached "
+           + "AnchorableBehaviours when its own active state changes? If this setting is enabled, "
+           + "the Anchor will deactivate the attached objects when its own GameObject is deactivated "
+           + "or if its script is disabled, and similarly for becoming active or enabled.")]
+    public bool matchActiveStateWithAttachedObjects = false;
+
     private HashSet<AnchorGroup> _groups = new HashSet<AnchorGroup>();
     public HashSet<AnchorGroup> groups { get { return _groups; } }
 
@@ -78,12 +84,28 @@ namespace Leap.Unity.Interaction {
       allAnchors.Add(this);
     }
 
+    void OnEnable() {
+      if (matchActiveStateWithAttachedObjects) {
+        foreach (var anchObj in _anchoredObjects) {
+          anchObj.gameObject.SetActive(true);
+        }
+      }
+    }
+
     void Start() {
       initUnityEvents();
     }
 
     void Update() {
       updateAnchorCallbacks();
+    }
+
+    void OnAnchorDisabled() {
+      if (matchActiveStateWithAttachedObjects) {
+        foreach (var anchObj in _anchoredObjects) {
+          anchObj.gameObject.SetActive(false);
+        }
+      }
     }
 
     void OnDestroy() {
@@ -137,17 +159,17 @@ namespace Leap.Unity.Interaction {
 
     #region Gizmos
 
-    public static Color anchorGizmoColor = new Color(0.6F, 0.2F, 0.8F);
+    public static Color AnchorGizmoColor = new Color(0.6F, 0.2F, 0.8F);
 
-    void OnDrawGizmos() {
+    void OnDrawGizmosSelected() {
       Matrix4x4 origMatrix = Gizmos.matrix;
       Gizmos.matrix = this.transform.localToWorldMatrix;
-      Gizmos.color = anchorGizmoColor;
-      float radius = 0.02F;
+      Gizmos.color = AnchorGizmoColor;
+      float radius = 0.015F;
 
       drawWireSphereGizmo(Vector3.zero, radius);
 
-      drawSphereCirclesGizmo(8, Vector3.zero, radius, Vector3.up);
+      drawSphereCirclesGizmo(8, Vector3.zero, radius, Vector3.forward);
 
       Gizmos.matrix = origMatrix;
     }
@@ -156,14 +178,18 @@ namespace Leap.Unity.Interaction {
 
     private void drawWireSphereGizmo(Vector3 pos, float radius) {
       foreach (var dir in worldDirs) {
-        // TODO: Implement anchor gizmos
-        return;
+        Utils.DrawCircle(pos, dir, radius, AnchorGizmoColor, quality: 24, depthTest: true);
       }
     }
 
     private void drawSphereCirclesGizmo(int numCircles, Vector3 pos, float radius, Vector3 poleDir) {
-      // TODO: Implement anchor gizmos
-      return;
+      float dTheta = 180F / numCircles;
+      float halfTheta = dTheta / 2F;
+
+      for (int i = 0; i < numCircles; i++) {
+        float curTheta = (dTheta * i) + halfTheta;
+        Utils.DrawCircle(pos + poleDir * Mathf.Cos(curTheta * Mathf.Deg2Rad) * radius, poleDir, Mathf.Sin(curTheta * Mathf.Deg2Rad) * radius, AnchorGizmoColor, quality: 16, depthTest: true);
+      }
     }
 
     #endregion
@@ -179,7 +205,7 @@ namespace Leap.Unity.Interaction {
       WhileAnchorPreferred = 120,
       OnAnchorablesAttached = 130,
       OnNoAnchorablesAttached = 140,
-      WhileAnchorablesAttached = 150
+      WhileAnchorablesAttached = 150,
     }
 
     private void initUnityEvents() {

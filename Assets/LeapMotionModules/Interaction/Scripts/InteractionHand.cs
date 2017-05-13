@@ -663,7 +663,6 @@ namespace Leap.Unity.Interaction {
 
     private ContactBone InitBrushBone(Bone bone, GameObject contactBoneObj, int boneArrayIndex, Collider boneCollider) {
       contactBoneObj.layer = _brushBoneParent.layer;
-      // TODO: _contactBoneParent will need its layer set appropriately once interaction layers are implemented.
       contactBoneObj.transform.localScale = Vector3.one;
 
       ContactBone contactBone = contactBoneObj.GetComponent<ContactBone>();
@@ -805,23 +804,6 @@ namespace Leap.Unity.Interaction {
                                                                        ref interactionManager._softContactOriginalVelocities,
                                                                        ref _tempColliderArray);
             }
-
-            // Support allowing individual Interaction Behaviours to choose whether they are influenced by soft contact at trigger colliders
-            // NOPE nevermind
-            //_softContactIdxRemovalBuffer.Clear();
-            //for (int i = 0; i < interactionManager._softContacts.Count; i++) {
-            //  var softContact = interactionManager._softContacts[i];
-            //  IInteractionBehaviour intObj;
-            //  if (interactionManager.rigidbodyRegistry.TryGetValue(softContact.body, out intObj)) {
-            //    if (softContact.touchingTrigger && !intObj.allowContactOnTriggers) {
-            //      _softContactIdxRemovalBuffer.Add(i);
-            //    }
-            //  }
-            //}
-            //// TODO: Consider making the soft contact list a HashSet instead to support O(1) removal
-            //for (int i = _softContactIdxRemovalBuffer.Count - 1; i >= 0; i++) {
-            //  interactionManager._softContacts.RemoveAt(_softContactIdxRemovalBuffer[i]);
-            //}
 
             softlyContacting = sphereIntersecting ? true : softlyContacting;
           }

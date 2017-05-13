@@ -75,35 +75,54 @@ namespace Leap.Unity.Interaction {
         // Attach / Detach Object
         EditorGUILayout.BeginHorizontal();
 
-        EditorGUI.BeginDisabledGroup(target.anchor == null || target.isAttached);
-        if (GUILayout.Button(new GUIContent("Attach",
+        EditorGUI.BeginDisabledGroup(!(targets.Length > 1) || target.anchor == null || target.isAttached);
+        if (GUILayout.Button(new GUIContent("Attach Object" + (targets.Length > 1 ? "s" : ""),
                                             "Will attach the object to its anchor. If the object is not currently at its anchor, "
                                           + "currently at its anchor, it will begin move to it when play mode begins."))) {
-          target.TryAttach(ignoreRange: true);
+          Undo.IncrementCurrentGroup();
+          foreach (var singleTarget in targets) {
+            Undo.RecordObject(singleTarget, "Try Attach Object");
+            singleTarget.TryAttach(ignoreRange: true);
+          }
         }
         EditorGUI.EndDisabledGroup();
 
-        EditorGUI.BeginDisabledGroup(!target.isAttached);
-        if (GUILayout.Button(new GUIContent("Detach",
+        EditorGUI.BeginDisabledGroup(!(targets.Length > 1) || !target.isAttached);
+        if (GUILayout.Button(new GUIContent("Detach Object" + (targets.Length > 1 ? "s" : ""),
                                             "Will detach the object from its anchor. AnchorableBehaviours won't seek out an anchor "
                                           + "until they are specifically told to attach to one."))) {
-          target.Detach();
+          Undo.IncrementCurrentGroup();
+          foreach (var singleTarget in targets) {
+            Undo.RecordObject(singleTarget, "Try Detach Object");
+            singleTarget.Detach();
+          }
         }
         EditorGUI.EndDisabledGroup();
 
         EditorGUILayout.EndHorizontal();
 
         // Move Object to Anchor
-        bool translatedFromAnchor = target.anchor != null && Vector3.Distance(target.transform.position, target.anchor.transform.position) > 0.0001F;
-        bool rotatedFromAnchor = target.anchor != null && target.anchorRotation && Quaternion.Angle(target.transform.rotation, target.anchor.transform.rotation) > 0.1F;
 
-        if (target.anchor != null && target.isAttached && (translatedFromAnchor || rotatedFromAnchor)) {
-          if (GUILayout.Button(new GUIContent("Move Object To Anchor",
+        bool anyTranslatedFromAnchor = false;
+        bool anyRotatedFromAnchor = false;
+
+        foreach (var singleTarget in targets) {
+          anyTranslatedFromAnchor  |= singleTarget.anchor != null && Vector3.Distance(singleTarget.transform.position, singleTarget.anchor.transform.position) > 0.0001F;
+          anyRotatedFromAnchor     |= singleTarget.anchor != null && singleTarget.anchorRotation
+                                                                  && Quaternion.Angle(singleTarget.transform.rotation, singleTarget.anchor.transform.rotation) > 0.1F;
+        }
+
+        if (anyTranslatedFromAnchor || anyRotatedFromAnchor) {
+          if (GUILayout.Button(new GUIContent("Move Object" + (targets.Length > 1 ? "s" : "") + " To Anchor",
                                               "Detected that the object is not currently at its anchor, but upon pressing play, "
                                             + "the object will move to to match its anchor. If you'd like the object to move to "
                                             + "its anchor now, click this button."))) {
-            if (translatedFromAnchor) target.transform.position = target.anchor.transform.position;
-            if (rotatedFromAnchor) target.transform.rotation = target.anchor.transform.rotation;
+            Undo.IncrementCurrentGroup();
+            foreach (var singleTarget in targets) {
+              Undo.RecordObject(singleTarget.transform, "Move Target Transform to Anchor");
+              singleTarget.transform.position = singleTarget.anchor.transform.position;
+              if (singleTarget.anchorRotation) singleTarget.transform.rotation = singleTarget.anchor.transform.rotation;
+            }
           }
         }
       }

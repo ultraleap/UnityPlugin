@@ -151,6 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 486446c4204e0334990bf2b162423ba6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scaleTarget: {fileID: 4579866561592978}
 --- !u!114 &114589100428820638
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -163,5 +164,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allowMultipleObjects: 0
+  matchActiveStateWithAttachedObjects: 0
   _eventTable:
     _entries: []

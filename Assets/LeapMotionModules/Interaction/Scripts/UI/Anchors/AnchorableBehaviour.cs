@@ -28,7 +28,35 @@ namespace Leap.Unity.Interaction {
     [SerializeField]
     [Tooltip("Whether or not this AnchorableBehaviour is actively attached to its anchor.")]
     private bool _isAttached = false;
-    public bool isAttached { get { return _isAttached; } }
+    public bool isAttached {
+      get {
+        return _isAttached;
+      }
+      set {
+        if (_isAttached != value) {
+          if (value == true) {
+            if (_anchor != null) {
+              _isAttached = value;
+              _anchor.NotifyAttached(this);
+              OnAttachedToAnchor.Invoke(this, _anchor);
+            }
+            else {
+              Debug.LogWarning("Tried to attach an anchorable behaviour, but it has no assigned anchor.", this.gameObject);
+            }
+          }
+          else {
+            _isAttached = false;
+            if (_isLockedToAnchor) _isLockedToAnchor = false;
+
+            OnDetachedFromAnchor.Invoke(this, _anchor);
+            _anchor.NotifyDetached(this);
+
+            _hasTargetPositionLastUpdate = false;
+            _hasTargetRotationLastUpdate = false;
+          }
+        }
+      }
+    }
 
     [Tooltip("The current anchor of this AnchorableBehaviour.")]
     [OnEditorChange("anchor"), SerializeField]
@@ -52,8 +80,10 @@ namespace Leap.Unity.Interaction {
             _hasTargetRotationLastUpdate = false;
 
             if (_anchor != null) {
-              _anchor.NotifyAttached(this);
-              OnAttachedToAnchor.Invoke(this, _anchor);
+              isAttached = true;
+            }
+            else {
+              isAttached = false;
             }
           }
           else {
@@ -83,11 +113,6 @@ namespace Leap.Unity.Interaction {
     }
 
     [Header("Attachment")]
-
-    // TODO: Delete me
-    //[Tooltip("If disabled, this anchorable object will disregard an anchor's range when seeking "
-    //       + "an anchor to attach to.")]
-    //public bool requireAnchorWithinRange = true;
 
     [Tooltip("Anchors beyond this range are ignored as possible anchors for this object.")]
     public float maxAnchorRange = 0.3F;
@@ -250,6 +275,10 @@ namespace Leap.Unity.Interaction {
       refreshInspectorConveniences();
     }
 
+    void Reset() {
+      refreshInteractionBehaviour();
+    }
+
     void Awake() {
       refreshInteractionBehaviour();
       refreshInspectorConveniences();
@@ -262,41 +291,13 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      InitUnityEvents();
-    }
-
-    private void refreshInspectorConveniences() {
-      _minAttachmentDotProduct = Mathf.Cos(_maxAttachmentAngle * Mathf.Deg2Rad);
-      _maxMotionlessRange = maxAnchorRange * _motionlessRangeFraction;
-    }
-
-    void Reset() {
-      refreshInteractionBehaviour();
-    }
-
-    private void refreshInteractionBehaviour() {
-      interactionBehaviour = GetComponent<InteractionBehaviour>();
-      _interactionBehaviourIsNull = interactionBehaviour == null;
-
-      detachWhenGrasped = !_interactionBehaviourIsNull;
-      if (_interactionBehaviourIsNull) useTrajectory = false;
-    }
-
-    void OnDisable() {
-      _isLockedToAnchor = false;
-      _isRotationLockedToAnchor = false;
-
-      // Reset anchor position storage; it can't be updated from this state.
-      _hasTargetPositionLastUpdate = false;
-      _hasTargetRotationLastUpdate = false;
-
-      // Make sure we don't leave dangling anchor-preference state.
-      endAnchorPreference();
+      initUnityEvents();
     }
 
     void Start() {
-      if (anchor != null) {
+      if (anchor != null && _isAttached) {
         anchor.NotifyAttached(this);
+        OnAttachedToAnchor(this, anchor);
       }
     }
 
@@ -317,6 +318,18 @@ namespace Leap.Unity.Interaction {
       updateAnchorPreference();
     }
 
+    void OnDisable() {
+      _isLockedToAnchor = false;
+      _isRotationLockedToAnchor = false;
+
+      // Reset anchor position storage; it can't be updated from this state.
+      _hasTargetPositionLastUpdate = false;
+      _hasTargetRotationLastUpdate = false;
+
+      // Make sure we don't leave dangling anchor-preference state.
+      endAnchorPreference();
+    }
+
     void OnDestroy() {
       if (interactionBehaviour != null) {
         interactionBehaviour.OnObjectGraspBegin -= detachAnchorOnObjectGraspBegin;
@@ -327,21 +340,25 @@ namespace Leap.Unity.Interaction {
       endAnchorPreference();
     }
 
+    private void refreshInspectorConveniences() {
+      _minAttachmentDotProduct = Mathf.Cos(_maxAttachmentAngle * Mathf.Deg2Rad);
+      _maxMotionlessRange = maxAnchorRange * _motionlessRangeFraction;
+    }
+
+    private void refreshInteractionBehaviour() {
+      interactionBehaviour = GetComponent<InteractionBehaviour>();
+      _interactionBehaviourIsNull = interactionBehaviour == null;
+
+      detachWhenGrasped = !_interactionBehaviourIsNull;
+      if (_interactionBehaviourIsNull) useTrajectory = false;
+    }
+
     /// <summary>
     /// Detaches this Anchorable object from its anchor. The anchor reference
     /// remains unchanged. Call TryAttach() to re-attach to this object's assigned anchor.
     /// </summary>
     public void Detach() {
-      _isAttached = false;
-      _isLockedToAnchor = false;
-
-      if (anchor != null) {
-        anchor.NotifyDetached(this);
-        OnDetachedFromAnchor.Invoke(this, anchor);
-      }
-
-      _hasTargetPositionLastUpdate = false;
-      _hasTargetRotationLastUpdate = false;
+      isAttached = false;
     }
 
     /// <summary>
@@ -414,7 +431,8 @@ namespace Leap.Unity.Interaction {
     /// Warning: This method checks squared-distance for all anchors in teh scene if this
     /// AnchorableBehaviour has no AnchorGroup.
     /// </summary>
-    public List<Anchor> GetNearbyValidAnchors(bool requireAnchorHasSpace = true) {
+    public List<Anchor> GetNearbyValidAnchors(bool requireAnchorHasSpace = true,
+                                              bool requireAnchorActiveAndEnabled = true) {
       HashSet<Anchor> anchorsToCheck;
 
       if (this.anchorGroup == null) {
@@ -426,7 +444,8 @@ namespace Leap.Unity.Interaction {
 
       _nearbyAnchorsBuffer.Clear();
       foreach (var anchor in anchorsToCheck) {
-        if (requireAnchorHasSpace && (!anchor.allowMultipleObjects && anchor.anchoredObjects.Count != 0)) continue;
+        if ((requireAnchorHasSpace && (!anchor.allowMultipleObjects && anchor.anchoredObjects.Count != 0))
+            || (requireAnchorActiveAndEnabled && !anchor.isActiveAndEnabled)) continue;
 
         if ((anchor.transform.position - this.transform.position).sqrMagnitude <= maxAnchorRange * maxAnchorRange) {
           _nearbyAnchorsBuffer.Add(anchor);
@@ -446,7 +465,9 @@ namespace Leap.Unity.Interaction {
     /// Warning: This method checks squared-distance for all anchors in the scene if this AnchorableBehaviour
     /// has no AnchorGroup.
     /// </summary>
-    public Anchor GetNearestValidAnchor(bool requireWithinRange = true, bool requireAnchorHasSpace = true) {
+    public Anchor GetNearestValidAnchor(bool requireWithinRange = true,
+                                        bool requireAnchorHasSpace = true,
+                                        bool requireAnchorActiveAndEnabled = true) {
       HashSet<Anchor> anchorsToCheck;
 
       if (this.anchorGroup == null) {
@@ -459,7 +480,8 @@ namespace Leap.Unity.Interaction {
       Anchor closestAnchor = null;
       float closestDistSqrd = float.PositiveInfinity;
       foreach (var testAnchor in anchorsToCheck) {
-        if (requireAnchorHasSpace && (!anchor.allowMultipleObjects || anchor.anchoredObjects.Count == 0)) continue;
+        if ((requireAnchorHasSpace && (!anchor.allowMultipleObjects || anchor.anchoredObjects.Count == 0))
+            || (requireAnchorActiveAndEnabled && !anchor.isActiveAndEnabled)) continue;
 
         float testDistanceSqrd = (testAnchor.transform.position - this.transform.position).sqrMagnitude;
         if (testDistanceSqrd < closestDistSqrd) {
@@ -483,8 +505,7 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public bool TryAttach(bool ignoreRange = false) {
       if (anchor != null && (ignoreRange || IsWithinRange(anchor))) {
-        _isAttached = true;
-        anchor.NotifyAttached(this);
+        isAttached = true;
         return true;
       }
       else {
@@ -503,8 +524,7 @@ namespace Leap.Unity.Interaction {
       if (preferredAnchor != null) {
         _preferredAnchor = preferredAnchor;
         anchor = preferredAnchor;
-        _isAttached = true;
-        anchor.NotifyAttached(this);
+        isAttached = true;
         return true;
       }
 
@@ -621,7 +641,7 @@ namespace Leap.Unity.Interaction {
           finalPosition -= _offsetTowardsHand;
 
           // If desired, automatically correct for the anchor itself moving while attempting to return to it.
-          if (matchAnchorMotionWhileAttaching) {
+          if (matchAnchorMotionWhileAttaching && this.transform.parent != anchor.transform) {
             if (_hasTargetPositionLastUpdate) {
               finalPosition += (targetPosition - _targetPositionLastUpdate);
             }
@@ -680,7 +700,7 @@ namespace Leap.Unity.Interaction {
         }
         else {
           // If desired, automatically correct for the anchor itself moving while attempting to return to it.
-          if (matchAnchorMotionWhileAttaching) {
+          if (matchAnchorMotionWhileAttaching && this.transform.parent != anchor.transform) {
             if (_hasTargetRotationLastUpdate) {
               finalRotation = (Quaternion.Inverse(_targetRotationLastUpdate) * targetRotation) * finalRotation;
             }
@@ -710,7 +730,7 @@ namespace Leap.Unity.Interaction {
 
     private void updateAnchorPreference() {
       Anchor newPreferredAnchor;
-      if (!_isAttached) {
+      if (!isAttached) {
         newPreferredAnchor = FindPreferredAnchor();
       }
       else {
@@ -763,7 +783,7 @@ namespace Leap.Unity.Interaction {
       OnPostTryAnchorOnGraspEnd = 130
     }
 
-    private void InitUnityEvents() {
+    private void initUnityEvents() {
       setupCallback(ref OnAttachedToAnchor,        EventType.OnAttachedToAnchor);
       setupCallback(ref OnLockedToAnchor,          EventType.OnLockedToAnchor);
       setupCallback(ref OnDetachedFromAnchor,      EventType.OnDetachedFromAnchor);
