@@ -52,6 +52,8 @@ namespace Leap.Unity.GraphicalRenderer {
         finishMesh();
         _generation.mesh = null;
       }
+
+      prepareMaterial();
     }
 
     public override SupportInfo GetSpaceSupportInfo(LeapSpace space) {
