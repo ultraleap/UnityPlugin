@@ -347,7 +347,7 @@ namespace Leap.Unity.GraphicalRenderer {
               }
             }
 
-            if (!graphic.enabled || !graphic.gameObject.IsActiveRelativeToParent(_renderer.gameObject)) {
+            if (!graphic.enabled || !graphic.transform.IsActiveRelativeToParent(_renderer.transform)) {
               graphic.attachedGroup.TryRemoveGraphic(graphic);
             }
           }

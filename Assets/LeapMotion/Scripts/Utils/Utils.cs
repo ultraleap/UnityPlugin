@@ -131,16 +131,16 @@ namespace Leap.Unity {
       return rect.width * rect.height;
     }
 
-    public static bool IsActiveRelativeToParent(this GameObject obj, GameObject parent) {
-      Assert.IsTrue(obj.transform.IsChildOf(parent.transform));
+    public static bool IsActiveRelativeToParent(this Transform obj, Transform parent) {
+      Assert.IsTrue(obj.IsChildOf(parent));
 
-      if (!obj.activeSelf) {
+      if (!obj.gameObject.activeSelf) {
         return false;
       } else {
-        if (obj.transform.parent == parent.transform) {
+        if (obj.parent == null || obj.parent == parent) {
           return true;
         } else {
-          return obj.transform.gameObject.IsActiveRelativeToParent(parent);
+          return obj.parent.IsActiveRelativeToParent(parent);
         }
       }
     }
