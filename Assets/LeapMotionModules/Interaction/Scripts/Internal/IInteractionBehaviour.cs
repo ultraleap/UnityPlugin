@@ -22,53 +22,61 @@ namespace Leap.Unity.Interaction.Internal {
   /// </summary>
   public interface IInteractionBehaviour {
 
-    // Properties from MonoBehaviour
+    // Properties from MonoBehaviour.
     string              name       { get; } // (subclass MonoBehaviour to satisfy)
     GameObject          gameObject { get; } // ^
     Transform           transform  { get; } // ^
 
-    // Properties for interaction
+    // Properties for interaction.
     InteractionManager  manager    { get; }
     Rigidbody           rigidbody  { get; }
     ISpaceComponent     space      { get; } // OK to return null if this object is not in curved space.
 
-    // Interaction overrides
+    // Interaction overrides.
     IgnoreHoverMode ignoreHoverMode { get; }
-    bool ignoreContact   { get; }
-    bool ignoreGrasping  { get; }
+    bool            ignoreContact   { get; }
+    bool            ignoreGrasping  { get; }
 
-    // Interaction settings
+    // Interaction settings.
     bool allowMultiGrasp { get; }
     
     // Called by the Interaction Manager manually
     // every fixed (physics) frame.
     void FixedUpdateObject();
 
-    // Hand interactions
+    // Interaction types:
+    // - Hover
+    //   -- Primary Hover
+    // - Contact
+    // - Grasping
+    //   -- Suspension
 
     // Hover
     float GetHoverDistance(Vector3 worldPosition);
-    void BeginHover(List<InteractionHand> hands);
-    void StayHovered(List<InteractionHand> hands);
-    void EndHover(List<InteractionHand> hands);
-    void BeginPrimaryHover(List<InteractionHand> hands);
-    void StayPrimaryHovered(List<InteractionHand> hands);
-    void EndPrimaryHover(List<InteractionHand> hands);
+    void BeginHover(List<InteractionControllerBase> beganHovering);
+    void EndHover(List<InteractionControllerBase> endedHovering);
+    void StayHovered(List<InteractionControllerBase> currentlyHovering);
+
+    // Primary hover
+    void BeginPrimaryHover(List<InteractionControllerBase> beganPrimaryHovering);
+    void EndPrimaryHover(List<InteractionControllerBase> endedPrimaryHovering);
+    void StayPrimaryHovered(List<InteractionControllerBase> currentlyPrimaryHovering);
 
     // Contact
-    void BeginContact(List<InteractionHand> hands);
-    void StayContacted(List<InteractionHand> hands);
-    void EndContact(List<InteractionHand> hands);
+    void BeginContact(List<InteractionControllerBase> beganContact);
+    void EndContact(List<InteractionControllerBase> endedContact);
+    void StayContacted(List<InteractionControllerBase> currentlyContacting);
 
     // Grasping
     bool isGrasped { get; }
-    void BeginGrasp(List<InteractionHand> hands);
-    void StayGrasped(List<InteractionHand> hands);
-    void EndGrasp(List<InteractionHand> hands);
+    void BeginGrasp(List<InteractionControllerBase> beganGrasping);
+    void EndGrasp(List<InteractionControllerBase> endedGrasping);
+    void StayGrasped(List<InteractionControllerBase> currentlyGrasping);
 
+    // Suspension
     bool isSuspended { get; }
-    void BeginSuspension(InteractionHand hand);
-    void EndSuspension(InteractionHand hand);
+    void BeginSuspension(InteractionControllerBase beganSuspending);
+    void EndSuspension(InteractionControllerBase endedSuspending);
 
   }
 

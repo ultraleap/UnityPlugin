@@ -113,11 +113,11 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public float SimulationScale { get { return _providerScale; } }
 
-    private InteractionHand[] _interactionHands = new InteractionHand[2];
+    private InteractionControllerBase[] _interactionControllers = new InteractionControllerBase[2];
     /// <summary>
     /// Gets the array of InteractionHands managed by this InteractionManager.
     /// </summary>
-    public InteractionHand[] interactionHands { get { return _interactionHands; } }
+    public InteractionControllerBase[] interactionControllers { get { return _interactionControllers; } }
 
     private HashSet<IInteractionBehaviour> _interactionBehaviours = new HashSet<IInteractionBehaviour>();
 
@@ -205,8 +205,8 @@ namespace Leap.Unity.Interaction {
     }
 
     void OnDisable() {
-      foreach (var intHand in _interactionHands) {
-        intHand.EnableSoftContact(); // disables the colliders in the InteractionHand; soft contact won't be applied if the hand is not updating.
+      foreach (var intHand in _interactionControllers) {
+        intHand.EnableSoftContact(); // disables the colliders in the InteractionControllerBase; soft contact won't be applied if the hand is not updating.
         if (intHand.isGraspingObject) intHand.ReleaseGrasp();
       }
     }
@@ -249,23 +249,23 @@ namespace Leap.Unity.Interaction {
     #region Public Methods
 
     /// <summary>
-    /// Returns the InteractionHand object that corresponds to the given Hand object.
+    /// Returns the InteractionControllerBase object that corresponds to the given Hand object.
     /// 
     /// Currently, the InteractionManager supports only two InteractionHands at one time: one player's left and right hands.
     /// </summary>
-    public InteractionHand GetInteractionHand(Hand hand) {
+    public InteractionControllerBase GetInteractionHand(Hand hand) {
       if (hand.IsLeft) {
-        return _interactionHands[0];
+        return _interactionControllers[0];
       }
       else {
-        return _interactionHands[1];
+        return _interactionControllers[1];
       }
     }
-    public InteractionHand GetInteractionHand(bool isLeft) {
+    public InteractionControllerBase GetInteractionHand(bool isLeft) {
       if (isLeft) {
-        return _interactionHands[0];
+        return _interactionControllers[0];
       } else {
-        return _interactionHands[1];
+        return _interactionControllers[1];
       }
     }
 
@@ -282,7 +282,7 @@ namespace Leap.Unity.Interaction {
       }
 
       var didRelease = false;
-      foreach (var hand in _interactionHands) {
+      foreach (var hand in _interactionControllers) {
         if (hand.graspedObject == interactionObj) {
           hand.ReleaseGrasp();
           didRelease = true;
@@ -298,8 +298,8 @@ namespace Leap.Unity.Interaction {
     private void fixedUpdateHands() {
       using (new ProfilerSample("Fixed Update Hands (Hand Representations)")) {
         // Perform general hand update, for hand representations
-        for (int i = 0; i < _interactionHands.Length; i++) {
-          _interactionHands[i].FixedUpdateHand(enableHovering, enableContact, enableGrasping);
+        for (int i = 0; i < _interactionControllers.Length; i++) {
+          _interactionControllers[i].FixedUpdateControllerBase(enableHovering, enableContact, enableGrasping);
         }
       }
 
@@ -325,7 +325,7 @@ namespace Leap.Unity.Interaction {
         // Suspension //
 
         // Check hands beginning object suspension.
-        foreach (var hand in _interactionHands) {
+        foreach (var hand in _interactionControllers) {
           IInteractionBehaviour suspendedObj;
           if (hand.CheckSuspensionBegin(out suspendedObj)) {
             suspendedObj.BeginSuspension(hand);
@@ -333,7 +333,7 @@ namespace Leap.Unity.Interaction {
         }
 
         // Check hands ending object suspension.
-        foreach (var hand in _interactionHands) {
+        foreach (var hand in _interactionControllers) {
           IInteractionBehaviour resumedObj;
           if (hand.CheckSuspensionEnd(out resumedObj)) {
             resumedObj.EndSuspension(hand);
@@ -344,7 +344,7 @@ namespace Leap.Unity.Interaction {
 
         // Check ending grasps.
         remapInteractionObjectStateChecks(
-          stateCheckFunc: (InteractionHand maybeReleasingHand, out IInteractionBehaviour maybeReleasedObject) => {
+          stateCheckFunc: (InteractionControllerBase maybeReleasingHand, out IInteractionBehaviour maybeReleasedObject) => {
             return maybeReleasingHand.CheckGraspEnd(out maybeReleasedObject);
           },
           actionPerInteractionObject: (releasedObject, releasingIntHands) => {
@@ -353,7 +353,7 @@ namespace Leap.Unity.Interaction {
 
         // Check ending contacts.
         remapMultiInteractionObjectStateChecks(
-          multiObjectStateCheckFunc: (InteractionHand maybeEndedContactingHand, out HashSet<IInteractionBehaviour> endContactedObjects) => {
+          multiObjectStateCheckFunc: (InteractionControllerBase maybeEndedContactingHand, out HashSet<IInteractionBehaviour> endContactedObjects) => {
             return maybeEndedContactingHand.CheckContactEnd(out endContactedObjects);
           },
           actionPerInteractionObject: (endContactedObject, endContactedIntHands) => {
@@ -362,7 +362,7 @@ namespace Leap.Unity.Interaction {
 
         // Check ending primary hovers.
         remapInteractionObjectStateChecks(
-          stateCheckFunc: (InteractionHand maybeEndedPrimaryHoveringHand, out IInteractionBehaviour endPrimaryHoveredObject) => {
+          stateCheckFunc: (InteractionControllerBase maybeEndedPrimaryHoveringHand, out IInteractionBehaviour endPrimaryHoveredObject) => {
             return maybeEndedPrimaryHoveringHand.CheckPrimaryHoverEnd(out endPrimaryHoveredObject);
           },
           actionPerInteractionObject: (endPrimaryHoveredObject, noLongerPrimaryHoveringHands) => {
@@ -371,7 +371,7 @@ namespace Leap.Unity.Interaction {
 
         // Check ending hovers.
         remapMultiInteractionObjectStateChecks(
-          multiObjectStateCheckFunc: (InteractionHand maybeEndedHoveringHand, out HashSet<IInteractionBehaviour> endHoveredObjects) => {
+          multiObjectStateCheckFunc: (InteractionControllerBase maybeEndedHoveringHand, out HashSet<IInteractionBehaviour> endHoveredObjects) => {
             return maybeEndedHoveringHand.CheckHoverEnd(out endHoveredObjects);
           },
           actionPerInteractionObject: (endHoveredObject, endHoveringIntHands) => {
@@ -383,7 +383,7 @@ namespace Leap.Unity.Interaction {
         // Check beginning hovers.
         if (enableHovering) {
           remapMultiInteractionObjectStateChecks(
-            multiObjectStateCheckFunc: (InteractionHand maybeBeganHoveringHand, out HashSet<IInteractionBehaviour> beganHoveredObjects) => {
+            multiObjectStateCheckFunc: (InteractionControllerBase maybeBeganHoveringHand, out HashSet<IInteractionBehaviour> beganHoveredObjects) => {
               return maybeBeganHoveringHand.CheckHoverBegin(out beganHoveredObjects);
             },
             actionPerInteractionObject: (beganHoveredObject, beganHoveringIntHands) => {
@@ -394,7 +394,7 @@ namespace Leap.Unity.Interaction {
         // Check beginning primary hovers.
         if (enableHovering) {
           remapInteractionObjectStateChecks(
-            stateCheckFunc: (InteractionHand maybeBeganPrimaryHoveringHand, out IInteractionBehaviour primaryHoveredObject) => {
+            stateCheckFunc: (InteractionControllerBase maybeBeganPrimaryHoveringHand, out IInteractionBehaviour primaryHoveredObject) => {
               return maybeBeganPrimaryHoveringHand.CheckPrimaryHoverBegin(out primaryHoveredObject);
             },
             actionPerInteractionObject: (newlyPrimaryHoveredObject, beganPrimaryHoveringHands) => {
@@ -405,7 +405,7 @@ namespace Leap.Unity.Interaction {
         // Check beginning contacts.
         if (enableContact) {
           remapMultiInteractionObjectStateChecks(
-            multiObjectStateCheckFunc: (InteractionHand maybeBeganContactingHand, out HashSet<IInteractionBehaviour> beganContactedObjects) => {
+            multiObjectStateCheckFunc: (InteractionControllerBase maybeBeganContactingHand, out HashSet<IInteractionBehaviour> beganContactedObjects) => {
               return maybeBeganContactingHand.CheckContactBegin(out beganContactedObjects);
             },
             actionPerInteractionObject: (beganContactedObject, beganContactingIntHands) => {
@@ -416,7 +416,7 @@ namespace Leap.Unity.Interaction {
         // Check beginning grasps.
         if (enableGrasping) {
           remapInteractionObjectStateChecks(
-            stateCheckFunc: (InteractionHand maybeBeganGraspingHand, out IInteractionBehaviour graspedObject) => {
+            stateCheckFunc: (InteractionControllerBase maybeBeganGraspingHand, out IInteractionBehaviour graspedObject) => {
               return maybeBeganGraspingHand.CheckGraspBegin(out graspedObject);
             },
             actionPerInteractionObject: (newlyGraspedObject, beganGraspingIntHands) => {
@@ -429,7 +429,7 @@ namespace Leap.Unity.Interaction {
         // Check sustaining hover.
         if (enableHovering) {
           remapMultiInteractionObjectStateChecks(
-            multiObjectStateCheckFunc: (InteractionHand maybeSustainedHoveringHand, out HashSet<IInteractionBehaviour> hoveredObjects) => {
+            multiObjectStateCheckFunc: (InteractionControllerBase maybeSustainedHoveringHand, out HashSet<IInteractionBehaviour> hoveredObjects) => {
               return maybeSustainedHoveringHand.CheckHoverStay(out hoveredObjects);
             },
             actionPerInteractionObject: (hoveredObject, hoveringIntHands) => {
@@ -440,7 +440,7 @@ namespace Leap.Unity.Interaction {
         // Check sustaining primary hovers.
         if (enableHovering) {
           remapInteractionObjectStateChecks(
-            stateCheckFunc: (InteractionHand maybeSustainedPrimaryHoveringHand, out IInteractionBehaviour primaryHoveredObject) => {
+            stateCheckFunc: (InteractionControllerBase maybeSustainedPrimaryHoveringHand, out IInteractionBehaviour primaryHoveredObject) => {
               return maybeSustainedPrimaryHoveringHand.CheckPrimaryHoverStay(out primaryHoveredObject);
             },
             actionPerInteractionObject: (primaryHoveredObject, primaryHoveringHands) => {
@@ -451,7 +451,7 @@ namespace Leap.Unity.Interaction {
         // Check sustained contact.
         if (enableContact) {
           remapMultiInteractionObjectStateChecks(
-            multiObjectStateCheckFunc: (InteractionHand maybeSustainedContactingHand, out HashSet<IInteractionBehaviour> contactedObjects) => {
+            multiObjectStateCheckFunc: (InteractionControllerBase maybeSustainedContactingHand, out HashSet<IInteractionBehaviour> contactedObjects) => {
               return maybeSustainedContactingHand.CheckContactStay(out contactedObjects);
             },
             actionPerInteractionObject: (contactedObject, contactingIntHands) => {
@@ -462,7 +462,7 @@ namespace Leap.Unity.Interaction {
         // Check sustained grasping.
         if (enableContact) {
           remapInteractionObjectStateChecks(
-            stateCheckFunc: (InteractionHand maybeSustainedGraspingHand, out IInteractionBehaviour graspedObject) => {
+            stateCheckFunc: (InteractionControllerBase maybeSustainedGraspingHand, out IInteractionBehaviour graspedObject) => {
               return maybeSustainedGraspingHand.CheckGraspHold(out graspedObject);
             },
             actionPerInteractionObject: (contactedObject, contactingIntHands) => {
@@ -473,29 +473,29 @@ namespace Leap.Unity.Interaction {
       }
     }
     
-    private delegate bool StateChangeCheckFunc(InteractionHand hand, out IInteractionBehaviour obj);
-    private delegate bool MultiStateChangeCheckFunc(InteractionHand hand, out HashSet<IInteractionBehaviour> objs);
+    private delegate bool StateChangeCheckFunc(InteractionControllerBase hand, out IInteractionBehaviour obj);
+    private delegate bool MultiStateChangeCheckFunc(InteractionControllerBase hand, out HashSet<IInteractionBehaviour> objs);
 
     [ThreadStatic]
-    private static Dictionary<IInteractionBehaviour, List<InteractionHand>> s_objHandsMap = new Dictionary<IInteractionBehaviour, List<InteractionHand>>();
+    private static Dictionary<IInteractionBehaviour, List<InteractionControllerBase>> s_objHandsMap = new Dictionary<IInteractionBehaviour, List<InteractionControllerBase>>();
 
     /// <summary>
     /// Checks object state per-hand, then calls an action per-object with all hand checks that reported back an object.
     /// </summary>
     private void remapInteractionObjectStateChecks(StateChangeCheckFunc stateCheckFunc,
-                                                   Action<IInteractionBehaviour, List<InteractionHand>> actionPerInteractionObject) {
+                                                   Action<IInteractionBehaviour, List<InteractionControllerBase>> actionPerInteractionObject) {
 
       // Ensure the object->hands buffer is non-null (ThreadStatic quirk) and clean.
-      if (s_objHandsMap == null) s_objHandsMap = new Dictionary<IInteractionBehaviour,List<InteractionHand>>();
+      if (s_objHandsMap == null) s_objHandsMap = new Dictionary<IInteractionBehaviour,List<InteractionControllerBase>>();
       s_objHandsMap.Clear();
 
       // In a nutshell, this remaps methods per-hand that output an interaction object if the hand changed that object's state
       // to methods per-object with all of the hands for which the check produced a state-change.
-      foreach (var hand in _interactionHands) {
+      foreach (var hand in _interactionControllers) {
         IInteractionBehaviour objectWhoseStateChanged;
         if (stateCheckFunc(hand, out objectWhoseStateChanged)) {
           if (!s_objHandsMap.ContainsKey(objectWhoseStateChanged)) {
-            s_objHandsMap[objectWhoseStateChanged] = Pool<List<InteractionHand>>.Spawn();
+            s_objHandsMap[objectWhoseStateChanged] = Pool<List<InteractionControllerBase>>.Spawn();
           }
           s_objHandsMap[objectWhoseStateChanged].Add(hand);
         }
@@ -506,7 +506,7 @@ namespace Leap.Unity.Interaction {
 
         // Clear each hands list and return it to the list pool.
         objHandsPair.Value.Clear();
-        Pool<List<InteractionHand>>.Recycle(objHandsPair.Value);
+        Pool<List<InteractionControllerBase>>.Recycle(objHandsPair.Value);
       }
     }
 
@@ -514,19 +514,19 @@ namespace Leap.Unity.Interaction {
     /// Checks object state per-hand, then calls an action per-object with all hand checks that reported back objects.
     /// </summary>
     private void remapMultiInteractionObjectStateChecks(MultiStateChangeCheckFunc multiObjectStateCheckFunc,
-                                                        Action<IInteractionBehaviour, List<InteractionHand>> actionPerInteractionObject) {
+                                                        Action<IInteractionBehaviour, List<InteractionControllerBase>> actionPerInteractionObject) {
       // Ensure object<->hands buffer is non-null (ThreadStatic quirk) and clean.
-      if (s_objHandsMap == null) s_objHandsMap = new Dictionary<IInteractionBehaviour, List<InteractionHand>>();
+      if (s_objHandsMap == null) s_objHandsMap = new Dictionary<IInteractionBehaviour, List<InteractionControllerBase>>();
       s_objHandsMap.Clear();
 
       // In a nutshell, this remaps methods per-hand that output multiple interaction objects if the hand changed those objects' states
       // to methods per-object with all of the hands for which the check produced a state-change.
-      foreach (var hand in _interactionHands) {
+      foreach (var hand in _interactionControllers) {
         HashSet<IInteractionBehaviour> stateChangedObjects;
         if (multiObjectStateCheckFunc(hand, out stateChangedObjects)) {
           foreach (var stateChangedObject in stateChangedObjects) {
             if (!s_objHandsMap.ContainsKey(stateChangedObject)) {
-              s_objHandsMap[stateChangedObject] = Pool<List<InteractionHand>>.Spawn();
+              s_objHandsMap[stateChangedObject] = Pool<List<InteractionControllerBase>>.Spawn();
             }
             s_objHandsMap[stateChangedObject].Add(hand);
           }
@@ -538,7 +538,7 @@ namespace Leap.Unity.Interaction {
 
         // Clear each hands list and return it to the list pool.
         objHandsPair.Value.Clear();
-        Pool<List<InteractionHand>>.Recycle(objHandsPair.Value);
+        Pool<List<InteractionControllerBase>>.Recycle(objHandsPair.Value);
       }
     }
 
@@ -556,7 +556,7 @@ namespace Leap.Unity.Interaction {
     public bool UnregisterInteractionBehaviour(IInteractionBehaviour interactionObj) {
       bool wasRemovalSuccessful = _interactionBehaviours.Remove(interactionObj);
       if (wasRemovalSuccessful) {
-        foreach (var intHand in _interactionHands) {
+        foreach (var intHand in _interactionControllers) {
           intHand.ReleaseObject(interactionObj);
           intHand.grabClassifier.UnregisterInteractionBehaviour(interactionObj);
         }
@@ -578,9 +578,9 @@ namespace Leap.Unity.Interaction {
     private void refreshInteractionHands() {
       int handsIdx = 0;
       foreach (var child in this.transform.GetChildren()) {
-        InteractionHand intHand = child.GetComponent<InteractionHand>();
+        InteractionControllerBase intHand = child.GetComponent<InteractionControllerBase>();
         if (intHand != null) {
-          _interactionHands[handsIdx++] = intHand;
+          _interactionControllers[handsIdx++] = intHand;
         }
         if (handsIdx == 2) break;
       }
@@ -592,23 +592,23 @@ namespace Leap.Unity.Interaction {
       }
 #endif
 
-      if (_interactionHands[0] == null) {
+      if (_interactionControllers[0] == null) {
         GameObject obj = new GameObject();
-        _interactionHands[0] = obj.AddComponent<InteractionHand>();
+        _interactionControllers[0] = obj.AddComponent<InteractionControllerBase>();
       }
-      _interactionHands[0].gameObject.name = "Interaction Hand (Left)";
-      _interactionHands[0].interactionManager = this;
-      _interactionHands[0].handAccessor = _getFixedLeftHand;
-      _interactionHands[0].transform.parent = this.transform;
+      _interactionControllers[0].gameObject.name = "Interaction Hand (Left)";
+      _interactionControllers[0].interactionManager = this;
+      _interactionControllers[0].handAccessor = _getFixedLeftHand;
+      _interactionControllers[0].transform.parent = this.transform;
 
-      if (_interactionHands[1] == null) {
+      if (_interactionControllers[1] == null) {
         GameObject obj = new GameObject();
-        _interactionHands[1] = obj.AddComponent<InteractionHand>();
+        _interactionControllers[1] = obj.AddComponent<InteractionControllerBase>();
       }
-      _interactionHands[1].gameObject.name = "Interaction Hand (Right)";
-      _interactionHands[1].interactionManager = this;
-      _interactionHands[1].handAccessor = _getFixedRightHand;
-      _interactionHands[1].transform.parent = this.transform;
+      _interactionControllers[1].gameObject.name = "Interaction Hand (Right)";
+      _interactionControllers[1].interactionManager = this;
+      _interactionControllers[1].handAccessor = _getFixedRightHand;
+      _interactionControllers[1].transform.parent = this.transform;
     }
 
     protected void generateAutomaticLayers() {
@@ -662,7 +662,7 @@ namespace Leap.Unity.Interaction {
 
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
       if (_drawHandRuntimeGizmos) {
-        foreach (var hand in _interactionHands) {
+        foreach (var hand in _interactionControllers) {
           if (hand != null) {
             hand.OnDrawRuntimeGizmos(drawer);
           }
