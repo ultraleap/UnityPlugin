@@ -1,4 +1,4 @@
-/******************************************************************************
+﻿/******************************************************************************
  * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
  * Leap Motion proprietary and  confidential.                                 *
  *                                                                            *
@@ -13,35 +13,33 @@ using System.Collections.Generic;
 namespace Leap.Unity {
 
   /// <summary>
-  /// A simple wrapper around List to provide readonly access.
-  /// Useful when you want to return a list to someone but you want
+  /// A simple wrapper around HashSet to provide readonly access.
+  /// Useful when you want to return a HashSet to someone but you want
   /// to make sure they don't muck it up!
   /// </summary>
-  public struct ReadonlyList<T> {
-    private readonly List<T> _list;
+  public struct ReadonlyHashSet<T> {
+    private readonly HashSet<T> _set;
 
-    public ReadonlyList(List<T> list) {
-      _list = list;
+    public ReadonlyHashSet(HashSet<T> set) {
+      _set = set;
     }
 
     public int Count {
       get {
-        return _list.Count;
+        return _set.Count;
       }
     }
 
-    public T this[int index] {
-      get {
-        return _list[index];
-      }
+    public HashSet<T>.Enumerator GetEnumerator() {
+      return _set.GetEnumerator();
     }
 
-    public List<T>.Enumerator GetEnumerator() {
-      return _list.GetEnumerator();
+    public bool Contains(T obj) {
+      return _set.Contains(obj);
     }
 
-    public static implicit operator ReadonlyList<T>(IList<T> list) {
-      return new ReadonlyList<T>(list);
+    public static implicit operator ReadonlyHashSet<T>(HashSet<T> set) {
+      return new ReadonlyHashSet<T>(set);
     }
   }
 }

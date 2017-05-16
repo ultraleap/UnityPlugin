@@ -597,7 +597,7 @@ namespace Leap.Unity.Interaction {
         _interactionControllers[0] = obj.AddComponent<InteractionControllerBase>();
       }
       _interactionControllers[0].gameObject.name = "Interaction Hand (Left)";
-      _interactionControllers[0].interactionManager = this;
+      _interactionControllers[0].manager = this;
       _interactionControllers[0].handAccessor = _getFixedLeftHand;
       _interactionControllers[0].transform.parent = this.transform;
 
@@ -606,7 +606,7 @@ namespace Leap.Unity.Interaction {
         _interactionControllers[1] = obj.AddComponent<InteractionControllerBase>();
       }
       _interactionControllers[1].gameObject.name = "Interaction Hand (Right)";
-      _interactionControllers[1].interactionManager = this;
+      _interactionControllers[1].manager = this;
       _interactionControllers[1].handAccessor = _getFixedRightHand;
       _interactionControllers[1].transform.parent = this.transform;
     }

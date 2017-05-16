@@ -45,14 +45,14 @@ namespace Leap.Unity.Interaction.Internal {
       _defaultGrabParams = new GrabClassifierHeuristics.ClassifierParameters(
         fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius,
         thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance,
-        layerMask == 0 ? (interactionHand.interactionManager.interactionLayer.layerMask
-                          | interactionHand.interactionManager.interactionNoContactLayer.layerMask) : layerMask,
+        layerMask == 0 ? (interactionHand.manager.interactionLayer.layerMask
+                          | interactionHand.manager.interactionNoContactLayer.layerMask) : layerMask,
         queryTriggers);
       _scaledGrabParams = new GrabClassifierHeuristics.ClassifierParameters(
         fingerStickiness, thumbStickiness, maxCurl, minCurl, fingerRadius,
         thumbRadius, grabCooldown, maxCurlVel, maxGrabDistance,
-        layerMask == 0 ? (interactionHand.interactionManager.interactionLayer.layerMask
-                          | interactionHand.interactionManager.interactionNoContactLayer.layerMask) : layerMask,
+        layerMask == 0 ? (interactionHand.manager.interactionLayer.layerMask
+                          | interactionHand.manager.interactionNoContactLayer.layerMask) : layerMask,
         queryTriggers);
 
       for (int i = 0; i < _collidingCandidates.Length; i++) {
@@ -66,11 +66,11 @@ namespace Leap.Unity.Interaction.Internal {
         if (interactionHand.isTracked) {
           // Ensure that all scale dependent variables are properly set.
           _scaledGrabParams.FINGERTIP_RADIUS = _defaultGrabParams.FINGERTIP_RADIUS
-                                             * interactionHand.interactionManager.SimulationScale;
+                                             * interactionHand.manager.SimulationScale;
           _scaledGrabParams.THUMBTIP_RADIUS = _defaultGrabParams.THUMBTIP_RADIUS
-                                            * interactionHand.interactionManager.SimulationScale;
+                                            * interactionHand.manager.SimulationScale;
           _scaledGrabParams.MAXIMUM_DISTANCE_FROM_HAND = _defaultGrabParams.MAXIMUM_DISTANCE_FROM_HAND
-                                                       * interactionHand.interactionManager.SimulationScale;
+                                                       * interactionHand.manager.SimulationScale;
       
           // Ensure that the temporally variant variables are updated.
           // scaledGrabParams.LAYER_MASK = 1 << _manager.InteractionLayer;
@@ -84,7 +84,7 @@ namespace Leap.Unity.Interaction.Internal {
     }
 
     public bool FixedUpdateClassifierGrasp(out IInteractionBehaviour graspedObject) {
-      using (new ProfilerSample("Update Grab Classifier - Grasp", interactionHand.interactionManager)) {
+      using (new ProfilerSample("Update Grab Classifier - Grasp", interactionHand.manager)) {
         graspedObject = null;
         if (interactionHand.isGraspingObject || interactionHand.GetLeapHand() == null) {
           // Cannot grasp another object with an untracked hand or while the hand is already grasping an object.
@@ -103,7 +103,7 @@ namespace Leap.Unity.Interaction.Internal {
     }
 
     public bool FixedUpdateClassifierRelease(out IInteractionBehaviour releasedObject) {
-      using (new ProfilerSample("Update Grab Classifier - Release", interactionHand.interactionManager)) {
+      using (new ProfilerSample("Update Grab Classifier - Release", interactionHand.manager)) {
         releasedObject = null;
         if (!interactionHand.isGraspingObject) {
           // Can't release an object if the hand is already not grasping one.
@@ -198,7 +198,7 @@ namespace Leap.Unity.Interaction.Internal {
       classifier.handChirality = hand.IsLeft;
       classifier.handDirection = hand.Direction.ToVector3();
       classifier.handXBasis = hand.Basis.xBasis.ToVector3();
-      float simScale = interactionHand.interactionManager.SimulationScale;
+      float simScale = interactionHand.manager.SimulationScale;
       classifier.handGrabCenter = (hand.PalmPosition
                                    + (hand.Direction * 0.05f * simScale)
                                    + (hand.PalmNormal * 0.01f * simScale)).ToVector3();

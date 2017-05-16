@@ -16,9 +16,10 @@ using UnityEngine;
 namespace Leap.Unity.Interaction {
 
   /// <summary>
-  /// ActivityManager is a wrapper around PhysX sphere queries for InteractionBehaviours.
+  /// ActivityManager is a wrapper around PhysX sphere queries for arbitrary Unity objects.
   /// "Active" objects are objects found in the latest query. It's also possible to get the
-  /// sets of objects that just began or stopped being active since the last query.
+  /// sets of objects that just began or stopped being active since the last query; this
+  /// requires enabling the trackStateChanges setting.
   /// </summary>
   public class ActivityManager<T> {
 
@@ -51,8 +52,11 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public HashSet<T> ActiveObjects { get { return _activeObjects; } }
 
-    /// <summary> If set to true, BeganActive and EndedActive will be calculated and populated. </summary>
-    public bool trackStateChanges = true;
+    /// <summary>
+    /// If set to true, BeganActive and EndedActive will be calculated and populated every time a
+    /// new query occurs.
+    /// </summary>
+    public bool trackStateChanges = false;
     private HashSet<T> _activeObjectsLastFrame = new HashSet<T>();
     private HashSet<T> _beganActiveObjects = new HashSet<T>();
     /// <summary>
@@ -78,47 +82,57 @@ namespace Leap.Unity.Interaction {
 
     [ThreadStatic]
     private static Collider[] s_colliderResultsBuffer = new Collider[32];
-    public void FixedUpdateQueryPosition(Vector3 palmPosition, List<LeapSpace> spaces = null) {
+    public void UpdateActivityQuery(Vector3? queryPosition, List<LeapSpace> spaces = null) {
       using (new ProfilerSample("Update Activity Manager")) {
-        _activeObjects.Clear();
-        
-        // Make sure collider results buffer exists (for other threads; see ThreadStatic)
-        if (s_colliderResultsBuffer == null || s_colliderResultsBuffer.Length < 32) {
-          s_colliderResultsBuffer = new Collider[32];
+        using (new ProfilerSample("Initialize Buffers")) {
+          _activeObjects.Clear();
+
+          // Make sure collider results buffer exists (for other threads; see ThreadStatic)
+          if (s_colliderResultsBuffer == null || s_colliderResultsBuffer.Length < 32) {
+            s_colliderResultsBuffer = new Collider[32];
+          }
         }
 
-        if (palmPosition != Vector3.zero) {
-          int count = GetSphereColliderResults(palmPosition, ref s_colliderResultsBuffer);
+        // Update object activity by activation radius around the query position (PhysX colliders necessary).
+        // queryPosition can be null, in which case no objects will be found, and they will all become inactive.
+        if (queryPosition.HasValue) {
+          Vector3 actualQueryPosition = queryPosition.GetValueOrDefault();
+
+          int count = GetSphereColliderResults(actualQueryPosition, ref s_colliderResultsBuffer);
           UpdateActiveList(count, s_colliderResultsBuffer);
 
-          if (spaces != null) {
-            //Check once in each of the GUI's subspaces
-            foreach (LeapSpace space in spaces) {
-              count = GetSphereColliderResults(transformPoint(palmPosition, space), ref s_colliderResultsBuffer);
-              UpdateActiveList(count, s_colliderResultsBuffer);
+          using (new ProfilerSample("Check GUI Spaces")) {
+            if (spaces != null) {
+              //Check once in each of the GUI's subspaces
+              foreach (LeapSpace space in spaces) {
+                count = GetSphereColliderResults(transformPoint(actualQueryPosition, space), ref s_colliderResultsBuffer);
+                UpdateActiveList(count, s_colliderResultsBuffer);
+              }
             }
           }
         }
 
-        if (trackStateChanges) {
-          _endedActiveObjects.Clear();
-          _beganActiveObjects.Clear();
+        using (new ProfilerSample("Track State Changes")) {
+          if (trackStateChanges) {
+            _endedActiveObjects.Clear();
+            _beganActiveObjects.Clear();
 
-          foreach (var behaviour in _activeObjects) {
-            if (!_activeObjectsLastFrame.Contains(behaviour)) {
-              _beganActiveObjects.Add(behaviour);
+            foreach (var behaviour in _activeObjects) {
+              if (!_activeObjectsLastFrame.Contains(behaviour)) {
+                _beganActiveObjects.Add(behaviour);
+              }
             }
-          }
 
-          foreach (var behaviour in _activeObjectsLastFrame) {
-            if (!_activeObjects.Contains(behaviour)) {
-              _endedActiveObjects.Add(behaviour);
+            foreach (var behaviour in _activeObjectsLastFrame) {
+              if (!_activeObjects.Contains(behaviour)) {
+                _endedActiveObjects.Add(behaviour);
+              }
             }
-          }
 
-          _activeObjectsLastFrame.Clear();
-          foreach (var behaviour in _activeObjects) {
-            _activeObjectsLastFrame.Add(behaviour);
+            _activeObjectsLastFrame.Clear();
+            foreach (var behaviour in _activeObjects) {
+              _activeObjectsLastFrame.Add(behaviour);
+            }
           }
         }
       }

@@ -32,8 +32,6 @@ namespace Leap.Unity.Interaction {
 
   public abstract class InteractionControllerBase : MonoBehaviour {
 
-    #region Public API
-
     /// <summary>
     /// Gets whether the underlying object (Leap hand or a held controller) is currently
     /// in a tracked state. Objects grasped by a controller that becomes untracked will
@@ -67,29 +65,11 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public abstract InteractionHand intHand { get; }
 
-    #region Hovering
-
-    /// <summary>
-    /// Gets whether the InteractionControllerBase is currently primarily hovering over any interaction object.
-    /// </summary>
-    public bool isPrimaryHovering { get { return hoverCheckResults.primaryHovered as InteractionBehaviour != null; } }
-
-    /// <summary>
-    /// Gets the InteractionBehaviour that is currently this InteractionControllerBase's primary hovered object,
-    /// if there is one.
-    /// </summary>
-    public InteractionBehaviour primaryHoveredObject { get { return hoverCheckResults.primaryHovered as InteractionBehaviour; } }
-
-    /// <summary>
-    /// Gets the distance from the closest fingertip on this hand to its primary hovered object, if there is one,
-    /// and if this controller represents a hand under the hood. If the controller represents a held wand, will
-    /// return the distance on any primary hovering colliders to the primary hovered object.
-    /// </summary>
-    public float primaryHoveredDistance { get { return isPrimaryHovering ? hoverCheckResults.primaryHoveredDistance : float.PositiveInfinity; } }
+    #region Events
 
     /// <summary>
     /// Called when this InteractionControllerBase begins primarily hovering over an InteractionBehaviour.
-    /// If the controller transitions to primarily-hovering a new object, OnEndPrimaryHoveringObject will
+    /// If the controller transitions to primarily hovering a new object, OnEndPrimaryHoveringObject will
     /// first be called on the old object, then OnBeginPrimaryHoveringObject will be called for
     /// the new object.
     /// </summary>
@@ -108,17 +88,11 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public Action<InteractionBehaviour> OnStayPrimaryHoveringObject = (intObj) => { };
 
-    /// <summary>
-    /// When set to true, locks the current primarily hovered object, even if the hand gets closer to
-    /// a different object.
-    /// </summary>
-    public void SetInteractionHoverOverride(bool value) {
-      _interactionHoverOverride = value;
-    }
-
     #endregion
 
     #region Grasping
+
+    // TODO: Move all o' dis down to the Grasping area.
 
     /// <summary> Gets whether the controller is currently grasping an object. </summary>
     public bool isGraspingObject { get { return _graspedObject != null; } }
@@ -191,14 +165,14 @@ namespace Leap.Unity.Interaction {
 
     #endregion
 
-    #endregion
-
-    public InteractionManager interactionManager;
+    public InteractionManager manager;
 
     protected virtual void Start() {
-      if (interactionManager == null) interactionManager = InteractionManager.instance;
+      if (manager == null) manager = InteractionManager.instance;
     }
 
+    // TODO: F this!! make ignoreHover and doHovering properties so that state can
+    // be updated immediately instead of having to have this stateful nonsense.
     private bool _didHoveringLastFrame, _didContactLastFrame, _didGraspingLastFrame;
     /// <summary>
     /// Called by the InteractionManager every fixed (physics) frame to populate the
@@ -207,7 +181,7 @@ namespace Leap.Unity.Interaction {
     public void FixedUpdateControllerBase(bool doHovering, bool doContact, bool doGrasping) {
       using (new ProfilerSample("Fixed Update InteractionControllerBase", _brushBoneParent)) {
 
-        if (doHovering || _didHoveringLastFrame) { FixedUpdateHovering(); }
+        if (doHovering || _didHoveringLastFrame) { fixedUpdateHovering(); }
         if (doContact || _didContactLastFrame) { FixedUpdateContact(doContact); }
         if (doGrasping || _didGraspingLastFrame) { FixedUpdateGrasping(); }
 
@@ -221,7 +195,27 @@ namespace Leap.Unity.Interaction {
 
     #region Hovering
 
-    private const float MAX_PRIMARY_HOVER_DISTANCE = 0.5F;
+    /// <summary>
+    /// In addition to standard hover validity checks, you can set this filter property
+    /// to further filter objects for hover consideration. Only objects for which this
+    /// function returns true will be hover candidates (if the filter is not null).
+    /// </summary>
+    public Func<IInteractionBehaviour, bool> customHoverActivityFilter = null;
+
+    // Hover Activity Filter
+    private Func<Collider, IInteractionBehaviour> hoverActivityFilter;
+    private IInteractionBehaviour hoverFilterFunc(Collider collider) {
+      Rigidbody rigidbody = collider.attachedRigidbody;
+      IInteractionBehaviour intObj = null;
+
+      bool objectValidForHover = rigidbody != null
+                                && manager.interactionObjectBodies.TryGetValue(rigidbody, out intObj)
+                                && !intObj.ShouldIgnoreHover(this)
+                                && (customHoverActivityFilter == null || customHoverActivityFilter(intObj));
+
+      if (objectValidForHover) return intObj;
+      else return null;
+    }
 
     // Hover Activity Manager
     private ActivityManager<IInteractionBehaviour> _hoverActivityManager;
@@ -230,206 +224,227 @@ namespace Leap.Unity.Interaction {
         if (_hoverActivityManager == null) {
           if (hoverActivityFilter == null) hoverActivityFilter = hoverFilterFunc;
 
-          _hoverActivityManager = new ActivityManager<IInteractionBehaviour>(interactionManager.hoverActivationRadius,
+          _hoverActivityManager = new ActivityManager<IInteractionBehaviour>(manager.hoverActivationRadius,
                                                                              hoverActivityFilter);
 
-          _hoverActivityManager.activationLayerMask = interactionManager.interactionLayer.layerMask
-                                                    | interactionManager.interactionNoContactLayer.layerMask;
+          _hoverActivityManager.activationLayerMask = manager.interactionLayer.layerMask
+                                                    | manager.interactionNoContactLayer.layerMask;
         }
         return _hoverActivityManager;
       }
     }
 
-    private Func<Collider, IInteractionBehaviour> hoverActivityFilter;
-    private IInteractionBehaviour hoverFilterFunc(Collider collider) {
-      if (collider.attachedRigidbody != null) {
-        Rigidbody body = collider.attachedRigidbody;
-        IInteractionBehaviour intObj;
-        if (body != null && interactionManager.interactionObjectBodies.TryGetValue(body, out intObj)
-            && !intObj.ShouldIgnoreHover(this)) {
-          return intObj;
-        }
-      }
-
-      return null;
+    /// <summary>
+    /// Disables broadphase checks if an object is currently interacting with this hand.
+    /// </summary>
+    private bool _hoverLocked = false;
+    /// <summary>
+    /// When set to true, locks the current primarily hovered object, even if the hand gets closer to
+    /// a different object.
+    /// </summary>
+    public bool hoverLocked {
+      get { return _hoverLocked; }
+      set { _hoverLocked = value; }
     }
-
-    // Disables broadphase checks if an object is currently interacting with this hand.
-    private bool _interactionHoverOverride = false;
-
-    public struct HoverCheckResults {
-      public HashSet<IInteractionBehaviour> hovered;
-      public IInteractionBehaviour primaryHovered;
-      public int primaryHoveringFingerIdx;
-      public float primaryHoveredDistance;
-      public IInteractionBehaviour[] perFingerHovered;
-      public float[] perFingerDistance;
-      public Hand checkedHand;
-    }
-
-    private HoverCheckResults _hoverResults = new HoverCheckResults();
 
     /// <summary>
     /// Gets the current position to check against nearby objects for hovering.
     /// Position is only used if the controller is currently tracked. For example,
     /// InteractionHand returns the center of the palm of the underlying Leap hand.
     /// </summary>
-    protected abstract Vector3 hoverPoint { get; }
+    protected abstract Transform hoverPoint { get; }
+
+    private HashSet<IInteractionBehaviour> _hoveredObjects;
+    /// <summary>
+    /// Returns a set of all Interaction objects currently hovered by this
+    /// InteractionController.
+    /// </summary>
+    public ReadonlyHashSet<IInteractionBehaviour> hoveredObjects { get { return _hoveredObjects; } }
+
+    protected abstract List<Transform> _primaryHoverPoints { get; }
+    /// <summary>
+    /// Gets the list of Transforms to consider against nearby objects to determine
+    /// the closest object (primary hover) of this controller.
+    /// </summary>
+    public ReadonlyList<Transform> primaryHoverPoints  { get { return primaryHoverPoints; } }
 
     /// <summary>
-    /// Returns the information used to calculate hover and primary hover callbacks from
-    /// the latest fixed frame.
+    /// Gets whether the InteractionControllerBase is currently primarily hovering over any interaction object.
     /// </summary>
-    public HoverCheckResults hoverCheckResults { get { return _hoverResults; } }
+    public bool isPrimaryHovering { get { return primaryHoveredObject != null; } }
 
-    private void FixedUpdateHovering() {
+    private IInteractionBehaviour _primaryHoveredObject;
+    /// <summary>
+    /// Gets the InteractionBehaviour that is currently this InteractionControllerBase's
+    /// primary hovered object, if there is one.
+    /// </summary>
+    public IInteractionBehaviour primaryHoveredObject { get { return _primaryHoveredObject; } }
+
+    private float _primaryHoverDistance = float.PositiveInfinity;
+    /// <summary>
+    /// Gets the distance from the closest primary hover point on this controller to its
+    /// primarily hovered object, if there are any.
+    /// </summary>
+    public float primaryHoverDistance { get { return _primaryHoverDistance; } }
+
+    /// <summary> Index of the closest primary hover point in the primaryHoverPoints list. </summary>
+    private int                         _primaryHoverPointIdx = -1;
+    private List<IInteractionBehaviour> _perPointPrimaryHovered = new List<IInteractionBehaviour>();
+    private List<float>                 _perPointPrimaryHoverDistance = new List<float>();
+
+    private void fixedUpdateHovering() {
       using (new ProfilerSample("Fixed Update InteractionControllerBase Hovering")) {
-        if (!isTracked && _interactionHoverOverride) {
-          _interactionHoverOverride = false;
+        // Reset hover lock if the controller loses tracking.
+        if (!isTracked && hoverLocked) {
+          _hoverLocked = false;
         }
 
-        if (!_interactionHoverOverride) {
-          hoverActivityManager.activationRadius = interactionManager.WorldHoverActivationRadius;
-          hoverActivityManager.FixedUpdateQueryPosition((isTracked) ? hoverPoint, LeapSpace.allEnabled);
+        // Update hover state if it's not currently locked.
+        if (!hoverLocked) {
+          hoverActivityManager.activationRadius = manager.WorldHoverActivationRadius;
 
-          using (new ProfilerSample("Check for Closest Elements")) {
-            CheckHoverForController(this, _hoverActivityManager.ActiveObjects);
+          Vector3? queryPosition = isTracked ? (Vector3?)hoverPoint.position : null;
+          hoverActivityManager.UpdateActivityQuery(queryPosition, LeapSpace.allEnabled);
+
+          // Add all returned objects as "hovered".
+          // Find closest objects per primary hover point to update primary hover state.
+          using (new ProfilerSample("Find Closest Objects for Primary Hover")) {
+            refreshHoverState(_hoverActivityManager.ActiveObjects);
           }
         }
 
-        ProcessHoverCheckResults();
-        
-        ProcessPrimaryHoverCheckResults();
+        // Refresh buffer information from the previous frame to be able to fire
+        // the appropriate hover state callbacks.
+        refreshHoverStateBuffers();
+        refreshPrimaryHoverStateBuffers();
 
-        // Support curved ("warped") space interactions.
-        ISpaceComponent space;
-        if (isTracked) {
+        // Support interactions in curved ("warped") space.
+        if (isTracked && isPrimaryHovering) {
+          ISpaceComponent space = primaryHoveredObject.space;
 
-          //_warpedHandData.CopyFrom(_handData);
-
-          // TODO: Support curved spaces!
-          //if (_hoverResults.primaryHovered != null && (space = _hoverResults.primaryHovered.space) != null) {
-          //  //Transform bulk hand to the closest element's warped space
-          //  inverseTransformHand(_warpedHandData, space);
-          //}
+          if (space != null) {
+            inverseTransformColliders(primaryHoverPoints[_primaryHoverPointIdx], space);
+          }
         }
       }
     }
 
     /// <summary>
-    /// 
+    /// Warps the collider transforms of this controller by the inverse of the
+    /// transformation that is applied on the provided warpedSpaceElement, using
+    /// the primaryHoverPoint as the pivot point for the transformation.
+    /// ISpaceComponents denote game objects whose visual positions are warped
+    /// from rectilinear (non-warped) space into a curved space (via, for example,
+    /// a LeapCylindricalSpace, which can only be rendered correctly by the Leap
+    /// Graphic Renderer). This method reverses that transformation for the hand,
+    /// bringing it into the object's rectilinear space, allowing objects curved
+    /// in this way to correctly collide with the bones in the hand or collider of
+    /// a held controller.
     /// </summary>
-    protected abstract void inverseTransformColliders(ISpaceComponent warpedSpaceElement) {
+    protected abstract void inverseTransformColliders(Transform primaryHoverPoint,
+                                                      ISpaceComponent warpedSpaceElement);
 
-    }
-
+    // Hover history, handled as part of the Interaction Manager's state-check calls.
     private IInteractionBehaviour _primaryHoveredLastFrame = null;
     private HashSet<IInteractionBehaviour> _hoveredLastFrame = new HashSet<IInteractionBehaviour>();
-    private HashSet<IInteractionBehaviour> _hoverableCache = new HashSet<IInteractionBehaviour>();
-    private IInteractionBehaviour[] _tempPerFingerHovered = new IInteractionBehaviour[3];
-    private float[] _tempPerFingerDistance = new float[3];
 
-    private float _minDistanceToBeat = float.PositiveInfinity;
+    /// <summary>
+    /// Clears the previous hover state data and calculates it anew based on the
+    /// latest hover and primary hover point data.
+    /// </summary>
+    private void refreshHoverState(HashSet<IInteractionBehaviour> hoverCandidates) {
+      // Prepare data from last frame for hysteresis later on.
+      int primaryHoverPointIdxLastFrame = _primaryHoveredLastFrame != null ? _primaryHoverPointIdx : -1;
 
-    private void CheckHoverForHand(Hand hand, HashSet<IInteractionBehaviour> hoverCandidates) {
-      _hoverableCache.Clear();
-      Array.Clear(_tempPerFingerHovered, 0, _tempPerFingerHovered.Length);
-      Array.Clear(_tempPerFingerDistance, 0, _tempPerFingerDistance.Length);
+      _hoveredObjects.Clear();
+      _primaryHoveredObject = null;
+      _primaryHoverDistance = float.PositiveInfinity;
+      _primaryHoverPointIdx = -1;
+      _perPointPrimaryHovered.Clear();
+      _perPointPrimaryHoverDistance.Clear();
 
-      int primaryHoveringFingerIdxLastFrame = _primaryHoveredLastFrame != null ? _hoverResults.primaryHoveringFingerIdx : -1;
+      // We can only update hover information if there's tracked data.
+      if (!isTracked) return;
 
-      _hoverResults.hovered = _hoverableCache;
-      _hoverResults.perFingerHovered = _tempPerFingerHovered;
-      _hoverResults.perFingerDistance = _tempPerFingerDistance;
-      _hoverResults.primaryHovered = null;
-      _hoverResults.primaryHoveredDistance = float.PositiveInfinity;
-      _hoverResults.primaryHoveringFingerIdx = -1;
-      _hoverResults.checkedHand = hand;
+      // Determine values to apply hysteresis to the primary hover state.
+      float maxNewPrimaryHoverDistance = float.PositiveInfinity;
+      if (_primaryHoveredLastFrame != null && primaryHoverPointIdxLastFrame != -1) {
+        float distanceToLastPrimaryHover = _primaryHoveredLastFrame.GetHoverDistance(
+                                              primaryHoverPoints[primaryHoverPointIdxLastFrame].position);
 
-      //Loop through all the fingers (that we care about)
-      if (hand != null) {
+        // The distance to a new object must be even closer than the current primary hover
+        // distance in order for that object to become the new primary hover.
+        maxNewPrimaryHoverDistance = distanceToLastPrimaryHover
+                                    * distanceToLastPrimaryHover.Map(0.009F, 0.018F, 0.4F, 0.95F);
 
-        // Calculate hysteresis to being able to change primary hover.
-        if (_primaryHoveredLastFrame != null && primaryHoveringFingerIdxLastFrame != -1) {
-          float _distanceToLastPrimaryHover = _primaryHoveredLastFrame.GetHoverDistance(hand.Fingers[primaryHoveringFingerIdxLastFrame].TipPosition.ToVector3());
-          _minDistanceToBeat = _distanceToLastPrimaryHover * _distanceToLastPrimaryHover.Map(0.009F, 0.018F, 0.4F, 0.95F); // hysteresis!
-          if (_minDistanceToBeat < 0.008F) _minDistanceToBeat = 0F;
-        }
+        // If we're very close, prevent the primary hover from changing at all.
+        if (maxNewPrimaryHoverDistance < 0.008F) maxNewPrimaryHoverDistance = 0F;
+      }
+
+      foreach (IInteractionBehaviour behaviour in hoverCandidates) {
+        // All hover candidates automatically count as hovered.
+        _hoveredObjects.Add(behaviour);
+
+        // Some objects can ignore consideration for primary hover as an
+        // optimization, since it can require a lot of distance checks.
+        if (behaviour.ignorePrimaryHover) continue;
+
+        // Do further processing to determine the primary hover.
         else {
-          _minDistanceToBeat = float.PositiveInfinity;
-        }
 
-        for (int i = 0; i < 3; i++) {
-          float leastFingerDistance = float.PositiveInfinity;
-          Vector3 fingerTip = hand.Fingers[i].TipPosition.ToVector3();
+          // Check against all positions currently registered as primary hover points,
+          // finding the closest one and updating hover data accordingly.
+          float shortestPointDistance = float.PositiveInfinity;
+          for (int i = 0; i < primaryHoverPoints.Count; i++) {
+            var primaryHoverPoint = primaryHoverPoints[i];
 
-          // Loop through all the candidates
-          foreach (IInteractionBehaviour behaviour in hoverCandidates) {
-            CheckHoverForBehaviour(fingerTip, behaviour, behaviour.space, i, ref leastFingerDistance, ref _hoverResults,
-                                   minDistanceToBeat: _minDistanceToBeat, minDistanceBasedOn: _primaryHoveredLastFrame);
+            // It's possible to disable primary hover points to ignore them for hover
+            // consideration.
+            if (!primaryHoverPoint.gameObject.activeInHierarchy) continue;
+
+            // TODO: ADD THIS BACK! To InteractionHand
+            // Skip non-index fingers if they aren't extended.
+            //if (!hand.Fingers[i].IsExtended && i != 1) { continue; }
+
+            // Check primary hover for the primary hover point.
+            float behaviourDistance = GetHoverDistance(primaryHoverPoint.position, behaviour);
+            if (behaviourDistance < shortestPointDistance) {
+
+              // This is the closest behaviour to this primary hover point.
+              _perPointPrimaryHovered[i] = behaviour;
+              _perPointPrimaryHoverDistance[i] = behaviourDistance;
+              shortestPointDistance = behaviourDistance;
+
+              if (shortestPointDistance < _primaryHoverDistance
+                  && (behaviour == _primaryHoveredLastFrame || behaviourDistance < maxNewPrimaryHoverDistance)) {
+
+                // This is the closest behaviour to ANY primary hover point, and the
+                // distance is less than the hysteresis distance to transition away from
+                // the previous primary hovered object.
+                _primaryHoveredObject = _perPointPrimaryHovered[i];
+                _primaryHoverDistance = _perPointPrimaryHoverDistance[i];
+                _primaryHoverPointIdx = i;
+              }
+            }
           }
         }
       }
     }
 
-    public Vector3 transformPoint(Vector3 worldPoint, ISpaceComponent element) {
-      if (element.anchor != null && element.anchor.space != null) {
-        Vector3 localPos = element.anchor.space.transform.InverseTransformPoint(worldPoint);
-        return element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPos));
-      }
-      else {
-        return worldPoint;
-      }
-    }
+    #region Hover State Checks
 
-    private void inverseTransformHand(Hand inHand, ISpaceComponent element) {
-      if (element.anchor != null && element.anchor.space != null) {
-        Vector3 originalPosition = inHand.Fingers[hoverCheckResults.primaryHoveringFingerIdx].bones[3].NextJoint.ToVector3();
-        Quaternion originalRotation = inHand.Fingers[hoverCheckResults.primaryHoveringFingerIdx].bones[3].Rotation.ToQuaternion();
-
-        Vector3 localTipPos = element.anchor.space.transform.InverseTransformPoint(originalPosition);
-        Quaternion localTipRot = element.anchor.space.transform.InverseTransformRotation(originalRotation);
-
-        inHand.Transform(-originalPosition, Quaternion.identity);
-        inHand.Transform(element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localTipPos)),
-                         element.anchor.space.transform.TransformRotation(element.anchor.transformer.InverseTransformRotation(localTipPos, localTipRot)) * Quaternion.Inverse(originalRotation));
-      }
-    }
-
-    private void CheckHoverForBehaviour(Vector3 position, IInteractionBehaviour behaviour, ISpaceComponent spaceComponent, int whichFinger, ref float leastFingerDistance, ref HoverCheckResults curResults, float minDistanceToBeat = float.PositiveInfinity, IInteractionBehaviour minDistanceBasedOn = null) {
-
-      float distance = float.PositiveInfinity;
-      if (spaceComponent == null) {
-        distance = behaviour.GetHoverDistance(position);
-      }
-      else {
-        distance = behaviour.GetHoverDistance(transformPoint(position, spaceComponent));
-      }
-
-      curResults.hovered.Add(behaviour);
-
-      if (distance < leastFingerDistance) {
-        curResults.perFingerHovered[whichFinger] = behaviour;
-        curResults.perFingerDistance[whichFinger] = distance;
-        leastFingerDistance = distance;
-
-        if (leastFingerDistance < curResults.primaryHoveredDistance && (behaviour == minDistanceBasedOn || distance < minDistanceToBeat)) {
-          curResults.primaryHoveredDistance = leastFingerDistance;
-          curResults.primaryHovered = curResults.perFingerHovered[whichFinger];
-          curResults.primaryHoveringFingerIdx = whichFinger;
-        }
-      }
-    }
+    private HashSet<IInteractionBehaviour> _hoverEndedBuffer = new HashSet<IInteractionBehaviour>();
+    private HashSet<IInteractionBehaviour> _hoverBeganBuffer = new HashSet<IInteractionBehaviour>();
 
     private List<IInteractionBehaviour> _hoverRemovalCache = new List<IInteractionBehaviour>();
-    private void ProcessHoverCheckResults() {
+    private void refreshHoverStateBuffers() {
       _hoverBeganBuffer.Clear();
       _hoverEndedBuffer.Clear();
 
       var trackedBehaviours = _hoverActivityManager.ActiveObjects;
       foreach (var hoverable in trackedBehaviours) {
         bool inLastFrame = false, inCurFrame = false;
-        if (_hoverResults.hovered.Contains(hoverable)) {
+        if (hoveredObjects.Contains(hoverable)) {
           inCurFrame = true;
         }
         if (_hoveredLastFrame.Contains(hoverable)) {
@@ -457,9 +472,6 @@ namespace Leap.Unity.Interaction {
       }
       _hoverRemovalCache.Clear();
     }
-
-    private HashSet<IInteractionBehaviour> _hoverEndedBuffer = new HashSet<IInteractionBehaviour>();
-    private HashSet<IInteractionBehaviour> _hoverBeganBuffer = new HashSet<IInteractionBehaviour>();
 
     /// <summary>
     /// Called by the Interaction Manager every fixed frame.
@@ -489,18 +501,23 @@ namespace Leap.Unity.Interaction {
     /// output set is empty.
     /// </summary>
     public bool CheckHoverStay(out HashSet<IInteractionBehaviour> hoveredObjects) {
-      hoveredObjects = hoverActivityManager.ActiveObjects;
+      hoveredObjects = _hoverResults.hovered;
       return hoveredObjects.Count > 0;
     }
 
-    // Primary Hover //
+    #endregion
 
-    private void ProcessPrimaryHoverCheckResults() {
-      if (_hoverResults.primaryHovered != _primaryHoveredLastFrame) {
+    #region Primary Hover State Checks
+
+    private IInteractionBehaviour _primaryHoverEndedObject = null;
+    private IInteractionBehaviour _primaryHoverBeganObject = null;
+
+    private void refreshPrimaryHoverStateBuffers() {
+      if (primaryHoveredObject != _primaryHoveredLastFrame) {
         if (_primaryHoveredLastFrame != null) _primaryHoverEndedObject = _primaryHoveredLastFrame;
         else _primaryHoverEndedObject = null;
 
-        _primaryHoveredLastFrame = _hoverResults.primaryHovered;
+        _primaryHoveredLastFrame = primaryHoveredObject;
 
         if (_primaryHoveredLastFrame != null) _primaryHoverBeganObject = _primaryHoveredLastFrame;
         else _primaryHoverBeganObject = null;
@@ -510,9 +527,6 @@ namespace Leap.Unity.Interaction {
         _primaryHoverBeganObject = null;
       }
     }
-
-    private IInteractionBehaviour _primaryHoverEndedObject = null;
-    private IInteractionBehaviour _primaryHoverBeganObject = null;
 
     /// <summary>
     /// Called by the Interaction Manager every fixed frame.
@@ -560,6 +574,34 @@ namespace Leap.Unity.Interaction {
       }
 
       return primaryHoverStayed;
+    }
+
+    #endregion
+
+    /// <summary>
+    /// Returns the hover distance from the hoverPoint to the specified object, automatically
+    /// accounting for ISpaceComponent warping if necessary.
+    /// </summary>
+    public static float GetHoverDistance(Vector3 hoverPoint, IInteractionBehaviour behaviour) {
+      if (behaviour.space != null) {
+        return behaviour.GetHoverDistance(TransformPoint(hoverPoint, behaviour.space));
+      }
+      else {
+        return behaviour.GetHoverDistance(hoverPoint);
+      }
+    }
+
+    /// <summary>
+    /// Applies the spatial warping of the provided ISpaceComponent to a world-space point.
+    /// </summary>
+    public static Vector3 TransformPoint(Vector3 worldPoint, ISpaceComponent element) {
+      if (element.anchor != null && element.anchor.space != null) {
+        Vector3 localPos = element.anchor.space.transform.InverseTransformPoint(worldPoint);
+        return element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localPos));
+      }
+      else {
+        return worldPoint;
+      }
     }
 
     #endregion
@@ -618,8 +660,8 @@ namespace Leap.Unity.Interaction {
 
     private void InitBrushBoneContainer() {
       _brushBoneParent = new GameObject((_warpedHandData.IsLeft ? "Left" : "Right") + " Interaction Hand Contact Bones");
-      _brushBoneParent.transform.parent = interactionManager.transform;
-      _brushBoneParent.layer = interactionManager.ContactBoneLayer;
+      _brushBoneParent.transform.parent = manager.transform;
+      _brushBoneParent.layer = manager.ContactBoneLayer;
     }
 
     private void InitBrushBones() {
@@ -632,7 +674,7 @@ namespace Leap.Unity.Interaction {
           int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
 
           GameObject contactBoneObj = new GameObject("Contact Fingerbone", typeof(CapsuleCollider), typeof(Rigidbody), typeof(ContactBone));
-          contactBoneObj.layer = interactionManager.ContactBoneLayer;
+          contactBoneObj.layer = manager.ContactBoneLayer;
 
           contactBoneObj.transform.position = bone.Center.ToVector3();
           contactBoneObj.transform.rotation = bone.Rotation.ToQuaternion();
@@ -811,9 +853,9 @@ namespace Leap.Unity.Interaction {
               sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, _softContactBoneRadius,
                                                                        (boneCenter - _previousBoneCenters[boneArrayIndex])
                                                                          / Time.fixedDeltaTime,
-                                                                       1 << interactionManager.interactionLayer,
-                                                                       ref interactionManager._softContacts,
-                                                                       ref interactionManager._softContactOriginalVelocities,
+                                                                       1 << manager.interactionLayer,
+                                                                       ref manager._softContacts,
+                                                                       ref manager._softContactOriginalVelocities,
                                                                        ref _tempColliderArray);
             }
 
@@ -899,7 +941,7 @@ namespace Leap.Unity.Interaction {
           _softContactEnabled = true;
           ResetBrushBoneJoints();
           if (_delayedDisableSoftContactCoroutine != null) {
-            interactionManager.StopCoroutine(_delayedDisableSoftContactCoroutine);
+            manager.StopCoroutine(_delayedDisableSoftContactCoroutine);
           }
           for (int i = _brushBones.Length; i-- != 0; ) {
             _brushBones[i].collider.isTrigger = true;
@@ -922,7 +964,7 @@ namespace Leap.Unity.Interaction {
       using (new ProfilerSample("Enqueue Disable Soft Contact")) {
         if (!_disableSoftContactEnqueued) {
           _delayedDisableSoftContactCoroutine = DelayedDisableSoftContact();
-          interactionManager.StartCoroutine(_delayedDisableSoftContactCoroutine);
+          manager.StartCoroutine(_delayedDisableSoftContactCoroutine);
           _disableSoftContactEnqueued = true;
         }
       }
@@ -1105,8 +1147,8 @@ namespace Leap.Unity.Interaction {
 
           _graspActivityManager = new ActivityManager<IInteractionBehaviour>(1F, graspActivityFilter);
 
-          _graspActivityManager.activationLayerMask = interactionManager.interactionLayer.layerMask
-                                                    | interactionManager.interactionNoContactLayer.layerMask;
+          _graspActivityManager.activationLayerMask = manager.interactionLayer.layerMask
+                                                    | manager.interactionNoContactLayer.layerMask;
         }
         return _graspActivityManager;
       }
@@ -1117,7 +1159,7 @@ namespace Leap.Unity.Interaction {
       if (collider.attachedRigidbody != null) {
         Rigidbody body = collider.attachedRigidbody;
         IInteractionBehaviour intObj;
-        if (body != null && interactionManager.interactionObjectBodies.TryGetValue(body, out intObj)
+        if (body != null && manager.interactionObjectBodies.TryGetValue(body, out intObj)
             && !intObj.ignoreGrasping) {
           return intObj;
         }
@@ -1139,7 +1181,7 @@ namespace Leap.Unity.Interaction {
 
     private void FixedUpdateGrasping() {
       using (new ProfilerSample("Fixed Update InteractionControllerBase Grasping")) {
-        graspActivityManager.FixedUpdateQueryPosition(GetLastTrackedLeapHand().PalmPosition.ToVector3(), LeapSpace.allEnabled);
+        graspActivityManager.UpdateActivityQuery(GetLastTrackedLeapHand().PalmPosition.ToVector3(), LeapSpace.allEnabled);
         grabClassifier.FixedUpdateClassifierHandState();
       }
     }

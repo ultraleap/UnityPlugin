@@ -53,61 +53,23 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     private Hand _hand;
 
+    public void REFRESHHANDDATA() {
+      // TODO: Fixme!
+      // Subscribe hands to the fixed-frame dispatch of the ServiceProvider.
+      // Hands will likely need methods to convert frames into hands.
+
+      // It will need to contain this:
+
+      _warpedHandData.CopyFrom(_handData);
+
+      return false; // fix this method D:<
+    }
+
     #region Hovering
 
     protected override Vector3 hoverPoint {
       get {
-        if (!isTracked) return Vector3.zero;
         return leapHand.PalmPosition.ToVector3();
-      }
-    }
-
-    private IInteractionBehaviour _primaryHoveredLastFrame = null;
-    private HashSet<IInteractionBehaviour> _hoveredLastFrame = new HashSet<IInteractionBehaviour>();
-    private HashSet<IInteractionBehaviour> _hoverableCache = new HashSet<IInteractionBehaviour>();
-    private IInteractionBehaviour[] _tempPerFingerHovered = new IInteractionBehaviour[3];
-    private float[] _tempPerFingerDistance = new float[3];
-
-    private float _minDistanceToBeat = float.PositiveInfinity;
-
-    private void CheckHoverForHand(Hand hand, HashSet<IInteractionBehaviour> hoverCandidates) {
-      _hoverableCache.Clear();
-      Array.Clear(_tempPerFingerHovered, 0, _tempPerFingerHovered.Length);
-      Array.Clear(_tempPerFingerDistance, 0, _tempPerFingerDistance.Length);
-
-      int primaryHoveringFingerIdxLastFrame = _primaryHoveredLastFrame != null ? _hoverResults.primaryHoveringFingerIdx : -1;
-
-      _hoverResults.hovered = _hoverableCache;
-      _hoverResults.perFingerHovered = _tempPerFingerHovered;
-      _hoverResults.perFingerDistance = _tempPerFingerDistance;
-      _hoverResults.primaryHovered = null;
-      _hoverResults.primaryHoveredDistance = float.PositiveInfinity;
-      _hoverResults.primaryHoveringFingerIdx = -1;
-      _hoverResults.checkedHand = hand;
-
-      //Loop through all the fingers (that we care about)
-      if (hand != null) {
-
-        // Calculate hysteresis to being able to change primary hover.
-        if (_primaryHoveredLastFrame != null && primaryHoveringFingerIdxLastFrame != -1) {
-          float _distanceToLastPrimaryHover = _primaryHoveredLastFrame.GetHoverDistance(hand.Fingers[primaryHoveringFingerIdxLastFrame].TipPosition.ToVector3());
-          _minDistanceToBeat = _distanceToLastPrimaryHover * _distanceToLastPrimaryHover.Map(0.009F, 0.018F, 0.4F, 0.95F); // hysteresis!
-          if (_minDistanceToBeat < 0.008F) _minDistanceToBeat = 0F;
-        }
-        else {
-          _minDistanceToBeat = float.PositiveInfinity;
-        }
-
-        for (int i = 0; i < 3; i++) {
-          float leastFingerDistance = float.PositiveInfinity;
-          Vector3 fingerTip = hand.Fingers[i].TipPosition.ToVector3();
-
-          // Loop through all the candidates
-          foreach (IInteractionBehaviour behaviour in hoverCandidates) {
-            CheckHoverForBehaviour(fingerTip, behaviour, behaviour.space, i, ref leastFingerDistance, ref _hoverResults,
-                                   minDistanceToBeat: _minDistanceToBeat, minDistanceBasedOn: _primaryHoveredLastFrame);
-          }
-        }
       }
     }
 
@@ -120,43 +82,21 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    // TODO: UNUSED. Need to get abstract controller representation that can support
-    // curved spaces.
-    private void inverseTransformHand(Hand inHand, ISpaceComponent element) {
-      if (element.anchor != null && element.anchor.space != null) {
-        Vector3 originalPosition = inHand.Fingers[hoverCheckResults.primaryHoveringFingerIdx].bones[3].NextJoint.ToVector3();
-        Quaternion originalRotation = inHand.Fingers[hoverCheckResults.primaryHoveringFingerIdx].bones[3].Rotation.ToQuaternion();
+    protected override void inverseTransformColliders(Vector3 primaryHoverPoint, Quaternion primaryHoverPointRotation, ISpaceComponent warpedSpaceElement) {
+      Hand handToWarp = _warpedHandData;
 
-        Vector3 localTipPos = element.anchor.space.transform.InverseTransformPoint(originalPosition);
-        Quaternion localTipRot = element.anchor.space.transform.InverseTransformRotation(originalRotation);
+      if (warpedSpaceElement.anchor != null && warpedSpaceElement.anchor.space != null) {
+        Vector3 originalPosition = primaryHoverPoint;
+        Quaternion originalRotation = primaryHoverPointRotation;
 
-        inHand.Transform(-originalPosition, Quaternion.identity);
-        inHand.Transform(element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localTipPos)),
-                         element.anchor.space.transform.TransformRotation(element.anchor.transformer.InverseTransformRotation(localTipPos, localTipRot)) * Quaternion.Inverse(originalRotation));
-      }
-    }
+        Vector3 localTipPos = warpedSpaceElement.anchor.space.transform.InverseTransformPoint(originalPosition);
+        Quaternion localTipRot = warpedSpaceElement.anchor.space.transform.InverseTransformRotation(originalRotation);
 
-    private void CheckHoverForBehaviour(Vector3 position, IInteractionBehaviour behaviour, ISpaceComponent spaceComponent, int whichFinger, ref float leastFingerDistance, ref HoverCheckResults curResults, float minDistanceToBeat = float.PositiveInfinity, IInteractionBehaviour minDistanceBasedOn = null) {
-
-      float distance = float.PositiveInfinity;
-      if (spaceComponent == null) {
-        distance = behaviour.GetHoverDistance(position);
-      } else {
-        distance = behaviour.GetHoverDistance(transformPoint(position, spaceComponent));
-      }
-
-      curResults.hovered.Add(behaviour);
-
-      if (distance < leastFingerDistance) {
-        curResults.perFingerHovered[whichFinger] = behaviour;
-        curResults.perFingerDistance[whichFinger] = distance;
-        leastFingerDistance = distance;
-
-        if (leastFingerDistance < curResults.primaryHoveredDistance && (behaviour == minDistanceBasedOn || distance < minDistanceToBeat)) {
-          curResults.primaryHoveredDistance = leastFingerDistance;
-          curResults.primaryHovered = curResults.perFingerHovered[whichFinger];
-          curResults.primaryHoveringFingerIdx = whichFinger;
-        }
+        handToWarp.Transform(-originalPosition, Quaternion.identity);
+        handToWarp.Transform(warpedSpaceElement.anchor.space.transform.TransformPoint(warpedSpaceElement.anchor.transformer.InverseTransformPoint(localTipPos)),
+          //warpedSpaceElement.anchor.space.transform.TransformRotation//(warpedSpaceElement.anchor.transformer.InverseTransformRotation(localTipPos, localTipRot)) * Quaternion.Inverse(originalRotation));
+                 warpedSpaceElement.anchor.transformer.TransformRotation(localTipPos, Quaternion.identity));
+        // Test this on `feature-leap-gui` before committing to it, but if it works this means I can re-architecture around just Vector3s rather than _needing_ whole Transforms!
       }
     }
 
@@ -356,8 +296,8 @@ namespace Leap.Unity.Interaction {
 
     private void InitBrushBoneContainer() {
       _brushBoneParent = new GameObject((_warpedHandData.IsLeft ? "Left" : "Right") + " Interaction Hand Contact Bones");
-      _brushBoneParent.transform.parent = interactionManager.transform;
-      _brushBoneParent.layer = interactionManager.ContactBoneLayer;
+      _brushBoneParent.transform.parent = manager.transform;
+      _brushBoneParent.layer = manager.ContactBoneLayer;
     }
 
     private void InitBrushBones() {
@@ -370,7 +310,7 @@ namespace Leap.Unity.Interaction {
           int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
 
           GameObject contactBoneObj = new GameObject("Contact Fingerbone", typeof(CapsuleCollider), typeof(Rigidbody), typeof(ContactBone));
-          contactBoneObj.layer = interactionManager.ContactBoneLayer;
+          contactBoneObj.layer = manager.ContactBoneLayer;
 
           contactBoneObj.transform.position = bone.Center.ToVector3();
           contactBoneObj.transform.rotation = bone.Rotation.ToQuaternion();
@@ -546,9 +486,9 @@ namespace Leap.Unity.Interaction {
               sphereIntersecting = PhysicsUtility.generateSphereContacts(boneCenter, _softContactBoneRadius,
                                                                        (boneCenter - _previousBoneCenters[boneArrayIndex])
                                                                          / Time.fixedDeltaTime,
-                                                                       1 << interactionManager.interactionLayer,
-                                                                       ref interactionManager._softContacts,
-                                                                       ref interactionManager._softContactOriginalVelocities,
+                                                                       1 << manager.interactionLayer,
+                                                                       ref manager._softContacts,
+                                                                       ref manager._softContactOriginalVelocities,
                                                                        ref _tempColliderArray);
             }
 
@@ -631,7 +571,7 @@ namespace Leap.Unity.Interaction {
           _softContactEnabled = true;
           ResetBrushBoneJoints();
           if (_delayedDisableSoftContactCoroutine != null) {
-            interactionManager.StopCoroutine(_delayedDisableSoftContactCoroutine);
+            manager.StopCoroutine(_delayedDisableSoftContactCoroutine);
           }
           for (int i = _brushBones.Length; i-- != 0;) {
             _brushBones[i].collider.isTrigger = true;
@@ -654,7 +594,7 @@ namespace Leap.Unity.Interaction {
       using (new ProfilerSample("Enqueue Disable Soft Contact")) {
         if (!_disableSoftContactEnqueued) {
           _delayedDisableSoftContactCoroutine = DelayedDisableSoftContact();
-          interactionManager.StartCoroutine(_delayedDisableSoftContactCoroutine);
+          manager.StartCoroutine(_delayedDisableSoftContactCoroutine);
           _disableSoftContactEnqueued = true;
         }
       }
@@ -835,8 +775,8 @@ namespace Leap.Unity.Interaction {
 
           _graspActivityManager = new ActivityManager<IInteractionBehaviour>(1F, graspActivityFilter);
 
-          _graspActivityManager.activationLayerMask = interactionManager.interactionLayer.layerMask
-                                                    | interactionManager.interactionNoContactLayer.layerMask;
+          _graspActivityManager.activationLayerMask = manager.interactionLayer.layerMask
+                                                    | manager.interactionNoContactLayer.layerMask;
         }
         return _graspActivityManager;
       }
@@ -847,7 +787,7 @@ namespace Leap.Unity.Interaction {
       if (collider.attachedRigidbody != null) {
         Rigidbody body = collider.attachedRigidbody;
         IInteractionBehaviour intObj;
-        if (body != null && interactionManager.interactionObjectBodies.TryGetValue(body, out intObj)
+        if (body != null && manager.interactionObjectBodies.TryGetValue(body, out intObj)
             && !intObj.ignoreGrasping) {
           return intObj;
         }
@@ -869,7 +809,7 @@ namespace Leap.Unity.Interaction {
 
     private void FixedUpdateGrasping() {
       using (new ProfilerSample("Fixed Update InteractionHand Grasping")) {
-        graspActivityManager.FixedUpdateQueryPosition(GetLastTrackedLeapHand().PalmPosition.ToVector3(), LeapSpace.allEnabled);
+        graspActivityManager.UpdateActivityQuery(GetLastTrackedLeapHand().PalmPosition.ToVector3(), LeapSpace.allEnabled);
         grabClassifier.FixedUpdateClassifierHandState();
       }
     }

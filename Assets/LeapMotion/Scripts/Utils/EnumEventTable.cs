@@ -35,6 +35,16 @@ namespace Leap.Unity {
     //when calling Invoke for speed.
     private Dictionary<int, UnityEvent> _entryMap = new Dictionary<int, UnityEvent>();
 
+    public bool HasUnityEvent(int enumValue) {
+      UnityEvent callback;
+      if (_entryMap.TryGetValue(enumValue, out callback)) {
+        return callback.GetPersistentEventCount() > 0;
+      }
+      else {
+        return false;
+      }
+    }
+
     public void Invoke(int enumValue) {
       UnityEvent callback;
       if (_entryMap.TryGetValue(enumValue, out callback)) {

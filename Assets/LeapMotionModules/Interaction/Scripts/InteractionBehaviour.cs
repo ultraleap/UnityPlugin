@@ -111,7 +111,7 @@ namespace Leap.Unity.Interaction {
     public float primaryHoverDistance {
       get {
         if (!isPrimaryHovered) return float.PositiveInfinity;
-        return primaryHoveringInteractionHand.hoverCheckResults.primaryHoveredDistance;
+        return primaryHoveringInteractionHand.hoverCheckResults.primaryHoverDistance;
       }
     }
 
@@ -474,6 +474,7 @@ namespace Leap.Unity.Interaction {
     /// solves that problem.
     /// </remarks>
     public void AddLinearAcceleration(Vector3 acceleration) {
+      _appliedForces = true;
       _accumulatedLinearAcceleration += acceleration;
     }
 
@@ -488,6 +489,7 @@ namespace Leap.Unity.Interaction {
     /// solves that problem.
     /// </remarks>
     public void AddAngularAcceleration(Vector3 acceleration) {
+      _appliedForces = true;
       _accumulatedAngularAcceleration += acceleration;
     }
 
@@ -532,6 +534,18 @@ namespace Leap.Unity.Interaction {
         _ignoreHoverMode = value;
         // TODO: If _ignoreHover is set to anything other than None, need to fire
         // appropriate EndHover events immediately.
+      }
+    }
+
+    [Tooltip("Hands will not be able to mark this object as their primary hover if this property is checked.")]
+    [SerializeField]
+    private bool _ignorePrimaryHover = false;
+    public bool ignorePrimaryHover {
+      get { return _ignorePrimaryHover; }
+      set {
+        _ignorePrimaryHover = value;
+        // TODO: If _ignorePrimaryHover is set to false, need to fire
+        // appropriate EndContact events immediately.
       }
     }
 
@@ -671,15 +685,9 @@ namespace Leap.Unity.Interaction {
     /// are updated (via InteractionManager.FixedUpdate).
     /// </summary>
     public void FixedUpdateObject() {
-      using (new ProfilerSample("FixedUpdateGrasping", this.gameObject)) {
-        FixedUpdateGrasping();
-      }
-      using (new ProfilerSample("FixedUpdateCollisionMode", this.gameObject)) {
-        FixedUpdateCollisionMode();
-      }
-      using (new ProfilerSample("FixedUpdateForces", this.gameObject)) {
-        FixedUpdateForces();
-      }
+      if (!ignoreGrasping) FixedUpdateGrasping();
+      FixedUpdateCollisionMode();
+      if (_appliedForces) { FixedUpdateForces(); }
     }
 
     #region Hovering
@@ -821,9 +829,9 @@ namespace Leap.Unity.Interaction {
       InteractionHand closestHand = null;
       float closestDist = float.PositiveInfinity;
       foreach (var hand in _primaryHoveringHands) {
-        if (closestHand == null || hand.hoverCheckResults.primaryHoveredDistance < closestDist) {
+        if (closestHand == null || hand.hoverCheckResults.primaryHoverDistance < closestDist) {
           closestHand = hand;
-          closestDist = hand.hoverCheckResults.primaryHoveredDistance;
+          closestDist = hand.hoverCheckResults.primaryHoverDistance;
         }
       }
       _closestPrimaryHoveringHand = closestHand;
@@ -1087,6 +1095,7 @@ namespace Leap.Unity.Interaction {
 
     #region Forces
 
+    private bool _appliedForces = false;
     protected Vector3 _accumulatedLinearAcceleration = Vector3.zero;
     protected Vector3 _accumulatedAngularAcceleration = Vector3.zero;
 
@@ -1104,6 +1113,8 @@ namespace Leap.Unity.Interaction {
         //Reset so we can accumulate for the next frame
         _accumulatedLinearAcceleration = Vector3.zero;
         _accumulatedAngularAcceleration = Vector3.zero;
+
+        _appliedForces = false;
       }
     }
 
@@ -1198,9 +1209,11 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      this.gameObject.layer = layer;
-      for (int i = 0; i < _interactionColliders.Count; i++) {
-        if (_interactionColliders[i].gameObject.layer != layer) _interactionColliders[i].gameObject.layer = layer;
+      if (this.gameObject.layer != layer) {
+        this.gameObject.layer = layer;
+        for (int i = 0; i < _interactionColliders.Count; i++) {
+          if (_interactionColliders[i].gameObject.layer != layer) _interactionColliders[i].gameObject.layer = layer;
+        }
       }
     }
 
@@ -1341,7 +1354,12 @@ namespace Leap.Unity.Interaction {
     }
 
     private void setupCallback<T>(ref Action<T> action, EventType type) {
-      action += h => _eventTable.Invoke((int)type);
+      if (_eventTable.HasUnityEvent((int)type)) {
+        action += h => _eventTable.Invoke((int)type);
+      }
+      else {
+        action += h => { };
+      }
     }
 
     #endregion
