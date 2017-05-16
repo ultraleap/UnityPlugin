@@ -640,7 +640,7 @@ namespace Leap.Unity.Interaction {
         manager.RegisterInteractionBehaviour(this);
       }
 
-      space = GetComponentInChildren<ISpaceComponent>();
+      space = GetComponent<ISpaceComponent>();
     }
 
     protected virtual void OnDisable() {
