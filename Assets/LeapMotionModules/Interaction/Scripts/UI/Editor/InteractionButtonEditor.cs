@@ -14,9 +14,15 @@ namespace Leap.Unity.Interaction {
 
       bool nonzeroRotation = button.transform.localRotation != Quaternion.identity;
       bool isRoot = button.transform == button.transform.root;
+      PrefabType objectType = PrefabUtility.GetPrefabType(button.gameObject);
+      bool isNotAnUninstantiatedPrefab = 
+        objectType == PrefabType.None || 
+        objectType == PrefabType.PrefabInstance || 
+        objectType == PrefabType.MissingPrefabInstance ||
+        objectType == PrefabType.DisconnectedPrefabInstance;
 
       EditorGUILayout.BeginHorizontal();
-      if (nonzeroRotation || isRoot) {
+      if ((nonzeroRotation || isRoot) && isNotAnUninstantiatedPrefab) {
         if (isRoot) {
           EditorGUILayout.HelpBox("This button has no parent!  Buttons do not work without a parent transform.", MessageType.Warning);
         } else if (nonzeroRotation) {

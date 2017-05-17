@@ -34,6 +34,8 @@ namespace Leap.Unity.Examples {
     private ToolState _toolState = ToolState.Idle;
     private HashSet<TransformHandle> _activeHandles = new HashSet<TransformHandle>();
 
+    private HashSet<TransformTranslationHandle.TranslationAxis> _activeTranslationAxes = new HashSet<TransformTranslationHandle.TranslationAxis>();
+
     void Start() {
       foreach (var handle in GetComponentsInChildren<TransformHandle>()) {
         _transformHandles.Add(handle);
@@ -126,10 +128,19 @@ namespace Leap.Unity.Examples {
           break;
 
         case ToolState.Translating:
-          // While translating, show all translation handles, and hide rotation handles.
+          // While translating, show all translation handles except the other handle
+          // on the same axis, and hide rotation handles.
           foreach (var handle in _transformHandles) {
             if (handle is TransformTranslationHandle) {
-              handle.EnsureVisible();
+              var translateHandle = handle as TransformTranslationHandle;
+
+              if (!_activeHandles.Contains(translateHandle)
+                  && _activeTranslationAxes.Contains(translateHandle.axis)) {
+                handle.EnsureHidden();
+              }
+              else {
+                handle.EnsureVisible();
+              }
             }
             else {
               handle.EnsureHidden();
@@ -162,6 +173,7 @@ namespace Leap.Unity.Examples {
 
           if (handle is TransformTranslationHandle) {
             _toolState = ToolState.Translating;
+            _activeTranslationAxes.Add(((TransformTranslationHandle)handle).axis);
           }
           else {
             _toolState = ToolState.Rotating;
@@ -174,6 +186,7 @@ namespace Leap.Unity.Examples {
           }
           else {
             _activeHandles.Add(handle);
+            _activeTranslationAxes.Add(((TransformTranslationHandle)handle).axis);
           }
           break;
 
@@ -187,6 +200,10 @@ namespace Leap.Unity.Examples {
     /// Called by Handles when they are released.
     /// </summary>
     public void NotifyHandleDeactivated(TransformHandle handle) {
+      if (handle is TransformTranslationHandle) {
+        _activeTranslationAxes.Remove(((TransformTranslationHandle)handle).axis);
+      }
+
       _activeHandles.Remove(handle);
 
       switch (_toolState) {

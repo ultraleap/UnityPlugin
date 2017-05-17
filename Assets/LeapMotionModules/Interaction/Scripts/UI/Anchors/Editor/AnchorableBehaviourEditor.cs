@@ -13,43 +13,119 @@ namespace Leap.Unity.Interaction {
     protected override void OnEnable() {
       base.OnEnable();
 
-      // Only draw anchor group settings when set to the AnchorGroup type.
-      specifyConditionalDrawing("_anchorType",
-                                (int)AnchorableBehaviour.AnchorType.AnchorGroup,
-                                "_anchorGroup");
+      deferProperty("_eventTable");
+      specifyCustomDrawer("_eventTable", drawEventTable);
 
-      // Only draw matchAnchorMotionWhileReturning when lockToAnchorWhenAttached is enabled
-      specifyConditionalDrawing("lockToAnchorWhenAttached",
-                                "matchAnchorMotionWhileReturning");
+      specifyConditionalDrawing("lockWhenAttached",
+                                "matchAnchorMotionWhileAttaching");
 
-      // Only draw Interaction settings when assigned an InteractionBehaviour.
+      specifyConditionalDrawing("useTrajectory",
+                                "_motionlessRangeFraction",
+                                "_maxMotionlessRange",
+                                "_maxAttachmentAngle");
+
       specifyConditionalDrawing(() => { return target.interactionBehaviour != null; },
                                 "detachWhenGrasped",
-                                "tryAnchorOnGraspEnd",
+                                "_tryAnchorNearestOnGraspEnd",
                                 "isAttractedByHand",
                                 "maxAttractionReach",
                                 "attractionReachByDistance");
 
-      // Only draw hand attraction settings when it is enabled.
       specifyConditionalDrawing("isAttractedByHand",
                                 "maxAttractionReach",
                                 "attractionReachByDistance");
     }
 
-    public override void OnInspectorGUI() {
-      if (target.anchorType == AnchorableBehaviour.AnchorType.SingleAnchor
-          && target.currentAnchor != null
-          && target.enabled
-          && Vector3.Distance(target.transform.position, target.currentAnchor.transform.position) > 0.0001F) {
-        if (GUILayout.Button(new GUIContent("Move Object To Anchor Position",
-                                            "Detected that the object is not currently at its anchor, but upon pressing play, "
-                                          + "the object will move to its anchor. If you'd like the object to move to its anchor now, "
-                                          + "click this button."))) {
-          target.transform.position = target.currentAnchor.transform.position;
-        }
+    private EnumEventTableEditor _tableEditor;
+    private void drawEventTable(SerializedProperty property) {
+      if (_tableEditor == null) {
+        _tableEditor = new EnumEventTableEditor(property, typeof(AnchorableBehaviour.EventType));
       }
 
+      _tableEditor.DoGuiLayout();
+    }
+
+    public override void OnInspectorGUI() {
+      drawWarningMessages();
+
+      drawAttachmentHelperButtons();
+
       base.OnInspectorGUI();
+    }
+
+    private void drawWarningMessages() {
+      // While the editor application is playing, we expect there to be at least the empty lambda that initializes the Action
+      // and the UnityEvent subscription.
+      // While in edit-mode, we only expect there to be the empty lambda that initializes the Action.
+      int expectedMinimumActionListeners = EditorApplication.isPlaying ? 2 : 1;
+
+      bool hasInvalidPostGraspEndCallback = !target.tryAnchorNearestOnGraspEnd
+                                         && (target.OnPostTryAnchorOnGraspEnd.GetInvocationList().Length > expectedMinimumActionListeners
+                                             || (_tableEditor != null &&
+                                                 _tableEditor.HasAnyCallbacks((int)AnchorableBehaviour.EventType.OnPostTryAnchorOnGraspEnd)));
+      if (hasInvalidPostGraspEndCallback) {
+        EditorGUILayout.HelpBox("This object's OnPostObjectGraspEnd is subscribed to, but the event will never "
+                              + "fire because tryAnchorNearestOnGraspEnd is disabled.",
+                                MessageType.Warning);
+      }
+    }
+
+    private void drawAttachmentHelperButtons() {
+      if (!EditorApplication.isPlaying) {
+        // Attach / Detach Object
+        EditorGUILayout.BeginHorizontal();
+
+        EditorGUI.BeginDisabledGroup(!(targets.Length > 1) || target.anchor == null || target.isAttached);
+        if (GUILayout.Button(new GUIContent("Attach Object" + (targets.Length > 1 ? "s" : ""),
+                                            "Will attach the object to its anchor. If the object is not currently at its anchor, "
+                                          + "currently at its anchor, it will begin move to it when play mode begins."))) {
+          Undo.IncrementCurrentGroup();
+          foreach (var singleTarget in targets) {
+            Undo.RecordObject(singleTarget, "Try Attach Object");
+            singleTarget.TryAttach(ignoreRange: true);
+          }
+        }
+        EditorGUI.EndDisabledGroup();
+
+        EditorGUI.BeginDisabledGroup(!(targets.Length > 1) || !target.isAttached);
+        if (GUILayout.Button(new GUIContent("Detach Object" + (targets.Length > 1 ? "s" : ""),
+                                            "Will detach the object from its anchor. AnchorableBehaviours won't seek out an anchor "
+                                          + "until they are specifically told to attach to one."))) {
+          Undo.IncrementCurrentGroup();
+          foreach (var singleTarget in targets) {
+            Undo.RecordObject(singleTarget, "Try Detach Object");
+            singleTarget.Detach();
+          }
+        }
+        EditorGUI.EndDisabledGroup();
+
+        EditorGUILayout.EndHorizontal();
+
+        // Move Object to Anchor
+
+        bool anyTranslatedFromAnchor = false;
+        bool anyRotatedFromAnchor = false;
+
+        foreach (var singleTarget in targets) {
+          anyTranslatedFromAnchor  |= singleTarget.anchor != null && Vector3.Distance(singleTarget.transform.position, singleTarget.anchor.transform.position) > 0.0001F;
+          anyRotatedFromAnchor     |= singleTarget.anchor != null && singleTarget.anchorRotation
+                                                                  && Quaternion.Angle(singleTarget.transform.rotation, singleTarget.anchor.transform.rotation) > 0.1F;
+        }
+
+        if (anyTranslatedFromAnchor || anyRotatedFromAnchor) {
+          if (GUILayout.Button(new GUIContent("Move Object" + (targets.Length > 1 ? "s" : "") + " To Anchor",
+                                              "Detected that the object is not currently at its anchor, but upon pressing play, "
+                                            + "the object will move to to match its anchor. If you'd like the object to move to "
+                                            + "its anchor now, click this button."))) {
+            Undo.IncrementCurrentGroup();
+            foreach (var singleTarget in targets) {
+              Undo.RecordObject(singleTarget.transform, "Move Target Transform to Anchor");
+              singleTarget.transform.position = singleTarget.anchor.transform.position;
+              if (singleTarget.anchorRotation) singleTarget.transform.rotation = singleTarget.anchor.transform.rotation;
+            }
+          }
+        }
+      }
     }
 
   }

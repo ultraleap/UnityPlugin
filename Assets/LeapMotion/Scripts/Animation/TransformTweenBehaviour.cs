@@ -8,6 +8,7 @@
  ******************************************************************************/
 
 using Leap.Unity.Attributes;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,10 +17,9 @@ using UnityEngine.Events;
 namespace Leap.Unity.Animation {
 
   /// <summary>
-  /// This is a wrapper MonoBehaviour that demonstrates and
-  /// exposes some of the basic functionality of the Tween
-  /// library. Tweens can interpolate between more than just
-  /// Transform properties, so don't be afraid to roll your own.
+  /// This is a wrapper MonoBehaviour that demonstrates and exposes some of the
+  /// basic functionality of the Tween library. Tweens can interpolate between
+  /// more than just Transform properties, so don't be afraid to roll your own.
   /// </summary>
   public class TransformTweenBehaviour : MonoBehaviour {
 
@@ -31,22 +31,26 @@ namespace Leap.Unity.Animation {
     [Tooltip("The transform whose position/rotation/localScale provide the end state of the tween.")]
     public Transform endTransform;
 
+    public bool startAtEnd = false;
+
     [Header("Tween Settings")]
     public bool tweenLocalPosition = true;
     public bool tweenLocalRotation = true;
     public bool tweenLocalScale    = true;
     [MinValue(0.001F)]
-    public float tweenDuration = 0.33F;
+    public float tweenDuration = 0.25F;
     public SmoothType tweenSmoothType = SmoothType.Smooth;
+    
+    #region Events
+    
+    public Action<float> OnProgress     = (progress) => { };
 
-    [Header("Tween Callbacks - Progress")]
-    public FloatEvent OnProgress = new FloatEvent();
-    [Header("Tween Callbacks - Forward")]
-    public UnityEvent OnLeaveStart = new UnityEvent();
-    public UnityEvent OnReachEnd = new UnityEvent();
-    [Header("Tween Callbacks - Backward")]
-    public UnityEvent OnLeaveEnd = new UnityEvent();
-    public UnityEvent OnReachStart = new UnityEvent();
+    public Action OnLeaveStart = () => { }; 
+    public Action OnReachEnd   = () => { }; 
+    public Action OnLeaveEnd   = () => { }; 
+    public Action OnReachStart = () => { };
+
+    #endregion
 
     private Tween _tween;
     /// <summary>
@@ -76,7 +80,9 @@ namespace Leap.Unity.Animation {
       }
     }
 
-    void Start() {
+    void Awake() {
+      initUnityEvents();
+
       // Tween setup methods return the Tween object itself, so you can chain your setup
       // method calls.
       _tween = Tween.Persistent().OverTime(tweenDuration)
@@ -88,20 +94,26 @@ namespace Leap.Unity.Animation {
       if (tweenLocalRotation) _tween = _tween.Target(targetTransform)
                                              .LocalRotation(startTransform, endTransform);
 
-      if (tweenLocalScale)    _tween = _tween.Target(targetTransform)
-                                             .LocalScale(startTransform, endTransform);
+      if (tweenLocalScale) _tween = _tween.Target(targetTransform)
+                                          .LocalScale(startTransform, endTransform);
 
       // Hook up the UnityEvents to the actual Tween callbacks.
-      _tween.OnProgress(OnProgress.Invoke);
-      _tween.OnLeaveStart(OnLeaveStart.Invoke);
-      _tween.OnReachEnd(OnReachEnd.Invoke);
-      _tween.OnLeaveEnd(OnLeaveEnd.Invoke);
-      _tween.OnReachStart(OnReachStart.Invoke);
+      _tween.OnProgress(OnProgress);
+      _tween.OnLeaveStart(OnLeaveStart);
+      _tween.OnReachEnd(OnReachEnd);
+      _tween.OnLeaveEnd(OnLeaveEnd);
+      _tween.OnReachStart(OnReachStart);
 
       // TODO: This isn't great but it's the only way I've seen to make sure the tween
-      // updates with its progress = 0 state :(
-      _tween.progress = 0.0001F;
-      _tween.Play(Direction.Backward);
+      // updates with its progress at the right state :(
+      if (startAtEnd) {
+        _tween.progress = 0.9999999F;
+        _tween.Play(Direction.Forward);
+      }
+      else {
+        _tween.progress = 0.0000001F;
+        _tween.Play(Direction.Backward);
+      }
     }
 
     void OnDestroy() {
@@ -110,22 +122,48 @@ namespace Leap.Unity.Animation {
       }
     }
 
+    private Coroutine _playTweenAfterDelayCoroutine;
+    private Direction _curDelayedDirection = Direction.Backward;
+
     /// <summary>
     /// Tweens play forward by default, but at any time past the starting
     /// state they can also be played backwards to return to the starting
     /// state. See the tween property for more direct control of this
     /// behaviour's tween.
     /// </summary>
-    public void PlayTween(Direction tweenDirection = Direction.Forward) {
+    public void PlayTween() {
+      PlayTween(Direction.Forward);
+    }
+
+    public void PlayTween(Direction tweenDirection = Direction.Forward, float afterDelay = 0F) {
+      if (_playTweenAfterDelayCoroutine != null && tweenDirection != _curDelayedDirection) {
+        StopCoroutine(_playTweenAfterDelayCoroutine);
+        _curDelayedDirection = tweenDirection;
+      }
+
+      _playTweenAfterDelayCoroutine = StartCoroutine(playAfterDelay(tweenDirection, afterDelay));
+    }
+
+    private IEnumerator playAfterDelay(Direction tweenDirection, float delay) {
+      yield return new WaitForSeconds(delay);
+
       tween.Play(tweenDirection);
     }
 
     public void PlayForward() {
-      PlayTween();
+      PlayTween(Direction.Forward);
     }
 
     public void PlayBackward() {
       PlayTween(Direction.Backward);
+    }
+
+    public void PlayForwardAfterDelay(float delay = 0F) {
+      PlayTween(Direction.Forward, delay);
+    }
+
+    public void PlayBackwardAfterDelay(float delay = 0F) {
+      PlayTween(Direction.Backward, delay);
     }
     
     /// <summary>
@@ -135,8 +173,54 @@ namespace Leap.Unity.Animation {
       tween.Stop();
     }
 
+    public void SetTargetToStart() {
+      setTargetTo(startTransform);
+    }
+
+    public void SetTargetToEnd() {
+      setTargetTo(endTransform);
+    }
+
+    private void setTargetTo(Transform t) {
+      if (targetTransform != null && t != null) {
+        if (tweenLocalPosition) targetTransform.localPosition = t.localPosition;
+        if (tweenLocalRotation) targetTransform.localRotation = t.localRotation;
+        if (tweenLocalScale)    targetTransform.localScale    = t.localScale;
+      }
+    }
+
+    #region Unity Events (Internal)
+
     [System.Serializable]
     public class FloatEvent : UnityEvent<float> { }
+
+    [SerializeField]
+    private EnumEventTable _eventTable;
+
+    public enum EventType {
+      //OnProgress = 100, // Requires float Event data
+      OnLeaveStart = 110,
+      OnReachEnd = 120,
+      OnLeaveEnd = 130,
+      OnReachStart = 140
+    }
+
+    private void initUnityEvents() {
+      setupCallback(ref OnLeaveStart, EventType.OnLeaveStart);
+      setupCallback(ref OnReachEnd, EventType.OnReachEnd);
+      setupCallback(ref OnLeaveEnd, EventType.OnLeaveEnd);
+      setupCallback(ref OnReachStart, EventType.OnReachStart);
+    }
+
+    private void setupCallback(ref Action action, EventType type) {
+      action += () => _eventTable.Invoke((int)type);
+    }
+
+    private void setupCallback<T>(ref Action<T> action, EventType type) {
+      action += (anchObj) => _eventTable.Invoke((int)type);
+    }
+
+    #endregion
 
   }
 

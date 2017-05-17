@@ -6,6 +6,7 @@ using UnityEngine.Events;
 
 namespace Leap.Unity.Examples {
 
+  [AddComponentMenu("")]
   [RequireComponent(typeof(InteractionBehaviour))]
   public class TransformHandle : MonoBehaviour {
 
@@ -50,6 +51,8 @@ namespace Leap.Unity.Examples {
     /// </summary>
     public void EnsureVisible() {
       OnShouldShowHandle.Invoke();
+
+      _intObj.ignoreGrasping = false;
     }
 
     /// <summary>
@@ -57,6 +60,8 @@ namespace Leap.Unity.Examples {
     /// </summary>
     public void EnsureHidden() {
       OnShouldHideHandle.Invoke();
+
+      _intObj.ignoreGrasping = true;
     }
 
     #endregion

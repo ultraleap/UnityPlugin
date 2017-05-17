@@ -27,12 +27,8 @@ namespace Leap.Unity.Interaction {
     private KabschSolver _kabsch;
     private List<Vector3> _points, _refPoints;
 
-    // TODO: These variables are only used for PivotAroundOrigin calculation,
-    // which is currently unused/unsupported
-#pragma warning disable 0414 // remove these when decision is made
     private Vector3 _handCentroid, _objectCentroid;
     private float _boneCount;
-#pragma warning restore 0414
 
     private Dictionary<InteractionHand, HandPointCollection> _handToPoints;
 
