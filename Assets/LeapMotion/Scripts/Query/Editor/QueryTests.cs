@@ -19,12 +19,18 @@ namespace Leap.Unity.Query.Test {
     public int[] LIST_1 = { 6, 7, 8, 9, 10 };
 
     [Test]
-    public void ForeachTest() {
-      List<int> found = new List<int>();
-      foreach (var item in LIST_0.Query().Concat(LIST_1.Query())) {
-        found.Add(item);
-      }
-      Assert.That(LIST_0.Concat(LIST_1).SequenceEqual(found));
+    public void AllTest() {
+      Assert.AreEqual(LIST_0.All(i => i < 5),
+                      LIST_0.Query().All(i => i < 5));
+
+      Assert.AreEqual(LIST_0.All(i => i != 8),
+                      LIST_0.Query().All(i => i != 8));
+    }
+
+    [Test]
+    public void AnyTest() {
+      Assert.AreEqual(LIST_0.Any(i => i == 4),
+                      LIST_0.Query().Any(i => i == 4));
     }
 
     [Test]
@@ -39,6 +45,122 @@ namespace Leap.Unity.Query.Test {
     public void ConcatTest() {
       Assert.That(LIST_0.Concat(LIST_1).SequenceEqual(
                   LIST_0.Query().Concat(LIST_1.Query()).ToList()));
+    }
+
+    [Test]
+    public void ContainsTest() {
+      Assert.AreEqual(LIST_0.Contains(3),
+                      LIST_0.Query().Contains(3));
+
+      Assert.AreEqual(LIST_0.Contains(9),
+                      LIST_0.Query().Contains(9));
+    }
+
+    [Test]
+    public void CountTests() {
+      Assert.AreEqual(LIST_0.Count(),
+                      LIST_0.Query().Count());
+
+      Assert.AreEqual(LIST_0.Count(i => i % 2 == 0),
+                      LIST_0.Query().Count(i => i % 2 == 0));
+    }
+
+
+    [Test]
+    public void ElemenAtTest() {
+      Assert.AreEqual(LIST_0.ElementAt(3),
+                      LIST_0.Query().ElementAt(3));
+
+      Assert.AreEqual(LIST_0.ElementAtOrDefault(100),
+                      LIST_0.Query().ElementAtOrDefault(100));
+    }
+
+    [Test]
+    public void EnumeratorTest() {
+      Assert.AreEqual(new TestEnumerator().Query().IndexOf(3), 3);
+    }
+
+    [Test]
+    public void FirstTests() {
+      Assert.AreEqual(LIST_0.First(),
+                      LIST_0.Query().First());
+
+      Assert.AreEqual(LIST_0.First(i => i % 2 == 0),
+                      LIST_0.Query().First(i => i % 2 == 0));
+    }
+
+    [Test]
+    public void FirstOrDefaultTests() {
+      Assert.AreEqual(LIST_0.FirstOrDefault(),
+                      LIST_0.Query().FirstOrDefault());
+
+      Assert.AreEqual(LIST_0.FirstOrDefault(i => i % 2 == 0),
+                      LIST_0.Query().FirstOrDefault(i => i % 2 == 0));
+
+      Assert.AreEqual(LIST_0.FirstOrDefault(i => i > 10),
+                      LIST_0.Query().FirstOrDefault(i => i > 10));
+    }
+
+    [Test]
+    public void FoldTest() {
+      Assert.AreEqual(LIST_0.Query().Fold((a, b) => a + b),
+                      LIST_0.Sum());
+    }
+
+    [Test]
+    public void ForeachTest() {
+      List<int> found = new List<int>();
+      foreach (var item in LIST_0.Query().Concat(LIST_1.Query())) {
+        found.Add(item);
+      }
+      Assert.That(LIST_0.Concat(LIST_1).SequenceEqual(found));
+    }
+
+    [Test]
+    public void IndexOfTests() {
+      Assert.AreEqual(LIST_0.Query().IndexOf(3), 2);
+      Assert.AreEqual(LIST_0.Query().IndexOf(100), -1);
+    }
+
+    [Test]
+    public void LastTests() {
+      Assert.That(LIST_0.Query().Last(), Is.EqualTo(LIST_0.Last()));
+
+      var empty = new int[] { };
+
+      Assert.That(() => {
+        empty.Query().Last();
+      }, Throws.InvalidOperationException);
+
+      Assert.That(empty.Query().LastOrDefault(), Is.EqualTo(empty.LastOrDefault()));
+    }
+
+    [Test]
+    public void MultiFirstTest() {
+      var q = LIST_0.Query();
+      var a = q.First();
+      var b = q.First();
+
+      Assert.That(a, Is.EqualTo(LIST_0[0]));
+      Assert.That(b, Is.EqualTo(LIST_0[0]));
+    }
+
+    [Test]
+    public void MultiForeachTest() {
+      List<int> a = new List<int>();
+      List<int> b = new List<int>();
+
+      var q = LIST_0.Query();
+      foreach (var item in q) {
+        a.Add(item);
+      }
+
+      foreach (var item in q) {
+        b.Add(item);
+      }
+
+      Assert.That(a, Is.EquivalentTo(LIST_0));
+      Assert.That(b, Is.EquivalentTo(LIST_0));
     }
 
     [Test]
@@ -67,6 +189,20 @@ namespace Leap.Unity.Query.Test {
     [Test]
     public void SelectManyEmptyTest() {
       new int[] { }.Query().SelectMany(i => new int[] { }.Query()).ToList();
+    }
+
+    [Test]
+    public void SingleTest() {
+      var array = new int[] { 5 };
+      Assert.That(array.Single(), Is.EqualTo(array.Query().Single()));
+
+      Assert.That(() => {
+        new int[] { }.Query().Single();
+      }, Throws.InvalidOperationException);
+
+      Assert.That(() => {
+        new int[] { 0, 1 }.Query().Single();
+      }, Throws.InvalidOperationException);
     }
 
     [Test]
@@ -127,86 +263,6 @@ namespace Leap.Unity.Query.Test {
     public void ZipTest() {
       Assert.That(LIST_0.Query().Zip(LIST_1.Query(), (a, b) => a.ToString() + b.ToString()).ToList().SequenceEqual(
                   new string[] { "16", "27", "38", "49", "510" }));
-    }
-
-    [Test]
-    public void AnyTest() {
-      Assert.AreEqual(LIST_0.Any(i => i == 4),
-                      LIST_0.Query().Any(i => i == 4));
-    }
-
-    [Test]
-    public void AllTest() {
-      Assert.AreEqual(LIST_0.All(i => i < 5),
-                      LIST_0.Query().All(i => i < 5));
-
-      Assert.AreEqual(LIST_0.All(i => i != 8),
-                      LIST_0.Query().All(i => i != 8));
-    }
-
-    [Test]
-    public void ConstainsTest() {
-      Assert.AreEqual(LIST_0.Contains(3),
-                      LIST_0.Query().Contains(3));
-
-      Assert.AreEqual(LIST_0.Contains(9),
-                      LIST_0.Query().Contains(9));
-    }
-
-    [Test]
-    public void CountTests() {
-      Assert.AreEqual(LIST_0.Count(),
-                      LIST_0.Query().Count());
-
-      Assert.AreEqual(LIST_0.Count(i => i % 2 == 0),
-                      LIST_0.Query().Count(i => i % 2 == 0));
-    }
-
-    [Test]
-    public void ElemenAtTest() {
-      Assert.AreEqual(LIST_0.ElementAt(3),
-                      LIST_0.Query().ElementAt(3));
-
-      Assert.AreEqual(LIST_0.ElementAtOrDefault(100),
-                      LIST_0.Query().ElementAtOrDefault(100));
-    }
-
-    [Test]
-    public void FirstTests() {
-      Assert.AreEqual(LIST_0.First(),
-                      LIST_0.Query().First());
-
-      Assert.AreEqual(LIST_0.First(i => i % 2 == 0),
-                      LIST_0.Query().First(i => i % 2 == 0));
-    }
-
-    [Test]
-    public void FirstOrDefaultTests() {
-      Assert.AreEqual(LIST_0.FirstOrDefault(),
-                      LIST_0.Query().FirstOrDefault());
-
-      Assert.AreEqual(LIST_0.FirstOrDefault(i => i % 2 == 0),
-                      LIST_0.Query().FirstOrDefault(i => i % 2 == 0));
-
-      Assert.AreEqual(LIST_0.FirstOrDefault(i => i > 10),
-                      LIST_0.Query().FirstOrDefault(i => i > 10));
-    }
-
-    [Test]
-    public void FoldTest() {
-      Assert.AreEqual(LIST_0.Query().Fold((a, b) => a + b),
-                      LIST_0.Sum());
-    }
-
-    [Test]
-    public void IndexOfTests() {
-      Assert.AreEqual(LIST_0.Query().IndexOf(3), 2);
-      Assert.AreEqual(LIST_0.Query().IndexOf(100), -1);
-    }
-
-    [Test]
-    public void EnumeratorTest() {
-      Assert.AreEqual(new TestEnumerator().Query().IndexOf(3), 3);
     }
 
     public class TestEnumerator : IEnumerator<int> {
