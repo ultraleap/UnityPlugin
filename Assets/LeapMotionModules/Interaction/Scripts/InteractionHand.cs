@@ -351,15 +351,20 @@ namespace Leap.Unity.Interaction {
 
     private void inverseTransformHand(Hand inHand, ISpaceComponent element) {
       if (element.anchor != null && element.anchor.space != null) {
+
+        // Original positions and rotations to be interpreted as the "warped" pose.
         Vector3 originalPosition = inHand.Fingers[hoverCheckResults.primaryHoveringFingerIdx].bones[3].NextJoint.ToVector3();
         Quaternion originalRotation = inHand.Fingers[hoverCheckResults.primaryHoveringFingerIdx].bones[3].Rotation.ToQuaternion();
 
-        Vector3 localTipPos = element.anchor.space.transform.InverseTransformPoint(originalPosition);
-        Quaternion localTipRot = element.anchor.space.transform.InverseTransformRotation(originalRotation);
+        // Extension method calculates "unwarped" pose, both in world space.
+        Vector3 unwarpedPosition;
+        Quaternion unwarpedRotation;
+        element.anchor.transformer.WorldSpaceUnwarp(originalPosition, originalRotation, out unwarpedPosition, out unwarpedRotation);
 
+        // First shift the hand to be centered on the fingertip position so that rotations applied to the hand pivot around the fingertip.
+        // Then apply the rest of the transformation.
         inHand.Transform(-originalPosition, Quaternion.identity);
-        inHand.Transform(element.anchor.space.transform.TransformPoint(element.anchor.transformer.InverseTransformPoint(localTipPos)),
-                         element.anchor.space.transform.TransformRotation(element.anchor.transformer.InverseTransformRotation(localTipPos, localTipRot)) * Quaternion.Inverse(originalRotation));
+        inHand.Transform(unwarpedPosition, unwarpedRotation * Quaternion.Inverse(originalRotation));
       }
     }
 
