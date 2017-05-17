@@ -640,7 +640,7 @@ namespace Leap.Unity.Interaction {
         manager.RegisterInteractionBehaviour(this);
       }
 
-      space = GetComponent<ISpaceComponent>();
+      space = GetComponentInChildren<ISpaceComponent>();
     }
 
     protected virtual void OnDisable() {
@@ -705,20 +705,16 @@ namespace Leap.Unity.Interaction {
         if (!hasColliders) hasColliders = true;
 
         // Custom, slower ClosestPoint
-        testDistance = (collider.transform.TransformPoint(collider.ClosestPointOnSurface(collider.transform.InverseTransformPoint(worldPosition)))
-                        - worldPosition).magnitude;
-
-        // TODO: Physics.ClosestPoint causes nothin' but trouble. Get rid of it!!
-        //if (((collider is SphereCollider) && (collider as SphereCollider).center != Vector3.zero)
-        //    || ((collider is BoxCollider) && (collider as BoxCollider).center != Vector3.zero)
-        //    || ((collider is CapsuleCollider) && (collider as CapsuleCollider).center != Vector3.zero)) {
-           // testDistance using custom ClosestPoint, above
-        //}
-        //else {
-        //  // Native, faster ClosestPoint (no support for off-center colliders)
-        //  testDistance = (Physics.ClosestPoint(worldPosition, collider, collider.transform.position, collider.transform.rotation)
-        //                  - worldPosition).magnitude;
-        //}
+        if (collider is MeshCollider) {
+          // Native, faster ClosestPoint, but no support for off-center colliders; use to support MeshColliders
+          testDistance = (Physics.ClosestPoint(worldPosition, collider, collider.attachedRigidbody.position, collider.attachedRigidbody.rotation)
+                          - worldPosition).magnitude;
+        }
+        else {
+          // Note: Should be using rigidbody position instead of transform; this will cause problems when colliders are moving fast (frame delay)
+          testDistance = (collider.transform.TransformPoint(collider.ClosestPointOnSurface(collider.transform.InverseTransformPoint(worldPosition)))
+                          - worldPosition).magnitude;
+        }
 
         if (testDistance < closestComparativeColliderDistance) {
           closestComparativeColliderDistance = testDistance;

@@ -971,6 +971,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12011a4b27c58f4f8969e87c61ab8d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attachmentHand: {fileID: 0}
   attachmentPoint: 4
 --- !u!1 &208420371
 GameObject:
@@ -1013,16 +1014,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1aceea2f5c70da64e893474302ff53e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _anchorType: 0
-  _anchorGroup: {fileID: 0}
+  _isAttached: 0
   _anchor: {fileID: 0}
+  _anchorGroup: {fileID: 0}
+  maxAnchorRange: 0.3
+  useTrajectory: 0
+  _motionlessRangeFraction: 0.4
+  _maxMotionlessRange: 0.120000005
+  _maxAttachmentAngle: 60
   lockToAnchor: 0
-  lockToAnchorWhenAttached: 1
-  matchAnchorMotionWhileReturning: 1
+  lockWhenAttached: 1
+  matchAnchorMotionWhileAttaching: 1
   anchorLerpCoeffPerSec: 20
+  anchorRotation: 0
   interactionBehaviour: {fileID: 0}
+  _interactionBehaviourIsNull: 1
   detachWhenGrasped: 0
-  tryAnchorOnGraspEnd: 0
+  tryAnchorNearestOnGraspEnd: 1
   isAttractedByHand: 0
   maxAttractionReach: 0.1
   attractionReachByDistance:
@@ -1031,6 +1039,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  _eventTable:
+    _entries: []
 --- !u!114 &208420374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1261,6 +1271,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d12011a4b27c58f4f8969e87c61ab8d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attachmentHand: {fileID: 0}
   attachmentPoint: 4
 --- !u!1 &355002481
 GameObject:
@@ -3194,6 +3205,8 @@ MonoBehaviour:
   _deviceOffsets:
   - DeviceName: oculus
     HeightOffset: 0
+  - DeviceName: openvr
+    HeightOffset: -1.4
   moveUpKey: 0
   moveDownKey: 0
   stepSize: 0.1

@@ -10,6 +10,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using Leap.Unity.Attributes;
+using System.Collections.Generic;
 
 namespace Leap.Unity.Interaction {
 
@@ -114,7 +115,17 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private void CalculateSliderValues() {
+    protected override void OnEnable() {
+      base.OnEnable();
+      OnContactStay += CalculateSliderValues;
+    }
+
+    protected override void OnDisable() {
+      OnContactStay -= CalculateSliderValues;
+      base.OnDisable();
+    }
+
+    private void CalculateSliderValues(List<InteractionHand> hands = null) {
       //Calculate the Renormalized Slider Values
       if (_horizontalSlideLimits.x != _horizontalSlideLimits.y) {
         _horizontalSliderPercent = Mathf.InverseLerp(initialLocalPosition.x + _horizontalSlideLimits.x, initialLocalPosition.x + _horizontalSlideLimits.y, localPhysicsPosition.x);
@@ -137,10 +148,11 @@ namespace Leap.Unity.Interaction {
       base.OnDrawGizmosSelected();
       if (transform.parent != null) {
         Vector3 originPosition = Application.isPlaying ? initialLocalPosition : transform.localPosition;
-        Vector2 limits = (horizontalSlideLimits);
 
         Gizmos.color = Color.blue;
-        Gizmos.DrawLine(originPosition + (Vector3.right * limits.x), originPosition + (Vector3.right * limits.y));
+        Gizmos.DrawWireCube(originPosition + 
+          new Vector3((horizontalSlideLimits.x + horizontalSlideLimits.y) * 0.5f, (verticalSlideLimits.x + verticalSlideLimits.y) * 0.5f, 0f),
+          new Vector3(horizontalSlideLimits.y - horizontalSlideLimits.x, verticalSlideLimits.y - verticalSlideLimits.x, 0f));
       }
     }
   }
