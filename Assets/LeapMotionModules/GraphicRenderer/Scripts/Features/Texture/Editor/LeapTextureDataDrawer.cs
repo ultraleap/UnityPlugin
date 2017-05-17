@@ -27,7 +27,7 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       };
 
-      drawProperty("texture", nameFunc);
+      drawProperty("_texture", nameFunc);
     }
   }
 }

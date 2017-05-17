@@ -9,6 +9,7 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
@@ -23,7 +24,19 @@ namespace Leap.Unity.GraphicalRenderer {
   [Serializable]
   public class LeapSpriteData : LeapFeatureData {
 
-    [EditTimeOnly]
-    public Sprite sprite;
+    [FormerlySerializedAs("sprite")]
+    [EditTimeOnly, SerializeField]
+    private Sprite _sprite;
+
+    public Sprite sprite {
+      get {
+        return _sprite;
+      }
+      set {
+        _sprite = value;
+        graphic.isRepresentationDirty = true;
+        MarkFeatureDirty();
+      }
+    }
   }
 }
