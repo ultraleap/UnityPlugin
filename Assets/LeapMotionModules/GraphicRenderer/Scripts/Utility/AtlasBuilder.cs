@@ -349,7 +349,7 @@ namespace Leap.Unity.GraphicalRenderer {
         }
       });
     }
-
+    
     private void prepareForPacking(LeapTextureFeature feature,
                                       out Texture2D defaultTexture,
                                       out Texture2D packedTexture,

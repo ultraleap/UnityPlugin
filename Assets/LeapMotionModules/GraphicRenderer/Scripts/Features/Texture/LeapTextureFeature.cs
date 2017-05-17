@@ -21,10 +21,11 @@ namespace Leap.Unity.GraphicalRenderer {
   [Serializable]
   public class LeapTextureFeature : LeapGraphicFeature<LeapTextureData> {
 
-    //[EditTimeOnly]
+    [Delayed]
+    [EditTimeOnly]
     public string propertyName = "_MainTex";
-
-    //[EditTimeOnly]
+    
+    [EditTimeOnly]
     public UVChannelFlags channel = UVChannelFlags.UV0;
   }
 }

@@ -9,9 +9,6 @@
 
 using System;
 using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
@@ -24,6 +21,8 @@ namespace Leap.Unity.GraphicalRenderer {
   public abstract class CustomChannelFeatureBase<T> : LeapGraphicFeature<T>, ICustomChannelFeature
     where T : LeapFeatureData, new() {
 
+    [Tooltip("The name of the channel.  This is the name used to access the channel from within the shader.")]
+    [Delayed]
     [EditTimeOnly]
     [SerializeField]
     private string _channelName = "_CustomChannel";

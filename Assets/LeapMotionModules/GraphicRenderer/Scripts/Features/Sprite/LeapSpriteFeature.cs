@@ -21,6 +21,8 @@ namespace Leap.Unity.GraphicalRenderer {
   [LeapGraphicTag("Sprite", 20)]
   [Serializable]
   public class LeapSpriteFeature : LeapGraphicFeature<LeapSpriteData> {
+
+    [Delayed]
     [EditTimeOnly]
     public string propertyName = "_MainTex";
 
