@@ -171,12 +171,12 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 #endif
 
-    protected override void setupForBuilding() {
+    protected override void prepareMaterial() {
       if (_shader == null) {
         _shader = Shader.Find(DEFAULT_SHADER);
       }
 
-      base.setupForBuilding();
+      base.prepareMaterial();
 
       switch (_motionType) {
         case MotionType.Translation:

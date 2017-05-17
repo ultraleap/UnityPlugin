@@ -146,6 +146,28 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     /// <summary>
+    /// Returns whether or not this graphic will be attached to a group within
+    /// the next frame.  Can only be true at runtime, since runtime is the only time
+    /// when delayed attachment occurs.
+    /// </summary>
+    public bool willbeAttached {
+      get {
+        return _willBeAttached;
+      }
+    }
+
+    /// <summary>
+    /// Returns whether or not this graphic will be detached from a group
+    /// within the next frame.  Can only be true at runtime, since runtime is the 
+    /// only time when delayed detaching occurs.
+    /// </summary>
+    public bool willbeDetached {
+      get {
+        return _willBeDetached;
+      }
+    }
+
+    /// <summary>
     /// Returns the type this graphic prefers to be attached to.  When calling
     /// LeapGraphicRenderer.TryAddGraphic it will prioritize being attached to 
     /// groups with this renderer type if possible.

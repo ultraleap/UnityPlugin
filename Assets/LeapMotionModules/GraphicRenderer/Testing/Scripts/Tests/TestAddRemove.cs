@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace Leap.Unity.GraphicalRenderer.Tests {
 
-  public class AddRemoveTests : GraphicRendererTestBase {
+  public class TestAddRemove : GraphicRendererTestBase {
 
     /// <summary>
     /// Validate that a pre-added graphic reports itself as being
@@ -151,6 +151,109 @@ namespace Leap.Unity.GraphicalRenderer.Tests {
       yield return null;
 
       Assert.That(oneGraphic.attachedGroup, Is.EqualTo(secondGroup));
+    }
+
+    /// <summary>
+    /// Validate that when we add a single graphic to two different groups
+    /// on the same frame that things don't break.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator AddToTwoGroupsSameFrame() {
+      InitTest("TwoEmptyDynamicGroups");
+      yield return null;
+
+      CreateGraphic("DisabledMeshGraphic");
+
+      bool didAddToFirst = firstGroup.TryAddGraphic(oneGraphic);
+      bool didAddToSecond = secondGroup.TryAddGraphic(oneGraphic);
+
+      Assert.IsTrue(didAddToFirst);
+      Assert.IsFalse(didAddToSecond);
+
+      yield return null;
+
+      Assert.That(oneGraphic.isAttachedToGroup);
+      Assert.That(oneGraphic.attachedGroup, Is.EqualTo(firstGroup));
+
+      Assert.That(firstGroup.graphics, Contains.Item(oneGraphic));
+      Assert.That(secondGroup.graphics, Is.Empty);
+    }
+
+    /// <summary>
+    /// Validate that we cannot add to a second group when we are already
+    /// added to a first.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator CantAddToASecondGroup() {
+      InitTest("TwoDynamicGroups");
+      yield return null;
+
+      bool didAdd = secondGroup.TryAddGraphic(oneGraphic);
+
+      Assert.IsFalse(didAdd);
+      Assert.That(oneGraphic.isAttachedToGroup);
+      Assert.That(oneGraphic.attachedGroup, Is.EqualTo(firstGroup));
+      Assert.IsFalse(oneGraphic.willbeAttached);
+      Assert.That(secondGroup.graphics, Is.Empty);
+    }
+
+    /// <summary>
+    /// Assert that when we remove a graphic from one group and add it
+    /// to another, that we cannot turn around on the same frame and add
+    /// it back to the group it is supposed to be removed from.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator CantCancelTheRemoveIfWillAttach() {
+      InitTest("TwoDynamicGroups");
+      yield return null;
+
+      bool didRemove = firstGroup.TryRemoveGraphic(oneGraphic);
+      bool didAddToSecond = secondGroup.TryAddGraphic(oneGraphic);
+      bool didAddToFirst = firstGroup.TryAddGraphic(oneGraphic);
+
+      Assert.That(oneGraphic.isAttachedToGroup);
+      Assert.That(oneGraphic.willbeAttached);
+      Assert.That(oneGraphic.willbeDetached);
+
+      Assert.That(didRemove);
+      Assert.That(didAddToSecond);
+      Assert.IsFalse(didAddToFirst);
+
+      yield return null;
+
+      Assert.That(oneGraphic.isAttachedToGroup);
+      Assert.That(oneGraphic.attachedGroup, Is.EqualTo(secondGroup));
+      Assert.IsFalse(oneGraphic.willbeDetached);
+      Assert.IsFalse(oneGraphic.willbeAttached);
+      Assert.That(firstGroup.graphics, Is.Empty);
+      Assert.That(secondGroup.graphics, Contains.Item(oneGraphic));
+    }
+
+    /// <summary>
+    /// Verify that if one calls TryAddGraphic and then TryRemoveGraphic
+    /// within the same frame, that it doesn't actually perform an add
+    /// or a remove, it just cancels the willAdd request.
+    /// </summary>
+    [UnityTest]
+    public IEnumerator CanCancelTheAddWithARemove() {
+      InitTest("OneEmptyDynamicGroup");
+      yield return null;
+
+      CreateGraphic("DisabledMeshGraphic");
+
+      bool didAdd = firstGroup.TryAddGraphic(oneGraphic);
+      bool didRemove = firstGroup.TryRemoveGraphic(oneGraphic);
+
+      Assert.That(didAdd);
+      Assert.That(didRemove);
+      Assert.IsFalse(oneGraphic.willbeAttached);
+      Assert.IsFalse(oneGraphic.willbeDetached);
+      Assert.IsFalse(oneGraphic.isAttachedToGroup);
+
+      yield return null;
+
+      Assert.IsFalse(oneGraphic.isAttachedToGroup);
+      Assert.That(firstGroup.graphics, Is.Empty);
     }
   }
 }
