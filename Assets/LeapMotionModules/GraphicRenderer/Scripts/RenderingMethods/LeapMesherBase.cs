@@ -64,29 +64,41 @@ namespace Leap.Unity.GraphicalRenderer {
     public Action<Texture2D, AtlasUvs> OnPostProcessAtlas;
 
     #region INSPECTOR FIELDS
+    /// <summary>
+    /// asdasdasdasdasd
+    /// </summary>
+
     //BEGIN MESH SETTINGS
+    [Tooltip("Should this renderer include uv0 coordinates in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private bool _useUv0 = true;
 
+    [Tooltip("Should this renderer include uv1 coordinates in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private bool _useUv1 = false;
 
+    [Tooltip("Should this renderer include uv2 coordinates in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private bool _useUv2 = false;
 
+    [Tooltip("Should this renderer include uv3 coordinates in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private bool _useUv3 = false;
 
+    [Tooltip("Should this renderer include vertex colors in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private bool _useColors = false;
 
+    [Tooltip("Multiply all vertex colors for all graphics by this color.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private Color _bakedTint = Color.white;
 
+    [Tooltip("Should this renderer include normals in the generated meshes.")]
     [EditTimeOnly, SerializeField, HideInInspector]
     private bool _useNormals = false;
 
     //BEGIN RENDERING SETTINGS
+    [Tooltip("Shader to use to display the graphics.")]
     [EditTimeOnly, SerializeField]
     protected Shader _shader;
 
@@ -94,6 +106,8 @@ namespace Leap.Unity.GraphicalRenderer {
     [SerializeField]
     private SingleLayer _visualLayer = 0;
 
+    [Tooltip("The atlas combines multiple textures into a single texture automatically, allowing each graphic to have a different " +
+             "texture but still allow the graphics as a whole to render efficiently.")]
     [SerializeField]
     private AtlasBuilder _atlas = new AtlasBuilder();
     #endregion

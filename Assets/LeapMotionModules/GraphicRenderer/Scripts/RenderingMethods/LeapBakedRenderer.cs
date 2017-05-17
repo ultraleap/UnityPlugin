@@ -27,10 +27,12 @@ namespace Leap.Unity.GraphicalRenderer {
 
     #region INSPECTOR FIELDS
 
+    [Tooltip("What type of graphic motion should be supported by this renderer?  Currently there are only two modes, None, and Translation.")]
     [EditTimeOnly]
     [SerializeField]
     private MotionType _motionType = MotionType.Translation;
 
+    [Tooltip("Should the baked renderer create an actual game object and attach a mesh renderer to it in order to display the graphics?")]
     [EditTimeOnly]
     [SerializeField]
     private bool _createMeshRenderers;
