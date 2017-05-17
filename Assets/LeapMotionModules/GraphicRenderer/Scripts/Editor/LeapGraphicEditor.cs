@@ -87,8 +87,7 @@ public abstract class LeapGraphicEditorBase<T> : CustomEditorBase<T> where T : L
         GenericMenu groupMenu = new GenericMenu();
         int index = 0;
         foreach (var group in mainGroup.renderer.groups.Query().Where(g => g.renderingMethod.IsValidGraphic(targets[0]))) {
-          string tag = LeapGraphicTagAttribute.GetTagName(group.renderingMethod.GetType());
-          groupMenu.AddItem(new GUIContent(index.ToString() + ": " + tag), false, () => {
+          groupMenu.AddItem(new GUIContent(index.ToString() + ": " + group.name), false, () => {
 
             bool areFeaturesUnequal = false;
             var typesA = group.features.Query().Select(f => f.GetType()).ToList();

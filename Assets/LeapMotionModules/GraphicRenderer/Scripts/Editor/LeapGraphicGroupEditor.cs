@@ -132,6 +132,8 @@ namespace Leap.Unity.GraphicalRenderer {
 
         drawRendererHeader();
 
+        drawGroupName();
+
         drawMonoScript();
 
         drawStatsArea();
@@ -202,6 +204,11 @@ namespace Leap.Unity.GraphicalRenderer {
                                            Select(path => AssetDatabase.LoadAssetAtPath<MonoScript>(path)).
                                            FirstOrDefault();
       }
+    }
+
+    private void drawGroupName() {
+      var nameProperty = _groupProperty.FindPropertyRelative("_groupName");
+      EditorGUILayout.PropertyField(nameProperty);
     }
 
     private void drawRendererHeader() {

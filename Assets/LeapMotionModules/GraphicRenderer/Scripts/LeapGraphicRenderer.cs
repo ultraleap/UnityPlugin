@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Leap.Unity.Space;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
@@ -53,6 +54,14 @@ namespace Leap.Unity.GraphicalRenderer {
       get {
         return _groups;
       }
+    }
+
+    /// <summary>
+    /// Searches the group list for a group with the given name.  If there is no
+    /// group with the given name, this method will return null.
+    /// </summary>
+    public LeapGraphicGroup FindGroup(string name) {
+      return _groups.Query().FirstOrDefault(g => g.name == name);
     }
 
     /// <summary>

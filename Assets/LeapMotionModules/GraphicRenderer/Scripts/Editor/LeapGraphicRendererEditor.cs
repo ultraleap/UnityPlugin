@@ -140,7 +140,7 @@ namespace Leap.Unity.GraphicalRenderer {
 
         var group = _renderer.groups[i];
         string tag = LeapGraphicTagAttribute.GetTagName(group.renderingMethod.GetType());
-        if (GUILayout.Button(tag, EditorStyles.toolbarButton, GUILayout.MaxWidth(60))) {
+        if (GUILayout.Button(group.name, EditorStyles.toolbarButton)) {
           _selectedGroup.intValue = i;
           _groupEditor.Invalidate();
           updateGroupProperty();

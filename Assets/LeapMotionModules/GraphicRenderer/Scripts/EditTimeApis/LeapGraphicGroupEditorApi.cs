@@ -24,6 +24,8 @@ namespace Leap.Unity.GraphicalRenderer {
     public readonly EditorApi editor;
 
     public LeapGraphicGroup(LeapGraphicRenderer renderer, Type renderingMethodType) {
+      _groupName = LeapGraphicTagAttribute.GetTagName(renderingMethodType);
+
       AssertHelper.AssertEditorOnly();
       Assert.IsNotNull(renderer);
       Assert.IsNotNull(renderingMethodType);

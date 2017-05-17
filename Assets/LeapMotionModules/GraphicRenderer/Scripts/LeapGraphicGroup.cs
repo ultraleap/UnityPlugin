@@ -25,6 +25,9 @@ namespace Leap.Unity.GraphicalRenderer {
 
     #region INSPECTOR FIELDS
     [SerializeField]
+    private string _groupName;
+
+    [SerializeField]
     private RenderingMethodReference _renderingMethod = new RenderingMethodReference();
 
     [SerializeField]
@@ -49,6 +52,12 @@ namespace Leap.Unity.GraphicalRenderer {
     #endregion
 
     #region PUBLIC RUNTIME API
+
+    public string name {
+      get {
+        return _groupName;
+      }
+    }
 
     /// <summary>
     /// Gets the renderer this group is attached to.  The set method is 
