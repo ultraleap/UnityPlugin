@@ -532,6 +532,10 @@ namespace Leap.Unity.GraphicalRenderer {
             renderer.space.RecalculateTransformers();
           }
 
+          foreach (var feature in _features) {
+            feature.isDirty = true;
+          }
+
           (_renderingMethod.Value as ISupportsAddRemove).OnAddRemoveGraphics(dirtyIndexes);
         } finally {
           dirtyIndexes.Clear();
