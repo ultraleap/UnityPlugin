@@ -209,6 +209,12 @@ namespace Leap.Unity.GraphicalRenderer {
     private void drawGroupName() {
       var nameProperty = _groupProperty.FindPropertyRelative("_groupName");
       EditorGUILayout.PropertyField(nameProperty);
+
+      nameProperty.stringValue = nameProperty.stringValue.Trim();
+
+      if (string.IsNullOrEmpty(nameProperty.stringValue)) {
+        nameProperty.stringValue = "MyGroupName";
+      }
     }
 
     private void drawRendererHeader() {
