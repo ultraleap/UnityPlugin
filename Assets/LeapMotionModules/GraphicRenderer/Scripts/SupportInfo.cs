@@ -48,9 +48,7 @@ namespace Leap.Unity.GraphicalRenderer {
     public static void OnlySupportFirstFeature<T>(List<T> features, List<SupportInfo> info)
       where T : LeapGraphicFeatureBase {
       for (int i = 1; i < features.Count; i++) {
-        info[i] = SupportInfo.Error("This renderer only supports a single " +
-                                            LeapGraphicTagAttribute.GetTagName(typeof(T)) +
-                                            " feature.");
+        info[i] = SupportInfo.Error("Only the first " + LeapGraphicTagAttribute.GetTagName(typeof(T)) + " is supported.");
       }
     }
   }
