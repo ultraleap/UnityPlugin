@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using System;
 using System.Collections.Generic;
+using Leap.Unity.Query;
 
 namespace Leap.Unity {
 
@@ -498,6 +499,31 @@ namespace Leap.Unity {
       for (float q = step; q <= height; q += step) {
         DrawCircle(origin + direction * q, direction, Mathf.Tan(angle * Constants.DEG_TO_RAD) * q, color, quality * 8, duration, depthTest);
       }
+    }
+
+    #endregion
+
+    #region Texture Utils
+
+    private static TextureFormat[] _incompressibleFormats = new TextureFormat[] {
+      TextureFormat.R16,
+      TextureFormat.EAC_R,
+      TextureFormat.EAC_R_SIGNED,
+      TextureFormat.EAC_RG,
+      TextureFormat.EAC_RG_SIGNED,
+      TextureFormat.ETC_RGB4_3DS,
+      TextureFormat.ETC_RGBA8_3DS
+    };
+
+    /// <summary>
+    /// Returns whether or not the given format is a valid input to EditorUtility.CompressTexture();
+    /// </summary>
+    public static bool IsCompressible(TextureFormat format) {
+      if (format < 0) {
+        return false;
+      }
+
+      return Array.IndexOf(_incompressibleFormats, format) < 0;
     }
 
     #endregion

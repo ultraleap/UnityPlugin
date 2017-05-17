@@ -71,20 +71,26 @@ namespace Leap.Unity.GraphicalRenderer {
   [Serializable]
   public class AtlasBuilder {
 
+    [Tooltip("When non-zero, extends each texture by a certain number of pixels, filling in the space with texture data based on the texture wrap mode.")]
     [MinValue(0)]
     [EditTimeOnly, SerializeField]
     private int _border = 0;
 
+    [Tooltip("When non-zero, adds an amount of empty space between each texture.")]
     [MinValue(0)]
     [EditTimeOnly, SerializeField]
     private int _padding = 0;
 
+    [Tooltip("Should the atlas have mip maps?")]
     [EditTimeOnly, SerializeField]
     private bool _mipMap = true;
 
+    [Tooltip("The filter mode that should be used for the atlas.")]
     [EditTimeOnly, SerializeField]
     private FilterMode _filterMode = FilterMode.Bilinear;
 
+    [Tooltip("The texture format that should be used for the atlas.")]
+    [Compressible]
     [EditTimeOnly, SerializeField]
     private TextureFormat _format = TextureFormat.ARGB32;
 
