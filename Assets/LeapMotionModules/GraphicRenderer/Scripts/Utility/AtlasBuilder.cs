@@ -16,6 +16,10 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.GraphicalRenderer {
 
+  /// <summary>
+  /// A class that contains mapping information that specifies how a texture
+  /// is packed into an atlas.
+  /// </summary>
   [Serializable]
   public class AtlasUvs {
 
@@ -34,6 +38,13 @@ namespace Leap.Unity.GraphicalRenderer {
     [SerializeField]
     private Rect[] _nullRects = new Rect[4];
 
+    /// <summary>
+    /// Given a texture object and a uv channel, return the rect that
+    /// this texture occupies within the atlas.  If the key is not
+    /// present in the atlas, the default rect is returned.  If a null
+    /// texture is passed in, the rect for the empty texture (which is valid!)
+    /// is returned.
+    /// </summary>
     public Rect GetRect(int channel, UnityEngine.Object key) {
       if (key == null) {
         return _nullRects[channel];
@@ -44,6 +55,11 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// Given a texture object and a uv channel, store into this data
+    /// structure the rect that the texture takes up inside of the atlas.
+    /// A null texture object is valid, and represents the empty texture.
+    /// </summary>
     public void SetRect(int channel, UnityEngine.Object key, Rect rect) {
       if (key == null) {
         _nullRects[channel] = rect;
@@ -104,6 +120,9 @@ namespace Leap.Unity.GraphicalRenderer {
     [SerializeField]
     private TextureReference[] _extraTextures;
 
+    /// <summary>
+    /// Returns whether or not the results built by this atlas have become invalid.
+    /// </summary>
     public bool isDirty {
       get {
         return _currHash != _atlasHash;
@@ -124,6 +143,11 @@ namespace Leap.Unity.GraphicalRenderer {
     private Hash _atlasHash = 1;
     private Hash _currHash = 0;
 
+    /// <summary>
+    /// Updates the internal list of textures given some texture features to build an atlas for.
+    /// This method does not do any atlas work, but must be called before RebuildAtlas is called.
+    /// Once this method is called, you can check the isDirty flag to see if a rebuild is needed.
+    /// </summary>
     public void UpdateTextureList(List<LeapTextureFeature> textureFeatures) {
       _features.Clear();
       _features.AddRange(textureFeatures);
@@ -167,6 +191,12 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
+    /// <summary>
+    /// Actually perform the build for the atlas.  This method outputs the atlas textures, and the atlas
+    /// uvs that map textures into the atlas.  This method takes in a progress bar so that the atlas 
+    /// process can be tracked visually, since it can take quite a bit of time when there are a lot of
+    /// textures to pack.
+    /// </summary>
     public void RebuildAtlas(ProgressBar progress, out Texture2D[] packedTextures, out AtlasUvs channelMapping) {
       _atlasHash = _currHash;
 
