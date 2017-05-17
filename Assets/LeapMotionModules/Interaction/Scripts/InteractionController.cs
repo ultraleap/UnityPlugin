@@ -14,6 +14,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.RuntimeGizmos;
 
 namespace Leap.Unity.Interaction {
 
@@ -51,6 +52,11 @@ namespace Leap.Unity.Interaction {
     /// or is held by a right hand (true) or a left hand (false).
     /// </summary>
     public bool isRight { get { return !isLeft; } }
+
+    /// <summary>
+    /// Returns the current velocity of this controller.
+    /// </summary>
+    public abstract Vector3 velocity { get; }
 
     /// <summary>
     /// Gets the type of controller this object represents underneath the InteractionControllerBase
@@ -179,10 +185,10 @@ namespace Leap.Unity.Interaction {
     /// Interaction Hand with state from the Leap hand and perform bookkeeping operations.
     /// </summary>
     public void FixedUpdateControllerBase(bool doHovering, bool doContact, bool doGrasping) {
-      using (new ProfilerSample("Fixed Update InteractionControllerBase", _brushBoneParent)) {
+      using (new ProfilerSample("Fixed Update InteractionControllerBase", contactBoneParent)) {
 
         if (doHovering || _didHoveringLastFrame) { fixedUpdateHovering(); }
-        if (doContact || _didContactLastFrame) { FixedUpdateContact(doContact); }
+        if (doContact || _didContactLastFrame) { fixedUpdateContact(doContact); }
         if (doGrasping || _didGraspingLastFrame) { FixedUpdateGrasping(); }
 
         // To support checking for interaction-ends e.g. if grasping is disabled, need to update an extra
@@ -323,16 +329,26 @@ namespace Leap.Unity.Interaction {
           ISpaceComponent space = primaryHoveredObject.space;
 
           if (space != null) {
-            inverseTransformColliders(primaryHoverPoints[_primaryHoverPointIdx], space);
+            unwarpColliders(primaryHoverPoints[_primaryHoverPointIdx], space);
           }
         }
       }
     }
 
     /// <summary>
+    /// Implementing this method is necessary to support curved spaces as
+    /// rendered by a Leap Graphic Renderer. See InteractionHand for an example
+    /// implementation. (Implementing this method is optional if you are not
+    /// using a curved space as rendered by a Leap Graphic Renderer.)
+    /// </summary>
+    /// <remarks>
     /// Warps the collider transforms of this controller by the inverse of the
     /// transformation that is applied on the provided warpedSpaceElement, using
-    /// the primaryHoverPoint as the pivot point for the transformation.
+    /// the primaryHoverPoint as the pivot transform for the transformation.
+    /// 
+    /// ITransformer.WorldSpaceUnwarp is a useful method here. (ISpaceComponents
+    /// contain references to their transformers via their anchors.)
+    /// 
     /// ISpaceComponents denote game objects whose visual positions are warped
     /// from rectilinear (non-warped) space into a curved space (via, for example,
     /// a LeapCylindricalSpace, which can only be rendered correctly by the Leap
@@ -340,9 +356,13 @@ namespace Leap.Unity.Interaction {
     /// bringing it into the object's rectilinear space, allowing objects curved
     /// in this way to correctly collide with the bones in the hand or collider of
     /// a held controller.
-    /// </summary>
-    protected abstract void inverseTransformColliders(Transform primaryHoverPoint,
-                                                      ISpaceComponent warpedSpaceElement);
+    /// 
+    /// The provided Transform is the closest primary hover point to any given
+    /// primary hover candidate, so it is used as the pivot point for unwarping
+    /// the colliders of this InteractionController.
+    /// </remarks>
+    protected abstract void unwarpColliders(Transform primaryHoverPoint,
+                                            ISpaceComponent warpedSpaceElement);
 
     // Hover history, handled as part of the Interaction Manager's state-check calls.
     private IInteractionBehaviour _primaryHoveredLastFrame = null;
@@ -501,7 +521,7 @@ namespace Leap.Unity.Interaction {
     /// output set is empty.
     /// </summary>
     public bool CheckHoverStay(out HashSet<IInteractionBehaviour> hoveredObjects) {
-      hoveredObjects = _hoverResults.hovered;
+      hoveredObjects = _hoveredObjects;
       return hoveredObjects.Count > 0;
     }
 
@@ -566,7 +586,7 @@ namespace Leap.Unity.Interaction {
     /// the object into primaryHoveredObject.
     /// </summary>
     public bool CheckPrimaryHoverStay(out IInteractionBehaviour primaryHoveredObject) {
-      primaryHoveredObject = _hoverResults.primaryHovered;
+      primaryHoveredObject = _primaryHoveredObject;
       bool primaryHoverStayed = primaryHoveredObject != null;
 
       if (primaryHoverStayed && primaryHoveredObject is InteractionBehaviour) {
@@ -608,213 +628,190 @@ namespace Leap.Unity.Interaction {
 
     #region Contact
 
-    #region Brush Bones & Soft Contact
+    #region Brush Bones
 
-    private const int NUM_FINGERS = 5;
-    private const int BONES_PER_FINGER = 3;
-    private const float DEAD_ZONE_FRACTION = 0.1F;
-    private const float DISLOCATION_FRACTION = 3.0F;
+    protected const float DEAD_ZONE_FRACTION = 0.1F;
+    protected const float DISLOCATION_FRACTION = 3.0F;
 
-    private ContactBone[] _brushBones;
-    private GameObject _brushBoneParent;
-
-    private PhysicMaterial _material;
-    protected PhysicMaterial ContactMaterial {
-      get { if (_material == null) { InitContactMaterial(); } return _material; }
+    private static PhysicMaterial s_defaultContactBoneMaterial;
+    protected static PhysicMaterial defaultContactBoneMaterial {
+      get {
+        if (s_defaultContactBoneMaterial == null) {
+          initDefaultContactBoneMaterial();
+        }
+        return s_defaultContactBoneMaterial;
+      }
     }
-    /// <summary> ContactBones must have PhysicMaterials with a
-    /// Bounciness of zero and Bounce Combine set to Minimum. </summary>
-    private void InitContactMaterial() {
-      _material = new PhysicMaterial();
-      _material.hideFlags = HideFlags.HideAndDontSave;
-      _material.bounceCombine = PhysicMaterialCombine.Minimum;
-      _material.bounciness = 0F;
-      // TODO: Ensure there aren't other optimal PhysicMaterial defaults to set here.
+
+    /// <summary>
+    /// ContactBones should have PhysicMaterials with a bounciness of
+    /// zero and a bounce combine set to minimum.
+    /// </summary>
+    private static void initDefaultContactBoneMaterial() {
+      if (s_defaultContactBoneMaterial == null) {
+        s_defaultContactBoneMaterial = new PhysicMaterial();
+      }
+      s_defaultContactBoneMaterial.hideFlags = HideFlags.HideAndDontSave;
+      s_defaultContactBoneMaterial.bounceCombine = PhysicMaterialCombine.Minimum;
+      s_defaultContactBoneMaterial.bounciness = 0F;
     }
 
     private bool _contactInitialized = false;
+    protected abstract ContactBone[] contactBones { get; }
+    protected abstract GameObject contactBoneParent { get; }
 
-    private bool InitContact() {
-      if (_hand == null) return false;
-      InitBrushBoneContainer();
-      InitBrushBones();
-      _contactInitialized = true;
-      return _contactInitialized;
+    /// <summary>
+    /// Called to initialize contact colliders. See remarks for implementation
+    /// requirements.
+    /// </summary>
+    /// <remarks>
+    /// initContact() should:
+    /// - Return false at any time if initialization cannot be performed.
+    /// - Ensure the "contactBones" property returns all contact colliders.
+    ///   - (Construct contact colliders if they don't already exist.)
+    /// - Ensure the "contactBoneParent" property returns the common parent of all
+    ///   contact colliders.
+    ///   - (Construct the contact bone parent if it doesn't already exist.)
+    /// - Return true if initialization was successful.
+    ///   
+    /// Contact will only begin updating after initialization succeeds, otherwise
+    /// it will try to initialize again on the next fixed frame.
+    /// 
+    /// After initialization, the contact bone parent's layer will be set to
+    /// the Interaction Manager's contactBoneLayer.
+    /// </remarks>
+    protected abstract bool initContact();
+
+    private void finishInitContact() {
+      contactBoneParent.gameObject.layer = manager.contactBoneLayer;
     }
 
-    private void FixedUpdateContact(bool contactEnabled) {
+    private void fixedUpdateContact(bool contactEnabled) {
+      // Make sure contact data is initialized.
       if (!_contactInitialized) {
-        if (!InitContact()) {
+        if (initContact()) {
+          finishInitContact();
+          _contactInitialized = true;
+        }
+        else {
           return;
         }
       }
 
-      if (_hand == null && _contactBehaviours.Count > 0) {
+      // Clear contact data if we lose tracking.
+      if (!isTracked && _contactBehaviours.Count > 0) {
         _contactBehaviours.Clear();
       }
 
-      using (new ProfilerSample("Update BrushBones")) { FixedUpdateBrushBones(); }
-      using (new ProfilerSample("Update SoftContacts")) { FixedUpdateSoftContact(); }
-      using (new ProfilerSample("Update ContactCallbacks")) { FixedUpdateContactState(contactEnabled); }
-    }
-
-    private void InitBrushBoneContainer() {
-      _brushBoneParent = new GameObject((_warpedHandData.IsLeft ? "Left" : "Right") + " Interaction Hand Contact Bones");
-      _brushBoneParent.transform.parent = manager.transform;
-      _brushBoneParent.layer = manager.ContactBoneLayer;
-    }
-
-    private void InitBrushBones() {
-      _brushBones = new ContactBone[NUM_FINGERS * BONES_PER_FINGER + 1];
-
-      // Finger bones
-      for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
-        for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
-          Bone bone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
-          int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
-
-          GameObject contactBoneObj = new GameObject("Contact Fingerbone", typeof(CapsuleCollider), typeof(Rigidbody), typeof(ContactBone));
-          contactBoneObj.layer = manager.ContactBoneLayer;
-
-          contactBoneObj.transform.position = bone.Center.ToVector3();
-          contactBoneObj.transform.rotation = bone.Rotation.ToQuaternion();
-          CapsuleCollider capsule = contactBoneObj.GetComponent<CapsuleCollider>();
-          capsule.direction = 2;
-          capsule.radius = bone.Width * 0.5f;
-          capsule.height = bone.Length + bone.Width;
-          capsule.material = ContactMaterial;
-
-          ContactBone contactBone = InitBrushBone(bone, contactBoneObj, boneArrayIndex, capsule);
-
-          contactBone.lastTarget = bone.Center.ToVector3();
-        }
-      }
-
-      // Palm bone
-      {
-        // Palm is attached to the third metacarpal and derived from it.
-        Bone bone = _warpedHandData.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL);
-        int boneArrayIndex = NUM_FINGERS * BONES_PER_FINGER;
-        GameObject contactBoneObj = new GameObject("Contact Palm Bone", typeof(BoxCollider), typeof(Rigidbody), typeof(ContactBone));
-
-        contactBoneObj.transform.position = _warpedHandData.PalmPosition.ToVector3();
-        contactBoneObj.transform.rotation = _warpedHandData.Rotation.ToQuaternion();
-        BoxCollider box = contactBoneObj.GetComponent<BoxCollider>();
-        box.center = new Vector3(_warpedHandData.IsLeft ? -0.005f : 0.005f, bone.Width * -0.3f, -0.01f);
-        box.size = new Vector3(bone.Length, bone.Width, bone.Length);
-        box.material = _material;
-
-        InitBrushBone(null, contactBoneObj, boneArrayIndex, box);
-      }
-
-      // Constrain the bones to each other to prevent separation
-      AddBrushBoneJoints();
-
-    }
-
-    private ContactBone InitBrushBone(Bone bone, GameObject contactBoneObj, int boneArrayIndex, Collider boneCollider) {
-      contactBoneObj.layer = _brushBoneParent.layer;
-      contactBoneObj.transform.localScale = Vector3.one;
-
-      ContactBone contactBone = contactBoneObj.GetComponent<ContactBone>();
-      contactBone.collider = boneCollider;
-      contactBone.interactionHand = this;
-      _brushBones[boneArrayIndex] = contactBone;
-
-      Transform capsuleTransform = contactBoneObj.transform;
-      capsuleTransform.SetParent(_brushBoneParent.transform, false);
-
-      Rigidbody body = contactBoneObj.GetComponent<Rigidbody>();
-      body.freezeRotation = true;
-      contactBone.body = body;
-      body.useGravity = false;
-      body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic; // TODO: Allow different collision detection modes as an optimization.
-      if (boneCollider is BoxCollider) {
-        body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-      }
-
-      body.mass = 0.1f;
-      body.position = bone != null ? bone.Center.ToVector3() : _warpedHandData.PalmPosition.ToVector3();
-      body.rotation = bone != null ? bone.Rotation.ToQuaternion() : _warpedHandData.Rotation.ToQuaternion();
-      contactBone.lastTarget = bone != null ? bone.Center.ToVector3() : _warpedHandData.PalmPosition.ToVector3();
-
-      return contactBone;
-    }
-
-    private void FixedUpdateBrushBones() {
-      if (_hand == null) {
-        _brushBoneParent.gameObject.SetActive(false);
+      // Disable contact bone parent if we lose tracking.
+      if (!isTracked) {
+        contactBoneParent.gameObject.SetActive(false);
         return;
       }
       else {
-        if (!_brushBoneParent.gameObject.activeSelf) {
-          _brushBoneParent.gameObject.SetActive(true);
+        if (!contactBoneParent.gameObject.activeSelf) {
+          contactBoneParent.gameObject.SetActive(true);
         }
       }
 
-      float deadzone = DEAD_ZONE_FRACTION * _warpedHandData.Fingers[1].Bone((Bone.BoneType)1).Width;
-
-      // Update finger contact bones
-      for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
-        for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
-          Bone bone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
-          int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
-          FixedUpdateBrushBone(bone, boneArrayIndex, deadzone);
+      using (new ProfilerSample("Update Contact Bone Positions")) {
+        for (int idx = 0; idx < contactBones.Length; idx++) {
+          updateContactBone(idx);
         }
       }
-
-      // Update palm contact bone
-      {
-        Bone bone = _warpedHandData.Fingers[(int)Finger.FingerType.TYPE_MIDDLE].Bone(Bone.BoneType.TYPE_METACARPAL);
-        int boneArrayIndex = NUM_FINGERS * BONES_PER_FINGER;
-        FixedUpdateBrushBone(bone, boneArrayIndex, deadzone);
+      using (new ProfilerSample("Update Soft Contact")) {
+        fixedUpdateSoftContact();
+      }
+      using (new ProfilerSample("Update ContactCallbacks")) {
+        fixedUpdateContactState(contactEnabled);
       }
     }
 
-    private void FixedUpdateBrushBone(Bone bone, int boneArrayIndex, float deadzone) {
-      ContactBone brushBone = _brushBones[boneArrayIndex];
-      Rigidbody body = brushBone.body;
+    // TODO: UNUSED, DELETEME.
+    ///// <summary>
+    ///// Should contact bones using the latest data from the tracked controller.
+    ///// This is called every fixed frame the Interaction Manager is enabled, even
+    ///// if this controller is not tracked. (In this circumstance it's valid to
+    ///// simply return immediately.)
+    ///// </summary>
+    //protected abstract void updateContactBonePositions();
 
-      // This hack works best when we set a fixed rotation for bones.  Otherwise
-      // most friction is lost as the bones roll on contact.
-      body.MoveRotation(bone.Rotation.ToQuaternion());
+    /// <summary>
+    /// If your controller features no moving colliders relative to itself, simply
+    /// return the desired position and rotation for the given indexed contact bone
+    /// in the contactBones array. (For example, by recording the local position and
+    /// local rotation of each contact bone in initContact()). More complex controllers,
+    /// such as InteractionHand, uses this method to set ContactBone target positions and
+    /// rotations based on the tracked Leap hand.
+    /// </summary>
+    protected abstract void getBoneTargetPositionRotation(int contactBoneIndex,
+                                                          out Vector3 targetPosition,
+                                                          out Quaternion targetRotation);
 
-      // Calculate how far off the mark the brushes are.
-      float targetingError = Vector3.Distance(brushBone.lastTarget, body.position) / bone.Width;
-      float massScale = Mathf.Clamp(1.0f - (targetingError * 2.0f), 0.1f, 1.0f)
-                      * Mathf.Clamp(_warpedHandData.PalmVelocity.Magnitude * 10f, 1f, 10f);
-      body.mass = massScale * brushBone._lastObjectTouchedAdjustedMass;
+    private void updateContactBone(int contactBoneIndex) {
+      ContactBone contactBone = contactBones[contactBoneIndex];
+      Rigidbody   body = contactBone.body;
 
-      //If these conditions are met, stop using brush hands to contact objects and switch to "Soft Contact"
-      if (!_softContactEnabled && targetingError >= DISLOCATION_FRACTION
-        && _warpedHandData.PalmVelocity.Magnitude < 1.5f && boneArrayIndex != NUM_FINGERS * BONES_PER_FINGER) {
-        EnableSoftContact();
-        return;
+      Vector3    targetPosition;
+      Quaternion targetRotation;
+      getBoneTargetPositionRotation(contactBoneIndex, out targetPosition, out targetRotation);
+
+      // Set a fixed rotation for bones; otherwise most friction is lost
+      // as any capsule or spherical bones will roll on contact.
+      body.MoveRotation(targetRotation);
+
+      // Calculate how far off its target the contact bone is.
+      float errorFraction = Vector3.Distance(contactBone.lastTarget, body.position) / contactBone.width;
+
+      // Adjust the mass of the contact bone based on the mass of
+      // the object it is currently touching.
+      float speed = velocity.magnitude;
+      float massScale = Mathf.Clamp(1.0F - (errorFraction * 2.0F), 0.1F, 1.0F)
+                      * Mathf.Clamp(speed * 10F, 1F, 10F);
+      body.mass = massScale * contactBone._lastObjectTouchedAdjustedMass;
+
+      // Potentially enable Soft Contact if our error is too large.
+      if (!_softContactEnabled && errorFraction >= DISLOCATION_FRACTION
+          && speed < 1.5F
+       /* && boneArrayIndex != NUM_FINGERS * BONES_PER_FINGER */) {
+         EnableSoftContact();
+         return;
       }
 
-      // Add a deadzone to avoid vibration.
-      Vector3 delta = bone.Center.ToVector3() - body.position;
-      float deltaLen = delta.magnitude;
-      if (deltaLen <= deadzone) {
+      // Attempt to move the contact bone to its target position by setting
+      // its target velocity. Include a "deadzone" to avoid tiny vibrations.
+      float deadzone = DEAD_ZONE_FRACTION * contactBone.width;
+      // TODO: Delete me once deadzone is resolved.
+      // deadzone = DEAD_ZONE_FRACTION
+      //          * _unwarpedHandData.Fingers[1].Bone((Bone.BoneType)1).Width;
+      Vector3 delta = targetPosition - body.position;
+      float deltaMag = delta.magnitude;
+      if (deltaMag <= deadzone) {
         body.velocity = Vector3.zero;
-        brushBone.lastTarget = body.position;
+        contactBone.lastTarget = body.position;
       }
       else {
-        delta *= (deltaLen - deadzone) / deltaLen;
-        brushBone.lastTarget = body.position + delta;
-        delta /= Time.fixedDeltaTime;
-        body.velocity = (delta / delta.magnitude) * Mathf.Clamp(delta.magnitude, 0f, 100f);
+        delta *= (deltaMag - deadzone) / deltaMag;
+        contactBone.lastTarget = body.position + delta;
+
+        Vector3 targetVelocity = delta / Time.fixedDeltaTime;
+        float targetVelocityMag = targetVelocity.magnitude;
+        body.velocity = (targetVelocity / targetVelocityMag) * Mathf.Clamp(targetVelocityMag, 0F, 100F);
       }
     }
+
+    #endregion
+
+    #region Soft Contact
 
     private bool _softContactEnabled = false;
     private bool _disableSoftContactEnqueued = false;
     private IEnumerator _delayedDisableSoftContactCoroutine;
     private Collider[] _tempColliderArray = new Collider[2];
-    private Vector3[] _previousBoneCenters = new Vector3[20];
+    private Vector3[] _previousBoneCenters = new Vector3[32];
     private float _softContactBoneRadius = 0.015f;
 
-    private bool _handWasNullLastFrame = true;
+    private bool _notTrackedLastFrame = true;
 
     // Vars removed because Interaction Managers are currently non-optional.
     //private List<PhysicsUtility.SoftContact> softContacts = new List<PhysicsUtility.SoftContact>(40);
@@ -822,18 +819,18 @@ namespace Leap.Unity.Interaction {
 
     //private List<int> _softContactIdxRemovalBuffer = new List<int>();
 
-    private void FixedUpdateSoftContact() {
-      if (_hand == null) {
-        _handWasNullLastFrame = true;
+    private void fixedUpdateSoftContact() {
+      if (!isTracked) {
+        _notTrackedLastFrame = true;
         return;
       }
       else {
         // If the hand was just initialized, initialize with soft contact.
-        if (_handWasNullLastFrame) {
+        if (_notTrackedLastFrame) {
           EnableSoftContact();
         }
 
-        _handWasNullLastFrame = false;
+        _notTrackedLastFrame = false;
       }
 
       if (_softContactEnabled) {
@@ -883,58 +880,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private void AddBrushBoneJoints() {
-      for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
-        for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
-          Bone bone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
-          int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
-
-          FixedJoint joint = _brushBones[boneArrayIndex].gameObject.AddComponent<FixedJoint>();
-          joint.autoConfigureConnectedAnchor = false;
-          if (jointIndex != 0) {
-            Bone prevBone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
-            joint.connectedBody = _brushBones[boneArrayIndex - 1].body;
-            joint.anchor = Vector3.back * bone.Length / 2f;
-            joint.connectedAnchor = Vector3.forward * prevBone.Length / 2f;
-            _brushBones[boneArrayIndex].joint = joint;
-          }
-          else {
-            joint.connectedBody = _brushBones[NUM_FINGERS * BONES_PER_FINGER].body;
-            joint.anchor = Vector3.back * bone.Length / 2f;
-            joint.connectedAnchor = _brushBones[NUM_FINGERS * BONES_PER_FINGER].transform.InverseTransformPoint(bone.PrevJoint.ToVector3());
-            _brushBones[boneArrayIndex].metacarpalJoint = joint;
-          }
-        }
-      }
-    }
-
-    /// <summary> Reconnects and resets all the joints in the hand. </summary>
-    private void ResetBrushBoneJoints() {
-      _brushBones[NUM_FINGERS * BONES_PER_FINGER].transform.position = _warpedHandData.PalmPosition.ToVector3();
-      _brushBones[NUM_FINGERS * BONES_PER_FINGER].transform.rotation = _warpedHandData.Rotation.ToQuaternion();
-      for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
-        for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
-          Bone bone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1); // +1 to skip first bone.
-          int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
-
-          if (jointIndex != 0 && _brushBones[boneArrayIndex].joint != null) {
-            Bone prevBone = _warpedHandData.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex));
-            _brushBones[boneArrayIndex].joint.connectedBody = _brushBones[boneArrayIndex - 1].body;
-            _brushBones[boneArrayIndex].joint.anchor = Vector3.back * bone.Length / 2f;
-            _brushBones[boneArrayIndex].joint.connectedAnchor = Vector3.forward * prevBone.Length / 2f;
-          }
-          else if (_brushBones[boneArrayIndex].metacarpalJoint != null) {
-            _brushBones[boneArrayIndex].metacarpalJoint.connectedBody = _brushBones[NUM_FINGERS * BONES_PER_FINGER].body;
-            _brushBones[boneArrayIndex].metacarpalJoint.anchor = Vector3.back * bone.Length / 2f;
-            _brushBones[boneArrayIndex].metacarpalJoint.connectedAnchor = _brushBones[NUM_FINGERS * BONES_PER_FINGER].transform
-                                                                            .InverseTransformPoint(bone.PrevJoint.ToVector3());
-          }
-        }
-      }
-    }
-
     public void EnableSoftContact() {
-      if (_hand == null) return;
+      if (!isTracked) return;
       using (new ProfilerSample("Enable Soft Contact")) {
         _disableSoftContactEnqueued = false;
         if (!_softContactEnabled) {
@@ -943,8 +890,8 @@ namespace Leap.Unity.Interaction {
           if (_delayedDisableSoftContactCoroutine != null) {
             manager.StopCoroutine(_delayedDisableSoftContactCoroutine);
           }
-          for (int i = _brushBones.Length; i-- != 0; ) {
-            _brushBones[i].collider.isTrigger = true;
+          for (int i = _contactBones.Length; i-- != 0; ) {
+            _contactBones[i].collider.isTrigger = true;
           }
 
           // Update the last positions of the bones with this frame.
@@ -976,8 +923,8 @@ namespace Leap.Unity.Interaction {
       if (_disableSoftContactEnqueued) {
         using (new ProfilerSample("Disable Soft Contact")) {
           _softContactEnabled = false;
-          for (int i = _brushBones.Length; i-- != 0; ) {
-            _brushBones[i].collider.isTrigger = false;
+          for (int i = _contactBones.Length; i-- != 0; ) {
+            _contactBones[i].collider.isTrigger = false;
           }
           if (_hand != null) ResetBrushBoneJoints();
         }
@@ -988,19 +935,19 @@ namespace Leap.Unity.Interaction {
     /// Can be used to display a graphical hand that matches the physical one. </summary>
     public void FillBones(Hand inHand) {
       if (_softContactEnabled) { return; }
-      if (Application.isPlaying && _brushBones.Length == NUM_FINGERS * BONES_PER_FINGER + 1) {
+      if (Application.isPlaying && _contactBones.Length == NUM_FINGERS * BONES_PER_FINGER + 1) {
         Vector elbowPos = inHand.Arm.ElbowPosition;
-        inHand.SetTransform(_brushBones[NUM_FINGERS * BONES_PER_FINGER].body.position, _brushBones[NUM_FINGERS * BONES_PER_FINGER].body.rotation);
+        inHand.SetTransform(_contactBones[NUM_FINGERS * BONES_PER_FINGER].body.position, _contactBones[NUM_FINGERS * BONES_PER_FINGER].body.rotation);
 
         for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
           for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
             Bone bone = inHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
             int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
-            Vector displacement = _brushBones[boneArrayIndex].body.position.ToVector() - bone.Center;
+            Vector displacement = _contactBones[boneArrayIndex].body.position.ToVector() - bone.Center;
             bone.Center += displacement;
             bone.PrevJoint += displacement;
             bone.NextJoint += displacement;
-            bone.Rotation = _brushBones[boneArrayIndex].body.rotation.ToLeapQuaternion();
+            bone.Rotation = _contactBones[boneArrayIndex].body.rotation.ToLeapQuaternion();
           }
         }
 
@@ -1050,13 +997,13 @@ namespace Leap.Unity.Interaction {
     /// Called as a part of the Interaction Hand's general fixed frame update,
     /// before any specific-callback-related updates.
     /// </summary>
-    private void FixedUpdateContactState(bool contactEnabled) {
+    private void fixedUpdateContactState(bool contactEnabled) {
       _contactEndedBuffer.Clear();
       _contactBeganBuffer.Clear();
 
       foreach (var interactionObj in _contactBehavioursLastFrame) {
         if (!_contactBehaviours.ContainsKey(interactionObj)
-         || !_brushBoneParent.gameObject.activeInHierarchy
+         || !_contactBoneParent.gameObject.activeInHierarchy
          || !contactEnabled) {
           _contactEndedBuffer.Add(interactionObj);
           _contactBehaviourRemovalCache.Add(interactionObj);
@@ -1066,7 +1013,7 @@ namespace Leap.Unity.Interaction {
         _contactBehavioursLastFrame.Remove(interactionObj);
       }
       _contactBehaviourRemovalCache.Clear();
-      if (_brushBoneParent.gameObject.activeInHierarchy && contactEnabled) {
+      if (_contactBoneParent.gameObject.activeInHierarchy && contactEnabled) {
         foreach (var intObjCountPair in _contactBehaviours) {
           var interactionObj = intObjCountPair.Key;
           if (!_contactBehavioursLastFrame.Contains(interactionObj)) {
@@ -1286,9 +1233,20 @@ namespace Leap.Unity.Interaction {
 
     #region Gizmos
 
+    /// <summary>
+    /// By default, this method will draw all of the colliders found in the
+    /// contactBoneParent hierarchy. You may override this method to modify
+    /// its behavior.
+    /// </summary>
+    public virtual void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
+      if (contactBoneParent != null) {
+        drawer.DrawColliders(contactBoneParent.gameObject, true, true);
+      }
+    }
+
     public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-      if (_brushBoneParent != null) {
-        drawer.DrawColliders(_brushBoneParent, true, true);
+      if (_contactBoneParent != null) {
+        drawer.DrawColliders(_contactBoneParent, true, true);
       }
     }
 

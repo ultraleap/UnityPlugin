@@ -89,4 +89,29 @@ namespace Leap.Unity.Space {
       return Matrix4x4.TRS(localRectPos, Quaternion.identity, Vector3.one);
     }
   }
+
+  public static class ITransformerExtensions {
+
+    /// <summary>
+    /// Given a transformer and a world-space position and rotation, this method interprets that position
+    /// and rotation as being within the transformers "warped" space (e.g. cylindrical space for LeapCylindricalSpace)
+    /// and outputs the world-space position and rotation that would result if the space was no longer warped,
+    /// i.e., standard Unity rectilinear space.
+    /// </summary>
+    public static void WorldSpaceUnwarp(this ITransformer transformer,
+                                        Vector3 worldWarpedPosition, Quaternion worldWarpedRotation,
+                                        out Vector3 worldRectilinearPosition, out Quaternion worldRectilinearRotation) {
+
+      Vector3 anchorLocalWarpedPosition = transformer.anchor.space.transform.InverseTransformPoint(worldWarpedPosition);
+      Quaternion anchorLocalWarpedRotation = transformer.anchor.space.transform.InverseTransformRotation(worldWarpedRotation);
+
+      Vector3 anchorLocalRectPosition = transformer.InverseTransformPoint(anchorLocalWarpedPosition);
+      worldRectilinearPosition = transformer.anchor.space.transform.TransformPoint(anchorLocalRectPosition);
+
+      Quaternion anchorLocalRectRotation = transformer.InverseTransformRotation(anchorLocalWarpedPosition, anchorLocalWarpedRotation);
+      worldRectilinearRotation = transformer.anchor.space.transform.TransformRotation(anchorLocalRectRotation);
+    }
+
+  }
+
 }

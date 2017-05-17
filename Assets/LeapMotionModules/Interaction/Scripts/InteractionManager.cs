@@ -75,7 +75,7 @@ namespace Leap.Unity.Interaction {
     [Tooltip("The layer containing the collider bones of the hand. This layer should collide with anything you'd like to be able to touch, but it should not collide with the grasped object layer.")]
     [SerializeField]
     protected SingleLayer _contactBoneLayer = 0;
-    public SingleLayer ContactBoneLayer { get { return _contactBoneLayer; } }
+    public SingleLayer contactBoneLayer { get { return _contactBoneLayer; } }
 
     [Header("Debug Settings")]
     [SerializeField]
