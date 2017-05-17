@@ -94,6 +94,7 @@ namespace Leap.Unity.GraphicalRenderer {
     [EditTimeOnly, SerializeField]
     private TextureFormat _format = TextureFormat.ARGB32;
 
+    [Tooltip("The maximum atlas size in pixels.")]
     [MinValue(16)]
     [MaxValue(8192)]
     [EditTimeOnly, SerializeField]
@@ -102,54 +103,6 @@ namespace Leap.Unity.GraphicalRenderer {
     [Tooltip("Add textures to this array to ensure that they are always present in the atlas.")]
     [SerializeField]
     private TextureReference[] _extraTextures;
-
-    public int border {
-      get {
-        return _border;
-      }
-      set {
-        if (_border != value) {
-          _border = value;
-          _currHash++;
-        }
-      }
-    }
-
-    public int padding {
-      get {
-        return _padding;
-      }
-      set {
-        if (_padding != value) {
-          _padding = value;
-          _currHash++;
-        }
-      }
-    }
-
-    public int maxAtlasSize {
-      get {
-        return _maxAtlasSize;
-      }
-      set {
-        if (_maxAtlasSize != value) {
-          _maxAtlasSize = value;
-          _currHash++;
-        }
-      }
-    }
-
-    public FilterMode filterMode {
-      get {
-        return _filterMode;
-      }
-      set {
-        if (_filterMode != value) {
-          _filterMode = value;
-          _currHash++;
-        }
-      }
-    }
 
     public bool isDirty {
       get {
@@ -410,10 +363,10 @@ namespace Leap.Unity.GraphicalRenderer {
           return processed;
         }
 
-        RenderTexture destRT = new RenderTexture(source.width + border * 2, source.height + border * 2, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+        RenderTexture destRT = new RenderTexture(source.width + _border * 2, source.height + _border * 2, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
 
         GL.LoadPixelMatrix(0, 1, 0, 1);
-        drawTexture(source, destRT, new Rect(0, 0, 1, 1), border / (float)source.width, border / (float)source.height);
+        drawTexture(source, destRT, new Rect(0, 0, 1, 1), _border / (float)source.width, _border / (float)source.height);
 
         processed = convertToTexture2D(destRT, mipmap: false);
         _cachedProcessedTextures[source] = processed;
