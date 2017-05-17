@@ -206,7 +206,7 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public virtual void GetSupportInfo(List<LeapSpriteFeature> features, List<SupportInfo> info) {
-      SupportUtil.OnlySupportFirstFeature(features, info);
+      SupportUtil.OnlySupportFirstFeature<LeapSpriteFeature>(info);
 
 #if UNITY_EDITOR
       if (!Application.isPlaying) {
@@ -235,11 +235,11 @@ namespace Leap.Unity.GraphicalRenderer {
     }
 
     public virtual void GetSupportInfo(List<LeapRuntimeTintFeature> features, List<SupportInfo> info) {
-      SupportUtil.OnlySupportFirstFeature(features, info);
+      SupportUtil.OnlySupportFirstFeature<LeapRuntimeTintFeature>(info);
     }
 
     public virtual void GetSupportInfo(List<LeapBlendShapeFeature> features, List<SupportInfo> info) {
-      SupportUtil.OnlySupportFirstFeature(features, info);
+      SupportUtil.OnlySupportFirstFeature<LeapBlendShapeFeature>(info);
     }
 
     //Full unconditional support for all custom channels
