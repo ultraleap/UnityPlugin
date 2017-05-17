@@ -40,13 +40,6 @@ namespace Leap.Unity.GraphicalRenderer {
       }
     }
 
-    public static void GetUVsOrDefault(this Mesh mesh, int channel, List<Vector4> uvs) {
-      mesh.GetUVs(channel, uvs);
-      if (uvs.Count != mesh.vertexCount) {
-        uvs.Fill(mesh.vertexCount, Vector4.zero);
-      }
-    }
-
     public static int Index(this UVChannelFlags flags) {
       switch (flags) {
         case UVChannelFlags.UV0:
