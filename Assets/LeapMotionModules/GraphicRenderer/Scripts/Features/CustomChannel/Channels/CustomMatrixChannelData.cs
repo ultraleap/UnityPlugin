@@ -21,7 +21,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// group, or if the channel does not match up with the data type.
     /// </summary>
     public void SetCustomChannel(string channelName, Matrix4x4 value) {
-      getCustomChannelFeature<CustomMatrixChannelData>(channelName).value = value;
+      GetCustomChannel<CustomMatrixChannelData>(channelName).value = value;
     }
   }
 

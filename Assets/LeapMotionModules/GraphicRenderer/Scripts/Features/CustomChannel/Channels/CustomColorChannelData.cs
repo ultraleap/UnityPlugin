@@ -21,7 +21,7 @@ namespace Leap.Unity.GraphicalRenderer {
     /// group, or if the channel does not match up with the data type.
     /// </summary>
     public void SetCustomChannel(string channelName, Color color) {
-      getCustomChannelFeature<CustomColorChannelData>(channelName).value = color;
+      GetCustomChannel<CustomColorChannelData>(channelName).value = color;
     }
   }
 

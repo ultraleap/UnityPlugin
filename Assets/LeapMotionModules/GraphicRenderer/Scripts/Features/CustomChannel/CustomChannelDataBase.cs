@@ -9,17 +9,33 @@
 
 using System;
 using UnityEngine;
-using Leap.Unity.Query;
 
 namespace Leap.Unity.GraphicalRenderer {
 
   public partial class LeapGraphic {
 
-    private T getCustomChannelFeature<T>(string channelName) where T : CustomChannelDataBase {
-      int index = _featureData.Query().
-                               Select(d => d.feature).
-                               Cast<ICustomChannelFeature>().
-                               IndexOf(f => f.channelName == channelName);
+    /// <summary>
+    /// Helper method to get a custom channel data object given the name of the
+    /// feature it is attached to.  This method can only be used if the graphic
+    /// is currently attached to a group.
+    /// </summary>
+    public T GetCustomChannel<T>(string channelName) where T : CustomChannelDataBase {
+      if (!isAttachedToGroup) {
+        throw new Exception("Cannot get a custom channel by name if the graphic is not attached to a group.");
+      }
+
+      int index = -1;
+      for (int i = 0; i < _featureData.Count; i++) {
+        var feature = _featureData[i].feature as ICustomChannelFeature;
+        if (feature == null) {
+          continue;
+        }
+
+        if (feature.channelName == channelName) {
+          index = i;
+          break;
+        }
+      }
 
       if (index == -1) {
         throw new Exception("No custom channel of the name " + channelName + " could be found.");
