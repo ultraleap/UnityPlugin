@@ -183,5 +183,17 @@ namespace Leap.Unity.Query {
         list.Add(obj);
       }
     }
+
+    public void FillHashSet(HashSet<QueryType> hashSet) {
+      hashSet.Clear();
+      AppendHashSet(hashSet);
+    }
+
+    public void AppendHashSet(HashSet<QueryType> hashSet) {
+      QueryType obj;
+      while (_op.TryGetNext(out obj)) {
+        hashSet.Add(obj);
+      }
+    }
   }
 }

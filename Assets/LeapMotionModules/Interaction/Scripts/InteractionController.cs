@@ -34,7 +34,7 @@ namespace Leap.Unity.Interaction {
   public abstract class InteractionControllerBase : MonoBehaviour {
 
     /// <summary>
-    /// Gets whether the underlying object (Leap hand or a held controller) is currently
+    /// Gets whether the underlying object (Leap hand or a held controller) is currently 
     /// in a tracked state. Objects grasped by a controller that becomes untracked will
     /// become "suspended" and receive specific suspension callbacks. (Implementing any
     /// behaviour during the suspension state is left up to the developer, however.)

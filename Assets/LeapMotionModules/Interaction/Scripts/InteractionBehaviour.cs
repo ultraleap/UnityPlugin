@@ -22,16 +22,17 @@ using Leap.Unity.RuntimeGizmos;
 namespace Leap.Unity.Interaction {
 
   /// <summary>
-  /// InteractionBehaviours are components that enable GameObjects to interact with Interaction
-  /// controllers in a physically intuitive way.
+  /// InteractionBehaviours are components that enable GameObjects to interact with
+  /// interaction controllers (InteractionControllerBase) in a physically intuitive way.
   /// 
-  /// By default, they represent objects that can be poked, prodded, smacked, grasped, and thrown
-  /// around by Interaction controllers, including Leap hands. They also provide a thorough public
-  /// API with settings and hovering, contact, and grasping callbacks for creating physical
-  /// interfaces or overriding the default physical behavior of the object.
+  /// By default, they represent objects that can be poked, prodded, smacked, grasped,
+  /// and thrown around by Interaction controllers, including Leap hands. They also
+  /// provide a thorough public API with settings and hovering, contact, and grasping
+  /// callbacks for creating physical interfaces or overriding the default physical
+  /// behavior of the object.
   /// 
-  /// In documentation and some method calls, GameObjects with an InteractionBehaviour component
-  /// may be referred to as interaction objects.
+  /// In documentation and some method calls, GameObjects with an InteractionBehaviour
+  /// component may be referred to as interaction objects.
   /// </summary>
   [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviour : MonoBehaviour, IInteractionBehaviour {
@@ -132,8 +133,8 @@ namespace Leap.Unity.Interaction {
     public Finger primaryHoveringFinger {
       get {
         if (!isPrimaryHovered) return null;
-        return _closestPrimaryHoveringHand.GetLastTrackedLeapHand()
-                  .Fingers[primaryHoveringInteractionHand.hoverCheckResults.primaryHoveringFingerIdx];
+        return _closestPrimaryHoveringHand.leapHand
+                  .Fingers[_closestPrimaryHoveringHand.primaryHoveringFingerIndex];
       }
     }
 
@@ -225,7 +226,7 @@ namespace Leap.Unity.Interaction {
     /// was not primarily hovered by any controllers on the previous frame.
     /// </summary>
     /// <remarks>
-    /// If this method is called on a given frame, it will be called before OnPrimaryHoverStay, and it
+    /// If this event is fired on a given frame, it will be called before OnPrimaryHoverStay, and it
     /// will be called after OnPrimaryHoverEnd.
     /// </remarks>
     public Action OnPrimaryHoverBegin;
@@ -235,7 +236,7 @@ namespace Leap.Unity.Interaction {
     /// object was primarily hovered by one or more controllers on the previous frame.
     /// </summary>
     /// <remarks>
-    /// If this method is called on a given frame, it will be called before OnPrimaryHoverStay and
+    /// If this event is fired on a given frame, it will be called before OnPrimaryHoverStay and
     /// OnPrimaryHoverBegin.
     /// </remarks>
     public Action OnPrimaryHoverEnd;
@@ -278,132 +279,162 @@ namespace Leap.Unity.Interaction {
 
     #region Grasping API
 
-    /// <summary> Gets whether this object is grasped by any hand. </summary>
-    public bool isGrasped { get { return _graspingHands.Count > 0; } }
+    /// <summary> Gets whether this object is grasped by any interaction controller. </summary>
+    public bool isGrasped { get { return _graspingControllers.Count > 0; } }
 
-    /// <summary> Gets a set of all hands currently grasping this object. </summary>
-    public HashSet<InteractionHand> graspingHands { get { return _graspingHands; } }
+    /// <summary>
+    /// Gets the controller currently grasping this object. Warning: If allowMultigrasp is enabled on
+    /// this object, it might have multiple grasping controllers, in which case this will only return one
+    /// of the controllers grasping this object, and there is no guarantee on which controller is returned!
+    /// If no controllers (Leap hands or supported VR controllers) are currently grasping this object,
+    /// returns null.
+    /// </summary>
+    public InteractionControllerBase graspingController { get { return _graspingControllers.Query().FirstOrDefault(); } }
+
+    /// <summary>
+    /// Gets the set of all interaction controllers currently grasping this object. Interaction
+    /// controllers include Leap hands via InteractionHand and supported VR controllers.
+    /// </summary>
+    public HashSet<InteractionControllerBase> graspingControllers { get { return _graspingControllers; } }
+
+    private HashSet<InteractionHand> _graspingHandsBuffer = new HashSet<InteractionHand>();
+    /// <summary>
+    /// Gets a set of all Leap hands currently grasping this object.
+    /// </summary>
+    public HashSet<InteractionHand> graspingHands {
+      get {
+        _graspingHandsBuffer.Clear();
+        _graspingControllers.Query().OfType<InteractionHand>().FillHashSet(_graspingHandsBuffer);
+        return _graspingHandsBuffer;
+      }
+    }
 
     /// <summary>
     /// Gets whether the object is currently suspended. An object is "suspended" if it
-    /// is currently grasped by an untracked hand. For more details, refer to OnSuspensionBegin.
+    /// is currently grasped by an untracked controller. For more details, refer to
+    /// OnSuspensionBegin.
     /// </summary>
-    public bool isSuspended { get { return _suspendingHand != null; } }
+    public bool isSuspended { get { return _suspendingController != null; } }
+
+    #region Grasp Events
 
     /// <summary>
-    /// Releases this object from the hand currently grasping it, if it is grasped, and returns true.
-    /// If the object was not grasped, this method returns false.  Directly after calling this method,
-    /// the object is guaranteed not to be held.
+    /// Called directly after this grasped object's Rigidbody has had its position and rotation set
+    /// by its currently grasping controller(s). Subscribe to this callback if you'd like to override
+    /// the default behaviour for grasping objects, for example, to constrain the object's position or rotation.
+    /// 
+    /// Use InteractionBehaviour.Rigidbody.position and InteractionBehaviour.Rigidbody.rotation to set the
+    /// object's position and rotation. Merely setting the object's Transform's position and rotation is not
+    /// recommended unless you understand the difference.
+    /// </summary>
+    /// <remarks>
+    /// This method is called after any OnGraspBegin or OnGraspEnd callbacks, but before OnGraspStay. It is
+    /// also valid to move the Interaction object (via its Rigidbody) in OnGraspStay, although OnGraspStay does
+    /// not provide pre- and post-solve data in its callback signature.
+    /// </remarks>
+    public Action<Vector3, Quaternion, Vector3, Quaternion, List<InteractionControllerBase>> OnGraspedMovement
+      = (preSolvedPos, preSolvedRot, solvedPos, solvedRot, graspingControllers) => { };
+
+    /// <summary>
+    /// Called when the object becomes grasped, if it was not already held by any interaction controllers on the
+    /// previous frame.
+    /// </summary>
+    /// <remarks>
+    /// If this event is fired on a given frame, it will occur after OnGraspEnd and before OnGraspStay.
+    /// </remarks>
+    public Action OnGraspBegin;
+
+    /// <summary>
+    /// Called when the object is no longer grasped by any interaction controllers.
+    /// </summary>
+    /// <remarks>
+    /// If this event is fired on a given frame, it will occur before OnGraspBegin and OnGraspStay.
+    /// </remarks>
+    public Action OnGraspEnd;
+
+    /// <summary>
+    /// Called every fixed (physics) frame during which this object is grasped by one or more hands.
+    /// 
+    /// Unless allowMultigrasp is set to true, only one hand will ever be grasping an object at any given
+    /// time.
+    /// </summary>
+    /// <remarks>
+    /// If this event is fired on a given frame, it will be fired after all other grasping callbacks, including
+    /// OnGraspedMovement.
+    /// </remarks>
+    public Action OnGraspStay;
+
+    /// <summary>
+    /// Called whenever an interaction controller grasps this object.
+    /// 
+    /// Unless allowMultigrasp is set to true, only one controller will ever be grasping an object at any given
+    /// time.
+    /// </summary>
+    /// <remarks>
+    /// If this event is fired on a given frame, it will be called after OnPreControllerGraspEnd and before
+    /// OnGraspStay.
+    /// </remarks>
+    public Action<InteractionControllerBase> OnPerControllerGraspBegin;
+
+    /// <summary>
+    /// Called whenever an interaction controller stops grasping this object.
+    /// 
+    /// Unless allowMultigrasp is set to true, only one controller will ever be grasping an object at any given
+    /// time. If a new controller grasps an object while allowMultigrasp is disabled, the object will first
+    /// receive the end grasp event before receiving the begin grasp event for the newly grasping controller.
+    /// </summary>
+    /// <remarks>
+    /// If this event is fired on a given frame, it will be before all other grasping callbacks.
+    /// </remarks>
+    public Action<InteractionControllerBase> OnPerControllerGraspEnd;
+
+    /// <summary>
+    /// Called when the interaction controller that is grasping this interaction object loses tracking. This can
+    /// occur if the controller is occluded from the sensor that is tracking it, e.g. by as the user's body or
+    /// an object in the real world.
+    /// 
+    /// An object is "suspended" if it is currently grasped by an untracked controller.
+    /// 
+    /// By default, suspended objects will hang in the air until the interaction controller grasping them
+    /// resumes tracking. Subscribe to this callback and OnResume to implement, e.g., the object disappearing
+    /// and re-appearing.
+    /// </summary>
+    public Action<InteractionControllerBase> OnSuspensionBegin;
+
+    /// <summary>
+    /// Called when an object ceases being suspended. An object is suspended if it is currently grasped by
+    /// an untracked controller.
+    /// 
+    /// Grasping a suspended object with a different controller will cease suspension of the object, and will
+    /// invoke OnSuspensionEnd, although the input to OnSuspensionEnd will be the newly grasping controller, not
+    /// the controller that suspended the object. OnGraspEnd will also be called for the interaction controller
+    /// that was formerly causing suspension.
+    /// </summary>
+    public Action<InteractionControllerBase> OnSuspensionEnd;
+
+    #endregion
+
+    /// <summary>
+    /// Releases this object from the interaction controller currently grasping it, if it
+    /// is grasped, and returns true. If the object was not grasped, this method returns 
+    /// false. Directly after calling this method, the object is guaranteed not to be held.
     /// </summary>
     public bool ReleaseFromGrasp() {
       return manager.TryReleaseObjectFromGrasp(this);
     }
 
     /// <summary>
-    /// Called directly after this grasped object's Rigidbody has had its position and rotation set
-    /// by the GraspedPoseController (which moves the object realistically with the hand). Subscribe to this
-    /// callback if you'd like to override the default behaviour for grasping.
-    /// 
-    /// Use InteractionBehaviour.Rigidbody.position and InteractionBehaviour.Rigidbody.rotation to modify the
-    /// object's position and rotation from the solved position. Setting the object's Transform position and
-    /// rotation is not recommended unless you know what you're doing.
-    /// </summary>
-    /// <remarks>
-    /// This method is called after any OnGraspBegin or OnGraspEnd callbacks, but before OnGraspHold.
-    /// </remarks>
-    public Action<Vector3, Quaternion, Vector3, Quaternion, List<InteractionHand>> OnGraspedMovement
-      = (preSolvedPos, preSolvedRot, solvedPos, solvedRot, hands) => { };
-
-    /// <summary>
-    /// Called when one or more hands grasp this object during a given frame.
-    /// 
-    /// Unless allowMultigrasp is set to true, only one hand will ever be grasping an object at any given
-    /// time, so the hands list will always be of length one.
-    /// </summary>
-    /// <remarks>
-    /// The argument list will only contain hands that began grasping the object this frame. For a list
-    /// of all hands currently grasping the object, subscribe to OnGraspHold or refer to graspingHands.
-    /// 
-    /// If this method is called on a given frame, it will be called after OnGraspEnd and before OnGraspHold.
-    /// </remarks>
-    public Action<List<InteractionHand>> OnHandGraspBegin;
-
-    /// <summary>
-    /// Called when one of more hands release this object during a given frame.
-    /// 
-    /// Unless allowMultigrasp is set to true, only one hand will ever be grasping an object at any given
-    /// time, so the hands list will always be of length one.
-    /// </summary>
-    /// <remarks>
-    /// The argument list will only contain hands that stopped grasping the object this frame. For a list
-    /// of all hands currently grasping the object, subscribe to OnGraspHold or refer to graspingHands.
-    /// 
-    /// If this method is called on a given frame, it will be before all other grasping callbacks.
-    /// </remarks>
-    public Action<List<InteractionHand>> OnHandGraspEnd;
-
-    /// <summary>
-    /// Called every frame during which this object is grasped by one or more hands.
-    /// 
-    /// Unless allowMultigrasp is set to true, only one hand will ever be grasping an object at any given
-    /// time, so the hands list will always be of length one.
-    /// </summary>
-    /// <remarks>
-    /// If this method is called on a given frame, it will be called after all other grasping callbacks.
-    /// </remarks>
-    public Action<List<InteractionHand>> OnGraspStay;
-
-    /// <summary>
-    /// Called when the object is grasped by one or more hands, if the object was not grasped by any
-    /// hands on the previous frame.
-    /// </summary>
-    /// <remarks>
-    /// If this method is called on a given frame, it will be called directly after OnGraspBegin.
-    /// </remarks>
-    public Action<List<InteractionHand>> OnObjectGraspBegin;
-
-    /// <summary>
-    /// Called when the object is no longer grasped by any hands.
-    /// </summary>
-    /// <remarks>
-    /// If this method is called on a given frame, it will be called directly after OnGraspEnd.
-    /// </remarks>
-    public Action<List<InteractionHand>> OnObjectGraspEnd;
-
-    /// <summary>
-    /// Called when the hand that is grasping this interaction object loses tracking. This can occur if
-    /// the hand leaves the device's field of view, or is fully occluded by another (real-world) object.
-    /// 
-    /// An object is "suspended" if it is currently grasped by an untracked hand.
-    /// 
-    /// By default, suspended objects will hang in the air until the hand grasping them resumes tracking.
-    /// Subscribe to this callback and OnResume to implement, e.g., the object disappearing and
-    /// re-appearing.
-    /// 
-    /// Grasping a suspended object with a different hand will cease suspension of the object, and will
-    /// invoke OnResume, although the input to OnResume will be the newly grasping hand, not the hand that
-    /// suspended the object. OnGraspEnd will also be called for the hand that was formerly causing suspension.
-    /// </summary>
-    public Action<InteractionHand> OnSuspensionBegin;
-
-    /// <summary>
-    /// Called when an object ceases being suspended. An object is suspended if it is currently grasped by
-    /// an untracked hand. This occurs when the hand grasping an object ceases being tracked.
-    /// </summary>
-    public Action<InteractionHand> OnSuspensionEnd;
-
-    /// <summary>
     /// Returns (approximately) where the argument hand is grasping this object.
-    /// If the hand is not currently grasping this object, returns Vector3.zero.
-    /// 
-    /// This method will log an error if the argument hand is not grasping this object.
+    /// If the interaction controller is not currently grasping this object, returns
+    /// Vector3.zero, and logs an error to the Unity console.
     /// </summary>
-    public Vector3 GetGraspPoint(InteractionHand intHand) {
-      if (intHand.graspedObject == this as IInteractionBehaviour) {
-        return intHand.GetGraspPoint();
+    public Vector3 GetGraspPoint(InteractionControllerBase intController) {
+      if (intController.graspedObject == this as IInteractionBehaviour) {
+        return intController.GetGraspPoint();
       }
       else {
-        Debug.LogError("Cannot get this object's grasp point: It is not currently grasped by the argument InteractionHand", intHand);
+        Debug.LogError("Cannot get this object's grasp point: It is not currently grasped "
+                     + "by the provided interaction controller.", intController);
         return Vector3.zero;
       }
     }
@@ -415,40 +446,32 @@ namespace Leap.Unity.Interaction {
     public enum ContactForceMode { Object, UI };
 
     /// <summary>
-    /// Called when one or more hands begins touching this object.
+    /// Called when this object begins colliding with any interaction controllers, if the
+    /// object was not colliding with any interaction controllers last frame.
     /// </summary>
-    /// <remarks>
-    /// The provided hands list will only contain the hands that began
-    /// touching this object. For a list of all hands currently touching
-    /// this object, refer to OnContactStay.
-    /// </remarks>
-    public Action<List<InteractionHand>> OnHandContactBegin;
+    public Action OnContactBegin;
 
     /// <summary>
-    /// Called every frame during which one or more hands is touching this object.
+    /// Called when the object ceases colliding with any interaction controllers, if the     
+    /// object was colliding with interaction controllers last frame.
     /// </summary>
-    public Action<List<InteractionHand>> OnContactStay;
+    public Action OnContactEnd;
 
     /// <summary>
-    /// Called when one or more hands stops touching this object.
+    /// Called every frame during which one or more interaction controllers is colliding
+    /// with this object.
     /// </summary>
-    /// <remarks>
-    /// The provided hands list will only contain the hands that stopped
-    /// touching this object. For a list of all hands currently touching
-    /// this object, refer to OnContactStay.
-    /// </remarks>
-    public Action<List<InteractionHand>> OnHandContactEnd;
+    public Action OnContactStay;
 
     /// <summary>
-    /// Called when this object starts being touched by one or more hands, but was
-    /// not touched by any hands during the previous frame.
+    /// Called whenever an interaction controller begins colliding with this object.
     /// </summary>
-    public Action<List<InteractionHand>> OnObjectContactBegin;
+    public Action<InteractionControllerBase> OnPerControllerContactBegin;
 
     /// <summary>
-    /// Called when this object stops being touched by any hands.
+    /// Called whenever an interaction controller stops colliding with this object.
     /// </summary>
-    public Action<List<InteractionHand>> OnObjectContactEnd;
+    public Action<InteractionControllerBase> OnPerControllerContactEnd;
 
     #endregion
 
@@ -460,8 +483,8 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     /// <remarks>
     /// Rigidbody.AddForce() will work in most scenarios, but will produce unexpected
-    /// behavior when hands are embedded inside an object. Calling this method instead
-    /// solves that problem.
+    /// behavior when interaction controllers are embedded inside an object due to soft
+    /// contact. Calling this method instead solves that problem.
     /// </remarks>
     public void AddLinearAcceleration(Vector3 acceleration) {
       _appliedForces = true;
@@ -475,8 +498,8 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     /// <remarks>
     /// Rigidbody.AddTorque() will work in most scenarios, but will produce unexpected
-    /// behavior when hands are embedded inside an object. Calling this method instead
-    /// solves that problem.
+    /// behavior when interaction controllers are embedded inside an object due to soft
+    /// contact. Calling this method instead solves that problem.
     /// </remarks>
     public void AddAngularAcceleration(Vector3 acceleration) {
       _appliedForces = true;
@@ -508,14 +531,16 @@ namespace Leap.Unity.Interaction {
     new 
     #endif
     /// <summary> The Rigidbody associated with this interaction object. </summary>
-    public Rigidbody rigidbody { get { return _rigidbody; } protected set { _rigidbody = value; } }
+    public Rigidbody rigidbody { get { return _rigidbody; }
+                                 protected set { _rigidbody = value; } }
 
     public ISpaceComponent space { get; protected set; }
 
     [Header("Interaction Overrides")]
     
-    [Tooltip("This object will not receive callbacks from left hands, right hands, or either hand "
-           + "if this mode is set to anything other than None.")]
+    [Tooltip("This object will not receive callbacks from left controllers, right "
+           + "controllers, or either hand if this mode is set to anything other than "
+           + "None.")]
     [SerializeField]
     private IgnoreHoverMode _ignoreHoverMode = IgnoreHoverMode.None;
     public IgnoreHoverMode ignoreHoverMode {
@@ -527,7 +552,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    [Tooltip("Hands will not be able to mark this object as their primary hover if this property is checked.")]
+    [Tooltip("Interaction controllers will not be able to mark this object as their "
+           + "primary hover if this property is checked.")]
     [SerializeField]
     private bool _ignorePrimaryHover = false;
     public bool ignorePrimaryHover {
@@ -539,7 +565,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    [Tooltip("Hands will not be able to touch this object if this property is checked.")]
+    [Tooltip("Interaction controllers will not be able to touch this object if this "
+           + "property is checked.")]
     [SerializeField]
     private bool _ignoreContact = false;
     public bool ignoreContact {
@@ -551,7 +578,8 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    [Tooltip("Hands will not be able to grasp this object if this property is checked.")]
+    [Tooltip("Interaction controllers will not be able to grasp this object if this "
+           + "property is checked.")]
     [SerializeField]
     private bool _ignoreGrasping = false;
     public bool ignoreGrasping {
@@ -565,55 +593,60 @@ namespace Leap.Unity.Interaction {
 
     [Header("Contact Settings")]
 
-    [Tooltip("Determines how much force the hand should apply to different kinds of objects.")]
+    [Tooltip("Determines how much force an interaction controller should apply to this "
+           + "object. For interface-style objects like buttons and sliders, choose UI. "
+           + "This will make the objects to feel lighter and more reactive to gentle "
+           + "touches; for normal physical objects, you'll almost always want Object.")]
     [SerializeField]
     private ContactForceMode _contactForceMode = ContactForceMode.Object;
-    public ContactForceMode contactForceMode { get { return _contactForceMode; } set { _contactForceMode = value; } }
+    public ContactForceMode contactForceMode { get { return _contactForceMode; }
+                                               set { _contactForceMode = value; } }
 
     [Header("Grasp Settings")]
 
-    [Tooltip("Can this object be grasped simultaneously with two or more hands?")]
+    [Tooltip("Can this object be grasped simultaneously with two or more interaction "
+           + "controllers?")]
     [SerializeField]
     private bool _allowMultiGrasp = false;
-    public bool allowMultiGrasp { get { return _allowMultiGrasp; } set { _allowMultiGrasp = value; } }
+    public bool allowMultiGrasp { get { return _allowMultiGrasp; }
+                                  set { _allowMultiGrasp = value; } }
 
-    [Tooltip("Should hands move the object as if it is held when the object is grasped? "
+    [Tooltip("Should interaction controllers move this object when it is grasped? "
            + "Without this property checked, objects will still receive grasp callbacks, "
-           + "but you must move them manually via script.")]
+           + "but you will need to move them manually via script.")]
     [SerializeField]
     private bool _moveObjectWhenGrasped = true;
-    public bool moveObjectWhenGrasped { get { return _moveObjectWhenGrasped; } set { _moveObjectWhenGrasped = value; } }
+    public bool moveObjectWhenGrasped { get { return _moveObjectWhenGrasped; }
+                                        set { _moveObjectWhenGrasped = value; } }
 
-    /// <summary>
-    /// When the object is held by an Interaction Hand, how should it move to its
-    /// new position? Nonkinematic bodies will collide with other Rigidbodies, so they
-    /// might not reach the target position. Kinematic rigidbodies will always move to the
-    /// target position, ignoring collisions. Inherit will simply use the isKinematic
-    /// state of the Rigidbody from before it was grasped.
-    /// </summary>
     public enum GraspedMovementType {
       Inherit,
       Kinematic,
       Nonkinematic
     }
-    [Tooltip("When the object is held by an Interaction Hand, how should it move to its "
-           + "new position? Nonkinematic bodies will collide with other Rigidbodies, so they "
-           + "might not reach the target position. Kinematic rigidbodies will always move to the "
-           + "target position, ignoring collisions. Inherit will simply use the isKinematic "
-           + "state of the Rigidbody from before it was grasped.")]
+    [Tooltip("When the object is held by an interaction controller, how should it move to "
+           + "its new position? Nonkinematic bodies will collide with other Rigidbodies, "
+           + "so they might not reach the target position. Kinematic rigidbodies will "
+           + "always move to the target position, ignoring collisions. Inherit will "
+           + "simply use the isKinematic state of the Rigidbody from before it was "
+           + "grasped.")]
     [DisableIf("_moveObjectWhenGrasped", isEqualTo: false)]
     public GraspedMovementType graspedMovementType;
 
-    /// <summary> The RigidbodyWarper manipulates the graphical (but not physical) position
-    /// of grasped objects based on the movement of the Leap hand so they appear move with less latency. </summary>
+    /// <summary>s
+    /// The RigidbodyWarper manipulates the graphical (but not physical) position ofs
+    /// grasped objects based on the movement of the Leap hand so they appear move with
+    /// less latency.
+    /// </summary>
     /// TODO: This is not actually implemented.
     [HideInInspector]
     public RigidbodyWarper rigidbodyWarper;
 
     [Header("Advanced Settings")]
 
-    [Tooltip("Warping manipulates the graphical (but not physical) position of grasped objects "
-           + "based on the movement of the Leap hand so the objects appear to move with less latency.")]
+    [Tooltip("Warping manipulates the graphical (but not physical) position of grasped "
+           + "objects based on the movement of the grasping interaction controller so "
+           + "the objects appear to move with less latency.")]
     public bool graspHoldWarpingEnabled__curIgnored = true; // TODO: Warping not yet implemented.
 
     #region Unity Callbacks
@@ -635,7 +668,8 @@ namespace Leap.Unity.Interaction {
         manager = InteractionManager.instance;
 
         if (manager == null) {
-          Debug.LogError("Interaction Behaviours require an Interaction Manager. Please ensure you have an InteractionManager in your scene.");
+          Debug.LogError("Interaction Behaviours require an Interaction Manager. Please "
+                       + "ensure you have an InteractionManager in your scene.");
           this.enabled = false;
         }
       }
@@ -657,9 +691,10 @@ namespace Leap.Unity.Interaction {
       // Make sure we have a list of all of this object's colliders.
       RefreshInteractionColliders();
 
-      // Check any Joint attachments to automatically be able to choose Kabsch pivot setting (grasping).
+      // Check any Joint attachments to automatically be able to choose Kabsch pivot
+      // setting (grasping).
       RefreshPositionLockedState();
-
+       
       // Ensure physics layers are set up properly.
       InitInternal();
     }
@@ -671,8 +706,9 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     /// <summary>
-    /// InteractionManager manually calls method this after all InteractionHands
-    /// are updated (via InteractionManager.FixedUpdate).
+    /// The InteractionManager manually calls method this after all
+    /// InteractionControllerBase objects are updated via the InteractionManager's
+    /// FixedUpdate().
     /// </summary>
     public void FixedUpdateObject() {
       if (!ignoreGrasping) FixedUpdateGrasping();
@@ -682,17 +718,19 @@ namespace Leap.Unity.Interaction {
 
     #region Hovering
 
-    private HashSet<InteractionHand> _hoveringControllers = new HashSet<InteractionHand>();
+    private HashSet<InteractionControllerBase> _hoveringControllers = new HashSet<InteractionControllerBase>();
 
+    private InteractionControllerBase _closestHoveringController = null;
     private InteractionHand _closestHoveringHand = null;
 
     /// <summary>
-    /// Returns a comparative distance to this interaction object. Calculated by finding the
-    /// smallest distance to each of the object's colliders.
+    /// Returns a comparative distance to this interaction object. Calculated by finding
+    /// the smallest distance to each of the object's colliders.
     /// 
-    /// Any MeshColliders, however, will not have their distances calculated precisely; the squared
-    /// distance to their bounding box is calculated instead. It is possible to use a custom
-    /// set of colliders against which to test primary hover calculations: see primaryHoverColliders.
+    /// Any MeshColliders, however, will not have their distances calculated precisely;
+    /// the squared distance to their bounding box is calculated instead. It is possible
+    /// to use a custom set of colliders against which to test primary hover calculations:
+    /// see primaryHoverColliders.
     /// </summary>
     public virtual float GetHoverDistance(Vector3 worldPosition) {
       float closestComparativeColliderDistance = float.PositiveInfinity;
@@ -704,13 +742,20 @@ namespace Leap.Unity.Interaction {
 
         // Custom, slower ClosestPoint
         if (collider is MeshCollider) {
-          // Native, faster ClosestPoint, but no support for off-center colliders; use to support MeshColliders
-          testDistance = (Physics.ClosestPoint(worldPosition, collider, collider.attachedRigidbody.position, collider.attachedRigidbody.rotation)
+          // Native, faster ClosestPoint, but no support for off-center colliders; use to
+          // support MeshColliders.
+          testDistance = (Physics.ClosestPoint(worldPosition,
+                                               collider,
+                                               collider.attachedRigidbody.position,
+                                               collider.attachedRigidbody.rotation)
                           - worldPosition).magnitude;
         }
         else {
-          // Note: Should be using rigidbody position instead of transform; this will cause problems when colliders are moving fast (frame delay)
-          testDistance = (collider.transform.TransformPoint(collider.ClosestPointOnSurface(collider.transform.InverseTransformPoint(worldPosition)))
+          // Note: Should be using rigidbody position instead of transform; this will
+          // cause problems when colliders are moving very fast (one-frame delay).
+          testDistance = (collider.transform.TransformPoint(
+                            collider.ClosestPointOnSurface(
+                              collider.transform.InverseTransformPoint(worldPosition)))
                           - worldPosition).magnitude;
         }
 
@@ -727,17 +772,19 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public virtual void BeginHover(List<InteractionHand> hands) {
-      foreach (var hand in hands) {
-        _hoveringControllers.Add(hand);
+    public virtual void BeginHover(List<InteractionControllerBase> controllers) {
+      foreach (var controller in controllers) {
+        _hoveringControllers.Add(controller);
       }
 
-      RefreshClosestHoveringHand();
+      refreshClosestHoveringController();
 
-      OnPerHandHoverBegin(hands);
+      foreach (var controller in controllers) {
+        OnPerControllerHoverBegin(hand);
+      }
 
       if (_hoveringControllers.Count == hands.Count) {
-        OnHoverBegin(hands);
+        OnHoverBegin();
       }
     }
 
@@ -746,25 +793,27 @@ namespace Leap.Unity.Interaction {
         _hoveringControllers.Remove(hand);
       }
 
-      RefreshClosestHoveringHand();
+      refreshClosestHoveringController();
 
-      OnHandHoverEnd(hands);
+      foreach (var hand in hands) {
+        OnPerControllerHoverEnd(hand);
+      }
 
       if (_hoveringControllers.Count == 0) {
-        OnObjectHoverEnd(hands);
+        OnHoverEnd();
       }
     }
 
     public virtual void StayHovered(List<InteractionHand> hands) {
-      RefreshClosestHoveringHand();
-      OnHoverStay(hands);
+      refreshClosestHoveringController();
+      OnHoverStay();
     }
 
-    private void RefreshClosestHoveringHand() {
-      _closestHoveringHand = GetClosestHand(_hoveringControllers);
+    private void refreshClosestHoveringController() {
+      _closestHoveringController = getClosestController(_hoveringControllers);
     }
 
-    private InteractionHand GetClosestHand(HashSet<InteractionHand> hands) {
+    private InteractionHand getClosestController(HashSet<InteractionControllerBase> hands) {
       InteractionHand closestHoveringHand = null;
       float closestHoveringHandDist = float.PositiveInfinity;
       foreach (var hand in hands) {
@@ -892,7 +941,7 @@ namespace Leap.Unity.Interaction {
 
     #region Grasping
 
-    private HashSet<InteractionHand> _graspingHands = new HashSet<InteractionHand>();
+    private HashSet<InteractionHand> _graspingControllers = new HashSet<InteractionHand>();
 
     private bool _graspingInitialized = false;
     private bool _moveObjectWhenGrasped__WasEnabledLastFrame;
@@ -959,17 +1008,17 @@ namespace Leap.Unity.Interaction {
       // End suspension by ending the grasp on the suspending hand,
       // calling EndGrasp immediately.
       if (isSuspended) {
-        _suspendingHand.ReleaseGrasp();
+        _suspendingController.ReleaseGrasp();
       }
 
       // If multi-grasp is not allowed, release the old grasp.
       if (!allowMultiGrasp && isGrasped) {
-        _graspingHands.Query().First().ReleaseGrasp();
+        _graspingControllers.Query().First().ReleaseGrasp();
       }
 
       // Add each newly grasping hand to internal reference and pose solver.
       foreach (var hand in hands) {
-        _graspingHands.Add(hand);
+        _graspingControllers.Add(hand);
 
         if (moveObjectWhenGrasped) {
           graspedPoseController.AddHand(hand);
@@ -981,7 +1030,7 @@ namespace Leap.Unity.Interaction {
 
       // If object wasn't grasped before, store rigidbody settings and
       // fire object interaction callback.
-      if (_graspingHands.Count == hands.Count) {
+      if (_graspingControllers.Count == hands.Count) {
 
         // Remember drag settings pre-grasp, to be restored on release.
         _dragBeforeGrasp = rigidbody.drag;
@@ -1007,7 +1056,7 @@ namespace Leap.Unity.Interaction {
 
     public virtual void EndGrasp(List<InteractionHand> hands) {
       foreach (var hand in hands) {
-        _graspingHands.Remove(hand);
+        _graspingControllers.Remove(hand);
 
         if (moveObjectWhenGrasped) {
           // Remove each hand from the pose solver.
@@ -1015,7 +1064,7 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      if (_graspingHands.Count == 0 && isSuspended) {
+      if (_graspingControllers.Count == 0 && isSuspended) {
         // No grasped hands: Should not be suspended any more;
         // having been suspended also means we were only grasped by one hand
         EndSuspension(hands[0]);
@@ -1025,7 +1074,7 @@ namespace Leap.Unity.Interaction {
 
       // If the object is no longer grasped by any hands, restore state and
       // activate throw controller.
-      if (_graspingHands.Count == 0) {
+      if (_graspingControllers.Count == 0) {
         // Restore drag settings from prior to the grasp.
         rigidbody.drag = _dragBeforeGrasp;
         rigidbody.angularDrag = _angularDragBeforeGrasp;
@@ -1067,16 +1116,16 @@ namespace Leap.Unity.Interaction {
       _justGrasped = false;
     }
 
-    protected InteractionHand _suspendingHand = null;
+    protected InteractionHand _suspendingController = null;
 
     public virtual void BeginSuspension(InteractionHand hand) {
-      _suspendingHand = hand;
+      _suspendingController = hand;
 
       OnSuspensionBegin(hand);
     }
 
     public virtual void EndSuspension(InteractionHand hand) {
-      _suspendingHand = null;
+      _suspendingController = null;
 
       OnSuspensionEnd(hand);
     }
