@@ -28,9 +28,9 @@ namespace Leap.Unity.Interaction {
 
     [Space]
     [Tooltip("The minimum and maximum horizontal extents that the slider can slide to in world space.")]
-    [MinMax(-0.25f, 0.25f)]
+    [MinMax(-0.5f, 0.5f)]
     public Vector2 horizontalSlideLimits = new Vector2(-0.05f, 0.05f);
-    [MinMax(-0.25f, 0.25f)]
+    [MinMax(-0.5f, 0.5f)]
     [Tooltip("The minimum and maximum vertical extents that the slider can slide to in world space.")]
     public Vector2 verticalSlideLimits = new Vector2(0f, 0f);
 
@@ -49,7 +49,7 @@ namespace Leap.Unity.Interaction {
         if (!_started) Start();
 
         _horizontalSliderPercent = value;
-        localPhysicsPosition.x = Mathf.Lerp(initialLocalPosition.x + _horizontalSlideLimits.x, initialLocalPosition.x + _horizontalSlideLimits.y, _horizontalSliderPercent);
+        localPhysicsPosition.x = Mathf.Lerp(initialLocalPosition.x + horizontalSlideLimits.x, initialLocalPosition.x + horizontalSlideLimits.y, _horizontalSliderPercent);
       }
     }
 
@@ -61,7 +61,7 @@ namespace Leap.Unity.Interaction {
         if (!_started) Start();
 
         _verticalSliderPercent = value;
-        localPhysicsPosition.y = Mathf.Lerp(initialLocalPosition.y + _verticalSlideLimits.x, initialLocalPosition.y + _verticalSlideLimits.y, _verticalSliderPercent);
+        localPhysicsPosition.y = Mathf.Lerp(initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y, _verticalSliderPercent);
       }
     }
 
@@ -85,13 +85,10 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    //Slide limits normalized to local space
-    protected Vector2 _horizontalSlideLimits;
-    protected Vector2 _verticalSlideLimits;
-
     //Internal Slider Values
     protected float _horizontalSliderPercent;
     protected float _verticalSliderPercent;
+    protected RectTransform parent;
 
     private bool _started = false;
 
@@ -100,9 +97,11 @@ namespace Leap.Unity.Interaction {
 
       _started = true;
 
-      //Conversion of limits to local space
-      _horizontalSlideLimits = horizontalSlideLimits;
-      _verticalSlideLimits = verticalSlideLimits;
+      parent = transform.parent.GetComponent<RectTransform>();
+      if(parent != null) {
+        horizontalSlideLimits = new Vector2(parent.rect.xMin - transform.localPosition.x, parent.rect.xMax - transform.localPosition.x);
+        verticalSlideLimits = new Vector2(parent.rect.yMin - transform.localPosition.y, parent.rect.yMax - transform.localPosition.y);
+      }
 
       base.Start();
     }
@@ -127,20 +126,20 @@ namespace Leap.Unity.Interaction {
 
     private void CalculateSliderValues(List<InteractionHand> hands = null) {
       //Calculate the Renormalized Slider Values
-      if (_horizontalSlideLimits.x != _horizontalSlideLimits.y) {
-        _horizontalSliderPercent = Mathf.InverseLerp(initialLocalPosition.x + _horizontalSlideLimits.x, initialLocalPosition.x + _horizontalSlideLimits.y, localPhysicsPosition.x);
+      if (horizontalSlideLimits.x != horizontalSlideLimits.y) {
+        _horizontalSliderPercent = Mathf.InverseLerp(initialLocalPosition.x + horizontalSlideLimits.x, initialLocalPosition.x + horizontalSlideLimits.y, localPhysicsPosition.x);
         horizontalSlideEvent.Invoke(HorizontalSliderValue);
       }
 
-      if (_verticalSlideLimits.x != _verticalSlideLimits.y) {
-        _verticalSliderPercent = Mathf.InverseLerp(initialLocalPosition.y + _verticalSlideLimits.x, initialLocalPosition.y + _verticalSlideLimits.y, localPhysicsPosition.y);
+      if (verticalSlideLimits.x != verticalSlideLimits.y) {
+        _verticalSliderPercent = Mathf.InverseLerp(initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y, localPhysicsPosition.y);
         verticalSlideEvent.Invoke(VerticalSliderValue);
       }
     }
 
     protected override Vector3 GetDepressedConstrainedLocalPosition(Vector3 desiredOffset) {
-      return new Vector3(Mathf.Clamp((localPhysicsPosition.x + desiredOffset.x), initialLocalPosition.x + _horizontalSlideLimits.x, initialLocalPosition.x + _horizontalSlideLimits.y),
-                         Mathf.Clamp((localPhysicsPosition.y + desiredOffset.y), initialLocalPosition.y + _verticalSlideLimits.x, initialLocalPosition.y + _verticalSlideLimits.y),
+      return new Vector3(Mathf.Clamp((localPhysicsPosition.x + desiredOffset.x), initialLocalPosition.x + horizontalSlideLimits.x, initialLocalPosition.x + horizontalSlideLimits.y),
+                         Mathf.Clamp((localPhysicsPosition.y + desiredOffset.y), initialLocalPosition.y + verticalSlideLimits.x, initialLocalPosition.y + verticalSlideLimits.y),
                                      (localPhysicsPosition.z + desiredOffset.z));
     }
 
@@ -148,6 +147,12 @@ namespace Leap.Unity.Interaction {
       base.OnDrawGizmosSelected();
       if (transform.parent != null) {
         Vector3 originPosition = Application.isPlaying ? initialLocalPosition : transform.localPosition;
+
+        parent = transform.parent.GetComponent<RectTransform>();
+        if (parent != null) {
+          horizontalSlideLimits = new Vector2(parent.rect.xMin - originPosition.x, parent.rect.xMax - originPosition.x);
+          verticalSlideLimits = new Vector2(parent.rect.yMin - originPosition.y, parent.rect.yMax - originPosition.y);
+        }
 
         Gizmos.color = Color.blue;
         Gizmos.DrawWireCube(originPosition + 
