@@ -37,6 +37,36 @@ namespace Leap.Unity.Interaction {
     public Hand leapHand { get { return _unwarpedHandData; } }
 
     /// <summary>
+    /// Gets whether the underlying tracked Leap hand is a left hand.
+    /// </summary>
+    public override bool isLeft {
+      get { return isTracked ? false : leapHand.IsLeft; }
+    }
+
+    /// <summary>
+    /// Gets the velocity of the underlying tracked Leap hand.
+    /// </summary>
+    public override Vector3 velocity {
+      get { return isTracked ? Vector3.zero : leapHand.PalmVelocity.ToVector3(); }
+    }
+
+    /// <summary>
+    /// Gets the controller type of this InteractionControllerBase. InteractionHands
+    /// are Interaction Engine controllers implemented over Leap hands.
+    /// </summary>
+    public override ControllerType controllerType {
+      get { return ControllerType.Hand; }
+    }
+
+    /// <summary>
+    /// Returns this InteractionHand object. This property will be null if the
+    /// InteractionControllerBase is not ControllerType.Hand.
+    /// </summary>
+    public override InteractionHand intHand {
+      get { return this; }
+    }
+
+    /// <summary>
     /// A copy of the latest tracked hand data; never null, never warped.
     /// </summary>
     private Hand _handData = new Hand();
@@ -53,6 +83,14 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     private Hand _hand;
 
+    protected override void getColliderBoneTargetPositionRotation(int contactBoneIndex,
+                                                                  out Vector3 targetPosition,
+                                                                  out Quaternion targetRotation) {
+      _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
+                                                     out targetPosition,
+                                                     out targetRotation);
+    }
+
     public void REFRESHHANDDATA() {
       // TODO: Fixme!
       // Subscribe hands to the fixed-frame dispatch of the ServiceProvider.
@@ -66,9 +104,18 @@ namespace Leap.Unity.Interaction {
       // Interaction Manager needs to handle it, or the object itself but via a call
     }
 
+    #region Hovering Controller Implementation
+
     protected override Vector3 hoverPoint {
       get {
         return leapHand.PalmPosition.ToVector3();
+      }
+    }
+
+    private List<Transform> _fingertipTransforms = new List<Transform>();
+    protected override List<Transform> _primaryHoverPoints {
+      get {
+        // TODO: return the thing
       }
     }
 
@@ -87,12 +134,15 @@ namespace Leap.Unity.Interaction {
                                                                out unwarpedRotation);
         
         // First shift the hand to be centered on the fingertip position so that rotations
-        // applied to the hand pivot around the fingertip, then apply the rest of the transformation.
+        // applied to the hand pivot around the fingertip, then apply the rest of the
+        // transformation.
         handToWarp.Transform(-primaryHoverPoint.position, Quaternion.identity);
         handToWarp.Transform(unwarpedPosition, unwarpedRotation
                                                * Quaternion.Inverse(primaryHoverPoint.rotation));
       }
     }
+
+    #endregion
 
     #region Contact Controller Implementation
 
@@ -122,12 +172,12 @@ namespace Leap.Unity.Interaction {
       return true;
     }
 
-    protected override void getColliderBoneTargetPositionRotation(int contactBoneIndex,
-                                                                  out Vector3 targetPosition,
-                                                                  out Quaternion targetRotation) {
-      _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
-                                                     out targetPosition,
-                                                     out targetRotation);
+    protected override void onPreEnableSoftContact() {
+      resetContactBoneJoints();
+    }
+
+    protected override void onPostDisableSoftContact() {
+      if (isTracked) resetContactBoneJoints();
     }
 
     #region Contact Bone Management
@@ -173,7 +223,7 @@ namespace Leap.Unity.Interaction {
 
           ContactBone contactBone = initContactBone(bone, contactBoneObj, boneArrayIndex, capsule);
 
-          contactBone.lastTarget = bone.Center.ToVector3();
+          contactBone.lastTargetPosition = bone.Center.ToVector3();
         }
       }
 
@@ -230,7 +280,7 @@ namespace Leap.Unity.Interaction {
                                    : _unwarpedHandData.PalmPosition.ToVector3();
       body.rotation = bone != null ? bone.Rotation.ToQuaternion()
                                    : _unwarpedHandData.Rotation.ToQuaternion();
-      contactBone.lastTarget = bone != null ? bone.Center.ToVector3()
+      contactBone.lastTargetPosition = bone != null ? bone.Center.ToVector3()
                                             : _unwarpedHandData.PalmPosition.ToVector3();
 
       return contactBone;
@@ -286,45 +336,44 @@ namespace Leap.Unity.Interaction {
       }
     }
 
+    /// <summary>
+    /// A utility function that sets a Hand object's bones based on this InteractionHand.
+    /// Can be used to display a graphical hand that matches the physical one.
+    /// </summary>
+    public void FillBones(Hand inHand) {
+      if (softContactEnabled) { return; }
+      if (Application.isPlaying && _contactBones.Length == NUM_FINGERS * BONES_PER_FINGER + 1) {
+        Vector elbowPos = inHand.Arm.ElbowPosition;
+        inHand.SetTransform(_contactBones[NUM_FINGERS * BONES_PER_FINGER].body.position, _contactBones[NUM_FINGERS * BONES_PER_FINGER].body.rotation);
+
+        for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
+          for (int jointIndex = 0; jointIndex < BONES_PER_FINGER; jointIndex++) {
+            Bone bone = inHand.Fingers[fingerIndex].Bone((Bone.BoneType)(jointIndex) + 1);
+            int boneArrayIndex = fingerIndex * BONES_PER_FINGER + jointIndex;
+            Vector displacement = _contactBones[boneArrayIndex].body.position.ToVector() - bone.Center;
+            bone.Center += displacement;
+            bone.PrevJoint += displacement;
+            bone.NextJoint += displacement;
+            bone.Rotation = _contactBones[boneArrayIndex].body.rotation.ToLeapQuaternion();
+          }
+        }
+
+        inHand.Arm.PrevJoint = elbowPos;
+        inHand.Arm.Direction = (inHand.Arm.PrevJoint - inHand.Arm.NextJoint).Normalized;
+        inHand.Arm.Center = (inHand.Arm.PrevJoint + inHand.Arm.NextJoint) * 0.5f;
+      }
+    }
+
     #endregion
 
     #endregion
 
-    #region Grasping
-
-    // Grasp Activity Manager
-    private ActivityManager<IInteractionBehaviour> _graspActivityManager;
-    /// <summary> Determines which objects are graspable any given frame. </summary>
-    private ActivityManager<IInteractionBehaviour> graspActivityManager {
-      get {
-        if (_graspActivityManager == null) {
-          if (graspActivityFilter == null) graspActivityFilter = graspFilterFunc;
-
-          _graspActivityManager = new ActivityManager<IInteractionBehaviour>(1F, graspActivityFilter);
-
-          _graspActivityManager.activationLayerMask = manager.interactionLayer.layerMask
-                                                    | manager.interactionNoContactLayer.layerMask;
-        }
-        return _graspActivityManager;
-      }
-    }
-
-    private Func<Collider, IInteractionBehaviour> graspActivityFilter;
-    private IInteractionBehaviour graspFilterFunc(Collider collider) {
-      if (collider.attachedRigidbody != null) {
-        Rigidbody body = collider.attachedRigidbody;
-        IInteractionBehaviour intObj;
-        if (body != null && manager.interactionObjectBodies.TryGetValue(body, out intObj)
-            && !intObj.ignoreGrasping) {
-          return intObj;
-        }
-      }
-
-      return null;
-    }
+    #region Grasp Controller Implementation
 
     private HeuristicGrabClassifier _grabClassifier;
-    /// <summary> Handles logic determining whether a hand has grabbed or released an interaction object. </summary>
+    /// <summary>
+    /// Handles logic determining whether a hand has grabbed or released an interaction object.
+    /// </summary>
     public HeuristicGrabClassifier grabClassifier {
       get {
         if (_grabClassifier == null) _grabClassifier = new HeuristicGrabClassifier(this);
@@ -332,133 +381,29 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private IInteractionBehaviour _graspedObject = null;
-
-    private void FixedUpdateGrasping() {
-      using (new ProfilerSample("Fixed Update InteractionHand Grasping")) {
-        graspActivityManager.UpdateActivityQuery(GetLastTrackedLeapHand().PalmPosition.ToVector3(), LeapSpace.allEnabled);
-        grabClassifier.FixedUpdateClassifierHandState();
-      }
-    }
-
-    private Vector3[] _graspingFingertipsCache = new Vector3[5];
     /// <summary>
-    /// Returns approximately where the hand is grasping the currently grasped InteractionBehaviour.
-    /// (Specifically, the centroid of the grasping fingers.) This method will print an error if the
-    /// hand is not currently grasping an object. </summary>
+    /// Returns approximately where the controller is grasping the currently grasped
+    /// InteractionBehaviour.
+    /// This method will print an error if the controller is not currently grasping an object.
+    /// </summary>
     public override Vector3 GetGraspPoint() {
-      if (_graspedObject == null) {
-        Debug.LogError("Cannot compute grasp point: This hand is not grasping an object.");
-        return Vector3.zero;
-      }
-      using (new ProfilerSample("Compute Grasp Location")) {
-        int numGraspingFingertips;
-        Vector3 sum = Vector3.zero; ;
-        grabClassifier.GetGraspingFingertipPositions(_graspedObject, _graspingFingertipsCache, out numGraspingFingertips);
-        if (numGraspingFingertips == 0) {
-          Debug.LogError("Cannot compute grasp point: The hand has a grasped object, but this object is not classified as grasped by the classifier.");
-        }
-        for (int i = 0; i < numGraspingFingertips; i++) {
-          sum += _graspingFingertipsCache[i];
-        }
-        sum /= numGraspingFingertips;
-        return sum;
-      }
+      throw new NotImplementedException();
     }
 
-    /// <summary>
-    /// Called by the Interaction Manager every fixed frame.
-    /// Returns true if the hand just released an object and outputs the released object into releasedObject.
-    /// </summary>
-    public bool CheckGraspEnd(out IInteractionBehaviour releasedObject) {
-      releasedObject = null;
-
-      bool shouldReleaseObject = false;
-
-      // Check releasing against interaction state.
-      if (_graspedObject == null) {
-        return false;
-      } else if (_graspedObject.ignoreGrasping) {
-        grabClassifier.NotifyGraspReleased(_graspedObject);
-        releasedObject = _graspedObject;
-
-        shouldReleaseObject = true;
-      }
-
-      // Update the grab classifier to determine if we should release the grasped object.
-      if (!shouldReleaseObject) shouldReleaseObject = grabClassifier.FixedUpdateClassifierRelease(out releasedObject);
-
-      if (shouldReleaseObject) {
-        _graspedObject = null;
-        EnableSoftContact(); // prevent objects popping out of the hand on release
-        return true;
-      }
-
-      return false;
+    protected override void fixedUpdateGraspingState() {
+      grabClassifier.FixedUpdateClassifierHandState();
     }
 
-    /// <summary>
-    /// Called by the Interaction Manager every fixed frame.
-    /// Returns true if the hand just grasped an object and outputs the grasped object into graspedObject.
-    /// </summary>
-    public bool CheckGraspBegin(out IInteractionBehaviour newlyGraspedObject) {
-      newlyGraspedObject = null;
-
-      // Check grasping against interaction state.
-      if (_graspedObject != null) {
-        // Can't grasp any object if we're already grasping one
-        return false;
-      }
-
-      // Update the grab classifier to determine if we should grasp an object.
-      bool shouldGraspObject = grabClassifier.FixedUpdateClassifierGrasp(out newlyGraspedObject);
-      if (shouldGraspObject) {
-        _graspedObject = newlyGraspedObject;
-
-        return true;
-      }
-
-      return false;
+    protected override void onGraspedObjectForciblyReleased(IInteractionBehaviour objectToBeReleased) {
+      grabClassifier.NotifyGraspReleased(objectToBeReleased);
     }
 
-    /// <summary>
-    /// Called by the Interaction Manager every fixed frame.
-    /// Returns whether there the hand is currently grasping an object and, if it is, outputs that
-    /// object into graspedObject.
-    /// </summary>
-    public bool CheckGraspHold(out IInteractionBehaviour graspedObject) {
-      graspedObject = _graspedObject;
-      return graspedObject != null;
+    protected override bool checkShouldRelease(out IInteractionBehaviour objectToRelease) {
+      return grabClassifier.FixedUpdateClassifierRelease(out objectToRelease);
     }
 
-    /// <summary>
-    /// Called by the Interaction Manager every fixed frame.
-    /// Returns whether the hand began suspending an object this frame and, if it did, outputs that
-    /// object into suspendedObject.
-    /// </summary>
-    public bool CheckSuspensionBegin(out IInteractionBehaviour suspendedObject) {
-      suspendedObject = null;
-
-      if (_graspedObject != null && _hand == null && !_graspedObject.isSuspended) {
-        suspendedObject = _graspedObject;
-      }
-
-      return suspendedObject != null;
-    }
-
-    /// <summary>
-    /// Called by the Interaction Manager every fixed frame.
-    /// Returns whether the hand stopped suspending an object this frame and, if it did, outputs that
-    /// object into resumedObject.
-    /// </summary>
-    public bool CheckSuspensionEnd(out IInteractionBehaviour resumedObject) {
-      resumedObject = null;
-
-      if (_graspedObject != null && _hand != null && _graspedObject.isSuspended) {
-        resumedObject = _graspedObject;
-      }
-
-      return resumedObject != null;
+    protected override bool checkShouldGrasp(out IInteractionBehaviour objectToGrasp) {
+      return grabClassifier.FixedUpdateClassifierGrasp(out objectToGrasp);
     }
 
     #endregion

@@ -40,7 +40,7 @@ namespace Leap.Unity {
       return _list.GetEnumerator();
     }
 
-    public static implicit operator ReadonlyList<T>(IList<T> list) {
+    public static implicit operator ReadonlyList<T>(List<T> list) {
       return new ReadonlyList<T>(list);
     }
   }

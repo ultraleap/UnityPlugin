@@ -16,31 +16,95 @@ namespace Leap.Unity.Interaction.Internal {
   /// bone of the contact-related representation of an InteractionHand.
   /// They also notify the InteractionHand of collisions for further
   /// processing.
+  /// 
+  /// To correctly initialize a newly-constructed ContactBone, you must
+  /// set its interactionController, body, and collider.
   /// </summary>
   [AddComponentMenu("")]
   public class ContactBone : MonoBehaviour {
 
-    public InteractionHand interactionHand;
-    public Rigidbody body;
-    #if UNITY_EDITOR
-    new 
-    #endif
-    public Collider collider;
-    public FixedJoint joint;
-    public FixedJoint metacarpalJoint;
-    public Vector3 lastTarget;
+    /// <summary>
+    /// ContactBones minimally require references to their InteractionControllerBase,
+    /// their Rigidbody, and strictly one (1) collider.
+    /// </summary>
+    public InteractionControllerBase interactionController;
 
-    public Vector3 desiredPosition;
-    public Quaternion desiredRotation;
+    /// <summary>
+    /// The Rigidbody of this ContactBone. This field must not be null for the ContactBone
+    /// to work correctly.
+    /// </summary>
+    public Rigidbody body;
+
+    /// <summary>
+    /// The Collider of this ContactBone. This field must not be null for the ContactBone
+    /// to work correctly.
+    /// </summary>
+    public Collider collider;
+
+    /// <summary>
+    /// Soft contact logic requires knowing the "width" of a ContactBone along its axis.
+    /// </summary>
+    public float width {
+      get {
+        Vector3 scale = collider.transform.lossyScale;
+        if (collider is SphereCollider) {
+          SphereCollider sphere = collider as SphereCollider;
+          return Mathf.Min(sphere.radius * scale.x,
+                 Mathf.Min(sphere.radius * scale.y,
+                           sphere.radius * scale.z)) * 2F;
+        }
+        else if (collider is CapsuleCollider) {
+          CapsuleCollider capsule = collider as CapsuleCollider;
+          return Mathf.Min(capsule.radius * scale.x,
+                 Mathf.Min(capsule.radius * scale.y,
+                           capsule.radius * scale.z)) * 2F;
+        }
+        else if (collider is BoxCollider) {
+          BoxCollider box = collider as BoxCollider;
+          return Mathf.Min(box.size.x * scale.x,
+                 Mathf.Min(box.size.y * scale.y,
+                           box.size.z * scale.z));
+        }
+        else {
+          return Mathf.Min(collider.bounds.size.x * scale.x,
+                 Mathf.Min(collider.bounds.size.y * scale.y,
+                           collider.bounds.size.z * scale.z));
+        }
+      }
+    }
+
+    /// <summary>
+    /// InteractionHands use ContactBones to store additional, hand-specific data.
+    /// Other InteractionControllerBase implementors need not set this field.
+    /// </summary>
+    public InteractionHand interactionHand;
+
+    /// <summary>
+    /// InteractionHands use ContactBones to store additional, hand-specific data.
+    /// Other InteractionControllerBase implementors need not set this field.
+    /// </summary>
+    public FixedJoint joint;
+
+    /// <summary>
+    /// InteractionHands use ContactBones to store additional, hand-specific data.
+    /// Other InteractionControllerBase implementors need not set this field.
+    /// </summary>
+    public FixedJoint metacarpalJoint;
+
+    /// <summary>
+    /// ContactBones remember their last target position; interaction controllers
+    /// use this to know when to switch to soft contact mode.
+    /// </summary>
+    public Vector3 lastTargetPosition;
 
     public float _lastObjectTouchedAdjustedMass;
 
     void Start() {
-      interactionHand.manager.contactBoneBodies[body] = this;
+      interactionController.manager.contactBoneBodies[body] = this;
     }
 
     void OnDestroy() {
-      interactionHand.manager.contactBoneBodies.Remove(body);
+      interactionController.manager.contactBoneBodies.Remove(body);
     }
 
     void OnCollisionEnter(Collision collision) {
@@ -51,7 +115,7 @@ namespace Leap.Unity.Interaction.Internal {
                      + "or ensure the Interaction layer only contains Interaction Behaviours.");
       }
 
-      if (interactionHand.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
+      if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
         _lastObjectTouchedAdjustedMass = collision.rigidbody.mass;
         if (interactionObj is InteractionBehaviour) {
           switch ((interactionObj as InteractionBehaviour).contactForceMode) {
@@ -67,13 +131,13 @@ namespace Leap.Unity.Interaction.Internal {
           }
         }
 
-        interactionHand.ContactBoneCollisionEnter(this, interactionObj, false);
+        interactionController.ContactBoneCollisionEnter(this, interactionObj, false);
       }
     }
     void OnCollisionExit(Collision collision) {
       IInteractionBehaviour interactionObj;
-      if (interactionHand.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
-        interactionHand.ContactBoneCollisionExit(this, interactionObj, false);
+      if (interactionController.manager.interactionObjectBodies.TryGetValue(collision.rigidbody, out interactionObj)) {
+        interactionController.ContactBoneCollisionExit(this, interactionObj, false);
       }
     }
     void OnTriggerEnter(Collider collider) {
@@ -83,14 +147,14 @@ namespace Leap.Unity.Interaction.Internal {
                      + "or ensure the Interaction layer only contains Interaction Behaviours.");
       }
       IInteractionBehaviour interactionObj;
-      if (interactionHand.manager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
-        interactionHand.ContactBoneCollisionEnter(this, interactionObj, true);
+      if (interactionController.manager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
+        interactionController.ContactBoneCollisionEnter(this, interactionObj, true);
       }
     }
     void OnTriggerExit(Collider collider) {
       IInteractionBehaviour interactionObj;
-      if (interactionHand.manager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
-        interactionHand.ContactBoneCollisionExit(this, interactionObj, true);
+      if (interactionController.manager.interactionObjectBodies.TryGetValue(collider.attachedRigidbody, out interactionObj)) {
+        interactionController.ContactBoneCollisionExit(this, interactionObj, true);
       }
     }
 

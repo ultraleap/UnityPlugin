@@ -22,13 +22,16 @@ using Leap.Unity.RuntimeGizmos;
 namespace Leap.Unity.Interaction {
 
   /// <summary>
-  /// InteractionBehaviours are components that enable GameObjects to interact with Leap
-  /// hands in a physical intuitive way. By default, they represent objects that can be
-  /// poked, prodded, smacked, grasped, and thrown around by Leap hands. They also provide
-  /// a thorough public API with callbacks for hovering, contact, and grasping callbacks
-  /// for creating feedback mechanisms or overriding the default physical behavior of the object.
+  /// InteractionBehaviours are components that enable GameObjects to interact with Interaction
+  /// controllers in a physically intuitive way.
+  /// 
+  /// By default, they represent objects that can be poked, prodded, smacked, grasped, and thrown
+  /// around by Interaction controllers, including Leap hands. They also provide a thorough public
+  /// API with settings and hovering, contact, and grasping callbacks for creating physical
+  /// interfaces or overriding the default physical behavior of the object.
+  /// 
   /// In documentation and some method calls, GameObjects with an InteractionBehaviour component
-  /// are called interaction objects.
+  /// may be referred to as interaction objects.
   /// </summary>
   [RequireComponent(typeof(Rigidbody))]
   public class InteractionBehaviour : MonoBehaviour, IInteractionBehaviour {
@@ -39,14 +42,25 @@ namespace Leap.Unity.Interaction {
 
     #region Hovering API
 
-    /// <summary> Gets whether any hand is nearby. </summary>
-    public bool isHovered { get { return _hoveringHands.Count > 0; } }
+    /// <summary> Gets whether any interaction controller is nearby. </summary>
+    public bool isHovered { get { return _hoveringControllers.Count > 0; } }
 
-    /// <summary> Gets the closest hand to this object, or null if no hand is nearby. </summary>
+    /// <summary>
+    /// Gets the closest interaction controller to this object, or null if no controller is nearby.
+    /// Leap hands and supported VR controllers both count as "controllers" for the purposes of
+    /// this getter.
+    /// </summary>
+    public InteractionControllerBase closestHoveringController {
+      get {
+        return _closestHoveringController;
+      }
+    }
+
+    /// <summary> Gets the closest Leap hand to this object, or null if no hand is nearby. </summary>
     public Hand closestHoveringHand {
       get {
-        return _closestHoveringHand == null ?
-               null : _closestHoveringHand.GetLastTrackedLeapHand();
+        return _closestHoveringHand == null ? null
+                                            : _closestHoveringHand.leapHand;
       }
     }
 
@@ -54,17 +68,48 @@ namespace Leap.Unity.Interaction {
     /// Gets the distance from this object to the palm of the closest hand to this object,
     /// or float.PositiveInfinity of no hand is nearby.
     /// </summary>
-    public float closestHoveringHandDistance {
+    public float closestHoveringControllerDistance {
       get {
-        return _closestHoveringHand == null ?
-               float.PositiveInfinity : GetHoverDistance(_closestHoveringHand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
+        return _closestHoveringControllerDistance;
       }
     }
 
     /// <summary>
-    /// Gets whether this object is the primary hover for any Interaction Hand.
+    /// Gets all of the interaction controllers hovering near this object, whether they
+    /// are Leap hands or supported VR controllers.
     /// </summary>
-    public bool isPrimaryHovered { get { return _primaryHoveringHands.Count > 0; } }
+    public HashSet<InteractionControllerBase> hoveringControllers {
+      get {
+        return _hoveringControllers;
+      }
+    }
+
+    /// <summary>
+    /// Gets whether this object is the primary hover for any interaction controller.
+    /// </summary>
+    public bool isPrimaryHovered { get { return _primaryHoveringControllers.Count > 0; } }
+
+    /// <summary>
+    /// Gets the closest primary hovering interaction controller for this object, if it has one.
+    /// An interaction controller can be a Leap hand or a supported VR controller. Any of these
+    /// controllers can be the primary hover for this interaction object only if the controller is
+    /// closer to it than any other interaction object. If there are multiple such controllers,
+    /// this getter will return the closest one.
+    /// </summary>
+    public InteractionControllerBase primaryHoveringController {
+      get {
+        return _closestPrimaryHoveringController;
+      }
+    }
+
+    /// <summary>
+    /// Gets the set of all interaction controllers primarily hovering over this object.
+    /// </summary>
+    public HashSet<InteractionControllerBase> primaryHoveringControllers {
+      get {
+        return _primaryHoveringControllers;
+      }
+    }
 
     /// <summary>
     /// Gets the primary hovering hand for this interaction object, if it has one.
@@ -74,15 +119,15 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public Hand primaryHoveringHand {
       get {
-        return _closestPrimaryHoveringHand == null ?
-               null : _closestPrimaryHoveringHand.GetLastTrackedLeapHand();
+        return _closestPrimaryHoveringHand == null ? null
+                                                   : _closestPrimaryHoveringHand.leapHand;
       }
     }
 
     /// <summary>
     /// Gets the finger that is currently primarily hovering over this object, of the closest
-    /// primarily hovering hand. Will return null if this object is not currently any hand's
-    /// primary hover.
+    /// primarily hovering hand. Will return null if this object is not currently any Leap 
+    /// hand's primary hover.
     /// </summary>
     public Finger primaryHoveringFinger {
       get {
@@ -93,196 +138,141 @@ namespace Leap.Unity.Interaction {
     }
 
     /// <summary>
-    /// Returns the primary hovering fingertip position of the finger that is primarily
-    /// hoveirng over this object. If this object is not the primary hover of any hand,
-    /// returns Vector3.zero.
+    /// Gets the position of the primaryHoverPoint on the primary hovering interaction
+    /// controller that is primarily hovering over this object. For example, if the primarily
+    /// hovering controller is a Leap hand, this will be the position of the fingertip that
+    /// is closest to this object.
     /// </summary>
-    public Vector3 primaryHoveringFingertip {
+    public Vector3 primaryHoveringControllerPoint {
       get {
         if (!isPrimaryHovered) return Vector3.zero;
-        return primaryHoveringFinger.TipPosition.ToVector3();
+        return primaryHoveringController.primaryHoveringPoint;
       }
     }
 
     /// <summary>
-    /// Returns the distance to the fingertip that is primarily hovering over this object.
-    /// If this object is not the primary hover of any hand, returns positive infinity.
+    /// Gets the distance to the primary hover point whose controller is primarily hovering over this
+    /// object. For example, if the primary hovering controller is a Leap hand, this will return the
+    /// distance to the fingertip that is closest to this object.
+    /// 
+    /// If this object is not the primary hover of any interaction controller, returns positive infinity.
     /// </summary>
     public float primaryHoverDistance {
       get {
         if (!isPrimaryHovered) return float.PositiveInfinity;
-        return primaryHoveringInteractionHand.hoverCheckResults.primaryHoverDistance;
+        return primaryHoveringController.primaryHoverDistance;
       }
     }
 
-    /// <summary>
-    /// Gets the primary hovering Interaction Hand for this interaction object, if it has one.
-    /// If there is no hand primarily hovering over this object, returns null.
-    /// 
-    /// Interaction Hands can access the underlying Leap Hand via GetLeapHand() or GetLastTrackedLeapHand(),
-    /// but they can also perform interaction-related actions, such as ReleaseGrasp().
-    /// </summary>
-    public InteractionHand primaryHoveringInteractionHand { get { return _closestPrimaryHoveringHand; } }
+    #region Hover Events
 
     /// <summary>
-    /// Called whenever one or more hands have entered the hover activity radius around this
-    /// Interaction Behaviour. The hover activity radius is a setting specified in the
-    /// Interaction Manager.
+    /// Called when the object becomes hovered by any nearby interaction controllers. The hover activity
+    /// radius is a setting specified by the Interaction Manager.
     /// </summary>
     /// <remarks>
-    /// The provided list will contain only the Interaction Hands that have entered the radius;
-    /// refer to OnHoverStay for a list of all Hands that are currently hovering near this object.
-    /// 
-    /// This method will be called every time a hand begins hovering near an object. To receive a
-    /// callback only when this object begins being hovered at all, subscribe to OnObjectHoverBegin.
-    /// 
-    /// If this method is to be called on a given frame, it will be called after OnHoverEnd
+    /// If this event is to be fired on a given frame, it will be called before OnHoverStay,
+    /// OnPerControllerHoverEnd, and OnHoverEnd, and it will be called after OnPerControllerHoverBegin.
+    /// </remarks>
+    public Action OnHoverBegin;
+
+    /// <summary>
+    /// Called when the object stops being hovered by any nearby interaction controllers. The hover activity
+    /// radius is a setting specified by the Interaction Manager.
+    /// </summary>
+    /// <remarks>
+    /// If this event is to be fired on a given frame, it will be called before OnPerControllerHoverBegin,
+    /// OnHoverBegin, and OnHoverStay, and it will be called after OnPerControllerHoverEnd.
+    /// </remarks>
+    public Action OnHoverEnd;
+
+    /// <summary>
+    /// Called during every fixed (physics) frame in which one or more interaction controller is
+    /// within the hover activity radius around this object. The hover activity radius is a setting
+    /// specified by the Interaction Manager.
+    /// </summary>
+    /// <remarks>
+    /// "Stay" methods are always called after their "Begin" and "End" counterparts.
+    /// </remarks>
+    public Action OnHoverStay;
+
+    /// <summary>
+    /// Called whenever an interaction controller enters the hover activity radius around this
+    /// interaction object. The hover activity radius is a setting specified by the Interaction Manager.
+    /// </summary>
+    /// <remarks>
+    /// If this event is to be fired on a given frame, it will be called after OnPerControllerHandHoverEnd
     /// and before OnHoverStay.
     /// </remarks>
-    public Action<List<InteractionHand>> OnHandHoverBegin;
+    public Action<InteractionControllerBase> OnPerControllerHoverBegin;
 
     /// <summary>
-    /// Called when one or more hands have left the hover activity radius around this
-    /// Interaction Behaviour.
+    /// Called whenever an interaction controller leaves the hover activity radius around this
+    /// interaction object. The hover activity radius is a setting specified by the Interaction Manager.
     /// </summary>
     /// <remarks>
-    /// The provided list will only contain the Interaction Hands that have left the radius;
-    /// refer to OnHoverStay for a list of all Hands that are currently hovering near this object.
-    /// 
-    /// This method will be called every time one or more hands ceases hovering near an object on
-    /// a given frame. To receive a callback only when the object ceases being hovered at all,
-    /// subscribe to OnObjectHoverEnd.
-    /// 
-    /// If this method is to be called on a given frame, it will be called before OnHoverBegin and
-    /// before OnHoverStay.
+    /// If this event is to be fired on a given frame, it will be called before OnPerControllerHoverBegin
+    /// and before OnHoverStay.
     /// </remarks>
-    public Action<List<InteractionHand>> OnHandHoverEnd;
+    public Action<InteractionControllerBase> OnPerControllerHandHoverEnd;
+
+    #endregion
+
+    #region Primary Hover Events
 
     /// <summary>
-    /// Called during every fixed (physics) frame wherein one or more hands is within the hover
-    /// activity radius around the Interaction Behaviour.
+    /// Called when the object becomes primarily hovered by any interaction controllers, if the object
+    /// was not primarily hovered by any controllers on the previous frame.
     /// </summary>
     /// <remarks>
-    /// The provided list will contain all Interaction Hands that are within the hover radius for
-    /// this Interaction object.
-    /// 
-    /// If this method is to be called on a given frame, it will be called after both
-    /// OnHoverEnd and OnHoverBegin.
+    /// If this method is called on a given frame, it will be called before OnPrimaryHoverStay, and it
+    /// will be called after OnPrimaryHoverEnd.
     /// </remarks>
-    public Action<List<InteractionHand>> OnHoverStay;
+    public Action OnPrimaryHoverBegin;
 
     /// <summary>
-    /// Called when the object transitions from having no hands nearby to having one or more
-    /// hands nearby.
+    /// Called when the object ceases being the primary hover of any interaction controllers, if the
+    /// object was primarily hovered by one or more controllers on the previous frame.
     /// </summary>
     /// <remarks>
-    /// The provided list will only contain the Interaction Hands that have just begun hovering
-    /// near the object. For a list of all hands hovering near an object any given frame, refer
-    /// to OnHoverStay.
-    /// 
-    /// Object callbacks are called on a per-object basis. OnHoverBegin will be called every time
-    /// a hand begins hovering near an object, but OnObjectHoverBegin will only be called when
-    /// the object becomes hovered at all.
-    /// 
-    /// If this method is to be called on a given frame, it will be called before OnHoverStay,
-    /// OnHoverEnd, and OnObjectHoverEnd, and it will be called after OnHoverBegin.
+    /// If this method is called on a given frame, it will be called before OnPrimaryHoverStay and
+    /// OnPrimaryHoverBegin.
     /// </remarks>
-    public Action<List<InteractionHand>> OnObjectHoverBegin;
+    public Action OnPrimaryHoverEnd;
 
     /// <summary>
-    /// Called when the object transitions from having one or more hands nearby to having no
-    /// hands nearby.
+    /// Called every fixed (physics) frame in which one or more interaction controllers is primarily
+    /// hovering over this object. Only one object may be the primary hover of a given controller at
+    /// any one time.
     /// </summary>
     /// <remarks>
-    /// The provided list will only contain the Interaction Hands that have just stopped hovering
-    /// near the object. For a list of all hands hovering near an object any given frame, refer
-    /// to OnHoverStay.
-    /// 
-    /// Object callbacks are called on a per-object basis. OnHoverEnd will be called every time
-    /// a hand stops hovering near an object, but OnObjectHoverBegin will only be called when
-    /// the object is no longer being hovered by any hands.
-    /// 
-    /// If this method is to be called on a given frame, it will be called before OnHoverBegin,
-    /// OnObjectHoverBegin, and OnHoverStay, and it will be called after OnHoverEnd.
+    /// "Stay" events are fired after any "End" and "Begin" events have been fired.
     /// </remarks>
-    public Action<List<InteractionHand>> OnObjectHoverEnd;
+    public Action OnPrimaryHoverStay;
 
     /// <summary>
-    /// Called when the object has become the primary hovered object for one or more
-    /// hands. Only one interaction object can be the primary hover for a given hand at a time.
+    /// Called whenever an interaction controller (a Leap hand or supported VR controller) begins primarily
+    /// hovering over this object. Only one interaction object can be the primary hover of a given controller
+    /// at a time.
     /// </summary>
     /// <remarks>
-    /// The provided list will only contain the Interaction Hands that have just begun primarily
-    /// hovering over this object. For a list of all hands primarily hovering over this object,
-    /// refer to OnPrimaryHoverStay.
-    /// 
-    /// This method will be called when any hand begins primarily hovering over this object. To
-    /// receive a callback when the object becomes primarily hovered at all, subscribe to
-    /// OnObjectPrimaryHoverBegin.
-    /// 
-    /// If this method is to be called on a given frame, it will be called before OnPrimaryHoverStay,
-    /// and it will be called after OnPrimaryHoverEnd.
+    /// If this event is to be fired on a given frame, it will be called before OnPrimaryHoverStay,
+    /// and it will be called after OnPerControllerPrimaryHoverEnd.
     /// </remarks>
-    public Action<List<InteractionHand>> OnHandPrimaryHoverBegin;
+    public Action<InteractionControllerBase> OnPerControllerPrimaryHoverBegin;
 
     /// <summary>
-    /// Called during every fixed (physics) frame in which one or more hands is primarily hovering
-    /// over this object. Only one object may be primarily hovered by a given hand at any one time.
+    /// Called whenever an interaction controler (a Leap hand or supported VR controller) stops primarily
+    /// hovering over this object. Only one interaction object can be the primary hover of a given controller
+    /// at a time.
     /// </summary>
     /// <remarks>
-    /// The provided list will contain all hands for which this object is their primary hovered object.
-    /// Primary hovered objects are objects for which a hand's fingertip or palm center is closest to
-    /// that object.
-    /// 
-    /// If this method is to be called on a given frame, it will be called after OnPrimaryHoverStay and
-    /// OnPrimaryHoverEnd.
-    /// </remarks>
-    public Action<List<InteractionHand>> OnPrimaryHoverStay;
-
-    /// <summary>
-    /// Called when the object has ceased being the primary hovered object for one or
-    /// more hands. Only one interaction object can be the primary hover for a given hand at one time.
-    /// </summary>
-    /// <remarks>
-    /// The provided list will only contain the Interaction Hands that have just stopped primarily
-    /// hovering over this object. For a list of all hands primarily hovering over this object,
-    /// refer to OnPrimaryHoverStay.
-    /// 
-    /// This method is called for every frame that a hand ceases primarily hovering over this object. To
-    /// receive a callback when the object ceases being primarily hovered at all, subscribe to
-    /// OnObjectPrimaryHoverEnd.
-    /// 
-    /// If this method is to be called on a given frame, it will be called before OnPrimaryHoverBegin
+    /// If this event is to be fired on a given frame, it will be called before OnPerControllerPrimaryHoverBegin
     /// and OnPrimaryHoverStay.
     /// </remarks>
-    public Action<List<InteractionHand>> OnHandPrimaryHoverEnd;
+    public Action<InteractionControllerBase> OnPerControllerPrimaryHoverEnd;
 
-    /// <summary>
-    /// Called when the object begins being the primary hover of one or more hands, if the object
-    /// was not primarily hovered by any hands on the previous frame.
-    /// </summary>
-    /// <remarks>
-    /// Object callbacks are called on a per-object basis. OnPrimaryHoverBegin will be called every time
-    /// a hand begins primarily hovering near an object, but OnObjectPrimarytHoverBegin will only be called
-    /// when the object begins being the primarily hovered by any hands.
-    /// 
-    /// If this method is called on a given frame, it will be called before OnPrimaryHoverStay, and it
-    /// will be called after OnPrimaryHoverEnd, OnObjectPrimaryHoverEnd, and OnPrimaryHoverBegin.
-    /// </remarks>
-    public Action<List<InteractionHand>> OnObjectPrimaryHoverBegin;
-
-    /// <summary>
-    /// Called when the object ceases being the primary hover of any hands.
-    /// </summary>
-    /// <remarks>
-    /// Object callbacks are called on a per-object basis. OnPrimaryHoverEnd will be called every time
-    /// a hand stops primarily hovering over an object, but OnObjectPrimaryHoverEnd will only be called
-    /// when the object is no longer being primarily hovered by any hands.
-    /// 
-    /// If this method is called on a given frame, it will be called before OnPrimaryHoverStay,
-    /// OnPrimaryHoverBegin, OnObjectPrimaryHoverBegin, and it will be called after OnPrimaryHoverEnd.
-    /// </remarks>
-    public Action<List<InteractionHand>> OnObjectPrimaryHoverEnd;
+    #endregion
 
     #endregion
 
@@ -692,7 +682,7 @@ namespace Leap.Unity.Interaction {
 
     #region Hovering
 
-    private HashSet<InteractionHand> _hoveringHands = new HashSet<InteractionHand>();
+    private HashSet<InteractionHand> _hoveringControllers = new HashSet<InteractionHand>();
 
     private InteractionHand _closestHoveringHand = null;
 
@@ -739,28 +729,28 @@ namespace Leap.Unity.Interaction {
 
     public virtual void BeginHover(List<InteractionHand> hands) {
       foreach (var hand in hands) {
-        _hoveringHands.Add(hand);
+        _hoveringControllers.Add(hand);
       }
 
       RefreshClosestHoveringHand();
 
-      OnHandHoverBegin(hands);
+      OnPerHandHoverBegin(hands);
 
-      if (_hoveringHands.Count == hands.Count) {
-        OnObjectHoverBegin(hands);
+      if (_hoveringControllers.Count == hands.Count) {
+        OnHoverBegin(hands);
       }
     }
 
     public virtual void EndHover(List<InteractionHand> hands) {
       foreach (var hand in hands) {
-        _hoveringHands.Remove(hand);
+        _hoveringControllers.Remove(hand);
       }
 
       RefreshClosestHoveringHand();
 
       OnHandHoverEnd(hands);
 
-      if (_hoveringHands.Count == 0) {
+      if (_hoveringControllers.Count == 0) {
         OnObjectHoverEnd(hands);
       }
     }
@@ -771,7 +761,7 @@ namespace Leap.Unity.Interaction {
     }
 
     private void RefreshClosestHoveringHand() {
-      _closestHoveringHand = GetClosestHand(_hoveringHands);
+      _closestHoveringHand = GetClosestHand(_hoveringControllers);
     }
 
     private InteractionHand GetClosestHand(HashSet<InteractionHand> hands) {
@@ -788,34 +778,34 @@ namespace Leap.Unity.Interaction {
       return closestHoveringHand;
     }
 
-    private HashSet<InteractionHand> _primaryHoveringHands = new HashSet<InteractionHand>();
+    private HashSet<InteractionHand> _primaryHoveringControllers = new HashSet<InteractionHand>();
 
     private InteractionHand _closestPrimaryHoveringHand = null;
 
     public virtual void BeginPrimaryHover(List<InteractionHand> hands) {
       foreach (var hand in hands) {
-        _primaryHoveringHands.Add(hand);
+        _primaryHoveringControllers.Add(hand);
       }
 
       RefreshClosestPrimaryHoveringHand();
 
       OnHandPrimaryHoverBegin(hands);
 
-      if (_primaryHoveringHands.Count == hands.Count) {
+      if (_primaryHoveringControllers.Count == hands.Count) {
         OnObjectPrimaryHoverBegin(hands);
       }
     }
 
     public virtual void EndPrimaryHover(List<InteractionHand> hands) {
       foreach (var hand in hands) {
-        _primaryHoveringHands.Remove(hand);
+        _primaryHoveringControllers.Remove(hand);
       }
 
       RefreshClosestPrimaryHoveringHand();
 
       OnHandPrimaryHoverEnd(hands);
 
-      if (_primaryHoveringHands.Count == 0) {
+      if (_primaryHoveringControllers.Count == 0) {
         OnObjectPrimaryHoverEnd(hands);
       }
     }
@@ -828,7 +818,7 @@ namespace Leap.Unity.Interaction {
     private void RefreshClosestPrimaryHoveringHand() {
       InteractionHand closestHand = null;
       float closestDist = float.PositiveInfinity;
-      foreach (var hand in _primaryHoveringHands) {
+      foreach (var hand in _primaryHoveringControllers) {
         if (closestHand == null || hand.hoverCheckResults.primaryHoverDistance < closestDist) {
           closestHand = hand;
           closestDist = hand.hoverCheckResults.primaryHoverDistance;
@@ -1325,10 +1315,10 @@ namespace Leap.Unity.Interaction {
     }
 
     private void InitUnityEvents() {
-      setupCallback(ref OnHandHoverBegin,           EventType.HandHoverBegin);
+      setupCallback(ref OnPerHandHoverBegin,           EventType.HandHoverBegin);
       setupCallback(ref OnHandHoverEnd,             EventType.HandHoverEnd);
       setupCallback(ref OnHoverStay,                EventType.HoverStay);
-      setupCallback(ref OnObjectHoverBegin,         EventType.ObjectHoverBegin);
+      setupCallback(ref OnHoverBegin,         EventType.ObjectHoverBegin);
       setupCallback(ref OnObjectHoverEnd,           EventType.ObjectHoverEnd);
 
       setupCallback(ref OnHandPrimaryHoverBegin,    EventType.HandPrimaryHoverBegin);
