@@ -100,8 +100,13 @@ namespace Leap.Unity.Interaction {
       if (transform.parent != null) {
         parent = transform.parent.GetComponent<RectTransform>();
         if (parent != null) {
-          horizontalSlideLimits = new Vector2(parent.rect.xMin - transform.localPosition.x, parent.rect.xMax - transform.localPosition.x);
-          verticalSlideLimits = new Vector2(parent.rect.yMin - transform.localPosition.y, parent.rect.yMax - transform.localPosition.y);
+          if (parent.rect.width < 0f || parent.rect.height < 0f) {
+            Debug.LogError("Parent Rectangle dimensions negative; can't set slider boundaries!", parent.gameObject);
+            enabled = false;
+          } else {
+            horizontalSlideLimits = new Vector2(parent.rect.xMin - transform.localPosition.x, parent.rect.xMax - transform.localPosition.x);
+            verticalSlideLimits = new Vector2(parent.rect.yMin - transform.localPosition.y, parent.rect.yMax - transform.localPosition.y);
+          }
         }
       }
 
