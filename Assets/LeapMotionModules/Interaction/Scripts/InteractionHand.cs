@@ -260,30 +260,25 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected override void unwarpColliders(Transform primaryHoverPoint, ISpaceComponent warpedSpaceElement) {
-
-      Hand handToWarp = _unwarpedHandData;
-
-      if (warpedSpaceElement.anchor != null && warpedSpaceElement.anchor.space != null) {
-
-        // Extension method calculates "unwarped" pose, both in world space.
-        Vector3 unwarpedPosition;
-        Quaternion unwarpedRotation;
-        warpedSpaceElement.anchor.transformer.WorldSpaceUnwarp(primaryHoverPoint.position, 
-                                                               primaryHoverPoint.rotation,
-                                                               out unwarpedPosition,
-                                                               out unwarpedRotation);
+    protected override void unwarpColliders(Transform primaryHoverPoint,
+                                            ISpaceComponent warpedSpaceElement) {
+      // Extension method calculates "unwarped" pose, both in world space.
+      Vector3 unwarpedPosition;
+      Quaternion unwarpedRotation;
+      warpedSpaceElement.anchor.transformer.WorldSpaceUnwarp(primaryHoverPoint.position, 
+                                                              primaryHoverPoint.rotation,
+                                                              out unwarpedPosition,
+                                                              out unwarpedRotation);
         
-        // First shift the hand to be centered on the fingertip position so that rotations
-        // applied to the hand pivot around the fingertip, then apply the rest of the
-        // transformation.
-        handToWarp.Transform(-primaryHoverPoint.position, Quaternion.identity);
-        handToWarp.Transform(unwarpedPosition, unwarpedRotation
-                                               * Quaternion.Inverse(primaryHoverPoint.rotation));
+      // First shift the hand to be centered on the fingertip position so that
+      // rotations applied to the hand pivot around the fingertip, then apply the rest
+      // of the transformation.
+      _unwarpedHandData.Transform(-primaryHoverPoint.position, Quaternion.identity);
+      _unwarpedHandData.Transform(unwarpedPosition, unwarpedRotation
+                                              * Quaternion.Inverse(primaryHoverPoint.rotation));
 
-        // Hand data was modified, so refresh point data.
-        refreshPointDataFromHand();
-      }
+      // Hand data was modified, so refresh point data.
+      refreshPointDataFromHand();
     }
 
     #endregion

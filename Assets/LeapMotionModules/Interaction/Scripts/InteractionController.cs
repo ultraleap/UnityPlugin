@@ -30,7 +30,7 @@ namespace Leap.Unity.Interaction {
   /// Leap Motion Controller, or by remote-style held controllers
   /// such as the Oculus Touch or Vive controller.
   /// </summary>
-  public enum ControllerType { Hand, Remote }
+  public enum ControllerType { Hand, VRController }
 
   public abstract class InteractionController : MonoBehaviour {
 
@@ -326,7 +326,9 @@ namespace Leap.Unity.Interaction {
         if (isTracked && isPrimaryHovering) {
           ISpaceComponent space = primaryHoveredObject.space;
 
-          if (space != null) {
+          if (space != null
+              && space.anchor != null
+              && space.anchor.space != null) {
             unwarpColliders(primaryHoverPoints[_primaryHoverPointIdx], space);
           }
         }
