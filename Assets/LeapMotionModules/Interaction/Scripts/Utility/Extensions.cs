@@ -19,11 +19,11 @@ namespace Leap.Unity.Interaction {
 
   public static class IInteractionBehaviourExtensions {
 
-    public static bool ShouldIgnoreHover(this IInteractionBehaviour intObj, InteractionControllerBase controller) {
+    public static bool ShouldIgnoreHover(this IInteractionBehaviour intObj, InteractionController controller) {
       switch (intObj.ignoreHoverMode) {
         case IgnoreHoverMode.None: return false;
-        case IgnoreHoverMode.Left: return !controller.isTracked || controller.isLeft;
-        case IgnoreHoverMode.Right: return !controller.isTracked || !controller.isLeft;
+        case IgnoreHoverMode.Left: return  !controller.isTracked || controller.isLeft;
+        case IgnoreHoverMode.Right: return !controller.isTracked || controller.isRight;
         case IgnoreHoverMode.Both: default: return true;
       }
     }

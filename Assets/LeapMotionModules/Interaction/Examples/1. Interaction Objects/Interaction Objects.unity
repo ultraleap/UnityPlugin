@@ -206,11 +206,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4000011359648756, guid: 2aa010a1e75292e49a24f3f71bb9cddb, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 0.051160265
+      value: 0.05116027
       objectReference: {fileID: 0}
     - target: {fileID: 4000011359648756, guid: 2aa010a1e75292e49a24f3f71bb9cddb, type: 2}
       propertyPath: m_LocalPosition.y
-      value: -0.11535743
+      value: -0.11535759
       objectReference: {fileID: 0}
     - target: {fileID: 4000011359648756, guid: 2aa010a1e75292e49a24f3f71bb9cddb, type: 2}
       propertyPath: m_LocalPosition.z
@@ -746,6 +746,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -847,6 +849,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &129172182
 GameObject:
   m_ObjectHideFlags: 0
@@ -959,7 +966,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 134797214}
   m_LocalRotation: {x: -0, y: 0.5855269, z: -0, w: 0.81065303}
-  m_LocalPosition: {x: 0.875, y: 0.112, z: 0.104}
+  m_LocalPosition: {x: 0.875, y: 0.112, z: -8.59}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1490356989}
@@ -1032,6 +1039,11 @@ Prefab:
         type: 2}
       propertyPath: m_Material
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 54494498398590960, guid: 5a1fb53528997fe478560ab3120da9cb,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5a1fb53528997fe478560ab3120da9cb, type: 2}
@@ -1295,6 +1307,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -1383,6 +1397,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &236842555
 GameObject:
   m_ObjectHideFlags: 0
@@ -1430,6 +1449,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -1518,6 +1539,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &237495162
 GameObject:
   m_ObjectHideFlags: 0
@@ -1556,7 +1582,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 237495162}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.07498428, y: -3.0063097, z: 3.7218971}
+  m_LocalPosition: {x: -0.07498428, y: -3.0063097, z: -4.97}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1609,6 +1635,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 0
   _contactForceMode: 0
@@ -1628,7 +1656,7 @@ ConfigurableJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.01535961, y: -0.049000025, z: 0.533}
+  m_ConnectedAnchor: {x: 0.01535961, y: -0.049000025, z: -8.163576}
   serializedVersion: 2
   m_SecondaryAxis: {x: 0, y: 1, z: 0}
   m_XMotion: 1
@@ -1723,7 +1751,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
 --- !u!65 &255649384
@@ -1800,7 +1828,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 259010354}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.45304066, y: 0.2656837, z: 0.9131953}
+  m_LocalPosition: {x: 0.45304066, y: 0.2656837, z: -7.78}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 294561430}
@@ -1835,10 +1863,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0625e574c0d47a241b7dfc7a8c67ca2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
-  _showAdvancedSettings: 0
+  _showAdvancedSettings: 1
   hoverActivationRadius: 0.2
   touchActivationRadius: 0.075
   _autoGenerateLayers: 1
@@ -1850,7 +1875,7 @@ MonoBehaviour:
     layerIndex: 9
   _contactBoneLayer:
     layerIndex: 10
-  _drawHandRuntimeGizmos: 0
+  _drawControllerRuntimeGizmos: 1
 --- !u!4 &289258608
 Transform:
   m_ObjectHideFlags: 0
@@ -1858,7 +1883,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 289258606}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.0211418, y: -5.322359, z: 8.63519}
+  m_LocalPosition: {x: 1.0211418, y: -5.322359, z: -0.06}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 486239174}
@@ -1946,6 +1971,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -2034,6 +2061,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &309724702
 GameObject:
   m_ObjectHideFlags: 0
@@ -2081,6 +2113,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -2169,6 +2203,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &344097042
 GameObject:
   m_ObjectHideFlags: 0
@@ -2454,6 +2493,11 @@ Prefab:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 54989536721116318, guid: 8998b2da307be7f419e285784a8495a6,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
   m_IsPrefabParent: 0
@@ -2480,6 +2524,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &394886097
 Prefab:
   m_ObjectHideFlags: 0
@@ -2497,7 +2546,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4167062488207904, guid: 9b0d46ef9e6296640baaf7bac58ac47b, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -8.7
       objectReference: {fileID: 0}
     - target: {fileID: 4167062488207904, guid: 9b0d46ef9e6296640baaf7bac58ac47b, type: 2}
       propertyPath: m_LocalRotation.x
@@ -2569,6 +2618,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -2657,6 +2708,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &435065600
 Prefab:
   m_ObjectHideFlags: 0
@@ -2752,6 +2808,11 @@ Prefab:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 54989536721116318, guid: 8998b2da307be7f419e285784a8495a6,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 0}
   m_ParentPrefab: {fileID: 100100000, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
@@ -2779,6 +2840,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &444300104
 GameObject:
   m_ObjectHideFlags: 0
@@ -2826,6 +2892,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -2914,6 +2982,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &445421612
 GameObject:
   m_ObjectHideFlags: 0
@@ -2948,6 +3021,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -3049,6 +3124,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &458127868
 GameObject:
   m_ObjectHideFlags: 0
@@ -3096,6 +3176,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -3184,6 +3266,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &486239173
 GameObject:
   m_ObjectHideFlags: 0
@@ -3224,7 +3311,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29207d17cdd06e84d9fecbdef2401c1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 289258607}
+  _hoverEnabled: 1
+  _contactEnabled: 1
+  _graspingEnabled: 1
+  manager: {fileID: 289258607}
+  _handDataMode: 0
 --- !u!1 &562917530
 GameObject:
   m_ObjectHideFlags: 0
@@ -3327,6 +3418,11 @@ Prefab:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 54494498398590960, guid: 5a1fb53528997fe478560ab3120da9cb,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5a1fb53528997fe478560ab3120da9cb, type: 2}
   m_IsPrefabParent: 0
@@ -3382,6 +3478,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -3470,6 +3568,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &660863408
 GameObject:
   m_ObjectHideFlags: 0
@@ -3517,6 +3620,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -3605,6 +3710,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &759419766
 Prefab:
   m_ObjectHideFlags: 0
@@ -3711,6 +3821,11 @@ Prefab:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 54989536721116318, guid: 8998b2da307be7f419e285784a8495a6,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
   m_IsPrefabParent: 0
@@ -3737,6 +3852,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &793958694
 GameObject:
   m_ObjectHideFlags: 0
@@ -3784,6 +3904,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -3872,6 +3994,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &811384329
 GameObject:
   m_ObjectHideFlags: 0
@@ -3919,6 +4046,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -4007,6 +4136,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &821878207
 GameObject:
   m_ObjectHideFlags: 0
@@ -4166,6 +4300,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -4254,6 +4390,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &922779605
 GameObject:
   m_ObjectHideFlags: 0
@@ -4407,6 +4548,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -4495,6 +4638,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &965526031
 GameObject:
   m_ObjectHideFlags: 0
@@ -4629,6 +4777,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -4717,6 +4867,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1020742380
 GameObject:
   m_ObjectHideFlags: 0
@@ -4739,7 +4894,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1020742380}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.3515843, y: -3.5993907, z: 9.456576}
+  m_LocalPosition: {x: 0.3515843, y: -3.5993907, z: 0.76}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 759419767}
@@ -4804,6 +4959,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -4892,6 +5049,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1087592053
 GameObject:
   m_ObjectHideFlags: 0
@@ -4939,6 +5101,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1087592056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4952,6 +5119,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -5075,6 +5244,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -5163,6 +5334,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1155409168
 GameObject:
   m_ObjectHideFlags: 0
@@ -5205,7 +5381,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1155409168}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -8.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 922779606}
@@ -5392,11 +5568,11 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4000012644673856, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -0.051160265
+      value: -0.05116027
       objectReference: {fileID: 0}
     - target: {fileID: 4000012644673856, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 0.11535736
+      value: 0.115357585
       objectReference: {fileID: 0}
     - target: {fileID: 4000012644673856, guid: 2276723046d707c4f94d431ceb80ab92, type: 2}
       propertyPath: m_LocalPosition.z
@@ -5886,6 +6062,11 @@ Prefab:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 54553201331445640, guid: 88a926f39f5ae5c40976d0ff02c7fd2f,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 88a926f39f5ae5c40976d0ff02c7fd2f, type: 2}
   m_IsPrefabParent: 0
@@ -5947,6 +6128,11 @@ Prefab:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 54494498398590960, guid: 5a1fb53528997fe478560ab3120da9cb,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5a1fb53528997fe478560ab3120da9cb, type: 2}
   m_IsPrefabParent: 0
@@ -6002,6 +6188,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -6090,6 +6278,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &1381133780
 Prefab:
   m_ObjectHideFlags: 0
@@ -6143,6 +6336,11 @@ Prefab:
         type: 2}
       propertyPath: m_Material
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 54728075337958320, guid: e2b312b753498524289c413de369c1fc,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e2b312b753498524289c413de369c1fc, type: 2}
@@ -6199,6 +6397,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -6287,6 +6487,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1436522777
 GameObject:
   m_ObjectHideFlags: 0
@@ -6334,6 +6539,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -6422,6 +6629,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1448879763
 GameObject:
   m_ObjectHideFlags: 0
@@ -6597,6 +6809,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -6685,6 +6899,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1500539201
 GameObject:
   m_ObjectHideFlags: 0
@@ -6725,7 +6944,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29207d17cdd06e84d9fecbdef2401c1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 289258607}
+  _hoverEnabled: 1
+  _contactEnabled: 1
+  _graspingEnabled: 1
+  manager: {fileID: 289258607}
+  _handDataMode: 1
 --- !u!1 &1574518198
 GameObject:
   m_ObjectHideFlags: 0
@@ -6908,6 +7131,11 @@ Prefab:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 54989536721116318, guid: 8998b2da307be7f419e285784a8495a6,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
   m_IsPrefabParent: 0
@@ -6934,6 +7162,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1604363482
 GameObject:
   m_ObjectHideFlags: 0
@@ -6981,6 +7214,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -7069,6 +7304,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1803602546
 GameObject:
   m_ObjectHideFlags: 0
@@ -7168,6 +7408,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1803602552
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7181,6 +7426,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -7252,6 +7499,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -7340,6 +7589,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1844324945
 GameObject:
   m_ObjectHideFlags: 0
@@ -7387,6 +7641,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -7475,6 +7731,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1903639699
 GameObject:
   m_ObjectHideFlags: 0
@@ -7574,6 +7835,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1903639705
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7587,6 +7853,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -7706,6 +7974,11 @@ Prefab:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 54494498398590960, guid: 5a1fb53528997fe478560ab3120da9cb,
+        type: 2}
+      propertyPath: m_Interpolate
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5a1fb53528997fe478560ab3120da9cb, type: 2}
   m_IsPrefabParent: 0
@@ -7760,6 +8033,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 0
   _contactForceMode: 0
@@ -7779,7 +8054,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.2196404, y: -0.24600005, z: 0.5279999}
+  m_ConnectedAnchor: {x: -0.2196404, y: -0.24600005, z: -8.168576}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -7813,7 +8088,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
 --- !u!1 &2048856376
@@ -7863,6 +8138,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -7951,6 +8228,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2071343626
 GameObject:
   m_ObjectHideFlags: 0
@@ -7998,6 +8280,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 289258607}
   _ignoreHoverMode: 0
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 1
   _ignoreGrasping: 1
   _contactForceMode: 0
@@ -8086,6 +8370,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useHover: 1
   usePrimaryHover: 0
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2114047134
 GameObject:
   m_ObjectHideFlags: 0

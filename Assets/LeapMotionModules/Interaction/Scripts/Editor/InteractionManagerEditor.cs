@@ -28,7 +28,7 @@ namespace Leap.Unity.Interaction {
       specifyConditionalDrawing("_showAdvancedSettings", "_interactionLayer");
       specifyConditionalDrawing("_showAdvancedSettings", "_interactionNoContactLayer");
       specifyConditionalDrawing("_showAdvancedSettings", "_contactBoneLayer");
-      specifyConditionalDrawing("_showAdvancedSettings", "_drawHandRuntimeGizmos");
+      specifyConditionalDrawing("_showAdvancedSettings", "_drawControllerRuntimeGizmos");
 
       // Layers
       SerializedProperty showAdvancedSettingsProperty = serializedObject.FindProperty("_showAdvancedSettings");

@@ -51,7 +51,7 @@ namespace Leap.Unity.Interaction {
     /// Leap hands and supported VR controllers both count as "controllers" for the purposes of
     /// this getter.
     /// </summary>
-    public InteractionControllerBase closestHoveringController {
+    public InteractionController closestHoveringController {
       get {
         return _closestHoveringController;
       }
@@ -79,7 +79,7 @@ namespace Leap.Unity.Interaction {
     /// Gets all of the interaction controllers hovering near this object, whether they
     /// are Leap hands or supported VR controllers.
     /// </summary>
-    public HashSet<InteractionControllerBase> hoveringControllers {
+    public HashSet<InteractionController> hoveringControllers {
       get {
         return _hoveringControllers;
       }
@@ -97,7 +97,7 @@ namespace Leap.Unity.Interaction {
     /// closer to it than any other interaction object. If there are multiple such controllers,
     /// this getter will return the closest one.
     /// </summary>
-    public InteractionControllerBase primaryHoveringController {
+    public InteractionController primaryHoveringController {
       get {
         return _closestPrimaryHoveringController;
       }
@@ -106,7 +106,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Gets the set of all interaction controllers primarily hovering over this object.
     /// </summary>
-    public HashSet<InteractionControllerBase> primaryHoveringControllers {
+    public HashSet<InteractionController> primaryHoveringControllers {
       get {
         return _primaryHoveringControllers;
       }
@@ -134,7 +134,7 @@ namespace Leap.Unity.Interaction {
       get {
         if (!isPrimaryHovered) return null;
         return _closestPrimaryHoveringHand.leapHand
-                  .Fingers[_closestPrimaryHoveringHand.primaryHoveringFingerIndex];
+                  .Fingers[_closestPrimaryHoveringHand.primaryHoveringPointIndex];
       }
     }
 
@@ -205,7 +205,7 @@ namespace Leap.Unity.Interaction {
     /// If this event is to be fired on a given frame, it will be called after OnPerControllerHandHoverEnd
     /// and before OnHoverStay.
     /// </remarks>
-    public Action<InteractionControllerBase> OnPerControllerHoverBegin;
+    public Action<InteractionController> OnPerControllerHoverBegin;
 
     /// <summary>
     /// Called whenever an interaction controller leaves the hover activity radius around this
@@ -215,7 +215,7 @@ namespace Leap.Unity.Interaction {
     /// If this event is to be fired on a given frame, it will be called before OnPerControllerHoverBegin
     /// and before OnHoverStay.
     /// </remarks>
-    public Action<InteractionControllerBase> OnPerControllerHandHoverEnd;
+    public Action<InteractionController> OnPerControllerHoverEnd;
 
     #endregion
 
@@ -260,7 +260,7 @@ namespace Leap.Unity.Interaction {
     /// If this event is to be fired on a given frame, it will be called before OnPrimaryHoverStay,
     /// and it will be called after OnPerControllerPrimaryHoverEnd.
     /// </remarks>
-    public Action<InteractionControllerBase> OnPerControllerPrimaryHoverBegin;
+    public Action<InteractionController> OnPerControllerPrimaryHoverBegin;
 
     /// <summary>
     /// Called whenever an interaction controler (a Leap hand or supported VR controller) stops primarily
@@ -271,7 +271,7 @@ namespace Leap.Unity.Interaction {
     /// If this event is to be fired on a given frame, it will be called before OnPerControllerPrimaryHoverBegin
     /// and OnPrimaryHoverStay.
     /// </remarks>
-    public Action<InteractionControllerBase> OnPerControllerPrimaryHoverEnd;
+    public Action<InteractionController> OnPerControllerPrimaryHoverEnd;
 
     #endregion
 
@@ -289,13 +289,13 @@ namespace Leap.Unity.Interaction {
     /// If no controllers (Leap hands or supported VR controllers) are currently grasping this object,
     /// returns null.
     /// </summary>
-    public InteractionControllerBase graspingController { get { return _graspingControllers.Query().FirstOrDefault(); } }
+    public InteractionController graspingController { get { return _graspingControllers.Query().FirstOrDefault(); } }
 
     /// <summary>
     /// Gets the set of all interaction controllers currently grasping this object. Interaction
     /// controllers include Leap hands via InteractionHand and supported VR controllers.
     /// </summary>
-    public HashSet<InteractionControllerBase> graspingControllers { get { return _graspingControllers; } }
+    public HashSet<InteractionController> graspingControllers { get { return _graspingControllers; } }
 
     private HashSet<InteractionHand> _graspingHandsBuffer = new HashSet<InteractionHand>();
     /// <summary>
@@ -332,7 +332,7 @@ namespace Leap.Unity.Interaction {
     /// also valid to move the Interaction object (via its Rigidbody) in OnGraspStay, although OnGraspStay does
     /// not provide pre- and post-solve data in its callback signature.
     /// </remarks>
-    public Action<Vector3, Quaternion, Vector3, Quaternion, List<InteractionControllerBase>> OnGraspedMovement
+    public Action<Vector3, Quaternion, Vector3, Quaternion, List<InteractionController>> OnGraspedMovement
       = (preSolvedPos, preSolvedRot, solvedPos, solvedRot, graspingControllers) => { };
 
     /// <summary>
@@ -374,7 +374,7 @@ namespace Leap.Unity.Interaction {
     /// If this event is fired on a given frame, it will be called after OnPreControllerGraspEnd and before
     /// OnGraspStay.
     /// </remarks>
-    public Action<InteractionControllerBase> OnPerControllerGraspBegin;
+    public Action<InteractionController> OnPerControllerGraspBegin;
 
     /// <summary>
     /// Called whenever an interaction controller stops grasping this object.
@@ -386,7 +386,7 @@ namespace Leap.Unity.Interaction {
     /// <remarks>
     /// If this event is fired on a given frame, it will be before all other grasping callbacks.
     /// </remarks>
-    public Action<InteractionControllerBase> OnPerControllerGraspEnd;
+    public Action<InteractionController> OnPerControllerGraspEnd;
 
     /// <summary>
     /// Called when the interaction controller that is grasping this interaction object loses tracking. This can
@@ -399,7 +399,7 @@ namespace Leap.Unity.Interaction {
     /// resumes tracking. Subscribe to this callback and OnResume to implement, e.g., the object disappearing
     /// and re-appearing.
     /// </summary>
-    public Action<InteractionControllerBase> OnSuspensionBegin;
+    public Action<InteractionController> OnSuspensionBegin;
 
     /// <summary>
     /// Called when an object ceases being suspended. An object is suspended if it is currently grasped by
@@ -410,7 +410,7 @@ namespace Leap.Unity.Interaction {
     /// the controller that suspended the object. OnGraspEnd will also be called for the interaction controller
     /// that was formerly causing suspension.
     /// </summary>
-    public Action<InteractionControllerBase> OnSuspensionEnd;
+    public Action<InteractionController> OnSuspensionEnd;
 
     #endregion
 
@@ -420,7 +420,14 @@ namespace Leap.Unity.Interaction {
     /// false. Directly after calling this method, the object is guaranteed not to be held.
     /// </summary>
     public bool ReleaseFromGrasp() {
-      return manager.TryReleaseObjectFromGrasp(this);
+      if (isGrasped) {
+        foreach (var controller in graspingControllers) {
+          controller.ReleaseGrasp();
+        }
+        return true;
+      }
+
+      return false;
     }
 
     /// <summary>
@@ -428,7 +435,7 @@ namespace Leap.Unity.Interaction {
     /// If the interaction controller is not currently grasping this object, returns
     /// Vector3.zero, and logs an error to the Unity console.
     /// </summary>
-    public Vector3 GetGraspPoint(InteractionControllerBase intController) {
+    public Vector3 GetGraspPoint(InteractionController intController) {
       if (intController.graspedObject == this as IInteractionBehaviour) {
         return intController.GetGraspPoint();
       }
@@ -466,12 +473,12 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Called whenever an interaction controller begins colliding with this object.
     /// </summary>
-    public Action<InteractionControllerBase> OnPerControllerContactBegin;
+    public Action<InteractionController> OnPerControllerContactBegin;
 
     /// <summary>
     /// Called whenever an interaction controller stops colliding with this object.
     /// </summary>
-    public Action<InteractionControllerBase> OnPerControllerContactEnd;
+    public Action<InteractionController> OnPerControllerContactEnd;
 
     #endregion
 
@@ -551,17 +558,21 @@ namespace Leap.Unity.Interaction {
         // appropriate EndHover events immediately.
       }
     }
+    [SerializeField, HideInInspector]
+    private bool _isIgnoringAllHoverState = false;
 
     [Tooltip("Interaction controllers will not be able to mark this object as their "
-           + "primary hover if this property is checked.")]
+           + "primary hover if this property is checked. Primary hover requires hovering "
+           + "enabled to function, but it can be disabled independently of hovering.")]
     [SerializeField]
+    [DisableIf("_isIgnoringAllHoverState", isEqualTo: true)]
     private bool _ignorePrimaryHover = false;
     public bool ignorePrimaryHover {
       get { return _ignorePrimaryHover; }
       set {
         _ignorePrimaryHover = value;
         // TODO: If _ignorePrimaryHover is set to false, need to fire
-        // appropriate EndContact events immediately.
+        // appropriate EndPrimaryHover events immediately.
       }
     }
 
@@ -653,6 +664,9 @@ namespace Leap.Unity.Interaction {
 
     protected virtual void OnValidate() {
       rigidbody = GetComponent<Rigidbody>();
+
+      _isIgnoringAllHoverState = ignoreHoverMode == IgnoreHoverMode.Both;
+      if (_isIgnoringAllHoverState) _ignorePrimaryHover = true;
     }
 
     protected virtual void Awake() {
@@ -718,9 +732,10 @@ namespace Leap.Unity.Interaction {
 
     #region Hovering
 
-    private HashSet<InteractionControllerBase> _hoveringControllers = new HashSet<InteractionControllerBase>();
+    private HashSet<InteractionController> _hoveringControllers = new HashSet<InteractionController>();
 
-    private InteractionControllerBase _closestHoveringController = null;
+    private InteractionController _closestHoveringController = null;
+    private float _closestHoveringControllerDistance = float.PositiveInfinity;
     private InteractionHand _closestHoveringHand = null;
 
     /// <summary>
@@ -772,7 +787,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public virtual void BeginHover(List<InteractionControllerBase> controllers) {
+    public void BeginHover(List<InteractionController> controllers) {
       foreach (var controller in controllers) {
         _hoveringControllers.Add(controller);
       }
@@ -780,23 +795,23 @@ namespace Leap.Unity.Interaction {
       refreshClosestHoveringController();
 
       foreach (var controller in controllers) {
-        OnPerControllerHoverBegin(hand);
+        OnPerControllerHoverBegin(controller);
       }
 
-      if (_hoveringControllers.Count == hands.Count) {
+      if (_hoveringControllers.Count == controllers.Count) {
         OnHoverBegin();
       }
     }
 
-    public virtual void EndHover(List<InteractionHand> hands) {
-      foreach (var hand in hands) {
-        _hoveringControllers.Remove(hand);
+    public void EndHover(List<InteractionController> controllers) {
+      foreach (var controller in controllers) {
+        _hoveringControllers.Remove(controller);
       }
 
       refreshClosestHoveringController();
 
-      foreach (var hand in hands) {
-        OnPerControllerHoverEnd(hand);
+      foreach (var controller in controllers) {
+        OnPerControllerHoverEnd(controller);
       }
 
       if (_hoveringControllers.Count == 0) {
@@ -804,82 +819,110 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    public virtual void StayHovered(List<InteractionHand> hands) {
+    public void StayHovered(List<InteractionController> controllers) {
       refreshClosestHoveringController();
       OnHoverStay();
     }
 
     private void refreshClosestHoveringController() {
-      _closestHoveringController = getClosestController(_hoveringControllers);
+      float closestControllerDistance = float.PositiveInfinity;
+      _closestHoveringController = getClosestController(_hoveringControllers,
+                                                        out closestControllerDistance);
+      _closestHoveringControllerDistance = closestControllerDistance;
+
+      float closestHandDistance = float.PositiveInfinity;
+      _closestHoveringHand = getClosestController(_hoveringControllers,
+                                                  out closestHandDistance,
+                                                  controller => controller.intHand != null)
+                               as InteractionHand;
+      // closestHandDistance unused for now.
     }
 
-    private InteractionHand getClosestController(HashSet<InteractionControllerBase> hands) {
-      InteractionHand closestHoveringHand = null;
-      float closestHoveringHandDist = float.PositiveInfinity;
-      foreach (var hand in hands) {
-        float distance = GetHoverDistance(hand.GetLastTrackedLeapHand().PalmPosition.ToVector3());
+    private InteractionController getClosestController(HashSet<InteractionController> controllers,
+                                                       out float closestDistance,
+                                                       Func<InteractionController, bool> filter = null) {
+      InteractionController closestHoveringController = null;
+      float closestHoveringControllerDist = float.PositiveInfinity;
+      foreach (var controller in controllers) {
+        if (filter != null && filter(controller) == false) continue;
+
+        float distance = GetHoverDistance(controller.hoverPoint);
         if (closestHoveringHand == null
-            || distance < closestHoveringHandDist) {
-          closestHoveringHand = hand;
-          closestHoveringHandDist = distance;
+            || distance < closestHoveringControllerDist) {
+              closestHoveringController = controller;
+              closestHoveringControllerDist = distance;
         }
       }
-      return closestHoveringHand;
+
+      closestDistance = closestHoveringControllerDist;
+      return closestHoveringController;
     }
 
-    private HashSet<InteractionHand> _primaryHoveringControllers = new HashSet<InteractionHand>();
-
+    private HashSet<InteractionController> _primaryHoveringControllers = new HashSet<InteractionController>();
+    private InteractionController _closestPrimaryHoveringController = null;
     private InteractionHand _closestPrimaryHoveringHand = null;
 
-    public virtual void BeginPrimaryHover(List<InteractionHand> hands) {
-      foreach (var hand in hands) {
-        _primaryHoveringControllers.Add(hand);
+    public void BeginPrimaryHover(List<InteractionController> controllers) {
+      foreach (var controller in controllers) {
+        _primaryHoveringControllers.Add(controller);
       }
 
-      RefreshClosestPrimaryHoveringHand();
+      refreshClosestPrimaryHoveringController();
 
-      OnHandPrimaryHoverBegin(hands);
+      foreach (var controller in controllers) {
+        OnPerControllerPrimaryHoverBegin(controller);
+      }
 
-      if (_primaryHoveringControllers.Count == hands.Count) {
-        OnObjectPrimaryHoverBegin(hands);
+      if (_primaryHoveringControllers.Count == controllers.Count) {
+        OnPrimaryHoverBegin();
       }
     }
 
-    public virtual void EndPrimaryHover(List<InteractionHand> hands) {
-      foreach (var hand in hands) {
-        _primaryHoveringControllers.Remove(hand);
+    public void EndPrimaryHover(List<InteractionController> controllers) {
+      foreach (var controller in controllers) {
+        _primaryHoveringControllers.Remove(controller);
       }
 
-      RefreshClosestPrimaryHoveringHand();
+      refreshClosestPrimaryHoveringController();
 
-      OnHandPrimaryHoverEnd(hands);
+      foreach (var controller in controllers) {
+        OnPerControllerPrimaryHoverEnd(controller);
+      }
 
       if (_primaryHoveringControllers.Count == 0) {
-        OnObjectPrimaryHoverEnd(hands);
+        OnPrimaryHoverEnd();
       }
     }
 
-    public virtual void StayPrimaryHovered(List<InteractionHand> hands) {
-      RefreshClosestPrimaryHoveringHand();
-      OnPrimaryHoverStay(hands);
+    public void StayPrimaryHovered(List<InteractionController> controllers) {
+      refreshClosestPrimaryHoveringController();
+      OnPrimaryHoverStay();
     }
 
-    private void RefreshClosestPrimaryHoveringHand() {
-      InteractionHand closestHand = null;
+    private void refreshClosestPrimaryHoveringController() {
+      _closestPrimaryHoveringController = getClosestPrimaryHoveringController();
+      _closestPrimaryHoveringHand = getClosestPrimaryHoveringController((controller) => controller.intHand != null) as InteractionHand;
+    }
+
+    private InteractionController getClosestPrimaryHoveringController(Func<InteractionController, bool> filter = null) {
+      InteractionController closestController = null;
       float closestDist = float.PositiveInfinity;
-      foreach (var hand in _primaryHoveringControllers) {
-        if (closestHand == null || hand.hoverCheckResults.primaryHoverDistance < closestDist) {
-          closestHand = hand;
-          closestDist = hand.hoverCheckResults.primaryHoverDistance;
+      foreach (var controller in _primaryHoveringControllers) {
+        if (filter != null && filter(controller) == false) continue;
+
+        if (closestController == null || controller.primaryHoverDistance < closestDist) {
+          closestController = controller;
+          closestDist = controller.primaryHoverDistance;
         }
       }
-      _closestPrimaryHoveringHand = closestHand;
+      return closestController;
     }
 
     /// <summary>
     /// Gets the List of Colliders used for hover distance checking for this Interaction
-    /// object. Hover distancing checking will affect which object is chosen for a hand's
-    /// primary hover, as well as for determining this object's closest hovering hand.
+    /// object. Hover distancing checking will affect which object is chosen for an
+    /// interaction controller's primary hover, as well as for determining this object's
+    /// closest hovering controller.
     /// 
     /// RefreshColliderState() will automatically populate the colliders List with
     /// the this rigidbody's colliders, but is only called once on Start(). If you change
@@ -890,14 +933,14 @@ namespace Leap.Unity.Interaction {
     /// If you're feeling brave, you can manually modify this list yourself.
     /// 
     /// Hover candidacy is determined by a hand-centric PhysX sphere-check against the
-    /// Interaction object's rigidbody's attached colliders. This behavior cannot be changed,
-    /// even if you modify the contents of primaryHoverColliders.
+    /// Interaction object's rigidbody's attached colliders. This behavior cannot be
+    /// changed, even if you modify the contents of primaryHoverColliders.
     /// 
     /// However, primary hover is determined by performing distance checks against the
     /// colliders in the primaryHoverColliders list, so it IS possible to use different
-    /// collider(s) for primary hover checks than are used for hover candidacy, by modifying
-    /// the collider contents of this list. This will also affect which hand is chosen by
-    /// this object as its closestHoveringHand.
+    /// collider(s) for primary hover checks than are used for hover candidacy, by
+    /// modifying the collider contents of this list. This will also affect which hand is
+    /// chosen by this object as its closestHoveringHand.
     /// </remarks>
     public List<Collider> primaryHoverColliders {
       get { return _interactionColliders; }
@@ -907,41 +950,41 @@ namespace Leap.Unity.Interaction {
 
     #region Contact
 
-    private HashSet<InteractionHand> _contactingHands = new HashSet<InteractionHand>();
+    private HashSet<InteractionController> _contactingControllers = new HashSet<InteractionController>();
 
-    public virtual void BeginContact(List<InteractionHand> hands) {
-      foreach (var hand in hands) {
-        _contactingHands.Add(hand);
+    public void BeginContact(List<InteractionController> controllers) {
+      foreach (var controller in controllers) {
+        _contactingControllers.Add(controller);
+
+        OnPerControllerContactBegin(controller);
       }
 
-      OnHandContactBegin(hands);
-
-      if (_contactingHands.Count == hands.Count) {
-        OnObjectContactBegin(hands);
-      }
-    }
-
-    public virtual void EndContact(List<InteractionHand> hands) {
-      foreach (var hand in hands) {
-        _contactingHands.Remove(hand);
-      }
-
-      OnHandContactEnd(hands);
-
-      if (_contactingHands.Count == 0) {
-        OnObjectContactEnd(hands);
+      if (_contactingControllers.Count == controllers.Count) {
+        OnContactBegin();
       }
     }
 
-    public virtual void StayContacted(List<InteractionHand> hands) {
-      OnContactStay(hands);
+    public void EndContact(List<InteractionController> controllers) {
+      foreach (var controller in controllers) {
+        _contactingControllers.Remove(controller);
+
+        OnPerControllerContactEnd(controller);
+      }
+
+      if (_contactingControllers.Count == 0) {
+        OnContactEnd();
+      }
+    }
+
+    public void StayContacted(List<InteractionController> controllers) {
+      OnContactStay();
     }
 
     #endregion
 
     #region Grasping
 
-    private HashSet<InteractionHand> _graspingControllers = new HashSet<InteractionHand>();
+    private HashSet<InteractionController> _graspingControllers = new HashSet<InteractionController>();
 
     private bool _graspingInitialized = false;
     private bool _moveObjectWhenGrasped__WasEnabledLastFrame;
@@ -997,12 +1040,12 @@ namespace Leap.Unity.Interaction {
       }
 
       if (!moveObjectWhenGrasped && _moveObjectWhenGrasped__WasEnabledLastFrame) {
-        graspedPoseController.ClearHands();
+        graspedPoseController.ClearControllers();
       }
       _moveObjectWhenGrasped__WasEnabledLastFrame = moveObjectWhenGrasped;
     }
 
-    public virtual void BeginGrasp(List<InteractionHand> hands) {
+    public void BeginGrasp(List<InteractionController> controllers) {
       _justGrasped = true;
 
       // End suspension by ending the grasp on the suspending hand,
@@ -1017,20 +1060,20 @@ namespace Leap.Unity.Interaction {
       }
 
       // Add each newly grasping hand to internal reference and pose solver.
-      foreach (var hand in hands) {
-        _graspingControllers.Add(hand);
+      foreach (var controller in controllers) {
+        _graspingControllers.Add(controller);
 
         if (moveObjectWhenGrasped) {
-          graspedPoseController.AddHand(hand);
+          graspedPoseController.AddController(controller);
         }
+        
+        // Fire interaction callback.
+        OnPerControllerGraspBegin(controller);
       }
-
-      // Fire interaction callback.
-      OnHandGraspBegin(hands);
 
       // If object wasn't grasped before, store rigidbody settings and
       // fire object interaction callback.
-      if (_graspingControllers.Count == hands.Count) {
+      if (_graspingControllers.Count == controllers.Count) {
 
         // Remember drag settings pre-grasp, to be restored on release.
         _dragBeforeGrasp = rigidbody.drag;
@@ -1050,27 +1093,28 @@ namespace Leap.Unity.Interaction {
         rigidbody.drag = 0F;
         rigidbody.angularDrag = 0F;
 
-        OnObjectGraspBegin(hands);
+        OnGraspBegin();
       }
     }
 
-    public virtual void EndGrasp(List<InteractionHand> hands) {
-      foreach (var hand in hands) {
-        _graspingControllers.Remove(hand);
+    public void EndGrasp(List<InteractionController> controllers) {
+      if (_graspingControllers.Count == controllers.Count && isSuspended) {
+        // No grasped hands: Should not be suspended any more;
+        // having been suspended also means we were only grasped by one hand
+        EndSuspension(controllers[0]);
+      }
+
+      foreach (var controller in controllers) {
+        _graspingControllers.Remove(controller);
+
+        // Fire interaction callback.
+        OnPerControllerGraspEnd(controller);
 
         if (moveObjectWhenGrasped) {
           // Remove each hand from the pose solver.
-          graspedPoseController.RemoveHand(hand);
+          graspedPoseController.RemoveController(controller);
         }
       }
-
-      if (_graspingControllers.Count == 0 && isSuspended) {
-        // No grasped hands: Should not be suspended any more;
-        // having been suspended also means we were only grasped by one hand
-        EndSuspension(hands[0]);
-      }
-
-      OnHandGraspEnd(hands);
 
       // If the object is no longer grasped by any hands, restore state and
       // activate throw controller.
@@ -1082,17 +1126,17 @@ namespace Leap.Unity.Interaction {
         // Revert kinematic state.
         rigidbody.isKinematic = _wasKinematicBeforeGrasp;
 
-        if (hands.Count == 1) {
-          throwController.OnThrow(this, hands.Query().First());
+        if (controllers.Count == 1) {
+          throwController.OnThrow(this, controllers.Query().First());
         }
 
-        OnObjectGraspEnd(hands);
+        OnGraspEnd();
 
         if (_justGrasped) _justGrasped = false;
       }
     }
 
-    public virtual void StayGrasped(List<InteractionHand> hands) {
+    public void StayGrasped(List<InteractionController> controllers) {
       if (moveObjectWhenGrasped) {
         Vector3    origPosition = rigidbody.position;
         Quaternion origRotation = rigidbody.rotation;
@@ -1106,28 +1150,28 @@ namespace Leap.Unity.Interaction {
                                                                : (IGraspedMovementController)_nonKinematicHoldingMovement;
         holdingMovementController.MoveTo(newPosition, newRotation, this, _justGrasped);
 
-        OnGraspedMovement(origPosition, origRotation, newPosition, newRotation, hands);
+        OnGraspedMovement(origPosition, origRotation, newPosition, newRotation, controllers);
 
-        throwController.OnHold(this, hands);
+        throwController.OnHold(this, controllers);
       }
 
-      OnGraspStay(hands);
+      OnGraspStay();
 
       _justGrasped = false;
     }
 
-    protected InteractionHand _suspendingController = null;
+    protected InteractionController _suspendingController = null;
 
-    public virtual void BeginSuspension(InteractionHand hand) {
-      _suspendingController = hand;
+    public void BeginSuspension(InteractionController controller) {
+      _suspendingController = controller;
 
-      OnSuspensionBegin(hand);
+      OnSuspensionBegin(controller);
     }
 
-    public virtual void EndSuspension(InteractionHand hand) {
+    public void EndSuspension(InteractionController controller) {
       _suspendingController = null;
 
-      OnSuspensionEnd(hand);
+      OnSuspensionEnd(controller);
     }
 
     #endregion
@@ -1198,7 +1242,7 @@ namespace Leap.Unity.Interaction {
     /// <summary>
     /// Recursively searches the hierarchy of this Interaction object to
     /// find all of the Colliders that are attached to its Rigidbody. These will
-    /// be the colliders used to calculate distance from the hand to determine
+    /// be the colliders used to calculate distance from the controller to determine
     /// which object will become the primary hover.
     /// 
     /// Call this method manually if you change an Interaction object's colliders
@@ -1251,7 +1295,9 @@ namespace Leap.Unity.Interaction {
       if (this.gameObject.layer != layer) {
         this.gameObject.layer = layer;
         for (int i = 0; i < _interactionColliders.Count; i++) {
-          if (_interactionColliders[i].gameObject.layer != layer) _interactionColliders[i].gameObject.layer = layer;
+          if (_interactionColliders[i].gameObject.layer != layer) {
+            _interactionColliders[i].gameObject.layer = layer;
+          }
         }
       }
     }
@@ -1335,69 +1381,78 @@ namespace Leap.Unity.Interaction {
     private EnumEventTable _eventTable;
 
     public enum EventType {
-      HandHoverBegin = 100,
-      HandHoverEnd = 101,
+      HoverBegin = 100,
+      HoverEnd = 101,
       HoverStay = 102,
-      ObjectHoverBegin = 110,
-      ObjectHoverEnd = 111,
+      PerControllerHoverBegin = 110,
+      PerControllerHoverEnd = 111,
 
-      HandPrimaryHoverBegin = 120,
-      HandPrimaryHoverEnd = 121,
+      PrimaryHoverBegin = 120,
+      PrimaryHoverEnd = 121,
       PrimaryHoverStay = 122,
-      ObjectPrimaryHoverBegin = 130,
-      ObjectPrimaryHoverEnd = 132,
+      PerControllerPrimaryHoverBegin = 130,
+      PerControllerPrimaryHoverEnd = 132,
 
-      HandGraspBegin = 140,
-      HandGraspEnd = 141,
+      GraspBegin = 140,
+      GraspEnd = 141,
       GraspStay = 142,
-      ObjectGraspBegin = 150,
-      ObjectGraspEnd = 152,
+      PerControllerGraspBegin = 150,
+      PerControllerGraspEnd = 152,
 
       SuspensionBegin = 160,
       SuspensionEnd = 161,
 
-      HandContactBegin = 170,
-      HandContactEnd = 171,
+      ContactBegin = 170,
+      ContactEnd = 171,
       ContactStay = 172,
-      ObjectContactBegin = 180,
-      ObjectContactEnd = 181
+      PerControllerContactBegin = 180,
+      PerControllerContactEnd = 181
     }
 
     private void InitUnityEvents() {
-      setupCallback(ref OnPerHandHoverBegin,           EventType.HandHoverBegin);
-      setupCallback(ref OnHandHoverEnd,             EventType.HandHoverEnd);
-      setupCallback(ref OnHoverStay,                EventType.HoverStay);
-      setupCallback(ref OnHoverBegin,         EventType.ObjectHoverBegin);
-      setupCallback(ref OnObjectHoverEnd,           EventType.ObjectHoverEnd);
+      setupCallback(ref OnHoverBegin,                     EventType.HoverBegin);
+      setupCallback(ref OnHoverEnd,                       EventType.HoverEnd);
+      setupCallback(ref OnHoverStay,                      EventType.HoverStay);
+      setupCallback(ref OnPerControllerHoverBegin,        EventType.PerControllerHoverBegin);
+      setupCallback(ref OnPerControllerHoverEnd,          EventType.PerControllerHoverEnd);
 
-      setupCallback(ref OnHandPrimaryHoverBegin,    EventType.HandPrimaryHoverBegin);
-      setupCallback(ref OnHandPrimaryHoverEnd,      EventType.HandPrimaryHoverEnd);
-      setupCallback(ref OnPrimaryHoverStay,         EventType.PrimaryHoverStay);
-      setupCallback(ref OnObjectPrimaryHoverBegin,  EventType.ObjectPrimaryHoverBegin);
-      setupCallback(ref OnObjectPrimaryHoverEnd,    EventType.ObjectPrimaryHoverEnd);
+      setupCallback(ref OnPrimaryHoverBegin,              EventType.PrimaryHoverBegin);
+      setupCallback(ref OnPrimaryHoverEnd,                EventType.PrimaryHoverEnd);
+      setupCallback(ref OnPrimaryHoverStay,               EventType.PrimaryHoverStay);
+      setupCallback(ref OnPerControllerPrimaryHoverBegin, EventType.PerControllerPrimaryHoverBegin);
+      setupCallback(ref OnPerControllerPrimaryHoverEnd,   EventType.PerControllerPrimaryHoverEnd);
 
-      setupCallback(ref OnHandGraspBegin,           EventType.HandGraspBegin);
-      setupCallback(ref OnHandGraspEnd,             EventType.HandGraspEnd);
-      setupCallback(ref OnGraspStay,                EventType.GraspStay);
-      setupCallback(ref OnObjectGraspBegin,         EventType.ObjectGraspBegin);
-      setupCallback(ref OnObjectGraspEnd,           EventType.ObjectGraspEnd);
+      setupCallback(ref OnGraspBegin,                     EventType.GraspBegin);
+      setupCallback(ref OnGraspEnd,                       EventType.GraspEnd);
+      setupCallback(ref OnGraspStay,                      EventType.GraspStay);
+      setupCallback(ref OnPerControllerGraspBegin,        EventType.PerControllerGraspBegin);
+      setupCallback(ref OnPerControllerGraspEnd,          EventType.PerControllerGraspEnd);
 
-      setupCallback(ref OnSuspensionBegin,          EventType.SuspensionBegin);
-      setupCallback(ref OnSuspensionEnd,            EventType.SuspensionEnd);
+      setupCallback(ref OnSuspensionBegin,                EventType.SuspensionBegin);
+      setupCallback(ref OnSuspensionEnd,                  EventType.SuspensionEnd);
 
-      setupCallback(ref OnHandContactBegin,         EventType.HandContactBegin);
-      setupCallback(ref OnHandContactEnd,           EventType.HandContactEnd);
-      setupCallback(ref OnContactStay,              EventType.ContactStay);
-      setupCallback(ref OnObjectContactBegin,       EventType.ObjectContactBegin);
-      setupCallback(ref OnObjectContactEnd,         EventType.ObjectContactEnd);
+      setupCallback(ref OnContactBegin,                   EventType.ContactBegin);
+      setupCallback(ref OnContactEnd,                     EventType.ContactEnd);
+      setupCallback(ref OnContactStay,                    EventType.ContactStay);
+      setupCallback(ref OnPerControllerContactBegin,      EventType.PerControllerContactBegin);
+      setupCallback(ref OnPerControllerContactEnd,        EventType.PerControllerContactEnd);
+    }
+
+    private void setupCallback(ref Action action, EventType type) {
+      if (_eventTable.HasUnityEvent((int)type)) {
+        action += () => _eventTable.Invoke((int)type);
+      }
+      else {
+        action += () => { };
+      }
     }
 
     private void setupCallback<T>(ref Action<T> action, EventType type) {
       if (_eventTable.HasUnityEvent((int)type)) {
-        action += h => _eventTable.Invoke((int)type);
+        action += (h) => _eventTable.Invoke((int)type);
       }
       else {
-        action += h => { };
+        action += (h) => { };
       }
     }
 

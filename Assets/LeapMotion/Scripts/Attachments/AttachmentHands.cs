@@ -84,6 +84,13 @@ namespace Leap.Unity.Attachments {
     }
 
     void Update() {
+      #if UNITY_EDITOR
+      PrefabType prefabType = PrefabUtility.GetPrefabType(this.gameObject);
+      if (prefabType == PrefabType.Prefab || prefabType == PrefabType.ModelPrefab) {
+        return;
+      }
+      #endif
+
       bool requiresReinitialization = false;
 
       using (new ProfilerSample("Attachment Hands Update", this.gameObject)) {
@@ -97,13 +104,13 @@ namespace Leap.Unity.Attachments {
 
           var leapHand = handAccessors[i]();
 
-#if UNITY_EDITOR
+          #if UNITY_EDITOR
           if (Hands.Provider != null) {
             if (leapHand == null && !Application.isPlaying) {
               leapHand = TestHandFactory.MakeTestHand(0, i, i == 0).TransformedCopy(UnityMatrixExtension.GetLeapMatrix(Hands.Provider.transform));
             }
           }
-#endif
+          #endif
 
           using (new ProfilerSample(attachmentHand.gameObject.name + " Update Points")) {
             foreach (var point in attachmentHand.points) {

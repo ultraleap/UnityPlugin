@@ -16,7 +16,7 @@ namespace Leap.Unity.Examples {
       _intObj.OnGraspedMovement += onGraspedMovement;
     }
 
-    private void onGraspedMovement(Vector3 presolvePos, Quaternion presolveRot, Vector3 solvedPos, Quaternion solvedRot, List<InteractionHand> hands) {
+    private void onGraspedMovement(Vector3 presolvePos, Quaternion presolveRot, Vector3 solvedPos, Quaternion solvedRot, List<InteractionController> controllers) {
       /* 
        * The RotationHandle works very similarly to the TranslationHandle.
        * 

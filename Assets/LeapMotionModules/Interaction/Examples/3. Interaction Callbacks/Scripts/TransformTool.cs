@@ -19,7 +19,8 @@ namespace Leap.Unity.Examples {
   [AddComponentMenu("")]
   public class TransformTool : MonoBehaviour {
 
-    [Tooltip("The scene's InteractionManager, used to get InteractionHands and manage handle state.")]
+    [Tooltip("The scene's InteractionManager, used to get InteractionControllers and "
+           + "manage handle state.")]
     public InteractionManager interactionManager;
 
     [Tooltip("The target object to be moved by this tool.")]
@@ -34,14 +35,15 @@ namespace Leap.Unity.Examples {
     private ToolState _toolState = ToolState.Idle;
     private HashSet<TransformHandle> _activeHandles = new HashSet<TransformHandle>();
 
-    private HashSet<TransformTranslationHandle.TranslationAxis> _activeTranslationAxes = new HashSet<TransformTranslationHandle.TranslationAxis>();
+    private HashSet<TranslationAxis> _activeTranslationAxes = new HashSet<TranslationAxis>();
 
     void Start() {
       foreach (var handle in GetComponentsInChildren<TransformHandle>()) {
         _transformHandles.Add(handle);
       }
 
-      // PhysicsCallbacks is useful for creating explicit pre-physics and post-physics behaviour.
+      // PhysicsCallbacks is useful for creating explicit pre-physics and post-physics
+      // behaviour.
       PhysicsCallbacks.OnPostPhysics += onPostPhysics;
     }
 
@@ -69,16 +71,17 @@ namespace Leap.Unity.Examples {
     }
 
     private void onPostPhysics() {
-      // Hooked up via PhysicsCallbacks in Start(), this method will run after FixedUpdate
-      // and after PhysX has run. We take the opportunity to immediately manipulate the
-      // target object's and this object's transforms using the accumulated information
-      // about movement and rotation from the Transform Handles.
+      // Hooked up via PhysicsCallbacks in Start(), this method will run after
+      // FixedUpdate and after PhysX has run. We take the opportunity to immediately
+      // manipulate the target object's and this object's transforms using the
+      // accumulated information about movement and rotation from the Transform Handles.
 
       // Apply accumulated movement and rotation to target object.
       target.transform.rotation = _rotateBuffer * target.transform.rotation;
       this.transform.rotation = target.transform.rotation;
 
-      // Match this transform with the target object's (this will move child TransformHandles' transforms).
+      // Match this transform with the target object's (this will move child
+      // TransformHandles' transforms).
       target.transform.position += _moveBuffer;
       this.transform.position = target.transform.position;
 
@@ -103,13 +106,17 @@ namespace Leap.Unity.Examples {
           // Find the closest handle to any InteractionHand.
           TransformHandle closestHandleToAnyHand = null;
           float closestHandleDist = float.PositiveInfinity;
-          foreach (var intHand in interactionManager.interactionHands.Query().Where(hand => hand.isTracked)) {
-            if (!intHand.isPrimaryHovering) continue;
-            TransformHandle testHandle = intHand.primaryHoveredObject.GetComponent<TransformHandle>();
+          foreach (var intController in interactionManager.interactionControllers
+                                                          .Query()
+                                                          .Where(controller => controller.isTracked)) {
+            if (!intController.isPrimaryHovering) continue;
+            TransformHandle testHandle = intController.primaryHoveredObject
+                                                      .gameObject
+                                                      .GetComponent<TransformHandle>();
 
             if (testHandle == null || !_transformHandles.Contains(testHandle)) continue;
 
-            float testDist = intHand.primaryHoveredDistance;
+            float testDist = intController.primaryHoverDistance;
             if (testDist < closestHandleDist) {
               closestHandleToAnyHand = testHandle;
               closestHandleDist = testDist;
@@ -182,7 +189,8 @@ namespace Leap.Unity.Examples {
 
         case ToolState.Translating:
           if (handle is TransformRotationHandle) {
-            Debug.LogError("Error: Can't rotate a transform while it is already being translated.");
+            Debug.LogError("Error: Can't rotate a transform while it is already being "
+                         + "translated.");
           }
           else {
             _activeHandles.Add(handle);
@@ -191,7 +199,8 @@ namespace Leap.Unity.Examples {
           break;
 
         case ToolState.Rotating:
-          Debug.LogError("Error: Only one handle can be active while a transform is being rotated.");
+          Debug.LogError("Error: Only one handle can be active while a transform is being "
+                       + "rotated.");
           break;
       }
     }

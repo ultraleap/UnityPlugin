@@ -21,16 +21,19 @@ namespace Leap.Unity.Interaction {
   public interface IThrowController {
 
     /// <summary>
-    /// Called every FixedUpdate frame while an Interaction object is being held.
+    /// Called every FixedUpdate frame while an interaction object is being held.
     /// </summary>
     /// <param name="intObj">The interaction object being held.</param>
-    /// <param name="hands">A list of the hands currently holding the object.</param>
-    void OnHold(InteractionBehaviour intObj, ReadonlyList<InteractionHand> hands);
+    /// <param name="hands">A list of the interaction controllers currently grasping
+    /// the object.</param>
+    void OnHold(InteractionBehaviour intObj,
+               ReadonlyList<InteractionController> controllers);
 
     /// <summary>
-    /// Called when an Interaction object is released by the last hands holding it.
+    /// Called when an Interaction object is released by the last interaction controller
+    /// holding it.
     /// </summary>
-    void OnThrow(InteractionBehaviour intObj, InteractionHand hand);
+    void OnThrow(InteractionBehaviour intObj, InteractionController controller);
 
   }
 

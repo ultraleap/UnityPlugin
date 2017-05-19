@@ -193,12 +193,12 @@ namespace Leap.Unity.Interaction {
       set {
         if (interactionBehaviour != null) {
           // Prevent duplicate subscription.
-          interactionBehaviour.OnObjectGraspEnd -= tryToAnchorOnObjectGraspEnd;
+          interactionBehaviour.OnGraspEnd -= tryToAnchorOnGraspEnd;
         }
 
         _tryAnchorNearestOnGraspEnd = value;
         if (interactionBehaviour != null && _tryAnchorNearestOnGraspEnd) {
-          interactionBehaviour.OnObjectGraspEnd += tryToAnchorOnObjectGraspEnd;
+          interactionBehaviour.OnGraspEnd += tryToAnchorOnGraspEnd;
         }
       }
     }
@@ -284,10 +284,10 @@ namespace Leap.Unity.Interaction {
       refreshInspectorConveniences();
 
       if (interactionBehaviour != null) {
-        interactionBehaviour.OnObjectGraspBegin += detachAnchorOnObjectGraspBegin;
+        interactionBehaviour.OnGraspBegin += detachAnchorOnGraspBegin;
 
         if (_tryAnchorNearestOnGraspEnd) {
-          interactionBehaviour.OnObjectGraspEnd += tryToAnchorOnObjectGraspEnd;
+          interactionBehaviour.OnGraspEnd += tryToAnchorOnGraspEnd;
         }
       }
 
@@ -332,8 +332,8 @@ namespace Leap.Unity.Interaction {
 
     void OnDestroy() {
       if (interactionBehaviour != null) {
-        interactionBehaviour.OnObjectGraspBegin -= detachAnchorOnObjectGraspBegin;
-        interactionBehaviour.OnObjectGraspEnd -= tryToAnchorOnObjectGraspEnd;
+        interactionBehaviour.OnGraspBegin -= detachAnchorOnGraspBegin;
+        interactionBehaviour.OnGraspEnd -= tryToAnchorOnGraspEnd;
       }
 
       // Make sure we don't leave dangling anchor-preference state.
@@ -757,13 +757,11 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    /// <summary> Wrapper method to match OnObjectGraspBegin method signature. </summary>
-    private void detachAnchorOnObjectGraspBegin(List<InteractionHand> hands) {
+    private void detachAnchorOnGraspBegin() {
       Detach();
     }
 
-    /// <summary> Wrapper method to match OnObjectGraspEnd method signature. </summary>
-    private void tryToAnchorOnObjectGraspEnd(List<InteractionHand> hands) {
+    private void tryToAnchorOnGraspEnd() {
       TryAttachToNearestAnchor();
 
       OnPostTryAnchorOnGraspEnd(this);

@@ -111,21 +111,21 @@ namespace Leap.Unity.Interaction {
       base.Update();
 
       if (isDepressed || isGrasped) {
-        CalculateSliderValues();
+        calculateSliderValues();
       }
     }
 
     protected override void OnEnable() {
       base.OnEnable();
-      OnContactStay += CalculateSliderValues;
+      OnContactStay += calculateSliderValues;
     }
 
     protected override void OnDisable() {
-      OnContactStay -= CalculateSliderValues;
+      OnContactStay -= calculateSliderValues;
       base.OnDisable();
     }
 
-    private void CalculateSliderValues(List<InteractionHand> hands = null) {
+    private void calculateSliderValues() {
       //Calculate the Renormalized Slider Values
       if (_horizontalSlideLimits.x != _horizontalSlideLimits.y) {
         _horizontalSliderPercent = Mathf.InverseLerp(initialLocalPosition.x + _horizontalSlideLimits.x, initialLocalPosition.x + _horizontalSlideLimits.y, localPhysicsPosition.x);
@@ -138,7 +138,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    protected override Vector3 GetDepressedConstrainedLocalPosition(Vector3 desiredOffset) {
+    protected override Vector3 getDepressedConstrainedLocalPosition(Vector3 desiredOffset) {
       return new Vector3(Mathf.Clamp((localPhysicsPosition.x + desiredOffset.x), initialLocalPosition.x + _horizontalSlideLimits.x, initialLocalPosition.x + _horizontalSlideLimits.y),
                          Mathf.Clamp((localPhysicsPosition.y + desiredOffset.y), initialLocalPosition.y + _verticalSlideLimits.x, initialLocalPosition.y + _verticalSlideLimits.y),
                                      (localPhysicsPosition.z + desiredOffset.z));

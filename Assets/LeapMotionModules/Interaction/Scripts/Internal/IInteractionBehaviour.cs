@@ -30,7 +30,8 @@ namespace Leap.Unity.Interaction.Internal {
     // Properties for interaction.
     InteractionManager  manager    { get; }
     Rigidbody           rigidbody  { get; }
-    ISpaceComponent     space      { get; } // OK to return null if this object is not in curved space.
+    ISpaceComponent     space      { get; } // OK to return null if this object is not in
+                                            // curved space.
 
     // Interaction overrides.
     IgnoreHoverMode ignoreHoverMode    { get; }
@@ -54,30 +55,30 @@ namespace Leap.Unity.Interaction.Internal {
 
     // Hover
     float GetHoverDistance(Vector3 worldPosition);
-    void BeginHover(List<InteractionControllerBase> beganHovering);
-    void EndHover(List<InteractionControllerBase> endedHovering);
-    void StayHovered(List<InteractionControllerBase> currentlyHovering);
+    void BeginHover(List<InteractionController> beganHovering);
+    void EndHover(List<InteractionController> endedHovering);
+    void StayHovered(List<InteractionController> currentlyHovering);
 
     // Primary hover
-    void BeginPrimaryHover(List<InteractionControllerBase> beganPrimaryHovering);
-    void EndPrimaryHover(List<InteractionControllerBase> endedPrimaryHovering);
-    void StayPrimaryHovered(List<InteractionControllerBase> currentlyPrimaryHovering);
+    void BeginPrimaryHover(List<InteractionController> beganPrimaryHovering);
+    void EndPrimaryHover(List<InteractionController> endedPrimaryHovering);
+    void StayPrimaryHovered(List<InteractionController> currentlyPrimaryHovering);
 
     // Contact
-    void BeginContact(List<InteractionControllerBase> beganContact);
-    void EndContact(List<InteractionControllerBase> endedContact);
-    void StayContacted(List<InteractionControllerBase> currentlyContacting);
+    void BeginContact(List<InteractionController> beganContact);
+    void EndContact(List<InteractionController> endedContact);
+    void StayContacted(List<InteractionController> currentlyContacting);
 
     // Grasping
     bool isGrasped { get; }
-    void BeginGrasp(List<InteractionControllerBase> beganGrasping);
-    void EndGrasp(List<InteractionControllerBase> endedGrasping);
-    void StayGrasped(List<InteractionControllerBase> currentlyGrasping);
+    void BeginGrasp(List<InteractionController> beganGrasping);
+    void EndGrasp(List<InteractionController> endedGrasping);
+    void StayGrasped(List<InteractionController> currentlyGrasping);
 
     // Suspension
     bool isSuspended { get; }
-    void BeginSuspension(InteractionControllerBase beganSuspending);
-    void EndSuspension(InteractionControllerBase endedSuspending);
+    void BeginSuspension(InteractionController beganSuspending);
+    void EndSuspension(InteractionController endedSuspending);
 
   }
 

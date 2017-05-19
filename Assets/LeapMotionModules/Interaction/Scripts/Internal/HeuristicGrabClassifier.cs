@@ -62,7 +62,8 @@ namespace Leap.Unity.Interaction.Internal {
 
     public void FixedUpdateClassifierHandState() {
       using (new ProfilerSample("Update Classifier Hand State")) {
-        var hand = interactionHand.GetLastTrackedLeapHand();
+        var hand = interactionHand.leapHand;
+
         if (interactionHand.isTracked) {
           // Ensure that all scale dependent variables are properly set.
           _scaledGrabParams.FINGERTIP_RADIUS = _defaultGrabParams.FINGERTIP_RADIUS
@@ -86,13 +87,14 @@ namespace Leap.Unity.Interaction.Internal {
     public bool FixedUpdateClassifierGrasp(out IInteractionBehaviour graspedObject) {
       using (new ProfilerSample("Update Grab Classifier - Grasp", interactionHand.manager)) {
         graspedObject = null;
-        if (interactionHand.isGraspingObject || interactionHand.GetLeapHand() == null) {
-          // Cannot grasp another object with an untracked hand or while the hand is already grasping an object.
+        if (interactionHand.isGraspingObject || !interactionHand.isTracked) {
+          // Cannot grasp another object with an untracked hand or while the hand is
+          // already grasping an object or if the hand is not tracked.
           return false;
         }
 
         foreach (var interactionObj in interactionHand.graspCandidates) {
-          if (UpdateBehaviour(interactionObj, interactionHand.GetLastTrackedLeapHand(), graspMode: GraspUpdateMode.BeginGrasp)) {
+          if (UpdateBehaviour(interactionObj, interactionHand.leapHand, graspMode: GraspUpdateMode.BeginGrasp)) {
             graspedObject = interactionObj;
             return true;
           }
@@ -110,7 +112,7 @@ namespace Leap.Unity.Interaction.Internal {
           return false;
         }
 
-        if (UpdateBehaviour(interactionHand.graspedObject, interactionHand.GetLastTrackedLeapHand(), graspMode: GraspUpdateMode.ReleaseGrasp)) {
+        if (UpdateBehaviour(interactionHand.graspedObject, interactionHand.leapHand, graspMode: GraspUpdateMode.ReleaseGrasp)) {
           releasedObject = interactionHand.graspedObject;
           return true;
         }

@@ -1030,7 +1030,7 @@ MonoBehaviour:
   interactionBehaviour: {fileID: 0}
   _interactionBehaviourIsNull: 1
   detachWhenGrasped: 0
-  tryAnchorNearestOnGraspEnd: 1
+  _tryAnchorNearestOnGraspEnd: 1
   isAttractedByHand: 0
   maxAttractionReach: 0.1
   attractionReachByDistance:
@@ -1052,7 +1052,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29207d17cdd06e84d9fecbdef2401c1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 1454829696}
+  _hoverEnabled: 1
+  _contactEnabled: 1
+  _graspingEnabled: 1
+  manager: {fileID: 1454829696}
+  _handDataMode: 0
 --- !u!1 &294359493
 GameObject:
   m_ObjectHideFlags: 0
@@ -1318,8 +1322,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useHover: 1
-  usePrimaryHover: 0
+  useHover: 0
+  usePrimaryHover: 1
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &355002484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1334,6 +1343,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHoverMode: 1
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 0
   _contactForceMode: 1
@@ -1720,7 +1731,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29207d17cdd06e84d9fecbdef2401c1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionManager: {fileID: 1454829696}
+  _hoverEnabled: 1
+  _contactEnabled: 1
+  _graspingEnabled: 1
+  manager: {fileID: 1454829696}
+  _handDataMode: 1
 --- !u!1 &824489013
 GameObject:
   m_ObjectHideFlags: 0
@@ -2016,58 +2031,14 @@ MonoBehaviour:
   targetTransform: {fileID: 1696142831}
   startTransform: {fileID: 1617690577}
   endTransform: {fileID: 1630340752}
+  startAtEnd: 0
   tweenLocalPosition: 1
   tweenLocalRotation: 1
   tweenLocalScale: 1
   tweenDuration: 0.2
   tweenSmoothType: 2
-  OnProgress:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: Leap.Unity.Animation.TransformTweenBehaviour+FloatEvent, Assembly-CSharp,
-      Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
-  OnLeaveStart:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 824489013}
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnReachEnd:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnLeaveEnd:
-    m_PersistentCalls:
-      m_Calls: []
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
-  OnReachStart:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 824489013}
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine, Version=0.0.0.0, Culture=neutral,
-      PublicKeyToken=null
+  _eventTable:
+    _entries: []
 --- !u!1001 &1078186970
 Prefab:
   m_ObjectHideFlags: 0
@@ -3158,9 +3129,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0625e574c0d47a241b7dfc7a8c67ca2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enableHovering: 1
-  enableContact: 1
-  enableGrasping: 1
   _showAdvancedSettings: 1
   hoverActivationRadius: 0.2
   touchActivationRadius: 0.075
@@ -3173,7 +3141,7 @@ MonoBehaviour:
     layerIndex: 9
   _contactBoneLayer:
     layerIndex: 10
-  _drawHandRuntimeGizmos: 0
+  _drawControllerRuntimeGizmos: 0
 --- !u!1 &1466310008
 GameObject:
   m_ObjectHideFlags: 0
@@ -3687,8 +3655,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useHover: 1
-  usePrimaryHover: 0
+  useHover: 0
+  usePrimaryHover: 1
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1820967667
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3703,6 +3676,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHoverMode: 1
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 1
   _contactForceMode: 1
@@ -3842,8 +3817,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useHover: 1
-  usePrimaryHover: 0
+  useHover: 0
+  usePrimaryHover: 1
+  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
+  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  pressedColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1960169091
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3858,6 +3838,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _manager: {fileID: 0}
   _ignoreHoverMode: 1
+  _isIgnoringAllHoverState: 0
+  _ignorePrimaryHover: 0
   _ignoreContact: 0
   _ignoreGrasping: 1
   _contactForceMode: 1

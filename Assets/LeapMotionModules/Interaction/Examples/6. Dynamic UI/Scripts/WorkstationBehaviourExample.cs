@@ -126,7 +126,9 @@ namespace Leap.Unity.Examples {
       _anchObj.OnPostTryAnchorOnGraspEnd += onPostObjectGraspEnd;
     }
 
-    private void onGraspedMovement(Vector3 preSolvePos, Quaternion preSolveRot, Vector3 curPos, Quaternion curRot, List<InteractionHand> hands) {
+    private void onGraspedMovement(Vector3 preSolvePos, Quaternion preSolveRot,
+                                   Vector3 curPos, Quaternion curRot,
+                                   List<InteractionController> controllers) {
       // If the workstation is not fully open when grasped, close it.
       if (workstationState == WorkstationState.Opening) {
         DeactivateWorkstation();

@@ -8,17 +8,21 @@
  ******************************************************************************/
 
 using InteractionEngineUtility;
+using Leap.Unity.Interaction.Internal;
 using Leap.Unity.RuntimeGizmos;
 using Leap.Unity.Space;
-using Leap.Unity.Interaction.Internal;
+using Leap.Unity.Query;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction {
 
-  public class InteractionHand : InteractionControllerBase {
+  public enum HandDataMode { PlayerLeft, PlayerRight, Custom }
+
+  public class InteractionHand : InteractionController {
 
     /// <summary>
     /// Gets whether the underlying Leap hand is currently tracked.
@@ -27,20 +31,30 @@ namespace Leap.Unity.Interaction {
 
     /// <summary>
     /// Gets the last tracked state of the Leap hand.
+    /// 
+    /// Note for those using the Leap Graphical Renderer: If the hand required warping
+    /// due to the nearby presence of an object in warped (curved) space, this will
+    /// return the hand as warped from that object's curved space into the rectilinear
+    /// space containing its colliders. This is only relevant if you are using the Leap
+    /// Graphical Renderer to render curved, interactive objects.
     /// </summary>
-    /// <remarks>
-    /// If the hand required warping due to the nearby presence of an object
-    /// in warped (curved) space, this will return the hand as warped from that
-    /// object's curved space into rectilinear space. This is only relevant if
-    /// you are using the Leap Graphical Renderer to render curved interfaces.
-    /// </remarks>
     public Hand leapHand { get { return _unwarpedHandData; } }
 
+    private bool _lastCustomHandWasLeft = false;
     /// <summary>
     /// Gets whether the underlying tracked Leap hand is a left hand.
     /// </summary>
     public override bool isLeft {
-      get { return isTracked ? false : leapHand.IsLeft; }
+      get {
+        switch (handDataMode) {
+          case HandDataMode.PlayerLeft:
+            return true;
+          case HandDataMode.PlayerRight:
+            return false;
+          case HandDataMode.Custom: default:
+            return _lastCustomHandWasLeft;
+        }
+      }
     }
 
     /// <summary>
@@ -83,6 +97,130 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     private Hand _hand;
 
+    [Tooltip("Should the data for the underlying Leap hand come from the player's left "
+           + "hand or their right hand? Alternatively, you can set this mode to Custom "
+           + "to specify accessor functions manually via script (recommended for advanced "
+           + "users only).")]
+    [SerializeField, EditTimeOnly]
+    private HandDataMode _handDataMode;
+    public HandDataMode handDataMode {
+      get { return _handDataMode; }
+      set {
+        // TODO: Do validation if this is modified!
+        _handDataMode = value;
+      }
+    }
+
+    private LeapProvider _leapProvider;
+    /// <summary>
+    /// If the hand data mode for this InteractionHand is set to Custom, you must also
+    /// manually specify the provider from which to retrieve Leap frames containing
+    /// hand data.
+    /// </summary>
+    public LeapProvider leapProvider {
+      get { return _leapProvider; }
+      set {
+        if (_leapProvider != null && Application.isPlaying) {
+          _leapProvider.OnFixedFrame -= onProviderFixedFrame;
+        }
+
+        _leapProvider = value;
+
+        if (_leapProvider != null && Application.isPlaying) {
+          _leapProvider.OnFixedFrame += onProviderFixedFrame;
+        }
+      }
+    }
+
+    private Func<Leap.Frame, Leap.Hand> _handAccessorFunc;
+    /// <summary>
+    /// If the hand data mode for this InteractionHand is set to Custom, you must
+    /// manually specify how this InteractionHand should retrieve a specific Hand data
+    /// object from a Leap frame.
+    /// </summary>
+    public Func<Leap.Frame, Leap.Hand> handAccessorFunc {
+      get { return _handAccessorFunc; }
+      set { _handAccessorFunc = value; }
+    }
+
+    protected override void Start() {
+      base.Start();
+
+      // Check manual configuration if data mode is custom.
+      if (handDataMode == HandDataMode.Custom) {
+        if (leapProvider == null) {
+          Debug.LogError("handDataMode is set to Custom, but no provider is set! "
+                       + "Please add a custom script that will configure the correct "
+                       + "LeapProvider for this InteractionHand before its Start() is "
+                       + "called, or set the handDataMode to a value other than Custom.",
+                       this);
+          return;
+        }
+        else if (handAccessorFunc == null) {
+          Debug.LogError("handDataMode is set to Custom, but no handAccessorFunc has "
+                       + "been set! Please add a custom script that will configure the "
+                       + "hand accessor function that will convert Leap frames into "
+                       + "Leap hand data for this InteractionHand before its Start() "
+                       + "is called, or set the handDataMode to a value other than "
+                       + "Custom.", this);
+          return;
+        }
+      }
+      else { // Otherwise, configure automatically.
+        if (leapProvider == null) {
+          leapProvider = Hands.Provider;
+
+          if (leapProvider == null) {
+            Debug.LogError("No LeapServiceProvider was found in your scene! Please "
+                         + "make sure you have a LeapServiceProvider if you intend to "
+                         + "use Leap hands in your scene.", this);
+            return;
+          }
+        }
+
+        if (handAccessorFunc == null) {
+          if (handDataMode == HandDataMode.PlayerLeft) {
+            handAccessorFunc = (frame) => frame.Hands.Query()
+                                                     .Where(hand => hand.IsLeft)
+                                                     .FirstOrDefault();
+          }
+          else {
+            handAccessorFunc = (frame) => frame.Hands.Query()
+                                                     .Where(hand => hand.IsRight)
+                                                     .FirstOrDefault();
+          }
+        }
+      }
+
+      leapProvider.OnFixedFrame -= onProviderFixedFrame; // avoid double-subscribe
+      leapProvider.OnFixedFrame += onProviderFixedFrame;
+
+      // Set up primary hover point Transforms for three fingertips.
+      // TODO: Support arbitrary fingertips!!!
+      for (int i = 0; i < 3; i++) {
+        Transform fingertipTransform = new GameObject("Fingertip Transform").transform;
+        fingertipTransform.parent = this.transform;
+        _fingertipTransforms.Add(fingertipTransform);
+      }
+    }
+
+    private void onProviderFixedFrame(Leap.Frame frame) {
+      _hand = handAccessorFunc(frame);
+
+      if (_hand != null) {
+        _handData.CopyFrom(_hand);
+        _unwarpedHandData.CopyFrom(_handData);
+
+        refreshPointDataFromHand();
+        _lastCustomHandWasLeft = _unwarpedHandData.IsLeft;
+      }
+
+    }
+
+    protected override void onObjectUnregistered(IInteractionBehaviour intObj) {
+      grabClassifier.UnregisterInteractionBehaviour(intObj);
+    }
+
     protected override void getColliderBoneTargetPositionRotation(int contactBoneIndex,
                                                                   out Vector3 targetPosition,
                                                                   out Quaternion targetRotation) {
@@ -91,22 +229,9 @@ namespace Leap.Unity.Interaction {
                                                      out targetRotation);
     }
 
-    public void REFRESHHANDDATA() {
-      // TODO: Fixme!
-      // Subscribe hands to the fixed-frame dispatch of the ServiceProvider.
-      // Hands will likely need methods to convert frames into hands.
-
-      // It will need to contain this:
-
-      _unwarpedHandData.CopyFrom(_handData);
-
-      return false; // fix this method D:<
-      // Interaction Manager needs to handle it, or the object itself but via a call
-    }
-
     #region Hovering Controller Implementation
 
-    protected override Vector3 hoverPoint {
+    public override Vector3 hoverPoint {
       get {
         return leapHand.PalmPosition.ToVector3();
       }
@@ -115,7 +240,23 @@ namespace Leap.Unity.Interaction {
     private List<Transform> _fingertipTransforms = new List<Transform>();
     protected override List<Transform> _primaryHoverPoints {
       get {
-        // TODO: return the thing
+
+        return _fingertipTransforms;
+      }
+    }
+
+    private void refreshPointDataFromHand() {
+      refreshPrimaryHoverPoints();
+      refreshGraspManipulatorPoints();
+    }
+
+    private void refreshPrimaryHoverPoints() {
+      // TODO: Make sure this works when setting up arbitrary fingertips!!!
+      // Also this is really inefficient, if we're using this getter a lot
+      for (int i = 0; i < 3; i++) {
+        Finger finger = leapHand.Fingers[i];
+        _fingertipTransforms[i].position = finger.TipPosition.ToVector3();
+        _fingertipTransforms[i].rotation = finger.bones[3].Rotation.ToQuaternion();
       }
     }
 
@@ -139,6 +280,9 @@ namespace Leap.Unity.Interaction {
         handToWarp.Transform(-primaryHoverPoint.position, Quaternion.identity);
         handToWarp.Transform(unwarpedPosition, unwarpedRotation
                                                * Quaternion.Inverse(primaryHoverPoint.rotation));
+
+        // Hand data was modified, so refresh point data.
+        refreshPointDataFromHand();
       }
     }
 
@@ -190,6 +334,7 @@ namespace Leap.Unity.Interaction {
 
     private void initContactBones() {
       _contactBones = new ContactBone[NUM_FINGERS * BONES_PER_FINGER + 1];
+      _handContactBoneMapFunctions = new BoneMapFunc[NUM_FINGERS * BONES_PER_FINGER + 1];
 
       // Finger bones
       for (int fingerIndex = 0; fingerIndex < NUM_FINGERS; fingerIndex++) {
@@ -263,6 +408,7 @@ namespace Leap.Unity.Interaction {
 
       ContactBone contactBone = contactBoneObj.GetComponent<ContactBone>();
       contactBone.collider = boneCollider;
+      contactBone.interactionController = this;
       contactBone.interactionHand = this;
       _contactBones[boneArrayIndex] = contactBone;
 
@@ -369,6 +515,33 @@ namespace Leap.Unity.Interaction {
     #endregion
 
     #region Grasp Controller Implementation
+
+    private List<Vector3> _graspManipulatorPoints = new List<Vector3>();
+    public override List<Vector3> graspManipulatorPoints {
+      get {
+        return _graspManipulatorPoints;
+      }
+    }
+
+    private void refreshGraspManipulatorPoints() {
+      int bufferIndex = 0;
+      for (int i = 0; i < NUM_FINGERS; i++) {
+        for (int boneIdx = 0; boneIdx < 2; boneIdx++) {
+          // Update or add knuckle-joint and first-finger-bone positions as the grasp
+          // manipulator points for this Hand.
+
+          Vector3 point = leapHand.Fingers[i].bones[boneIdx].NextJoint.ToVector3();
+
+          if (_graspManipulatorPoints.Count - 1 < bufferIndex) {
+            _graspManipulatorPoints.Add(point);
+          }
+          else {
+            _graspManipulatorPoints[bufferIndex] = point;
+          }
+          bufferIndex += 1;
+        }
+      }
+    }
 
     private HeuristicGrabClassifier _grabClassifier;
     /// <summary>

@@ -20,8 +20,8 @@ namespace Leap.Unity.Examples {
 
     protected virtual void Start() {
       _intObj = GetComponent<InteractionBehaviour>();
-      _intObj.OnObjectGraspBegin += onObjectGraspBegin;
-      _intObj.OnObjectGraspEnd += onObjectGraspEnd;
+      _intObj.OnGraspBegin += onGraspBegin;
+      _intObj.OnGraspEnd += onGraspEnd;
 
       _tool = GetComponentInParent<TransformTool>();
       if (_tool == null) Debug.LogError("No TransformTool found in a parent GameObject.");
@@ -32,13 +32,13 @@ namespace Leap.Unity.Examples {
       _intObj.rigidbody.rotation = this.transform.rotation;
     }
 
-    private void onObjectGraspBegin(List<InteractionHand> hands) {
+    private void onGraspBegin() {
       _tool.NotifyHandleActivated(this);
 
       OnHandleActivated.Invoke();
     }
 
-    private void onObjectGraspEnd(List<InteractionHand> hands) {
+    private void onGraspEnd() {
       _tool.NotifyHandleDeactivated(this);
 
       OnHandleDeactivated.Invoke();

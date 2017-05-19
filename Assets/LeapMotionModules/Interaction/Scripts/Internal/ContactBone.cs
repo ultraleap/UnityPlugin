@@ -27,7 +27,7 @@ namespace Leap.Unity.Interaction.Internal {
     /// ContactBones minimally require references to their InteractionControllerBase,
     /// their Rigidbody, and strictly one (1) collider.
     /// </summary>
-    public InteractionControllerBase interactionController;
+    public InteractionController interactionController;
 
     /// <summary>
     /// The Rigidbody of this ContactBone. This field must not be null for the ContactBone
@@ -39,6 +39,9 @@ namespace Leap.Unity.Interaction.Internal {
     /// The Collider of this ContactBone. This field must not be null for the ContactBone
     /// to work correctly.
     /// </summary>
+    #if UNITY_EDITOR
+    new
+    #endif
     public Collider collider;
 
     /// <summary>
@@ -110,7 +113,7 @@ namespace Leap.Unity.Interaction.Internal {
     void OnCollisionEnter(Collision collision) {
       IInteractionBehaviour interactionObj;
       if (collision.rigidbody == null) {
-        Debug.LogError("Brush Bone collided with non-rigidbody collider: " + collision.collider.name + "."
+        Debug.LogError("Contact Bone collided with non-rigidbody collider: " + collision.collider.name + ". "
                      + "Please enable automatic layer generation in the Interaction Manager, "
                      + "or ensure the Interaction layer only contains Interaction Behaviours.");
       }
@@ -142,7 +145,7 @@ namespace Leap.Unity.Interaction.Internal {
     }
     void OnTriggerEnter(Collider collider) {
       if (collider.attachedRigidbody == null) {
-        Debug.LogError("Brush Bone collided with non-rigidbody collider trigger: " + collider.name + "."
+        Debug.LogError("Contact Bone collided with non-rigidbody collider: " + collider.name + ". "
                      + "Please enable automatic layer generation in the Interaction Manager, "
                      + "or ensure the Interaction layer only contains Interaction Behaviours.");
       }
