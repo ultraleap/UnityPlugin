@@ -37,7 +37,7 @@ GameObject:
   - component: {fileID: 4945874923476290}
   - component: {fileID: 114370018576889794}
   m_Layer: 0
-  m_Name: Interaction Oculus Controller (Right)
+  m_Name: Unity Built-in VR Controller (Right)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
