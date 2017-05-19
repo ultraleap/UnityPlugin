@@ -165,10 +165,10 @@ namespace Leap.Unity.Interaction {
         // If the button is depressed past its limit...
         if (localPhysicsPosition.z > initialLocalPosition.z - minMaxHeight.x) {
           transform.localPosition = new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.x);
-          if (isPrimaryHovered || isGrasped) {
+          if ((isPrimaryHovered && _lastDepressor!=null) || isGrasped) {
             isDepressed = true;
           } else {
-            _physicsPosition = transform.parent.TransformPoint(new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z));
+            _physicsPosition = transform.parent.TransformPoint(new Vector3(localPhysicsPosition.x, localPhysicsPosition.y, initialLocalPosition.z - minMaxHeight.x));
             _physicsVelocity = _physicsVelocity * 0.1f;
             isDepressed = false;
             _lastDepressor = null;
@@ -199,6 +199,7 @@ namespace Leap.Unity.Interaction {
         } else if (!isDepressed && oldDepressed) {
           unDepressedThisFrame = true;
           OnUnpress.Invoke();
+          _lastDepressor = null;
           manager.GetInteractionHand(_handIsLeft).SetInteractionHoverOverride(false);
         }
       }
@@ -227,7 +228,7 @@ namespace Leap.Unity.Interaction {
 
     // Try grabbing the offset between the fingertip and this object...
     private void trySetDepressor(Collision collision) {
-      if (collision.rigidbody != null && _lastDepressor == null && isDepressed
+      if (collision.rigidbody != null && _lastDepressor == null && (localPhysicsPosition.z > initialLocalPosition.z - minMaxHeight.x)
         && (manager.contactBoneBodies.ContainsKey(collision.collider.attachedRigidbody)
             && !this.ShouldIgnoreHover(manager.contactBoneBodies[collision.collider.attachedRigidbody].interactionHand))) {
         _lastDepressor = collision.rigidbody;
