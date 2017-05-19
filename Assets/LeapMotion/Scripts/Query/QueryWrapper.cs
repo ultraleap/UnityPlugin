@@ -81,6 +81,10 @@ namespace Leap.Unity.Query {
       return new QueryWrapper<T, ListQueryOp<T>>(new ListQueryOp<T>(list));
     }
 
+    public static QueryWrapper<T, ReadonlyListQueryOp<T>> Query<T>(this ReadonlyList<T> list) {
+      return new QueryWrapper<T, ReadonlyListQueryOp<T>>(new ReadonlyListQueryOp<T>(list));
+    }
+
     public static QueryWrapper<KeyValuePair<K, V>, EnumerableQueryOp<KeyValuePair<K, V>, Dictionary<K, V>.Enumerator>> Query<T, K, V>(this Dictionary<K, V> dictionary) {
       return new QueryWrapper<KeyValuePair<K, V>, EnumerableQueryOp<KeyValuePair<K, V>, Dictionary<K, V>.Enumerator>>(new EnumerableQueryOp<KeyValuePair<K, V>, Dictionary<K, V>.Enumerator>(dictionary.GetEnumerator()));
     }
@@ -121,6 +125,31 @@ namespace Leap.Unity.Query {
           t = default(T);
           return false;
         } else {
+          t = _list[_index++];
+          return true;
+        }
+      }
+
+      public void Reset() {
+        _index = 0;
+      }
+    }
+
+    public struct ReadonlyListQueryOp<T> : IQueryOp<T> {
+      private ReadonlyList<T> _list;
+      private int _index;
+
+      public ReadonlyListQueryOp(ReadonlyList<T> list) {
+        _list = list;
+        _index = 0;
+      }
+
+      public bool TryGetNext(out T t) {
+        if (_index >= _list.Count) {
+          t = default(T);
+          return false;
+        }
+        else {
           t = _list[_index++];
           return true;
         }

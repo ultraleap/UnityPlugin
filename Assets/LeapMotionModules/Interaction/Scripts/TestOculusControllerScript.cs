@@ -6,9 +6,11 @@ using UnityEngine.VR;
 
 public class TestOculusControllerScript : MonoBehaviour, IRuntimeGizmoComponent {
 
+  public Color leftGizmoColor = Color.blue;
   private Vector3 _leftPosition;
   private Quaternion _leftRotation;
 
+  public Color rightGizmoColor = Color.red;
   private Vector3 _rightPosition;
   private Quaternion _rightRotation;
 
@@ -25,10 +27,12 @@ public class TestOculusControllerScript : MonoBehaviour, IRuntimeGizmoComponent 
   }
 
   public void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
-    drawer.color = Color.blue;
-    drawer.DrawWireSphere(_leftPosition, 0.05F);
+    if (Application.isPlaying) {
+      drawer.color = leftGizmoColor;
+      drawer.DrawWireSphere(_leftPosition, 0.05F);
 
-    drawer.color = Color.red;
-    drawer.DrawWireSphere(_rightPosition, 0.05F);
+      drawer.color = rightGizmoColor;
+      drawer.DrawWireSphere(_rightPosition, 0.05F);
+    }
   }
 }

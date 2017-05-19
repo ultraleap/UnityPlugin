@@ -635,7 +635,8 @@ namespace Leap.Unity.Interaction {
     #region Contact Bones
 
     protected const float DEAD_ZONE_FRACTION = 0.1F;
-    protected const float DISLOCATION_FRACTION = 3.0F;
+
+    public float softContactDisplacementFraction = 3.0F;
 
     private static PhysicMaterial s_defaultContactBoneMaterial;
     protected static PhysicMaterial defaultContactBoneMaterial {
@@ -782,7 +783,7 @@ namespace Leap.Unity.Interaction {
       body.mass = massScale * contactBone._lastObjectTouchedAdjustedMass;
 
       // Potentially enable Soft Contact if our error is too large.
-      if (!_softContactEnabled && errorFraction >= DISLOCATION_FRACTION
+      if (!_softContactEnabled && errorFraction >= softContactDisplacementFraction
           && speed < 1.5F
        /* && boneArrayIndex != NUM_FINGERS * BONES_PER_FINGER */) {
          EnableSoftContact();
@@ -1338,6 +1339,8 @@ namespace Leap.Unity.Interaction {
     /// method to modify its behavior.
     /// </summary>
     public virtual void OnDrawRuntimeGizmos(RuntimeGizmoDrawer drawer) {
+      if (!this.isActiveAndEnabled) return;
+
       if (!softContactEnabled) {
         drawer.color = Color.green;
         if (contactBoneParent != null) {
@@ -1349,6 +1352,20 @@ namespace Leap.Unity.Interaction {
         float radius = _softContactBoneRadius;
         foreach (var pos in _boneTargetPositions) {
           drawer.DrawWireSphere(pos, radius);
+        }
+      }
+
+      // Hover Point
+      if (hoverEnabled) {
+        drawer.color = Color.yellow;
+        drawer.DrawWireSphere(hoverPoint, 0.015F);
+      }
+
+      // Primary Hover Points
+      if (hoverEnabled) {
+        drawer.color = Color.Lerp(Color.red, Color.yellow, 0.5F);
+        foreach (var point in primaryHoverPoints) {
+          drawer.DrawWireSphere(point.position, 0.02F);
         }
       }
     }

@@ -230,7 +230,7 @@ namespace Leap.Unity.Interaction {
     private void trySetDepressor(Collision collision) {
       if (collision.rigidbody != null && _lastDepressor == null && isDepressed
         && (manager.contactBoneBodies.ContainsKey(collision.collider.attachedRigidbody)
-            && !this.ShouldIgnoreHover(manager.contactBoneBodies[collision.collider.attachedRigidbody].interactionHand))) {
+            && !this.ShouldIgnoreHover(manager.contactBoneBodies[collision.collider.attachedRigidbody].interactionController))) {
         _lastDepressor = collision.rigidbody;
         _localDepressorPosition = transform.InverseTransformPoint(collision.rigidbody.position);
       }

@@ -72,7 +72,7 @@ public class SimpleInteractionGlow : MonoBehaviour {
         // state information such as the closest hand that is hovering nearby, if the object
         // is hovered at all.
         if (_intObj.isHovered && useHover) {
-          float glow = Vector3.Distance(_intObj.closestHoveringHand.PalmPosition.ToVector3(), this.transform.position).Map(0F, 0.2F, 1F, 0.0F);
+          float glow = _intObj.closestHoveringControllerDistance.Map(0F, 0.2F, 1F, 0.0F);
           targetColor = Color.Lerp(defaultColor, hoverColor, glow);
         }
       }

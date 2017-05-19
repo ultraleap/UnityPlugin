@@ -24,79 +24,6 @@ namespace Leap.Unity.Interaction {
 
   public class InteractionHand : InteractionController {
 
-    /// <summary>
-    /// Gets whether the underlying Leap hand is currently tracked.
-    /// </summary>
-    public override bool isTracked { get { return _hand != null; } }
-
-    /// <summary>
-    /// Gets the last tracked state of the Leap hand.
-    /// 
-    /// Note for those using the Leap Graphical Renderer: If the hand required warping
-    /// due to the nearby presence of an object in warped (curved) space, this will
-    /// return the hand as warped from that object's curved space into the rectilinear
-    /// space containing its colliders. This is only relevant if you are using the Leap
-    /// Graphical Renderer to render curved, interactive objects.
-    /// </summary>
-    public Hand leapHand { get { return _unwarpedHandData; } }
-
-    private bool _lastCustomHandWasLeft = false;
-    /// <summary>
-    /// Gets whether the underlying tracked Leap hand is a left hand.
-    /// </summary>
-    public override bool isLeft {
-      get {
-        switch (handDataMode) {
-          case HandDataMode.PlayerLeft:
-            return true;
-          case HandDataMode.PlayerRight:
-            return false;
-          case HandDataMode.Custom: default:
-            return _lastCustomHandWasLeft;
-        }
-      }
-    }
-
-    /// <summary>
-    /// Gets the velocity of the underlying tracked Leap hand.
-    /// </summary>
-    public override Vector3 velocity {
-      get { return isTracked ? Vector3.zero : leapHand.PalmVelocity.ToVector3(); }
-    }
-
-    /// <summary>
-    /// Gets the controller type of this InteractionControllerBase. InteractionHands
-    /// are Interaction Engine controllers implemented over Leap hands.
-    /// </summary>
-    public override ControllerType controllerType {
-      get { return ControllerType.Hand; }
-    }
-
-    /// <summary>
-    /// Returns this InteractionHand object. This property will be null if the
-    /// InteractionControllerBase is not ControllerType.Hand.
-    /// </summary>
-    public override InteractionHand intHand {
-      get { return this; }
-    }
-
-    /// <summary>
-    /// A copy of the latest tracked hand data; never null, never warped.
-    /// </summary>
-    private Hand _handData = new Hand();
-
-    /// <summary>
-    /// An unwarped copy of _handData (if unwarping is necessary; otherwise
-    /// identical). Only relevant when using the Leap Graphical Renderer to create
-    /// curved user interfaces.
-    /// </summary>
-    private Hand _unwarpedHandData = new Hand();
-
-    /// <summary>
-    /// Will be null when not tracked, otherwise contains the same data as _handData.
-    /// </summary>
-    private Hand _hand;
-
     [Tooltip("Should the data for the underlying Leap hand come from the player's left "
            + "hand or their right hand? Alternatively, you can set this mode to Custom "
            + "to specify accessor functions manually via script (recommended for advanced "
@@ -142,6 +69,25 @@ namespace Leap.Unity.Interaction {
       get { return _handAccessorFunc; }
       set { _handAccessorFunc = value; }
     }
+
+    /// <summary>
+    /// A copy of the latest tracked hand data; never null, never warped.
+    /// </summary>
+    private Hand _handData = new Hand();
+
+    /// <summary>
+    /// An unwarped copy of _handData (if unwarping is necessary; otherwise
+    /// identical). Only relevant when using the Leap Graphical Renderer to create
+    /// curved user interfaces.
+    /// </summary>
+    private Hand _unwarpedHandData = new Hand();
+
+    /// <summary>
+    /// Will be null when not tracked, otherwise contains the same data as _handData.
+    /// </summary>
+    private Hand _hand;
+
+    #region Unity Events
 
     protected override void Start() {
       base.Start();
@@ -217,17 +163,71 @@ namespace Leap.Unity.Interaction {
 
     }
 
+    #endregion
+
+    #region General InteractionController Implementation
+
+    /// <summary>
+    /// Gets whether the underlying Leap hand is currently tracked.
+    /// </summary>
+    public override bool isTracked { get { return _hand != null; } }
+
+    /// <summary>
+    /// Gets the last tracked state of the Leap hand.
+    /// 
+    /// Note for those using the Leap Graphical Renderer: If the hand required warping
+    /// due to the nearby presence of an object in warped (curved) space, this will
+    /// return the hand as warped from that object's curved space into the rectilinear
+    /// space containing its colliders. This is only relevant if you are using the Leap
+    /// Graphical Renderer to render curved, interactive objects.
+    /// </summary>
+    public Hand leapHand { get { return _unwarpedHandData; } }
+
+    private bool _lastCustomHandWasLeft = false;
+    /// <summary>
+    /// Gets whether the underlying tracked Leap hand is a left hand.
+    /// </summary>
+    public override bool isLeft {
+      get {
+        switch (handDataMode) {
+          case HandDataMode.PlayerLeft:
+            return true;
+          case HandDataMode.PlayerRight:
+            return false;
+          case HandDataMode.Custom: default:
+            return _lastCustomHandWasLeft;
+        }
+      }
+    }
+
+    /// <summary>
+    /// Gets the velocity of the underlying tracked Leap hand.
+    /// </summary>
+    public override Vector3 velocity {
+      get { return isTracked ? Vector3.zero : leapHand.PalmVelocity.ToVector3(); }
+    }
+
+    /// <summary>
+    /// Gets the controller type of this InteractionControllerBase. InteractionHands
+    /// are Interaction Engine controllers implemented over Leap hands.
+    /// </summary>
+    public override ControllerType controllerType {
+      get { return ControllerType.Hand; }
+    }
+
+    /// <summary>
+    /// Returns this InteractionHand object. This property will be null if the
+    /// InteractionControllerBase is not ControllerType.Hand.
+    /// </summary>
+    public override InteractionHand intHand {
+      get { return this; }
+    }
+
     protected override void onObjectUnregistered(IInteractionBehaviour intObj) {
       grabClassifier.UnregisterInteractionBehaviour(intObj);
     }
 
-    protected override void getColliderBoneTargetPositionRotation(int contactBoneIndex,
-                                                                  out Vector3 targetPosition,
-                                                                  out Quaternion targetRotation) {
-      _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
-                                                     out targetPosition,
-                                                     out targetRotation);
-    }
+    #endregion
 
     #region Hovering Controller Implementation
 
@@ -301,6 +301,14 @@ namespace Leap.Unity.Interaction {
     private delegate void BoneMapFunc(Leap.Hand hand, out Vector3 targetPosition,
                                                       out Quaternion targetRotation);
     private BoneMapFunc[] _handContactBoneMapFunctions;
+
+    protected override void getColliderBoneTargetPositionRotation(int contactBoneIndex,
+                                                                  out Vector3 targetPosition,
+                                                                  out Quaternion targetRotation) {
+      _handContactBoneMapFunctions[contactBoneIndex](_unwarpedHandData,
+                                                     out targetPosition,
+                                                     out targetRotation);
+    }
 
     protected override bool initContact() {
       if (!isTracked) return false;

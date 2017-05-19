@@ -1238,7 +1238,6 @@ namespace Leap.Unity.Interaction {
       _initialLayer = gameObject.layer;
     }
 
-    private Stack<Transform> _toVisit = new Stack<Transform>();
     /// <summary>
     /// Recursively searches the hierarchy of this Interaction object to
     /// find all of the Colliders that are attached to its Rigidbody. These will
@@ -1249,30 +1248,7 @@ namespace Leap.Unity.Interaction {
     /// after its Start() method has been called! (Called automatically on Start().)
     /// </summary>
     public void RefreshInteractionColliders() {
-      _interactionColliders.Clear();
-
-      // Traverse the hierarchy of this object's transform to find
-      // all of its Colliders.
-      _toVisit.Push(this.transform);
-      Transform curT;
-      while (_toVisit.Count > 0) {
-        curT = _toVisit.Pop();
-
-        // Recursively search children and children's children
-        foreach (var child in curT.GetChildren()) {
-          // Ignore children with Rigidbodies of their own; its own Rigidbody
-          // owns its own colliders and the colliders of its children
-          if (child.GetComponent<Rigidbody>() == null) {
-            _toVisit.Push(child);
-          }
-        }
-
-        // Since we'll visit every child, all we need to do is add the colliders
-        // of every transform we visit.
-        foreach (var collider in curT.GetComponents<Collider>()) {
-          _interactionColliders.Add(collider);
-        }
-      }
+      Utils.FindColliders<Collider>(this.gameObject, ref _interactionColliders);
     }
 
     protected void FixedUpdateLayer() {

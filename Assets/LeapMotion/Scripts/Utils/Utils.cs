@@ -430,6 +430,46 @@ namespace Leap.Unity {
       capsule.height = (capsuleSpaceDistToA + capsule.radius) * 2;
     }
 
+    /// <summary>
+    /// Recursively searches the hierarchy of the argument GameObject to find all of the
+    /// Colliders that are attached to the object's Rigidbody (or that _would_ be 
+    /// attached to its Rigidbody if it doesn't have one) and adds them to the provided
+    /// colliders list. Warning: The provided "colliders" List will be cleared before
+    /// use.
+    /// 
+    /// Colliders that are the children of other Rigidbody elements beneath the argument
+    /// object are ignored.
+    /// </summary>
+    public static void FindColliders<T>(GameObject obj, ref List<T> colliders) where T : Collider {
+      colliders.Clear();
+      Stack<Transform> toVisit = Pool<Stack<Transform>>.Spawn();
+
+      // Traverse the hierarchy of this object's transform to find
+      // all of its Colliders.
+      toVisit.Push(obj.transform);
+      Transform curTransform;
+      while (toVisit.Count > 0) {
+        curTransform = toVisit.Pop();
+
+        // Recursively search children and children's children
+        foreach (var child in curTransform.GetChildren()) {
+          // Ignore children with Rigidbodies of their own; its own Rigidbody
+          // owns its own colliders and the colliders of its children
+          if (child.GetComponent<Rigidbody>() == null) {
+            toVisit.Push(child);
+          }
+        }
+
+        // Since we'll visit every child, all we need to do is add the colliders
+        // of every transform we visit.
+        foreach (var collider in curTransform.GetComponents<T>()) {
+          colliders.Add(collider);
+        }
+      }
+
+      Pool<Stack<Transform>>.Recycle(toVisit);
+    }
+
     #endregion
 
     #region Gizmo Utils

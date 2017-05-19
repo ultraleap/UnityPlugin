@@ -130,11 +130,14 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     public float SimulationScale { get { return _scale; } }
 
-    private InteractionController[] _interactionControllers = new InteractionController[2];
+    [SerializeField]
+    private List<InteractionController> _interactionControllers = new List<InteractionController>();
     /// <summary>
-    /// Gets the array of interaction controllers managed by this InteractionManager.
+    /// Gets the list of interaction controllers managed by this InteractionManager.
     /// </summary>
-    public InteractionController[] interactionControllers { get { return _interactionControllers; } }
+    public ReadonlyList<InteractionController> interactionControllers {
+      get { return _interactionControllers; }
+    }
 
     private HashSet<IInteractionBehaviour> _interactionBehaviours = new HashSet<IInteractionBehaviour>();
 
@@ -274,8 +277,9 @@ namespace Leap.Unity.Interaction {
       using (new ProfilerSample("Fixed Update Controllers (General Update)")) {
         // Perform general controller update, for controller collider and point
         // representations.
-        for (int i = 0; i < _interactionControllers.Length; i++) {
-          _interactionControllers[i].FixedUpdateController();
+        foreach (var controller in interactionControllers) {
+          if (!controller.isActiveAndEnabled) continue;
+          controller.FixedUpdateController();
         }
       }
 
@@ -524,7 +528,8 @@ namespace Leap.Unity.Interaction {
 
           intController.NotifyObjectUnregistered(interactionObj);
         }
-        interactionObjectBodies.Remove(interactionObj.rigidbody);      }
+        interactionObjectBodies.Remove(interactionObj.rigidbody);
+      }
       return wasRemovalSuccessful;
     }
 
@@ -537,11 +542,19 @@ namespace Leap.Unity.Interaction {
     #region Internal
 
     private void refreshInteractionHands() {
+      _interactionControllers.Clear();
+
       int handsIdx = 0;
       foreach (var child in this.transform.GetChildren()) {
         InteractionHand intHand = child.GetComponent<InteractionHand>();
         if (intHand != null) {
-          _interactionControllers[handsIdx++] = intHand;
+          if (_interactionControllers.Count == handsIdx) {
+            _interactionControllers.Add(intHand);
+          }
+          else {
+            _interactionControllers[handsIdx] = intHand;
+          }
+          handsIdx++;
         }
         if (handsIdx == 2) break;
       }
@@ -570,6 +583,17 @@ namespace Leap.Unity.Interaction {
       _interactionControllers[1].manager = this;
       _interactionControllers[1].transform.parent = this.transform;
       _interactionControllers[1].intHand.handDataMode = HandDataMode.PlayerRight;
+
+      // TODO: Move me somewhere else.
+      // Scan the Interaction Manager for any other child InteractionController objects
+      // and add them to the interaction controllers list.
+      foreach (Transform child in this.transform.GetChildren()) {
+        InteractionController controller = child.GetComponent<InteractionController>();
+        if (controller is InteractionHand) continue;
+        else {
+          _interactionControllers.Add(controller);
+        }
+      }
     }
 
     protected void generateAutomaticLayers() {
