@@ -1,5 +1,13 @@
-﻿using UnityEngine;
-using Leap.Unity.Interaction.CApi;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
 
 namespace Leap.Unity.Interaction.Testing {
 
@@ -12,16 +20,6 @@ namespace Leap.Unity.Interaction.Testing {
     protected override void OnUnregistered() {
       base.OnUnregistered();
       checkCallback(InteractionCallback.OnUnregister);
-    }
-
-    protected override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
-      base.OnInteractionShapeCreated(instanceHandle);
-      checkCallback(InteractionCallback.OnCreateInstance);
-    }
-
-    protected override void OnInteractionShapeDestroyed() {
-      base.OnInteractionShapeDestroyed();
-      checkCallback(InteractionCallback.OnDestroyInstance);
     }
 
     protected override void OnGraspBegin() {
@@ -42,14 +40,6 @@ namespace Leap.Unity.Interaction.Testing {
     protected override void OnHandRegainedTracking(Hand newHand, int oldId) {
       base.OnHandRegainedTracking(newHand, oldId);
       checkCallback(InteractionCallback.OnResume);
-    }
-
-    protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
-      base.OnRecievedSimulationResults(results);
-
-      if ((results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
-        checkCallback(InteractionCallback.RecieveVelocityResults);
-      }
     }
 
     private float _afterDelayTime;

@@ -1,8 +1,11 @@
-﻿/******************************************************************************\
-* Copyright (C) Leap Motion, Inc. 2011-2014.                                   *
-* Leap Motion proprietary. Licensed under Apache 2.0                           *
-* Available at http://www.apache.org/licenses/LICENSE-2.0.html                 *
-\******************************************************************************/
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
 
 using UnityEditor;
 using UnityEngine;
@@ -11,21 +14,13 @@ using Leap;
 
 namespace Leap.Unity {
   [CustomEditor(typeof(LeapHandController))]
-  public class LeapHandControllerEditor : CustomEditorBase {
+  public class LeapHandControllerEditor : CustomEditorBase<LeapHandController> {
     private const float BOX_RADIUS = 0.45f;
     private const float BOX_WIDTH = 0.965f;
     private const float BOX_DEPTH = 0.6671f;
 
-    private LeapHandController controller;
-
-    protected override void OnEnable() {
-      base.OnEnable();
-
-      controller = target as LeapHandController;
-    }
-
     public void OnSceneGUI() {
-      Vector3 origin = controller.transform.TransformPoint(Vector3.zero);
+      Vector3 origin = target.transform.TransformPoint(Vector3.zero);
 
       Vector3 local_top_left, top_left, local_top_right, top_right,
               local_bottom_left, bottom_left, local_bottom_right, bottom_right;
@@ -50,16 +45,16 @@ namespace Leap.Unity {
 
     private void getLocalGlobalPoint(int x, int y, int z, out Vector3 local, out Vector3 global) {
       local = new Vector3(x * BOX_WIDTH, y * BOX_RADIUS, z * BOX_DEPTH);
-      global = controller.transform.TransformPoint(BOX_RADIUS * local.normalized);
+      global = target.transform.TransformPoint(BOX_RADIUS * local.normalized);
     }
 
     private void drawControllerEdge(Vector3 origin,
                                     Vector3 edge0, Vector3 edge1) {
-      Vector3 right_normal = controller.transform.TransformDirection(Vector3.Cross(edge0, edge1));
+      Vector3 right_normal = target.transform.TransformDirection(Vector3.Cross(edge0, edge1));
       float right_angle = Vector3.Angle(edge0, edge1);
       Handles.DrawWireArc(origin, right_normal,
-                          controller.transform.TransformDirection(edge0),
-                          right_angle, controller.transform.lossyScale.x * BOX_RADIUS);
+                          target.transform.TransformDirection(edge0),
+                          right_angle, target.transform.lossyScale.x * BOX_RADIUS);
     }
 
     private void drawControllerArc(Vector3 origin,
@@ -69,11 +64,11 @@ namespace Leap.Unity {
       Vector3 faceA = Vector3.Lerp(edgeA0, edgeA1, 0.5f);
       Vector3 faceB = Vector3.Lerp(edgeB0, edgeB1, 0.5f);
 
-      Vector3 depth_normal = controller.transform.TransformDirection(direction);
+      Vector3 depth_normal = target.transform.TransformDirection(direction);
       float angle = Vector3.Angle(faceA, faceB);
       Handles.DrawWireArc(origin, depth_normal,
-                          controller.transform.TransformDirection(faceA),
-                          angle, controller.transform.lossyScale.x * BOX_RADIUS);
+                          target.transform.TransformDirection(faceA),
+                          angle, target.transform.lossyScale.x * BOX_RADIUS);
     }
   }
 }

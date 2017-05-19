@@ -1,7 +1,15 @@
-﻿using UnityEngine;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
@@ -20,16 +28,6 @@ namespace Leap.Unity.Interaction {
     /// Gets whether or not the behaviour is currently registered with the manager.
     /// </summary>
     public abstract bool IsRegisteredWithManager { get; }
-
-    /// <summary>
-    /// Gets the handle to the internal shape description.
-    /// </summary>
-    public abstract INTERACTION_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle { get; }
-
-    /// <summary>
-    /// Gets the handle to the internal shape instance.
-    /// </summary>
-    public abstract INTERACTION_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle { get; }
 
     /// <summary>
     /// Returns true if there is at least one hand grasping this object.
@@ -92,35 +90,6 @@ namespace Leap.Unity.Interaction {
     /// Called by InteractionManager after all solving is performed.
     /// </summary>
     public abstract void NotifyPostSolve();
-
-    /// <summary>
-    /// Called by InteractionManager to get the creation info used to create the shape associated with this InteractionBehaviour.
-    /// </summary>
-    /// <param name="createInfo"></param>
-    /// <param name="createTransform"></param>
-    public abstract void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform);
-
-    /// <summary>
-    /// Called by InteractionManager when the interaction shape associated with this InteractionBehaviour
-    /// is created and added to the interaction scene.
-    /// </summary>
-    public abstract void NotifyInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle);
-
-    /// <summary>
-    /// Called by InteractionManager to get the update info needed to update the internal state of the object.
-    /// </summary>
-    public abstract void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform);
-
-    /// <summary>
-    /// Called by InteractionManager when the interaction shape associated with this InteractionBehaviour
-    /// is destroyed and removed from the interaction scene.
-    /// </summary>
-    public abstract void NotifyInteractionShapeDestroyed();
-
-    /// <summary>
-    /// Called by InteractionManager when simulation results are available for this object.
-    /// </summary>
-    public abstract void NotifyRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results);
 
     /// <summary>
     /// Called by InteractionManager when a Hand begins grasping this object.

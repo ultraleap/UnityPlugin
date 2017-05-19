@@ -1,8 +1,15 @@
-﻿
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
 using System;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
@@ -34,15 +41,14 @@ namespace Leap.Unity.Interaction {
   [RequireComponent(typeof(Rigidbody))]
   public partial class InteractionBehaviour : InteractionBehaviourBase {
     protected enum ContactMode {
-      NORMAL = 0,  // Influenced by brushes and not by soft contact.
-      SOFT = 1,    // Influenced by soft contact and not by brushes.  Will not return to NORMAL until no brush or soft contact remains.
-      GRASPED = 2, // Not infuenced by either brushes or soft contact.  Returns to SOFT not NORMAL.
+      NORMAL = 0,  // Influenced by brushes and by soft contact.
+      GRASPED = 1, // Not infuenced by either brushes or soft contact.
     };
 
     [Tooltip("The InteractionMaterial defining interaction behaviors.")]
     [SerializeField]
     protected InteractionMaterial _material;
-
+    
     protected Transform[] _childrenArray;
     protected Rigidbody _rigidbody;
 
@@ -54,8 +60,6 @@ namespace Leap.Unity.Interaction {
     protected float _angularDrag;
 
     // Try to allow brushes to exit gracefully when passing fingers between objects.
-    private const int DISLOCATED_BRUSH_COOLDOWN = 120;
-    protected uint _dislocatedBrushCounter = DISLOCATED_BRUSH_COOLDOWN;
     protected ContactMode _contactMode = ContactMode.NORMAL;
 
     protected bool _recievedVelocityUpdate = false;
@@ -91,11 +95,7 @@ namespace Leap.Unity.Interaction {
       }
       set {
         _isKinematic = value;
-        if (HasShapeInstance) {
-          if (_contactMode != ContactMode.GRASPED) {
-            _rigidbody.isKinematic = value;
-          }
-        } else {
+        if (_contactMode != ContactMode.GRASPED) {
           _rigidbody.isKinematic = value;
         }
       }
@@ -140,9 +140,7 @@ namespace Leap.Unity.Interaction {
       }
       set {
         _useGravity = value;
-        if (!HasShapeInstance) {
-          _rigidbody.useGravity = _useGravity;
-        }
+        _rigidbody.useGravity = _useGravity;
       }
     }
 
@@ -212,7 +210,7 @@ namespace Leap.Unity.Interaction {
       Assert.IsTrue(UntrackedHandCount == 0);
 
       // Ditch this object in the layer that doesn't collide with brushes in case they are still embedded.
-      _contactMode = ContactMode.SOFT;
+      _contactMode = ContactMode.GRASPED;
       updateLayer();
 
       _warper.Dispose();
@@ -224,17 +222,28 @@ namespace Leap.Unity.Interaction {
     protected override void OnPreSolve() {
       base.OnPreSolve();
       _recievedVelocityUpdate = false;
-      
-      ++_dislocatedBrushCounter;
-      _minHandDistance = float.MaxValue;
 
-#if UNITY_EDITOR
       if (_contactMode == ContactMode.GRASPED && UntrackedHandCount == 0 &&
+          _solvedPosition != Vector3.zero &&
           Vector3.Distance(_solvedPosition, _warper.RigidbodyPosition) > _material.ReleaseDistance * _manager.SimulationScale ||
           Quaternion.Angle(_solvedRotation, _warper.RigidbodyRotation) > _material.ReleaseAngle) {
         _manager.ReleaseObject(this);
       }
-#endif
+
+      if(_contactMode != ContactMode.GRASPED) {
+        //Only apply if non-zero to prevent waking up the body
+        if (_accumulatedLinearAcceleration != Vector3.zero) {
+          _rigidbody.velocity += _accumulatedLinearAcceleration * Time.fixedDeltaTime;
+        }
+
+        if (_accumulatedAngularAcceleration != Vector3.zero) {
+          _rigidbody.angularVelocity += _accumulatedAngularAcceleration * Time.fixedDeltaTime;
+        }
+
+        //Reset so we can accumulate for the next frame
+        _accumulatedLinearAcceleration = Vector3.zero;
+        _accumulatedAngularAcceleration = Vector3.zero;
+      }
     }
 
     protected override void OnPostSolve() {
@@ -254,15 +263,6 @@ namespace Leap.Unity.Interaction {
           if (_rigidbody.useGravity != _useGravity) {
             _rigidbody.useGravity = _useGravity;
           }
-
-          //Only apply if non-zero to prevent waking up the body
-          if (_accumulatedLinearAcceleration != Vector3.zero) {
-            _rigidbody.AddForce(_accumulatedLinearAcceleration, ForceMode.Acceleration);
-          }
-
-          if (_accumulatedAngularAcceleration != Vector3.zero) {
-            _rigidbody.AddTorque(_accumulatedAngularAcceleration, ForceMode.Acceleration);
-          }
         }
 
         if (_recievedVelocityUpdate || _minHandDistance <= 0.0f) {
@@ -274,81 +274,8 @@ namespace Leap.Unity.Interaction {
         }
       }
 
-      //Reset so we can accumulate for the next frame
-      _accumulatedLinearAcceleration = Vector3.zero;
-      _accumulatedAngularAcceleration = Vector3.zero;
       _minHandDistance = float.MaxValue;
       _notifiedOfTeleport = false;
-    }
-
-    public override void GetInteractionShapeCreationInfo(out INTERACTION_CREATE_SHAPE_INFO createInfo, out INTERACTION_TRANSFORM createTransform) {
-      createInfo = new INTERACTION_CREATE_SHAPE_INFO();
-      createInfo.shapeFlags = ShapeInfoFlags.None;
-
-      createTransform = getRigidbodyTransform();
-    }
-
-    protected override void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
-      base.OnInteractionShapeCreated(instanceHandle);
-
-      _solvedPosition = _rigidbody.position;
-      _solvedRotation = _rigidbody.rotation;
-
-      updateLayer();
-    }
-
-    protected override void OnInteractionShapeDestroyed() {
-      base.OnInteractionShapeDestroyed();
-      updateContactMode();
-      revertRigidbodyState();
-    }
-
-    public override void GetInteractionShapeUpdateInfo(out INTERACTION_UPDATE_SHAPE_INFO updateInfo, out INTERACTION_TRANSFORM interactionTransform) {
-      updateInfo = new INTERACTION_UPDATE_SHAPE_INFO();
-
-      updateInfo.updateFlags = UpdateInfoFlags.VelocityEnabled;
-      updateInfo.linearVelocity = _rigidbody.velocity.ToCVector();
-      updateInfo.angularVelocity = _rigidbody.angularVelocity.ToCVector();
-
-      if (_isKinematic) {
-        updateInfo.updateFlags |= UpdateInfoFlags.Kinematic;
-      } else {
-        // Generates notifications even when hands are no longer influencing
-        if (_contactMode == ContactMode.SOFT) {
-          updateInfo.updateFlags |= UpdateInfoFlags.SoftContact;
-        }
-
-        // All forms of acceleration.
-        if (_contactMode != ContactMode.GRASPED) {
-          updateInfo.updateFlags |= UpdateInfoFlags.AccelerationEnabled;
-          updateInfo.linearAcceleration = _accumulatedLinearAcceleration.ToCVector();
-          updateInfo.angularAcceleration = _accumulatedAngularAcceleration.ToCVector();
-
-          if (_useGravity) {
-            updateInfo.updateFlags |= UpdateInfoFlags.GravityEnabled;
-          }
-        }
-      }
-
-      interactionTransform = getRigidbodyTransform();
-    }
-
-    protected override void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
-      base.OnRecievedSimulationResults(results);
-
-      // Velocities can propagate even when not able to contact the hand.
-      if (_contactMode != ContactMode.GRASPED && (results.resultFlags & ShapeInstanceResultFlags.Velocities) != 0) {
-        Assert.IsFalse(_isKinematic);
-        _rigidbody.velocity = results.linearVelocity.ToVector3();
-        _rigidbody.angularVelocity = results.angularVelocity.ToVector3();
-        _recievedVelocityUpdate = true;
-      }
-
-      if ((results.resultFlags & ShapeInstanceResultFlags.MaxHand) != 0) {
-        _minHandDistance = results.minHandDistance;
-      }
-
-      updateContactMode();
     }
 
     protected override void OnHandGrasped(Hand hand) {
@@ -396,6 +323,7 @@ namespace Leap.Unity.Interaction {
       base.OnHandReleased(hand);
 
       _controllers.HoldingPoseController.RemoveHand(hand);
+      _solvedPosition = Vector3.zero;
     }
 
     protected override void OnHandLostTracking(Hand oldHand, out float maxSuspensionTime) {
@@ -457,7 +385,6 @@ namespace Leap.Unity.Interaction {
 
       // Transition to soft contact when exiting grasp.  This is because the fingers
       // are probably embedded.
-      _dislocatedBrushCounter = 0;
       updateContactMode();
     }
     #endregion
@@ -465,7 +392,6 @@ namespace Leap.Unity.Interaction {
     #region BRUSH CALLBACKS
 
     public override void NotifyBrushDislocated() {
-      _dislocatedBrushCounter = 0;
       updateContactMode();
     }
 
@@ -528,8 +454,6 @@ namespace Leap.Unity.Interaction {
       ContactMode desiredContactMode = ContactMode.NORMAL;
       if (base.IsBeingGrasped) {
         desiredContactMode = ContactMode.GRASPED;
-      } else if (_dislocatedBrushCounter < DISLOCATED_BRUSH_COOLDOWN || (_contactMode != ContactMode.NORMAL && _minHandDistance <= 0.0f)) {
-        desiredContactMode = ContactMode.SOFT;
       }
 
       if (_contactMode != desiredContactMode) {
@@ -576,21 +500,6 @@ namespace Leap.Unity.Interaction {
       if (_rigidbody.angularDrag != _angularDrag) {
         _rigidbody.angularDrag = _angularDrag;
       }
-    }
-
-    protected INTERACTION_TRANSFORM getRigidbodyTransform() {
-      INTERACTION_TRANSFORM interactionTransform = new INTERACTION_TRANSFORM();
-
-      if (IsBeingGrasped) {
-        interactionTransform.position = _solvedPosition.ToCVector();
-        interactionTransform.rotation = _solvedRotation.ToCQuaternion();
-      } else {
-        interactionTransform.position = _warper.RigidbodyPosition.ToCVector();
-        interactionTransform.rotation = _warper.RigidbodyRotation.ToCQuaternion();
-      }
-
-      interactionTransform.wallTime = Time.fixedTime;
-      return interactionTransform;
     }
     #endregion
   }

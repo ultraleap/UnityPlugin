@@ -1,4 +1,13 @@
-﻿using UnityEngine;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -6,21 +15,25 @@ using System;
 
 namespace Leap.Unity.Attributes {
 
-  public class DisableIf : CombinablePropertyAttribute, IPropertyDisabler {
-    public readonly string propertyName;
+  /// <summary>
+  /// Conditionally disables a property based on the value of another property.  The only condition
+  /// types that are currently supported are bool types, and enum types.  The property has two arguments
+  /// names 'equalTo' and 'notEqualTo'.  Exactly one of them must be specified, like so:
+  /// 
+  /// [DisableIf("myBoolProperty", isEqualTo: true)]
+  /// [DisableIf("myEnumProperty", isNotEqualTo: MyEnum.Value)]
+  /// [DisableIfAny("bool1", "bool2", isEqualTo: false)]
+  /// [DisableIfAll("cond1", "cond2", "cond3", isNotEqualTo: true)]
+  /// </summary>
+  public abstract class DisableIfBase : CombinablePropertyAttribute, IPropertyDisabler {
+    public readonly string[] propertyNames;
     public readonly object testValue;
     public readonly bool disableResult;
+    public readonly bool isAndOperation;
 
-    /// <summary>
-    /// Conditionally disables a property based on the value of another property.  The only condition
-    /// types that are currently supported are bool types, and enum types.  The property has two arguments
-    /// names 'equalTo' and 'notEqualTo'.  Exactly one of them must be specified, like so:
-    /// 
-    /// [DisableIf("myBoolProperty", isEqualTo: true)]
-    /// [DisableIf("myEnumProperty", isNotEqualTo: MyEnum.Value)]
-    /// </summary>
-    public DisableIf(string propertyName, object isEqualTo = null, object isNotEqualTo = null) {
-      this.propertyName = propertyName;
+    public DisableIfBase(object isEqualTo, object isNotEqualTo, bool isAndOperation, params string[] propertyNames) {
+      this.propertyNames = propertyNames;
+      this.isAndOperation = isAndOperation;
 
       if ((isEqualTo != null) == (isNotEqualTo != null)) {
         throw new ArgumentException("Must specify exactly one of 'equalTo' or 'notEqualTo'.");
@@ -41,17 +54,67 @@ namespace Leap.Unity.Attributes {
 
 #if UNITY_EDITOR
     public bool ShouldDisable(SerializedProperty property) {
-      SerializedProperty prop = property.serializedObject.FindProperty(propertyName);
+      foreach (var name in propertyNames) {
+        var prop = property.serializedObject.FindProperty(name);
 
-      if (prop.propertyType == SerializedPropertyType.Boolean) {
-        return (prop.boolValue == (bool)testValue) == disableResult;
-      } else if (prop.propertyType == SerializedPropertyType.Enum) {
-        return (prop.intValue == (int)testValue) == disableResult;
+        bool result = shouldDisable(prop);
+        if (isAndOperation) {
+          if (!result) {
+            return false;
+          }
+        } else {
+          if (result) {
+            return true;
+          }
+        }
+      }
+
+      if (isAndOperation) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    private bool shouldDisable(SerializedProperty property) {
+      if (property.propertyType == SerializedPropertyType.Boolean) {
+        return (property.boolValue == (bool)testValue) == disableResult;
+      } else if (property.propertyType == SerializedPropertyType.Enum) {
+        return (property.intValue == (int)testValue) == disableResult;
       } else {
         Debug.LogError("Can only conditionally disable based on boolean or enum types.");
         return false;
       }
     }
 #endif
+  }
+
+  public class DisableIf : DisableIfBase {
+    public DisableIf(string propertyName, object isEqualTo = null, object isNotEqualTo = null) :
+      base(isEqualTo, isNotEqualTo, true, propertyName) { }
+  }
+
+  public class DisableIfAny : DisableIfBase {
+
+    public DisableIfAny(string propertyName1, string propertyName2, object areEqualTo = null, object areNotEqualTo = null) :
+      base(areEqualTo, areNotEqualTo, false, propertyName1, propertyName2) { }
+
+    public DisableIfAny(string propertyName1, string propertyName2, string propertyName3, object areEqualTo = null, object areNotEqualTo = null) :
+      base(areEqualTo, areNotEqualTo, false, propertyName1, propertyName2, propertyName3) { }
+
+    public DisableIfAny(string propertyName1, string propertyName2, string propertyName3, string propertyName4, object areEqualTo = null, object areNotEqualTo = null) :
+      base(areEqualTo, areNotEqualTo, false, propertyName1, propertyName2, propertyName3, propertyName4) { }
+  }
+
+  public class DisableIfAll : DisableIfBase {
+
+    public DisableIfAll(string propertyName1, string propertyName2, object areEqualTo = null, object areNotEqualTo = null) :
+      base(areEqualTo, areNotEqualTo, true, propertyName1, propertyName2) { }
+
+    public DisableIfAll(string propertyName1, string propertyName2, string propertyName3, object areEqualTo = null, object areNotEqualTo = null) :
+      base(areEqualTo, areNotEqualTo, true, propertyName1, propertyName2, propertyName3) { }
+
+    public DisableIfAll(string propertyName1, string propertyName2, string propertyName3, string propertyName4, object areEqualTo = null, object areNotEqualTo = null) :
+      base(areEqualTo, areNotEqualTo, true, propertyName1, propertyName2, propertyName3, propertyName4) { }
   }
 }

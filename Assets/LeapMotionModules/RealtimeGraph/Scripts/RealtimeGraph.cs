@@ -1,8 +1,19 @@
-﻿using UnityEngine;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Profiling;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Leap.Unity.Query;
 
 namespace Leap.Unity.Graphing {
 
@@ -42,6 +53,9 @@ namespace Leap.Unity.Graphing {
 
     [SerializeField]
     protected string _defaultGraph = "Framerate";
+
+    [SerializeField]
+    protected string[] _unitySamplerNames = new string[0];
 
     [SerializeField]
     protected GraphMode _graphMode = GraphMode.Exclusive;
@@ -120,6 +134,8 @@ namespace Leap.Unity.Graphing {
 
     protected Deque<GraphKey> _keyBuffer = new Deque<GraphKey>();
 
+    protected List<Recorder> _unityRecorders = new List<Recorder>();
+
     //Custom sample timers
     protected long _preCullTicks, _renderTicks, _fixedTicks = -1;
 
@@ -181,6 +197,11 @@ namespace Leap.Unity.Graphing {
 
       _graphRenderer.material.SetTexture("_GraphTexture", _texture);
 
+      _unitySamplerNames.Query().Select(n => {
+        getGraph(n, GraphUnits.Miliseconds);
+        return Recorder.Get(n);
+      }).FillList(_unityRecorders);
+
       _stopwatch.Start();
     }
 
@@ -206,6 +227,11 @@ namespace Leap.Unity.Graphing {
 
       if (_provider != null) {
         AddSample("Tracking Framerate", GraphUnits.Framerate, 1000.0f / _provider.CurrentFrame.CurrentFramesPerSecond);
+      }
+
+      for (int i = 0; i < _unityRecorders.Count; i++) {
+        var recorder = _unityRecorders[i];
+        AddSample(_unitySamplerNames[i], GraphUnits.Miliseconds, recorder.elapsedNanoseconds / 1000000.0f);
       }
 
       if (_currentGraph == null) {
@@ -272,7 +298,15 @@ namespace Leap.Unity.Graphing {
         endOfFrameTicks = newTicks;
 
         AddSample("Render Delta", GraphUnits.Miliseconds, _renderTicks);
-        AddSample("GPU Time", GraphUnits.Miliseconds, UnityEngine.VR.VRStats.gpuTimeLastFrame);
+
+        float gpuTime;
+#if UNITY_5_6_OR_NEWER
+        UnityEngine.VR.VRStats.TryGetGPUTimeLastFrame(out gpuTime);
+#else
+        gpuTime = UnityEngine.VR.VRStats.gpuTimeLastFrame;
+#endif
+
+        AddSample("GPU Time", GraphUnits.Miliseconds, gpuTime);
 
         if (_provider != null) {
           AddSample("Tracking Latency", GraphUnits.Miliseconds, (_provider.GetLeapController().Now() - _provider.CurrentFrame.Timestamp) * 0.001f);

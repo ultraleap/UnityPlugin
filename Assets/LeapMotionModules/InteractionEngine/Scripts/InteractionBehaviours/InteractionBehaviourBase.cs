@@ -1,8 +1,16 @@
-﻿using UnityEngine;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
 using UnityEngine.Assertions;
 using System;
 using System.Collections.Generic;
-using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
@@ -44,12 +52,6 @@ namespace Leap.Unity.Interaction {
     #region INTERNAL FIELDS
     private bool _isRegisteredWithManager = false;
 
-    private bool _hasShapeDescriptionBeenCreated = false;
-    private INTERACTION_SHAPE_DESCRIPTION_HANDLE _shapeDescriptionHandle;
-
-    private bool _hasShapeInstanceHandle = false;
-    private INTERACTION_SHAPE_INSTANCE_HANDLE _shapeInstanceHandle;
-
     private List<int> _graspingIds = new List<int>();
     private List<int> _untrackedIds = new List<int>();
 
@@ -83,36 +85,6 @@ namespace Leap.Unity.Interaction {
     public override bool IsRegisteredWithManager {
       get {
         return _isRegisteredWithManager;
-      }
-    }
-
-    public bool HasShapeInstance {
-      get {
-        return _hasShapeInstanceHandle;
-      }
-    }
-
-    public override INTERACTION_SHAPE_DESCRIPTION_HANDLE ShapeDescriptionHandle {
-      get {
-        if (!_isRegisteredWithManager) {
-          throw new InvalidOperationException("Cannot get Shape Description Handle because the Interaction Object has not yet been registered with an Interaction Manager.");
-        }
-
-        if (!_hasShapeDescriptionBeenCreated) {
-          _shapeDescriptionHandle = GenerateShapeDescriptionHandle();
-          _hasShapeDescriptionBeenCreated = true;
-        }
-        return _shapeDescriptionHandle;
-      }
-    }
-
-    public override INTERACTION_SHAPE_INSTANCE_HANDLE ShapeInstanceHandle {
-      get {
-        if (!_hasShapeInstanceHandle) {
-          throw new InvalidOperationException("Cannot get ShapeInstanceHandle because it has not been assigned.");
-        }
-
-        return _shapeInstanceHandle;
       }
     }
 
@@ -178,12 +150,6 @@ namespace Leap.Unity.Interaction {
         enabled = false;
       }
 
-      if (_hasShapeDescriptionBeenCreated) {
-        _manager.ShapePool.ReturnShape(_shapeDescriptionHandle);
-        _shapeDescriptionHandle = new INTERACTION_SHAPE_DESCRIPTION_HANDLE();
-        _hasShapeDescriptionBeenCreated = false;
-      }
-
       _baseCallGuard.Begin("OnUnregistered");
       OnUnregistered();
       _baseCallGuard.AssertBaseCalled();
@@ -198,24 +164,6 @@ namespace Leap.Unity.Interaction {
     public override sealed void NotifyPostSolve() {
       _baseCallGuard.Begin("OnPostSolve");
       OnPostSolve();
-      _baseCallGuard.AssertBaseCalled();
-    }
-
-    public override sealed void NotifyInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
-      _shapeInstanceHandle = instanceHandle;
-      _hasShapeInstanceHandle = true;
-
-      _baseCallGuard.Begin("OnInteractionShapeCreated");
-      OnInteractionShapeCreated(instanceHandle);
-      _baseCallGuard.AssertBaseCalled();
-    }
-
-    public override sealed void NotifyInteractionShapeDestroyed() {
-      _shapeInstanceHandle = new INTERACTION_SHAPE_INSTANCE_HANDLE();
-      _hasShapeInstanceHandle = false;
-
-      _baseCallGuard.Begin("OnInteractionShapeDestroyed");
-      OnInteractionShapeDestroyed();
       _baseCallGuard.AssertBaseCalled();
     }
 
@@ -304,25 +252,9 @@ namespace Leap.Unity.Interaction {
         _baseCallGuard.AssertBaseCalled();
       }
     }
-
-    public override sealed void NotifyRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
-      _baseCallGuard.Begin("OnRecievedSimulationResults");
-      OnRecievedSimulationResults(results);
-      _baseCallGuard.AssertBaseCalled();
-    }
     #endregion
 
     #region PROTECTED METHODS
-
-    /// <summary>
-    /// This method is called to generate the internal description of the interaction shape.
-    /// The default implementation uses the GetCollision() method of the ShapeDescriptionPool class, which
-    /// accounts for all colliders on this gameObject and its children.
-    /// </summary>
-    /// <returns></returns>
-    protected virtual INTERACTION_SHAPE_DESCRIPTION_HANDLE GenerateShapeDescriptionHandle() {
-      return _manager.ShapePool.GetCollision(gameObject);
-    }
 
     /// <summary>
     /// Called when the behaviour is successfully registered with the manager.
@@ -350,29 +282,6 @@ namespace Leap.Unity.Interaction {
     /// </summary>
     protected virtual void OnPostSolve() {
       _baseCallGuard.NotifyBaseCalled("OnPostSolve");
-    }
-
-    /// <summary>
-    /// Called when the interaction shape associated with this InteractionBehaviour
-    /// is created and added to the interaction scene.
-    /// </summary>
-    protected virtual void OnInteractionShapeCreated(INTERACTION_SHAPE_INSTANCE_HANDLE instanceHandle) {
-      _baseCallGuard.NotifyBaseCalled("OnInteractionShapeCreated");
-    }
-
-    /// <summary>
-    /// Called when the interaction shape associated with this InteractionBehaviour
-    /// is destroyed and removed from the interaction scene.
-    /// </summary>
-    protected virtual void OnInteractionShapeDestroyed() {
-      _baseCallGuard.NotifyBaseCalled("OnInteractionShapeDestroyed");
-    }
-
-    /// <summary>
-    /// Called when simulation results are available for this object.
-    /// </summary>
-    protected virtual void OnRecievedSimulationResults(INTERACTION_SHAPE_INSTANCE_RESULTS results) {
-      _baseCallGuard.NotifyBaseCalled("OnRecievedSimulationResults");
     }
 
     /// <summary>

@@ -1,4 +1,13 @@
-﻿using UnityEngine;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
 using UnityEditor;
 using System.Linq;
 using System.Collections.Generic;
@@ -35,17 +44,12 @@ namespace Leap.Unity.Attributes {
       bool canUseDefaultDrawer = true;
       bool shouldDisable = false;
 
-      Component attachedComponent = null;
-      if (!property.serializedObject.isEditingMultipleObjects) {
-        attachedComponent = property.serializedObject.targetObject as Component;
-      }
-
       RangeAttribute rangeAttribute = fieldInfo.GetCustomAttributes(typeof(RangeAttribute), true).FirstOrDefault() as RangeAttribute;
 
       IFullPropertyDrawer fullPropertyDrawer = null;
       foreach (var a in attributes) {
         a.fieldInfo = fieldInfo;
-        a.component = attachedComponent;
+        a.targets = property.serializedObject.targetObjects;
 
         if (a is IBeforeLabelAdditiveDrawer) {
           EditorGUIUtility.labelWidth -= (a as IBeforeLabelAdditiveDrawer).GetWidth();
@@ -131,6 +135,12 @@ namespace Leap.Unity.Attributes {
           if (a is IPropertyConstrainer) {
             (a as IPropertyConstrainer).ConstrainValue(property);
           }
+        }
+      }
+
+      if (didChange) {
+        foreach (var a in attributes) {
+          a.OnPropertyChanged(property);
         }
       }
 

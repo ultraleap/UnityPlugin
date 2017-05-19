@@ -1,9 +1,18 @@
-﻿using UnityEngine;
-//using UnityTest;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
+using UnityTest;
 
 namespace Leap.Unity.Interaction.Testing {
 
-  public class InteractionTestRunner : MonoBehaviour /*TestRunner*/ {
+  public class InteractionTestRunner : TestRunner {
 
     [SerializeField]
     protected GameObject _testPrefab;
@@ -24,13 +33,11 @@ namespace Leap.Unity.Interaction.Testing {
       Time.timeScale = _timeScale;
     }
 
-    /*
     protected override void FinishTest(TestResult.ResultType result) {
       base.FinishTest(result);
 
       DestroyImmediate(_spawned);
       _spawned = null;
     }
-    */
   }
 }

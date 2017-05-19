@@ -26,7 +26,7 @@
 
     frag_in vert(appdata_img v){
       frag_in o;
-      o.position = mul(UNITY_MATRIX_MVP, v.vertex);
+      o.position = UnityObjectToClipPos(v.vertex);
       o.screenPos = LeapGetWarpedScreenPos(o.position);
       return o;
     }

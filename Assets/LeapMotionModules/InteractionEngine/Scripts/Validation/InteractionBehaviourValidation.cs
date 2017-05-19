@@ -1,4 +1,13 @@
-﻿using UnityEngine.Assertions;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine.Assertions;
 
 namespace Leap.Unity.Interaction {
 
@@ -11,11 +20,6 @@ namespace Leap.Unity.Interaction {
 
       //If being grasped, actual state might be different than shadow state.
       if (IsBeingGrasped) {
-        shouldShadowStateMatch = false;
-      }
-
-      //If in soft contact mode, actual state might be different than shadow state.
-      if (_contactMode == ContactMode.SOFT) {
         shouldShadowStateMatch = false;
       }
 

@@ -1,6 +1,15 @@
-﻿using UnityEngine;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
 using UnityEngine.Assertions;
-//using UnityTest;
+using UnityTest;
 using System;
 using System.Collections;
 #if UNITY_EDITOR
@@ -11,7 +20,7 @@ using Leap.Unity.Attributes;
 
 namespace Leap.Unity.Interaction.Testing {
 
-  public class SadisticTest : MonoBehaviour /*TestComponent*/ {
+  public class SadisticTest : TestComponent {
     public static SadisticTest current;
 
     [Header("Test Settings")]
@@ -65,8 +74,6 @@ namespace Leap.Unity.Interaction.Testing {
       _provider = FindObjectOfType<InteractionTestProvider>();
 
       _manager.MaxActivationDepth = activationDepth;
-      _manager.ShowDebugLines = true;
-      _manager.ShowDebugOutput = true;
       _manager.ContactEnabled = contactEnabled;
       _manager.GraspingEnabled = graspEnabled;
       _manager.UpdateSceneInfo();
@@ -89,7 +96,7 @@ namespace Leap.Unity.Interaction.Testing {
 
     public void ReportCallback(InteractionCallback callback) {
       if ((callback & forbiddenCallbacks) != 0) {
-        //IntegrationTest.Fail("Recieved a forbidden callback " + callback);
+        IntegrationTest.Fail("Recieved a forbidden callback " + callback);
         return;
       }
 
@@ -123,14 +130,14 @@ namespace Leap.Unity.Interaction.Testing {
         _provider.DestroyShapes();
 
         if ((allCallbacksRecieved & expectedCallbacks) == expectedCallbacks) {
-          //IntegrationTest.Pass();
+          IntegrationTest.Pass();
           return;
         }
 
         Debug.LogError(getEnumMessage("Expected callbacks: " + expectedCallbacks, expectedCallbacks));
         Debug.LogError(getEnumMessage("Recieved callbacks: " + allCallbacksRecieved, allCallbacksRecieved));
 
-        //IntegrationTest.Fail("Could not find an interaction behaviour that recieved all expected callbacks");
+        IntegrationTest.Fail("Could not find an interaction behaviour that recieved all expected callbacks");
       }
 #if UNITY_EDITOR
       else {

@@ -1,7 +1,14 @@
-﻿using UnityEngine;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
 using System.Collections.Generic;
-using LeapInternal;
-using Leap.Unity.Interaction.CApi;
 
 namespace Leap.Unity.Interaction {
 
@@ -33,13 +40,16 @@ namespace Leap.Unity.Interaction {
     protected SolveMethod _solveMethod;
 
     protected Dictionary<int, HandPointCollection> _handIdToPoints;
-    protected LEAP_IE_KABSCH _kabsch;
+    KabschSolver _kabsch;
+    List<Vector3> points, refPoints;
+    Vector3 handCentroid, objectCentroid; float boneCount;
 
     protected override void Init(InteractionBehaviour obj) {
       base.Init(obj);
 
       _handIdToPoints = new Dictionary<int, HandPointCollection>();
-      KabschC.Construct(ref _kabsch);
+      _kabsch = new KabschSolver();
+      points = new List<Vector3>(20); refPoints = new List<Vector3>(20);
     }
 
     public override void TransferHandId(int oldId, int newId) {
@@ -76,12 +86,12 @@ namespace Leap.Unity.Interaction {
     }
 
     public override void GetHoldingPose(ReadonlyList<Hand> hands, out Vector3 newPosition, out Quaternion newRotation) {
-      KabschC.Reset(ref _kabsch);
-
+      points.Clear(); refPoints.Clear();
       Vector3 bodyPosition = _obj.warper.RigidbodyPosition;
       Quaternion bodyRotation = _obj.warper.RigidbodyRotation;
       Matrix4x4 it = Matrix4x4.TRS(bodyPosition, bodyRotation, Vector3.one);
 
+      handCentroid = Vector3.zero; objectCentroid = Vector3.zero; boneCount = 0f;
       for (int h = 0; h < hands.Count; h++) {
         Hand hand = hands[h];
 
@@ -99,35 +109,46 @@ namespace Leap.Unity.Interaction {
             Vector3 bonePos = bone.NextJoint.ToVector3();
 
             //Do the solve such that the objects positions are matched to the new bone positions
-            LEAP_VECTOR point1 = (it.MultiplyPoint3x4(localPos) - bodyPosition).ToCVector();
-            LEAP_VECTOR point2 = (bonePos - bodyPosition).ToCVector();
+            Vector3 point1 = (it.MultiplyPoint3x4(localPos) - bodyPosition);
+            Vector3 point2 = (bonePos - bodyPosition);
 
-            KabschC.AddPoint(ref _kabsch, ref point1, ref point2, 1.0f);
+            switch (_solveMethod) {
+              case SolveMethod.SixDegreeSolve:
+                //Set the relevant points in each array
+                points.Add(point1); refPoints.Add(point2);
+                break;
+              case SolveMethod.PivotAroundOrigin:
+                //Calculate the Centroids of the object and hand(s) points
+                objectCentroid += point1;
+                handCentroid += point2;
+                boneCount += 1f;
+                break;
+            }
           }
         }
       }
 
-      performSolve();
+      Matrix4x4 KabschTransform = performSolve(bodyPosition);
 
-      LEAP_VECTOR leapTranslation;
-      LEAP_QUATERNION leapRotation;
-      KabschC.GetTranslation(ref _kabsch, out leapTranslation);
-      KabschC.GetRotation(ref _kabsch, out leapRotation);
-
-      newPosition = bodyPosition + leapTranslation.ToVector3();
-      newRotation = leapRotation.ToQuaternion() * bodyRotation;
+      newPosition = bodyPosition + KabschTransform.GetVector3();
+      newRotation = KabschTransform.GetQuaternion() * bodyRotation;
     }
 
-    protected void performSolve() {
+    
+    protected Matrix4x4 performSolve(Vector3 position) {
       switch (_solveMethod) {
         case SolveMethod.SixDegreeSolve:
-          KabschC.Solve(ref _kabsch);
-          break;
+          return _kabsch.SolveKabsch(points, refPoints);
         case SolveMethod.PivotAroundOrigin:
-          LEAP_VECTOR v = new LEAP_VECTOR();
-          v.x = v.y = v.z = 0;
-          KabschC.SolveWithPivot(ref _kabsch, ref v);
-          break;
+          objectCentroid /= boneCount;
+          handCentroid /= boneCount;
+          if (!objectCentroid.Equals(handCentroid)) {
+            return Matrix4x4.TRS(Vector3.zero, Quaternion.FromToRotation(objectCentroid, handCentroid), Vector3.one);
+          }else {
+            return Matrix4x4.identity;
+          }
+        default:
+          return _kabsch.SolveKabsch(points, refPoints);
       }
     }
 

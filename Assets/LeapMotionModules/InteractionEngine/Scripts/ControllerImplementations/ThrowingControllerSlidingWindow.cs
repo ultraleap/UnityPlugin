@@ -1,7 +1,15 @@
-﻿using UnityEngine;
-using UnityEngine.Assertions;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
 using System.Collections.Generic;
-using System;
+using InteractionEngineUtility;
 
 namespace Leap.Unity.Interaction {
 
@@ -55,7 +63,7 @@ namespace Leap.Unity.Interaction {
       }
     }
 
-    private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>();
+    private Queue<VelocitySample> _velocityQueue = new Queue<VelocitySample>(64);
 
     /** Samples the current velocity and adds it to the rolling average. */
     public override void OnHold(ReadonlyList<Hand> hands) {
@@ -114,7 +122,15 @@ namespace Leap.Unity.Interaction {
       VelocitySample start = VelocitySample.Interpolate(start0, start1, windowStart);
       VelocitySample end = VelocitySample.Interpolate(end0, end1, windowEnd);
 
-      _obj.rigidbody.velocity = PhysicsUtility.ToLinearVelocity(start.position, end.position, _windowLength);
+      Vector3 interpolatedVelocity = PhysicsUtility.ToLinearVelocity(start.position, end.position, _windowLength);
+
+      //If trying to throw the object backwards into the hand
+      Vector3 relativeVelocity = interpolatedVelocity - throwingHand.PalmVelocity.ToVector3();
+      if (Vector3.Dot(relativeVelocity, throwingHand.PalmNormal.ToVector3()) < 0) {
+        interpolatedVelocity -= Vector3.Project(relativeVelocity, throwingHand.PalmNormal.ToVector3());
+      }
+
+      _obj.rigidbody.velocity = interpolatedVelocity;
       _obj.rigidbody.angularVelocity = PhysicsUtility.ToAngularVelocity(start.rotation, end.rotation, _windowLength);
 
       _obj.rigidbody.velocity *= _velocityMultiplierCurve.Evaluate(_obj.rigidbody.velocity.magnitude);

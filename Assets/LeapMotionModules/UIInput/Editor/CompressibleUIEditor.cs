@@ -1,10 +1,20 @@
-﻿using UnityEngine;
+/******************************************************************************
+ * Copyright (C) Leap Motion, Inc. 2011-2017.                                 *
+ * Leap Motion proprietary and  confidential.                                 *
+ *                                                                            *
+ * Use subject to the terms of the Leap Motion SDK Agreement available at     *
+ * https://developer.leapmotion.com/sdk_agreement, or another agreement       *
+ * between Leap Motion and you, your company or other organization.           *
+ ******************************************************************************/
+
+using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
-using System.Collections;
+
 namespace Leap.Unity.InputModule {
+
   [CustomEditor(typeof(CompressibleUI))]
-  public class CompressibleUIEditor : CustomEditorBase {
+  public class CompressibleUIEditor : CustomEditorBase<CompressibleUI> {
     private ReorderableList list;
     protected override void OnEnable() {
       base.OnEnable();
@@ -23,11 +33,10 @@ namespace Leap.Unity.InputModule {
     }
 
     private bool showEventTrigger() {
-      CompressibleUI module = target as CompressibleUI;
       bool showEventTrigger = false;
-      if (module.Layers != null) {
-        for (int i = 0; i < module.Layers.Length; i++) {
-          if (module.Layers[i].TriggerLayerEvent) {
+      if (target.Layers != null) {
+        for (int i = 0; i < target.Layers.Length; i++) {
+          if (target.Layers[i].TriggerLayerEvent) {
             showEventTrigger = true;
           }
         }
