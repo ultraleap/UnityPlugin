@@ -122,14 +122,16 @@ namespace Leap.Unity.Interaction.Internal {
         _lastObjectTouchedAdjustedMass = collision.rigidbody.mass;
         if (interactionObj is InteractionBehaviour) {
           switch ((interactionObj as InteractionBehaviour).contactForceMode) {
-            case InteractionBehaviour.ContactForceMode.Object:
-              _lastObjectTouchedAdjustedMass *= 0.1f;
-              break;
             case InteractionBehaviour.ContactForceMode.UI:
-              _lastObjectTouchedAdjustedMass *= 10f;
+              _lastObjectTouchedAdjustedMass *= 10F;
               break;
-            default:
-              _lastObjectTouchedAdjustedMass *= 0.1f;
+            case InteractionBehaviour.ContactForceMode.Object: default:
+              if (interactionHand != null) {
+                _lastObjectTouchedAdjustedMass *= 0.1F;
+              }
+              else {
+                _lastObjectTouchedAdjustedMass *= 3F;
+              }
               break;
           }
         }

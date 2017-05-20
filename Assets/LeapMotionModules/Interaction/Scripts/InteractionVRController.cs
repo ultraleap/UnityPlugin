@@ -150,8 +150,9 @@ namespace Leap.Unity.Interaction {
     protected override bool initContact() {
       initContactBones();
 
-      _contactBoneParent = new GameObject("VR Controller Contact Bones");
-      _contactBoneParent.transform.parent = this.transform;
+      _contactBoneParent = new GameObject("VR Controller Contact Bones "
+                                        + (isLeft ? "(Left)" : "(Right"));
+      _contactBoneParent.transform.parent = manager.transform;
 
       foreach (var contactBone in _contactBones) {
         contactBone.transform.parent = _contactBoneParent.transform;
@@ -185,7 +186,11 @@ namespace Leap.Unity.Interaction {
           body = capsule.gameObject.AddComponent<Rigidbody>();
         }
 
+        body.freezeRotation = true;
         body.useGravity = false;
+        body.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        body.mass = 1F;
+
         contactBone.interactionController = this;
         contactBone.body = body;
         contactBone.collider = capsule;

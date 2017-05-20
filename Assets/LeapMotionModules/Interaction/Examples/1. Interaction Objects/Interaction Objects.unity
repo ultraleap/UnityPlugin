@@ -848,7 +848,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -1091,6 +1091,11 @@ Prefab:
     - target: {fileID: 4048813689411764, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e, type: 2}
       propertyPath: m_RootOrder
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114804695224471122, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e,
+        type: 2}
+      propertyPath: softContactDislocationFraction
+      value: 0.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 2d3679cbbb1638e4d84497b3eaaf0f1e, type: 2}
@@ -1438,7 +1443,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -1580,7 +1585,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -2109,7 +2114,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -2251,7 +2256,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -2417,15 +2422,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
       propertyPath: m_LocalScale.x
-      value: 0.99995863
+      value: 0.94496095
       objectReference: {fileID: 0}
     - target: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
       propertyPath: m_LocalScale.y
-      value: 0.99995875
+      value: 0.9449611
       objectReference: {fileID: 0}
     - target: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
       propertyPath: m_LocalScale.z
-      value: 0.99995863
+      value: 0.94496095
       objectReference: {fileID: 0}
     - target: {fileID: 4299111203110852, guid: 8998b2da307be7f419e285784a8495a6, type: 2}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -2757,7 +2762,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -3031,7 +3036,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -3173,149 +3178,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
-  defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
-  suspendedColor: {r: 1, g: 0, b: 0, a: 1}
-  hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
-  primaryHoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  pressedColor: {r: 1, g: 1, b: 1, a: 1}
---- !u!1 &458127868
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 5
-  m_Component:
-  - component: {fileID: 458127869}
-  - component: {fileID: 458127875}
-  - component: {fileID: 458127874}
-  - component: {fileID: 458127873}
-  - component: {fileID: 458127872}
-  - component: {fileID: 458127871}
-  - component: {fileID: 458127876}
-  m_Layer: 0
-  m_Name: TESTCUBE
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &458127869
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 458127868}
-  m_LocalRotation: {x: 0.46454108, y: 0.43578628, z: 0.70841694, w: 0.30403537}
-  m_LocalPosition: {x: 0.275, y: 0.120000005, z: 0.031}
-  m_LocalScale: {x: 0.061589997, y: 0.30277005, z: 0.029159999}
-  m_Children: []
-  m_Father: {fileID: 562917531}
-  m_RootOrder: 8
-  m_LocalEulerAnglesHint: {x: -19.570002, y: 78.454, z: 117.51601}
---- !u!114 &458127871
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 458127868}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f10fa40360571247a7ca806d6859557, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _manager: {fileID: 289258607}
-  _ignoreHoverMode: 0
-  _isIgnoringAllHoverState: 0
-  _ignorePrimaryHover: 0
-  _ignoreContact: 1
-  _ignoreGrasping: 1
-  _contactForceMode: 0
-  _allowMultiGrasp: 0
-  _moveObjectWhenGrasped: 1
-  graspedMovementType: 0
-  graspHoldWarpingEnabled__curIgnored: 1
-  _eventTable:
-    _entries: []
---- !u!54 &458127872
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 458127868}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
---- !u!23 &458127873
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 458127868}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_Materials:
-  - {fileID: 2100000, guid: 95c889baf756fd84ba2f1ab36adf3687, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_PreserveUVs: 1
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
---- !u!65 &458127874
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 458127868}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!33 &458127875
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 458127868}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &458127876
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 458127868}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b02e2f8ae628ac4f9faca951fe12db4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -3336,7 +3199,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &486239174
 Transform:
   m_ObjectHideFlags: 0
@@ -3365,7 +3228,7 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   manager: {fileID: 289258607}
-  softContactDisplacementFraction: 3
+  softContactDislocationFraction: 3
   _handDataMode: 0
 --- !u!1 &562917530
 GameObject:
@@ -3400,7 +3263,6 @@ Transform:
   - {fileID: 2048856377}
   - {fileID: 811384330}
   - {fileID: 960290466}
-  - {fileID: 458127869}
   m_Father: {fileID: 134797215}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3618,7 +3480,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -3760,7 +3622,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -4044,7 +3906,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -4186,7 +4048,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -4440,7 +4302,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -4688,7 +4550,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -4917,7 +4779,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -5099,7 +4961,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -5151,7 +5013,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -5384,7 +5246,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -6328,7 +6190,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -6548,7 +6410,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -6603,6 +6465,11 @@ Prefab:
     - target: {fileID: 4945874923476290, guid: c2f432850d1e97944a20cbab04cab188, type: 2}
       propertyPath: m_RootOrder
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114370018576889794, guid: c2f432850d1e97944a20cbab04cab188,
+        type: 2}
+      propertyPath: softContactDislocationFraction
+      value: 0.5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: c2f432850d1e97944a20cbab04cab188, type: 2}
@@ -6743,7 +6610,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -7013,7 +6880,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -7034,7 +6901,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1500539202
 Transform:
   m_ObjectHideFlags: 0
@@ -7063,7 +6930,7 @@ MonoBehaviour:
   _contactEnabled: 1
   _graspingEnabled: 1
   manager: {fileID: 289258607}
-  softContactDisplacementFraction: 3
+  softContactDislocationFraction: 3
   _handDataMode: 1
 --- !u!1 &1574518198
 GameObject:
@@ -7419,7 +7286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -7523,7 +7390,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -7704,7 +7571,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -7846,7 +7713,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -7950,7 +7817,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -8343,7 +8210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}
@@ -8485,7 +8352,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useHover: 1
-  usePrimaryHover: 0
+  usePrimaryHover: 1
   defaultColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   suspendedColor: {r: 1, g: 0, b: 0, a: 1}
   hoverColor: {r: 0.7, g: 0.7, b: 0.7, a: 1}

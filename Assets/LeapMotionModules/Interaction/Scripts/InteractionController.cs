@@ -636,7 +636,7 @@ namespace Leap.Unity.Interaction {
 
     protected const float DEAD_ZONE_FRACTION = 0.1F;
 
-    public float softContactDisplacementFraction = 3.0F;
+    public float softContactDislocationFraction = 3.0F;
 
     private static PhysicMaterial s_defaultContactBoneMaterial;
     protected static PhysicMaterial defaultContactBoneMaterial {
@@ -783,7 +783,7 @@ namespace Leap.Unity.Interaction {
       body.mass = massScale * contactBone._lastObjectTouchedAdjustedMass;
 
       // Potentially enable Soft Contact if our error is too large.
-      if (!_softContactEnabled && errorFraction >= softContactDisplacementFraction
+      if (!_softContactEnabled && errorFraction >= softContactDislocationFraction
           && speed < 1.5F
        /* && boneArrayIndex != NUM_FINGERS * BONES_PER_FINGER */) {
          EnableSoftContact();
@@ -808,7 +808,8 @@ namespace Leap.Unity.Interaction {
 
         Vector3 targetVelocity = delta / Time.fixedDeltaTime;
         float targetVelocityMag = targetVelocity.magnitude;
-        body.velocity = (targetVelocity / targetVelocityMag) * Mathf.Clamp(targetVelocityMag, 0F, 100F);
+        body.velocity = (targetVelocity / targetVelocityMag)
+                      * Mathf.Clamp(targetVelocityMag, 0F, 100F);
       }
     }
 
@@ -842,11 +843,15 @@ namespace Leap.Unity.Interaction {
       }
 
       if (_softContactEnabled) {
-        // Generate contacts.
+        // Generate contacts -- todo
         bool softlyContacting = false;
         for (int i = 0; i < contactBones.Length; i++) {
           Vector3    bonePosition = _boneTargetPositions[i];
           // Quaternion boneRotation = _boneTargetRotations[i];
+
+          // TODO: Next task: Keep track of overlapping collider-trigger<->collidee
+          // relationships and process each of them via individual
+          // PhysicsUtility.generateXContact calls.
 
           // Generate soft contact data based on spheres at each bonePosition
           // of radius softContactBoneRadius.
